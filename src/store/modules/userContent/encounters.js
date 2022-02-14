@@ -455,6 +455,44 @@ const actions = {
     }
   },
 
+   /**
+	 * Updates the override settings for the live initiative screen on an entity
+	 * 
+	 * @param {string} entityId EntityId
+	 * @param {string} key Setting key
+	 * @param {any} value
+	 */
+  async set_entity_setting({ rootGetters, dispatch, commit }, { campaignId, encounterId, entityId, key, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}/settings`, { [key]: value });
+        commit("SET_ENTITY_SETTING", { uid, campaignId, encounterId, entityId, key, value });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Clear the override settings for the live initiative screen on an entity
+	 * 
+	 * @param {string} entityId EntityId
+	 */
+   async clear_entity_settings({ rootGetters, dispatch, commit }, { campaignId, encounterId, entityId }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}`, { settings: null });
+        commit("CLEAR_ENTITY_SETTINGS", { uid, campaignId, encounterId, entityId });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   /**
 	 * Sets reminders on an entity
 	 * 
@@ -513,8 +551,13 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
-        await services.editEncounter(uid, campaignId, encounterId, value);
+        // Search_encounter
+        const search_encounter = convert_encounter(value);
+        search_encounter.entity_count = (value.entities) ? Object.keys(value.entities).length : 0;
+
+        await services.editEncounter(uid, campaignId, encounterId, value, search_encounter);
         commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId, encounter: value });
+        commit("UPDATE_SEARCH_ENCOUNTER", { uid, campaignId, id: encounterId, encounter: search_encounter });
         return;
       } catch(error) {
         throw error;
@@ -549,7 +592,7 @@ const actions = {
    * @param {string} campaignId
    * @param {string} encounterId
    */
-   async reset_encounter({ rootGetters, commit, dispatch }, { campaignId, id}) {
+   async reset_encounter({ rootGetters, dispatch }, { campaignId, id}) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       try {
@@ -586,11 +629,6 @@ const actions = {
         
         // Update the encounter in the store and firebase
         await dispatch("edit_encounter", { uid, campaignId, encounterId: id, value: encounter });
-
-        // Update the search_encounter in the store
-        let search_encounter = convert_encounter(encounter);
-        search_encounter.entity_count = Object.keys(encounter.entities).length;
-        commit("SET_ENCOUNTER", { uid, campaignId, id, encounter: search_encounter });
         return;
       } catch(error) {
         throw error;
@@ -808,6 +846,11 @@ const mutations = {
       Vue.set(state.encounters, campaignId, { [id]: encounter });
     }
   },
+  UPDATE_SEARCH_ENCOUNTER(state, { campaignId, id, encounter }) {
+    if(state.encounters[campaignId] && state.encounters[campaignId][id]) {
+      Vue.set(state.encounters[campaignId], id, encounter);
+    }
+  },
   REMOVE_ENCOUNTER(state, { campaignId, id }) {
     if(state.encounters[campaignId]) {
       Vue.delete(state.encounters[campaignId], id);
@@ -819,7 +862,7 @@ const mutations = {
     }
   },
   SET_ENCOUNTERS(state, { campaignId, encounters }) {
-      Vue.set(state.encounters, campaignId, encounters);
+    Vue.set(state.encounters, campaignId, encounters);
   },
   ADD_ENTITY(state, { uid, campaignId, encounterId, entityId, entity }) { 
     if(state.cached_encounters[uid][campaignId][encounterId].entities) {
@@ -877,7 +920,11 @@ const mutations = {
     }
   },
   SET_ENTITY_METERS(state, { uid, campaignId, encounterId, entityId, type, value}) {
-    Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters, type, value);
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters, type, value);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], "meters", { [type]: value });
+    }
   },
   SET_ENTITY_CONDITION(state, { uid, campaignId, encounterId, entityId, condition, value}) { 
     if(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions) {
@@ -949,6 +996,18 @@ const mutations = {
   },
   UPDATE_REMINDER(state, { uid, campaignId, encounterId, entity, key, property, value }) {
     Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders[key], property, value);
+  },
+  SET_ENTITY_SETTING(state, { uid, campaignId, encounterId, entityId, key, value }) {
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings, key, value);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], "settings", { [key]: value });
+    }
+  },
+  CLEAR_ENTITY_SETTINGS(state, { uid, campaignId, encounterId, entityId }) {
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[entityId]) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], "settings", {});
+    }
   },
   SET_ENCOUNTER_PROP(state, { uid, campaignId, encounterId, property, value, update_search}) {
     if(update_search && state.encounters[campaignId] && state.encounters[campaignId][encounterId]) {

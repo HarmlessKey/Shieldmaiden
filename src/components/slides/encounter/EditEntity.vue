@@ -170,13 +170,13 @@
 				</q-input>
 			</div>
 
-			<!-- Display settings NPC's (Player screen) -->
+			<!-- Display settings NPC's (Live initiative screen) -->
 			<template v-if="!demo && entity.entityType === 'npc'">
 				<hr>
-				<span class="justify-content-between d-flex">
-					<h2 class="mb-0">Display Override</h2>
-					<a @click="clearOverrides()" class="red">
-						<span class="mr-1 small">clear</span>
+				<span class="justify-content-between d-flex items-center">
+					<h2 class="mb-1">Display Override</h2>
+					<a @click="clearOverrides()" class="red btn btn-clear btn-sm">
+						<span class="mr-1 small">Clear</span>
 						<i class="fas fa-broom small"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Clear display overrides
@@ -202,11 +202,11 @@
 						</q-item-section>
 						<q-item-section side>
 							<q-icon 
-								:name="entity_settings && entity_settings[setting.key] !== undefined
-									? displaySetting(index, setting.key, entity_settings[setting.key]).icon 
+								:name="entity.settings && entity.settings[setting.key] !== undefined
+									? displaySetting(index, setting.key, entity.settings[setting.key]).icon 
 									: displaySetting(index, setting.key, undefined).icon" 
-								:class="entity_settings && entity_settings[setting.key] !== undefined
-									? displaySetting(index, setting.key, entity_settings[setting.key]).color 
+								:class="entity.settings && entity.settings[setting.key] !== undefined
+									? displaySetting(index, setting.key, entity.settings[setting.key]).color 
 									: displaySetting(index, setting.key, undefined).color"
 								size="small"
 							/>
@@ -283,7 +283,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 
@@ -299,8 +298,6 @@
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				npcSettings: undefined,
-				entity_settings: undefined,
 				maxHpMod: undefined,
 				tempHp: undefined,
 				ac_bonus: undefined,
@@ -314,34 +311,34 @@
 				],
 				npcsOptions: [
 					{ 
-						key: 'name',
-						entity: 'npc',
-						name: 'Name', 
-						icon: 'fas fa-helmet-battle',
+						key: "name",
+						entity: "npc",
+						name: "Name", 
+						icon: "fas fa-helmet-battle",
 						options: [
-							{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							{ value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green', settings_default: true },
+							{ value: false, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red" },
+							{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green", settings_default: true },
 						]
 					},
 					{ 
-						key: 'health',
-						entity: 'npc',
-						name: 'Health', 
-						icon: 'fas fa-heart',
+						key: "health",
+						entity: "npc",
+						name: "Health", 
+						icon: "fas fa-heart",
 						options: [
-							{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red', settings_default: true },
-							{ value: 'obscured', name: 'Obscured', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
-							{ value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+							{ value: false, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red", settings_default: true },
+							{ value: "obscured", name: "Obscured", action: "Obsc", icon: "fas fa-question-circle", color: "orange" },
+							{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
 						]
 					},
 					{ 
-						key: 'ac',
-						entity: 'npc',
-						name: 'Armor Class', 
-						icon: 'fas fa-shield',
+						key: "ac",
+						entity: "npc",
+						name: "Armor Class", 
+						icon: "fas fa-shield",
 						options: [
-							{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red', settings_default: true },
-							{ value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+							{ value: false, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red", settings_default: true },
+							{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
 						]
 					}
 				],
@@ -349,13 +346,14 @@
 		},
 		computed: {
 			...mapGetters([
-				'entities',
-				'targeted',
+				"entities",
+				"targeted",
+				"userSettings"
 			]),
-			edit_targets: function() {
-				if (this.data !== undefined && this.data.length > 0)
+			edit_targets() {
+				if (this.data !== undefined && this.data.length > 0) {
 					return this.data;
-				
+				}
 				return this.targeted;
 			},
 			entity: {
@@ -382,24 +380,17 @@
 					this.entitySetter = newValue;
 				}
 			},
-		},
-		mounted() {
-			if(!this.demo && this.entity !== undefined) {
-				const npcSettings_ref = db.ref(`settings/${this.userId}/track/npc`);
-				npcSettings_ref.on('value', async (snapshot) => {
-					this.npcSettings = snapshot.val();
-				});
-				const entity_settings_ref = db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}/settings`);
-				entity_settings_ref.on('value', async (snapshot) => {
-					this.entity_settings = snapshot.val();
-				});
-			}
+			npcSettings() {
+				return (this.userSettings && this.userSettings.track) ? this.userSettings.track.npc : undefined;
+			},
 		},
 		methods: {
 			...mapActions([
-				'set_initiative',
-				'edit_entity_prop',
-				'transform_entity'
+				"set_initiative",
+				"edit_entity_prop",
+				"transform_entity",
+				"set_entity_setting",
+				"clear_entity_settings"
 			]),
 			editValue(prop, value) {
 				for(const key of this.edit_targets) {
@@ -414,7 +405,7 @@
 			},
 			setSetting(key, value) {
 				value = (value === undefined) ? null : value;
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}/settings/${key}`).set(value);
+				this.set_entity_setting({ entityId: this.entity.key, key, value });
 			},
 			isActive(key, option) {
 				if (this.entity_settings && this.entity_settings[key] !== undefined) {
@@ -435,7 +426,7 @@
 					return false;
 			},
 			clearOverrides() {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}/settings`).remove();
+				this.clear_entity_settings(this.entity.key);
 			},
 			displaySetting(index, key, value) {
 				const settings_default = this.npcsOptions[index].options.filter(item => {

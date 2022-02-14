@@ -250,7 +250,7 @@ const actions = {
           }
         }
 
-        commit("SET_PLAYER", { id, search_player });
+        commit("UPDATE_SEARCH_PLAYER", { id, search_player });
         commit("SET_CACHED_PLAYER", { uid, id, player });
         return;
       } catch(error) {
@@ -422,6 +422,11 @@ const mutations = {
       Vue.set(state.players, id, search_player);
     } else {
       Vue.set(state, "players", { [id]: search_player });
+    }
+  },
+  UPDATE_SEARCH_PLAYER(state, { id, search_player }) {
+    if(state.players && state.players[id]) {
+      Vue.set(state.players, id, search_player);
     }
   },
   REMOVE_PLAYER(state, id) { 

@@ -9,7 +9,7 @@
 		</a>
 
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(editReminder())">
+			<q-form @submit="handleSubmit(editReminder)">
 				<reminder-form v-model="reminder" :select-options="true" />
 				<button class="btn btn-block" :disabled="!valid">Save</button>
 			</q-form>
@@ -18,14 +18,14 @@
 </template>
 
 <script>
-	import { remindersMixin } from '@/mixins/reminders';
-	import { mapActions } from 'vuex';
-	import ReminderForm from '@/components/ReminderForm';
-	import TargetItem from '@/components/combat/TargetItem.vue';
+	import { remindersMixin } from "@/mixins/reminders";
+	import { mapActions } from "vuex";
+	import ReminderForm from "@/components/ReminderForm";
+	import TargetItem from "@/components/combat/TargetItem.vue";
 
 	export default {
-		name: 'Reminder',
-		props: ['data'],
+		name: "Reminder",
+		props: ["data"],
 		mixins: [remindersMixin],
 		components: {
 			ReminderForm,
@@ -34,13 +34,12 @@
 		data() {
 			return {
 				entity: this.data.entity,
-				key: this.data.key
+				key: this.data.key,
+				reminderSetter: undefined,
+				reminder: {}
 			}
 		},
 		computed: {
-			reminder() {
-				return {...this.entity.reminders[this.key]};
-			},
 			title() {
 				let title = this.reminder.title;
 
@@ -50,26 +49,31 @@
 				return title;
 			}
 		},
+		mounted() {
+			// This has to be done in mounted and can't be a computed,
+			// for some weird reason the copied object is not reactive as computed property
+			this.reminder = {...this.entity.reminders[this.key]};
+		},
 		methods: {
 			...mapActions([
-				'setSlide',
-				'set_targetReminder',
+				"setSlide",
+				"set_targetReminder",
 			]),
 			setValidation(validate) {
 				this.validation = validate;
 			},
 			remove() {
 				this.set_targetReminder({
-					action: 'remove',
+					action: "remove",
 					entity: this.data.entity.key,
 					key: this.data.key,
 				});
 				this.setSlide(false);
 			},
 			editReminder() {
-				delete this.reminder['.key'];
+				delete this.reminder[".key"];
 				this.set_targetReminder({
-					action: 'update',
+					action: "update",
 					entity: this.data.entity.key,
 					key: this.data.key,
 					reminder: this.reminder

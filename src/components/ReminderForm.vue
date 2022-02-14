@@ -156,7 +156,7 @@
 						<q-input 
 							:dark="$store.getters.theme === 'dark'" filled square
 							:label="`Option ${i+1}`"
-							:disable="selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]"
+							:disable="selectOptions && reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i]"
 							type="text" 
 							autocomplete="off" 
 							v-model="reminder.variables[key][i]"
@@ -166,14 +166,14 @@
 						>
 							<div slot="before" v-if="selectOptions">
 								<button class="btn btn-sm bg-neutral-4" @click="setOption(key, reminder.variables[key][i])">
-									<i class="fas fa-check" :class="{ green: reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
+									<i class="fas fa-check" :class="{ green: reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
 								</button>
 							</div>
 							<template slot="append">
 								<q-icon 
 									name="fas fa-trash-alt" 
 									class="red pointer" size="xs" 
-									@click="(selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]) ? null : removeOption(key, i)"
+									@click="(selectOptions && reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i]) ? null : removeOption(key, i)"
 								>
 									<q-tooltip anchor="top middle" self="center middle">
 										Remove option
@@ -192,7 +192,10 @@
 export default {
 	name: "ReminderForm",
 	props: {
-		value: Object,
+		value: {
+			type: Object,
+			required: true
+		},
 		variables: {
 			type: Boolean,
 			default: true
@@ -250,20 +253,20 @@ export default {
 			this.$set(this.reminder, 'color', color);
 		},
 		addVariable() {
-			if(!this.reminder.variables) {
-				this.$set(this.reminder, 'variables', {});
-			}
 			if(this.newVar) {
+				if(!this.reminder.variables) {
+					this.$set(this.reminder, 'variables', {});
+				}
 				this.$set(this.reminder.variables, this.newVar, [""]);
 				this.newVar = undefined;
 			}
+			this.$forceUpdate();
 		},
 		addOption(key) {
 			this.reminder.variables[key].push("");
 			this.$forceUpdate();
 		},
 		removeOption(key, i) {
-			
 			this.$delete(this.reminder.variables[key], i);
 			this.$forceUpdate();
 		},
@@ -278,6 +281,9 @@ export default {
 			this.$forceUpdate();
 		},
 		setOption(key, i) {
+			if(!this.reminder.selectedVars) {
+				this.$set(this.reminder, "selectedVars", {});
+			}
 			this.reminder.selectedVars[key] = i;
 			this.$forceUpdate();
 		}

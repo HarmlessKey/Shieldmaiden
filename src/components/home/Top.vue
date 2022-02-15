@@ -30,13 +30,12 @@
 				<div class="content-box">
 					<div class="text">
 						<template>
-							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
 							<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
 							<h3>The online tool for offline play.</h3>
 						</template>
 
 						<div class="button-container">
-							<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<router-link to="/demo" class="btn btn-lg bg-green">Try Demo Encounter</router-link>
 						</div>
 						
 						<!-- PATREON -->

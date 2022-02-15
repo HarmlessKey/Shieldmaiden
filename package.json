@@ -1,6 +1,6 @@
 {
   "name": "harmlesskey_app",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -16,7 +16,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.5",
     "@quasar/extras": "^1.0.0",
     "animate.css": "^4.1.1",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "core-js": "^2.6.5",
     "firebase": "^8.0.0",
     "lodash": "^4.17.21",

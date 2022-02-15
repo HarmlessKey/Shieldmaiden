@@ -40,8 +40,9 @@
 				<template v-slot:avatar>
 					<q-icon name="info" />
 				</template>
-				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
-				<p>No announcement</p>
+				<h3 class="mb-1">Scheduled maintenance</h3>
+				<p><b>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</b></p>
+				<p>Harmless Key will be unavailable for 1 to 2 hours.</p>
 				<template v-slot:action>
 					<q-btn flat icon="close" @click="closeAnnouncement()" />
 				</template>
@@ -138,7 +139,7 @@
 		return {
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
-			announcementSetter: false,
+			announcementSetter: undefined,
 			announcement_cookie: false,
 			install_cookie: false,
 			broadcast: undefined,

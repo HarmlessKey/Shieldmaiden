@@ -340,7 +340,7 @@
 		async mounted() {
 			await this.get_campaign({ uid: this.userId, id: this.campaignId }).then(result => {
 				const entity = result.players[this.entityKey];
-				this.entity = entity;
+				this.entity = {...entity};
 				this.maxHpMod = entity.maxHpMod;
 				this.advancement = result.advancement;
 			});

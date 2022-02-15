@@ -1,15 +1,9 @@
 <template>
-	<div class="pb-1" ref="entity" :class="{ smallWidth: is_small }">
+	<div class="pb-1" ref="entity" :class="{ smallWidth: is_small }" v-if="!entity.no_linked_npc">
 		<h2>
-			<q-badge v-if="entity.old" label="DEPRECATED" color="red" />
 			{{ entity.name.capitalizeEach() }}
 			<small v-if="entity.source">{{ entity.source }}</small>
 		</h2>
-		<p v-if="entity.old" class="red">
-			Some values might not show, or show incorrectly. 
-			Please update your NPC at the
-			<router-link to="/npcs">NPC's page</router-link>.
-		</p>
 		<i>
 			<template v-if="entity.size">{{ entity.size }}</template>
 			<template v-if="entity.type"> {{ entity.type }}</template>
@@ -289,7 +283,11 @@
 				</template>
 			</div>
 		</div>
-
+		<q-resize-observer @resize="setSize" />
+	</div>
+	<div v-else>
+		There is no monster card for this entity.<br/>
+		It was probably added during the encounter without linking a monster to it.
 	</div>
 </template>
 
@@ -340,7 +338,7 @@
 			},
 			entity() {
 				let entity = JSON.parse(JSON.stringify(this.data));
-				if(entity.entityType === 'npc' && !entity.old && !entity.proficiency) {
+				if(entity.entityType === 'npc' && !entity.no_linked_npc && !entity.proficiency) {
 					entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 				}
 				return entity;
@@ -366,14 +364,14 @@
 			}
 		},
 		methods: {
-			setSize() {
-				let width = this.$refs.entity.clientWidth
+			setSize(size) {
+				let width = size.width
 				let small = 300;
 
 				this.is_small = (width <= small) ? true : false;
 
 				//sets new width on resize
-				this.width = this.$refs.entity.clientWidth;
+				this.width = width;
 			},
 			modifier(score) {
 				var mod = Math.floor((score - 10) / 2)
@@ -414,16 +412,6 @@
 					return item.limit == limit;
 				}).map(item => { return item[1] });
 			},
-		},
-		mounted() {
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.setSize);
-				//Init
-				this.setSize();
-			});
-		},
-		beforeDestroy() {
-			window.removeEventListener('resize', this.setSize);
 		}
 	};
 </script>

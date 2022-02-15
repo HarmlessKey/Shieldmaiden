@@ -3,16 +3,16 @@
 		<div slot="header" :class="cardView ? 'card-header' : 'top-menu'">
 			<div 
 				class="money" 
-				:class="{ red: currency['.value'] >= maxCurrencyAmount }"
+				:class="{ red: currency >= maxCurrencyAmount }"
 				@click="
 					viewerIsUser
 					? setSlide({
 						show: true,
 						type: 'slides/party/Currency',
-						data: { current: currency['.value'] }
+						data: { current: currency }
 					}) : null
 				">
-				<template v-if="currency['.value']">
+				<template v-if="currency">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
 							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>
@@ -85,25 +85,25 @@
 			<div class="col header ac">
 			</div>
 			<div class="col header name"></div>
-			<div class="col header text-center pp" v-if="settings.passive_perception === undefined && !is_small">
+			<div class="col header text-center pp" v-if="userSettings.general && userSettings.general.passive_perception === undefined && !is_small">
 				<i class="fas fa-eye"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive perception
 				</q-tooltip>
 			</div>
-			<div class="col header text-center pinv" v-if="settings.passive_investigation === undefined && !is_small">
+			<div class="col header text-center pinv" v-if="userSettings.general && userSettings.general.passive_investigation === undefined && !is_small">
 				<i class="fas fa-search"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive investigation
 				</q-tooltip>
 			</div>
-			<div class="col header text-center pins" v-if="settings.passive_insight === undefined && !is_medium">
+			<div class="col header text-center pins" v-if="userSettings.general && userSettings.general.passive_insight === undefined && !is_medium">
 				<i class="fas fa-lightbulb-on"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive insight
 				</q-tooltip>
 			</div>
-			<div class="col header text-center save" v-if="settings.save_dc === undefined && !is_medium">
+			<div class="col header text-center save" v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium">
 				<i class="fas fa-hand-holding-magic"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Save DC
@@ -154,28 +154,28 @@
 
 					<div 
 						class="col pp" 
-						v-if="settings.passive_perception === undefined && !is_small"
+						v-if="userSettings.general && userSettings.general.passive_perception === undefined && !is_small"
 						:key="'pp-'+key"
 					>
 						{{ players[key].passive_perception }}
 					</div>
 					<div 
 						class="col pinv" 
-						v-if="settings.passive_investigation === undefined && !is_small"
+						v-if="userSettings.general && userSettings.general.passive_investigation === undefined && !is_small"
 						:key="'pinv-'+key"
 					>
 						{{ players[key].passive_investigation }}
 					</div>
 					<div 
 						class="col pins" 
-						v-if="settings.passive_insight === undefined && !is_medium"
+						v-if="userSettings.general && userSettings.general.passive_insight === undefined && !is_medium"
 						:key="'pins-'+key"
 					>
 						{{ players[key].passive_insight }}
 					</div>
 					<div 
 						class="col save" 
-						v-if="settings.save_dc === undefined && !is_medium"
+						v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
 						:key="'save-'+key"
 					>
 						{{ players[key].spell_save_dc }}
@@ -274,13 +274,12 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
-	import { db } from '@/firebase';
-	import { experience } from '@/mixins/experience.js';
-	import { currencyMixin } from '@/mixins/currency.js';
+	import { mapGetters, mapActions } from "vuex";
+	import { experience } from "@/mixins/experience.js";
+	import { currencyMixin } from "@/mixins/currency.js";
 
 	export default {
-		name: 'Players',
+		name: "Players",
 		props: {
 			userId: {
 				type: String
@@ -288,6 +287,13 @@
 			campaignId: {
 				type: String
 			}, 
+			campaign: {
+				type: Object,
+				required: true
+			},
+			players: {
+				type: Object
+			},
 			cardView: {
 				type: Boolean,
 				default: false
@@ -301,25 +307,12 @@
 				is_medium: false,
 				is_large: false,
 				viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
-				loading: true,
-				players: [],
-				campaign: {},
+				loading: false,
 				isXpAdvancement: false
 			}
 		},
-		firebase() {
-			return {
-				settings: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				},
-				currency: {
-					source: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`),
-					asObject: true
-				}
-			}
-		},
 		computed: {
+			...mapGetters(["userSettings"]),
 			viewerIsUser() {
 				//If the viewer is the user that runs the campaign
 				//Edit functions are enabled
@@ -331,16 +324,16 @@
 			templateColumns() {
 				let templateColumns = 'max-content max-content auto ';
 
-				if(this.settings.passive_perception === undefined && !this.is_small) { 
+				if(this.userSettings.general && this.userSettings.general.passive_perception === undefined && !this.is_small) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.passive_investigation === undefined && !this.is_small) { 
+				if(this.userSettings.general && this.userSettings.general.passive_investigation === undefined && !this.is_small) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.passive_insight === undefined && !this.is_medium) { 
+				if(this.userSettings.general && this.userSettings.general.passive_insight === undefined && !this.is_medium) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.save_dc === undefined && !this.is_medium) {
+				if(this.userSettings.general && this.userSettings.general.save_dc === undefined && !this.is_medium) {
 					templateColumns = templateColumns.concat(' max-content');
 				}
 				if(this.viewerIsUser) {
@@ -360,33 +353,17 @@
 
 				return colspan;
 			},
+			currency() {
+				return (this.campaign.inventory && this.campaign.inventory.currency) ? this.campaign.inventory.currency : {};
+			},
 			money() {
-				return this.copperToPretty(this.currency['.value']);
+				return this.copperToPretty(this.currency);
 			}
 		},
-		async mounted() {
-			await this.get_campaign({
-				uid: this.userId,
-				id: this.campaignId
-			}).then(async campaign => {
-				this.campaign = campaign;
-				this.isXpAdvancement = campaign.advancement !== "milestone";
-
-				const campaignPlayers = {};
-				for(const playerId in campaign.players) {
-					const player = await this.get_player({ uid: this.userId, id: playerId });
-					if(player) {
-						campaignPlayers[playerId] = player;
-					}
-				}
-				this.players = campaignPlayers;
-				this.loading = false;
-			});		
-		},
+		
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("players", ["get_player"]),
-			...mapActions("campaigns", ["get_campaign"]),
+			...mapActions("campaigns", ["update_campaign_entity"]),
 			onResize (size) {
 				let width = size.width;
 				let small = 400;
@@ -408,16 +385,43 @@
 				return parseInt((maxHpMod) ? maxHp + maxHpMod : maxHp);
 			},
 			reset() {
-				for(const [key, player] of Object.entries(this.players)) {
+				for(const [id, player] of Object.entries(this.players)) {
 					if(!player.dead) {
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
-							curHp: player.maxHp,
-							tempHp: 0,
-							maxHpMod: 0
+						this.update_campaign_entity({
+							uid: this.userId,
+							campaignId: this.campaignId,
+							type: "players",
+							id,
+							property: "curHp",
+							value: player.maxHp
 						});
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/transformed`).remove();
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/stable`).remove();
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/saves`).remove();
+						this.update_campaign_entity({
+							uid: this.userId,
+							campaignId: this.campaignId,
+							type: "players",
+							id,
+							property: "tempHp",
+							value: 0
+						});
+						this.update_campaign_entity({
+							uid: this.userId,
+							campaignId: this.campaignId,
+							type: "players",
+							id,
+							property: "maxHpMod",
+							value: 0
+						});
+
+						for(const property of ["transformed", "stable", "saves"]) {
+							this.update_campaign_entity({
+								uid: this.userId,
+								campaignId: this.campaignId,
+								type: "players",
+								id,
+								property,
+								value: null
+							});
+						}
 					}
 				}
 			},
@@ -432,6 +436,7 @@
 			justify-content: space-between;
 			border-bottom: solid 2px $white;
 			padding-bottom: 2px;
+			margin-bottom: 23px;
 
 			.money {
 				text-shadow: 0 0 3px $black;

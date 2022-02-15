@@ -358,15 +358,19 @@ const actions = {
 				// NPC
 				else {
 					//Fetch data from Firebase or API
-					if(entity.npc === 'srd' || entity.npc === 'api') {
-						data_npc = await dispatch("api_monsters/get_monster", entity.id);
-					}
-					else {
-						data_npc = await dispatch("npcs/get_npc", { uid, id: entity.id });
+					if(entity.npc) {
+						if(entity.npc === "custom") {
+							data_npc = await dispatch("npcs/get_npc", { uid, id: entity.id });
+						}
+						else {
+							data_npc = await dispatch("api_monsters/get_monster", entity.id);
+						}
+					} else {
+						entity.no_linked_npc = true;
 					}
 
 					// Values from encounter
-					entity.curHp = db_entity.curHp;
+					entity.curHp = parseInt(db_entity.curHp);
 					entity.tempHp = db_entity.tempHp;
 					entity.maxHpMod = db_entity.maxHpMod;
 					entity.ac_bonus = db_entity.ac_bonus;
@@ -383,7 +387,7 @@ const actions = {
 						entity.transformed = false;
 					}
 					if(!entity.avatar) {
-						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
+						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : "monster";
 					}
 					else {
 						entity.img = entity.avatar;
@@ -394,7 +398,6 @@ const actions = {
 				//without copying an existing
 				//it won't have data_npc
 				if(data_npc) {
-					entity.old = data_npc.old;
 					entity.size = data_npc.size;
 					entity.type = data_npc.type;
 					entity.subtype = data_npc.subtype;

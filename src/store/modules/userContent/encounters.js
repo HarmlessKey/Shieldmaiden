@@ -134,7 +134,7 @@ const actions = {
     if(encounter.entities) {
       for(const [entityId, entity] of Object.entries(encounter.entities)) {
         // REMOVE NON EXISTING NPCs
-        if(entity.entityType === "npc" && entity.npc === "custom") {
+        if(entity.entityType === "npc" && entity.npc === "custom" && entity.id) {
           const npc = await dispatch("npcs/get_npc", { uid, id: entity.id }, { root: true });
           if(!npc) {
             const npc_id = entity.id;

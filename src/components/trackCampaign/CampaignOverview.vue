@@ -3,13 +3,13 @@
 		<div class="players">
 			<h3 class="text-shadow">Campaign Players</h3>
 			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
-				<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
+				<ViewPlayers :userId="userId" :campaignId="$route.params.campid" :campaign="campaign" :players="players" />
 			</q-scroll-area>
 		</div>
 		<div class="side">
 			<h3 class="text-shadow">Campaign wide meters</h3>
 			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
-				<Meters :entities="campaignPlayers" :players="players" :campaign="true" :npcs="{}" />
+				<Meters :entities="campaign.players" :players="players" :campaign="true" :npcs="{}" />
 			</q-scroll-area>
 		</div>
 		<div v-if="live" class="shares-bar" :class="{ shown: showShares }">
@@ -66,10 +66,10 @@
 			class="transparent-bg"
 		>
 			<q-tab-panel name="players">
-				<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
+				<ViewPlayers :userId="userId" :campaignId="$route.params.campid" :campaign="campaign" :players="players" />
 			</q-tab-panel>
 			<q-tab-panel name="meters">
-				<Meters :entities="campaignPlayers" :players="players" :campaign="true" :npcs="{}" />
+				<Meters :entities="campaign.players" :players="players" :campaign="true" :npcs="{}" />
 			</q-tab-panel>
 		</q-tab-panels>
 	</div>
@@ -83,7 +83,7 @@
 		name: "Players",
 		props: [
 			"players", 
-			"campaignPlayers", 
+			"campaign", 
 			"width", 
 			"shares", 
 			"live"

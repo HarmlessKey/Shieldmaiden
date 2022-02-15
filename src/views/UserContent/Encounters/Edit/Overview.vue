@@ -104,7 +104,7 @@
 									:style="{ backgroundImage: 'url(\'' + entity_data[data.row.id].avatar + '\')' }"
 									class="image"
 								>
-									<i v-if="!entity_data[data.row.id].avatar" class="hki-companion" />
+									<i v-if="!data.row.id || !entity_data[data.row.id].avatar" class="hki-companion" />
 								</span>
 
 								<!-- Friendly NPC avatar -->
@@ -112,12 +112,12 @@
 									v-else-if="data.row.entityType === 'npc'"
 									class="image" 
 									:style="{ 
-										backgroundImage: 'url(\'' + (data.row.avatar || entity_data[data.row.id].avatar) + '\')', 
+										backgroundImage: 'url(\'' + (data.row.avatar || (data.row.id && entity_data[data.row.id].avatar)) + '\')', 
 										'border-color': data.row.color_label ? data.row.color_label : ``,
 										'color': data.row.color_label ? data.row.color_label : ``
 									}"
 								>
-									<i v-if="!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar)" class="hki-monster" />
+									<i v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
 								</span>
 							</div>
 
@@ -160,12 +160,12 @@
 								slot-scope="data"
 								class="image" 
 								:style="{ 
-									backgroundImage: 'url(\'' + (data.row.avatar || entity_data[data.row.id].avatar) + '\')', 
+									backgroundImage: 'url(\'' + (data.row.avatar || (data.row.id && entity_data[data.row.id].avatar)) + '\')', 
 									'border-color': data.row.color_label ? data.row.color_label : ``,
 									'color': data.row.color_label ? data.row.color_label : ``
 								}"
 							>
-								<i v-if="!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar)" class="hki-monster" />
+								<i v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
 								
 							</span>
 
@@ -341,7 +341,7 @@
 			async get_entity_data() {
 				const entities = {};
 				if(this.encounter.entities) {
-					for (const [key, entity] of Object.entries(this.encounter.entities)) {
+					for (const [key, entity] of Object.entries(this.encounter.entities)) {					
 						if (entity.id in entities) {
 							continue
 						}

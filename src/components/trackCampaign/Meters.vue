@@ -35,7 +35,7 @@
 								>
 									<div class="info">
 										<span class="name">
-											<Name :entity="entity" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
+											<Name :entity="entity" :players="players" :npcs="npcs" :npcSettings="npcSettings || {}" />
 										</span>
 										<span class="numbers">
 											<span :class="{

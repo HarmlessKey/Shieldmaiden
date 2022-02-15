@@ -25,7 +25,7 @@
 		<h3 class="d-flex justify-content-between mt-3">
 			<span>
 				<i class="far fa-staff"></i> Items
-				<span v-if="items">( {{ Object.keys(items).length }} )</span>
+				<span v-if="encounter.loot">( {{ Object.keys(encounter.loot).length }} )</span>
 			</span>
 			<a class="btn btn-sm bg-neutral-5" @click="addItem()">
 				<i class="fas fa-plus green"></i>
@@ -33,8 +33,8 @@
 			</a>
 		</h3>
 		<hr>
-		<q-list v-if="items" :dark="$store.getters.theme === 'dark'" class="accordion">
-			<ValidationObserver v-for="(item, key) in items" :key="key" v-slot="{ handleSubmit, validate, valid }">
+		<q-list v-if="encounter.loot" :dark="$store.getters.theme === 'dark'" class="accordion">
+			<ValidationObserver v-for="(item, key) in encounter.loot" :key="key" v-slot="{ handleSubmit, validate, valid }">
 				<q-form @submit="valid ? handleSubmit(saveItem(item, key)) : validate()" greedy>
 					<q-expansion-item
 						:dark="$store.getters.theme === 'dark'" switch-toggle-side
@@ -172,9 +172,7 @@
 				user: this.$store.getters.user,
 				slide: this.$store.getters.getSlide,
 				editItem: undefined,
-				currency: this.encounter.currency || {},
-				items: this.encounter.loot || {},
-				linked_items: {}
+				currency: this.encounter.currency || {}
 			} 
 		},
 		methods: {

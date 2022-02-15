@@ -23,7 +23,7 @@
 				</div>
 				
 				<div class="actions">
-					<a @click="setSlide({show: true, type: 'combat/ViewEntity', data: entity })">
+					<a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'combat/ViewEntity', data: entity })">
 						<i class="fas fa-info"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Show info
@@ -162,7 +162,9 @@
 <style lang="scss" scoped>
 	ul.entities li {
 		padding-right: 3px;
+		
 		.actions {
+			align-items: center;
 			padding: 0;
 		}
 	}

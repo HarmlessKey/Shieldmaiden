@@ -4,7 +4,7 @@
 			<div class="container">
 				<hk-video />
 				<div class="content-box">
-					<div class="text">
+					<div class="text" v-if="!maintenance">
 						<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
 						<h3>The online tool for offline play.</h3>
 
@@ -25,6 +25,11 @@
 							</a>
 						</div>
 					</div>
+					<div v-else>
+						<h1>Closed for maintenance</h1>
+						<h3>We expect to back in:</h3>
+						<FlipCountdown :deadline="maintenance" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -33,11 +38,16 @@
 
 <script>
 	import HkVideo from "@/components/hk-components/hk-video";
+	import FlipCountdown from 'vue2-flip-countdown';
 
 	export default {
 		name: 'Top',
+		props: {
+			maintenance: [Boolean, String]
+		},
 		components: {
-			HkVideo
+			HkVideo,
+			FlipCountdown
 		}
 	}
 </script>
@@ -50,7 +60,6 @@
 		min-height: calc(100vh - 50px - 55px);
 		background-color: $neutral-11;
 		overflow: hidden;
-
 		
 		.logo {
 			display: block;

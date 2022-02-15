@@ -1,16 +1,17 @@
 <template>
 	<div id="app" @click="setSideSmallScreen(false)">
 		<div>
-			<nav-main/>
+			<nav-main :maintenance="maintenance" />
 			<PaymentDeclined v-if="user !== null" />
 			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
-			<div :class="{ hasSide: $route.meta.sidebar !== false }">
+			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar />
 				<div class="scrollable-content">
 					<router-view v-if="initialized" />
 					<hk-loader v-else />
 				</div>
 			</div>
+			<Home v-else :maintenance="maintenance" />
 		</div>
 		<transition 
 			enter-active-class="animated animate__slideInRight" 
@@ -85,6 +86,7 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import HkRolls from './components/hk-components/hk-rolls';
 	import { general } from './mixins/general';
+	import Home from "./views/Home"
 
 	export default {
 	name: "App",
@@ -94,7 +96,8 @@
 		Sidebar,
 		Slide,
 		PaymentDeclined,
-		HkRolls
+		HkRolls,
+		Home
 	},
 	metaInfo() {
 		return {
@@ -181,7 +184,8 @@
 			broadcast: undefined,
 			deferredPrompt: null,
 			install_dialog: false,
-			never_show_install: false
+			never_show_install: false,
+			maintenance: false,
 		}
 	},
 	watch: {
@@ -316,5 +320,5 @@
 </script>
 
 <style lang="scss" src="./css/styles.scss">
-
+	
 </style>

@@ -15,7 +15,7 @@
 			</div>
 
 			<div class="d-flex justify-content-end">
-				<div class="area d-flex justify-content-end">
+				<div class="area d-flex justify-content-end" :class="{ 'mr-2': maintenance }">
 					<a class="icon">
 						<i class="fas fa-moon"/>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
@@ -46,7 +46,7 @@
 						</q-tooltip>
 					</a>
 					<a 
-						v-if="user"
+						v-if="user && !maintenance"
 						class="icon"
 						@click="setSlide({show: true, type: 'PlayerLink'})">
 						<i class="fas fa-share-alt"></i>
@@ -62,43 +62,45 @@
 						</q-tooltip>
 					</a>
 				</div>
-				<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
-				<div v-if="user" class="user">
-					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
-					<i v-else class="fas fa-user"></i>
-					<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
-						<div class="bg-neutral-8">
-							<q-list>
-								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
-									<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
-									<q-item-section>Admin</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
-									<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
-									<q-item-section>Contribute</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/profile">
-									<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
-									<q-item-section>Profile</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/content">
-									<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
-									<q-item-section>My content</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/settings">
-									<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
-									<q-item-section>Settings</q-item-section>
-								</q-item>
-								<q-separator />
-								<q-item clickable v-close-popup @click="signOut()">
-									<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
-									<q-item-section>Sign out</q-item-section>
-								</q-item>
-							</q-list>
-						</div>
-					</q-popup-proxy>
-				</div>
-				<router-link v-else to="/sign-in" class="px-2">Sign in</router-link>
+				<template v-if="!maintenance">
+					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
+					<div v-if="user" class="user">
+						<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<i v-else class="fas fa-user"></i>
+						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
+							<div class="bg-neutral-8">
+								<q-list>
+									<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
+										<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
+										<q-item-section>Admin</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
+										<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
+										<q-item-section>Contribute</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/profile">
+										<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
+										<q-item-section>Profile</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/content">
+										<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
+										<q-item-section>My content</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/settings">
+										<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+										<q-item-section>Settings</q-item-section>
+									</q-item>
+									<q-separator />
+									<q-item clickable v-close-popup @click="signOut()">
+										<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
+										<q-item-section>Sign out</q-item-section>
+									</q-item>
+								</q-list>
+							</div>
+						</q-popup-proxy>
+					</div>
+					<router-link v-else to="/sign-in" class="px-2">Sign in</router-link>
+				</template>
 			</div>
 		</div>
 	</header>
@@ -109,6 +111,13 @@
 	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
+		name: "Header",
+		props: {
+			maintenance: {
+				type: [Boolean, String],
+				default: false
+			}
+		},
 		data() {
 			return {
 				user: auth.currentUser,

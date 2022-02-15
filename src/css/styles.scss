@@ -496,10 +496,36 @@ html body {
 		animation: fadeout .3s linear;
 		animation-delay: 2s;
 	}
+
+	.flip-clock {
+		.flip-card {
+			&__top, &__bottom, &__back, &__back-bottom {
+				color: $blue !important;
+
+				&:before {
+					color: $blue !important;
+				}
+			}
+		}
+	}
 	
 	.disabled {
 		cursor: forbidden !important;
 		opacity: .5 !important;
+	}
+
+	.content-count {
+		border: solid 1px $neutral-5;
+		background-color: $neutral-9;
+		padding: 5px 10px;
+		border-radius: 12px;
+		user-select: none;
+		margin-right: 4px;
+
+		.divider {
+			color: $neutral-2;
+			margin: 0 4px;
+		}
 	}
 
 	.invert { filter: invert(1); }
@@ -1250,6 +1276,11 @@ html body {
 		.q-item {
 			background-color: $neutral-9 !important;
 		}
+		.q-field__control {
+			.q-item {
+				background: none !important;
+			}
+		}
 	}
 	table.table, table {
 		border-collapse: separate !important; 
@@ -1366,6 +1397,10 @@ html body {
 		}
 	}
 
+	.target-item-wrapper {
+		border-radius: $border-radius-small;
+		overflow: hidden;
+	}
 	.target-item {
 		display: grid;
 		grid-template-columns: 35px 35px 1fr;
@@ -1373,6 +1408,7 @@ html body {
 		grid-gap: 0;
 		line-height: 35px;
 		user-select: none;
+		border-radius: $border-radius-small;
 	
 		&.hasInitiative {
 			grid-template-columns: 35px 35px 35px 1fr;
@@ -1450,16 +1486,19 @@ html body {
 					}
 				}
 		
-				.hp {
-					text-align: right;
-					cursor: pointer;
-					
-					.current {
-						font-size: 18px;
-						font-weight: bold;
-					}
-					.max, .temp {
-						opacity: .5;
+				.hp {					
+					.health, .temp {
+						text-align: right;
+						cursor: pointer;
+						border-radius: $border-radius-small;
+						font-size: 15px;
+
+						.current {
+							font-weight: bold;
+						}
+						.max {
+							opacity: .8;
+						}
 					}
 					.save {
 						margin-right: 4px;

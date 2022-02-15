@@ -427,7 +427,13 @@
 		<q-dialog v-model="companion_dialog">
 			<hk-card header="Add companion" :min-width="320">
 				<div class="card-body">
-					<CopyContent @copy="add" type="monster" button="plus" custom-only :disabled-custom="npcsAsCompanion" />
+					<CopyContent 
+						@copy="add" 
+						type="monster" 
+						button="plus" 
+						:content="['custom']"
+						:disabled-custom="npcsAsCompanion"
+					/>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -595,7 +601,8 @@
 					companions: this.companions || [],
 					deleted_companions: this.companions_to_delete || []
 				});
-				this.$router.replace("/content/players");
+				if(this.$route.name === "Edit character") this.$router.replace("/content/characters");
+				else this.$router.replace("/content/players");
 			},
 			add({ result, id }) {
 				this.companion_dialog = false;

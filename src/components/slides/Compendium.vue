@@ -11,7 +11,7 @@
 			>
 				<q-tab 
 					v-for="({name, label, icon}, index) in types" 
-					:name="name" 
+					:name="name"
 					:icon="icon" 
 					@click="setType(name)"
 					:key="`tab-${index}`"
@@ -24,24 +24,23 @@
 
 		<template v-if="current">
 			<q-input 
-				:dark="$store.getters.theme === 'dark'" filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square
 				:placeholder="`Search ${current}`"
 				type="text" 
 				class="mb-2"
 				autocomplete="off" 
 				v-model="search"
 				@keyup="searchType()"
+				:error="!!noResult"
+				:error-message="noResult"
 			>
 				<q-icon slot="append" name="fas fa-search" size="xs" class="pointer" @click="searchType()" />
 			</q-input>
 
-			<p v-if="noResult" class="red">{{ noResult }}</p>
-			<p v-if="searching && !noResult && Object.keys(searchResults).length" class="green">{{ Object.keys(searchResults).length }} {{ current }} found</p>
-
 			<!-- SHOW SEARCH RESULTS -->
 			<ul v-if="!show" class="results">
-				<li v-for="(result, index) in searchResults" :key="index">
-					<a @click="showInfo(result['_id'])">
+				<li v-for="(result, index) in searchResults" :key="index" class="truncate">
+					<a @click="show = result['_id']">
 						{{ result.name.capitalizeEach() }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Show info
@@ -52,7 +51,10 @@
 
 			<!-- SHOW SELECTED RESULT -->
 			<div v-if="show">
-				<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">Close</a>
+				<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">
+					<i class="fas fa-times red mr-1" />
+					Close
+				</a>
 				<ViewMonster v-if="current == 'monsters'" :id="show" />
 				<Spell v-if="current == 'spells'" :id="show" />
 				<Condition v-if="current == 'conditions'" :id="show" />
@@ -60,13 +62,13 @@
 			</div>
 
 		</template>
-		<router-link v-else class="btn bg-neutral-5 btn-block" to="/compendium">View entire compendium</router-link>
+		<router-link v-else class="btn bg-neutral-5 mt-3 btn-block" to="/compendium">
+			View entire compendium
+		</router-link>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'
-
 	import ViewMonster from '@/components/compendium/Monster.vue';
 	import Item from '@/components/compendium/Item.vue';
 	import Spell from '@/components/compendium/Spell.vue';
@@ -91,20 +93,15 @@
 				current: undefined,
 				show: undefined,
 				search: '',
-				searching: '',
 				searchResults: [],
 				noResult: '',
 			}
 		},
-		firebase() {
-			return {
-				items: db.ref('items'),
-				spells: db.ref('spells'),
-				conditions: db.ref('conditions'),
-			}
-		},
 		methods: {
 			...mapActions("api_monsters", ["get_monsters"]),
+			...mapActions("api_items", ["get_api_items"]),
+			...mapActions("api_spells", ["get_api_spells"]),
+			...mapActions("api_conditions", ["get_conditions"]),
 			setType(type) {
 				this.show = undefined //clear the previous selected item
 				this.current = type;
@@ -112,44 +109,43 @@
 				//Clear the search
 				this.searchResults = [];
 				this.search = '';
-				this.searching = '';
 			},
-			showInfo(id) {
-				this.show = id;
-			},
-			searchType() {
+			async searchType() {
 				this.show = undefined //clear the previous selected item
 				this.searchResults = [] //clear old search results
 
 				if(this.current === "monsters") {
-					this.searchMonsters();
-				} else {
-					this.searching = true // shows someone is searching
-
-					//loop over all entries
-					for (let i in this[this.current]) {
-						let m = this[this.current][i]
-	
-						//if the name of an entry contains the search words, add it to search results
-						if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-							this.noResult = ''
-							this.searchResults.push(m)
-						}
-					}
-					// If there are no results, show this
-					if(this.searchResults == '' && this.search != '') {
-						this.noResult = 'No results for "' + this.search + '"';
-					}
-					// if someons is not searching anymore
-					if(this.search == '') {
-						this.searching = false
-					}
-				}
-			},
-			async searchMonsters() {
-				if(this.search.length >= 3) {
-					this.searching = true;
 					await this.get_monsters({ query: { search: this.search }}).then(results => {
+						if(results.meta.count === 0) {
+							this.noResult = 'No results for "' + this.search + '"';
+						} else {
+							this.noResult = "";
+							this.searchResults = results.results;
+						}
+					});
+				}
+				if(this.current === "items") {
+					await this.get_api_items({ query: { search: this.search }}).then(results => {
+						if(results.meta.count === 0) {
+							this.noResult = 'No results for "' + this.search + '"';
+						} else {
+							this.noResult = "";
+							this.searchResults = results.results;
+						}
+					});
+				}
+				if(this.current === "spells") {
+					await this.get_api_spells({ query: { search: this.search }}).then(results => {
+						if(results.meta.count === 0) {
+							this.noResult = 'No results for "' + this.search + '"';
+						} else {
+							this.noResult = "";
+							this.searchResults = results.results;
+						}
+					});
+				}
+				if(this.current === "conditions") {
+					await this.get_conditions({ query: { search: this.search }}).then(results => {
 						if(results.meta.count === 0) {
 							this.noResult = 'No results for "' + this.search + '"';
 						} else {
@@ -167,42 +163,16 @@
 	h2 {
 		margin-bottom: 5px !important;
 	}
-	.options {
-		margin: 20px 0;
-
-		a {
-			text-align: center;
-			color: $neutral-2 !important;
-			border-radius: 50%;
-			width: 30px;
-			height: 30px;
-			display: block;
-			font-size: 15px; 
-			line-height: 30px;
-			&:hover {
-				background-color: #494747;
-			}
-			&.active {
-				color: $blue !important;
-			}
-		}
-	}
 	ul.results {
 		list-style: none;
 		padding: 0;
 		
 		li {
-			display: grid;
 			background-color: $neutral-9;
-			grid-template-columns: max-content auto;
 			margin-bottom: 1px;
 			vertical-align: center;
 			line-height: 46px;
 			padding: 0 10px;
-
-			.index {
-				padding-right: 10px;
-			}
 		}
 	}
 </style>

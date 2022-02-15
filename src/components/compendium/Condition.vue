@@ -9,7 +9,7 @@
 		</ul>
 
 		<!-- EXHAUSTION -->
-		<table v-if="condition.value == 'exhaustion'" class="table">
+		<table v-if="condition.name == 'Exhaustion'" class="table">
 			<thead>
 				<th>Level</th>
 				<th>Effect</th>
@@ -25,15 +25,24 @@
 </template>
 
 <script>
+	import { mapActions } from "vuex";
 
 	export default {
-		name: 'Condition',
-		props: [
-			'data'
-		],
+		name: "Condition",
+		props: {
+			// If the condition is fetched in a parent component you can send the full condition object in de data prop
+			data: {
+				type: Object
+			},
+			// If the id prop is passed, the condition is fetched in the Condition component
+			id: {
+				type: String
+			}
+		},
 		data() {
 			return {
-				condition: this.data,
+				condition: {},
+				loading: true,
 				effects: [
 					"Disadvantage on ability checks",
 					"Speed halved",
@@ -43,6 +52,18 @@
 					"Death",
 				]
 			}
+		},
+		async beforeMount() {
+			if(this.data) {
+				this.condition = this.data;		
+				this.loading = false;
+			} else {
+				this.condition = await this.get_condition(this.id);
+				this.loading = false;
+			}			
+		},
+		methods: {
+			...mapActions("api_conditions", ["get_condition"]),
 		}
 	};
 </script>

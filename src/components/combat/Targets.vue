@@ -74,12 +74,39 @@
 								v-shortkey="[i]" @shortkey="set_targeted({ type: 'single', key: entity.key })">
 								<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
 							</div>
+
+							<div v-if="!entity.active" class="d-flex">
+								<a class="btn btn-sm btn-clear mx-1" 
+									v-if="entity.addNextRound"
+									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
+									<i class="fas fa-check green"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Will be added next round
+									</q-tooltip>
+								</a>
+								<a class="btn btn-sm btn-clear mx-1" 
+									v-if="!entity.addNextRound"
+									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
+									<i class="fas fa-check neutral-2"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Click to add next round
+									</q-tooltip>
+								</a>
+								<a class="btn btn-sm bg-neutral-5" 
+									@click="add_next_round({key: entity.key, action: 'set'})">
+									<i class="fas fa-arrow-up"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Add now
+									</q-tooltip>
+								</a>
+							</div>
 							<a class="options">
 								<i class="fal fa-ellipsis-v"></i>
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'" anchor="bottom right" self="top right" :breakpoint="576">
 									<target-menu :entity="entity" />
 								</q-popup-proxy>
 							</a>
+
 						</li>
 					</transition-group>
 				</template>
@@ -180,6 +207,7 @@
 				'set_targeted',
 				'set_stable',
 				'remove_entity',
+				'add_next_round',
 			]),
 			setHidden(key, hidden) {
 				if(key) {
@@ -304,9 +332,14 @@ ul.targets {
 		border: solid 1px transparent;
 		cursor: pointer;
 		background: $neutral-8;
+		border-radius: $border-radius-small;
 
 		&.targeted {
 			border-color: $blue !important;
+		}
+		.target-item-wrapper {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
 		}
 	}
 	&.active_targets li:first-child {

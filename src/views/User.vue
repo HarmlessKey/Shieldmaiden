@@ -1,16 +1,20 @@
 <template>
 <div v-if="!loadingCampaigns">
 	<div class="content" v-if="!$route.params.campid">
-		<div class="d-flex justify-content-between">
-			<span><i class="fas fa-user mr-1"></i> {{ username['.value'] }}</span>
+		<div class="top">
+			<span>
+				<Follow v-if="user"/>
+				{{ username['.value'] }}
+			</span>
 		</div>
-		<hr>
 		<div class="row q-col-gutter-md">		
 			<div class="col-12 col-md-9">		
 				<hk-card>
 					<div slot="header" class="card-header">
-						<span><i class="fas fa-dungeon mr-1"></i> Campaigns</span>
-						<Follow v-if="user"/>
+						<span>
+							<i class="fas fa-dungeon mr-1" />
+							Campaigns
+						</span>
 					</div>
 					<div class="card-body">
 						<!-- CAMPAIGNS -->
@@ -53,7 +57,7 @@
 										</div>
 										
 										<h2 class="truncate" :class="{ 'no-players': !campaign.players }">		
-											{{ campaign.campaign }}
+											{{ campaign.name }}
 										</h2>
 										<div class="d-flex justify-content-center">
 											<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
@@ -143,6 +147,14 @@
 </script>
 
 <style lang="scss" scoped>
+	.top {
+		background-color: $neutral-8;
+		border-radius: $border-radius;
+		padding: 15px;
+		border: solid 1px $neutral-5;
+		margin-bottom: 15px;
+		align-items: center;
+	}
 	.hk-card.campaign {
 		.card-image {
 			display: flex;

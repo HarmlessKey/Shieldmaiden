@@ -1,15 +1,15 @@
 import axios from "axios";
 
-const SPELLS_REF = "/spells";
+const CONDITIONS_REF = "/conditions";
 
-export class spellServices {
-	constructor() {
+export class conditionServices {
+  constructor() {
     this.HK = axios.create({
       baseURL: process.env.VUE_APP_HK_API_ROOT
     });
   }
 
-  async getSpells(pageNumber = 1, pageSize = 15, query, fields=["ALL"], sortBy = "name", descending=false) {
+  async getConditions(pageNumber = 1, pageSize = 15, query, fields=["ALL"], sortBy = "name", descending=false) {
     const skip = (pageNumber - 1)*pageSize;
     const fieldsString = fields.join(" ");
     let params = `?skip=${skip}&limit=${pageSize}&fields=${fieldsString}`;
@@ -23,20 +23,21 @@ export class spellServices {
       
       if(query.search) {
         queryParams.push(`name=${query.search}`);
-      }    
+      }
+
       params += `&${queryParams.join("&")}`;
     }
     
-    return this.HK.get(SPELLS_REF + params).then((response) => {
+    return this.HK.get(CONDITIONS_REF + params).then((response) => {
       return response.data;
     }).catch((error) => {
       throw error;
     });
   }
 
-  async getSpell(id) {
-    console.log(`Spell ${id} fetched from DB`);
-    return this.HK.get(`${SPELLS_REF}/${id}`).then((response) => {
+  async getCondition(id) {
+    console.log(`Condition ${id} fetched from DB`)
+    return this.HK.get(`${CONDITIONS_REF}/${id}`).then((response) => {
       return response.data;
     }).catch((error) => {
       throw error;

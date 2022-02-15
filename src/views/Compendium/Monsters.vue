@@ -130,7 +130,7 @@
 						>
 							<div class="truncate-cell">
 								<div class="truncate">
-									<router-link v-if="col.name === 'name'" :to="`/compendium/monsters/${props.row.url}`">
+									<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
 										{{ col.value }}
 									</router-link>
 									<template v-else>{{ col.value }}</template>
@@ -150,18 +150,14 @@
 </template>
 
 <script>
-	import Crumble from '@/components/crumble/Compendium.vue';
-	import Footer from '@/components/Footer.vue';
-	import ViewMonster from '@/components/compendium/Monster.vue';
-	import { monsterMixin } from '@/mixins/monster.js';
+	import ViewMonster from "@/components/compendium/Monster.vue";
+	import { monsterMixin } from "@/mixins/monster.js";
 	import { mapActions } from "vuex";
 
 	export default {
-		name: 'Monsters',
+		name: "Monsters",
 		mixins: [monsterMixin],
 		components: {
-			Crumble,
-			Footer,
 			ViewMonster
 		},
 		data() {
@@ -172,7 +168,7 @@
 				challenge_rating: [],
 				types: null,
 				pagination: {
-					sortBy: 'name',
+					sortBy: "name",
 					descending: false,
 					page: 1,
 					rowsPerPage: 15,
@@ -265,28 +261,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-.grid {
-	height: calc(100vh - 50px) !important;
-	display: grid;
-	grid-template-columns: auto;
-	grid-template-rows: 3fr 1fr;
-	grid-gap: 0;
-	grid-template-areas: 
-	"container"
-	"footer";
-
-	.container {
-		padding-top: 30px;
-		padding-bottom: 50px;
-		line-height: 25px;
-		font-size: 15px; 
-		font-weight: lighter;
-	}
-}
-.scroll {
-	overflow: hidden;
-}
-
-</style>

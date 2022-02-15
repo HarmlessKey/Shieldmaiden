@@ -3,6 +3,12 @@
 		<template v-if="!loading">
 			<div slot="header" class="card-header">
 				<h1>{{ not_found ? "Item not found" : item.name }}</h1>
+				<hk-share 
+					v-if="!not_found" 
+					:title="item.name" 
+					:text="item.description" 
+					size="sm"
+				/>
 			</div>
 			<div class="card-body">
 				<div v-if="not_found">

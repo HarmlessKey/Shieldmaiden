@@ -103,7 +103,7 @@
 					<ValidationObserver v-slot="{ handleSubmit, valid }">
 						<q-form @submit="handleSubmit(valid ? addReminder('custom') : null)">
 							<reminder-form v-model="customReminder" :variables="false"/>
-							<q-btn color="blue" no-caps type="submit" :disabled="!valid">Set</q-btn>
+							<q-btn color="blue" class="full-width" no-caps type="submit" :disabled="!valid">Set reminder</q-btn>
 						</q-form>
 					</ValidationObserver>
 				</q-tab-panel>
@@ -191,13 +191,14 @@
 				}
 				else if(type === 'custom') {
 					for(const target of this.reminder_targets) {
-						this.set_targetReminder({
+						await this.set_targetReminder({
 							action: 'add',
 							entity: target,
 							type: 'custom',
 							reminder: this.customReminder
 						});
 					}
+					this.tab = "premade";
 					this.customReminder = {};
 				}
 			},

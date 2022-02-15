@@ -2,13 +2,30 @@
 	<hk-card>
 		<template v-if="!loading">
 			<div slot="header" class="card-header">
-				<h1>{{ spell.name }}</h1>
-				<span class="neutral-3">
-					{{ spell.page }}
-				</span>
+				<h1>
+					{{ not_found ? "Spell not found" : spell.name.capitalizeEach() }}
+				</h1>
+				<div>
+					<span class="neutral-3">
+						{{ spell.page }}
+					</span>
+					<hk-share 
+						v-if="!not_found" 
+						:title="spell.name.capitalizeEach()" 
+						:text="spell.description" 
+						size="sm"
+						class="ml-1"
+					/>
+				</div>
 			</div>
 			<div class="card-body">
-				<Spell :data="spell" />
+				<template v-if="not_found">
+					<p>Could not find spell <b>{{ id }}</b></p>
+					<router-link to="/compendium/spells" class="btn bg-neutral-5">
+						Find spells
+					</router-link>
+				</template>
+				<Spell v-else :data="spell" />
 			</div>
 		</template>
 		<hk-loader v-else name="Loading spell" />
@@ -61,34 +78,26 @@
 			return {
 				id: this.$route.params.id,
 				loading: true,
-				spell: {}
-			}
-		},
-		computed: {
-			description() {
-				const maxLength = 160 - (29 + this.spell.name.length);
-				return (this.spell && this.spell.desc) ? `${this.spell.desc.join(" ").substring(0, maxLength).trim()}...` : "";
+				spell: {},
+				not_found: false
 			}
 		},
 		async mounted() {
-			await this.get_spell(this.id).then(spell => {
+			await this.get_api_spell(this.id).then(spell => {
 				const maxLength = 160 - (29 + spell.name.length);
-				spell.description = `${spell.desc.join(" ").substring(0, maxLength).trim()}...`;
+				spell.description = (spell.desc) ? `${spell.desc.join(" ").substring(0, maxLength).trim()}...` : "...";
 
 				this.spell = spell;
+				this.loading = false;
+			}).catch(() => {
+				this.not_found = true;
 				this.loading = false;
 			});
 			// Root emit with the spell name, so it can be used in Crumble component
 			this.$root.$emit('route-name', this.spell.name);
 		},
 		methods: {
-			...mapActions([
-				"get_spell"
-			])
+			...mapActions("api_spells", ["get_api_spell"]),
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-
-</style>

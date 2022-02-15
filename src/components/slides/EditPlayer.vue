@@ -81,174 +81,187 @@
 					<h2>Temporary</h2>
 					<div class="row q-col-gutter-md mb-2">
 						<div class="col">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								label="AC bonus"
-								type="number" 
-								name="ac_bonus" 
-								v-model="entity.ac_bonus"
-								clearable
-							/>
+							<ValidationProvider rules="between:-99,99" name="AC" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="AC bonus"
+									type="number" 
+									name="ac_bonus" 
+									v-model="entity.ac_bonus"
+									clearable
+									no-error-icon
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
 						</div>
 
 						<div class="col">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								label="Temp HP"
-								type="number" 
-								name="tempHp" 
-								v-model="entity.tempHp"
-								clearable
-							/>
+							<ValidationProvider rules="between:0,999" name="Temp HP" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Temp HP"
+									type="number" 
+									name="tempHp" 
+									v-model="entity.tempHp"
+									clearable
+									no-error-icon
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
 						</div>
 
 						<div class="col" v-if="!entity.transformed">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								label="Max HP Mod"
-								type="number" 
-								name="maxHpMod" 
-								v-model="maxHpMod"
-								clearable
-							/>
+							<ValidationProvider rules="between:-999,999" name="Max Hp mod" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Max HP Mod"
+									type="number" 
+									name="maxHpMod" 
+									v-model="maxHpMod"
+									clearable
+									no-error-icon
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
 						</div>
 					</div>
 
-					<template>
-						<hr>
-						<h2 class="mb-0">Override</h2>
-						<div class="row q-col-gutter-md my-2">
-							<div class="col">
-								<ValidationProvider rules="min_value:0|required" name="Current HP" v-slot="{ errors, invalid, validated }">
-									<q-input 
-										v-if="entity.transformed"
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Cur HP"
-										type="number" 
-										class="text-center"
-										min="0"
-										v-model="entity.transformed.curHp"
-										placeholder="Current Hit Points"
-										:error="invalid && validated"
-										:error-message="errors[0]"
-									>
-										<q-icon slot="prepend" name="fas fa-paw-claws green">
-											<q-tooltip anchor="top middle" self="center middle">
-												Transformed
-											</q-tooltip>
-										</q-icon>
-									</q-input>
-									<q-input 
-										v-else
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Cur HP"
-										class="text-center"
-										type="number" 
-										min="0"
-										v-model="entity.curHp"
-										:error="invalid && validated"
-										:error-message="errors[0]"
-									/>
-								</ValidationProvider>
-							</div>
+					<hr>
+					<h2 class="mb-0">Override</h2>
+					<div class="row q-col-gutter-md my-2">
+						<div class="col">
+							<ValidationProvider rules="min_value:0|required" name="Current HP" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									v-if="entity.transformed"
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Cur HP"
+									type="number" 
+									class="text-center"
+									min="0"
+									v-model="entity.transformed.curHp"
+									placeholder="Current Hit Points"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<q-icon slot="prepend" name="fas fa-paw-claws green">
+										<q-tooltip anchor="top middle" self="center middle">
+											Transformed
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<q-input 
+									v-else
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Cur HP"
+									class="text-center"
+									type="number" 
+									min="0"
+									v-model="entity.curHp"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
 
-							<div class="col">
-								<ValidationProvider rules="between:1,9999|required" name="Max HP" v-slot="{ errors, invalid, validated }">
-									<q-input 	
-										v-if="entity.transformed"
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Max HP"	
-										class="text-center"
-										type="number" 
-										min="1"
-										max="9999"
-										v-model="entity.transformed.maxHp"
-										:error="invalid && validated"
-										:error-message="errors[0]"
-									>
-										<q-icon slot="prepend" name="fas fa-paw-claws green">
-											<q-tooltip anchor="top middle" self="center middle">
-												Transformed
-											</q-tooltip>
-										</q-icon>
-									</q-input>
-									<q-input 
-										v-else
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Max HP"
-										class="text-center"
-										type="number" 
-										min="1"
-										max="9999"
-										v-model="playerBase.maxHp"
-										:error="invalid && validated"
-										:error-message="errors[0]"
-									/>
-								</ValidationProvider>
-							</div>
+						<div class="col">
+							<ValidationProvider rules="between:1,9999|required" name="Max HP" v-slot="{ errors, invalid, validated }">
+								<q-input 	
+									v-if="entity.transformed"
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Max HP"	
+									class="text-center"
+									type="number" 
+									min="1"
+									max="9999"
+									v-model="entity.transformed.maxHp"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<q-icon slot="prepend" name="fas fa-paw-claws green">
+										<q-tooltip anchor="top middle" self="center middle">
+											Transformed
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<q-input 
+									v-else
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Max HP"
+									class="text-center"
+									type="number" 
+									min="1"
+									max="9999"
+									v-model="playerBase.maxHp"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
 						</div>
-						<div class="row q-col-gutter-md">
-							<div class="col">
-								<ValidationProvider rules="between:1,99|required" name="Armor class" v-slot="{ errors, invalid, validated }">
-									<q-input 
-										v-if="entity.transformed"
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Armor class"
-										class="text-center"
-										type="number" 
-										min="1"
-										max="99"
-										v-model="entity.transformed.ac"
-										:error="invalid && validated"
-										:error-message="errors[0]"
-									>
-										<q-icon slot="prepend" name="fas fa-paw-claws green">
-											<q-tooltip anchor="top middle" self="center middle">
-												Transformed
-											</q-tooltip>
-										</q-icon>
-									</q-input>
-									<q-input 
-										v-else
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Armor class"
-										class="text-center"
-										type="number" 
-										name="ac" 
-										min="1"
-										max="99"
-										v-model="playerBase.ac"
-										placeholder="Armor Class"
-										:error="invalid && validated"
-										:error-message="errors[0]"
-									/>
-								</ValidationProvider>
-							</div>
-							<div class="col">
-								<ValidationProvider :rules="isXpAdvancement() ? 'numeric|between:1,20' : 'required|numeric|between:1,20'" name="Level" v-slot="{ errors, invalid, validated }">
-									<q-input 
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Level"
-										class="text-center"
-										type="number" 
-										min="1"
-										max="20"
-										v-model="playerBase.level"
-										:clearable="isXpAdvancement()"
-										:error="invalid && validated"
-										:error-message="errors[0]"
-									>
-										<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level  }">
-											{{ calculatedLevel(playerBase.experience) }}
-											<q-tooltip anchor="top left" self="center left">
-												Level based on XP
-											</q-tooltip>
-										</span>
-									</q-input>
-								</ValidationProvider>
-							</div>
+					</div>
+					<div class="row q-col-gutter-md">
+						<div class="col">
+							<ValidationProvider rules="between:1,99|required" name="Armor class" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									v-if="entity.transformed"
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Armor class"
+									class="text-center"
+									type="number" 
+									min="1"
+									max="99"
+									v-model="entity.transformed.ac"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<q-icon slot="prepend" name="fas fa-paw-claws green">
+										<q-tooltip anchor="top middle" self="center middle">
+											Transformed
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<q-input 
+									v-else
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Armor class"
+									class="text-center"
+									type="number" 
+									name="ac" 
+									min="1"
+									max="99"
+									v-model="playerBase.ac"
+									placeholder="Armor Class"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
 						</div>
-					</template>
+						<div class="col">
+							<ValidationProvider :rules="isXpAdvancement() ? 'numeric|between:1,20' : 'required|numeric|between:1,20'" name="Level" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Level"
+									class="text-center"
+									type="number" 
+									min="1"
+									max="20"
+									v-model="playerBase.level"
+									:clearable="isXpAdvancement()"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level  }">
+										{{ calculatedLevel(playerBase.experience) }}
+										<q-tooltip anchor="top left" self="center left">
+											Level based on XP
+										</q-tooltip>
+									</span>
+								</q-input>
+							</ValidationProvider>
+						</div>
+					</div>
 
 					<q-btn no-caps label="Save" class="full-width" color="primary" type="submit" />
 				</q-form>
@@ -460,21 +473,25 @@
 				//Parse to INT
 				this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : 0;
 				this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : 0;
-				this.maxHpMod = (this.maxHpMod) ? parseInt(this.maxHpMod) : 0;
 				this.entity.maxHpMod = (this.entity.maxHpMod) ? parseInt(this.entity.maxHpMod) : 0;
 				this.playerBase.ac = parseInt(this.playerBase.ac);
 				this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
 				this.entity.curHp = parseInt(this.entity.curHp);
+				let maxHpMod = (this.maxHpMod) ? parseInt(this.maxHpMod) : 0;
 
+				// If the MaxHpMod is negative and larger than the maxHp
+				if(maxHpMod < 0 && Math.abs(maxHpMod) > this.playerBase.maxHp) {
+					maxHpMod = -this.playerBase.maxHp;
+				}
 
 				//Modify curHP with maxHpMod
 				if(this.entity.maxHpMod === 0) {
 					//If the there was no current mod
 					//only modify curHp if maxHpMod = positive
-					if(this.maxHpMod > 0) {
-						this.entity.curHp = parseInt(this.entity.curHp + this.maxHpMod);
+					if(maxHpMod > 0) {
+						this.entity.curHp = parseInt(this.entity.curHp + maxHpMod);
 					}
-				} else if(this.maxHpMod === 0) {
+				} else if(maxHpMod === 0) {
 					//if the new mod is 0, check if the old mod was positive
 					//If so, remove it from the curHp
 					if(this.entity.maxHpMod > 0) {
@@ -482,16 +499,16 @@
 					}
 				} else {
 					//If the new mod is positive
-					if(this.maxHpMod > 0) {
+					if(maxHpMod > 0) {
 						//check if the current mod was positive too
 						if(this.entity.maxHpMod > 0) {
 							//if so, first substract current mod, then add new
-							this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod + this.maxHpMod);
+							this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod + maxHpMod);
 						} else {
 							//else only add the new mod
-							this.entity.curHp = parseInt(parseInt(this.entity.curHp) + this.maxHpMod);
+							this.entity.curHp = parseInt(parseInt(this.entity.curHp) + maxHpMod);
 						}
-					} else if(this.maxHpMod < 0) {
+					} else if(maxHpMod < 0) {
 						//if the new mod is negative,
 						//but the current is positive, still substract current
 						if(this.entity.maxHpMod > 0) {
@@ -499,7 +516,7 @@
 						}
 					}
 				}
-				this.entity.maxHpMod = this.maxHpMod;
+				this.entity.maxHpMod = maxHpMod;
 
 				//CurHp can never be > maxHp
 				if(this.entity.curHp > (this.playerBase.maxHp + this.entity.maxHpMod)) {

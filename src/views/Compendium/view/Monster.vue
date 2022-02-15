@@ -6,9 +6,18 @@
 				<h1>
 					{{ not_found ? "Monster not found" : monster.name.capitalizeEach() }}
 				</h1>
-				<span class="neutral-3">
-					{{ monster.source }}
-				</span>
+				<div>
+					<span class="neutral-3">
+						{{ monster.source }}
+					</span>
+					<hk-share 
+						v-if="!not_found" 
+						:title="monster.name.capitalizeEach()" 
+						:text="monster.description" 
+						size="sm"
+						class="ml-1"
+					/>
+				</div>
 			</div>
 			<div v-if="not_found" class="card-body">
 				<p>Could not find monster <b>{{ id }}</b></p>

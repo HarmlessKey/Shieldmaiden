@@ -6,7 +6,7 @@
 	>
 		<template v-if="diceColors.length > 0">
 			<section id="top">
-				<Top />
+				<Top :maintenance="maintenance" />
 				<span 
 					class="die" 
 					:style="{ 
@@ -75,6 +75,9 @@
 
 	export default {
 		name: 'home',
+		props: {
+			maintenance: [Boolean, String]
+		},
 		components: {
 			Top,
 			Overview,
@@ -142,17 +145,6 @@
 		background-position: center;
 		background-repeat: no-repeat;
 		z-index: 97;
-	}
-	.bottom-actions {
-		background: rgba(0, 0, 0, .3);
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		padding: 20px 10px;
-		height: 85px;
-		line-height: 33px;
-		z-index: 97;
-		backdrop-filter: blur(3px);
 	}
 }
 </style>

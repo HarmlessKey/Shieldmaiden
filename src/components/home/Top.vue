@@ -4,12 +4,17 @@
 			<div class="container">
 				<hk-video />
 				<div class="content-box">
-					<div class="text">
+					<div class="text" v-if="!maintenance">
 						<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
 						<h3>The online tool for offline play.</h3>
 
 						<div class="button-container">
-							<router-link v-if="!$store.getters.user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<div v-if="!$store.getters.user">
+								<q-btn to="/demo" color="primary" size="xl" no-caps push>Try demo encounter</q-btn>
+								<div><small>
+									<i class="neutral-4">No download required</i>
+								</small></div>
+							</div>
 							<router-link v-else to="/content" class="btn btn-lg bg-green">My content</router-link>
 						</div>
 						
@@ -20,6 +25,11 @@
 							</a>
 						</div>
 					</div>
+					<div v-else>
+						<h1>Closed for maintenance</h1>
+						<h3>We expect to back in:</h3>
+						<FlipCountdown :deadline="maintenance" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -28,11 +38,16 @@
 
 <script>
 	import HkVideo from "@/components/hk-components/hk-video";
+	import FlipCountdown from 'vue2-flip-countdown';
 
 	export default {
 		name: 'Top',
+		props: {
+			maintenance: [Boolean, String]
+		},
 		components: {
-			HkVideo
+			HkVideo,
+			FlipCountdown
 		}
 	}
 </script>
@@ -45,7 +60,6 @@
 		min-height: calc(100vh - 50px - 55px);
 		background-color: $neutral-11;
 		overflow: hidden;
-
 		
 		.logo {
 			display: block;

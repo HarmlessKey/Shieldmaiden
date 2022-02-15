@@ -1,15 +1,17 @@
 <template>
 	<div class="card-header">
 		<div>
-			{{ type.capitalize() }} ( 
-			<span :class=" 
-				content_count[type] > tier.benefits[type] ? 'red' :
-				content_count[type] == tier.benefits[type] ? 'neutral-2' : 'green'
-			">{{ content_count[type] }}</span> 
-				/ 
+			<span class="content-count">
+				<span
+					:class=" 
+					content_count[type] > tier.benefits[type] ? 'red' :
+					content_count[type] == tier.benefits[type] ? 'neutral-2' : 'green'
+				">{{ content_count[type] }}</span>
+				<span class="divider">/</span> 
 				<i v-if="tier.benefits[type] == 'infinite'" class="far fa-infinity"></i> 
 				<template v-else>{{ tier.benefits[type] }}</template>	
-				)
+			</span>
+			{{ type === "npcs" ? `${type.substring(0, 3).toUpperCase()}s` : type.capitalize() }}
 		</div>
 		<div>
 			<slot name="actions-left" />

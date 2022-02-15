@@ -2,12 +2,11 @@
 	<div id="actions">
 		<template v-if="selectEntity">
 			<p>Action performed by:</p>
+
 			<q-select 
-				:dark="$store.getters.theme === 'dark'" filled square dense
-				name="doneBy"
+				:dark="$store.getters.theme === 'dark'" filled square
 				:value="doneBy"
 				:options="_active"
-				v-validate="'required'"
 			>
 				<template v-slot:selected>
 					<q-item v-if="doneBy" class="selected">
@@ -57,7 +56,6 @@
 					</q-item>
 				</template>
 			</q-select>
-			<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
 
 			<div 
 				v-if="doneBy && entitiesList[doneBy].reminders && entitiesList[doneBy].reminders.reaction"
@@ -150,6 +148,7 @@
 			...mapGetters([
 				'entities',
 				'targeted',
+				'userSettings'
 			]),
 			_active: function() {
 				let active = _.chain(this.entities)
@@ -203,7 +202,7 @@
 					const tab = (
 						(this.current && (this.current.entityType === 'player' || 
 						this.current.entityType === 'companion')) || 
-						this.settings.npcDamageTab
+						this.userSettings.npcDamageTab
 					) ? "manual" : "roll";
 
 					return (this.tabSetter) ? this.tabSetter : tab;

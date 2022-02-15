@@ -134,7 +134,6 @@ export const remindersMixin = {
 					},
 				]
 			} else {
-				console.log(target.reminders[key])
 				notify = target.reminders[key].notify !== undefined ? target.reminders[key].notify : 'Reminder removed';
 				buttons = '';
 			}

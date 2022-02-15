@@ -371,6 +371,7 @@ const actions = {
 					entity.maxHpMod = db_entity.maxHpMod;
 					entity.ac_bonus = db_entity.ac_bonus;
 					entity.maxHp = (entity.maxHpMod) ? parseInt(db_entity.maxHp + entity.maxHpMod) : parseInt(db_entity.maxHp);
+					entity.settings = db_entity.settings;
 
 					if(db_entity.transformed) {
 						entity.transformed = true;
@@ -466,6 +467,44 @@ const actions = {
 			}
 		}
 		commit("ADD_ENTITY", { key, entity })		
+	},
+
+	/**
+	 * Adds an NPC during an encounter
+	 * 
+	 * @param {object} npc
+	 */
+	async add_npc({ state, dispatch }, npc) {
+		if(!state.demo) {
+			const id = await dispatch("encounters/add_npc_encounter", {
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				npc
+			}, { root: true });
+			await dispatch("add_entity", id);
+		} else {
+			await dispatch("add_entity_demo", npc);
+		}
+	},
+
+	/**
+	 * Adds a player or companion during an encounter
+	 * 
+	 * @param {id} id
+	 * @param {object} entity player or companion object
+	 */
+	async add_player({ state, dispatch }, { id, entity }) {
+		if(!state.demo) {
+			await dispatch("encounters/add_player_encounter", {
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				playerId: id,
+				player: entity
+			}, { root: true });
+			await dispatch("add_entity", id);
+		} else {
+			await dispatch("add_entity_demo", entity);
+		}
 	},
 
 	/**
@@ -1215,6 +1254,44 @@ const actions = {
 	},
 
 	/**
+	 * Sets the override settings of an entity for the live initiative screen
+	 * 
+	 * @param {string} entityId Entity key
+	 * @param {object} key Setting
+	 * @param {any} value
+	 */
+	async set_entity_setting({ state, rootGetters, commit, dispatch }, { entityId, key, value }) {
+		if(!state.demo)  {
+			await dispatch("encounters/set_entity_setting", {
+				uid: rootGetters.user.uid,
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId,
+				key,
+				value
+				}, { root: true });
+		}
+		commit("SET_ENTITY_SETTING", { entityId, key, value });
+	},
+
+	/**
+	 * Clears the override settings of an entity for the live initiative screen
+	 * 
+	 * @param {string} entityId Entity key
+	 */
+	async clear_entity_settings({ state, rootGetters, commit, dispatch }, entityId) {
+		if(!state.demo)  {
+			await dispatch("encounters/clear_entity_settings", {
+				uid: rootGetters.user.uid,
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId
+				}, { root: true });
+		}
+		commit("CLEAR_ENTITY_SETTINGS", entityId);
+	},
+
+	/**
 	 * Transform an entity so it has different HP and AC
 	 * 
 	 * @param {string} key Entity key
@@ -1569,6 +1646,13 @@ const mutations = {
 	SET_LIMITED_USES(state, {key, category, index, value}) {
 		if(!state.entities[key].limited_uses[category]) Vue.set(state.entities[key].limited_uses, category, {});
 		Vue.set(state.entities[key].limited_uses[category], index, value);
+	},
+	SET_ENTITY_SETTING(state, { entityId, key, value}) {
+		if(!state.entities[entityId].settings) Vue.set(state.entities[entityId], "settings", {});
+		Vue.set(state.entities[entityId].settings, key, value);
+	},
+	CLEAR_ENTITY_SETTINGS(state, entityId) {
+		Vue.set(state.entities[entityId], "settings", {});
 	},
 	REMOVE_LIMITED_USES(state, {key, category, index}) { Vue.delete(state.entities[key].limited_uses[category], index); },
 	

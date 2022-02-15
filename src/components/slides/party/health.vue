@@ -1,12 +1,11 @@
 <template>
 	<div>
 		<h2>Health Modifiers</h2>
-
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(setHpModifiers)">
 				<div class="row q-col-gutter-md">
 					<div class="col">
-						<ValidationProvider rules="between:1,999" name="Temp HP" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:0,999" name="Temp HP" v-slot="{ errors, invalid, validated }">
 						<q-input 
 							:dark="$store.getters.theme === 'dark'" filled square
 							label="Temporary HP"
@@ -127,19 +126,24 @@
 					}
 				}
 				if(this.maxHpMod !== undefined) {
-					this.maxHpMod = parseInt(this.maxHpMod);
 					for(const key of this.setFor) {
+						let maxHpMod = parseInt(this.maxHpMod);
 						const player = this.players[key];
-						let entity = this.campaign.players[key];
+						let entity = {...this.campaign.players[key]};
+
+						// If the MaxHpMod is negative and larger than the maxHp
+						if(maxHpMod < 0 && Math.abs(maxHpMod) > player.maxHp) {
+							maxHpMod = -player.maxHp;
+						}
 
 						//Modify curHP with maxHpMod
 						if(entity.maxHpMod === 0) {
 							//If there was no current mod
 							//only modify curHp if maxHpMod = positive
-							if(this.maxHpMod > 0) {
-								entity.curHp = parseInt(parseInt(entity.curHp) + this.maxHpMod);
+							if(maxHpMod > 0) {
+								entity.curHp = parseInt(parseInt(entity.curHp) + maxHpMod);
 							}
-						} else if(this.maxHpMod === 0) {
+						} else if(maxHpMod === 0) {
 							//if the new mod is 0, check if the old mod was positive
 							//If so, remove it from the curHp
 							if(entity.maxHpMod > 0) {
@@ -147,16 +151,16 @@
 							}
 						} else {
 							//If the new mod is positive
-							if(this.maxHpMod > 0) {
+							if(maxHpMod > 0) {
 								//check if the current mod was positive to 0
 								if(entity.maxHpMod > 0) {
 									//if so, first substract current mod, then add new
-									entity.curHp = parseInt(parseInt(entity.curHp) - entity.maxHpMod + this.maxHpMod);
+									entity.curHp = parseInt(parseInt(entity.curHp) - entity.maxHpMod + maxHpMod);
 								} else {
 									//else only add the new mod
-									entity.curHp = parseInt(parseInt(entity.curHp) + this.maxHpMod);
+									entity.curHp = parseInt(parseInt(entity.curHp) + maxHpMod);
 								}
-							} else if(this.maxHpMod < 0) {
+							} else if(maxHpMod < 0) {
 								//if the new mod is negative,
 								//but the current is positive, still substract current
 								if(entity.maxHpMod > 0) {
@@ -164,7 +168,7 @@
 								}
 							}
 						}
-						entity.maxHpMod = this.maxHpMod; //to store new in firebase
+						entity.maxHpMod = maxHpMod; //to store new in firebase
 
 						//CurHp can never be > maxHp
 						if(entity.curHp > (player.maxHp + entity.maxHpMod)) {

@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<div class="share" :class="{ small: is_small }" ref="share">
+		<div class="share" :class="{ small: is_small }">
 			<div class="qr-wrapper" v-if="qr">
-				<vue-qr class="qr" :text="copy" qid="testid" :size="110" colorLight="true" :margin="5"></vue-qr>
+				<vue-qr class="qr" :text="url" qid="testid" :size="110" colorLight="true" :margin="5" />
 			</div>
 			<div>
 				<h2 v-if="title" class="mb-2">Share live initiative list</h2>
@@ -11,28 +11,24 @@
 				</p>
 				<q-input
 					:dark="$store.getters.theme === 'dark'" filled square
-					:value="copy"
+					:value="url"
 					autocomplete="off"
 					type="text"
 				>
-					<q-icon v-if="!share_available" slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
-						<q-tooltip anchor="top middle" self="center middle">
-							Click to copy
-						</q-tooltip>
-					</q-icon>
-					<q-icon v-else slot="append" size="xs" class="blue pointer" @click="share()" name="fas fa-share-alt">
-						<q-tooltip anchor="top middle" self="center middle">
-							Click to share
-						</q-tooltip>
-					</q-icon>
+					<hk-share 
+						title="Harmless Key"
+						text="Follow my campaigns on Harmless Key!"
+						:url="url"
+						slot="after"
+					/>
 				</q-input>
-				<input :value="copy" id="copy" type="hidden" />
 			</div>
 		</div>
 		<div class="mt-4 neutral-2" v-if="info">
 			Make sure your campaign is set to <span class="green">Public</span>, or your followers won't be able to see it.
 			Then click the <span class="live neutral-1">GO LIVE</span> icon in your campaign to share the initiative of the encounter that is active. You can stay live for your entire session, whenever you're not running an encounter, followers won't see what you're doing.
 		</div>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -41,6 +37,9 @@
 	
 	export default {
 		name: 'PlayerLink',
+		components: {
+			VueQr,
+		},
 		props: {
 			qr: {
 				type: Boolean,
@@ -55,14 +54,11 @@
 				default: true
 			}
 		},
-		components: {
-				VueQr,
-		},
 		data() {
 			return {
 				is_small: false,
 				showInfo: false,
-				copy: window.origin + '/user/' + this.$store.getters.user.uid,
+				url: window.origin + '/user/' + this.$store.getters.user.uid,
 			}
 		},
 		computed: {
@@ -71,56 +67,15 @@
 			}
 		},
 		methods: {
-			setSize() {
-				let width = this.$refs.share.clientWidth
+			setSize(size) {
+				let width = size.width;
 				let small = 450;
 
 				this.is_small = (width <= small) ? true : false;
 
 				//sets new width on resize
-				this.width = this.$refs.share.clientWidth;
-			},
-			copyLink() {
-
-				let toCopy = document.querySelector('#copy')
-				toCopy.setAttribute('type', 'text') //hidden
-				toCopy.select()
-
-				try {
-					var successful = document.execCommand('copy');
-					var msg = successful ? 'Successful' : 'Unsuccessful';
-
-					this.$snotify.success(msg, 'Link Copied!', {
-						position: "rightTop"
-					});
-				} catch (err) {
-					alert('Something went wrong, unable to copy');
-				}
-
-				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
-				window.getSelection().removeAllRanges()
-			},
-			share() {
-				if (navigator.share) {
-					navigator.share({
-						title: 'Harmless Key',
-						text: 'Follow my campaigns on Harmless Key!',
-						url: this.copy,
-					})
-					.catch((error) => console.log('Error sharing', error));
-				}
-			},
-		},
-		mounted() {
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.setSize);
-				//Init
-				this.setSize();
-			});
-		},
-		beforeDestroy() {
-			window.removeEventListener('resize', this.setSize);
+				this.width = width;
+			},		
 		}
 	}
 </script>

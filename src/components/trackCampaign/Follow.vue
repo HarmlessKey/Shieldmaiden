@@ -1,24 +1,21 @@
 <template>
-	<div class="follow neutral-2">
-		<div v-if="user.uid">
-			<small v-if="!following['.value']">
-				Follow user
-				<a @click="follow(true)" class="btn btn-sm bg-neutral-5">
-					<i class="fas fa-user-plus mr-1"></i> 
-				</a>
-			</small>
-			<small v-else>
-				<div class="d-none d-md-inline mr-2">Following user</div>
-				<a @click="follow(false)" class="btn btn-sm bg-neutral-5
-				">
-					<i class="fas fa-user-check green"></i> 
-				</a>
-			</small>
-		</div>
-		<small v-else>
-			<router-link to="/sign-in">Sign in to follow</router-link>
-		</small>
-	</div>
+	<span>
+		<template v-if="user.uid">
+			<a v-if="!following['.value']" @click="follow(true)" class="btn btn-sm btn-clear">
+				<i class="fas fa-user-plus mr-1" /> 
+				<q-tooltip anchor="bottom middle" self="top middle">
+					Follow
+				</q-tooltip>
+			</a>
+			<a v-else @click="follow(false)" class="btn btn-sm btn-clear">
+				<i class="fas fa-user-check green" />
+				<q-tooltip anchor="bottom middle" self="top middle">
+					Unfollow
+				</q-tooltip>
+			</a>
+		</template>
+		<i v-else class="fas fa-user" />
+	</span>
 </template>
 
 <script>
@@ -54,6 +51,3 @@
 		},
 	}
 </script>
-
-<style lang="scss" scoped>
-</style>

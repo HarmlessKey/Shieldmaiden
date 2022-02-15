@@ -73,13 +73,20 @@ export class encounterServices {
   }
 
   // Overwrites an encounter with a full new object
-  async editEncounter(uid, campaignId, encounterId, value) {
+  async editEncounter(uid, campaignId, encounterId, value, search_encounter=undefined) {
     const path = `${uid}/${campaignId}/${encounterId}`
     ENCOUNTERS_REF.child(path).set(value).then(() => {
-      return;
     }).catch((error) => {
       throw error;
     });
+
+    // Update search_encounter
+    if(search_encounter) {
+      SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${encounterId}`).set(search_encounter).then(() => {
+      }).catch((error) => {
+        throw error;
+      });
+    }
   }
 
   /**

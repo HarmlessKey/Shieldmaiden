@@ -4,8 +4,7 @@ import { monsterServices } from "@/services/api/monsters";
 
 const state = {
   monster_services: null,
-  cached_monsters: {
-  },
+  cached_monsters: {},
 };
 
 const getters = {

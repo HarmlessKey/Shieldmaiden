@@ -3,7 +3,7 @@
 		<h2 class="mb-1">{{ spell.name }}</h2>
 		<i class="mb-3 d-block">
 			<template v-if="spell.level > 0">
-				{{ spell. level | numeral("oO") }} level
+				{{ spell.level | numeral("oO") }} level
 			</template>
 			<template v-else>Cantrip</template>
 			<span v-if="spell.school"> {{ spell.school.name }}</span>
@@ -48,7 +48,7 @@
 	import { mapActions } from "vuex";
 
 	export default {
-		name: 'Spell',
+		name: "Spell",
 		props: {
 			// If the spell is fetched in a parent component you can send the full spell object in de data prop
 			data: {
@@ -70,14 +70,12 @@
 				this.spell = this.data;		
 				this.loading = false;
 			} else {
-				this.spell = await this.get_spell(this.id);
+				this.spell = await this.get_api_spell(this.id);
 				this.loading = false;
 			}			
 		},
 		methods: {
-			...mapActions([
-				"get_spell"
-			]),
+			...mapActions("api_spells", ["get_api_spell"]),
 			parse_spell_str(text) {
 				// map to replace weird character with real character 
 				let rules = [

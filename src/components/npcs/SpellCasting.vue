@@ -161,40 +161,17 @@
 			<div>
 				<hk-card :header="(category === 'caster') ? 'Add spells' : 'Add innate spells'" class="mb-0">
 					<div class="card-body">
-						<q-input
-							:dark="$store.getters.theme === 'dark'" filled square
-							label="Search spell"
-							v-model="spell_name"
-							class="mb-2"
-							@change="searchSpells()"
-						>
-							<a slot="append" color="primary" @click="searchSpells()">
-								<i class="fas fa-search" />
-							</a>
-						</q-input>
-
-						<q-list :dark="$store.getters.theme === 'dark'" v-if="spell_name && spells">
-							<q-item v-for="(spell, key) in spells" :key="key">
-								<q-item-section>
-									{{ spell.name }}
-								</q-item-section>
-								<q-item-section avatar>
-									<i 
-										class="fas fa-check mr-2" 
-										v-if="npc[`${category}_spells`] && Object.keys(npc[`${category}_spells`]).includes(key)"
-									/>
-									<a class="btn btn-sm bg-neutral-5" v-else @click="addSpell(key, spell.name.toLowerCase(), spell.level)">
-										<i class="fas fa-plus green" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Add spell
-										</q-tooltip>
-									</a>
-								</q-item-section>
-							</q-item>
-						</q-list>
-						<p class="red" v-if="spell_name && spells === null">
-							No spells found with "{{ spell_name }}"
-						</p>
+						<CopyContent 
+							type="spell" 
+							:content="['srd']" 
+							button="plus"
+							@copy="addSpell"
+							:disabled-srd="
+								(category === 'caster' && npc.caster_spells) 
+								? Object.keys(npc.caster_spells) 
+								: (category === 'innate' && npc.innate_spells) ? Object.keys(npc.innate_spells) : []
+							"
+						/>
 					</div>
 
 					<div slot="footer" class="card-footer d-flex justify-content-end">
@@ -209,11 +186,15 @@
 <script>
 	import { db } from '@/firebase';
 	import { abilities } from '@/mixins/abilities.js';
+	import CopyContent from "@/components/CopyContent";
 	
 	export default {
 		name: 'npc-SpellCasting',
 		props: ['value'],
 		mixins: [abilities],
+		components: {
+			CopyContent
+		},
 		data() {
 			return {
 				spells_dialog: false,
@@ -295,18 +276,16 @@
 					this.spells = undefined;
 				}
 			},
-			addSpell(key, name, level) {
+			addSpell({ result, id }) {
 				if(!this.npc[`${this.category}_spells`]) {
 					this.$set(this.npc, `${this.category}_spells`, {})
 				}
 
-				let spell = {
-					name
-				}
+				let spell = { name: result.name };
 				if(this.category === 'innate') spell.limit = 0;
-				if(this.category === 'caster') spell.level = level;
+				if(this.category === 'caster') spell.level = result.level;
 
-				this.npc[`${this.category}_spells`][key] = spell;
+				this.npc[`${this.category}_spells`][id] = spell;
 				this.$forceUpdate();
 			},
 			removeSpell(key, category) {

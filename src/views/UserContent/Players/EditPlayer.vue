@@ -601,7 +601,8 @@
 					companions: this.companions || [],
 					deleted_companions: this.companions_to_delete || []
 				});
-				this.$router.replace("/content/players");
+				if(this.$route.name === "Edit character") this.$router.replace("/content/characters");
+				else this.$router.replace("/content/players");
 			},
 			add({ result, id }) {
 				this.companion_dialog = false;

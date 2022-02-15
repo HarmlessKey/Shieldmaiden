@@ -8,7 +8,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions } from "vuex";
 
 	export default {
@@ -16,20 +15,21 @@
 		data() {
 			return {
 				routes: [
-					"http://harmlesskey.com",
-					"http://harmlesskey.com/demo",
-					"http://harmlesskey.com/documentation",
-					"http://harmlesskey.com/about-us",
-					"http://harmlesskey.com/sign-up",
-					"http://harmlesskey.com/sign-in",
-					"http://harmlesskey.com/privacy-policy",
-					"http://harmlesskey.com/updates",
-					"http://harmlesskey.com/feedback",
-					"http://harmlesskey.com/compendium",
-					"http://harmlesskey.com/compendium/conditions",
-					"http://harmlesskey.com/compendium/monsters",
-					"http://harmlesskey.com/compendium/spells",
-					"http://harmlesskey.com/compendium/items"
+					"https://harmlesskey.com",
+					"https://harmlesskey.com/demo",
+					"https://harmlesskey.com/documentation",
+					"https://harmlesskey.com/about-us",
+					"https://harmlesskey.com/sign-up",
+					"https://harmlesskey.com/sign-in",
+					"https://harmlesskey.com/privacy-policy",
+					"https://harmlesskey.com/updates",
+					"https://harmlesskey.com/feedback",
+					"https://harmlesskey.com/patreon",
+					"https://harmlesskey.com/compendium",
+					"https://harmlesskey.com/compendium/conditions",
+					"https://harmlesskey.com/compendium/monsters",
+					"https://harmlesskey.com/compendium/spells",
+					"https://harmlesskey.com/compendium/items"
 				]
 			}
 		},
@@ -37,6 +37,8 @@
 		methods: {
 			...mapActions("api_monsters", ["get_monsters",]),
 			...mapActions("api_items", ["get_api_items",]),
+			...mapActions("api_spells", ["get_api_spells",]),
+			...mapActions("api_conditions", ["get_conditions",]),
 			async downloadXml() {
 				const d = new Date();
 				const lastmodDate = `${d.getFullYear()}-${d.getMonth() < 10 ? '0'+d.getMonth() : d.getMonth() }-${d.getDate() < 10 ? '0'+d.getDate() : d.getDate() }`;
@@ -68,32 +70,33 @@
 					urlset.appendChild(urlElement); 
 				}
 
-				//CONDTIONS
-				const conditions_ref = db.ref('conditions');
-				await conditions_ref.once('value', (snapshot) => {
-					let conditions = snapshot.val()
-
-					for(let key in conditions) {
-						let urlElement = xmlDoc.createElement("url");
-
-						//Add loc element
-						let loc = xmlDoc.createElement("loc");
-						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/conditions/${key}`);
-						loc.appendChild(url);
-						urlElement.appendChild(loc);
-
-						//Add lastmod element
-						let lastmod = xmlDoc.createElement("lastmod");
-						let date = xmlDoc.createTextNode(lastmodDate);
-						lastmod.appendChild(date);
-						urlElement.appendChild(lastmod);
-
-						//Add to urlset
-						urlset.appendChild(urlElement);
-					}
+				// CONDITIONS
+				const conditions = await this.get_conditions({
+					pageNumber: 1,
+					pageSize: 0,
+					fields: ["url"]
 				});
+		
+				for(const condition of conditions.results) {
+					let urlElement = xmlDoc.createElement("url");
 
-				//ITEMS
+					//Add loc element
+					let loc = xmlDoc.createElement("loc");
+					let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/conditions/${condition.url}`);
+					loc.appendChild(url);
+					urlElement.appendChild(loc);
+
+					//Add lastmod element
+					let lastmod = xmlDoc.createElement("lastmod");
+					let date = xmlDoc.createTextNode(lastmodDate);
+					lastmod.appendChild(date);
+					urlElement.appendChild(lastmod);
+
+					//Add to urlset
+					urlset.appendChild(urlElement);
+				}
+
+				// ITEMS
 				const items = await this.get_api_items({
 					pageNumber: 1,
 					pageSize: 0,
@@ -105,7 +108,7 @@
 
 					//Add loc element
 					let loc = xmlDoc.createElement("loc");
-					let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/items/${item.url.toLowerCase()}`);
+					let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/items/${item.url}`);
 					loc.appendChild(url);
 					urlElement.appendChild(loc);
 
@@ -119,7 +122,7 @@
 					urlset.appendChild(urlElement);
 				}
 
-				//MONSTERS
+				// MONSTERS
 				const monsters = await this.get_monsters({
 					pageNumber: 1,
 					pageSize: 0,
@@ -131,7 +134,7 @@
 
 					//Add loc element
 					let loc = xmlDoc.createElement("loc");
-					let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/monsters/${monster.url}`);
+					let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/monsters/${monster.url}`);
 					loc.appendChild(url);
 					urlElement.appendChild(loc);
 
@@ -145,30 +148,31 @@
 					urlset.appendChild(urlElement);
 				}
 
-				//SPELLS
-				const spells_ref = db.ref('spells');
-				await spells_ref.once('value', (snapshot) => {
-					let spells = snapshot.val()
-
-					for(let key in spells) {
-						let urlElement = xmlDoc.createElement("url");
-
-						//Add loc element
-						let loc = xmlDoc.createElement("loc");
-						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/spells/${key}`);
-						loc.appendChild(url);
-						urlElement.appendChild(loc);
-
-						//Add lastmod element
-						let lastmod = xmlDoc.createElement("lastmod");
-						let date = xmlDoc.createTextNode(lastmodDate);
-						lastmod.appendChild(date);
-						urlElement.appendChild(lastmod);
-
-						//Add to urlset
-						urlset.appendChild(urlElement);
-					}
+				// SPELLS
+				const spells = await this.get_api_spells({
+					pageNumber: 1,
+					pageSize: 0,
+					fields: ["url"]
 				});
+		
+				for(const spell of spells.results) {
+					let urlElement = xmlDoc.createElement("url");
+
+					//Add loc element
+					let loc = xmlDoc.createElement("loc");
+					let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/spells/${spell.url}`);
+					loc.appendChild(url);
+					urlElement.appendChild(loc);
+
+					//Add lastmod element
+					let lastmod = xmlDoc.createElement("lastmod");
+					let date = xmlDoc.createTextNode(lastmodDate);
+					lastmod.appendChild(date);
+					urlElement.appendChild(lastmod);
+
+					//Add to urlset
+					urlset.appendChild(urlElement);
+				}
 
 				//TO DOWNLOAD THE FILE
 				var serializer = new XMLSerializer();

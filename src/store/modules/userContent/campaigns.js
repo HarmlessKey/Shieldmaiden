@@ -278,6 +278,7 @@ const actions = {
   /**
    * Deletes a campaign
    * - Deletes all encounters for this campaign
+   * - Removes campaign_id from players linked to the campaign
    * 
    * @param {object} id 
    */
@@ -289,19 +290,21 @@ const actions = {
         const campaign = await dispatch("get_campaign", { uid, id });
         await services.deleteCampaign(uid, id);
 
-        // DELETE ALL ENCOUNTER OF CAMPAIGN
+        // Delete all encounters of the campaign
         dispatch("encounters/delete_campaign_encounters", id, { root: true });
+
+        // Remove campaign_id from players linked to the campaign
+        for (const playerId in campaign.players) {
+          dispatch("players/set_player_prop", { uid, id: playerId, property: "campaign_id", value: null }, { root: true });
+        }
 
         commit("REMOVE_CAMPAIGN", id);
         commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
         
+        // Update campaign count
         const new_count = await services.updateCampaignCount(uid, -1);
         commit("SET_CAMPAIGN_COUNT", new_count);
         dispatch("checkEncumbrance", "", { root: true });
-
-        for (const playerId in campaign.players) {
-          dispatch("players/set_player_prop", { uid, id: playerId, property: "campaign_id", value: null }, { root: true });
-        }
         return;
       } catch(error) {
         throw error;

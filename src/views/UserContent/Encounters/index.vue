@@ -19,22 +19,21 @@
 						<div slot="header" class="card-header">
 							<span>
 								<span>
-									<i class="fas fa-swords mr-1" />
-									Encounters
-									<span>( 
+									<span class="content-count"> 
 										<span :class="
 											encounter_count > tier.benefits.encounters ? 'red' :
 											encounter_count == tier.benefits.encounters ? 'neutral-2' : 'green'
 										">
 											{{ encounter_count || 0 }}
 										</span> / 
-										<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+										<i v-if="tier.benefits.encounters === 'infinite'" class="far fa-infinity" />
 										<template v-else>{{ tier.benefits.encounters }}</template>
-									) </span>
+									</span>
 								</span>
+								Encounters
 							</span>
 							<a 
-								v-if="tier.benefits.encounters == 'infinite' || (!overencumbered && encounter_count < tier.benefits.encounters)" 
+								v-if="tier.benefits.encounters === 'infinite' || (!overencumbered && encounter_count < tier.benefits.encounters)" 
 								@click="add = !add"
 								class="btn btn-sm"
 							>

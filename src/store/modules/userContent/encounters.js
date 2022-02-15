@@ -41,7 +41,7 @@ const getters = {
     .value();
   },
   encounter_count: (state) => { return state.encounter_count; },
-  get_encounter_count: (state) => (campaignId) => { return state.encounter_count[campaignId]; },
+  get_encounter_count: (state) => (campaignId) => { return state.encounter_count[campaignId] || 0; },
   encounter_services: (state) => { return state.encounter_services; }
 };
 

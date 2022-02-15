@@ -13,7 +13,7 @@
 			</span>
 			<span class="truncate neutral-4">
 				<span class="neutral-1">
-					{{ type.slice(0, -1).capitalize() }} slot{{ tier.benefits[type] > 1 ? "s" : "" }}
+					{{ type.slice(0, -1).capitalize() }} slot{{ (tier.benefits[type] > 1 || tier.benefits[type] === "infinite") ? "s" : "" }}
 				</span>
 				<span v-if="type === 'encounters'" class="neutral-4">
 					(per campaign)

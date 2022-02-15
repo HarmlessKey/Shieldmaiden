@@ -1,14 +1,16 @@
 <template>
 	<hk-card header="Admin">
 		<div class="card-body">
-			<ul class="entities hasImg">
-				<li v-for="(item, index) in items" :key="index">
-					<i class="img mr-2" :class="item.icon"></i>
-					<div class="d-flex justify-content-between">
+			<q-list>
+				<q-item v-for="(item, index) in items" :key="index">
+					<q-item-section avatar>
+						<i class="mr-2" :class="item.icon" />
+					</q-item-section>
+					<q-item-section>
 						<router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
-					</div>
-				</li>
-			</ul>
+					</q-item-section>
+				</q-item>
+			</q-list>
 		</div>
 	</hk-card>
 </template>
@@ -66,23 +68,8 @@
 </script>
 
 <style lang="scss" scoped>
-
-
-	.container-fluid {
-		padding: 20px;
-
-		ul.entities {
-			li {
-				.img {
-					border: transparent;
-					background: none;
-					text-align: center;
-					font-size: 20px;
-					line-height: 49px;
-				}
-			}
-		}
+	.q-item {
+		background-color: $neutral-8;
+		margin-bottom: 1px;
 	}
-
-
 </style>

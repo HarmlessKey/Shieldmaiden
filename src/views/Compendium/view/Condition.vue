@@ -6,6 +6,12 @@
 					<i :class="`hki-${condition.name.toLowerCase()}`" />
 					{{ condition.name }}
 				</h1>
+				<hk-share 
+					v-if="!not_found" 
+					:title="condition.name" 
+					:text="condition.description" 
+					size="sm"
+				/>
 			</div>
 			<div class="card-body">
 				<template v-if="not_found">

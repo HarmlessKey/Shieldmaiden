@@ -496,10 +496,36 @@ html body {
 		animation: fadeout .3s linear;
 		animation-delay: 2s;
 	}
+
+	.flip-clock {
+		.flip-card {
+			&__top, &__bottom, &__back, &__back-bottom {
+				color: $blue !important;
+
+				&:before {
+					color: $blue !important;
+				}
+			}
+		}
+	}
 	
 	.disabled {
 		cursor: forbidden !important;
 		opacity: .5 !important;
+	}
+
+	.content-count {
+		border: solid 1px $neutral-5;
+		background-color: $neutral-9;
+		padding: 5px 10px;
+		border-radius: 12px;
+		user-select: none;
+		margin-right: 4px;
+
+		.divider {
+			color: $neutral-2;
+			margin: 0 4px;
+		}
 	}
 
 	.invert { filter: invert(1); }

@@ -10,6 +10,7 @@ import HkLoader from './components/hk-components/hk-loader';
 import HkDmgTypeSelect from './components/hk-components/hk-dmg-type-select';
 import HkTip from './components/hk-components/hk-tip';
 import HkTimer from './components/hk-components/hk-timer';
+import HkShare from './components/hk-components/hk-share-button';
 
 Vue.component('hk-table', HkTable);
 Vue.component('hk-card', HkCard);
@@ -22,3 +23,4 @@ Vue.component('hk-popover', HkPopover);
 Vue.component('hk-dmg-type-select', HkDmgTypeSelect);
 Vue.component('hk-tip', HkTip);
 Vue.component('hk-timer', HkTimer);
+Vue.component('hk-share', HkShare);

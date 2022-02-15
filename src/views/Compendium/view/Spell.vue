@@ -5,9 +5,18 @@
 				<h1>
 					{{ not_found ? "Spell not found" : spell.name.capitalizeEach() }}
 				</h1>
-				<span class="neutral-3">
-					{{ spell.page }}
-				</span>
+				<div>
+					<span class="neutral-3">
+						{{ spell.page }}
+					</span>
+					<hk-share 
+						v-if="!not_found" 
+						:title="spell.name.capitalizeEach()" 
+						:text="spell.description" 
+						size="sm"
+						class="ml-1"
+					/>
+				</div>
 			</div>
 			<div class="card-body">
 				<template v-if="not_found">

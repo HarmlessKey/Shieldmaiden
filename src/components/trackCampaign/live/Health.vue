@@ -97,7 +97,7 @@
 						maxHp = (this.camp_data.maxHpMod) ? parseInt(this.players[key].maxHp) + this.camp_data.maxHpMod : this.players[key].maxHp;
 
 					else if (this.entity.entityType === 'companion')
-						maxHp = (this.camp_data.maxHpMod) ? parseInt(this.npcs[key].maxHp) + this.camp_data.maxHpMod : this.npcs[key].maxHp;
+						maxHp = (this.camp_data.maxHpMod) ? parseInt(this.npcs[key].hit_points) + this.camp_data.maxHpMod : this.npcs[key].hit_points;
 				}
 
 				ret = {

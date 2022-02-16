@@ -94,8 +94,30 @@
 				stripe rounded size="20px" 
 				:value="imported/importing" 
 				color="primary" 
-				class="mb-3"
+				class="mb-4"
 			/>
+
+			<q-expansion-item v-if="failed_imports.length" class="mb-4">
+				<template slot="header">
+					<q-item-section avatar>
+						<b class="red">{{ failed_imports.length }}</b>
+					</q-item-section>
+					<q-item-section class="red">Failed imports</q-item-section>
+				</template>
+				<div class="bg-neutral-8 px-3 py-2">
+					Import failed for these NPCs
+					<ol>
+						<li v-for="(failed, i) in failed_imports" :key="`failed-${i}`">
+							{{ failed.capitalizeEach() }}
+						</li>
+					</ol>
+					<p>
+						Make sure there are no validation errors.<br/>
+						<a @click="showSchema = true">Compare with our schema.</a>
+					</p>
+				</div>
+			</q-expansion-item>
+
 			<p v-if="imported < importing" class="text-center">
 				<hk-animated-integer :value="imported" /> / {{ importing }} imported.
 			</p>
@@ -106,20 +128,46 @@
 				<q-btn no-caps label="Close" color="neutral-5" class="full-width" v-close-popup />
 			</div>
 		</div>
+		<q-dialog v-model="showSchema">
+			<hk-card header="NPC Schema">
+				<div slot="header" class="card-header">
+					<span>NPC Schema</span>
+					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" v-close-popup />
+				</div>
+				<div class="card-body">
+					<p>
+						You can use <a href="https://www.jsonschemavalidator.net/" target="_blank">this schema validator</a> to find errors in your NPC.<br/>
+						Paste our schema in the left field and the JSON of your NPC in the right.
+					</p>
+					<a class="btn btn-sm mb-2" @click="copySchema">Copy schema</a>
+					<h3>HK NPC Schema</h3>
+					<div class="bg-neutral-8 px-2 py-2 overflow-auto">
+						<pre>
+							{{ schema }}
+						</pre>
+					</div>
+					<input :value="JSON.stringify(schema)" id="copy" type="hidden" />
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import schema from "@/schemas/hk-npc-schema.json"
 
 export default {
 	name: "ImportNPCs",
 	data() { 
 		return {
+			schema: schema,
+			showSchema: false,
 			json_file: undefined,
 			json_input: undefined,
 			overwrite: true,
 			parsed: false,
+			failed_imports: [],
 			importing: undefined,
 			imported: 0,
 			imports: {
@@ -217,32 +265,67 @@ export default {
 				this.importing = this.selected.unique.length + this.selected.duplicate.length;
 				for (const npc of this.selected.unique) {
 					delete npc.index; // Was added for selecion
-					await this.add_npc(npc);
+					try {
+						await this.add_npc(npc);
+					} catch {
+						this.failed_imports.push(npc.name);
+					}
 					this.imported++;
 				}
-
-				
+	
 				for (const npc of this.selected.duplicate) {
 					delete npc.index; // Was added for selecion
 					if(this.overwrite) {
 						// Get the id of the existing NPC with the same name
 						const id = this.npcs.filter(item => { return item.name === npc.name})[0].key;
-						await this.edit_npc({
-							uid: this.uid,
-							id,
-							npc
-						});
+						try {
+							await this.edit_npc({
+								uid: this.uid,
+								id,
+								npc
+							});
+						} catch {
+							this.failed_imports.push(npc.name);
+						}
 					} else {
-						await this.add_npc(npc);
+						try {
+							await this.add_npc(npc);
+						} catch {
+							this.failed_imports.push(npc.name);
+						}
 					}
 					this.imported++;
 				}
 			}
-		}
+		},
+		copySchema() {
+			const toCopy = document.querySelector('#copy')
+			toCopy.setAttribute('type', 'text') //hidden
+			toCopy.select()
+
+			try {
+				const successful = document.execCommand('copy');
+				const msg = successful ? 'Successful' : 'Unsuccessful';
+
+				this.$snotify.success(msg, 'Schema copied', {
+					position: "rightTop"
+				});
+			} catch (err) {
+				this.$snotify.error("Unsuccessful", 'Schema not copied', {
+					position: "rightTop"
+				});
+			}
+
+			/* unselect the range */
+			toCopy.setAttribute('type', 'hidden')
+			window.getSelection().removeAllRanges()
+		},
 	}
 }
 </script>
 
 <style lang="scss" scoped>
-	
+	.q-expansion-item {
+		background-color: $neutral-9;
+	}
 </style>

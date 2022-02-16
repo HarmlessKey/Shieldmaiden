@@ -100,7 +100,11 @@
 
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
-			<hk-card header="Import NPC from JSON" :minWidth="400">
+			<hk-card :minWidth="400">
+				<div slot="header" class="card-header">
+					<span>Import NPC from JSON</span>
+					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" v-close-popup />
+				</div>
 				<div class="card-body">
 					<ImportNPC v-model="import_dialog" />
 				</div>

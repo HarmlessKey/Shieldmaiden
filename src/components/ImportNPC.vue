@@ -36,28 +36,81 @@
 				</q-form>
 			</ValidationObserver>
 		</template>
+		<div v-else-if="!importing">
+			<template v-for="type in Object.keys(imports)">
+				<div v-if="imports[type].length" class="mb-4" :key="type">
+					<p>
+						Found <span :class="type === 'unique' ? 'green' : 'orange'">
+							{{ imports[type].length }} {{ type === "unique" ? "new" : "duplicate" }}
+						</span> NPCs
+					</p>
+					<q-table
+						class="sticky-header-table mb-2"
+						:virtual-scroll-sticky-size-start="48"
+						:dark="$store.getters.theme !== 'light'"
+						flat dense square
+						:data="imports[type]"
+						:columns="columns"
+						row-key="index"
+						virtual-scroll
+						:pagination.sync="pagination"
+						:rows-per-page-options="[0]"
+						selection="multiple"
+						:selected.sync="selected[type]"
+						hide-bottom
+					/>
+					<q-toggle 
+						v-if="type === 'duplicate'"
+						v-model="overwrite" 
+						label="Overwrite duplicates" 
+						unchecked-icon="none"
+					/>
+				</div>
+			</template>
+			<div v-if="importTotal > availableSlots">
+				Insufficient slots. You're trying to import <b class="red">{{ importTotal }}</b> NPCs,<br/> 
+				but have only <b class="red">{{ availableSlots }}</b> slots available.
+			</div>
+
+			<div class="d-flex justify-content-end">
+				<q-form @submit="import_npcs">
+					<q-btn 
+						color="primary" 
+						no-caps 
+						type="submit"
+						:disabled="(!selected.unique.length && !selected.duplicate.length) || importTotal > availableSlots"
+					>
+						Import NPCs
+					</q-btn>
+				</q-form>
+			</div>
+		</div>
 		<div v-else>
-			<p>Found <span class="green">{{ Object.keys(unique_npcs).length }} new</span> npcs</p>
-			<p>Found <span class="orange">{{ Object.keys(duplicate_npcs).length }} duplicate</span> npcs</p>
-			<q-form @submit="import_npcs">
-				<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit">
-					Import NPCs
-				</q-btn>
-				<q-toggle 
-					v-model="overwrite" 
-					color="warning" 
-					label="Overwrite duplicates" 
-					checked-icon="fas fa-exclamation-circle"
-					unchecked-icon="none"
-				/>
-			</q-form>
+			<h3 class="text-center">
+				{{ (imported &lt; importing) ? "Importing" : "Imported" }} {{ importing }} NPCs
+			</h3>
+			<q-linear-progress 
+				:dark="$store.getters.theme !== 'light'" 
+				stripe rounded size="20px" 
+				:value="imported/importing" 
+				color="primary" 
+				class="mb-3"
+			/>
+			<p v-if="imported < importing" class="text-center">
+				<hk-animated-integer :value="imported" /> / {{ importing }} imported.
+			</p>
+			<div v-else>
+				<p class="text-center green">
+					Finished import!
+				</p>
+				<q-btn no-caps label="Close" color="neutral-5" class="full-width" v-close-popup />
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
-import { db } from "../firebase";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
 	name: "ImportNPCs",
@@ -65,15 +118,54 @@ export default {
 		return {
 			json_file: undefined,
 			json_input: undefined,
-			overwrite: false,
+			overwrite: true,
 			parsed: false,
-			unique_npcs: {},
-			duplicate_npcs: {},
-			uid: this.$store.getters.user.uid
+			importing: undefined,
+			imported: 0,
+			imports: {
+				unique: [],
+				duplicate: []
+			},
+			selected: {
+				unique: [],
+				duplicate: []
+			},
+			uid: this.$store.getters.user.uid,
+			columns: [
+				{
+					name: "name",
+					label: "Name",
+					field: "name",
+					sortable: true,
+					align: "left",
+					format: val => val.capitalizeEach()
+				}
+			],
+			pagination: { 
+				rowsPerPage: 0
+			}
 		}
 	},
+	computed: {
+		...mapGetters(["tier"]),
+		...mapGetters("npcs", ["npcs", "npc_count"]),
+		availableSlots() {
+			return (this.tier.benefits.npcs === "infinite") ? Infinity : this.tier.benefits.npcs - this.npc_count;
+		},
+		importTotal() {
+			return (!this.overwrite) ? this.selected.unique.length + this.selected.duplicate.length : this.selected.unique.length;
+		}
+	},
+	async mounted() {
+		await this.get_npcs();
+	},
 	methods: {
-		...mapActions("npcs", ["get_full_npcs", "add_npc", "edit_npc"]),
+		...mapActions("npcs", [
+			"get_full_npcs", 
+			"add_npc", 
+			"edit_npc", 
+			"get_npcs"
+		]),
 		loadJSON() {
 			const fr = new FileReader();
 
@@ -102,50 +194,55 @@ export default {
 				npcs = [npcs];
 			}
 
-			// const existing_npcs = await this.get_full_npcs();
+			// Filter out duplicate NPCs
+			this.imports.duplicate = npcs.filter(npc => {
+				return this.npcs.map(npc => { return npc.name }).includes(npc.name);
+			});
+			// Add index for selection
+			this.imports.duplicate.forEach((row, index) => {
+				row.index = index
+			});
 
-			for (const npc of npcs) {
-				const hk_key = npc.harmless_key;
-
-				let existing = db.ref(`npcs/${this.uid}`).orderByChild('harmless_key').equalTo(hk_key);
-				const exists = await existing.once('value')
-
-				if (exists.val() === null) {
-					this.$set(this.unique_npcs, hk_key, npc)
-				}
-				else {
-					this.$set(this.duplicate_npcs, hk_key, npc)
-				}
-			}
+			// Filter out new NPCs
+			this.imports.unique = npcs.filter(npc => {
+				return !this.npcs.map(npc => { return npc.name }).includes(npc.name);
+			});
+			// Add index for selection
+			this.imports.unique.forEach((row, index) => {
+				row.index = index
+			});
 		},
 		async import_npcs() {
-			
-			for (const npc of Object.values(this.unique_npcs)) {
-				this.add_npc(npc);
-			}
+			if(this.importTotal <= this.availableSlots) {
+				this.importing = this.selected.unique.length + this.selected.duplicate.length;
+				for (const npc of this.selected.unique) {
+					delete npc.index; // Was added for selecion
+					await this.add_npc(npc);
+					this.imported++;
+				}
 
-			if (this.overwrite) {
-				console.log(this.overwrite)
-				for (const npc of Object.values(this.duplicate_npcs)) {
-					let existing = db.ref(`npcs/${this.uid}`).orderByChild('name').equalTo(npc.name);
-					const exists = await existing.once('value')
-					console.log(exists.val(), npc)
-					// this.edit_npc(npc, key);
+				
+				for (const npc of this.selected.duplicate) {
+					delete npc.index; // Was added for selecion
+					if(this.overwrite) {
+						// Get the id of the existing NPC with the same name
+						const id = this.npcs.filter(item => { return item.name === npc.name})[0].key;
+						await this.edit_npc({
+							uid: this.uid,
+							id,
+							npc
+						});
+					} else {
+						await this.add_npc(npc);
+					}
+					this.imported++;
 				}
 			}
-			const added = !this.overwrite ? Object.keys(this.unique_npcs).length : Object.keys(this.unique_npcs).length + Object.keys(this.duplicate_npcs).length
-			if (added > 0) {
-				const added = Object.keys(this.unique_npcs).length
-				this.$snotify.success(`Imported ${added} Monster${added>1?'s':''}`, 'Critical hit!', {position: "rightTop"});
-			}
-
-			// Close import dialog
-			this.$emit('input', false);
 		}
 	}
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+	
 </style>

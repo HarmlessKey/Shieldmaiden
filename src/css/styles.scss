@@ -2060,6 +2060,27 @@ html body {
 		}
 	}
 
+	.sticky-header-table {
+		max-height: 300px;
+
+		.q-table__top,
+		.q-table__bottom,
+		thead tr:first-child th {
+				background-color: $neutral-6;
+		} 
+
+		thead tr th {
+			position: sticky;
+			z-index: 1;
+		}
+		thead tr:last-child th {
+			top: 48px;
+		}
+		thead tr:first-child th {
+			top: 0;
+		}
+	}
+
 	.q-tabs--dense {
 		.q-tab {
 			min-height: 35px;

@@ -1,18 +1,18 @@
 <template>
 	<q-expansion-item
 		class="request" 
-		:dark="$store.getters.theme === 'dark'" switch-toggle-side
+		:dark="$store.getters.theme === 'dark'" 
 		group="requests"
 	>
 		<template #header>
 			<q-item-section>
-				<q-item-label caption class="blue">{{ players[request.player].character_name }}</q-item-label>
+				<q-item-label caption>{{ entities[request.player].name }}</q-item-label>
 				<q-item-label>
 					{{ totalAmount }} <span :class="request.type === 'healing' ? 'green' : 'red'">{{ request.type }}</span>
 				</q-item-label> 
 			</q-item-section>
-			<q-item-label class="text-right">
-				<q-item-label caption>
+			<q-item-label class="text-right neutral-3">
+				<q-item-label caption class="text-right neutral-3">
 					Round: {{ request.round }}
 				</q-item-label>	
 				<q-item-label>
@@ -109,8 +109,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapGetters } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
 
 	export default {
@@ -138,8 +137,7 @@
 		},
 		computed: {
 			...mapGetters([
-				'players',
-				'entities'
+				"entities"
 			]),
 			totalAmount() {
 				let amount = 0;
@@ -193,6 +191,7 @@
 			this.final_results = this.setFinal(this.results);
 		},
 		methods: {
+			...mapActions(["delete_request"]),
 			setFinal(results) {
 				let final = this.final_results;
 
@@ -261,21 +260,25 @@
 						}
 						config.actions[0].rolls.push(roll);
 					}
-
 					this.setHP(amount, this.entities[key], this.entities[this.request.player], config);
 				}
 				this.remove();
 			},
 			remove() {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/requests/${this.request.key}`).remove();
+				this.delete_request(this.request.key);
 			}
 		},
 	}
 </script>
 
 <style lang="scss" scoped>
+	.q-expansion-item {
+		background-color: $neutral-8;
+		margin-bottom: 1px;
+	}
 	.accordion-body {
-		background-color: rgba(0, 0, 0, .1) !important;
+		padding: 10px;
+		background-color: $neutral-9;
 
 		.damage {
 			font-size: 15px;

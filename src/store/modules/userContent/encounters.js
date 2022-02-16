@@ -395,7 +395,9 @@ const actions = {
 
   /**
 	 * Updates abilities with limited uses
-	 * 
+	 *
+   * @param {string} campaignId CampaignId
+	 * @param {string} encounterId EncounterId
 	 * @param {string} key Entity Key
 	 * @param {integer} index index of the action or level of the spell slot used
 	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
@@ -417,6 +419,8 @@ const actions = {
   /**
 	 * Adds a reminder to an entity
 	 * 
+   * @param {string} campaignId CampaignId
+	 * @param {string} encounterId EncounterId
 	 * @param {string} key Entity key
 	 * @param {object} reminder full reminder object, or integer with rounds
 	 */
@@ -437,6 +441,8 @@ const actions = {
   /**
 	 * Updates reminders on an entity
 	 * 
+   * @param {string} campaignId CampaignId
+	 * @param {string} encounterId EncounterId
 	 * @param {string} entity Entity key
 	 * @param {string} key Reminder key
 	 * @param {string} property
@@ -457,7 +463,9 @@ const actions = {
 
    /**
 	 * Updates the override settings for the live initiative screen on an entity
-	 * 
+   * 
+	 * @param {string} campaignId CampaignId
+	 * @param {string} encounterId EncounterId
 	 * @param {string} entityId EntityId
 	 * @param {string} key Setting key
 	 * @param {any} value
@@ -478,6 +486,8 @@ const actions = {
   /**
 	 * Clear the override settings for the live initiative screen on an entity
 	 * 
+	 * @param {string} campaignId CampaignId
+	 * @param {string} encounterId EncounterId
 	 * @param {string} entityId EntityId
 	 */
    async clear_entity_settings({ rootGetters, dispatch, commit }, { campaignId, encounterId, entityId }) {
@@ -494,8 +504,30 @@ const actions = {
   },
 
   /**
-	 * Sets reminders on an entity
+	 * Deletes a player request from the encounter
 	 * 
+   * @param {string} campaignId CampaignId
+	 * @param {string} encounterId EncounterId
+	 * @param {string} id Request ID
+	 */
+   async delete_request({ rootGetters, dispatch, commit }, { campaignId, encounterId, id }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/requests`, { [id]: null });
+        commit("DELETE_REQUEST", { uid, campaignId, encounterId, id });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Sets reminders on an entity
+   * 
+	 * @param {string} campaignId CampaignId
+	 * @param {string} encounterId EncounterId
 	 * @param {string} entity Entity key
 	 * @param {string} key Reminder key
 	 * @param {object} reminder full reminder object, or integer with rounds
@@ -516,7 +548,6 @@ const actions = {
   /**
    * Deletes an entity from an encounter
    * 
-   * @param {string} uid
    * @param {string} campaignId
    * @param {string} encounterId
    * @param {object} playerId 
@@ -1007,6 +1038,11 @@ const mutations = {
   CLEAR_ENTITY_SETTINGS(state, { uid, campaignId, encounterId, entityId }) {
     if(state.cached_encounters[uid][campaignId][encounterId].entities[entityId]) {
       Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], "settings", {});
+    }
+  },
+  DELETE_REQUEST(state, { uid, campaignId, encounterId, id }) {
+    if(state.cached_encounters[uid][campaignId][encounterId].requests) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].requests, id);
     }
   },
   SET_ENCOUNTER_PROP(state, { uid, campaignId, encounterId, property, value, update_search}) {

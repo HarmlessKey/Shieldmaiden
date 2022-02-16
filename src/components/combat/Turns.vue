@@ -126,13 +126,13 @@
 
 			<template v-if="encounter.round > 0">
 				<div 
+					v-if="requests && Object.keys(requests).length"
 					class="requests d-none d-md-block" 
-					v-if="encounter.requests && Object.keys(encounter.requests).length > 0"
 					@click="setSlide({show: true, type: 'combat/side/Requests'})"
 				>
 					<i class="fas fa-bell"></i>
 					<div class="notifications bg-red white animated zoomIn">
-						<div>{{ Object.keys(encounter.requests).length }}</div>
+						<div>{{ Object.keys(requests).length }}</div>
 					</div>
 				</div>
 
@@ -165,15 +165,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapActions, mapGetters } from 'vuex';
-	import { remindersMixin } from '@/mixins/reminders';
-	import { audio } from '@/mixins/audio';
+	import { mapActions, mapGetters } from "vuex";
+	import { remindersMixin } from "@/mixins/reminders";
+	import { audio } from "@/mixins/audio";
 
 	export default {
-		name: 'Turns',
+		name: "Turns",
 		mixins: [remindersMixin, audio],
-		props: ['active_len', 'current', 'next', 'settings'],
+		props: ["active_len", "current", "next", "settings"],
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
@@ -182,9 +181,9 @@
 		},
 		computed: {
 			...mapGetters([
-				'encounter',
-				'path',
-				'broadcast'
+				"encounter",
+				"broadcast",
+				"requests"
 			]),
 			timer() {
 				return (this.settings) ? this.settings.timer : 0;
@@ -192,18 +191,18 @@
 		},
 		methods: {
 			...mapActions([
-				'set_turn',
-				'update_round',
-				'set_targeted',
-				'setSlide',
-				'set_finished',
+				"set_turn",
+				"update_round",
+				"set_targeted",
+				"setSlide",
+				"set_finished"
 			]),
 			reload() {
 				this.$router.go();
 			},
 			startEncounter() {
 				this.set_turn({turn: 0, round: 1});
-				this.checkReminders(this.next, 'startTurn');
+				this.checkReminders(this.next, "startTurn");
 			},
 			nextTurn() {
 				let turn = this.encounter.turn + 1
@@ -215,9 +214,8 @@
 					this.update_round()
 				}
 				this.set_turn({turn, round})
-				if(!this.demo) db.ref(`encounters/${this.path}/lastRoll`).set(false);
-				this.set_targeted({ type: 'untarget', key: 'all' });
-				this.checkReminders(this.current, 'endTurn');
+				this.set_targeted({ type: "untarget", key: "all" });
+				this.checkReminders(this.current, "endTurn");
 			},
 			prevTurn() {
 				let turn = this.encounter.turn - 1
@@ -230,15 +228,15 @@
 					turn = 0
 				}
 				this.set_turn({turn, round});
-				this.set_targeted({ type: 'untarget', key: 'all' });
+				this.set_targeted({ type: "untarget", key: "all" });
 			},
 			confirmFinish() {
-				this.$snotify.error('Are you sure you want to finish the encounter?', 'Finish Encounter', {
+				this.$snotify.error("Are you sure you want to finish the encounter?", "Finish Encounter", {
 					position: "centerCenter",
 					timeout: 0,
 					buttons: [
-						{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
-						{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: "Finish", action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: "Cancel", action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},

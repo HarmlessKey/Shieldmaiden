@@ -1,5 +1,5 @@
 <template>
-	<div ref="encounter" v-if="!loading">
+	<div v-if="!loading">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>
@@ -85,35 +85,36 @@
 				</div>
 			</template>
 		</div>
+		<q-resize-observer @resize="setSize" />
 	</div>
-	<div v-else class="combat-wrapper" ref="encounter">
+	<div v-else class="combat-wrapper">
 		<hk-loader name="encounter" />
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
 <script>
-	import _ from 'lodash';
-	import { mapActions, mapGetters } from 'vuex';
-	import { db } from '@/firebase';
+	import _ from "lodash";
+	import { mapActions, mapGetters } from "vuex";
 
-	import { audio } from '@/mixins/audio';
+	import { audio } from "@/mixins/audio";
 	
-	import Finished from '@/components/combat/Finished.vue';
-	import DemoFinished from '@/components/combat/DemoFinished.vue';
-	import Actions from '@/components/combat/actions/Actions.vue';
-	import Turns from '@/components/combat/Turns.vue';
-	import Menu from '@/components/combat/mobile/Menu.vue';
-	import Current from '@/components/combat/Current.vue';
-	import CurrentMobile from '@/components/combat/mobile/Current.vue';
-	import Targets from '@/components/combat/Targets.vue';
-	import Targeted from '@/components/combat/Targeted.vue';
-	import Side from '@/components/combat/side/Side.vue';
-	import SetInitiative from '@/components/combat/initiative';
-	import OverEncumbered from '@/components/userContent/OverEncumbered.vue';
-	import DemoOverlay from '@/components/combat/DemoOverlay.vue';
+	import Finished from "@/components/combat/Finished.vue";
+	import DemoFinished from "@/components/combat/DemoFinished.vue";
+	import Actions from "@/components/combat/actions/Actions.vue";
+	import Turns from "@/components/combat/Turns.vue";
+	import Menu from "@/components/combat/mobile/Menu.vue";
+	import Current from "@/components/combat/Current.vue";
+	import CurrentMobile from "@/components/combat/mobile/Current.vue";
+	import Targets from "@/components/combat/Targets.vue";
+	import Targeted from "@/components/combat/Targeted.vue";
+	import Side from "@/components/combat/side/Side.vue";
+	import SetInitiative from "@/components/combat/initiative";
+	import OverEncumbered from "@/components/userContent/OverEncumbered.vue";
+	import DemoOverlay from "@/components/combat/DemoOverlay.vue";
 
 	export default {
-		name: 'RunEncounter',
+		name: "RunEncounter",
 		components: {
 			Finished,
 			DemoFinished,
@@ -142,14 +143,6 @@
 				loading: true,
 			}
 		},
-		firebase() {
-			return {
-				settings: {
-					source: db.ref(`settings/${this.userId}/encounter`),
-					asObject: true,
-				},
-			}
-		},
 		beforeMount() {
 			if(this.$route.name !== "Demo" && this.broadcast.live === this.campaignId) {
 				this.setLiveEncounter(this.encounterId);
@@ -166,25 +159,24 @@
 				demo: this.demo
 			});
 			this.loading = false;
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.setSize);
-				//Init
-				this.setSize();
-			});
-			// this.track_Encounter(this.demo);
 		},
 		computed: {
 			...mapGetters([
-				'encounter',
-				'campaigns',
-				'entities',
-				'encounter_initialized',
-				'overencumbered',
-				'broadcast'
+				"encounter",
+				"campaigns",
+				"entities",
+				"encounter_initialized",
+				"overencumbered",
+				"broadcast",
+				"requests",
+				"userSettings"
 			]),
 			...mapGetters("players", ["players"]),
+			settings() {
+				return (this.userSettings && this.userSettings.general) ? this.userSettings.general : {};
+			},
 			_active: function() {
-				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc'; 
+				let order = (this.settings && this.settings.initOrder) ? "asc" : "desc"; 
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -193,14 +185,14 @@
 					})
 					.orderBy(function(entity) {
 						return entity.name
-					}, 'asc')
+					}, "asc")
 					.orderBy(function(entity){
 						return Number(entity.initiative)
 					} , order)
 					.value()
 			},
 			_idle: function() {
-				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
+				let order = (this.settings && this.settings.initOrder) ? "asc" : "desc";
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -216,12 +208,12 @@
 				return Object.keys(this._alive).length;
 			},
 			_alive: function() {
-				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
+				let order = (this.settings && this.settings.initOrder) ? "asc" : "desc";
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
 						entity.key = key
-						return entity.active && entity.curHp > 0 && entity.entityType == 'npc';
+						return entity.active && entity.curHp > 0 && entity.entityType == "npc";
 					})
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
@@ -232,11 +224,6 @@
 				//returns next in initiative order
 				//returns first if there is no next
 				return this._active[this.encounter.turn + 1] || this._active[0];
-			},
-			requests() {
-				if(this.encounter) {
-					return this.encounter.requests;
-				}
 			},
 		},
 		watch: {
@@ -252,16 +239,16 @@
 					if (newValue !== undefined && newValue.audio !== undefined && this.audio_notification === false) {
 						this.audio_notification = true;
 						this.$q.notify({
-							message: 'Audio link found',
-							caption: 'Would you like to follow it?',
+							message: "Audio link found",
+							caption: "Would you like to follow it?",
 							color: "blue-light",
 							position: "top",
 							progress: true,
 							timeout: 7500,
 							icon: this.audio_icons[this.audio_link_type].icon,
 							actions: [
-								{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
-								{ label: 'No', color: 'white', handler: () => { /* ... */ } }
+								{ label: "Yes", color: "white", handler: () => { this.open_audio_link(this.encounter.audio) } },
+								{ label: "No", color: "white", handler: () => { /* ... */ } }
 							]
 						})
 					}
@@ -272,20 +259,20 @@
 				handler(newValue, oldValue) {
 					if((newValue && oldValue) && (Object.keys(newValue).length > Object.keys(oldValue).length)) {
 							this.$snotify.warning(
-							'A new player request was made.',
-							'New request', 
+							"A new player request was made.",
+							"New request", 
 							{
 								timeout: 5000,
 								buttons: [
 									{ 
-										text: 'Show requests', 
+										text: "Show requests", 
 										action: (toast) => { 
-											this.setSlide({show: true, type: 'combat/side/Requests'});
+											this.setSlide({show: true, type: "combat/side/Requests"});
 											this.$snotify.remove(toast.id); 
 										}, bold: false
 									},
 									{ 
-										text: 'Close', 
+										text: "Close", 
 										action: (toast) => { 
 											this.$snotify.remove(toast.id); 
 										}, bold: false
@@ -307,29 +294,26 @@
 			this.setLiveEncounter();
 			next();
 		},
-		beforeDestroy() {
-			window.removeEventListener('resize', this.setSize);
-		},
 		methods: {
 			...mapActions([
-				'init_Encounter',
-				'set_finished',
-				'reset_store',
-				'setSlide',
-				'setLiveEncounter'
+				"init_Encounter",
+				"set_finished",
+				"reset_store",
+				"setSlide",
+				"setLiveEncounter"
 			]),
 			...mapActions("campaigns", ["get_campaign"]),
 			...mapActions("encounters", ["get_encounter"]),
-			setSize() {
-				this.width = this.$refs.encounter.clientWidth;
+			setSize(size) {
+				this.width = size.width;
 			},
 			confirmFinish() {
-				this.$snotify.error('All NPC\'s seem to be dead. Do you want to finish the encounter?', 'Finish Encounter', {
+				this.$snotify.error("All NPC's seem to be dead. Do you want to finish the encounter?", "Finish Encounter", {
 					position: "centerCenter",
 					timeout: 0,
 					buttons: [
-						{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
-						{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: "Finish", action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: "Cancel", action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { general_module } from '@/store/modules/general';
 import { tips_module } from '@/store/modules/tips';
-import { encounter_module } from '@/store/modules/encounter';
+import { run_encounter } from '@/store/modules/runEncounter';
 import user from '@/store/modules/user';
 import api_spells from '@/store/modules/content/spells.js';
 import api_monsters from '@/store/modules/content/monsters.js';
@@ -25,7 +25,7 @@ export const store = new Vuex.Store({
 	modules: {
 		general: general_module,
 		user: user,
-		encounter: encounter_module,
+		encounter: run_encounter,
 		api_spells: api_spells,
 		campaigns: campaigns,
 		api_monsters: api_monsters,

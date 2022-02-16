@@ -1,6 +1,7 @@
 import { skills } from "@/mixins/skills";
 import { abilities } from "@/mixins/abilities";
 import { monsterMixin } from "@/mixins/monster";
+import { db } from "@/firebase";
 import Vue from "vue";
 
 const demoPlayers = {
@@ -128,6 +129,7 @@ const getDefaultState = () => {
 		entities: {},
 		targeted: [],
 		encounter: undefined,
+		requests: undefined,
 		campaignId: undefined,
 		encounterId: undefined,
 		log: [],
@@ -148,6 +150,7 @@ const getters = {
 	down(state) { return state.down },
 	targeted(state) { return state.targeted },
 	encounter(state) { return state.encounter },
+	requests(state) { return state.requests },
 	uid(state) { return state.uid },
 	campaignId(state) { return state.campaignId },
 	encounterId(state) { return state.encounterId },
@@ -189,14 +192,23 @@ const actions = {
 		commit("SET_PATH", path);
 
 		try {
-			//Set the entities when it's not a demo encounter
+			// Set the entities when it's not a demo encounter
 			if(!demo) {
+				// Fetch the encounter
 				const encounter = await dispatch("encounters/get_encounter", {
 					uid,
 					campaignId: cid,
 					id: eid
 				});
 				commit("SET_ENCOUNTER", encounter);
+
+				// Setup the requests connection
+				const requests_ref = db.ref(`encounters/${uid}/${cid}/${eid}/requests`);
+				await requests_ref.on("value", (snapshot) => {
+					commit("SET_REQUESTS", snapshot.val());
+				});
+
+				// Add the entities
 				for (let key in encounter.entities) {
 					await dispatch("add_entity", key);
 				}
@@ -1559,6 +1571,23 @@ const actions = {
 	},
 
 	/**
+	 * Delete a player request
+	 * 
+	 * @param {string} id Request ID
+	 */
+	async delete_request({ state, rootGetters, commit, dispatch }, id) {
+		if(!state.demo)  {
+			await dispatch("encounters/delete_request", {
+				uid: rootGetters.user.uid,
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				id
+				}, { root: true });
+		}
+		commit("DELETE_REQUEST", id);
+	},
+
+	/**
 	 * Tracks use of abilities with limited uses
 	 * 
 	 * @param {string} key Entity Key
@@ -1625,6 +1654,7 @@ const mutations = {
 	SET_ENCOUNTER(state, payload) { Vue.set(state, 'encounter', payload); },
 	SET_TARGETED(state, payload) { Vue.set(state, "targeted", payload); },
 	SET_PATH(state, path) { Vue.set(state, 'path', path); },
+	SET_REQUESTS(state, requests) { Vue.set(state, "requests", requests); },
 	INITIALIZED(state) { Vue.set(state, 'encounter_initialized', true); },
 	UNINITIALIZED(state) { Vue.set(state, 'encounter_initialized', false); },
 	RESET_STORE(state) { Object.assign(state, getDefaultState()); },
@@ -1633,6 +1663,7 @@ const mutations = {
 	SET_TURN(state, payload) { Vue.set(state.encounter, 'turn', payload); },
 	SET_ROUND(state, payload) { Vue.set(state.encounter, 'round', payload); },
 	FINISH(state) { Vue.set(state.encounter, 'finished', true); },
+	DELETE_REQUEST(state, id) { Vue.delete(state.encounter.requests, id) },
 
 	//ENTITY MUTATIONS
 	SET_ENTITY_PROPERTY(state, {key, prop, value}) { Vue.set(state.entities[key], prop, value); },
@@ -1679,7 +1710,7 @@ const mutations = {
 	}
 }
 
-export const encounter_module = {
+export const run_encounter = {
 	state: state,
 	getters: getters,
 	mutations: mutations,

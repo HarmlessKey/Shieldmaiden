@@ -20,7 +20,7 @@
 					<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 						<CampaignOverview 
 							:players="players" 
-							:campaign-players="campaign.players" 
+							:campaign="campaign" 
 							:width="width" 
 							:shares="shares"
 							:live="broadcasting['.value'] === $route.params.campid"

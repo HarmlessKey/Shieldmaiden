@@ -39,7 +39,6 @@
 </template>
 
 <script>
-	// import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 	import Conditions from '@/components/combat/Conditions.vue';
 	import Reminders from '@/components/combat/Reminders.vue';

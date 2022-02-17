@@ -1,18 +1,11 @@
 <template>
 	<div>
 		<h2>Player requests</h2>
-		<transition-group 
-			v-if="_requests.length"
-			tag="q-list" 
-			class="accordion"
-			name="requests" 
-			enter-active-class="animated animate__fadeInDown" 
-			leave-active-class="animated animate__fadeOutRight"
-		>
+		<q-list	v-if="_requests.length">
 			<template v-for="(request, i) in _requests">
 				<Request :request="request" :i="i" :key="`request-${request.key}`" />
 			</template>
-		</transition-group>
+		</q-list>
 		<template v-else>
 			<p class="red">No requests have been made.</p>
 			<p>
@@ -49,10 +42,10 @@
 		},
 		computed: {
 			...mapGetters([
-				'encounter'
+				"requests"
 			]),
 			_requests() {
-				return _.chain(this.encounter.requests)
+				return _.chain(this.requests)
 					.filter(function(request, key) {
 						request.key = key
 						return request;

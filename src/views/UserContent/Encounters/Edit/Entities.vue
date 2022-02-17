@@ -544,7 +544,7 @@
 				}
 
 				// PLAYER
-				else if (type == 'player') {
+				else if (type === 'player') {
 					await this.add_player_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
@@ -552,14 +552,14 @@
 						player: entity
 					});
 					const companions = this.campaign_players[id].companions;
-					for (let key in companions) {
+					for (const key in companions) {
 						const companion = await this.get_npc({ uid: this.user.uid, id: key });
 						await this.add(e, key, 'companion', companion.name, true, false, id);
 					}
 				}
 
 				// COMPANION
-				else if (type == 'companion') {
+				else if (type === 'companion') {
 					entity.npc = 'custom';
 					entity.player = companion_of;
 					await this.add_player_encounter({

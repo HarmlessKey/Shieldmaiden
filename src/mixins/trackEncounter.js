@@ -23,7 +23,7 @@ export const trackEncounter = {
 					}
 				} else if (entity.entityType === 'companion') {
 					stats = {
-						ac: parseInt(npc.ac),
+						ac: parseInt(npc.armor_class),
 						bonus: parseInt(camp_data.ac_bonus),
 					}
 				} else {

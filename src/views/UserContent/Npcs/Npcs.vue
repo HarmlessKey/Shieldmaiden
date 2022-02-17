@@ -100,9 +100,13 @@
 
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
-			<hk-card header="Import NPC from JSON" :minWidth="400">
+			<hk-card :minWidth="400">
+				<div slot="header" class="card-header">
+					<span>Import NPC from JSON</span>
+					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" v-close-popup />
+				</div>
 				<div class="card-body">
-					<ImportNPC @imported="imported"/>
+					<ImportNPC v-model="import_dialog" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -129,6 +133,7 @@
 				loading_npcs: true,
 				search: "",
 				card_width: 0,
+				overwrite:undefined,
 				columns: [
 					{
 						name: "avatar",
@@ -189,7 +194,7 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs"]),
+			...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs", "add_npc"]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
@@ -225,26 +230,22 @@
 			deleteNpc(key) {
 				this.delete_npc(key);
 			},
-			async imported(npcs) {
-				if (!(npcs instanceof Array)) {
-					npcs = [npcs];
-				}
-				this.import_dialog = false;
-				for (const npc of npcs) {
-					await this.add_npc(npc);
-				}
-				this.$snotify.success(`Imported ${npcs.length} Monsters`, 'Critical hit!', {position: "rightTop"});
-			},
+			
 			setSize(e) {
 				this.card_width = e.width;
 			},
 			async exportAll() {
 				const all_npcs = await this.get_full_npcs();
+				for (const key in all_npcs) {
+					all_npcs[key].harmless_key = key
+				}
+
 				const json_export = Object.values(all_npcs);
 				this.downloadJSON(json_export);
 			},
 			async exportNPC(id) {
 				const npc = await this.get_npc({ uid: this.userId, id });
+				npc.harmless_key = id;
 				this.downloadJSON(npc);
 			},
 			async downloadJSON(data) {

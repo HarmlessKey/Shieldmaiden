@@ -260,7 +260,14 @@
 
 			<!-- PLAYERS -->
 			<div class="col-12 col-md-5">
-				<Players v-if="!loading_campaign" :userId="user.uid" :campaignId="campaignId" card-view />
+				<Players 
+					v-if="!loading_campaign" 
+					:userId="user.uid" 
+					:campaignId="campaignId" 
+					card-view
+					:campaign="campaign"
+					:players="players"
+				/>
 				<hk-card v-else>
 					<hk-loader name="campaign" />
 				</hk-card>
@@ -323,6 +330,7 @@
 				loading_finished: false,
 				finished_fetched: false,
 				campaign: {},
+				players: {},
 				newEncounter: "",
 				add: false,
 				currentPage: 1,
@@ -363,12 +371,23 @@
 			}
 		},
 		async mounted() {
-			this.campaign = await this.get_campaign({
+			await this.get_campaign({
 				uid: this.user.uid,
 				id: this.campaignId
+			}).then(async campaign => {
+				this.campaign = campaign;
+				
+				const campaignPlayers = {};
+				for(const playerId in campaign.players) {
+					const player = await this.get_player({ uid: this.user.uid, id: playerId });
+					if(player) {
+						campaignPlayers[playerId] = player;
+					}
+				}
+				this.players = campaignPlayers;
+				this.loading_campaign = false;
 			});
 			this.set_active_campaign(this.campaignId);
-			this.loading_campaign = false;
 
 			await this.get_campaign_encounters({ campaignId: this.campaignId });
 			this.loading_active = false;
@@ -404,30 +423,29 @@
 				"get_campaign",
 				"set_active_campaign"
 			]),
+			...mapActions("players", ["get_player"]),
 			async getFinishedEncounters() {
 				this.loading_finished = true;
 				await this.get_campaign_encounters({ campaignId: this.campaignId, finished: true });
 				this.loading_finished = false;
 				this.finished_fetched = true;
 			},
-			addEncounter() {
-				if ((this.encounter_count < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
-					this.add_encounter({
-						campaignId: this.campaignId, 
-						encounter: {
-							name: this.newEncounter, 
-							round: 0, 
-							turn: 0, 
-							finished: false,
-							timestamp: Date.now()
-						}
-					});
-					this.newEncounter = "";
-					this.$snotify.success('Encounter added.', 'Critical hit!', {
-						position: "rightTop"
-					});
-					this.add = false;
-				}
+			async addEncounter() {			
+				this.add = false;
+				await this.add_encounter({
+					campaignId: this.campaignId, 
+					encounter: {
+						name: this.newEncounter, 
+						round: 0, 
+						turn: 0, 
+						finished: false,
+						timestamp: Date.now()
+					}
+				});
+				this.newEncounter = "";
+				this.$snotify.success('Encounter added.', 'Critical hit!', {
+					position: "rightTop"
+				});
 			},
 			deleteEncounter(e, key, encounter) {
 				//Instantly delete when shift is held

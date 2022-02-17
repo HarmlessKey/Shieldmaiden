@@ -18,7 +18,7 @@
 						{{ entity.curHp}} / {{entity.maxHp}}
 						<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
 					</div>
-					<a @click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: [entity.key] })">
+					<a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: [entity.key] })">
 						<i class="fas fa-pencil"></i>
 					</a>
 					<q-input 
@@ -65,7 +65,9 @@
 <style lang="scss" scoped>
 	ul.entities li {
 		padding-right: 3px;
+		
 		.actions {
+			align-items: center;
 			padding: 0;
 		}
 	}

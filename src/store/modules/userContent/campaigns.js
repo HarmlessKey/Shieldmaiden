@@ -98,6 +98,7 @@ const actions = {
    * - Check advancement
    * - Set current hit points
    * - Remove ghost players
+   * - Remove ghost companions
    * 
    * @param {string} uid userId
    * @param {string} id campaignId
@@ -840,7 +841,7 @@ const mutations = {
         if(state.cached_campaigns[uid][campaignId].inventory.items) {
           Vue.set(state.cached_campaigns[uid][campaignId].inventory.items, id, item);
         } else {
-          Vue.set(state.cached_campaigns[uid][campaignId], "items", { [id]: item });
+          Vue.set(state.cached_campaigns[uid][campaignId].inventory, "items", { [id]: item });
         }
       } else {
         Vue.set(state.cached_campaigns[uid][campaignId], "inventory", { items: { [id]: item } });

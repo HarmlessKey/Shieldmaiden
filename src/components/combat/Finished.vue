@@ -100,17 +100,17 @@
 											</div>
 										</div>
 										
-										<div class="d-flex justify-content-center mt-3">
-											<a
-												v-if="!encounter.currency_awarded"
-												class="btn" 
-												@click="awardCurrency"
-											>
-												Award <i class="far fa-chevron-double-right"></i>
-											</a>
-											<div v-else class="green">
-												<i class="fas fa-check"></i> Awarded
-											</div>
+									</div>
+									<div class="d-flex justify-content-center mb-4">
+										<a
+											v-if="!encounter.currency_awarded"
+											class="btn" 
+											@click="awardCurrency"
+										>
+											Award <i class="far fa-chevron-double-right"></i>
+										</a>
+										<div v-else class="green">
+											<i class="fas fa-check"></i> Currency awarded
 										</div>
 									</div>
 									
@@ -135,7 +135,7 @@
 										</q-list>
 									</template>
 
-									<template v-if="awardedItems">
+									<template v-if="awardedItems && Object.keys(awardedItems).length">
 										<h3>Awarded Items</h3>
 										<q-list>
 											<q-item v-for="(item, key) in awardedItems" :key="key">

@@ -40,32 +40,32 @@
 				</div>
 				<div class="actions">
 					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
-					<a v-if="!entity.reminders.surprised" class="pointer" @click="setSurprised(entity.key, true)">
+					<a v-if="!entity.reminders.surprised" class="btn btn-sm bg-neutral-5" @click="setSurprised(entity.key, true)">
 						<i class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set surprised
 						</q-tooltip>
 					</a>
-					<a v-else class="pointer" @click="setSurprised(entity.key, false)">
+					<a v-else class="btn btn-sm bg-neutral-5" @click="setSurprised(entity.key, false)">
 						<i class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Remove surprised
 						</q-tooltip>
 					</a>
 					<!-- Hide / Unhide Entity -->
-					<a v-if="!entity.hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})">
+					<a v-if="!entity.hidden" class="btn btn-sm bg-neutral-5" @click="set_hidden({key: entity.key, hidden: true})">
 						<i class="fas fa-eye-slash"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set hidden
 						</q-tooltip>
 					</a>
-					<a v-else class="pointer mr-1" @click="set_hidden({key: entity.key, hidden: false})">
+					<a v-else class="btn btn-sm bg-neutral-5 mr-1" @click="set_hidden({key: entity.key, hidden: false})">
 						<i class="fas fa-eye"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Unhide
 						</q-tooltip>
 					</a>
-					<a class="pointer" @click="set_active({key: entity.key, active: false})">
+					<a class="btn btn-sm bg-neutral-5" @click="set_active({key: entity.key, active: false})">
 						<i class="fas fa-minus"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set inactive
@@ -149,5 +149,13 @@
 <style lang="scss" scoped>
 	ul.entities li {
 		padding-right: 3px;
+
+		.actions {
+			align-items: center;
+
+			a {
+				margin-left: 5px;
+			}
+		}
 	}
 </style>

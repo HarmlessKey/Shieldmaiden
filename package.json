@@ -15,6 +15,8 @@
     "@fortawesome/free-solid-svg-icons": "^5.7.0",
     "@fortawesome/vue-fontawesome": "^0.1.5",
     "@quasar/extras": "^1.0.0",
+    "ajv": "^8.10.0",
+    "ajv-formats": "^2.1.1",
     "animate.css": "^4.1.1",
     "axios": "^0.21.4",
     "core-js": "^2.6.5",

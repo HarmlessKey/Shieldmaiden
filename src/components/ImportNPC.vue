@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<template v-if="!parsed">
+		<template v-if="!parsed && !parsing">
 			<q-file 
 				:dark="$store.getters.theme === 'dark'" 
 				filled square 
@@ -36,6 +36,7 @@
 				</q-form>
 			</ValidationObserver>
 		</template>
+		<hk-loader v-else-if="!parsed" prefix="Validating" />
 		<div v-else-if="!importing">
 			<template v-for="type in Object.keys(imports)">
 				<div v-if="imports[type].length" class="mb-4" :key="type">
@@ -58,7 +59,21 @@
 						selection="multiple"
 						:selected.sync="selected[type]"
 						hide-bottom
-					/>
+					>
+						<template v-slot:body-cell-invalid="props">
+							<td class="text-right">
+								<hk-popover v-if="props.row.errors">
+									<q-icon name="error" class="red" />
+									<div slot="content">
+										NPC is invalid.
+										<div v-for="(error, i) in props.row.errors" :key="`${props.row.index}-error-${i}`" class="red">
+											{{ error.message.capitalize() }} 
+										</div>
+									</div>
+								</hk-popover>
+							</td>
+						</template>
+					</q-table>
 					<q-toggle 
 						v-if="type === 'duplicate'"
 						v-model="overwrite" 
@@ -155,7 +170,12 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import schema from "@/schemas/hk-npc-schema.json"
+import schema from "@/schemas/hk-npc-schema.json";
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
+
+const ajv = new Ajv();
+addFormats(ajv, ["uri"]);
 
 export default {
 	name: "ImportNPCs",
@@ -166,6 +186,7 @@ export default {
 			json_file: undefined,
 			json_input: undefined,
 			overwrite: true,
+			parsing: false,
 			parsed: false,
 			failed_imports: [],
 			importing: undefined,
@@ -187,6 +208,12 @@ export default {
 					sortable: true,
 					align: "left",
 					format: val => val.capitalizeEach()
+				},
+				{
+					name: "invalid",
+					label: "",
+					field: "errors",
+					align: "right"
 				}
 			],
 			pagination: { 
@@ -237,9 +264,19 @@ export default {
 		},
 
 		async parse(npcs) {
-			this.parsed = true;
+			this.parsing = true;
 			if (!(npcs instanceof Array)) {
 				npcs = [npcs];
+			}
+
+			// Validate NPCs
+			for(const npc of npcs) {
+				const valid = ajv.validate(schema, npc);
+
+				if(!valid) {
+					console.log(ajv.errors)
+					npc.errors = ajv.errors;
+				}
 			}
 
 			// Filter out duplicate NPCs
@@ -259,6 +296,8 @@ export default {
 			this.imports.unique.forEach((row, index) => {
 				row.index = index
 			});
+
+			this.parsed = true;
 		},
 		async import_npcs() {
 			if(this.importTotal <= this.availableSlots) {

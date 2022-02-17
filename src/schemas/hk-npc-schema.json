@@ -5,6 +5,10 @@
   "description": "JSON Schema for importing Harmless Key NPCs",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "properties": {
+    "harmless_key": {
+      "type": "string",
+      "maxLength": 100
+    },
     "name": {
       "title": "Name",
       "type": "string",
@@ -67,9 +71,9 @@
         "Any",
         "Any alignment",
         "Unaligned",
-        "Lawful Good",
-        "Neutral Good",
-        "Chaotic Good",
+        "Lawful good",
+        "Neutral good",
+        "Chaotic good",
         "Lawful neutral",
         "Neutral",
         "Chaotic neutral",
@@ -293,7 +297,7 @@
       "title": "Skills",
       "type": "array",
       "items": {
-        "$refs": "#/$defs/skill-select"
+        "$ref": "#/$defs/skill-select"
       }
     },
     "skills_expertise": {
@@ -531,6 +535,7 @@
         "properties": {
           "legendary_cost": {
             "title": "Legendary cost",
+            "type": "integer",
             "description": "How many legendary actions does this action cost.",
             "minimum": 0,
             "maximum": 9

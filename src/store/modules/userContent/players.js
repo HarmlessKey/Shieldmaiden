@@ -77,12 +77,17 @@ const actions = {
     return players;
   },
 
+  /**
+   * Fetches a full player object
+   * 
+   * - Delete ghost companions
+   */
   async get_player({ state, commit, dispatch }, { uid, id }) {
     let player = (state.cached_players[uid]) ? state.cached_players[uid][id] : undefined;
+    const services = await dispatch("get_player_services");
 
     // The player is not in the store and needs to be fetched from the database
     if(!player) {
-      const services = await dispatch("get_player_services");
       try {
         player = await services.getPlayer(uid, id);
         commit("SET_CACHED_PLAYER", { uid, id, player });
@@ -90,6 +95,25 @@ const actions = {
         throw error;
       }
     }
+
+    // Delete ghost companions
+    if(player.companions) {
+      for(const companionId of Object.keys(player.companions)) {
+        const companion = await dispatch("npcs/get_npc", { uid, id: companionId }, { root: true });
+
+        // If the NPC doesn't exist, delete the companion
+        if(!companion) {
+          await dispatch("delete_companion", {
+            uid,
+            playerId: id,
+            id: companionId
+          });
+          delete player.companions[companionId];
+          console.warn(`Ghost companion ${companionId} deleted from player`);
+        }
+      }
+    }
+
     return player;
   },
 

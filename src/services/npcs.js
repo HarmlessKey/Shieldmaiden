@@ -89,12 +89,12 @@ export class npcServices {
    * @param {Object} search_npc Compressed NPC
    */
   async editNpc(uid, id, npc, search_npc) {
-    NPCS_REF.child(uid).child(id).set(npc).then(() => {
-      SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
-      return;
-    }).catch((error) => {
+    try {
+      await NPCS_REF.child(uid).child(id).set(npc);
+      await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+    } catch(error) {
       throw error;
-    });
+    }
   }
 
   /**

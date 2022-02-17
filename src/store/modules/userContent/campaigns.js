@@ -98,6 +98,7 @@ const actions = {
    * - Check advancement
    * - Set current hit points
    * - Remove ghost players
+   * - Remove ghost companions
    * 
    * @param {string} uid userId
    * @param {string} id campaignId

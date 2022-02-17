@@ -1,9 +1,9 @@
 {
-  "type": "object",
-  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Harmless Key NPC",
   "description": "JSON Schema for importing Harmless Key NPCs",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "type": "object",
   "properties": {
     "harmless_key": {
       "type": "string",
@@ -56,7 +56,7 @@
         "Ooze",
         "Plant",
         "Swarm of tiny beasts",
-        "undead"
+        "Undead"
       ]
     },
     "subtype": {
@@ -307,7 +307,7 @@
         "$ref": "#/$defs/skill-select"
       }
     },
-    "skill_odifiers": {
+    "skill_modifiers": {
       "title": "Skill modifiers",
       "type": "object",
       "additionalProperties": false,
@@ -402,7 +402,7 @@
       "title": "Caster spell slots",
       "type": "array",
       "items": {
-        "type": "integer",
+        "type": ["integer", "null"],
         "maximum": 9,
         "minimum": 1
       },
@@ -452,7 +452,7 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "level": {
+          "limit": {
             "type": "integer",
             "maximum": 9,
             "minimum": -1
@@ -463,7 +463,7 @@
           }
         },
         "required": [
-          "level",
+          "limit",
           "name"
         ]
       }
@@ -837,12 +837,15 @@
                 },
                 "special": {
                   "title": "special",
-                  "type": "string",
-                  "enum": [
-                    "siphon_full",
-                    "siphon_half",
-                    "drain"
-                  ]
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "siphon_full",
+                      "siphon_half",
+                      "drain"
+                    ]
+                  }
                 }
               }
             }

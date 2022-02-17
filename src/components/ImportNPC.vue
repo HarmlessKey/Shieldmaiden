@@ -7,6 +7,7 @@
 				accept=".json"
 				v-model="json_file"
 				@input="loadJSON()"
+				label="Upload JSON file"
 			>
 				<template v-slot:prepend>
 					<q-icon name="attach_file" />
@@ -28,7 +29,6 @@
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
-
 					</ValidationProvider>
 					<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
 						Parse Input
@@ -36,7 +36,7 @@
 				</q-form>
 			</ValidationObserver>
 		</template>
-		<hk-loader v-else-if="!parsed" prefix="Validating" />
+		<hk-loader v-else-if="!parsed" prefix="Validating" title="NPCs" />
 		<div v-else-if="!importing">
 			<template v-for="type in Object.keys(imports)">
 				<div v-if="imports[type].length" class="mb-4" :key="type">
@@ -62,13 +62,17 @@
 					>
 						<template v-slot:body-cell-invalid="props">
 							<td class="text-right">
-								<hk-popover v-if="props.row.errors">
+								<hk-popover v-if="props.row.errors" header="Validation errors">
 									<q-icon name="error" class="red" />
 									<div slot="content">
-										NPC is invalid.
-										<div v-for="(error, i) in props.row.errors" :key="`${props.row.index}-error-${i}`" class="red">
-											{{ error.message.capitalize() }} 
-										</div>
+										<ol class="px-3">
+											<li v-for="(error, i) in props.row.errors" :key="`${props.row.index}-error-${i}`" class="red">
+												<b v-if="error.instancePath" class="neutral-1">
+													{{ error.instancePath }}
+												</b>
+												{{ error.message.capitalize() }} 
+											</li>
+										</ol>
 									</div>
 								</hk-popover>
 							</td>
@@ -87,7 +91,10 @@
 				but have only <b class="red">{{ availableSlots }}</b> slots available.
 			</div>
 
-			<div class="d-flex justify-content-end">
+			<div class="d-flex justify-content-between items-center pb-2">
+				<div>
+					<b>{{ selected.unique.length + selected.duplicate.length }}</b> selected
+				</div>
 				<q-form @submit="import_npcs">
 					<q-btn 
 						color="primary" 
@@ -120,12 +127,29 @@
 					<q-item-section class="red">Failed imports</q-item-section>
 				</template>
 				<div class="bg-neutral-8 px-3 py-2">
-					Import failed for these NPCs
-					<ol>
-						<li v-for="(failed, i) in failed_imports" :key="`failed-${i}`">
-							{{ failed.capitalizeEach() }}
-						</li>
-					</ol>
+					<p>Import failed for these NPCs</p>
+					<q-list dense class="mb-2">
+						<q-item v-for="(failed, i) in failed_imports" :key="`failed-${i}`" class="bg-neutral-9">
+							<q-item-section>
+								{{ failed.name.capitalizeEach() }}
+							</q-item-section>
+							<q-item-section avatar>
+								<hk-popover v-if="failed.errors" header="Validation errors">
+									<q-icon name="error" class="red" />
+									<div slot="content">
+										<ol class="px-3">
+											<li v-for="(error, index) in failed.errors" :key="`${i}-error-${index}`" class="red">
+												<b v-if="error.instancePath" class="neutral-1">
+													{{ error.instancePath }}
+												</b>
+												{{ error.message.capitalize() }} 
+											</li>
+										</ol>
+									</div>
+								</hk-popover>
+							</q-item-section>
+						</q-item>
+					</q-list>
 					<p>
 						Make sure there are no validation errors.<br/>
 						<a @click="showSchema = true">Compare with our schema.</a>
@@ -174,7 +198,7 @@ import schema from "@/schemas/hk-npc-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-const ajv = new Ajv();
+const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
 
 export default {
@@ -236,10 +260,10 @@ export default {
 	},
 	methods: {
 		...mapActions("npcs", [
-			"get_full_npcs", 
-			"add_npc", 
-			"edit_npc", 
-			"get_npcs"
+			"add_npc",
+			"edit_npc",
+			"get_npcs",
+			"get_npc"
 		]),
 		loadJSON() {
 			const fr = new FileReader();
@@ -254,11 +278,9 @@ export default {
 		parseJSON() {
 			try {
 				const result = JSON.parse(this.json_input);
-				console.log('result',result)
 				this.parse(result);
 			}
 			catch {
-				console.log("Invalid JSON");
 				this.$snotify.error("Invalid JSON");
 			} 
 		},
@@ -274,14 +296,13 @@ export default {
 				const valid = ajv.validate(schema, npc);
 
 				if(!valid) {
-					console.log(ajv.errors)
 					npc.errors = ajv.errors;
 				}
 			}
 
 			// Filter out duplicate NPCs
 			this.imports.duplicate = npcs.filter(npc => {
-				return this.npcs.map(npc => { return npc.name }).includes(npc.name);
+				return this.npcs.map(npc => { return npc.name.toLowerCase() }).includes(npc.name.toLowerCase());
 			});
 			// Add index for selection
 			this.imports.duplicate.forEach((row, index) => {
@@ -290,7 +311,7 @@ export default {
 
 			// Filter out new NPCs
 			this.imports.unique = npcs.filter(npc => {
-				return !this.npcs.map(npc => { return npc.name }).includes(npc.name);
+				return !this.npcs.map(npc => { return npc.name.toLowerCase() }).includes(npc.name.toLowerCase());
 			});
 			// Add index for selection
 			this.imports.unique.forEach((row, index) => {
@@ -304,33 +325,43 @@ export default {
 				this.importing = this.selected.unique.length + this.selected.duplicate.length;
 				for (const npc of this.selected.unique) {
 					delete npc.index; // Was added for selecion
+						delete npc.player_id; // Should never be imported. Account related property.
 					try {
 						await this.add_npc(npc);
 					} catch {
-						this.failed_imports.push(npc.name);
+						this.failed_imports.push(npc);
 					}
 					this.imported++;
 				}
 	
 				for (const npc of this.selected.duplicate) {
 					delete npc.index; // Was added for selecion
+					delete npc.player_id; // Should never be imported. Account related property.
 					if(this.overwrite) {
 						// Get the id of the existing NPC with the same name
-						const id = this.npcs.filter(item => { return item.name === npc.name})[0].key;
+						const id = this.npcs.filter(item => { return item.name.toLowerCase() === npc.name.toLowerCase()})[0].key;
 						try {
+							// Fetch the full existing NPC
+							const existing_npc = await this.get_npc({ uid: this.uid, id });
+
+							// Keep the player_id of the existing NPC, or remove it if the existing has no player_id
+							// This is an account related property for companions that shouldn't change with imports
+							npc.player_id = (existing_npc.player_id) ? existing_npc.player_id : null;
+
+							// Edit the NPC
 							await this.edit_npc({
 								uid: this.uid,
 								id,
 								npc
 							});
 						} catch {
-							this.failed_imports.push(npc.name);
+							this.failed_imports.push(npc);
 						}
 					} else {
 						try {
 							await this.add_npc(npc);
 						} catch {
-							this.failed_imports.push(npc.name);
+							this.failed_imports.push(npc);
 						}
 					}
 					this.imported++;

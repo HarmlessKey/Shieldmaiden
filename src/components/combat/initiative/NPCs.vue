@@ -2,7 +2,7 @@
 	<div>
 		<hk-tip 
 			value="initiative-decimals" 
-			title="Initiateve decimals" 
+			title="Initiative decimals" 
 			content="Use decimals when multiple entities have the same initiative to change the order."
 		/>
 		

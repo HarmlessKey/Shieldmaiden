@@ -192,7 +192,7 @@
 		data() {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				copy_dialog: false,
@@ -214,19 +214,21 @@
 			}
 		},
 		async mounted() {
-			await this.get_campaign({
-				uid: this.userId,
-				id: this.campaignId
-			}).then(async campaign => {
-				const players = {};
-
-				for(const id in campaign.players) {
-					if(!Object.keys(this.entities).includes(id)) {
-						players[id] = await this.get_player({uid: this.userId, id});
+			if(!this.demo) {
+				await this.get_campaign({
+					uid: this.userId,
+					id: this.campaignId
+				}).then(async campaign => {
+					const players = {};
+	
+					for(const id in campaign.players) {
+						if(!Object.keys(this.entities).includes(id)) {
+							players[id] = await this.get_player({uid: this.userId, id});
+						}
 					}
-				}
-				this.players = players;
-			});
+					this.players = players;
+				});
+			}
 		},
 		computed: {
 			...mapGetters([

@@ -49,7 +49,6 @@ export class npcServices {
    * @returns An entire NPC from the npcs reference
    */
   async getNpc(uid, id) {
-    console.log(`NPC ${id} fetched from database`)
     try {
       const npc = await NPCS_REF.child(uid).child(id).once('value');
       return npc.val();

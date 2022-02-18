@@ -324,7 +324,6 @@ export default {
 				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
 			};
 			if(this.special) {
-				console.log(this.special)
 				if(this.special.includes("siphon_full")) specials.siphon_half.disable = true;
 				if(this.special.includes("siphon_half")) specials.siphon_full.disable = true;
 			}

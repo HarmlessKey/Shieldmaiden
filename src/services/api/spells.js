@@ -35,7 +35,6 @@ export class spellServices {
   }
 
   async getSpell(id) {
-    console.log(`Spell ${id} fetched from DB`);
     return this.HK.get(`${SPELLS_REF}/${id}`).then((response) => {
       return response.data;
     }).catch((error) => {

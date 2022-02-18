@@ -235,7 +235,6 @@ const mutations = {
     }
   },
   REMOVE_REMINDER(state, id) { 
-    console.log("remove", id)
     Vue.delete(state.reminders, id); },
   REMOVE_CACHED_REMINDER(state, { uid, id }) {
     if(state.cached_reminders[uid]) {

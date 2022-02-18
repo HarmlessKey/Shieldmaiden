@@ -46,7 +46,6 @@ export class monsterServices {
   }
 
   async getMonster(id) {
-    console.log(`Monster ${id} fetched from DB`)
     return this.HK.get(`${MONSTERS_REF}/${id}`).then((response) => {
       return response.data;
     }).catch((error) => {

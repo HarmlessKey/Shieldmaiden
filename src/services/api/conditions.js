@@ -36,7 +36,6 @@ export class conditionServices {
   }
 
   async getCondition(id) {
-    console.log(`Condition ${id} fetched from DB`)
     return this.HK.get(`${CONDITIONS_REF}/${id}`).then((response) => {
       return response.data;
     }).catch((error) => {

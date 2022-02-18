@@ -262,7 +262,6 @@
 		},
 		methods: {
 			setVoucher(valid) {
-				console.log(valid)
 				if (valid) {
 					if(this.voucher.id === 'basic') {
 						db.ref(`users/${this.id}/voucher`).remove()

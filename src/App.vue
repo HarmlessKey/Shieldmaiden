@@ -42,9 +42,9 @@
 				<template v-slot:avatar>
 					<q-icon name="info" />
 				</template>
-				<h3 class="mb-1">Scheduled maintenance</h3>
+				<h3 class="mb-1">Nothing to see here</h3>
 				<p><b>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</b></p>
-				<p>Harmless Key will be unavailable for 1 to 2 hours.</p>
+				<p>No announcement</p>
 				<template v-slot:action>
 					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
 				</template>
@@ -179,14 +179,14 @@
 		return {
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
-			announcementSetter: undefined,
+			announcementSetter: false,
 			announcement_cookie: false,
 			install_cookie: false,
 			broadcast: undefined,
 			deferredPrompt: null,
 			install_dialog: false,
 			never_show_install: false,
-			maintenance: false,
+			maintenance: "2022-02-18 11:00:00.000Z",
 		}
 	},
 	watch: {

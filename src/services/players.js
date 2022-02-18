@@ -26,7 +26,6 @@ export class playerServices {
   }
 
   async getPlayer(uid, id) {
-    console.log(`Player ${id} fetched from database`);
     try {
       const player = await PLAYERS_REF.child(uid).child(id).once('value');
       return player.val();

@@ -115,8 +115,17 @@
 								const encounter = users[uid][cid][eid];
 	
 								if ('loot' in encounter) {
+									const loot = encounter.loot;
+									const properties = ["items", "cp", "sp", "ep", "gp", "pp"];
+									console.log(Object.keys(loot), properties, properties.filter(val => Object.keys(loot).includes(val)))
+									if(properties.filter(val => Object.keys(loot).includes(val)).length > 0) {
+										await db.ref(`encounters/${uid}/${cid}/${eid}/loot`).remove();
+										console.log("old stuff deleted");
+										continue;
+									}
 									for (const item_key in encounter.loot) {
 										const item = encounter.loot[item_key];
+										console.log("encounter", eid, item)
 										if ('linked_item' in item && typeof item.linked_item === 'string') {
 											// Create linked_item object, default to not custom item.
 											const linked_item = {

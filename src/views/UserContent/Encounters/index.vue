@@ -347,19 +347,25 @@
 						name: "entities",
 						label: "Entities",
 						field: "entity_count",
-						align: "left"
+						align: "left",
+						style: 'width: 40px',
+						headerStyle: 'width: 40px'
 					},
 					{
 						name: "round",
 						label: "Round",
 						field: "round",
-						align: "left"
+						align: "left",
+						style: 'width: 40px',
+						headerStyle: 'width: 40px'
 					},
 					{
 						name: "turn",
 						label: "Turn",
 						field: "turn",
 						align: "left",
+						style: 'width: 40px',
+						headerStyle: 'width: 40px',
 						format: val => val + 1
 					},
 					{

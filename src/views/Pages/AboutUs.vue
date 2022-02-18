@@ -28,8 +28,8 @@
 									</div>
 								</div>
 								<div class="initiative text-center">
-									Initiative 
-									<div class="score">-2</div>
+									Proficiency 
+									<div class="score">+5</div>
 								</div>
 							</div>
 							<div class="row q-col-gutter-md">
@@ -86,8 +86,8 @@
 									</div>
 								</div>
 								<div class="initiative text-center">
-									Initiative 
-									<div class="score">+2</div>
+									Proficiency 
+									<div class="score">+5</div>
 								</div>
 							</div>
 							<div class="row q-col-gutter-md">

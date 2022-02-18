@@ -12,7 +12,7 @@
 						data: { current: currency }
 					}) : null
 				">
-				<template v-if="currency">
+				<template v-if="currency && Object.keys(currency).length">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
 							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>
@@ -118,7 +118,7 @@
 			<div class="col header text-right" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in campaign.players">
-				<template v-if="player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
+				<template v-if="players[key] && player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
 					<div 
 						class="image" 
 						:key="'image-'+key" 

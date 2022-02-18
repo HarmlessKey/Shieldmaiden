@@ -87,7 +87,7 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.user.uid,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				query: "",
 				searchResults: [],
 				noResult: "",
@@ -113,7 +113,7 @@
 		},
 		async mounted() {
 			// Get custom content
-			if(this.content.includes("custom")) {
+			if(this.content.includes("custom") && this.userId) {
 				if(this.type === "monster") {
 					await this.get_npcs();
 				}

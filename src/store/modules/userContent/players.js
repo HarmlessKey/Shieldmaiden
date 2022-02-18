@@ -419,8 +419,8 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
-        await services.removeControl(uid, id);
         await services.updatePlayer(owner_id, id, "", { control: null });
+        await services.removeControl(uid, id);
         commit("REMOVE_CHARACTER", id);
         return;
       } catch(error) {

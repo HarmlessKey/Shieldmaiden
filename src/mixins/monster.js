@@ -142,7 +142,7 @@ export const monsterMixin = {
 		 * @param {object} monster The old monster object
 		 * @returns {object} The new monster object
 		 */
-		parseMonster(monster) {
+		parseMonster(monster, uid, key) {
 			let new_monster = {};
 			new_monster.name = (monster.name) ? monster.name.toLowerCase() : "monster name"; // required
 			new_monster.challenge_rating = (Number(monster.challenge_rating) && !isNaN(monster.challenge_rating)) ? monster.challenge_rating : 1; // required
@@ -164,6 +164,7 @@ export const monsterMixin = {
 			if(monster.friendly) new_monster.friendly = true;
 			
 			let proficiency = 0
+			if(!this.monster_challenge_rating[new_monster.challenge_rating]) console.log(uid, key)
 			if (this.monster_challenge_rating[new_monster.challenge_rating].proficiency) {
 				proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency
 			} else {

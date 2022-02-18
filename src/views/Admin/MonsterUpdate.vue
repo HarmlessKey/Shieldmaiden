@@ -232,7 +232,7 @@
 				const ref = (uid) ? db.ref(`npcs/${uid}/${key}`) : db.ref(`monsters/${key}`);
 				// If a mosnter has old properties, parse it first
 				if(entry.hasOwnProperty("ac") || entry.hasOwnProperty('old')) {
-					entry = await this.parseMonster(entry);
+					entry = await this.parseMonster(entry, uid, key);
 				}
 
 				// Remove not allowed properties

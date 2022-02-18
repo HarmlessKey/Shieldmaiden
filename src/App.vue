@@ -186,7 +186,7 @@
 			deferredPrompt: null,
 			install_dialog: false,
 			never_show_install: false,
-			maintenance: "2022-02-18 11:00:00.000Z",
+			maintenance: false,
 		}
 	},
 	watch: {

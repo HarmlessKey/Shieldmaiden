@@ -13,10 +13,6 @@
 							<i class="fas fa-copy mr-2"></i>
 							Copy
 						</q-btn>
-						<q-btn v-if="!npcId" color="neutral-5" no-caps @click="import_dialog = true">
-							<i class="fas fa-file-upload mr-2"></i>
-							Import
-						</q-btn>
 					</div>
 
 					<div class="form">
@@ -73,19 +69,6 @@
 					<CopyContent @copy="copy" type="monster" />
 				</div>
 			</hk-card>
-		</q-dialog>		
-		
-		<!-- Import Dialog  -->
-		<q-dialog v-model="import_dialog">
-			<hk-card :minWidth="400">
-				<div slot="header" class="card-header">
-					<span>Import NPC from JSON</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
-				<div class="card-body">
-					<ImportNPC @imported="imported" />
-				</div>
-			</hk-card>
 		</q-dialog>
 	</div>
 	<hk-loader v-else name="NPC" />
@@ -102,7 +85,6 @@
 	import SpellCasting from '@/components/npcs/SpellCasting';
 	import Actions from '@/components/npcs/Actions';
 	import CopyContent from "@/components/CopyContent";
-	import ImportNPC from "@/components/ImportNPC";
 
 	export default {
 		name: 'EditNpc',
@@ -115,8 +97,7 @@
 			Defenses,
 			SpellCasting,
 			Actions,
-			CopyContent,
-			ImportNPC
+			CopyContent
 		},
 		data() {
 			return {
@@ -128,9 +109,7 @@
 				copy_dialog: false,
 				copy_resource_setter: undefined,
 				import_dialog: false,
-				unsaved_changes: false,
-				// json_file: undefined,
-				// json_input: ""
+				unsaved_changes: false
 			}
 		},
 		async mounted() {
@@ -179,17 +158,6 @@
 			copy({ result }) {
 				this.copy_dialog = false;
 				this.npc = result;
-			},
-			imported(npc) {
-				if (npc instanceof Array) {
-					if (npc.length > 1) {
-						this.$snotify.warning("Imported first in list", "Multiple NPCs")
-					}
-					npc = npc[0]
-				}
-				
-				this.import_dialog = false;
-				this.npc = npc;
 			},
 			revert_changes() {
 				this.npc = JSON.parse(this.npc_copy);

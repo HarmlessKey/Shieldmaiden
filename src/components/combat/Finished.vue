@@ -166,7 +166,13 @@
 					</hk-card>
 				</div>
 				<div class="col-12 col-md-5">
-					<Players :userId="userId" card-view :campaignId="campaignId" />
+					<Players 
+						:userId="userId" 
+						card-view 
+						:campaign="campaign" 
+						:campaignId="campaignId"
+						:players="campaignPlayers"
+					/>
 				</div>
 			</div>
 		</div>
@@ -195,6 +201,7 @@
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				campaignPlayers: {},
 				campaign: {},
 				patreon: true,
 				tab: "loot"
@@ -238,9 +245,20 @@
 			}
 		},
 		async mounted() {
-			this.campaign = await this.get_campaign({
+			await this.get_campaign({
 				uid: this.userId,
 				id: this.campaignId
+			}).then(async campaign => {
+				this.campaign = campaign;
+				
+				const campaignPlayers = {};
+				for(const playerId in campaign.players) {
+					const player = await this.get_player({ uid: this.userId, id: playerId });
+					if(player) {
+						campaignPlayers[playerId] = player;
+					}
+				}
+				this.campaignPlayers = campaignPlayers;
 			});
 		},
 		methods: {
@@ -260,6 +278,7 @@
 				"set_campaign_currency",
 				"add_campaign_item"
 			]),
+			...mapActions("players", ["get_player"]),
 			awardCurrency() {
 				let oldValue = (this.campaign.inventory && this.campaign.inventory.currency) ? this.campaign.inventory.currency : 0;
 				let newValue = parseInt(oldValue) + this.currencyToCopper(this.encounter.currency);

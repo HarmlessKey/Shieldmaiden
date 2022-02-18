@@ -7,7 +7,7 @@
 		<div id="login" v-show="credentials">
 			<form v-on:submit.prevent>
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				autocomplete="off" 
 				type="text" 
 				v-model="email" 
@@ -16,7 +16,7 @@
 				class="email"
 			/>
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				autocomplete="off" 
 				type="password" 
 				v-model="password" 
@@ -29,7 +29,7 @@
 		</div>
 
 		<div class="d-flex justify-content-center">
-			<router-link class="btn bg-gray mr-2" to="/profile"><i class="fas fa-times"></i> Cancel</router-link>
+			<router-link class="btn bg-neutral-4 mr-2" to="/profile"><i class="fas fa-times"></i> Cancel</router-link>
 			<a v-if="!credentials" class="btn bg-red" @click="deleteUser()"><i class="fas fa-trash-alt"></i> Permanently Remove account</a>
 		</div>
 	</div>
@@ -102,7 +102,7 @@ export default {
 		text-align: center;
 
 		.warning {
-			color:$white;
+			color:$neutral-1;
 			padding: 10px;
 		}
 		#login {

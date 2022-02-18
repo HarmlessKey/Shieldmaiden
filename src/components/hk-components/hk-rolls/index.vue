@@ -1,5 +1,5 @@
 <template>
-	<div class="hk-rolls center-top">
+	<div class="hk-rolls center-top" v-if="action_rolls && action_rolls.length > 0">
 		<transition-group 
 			tag="div"
 			class="rolls"
@@ -11,8 +11,8 @@
 				v-if="action_rolls && action_rolls.length > 1"
 				:key="`clear-button`"
 				@click="clearRolls"
-				color="gray" 
-				class="full-width mb-2" 
+				color="neutral-9" 
+				class="full-width mb-2 neutral-1" 
 				label="Clear all" 
 				icon="fas fa-times" 
 				no-caps

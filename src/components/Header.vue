@@ -15,23 +15,22 @@
 			</div>
 
 			<div class="d-flex justify-content-end">
-				<div class="d-none d-sm-flex">
-					<div 
-						v-for="{name, icon, url} in social_media"
-						class="area d-flex justify-content-end"
-						:key="name"
-					>
-						<a class="icon" :href="url" target="_blank" rel="noopener">
-							<i :class="icon" />
-							<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
-								{{ name }}
-							</q-tooltip>
-						</a>
-					</div>
-					<q-separator vertical dark inset class="mx-1" />
-				</div>
-
-				<div class="area d-flex justify-content-end">
+				<div class="area d-flex justify-content-end" :class="{ 'mr-2': maintenance }">
+					<a class="icon">
+						<i class="fas fa-moon"/>
+						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
+							<div class="theme">
+								<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
+									<img src="@/assets/_img/dark.webp" />
+									Dark
+								</a>
+								<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
+									<img src="@/assets/_img/light.webp" />
+									Light
+								</a>
+							</div>
+						</q-popup-proxy>
+					</a>
 					<a class="icon d-none d-md-block"
 						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
 						<i class="fas fa-keyboard"/>
@@ -47,12 +46,12 @@
 						</q-tooltip>
 					</a>
 					<a 
-						v-if="user"
+						v-if="user && !maintenance"
 						class="icon"
 						@click="setSlide({show: true, type: 'PlayerLink'})">
 						<i class="fas fa-share-alt"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
-							Player link
+							Public initiative
 						</q-tooltip>
 					</a>
 					<a class="icon roll" 
@@ -63,43 +62,45 @@
 						</q-tooltip>
 					</a>
 				</div>
-				<q-separator vertical dark inset class="mx-1" />
-				<div v-if="user" class="user">
-					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
-					<i v-else class="fas fa-user"></i>
-					<q-popup-proxy square :offset="[9, 0]">
-						<div class="bg-gray gray-light">
-							<q-list>
-								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
-									<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
-									<q-item-section>Admin</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
-									<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
-									<q-item-section>Contribute</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/profile">
-									<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
-									<q-item-section>Profile</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/content">
-									<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
-									<q-item-section>My content</q-item-section>
-								</q-item>
-								<q-item clickable v-close-popup to="/settings">
-									<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
-									<q-item-section>Settings</q-item-section>
-								</q-item>
-								<q-separator />
-								<q-item clickable v-close-popup @click="signOut()">
-									<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
-									<q-item-section>Sign out</q-item-section>
-								</q-item>
-							</q-list>
-						</div>
-					</q-popup-proxy>
-				</div>
-				<router-link v-else to="/sign-in" class="px-2">Sign in</router-link>
+				<template v-if="!maintenance">
+					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
+					<div v-if="user" class="user">
+						<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<i v-else class="fas fa-user"></i>
+						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
+							<div class="bg-neutral-8">
+								<q-list>
+									<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
+										<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
+										<q-item-section>Admin</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
+										<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
+										<q-item-section>Contribute</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/profile">
+										<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
+										<q-item-section>Profile</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/content">
+										<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
+										<q-item-section>My content</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup to="/settings">
+										<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+										<q-item-section>Settings</q-item-section>
+									</q-item>
+									<q-separator />
+									<q-item clickable v-close-popup @click="signOut()">
+										<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
+										<q-item-section>Sign out</q-item-section>
+									</q-item>
+								</q-list>
+							</div>
+						</q-popup-proxy>
+					</div>
+					<router-link v-else to="/sign-in" class="px-2">Sign in</router-link>
+				</template>
 			</div>
 		</div>
 	</header>
@@ -110,37 +111,17 @@
 	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
+		name: "Header",
+		props: {
+			maintenance: {
+				type: [Boolean, String],
+				default: false
+			}
+		},
 		data() {
 			return {
 				user: auth.currentUser,
-				enviroment: process.env.NODE_ENV,
-				social_media: [
-					{
-						name: "Discord",
-						icon: "fab fa-discord",
-						url: "https://discord.gg/fhmKBM7"
-					},
-					{
-						name: "Reddit",
-						icon: "fab fa-reddit-alien",
-						url: "https://www.reddit.com/r/HarmlessKey"
-					},
-					{
-						name: "Facebook",
-						icon: "fab fa-facebook",
-						url: "https://www.facebook.com/harmlesskey"
-					},
-					{
-						name: "Instagram",
-						icon: "fab fa-instagram",
-						url: "https://www.instagram.com/harmlesskey"
-					},
-					{
-						name: "Twitter",
-						icon: "fab fa-twitter-square",
-						url: "https://twitter.com/KeyHarmless"
-					},
-				]
+				enviroment: process.env.NODE_ENV
 			}
 		},
 		computed: {
@@ -151,7 +132,9 @@
 		methods: {
 			...mapActions([
 				'setSlide',
-				'setSideSmallScreen'
+				'setSideSmallScreen',
+				'setTheme',
+				'sign_out'
 			]),
 			showSlide(type) {
 				this.setSlide({
@@ -159,12 +142,9 @@
 					type,
 				})
 			},
-			signOut: function() {
-				this.$store.commit("SET_USER", undefined)
-				auth.signOut()
-				.then(() => {
-					if(this.$route.path !== "/") this.$router.replace('/');
-				});
+			signOut() {
+				if(this.$route.path !== "/") this.$router.replace('/');
+				this.sign_out();
 			}
 		}
 	};
@@ -196,7 +176,7 @@
 	}
 }
 a {
-	color:$gray-light !important;
+	color: $neutral-2 !important;
 
 	&:hover {
 		color: $blue !important;
@@ -212,7 +192,7 @@ a.icon {
 	line-height: 50px !important;
 
 	&:hover {
-		color:$white !important;
+		color: $neutral-1 !important;
 	}
 	&.roll {
 		margin-left: 5px;
@@ -220,6 +200,33 @@ a.icon {
 		background-size: 22px 22px;
 		background-position: center;
 		background-repeat: no-repeat;
+	}
+}
+.theme {
+	padding: 15px;
+	text-align: center;
+	background-color: $neutral-8;
+
+	a {
+		display: block;
+		margin-bottom: 10px;
+
+		&:last-child {
+			margin: 0;
+		}
+		border: solid 1px transparent;
+		border-radius: $border-radius;
+		padding: 3px;
+		color: $neutral-3;
+
+		&:hover, &.active {
+			border-color: $blue;
+			color: $neutral-1;
+		}
+		img {
+			max-width: 150px;
+			display: block;
+		}
 	}
 }
 .user	{
@@ -275,6 +282,11 @@ a.icon {
 			height: 30px;
 			width: 30px;
 		}
+	}
+}
+[data-theme="light"] {
+	a.icon.roll {
+		background-image: url('../assets/_img/logo/logo-icon-no-shield-gray-dark-no-border.svg');
 	}
 }
 </style>

@@ -5,7 +5,7 @@
 			<div class="card-header d-flex justify-content-between">
 				<span><i class="fas fa-dice-d20"/> Rolls</span>
 				<a 
-					class="gray-light text-capitalize" 
+					class="neutral-2 text-capitalize" 
 					@click="newRoll()"
 				>
 					<i class="fas fa-plus green"></i>
@@ -80,8 +80,8 @@
 							@input="$forceUpdate()"
 						/>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
-							<q-btn color="primary" type="submit" :label="(edit_index !== undefined) ? 'Save' : 'Add'" />
+							<q-btn no-caps class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
+							<q-btn no-caps color="primary" type="submit" :label="(edit_index !== undefined) ? 'Save' : 'Add'" />
 						</div>
 					</hk-card>
 				</q-form>

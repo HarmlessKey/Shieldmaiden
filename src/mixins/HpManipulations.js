@@ -117,7 +117,7 @@ export const setHP = {
 			if(rest_amount > 0) {
 				var newhp = parseInt(curHp - rest_amount);
 
-				if(newhp <= 0) {
+				if(newhp <= 0 && target.entityType !== "npc") {
 					this.set_stable({
 						key: target.key,
 						action: 'unset',
@@ -138,10 +138,7 @@ export const setHP = {
 					}
 					//Character dies if the overkill is >= maxHp
 					if(over >= maxHp && (target.entityType === 'player' || target.entityType === 'companion')) {
-						this.set_dead({
-							key: target.key,
-							action: 'set',
-						})
+						this.set_dead({ key: target.key })
 					}
 				}
 				this.set_hp({
@@ -232,7 +229,7 @@ export const setHP = {
 				})
 				this.set_dead({
 					key: target.key,
-					action: 'unset',
+					action: "unset"
 				})
 			}
 

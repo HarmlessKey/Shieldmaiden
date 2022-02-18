@@ -2,10 +2,19 @@
   "rules": {
     "campaigns": {
       "$uid": {
-        ".write": "$uid === auth.uid",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
         ".indexOn": "private"
       },
       ".read": true
+    },
+    "search_campaigns": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": {
+          ".indexOn": ["name"]
+        }
+      }
     },
     "users": {
       "$uid": {
@@ -32,25 +41,17 @@
         },
         "patreon_email": {
           ".write": "root.child('users').child(auth.uid).child('admin').exists()"
-        }
+        },
       },
       ".read": true,
-      ".indexOn": [
-        "username",
-        "email",
-        "admin",
-        "contribute"
-      ]
+      ".indexOn": ["username", "email", "admin", "contribute"]
     },
     "search_users": {
       "$uid": {
         ".write": true
       },
       ".read": true,
-      ".indexOn": [
-        "username",
-        "email"
-      ]
+      ".indexOn": ["username", "email"]
     },
     "status": {
       ".write": true,
@@ -60,7 +61,7 @@
     "posters": {
       ".write": true,
       ".read": true,
-    },
+  	},
     "patrons": {
       ".write": true,
       ".read": true,
@@ -89,15 +90,51 @@
     "players": {
       "$uid": {
         "$playerid": {
-          ".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child($playerid).child('user').val() === $uid"
-        },
+          	".write": "
+              $uid === auth.uid || 
+              root.child('character_control').child(auth.uid).child($playerid).child('user').val() === $uid
+       			"
+        }, 
+        ".read": true
+      },
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_players": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": {
+          ".indexOn": ["character_name"]
+        }
+      }
+    },
+    "characters_computed": {
+      "$uid": {
+        "$characterId": {
+          	".write": "
+              $uid === auth.uid || 
+              root.child('character_control').child(auth.uid).child($characterId).child('user').val() === $uid
+       			"
+        }, 
+        ".read": true
+      },
+      ".read": true
+    },
+    "characters_base": {
+      "$uid": {
+        "$characterId": {
+          	".write": "
+              $uid === auth.uid || 
+              root.child('character_control').child(auth.uid).child($characterId).child('user').val() === $uid
+       			"
+        }, 
         ".read": true
       }
     },
     "character_control": {
       "$uid": {
         "$playerid": {
-          ".write": "data.exists() || newData.child('user').val() === auth.uid"
+        	".write": "data.exists() || newData.child('user').val() === auth.uid"
         },
         ".read": true
       }
@@ -105,178 +142,780 @@
     "npcs": {
       "$uid": {
         "$npcId": {
-          ".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child( data.child('player_id').val() ).child('user').val() === $uid",
-          ".validate": "newData.hasChildren(['name', 'challenge_rating', 'armor_class', 'hit_points'])",
+          ".write": "
+          	$uid === auth.uid ||
+            root.child('character_control').child(auth.uid).child( data.child('player_id').val() ).child('user').val() === $uid
+          ",
+          ".validate": "newData.hasChildren(['name', 'size', 'type', 'challenge_rating', 'armor_class', 'hit_points', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'])",
+          "harmless_key": {
+            ".validate": "newData.isString() && newData.val().length <= 100"
+          },
+          // BASIC INFO
           "name": {
             ".validate": "newData.isString() && newData.val().length <= 100"
           },
           "source": {
-            ".validate": "newData.isString() && newData.val().length <= 15"
-          },
-          "avatar": {
-            ".validate": "newData.isString() && newData.val().length <= 9999"
-          },
-          "size": {
             ".validate": "newData.isString() && newData.val().length <= 20"
           },
+          "avatar": {
+            ".validate": "newData.isString() && newData.val().length <= 2000"
+          },
+          "size": {
+            ".validate": "newData.isString() && newData.val().matches(/^(Tiny|Small|Medium|Large|Huge|Gargantuan)$/)"
+          },
           "type": {
-            ".validate": "newData.isString() && newData.val().length <= 25"
+            ".validate": "newData.isString() && newData.val().matches(/^(Aberration|Beast|Celestial|Construct|Dragon|Elemental|Fey|Fiend|Giant|Humanoid|Monstrosity|Ooze|Plant|Swarm of tiny beasts|Undead)$/)"
           },
           "subtype": {
             ".validate": "newData.isString() && newData.val().length <= 25"
           },
           "alignment": {
-            ".validate": "newData.isString() && newData.val().length <= 25"
+            ".validate": "newData.isString() && newData.val().matches(/^(Any|Any alignment|Unaligned|Lawful Good|Neutral Good|Chaotic Good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/i)"
           },
           "walk_speed": {
-            ".validate": "newData.isInteger() && newData.val() <= 999"
+            ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
           },
           "swim_speed": {
-            ".validate": "newData.isInteger() && newData.val() <= 999"
+            ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
           },
           "fly_speed": {
-            ".validate": "newData.isInteger() && newData.val() <= 999"
+            ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
           },
           "burrow_speed": {
-            ".validate": "newData.isInteger() && newData.val() <= 999"
+            ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
           },
           "climb_speed": {
-            ".validate": "newData.isInteger() && newData.val() <= 999"
+            ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
           },
           "languages": {
+            "$langugeIndex": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            }
           },
           "challenge_rating": {
-            ".validate": "newData.isNumber() && newData.val() <= 30"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 30"
+          },
+          "proficiency": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
           },
           "friendly": {
             ".validate": "newData.isBoolean()"
           },
+          "player_id": {
+            ".validate": "newData.isString() && newData.val().length <= 50"
+          },
           "armor_class": {
-            ".validate": "newData.isInteger() && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
           },
           "hit_points": {
-            ".validate": "newData.isInteger() && newData.val() <= 999"
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9999"
           },
           "hit_dice": {
-            ".validate": "newData.isString() && newData.val().matches(/^[0-9]+d[0-9]+$/) && newData.val().lengh <= 10"
+            ".validate": "newData.isString() && newData.val().length <= 10 && (newData.val().length === 0 ||newData.val().matches(/^[0-9]+d[0-9]+$/))"
           },
+
+          // SENSES
           "senses": {
             "blindsight": {
               "blindsight": {
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "comments": {
                 ".validate": "newData.isString() && newData.val().length <= 999"
-              }
+              },
+              "$other": { ".validate": false }
             },
             "darkvision": {
               "darkvision": {
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "comments": {
                 ".validate": "newData.isString() && newData.val().length <= 999"
-              }
+              },
+              "$other": { ".validate": false }
             },
             "tremorsense": {
               "tremorsense": {
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "comments": {
                 ".validate": "newData.isString() && newData.val().length <= 999"
-              }
+              },
+              "$other": { ".validate": false }
             },
             "truesight": {
               "truesight": {
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "comments": {
                 ".validate": "newData.isString() && newData.val().length <= 999"
-              }
+              },
+              "$other": { ".validate": false }
             }
           },
+
+          // ABILITYSCORES
           "strength": {
-            ".validate": "newData.isInteger() && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
           "dexterity": {
-            ".validate": "newData.isInteger() && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
           "constitution": {
-            ".validate": "newData.isInteger() && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
           "intelligence": {
-            ".validate": "newData.isInteger() && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
           "wisdom": {
-            ".validate": "newData.isInteger() && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
           "charisma": {
-            ".validate": "newData.isInteger() && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
+
           "saving_throws": {
+            "$savingIndex": {
+              ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+            }
           },
+
+          // SKILLS
           "skills": {
+            "$skillIndex": {
+              ".validate": "newData.isString() && newData.val().matches(/^(acrobatics|animal Handling|arcana|athletics|deception|history|insight|intimidation|investigation|medicine|nature|perception|performance|persuasion|religion|sleight of Hand|stealth|survival)$/)"
+            }
           },
           "skills_expertise": {
+            "$skillIndex": {
+              ".validate": "newData.isString() && newData.val().matches(/^(acrobatics|animal Handling|arcana|athletics|deception|history|insight|intimidation|investigation|medicine|nature|perception|performance|persuasion|religion|sleight of Hand|stealth|survival)$/)"
+            }
           },
           "skill_modifiers": {
-            "acrobatics": "newData.isInteger() && newData.val() <= 99",
-            "animal Handling": "newData.isInteger() && newData.val() <= 99",
-            "arcana": "newData.isInteger() && newData.val() <= 99",
-            "athletics": "newData.isInteger() && newData.val() <= 99",
-            "deception": "newData.isInteger() && newData.val() <= 99",
-            "history": "newData.isInteger() && newData.val() <= 99",
-            "insight": "newData.isInteger() && newData.val() <= 99",
-            "intimidation": "newData.isInteger() && newData.val() <= 99",
-            "investigation": "newData.isInteger() && newData.val() <= 99",
-            "medicine": "newData.isInteger() && newData.val() <= 99",
-            "nature": "newData.isInteger() && newData.val() <= 99",
-            "perception": "newData.isInteger() && newData.val() <= 99",
-            "performance": "newData.isInteger() && newData.val() <= 99",
-            "persuasion": "newData.isInteger() && newData.val() <= 99",
-            "religion": "newData.isInteger() && newData.val() <= 99",
-            "sleight of Hand": "newData.isInteger() && newData.val() <= 99",
-            "stealth": "newData.isInteger() && newData.val() <= 99",
-            "survival": "newData.isInteger() && newData.val() <= 99"
-          }
-        
+            "acrobatics": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "animal Handling": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "arcana": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "athletics": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "deception": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "history": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "insight": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "intimidation": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "investigation": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "medicine": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "nature": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "perception": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "performance": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "persuasion": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "religion": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "sleight of Hand": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "stealth": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "survival": {
+              ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+            },
+            "$other": {
+              ".validate": false
+            }
+          },
+
+          // DEFENSES
+          "damage_vulnerabilities": {
+            "$vulnerabilityIndex": {
+              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+            }
+          },
+          "damage_resistances": {
+            "$resistanceIndex": {
+              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+            }
+          },
+          "damage_immunities": {
+            "$immunityIndex": {
+              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+            }
+          },
+          "condition_immunities": {
+            "$conditionImmunityIndex": {
+              ".validate": "newData.isString() && newData.val().matches(/^(blinded|charmed|deafened|exhaustion|frightened|grappled|incapacitated|invisible|paralyzed|petrified|poisoned|prone|restrained|stunned|unconscious)$/)"
+            }
+          },
+
+          // SPELLCASTING
+          "caster_ability": {
+            ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+          },
+          "caster_level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+          },
+          "caster_save_dc": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+          },
+          "caster_spell_attack": {
+            ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+          },
+          "caster_spell_slots": {
+            "$slotIndex": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+            }
+          },
+          "caster_spells": {
+            "$spellId": {
+              "level": {
+                ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 9"
+              },
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "$other": { ".validate": false }
+            }
+          },
+
+          "innate_ability": {
+            ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+          },
+          "innate_save_dc": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+          },
+          "innate_spell_attack": {
+            ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+          },
+          "innate_spells": {
+            "$spellId": {
+              "limit": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+              },
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "$other": { ".validate": false }
+            }
+          },
+
+          // ABILITIES
+          "special_abilities": {
+            "$abilityIndex": {
+              ".validate": "newData.hasChildren(['name'])",
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "recharge": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
+              },
+              "limit": {
+                ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+              },
+              "limit_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(day|turn)$/)"
+              },
+              "desc": {
+                ".validate": "newData.isString() && newData.val().length <= 2000"
+              },
+              "reach": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "range": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
+              },
+              "aoe_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
+              },
+              "aoe_size": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "versatile": {
+                ".validate": "newData.isBoolean()"
+              },
+              "versatile_one": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "versatile_two": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "action_list": {
+                "$listIndex": {
+                  "type": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(melee_weapon|ranged_weapon|spell_attack|save|damage|healing|other)$/)"
+                  },
+                  "attack_bonus": {
+                    ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+                  },
+                  "save_ability": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+                  },
+                  "save_dc": {
+                    ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                  },
+                  "rolls": {
+                    "$rollIndex": {
+                      "damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "versatile_damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "versatile_dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "versatile_dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "versatile_fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "projectile_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "miss_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "save_fail_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "special": {
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
+                      },
+                      "$other": { ".validate": false }
+                    }
+                  },
+                  "$other": { ".validate": false }
+                }
+              },
+              "$other": { ".validate": false }
+            }
+          },
+
+          "actions": {
+            "$actionIndex": {
+              ".validate": "newData.hasChildren(['name'])",
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "recharge": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
+              },
+              "limit": {
+                ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+              },
+              "limit_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(day|turn)$/)"
+              },
+              "desc": {
+                ".validate": "newData.isString() && newData.val().length <= 2000"
+              },
+              "reach": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "range": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
+              },
+              "aoe_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
+              },
+              "aoe_size": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "versatile": {
+                ".validate": "newData.isBoolean()"
+              },
+              "versatile_one": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "versatile_two": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "action_list": {
+                "$listIndex": {
+                  "type": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(melee_weapon|ranged_weapon|spell_attack|save|damage|healing|other)$/)"
+                  },
+                  "attack_bonus": {
+                    ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+                  },
+                  "save_ability": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+                  },
+                  "save_dc": {
+                    ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                  },
+                  "rolls": {
+                    "$rollIndex": {
+                      "damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "versatile_damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "versatile_dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "versatile_dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "versatile_fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "projectile_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "miss_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "save_fail_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "special": {
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
+                      },
+                      "$other": { ".validate": false }
+                    }
+                  },
+                  "$other": { ".validate": false }
+                }
+              },
+              "$other": { ".validate": false }
+            }
+          },
+
+          "legendary_count": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+          },
+          "legendary_actions": {
+            "$legendaryIndex": {
+              ".validate": "newData.hasChildren(['name', 'legendary_cost'])",
+              "legendary_cost": {
+                ".validate":  "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9"
+              },
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "recharge": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
+              },
+              "limit": {
+                ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+              },
+              "limit_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(day|turn)$/)"
+              },
+              "desc": {
+                ".validate": "newData.isString() && newData.val().length <= 2000"
+              },
+              "reach": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "range": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
+              },
+              "aoe_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
+              },
+              "aoe_size": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "versatile": {
+                ".validate": "newData.isBoolean()"
+              },
+              "versatile_one": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "versatile_two": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "action_list": {
+                "$listIndex": {
+                  "type": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(melee_weapon|ranged_weapon|spell_attack|save|damage|healing|other)$/)"
+                  },
+                  "attack_bonus": {
+                    ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+                  },
+                  "save_ability": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+                  },
+                  "save_dc": {
+                    ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                  },
+                  "rolls": {
+                    "$rollIndex": {
+                      "damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "versatile_damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "versatile_dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "versatile_dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "versatile_fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "projectile_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "miss_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "save_fail_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "special": {
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
+                      },
+                      "$other": { ".validate": false }
+                    }
+                  },
+                  "$other": { ".validate": false }
+                }
+              },
+              "$other": { ".validate": false }
+            }
+          },
+
+          "reactions": {
+            "$reactionIndex": {
+              ".validate": "newData.hasChildren(['name'])",
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "recharge": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
+              },
+              "limit": {
+                ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+              },
+              "limit_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(day|turn)$/)"
+              },
+              "desc": {
+                ".validate": "newData.isString() && newData.val().length <= 2000"
+              },
+              "reach": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "range": {
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
+              },
+              "aoe_type": {
+                ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
+              },
+              "aoe_size": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+              },
+              "versatile": {
+                ".validate": "newData.isBoolean()"
+              },
+              "versatile_one": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "versatile_two": {
+                ".validate": "newData.isString() && newData.val().length <= 25"
+              },
+              "action_list": {
+                "$listIndex": {
+                  "type": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(melee_weapon|ranged_weapon|spell_attack|save|damage|healing|other)$/)"
+                  },
+                  "attack_bonus": {
+                    ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+                  },
+                  "save_ability": {
+                    ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+                  },
+                  "save_dc": {
+                    ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                  },
+                  "rolls": {
+                    "$rollIndex": {
+                      "damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "versatile_damage_type": {
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                      },
+                      "versatile_dice_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "versatile_dice_type": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+                      },
+                      "versatile_fixed_val": {
+                        ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+                      },
+                      "projectile_count": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+                      },
+                      "miss_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "save_fail_mod": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+                      },
+                      "special": {
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
+                      },
+                      "$other": { ".validate": false }
+                    }
+                  },
+                  "$other": { ".validate": false }
+                }
+              },
+              "$other": { ".validate": false }
+            }
+          },
+          "$other": { ".validate": false }
         },
         ".write": "root.child('users').child(auth.uid).child('admin').exists()",
-        ".read": true
+        ".read": true,
+        ".indexOn": ["name", "harmless_key"]
+      },
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_npcs": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": { 
+        	".indexOn": ["name", "challenge_rating", "type"]
+        }
       }
     },
     "custom_items": {
       "$uid": {
         ".write": "$uid === auth.uid",
         ".read": true
+      },
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_custom_items": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": { 
+        	".indexOn": ["name"]
+        }
       }
     },
     "encounters": {
       "$uid": {
-        ".write": "$uid === auth.uid",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
         ".read": true,
+          
         // Allow all to write to requests
         "$campaignId": {
+          ".indexOn": "entities/id",
           "$encounterId": {
             "requests": {
               ".write": true
             }
           }
         }
+      },
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_encounters": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": {
+          "$campaignId": { 
+            ".indexOn": ["name", "finished"]
+          }
+        }
       }
     },
-    "meters": {
+		"meters": {
       "$uid": {
         ".write": "$uid === auth.uid",
         ".read": true
@@ -286,7 +925,7 @@
       "$uid": {
         ".write": true,
       },
-      ".read": true
+        ".read": true
     },
     "broadcast": {
       "$uid": {
@@ -295,12 +934,12 @@
       ".read": true
     },
     "conditions": {
-      ".write": false,
-      ".read": true
+        ".write": false,
+        ".read": true
     },
     "items": {
-      ".write": false,
-      ".read": true
+        ".write": false,
+        ".read": true
     },
     "abilities": {
       ".write": false,
@@ -314,26 +953,17 @@
     "new_monsters": {
       ".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
       ".read": true,
-      ".indexOn": [
-        "metadata/tagged",
-        "metadata/finished"
-      ]
+      ".indexOn": ["metadata/tagged", "metadata/finished"]
     },
     "spells": {
       ".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
       ".read": true,
-      ".indexOn": [
-        "metadata/tagged",
-        "name"
-      ]
+      ".indexOn": ["metadata/tagged", "name"]
     },
     "new_spells": {
       ".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
       ".read": true,
-      ".indexOn": [
-        "metadata/tagged",
-        "metadata/finished"
-      ]
+      ".indexOn": ["metadata/tagged", "metadata/finished"]
     },
     "challenge": {
       ".write": false,
@@ -341,8 +971,18 @@
     },
     "reminders": {
       "$uid": {
-        ".write": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",  
         ".read": true
+      },
+  		".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_reminders": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": { 
+        	".indexOn": ["name"]
+        }
       }
     }
   }

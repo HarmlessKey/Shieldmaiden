@@ -3,7 +3,7 @@
 		<h2 class="d-flex justify-content-between">
 			<span><i class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
 			<a 
-				class="gray-light text-capitalize" 
+				class="neutral-2 text-capitalize" 
 				@click="add_effect()"
 			>
 				<i class="fas fa-plus green"></i>
@@ -14,11 +14,11 @@
 			</a>
 		</h2>
 
-		<q-list dark square :class="`accordion`">
+		<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 			<q-expansion-item
 				v-for="(effect, eff_index) in effects"
 				:key="`effect-${eff_index}`"
-				dark switch-toggle-side
+				:dark="$store.getters.theme === 'dark'" switch-toggle-side
 				group="effects"
 			>
 				<template v-slot:header>
@@ -28,7 +28,7 @@
 						{{ effect.effect.subtype }}
 					</q-item-section>
 					<q-item-section avatar>
-						<a @click="remove_effect(eff_index)" class="gray-hover text-capitalize">
+						<a @click="remove_effect(eff_index)" class="neutral-2 text-capitalize">
 							<i class="fas fa-trash-alt red"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove effect
@@ -42,7 +42,7 @@
 					<div class="row q-col-gutter-md mt-3">
 						<div class="col-12 col-md-6">
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								emit-value
 								map-options
 								label="Application"
@@ -56,9 +56,9 @@
 							>
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Apply effect</b>
 												</q-card-section>
 
@@ -75,7 +75,7 @@
 						<!-- TARGETS -->
 						<div class="col-12 col-md-6">
 							<q-select
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Target"
 								v-model="effect.target"
 								:options="targets"
@@ -87,9 +87,9 @@
 							>							
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Target</b>
 												</q-card-section>
 												<q-card-section>
@@ -110,7 +110,7 @@
 								Scaling
 								<a 
 									v-if="level_tier_addable(eff_index)"
-									class="gray-hover text-capitalize" 
+									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(eff_index)"
 								>
 									<i class="fas fa-plus green"></i>
@@ -124,7 +124,7 @@
 								<!-- HL LEVEL SCALE -->
 								<div class="col-12 col-md-2">
 									<q-input 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										:label="level_scaling.capitalizeEach()"
 										v-model="level_tier.level"
 										autocomplete="off"
@@ -140,7 +140,7 @@
 								<!-- HL DICE COUNT -->
 								<div class="col-12 col-md-2">
 									<q-input 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										label="Dice count"
 										v-model="level_tier.dice_count"
 										autocomplete="off"
@@ -153,7 +153,7 @@
 								<div class="col-12 col-md-3">
 									<label for="dice_type">Dice Type</label>
 									<q-select 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										emit-value
 										map-options
 										label="Dice type"
@@ -168,7 +168,7 @@
 								<div class="col-12 col-md-3">
 									<div class="d-flex justify-content-between">
 										<q-input 
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											emit-value
 											map-options
 											label="Fixed value"
@@ -370,14 +370,14 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px$gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 5px;
 }
 label {
 	display: flex;
 	justify-content: flex-start;
 	&.var {
-		border-bottom: solid 1px$gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		padding-bottom: 5px;
 	}
 }
@@ -388,7 +388,7 @@ label {
 .card {
 	.card-header {
 		cursor: pointer;
-		background-color:$gray-dark;
+		background-color: $neutral-8;
 
 		.caret {
 			display: inline-block;
@@ -403,7 +403,7 @@ label {
 		}
 	}
 	.card-body {
-		background-color: $gray-darker;
+		background-color: $neutral-6;
 	}
 }
 </style>

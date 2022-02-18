@@ -1,70 +1,74 @@
 <template>
-	<div class="container-fluid">
-		<template v-if="!$route.params.id">
-			<Crumble />
-			<h1 class="mb-3">
-				<i class="fas fa-users"></i> Users 
+	<div>
+		<hk-card v-if="!$route.params.id">
+			<div class="card-header">
+				<h1>
+					<i class="fas fa-users"></i> Users 
+				</h1>
+				<div>
 					<span v-if="isBusy" class="loader pl-5"></span>
-				<template v-else>
-					( {{ Object.keys(users).length }}, {{ Object.keys(online).length }} online )
-				</template>
-			</h1>
-
-			<hk-table
-				:items="users"
-				:columns="fields"
-				:perPage="15"
-				:loading="isBusy"
-				:search="['username','email']"
-			>
-				<span slot="status" slot-scope="data">
-					<template v-if="data.item === 'online'">
-						<i :class="{ 'green': data.item === 'online', 'gray-hover': data.item === 'offline' }" class="fas fa-circle"></i>
+					<template v-else>
+						{{ Object.keys(users).length }}, {{ Object.keys(online).length }} online
 					</template>
-					<span v-else><i class="fas fa-circle gray-hover"></i></span>
-				</span>
-
-				<router-link :to="'/admin/users/' + data.row['.key']" slot="username" slot-scope="data">
-					<span v-if="data.item">{{ data.item }}</span>
-					<span v-else>UNDEFINED</span>
-				</router-link>
-					
-				<span slot="voucher" slot-scope="data" v-if="data.item">
-					<i 
-						v-if="tiers[data.item.id]"
-						class="fas fa-ticket-alt"
-						:class="{
-							'blue': tiers[data.item.id].name == 'Folk Hero',
-							'purple': tiers[data.item.id].name == 'Noble',
-							'orange': tiers[data.item.id].name == 'Deity'
-					}"></i>
-				</span>
-
-				<span slot="patreon" slot-scope="data" v-if="data.item">
-					<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
-					<i 
-						v-else-if="data.item"
-						v-for="tier in data.item"
-						:key="tier"
-						class="fab fa-patreon"
-						:class="{
-							'blue': tiers[tier].name == 'Folk Hero',
-							'purple': tiers[tier].name == 'Noble',
-							'orange': tiers[tier].name == 'Deity',
-							'red' : tiers[tier].name == 'Former'
-					}"></i>
-				</span>
-
-				<span slot="live" slot-scope="data" v-if="data.item" class="red">
-					<i class="far fa-dot-circle"></i>
-				</span>
-
-				<div slot="table-loading" class="loader">
-					<span>Loading users...</span>
 				</div>
-			</hk-table>
-		
-		</template>
+			</div>
+
+			<div class="card-body">
+				<hk-table
+					:items="users"
+					:columns="fields"
+					:perPage="15"
+					:loading="isBusy"
+					:search="['username','email']"
+				>
+					<span slot="status" slot-scope="data">
+						<template v-if="data.item === 'online'">
+							<i :class="{ 'green': data.item === 'online', 'neutral-2': data.item === 'offline' }" class="fas fa-circle"></i>
+						</template>
+						<span v-else><i class="fas fa-circle neutral-2"></i></span>
+					</span>
+
+					<router-link :to="'/admin/users/' + data.row['.key']" slot="username" slot-scope="data">
+						<span v-if="data.item">{{ data.item }}</span>
+						<span v-else>UNDEFINED</span>
+					</router-link>
+						
+					<span slot="voucher" slot-scope="data" v-if="data.item">
+						<i 
+							v-if="tiers[data.item.id]"
+							class="fas fa-ticket-alt"
+							:class="{
+								'blue': tiers[data.item.id].name == 'Folk Hero',
+								'purple': tiers[data.item.id].name == 'Noble',
+								'orange': tiers[data.item.id].name == 'Deity'
+						}"></i>
+					</span>
+
+					<span slot="patreon" slot-scope="data" v-if="data.item">
+						<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
+						<i 
+							v-else-if="data.item"
+							v-for="tier in data.item"
+							:key="tier"
+							class="fab fa-patreon"
+							:class="{
+								'blue': tiers[tier].name == 'Folk Hero',
+								'purple': tiers[tier].name == 'Noble',
+								'orange': tiers[tier].name == 'Deity',
+								'red' : tiers[tier].name == 'Former'
+						}"></i>
+					</span>
+
+					<span slot="live" slot-scope="data" v-if="data.item" class="red">
+						<i class="far fa-dot-circle"></i>
+					</span>
+
+					<div slot="table-loading" class="loader">
+						<span>Loading users...</span>
+					</div>
+				</hk-table>
+			</div>
+		</hk-card>
 
 		<!-- SHOW USER -->
 		<template v-else>
@@ -75,18 +79,13 @@
 
 <script>
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 	import User from '@/components/Admin/User.vue';
 	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'Users',
 		components: {
-			Crumble,
 			User
-		},
-		metaInfo: {
-			title: 'Admin | Users'
 		},
 		data() {
 			return {
@@ -197,7 +196,7 @@
 	.tiers {
 		&::after {
 			content: ', ';
-			color: $gray-light;
+			color: $neutral-2;
 		}
 		&:last-child::after {
 			content: '';

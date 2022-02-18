@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import App from './App.vue';
-import VueFire from 'vuefire'
-import VeeValidate from 'vee-validate';
-import { auth, firebase, db } from './firebase';
+import VueFire from 'vuefire';
+import './vee-validate';
+import { auth, firebase } from './firebase';
 import VueRouter from 'vue-router';
 import VueAnalytics from 'vue-analytics'
 import { store } from './store/store';
@@ -13,22 +13,12 @@ import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
-import HkTable from './components/hk-components/hk-table';
-import HkCard from './components/hk-components/hk-card';
-import HkCardDeck from './components/hk-components/hk-card-deck';
-import HkRoll from './components/hk-components/hk-roll';
-import HkAnimatedInteger from './components/hk-components/hk-animated-integer';
-import HkDiceText from './components/hk-components/hk-dice-text';
-import HkPopover from './components/hk-components/hk-popover';
-import HkLoader from './components/hk-components/hk-loader';
-import HkDmgTypeSelect from './components/hk-components/hk-dmg-type-select';
-import HkTip from './components/hk-components/hk-tip';
-import HkTimer from './components/hk-components/hk-timer';
-import Icon from './components/Icon';
+import './hk-components';
 import './quasar';
 import './registerServiceWorker';
 import { Notify } from 'quasar';
 import 'animate.css';
+import Ads from 'vue-google-adsense';
 
 const options = {
 	toast: {
@@ -37,26 +27,18 @@ const options = {
 	}
 }
 
-Vue.component('hk-table', HkTable);
-Vue.component('hk-card', HkCard);
-Vue.component('hk-card-deck', HkCardDeck);
-Vue.component('hk-animated-integer', HkAnimatedInteger);
-Vue.component('hk-roll', HkRoll);
-Vue.component('hk-loader', HkLoader);
-Vue.component('hk-dice-text', HkDiceText);
-Vue.component('hk-popover', HkPopover);
-Vue.component('hk-dmg-type-select', HkDmgTypeSelect);
-Vue.component('hk-tip', HkTip);
-Vue.component('hk-timer', HkTimer);
-Vue.component('icon', Icon);
+Vue.config.productionTip = false;
+
+
 Vue.use(Snotify, options);
-Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
 Vue.use(VueFire);
 Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
 Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
+Vue.use(require('vue-script2'));
+Vue.use(Ads.Adsense);
 
 
 require('./functions.js')
@@ -70,9 +52,14 @@ Vue.use(VueRouter);
 
 const router = new VueRouter({
 	routes: routes,
+	scrollBehavior () {
+		const el = document.querySelector('.scrollable-content');
+		el.scrollLeft = 0;
+		el.scrollTop = 0;
+	},
 	linkActiveClass: "active", // active class for non-exact links.
 	linkExactActiveClass: "exact-active", // active class for *exact* links.
-	mode: 'history'
+	mode: 'history',
 });
 
 Vue.use(VueAnalytics, {
@@ -81,87 +68,91 @@ Vue.use(VueAnalytics, {
 });
 
 // Check if user is connected
-firebase.auth().onAuthStateChanged( function() {
-	const uid = firebase.auth().currentUser.uid;
-	const userStatusDatabaseRef = firebase.database().ref(`/status/${uid}`);
-	const userLiveDatabaseRef = firebase.database().ref(`/broadcast/${uid}`);
+firebase.auth().onAuthStateChanged(() => {
+	if(firebase.auth().currentUser) {
+		const uid = firebase.auth().currentUser.uid;
+		const userStatusDatabaseRef = firebase.database().ref(`/status/${uid}`);
+		const userLiveDatabaseRef = firebase.database().ref(`/broadcast/${uid}`);
 
-	const isOfflineForDatabase = {
-		state: 'offline',
-		last_change: firebase.database.ServerValue.TIMESTAMP
-	}
+		const isOfflineForDatabase = {
+			state: 'offline',
+			last_change: firebase.database.ServerValue.TIMESTAMP
+		}
 
-	const isOnlineForDatabase = {
-		state: 'online',
-		lastt_changed: firebase.database.ServerValue.TIMESTAMP
-	}
+		const isOnlineForDatabase = {
+			state: 'online',
+			lastt_changed: firebase.database.ServerValue.TIMESTAMP
+		}
 
-	firebase.database().ref('.info/connected').on('value', function(snapshot) {
-		if(snapshot.val() == false) return;
-	
-		userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
-			userStatusDatabaseRef.set(isOnlineForDatabase);
-		});
+		firebase.database().ref('.info/connected').on('value', function(snapshot) {
+			if(snapshot.val() == false) return;
 		
-		// Stop broadcast when connection is lost
-		userLiveDatabaseRef.onDisconnect().remove().then(function() {
+			userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
+				userStatusDatabaseRef.set(isOnlineForDatabase);
+			});
+			
+			// Stop broadcast when connection is lost
+			userLiveDatabaseRef.onDisconnect().remove().then(function() {
+			});
 		});
-	});
+	}
 });
 
 
 // Check before each page load whether the page requires authentication/
 // if it does check whether the user is signed into the web app or
 // redirect to the sign-in page to enable them to sign-in
-router.beforeEach((to, from, next) => {
-	store.dispatch('setSlide', false); //Always hide slide
-	store.commit("CLEAR_ACTION_ROLLS");
+router.beforeEach(async (to, from, next) => {
+	// We make sure store is always initialized
+	store.dispatch("initialize").then(() => {
+		store.dispatch("setSlide", false); //Always hide slide
+		store.commit("CLEAR_ACTION_ROLLS");
 
-	const currentUser = auth.currentUser; //Check if there is a user
-	const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)
-	const offline = to.matched.some(record => record.meta.offline); //Check if route is offline available
-	const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin); //Check if Admin is needed for the page (defined in routes)
-	const requiresContribute = to.matched.some(record => record.meta.requiresContribute); //Check if Contribute is needed for the page (defined in routes)
+		const currentUser = auth.currentUser; //Check if there is a user
+		const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)
+		const offline = to.matched.some(record => record.meta.offline); //Check if route is offline available
+		const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin); //Check if Admin is needed for the page (defined in routes)
+		const requiresContribute = to.matched.some(record => record.meta.requiresContribute); //Check if Contribute is needed for the page (defined in routes)
 
 
-	// Check if a user is offline, if the page is not available offline, send to home
-	if(!navigator.onLine && !offline) {
-		Notify.create({
-			message: "Page not available offline, redirected to home.",
-			icon: "fas fa-wifi-slash",
-			color: "negative",
-			position: "top"
-		})
-		next('/');
-	}
+		if(to.path === "/sign-in" && auth.currentUser) {
+			console.log("You're already signed in!");
+			next("/content")
+		}
+		// Check if a user is offline, if the page is not available offline, send to home
+		if(!navigator.onLine && !offline) {
+			Notify.create({
+				message: "Page not available offline, redirected to home.",
+				icon: "fas fa-wifi-slash",
+				color: "negative",
+				position: "top"
+			})
+			next("/");
+		}
 
-	//Check if someone is logged in and if Auth is needed
-	else if (requiresAuth && !currentUser) {
-		next('/sign-in'); //no user, but auth is needed
-	} else if (requiresAuth && currentUser) {
-		//Auth is needed and there is a user
-
-		//GET USER
-		//DOESN'T SEEM TO WORK TROUGH STORE, SO DIRECTLY FROM FIREBASE
-		var user = db.ref(`users/${currentUser.uid}`);
-		user.on('value' , (snapshot) => {
-
+		//Check if someone is logged in and if Auth is needed
+		else if (requiresAuth && !currentUser) {
+			next('/sign-in'); //no user, but auth is needed
+		} else if (requiresAuth && currentUser) {
+			//Auth is needed and there is a user
+			
 			//Check if user data exists
-			if(snapshot.val()) {
-				let admin = snapshot.val().admin
-				let contribute = snapshot.val().contribute
-				let username = snapshot.val().username
+			if(store.getters.userInfo) {
+				const admin = store.getters.userInfo.admin;
+				const contribute = store.getters.userInfo.contribute;
+				const username = store.getters.userInfo.username;
 
 				//Force to input a username
 				if(!username) {
-					next('/set-username');
+					console.log("no username")
+					next("/set-username");
 				} else {
 					//CHECK FOR ADMIN
 					if(requiresAdmin && !admin) {
-						next('/404');
+						next("/404");
 					} else if(requiresContribute) {
 						if(!contribute && !admin) {			
-							next('/404');
+							next("/404");
 						} else {
 							next();
 						}
@@ -171,24 +162,22 @@ router.beforeEach((to, from, next) => {
 				}
 			} else {
 				//Force to create userdata
-				next('/set-username');
+				next("/set-username");
 			}
-		});
-	} else {
-		next(); //No Auth is needed
-	}
+		} else {
+			next(); //No Auth is needed
+		}
+	});
 });
 
 // Wrap the vue instance in a Firebase onAuthStateChanged method
 // This stops the execution of the navigation guard 'beforeEach'
 // method until the Firebase initialization ends
-auth.onAuthStateChanged(function () {
-
+auth.onAuthStateChanged(() => {	
 	window.App = new Vue({
 		el: '#app',
 		store: store,
 		router: router,
 		render: h => h(App)
 	});
-
 });

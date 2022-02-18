@@ -1,15 +1,17 @@
 <template>
-	<div id="app" class="container-fluid" @click="setSideSmallScreen(false)">
+	<div id="app" @click="setSideSmallScreen(false)">
 		<div>
-			<nav-main/>
+			<nav-main :maintenance="maintenance" />
 			<PaymentDeclined v-if="user !== null" />
-			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash"></i> No internet connection</div>
-			<div :class="{ hasSide: $route.meta.sidebar !== false }">
+			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
+			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar />
 				<div class="scrollable-content">
-					<router-view/>
+					<router-view v-if="initialized" />
+					<hk-loader v-else />
 				</div>
 			</div>
+			<Home v-else :maintenance="maintenance" />
 		</div>
 		<transition 
 			enter-active-class="animated animate__slideInRight" 
@@ -20,7 +22,7 @@
 					v-shortkey="['esc']" @shortkey="hideSlide()"
 					class="hide" 
 				>
-					<i class="far fa-chevron-double-right"></i> <span class="gray-hover ml-2 d-none d-sm-inline">[esc]</span>
+					<i class="far fa-chevron-double-right"></i> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
 					<q-tooltip anchor="bottom middle" self="center middle">
 						Hide [esc]
 					</q-tooltip>
@@ -44,7 +46,7 @@
 				<p><b>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</b></p>
 				<p>Harmless Key will be unavailable for 1 to 2 hours.</p>
 				<template v-slot:action>
-					<q-btn flat icon="close" @click="closeAnnouncement()" />
+					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
 				</template>
 			</q-banner>
 		</q-dialog>
@@ -85,7 +87,7 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import HkRolls from './components/hk-components/hk-rolls';
 	import { general } from './mixins/general';
-
+	import Home from "./views/Home"
 
 	export default {
 	name: "App",
@@ -95,43 +97,81 @@
 		Sidebar,
 		Slide,
 		PaymentDeclined,
-		HkRolls
+		HkRolls,
+		Home
 	},
 	metaInfo() {
 		return {
-			title: 'Combat Tracker D&D | Harmless Key',
-			author: 'Harmless Key',
+			title: this.$route.meta.title || "D&D Combat Tracker",
+			titleTemplate: "%s | Harmless Key",
+			author: "Harmless Key",
 			htmlAttrs: {
 				lang: "en"
 			},
 			meta: [
-				{ charset: 'utf-8' },
+				{ charset: "utf-8" },
 				{ 
-					vmid: 'description', 
-					name: 'description', 
-					content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.'
+					vmid: "description", 
+					name: "description", 
+					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
 				{ name: "twitter:card", content: "summary" },
-				{ name: "twitter:title", content: "Combat Tracker D&D | Harmless Key" },
+				{ 
+					vmid: "twitter-title",
+					name: "twitter:title", 
+					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key" 
+				},
 				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full.png"  },
 				{
+					vmid: "twitter-description",
 					name: "twitter:description",
-					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
+					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
-				{ name: "twitter:site", content: "@KeyHarmless" },
-
-				{ property: "og:title", content: "Combat Tracker D&D | Harmless Key" },
-				{	property: "og:site_name", content: "harmlesskey.com" },
-				{	property: "og:type", content: "website" },
+				{ 
+					name: "twitter:site", 
+					content: "@KeyHarmless"
+				},
+				{ 
+					vmid: "og-title",
+					property: "og:title", 
+					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
+				},
+				{	
+					vmid: "og-site_name",
+					property: "og:site_name", 
+					content: "harmlesskey.com" },
+				{	
+					vmid: "og-type",
+					property: "og:type", 
+					content: "website"
+				},
 				{
+					vmid: "og-description",
 					property: "og:description",
 					name: "description",
-					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
+					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
-				{	property: "og:url", content: `https://harmlesskey.com${this.$route.path}` },
-				{	property: "og:image", name: "image", content: `https://harmlesskey.com/linkedin.png` },
-				{	property: "og:image:type", content: "image/png" },
-				{	property: "og:image:alt", content: "Harmless Key Logo" },
+				{	
+					vmid: "og-url",
+					property: "og:url", 
+					content: `https://harmlesskey.com${this.$route.path}`
+				},
+				{	
+					vmid: "og-image",
+					property: "og:image", 
+					name: "image", 
+					content: `https://harmlesskey.com/linkedin.png` 
+				},
+				{	
+					vmid: "og-image-type",
+					property: "og:image:type", 
+					content: "image/png"
+				},
+				{	
+					vmid: "og-image-alt",
+					property: "og:image:alt", 
+					content: "Harmless Key Logo"
+				},
 			]
 		}
 	},
@@ -145,7 +185,8 @@
 			broadcast: undefined,
 			deferredPrompt: null,
 			install_dialog: false,
-			never_show_install: false
+			never_show_install: false,
+			maintenance: false,
 		}
 	},
 	watch: {
@@ -177,6 +218,10 @@
 			slide: 'getSlide',
 			storeBroadcast: 'broadcast'
 		}),
+		...mapGetters([
+			"initialized",
+			"theme"
+		]),
 		announcement: {
 			get() {
 				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
@@ -205,18 +250,6 @@
 		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
-		this.setTips();
-
-		if(auth.currentUser !== null) {
-			this.setUser();
-			this.setUserInfo();
-			this.setUserSettings();
-			// players need prio!
-			this.fetchPlayers();
-			this.fetchNpcs();
-			this.fetchCampaigns();
-			this.fetchAllEncounters();
-		}
 	},
 	mounted() {
 		if(auth.currentUser !== null){
@@ -241,14 +274,7 @@
 	},
 	methods: {
 		...mapActions([
-			"setTips",
-			"fetchCampaigns",
-			"fetchAllEncounters",
-			"fetchPlayers",
-			"fetchNpcs",
-			"setUser",
-			"setUserInfo",
-			"setUserSettings",
+			"initialize",
 			"setSlide",
 			"setSideSmallScreen",
 			"setLive"
@@ -295,5 +321,5 @@
 </script>
 
 <style lang="scss" src="./css/styles.scss">
-
+	
 </style>

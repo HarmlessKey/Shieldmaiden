@@ -2,31 +2,25 @@
 	<div id="actions">
 		<template v-if="selectEntity">
 			<p>Action performed by:</p>
+
 			<q-select 
-				dark filled square dense
-				name="doneBy"
+				:dark="$store.getters.theme === 'dark'" filled square
 				:value="doneBy"
 				:options="_active"
-				v-validate="'required'"
 			>
 				<template v-slot:selected>
 					<q-item v-if="doneBy" class="selected">
 						<q-item-section avatar>
-							<icon 
-								class="img" 
-								v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" 
-								:icon="entitiesList[doneBy].img" 
-								:fill="entitiesList[doneBy].color_label" 
-								:style="entitiesList[doneBy].color_label ? `border-color: ${entitiesList[doneBy].color_label}` : ``" 
-							/>
 							<span 
-								v-else 
 								class="img" 
 								:style="{
 									'background-image': 'url(' + entitiesList[doneBy].img + ')',
-									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
+									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``,
+									'color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
 								}
-							"/>
+							">
+								<i v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" :class="`hki-${entitiesList[doneBy].img}`" />
+							</span>
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-html="entitiesList[doneBy].name.capitalizeEach()"/>
@@ -45,15 +39,16 @@
 						@click="doneBy = scope.opt.key"
 					>
 						<q-item-section avatar>
-							<icon v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" class="img" :icon="scope.opt.img" :fill="scope.opt.color_label" :style="scope.opt.color_label ? `border-color: ${scope.opt.color_label}` : ``" />
 							<span 
-								v-else 
 								class="img" 
 								:style="{
 									'background-image': 'url(' + scope.opt.img + ')',
-									'border-color': scope.opt.color_label ? scope.opt.color_label : ``
+									'border-color': scope.opt.color_label ? scope.opt.color_label : ``,
+									'color': scope.opt.color_label ? scope.opt.color_label : ``
 								}
-							"/>
+							">
+								<i v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" :class="`hki-${scope.opt.img}`" />
+							</span>
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-html="scope.opt.name.capitalizeEach()"/>
@@ -61,7 +56,6 @@
 					</q-item>
 				</template>
 			</q-select>
-			<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
 
 			<div 
 				v-if="doneBy && entitiesList[doneBy].reminders && entitiesList[doneBy].reminders.reaction"
@@ -89,11 +83,11 @@
 		<template v-if="doneBy">
 			<q-tabs
 				v-model="tab"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				inline-label
 				dense
 				no-caps
-				class="bg-gray-light gray-dark"
+				class="bg-neutral-3 neutral-10"
 			>
 				<q-tab 
 					v-for="({name, icon, label}, index) in tabs"
@@ -108,8 +102,7 @@
 				<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
 					<Custom v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
 					<template v-if="name === 'roll'">
-						<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
-						<Roll v-else :current="entitiesList[doneBy]" />
+						<Roll :current="entitiesList[doneBy]" />
 					</template>
 					<Spellcasting v-if="name === 'spells'" :current="entitiesList[doneBy]" />
 				</q-tab-panel>
@@ -124,7 +117,6 @@
 	import { setHP } from '@/mixins/HpManipulations.js';
 
 	import Custom from '@/components/combat/actions/custom';
-	import RollDeprecated from '@/components/combat/actions/RollDeprecated.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
 	import Spellcasting from '@/components/combat/actions/Spellcasting.vue';
 	import { damage_types } from '@/mixins/damageTypes.js';
@@ -133,7 +125,6 @@
 		name: 'Actions',
 		components: {
 			Custom,
-			RollDeprecated,
 			Roll,
 			Spellcasting
 		},
@@ -157,6 +148,7 @@
 			...mapGetters([
 				'entities',
 				'targeted',
+				'userSettings'
 			]),
 			_active: function() {
 				let active = _.chain(this.entities)
@@ -210,7 +202,7 @@
 					const tab = (
 						(this.current && (this.current.entityType === 'player' || 
 						this.current.entityType === 'companion')) || 
-						this.settings.npcDamageTab
+						this.userSettings.npcDamageTab
 					) ? "manual" : "roll";
 
 					return (this.tabSetter) ? this.tabSetter : tab;
@@ -249,12 +241,27 @@
 		height: 35px;
 		background-size: cover;
 		background-position: top center;
-		border: solid 1px $gray-light;
+		border: solid 1px $neutral-2;
+		font-size: 27px;
+		line-height: 35px;
+		background-color: $neutral-9;
+		color: $neutral-2;
+		
+		i {
+			vertical-align: 5px !important;
+		}
 	}
 	.reaction-used {
 		font-size: 15px;
 		i {
 			margin: 4px 5px 0 0;
+		}
+	}
+
+	[data-theme="light"] {
+		.img {
+			background-color: $neutral-2;
+			color: $neutral-8;
 		}
 	}
 </style>

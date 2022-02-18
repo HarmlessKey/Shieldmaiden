@@ -14,7 +14,7 @@
 			/>
 		</q-tabs>
 
-		<q-tab-panels v-model="tab" class="bg-transparent">
+		<q-tab-panels v-model="tab" class="bg-transparent" keep-alive>
 			<q-tab-panel
 				v-for="(option, index) in options"
 				:key="`verstatile-panel-${index}`"
@@ -23,36 +23,43 @@
 				<hk-dmg-type-select 
 					v-if="action_type !== 'healing'"
 					class="mb-3"
-					:label="`Damage type ${index == 1 ? option.label : ''}`"
+					:label="`Damage type ${index == 1 ? option.label : '*'}`"
 					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
-					required
+					:validation-rules="index === 0 ? 'required' : ''"
 				/>
 
 				<!-- ROLLS -->
 				<div class="row q-col-gutter-md mb-3">
 					<!-- DICE COUNT -->
 					<div class="col">
-						<q-input 
-							dark filled square
-							:label="`Dice count ${index == 1 ? option.label : ''}`"
-							v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
-							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
-							:rules="[
-								val => !val || (val <= 99 && val > 0) || 'Min is 1, max is 99',
-								(roll[`${index === 1 ? 'versatile_' : '' }dice_type`]) ? val => !!val || 'Required' : ''
-							]"
-							min="1"
-							max="99"
-							autocomplete="off"
-							name="dice_count"
-							class="mb-2"
-							type="number"
-						/>
+						<ValidationProvider 
+							:rules="{
+								between: [1, 99],
+								required: !!roll[`${index === 1 ? 'versatile_' : '' }dice_type`]
+							}" 
+							:name="`Dice count ${index == 1 ? option.label : ''}`" 
+							v-slot="{ errors, invalid, validated }"
+						>
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								:label="`Dice count ${index == 1 ? option.label : '*'}`"
+								v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
+								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
+								min="1"
+								max="99"
+								autocomplete="off"
+								name="dice_count"
+								class="mb-2"
+								type="number"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
 					</div>
 					<div class="col">
 						<!-- DICE TYPE -->
 						<q-select 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							map-options emit-value
 							clearable
 							:label="`Dice type ${index == 1 ? option.label : ''}`"
@@ -63,25 +70,28 @@
 					</div>
 					<div class="col">
 						<!-- MODIFIER FIXED VALUE -->
-						<q-input 
-							dark filled square
-							:label="`Fixed value ${index == 1 ? option.label : ''}`"
-							v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
-							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
-							:rules="[val => !val || val <= 99 || 'Max is 99']"
-							autocomplete="off"
-							class="mb-2"
-							type="number"
-						>
-							<template v-slot:append>
-								<hk-popover 
-									header="Fixed value"
-									content="Set the fixed value that is added on top of the rolled value."
-								>
-									<q-icon name="info" />
-								</hk-popover>
-							</template>
-						</q-input>
+						<ValidationProvider rules="between:-99,99" name="Fixed value" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								:label="`Fixed value ${index == 1 ? option.label : ''}`"
+								v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
+								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
+								autocomplete="off"
+								class="mb-2"
+								type="number"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							>
+								<template v-slot:append>
+									<hk-popover 
+										header="Fixed value"
+										content="Set the fixed value that is added on top of the rolled value."
+									>
+										<q-icon name="info" />
+									</hk-popover>
+								</template>
+							</q-input>
+						</ValidationProvider>
 					</div>
 
 					<!-- PRIMARY STAT -->
@@ -106,7 +116,7 @@
 		<!-- PROJECTILE COUNT -->
 		<q-input 
 			v-if="action_type !== 'healing'"
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Projectile count"
 			v-model="roll.projectile_count"
 			autocomplete="off"
@@ -127,37 +137,41 @@
 		</q-input>
 
 		<!-- FAIL MODIFIER -->
-		<q-select 
-			v-if="action_type === 'save'"
-			dark filled square
-			map-options
-			emit-value
-			label="Succesful save"
-			:options="save_fail_mod"
-			v-model="roll.save_fail_mod"
-			class="mb-3"
-			hint="The effect if the target makes a successful saving throw."
-			:rules="[val => val !== undefined || 'What happens on a succesful save?']"
-		/>
-		<q-select 
-			v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
-			dark filled square
-			map-options
-			emit-value
-			label="Miss modifier"
-			:options="save_fail_mod"
-			v-model="roll.miss_mod"
-			class="mb-3"
-			hint="The effect if the attack is a miss."
-			:rules="[val => val !== undefined || 'What happens on a miss?']"
-		/>
+		<ValidationProvider v-if="action_type === 'save'" rules="required" name="Fixed value" v-slot="{ invalid, validated }">
+			<q-select 		
+				:dark="$store.getters.theme === 'dark'" filled square
+				map-options
+				emit-value
+				label="Succesful save *"
+				:options="save_fail_mod"
+				v-model="roll.save_fail_mod"
+				class="mb-3"
+				hint="The effect if the target makes a successful saving throw."
+				:error="invalid && validated"
+				error-message="What happens on a succesful save?"
+			/>
+		</ValidationProvider>
+		<ValidationProvider v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)" rules="required" name="Fixed value" v-slot="{ invalid, validated }">
+			<q-select 	
+				:dark="$store.getters.theme === 'dark'" filled square
+				map-options
+				emit-value
+				label="Miss modifier *"
+				:options="save_fail_mod"
+				v-model="roll.miss_mod"
+				class="mb-3"
+				hint="The effect if the attack is a miss."
+				:error="invalid && validated"
+				error-message="What happens on a miss?"
+			/>
+		</ValidationProvider>
 
 		<template v-if="action_type !== 'healing'">
 			<hr>
 			<!-- SPECIAL ACTIONS -->
 			<div class="col-12 col-md-3">
 				<q-select 
-					dark filled square multiple
+					:dark="$store.getters.theme === 'dark'" filled square multiple
 					map-options
 					emit-value
 					label="Special events"
@@ -180,7 +194,7 @@
 				</span>
 				<a 
 					v-if="level_tier_addable()"
-					class="gray-hover text-capitalize" 
+					class="neutral-2 text-capitalize" 
 					@click="add_level_tier()"
 				>
 					<i class="fas fa-plus green"></i>
@@ -194,7 +208,7 @@
 					<!-- HL LEVEL SCALE -->
 					<div>
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Scale size"
 							v-model="level_tier.level"
 							autocomplete="off"
@@ -209,7 +223,7 @@
 							<!-- HL DICE COUNT -->
 							<div class="col">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Dice count"
 									v-model="level_tier.dice_count"
 									autocomplete="off"
@@ -221,7 +235,7 @@
 							<div class="col">
 								<!-- HL MODIFIER DICETYPE -->
 								<q-select 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									map-options
 									emit-value
 									label="Dice type"
@@ -233,7 +247,7 @@
 							</div>
 							<div class="col">
 								<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Fixed value"
 										v-model="level_tier.fixed_val"
 										autocomplete="off"
@@ -245,7 +259,7 @@
 						</div>
 
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Projectile count"
 							v-model="level_tier.projectile_count"
 							autocomplete="off"
@@ -448,12 +462,12 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px $gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 5px;
 }
 .q-tab-panel {
 	padding: 15px 0 0 0 !important;
-	border-bottom: solid 1px $gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	margin-bottom: 15px;
 }
 </style>

@@ -2,66 +2,68 @@
 	<div class="footer">
 		<div class="top">
 			<div class="content">
-				<div class="row q-col-gutter-md">
-					<div class="col-12 col-md-3 logo-container">
-						<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
-					</div>
+				<div class="logo-container">
+					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
+				</div>
 
-					<div class="col-12 col-md-9 links">
-						<div v-if="user">
-							<h2 class="gray-light">Your content</h2>
+				<div class="links">
+					<div>
+						<h2 class="neutral-2">Quick Links</h2>
+						<ul>
+							<li><router-link to="/compendium">Compendium</router-link></li>
+							<li><router-link to="/feedback">Feedback</router-link></li>
+							<li><router-link to="/updates">Updates</router-link></li>
+							<li><router-link to="/documentation">Documentation</router-link></li>
+							<li><router-link to="/about-us">About us</router-link></li>
+						</ul>
+					</div>
+					<div>
+						<h2 class="neutral-2">Follow us</h2>
+						<ul>
+							<li>
+								<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">Patreon</a>
+							</li>
+							<li>
+								<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a>
+							</li>
+							<li>
+								<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener">Instagram</a>
+							</li>
+							<li>
+								<a href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">Twitter</a>
+							</li>
+							<li>
+								<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener">Facebook</a>
+							</li>
+							<li>
+								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener">Reddit</a>
+							</li>
+						</ul>
+					</div>
+					<template v-if="user">
+						<div>
+							<h2 class="neutral-2">DM Content</h2>
 							<ul>
+								<li><router-link to="/content/campaigns">Campaigns</router-link></li>
+								<li><router-link to="/content/players">Players</router-link></li>
+								<li><router-link to="/content/npcs">NPC's</router-link></li>
+								<li><router-link to="/content/reminders">Reminders</router-link></li>
+								<li><router-link to="/content/items">Items</router-link></li>
+							</ul>
+						</div>
+						<div>
+							<h2 class="neutral-2">Player Content</h2>
+							<ul>
+								<li><router-link to="/content/characters">Characters</router-link></li>
+								<li><router-link to="/content/followed">Following</router-link></li>
+							</ul>
+							<h2 class="neutral-2">Account</h2>
+							<ul>
+								<li><router-link to="/profile">Profile</router-link></li>
 								<li><router-link to="/settings">Settings</router-link></li>
 							</ul>
-							<h2 class="gray-light">DM</h2>
-							<ul>
-								<li><router-link to="/campaigns">Campaigns</router-link></li>
-								<li><router-link to="/players">Players</router-link></li>
-								<li><router-link to="/npcs">NPC's</router-link></li>
-								<li><router-link to="/reminders">Reminders</router-link></li>
-								<li><router-link to="/items">Items</router-link></li>
-							</ul>
-							<h2 class="gray-light">Player</h2>
-							<ul>
-								<li><router-link to="/characters">Characters</router-link></li>
-								<li><router-link to="/followed">Following</router-link></li>
-							</ul>
 						</div>
-						<div>
-							<h2 class="gray-light">Quick Links</h2>
-							<ul>
-								<li><router-link to="/compendium">Compendium</router-link></li>
-								<li><router-link to="/feedback">Feedback</router-link></li>
-								<li><router-link to="/planned">Planned</router-link></li>
-								<li><router-link to="/updates">Updates</router-link></li>
-								<li><router-link to="/documentation">Documentation</router-link></li>
-								<li><router-link to="/about-us">About us</router-link></li>
-							</ul>
-						</div>
-						<div>
-							<h2 class="gray-light">Follow us</h2>
-							<ul>
-								<li>
-									<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">Patreon</a>
-								</li>
-								<li>
-									<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a>
-								</li>
-								<li>
-									<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener">Instagram</a>
-								</li>
-								<li>
-									<a href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">Twitter</a>
-								</li>
-								<li>
-									<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener">Facebook</a>
-								</li>
-								<li>
-									<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener">Reddit</a>
-								</li>
-							</ul>
-						</div>
-					</div>
+					</template>
 				</div>
 			</div>
 		</div>
@@ -75,7 +77,7 @@
 				<small>
 					©{{ year }} Harmless Key | All Rights Reserved<br/>
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.<br/>
-					All content is provided under terms of the <a href="./SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">Open Gaming License version 1.0a.</a>
+					All content is provided under terms of the <a href="/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">Open Gaming License version 1.0a.</a>
 				</small>
 			</div>
 		</div>
@@ -101,65 +103,79 @@
 
 <style lang="scss" scoped>
 	.footer {
-		background-color: $gray-darker;
+		background-color: $neutral-9;
 
 		.top {
-			padding: 10px 0;
-
-			.logo-container {
+			.content {
+				padding-top: 30px;
 				display: flex;
-				justify-content: flex-start;
-				height: 200px;
-				// background:$black;
+				justify-content: space-between;
+				flex-wrap: wrap;
 
-				.logo {
-					width: 250px;
+				.logo-container {
+					display: flex;
+					justify-content: flex-start;
+					height: 200px;
+	
+					.logo {
+						margin-top: -40px;
+						width: 250px;
+					}
 				}
 			}
 			.links {
 				display: flex;
-				justify-content: flex-end;
+				justify-content: flex-start;
+				flex-wrap: wrap;
 
 				div {
-					margin-left: 50px;
+					width: 130px;
 
 					ul {
 						padding: 0;
 						list-style: none;
+						margin: 0 0 30px 0;
 
 						a {
 							font-size: 12px;
-							color: $gray-light !important;
+							color: $neutral-3;
 							text-transform: uppercase;
+
+							&:hover {
+								color: $neutral-1;
+							}
+							&.active {
+								font-weight: bold;
+								color: $neutral-1;
+							}
 						}
 					}
 				}
 			}
-			@media (max-width: 766px) {
-				.logo-container {
-					justify-content: center;
-				}
-				.links {
-					justify-content: center;
-
-					div {
-						margin: 15px;
-					}
-				}
-			}
+		
 			
 
 			h2 {
 				font-weight: bold !important;
 				font-size: 13px !important;
-				color: #494747 !important;
+				line-height: 25px;
 				margin-bottom: 10px;
 			}
 
 			
 		}
 		.bottom {
-			background-color:$gray-dark;
+			background-color: $neutral-10;
+		}
+	}
+	@media (max-width: 854px) {
+		.footer .top .content {
+			justify-content: center;
+
+			.links {
+				justify-content: center;
+				text-align: center;
+			}
 		}
 	}
 </style>

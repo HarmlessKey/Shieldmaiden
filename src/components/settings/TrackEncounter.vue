@@ -1,24 +1,31 @@
 <template>
-	<div>
-		<a @click="setSlide({ show: true, type: 'PlayerLink'})" class="d-block mb-3">
+	<div class="card-body">
+		<p>
+			The public initiative list is accessable through a link you can share with your party, 
+			or you can put it up on a second screen for your party to see. 
+			In here players can follow the encounter, see who's turn it is and what the status 
+			of the entities within the encounter is. Below you can determine what should be 
+			visible on the public initiative list.
+		</p>
+		<a @click="setSlide({ show: true, type: 'PlayerLink'})" class="btn bg-neutral-4 mb-3">
 			Share your adventures
 		</a>
 
 		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
 			<q-select 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-for="(setting, index) in type_settings" 
 				:options="setting.options"
 				:value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item dark slot="selected">
+				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
 					<q-item-section avatar>
-						<q-icon :name="setting.icon" class="gray-light" size="large" />
+						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
-					<q-item-section class="gray-light truncate">
+					<q-item-section class="neutral-2 truncate">
 						<q-item-label>{{ setting.name }}</q-item-label>
 						<q-item-label caption>
 							{{ displaySetting(type_key, setting.key, settings[setting.entity] ? settings[setting.entity][setting.key] : undefined).name }}
@@ -48,41 +55,27 @@
 						</q-item-section>
 					</q-item>
 				</template>
-				<span slot="after" v-if="setting.info">
-					<a @click.stop>
-						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
-										<b>{{ setting.name }}</b>
-									</q-card-section>
-
-									<q-card-section>
-										<div v-html="setting.info" />
-										<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
-									</q-card-section>
-								</q-card>
-							</q-menu>
-						</q-icon>
-					</a>
-				</span>
+				<hk-popover v-if="setting.info" slot="after" :header="setting.name">
+					<q-icon name="info" size="sm" color="neutral-3" />
+					<div slot="content" v-html="setting.info" />
+				</hk-popover>
 			</q-select>
 		</div>
 		
-		<a class="btn mt-3" @click="setDefault()">Reset to default</a>
+		<a class="btn mt-3 bg-neutral-5" @click="set_default_settings('track')">
+			Reset to default
+		</a>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
-		name: 'Track',
+		name: 'TrackEncounterSettings',
 		data(){
 			return {
 				userId: this.$store.getters.user.uid,
-				copy: window.location.host + '/user/' + this.$store.getters.user.uid,
 				types: {
 					general: {
 						type_settings: [
@@ -191,51 +184,29 @@
 				},
 			}
 		},
-		firebase() {
-			return {
-				settings: {
-					source: db.ref(`settings/${this.userId}/track`),
-					asObject: true,
-				}
+		computed: {
+			...mapGetters(["userSettings"]),
+			settings() {
+				return this.userSettings.track || {};
 			}
 		},
 		methods: {
 			...mapActions([
-				"setSlide"
+				"setSlide",
+				"update_settings",
+				"set_default_settings"
 			]),
-			setSetting(entity, type, value) {
-				if(value == undefined) {
-					db.ref(`settings/${this.userId}/track/${entity}/${type}`).remove();
-				} else {
-					db.ref(`settings/${this.userId}/track/${entity}/${type}`).set(value);
-				}
-			},
-			setDefault() {
-				db.ref(`settings/${this.userId}/track`).remove();
+			setSetting(sub_category, type, value) {
+				this.update_settings({
+					category: "track",
+					sub_category,
+					type,
+					value
+				});
 			},
 			selected(value, current) {
 				return value === current;
-			},
-			copyLink() {
-				let toCopy = document.querySelector('#copy')
-				toCopy.setAttribute('type', 'text')    //hidden
-				toCopy.select()
-
-				try {
-					var successful = document.execCommand('copy');
-					var msg = successful ? 'Successful' : 'Unsuccessful';
-
-					this.$snotify.success(msg, 'Link Copied!', {
-						position: "rightTop"
-					});
-				} catch (err) {
-					alert('Something went wrong, unable to copy');
-				}
-
-				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
-				window.getSelection().removeAllRanges()
-			},
+			},			
 			displaySetting(type, key, value) {
 				let options = this.types[type].type_settings.filter(item => {
 					return item.key === key;

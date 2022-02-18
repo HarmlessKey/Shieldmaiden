@@ -1,44 +1,38 @@
 <template>
-	<div class="content">
-		<Crumble />
-		<h3>Export a database</h3>
-		<p>
-			Creates a JSON file with an array of all entries in a firebase reference.
-		</p>
-		<ul>
-			<li>- ".key" is saved under "_id" for mongodb import.</li>
-			<li>- "metadata" is deleted.</li>
-			<li>- "changed" is deleted.</li>
-		</ul>
-		<q-select
-			dark filled square
-			class="select"
-			label="Reference"
-			v-model="ref"
-			:options="refs"
-		/>
-		<a class="btn bnt-large" @click="downloadJson()" :disabled="!ref || loading">
-			<i class="fas fa-file-download" />
-			{{ ref ? `Download ${ref}` : "Select a reference" }}
-		</a>
-		<span v-if="loading" class="ml-3">
-			<span class="loader" />
-		</span>
-	</div>
+	<hk-card header="Export a database">
+		<div class="card-body">
+			<p>
+				Creates a JSON file with an array of all entries in a firebase reference.
+			</p>
+			<ul>
+				<li>- ".key" is saved under "_id" for mongodb import.</li>
+				<li>- "metadata" is deleted.</li>
+				<li>- "changed" is deleted.</li>
+				<li>- "url" is generated, kebap-lowercase-name.</li>
+			</ul>
+			<q-select
+				dark filled square
+				class="select"
+				label="Reference"
+				v-model="ref"
+				:options="refs"
+			/>
+			<a class="btn bnt-large" @click="downloadJson()" :disabled="!ref || loading">
+				<i class="fas fa-file-download" />
+				{{ ref ? `Download ${ref}` : "Select a reference" }}
+			</a>
+			<span v-if="loading" class="ml-3">
+				<span class="loader" />
+			</span>
+		</div>
+	</hk-card>
 </template>
 
 <script>
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 
 	export default {
 		name: 'ExportDatabases',
-		components: {
-			Crumble
-		},
-		metaInfo: {
-			title: 'Admin | Export'
-		},
 		data() {
 			return {
 				loading: false,
@@ -47,6 +41,7 @@
 					"monsters",
 					"items",
 					"spells",
+					"conditions",
 				]
 			}
 		},
@@ -66,7 +61,9 @@
 						delete entry["metadata"];
 						delete entry["changed"];
 
-						entry.url = entry.name.replace(/ /g, "-");
+						// entry.name = entry.name.toLowerCase();
+						entry.url = entry.name.toLowerCase().replace(/[\s/]/g, "-").replace(/['()]/g, '');
+						
 						
 						data.push(entry);
 					}

@@ -2,44 +2,46 @@
 	<div>
 		<h3 v-if="targeted.length === 0" class="red text-center">Select a target</h3>
 		<template v-else>
-			<q-checkbox dark v-model="crit" label="Critical hit" indeterminate-value="something-else" />
+			<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="crit" label="Critical hit" indeterminate-value="something-else" />
 
 			<hk-dmg-type-select v-model="damage_type" placeholder="Damage type" clearable dense class="mb-2"/>
 
-			<div class="manual">
-				<q-input 
-					dark filled square
-					type="number" 
-					v-model="manualAmount" 
-					v-validate="'numeric'" 
-					name="Manual Input" 
-					min="0"
-					class="manual-input"
-					@keypress="submitManual($event)"
-					autocomplete="off" 
-				/>
-				<button class="btn dmg bg-red" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual('damage')"
-				>
-					Attack
-					<img src="@/assets/_img/styles/sword-break.png" />
-					<q-tooltip anchor="center right" self="center left">
-						Enter
-					</q-tooltip>
-				</button>
-				<button class="btn heal bg-green" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual('healing')"
-				>
-					Heal
-					<img src="@/assets/_img/styles/heal.png" />
-					<q-tooltip anchor="center right" self="center left">
-						Shift + Enter
-					</q-tooltip>
-				</button>
-			</div>
-			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
+			<ValidationProvider rules="min_value:0" name="Input" v-slot="{ errors, invalid, validated}">
+				<div class="manual">
+					<q-input 
+						:dark="$store.getters.theme === 'dark'" filled square
+						type="number" 
+						v-model="manualAmount" 
+						name="Manual Input" 
+						min="0"
+						class="manual-input"
+						@keypress="submitManual($event, !invalid)"
+						autocomplete="off"
+						:error="invalid && validated"
+						:error-message="errors[0]"
+					/>
+					<button class="btn dmg bg-red white" 
+						:class="{disabled: invalid || manualAmount === ''}" 
+						@click="setManual('damage', !invalid)"
+					>
+						Attack
+						<i class="hki-sword-break ml-3" />
+						<q-tooltip anchor="center right" self="center left">
+							Enter
+						</q-tooltip>
+					</button>
+					<button class="btn heal bg-green white" 
+						:class="{disabled: invalid || manualAmount === ''}" 
+						@click="setManual('healing', !invalid)"
+					>
+						Heal
+						<i class="hki-heal" />
+						<q-tooltip anchor="center right" self="center left">
+							Shift + Enter
+						</q-tooltip>
+					</button>
+				</div>
+			</ValidationProvider>
 			
 			<div class="select-amount" :class="{ 'has-defenses': damage_type }">
 				<div>Target</div>
@@ -193,11 +195,11 @@
 				else this.$set(this.resistances, target, defense);
 				this.$forceUpdate();
 			},
-			submitManual(e) {
+			submitManual(e, valid) {
 				if(e.key === 'Enter' && e.shiftKey) {
-					this.setManual('healing');
+					this.setManual('healing', valid);
 				} else if(e.key === 'Enter') {
-					this.setManual('damage');
+					this.setManual('damage', valid);
 				}
 			},
 			calculateAmount(target, type) {
@@ -213,46 +215,43 @@
 				}
 				return Math.floor(value);
 			},
-			setManual(type) {
-				this.$validator.validateAll().then((result) => {
-					if(result && this.manualAmount != '') {
+			setManual(type, valid) {
+				if(valid && this.manualAmount != '') {
+					//Update HP
+					for(let i in this.targeted) {
+						let key = this.targeted[i];
+						let amount = {};
+						amount[type] = parseInt(this.manualAmount);
 
-						//Update HP
-						for(let i in this.targeted) {
-							let key = this.targeted[i];
-							let amount = {};
-							amount[type] = parseInt(this.manualAmount);
+						amount[type] = this.calculateAmount(key, type);
 
-							amount[type] = this.calculateAmount(key, type);
+						// Set config for HpManipulation and log
+						const config = {
+							crit: this.crit,
+							ability: "manual input",
+							log: true,
+							actions: [
+								{
+									type,
+									manual: true,
+									rolls: [
+										{
+											damage_type: this.damage_type,
+											value: amount[type]
+										}
+									]
+								}
+							]
+						};
 
-							// Set config for HpManipulation and log
-							const config = {
-								crit: this.crit,
-								ability: "manual input",
-								log: true,
-								actions: [
-									{
-										type,
-										manual: true,
-										rolls: [
-											{
-												damage_type: this.damage_type,
-												value: amount[type]
-											}
-										]
-									}
-								]
-							};
-
-							this.setHP(amount, this.entities[key], this.current, config)
-						}
-
-						//Reset input fields
-						this.manualAmount = '';
-						this.damage_type = '';
-						this.crit = false;
+						this.setHP(amount, this.entities[key], this.current, config)
 					}
-				})
+
+					//Reset input fields
+					this.manualAmount = '';
+					this.damage_type = '';
+					this.crit = false;
+				}
 			},
 		},
 	}
@@ -261,7 +260,7 @@
 <style lang="scss" scoped>
 .manual {
 	display:grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr max-content;
 	grid-template-rows: 40px 40px;
 	grid-gap: 10px;
 	grid-template-areas: 
@@ -276,15 +275,8 @@
 		grid-area: btn-dmg;
 	}
 	.dmg, .heal {
-		text-align: left;
-		position: relative;
-		padding: 5px 35px 5px 8px;
-
-		img {
-			position: absolute;
-			height: 25px;
-			right: 8px;
-		}
+		display: flex;
+		justify-content: space-between;
 	}
 }
 .select-amount {
@@ -298,11 +290,11 @@
 	}
 
 	.name {
-		background: $gray-dark;
+		background: $neutral-8;
 		padding: 5px;
 	}
 	.defenses {
-		background: $gray-dark;
+		background: $neutral-8;
 		display: grid;
 		grid-template-columns: 18px 18px 18px auto;
 		grid-column-gap: 5px;
@@ -321,7 +313,7 @@
 			font-size: 18px;
 			text-align: center;
 			line-height: 28px;
-			color: $gray-light;
+			color: $neutral-2;
 
 			span {
 				font-size: 12px;
@@ -332,14 +324,14 @@
 				line-height: 28px;
 				top: 0;
 				left: 0;
-				color: $gray-dark;
+				color: $neutral-8;
 			}
 
 			&.active {
 				&.i, &.r { color: $green; }
 				&.v { color: $red; }
 				span {
-					color: $white;
+					color: $neutral-1;
 				}
 			}
 		}
@@ -347,14 +339,14 @@
 	.multipliers {
 		display: flex;
 		justify-content: flex-end;
-		background: $gray-dark;
+		background: $neutral-8;
 
 		.multiplier {
 			padding: 0 8px;
 			margin-left: 1px;
 			line-height: 28px;
-			background: $gray-hover;
-			color: $white;
+			background: $neutral-5;
+			color: $neutral-1;
 			user-select: none;
 			cursor: pointer;
 		}
@@ -366,6 +358,22 @@
 		font-weight: bold;
 		font-size: 15px;
 		color: $blue;
+	}
+}
+
+[data-theme="light"] {
+	.select-amount {
+		.defenses {
+			.option {
+				color: $neutral-4;
+
+				&.active {
+				span {
+					color: $neutral-11;
+				}
+			}
+			}
+		}
 	}
 }
 </style>

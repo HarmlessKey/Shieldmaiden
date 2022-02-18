@@ -1,6 +1,10 @@
 <template>
 	<div>
-		<hk-tip value="broadcast" title="Broadcast" content="Only when you're live, your players can see the initiative list of your active encounter." />
+		<hk-tip 
+			value="broadcast" 
+			title="Broadcast" 
+			content="Only when you're live, your players can see the initiative list of your active encounter." 
+		/>
 		<span 
 			class="live mb-3" 
 			:class="{'active': broadcast.live === campaign_id }">
@@ -10,11 +14,11 @@
 		<p>
 			When you're live, your players can see the initiative list 
 			of your active encounter and you can choose to show them your rolls there as well.
-			Your encounters can be followed with the <a @click="setSlide({show: true, type: 'PlayerLink'})">player link.</a>
+			Your encounters can be followed with your <a @click="setSlide({show: true, type: 'PlayerLink'})">public initiative link.</a>
 		</p>
 		
 		<q-select
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			v-model="shares"
 			:options="options"
 			label="Share"
@@ -30,7 +34,13 @@
 						<q-item-label>Select All</q-item-label>
 					</q-item-section>
 					<q-item-section side>
-						<q-checkbox dark v-model="all" @input="checkAll"/>
+						<q-checkbox 
+							:dark="$store.getters.theme === 'dark'" 
+							v-model="all" 
+							@input="checkAll"
+							:indeterminate-value="false"
+							:false-value="null"
+						/>
 					</q-item-section>
 				</q-item>
 			</template>
@@ -43,7 +53,7 @@
 						<q-item-label v-html="scope.opt.label"/>
 					</q-item-section>
 					<q-item-section side>
-						<q-checkbox dark v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
+						<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
 					</q-item-section>
 				</q-item>
 			</template>
@@ -66,19 +76,13 @@
 		props: ["data"],
 		data() {
 			return {
+				user: this.$store.getters.user,
 				campaign_id: this.data.campaign_id,
 				encounter_id: this.data.encounter_id,
+				campaign: {},
 				sharesSetter: undefined,
-				all: false
-			}
-		},
-		computed: {
-			...mapGetters([
-				"broadcast",
-				"campaign"
-			]),
-			options() {
-				let options =[
+				all: null,
+				options: [
 					{
 						label: "Action rolls",
 						value: "action_rolls"
@@ -103,15 +107,13 @@
 						label: "Skill checks",
 						value: "skill_rolls"
 					}
-				];
-				if(this.campaign.advancement === "experience") {
-					options.push({
-						label: "Experience awards",
-						value: "xp"
-					});
-				}
-				return options;
-			},
+				]
+			}
+		},
+		computed: {
+			...mapGetters([
+				"broadcast",
+			]),
 			shares: {
 				get() {
 					const shares = (this.broadcast.shares) ? this.broadcast.shares : [];
@@ -122,12 +124,25 @@
 				}
 			}
 		},
+		async mounted() {
+			this.campaign = await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaign_id
+			});
+			if(this.campaign.advancement === "experience") {
+				this.options.push({
+					label: "Experience awards",
+					value: "xp"
+				});
+			}
+		},
 		methods: {
 			...mapActions([
 				"setLive",
 				"setLiveShares",
 				"setSlide"
 			]),
+			...mapActions("campaigns", ["get_campaign"]),
 			live() {
 				this.setLive({
 					campaign_id: this.campaign_id, 
@@ -146,8 +161,10 @@
 			sharesSelected () {
 				if (this.shares.length === this.options.length) {
 					this.all = true
-				} else {
+				} else if (this.shares.length) {
 					this.all = false
+				} else {
+					this.all = null
 				}
 				if(this.broadcast.live) this.setLiveShares(this.shares);
 			},

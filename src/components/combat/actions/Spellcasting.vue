@@ -12,8 +12,8 @@
 		</hk-tip>
 		<q-tabs
 			v-model="tab"
-			dark inline-label dense no-caps
-			:indicator-color="tabs.length === 1 ? 'transparent' : 'gray-light'"
+			:dark="$store.getters.theme === 'dark'" inline-label dense no-caps
+			:indicator-color="tabs.length === 1 ? 'transparent' : 'neutral-2'"
 		>
 			<q-tab 
 				v-for="({name, label}, index) in tabs"
@@ -96,11 +96,11 @@
 						<div v-else>
 							{{ level }} each
 						</div>
-						<q-list dark square class="accordion mb-3">
+						<q-list :dark="$store.getters.theme === 'dark'" square class="accordion mb-3">
 							<q-expansion-item 
 								v-for="spell in spellsForLevel(tab, level)" 
 								:key="`${level}-${spell.key}`"
-								dark switch-toggle-side
+								:dark="$store.getters.theme === 'dark'" switch-toggle-side
 								expand-icon-class="hidden-toggle"
 								@show="showSpell = `${level}-${spell.key}`"
 								:group="tab"
@@ -298,7 +298,7 @@
 			.value {
 				font-size: 18px;
 				font-weight: bold;
-				color: $white;
+				color: $neutral-1;
 			}
 		}
 		.display-levels {
@@ -308,7 +308,7 @@
 			line-height: 20px;
 
 			.level {
-				background-color: $gray-dark;
+				background-color: $neutral-5;
 				padding: 0 6px;
 				margin-right: 3px;
 				cursor: pointer;
@@ -316,14 +316,14 @@
 
 				&.active {
 					background-color: $blue;
-					color: $white;
+					color: $neutral-1;
 
 					&:hover {
 						background: $blue-hover;
 					}
 				}
 				&:hover {
-					background: $gray-darker;
+					background: $neutral-4;
 				}
 			}
 		}

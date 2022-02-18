@@ -71,7 +71,7 @@
 				
 				.card-header {
 					font-family: 'Fredericka the Great', cursive;
-					color:$white;
+					color:$neutral-1;
 				}
 				.card-footer {
 					padding: 0;

@@ -1,5 +1,5 @@
 <template>
-	<div class="turns d-flex justify-content-center bg-gray-darker">
+	<div class="turns d-flex justify-content-center bg-neutral-8">
 		<h2 v-if="encounter.finished">
 			Finished
 		</h2>
@@ -16,7 +16,7 @@
 				<div>
 					<div>Turn</div>
 					<div class="number">
-						{{ turn + 1 }}<span class="small gray-hover">/{{ entities_len }}</span>
+						{{ turn + 1 }}<span class="small neutral-4">/{{ entities_len }}</span>
 					</div>
 				</div>
 			</div>
@@ -45,7 +45,7 @@
 					|| (current.entityType == 'npc' && displayNPCField('health', current) === 'obscured')
 				">
 					<template v-if="current.curHp == 0">
-						<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+						<i class="fas fa-skull-crossbones red"></i>
 					</template>
 					<span v-else>
 						
@@ -56,7 +56,7 @@
 						}"></i>
 					</span>
 				</template>
-				<span v-else class="gray-hover">
+				<span v-else class="neutral-4">
 					? ? ?
 				</span>
 			</h2>
@@ -162,6 +162,10 @@
 			width: 40px;
 			height: 40px;
 			margin-left: 15px;
+
+			.avatar {
+				font-size: 29px;
+			}
 		}
 		h2 {
 			line-height: 40px;
@@ -180,7 +184,7 @@
 				width: 60px;
 				line-height: 60px;
 				text-align: center;
-				color: $white;
+				color: $neutral-1;
 				font-size: 25px;
 
 				.hide {
@@ -195,7 +199,7 @@
 				line-height: 60px;
 				font-size: 25px;
 				text-align: center;
-				color: $gray-light;
+				color: $neutral-2;
 				
 				i {
 					vertical-align: -2px;

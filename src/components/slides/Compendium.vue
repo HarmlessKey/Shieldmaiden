@@ -2,29 +2,16 @@
 	<div>
 		<h2>Compendium</h2>
 		<i>What are you looking for?</i>
-<!-- 
-		<div class="options d-flex justify-content-start">
-			<a v-for="(type, name) in types" :key="name"
-				@click="setType(name)"
-				class="mr-2"
-				:class="{ 'active': current == name}"
-			>
-				<span class="icon"><i :class="type.icon"></i></span>
-				<q-tooltip anchor="top middle" self="center middle">
-					{{ name }}
-				</q-tooltip>
-			</a>
-		</div> -->
 
 		<q-tabs
 				v-model="current"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				no-caps
 				class="my-3"
 			>
 				<q-tab 
 					v-for="({name, label, icon}, index) in types" 
-					:name="name" 
+					:name="name"
 					:icon="icon" 
 					@click="setType(name)"
 					:key="`tab-${index}`"
@@ -37,58 +24,60 @@
 
 		<template v-if="current">
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square
 				:placeholder="`Search ${current}`"
 				type="text" 
 				class="mb-2"
 				autocomplete="off" 
 				v-model="search"
 				@keyup="searchType()"
+				:error="!!noResult"
+				:error-message="noResult"
 			>
 				<q-icon slot="append" name="fas fa-search" size="xs" class="pointer" @click="searchType()" />
 			</q-input>
 
-
-			<p v-if="noResult" class="red">{{ noResult }}</p>
-			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} {{ current }} found</p>
-
 			<!-- SHOW SEARCH RESULTS -->
-			<ul class="results">
-				<li v-for="(result, index) in searchResults" :key="index">
-						<div class="index">{{ index + 1 }}. </div>
-						<a @click="showInfo(result['.key'])">
-							{{ result.name }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Show info
-							</q-tooltip>
-						</a>
+			<ul v-if="!show" class="results">
+				<li v-for="(result, index) in searchResults" :key="index" class="truncate">
+					<a @click="show = result['_id']">
+						{{ result.name.capitalizeEach() }}
+						<q-tooltip anchor="top middle" self="center middle">
+							Show info
+						</q-tooltip>
+					</a>
 				</li>
 			</ul>
 
 			<!-- SHOW SELECTED RESULT -->
-			<template v-if="show">
-				<Monster v-if="current == 'monsters'" :id="show" />
+			<div v-if="show">
+				<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">
+					<i class="fas fa-times red mr-1" />
+					Close
+				</a>
+				<ViewMonster v-if="current == 'monsters'" :id="show" />
 				<Spell v-if="current == 'spells'" :id="show" />
 				<Condition v-if="current == 'conditions'" :id="show" />
 				<Item v-if="current == 'items'" :id="show" />
-			</template>
+			</div>
 
 		</template>
-		<router-link v-else to="/compendium">View entire compendium</router-link>
+		<router-link v-else class="btn bg-neutral-5 mt-3 btn-block" to="/compendium">
+			View entire compendium
+		</router-link>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'
-
-	import Monster from '@/components/compendium/Monster.vue';
+	import ViewMonster from '@/components/compendium/Monster.vue';
 	import Item from '@/components/compendium/Item.vue';
 	import Spell from '@/components/compendium/Spell.vue';
 	import Condition from '@/components/compendium/Condition.vue';
+	import { mapActions } from "vuex";
 
 	export default {
 		components: {
-			Monster,
+			ViewMonster,
 			Item,
 			Spell,
 			Condition,
@@ -99,66 +88,73 @@
 					{ name: 'monsters', label: 'Monsters', icon: 'fas fa-dragon' },
 					{ name: 'items', label: 'Items', icon: 'fas fa-treasure-chest' },
 					{ name: 'spells', label: 'Spells', icon: 'fas fa-wand-magic' },
-					{ name: 'conditions', label: 'Conditions', icon: 'fas fa-skull-crossbones' },
+					{ name: 'conditions', label: 'Conditions', icon: 'fas fa-flame' },
 				],
 				current: undefined,
 				show: undefined,
 				search: '',
-				searching: '',
 				searchResults: [],
 				noResult: '',
 			}
 		},
-		firebase() {
-			return {
-				monsters: db.ref('monsters'),
-				items: db.ref('items'),
-				spells: db.ref('spells'),
-				conditions: db.ref('conditions'),
-			}
-		},
 		methods: {
+			...mapActions("api_monsters", ["get_monsters"]),
+			...mapActions("api_items", ["get_api_items"]),
+			...mapActions("api_spells", ["get_api_spells"]),
+			...mapActions("api_conditions", ["get_conditions"]),
 			setType(type) {
 				this.show = undefined //clear the previous selected item
 				this.current = type;
 
 				//Clear the search
-				this.searchResults = []
-				this.search = ''
-				this.searching = ''
+				this.searchResults = [];
+				this.search = '';
 			},
-			showInfo(id) {
-				this.show = id;
-
-				//Clear the search
-				this.searchResults = []
-				this.search = ''
-				this.searching = ''
-			},
-			searchType() {
+			async searchType() {
 				this.show = undefined //clear the previous selected item
 				this.searchResults = [] //clear old search results
-				this.searching = true // shows someone is searching
 
-				//loop over all spells
-				for (let i in this[this.current]) {
-					let m = this[this.current][i]
-
-					//if the name of a spell contains the search words, add it to search results
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
+				if(this.current === "monsters") {
+					await this.get_monsters({ query: { search: this.search }}).then(results => {
+						if(results.meta.count === 0) {
+							this.noResult = 'No results for "' + this.search + '"';
+						} else {
+							this.noResult = "";
+							this.searchResults = results.results;
+						}
+					});
 				}
-				// If there are no results, show this
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
+				if(this.current === "items") {
+					await this.get_api_items({ query: { search: this.search }}).then(results => {
+						if(results.meta.count === 0) {
+							this.noResult = 'No results for "' + this.search + '"';
+						} else {
+							this.noResult = "";
+							this.searchResults = results.results;
+						}
+					});
 				}
-				// if someons is not searching anymore
-				if(this.search == '') {
-					this.searching = false
+				if(this.current === "spells") {
+					await this.get_api_spells({ query: { search: this.search }}).then(results => {
+						if(results.meta.count === 0) {
+							this.noResult = 'No results for "' + this.search + '"';
+						} else {
+							this.noResult = "";
+							this.searchResults = results.results;
+						}
+					});
 				}
-			},
+				if(this.current === "conditions") {
+					await this.get_conditions({ query: { search: this.search }}).then(results => {
+						if(results.meta.count === 0) {
+							this.noResult = 'No results for "' + this.search + '"';
+						} else {
+							this.noResult = "";
+							this.searchResults = results.results;
+						}
+					});
+				}
+			}
 		},
 	};
 </script>
@@ -167,43 +163,16 @@
 	h2 {
 		margin-bottom: 5px !important;
 	}
-	.options {
-		margin: 20px 0;
-
-		a {
-			text-align: center;
-			color: $gray-light !important;
-			border-radius: 50%;
-			background-color:$gray-active;
-			width: 30px;
-			height: 30px;
-			display: block;
-			font-size: 15px; 
-			line-height: 30px;
-			&:hover {
-				background-color: #494747;
-			}
-			&.active {
-				color: $blue !important;
-			}
-		}
-	}
 	ul.results {
 		list-style: none;
 		padding: 0;
 		
 		li {
-			display: grid;
-			background-color:$gray-dark;
-			grid-template-columns: max-content auto;
+			background-color: $neutral-9;
 			margin-bottom: 1px;
 			vertical-align: center;
 			line-height: 46px;
-			padding: 0 5px;
-
-			.index {
-				padding-right: 10px;
-			}
+			padding: 0 10px;
 		}
 	}
 </style>

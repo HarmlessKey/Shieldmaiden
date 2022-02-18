@@ -26,13 +26,13 @@
 							@click="setDialog(name)"
 						>
 							<q-item-section avatar>
-								<i :class="icon" />
+								<i :class="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								{{ title }}
 							</q-item-section>
 							<q-item-section avatar>
-								<i class="fas fa-eye gray-hover" />
+								<i class="fas fa-eye neutral-3" />
 							</q-item-section>
 						</q-item>
 					</q-list>
@@ -108,7 +108,7 @@
 <style lang="scss" scoped>
 	.campaign {
 		padding-bottom: 75px;
-		background-color: #181818;
+		background-color: $neutral-8;
 
 		ul {
 			margin-bottom: 30px;

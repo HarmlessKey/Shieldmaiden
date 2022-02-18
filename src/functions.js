@@ -6,6 +6,17 @@ String.prototype.capitalizeEach = function(sep=' ') {
 	return this.split(sep).map((s) => s.capitalize()).join(sep);
 }
 
+String.prototype.formatUnicorn = function() {
+	var e = this.toString();
+	if (!arguments.length)
+			return e;
+	var t = typeof arguments[0]
+		, n = "string" === t || "number" === t ? Array.prototype.slice.call(arguments) : arguments[0];
+	for (var o in n)
+			e = e.replace(new RegExp("\\{" + o + "\\}","gi"), n[o]);
+	return e
+}
+
 /**
  * Returns the browser type
  * @return {string} browser: Opera, Firefox, Safari, IE, edge, chrome

@@ -4,7 +4,7 @@
 			<Crumble />
 			<h2><i class="fas fa-dragons"></i> Contribute to Monsters</h2>
 
-			<q-linear-progress dark stripe rounded size="25px" :value="Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
+			<q-linear-progress :dark="$store.getters.theme === 'dark'" stripe rounded size="25px" :value="Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
 			<div class="absolute-full flex flex-center white">
         {{ Object.keys(allFinishedMonsters).length }} / {{ Object.keys(allMonsters).length }} ({{ Math.floor(Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length * 100) }}%)
       </div>
@@ -105,7 +105,7 @@
 								</a>
 								<a v-if="key === 'allTagged'">
 									<i class="fas fa-info"></i>
-									<q-popup-proxy dark square>
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
 										<hk-card header="Info" class="mb-0">
 											Tagged by: {{ getPlayerName(data.row.metadata.tagged) }}<br/>
 										</hk-card>
@@ -126,7 +126,7 @@
 
 						<q-checkbox
 							v-if="userInfo.admin"
-							dark
+							:dark="$store.getters.theme === 'dark'"
 							label="Only finished by others"
 							v-model="othersFinished"
 							indeterminate-value="Something else"
@@ -173,7 +173,7 @@
 								</a>
 								<a v-if="userInfo.admin">
 									<i class="fas fa-info"></i>
-									<q-popup-proxy dark square>
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
 										<hk-card header="Info" class="mb-0">
 											Finished by: {{ getPlayerName(data.row.metadata.finished_by) }}
 										</hk-card>
@@ -206,7 +206,7 @@
 								</a>
 								<a v-if="userInfo.admin">
 									<i class="fas fa-info"></i>
-									<q-popup-proxy dark square>
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
 										<hk-card header="Info" class="mb-0">
 											Approved by: {{ getPlayerName(data.row.metadata.approved) }}<br/>
 											Finished by: {{ getPlayerName(data.row.metadata.finished_by) }}
@@ -234,7 +234,7 @@
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Monster from '@/components/compendium/Monster.vue';
-	import ViewMonster from '@/components/ViewMonster.vue';
+	import ViewMonster from '@/components/compendium/Monster.vue';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
@@ -244,9 +244,6 @@
 			Footer,
 			Monster,
 			ViewMonster
-		},
-		metaInfo: {
-			title: 'Monsters'
 		},
 		data() {
 			return {

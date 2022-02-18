@@ -15,7 +15,7 @@
 				<template v-if="$store.getters.user">
 					<h3>DM Content</h3>
 					<q-list @click="setSideSmallScreen(false)">
-						<q-item clickable v-ripple to="/campaigns">
+						<q-item clickable v-ripple to="/content/campaigns">
 							<q-item-section avatar>
 								<i class="fas fa-dungeon"></i>
 							</q-item-section>
@@ -24,7 +24,7 @@
 								Campaigns
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/players">
+						<q-item clickable v-ripple to="/content/players">
 							<q-item-section avatar>
 								<i class="fas fa-users"></i>
 							</q-item-section>
@@ -33,7 +33,7 @@
 								Players
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/npcs">
+						<q-item clickable v-ripple to="/content/npcs">
 							<q-item-section avatar>
 								<i class="fas fa-dragon"></i>
 							</q-item-section>
@@ -42,7 +42,7 @@
 								NPC's
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/reminders">
+						<q-item clickable v-ripple to="/content/reminders">
 							<q-item-section avatar>
 								<i class="fas fa-stopwatch"></i>
 							</q-item-section>
@@ -51,7 +51,7 @@
 								Reminders
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/items">
+						<q-item clickable v-ripple to="/content/items">
 							<q-item-section avatar>
 								<i class="fas fa-staff"></i>
 							</q-item-section>
@@ -64,7 +64,7 @@
 					<hr>
 					<h3>Player Content</h3>
 					<q-list @click="setSideSmallScreen(false)">
-						<q-item clickable v-ripple to="/characters">
+						<q-item clickable v-ripple to="/content/characters">
 							<q-item-section avatar>
 								<i class="fas fa-helmet-battle"></i>
 							</q-item-section>
@@ -73,13 +73,13 @@
 								Characters
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/followed">
+						<q-item clickable v-ripple to="/content/followed">
 							<q-item-section avatar>
 								<i class="fas fa-user-check"></i>
 							</q-item-section>
-							<q-item-section class="title">Following</q-item-section>
+							<q-item-section class="title">Followed users</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-								Following
+								Followed users
 							</q-tooltip>
 						</q-item>
 					</q-list>
@@ -234,7 +234,6 @@
 					this.small_screen = false;
 				}
 			}
-			this.setSideCollapsed();
 		}, 
 	}
 </script>
@@ -251,10 +250,10 @@
 	height: calc(100vh - 50px);
 	position: relative;
 	padding-top:10px;
-	background:$gray;
+	background: $neutral-8;
 	transition: width 0.5s linear;
 	z-index: 98;
-	border-right: 1px solid$gray-active;
+	border-right: 1px solid $neutral-5;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	padding-bottom: 40px;
@@ -266,15 +265,15 @@
 		font-weight: bold;
 		margin: 10px 0;
 		width: 250px;
-		color:$gray-hover;
+		color: $neutral-3;
 	}
 	hr {
-		background-color:$gray-active;
+		background-color: $neutral-6;
 	}
 	
 	.q-list {
 		.q-item {
-			color: $gray-light !important;
+			color: $neutral-3 !important;
 			overflow: hidden;
 			width: 250px;
 			transition: padding-left 0.5s linear;
@@ -282,26 +281,30 @@
 
 			.q-item__section--avatar {
 				min-width: 35px;
+				color: $neutral-4;
 			}
 
 			&.q-router-link--active {
-				i::before {	
-					color: $blue !important;
+				color: $neutral-1 !important;
+
+				.q-item__section--avatar {
+					color: $neutral-1 !important;
 				}
 			}
 		}
 	}
 	#toggle-width {
-		background:$gray;
+		background: $neutral-8;
 		height: 40px;
 		width: calc(100%);
 		position: fixed;
 		right: left;
 		bottom: 0;
 		padding: 0 20px;
-		border-top: 1px solid$gray-active;
+		border-top: 1px solid $neutral-6;
+		border-right: 1px solid $neutral-5;
 		cursor: pointer;
-		color: $gray-light;
+		color: $neutral-3;
 		line-height: 40px;
 		font-size: 20px;
 		text-align: right;

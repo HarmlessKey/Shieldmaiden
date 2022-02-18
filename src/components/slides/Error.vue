@@ -3,7 +3,7 @@
 		<h2 class="red">Slide not found</h2>
 		<p>We might have failed a perception check, cause this slide can not be found...</p>
 
-		<small class="gray-hover">
+		<small class="neutral-3">
 			You tried to acces: {{ type }}<br/>
 			With the data: <br/>
 			{{ data }}

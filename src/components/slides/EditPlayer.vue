@@ -16,232 +16,257 @@
 		<a v-if="entity.transformed" @click="removeTransform()" class="btn btn-block bg-red mb-3">Remove transformation</a>
 		
 		<Transform :data="entityKey" @close="closeTransform" v-if="setTransform" />
+
 		<template v-else>
-			<div v-if="location == 'encounter'" class="mb-3">
-				<q-input 
-					dark filled square
-					label="initiative"
-					type="number" 
-					name="initiative"
-					min="0"
-					v-model="initiative['.value']"
-					v-validate="'required'"
-				/>
-				<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
-			</div>
-			<template v-else-if="entity.curHp === 0 && !entity.stable && !entity.dead">
+			<!-- DEATH SAVING THROWS -->
+			<template v-if="entity.curHp === 0 && !entity.stable && !entity.dead">
 				<div class="px-1 my-3 d-flex justify-content-between">
 					<div v-for="(n, index) in 5" :key="index">
-						<template v-if="Object.keys(entity.saves).length === n">
-							<a v-show="entity.saves[n] === 'succes'" class="green" @click="set_save('unset', n)">
+						<template v-if="entity.saves && Object.keys(entity.saves).length === n">
+							<a v-show="entity.saves[n] === 'succes'" class="green" @click="set_save(null, n)">
 								<i class="fas fa-check"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Change
 								</q-tooltip>
 							</a>
-							<a v-show="entity.saves[n] === 'fail'" class="red" @click="set_save('unset', n)">
+							<a v-show="entity.saves[n] === 'fail'" class="red" @click="set_save(null, n)">
 								<i class="fas fa-times"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Change
 								</q-tooltip>
 							</a>
 						</template>
-						<template v-else>
+						<template v-else-if="entity.saves">
 							<span v-show="entity.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
 							<span v-show="entity.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
 						</template>
-						<span v-show="!entity.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
+						<span v-show="!entity.saves || !entity.saves[n]" class="neutral-2"><i class="fas fa-dot-circle"></i></span>
 					</div>
 				</div>
-				<div v-if="Object.keys(entity.saves).length < 5" class="d-flex justify-content-between">
-					<button class="btn save bg-green" @click="set_save('succes', Object.keys(entity.saves).length)"><i class="fas fa-check"></i></button>
-					<button class="btn save bg-red" @click="set_save('fail', Object.keys(entity.saves).length)"><i class="fas fa-times"></i></button>
+				<div v-if="!entity.saves || Object.keys(entity.saves).length < 6" class="d-flex justify-content-between">
+					<button class="btn save bg-green" @click="set_save('succes', !entity.saves ? 0 : Object.keys(entity.saves).length)">
+						<i class="fas fa-check"></i>
+					</button>
+					<button class="btn save bg-red" @click="set_save('fail', !entity.saves ? 0 : Object.keys(entity.saves).length)">
+						<i class="fas fa-times"></i>
+					</button>
 				</div>
 				<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill()"><i class="fas fa-skull"></i> Player died</a>
 				<a class="btn btn-block my-3" @click="stabilize()"><i class="fas fa-heartbeat"></i> Stabilize</a>
 			</template>
 			<a v-else-if="entity.dead" class="btn bg-green btn-block my-3" @click="revive()"><i class="fas fa-hand-holding-magic"></i> Revive</a>
-
-			<h2>Temporary</h2>
-			<div class="row q-col-gutter-md mb-2">
-				<div class="col">
-					<q-input 
-						dark filled square
-						label="AC bonus"
-						type="number" 
-						name="ac_bonus" 
-						v-model="entity.ac_bonus"
-						clearable
-					/>
-				</div>
-
-				<div class="col">
-					<q-input 
-						dark filled square
-						label="Temp HP"
-						type="number" 
-						name="tempHp" 
-						v-model="entity.tempHp"
-						clearable
-					/>
-				</div>
-
-				<div class="col" v-if="!entity.transformed">
-					<q-input 
-						dark filled square
-						label="Max HP Mod"
-						type="number" 
-						name="maxHpMod" 
-						v-model="maxHpMod"
-						clearable
-					/>
-				</div>
-			</div>
-
-			<template>
-				<hr>
-				<h2 class="mb-0">Override</h2>
-				<div class="row q-col-gutter-md my-2">
-					<div class="col">
-						<template v-if="entity.transformed">
-							<q-input 
-								dark filled square
-								label="Cur HP"
-								type="number" 
-								name="t-curHp" 
-								min="1"
-								v-model="entity.transformed.curHp"
-								v-validate="'required|numeric|min:1'"
-								data-vv-as="Current HP"
-								placeholder="Current Hit Points"
-							>
-								<q-icon slot="prepend" name="fas fa-paw-claws green">
-									<q-tooltip anchor="top middle" self="center middle">
-										Transformed
-									</q-tooltip>
-								</q-icon>
-							</q-input>
-							<p class="validate red" v-if="errors.has('t-curHp')">{{ errors.first('t-curHp') }}</p>
-						</template>
-						<template v-else>
-							<q-input 
-								dark filled square
-								label="Cur HP"
-								class="text-center"
-								type="number" 
-								name="curHp" 
-								min="0"
-								v-model="entity.curHp"
-								v-validate="'required|numeric'"
-								data-vv-as="Current HP"
-							/>
-							<p class="validate red" v-if="errors.has('curHp')">{{ errors.first('curHp') }}</p>
-						</template>
-					</div>
-
-					<div class="col">
-						<template v-if="entity.transformed">
-							<q-input 	
-								dark filled square
-								label="Max HP"	
-								class="text-center"
-								type="number" 
-								name="t-maxHp" 
-								min="1"
-								v-model="entity.transformed.maxHp"
-								v-validate="'required|numeric'"
-								data-vv-as="Maximum HP"
-							>
-								<q-icon slot="prepend" name="fas fa-paw-claws green">
-									<q-tooltip anchor="top middle" self="center middle">
-										Transformed
-									</q-tooltip>
-								</q-icon>
-							</q-input>
-							<p class="validate red" v-if="errors.has('t-maxHp')">{{ errors.first('t-maxHp') }}</p>
-						</template>
-						<template v-else>
-							<q-input 
-								dark filled square
-								label="Max HP"
-								class="text-center"
-								type="number" 
-								name="maxHp" 
-								min="1"
-								v-model="playerBase.maxHp"
-								v-validate="'required|numeric'"
-								data-vv-as="Maximum HP"
-							/>
-							<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-						</template>
-					</div>
-				</div>
-				<div class="row q-col-gutter-md">
-					<div class="col">
-						<template v-if="entity.transformed">
-							<q-input 
-								dark filled square
-								label="Armor class"
-								class="text-center"
-								type="number" 
-								name="t-ac" 
-								min="1"
-								v-model="entity.transformed.ac"
-								v-validate="'required|numeric'"
-								data-vv-as="Amor Class"
-							>
-								<q-icon slot="prepend" name="fas fa-paw-claws green">
-									<q-tooltip anchor="top middle" self="center middle">
-										Transformed
-									</q-tooltip>
-								</q-icon>
-							</q-input>
-							<p class="validate red" v-if="errors.has('t-ac')">{{ errors.first('t-ac') }}</p>
-						</template>
-						<template v-else>
-							<q-input 
-								dark filled square
-								label="Armor class"
-								class="text-center"
-								type="number" 
-								name="ac" 
-								min="1"
-								v-model="playerBase.ac"
-								v-validate="'required|numeric'"
-								data-vv-as="Amor Class"
-								placeholder="Armor Class"/>
-							<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-						</template>
-					</div>
-					<div class="col">
+			
+			<!-- EDIT PLAYER -->	
+			<ValidationObserver v-slot="{ handleSubmit }">
+				<q-form @submit="handleSubmit(edit)">
+					<ValidationProvider 
+						v-if="location == 'encounter'" 
+						rules="between:0,99|required" 
+						name="Initiative" 
+						v-slot="{ errors, invalid, validated }"
+					>
 						<q-input 
-							dark filled square
-							label="Level"
-							class="text-center"
+							:dark="$store.getters.theme === 'dark'" filled square
+							label="initiative"
 							type="number" 
-							name="level" 
-							min="1"
-							max="20"
-							v-model="playerBase.level"
-							v-validate="isXpAdvancement() ? 'numeric|between:1,20' : 'required|numeric|between:1,20'"
-							data-vv-as="Level"
-							:clearable="isXpAdvancement()"
-						>
-							<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level  }">
-								{{ calculatedLevel(playerBase.experience) }}
-								<q-tooltip anchor="top left" self="center left">
-									Level based on XP
-								</q-tooltip>
-							</span>
-						</q-input>
-						<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+							min="0"
+							max="99"
+							v-model="initiative"
+							v-validate="'required'"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+					</ValidationProvider>
+
+					<h2>Temporary</h2>
+					<div class="row q-col-gutter-md mb-2">
+						<div class="col">
+							<ValidationProvider rules="between:-99,99" name="AC" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="AC bonus"
+									type="number" 
+									name="ac_bonus" 
+									v-model="entity.ac_bonus"
+									clearable
+									no-error-icon
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
+
+						<div class="col">
+							<ValidationProvider rules="between:0,999" name="Temp HP" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Temp HP"
+									type="number" 
+									name="tempHp" 
+									v-model="entity.tempHp"
+									clearable
+									no-error-icon
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
+
+						<div class="col" v-if="!entity.transformed">
+							<ValidationProvider rules="between:-999,999" name="Max Hp mod" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Max HP Mod"
+									type="number" 
+									name="maxHpMod" 
+									v-model="maxHpMod"
+									clearable
+									no-error-icon
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
 					</div>
-				</div>
-			</template>
 
-			<button class="btn btn-block my-3" @click="edit()">Save</button>
+					<hr>
+					<h2 class="mb-0">Override</h2>
+					<div class="row q-col-gutter-md my-2">
+						<div class="col">
+							<ValidationProvider rules="min_value:0|required" name="Current HP" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									v-if="entity.transformed"
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Cur HP"
+									type="number" 
+									class="text-center"
+									min="0"
+									v-model="entity.transformed.curHp"
+									placeholder="Current Hit Points"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<q-icon slot="prepend" name="fas fa-paw-claws green">
+										<q-tooltip anchor="top middle" self="center middle">
+											Transformed
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<q-input 
+									v-else
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Cur HP"
+									class="text-center"
+									type="number" 
+									min="0"
+									v-model="entity.curHp"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
 
-			<div v-if="isXpAdvancement()" class="pt-2">
+						<div class="col">
+							<ValidationProvider rules="between:1,9999|required" name="Max HP" v-slot="{ errors, invalid, validated }">
+								<q-input 	
+									v-if="entity.transformed"
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Max HP"	
+									class="text-center"
+									type="number" 
+									min="1"
+									max="9999"
+									v-model="entity.transformed.maxHp"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<q-icon slot="prepend" name="fas fa-paw-claws green">
+										<q-tooltip anchor="top middle" self="center middle">
+											Transformed
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<q-input 
+									v-else
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Max HP"
+									class="text-center"
+									type="number" 
+									min="1"
+									max="9999"
+									v-model="playerBase.maxHp"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
+					</div>
+					<div class="row q-col-gutter-md">
+						<div class="col">
+							<ValidationProvider rules="between:1,99|required" name="Armor class" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									v-if="entity.transformed"
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Armor class"
+									class="text-center"
+									type="number" 
+									min="1"
+									max="99"
+									v-model="entity.transformed.ac"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<q-icon slot="prepend" name="fas fa-paw-claws green">
+										<q-tooltip anchor="top middle" self="center middle">
+											Transformed
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<q-input 
+									v-else
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Armor class"
+									class="text-center"
+									type="number" 
+									name="ac" 
+									min="1"
+									max="99"
+									v-model="playerBase.ac"
+									placeholder="Armor Class"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
+						<div class="col">
+							<ValidationProvider :rules="isXpAdvancement() ? 'numeric|between:1,20' : 'required|numeric|between:1,20'" name="Level" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Level"
+									class="text-center"
+									type="number" 
+									min="1"
+									max="20"
+									v-model="playerBase.level"
+									:clearable="isXpAdvancement()"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level  }">
+										{{ calculatedLevel(playerBase.experience) }}
+										<q-tooltip anchor="top left" self="center left">
+											Level based on XP
+										</q-tooltip>
+									</span>
+								</q-input>
+							</ValidationProvider>
+						</div>
+					</div>
+
+					<q-btn no-caps label="Save" class="full-width" color="primary" type="submit" />
+				</q-form>
+			</ValidationObserver>
+			<div v-if="isXpAdvancement() && playerBase.experience !== undefined" class="pt-2">
 				<hr>
 				<h2>Experience Points</h2>
 				<h2 class="text-center xp">
@@ -261,7 +286,7 @@
 				</div>
 
 				<q-input 
-					dark square filled
+					:dark="$store.getters.theme === 'dark'" square filled
 					class="text-center"
 					type="number" 
 					name="xp" 
@@ -282,13 +307,12 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapGetters, mapActions } from 'vuex';
 	import { experience } from '@/mixins/experience.js';
 	import Transform from './party/Transform.vue';
 
 	export default {
-		name: 'EditEntity',
+		name: 'EditPlayer',
 		mixins: [experience],
 		components: {
 			Transform
@@ -304,43 +328,39 @@
 				encounterId: this.$route.params.encid,
 				entityKey: this.data.key,
 				location: this.data.location,
-				entity: undefined,
+				entity: {},
+				playerBase: {},
 				maxHpMod: undefined,
 				xp: undefined,
-				setTransform: false
+				setTransform: false,
+				advancement: undefined,
+				initiative: 0,
 			}
 		},
-		mounted() {
-			const entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
-			entity.on('value', async (snapshot) => {
-				this.entity = snapshot.val();
-				this.entity.saves = (snapshot.val().saves) ? snapshot.val().saves : {};
-				this.maxHpMod = snapshot.val().maxHpMod;
+		async mounted() {
+			await this.get_campaign({ uid: this.userId, id: this.campaignId }).then(result => {
+				const entity = result.players[this.entityKey];
+				this.entity = {...entity};
+				this.maxHpMod = entity.maxHpMod;
+				this.advancement = result.advancement;
 			});
 
-			if(this.isXpAdvancement()) {
-				if(this.playerBase.experience === undefined) {
-					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(0);
-					this.playerBase.experience = 0;
+			await this.get_player({ uid: this.userId, id: this.entityKey }).then(result => {
+				this.playerBase = result;
+				if(this.isXpAdvancement() && this.playerBase.experience === undefined) {
+					this.set_player_prop({ uid: this.userId, id: this.entityKey, property: "experience", value: 0 });
 				}
-			}
-		},
-		firebase() {
-			return {
-				playerBase: {
-					source:	db.ref(`players/${this.userId}/${this.entityKey}`),
-					asObject: true
-				},
-				advancement: {
-					source:	db.ref(`campaigns/${this.userId}/${this.campaignId}/advancement`),
-					asObject: true
-				},
+			});
+
+			// Get the initiative of the player when in an encounter
+			if(this.location === "encounter") {
+				await this.get_encounter({ uid: this.userId, campaignId: this.campaignId, id: this.encounterId }).then(result => {
+					this.initiative = result.entities[this.entityKey].initiative;
+				});
 			}
 		},
 		computed: {
-			...mapGetters([
-				'broadcast'
-			]),
+			...mapGetters(["broadcast"]),
 			share() {
 				return (this.broadcast.shares && this.broadcast.shares.includes("xp")) || false;
 			},
@@ -358,6 +378,17 @@
 			...mapActions([
 				'setSlide',
 				'edit_player',
+			]),
+			...mapActions("players", ["get_player", "edit_player", "set_player_prop"]),
+			...mapActions("campaigns", [
+				"get_campaign", 
+				"stabilize_entity", 
+				"kill_entity", 
+				"revive_entity", 
+				"update_campaign_entity",
+				"edit_campaign_player",
+				"set_share",
+				"set_death_save"
 			]),
 			addXp() {
 				if(this.xp) {
@@ -377,132 +408,154 @@
 							}
 						};
 						if(this.$route.name === 'RunEncounter') share.encounter_id = this.encounterId;
-
-						db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share);
+						this.set_share({ id: this.broadcast.live, share });
 					}
-
-					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(newXp)
+					this.set_player_prop({ uid: this.userId, id: this.entityKey, property: "experience", value: newXp });
 					this.xp = undefined;
 				}
 			},
 			isXpAdvancement() {
-				return this.advancement['.value'] !== 'milestone';
+				return this.advancement !== 'milestone';
 			},
-			set_save(check, index) {
-				if(check === 'unset') {
-					// delete this.entity.saves[index];
-					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves/${index}`).remove();
-				}
-				else {
-					var i = parseInt(index + 1);
-					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves/${i}`).set(check);
-				}
+			set_save(value, index) {
+				index = (value) ? index + 1 : index;
+				this.set_death_save({
+					campaignId: this.campaignId,
+					type: "players",
+					id: this.entityKey,
+					index,
+					value
+				});
 			},
 			closeTransform() {
 				this.setTransform = false;
 			},
 			removeTransform() {
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/transformed`).remove();
+				this.update_campaign_entity({ 
+					uid: this.userId, 
+					campaignId: this.campaignId, 
+					type: "players",
+					id: this.entityKey,
+					property: "transformed",
+					value: null
+				});
 			},
 			stabilize() {
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).set(true);
+				this.stabilize_entity({ 
+					uid: this.userId, 
+					campaignId: this.campaignId, 
+					type: "players",
+					id: this.entityKey
+				});
 			},
 			kill() {
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).remove();
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).set(true);
+				this.kill_entity({ 
+					uid: this.userId, 
+					campaignId: this.campaignId, 
+					type: "players",
+					id: this.entityKey
+				});
 			},
 			revive() {
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).remove();
-				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/curHp`).set(1);
+				this.revive_entity({ 
+					uid: this.userId, 
+					campaignId: this.campaignId, 
+					type: "players",
+					id: this.entityKey, 
+					curHp: 1
+				});
 			},
 			edit() {
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						delete this.entity['.key'] // can't be entered in Firebase
-						delete this.playerBase['.key'] // can't be entered in Firebase
+				if(this.location === 'encounter') {
+					this.initiative = Number(this.initiative);
+				}
 
-						if(this.location == 'encounter') {
-							this.initiative['.value'] = Number(this.initiative['.value']);
-						}
+				//Parse to INT
+				this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : 0;
+				this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : 0;
+				this.entity.maxHpMod = (this.entity.maxHpMod) ? parseInt(this.entity.maxHpMod) : 0;
+				this.playerBase.ac = parseInt(this.playerBase.ac);
+				this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
+				this.entity.curHp = parseInt(this.entity.curHp);
+				let maxHpMod = (this.maxHpMod) ? parseInt(this.maxHpMod) : 0;
 
-						//Parse to INT
-						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : 0;
-						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : 0;
-						this.maxHpMod = (this.maxHpMod) ? parseInt(this.maxHpMod) : 0;
-						this.entity.maxHpMod = (this.entity.maxHpMod) ? parseInt(this.entity.maxHpMod) : 0;
-						this.playerBase.ac = parseInt(this.playerBase.ac);
-						this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
-						this.entity.curHp = parseInt(this.entity.curHp);
+				// If the MaxHpMod is negative and larger than the maxHp
+				if(maxHpMod < 0 && Math.abs(maxHpMod) > this.playerBase.maxHp) {
+					maxHpMod = -this.playerBase.maxHp;
+				}
 
-
-						//Modify curHP with maxHpMod
-						if(this.entity.maxHpMod === 0) {
-							//If the there was no current mod
-							//only modify curHp if maxHpMod = positive
-							if(this.maxHpMod > 0) {
-								this.entity.curHp = parseInt(this.entity.curHp + this.maxHpMod);
-							}
-						} else if(this.maxHpMod === 0) {
-							//if the new mod is 0, check if the old mod was positive
-							//If so, remove it from the curHp
-							if(this.entity.maxHpMod > 0) {
-								this.entity.curHp = parseInt(this.entity.curHp - this.entity.maxHpMod);
-							}
+				//Modify curHP with maxHpMod
+				if(this.entity.maxHpMod === 0) {
+					//If the there was no current mod
+					//only modify curHp if maxHpMod = positive
+					if(maxHpMod > 0) {
+						this.entity.curHp = parseInt(this.entity.curHp + maxHpMod);
+					}
+				} else if(maxHpMod === 0) {
+					//if the new mod is 0, check if the old mod was positive
+					//If so, remove it from the curHp
+					if(this.entity.maxHpMod > 0) {
+						this.entity.curHp = parseInt(this.entity.curHp - this.entity.maxHpMod);
+					}
+				} else {
+					//If the new mod is positive
+					if(maxHpMod > 0) {
+						//check if the current mod was positive too
+						if(this.entity.maxHpMod > 0) {
+							//if so, first substract current mod, then add new
+							this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod + maxHpMod);
 						} else {
-							//If the new mod is positive
-							if(this.maxHpMod > 0) {
-								//check if the current mod was positive too
-								if(this.entity.maxHpMod > 0) {
-									//if so, first substract current mod, then add new
-									this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod + this.maxHpMod);
-								} else {
-									//else only add the new mod
-									this.entity.curHp = parseInt(parseInt(this.entity.curHp) + this.maxHpMod);
-								}
-							} else if(this.maxHpMod < 0) {
-								//if the new mod is negative,
-								//but the current is positive, still substract current
-								if(this.entity.maxHpMod > 0) {
-									this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod);
-								}
-							}
+							//else only add the new mod
+							this.entity.curHp = parseInt(parseInt(this.entity.curHp) + maxHpMod);
 						}
-						this.entity.maxHpMod = this.maxHpMod; //to store new in firebase
-
-						//CurHp can never be > maxHp
-						if(this.entity.curHp > (this.playerBase.maxHp + this.entity.maxHpMod)) {
-							this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod);
+					} else if(maxHpMod < 0) {
+						//if the new mod is negative,
+						//but the current is positive, still substract current
+						if(this.entity.maxHpMod > 0) {
+							this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod);
 						}
-						if(this.entity.transformed) {
-							if(this.entity.transformed.curHp > this.entity.transformed.maxHp) {
-								this.entity.transformed.curHp = this.entity.transformed.maxHp;
-							}
-							if(this.entity.transformed.curHp <= 0) {
-								this.$delete(this.entity, 'transformed');
-							}
-						}				
-
-						//Update Firebase apart from store, cause it can be edited where there is no store.
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).set(this.entity);
-						db.ref(`players/${this.userId}/${this.entityKey}`).update(this.playerBase);
-
-						//If the new curHp > 0, remove stable and dead conditions
-						if(this.entity.curHp > 0) {
-							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
-							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).remove();
-							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
-						}
-						
-						this.setSlide(false);
 					}
-					else {
-						//console.log('Not valid');
+				}
+				this.entity.maxHpMod = maxHpMod;
+
+				//CurHp can never be > maxHp
+				if(this.entity.curHp > (this.playerBase.maxHp + this.entity.maxHpMod)) {
+					this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod);
+				}
+				if(this.entity.transformed) {
+					if(this.entity.transformed.curHp > this.entity.transformed.maxHp) {
+						this.entity.transformed.curHp = this.entity.transformed.maxHp;
 					}
-				})
+					if(this.entity.transformed.curHp <= 0) {
+						this.$delete(this.entity, 'transformed');
+					}
+				}				
+
+				// Update the player in the campaign
+				this.edit_campaign_player({
+					id: this.campaignId,
+					playerId: this.entityKey,
+					player: this.entity
+				});
+				// Update the player
+				this.edit_player({ 
+					uid: this.userId, 
+					id: this.entityKey, 
+					player: this.playerBase
+				});
+
+				//If the new curHp > 0, revive a player and set the new curHp 
+				if(this.entity.curHp > 0) {
+					this.revive_entity({ 
+						uid: this.userId, 
+						campaignId: this.campaignId, 
+						type: "players",
+						id: this.entityKey, 
+						curHp: this.entity.curHp
+					});
+				}
+
+				this.setSlide(false);
 			}
 		}
 	};

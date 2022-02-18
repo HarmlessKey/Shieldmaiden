@@ -8,30 +8,30 @@
 		</ul>
 		<hr>
 		<template v-if="condition_targets.length > 0">
-			<q-list dark square :class="`accordion`">
+			<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 				<q-expansion-item
 					v-for="({value, name, condition, effects }, index) in conditionList"
 					:key="index"
-					dark switch-toggle-side
+					:dark="$store.getters.theme === 'dark'" switch-toggle-side
 					:group="name"
 				>
 					<template v-slot:header>
 						<q-item-section>
 							<div class="d-flex justify-content-start">
-								<icon :icon="value" class="icon"/>
+								<i :class="`hki-${value}`" class="icon" />
 								{{ name }}
 							</div>
 						</q-item-section>
 
 						<q-item-section v-if="value === 'exhaustion'" avatar>
 							<a @click.stop>
-								<span class="exhaustion gray-dark" v-if="checkExhaustion() != undefined">
+								<span class="exhaustion neutral-11" v-if="checkExhaustion() != undefined">
 									{{ checkExhaustion() }}
 								</span>
 								<i v-else class="fas fa-plus-circle green" />
 
-								<q-popup-proxy square :breakpoint="576">
-									<div class="bg-gray gray-light">
+								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+									<div class="bg-neutral-8">
 										<q-list>
 											<q-item>
 												<q-item-section>Exhaustion</q-item-section>
@@ -167,10 +167,14 @@
 </script>
 
 <style lang="scss" scoped>
-	.icon {
-		width: 25px;
-		height: 25px;
-		margin-right: 10px;
+	.q-item__section {
+		line-height: 27px;
+
+		.icon {
+			color: $neutral-3;
+			font-size: 23px;
+			margin-right: 12px;
+		}
 	}
 	a .exhaustion {
 		display: block;
@@ -190,38 +194,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
-		}
-	}
-	ul.conditions {
-		list-style: none;
-		padding: 0;
-		line-height: 25px;
-		font-size: 16px;
-
-		a {
-			color: $gray-light !important;
-		}
-		.icon {
-			width: 25px;
-			height: 25px;
-			margin-right: 10px;
-		}
-
-		li {
-			margin-bottom: 15px;
-
-			.shown {
-				color: $gray-light;
-				background:$gray-active;
-				padding: 20px;
-
-				ul {
-					padding: 15px 0 0 18px;
-					margin: 0;	
-				}
-				margin: 10px 0;				
-			}
 		}
 	}
 </style>

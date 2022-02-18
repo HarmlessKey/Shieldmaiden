@@ -1,124 +1,180 @@
 <template>
-<div class="grid">
-	<div class="content">
+	<hk-card>
+		<div slot="header" class="card-header">
+			<h1><i class="fas fa-treasure-chest mr-2" /> Items</h1>
+			<span class="neutral-3">
+				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+			</span>
+		</div>
+		<div class="card-body">
+			<q-input 
+				:dark="$store.getters.theme !== 'light'" 
+				v-model="search"
+				borderless 
+				filled square
+				debounce="300" 
+				clearable
+				placeholder="Search">
+				<q-icon slot="append" name="search" />
+				<button slot="after" class="btn" @click="filter()">Filter</button>
+			</q-input>
 
-		<!-- ITEM OVERVIEW -->
-		<template v-if="!$route.params.id">
-			<Crumble />
-			<h1><i class="fas fa-treasure-chest"></i> Items</h1>
-			
-			<p>
-				If you can't find a item, 
-				it is because we are only allowed to store 
-				items from the <a href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD</a>.
-			</p>
-
-			<hk-table
-				:items="items"
-				:columns="fields"
-				:perPage="15"
-				:loading="isBusy"
-				:search="['name']"
-				:collapse="true"
+			<q-table
+				:data="items"
+				:columns="columns"
+				row-key="_id"
+				card-class="bg-none"
+				flat
+				:dark="$store.getters.theme !== 'light'"
+				:pagination.sync="pagination"
+				:loading="loading"
+				separator="none"
+				wrap-cells
+				@request="request"
 			>
-				<router-link :to="'/compendium/items/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
-
-				<!-- ATTUNEMENT -->
-				<span slot="requires_attunement" slot-scope="data">
-					<template v-if="data.item">Required</template>
-					<template v-else>--</template>
-				</span>
-
-				<!-- RARITY -->
-				<span :class="{ 
-					'white': data.item == 'common',
-					'green': data.item == 'uncommon',
-					'blue': data.item == 'rare',
-					'purple': data.item == 'very rare',
-					'orange': data.item == 'legendary',
-					'red-light': data.item == 'artifact',
-					}" 
-					slot="rarity" slot-scope="data">
-						{{ data.item }}
-				</span>
-
-				<!-- COLLAPSE -->
-				<div slot="collapse" slot-scope="data">
-					<ViewItem :data="data.row" />
-				</div>
+				<div slot="no-data" />
+				<hk-loader slot="loading" name="monsters" />
 				
-				<div slot="table-busy" class="loader">
-					<span>Loading items....</span>
-				</div>
-			</hk-table>
-		</template>
-	</div>
-	<Footer />
-</div>
+				<template v-slot:header="props">
+					<q-tr :props="props">
+						<q-th auto-width />
+						<q-th
+							v-for="col in props.cols"
+							:key="col.name"
+							:props="props"
+						>
+							{{ col.label }}
+						</q-th>
+					</q-tr>
+				</template>
+
+				<!-- Body -->
+				<template v-slot:body="props">
+					<q-tr :props="props">
+						<q-td auto-width>
+							<a  @click="props.expand = !props.expand">
+								<i class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+							</a>
+						</q-td>
+						<q-td
+							v-for="col in props.cols"
+							:key="col.name"
+							:props="props"
+						>
+							<div class="truncate-cell">
+								<div class="truncate">
+									<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
+										{{ col.value }}
+									</router-link>
+									<span 
+										v-else-if="col.name === 'rarity'"
+										:class="{ 
+										'white': col.value == 'common',
+										'green': col.value == 'uncommon',
+										'blue': col.value == 'rare',
+										'purple': col.value == 'very rare',
+										'orange': col.value == 'legendary',
+										'red-light': col.value == 'artifact',
+										}" 
+									>
+										{{ col.value }}
+									</span>
+									<template v-else>{{ col.value }}</template>
+								</div>
+							</div>
+						</q-td>
+					</q-tr>
+					<q-tr v-if="props.expand" :props="props">
+						<q-td colspan="100%" auto-width>
+							<Item :id="props.key" />
+						</q-td>
+					</q-tr>
+				</template>
+			</q-table>
+		</div>
+	</hk-card>
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
-	import Footer from '@/components/Footer.vue';
-	import ViewItem from '@/components/ViewItem.vue';
+	import Item from '@/components/compendium/Item.vue';
+	import { mapActions } from "vuex";
 
 	export default {
-		name: 'Error',
+		name: 'Items',
 		components: {
-			Crumble,
-			Footer,
-			ViewItem
-		},
-		metaInfo: {
-			title: 'Items'
+			Item
 		},
 		data() {
 			return {
-				fields: {
-					name: {
-						label: 'Name',
+				items: [],
+				search: "",
+				query: null,
+				pagination: {
+					sortBy: 'name',
+					descending: false,
+					page: 1,
+					rowsPerPage: 15,
+					rowsNumber: 0
+				},
+				columns: [
+					{
+						name: "name",
+						label: "Name",
+						field: "name",
+						sortable: true,
+						align: "left",
+						format: val => val.capitalizeEach()
+					},
+					{
+						name: "attunement",
+						label: "Attunement",
+						field: "requires_attunement",
+						align: "left",
 						sortable: true
 					},
-					requires_attunement: {
-						label: 'Attunement',
-					},
-					rarity: {
-						label: 'Rarity',
+					{
+						name: "rarity",
+						label: "Rarity",
+						field: "rarity",
+						align: "left",
 						sortable: true
 					}
-				},
-				isBusy: true,
+				],
+				loading: true,
 			}
 		},
-		firebase() {
-			return {
-				items: {
-					source: db.ref('items'),
-					readyCallback: () => this.isBusy = false
+		methods: {
+			...mapActions("api_items", ["get_api_items"]),
+			filter() {
+				this.loading = true;
+				this.items = [];
+				this.pagination.page = 1;
+				this.query = {
+					search: this.search
 				}
+				this.fetchItems();
+			},
+			request(req) {
+				this.pagination = req.pagination;
+				this.fetchItems();		
+			},
+			async fetchItems() {
+				await this.get_api_items({
+					pageNumber: this.pagination.page,
+					pageSize: this.pagination.rowsPerPage,
+					query: this.query,
+					fields: ["name", "requires_attunement", "rarity", "url"],
+					sortBy: this.pagination.sortBy,
+					descending: this.pagination.descending
+				}).then(result => {
+					this.pagination.rowsNumber = result.meta.count;
+					this.items = result.results;
+					this.loading = false;
+				});
 			}
+		},
+		async mounted() {
+			await this.fetchItems();
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-.grid {
-	height: calc(100vh - 50px) !important;
-	display: grid;
-	grid-template-columns: auto;
-	grid-template-rows: 3fr 1fr;
-	grid-gap: 0;
-	grid-template-areas: 
-	"container"
-	"footer";
-
-	.container {
-		padding-top: 30px;
-		padding-bottom: 50px;
-		line-height: 25px;
-		font-size: 15px; 
-		font-weight: lighter;
-	}
-}
-</style>

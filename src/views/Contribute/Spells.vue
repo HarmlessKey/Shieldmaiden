@@ -210,7 +210,6 @@
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Spell from '@/components/compendium/Spell.vue';
-	import ViewSpell from '@/components/ViewMonster.vue';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
@@ -218,11 +217,7 @@
 		components: {
 			Crumble,
 			Footer,
-			Spell,
-			ViewSpell
-		},
-		metaInfo: {
-			title: 'Spells'
+			Spell
 		},
 		data() {
 			return {

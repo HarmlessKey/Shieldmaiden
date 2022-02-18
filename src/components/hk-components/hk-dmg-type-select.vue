@@ -1,44 +1,47 @@
 <template>
-	<q-select 
-		dark filled square
-		:dense="dense"
-		:clearable="clearable"
-		:use-input="hide_selected"
-		input-debounce="0"
-		:label="label"
-		:options="filtered_damage_types"
-		v-model="damage_type"
-		@filter="filterTypes"
-		:rules="required ? [val => !!val || 'Required'] : []"
-		@focus="hide_selected = true"
-		@blur="hide_selected = false"
-	>
-		<template v-slot:selected>
-			<span v-if="damage_type && !hide_selected" class="truncate">
-				<i :class="[damage_type_icons[damage_type], damage_type]"/>
-				{{ damage_type.capitalize() }} damage
-			</span>
-			<span v-else>
-				{{ !hide_selected ? placeholder : "" }}
-			</span>
-		</template>
-		<template v-slot:option="scope">
-			<q-item
-				clickable
-				v-ripple
-				v-close-popup
-				:active="damage_type === scope.opt"
-				@click="damage_type = scope.opt"
-			>
-				<q-item-section avatar>
-					<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
-				</q-item-section>
-				<q-item-section>
-					<q-item-label v-html="scope.opt.capitalize()"/>
-				</q-item-section>
-			</q-item>
-		</template>
-	</q-select>
+	<ValidationProvider :rules="validationRules" :name="label" v-slot="{ errors, invalid, validated }">
+		<q-select 
+			:dark="$store.getters.theme === 'dark'" filled square
+			:dense="dense"
+			:clearable="clearable"
+			:use-input="hide_selected"
+			input-debounce="0"
+			:label="label"
+			:options="filtered_damage_types"
+			v-model="damage_type"
+			@filter="filterTypes"
+			@focus="hide_selected = true"
+			@blur="hide_selected = false"
+			:error="invalid && validated"
+			:error-message="errors[0]"
+		>
+			<template v-slot:selected>
+				<span v-if="damage_type && !hide_selected" class="truncate">
+					<i :class="[damage_type_icons[damage_type], damage_type]"/>
+					{{ damage_type.capitalize() }} damage
+				</span>
+				<span v-else>
+					{{ !hide_selected ? placeholder : "" }}
+				</span>
+			</template>
+			<template v-slot:option="scope">
+				<q-item
+					clickable
+					v-ripple
+					v-close-popup
+					:active="damage_type === scope.opt"
+					@click="damage_type = scope.opt"
+				>
+					<q-item-section avatar>
+						<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
+					</q-item-section>
+					<q-item-section>
+						<q-item-label v-html="scope.opt.capitalize()"/>
+					</q-item-section>
+				</q-item>
+			</template>
+		</q-select>
+	</ValidationProvider>
 </template>
 
 <script>
@@ -70,10 +73,10 @@
 				required: false,
 				default: false
 			},
-			required: {
-				type: Boolean,
+			validationRules: {
+				type: String,
 				required: false,
-				default: false
+				default: ""
 			},
 		},
 		computed: {

@@ -11,7 +11,7 @@
 			<!-- NAME -->
 			<div class="col-12 col-md-6">
 				<q-input
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Name" 
 					v-model="spell.name"
 					class="mb-2"
@@ -24,7 +24,7 @@
 			<!-- LEVEL -->
 			<div class="col-12 col-md-3">
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value map-options
 					label="Level"
 					:options="spell_levels"
@@ -37,7 +37,7 @@
 			<!-- SCHOOL -->
 			<div class="col-12 col-md-3">
 				<q-select
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value map-options
 					:options="spell_schools"
 					label="School"
@@ -52,7 +52,7 @@
 			<!-- CAST TIME -->
 			<div class="col-12 col-md-2">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Cast time"
 					v-model="spell.cast_time_nr"
 					autocomplete="off"
@@ -65,7 +65,7 @@
 			<!-- CAST TIME TYPE -->
 			<div class="col-12 col-md-3">
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value map-options
 					label="Cast type"
 					:options="spell_cast_time_types"
@@ -77,7 +77,7 @@
 			<!-- REACTION TIME DESCRIPTION -->
 			<div class="col-12 col-md-7" v-if="spell.cast_time_type === 'reaction'">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Reaction time description"
 					v-model="spell.cast_time_react_desc"
 					:disable="spell.cast_time_type !== 'reaction'"
@@ -90,7 +90,7 @@
 			<!-- COMPONENTS -->
 			<div class="col-12 col-md-4">
 				<q-select 
-					dark filled square multiple
+					:dark="$store.getters.theme === 'dark'" filled square multiple
 					map-options emit-value
 					:options="spell_components"
 					v-model="spell.components"
@@ -100,7 +100,7 @@
 			<!-- MATERIAL COMPONENT DESCRIPTION -->
 			<div class="col-12 col-md-8" v-if="spell.components && spell.components.includes('material')">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Material components description"
 					v-model="spell.material_description"
 					:disable="!spell.components || !spell.components.includes('material')"
@@ -115,7 +115,7 @@
 			<!-- RANGE TYPE -->
 			<div class="col-12 col-md-4">
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value
 					map-options
 					label="Range type"
@@ -130,7 +130,7 @@
 			<!-- RANGE -->
 			<div class="col-12 col-md-4">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Range ft."
 					v-model="spell.range"
 					:disable="spell.range_type !== 'ranged'"
@@ -145,7 +145,7 @@
 			<div class="col-12 col-md-4">
 				<div>
 					<q-select
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						emit-value
 						map-options
 						v-model="spell.classes"
@@ -160,7 +160,7 @@
 			<!-- DURATION -->
 			<div class="col-12 col-md-4">
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value
 					map-options
 					label="Duration type"
@@ -174,7 +174,7 @@
 			<!-- DURATION N -->
 			<div class="col-12 col-md-4">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Duration #"
 					v-model="spell.duration_n"
 					:disable="!spell_duration_types_time.includes(spell.duration_type)"
@@ -188,7 +188,7 @@
 			<!-- DURATION SCALE -->
 			<div class="col-12 col-md-4">
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value
 					map-options
 					label="Time scale"
@@ -204,7 +204,7 @@
 			<div class="col-12 col-md-6">
 				<!-- AOE TYPE -->
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value
 					map-options
 					label="AOE type"
@@ -216,7 +216,7 @@
 			</div>
 			<div class="col-12 col-md-6">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="AOE Size ft."
 					v-model="spell.aoe_size"
 					:disable="spell.aoe_type === 'none'"
@@ -231,7 +231,7 @@
 			<!-- RITUAL -->
 			<div class="col-12 col-md-2">
 				<q-checkbox 
-					size="lg" dark 
+					size="lg" :dark="$store.getters.theme === 'dark'" 
 					v-model="spell.ritual"
 					label="Ritual" 
 					:false-value="null"
@@ -241,7 +241,7 @@
 			<!-- LEVEL SCALING -->
 			<div class="col-12 col-md-5">
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value
 					map-options
 					:options="level_scaling"
@@ -253,9 +253,9 @@
 				>
 					<template v-slot:append>
 						<q-icon name="info" @click.stop>
-							<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+								<q-card :dark="$store.getters.theme === 'dark'">
+									<q-card-section class="bg-neutral-8">
 										<b>At higer levels</b>
 									</q-card-section>
 									<q-card-section>
@@ -270,7 +270,7 @@
 			<!-- SOURCE BOOK -->
 			<div class="col-12 col-md-5">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Source"
 					v-model="spell.source"
 					autocomplete="off"
@@ -284,7 +284,7 @@
 			<!-- DESCRIPTION -->
 			<div class="col-12 col-md-6">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Description"
 					v-model="spell.description"
 					class="mb-2"
@@ -294,9 +294,9 @@
 				>
 					<template v-slot:append>
 						<q-icon name="info" @click.stop>
-							<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+								<q-card :dark="$store.getters.theme === 'dark'">
+									<q-card-section class="bg-neutral-8">
 										<b>Markdown</b>
 									</q-card-section>
 
@@ -315,7 +315,7 @@
 				</q-input>
 
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="At higher levels"
 					v-model="spell.higher_level"
 					class="mb-2"

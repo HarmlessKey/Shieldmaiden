@@ -2,31 +2,30 @@
 	<div class="pb-5">
 		<h2>{{ title }}</h2>
 
-		<div class="bg-gray-dark">
-				<TargetItem  :item="entity.key" />
-		</div>
+		<TargetItem  :item="entity.key" />
 
-		<a 
-			class="btn btn-block bg-red my-3"
-			@click="remove()"
-		>
+		<a class="btn btn-block bg-red my-3" @click="remove()">
 			Remove reminder
 		</a>
 
-		<reminder-form v-model="reminder" @validation="setValidation" :select-options="true" />
-		<button class="btn btn-block" @click="editReminder()">Save</button>
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(editReminder)">
+				<reminder-form v-model="reminder" :select-options="true" />
+				<button class="btn btn-block" :disabled="!valid">Save</button>
+			</q-form>
+		</ValidationObserver>
 	</div>
 </template>
 
 <script>
-	import { remindersMixin } from '@/mixins/reminders';
-	import { mapActions } from 'vuex';
-	import ReminderForm from '@/components/ReminderForm';
-	import TargetItem from '@/components/combat/TargetItem.vue';
+	import { remindersMixin } from "@/mixins/reminders";
+	import { mapActions } from "vuex";
+	import ReminderForm from "@/components/ReminderForm";
+	import TargetItem from "@/components/combat/TargetItem.vue";
 
 	export default {
-		name: 'Reminder',
-		props: ['data'],
+		name: "Reminder",
+		props: ["data"],
 		mixins: [remindersMixin],
 		components: {
 			ReminderForm,
@@ -35,13 +34,12 @@
 		data() {
 			return {
 				entity: this.data.entity,
-				key: this.data.key
+				key: this.data.key,
+				reminderSetter: undefined,
+				reminder: {}
 			}
 		},
 		computed: {
-			reminder() {
-				return this.entity.reminders[this.key];
-			},
 			title() {
 				let title = this.reminder.title;
 
@@ -51,80 +49,37 @@
 				return title;
 			}
 		},
+		mounted() {
+			// This has to be done in mounted and can't be a computed,
+			// for some weird reason the copied object is not reactive as computed property
+			this.reminder = {...this.entity.reminders[this.key]};
+		},
 		methods: {
 			...mapActions([
-				'setSlide',
-				'set_targetReminder',
+				"setSlide",
+				"set_targetReminder",
 			]),
 			setValidation(validate) {
 				this.validation = validate;
 			},
 			remove() {
 				this.set_targetReminder({
-					action: 'remove',
+					action: "remove",
 					entity: this.data.entity.key,
 					key: this.data.key,
 				});
 				this.setSlide(false);
 			},
 			editReminder() {
-				this.validation.validateAll().then((result) => {
-					// console.log(this.reminder)
-					delete this.reminder['.key'];
-
-					if (result) {
-						this.set_targetReminder({
-							action: 'update',
-							entity: this.data.entity.key,
-							key: this.data.key,
-							reminder: this.reminder
-						}); 
-						this.setSlide(false);
-					}
-				});
+				delete this.reminder[".key"];
+				this.set_targetReminder({
+					action: "update",
+					entity: this.data.entity.key,
+					key: this.data.key,
+					reminder: this.reminder
+				}); 
+				this.setSlide(false);
 			}
 		},
 	};
 </script>
-
-<style lang="scss" scoped>
-	ul {
-		padding-left: 20px;
-
-		&.exhaustion {
-			list-style: none !important;
-			padding-left: 5px;
-		}
-
-		li {
-			margin-bottom: 10px;
-		}
-	}
-	svg {
-		width: 23px;
-		height: 23px;
-		color: $gray-light;
-		fill: $gray-light;
-	}
-	.table {
-
-		td {
-			background:$gray-active;
-
-			a {
-				color: $gray-light !important;
-				background: #494747;
-				line-height: 30px;
-				height: 30px;
-				display: block;
-				text-align: center;
-
-				&.active {
-					background: $gray-light;
-					color:$gray-active !important;
-				}
-			}
-		}
-	}
-
-</style>

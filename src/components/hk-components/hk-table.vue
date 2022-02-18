@@ -3,7 +3,7 @@
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				placeholder="Search"
 				type="text" 
 				class="mb-2"
@@ -346,14 +346,15 @@
 				text-align: right;
 			}
 			&.hk-table-column-sortable {
+				user-select: none;
 				cursor: pointer;
 				display: flex;
-				justify-content: flex-start;
+				justify-content: space-between;
 
 				.sort {
 					width: 25px;
 					position: relative;
-					color: #494747;
+					color: $neutral-3;
 
 
 					.fas {
@@ -371,11 +372,11 @@
 			}
 		}
 		.hk-collapsed-column {
-			padding: 10px;
+			padding: 20px;
 
 			pre {
 				overflow: hidden;
-				color: #494747;
+				color: $neutral-8;
 			}
 		}
 	}

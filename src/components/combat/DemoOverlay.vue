@@ -4,16 +4,16 @@
 			enter-active-class="animated animate__slideInBottom" 
 			leave-active-class="animated animate__slideOutBottom"
 		>
-			<div class="grid bg-gray-dark" :class="{ hide: !showInfo }">
+			<div class="grid bg-neutral-8" :class="{ hide: !showInfo }">
 				<div class="">
 					<h3>
-						Demo Encounter 
-						<a @click="reload">
+						<a class="btn btn-sm bg-neutral-5" @click="reload">
 							<i class="far fa-sync-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Reset
 							</q-tooltip>
 						</a>
+						Demo Encounter 
 					</h3>
 					This demo encounter has all the functionality our encounter tracker has. If you create an account you can make your own encounters and run them just like this, but with your custom content.<br/>
 					Create your personal account now and run your D&D encounters smoother than ever.
@@ -83,7 +83,7 @@
         display: block;
         cursor: pointer;
         line-height: 50px;
-        color:$white !important;
+        color:$neutral-1 !important;
 
         i {
             transition: transform .5s linear;

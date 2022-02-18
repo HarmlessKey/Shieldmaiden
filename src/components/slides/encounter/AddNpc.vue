@@ -5,7 +5,7 @@
 		<q-tabs
 			v-if="!demo"
 			v-model="tab"
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			inline-label
 			dense
 			no-caps
@@ -21,121 +21,107 @@
 
 		<q-tab-panels v-model="tab" class="bg-transparent mt-3">
 			<q-tab-panel name="npc">
-				<q-form @submit="addNPC()">
-					<q-input 
-						dark filled square
-						autocomplete="off"
-						label="Name"
-						type="text" 
-						name="name" 
-						v-model="entity.name"
-						:rules="[ val => val && val.length > 0 || 'Enter a name']"
-						no-error-icon
-					/>
-					<hr>
-					<div class="row q-col-gutter-md mb-2">
-						<div class="col">
-							<q-input 
-								dark filled square
-								autocomplete="off"
-								label="Initiative"
-								type="number" 
-								name="initiative"
-								min="0"
-								v-model="entity.initiative"
-								:rules="[ val => val >= 1 || 'Min = 1']"
-								no-error-icon
-							>
-								<template v-slot:append>
-									<a @click="rollInitiative">
-									<q-icon size="small" name="fas fa-dice-d20"/>
-									<q-tooltip anchor="top middle" self="center middle">
-										1d20 {{ dexterity ? `+ ${calcMod(dexterity)}` : `` }}
-									</q-tooltip>
-								</a>
-								</template>
-							</q-input>
-						</div>
-						<div class="col">
-							<q-input 
-								dark filled square
-								autocomplete="off"
-								label="Armor class"
-								type="number" 
-								name="ac"
-								min="1"
-								v-model="entity.ac"
-								:rules="[ val => val >= 1 || 'Min = 1']"
-								no-error-icon
-							/>
-						</div>
-						<div class="col">
-							<q-input 
-								dark filled square
-								autocomplete="off"
-								label="Hit points"
-								type="number" 
-								name="maxHp"
-								min="1"
-								v-model="entity.maxHp"
-								:rules="[ val => val >= 1 || 'Min = 1']"
-								no-error-icon
-							/>
-						</div>
-					</div>
-					<label class="my-2">When to add</label>
-					<q-btn-toggle
-						class="mt-2"
-						v-model="addMoment"
-						spread
-						no-caps
-						flat
-						dark
-						:options="options"
-						toggle-color="primary"
-					/>
-					<hr>
-					<q-btn class="btn btn-block mb-3" type="submit" label="Add" />
-				</q-form>
+				<a class="btn bg-neutral-5 full-width mb-3" @click="copy_dialog = true">
+					<i class="fas fa-copy" /> Copy NPC
+				</a>
 
-				<h2>Copy an NPC from below</h2>
-				
-				<p>Search all NPC's, including your custom.</p>
-				<q-input 
-					dark filled square
-					label="Search NPC"
-					type="text" 
-					autocomplete="off" 
-					v-model="search"
-					@keyup="searchNPC()" 
-				>
-					<q-icon slot="append" name="fas fa-search" size="xs" @click="searchNPC()" />
-				</q-input>
-				<ul class="entities">
-					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
-						<span :class="{ 'blue': npc.origin == 'custom' }">
-							{{ npc.name.capitalizeEach() }}
-						</span>
-						<a class="gray-light" @click="set(npc['.key'], npc.origin)">
-							<i class="fas fa-copy blue"></i>
-							<span class="d-none d-md-inline ml-1">Copy</span>
-							<q-tooltip anchor="top middle" self="center middle">
-								Copy NPC
-							</q-tooltip>
-						</a>
-					</li>
-				</ul>
+				<ValidationObserver v-slot="{ handleSubmit, validate, valid }">
+					<q-form @submit="valid ? handleSubmit(addNPC) : validate()" greedy>
+						<ValidationProvider rules="required|max:100" name="Name" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								autocomplete="off"
+								label="Name"
+								type="text" 
+								name="name" 
+								v-model="entity.name"
+								no-error-icon
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
+						<hr>
+						<div class="row q-col-gutter-md mb-2">
+							<div class="col">
+								<ValidationProvider rules="required|between:0,99" name="Initiative" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									autocomplete="off"
+									label="Initiative"
+									type="number" 
+									min="0" max="99"
+									v-model="entity.initiative"
+									no-error-icon
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								>
+									<template v-slot:append>
+										<a @click="rollInitiative">
+										<q-icon size="small" name="fas fa-dice-d20"/>
+										<q-tooltip anchor="top middle" self="center middle">
+											1d20 {{ dexterity ? `+ ${calcMod(dexterity)}` : `` }}
+										</q-tooltip>
+									</a>
+									</template>
+								</q-input>
+								</ValidationProvider>
+							</div>
+							<div class="col">
+								<ValidationProvider rules="required|between:1,99" name="AC" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										autocomplete="off"
+										label="Armor class"
+										type="number" 
+										min="1" max="99"
+										v-model="entity.ac"
+										no-error-icon
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+							</div>
+							<div class="col">
+								<ValidationProvider rules="required|between:1,9999" name="HP" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										autocomplete="off"
+										label="Hit points"
+										type="number" 
+										min="1" max="9999"
+										v-model="entity.maxHp"
+										no-error-icon
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+							</div>
+						</div>
+						<label class="my-2">When to add</label>
+						<q-btn-toggle
+							class="mt-2"
+							v-model="addMoment"
+							spread
+							no-caps
+							flat
+							:dark="$store.getters.theme === 'dark'"
+							:options="options"
+							toggle-color="primary"
+						/>
+						<hr>
+						<q-btn class="full-width mb-3" color="primary" no-caps type="submit" label="Add" />
+					</q-form>
+				</ValidationObserver>
 			</q-tab-panel>
 			<q-tab-panel name="player">
-				<q-form @submit="addPlayer()" v-if="Object.keys(excludedPlayers).length > 0">
+				<q-form @submit="addPlayer()" v-if="Object.keys(players).length > 0">
 					<ul class="entities">
-						<template v-for="(player, key) in excludedPlayers">
+						<template v-for="(player, key) in players">
 							<li v-if="!Object.keys(entities).includes(key)" :key="key" class="players">
 								<q-checkbox 
 									slot="append"
 									size="s" 
-									dark 
+									:dark="$store.getters.theme === 'dark'" 
 									:false-value="undefined" 
 									indeterminate-value="something-else"
 									v-model="selectedPlayers"
@@ -143,7 +129,7 @@
 									:label="player.character_name"
 								/>
 								<q-input 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									type="number" 
 									placeholder="Initiative"
 									v-model="playerInitiative[key]"
@@ -161,16 +147,16 @@
 						v-model="addMoment"
 						spread
 						no-caps
-						flat
-						dark
+						:dark="$store.getters.theme === 'dark'"
 						:options="options"
 						toggle-color="primary"
 					/>
 					<hr>
 					<q-btn 
 						v-if="selectedPlayers.length > 0" 
-						class="btn btn-block" 
+						color="primary"
 						type="submit" 
+						no-caps
 						:label="`Add player${selectedPlayers.length > 1 ? 's' : ''}`"
 					/>
 				</q-form>
@@ -180,32 +166,41 @@
 				</p>
 			</q-tab-panel>
 		</q-tab-panels>
+
+		<q-dialog v-model="copy_dialog">
+			<hk-card header="Copy NPC" :min-width="320">
+				<div class="card-body">
+					<CopyContent @copy="set" type="monster" button="copy" />
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
+	import CopyContent from "@/components/CopyContent";
 
 	export default {
 		name: 'AddEntity',
 		mixins: [general, dice],
+		components: {
+			CopyContent
+		},
 		data() {
 			return {
-				test: undefined,
 				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				copy_dialog: false,
 				entity: {},
 				dexterity: undefined,
-				search: '',
-				searchResults: [],
+				players: {},
 				selectedPlayers: [],
 				playerInitiative: {},
-				noResult: '',
 				options: [
 					{ label: 'Add next round', value: 'next' },
 					{ label: 'Add directly', value: 'directly' },
@@ -218,66 +213,40 @@
 				tab: "npc"
 			}
 		},
-		mounted() {
-			//GET NPCS
-			var monsters = db.ref(`monsters`);
-			monsters.on('value', async (snapshot) => {
-				let monsters = snapshot.val();
+		async mounted() {
+			await this.get_campaign({
+				uid: this.userId,
+				id: this.campaignId
+			}).then(async campaign => {
+				const players = {};
 
-				for(let key in monsters) {
-					monsters[key]['.key'] = key;
-					monsters[key].origin = 'api';
-				}
-				let custom = db.ref(`npcs/${this.userId}`);
-				custom.on('value', async (snapshot) => {
-					let customNpcs = snapshot.val();
-					for(let key in customNpcs) {
-						customNpcs[key].origin = 'custom';
-						customNpcs[key]['.key'] = key;
-						monsters.push(customNpcs[key]);
+				for(const id in campaign.players) {
+					if(!Object.keys(this.entities).includes(id)) {
+						players[id] = await this.get_player({uid: this.userId, id});
 					}
-				});
-				this.monsters = monsters;
-				this.loadingNpcs = false;
+				}
+				this.players = players;
 			});
 		},
 		computed: {
 			...mapGetters([
-				'npcs',
-				'players',
-				'entities',
-				'broadcast'
+				"entities",
+				"broadcast"
 			]),
 			share() {
 				return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
 			},
-			excludedPlayers() {
-				// Filter players for only in campaign and not in current encounter
-				return Object.fromEntries(Object.entries(this.players).filter(([key, player]) => {
-					return player.campaign_id === this.campaignId && !Object.keys(this.entities).includes(key);
-				}));
-			}
 		},
 		methods: {
 			...mapActions([
-				'setSlide',
-				'add_entity_demo',
-				'add_entity',
+				"setSlide",
+				"add_entity_demo",
+				"add_player",
+				"add_npc"
 			]),
-			searchNPC() {
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.monsters) {
-					var m = this.monsters[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-			},
+			...mapActions("campaigns", ["get_campaign"]),
+			...mapActions("players", ["get_player"]),
+			...mapActions("npcs", ["get_npc"]),
 			rollInitiative(e) {
 				const mod = (this.dexterity) ? this.calcMod(this.dexterity) : 0;
 				const roll = this.rollD(
@@ -289,57 +258,35 @@
 				);
 				this.$set(this.entity, "initiative", Number(roll.total));
 			},
-			set(id, type) {
-				this.entity.id = id;
+			set({ result, id, resource }) {
+				this.$set(this.entity, "id", id);
+				this.$set(this.entity, "npc", (resource === "custom") ? "custom" : "api");
+				this.$set(this.entity, "maxHp", parseInt(result.hit_points));
+				this.$set(this.entity, "ac", parseInt(result.armor_class));
+				this.$set(this.entity, "name", result.name);
 
-				let npc_data;
-				if(type === 'api') {
-					npc_data = this.monsters[id];
-					this.$set(this.entity, "npc", 'api');
-					this.$set(this.entity, "maxHp", parseInt(npc_data.hit_points));
-					this.$set(this.entity, "ac", parseInt(npc_data.armor_class));
-					this.$set(this.entity, "name", npc_data.name);
-				}
-				else if(type === 'custom') {
-					npc_data = this.npcs;
-					this.$set(this.entity, "npc", 'custom');
-					this.$set(this.entity, "maxHp", parseInt(npc_data[id].maxHp));
-					this.$set(this.entity, "ac", parseInt(npc_data[id].ac));
-					this.$set(this.entity, "name", npc_data[id].name);
-				}
-				this.dexterity = npc_data.dexterity;
+				this.dexterity = result.dexterity; // needed to roll initiative
 
-				this.searchResults = [];
-				this.searching = false;
+				this.copy_dialog = false;
 				this.$forceUpdate();
 			},
-			addNPC() {
-				this.entity.entityType = 'npc';
+			async addNPC() {
+				this.entity.entityType = "npc";
 				this.entity.curHp = this.entity.maxHp;
 
-				if(this.addMoment === 'next') {
+				if(this.addMoment === "next") {
 					this.entity.addNextRound = true;
 					this.entity.active = false;
 				} else {
 					this.entity.active = true;
 				}
-				this.entity.npc = (this.entity.npc) ? this.entity.npc : 'custom';
-				
-				if(!this.demo) {
-					db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(this.entity)
-						.then(res => {
-							//Returns the key of the added entry
-							this.add_entity(res.getKey())
-						});
-				} else {
-					this.add_entity_demo(this.entity);
-				}
+				await this.add_npc(this.entity);
 			},
 			isValid(key) {
 				return (this.selectedPlayers.includes(key) && this.playerInitiative[key] > 0) 
 					|| !this.selectedPlayers.includes(key);
 			},
-			addPlayer() {
+			async addPlayer() {
 				for(const key of this.selectedPlayers) {
 					if(this.playerInitiative[key] > 0) {
 						const player = this.players[key];
@@ -349,7 +296,6 @@
 							curHp: player.maxHp,
 							initiative: this.playerInitiative[key],
 							name: player.character_name,
-							key: key,
 							id: key
 						};
 
@@ -360,37 +306,35 @@
 							entity.active = true;
 						}
 
-						if(!this.demo) {
-							// Add player
-							db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).set(entity);
-							this.add_entity(key);
+						// Add player
+						await this.add_player({ id: key, entity });
 
-							// Add companions
-							const companions = player.companions;
-							for (let Key in companions) {
-								const companion = this.npcs[Key];
-								let companionEntity = {
-									entityType: "companion",
-									curHp: companion.maxHp,
-									initiative: this.playerInitiative[key],
-									name: companion.name,
-									key: Key,
-									id: Key
-								};
-								
-								if(this.addMoment === 'next') {
-									companionEntity.addNextRound = true;
-									companionEntity.active = false;
-								} else {
-									companionEntity.active = true;
-								}
+						// Add companions
+						const companions = player.companions;
+						for (let companionId in companions) {
+							const companion = await this.get_npc({ uid: this.userId, id: companionId });
 
-								db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${Key}`).set(companionEntity);
-								this.add_entity(Key);
+							let companionEntity = {
+								entityType: "companion",
+								curHp: companion.hit_points,
+								initiative: this.playerInitiative[key],
+								name: companion.name,
+								player: key,
+								id: companionId,
+								npc: "custom"
+							};
+							
+							if(this.addMoment === 'next') {
+								companionEntity.addNextRound = true;
+								companionEntity.active = false;
+							} else {
+								companionEntity.active = true;
 							}
 
-						} else {
-							this.add_entity_demo(this.entity);
+							await this.add_player({
+								id: companionId,
+								entity: companionEntity
+							});
 						}
 					}
 				}
@@ -422,13 +366,6 @@
 				.row {
 					padding: 0;
 				}
-			}
-		}
-	}
-	ul.nav {
-		a.nav-link {
-			&.active {
-				background:$gray-active !important;
 			}
 		}
 	}

@@ -6,210 +6,194 @@
 					{{ casting.name }}
 					<a 
 						v-if="npc[`${casting.category}_ability`]"
-						class="gray-hover text-capitalize" 
 						@click="openDialog(casting.category)"
+						class="btn btn-sm bg-neutral-5"
 					>
 						<i class="fas fa-plus green"></i>
-						<span class="d-none d-md-inline ml-1">Add spell</span>
+						<span class="ml-1">Add spell</span>
 					</a>
 				</div>
 
-				<q-select 
-					dark filled square
-					clearable
-					label="Spellcasting ability"
-					:options="abilities"
-					v-model="npc[`${casting.category}_ability`]"
-					class="mb-2"
-					@input="setCaster($event, casting.category)"
-				/>
+				<div class="card-body">
+					<q-select 
+						:dark="$store.getters.theme === 'dark'" filled square
+						clearable
+						label="Spellcasting ability"
+						:options="abilities"
+						v-model="npc[`${casting.category}_ability`]"
+						class="mb-2"
+						@input="setCaster($event, casting.category)"
+					/>
 
-				<template v-if="npc[`${casting.category}_ability`]">
-					<div class="row q-col-gutter-sm">
-						<div class="col" v-if="casting.category === 'caster'">
-							<q-input 
-								dark filled square
-								label="Caster level"
-								v-model.number="npc[`${casting.category}_level`]"
-								@input="parseToInt(npc, `${casting.category}_level`)"
-								type="number"
-								class="mb-3"
-								:rules="[
-									val => !!val || 'Required',
-									val => val <= 20 || 'Max is 20'
-								]"
-							/>
-						</div>
-						<div class="col">
-							<q-input 
-								dark filled square
-								label="Save DC"
-								v-model.number="npc[`${casting.category}_save_dc`]"
-								@input="parseToInt(npc, `${casting.category}_save_dc`)"
-								type="number"
-								class="mb-3"
-								:rules="[
-									val => !!val || 'Required',
-									val => val <= 99 || 'Max is 99'
-								]"
-							/>
-						</div>
-						<div class="col">
-							<q-input 
-								dark filled square
-								label="Spell attack"
-								v-model.number="npc[`${casting.category}_spell_attack`]"
-								@input="parseToInt(npc, `${casting.category}_spell_attack`)"
-								type="number"
-								class="mb-3"
-								:rules="[
-									val => !!val || 'Required',
-									val => val <= 99 || 'Max is 99'
-								]"
-							/>
-						</div>
-					</div>
-
-					<!-- SPELL SLOTS -->
-					<template v-if="npc[`${casting.category}_spell_slots`]">
-						<label class="d-block mb-3">Spell slots</label>
-						<div class="slots">
-							<div v-for="level in 9" :key="`level-${level}`" class="slot">
-								<div class="level">{{ level | numeral("Oo") }}</div>
-								<div class="handling">
-									<div 
-										class="up" 
-										:class="{ disable: npc[`${casting.category}_spell_slots`][level] >= 9 }"
-										@click="setSpellSlot('up', level)"
-									>
-										<i class="fas fa-chevron-up"/>
-									</div>
-									<input 
-										v-model.number="npc[`${casting.category}_spell_slots`][level]" 
-										@keyup="checkSpellSlot(level)"
+					<template v-if="npc[`${casting.category}_ability`]">
+						<div class="row q-col-gutter-sm">
+							<div class="col" v-if="casting.category === 'caster'">
+								<ValidationProvider rules="between:1,20|required" name="Caster level" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Caster level"
+										v-model.number="npc[`${casting.category}_level`]"
+										@input="parseToInt(npc, `${casting.category}_level`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
 									/>
-									<div 
-										class="down" 
-										:class="{ disable: npc[`${casting.category}_spell_slots`][level] <= 0 }"
-										@click="setSpellSlot('down', level)"
-									>
-										<i class="fas fa-chevron-down"/>
+								</ValidationProvider>
+							</div>
+							<div class="col">
+								<ValidationProvider rules="between:1,99|required" name="Save DC" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Save DC"
+										v-model.number="npc[`${casting.category}_save_dc`]"
+										@input="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+							</div>
+							<div class="col">
+								<ValidationProvider rules="between:-10,99|required" name="Save DC" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Spell attack"
+										v-model.number="npc[`${casting.category}_spell_attack`]"
+										@input="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+							</div>
+						</div>
+
+						<!-- SPELL SLOTS -->
+						<template v-if="npc[`${casting.category}_spell_slots`]">
+							<label class="d-block mb-3">Spell slots</label>
+							<div class="slots">
+								<div v-for="level in 9" :key="`level-${level}`" class="slot">
+									<div class="level">{{ level | numeral("Oo") }}</div>
+									<div class="handling">
+										<div 
+											class="up" 
+											:class="{ disable: npc[`${casting.category}_spell_slots`][level] >= 9 }"
+											@click="setSpellSlot('up', level)"
+										>
+											<i class="fas fa-chevron-up"/>
+										</div>
+										<input 
+											v-model.number="npc[`${casting.category}_spell_slots`][level]" 
+											@keyup="checkSpellSlot(level)"
+										/>
+										<div 
+											class="down" 
+											:class="{ disable: npc[`${casting.category}_spell_slots`][level] <= 0 }"
+											@click="setSpellSlot('down', level)"
+										>
+											<i class="fas fa-chevron-down"/>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-					</template>
+						</template>
 
-					<template v-if="npc[`${casting.category}_spells`]">
-						<label class="d-block mb-2">Spells</label>
-						<q-list dark>
-							<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
-								<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
-									{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
-									<q-popup-edit dark square v-model.number="spell.limit" buttons>
-										<q-checkbox 
-											size="sm" dark 
-											v-model="spell.limit"
-											label="At will" 
-											:true-value="0" 
-											:false-value="1"
-											:indeterminate-value="undefined"
-											:toggle-indeterminate="false"
-											class="mb-2"
-											@input="$forceUpdate()"
-										/>
-										<q-input 
-											dark
-											v-model.number="spell.limit" 
-											label="Limit"
-											type="number" 
-											:disable="spell.limit === 0" 
-											suffix="/day"
-											@keyup="$forceUpdate()"
-										/>
-									</q-popup-edit>
-								</q-item-section>
-								<q-item-section v-else avatar class="gray-light">
-									<template v-if="spell.level > 0">
-										{{ spell.level | numeral('Oo') }}
-									</template>
-									<template v-else>
-										Cant
-									</template>
-								</q-item-section>
-								<q-item-section>
-									{{ spell.name.capitalizeEach() }}
-								</q-item-section>
-								<q-item-section avatar>
-									<a @click="removeSpell(key, casting.category)">
-										<i class="fas fa-trash-alt red" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Remove spell
-										</q-tooltip>
-									</a>
-								</q-item-section>
-							</q-item>
-						</q-list>
+						<template v-if="npc[`${casting.category}_spells`]">
+							<label class="d-block mb-2">Spells</label>
+							<q-list :dark="$store.getters.theme === 'dark'">
+								<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
+									<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
+										{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
+										<q-popup-edit :dark="$store.getters.theme === 'dark'" square v-model.number="spell.limit" buttons>
+											<q-checkbox 
+												size="sm" :dark="$store.getters.theme === 'dark'" 
+												v-model="spell.limit"
+												label="At will" 
+												:true-value="0" 
+												:false-value="1"
+												:indeterminate-value="undefined"
+												:toggle-indeterminate="false"
+												class="mb-2"
+												@input="$forceUpdate()"
+											/>
+											<q-input 
+												:dark="$store.getters.theme === 'dark'"
+												v-model.number="spell.limit" 
+												label="Limit"
+												type="number" 
+												:disable="spell.limit === 0" 
+												suffix="/day"
+												@keyup="$forceUpdate()"
+											/>
+										</q-popup-edit>
+									</q-item-section>
+									<q-item-section v-else avatar class="neutral-2">
+										<template v-if="spell.level > 0">
+											{{ spell.level | numeral('Oo') }}
+										</template>
+										<template v-else>
+											Cant
+										</template>
+									</q-item-section>
+									<q-item-section>
+										{{ spell.name.capitalizeEach() }}
+									</q-item-section>
+									<q-item-section avatar>
+										<a class="btn btn-sm bg-neutral-5" @click="removeSpell(key, casting.category)">
+											<i class="fas fa-trash-alt red" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Remove spell
+											</q-tooltip>
+										</a>
+									</q-item-section>
+								</q-item>
+							</q-list>
+						</template>
 					</template>
-				</template>
+				</div>
 			</hk-card>
 		</hk-card-deck>
 
 		<q-dialog square v-model="spells_dialog">
 			<div>
-					<hk-card :header="(category === 'caster') ? 'Add spells' : 'Add innate spells'" class="mb-0">
-						<q-input
-							dark filled square
-							label="Search spell"
-							v-model="spell_name"
-							class="mb-2"
-							@change="searchSpells()"
-						>
-							<a slot="append" color="primary" @click="searchSpells()">
-								<i class="fas fa-search" />
-							</a>
-						</q-input>
+				<hk-card :header="(category === 'caster') ? 'Add spells' : 'Add innate spells'" class="mb-0">
+					<div class="card-body">
+						<CopyContent 
+							type="spell" 
+							:content="['srd']" 
+							button="plus"
+							@copy="addSpell"
+							:disabled-srd="
+								(category === 'caster' && npc.caster_spells) 
+								? Object.keys(npc.caster_spells) 
+								: (category === 'innate' && npc.innate_spells) ? Object.keys(npc.innate_spells) : []
+							"
+						/>
+					</div>
 
-						<q-list dark v-if="spell_name && spells">
-							<q-item v-for="(spell, key) in spells" :key="key">
-								<q-item-section>
-									{{ spell.name }}
-								</q-item-section>
-								<q-item-section avatar>
-									<i 
-										class="fas fa-check" 
-										v-if="npc[`${category}_spells`] && Object.keys(npc[`${category}_spells`]).includes(key)"
-									/>
-									<a v-else @click="addSpell(key, spell.name.toLowerCase(), spell.level)">
-										<i class="fas fa-plus green" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Add spell
-										</q-tooltip>
-									</a>
-								</q-item-section>
-							</q-item>
-						</q-list>
-						<p class="red" v-if="spell_name && spells === null">
-							No spells found with "{{ spell_name }}"
-						</p>
-
-						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="mr-1" type="cancel" v-close-popup>Close</q-btn>
-						</div>
-					</hk-card>
+					<div slot="footer" class="card-footer d-flex justify-content-end">
+						<q-btn class="mr-1" type="cancel" no-caps v-close-popup>Close</q-btn>
+					</div>
+				</hk-card>
 			</div>
 		</q-dialog>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { abilities } from '@/mixins/abilities.js';
+	import CopyContent from "@/components/CopyContent";
 	
 	export default {
 		name: 'npc-SpellCasting',
 		props: ['value'],
 		mixins: [abilities],
+		components: {
+			CopyContent
+		},
 		data() {
 			return {
 				spells_dialog: false,
@@ -233,10 +217,10 @@
 			}
 		},
 		methods: {
-			parseToInt(value, object, property) {
+			parseToInt(value, object, property, valid) {
 				if(value === undefined || value === "") {
 					this.$delete(object, property);
-				} else {
+				} else if(valid) {
 					this.$set(object, property, parseInt(value));
 				}
 			},
@@ -278,31 +262,16 @@
 				this.category = category;
 				this.spells_dialog = true;
 			},
-			searchSpells() {
-				if(this.spell_name) {
-					let spells = db.ref(`spells`).orderByChild('name').startAt(this.spell_name.capitalizeEach()).endAt(this.spell_name.capitalizeEach()
-					+"\uf8ff");
-
-					// Check username
-					spells.on('value' , (snapshot) => {
-						this.spells = snapshot.val();
-					});
-				} else if(!this.spell_name) {
-					this.spells = undefined;
-				}
-			},
-			addSpell(key, name, level) {
+			addSpell({ result, id }) {
 				if(!this.npc[`${this.category}_spells`]) {
 					this.$set(this.npc, `${this.category}_spells`, {})
 				}
 
-				let spell = {
-					name
-				}
+				let spell = { name: result.name };
 				if(this.category === 'innate') spell.limit = 0;
-				if(this.category === 'caster') spell.level = level;
+				if(this.category === 'caster') spell.level = result.level;
 
-				this.npc[`${this.category}_spells`][key] = spell;
+				this.npc[`${this.category}_spells`][id] = spell;
 				this.$forceUpdate();
 			},
 			removeSpell(key, category) {
@@ -314,7 +283,7 @@
 
 <style lang="scss" scoped>
 	.q-item {
-		background-color: $gray-dark;
+		background-color: $neutral-7;
 		margin-bottom: 1px;
 	}
 	.slots {
@@ -325,7 +294,7 @@
 		.slot {
 			max-width: 40px;
 			text-align: center;
-			color: $white;
+			color: $neutral-1;
 
 			.handling {
 				margin-top: 5px;
@@ -334,12 +303,11 @@
 				.up, .down {
 					background-color: rgba(255, 255, 255, .07);
 					font-size: 11px;
-					color: $gray-light;
 					padding: 5px 0;
 					cursor: pointer;
 
 					&:hover {
-						color: $white
+						color: $neutral-1
 					}
 					.disable {
 						opacity: .5;
@@ -354,7 +322,7 @@
 					height: 35px;
 					line-height: 35px;
 					font-weight: bold;
-					color: $white;
+					color: $neutral-1;
 
 					&:focus {
 						outline: none;

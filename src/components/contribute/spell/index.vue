@@ -10,7 +10,7 @@
 						Edit
 					</q-tooltip>
 				</router-link>
-				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
+				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'neutral-2': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
 			</span>
 		</h2>
 
@@ -161,7 +161,7 @@
  .spellTitle {
 		font-size: 18px !important;
 		text-transform: none !important;
-		border-bottom: solid 1px$gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		padding-bottom: 5px;
 		margin-bottom: 5px;
 

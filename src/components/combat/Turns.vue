@@ -1,63 +1,60 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
 		<div>
-			<a class="edit">
+			<a class="btn btn-clear">
 				<i class="fas fa-cog"></i>
-				<q-popup-proxy square :breakpoint="576">
-					<div class="bg-gray gray-light">
-						<q-list>
-							<q-item>
-								<q-item-section>
-									<b>{{ encounter.encounter }}</b>
-								</q-item-section>
-							</q-item>
-							<q-separator />
-							<q-item 
-								v-if="!demo" clickable v-close-popup
-								@click="setSlide({
-									show: true, 
-									type: 'slides/Broadcast', 
-									data: { 
-										campaign_id: $route.params.campid,
-										encounter_id: $route.params.encid
-									}
-								})"
-							>
-								<q-item-section avatar>
-									<i class="far fa-dot-circle" :class="{ red: broadcast.live === $route.params.campid }"></i>
-								</q-item-section>
-								<q-item-section>
-									{{ broadcast.live !== $route.params.campid ? "Go live" : "Stop broadcast" }}
-								</q-item-section>
-							</q-item>
-							<q-item v-if="encounter.audio" clickable v-close-popup @click="open_audio_link(encounter.audio)">
-								<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
-								<q-item-section>Audio Link</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
-								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
-								<q-item-section>Settings</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
-								<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
-								<q-item-section>Track settings</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup v-if="demo" @click="reload">
-								<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
-								<q-item-section>Reset encounter</q-item-section>
-							</q-item>
-							<q-separator />
-							<q-item clickable v-close-popup :to="`/encounters/${$route.params.campid}`">
-								<q-item-section avatar><i class="fas fa-angle-left"></i></q-item-section>
-								<q-item-section>Leave encounter</q-item-section>
-							</q-item>
-							<q-separator />
-							<q-item clickable v-close-popup @click="confirmFinish()">
-								<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
-								<q-item-section>End encounter</q-item-section>
-							</q-item>
-						</q-list>
-					</div>
+				<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+					<q-list class="bg-neutral-8">
+						<q-item>
+							<q-item-section>
+								<b>{{ encounter.name }}</b>
+							</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item 
+							v-if="!demo" clickable v-close-popup
+							@click="setSlide({
+								show: true, 
+								type: 'slides/Broadcast', 
+								data: { 
+									campaign_id: $route.params.campid,
+									encounter_id: $route.params.encid
+								}
+							})"
+						>
+							<q-item-section avatar>
+								<i class="far fa-dot-circle" :class="{ red: broadcast.live === $route.params.campid }"></i>
+							</q-item-section>
+							<q-item-section>
+								{{ broadcast.live !== $route.params.campid ? "Go live" : "Stop broadcast" }}
+							</q-item-section>
+						</q-item>
+						<q-item v-if="encounter.audio" clickable v-close-popup @click="open_audio_link(encounter.audio)">
+							<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
+							<q-item-section>Audio Link</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
+							<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+							<q-item-section>Settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+							<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
+							<q-item-section>Public initiatve settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup v-if="demo" @click="reload">
+							<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
+							<q-item-section>Reset encounter</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup @click="confirmFinish()">
+							<q-item-section avatar><i class="fas fa-check"></i></q-item-section>
+							<q-item-section>Finish encounter</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item clickable v-close-popup :to="`/content/campaigns/${$route.params.campid}`">
+							<q-item-section avatar><i class="fas fa-chevron-left"></i></q-item-section>
+							<q-item-section>Leave encounter</q-item-section>
+						</q-item>
+					</q-list>
 				</q-popup-proxy>
 			</a>
 
@@ -67,7 +64,7 @@
 		<!-- TURNS & ROUNDS -->
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">	
 			<a
-				class="handler gray-light" 
+				class="handler neutral-2" 
 				@click="prevTurn()"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()"
 			>
@@ -85,12 +82,12 @@
 				<div>
 					<div class="header">Turn</div>
 					<div class="number">
-						{{ encounter.turn + 1 }}<span class="small gray-hover">/{{ active_len }}</span>
+						{{ encounter.turn + 1 }}<span class="neutral-3"><span class="neutral-4">/</span>{{ active_len }}</span>
 					</div>
 				</div>
 			</template>
 
-			<a class="handler gray-light" 
+			<a class="handler neutral-2" 
 				@click="nextTurn()" 
 				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
 				<i class="fas fa-step-forward"></i>
@@ -99,7 +96,7 @@
 				</q-tooltip>
 			</a>
 		</div>
-		<div class="blue" v-else>
+		<div v-else>
 			Set Intitative
 		</div>
 
@@ -129,13 +126,13 @@
 
 			<template v-if="encounter.round > 0">
 				<div 
+					v-if="requests && Object.keys(requests).length"
 					class="requests d-none d-md-block" 
-					v-if="encounter.requests && Object.keys(encounter.requests).length > 0"
 					@click="setSlide({show: true, type: 'combat/side/Requests'})"
 				>
 					<i class="fas fa-bell"></i>
 					<div class="notifications bg-red white animated zoomIn">
-						<div>{{ Object.keys(encounter.requests).length }}</div>
+						<div>{{ Object.keys(requests).length }}</div>
 					</div>
 				</div>
 
@@ -145,18 +142,18 @@
 						type: 'combat/side/Side'
 					})"
 				>
-					<q-icon name="info" />
+					<i class="fas fa-bars" />
 				</div>
 			</template>
 
 			<template v-else>
 				<span class="d-none d-md-block">
-					<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
+					<router-link v-if="!demo" :to="'/content/campaigns/' + $route.params.campid" class="btn bg-neutral-8 ml-2">
 						<i class="fas fa-arrow-left"></i> 
 						Leave
 					</router-link>
 				</span>
-				<a class="btn" @click="startEncounter()">
+				<a class="btn ml-2" @click="startEncounter()">
 					Start 
 					<span class="ml-1 d-none d-md-inline"> 
 						encounter <i class="fas fa-arrow-right"></i>
@@ -168,15 +165,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapActions, mapGetters } from 'vuex';
-	import { remindersMixin } from '@/mixins/reminders';
-	import { audio } from '@/mixins/audio';
+	import { mapActions, mapGetters } from "vuex";
+	import { remindersMixin } from "@/mixins/reminders";
+	import { audio } from "@/mixins/audio";
 
 	export default {
-		name: 'Turns',
+		name: "Turns",
 		mixins: [remindersMixin, audio],
-		props: ['active_len', 'current', 'next', 'settings'],
+		props: ["active_len", "current", "next", "settings"],
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
@@ -185,9 +181,9 @@
 		},
 		computed: {
 			...mapGetters([
-				'encounter',
-				'path',
-				'broadcast'
+				"encounter",
+				"broadcast",
+				"requests"
 			]),
 			timer() {
 				return (this.settings) ? this.settings.timer : 0;
@@ -195,18 +191,18 @@
 		},
 		methods: {
 			...mapActions([
-				'set_turn',
-				'update_round',
-				'set_targeted',
-				'setSlide',
-				'set_finished',
+				"set_turn",
+				"update_round",
+				"set_targeted",
+				"setSlide",
+				"set_finished"
 			]),
 			reload() {
 				this.$router.go();
 			},
 			startEncounter() {
 				this.set_turn({turn: 0, round: 1});
-				this.checkReminders(this.next, 'startTurn');
+				this.checkReminders(this.next, "startTurn");
 			},
 			nextTurn() {
 				let turn = this.encounter.turn + 1
@@ -218,9 +214,8 @@
 					this.update_round()
 				}
 				this.set_turn({turn, round})
-				if(!this.demo) db.ref(`encounters/${this.path}/lastRoll`).set(false);
-				this.set_targeted({ type: 'untarget', key: 'all' });
-				this.checkReminders(this.current, 'endTurn');
+				this.set_targeted({ type: "untarget", key: "all" });
+				this.checkReminders(this.current, "endTurn");
 			},
 			prevTurn() {
 				let turn = this.encounter.turn - 1
@@ -233,15 +228,15 @@
 					turn = 0
 				}
 				this.set_turn({turn, round});
-				this.set_targeted({ type: 'untarget', key: 'all' });
+				this.set_targeted({ type: "untarget", key: "all" });
 			},
 			confirmFinish() {
-				this.$snotify.error('Are you sure you want to finish the encounter?', 'Finish Encounter', {
+				this.$snotify.error("Are you sure you want to finish the encounter?", "Finish Encounter", {
 					position: "centerCenter",
 					timeout: 0,
 					buttons: [
-						{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
-						{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: "Finish", action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: "Cancel", action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
@@ -259,7 +254,7 @@
 	padding: 10px;
 	font-size: 15px;
 	line-height: 40px;
-	background: rgba(38, 38, 38, .9);
+	background: $neutral-8-transparent;
 	font-size: 20px;
 	grid-area: turns;
 	align-items: center;
@@ -334,6 +329,7 @@
 		padding: 0;
 		display: none;
 		font-size: 28px;
+		color: $neutral-3;
 
 		.q-icon {
 			vertical-align: -4px;
@@ -349,7 +345,7 @@
 		display: block !important;
 	}
 	.edit {
-		color: $gray-light;
+		color: $neutral-3;
 	}
 	.round-info {
 		.header {
@@ -372,7 +368,7 @@
 		top: 0;
 		left: 50%;
 		transform: translateX(-50%);
-		border-bottom: solid 1px $gray-light;
+		border-bottom: solid 1px $neutral-4;
 		padding: 0 10px;
 
 		i {

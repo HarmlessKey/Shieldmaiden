@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Track encounter settings</h2>
+		<h2>Public initiative list settings</h2>
 		<Track />
 	</div>
 </template>

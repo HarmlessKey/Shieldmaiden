@@ -50,7 +50,7 @@
 <script>
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { db } from '@/firebase';
-	import ViewItem from '@/components/ViewItem.vue';
+	import ViewItem from '@/components/compendium/Item.vue';
 
 	export default {
 		mixins: [currencyMixin],
@@ -137,7 +137,7 @@
 		}
 	}
 	.addCurrency {
-		border-top: solid 1px$gray-hover;
+		border-top: solid 1px $neutral-4;
 		margin-top: 20px; 
 		padding-top: 20px;
 			

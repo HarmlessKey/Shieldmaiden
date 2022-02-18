@@ -1,77 +1,77 @@
 <template>
 	<div>
 		<div class="type d-flex justify-content-between">
-			<button class="btn bg-gray-hover mb-3" :class="{ 'bg-red': type === 'damage' }" @click="type = 'damage'">
-				Damage <img src="@/assets/_img/styles/sword-break.png" />
+			<button class="btn bg-neutral-4 mb-3" :class="{ 'bg-red': type === 'damage' }" @click="type = 'damage'">
+				Damage <i class="hki-sword-break" />
 			</button>
-			<button class="btn bg-gray-hover mb-3" :class="{ 'bg-green': type === 'healing' }" @click="type = 'healing'">
-				Healing <img src="@/assets/_img/styles/heal.png" />
+			<button class="btn bg-neutral-4 mb-3" :class="{ 'bg-green': type === 'healing' }" @click="type = 'healing'">
+				Healing <i class="hki-heal" />
 			</button>
 		</div>
 
 		<template v-if="type === 'damage'">
-			<div class="damage_inputs">
-				<div>Amount</div>
-				<div>Type</div>
-				<a @click="addInput()" class="handle"><i class="fas fa-plus green"></i></a>
-
-				<template v-for="(input, i) in damage">
-					<q-input
-						dark filled square dense
-						label="Amount"
-						:key="`damage-${i}`"
-						class="amount"
-						autocomplete="off"
-						type="number" 
-						v-model="damage[i].amount" 
-						v-validate="'required|numeric'" 
-						:name="`amount-${i}`" 
-						data-vv-as="amount"
-						min="0"
-					/>
-
-					<hk-dmg-type-select 
-						v-model="damage[i].damage_type" 
-						label="Damage type" 
-						dense 
-						:key="`type-${i}`"
-						@input="$forceUpdate()"
-						:class="{'no-delete': i === 0}"
-					/>
-					<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"><i class="fas fa-trash-alt red"></i></a>
-
-					<p class="validate red" v-if="errors.has(`amount-${i}`)" :key="`validate-${i}`">{{ errors.first(`amount-${i}`) }}</p>
-				</template>
-			</div>
-			<button 
-				class="btn btn-block" 
-				@click="sendRequest()"
-				:disabled="errors.items && errors.items.length > 0"
-				:class="{disabled: errors.items && errors.items.length > 0}"
-			>
-				Send Request
-			</button>
+			<ValidationObserver v-slot="{ valid }">
+				<div class="damage_inputs">
+					<div>Amount</div>
+					<div>Type</div>
+					<a @click="addInput()" class="handle"><i class="fas fa-plus green"></i></a>
+					<template v-for="(input, i) in damage">
+						<ValidationProvider rules="required|numeric|min_value:0" :name="`amount-${i}`" v-slot="{ errors, invalid, validated }" :key="`damage-${i}`">
+							<q-input
+								:dark="$store.getters.theme === 'dark'" filled square dense
+								label="Amount"		
+								class="amount"
+								autocomplete="off"
+								type="number" 
+								v-model="damage[i].amount" 
+								min="0"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
+											
+						<hk-dmg-type-select 
+							v-model="damage[i].damage_type" 
+							label="Damage type" 
+							dense 
+							:key="`type-${i}`"
+							@input="$forceUpdate()"
+							:class="{'no-delete': i === 0}"
+						/>			
+						<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"><i class="fas fa-trash-alt red"></i></a>
+					</template>
+				</div>
+				<button 
+					class="btn btn-block" 
+					@click="valid ? sendRequest(): null"
+					:disabled="!valid"
+					:class="{disabled: !valid}"
+				>
+					Send Request
+				</button>
+			</ValidationObserver>
 		</template>
 
-		<template v-if="type === 'healing'">
-			<q-input 
-				dark filled square
-				autocomplete="off"
-				type="number" 
-				v-model="healingAmount" 
-				v-validate="'numeric'" 
-				name="Manual Input" 
-				min="0"
-				class="healing-input"
-			/>
-			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
+		<ValidationObserver v-if="type === 'healing'" v-slot="{ valid }">
+			<ValidationProvider rules="required|numeric|min_value:0" name="Manual input`" v-slot="{ errors, invalid, validated }">
+				<q-input 
+					:dark="$store.getters.theme === 'dark'" filled square
+					autocomplete="off"
+					type="number" 
+					v-model="healingAmount" 
+					min="0"
+					class="healing-input"
+					:error="invalid && validated"
+					:error-message="errors[0]"
+				/>
+			</ValidationProvider>
 			<button 
 				class="btn btn-block" 
-				@click="sendRequest()"
-				:class="{disabled: errors.has('Manual Input') || healingAmount == ''}">
+				@click="valid ? sendRequest() : null"
+				:class="{disabled: !valid}">
 				Send Request
 			</button>
-		</template>
+		</ValidationObserver>
 
 
 	</div>
@@ -137,43 +137,39 @@
 				this.$delete(this.damage, i);
 				this.$forceUpdate();
 			},
-			sendRequest() {
-				this.$validator.validateAll().then((result) => {
-					if(result && this.manualAmount != '') {
-						let results = {};
+			sendRequest() {				
+				let results = {};
 
-						if(this.type === 'healing') {
-							results = [{
-								amount: this.healingAmount,
-								damage_type: 'healing'
-							}]
-						}
-						if(this.type === 'damage') {
-							results = this.damage;
-						}
+				if(this.type === 'healing') {
+					results = [{
+						amount: this.healingAmount,
+						damage_type: 'healing'
+					}]
+				}
+				if(this.type === 'damage') {
+					results = this.damage;
+				}
 
-						//Create a request
-						const request = {
-							timestamp: Date.now(),
-							username: this.userInfo.username,
-							round: this.encounter.round,
-							turn: this.encounter.turn,
-							player: this.player,
-							targets: this.targeted,
-							results,
-							type: this.type
-						};
+				//Create a request
+				const request = {
+					timestamp: Date.now(),
+					username: this.userInfo.username,
+					round: this.encounter.round,
+					turn: this.encounter.turn,
+					player: this.player,
+					targets: this.targeted,
+					results,
+					type: this.type
+				};
 
-						db.ref(`encounters/${this.dmId}/${this.campaignId}/${this.encounter.key}/requests`).push(request);
+				db.ref(`encounters/${this.dmId}/${this.campaignId}/${this.encounter.key}/requests`).push(request);
 
-						this.$snotify.success(
-							`Your ${this.type} request was successfuly sent.`, 
-							`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`, 
-							{ position: "centerTop" }
-						);
-						this.setSlide({show: false});
-					}
-				});
+				this.$snotify.success(
+					`Your ${this.type} request was successfuly sent.`, 
+					`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`, 
+					{ position: "centerTop" }
+				);
+				this.setSlide({show: false});
 			},
 			displayNPCField(field, entity) {
 				const defaults = {name: true, health: false, ac: false};

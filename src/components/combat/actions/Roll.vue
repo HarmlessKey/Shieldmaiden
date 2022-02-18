@@ -238,7 +238,6 @@
 </template>
 
 <script>
-	import { db } from "@/firebase";
 	import { mapGetters, mapActions } from "vuex";
 	import { dice } from "@/mixins/dice.js";
 	import { setHP } from "@/mixins/HpManipulations.js";
@@ -284,22 +283,18 @@
 				aoeRoll: undefined
 			}
 		},
-		firebase() {
-			return {
-				criticalSettings: {
-					source: db.ref(`settings/${this.userId}/encounter/critical`),
-					asObject: true
-				},
-			}
-		},
 		computed: {
 			...mapGetters([
 				"encounter",
 				"entities",
 				"turn",
 				"targeted",
-				"broadcast"
+				"broadcast",
+				"userSettings"
 			]),
+			criticalSettings() {
+				return (this.userSettings && this.userSettings.encounter) ? this.userSettings.encounter.critical : undefined;
+			},
 			share() {
 				return (this.broadcast.shares && this.broadcast.shares.includes("action_rolls")) || false;
 			},
@@ -328,6 +323,7 @@
 				"setActionRoll",
 				"set_limitedUses"
 			]),
+			...mapActions("campaigns", ["set_share"]),
 			roll(e, action_index, action, category, versatile) {
 				let roll;
 				const config = {
@@ -425,7 +421,7 @@
 						};
 					});
 				});
-				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share);
+				this.set_share({ id: this.broadcast.live, share})
 			},
 			advantage(input) {
 				return Object.keys(input)[0].charAt(0);

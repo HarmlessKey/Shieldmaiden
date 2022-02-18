@@ -7,14 +7,14 @@
 				accept=".json"
 				v-model="json_file"
 				@input="loadJSON()"
-				label="Upload JSON file"
+				label="Drag a file here or click to upload"
 			>
 				<template v-slot:prepend>
 					<q-icon name="attach_file" />
 				</template>
 			</q-file>
 
-			<h4 class="my-3">
+			<h4 class="my-3 text-center">
 				OR
 			</h4>
 			<ValidationObserver  v-slot="{ handleSubmit }">
@@ -30,7 +30,7 @@
 							:error-message="errors[0]"
 						/>
 					</ValidationProvider>
-					<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
+					<q-btn class="full-width my-2" color="primary" no-caps type="submit" :disabled="!json_input">
 						Parse Input
 					</q-btn>
 				</q-form>
@@ -325,7 +325,7 @@ export default {
 				this.importing = this.selected.unique.length + this.selected.duplicate.length;
 				for (const npc of this.selected.unique) {
 					delete npc.index; // Was added for selecion
-						delete npc.player_id; // Should never be imported. Account related property.
+					delete npc.player_id; // Should never be imported. Account related property.
 					try {
 						await this.add_npc(npc);
 					} catch {

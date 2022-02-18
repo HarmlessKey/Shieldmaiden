@@ -92,7 +92,7 @@
 							@shortkey="undo(key, item.amount, item.over, item.target, item.by, item.type)"
 						>
 							Undo
-							<template v-if="showKeybinds.keyBinds === undefined"> [ctrl] + [z]</template>
+							<template v-if="!showKeybinds"> [ctrl] + [z]</template>
 						</a>
 					</div>
 				</li>
@@ -107,7 +107,6 @@
 <script>
 	import { mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
-	import { db } from '@/firebase';
 
 	export default {
 		name: 'Log',
@@ -121,20 +120,15 @@
 				},
 			}
 		},
-		firebase() {
-			return {
-				showKeybinds: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				}
-			}
-		},
 		computed: {
 			...mapGetters([
 				'encounter',
 				'log',
 				'entities',
 			]),
+			showKeybinds() {
+				return (this.userSettings && this.userSettings.general) ? this.userSettings.general.keyBinds : undefined;
+			},
 		},
 		methods: {
 			setLog() {

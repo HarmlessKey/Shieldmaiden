@@ -92,7 +92,6 @@
 </template>
 
 <script>
-	import { db } from "@/firebase";
 	import { mapGetters, mapActions } from "vuex";
 	import { dice } from "@/mixins/dice.js";
 	import { setHP } from "@/mixins/HpManipulations.js";
@@ -140,6 +139,7 @@
 				"setShareRolls",
 				"set_limitedUses"
 			]),
+			...mapActions("campaigns", ["set_share"]),
 			setType(value) {
 				this.custom_rolls = [
 					{
@@ -276,7 +276,7 @@
 						};
 					});
 				});
-				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share);
+				this.set_share({ id: this.broadcast.live, share});
 			},
 			advantage(input) {
 				return Object.keys(input)[0].charAt(0);

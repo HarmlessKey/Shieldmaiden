@@ -184,7 +184,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { abilities } from '@/mixins/abilities.js';
 	import CopyContent from "@/components/CopyContent";
 	
@@ -262,19 +261,6 @@
 			openDialog(category) {
 				this.category = category;
 				this.spells_dialog = true;
-			},
-			searchSpells() {
-				if(this.spell_name) {
-					let spells = db.ref(`spells`).orderByChild('name').startAt(this.spell_name.capitalizeEach()).endAt(this.spell_name.capitalizeEach()
-					+"\uf8ff");
-
-					// Check username
-					spells.on('value' , (snapshot) => {
-						this.spells = snapshot.val();
-					});
-				} else if(!this.spell_name) {
-					this.spells = undefined;
-				}
 			},
 			addSpell({ result, id }) {
 				if(!this.npc[`${this.category}_spells`]) {

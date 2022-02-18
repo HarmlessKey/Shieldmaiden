@@ -23,24 +23,22 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
-	import { db } from '@/firebase';
+	import { mapActions } from "vuex";
+	import { db } from "@/firebase";
 
 	export default {
-		name: 'Conditions',
-		props: ['entity'],
+		name: "Conditions",
+		props: ["entity"],
 		firebase() {
 			return {
 				conditions: {
-					source: db.ref('conditions'),
+					source: db.ref("conditions"),
 					asObject: true,
 				}
 			}
 		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			])
+			...mapActions(["setSlide"])
 		}
 	}
 </script>

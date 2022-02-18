@@ -164,7 +164,7 @@ const actions = {
         // - there is no player with this NPC as companion in the campaign
         if(!companion || !player_companions.length || !player_companions.includes(companionId)) {
           await dispatch("delete_companion", { id, companionId });
-          console.warn(`Ghost companion ${companionId} deleted`);
+          console.warn(`Ghost companion ${companionId} deleted from campaign`);
         } else {
           // If the companion has no curHp, set it
           if(campaign_companion.curHp === undefined) {

@@ -377,11 +377,8 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import { db } from '@/firebase';
-import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 
 	export default {
-  components: { hkAnimatedInteger },
 		name: 'TargetItem',
 		props: {
 			item : {
@@ -415,18 +412,10 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 				],
 			}
 		},
-		firebase() {
-			return {
-				showKeybinds: {
-					source: db.ref(`settings/${this.user.uid}/general`),
-					asObject: true
-				}
-			}
-		},
 		computed: {
 			...mapGetters([
 				'entities',
-				'targeted',
+				'targeted'
 			]),
 			entity() {
 				return this.entities[this.item];

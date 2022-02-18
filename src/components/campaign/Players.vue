@@ -118,7 +118,7 @@
 			<div class="col header text-right" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in campaign.players">
-				<template v-if="player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
+				<template v-if="players[key] && player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
 					<div 
 						class="image" 
 						:key="'image-'+key" 

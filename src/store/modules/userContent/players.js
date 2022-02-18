@@ -97,7 +97,7 @@ const actions = {
     }
 
     // Delete ghost companions
-    if(player.companions) {
+    if(player && player.companions) {
       for(const companionId of Object.keys(player.companions)) {
         const companion = await dispatch("npcs/get_npc", { uid, id: companionId }, { root: true });
 

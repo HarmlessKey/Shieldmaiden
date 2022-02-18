@@ -167,7 +167,7 @@ export const general_module = {
 		setSideCollapsed({ commit, rootGetters }) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 
-			if(uid) {
+			if(uid && rootGetters.userSettings) {
 				const collapsed = (rootGetters.userSettings.general && rootGetters.userSettings.general.side_collapsed) 
 					? rootGetters.userSettings.general.side_collapsed : false;
 				commit("SET_SIDE_COLLAPSE", collapsed);

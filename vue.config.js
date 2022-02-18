@@ -1,3 +1,7 @@
+const path = require('path');
+const PrerenderSPAPlugin = require('prerender-spa-plugin');
+const prerender = require('./prerender.json');
+
 module.exports = {
   css: {
     loaderOptions: {
@@ -14,5 +18,15 @@ module.exports = {
   },
   transpileDependencies: [
     'quasar'
-  ]
+  ],
+  configureWebpack: {
+    plugins: [
+      new PrerenderSPAPlugin({
+        staticDir: path.join(__dirname, 'dist'),
+        maxConcurrentRoutes: 1,
+        routes: prerender,
+        headless: true
+      })
+    ]
+  }
 }

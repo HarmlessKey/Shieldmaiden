@@ -165,7 +165,7 @@ const actions = {
 			const services = await dispatch("get_user_services");
 			try {
 				const user_settings = await services.getSettings(uid);
-				commit('SET_USER_SETTINGS', user_settings);
+				commit('SET_USER_SETTINGS', user_settings || {});
 			} catch(error) {
 				throw error;
 			}

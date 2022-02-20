@@ -119,6 +119,7 @@
 			:dark="$store.getters.theme === 'dark'" filled square
 			label="Projectile count"
 			v-model="roll.projectile_count"
+			@input="parseToInt($event, roll, 'projectile_count')"
 			autocomplete="off"
 			class="mb-4"
 			type="number"

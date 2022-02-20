@@ -23,7 +23,7 @@
 								:value="npc.senses && npc.senses[sense] ? npc.senses[sense].range : undefined" 
 								suffix="ft."
 								:disable="!npc.senses || !npc.senses[sense]"
-								@input="$event => !$event || $set(npc.senses[sense], 'range', $event)"
+								@input="parseToInt($event, npc.senses[sense], 'range')"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
@@ -75,6 +75,13 @@ import { monsterMixin } from '@/mixins/monster.js';
 					this.$set(this.npc.senses, sense, val);
 				} else {
 					this.$delete(this.npc.senses, sense);
+				}
+			},
+			parseToInt(value, object, property) {
+				if(value === undefined || value === "") {
+					this.$delete(object, property);
+				} else {
+					this.$set(object, property, parseInt(value));
 				}
 			}
 		}

@@ -293,6 +293,9 @@ export default {
 
 			// Validate NPCs
 			for(const npc of npcs) {
+				// Delete damage_vulnerability property.
+				delete npc.damage_vulnerability;
+
 				const valid = ajv.validate(schema, npc);
 
 				if(!valid) {

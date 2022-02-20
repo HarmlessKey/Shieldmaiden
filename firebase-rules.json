@@ -170,7 +170,7 @@
             ".validate": "newData.isString() && newData.val().length <= 25"
           },
           "alignment": {
-            ".validate": "newData.isString() && newData.val().matches(/^(Any|Any alignment|Unaligned|Lawful Good|Neutral Good|Chaotic Good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/i)"
+            ".validate": "newData.isString() && newData.val().matches(/^(Any|Any alignment|Unaligned|Lawful good|Neutral good|Chaotic good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/i)"
           },
           "walk_speed": {
             ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
@@ -236,7 +236,7 @@
                 ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "comments": {
-                ".validate": "newData.isString() && newData.val().length <= 999"
+                ".validate": "newData.isString() && newData.val().length <= 100"
               },
               "$other": { ".validate": false }
             },
@@ -248,7 +248,7 @@
                 ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "comments": {
-                ".validate": "newData.isString() && newData.val().length <= 999"
+                ".validate": "newData.isString() && newData.val().length <= 100"
               },
               "$other": { ".validate": false }
             },
@@ -260,7 +260,7 @@
                 ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "comments": {
-                ".validate": "newData.isString() && newData.val().length <= 999"
+                ".validate": "newData.isString() && newData.val().length <= 100"
               },
               "$other": { ".validate": false }
             }

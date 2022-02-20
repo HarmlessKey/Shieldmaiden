@@ -8,9 +8,9 @@
       ".read": true
     },
     "search_campaigns": {
-      ".write": true,
       ".read": true,
       "$uid": {
+        ".write": "$uid === auth.uid",
         "results": {
           ".indexOn": ["name"]
         }
@@ -47,10 +47,10 @@
       ".indexOn": ["username", "email", "admin", "contribute"]
     },
     "search_users": {
-      "$uid": {
-        ".write": true
-      },
       ".read": true,
+      "$uid": {
+        ".write": "$uid === auth.uid",
+      },
       ".indexOn": ["username", "email"]
     },
     "status": {
@@ -100,9 +100,9 @@
       ".read": "root.child('users').child(auth.uid).child('admin').exists()"
     },
     "search_players": {
-      ".write": true,
       ".read": true,
       "$uid": {
+        ".write": "$uid === auth.uid",
         "results": {
           ".indexOn": ["character_name"]
         }
@@ -863,9 +863,9 @@
       ".read": "root.child('users').child(auth.uid).child('admin').exists()"
     },
     "search_npcs": {
-      ".write": true,
       ".read": true,
       "$uid": {
+        ".write": "$uid === auth.uid",
         "results": { 
         	".indexOn": ["name", "challenge_rating", "type"]
         }
@@ -879,9 +879,9 @@
       ".read": "root.child('users').child(auth.uid).child('admin').exists()"
     },
     "search_custom_items": {
-      ".write": true,
       ".read": true,
       "$uid": {
+        ".write": "$uid === auth.uid",
         "results": { 
         	".indexOn": ["name"]
         }
@@ -905,9 +905,9 @@
       ".read": "root.child('users').child(auth.uid).child('admin').exists()"
     },
     "search_encounters": {
-      ".write": true,
       ".read": true,
       "$uid": {
+        ".write": "$uid === auth.uid",
         "results": {
           "$campaignId": { 
             ".indexOn": ["name", "finished"]
@@ -977,9 +977,9 @@
   		".read": "root.child('users').child(auth.uid).child('admin').exists()"
     },
     "search_reminders": {
-      ".write": true,
       ".read": true,
       "$uid": {
+        ".write": "$uid === auth.uid",
         "results": { 
         	".indexOn": ["name"]
         }

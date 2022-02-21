@@ -97,6 +97,10 @@
       "--no-sandbox",
       "--disable-setuid-sandbox"
     ],
+    "minifyHtml": {
+      "collapseWhitespace": false,
+      "removeComments": false
+    },
     "include": [
       "/",
       "/about-us",

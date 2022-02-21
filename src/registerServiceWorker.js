@@ -4,11 +4,14 @@ import { register } from 'register-service-worker'
 
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
+    registrationOptions: { 
+      scope: "/content"
+    },
     ready () {
-      console.log(
-        'App is being served from cache by a service worker.\n' +
-        'For more details, visit https://goo.gl/AFskqB'
-      )
+      // console.log(
+      //   'App is being served from cache by a service worker.\n' +
+      //   'For more details, visit https://goo.gl/AFskqB'
+      // )
     },
     registered () {
       // console.log('Service worker has been registered.')
@@ -22,7 +25,7 @@ if (process.env.NODE_ENV === 'production') {
     updated () {
       // console.log('New content is available; please refresh.');
 
-      // Cleares old cash so new content is downloaded
+      // Cleares old cache so new content is downloaded
       caches.keys().then(function(names) {
         for (let name of names) {
           caches.delete(name);

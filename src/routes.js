@@ -956,11 +956,6 @@ export const routes = [{
 		redirect: '/user/:userid',
 	},
 	{
-		path: '/404',
-		name: '404',
-		component: Error404
-	},
-	{
 		path: '/offline',
 		name: 'Offline',
 		component: Offline
@@ -978,6 +973,6 @@ export const routes = [{
 
 	{
 		path: '*',
-		redirect: '/404'
+		component: Error404
 	},
 ];

@@ -319,7 +319,6 @@
 		},
 		methods: {
 			...mapActions([
-				"setSlide",
 				"setActionRoll",
 				"set_limitedUses"
 			]),

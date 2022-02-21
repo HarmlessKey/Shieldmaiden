@@ -97,7 +97,6 @@
 					:label="label"
 				/>
 			</q-tabs>
-
 			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
 					<Custom v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />

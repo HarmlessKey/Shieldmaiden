@@ -894,15 +894,17 @@ html body {
 		&:hover {
 			background-color: $blue-hover;
 		}
+		&.btn-xs {
+			padding: 0.1rem 0.3rem;
+			font-size: 0.6rem;
+		}
 		&.btn-sm {
 			padding: 0.25rem 0.5rem;
 			font-size: 0.875rem;
-			line-height: 1.5;
 		}
 		&.btn-lg {
 			padding: 0.5rem 1rem;
 			font-size: 1.25rem;
-			line-height: 1.5;
 		}
 		&.btn-block {
 			display: block;
@@ -1400,6 +1402,7 @@ html body {
 	.target-item-wrapper {
 		border-radius: $border-radius-small;
 		overflow: hidden;
+		width: 100%;
 	}
 	.target-item {
 		display: grid;
@@ -1409,6 +1412,7 @@ html body {
 		line-height: 35px;
 		user-select: none;
 		border-radius: $border-radius-small;
+		width: 100%;
 	
 		&.hasInitiative {
 			grid-template-columns: 35px 35px 35px 1fr;

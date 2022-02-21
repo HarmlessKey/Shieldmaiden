@@ -1,119 +1,178 @@
 <template>
 	<div class="pb-1" ref="entity" :class="{ smallWidth: is_small }" v-if="!entity.no_linked_npc">
-		<h2>
-			{{ entity.name.capitalizeEach() }}
-			<small v-if="entity.source">{{ entity.source }}</small>
-		</h2>
-		<i>
-			<template v-if="entity.size">{{ entity.size }}</template>
-			<template v-if="entity.type"> {{ entity.type }}</template>
-			<span v-if="entity.subtype">({{ entity.subtype }})</span>
-			<template v-if="entity.alignment">, {{ entity.alignment }}</template>
-		</i>
-		<hr>
-		<p>
-			<template v-if="entity.entityType === 'player'">
-				<b>Level</b>: 
-				<span> {{ entity.level || calculatedLevel(entity.experience) }}</span><br/>
-			</template>
-			<b>Armor Class</b>: 
-			<span> {{ entity.armor_class ? entity.armor_class : entity.ac }}</span><br/>
-			<template>
-				<b>Hit Points</b>: 
-				<span> {{ entity.hit_points ? entity.hit_points : entity.maxHp }}</span>
-			</template>
-			<template v-if="entity.hit_dice"> {{ entity.hit_dice ? `(${hitDiceStr(data)})` : '' }}</template>
-			<template v-if="entity.old || entity.entityType === 'player'">
-				<template v-if="entity.speed">
-					<br/><b>Speed</b>: 
-					<span> {{ entity.speed }}</span>
+		<template v-if="!is_current">
+			<h2>
+				{{ entity.name.capitalizeEach() }}
+				<small v-if="entity.source">{{ entity.source }}</small>
+			</h2>
+			<i>
+				<template v-if="entity.size">{{ entity.size }}</template>
+				<template v-if="entity.type"> {{ entity.type }}</template>
+				<span v-if="entity.subtype">({{ entity.subtype }})</span>
+				<template v-if="entity.alignment">, {{ entity.alignment }}</template>
+			</i>
+			<hr>
+			<p>
+				<template v-if="entity.entityType === 'player'">
+					<b>Level</b>: 
+					<span> {{ entity.level || calculatedLevel(entity.experience) }}</span><br/>
 				</template>
-			</template>
-			<template v-else>
-				<br/><b>Speed</b>: {{ entity.walk_speed ? entity.walk_speed : 0 }} ft.{{ 
-					entity.swim_speed ? `, swim ${entity.swim_speed} ft.` : `` 
-				}}{{ 
-					entity.fly_speed ? `, fly ${entity.fly_speed} ft.` : `` 
-				}}{{ 
-					entity.burrow_speed ? `, burrow ${entity.burrow_speed} ft.` : `` 
-				}}{{ 
-					entity.climb_speed ? `, climb ${entity.climb_speed} ft.` : ``
-				}}
-			</template>
-		</p>
-		<hr>
-		<div class="abilities">
-			<hk-roll 
-				v-for="(ability, index) in abilities" 
-				:key="index" 
-				tooltip="Roll"
-				:roll="{
-					d: 20, 
-					n: 1, 
-					m: modifier(data[ability]),
-					title: `${ability.capitalize()} check`,
-					entity_name: entity.name.capitalizeEach(), 
-					notify: true
-				}"
-				:share="shares.includes('ability_rolls') ? { 
-					encounter_id: encounterId,
-					entity_key: entity.key
-				} : null"
-			>
-				<div v-if="data[ability]" class="ability">
-					<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
-					{{ data[ability] }}
-					({{ modifier(data[ability]) }})
-				</div>
-			</hk-roll>
-		</div>
-		<hr>
+				<b>Armor Class</b>: 
+				<span> {{ entity.armor_class ? entity.armor_class : entity.ac }}</span><br/>
+				<template>
+					<b>Hit Points</b>: 
+					<span> {{ entity.hit_points ? entity.hit_points : entity.maxHp }}</span>
+				</template>
+				<template v-if="entity.hit_dice"> {{ entity.hit_dice ? `(${hitDiceStr(data)})` : '' }}</template>
+				<template v-if="entity.old || entity.entityType === 'player'">
+					<template v-if="entity.speed">
+						<br/><b>Speed</b>: 
+						<span> {{ entity.speed }}</span>
+					</template>
+				</template>
+				<template v-else>
+					<br/><b>Speed</b>: {{ entity.walk_speed ? entity.walk_speed : 0 }} ft.{{ 
+						entity.swim_speed ? `, swim ${entity.swim_speed} ft.` : `` 
+					}}{{ 
+						entity.fly_speed ? `, fly ${entity.fly_speed} ft.` : `` 
+					}}{{ 
+						entity.burrow_speed ? `, burrow ${entity.burrow_speed} ft.` : `` 
+					}}{{ 
+						entity.climb_speed ? `, climb ${entity.climb_speed} ft.` : ``
+					}}
+				</template>
+			</p>
+			<hr>
+			<div class="abilities">
+				<hk-roll 
+					v-for="(ability, index) in abilities" 
+					:key="index" 
+					tooltip="Roll"
+					:roll="{
+						d: 20, 
+						n: 1, 
+						m: modifier(data[ability]),
+						title: `${ability.capitalize()} check`,
+						entity_name: entity.name.capitalizeEach(), 
+						notify: true
+					}"
+					:share="shares.includes('ability_rolls') ? { 
+						encounter_id: encounterId,
+						entity_key: entity.key
+					} : null"
+				>
+					<div v-if="data[ability]" class="ability">
+						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
+						{{ data[ability] }}
+						({{ modifier(data[ability]) }})
+					</div>
+				</hk-roll>
+			</div>
+			<hr>
 
-		<p v-if="!entity.old && entity.entityType !== 'player'">
-			<template v-if="entity.saving_throws">
-				<b>Saving Throws </b>
-				<span class="saves">
+			<p v-if="!entity.old && entity.entityType !== 'player'">
+				<template v-if="entity.saving_throws">
+					<b>Saving Throws </b>
+					<span class="saves">
+						<hk-roll 
+							tooltip="Roll save" 
+							v-for="(ability, index) in entity.saving_throws" 
+							:key="ability"
+							:roll="{
+								d: 20, 
+								n: 1, 
+								m: calcMod(data[ability]) + entity.proficiency,
+								title: `${ability.capitalize()} save`, 
+								entity_name: entity.name.capitalizeEach(), 
+								notify: true
+							}"
+							:share="shares.includes('save_rolls') ? { 
+								encounter_id: encounterId,
+								entity_key: entity.key
+							} : null"
+						>
+							<span class="save">
+								{{ ability.substring(0,3).capitalize() }} 
+								+{{ 
+									calcMod(data[ability]) + entity.proficiency 
+								}}{{ 
+									index+1 &lt; entity.saving_throws.length ? "," : ""
+								}}
+							</span>
+						</hk-roll>
+					</span>
+					<br/>
+				</template>
+				<template v-if="entity.skills">
+					<b>Skills</b>
+					<span class="saves">
+						<hk-roll 
+							v-for="(skill, index) in entity.skills" 
+							:key="skill" 
+							:tooltip="`Roll ${skill}`"
+							:roll="{
+								d: 20, 
+								n: 1, 
+								m: skillModifier(skillList[skill].ability, skill),
+								title: `${skill} check`,
+								entity_name: entity.name.capitalizeEach(),
+								notify: true
+							}"
+							:share="shares.includes('skill_rolls') ? { 
+								encounter_id: encounterId,
+								entity_key: entity.key
+							} : null"
+						>
+							<span class="save">
+								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; entity.skills.length ? "," : "" }}
+							</span>
+						</hk-roll>
+						<br/>
+					</span>
+				</template>
+				<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
+					<b>Damage vulnerabilities</b> {{ entity.damage_vulnerabilities.join(", ") }}<br/>
+				</template>
+				<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
+					<b>Damage resistances</b> {{ entity.damage_resistances.join(", ") }}<br/>
+				</template>
+				<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
+					<b>Damage immunities</b> {{ entity.damage_immunities.join(", ") }}<br/>
+				</template>
+				<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
+					<b>Condition immunities</b> {{ entity.condition_immunities.join(", ") }}<br/>
+				</template>
+
+				<b>Senses</b> 
+				<template v-if="entity.senses">
+					<span v-for="(sense, key) in entity.senses" :key="key">
+						{{ key }} {{ sense.range ? `${sense.range} ft.` : `` }}{{ 
+							sense.comments ? `${sense.comments}` : ``
+						}},
+					</span>
+				</template>
+				passive Perception {{ passivePerception() }}<br/>
+
+				<template v-if="entity.languages && entity.languages.length > 0"><b>Languages</b> {{ entity.languages.join(", ") }}<br/></template>
+				<template v-if="entity.challenge_rating">
+					<b>Challenge Rating</b> {{ entity.challenge_rating }} 
+					({{ monster_challenge_rating[entity.challenge_rating].xp | numeral('0,0') }} XP)<br/>
+				</template>
+			</p>
+
+			<!-- SKILLS -->
+			<template v-if="!entity.old">
+				<h3>Skills</h3>
+				<div class="playerSkills">
 					<hk-roll 
-						tooltip="Roll save" 
-						v-for="(ability, index) in entity.saving_throws" 
-						:key="ability"
+						v-for="(skill, key) in skillList" 
+						:key="key" 
+						tooltip="Roll"
 						:roll="{
 							d: 20, 
 							n: 1, 
-							m: calcMod(data[ability]) + entity.proficiency,
-							title: `${ability.capitalize()} save`, 
-							entity_name: entity.name.capitalizeEach(), 
-							notify: true
-						}"
-						:share="shares.includes('save_rolls') ? { 
-							encounter_id: encounterId,
-							entity_key: entity.key
-						} : null"
-					>
-						<span class="save">
-							{{ ability.substring(0,3).capitalize() }} 
-							+{{ 
-								calcMod(data[ability]) + entity.proficiency 
-							}}{{ 
-								index+1 &lt; entity.saving_throws.length ? "," : ""
-							}}
-						</span>
-					</hk-roll>
-				</span>
-				<br/>
-			</template>
-			<template v-if="entity.skills">
-				<b>Skills</b>
-				<span class="saves">
-					<hk-roll 
-						v-for="(skill, index) in entity.skills" 
-						:key="skill" 
-						:tooltip="`Roll ${skill}`"
-						:roll="{
-							d: 20, 
-							n: 1, 
-							m: skillModifier(skillList[skill].ability, skill),
-							title: `${skill} check`,
+							m: skillModifier(skill, key),
+							title: `${skill.skill} check`, 
 							entity_name: entity.name.capitalizeEach(),
 							notify: true
 						}"
@@ -122,85 +181,28 @@
 							entity_key: entity.key
 						} : null"
 					>
-						<span class="save">
-							{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; entity.skills.length ? "," : "" }}
+						<span class="playerSkill">
+							<span class="truncate">
+								<template v-if="entity.skills && entity.skills.includes(key)">
+									<i v-if="entity.skills_expertise && entity.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+									<i v-else class="fas fa-circle"></i>
+								</template>
+								<i v-else class="far fa-circle"></i>
+								{{ skill.skill }}
+							</span>
+							<span>{{ skillModifier(skill, key) }}</span>
 						</span>
 					</hk-roll>
-					<br/>
-				</span>
+				</div>
+				<hr>
 			</template>
-			<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
-				<b>Damage vulnerabilities</b> {{ entity.damage_vulnerabilities.join(", ") }}<br/>
-			</template>
-			<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
-				<b>Damage resistances</b> {{ entity.damage_resistances.join(", ") }}<br/>
-			</template>
-			<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
-				<b>Damage immunities</b> {{ entity.damage_immunities.join(", ") }}<br/>
-			</template>
-			<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
-				<b>Condition immunities</b> {{ entity.condition_immunities.join(", ") }}<br/>
-			</template>
-
-			<b>Senses</b> 
-			<template v-if="entity.senses">
-				<span v-for="(sense, key) in entity.senses" :key="key">
-					{{ key }} {{ sense.range ? `${sense.range} ft.` : `` }}{{ 
-						sense.comments ? `${sense.comments}` : ``
-					}},
-				</span>
-			</template>
-			passive Perception {{ passivePerception() }}<br/>
-
-			<template v-if="entity.languages && entity.languages.length > 0"><b>Languages</b> {{ entity.languages.join(", ") }}<br/></template>
-			<template v-if="entity.challenge_rating">
-				<b>Challenge Rating</b> {{ entity.challenge_rating }} 
-				({{ monster_challenge_rating[entity.challenge_rating].xp | numeral('0,0') }} XP)<br/>
-			</template>
-		</p>
-
-		<!-- SKILLS -->
-		<template v-if="!entity.old">
-			<h3>Skills</h3>
-			<div class="playerSkills">
-				<hk-roll 
-					v-for="(skill, key) in skillList" 
-					:key="key" 
-					tooltip="Roll"
-					:roll="{
-						d: 20, 
-						n: 1, 
-						m: skillModifier(skill, key),
-						title: `${skill.skill} check`, 
-						entity_name: entity.name.capitalizeEach(),
-						notify: true
-					}"
-					:share="shares.includes('skill_rolls') ? { 
-						encounter_id: encounterId,
-						entity_key: entity.key
-					} : null"
-				>
-					<span class="playerSkill">
-						<span class="truncate">
-							<template v-if="entity.skills && entity.skills.includes(key)">
-								<i v-if="entity.skills_expertise && entity.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
-								<i v-else class="fas fa-circle"></i>
-							</template>
-							<i v-else class="far fa-circle"></i>
-							{{ skill.skill }}
-						</span>
-						<span>{{ skillModifier(skill, key) }}</span>
-					</span>
-				</hk-roll>
-			</div>
-			<hr>
 		</template>
 
 		<!-- SPELLCASTING -->
 		<template v-if="entity.caster_ability">
-			<p>
+			<p v-if="!is_current">
 				<b><i>
-					Spellcasting
+					{{ label }}
 				</i></b>
 				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral('Oo')}}-level spellcaster.
 				It's spellcasting ability is {{ entity.caster_ability.capitalize() }}
@@ -208,6 +210,20 @@
 				{{ entity.caster_spell_attack > 0 ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }} to hit with spell attacks). 
 				The {{ entity.name.capitalizeEach() }} has the following spells prepared:
 			</p>
+			<div v-else class="caster-info">
+				<div>
+					<div>Casting ability</div>
+					<div class="value">{{ entity.caster_ability.substring(0,3).toUpperCase() }}</div>
+				</div>
+				<div class="mx-3">
+					<div>Save DC</div>
+					<div class="value">{{ entity.caster_save_dc }}</div>
+				</div>
+				<div>
+					<div>Attack modifier</div>
+					<div class="value">{{ (entity.caster_spell_attack > 0) ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }}</div>
+				</div>
+			</div>
 			<p>
 				<template v-for="level in caster_spell_levels" >
 					<div :key="`spell-${level}`">
@@ -232,7 +248,7 @@
 
 		<!-- INNATE SPELLCASTING -->
 		<template v-if="entity.innate_ability">
-			<p>
+			<p v-if="!is_current">
 				<b><i>
 					Innate spellcasting
 				</i></b>
@@ -241,6 +257,20 @@
 				{{ entity.innate_spell_attack > 0 ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }} to hit with spell attacks). 
 				The {{ entity.name.capitalizeEach() }} can cast the following spells, requiring no material components:
 			</p>
+			<div v-else class="caster-info">
+				<div>
+					<div>Innate ability</div>
+					<div class="value">{{ entity.innate_ability.substring(0,3).toUpperCase() }}</div>
+				</div>
+				<div class="mx-3">
+					<div>Save DC</div>
+					<div class="value">{{ entity.innate_save_dc }}</div>
+				</div>
+				<div>
+					<div>Attack modifier</div>
+					<div class="value">{{ (entity.innate_spell_attack > 0) ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }}</div>
+				</div>
+			</div>
 			<p>
 				<template v-for="limit in innate_spell_levels" >
 					<div :key="`spell-${limit}`">
@@ -266,20 +296,193 @@
 		<div class="monster-actions" v-if="entity.entityType !== 'player'">
 			<div v-for="{category, name} in actions" :key="category">
 				<template v-if="entity[category] && entity[category].length > 0">
-					<h3 v-if="category !== 'special_abilities'">{{ name }}</h3>
+					<h3 v-if="category !== 'special_abilities'" class="d-flex justify-content-between">
+						{{ name }}
+						<div v-if="category === 'legendary_actions' && entity.legendary_count" class="slots pointer">
+							<span 
+								v-for="i in entity.legendary_count" 
+								:key="`legendary-${i}`" 
+								class="mr-1"
+								@click="
+									entity.limited_uses['legendary_actions'] && entity.limited_uses['legendary_actions'].legendaries_used >= i
+									? spendLimited('legendary_actions', 'legendaries_used', true)
+									: spendLimited('legendary_actions', 'legendaries_used')
+								"
+							>
+								<i class="far" :class="
+									entity.limited_uses['legendary_actions'] && entity.limited_uses['legendary_actions'].legendaries_used >= i
+									? 'fa-dot-circle' : 'fa-circle'
+									"
+								/>
+								<q-tooltip anchor="top middle" self="center middle">
+									{{ 
+										entity.limited_uses['legendary_actions'] && entity.limited_uses['legendary_actions'].legendaries_used >= i
+										? "Regain action" : "Spend action"
+									}}
+								</q-tooltip>
+							</span>
+						</div>
+					</h3>
 					<p v-if="entity.legendary_count && category === 'legendary_actions'">
 						{{ entity.name.capitalizeEach() }} can take {{ entity.legendary_count }} legendary actions, choosing from the options below. 
-						Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ entity.name }} regains spent legendary actions at the start of their turn.
+						Only one legendary action option can be used at a time and only at the end of another creature's turn. {{ entity.name }} regains spent legendary actions at the start of their turn.
 					</p>
-					<p v-for="(ability, index) in entity[category]" :key="`${category}-${index}`">
-						<b><i>
-							{{ ability.name }}
-							{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : ``}}
-							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
-							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
-						</i></b>
-						<hk-dice-text v-if="ability.desc" :input_text="ability.desc"/>
-					</p>
+
+					<!-- Action title -->
+					<div v-for="(action, action_index) in entity[category]" :key="`${category}-${action_index}`" class="monster-action">
+						<div class="monster-action-title">
+							<template v-if="action.action_list && action.action_list[0] && action.action_list[0].type !== 'other' && action.action_list[0].rolls">
+								<span v-if="action.versatile" class="roll-button" @click.stop>
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+										<div class="bg-neutral-8">
+											<q-item>
+												<q-item-section>
+													<b>{{ action.name }}</b>
+												</q-item-section>
+											</q-item>
+											<q-separator />
+											<q-list :dark="$store.getters.theme === 'dark'">
+												<q-item clickable v-close-popup>
+													<q-item-section avatar>1</q-item-section>
+													<q-item-section>
+														<hk-roll 
+															:tooltip="`${action.name} (${action.versatile_one || 'Option 1'})`"
+															tooltipPosition="right"
+															@roll="roll($event, acion_index, action, category, 0)"
+															:disabled="!checkAvailable(category, action_index, action)"
+														>
+															{{ action.versatile_one || 'Option 1' }}
+														</hk-roll>
+													</q-item-section>
+												</q-item>
+												<q-item clickable v-close-popup>
+													<q-item-section avatar>2</q-item-section>
+													<q-item-section>
+														<hk-roll 
+															:tooltip="`${action.name} (${action.versatile_two || 'Option 2'})`"
+															tooltipPosition="right"
+															@roll="roll($event, action_index, action, category, 1)"
+															:disabled="!checkAvailable(category, action_index, action)"
+														>
+															{{ action.versatile_two || 'Option 2' }}
+														</hk-roll>
+													</q-item-section>
+												</q-item>
+											</q-list>
+										</div>
+									</q-popup-proxy>
+								</span>
+								<hk-roll 
+									v-else
+									:tooltip="`Roll ${action.name}`" 
+									@roll="roll($event, action_index, action, category)"
+									:disabled="!checkAvailable(category, action_index, action)"
+								>
+									<span class="roll-button" />
+								</hk-roll>
+							</template>
+							<div class="monster-action-title__name">
+								<b><i>
+									{{ action.name }}
+									{{ action.recharge ? `(Recharge ${action.recharge === 'rest' ? "after a Short or Long Rest" : action.recharge})` : ``}}
+									{{ action.limit ? `(${action.limit}/${action.limit_type ? action.limit_type.capitalize(): `Day`})` : ``}}
+									{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : ``}}			
+								</i></b>
+
+								<template v-if="action.limit || action.recharge || action.legendary_cost">
+									<template v-if="action.legendary_cost || action.recharge">
+										<div 
+											v-if="checkAvailable(category, action_index, action)"
+											class="btn btn-xs btn-clear"
+											@click.stop="spendLimited(
+												category, 
+												action.legendary_cost ? 'legendaries_used' : action_index,
+												false,
+												action.legendary_cost ? action.legendary_cost : 1
+											)"
+										>
+											Spend
+										</div>
+										<i v-else class="fas fa-ban neutral-2" />
+									</template>
+									<div v-else class="slots">
+										<span 
+											v-for="i in parseInt(action.limit)" 
+											:key="`legendary-${i}`" 
+											class="mr-1"
+											@click.stop="
+												entity.limited_uses[category] && entity.limited_uses[category][action_index] >= i
+												? spendLimited(category, action_index, true)
+												: spendLimited(category, action_index)
+											"
+										>
+											<i class="far" :class="
+												entity.limited_uses[category] && entity.limited_uses[category][action_index] >= i
+												? 'fa-dot-circle' : 'fa-circle'
+												"
+											/>
+											<q-tooltip anchor="top middle" self="center middle">
+												{{ 
+													entity.limited_uses[category] && entity.limited_uses[category][action_index] >= i
+													? "Regain" : "Spend"
+												}}
+											</q-tooltip>
+										</span>
+									</div>
+								</template>
+							</div>
+						</div>
+						<!-- Roll Summary -->
+						<div v-if="action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'">
+							<span v-if="action.action_list[0].rolls">
+								<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${action_index}-${roll_index}`">
+									(<i :class="[
+										action.action_list[0].type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
+										roll.damage_type
+										]" /> 
+									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``}}<template v-if="roll.fixed_val && roll.dice_count">
+										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`  }})
+									</template><template v-else>{{ roll.fixed_val }})</template>
+									{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ action.action_list[0].type === "healing" ? "Healing" : `${roll.damage_type.capitalize()} damage` }}
+									</q-tooltip>
+								</span>
+							</span>
+							<!-- Reach -->
+							<span v-if="action.reach">
+								<span class="blue">|</span> {{action.reach}}<small class="neutral-2">ft.</small>
+								<q-tooltip anchor="top middle" self="center middle">
+									Reach
+								</q-tooltip>
+							</span>
+							<!-- Range -->
+							<span v-if="action.range">
+								<span class="blue">|</span> {{ action.range }}<small class="neutral-2">ft.</small>
+								<q-tooltip anchor="top middle" self="center middle">
+									Range
+								</q-tooltip>
+							</span>
+							<!-- Saving trow -->
+							<span v-if="action.action_list[0].type === 'save' && action.action_list[0].save_dc">
+								<span class="blue">|</span>
+								<span v-if="action.action_list[0].save_ability">
+									{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
+								</span>
+								{{ action.action_list[0].save_dc }}
+							</span>
+							<!-- AOE -->
+							<span v-if="action.aoe_type">
+								<span class="blue">|</span>
+								{{ action.aoe_size }}<small class="neutral-2">ft.</small>
+								{{ action.aoe_type.capitalize() }}
+								<q-tooltip anchor="top middle" self="center middle">
+									Area of effect
+								</q-tooltip>
+							</span>
+						</div>
+						<hk-dice-text v-if="action.desc" :input_text="action.desc"/>
+					</div>
 				</template>
 			</div>
 		</div>
@@ -292,7 +495,7 @@
 </template>
 
 <script>
-	import { mapGetters } from "vuex";
+	import { mapGetters, mapActions } from "vuex";
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
 	import { skills } from '@/mixins/skills.js';
@@ -314,12 +517,20 @@
 		components: {
 			Spell
 		},
-		props: [
-		'data'
-		],
+		props: {
+			data: {
+				type: Object,
+				required: true
+			},
+			current: {
+				type: Boolean,
+				default: false
+			}
+		},
 		data() {
 			return {
 				is_small: false,
+				is_current: this.current,
 				actions: [
 					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
 					{ category: 'actions', name: 'Actions', name_single: 'Action' },
@@ -330,8 +541,10 @@
 		},
 		computed: {
 			...mapGetters([
+				"entities",
 				"encounterId",
-				"broadcast"
+				"broadcast",
+				"targeted",
 			]),
 			shares() {
 				return this.broadcast.shares || [];
@@ -342,6 +555,18 @@
 					entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 				}
 				return entity;
+			},
+			spellCasting() {
+				let casting = [];
+				if(this.entity.innate_ability) casting.push({
+					name: "innate",
+					label: "Innate spellcasting"
+				});
+				if(this.entity.caster_ability) casting.push({
+					name: "caster",
+					label: "Spellcasting"
+				});
+				return casting;
 			},
 			caster_spell_levels() {
 				if(this.entity.caster_spells) {
@@ -364,6 +589,10 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"setActionRoll",
+				"set_limitedUses"
+			]),
 			setSize(size) {
 				let width = size.width
 				let small = 300;
@@ -412,6 +641,107 @@
 					return item.limit == limit;
 				}).map(item => { return item[1] });
 			},
+			roll(e, action_index, action, category, versatile) {
+				let roll;
+				const config = {
+					type: "monster_action",
+					versatile
+				}
+
+				// Roll once for AOE
+				if(action.aoe_type) {
+					roll = this.rollAction(e, action, config);
+					if(this.share) this.shareRoll(roll, this.targeted);
+				}
+
+				// Check for limited uses
+				if(action.limit || action.recharge) {
+					this.spendLimited(category, action_index);
+				}
+				if(action.legendary_cost) {
+					this.spendLimited(category, "legendaries_used", false, action.legendary_cost);
+				}
+
+				for(const key of this.targeted) {
+					let newRoll = { ...roll };
+
+					// Reroll for each target if it's not AOE
+					if(!action.aoe_type) {
+						newRoll = this.rollAction(e, action, config);
+						if(this.share) this.shareRoll(newRoll, [key]);
+					}
+
+					// Set the target and current
+					this.$set(newRoll, "target", this.entities[key]);
+					this.$set(newRoll, "current", this.entity);
+
+					this.setActionRoll(newRoll);
+				}
+			},
+			spendLimited(category, index, regain=false, cost=1) {
+				this.set_limitedUses({key: this.entity.key, index, category, regain, cost});
+			},
+			checkAvailable(category, index, action) {
+				// If there are not limits to the use, the ability is always available
+				if(!action.limit && !action.recharge && !action.legendary_cost) return true;
+
+				// Otherwise, check if the ability is available and can be used
+				if(action.legendary_cost) {
+					return !this.entity.limited_uses[category] || 
+						!this.entity.limited_uses[category].legendaries_used || 
+						(action.legendary_cost <= (this.entity.legendary_count - this.entity.limited_uses['legendary_actions'].legendaries_used));
+				}
+				if(action.limit) {
+					return !this.entity.limited_uses[category] || (this.entity.limited_uses[category][index] < action.limit);
+				}
+				if(action.recharge) {
+					return !this.entity.limited_uses[category] || !this.entity.limited_uses[category][index];
+				}
+			},
+			shareRoll(roll, targets) {
+				const key = Date.now() + Math.random().toString(36).substring(4);
+				let share = {
+					key,
+					type: "action_roll",
+					entity_key: this.entity.key,
+					encounter_id: this.encounterId,
+					notification: {
+						title: roll.name,
+						targets,
+						actions: []
+					}
+				};
+				roll.actions.forEach((action, action_index) => {
+					const type = (action.type === "healing") ? "healing" : "damage";
+
+					share.notification.actions[action_index] = {
+						rolls: [],
+						type
+					};
+					// To hit
+					if(action.toHit) {
+						const toHit = action.toHit;
+						share.notification.actions[action_index].toHit = {
+							roll: toHit.roll,
+							total: toHit.total
+						}
+						if(toHit.ignored) share.notification.actions[action_index].toHit.advantage_disadvantage = this.advantage(toHit.advantage_disadvantage);
+					}
+
+					//Rolls
+					action.rolls.forEach((roll, roll_index) => {
+						share.notification.actions[action_index].rolls[roll_index] = {
+							damage_type: roll.damage_type || null,
+							roll: roll.modifierRoll.roll,
+							total: roll.modifierRoll.total,
+						};
+					});
+				});
+				this.set_share({ id: this.broadcast.live, share})
+			},
+			advantage(input) {
+				return Object.keys(input)[0].charAt(0);
+			}
 		}
 	};
 </script>
@@ -454,6 +784,58 @@ a {
 	}
 	.disadvantage .ability:hover {
 		color:$red
+	}
+}
+.caster-info {
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	margin-bottom: 15px;
+
+	.value {
+		font-size: 18px;
+		font-weight: bold;
+		color: $neutral-1;
+	}
+}
+.monster-action {
+	margin-bottom: 20px;
+
+	&-title {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		margin-bottom: 5px;
+		width: 100%;
+
+		&__name {
+			width: 100%;
+			display: flex; 
+			justify-content: space-between;
+
+			.slots {
+				cursor: pointer;
+			}
+		}
+
+		.roll-button {
+			margin-right: 5px;
+			display: inline-block;
+			cursor: pointer;
+			background-image: url('../../assets/_img/logo/logo-icon-no-shield-cyan.svg');
+			height: 20px;
+			width: 20px;
+			background-position: center;
+			background-size: cover;
+			vertical-align: -5px;
+			user-select: none;
+		}
+		.advantage .roll-button:hover {
+			background-image: url('../../assets/_img/logo/logo-icon-no-shield-green.svg');
+		}
+		.disadvantage .roll-button:hover {
+			background-image: url('../../assets/_img/logo/logo-icon-no-shield-red.svg');
+		}
 	}
 }
 .playerSkills {

@@ -3,9 +3,8 @@
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 			<span>
 				<i v-if="current.hidden" class="fas fa-eye-slash red"></i>
-				<q-badge v-if="current.old" label="DEPRECATED" color="red" />
 				{{ current.name.capitalizeEach() }}
-			</span>
+			</span>		
 			<a class="btn btn-sm bg-neutral-5" @click="showCard = !showCard">
 				<i :class="showCard ? 'fas fa-swords' : 'fas fa-eye'"/>
 				<q-tooltip anchor="top middle" self="center middle">
@@ -13,11 +12,6 @@
 				</q-tooltip>
 			</a>
 		</h2>
-		<p v-if="current.old" class="red px-3">
-			Some values might not show, or show incorrectly. 
-			Please update your NPC at the
-			<router-link to="/npcs">NPC's page</router-link>.
-		</p>
 		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
 			<div class="current">
 				<DeathSaves 
@@ -25,14 +19,16 @@
 					:target="current"
 				/>
 
-				<TargetItem :item="current.key" />
+				<div class="d-flex justify-content-start">
+					<TargetItem :item="current.key" />
+				</div>
 					
 				<Conditions :entity="current" />
 				<Reminders :entity="current" />
 			</div>
 
 			<div class="px-3 mb-1" v-if="showCard">
-				<ViewEntity :data="current" />
+				<ViewEntity :data="current" current />
 			</div>
 
 			<div v-else class="px-3 py-3">

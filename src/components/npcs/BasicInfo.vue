@@ -57,7 +57,7 @@
 				</div>
 
 				<!-- SIZE -->
-				<ValidationProvider rules="required" name="Type" v-slot="{ errors, invalid, validated }">
+				<ValidationProvider rules="required" name="Size" v-slot="{ errors, invalid, validated }">
 					<q-select
 						:dark="$store.getters.theme === 'dark'" filled square
 						label="Size *"
@@ -271,7 +271,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col-12 col-md-4">
-						<ValidationProvider rules="required|between:1,999" name="HP" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="required|between:1,9999" name="HP" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Hit points *"
@@ -300,7 +300,6 @@
 								class="mb-2" 
 								v-model="npc.hit_dice"  
 								name="hit_dice" 
-								id="hitdice"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							>

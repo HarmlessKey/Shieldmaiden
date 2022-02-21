@@ -137,7 +137,7 @@
 		methods: {
 			setDialog() {
 				if(!this.npc.skill_modifiers) {
-					this.$set(this.npc, "skill_modifiers", []);
+					this.$set(this.npc, "skill_modifiers", {});
 				}
 				this.modifier_dialog = true;
 			},

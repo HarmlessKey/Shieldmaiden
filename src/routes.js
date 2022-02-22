@@ -374,7 +374,7 @@ export const routes = [{
 		path: '/compendium',
 		component: () => import('@/views/View'),
 		meta: { 
-			title: "Compendium"
+			title: "Compendium",
 		},
 		children: [
 			{

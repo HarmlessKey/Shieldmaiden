@@ -14,5 +14,11 @@ module.exports = {
   },
   transpileDependencies: [
     'quasar'
-  ]
+  ],
+  pwa: {
+    workboxPluginMode: "InjectManifest",
+    workboxOptions: {
+      swSrc: "src/service-worker.js"
+    }
+  }
 }

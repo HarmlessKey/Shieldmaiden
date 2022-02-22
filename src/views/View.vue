@@ -21,7 +21,7 @@
 			<div class="col-12" :class="{ 'col-md-9': !this.$route.meta || this.$route.meta.side !== false }">
         <router-view />
       </div>
-      <div class="col-12 col-md-3" v-if="width > 978 && (!this.$route.meta || this.$route.meta.side !== false)">
+      <div class="col-12 col-md-3" v-if="(!width  || width > 978) && (!this.$route.meta || this.$route.meta.side !== false)">
 				<ContentSideRight />
 			</div>
     </div>

@@ -1,33 +1,65 @@
-workbox.core.setCacheNameDetails({prefix: "harmlesskey"});
+/**
+ * Through vue.config.js a service worker is rendered with the content of this file.
+ * This rendered service worker will have workbox imported, so we don't have to do this here.
+ */
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
+/** 
+* Cache css & js
+* StaleWhileRevalidate means we only use cache when offline. 
+* New files will be fetched if there is an internet connection
+*/
+workbox.routing.registerRoute(
+  /\.(?:css|js)$/,
+  new workbox.strategies.StaleWhileRevalidate({
+    "cacheName": "assets",
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxEntries: 1000,
+        maxAgeSeconds: 60*60*24*30 // month
+      })
+    ]
+  })
+);
 
-workbox.routing.registerNavigationRoute("/index.html", {
-  // blacklist: [
-  //   new RegExp('/compendium'),
-  //   new RegExp('/feedback'),
-  //   new RegExp('/patreon'),
-  //   new RegExp('/user'),
-  //   new RegExp('/about-us'),
-  //   new RegExp('/updates'),
-  //   new RegExp('/documentation'),
-  //   new RegExp('/privacy-policy'),
-  // ],
-  blacklist: [
-    /^\/compendium/,
-    /^\/admin/,
-    /^\/feedback/,
-    /^\/patreon/,
-    /^\/user/,
-    /^\/about-us/,
-    /^\/documentation/,
-    /^\/privacy-policy/,
-  ]
-});
+/** 
+* Cache media
+* CacheFirst means we get the file from the cache if present and only download if not. 
+*/
+workbox.routing.registerRoute(
+  /\.(?:png|jpg|gif|webp|webm|svg)$/,
+  new workbox.strategies.CacheFirst({
+    "cacheName": "media",
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxEntries: 100,
+        maxAgeSeconds: 60*60*24*365 // year
+      })
+    ]
+  })
+);
+
+
+
+// workbox.core.setCacheNameDetails({prefix: "harmlesskey"});
+
+// self.addEventListener('message', (event) => {
+//   if (event.data && event.data.type === 'SKIP_WAITING') {
+//     self.skipWaiting();
+//   }
+// });
+
+// workbox.routing.registerNavigationRoute("/index.html", {
+//   blacklist: [
+//     /^\/compendium/,
+//     /^\/admin/,
+//     /^\/feedback/,
+//     /^\/patreon/,
+//     /^\/user/,
+//     /^\/about-us/,
+//     /^\/documentation/,
+//     /^\/privacy-policy/,
+//   ]
+// });
 
 /**
  * The workboxSW.precacheAndRoute() method efficiently caches and responds to

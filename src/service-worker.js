@@ -11,7 +11,7 @@ self.addEventListener('message', (event) => {
 
 workbox.core.setCacheNameDetails({prefix: "harmlesskey"});
 
-// Precache array of routes (precacheManifest = this array) 
+// Precache array of routes (precacheManifest = this array)
 // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});

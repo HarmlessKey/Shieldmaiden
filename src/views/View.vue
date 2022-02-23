@@ -61,7 +61,7 @@
 			},
 			show_mobile_ad() {
 				const pathArray = this.$route.path.split("/");
-				return this.$route && pathArray[1] !== "content" && this.width && this.width <= 978;
+				return pathArray[1] !== "content" && this.width && this.width <= 978;
 			}
 		},
 		methods: {

@@ -41,6 +41,12 @@ html body {
 		height: calc(100vh - 100px);
 			/*width: 100vw;*/
 	}
+
+	.hasSide {
+		display: grid;
+		grid-template-columns: max-content auto;
+	}
+
 	.container-fluid {
 		padding: 0;
 	}
@@ -2129,6 +2135,9 @@ html body {
 					display: inline-block !important;
 				}
 			}
+		}
+		.hasSide {
+			grid-template-columns: auto;
 		}
 	}
 

@@ -5,10 +5,9 @@
 	>
 		<div 
 			@click.stop=""
-			v-if="(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen"
 			id="sidebar" 
 			:class="{
-				'side-collapsed': $store.getters.side_collapsed && !small_screen && $route.meta.sidebar !== false,
+				'side-collapsed': $store.getters.side_collapsed && !smallScreen && $route.meta.sidebar !== false,
 				'slideIn': $route.meta.sidebar === false
 			}">
 			<div>
@@ -179,9 +178,9 @@
 
 	export default {
 		name: 'Sidebar',
+		props: ["smallScreen"],
 		data() {
 			return {
-				small_screen: window.innerWidth < 600,
 				man_col: false,
 				social_media: [
 					{
@@ -224,148 +223,142 @@
 				'setSideSmallScreen'
 			]),
 		},
-		mounted() {
-			window.onresize = () => {
-				let small = 600
-				if (window.innerWidth < small) {
-					this.small_screen = true;
-				}
-				if (window.innerWidth >= small){
-					this.small_screen = false;
-				}
-			}
-		}, 
+		// mounted() {
+		// 	window.onresize = () => {
+		// 		let small = 576
+		// 		if (window.innerWidth < small) {
+		// 			this.small_screen = true;
+		// 		}
+		// 		if (window.innerWidth >= small){
+		// 			this.small_screen = false;
+		// 		}
+		// 	}
+		// }, 
 	}
 </script>
 
-<style lang="scss">
-
-.hasSide {
-	display: grid;
-	grid-template-columns: max-content auto;
-}
+<style lang="scss" scoped>
 
 #sidebar {
-	width: 250px;
-	height: calc(100vh - 50px);
-	position: relative;
-	padding-top:10px;
-	background: $neutral-8;
-	transition: width 0.5s linear;
-	z-index: 98;
-	border-right: 1px solid $neutral-5;
-	overflow-y: scroll;
-	overflow-x: hidden;
-	padding-bottom: 40px;
-
-	h3 {
-		padding-left: 10px;
-		text-transform: uppercase;
-		font-size: 13px;
-		font-weight: bold;
-		margin: 10px 0;
 		width: 250px;
-		color: $neutral-3;
-	}
-	hr {
-		background-color: $neutral-6;
-	}
+		height: calc(100vh - 50px);
+		position: relative;
+		padding-top:10px;
+		background: $neutral-8;
+		transition: width 0.5s linear;
+		z-index: 98;
+		border-right: 1px solid $neutral-5;
+		overflow-y: scroll;
+		overflow-x: hidden;
+		padding-bottom: 40px;
 	
-	.q-list {
-		.q-item {
-			color: $neutral-3 !important;
-			overflow: hidden;
+		h3 {
+			padding-left: 10px;
+			text-transform: uppercase;
+			font-size: 13px;
+			font-weight: bold;
+			margin: 10px 0;
 			width: 250px;
-			transition: padding-left 0.5s linear;
-			min-height: 40px;
-
-			.q-item__section--avatar {
-				min-width: 35px;
-				color: $neutral-4;
-			}
-
-			&.q-router-link--active {
-				color: $neutral-1 !important;
-
+			color: $neutral-3;
+		}
+		hr {
+			background-color: $neutral-6;
+		}
+		
+		.q-list {
+			.q-item {
+				color: $neutral-3 !important;
+				overflow: hidden;
+				width: 250px;
+				transition: padding-left 0.5s linear;
+				min-height: 40px;
+	
 				.q-item__section--avatar {
+					min-width: 35px;
+					color: $neutral-4;
+				}
+	
+				&.q-router-link--active {
 					color: $neutral-1 !important;
+	
+					.q-item__section--avatar {
+						color: $neutral-1 !important;
+					}
 				}
 			}
 		}
-	}
-	#toggle-width {
-		background: $neutral-8;
-		height: 40px;
-		width: calc(100%);
-		position: fixed;
-		right: left;
-		bottom: 0;
-		padding: 0 20px;
-		border-top: 1px solid $neutral-6;
-		border-right: 1px solid $neutral-5;
-		cursor: pointer;
-		color: $neutral-3;
-		line-height: 40px;
-		font-size: 20px;
-		text-align: right;
-		width: 250px;
-		transition: width 0.5s linear;
-
-		i {
-			transition: transform 0.5s linear;
-		}
-	}
-	&.side-collapsed {
-		width: 45px;
-
-		h3 {
-			display: none;
-		}
-
-		.q-item {
-			width: 44px;
-			padding-left: 12px;
-			margin: 0;
+		#toggle-width {
+			background: $neutral-8;
+			height: 40px;
+			width: calc(100%);
+			position: fixed;
+			right: left;
+			bottom: 0;
+			padding: 0 20px;
+			border-top: 1px solid $neutral-6;
+			border-right: 1px solid $neutral-5;
+			cursor: pointer;
+			color: $neutral-3;
+			line-height: 40px;
+			font-size: 20px;
+			text-align: right;
+			width: 250px;
 			transition: width 0.5s linear;
-
-			.title {
-				display:none;
-			}
-		}
-
-		span {
-			display: none;
-		}
-		#toggle-width {
-			width: 45px;
+	
 			i {
-				transform: rotate(180deg);
+				transition: transform 0.5s linear;
 			}
 		}
-		
-	}
-	&::-webkit-scrollbar {
-		display: none;
-	}
-
-	&.slideIn {
-		position: absolute;
-
-		#toggle-width {
+		&.side-collapsed {
+			width: 45px;
+	
+			h3 {
+				display: none;
+			}
+	
+			.q-item {
+				width: 44px;
+				padding-left: 12px;
+				margin: 0;
+				transition: width 0.5s linear;
+	
+				.title {
+					display:none;
+				}
+			}
+	
+			span {
+				display: none;
+			}
+			#toggle-width {
+				width: 45px;
+				i {
+					transform: rotate(180deg);
+				}
+			}
+			
+		}
+		&::-webkit-scrollbar {
 			display: none;
 		}
+	
+		&.slideIn {
+			position: absolute;
+	
+			#toggle-width {
+				display: none;
+			}
+		}
 	}
-}
+
+
 .slideInLeft {
 	animation-duration: 0.5s !important;
 }
 .slideOutLeft {
 	animation-duration: 0.5s !important;
 }
-@media only screen and (max-width: 600px) {
-	.hasSide {
-		grid-template-columns: auto;
-	}
+@media only screen and (max-width: 576px) {
 	#sidebar {
 		position: absolute;
 

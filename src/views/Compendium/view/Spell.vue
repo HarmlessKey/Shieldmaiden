@@ -12,7 +12,7 @@
 					<hk-share 
 						v-if="!not_found" 
 						:title="spell.name.capitalizeEach()" 
-						:text="spell.description" 
+						:text="`${spell.name.capitalizeEach()} D&D 5e. ${spell.description}`" 
 						size="sm"
 						class="ml-1"
 					/>

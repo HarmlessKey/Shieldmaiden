@@ -1,7 +1,6 @@
 /**
  * Through vue.config.js a service worker is rendered with the content of this file.
  * This rendered service worker will have workbox imported, so we don't have to do this here.
- *
  */
 
 self.addEventListener('message', (event) => {
@@ -28,6 +27,7 @@ workbox.routing.registerNavigationRoute('/200.html', {
     new RegExp('^/user'),
     new RegExp('^/about-us'),
     new RegExp('^/documentation'),
-    new RegExp('^/privacy-policy')
+    new RegExp('^/privacy-policy'),
+    new RegExp('^/demo'),
   ]
 });

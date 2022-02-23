@@ -4,8 +4,8 @@
 			<nav-main :maintenance="maintenance" />
 			<PaymentDeclined v-if="user !== null" />
 			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
-			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
-				<Sidebar />
+			<div v-if="!maintenance" :class="{ hasSide: !small_screen && $route.meta.sidebar !== false }">
+				<Sidebar v-if="(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen" :small-screen="small_screen" />
 				<div class="scrollable-content">
 					<router-view v-if="initialized" />
 					<hk-loader v-else />
@@ -178,6 +178,7 @@
 	data() {
 		return {
 			user: auth.currentUser,
+			small_screen: window.innerWidth < 576,
 			connection: navigator.onLine ? 'online' : 'offline',
 			announcementSetter: false,
 			announcement_cookie: false,
@@ -252,6 +253,15 @@
 		window.addEventListener('online', () => { this.connection = "online" });
 	},
 	mounted() {
+		window.onresize = () => {
+			let small = 576
+			if (window.innerWidth < small) {
+				this.small_screen = true;
+			}
+			if (window.innerWidth >= small){
+				this.small_screen = false;
+			}
+		}
 		if(auth.currentUser !== null){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {

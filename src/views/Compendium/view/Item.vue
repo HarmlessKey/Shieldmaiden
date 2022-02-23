@@ -6,7 +6,7 @@
 				<hk-share 
 					v-if="!not_found" 
 					:title="item.name" 
-					:text="item.description" 
+					:text="`${item.name} D&D 5e. ${item.description}`" 
 					size="sm"
 				/>
 			</div>

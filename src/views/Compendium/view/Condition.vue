@@ -9,7 +9,7 @@
 				<hk-share 
 					v-if="!not_found" 
 					:title="condition.name" 
-					:text="condition.description" 
+					:text="`${condition.name} D&D 5e. ${condition.description}`" 
 					size="sm"
 				/>
 			</div>

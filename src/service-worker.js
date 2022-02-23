@@ -19,16 +19,15 @@ workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 // This assumes /index.html has been precached.
 // https://developers.google.com/web/tools/workbox/modules/workbox-routing#how_to_register_a_navigation_route
-workbox.routing.registerNavigationRoute(
-  workbox.precaching.getCacheKeyForURL('/index.html'), {
+workbox.routing.registerNavigationRoute('/index.html', {
   blacklist: [
-    /^\/compendium/,
-    /^\/admin/,
-    /^\/feedback/,
-    /^\/patreon/,
-    /^\/user/,
-    /^\/about-us/,
-    /^\/documentation/,
-    /^\/privacy-policy/,
+    new RegExp('^/compendium'),
+    new RegExp('^/admin'),
+    new RegExp('^/feedback'),
+    new RegExp('^/patreon'),
+    new RegExp('^/user'),
+    new RegExp('^/about-us'),
+    new RegExp('^/documentation'),
+    new RegExp('^/privacy-policy')
   ]
 });

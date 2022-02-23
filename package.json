@@ -94,7 +94,6 @@
   "reactSnap": {
     "source": "dist",
     "concurrency": 1,
-    "puppeteerExecutablePath": "/usr/bin/chromium-browser",
     "puppeteerArgs": [
       "--no-sandbox",
       "--disable-setuid-sandbox"

@@ -11,23 +11,23 @@
 						<div class="title">
 							<i class="fas fa-swords" /> Combat Tracker
 						</div>
-						<i class="">Harmless Key</i>						
+						<i>Harmless Key</i>						
 					</div>
 					<router-link to="/demo" class="btn btn-sm bg-green my-2">Try demo</router-link>
 				</div>
 			</div>
 		</hk-card>
 		<div class="row q-col-gutter-md">		
-			<div class="col-12" :class="{ 'col-md-9': !this.$route.meta || this.$route.meta.side !== false }">
+			<div class="col-12" :class="{ 'col-md-9': width > 978 && (!$route.meta || $route.meta.side !== false) }">
         <router-view />
       </div>
-      <div class="col-12 col-md-3" v-if="(!width  || width > 978) && (!this.$route.meta || this.$route.meta.side !== false)">
+      <div class="col-12 col-md-3" v-if="width > 978 && (!$route.meta || $route.meta.side !== false)">
 				<ContentSideRight />
 			</div>
     </div>
-		<q-resize-observer @resize="setSize" />
 	</div>
 	<Footer />
+	<q-resize-observer @resize="setSize" />
 </div>
 </template>
 
@@ -61,7 +61,7 @@
 			},
 			show_mobile_ad() {
 				const pathArray = this.$route.path.split("/");
-				return pathArray[1] !== "content" && this.width <= 978;
+				return this.$route && pathArray[1] !== "content" && this.width && this.width <= 978;
 			}
 		},
 		methods: {

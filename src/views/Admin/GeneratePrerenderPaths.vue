@@ -18,6 +18,8 @@
 					"/",
 					"/about-us",
 					"/privacy-policy",
+					"/patreon",
+					"/feedback",
 					"/compendium",
 					"/compendium/conditions",
 					"/compendium/monsters",

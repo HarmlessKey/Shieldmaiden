@@ -23,12 +23,12 @@ if (process.env.NODE_ENV === "production") {
       // console.log("[registerServiceWorker] New content is available; please refresh.");
 
       // Cleares old cache so new content is downloaded
-      // caches.keys().then(function(names) {
-      //   for (let name of names) {
-      //     console.log("[registerServiceWorker] Cleared cache:", name)
-      //     caches.delete(name);
-      //   }
-      // });
+      caches.keys().then(function(names) {
+        for (let name of names) {
+          caches.delete(name);
+          console.log("[registerServiceWorker] Cleared cache:", name)
+        }
+      });
     },
     offline () {
       // console.log("[registerServiceWorker] No internet connection found. App is running in offline mode.")

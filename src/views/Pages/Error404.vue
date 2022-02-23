@@ -56,7 +56,12 @@
 	import { auth } from '@/firebase.js';
 
 	export default {
-		name: 'Error',
+		name: 'Error404',
+		metaInfo() {
+			return {
+				title: "404",
+			}
+		},
 		components: {
 			Footer,
 		},

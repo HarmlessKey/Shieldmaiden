@@ -19,7 +19,6 @@ const WeatherDemo = () => import('@/views/Pages/WeatherDemo.vue');
 const Profile = () => import('@/views/profile/Profile.vue');
 const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
-const Error404 = () => import('@/views/Pages/Error404.vue');
 const Offline = () => import('@/views/Pages/Offline.vue');
 const EditEncounter = () => import('@/views/UserContent/Encounters/Edit');
 const RunEncounter = () => import('@/views/RunEncounter.vue');
@@ -973,6 +972,6 @@ export const routes = [{
 
 	{
 		path: '*',
-		component: Error404
+		component:  () => import('@/views/Pages/Error404.vue')
 	},
 ];

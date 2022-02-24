@@ -1,5 +1,5 @@
 <template>
-	<div class="pb-1" ref="entity" :class="{ smallWidth: is_small }" v-if="!entity.no_linked_npc">
+	<div class="py-1" ref="entity" :class="{ smallWidth: is_small }" v-if="!entity.no_linked_npc">
 		<template v-if="!is_current">
 			<h2>
 				{{ entity.name.capitalizeEach() }}
@@ -202,7 +202,7 @@
 		<template v-if="entity.caster_ability">
 			<p v-if="!is_current">
 				<b><i>
-					{{ label }}
+					Spellcasting
 				</i></b>
 				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral('Oo')}}-level spellcaster.
 				It's spellcasting ability is {{ entity.caster_ability.capitalize() }}
@@ -210,20 +210,23 @@
 				{{ entity.caster_spell_attack > 0 ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }} to hit with spell attacks). 
 				The {{ entity.name.capitalizeEach() }} has the following spells prepared:
 			</p>
-			<div v-else class="caster-info">
-				<div>
-					<div>Casting ability</div>
-					<div class="value">{{ entity.caster_ability.substring(0,3).toUpperCase() }}</div>
+			<template v-else>
+				<div class="caster-info">
+					<div>
+						<div>Casting ability</div>
+						<div class="value">{{ entity.caster_ability.substring(0,3).toUpperCase() }}</div>
+					</div>
+					<div class="mx-3">
+						<div>Save DC</div>
+						<div class="value">{{ entity.caster_save_dc }}</div>
+					</div>
+					<div>
+						<div>Attack modifier</div>
+						<div class="value">{{ (entity.caster_spell_attack > 0) ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }}</div>
+					</div>
 				</div>
-				<div class="mx-3">
-					<div>Save DC</div>
-					<div class="value">{{ entity.caster_save_dc }}</div>
-				</div>
-				<div>
-					<div>Attack modifier</div>
-					<div class="value">{{ (entity.caster_spell_attack > 0) ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }}</div>
-				</div>
-			</div>
+				<b><i>Spells</i></b><br/>
+			</template>
 			<p>
 				<template v-for="level in caster_spell_levels" >
 					<div :key="`spell-${level}`">
@@ -257,20 +260,23 @@
 				{{ entity.innate_spell_attack > 0 ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }} to hit with spell attacks). 
 				The {{ entity.name.capitalizeEach() }} can cast the following spells, requiring no material components:
 			</p>
-			<div v-else class="caster-info">
-				<div>
-					<div>Innate ability</div>
-					<div class="value">{{ entity.innate_ability.substring(0,3).toUpperCase() }}</div>
+			<template v-else>
+				<div class="caster-info">
+					<div>
+						<div>Innate ability</div>
+						<div class="value">{{ entity.innate_ability.substring(0,3).toUpperCase() }}</div>
+					</div>
+					<div class="mx-3">
+						<div>Save DC</div>
+						<div class="value">{{ entity.innate_save_dc }}</div>
+					</div>
+					<div>
+						<div>Attack modifier</div>
+						<div class="value">{{ (entity.innate_spell_attack > 0) ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }}</div>
+					</div>
 				</div>
-				<div class="mx-3">
-					<div>Save DC</div>
-					<div class="value">{{ entity.innate_save_dc }}</div>
-				</div>
-				<div>
-					<div>Attack modifier</div>
-					<div class="value">{{ (entity.innate_spell_attack > 0) ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }}</div>
-				</div>
-			</div>
+				<b><i>Innate spells</i></b><br/>
+			</template>
 			<p>
 				<template v-for="limit in innate_spell_levels" >
 					<div :key="`spell-${limit}`">
@@ -331,7 +337,7 @@
 					<!-- Action title -->
 					<div v-for="(action, action_index) in entity[category]" :key="`${category}-${action_index}`" class="monster-action">
 						<div class="monster-action-title">
-							<template v-if="action.action_list && action.action_list[0] && action.action_list[0].type !== 'other' && action.action_list[0].rolls">
+							<template v-if="is_current && action.action_list && action.action_list[0] && action.action_list[0].type !== 'other' && action.action_list[0].rolls && action.action_list[0].rolls.length">
 								<span v-if="action.versatile" class="roll-button" @click.stop>
 									<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 										<div class="bg-neutral-8">
@@ -433,7 +439,7 @@
 							</div>
 						</div>
 						<!-- Roll Summary -->
-						<div v-if="action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'">
+						<div v-if="is_current && action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'">
 							<span v-if="action.action_list[0].rolls">
 								<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${action_index}-${roll_index}`">
 									(<i :class="[
@@ -642,40 +648,49 @@
 				}).map(item => { return item[1] });
 			},
 			roll(e, action_index, action, category, versatile) {
-				let roll;
-				const config = {
-					type: "monster_action",
-					versatile
-				}
-
-				// Roll once for AOE
-				if(action.aoe_type) {
-					roll = this.rollAction(e, action, config);
-					if(this.share) this.shareRoll(roll, this.targeted);
-				}
-
-				// Check for limited uses
-				if(action.limit || action.recharge) {
-					this.spendLimited(category, action_index);
-				}
-				if(action.legendary_cost) {
-					this.spendLimited(category, "legendaries_used", false, action.legendary_cost);
-				}
-
-				for(const key of this.targeted) {
-					let newRoll = { ...roll };
-
-					// Reroll for each target if it's not AOE
-					if(!action.aoe_type) {
-						newRoll = this.rollAction(e, action, config);
-						if(this.share) this.shareRoll(newRoll, [key]);
+				if(this.targeted && this.targeted.length) {
+					let roll;
+					const config = {
+						type: "monster_action",
+						versatile
 					}
 
-					// Set the target and current
-					this.$set(newRoll, "target", this.entities[key]);
-					this.$set(newRoll, "current", this.entity);
+					// Roll once for AOE
+					if(action.aoe_type) {
+						roll = this.rollAction(e, action, config);
+						if(this.share) this.shareRoll(roll, this.targeted);
+					}
 
-					this.setActionRoll(newRoll);
+					// Check for limited uses
+					if(action.limit || action.recharge) {
+						this.spendLimited(category, action_index);
+					}
+					if(action.legendary_cost) {
+						this.spendLimited(category, "legendaries_used", false, action.legendary_cost);
+					}
+
+					for(const key of this.targeted) {
+						let newRoll = { ...roll };
+	
+						// Reroll for each target if it's not AOE
+						if(!action.aoe_type) {
+							newRoll = this.rollAction(e, action, config);
+							if(this.share) this.shareRoll(newRoll, [key]);
+						}
+	
+						// Set the target and current
+						this.$set(newRoll, "target", this.entities[key]);
+						this.$set(newRoll, "current", this.entity);
+	
+						this.setActionRoll(newRoll);
+					}
+				} else {
+					this.$q.notify({
+						message: "Select a target first.",
+						color: "warning",
+						position: "top",
+						timeout: 1000
+					});
 				}
 			},
 			spendLimited(category, index, regain=false, cost=1) {

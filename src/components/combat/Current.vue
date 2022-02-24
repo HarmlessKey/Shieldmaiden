@@ -5,7 +5,7 @@
 				<i v-if="current.hidden" class="fas fa-eye-slash red"></i>
 				{{ current.name.capitalizeEach() }}
 			</span>		
-			<a class="btn btn-sm bg-neutral-5" @click="showCard = !showCard">
+			<a class="btn btn-sm bg-neutral-5" @click="setShowCard">
 				<i :class="showCard ? 'fas fa-swords' : 'fas fa-eye'"/>
 				<q-tooltip anchor="top middle" self="center middle">
 					{{ showCard ? "Show actions" : "Show monster card" }}
@@ -50,7 +50,7 @@
 	import ViewEntity from './ViewEntity.vue';
 
 	export default {
-		name: 'Current',
+		name: "Current",
 		mixins: [remindersMixin, dice],
 		components: {
 			Actions,
@@ -60,17 +60,17 @@
 			DeathSaves,
 			ViewEntity
 		},
-		props: ['current', 'next', 'settings'],
+		props: ["current", "next", "settings"],
 		data() {
 			return {
 				setShadow: 0,
-				showCard: false
+				showCardSetter: undefined
 			}
 		},
 		watch: {
 			//Watch turn to trigger reminders when an entity starts their turn
 			turn(newVal, oldVal) {
-				this.checkReminders(this.current, 'startTurn');
+				this.checkReminders(this.current, "startTurn");
 				this.showCard = false;
 
 				//Check if the turn went up or down	concidering round changes
@@ -79,10 +79,10 @@
 					(newVal > oldVal && oldVal === 0 && newVal === 1) || 
 					(newVal === 0 && oldVal > newVal && oldVal !== 1)
 				) {
-					this.timedReminders(this.current, 'up');
+					this.timedReminders(this.current, "up");
 				} else {
 					//Update next in initiative order
-					this.timedReminders(this.next, 'down');
+					this.timedReminders(this.next, "down");
 				}
 
 				// Check limited uses
@@ -130,20 +130,39 @@
 		},
 		computed: {
 			...mapGetters([
-				'entities',
-				'round',
-				'turn',
-				'targeted',
-			])
+				"entities",
+				"round",
+				"turn",
+				"targeted",
+				"show_monster_card"
+			]),
+			showCard: {
+				get() {
+					const show = (this.current.entityType === "npc" && this.show_monster_card) ? true : false;
+					return (this.showCardSetter) ? this.showCardSetter : show;
+				},
+				set(newVal) {
+					this.showCardSetter = newVal;
+				}
+			}
 		},
 		methods: {
 			...mapActions([
-				'setSlide',
-				'remove_limitedUses'
+				"setSlide",
+				"remove_limitedUses",
+				"set_show_monster_card"
 			]),
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100);
 				return hp_percentage;
+			},
+			setShowCard() {
+				const value = !this.showCard;
+				if(this.current.entityType === "npc") {
+					this.set_show_monster_card(value);
+				} else {
+					this.showCard = value;
+				}
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollPosition;

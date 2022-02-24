@@ -80,7 +80,7 @@
 			</template>
 		</hk-tip>
 
-		<template v-if="doneBy">
+		<template v-if="doneBy && entitiesList[doneBy]">
 			<q-tabs
 				v-model="tab"
 				:dark="$store.getters.theme === 'dark'"
@@ -121,7 +121,7 @@
 	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
-		name: 'Actions',
+		name: "Actions",
 		components: {
 			Custom,
 			Roll,
@@ -139,15 +139,21 @@
 		},
 		data() {
 			return {
-				tabSetter: undefined,
-				doneBySetter: undefined
+				tab: "manual",
+				tabs: [{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }],
+				doneBySetter: undefined,
+				settingsSetter: undefined
 			}
+		},
+		mounted() {
+			this.tab = this.returnTab(this.entitiesList[this.doneBy]);
+			this.tabs = this.returnTabs(this.entitiesList[this.doneBy]);
 		},
 		computed: {
 			...mapGetters([
-				'entities',
-				'targeted',
-				'userSettings'
+				"entities",
+				"targeted",
+				"userSettings"
 			]),
 			_active: function() {
 				let active = _.chain(this.entities)
@@ -155,7 +161,7 @@
 					entity.key = key
 					return !entity.down;
 				})
-				.sortBy('name' , 'asc')
+				.sortBy("name", "asc")
 				.value();
 				active.unshift({
 					key: "environment",
@@ -174,19 +180,6 @@
 				};
 				return list;
 			},
-			tabs() {
-				const current = this.entitiesList[this.doneBy];
-				let tabs = [
-					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }
-				];
-				if(current.special_abilities || current.actions || current.legendary_actions || current.reactions) {
-					tabs.push({ name: "roll", label: "Actions", icon: "fas fa-dice-d20" })
-				}
-				if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
-					tabs.push({ name: "spells", label: "Spells", icon: "fas fa-wand-magic" })
-				}
-				return tabs;
-			},
 			doneBy: {
 				get() {
 					const key = (this.current) ? this.current.key : undefined;
@@ -196,18 +189,44 @@
 					this.doneBySetter = newValue;
 				}
 			},
-			tab: {
+			settings: {
 				get() {
-					const tab = (
-						(this.current && (this.current.entityType === 'player' || 
-						this.current.entityType === 'companion')) || 
-						this.userSettings.npcDamageTab
-					) ? "manual" : "roll";
-
-					return (this.tabSetter) ? this.tabSetter : tab;
+					const settings = (this.userSettings && this.userSettings.encounter) ? this.userSettings.encounter : {};
+					return (this.settingsSetter) ? this.settingsSetter : settings;
 				},
 				set(newValue) {
-					this.tabSetter = newValue;
+					this.settingsSetter = newValue;
+				}
+			}
+		},
+		methods: {
+			returnTabs(current) {
+				let tabs = [
+					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }
+				];
+				if(current) {
+					if(current.special_abilities || current.actions || current.legendary_actions || current.reactions) {
+						tabs.push({ name: "roll", label: "Actions", icon: "fas fa-dice-d20" })
+					}
+					if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
+						tabs.push({ name: "spells", label: "Spells", icon: "fas fa-wand-magic" })
+					}
+				}
+				return tabs;
+			},
+			returnTab(current) {
+				return ((current && (["player", "companion", "environment"].includes(current.entityType))) || 
+						this.settings.npcDamageTab
+					) ? "manual" : "roll";
+			}
+		},
+		watch: {
+			doneBy: {
+				deep: true,
+				handler(newVal) {
+					const current = this.entitiesList[newVal];
+					this.tab = this.returnTab(current);
+					this.tabs = this.returnTabs(current);
 				}
 			}
 		}

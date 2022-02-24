@@ -136,6 +136,7 @@ const getDefaultState = () => {
 		path: undefined,
 		track: undefined,
 		encounter_initialized: false,
+		show_monster_card: false
 	}
 }
 
@@ -156,6 +157,7 @@ const getters = {
 	encounterId(state) { return state.encounterId },
 	path(state) { return state.path },
 	encounter_initialized(state) { return state.encounter_initialized },
+	show_monster_card(state) { return state.show_monster_card },
 	log(state) {
 		//If there is a storage log, set it in the store
 		if(localStorage.getItem(state.encounterId)) {
@@ -548,7 +550,17 @@ const actions = {
 		commit("SET_TURN", turn);
 		commit("SET_ROUND", round);
 	},
-	set_log({ commit }, payload) { commit("SET_LOG", payload) },
+	set_log({ commit }, payload) { commit("SET_LOG", payload); },
+
+	/**
+	 * Saves if the user wants to show the monster card for NPC whose turn it is 
+	 * instead of showing the actions overview
+	 * 
+	 * @param {boolean} value
+	 */
+	set_show_monster_card({ commit }, value) {
+		commit("SET_SHOW_MONSTER_CARD", value);
+	},
 
 	/**
 	 * Edit entity properties
@@ -1691,6 +1703,7 @@ const mutations = {
 	REMOVE_LIMITED_USES(state, {key, category, index}) { Vue.delete(state.entities[key].limited_uses[category], index); },
 	
 	ADD_ENTITY(state, { key, entity }) { Vue.set(state.entities, key, entity); },
+	SET_SHOW_MONSTER_CARD(state, value) { Vue.set(state, "show_monster_card", value); },
 	SET_LOG(state, {action, value}) {
 		if(localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
 			state.log = JSON.parse(localStorage.getItem(state.encounterId));

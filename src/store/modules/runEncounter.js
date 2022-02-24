@@ -58,7 +58,7 @@ const demoPlayers = {
 	}
 }
 const demoEncounter = {
-	"encounter" : "Demo Encounter",
+	"name" : "Demo Encounter",
 	"entities" : {
 		"playerone" : {
 			"active" : true,		

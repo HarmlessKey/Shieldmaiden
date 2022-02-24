@@ -33,11 +33,11 @@
 							<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
 							<q-item-section>Audio Link</q-item-section>
 						</q-item>
-						<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
+						<q-item v-if="!demo" clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
 							<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
 							<q-item-section>Settings</q-item-section>
 						</q-item>
-						<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+						<q-item v-if="!demo" clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 							<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
 							<q-item-section>Public initiatve settings</q-item-section>
 						</q-item>
@@ -50,7 +50,7 @@
 							<q-item-section>Finish encounter</q-item-section>
 						</q-item>
 						<q-separator />
-						<q-item clickable v-close-popup :to="`/content/campaigns/${$route.params.campid}`">
+						<q-item clickable v-close-popup :to="demo ? `/` : `/content/campaigns/${$route.params.campid}`">
 							<q-item-section avatar><i class="fas fa-chevron-left"></i></q-item-section>
 							<q-item-section>Leave encounter</q-item-section>
 						</q-item>
@@ -58,7 +58,7 @@
 				</q-popup-proxy>
 			</a>
 
-			<span class="ml-2 d-none d-md-inline truncate">{{ encounter.encounter }}</span>
+			<span class="ml-2 d-none d-md-inline truncate">{{ encounter.name }}</span>
 		</div>
 
 		<!-- TURNS & ROUNDS -->

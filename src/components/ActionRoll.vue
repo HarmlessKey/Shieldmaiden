@@ -191,14 +191,14 @@
 			<!-- HIGHER LEVEL MODIFIER -->
 			<h2 class="d-flex justify-content-between mt-3">
 				<span>
-					<i class="fas fa-chart-line"></i> Scaling
+					<i aria-hidden="true" class="fas fa-chart-line"></i> Scaling
 				</span>
 				<a 
 					v-if="level_tier_addable()"
 					class="neutral-2 text-capitalize" 
 					@click="add_level_tier()"
 				>
-					<i class="fas fa-plus green"></i>
+					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<q-tooltip anchor="center right" self="center left">
 						Add level tier
 					</q-tooltip>
@@ -271,7 +271,7 @@
 					</div>
 					<div>
 						<a @click="remove_level_tier(tier_index)" class="remove">
-							<i class="fas fa-trash-alt red"></i>
+							<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 						</a>
 					</div>
 				</div>

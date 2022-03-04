@@ -9,7 +9,7 @@
 						@click="openDialog(casting.category)"
 						class="btn btn-sm bg-neutral-5"
 					>
-						<i class="fas fa-plus green"></i>
+						<i aria-hidden="true" class="fas fa-plus green"></i>
 						<span class="ml-1">Add spell</span>
 					</a>
 				</div>
@@ -83,7 +83,7 @@
 											:class="{ disable: npc[`${casting.category}_spell_slots`][level] >= 9 }"
 											@click="setSpellSlot('up', level)"
 										>
-											<i class="fas fa-chevron-up"/>
+											<i aria-hidden="true" class="fas fa-chevron-up"/>
 										</div>
 										<input 
 											v-model.number="npc[`${casting.category}_spell_slots`][level]" 
@@ -94,7 +94,7 @@
 											:class="{ disable: npc[`${casting.category}_spell_slots`][level] <= 0 }"
 											@click="setSpellSlot('down', level)"
 										>
-											<i class="fas fa-chevron-down"/>
+											<i aria-hidden="true" class="fas fa-chevron-down"/>
 										</div>
 									</div>
 								</div>
@@ -143,7 +143,7 @@
 									</q-item-section>
 									<q-item-section avatar>
 										<a class="btn btn-sm bg-neutral-5" @click="removeSpell(key, casting.category)">
-											<i class="fas fa-trash-alt red" />
+											<i aria-hidden="true" class="fas fa-trash-alt red" />
 											<q-tooltip anchor="top middle" self="center middle">
 												Remove spell
 											</q-tooltip>

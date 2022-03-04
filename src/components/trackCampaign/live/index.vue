@@ -55,7 +55,7 @@
 				</div>
 				<div class="shares-bar" :class="{ shown: showShares }">
 					<div class="show" @click="showShares = !showShares">
-						<i class="fas fa-chevron-left" />
+						<i aria-hidden="true" class="fas fa-chevron-left" />
 					</div>
 					<Shares 
 						:shares="shares" 

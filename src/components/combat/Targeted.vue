@@ -3,9 +3,9 @@
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 
 			<div class="d-flex justify-content-between">
-				<span><i class="fas fa-crosshairs"></i> Targeted</span>
+				<span><i aria-hidden="true" class="fas fa-crosshairs"></i> Targeted</span>
 				<a v-if="targeted.length > 0" @click="set_targeted({type: 'untarget', key: 'all'})">
-					<i class="fas fa-times red"></i>
+					<i aria-hidden="true" class="fas fa-times red"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Untarget all
 					</q-tooltip>
@@ -16,14 +16,14 @@
 			<div class="options d-flex justify-content-between" v-if="target">
 				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing' })"
 					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing' })">
-					<span class="icon"><i class="fas fa-swords"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-swords"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[d] Do damage / healing
 					</q-tooltip>
 				</a>
 				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions'})">
-					<span class="icon"><i class="fas fa-flame"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-flame"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[c] Conditions
 					</q-tooltip>
@@ -31,7 +31,7 @@
 				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 				>
-					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-stopwatch"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[m] Reminders
 					</q-tooltip>
@@ -39,7 +39,7 @@
 				<a @click="setSlide({show: true, type: 'slides/Transform', data: target })"
 					v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: target })"
 				>
-					<span class="icon"><i class="fas fa-paw-claws"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-paw-claws"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[t] Transform
 					</q-tooltip>
@@ -48,7 +48,7 @@
 				<a @click="setHidden()"
 					v-shortkey="['h']" @shortkey="setHidden()"
 				>
-					<span class="icon"><i class="fas fa-eye"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-eye"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[h] Hide
 					</q-tooltip>
@@ -58,7 +58,7 @@
 					@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })" 
 					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 				>
-					<span class="icon"><i class="fas fa-pencil"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-pencil"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[e] Edit
 					</q-tooltip>
@@ -70,7 +70,7 @@
 				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
 					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
 				>
-					<span class="icon"><i class="fas fa-swords"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-swords"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[d] Do damage / healing
 					</q-tooltip>
@@ -79,7 +79,7 @@
 					@click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 				>
-					<span class="icon"><i class="fas fa-flame"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-flame"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[c] Conditions
 					</q-tooltip>
@@ -88,7 +88,7 @@
 					@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
 					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
 				>
-					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-stopwatch"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[m] Reminders
 					</q-tooltip>
@@ -97,7 +97,7 @@
 				<a @click="setHidden()"
 					v-shortkey="['h']" @shortkey="setHidden()"
 				>
-					<span class="icon"><i class="fas fa-eye"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-eye"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[h] Hide
 					</q-tooltip>
@@ -107,7 +107,7 @@
 					@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })" 
 					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 				>
-					<span class="icon"><i class="fas fa-pencil"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-pencil"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[e] Edit
 					</q-tooltip>
@@ -127,7 +127,7 @@
 						<div class="health">
 							<TargetItem :item="key" />
 							<a class="clear" @click="set_targeted({type: 'untarget', key})">
-								<i class="fas fa-times red"></i>
+								<i aria-hidden="true" class="fas fa-times red"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Untarget
 								</q-tooltip>

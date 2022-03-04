@@ -7,7 +7,7 @@
 		'color': entity.color_label ? entity.color_label : ''
 		}"
 	>
-		<i v-if="['monster', 'player', 'companion'].includes(displayImg(entity))" :class="`hki-${displayImg(entity)}`" />
+		<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(displayImg(entity))" :class="`hki-${displayImg(entity)}`" />
 	</div>
 </template>
 

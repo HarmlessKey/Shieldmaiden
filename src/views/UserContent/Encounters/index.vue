@@ -26,7 +26,7 @@
 										">
 											{{ encounter_count || 0 }}
 										</span> / 
-										<i v-if="tier.benefits.encounters === 'infinite'" class="far fa-infinity" />
+										<i aria-hidden="true" v-if="tier.benefits.encounters === 'infinite'" class="far fa-infinity" />
 										<template v-else>{{ tier.benefits.encounters }}</template>
 									</span>
 								</span>
@@ -37,15 +37,15 @@
 								@click="add = !add"
 								class="btn btn-sm"
 							>
-								<i class="fas fa-plus green" />
+								<i aria-hidden="true" class="fas fa-plus green" />
 								New encounter
 							</a>
 							<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">
-								<i class="fas fa-box-full red mr-1"/>
+								<i aria-hidden="true" class="fas fa-box-full red mr-1"/>
 								Over encumbered
 							</router-link>
 							<router-link v-else class="btn btn-sm ml-1" to="/patreon">
-								<i class="fab fa-patreon patreon-red mr-1"/>
+								<i aria-hidden="true" class="fab fa-patreon patreon-red mr-1"/>
 								Get more slots
 							</router-link>
 						</div>
@@ -119,26 +119,26 @@
 												class="btn btn-sm bg-neutral-5 mr-1"
 												:to="'/run-encounter/' + campaignId + '/' + props.key"
 											>
-												<i class="fas fa-play"></i>
+												<i aria-hidden="true" class="fas fa-play"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Run encounter
 												</q-tooltip>
 											</router-link>
 											<a v-else class="disabled btn btn-sm mr-1 bg-neutral-5">
-												<i class="fas fa-play"></i>
+												<i aria-hidden="true" class="fas fa-play"></i>
 											</a>
 											<router-link 
 												v-if="!overencumbered"
 												class="mr-1 btn btn-sm bg-neutral-5" 
 												:to="'/content/campaigns/' + campaignId + '/' + props.key"
 											>
-												<i class="fas fa-pencil-alt"></i>
+												<i aria-hidden="true" class="fas fa-pencil-alt"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Edit
 												</q-tooltip>
 											</router-link>
 											<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, props.key, props.row.name)">
-												<i class="fas fa-trash-alt"></i>
+												<i aria-hidden="true" class="fas fa-trash-alt"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Delete
 												</q-tooltip>
@@ -159,7 +159,7 @@
 								class="btn btn-sm bg-neutral-5"
 								@click="deleteFinishedEncounters"
 							>
-								<i class="fas fa-trash-alt mr-1 red" />
+								<i aria-hidden="true" class="fas fa-trash-alt mr-1 red" />
 								Delete all
 							</a>
 						</div>
@@ -198,25 +198,25 @@
 											class="btn btn-sm bg-neutral-5" 
 											:to="`/run-encounter/${campaignId}/${props.key}`"
 										>
-											<i class="fas fa-eye"></i>
+											<i aria-hidden="true" class="fas fa-eye"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												View
 											</q-tooltip>
 										</router-link>
 										<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(props.key, hard=false)">
-											<i class="fas fa-trash-restore-alt"></i>
+											<i aria-hidden="true" class="fas fa-trash-restore-alt"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Unfinish
 											</q-tooltip>
 										</a>
 										<a v-if="!overencumbered" class="btn btn-sm bg-neutral-5 mx-1" @click="reset(props.key)">
-											<i class="fas fa-undo"></i>
+											<i aria-hidden="true" class="fas fa-undo"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Reset
 											</q-tooltip>
 										</a>
 										<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, props.key, props.row.name)">
-											<i class="fas fa-trash-alt"></i>
+											<i aria-hidden="true" class="fas fa-trash-alt"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Delete
 											</q-tooltip>

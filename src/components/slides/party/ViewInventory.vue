@@ -32,7 +32,7 @@
 						<div class="linked-item">
 							<span>Qualities</span>
 							<a @click="showItem = !showItem" :class="{ collapsed: showItem }">
-								<i class="fas fa-chevron-down"></i>
+								<i aria-hidden="true" class="fas fa-chevron-down"></i>
 							</a>
 						</div>
 						<q-slide-transition>

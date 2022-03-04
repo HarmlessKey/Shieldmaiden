@@ -9,7 +9,7 @@
 		
 		<div v-if="controlUser">
 			<a @click="removeControl()">
-				<i class="fas fa-times red"></i>
+				<i aria-hidden="true" class="fas fa-times red"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Remove control
 				</q-tooltip>

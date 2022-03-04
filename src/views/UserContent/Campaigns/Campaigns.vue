@@ -31,7 +31,7 @@
 										: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
 									]">
 									<div class="d-flex justify-content-between">
-										<i 
+										<i aria-hidden="true" 
 											class="px-1 py-2"
 											:class="{
 												'fas fa-eye text-shadow-6 white': !campaign.private,
@@ -45,13 +45,13 @@
 										<div class="campaign-actions">
 											<template v-if="!overencumbered">
 												<a class="btn btn-sm btn-clear white" @click="edit_players = { show: true, campaign: campaign }">
-													<i class="fas fa-user-plus"></i>
+													<i aria-hidden="true" class="fas fa-user-plus"></i>
 													<q-tooltip anchor="top middle" self="bottom middle">
 														Add players
 													</q-tooltip>
 												</a>
 												<a class="btn btn-sm btn-clear white" @click="edit_campaign = { show: true, campaign: campaign }">
-													<i class="fas fa-pencil"></i>
+													<i aria-hidden="true" class="fas fa-pencil"></i>
 													<q-tooltip anchor="top middle" self="bottom middle">
 														Edit
 													</q-tooltip>
@@ -61,7 +61,7 @@
 												class="btn btn-sm btn-clear white"
 												@click="confirmDelete($event, campaign.key, campaign.name)"
 											>
-												<i class="fas fa-trash-alt"></i>
+												<i aria-hidden="true" class="fas fa-trash-alt"></i>
 												<q-tooltip anchor="top middle" self="bottom middle">
 													Delete
 												</q-tooltip>
@@ -92,14 +92,14 @@
 											@click="!overencumbered ? edit_players = { show: true, campaign: campaign } : null"
 											:disabled="overencumbered"
 										>
-											<i class="fas fa-users mr-1 neutral-2" />
+											<i aria-hidden="true" class="fas fa-users mr-1 neutral-2" />
 											{{ campaign.player_count ? campaign.player_count : "0" }}
 											player{{ campaign.player_count === 1 ? "" : "s" }}
 										</a>
 									</div>
 									
 									<router-link class="btn btn-clear btn-sm" :to="`${$route.path}/${campaign.key}`">
-										<i class="fas fa-swords mr-2 neutral-2" />
+										<i aria-hidden="true" class="fas fa-swords mr-2 neutral-2" />
 											<span 
 												:class="{ 
 													'green': get_encounter_count(campaign.key), 
@@ -113,19 +113,19 @@
 									
 									<div class="mt-4" v-if="!overencumbered">
 										<router-link to="/content/players" v-if="!player_count" class="btn ">
-											<i class="fas fa-user"></i> Create players
+											<i aria-hidden="true" class="fas fa-user"></i> Create players
 										</router-link>
 										<a 
 											v-else-if="!campaign.player_count" class="btn"
 											@click="edit_players = { show: true, campaign: campaign }" 
 										>
-											<i class="fas fa-plus"></i> Add players
+											<i aria-hidden="true" class="fas fa-plus"></i> Add players
 										</a>
 										<router-link 
 											v-else-if="!get_encounter_count(campaign.key)" class="btn"
 											:to="`${$route.path}/${campaign.key}`" 
 										>
-											<i class="fas fa-swords"></i> Add encounters
+											<i aria-hidden="true" class="fas fa-swords"></i> Add encounters
 										</router-link>
 										<router-link :to="`${$route.path}/${campaign.key}`" v-else class="btn bg-green">
 											Continue

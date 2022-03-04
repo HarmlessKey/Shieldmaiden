@@ -23,7 +23,7 @@
 
 		<div class="colors d-flex justify-content-between my-3">
 			<a v-for="(color, index) in colors" :key="index" class="color" :class="'bg-'+color" @click="setColor(color)">
-				<span v-show="color == reminder.color"><i class="fas fa-check"></i></span>
+				<span v-show="color == reminder.color"><i aria-hidden="true" class="fas fa-check"></i></span>
 			</a>
 		</div>
 
@@ -136,13 +136,13 @@
 					<span>{{ key }}</span>
 					<div>
 						<a @click="removeVar(key)" class="btn btn-sm bg-neutral-5">
-							<i class="fas fa-trash-alt"></i>
+							<i aria-hidden="true" class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="bottom middle">
 								Remove variable
 							</q-tooltip>
 						</a>
 						<a @click="addOption(key)" class="btn btn-sm bg-neutral-5 ml-2">
-							<i class="fas fa-plus"></i>
+							<i aria-hidden="true" class="fas fa-plus"></i>
 							<q-tooltip anchor="top middle" self="bottom middle">
 								Add option
 							</q-tooltip>
@@ -166,7 +166,7 @@
 						>
 							<div slot="before" v-if="selectOptions">
 								<button class="btn btn-sm bg-neutral-4" @click="setOption(key, reminder.variables[key][i])">
-									<i class="fas fa-check" :class="{ green: reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
+									<i aria-hidden="true" class="fas fa-check" :class="{ green: reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
 								</button>
 							</div>
 							<template slot="append">

@@ -12,7 +12,7 @@
 			<div class="d-flex justify-content-left">
 				<template v-if="!player_in_encounter(key)">
 					<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
-						<i v-if="!player.avatar" class="hki-player" />
+						<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 					</span>
 				</template>
 			</div>
@@ -22,7 +22,7 @@
 		</div>
 
 		<div v-if="campaign && campaign.players === undefined">
-			<h3 class="red"><i class="fas fa-users"></i> No Players Yet</h3>
+			<h3 class="red"><i aria-hidden="true" class="fas fa-users"></i> No Players Yet</h3>
 			<p>Add players to your campaign first.</p>
 			<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
 		</div>
@@ -100,13 +100,13 @@
 							v-model="to_add[props.key]"
 						/>
 						<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, props.key, 'npc', props.row.name, true)">
-							<i class="fas fa-plus"></i>
+							<i aria-hidden="true" class="fas fa-plus"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Add with average HP
 							</q-tooltip>
 						</a>
 						<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, props.key, 'npc', props.row.name, true, true)">
-							<i class="fas fa-dice-d20"></i>
+							<i aria-hidden="true" class="fas fa-dice-d20"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Add with rolled HP
 							</q-tooltip>
@@ -178,7 +178,7 @@
 				<q-tr :props="props">
 					<q-td auto-width>
 						<a  @click="props.expand = !props.expand">
-							<i class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+							<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
 						</a>
 					</q-td>
 					<q-td
@@ -204,13 +204,13 @@
 										v-model="to_add[props.key]"
 									/>
 									<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, props.key, 'npc', props.row.name, false)">
-										<i class="fas fa-plus"></i>
+										<i aria-hidden="true" class="fas fa-plus"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add with average HP
 										</q-tooltip>
 									</a>
 									<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, props.key, 'npc', props.row.name, false, true)">
-										<i class="fas fa-dice-d20"></i>
+										<i aria-hidden="true" class="fas fa-dice-d20"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add with rolled HP
 										</q-tooltip>

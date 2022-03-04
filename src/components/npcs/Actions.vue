@@ -4,7 +4,7 @@
 			<div slot="header" class="card-header d-flex justify-content-between">
 				Abilities
 				<a class="btn btn-sm bg-neutral-5">
-					<i class="fas fa-plus green"></i>
+					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Add
@@ -19,7 +19,7 @@
 									@click="add(category)"
 								>
 									<q-item-section avatar>
-										<i class="fas fa-plus"></i>
+										<i aria-hidden="true" class="fas fa-plus"></i>
 									</q-item-section>
 									<q-item-section>{{ name_single }}</q-item-section>
 								</q-item>
@@ -35,7 +35,7 @@
 						<h3 class="d-flex justify-content-between">
 							{{ name }}
 							<a class="btn btn-sm btn-clear" @click="add(category)">
-								<i class="fas fa-plus green"></i>
+								<i aria-hidden="true" class="fas fa-plus green"></i>
 								<span class="d-none d-md-inline ml-1">Add {{ name_single }}</span>
 							</a>
 						</h3>
@@ -114,7 +114,7 @@
 										</q-item-section>
 										<q-item-section avatar>
 											<a @click.stop="remove(ability_index, category)" class="remove">
-												<i class="fas fa-trash-alt red" />
+												<i aria-hidden="true" class="fas fa-trash-alt red" />
 												<q-tooltip anchor="top middle" self="center middle">
 													Remove
 												</q-tooltip>
@@ -385,12 +385,12 @@
 													<!-- ACTION ROLLS -->
 													<div class="hk-card mt-3 rolls">
 														<div class="card-header d-flex justify-content-between">
-															<span><i class="fas fa-dice-d20"/> Rolls</span>
+															<span><i aria-hidden="true" class="fas fa-dice-d20"/> Rolls</span>
 															<a 
 																class="btn btn-sm bg-neutral-5" 
 																@click="newRoll(ability_index, ability, category, action_index, action)"
 															>
-																<i class="fas fa-plus green"></i>
+																<i aria-hidden="true" class="fas fa-plus green"></i>
 																<span class="d-none d-md-inline ml-1">Add roll</span>
 															</a>
 														</div>
@@ -430,11 +430,11 @@
 
 															<span slot="type" slot-scope="data">
 																<span v-if="action.type === 'healing'" class="healing">
-																	<i class="fas fa-heart" /> Healing
+																	<i aria-hidden="true" class="fas fa-heart" /> Healing
 																</span>
 																<template v-else-if="data.row.damage_type">
 																	<span :class="data.row.damage_type">
-																		<i :class="damage_type_icons[data.row.damage_type]" /> 
+																		<i aria-hidden="true" :class="damage_type_icons[data.row.damage_type]" /> 
 																		{{ data.row.damage_type.capitalize() }} 
 																		<q-tooltip v-if="ability.versatile" anchor="top middle" self="bottom middle">
 																			{{ ability.versatile_two || "Enter versatile option" }}
@@ -444,7 +444,7 @@
 																		v-if="ability.versatile && (data.row.versatile_damage_type && data.row.versatile_damage_type !== data.row.damage_type)" 
 																	>
 																		| <span :class="data.row.versatile_damage_type">
-																			<i :class="damage_type_icons[data.row.versatile_damage_type]" />
+																			<i aria-hidden="true" :class="damage_type_icons[data.row.versatile_damage_type]" />
 																			{{ data.row.versatile_damage_type.capitalize() }} 
 																			<q-tooltip anchor="top middle" self="bottom middle">
 																				{{ ability.versatile_two || "Enter versatile option" }}
@@ -476,13 +476,13 @@
 																			data.row
 																		)"
 																	>
-																	<i class="fas fa-pencil-alt"></i>
+																	<i aria-hidden="true" class="fas fa-pencil-alt"></i>
 																	<q-tooltip anchor="top middle" self="center middle">
 																		Edit
 																	</q-tooltip>
 																</a>
 																<a class="ml-2 btn btn-sm bg-neutral-5" @click="deleteRoll(ability_index, category, action_index, data.index)">
-																	<i class="fas fa-trash-alt"></i>
+																	<i aria-hidden="true" class="fas fa-trash-alt"></i>
 																	<q-tooltip anchor="top middle" self="center middle">
 																		Delete
 																	</q-tooltip>

@@ -5,8 +5,8 @@
 		<h2 class="d-flex justify-content-between">
 			<span>Edit {{ playerBase.character_name }}</span>
 			<a @click="setTransform = !setTransform">
-				<i v-if="setTransform" class="fas fa-times red"></i>
-				<i v-else class="fas fa-paw-claws green"></i>
+				<i aria-hidden="true" v-if="setTransform" class="fas fa-times red"></i>
+				<i aria-hidden="true" v-else class="fas fa-paw-claws green"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Transform
 				</q-tooltip>
@@ -24,37 +24,37 @@
 					<div v-for="(n, index) in 5" :key="index">
 						<template v-if="entity.saves && Object.keys(entity.saves).length === n">
 							<a v-show="entity.saves[n] === 'succes'" class="green" @click="set_save(null, n)">
-								<i class="fas fa-check"></i>
+								<i aria-hidden="true" class="fas fa-check"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Change
 								</q-tooltip>
 							</a>
 							<a v-show="entity.saves[n] === 'fail'" class="red" @click="set_save(null, n)">
-								<i class="fas fa-times"></i>
+								<i aria-hidden="true" class="fas fa-times"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Change
 								</q-tooltip>
 							</a>
 						</template>
 						<template v-else-if="entity.saves">
-							<span v-show="entity.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
-							<span v-show="entity.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
+							<span v-show="entity.saves[n] === 'succes'" class="green"><i aria-hidden="true" class="fas fa-check"></i></span>
+							<span v-show="entity.saves[n] === 'fail'" class="red"><i aria-hidden="true" class="fas fa-times"></i></span>
 						</template>
-						<span v-show="!entity.saves || !entity.saves[n]" class="neutral-2"><i class="fas fa-dot-circle"></i></span>
+						<span v-show="!entity.saves || !entity.saves[n]" class="neutral-2"><i aria-hidden="true" class="fas fa-dot-circle"></i></span>
 					</div>
 				</div>
 				<div v-if="!entity.saves || Object.keys(entity.saves).length < 6" class="d-flex justify-content-between">
 					<button class="btn save bg-green" @click="set_save('succes', !entity.saves ? 0 : Object.keys(entity.saves).length)">
-						<i class="fas fa-check"></i>
+						<i aria-hidden="true" class="fas fa-check"></i>
 					</button>
 					<button class="btn save bg-red" @click="set_save('fail', !entity.saves ? 0 : Object.keys(entity.saves).length)">
-						<i class="fas fa-times"></i>
+						<i aria-hidden="true" class="fas fa-times"></i>
 					</button>
 				</div>
-				<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill()"><i class="fas fa-skull"></i> Player died</a>
-				<a class="btn btn-block my-3" @click="stabilize()"><i class="fas fa-heartbeat"></i> Stabilize</a>
+				<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill()"><i aria-hidden="true" class="fas fa-skull"></i> Player died</a>
+				<a class="btn btn-block my-3" @click="stabilize()"><i aria-hidden="true" class="fas fa-heartbeat"></i> Stabilize</a>
 			</template>
-			<a v-else-if="entity.dead" class="btn bg-green btn-block my-3" @click="revive()"><i class="fas fa-hand-holding-magic"></i> Revive</a>
+			<a v-else-if="entity.dead" class="btn bg-green btn-block my-3" @click="revive()"><i aria-hidden="true" class="fas fa-hand-holding-magic"></i> Revive</a>
 			
 			<!-- EDIT PLAYER -->	
 			<ValidationObserver v-slot="{ handleSubmit }">

@@ -7,7 +7,7 @@
 		<div class="players">
 			<h2 
 				class="componentHeader" :class="{ shadow : setShadowPlayer > 0 }">
-				<span><i class="fas fa-helmet-battle"></i> Players</span>
+				<span><i aria-hidden="true" class="fas fa-helmet-battle"></i> Players</span>
 			</h2>
 			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
 				<Players :players="_players" />
@@ -15,7 +15,7 @@
 		</div>
 		<div class="npcs">
 			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
-				<span><i class="fas fa-dragon"></i> NPC's</span>
+				<span><i aria-hidden="true" class="fas fa-dragon"></i> NPC's</span>
 			</h2>
 			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
 				<NPCs :npcs="_npcs" />	

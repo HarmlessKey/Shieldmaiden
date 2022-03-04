@@ -23,7 +23,7 @@
 									<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/harm.jpg') + ')'}"></div>
 									<div>
 										Harm Manders<br/>
-										<small><i class="neutral-3">Male human developer</i><br/>
+										<small><i aria-hidden="true" class="neutral-3">Male human developer</i><br/>
 										<i>Level {{ getAge('1992-03-29') }}</i></small>
 									</div>
 								</div>
@@ -61,7 +61,7 @@
 										>
 											<li>
 												<span class="skill">
-													<i :class="proficient ? 'fas' : 'far'" class="fa-circle mr-1" /> 
+													<i aria-hidden="true" :class="proficient ? 'fas' : 'far'" class="fa-circle mr-1" /> 
 													{{ skill }}
 												</span> 
 												<span class="score">
@@ -81,7 +81,7 @@
 									<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/key.jpg') + ')'}"></div>
 									<div>
 										Key Roos<br/>
-										<small><i class="neutral-3">Male human developer</i><br/>
+										<small><i aria-hidden="true" class="neutral-3">Male human developer</i><br/>
 										<i>Level {{ getAge('1987-06-11') }}</i></small>
 									</div>
 								</div>
@@ -119,7 +119,7 @@
 										>
 											<li>
 												<span class="skill">
-													<i :class="proficient ? 'fas' : 'far'" class="fa-circle mr-1" /> 
+													<i aria-hidden="true" :class="proficient ? 'fas' : 'far'" class="fa-circle mr-1" /> 
 													{{ skill }}
 												</span> 
 												<span class="score">

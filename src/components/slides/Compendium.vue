@@ -52,7 +52,7 @@
 			<!-- SHOW SELECTED RESULT -->
 			<div v-if="show">
 				<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">
-					<i class="fas fa-times red mr-1" />
+					<i aria-hidden="true" class="fas fa-times red mr-1" />
 					Close
 				</a>
 				<ViewMonster v-if="current == 'monsters'" :id="show" />

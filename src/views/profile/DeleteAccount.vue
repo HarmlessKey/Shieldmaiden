@@ -23,14 +23,14 @@
 				placeholder="password" 
 				name="password"
 			/>
-			<button class="btn btn-block mt-3" @click="signIn()">Sign In <i class="fas fa-sign-in-alt"></i></button>
+			<button class="btn btn-block mt-3" @click="signIn()">Sign In <i aria-hidden="true" class="fas fa-sign-in-alt"></i></button>
 		</form>
 		<a class="btn btn-block google my-3" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
 		</div>
 
 		<div class="d-flex justify-content-center">
-			<router-link class="btn bg-neutral-4 mr-2" to="/profile"><i class="fas fa-times"></i> Cancel</router-link>
-			<a v-if="!credentials" class="btn bg-red" @click="deleteUser()"><i class="fas fa-trash-alt"></i> Permanently Remove account</a>
+			<router-link class="btn bg-neutral-4 mr-2" to="/profile"><i aria-hidden="true" class="fas fa-times"></i> Cancel</router-link>
+			<a v-if="!credentials" class="btn bg-red" @click="deleteUser()"><i aria-hidden="true" class="fas fa-trash-alt"></i> Permanently Remove account</a>
 		</div>
 	</div>
 </template>

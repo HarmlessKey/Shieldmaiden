@@ -2,7 +2,7 @@
 	<div v-if="campPlayers && campPlayers && players && npcs && (health.curHp > 0 || entity.entityType == 'npc')">
 		<span class="hp">
 			<span v-if="isTransformed(entity, camp_data)" class="mr-1">
-				<i class="fas fa-paw-claws mr-2"></i>
+				<i aria-hidden="true" class="fas fa-paw-claws mr-2"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Transformed
 				</q-tooltip>
@@ -26,15 +26,15 @@
 	</div>
 	<div v-else>
 		<div v-if="camp_data.stable" class="green">
-			<span><i class="fas fa-fist-raised"></i> Stable</span>
+			<span><i aria-hidden="true" class="fas fa-fist-raised"></i> Stable</span>
 		</div>
 		<div v-else-if="camp_data.dead" class="red">
-			<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+			<span><i aria-hidden="true" class="fas fa-skull-crossbones"></i> Dead</span>
 		</div>
 		<div v-else class="hp d-flex justify-content-start">
 			<div v-for="(check, key) in camp_data.saves" v-bind:key="key" class="mr-1">
-				<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
-				<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
+				<span v-show="check == 'succes'" class="save green"><i aria-hidden="true" class="fas fa-check"></i></span> 
+				<span v-show="check == 'fail'" class="save red"><i aria-hidden="true" class="fas fa-times"></i></span>
 			</div>
 		</div>
 	</div>

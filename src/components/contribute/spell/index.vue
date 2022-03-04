@@ -5,18 +5,18 @@
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
 			<span v-if="canEdit()">
 				<router-link :to="'/contribute/spells/' + spellId + '/edit'" class="mx-2">
-					<i class="fas fa-pencil-alt"></i>
+					<i aria-hidden="true" class="fas fa-pencil-alt"></i>
 					<q-tooltip anchor="center right" self="center left">
 						Edit
 					</q-tooltip>
 				</router-link>
-				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'neutral-2': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
+				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'neutral-2': !spell.checked, 'green': spell.checked}"><i aria-hidden="true" class="fas fa-check"></i> Item checked</a> -->
 			</span>
 		</h2>
 
 			<!-- SHOW THE OLD SPELL IF SPELL IS NOT CHANGED YET -->
 			<template v-if="oldSpell.school && !spell.changed">
-				<i class="mb-3 d-block">
+				<i aria-hidden="true" class="mb-3 d-block">
 					{{ levels[oldSpell.level] }}
 					{{ oldSpell.school.name }}
 				</i>
@@ -52,7 +52,7 @@
 			</template>
 			<template v-else-if="spell && spell.changed">
 				<!-- {{ spell }} -->
-				<i class="mb-3 d-block">
+				<i aria-hidden="true" class="mb-3 d-block">
 					{{ levels[spell.level] }}
 					{{ spell.school }}
 				</i>

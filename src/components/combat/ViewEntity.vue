@@ -184,10 +184,10 @@
 						<span class="playerSkill">
 							<span class="truncate">
 								<template v-if="entity.skills && entity.skills.includes(key)">
-									<i v-if="entity.skills_expertise && entity.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
-									<i v-else class="fas fa-circle"></i>
+									<i aria-hidden="true" v-if="entity.skills_expertise && entity.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+									<i aria-hidden="true" v-else class="fas fa-circle"></i>
 								</template>
-								<i v-else class="far fa-circle"></i>
+								<i aria-hidden="true" v-else class="far fa-circle"></i>
 								{{ skill.skill }}
 							</span>
 							<span>{{ skillModifier(skill, key) }}</span>
@@ -236,7 +236,7 @@
 						<template v-else>
 							{{ level | numeral('Oo') }} level ({{ entity.caster_spell_slots[level] }} slots):
 						</template>
-						<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
@@ -286,7 +286,7 @@
 						<template v-else>
 							{{ limit }}/day each:
 						</template>
-						<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
+						<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
@@ -315,7 +315,7 @@
 									: spendLimited('legendary_actions', 'legendaries_used')
 								"
 							>
-								<i class="far" :class="
+								<i aria-hidden="true" class="far" :class="
 									entity.limited_uses['legendary_actions'] && entity.limited_uses['legendary_actions'].legendaries_used >= i
 									? 'fa-dot-circle' : 'fa-circle'
 									"
@@ -409,7 +409,7 @@
 										>
 											Spend
 										</div>
-										<i v-else class="fas fa-ban neutral-2" />
+										<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
 									</template>
 									<div v-else class="slots">
 										<span 
@@ -422,7 +422,7 @@
 												: spendLimited(category, action_index)
 											"
 										>
-											<i class="far" :class="
+											<i aria-hidden="true" class="far" :class="
 												entity.limited_uses[category] && entity.limited_uses[category][action_index] >= i
 												? 'fa-dot-circle' : 'fa-circle'
 												"
@@ -442,7 +442,7 @@
 						<div v-if="is_current && action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'">
 							<span v-if="action.action_list[0].rolls">
 								<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${action_index}-${roll_index}`">
-									(<i :class="[
+									(<i aria-hidden="true" :class="[
 										action.action_list[0].type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
 										roll.damage_type
 										]" /> 

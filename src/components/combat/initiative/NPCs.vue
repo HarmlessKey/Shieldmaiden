@@ -16,7 +16,7 @@
 						'color': entity.color_label ? entity.color_label : ``
 					}"
 				>
-					<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
 				</span>
 				<div class="truncate">
 					<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
@@ -24,7 +24,7 @@
 				
 				<div class="actions">
 					<a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'combat/ViewEntity', data: entity })">
-						<i class="fas fa-info"></i>
+						<i aria-hidden="true" class="fas fa-info"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Show info
 						</q-tooltip>
@@ -60,7 +60,7 @@
 				@roll="(selected.length === 0) ? rollAll($event) : rollGroup($event)"
 			>
 				<a class="btn btn-block">
-					<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
+					<i aria-hidden="true" class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
 				</a>
 			</hk-roll>
 		</div>

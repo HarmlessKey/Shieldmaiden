@@ -43,7 +43,7 @@
 			<h3>
 				Rolls
 				<a @click="addRoll">
-					<i class="fas fa-plus green" />
+					<i aria-hidden="true" class="fas fa-plus green" />
 				</a>
 			</h3>
 			
@@ -74,7 +74,7 @@
 					/>
 
 					<a v-if="index > 0" class="remove" @click="removeRoll(index)">
-						<i class="fas fa-trash-alt" />
+						<i aria-hidden="true" class="fas fa-trash-alt" />
 					</a>
 				</div>
 

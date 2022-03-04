@@ -31,7 +31,7 @@
 							show: true,
 							type: 'slides/party/health'
 						})">
-						<i class="fas fa-heart"></i>
+						<i aria-hidden="true" class="fas fa-heart"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit Group Health
 						</q-tooltip>
@@ -54,7 +54,7 @@
 							show: true,
 							type: 'slides/party/Inventory'
 						})">
-						<i class="fas fa-treasure-chest"></i>
+						<i aria-hidden="true" class="fas fa-treasure-chest"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Party Inventory
 						</q-tooltip>
@@ -67,7 +67,7 @@
 						show: true,
 						type: 'slides/party/ViewInventory'
 					})">
-						<i class="fas fa-treasure-chest mr-1"></i>
+						<i aria-hidden="true" class="fas fa-treasure-chest mr-1"></i>
 						{{ Object.keys(campaign.inventory.items).length }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Party Inventory
@@ -86,36 +86,36 @@
 			</div>
 			<div class="col header name"></div>
 			<div class="col header text-center pp" v-if="userSettings.general && userSettings.general.passive_perception === undefined && !is_small">
-				<i class="fas fa-eye"></i>
+				<i aria-hidden="true" class="fas fa-eye"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive perception
 				</q-tooltip>
 			</div>
 			<div class="col header text-center pinv" v-if="userSettings.general && userSettings.general.passive_investigation === undefined && !is_small">
-				<i class="fas fa-search"></i>
+				<i aria-hidden="true" class="fas fa-search"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive investigation
 				</q-tooltip>
 			</div>
 			<div class="col header text-center pins" v-if="userSettings.general && userSettings.general.passive_insight === undefined && !is_medium">
-				<i class="fas fa-lightbulb-on"></i>
+				<i aria-hidden="true" class="fas fa-lightbulb-on"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive insight
 				</q-tooltip>
 			</div>
 			<div class="col header text-center save" v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium">
-				<i class="fas fa-hand-holding-magic"></i>
+				<i aria-hidden="true" class="fas fa-hand-holding-magic"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Save DC
 				</q-tooltip>
 			</div>
 			<div class="col header text-center">
-				<i class="fas fa-heart"></i>
+				<i aria-hidden="true" class="fas fa-heart"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Health
 				</q-tooltip>
 			</div>
-			<div class="col header text-right" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
+			<div class="col header text-right" v-if="viewerIsUser"><i aria-hidden="true" class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in campaign.players">
 				<template v-if="players[key] && player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
@@ -125,15 +125,15 @@
 						:style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"
 					>
 						<div class="transformed" v-if="player.transformed">
-							<i class="fas fa-paw-claws green"></i>
+							<i aria-hidden="true" class="fas fa-paw-claws green"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Transformed
 							</q-tooltip>
 						</div>
-						<i v-if="!players[key].avatar" class="hki-player" />
+						<i aria-hidden="true" v-if="!players[key].avatar" class="hki-player" />
 					</div>
 					<div class="col ac" :key="'ac-'+key">
-						<i class="fas fa-shield" ></i>
+						<i aria-hidden="true" class="fas fa-shield" ></i>
 						<span 
 							v-if="player.ac_bonus"
 							class="value" 
@@ -184,15 +184,15 @@
 					<div class="col health" :key="'health-'+key">
 						<template v-if="player.curHp <= 0">
 							<div v-if="player.stable" class="green">
-								<span><i class="fas fa-fist-raised"></i> Stable</span>
+								<span><i aria-hidden="true" class="fas fa-fist-raised"></i> Stable</span>
 							</div>
 							<div v-else-if="player.dead" class="red">
-								<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+								<span><i aria-hidden="true" class="fas fa-skull-crossbones"></i> Dead</span>
 							</div>
 							<div v-else class="saves d-flex justify-content-end">
 								<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
-									<span v-show="check === 'succes'" class="green"><i class="fas fa-check"></i></span> 
-									<span v-show="check === 'fail'" class="red"><i class="fas fa-times"></i></span>
+									<span v-show="check === 'succes'" class="green"><i aria-hidden="true" class="fas fa-check"></i></span> 
+									<span v-show="check === 'fail'" class="red"><i aria-hidden="true" class="fas fa-times"></i></span>
 								</div>
 							</div>
 						</template>
@@ -245,7 +245,7 @@
 								type: 'slides/EditPlayer',
 								data: { key, location: 'overview',}
 							})">
-							<i class="fas fa-pencil"></i>
+							<i aria-hidden="true" class="fas fa-pencil"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Edit player
 							</q-tooltip>
@@ -266,7 +266,7 @@
 		<hk-loader v-else name="players" />
 		<div slot="footer" v-if="viewerIsUser && page !== 'user'">
 			<button class="btn btn-block btn-square" @click="reset()">
-				<i class="fas fa-undo-alt"></i> Reset player health
+				<i aria-hidden="true" class="fas fa-undo-alt"></i> Reset player health
 			</button>
 		</div>
 		<q-resize-observer @resize="onResize" />

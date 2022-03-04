@@ -52,7 +52,7 @@
 						clickable v-close-popup 
 						@click="set_stable({key: entities[targeted[0]].key, action: 'set'})"
 					>
-						<q-item-section avatar><i class="fas fa-heartbeat"></i></q-item-section>
+						<q-item-section avatar><i aria-hidden="true" class="fas fa-heartbeat"></i></q-item-section>
 						<q-item-section>Stabilize</q-item-section>
 					</q-item>
 					<q-item 
@@ -60,14 +60,14 @@
 						clickable v-close-popup 
 						@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 					>
-						<q-item-section avatar><i class="fas fa-pencil"></i></q-item-section>
+						<q-item-section avatar><i aria-hidden="true" class="fas fa-pencil"></i></q-item-section>
 						<q-item-section>Edit</q-item-section>
 					</q-item>
 					<q-item 
 						clickable v-close-popup 
 						@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 					>
-						<q-item-section avatar><i class="fas fa-stopwatch"></i></q-item-section>
+						<q-item-section avatar><i aria-hidden="true" class="fas fa-stopwatch"></i></q-item-section>
 						<q-item-section>Reminders</q-item-section>
 					</q-item>
 					<q-item 
@@ -75,7 +75,7 @@
 						clickable v-close-popup 
 						@click="setSlide({show: true, type: 'slides/Transform', data: entities[targeted[0]]})"
 					>
-						<q-item-section avatar><i class="fas fa-paw-claws"></i></q-item-section>
+						<q-item-section avatar><i aria-hidden="true" class="fas fa-paw-claws"></i></q-item-section>
 						<q-item-section>Transform</q-item-section>
 					</q-item>
 					<q-item 
@@ -83,14 +83,14 @@
 						clickable v-close-popup 
 						@click="setHidden(entities[targeted[0]].key, !entities[targeted[0]].hidden)"
 					>
-						<q-item-section avatar><i :class="entities[targeted[0]].hidden ? 'fas fa-eye' : 'fas fa-eye-slash'"></i></q-item-section>
+						<q-item-section avatar><i aria-hidden="true" :class="entities[targeted[0]].hidden ? 'fas fa-eye' : 'fas fa-eye-slash'"></i></q-item-section>
 						<q-item-section>{{ entities[targeted[0]].hidden ? "Show" : "Hide" }}</q-item-section>
 					</q-item>
 					<q-item 
 						clickable v-close-popup 
 						@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entities[targeted[0]]})"
 					>
-						<q-item-section avatar><i class="fas fa-flame"></i></q-item-section>
+						<q-item-section avatar><i aria-hidden="true" class="fas fa-flame"></i></q-item-section>
 						<q-item-section>Conditions</q-item-section>
 					</q-item>
 					<q-separator />
@@ -99,7 +99,7 @@
 						clickable
 						@click="remove(entities[targeted[0]].key, entities[targeted[0]].name)"
 					>
-						<q-item-section avatar><i class="fas fa-trash-alt red"></i></q-item-section>
+						<q-item-section avatar><i aria-hidden="true" class="fas fa-trash-alt red"></i></q-item-section>
 						<q-item-section>Remove</q-item-section>
 					</q-item>
 				</q-list>

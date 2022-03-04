@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2 class="d-flex justify-content-between">
-			<span><i class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
+			<span><i aria-hidden="true" class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
 			<a 
 				class="neutral-2 text-capitalize" 
 				@click="add_effect()"
 			>
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 				<q-tooltip anchor="center right" self="center left">
 					Add effect
@@ -29,7 +29,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a @click="remove_effect(eff_index)" class="neutral-2 text-capitalize">
-							<i class="fas fa-trash-alt red"></i>
+							<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove effect
 							</q-tooltip>
@@ -113,7 +113,7 @@
 									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(eff_index)"
 								>
-									<i class="fas fa-plus green"></i>
+									<i aria-hidden="true" class="fas fa-plus green"></i>
 									<q-tooltip anchor="center right" self="center left">
 										Add level tier
 									</q-tooltip>
@@ -180,7 +180,7 @@
 										/>
 
 										<a @click="remove_level_tier(eff_index, tier_index)" class="remove">
-											<i class="fas fa-trash-alt red"></i>
+											<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 											<q-tooltip anchor="center right" self="center left">
 												Remove
 											</q-tooltip>

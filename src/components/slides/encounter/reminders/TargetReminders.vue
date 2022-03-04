@@ -38,7 +38,7 @@
 						:class="'bg-'+reminder.color">
 						<div class="title">{{ reminder.title }}</div>
 						<a class="green add" @click="addReminder('premade', reminder)">
-							<i class="fas fa-plus"></i>
+							<i aria-hidden="true" class="fas fa-plus"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Set
 							</q-tooltip>
@@ -57,7 +57,7 @@
 									@click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)"
 									:class="{ open: varOptions === key }"
 								>
-									<i :class="reminder.variables ? 'fas fa-chevron-down' : 'fas fa-plus green'"></i>
+									<i aria-hidden="true" :class="reminder.variables ? 'fas fa-chevron-down' : 'fas fa-plus green'"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Set
 									</q-tooltip>
@@ -90,7 +90,7 @@
 											:disabled="!valid"
 											class="btn btn-sm btn-clear"
 										>
-											<i class="fas fa-plus green"></i> Add reminder
+											<i aria-hidden="true" class="fas fa-plus green"></i> Add reminder
 										</a>
 									</ValidationObserver>
 								</div>

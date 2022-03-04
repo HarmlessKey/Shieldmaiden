@@ -56,7 +56,7 @@
 										<div v-if="action.toHit" class="result toHit">
 											<span class="roll">
 												<span class="mr-1 neutral-2">
-													<i class="hki-sword-break" />
+													<i aria-hidden="true" class="hki-sword-break" />
 													<q-tooltip anchor="top middle" self="center middle">
 														To hit roll
 													</q-tooltip>
@@ -71,8 +71,8 @@
 
 										<div v-for="(roll, roll_index) in action.rolls" class="result " :key="`action-roll-${roll_index}`">
 											<span class="roll">
-												<i v-if="action.type === 'healing'" class="fas fa-heart green" />
-												<i v-else-if="roll.damage_type" :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
+												<i aria-hidden="true" v-if="action.type === 'healing'" class="fas fa-heart green" />
+												<i aria-hidden="true" v-else-if="roll.damage_type" :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
 												{{ roll.roll }}
 											</span>
 											<span class="total" :class="(action.type === 'healing') ? 'green' : roll.damage_type">

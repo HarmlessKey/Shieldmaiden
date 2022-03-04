@@ -4,12 +4,12 @@
 			class="componentHeader d-flex justify-content-between" 
 			:class="{ shadow : setShadow > 0 }">
 			<span>
-				<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+				<i aria-hidden="true" class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
 			</span>
 			<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 				v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 				class="btn btn-sm bg-neutral-5">
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="ml-1">
 					Add
 					<span v-if="showKeybinds.keyBinds === undefined" class="d-none d-sm-inline">[a]</span>
@@ -27,7 +27,7 @@
 			>
 				<template v-for="{group, targets} in groups">
 					<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
-						<i v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
+						<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
 					</h2>
 					<transition-group
 						:key="group"
@@ -79,7 +79,7 @@
 								<a class="btn btn-sm btn-clear mx-1" 
 									v-if="entity.addNextRound"
 									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
-									<i class="fas fa-check green"></i>
+									<i aria-hidden="true" class="fas fa-check green"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Will be added next round
 									</q-tooltip>
@@ -87,21 +87,21 @@
 								<a class="btn btn-sm btn-clear mx-1" 
 									v-if="!entity.addNextRound"
 									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
-									<i class="fas fa-check neutral-2"></i>
+									<i aria-hidden="true" class="fas fa-check neutral-2"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Click to add next round
 									</q-tooltip>
 								</a>
 								<a class="btn btn-sm bg-neutral-5" 
 									@click="add_next_round({key: entity.key, action: 'set'})">
-									<i class="fas fa-arrow-up"></i>
+									<i aria-hidden="true" class="fas fa-arrow-up"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Add now
 									</q-tooltip>
 								</a>
 							</div>
 							<a class="options">
-								<i class="fal fa-ellipsis-v"></i>
+								<i aria-hidden="true" class="fal fa-ellipsis-v"></i>
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'" anchor="bottom right" self="top right" :breakpoint="576">
 									<target-menu :entity="entity" />
 								</q-popup-proxy>

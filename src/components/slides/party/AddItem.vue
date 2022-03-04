@@ -2,7 +2,7 @@
 	<div>
 		<div class="mb-2">
 			<a class="btn btn-sm btn-clear" @click="cancel">
-				<i class="fas fa-times red mr-1" />
+				<i aria-hidden="true" class="fas fa-times red mr-1" />
 				Cancel
 			</a>
 		</div>
@@ -48,14 +48,14 @@
 				<div class="linked mb-3">
 					<LinkedItem v-if="item.linked_item" :linked-item="item.linked_item">
 						<a class="btn btn-sm bg-neutral-5 mr-2" @click="item.linked_item = null">
-							<i class="fas fa-unlink red" />
+							<i aria-hidden="true" class="fas fa-unlink red" />
 							<q-tooltip anchor="top middle" self="center middle">
 								Unlink
 							</q-tooltip>
 						</a>
 					</LinkedItem>
 					<a v-else class="btn bg-neutral-5" @click="link_dialog = true">
-						<i class="fas fa-link mr-1" /> Link item
+						<i aria-hidden="true" class="fas fa-link mr-1" /> Link item
 					</a>
 				</div>
 

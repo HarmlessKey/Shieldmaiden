@@ -1,7 +1,7 @@
 <template>
 	<div v-if="!loading">
 		<h2 class="mb-1">{{ spell.name }}</h2>
-		<i class="mb-3 d-block">
+		<i aria-hidden="true" class="mb-3 d-block">
 			<template v-if="spell.level > 0">
 				{{ spell.level | numeral("oO") }} level
 			</template>

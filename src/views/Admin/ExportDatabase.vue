@@ -18,7 +18,7 @@
 				:options="refs"
 			/>
 			<a class="btn bnt-large" @click="downloadJson()" :disabled="!ref || loading">
-				<i class="fas fa-file-download" />
+				<i aria-hidden="true" class="fas fa-file-download" />
 				{{ ref ? `Download ${ref}` : "Select a reference" }}
 			</a>
 			<span v-if="loading" class="ml-3">

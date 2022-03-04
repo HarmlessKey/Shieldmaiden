@@ -17,7 +17,7 @@
 					<q-list @click="setSideSmallScreen(false)">
 						<q-item clickable v-ripple to="/content/campaigns">
 							<q-item-section avatar>
-								<i class="fas fa-dungeon"></i>
+								<i aria-hidden="true" class="fas fa-dungeon"></i>
 							</q-item-section>
 							<q-item-section class="title">Campaigns</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -26,7 +26,7 @@
 						</q-item>
 						<q-item clickable v-ripple to="/content/players">
 							<q-item-section avatar>
-								<i class="fas fa-users"></i>
+								<i aria-hidden="true" class="fas fa-users"></i>
 							</q-item-section>
 							<q-item-section class="title">Players</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -35,7 +35,7 @@
 						</q-item>
 						<q-item clickable v-ripple to="/content/npcs">
 							<q-item-section avatar>
-								<i class="fas fa-dragon"></i>
+								<i aria-hidden="true" class="fas fa-dragon"></i>
 							</q-item-section>
 							<q-item-section class="title">NPC's</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -44,7 +44,7 @@
 						</q-item>
 						<q-item clickable v-ripple to="/content/reminders">
 							<q-item-section avatar>
-								<i class="fas fa-stopwatch"></i>
+								<i aria-hidden="true" class="fas fa-stopwatch"></i>
 							</q-item-section>
 							<q-item-section class="title">Reminders</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -53,7 +53,7 @@
 						</q-item>
 						<q-item clickable v-ripple to="/content/items">
 							<q-item-section avatar>
-								<i class="fas fa-staff"></i>
+								<i aria-hidden="true" class="fas fa-staff"></i>
 							</q-item-section>
 							<q-item-section class="title">Items</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -66,7 +66,7 @@
 					<q-list @click="setSideSmallScreen(false)">
 						<q-item clickable v-ripple to="/content/characters">
 							<q-item-section avatar>
-								<i class="fas fa-helmet-battle"></i>
+								<i aria-hidden="true" class="fas fa-helmet-battle"></i>
 							</q-item-section>
 							<q-item-section class="title">Characters</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -75,7 +75,7 @@
 						</q-item>
 						<q-item clickable v-ripple to="/content/followed">
 							<q-item-section avatar>
-								<i class="fas fa-user-check"></i>
+								<i aria-hidden="true" class="fas fa-user-check"></i>
 							</q-item-section>
 							<q-item-section class="title">Followed users</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -89,7 +89,7 @@
 					<q-list @click="setSideSmallScreen(false)">
 						<q-item clickable v-ripple to="/sign-in" color="primary">
 							<q-item-section avatar>
-								<i class="fas fa-sign-in"></i>
+								<i aria-hidden="true" class="fas fa-sign-in"></i>
 							</q-item-section>
 							<q-item-section class="title">Sign in</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -98,7 +98,7 @@
 						</q-item>
 						<q-item clickable v-ripple to="/sign-up" color="primary">
 							<q-item-section avatar>
-								<i class="fas fa-user-plus"></i>
+								<i aria-hidden="true" class="fas fa-user-plus"></i>
 							</q-item-section>
 							<q-item-section class="title">Create account</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -112,7 +112,7 @@
 				<q-list @click="setSideSmallScreen(false)">
 					<q-item clickable v-ripple to="/compendium">
 						<q-item-section avatar>
-							<i class="fas fa-book-spells"></i>
+							<i aria-hidden="true" class="fas fa-book-spells"></i>
 						</q-item-section>
 						<q-item-section class="title">Compendium</q-item-section>
 						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -121,7 +121,7 @@
 					</q-item>
 					<q-item clickable v-ripple to="/feedback">
 						<q-item-section avatar>
-							<i class="fas fa-comment-alt"></i>
+							<i aria-hidden="true" class="fas fa-comment-alt"></i>
 						</q-item-section>
 						<q-item-section class="title">Feedback</q-item-section>
 						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -130,7 +130,7 @@
 					</q-item>
 					<q-item clickable v-ripple to="/documentation">
 						<q-item-section avatar>
-							<i class="fas fa-file"></i>
+							<i aria-hidden="true" class="fas fa-file"></i>
 						</q-item-section>
 						<q-item-section class="title">Documentation</q-item-section>
 						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -139,7 +139,7 @@
 					</q-item>
 					<q-item clickable v-ripple to="/about-us">
 						<q-item-section avatar>
-							<i class="fas fa-user-friends"></i>
+							<i aria-hidden="true" class="fas fa-user-friends"></i>
 						</q-item-section>
 						<q-item-section class="title">About us</q-item-section>
 						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
@@ -158,7 +158,7 @@
 						:key="name"
 					>
 						<q-item-section avatar>
-							<i :class="icon"></i>
+							<i aria-hidden="true" :class="icon"></i>
 						</q-item-section>
 						<q-item-section class="title">{{ name }} </q-item-section>
 						<q-tooltip v-if="$store.getters.side_collapsed" anchor="center right" self="center left">
@@ -168,7 +168,7 @@
 				</q-list>
 			</div>
 			<div id="toggle-width" @click="toggleSideCollapsed()">
-				<i class="far fa-angle-left"></i>
+				<i aria-hidden="true" class="far fa-angle-left"></i>
 			</div>
 		</div>
 	</transition>

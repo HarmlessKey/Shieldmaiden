@@ -41,7 +41,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a v-if="!disabledCustom.includes(result.key)" class="btn btn-sm bg-neutral-5" @click="copy(copy_resource === 'custom' ? result.key : result._id)">
-							<i class="fas" :class="`fa-${button}`"/>
+							<i aria-hidden="true" class="fas" :class="`fa-${button}`"/>
 						</a>
 					</q-item-section>
 				</q-item>

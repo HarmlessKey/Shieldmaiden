@@ -2,13 +2,13 @@
 	<div>
 		<h2 class="d-flex justify-content-between">
 			<span>
-				<i class="fas fa-flame"/> Conditions <template v-if="conditions">( {{conditions.length }} )</template>
+				<i aria-hidden="true" class="fas fa-flame"/> Conditions <template v-if="conditions">( {{conditions.length }} )</template>
 			</span>
 			<a 
 				class="neutral-2 text-capitalize" 
 				@click="add_condition()"
 			>
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 				<q-tooltip anchor="top middle" self="center middle">
 					Add condition
@@ -29,7 +29,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a @click="remove_condition(con_index)" class="remove">
-							<i class="fas fa-trash-alt red" />
+							<i aria-hidden="true" class="fas fa-trash-alt red" />
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove
 							</q-tooltip>
@@ -186,7 +186,7 @@
 									v-if="level_tier_addable(con_index)"
 									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(con_index)">
-										<i class="fas fa-plus green"></i>
+										<i aria-hidden="true" class="fas fa-plus green"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add level tier
 										</q-tooltip>
@@ -256,7 +256,7 @@
 												@keyup="$forceUpdate()"
 											/>
 											<a @click="remove_level_tier(con_index, tier_index)" class="remove">
-												<i class="fas fa-trash-alt red"></i>
+												<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Remove
 												</q-tooltip>

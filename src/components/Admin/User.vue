@@ -3,7 +3,7 @@
 		<hk-card>
 			<div class="card-header">
 				<span>
-					<i :class="{ 'green': status.state == 'online', 'neutral-3': status.state == 'offline' }" class="fas fa-circle"></i>
+					<i aria-hidden="true" :class="{ 'green': status.state == 'online', 'neutral-3': status.state == 'offline' }" class="fas fa-circle"></i>
 					{{ user.username }}
 				</span>
 				<router-link :to="'/user/' + id">
@@ -13,7 +13,7 @@
 			<div class="card-body">
 				<p>{{ user.email }}</p>
 				<p v-if="user.patreon_email">patron: {{ user.patreon_email }}</p>
-				<p><i class="neutral-3">{{ id }}</i></p>
+				<p><i aria-hidden="true" class="neutral-3">{{ id }}</i></p>
 			</div>
 		</hk-card>
 

@@ -3,8 +3,8 @@
 		<div id="login">
 			<img class="logo" src="../../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key"/>
 			<h2>Reset password</h2>
-			<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
-			<p v-if="success" class="green"><i class="fas fa-check"></i> {{ success }}</p>
+			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
+			<p v-if="success" class="green"><i aria-hidden="true" class="fas fa-check"></i> {{ success }}</p>
 			<q-input 
 				:dark="$store.getters.theme === 'dark'" filled square dense
 				autocomplete="off" 
@@ -14,7 +14,7 @@
 				label="Email" 
 				class="email"
 			/>
-			<button class="btn btn-block mt-3" @click="resetPassword()">Reset password <i class="fas fa-redo fa-flip-horizontal"></i></button>
+			<button class="btn btn-block mt-3" @click="resetPassword()">Reset password <i aria-hidden="true" class="fas fa-redo fa-flip-horizontal"></i></button>
 
 			<div class="text-center mt-3"><small><router-link to="/sign-in">Sign in.</router-link></small></div>
 		</div>

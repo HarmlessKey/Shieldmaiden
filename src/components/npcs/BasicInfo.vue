@@ -37,7 +37,7 @@
 				<!-- AVATAR -->
 				<div class="avatar mb-2">
 					<div class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }">
-						<i v-if="!npc.avatar" class="hki-monster" />
+						<i aria-hidden="true" v-if="!npc.avatar" class="hki-monster" />
 					</div>
 					<div>
 						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">

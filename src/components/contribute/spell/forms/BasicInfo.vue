@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header d-flex justify-content-between">
 			<span>Basic Info</span>
 			<a @click="setSlide({ show: true, type: 'ViewSpell', data: spell })">
-				<i class="fas fa-eye"></i>
+				<i aria-hidden="true" class="fas fa-eye"></i>
 			</a>
 		</div>
 		

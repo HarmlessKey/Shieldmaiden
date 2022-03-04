@@ -2,11 +2,11 @@
 	<div id="current" class="bg-neutral-6-transparent" v-if="current">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 			<span>
-				<i v-if="current.hidden" class="fas fa-eye-slash red"></i>
+				<i aria-hidden="true" v-if="current.hidden" class="fas fa-eye-slash red"></i>
 				{{ current.name.capitalizeEach() }}
 			</span>		
 			<a class="btn btn-sm bg-neutral-5" @click="setShowCard">
-				<i :class="showCard ? 'fas fa-swords' : 'fas fa-eye'"/>
+				<i aria-hidden="true" :class="showCard ? 'fas fa-swords' : 'fas fa-eye'"/>
 				<q-tooltip anchor="top middle" self="center middle">
 					{{ showCard ? "Show actions" : "Show monster card" }}
 				</q-tooltip>

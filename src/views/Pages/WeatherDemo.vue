@@ -3,7 +3,7 @@
 	<div class="menu">
 		<div class="left">
 			<router-link :to="prevRoute" class="ml-1 btn btn-sm btn-clear">
-				<i class="fas fa-chevron-left" />
+				<i aria-hidden="true" class="fas fa-chevron-left" />
 				Back
 			</router-link>
 			<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
@@ -16,12 +16,12 @@
 		</div>
 		<div class="right">
 			<!-- <a @click="audio = !audio">
-				<i :class="audio ? 'fas fa-volume-up' : 'fas fa-volume-mute'" />
+				<i aria-hidden="true" :class="audio ? 'fas fa-volume-up' : 'fas fa-volume-mute'" />
 			</a>
 			<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-3" /> -->
 			<q-btn-dropdown stretch no-caps flat :dark="$store.getters.theme === 'dark'" square>
 				<template #label>
-					<i class="fas fa-cloud" />
+					<i aria-hidden="true" class="fas fa-cloud" />
 					<span class="ml-1 d-none d-md-inline-block">Select effect</span>
 				</template>
 				<div class="bg-neutral-11 edit-weather">

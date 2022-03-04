@@ -12,7 +12,7 @@
 					</span>
 				</div>
 				<a class="btn btn-sm bg-neutral-5" @click="setDialog()">
-					<i class="fas fa-plus green"></i>
+					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Modifiers</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Skill modifiers
@@ -82,7 +82,7 @@
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							>
-								<i class="fas fa-check green saved" slot="append" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
+								<i aria-hidden="true" class="fas fa-check green saved" slot="append" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
 							</q-input>
 						</ValidationProvider>
 					</div>

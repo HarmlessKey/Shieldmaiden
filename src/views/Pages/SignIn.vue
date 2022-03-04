@@ -3,7 +3,7 @@
 		<div id="login">
 			<img class="logo" src="../../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key"/>
 			<h2>Sign in</h2>
-			<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
+			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 			<form v-on:submit.prevent>
 				<q-input 
 					:dark="$store.getters.theme === 'dark'" filled square dense
@@ -22,7 +22,7 @@
 					placeholder="password" 
 					name="password"
 				/>
-				<button class="btn btn-block mt-3" @click="signIn()">Sign In <i class="fas fa-sign-in-alt"></i></button>
+				<button class="btn btn-block mt-3" @click="signIn()">Sign In <i aria-hidden="true" class="fas fa-sign-in-alt"></i></button>
 			</form>
 			<a class="btn btn-block google my-2" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
 

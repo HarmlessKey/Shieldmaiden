@@ -7,7 +7,7 @@
 		<ul class="entities hasImg">
 			<template v-for="(item, index) in items">
 				<li v-if="userInfo.contribute.includes(item.url)" :key="index">
-					<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path.replace(/\/$/, '')+'/'+item.url">{{ item.name }}</router-link>
+					<i aria-hidden="true" class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path.replace(/\/$/, '')+'/'+item.url">{{ item.name }}</router-link>
 				</li>
 			</template>
 		</ul>

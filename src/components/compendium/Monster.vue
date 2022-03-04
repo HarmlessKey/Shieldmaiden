@@ -179,10 +179,10 @@
 					<span class="skill">
 						<span class="truncate">
 							<template v-if="monster.skills && monster.skills.includes(key)">
-								<i v-if="monster.skills_expertise && monster.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
-								<i v-else class="fas fa-circle"></i>
+								<i aria-hidden="true" v-if="monster.skills_expertise && monster.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+								<i aria-hidden="true" v-else class="fas fa-circle"></i>
 							</template>
-							<i v-else class="far fa-circle"></i>
+							<i aria-hidden="true" v-else class="far fa-circle"></i>
 							{{ skill.skill }}
 						</span>
 						<span>{{ skillModifier(skill.ability, key) }}</span>
@@ -213,7 +213,7 @@
 							<template v-else>
 								{{ level | numeral('Oo') }} level ({{ monster.caster_spell_slots[level] }} slots):
 							</template>
-							<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+							<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 								<hk-popover>
 									{{ spell.name }}
 									<template #content>
@@ -246,7 +246,7 @@
 							<template v-else>
 								{{ limit }}/day each:
 							</template>
-							<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
+							<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
 								<hk-popover>
 								{{ spell.name }}
 								<template #content>

@@ -35,7 +35,7 @@
 										: spendLimited('legendary_actions', 'legendaries_used')
 									"
 								>
-									<i class="far" :class="
+									<i aria-hidden="true" class="far" :class="
 										current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
 										? 'fa-dot-circle' : 'fa-circle'
 										"
@@ -73,7 +73,7 @@
 											<!-- Rolls -->
 											<span v-if="action.action_list[0].rolls">
 												<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${action_index}-${roll_index}`">
-													(<i :class="[
+													(<i aria-hidden="true" :class="[
 														action.action_list[0].type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
 														roll.damage_type
 														]" /> 
@@ -184,7 +184,7 @@
 											>
 												Use
 											</div>
-											<i v-else class="fas fa-ban neutral-2" />
+											<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
 										</template>
 										<div v-else class="slots">
 											<span 
@@ -197,7 +197,7 @@
 													: spendLimited(type, action_index)
 												"
 											>
-												<i class="far" :class="
+												<i aria-hidden="true" class="far" :class="
 													current.limited_uses[type] && current.limited_uses[type][action_index] >= i
 													? 'fa-dot-circle' : 'fa-circle'
 													"

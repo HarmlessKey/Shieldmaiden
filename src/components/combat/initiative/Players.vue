@@ -8,7 +8,7 @@
 						'background-image': 'url(' + entity.img + ')',
 						'border-color': entity.color_label ? entity.color_label : ``
 					}">
-						<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+						<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
 					</span>
 				<div class="truncate">
 					{{ entity.name }}
@@ -19,7 +19,7 @@
 						<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
 					</div>
 					<a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: [entity.key] })">
-						<i class="fas fa-pencil"></i>
+						<i aria-hidden="true" class="fas fa-pencil"></i>
 					</a>
 					<q-input 
 						:dark="$store.getters.theme === 'dark'" filled square dense

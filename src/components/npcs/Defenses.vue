@@ -19,7 +19,7 @@
 						>
 							<template slot="prepend">
 								<div class="defense" :class="type">
-									<i class="fas fa-shield"></i>
+									<i aria-hidden="true" class="fas fa-shield"></i>
 									<span>
 										{{ type === "damage_vulnerabilities" ? "V" : type === "damage_resistances" ? "R" : "I" }}
 									</span>
@@ -56,7 +56,7 @@
 					name="condition_immunities" 
 				>
 					<template slot="prepend">
-						<i class="fas fa-fist-raised" />
+						<i aria-hidden="true" class="fas fa-fist-raised" />
 					</template>
 					<template v-slot:option="scope">
 						<q-item
@@ -66,7 +66,7 @@
 							@click="setCondition(scope.opt)"
 						>
 							<q-item-section avatar>
-								<i :class="`hki-${scope.opt}`" />
+								<i aria-hidden="true" :class="`hki-${scope.opt}`" />
 							</q-item-section>
 							<q-item-section>
 								<q-item-label v-html="scope.opt.capitalize()"/>

@@ -27,7 +27,7 @@
 							'color': npc.color_label ? npc.color_label : ``
 						}"
 					>
-						<i v-if="!npc.avatar" class="hki-monster" />
+						<i aria-hidden="true" v-if="!npc.avatar" class="hki-monster" />
 					</div>
 					<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
 						<q-input
@@ -80,7 +80,7 @@
 							:error-message="errors[0]"
 						>
 							<template v-slot:append>
-								<i class="fas fa-shield"/>
+								<i aria-hidden="true" class="fas fa-shield"/>
 							</template>
 						</q-input>
 					</ValidationProvider>

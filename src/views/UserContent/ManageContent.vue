@@ -2,10 +2,10 @@
 	<hk-card header="Manage your content">
 		<div class="card-body">
 			<template v-if="overencumbered">
-				<h3><i class="fas fa-box-full neutral-2" /> You're over encumbered</h3>
+				<h3><i aria-hidden="true" class="fas fa-box-full neutral-2" /> You're over encumbered</h3>
 				<p>You can either delete some of your content, or get a subscription that allows for more.</p>
 				<router-link to="/patreon" class="btn btn-block btn-lg bg-neutral-9 mt-2">
-					<i class="fab fa-patreon patreon-red mr-2" /> 
+					<i aria-hidden="true" class="fab fa-patreon patreon-red mr-2" /> 
 					{{ tier.name === "Free" ? "Get" : "Upgrade" }} supscription
 				</router-link>
 			</template>

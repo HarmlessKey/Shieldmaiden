@@ -19,7 +19,7 @@
 								:error-message="errors[0]"
 							/>
 							<p v-if="username" class="pl-1">
-								<i class="fas mr-1" :class="{'green fa-check': check == 'available', 'red fa-times': check === 'unavailable'}" />
+								<i aria-hidden="true" class="fas mr-1" :class="{'green fa-check': check == 'available', 'red fa-times': check === 'unavailable'}" />
 									<b>{{ username }}</b> is {{ check }}
 							</p>
 							<button 

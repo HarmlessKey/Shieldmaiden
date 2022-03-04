@@ -6,20 +6,20 @@
 			{{ patron.full_name }}
 			<span>
 				<a v-if="!edit" @click="setEdit(true)" class="mx-2">
-					<i class="fas fa-pencil-alt"></i>
+					<i aria-hidden="true" class="fas fa-pencil-alt"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Edit
 					</q-tooltip>
 				</a>
 				<a v-else @click="setEdit(false)" class="mx-2">
-					<i class="fas fa-times"></i>
+					<i aria-hidden="true" class="fas fa-times"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Cancel
 					</q-tooltip>
 				</a>
 			</span>
 		</h1>
-		<p><i class="neutral-2">{{ patron['.key'] }}</i></p>
+		<p><i aria-hidden="true" class="neutral-2">{{ patron['.key'] }}</i></p>
 
 		<template v-if="!edit">
 			<div class="row q-col-gutter-md mb-2">

@@ -13,7 +13,7 @@
 				:options="refs"
 			/>
 			<a class="btn bnt-large" @click="update()" :disabled="!ref || loading">
-				<i class="fas fa-file-edit" />
+				<i aria-hidden="true" class="fas fa-file-edit" />
 				{{ ref ? `Update ${ref}` : "Select a reference" }}
 			</a>
 			<span v-if="loading" class="ml-3">

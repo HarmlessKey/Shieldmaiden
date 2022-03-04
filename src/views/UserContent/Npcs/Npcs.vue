@@ -47,7 +47,7 @@
 								class="avatar"
 								:style="props.value ? `background-image: url('${props.value}')` : ''"
 							>
-								<i v-if="!props.value" class="hki-monster" />
+								<i aria-hidden="true" v-if="!props.value" class="hki-monster" />
 							</q-td>
 							<q-td v-else-if="props.col.name !== 'actions'">
 								<div  class="truncate-cell">
@@ -63,19 +63,19 @@
 							</q-td>
 							<q-td v-else class="text-right d-flex justify-content-between">
 								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i class="fas fa-pencil" />
+									<i aria-hidden="true" class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
-									<i class="fas fa-arrow-alt-down" />
+									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Download
 									</q-tooltip>
 								</a>
 								<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, props.key, props.row)">
-									<i class="fas fa-trash-alt" />
+									<i aria-hidden="true" class="fas fa-trash-alt" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Delete
 									</q-tooltip>
@@ -88,7 +88,7 @@
 				</template>
 
 				<router-link v-if="!npcs.length && !overencumbered" class="btn btn-lg bg-neutral-5" to="/content/npcs/add-npc">
-					<i class="fas fa-plus green mr-1" /> Create your first NPC
+					<i aria-hidden="true" class="fas fa-plus green mr-1" /> Create your first NPC
 				</router-link>
 				<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
 					Get more NPC slots

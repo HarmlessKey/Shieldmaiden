@@ -46,6 +46,11 @@
 						url: 'xml',
 						icon: 'fas fa-file-code',
 					},
+					'prerender': { 
+						name: 'Generate prerender paths JSON',
+						url: 'prerender',
+						icon: 'fas fa-brackets-curly',
+					},
 					'monster-update': { 
 						name: 'Update monsters',
 						url: 'monster-update',

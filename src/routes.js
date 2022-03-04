@@ -41,17 +41,18 @@ export const routes = [{
 			title: "D&D Combat Tracker"
 		}
 	},
-	{
-		path: '/home',
-		name: 'landingpage',
-		component: () => import('@/views/Home.vue'),
-		meta: {
-			sidebar: false,
-			offline: true,
-			description: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
-			title: "D&D Combat Tracker"
-		},
-	},
+	{ path: "/home", redirect: "/" },
+	// {
+	// 	path: '/home',
+	// 	name: 'landingpage',
+	// 	component: () => import('@/views/Home.vue'),
+	// 	meta: {
+	// 		sidebar: false,
+	// 		offline: true,
+	// 		description: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+	// 		title: "D&D Combat Tracker"
+	// 	},
+	// },
 
 	// CONTENT
 	{
@@ -603,6 +604,23 @@ export const routes = [{
 						path: "",
 						name: 'Generate XML',
 						component: () => import('@/views/Admin/GenerateXML.vue'),
+						meta: {
+							side: false
+						}
+					}
+				]
+			},
+			{
+				path: "prerender",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Generete prerender paths JSON"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Generate JSON',
+						component: () => import('@/views/Admin/GeneratePrerenderPaths.vue'),
 						meta: {
 							side: false
 						}

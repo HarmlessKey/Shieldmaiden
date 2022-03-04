@@ -199,7 +199,7 @@ export const monsterMixin = {
 
 				// Save proficiency
 				if(modifier) {
-					new_monster.skills.push(skill.value).value;
+					new_monster.skills.push(skill.value);
 
 					// Check for expertise
 					// If the modifier in old_monster is higher than the ability_mod + proficiency

@@ -296,7 +296,6 @@
 	#toggle-width {
 		background: $neutral-8;
 		height: 40px;
-		width: calc(100%);
 		position: fixed;
 		right: left;
 		bottom: 0;

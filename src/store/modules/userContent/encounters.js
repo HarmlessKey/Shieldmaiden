@@ -888,7 +888,7 @@ const mutations = {
     }
   },
   REMOVE_CAMPAIGN_ENCOUNTERS(state, campaignId) {
-    if(state.encounters[campaignId] && state.encounters[campaignId]) {
+    if(state.encounters && state.encounters[campaignId]) {
       Vue.delete(state.encounters, campaignId);
     }
   },

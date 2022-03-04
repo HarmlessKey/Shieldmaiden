@@ -60,7 +60,7 @@
 		grid-template-columns: 1fr max-content;
 		grid-template-rows: max-content;
 		padding: 20px;
-		box-shadow: 0px 0px 15px$black;
+		box-shadow: 0px 0px 15px $black;
 		transition: bottom .5s linear;
 		grid-gap: 20px;
 

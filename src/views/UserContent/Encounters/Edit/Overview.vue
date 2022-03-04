@@ -413,14 +413,13 @@
 			overflow: scroll;
 			z-index: 96;
 			background: $neutral-6;
-			overflow: scroll;
 			width: 300px;
 			transition: right .5s linear,
 			box-shadow .5s linear;
 
 			&.show {
 				right: 0;
-				box-shadow: 0 10px 15px$black;
+				box-shadow: 0 10px 15px $black;
 			}
 
 			h3.header {

@@ -93,7 +93,6 @@
 			height: 36px;
 			width: 100%;
 			z-index: 999;
-			position: relative;
 			display: flex;
 			justify-content: space-between;
 			line-height: 31px;

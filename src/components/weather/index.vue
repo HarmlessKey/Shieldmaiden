@@ -101,7 +101,6 @@ export default {
 			background-position: center top;
 			animation: imagezoom 30s ease-in-out infinite;
 			animation-direction: alternate-reverse;
-			overflow: hidden;
 
 			&.light {
 				animation: lightnings 360s linear infinite;

@@ -252,7 +252,6 @@
 	user-select: none;
 	height: 60px;
 	padding: 10px;
-	font-size: 15px;
 	line-height: 40px;
 	background: $neutral-8-transparent;
 	font-size: 20px;
@@ -338,43 +337,45 @@
 }
 
 @media only screen and (max-width: 576px) {
-	.live {
-		display: none;
-	}
-	.info {
-		display: block !important;
-	}
-	.edit {
-		color: $neutral-3;
-	}
-	.round-info {
-		.header {
-			margin-top: 17px;
+	#turns {
+		.live {
+			display: none;
 		}
-
-		.number { 
-			font-weight: bold;
-			font-size: 18px !important;
-			line-height: 18px !important;
+		.info {
+			display: block !important;
 		}
-	}
-	.timer {
-		display: flex;
-		flex-direction: row-reverse;
-		margin: 0;
-		font-size: 15px;
-		position: absolute;
-		line-height: 20px;
-		top: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		border-bottom: solid 1px $neutral-4;
-		padding: 0 10px;
-
-		i {
-			margin-right: 5px;
+		.edit {
+			color: $neutral-3;
+		}
+		.round-info {
+			.header {
+				margin-top: 17px;
+			}
+	
+			.number { 
+				font-weight: bold;
+				font-size: 18px !important;
+				line-height: 18px !important;
+			}
+		}
+		.timer {
+			display: flex;
+			flex-direction: row-reverse;
+			margin-right: 0;
+			font-size: 15px;
+			position: absolute;
 			line-height: 20px;
-			font-size: 12px;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			border-bottom: solid 1px $neutral-4;
+			padding: 0 10px;
+	
+			i {
+				margin-right: 5px;
+				line-height: 20px;
+				font-size: 12px;
+			}
 		}
 	}
 }

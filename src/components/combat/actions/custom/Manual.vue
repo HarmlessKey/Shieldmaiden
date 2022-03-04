@@ -203,7 +203,7 @@
 				}
 			},
 			calculateAmount(target, type) {
-				let value = this.manualAmount;
+				let value = parseInt(this.manualAmount);
 				value = value * this.multiplier[target];
 
 				if((!type || type === "damage") && this.resistances[target]) {
@@ -221,8 +221,6 @@
 					for(let i in this.targeted) {
 						let key = this.targeted[i];
 						let amount = {};
-						amount[type] = parseInt(this.manualAmount);
-
 						amount[type] = this.calculateAmount(key, type);
 
 						// Set config for HpManipulation and log

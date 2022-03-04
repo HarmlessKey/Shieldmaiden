@@ -153,8 +153,7 @@
 				"set_show_monster_card"
 			]),
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100);
-				return hp_percentage;
+				return Math.floor(current / max * 100);
 			},
 			setShowCard() {
 				const value = !this.showCard;

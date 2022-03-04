@@ -305,7 +305,6 @@
 </template>
 
 <script>
-	import OutOfSlots from "@/components/OutOfSlots.vue";
 	import Crumble from "@/components/crumble";
 	import PlayerLink from "@/components/PlayerLink.vue";
 	import Players from "@/components/campaign/Players.vue";
@@ -317,7 +316,6 @@
 		components: {
 			Crumble,
 			PlayerLink,
-			OutOfSlots,
 			Players
 		},
 		data() {

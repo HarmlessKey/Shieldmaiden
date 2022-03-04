@@ -351,7 +351,7 @@
 						<div class="condition bg-red" 
 							v-for="(condition, key) in entity.conditions" 
 							:key="key" 
-							@click="showCondition(key)">
+							@click.stop="showCondition(key)">
 							<q-tooltip anchor="top middle" self="center middle">
 								<i aria-hidden="true" :class="`hki-${key}`" />
 								{{ key.capitalize() }}
@@ -455,20 +455,16 @@
 				'display_maxHp'
 			]),
 			showCondition(key) {
-				//Stop other functions so target is not deselected
-				event.stopPropagation();
-
 				this.setSlide({
 					show: true, 
 					type: 'slides/encounter/Condition',
 					data: {
 						condition: key,
 						entity: this.entity
-				}})
+				}});
 			},
 			percentage(current, max) {
-				const hp_percentage = (current === 0) ? 0 : current / max;
-				return hp_percentage;
+				return (current === 0) ? 0 : current / max;
 			},
 			hpBarColor(percentage) {
 				if(percentage < 33) {

@@ -219,10 +219,9 @@
 				// Return an array with the keys of all players in the encounter
 				let entities = Object.values(this.encounter.entities);
 				let playerKeys = [];
-				let players = entities.filter( function(entity) {
+				let players = entities.filter((entity) => {
 					let entityType = entity.entityType;
-					entity = [];
-					return entityType === "player"
+					return entityType === "player";
 				});
 				for(let i in players) {
 					playerKeys.push(players[i].id);

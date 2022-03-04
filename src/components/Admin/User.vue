@@ -206,8 +206,8 @@
 			}
 		},
 		mounted() {
-			var characters = db.ref(`character_control/${this.id}`);
-			characters.on('value', async (snapshot) => {
+			var characters_ref = db.ref(`character_control/${this.id}`);
+			characters_ref.on('value', async (snapshot) => {
 				let characters = snapshot.val();
 				
 				//Get Players
@@ -216,24 +216,24 @@
 					characters[key].character_name = undefined;
 
 					let getPlayer = db.ref(`players/${userId}/${key}/character_name`);
-					getPlayer.on('value', (snapshot) => {
-						characters[key].character_name = snapshot.val()
+					getPlayer.on('value', (result) => {
+						characters[key].character_name = result.val()
 					});
 				}
 				this.characters = characters;
 				this.loading_characters = false;
 			});
 
-			var user = db.ref(`users/${this.id}`);
-			user.on('value', async (snapshot) => {
+			var user_ref = db.ref(`users/${this.id}`);
+			user_ref.on('value', async (snapshot) => {
 				let user = snapshot.val();
 				
 				let followed = {};
 				for(let key in user.follow) {
 					let getFollowed = db.ref(`users/${key}/username`);
 
-					await getFollowed.on('value', (snapshot) => {			
-						followed[key] = snapshot.val()
+					await getFollowed.on('value', (result) => {			
+						followed[key] = result.val()
 					});
 				}
 				user.followed = followed;

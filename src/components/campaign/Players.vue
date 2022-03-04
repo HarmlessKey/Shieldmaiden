@@ -17,7 +17,7 @@
 						<div v-if="coin" :key="key">
 							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>
 							<template v-else>{{ coin }} </template>
-							<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
+							<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
 						</div>
 					</template>
 				</template>
@@ -354,10 +354,11 @@
 				return colspan;
 			},
 			currency() {
-				return (this.campaign.inventory && this.campaign.inventory.currency) ? this.campaign.inventory.currency : {};
+				return (this.campaign.inventory && this.campaign.inventory.currency) ? this.campaign.inventory.currency : 0;
 			},
 			money() {
-				return this.copperToPretty(this.currency);
+				const currency = (this.campaign.inventory && this.campaign.inventory.currency) ? this.campaign.inventory.currency : 0;
+				return this.copperToPretty(currency);
 			}
 		},
 		
@@ -378,8 +379,7 @@
 				this.width = size.width;
 			},
 			percentage(current, max) {
-				var percentage = Math.floor(current / max * 100)
-				return percentage
+				return Math.floor(current / max * 100);
 			},
 			maxHp(maxHp, maxHpMod) {
 				return parseInt((maxHpMod) ? maxHp + maxHpMod : maxHp);

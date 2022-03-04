@@ -98,7 +98,13 @@
 			...mapGetters("npcs", ["npcs"]),
 			...mapGetters("items", ["items"]),
 			custom_content() {
-				return (this.type === "monster") ? this.npcs : (this.type === "item") ? this.items : [];
+				let content = [];
+				if(this.type === "monster") {
+					content = this.npcs;
+				} else if(this.type === "item") {
+					content = this.items;
+				}
+				return content;
 			},
 			copy_resource: {
 				get() {
@@ -152,39 +158,20 @@
 					} 
 					// API
 					else {
-						// Monsters
-						if(this.type === "monster") {
-							await this.get_monsters({ query: { search: this.query }}).then(results => {
-								if(results.meta.count === 0) {
-									this.noResult = 'Nothing found for "' + this.query + '"';
-								} else {
-									this.noResult = "";
-									this.searchResults = results.results;
-								}
-							});
-						}
-						// Items
-						if(this.type === "item") {
-							await this.get_api_items({ query: { search: this.query }}).then(results => {
-								if(results.meta.count === 0) {
-									this.noResult = 'Nothing found for "' + this.query + '"';
-								} else {
-									this.noResult = "";
-									this.searchResults = results.results;
-								}
-							});
-						}
-						// Spells
-						if(this.type === "spell") {
-							await this.get_api_spells({ query: { search: this.query }}).then(results => {
-								if(results.meta.count === 0) {
-									this.noResult = 'Nothing found for "' + this.query + '"';
-								} else {
-									this.noResult = "";
-									this.searchResults = results.results;
-								}
-							});
-						}
+						let data;
+
+						if(this.type === "monster") { data = this.get_monsters; }
+						else if(this.type === "item") { data =  this.get_api_items; }
+						else if(this.type === "spell") { data = this.get_api_spells; }
+						
+						await data({ query: { search: this.query }}).then(results => {
+							if(results.meta.count === 0) {
+								this.noResult = 'Nothing found for "' + this.query + '"';
+							} else {
+								this.noResult = "";
+								this.searchResults = results.results;
+							}
+						});
 					}
 				} else {
 					this.noResult = "";

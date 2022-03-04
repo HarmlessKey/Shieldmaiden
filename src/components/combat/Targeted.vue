@@ -157,7 +157,7 @@
 									>
 										<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 										<div class="mod bg-neutral-8">
-											{{ modifier(entities[key][ability]) }}
+											{{ modifier(entities[key][ability]) > 0 ? `+${modifier(entities[key][ability])}` : modifier(entities[key][ability]) }}
 										</div>
 									</hk-roll>
 									<hk-roll
@@ -188,9 +188,9 @@
 					<h3 class="red">No target selected</h3>
 					<p> Select at least 1 target from the target list to perform targeted actions.</p>
 
-					<p><b>Selecing a target</b><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
-					<p><b>Multi-targeting</b><br/>Hold down shift and click on multiple entities to target them all at once.</p>
-					<p><b>Cycle through targets</b><br/>Use the up and down arrow keys on your keyboard to cycle through the targets. Hold shift to select multiple targets in a row.</p>
+					<p><strong>Selecing a target</strong><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
+					<p><strong>Multi-targeting</strong><br/>Hold down shift and click on multiple entities to target them all at once.</p>
+					<p><strong>Cycle through targets</strong><br/>Use the up and down arrow keys on your keyboard to cycle through the targets. Hold shift to select multiple targets in a row.</p>
 				</div>
 			</div>
 		</q-scroll-area>
@@ -253,39 +253,6 @@
 				'set_targetReminder',
 				'set_hidden'
 			]),
-			showCondition(show) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'condition',
-					condition: show,
-					entity: this.target
-				})
-			},
-			edit(key, entityType) {
-				let editType = undefined;
-				switch(entityType) {
-					case 'player':
-						editType = 'slides/EditPlayer';
-						break;
-					case 'companion':
-						editType = 'slides/encounter/EditCompanion';
-						break;
-					case 'npc':
-						editType = 'slides/encounter/EditNpc';
-						break;
-				}
-
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: editType,
-					data: {
-						key: key,
-						location: 'encounter'
-					}
-				})
-			},
 			setHidden() {
 				for(const key of this.targeted) {
 					this.set_hidden({
@@ -293,10 +260,6 @@
 						hidden: !this.entities[key].hidden
 					});
 				}
-			},
-			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollPosition;
@@ -316,7 +279,7 @@
 			},
 			displayStats(target) {
 				var stats = '';
-				if(target.transformed == true) {
+				if(target.transformed) {
 					stats = {
 						ac: target.transformedAc,
 						maxHp: target.transformedMaxHp,
@@ -333,8 +296,7 @@
 				return stats
 			},
 			modifier(score) {
-				let mod = Math.floor((score - 10) / 2);
-				return (mod > 0) ? `+${mod}` : mod;
+				return Math.floor((score - 10) / 2);
 			},
 			savingThrow(entity, ability) {
 				let proficiency;

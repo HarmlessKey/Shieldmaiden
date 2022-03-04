@@ -2,7 +2,7 @@
 	<q-list class="bg-neutral-8">
 		<q-item>
 			<q-item-section>
-				<b>{{ entity.name.capitalizeEach() }}</b>
+				<strong>{{ entity.name.capitalizeEach() }}</strong>
 			</q-item-section>
 		</q-item>
 		<q-separator />
@@ -73,11 +73,6 @@
 	export default {
 		name: 'TargetMenu',
 		props: ['entity'],
-		data() {
-			return {
-
-			}
-		},
 		computed: {
 			...mapGetters([
 				'entities',
@@ -112,7 +107,3 @@
 		}
 	}
 </script>
-
-<style>
-
-</style>

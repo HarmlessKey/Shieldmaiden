@@ -387,12 +387,10 @@ export default {
 			}
 		},
 		level_tier_addable() {
-			if (this.spell &&
-					this.spell.scaling === "spell_scale" && 
-					this.roll.level_tiers &&
-					this.roll.level_tiers.length >= 1) {
-				return false;
-			} return true;
+			return !(this.spell &&
+				this.spell.scaling === "spell_scale" && 
+				this.roll.level_tiers &&
+				this.roll.level_tiers.length >= 1);
 		},
 		add_level_tier() {
 			if(!this.roll.level_tiers) {
@@ -416,7 +414,10 @@ export default {
 					let level_txt = `at ${numeral(tier.level).format('0o')} level`
 					let damage_txt = 'this spell roll does ';
 					damage_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-					damage_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+					if(tier.fixed_val) {
+						damage_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`;
+					}
 
 					let new_line = `${tier.projectile_count ? count_txt : ''} `
 					new_line += `${!tier.projectile_count && tier.dice_count ? level_txt.capitalize()+'s,' : level_txt}`
@@ -430,10 +431,15 @@ export default {
 				// Opening line
 				let level_txt = "When you cast this spell using a spell slot of "
 				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`
+
 				// Damage modifier text
 				let damage_txt = 'the damage of this roll increases by '
 				damage_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-				damage_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+				if(tier.fixed_val) {
+					damage_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`;
+				}
+
 				// Projectile count text
 				let count_txt = `the spell creates ${tier.projectile_count} more projectile${tier.projectile_count > 1 ? "s" : ""}`
 				// Spell slot text

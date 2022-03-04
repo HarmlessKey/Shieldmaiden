@@ -122,7 +122,7 @@
 			<q-expansion-item v-if="failed_imports.length" class="mb-4">
 				<template slot="header">
 					<q-item-section avatar>
-						<b class="red">{{ failed_imports.length }}</b>
+						<strong class="red">{{ failed_imports.length }}</strong>
 					</q-item-section>
 					<q-item-section class="red">Failed imports</q-item-section>
 				</template>
@@ -139,9 +139,9 @@
 									<div slot="content">
 										<ol class="px-3">
 											<li v-for="(error, index) in failed.errors" :key="`${i}-error-${index}`" class="red">
-												<b v-if="error.instancePath" class="neutral-1">
+												<strong v-if="error.instancePath" class="neutral-1">
 													{{ error.instancePath }}
-												</b>
+												</strong>
 												{{ error.message.capitalize() }} 
 											</li>
 										</ol>
@@ -305,7 +305,7 @@ export default {
 
 			// Filter out duplicate NPCs
 			this.imports.duplicate = npcs.filter(npc => {
-				return this.npcs.map(npc => { return npc.name.toLowerCase() }).includes(npc.name.toLowerCase());
+				return this.npcs.map(item => { return item.name.toLowerCase() }).includes(npc.name.toLowerCase());
 			});
 			// Add index for selection
 			this.imports.duplicate.forEach((row, index) => {
@@ -314,7 +314,7 @@ export default {
 
 			// Filter out new NPCs
 			this.imports.unique = npcs.filter(npc => {
-				return !this.npcs.map(npc => { return npc.name.toLowerCase() }).includes(npc.name.toLowerCase());
+				return !this.npcs.map(item => { return item.name.toLowerCase() }).includes(npc.name.toLowerCase());
 			});
 			// Add index for selection
 			this.imports.unique.forEach((row, index) => {

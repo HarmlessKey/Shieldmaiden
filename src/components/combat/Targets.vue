@@ -12,7 +12,7 @@
 				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="ml-1">
 					Add
-					<span v-if="showKeybinds.keyBinds === undefined" class="d-none d-sm-inline">[a]</span>
+					<span v-if="!showKeybinds" class="d-none d-sm-inline">[a]</span>
 				</span>
 			</a>
 		</h2>
@@ -117,7 +117,6 @@
 
 <script>
 	import _ from 'lodash';
-	import { db, auth } from '@/firebase';
 	import { mapGetters, mapActions } from 'vuex';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 	import TargetMenu from '@/components/combat/TargetMenu.vue';
@@ -128,7 +127,7 @@
 		props: ['_active','_idle'],
 		data() {
 			return {
-				userId: (auth.currentUser) ? auth.currentUser.uid : undefined,
+				userId: this.$store.getters.user.uid,
 				currentTarget: {},
 				setShadow: 0
 			}
@@ -140,6 +139,7 @@
 				'encounter',
 				'entities',
 				'targeted',
+				'userSettings'
 			]),
 			groups() {
 				return [
@@ -167,7 +167,7 @@
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
 						entity.key = key
-						return entity.down == true;
+						return !!entity.down;
 					})
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
@@ -186,19 +186,14 @@
 			_addedNextRound: function() {
 				return _.chain(this._idle)
 					.filter(function(entity) {
-						return entity.addNextRound == true;
+						return !!entity.addNextRound;
 					})
 					.sortBy('name' , 'desc')
 					.value()
 			},
-		},
-		firebase() {
-			return {
-				showKeybinds: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				}
-			}
+			showKeybinds() {
+				return (this.userSettings && this.userSettings.general) ? this.userSettings.general.keyBinds : undefined;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -226,8 +221,8 @@
 			remove(key, name) {
 				this.$snotify.error('Are you sure you want to remove "' + name + '" from this encounter?', 'Delete character', {
 					buttons: [
-					{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
@@ -243,8 +238,8 @@
 				const lastSelected = this.targeted[this.targeted.length - 1];
 				const type = (event.srcKey === 'upSingle' || event.srcKey === 'downSingle') ? "single" : "multi"; //Multitarget or not
 				//Create array with keys of all targets
-				const targetsArray = this._targets.map(function (target) {
-					return target.key;
+				const targetsArray = this._targets.map((item) => {
+					return item.key;
 				});
 				const current = targetsArray.indexOf(lastSelected); //Set the target from where we're gonna select the next
 

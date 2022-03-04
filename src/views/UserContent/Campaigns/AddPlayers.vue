@@ -112,9 +112,21 @@
 		},
 		async mounted() {
 			await this.get_players();
+
+			// Check if the campaign_player count matches the player_count of the campaign
+			// update if it doesn't match
+			if(this.campaign_players.length !== this.campaign.player_count) {
+				this.update_player_count({ id: this.campaign.key, new_count: this.campaign_players.length });
+			}
 		},
 		methods: {
-			...mapActions("campaigns", ["campaigns", "get_campaign", "add_player", "delete_player"]),
+			...mapActions("campaigns", [
+				"campaigns", 
+				"get_campaign", 
+				"add_player", 
+				"delete_player", 
+				"update_player_count"
+			]),
 			...mapActions("players", ["get_players"]),
 			addPlayer(id) {
 				// Set the current HP

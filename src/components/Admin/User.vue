@@ -141,13 +141,9 @@
 
 <script>
 	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'Condition',
-		components: {
-			Crumble
-		},
 		props: ['id'],
 		data() {
 			return {

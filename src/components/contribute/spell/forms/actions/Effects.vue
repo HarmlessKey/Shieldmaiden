@@ -237,12 +237,10 @@ export default {
 		application() {
 			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
 
-			let application = [
+			return [
 				{ label: "Always", value: "always" },
 				hitFail
 			];
-
-			return application;
 		},
 		effects: {
 			get() {
@@ -296,12 +294,9 @@ export default {
 			this.$forceUpdate();
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "spell scale" && 
+			return !(this.level_scaling == "spell scale" && 
 					this.effects[index].level_tiers &&
-					this.effects[index].level_tiers.length >= 1) {
-				return false;
-			}
-			return true;
+					this.effects[index].level_tiers.length >= 1);
 		},
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
@@ -314,7 +309,10 @@ export default {
 					let level_txt = `At ${numeral(tier.level).format('0o')} level`;
 					let effect_txt = 'the value of this effect is ';
 					effect_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-					effect_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+					if(tier.fixed_val) {
+						effect_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`
+					}
 	
 					let new_line = `${tier.dice_count ? level_txt.capitalize()+',' : level_txt}`;
 					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`;
@@ -331,7 +329,10 @@ export default {
 				// Effect text
 				let effect_txt = 'the value of this effect increases by ';
 				effect_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-				effect_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+				if(tier.fixed_val) {
+						effect_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`
+					}
 
 				// Spell slot text
 				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`;

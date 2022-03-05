@@ -58,13 +58,6 @@
 				"content_count",
 				"overencumbered"
 			])
-		},
-		methods: {
-			
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	
-</style>

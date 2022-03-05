@@ -61,7 +61,6 @@
 						delete entry["metadata"];
 						delete entry["changed"];
 
-						// entry.name = entry.name.toLowerCase();
 						entry.url = entry.name.toLowerCase().replace(/[\s/]/g, "-").replace(/['()]/g, '');
 						
 						

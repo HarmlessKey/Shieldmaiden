@@ -1,7 +1,6 @@
 <template>
 <div class="grid">
 	<div class="container">
-		<Crumble />
 		<h1>Contribute</h1>
 		
 		<ul class="entities hasImg">
@@ -18,12 +17,10 @@
 
 <script>
 	import Footer from '@/components/Footer.vue'
-	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'Contribute',
 		components: {
-			Crumble,
 			Footer,
 		},
 		data() {

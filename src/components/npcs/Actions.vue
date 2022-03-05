@@ -666,7 +666,15 @@
 			 * @param {string} category actions / lengedary_actions / special_abilities
 			 */
 			add(category) {
-				const type = (category === "actions") ? "melee_weapon" : (category === "legendary_actions") ? "save" : "other";
+				let type;
+				if(category === "actions") {
+					type = "melee_weapon";
+				} else if(category === "legendary_actions") {
+					type = "save";
+				} else {
+					type = "other";
+				}
+
 				const action = {
 					name: "New",
 					action_list: [{

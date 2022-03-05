@@ -57,7 +57,6 @@
 			placeholder="Search custom NPCs"
 		>
 			<q-icon slot="prepend" name="search" />
-			<!-- <q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" /> -->
 		</q-input>
 		<q-table		
 			:data="npcs"
@@ -479,8 +478,8 @@
 					for (let i in this.encounter.entities) {
 						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d+)\))$)|(?:^(.*)(?!\s\(\d+\))$)/);
 						
-						let name = match[1] || match[3];
-						if (name == entity.name) {
+						let new_name = match[1] || match[3];
+						if (new_name === entity.name) {
 							n++;
 							let digit = parseInt(match[2]);
 							last = digit > last ? digit : last;
@@ -497,10 +496,10 @@
 						let npc_data = await this.get_monster(id);
 						entity.npc = "srd";
 						if(rollHp && npc_data.hit_dice) {
-							let dice = npc_data.hit_dice.split('d');
-							let mod = dice[0] * this.calcMod(npc_data.constitution);
+							let dice_values = npc_data.hit_dice.split('d');
+							let mod = dice_values[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
+							HP = this.rollD(e, dice_values[1], dice_values[0], mod, "Hit points roll", npc_data.name);
 
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -523,10 +522,10 @@
 						}
 
 						if(rollHp && npc_data.hit_dice) {
-							let dice = npc_data.hit_dice.split('d');
-							let mod = dice[0] * this.calcMod(npc_data.constitution);
+							let dice_values = npc_data.hit_dice.split('d');
+							let mod = dice_values[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
+							HP = this.rollD(e, dice_values[1], dice_values[0], mod, "Hit points roll", npc_data.name);
 							
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -572,7 +571,7 @@
 
 				// NOTIFICATION
 				if(type === 'npc') {
-					let notifyHP = [];
+					let notifyHP = {};
 
 					if(HP) {
 						notifyHP.total = HP.total

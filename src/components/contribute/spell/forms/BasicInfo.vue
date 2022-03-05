@@ -256,7 +256,7 @@
 							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
 								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-8">
-										<b>At higer levels</b>
+										<strong>At higer levels</strong>
 									</q-card-section>
 									<q-card-section>
 										Set in what way the spell changes at higher levels.
@@ -297,7 +297,7 @@
 							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
 								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-8">
-										<b>Markdown</b>
+										<strong>Markdown</strong>
 									</q-card-section>
 
 									<q-card-section>
@@ -328,7 +328,7 @@
 				<label for="description_preview">Preview</label>
 				<vue-markdown name="description_preview" :source="spell.description"></vue-markdown>
 				<div v-if="spell.higher_level">
-					<b class="pl-2"><i>At Higher Levels.</i></b> {{ spell.higher_level }}
+					<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 				</div>
 			</div>
 		</div>
@@ -340,7 +340,6 @@
 
 import VueMarkdown from 'vue-markdown';
 import { mapActions } from 'vuex';
-import { validation } from '@/mixins/validation';
 import { spells } from '@/mixins/spells';
 
 export default {
@@ -348,7 +347,7 @@ export default {
 	props: {
 		value: Object
 	},
-	mixins: [ validation, spells ],
+	mixins: [ spells ],
 	components: {
 		VueMarkdown
 	},

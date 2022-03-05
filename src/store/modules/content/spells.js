@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import { spellServices } from "@/services/api/spells"; 
 
-const state = {
+const spell_state = {
   spell_services: null,
   cached_spells: {},
 };
-const getters = {
+const spell_getters = {
   spell_services: (state) => { return state.spell_services; },
 };
-const actions = {
+const spell_actions = {
   async get_spell_services({ getters, commit }) {
     if(getters.spell_services === null) {
       commit("SET_SPELL_SERVICES", new spellServices);
@@ -19,8 +19,7 @@ const actions = {
   async get_api_spells({ dispatch}, { pageNumber, pageSize, query, fields, sortBy, descending }) {
     const services = await dispatch("get_spell_services");
     try {
-      const spells = await services.getSpells(pageNumber, pageSize, query, fields, sortBy, descending);
-      return spells;
+      return await services.getSpells(query, pageNumber, pageSize, fields, sortBy, descending);
     } catch(error) {
       console.error(error);
     }
@@ -59,15 +58,15 @@ const actions = {
     return spell;
   },
 };
-const mutations = {
+const spell_mutations = {
   SET_SPELL_SERVICES(state, payload) { Vue.set(state, "spell_services", payload); },
   SET_CACHED_SPELL(state, payload) { Vue.set(state.cached_spells, payload["_id"], payload) },
 };
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: spell_state,
+  getters: spell_getters,
+  actions: spell_actions,
+  mutations: spell_mutations
 }

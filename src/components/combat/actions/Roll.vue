@@ -411,11 +411,11 @@
 					}
 
 					//Rolls
-					action.rolls.forEach((roll, roll_index) => {
+					action.rolls.forEach((item, roll_index) => {
 						share.notification.actions[action_index].rolls[roll_index] = {
-							damage_type: roll.damage_type || null,
-							roll: roll.modifierRoll.roll,
-							total: roll.modifierRoll.total,
+							damage_type: item.damage_type || null,
+							roll: item.modifierRoll.roll,
+							total: item.modifierRoll.total,
 						};
 					});
 				});

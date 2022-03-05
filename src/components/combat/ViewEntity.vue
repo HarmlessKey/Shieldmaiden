@@ -64,7 +64,7 @@
 					<div v-if="data[ability]" class="ability">
 						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 						{{ data[ability] }}
-						({{ modifier(data[ability]) }})
+						({{ modifier(data[ability]) > 0 ? `+${modifier(data[ability])}` : modifier(data[ability]) }})
 					</div>
 				</hk-roll>
 			</div>
@@ -104,7 +104,7 @@
 					<br/>
 				</template>
 				<template v-if="entity.skills">
-					<b>Skills</b>
+					<strong>Skills</strong>
 					<span class="saves">
 						<hk-roll 
 							v-for="(skill, index) in entity.skills" 
@@ -201,9 +201,9 @@
 		<!-- SPELLCASTING -->
 		<template v-if="entity.caster_ability">
 			<p v-if="!is_current">
-				<b><i>
+				<strong><em>
 					Spellcasting
-				</i></b>
+				</em></strong>
 				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral('Oo')}}-level spellcaster.
 				It's spellcasting ability is {{ entity.caster_ability.capitalize() }}
 				(spell save DC {{ entity.caster_save_dc }}, 
@@ -225,7 +225,7 @@
 						<div class="value">{{ (entity.caster_spell_attack > 0) ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }}</div>
 					</div>
 				</div>
-				<b><i>Spells</i></b><br/>
+				<strong><em>Spells</em></strong><br/>
 			</template>
 			<p>
 				<template v-for="level in caster_spell_levels" >
@@ -252,9 +252,9 @@
 		<!-- INNATE SPELLCASTING -->
 		<template v-if="entity.innate_ability">
 			<p v-if="!is_current">
-				<b><i>
+				<strong><em>
 					Innate spellcasting
-				</i></b>
+				</em></strong>
 				The {{ entity.name.capitalizeEach() }}'s innate spellcasting ability is {{ entity.innate_ability.capitalize() }}
 				(spell save DC {{ entity.innate_save_dc }}, 
 				{{ entity.innate_spell_attack > 0 ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }} to hit with spell attacks). 
@@ -275,7 +275,7 @@
 						<div class="value">{{ (entity.innate_spell_attack > 0) ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }}</div>
 					</div>
 				</div>
-				<b><i>Innate spells</i></b><br/>
+				<strong><em>Innate spells</em></strong><br/>
 			</template>
 			<p>
 				<template v-for="limit in innate_spell_levels" >
@@ -343,7 +343,7 @@
 										<div class="bg-neutral-8">
 											<q-item>
 												<q-item-section>
-													<b>{{ action.name }}</b>
+													<strong>{{ action.name }}</strong>
 												</q-item-section>
 											</q-item>
 											<q-separator />
@@ -388,12 +388,12 @@
 								</hk-roll>
 							</template>
 							<div class="monster-action-title__name">
-								<b><i>
+								<strong><em>
 									{{ action.name }}
 									{{ action.recharge ? `(Recharge ${action.recharge === 'rest' ? "after a Short or Long Rest" : action.recharge})` : ``}}
 									{{ action.limit ? `(${action.limit}/${action.limit_type ? action.limit_type.capitalize(): `Day`})` : ``}}
 									{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : ``}}			
-								</i></b>
+								</em></strong>
 
 								<template v-if="action.limit || action.recharge || action.legendary_cost">
 									<template v-if="action.legendary_cost || action.recharge">
@@ -590,7 +590,8 @@
 						const limit = (spell.limit) ? spell.limit : Infinity;
 						if(!levels.includes(limit)) levels.push(limit);
 					}
-					return levels.sort().reverse();
+					levels = levels.sort();
+					return levels.reverse();
 				} return [];
 			}
 		},
@@ -609,13 +610,7 @@
 				this.width = width;
 			},
 			modifier(score) {
-				var mod = Math.floor((score - 10) / 2)
-				if(mod > 0) {
-					return '+' + mod;
-				}
-				else {
-					return mod;
-				}
+				return Math.floor((score - 10) / 2);
 			},
 			passivePerception() {
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));

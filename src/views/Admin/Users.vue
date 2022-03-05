@@ -137,8 +137,8 @@
 			}
 		},
 		mounted() {
-			var users = db.ref('users').orderByChild('username')
-			users.on('value', async (snapshot) => {
+			var users_ref = db.ref('users').orderByChild('username')
+			users_ref.on('value', async (snapshot) => {
 				let users = snapshot.val()
 
 				for(let key in users) {
@@ -148,10 +148,10 @@
 
 					//Get Patreon
 					let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);
-					await getPatron.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							for(let patreonId in snapshot.val()) {
-								let patron = snapshot.val()[patreonId];
+					await getPatron.on('value', (result) => {
+						if(result.val()) {
+							for(let patreonId in result.val()) {
+								let patron = result.val()[patreonId];
 								if(new Date(patron.pledge_end) >= new Date()) {
 									users[key].patreon = Object.keys(patron.tiers)
 								} else {
@@ -163,17 +163,17 @@
 
 					// Get Status
 					let getStatus = db.ref(`status/${key}`);
-					await getStatus.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							users[key].status = snapshot.val().state;
+					await getStatus.on('value', (result) => {
+						if(result.val()) {
+							users[key].status = result.val().state;
 						}
 					});
 
 					// Get Status
 					let getLive = db.ref(`broadcast/${key}/live`);
-					await getLive.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							users[key].live = snapshot.val();
+					await getLive.on('value', (result) => {
+						if(result.val()) {
+							users[key].live = result.val();
 						}
 					});
 				}

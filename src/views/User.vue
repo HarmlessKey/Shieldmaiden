@@ -124,8 +124,8 @@
 			}
 		},
 		mounted() {
-			var campaigns = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
-			campaigns.on('value', async (snapshot) => {
+			var campaigns_ref = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
+			campaigns_ref.on('value', async (snapshot) => {
 				let campaigns = snapshot.val();
 				
 				//Get Players
@@ -134,8 +134,8 @@
 
 					for(let playerKey in campaigns[key].players) {
 						let getPlayer = db.ref(`players/${this.dmId}/${playerKey}`);
-						await getPlayer.on('value', (snapshot) => {
-							campaigns[key].players[playerKey] = snapshot.val()
+						await getPlayer.on('value', (result) => {
+							campaigns[key].players[playerKey] = result.val()
 						});
 					}
 				}

@@ -178,7 +178,7 @@
 											</q-tooltip>
 										</div>
 									</template>
-									<b 
+									<strong 
 										v-if="Object.keys(entity.conditions).length > conditionCount"
 										class="condtion"
 										:key="`more-conditions-${entity.key}`"
@@ -188,7 +188,7 @@
 											{{ Object.keys(entity.conditions).length - conditionCount }}
 											more conditions
 										</q-tooltip>
-									</b>
+									</strong>
 
 									<!-- All conditions -->
 									<q-popup-proxy square prevent>
@@ -219,9 +219,9 @@
 													<q-item-section>
 														<span>
 															{{ name }}
-															<b v-if="value === 'exhaustion'">
+															<strong v-if="value === 'exhaustion'">
 																{{ entity.conditions[value] }}
-															</b>
+															</strong>
 														</span>
 													</q-item-section>
 												</q-item>
@@ -377,9 +377,9 @@
 					}
 				})
 			},
-			returnConditions(conditions) {
+			returnConditions(entity_conditions) {
 				let returnConditions = [];
-				for(const key in conditions) {
+				for(const key in entity_conditions) {
 					returnConditions.push(
 						this.conditionList.filter(item => {
 							return item.value === key;

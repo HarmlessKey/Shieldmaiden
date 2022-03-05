@@ -119,13 +119,10 @@
 				}
 			},
 			rollGroup(e) {
-				let dex = Infinity
-				let i
-				let key
-				let entity
-				for(i in this.selected) {
-					key = this.selected[i]
-					entity = this.npcs[key]
+				let dex = Infinity;
+				let entity;
+				for(const key of this.selected) {
+					entity = this.npcs[key];
 
 					//Find lowest Dex
 					if(entity.dexterity < dex) {
@@ -143,8 +140,7 @@
 					this.share ? { encounter_id: this.encounterId } : null
 				).total;
 
-				for(let i in this.selected) {
-					key = this.selected[i];
+				for(const key in this.selected) {
 					entity = this.npcs[key];
 					entity.initiative = roll;
 
@@ -153,7 +149,7 @@
 						initiative: entity.initiative
 					});
 				}
-				this.selected = []
+				this.selected = [];
 			},
 		}
 	}

@@ -96,7 +96,3 @@
 		}
 	};
 </script>
-
-<style scoped>
-
-</style>

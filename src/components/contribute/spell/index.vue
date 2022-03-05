@@ -1,6 +1,5 @@
 <template>
 	<div class="content">
-		<Crumble :name="(spell.changed) ? spell.name : oldSpell.name"/>
 		<h2 class="spellTitle d-flex justify-content-between" v-if="oldSpell">
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
 			<span v-if="canEdit()">
@@ -10,7 +9,6 @@
 						Edit
 					</q-tooltip>
 				</router-link>
-				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'neutral-2': !spell.checked, 'green': spell.checked}"><i aria-hidden="true" class="fas fa-check"></i> Item checked</a> -->
 			</span>
 		</h2>
 
@@ -22,18 +20,18 @@
 				</i>
 
 				<p>
-					<b>Casting time:</b> {{ oldSpell.casting_time }}<br/>
-					<b>Range:</b> {{ oldSpell.range }}<br/>
-					<b>Components:</b> 
+					<strong>Casting time:</strong> {{ oldSpell.casting_time }}<br/>
+					<strong>Range:</strong> {{ oldSpell.range }}<br/>
+					<strong>Components:</strong> 
 					<template v-for="(component, index) in oldSpell.components">
 						{{ component }}<template v-if="Object.keys(oldSpell.components).length > index + 1">, </template>
 					</template>
 					<template v-if="oldSpell.material"> ({{ oldSpell.material }})</template>
 					<br/>
-					<b>Duration:</b>
+					<strong>Duration:</strong>
 						<template v-if="oldSpell.concentration == 'yes'"> Concentration, </template>
 						{{ oldSpell.duration }}<br/>
-					<b>Classes:</b> 
+					<strong>Classes:</strong> 
 					<template v-for="(_class, index) in oldSpell.classes">
 						{{ _class.name }}<template v-if="Object.keys(oldSpell.classes).length > index + 1">, </template>
 					</template>
@@ -58,16 +56,16 @@
 				</i>
 
 				<p>
-					<b>Casting time:</b> {{ spell.cast_time_nr }} {{spell.cast_time_type}}<br/>
-					<b>Range:</b> {{ (spell.range_type == "Ranged") ? spell.range + " feet" : spell.range_type}}<br/>
-					<b>Components:</b> 
+					<strong>Casting time:</strong> {{ spell.cast_time_nr }} {{spell.cast_time_type}}<br/>
+					<strong>Range:</strong> {{ (spell.range_type == "Ranged") ? spell.range + " feet" : spell.range_type}}<br/>
+					<strong>Components:</strong> 
 					<template v-for="(val, component) in spell.components">
 						{{ val ? component.charAt(0).toUpperCase() : ""}}
 					</template>
 					<template v-if="spell.material_desciption"> ({{ spell.material_desciption }})</template>
 					<br/>
-					<b>Duration:</b> {{ spell.duration_type }}<br>
-					<b>Classes:</b> 
+					<strong>Duration:</strong> {{ spell.duration_type }}<br>
+					<strong>Classes:</strong> 
 					<template v-for="(_class, index) in spell.classes">
 						{{ _class }}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
 					</template>
@@ -82,7 +80,6 @@
 
 <script>
 	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
 	import SpellEdit from '@/components/contribute/spell/edit.vue'
 	import { mapGetters } from 'vuex'
 	import VueMarkdown from 'vue-markdown'
@@ -90,7 +87,6 @@
 	export default {
 		name: 'Spell',
 		components: {
-			Crumble,
 			SpellEdit,
 			VueMarkdown,
 		},

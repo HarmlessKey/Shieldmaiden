@@ -9,7 +9,7 @@ export class monsterServices {
     });
   }
 
-  async getMonsters(pageNumber = 1, pageSize = 15, query, fields=["ALL"], sortBy = "name", descending=false) {
+  async getMonsters(query, pageNumber = 1, pageSize = 15, fields=["ALL"], sortBy = "name", descending=false) {
     const skip = (pageNumber - 1)*pageSize;
     const fieldsString = fields.join(" ");
     let params = `?skip=${skip}&limit=${pageSize}&fields=${fieldsString}`;

@@ -57,14 +57,14 @@ export default {
 				const intensities = ["light", "medium", "heavy"];
 				const index = this.weather.lightning - 1;
 				return intensities[index];	
-			} return false;
+			} return undefined;
 		},
 		thunder_interval() {
 			if(this.weather && this.weather.lightning > 0) {
 				const intervals = [360000, 180000, 60000];
 				const index = this.weather.lightning - 1;
 				return intervals[index];
-			} return false;
+			} return undefined;
 		}
 	},
 	mounted() {

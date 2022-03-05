@@ -1,6 +1,5 @@
 <template>
 	<div id="container" v-if="width > 576">
-		<!-- <Turns /> -->
 		<Turns 
 			:next="_active[0]"
 		/>

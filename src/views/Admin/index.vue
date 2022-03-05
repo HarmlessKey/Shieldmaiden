@@ -16,13 +16,8 @@
 </template>
 
 <script>
-	import Crumble from '@/components/crumble/Compendium.vue'
-
 	export default {
 		name: 'Admin',
-		components: {
-			Crumble,
-		},
 		data() {
 			return {
 				items: {

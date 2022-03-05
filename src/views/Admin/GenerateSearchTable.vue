@@ -25,16 +25,12 @@
 
 <script>
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 	import { monsterMixin } from "@/mixins/monster";
 	import { skills} from "@/mixins/skills";
 
 	export default {
 		name: 'GenerateSearchTable',
 		mixins: [monsterMixin, skills],
-		components: {
-			Crumble
-		},
 		data() {
 			return {
 				loading: false,

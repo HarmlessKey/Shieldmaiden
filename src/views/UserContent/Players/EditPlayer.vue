@@ -271,7 +271,7 @@
 						<div class="card-body">
 							<h5>
 								Proficiency Bonus: 
-								+<b class="blue">{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</b>
+								+<strong class="blue">{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</strong>
 							</h5>
 
 							<div class="skills">
@@ -304,16 +304,7 @@
 												<div class="neutral-2 abillity">{{ skill.ability.substring(0,3) }}</div>
 												{{ skill.skill  }}
 												<div class="mod">
-													{{ 
-														calculateSkillModifier(
-															calcMod(player[skill.ability]),
-															player.skills ? (
-															player.skills.includes(key) ? 
-															returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
-															: 0) : 0,
-															player.skills_expertise ? player.skills_expertise.includes(key) : false
-														) 
-													}}
+													{{ skillMod(skill, key) > 0 ? `+${skillMod(skill, key)}` : skillMod(skill, key) }}
 												</div>
 											</div>
 										</template>
@@ -642,6 +633,17 @@
 					}
 					this.$set(object, property, parseInt(value));
 				}
+			},
+			skillMod(skill, key) {
+				const mod = this.calculateSkillModifier(
+					this.calcMod(this.player[skill.ability]),
+					this.player.skills ? (
+					this.player.skills.includes(key) ? 
+					this.returnProficiency(this.player.level ? this.player.level : this.calculatedLevel(this.player.experience))
+					: 0) : 0,
+					this.player.skills_expertise ? this.player.skills_expertise.includes(key) : false
+				);
+				return parseInt(mod);
 			}
 		}
 	}

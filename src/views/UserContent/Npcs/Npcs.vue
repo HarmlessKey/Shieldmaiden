@@ -249,7 +249,7 @@
 				this.downloadJSON(npc);
 			},
 			async downloadJSON(data) {
-				let filename = "export.json"
+				let filename;
 				if (data instanceof Array) {
 					filename = "harmlesskey_npcs.json";
 				}

@@ -176,8 +176,8 @@
 
 						let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
 
-						encounter.on('value' , (snapshot) => {
-							let enc = snapshot.val();
+						encounter.on('value' , (result) => {
+							let enc = result.val();
 							if(enc) {
 								enc.key = encId;
 							}
@@ -187,8 +187,8 @@
 					//Get campaign for player curHP/tempHP/ACBonus/Dead/Stable/DeathSaves
 					let fetchCampaign = db.ref(`campaigns/${this.userId}/${campId}`);
 
-					fetchCampaign.on('value' , (snapshot) => {				
-						this.campaign = snapshot.val();
+					fetchCampaign.on('value' , (result) => {				
+						this.campaign = result.val();
 					});
 				});
 			},
@@ -196,13 +196,8 @@
 				const target = e.target.parentNode.parentNode.parentNode.parentNode;
 
 				this.$q.fullscreen.toggle(target)
-					.then(() => {
-						// success!
-					})
 					.catch((err) => {
-						alert(err)
-						// uh, oh, error!!
-						// console.error(err)
+						alert(err);
 					})
 			},
 			checkShare(key) {

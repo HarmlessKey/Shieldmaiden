@@ -394,15 +394,15 @@ export const monsterMixin = {
 							}
 
 							// Create an array of damage types found in the description
-							let damage_types = [];
+							let types = [];
 							for(const type of this.damage_types) {
 								const position = (ability.desc) ? ability.desc.toLowerCase().search(type) : -1;
-								if(position > -1 && !damage_types.includes(type)) {
+								if(position > -1 && !types.includes(type)) {
 									// Make sure they're in the correct order
-									if(damage_types[0] && position > ability.desc.toLowerCase().search(damage_types[0])) {
-										damage_types.push(type);
+									if(types[0] && position > ability.desc.toLowerCase().search(types[0])) {
+										types.push(type);
 									} else {
-										damage_types.unshift(type);
+										types.unshift(type);
 									}
 								}
 							}
@@ -412,7 +412,7 @@ export const monsterMixin = {
 							if(ability.damage_dice) {
 								ability.damage_dice.split("+").forEach((damage, index) => {
 
-									const damage_type = (damage_types[index]) ? damage_types[index] : "slashing";
+									const damage_type = (types[index]) ? types[index] : "slashing";
 									let newRoll = {
 										damage_type
 									};
@@ -431,7 +431,7 @@ export const monsterMixin = {
 									newRoll[fail_miss] = (fail_miss === "miss_mod") ? 0 : 0.5;
 
 									newAbility.action_list[0].rolls.push(newRoll);
-								})
+								});
 
 								// Check if there is a damage bonus
 								// Add it only once (to the first roll by default, this might be wrong in some cases)

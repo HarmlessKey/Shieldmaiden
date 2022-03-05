@@ -220,7 +220,8 @@
 							if(spell.limit == 0) spell.limit = Infinity;
 							if(!levels.includes(spell.limit)) levels.push(spell.limit);
 						}
-						levels = levels.sort().reverse();
+						levels = levels.sort();
+						levels = levels.reverse();
 					}
 				} 
 				return levels;

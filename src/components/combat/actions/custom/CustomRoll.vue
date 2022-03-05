@@ -194,7 +194,14 @@
 				}
 			},
 			formatAction() {
-				const type = (this.roll_type === "attack") ? "melee_weapon" : (this.roll_type === "save") ? "save" : "healing";
+				let type;
+				if(this.roll_type === "attack") {
+					type = "melee_weapon";
+				} else if(this.roll_type === "save") {
+					type = "save";
+				} else {
+					type =  "healing";
+				}
 
 				let custom_roll = {
 					name: `Custom ${this.roll_type} roll`,
@@ -211,7 +218,7 @@
 
 				for(const roll of this.custom_rolls) {
 					const rolls = roll.roll.split("+");
-					const dice = rolls[0].split("d");
+					const dice_values = rolls[0].split("d");
 					const fixed_val = (rolls[1]) ? roll[1] : undefined;
 					const damage_type = (type !== "healing") ? roll.damage_type : undefined;
 					const miss_mod = (this.roll_type === "attack") ? 0 : undefined;
@@ -219,8 +226,8 @@
 					
 					custom_roll.action_list[0].rolls.push({
 						damage_type,
-						dice_count: dice[0],
-						dice_type: dice[1],
+						dice_count: dice_values[0],
+						dice_type: dice_values[1],
 						fixed_val,
 						miss_mod,
 						save_fail_mod
@@ -268,11 +275,11 @@
 					}
 
 					//Rolls
-					action.rolls.forEach((roll, roll_index) => {
+					action.rolls.forEach((item, roll_index) => {
 						share.notification.actions[action_index].rolls[roll_index] = {
-							damage_type: roll.damage_type || null,
-							roll: roll.modifierRoll.roll,
-							total: roll.modifierRoll.total,
+							damage_type: item.damage_type || null,
+							roll: item.modifierRoll.roll,
+							total: item.modifierRoll.total,
 						};
 					});
 				});

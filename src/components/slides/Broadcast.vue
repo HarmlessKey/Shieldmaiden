@@ -152,7 +152,7 @@
 			},
 			checkAll (v) {
 				if (v) {
-					this.shares = this.options.map(v => v.value);
+					this.shares = this.options.map(item => item.value);
 					this.sharesSelected();
 					return
 				}

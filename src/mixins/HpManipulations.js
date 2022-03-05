@@ -170,9 +170,8 @@ export const setHP = {
 			//Add to damagemeters
 			//undo holds the value of ovherhealing, if there was any
 			if(config.undo) {
-				amount = -amount
+				amount = -amount;
 				over = (config.undo !== true) ? -config.undo : 0;
-				type = 'healing'
 			}
 			
 			//Campaign wide damage meters (no need to go through store)
@@ -207,19 +206,22 @@ export const setHP = {
 			}
 		},
 		isHealing(amount, target, current, config) {
+			let maxHp;
+			let curHp;
+			let pool;
 			if(target.transformed == true) {
-				var maxHp = parseInt(target.transformedMaxHp);
-				var curHp = parseInt(target.transformedCurHp);
-				var pool = 'transformed';
+				maxHp = parseInt(target.transformedMaxHp);
+				curHp = parseInt(target.transformedCurHp);
+				pool = 'transformed';
 			}
 			else {
 				maxHp = parseInt(target.maxHp);
 				curHp = parseInt(target.curHp);
 				pool = '';
 			}
-			var newhp = parseInt(curHp + amount);
-			var type = 'healing'
-			var over = 0
+			let newhp = parseInt(curHp + amount);
+			let type = 'healing';
+			let over = 0;
 
 			//If the target is a player and the curHp was 0, saves need to be reset
 			if((target.entityType === 'player' || target.entityType === 'companion') && curHp === 0) {
@@ -268,7 +270,6 @@ export const setHP = {
 			if(config.undo) {
 				amount = -amount
 				over = (config.undo !== true) ? -config.undo : 0;
-				type = 'damage'
 			}
 
 			//Campaign wide healing meters (no need to go through store)

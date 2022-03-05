@@ -91,7 +91,6 @@
 							</q-select>
 							<p class="validate red" v-if="errors.has(`application-${con_index}`)">{{ errors.first(`application-${con_index}`) }}</p>
 						</div>
-						<!-- <span>{{ condition.application }}</span> -->
 					</div>
 					<template v-if="condition.application == 'hitpoint_based'">
 						<div class="row q-col-gutter-md">
@@ -265,11 +264,6 @@
 									</div>
 								</div>
 							</template>
-							<!-- <p v-if="condition.level_tiers && condition.level_tiers.length > 0">
-								<span v-for="(line, i) in create_spell_level_tier_description(condition.level_tiers)" :key="`tier-${i}`">
-									{{line}}<br>
-								</span>
-							</p> -->
 						</template>
 					</template>
 				</div>
@@ -294,13 +288,11 @@ export default {
 		application() {
 			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
 
-			let application = [
+			return [
 				{ label: "Always", value: "always" },
 				{ label: "Hitpoint based", value: "hitpoint_based" },
 				hitFail,
 			];
-
-			return application;
 		},
 		conditions: {
 			get() {
@@ -339,12 +331,12 @@ export default {
 	},
 	methods: {
 		add_condition() {
-			let conditions = this.conditions;
-			if(conditions === undefined) {
-				conditions = []
+			let condition_list = this.conditions;
+			if(condition_list === undefined) {
+				condition_list = []
 			}
-			conditions.push({});
-			this.$emit("input", conditions)
+			condition_list.push({});
+			this.$emit("input", condition_list)
 			this.$forceUpdate(); //IMPORTANT
 		},
 		remove_condition(index) {
@@ -363,12 +355,9 @@ export default {
 			this.$forceUpdate()
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "spell scale" && 
+			return !(this.level_scaling == "spell scale" && 
 					this.conditions[index].level_tiers &&
-					this.conditions[index].level_tiers.length >= 1) {
-				return false
-			}
-			return true
+					this.conditions[index].level_tiers.length >= 1);
 		},
 	},
 	watch: {

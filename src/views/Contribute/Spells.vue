@@ -1,7 +1,6 @@
 <template>
 	<div class="content">
 		<template v-if="!$route.params.id">
-			<Crumble />
 			<h2><i aria-hidden="true" class="fas fa-wand-magic"></i> Contribute to Spells</h2>
 
 			<div class="grid">
@@ -207,7 +206,6 @@
 <script>
 	import _ from 'lodash';
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Spell from '@/components/compendium/Spell.vue';
 	import { mapGetters, mapActions } from 'vuex';
@@ -215,7 +213,6 @@
 	export default {
 		name: 'Spells',
 		components: {
-			Crumble,
 			Footer,
 			Spell
 		},

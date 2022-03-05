@@ -1,7 +1,6 @@
 <template>
 	<div class="content">
 		<template v-if="!$route.params.id">
-			<Crumble />
 			<h2><i aria-hidden="true" class="fas fa-dragons"></i> Contribute to Monsters</h2>
 
 			<q-linear-progress :dark="$store.getters.theme === 'dark'" stripe rounded size="25px" :value="Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
@@ -231,19 +230,13 @@
 <script>
 	import _ from 'lodash';
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
-	import Monster from '@/components/compendium/Monster.vue';
-	import ViewMonster from '@/components/compendium/Monster.vue';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		name: 'Monsters',
 		components: {
-			Crumble,
-			Footer,
-			Monster,
-			ViewMonster
+			Footer
 		},
 		data() {
 			return {

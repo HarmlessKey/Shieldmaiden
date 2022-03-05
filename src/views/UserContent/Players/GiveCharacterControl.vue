@@ -91,13 +91,13 @@
 				username.once("value" , (snapshot) => {
 					if(snapshot.exists()) {
 						this.foundUser = snapshot.val();
-						return
+						return;
 					} else {
 						// Check email
-						email.once('value' , (snapshot) => {
-							if(snapshot.val()) {
-								this.foundUser = snapshot.val();
-								return
+						email.once('value' , (result) => {
+							if(result.val()) {
+								this.foundUser = result.val();
+								return;
 							} else {
 								this.foundUser = false;
 							}

@@ -3,7 +3,7 @@
 		<hk-card v-if="!$route.params.id">
 			<div class="card-header">
 				<h1>
-					<i class="fas fa-users"></i> Users 
+					<i aria-hidden="true" class="fas fa-users"></i> Users 
 				</h1>
 				<div>
 					<span v-if="isBusy" class="loader pl-5"></span>
@@ -23,9 +23,9 @@
 				>
 					<span slot="status" slot-scope="data">
 						<template v-if="data.item === 'online'">
-							<i :class="{ 'green': data.item === 'online', 'neutral-2': data.item === 'offline' }" class="fas fa-circle"></i>
+							<i aria-hidden="true" :class="{ 'green': data.item === 'online', 'neutral-2': data.item === 'offline' }" class="fas fa-circle"></i>
 						</template>
-						<span v-else><i class="fas fa-circle neutral-2"></i></span>
+						<span v-else><i aria-hidden="true" class="fas fa-circle neutral-2"></i></span>
 					</span>
 
 					<router-link :to="'/admin/users/' + data.row['.key']" slot="username" slot-scope="data">
@@ -34,7 +34,7 @@
 					</router-link>
 						
 					<span slot="voucher" slot-scope="data" v-if="data.item">
-						<i 
+						<i aria-hidden="true" 
 							v-if="tiers[data.item.id]"
 							class="fas fa-ticket-alt"
 							:class="{
@@ -46,7 +46,7 @@
 
 					<span slot="patreon" slot-scope="data" v-if="data.item">
 						<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
-						<i 
+						<i aria-hidden="true" 
 							v-else-if="data.item"
 							v-for="tier in data.item"
 							:key="tier"
@@ -60,7 +60,7 @@
 					</span>
 
 					<span slot="live" slot-scope="data" v-if="data.item" class="red">
-						<i class="far fa-dot-circle"></i>
+						<i aria-hidden="true" class="far fa-dot-circle"></i>
 					</span>
 
 					<div slot="table-loading" class="loader">
@@ -108,12 +108,12 @@
 						hide: 'md'
 					},
 					voucher: {
-						label: '<i class="fas fa-ticket-alt"></i>',
+						label: '<i aria-hidden="true" class="fas fa-ticket-alt"></i>',
 						maxContent: true,
 						sortable: true
 					},
 					patreon: {
-						label: '<i class="fab fa-patreon"></i>',
+						label: '<i aria-hidden="true" class="fab fa-patreon"></i>',
 						maxContent: true,
 						sortable: true
 					},
@@ -137,8 +137,8 @@
 			}
 		},
 		mounted() {
-			var users = db.ref('users').orderByChild('username')
-			users.on('value', async (snapshot) => {
+			var users_ref = db.ref('users').orderByChild('username')
+			users_ref.on('value', async (snapshot) => {
 				let users = snapshot.val()
 
 				for(let key in users) {
@@ -148,10 +148,10 @@
 
 					//Get Patreon
 					let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);
-					await getPatron.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							for(let patreonId in snapshot.val()) {
-								let patron = snapshot.val()[patreonId];
+					await getPatron.on('value', (result) => {
+						if(result.val()) {
+							for(let patreonId in result.val()) {
+								let patron = result.val()[patreonId];
 								if(new Date(patron.pledge_end) >= new Date()) {
 									users[key].patreon = Object.keys(patron.tiers)
 								} else {
@@ -163,17 +163,17 @@
 
 					// Get Status
 					let getStatus = db.ref(`status/${key}`);
-					await getStatus.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							users[key].status = snapshot.val().state;
+					await getStatus.on('value', (result) => {
+						if(result.val()) {
+							users[key].status = result.val().state;
 						}
 					});
 
 					// Get Status
 					let getLive = db.ref(`broadcast/${key}/live`);
-					await getLive.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							users[key].live = snapshot.val();
+					await getLive.on('value', (result) => {
+						if(result.val()) {
+							users[key].live = result.val();
 						}
 					});
 				}

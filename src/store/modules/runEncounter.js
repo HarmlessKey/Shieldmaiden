@@ -140,9 +140,9 @@ const getDefaultState = () => {
 	}
 }
 
-const state = getDefaultState();
+const run_encounter_state = getDefaultState();
 
-const getters = {
+const run_encounter_getters = {
 	entities(state) { return state.entities },
 	demoEntities(state) { return state.demoEntities },
 	track(state) { return state.track },
@@ -173,7 +173,7 @@ const getters = {
 	}
 }
 
-const actions = {
+const run_encounter_actions = {
 	/**
 	 * Initialize the encounter
 	 * 
@@ -1199,7 +1199,7 @@ const actions = {
 	 * @param {string} check set, unset, reset
 	 * @param {integer} index index of the check
 	 */
-	async set_save({ commit, rootGetters, dispatch }, {key, check, index}) { 
+	async set_save({ state, commit, rootGetters, dispatch }, {key, check, index}) { 
 		let type = state.entities[key].entityType + 's';
 		if(check == 'reset') {
 			if(!state.demo)  {
@@ -1656,7 +1656,7 @@ const actions = {
 	reset_store({ commit }) { commit("RESET_STORE"); },
 }
 
-const mutations = {
+const run_encounter_mutations = {
 	//INITATIALIZE ENCOUNTER
 	TRACK(state, value) { Vue.set(state, 'track', value); },
 	SET_DEMO(state, value) { Vue.set(state, 'demo', value); },
@@ -1724,8 +1724,8 @@ const mutations = {
 }
 
 export const run_encounter = {
-	state: state,
-	getters: getters,
-	mutations: mutations,
-	actions: actions,
+	state: run_encounter_state,
+	getters: run_encounter_getters,
+	mutations: run_encounter_mutations,
+	actions: run_encounter_actions
 }

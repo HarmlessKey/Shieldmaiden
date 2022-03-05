@@ -25,7 +25,7 @@
 						@click="setManual('damage', !invalid)"
 					>
 						Attack
-						<i class="hki-sword-break ml-3" />
+						<i aria-hidden="true" class="hki-sword-break ml-3" />
 						<q-tooltip anchor="center right" self="center left">
 							Enter
 						</q-tooltip>
@@ -35,7 +35,7 @@
 						@click="setManual('healing', !invalid)"
 					>
 						Heal
-						<i class="hki-heal" />
+						<i aria-hidden="true" class="hki-heal" />
 						<q-tooltip anchor="center right" self="center left">
 							Shift + Enter
 						</q-tooltip>
@@ -63,7 +63,7 @@
 							@click.stop="setDefense(key, defense_key)"
 							:class="[{active: resistances[key] === defense_key}, defense_key]"
 						>
-							<i class="fas fa-shield"></i>
+							<i aria-hidden="true" class="fas fa-shield"></i>
 							<span>{{ defense_key.capitalize() }}</span>
 							<q-tooltip anchor="top middle" self="center middle">
 								{{ name }}
@@ -203,7 +203,7 @@
 				}
 			},
 			calculateAmount(target, type) {
-				let value = this.manualAmount;
+				let value = parseInt(this.manualAmount);
 				value = value * this.multiplier[target];
 
 				if((!type || type === "damage") && this.resistances[target]) {
@@ -221,8 +221,6 @@
 					for(let i in this.targeted) {
 						let key = this.targeted[i];
 						let amount = {};
-						amount[type] = parseInt(this.manualAmount);
-
 						amount[type] = this.calculateAmount(key, type);
 
 						// Set config for HpManipulation and log

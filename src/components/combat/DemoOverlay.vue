@@ -8,7 +8,7 @@
 				<div class="">
 					<h3>
 						<a class="btn btn-sm bg-neutral-5" @click="reload">
-							<i class="far fa-sync-alt"></i>
+							<i aria-hidden="true" class="far fa-sync-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Reset
 							</q-tooltip>
@@ -24,8 +24,8 @@
 			</div>
 		</transition>
 		<div class="toggle bg-blue" @click="showInfo = !showInfo">
-			<i class="fas fa-times" v-if="showInfo"></i>
-			<i class="fas fa-chevron-up" v-else></i>
+			<i aria-hidden="true" class="fas fa-times" v-if="showInfo"></i>
+			<i aria-hidden="true" class="fas fa-chevron-up" v-else></i>
 		</div>
 	</div>
 </template>
@@ -60,7 +60,7 @@
 		grid-template-columns: 1fr max-content;
 		grid-template-rows: max-content;
 		padding: 20px;
-		box-shadow: 0px 0px 15px$black;
+		box-shadow: 0px 0px 15px $black;
 		transition: bottom .5s linear;
 		grid-gap: 20px;
 

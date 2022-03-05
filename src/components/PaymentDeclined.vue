@@ -9,7 +9,7 @@
             Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
             Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
         </div>
-        <a @click="hide = true"><i class="fas fa-times"></i></a>
+        <a @click="hide = true"><i aria-hidden="true" class="fas fa-times"></i></a>
 	</div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
 	<ul class="benefits">
 		<li v-for="type in content_types" :key="type">
-			<i v-if="tier.benefits[type] === 'infinite'" class="green far fa-infinity count"/>
+			<i aria-hidden="true" v-if="tier.benefits[type] === 'infinite'" class="green far fa-infinity count"/>
 			<span 
 				v-else
 				class="count"

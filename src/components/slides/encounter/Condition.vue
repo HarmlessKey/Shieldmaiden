@@ -1,7 +1,7 @@
 <template>
 	<div class="pb-5">
 		<h2>
-			<i :class="`hki-${cond.value}`" />
+			<i aria-hidden="true" :class="`hki-${cond.value}`" />
 			{{ cond.name }}
 		</h2>
 
@@ -23,7 +23,7 @@
 				<tr v-for="(effect, index) in effects" :key="index">
 					<td><a :class="{'active': entity.conditions['exhaustion'] >= index + 1}" 
 					@click="setExhausted(index + 1)">
-					<span v-if="entity.conditions['exhaustion'] >= index + 1"><i class="fas fa-check"></i></span>
+					<span v-if="entity.conditions['exhaustion'] >= index + 1"><i aria-hidden="true" class="fas fa-check"></i></span>
 					<span v-else>{{ index + 1 }}</span>
 					</a></td>
 					<td :class="{'neutral-2': entity.conditions['exhaustion'] < index + 1}">{{ effect }}</td>

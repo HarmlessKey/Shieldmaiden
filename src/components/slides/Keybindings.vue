@@ -5,7 +5,7 @@
 			<table class="table mb-3" :key="`group-${index}`" :class="{ 'table-sm': data && data.sm }">
 				<thead>
 					<th>Action</th>
-					<th><i class="fas fa-keyboard"></i> Keybind</th>
+					<th><i aria-hidden="true" class="fas fa-keyboard"></i> Keybind</th>
 				</thead>
 				<tbody>
 					<tr v-for="({action, bind}, i) in keybindings" :key="`row-${index}-${i}`">
@@ -95,6 +95,3 @@
 		}
 	};
 </script>
-
-<style lang="scss" scoped>
-</style>

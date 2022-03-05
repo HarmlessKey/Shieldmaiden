@@ -42,7 +42,7 @@
 			<h2 class="my-4 d-flex justify-content-between items-center">
 				<span>Items</span>
 				<a @click="addNew = true" class="btn btn-sm bg-neutral-5">
-					<i class="fas fa-plus green" />
+					<i aria-hidden="true" class="fas fa-plus green" />
 				</a>
 			</h2>
 
@@ -64,13 +64,13 @@
 									red: !item.identified
 								}"
 							>
-								<i class="far fa-link"></i>
+								<i aria-hidden="true" class="far fa-link"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									{{ item.identified ? 'Identified' : 'Not Identified' }}
 								</q-tooltip>
 							</a>
 							<span v-else class="neutral-3 mr-1">
-								<i class="far fa-unlink"></i>
+								<i aria-hidden="true" class="far fa-unlink"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									No linked item
 								</q-tooltip>
@@ -81,7 +81,7 @@
 						</q-item-section>
 						<q-item-section avatar>
 							<a @click.stop="deleteItem(key)" class="btn btn-sm bg-neutral-5">
-								<i class="fas fa-trash-alt"></i>
+								<i aria-hidden="true" class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Remove
 								</q-tooltip>
@@ -99,7 +99,7 @@
 							:linked-item="item.linked_item"
 						>
 							<a class="btn btn-sm bg-neutral-5 mr-2" @click="identify(key, !item.identified)">
-								<i :class="!item.identified ? 'fas fa-unlink red' : 'fas fa-link green'" />
+								<i aria-hidden="true" :class="!item.identified ? 'fas fa-unlink red' : 'fas fa-link green'" />
 								<q-tooltip anchor="top middle" self="center middle">
 									{{ item.identified ? "Unidentify" : "Identify" }}
 								</q-tooltip>

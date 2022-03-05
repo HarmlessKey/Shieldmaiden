@@ -20,14 +20,14 @@ const convert_encounter = (encounter) => {
 	return returnEncounter;
 }
 
-const state = {
+const encounter_state = {
   encounter_services: null,
   cached_encounters: {},
   encounters: {},
   encounter_count: {}
 };
 
-const getters = {
+const encounter_getters = {
   get_encounters: (state) => (campaignId, finished) => {
     const encounters = state.encounters[campaignId];
     // Convert object to sorted array
@@ -45,7 +45,7 @@ const getters = {
   encounter_services: (state) => { return state.encounter_services; }
 };
 
-const actions = {
+const encounter_actions = {
   async get_encounter_services({ getters, commit }) {
     if(getters.encounter_services === null) {
       commit("SET_ENCOUNTER_SERVICES", new encounterServices);
@@ -864,7 +864,7 @@ const actions = {
     }
   }
 };
-const mutations = {
+const encounter_mutations = {
   SET_ENCOUNTER_SERVICES(state, payload) { Vue.set(state, "encounter_services", payload); },
   SET_CACHED_ENCOUNTERS(state, { uid, encounters }) { Vue.set(state.cached_encounters, uid, encounters); },
   SET_ENCOUNTER_COUNT(state, { campaignId, count }) {
@@ -888,7 +888,7 @@ const mutations = {
     }
   },
   REMOVE_CAMPAIGN_ENCOUNTERS(state, campaignId) {
-    if(state.encounters[campaignId] && state.encounters[campaignId]) {
+    if(state.encounters && state.encounters[campaignId]) {
       Vue.delete(state.encounters, campaignId);
     }
   },
@@ -1049,8 +1049,9 @@ const mutations = {
     if(update_search && state.encounters[campaignId] && state.encounters[campaignId][encounterId]) {
       Vue.set(state.encounters[campaignId][encounterId], property, value)
     }
-    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][encounterId])
-    Vue.set(state.cached_encounters[uid][campaignId][encounterId], property, value);
+    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][encounterId]) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId], property, value);
+    }
   },
   FINISH_ENCOUNTER(state, { uid, campaignId, id, finished }) {
     if(state.encounters[campaignId] && state.encounters[campaignId][id]) {
@@ -1068,8 +1069,8 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: encounter_state,
+  getters: encounter_getters,
+  actions: encounter_actions,
+  mutations: encounter_mutations
 }

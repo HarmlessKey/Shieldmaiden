@@ -36,7 +36,7 @@
 							class="avatar"
 							:style="props.value ? `background-image: url('${props.value}')` : ''"
 						>
-							<i v-if="!props.value" class="hki-player" />
+							<i aria-hidden="true" v-if="!props.value" class="hki-player" />
 						</q-td>
 						<q-td v-else-if="props.col.name !== 'actions'">
 							<div  class="truncate-cell">
@@ -52,13 +52,13 @@
 						</q-td>
 						<q-td v-else class="text-right d-flex justify-content-between">
 							<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-								<i class="fas fa-pencil"></i>
+								<i aria-hidden="true" class="fas fa-pencil"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Edit
 								</q-tooltip>
 							</router-link>
 							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
-								<i class="fas fa-trash-alt"></i>
+								<i aria-hidden="true" class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
 								</q-tooltip>
@@ -71,7 +71,7 @@
 			</template>
 
 			<router-link v-if="!players.length && !overencumbered" class="btn btn-lg bg-neutral-5" to="/content/players/add-player">
-				<i class="fas fa-plus green mr-1" /> Create your first player
+				<i aria-hidden="true" class="fas fa-plus green mr-1" /> Create your first player
 			</router-link>
 			<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
 				Get more player slots

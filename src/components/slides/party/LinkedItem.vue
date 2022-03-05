@@ -4,7 +4,7 @@
 			<slot />
 			<div @click="showItem = !showItem" class="title">
 				{{ item.name }}
-				<i class="fas fa-chevron-down" :class="{ collapsed: showItem }" />
+				<i aria-hidden="true" class="fas fa-chevron-down" :class="{ collapsed: showItem }" />
 			</div>
 		</div>
 		<q-slide-transition>

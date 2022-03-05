@@ -2,10 +2,10 @@
 	<div>
 		<div class="type d-flex justify-content-between">
 			<button class="btn bg-neutral-4 mb-3" :class="{ 'bg-red': type === 'damage' }" @click="type = 'damage'">
-				Damage <i class="hki-sword-break" />
+				Damage <i aria-hidden="true" class="hki-sword-break" />
 			</button>
 			<button class="btn bg-neutral-4 mb-3" :class="{ 'bg-green': type === 'healing' }" @click="type = 'healing'">
-				Healing <i class="hki-heal" />
+				Healing <i aria-hidden="true" class="hki-heal" />
 			</button>
 		</div>
 
@@ -14,7 +14,7 @@
 				<div class="damage_inputs">
 					<div>Amount</div>
 					<div>Type</div>
-					<a @click="addInput()" class="handle"><i class="fas fa-plus green"></i></a>
+					<a @click="addInput()" class="handle"><i aria-hidden="true" class="fas fa-plus green"></i></a>
 					<template v-for="(input, i) in damage">
 						<ValidationProvider rules="required|numeric|min_value:0" :name="`amount-${i}`" v-slot="{ errors, invalid, validated }" :key="`damage-${i}`">
 							<q-input
@@ -38,7 +38,7 @@
 							@input="$forceUpdate()"
 							:class="{'no-delete': i === 0}"
 						/>			
-						<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"><i class="fas fa-trash-alt red"></i></a>
+						<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"><i aria-hidden="true" class="fas fa-trash-alt red"></i></a>
 					</template>
 				</div>
 				<button 

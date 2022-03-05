@@ -26,13 +26,13 @@
 							@click="setDialog(name)"
 						>
 							<q-item-section avatar>
-								<i :class="icon" class="neutral-2" />
+								<i aria-hidden="true" :class="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								{{ title }}
 							</q-item-section>
 							<q-item-section avatar>
-								<i class="fas fa-eye neutral-3" />
+								<i aria-hidden="true" class="fas fa-eye neutral-3" />
 							</q-item-section>
 						</q-item>
 					</q-list>

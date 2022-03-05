@@ -3,16 +3,16 @@
 		<hk-tip value="initiative-overview" title="Actions">
 			<template #content>
 				<p>
-					<i class="hki-surprised" />
+					<i aria-hidden="true" class="hki-surprised" />
 					Reminds you this entity was surprised when their turn starts.
 				</p>
 				<p>
-					<i class="fas fa-eye-slash white" />
+					<i aria-hidden="true" class="fas fa-eye-slash white" />
 					Hides the entity from your players on the 
 					<a @click="setSlide({show: true, type: 'PlayerLink' })">public initiative list</a>.
 				</p>
 				<span>
-					<i class="fas fa-minus white" /> 
+					<i aria-hidden="true" class="fas fa-minus white" /> 
 					Moves the entity to a seperate initiative 
 					list that is hidden for your players, from which they can quickly be added.
 				</span>
@@ -20,8 +20,8 @@
 		</hk-tip>
 		<ul class="entities hasImg">
 			<li v-for="(entity) in active" v-bind:key="entity.key">
-				<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
-				<span v-else-if="entity.reminders.surprised" class="img orange"><i class="hki hki-surprised"></i></span>
+				<span v-if="entity.hidden" class="img"><i aria-hidden="true" class="fas fa-eye-slash red"></i></span>
+				<span v-else-if="entity.reminders.surprised" class="img orange"><i aria-hidden="true" class="hki hki-surprised"></i></span>
 				<template v-else>
 					<span 
 						class="img pointer" 
@@ -31,7 +31,7 @@
 							'color': entity.color_label ? entity.color_label : ``
 						}"
 					>
-						<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+						<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
 					</span>
 				</template>
 				<div class="overview-item">
@@ -41,32 +41,32 @@
 				<div class="actions">
 					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
 					<a v-if="!entity.reminders.surprised" class="btn btn-sm bg-neutral-5" @click="setSurprised(entity.key, true)">
-						<i class="hki-surprised"></i>
+						<i aria-hidden="true" class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set surprised
 						</q-tooltip>
 					</a>
 					<a v-else class="btn btn-sm bg-neutral-5" @click="setSurprised(entity.key, false)">
-						<i class="hki-surprised"></i>
+						<i aria-hidden="true" class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Remove surprised
 						</q-tooltip>
 					</a>
 					<!-- Hide / Unhide Entity -->
 					<a v-if="!entity.hidden" class="btn btn-sm bg-neutral-5" @click="set_hidden({key: entity.key, hidden: true})">
-						<i class="fas fa-eye-slash"></i>
+						<i aria-hidden="true" class="fas fa-eye-slash"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set hidden
 						</q-tooltip>
 					</a>
 					<a v-else class="btn btn-sm bg-neutral-5 mr-1" @click="set_hidden({key: entity.key, hidden: false})">
-						<i class="fas fa-eye"></i>
+						<i aria-hidden="true" class="fas fa-eye"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Unhide
 						</q-tooltip>
 					</a>
 					<a class="btn btn-sm bg-neutral-5" @click="set_active({key: entity.key, active: false})">
-						<i class="fas fa-minus"></i>
+						<i aria-hidden="true" class="fas fa-minus"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set inactive
 						</q-tooltip>
@@ -87,7 +87,7 @@
 						'color': entity.color_label ? entity.color_label : ``
 					}"
 				>
-					<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
 				</span>
 				<span class="d-flex justify-content-between">
 					{{ entity.name }}
@@ -95,7 +95,7 @@
 				</span>
 				<div class="actions">
 					<a @click="set_active({key: entity.key, active: true})">
-						<i class="fas fa-plus"></i>
+						<i aria-hidden="true" class="fas fa-plus"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set active
 						</q-tooltip>

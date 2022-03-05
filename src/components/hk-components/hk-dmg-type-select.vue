@@ -17,7 +17,7 @@
 		>
 			<template v-slot:selected>
 				<span v-if="damage_type && !hide_selected" class="truncate">
-					<i :class="[damage_type_icons[damage_type], damage_type]"/>
+					<i aria-hidden="true" :class="[damage_type_icons[damage_type], damage_type]"/>
 					{{ damage_type.capitalize() }} damage
 				</span>
 				<span v-else>

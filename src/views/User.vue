@@ -12,7 +12,7 @@
 				<hk-card>
 					<div slot="header" class="card-header">
 						<span>
-							<i class="fas fa-dungeon mr-1" />
+							<i aria-hidden="true" class="fas fa-dungeon mr-1" />
 							Campaigns
 						</span>
 					</div>
@@ -49,7 +49,7 @@
 												class="img"
 											>
 												<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-												<i v-else class="hki-player" />
+												<i aria-hidden="true" v-else class="hki-player" />
 												<q-tooltip anchor="top middle" self="center middle">
 													{{ player.character_name }}
 												</q-tooltip>
@@ -124,8 +124,8 @@
 			}
 		},
 		mounted() {
-			var campaigns = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
-			campaigns.on('value', async (snapshot) => {
+			var campaigns_ref = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
+			campaigns_ref.on('value', async (snapshot) => {
 				let campaigns = snapshot.val();
 				
 				//Get Players
@@ -134,8 +134,8 @@
 
 					for(let playerKey in campaigns[key].players) {
 						let getPlayer = db.ref(`players/${this.dmId}/${playerKey}`);
-						await getPlayer.on('value', (snapshot) => {
-							campaigns[key].players[playerKey] = snapshot.val()
+						await getPlayer.on('value', (result) => {
+							campaigns[key].players[playerKey] = result.val()
 						});
 					}
 				}

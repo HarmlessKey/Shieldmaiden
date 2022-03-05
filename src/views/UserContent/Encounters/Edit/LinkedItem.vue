@@ -1,6 +1,6 @@
 <template>
 	<a v-if="!loading" class="btn btn-clear" @click="setSlide({show: true, type: 'compendium/Item', data: item })">
-		<i class="far fa-link mr-1"></i>
+		<i aria-hidden="true" class="far fa-link mr-1"></i>
 		{{ item.name.capitalizeEach() }}
 	</a>
 	<span v-else class="loader pl-5" />

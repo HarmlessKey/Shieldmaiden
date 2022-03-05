@@ -13,7 +13,7 @@
 				:options="refs"
 			/>
 			<a class="btn bnt-large" @click="update()" :disabled="!ref || loading">
-				<i class="fas fa-file-edit" />
+				<i aria-hidden="true" class="fas fa-file-edit" />
 				{{ ref ? `Update ${ref}` : "Select a reference" }}
 			</a>
 			<span v-if="loading" class="ml-3">
@@ -25,16 +25,12 @@
 
 <script>
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 	import { monsterMixin } from "@/mixins/monster";
 	import { skills} from "@/mixins/skills";
 
 	export default {
 		name: 'ExportDatabases',
 		mixins: [monsterMixin, skills],
-		components: {
-			Crumble
-		},
 		data() {
 			return {
 				loading: false,

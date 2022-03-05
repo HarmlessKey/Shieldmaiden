@@ -25,18 +25,18 @@
 								class="btn btn-sm btn-clear" 
 								:to="'/content/campaigns/' + $route.params.campid"
 							>
-								<i class="fas fa-chevron-left"></i> Leave
+								<i aria-hidden="true" class="fas fa-chevron-left"></i> Leave
 							</router-link>
 
 							<span class="right">
 								<a class="btn btn-sm bg-neutral-5" @click="reset(hard=false)">
-									<i class="fas fa-trash-restore-alt"></i>
+									<i aria-hidden="true" class="fas fa-trash-restore-alt"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Unfinish encounter
 									</q-tooltip>
 								</a>
 								<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset()">
-									<i class="fas fa-undo"></i>
+									<i aria-hidden="true" class="fas fa-undo"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Reset encounter
 									</q-tooltip>
@@ -76,10 +76,10 @@
 													entities: players
 												}
 										})">
-											Award <i class="far fa-chevron-double-right"></i>
+											Award <i aria-hidden="true" class="far fa-chevron-double-right"></i>
 										</a>
 										<div v-else class="green">
-											<i class="fas fa-check"></i> Awarded
+											<i aria-hidden="true" class="fas fa-check"></i> Awarded
 										</div>
 									</div>
 
@@ -107,10 +107,10 @@
 											class="btn" 
 											@click="awardCurrency"
 										>
-											Award <i class="far fa-chevron-double-right"></i>
+											Award <i aria-hidden="true" class="far fa-chevron-double-right"></i>
 										</a>
 										<div v-else class="green">
-											<i class="fas fa-check"></i> Currency awarded
+											<i aria-hidden="true" class="fas fa-check"></i> Currency awarded
 										</div>
 									</div>
 									
@@ -118,7 +118,7 @@
 										<h3 class="d-flex justify-content-between">
 											Items
 											<a @click="awardAllItems" class="btn">
-												Award all <i class="far fa-chevron-double-right" />
+												Award all <i aria-hidden="true" class="far fa-chevron-double-right" />
 											</a>
 										</h3>
 										<q-list>
@@ -128,7 +128,7 @@
 												</q-item-section>
 												<q-item-section avatar>
 													<q-btn flat no-caps @click="awardItem(item, key)">
-														Award <i class="far fa-chevron-double-right ml-2" />
+														Award <i aria-hidden="true" class="far fa-chevron-double-right ml-2" />
 													</q-btn>
 												</q-item-section>
 											</q-item>
@@ -143,7 +143,7 @@
 													{{ item.public_name }}
 												</q-item-section>
 												<q-item-section avatar>
-													<i class="fas fa-check green" />
+													<i aria-hidden="true" class="fas fa-check green" />
 												</q-item-section>
 											</q-item>
 										</q-list>
@@ -219,10 +219,9 @@
 				// Return an array with the keys of all players in the encounter
 				let entities = Object.values(this.encounter.entities);
 				let playerKeys = [];
-				let players = entities.filter( function(entity) {
+				let players = entities.filter((entity) => {
 					let entityType = entity.entityType;
-					entity = [];
-					return entityType === "player"
+					return entityType === "player";
 				});
 				for(let i in players) {
 					playerKeys.push(players[i].id);

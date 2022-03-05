@@ -1,7 +1,7 @@
 <template>
 	<hk-card>
 		<div slot="header" class="card-header">
-			<h1><i class="fas fa-dragon"></i> Monsters</h1>
+			<h1><i aria-hidden="true" class="fas fa-dragon"></i> Monsters</h1>
 			<span class="neutral-3">
 				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
 			</span>
@@ -120,7 +120,7 @@
 					<q-tr :props="props">
 						<q-td auto-width>
 							<a  @click="props.expand = !props.expand">
-								<i class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+								<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
 							</a>
 						</q-td>
 						<q-td

@@ -7,7 +7,7 @@
 					<h3>We hope you were impressed by the possibilities</h3>
 					<p>This is exactly how you can run your custom created encounters in our app. With your own players, and monsters from the SRD or created by you.</p>
 					<a @click="reload" class="btn bg-neutral-5">
-						<i class="far fa-sync-alt"></i> Reset encounter
+						<i aria-hidden="true" class="far fa-sync-alt"></i> Reset encounter
 						<q-tooltip anchor="top middle" self="center middle">
 							Reset
 						</q-tooltip>

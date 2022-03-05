@@ -38,11 +38,11 @@ extend('alpha_num', {
 
 // Value must be between 2 numbers
 extend("between", {
-  validate(value, { min, max } = {}) {
-    return Number(min) <= value && Number(max) >= value;
+  validate(value, { minimum, maximum } = {}) {
+    return Number(minimum) <= value && Number(maximum) >= value;
   },
-  params: ["min", "max"],
-  message: "Must be between {min} and {max}"
+  params: ["minimum", "maximum"],
+  message: "Must be between {minimum} and {maximum}"
 });
 
 // Recharge 1, 5-6 or rest

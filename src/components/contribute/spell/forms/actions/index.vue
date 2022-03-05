@@ -4,7 +4,7 @@
 			<div slot="header" class="card-header d-flex justify-content-between">
 				Spell actions
 				<a class="neutral-2 text-capitalize" @click="add_action()">
-					<i class="fas fa-plus green"></i>
+					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Add action
@@ -30,7 +30,7 @@
 						</q-item-section>
 						<q-item-section avatar>
 							<a @click="remove_action(action_index)" class="remove">
-								<i class="fas fa-trash-alt red" />
+								<i aria-hidden="true" class="fas fa-trash-alt red" />
 								<q-tooltip anchor="top middle" self="center middle">
 									Remove
 								</q-tooltip>
@@ -187,6 +187,3 @@ export default {
 	},
 };
 </script>
-
-<style lang="scss" scoped>
-</style>

@@ -108,7 +108,7 @@
 					@change="editValue('maxHpMod', entity.maxHpMod)"
 				>
 					<template v-slot:label>
-						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						<i aria-hidden="true" v-if="entity.transformed" class="fas fa-paw-claws green" />
 						Max HP Mod
 					</template>
 				</q-input>
@@ -130,7 +130,7 @@
 					@change="editValue('ac', entity.ac)"
 				>
 					<template v-slot:label>
-						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						<i aria-hidden="true" v-if="entity.transformed" class="fas fa-paw-claws green" />
 						Armor class
 					</template>
 				</q-input>
@@ -147,7 +147,7 @@
 					@change="editValue('maxHp', entity.maxHp)"
 				>
 					<template v-slot:label>
-						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						<i aria-hidden="true" v-if="entity.transformed" class="fas fa-paw-claws green" />
 						Max HP
 					</template>
 				</q-input>
@@ -164,7 +164,7 @@
 					@change="editValue('curHp', entity.curHp)"
 				>	
 					<template v-slot:label>
-						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						<i aria-hidden="true" v-if="entity.transformed" class="fas fa-paw-claws green" />
 						Cur HP
 					</template>
 				</q-input>
@@ -177,7 +177,7 @@
 					<h2 class="mb-1">Display Override</h2>
 					<a @click="clearOverrides()" class="red btn btn-clear btn-sm">
 						<span class="mr-1 small">Clear</span>
-						<i class="fas fa-broom small"></i>
+						<i aria-hidden="true" class="fas fa-broom small"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Clear display overrides
 						</q-tooltip>

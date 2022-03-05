@@ -64,7 +64,7 @@
 					<div v-if="data[ability]" class="ability">
 						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 						{{ data[ability] }}
-						({{ modifier(data[ability]) }})
+						({{ modifier(data[ability]) > 0 ? `+${modifier(data[ability])}` : modifier(data[ability]) }})
 					</div>
 				</hk-roll>
 			</div>
@@ -104,7 +104,7 @@
 					<br/>
 				</template>
 				<template v-if="entity.skills">
-					<b>Skills</b>
+					<strong>Skills</strong>
 					<span class="saves">
 						<hk-roll 
 							v-for="(skill, index) in entity.skills" 
@@ -184,10 +184,10 @@
 						<span class="playerSkill">
 							<span class="truncate">
 								<template v-if="entity.skills && entity.skills.includes(key)">
-									<i v-if="entity.skills_expertise && entity.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
-									<i v-else class="fas fa-circle"></i>
+									<i aria-hidden="true" v-if="entity.skills_expertise && entity.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+									<i aria-hidden="true" v-else class="fas fa-circle"></i>
 								</template>
-								<i v-else class="far fa-circle"></i>
+								<i aria-hidden="true" v-else class="far fa-circle"></i>
 								{{ skill.skill }}
 							</span>
 							<span>{{ skillModifier(skill, key) }}</span>
@@ -201,9 +201,9 @@
 		<!-- SPELLCASTING -->
 		<template v-if="entity.caster_ability">
 			<p v-if="!is_current">
-				<b><i>
+				<strong><em>
 					Spellcasting
-				</i></b>
+				</em></strong>
 				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral('Oo')}}-level spellcaster.
 				It's spellcasting ability is {{ entity.caster_ability.capitalize() }}
 				(spell save DC {{ entity.caster_save_dc }}, 
@@ -225,7 +225,7 @@
 						<div class="value">{{ (entity.caster_spell_attack > 0) ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }}</div>
 					</div>
 				</div>
-				<b><i>Spells</i></b><br/>
+				<strong><em>Spells</em></strong><br/>
 			</template>
 			<p>
 				<template v-for="level in caster_spell_levels" >
@@ -236,7 +236,7 @@
 						<template v-else>
 							{{ level | numeral('Oo') }} level ({{ entity.caster_spell_slots[level] }} slots):
 						</template>
-						<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
@@ -252,9 +252,9 @@
 		<!-- INNATE SPELLCASTING -->
 		<template v-if="entity.innate_ability">
 			<p v-if="!is_current">
-				<b><i>
+				<strong><em>
 					Innate spellcasting
-				</i></b>
+				</em></strong>
 				The {{ entity.name.capitalizeEach() }}'s innate spellcasting ability is {{ entity.innate_ability.capitalize() }}
 				(spell save DC {{ entity.innate_save_dc }}, 
 				{{ entity.innate_spell_attack > 0 ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }} to hit with spell attacks). 
@@ -275,7 +275,7 @@
 						<div class="value">{{ (entity.innate_spell_attack > 0) ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }}</div>
 					</div>
 				</div>
-				<b><i>Innate spells</i></b><br/>
+				<strong><em>Innate spells</em></strong><br/>
 			</template>
 			<p>
 				<template v-for="limit in innate_spell_levels" >
@@ -286,7 +286,7 @@
 						<template v-else>
 							{{ limit }}/day each:
 						</template>
-						<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
+						<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
@@ -315,7 +315,7 @@
 									: spendLimited('legendary_actions', 'legendaries_used')
 								"
 							>
-								<i class="far" :class="
+								<i aria-hidden="true" class="far" :class="
 									entity.limited_uses['legendary_actions'] && entity.limited_uses['legendary_actions'].legendaries_used >= i
 									? 'fa-dot-circle' : 'fa-circle'
 									"
@@ -343,7 +343,7 @@
 										<div class="bg-neutral-8">
 											<q-item>
 												<q-item-section>
-													<b>{{ action.name }}</b>
+													<strong>{{ action.name }}</strong>
 												</q-item-section>
 											</q-item>
 											<q-separator />
@@ -388,12 +388,12 @@
 								</hk-roll>
 							</template>
 							<div class="monster-action-title__name">
-								<b><i>
+								<strong><em>
 									{{ action.name }}
 									{{ action.recharge ? `(Recharge ${action.recharge === 'rest' ? "after a Short or Long Rest" : action.recharge})` : ``}}
 									{{ action.limit ? `(${action.limit}/${action.limit_type ? action.limit_type.capitalize(): `Day`})` : ``}}
 									{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : ``}}			
-								</i></b>
+								</em></strong>
 
 								<template v-if="action.limit || action.recharge || action.legendary_cost">
 									<template v-if="action.legendary_cost || action.recharge">
@@ -409,7 +409,7 @@
 										>
 											Spend
 										</div>
-										<i v-else class="fas fa-ban neutral-2" />
+										<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
 									</template>
 									<div v-else class="slots">
 										<span 
@@ -422,7 +422,7 @@
 												: spendLimited(category, action_index)
 											"
 										>
-											<i class="far" :class="
+											<i aria-hidden="true" class="far" :class="
 												entity.limited_uses[category] && entity.limited_uses[category][action_index] >= i
 												? 'fa-dot-circle' : 'fa-circle'
 												"
@@ -442,7 +442,7 @@
 						<div v-if="is_current && action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'">
 							<span v-if="action.action_list[0].rolls">
 								<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${action_index}-${roll_index}`">
-									(<i :class="[
+									(<i aria-hidden="true" :class="[
 										action.action_list[0].type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
 										roll.damage_type
 										]" /> 
@@ -590,7 +590,8 @@
 						const limit = (spell.limit) ? spell.limit : Infinity;
 						if(!levels.includes(limit)) levels.push(limit);
 					}
-					return levels.sort().reverse();
+					levels = levels.sort();
+					return levels.reverse();
 				} return [];
 			}
 		},
@@ -609,13 +610,7 @@
 				this.width = width;
 			},
 			modifier(score) {
-				var mod = Math.floor((score - 10) / 2)
-				if(mod > 0) {
-					return '+' + mod;
-				}
-				else {
-					return mod;
-				}
+				return Math.floor((score - 10) / 2);
 			},
 			passivePerception() {
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));

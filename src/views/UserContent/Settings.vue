@@ -1,6 +1,6 @@
 <template>
 	<div class="container">
-		<h1><i class="fas fa-cogs"></i> Settings</h1>
+		<h1><i aria-hidden="true" class="fas fa-cogs"></i> Settings</h1>
 		<hk-card header="General Settings" id="general">
 			<General />
 		</hk-card>

@@ -19,7 +19,7 @@
 									'color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
 								}
 							">
-								<i v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" :class="`hki-${entitiesList[doneBy].img}`" />
+								<i aria-hidden="true" v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" :class="`hki-${entitiesList[doneBy].img}`" />
 							</span>
 						</q-item-section>
 						<q-item-section>
@@ -47,7 +47,7 @@
 									'color': scope.opt.color_label ? scope.opt.color_label : ``
 								}
 							">
-								<i v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" :class="`hki-${scope.opt.img}`" />
+								<i aria-hidden="true" v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" :class="`hki-${scope.opt.img}`" />
 							</span>
 						</q-item-section>
 						<q-item-section>

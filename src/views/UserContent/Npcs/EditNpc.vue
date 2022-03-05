@@ -10,7 +10,7 @@
 							</q-tooltip>
 						</q-icon>
 						<q-btn v-if="!npcId" class="mx-1" color="neutral-5" no-caps @click="copy_dialog = true">
-							<i class="fas fa-copy mr-2"></i>
+							<i aria-hidden="true" class="fas fa-copy mr-2"></i>
 							Copy
 						</q-btn>
 					</div>
@@ -45,10 +45,10 @@
 						<div class="d-flex justify-content-start unsaved_changes">
 							<template v-if="unsaved_changes">
 								<div  class="orange truncate mr-2 d-none d-md-block">
-									<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>	
 								<a class="btn btn-sm bg-neutral-5" @click="revert_changes()">
-									<i class="fas fa-undo" />
+									<i aria-hidden="true" class="fas fa-undo" />
 									Revert
 								</a>
 							</template>

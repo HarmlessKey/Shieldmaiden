@@ -1,6 +1,6 @@
 <template>
 	<div class="loot">
-		<h3><i class="fas fa-coins"></i> Currency</h3>
+		<h3><i aria-hidden="true" class="fas fa-coins"></i> Currency</h3>
 		<div class="currency">
 			<div v-for="(coin, key) in currencies" :key="key">
 				<span class="coins" :class="coin.color">
@@ -24,11 +24,11 @@
 
 		<h3 class="d-flex justify-content-between mt-3">
 			<span>
-				<i class="far fa-staff"></i> Items
+				<i aria-hidden="true" class="far fa-staff"></i> Items
 				<span v-if="encounter.loot">( {{ Object.keys(encounter.loot).length }} )</span>
 			</span>
 			<a class="btn btn-sm bg-neutral-5" @click="addItem()">
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 			</a>
 		</h3>
@@ -48,13 +48,13 @@
 							<q-item-section avatar>
 								<span>
 									<a  @click="setEdit(key)" class="btn btn-sm bg-neutral-5 mr-1">
-										<i class="fas fa-pencil"></i>
+										<i aria-hidden="true" class="fas fa-pencil"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Edit
 										</q-tooltip>
 									</a>
 									<a @click.stop="removeItem(key)" class="btn btn-sm bg-neutral-5">
-										<i class="fas fa-trash-alt"></i>
+										<i aria-hidden="true" class="fas fa-trash-alt"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Remove
 										</q-tooltip>
@@ -110,12 +110,12 @@
 										data: { item, key }
 									})"
 								>
-									<i class="far fa-link"></i> Link item
+									<i aria-hidden="true" class="far fa-link"></i> Link item
 								</a>
 								<template v-else>
 									<LinkedItem :linked-item="item.linked_item" />
 									<a class="btn btn-clear mx-1" @click="unlink(key)">
-										<i class="fas fa-unlink red"></i>
+										<i aria-hidden="true" class="fas fa-unlink red"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Unlink
 										</q-tooltip>

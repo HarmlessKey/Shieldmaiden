@@ -18,7 +18,3 @@ export default {
 	props: { spell: Object },
 }
 </script>
-
-<style>
-
-</style>

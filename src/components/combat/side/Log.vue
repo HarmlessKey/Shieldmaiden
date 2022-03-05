@@ -15,18 +15,18 @@
 					<!-- TOTAL -->
 					<div class="d-flex justify-between">
 						<div>
-							<b :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
+							<strong :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
 								{{ item.amount }} {{ item.type }}
-							</b>
+							</strong>
 
 							<!-- OVER -->
 							<span v-if="item.over > 0">
 								- {{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }}
 							</span>
 						</div>
-						<small v-if="item.multiplier && item.multiplier !== 1" class="blue"><b>
+						<small v-if="item.multiplier && item.multiplier !== 1" class="blue"><strong>
 							{{ (item.multiplier === .5) ? "HALVED" : "DOUBLED" }}
-						</b></small>
+						</strong></small>
 					</div>
 
 					<!-- ACTIONS -->
@@ -34,21 +34,21 @@
 						<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
 							<!-- Manual -->
 							<span v-if="(action.manual || action.request) && action.type === 'damage'">
-								<b>{{ item.by_name.capitalizeEach() }}s</b> {{ item.ability }} did
+								<strong>{{ item.by_name.capitalizeEach() }}s</strong> {{ item.ability }} did
 							</span>
 
 							<!-- To hit -->
 							<span v-else-if="action.hitOrMiss">
-								<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `s ${item.ability}` : `` }}
+								<strong>{{ item.by_name.capitalizeEach() }}</strong>{{ item.ability ? `s ${item.ability}` : `` }}
 								<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
 									{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
 								</span>
-								<b>{{ item.target_name.capitalizeEach() }}</b> for
+								<strong>{{ item.target_name.capitalizeEach() }}</strong> for
 							</span>
 
 							<!-- Saving throw -->
 							<span v-else-if="action.savingThrowResult">
-								<b>{{item.target_name.capitalizeEach() }}</b> had a
+								<strong>{{item.target_name.capitalizeEach() }}</strong> had a
 								<span :class="action.savingThrowResult === 'save' ? 'green' : 'red'">
 									{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
 								</span>
@@ -57,20 +57,20 @@
 
 							<!-- Healing -->
 							<span v-else-if="action.type === 'healing'">
-								<b>{{item.by_name.capitalizeEach() }}s</b> {{ item.ability }} healed
-								<b>{{item.target_name.capitalizeEach() }}</b> for
+								<strong>{{item.by_name.capitalizeEach() }}s</strong> {{ item.ability }} healed
+								<strong>{{item.target_name.capitalizeEach() }}</strong> for
 							</span>
 
 							<!-- Damage rolls with no to hit or save -->
 							<span v-else>
-								<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `s ${item.ability}` : `` }}
-								damaged <b>{{ item.target_name.capitalizeEach() }}</b> for
+								<strong>{{ item.by_name.capitalizeEach() }}</strong>{{ item.ability ? `s ${item.ability}` : `` }}
+								damaged <strong>{{ item.target_name.capitalizeEach() }}</strong> for
 							</span>
 
 							<!-- Rolls -->
 							<span v-for="(roll, roll_index) in action.rolls" :key="`roll-${key}-${index}-${roll_index}`">
 								<span :class="action.type === 'healing' ? 'green' : roll.damage_type ? roll.damage_type : 'red'">
-									<b>{{ roll.value }}</b> 
+									<strong>{{ roll.value }}</strong> 
 									{{ action.type !== "healing" ? roll.damage_type : "" }}
 								</span>
 								{{ roll_index+1 &lt; action.rolls.length ? "and" : action.type !== "healing" ? "damage" : "healing" }}
@@ -78,7 +78,7 @@
 
 							<!-- MANUAL END -->
 							<span v-if="(action.manual || action.request) && action.type === 'damage'">
-								to <b>{{ item.target_name.capitalizeEach() }}</b>
+								to <strong>{{ item.target_name.capitalizeEach() }}</strong>
 							</span>
 						</span>
 					</div>
@@ -98,7 +98,7 @@
 				</li>
 			</transition-group>
 			<p v-else>
-				<b>There is no log yet.</b><br/>
+				<strong>There is no log yet.</strong><br/>
 				Log items are created by doing damage or healing. From this log you can undo mistakes.
 			</p>
 		</div>
@@ -125,6 +125,7 @@
 				'encounter',
 				'log',
 				'entities',
+				'userSettings',
 			]),
 			showKeybinds() {
 				return (this.userSettings && this.userSettings.general) ? this.userSettings.general.keyBinds : undefined;

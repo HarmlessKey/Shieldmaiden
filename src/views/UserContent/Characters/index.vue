@@ -22,7 +22,7 @@
 						class="avatar"
 						:style="props.value ? `background-image: url('${props.value}')` : ''"
 					>
-						<i v-if="!props.value" class="hki-player" />
+						<i aria-hidden="true" v-if="!props.value" class="hki-player" />
 					</q-td>
 					<q-td v-else-if="props.col.name !== 'actions'">
 						<div  class="truncate-cell">
@@ -42,17 +42,17 @@
 							class="btn btn-sm bg-neutral-9 mr-2"
 							:to="`/user/${props.row.user_id}/${props.row.campaign_id}`"
 						>
-							<i class="fas fa-dungeon neutral-2 mr-1" />
+							<i aria-hidden="true" class="fas fa-dungeon neutral-2 mr-1" />
 							Campaign
 						</router-link>
 						<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-							<i class="fas fa-pencil"></i>
+							<i aria-hidden="true" class="fas fa-pencil"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Edit
 							</q-tooltip>
 						</router-link>
 						<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
-							<i class="fas fa-trash-alt"></i>
+							<i aria-hidden="true" class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Delete
 							</q-tooltip>

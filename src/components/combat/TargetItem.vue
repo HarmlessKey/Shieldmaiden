@@ -41,13 +41,13 @@
 				:style="entity.color_label ? `border-color: ${entity.color_label}; color: color: ${entity.color_label}` : ``"
 			>
 				<span class="img" v-if="entity.hidden">
-					<i class="fas fa-eye-slash red" />
+					<i aria-hidden="true" class="fas fa-eye-slash red" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Hidden
 					</q-tooltip>
 				</span>
 				<span class="img" v-else-if="entity.transformed">
-					<i class="fas fa-paw-claws" />
+					<i aria-hidden="true" class="fas fa-paw-claws" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Transformed
 					</q-tooltip>
@@ -61,7 +61,7 @@
 						'color': entity.color_label ? entity.color_label : ``,
 					}"
 				>
-					<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
 				</span>
 
 				<q-popup-proxy 
@@ -102,7 +102,7 @@
 
 			<!-- ARMOR CLASS -->
 			<div class="ac_wrapper" @click.stop>
-				<i class="fas fa-shield" ></i>
+				<i aria-hidden="true" class="fas fa-shield" ></i>
 				<span 
 					v-if="entity.ac_bonus"
 					class="ac" 
@@ -212,16 +212,16 @@
 						</template>
 						<template v-else>
 							<div v-if="entity.stable">
-								<i class="fas fa-fist-raised green"></i> Stable
+								<i aria-hidden="true" class="fas fa-fist-raised green"></i> Stable
 							</div>
 							<div v-if="entity.dead && !entity.stable">
-								<i class="fas fa-skull-crossbones red"></i> Dead
+								<i aria-hidden="true" class="fas fa-skull-crossbones red"></i> Dead
 							</div>
 							<div v-else class="hp d-flex justify-content-end">
 								<div v-for="index in 5" :key="index">
-									<span v-show="entity.saves[index] == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
-									<span v-show="entity.saves[index] == 'fail'" class="save red"><i class="fas fa-times"></i></span>
-									<span v-show="!entity.saves[index]" class="save neutral-2"><i class="fas fa-dot-circle"></i></span>
+									<span v-show="entity.saves[index] == 'succes'" class="save green"><i aria-hidden="true" class="fas fa-check"></i></span> 
+									<span v-show="entity.saves[index] == 'fail'" class="save red"><i aria-hidden="true" class="fas fa-times"></i></span>
+									<span v-show="!entity.saves[index]" class="save neutral-2"><i aria-hidden="true" class="fas fa-dot-circle"></i></span>
 								</div>
 							</div>
 						</template>
@@ -351,9 +351,9 @@
 						<div class="condition bg-red" 
 							v-for="(condition, key) in entity.conditions" 
 							:key="key" 
-							@click="showCondition(key)">
+							@click.stop="showCondition(key)">
 							<q-tooltip anchor="top middle" self="center middle">
-								<i :class="`hki-${key}`" />
+								<i aria-hidden="true" :class="`hki-${key}`" />
 								{{ key.capitalize() }}
 							</q-tooltip>
 						</div>
@@ -455,20 +455,16 @@
 				'display_maxHp'
 			]),
 			showCondition(key) {
-				//Stop other functions so target is not deselected
-				event.stopPropagation();
-
 				this.setSlide({
 					show: true, 
 					type: 'slides/encounter/Condition',
 					data: {
 						condition: key,
 						entity: this.entity
-				}})
+				}});
 			},
 			percentage(current, max) {
-				const hp_percentage = (current === 0) ? 0 : current / max;
-				return hp_percentage;
+				return (current === 0) ? 0 : current / max;
 			},
 			hpBarColor(percentage) {
 				if(percentage < 33) {

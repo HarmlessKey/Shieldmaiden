@@ -95,7 +95,7 @@
 									:style="{ backgroundImage: 'url(\'' + campaign_players[data.row.id].avatar + '\')' }"
 									class="image"
 								>
-									<i v-if="!campaign_players[data.row.id].avatar" class="hki-player" />
+									<i aria-hidden="true" v-if="!campaign_players[data.row.id].avatar" class="hki-player" />
 								</span>
 
 								<!-- Companion avatar -->
@@ -104,7 +104,7 @@
 									:style="{ backgroundImage: 'url(\'' + entity_data[data.row.id].avatar + '\')' }"
 									class="image"
 								>
-									<i v-if="!data.row.id || !entity_data[data.row.id].avatar" class="hki-companion" />
+									<i aria-hidden="true" v-if="!data.row.id || !entity_data[data.row.id].avatar" class="hki-companion" />
 								</span>
 
 								<!-- Friendly NPC avatar -->
@@ -117,7 +117,7 @@
 										'color': data.row.color_label ? data.row.color_label : ``
 									}"
 								>
-									<i v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
+									<i aria-hidden="true" v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
 								</span>
 							</div>
 
@@ -132,13 +132,13 @@
 									@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
 									class="mr-2 btn btn-sm bg-neutral-5" 
 								>
-									<i class="fas fa-pencil"></i>
+									<i aria-hidden="true" class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</a>
 								<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
-									<i class="fas fa-minus"></i>
+									<i aria-hidden="true" class="fas fa-minus"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Remove character
 									</q-tooltip>
@@ -165,7 +165,7 @@
 									'color': data.row.color_label ? data.row.color_label : ``
 								}"
 							>
-								<i v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
+								<i aria-hidden="true" v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
 								
 							</span>
 
@@ -179,10 +179,10 @@
 								<q-tooltip anchor="top middle" self="center middle">
 									Edit
 								</q-tooltip>
-									<i class="fas fa-pencil"></i>
+									<i aria-hidden="true" class="fas fa-pencil"></i>
 								</a>
 								<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
-									<i class="fas fa-minus"></i>
+									<i aria-hidden="true" class="fas fa-minus"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Remove character
 									</q-tooltip>
@@ -201,7 +201,7 @@
 
 		</hk-card>
 		<div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
-			<i class="fas fa-chevron-left"></i>
+			<i aria-hidden="true" class="fas fa-chevron-left"></i>
 		</div>
 	</div>
 </template>
@@ -413,14 +413,13 @@
 			overflow: scroll;
 			z-index: 96;
 			background: $neutral-6;
-			overflow: scroll;
 			width: 300px;
 			transition: right .5s linear,
 			box-shadow .5s linear;
 
 			&.show {
 				right: 0;
-				box-shadow: 0 10px 15px$black;
+				box-shadow: 0 10px 15px $black;
 			}
 
 			h3.header {

@@ -77,7 +77,7 @@
 										: useSpellSlot(level, tab)
 									"
 								>
-									<i class="far" :class="
+									<i aria-hidden="true" class="far" :class="
 										entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i
 										? 'fa-dot-circle'
 										: 'fa-circle'
@@ -128,7 +128,7 @@
 													: useSpellSlot(spell.key, tab)
 												"
 											>
-												<i class="far" :class="
+												<i aria-hidden="true" class="far" :class="
 													entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i
 													? 'fa-dot-circle'
 													: 'fa-circle'
@@ -220,7 +220,8 @@
 							if(spell.limit == 0) spell.limit = Infinity;
 							if(!levels.includes(spell.limit)) levels.push(spell.limit);
 						}
-						levels = levels.sort().reverse();
+						levels = levels.sort();
+						levels = levels.reverse();
 					}
 				} 
 				return levels;

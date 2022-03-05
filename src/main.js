@@ -92,8 +92,7 @@ firebase.auth().onAuthStateChanged(() => {
 			});
 			
 			// Stop broadcast when connection is lost
-			userLiveDatabaseRef.onDisconnect().remove().then(function() {
-			});
+			userLiveDatabaseRef.onDisconnect().remove();
 		});
 	}
 });

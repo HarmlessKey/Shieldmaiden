@@ -52,9 +52,6 @@ export default {
 			signIn: function() {
 				auth.signInWithEmailAndPassword(this.email, this.password).then(
 					// eslint-disable-next-line
-					(user) => {
-
-					},
 					(err) => {
 						this.error = err.message;
 					}

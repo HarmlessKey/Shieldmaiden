@@ -145,7 +145,7 @@
 				return (campaign_id === this.campaign.key);
 			},
 			inOtherCampaign(campaign_id) {
-				return (campaign_id !== undefined && campaign_id !== this.campaign.key)
+				return (campaign_id && campaign_id !== this.campaign.key)
 			},
 		}
 	}

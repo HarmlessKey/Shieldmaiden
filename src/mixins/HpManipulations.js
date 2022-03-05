@@ -47,12 +47,12 @@ export const setHP = {
 		 */
 		setHP(amounts, target, current, config) {
 			for(let [type, amount] of Object.entries(amounts)) {
-				amount = parseInt(amount);
+				const int_amount = parseInt(amount);
 
 				if(type === "damage") {
-					this.isDamage(amount, target, current, config);
+					this.isDamage(int_amount, target, current, config);
 				} else {
-					this.isHealing(amount, target, current, config);
+					this.isHealing(int_amount, target, current, config);
 				}
 			}
 		},

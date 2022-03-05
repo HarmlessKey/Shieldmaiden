@@ -1049,8 +1049,9 @@ const mutations = {
     if(update_search && state.encounters[campaignId] && state.encounters[campaignId][encounterId]) {
       Vue.set(state.encounters[campaignId][encounterId], property, value)
     }
-    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][encounterId])
-    Vue.set(state.cached_encounters[uid][campaignId][encounterId], property, value);
+    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][encounterId]) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId], property, value);
+    }
   },
   FINISH_ENCOUNTER(state, { uid, campaignId, id, finished }) {
     if(state.encounters[campaignId] && state.encounters[campaignId][id]) {

@@ -301,9 +301,9 @@ export const monsterMixin = {
 				new_monster.condition_immunities = [];
 				for(let immunity of condition_immunities) {
 					if(immunity) {
-						immunity = immunity.trim().toLowerCase();
-						if(this.conditions.includes(immunity)) {
-							new_monster.condition_immunities.push(immunity);
+						const trimmed_immunity = immunity.trim().toLowerCase();
+						if(this.conditions.includes(trimmed_immunity)) {
+							new_monster.condition_immunities.push(trimmed_immunity);
 						}
 					}
 				}

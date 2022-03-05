@@ -326,7 +326,6 @@ const actions = {
       try {
         const player = await dispatch("players/get_player", { uid, id: playerId }, { root: true });
         const campaign_player = { curHp: player.maxHp };
-        // const new_count = (campaign.player_count) ? campaign.player_count + 1 : 1;
 
         // If the campaign has experience advancement
         // make sure the player has experience points set

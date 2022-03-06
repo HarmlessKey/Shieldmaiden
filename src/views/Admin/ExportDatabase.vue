@@ -18,7 +18,7 @@
 				:options="refs"
 			/>
 			<a class="btn bnt-large" @click="downloadJson()" :disabled="!ref || loading">
-				<i class="fas fa-file-download" />
+				<i aria-hidden="true" class="fas fa-file-download" />
 				{{ ref ? `Download ${ref}` : "Select a reference" }}
 			</a>
 			<span v-if="loading" class="ml-3">
@@ -61,7 +61,6 @@
 						delete entry["metadata"];
 						delete entry["changed"];
 
-						// entry.name = entry.name.toLowerCase();
 						entry.url = entry.name.toLowerCase().replace(/[\s/]/g, "-").replace(/['()]/g, '');
 						
 						

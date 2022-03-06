@@ -13,7 +13,7 @@
 					<span class="n" v-if="key == 'exhaustion'">
 						{{ entity.conditions[key] }}
 					</span>
-					<i :class="`hki-${key}`" class="icon" />
+					<i aria-hidden="true" :class="`hki-${key}`" class="icon" />
 					<q-tooltip anchor="top middle" self="center middle">
 						{{ key.capitalize() }}
 					</q-tooltip>

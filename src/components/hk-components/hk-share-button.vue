@@ -5,7 +5,7 @@
 		:class="size ? `btn-${size}` : ``"
 		@click="share"
 	>
-		<i class="fas fa-share-alt" />
+		<i aria-hidden="true" class="fas fa-share-alt" />
 	</a>
 	<span v-else>
 		<a 
@@ -13,7 +13,7 @@
 			:class="size ? `btn-${size}` : ``"
 			@click="copy"
 		>
-			<i class="fas fa-share-alt" />
+			<i aria-hidden="true" class="fas fa-share-alt" />
 		</a>
 		<input :value="link" id="copy" type="hidden" />
 	</span>

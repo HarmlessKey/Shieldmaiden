@@ -34,7 +34,7 @@
 					<a 
 						v-if="targeted.length > 0"
 						@click="damageRequest()">
-						<i class="fas fa-sword white"></i>
+						<i aria-hidden="true" class="fas fa-sword white"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Do damage or healing
 						</q-tooltip>
@@ -50,9 +50,9 @@
 					<thead class='white text-shadow'>
 						<th class="init">In.</th>
 						<th class="image"></th>
-						<th class="ac"><i class="fas fa-shield"></i></th>
+						<th class="ac"><i aria-hidden="true" class="fas fa-shield"></i></th>
 						<th>Name</th>
-						<th class="hp"><i class="fas fa-heart"></i></th>
+						<th class="hp"><i aria-hidden="true" class="fas fa-heart"></i></th>
 						<th class="conditions"></th>
 					</thead>
 					<tbody 
@@ -73,7 +73,7 @@
 								@click="target($event, 'single', entity.key)"
 							>
 								<td class="init white">
-									<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs"></i>
+									<i aria-hidden="true" v-if="targeted.includes(entity.key)" class="fas fa-crosshairs"></i>
 									<template v-else>{{ entity.initiative }}</template>
 								</td>
 							
@@ -82,7 +82,7 @@
 								</td>
 								<td class="ac">
 									<div class="ac_wrapper">
-										<i class="fas fa-shield" ></i>
+										<i aria-hidden="true" class="fas fa-shield" ></i>
 										<template v-if="
 											(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
 											|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
@@ -135,9 +135,9 @@
 									|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
 								">
 								<template v-if="entity.curHp == 0">
-									<i class="fas fa-skull-crossbones red"></i>
+									<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 									</template>
-									<i v-else class="fas" :class="{
+									<i aria-hidden="true" v-else class="fas" :class="{
 											'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
 											'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
 											'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
@@ -147,7 +147,7 @@
 								<template v-else>
 									<span class="neutral-2">
 										<template v-if="entity.curHp == 0">
-											<i class="fas fa-skull-crossbones red"></i>
+											<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 										</template>
 										<template v-else>? ? ?</template>
 									</span>
@@ -171,14 +171,14 @@
 											<span class="n" v-if="value === 'exhaustion'">
 												{{ entity.conditions[value] }}
 											</span>
-											<i :class="`hki-${value}`" />
+											<i aria-hidden="true" :class="`hki-${value}`" />
 											<q-tooltip anchor="top middle" self="center middle">
 												{{ name }}
 												{{ value === 'exhaustion' ? entity.conditions[value] : "" }}
 											</q-tooltip>
 										</div>
 									</template>
-									<b 
+									<strong 
 										v-if="Object.keys(entity.conditions).length > conditionCount"
 										class="condtion"
 										:key="`more-conditions-${entity.key}`"
@@ -188,7 +188,7 @@
 											{{ Object.keys(entity.conditions).length - conditionCount }}
 											more conditions
 										</q-tooltip>
-									</b>
+									</strong>
 
 									<!-- All conditions -->
 									<q-popup-proxy square prevent>
@@ -214,14 +214,14 @@
 													:key="`condition-list-${entity.key}-${value}`"
 												>
 													<q-item-section avatar>
-														<i :class="`hki-${value}`" />
+														<i aria-hidden="true" :class="`hki-${value}`" />
 													</q-item-section>
 													<q-item-section>
 														<span>
 															{{ name }}
-															<b v-if="value === 'exhaustion'">
+															<strong v-if="value === 'exhaustion'">
 																{{ entity.conditions[value] }}
-															</b>
+															</strong>
 														</span>
 													</q-item-section>
 												</q-item>
@@ -377,9 +377,9 @@
 					}
 				})
 			},
-			returnConditions(conditions) {
+			returnConditions(entity_conditions) {
 				let returnConditions = [];
-				for(const key in conditions) {
+				for(const key in entity_conditions) {
 					returnConditions.push(
 						this.conditionList.filter(item => {
 							return item.value === key;

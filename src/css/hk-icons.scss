@@ -11,7 +11,7 @@ TO UPDATE THE FONT
 */
 
 @font-face {
-  font-family: 'harmless-key';
+  font-family: 'harmless-key, sans-serif';
   src: url('../assets/hk-icon-font/harmless-key.eot?29559614');
   src: url('../assets/hk-icon-font/harmless-key.eot?29559614#iefix') format('embedded-opentype'),
        url('../assets/hk-icon-font/harmless-key.woff2?29559614') format('woff2'),
@@ -22,7 +22,7 @@ TO UPDATE THE FONT
   font-style: normal;
 }
 [class^="hki-"]:before, [class*=" hki-"]:before {
-  font-family: "harmless-key";
+  font-family: "harmless-key, sans-serif";
   font-style: normal;
   font-weight: normal;
   speak: never;

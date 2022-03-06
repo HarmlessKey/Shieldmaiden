@@ -21,8 +21,7 @@ export const general = {
 			return "" + npc.hit_dice + sign + mod_str;
 		},
 		percentage(current, max) {
-			var percentage = Math.floor(current / max * 100)
-			return percentage
+			return Math.floor(current / max * 100);
 		},
 		makeDate(input, showTime = false, short = false) {
 			let monthNames = [
@@ -35,7 +34,6 @@ export const general = {
 			let d = new Date(input)
 			let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
 			let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
-			// let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
 
 			let time = hours + ":" + minutes;
 			let date = (short) ?
@@ -47,8 +45,8 @@ export const general = {
 		},
 		toKebabCase(input) {
 			return input.replace(/(a-z)(A-Z)/g, "$1-$2")
-									.replace(/\s+/g, '-')
-									.toLowerCase();
+				.replace(/\s+/g, '-')
+				.toLowerCase();
 		}
 	}
 }

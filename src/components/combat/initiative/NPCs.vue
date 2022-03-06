@@ -16,7 +16,7 @@
 						'color': entity.color_label ? entity.color_label : ``
 					}"
 				>
-					<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
 				</span>
 				<div class="truncate">
 					<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
@@ -24,7 +24,7 @@
 				
 				<div class="actions">
 					<a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'combat/ViewEntity', data: entity })">
-						<i class="fas fa-info"></i>
+						<i aria-hidden="true" class="fas fa-info"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Show info
 						</q-tooltip>
@@ -60,7 +60,7 @@
 				@roll="(selected.length === 0) ? rollAll($event) : rollGroup($event)"
 			>
 				<a class="btn btn-block">
-					<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
+					<i aria-hidden="true" class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
 				</a>
 			</hk-roll>
 		</div>
@@ -119,13 +119,10 @@
 				}
 			},
 			rollGroup(e) {
-				let dex = Infinity
-				let i
-				let key
-				let entity
-				for(i in this.selected) {
-					key = this.selected[i]
-					entity = this.npcs[key]
+				let dex = Infinity;
+				let entity;
+				for(const key of this.selected) {
+					entity = this.npcs[key];
 
 					//Find lowest Dex
 					if(entity.dexterity < dex) {
@@ -143,8 +140,7 @@
 					this.share ? { encounter_id: this.encounterId } : null
 				).total;
 
-				for(let i in this.selected) {
-					key = this.selected[i];
+				for(const key in this.selected) {
 					entity = this.npcs[key];
 					entity.initiative = roll;
 
@@ -153,7 +149,7 @@
 						initiative: entity.initiative
 					});
 				}
-				this.selected = []
+				this.selected = [];
 			},
 		}
 	}

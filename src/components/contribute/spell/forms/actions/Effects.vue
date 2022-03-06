@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2 class="d-flex justify-content-between">
-			<span><i class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
+			<span><i aria-hidden="true" class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
 			<a 
 				class="neutral-2 text-capitalize" 
 				@click="add_effect()"
 			>
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 				<q-tooltip anchor="center right" self="center left">
 					Add effect
@@ -29,7 +29,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a @click="remove_effect(eff_index)" class="neutral-2 text-capitalize">
-							<i class="fas fa-trash-alt red"></i>
+							<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove effect
 							</q-tooltip>
@@ -113,7 +113,7 @@
 									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(eff_index)"
 								>
-									<i class="fas fa-plus green"></i>
+									<i aria-hidden="true" class="fas fa-plus green"></i>
 									<q-tooltip anchor="center right" self="center left">
 										Add level tier
 									</q-tooltip>
@@ -180,7 +180,7 @@
 										/>
 
 										<a @click="remove_level_tier(eff_index, tier_index)" class="remove">
-											<i class="fas fa-trash-alt red"></i>
+											<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 											<q-tooltip anchor="center right" self="center left">
 												Remove
 											</q-tooltip>
@@ -237,12 +237,10 @@ export default {
 		application() {
 			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
 
-			let application = [
+			return [
 				{ label: "Always", value: "always" },
 				hitFail
 			];
-
-			return application;
 		},
 		effects: {
 			get() {
@@ -296,12 +294,9 @@ export default {
 			this.$forceUpdate();
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "spell scale" && 
+			return !(this.level_scaling == "spell scale" && 
 					this.effects[index].level_tiers &&
-					this.effects[index].level_tiers.length >= 1) {
-				return false;
-			}
-			return true;
+					this.effects[index].level_tiers.length >= 1);
 		},
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
@@ -314,7 +309,10 @@ export default {
 					let level_txt = `At ${numeral(tier.level).format('0o')} level`;
 					let effect_txt = 'the value of this effect is ';
 					effect_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-					effect_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+					if(tier.fixed_val) {
+						effect_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`
+					}
 	
 					let new_line = `${tier.dice_count ? level_txt.capitalize()+',' : level_txt}`;
 					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`;
@@ -331,7 +329,10 @@ export default {
 				// Effect text
 				let effect_txt = 'the value of this effect increases by ';
 				effect_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-				effect_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+				if(tier.fixed_val) {
+						effect_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`
+					}
 
 				// Spell slot text
 				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`;

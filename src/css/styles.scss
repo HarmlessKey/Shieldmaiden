@@ -114,7 +114,6 @@ html body {
 	/* 4. Classes */
 	/*********************************************/
 	.white { color: $white !important; }
-	.black { color: $black !important; }
 	
 	.neutral-1, .text-neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
 	.neutral-2, .text-neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
@@ -137,7 +136,6 @@ html body {
 	.orange { color: $orange !important; path { fill: $orange !important;} }
 	.yellow { color: $yellow !important; path { fill: $yellow !important;} }
 	.purple { color: $purple !important; path { fill: $purple !important;} }
-	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
 	.blue-light { color: $blue-light !important; path { fill: $blue-light !important;} }
 	.facebook-blue { color: $facebook-blue !important; path { fill: $facebook-blue !important;} }
 	.green-light { color: $green-light !important; path { fill: $green-light !important;} }
@@ -173,7 +171,6 @@ html body {
 	.bg-black { background-color: $black !important; }
 	.bg-none { background: none !important; }
 
-	.bg-black { background-color: $black !important; }
 	.bg-green { background-color: $green !important; }
 	.bg-blue { background-color: $blue !important; }
 	.bg-red { background-color: $red !important; }
@@ -868,7 +865,6 @@ html body {
 		border-radius: $border-radius-small;
 		background: $blue;
 		color: $neutral-1;
-		border: none;
 		display: inline-block;
     font-weight: 400;
     text-align: center;
@@ -894,15 +890,17 @@ html body {
 		&:hover {
 			background-color: $blue-hover;
 		}
+		&.btn-xs {
+			padding: 0.1rem 0.3rem;
+			font-size: 0.6rem;
+		}
 		&.btn-sm {
 			padding: 0.25rem 0.5rem;
 			font-size: 0.875rem;
-			line-height: 1.5;
 		}
 		&.btn-lg {
 			padding: 0.5rem 1rem;
 			font-size: 1.25rem;
-			line-height: 1.5;
 		}
 		&.btn-block {
 			display: block;
@@ -1259,6 +1257,48 @@ html body {
 	}
 
 	.slide {
+		position: fixed;
+		right: 0;
+		top: 50px;
+		height: calc(100vh - 50px);
+		width: 330px;
+		z-index: 99;
+		box-shadow: 0 10px 15px $black;
+		background: $neutral-8;
+		display: grid;
+		grid-template-columns: auto;
+		grid-template-rows: 40px auto;
+		grid-template-areas: 
+		"hide"
+		"content";
+
+		a.hide {
+			grid-area: hide;
+			padding-left: 10px;
+			width: 100%;
+			font-size: 15px;
+			line-height: 40px;
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			z-index: 1000;
+			background: $neutral-9;
+			color: $neutral-1 !important;
+		}
+		.content {
+			padding: 15px;
+			grid-area: content;
+			overflow: auto;
+
+			&.monster-card {
+				background-color: #f7e4ba !important;
+				background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
+			}
+			&::-webkit-scrollbar {
+				display: none !important;
+			}
+		}
+
 		.hk-table {
 			.hk-table-column, .hk-collapsed-column {
 				background: $neutral-9;
@@ -1281,7 +1321,27 @@ html body {
 				background: none !important;
 			}
 		}
+		ul.entities {
+			li {
+				background-color: $neutral-8;
+				border-radius: $border-radius;
+				overflow: hidden;
+
+				&:hover {
+					background-color: $neutral-7;
+				}
+				transition: background-color .2s linear;
+			}
+		}
+		table, .table {
+			tr {
+				td {
+					background-color: $neutral-8;
+				}
+			}
+		}
 	}
+
 	table.table, table {
 		border-collapse: separate !important; 
 		border-spacing: 0 1px;
@@ -1400,6 +1460,7 @@ html body {
 	.target-item-wrapper {
 		border-radius: $border-radius-small;
 		overflow: hidden;
+		width: 100%;
 	}
 	.target-item {
 		display: grid;
@@ -1409,6 +1470,7 @@ html body {
 		line-height: 35px;
 		user-select: none;
 		border-radius: $border-radius-small;
+		width: 100%;
 	
 		&.hasInitiative {
 			grid-template-columns: 35px 35px 35px 1fr;
@@ -1622,27 +1684,6 @@ html body {
 			}
 		}
 	}
-	.slide {
-		ul.entities {
-			li {
-				background-color: $neutral-8;
-				border-radius: $border-radius;
-				overflow: hidden;
-
-				&:hover {
-					background-color: $neutral-7;
-				}
-				transition: background-color .2s linear;
-			}
-		}
-		table {
-			tr {
-				td {
-					background-color: $neutral-8;
-				}
-			}
-		}
-	}
 
 	// Q-INPUT FIELDS
 	.manual-input {
@@ -1672,60 +1713,27 @@ html body {
 		}
 	}
 
-	.slide {
-		position: fixed;
-		right: 0;
-		top: 50px;
-		height: calc(100vh - 50px);
-		width: 330px;
-		z-index: 99;
-		box-shadow: 0 10px 15px $black;
-		background: $neutral-8;
-		display: grid;
-		grid-template-columns: auto;
-		grid-template-rows: 40px auto;
-		grid-template-areas: 
-		"hide"
-		"content";
-
-		a.hide {
-			grid-area: hide;
-			padding-left: 10px;
-			width: 100%;
-			font-size: 15px;
-			line-height: 40px;
-			position: absolute;
-			right: 0px;
-			top: 0px;
-			z-index: 1000;
-			background: $neutral-9;
-			color: $neutral-1 !important;
-		}
-		.content {
-			padding: 15px;
-			grid-area: content;
-			overflow: auto;
-
-			&.monster-card {
-				background-color: #f7e4ba !important;
-				background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
-			}
-			&::-webkit-scrollbar {
-				display: none !important;
-			}
-		}
-
-		.table {
-			td {
-				background-color: $neutral-9;
-			}
-		}
-	}
 
 	//VIEW MONSTER
 	.q-table {
 		border-spacing: 0 1px;
-
+		
+		.q-field {
+			width: 60px;
+	
+			.row {
+				padding: 0;
+			}
+			&__control {
+				height: 26px;
+			}
+			input {
+				text-align: center;
+				height: 26px;
+				line-height: 26px;
+				padding: 0 5px;
+			}
+		}
 		.q-td {
 			background-color: $neutral-7;
 
@@ -2037,25 +2045,6 @@ html body {
 				&.hidden-toggle {
 					display: none !important;
 				}
-			}
-		}
-	}
-
-	.q-table {
-		.q-field {
-			width: 60px;
-	
-			.row {
-				padding: 0;
-			}
-			&__control {
-				height: 26px;
-			}
-			input {
-				text-align: center;
-				height: 26px;
-				line-height: 26px;
-				padding: 0 5px;
 			}
 		}
 	}

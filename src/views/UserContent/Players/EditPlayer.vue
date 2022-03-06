@@ -45,7 +45,7 @@
 			
 								<div class="avatar">
 									<div class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
-										<i v-if="!player.avatar" class="hki-player" />
+										<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 									</div>
 									<div>
 										<ValidationProvider rules="url" name="Avatar" v-slot="{ errors, invalid, validated }">
@@ -271,7 +271,7 @@
 						<div class="card-body">
 							<h5>
 								Proficiency Bonus: 
-								+<b class="blue">{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</b>
+								+<strong class="blue">{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</strong>
 							</h5>
 
 							<div class="skills">
@@ -304,16 +304,7 @@
 												<div class="neutral-2 abillity">{{ skill.ability.substring(0,3) }}</div>
 												{{ skill.skill  }}
 												<div class="mod">
-													{{ 
-														calculateSkillModifier(
-															calcMod(player[skill.ability]),
-															player.skills ? (
-															player.skills.includes(key) ? 
-															returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
-															: 0) : 0,
-															player.skills_expertise ? player.skills_expertise.includes(key) : false
-														) 
-													}}
+													{{ skillMod(skill, key) > 0 ? `+${skillMod(skill, key)}` : skillMod(skill, key) }}
 												</div>
 											</div>
 										</template>
@@ -335,7 +326,7 @@
 								class="btn btn-sm bg-neutral-5"
 								@click="companion_dialog = !companion_dialog"
 							>
-								<i class="fas fa-plus green mr-1" />
+								<i aria-hidden="true" class="fas fa-plus green mr-1" />
 								Add companion
 							</a>
 						</div>
@@ -345,7 +336,7 @@
 									<p>You currently have no custom npcs created</p>
 									<p>First create a custom NPC to use as a companion</p>
 									<router-link class="btn bg-green" to="/content/npcs">
-										<i class="fas fa-plus"></i>Add an NPC
+										<i aria-hidden="true" class="fas fa-plus"></i>Add an NPC
 									</router-link>
 								</div>
 							</template>
@@ -357,7 +348,7 @@
 							>
 								<template slot="avatar" slot-scope="data">
 									<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
-										<i v-if="!data.item" class="hki-monster" />
+										<i aria-hidden="true" v-if="!data.item" class="hki-monster" />
 									</div>
 								</template>
 
@@ -372,7 +363,7 @@
 
 								<div slot="actions" slot-scope="data" class="actions">
 									<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="`/content/companions/${userId}/${data.row.key}`" >
-										<i class="fas fa-pencil"></i>
+										<i aria-hidden="true" class="fas fa-pencil"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Edit
 										</q-tooltip>
@@ -380,7 +371,7 @@
 									<a v-if="isOwner()"
 										class="btn btn-sm bg-neutral-5"
 										@click="removeCompanion(data.index, data.row.key)">
-										<i class="fas fa-trash-alt"></i>
+										<i aria-hidden="true" class="fas fa-trash-alt"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Remove
 										</q-tooltip>
@@ -398,7 +389,7 @@
 									class="btn bg-neutral-5"
 									@click="companion_dialog = !companion_dialog"
 								>
-									<i class="fas fa-plus green mr-1" />
+									<i aria-hidden="true" class="fas fa-plus green mr-1" />
 									Add companion
 								</a>
 							</div>
@@ -478,7 +469,7 @@
 						truncate: true
 					},
 					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
+						label: '<i aria-hidden="true" class="far fa-ellipsis-h"></i>',
 						noPadding: true,
 						right: true,
 						maxContent: true
@@ -642,6 +633,17 @@
 					}
 					this.$set(object, property, parseInt(value));
 				}
+			},
+			skillMod(skill, key) {
+				const mod = this.calculateSkillModifier(
+					this.calcMod(this.player[skill.ability]),
+					this.player.skills ? (
+					this.player.skills.includes(key) ? 
+					this.returnProficiency(this.player.level ? this.player.level : this.calculatedLevel(this.player.experience))
+					: 0) : 0,
+					this.player.skills_expertise ? this.player.skills_expertise.includes(key) : false
+				);
+				return parseInt(mod);
 			}
 		}
 	}

@@ -299,9 +299,6 @@ export default {
 			}
 		}
 	},
-	mounted() {
-		
-	},
 	methods: {
 		setPrimary(effect) {
 			if (effect.primary == undefined) {

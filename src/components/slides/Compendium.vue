@@ -52,7 +52,7 @@
 			<!-- SHOW SELECTED RESULT -->
 			<div v-if="show">
 				<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">
-					<i class="fas fa-times red mr-1" />
+					<i aria-hidden="true" class="fas fa-times red mr-1" />
 					Close
 				</a>
 				<ViewMonster v-if="current == 'monsters'" :id="show" />
@@ -113,47 +113,21 @@
 			async searchType() {
 				this.show = undefined //clear the previous selected item
 				this.searchResults = [] //clear old search results
+				let data;
 
-				if(this.current === "monsters") {
-					await this.get_monsters({ query: { search: this.search }}).then(results => {
-						if(results.meta.count === 0) {
-							this.noResult = 'No results for "' + this.search + '"';
-						} else {
-							this.noResult = "";
-							this.searchResults = results.results;
-						}
-					});
-				}
-				if(this.current === "items") {
-					await this.get_api_items({ query: { search: this.search }}).then(results => {
-						if(results.meta.count === 0) {
-							this.noResult = 'No results for "' + this.search + '"';
-						} else {
-							this.noResult = "";
-							this.searchResults = results.results;
-						}
-					});
-				}
-				if(this.current === "spells") {
-					await this.get_api_spells({ query: { search: this.search }}).then(results => {
-						if(results.meta.count === 0) {
-							this.noResult = 'No results for "' + this.search + '"';
-						} else {
-							this.noResult = "";
-							this.searchResults = results.results;
-						}
-					});
-				}
-				if(this.current === "conditions") {
-					await this.get_conditions({ query: { search: this.search }}).then(results => {
-						if(results.meta.count === 0) {
-							this.noResult = 'No results for "' + this.search + '"';
-						} else {
-							this.noResult = "";
-							this.searchResults = results.results;
-						}
-					});
-				}
+				if(this.current === "monsters") { data = this.get_monsters; }
+				if(this.current === "items") { data = this.get_api_items; }
+				if(this.current === "spells") { data = this.get_api_spells; }
+				if(this.current === "conditions") { data = this.get_conditions; }
+				
+				data({ query: { search: this.search }}).then(results => {
+					if(results.meta.count === 0) {
+						this.noResult = 'No results for "' + this.search + '"';
+					} else {
+						this.noResult = "";
+						this.searchResults = results.results;
+					}
+				});
 			}
 		},
 	};

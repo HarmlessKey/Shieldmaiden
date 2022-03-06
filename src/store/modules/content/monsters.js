@@ -2,16 +2,16 @@ import Vue from 'vue';
 import { monsterServices } from "@/services/api/monsters"; 
 
 
-const state = {
+const monster_state = {
   monster_services: null,
   cached_monsters: {},
 };
 
-const getters = {
+const monster_getters = {
   monster_services: (state) => { return state.monster_services; },
 };
 
-const actions = {
+const monster_actions = {
   get_monster_services: async ({ getters, commit }) => {
     if(getters.monster_services === null) {
       commit("SET_MONSTER_SERVICES", new monsterServices);
@@ -22,8 +22,7 @@ const actions = {
   async get_monsters({ dispatch}, { pageNumber, pageSize, query, fields, sortBy, descending }) {
     const services = await dispatch("get_monster_services");
     try {
-      const monsters = await services.getMonsters(pageNumber, pageSize, query, fields, sortBy, descending);
-      return monsters;
+      return await services.getMonsters(query, pageNumber, pageSize, fields, sortBy, descending);
     } catch(error) {
       console.error(error);
     }
@@ -62,7 +61,7 @@ const actions = {
     return monster;
   },
 };
-const mutations = {
+const monster_mutations = {
   SET_MONSTER_SERVICES(state, payload) { Vue.set(state, "monster_services", payload); },
   SET_MONSTERS(state, payload) { Vue.set(state, "monsters", payload); },
   SET_CACHED_MONSTER(state, payload) { Vue.set(state.cached_monsters, payload["_id"], payload) },
@@ -70,8 +69,8 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: monster_state,
+  getters: monster_getters,
+  actions: monster_actions,
+  mutations: monster_mutations
 }

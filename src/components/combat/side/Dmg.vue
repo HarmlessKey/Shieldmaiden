@@ -14,7 +14,7 @@
 								'color': entity.color_label ? entity.color_label : ``
 							}"
 						>
-							<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+							<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
 						</div>
 						<q-linear-progress 
 							size="30px" 

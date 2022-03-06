@@ -7,7 +7,7 @@
 		'color': entity.color_label ? entity.color_label : ''
 		}"
 	>
-		<i v-if="['monster', 'player', 'companion'].includes(displayImg(entity))" :class="`hki-${displayImg(entity)}`" />
+		<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(displayImg(entity))" :class="`hki-${displayImg(entity)}`" />
 	</div>
 </template>
 
@@ -35,9 +35,10 @@
 			displayImg(entity) {
 			//Check what image should be displayed
 			let encounterImg = (entity) ? entity.avatar : undefined; //img linked within the encounter
+			let img;
 
 			if(encounterImg) {
-				var img = encounterImg;
+				img = encounterImg;
 			} else {
 				if(!entity.entityType) {
 					let playerImg = (this.players && this.players[entity.key]) ? this.players[entity.key].avatar : entity.avatar;

@@ -2,19 +2,19 @@
 	<span>
 		<template v-if="user.uid">
 			<a v-if="!following['.value']" @click="follow(true)" class="btn btn-sm btn-clear">
-				<i class="fas fa-user-plus mr-1" /> 
+				<i aria-hidden="true" class="fas fa-user-plus mr-1" /> 
 				<q-tooltip anchor="bottom middle" self="top middle">
 					Follow
 				</q-tooltip>
 			</a>
 			<a v-else @click="follow(false)" class="btn btn-sm btn-clear">
-				<i class="fas fa-user-check green" />
+				<i aria-hidden="true" class="fas fa-user-check green" />
 				<q-tooltip anchor="bottom middle" self="top middle">
 					Unfollow
 				</q-tooltip>
 			</a>
 		</template>
-		<i v-else class="fas fa-user" />
+		<i aria-hidden="true" v-else class="fas fa-user" />
 	</span>
 </template>
 

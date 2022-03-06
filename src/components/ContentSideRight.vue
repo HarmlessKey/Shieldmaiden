@@ -7,7 +7,7 @@
     <!-- COMPENDIUM -->
     <hk-card v-if="$route.path.split('/')[1] !== 'content'">
       <div slot="header" class="card-header">
-        <h2><i class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
+        <h2><i aria-hidden="true" class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
       </div>
       <div class="card-body overflow-x-hidden">
         <hk-video />
@@ -22,7 +22,7 @@
       <div slot="header" class="card-header">
         <span>Share your adventures</span>
         <a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'PlayerLink'})">
-          <i class="fas fa-qrcode" />
+          <i aria-hidden="true" class="fas fa-qrcode" />
         </a>
       </div>
       <div class="card-body">
@@ -34,7 +34,7 @@
     <hk-card small header="Join our community">
       <div class="card-body">
         <a class="btn btn-block bg-neutral-8 mb-3" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">
-          <i class="fab fa-discord discord-purple mr-2" /> Discord
+          <i aria-hidden="true" class="fab fa-discord discord-purple mr-2" /> Discord
         </a>
         <p class="neutral-2 text-center">
           Join others on our Discord and be amongst the first to know about new updates.
@@ -49,7 +49,7 @@
             :href="url" 
             target="_blank" rel="noopener"
           >
-            <i :class="icon" />
+            <i aria-hidden="true" :class="icon" />
           </a>
         </div>
       </div>
@@ -144,7 +144,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>

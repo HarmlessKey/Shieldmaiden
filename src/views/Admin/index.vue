@@ -4,7 +4,7 @@
 			<q-list>
 				<q-item v-for="(item, index) in items" :key="index">
 					<q-item-section avatar>
-						<i class="mr-2" :class="item.icon" />
+						<i aria-hidden="true" class="mr-2" :class="item.icon" />
 					</q-item-section>
 					<q-item-section>
 						<router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
@@ -16,13 +16,8 @@
 </template>
 
 <script>
-	import Crumble from '@/components/crumble/Compendium.vue'
-
 	export default {
 		name: 'Admin',
-		components: {
-			Crumble,
-		},
 		data() {
 			return {
 				items: {

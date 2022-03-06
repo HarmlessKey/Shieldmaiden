@@ -11,7 +11,7 @@
 			
 			<ul class="entities hasImg">
 				<li v-for="(item, index) in items" :key="index">
-					<i class="icon neutral-2 mr-2" :class="item.icon"></i> <router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
+					<i aria-hidden="true" class="icon neutral-2 mr-2" :class="item.icon"></i> <router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
 				</li>
 			</ul>
 		</div>

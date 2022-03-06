@@ -5,7 +5,7 @@
 				{{ roll.name }}
 			</div>
 			<a class="btn btn-sm btn-clear" @click="removeActionRoll(index)">
-				<i class="fas fa-times" />
+				<i aria-hidden="true" class="fas fa-times" />
 			</a>
 		</div>
 
@@ -20,10 +20,10 @@
 						'color': roll.target.color_label ? roll.target.color_label : ``
 					}"
 				>
-					<i v-if="['monster', 'player', 'companion'].includes(roll.target.img)" :class="`hki-${roll.target.img}`" />
+					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(roll.target.img)" :class="`hki-${roll.target.img}`" />
 				</span>
 				<div class="ac_wrapper">
-					<i class="fas fa-shield" ></i>
+					<i aria-hidden="true" class="fas fa-shield" ></i>
 					<span 
 						v-if="roll.target.ac_bonus"
 						class="ac" 
@@ -142,7 +142,7 @@
 						<template #header>
 							<q-item-section v-if="action.type === 'healing'">
 								<span class="type truncate green">
-										<i class="fas fa-heart"/> 
+										<i aria-hidden="true" class="fas fa-heart"/> 
 										Healing
 									</span>
 							</q-item-section>
@@ -155,7 +155,7 @@
 										@click.stop="setDefense(rolled.damage_type, key, roll.key)"
 										:class="[{active: resistances && resistances[rolled.damage_type] === key}, key]"
 									>
-										<i class="fas fa-shield"></i>
+										<i aria-hidden="true" class="fas fa-shield"></i>
 										<span>{{ key.capitalize() }}</span>
 										<q-tooltip anchor="top middle" self="center middle">
 											{{ name }}
@@ -165,7 +165,7 @@
 										class="type truncate"
 										:class="rolled.damage_type"
 									>
-										<i :class="damage_type_icons[rolled.damage_type]"/> 
+										<i aria-hidden="true" :class="damage_type_icons[rolled.damage_type]"/> 
 										{{ rolled.damage_type }}
 									</span>
 								</div>
@@ -311,7 +311,7 @@
 			<q-btn color="neutral-9" class="full-width neutral-1" label="Half" no-caps @click="apply(.5)" />
 			<q-btn color="neutral-9" class="full-width neutral-1" label="Double" no-caps @click="apply(2)" />
 			<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeActionRoll(index)">
-				<i class="fas fa-times" />
+				<i aria-hidden="true" class="fas fa-times" />
 			</q-btn>
 		</div>
 	</hk-card>

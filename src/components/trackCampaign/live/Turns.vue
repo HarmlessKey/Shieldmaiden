@@ -5,7 +5,7 @@
 		</h2>
 		<template v-else>
 			<div class="timer">
-				<i class="fas fa-stopwatch" />
+				<i aria-hidden="true" class="fas fa-stopwatch" />
 				<hk-timer :value="timer || 0" :key="encounter.turn" />
 			</div >
 			<div class="round-info d-flex justify-content-center" v-if="encounter.round">
@@ -45,11 +45,11 @@
 					|| (current.entityType == 'npc' && displayNPCField('health', current) === 'obscured')
 				">
 					<template v-if="current.curHp == 0">
-						<i class="fas fa-skull-crossbones red"></i>
+						<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 					</template>
 					<span v-else>
 						
-					<i  class="fas" :class="{
+					<i aria-hidden="true"  class="fas" :class="{
 							'green fa-heart': percentage(current.curHp, current.maxHp) == 100,
 							'orange fa-heart-broken': percentage(current.curHp, current.maxHp) < 100 && percentage(current.curHp, current.maxHp) > 33,
 							'red fa-heartbeat': percentage(current.curHp, current.maxHp) <= 33,
@@ -63,8 +63,8 @@
 		</template>
 		<span class="actions">
 			<a @click="setWeather" class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length > 0">
-				<i v-if="weather" class="fas fa-cloud-showers"></i>
-				<i v-else class="fas fa-cloud hide"></i>
+				<i aria-hidden="true" v-if="weather" class="fas fa-cloud-showers"></i>
+				<i aria-hidden="true" v-else class="fas fa-cloud hide"></i>
 			</a>
 			<a @click="$q.fullscreen.toggle()" class="full">
 				<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />

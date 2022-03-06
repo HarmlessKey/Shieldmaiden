@@ -2,13 +2,13 @@
 	<div>
 		<h2 class="d-flex justify-content-between">
 			<span>
-				<i class="fas fa-flame"/> Conditions <template v-if="conditions">( {{conditions.length }} )</template>
+				<i aria-hidden="true" class="fas fa-flame"/> Conditions <template v-if="conditions">( {{conditions.length }} )</template>
 			</span>
 			<a 
 				class="neutral-2 text-capitalize" 
 				@click="add_condition()"
 			>
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 				<q-tooltip anchor="top middle" self="center middle">
 					Add condition
@@ -29,7 +29,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a @click="remove_condition(con_index)" class="remove">
-							<i class="fas fa-trash-alt red" />
+							<i aria-hidden="true" class="fas fa-trash-alt red" />
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove
 							</q-tooltip>
@@ -91,7 +91,6 @@
 							</q-select>
 							<p class="validate red" v-if="errors.has(`application-${con_index}`)">{{ errors.first(`application-${con_index}`) }}</p>
 						</div>
-						<!-- <span>{{ condition.application }}</span> -->
 					</div>
 					<template v-if="condition.application == 'hitpoint_based'">
 						<div class="row q-col-gutter-md">
@@ -186,7 +185,7 @@
 									v-if="level_tier_addable(con_index)"
 									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(con_index)">
-										<i class="fas fa-plus green"></i>
+										<i aria-hidden="true" class="fas fa-plus green"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add level tier
 										</q-tooltip>
@@ -256,7 +255,7 @@
 												@keyup="$forceUpdate()"
 											/>
 											<a @click="remove_level_tier(con_index, tier_index)" class="remove">
-												<i class="fas fa-trash-alt red"></i>
+												<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Remove
 												</q-tooltip>
@@ -265,11 +264,6 @@
 									</div>
 								</div>
 							</template>
-							<!-- <p v-if="condition.level_tiers && condition.level_tiers.length > 0">
-								<span v-for="(line, i) in create_spell_level_tier_description(condition.level_tiers)" :key="`tier-${i}`">
-									{{line}}<br>
-								</span>
-							</p> -->
 						</template>
 					</template>
 				</div>
@@ -294,13 +288,11 @@ export default {
 		application() {
 			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
 
-			let application = [
+			return [
 				{ label: "Always", value: "always" },
 				{ label: "Hitpoint based", value: "hitpoint_based" },
 				hitFail,
 			];
-
-			return application;
 		},
 		conditions: {
 			get() {
@@ -339,12 +331,12 @@ export default {
 	},
 	methods: {
 		add_condition() {
-			let conditions = this.conditions;
-			if(conditions === undefined) {
-				conditions = []
+			let condition_list = this.conditions;
+			if(condition_list === undefined) {
+				condition_list = []
 			}
-			conditions.push({});
-			this.$emit("input", conditions)
+			condition_list.push({});
+			this.$emit("input", condition_list)
 			this.$forceUpdate(); //IMPORTANT
 		},
 		remove_condition(index) {
@@ -363,12 +355,9 @@ export default {
 			this.$forceUpdate()
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "spell scale" && 
+			return !(this.level_scaling == "spell scale" && 
 					this.conditions[index].level_tiers &&
-					this.conditions[index].level_tiers.length >= 1) {
-				return false
-			}
-			return true
+					this.conditions[index].level_tiers.length >= 1);
 		},
 	},
 	watch: {

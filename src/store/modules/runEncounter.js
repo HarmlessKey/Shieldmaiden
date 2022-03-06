@@ -58,7 +58,7 @@ const demoPlayers = {
 	}
 }
 const demoEncounter = {
-	"encounter" : "Demo Encounter",
+	"name" : "Demo Encounter",
 	"entities" : {
 		"playerone" : {
 			"active" : true,		
@@ -136,12 +136,13 @@ const getDefaultState = () => {
 		path: undefined,
 		track: undefined,
 		encounter_initialized: false,
+		show_monster_card: false
 	}
 }
 
-const state = getDefaultState();
+const run_encounter_state = getDefaultState();
 
-const getters = {
+const run_encounter_getters = {
 	entities(state) { return state.entities },
 	demoEntities(state) { return state.demoEntities },
 	track(state) { return state.track },
@@ -156,6 +157,7 @@ const getters = {
 	encounterId(state) { return state.encounterId },
 	path(state) { return state.path },
 	encounter_initialized(state) { return state.encounter_initialized },
+	show_monster_card(state) { return state.show_monster_card },
 	log(state) {
 		//If there is a storage log, set it in the store
 		if(localStorage.getItem(state.encounterId)) {
@@ -171,7 +173,7 @@ const getters = {
 	}
 }
 
-const actions = {
+const run_encounter_actions = {
 	/**
 	 * Initialize the encounter
 	 * 
@@ -548,7 +550,17 @@ const actions = {
 		commit("SET_TURN", turn);
 		commit("SET_ROUND", round);
 	},
-	set_log({ commit }, payload) { commit("SET_LOG", payload) },
+	set_log({ commit }, payload) { commit("SET_LOG", payload); },
+
+	/**
+	 * Saves if the user wants to show the monster card for NPC whose turn it is 
+	 * instead of showing the actions overview
+	 * 
+	 * @param {boolean} value
+	 */
+	set_show_monster_card({ commit }, value) {
+		commit("SET_SHOW_MONSTER_CARD", value);
+	},
 
 	/**
 	 * Edit entity properties
@@ -1187,7 +1199,7 @@ const actions = {
 	 * @param {string} check set, unset, reset
 	 * @param {integer} index index of the check
 	 */
-	async set_save({ commit, rootGetters, dispatch }, {key, check, index}) { 
+	async set_save({ state, commit, rootGetters, dispatch }, {key, check, index}) { 
 		let type = state.entities[key].entityType + 's';
 		if(check == 'reset') {
 			if(!state.demo)  {
@@ -1644,7 +1656,7 @@ const actions = {
 	reset_store({ commit }) { commit("RESET_STORE"); },
 }
 
-const mutations = {
+const run_encounter_mutations = {
 	//INITATIALIZE ENCOUNTER
 	TRACK(state, value) { Vue.set(state, 'track', value); },
 	SET_DEMO(state, value) { Vue.set(state, 'demo', value); },
@@ -1691,6 +1703,7 @@ const mutations = {
 	REMOVE_LIMITED_USES(state, {key, category, index}) { Vue.delete(state.entities[key].limited_uses[category], index); },
 	
 	ADD_ENTITY(state, { key, entity }) { Vue.set(state.entities, key, entity); },
+	SET_SHOW_MONSTER_CARD(state, value) { Vue.set(state, "show_monster_card", value); },
 	SET_LOG(state, {action, value}) {
 		if(localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
 			state.log = JSON.parse(localStorage.getItem(state.encounterId));
@@ -1711,8 +1724,8 @@ const mutations = {
 }
 
 export const run_encounter = {
-	state: state,
-	getters: getters,
-	mutations: mutations,
-	actions: actions,
+	state: run_encounter_state,
+	getters: run_encounter_getters,
+	mutations: run_encounter_mutations,
+	actions: run_encounter_actions
 }

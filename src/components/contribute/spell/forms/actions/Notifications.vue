@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2 class="d-flex justify-content-between">
-			<span><i class="fas fa-bell"/> Notifications <template v-if="notifications">( {{ notifications.length }} )</template></span>
+			<span><i aria-hidden="true" class="fas fa-bell"/> Notifications <template v-if="notifications">( {{ notifications.length }} )</template></span>
 			<a 
 				class="neutral-2 text-capitalize" 
 				@click="add_notification()"
 			>
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 				<q-tooltip anchor="center right" self="center left">
 					Add notification
@@ -27,7 +27,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a @click="remove_notification(not_index)" class="remove">
-							<i class="fas fa-trash-alt red" />
+							<i aria-hidden="true" class="fas fa-trash-alt red" />
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove notification
 							</q-tooltip>
@@ -133,7 +133,7 @@
 												v-if="level_tier_addable(not_index, key)"
 												class="neutral-2 text-capitalize" 
 												@click="add_level_tier(not_index, key)">
-													<i class="fas fa-plus green"></i>
+													<i aria-hidden="true" class="fas fa-plus green"></i>
 													<q-tooltip anchor="center right" self="center left">
 														Add level tier
 													</q-tooltip>
@@ -172,7 +172,7 @@
 															@keyup="$forceUpdate()"
 														/>
 														<a @click="remove_level_tier(not_index, tier_index, key)" class="remove">
-															<i class="fas fa-trash-alt red"></i>
+															<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 															<q-tooltip anchor="center right" self="center left">
 																Remove
 															</q-tooltip>

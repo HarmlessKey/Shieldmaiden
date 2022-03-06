@@ -9,9 +9,9 @@
 				<div class="right">
 					<div class="mr-2">
 						<div class="title">
-							<i class="fas fa-swords" /> Combat Tracker
+							<i aria-hidden="true" class="fas fa-swords" /> Combat Tracker
 						</div>
-						<i class="">Harmless Key</i>						
+						<i aria-hidden="true" class="">Harmless Key</i>						
 					</div>
 					<router-link to="/demo" class="btn btn-sm bg-green my-2">Try demo</router-link>
 				</div>

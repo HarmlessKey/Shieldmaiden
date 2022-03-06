@@ -55,21 +55,21 @@
 						<div class="mt-3 neutral-2 pointer">
 							<span class="btn btn-clear" @click="$set(editCampaign, 'private', null)">
 								<span :class="!editCampaign.private ? 'green' : 'neutral-2'">
-									<i class="fas fa-eye"></i>
+									<i aria-hidden="true" class="fas fa-eye"></i>
 									Public
 								</span>
 							</span>
 							/
 							<span class="btn btn-clear mr-2" @click="$set(editCampaign, 'private', true)">
 								<span :class="editCampaign.private ? 'red' : 'neutral-2'">
-									<i class="fas fa-eye-slash"></i>
+									<i aria-hidden="true" class="fas fa-eye-slash"></i>
 									Private
 								</span>
 							</span>
 							<hk-popover 
 								header="Private vs Public"
 							>
-								<i class="fas fa-info-circle blue" />
+								<i aria-hidden="true" class="fas fa-info-circle blue" />
 								<template #content>
 									<p>
 										You can only share the inititiave list with your 

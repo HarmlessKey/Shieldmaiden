@@ -14,20 +14,20 @@
 			<hr>
 			<span class="attributes">
 				<template v-if="monster.armor_class">
-					<b>Armor Class: </b> {{ monster.armor_class }}<br/>
+					<strong>Armor Class: </strong> {{ monster.armor_class }}<br/>
 				</template>
 				<template v-else>
-					<b>Armor Class</b>: {{ monster.ac }}<br/>
+					<strong>Armor Class</strong>: {{ monster.ac }}<br/>
 				</template>
 				<template v-if="monster.hit_points">
-					<b>Hit Points</b>: {{ monster.hit_points }}
+					<strong>Hit Points</strong>: {{ monster.hit_points }}
 				</template>
 				<template v-else>
-					<b>Hit Points</b>: {{ monster.maxHp }}
+					<strong>Hit Points</strong>: {{ monster.maxHp }}
 				</template>
 				<template v-if="monster.hit_dice"> ({{ monster.hit_dice ? hitDiceStr(monster) : '' }})</template>
 				<template>
-					<br/><b>Speed</b>: {{ monster.walk_speed ? monster.walk_speed : 0 }} ft.{{ 
+					<br/><strong>Speed</strong>: {{ monster.walk_speed ? monster.walk_speed : 0 }} ft.{{ 
 						monster.swim_speed ? `, swim ${monster.swim_speed} ft.` : `` 
 					}}{{ 
 						monster.fly_speed ? `, fly ${monster.fly_speed} ft.` : `` 
@@ -69,7 +69,7 @@
 
 			<div class="stats mb-2">
 				<template v-if="monster.saving_throws">
-					<b>Saving Throws </b>
+					<strong>Saving Throws </strong>
 					<span class="saves">
 						<hk-roll 
 							tooltip="Roll save" 
@@ -100,7 +100,7 @@
 					</span>
 					<br/>
 				</template>
-				<template v-if="monster.skills"><b>Skills</b>
+				<template v-if="monster.skills"><strong>Skills</strong>
 					<span class="saves">
 						<hk-roll 
 							v-for="(skill, index) in monster.skills" 
@@ -120,26 +120,26 @@
 							} : null"
 						>
 							<span class="save">
-								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
+								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) > 0 ? `+${skillModifier(skillList[skill].ability, skill)}` : skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
 							</span>
 						</hk-roll>
 						<br/>
 					</span>
 				</template>
 				<template v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0">
-					<b>Damage vulnerabilities</b> {{ monster.damage_vulnerabilities.join(", ") }}<br/>
+					<strong>Damage vulnerabilities</strong> {{ monster.damage_vulnerabilities.join(", ") }}<br/>
 				</template>
 				<template v-if="monster.damage_resistances && monster.damage_resistances.length > 0">
-					<b>Damage resistances</b> {{ monster.damage_resistances.join(", ") }}<br/>
+					<strong>Damage resistances</strong> {{ monster.damage_resistances.join(", ") }}<br/>
 				</template>
 				<template v-if="monster.damage_immunities && monster.damage_immunities.length > 0">
-					<b>Damage immunities</b> {{ monster.damage_immunities.join(", ") }}<br/>
+					<strong>Damage immunities</strong> {{ monster.damage_immunities.join(", ") }}<br/>
 				</template>
 				<template v-if="monster.condition_immunities && monster.condition_immunities.length > 0">
-					<b>Condition immunities</b> {{ monster.condition_immunities.join(", ") }}<br/>
+					<strong>Condition immunities</strong> {{ monster.condition_immunities.join(", ") }}<br/>
 				</template>
 
-				<b>Senses</b> 
+				<strong>Senses</strong> 
 				<template v-if="monster.senses">
 					<span v-for="(sense, key) in monster.senses" :key="key">
 						{{ key }} {{ sense.range ? `${sense.range} ft.` : `` }}{{ 
@@ -149,12 +149,12 @@
 				</template>
 				passive Perception {{ passivePerception() }}<br/>
 
-				<template v-if="monster.languages && monster.languages.length > 0"><b>Languages</b> {{ monster.languages.join(", ") }}<br/></template>
+				<template v-if="monster.languages && monster.languages.length > 0"><strong>Languages</strong> {{ monster.languages.join(", ") }}<br/></template>
 				<template v-if="monster.challenge_rating">
-					<b>Challenge Rating</b> {{ monster.challenge_rating }} 
+					<strong>Challenge Rating</strong> {{ monster.challenge_rating }} 
 					({{ monster_challenge_rating[monster.challenge_rating].xp | numeral('0,0') }} XP)<br/>
 				</template>
-				<template v-if="monster.challenge_rating"><b>Proficiency bonus</b> +{{ monster.proficiency }}</template>
+				<template v-if="monster.challenge_rating"><strong>Proficiency bonus</strong> +{{ monster.proficiency }}</template>
 			</div>
 
 			<h3>Skills</h3>
@@ -179,13 +179,13 @@
 					<span class="skill">
 						<span class="truncate">
 							<template v-if="monster.skills && monster.skills.includes(key)">
-								<i v-if="monster.skills_expertise && monster.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
-								<i v-else class="fas fa-circle"></i>
+								<i aria-hidden="true" v-if="monster.skills_expertise && monster.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+								<i aria-hidden="true" v-else class="fas fa-circle"></i>
 							</template>
-							<i v-else class="far fa-circle"></i>
+							<i aria-hidden="true" v-else class="far fa-circle"></i>
 							{{ skill.skill }}
 						</span>
-						<span>{{ skillModifier(skill.ability, key) }}</span>
+						<span>{{ skillModifier(skill.ability, key) > 0 ? `+${skillModifier(skill.ability, key)}` : skillModifier(skill.ability, key) }}</span>
 					</span>
 				</hk-roll>
 			</div>
@@ -195,9 +195,9 @@
 			<!-- SPELLCASTING -->
 			<template v-if="monster.caster_ability">
 				<p>
-					<b><i>
+					<strong><em>
 						Spellcasting
-					</i></b>
+					</em></strong>
 					The {{ monster.name.capitalizeEach() }} is a {{ monster.caster_level | numeral('Oo')}}-level spellcaster.
 					It's spellcasting ability is {{ monster.caster_ability.capitalize() }}
 					(spell save DC {{ monster.caster_save_dc }}, 
@@ -213,7 +213,7 @@
 							<template v-else>
 								{{ level | numeral('Oo') }} level ({{ monster.caster_spell_slots[level] }} slots):
 							</template>
-							<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+							<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 								<hk-popover>
 									{{ spell.name }}
 									<template #content>
@@ -229,9 +229,9 @@
 			<!-- INNATE SPELLCASTING -->
 			<template v-if="monster.innate_ability">
 				<p>
-					<b><i>
+					<strong><em>
 						Innate spellcasting
-					</i></b>
+					</em></strong>
 					The {{ monster.name.capitalizeEach() }}'s innate spellcasting ability is {{ monster.innate_ability.capitalize() }}
 					(spell save DC {{ monster.innate_save_dc }}, 
 					{{ monster.innate_spell_attack > 0 ? `+${monster.innate_spell_attack}` : monster.innate_spell_attack }} to hit with spell attacks). 
@@ -246,7 +246,7 @@
 							<template v-else>
 								{{ limit }}/day each:
 							</template>
-							<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
+							<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
 								<hk-popover>
 								{{ spell.name }}
 								<template #content>
@@ -263,7 +263,7 @@
 			<template v-if="monster.reactions">
 				<h3>Reactions</h3>
 				<p v-for="(action, index) in monster.reactions" :key="`action-${index}`">
-						<b><i>{{ action.name }}</i></b> {{ action.desc }}
+						<strong><em>{{ action.name }}</em></strong> {{ action.desc }}
 				</p>
 			</template>
 		</div>
@@ -284,7 +284,7 @@
 									<div class="bg-neutral-8">
 										<q-item>
 											<q-item-section>
-												<b>{{ ability.name }}</b>
+												<strong>{{ ability.name }}</strong>
 											</q-item-section>
 										</q-item>
 										<q-list :dark="$store.getters.theme === 'dark'">
@@ -324,12 +324,12 @@
 								<span class="roll-button" />
 							</hk-roll>
 						</template>
-						<b><i>
+						<strong><em>
 							{{ ability.name }}
 							{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : ``}}
 							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
-						</i></b>
+						</em></strong>
 						<hk-dice-text v-if="ability.desc" :input_text="ability.desc"/>
 					</p>
 				</template>
@@ -424,7 +424,8 @@
 						const limit = (spell.limit) ? spell.limit : Infinity;
 						if(!levels.includes(limit)) levels.push(limit);
 					}
-					return levels.sort().reverse();
+					levels = levels.sort();
+					return levels.reverse();
 				} return [];
 			}
 		},
@@ -442,16 +443,16 @@
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
 			},
 			spellsForLevel(level) {
-				return Object.entries(this.monster.caster_spells).filter(([key, item]) => { 
-						item.key = key;
-						return item.level == level;
+				return Object.entries(this.monster.caster_spells).filter(([key, spell]) => { 
+						spell.key = key;
+						return spell.level == level;
 					}).map(item => { return item[1] });
 			},
 			spellsForLimit(limit) {
-				return Object.entries(this.monster.innate_spells).filter(([key, item]) => { 
-					item.key = key;
-					if(item.limit === 0) item.imit = Infinity;
-					return item.limit == limit;
+				return Object.entries(this.monster.innate_spells).filter(([key, spell]) => { 
+					spell.key = key;
+					if(spell.limit === 0) spell.imit = Infinity;
+					return spell.limit == limit;
 				}).map(item => { return item[1] });
 			},
 			skillModifier(ability, skill) {
@@ -467,7 +468,7 @@
 				if(this.monster.skill_modifiers && this.monster.skill_modifiers[skill]) {
 					mod = parseInt(mod) + parseInt(this.monster.skill_modifiers[skill]);
 				}
-				return (mod) >= 0 ? '+' + parseInt(mod) : parseInt(mod);
+				return parseInt(mod);
 			}
 		}
 	};

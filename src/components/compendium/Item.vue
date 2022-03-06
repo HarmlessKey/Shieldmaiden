@@ -4,7 +4,7 @@
 			{{ item.name }}
 		</h3>
 
-		<i class="mb-3 d-block">
+		<i aria-hidden="true" class="mb-3 d-block">
 			{{ item.type }}, 
 			<span :class="{ 
 				'white': item.rarity == 'common',
@@ -76,8 +76,3 @@
 		}
 	};
 </script>
-
-<style lang="scss" scoped>
-
-
-</style>

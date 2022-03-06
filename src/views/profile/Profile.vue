@@ -29,8 +29,8 @@
 					<template v-if="tier && tier.name !== 'Free'">
 						<!-- PATRON -->
 						<div v-if="userInfo.patron">
-							<h3><i class="fab fa-patreon patreon-red"></i> Patreon: <b>{{ userInfo.patron.tier }}</b></h3>
-							<p>Thank you so much for your support. <i class="patreon-red fas fa-heart"></i></p>
+							<h3><i aria-hidden="true" class="fab fa-patreon patreon-red"></i> Patreon: <b>{{ userInfo.patron.tier }}</b></h3>
+							<p>Thank you so much for your support. <i aria-hidden="true" class="patreon-red fas fa-heart"></i></p>
 
 							<div v-if="userInfo.patron.last_charge_status === 'Declined' && valid(userInfo.patron.pledge_end)">
 								<h3 class="red">Payment Declined</h3>
@@ -42,7 +42,7 @@
 							<div v-if="!valid(userInfo.patron.pledge_end)"> 
 								<p>Your subscription <b class="red">expired</b></p>
 								<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-neutral-5">
-									<i class="fas fa-redo-alt blue mr-1" /> Renew
+									<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Renew
 								</a>
 							</div>
 							<small v-else><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank" rel="noopener">Cancel subscription</a></small>
@@ -51,11 +51,11 @@
 
 						<!-- VOUCHER -->
 						<div v-if="voucher">
-							<h3><i class="fas fa-ticket-alt"></i> Voucher subscription</h3>
+							<h3><i aria-hidden="true" class="fas fa-ticket-alt"></i> Voucher subscription</h3>
 							<p v-if="voucher.message" class="green">{{ voucher.message }}</p>
 							<p >Your voucher ends on: 
 								<span class="red" v-if="voucher.date">{{ makeDate(voucher.date, false) }}</span>
-								<i v-else>never</i>.
+								<i aria-hidden="true" v-else>never</i>.
 							</p>
 							<hr>
 						</div>
@@ -74,15 +74,15 @@
 				<!-- ACTIONS -->
 				<hk-card>
 					<div class="card-body actions">
-						<p v-if="resetError" class="red text-center"><i class="fas fa-exclamation-triangle" /> {{ resetError }}</p>
-						<p v-if="resetSuccess" class="green text-center"><i class="fas fa-check" /> {{ resetSuccess }}</p>
+						<p v-if="resetError" class="red text-center"><i aria-hidden="true" class="fas fa-exclamation-triangle" /> {{ resetError }}</p>
+						<p v-if="resetSuccess" class="green text-center"><i aria-hidden="true" class="fas fa-check" /> {{ resetSuccess }}</p>
 
 						<div class="d-flex justify-content-between">
 							<a @click="resetPassword()" class="btn btn-sm btn-clear">
-								<i class="fas fa-redo-alt blue mr-1" /> Reset Password
+								<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Reset Password
 							</a>
 							<router-link to="/profile/delete-account" class="btn btn-sm btn-clear">
-								<i class="fas fa-trash-alt red mr-1" /> Delete account
+								<i aria-hidden="true" class="fas fa-trash-alt red mr-1" /> Delete account
 							</router-link>
 						</div>
 					</div>
@@ -93,7 +93,7 @@
 			<div class="col">
 				<hk-card>
 					<div class="card-header" slot="header">
-						<span><i class="fas fa-link"></i> Public initiative link</span>
+						<span><i aria-hidden="true" class="fas fa-link"></i> Public initiative link</span>
 					</div>
 					<div class="card-body">
 						<PlayerLink />

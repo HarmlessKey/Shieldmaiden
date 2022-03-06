@@ -16,12 +16,6 @@
 			return {
 				userId: this.$store.getters.user.uid,
 			}
-		},
-		methods: {
 		}
 	};
 </script>
-
-<style lang="scss" scoped>
-
-</style>

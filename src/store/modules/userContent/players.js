@@ -20,7 +20,7 @@ const convert_player = (player) => {
 	return returnPlayer;
 }
 
-const state = {
+const player_state = {
   player_services: null,
   players: undefined,
   player_count: 0,
@@ -28,7 +28,7 @@ const state = {
   characters: undefined
 };
 
-const getters = {
+const player_getters = {
   players: (state) => {
     // Convert object to sorted array
     return _.chain(state.players)
@@ -49,7 +49,7 @@ const getters = {
   player_services: (state) => { return state.player_services; }
 };
 
-const actions = {
+const player_actions = {
   async get_player_services({ getters, commit }) {
     if(getters.player_services === null) {
       commit("SET_PLAYER_SERVICES", new playerServices);
@@ -61,7 +61,7 @@ const actions = {
    * Fetches all the search_players for a user
    * and stores them in players
    */
-   async get_players({ rootGetters, dispatch, commit }) {
+   async get_players({ state, rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let players = (state.players) ? state.players : undefined;
 
@@ -139,7 +139,7 @@ const actions = {
    * Fetches all the characters for a user
    * and stores them in characters
    */
-   async get_characters({ rootGetters, dispatch, commit }) {
+   async get_characters({ state, rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let characters = (state.characters) ? state.characters : undefined;
 
@@ -436,7 +436,7 @@ const actions = {
     }
   }
 };
-const mutations = {
+const player_mutations = {
   SET_PLAYER_SERVICES(state, payload) { Vue.set(state, "player_services", payload); },
   SET_PLAYERS(state, payload) { Vue.set(state, "players", payload); },
   SET_CHARACTERS(state, payload) { Vue.set(state, "characters", payload); },
@@ -499,8 +499,8 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: player_state,
+  getters: player_getters,
+  actions: player_actions,
+  mutations: player_mutations
 }

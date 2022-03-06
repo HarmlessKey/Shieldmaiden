@@ -2,7 +2,6 @@
 	<div class="container-fluid" :class="{'p-4': $route.path === '/admin/patrons/new'}" v-if="patron">
 		
 		<template v-if="$route.path === '/admin/patrons/new'">
-			<Crumble />
 			<h1>New Patron</h1>
 		</template>
 
@@ -73,14 +72,10 @@
 
 <script>
 	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'NewPatron',
 		props: ["editPatron"],
-		components: {
-			Crumble,
-		},
 		firebase() {
 			return {
 				tiers: {
@@ -116,8 +111,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-
-
-</style>

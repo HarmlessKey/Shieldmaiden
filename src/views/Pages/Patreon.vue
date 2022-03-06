@@ -27,7 +27,7 @@
 						</p>
 
 						<a class="btn bg-patreon-red btn-block" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">
-							<i class="fab fa-patreon black"></i> Support us
+							<i aria-hidden="true" class="fab fa-patreon black"></i> Support us
 						</a>
 					</div>
 				</hk-card>

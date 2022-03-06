@@ -508,6 +508,7 @@
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { experience } from '@/mixins/experience.js';
 	import { abilities } from '@/mixins/abilities.js';
+	import { runEncounter } from '@/mixins/runEncounter.js';
 	import Spell from "@/components/compendium/Spell";
 
 	export default {
@@ -518,7 +519,8 @@
 			experience, 
 			skills, 
 			monsterMixin,
-			abilities
+			abilities,
+			runEncounter
 		],
 		components: {
 			Spell
@@ -547,7 +549,6 @@
 		},
 		computed: {
 			...mapGetters([
-				"entities",
 				"encounterId",
 				"broadcast",
 				"targeted",
@@ -644,41 +645,15 @@
 			},
 			roll(e, action_index, action, category, versatile) {
 				if(this.targeted && this.targeted.length) {
-					let roll;
-					const config = {
-						type: "monster_action",
-						versatile
-					}
-
-					// Roll once for AOE
-					if(action.aoe_type) {
-						roll = this.rollAction(e, action, config);
-						if(this.share) this.shareRoll(roll, this.targeted);
-					}
-
-					// Check for limited uses
-					if(action.limit || action.recharge) {
-						this.spendLimited(category, action_index);
-					}
-					if(action.legendary_cost) {
-						this.spendLimited(category, "legendaries_used", false, action.legendary_cost);
-					}
-
-					for(const key of this.targeted) {
-						let newRoll = { ...roll };
-	
-						// Reroll for each target if it's not AOE
-						if(!action.aoe_type) {
-							newRoll = this.rollAction(e, action, config);
-							if(this.share) this.shareRoll(newRoll, [key]);
-						}
-	
-						// Set the target and current
-						this.$set(newRoll, "target", this.entities[key]);
-						this.$set(newRoll, "current", this.entity);
-	
-						this.setActionRoll(newRoll);
-					}
+					this.roll_action(
+						e,
+						action_index,
+						action,
+						category,
+						versatile,
+						this.entity,
+						this.targeted
+					);
 				} else {
 					this.$q.notify({
 						message: "Select a target first.",
@@ -707,50 +682,6 @@
 				if(action.recharge) {
 					return !this.entity.limited_uses[category] || !this.entity.limited_uses[category][index];
 				}
-			},
-			shareRoll(roll, targets) {
-				const key = Date.now() + Math.random().toString(36).substring(4);
-				let share = {
-					key,
-					type: "action_roll",
-					entity_key: this.entity.key,
-					encounter_id: this.encounterId,
-					notification: {
-						title: roll.name,
-						targets,
-						actions: []
-					}
-				};
-				roll.actions.forEach((action, action_index) => {
-					const type = (action.type === "healing") ? "healing" : "damage";
-
-					share.notification.actions[action_index] = {
-						rolls: [],
-						type
-					};
-					// To hit
-					if(action.toHit) {
-						const toHit = action.toHit;
-						share.notification.actions[action_index].toHit = {
-							roll: toHit.roll,
-							total: toHit.total
-						}
-						if(toHit.ignored) share.notification.actions[action_index].toHit.advantage_disadvantage = this.advantage(toHit.advantage_disadvantage);
-					}
-
-					//Rolls
-					action.rolls.forEach((item, roll_index) => {
-						share.notification.actions[action_index].rolls[roll_index] = {
-							damage_type: item.damage_type || null,
-							roll: item.modifierRoll.roll,
-							total: item.modifierRoll.total,
-						};
-					});
-				});
-				this.set_share({ id: this.broadcast.live, share})
-			},
-			advantage(input) {
-				return Object.keys(input)[0].charAt(0);
 			}
 		}
 	};

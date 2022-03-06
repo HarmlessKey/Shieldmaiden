@@ -8,7 +8,7 @@
 					content_count[type] == tier.benefits[type] ? 'neutral-2' : 'green'
 				">{{ content_count[type] }}</span>
 				<span class="divider">/</span> 
-				<i v-if="tier.benefits[type] == 'infinite'" class="far fa-infinity"></i> 
+				<i aria-hidden="true" v-if="tier.benefits[type] == 'infinite'" class="far fa-infinity"></i> 
 				<template v-else>{{ tier.benefits[type] }}</template>	
 			</span>
 			{{ type === "npcs" ? `${type.substring(0, 3).toUpperCase()}s` : type.capitalize() }}
@@ -22,22 +22,22 @@
 					class="btn btn-sm bg-neutral-5" 
 					@click="$emit('add')"
 				>
-					<i class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
+					<i aria-hidden="true" class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
 				</a>
 				<router-link
 					v-else
 					class="btn btn-sm bg-neutral-5" 
 					:to="`${$route.path}/add-${type.slice(0, -1)}`"
 				>
-					<i class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
+					<i aria-hidden="true" class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
 				</router-link>
 			</template>
 			<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">
-				<i class="fas fa-box-full red mr-1"/>
+				<i aria-hidden="true" class="fas fa-box-full red mr-1"/>
 				Over encumbered
 			</router-link>
 			<router-link v-else class="btn btn-sm ml-1" to="/patreon">
-				<i class="fab fa-patreon patreon-red mr-1"/>
+				<i aria-hidden="true" class="fab fa-patreon patreon-red mr-1"/>
 				Get more slots
 			</router-link>
 		</div>

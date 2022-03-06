@@ -287,16 +287,6 @@
 		}
 	}
 
-	.container-fluid {
-		height: calc(100vh -50px);
-		overflow-y: scroll;
-		padding-bottom: 50px !important;
-
-		&::-webkit-scrollbar { 
-			display: none; 
-		}
-	}
-
 	section {
 		padding-top: 55px;
 

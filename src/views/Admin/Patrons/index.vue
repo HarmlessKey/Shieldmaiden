@@ -4,11 +4,11 @@
 			<div class="card-header">
 				<h1 class="d-flex justify-content-between">
 					<span>
-						<i class="fab fa-patreon"></i> Patrons ( {{ Object.keys(patrons).length }} )
+						<i aria-hidden="true" class="fab fa-patreon"></i> Patrons ( {{ Object.keys(patrons).length }} )
 					</span>
 				</h1>
 				<router-link to="/admin/patrons/new" class="btn btn-sm bg-neutral-5" >
-					<i class="fas fa-plus green"></i> New
+					<i aria-hidden="true" class="fas fa-plus green"></i> New
 				</router-link>
 			</div>
 
@@ -29,7 +29,7 @@
 							<!-- TIER -->
 							<span slot="tiers" slot-scope="data">
 								<template	v-for="(tier, key) in data.item">
-									<i 
+									<i aria-hidden="true" 
 										v-if="tiers[key]"
 										:key="tier"
 										class="fab fa-patreon"
@@ -50,7 +50,7 @@
 
 							<!-- STATUS -->
 							<span slot="last_charge_status" slot-scope="data">
-								<i :class="{'green fas fa-check': data.item == 'Paid', 'red fas fa-times': data.item == 'Declined' }">
+								<i aria-hidden="true" :class="{'green fas fa-check': data.item == 'Paid', 'red fas fa-times': data.item == 'Declined' }">
 								</i>
 							</span>
 
@@ -112,11 +112,11 @@
 						sortable: true
 					},
 					tiers: {
-						label: '<i class="fab fa-patreon"></i>',
+						label: '<i aria-hidden="true" class="fab fa-patreon"></i>',
 						maxContent: true
 					},
 					last_charge_status: {
-						label: '<i class="fas fa-file-invoice-dollar"></i>',
+						label: '<i aria-hidden="true" class="fas fa-file-invoice-dollar"></i>',
 						maxContent: true,
 						sortable: true
 					},

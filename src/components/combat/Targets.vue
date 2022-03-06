@@ -4,15 +4,15 @@
 			class="componentHeader d-flex justify-content-between" 
 			:class="{ shadow : setShadow > 0 }">
 			<span>
-				<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+				<i aria-hidden="true" class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
 			</span>
 			<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 				v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 				class="btn btn-sm bg-neutral-5">
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="ml-1">
 					Add
-					<span v-if="showKeybinds.keyBinds === undefined" class="d-none d-sm-inline">[a]</span>
+					<span v-if="!showKeybinds" class="d-none d-sm-inline">[a]</span>
 				</span>
 			</a>
 		</h2>
@@ -27,7 +27,7 @@
 			>
 				<template v-for="{group, targets} in groups">
 					<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
-						<i v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
+						<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
 					</h2>
 					<transition-group
 						:key="group"
@@ -79,7 +79,7 @@
 								<a class="btn btn-sm btn-clear mx-1" 
 									v-if="entity.addNextRound"
 									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
-									<i class="fas fa-check green"></i>
+									<i aria-hidden="true" class="fas fa-check green"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Will be added next round
 									</q-tooltip>
@@ -87,21 +87,21 @@
 								<a class="btn btn-sm btn-clear mx-1" 
 									v-if="!entity.addNextRound"
 									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
-									<i class="fas fa-check neutral-2"></i>
+									<i aria-hidden="true" class="fas fa-check neutral-2"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Click to add next round
 									</q-tooltip>
 								</a>
 								<a class="btn btn-sm bg-neutral-5" 
 									@click="add_next_round({key: entity.key, action: 'set'})">
-									<i class="fas fa-arrow-up"></i>
+									<i aria-hidden="true" class="fas fa-arrow-up"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Add now
 									</q-tooltip>
 								</a>
 							</div>
 							<a class="options">
-								<i class="fal fa-ellipsis-v"></i>
+								<i aria-hidden="true" class="fal fa-ellipsis-v"></i>
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'" anchor="bottom right" self="top right" :breakpoint="576">
 									<target-menu :entity="entity" />
 								</q-popup-proxy>
@@ -117,7 +117,6 @@
 
 <script>
 	import _ from 'lodash';
-	import { db, auth } from '@/firebase';
 	import { mapGetters, mapActions } from 'vuex';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 	import TargetMenu from '@/components/combat/TargetMenu.vue';
@@ -128,7 +127,7 @@
 		props: ['_active','_idle'],
 		data() {
 			return {
-				userId: (auth.currentUser) ? auth.currentUser.uid : undefined,
+				userId: this.$store.getters.user.uid,
 				currentTarget: {},
 				setShadow: 0
 			}
@@ -140,6 +139,7 @@
 				'encounter',
 				'entities',
 				'targeted',
+				'userSettings'
 			]),
 			groups() {
 				return [
@@ -167,7 +167,7 @@
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
 						entity.key = key
-						return entity.down == true;
+						return !!entity.down;
 					})
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
@@ -186,19 +186,14 @@
 			_addedNextRound: function() {
 				return _.chain(this._idle)
 					.filter(function(entity) {
-						return entity.addNextRound == true;
+						return !!entity.addNextRound;
 					})
 					.sortBy('name' , 'desc')
 					.value()
 			},
-		},
-		firebase() {
-			return {
-				showKeybinds: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				}
-			}
+			showKeybinds() {
+				return (this.userSettings && this.userSettings.general) ? this.userSettings.general.keyBinds : undefined;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -226,8 +221,8 @@
 			remove(key, name) {
 				this.$snotify.error('Are you sure you want to remove "' + name + '" from this encounter?', 'Delete character', {
 					buttons: [
-					{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
@@ -243,8 +238,8 @@
 				const lastSelected = this.targeted[this.targeted.length - 1];
 				const type = (event.srcKey === 'upSingle' || event.srcKey === 'downSingle') ? "single" : "multi"; //Multitarget or not
 				//Create array with keys of all targets
-				const targetsArray = this._targets.map(function (target) {
-					return target.key;
+				const targetsArray = this._targets.map((item) => {
+					return item.key;
 				});
 				const current = targetsArray.indexOf(lastSelected); //Set the target from where we're gonna select the next
 

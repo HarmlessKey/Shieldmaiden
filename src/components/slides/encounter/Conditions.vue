@@ -18,7 +18,7 @@
 					<template v-slot:header>
 						<q-item-section>
 							<div class="d-flex justify-content-start">
-								<i :class="`hki-${value}`" class="icon" />
+								<i aria-hidden="true" :class="`hki-${value}`" class="icon" />
 								{{ name }}
 							</div>
 						</q-item-section>
@@ -28,7 +28,7 @@
 								<span class="exhaustion neutral-11" v-if="checkExhaustion() != undefined">
 									{{ checkExhaustion() }}
 								</span>
-								<i v-else class="fas fa-plus-circle green" />
+								<i aria-hidden="true" v-else class="fas fa-plus-circle green" />
 
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
 									<div class="bg-neutral-8">
@@ -52,8 +52,8 @@
 
 						<q-item-section avatar v-else>
 							<a @click.stop="set(value)" :key="value">
-								<span v-if="!checkAll(value)"><i class="fas fa-plus-circle green" key="true"></i></span>
-								<span v-if="checkAll(value)"><i class="fas fa-minus-circle red" key="true"></i></span>
+								<span v-if="!checkAll(value)"><i aria-hidden="true" class="fas fa-plus-circle green" key="true"></i></span>
+								<span v-if="checkAll(value)"><i aria-hidden="true" class="fas fa-minus-circle red" key="true"></i></span>
 							</a>
 						</q-item-section>
 					</template>

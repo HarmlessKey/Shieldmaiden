@@ -5,7 +5,7 @@
 		<div class="currency">
 			<div v-for="(coin, key) in currencies" :key="key">
 					<span class="coins" :class="coin.color">
-						<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+						<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" :alt="coin.name" />
 						<q-tooltip anchor="top middle" self="center middle">
 							{{ coin.name }}
 						</q-tooltip>
@@ -37,9 +37,7 @@
 
 	export default {
 		mixins: [currencyMixin],
-		props: [
-			"data",
-		],
+		props: ["data"],
 		data() {
 			return {
 				user: this.$store.getters.user,

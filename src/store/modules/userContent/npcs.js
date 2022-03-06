@@ -20,14 +20,14 @@ const convert_npc = (npc) => {
 	return returnNpc;
 }
 
-const state = {
+const npc_state = {
   npc_services: null,
   cached_npcs: {},
   npc_count: 0,
   npcs: undefined
 };
 
-const getters = {
+const npc_getters = {
   npcs: (state) => {
     // Convert object to sorted array
     return _.chain(state.npcs)
@@ -40,7 +40,7 @@ const getters = {
   npc_services: (state) => { return state.npc_services; }
 };
 
-const actions = {
+const npc_actions = {
   async get_npc_services({ getters, commit }) {
     if(getters.npc_services === null) {
       commit("SET_NPC_SERVICES", new npcServices);
@@ -52,7 +52,7 @@ const actions = {
    * Fetches all the search_npcs for a user
    * and stores them in npcs
    */
-  async get_npcs({ rootGetters, dispatch, commit }) {
+  async get_npcs({ state, rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let npcs = (state.npcs) ? state.npcs : undefined;
 
@@ -256,7 +256,7 @@ const actions = {
     }
   }
 };
-const mutations = {
+const npc_mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },
   SET_NPC_COUNT(state, value) { Vue.set(state, "npc_count", value); },
   SET_NPCS(state, value) { Vue.set(state, "npcs", value); },
@@ -301,8 +301,8 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: npc_state,
+  getters: npc_getters,
+  actions: npc_actions,
+  mutations: npc_mutations
 }

@@ -5,7 +5,7 @@
 			<template v-for="(coin, key) in copperToPretty(currency['.value'])">
 				<div v-if="coin" :key="key">
 					{{ coin }}
-					<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
+					<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
 				</div>
 			</template>
 		</div>
@@ -25,14 +25,14 @@
 				<!-- COLLAPSE -->
 				<div slot="collapse" slot-scope="data">
 					<div class="mb-2">
-						<b>{{ data.row.public_name }}</b><br/>
+						<strong>{{ data.row.public_name }}</strong><br/>
 						{{ data.row.public_description }}
 					</div>
 					<template v-if="data.row.linked_item && data.row.identified">
 						<div class="linked-item">
 							<span>Qualities</span>
 							<a @click="showItem = !showItem" :class="{ collapsed: showItem }">
-								<i class="fas fa-chevron-down"></i>
+								<i aria-hidden="true" class="fas fa-chevron-down"></i>
 							</a>
 						</div>
 						<q-slide-transition>
@@ -84,8 +84,8 @@
 			}
 		},
 		mounted() {
-			const items = db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/items`);
-			items.on('value', async (snapshot) => {
+			const items_ref = db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/items`);
+			items_ref.on('value', async (snapshot) => {
 				let items = snapshot.val()
 
 				for(let key in items) {
@@ -95,16 +95,16 @@
 
 					//Get Linked item
 					let linkedItem = db.ref(`items/${item.linked_item}`)
-					await linkedItem.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							items[key].full_linked_item = snapshot.val();
+					await linkedItem.on('value', (result) => {
+						if(result.val()) {
+							items[key].full_linked_item = result.val();
 						}
 					});
 					//Get Linked item
 					let linkedCustomItem = db.ref(`custom_items/${this.userId}/${item.linked_item}`)
-					await linkedCustomItem.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							items[key].full_linked_item = snapshot.val();
+					await linkedCustomItem.on('value', (result) => {
+						if(result.val()) {
+							items[key].full_linked_item = result.val();
 						}
 					});
 				}

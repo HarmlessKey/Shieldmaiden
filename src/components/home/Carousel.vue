@@ -20,7 +20,7 @@
 					:key="`slide-${index}`"
 					class="column no-wrap flex-center"
 				>	
-					<i class="icon" :class="icon" />
+					<i aria-hidden="true" class="icon" :class="icon" />
 					<h3 v-html="title" />
 					<p v-html="text" />
 					<router-link v-if="name === 'more'" to="sign-up" class="btn bg-green" >Create account</router-link>

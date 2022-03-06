@@ -5,7 +5,7 @@
 			<p>Check the latest updates on our Discord.</p>
 
 			<a href="https://discord.gg/gCXJZCs" target="_blank" rel="noopener" class="btn btn-lg bg-discord-purple">
-			<i class="fab fa-discord mr-2"/>
+			<i aria-hidden="true" class="fab fa-discord mr-2"/>
 				Harmless Key Discord
 			</a>
 		</div>

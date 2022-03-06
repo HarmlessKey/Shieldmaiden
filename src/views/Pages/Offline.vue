@@ -9,7 +9,3 @@
 		name: 'Oflline'
 	}
 </script>
-
-<style lang="scss" scoped>
-
-</style>

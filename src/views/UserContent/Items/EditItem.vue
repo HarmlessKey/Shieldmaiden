@@ -8,7 +8,7 @@
 
 						<a v-if="$route.name == 'Add item' && !itemId" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
 							Copy item
-							<i class="ml-1 fas fa-copy"/>
+							<i aria-hidden="true" class="ml-1 fas fa-copy"/>
 						</a>
 					</div>
 					<div class="card-body">
@@ -31,7 +31,7 @@
 						<div class="avatar">
 							<div class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></div>
 							<div class="img" v-else>
-								<i class="hki-axe" />
+								<i aria-hidden="true" class="hki-axe" />
 							</div>
 							<div>
 								<ValidationProvider rules="url" name="Image" v-slot="{ errors, invalid, validated }">
@@ -68,10 +68,10 @@
 				<hk-card>
 					<div slot="header" class="card-header">
 						<span>
-							<i class="fal fa-table"></i> Info Tables
+							<i aria-hidden="true" class="fal fa-table"></i> Info Tables
 						</span>
 							<a slot="after"  class="btn bg-neutral-5">
-								<i class="fas fa-plus"></i> Add table
+								<i aria-hidden="true" class="fas fa-plus"></i> Add table
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
 									<div class="bg-neutral-8 px-2 py-2" >
 											<p>Add a table</p>
@@ -126,7 +126,7 @@
 											{{ table.name || 'Table ' + (parseInt(tableIndex)+1) }}
 										</q-item-section>
 										<q-item-section avatar>
-											<a class="red" @click="removeTable(tableIndex)"><i class="fas fa-trash-alt"></i></a>
+											<a class="red" @click="removeTable(tableIndex)"><i aria-hidden="true" class="fas fa-trash-alt"></i></a>
 										</q-item-section>
 									</template>
 
@@ -156,7 +156,7 @@
 													/>
 												</ValidationProvider>
 											</div>
-											<a @click="addRow(tableIndex)" class="remove green"><i class="fas fa-plus"/></a>
+											<a @click="addRow(tableIndex)" class="remove green"><i aria-hidden="true" class="fas fa-plus"/></a>
 											<template v-for="(row, rowIndex) in table.rows">
 												<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
 													<ValidationProvider rules="required|max:5000" :name="`Column ${colIndex+1}`" v-slot="{ errors, invalid, validated }">
@@ -170,7 +170,7 @@
 														/>
 													</ValidationProvider>
 												</div>
-												<a class="red remove" @click="removeRow(tableIndex, rowIndex)" :key="`remove-${rowIndex}`"><i class="fas fa-trash-alt"></i></a>
+												<a class="red remove" @click="removeRow(tableIndex, rowIndex)" :key="`remove-${rowIndex}`"><i aria-hidden="true" class="fas fa-trash-alt"></i></a>
 											</template>
 										</div>
 										<a @click="addRow(tableIndex)" class="btn btn-block mt-4">Add Row</a>

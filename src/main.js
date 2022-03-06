@@ -7,7 +7,6 @@ import VueRouter from 'vue-router';
 import VueAnalytics from 'vue-analytics'
 import { store } from './store/store';
 import { routes } from './routes';
-import Validation from './validation';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
@@ -29,7 +28,6 @@ const options = {
 
 Vue.config.productionTip = false;
 
-
 Vue.use(Snotify, options);
 Vue.use(VueFire);
 Vue.use(VueCookies);
@@ -42,7 +40,6 @@ Vue.use(Ads.Adsense);
 
 
 require('./functions.js')
-Vue.use(Validation)
 
 // Set-up and use the Vue Router
 // Pass in your routes and then
@@ -92,8 +89,7 @@ firebase.auth().onAuthStateChanged(() => {
 			});
 			
 			// Stop broadcast when connection is lost
-			userLiveDatabaseRef.onDisconnect().remove().then(function() {
-			});
+			userLiveDatabaseRef.onDisconnect().remove();
 		});
 	}
 });

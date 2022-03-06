@@ -16,7 +16,7 @@
 								class="img" 
 								:style="{'background-image': 'url(' + players[player].avatar + ')'}
 							">
-								<i v-if="!players[player].avatar" class="hki-player" />
+								<i aria-hidden="true" v-if="!players[player].avatar" class="hki-player" />
 							</span>
 						</q-item-section>
 						<q-item-section>
@@ -40,7 +40,7 @@
 								class="img" 
 								:style="{'background-image': 'url(' + players[scope.opt].avatar + ')'}
 							">
-								<i v-if="!players[scope.opt].avatar" class="hki-player" />
+								<i aria-hidden="true" v-if="!players[scope.opt].avatar" class="hki-player" />
 							</span>
 						</q-item-section>
 						<q-item-section>

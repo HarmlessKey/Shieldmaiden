@@ -5,7 +5,7 @@
 				<!-- NOT LIVE -->
 				<div class="track-wrapper" v-if="!encounter || broadcasting['.value'] !== $route.params.campid">
 					<div class="top">
-						<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+						<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i aria-hidden="true" class="fas fa-chevron-left"></i> Back</router-link>
 						<span class="title truncate">{{ campaign.campaign }}</span>
 						<span>
 							<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
@@ -38,7 +38,7 @@
 			</template>
 			<div v-else>
 				<div class="top d-flex justify-content-between">
-					<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+					<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i aria-hidden="true" class="fas fa-chevron-left"></i> Back</router-link>
 					Not found
 				</div>
 				<div class="container-fluid">
@@ -176,8 +176,8 @@
 
 						let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
 
-						encounter.on('value' , (snapshot) => {
-							let enc = snapshot.val();
+						encounter.on('value' , (result) => {
+							let enc = result.val();
 							if(enc) {
 								enc.key = encId;
 							}
@@ -187,8 +187,8 @@
 					//Get campaign for player curHP/tempHP/ACBonus/Dead/Stable/DeathSaves
 					let fetchCampaign = db.ref(`campaigns/${this.userId}/${campId}`);
 
-					fetchCampaign.on('value' , (snapshot) => {				
-						this.campaign = snapshot.val();
+					fetchCampaign.on('value' , (result) => {				
+						this.campaign = result.val();
 					});
 				});
 			},
@@ -196,13 +196,8 @@
 				const target = e.target.parentNode.parentNode.parentNode.parentNode;
 
 				this.$q.fullscreen.toggle(target)
-					.then(() => {
-						// success!
-					})
 					.catch((err) => {
-						alert(err)
-						// uh, oh, error!!
-						// console.error(err)
+						alert(err);
 					})
 			},
 			checkShare(key) {

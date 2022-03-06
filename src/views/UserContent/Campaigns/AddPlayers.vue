@@ -5,14 +5,14 @@
 			<div slot="header" class="card-header">
 				Players
 				<a @click="players_dialog = true" class="btn btn-sm">
-					<i class="fas fa-plus green mr-1" /> Add players
+					<i aria-hidden="true" class="fas fa-plus green mr-1" /> Add players
 				</a>
 			</div>
 			<div class="card-body">
 				<ul class="entities hasImg" v-if="campaign_players.length">
 					<li v-for="player in campaign_players" :key="player.key">	
 						<span class="img" :style="{ backgroundImage: 'url(\''+ player.avatar + '\')' }">
-							<i v-if="!player.avatar" class="hki-player" />
+							<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 						</span>
 
 						<div :class="{ 'red': inOtherCampaign(player.campaign_id) }">
@@ -24,7 +24,7 @@
 						
 						<div class="actions items-center pr-0">
 							<a class="btn btn-sm bg-neutral-5" @click="removePlayer(player)">
-								<i class="fas fa-trash-alt"></i>
+								<i aria-hidden="true" class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center right">
 									Remove from campaign
 								</q-tooltip>
@@ -55,7 +55,7 @@
 					<ul class="entities hasImg">
 						<li v-for="player in players" :key="player.key">
 							<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
-								<i v-if="!player.avatar" class="hki-player" />
+								<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 							</span>
 
 							{{ player.character_name }}
@@ -65,12 +65,12 @@
 							</span>
 
 							<span v-else-if="checkPlayer(player.campaign_id)">
-								<i class="fas fa-check pr-2 neutral-2"></i>
+								<i aria-hidden="true" class="fas fa-check pr-2 neutral-2"></i>
 							</span>
 
 							<div v-else class="actions items-center pr-0">
 								<a @click="addPlayer(player.key)" class="btn btn-sm bg-neutral-5">
-									<i class="fas fa-plus green"></i>
+									<i aria-hidden="true" class="fas fa-plus green"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Add character
 									</q-tooltip>
@@ -112,9 +112,21 @@
 		},
 		async mounted() {
 			await this.get_players();
+
+			// Check if the campaign_player count matches the player_count of the campaign
+			// update if it doesn't match
+			if(this.campaign_players.length !== this.campaign.player_count) {
+				this.update_player_count({ id: this.campaign.key, new_count: this.campaign_players.length });
+			}
 		},
 		methods: {
-			...mapActions("campaigns", ["campaigns", "get_campaign", "add_player", "delete_player"]),
+			...mapActions("campaigns", [
+				"campaigns", 
+				"get_campaign", 
+				"add_player", 
+				"delete_player", 
+				"update_player_count"
+			]),
 			...mapActions("players", ["get_players"]),
 			addPlayer(id) {
 				// Set the current HP
@@ -133,7 +145,7 @@
 				return (campaign_id === this.campaign.key);
 			},
 			inOtherCampaign(campaign_id) {
-				return (campaign_id !== undefined && campaign_id !== this.campaign.key)
+				return (campaign_id && campaign_id !== this.campaign.key)
 			},
 		}
 	}

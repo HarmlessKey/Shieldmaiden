@@ -1,8 +1,7 @@
 <template>
 	<div class="content">
 		<template v-if="!$route.params.id">
-			<Crumble />
-			<h2><i class="fas fa-wand-magic"></i> Contribute to Spells</h2>
+			<h2><i aria-hidden="true" class="fas fa-wand-magic"></i> Contribute to Spells</h2>
 
 			<div class="grid">
 				<div>
@@ -24,7 +23,7 @@
 							>
 								<span>{{ data.item }}</span>
 								<a v-if="isDifficult(data.row)" class="ml-2">
-									<i class="fas fa-exclamation-triangle"></i>
+									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Dificult
 									</q-tooltip>
@@ -35,7 +34,7 @@
 									v-if="Object.keys(taggedSpell).length === 0"
 									@click="tag(data.row['.key'], data.row.name)"
 								>
-									<i class="fas fa-plus"></i>
+									<i aria-hidden="true" class="fas fa-plus"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Tag
 									</q-tooltip>
@@ -62,19 +61,19 @@
 								<router-link 
 									:to="'/contribute/spells/' + data.row['.key']+'/edit'"
 								>
-									<i class="fas fa-pencil"></i>
+									<i aria-hidden="true" class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
-									<i class="fas fa-eye"></i>
+									<i aria-hidden="true" class="fas fa-eye"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Preview
 									</q-tooltip>
 								</a>
 								<a @click="markDifficult(data.row)">
-									<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+									<i aria-hidden="true" class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Mark difficult
 									</q-tooltip>
@@ -82,13 +81,13 @@
 								<a 
 									@click="confirmFinish(data.row['.key'], data.row.name)"
 								>
-									<i class="fas fa-check"></i>
+									<i aria-hidden="true" class="fas fa-check"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Finish
 									</q-tooltip>
 								</a>
 								<a @click="unTag(data.row['.key'])">
-									<i class="fas fa-times"></i>
+									<i aria-hidden="true" class="fas fa-times"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Untag
 									</q-tooltip>
@@ -119,31 +118,31 @@
 								<router-link 
 									:to="'/contribute/spells/' + data.row['.key']+'/edit'"
 								>
-									<i class="fas fa-pencil"></i>
+									<i aria-hidden="true" class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
-									<i class="fas fa-eye"></i>
+									<i aria-hidden="true" class="fas fa-eye"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Preview
 									</q-tooltip>
 								</a>
 								<a @click="markDifficult(data.row)">
-									<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+									<i aria-hidden="true" class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Mark difficult
 									</q-tooltip>
 								</a>
 								<a @click="confirmFinish(data.row['.key'], data.row.name)">
-									<i class="fas fa-check"></i>
+									<i aria-hidden="true" class="fas fa-check"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Finish
 									</q-tooltip>
 								</a>
 								<a @click="unTag(data.row['.key'])">
-									<i class="fas fa-times"></i>
+									<i aria-hidden="true" class="fas fa-times"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Mark difficult
 									</q-tooltip>
@@ -167,7 +166,7 @@
 							<div slot="name" slot-scope="data" :class="isDifficult(data.row) ? 'red' : ''">
 								<span>{{data.item}}</span>
 								<a v-if="isDifficult(data.row)" class="ml-2">
-									<i class="fas fa-exclamation-triangle"></i>
+									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Difficult
 									</q-tooltip>
@@ -175,7 +174,7 @@
 							</div>
 							<div slot="actions" slot-scope="data" class="actions">
 								<a v-if="isDifficult(data.row)" @click="markDifficult(data.row)">
-									<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+									<i aria-hidden="true" class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Unmark difficult
 									</q-tooltip>
@@ -184,13 +183,13 @@
 									v-if="userInfo.admin"
 									:to="'/contribute/spells/' + data.row['.key']"
 								>
-									<i class="fas fa-pencil"></i>
+									<i aria-hidden="true" class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a @click="setSlide({ show: true, type: 'ViewSpell', data: data.row })">
-									<i class="fas fa-eye"></i>
+									<i aria-hidden="true" class="fas fa-eye"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Preview
 									</q-tooltip>
@@ -207,7 +206,6 @@
 <script>
 	import _ from 'lodash';
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Spell from '@/components/compendium/Spell.vue';
 	import { mapGetters, mapActions } from 'vuex';
@@ -215,7 +213,6 @@
 	export default {
 		name: 'Spells',
 		components: {
-			Crumble,
 			Footer,
 			Spell
 		},
@@ -229,7 +226,7 @@
 						truncate: true
 					},
 					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
+						label: '<i aria-hidden="true" class="far fa-ellipsis-h"></i>',
 						noPadding: true,
 						right: true,
 						maxContent: true
@@ -241,7 +238,7 @@
 						truncate: true
 					},
 					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
+						label: '<i aria-hidden="true" class="far fa-ellipsis-h"></i>',
 						noPadding: true,
 						right: true,
 						maxContent: true

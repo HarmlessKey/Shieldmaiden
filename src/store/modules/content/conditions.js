@@ -2,16 +2,16 @@ import Vue from 'vue';
 import { conditionServices } from "@/services/api/conditions"; 
 
 
-const state = {
+const conditions_state = {
   condition_services: null,
   cached_conditions: {},
 };
 
-const getters = {
+const conditions_getters = {
   condition_services: (state) => { return state.condition_services; },
 };
 
-const actions = {
+const conditions_actions = {
   get_condition_services: async ({ getters, commit }) => {
     if(getters.condition_services === null) {
       commit("SET_CONDITION_SERVICES", new conditionServices);
@@ -22,8 +22,7 @@ const actions = {
   async get_conditions({ dispatch}, { pageNumber, pageSize, query, fields, sortBy, descending }) {
     const services = await dispatch("get_condition_services");
     try {
-      const conditions = await services.getConditions(pageNumber, pageSize, query, fields, sortBy, descending);
-      return conditions;
+      return await services.getConditions(query, pageNumber, pageSize, fields, sortBy, descending);
     } catch(error) {
       console.error(error);
     }
@@ -62,15 +61,15 @@ const actions = {
     return condition;
   },
 };
-const mutations = {
+const conditions_mutations = {
   SET_CONDITION_SERVICES(state, payload) { Vue.set(state, "condition_services", payload); },
   SET_CACHED_CONDITION(state, payload) { Vue.set(state.cached_conditions, payload["_id"], payload) },
 };
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: conditions_state,
+  getters: conditions_getters,
+  actions: conditions_actions,
+  mutations: conditions_mutations
 }

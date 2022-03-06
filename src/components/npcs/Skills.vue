@@ -5,14 +5,14 @@
 				<div>
 					Skills
 					<span>
-						+<b class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</b>
+						+<strong class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</strong>
 						<q-tooltip anchor="top middle" self="center middle">
 							Proficiency bonus
 					</q-tooltip>
 					</span>
 				</div>
 				<a class="btn btn-sm bg-neutral-5" @click="setDialog()">
-					<i class="fas fa-plus green"></i>
+					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Modifiers</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Skill modifiers
@@ -53,7 +53,7 @@
 									{{ skill.skill  }}
 									<div class="mod">
 										{{ 
-											skillModifier(skill, key)
+											skillModifier(skill, key) > 0 ? `+${skillModifier(skill, key)}` : skillModifier(skill, key)
 										}}
 									</div>
 								</div>
@@ -82,7 +82,7 @@
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							>
-								<i class="fas fa-check green saved" slot="append" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
+								<i aria-hidden="true" class="fas fa-check green saved" slot="append" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
 							</q-input>
 						</ValidationProvider>
 					</div>
@@ -164,7 +164,7 @@
 					this.calcMod(this.npc[skill.ability]),
 					this.npc.skills ? (
 					this.npc.skills.includes(key) ? 
-					(this.npc.challenge_rating ?this. monster_challenge_rating[this.npc.challenge_rating].proficiency : '')
+					(this.npc.challenge_rating ? this. monster_challenge_rating[this.npc.challenge_rating].proficiency : '')
 					: 0) : 0,
 					this.npc.skills_expertise ? this.npc.skills_expertise.includes(key) : false
 				);
@@ -172,7 +172,7 @@
 				if(this.npc.skill_modifiers && this.npc.skill_modifiers[key]) {
 					mod = parseInt(mod) + parseInt(this.npc.skill_modifiers[key]);
 				}
-				return (mod) >= 0 ? '+' + parseInt(mod) : parseInt(mod);
+				return parseInt(mod);
 			}
 		}
 	}

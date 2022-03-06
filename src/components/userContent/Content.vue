@@ -13,7 +13,7 @@
 				track-color="neutral-10"
 			/>
 			<q-item-section avatar>
-				<i class="fas neutral-2" :class="icon" />
+				<i aria-hidden="true" class="fas neutral-2" :class="icon" />
 			</q-item-section>
 			<q-item-section>
 				{{ type.capitalize() }}
@@ -24,7 +24,7 @@
 						{{ content_count[type] }}
 					</span> 
 					<span> / </span>
-					<i v-if="tier.benefits[type] === 'infinite'" class="far fa-infinity" />
+					<i aria-hidden="true" v-if="tier.benefits[type] === 'infinite'" class="far fa-infinity" />
 					<span v-else>{{ tier.benefits[type] }}</span>
 				</div>
 			</q-item-section>

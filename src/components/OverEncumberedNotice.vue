@@ -7,12 +7,3 @@
 		<router-link to="/patreon">Need more content slots?</router-link>
 	</div>
 </template>
-
-<script>
-	export default {
-
-	};
-</script>
-
-<style lang="scss" scoped>
-</style>

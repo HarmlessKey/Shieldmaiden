@@ -12,7 +12,7 @@
 			<div class="d-flex justify-content-left">
 				<template v-if="!player_in_encounter(key)">
 					<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
-						<i v-if="!player.avatar" class="hki-player" />
+						<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 					</span>
 				</template>
 			</div>
@@ -22,7 +22,7 @@
 		</div>
 
 		<div v-if="campaign && campaign.players === undefined">
-			<h3 class="red"><i class="fas fa-users"></i> No Players Yet</h3>
+			<h3 class="red"><i aria-hidden="true" class="fas fa-users"></i> No Players Yet</h3>
 			<p>Add players to your campaign first.</p>
 			<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
 		</div>
@@ -57,7 +57,6 @@
 			placeholder="Search custom NPCs"
 		>
 			<q-icon slot="prepend" name="search" />
-			<!-- <q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" /> -->
 		</q-input>
 		<q-table		
 			:data="npcs"
@@ -100,13 +99,13 @@
 							v-model="to_add[props.key]"
 						/>
 						<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, props.key, 'npc', props.row.name, true)">
-							<i class="fas fa-plus"></i>
+							<i aria-hidden="true" class="fas fa-plus"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Add with average HP
 							</q-tooltip>
 						</a>
 						<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, props.key, 'npc', props.row.name, true, true)">
-							<i class="fas fa-dice-d20"></i>
+							<i aria-hidden="true" class="fas fa-dice-d20"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Add with rolled HP
 							</q-tooltip>
@@ -178,7 +177,7 @@
 				<q-tr :props="props">
 					<q-td auto-width>
 						<a  @click="props.expand = !props.expand">
-							<i class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+							<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
 						</a>
 					</q-td>
 					<q-td
@@ -204,13 +203,13 @@
 										v-model="to_add[props.key]"
 									/>
 									<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, props.key, 'npc', props.row.name, false)">
-										<i class="fas fa-plus"></i>
+										<i aria-hidden="true" class="fas fa-plus"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add with average HP
 										</q-tooltip>
 									</a>
 									<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, props.key, 'npc', props.row.name, false, true)">
-										<i class="fas fa-dice-d20"></i>
+										<i aria-hidden="true" class="fas fa-dice-d20"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add with rolled HP
 										</q-tooltip>
@@ -479,8 +478,8 @@
 					for (let i in this.encounter.entities) {
 						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d+)\))$)|(?:^(.*)(?!\s\(\d+\))$)/);
 						
-						let name = match[1] || match[3];
-						if (name == entity.name) {
+						let new_name = match[1] || match[3];
+						if (new_name === entity.name) {
 							n++;
 							let digit = parseInt(match[2]);
 							last = digit > last ? digit : last;
@@ -497,10 +496,10 @@
 						let npc_data = await this.get_monster(id);
 						entity.npc = "srd";
 						if(rollHp && npc_data.hit_dice) {
-							let dice = npc_data.hit_dice.split('d');
-							let mod = dice[0] * this.calcMod(npc_data.constitution);
+							let dice_values = npc_data.hit_dice.split('d');
+							let mod = dice_values[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
+							HP = this.rollD(e, dice_values[1], dice_values[0], mod, "Hit points roll", npc_data.name);
 
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -523,10 +522,10 @@
 						}
 
 						if(rollHp && npc_data.hit_dice) {
-							let dice = npc_data.hit_dice.split('d');
-							let mod = dice[0] * this.calcMod(npc_data.constitution);
+							let dice_values = npc_data.hit_dice.split('d');
+							let mod = dice_values[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
+							HP = this.rollD(e, dice_values[1], dice_values[0], mod, "Hit points roll", npc_data.name);
 							
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -572,7 +571,7 @@
 
 				// NOTIFICATION
 				if(type === 'npc') {
-					let notifyHP = [];
+					let notifyHP = {};
 
 					if(HP) {
 						notifyHP.total = HP.total

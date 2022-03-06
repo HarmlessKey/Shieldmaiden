@@ -9,7 +9,7 @@
 		
 		<div v-if="controlUser">
 			<a @click="removeControl()">
-				<i class="fas fa-times red"></i>
+				<i aria-hidden="true" class="fas fa-times red"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Remove control
 				</q-tooltip>
@@ -91,13 +91,13 @@
 				username.once("value" , (snapshot) => {
 					if(snapshot.exists()) {
 						this.foundUser = snapshot.val();
-						return
+						return;
 					} else {
 						// Check email
-						email.once('value' , (snapshot) => {
-							if(snapshot.val()) {
-								this.foundUser = snapshot.val();
-								return
+						email.once('value' , (result) => {
+							if(result.val()) {
+								this.foundUser = result.val();
+								return;
 							} else {
 								this.foundUser = false;
 							}

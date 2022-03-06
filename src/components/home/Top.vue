@@ -12,7 +12,7 @@
 							<div v-if="!$store.getters.user">
 								<q-btn to="/demo" color="primary" size="xl" no-caps push>Try demo encounter</q-btn>
 								<div><small>
-									<i class="neutral-4">No download required</i>
+									<i aria-hidden="true" class="neutral-4">No download required</i>
 								</small></div>
 							</div>
 							<router-link v-else to="/content" class="btn btn-lg bg-green">My content</router-link>
@@ -21,7 +21,7 @@
 						<!-- PATREON -->
 						<div>
 							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red btn btn-lg btn-clear">
-								<i class="fab fa-patreon"></i> Support us on Patreon
+								<i aria-hidden="true" class="fab fa-patreon"></i> Support us on Patreon
 							</a>
 						</div>
 					</div>

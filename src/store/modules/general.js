@@ -143,10 +143,7 @@ export const general_module = {
 		setSlide({ commit, state }, payload) {
 			let slide = state.slide;
 
-			if(slide.type != payload.type) {
-				commit('SET_SLIDE', false);
-				setTimeout(() => commit('SET_SLIDE', payload), 100);
-			} else if(JSON.stringify(slide.data) !== JSON.stringify(payload.data) && payload.data != undefined) {
+			if(slide.type !== payload.type || (JSON.stringify(slide.data) !== JSON.stringify(payload.data) && payload.data != undefined)) {
 				commit('SET_SLIDE', false);
 				setTimeout(() => commit('SET_SLIDE', payload), 100);
 			} else {

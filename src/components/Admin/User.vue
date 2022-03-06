@@ -3,7 +3,7 @@
 		<hk-card>
 			<div class="card-header">
 				<span>
-					<i :class="{ 'green': status.state == 'online', 'neutral-3': status.state == 'offline' }" class="fas fa-circle"></i>
+					<i aria-hidden="true" :class="{ 'green': status.state == 'online', 'neutral-3': status.state == 'offline' }" class="fas fa-circle"></i>
 					{{ user.username }}
 				</span>
 				<router-link :to="'/user/' + id">
@@ -13,7 +13,7 @@
 			<div class="card-body">
 				<p>{{ user.email }}</p>
 				<p v-if="user.patreon_email">patron: {{ user.patreon_email }}</p>
-				<p><i class="neutral-3">{{ id }}</i></p>
+				<p><i aria-hidden="true" class="neutral-3">{{ id }}</i></p>
 			</div>
 		</hk-card>
 
@@ -141,13 +141,9 @@
 
 <script>
 	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'Condition',
-		components: {
-			Crumble
-		},
 		props: ['id'],
 		data() {
 			return {
@@ -206,8 +202,8 @@
 			}
 		},
 		mounted() {
-			var characters = db.ref(`character_control/${this.id}`);
-			characters.on('value', async (snapshot) => {
+			var characters_ref = db.ref(`character_control/${this.id}`);
+			characters_ref.on('value', async (snapshot) => {
 				let characters = snapshot.val();
 				
 				//Get Players
@@ -216,24 +212,24 @@
 					characters[key].character_name = undefined;
 
 					let getPlayer = db.ref(`players/${userId}/${key}/character_name`);
-					getPlayer.on('value', (snapshot) => {
-						characters[key].character_name = snapshot.val()
+					getPlayer.on('value', (result) => {
+						characters[key].character_name = result.val()
 					});
 				}
 				this.characters = characters;
 				this.loading_characters = false;
 			});
 
-			var user = db.ref(`users/${this.id}`);
-			user.on('value', async (snapshot) => {
+			var user_ref = db.ref(`users/${this.id}`);
+			user_ref.on('value', async (snapshot) => {
 				let user = snapshot.val();
 				
 				let followed = {};
 				for(let key in user.follow) {
 					let getFollowed = db.ref(`users/${key}/username`);
 
-					await getFollowed.on('value', (snapshot) => {			
-						followed[key] = snapshot.val()
+					await getFollowed.on('value', (result) => {			
+						followed[key] = result.val()
 					});
 				}
 				user.followed = followed;

@@ -9,7 +9,7 @@
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"
-				:entities_len="Object.keys(_turnCount).length"
+				:entities_len="Object.keys(_non_hidden).length"
 				:turn="turn"
 				:campPlayers="campaign.players"
 				:campCompanions="campaign.companions"
@@ -28,7 +28,7 @@
 						v-if="!encounter.finished"
 						:encounter="encounter" 
 						:targets="_non_hidden_targets"
-						:allEntities="_turnCount"
+						:allEntities="_non_hidden"
 						:turn="turn"
 						:campPlayers="campaign.players"
 						:campCompanions="campaign.companions"
@@ -55,7 +55,7 @@
 				</div>
 				<div class="shares-bar" :class="{ shown: showShares }">
 					<div class="show" @click="showShares = !showShares">
-						<i class="fas fa-chevron-left" />
+						<i aria-hidden="true" class="fas fa-chevron-left" />
 					</div>
 					<Shares 
 						:shares="shares" 
@@ -116,7 +116,7 @@
 							v-if="!encounter.finished"
 							:encounter="encounter" 
 							:targets="_non_hidden_targets"
-							:allEntities="_turnCount"
+							:allEntities="_non_hidden"
 							:turn="turn"
 							:campPlayers="campaign.players"
 							:campCompanions="campaign.companions"
@@ -234,21 +234,6 @@
 			}
 		},
 		computed: {
-			//All entities, without hidden entities
-			_turnCount() {
-				return _.chain(this.encounter.entities)
-				.filter(function(entity, key) {
-					entity.key = key
-					return entity.active && !entity.down && !entity.hidden;
-				})
-				.orderBy(function(entity) {
-					return entity.name
-				}, 'asc')
-				.orderBy(function(entity){
-					return Number(entity.initiative)
-				} , 'desc')
-				.value()
-			},
 			_allEntities() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -269,6 +254,7 @@
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._allEntities[i])
 			},
+			//All entities, without hidden entities
 			_non_hidden() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {

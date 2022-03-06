@@ -69,11 +69,11 @@
 			<!-- ADVANTAGE INPUT -->
 			<div v-if="isToHit" class="advantage d-flex justify-content-between">
 				<button class="btn btn-sm bg-neutral-5" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
-					<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
+					<i aria-hidden="true" v-if="advantage == 'advantage'" class="fas fa-check"></i>
 					Advantage
 				</button>
 				<button class="btn btn-sm bg-neutral-5" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
-					<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
+					<i aria-hidden="true" v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
 					Disadvantage
 				</button>
 			</div>

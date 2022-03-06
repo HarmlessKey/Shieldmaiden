@@ -3,7 +3,7 @@
 		<template v-if="!loading">
 			<div slot="header" class="card-header">
 				<h1>
-					<i :class="`hki-${condition.name.toLowerCase()}`" />
+					<i aria-hidden="true" :class="`hki-${condition.name.toLowerCase()}`" />
 					{{ condition.name }}
 				</h1>
 				<hk-share 

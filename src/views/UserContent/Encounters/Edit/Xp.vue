@@ -10,10 +10,10 @@
 		
 		<div class="d-flex justify-content-start">
 			<span class="xp" :class="{ strikeTrough: xp.overwrite }">{{ xp.calculated }}</span>
-			<a @click="setOverwrite = !setOverwrite" class="ml-2" v-if="!xp.overwrite"><i class="fas fa-edit"></i></a>
+			<a @click="setOverwrite = !setOverwrite" class="ml-2" v-if="!xp.overwrite"><i aria-hidden="true" class="fas fa-edit"></i></a>
 			<template v-if="xp.overwrite">
 				<span class="xp ml-3">{{ xp.overwrite }}</span>
-				<a @click="clearOverwrite" class="ml-2 red"><i class="fas fa-times"></i></a>
+				<a @click="clearOverwrite" class="ml-2 red"><i aria-hidden="true" class="fas fa-times"></i></a>
 			</template>
 		</div>
 		

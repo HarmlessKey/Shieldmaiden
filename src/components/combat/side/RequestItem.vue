@@ -43,7 +43,7 @@
 									@click.stop="setDefense(defense_key, index, key)"
 									:class="[{active: target.defense === defense_key}, defense_key]"
 								>
-									<i class="fas fa-shield"></i>
+									<i aria-hidden="true" class="fas fa-shield"></i>
 									<span>{{ defense_key.capitalize() }}</span>
 									<q-tooltip anchor="top middle" self="center middle">
 										{{ name }}
@@ -72,7 +72,7 @@
 								:class="{blue: intensity[key] === multiplier}"
 								:key="multiplier"
 							>
-								<i class="fas fa-circle"></i>
+								<i aria-hidden="true" class="fas fa-circle"></i>
 								<span>{{ name }}</span>
 								<q-tooltip anchor="top middle" self="center middle">
 									{{ label }}

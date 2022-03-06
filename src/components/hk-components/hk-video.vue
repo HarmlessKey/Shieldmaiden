@@ -8,13 +8,13 @@
   >
     <div class="video-controls" v-if="video_hover">
       <span>
-        <i @click.stop="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
+        <i aria-hidden="true" @click.stop="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
         <q-tooltip anchor="bottom middle" self="center middle">
           Mute
         </q-tooltip>
       </span>
       <span>
-        <i @click="replay()" class="fas fa-redo-alt"></i>
+        <i aria-hidden="true" @click="replay()" class="fas fa-redo-alt"></i>
         <q-tooltip anchor="bottom middle" self="center middle">
           Replay
         </q-tooltip>

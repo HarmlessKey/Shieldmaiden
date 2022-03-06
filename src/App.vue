@@ -3,7 +3,7 @@
 		<div>
 			<nav-main :maintenance="maintenance" />
 			<PaymentDeclined v-if="user !== null" />
-			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
+			<div class="offline" v-if="connection === 'offline'"><i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
 			<div v-if="!maintenance" :class="{ hasSide: !small_screen && $route.meta.sidebar !== false }">
 				<Sidebar v-if="(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen" :small-screen="small_screen" />
 				<div class="scrollable-content">
@@ -22,7 +22,7 @@
 					v-shortkey="['esc']" @shortkey="hideSlide()"
 					class="hide" 
 				>
-					<i class="far fa-chevron-double-right"></i> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
+					<i aria-hidden="true" class="far fa-chevron-double-right"></i> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
 					<q-tooltip anchor="bottom middle" self="center middle">
 						Hide [esc]
 					</q-tooltip>

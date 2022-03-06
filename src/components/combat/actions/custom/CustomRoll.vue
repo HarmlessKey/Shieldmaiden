@@ -92,15 +92,16 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
+	import { mapGetters } from "vuex";
 	import { dice } from "@/mixins/dice.js";
 	import { setHP } from "@/mixins/HpManipulations.js";
 	import { damage_types } from "@/mixins/damageTypes.js";
 	import { abilities } from "@/mixins/abilities.js";
+	import { runEncounter } from '@/mixins/runEncounter.js';
 
 	export default {
 		name: "CustomRoll",
-		mixins: [setHP, dice, damage_types, abilities],
+		mixins: [setHP, dice, damage_types, abilities, runEncounter],
 		props: ["current"],
 		data() {
 			return {
@@ -122,24 +123,10 @@
 		},
 		computed: {
 			...mapGetters([
-				"encounter",
-				"entities",
-				"turn",
-				"targeted",
-				"broadcast"
+				"targeted"
 			]),
-			share() {
-				return (this.broadcast.shares && this.broadcast.shares.includes("action_rolls")) || false;
-			},
 		},
 		methods: {
-			...mapActions([
-				"setSlide",
-				"setActionRoll",
-				"setShareRolls",
-				"set_limitedUses"
-			]),
-			...mapActions("campaigns", ["set_share"]),
 			setType(value) {
 				this.custom_rolls = [
 					{
@@ -161,44 +148,24 @@
 
 				// Roll if there are no errors
 				if(isValid) {
-					let roll;
-					const config = {
-						type: "monster_action"
-					}
-
-					// Create an action with the custom rolls
 					const action = this.formatAction();
 
-					// Roll once for AOE
-					if(this.roll_type === "save") {
-						roll = this.rollAction(e, action, config);
-						if(this.share) this.shareRoll(roll, this.targeted);
-					}
-
-					// Loop over all targets
-					for(const key of this.targeted) {
-						let newRoll = { ...roll };
-
-						// Reroll for each target if it's to hit or healing
-						if(this.roll_type !== "save") {
-							newRoll = this.rollAction(e, action, config);
-							if(this.share) this.shareRoll(newRoll, [key]);
-						}
-
-						// Set the target and current
-						this.$set(newRoll, "target", this.entities[key]);
-						this.$set(newRoll, "current", this.current);
-
-						this.setActionRoll(newRoll);
-					}
+					this.roll_action({
+						e,
+						action,
+						entity: this.current,
+						targets: this.targeted
+					});
 				}
 			},
 			formatAction() {
 				let type;
+				let aoe_type = undefined;
 				if(this.roll_type === "attack") {
 					type = "melee_weapon";
 				} else if(this.roll_type === "save") {
 					type = "save";
+					aoe_type = "square";
 				} else {
 					type =  "healing";
 				}
@@ -211,6 +178,7 @@
 							attack_bonus: this.attack_bonus,
 							save_dc: this.save_dc,
 							save_ability: this.save_ability,
+							aoe_type,
 							rolls: []
 						}
 					]
@@ -243,50 +211,6 @@
 			},
 			removeRoll(index) {
 				if(index != 0) this.$delete(this.custom_rolls, index);
-			},
-			shareRoll(roll, targets) {
-				const key = Date.now() + Math.random().toString(36).substring(4);
-				let share = {
-					key,
-					type: "action_roll",
-					entity_key: this.current.key,
-					encounter_id: this.encounterId,
-					notification: {
-						title: roll.name,
-						targets,
-						actions: []
-					}
-				};
-				roll.actions.forEach((action, action_index) => {
-					const type = (action.type === "healing") ? "healing" : "damage";
-
-					share.notification.actions[action_index] = {
-						rolls: [],
-						type
-					};
-					// To hit
-					if(action.toHit) {
-						const toHit = action.toHit;
-						share.notification.actions[action_index].toHit = {
-							roll: toHit.roll,
-							total: toHit.total
-						}
-						if(toHit.ignored) share.notification.actions[action_index].toHit.advantage_disadvantage = this.advantage(toHit.advantage_disadvantage);
-					}
-
-					//Rolls
-					action.rolls.forEach((item, roll_index) => {
-						share.notification.actions[action_index].rolls[roll_index] = {
-							damage_type: item.damage_type || null,
-							roll: item.modifierRoll.roll,
-							total: item.modifierRoll.total,
-						};
-					});
-				});
-				this.set_share({ id: this.broadcast.live, share});
-			},
-			advantage(input) {
-				return Object.keys(input)[0].charAt(0);
 			}
 		}
 	}

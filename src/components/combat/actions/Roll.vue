@@ -314,15 +314,15 @@
 			...mapActions("campaigns", ["set_share"]),
 			roll(e, action_index, action, category, versatile) {
 				if(this.targeted && this.targeted.length) {
-					this.roll_action(
+					this.roll_action({
 						e,
 						action_index,
 						action,
 						category,
-						versatile,
-						this.current,
-						this.targeted
-					);
+						entity: this.current,
+						targets: this.targeted,
+						versatile
+					});
 				}
 			},
 			spendLimited(category, index, regain=false, cost=1) {

@@ -645,15 +645,15 @@
 			},
 			roll(e, action_index, action, category, versatile) {
 				if(this.targeted && this.targeted.length) {
-					this.roll_action(
+					this.roll_action({
 						e,
 						action_index,
 						action,
 						category,
-						versatile,
-						this.entity,
-						this.targeted
-					);
+						entity: this.entity,
+						targets: this.targeted,
+						versatile
+					});
 				} else {
 					this.$q.notify({
 						message: "Select a target first.",

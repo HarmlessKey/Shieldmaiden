@@ -18,7 +18,7 @@ export const runEncounter = {
       "set_limitedUses"
     ]),
     ...mapActions("campaigns", ["set_share"]),
-    roll_action(e, action_index, action, category, versatile, entity, targets) {
+    roll_action({e, action_index, action, category, entity, targets, versatile=undefined }) {
       let roll;
       const config = {
         type: "monster_action",

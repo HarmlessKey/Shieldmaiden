@@ -122,7 +122,7 @@ router.beforeEach(async (to, from, next) => {
 				icon: "fas fa-wifi-slash",
 				color: "negative",
 				position: "top"
-			})
+			});
 			next("/");
 		}
 

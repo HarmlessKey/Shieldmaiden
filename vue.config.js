@@ -18,7 +18,8 @@ module.exports = {
   pwa: {
     workboxPluginMode: "InjectManifest",
     workboxOptions: {
-      swSrc: "src/service-worker.js"
+      swSrc: "src/service-worker.js",
+      importScripts: []
     },
     manifestOptions: {
       name: "Harmless Key",

@@ -96,7 +96,6 @@
   "reactSnap": {
     "source": "dist",
     "concurrency": 1,
-    "puppeteerExecutablePath": "/usr/bin/chromium-browser",
     "puppeteerArgs": [
       "--no-sandbox",
       "--disable-setuid-sandbox"
@@ -106,7 +105,6 @@
       "removeComments": false
     },
     "include": [
-      "/",
       "/about-us",
       "/privacy-policy",
       "/patreon",

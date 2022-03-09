@@ -36,11 +36,7 @@ html body {
 		display: none;
 	}
 	
-	.view {
-		padding: 5px;
-		height: calc(100vh - 100px);
-			/*width: 100vw;*/
-	}
+
 	.container-fluid {
 		padding: 0;
 	}
@@ -1262,7 +1258,8 @@ html body {
 		right: 0;
 		top: 50px;
 		height: calc(100vh - 50px);
-		width: 330px;
+		width: 380px;
+		max-width: 95%;
 		z-index: 99;
 		box-shadow: 0 10px 15px $black;
 		background: $neutral-8;
@@ -2120,6 +2117,39 @@ html body {
 				}
 			}
 		}
+		.scrollable-content {
+			padding-top: 38px;
+
+			.breadcrumb {
+				margin-bottom: 0;
+				background: $neutral-7;
+				border-radius: 0;
+				border: none;
+				padding: 10px 15px;
+				position: absolute;
+				top: 50px;
+				left: 0;
+				width: 100%;
+				z-index: 1;
+				font-size: 13px;
+				line-height: normal;
+
+				.q-breadcrumbs {
+					> div {
+						flex-wrap: nowrap;
+						min-width: 0;
+						white-space: nowrap;
+
+						:not(:first-child):not(:last-child) {
+							 &.flex {
+								 overflow: hidden;
+								 text-overflow: ellipsis;
+							 }							
+						}
+					}
+				}
+			}
+		}
 	}
 
 	//SM
@@ -2216,6 +2246,9 @@ html body {
 	@media only screen and (min-width: 1200px) {
 		.container {
 			max-width: 1140px;
+		}
+		.slide {
+			width: 420px;
 		}
 		.d-xl {
 			&-flex {

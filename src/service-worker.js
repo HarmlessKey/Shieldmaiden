@@ -4,7 +4,10 @@
  */
 
 self.addEventListener('message', (event) => {
-  if (["https://harmlesskey.com", "https://staging.harmlesskey.com"].includes(event.origin) && event.data && event.data.type === 'SKIP_WAITING') {
+  if(event.origin !== "https://harmlesskey.com" && event.origin !== "https://staging.harmlesskey.com") 
+    return;
+    
+  if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });

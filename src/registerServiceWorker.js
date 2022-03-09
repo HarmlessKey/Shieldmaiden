@@ -1,7 +1,7 @@
 import { register } from "register-service-worker";
 import { Notify } from 'quasar';
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "production" && navigator.userAgent !== "ReactSnap") {
   register(`${process.env.BASE_URL}service-worker.js`, {
     ready () { /* App is being served from cache by a service worker */ },
     registered () { /* Service worker has been registered */ },

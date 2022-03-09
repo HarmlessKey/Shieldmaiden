@@ -598,7 +598,7 @@ html body {
 
 	.scrollable-content {
 		height: calc(100vh - #{$header-height});
-		overflow: auto;
+
 
 		&::-webkit-scrollbar {
 			display: none;
@@ -2117,7 +2117,7 @@ html body {
 				}
 			}
 		}
-		.scrollable-content {
+		.hk-view {
 			padding-top: 38px;
 
 			.breadcrumb {
@@ -2126,7 +2126,7 @@ html body {
 				border-radius: 0;
 				border: none;
 				padding: 10px 15px;
-				position: absolute;
+				position: fixed;
 				top: 50px;
 				left: 0;
 				width: 100%;

@@ -1,5 +1,5 @@
 <template>
-	<div class="loading">
+	<div class="loading" :class="{ 'full-height': fullHeight }">
 			<div>
 				<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
 				<h2>{{ prefix ? prefix : "Loading" }}{{ name ? ` ${name}` : `` }}...</h2>
@@ -17,6 +17,10 @@ export default {
 		prefix: {
 			type: String,
 			default: undefined
+		},
+		fullHeight: {
+			type: Boolean,
+			default: false
 		}
 	},
 	computed: {
@@ -46,6 +50,10 @@ export default {
 		display: grid;
 		align-content: center;
 		background: rgba(0, 0, 0, .1);
+
+		&.full-height {
+			height: calc(100vh - 50px) !important;
+		}
 
 		.die {
 			display: inline-block;

@@ -747,7 +747,7 @@ html body {
 		}
 		&:after {
 			display: inline-block;
-			animation: ellipsis steps(1,end) 1s infinite;;
+			animation: ellipsis steps(1,end) 1s infinite;
 			content: "";
 		}
 	}

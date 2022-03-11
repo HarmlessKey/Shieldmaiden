@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { conditionServices } from "@/services/api/conditions"; 
+import { conditionServices } from "src/services/api/conditions"; 
 
 
 const state = {

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { itemServices } from "@/services/api/items"; 
+import { itemServices } from "src/services/api/items"; 
 
 
 const state = {

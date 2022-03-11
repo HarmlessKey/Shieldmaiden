@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { reminderServices } from "@/services/reminders"; 
+import { reminderServices } from "src/services/reminders"; 
 import _ from "lodash";
 
 // Converts a full reminder to a search_reminder

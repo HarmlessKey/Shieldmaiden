@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { playerServices } from "@/services/players"; 
+import { playerServices } from "src/services/players"; 
 import _ from 'lodash';
 
 // Converts a full player to a search_player

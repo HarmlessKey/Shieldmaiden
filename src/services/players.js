@@ -1,4 +1,4 @@
-import { db } from "@/firebase";
+import { db } from "src/firebase";
 
 const PLAYERS_REF = db.ref("players");
 const SEARCH_PLAYERS_REF = db.ref("search_players");

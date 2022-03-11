@@ -1,4 +1,4 @@
-import { auth } from '@/firebase';
+import { auth } from 'src/firebase';
 import Vue from 'vue';
 import { browserDetect } from '../../functions';
 

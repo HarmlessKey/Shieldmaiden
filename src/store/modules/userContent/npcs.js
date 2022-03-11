@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { npcServices } from "@/services/npcs"; 
+import { npcServices } from "src/services/npcs"; 
 import _ from "lodash";
 
 // Converts a full npc to a search_npc

@@ -1,5 +1,5 @@
-import { db, auth } from '@/firebase';
-import { userServices } from "@/services/user"; 
+import { db, auth } from 'src/firebase';
+import { userServices } from "src/services/user"; 
 import Vue from 'vue';
 
 const users_ref = db.ref('users');

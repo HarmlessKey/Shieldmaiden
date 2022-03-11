@@ -1,0 +1,105 @@
+import { auth, db } from '../firebase';
+
+export default async ({ app, router, store, Vue }) => {
+	// Check if user is connected
+	auth.onAuthStateChanged(() => {
+		if(auth.currentUser) {
+			const uid = auth.currentUser.uid;
+			const userStatusDatabaseRef = db.ref(`/status/${uid}`);
+			const userLiveDatabaseRef = db.ref(`/broadcast/${uid}`);
+
+			const isOfflineForDatabase = {
+				state: 'offline',
+				last_change: firebase.database.ServerValue.TIMESTAMP
+			}
+
+			const isOnlineForDatabase = {
+				state: 'online',
+				lastt_changed: firebase.database.ServerValue.TIMESTAMP
+			}
+
+			db.ref('.info/connected').on('value', function(snapshot) {
+				if(snapshot.val() == false) return;
+			
+				userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
+					userStatusDatabaseRef.set(isOnlineForDatabase);
+				});
+				
+				// Stop broadcast when connection is lost
+				userLiveDatabaseRef.onDisconnect().remove().then(function() {
+				});
+			});
+		}
+	});
+
+	// Check before each page load whether the page requires authentication/
+	// if it does check whether the user is signed into the web app or
+	// redirect to the sign-in page to enable them to sign-in
+	router.beforeEach(async (to, from, next) => {
+		// We make sure store is always initialized
+		store.dispatch("initialize").then(() => {
+			store.dispatch("setSlide", false); //Always hide slide
+			store.commit("CLEAR_ACTION_ROLLS");
+
+			const currentUser = auth.currentUser; //Check if there is a user
+			const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)
+			const offline = to.matched.some(record => record.meta.offline); //Check if route is offline available
+			const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin); //Check if Admin is needed for the page (defined in routes)
+			const requiresContribute = to.matched.some(record => record.meta.requiresContribute); //Check if Contribute is needed for the page (defined in routes)
+
+
+			if(to.path === "/sign-in" && auth.currentUser) {
+				console.log("You're already signed in!");
+				next("/content")
+			}
+			// Check if a user is offline, if the page is not available offline, send to home
+			if(!navigator.onLine && !offline) {
+				Notify.create({
+					message: "Page not available offline, redirected to home.",
+					icon: "fas fa-wifi-slash",
+					color: "negative",
+					position: "top"
+				})
+				next("/");
+			}
+
+			//Check if someone is logged in and if Auth is needed
+			else if (requiresAuth && !currentUser) {
+				next('/sign-in'); //no user, but auth is needed
+			} else if (requiresAuth && currentUser) {
+				//Auth is needed and there is a user
+				
+				//Check if user data exists
+				if(store.getters.userInfo) {
+					const admin = store.getters.userInfo.admin;
+					const contribute = store.getters.userInfo.contribute;
+					const username = store.getters.userInfo.username;
+
+					//Force to input a username
+					if(!username) {
+						console.log("no username")
+						next("/set-username");
+					} else {
+						//CHECK FOR ADMIN
+						if(requiresAdmin && !admin) {
+							next("/404");
+						} else if(requiresContribute) {
+							if(!contribute && !admin) {			
+								next("/404");
+							} else {
+								next();
+							}
+						} else {
+							next(); //No admin/contribute pages can be visited
+						}
+					}
+				} else {
+					//Force to create userdata
+					next("/set-username");
+				}
+			} else {
+				next(); //No Auth is needed
+			}
+		});
+	});
+}

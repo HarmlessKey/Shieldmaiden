@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { itemServices } from "@/services/items"; 
+import { itemServices } from "src/services/items"; 
 import _ from "lodash";
 
 // Converts a full item to a search_item

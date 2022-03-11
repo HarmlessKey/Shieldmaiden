@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { monsterServices } from "@/services/api/monsters"; 
+import { monsterServices } from "src/services/api/monsters"; 
 
 
 const state = {

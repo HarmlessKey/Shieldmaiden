@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { campaignServices } from "@/services/campaigns"; 
+import { campaignServices } from "src/services/campaigns"; 
 import _ from 'lodash';
 
 // Converts a full campaign to a search_campaign

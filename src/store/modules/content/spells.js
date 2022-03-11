@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { spellServices } from "@/services/api/spells"; 
+import { spellServices } from "src/services/api/spells"; 
 
 const state = {
   spell_services: null,

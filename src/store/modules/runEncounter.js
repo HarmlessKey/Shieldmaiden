@@ -1,7 +1,7 @@
-import { skills } from "@/mixins/skills";
-import { abilities } from "@/mixins/abilities";
-import { monsterMixin } from "@/mixins/monster";
-import { db } from "@/firebase";
+import { skills } from "src/mixins/skills";
+import { abilities } from "src/mixins/abilities";
+import { monsterMixin } from "src/mixins/monster";
+import { db } from "src/firebase";
 import Vue from "vue";
 
 const demoPlayers = {

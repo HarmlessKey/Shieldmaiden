@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { encounterServices } from "@/services/encounters"; 
+import { encounterServices } from "src/services/encounters"; 
 import _ from 'lodash';
 
 // Converts a full encounter to a search_encounter

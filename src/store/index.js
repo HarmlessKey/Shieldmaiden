@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { general_module } from './modules/general';
+import general from './modules/general';
 import { tips_module } from './modules/tips';
 import { run_encounter } from './modules/runEncounter';
 import user from './modules/user';
@@ -27,9 +27,9 @@ Vue.use(Vuex);
  */
 
 export default function (/* { ssrContext } */) {
-  const Store = new Vuex.Store({
+  return new Vuex.Store({
     modules: {
-      general: general_module,
+      general: general,
 			user: user,
 			encounter: run_encounter,
 			api_spells: api_spells,
@@ -47,8 +47,7 @@ export default function (/* { ssrContext } */) {
 
     // enable strict mode (adds overhead!)
     // for dev mode only
-    strict: process.env.DEBUGGING
-  })
-
-  return Store
+    // strict: process.env.DEBUGGING
+		strict: false
+  });
 }

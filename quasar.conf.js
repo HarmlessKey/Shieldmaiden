@@ -22,7 +22,8 @@ module.exports = function (/* ctx */) {
     boot: [
       'plugins',
       'firebase-auth',
-      'hk-components'
+      'hk-components',
+      'vee-validate'
     ],
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

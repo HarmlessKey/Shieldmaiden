@@ -22,15 +22,15 @@ const convert_campaign = (campaign) => {
 	return returnCampaign;
 }
 
-const state = {
+const campaign_state = () => ({
   campaign_services: null,
   active_campaign: undefined,
   cached_campaigns: {},
   campaigns: undefined,
   campaign_count: 0
-};
+});
 
-const getters = {
+const campaign_getters = {
   campaigns: (state) => { 
     // Convert object to sorted array
     return _.chain(state.campaigns)
@@ -46,7 +46,7 @@ const getters = {
   campaign_services: (state) => { return state.campaign_services; }
 };
 
-const actions = {
+const campaign_actions = {
   async get_campaign_services({ getters, commit }) {
     if(getters.campaign_services === null) {
       commit("SET_CAMPAIGN_SERVICES", new campaignServices);
@@ -326,7 +326,6 @@ const actions = {
       try {
         const player = await dispatch("players/get_player", { uid, id: playerId }, { root: true });
         const campaign_player = { curHp: player.maxHp };
-        // const new_count = (campaign.player_count) ? campaign.player_count + 1 : 1;
 
         // If the campaign has experience advancement
         // make sure the player has experience points set
@@ -360,7 +359,7 @@ const actions = {
           }
         }
 
-        await services.addPlayer(uid, campaign.key, playerId, campaign_player);
+        await services.setPlayer(uid, campaign.key, playerId, campaign_player);
         commit("SET_PLAYER", { uid, id: campaign.key, playerId, player });
 
         const new_count = await services.updatePlayerCount(uid, campaign.key, 1);
@@ -404,7 +403,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        await services.editPlayer(uid, id, playerId, player);
+        await services.setPlayer(uid, id, playerId, player);
         commit("SET_PLAYER", { uid, id, playerId, player });
         return;
       } catch(error) {
@@ -727,7 +726,7 @@ const actions = {
     }
   }
 };
-const mutations = {
+const campaign_mutations = {
   SET_CAMPAIGN_SERVICES(state, payload) { Vue.set(state, "campaign_services", payload); },
   SET_CAMPAIGNS(state, payload) { Vue.set(state, "campaigns", payload); },
   SET_CAMPAIGN_COUNT(state, value) { Vue.set(state, "campaign_count", value); },
@@ -863,8 +862,8 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: campaign_state,
+  getters: campaign_getters,
+  actions: campaign_actions,
+  mutations: campaign_mutations
 }

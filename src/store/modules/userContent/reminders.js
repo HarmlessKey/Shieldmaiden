@@ -17,14 +17,14 @@ const convert_reminder = (reminder) => {
 	return returnReminder;
 }
 
-const state = {
+const reminder_state = () => ({
 	reminder_services: null,
 	cached_reminders: {},
 	reminder_count: 0,
 	reminders: undefined
-}
+});
 
-const getters = {
+const reminder_getters = {
 	reminders: (state) => {
     // Convert object to sorted array
     return _.chain(state.reminders)
@@ -35,9 +35,9 @@ const getters = {
   },
 	reminder_count: (state) => { return state.reminder_count },
 	reminder_services: (state) => { return state.reminder_services },
-}
+};
 
-const actions = {
+const reminder_actions = {
 	async get_reminder_services({ getters, commit }) {
 		if (getters.reminder_services === null) {
 			commit("SET_REMINDER_SERVICES", new reminderServices);
@@ -50,7 +50,7 @@ const actions = {
 	 * Stores those reminders in reminders store
 	 * Returns an Array of reminders, ordered by name.
 	 */
-	async get_reminders({ rootGetters, dispatch, commit }) {
+	async get_reminders({ state, rootGetters, dispatch, commit }) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
 		let reminders = (state.reminders) ? state.reminders : undefined;
 
@@ -213,7 +213,7 @@ const actions = {
 }
 
 
-const mutations = {
+const reminder_mutations = {
 	SET_REMINDER_SERVICES(state, payload) { Vue.set(state, "reminder_services", payload); },
   SET_REMINDER_COUNT(state, value) { Vue.set(state, "reminder_count", value); },
   SET_REMINDERS(state, value) { Vue.set(state, "reminders", value); },
@@ -251,8 +251,8 @@ const mutations = {
 
 export default {
 	namespaced: true,
-	state,
-	getters,
-	actions, 
-	mutations,
+	state: reminder_state,
+	getters: reminder_getters,
+	actions: reminder_actions, 
+	mutations: reminder_mutations
 }

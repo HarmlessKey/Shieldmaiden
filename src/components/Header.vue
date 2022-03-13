@@ -107,7 +107,6 @@
 </template>
 
 <script>
-	import { auth } from 'src/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
@@ -120,12 +119,12 @@
 		},
 		data() {
 			return {
-				user: auth.currentUser,
 				enviroment: process.env.NODE_ENV
 			}
 		},
 		computed: {
 			...mapGetters([
+				'user',
 				'userInfo'
 			]),
 		},

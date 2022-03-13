@@ -5,7 +5,7 @@ import Vue from 'vue';
 const users_ref = db.ref('users');
 const tiers_ref = db.ref('tiers');
 
-const	state = {
+const	user_state = () => ({
 	user_services: null,
 	user: undefined,
 	userInfo: undefined,
@@ -18,9 +18,9 @@ const	state = {
 	poster: undefined,
 	broadcast: {},
 	followed: {}
-};
+});
 
-const getters = {
+const user_getters = {
 	user_services: (state) => { return state.user_services },
 	user: function( state ) { return state.user; },
 	userInfo(state) { return state.userInfo; },
@@ -35,7 +35,7 @@ const getters = {
 	followed(state) { return state.followed; },
 };
 
-const actions = {
+const user_actions = {
 	async get_user_services({ getters, commit }) {
 		if (getters.user_services === null) {
 			commit("SET_USER_SERVICES", new userServices);
@@ -165,7 +165,7 @@ const actions = {
 			const services = await dispatch("get_user_services");
 			try {
 				const user_settings = await services.getSettings(uid);
-				commit('SET_USER_SETTINGS', user_settings);
+				commit('SET_USER_SETTINGS', user_settings || {});
 			} catch(error) {
 				throw error;
 			}
@@ -350,7 +350,7 @@ const actions = {
 	}
 };
 
-const	mutations = {
+const	user_mutations = {
 	SET_USER_SERVICES(state, payload) { Vue.set(state, "user_services", payload); },
 	SET_USER(state, payload) { Vue.set(state, "user", payload); },
 	SET_USERINFO(state, payload) { Vue.set(state, "userInfo", payload); },
@@ -399,8 +399,8 @@ const	mutations = {
 };
 
 export default {
-  state,
-  getters,
-  actions,
-  mutations
+  state: user_state,
+  getters: user_getters,
+  actions: user_actions,
+  mutations: user_mutations
 }

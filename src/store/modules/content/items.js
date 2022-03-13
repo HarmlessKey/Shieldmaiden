@@ -2,17 +2,17 @@ import Vue from 'vue';
 import { itemServices } from "src/services/api/items"; 
 
 
-const state = {
+const item_state = () => ({
   item_services: null,
   cached_items: {
   },
-};
+});
 
-const getters = {
+const item_getters = {
   item_services: (state) => { return state.item_services; },
 };
 
-const actions = {
+const item_actions = {
   get_api_item_services: async ({ getters, commit }) => {
     if(getters.item_services === null) {
       commit("SET_ITEM_SERVICES", new itemServices);
@@ -23,8 +23,7 @@ const actions = {
   async get_api_items({ dispatch}, { pageNumber, pageSize, query, fields, sortBy, descending }) {
     const services = await dispatch("get_api_item_services");
     try {
-      const items = await services.getItems(pageNumber, pageSize, query, fields, sortBy, descending);
-      return items;
+      return await services.getItems(query, pageNumber, pageSize, fields, sortBy, descending);
     } catch(error) {
       console.error(error);
     }
@@ -63,7 +62,7 @@ const actions = {
     return item;
   },
 };
-const mutations = {
+const item_mutations = {
   SET_ITEM_SERVICES(state, payload) { Vue.set(state, "item_services", payload); },
   SET_ITEMS(state, payload) { Vue.set(state, "items", payload); },
   SET_CACHED_ITEM(state, payload) { Vue.set(state.cached_items, payload["_id"], payload) },
@@ -71,8 +70,8 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
+  state: item_state,
+  getters: item_getters,
+  actions: item_actions,
+  mutations: item_mutations
 }

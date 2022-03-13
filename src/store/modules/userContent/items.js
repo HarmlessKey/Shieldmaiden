@@ -18,14 +18,14 @@ const convert_item = (item) => {
 	return returnItem;
 }
 
-const state = {
+const item_state = () => ({
 	item_services: null,
 	cached_items: {},
 	item_count: 0,
 	items: undefined,
-}
+});
 
-const getters = {
+const item_getters = {
 	items: (state) => {
     // Convert object to sorted array
     return _.chain(state.items)
@@ -36,9 +36,9 @@ const getters = {
   },
 	item_services: (state) => { return state.item_services },
 	item_count: (state) => { return state.item_count },
-}
+};
 
-const actions = {
+const item_actions = {
 	async get_item_services({ getters, commit }) {
 		if (getters.item_services === null) {
 			commit("SET_ITEM_SERVICES", new itemServices);
@@ -51,7 +51,7 @@ const actions = {
 	 * Stores those items in items store
 	 * Returns an Array of items, ordered by name.
 	 */
-	async get_items({ rootGetters, dispatch, commit }) {
+	async get_items({ state, rootGetters, dispatch, commit }) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
 		let items = (state.items) ? state.items : undefined;
 
@@ -194,7 +194,7 @@ const actions = {
 }
 
 
-const mutations = {
+const item_mutations = {
 	SET_ITEM_SERVICES(state, payload) { Vue.set(state, "item_services", payload); },
   SET_ITEM_COUNT(state, value) { Vue.set(state, "item_count", value); },
   SET_ITEMS(state, value) { Vue.set(state, "items", value); },
@@ -227,8 +227,8 @@ const mutations = {
 
 export default {
 	namespaced: true,
-	state,
-	getters,
-	actions, 
-	mutations,
+	state: item_state,
+	getters: item_getters,
+	actions: item_actions, 
+	mutations: item_mutations,
 }

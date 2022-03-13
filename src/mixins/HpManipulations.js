@@ -1,6 +1,6 @@
-import { db } from '@/firebase';
+import { db } from 'src/firebase';
 import { mapActions, mapGetters } from 'vuex';
-import { remindersMixin } from '@/mixins/reminders';
+import { remindersMixin } from 'src/mixins/reminders';
 
 export const setHP = {
 	mixins: [remindersMixin],

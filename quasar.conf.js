@@ -21,12 +21,13 @@ module.exports = function (/* ctx */) {
     // https://v1.quasar.dev/quasar-cli/boot-files
     boot: [
       'plugins',
-      'firebase-auth'
+      'firebase-auth',
+      'hk-components'
     ],
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: [
-      'app.scss'
+      'styles.scss'
     ],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
@@ -47,6 +48,9 @@ module.exports = function (/* ctx */) {
     build: {
       vueRouterMode: 'history', // available values: 'hash', 'history'
       env: require('dotenv').config().parsed,
+      scssLoaderOptions: {
+        additionalData: '@import "src/css/variables.scss";'
+      },
 
       // transpile: false,
 

@@ -1,22 +1,37 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= productName %></title>
+<html lang="en">
+<head>
 
-    <meta charset="utf-8">
-    <meta name="description" content="<%= productDescription %>">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<link rel="apple-touch-icon" sizes="180x180" href=img/icons/apple-touch-icon-transparent-180x180.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/icons/favicon-16x16.png">
+	<link rel="icon" href="favicon.png">
+	<link rel="manifest" href="site.webmanifest">
+	<meta name="theme-color" content="#191919">
+	<link rel="canonical" href="https://harmlesskey.com/">
+	
+	<!-- Google -->
+	<meta name="google-site-verification" content="TE9I25eHFxUhAMhDul4v44NM6qCNfChZ9eGTf4Zv3-w" />
 
-    <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="icon" type="image/ico" href="favicon.ico">
-  </head>
-  <body>
-    <!-- DO NOT touch the following DIV -->
-    <div id="q-app"></div>
-  </body>
+	<!-- Font awesome -->
+	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
+
+	<meta property="og:image" data-vmid="og-image" name="image" content="https://harmlesskey.com/linkedin.png" />
+	<meta property="og:description" data-vmid="og-description" name="description" content="Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.g" />
+		
+	<!-- Tween -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/tween.js@16.3.4"></script>
+	<title>D&D Combat Tracker | Harmless Key</title>
+</head>
+<body>
+	<noscript>
+		<strong>We're sorry but Harmless Key doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+	</noscript>
+	<div id="q-app"></div>
+	<!-- built files will be auto injected -->
+</body>
 </html>

@@ -1,4 +1,4 @@
-import { auth, db } from '../firebase';
+import { auth, db, firebase } from '../firebase';
 
 export default async ({ app, router, store, Vue }) => {
 	// Check if user is connected
@@ -19,15 +19,14 @@ export default async ({ app, router, store, Vue }) => {
 			}
 
 			db.ref('.info/connected').on('value', function(snapshot) {
-				if(snapshot.val() == false) return;
+				if(!snapshot.val()) return;
 			
 				userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
 					userStatusDatabaseRef.set(isOnlineForDatabase);
 				});
 				
 				// Stop broadcast when connection is lost
-				userLiveDatabaseRef.onDisconnect().remove().then(function() {
-				});
+				userLiveDatabaseRef.onDisconnect().remove();
 			});
 		}
 	});

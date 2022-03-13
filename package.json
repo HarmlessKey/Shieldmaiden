@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "ajv": "^8.10.0",
+    "ajv-formats": "^2.1.1",
     "axios": "^0.21.4",
     "core-js": "^3.6.5",
     "dotenv": "^16.0.0",
@@ -20,8 +22,10 @@
     "vue-cookies": "^1.7.4",
     "vue-meta": "^2.4.0",
     "vue-numeral-filter": "^2.2.0",
+    "vue-qr": "^3.2.4",
     "vue-shortkey": "^3.1.7",
     "vue-snotify": "^3.2.1",
+    "vue2-flip-countdown": "^0.12.1",
     "vuebar": "0.0.20",
     "vuefire": "^1.4.5",
     "vuex": "^3.0.1"

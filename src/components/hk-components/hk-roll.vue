@@ -99,7 +99,7 @@
 				}
 			}
 		},
-		created() {
+		mounted() {
 			this.$nextTick(function() {
 				window.addEventListener('keyup', this.checkKeyPress);
 				window.addEventListener('keydown', this.checkKeyPress);

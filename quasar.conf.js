@@ -11,10 +11,10 @@ const ESLintPlugin = require('eslint-webpack-plugin')
 module.exports = function (/* ctx */) {
   return {
     // https://v1.quasar.dev/quasar-cli/supporting-ts
-    supportTS: false,
+    supportTS: true,
 
     // https://v1.quasar.dev/quasar-cli/prefetch-feature
-    // preFetch: true,
+    preFetch: false,
 
     // app boot file (src/boot)
     // --> boot files are part of "main.js"
@@ -53,12 +53,16 @@ module.exports = function (/* ctx */) {
         additionalData: '@import "src/css/variables.scss";'
       },
 
-      // transpile: false,
+      transpile: true,
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
       // Applies only if "transpile" is set to true.
-      // transpileDependencies: [],
+      transpileDependencies: [
+        'vee-validate/dist/rules',
+        'vue-numeral-filter',
+        'vue-shortkey'
+      ],
 
       // rtl: false, // https://v1.quasar.dev/options/rtl-support
       // preloadChunks: true,
@@ -112,46 +116,114 @@ module.exports = function (/* ctx */) {
 
     // https://v1.quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
-      pwa: false
+      pwa: true
     },
 
     // https://v1.quasar.dev/quasar-cli/developing-pwa/configuring-pwa
     pwa: {
-      workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
+      workboxPluginMode: "GenerateSW", // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: `Quasar App`,
-        short_name: `Quasar App`,
-        description: `A Quasar Framework app`,
-        display: 'standalone',
-        orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#027be3',
+        name: "Harmless Key",
+        short_name: "Harmless Key",
+        start_url: ".",
+        description: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+        orientation: "portrait",
+        theme_color: "#191a1c",
+        background_color: "#191a1c",
+        display: "standalone",
+        categories: [
+          "games",
+          "entertainment"
+        ],
         icons: [
           {
-            src: 'icons/icon-128x128.png',
-            sizes: '128x128',
-            type: 'image/png'
+            src: "/img/icons/transparent-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any"
           },
           {
-            src: 'icons/icon-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            src: "/img/icons/maskable-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable"
           },
           {
-            src: 'icons/icon-256x256.png',
-            sizes: '256x256',
-            type: 'image/png'
+            src: "/img/icons/transparent-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any"
           },
           {
-            src: 'icons/icon-384x384.png',
-            sizes: '384x384',
-            type: 'image/png'
+            src: "/img/icons/maskable-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "maskable"
           },
           {
-            src: 'icons/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            src: "/img/icons/ms/app-icon-44x44.png",
+            sizes: "44x44",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/img/icons/ms/small-tile-71x71.png",
+            sizes: "71x71",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/img/icons/ms/wide-tile-350x150.png",
+            sizes: "350x150",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/img/icons/ms/large-tile-310x310.png",
+            sizes: "310x310",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/img/icons/ms/store-logo-50x50.png",
+            sizes: "50x50",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/img/icons/ms/splash-screen-620x300.png",
+            sizes: "620x300",
+            type: "image/png",
+            purpose: "any"
+          }
+        ],
+        shortcuts: [
+          {
+            name: "Campaigns",
+            description: "The campaigns you are running.",
+            url: "/content/campaigns",
+            icons: [
+              {
+                src: "/img/icons/shortcuts/campaigns-512x512.png",
+                sizes: "512x512",
+                type: "image/png",
+                purpose: "any"
+              }
+            ]
+          },
+          {
+            name: "Characters",
+            description: "Your player characters.",
+            url: "/content/characters",
+            icons: [
+              {
+                src: "/img/icons/shortcuts/characters-512x512.png",
+                sizes: "512x512",
+                type: "image/png",
+                purpose: "any"
+              }
+            ]
           }
         ]
       }

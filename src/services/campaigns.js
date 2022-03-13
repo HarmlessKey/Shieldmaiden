@@ -83,7 +83,6 @@ export class campaignServices {
       if(update_search) {
         SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${id}${path}`).update(value);
       }
-      return;
     }).catch((error) => {
       throw error;
     });
@@ -98,15 +97,7 @@ export class campaignServices {
     });
   }
 
-  async addPlayer(uid, id, playerId, player) {
-    CAMPAIGNS_REF.child(uid).child(id).child(`players/${playerId}`).set(player).then(() => {
-      return;
-    }).catch((error) => {
-      throw error;
-    });
-  }
-
-  async editPlayer(uid, id, playerId, player) {
+  async setPlayer(uid, id, playerId, player) {
     CAMPAIGNS_REF.child(uid).child(id).child(`players/${playerId}`).set(player).then(() => {
       return;
     }).catch((error) => {

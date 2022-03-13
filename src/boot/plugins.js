@@ -2,8 +2,9 @@ import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueFire from 'vuefire';
 import VueCookies from 'vue-cookies'
 import Meta from 'vue-meta';
-import vueNumeralFilterInstaller from 'vue-numeral-filter';
 import VueAnalytics from 'vue-analytics';
+import shortkey from 'vue-shortkey';
+import numeral from 'vue-numeral-filter';
 
 export default async ({ router, Vue }) => {
 	Vue.config.productionTip = false;
@@ -19,8 +20,8 @@ export default async ({ router, Vue }) => {
 	Vue.use(VueFire);
 	Vue.use(VueCookies);
 	Vue.use(Meta);
-	Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
-	Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
+	Vue.use(numeral, { locale: 'en' });
+	Vue.use(shortkey, { prevent: ['input', 'textarea'] });
 
 	require('../functions.js');
 

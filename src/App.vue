@@ -248,8 +248,6 @@
 				this.install_cookie = true;
 			}
 		}
-		window.addEventListener('offline', () => { this.connection = "offline" });
-		window.addEventListener('online', () => { this.connection = "online" });
 	},
 	mounted() {
 		if(auth.currentUser !== null){
@@ -259,6 +257,9 @@
 				this.$forceUpdate();
 			});
 		}
+
+		window.addEventListener('offline', () => { this.connection = "offline" });
+		window.addEventListener('online', () => { this.connection = "online" });
 
 		// Install prompt
 		window.addEventListener('beforeinstallprompt', (e) => {

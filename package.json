@@ -6,6 +6,8 @@
   "private": true,
   "scripts": {
     "serve": "quasar dev",
+    "ssr": "quasar dev -m ssr",
+    "build": "quasar build -m ssr",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "docker-build": "docker build -t harmlesskey/harmlesskey .",
@@ -39,7 +41,8 @@
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^7.7.0",
-    "eslint-webpack-plugin": "^2.4.0"
+    "eslint-webpack-plugin": "^2.4.0",
+    "workbox-webpack-plugin": "^5.1.4"
   },
   "browserslist": [
     "last 10 Chrome versions",

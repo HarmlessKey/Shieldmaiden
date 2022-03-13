@@ -88,7 +88,6 @@ export class playerServices {
   async editPlayer(uid, id, player, search_player) {
     PLAYERS_REF.child(uid).child(id).set(player).then(() => {
       SEARCH_PLAYERS_REF.child(`${uid}/results/${id}`).set(search_player);
-      return;
     }).catch((error) => {
       throw error;
     });
@@ -108,7 +107,6 @@ export class playerServices {
       if(update_search) {
         SEARCH_PLAYERS_REF.child(`${uid}/results/${id}${path}`).update(value);
       }
-      return;
     }).catch((error) => {
       throw error;
     });

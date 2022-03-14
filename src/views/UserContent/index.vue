@@ -153,6 +153,11 @@
 	export default {
 		name: "UserContent",
 		mixins: [general],
+		preFetch({ store, redirect }) {
+      if(!store.state.user) {
+				redirect('/sign-in');
+			} 
+    },
 		data() {
 			return {
 				campaigns: {},

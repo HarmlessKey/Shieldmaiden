@@ -48,7 +48,7 @@ export default {
 	},
 	computed: {
 		share_available() {
-			return navigator.share !== undefined;
+			return process.browser && navigator.share !== undefined;
 		}
 	},
 	methods: {

@@ -181,7 +181,7 @@
 		name: 'Sidebar',
 		data() {
 			return {
-				small_screen: window.innerWidth < 600,
+				small_screen: false,
 				man_col: false,
 				social_media: [
 					{

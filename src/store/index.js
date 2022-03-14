@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import general from './modules/general';
-import { tips_module } from './modules/tips';
+import tips from './modules/tips';
 import { run_encounter } from './modules/runEncounter';
 import user from './modules/user';
 import api_spells from './modules/content/spells.js';
@@ -42,9 +42,8 @@ export default function (/* { ssrContext } */) {
 			reminders: reminders,
 			players: players,
 			encounters: encounters,
-			tips: tips_module
+			tips: tips
     },
-
     // enable strict mode (adds overhead!)
     // for dev mode only
     // strict: process.env.DEBUGGING

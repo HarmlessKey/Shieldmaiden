@@ -22,7 +22,7 @@ String.prototype.formatUnicorn = function() {
  * @return {string} browser: Opera, Firefox, Safari, IE, edge, chrome
  */
  /* eslint-disable */ export function browserDetect() {
-	 if(process.browers) {
+	 if(process.browser) {
 		 // Opera 8.0+
 		 const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
  

@@ -51,10 +51,3 @@ register(process.env.SERVICE_WORKER_FILE, {
     // console.error('Error during service worker registration:', err)
   }
 });
-
-let refreshing;
-navigator.serviceWorker.addEventListener("controllerChange", () => {
-  if(refreshing) return;
-  window.location.reload();
-  refreshing = true;
-});

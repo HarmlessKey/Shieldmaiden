@@ -6,7 +6,7 @@
 // Configuration for your app
 // https://v1.quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-env node */
-const ESLintPlugin = require('eslint-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = function (/* ctx */) {
   return {
@@ -23,7 +23,8 @@ module.exports = function (/* ctx */) {
       'plugins',
       'firebase-auth',
       'hk-components',
-      'vee-validate'
+      'vee-validate',
+      { path: "vue-shortkey", server: false }
     ],
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -60,8 +61,7 @@ module.exports = function (/* ctx */) {
       // Applies only if "transpile" is set to true.
       transpileDependencies: [
         'vee-validate/dist/rules',
-        'vue-numeral-filter',
-        'vue-shortkey'
+        'vue-numeral-filter'
       ],
 
       // rtl: false, // https://v1.quasar.dev/options/rtl-support
@@ -107,7 +107,10 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'AppFullscreen',
+        'Notify'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
@@ -138,61 +141,61 @@ module.exports = function (/* ctx */) {
         ],
         icons: [
           {
-            src: "/img/icons/transparent-512x512.png",
+            src: "img/icons/transparent-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/img/icons/maskable-512x512.png",
+            src: "img/icons/maskable-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable"
           },
           {
-            src: "/img/icons/transparent-192x192.png",
+            src: "img/icons/transparent-192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/img/icons/maskable-192x192.png",
+            src: "img/icons/maskable-192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "maskable"
           },
           {
-            src: "/img/icons/ms/app-icon-44x44.png",
+            src: "img/icons/ms/app-icon-44x44.png",
             sizes: "44x44",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/img/icons/ms/small-tile-71x71.png",
+            src: "img/icons/ms/small-tile-71x71.png",
             sizes: "71x71",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/img/icons/ms/wide-tile-350x150.png",
+            src: "img/icons/ms/wide-tile-350x150.png",
             sizes: "350x150",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/img/icons/ms/large-tile-310x310.png",
+            src: "img/icons/ms/large-tile-310x310.png",
             sizes: "310x310",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/img/icons/ms/store-logo-50x50.png",
+            src: "img/icons/ms/store-logo-50x50.png",
             sizes: "50x50",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/img/icons/ms/splash-screen-620x300.png",
+            src: "img/icons/ms/splash-screen-620x300.png",
             sizes: "620x300",
             type: "image/png",
             purpose: "any"

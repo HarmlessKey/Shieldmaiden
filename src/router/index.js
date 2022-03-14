@@ -43,7 +43,7 @@ export default function ({ store, ssrContext }) {
 
 			const currentUser = auth.currentUser; //Check if there is a user
 			const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)
-			const offline = to.matched.some(record => record.meta.offline); //Check if route is offline available
+			const offline_available = to.matched.some(record => record.meta.offline); //Check if route is offline available
 			const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin); //Check if Admin is needed for the page (defined in routes)
 			const requiresContribute = to.matched.some(record => record.meta.requiresContribute); //Check if Contribute is needed for the page (defined in routes)
 
@@ -53,7 +53,7 @@ export default function ({ store, ssrContext }) {
 				next("/content")
 			}
 			// Check if a user is offline, if the page is not available offline, send to home
-			if(!navigator.onLine && !offline) {
+			if(process.browser && !navigator.onLine && !offline_available) {
 				Notify.create({
 					message: "Page not available offline, redirected to home.",
 					icon: "fas fa-wifi-slash",

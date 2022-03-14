@@ -3,7 +3,6 @@ import VueFire from 'vuefire';
 import VueCookies from 'vue-cookies'
 import Meta from 'vue-meta';
 import VueAnalytics from 'vue-analytics';
-import shortkey from 'vue-shortkey';
 import numeral from 'vue-numeral-filter';
 
 export default async ({ router, Vue }) => {
@@ -21,7 +20,6 @@ export default async ({ router, Vue }) => {
 	Vue.use(VueCookies);
 	Vue.use(Meta);
 	Vue.use(numeral, { locale: 'en' });
-	Vue.use(shortkey, { prevent: ['input', 'textarea'] });
 
 	require('../functions.js');
 

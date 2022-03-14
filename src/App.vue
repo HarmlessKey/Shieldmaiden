@@ -87,7 +87,7 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import HkRolls from './components/hk-components/hk-rolls';
 	import { general } from './mixins/general';
-	import Home from "./views/Home"
+	import Home from "./views/Home";
 
 	export default {
 	name: "App",
@@ -178,7 +178,6 @@
 	data() {
 		return {
 			user: auth.currentUser,
-			connection: navigator.onLine ? 'online' : 'offline',
 			announcementSetter: false,
 			announcement_cookie: false,
 			install_cookie: false,
@@ -222,6 +221,9 @@
 			"initialized",
 			"theme"
 		]),
+		connection() {
+			return process.browser && !navigator.onLine ? 'offline' : 'online';
+		},
 		announcement: {
 			get() {
 				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
@@ -232,11 +234,11 @@
 			}
 		},
 		isAndroid() {
-			const userAgent = navigator.userAgent.toLowerCase();
+			const userAgent = process.browser ? navigator.userAgent.toLowerCase() : "";
 			return userAgent.indexOf("android") > -1;
 		}
 	},
-	created() {
+	mounted() {
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {
@@ -248,8 +250,7 @@
 				this.install_cookie = true;
 			}
 		}
-	},
-	mounted() {
+		
 		if(auth.currentUser !== null){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
@@ -275,7 +276,6 @@
 	},
 	methods: {
 		...mapActions([
-			"initialize",
 			"setSlide",
 			"setSideSmallScreen",
 			"setLive"

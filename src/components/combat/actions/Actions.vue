@@ -23,7 +23,7 @@
 							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="entitiesList[doneBy].name.capitalizeEach()"/>
+							<q-item-label v-text="entitiesList[doneBy].name.capitalizeEach()"/>
 						</q-item-section>
 					</q-item>
 					<span v-else>
@@ -51,7 +51,7 @@
 							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="scope.opt.name.capitalizeEach()"/>
+							<q-item-label v-text="scope.opt.name.capitalizeEach()"/>
 						</q-item-section>
 					</q-item>
 				</template>

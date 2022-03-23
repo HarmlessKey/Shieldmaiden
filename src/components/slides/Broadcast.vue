@@ -50,7 +50,7 @@
 					v-on="scope.itemEvents"      
 				>
 					<q-item-section>
-						<q-item-label v-html="scope.opt.label"/>
+						<q-item-label v-text="scope.opt.label"/>
 					</q-item-section>
 					<q-item-section side>
 						<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>

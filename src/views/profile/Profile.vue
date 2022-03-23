@@ -40,8 +40,8 @@
 								</p>
 							</div>
 							<div v-if="!valid(userInfo.patron.pledge_end)"> 
-								<p>Your subscription <b class="red">expired</b></p>
-								<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-neutral-5">
+								<p>Your subscription <strong class="red">expired</strong></p>
+								<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-neutral-5" rel="noopener">
 									<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Renew
 								</a>
 							</div>

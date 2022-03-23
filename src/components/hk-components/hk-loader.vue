@@ -1,8 +1,10 @@
 <template>
-	<div class="loading">
+	<div class="loading" :class="{ 'full-height': fullHeight }">
 			<div>
-				<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
-				<h2>{{ prefix ? prefix : "Loading" }}{{ name ? ` ${name}` : `` }}...</h2>
+				<span class="loading__die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
+				<div class="loading__title">
+					{{ prefix ? prefix : "Loading" }}{{ name ? ` ${name}` : `` }}...
+				</div>
 			</div>
 		</div>
 </template>
@@ -17,6 +19,10 @@ export default {
 		prefix: {
 			type: String,
 			default: undefined
+		},
+		fullHeight: {
+			type: Boolean,
+			default: false
 		}
 	},
 	computed: {
@@ -47,7 +53,11 @@ export default {
 		align-content: center;
 		background: rgba(0, 0, 0, .1);
 
-		.die {
+		&.full-height {
+			height: calc(100vh - 50px) !important;
+		}
+
+		&__die {
 			display: inline-block;
 			width: 50px; 
 			height: 50px;
@@ -61,7 +71,7 @@ export default {
 				animation: spin 1.5s ease infinite;
 			}
 		}
-		h2 {
+		&__title {
 			font-weight: bold;
 			font-size: 18px;
 			text-transform: none;

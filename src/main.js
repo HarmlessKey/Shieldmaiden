@@ -9,7 +9,6 @@ import { store } from './store/store';
 import { routes } from './routes';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
-import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
 import './hk-components';
@@ -17,7 +16,6 @@ import './quasar';
 import './registerServiceWorker';
 import { Notify } from 'quasar';
 import 'animate.css';
-import Ads from 'vue-google-adsense';
 
 const options = {
 	toast: {
@@ -31,13 +29,10 @@ Vue.config.productionTip = false;
 Vue.use(Snotify, options);
 Vue.use(VueFire);
 Vue.use(VueCookies);
-Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
 Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 Vue.use(require('vue-script2'));
-Vue.use(Ads.Adsense);
-
 
 require('./functions.js')
 

@@ -32,7 +32,7 @@
 							{{ date }}
 						</span>
 						<template v-if="link">
-							- <a target="_blank" :href="link">View original post</a>
+							- <a target="_blank" :href="link" rel="noopener">View original post</a>
 						</template>
 					</q-carousel-slide>
 				</q-carousel>

@@ -22,23 +22,25 @@
 					class="btn btn-sm bg-neutral-5" 
 					@click="$emit('add')"
 				>
-					<i aria-hidden="true" class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
+					<i aria-hidden="true" class="fas fa-plus green" /> 
+					<span class="d-none d-md-inline-block ml-1">New {{ type.slice(0, -1) }}</span>
 				</a>
 				<router-link
 					v-else
 					class="btn btn-sm bg-neutral-5" 
 					:to="`${$route.path}/add-${type.slice(0, -1)}`"
 				>
-					<i aria-hidden="true" class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
+					<i aria-hidden="true" class="fas fa-plus green" /> 
+					<span class="d-none d-md-inline-block ml-1">New {{ type.slice(0, -1) }}</span>
 				</router-link>
 			</template>
 			<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">
-				<i aria-hidden="true" class="fas fa-box-full red mr-1"/>
-				Over encumbered
+				<i aria-hidden="true" class="fas fa-box-full red"/>
+				<span class="d-none d-md-inline-block ml-1">Over encumbered</span>
 			</router-link>
 			<router-link v-else class="btn btn-sm ml-1" to="/patreon">
-				<i aria-hidden="true" class="fab fa-patreon patreon-red mr-1"/>
-				Get more slots
+				<i aria-hidden="true" class="fab fa-patreon patreon-red"/>
+				<span class="d-none d-md-inline-block ml-1">Get more slots</span>
 			</router-link>
 		</div>
 	</div>

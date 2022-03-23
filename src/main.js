@@ -50,7 +50,7 @@ Vue.use(VueRouter);
 const router = new VueRouter({
 	routes: routes,
 	scrollBehavior () {
-		const el = document.querySelector('.scrollable-content');
+		const el = document.querySelector('.scroll');
 		el.scrollLeft = 0;
 		el.scrollTop = 0;
 	},

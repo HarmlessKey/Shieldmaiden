@@ -71,7 +71,9 @@
 			</hk-card>
 		</q-dialog>
 	</div>
-	<hk-loader v-else name="NPC" />
+	<hk-card v-else header="Basic info">
+		<hk-loader name="NPC" />
+	</hk-card>
 </template>
 
 <script>

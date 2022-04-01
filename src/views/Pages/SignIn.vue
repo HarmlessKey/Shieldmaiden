@@ -48,10 +48,11 @@
 			}
 		},
 		methods: {
-			...mapActions(["reinitialize"]),
+			...mapActions(["reinitialize", "setUser"]),
 			async signIn() {
 				await auth.signInWithEmailAndPassword(this.email, this.password).then(
-					async () => {
+					async (result) => {
+						await this.setUser(result.user);
 						await this.reinitialize();
 						this.$router.replace("/content");
 					},
@@ -64,14 +65,16 @@
 				const provider = new firebase.auth.GoogleAuthProvider();
 
 				if(this.browser === "Edge") {
-					auth.signInWithRedirect(provider).then(async () => {
+					auth.signInWithRedirect(provider).then(async (result) => {
+						await this.setUser(result.user);
 						await this.reinitialize();
 						this.$router.replace("/content");
 					}).catch((err) => {
 						this.error = err.message;
 					});
 				} else {
-					auth.signInWithPopup(provider).then(async () => {
+					auth.signInWithPopup(provider).then(async (result) => {
+						await this.setUser(result.user);
 						await this.reinitialize();
 						this.$router.replace("/content");
 					}).catch((err) => {

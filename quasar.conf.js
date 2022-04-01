@@ -14,7 +14,7 @@ module.exports = function (/* ctx */) {
     supportTS: true,
 
     // https://v1.quasar.dev/quasar-cli/prefetch-feature
-    preFetch: false,
+    preFetch: true,
 
     // app boot file (src/boot)
     // --> boot files are part of "main.js"
@@ -109,7 +109,8 @@ module.exports = function (/* ctx */) {
       // Quasar plugins
       plugins: [
         'AppFullscreen',
-        'Notify'
+        'Notify',
+        'Cookies'
       ]
     },
 

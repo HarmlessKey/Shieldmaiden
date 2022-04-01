@@ -1,5 +1,5 @@
 import { register } from 'register-service-worker'
-import { Notify } from 'quasar';
+// import { Notify } from 'quasar';
 
 // The ready(), registered(), cached(), updatefound() and updated()
 // events passes a ServiceWorkerRegistration instance in their arguments.
@@ -30,17 +30,17 @@ register(process.env.SERVICE_WORKER_FILE, {
 
   updated (registration) {
     // Nofitify the user and let them download the new content
-    Notify.create({
-      message: "New content available.",
-      icon: "fas fa-sync",
-      color: "primary",
-      position: "top",
-      timeout: 0,
-      actions: [
-        { label: 'Fetch', color: 'white', handler: () => { registration.waiting.postMessage({ type: "SKIP_WAITING" }); } },
-        { label: 'Cancel', color: 'white', handler: () => { /* ... */ } }
-      ]
-    });
+    // Notify.create({
+    //   message: "New content available.",
+    //   icon: "fas fa-sync",
+    //   color: "primary",
+    //   position: "top",
+    //   timeout: 0,
+    //   actions: [
+    //     { label: 'Fetch', color: 'white', handler: () => { registration.waiting.postMessage({ type: "SKIP_WAITING" }); } },
+    //     { label: 'Cancel', color: 'white', handler: () => { /* ... */ } }
+    //   ]
+    // });
   },
 
   offline () {

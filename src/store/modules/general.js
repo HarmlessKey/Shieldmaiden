@@ -27,7 +27,8 @@ export default {
 
 	actions: {
 		// Initialize basic settings depending on a user being logged in or not.
-		async initialize({ state, dispatch, commit }) {
+		async initialize({ state, dispatch, commit, rootGetters }) {
+			console.log("INITIALIZE")
 			if(state.initialized) return;
 		
 			dispatch("setTips");
@@ -35,8 +36,8 @@ export default {
 			// In main.js before the Vue instance is rendered
 			// it's checked if there is a firebase authorization present.
 			// Therefore we can check here with 'auth' if there is a user.
-			if(auth.currentUser !== null) {
-				await dispatch("setUser");
+			if(rootGetters.user) {
+				// await dispatch("setUser");
 				// first set the user settings in order to set theme correctly
 				await dispatch("set_user_settings")
 					.then(() => {
@@ -71,7 +72,7 @@ export default {
 							"color: #cc3e4a;"
 						);
 						console.error(error);
-					});			
+					});
 			} else {
 				dispatch("setTheme");
 				commit("SET_INITIALIZED", true);
@@ -84,8 +85,9 @@ export default {
 		 * By simply setting initialized to false 
 		 * the beforeEach() in main.js will take care of the rest
 		 */
-		reinitialize({ commit }) {
+		async reinitialize({ commit, dispatch }) {
 			commit("SET_INITIALIZED", false);
+			await dispatch("initialize");
 		},
 		setTheme({ commit, state, rootGetters, dispatch }, theme) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;

@@ -154,7 +154,8 @@
 		name: "UserContent",
 		mixins: [general],
 		preFetch({ store, redirect }) {
-      if(!store.state.user) {
+			console.log("Content Prefetch")
+      if(!store.getters.user) {
 				redirect('/sign-in');
 			} 
     },

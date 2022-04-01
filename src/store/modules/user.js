@@ -1,3 +1,4 @@
+import { Cookies } from 'quasar';
 import { db, auth } from 'src/firebase';
 import { userServices } from "src/services/user"; 
 import Vue from 'vue';
@@ -43,8 +44,9 @@ const user_actions = {
 		return getters.user_services;
 	},
 	
-	setUser({ commit }) {
-		commit("SET_USER", auth.currentUser);
+	setUser({ commit }, user) {
+		console.log("SET USER", user)
+		commit("SET_USER", user);
 	},
 	async setUserInfo({ commit, dispatch, rootGetters }) {
 		if(rootGetters.user) {
@@ -346,6 +348,7 @@ const user_actions = {
 		await commit("CLEAR_USER", undefined);
 
 		// Sign out from firebase
+		Cookies.remove("access_token")
 		await auth.signOut();
 	}
 };

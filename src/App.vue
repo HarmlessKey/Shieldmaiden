@@ -92,6 +92,9 @@
 	import { general } from './mixins/general';
 	import Home from "./views/Home";
 
+	import { Cookies } from 'quasar';
+	import jwt_decode from 'jwt-decode';
+
 	export default {
 	name: "App",
 	mixins: [general],
@@ -180,7 +183,6 @@
 	},
 	data() {
 		return {
-			user: auth.currentUser,
 			announcementSetter: false,
 			announcement_cookie: false,
 			install_cookie: false,
@@ -222,7 +224,8 @@
 		}),
 		...mapGetters([
 			"initialized",
-			"theme"
+			"theme",
+			"user"
 		]),
 		connection() {
 			return process.browser && !navigator.onLine ? 'offline' : 'online';
@@ -241,7 +244,48 @@
 			return userAgent.indexOf("android") > -1;
 		}
 	},
-	mounted() {
+	async preFetch({ store, ssrContext}) {
+		console.log("PREFETCH")
+		const cookies = Cookies.parseSSR(ssrContext);
+		const access_token = cookies.get('access_token')
+		if (!access_token) return;
+
+		const user = jwt_decode(access_token);
+		if (!user && !user.user_id) return;
+		console.log("found cookie")
+
+		const transform = {
+			'uid': 'user_id',
+			'displayName': 'name',
+			'photoURL': 'picture',
+			'email': 'email',
+			'emailVerified': 'email_verified',
+		}
+
+		const transformed_user = {}
+		for (const [k, v] of Object.entries(transform)) {
+			transformed_user[k] = user[v];
+		}
+
+
+		await store.dispatch("setUser", transformed_user);
+	},
+	async mounted() {
+		auth.onAuthStateChanged(user => {
+			console.log("ON AUTH STATE CHANGED")
+			if (user) {
+				auth.currentUser.getIdToken(true).then(async token => {
+					console.log("Bake cookie")
+					this.$q.cookies.set('access_token', token);
+				})
+			}
+			else {
+				this.$q.cookies.remove('access_token');
+			}
+		});
+
+		await this.initialize();
+
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {
@@ -281,7 +325,10 @@
 		...mapActions([
 			"setSlide",
 			"setSideSmallScreen",
-			"setLive"
+			"setLive",
+			"initialize",
+			"reinitialize",
+			"setUser"
 		]),
 		hideSlide() {
 			this.setSlide(false)

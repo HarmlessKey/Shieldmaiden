@@ -71,7 +71,9 @@
 			</hk-card>
 		</q-dialog>
 	</div>
-	<hk-loader v-else name="NPC" />
+	<hk-card v-else header="Basic info">
+		<hk-loader name="NPC" />
+	</hk-card>
 </template>
 
 <script>
@@ -151,9 +153,7 @@
 			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
 			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
-				if (this.$route.name == 'Edit Companion') {
-					return false;
-				} return true;
+				return this.$route.name !== 'Edit Companion';
 			},
 			copy({ result }) {
 				this.copy_dialog = false;

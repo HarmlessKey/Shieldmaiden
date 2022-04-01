@@ -145,7 +145,7 @@ export const difficulty = {
 			var nPlayers = 0;
 			var totalTreshold = []; //Party difficulty treshold
 
-			var diff = []; //Object that will hold values to return.
+			var diff = {}; //Object that will hold values to return.
 			
 			//Loop over all entities
 			for(let key in entities) {
@@ -159,11 +159,10 @@ export const difficulty = {
 
 					// If there is no rating for a monster, difficulty can't be calculated
 					if(rating === undefined) {
-						let error = {
+						return {
 							0: 'error',
 							1: 'An NPC with no challenge rating is added.',
-						}
-						return error;
+						};
 					}
 					
 					//Get the XP
@@ -184,23 +183,21 @@ export const difficulty = {
 
 					//If there is a player without a level, return an error
 					if(!playerLevel) {
-						let error = {
+						return {
 							0: 'error',
 							1: 'A player with no level set was added.',
-						}
-						return error;
+						};
 					}
 					
 					//Loop over all difficulties
-					for(let key in this.difficulties) {
-						let level = playerLevel
-						let difficulty = this.difficulties[key]
-						let treshold = this.tresholds[level][difficulty]
+					for(const difficult of this.difficulties) {
+						let level = playerLevel;
+						let treshold = this.tresholds[level][difficult];
 						
-						if(!totalTreshold[difficulty]) {
-							totalTreshold[difficulty] = 0;
+						if(!totalTreshold[difficult]) {
+							totalTreshold[difficult] = 0;
 						}
-						totalTreshold[difficulty] = parseInt(totalTreshold[difficulty]) + parseInt(treshold);
+						totalTreshold[difficult] = parseInt(totalTreshold[difficult]) + parseInt(treshold);
 						
 					}
 					nPlayers++; //total player
@@ -216,35 +213,34 @@ export const difficulty = {
 
 			//Return the right difficulty for the encounter
 			if(compare != undefined) {
+				let diffic;
 
 				//Loop over all difficulties
-				for(let key in this.difficulties) {
-					let difficulty = this.difficulties[key];
-					diff[difficulty] = totalTreshold[difficulty];
+				for(const difficult of this.difficulties) {
+					diff[difficult] = totalTreshold[difficult];
 
-					var diffic;
 					//Return the difficulty.
 					//if the total XP value for the encounter is >= than a treshold,
 					//set the difficulty to the difficulty matching that treshold
-					if(compare >= totalTreshold[difficulty]) {
-						diffic = difficulty						
+					if(compare >= totalTreshold[difficult]) {
+						diffic = difficult;					
 					}
 				}
 
 				//If the difficulty is set
 				//set it in the object (diff[]) that is returned 
 				if(diffic) {
-					diff[0] = diffic
+					diff[0] = diffic;
 				}
 				//if the total xp was lower than the lowest treshold,
 				//the encounter is trivial
 				else {
-					diff[0] = 'trivial'
+					diff[0] = 'trivial';
 				}
 			}
 			//When no NPC's are added yet
 			else {
-				diff[0] = 'add NPC\'s'
+				diff[0] = 'add NPC\'s';
 			}
 
 			//return the object that holds the tresholds, total XP and the difficulty
@@ -253,7 +249,7 @@ export const difficulty = {
 			//diff['Nmonsters'] = N monsters
 			//diff['compare'] = total XP value
 			//diff['easy', 'medium', 'hard', 'deadly'] = party tresholds
-			return diff
+			return diff;
 		},
 		multiply(nMonsters, nPlayers, totalXp) {
 			//The total XP is multiplied based on the amount of monsters

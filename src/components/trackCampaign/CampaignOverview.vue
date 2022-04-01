@@ -35,7 +35,7 @@
 							<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="panels.filter( item => { return item.value === panel })[0].label"/>
+							<q-item-label v-text="panels.filter( item => { return item.value === panel })[0].label"/>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -51,7 +51,7 @@
 							<q-icon :name="scope.opt.icon"/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="scope.opt.label"/>
+							<q-item-label v-text="scope.opt.label"/>
 						</q-item-section>
 					</q-item>
 				</template>

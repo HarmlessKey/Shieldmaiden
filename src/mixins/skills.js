@@ -26,8 +26,7 @@ export const skills = {
 	methods: {
 		calculateSkillModifier(abilityScore, proficiency, expertise) {
 			let mod = (expertise) ? (abilityScore + proficiency + proficiency) : abilityScore + proficiency;
-
-			return (mod) >= 0 ? '+' + parseInt(mod) : parseInt(mod);
+			return parseInt(mod);
 		}
 	}
 }

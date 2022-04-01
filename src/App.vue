@@ -6,10 +6,13 @@
 			<div class="offline" v-if="connection === 'offline'"><i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
 			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar />
-				<div class="scrollable-content">
+				<q-scroll-area 
+					class="scrollable-content" 
+					:dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}"
+				>
 					<router-view v-if="initialized" />
-					<hk-loader v-else />
-				</div>
+					<hk-loader v-else full-height />
+				</q-scroll-area>
 			</div>
 			<Home v-else :maintenance="maintenance" />
 		</div>

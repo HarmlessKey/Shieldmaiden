@@ -1,6 +1,6 @@
 {
-  "name": "harmless_key",
   "version": "2.3.0",
+  "name": "harmless_key",
   "description": "A Dungeons and Dragons Combat Tracker",
   "productName": "Harmless Key",
   "private": true,
@@ -22,6 +22,7 @@
     "core-js": "^3.6.5",
     "dotenv": "^16.0.0",
     "firebase": "^8.0.0",
+    "lodash": "^4.17.21",
     "quasar": "^1.0.0",
     "vue-analytics": "^5.22.1",
     "vue-cookies": "^1.7.4",

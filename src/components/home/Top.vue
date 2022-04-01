@@ -167,11 +167,10 @@
 
 	@media only screen and (max-width: 767px) {
 		.top {
-			.animated-video {
-					width: 150%;
-					margin: -14% 0 -20% -25%;
-					pointer-events: none;
-				}
+			.video {
+				width: 150%;
+				margin: -5% 0 0 -25%;
+			}
 		}
 	}
 	@media only screen and (max-width: 567px) {
@@ -193,9 +192,9 @@
 				display: flex;
 				justify-content: space-between;
 			}
-			.animated-video {
+			.video {
 				width: 170%;
-				margin: -14% 0 -20% -35%;
+				margin: -5% 0 0 -35%;
 				pointer-events: none;
 			}
 			.container-fluid {

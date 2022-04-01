@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="hk-view">
 	<div class="content">
 		<Crumble />
 		<OverEncumbered v-if="show_overencumbered" />
@@ -73,30 +73,36 @@
 </script>
 
 <style lang="scss" scoped>
-	.ad {
-		background-color: $neutral-10;
+	.hk-view {
+		height: 100%;
+		display: grid;
+		grid-template-rows: 1fr max-content;
+		grid-template-columns: 100%;
 
-		.card-body {
-			padding: 10px 15px;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			// flex-wrap: wrap;
+		.ad {
+			background-color: $neutral-10;
 	
-			img {
-				margin: 0 15px 0 -5px;
-				width: 80px;
-			}
-			.right {
+			.card-body {
+				padding: 10px 15px;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				flex-wrap: wrap;
-				width: 100%;
-	
-				.title {
-					font-weight: bold;
-					font-size: 20px;
+		
+				img {
+					margin: 0 15px 0 -5px;
+					width: 80px;
+				}
+				.right {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					flex-wrap: wrap;
+					width: 100%;
+		
+					.title {
+						font-weight: bold;
+						font-size: 20px;
+					}
 				}
 			}
 		}

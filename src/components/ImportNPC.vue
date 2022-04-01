@@ -67,9 +67,9 @@
 									<div slot="content">
 										<ol class="px-3">
 											<li v-for="(error, i) in props.row.errors" :key="`${props.row.index}-error-${i}`" class="red">
-												<b v-if="error.instancePath" class="neutral-1">
+												<strong v-if="error.instancePath" class="neutral-1">
 													{{ error.instancePath }}
-												</b>
+												</strong>
 												{{ error.message.capitalize() }} 
 											</li>
 										</ol>
@@ -87,13 +87,13 @@
 				</div>
 			</template>
 			<div v-if="importTotal > availableSlots">
-				Insufficient slots. You're trying to import <b class="red">{{ importTotal }}</b> NPCs,<br/> 
-				but have only <b class="red">{{ availableSlots }}</b> slots available.
+				Insufficient slots. You're trying to import <strong class="red">{{ importTotal }}</strong> NPCs,<br/> 
+				but have only <strong class="red">{{ availableSlots }}</strong> slots available.
 			</div>
 
 			<div class="d-flex justify-content-between items-center pb-2">
 				<div>
-					<b>{{ selected.unique.length + selected.duplicate.length }}</b> selected
+					<strong>{{ selected.unique.length + selected.duplicate.length }}</strong> selected
 				</div>
 				<q-form @submit="import_npcs">
 					<q-btn 
@@ -175,7 +175,7 @@
 				</div>
 				<div class="card-body">
 					<p>
-						You can use <a href="https://www.jsonschemavalidator.net/" target="_blank">this schema validator</a> to find errors in your NPC.<br/>
+						You can use <a href="https://www.jsonschemavalidator.net/" target="_blank" rel="noopener">this schema validator</a> to find errors in your NPC.<br/>
 						Paste our schema in the left field and the JSON of your NPC in the right.
 					</p>
 					<a class="btn btn-sm mb-2" @click="copySchema">Copy schema</a>

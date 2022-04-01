@@ -20,7 +20,7 @@
 							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="players[player].character_name"/>
+							<q-item-label v-text="players[player].character_name"/>
 						</q-item-section>
 					</q-item>
 					<span v-else>
@@ -44,7 +44,7 @@
 							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="players[scope.opt].character_name"/>
+							<q-item-label v-text="players[scope.opt].character_name"/>
 						</q-item-section>
 					</q-item>
 				</template>

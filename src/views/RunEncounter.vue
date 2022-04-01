@@ -336,7 +336,7 @@
 	.desktop {
 		padding: 5px;
 		width: 100%;
-		height: calc(100% - 50px);
+		height: 100%;
 		display: grid;
 		grid-template-columns: 3fr 4fr 3fr 2fr;
 		grid-template-rows: 60px 1fr;

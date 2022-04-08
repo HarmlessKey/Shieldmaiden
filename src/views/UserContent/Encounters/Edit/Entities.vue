@@ -401,7 +401,7 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 			...mapActions("npcs", ["get_npcs", "get_npc"]),
 			...mapActions("players", ["get_players", "get_player"]),
 			...mapActions("encounters", [
@@ -428,7 +428,7 @@
 				this.fetchMonsters();		
 			},
 			async fetchMonsters() {
-				await this.get_monsters({
+				await this.fetch_monsters({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,
@@ -493,7 +493,7 @@
 					
 					// SRD NPC
 					if(!custom) {
-						let npc_data = await this.get_monster(id);
+						let npc_data = await this.fetch_monster(id);
 						entity.npc = "srd";
 						if(rollHp && npc_data.hit_dice) {
 							let dice_values = npc_data.hit_dice.split('d');

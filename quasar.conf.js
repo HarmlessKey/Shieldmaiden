@@ -110,7 +110,8 @@ module.exports = function (/* ctx */) {
       plugins: [
         'AppFullscreen',
         'Notify',
-        'Cookies'
+        'Cookies',
+        'Meta'
       ]
     },
 

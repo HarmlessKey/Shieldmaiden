@@ -377,7 +377,7 @@ const run_encounter_actions = {
 							data_npc = await dispatch("npcs/get_npc", { uid, id: entity.id });
 						}
 						else {
-							data_npc = await dispatch("api_monsters/get_monster", entity.id);
+							data_npc = await dispatch("api_monsters/fetch_monster", entity.id);
 						}
 					} else {
 						entity.no_linked_npc = true;

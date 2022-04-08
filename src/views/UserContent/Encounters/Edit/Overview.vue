@@ -320,7 +320,7 @@
 			]),
 			...mapActions("players", ["get_player"]),
 			...mapActions("npcs", ["get_npc"]),
-			...mapActions("api_monsters", ["get_monster"]),
+			...mapActions("api_monsters", ["fetch_monster"]),
 			async remove(id) {
 				await this.delete_entity({
 					campaignId: this.campaignId,
@@ -352,7 +352,7 @@
 							entities[entity.id] = await this.get_npc({ uid: this.user.uid, id: entity.id })
 						}
 						else if (entity.npc === 'api' || entity.npc === 'srd') {
-							entities[entity.id] = await this.get_monster(entity.id);
+							entities[entity.id] = await this.fetch_monster(entity.id);
 						}
 					}
 				}

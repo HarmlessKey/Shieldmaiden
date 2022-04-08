@@ -10,8 +10,8 @@
 					class="scrollable-content" 
 					:dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}"
 				>
-					<router-view v-if="initialized" />
-					<hk-loader v-else full-height />
+					<router-view />
+					<!-- <hk-loader v-else full-height /> -->
 				</q-scroll-area>
 			</div>
 			<Home v-else :maintenance="maintenance" />
@@ -110,79 +110,76 @@
 		HkRolls,
 		Home
 	},
-	metaInfo() {
+	meta() {
 		return {
 			title: this.$route.meta.title || "D&D Combat Tracker",
-			titleTemplate: "%s | Harmless Key",
-			author: "Harmless Key",
-			htmlAttrs: {
-				lang: "en"
-			},
-			meta: [
-				{ charset: "utf-8" },
-				{ 
-					vmid: "description", 
-					name: "description", 
-					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
+			titleTemplate: title => `${title} | Harmless Key`,
+			meta: {
+				title: {
+					name: "title",
+					content: this.$route.meta.title || "D&D Combat Tracker",
 				},
-				{ name: "twitter:card", content: "summary" },
-				{ 
-					vmid: "twitter-title",
-					name: "twitter:title", 
-					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key" 
+				description: {
+					name: "description",
+					content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
 				},
-				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full.png"  },
-				{
-					vmid: "twitter-description",
+
+				// TWITTER
+				twitterCard: {
+					property: "twitter:card",
+					content: "summary"
+				},
+				twitterTitle: {
+					name: "twitter:title",
+					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
+				},
+				twitterDescription: {
 					name: "twitter:description",
-					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
+					content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
 				},
-				{ 
+				twitterImage: {
+					name: "twitter:image",
+					content: "https://harmlesskey.com/harmless_key_logo_full.png" 
+				},
+				twitterSite: {
 					name: "twitter:site", 
 					content: "@KeyHarmless"
 				},
-				{ 
-					vmid: "og-title",
-					property: "og:title", 
+
+				// OG
+				ogTitle: {
+					property: "og:title",
 					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
 				},
-				{	
-					vmid: "og-site_name",
-					property: "og:site_name", 
-					content: "harmlesskey.com" },
-				{	
-					vmid: "og-type",
-					property: "og:type", 
+				ogDescription: {
+					property: "og:description",
+					content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
+				},
+				ogSiteName: {
+					property: "og:site_name",
+					content: "harmlesskey.com"
+				},
+				ogType: {
+					property: "og:type",
 					content: "website"
 				},
-				{
-					vmid: "og-description",
-					property: "og:description",
-					name: "description",
-					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
-				},
-				{	
-					vmid: "og-url",
+				ogUrl: {
 					property: "og:url", 
 					content: `https://harmlesskey.com${this.$route.path}`
 				},
-				{	
-					vmid: "og-image",
+				ogImage: {	
 					property: "og:image", 
-					name: "image", 
 					content: `https://harmlesskey.com/linkedin.png` 
 				},
-				{	
-					vmid: "og-image-type",
+				ogImageType: {	
 					property: "og:image:type", 
 					content: "image/png"
 				},
-				{	
-					vmid: "og-image-alt",
+				ogImageAlt: {	
 					property: "og:image:alt", 
 					content: "Harmless Key Logo"
-				},
-			]
+				}
+			}
 		}
 	},
 	data() {

@@ -98,7 +98,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monsters"]),
+			...mapActions("api_monsters", ["fetch_monsters"]),
 			...mapActions("api_items", ["get_api_items"]),
 			...mapActions("api_spells", ["get_api_spells"]),
 			...mapActions("api_conditions", ["get_conditions"]),
@@ -115,7 +115,7 @@
 				this.searchResults = [] //clear old search results
 				let data;
 
-				if(this.current === "monsters") { data = this.get_monsters; }
+				if(this.current === "monsters") { data = this.fetch_monsters; }
 				if(this.current === "items") { data = this.get_api_items; }
 				if(this.current === "spells") { data = this.get_api_spells; }
 				if(this.current === "conditions") { data = this.get_conditions; }

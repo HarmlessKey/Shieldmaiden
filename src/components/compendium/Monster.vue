@@ -391,7 +391,7 @@
 				this.monster = monster;
 				this.loading = false;
 			} else {
-				await this.get_monster(this.id).then(result => {
+				await this.fetch_monster(this.id).then(result => {
 					if(this.monster_challenge_rating[result.challenge_rating]) {
 						result.proficiency = this.monster_challenge_rating[result.challenge_rating].proficiency;
 					}
@@ -430,7 +430,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monster"]),
+			...mapActions("api_monsters", ["fetch_monster"]),
 			...mapActions(["setActionRoll"]),
 			roll(e, action, versatile) {
 				const config = {

@@ -212,7 +212,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monsters"]),
+			...mapActions("api_monsters", ["fetch_monsters"]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
@@ -242,7 +242,7 @@
 				this.fetchMonsters();		
 			},
 			async fetchMonsters() {
-				await this.get_monsters({
+				await this.fetch_monsters({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

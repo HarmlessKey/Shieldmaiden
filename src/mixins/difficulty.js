@@ -137,7 +137,7 @@ export const difficulty = {
 	// },
 	methods: {
 		...mapActions("npcs", ["get_npc"]),
-		...mapActions("api_monsters", ["get_monster"]),
+		...mapActions("api_monsters", ["fetch_monster"]),
 		...mapActions("players", ["get_player"]),
 		async difficulty(entities) {
 			var totalXp = 0;
@@ -154,7 +154,7 @@ export const difficulty = {
 				//Calculate Monsters XP
 				// entity.npc is the type of the linked npc, srd or custom. Without a type, ignore the monster cause there is nothing linked.
 				if(entity.entityType === 'npc' && entity.npc) {
-					const npc = (entity.npc === "custom") ? await this.get_npc({ uid: this.user.uid, id: entity.id }) : await this.get_monster(entity.id);
+					const npc = (entity.npc === "custom") ? await this.get_npc({ uid: this.user.uid, id: entity.id }) : await this.fetch_monster(entity.id);
 					const rating = npc.challenge_rating;
 
 					// If there is no rating for a monster, difficulty can't be calculated

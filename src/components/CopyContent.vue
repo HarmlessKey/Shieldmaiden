@@ -129,7 +129,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 			...mapActions("npcs", ["get_npcs", "get_npc"]),
 			...mapActions("api_items", ["get_api_items", "get_api_item"]),
 			...mapActions("items", ["get_items", "get_item"]),
@@ -160,7 +160,7 @@
 					else {
 						let data;
 
-						if(this.type === "monster") { data = this.get_monsters; }
+						if(this.type === "monster") { data = this.fetch_monsters; }
 						else if(this.type === "item") { data =  this.get_api_items; }
 						else if(this.type === "spell") { data = this.get_api_spells; }
 						
@@ -194,7 +194,7 @@
 					if(this.type === "monster") {
 						result = (this.copy_resource === "custom")
 							? await this.get_npc({ uid: this.userId, id })
-							: await this.get_monster(id);
+							: await this.fetch_monster(id);
 					}
 					if(this.type === "item") {
 						result = (this.copy_resource === "custom")

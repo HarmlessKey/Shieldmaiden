@@ -35,7 +35,7 @@
 		},
 
 		methods: {
-			...mapActions("api_monsters", ["get_monsters",]),
+			...mapActions("api_monsters", ["fetch_monsters",]),
 			...mapActions("api_items", ["get_api_items",]),
 			...mapActions("api_spells", ["get_api_spells",]),
 			...mapActions("api_conditions", ["get_conditions",]),
@@ -123,7 +123,7 @@
 				}
 
 				// MONSTERS
-				const monsters = await this.get_monsters({
+				const monsters = await this.fetch_monsters({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]

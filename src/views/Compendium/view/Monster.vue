@@ -20,7 +20,7 @@
 				</div>
 			</div>
 			<div v-if="not_found" class="card-body">
-				<p>Could not find monster <b>{{ id }}</b></p>
+				<p>Could not find monster <strong>{{ id }}</strong></p>
 				<router-link to="/compendium/monsters" class="btn bg-neutral-5">
 					Find monsters
 				</router-link>
@@ -32,7 +32,7 @@
 
 <script>
 	import ViewMonster from 'src/components/compendium/Monster.vue';
-	import { mapActions } from 'vuex';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 		name: 'Monster',
@@ -42,76 +42,53 @@
 		data() {
 			return {
 				id: this.$route.params.id,
-				monster: {},
 				loading: true,
 				not_found: false
 			}
 		},
-		metaInfo() {
-			return {
-				title: `${this.monster.name ? this.monster.name.capitalizeEach() : "Monster"} D&D 5e`,
-				meta: [
-					{ 
-						vmid: "description", 
-						name: "description", 
-						content: `D&D 5th Edition monster: ${ this.monster.name ? this.monster.name.capitalizeEach() : "Monster" }. ${this.monster.description}`
-					},
-					{
-						vmid: "og-title",
-						property: "og:title", 
-						content: `D&D 5th Edition monster: ${ this.monster.name ? this.monster.name.capitalizeEach() : "Monster" }. ${this.monster.description}`
-					},
-					{ 
-						vmid: "og-description", 
-						property: "og:description",
-						name: "description", 
-						content: `D&D 5th Edition monster: ${ this.monster.name ? this.monster.name.capitalizeEach() : "Monster" }. ${this.monster.description}`
-					},
-					{ 
-						vmid: "twitter-title",
-						name: "twitter:title", 
-						content: `${this.monster.name ? this.monster.name.capitalizeEach() : "Monster"} D&D 5e`
-					},
-					{ 
-						vmid: "twitter-description", 
-						name: "twitter:description",
-						content: `D&D 5th Edition monster: ${ this.monster.name ? this.monster.name.capitalizeEach() : "Monster" }. ${this.monster.description}`
-					},
-				],
+		// Fetch the monster Server side, on the Client side retrieve it from the store
+		async preFetch({ store, currentRoute }) {
+			await store.dispatch("api_monsters/fetch_monster", currentRoute.params.id, { root: true });
+		},
+		computed: {
+			...mapGetters("api_monsters", ["get_monster"]),
+			monster() {
+				return this.get_monster(this.id);
 			}
 		},
-		methods: {
-			...mapActions("api_monsters", ["get_monster"]),
-		},
-		async mounted() {
-			await this.get_monster(this.id).then(result => {
-				this.monster = result;
-				this.$root.$emit('route-name', result.name.capitalizeEach());
-				this.monster.description = result.type;
-				this.monster.description += (result.subtype) ? ` ${result.subtype}, `: ", ";
-				this.monster.description += `${result.alignment}. `;
-				this.monster.description += `Challenge rating: ${result.challenge_rating}. `
-				this.monster.description += `Armor class: ${result.armor_class}. Hit points: ${result.hit_points}. `;
-
-				this.monster.description += result.walk_speed ? `Speed: ${result.walk_speed}ft.` : "Speed: 0ft.";
-				if(result.swim_speed) this.monster.description += `, swim ${result.swim_speed}ft.`;
-				if(result.fly_speed) this.monster.description += `, fly ${result.fly_speed}ft.`; 
-				if(result.burrow_speed) this.monster.description += `, burrow ${result.burrow_speed}ft.`; 
-				if(result.climb_speed) this.monster.description += `, climb ${result.climb_speed}ft.`;
-
-				for(const ability of ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]) {
-					this.monster.description += ` ${ability.substring(0, 3).toUpperCase()}: ${result[ability]}.`;
+		meta() {
+			return {
+				title: this.monster.meta.title,
+				meta: {
+					title: {
+						name: "title",
+						content: this.monster.meta.title
+					},
+					description: {
+						name: "description",
+						content: this.monster.meta.description
+					},
+					ogTitle: {
+						property: "og:title",
+						content: this.monster.meta.title
+					},
+					ogDescription: {
+						property: "og:description",
+						content: this.monster.meta.description
+					},
+					twitterTitle: {
+						name: "twitter:title",
+						content: this.monster.meta.title
+					},
+					twitterDescription: {
+						name: "twitter:description",
+						content: this.monster.meta.description
+					}
 				}
-
-				const maxLength = 160 - (result.name.length + 25);
-
-				this.monster.description = this.monster.description.substring(0, maxLength).trim() + "...";
-
-				this.loading = false;
-			}).catch(() => {
-				this.not_found = true;
-				this.loading = false;
-			});
+			}
+		},
+		mounted() {
+			this.$root.$emit('route-name', this.monster.name.capitalizeEach());
 		}
 	}
 </script>

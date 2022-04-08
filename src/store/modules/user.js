@@ -45,7 +45,6 @@ const user_actions = {
 	},
 	
 	setUser({ commit }, user) {
-		console.log("SET USER", user)
 		commit("SET_USER", user);
 	},
 	async setUserInfo({ commit, dispatch, rootGetters }) {

@@ -28,7 +28,6 @@ export default {
 	actions: {
 		// Initialize basic settings depending on a user being logged in or not.
 		async initialize({ state, dispatch, commit, rootGetters }) {
-			console.log("INITIALIZE")
 			if(state.initialized) return;
 		
 			dispatch("setTips");

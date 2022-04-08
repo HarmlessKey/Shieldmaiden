@@ -46,7 +46,7 @@
 					<q-icon name="info" />
 				</template>
 				<h3 class="mb-1">Nothing to see here</h3>
-				<p><b>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</b></p>
+				<p><strong>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</strong></p>
 				<p>No announcement</p>
 				<template v-slot:action>
 					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
@@ -59,7 +59,7 @@
       <q-card class="install-prompt">
         <q-card-section class="d-flex justify-content-start">
 					<div class="logo">
-						<img src="~assets/_img/logo/logo-icon-cyan.svg" />
+						<img src="~assets/_img/logo/logo-icon-cyan.svg" alt="Logo Harmless Key" />
 					</div>
 					<div>
 						<h4>Install our app</h4>
@@ -72,7 +72,11 @@
 				<q-card-section>
 					<div class="d-flex justify-content-end">
 						<q-btn @click="install(false)" label="No thanks" class="mr-1" flat no-caps />
-						<img v-if="isAndroid" @click="install(true, 'android')" src="~assets/_img/google-play-badge.png" class="play-store" />
+						<img 
+							v-if="isAndroid" @click="install(true, 'android')" 
+							src="~assets/_img/google-play-badge.png" class="play-store"
+							alt="Google Play"
+						/>
 						<q-btn v-else @click="install(true, 'pwa')" label="Install" color="primary" no-caps />
 					</div>
 				</q-card-section>
@@ -245,14 +249,12 @@
 		}
 	},
 	async preFetch({ store, ssrContext}) {
-		console.log("PREFETCH")
 		const cookies = Cookies.parseSSR(ssrContext);
 		const access_token = cookies.get('access_token')
 		if (!access_token) return;
 
 		const user = jwt_decode(access_token);
 		if (!user && !user.user_id) return;
-		console.log("found cookie")
 
 		const transform = {
 			'uid': 'user_id',
@@ -272,10 +274,8 @@
 	},
 	async mounted() {
 		auth.onAuthStateChanged(user => {
-			console.log("ON AUTH STATE CHANGED")
 			if (user) {
 				auth.currentUser.getIdToken(true).then(async token => {
-					console.log("Bake cookie")
 					this.$q.cookies.set('access_token', token);
 				})
 			}

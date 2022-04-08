@@ -33,9 +33,13 @@
 <script>
 	import ViewMonster from 'src/components/compendium/Monster.vue';
 	import { mapActions, mapGetters } from 'vuex';
+	import { metaCompendium } from 'src/mixins/metaCompendium';
 
 	export default {
 		name: 'Monster',
+		mixins: [
+			metaCompendium
+		],
 		components: {
 			ViewMonster,
 		},
@@ -59,32 +63,7 @@
 		meta() {
 			return {
 				title: this.monster.meta.title,
-				meta: {
-					title: {
-						name: "title",
-						content: this.monster.meta.title
-					},
-					description: {
-						name: "description",
-						content: this.monster.meta.description
-					},
-					ogTitle: {
-						property: "og:title",
-						content: this.monster.meta.title
-					},
-					ogDescription: {
-						property: "og:description",
-						content: this.monster.meta.description
-					},
-					twitterTitle: {
-						name: "twitter:title",
-						content: this.monster.meta.title
-					},
-					twitterDescription: {
-						name: "twitter:description",
-						content: this.monster.meta.description
-					}
-				}
+				meta: this.generate_compendium_meta(this.monster.meta)
 			}
 		},
 		mounted() {

@@ -70,6 +70,7 @@
 				this.$root.$emit('route-name', this.condition.name);
 			} else {
 				this.not_found = true;
+				this.loading = false;
 			}
 		}
 	}

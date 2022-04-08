@@ -67,7 +67,13 @@
 			}
 		},
 		mounted() {
-			this.$root.$emit('route-name', this.monster.name.capitalizeEach());
+			if(this.monster) {
+				this.loading = false;
+				this.$root.$emit('route-name', this.monster.name.capitalizeEach());
+			} else {
+				this.not_found = true;
+				this.loading = false;
+			}
 		}
 	}
 </script>

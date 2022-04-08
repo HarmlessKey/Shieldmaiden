@@ -75,6 +75,7 @@
 				this.$root.$emit('route-name', this.spell.name);
 			} else {
 				this.not_found = true;
+				this.loading = false;
 			}
 		}
 	}

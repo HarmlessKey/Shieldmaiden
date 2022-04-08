@@ -12,8 +12,8 @@
 					</span>
 					<hk-share 
 						v-if="!not_found" 
-						:title="monster.name.capitalizeEach()" 
-						:text="monster.description" 
+						:title="monster.meta.title" 
+						:text="monster.meta.description" 
 						size="sm"
 						class="ml-1"
 					/>
@@ -31,8 +31,8 @@
 </template>
 
 <script>
-	import ViewMonster from 'src/components/compendium/Monster.vue';
-	import { mapActions, mapGetters } from 'vuex';
+	import ViewMonster from 'src/components/compendium/Monster';
+	import { mapGetters } from 'vuex';
 	import { metaCompendium } from 'src/mixins/metaCompendium';
 
 	export default {

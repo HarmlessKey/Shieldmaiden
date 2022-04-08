@@ -85,7 +85,7 @@ const monster_actions = {
         monster.meta.description = monster.meta.description.substring(0, maxLength).trim() + "...";
 
         commit("SET_CACHED_MONSTER", monster);
-        commit("SET_CACHED_URL", { url: monster.url, id: monster._id })
+        commit("SET_CACHED_URL", { url: monster.url, id: monster._id });
       } catch(error) {
         throw error;
       }

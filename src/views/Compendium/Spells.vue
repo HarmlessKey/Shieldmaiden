@@ -125,7 +125,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_spells", ["get_api_spells"]),
+			...mapActions("api_spells", ["fetch_api_spells"]),
 			filter() {
 				this.loading = true;
 				this.spells = [];
@@ -140,7 +140,7 @@
 				this.fetchSpells();		
 			},
 			async fetchSpells() {
-				await this.get_api_spells({
+				await this.fetch_api_spells({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

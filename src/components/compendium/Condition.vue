@@ -58,12 +58,12 @@
 				this.condition = this.data;		
 				this.loading = false;
 			} else {
-				this.condition = await this.get_condition(this.id);
+				this.condition = await this.fetch_condition(this.id);
 				this.loading = false;
 			}			
 		},
 		methods: {
-			...mapActions("api_conditions", ["get_condition"]),
+			...mapActions("api_conditions", ["fetch_condition"]),
 		}
 	};
 </script>

@@ -4,9 +4,14 @@ import { spellServices } from "src/services/api/spells";
 const spell_state = () => ({
   spell_services: null,
   cached_spells: {},
+  cached_urls: {}
 });
 const spell_getters = {
   spell_services: (state) => { return state.spell_services; },
+  get_api_spell: (state) => (key) => { 
+    const id = state.cached_urls[key] || key;
+    return state.cached_spells[id];
+  },
 };
 const spell_actions = {
   async get_spell_services({ getters, commit }) {
@@ -16,7 +21,7 @@ const spell_actions = {
     return getters.spell_services;
   },
 
-  async get_api_spells({ dispatch}, { pageNumber, pageSize, query, fields, sortBy, descending }) {
+  async fetch_api_spells({ dispatch}, { pageNumber, pageSize, query, fields, sortBy, descending }) {
     const services = await dispatch("get_spell_services");
     try {
       return await services.getSpells(query, pageNumber, pageSize, fields, sortBy, descending);
@@ -32,7 +37,7 @@ const spell_actions = {
    * @param {number | string} id | kebab name
    * @returns {object} spell
    */
-   async get_api_spell({ commit, state, dispatch}, id) {
+   async fetch_api_spell({ commit, state, dispatch}, id) {
     const cached = state.cached_spells;
     let spell = undefined;
 
@@ -50,7 +55,18 @@ const spell_actions = {
       const services = await dispatch("get_spell_services");
       try {
         spell = await services.getSpell(id);
+
+        // Create meta tags
+        const maxLength = 160 - 26;
+				const description = (spell.desc) ? `${spell.desc.join(" ").substring(0, maxLength).trim()}...` : "...";
+        
+        spell.meta = { 
+          title: `${spell.name} D&D 5e`,
+          description: `D&D 5th Edition Spell: ${description}`
+        };
+
         commit("SET_CACHED_SPELL", spell);
+        commit("SET_CACHED_URL", { url: spell.url, id: spell._id });
       } catch(error) {
         throw error;
       }
@@ -61,6 +77,7 @@ const spell_actions = {
 const spell_mutations = {
   SET_SPELL_SERVICES(state, payload) { Vue.set(state, "spell_services", payload); },
   SET_CACHED_SPELL(state, payload) { Vue.set(state.cached_spells, payload["_id"], payload) },
+  SET_CACHED_URL(state, { url, id }) { Vue.set(state.cached_urls, url, id) },
 };
 
 export default {

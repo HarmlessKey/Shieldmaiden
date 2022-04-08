@@ -117,7 +117,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_conditions", ["get_conditions"]),
+			...mapActions("api_conditions", ["fetch_conditions"]),
 			filter() {
 				this.loading = true;
 				this.conditions = [];
@@ -132,7 +132,7 @@
 				this.fetchSpells();		
 			},
 			async fetchSpells() {
-				await this.get_conditions({
+				await this.fetch_conditions({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

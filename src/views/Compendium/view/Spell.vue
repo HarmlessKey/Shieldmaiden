@@ -11,8 +11,8 @@
 					</span>
 					<hk-share 
 						v-if="!not_found" 
-						:title="spell.name.capitalizeEach()" 
-						:text="spell.description" 
+						:title="spell.meta.title" 
+						:text="spell.meta.description" 
 						size="sm"
 						class="ml-1"
 					/>
@@ -20,7 +20,7 @@
 			</div>
 			<div class="card-body">
 				<template v-if="not_found">
-					<p>Could not find spell <b>{{ id }}</b></p>
+					<p>Could not find spell <strong>{{ id }}</strong></p>
 					<router-link to="/compendium/spells" class="btn bg-neutral-5">
 						Find spells
 					</router-link>
@@ -28,76 +28,54 @@
 				<Spell v-else :data="spell" />
 			</div>
 		</template>
-		<hk-loader v-else name="Loading spell" />
+		<hk-loader v-else name="spell" />
 	</hk-card>
 </template>
 
 <script>
-	import { mapActions } from "vuex";
+	import { mapGetters } from "vuex";
 	import Spell from "src/components/compendium/Spell";
+	import { metaCompendium } from 'src/mixins/metaCompendium';
 
 	export default {
 		name: "ViewSpell",
+		mixins: [
+			metaCompendium
+		],
 		components: {
 			Spell
-		},
-		metaInfo() {
-			return {
-				title: `${this.spell.name ? this.spell.name.capitalizeEach() : "Spell"} D&D 5e`,
-				meta: [
-					{ 
-						vmid: "description", 
-						name: "description", 
-						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.spell.description}`
-					},
-					{
-						vmid: "og-title",
-						property: "og:title", 
-						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.spell.description}`
-					},
-					{ 
-						vmid: "og-description", 
-						property: "og:description",
-						name: "description", 
-						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.spell.description}`
-					},
-					{ 
-						vmid: "twitter-title",
-						name: "twitter:title", 
-						content: `${this.spell.name ? this.spell.name.capitalizeEach() : "Spell"} D&D 5e`
-					},
-					{ 
-						vmid: "twitter-description", 
-						name: "twitter:description",
-						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.spell.description}`
-					},
-				],
-			}
 		},
 		data() {
 			return {
 				id: this.$route.params.id,
 				loading: true,
-				spell: {},
 				not_found: false
 			}
 		},
-		async mounted() {
-			await this.get_api_spell(this.id).then(spell => {
-				const maxLength = 160 - (29 + spell.name.length);
-				spell.description = (spell.desc) ? `${spell.desc.join(" ").substring(0, maxLength).trim()}...` : "...";
-
-				this.spell = spell;
-				this.loading = false;
-			}).catch(() => {
-				this.not_found = true;
-				this.loading = false;
-			});
-			// Root emit with the spell name, so it can be used in Crumble component
-			this.$root.$emit('route-name', this.spell.name);
+		// Fetch the spell Server side, on the Client side retrieve it from the store
+		async preFetch({ store, currentRoute }) {
+			await store.dispatch("api_spells/fetch_api_spell", currentRoute.params.id, { root: true });
 		},
-		methods: {
-			...mapActions("api_spells", ["get_api_spell"]),
+		computed: {
+			...mapGetters("api_spells", ["get_api_spell"]),
+			spell() {
+				return this.get_api_spell(this.id);
+			}
+		},
+		meta() {
+			return {
+				title: this.spell.meta.title,
+				meta: this.generate_compendium_meta(this.spell.meta)
+			}
+		},
+		mounted() {
+			if(this.spell) {
+				this.loading = false;
+				// Root emit with the spell name, so it can be used in Crumble component
+				this.$root.$emit('route-name', this.spell.name);
+			} else {
+				this.not_found = true;
+			}
 		}
 	}
 </script>

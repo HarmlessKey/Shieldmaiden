@@ -100,8 +100,8 @@
 		methods: {
 			...mapActions("api_monsters", ["fetch_monsters"]),
 			...mapActions("api_items", ["get_api_items"]),
-			...mapActions("api_spells", ["get_api_spells"]),
-			...mapActions("api_conditions", ["get_conditions"]),
+			...mapActions("api_spells", ["fetch_api_spells"]),
+			...mapActions("api_conditions", ["fetch_conditions"]),
 			setType(type) {
 				this.show = undefined //clear the previous selected item
 				this.current = type;
@@ -117,8 +117,8 @@
 
 				if(this.current === "monsters") { data = this.fetch_monsters; }
 				if(this.current === "items") { data = this.get_api_items; }
-				if(this.current === "spells") { data = this.get_api_spells; }
-				if(this.current === "conditions") { data = this.get_conditions; }
+				if(this.current === "spells") { data = this.fetch_api_spells; }
+				if(this.current === "conditions") { data = this.fetch_conditions; }
 				
 				data({ query: { search: this.search }}).then(results => {
 					if(results.meta.count === 0) {

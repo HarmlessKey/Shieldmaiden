@@ -70,12 +70,12 @@
 				this.spell = this.data;		
 				this.loading = false;
 			} else {
-				this.spell = await this.get_api_spell(this.id);
+				this.spell = await this.fetch_api_spell(this.id);
 				this.loading = false;
 			}			
 		},
 		methods: {
-			...mapActions("api_spells", ["get_api_spell"]),
+			...mapActions("api_spells", ["fetch_api_spell"]),
 			parse_spell_str(text) {
 				// map to replace weird character with real character 
 				let rules = [

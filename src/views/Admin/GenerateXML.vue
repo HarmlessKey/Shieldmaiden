@@ -37,8 +37,8 @@
 		methods: {
 			...mapActions("api_monsters", ["fetch_monsters",]),
 			...mapActions("api_items", ["get_api_items",]),
-			...mapActions("api_spells", ["get_api_spells",]),
-			...mapActions("api_conditions", ["get_conditions",]),
+			...mapActions("api_spells", ["fetch_api_spells",]),
+			...mapActions("api_conditions", ["fetch_conditions",]),
 			async downloadXml() {
 				const d = new Date();
 				const lastmodDate = `${d.getFullYear()}-${d.getMonth() < 10 ? '0'+d.getMonth() : d.getMonth() }-${d.getDate() < 10 ? '0'+d.getDate() : d.getDate() }`;
@@ -71,7 +71,7 @@
 				}
 
 				// CONDITIONS
-				const conditions = await this.get_conditions({
+				const conditions = await this.fetch_conditions({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]
@@ -149,7 +149,7 @@
 				}
 
 				// SPELLS
-				const spells = await this.get_api_spells({
+				const spells = await this.fetch_api_spells({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]

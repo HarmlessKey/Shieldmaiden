@@ -131,7 +131,7 @@
 		methods: {
 			...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 			...mapActions("npcs", ["get_npcs", "get_npc"]),
-			...mapActions("api_items", ["get_api_items", "get_api_item"]),
+			...mapActions("api_items", ["fetch_api_items", "fetch_api_item"]),
 			...mapActions("items", ["get_items", "get_item"]),
 			...mapActions("api_spells", ["fetch_api_spells", "fetch_api_spell"]),
 			changeCopyResource(value) {
@@ -161,7 +161,7 @@
 						let data;
 
 						if(this.type === "monster") { data = this.fetch_monsters; }
-						else if(this.type === "item") { data =  this.get_api_items; }
+						else if(this.type === "item") { data =  this.fetch_api_items; }
 						else if(this.type === "spell") { data = this.fetch_api_spells; }
 						
 						await data({ query: { search: this.query }}).then(results => {
@@ -199,7 +199,7 @@
 					if(this.type === "item") {
 						result = (this.copy_resource === "custom")
 							? await this.get_item({ uid: this.userId, id })
-							: await this.get_api_item(id);
+							: await this.fetch_api_item(id);
 					}
 					if(this.type === "spell") {
 						result = (this.copy_resource === "custom")

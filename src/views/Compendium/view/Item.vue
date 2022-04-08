@@ -5,8 +5,8 @@
 				<h1>{{ not_found ? "Item not found" : item.name }}</h1>
 				<hk-share 
 					v-if="!not_found" 
-					:title="item.name" 
-					:text="item.description" 
+					:title="item.meta.title.capitalizeEach()"
+					:text="item.meta.description" 
 					size="sm"
 				/>
 			</div>
@@ -25,70 +25,92 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
+	import { mapGetters } from 'vuex';
 	import Item from "src/components/compendium/Item.vue";
+	import { metaCompendium } from 'src/mixins/metaCompendium';
 
 	export default {
 		name: "ViewItem",
+		mixins: [
+			metaCompendium,
+		],
 		components: {
 			Item
-		},
-		metaInfo() {
-			return {
-				title: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`,
-				meta: [
-					{ 
-						vmid: "description", 
-						name: "description", 
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-					},
-					{
-						vmid: "og-title",
-						property: "og:title", 
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-					},
-					{ 
-						vmid: "og-description", 
-						property: "og:description",
-						name: "description", 
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-					},
-					{ 
-						vmid: "twitter-title",
-						name: "twitter:title", 
-						content: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`
-					},
-					{ 
-						vmid: "twitter-description", 
-						name: "twitter:description",
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-					},
-				],
-			}
 		},
 		data() {
 			return {
 				id: this.$route.params.id,
-				item: {},
 				loading: true,
 				not_found: false
 			}
 		},
-		methods: {
-			...mapActions("api_items", ["get_api_item"]),
+		async preFetch({ store, currentRoute }) {
+			await store.dispatch('api_items/fetch_api_item', currentRoute.params.id, { root: true });
 		},
-		async mounted() {
-			await this.get_api_item(this.id).then(result => {
-				const maxLength = 160 - (25 + result.name.length);
-				result.description = `${result.desc.substring(0, maxLength).trim()}...`
+		computed: {
+			...mapGetters("api_items", ["get_api_item"]),
+			item() {
+				return this.get_api_item(this.id)
+			}
+		},
+		meta() {
+			return {
+				title: this.item.meta.title,
+				meta: this.generate_compendium_meta(this.item.meta)
+			}
+		},
+		mounted() {
+			this.$root.$emit('route-name', this.item.name.capitalizeEach())
+		},
+		// metaInfo() {
+		// 	return {
+		// 		title: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`,
+		// 		meta: [
+		// 			{ 
+		// 				vmid: "description", 
+		// 				name: "description", 
+		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
+		// 			},
+		// 			{
+		// 				vmid: "og-title",
+		// 				property: "og:title", 
+		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
+		// 			},
+		// 			{ 
+		// 				vmid: "og-description", 
+		// 				property: "og:description",
+		// 				name: "description", 
+		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
+		// 			},
+		// 			{ 
+		// 				vmid: "twitter-title",
+		// 				name: "twitter:title", 
+		// 				content: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`
+		// 			},
+		// 			{ 
+		// 				vmid: "twitter-description", 
+		// 				name: "twitter:description",
+		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
+		// 			},
+		// 		],
+		// 	}
+		// },
+		
+		// methods: {
+		// 	...mapActions("api_items", ["fetch_api_item"]),
+		// },
+		// async mounted() {
+		// 	await this.fetch_api_item(this.id).then(result => {
+		// 		const maxLength = 160 - (25 + result.name.length);
+		// 		result.description = `${result.desc.substring(0, maxLength).trim()}...`
 
-				this.item = result;
-				this.loading = false;
-			}).catch(() => {
-				this.not_found = true;
-				this.loading = false;
-			});
-		}
+		// 		this.item = result;
+		// 		this.loading = false;
+		// 	}).catch(() => {
+		// 		this.not_found = true;
+		// 		this.loading = false;
+		// 	});
+		// }
 	}
 </script>
 

@@ -36,7 +36,7 @@
 
 		methods: {
 			...mapActions("api_monsters", ["fetch_monsters",]),
-			...mapActions("api_items", ["get_api_items",]),
+			...mapActions("api_items", ["fetch_api_items",]),
 			...mapActions("api_spells", ["fetch_api_spells",]),
 			...mapActions("api_conditions", ["fetch_conditions",]),
 			async downloadXml() {
@@ -97,7 +97,7 @@
 				}
 
 				// ITEMS
-				const items = await this.get_api_items({
+				const items = await this.fetch_api_items({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]

@@ -144,7 +144,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_items", ["get_api_items"]),
+			...mapActions("api_items", ["fetch_api_items"]),
 			filter() {
 				this.loading = true;
 				this.items = [];
@@ -159,7 +159,7 @@
 				this.fetchItems();		
 			},
 			async fetchItems() {
-				await this.get_api_items({
+				await this.fetch_api_items({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

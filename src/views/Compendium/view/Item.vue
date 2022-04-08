@@ -12,7 +12,7 @@
 			</div>
 			<div class="card-body">
 				<div v-if="not_found">
-					<p>Could not find item <b>{{ id }}</b></p>
+					<p>Could not find item <strong>{{ id }}</strong></p>
 					<router-link to="/compendium/items" class="btn bg-neutral-5">
 						Find items
 					</router-link>
@@ -26,7 +26,7 @@
 
 <script>
 	import { mapGetters } from 'vuex';
-	import Item from "src/components/compendium/Item.vue";
+	import Item from "src/components/compendium/Item";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
 
 	export default {
@@ -60,60 +60,13 @@
 			}
 		},
 		mounted() {
-			this.$root.$emit('route-name', this.item.name.capitalizeEach())
-		},
-		// metaInfo() {
-		// 	return {
-		// 		title: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`,
-		// 		meta: [
-		// 			{ 
-		// 				vmid: "description", 
-		// 				name: "description", 
-		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-		// 			},
-		// 			{
-		// 				vmid: "og-title",
-		// 				property: "og:title", 
-		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-		// 			},
-		// 			{ 
-		// 				vmid: "og-description", 
-		// 				property: "og:description",
-		// 				name: "description", 
-		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-		// 			},
-		// 			{ 
-		// 				vmid: "twitter-title",
-		// 				name: "twitter:title", 
-		// 				content: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`
-		// 			},
-		// 			{ 
-		// 				vmid: "twitter-description", 
-		// 				name: "twitter:description",
-		// 				content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.item.description}`
-		// 			},
-		// 		],
-		// 	}
-		// },
-		
-		// methods: {
-		// 	...mapActions("api_items", ["fetch_api_item"]),
-		// },
-		// async mounted() {
-		// 	await this.fetch_api_item(this.id).then(result => {
-		// 		const maxLength = 160 - (25 + result.name.length);
-		// 		result.description = `${result.desc.substring(0, maxLength).trim()}...`
-
-		// 		this.item = result;
-		// 		this.loading = false;
-		// 	}).catch(() => {
-		// 		this.not_found = true;
-		// 		this.loading = false;
-		// 	});
-		// }
+			if(this.item) {
+				this.loading = false;
+				this.$root.$emit('route-name', this.item.name.capitalizeEach())
+			} else {
+				this.not_found = true;
+				this.loading = false;
+			}
+		}
 	}
 </script>
-
-<style lang="scss" scoped>
-
-</style>

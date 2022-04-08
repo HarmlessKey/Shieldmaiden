@@ -48,11 +48,12 @@
 			}
 		},
 		methods: {
-			...mapActions(["reinitialize", "setUser"]),
+			...mapActions(["reinitialize", "setUser", "setUserInfo"]),
 			async signIn() {
 				await auth.signInWithEmailAndPassword(this.email, this.password).then(
 					async (result) => {
 						await this.setUser(result.user);
+						await this.setUserInfo();
 						await this.reinitialize();
 						this.$router.replace("/content");
 					},
@@ -67,6 +68,7 @@
 				if(this.browser === "Edge") {
 					auth.signInWithRedirect(provider).then(async (result) => {
 						await this.setUser(result.user);
+						await this.setUserInfo();
 						await this.reinitialize();
 						this.$router.replace("/content");
 					}).catch((err) => {
@@ -75,6 +77,7 @@
 				} else {
 					auth.signInWithPopup(provider).then(async (result) => {
 						await this.setUser(result.user);
+						await this.setUserInfo();
 						await this.reinitialize();
 						this.$router.replace("/content");
 					}).catch((err) => {

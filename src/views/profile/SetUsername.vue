@@ -4,32 +4,32 @@
 			<hk-card header="Username">
 				<div class="card-body">
 					<h3>
-						Thank you for creating a <b>Harmless Key</b> account!</h3>
+						Thank you for creating a <strong>Harmless Key</strong> account!</h3>
 					<p>To continue, please first enter a username.</p>
-						<ValidationProvider rules="required|alpha_num|min:3|max:20" name="Username" v-slot="{ errors, invalid, validated }">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								type="text" 
-								autocomplete="off"
-								label="Username" 
-								maxlength="20"
-								minlength="3"
-								v-model="username" @keyup.native="checkUsername()"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-							<p v-if="username" class="pl-1">
-								<i aria-hidden="true" class="fas mr-1" :class="{'green fa-check': check == 'available', 'red fa-times': check === 'unavailable'}" />
-									<b>{{ username }}</b> is {{ check }}
-							</p>
-							<button 
-								class="btn btn-block" 
-								:class="{'disabled': check === 'unavailable' || invalid }" 
-								@click="setUsername(!invalid)"
-							>
-								Save
-							</button>
-						</ValidationProvider>
+					<ValidationProvider rules="required|alpha_num|min:3|max:20" name="Username" v-slot="{ errors, invalid, validated }">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							type="text" 
+							autocomplete="off"
+							label="Username" 
+							maxlength="20"
+							minlength="3"
+							v-model="username" @keyup.native="checkUsername()"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+						<p v-if="username" class="pl-1">
+							<i aria-hidden="true" class="fas mr-1" :class="{'green fa-check': check == 'available', 'red fa-times': check === 'unavailable'}" />
+								<strong>{{ username }}</strong> is {{ check }}
+						</p>
+						<button 
+							class="btn btn-block" 
+							:class="{'disabled': check === 'unavailable' || invalid }" 
+							@click="setUsername(!invalid)"
+						>
+							Save
+						</button>
+					</ValidationProvider>
 				</div>
 			</hk-card>
 		</template>

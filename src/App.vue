@@ -267,8 +267,8 @@
 			transformed_user[k] = user[v];
 		}
 
-
 		await store.dispatch("setUser", transformed_user);
+		await store.dispatch("setUserInfo");
 	},
 	async mounted() {
 		auth.onAuthStateChanged(user => {

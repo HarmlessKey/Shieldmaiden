@@ -45,7 +45,6 @@ export default {
 						return Promise.all([
 							dispatch("setTheme"),
 							dispatch("setSideCollapsed"),
-							dispatch("setUserInfo"),
 							dispatch("players/fetch_player_count"),
 							dispatch("npcs/fetch_npc_count"),
 							dispatch("items/fetch_item_count"),

@@ -1,5 +1,5 @@
 <template>
-<div class="hk-view">
+<div class="hk-auth-layout">
 	<div class="content">
 		<Crumble />
 		<OverEncumbered v-if="show_overencumbered" />
@@ -18,10 +18,10 @@
 			</div>
 		</hk-card>
 		<div class="row q-col-gutter-md">		
-			<div class="col-12" :class="{ 'col-md-9': !this.$route.meta || this.$route.meta.side !== false }">
+			<div class="col-12 col-md-9">
         <router-view />
       </div>
-      <div class="col-12 col-md-3" v-if="width > 978 && (!this.$route.meta || this.$route.meta.side !== false)">
+      <div class="col-12 col-md-3" v-if="width > 978">
 				<ContentSideRight />
 			</div>
     </div>
@@ -33,19 +33,27 @@
 
 <script>
 	import { mapGetters} from "vuex";
-	import Footer from "src/components/Footer.vue";
+	import Footer from "src/components/Footer";
 	import Crumble from "src/components/crumble";
 	import ContentSideRight from "src/components/ContentSideRight";
 	import OverEncumbered from "src/components/userContent/OverEncumbered";
 
 	export default {
-		name: "CompendiumRouterView",
+		name: "AuthenticatedLayout",
 		components: {
 			Crumble,
 			Footer,
 			ContentSideRight,
 			OverEncumbered
 		},
+		preFetch({ store, redirect }) {
+      if(!store.getters.user) {
+				redirect('/sign-in');
+			}
+			if(!store.getters.userInfo) {
+				redirect("/set-username");
+			}
+    },
 		data() {
 			return {
 				width: 0
@@ -73,7 +81,7 @@
 </script>
 
 <style lang="scss" scoped>
-	.hk-view {
+	.hk-auth-layout {
 		height: 100%;
 		display: grid;
 		grid-template-rows: 1fr max-content;

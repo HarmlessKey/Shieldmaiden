@@ -1,6 +1,3 @@
-const Contribute = () => import('src/views/Contribute');
-const Spells_contrib = () => import('src/views/Contribute/Spells.vue');
-const Spell_contrib = () => import('src/components/contribute/spell');
 const SpellEdit = () => import('src/components/contribute/spell/edit.vue');
 
 const Sitemap = () => import('src/views/Pages/Sitemap.vue');
@@ -55,7 +52,7 @@ const routes = [
 	// CONTENT
 	{
 		path: "/content",
-		component: () => import("src/views/View"),
+		component: () => import("src/layouts/authenticated"),
 		meta: {
 			requiresAuth: true,
 			title: "Content"
@@ -109,7 +106,6 @@ const routes = [
 								name: "Run campaign",
 								component: () => import("src/views/UserContent/Encounters"),
 								meta: {
-									side: false,
 									description: "Run your campaign on Harmless Key.",
 									title: "Run campaign"
 								},
@@ -120,7 +116,6 @@ const routes = [
 								component: EditEncounter,
 								meta: {
 									title: 'Edit encounter',
-									side: false,
 									description: "Edit your Harmless Key encounter."
 								}
 							},
@@ -370,7 +365,7 @@ const routes = [
 	//COMPENDIUM
 	{
 		path: '/compendium',
-		component: () => import('src/views/View'),
+		component: () => import('src/layouts/default'),
 		meta: { 
 			title: "Compendium"
 		},
@@ -496,45 +491,36 @@ const routes = [
 	// ADMIN
 	{
 		path: '/admin',
-		component: () => import('src/views/View'),
+		component: () => import('src/layouts/admin'),
 		meta: {
 			requiresAuth: true,
 			requiresAdmin: true,
-			side: false,
 			title: "Admin"
 		},
 		children: [
 			{
 				path: "",
 				name: 'Admin',
-				component: () => import('src/views/Admin'),
-				meta: {
-					side: false
-				}
+				component: () => import('src/views/Admin')
 			},
 			{
 				path: 'users',
 				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Users",
-					side: false
+					title: "Users"
 				},
 				children: [
 					{
 						path: "",
 						name: 'Users',
-						component: () => import('src/views/Admin/Users.vue'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/Users.vue')
 					},
 					{
 						path: ':id',
 						name: 'User',
 						component: () => import('src/views/Admin/Users.vue'),
 						meta: {
-							title: "User",
-							side: false
+							title: "User"
 						}
 					},
 				]
@@ -549,18 +535,14 @@ const routes = [
 					{
 						path: "",
 						name: 'Patrons',
-						component: () => import('src/views/Admin/Patrons'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/Patrons')
 					},
 					{
 						path: 'new',
 						name: 'New patron',
 						component: () => import('src/views/Admin/Patrons/New'),
 						meta: {
-							title: "New patron",
-							side: false
+							title: "New patron"
 						}
 					},
 					{
@@ -568,8 +550,7 @@ const routes = [
 						name: 'Patron',
 						component: () => import('src/views/Admin/Patrons'),
 						meta: {
-							title: "Patron",
-							side: false
+							title: "Patron"
 						}
 					},
 				]
@@ -584,10 +565,7 @@ const routes = [
 					{
 						path: "",
 						name: 'Export datases',
-						component: () => import('src/views/Admin/ExportDatabase.vue'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/ExportDatabase.vue')
 					}
 				]
 			},
@@ -601,10 +579,7 @@ const routes = [
 					{
 						path: "",
 						name: 'Generate XML',
-						component: () => import('src/views/Admin/GenerateXML.vue'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/GenerateXML.vue')
 					}
 				]
 			},
@@ -618,10 +593,7 @@ const routes = [
 					{
 						path: "",
 						name: 'Generate JSON',
-						component: () => import('src/views/Admin/GeneratePrerenderPaths.vue'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/GeneratePrerenderPaths.vue')
 					}
 				]
 			},
@@ -635,10 +607,7 @@ const routes = [
 					{
 						path: "",
 						name: 'Update monsters',
-						component: () => import('src/views/Admin/MonsterUpdate.vue'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/MonsterUpdate.vue')
 					}
 				]
 			},
@@ -652,10 +621,7 @@ const routes = [
 					{
 						path: "",
 						name: 'Generate search table',
-						component: () => import('src/views/Admin/GenerateSearchTable.vue'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/GenerateSearchTable.vue')
 					}
 				]
 			},
@@ -669,10 +635,7 @@ const routes = [
 					{
 						path: "",
 						name: 'Restructure Database',
-						component: () => import('src/views/Admin/RestructDatabase.vue'),
-						meta: {
-							side: false
-						}
+						component: () => import('src/views/Admin/RestructDatabase.vue')
 					}
 				]
 			},
@@ -704,39 +667,43 @@ const routes = [
 	},
 	
 
-	// CONTRUBUTE
+	// CONTRIBUTE
 	{
 		path: '/contribute',
-		name: 'Contribute',
-		component: Contribute,
+		component: () => import('src/layouts/contribute'),
 		meta: {
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
-	{
-		path: '/contribute/spells',
-		name: 'Contribute Spells',
-		component: Spells_contrib,
-		meta: {
-			baseName: 'Spells',
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
-	{
-		path: '/contribute/spells/:id',
-		name: 'Contribute Spell',
-		component: Spell_contrib,
-		props: (route) => ({
-			id: route.query.id,
-		}),
-		meta: {
-			basePath: '/contribute',
-			baseName: 'Spells',
-			requiresContribute: true,
-			requiresAuth: true
-		}
+			requiresAuth: true,
+			title: "Contribute"
+		},
+		children: [
+			{
+				path: "",
+				name: 'Contribute',
+				component: () => import('src/views/Contribute')
+			},
+			{
+				path: 'spells',
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Spells"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Spells',
+						component: () => import('src/views/Contribute/Spells.vue')
+					},
+					{
+						path: ':id',
+						name: 'User',
+						component:  () => import('src/components/contribute/spell'),
+						meta: {
+							title: "User",
+						}
+					},
+				]
+			}
+		]
 	},
 	{
 		path: '/contribute/spells/:id/edit',
@@ -774,7 +741,7 @@ const routes = [
 	},
 	{
 		path: "/about-us",
-		component: () => import("src/views/View"),
+		component: () => import("src/layouts/default"),
 		meta: {
 			offline: true,
 			title: "About us"
@@ -803,7 +770,7 @@ const routes = [
 	},
 	{
 		path: "/feedback",
-		component: () => import("src/views/View"),
+		component: () => import("src/layouts/default"),
 		meta: {
 			offline: true,
 			title: "Feedback"

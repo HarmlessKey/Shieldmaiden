@@ -1,7 +1,7 @@
 <template>
 	<div class="loading" :class="{ 'full-height': fullHeight }">
 			<div>
-				<span class="die spin" :style="{ backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
+				<span class="loading__die spin" :style="{ backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
 				<div class="loading__title">
 					{{ prefix ? prefix : "Loading" }}{{ name ? ` ${name}` : `` }}...
 				</div>

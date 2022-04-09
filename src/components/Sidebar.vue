@@ -5,10 +5,9 @@
 	>
 		<div 
 			@click.stop=""
-			v-if="(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen"
 			id="sidebar" 
 			:class="{
-				'side-collapsed': $store.getters.side_collapsed && !small_screen && $route.meta.sidebar !== false,
+				'side-collapsed': $store.getters.side_collapsed && !smallScreen && $route.meta.sidebar !== false,
 				'slideIn': $route.meta.sidebar === false
 			}">
 			<div>
@@ -179,9 +178,9 @@
 
 	export default {
 		name: 'Sidebar',
+		props: ["smallScreen"],
 		data() {
 			return {
-				small_screen: false,
 				man_col: false,
 				social_media: [
 					{
@@ -223,28 +222,11 @@
 				'setSideCollapsed',
 				'setSideSmallScreen'
 			]),
-		},
-		mounted() {
-			window.onresize = () => {
-				let small = 600
-				if (window.innerWidth < small) {
-					this.small_screen = true;
-				}
-				if (window.innerWidth >= small){
-					this.small_screen = false;
-				}
-			}
-		}, 
+		}
 	}
 </script>
 
 <style lang="scss">
-
-.hasSide {
-	display: grid;
-	grid-template-columns: max-content auto;
-}
-
 #sidebar {
 	width: 250px;
 	height: calc(100vh - 50px);
@@ -361,10 +343,7 @@
 .slideOutLeft {
 	animation-duration: 0.5s !important;
 }
-@media only screen and (max-width: 600px) {
-	.hasSide {
-		grid-template-columns: auto;
-	}
+@media only screen and (max-width: 576px) {
 	#sidebar {
 		position: absolute;
 

@@ -1,4 +1,3 @@
-const SpellEdit = () => import('src/components/contribute/spell/edit.vue');
 
 const Sitemap = () => import('src/views/Pages/Sitemap.vue');
 const Privacy = () => import('src/views/Pages/Privacy.vue');
@@ -695,29 +694,26 @@ const routes = [
 					},
 					{
 						path: ':id',
-						name: 'User',
-						component:  () => import('src/components/contribute/spell'),
+						component: { render (c) { return c('router-view') }},
 						meta: {
-							title: "User",
-						}
+							title: "Spell contribute",
+						},
+						children: [
+							{
+								path: "",
+								name: 'Spell contribute',
+								component: () => import('src/components/contribute/spell'),
+							},
+							{
+								path: "edit",
+								name: "Edit spell",
+								component: () => import('src/components/contribute/spell/edit.vue'),
+							}
+						]
 					},
 				]
 			}
 		]
-	},
-	{
-		path: '/contribute/spells/:id/edit',
-		name: 'Edit Spell',
-		component: SpellEdit,
-		props: (route) => ({
-			id: route.query.id,
-		}),
-		meta: {
-			basePath: '/contribute',
-			baseName: 'Monsters',
-			requiresContribute: true,
-			requiresAuth: true
-		}
 	},
 
 	//STAND ALONE PAGES

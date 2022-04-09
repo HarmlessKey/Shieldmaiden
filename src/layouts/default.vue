@@ -1,9 +1,9 @@
 <template>
-<div class="hk-default-layout">
+<div class="hk-layout">
 	<div class="content">
 		<Crumble />
 		<OverEncumbered v-if="show_overencumbered" />
-		<hk-card v-if="show_mobile_ad" class="ad">
+		<hk-card v-if="show_mobile_ad" class="hk-ad">
 			<div class="card-body">
 				<img src="../assets/_img/logo/logo-icon-cyan.svg" alt="Harmless Key: D&D Combat Tracker" />
 				<div class="right">
@@ -18,7 +18,7 @@
 			</div>
 		</hk-card>
 		<div class="row q-col-gutter-md">		
-			<div class="col-12 col-md-9">
+			<div class="col-12" :class="{ 'col-md-9': width > 978 }">
         <router-view />
       </div>
       <div class="col-12 col-md-3" v-if="width > 978">
@@ -53,6 +53,7 @@
 		},
 		computed: {
 			...mapGetters([
+				"user",
 				"overencumbered"
 			]),
 			show_overencumbered() {
@@ -61,7 +62,7 @@
 			},
 			show_mobile_ad() {
 				const pathArray = this.$route.path.split("/");
-				return pathArray[1] !== "content" && this.width <= 978;
+				return pathArray[1] !== "content" && this.width <= 978 && !this.user;
 			}
 		},
 		methods: {
@@ -71,40 +72,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	.hk-default-layout {
-		height: 100%;
-		display: grid;
-		grid-template-rows: 1fr max-content;
-		grid-template-columns: 100%;
-
-		.ad {
-			background-color: $neutral-10;
-	
-			.card-body {
-				padding: 10px 15px;
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-		
-				img {
-					margin: 0 15px 0 -5px;
-					width: 80px;
-				}
-				.right {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					flex-wrap: wrap;
-					width: 100%;
-		
-					.title {
-						font-weight: bold;
-						font-size: 20px;
-					}
-				}
-			}
-		}
-	}
-</style>

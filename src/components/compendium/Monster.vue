@@ -1,5 +1,9 @@
 <template>
-	<div v-if="!loading" class="monster monster-card" ref="entity">
+	<div 
+		v-if="!loading" 
+		class="monster monster-card"
+		:class="{ smallWidth: width < 576 }"
+	>
 		<div class="monster-stats">
 			<h2 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
@@ -335,6 +339,7 @@
 				</template>
 			</div>
 		</div>
+		<q-resize-observer @resize="setSize" />
 	</div>
 	<hk-loader v-else name="monster" />
 </template>
@@ -372,6 +377,7 @@
 		},
 		data() {
 			return {
+				width: 0,
 				monster: {},
 				loading: true,
 				actions: [
@@ -432,6 +438,9 @@
 		methods: {
 			...mapActions("api_monsters", ["fetch_monster"]),
 			...mapActions(["setActionRoll"]),
+			setSize(size) {
+				this.width = size.width;
+			},
 			roll(e, action, versatile) {
 				const config = {
 					type: "monster_action",
@@ -536,8 +545,9 @@
 
 
 		.skill {
-			display: flex;
-			justify-content: space-between;
+			display: grid;
+			grid-template-columns: 1fr max-content;
+			column-gap: 5px;
 			cursor: pointer;
 
 			&:hover {
@@ -601,6 +611,18 @@
 			color: $red
 		}
 	}
+
+	&.smallWidth {
+		.abilities {
+			grid-template-columns: 	repeat(3, auto);
+			grid-template-rows: auto auto;
+			grid-row-gap: 15px;
+		}
+
+		.skills {
+			column-count: 2;
+		}
+	}
 }
 .roll-button {
 	display: inline-block;
@@ -618,17 +640,6 @@
 }
 .disadvantage .roll-button:hover {
 	background-image: url('../../assets/_img/logo/logo-icon-no-shield-red.svg');
-}
-.smallWidth {
-	.abilities {
-		grid-template-columns: 	repeat(3, auto);
-		grid-template-rows: auto auto;
-		grid-row-gap: 15px;
-	}
-
-	.skills {
-		column-count: 2;
-	}
 }
 
 

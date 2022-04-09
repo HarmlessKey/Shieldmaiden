@@ -41,6 +41,12 @@ html body {
 	.container-fluid {
 		padding: 0;
 	}
+
+	.hasSide {
+		display: grid;
+		grid-template-columns: max-content auto;
+	}
+
 	header {
 		display: block;
 		height: $header-height;
@@ -459,6 +465,41 @@ html body {
 		}
 		&-end {
 			align-items: end;
+		}
+	}
+
+	.hk-layout {
+		height: 100%;
+		display: grid;
+		grid-template-rows: 1fr max-content;
+		grid-template-columns: 100%;
+
+		.hk-ad {
+			background-color: $neutral-10;
+	
+			.card-body {
+				padding: 10px 15px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+		
+				img {
+					margin: 0 15px 0 -5px;
+					width: 80px;
+				}
+				.right {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					flex-wrap: wrap;
+					width: 100%;
+		
+					.title {
+						font-weight: bold;
+						font-size: 20px;
+					}
+				}
+			}
 		}
 	}
 
@@ -2118,7 +2159,7 @@ html body {
 				}
 			}
 		}
-		.hk-view {
+		.hk-layout {
 			padding-top: 38px;
 
 			.breadcrumb {
@@ -2128,7 +2169,7 @@ html body {
 				border: none;
 				padding: 10px 15px;
 				position: fixed;
-				top: 50px;
+				top: 0;
 				left: 0;
 				width: 100%;
 				z-index: 1;
@@ -2150,6 +2191,9 @@ html body {
 					}
 				}
 			}
+		}
+		.hasSide {
+			grid-template-columns: auto;
 		}
 	}
 

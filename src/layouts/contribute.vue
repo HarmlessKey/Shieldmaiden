@@ -1,10 +1,10 @@
 <template>
-<div class="hk-admin-layout">
-	<div class="content">
-		<Crumble />
-    <router-view />
+	<div class="hk-layout">
+		<div class="content">
+			<Crumble />
+			<router-view />
+		</div>
 	</div>
-</div>
 </template>
 
 <script>

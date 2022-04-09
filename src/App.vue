@@ -5,13 +5,15 @@
 			<PaymentDeclined v-if="user !== null" />
 			<div class="offline" v-if="connection === 'offline'"><i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
 			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
-				<Sidebar />
+				<Sidebar 
+					v-if="(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen" 
+					:small-screen="small_screen" 
+				/>
 				<q-scroll-area 
 					class="scrollable-content" 
 					:dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}"
 				>
 					<router-view />
-					<!-- <hk-loader v-else full-height /> -->
 				</q-scroll-area>
 			</div>
 			<Home v-else :maintenance="maintenance" />
@@ -82,6 +84,7 @@
 				</q-card-section>
       </q-card>
     </q-dialog>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -184,6 +187,8 @@
 	},
 	data() {
 		return {
+			width: 0,
+			small_screen: true,
 			announcementSetter: false,
 			announcement_cookie: false,
 			install_cookie: false,
@@ -327,6 +332,10 @@
 			"reinitialize",
 			"setUser"
 		]),
+		setSize(size) {
+			this.small_screen = size.width < 576;
+			this.width = size.width;
+		},
 		hideSlide() {
 			this.setSlide(false)
 		},

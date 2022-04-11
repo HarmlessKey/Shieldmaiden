@@ -31,22 +31,11 @@ const routes = [
 		meta: {
 			sidebar: false,
 			offline: true,
-			description: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+			description: "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
 			title: "D&D Combat Tracker"
 		}
 	},
 	{ path: "/home", redirect: "/" },
-	// {
-	// 	path: '/home',
-	// 	name: 'landingpage',
-	// 	component: () => import('src/views/Home.vue'),
-	// 	meta: {
-	// 		sidebar: false,
-	// 		offline: true,
-	// 		description: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
-	// 		title: "D&D Combat Tracker"
-	// 	},
-	// },
 
 	// CONTENT
 	{

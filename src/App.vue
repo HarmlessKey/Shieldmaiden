@@ -117,6 +117,12 @@
 		return {
 			title: this.$route.meta.title || "D&D Combat Tracker",
 			titleTemplate: title => `${title} | Harmless Key`,
+			link: {
+				canonical: {
+					rel: "canonical",
+					href: `https://harmlesskey.com${this.$route.path}`
+				}
+			},
 			meta: {
 				title: {
 					name: "title",
@@ -160,7 +166,7 @@
 				},
 				ogSiteName: {
 					property: "og:site_name",
-					content: "harmlesskey.com"
+					content: "Harmless Key"
 				},
 				ogType: {
 					property: "og:type",

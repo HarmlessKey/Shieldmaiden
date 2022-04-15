@@ -19,9 +19,18 @@ const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()
 // Use Helmet middleware to prevent common attack vectors.
-// app.use(helmet());
 app.use(helmet({
-  contentSecurityPolicy: false
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ['"self"', '*.harmlesskey.com'],
+      scriptSrc:  ['"self"', '*.harmlesskey.com', 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com'],
+      styleSrc:   ['"self"', '*.harmlesskey.com', 'pro.fontawesome.com'],
+      fontSrc:    ['"self"', '*.harmlesskey.com', 'pro.fontawesome.com'],
+      imgSrc:     ['*'],
+      blockAllMixedContent: [] // Compliant
+    },
+    reportOnly: true,
+  }
 }));
 
 const port = process.env.PORT || 3000

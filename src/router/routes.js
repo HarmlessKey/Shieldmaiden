@@ -738,7 +738,7 @@ const routes = [
 				component: () => import("src/views/Pages/AboutUs"),
 				meta: {
 					title: "About us",
-					description: "Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 expierenced D&D players who were missing an initiative tracker that met their needs."
+					description: "Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 experienced D&D players who were missing an initiative tracker that met their needs."
 				}
 			}
 		]

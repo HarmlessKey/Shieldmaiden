@@ -28,7 +28,8 @@ app.use(helmet.contentSecurityPolicy({
     fontSrc: ["self", "pro.fontawesome.com"],
     imgSrc: ["*"],
     blockAllMixedContent: [] // Compliant
-  }
+  },
+  reportOnly: true,
 }));
 
 const port = process.env.PORT || 3000

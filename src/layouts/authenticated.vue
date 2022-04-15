@@ -4,10 +4,10 @@
 			<Crumble />
 			<OverEncumbered v-if="show_overencumbered" />
 			<div class="row q-col-gutter-md">		
-				<div class="col-12" :class="{ 'col-md-9': width > 978 }">
+				<div class="col-12" :class="{ 'col-md-9': width > 978 &&  $route.meta.side !== false }">
 					<router-view />
 				</div>
-				<div class="col-12 col-md-3" v-if="width > 978">
+				<div class="col-12 col-md-3" v-if="width > 978 && $route.meta.side !== false">
 					<ContentSideRight />
 				</div>
 			</div>

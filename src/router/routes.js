@@ -95,7 +95,8 @@ const routes = [
 								component: () => import("src/views/UserContent/Encounters"),
 								meta: {
 									description: "Run your campaign on Harmless Key.",
-									title: "Run campaign"
+									title: "Run campaign",
+									side: false
 								},
 							},
 							{

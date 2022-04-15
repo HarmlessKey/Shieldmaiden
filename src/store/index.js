@@ -26,7 +26,7 @@ Vue.use(Vuex);
  * with the Store instance.
  */
 
-export default function (/* { ssrContext } */) {
+export default function () {
   return new Vuex.Store({
     modules: {
       general: general,

@@ -1,5 +1,4 @@
 import { register } from 'register-service-worker'
-// import { Notify } from 'quasar';
 
 // The ready(), registered(), cached(), updatefound() and updated()
 // events passes a ServiceWorkerRegistration instance in their arguments.

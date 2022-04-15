@@ -12,11 +12,16 @@
  */
 
 const express = require('express')
+const helmet = require("helmet")
 const compression = require('compression')
 
 const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()
+// Use Helmet middleware to prevent common attack vectors.
+app.use(helmet());
+app.use(helmet.hidePoweredBy());
+
 const port = process.env.PORT || 3000
 
 const serve = (path, cache) => express.static(ssr.resolveWWW(path), {

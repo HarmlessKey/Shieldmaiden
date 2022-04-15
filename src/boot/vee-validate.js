@@ -49,7 +49,7 @@ export default async ({ router, Vue }) => {
   extend('recharge', {
     validate(value) {
       if (value) {
-        const regex = /^[0-9]+(-[0-9]+)*$/;
+        const regex = /^[\d]+(-[\d]+)*$/;
         return regex.test(value) || value === "rest";
       } return false;
     },
@@ -60,7 +60,7 @@ export default async ({ router, Vue }) => {
   extend('range', {
     validate(value) {
       if (value) {
-        const regex = /^[0-9]+(\/[0-9]+)*$/g;
+        const regex = /^[\d]+(\/[\d]+)*$/g;
         return regex.test(value);
       } return false;
     },
@@ -71,7 +71,7 @@ export default async ({ router, Vue }) => {
   extend('hit_dice', {
     validate(value) {
       if (value) {
-        const regex = /^[0-9]+d[0-9]+$/;
+        const regex = /^[\d]+d[\d]+$/;
         return regex.test(value);
       } return false;
     },
@@ -82,7 +82,7 @@ export default async ({ router, Vue }) => {
   extend('url', {
     validate(value) {
       if (value) {
-        const regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+        const regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z\d]+([-.]{1}[a-z\d]+)*\.[a-z]{2,5}(:[\d]{1,5})?(\/.*)?$/;
         return regex.test(value);
       } return false;
     },
@@ -93,7 +93,7 @@ export default async ({ router, Vue }) => {
     validate(value) {
       if (value) {
         // Check if value is url
-        const url_expr = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
+        const url_expr = /[A-z\d@:%._+~#=-]{1,256}\.[A-z\d()]{1,6}\b([A-z\d()@:%_+.~#?&//=-]+)?/gi
         const url_regex = new RegExp(url_expr);
         if (value.match(url_regex)) {
           return true;

@@ -211,6 +211,7 @@
 					delete result._id;
 					delete result.key;
 					delete result.url;
+					delete result.meta;
 
 					this.$emit("copy", { result, id, resource: this.copy_resource });
 				}

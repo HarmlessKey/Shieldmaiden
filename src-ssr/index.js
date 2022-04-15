@@ -22,10 +22,10 @@ const app = express()
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ['"self"', '*.harmlesskey.com'],
-      scriptSrc:  ['"self"', '*.harmlesskey.com', 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com'],
-      styleSrc:   ['"self"', '*.harmlesskey.com', 'pro.fontawesome.com'],
-      fontSrc:    ['"self"', '*.harmlesskey.com', 'pro.fontawesome.com'],
+      defaultSrc: ["'self'", '*.harmlesskey.com'],
+      scriptSrc:  ["'self'", '*.harmlesskey.com', 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com'],
+      styleSrc:   ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com'],
+      fontSrc:    ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com'],
       imgSrc:     ['*'],
       blockAllMixedContent: [] // Compliant
     },

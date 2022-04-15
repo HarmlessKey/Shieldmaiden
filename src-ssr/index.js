@@ -19,17 +19,9 @@ const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()
 // Use Helmet middleware to prevent common attack vectors.
-app.use(helmet());
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["self"],
-    scriptSrc: ["self", "cdnjs.cloudflare.com", "google-analytics.com", "*.firebaseio.com"],
-    styleSrc: ["self", "pro.fontawesome.com"],
-    fontSrc: ["self", "pro.fontawesome.com"],
-    imgSrc: ["*"],
-    blockAllMixedContent: [] // Compliant
-  },
-  reportOnly: true,
+// app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false
 }));
 
 const port = process.env.PORT || 3000

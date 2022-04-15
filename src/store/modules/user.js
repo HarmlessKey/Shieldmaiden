@@ -6,7 +6,7 @@ import Vue from 'vue';
 const users_ref = db.ref('users');
 const tiers_ref = db.ref('tiers');
 
-const	user_state = () => ({
+const user_state = () => ({
 	user_services: null,
 	user: undefined,
 	userInfo: undefined,

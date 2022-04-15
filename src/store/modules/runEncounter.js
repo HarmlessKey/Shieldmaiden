@@ -121,8 +121,7 @@ const demoEncounter = {
 }
 
 
-const getDefaultState = () => {
-	return () => ({
+const getDefaultState = () => ({
 		demo: false,
 		demoEntities: demoEncounter.entities,
 		uid: undefined,
@@ -137,8 +136,7 @@ const getDefaultState = () => {
 		track: undefined,
 		encounter_initialized: false,
 		show_monster_card: false
-	});
-}
+});
 
 const run_encounter_state = getDefaultState();
 

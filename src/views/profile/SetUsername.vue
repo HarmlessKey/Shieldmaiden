@@ -48,6 +48,11 @@ export default {
 				check: 'available',
 			}
 		},
+		preFetch({ store, redirect }) {
+      if(!store.getters.user) {
+				redirect('/sign-in');
+			}
+		},
 		computed: {
 			...mapGetters([
 				'user',

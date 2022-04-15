@@ -36,7 +36,7 @@
       if(!store.getters.user) {
 				redirect('/sign-in');
 			}
-			if(!store.getters.userInfo) {
+			else if(!store.getters.userInfo) {
 				redirect("/set-username");
 			}
     },

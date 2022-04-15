@@ -47,6 +47,11 @@
 				user: this.$store.getters.user,
 			}
 		},
+		preFetch({ store, redirect }) {
+      		if(store.getters.user) {
+				redirect('/content');
+			}
+		},
 		methods: {
 			...mapActions(["reinitialize", "setUser", "setUserInfo"]),
 			async signIn() {

@@ -12,7 +12,6 @@
       <div class="card-body overflow-x-hidden">
         <hk-video />
         <p class="neutral-2 mt-3 text-center">Try the most advanced initiative tracker on the internet.</p>
-
         <router-link class="btn btn-block btn-sm bg-green" to="/demo">Demo encounter</router-link>
       </div>
     </hk-card>
@@ -27,6 +26,21 @@
       </div>
       <div class="card-body">
        <PlayerLink :qr="false" :title="false" :info="false" />
+      </div>
+    </hk-card>
+
+    <!-- HOMEBREW CREATION -->
+    <hk-card v-if="false">
+      <div 
+        slot="image"
+        class="card-image" 
+        :style="{ backgroundImage: `url(${require('src/assets/_img/homebrew-creation.webp')})`}"
+      >
+        <div class="image-title">Homebrew creation</div>
+      </div>
+      <div class="card-body">
+        <p class="text-center">Need a free adventure template, or help forming the basic idea of your adventure?</p>
+        <a class="btn btn-block btn-sm" href="http://homebrewcreation.com" rel="noopener" target="_blank">Start creating</a>
       </div>
     </hk-card>
 
@@ -144,3 +158,21 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .hk-card {
+    .card-image {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+
+      .image-title {
+        font-size: 30px;
+        line-height: 35px;
+        opacity: 1;
+        font-weight: bold;
+        text-shadow: 2px 2px 5px $black;
+      }
+    }
+  }
+</style>

@@ -1059,11 +1059,11 @@ html body {
 	/* HK CARD */
 	.hk-card {
 		position: relative;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    word-wrap: break-word;
-    background-clip: border-box;
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		word-wrap: break-word;
+		background-clip: border-box;
 		background-color: $neutral-6;
 		margin-bottom: 20px;
 		border-radius: $border-radius;
@@ -1125,7 +1125,8 @@ html body {
 			box-shadow: inset 0 -5px 25px rgba(0, 0, 0, 1);
 			padding: 10px;
 			
-			h2 {
+			h2, .image-title {
+				font-size: 20px;
 				text-align: center;
 				font-family: unset;
 				opacity: .8;

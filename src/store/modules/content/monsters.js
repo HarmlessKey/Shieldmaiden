@@ -18,7 +18,8 @@ const monster_getters = {
 
 const monster_actions = {
   get_monster_services: async ({ getters, commit }) => {
-    if(getters.monster_services === null) {
+  
+    if(getters.monster_services === null || !Object.keys(getters.monster_services).length ) {
       commit("SET_MONSTER_SERVICES", new monsterServices);
     }
     return getters.monster_services;
@@ -26,6 +27,7 @@ const monster_actions = {
 
   async fetch_monsters({ dispatch}, { pageNumber, pageSize, query, fields, sortBy, descending }) {
     const services = await dispatch("get_monster_services");
+    console.log("In store log services:", services)
     try {
       return await services.getMonsters(query, pageNumber, pageSize, fields, sortBy, descending);
     } catch(error) {

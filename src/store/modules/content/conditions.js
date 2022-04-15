@@ -18,7 +18,7 @@ const conditions_getters = {
 
 const conditions_actions = {
   get_condition_services: async ({ getters, commit }) => {
-    if(getters.condition_services === null) {
+    if(getters.condition_services === null || !Object.keys(getters.condition_services).length ) {
       commit("SET_CONDITION_SERVICES", new conditionServices);
     }
     return getters.condition_services;

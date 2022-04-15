@@ -18,7 +18,7 @@ const item_getters = {
 
 const item_actions = {
   get_api_item_services: async ({ getters, commit }) => {
-    if(getters.item_services === null) {
+    if(getters.item_services === null || !Object.keys(getters.item_services).length ) {
       commit("SET_ITEM_SERVICES", new itemServices);
     }
     return getters.item_services;

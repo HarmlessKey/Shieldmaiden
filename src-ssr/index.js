@@ -23,9 +23,10 @@ app.use(helmet());
 app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: ["self"],
-    scriptSrc: ["self", "cdnjs.cloudflare.com", "google-analytics.com", "firebaseio.com"],
+    scriptSrc: ["self", "cdnjs.cloudflare.com", "google-analytics.com", "*.firebaseio.com"],
     styleSrc: ["self", "pro.fontawesome.com"],
     fontSrc: ["self", "pro.fontawesome.com"],
+    imgSrc: ["*"],
     blockAllMixedContent: [] // Compliant
   }
 }));

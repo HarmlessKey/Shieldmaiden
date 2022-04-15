@@ -16,7 +16,7 @@ Vue.use(VueRouter);
 export default function ({ store, ssrContext }) {
   const router = new VueRouter({
     scrollBehavior () {
-      const el = document.querySelector('.scrollable-content');
+			const el = document.querySelector('.scroll');
       el.scrollLeft = 0;
       el.scrollTop = 0;
     },

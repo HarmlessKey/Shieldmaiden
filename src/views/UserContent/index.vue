@@ -55,7 +55,8 @@
 					active_campaign && active_campaign.background
 					? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
 					: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
-			]">
+				]"
+			>
 				<a 
 					v-if="!active_campaign || !active_campaign.background" 
 					class="white text-shadow-3 link" 
@@ -69,7 +70,7 @@
 				<div>
 					<div class="neutral-4 mb-1">Continue</div>
 					<h3 class="neutral-1">
-						<b>{{ active_campaign.name }}</b><br/>
+						<strong>{{ active_campaign.name }}</strong><br/>
 					</h3>
 					<p class="neutral-3">Dive right back into your adventure.</p>
 				</div>
@@ -83,7 +84,7 @@
 				<div>
 					<div class="neutral-4 mb-1">Campaigns</div>
 					<h3 class="neutral-1">
-						<b>No campaigns</b><br/>
+						<strong>No campaigns</strong><br/>
 					</h3>
 					<p class="neutral-3">Start your first adventure.</p>
 				</div>
@@ -308,11 +309,6 @@
 		}
 	}
 	@media only screen and (max-width: 576px) {
-		.hk-card {
-			.card-body {
-				font-size: 25px;
-			}
-		}
 		.q-item {
 			padding: 18px 20px;
 			font-size: 16px;

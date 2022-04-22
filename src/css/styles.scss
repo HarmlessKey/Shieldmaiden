@@ -2196,6 +2196,16 @@ html body {
 		.hasSide {
 			grid-template-columns: auto;
 		}
+		.hk-card {
+			&.banner {
+				flex-direction: column;
+	
+				.card-body {
+					width: unset;
+					max-width: unset;
+				}
+			}
+		}
 	}
 
 	//SM

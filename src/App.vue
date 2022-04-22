@@ -203,6 +203,7 @@
 			install_dialog: false,
 			never_show_install: false,
 			maintenance: false,
+			connection: process.browser && !navigator.onLine ? 'offline' : 'online'
 		}
 	},
 	watch: {
@@ -239,9 +240,6 @@
 			"theme",
 			"user"
 		]),
-		connection() {
-			return process.browser && !navigator.onLine ? 'offline' : 'online';
-		},
 		announcement: {
 			get() {
 				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;

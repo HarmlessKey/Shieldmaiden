@@ -137,14 +137,14 @@
 					this.log = this.storageLog
 				}
 			},
-			undo(key, value, over, target, by, type) {
+			async undo(key, value, over, target, by, type) {
 				type = (type == 'damage') ? 'healing' : 'damage';
 				let undo = (over > 0) ? over : true; //Send the over value as undo true/false
 				let doneBy = (by === 'environment') ? this.environment : this.entities[by];
 				let amount = {};
 				amount[type] = value;
 				
-				this.setHP(amount, this.entities[target], doneBy, { undo });
+				await this.setHP(amount, this.entities[target], doneBy, { undo });
 				this.set_log({
 					action: 'unset',
 					value: key

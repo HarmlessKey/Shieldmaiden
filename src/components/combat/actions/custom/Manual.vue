@@ -215,7 +215,7 @@
 				}
 				return Math.floor(value);
 			},
-			setManual(type, valid) {
+			async setManual(type, valid) {
 				if(valid && this.manualAmount != '') {
 					//Update HP
 					for(let i in this.targeted) {
@@ -242,7 +242,7 @@
 							]
 						};
 
-						this.setHP(amount, this.entities[key], this.current, config)
+						await this.setHP(amount, this.entities[key], this.current, config)
 					}
 
 					//Reset input fields

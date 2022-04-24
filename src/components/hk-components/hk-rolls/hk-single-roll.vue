@@ -410,7 +410,7 @@ export default {
 			const color = (type === "A") ? "green" : "red";
 			return `<b class="${color}">${type}</b>`;
 		},
-		apply(multiplier) {
+		async apply(multiplier) {
 			// Create the info object for the log
 			let config = {
 				log: true,
@@ -461,7 +461,7 @@ export default {
 			if(totalHealing !== undefined) totalValue.healing = Math.floor(totalHealing * multiplier);
 
 			// Apply the rolled damage/healing
-			this.setHP(totalValue, this.roll.target, this.roll.current, config);
+			await this.setHP(totalValue, this.roll.target, this.roll.current, config);
 
 			// Apply the special events
 			for(const special of specials) {
@@ -479,7 +479,7 @@ export default {
 							}
 						]
 					};
-					this.setHP({ healing: event[1] }, this.roll.current, this.roll.current, event_config);
+					await this.setHP({ healing: event[1] }, this.roll.current, this.roll.current, event_config);
 				} else if(event[0] === "drain") {
 					const value = (this.roll.target.maxHpMod) ? this.roll.target.maxHpMod - event[1] : -event[1];
 					this.edit_entity_prop({

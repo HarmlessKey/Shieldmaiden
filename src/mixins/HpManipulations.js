@@ -370,6 +370,9 @@ export const setHP = {
 			if(currentAmount === null) { currentAmount = 0; } //if there is no healing done/taken yet
 			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
 
+			// Don't allow values below 0
+			newAmount = (newAmount < 0) ? 0 : newAmount;
+
 			//Set the new amount
 			await db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`).set(newAmount);
 		}

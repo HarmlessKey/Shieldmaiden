@@ -22,7 +22,7 @@
 			/>
 
 			<!-- DESKTOP -->
-			<div class="track desktop" v-if="width > 576">
+			<div class="track desktop" :class="{ 'no-meters': playerSettings.meters !== undefined }" v-if="width > 576">
 				<div class="initiative">
 					<Initiative 
 						v-if="!encounter.finished"
@@ -40,11 +40,10 @@
 					/>
 					<Rewards v-else :encounter="encounter"/>
 				</div>
-				<div class="side">
+				<div class="side" v-if="playerSettings.meters === undefined">
 					<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" class="during-encounter">
 						<div class="meters-wrapper">
-							<Meters 
-								v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
+							<Meters
 								:entities="encounter.entities" 
 								:npcs="npcs" 
 								:players="players"
@@ -189,7 +188,6 @@
 			return {
 				userId: this.$route.params.userid,
 				panel: "initiative",
-				setSideDisplay: undefined,
 				counter: 0,
 				rolls: [],
 				weather: true,
@@ -310,17 +308,6 @@
 					icon: "fas fa-dice-d20",
 				});
 				return tabs;
-			},
-			sideDisplay: {
-				get() {
-					if(this.setSideDisplay) {
-						return this.setSideDisplay;
-					}
-					return (this.playerSettings.meters === undefined) ? 'damage' : 'rolls';
-				},
-				set(newValue) {
-					this.setSideDisplay = newValue;
-				}
 			}
 		},
 		methods: {
@@ -391,6 +378,10 @@
 				width: 100%;
 			}
 		}
+
+		&.no-meters {
+			grid-template-columns: 1fr minmax(200px, 250px);
+		}
 	}
 	&.mobile {
 		grid-template-rows: 60px 1fr;
@@ -458,11 +449,22 @@
 				}
 			}
 		}
+		&.no-meters {
+			grid-template-columns: 1fr !important;
+
+			.initiative {
+				padding-right: 15px;
+			}
+		}
 	}
 }
 @media only screen and (max-width: 992px) {
 	.track.desktop {
 		grid-template-columns: 3fr 1fr minmax(180px, 200px);
+
+		&.no-meters {
+			grid-template-columns: 1fr minmax(180px, 200px);
+		}
 	}
 }
 @media only screen and (min-width: 1250px) {
@@ -472,6 +474,10 @@
 
 		.initiative {
 			padding-left: 30px;
+		}
+
+		&.no-meters {
+			grid-template-columns: 1fr minmax(180px, 200px);
 		}
 	}
 }

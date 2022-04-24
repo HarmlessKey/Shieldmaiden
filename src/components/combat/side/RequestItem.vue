@@ -235,7 +235,7 @@
 				this.$set(this.intensity, target, value);
 				this.$forceUpdate();
 			},
-			apply(type) {
+			async apply(type) {
 				for(let key in this.final_results) {
 					let amount = {};
 					amount[type] = Math.floor(this.final_results[key] * this.intensity[key]);
@@ -260,7 +260,7 @@
 						}
 						config.actions[0].rolls.push(roll);
 					}
-					this.setHP(amount, this.entities[key], this.entities[this.request.player], config);
+					await this.setHP(amount, this.entities[key], this.entities[this.request.player], config);
 				}
 				this.remove();
 			},

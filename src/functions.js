@@ -17,6 +17,12 @@ String.prototype.formatUnicorn = function() {
 	return e
 }
 
+// Returns a positive number, or 0
+Number.prototype.positive = function() {
+	return (this >= 0) ? this : 0;
+}
+
+
 /**
  * Returns the browser type
  * @return {string} browser: Opera, Firefox, Safari, IE, edge, chrome

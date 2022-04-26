@@ -20,6 +20,8 @@ const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()
 
+app.disable('x-powered-by');
+
 // // Allow CORS
 // const cors_options = {
 //   origin: "https://dndcombat-71e41.firebaseio.com/",

@@ -21,7 +21,7 @@ const extension = require('./extension')
 const app = express()
 
 // Allow CORS
-cors_options = {
+const cors_options = {
   origin: "https://dndcombat-71e41.firebaseio.com/",
   optionsSuccessStatus: 200
 }
@@ -32,16 +32,18 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com', "'unsafe-inline'", "'unsafe-eval'"],
-      styleSrc:   ["'self'", 'pro.fontawesome.com', 'fonts.googleapis.com', "'unsafe-inline'"],
+      scriptSrc:  ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'cdnjs.cloudflare.com', '*.google-analytics.com', 'apis.google.com', '*.firebaseio.com'],
+      styleSrc:   ["'self'", "'unsafe-inline'", 'pro.fontawesome.com', 'fonts.googleapis.com'],
       fontSrc:    ["'self'", 'pro.fontawesome.com', 'fonts.gstatic.com'],
       imgSrc:     ["'self'", '*', 'data:'],
-      connectSrc: ["'self'", '*.google-analytics.com', 'https://api.harmlesskey.com', '*.firebaseio.com'],
+      frameSrc:   ["'self'", 'https://harmlesskey.firebaseapp.com'],
+      connectSrc: ["'self'", '*.google-analytics.com', 'https://api.harmlesskey.com', '*.firebaseio.com', 'www.googleapis.com'],
       workerSrc:  ["'self'"],
       blockAllMixedContent: [] // Compliant
     },
     reportOnly: true,
   }
+  // contentSecurityPolicy: false,
 }));
 
 const port = process.env.PORT || 3000

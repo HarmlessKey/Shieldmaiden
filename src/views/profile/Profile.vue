@@ -6,10 +6,6 @@
 					<div class="card-body">
 						<div>
 							<h4>{{ userInfo.username }}</h4>
-							<p class="info">
-								<span class="neutral-3">Created:</span> {{ makeDate(user.metadata.creationTime, true) }}<br/>
-								<span class="neutral-3">Last login:</span> {{ makeDate(user.metadata.lastSignInTime, true) }}
-							</p>
 						</div>
 					</div>
 				</hk-card>

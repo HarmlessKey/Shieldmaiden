@@ -4,7 +4,7 @@ import { browserDetect } from '../../functions';
 export default {
 	state: () => ({
 		initialized: false,
-		theme: undefined,
+		theme: "dark",
 		slide: {},
 		rolls: [],
 		action_rolls: [],

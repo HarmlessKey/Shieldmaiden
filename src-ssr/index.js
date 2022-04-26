@@ -24,9 +24,10 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'", '*.harmlesskey.com'],
       scriptSrc:  ["'self'", '*.harmlesskey.com', 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com'],
-      styleSrc:   ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com'],
-      fontSrc:    ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com'],
-      imgSrc:     ['*'],
+      styleSrc:   ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com', 'fonts.googleapis.com'],
+      fontSrc:    ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com', 'fonts.gstatic.com'],
+      imgSrc:     ["'self'", '*', 'data:'],
+      connectSrc: ["'self'", '*.harmlesskey.com', '*.google-analytics.com'],
       blockAllMixedContent: [] // Compliant
     },
     reportOnly: true,

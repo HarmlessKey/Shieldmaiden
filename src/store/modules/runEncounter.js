@@ -984,35 +984,41 @@ const run_encounter_actions = {
 
 			// Set NPCs with 0 hp as down
 			if (e.curHp <= 0 && e.entityType === "npc") {
-				await dispatch("encounters/set_entity_prop", { 
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					property: "down",
-					value: true
-				}, { root: true });
+				if(!state.demo) {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "down",
+						value: true
+					}, { root: true });
+				}
 				commit("SET_ENTITY_PROPERTY", { key, prop: "down", value: true });
 			}
 			// If an entity has more than 0 hp, but is marked as down, remove the down mark
 			if (e.curHp > 0 && e.down) {
-				await dispatch("encounters/set_entity_prop", { 
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					property: "down",
-					value: null
-				}, { root: true });
+				if(!state.demo) {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "down",
+						value: null
+					}, { root: true });
+				}
 				commit("SET_ENTITY_PROPERTY", { key, prop: "down", value: false});
 			}
 			// Check if the entity is not yet active, but needs to be added in the new round
 			if(e.addNextRound) {
-				await dispatch("encounters/set_entity_prop", { 
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					property: "active",
-					value: true
-				}, { root: true });
+				if(!state.demo) {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "active",
+						value: true
+					}, { root: true });
+				}
 				commit("SET_ENTITY_PROPERTY", {key, prop: "active", value: true});
 				commit("DELETE_ENTITY_PROPERTY", {key, prop: "addNextRound"});
 			}

@@ -12,20 +12,20 @@
  */
 
 const express = require('express')
-const helmet = require("helmet")
-const cors = require('cors');
+// const helmet = require("helmet")
+// const cors = require('cors');
 const compression = require('compression')
 
 const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()
 
-// Allow CORS
-const cors_options = {
-  origin: "https://dndcombat-71e41.firebaseio.com/",
-  optionsSuccessStatus: 200
-}
-app.use(cors(cors_options))
+// // Allow CORS
+// const cors_options = {
+//   origin: "https://dndcombat-71e41.firebaseio.com/",
+//   optionsSuccessStatus: 200
+// }
+// app.use(cors(cors_options))
 
 // Use Helmet middleware to prevent common attack vectors.
 // app.use(helmet({

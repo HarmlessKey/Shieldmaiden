@@ -13,17 +13,22 @@
 
 const express = require('express')
 const helmet = require("helmet")
+const cors = require('cors');
 const compression = require('compression')
 
 const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()
+
+// Allow CORS
+app.use(cors())
+
 // Use Helmet middleware to prevent common attack vectors.
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com', "'unsafe-inline'"],
+      scriptSrc:  ["'self'", 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com', "'unsafe-inline'", "'unsafe-eval'"],
       styleSrc:   ["'self'", 'pro.fontawesome.com', 'fonts.googleapis.com', "'unsafe-inline'"],
       fontSrc:    ["'self'", 'pro.fontawesome.com', 'fonts.gstatic.com'],
       imgSrc:     ["'self'", '*', 'data:'],

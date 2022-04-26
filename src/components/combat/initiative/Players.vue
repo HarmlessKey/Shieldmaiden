@@ -63,12 +63,15 @@
 </script>
 
 <style lang="scss" scoped>
-	ul.entities li {
-		padding-right: 3px;
-		
-		.actions {
-			align-items: center;
-			padding: 0;
+	ul.entities {
+		margin: 0;
+		li {
+			padding-right: 3px;
+			
+			.actions {
+				align-items: center;
+				padding: 0;
+			}
 		}
 	}
 </style>

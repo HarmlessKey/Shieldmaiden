@@ -1491,18 +1491,20 @@ const run_encounter_actions = {
 		// Add a new reminder
 		if(action === 'add') {
 			if(type === 'premade') {
-				await dispatch(
-					"encounters/set_reminder", 
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						reminder,
-					}, 
-					{ root: true }
-				);
-				commit("SET_REMINDER", {entityKey: entity, key, reminder});
+				if(!state.demo) {
+					await dispatch(
+						"encounters/set_reminder", 
+						{
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entity,
+							key,
+							reminder,
+						}, 
+						{ root: true }
+					);
+				}
+				commit("SET_REMINDER", { entityKey: entity, key, reminder });
 			}
 			if(type === 'custom') {
 				if(!state.demo) {

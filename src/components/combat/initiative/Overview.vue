@@ -36,7 +36,7 @@
 				</template>
 				<div class="overview-item">
 					<div class="name truncate">{{ entity.name.capitalizeEach() }}</div>
-					<b class="blue initiative">{{ entity.initiative }}</b>
+					<strong class="blue initiative">{{ entity.initiative }}</strong>
 				</div>
 				<div class="actions">
 					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
@@ -59,7 +59,7 @@
 							Set hidden
 						</q-tooltip>
 					</a>
-					<a v-else class="btn btn-sm bg-neutral-5 mr-1" @click="set_hidden({key: entity.key, hidden: false})">
+					<a v-else class="btn btn-sm bg-neutral-5" @click="set_hidden({key: entity.key, hidden: false})">
 						<i aria-hidden="true" class="fas fa-eye"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Unhide
@@ -94,7 +94,7 @@
 					<span>{{ entity.initiative }}</span>
 				</span>
 				<div class="actions">
-					<a @click="set_active({key: entity.key, active: true})">
+					<a class="btn btn-sm bg-neutral-5" @click="set_active({key: entity.key, active: true})">
 						<i aria-hidden="true" class="fas fa-plus"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set active
@@ -132,7 +132,7 @@
 			setSurprised(entity_key, value) {
 				const reminder = this.premade.surprised;
 				delete reminder['.key'];
-				let action = value ? 'add' : 'remove';
+				const action = value ? 'add' : 'remove';
 
 				this.set_targetReminder({
 					action: action,
@@ -140,21 +140,25 @@
 					key: 'surprised',
 					reminder: reminder,
 					type: 'premade',
-				})
+				});
 			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	ul.entities li {
-		padding-right: 3px;
+	ul.entities {
+		margin-top: 0;
 
-		.actions {
-			align-items: center;
+		li {
+			padding-right: 3px;
 
-			a {
-				margin-left: 5px;
+			.actions {
+				align-items: center;
+
+				a {
+					margin-left: 5px;
+				}
 			}
 		}
 	}

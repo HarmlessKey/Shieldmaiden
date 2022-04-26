@@ -23,7 +23,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'", '*.harmlesskey.com'],
-      scriptSrc:  ["'self'", '*.harmlesskey.com', 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com'],
+      scriptSrc:  ["'self'", '*.harmlesskey.com', 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com', 'sha512-B8ruywf8mKA4fm0K8SrrNhO5DTokuipFEo7rEnI0RVTt9p29MJKfg8TfOVwMAFZxgI+zOF4iwOA/ByvyJ/sslw==', 'sha512-jrMOSezfLmrgTWzx0L5f490NCRT8V7Tx9EeGvgeyjq/TZU5O+IMmUUPDO/WuKb6F8yCp1cBq8gZeg/Gm40rOfg=='],
       styleSrc:   ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com', 'fonts.googleapis.com'],
       fontSrc:    ["'self'", '*.harmlesskey.com', 'pro.fontawesome.com', 'fonts.gstatic.com'],
       imgSrc:     ["'self'", '*', 'data:'],

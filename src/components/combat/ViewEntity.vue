@@ -5,33 +5,33 @@
 				{{ entity.name.capitalizeEach() }}
 				<small v-if="entity.source">{{ entity.source }}</small>
 			</h2>
-			<i>
+			<em>
 				<template v-if="entity.size">{{ entity.size }}</template>
 				<template v-if="entity.type"> {{ entity.type }}</template>
 				<span v-if="entity.subtype">({{ entity.subtype }})</span>
 				<template v-if="entity.alignment">, {{ entity.alignment }}</template>
-			</i>
+			</em>
 			<hr>
 			<p>
 				<template v-if="entity.entityType === 'player'">
-					<b>Level</b>: 
+					<strong>Level</strong>: 
 					<span> {{ entity.level || calculatedLevel(entity.experience) }}</span><br/>
 				</template>
-				<b>Armor Class</b>: 
+				<strong>Armor Class</strong>: 
 				<span> {{ entity.armor_class ? entity.armor_class : entity.ac }}</span><br/>
 				<template>
-					<b>Hit Points</b>: 
+					<strong>Hit Points</strong>: 
 					<span> {{ entity.hit_points ? entity.hit_points : entity.maxHp }}</span>
 				</template>
 				<template v-if="entity.hit_dice"> {{ entity.hit_dice ? `(${hitDiceStr(data)})` : '' }}</template>
 				<template v-if="entity.old || entity.entityType === 'player'">
 					<template v-if="entity.speed">
-						<br/><b>Speed</b>: 
+						<br/><strong>Speed</strong>: 
 						<span> {{ entity.speed }}</span>
 					</template>
 				</template>
 				<template v-else>
-					<br/><b>Speed</b>: {{ entity.walk_speed ? entity.walk_speed : 0 }} ft.{{ 
+					<br/><strong>Speed</strong>: {{ entity.walk_speed ? entity.walk_speed : 0 }} ft.{{ 
 						entity.swim_speed ? `, swim ${entity.swim_speed} ft.` : `` 
 					}}{{ 
 						entity.fly_speed ? `, fly ${entity.fly_speed} ft.` : `` 
@@ -72,7 +72,7 @@
 
 			<p v-if="!entity.old && entity.entityType !== 'player'">
 				<template v-if="entity.saving_throws">
-					<b>Saving Throws </b>
+					<strong>Saving Throws </strong>
 					<span class="saves">
 						<hk-roll 
 							tooltip="Roll save" 
@@ -131,19 +131,19 @@
 					</span>
 				</template>
 				<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
-					<b>Damage vulnerabilities</b> {{ entity.damage_vulnerabilities.join(", ") }}<br/>
+					<strong>Damage vulnerabilities</strong> {{ entity.damage_vulnerabilities.join(", ") }}<br/>
 				</template>
 				<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
-					<b>Damage resistances</b> {{ entity.damage_resistances.join(", ") }}<br/>
+					<strong>Damage resistances</strong> {{ entity.damage_resistances.join(", ") }}<br/>
 				</template>
 				<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
-					<b>Damage immunities</b> {{ entity.damage_immunities.join(", ") }}<br/>
+					<strong>Damage immunities</strong> {{ entity.damage_immunities.join(", ") }}<br/>
 				</template>
 				<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
-					<b>Condition immunities</b> {{ entity.condition_immunities.join(", ") }}<br/>
+					<strong>Condition immunities</strong> {{ entity.condition_immunities.join(", ") }}<br/>
 				</template>
 
-				<b>Senses</b> 
+				<strong>Senses</strong> 
 				<template v-if="entity.senses">
 					<span v-for="(sense, key) in entity.senses" :key="key">
 						{{ key }} {{ sense.range ? `${sense.range} ft.` : `` }}{{ 
@@ -153,9 +153,9 @@
 				</template>
 				passive Perception {{ passivePerception() }}<br/>
 
-				<template v-if="entity.languages && entity.languages.length > 0"><b>Languages</b> {{ entity.languages.join(", ") }}<br/></template>
+				<template v-if="entity.languages && entity.languages.length > 0"><strong>Languages</strong> {{ entity.languages.join(", ") }}<br/></template>
 				<template v-if="entity.challenge_rating">
-					<b>Challenge Rating</b> {{ entity.challenge_rating }} 
+					<strong>Challenge Rating</strong> {{ entity.challenge_rating }} 
 					({{ monster_challenge_rating[entity.challenge_rating].xp | numeral('0,0') }} XP)<br/>
 				</template>
 			</p>
@@ -538,6 +538,7 @@
 		data() {
 			return {
 				is_small: false,
+				width: 0,
 				is_current: this.current,
 				actions: [
 					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
@@ -603,7 +604,7 @@
 			]),
 			setSize(size) {
 				let width = size.width
-				let small = 300;
+				let small = 310;
 
 				this.is_small = (width <= small) ? true : false;
 
@@ -787,8 +788,9 @@ a {
 
 
 	.playerSkill {
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr max-content;
+		column-gap: 5px;
 		cursor: pointer;
 
 		&:hover {

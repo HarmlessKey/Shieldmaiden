@@ -37,7 +37,7 @@ app.use(helmet({
       fontSrc:    ["'self'", 'pro.fontawesome.com', 'fonts.gstatic.com'],
       imgSrc:     ["'self'", '*', 'data:'],
       frameSrc:   ["'self'", 'https://harmlesskey.firebaseapp.com'],
-      connectSrc: ["'self'", '*.google-analytics.com', 'https://api.harmlesskey.com', '*.firebaseio.com', 'www.googleapis.com'],
+      connectSrc: ["'self'", '*.google-analytics.com', 'https://api.harmlesskey.com', 'wss://*.firebaseio.com', 'www.googleapis.com'],
       workerSrc:  ["'self'"],
       blockAllMixedContent: [] // Compliant
     },

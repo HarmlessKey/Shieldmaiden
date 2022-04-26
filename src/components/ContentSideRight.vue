@@ -73,7 +73,14 @@
     <hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
       <div slot="header" class="card-header">
         Subscription
-        <b>{{ tier.name }}</b>
+        <hk-popover 
+          v-if="pending_payment"
+          header="Pending"
+          content="Your Patreon payment is pending, this might take a few minutes." 
+        >
+          Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
+        </hk-popover>
+        <strong v-else>{{ tier.name }}</strong>
       </div>
       <q-linear-progress 
         v-if="tier.name !== 'Deity'"
@@ -143,9 +150,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["user", "tier", "slots_used"]),
+    ...mapGetters(["user", "tier", "slots_used", "userInfo"]),
     filtered_content() {
       return this.content.filter(item => item.value !== this.page);
+    },
+    pending_payment() {
+      return this.userInfo && this.userInfo.patron && this.userInfo.patron.last_charge_status === "Pending";
     }
   },
   methods: {

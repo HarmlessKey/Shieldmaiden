@@ -101,11 +101,8 @@ export default async ({ router, Vue }) => {
         // Check if value is spotify URI
         const spotify_expr  = /^spotify:.+/gi;
         const spotify_regex = new RegExp(spotify_expr);
-        if (value.match(spotify_regex)) {
-          return true;
-        }
-
-        return false;
+        
+        return value.match(spotify_regex);
       } return false;
     },
     message: '{_field_} must be a valid URL or URI',

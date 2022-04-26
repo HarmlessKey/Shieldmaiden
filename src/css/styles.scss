@@ -794,6 +794,10 @@ html body {
 		}
 	}
 
+	.spin {
+		animation: spinner 1s ease infinite;
+	}
+
 	.live {
 		font-family: 'Open Sans', sans-serif;
 		user-select: none;

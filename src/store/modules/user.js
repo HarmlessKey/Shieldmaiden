@@ -105,24 +105,29 @@ const user_actions = {
 								const pledge_end = new Date(patron_data.pledge_end).toISOString();
 
 								// Compare patron tiers to find highest tier checking order in FB
-								const patron_tierlist = Object.keys(patron_data.tiers);
-								
 								let highest_order = 0;
 								let highest_tier = "basic";
-								if (patron_tierlist.length > 1) {
-									for (let i in patron_tierlist) {
-										let tier_id = patron_tierlist[i]
-										// SMART AWAIT ASYNC CONSTRUCTION #bless Key
-										await tiers_ref.child(tier_id).once("value", tier_snapshot => {
-											let tier_order = tier_snapshot.val().order
-											if (tier_order > highest_order) {
-												highest_order = tier_order;
-												highest_tier = tier_id;
-											}
-										})
+
+								// When the last_charge_status = Pending a user won't have a Patreon tier yet
+								// Just hand out free tier for pending status
+								if(patron_data.tiers) {
+									const patron_tierlist = Object.keys(patron_data.tiers);
+									
+									if (patron_tierlist.length > 1) {
+										for (let i in patron_tierlist) {
+											let tier_id = patron_tierlist[i]
+											// SMART AWAIT ASYNC CONSTRUCTION #bless Key
+											await tiers_ref.child(tier_id).once("value", tier_snapshot => {
+												let tier_order = tier_snapshot.val().order
+												if (tier_order > highest_order) {
+													highest_order = tier_order;
+													highest_tier = tier_id;
+												}
+											})
+										}
+									} else {
+										highest_tier = patron_tierlist[0];
 									}
-								} else {
-									highest_tier = patron_tierlist[0];
 								}
 
 								//Get tier info

@@ -2,7 +2,6 @@
 	<div id="q-app" @click="setSideSmallScreen(false)">
 		<div>
 			<nav-main :maintenance="maintenance" />
-			<PaymentDeclined v-if="user !== null" />
 			<div class="offline" v-if="connection === 'offline'"><i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
 			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar 
@@ -93,7 +92,6 @@
 	import Header from './components/Header.vue';
 	import Sidebar from './components/Sidebar.vue';
 	import Slide from './components/Slide.vue';
-	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
 	import HkRolls from './components/hk-components/hk-rolls';
 	import { general } from './mixins/general';
@@ -109,7 +107,6 @@
 		navMain: Header,
 		Sidebar,
 		Slide,
-		PaymentDeclined,
 		HkRolls,
 		Home
 	},

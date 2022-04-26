@@ -2,6 +2,7 @@
 	<div class="hk-layout">
 		<div class="content">
 			<Crumble />
+			<PaymentDeclined />
 			<OverEncumbered v-if="show_overencumbered" />
 			<div class="row q-col-gutter-md">		
 				<div class="col-12" :class="{ 'col-md-9': width > 978 &&  $route.meta.side !== false }">
@@ -23,6 +24,7 @@
 	import Crumble from "src/components/crumble";
 	import ContentSideRight from "src/components/ContentSideRight";
 	import OverEncumbered from "src/components/userContent/OverEncumbered";
+	import PaymentDeclined from 'src/components/PaymentDeclined.vue';
 
 	export default {
 		name: "AuthenticatedLayout",
@@ -30,7 +32,8 @@
 			Crumble,
 			Footer,
 			ContentSideRight,
-			OverEncumbered
+			OverEncumbered,
+			PaymentDeclined
 		},
 		preFetch({ store, redirect }) {
       if(!store.getters.user) {

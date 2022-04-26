@@ -367,8 +367,8 @@ export const setHP = {
 			let currentAmount = await targetMeters.once('value').then(function(snapshot) {
 				return snapshot.val()
 			})
-			if(currentAmount === null) { currentAmount = 0; } //if there is no healing done/taken yet
-			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
+			if(currentAmount === null) { currentAmount = 0; } // if there is no healing done/taken yet
+			let newAmount = parseInt(currentAmount) + parseInt(amount); // calculate the new amount
 
 			//Set the new amount
 			await db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`).set(newAmount.positive());

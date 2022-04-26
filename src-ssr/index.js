@@ -23,8 +23,8 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com', 'unsafe-inline'],
-      styleSrc:   ["'self'", 'pro.fontawesome.com', 'fonts.googleapis.com', 'unsafe-inline'],
+      scriptSrc:  ["'self'", 'cdnjs.cloudflare.com', '*.google-analytics.com', '*.firebaseio.com', "'unsafe-inline'"],
+      styleSrc:   ["'self'", 'pro.fontawesome.com', 'fonts.googleapis.com', "'unsafe-inline'"],
       fontSrc:    ["'self'", 'pro.fontawesome.com', 'fonts.gstatic.com'],
       imgSrc:     ["'self'", '*', 'data:'],
       connectSrc: ["'self'", '*.google-analytics.com'],

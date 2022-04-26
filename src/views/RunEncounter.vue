@@ -1,5 +1,5 @@
 <template>
-	<div v-if="!loading">
+	<div v-if="encounter_initialized">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>

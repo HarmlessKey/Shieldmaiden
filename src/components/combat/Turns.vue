@@ -7,7 +7,7 @@
 					<q-list class="bg-neutral-8">
 						<q-item>
 							<q-item-section>
-								<b>{{ encounter.name }}</b>
+								<strong>{{ encounter.name }}</strong>
 							</q-item-section>
 						</q-item>
 						<q-separator />
@@ -41,7 +41,7 @@
 							<q-item-section avatar><i aria-hidden="true" class="fas fa-desktop"></i></q-item-section>
 							<q-item-section>Public initiatve settings</q-item-section>
 						</q-item>
-						<q-item clickable v-close-popup v-if="demo" @click="reload">
+						<q-item clickable v-close-popup v-if="demo" @click="reset_demo()">
 							<q-item-section avatar><i aria-hidden="true" class="far fa-sync-alt"></i></q-item-section>
 							<q-item-section>Reset encounter</q-item-section>
 						</q-item>
@@ -195,11 +195,9 @@
 				"update_round",
 				"set_targeted",
 				"setSlide",
-				"set_finished"
+				"set_finished",
+				"reset_demo"
 			]),
-			reload() {
-				this.$router.go();
-			},
 			startEncounter() {
 				this.set_turn({turn: 0, round: 1});
 				this.checkReminders(this.next, "startTurn");

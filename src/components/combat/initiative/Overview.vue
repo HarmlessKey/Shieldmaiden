@@ -115,11 +115,6 @@
 		name: 'SetInitiativeNPC',
 		mixins: [general, remindersMixin],
 		props: ['active', 'idle'],
-		data () {
-			return {
-
-			}
-		},
 		methods: {
 			...mapActions([
 				'set_active',

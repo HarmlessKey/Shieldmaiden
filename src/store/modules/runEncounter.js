@@ -214,7 +214,7 @@ const run_encounter_actions = {
 				}
 			} 
 			else {
-				commit('SET_ENCOUNTER', demoEncounter);
+				commit('SET_ENCOUNTER', {...demoEncounter});
 				for (let key in demoEncounter.entities) {
 					await dispatch("add_entity", key);
 				}
@@ -224,6 +224,12 @@ const run_encounter_actions = {
 		} finally {
 			commit('INITIALIZED');
 		}
+	},
+
+	async reset_demo({ commit, dispatch }) {
+		commit("UNINITIALIZED");
+		await dispatch("reset_store");
+		await dispatch("init_Encounter", { cid: null, eid: null, demo: true });
 	},
 
 	async add_entity({ state, commit, rootGetters, dispatch }, key) {
@@ -1653,7 +1659,15 @@ const run_encounter_actions = {
 		);
 		commit("REMOVE_LIMITED_USES", {key, category, index});
 	},
-	reset_store({ commit }) { commit("RESET_STORE"); },
+	reset_store({ commit }) { 
+		commit("RESET_STORE");
+
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve()
+			}, 1000)
+		});
+	},
 }
 
 const run_encounter_mutations = {

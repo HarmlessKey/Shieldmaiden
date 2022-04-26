@@ -91,15 +91,16 @@ export default {
 			
 			// If no theme is specified, it's called from initialize() so set it to the previously choosen theme if it exists, or dark otherwise.
 			if(!theme) {
+				theme = "dark";
 				if(process.browser) {
 					if(uid && rootGetters.userSettings) {
-						theme = (rootGetters.userSettings.general && rootGetters.userSettings.general.theme) ? rootGetters.userSettings.general.theme : "dark";
+						theme = (rootGetters.userSettings.general && rootGetters.userSettings.general.theme) ? rootGetters.userSettings.general.theme : theme;
 					} else {
-						theme = (localStorage.getItem("theme")) ? localStorage.getItem("theme") : "dark";
+						theme = (localStorage.getItem("theme")) ? localStorage.getItem("theme") : theme;
 					}
 					document.documentElement.setAttribute("data-theme", theme);
-					commit("SET_THEME", theme);
 				}
+				commit("SET_THEME", theme);
 			} 
 			// Set the new choosen theme
 			else {

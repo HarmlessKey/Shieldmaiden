@@ -21,7 +21,11 @@ const extension = require('./extension')
 const app = express()
 
 // Allow CORS
-app.use(cors())
+cors_options = {
+  origin: "https://dndcombat-71e41.firebaseio.com/",
+  optionsSuccessStatus: 200
+}
+app.use(cors(cors_options))
 
 // Use Helmet middleware to prevent common attack vectors.
 app.use(helmet({
@@ -32,7 +36,7 @@ app.use(helmet({
       styleSrc:   ["'self'", 'pro.fontawesome.com', 'fonts.googleapis.com', "'unsafe-inline'"],
       fontSrc:    ["'self'", 'pro.fontawesome.com', 'fonts.gstatic.com'],
       imgSrc:     ["'self'", '*', 'data:'],
-      connectSrc: ["'self'", '*.google-analytics.com'],
+      connectSrc: ["'self'", '*.google-analytics.com', 'https://api.harmlesskey.com', '*.firebaseio.com'],
       workerSrc:  ["'self'"],
       blockAllMixedContent: [] // Compliant
     },

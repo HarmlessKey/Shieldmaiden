@@ -29,21 +29,21 @@ app.use(cors(cors_options))
 
 // Use Helmet middleware to prevent common attack vectors.
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'cdnjs.cloudflare.com', '*.google-analytics.com', 'apis.google.com', '*.firebaseio.com'],
-      styleSrc:   ["'self'", "'unsafe-inline'", 'pro.fontawesome.com', 'fonts.googleapis.com'],
-      fontSrc:    ["'self'", 'pro.fontawesome.com', 'fonts.gstatic.com'],
-      imgSrc:     ["'self'", '*', 'data:'],
-      frameSrc:   ["'self'", 'https://harmlesskey.firebaseapp.com'],
-      connectSrc: ["'self'", '*.google-analytics.com', 'https://api.harmlesskey.com', 'wss://*.firebaseio.com', 'www.googleapis.com'],
-      workerSrc:  ["'self'"],
-      blockAllMixedContent: [] // Compliant
-    },
-    reportOnly: true,
-  }
-  // contentSecurityPolicy: false,
+  // contentSecurityPolicy: {
+  //   directives: {
+  //     defaultSrc: ["'self'"],
+  //     scriptSrc:  ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'cdnjs.cloudflare.com', '*.google-analytics.com', 'apis.google.com', '*.firebaseio.com'],
+  //     styleSrc:   ["'self'", "'unsafe-inline'", 'pro.fontawesome.com', 'fonts.googleapis.com'],
+  //     fontSrc:    ["'self'", 'pro.fontawesome.com', 'fonts.gstatic.com'],
+  //     imgSrc:     ["'self'", '*', 'data:'],
+  //     frameSrc:   ["'self'", 'https://harmlesskey.firebaseapp.com'],
+  //     connectSrc: ["'self'", '*.google-analytics.com', 'https://api.harmlesskey.com', 'wss://*.firebaseio.com', 'www.googleapis.com'],
+  //     workerSrc:  ["'self'"],
+  //     blockAllMixedContent: [] // Compliant
+  //   },
+  //   reportOnly: true,
+  // }
+  contentSecurityPolicy: false,
 }));
 
 const port = process.env.PORT || 3000

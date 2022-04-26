@@ -40,7 +40,7 @@ const item_getters = {
 
 const item_actions = {
 	async get_item_services({ getters, commit }) {
-		if (getters.item_services === null) {
+		if (getters.item_services === null || !Object.keys(getters.item_services).length) {
 			commit("SET_ITEM_SERVICES", new itemServices);
 		}
 		return getters.item_services;

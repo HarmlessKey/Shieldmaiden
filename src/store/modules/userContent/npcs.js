@@ -42,7 +42,7 @@ const npc_getters = {
 
 const npc_actions = {
   async get_npc_services({ getters, commit }) {
-    if(getters.npc_services === null) {
+    if(getters.npc_services === null || !Object.keys(getters.npc_services).length) {
       commit("SET_NPC_SERVICES", new npcServices);
     }
     return getters.npc_services;

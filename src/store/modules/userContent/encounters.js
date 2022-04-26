@@ -47,7 +47,7 @@ const encounter_getters = {
 
 const encounter_actions = {
   async get_encounter_services({ getters, commit }) {
-    if(getters.encounter_services === null) {
+    if(getters.encounter_services === null || !Object.keys(getters.encounter_services).length) {
       commit("SET_ENCOUNTER_SERVICES", new encounterServices);
     }
     return getters.encounter_services;

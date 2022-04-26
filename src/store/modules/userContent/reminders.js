@@ -39,7 +39,7 @@ const reminder_getters = {
 
 const reminder_actions = {
 	async get_reminder_services({ getters, commit }) {
-		if (getters.reminder_services === null) {
+		if (getters.reminder_services === null || !Object.keys(getters.reminder_services).length) {
 			commit("SET_REMINDER_SERVICES", new reminderServices);
 		}
 		return getters.reminder_services;

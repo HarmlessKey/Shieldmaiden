@@ -51,7 +51,7 @@ const player_getters = {
 
 const player_actions = {
   async get_player_services({ getters, commit }) {
-    if(getters.player_services === null) {
+    if(getters.player_services === null || !Object.keys(getters.player_services).length) {
       commit("SET_PLAYER_SERVICES", new playerServices);
     }
     return getters.player_services;

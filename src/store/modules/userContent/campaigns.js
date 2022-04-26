@@ -42,13 +42,15 @@ const campaign_getters = {
     } , 'asc')
     .value();
   },
-  campaign_count: (state) => { return state.campaign_count; },
+  campaign_count: (state) => { 
+    return state.campaign_count; 
+  },
   campaign_services: (state) => { return state.campaign_services; }
 };
 
 const campaign_actions = {
   async get_campaign_services({ getters, commit }) {
-    if(getters.campaign_services === null) {
+    if(getters.campaign_services === null || !Object.keys(getters.campaign_services).length) {
       commit("SET_CAMPAIGN_SERVICES", new campaignServices);
     }
     return getters.campaign_services;
@@ -61,7 +63,7 @@ const campaign_actions = {
    async get_campaigns({ state, rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let campaigns = (state.campaigns) ? state.campaigns : undefined;
-
+    
     if(!campaigns && uid) {
       const services = await dispatch("get_campaign_services");
       try {

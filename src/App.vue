@@ -274,6 +274,7 @@
 
 		await store.dispatch("setUser", transformed_user);
 		await store.dispatch("setUserInfo");
+		await store.dispatch("initialize");
 	},
 	async mounted() {
 		auth.onAuthStateChanged(user => {
@@ -287,7 +288,7 @@
 			}
 		});
 
-		await this.initialize();
+		// await this.initialize();
 
 		const cookies = document.cookie.split(';');
 

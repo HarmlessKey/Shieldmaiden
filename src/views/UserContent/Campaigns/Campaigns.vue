@@ -367,7 +367,7 @@
 						width: 100%;
 						display: block;
 						color:$neutral-1 !important;
-						text-shadow: 5px 5px 5pxrgba(0, 0, 0, .5);
+						text-shadow: 5px 5px 5px rgba(0, 0, 0, .5);
 	
 						&:hover {
 							text-decoration: none;

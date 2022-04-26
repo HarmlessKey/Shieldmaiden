@@ -175,7 +175,7 @@
 			RollForInitiative,
 			Shares: () => import('../Shares'),
 			Rewards: () => import('./Rewards'),
-			Weather: () => import('@/components/weather')
+			Weather: () => import('src/components/weather')
 		},
 		props: [
 			"encounter", 

@@ -282,7 +282,7 @@
 					</p>
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
 						<!-- Checks for type and rolls on index 0 so later more actions can be grouped under one ability -->
-						<template v-if="ability.action_list && ability.action_list[0] && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
+						<template v-if="ability.action_list && ability.action_list[0] && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls && ability.action_list[0].rolls.length">
 							<span v-if="ability.versatile" class="roll-button" @click.stop>
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 									<div class="bg-neutral-8">

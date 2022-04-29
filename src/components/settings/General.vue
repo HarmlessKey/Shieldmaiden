@@ -28,8 +28,10 @@
 						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
 					<q-item-section class="neutral-2 truncate">
-						<q-item-label>{{ setting.name }}</q-item-label>
-						<q-item-label caption>
+						<q-item-label class="truncate">
+							{{ setting.name }}
+						</q-item-label>
+						<q-item-label caption class="truncate">
 							{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
 						</q-item-label>
 					</q-item-section>
@@ -116,7 +118,7 @@
 							},
 							{ 
 								key: 'passive_investigation',
-								name: 'Passive Invastigation', 
+								name: 'Passive Investigation', 
 								icon: 'fas fa-search',
 								info: 'Show passive investigation in the player overview.',
 								options: [
@@ -202,6 +204,9 @@
 		.q-item {
 			width: 100%;
 		}
+	}
+	.q-item.no-wrap {
+		flex-wrap: wrap;
 	}
 	.theme {
 		display: flex;

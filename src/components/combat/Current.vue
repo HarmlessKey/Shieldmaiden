@@ -12,7 +12,13 @@
 				</q-tooltip>
 			</a>
 		</h2>
-		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
+		<q-scroll-area 
+			:dark="$store.getters.theme === 'dark'" 
+			:thumb-style="{ width: '5px'}" 
+			v-on:scroll="shadow()" 
+			ref="scroll"
+			:content-style="{ width: '100%'}"
+		> 
 			<div class="current">
 				<DeathSaves 
 					v-if="(current.entityType === 'player' || current.entityType === 'companion')" 
@@ -32,7 +38,7 @@
 			</div>
 
 			<div v-else class="px-3 py-3">
-				<Actions :current="current" :settings="settings" />
+				<Actions :current="current" />
 			</div>
 		</q-scroll-area>
 	</div>

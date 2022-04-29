@@ -1,14 +1,14 @@
 <template>
 	<div>
-		<h1 class="mb-3 d-flex justify-content-between">
+		<h1 class="mb-3 d-flex justify-content-between items-center">
 			{{ campaign.name }}
-			<span 
+			<div 
 				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId } })" 
-				class="live" 
+				class="live pointer" 
 				:class="{'active': broadcast.live === campaignId }"
 			>
 				{{ broadcast.live === campaignId ? "" : "go" }} live
-			</span>
+			</div>
 		</h1>
 
 		<div class="row q-col-gutter-md">

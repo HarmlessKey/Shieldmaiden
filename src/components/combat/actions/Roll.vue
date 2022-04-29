@@ -358,9 +358,6 @@
 	.q-tab-panel {
 		padding: 15px 0;
 	}
-	.description {
-		white-space: pre-line;
-	}
 	.limited {
 		font-size: 15px;
 		margin-bottom: 5px;

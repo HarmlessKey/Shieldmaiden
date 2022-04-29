@@ -71,7 +71,7 @@
 			<template #content>
 				<p class="mt-2">
 					On desktop<br/>
-					Hold <b>SHIFT</b> to roll with <span class="green">advantage</span>, <b>CTRL</b> for <span class="red">disadvantage</span>.				
+					Hold <strong>SHIFT</strong> to roll with <span class="green">advantage</span>, <strong>CTRL</strong> for <span class="red">disadvantage</span>.				
 				</p>
 				<span>
 					On touch screens<br/>
@@ -94,8 +94,12 @@
 					:key="`tab-${index}`" 
 					:name="name" 
 					:icon="icon"
-					:label="label"
-				/>
+					:label="width > 300 ? label : null"
+				>
+					<q-tooltip v-if="width <= 300" anchor="top middle" self="center middle">
+						{{ label }}
+					</q-tooltip>
+				</q-tab>
 			</q-tabs>
 			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
@@ -107,6 +111,7 @@
 				</q-tab-panel>
 			</q-tab-panels>
 		</template>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -142,7 +147,8 @@
 				tab: "manual",
 				tabs: [{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }],
 				doneBySetter: undefined,
-				settingsSetter: undefined
+				settingsSetter: undefined,
+				width: 0,
 			}
 		},
 		mounted() {
@@ -200,6 +206,9 @@
 			}
 		},
 		methods: {
+			setSize(size) {
+				this.width = size.width;
+			},
 			returnTabs(current) {
 				let tabs = [
 					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }

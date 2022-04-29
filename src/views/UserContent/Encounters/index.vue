@@ -88,6 +88,7 @@
 								<q-table
 									:data="active_encounters"
 									:columns="columns"
+									:visible-columns="visibleColumns"
 									row-key="key"
 									card-class="bg-none"
 									flat
@@ -148,6 +149,7 @@
 									<div slot="no-data" />
 								</q-table>
 							</template>
+							<q-resize-observer @resize="setSize" />
 						</div>
 					</hk-card>
 
@@ -318,6 +320,7 @@
 			return {
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
+				card_width: 0,
 				encounters: {},
 				loading_campaign: true,
 				loading_active: true,
@@ -399,6 +402,11 @@
 				"broadcast"
 			]),
 			...mapGetters("encounters", ["get_encounters", "get_encounter_count"]),
+			visibleColumns() {
+				return (this.card_width > 450) ? 
+					["name", "entities", "round", "turn", "actions"] : 
+					["name", "actions"];
+			},
 			encounter_count() {
 				return this.get_encounter_count(this.campaignId);
 			},
@@ -424,6 +432,9 @@
 				"set_active_campaign"
 			]),
 			...mapActions("players", ["get_player"]),
+			setSize(e) {
+				this.card_width = e.width;
+			},
 			async getFinishedEncounters() {
 				this.loading_finished = true;
 				await this.get_campaign_encounters({ campaignId: this.campaignId, finished: true });

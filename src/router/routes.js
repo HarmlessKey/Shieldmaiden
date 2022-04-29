@@ -615,6 +615,20 @@ const routes = [
 				]
 			},
 			{
+				path: "update-db-keys",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Update db keys"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Update db keys',
+						component: () => import('src/views/Admin/UpdateDBkeys.vue')
+					}
+				]
+			},
+			{
 				path: "restruct-db",
 				component: { render (c) { return c('router-view') }},
 				meta: {

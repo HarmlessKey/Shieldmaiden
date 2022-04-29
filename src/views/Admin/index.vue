@@ -56,6 +56,11 @@
 						url: 'search-table',
 						icon: 'fas fa-print-search',
 					},
+					'update-db-keys': {
+						name: "Update DB keys",
+						url: 'update-db-keys',
+						icon: 'fas fa-key-skeleton',
+					},
 					'restruct-database': {
 						name: "Restructure Database",
 						url: 'restruct-db',

@@ -352,7 +352,7 @@ const user_actions = {
 		await commit("CLEAR_USER", undefined);
 
 		// Sign out from firebase
-		Cookies.remove("access_token")
+		Cookies.remove("access_token");
 		await auth.signOut();
 	}
 };

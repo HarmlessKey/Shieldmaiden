@@ -66,7 +66,7 @@
 			return {
 				is_small: false,
 				showInfo: false,
-				url: window.origin + '/user/' + this.$store.getters.user.uid,
+				url: undefined,
 			}
 		},
 		computed: {
@@ -84,6 +84,9 @@
 				//sets new width on resize
 				this.width = width;
 			},		
+		},
+		mounted() {
+			this.url = window.origin + '/user/' + this.$store.getters.user.uid;
 		}
 	}
 </script>

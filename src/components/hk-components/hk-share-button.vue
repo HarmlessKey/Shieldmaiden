@@ -43,7 +43,7 @@ export default {
 	},
 	data() {
 		return {
-			link: this.url || `${window.origin}${this.$route.path}`
+			link: this.url
 		}
 	},
 	computed: {
@@ -84,6 +84,11 @@ export default {
 				.catch((error) => console.log('Error sharing', error));
 			}
 		},
+	},
+	mounted() {
+		if(!this.url) {
+			this.link = `${window.origin}${this.$route.path}`;
+		}
 	}
 }
 </script>

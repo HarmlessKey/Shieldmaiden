@@ -1,5 +1,5 @@
 <template>
-	<div v-if="!loadingCampaigns">
+	<div>
 		<div class="content">
 			<div class="top">
 				<span>
@@ -16,7 +16,7 @@
 								Campaigns
 							</span>
 						</div>
-						<div class="card-body">
+						<div class="card-body" v-if="!loadingCampaigns">
 							<!-- CAMPAIGNS -->
 							<div v-if="campaigns" class="row q-col-gutter-md">
 								<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign['.key']">
@@ -43,17 +43,15 @@
 											
 											<!-- SHOW PLAYERS -->
 											<div v-if="campaign.players" class="players">
-												<div 
-													v-for="(player, key) in campaign.players" 
-													:key="key"
-													class="img"
-												>
-													<div v-if="player && player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-													<i aria-hidden="true" v-else class="hki-player" />
-													<q-tooltip anchor="top middle" self="center middle">
-														{{ player.character_name }}
-													</q-tooltip>
-												</div>
+												<template v-for="(player, key) in campaign.players">
+													<div v-if="player" :key="key" class="img">
+														<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+														<i aria-hidden="true" v-else class="hki-player" />
+														<q-tooltip anchor="top middle" self="center middle">
+															{{ player.character_name }}
+														</q-tooltip>
+													</div>
+												</template>
 											</div>
 											
 											<h2 class="truncate" :class="{ 'no-players': !campaign.players }">		
@@ -74,6 +72,7 @@
 								<p>This user has no public campaigns.</p>
 							</div>
 						</div>
+						<hk-loader v-else />
 					</hk-card>
 				</div>
 				<div class="col-12 col-md-3">
@@ -82,7 +81,6 @@
 			</div>
 		</div>
 	</div>
-	<hk-loader v-else />
 </template>
 
 <script>

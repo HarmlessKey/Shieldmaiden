@@ -38,7 +38,7 @@ const user_getters = {
 
 const user_actions = {
 	async get_user_services({ getters, commit }) {
-		if (getters.user_services === null) {
+		if (getters.user_services === null || !Object.keys(getters.user_services).length) {
 			commit("SET_USER_SERVICES", new userServices);
 		}
 		return getters.user_services;

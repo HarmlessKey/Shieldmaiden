@@ -1,6 +1,6 @@
 <template>
 <div v-if="!loadingCampaigns">
-	<div class="content" v-if="!$route.params.campid">
+	<div class="content">
 		<div class="top">
 			<span>
 				<Follow v-if="user"/>
@@ -81,15 +81,11 @@
 			</div>
     </div>
 	</div>
-
-	<trackCampaign v-else />
-
 </div>
 </template>
 
 <script>
 	import { db } from "src/firebase"
-	import trackCampaign from "src/components/trackCampaign"
 	import { general } from "src/mixins/general.js"
 	import ContentSideRight from "src/components/ContentSideRight";
 
@@ -98,7 +94,6 @@
 	export default {
 		name: "TrackUser",
 		components: {
-			trackCampaign,
 			Follow,
 			ContentSideRight
 		},

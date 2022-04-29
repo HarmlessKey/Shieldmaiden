@@ -890,7 +890,7 @@ const routes = [
 	{
 		path: '/user/:userid/:campid',
 		name: 'Follow campaign',
-		component: User,
+		component: () => import("src/components/trackCampaign"),
 		meta: {
 			basePath: '/user',
 			title: 'Campaign',
@@ -898,10 +898,7 @@ const routes = [
 			description: "Campaign with live initiative list of the encounters with Harmless Key, a Dungeons & Dragons Initiavive Tracker."
 		}
 	},
-	{
-		path: '/track-encounter/:userid',
-		redirect: '/user/:userid',
-	},
+	{ path: '/track-encounter/:userid', redirect: '/user/:userid' },
 	{
 		path: '/offline',
 		name: 'Offline',

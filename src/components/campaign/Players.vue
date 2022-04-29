@@ -12,7 +12,7 @@
 						data: { current: currency }
 					}) : null
 				">
-				<template v-if="money && Object.keys(money).length">
+				<template v-if="currency">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
 							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>

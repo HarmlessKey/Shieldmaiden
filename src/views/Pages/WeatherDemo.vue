@@ -75,7 +75,7 @@
 <style lang="scss" scoped>
 	.weather {
 		overflow: hidden;
-		height: 100%;
+		height: calc(100vh - 50px);
 		width: 100%;
 		position: relative;
 		background-size: cover;

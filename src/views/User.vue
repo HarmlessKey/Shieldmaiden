@@ -118,7 +118,6 @@
 			}
 		},
 		mounted() {
-			console.log("mounted")
 			const campaigns_ref = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
 			campaigns_ref.on('value', async (snapshot) => {
 				let campaigns = snapshot.val();
@@ -134,7 +133,6 @@
 						});
 					}
 				}
-				console.log("campaigns fetched")
 				this.campaigns = campaigns;
 				this.loadingCampaigns = false;
 			});

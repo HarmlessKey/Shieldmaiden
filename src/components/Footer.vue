@@ -86,12 +86,10 @@
 </template>
 
 <script>
-	import { auth } from 'src/firebase.js';
-
 	export default {
 		data() {
 			return {
-				user: auth.currentUser,
+				user: this.$store.getters.user,
 				year: (new Date()).getFullYear(),
 			}
 		},

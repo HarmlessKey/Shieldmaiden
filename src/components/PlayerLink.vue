@@ -66,7 +66,7 @@
 			return {
 				is_small: false,
 				showInfo: false,
-				url: undefined,
+				url: "",
 			}
 		},
 		computed: {

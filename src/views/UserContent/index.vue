@@ -1,50 +1,6 @@
 <template>
 	<div>
-		<q-banner
-			:dark="$store.getters.theme !== 'light'"
-			rounded inline-actions
-			class="mb-3"
-		>
-			Welcome {{ userInfo.username }}
-			<template slot="action">
-				<q-btn 
-					size="sm" 
-					flat padding="sm"
-					color="neutral-2"
-					no-caps 
-					icon="fas fa-cogs" 
-					to="/settings" 
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						Settings
-					</q-tooltip>
-				</q-btn>
-				<q-btn 
-					size="sm" 
-					flat padding="sm"
-					color="neutral-2"
-					no-caps 
-					icon="fas fa-user" 
-					to="/profile" 
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						Profile
-					</q-tooltip>
-				</q-btn>
-				<q-btn 
-					size="sm" 
-					flat padding="sm"
-					color="neutral-2"
-					no-caps 
-					icon="fas fa-sign-out" 
-					@click="signOut" 
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						Sign out
-					</q-tooltip>
-				</q-btn>
-			</template>
-		</q-banner>
+		<user-banner />
 		<!-- Continue Campaign -->
 		<hk-card class="banner">
 			<div 
@@ -150,10 +106,14 @@
 <script>
 	import { mapGetters, mapActions } from "vuex";
 	import { general } from "src/mixins/general.js";
+	import UserBanner from 'src/components/userContent/UserBanner';
 
 	export default {
 		name: "UserContent",
 		mixins: [general],
+  	components: { 
+			UserBanner
+		},
 		data() {
 			return {
 				campaigns: {},
@@ -237,15 +197,8 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				"setSlide",
-				"sign_out"
-			]),
-			...mapActions("campaigns", ["get_campaigns"]),
-			signOut() {
-				this.$router.replace("/");
-				this.sign_out();
-			}
+			...mapActions(["setSlide"]),
+			...mapActions("campaigns", ["get_campaigns"])
 		}
 	}
 </script>

@@ -1,5 +1,5 @@
 import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
-import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num} from "vee-validate/dist/rules";
+import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num, is, email, confirmed} from "vee-validate/dist/rules";
 
 export default async ({ router, Vue }) => {
   Vue.component('ValidationProvider', ValidationProvider);
@@ -33,8 +33,16 @@ export default async ({ router, Vue }) => {
   extend("numeric", numeric);
   extend('alpha_num', {
     ...alpha_num,
-    message: "{_field_} may only contain alpha-numeric characters"
+    message: "{_field_} may only contain alpha-numeric characters."
   });
+
+  extend("email", {
+    ...email,
+    message: "{_field_} must be a valid email address."
+  });
+
+  // Value is same as other field
+  extend("confirmed", confirmed);
 
   // Value must be between 2 numbers
   extend("between", {

@@ -239,7 +239,7 @@
 		]),
 		announcement: {
 			get() {
-				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
+				const announcement = (this.user && !this.announcement_cookie) ? true : false;
 				return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
 			},
 			set(newVal) {
@@ -302,7 +302,7 @@
 			}
 		}
 		
-		if(auth.currentUser !== null){
+		if(this.user){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
 				this.broadcast = snapshot.val();

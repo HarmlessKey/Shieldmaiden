@@ -36,7 +36,7 @@
 							</a>
 						</div>
 						<q-slide-transition>
-							<div v-show="showItem" class="full-item">
+							<div v-if="Object.keys(data.row.full_linked_item).length" v-show="showItem" class="full-item">
 								<ViewItem :data="data.row.full_linked_item"/>
 							</div>
 						</q-slide-transition>

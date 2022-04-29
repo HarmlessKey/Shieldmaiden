@@ -73,7 +73,6 @@ const item_actions = {
         
         commit("SET_CACHED_ITEM", item);
         commit("SET_CACHED_URL", { url: item.url, id: item._id });
-        console.log("fetched item", item)
       } catch(error) {
         throw error;
       }

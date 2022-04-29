@@ -94,14 +94,14 @@
 					items[key]['.key'] = key;
 
 					//Get Linked item
-					let linkedItem = db.ref(`items/${item.linked_item}`)
+					let linkedItem = db.ref(`items/${item.linked_item.key}`)
 					await linkedItem.on('value', (result) => {
 						if(result.val()) {
 							items[key].full_linked_item = result.val();
 						}
 					});
 					//Get Linked item
-					let linkedCustomItem = db.ref(`custom_items/${this.userId}/${item.linked_item}`)
+					let linkedCustomItem = db.ref(`custom_items/${this.userId}/${item.linked_item.key}`)
 					await linkedCustomItem.on('value', (result) => {
 						if(result.val()) {
 							items[key].full_linked_item = result.val();

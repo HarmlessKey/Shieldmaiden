@@ -1,4 +1,4 @@
-import { register } from 'register-service-worker'
+import { register } from 'register-service-worker';
 
 // The ready(), registered(), cached(), updatefound() and updated()
 // events passes a ServiceWorkerRegistration instance in their arguments.
@@ -31,13 +31,14 @@ register(process.env.SERVICE_WORKER_FILE, {
     // Nofitify the user and let them download the new content
     // Notify.create({
     //   message: "New content available.",
-    //   icon: "fas fa-sync",
-    //   color: "primary",
+    //   type: "info",
+    //   icon: "fas fa-arrow-alt-to-bottom",
+    //   color: "neutral-7",
+    //   iconSize: "15px",
     //   position: "top",
     //   timeout: 0,
     //   actions: [
-    //     { label: 'Fetch', color: 'white', handler: () => { registration.waiting.postMessage({ type: "SKIP_WAITING" }); } },
-    //     { label: 'Cancel', color: 'white', handler: () => { /* ... */ } }
+    //     { label: 'Fetch', color: 'white', noCaps: true, size: "md", handler: () => { registration.waiting.postMessage({ type: "SKIP_WAITING" }); } },
     //   ]
     // });
   },

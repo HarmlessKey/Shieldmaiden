@@ -66,7 +66,7 @@
 			<div class="col">
 				<hk-card>
 					<div class="card-header" slot="header">
-						<span><i aria-hidden="true" class="fas fa-link"></i> Public initiative link</span>
+						<i aria-hidden="true" class="fas fa-link"></i> Public initiative link
 					</div>
 					<div class="card-body">
 						<PlayerLink />

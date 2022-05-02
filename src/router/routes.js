@@ -105,7 +105,8 @@ const routes = [
 								component: EditEncounter,
 								meta: {
 									title: 'Edit encounter',
-									description: "Edit your Harmless Key encounter."
+									description: "Edit your Harmless Key encounter.",
+									side: false
 								}
 							},
 						]

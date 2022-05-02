@@ -28,6 +28,14 @@ register(process.env.SERVICE_WORKER_FILE, {
   },
 
   updated (registration) {
+    // Cleares old cash so new content is downloaded
+    caches.keys().then(function(names) {
+      for (let name of names) {
+        console.log("SW Updated. Delete cache", name)
+        caches.delete(name);
+      }
+    });
+
     // Nofitify the user and let them download the new content
     // Notify.create({
     //   message: "New content available.",

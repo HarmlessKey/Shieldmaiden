@@ -3,14 +3,19 @@
 		<h1 class="mb-3 d-flex justify-content-between items-center">
 			{{ campaign.name }}
 			<div 
-				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId } })" 
+				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId, private: campaign.private } })" 
 				class="live pointer" 
-				:class="{'active': broadcast.live === campaignId }"
+				:class="{
+					'active': broadcast.live === campaignId,
+					'disabled': campaign.private
+				}"
 			>
 				{{ broadcast.live === campaignId ? "" : "go" }} live
+				<q-tooltip anchor="center left" self="center right">
+					Private campaign
+				</q-tooltip>
 			</div>
 		</h1>
-
 		<div class="row q-col-gutter-md">
 			<!-- SHOW ENCOUNTERS -->
 			<div class="col-12 col-md-7">
@@ -308,7 +313,6 @@
 
 <script>
 	import Players from "src/components/campaign/Players.vue";
-
 	import { mapGetters, mapActions } from "vuex";
 
 	export default {

@@ -834,6 +834,10 @@ html body {
 				background-color: $red-hover;
 			}
 		}
+		&.disabled {
+			opacity: .8;
+			cursor: not-allowed !important;
+		}
 	}
 
 	.grow {

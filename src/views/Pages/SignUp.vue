@@ -88,7 +88,7 @@
 						Sign up with Google
 					</a>
 				</q-form>
-				<hk-loader v-else prefix="Signing you up" />
+				<hk-loader v-else prefix="Signing you up" noBackground />
 			</ValidationObserver>
 		</div>
 	</div>
@@ -116,21 +116,6 @@
 		},
 		methods: {
 			...mapActions(["reinitialize", "setUser", "setUserInfo"]),
-			checkUsername() {
-				
-				let username = db.ref(`search_users`).orderByChild('username').equalTo(this.username.toLowerCase());
-
-				// Check username
-				username.on('value' , (snapshot) => {
-					if(snapshot.exists()) {
-						this.check = 'unavailable';
-						return
-					} else {
-						this.check = 'available';
-					}
-				});
-
-			},
 			async createUser(uid) {
 				let user = {
 					username: this.username,

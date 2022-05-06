@@ -130,9 +130,6 @@ module.exports = function (/* ctx */) {
       workboxOptions: {
         skipWaiting: true,
         clientsClaim: true,
-        additionalManifestEntries: [
-          "/offline.html"
-        ]
       },
       manifest: {
         name: "Harmless Key",

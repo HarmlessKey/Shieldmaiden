@@ -156,7 +156,6 @@ export default async ({ router, Vue }) => {
       let exists = false
       await username_ref.once('value' , (snapshot) => {
         exists = snapshot.exists();
-        console.log(exists)
       });
 
       return !exists;

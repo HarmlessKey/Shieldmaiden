@@ -48,6 +48,8 @@ export default {
 		preFetch({ store, redirect }) {
       if(!store.getters.user) {
 				redirect('/sign-in');
+			} else if (store.getters.userInfo.username) {
+				redirect('/profile')
 			}
 		},
 		computed: {
@@ -58,7 +60,7 @@ export default {
 			])
 		},
 		methods: {
-			...mapActions([ 'initialize' ]),
+			...mapActions([ 'reinitialize' ]),
 			async setUsername(valid) {
 				if (valid && this.check === "available") {
 					let user = {
@@ -77,7 +79,7 @@ export default {
 					this.$snotify.success('Username saved.', 'Critical hit!', {
 						position: "centerTop"
 					});
-					await this.initialize();
+					await this.reinitialize();
 					this.$router.replace('/profile');
 				}
 			}

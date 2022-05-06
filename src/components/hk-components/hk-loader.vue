@@ -1,5 +1,5 @@
 <template>
-	<div class="loading" :class="{ 'full-height': fullHeight }">
+	<div class="loading" :class="{ 'full-height': fullHeight, 'nobackground': noBackground }">
 			<div>
 				<span class="loading__die spin" :style="{ backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
 				<div class="loading__title">
@@ -21,6 +21,10 @@ export default {
 			default: undefined
 		},
 		fullHeight: {
+			type: Boolean,
+			default: false
+		},
+		noBackground: {
 			type: Boolean,
 			default: false
 		}
@@ -53,6 +57,10 @@ export default {
 		display: grid;
 		align-content: center;
 		background: rgba(0, 0, 0, .1);
+		
+		&.nobackground {
+			background: none;
+		}
 
 		&.full-height {
 			height: calc(100vh - 50px) !important;

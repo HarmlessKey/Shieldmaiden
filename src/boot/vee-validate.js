@@ -1,3 +1,4 @@
+import { db } from 'src/firebase';
 import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
 import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num, is, email, confirmed} from "vee-validate/dist/rules";
 
@@ -145,4 +146,20 @@ export default async ({ router, Vue }) => {
       }
     }
   });
+
+  extend('username', {
+    message: "This usename has already been taken",
+    validate: async (value) => {
+      let username_ref = db.ref(`search_users`).orderByChild('username').equalTo(value.toLowerCase());
+  
+      // Check username
+      let exists = false
+      await username_ref.once('value' , (snapshot) => {
+        exists = snapshot.exists();
+        console.log(exists)
+      });
+
+      return !exists;
+    }
+  })
 };

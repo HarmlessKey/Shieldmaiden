@@ -5,7 +5,7 @@
 			<h2>Create an account</h2>
 			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 			<ValidationObserver v-slot="{ handleSubmit, valid }">
-				<q-form @submit="handleSubmit(signUp)">
+				<q-form v-if="!loading" @submit="handleSubmit(signUp)">
 					
 					<ValidationProvider 
 						rules="required|email" 
@@ -15,7 +15,7 @@
 						<q-input
 							:dark="$store.getters.theme === 'dark'" filled square dense 
 							autocomplete="off" 
-							class="email" 
+							class="email mb-2" 
 							type="email" 
 							placeholder="Email" 
 							v-model="email"
@@ -25,24 +25,23 @@
 					</ValidationProvider>
 
 					<ValidationProvider 
-						rules="required" 
+						rules="required|alpha_num|max:20|min:3|username"
 						name="Username" 
-						v-slot="{ errors, invalid, validated}"
+						v-slot="{ errors, invalid, validated }"
 					>
-						<q-input
-							:dark="$store.getters.theme === 'dark'" filled square dense 
-							autocomplete="off" 
-							class="username" 
-							type="username" 
-							placeholder="Username" 
-							v-model="username" @keyup.native="checkUsername()"
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square dense
+							type="text" 
+							class="mb-2"
+							autocomplete="off"
+							label="Username" 
+							maxlength="20"
+							minlength="3"
+							v-model="username"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
-						<p v-if="username" class="pl-1">
-							<i aria-hidden="true" class="fas mr-1" :class="{'green fa-check': check == 'available', 'red fa-times': check === 'unavailable'}" />
-								<strong>{{ username }}</strong> is {{ check }}
-						</p>
+					
 					</ValidationProvider>
 
 					<ValidationProvider
@@ -54,6 +53,7 @@
 						<q-input
 							:dark="$store.getters.theme === 'dark'" filled square dense 
 							autocomplete="off" 
+							class="mb-2"
 							type="password" 
 							placeholder="Password" 
 							v-model="password" 
@@ -71,6 +71,7 @@
 						<q-input
 							:dark="$store.getters.theme === 'dark'" filled square dense 
 							autocomplete="off"
+							class="mb-2"
 							type="password" 
 							placeholder="Confirm Password" 
 							v-model="confirm_password"
@@ -82,18 +83,20 @@
 
 						<q-btn no-caps label="Sign Up" class="full-width" color="primary" type="submit" :disabled="!valid" />
 
+					<a class="btn btn-block google mt-2" @click="googleSignIn()">
+						<img src="~assets/_img/styles/google.png" alt="Google logo"/> 
+						Sign up with Google
+					</a>
 				</q-form>
+				<hk-loader v-else prefix="Signing you up" />
 			</ValidationObserver>
-			<a class="btn btn-block google mt-2" @click="googleSignIn()">
-				<img src="~assets/_img/styles/google.png" alt="Google logo"/> 
-				Sign up with Google
-			</a>
 		</div>
 	</div>
 </template>
 
 <script>
 	import { db, firebase, auth } from 'src/firebase';
+	import { mapActions } from 'vuex';
 
 	export default {
 		data: function() {
@@ -103,11 +106,16 @@
 				confirm_password: undefined,
 				username: undefined,
 				error: undefined,
-				check: undefined
-
+				loading: false,
 			};
 		},
+		preFetch({ store, redirect }) {
+			if(store.getters.user) {
+				redirect('/content');
+			}
+		},
 		methods: {
+			...mapActions(["reinitialize", "setUser", "setUserInfo"]),
 			checkUsername() {
 				
 				let username = db.ref(`search_users`).orderByChild('username').equalTo(this.username.toLowerCase());
@@ -123,35 +131,35 @@
 				});
 
 			},
-			setUsername(valid) {
-				if (valid && this.check === "available") {
-					let user = {
-						username: this.username,
-						email: this.user.email
-					}
-
-					db.ref(`users/${this.user.uid}`).update(user);
-
-					//Save searchable results in search_user
-					db.ref(`search_users`).child(this.user.uid).set({
-						username: this.username.toLowerCase(),
-						email: this.user.email.toLowerCase()
-					});
-
-					this.$snotify.success('Username saved.', 'Critical hit!', {
-						position: "centerTop"
-					});
-					this.$router.replace('/profile');
+			async createUser(uid) {
+				let user = {
+					username: this.username,
+					email: this.email
 				}
+
+				await db.ref(`users/${uid}`).update(user);
+
+				//Save searchable results in search_user
+				await db.ref(`search_users`).child(uid).set({
+					username: this.username.toLowerCase(),
+					email: this.email.toLowerCase()
+				});
+					
 			},
 			signUp: function() {
+				this.loading = true
 				auth.createUserWithEmailAndPassword(this.email, this.password).then(
 					// eslint-disable-next-line
-					user => {
-						this.$router.replace('/set-username');
+					async result => {
+						await this.createUser(result.user.uid);
+						await this.setUser(result.user);
+						await this.setUserInfo();
+						await this.reinitialize();
+						this.$router.replace("/content");
 					},
 					err => {
 						this.error = err.message;
+						this.loading = false;
 					});
 			},
 			googleSignIn() {

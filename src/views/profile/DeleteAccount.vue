@@ -98,9 +98,9 @@ export default {
 
 				user.delete().then(function() {
 					//REMOVE ALL USER DATA
-					for(const data of vm.user_data) {
-						db.ref(`${data}/${user.uid}`).remove();
-					}
+					// for(const data of vm.user_data) {
+					// 	db.ref(`${data}/${user.uid}`).remove();
+					// }
 
 					vm.sign_out();
 					vm.$router.replace('/');

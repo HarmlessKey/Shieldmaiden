@@ -7,7 +7,7 @@
 			<form v-if="!loading" v-on:submit.prevent>
 				<q-input 
 					:dark="$store.getters.theme === 'dark'" filled square dense
-					autocomplete="off" 
+					autocomplete="username" 
 					type="text" 
 					v-model="email" 
 					name="email"

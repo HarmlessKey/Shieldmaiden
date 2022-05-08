@@ -14,8 +14,8 @@
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'" filled square dense 
-							autocomplete="off" 
-							class="email mb-2" 
+							autocomplete="username" 
+							class="email mb-2"
 							type="email" 
 							placeholder="Email" 
 							v-model="email"
@@ -52,7 +52,7 @@
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'" filled square dense 
-							autocomplete="off" 
+							autocomplete="new-password" 
 							class="mb-2"
 							type="password" 
 							placeholder="Password" 
@@ -70,7 +70,7 @@
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'" filled square dense 
-							autocomplete="off"
+							autocomplete="new-password"
 							class="mb-2"
 							type="password" 
 							placeholder="Confirm Password" 
@@ -81,7 +81,7 @@
 						/>
 					</ValidationProvider>
 
-						<q-btn no-caps label="Sign Up" class="full-width" color="primary" type="submit" :disabled="!valid" />
+					<q-btn no-caps label="Sign Up" class="full-width" color="primary" type="submit" :disabled="!valid" />
 
 					<a class="btn btn-block google mt-2" @click="googleSignIn()">
 						<img src="~assets/_img/styles/google.png" alt="Google logo"/> 

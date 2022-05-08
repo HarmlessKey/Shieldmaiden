@@ -12,8 +12,6 @@
  */
 
 const express = require('express')
-// const helmet = require("helmet")
-// const cors = require('cors');
 const compression = require('compression')
 
 const ssr = require('quasar-ssr')

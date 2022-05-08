@@ -288,8 +288,6 @@
 			}
 		});
 
-		// await this.initialize();
-
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {

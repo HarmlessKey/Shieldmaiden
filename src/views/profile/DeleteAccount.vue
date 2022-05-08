@@ -38,7 +38,7 @@
 </template>
 
 <script>
-	import { firebase, db, auth } from 'src/firebase';
+	import { firebase, auth } from 'src/firebase';
 	import { mapActions } from 'vuex';
 
 export default {
@@ -48,31 +48,12 @@ export default {
 				email: undefined,
 				password: undefined,
 				error: '',
-				credentials: undefined,
-				user_data: [
-					"character_control",
-					"campaigns",
-					"custom_items",
-					"encounters",
-					"npcs",
-					"players",
-					"reminders",
-					"search_campaigns",
-					"search_custom_items",
-					"search_encounters",
-					"search_npcs",
-					"search_players",
-					"search_reminders",
-					"search_users",
-					"settings",
-					"status",
-					"users"
-				]
+				credentials: undefined
 			}
 		},
 		methods: {
 			...mapActions(["sign_out"]),
-			signIn: function() {
+			signIn() {
 				auth.signInWithEmailAndPassword(this.email, this.password).then(
 					// eslint-disable-next-line
 					(err) => {
@@ -97,11 +78,7 @@ export default {
 				var user = auth.currentUser;
 
 				user.delete().then(function() {
-					//REMOVE ALL USER DATA
-					// for(const data of vm.user_data) {
-					// 	db.ref(`${data}/${user.uid}`).remove();
-					// }
-
+					// USER DATA IS DELETED WITH A FIREBASE CLOUD FUNCTION
 					vm.sign_out();
 					vm.$router.replace('/');
 				}).catch(function(error) {

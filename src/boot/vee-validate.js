@@ -1,6 +1,6 @@
 import { db } from 'src/firebase';
 import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
-import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num, is, email, confirmed} from "vee-validate/dist/rules";
+import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num, email, confirmed} from "vee-validate/dist/rules";
 
 export default async ({ router, Vue }) => {
   Vue.component('ValidationProvider', ValidationProvider);
@@ -102,16 +102,14 @@ export default async ({ router, Vue }) => {
     validate(value) {
       if (value) {
         // Check if value is url
-        const url_expr = /[A-z\d@:%._+~#=-]{1,256}\.[A-z\d()]{1,6}\b([A-z\d()@:%_+.~#?&//=-]+)?/gi
-        const url_regex = new RegExp(url_expr);
-        if (value.match(url_regex)) {
+        const url_expr = /[A-z\d@:%._+~#=-]{1,256}\.[A-z\d()]{1,6}\b([A-z\d()@:%_+.~#?&/=-]+)?/gi;
+        if (value.match(url_expr)) {
           return true;
         }
         // Check if value is spotify URI
         const spotify_expr  = /^spotify:.+/gi;
-        const spotify_regex = new RegExp(spotify_expr);
         
-        return value.match(spotify_regex);
+        return value.match(spotify_expr);
       } return false;
     },
     message: '{_field_} must be a valid URL or URI',

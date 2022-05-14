@@ -28,8 +28,8 @@ jobs:
       
       - name: Create env file
         run: |
-            cat << EOF >> .env.production.local
-            ${{ secrets.ENV_FILE }}
+            cat << EOF >> .env.staging.local
+            ${{ secrets.STAGING_ENV_FILE }}
             EOF
       
       # - run: npm run build --if-present

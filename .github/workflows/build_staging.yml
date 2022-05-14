@@ -28,7 +28,7 @@ jobs:
       - name: Create env file
         run: |
             cat << EOF >> .env
-            ${{ secrets.ENV_FILE }}
+            ${{ secrets.STAGING_ENV_FILE }}
             EOF
       
       - run: npm run build --if-present

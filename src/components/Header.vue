@@ -1,6 +1,6 @@
 <template>
-	<header :class="{ invert: enviroment === 'development' }">
-		<div id="header" class="d-flex justify-content-between" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
+	<header :class="{ invert: environment !== 'production' }">
+		<div id="header" class="d-flex justify-content-between items-center" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
 			<div>
 				<div 
 					class="menu"
@@ -13,6 +13,10 @@
 					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
 				</router-link>
 			</div>
+			<q-chip v-if="environment !== 'production'" color="blue">
+				{{ environment }}
+			</q-chip>
+
 
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end" :class="{ 'mr-2': maintenance }">
@@ -21,11 +25,11 @@
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="theme">
 								<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
-									<img src="~assets/_img/dark.webp" />
+									<img src="~assets/_img/dark.webp" alt="Dark theme" />
 									Dark
 								</a>
 								<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
-									<img src="~assets/_img/light.webp" />
+									<img src="~assets/_img/light.webp" alt="Light theme" />
 									Light
 								</a>
 							</div>
@@ -65,7 +69,7 @@
 				<template v-if="!maintenance">
 					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 					<div v-if="user" class="user">
-						<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<span class="img" :class="{ invert: environment !== 'production' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 						<i aria-hidden="true" v-else class="fas fa-user"></i>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="bg-neutral-8">
@@ -119,7 +123,7 @@
 		},
 		data() {
 			return {
-				enviroment: process.env.NODE_ENV
+				environment: process.env.NODE_ENV
 			}
 		},
 		computed: {

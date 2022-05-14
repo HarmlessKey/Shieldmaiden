@@ -100,6 +100,7 @@
 	import { Cookies } from 'quasar';
 	import jwt_decode from 'jwt-decode';
 
+
 	export default {
 	name: "App",
 	mixins: [general],
@@ -111,6 +112,81 @@
 		Home
 	},
 	meta() {
+		const meta = {
+			title: {
+				name: "title",
+				content: this.$route.meta.title || "D&D Combat Tracker",
+			},
+			description: {
+				name: "description",
+				content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
+			},
+
+			// TWITTER
+			twitterCard: {
+				property: "twitter:card",
+				content: "summary"
+			},
+			twitterTitle: {
+				name: "twitter:title",
+				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
+			},
+			twitterDescription: {
+				name: "twitter:description",
+				content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
+			},
+			twitterImage: {
+				name: "twitter:image",
+				content: "https://harmlesskey.com/harmless_key_logo_full.png" 
+			},
+			twitterSite: {
+				name: "twitter:site", 
+				content: "@KeyHarmless"
+			},
+
+			// OG
+			ogTitle: {
+				property: "og:title",
+				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
+			},
+			ogDescription: {
+				property: "og:description",
+				content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
+			},
+			ogSiteName: {
+				property: "og:site_name",
+				content: "Harmless Key"
+			},
+			ogType: {
+				property: "og:type",
+				content: "website"
+			},
+			ogUrl: {
+				property: "og:url", 
+				content: `https://harmlesskey.com${this.$route.path}`
+			},
+			ogImage: {	
+				property: "og:image", 
+				content: `https://harmlesskey.com/linkedin.png` 
+			},
+			ogImageType: {	
+				property: "og:image:type", 
+				content: "image/png"
+			},
+			ogImageAlt: {	
+				property: "og:image:alt", 
+				content: "Harmless Key Logo"
+			}
+		};
+
+		// NoIndex on non-production environments
+		if(process.env.NODE_ENV !== "production") {
+			meta.noindex = {
+				name: "robots",
+				content: "noindex, nofollow"
+			};
+		}
+
 		return {
 			title: this.$route.meta.title || "D&D Combat Tracker",
 			titleTemplate: title => `${title} | Harmless Key`,
@@ -120,72 +196,7 @@
 					href: `https://harmlesskey.com${this.$route.path}`
 				}
 			},
-			meta: {
-				title: {
-					name: "title",
-					content: this.$route.meta.title || "D&D Combat Tracker",
-				},
-				description: {
-					name: "description",
-					content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
-				},
-
-				// TWITTER
-				twitterCard: {
-					property: "twitter:card",
-					content: "summary"
-				},
-				twitterTitle: {
-					name: "twitter:title",
-					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
-				},
-				twitterDescription: {
-					name: "twitter:description",
-					content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
-				},
-				twitterImage: {
-					name: "twitter:image",
-					content: "https://harmlesskey.com/harmless_key_logo_full.png" 
-				},
-				twitterSite: {
-					name: "twitter:site", 
-					content: "@KeyHarmless"
-				},
-
-				// OG
-				ogTitle: {
-					property: "og:title",
-					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
-				},
-				ogDescription: {
-					property: "og:description",
-					content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
-				},
-				ogSiteName: {
-					property: "og:site_name",
-					content: "Harmless Key"
-				},
-				ogType: {
-					property: "og:type",
-					content: "website"
-				},
-				ogUrl: {
-					property: "og:url", 
-					content: `https://harmlesskey.com${this.$route.path}`
-				},
-				ogImage: {	
-					property: "og:image", 
-					content: `https://harmlesskey.com/linkedin.png` 
-				},
-				ogImageType: {	
-					property: "og:image:type", 
-					content: "image/png"
-				},
-				ogImageAlt: {	
-					property: "og:image:alt", 
-					content: "Harmless Key Logo"
-				}
-			}
+			meta: meta
 		}
 	},
 	data() {

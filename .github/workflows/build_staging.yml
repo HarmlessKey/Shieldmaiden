@@ -32,8 +32,8 @@ jobs:
             ${{ secrets.STAGING_ENV_FILE }}
             EOF
       
-      # - run: npm run build --if-present
-      - run: quasar build -m ssr --if-present
+      # - run: npm run build in debug mode --if-present
+      - run: quasar build -m ssr -d --if-present
       
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action

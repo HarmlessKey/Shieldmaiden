@@ -180,12 +180,12 @@
 		};
 
 		// NoIndex on non-production environments
-		if(process.env.NODE_ENV !== "production") {
+		if(process.env.VUE_APP_ENV_NAME !== "live") {
 			meta.noindex = {
 				name: "robots",
 				content: "noindex, nofollow"
 			};
-		}
+		};
 
 		return {
 			title: this.$route.meta.title || "D&D Combat Tracker",

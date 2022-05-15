@@ -1,5 +1,5 @@
 <template>
-	<header :class="{ invert: environment !== 'production' }">
+	<header :class="{ invert: environment !== 'live' }">
 		<div id="header" class="d-flex justify-content-between items-center" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
 			<div>
 				<div 
@@ -13,7 +13,7 @@
 					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
 				</router-link>
 			</div>
-			<q-chip v-if="environment !== 'production'" color="blue">
+			<q-chip v-if="environment !== 'live'" color="blue">
 				{{ environment }}
 			</q-chip>
 
@@ -69,7 +69,7 @@
 				<template v-if="!maintenance">
 					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 					<div v-if="user" class="user">
-						<span class="img" :class="{ invert: environment !== 'production' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<span class="img" :class="{ invert: environment !== 'live' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 						<i aria-hidden="true" v-else class="fas fa-user"></i>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="bg-neutral-8">
@@ -123,7 +123,7 @@
 		},
 		data() {
 			return {
-				environment: process.env.NODE_ENV
+				environment: process.env.VUE_APP_ENV_NAME
 			}
 		},
 		computed: {

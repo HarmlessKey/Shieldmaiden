@@ -267,11 +267,12 @@ a.icon, button.icon {
 	}
 	.menu {
 		font-size: 25px;
+		width: 41px;
+		padding: 0 10px;
 	}
 	a.icon, button.icon {
 		font-size: 25px;
-		padding: 0 20px;
-		width: 25px;
+		width: 30px;
 		
 		&.roll {
 			padding-left: 30px;

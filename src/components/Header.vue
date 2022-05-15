@@ -1,5 +1,5 @@
 <template>
-	<header :class="{ invert: environment !== 'live' }">
+	<header>
 		<div id="header" class="d-flex justify-content-between items-center" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
 			<div>
 				<div 
@@ -9,12 +9,12 @@
 					<i aria-hidden="true" class="fas" :class="$store.getters.side_small_screen ? 'fa-times' : 'fa-bars'"/>
 				</div>
 				<router-link to="/" class="logo d-flex justify-content-start" :class="{ home: $route.meta.sidebar === false }">
-					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon"/>
+					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon" :class="{ 'd-none d-md-block': environment !== 'live' }" />
 					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
 				</router-link>
 			</div>
-			<q-chip v-if="environment !== 'live'" color="blue">
-				{{ environment }}
+			<q-chip v-if="environment !== 'live'" color="red">
+				{{ environment.capitalize() }}
 			</q-chip>
 
 
@@ -69,7 +69,7 @@
 				<template v-if="!maintenance">
 					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 					<div v-if="user" class="user">
-						<span class="img" :class="{ invert: environment !== 'live' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 						<i aria-hidden="true" v-else class="fas fa-user"></i>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="bg-neutral-8">

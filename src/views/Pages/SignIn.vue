@@ -5,6 +5,13 @@
 			<h2>Sign in</h2>
 			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 			<form v-if="!loading" v-on:submit.prevent>
+				<button class="google mb-2" @click="googleSignIn()">
+					Sign in with Google
+				</button>
+				<hr>
+				<h4 class="text-center neutral-2">
+					With email and password
+				</h4>
 				<q-input 
 					:dark="$store.getters.theme === 'dark'" filled square dense
 					autocomplete="username" 
@@ -22,8 +29,7 @@
 					placeholder="password" 
 					name="password"
 				/>
-				<button class="btn btn-block mt-3" @click="signIn()">Sign In <i aria-hidden="true" class="fas fa-sign-in-alt"></i></button>
-				<a class="btn btn-block google my-2" @click="googleSignIn()"><img src="~assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
+				<button class="btn btn-block my-3" @click="signIn()">Sign In <i aria-hidden="true" class="fas fa-sign-in-alt"></i></button>
 
 				<p class="text-center mb-1"><small><router-link to="/forgot-password">Forgot password?</router-link></small></p>
 				<div class="text-center"><small>No account yet? <router-link to="/sign-up">Create one here.</router-link></small></div>

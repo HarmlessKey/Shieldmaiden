@@ -4,8 +4,17 @@
 			<img class="logo" src="../../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key"/>
 			<h2>Create an account</h2>
 			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
+					
 			<ValidationObserver v-slot="{ handleSubmit, valid }">
 				<q-form v-if="!loading" @submit="handleSubmit(signUp)">
+					<button class="google mt-2" @click="googleSignIn()">
+						Sign up with Google
+					</button>
+					<hr>
+
+					<h4 class="text-center neutral-2">
+						With email and password
+					</h4>
 					
 					<ValidationProvider 
 						rules="required|email" 
@@ -82,11 +91,6 @@
 					</ValidationProvider>
 
 					<q-btn no-caps label="Sign Up" class="full-width" color="primary" type="submit" :disabled="!valid" />
-
-					<a class="btn btn-block google mt-2" @click="googleSignIn()">
-						<img src="~assets/_img/styles/google.png" alt="Google logo"/> 
-						Sign up with Google
-					</a>
 				</q-form>
 				<hk-loader v-else prefix="Signing you up" noBackground />
 			</ValidationObserver>

@@ -26,7 +26,9 @@
 						/>
 						<button class="btn btn-block mt-3" @click="signIn()">Sign In <i aria-hidden="true" class="fas fa-sign-in-alt"></i></button>
 					</form>
-					<a class="btn btn-block google my-3" @click="googleSignIn()"><img src="~assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
+					<button class="google my-3" @click="googleSignIn()">
+						Sign in with Google
+					</button>
 				</template>
 
 				<div class="d-flex justify-content-center">

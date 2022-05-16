@@ -2,6 +2,7 @@
 @import "~vue-snotify/styles/material.css";
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 @import "hk-icons.scss";
 @import "./variables.scss";
 
@@ -1003,7 +1004,6 @@ html body {
 	}
 
 	.login-container {
-		color: #fff;
 		background-position: center;
 		padding: 100px 30px 0 30px;
 
@@ -1031,20 +1031,38 @@ html body {
 			.q-field {
 				margin-bottom: 1px;
 			}
-			.google {
-				background-color: $neutral-2 !important;
-				color: #262626 !important;
-				height: 38px;
-				padding: 0 !important;
-				line-height: 38px;
-				
-				img {
-					vertical-align: -6px;
-					margin-right: 5px;
-					display: inline;
-					height: 26px;
-				}
-			}
+		}
+	}
+	.google {
+		background-color: $google-blue;
+		font-family: 'Roboto', sans-serif;
+		height: 40px;
+		padding: 0 8px 0 0;
+		line-height: 40px;
+		text-align: left;
+		font-weight: bold;
+		border: none;
+		width: 100%;
+		border-radius: $border-radius-small;
+		color: $neutral-1;
+		align-items: center;
+		cursor: pointer;
+		border: solid 1px $google-blue;
+	
+		&::before {
+			content: "";
+			background-image: url("../assets/_img/styles/google.png");
+			background-color: $white;
+			background-repeat: no-repeat;
+			background-position: center;
+			height: 38px;
+			width: 38px;
+			margin-right: 9px;
+			display: block;
+			float: left;
+			background-size: 22px;
+			border-top-left-radius: $border-radius-small;
+			border-bottom-left-radius: $border-radius-small;
 		}
 	}
 

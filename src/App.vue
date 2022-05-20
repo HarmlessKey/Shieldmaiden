@@ -185,7 +185,7 @@
 				name: "robots",
 				content: "noindex, nofollow"
 			};
-		};
+		}
 
 		return {
 			title: this.$route.meta.title || "D&D Combat Tracker",

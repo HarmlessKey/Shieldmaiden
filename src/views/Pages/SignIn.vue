@@ -80,7 +80,7 @@
 			},
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
-				this.loading = true
+				this.loading = true;
 				if(this.browser === "Edge") {
 					auth.signInWithRedirect(provider).then(async (result) => {
 						await this.setUser(result.user);

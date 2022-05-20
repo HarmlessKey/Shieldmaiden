@@ -470,7 +470,7 @@ html body {
 	}
 
 	.hk-layout {
-		height: 100%;
+		min-height: calc(100vh - #{$header-height});
 		display: grid;
 		grid-template-rows: 1fr max-content;
 		grid-template-columns: 100%;

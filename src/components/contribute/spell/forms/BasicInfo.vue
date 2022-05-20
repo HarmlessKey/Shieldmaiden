@@ -326,7 +326,7 @@
 			</div>
 			<div class="col-12 col-md-6">
 				<label for="description_preview">Preview</label>
-				<vue-markdown name="description_preview" :source="spell.description"></vue-markdown>
+				<!-- <vue-markdown name="description_preview" :source="spell.description"></vue-markdown> -->
 				<div v-if="spell.higher_level">
 					<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 				</div>
@@ -338,9 +338,9 @@
 
 <script>
 
-import VueMarkdown from 'vue-markdown';
+// import VueMarkdown from 'vue-markdown';
 import { mapActions } from 'vuex';
-import { spells } from '@/mixins/spells';
+import { spells } from 'src/mixins/spells';
 
 export default {
 	name: 'spells-BasicInfo',
@@ -349,7 +349,7 @@ export default {
 	},
 	mixins: [ spells ],
 	components: {
-		VueMarkdown
+		// VueMarkdown
 	},
 	data() {
 		return {	

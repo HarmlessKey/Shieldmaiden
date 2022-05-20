@@ -78,15 +78,15 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import { general } from '@/mixins/general.js';
-	import BasicInfo from '@/components/npcs/BasicInfo';
-	import Senses from '@/components/npcs/Senses';
-	import AbilityScores from '@/components/npcs/AbilityScores';
-	import Skills from '@/components/npcs/Skills';
-	import Defenses from '@/components/npcs/Defenses';
-	import SpellCasting from '@/components/npcs/SpellCasting';
-	import Actions from '@/components/npcs/Actions';
-	import CopyContent from "@/components/CopyContent";
+	import { general } from 'src/mixins/general.js';
+	import BasicInfo from 'src/components/npcs/BasicInfo';
+	import Senses from 'src/components/npcs/Senses';
+	import AbilityScores from 'src/components/npcs/AbilityScores';
+	import Skills from 'src/components/npcs/Skills';
+	import Defenses from 'src/components/npcs/Defenses';
+	import SpellCasting from 'src/components/npcs/SpellCasting';
+	import Actions from 'src/components/npcs/Actions';
+	import CopyContent from "src/components/CopyContent";
 
 	export default {
 		name: 'EditNpc',
@@ -150,7 +150,7 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
 				return this.$route.name !== 'Edit Companion';

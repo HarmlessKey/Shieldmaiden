@@ -93,11 +93,11 @@
 
 <script>
 	import { mapGetters } from "vuex";
-	import { dice } from "@/mixins/dice.js";
-	import { setHP } from "@/mixins/HpManipulations.js";
-	import { damage_types } from "@/mixins/damageTypes.js";
-	import { abilities } from "@/mixins/abilities.js";
-	import { runEncounter } from '@/mixins/runEncounter.js';
+	import { dice } from "src/mixins/dice.js";
+	import { setHP } from "src/mixins/HpManipulations.js";
+	import { damage_types } from "src/mixins/damageTypes.js";
+	import { abilities } from "src/mixins/abilities.js";
+	import { runEncounter } from 'src/mixins/runEncounter.js';
 
 	export default {
 		name: "CustomRoll",

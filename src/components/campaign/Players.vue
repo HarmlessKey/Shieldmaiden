@@ -12,12 +12,12 @@
 						data: { current: currency }
 					}) : null
 				">
-				<template v-if="currency && Object.keys(currency).length">
+				<template v-if="currency">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
 							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>
 							<template v-else>{{ coin }} </template>
-							<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
+							<img :src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
 						</div>
 					</template>
 				</template>
@@ -85,13 +85,13 @@
 			<div class="col header ac">
 			</div>
 			<div class="col header name"></div>
-			<div class="col header text-center pp" v-if="userSettings.general && userSettings.general.passive_perception === undefined && !is_small">
+			<div class="col header text-center pp" v-if="userSettings.general && userSettings.general.passive_perception === undefined && !is_medium">
 				<i aria-hidden="true" class="fas fa-eye"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive perception
 				</q-tooltip>
 			</div>
-			<div class="col header text-center pinv" v-if="userSettings.general && userSettings.general.passive_investigation === undefined && !is_small">
+			<div class="col header text-center pinv" v-if="userSettings.general && userSettings.general.passive_investigation === undefined && !is_medium">
 				<i aria-hidden="true" class="fas fa-search"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive investigation
@@ -154,14 +154,14 @@
 
 					<div 
 						class="col pp" 
-						v-if="userSettings.general && userSettings.general.passive_perception === undefined && !is_small"
+						v-if="userSettings.general && userSettings.general.passive_perception === undefined && !is_medium"
 						:key="'pp-'+key"
 					>
 						{{ players[key].passive_perception }}
 					</div>
 					<div 
 						class="col pinv" 
-						v-if="userSettings.general && userSettings.general.passive_investigation === undefined && !is_small"
+						v-if="userSettings.general && userSettings.general.passive_investigation === undefined && !is_medium"
 						:key="'pinv-'+key"
 					>
 						{{ players[key].passive_investigation }}
@@ -275,8 +275,8 @@
 
 <script>
 	import { mapGetters, mapActions } from "vuex";
-	import { experience } from "@/mixins/experience.js";
-	import { currencyMixin } from "@/mixins/currency.js";
+	import { experience } from "src/mixins/experience.js";
+	import { currencyMixin } from "src/mixins/currency.js";
 
 	export default {
 		name: "Players",
@@ -324,10 +324,10 @@
 			templateColumns() {
 				let templateColumns = 'max-content max-content auto ';
 
-				if(this.userSettings.general && this.userSettings.general.passive_perception === undefined && !this.is_small) { 
+				if(this.userSettings.general && this.userSettings.general.passive_perception === undefined && !this.is_medium) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.userSettings.general && this.userSettings.general.passive_investigation === undefined && !this.is_small) { 
+				if(this.userSettings.general && this.userSettings.general.passive_investigation === undefined && !this.is_medium) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
 				if(this.userSettings.general && this.userSettings.general.passive_insight === undefined && !this.is_medium) { 
@@ -346,8 +346,8 @@
 			calcColspan() {
 				let colspan = (this.viewerIsUser) ? 4 : 3;
 
-				if(this.settings.passive_perception === undefined && !this.is_small) { colspan++; }
-				if(this.settings.passive_investigation === undefined && !this.is_small) { colspan++; }
+				if(this.settings.passive_perception === undefined && !this.is_medium) { colspan++; }
+				if(this.settings.passive_investigation === undefined && !this.is_medium) { colspan++; }
 				if(this.settings.passive_insight === undefined && !this.is_medium) { colspan++; }
 				if(this.settings.save_dc === undefined && !this.is_medium) { colspan++; }
 

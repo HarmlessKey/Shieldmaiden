@@ -220,6 +220,9 @@
 			width: 100%;
 		}
 	}
+	.q-item.no-wrap {
+		flex-wrap: wrap;
+	}
 	.timer {
 		display: flex;
 

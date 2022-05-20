@@ -1,19 +1,18 @@
-import { auth } from '@/firebase';
 import Vue from 'vue';
 import { browserDetect } from '../../functions';
 
-
-export const general_module = {
-	state: {
+export default {
+	state: () => ({
 		initialized: false,
-		theme: undefined,
+		theme: "dark",
 		slide: {},
 		rolls: [],
 		action_rolls: [],
 		side_collapsed: true,
 		side_small_screen: false,
 		browser: browserDetect()
-	},
+	}),
+
 	getters: {
 		initialized: (state) => { return state.initialized },
 		theme: (state) => { return state.theme },
@@ -24,9 +23,10 @@ export const general_module = {
 		side_small_screen(state) { return state.side_small_screen; },
 		browser(state) { return state.browser; },
 	},
+
 	actions: {
 		// Initialize basic settings depending on a user being logged in or not.
-		async initialize({ state, dispatch, commit }) {
+		async initialize({ state, dispatch, commit, rootGetters }) {
 			if(state.initialized) return;
 		
 			dispatch("setTips");
@@ -34,8 +34,8 @@ export const general_module = {
 			// In main.js before the Vue instance is rendered
 			// it's checked if there is a firebase authorization present.
 			// Therefore we can check here with 'auth' if there is a user.
-			if(auth.currentUser !== null) {
-				await dispatch("setUser");
+			if(rootGetters.user) {
+				// await dispatch("setUser");
 				// first set the user settings in order to set theme correctly
 				await dispatch("set_user_settings")
 					.then(() => {
@@ -43,7 +43,6 @@ export const general_module = {
 						return Promise.all([
 							dispatch("setTheme"),
 							dispatch("setSideCollapsed"),
-							dispatch("setUserInfo"),
 							dispatch("players/fetch_player_count"),
 							dispatch("npcs/fetch_npc_count"),
 							dispatch("items/fetch_item_count"),
@@ -70,7 +69,7 @@ export const general_module = {
 							"color: #cc3e4a;"
 						);
 						console.error(error);
-					});			
+					});
 			} else {
 				dispatch("setTheme");
 				commit("SET_INITIALIZED", true);
@@ -83,20 +82,24 @@ export const general_module = {
 		 * By simply setting initialized to false 
 		 * the beforeEach() in main.js will take care of the rest
 		 */
-		reinitialize({ commit }) {
+		async reinitialize({ commit, dispatch }) {
 			commit("SET_INITIALIZED", false);
+			await dispatch("initialize");
 		},
 		setTheme({ commit, state, rootGetters, dispatch }, theme) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 			
 			// If no theme is specified, it's called from initialize() so set it to the previously choosen theme if it exists, or dark otherwise.
 			if(!theme) {
-				if(uid && rootGetters.userSettings) {
-					theme = (rootGetters.userSettings.general && rootGetters.userSettings.general.theme) ? rootGetters.userSettings.general.theme : "dark";
-				} else {
-					theme = (localStorage.getItem("theme")) ? localStorage.getItem("theme") : "dark";
+				theme = "dark";
+				if(process.browser) {
+					if(uid && rootGetters.userSettings) {
+						theme = (rootGetters.userSettings.general && rootGetters.userSettings.general.theme) ? rootGetters.userSettings.general.theme : theme;
+					} else {
+						theme = (localStorage.getItem("theme")) ? localStorage.getItem("theme") : theme;
+					}
+					document.documentElement.setAttribute("data-theme", theme);
 				}
-				document.documentElement.setAttribute("data-theme", theme);
 				commit("SET_THEME", theme);
 			} 
 			// Set the new choosen theme
@@ -174,6 +177,7 @@ export const general_module = {
 			commit("SET_SIDE_SMALL_SCREEN", payload)
 		},
 	},
+
 	mutations: {
 		SET_INITIALIZED(state, payload) { Vue.set(state, "initialized", payload) },
 		SET_THEME(state, payload) { Vue.set(state, 'theme', payload); },
@@ -185,5 +189,5 @@ export const general_module = {
 		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
 		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
 		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },		
-	},
+	}
 };

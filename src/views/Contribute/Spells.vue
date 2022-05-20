@@ -205,17 +205,11 @@
 
 <script>
 	import _ from 'lodash';
-	import { db } from '@/firebase';
-	import Footer from '@/components/Footer.vue';
-	import Spell from '@/components/compendium/Spell.vue';
+	import { db } from 'src/firebase';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		name: 'Spells',
-		components: {
-			Footer,
-			Spell
-		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,

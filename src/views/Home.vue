@@ -10,7 +10,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -20,7 +20,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -30,7 +30,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -40,7 +40,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -50,7 +50,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -64,14 +64,13 @@
 </template>
 
 <script>
-	import Top from '@/components/home/Top.vue';
-	import Overview from '@/components/home/Overview.vue';
-	import Feedback from '@/components/home/Feedback.vue';
-	import General from '@/components/home/General.vue';
-	import Share from '@/components/home/Share.vue';
-	import Builder from '@/components/home/Builder.vue';
-	import Campaign from '@/components/home/Campaign.vue';
-	import Footer from '@/components/Footer.vue';
+	import Top from 'src/components/home/Top.vue';
+	import Feedback from 'src/components/home/Feedback.vue';
+	import General from 'src/components/home/General.vue';
+	import Share from 'src/components/home/Share.vue';
+	import Builder from 'src/components/home/Builder.vue';
+	import Campaign from 'src/components/home/Campaign.vue';
+	import Footer from 'src/components/Footer.vue';
 
 	export default {
 		name: 'home',
@@ -80,7 +79,6 @@
 		},
 		components: {
 			Top,
-			Overview,
 			Feedback,
 			General,
 			Share,

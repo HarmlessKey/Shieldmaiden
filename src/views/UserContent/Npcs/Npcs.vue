@@ -115,9 +115,9 @@
 
 <script>
 	import { mapActions, mapGetters } from "vuex";
-	import { monsterMixin } from "@/mixins/monster";
-	import ImportNPC from "@/components/ImportNPC.vue";
-	import ContentHeader from "@/components/userContent/ContentHeader";
+	import { monsterMixin } from "src/mixins/monster";
+	import ImportNPC from "src/components/ImportNPC.vue";
+	import ContentHeader from "src/components/userContent/ContentHeader";
 
 	export default {
 		name: "Npcs",

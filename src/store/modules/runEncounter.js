@@ -1,7 +1,7 @@
-import { skills } from "@/mixins/skills";
-import { abilities } from "@/mixins/abilities";
-import { monsterMixin } from "@/mixins/monster";
-import { db } from "@/firebase";
+import { skills } from "src/mixins/skills";
+import { abilities } from "src/mixins/abilities";
+import { monsterMixin } from "src/mixins/monster";
+import { db } from "src/firebase";
 import Vue from "vue";
 
 const demoPlayers = {
@@ -121,8 +121,7 @@ const demoEncounter = {
 }
 
 
-const getDefaultState = () => {
-	return {
+const getDefaultState = () => ({
 		demo: false,
 		demoEntities: demoEncounter.entities,
 		uid: undefined,
@@ -137,8 +136,7 @@ const getDefaultState = () => {
 		track: undefined,
 		encounter_initialized: false,
 		show_monster_card: false
-	}
-}
+});
 
 const run_encounter_state = getDefaultState();
 
@@ -216,7 +214,7 @@ const run_encounter_actions = {
 				}
 			} 
 			else {
-				commit('SET_ENCOUNTER', demoEncounter);
+				commit('SET_ENCOUNTER', {...demoEncounter});
 				for (let key in demoEncounter.entities) {
 					await dispatch("add_entity", key);
 				}
@@ -226,6 +224,12 @@ const run_encounter_actions = {
 		} finally {
 			commit('INITIALIZED');
 		}
+	},
+
+	async reset_demo({ commit, dispatch }) {
+		commit("UNINITIALIZED");
+		await dispatch("reset_store");
+		await dispatch("init_Encounter", { cid: null, eid: null, demo: true });
 	},
 
 	async add_entity({ state, commit, rootGetters, dispatch }, key) {
@@ -377,7 +381,7 @@ const run_encounter_actions = {
 							data_npc = await dispatch("npcs/get_npc", { uid, id: entity.id });
 						}
 						else {
-							data_npc = await dispatch("api_monsters/get_monster", entity.id);
+							data_npc = await dispatch("api_monsters/fetch_monster", entity.id);
 						}
 					} else {
 						entity.no_linked_npc = true;
@@ -980,35 +984,41 @@ const run_encounter_actions = {
 
 			// Set NPCs with 0 hp as down
 			if (e.curHp <= 0 && e.entityType === "npc") {
-				await dispatch("encounters/set_entity_prop", { 
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					property: "down",
-					value: true
-				}, { root: true });
+				if(!state.demo) {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "down",
+						value: true
+					}, { root: true });
+				}
 				commit("SET_ENTITY_PROPERTY", { key, prop: "down", value: true });
 			}
 			// If an entity has more than 0 hp, but is marked as down, remove the down mark
 			if (e.curHp > 0 && e.down) {
-				await dispatch("encounters/set_entity_prop", { 
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					property: "down",
-					value: null
-				}, { root: true });
+				if(!state.demo) {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "down",
+						value: null
+					}, { root: true });
+				}
 				commit("SET_ENTITY_PROPERTY", { key, prop: "down", value: false});
 			}
 			// Check if the entity is not yet active, but needs to be added in the new round
 			if(e.addNextRound) {
-				await dispatch("encounters/set_entity_prop", { 
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					property: "active",
-					value: true
-				}, { root: true });
+				if(!state.demo) {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "active",
+						value: true
+					}, { root: true });
+				}
 				commit("SET_ENTITY_PROPERTY", {key, prop: "active", value: true});
 				commit("DELETE_ENTITY_PROPERTY", {key, prop: "addNextRound"});
 			}
@@ -1493,18 +1503,20 @@ const run_encounter_actions = {
 		// Add a new reminder
 		if(action === 'add') {
 			if(type === 'premade') {
-				await dispatch(
-					"encounters/set_reminder", 
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						reminder,
-					}, 
-					{ root: true }
-				);
-				commit("SET_REMINDER", {entityKey: entity, key, reminder});
+				if(!state.demo) {
+					await dispatch(
+						"encounters/set_reminder", 
+						{
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entity,
+							key,
+							reminder,
+						}, 
+						{ root: true }
+					);
+				}
+				commit("SET_REMINDER", { entityKey: entity, key, reminder });
 			}
 			if(type === 'custom') {
 				if(!state.demo) {
@@ -1653,7 +1665,15 @@ const run_encounter_actions = {
 		);
 		commit("REMOVE_LIMITED_USES", {key, category, index});
 	},
-	reset_store({ commit }) { commit("RESET_STORE"); },
+	reset_store({ commit }) { 
+		commit("RESET_STORE");
+
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve()
+			}, 1000)
+		});
+	},
 }
 
 const run_encounter_mutations = {

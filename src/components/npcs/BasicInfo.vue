@@ -322,9 +322,9 @@
 </template>
 
 <script>
-	import { general } from '@/mixins/general.js';
-	import { languages } from '@/mixins/languages.js';
-	import { monsterMixin } from '@/mixins/monster.js';
+	import { general } from 'src/mixins/general.js';
+	import { languages } from 'src/mixins/languages.js';
+	import { monsterMixin } from 'src/mixins/monster.js';
 
 	export default {
 		name: 'npc-BasicInfo',

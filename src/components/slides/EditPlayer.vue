@@ -308,7 +308,7 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import { experience } from '@/mixins/experience.js';
+	import { experience } from 'src/mixins/experience.js';
 	import Transform from './party/Transform.vue';
 
 	export default {

@@ -1,6 +1,6 @@
 <template>
-	<header :class="{ invert: enviroment === 'development' }">
-		<div id="header" class="d-flex justify-content-between" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
+	<header>
+		<div id="header" class="d-flex justify-content-between items-center" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
 			<div>
 				<div 
 					class="menu"
@@ -9,63 +9,70 @@
 					<i aria-hidden="true" class="fas" :class="$store.getters.side_small_screen ? 'fa-times' : 'fa-bars'"/>
 				</div>
 				<router-link to="/" class="logo d-flex justify-content-start" :class="{ home: $route.meta.sidebar === false }">
-					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon"/>
+					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon" :class="{ 'd-none d-md-block': environment !== 'live' }" />
 					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
 				</router-link>
 			</div>
 
+			<!-- ENVIRONMENT LABEL -->
+			<q-chip v-if="environment !== 'live'" color="red" icon="far fa-rocket" class="white">
+				<span class="ml-1">{{ environment.capitalize() }}</span>
+			</q-chip>
+
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end" :class="{ 'mr-2': maintenance }">
-					<a class="icon">
+					<button class="icon" aria-label="Select theme">
 						<i aria-hidden="true" class="fas fa-moon"/>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="theme">
-								<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
-									<img src="@/assets/_img/dark.webp" />
+								<button @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }" aria-label="Dark theme">
+									<img src="~assets/_img/dark.webp" alt="Dark theme" />
 									Dark
-								</a>
-								<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
-									<img src="@/assets/_img/light.webp" />
+								</button>
+								<button @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }" aria-label="Light theme">
+									<img src="~assets/_img/light.webp" alt="Light theme" />
 									Light
-								</a>
+								</button>
 							</div>
 						</q-popup-proxy>
-					</a>
-					<a class="icon d-none d-md-block"
+					</button>
+					<button class="icon d-none d-md-block" aria-label="Keybindings"
 						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
 						<i aria-hidden="true" class="fas fa-keyboard"/>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Keybindings
 						</q-tooltip>
-					</a>
-					<a class="icon"
+					</button>
+					<button class="icon" aria-label="Compendium"
 						@click="setSlide({show: true, type: 'slides/Compendium'})">
 						<i aria-hidden="true" class="fas fa-book-spells"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Compendium
 						</q-tooltip>
-					</a>
-					<a 
+					</button>
+					<button 
 						v-if="user && !maintenance"
+						aria-label="Live initiative link"
 						class="icon"
 						@click="setSlide({show: true, type: 'PlayerLink'})">
 						<i aria-hidden="true" class="fas fa-share-alt"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Public initiative
 						</q-tooltip>
-					</a>
-					<a class="icon roll" 
+					</button>
+					<button class="icon roll" 
+						aria-label="Dice roller"
 						v-shortkey="['r']" @shortkey="setSlide({show: true, type: 'slides/roll/index'})"
 						@click="setSlide({show: true, type: 'slides/roll/index'})">
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Dice roller
 						</q-tooltip>
-					</a>
+					</button>
 				</div>
 				<template v-if="!maintenance">
 					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 					<div v-if="user" class="user">
-						<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 						<i aria-hidden="true" v-else class="fas fa-user"></i>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="bg-neutral-8">
@@ -107,7 +114,6 @@
 </template>
 
 <script>
-	import { auth } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
@@ -120,12 +126,12 @@
 		},
 		data() {
 			return {
-				user: auth.currentUser,
-				enviroment: process.env.NODE_ENV
+				environment: process.env.VUE_APP_ENV_NAME
 			}
 		},
 		computed: {
 			...mapGetters([
+				'user',
 				'userInfo'
 			]),
 		},
@@ -175,14 +181,7 @@
 		height: 13px;
 	}
 }
-a {
-	color: $neutral-2 !important;
-
-	&:hover {
-		color: $blue !important;
-	}
-}
-a.icon {
+a.icon, button.icon {
 	cursor: pointer;
 	font-size: 18px;
 	text-align: center;
@@ -190,6 +189,10 @@ a.icon {
 	width: 24px;
 	margin-left: 8px;
 	line-height: 50px !important;
+	padding: 0;
+	background: none;
+	border: none;
+	color: $neutral-2;
 
 	&:hover {
 		color: $neutral-1 !important;
@@ -207,9 +210,11 @@ a.icon {
 	text-align: center;
 	background-color: $neutral-8;
 
-	a {
+	button {
 		display: block;
 		margin-bottom: 10px;
+		background: none;
+		cursor: pointer;
 
 		&:last-child {
 			margin: 0;
@@ -262,11 +267,12 @@ a.icon {
 	}
 	.menu {
 		font-size: 25px;
+		width: 41px;
+		padding: 0 10px;
 	}
-	a.icon {
+	a.icon, button.icon {
 		font-size: 25px;
-		padding: 0 20px;
-		width: 25px;
+		width: 30px;
 		
 		&.roll {
 			padding-left: 30px;

@@ -20,7 +20,7 @@
 						<div class="card-body sheet">
 							<div class="character harm">
 								<div class="d-flex justify-content-start items-center">
-									<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/harm.jpg') + ')'}"></div>
+									<div class="img" :style="{'background-image': 'url(' + require('src/assets/_img/harm.jpg') + ')'}"></div>
 									<div>
 										Harm Manders<br/>
 										<small><i aria-hidden="true" class="neutral-3">Male human developer</i><br/>
@@ -78,7 +78,7 @@
 						<div class="card-body sheet">
 							<div class="character key">
 								<div class="d-flex justify-content-start items-center">
-									<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/key.jpg') + ')'}"></div>
+									<div class="img" :style="{'background-image': 'url(' + require('src/assets/_img/key.jpg') + ')'}"></div>
 									<div>
 										Key Roos<br/>
 										<small><i aria-hidden="true" class="neutral-3">Male human developer</i><br/>
@@ -168,13 +168,8 @@
 </template>
 
 <script>
-	import Footer from '@/components/Footer.vue'
-
 	export default {
 		name: 'home',
-		components: {
-			Footer,
-		},
 		data() {
 			return {
 				skills: {

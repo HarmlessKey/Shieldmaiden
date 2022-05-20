@@ -1,7 +1,7 @@
 <template>
 		<div class="roll-for-initiative">
 			<div>
-				<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
+				<span class="die spin" :style="{ backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
 				<h2>Roll for initiative!</h2>
 			</div>
 		</div>
@@ -13,7 +13,7 @@
 		computed: {
 			//Random die color
 			dieColor() {
-				let number = Math.ceil(Math.random() * 6)
+				let number = Math.ceil(Math.random() * 6);
 
 				switch(number) {
 					case 1: return 'blue';
@@ -22,7 +22,8 @@
 					case 4: return 'orange';
 					case 5: return 'red';
 					case 6: return 'yellow';
-				}
+				} 
+				return 'blue';
 			},
 		}
 	}

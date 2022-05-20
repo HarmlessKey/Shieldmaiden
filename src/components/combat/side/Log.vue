@@ -106,7 +106,7 @@
 
 <script>
 	import { mapGetters } from 'vuex';
-	import { setHP } from '@/mixins/HpManipulations.js';
+	import { setHP } from 'src/mixins/HpManipulations.js';
 
 	export default {
 		name: 'Log',

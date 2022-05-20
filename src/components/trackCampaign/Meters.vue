@@ -63,7 +63,7 @@
 
 <script>
 	import _ from 'lodash';
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
 	import Name from './live/Name';
 	import Avatar from './live/Avatar';
 

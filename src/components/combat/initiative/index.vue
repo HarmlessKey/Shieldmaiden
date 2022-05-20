@@ -98,7 +98,7 @@
 	import _ from 'lodash'
 	import { mapActions, mapGetters } from 'vuex';
 
-	import Turns from '@/components/combat/Turns.vue';
+	import Turns from 'src/components/combat/Turns.vue';
 	import Players from './Players.vue';
 	import NPCs from './NPCs.vue';
 	import Overview from './Overview.vue';
@@ -192,7 +192,7 @@
 #container {
 	padding: 5px;
 	width: 100vw;
-	height: calc(100% - 50px);
+	height: 100%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 60px auto;
@@ -203,7 +203,7 @@
 	position: absolute;
 
 	.q-scrollarea{
-		padding:0 15px 15px 15px;
+		padding:15px;
 		height: calc(100% - 45px);
 	}
 	

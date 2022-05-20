@@ -24,7 +24,7 @@
 
 <script>
 	import { mapActions } from "vuex";
-	import { db } from "@/firebase";
+	import { db } from "src/firebase";
 
 	export default {
 		name: "Conditions",

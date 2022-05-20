@@ -40,8 +40,8 @@
 
 <script>
 	import { mapActions } from 'vuex';
-	import { conditions } from '@/mixins/conditions.js';
-	import TargetItem from '@/components/combat/TargetItem.vue';
+	import { conditions } from 'src/mixins/conditions.js';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Condition',

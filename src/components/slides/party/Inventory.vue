@@ -8,7 +8,7 @@
 					<div v-if="coin" :key="key">
 						<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>
 						<template v-else>{{ coin }} </template>
-						<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
+						<img :src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)" />
 					</div>
 				</template>
 			</div>
@@ -17,7 +17,7 @@
 				<div class="currency">
 					<div v-for="(coin, key) in currencies" :key="key">
 						<span class="coins" :class="coin.color">
-							<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+							<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" />
 							<q-tooltip anchor="top middle" self="center middle">
 								{{ coin.name }}
 							</q-tooltip>
@@ -114,8 +114,8 @@
 </template>
 
 <script>
-	import { currencyMixin } from '@/mixins/currency.js';
-	import AddItem from '@/components/slides/party/AddItem.vue';
+	import { currencyMixin } from 'src/mixins/currency.js';
+	import AddItem from 'src/components/slides/party/AddItem.vue';
 	import { mapActions } from "vuex";
 	import LinkedItem from "./LinkedItem";
 

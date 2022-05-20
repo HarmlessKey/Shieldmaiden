@@ -4,32 +4,29 @@
 			<hk-card header="Username">
 				<div class="card-body">
 					<h3>
-						Thank you for creating a <b>Harmless Key</b> account!</h3>
+						Thank you for creating a <strong>Harmless Key</strong> account!</h3>
 					<p>To continue, please first enter a username.</p>
-						<ValidationProvider rules="required|alpha_num|min:3|max:20" name="Username" v-slot="{ errors, invalid, validated }">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								type="text" 
-								autocomplete="off"
-								label="Username" 
-								maxlength="20"
-								minlength="3"
-								v-model="username" @keyup.native="checkUsername()"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-							<p v-if="username" class="pl-1">
-								<i aria-hidden="true" class="fas mr-1" :class="{'green fa-check': check == 'available', 'red fa-times': check === 'unavailable'}" />
-									<b>{{ username }}</b> is {{ check }}
-							</p>
-							<button 
-								class="btn btn-block" 
-								:class="{'disabled': check === 'unavailable' || invalid }" 
-								@click="setUsername(!invalid)"
-							>
-								Save
-							</button>
-						</ValidationProvider>
+					<ValidationProvider rules="required|alpha_num|min:3|max:20|username" name="Username" v-slot="{ errors, invalid, validated }">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							type="text" 
+							class="mb-2"
+							autocomplete="off"
+							label="Username" 
+							maxlength="20"
+							minlength="3"
+							v-model="username"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+						<button 
+							class="btn btn-block" 
+							:class="{'disabled': check === 'unavailable' || invalid }" 
+							@click="setUsername(!invalid)"
+						>
+							Save
+						</button>
+					</ValidationProvider>
 				</div>
 			</hk-card>
 		</template>
@@ -37,8 +34,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'	
-	import { mapGetters } from 'vuex'
+	import { db } from 'src/firebase'	
+	import { mapActions, mapGetters } from 'vuex'
 
 export default {
 		name: 'Username',
@@ -46,6 +43,13 @@ export default {
 			return {
 				username: undefined,
 				check: 'available',
+			}
+		},
+		preFetch({ store, redirect }) {
+      if(!store.getters.user) {
+				redirect('/sign-in');
+			} else if (store.getters.userInfo.username) {
+				redirect('/profile')
 			}
 		},
 		computed: {
@@ -56,28 +60,13 @@ export default {
 			])
 		},
 		methods: {
-			checkUsername() {
-				
-				let username = db.ref(`search_users`).orderByChild('username').equalTo(this.username.toLowerCase());
-
-				// Check username
-				username.on('value' , (snapshot) => {
-					if(snapshot.exists()) {
-						this.check = 'unavailable';
-						return
-					} else {
-						this.check = 'available';
-					}
-				});
-
-			},
-			setUsername(valid) {
+			...mapActions([ 'reinitialize' ]),
+			async setUsername(valid) {
 				if (valid && this.check === "available") {
 					let user = {
 						username: this.username,
 						email: this.user.email
 					}
-					if (this.poster) user.poster = true;
 
 					db.ref(`users/${this.user.uid}`).update(user);
 
@@ -90,6 +79,7 @@ export default {
 					this.$snotify.success('Username saved.', 'Critical hit!', {
 						position: "centerTop"
 					});
+					await this.reinitialize();
 					this.$router.replace('/profile');
 				}
 			}

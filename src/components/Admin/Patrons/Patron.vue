@@ -92,9 +92,9 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { general } from '@/mixins/general.js'
-	import EditPatron from '@/views/Admin/Patrons/New.vue'
+	import { db } from 'src/firebase'
+	import { general } from 'src/mixins/general.js'
+	import EditPatron from 'src/views/Admin/Patrons/New.vue'
 
 	export default {
 		name: 'Patron',

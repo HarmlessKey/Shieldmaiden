@@ -38,8 +38,8 @@
 </template>
 
 <script>
-	import Tiers from '@/components/Tiers.vue'
-	import Footer from '@/components/Footer.vue'
+	import Tiers from 'src/components/Tiers.vue'
+	import Footer from 'src/components/Footer.vue'
 
 	export default {
 		name: 'Patreon',

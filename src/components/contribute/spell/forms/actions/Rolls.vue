@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import { damage_types } from '@/mixins/damageTypes.js';
-import ActionRoll from "@/components/ActionRoll"
+import { damage_types } from 'src/mixins/damageTypes.js';
+import ActionRoll from "src/components/ActionRoll"
 
 export default {
 	name: 'spell-action-rolls',

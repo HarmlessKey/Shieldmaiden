@@ -69,8 +69,8 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import { dice } from '@/mixins/dice.js';
-	import { general } from '@/mixins/general.js';
+	import { dice } from 'src/mixins/dice.js';
+	import { general } from 'src/mixins/general.js';
 
 	export default {
 		name: 'SetInitiativeNPC',
@@ -156,12 +156,16 @@
 </script>
 
 <style lang="scss" scoped>
-	ul.entities li {
-		padding-right: 3px;
-		
-		.actions {
-			align-items: center;
-			padding: 0;
+	ul.entities {
+		margin-top: 0;
+
+		li {
+			padding-right: 3px;
+			
+			.actions {
+				align-items: center;
+				padding: 0;
+			}
 		}
 	}
 	.advantage .btn:hover {

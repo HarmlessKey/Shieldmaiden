@@ -11,7 +11,7 @@
 			<div class="row q-col-gutter-xl mb-5">
 				<div class="col-12 col-md-6">
 					<video 
-						class="video" src="@/assets/_img/home/player-overview.mp4" 
+						class="video" src="~assets/_img/home/player-overview.mp4" 
 						muted autoplay playsinline alt="D&D Combat Tracker Harmless Key player overview" loop
 					/>
 				</div>

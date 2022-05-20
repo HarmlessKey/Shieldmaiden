@@ -85,13 +85,11 @@
 	import Entities from "./Entities.vue";
 	import Overview from "./Overview.vue";
 	import General from "./General.vue";
-	import OverEncumbered from "@/components/userContent/OverEncumbered.vue";
 	import { mapGetters, mapActions } from "vuex";
 
 	export default {
 		name: "EditEncounter",
 		components: {
-			OverEncumbered,
 			Loot,
 			Xp,
 			Entities,

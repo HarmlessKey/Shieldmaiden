@@ -52,8 +52,7 @@
 </template>
 
 <script>
-	import Footer from '@/components/Footer.vue';
-	import { auth } from '@/firebase.js';
+	import Footer from 'src/components/Footer.vue';
 
 	export default {
 		name: 'Error',
@@ -62,7 +61,7 @@
 		},
 		data() {
 			return {
-				user: auth.currentUser,
+				user: this.$store.getters.user
 			}
 		},
 	}

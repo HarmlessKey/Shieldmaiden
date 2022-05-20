@@ -34,7 +34,7 @@
 </template>
 
 <script>
-	import { remindersMixin } from '@/mixins/reminders';
+	import { remindersMixin } from 'src/mixins/reminders';
 	import { mapActions } from 'vuex';
 
 	export default {

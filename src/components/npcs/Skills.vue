@@ -96,9 +96,9 @@
 </template>
 
 <script>
-	import { general } from '@/mixins/general.js';
-	import { skills } from '@/mixins/skills.js';
-	import { monsterMixin } from '@/mixins/monster.js';
+	import { general } from 'src/mixins/general.js';
+	import { skills } from 'src/mixins/skills.js';
+	import { monsterMixin } from 'src/mixins/monster.js';
 
 	export default {
 		name: 'npc-Skills',

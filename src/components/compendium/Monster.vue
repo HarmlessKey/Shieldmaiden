@@ -1,5 +1,9 @@
 <template>
-	<div v-if="!loading" class="monster monster-card" ref="entity">
+	<div 
+		v-if="!loading" 
+		class="monster monster-card"
+		:class="{ smallWidth: width < 576 }"
+	>
 		<div class="monster-stats">
 			<h2 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
@@ -278,7 +282,7 @@
 					</p>
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
 						<!-- Checks for type and rolls on index 0 so later more actions can be grouped under one ability -->
-						<template v-if="ability.action_list && ability.action_list[0] && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
+						<template v-if="ability.action_list && ability.action_list[0] && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls && ability.action_list[0].rolls.length">
 							<span v-if="ability.versatile" class="roll-button" @click.stop>
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 									<div class="bg-neutral-8">
@@ -335,18 +339,19 @@
 				</template>
 			</div>
 		</div>
+		<q-resize-observer @resize="setSize" />
 	</div>
 	<hk-loader v-else name="monster" />
 </template>
 
 <script>
-	import { general } from '@/mixins/general.js';
-	import { dice } from '@/mixins/dice.js';
-	import { abilities } from '@/mixins/abilities.js';
-	import { monsterMixin } from '@/mixins/monster.js';
-	import { skills } from '@/mixins/skills.js';
+	import { general } from 'src/mixins/general.js';
+	import { dice } from 'src/mixins/dice.js';
+	import { abilities } from 'src/mixins/abilities.js';
+	import { monsterMixin } from 'src/mixins/monster.js';
+	import { skills } from 'src/mixins/skills.js';
 	import { mapActions, mapGetters } from 'vuex';
-	import Spell from "@/components/compendium/Spell"
+	import Spell from "src/components/compendium/Spell"
 
 	export default {
 		name: 'ViewMonster',
@@ -372,6 +377,7 @@
 		},
 		data() {
 			return {
+				width: 0,
 				monster: {},
 				loading: true,
 				actions: [
@@ -391,7 +397,7 @@
 				this.monster = monster;
 				this.loading = false;
 			} else {
-				await this.get_monster(this.id).then(result => {
+				await this.fetch_monster(this.id).then(result => {
 					if(this.monster_challenge_rating[result.challenge_rating]) {
 						result.proficiency = this.monster_challenge_rating[result.challenge_rating].proficiency;
 					}
@@ -430,8 +436,11 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monster"]),
+			...mapActions("api_monsters", ["fetch_monster"]),
 			...mapActions(["setActionRoll"]),
+			setSize(size) {
+				this.width = size.width;
+			},
 			roll(e, action, versatile) {
 				const config = {
 					type: "monster_action",
@@ -536,8 +545,9 @@
 
 
 		.skill {
-			display: flex;
-			justify-content: space-between;
+			display: grid;
+			grid-template-columns: 1fr max-content;
+			column-gap: 5px;
 			cursor: pointer;
 
 			&:hover {
@@ -601,6 +611,18 @@
 			color: $red
 		}
 	}
+
+	&.smallWidth {
+		.abilities {
+			grid-template-columns: 	repeat(3, auto);
+			grid-template-rows: auto auto;
+			grid-row-gap: 15px;
+		}
+
+		.skills {
+			column-count: 2;
+		}
+	}
 }
 .roll-button {
 	display: inline-block;
@@ -618,17 +640,6 @@
 }
 .disadvantage .roll-button:hover {
 	background-image: url('../../assets/_img/logo/logo-icon-no-shield-red.svg');
-}
-.smallWidth {
-	.abilities {
-		grid-template-columns: 	repeat(3, auto);
-		grid-template-rows: auto auto;
-		grid-row-gap: 15px;
-	}
-
-	.skills {
-		column-count: 2;
-	}
 }
 
 

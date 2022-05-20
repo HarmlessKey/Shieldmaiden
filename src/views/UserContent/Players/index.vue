@@ -83,8 +83,8 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import { experience } from '@/mixins/experience.js';
-	import ContentHeader from "@/components/userContent/ContentHeader";
+	import { experience } from 'src/mixins/experience.js';
+	import ContentHeader from "src/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Players',

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-	import TrackEncounter from '@/components/settings/TrackEncounter.vue';
+	import TrackEncounter from 'src/components/settings/TrackEncounter.vue';
 
 	export default {
 		name: 'TrackSettings',

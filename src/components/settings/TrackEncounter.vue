@@ -226,4 +226,7 @@
 			width: 100%;
 		}
 	}
+	.q-item.no-wrap {
+		flex-wrap: wrap;
+	}
 </style>

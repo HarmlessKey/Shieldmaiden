@@ -14,9 +14,9 @@
 </template>
 
 <script>
-	import General from '@/components/settings/General.vue';
-	import Encounter from '@/components/settings/Encounter.vue';
-	import TrackEncounter from '@/components/settings/TrackEncounter.vue';
+	import General from 'src/components/settings/General.vue';
+	import Encounter from 'src/components/settings/Encounter.vue';
+	import TrackEncounter from 'src/components/settings/TrackEncounter.vue';
 
 	export default {
 		name: 'Settings',

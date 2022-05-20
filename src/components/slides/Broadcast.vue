@@ -11,7 +11,12 @@
 			{{ broadcast.live === campaign_id ? "You're live" : "You're not live" }}
 		</span>
 
-		<p>
+		<p v-if="private_campaign">
+			<strong class="red">Private campaign</strong><br/>
+			Players can't follow your private campaigns.
+		</p>
+
+		<p v-else>
 			When you're live, your players can see the initiative list 
 			of your active encounter and you can choose to show them your rolls there as well.
 			Your encounters can be followed with your <a @click="setSlide({show: true, type: 'PlayerLink'})">public initiative link.</a>
@@ -62,7 +67,7 @@
 			</template>
 		</q-select>
 
-		<a class="btn btn-block mt-4" @click="live()" >
+		<a class="btn btn-block mt-4" @click="private_campaign ? null : live()" :class="{ disabled: private_campaign }">
 			{{ broadcast.live === campaign_id ? "Stop broadcast" : "Go live" }}
 		</a>
 	</div>
@@ -122,6 +127,9 @@
 				set(newVal) {
 					this.sharesSetter = newVal;
 				}
+			},
+			private_campaign() {
+				return this.data.private;
 			}
 		},
 		async mounted() {

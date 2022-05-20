@@ -1,4 +1,4 @@
-import { db } from "@/firebase";
+import { db } from "src/firebase";
 
 const ITEMS_REF = db.ref("custom_items")
 const SEARCH_ITEMS_REF = db.ref("search_custom_items")

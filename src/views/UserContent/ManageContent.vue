@@ -18,7 +18,7 @@
 
 <script>
 	import { mapGetters } from "vuex";
-	import Content from "@/components/userContent/Content";
+	import Content from "src/components/userContent/Content";
 
 	export default {
 		name: "manage-content",

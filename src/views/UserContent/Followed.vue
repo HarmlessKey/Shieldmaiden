@@ -16,13 +16,9 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import Crumble from "@/components/crumble";
 
 	export default {
 		name: 'Followed',
-		components: {
-			Crumble
-		},
 		data() {
 			return {
 				loading: true

@@ -28,7 +28,7 @@
 		</div>
 
 		<div class="spell__description">
-			<vue-markdown name="description" :source="spell.description"/>
+			<!-- <vue-markdown name="description" :source="spell.description"/> -->
 			<div v-if="spell.higher_level">
 				<b class="pl-2"><i>At Higher Levels.</i></b> {{ spell.higher_level }}
 			</div>
@@ -110,15 +110,15 @@
 </template>
 
 <script>
-	import { spells } from '@/mixins/spells.js';
-	import VueMarkdown from 'vue-markdown';
-	import { damage_types } from '@/mixins/damageTypes.js';
+	import { spells } from 'src/mixins/spells.js';
+	// import VueMarkdown from 'vue-markdown';
+	import { damage_types } from 'src/mixins/damageTypes.js';
 
 	export default {
 		name: 'Spell',
 		mixins: [spells, damage_types],
 		components: {
-			VueMarkdown
+			// VueMarkdown
 		},
 		props: [
 			'data',

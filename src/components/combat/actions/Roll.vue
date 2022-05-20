@@ -239,9 +239,9 @@
 
 <script>
 	import { mapGetters, mapActions } from "vuex";
-	import { setHP } from "@/mixins/HpManipulations.js";
-	import { damage_types } from '@/mixins/damageTypes.js';
-	import { runEncounter } from '@/mixins/runEncounter.js';
+	import { setHP } from "src/mixins/HpManipulations.js";
+	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { runEncounter } from 'src/mixins/runEncounter.js';
 
 	export default {
 		name: "Roll",
@@ -357,9 +357,6 @@
 	}
 	.q-tab-panel {
 		padding: 15px 0;
-	}
-	.description {
-		white-space: pre-line;
 	}
 	.limited {
 		font-size: 15px;

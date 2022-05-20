@@ -75,7 +75,7 @@
 
 <script>
 	import { mapActions } from 'vuex';
-	import CopyContent from "@/components/CopyContent";
+	import CopyContent from "src/components/CopyContent";
 	import LinkedItem from "./LinkedItem";
 
 	export default {

@@ -40,20 +40,12 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex'
-	import Conditions from '@/components/combat/Conditions.vue';
-	import Reminders from '@/components/combat/Reminders.vue';
-	import { dice } from '@/mixins/dice.js';
-	import TargetItem from '@/components/combat/TargetItem.vue';
+	import { dice } from 'src/mixins/dice.js';
 
 	export default {
 		name: 'DeathSaves',
 		mixins: [dice],
 		props: ["target"],
-		components: {
-			Conditions,
-			Reminders,
-			TargetItem
-		},
 		computed: {
 			...mapGetters([
 				'entities',

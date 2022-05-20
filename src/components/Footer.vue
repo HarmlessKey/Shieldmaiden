@@ -77,7 +77,7 @@
 				<small>
 					©{{ year }} Harmless Key | All Rights Reserved<br/>
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.<br/>
-					All content is provided under terms of the <a href="/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">Open Gaming License version 1.0a.</a>
+					All content is provided under terms of the <a href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">Open Gaming License version 1.0a.</a>
 				</small>
 			</div>
 		</div>
@@ -86,12 +86,10 @@
 </template>
 
 <script>
-	import { auth } from '@/firebase.js';
-
 	export default {
 		data() {
 			return {
-				user: auth.currentUser,
+				user: this.$store.getters.user,
 				year: (new Date()).getFullYear(),
 			}
 		},

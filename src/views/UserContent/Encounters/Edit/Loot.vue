@@ -4,7 +4,7 @@
 		<div class="currency">
 			<div v-for="(coin, key) in currencies" :key="key">
 				<span class="coins" :class="coin.color">
-					<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+					<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" />
 					<q-tooltip anchor="top middle" self="center middle">
 						{{ coin.name }}
 					</q-tooltip>
@@ -146,7 +146,7 @@
 
 <script>
 	import { mapActions } from "vuex";
-	import { currencyMixin } from "@/mixins/currency.js";
+	import { currencyMixin } from "src/mixins/currency.js";
 	import LinkedItem from "./LinkedItem";
 
 	export default {
@@ -186,7 +186,7 @@
 					"delete_encounter_item_link"
 				]),
 			...mapActions("items", ["get_item"]),
-			...mapActions("api_items", ["get_api_item"]),
+			...mapActions("api_items", ["fetch_api_item"]),
 			async setCurrency() {
 				await this.update_encounter_prop({
 					campaignId: this.campaignId,
@@ -203,7 +203,7 @@
 				if(custom) {
 					item = await this.get_item({ uid: this.user.uid, id });
 				} else {
-					item = await this.get_api_item(id);
+					item = await this.fetch_api_item(id);
 				}
 				return item;
 			},

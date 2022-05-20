@@ -37,7 +37,7 @@
 </template>
 
 <script>
-	import HkVideo from "@/components/hk-components/hk-video";
+	import HkVideo from "src/components/hk-components/hk-video";
 	import FlipCountdown from 'vue2-flip-countdown';
 
 	export default {

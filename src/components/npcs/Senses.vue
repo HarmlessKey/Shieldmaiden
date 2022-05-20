@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { monsterMixin } from '@/mixins/monster.js';
+import { monsterMixin } from 'src/mixins/monster.js';
 
 	export default {
 		name: 'npc-Senses',

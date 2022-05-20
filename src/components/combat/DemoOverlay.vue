@@ -7,7 +7,7 @@
 			<div class="grid bg-neutral-8" :class="{ hide: !showInfo }">
 				<div class="">
 					<h3>
-						<a class="btn btn-sm bg-neutral-5" @click="reload">
+						<a class="btn btn-sm bg-neutral-5" @click="reset_demo()">
 							<i aria-hidden="true" class="far fa-sync-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Reset
@@ -31,6 +31,8 @@
 </template>
 
 <script>
+	import  { mapActions } from "vuex";
+
 	export default {
 		name: 'DemoOverlay',
 		data () {
@@ -39,9 +41,7 @@
 			}
 		},
 		methods: {
-			reload() {
-				this.$router.go();
-			}
+			...mapActions(["reset_demo"])
 		}		
 	}
 </script>

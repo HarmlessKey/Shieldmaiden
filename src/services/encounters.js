@@ -1,4 +1,4 @@
-import { db } from "@/firebase";
+import { db } from "src/firebase";
 
 const ENCOUNTERS_REF = db.ref("encounters");
 const SEARCH_ENCOUNTERS_REF = db.ref("search_encounters");

@@ -80,8 +80,8 @@
 </template>
 
 <script>
-	import { conditions } from '@/mixins/conditions.js';
-	import { damage_types } from '@/mixins/damageTypes.js';
+	import { conditions } from 'src/mixins/conditions.js';
+	import { damage_types } from 'src/mixins/damageTypes.js';
 
 	export default {
 		name: 'npc-Defenses',

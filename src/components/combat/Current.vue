@@ -12,7 +12,13 @@
 				</q-tooltip>
 			</a>
 		</h2>
-		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
+		<q-scroll-area 
+			:dark="$store.getters.theme === 'dark'" 
+			:thumb-style="{ width: '5px'}" 
+			v-on:scroll="shadow()" 
+			ref="scroll"
+			:content-style="{ width: '100%'}"
+		> 
 			<div class="current">
 				<DeathSaves 
 					v-if="(current.entityType === 'player' || current.entityType === 'companion')" 
@@ -32,7 +38,7 @@
 			</div>
 
 			<div v-else class="px-3 py-3">
-				<Actions :current="current" :settings="settings" />
+				<Actions :current="current" />
 			</div>
 		</q-scroll-area>
 	</div>
@@ -40,13 +46,13 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import Conditions from '@/components/combat/Conditions.vue';
-	import Reminders from '@/components/combat/Reminders.vue';
-	import Actions from '@/components/combat/actions/Actions.vue';
-	import { remindersMixin } from '@/mixins/reminders';
-	import { dice } from '@/mixins/dice';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import DeathSaves from '@/components/combat/DeathSaves.vue';
+	import Conditions from 'src/components/combat/Conditions.vue';
+	import Reminders from 'src/components/combat/Reminders.vue';
+	import Actions from 'src/components/combat/actions/Actions.vue';
+	import { remindersMixin } from 'src/mixins/reminders';
+	import { dice } from 'src/mixins/dice';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import DeathSaves from 'src/components/combat/DeathSaves.vue';
 	import ViewEntity from './ViewEntity.vue';
 
 	export default {

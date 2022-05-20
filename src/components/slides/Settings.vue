@@ -7,7 +7,7 @@
 </template>
 
 <script>
-	import Encounter from '@/components/settings/Encounter.vue';
+	import Encounter from 'src/components/settings/Encounter.vue';
 
 	export default {
 		name: 'Settings',

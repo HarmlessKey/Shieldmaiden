@@ -31,13 +31,13 @@
 		methods: {
 			...mapActions(["setSlide"]),
 			...mapActions("items", ["get_item"]),
-			...mapActions("api_items", ["get_api_item"]),
+			...mapActions("api_items", ["fetch_api_item"]),
 			async getItem(id, custom) {
 				let item;
 				if(custom) {
 					item = await this.get_item({ uid: this.user.uid, id });
 				} else {
-					item = await this.get_api_item(id);
+					item = await this.fetch_api_item(id);
 				}
 				return item;
 			}

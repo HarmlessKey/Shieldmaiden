@@ -3,11 +3,11 @@
 		<h3>Theme</h3>
 		<div class="theme">
 			<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
-				<img src="@/assets/_img/dark.webp" />
+				<img src="~assets/_img/dark.webp" />
 				Dark
 			</a>
 			<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
-				<img src="@/assets/_img/light.webp" />
+				<img src="~assets/_img/light.webp" />
 				Light
 			</a>
 		</div>
@@ -28,8 +28,10 @@
 						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
 					<q-item-section class="neutral-2 truncate">
-						<q-item-label>{{ setting.name }}</q-item-label>
-						<q-item-label caption>
+						<q-item-label class="truncate">
+							{{ setting.name }}
+						</q-item-label>
+						<q-item-label caption class="truncate">
 							{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
 						</q-item-label>
 					</q-item-section>
@@ -74,7 +76,7 @@
 </template>
 
 <script>
-	import Keybindings from '@/components/slides/Keybindings.vue';
+	import Keybindings from 'src/components/slides/Keybindings.vue';
 	import { mapGetters, mapActions } from "vuex";
 
 	export default {
@@ -116,7 +118,7 @@
 							},
 							{ 
 								key: 'passive_investigation',
-								name: 'Passive Invastigation', 
+								name: 'Passive Investigation', 
 								icon: 'fas fa-search',
 								info: 'Show passive investigation in the player overview.',
 								options: [
@@ -202,6 +204,9 @@
 		.q-item {
 			width: 100%;
 		}
+	}
+	.q-item.no-wrap {
+		flex-wrap: wrap;
 	}
 	.theme {
 		display: flex;

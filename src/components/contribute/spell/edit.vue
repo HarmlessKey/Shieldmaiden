@@ -92,11 +92,11 @@
 </template>
 
 <script>
-import { db } from '@/firebase';
-import EditSpell from '@/components/contribute/spell/forms';
+import { db } from 'src/firebase';
+import EditSpell from 'src/components/contribute/spell/forms';
 import ViewSpell from './ViewSpell.vue';
-import { general } from '@/mixins/general';
-import { spells } from '@/mixins/spells';
+import { general } from 'src/mixins/general';
+import { spells } from 'src/mixins/spells';
 import { mapGetters } from 'vuex';
 
 export default {

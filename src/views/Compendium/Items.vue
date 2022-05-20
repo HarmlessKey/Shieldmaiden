@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header">
 			<h1><i aria-hidden="true" class="fas fa-treasure-chest mr-2" /> Items</h1>
 			<span class="neutral-3">
-				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+				Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
 			</span>
 		</div>
 		<div class="card-body">
@@ -96,7 +96,7 @@
 </template>
 
 <script>
-	import Item from '@/components/compendium/Item.vue';
+	import Item from 'src/components/compendium/Item.vue';
 	import { mapActions } from "vuex";
 
 	export default {
@@ -144,7 +144,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_items", ["get_api_items"]),
+			...mapActions("api_items", ["fetch_api_items"]),
 			filter() {
 				this.loading = true;
 				this.items = [];
@@ -159,7 +159,7 @@
 				this.fetchItems();		
 			},
 			async fetchItems() {
-				await this.get_api_items({
+				await this.fetch_api_items({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

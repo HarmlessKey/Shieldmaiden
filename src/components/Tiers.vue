@@ -45,7 +45,7 @@
 
 <script>
 	import { mapGetters } from 'vuex'
-	import { db } from '@/firebase'	
+	import { db } from 'src/firebase'	
 
 	export default {
 		data() {

@@ -24,9 +24,9 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { monsterMixin } from "@/mixins/monster";
-	import { skills} from "@/mixins/skills";
+	import { db } from 'src/firebase';
+	import { monsterMixin } from "src/mixins/monster";
+	import { skills} from "src/mixins/skills";
 
 	export default {
 		name: 'GenerateSearchTable',
@@ -90,19 +90,25 @@
 									let entry = entries[key];
 
 									// USE THIS TO CHANGE KEY FOR CAMPAIGN NAME FROM CAMPAING TO NAME
-									// await db.ref(`encounters/${uid}/${cid}/${key}/name`).set(entry.encounter);
-									// await db.ref(`encounters/${uid}/${cid}/${key}/encounter`).remove();
-
-									const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
-									const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}/${key}`);
-									try {
-										await search_ref.set(search_entry)
-									} catch(error) {
-										console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
+									if (encounter.encounter !== undefined) {
+										if (encounter.name === undefined) {
+											// Encounter name stored in .encounter should be in .name
+											await db.ref(`encounters/${uid}/${cid}/${key}/name`).set(entry.encounter);
+										}
+										// .encounter should be removed
+										await db.ref(`encounters/${uid}/${cid}/${key}/encounter`).remove();
 									}
+
+									// const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
+									// const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}/${key}`);
+									// try {
+									// 	// await search_ref.set(search_entry)
+									// } catch(error) {
+									// 	console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
+									// }
 								}
-								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/${cid}/count`);
-								await count_ref.set(Object.keys(entries).length);
+								// const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/${cid}/count`);
+								// await count_ref.set(Object.keys(entries).length);
 							}
 							console.groupEnd();
 						}
@@ -112,13 +118,23 @@
 							console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
 							for (const cid in campaigns) {
 								const campaign = campaigns[cid]
+								console.log("camp obj",campaign);
 
 								// USE THIS TO CHANGE KEY FOR CAMPAIGN NAME FROM CAMPAING TO NAME
-								// await db.ref(`campaigns/${uid}/${cid}/name`).set(campaign.campaign);
-								// await db.ref(`campaigns/${uid}/${cid}/campaign`).remove();
+								if (campaign.campaign !== undefined) {
+									// A campaign key was found so db needs update
+									if (campaign.name === undefined) {
+										// campaign has old campaign key and NO name key. Name needs to be generated
+										await db.ref(`campaigns/${uid}/${cid}/name`).set(campaign.campaign);
+									}
+									// campaign has old campaign key so needs to be removed
+									await db.ref(`campaigns/${uid}/${cid}/campaign`).remove();
+								}
+								// If no campaign key found, no update needed.
 
-								const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}`);
-								const search_entry = this.extractFields(campaign, this.search_fields[this.ref]);
+
+								// const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}`);
+								// const search_entry = this.extractFields(campaign, this.search_fields[this.ref]);
 								// const camp_enc_ref = db.ref(`encounters/${uid}/${cid}`)
 								// const camp_encs = await camp_enc_ref.once('value');
 
@@ -127,18 +143,18 @@
 								// 	search_entry.encounter_count = Object.keys(camp_encs.val()).length;
 								// }
 								
-								try {
-									await search_ref.set(search_entry)
-								} catch(error) {
-									console.error(`Couldn't update ${this.search_ref[this.ref]} table`, cid, campaign.campaign, error, search_entry)
-								}
+								// try {
+								// 	await search_ref.set(search_entry)
+								// } catch(error) {
+								// 	console.error(`Couldn't update ${this.search_ref[this.ref]} table`, cid, campaign.campaign, error, search_entry)
+								// }
 
-								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-								await count_ref.set(Object.keys(campaigns).length);
+								// const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
+								// await count_ref.set(Object.keys(campaigns).length);
 							}
 							console.groupEnd();
-							const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-							await count_ref.set(Object.keys(campaigns).length);
+							// const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
+							// await count_ref.set(Object.keys(campaigns).length);
 						}
 
 

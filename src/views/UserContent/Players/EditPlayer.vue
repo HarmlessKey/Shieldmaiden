@@ -435,12 +435,12 @@
 <script>
 	import GiveCharacterControl from './GiveCharacterControl.vue';
 	import { mapGetters, mapActions } from 'vuex';
-	import { experience } from '@/mixins/experience.js';
-	import { skills } from '@/mixins/skills.js';
-	import { general } from '@/mixins/general.js';
+	import { experience } from 'src/mixins/experience.js';
+	import { skills } from 'src/mixins/skills.js';
+	import { general } from 'src/mixins/general.js';
 	import Defenses from './Defenses';
 	import CopyContent from '../../../components/CopyContent.vue';
-	import { abilities } from "@/mixins/abilities";
+	import { abilities } from "src/mixins/abilities";
 
 	export default {
 		name: 'EditPlayer',

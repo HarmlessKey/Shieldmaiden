@@ -87,7 +87,7 @@
 									<div class="currency mb-3" v-if="encounter.currency">
 										<div class="currency-form">
 											<div v-for="(coin, key) in currencies" :key="key">
-												<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+												<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" />
 												<q-input
 													:dark="$store.getters.theme === 'dark'" filled square dense
 													class="text-center"
@@ -96,7 +96,7 @@
 													type="number" 
 													size="sm"
 													min="0" 
-													v-model="encounter.currency[key]" :placeholder="coin.name"/>
+													v-model="editableEncounter.currency[key]" :placeholder="coin.name"/>
 											</div>
 										</div>
 										
@@ -180,9 +180,9 @@
 </template>
 
 <script>
-	import Dmg from "@/components/combat/side/Dmg.vue";
-	import Log from "@/components/combat/side/Log.vue";
-	import { currencyMixin } from "@/mixins/currency.js";
+	import Dmg from "src/components/combat/side/Dmg.vue";
+	import Log from "src/components/combat/side/Log.vue";
+	import { currencyMixin } from "src/mixins/currency.js";
 	import { mapActions, mapGetters } from "vuex";
 
 	export default {
@@ -194,7 +194,7 @@
 		components: {
 			Dmg,
 			Log,
-			Players: () => import("@/components/campaign/Players.vue")
+			Players: () => import("src/components/campaign/Players.vue")
 		},
 		data() {
 			return {
@@ -204,7 +204,8 @@
 				campaignPlayers: {},
 				campaign: {},
 				patreon: true,
-				tab: "loot"
+				tab: "loot",
+				editableEncounter: this.encounter
 			}
 		},
 		computed: {
@@ -280,7 +281,7 @@
 			...mapActions("players", ["get_player"]),
 			awardCurrency() {
 				let oldValue = (this.campaign.inventory && this.campaign.inventory.currency) ? this.campaign.inventory.currency : 0;
-				let newValue = parseInt(oldValue) + this.currencyToCopper(this.encounter.currency);
+				let newValue = parseInt(oldValue) + this.currencyToCopper(this.editableEncounter.currency);
 				newValue = (newValue > this.maxCurrencyAmount) ? this.maxCurrencyAmount : newValue;
 
 				this.set_campaign_currency({

@@ -71,7 +71,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import { db } from 'src/firebase'
 
 	export default {
 		name: 'NewPatron',

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-	import { auth } from '@/firebase'
+	import { auth } from 'src/firebase'
 
 	export default {
 		name: 'login',

@@ -30,7 +30,7 @@
 				return intensities[index];	
 			},
 			// audio_file() {
-			// 	return require(`@/assets/_audio/weather/rain/${this.intensity}.wav`);
+			// 	return require(`src/assets/_audio/weather/rain/${this.intensity}.wav`);
 			// }
 		}
 	};

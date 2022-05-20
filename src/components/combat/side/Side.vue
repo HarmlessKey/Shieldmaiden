@@ -32,9 +32,9 @@
 </template>
 
 <script>
-	import Dmg from "@/components/combat/side/Dmg.vue";
-	import Log from "@/components/combat/side/Log.vue";
-	import Requests from "@/components/combat/side/Requests.vue";
+	import Dmg from "src/components/combat/side/Dmg.vue";
+	import Log from "src/components/combat/side/Log.vue";
+	import Requests from "src/components/combat/side/Requests.vue";
 	import { mapGetters } from "vuex";
 
 	export default {

@@ -1,6 +1,6 @@
-import { db } from '@/firebase';
+import { db } from 'src/firebase';
 import { mapActions, mapGetters } from 'vuex';
-import { remindersMixin } from '@/mixins/reminders';
+import { remindersMixin } from 'src/mixins/reminders';
 
 export const setHP = {
 	mixins: [remindersMixin],
@@ -193,7 +193,7 @@ export const setHP = {
 						await this.damageMeters(target.key, 'damageTaken', amount, target.entityType); //damage taken
 						await this.damageMeters(target.key, 'overkillTaken', over, target.entityType); //Over damage taken
 					}
-				}  
+				} 
 				//To undo, run same function with opposite types 
 				else {
 					await this.set_meters({key: current.key, type: 'healing', amount}) //Undo damage done
@@ -281,7 +281,7 @@ export const setHP = {
 				over = (config.undo !== true) ? -config.undo : 0;
 			}
 
-			// Update healing meters
+			// Update the healing meters
 			if(!this.demo) {
 				if(!config.undo) {
 					// Meters for the encounter
@@ -303,7 +303,7 @@ export const setHP = {
 						await this.damageMeters(target.key, 'overhealingTaken', over, target.entityType); //Over healing taken
 					}
 				}
-				//To undo, run same function with opposite types 
+				// To undo, run same function with opposite types 
 				else {
 					await this.set_meters({key: current.key, type: 'damage', amount}) //Undo Healing done
 					await this.set_meters({key: current.key, type: 'overkill', amount: over}) //Undo Over Healing done

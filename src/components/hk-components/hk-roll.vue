@@ -39,7 +39,7 @@
 </template>
 
 <script>
-	import { dice } from '@/mixins/dice.js';
+	import { dice } from 'src/mixins/dice.js';
 	export default {
 		name: 'hk-roll',
 		mixins: [dice],
@@ -99,7 +99,7 @@
 				}
 			}
 		},
-		created() {
+		mounted() {
 			this.$nextTick(function() {
 				window.addEventListener('keyup', this.checkKeyPress);
 				window.addEventListener('keydown', this.checkKeyPress);

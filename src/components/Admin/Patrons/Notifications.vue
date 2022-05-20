@@ -64,9 +64,9 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import { db } from 'src/firebase'
 	import _ from 'lodash'
-	import { general } from '@/mixins/general.js'
+	import { general } from 'src/mixins/general.js'
 
 	export default {
 		name: 'Notifications',

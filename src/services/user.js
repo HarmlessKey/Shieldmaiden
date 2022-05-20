@@ -1,4 +1,4 @@
-import { db } from "@/firebase";
+import { db } from "src/firebase";
 
 const USERS_REF = db.ref("users");
 const SETTINGS_REF = db.ref("settings");

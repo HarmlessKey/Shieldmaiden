@@ -18,10 +18,10 @@
 </template>
 
 <script>
-	import { remindersMixin } from "@/mixins/reminders";
+	import { remindersMixin } from "src/mixins/reminders";
 	import { mapActions } from "vuex";
-	import ReminderForm from "@/components/ReminderForm";
-	import TargetItem from "@/components/combat/TargetItem.vue";
+	import ReminderForm from "src/components/ReminderForm";
+	import TargetItem from "src/components/combat/TargetItem.vue";
 
 	export default {
 		name: "Reminder",

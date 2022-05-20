@@ -14,7 +14,7 @@
 									<div class="img" v-if="entity_key && entities && Object.keys(entities).includes(entity_key)">
 										<Avatar :entity="entities[entity_key]" :players="players" :npcs="npcs" />
 									</div>
-									<img class="img logo" v-else src="@/assets/_img/logo/logo-icon-no-shield-cyan.svg" alt="Avatar" />
+									<img class="img logo" alt="logo" v-else src="~assets/_img/logo/logo-icon-no-shield-cyan.svg" />
 
 									<div class="header">
 										<!-- NAME -->
@@ -109,8 +109,8 @@
 </template>
 
 <script>
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
-	import { damage_types } from "@/mixins/damageTypes.js";
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
+	import { damage_types } from "src/mixins/damageTypes.js";
 	import Name from "./live/Name";
 	import Avatar from "./live/Avatar";
 

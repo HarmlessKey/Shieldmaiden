@@ -10,7 +10,7 @@
 </template>
 
 <script>
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
 
 	export default {
 		name: 'Name',

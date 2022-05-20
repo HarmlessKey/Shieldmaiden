@@ -129,11 +129,11 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 			...mapActions("npcs", ["get_npcs", "get_npc"]),
-			...mapActions("api_items", ["get_api_items", "get_api_item"]),
+			...mapActions("api_items", ["fetch_api_items", "fetch_api_item"]),
 			...mapActions("items", ["get_items", "get_item"]),
-			...mapActions("api_spells", ["get_api_spells", "get_api_spell"]),
+			...mapActions("api_spells", ["fetch_api_spells", "fetch_api_spell"]),
 			changeCopyResource(value) {
 				this.copy_resource = value;
 				this.query = "";
@@ -160,9 +160,9 @@
 					else {
 						let data;
 
-						if(this.type === "monster") { data = this.get_monsters; }
-						else if(this.type === "item") { data =  this.get_api_items; }
-						else if(this.type === "spell") { data = this.get_api_spells; }
+						if(this.type === "monster") { data = this.fetch_monsters; }
+						else if(this.type === "item") { data =  this.fetch_api_items; }
+						else if(this.type === "spell") { data = this.fetch_api_spells; }
 						
 						await data({ query: { search: this.query }}).then(results => {
 							if(results.meta.count === 0) {
@@ -194,23 +194,24 @@
 					if(this.type === "monster") {
 						result = (this.copy_resource === "custom")
 							? await this.get_npc({ uid: this.userId, id })
-							: await this.get_monster(id);
+							: await this.fetch_monster(id);
 					}
 					if(this.type === "item") {
 						result = (this.copy_resource === "custom")
 							? await this.get_item({ uid: this.userId, id })
-							: await this.get_api_item(id);
+							: await this.fetch_api_item(id);
 					}
 					if(this.type === "spell") {
 						result = (this.copy_resource === "custom")
 							? await this.get_spell({ uid: this.userId, id })
-							: await this.get_api_spell(id);
+							: await this.fetch_api_spell(id);
 					}
 	
 					// Remove properties not needed for custom monsters
 					delete result._id;
 					delete result.key;
 					delete result.url;
+					delete result.meta;
 
 					this.$emit("copy", { result, id, resource: this.copy_resource });
 				}

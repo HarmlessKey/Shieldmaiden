@@ -78,8 +78,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import User from '@/components/Admin/User.vue';
+	import { db } from 'src/firebase';
+	import User from 'src/components/Admin/User.vue';
 	import { mapActions } from 'vuex';
 
 	export default {

@@ -111,16 +111,12 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import Actions from '@/components/combat/actions/Actions.vue';
-	import Roll from '@/components/combat/actions/Roll.vue';
-	import TargetMenu from '@/components/combat/TargetMenu.vue';
+	import Actions from 'src/components/combat/actions/Actions.vue';
 
 	export default {
 		name: 'Menu',
 		components: {
-			Actions,
-			Roll,
-			TargetMenu,
+			Actions
 		},
 		props: ["entities", "settings", "current"],
 		data () {
@@ -170,8 +166,7 @@
 						}
 					});
 				}
-				if(this.targeted.length)
-					return tabs;
+				return tabs;
 			},
 		},
 		methods: {

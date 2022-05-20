@@ -1,7 +1,7 @@
 <template>
 	<div class="container-fluid">
 		<div class="container">
-			<img src="@/assets/_img/logo/logo-main-icon-left.svg"/>
+			<img src="~assets/_img/logo/logo-main-icon-left.svg"/>
 			<hk-card header="Thanks for trying our demo">
 				<div class="card-body">
 					<h3>We hope you were impressed by the possibilities</h3>

@@ -24,8 +24,8 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import DeathSaves from '@/components/combat/DeathSaves.vue';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import DeathSaves from 'src/components/combat/DeathSaves.vue';
 
 	export default {
 		name: 'Current',

@@ -273,7 +273,7 @@
 </template>
 
 <script>
-import { conditions } from '@/mixins/conditions.js';
+import { conditions } from 'src/mixins/conditions.js';
 
 export default {
 	name: 'spell-action-conditions',

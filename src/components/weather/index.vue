@@ -69,7 +69,7 @@ export default {
 	},
 	mounted() {
 		if(this.audio && this.weather && this.weather.lightning > 0) {
-			// this.thunder_audio = require("@/assets/_audio/weather/thunder.wav");
+			// this.thunder_audio = require("src/assets/_audio/weather/thunder.wav");
 			this.thunder();
 		}
 	},

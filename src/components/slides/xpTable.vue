@@ -14,7 +14,7 @@
 </template>
 
 <script>
-	import { experience } from '@/mixins/experience.js'
+	import { experience } from 'src/mixins/experience.js'
 
 	export default {
 		name: 'DeathSaves',

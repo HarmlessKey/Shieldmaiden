@@ -7,7 +7,7 @@
 
 <script>
 	import { mapActions } from "vuex";
-	import CopyContent from "@/components/CopyContent";
+	import CopyContent from "src/components/CopyContent";
 
 	export default {
 		name: "LinkItemEncounter",

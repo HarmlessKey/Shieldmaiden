@@ -30,7 +30,7 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import ReminderForm from '@/components/ReminderForm';
+	import ReminderForm from 'src/components/ReminderForm';
 
 	export default {
 		name: 'EditReminder',

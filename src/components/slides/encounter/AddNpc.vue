@@ -179,9 +179,9 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import { general } from '@/mixins/general.js';
-	import { dice } from '@/mixins/dice.js';
-	import CopyContent from "@/components/CopyContent";
+	import { general } from 'src/mixins/general.js';
+	import { dice } from 'src/mixins/dice.js';
+	import CopyContent from "src/components/CopyContent";
 
 	export default {
 		name: 'AddEntity',

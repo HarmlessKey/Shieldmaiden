@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { npcServices } from "@/services/npcs"; 
+import { npcServices } from "src/services/npcs"; 
 import _ from "lodash";
 
 // Converts a full npc to a search_npc
@@ -20,12 +20,12 @@ const convert_npc = (npc) => {
 	return returnNpc;
 }
 
-const npc_state = {
+const npc_state = () => ({
   npc_services: null,
   cached_npcs: {},
   npc_count: 0,
   npcs: undefined
-};
+});
 
 const npc_getters = {
   npcs: (state) => {
@@ -42,7 +42,7 @@ const npc_getters = {
 
 const npc_actions = {
   async get_npc_services({ getters, commit }) {
-    if(getters.npc_services === null) {
+    if(getters.npc_services === null || !Object.keys(getters.npc_services).length) {
       commit("SET_NPC_SERVICES", new npcServices);
     }
     return getters.npc_services;

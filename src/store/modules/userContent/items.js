@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { itemServices } from "@/services/items"; 
+import { itemServices } from "src/services/items"; 
 import _ from "lodash";
 
 // Converts a full item to a search_item
@@ -18,12 +18,12 @@ const convert_item = (item) => {
 	return returnItem;
 }
 
-const item_state = {
+const item_state = () => ({
 	item_services: null,
 	cached_items: {},
 	item_count: 0,
 	items: undefined,
-}
+});
 
 const item_getters = {
 	items: (state) => {
@@ -36,11 +36,11 @@ const item_getters = {
   },
 	item_services: (state) => { return state.item_services },
 	item_count: (state) => { return state.item_count },
-}
+};
 
 const item_actions = {
 	async get_item_services({ getters, commit }) {
-		if (getters.item_services === null) {
+		if (getters.item_services === null || !Object.keys(getters.item_services).length) {
 			commit("SET_ITEM_SERVICES", new itemServices);
 		}
 		return getters.item_services;

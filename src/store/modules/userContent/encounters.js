@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { encounterServices } from "@/services/encounters"; 
+import { encounterServices } from "src/services/encounters"; 
 import _ from 'lodash';
 
 // Converts a full encounter to a search_encounter
@@ -20,12 +20,12 @@ const convert_encounter = (encounter) => {
 	return returnEncounter;
 }
 
-const encounter_state = {
+const encounter_state = () => ({
   encounter_services: null,
   cached_encounters: {},
   encounters: {},
   encounter_count: {}
-};
+});
 
 const encounter_getters = {
   get_encounters: (state) => (campaignId, finished) => {
@@ -47,7 +47,7 @@ const encounter_getters = {
 
 const encounter_actions = {
   async get_encounter_services({ getters, commit }) {
-    if(getters.encounter_services === null) {
+    if(getters.encounter_services === null || !Object.keys(getters.encounter_services).length) {
       commit("SET_ENCOUNTER_SERVICES", new encounterServices);
     }
     return getters.encounter_services;

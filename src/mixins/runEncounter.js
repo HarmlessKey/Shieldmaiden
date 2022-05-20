@@ -1,4 +1,4 @@
-import { dice } from "@/mixins/dice.js";
+import { dice } from "src/mixins/dice.js";
 import { mapActions, mapGetters } from "vuex";
 
 export const runEncounter = {

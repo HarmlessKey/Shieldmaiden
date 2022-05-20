@@ -240,11 +240,11 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { general } from '@/mixins/general.js';
+	import { db } from 'src/firebase';
+	import { general } from 'src/mixins/general.js';
 	import { mapActions } from 'vuex';
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
-	import { conditions } from '@/mixins/conditions.js';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
+	import { conditions } from 'src/mixins/conditions.js';
 
 	import Health from './Health.vue';
 	import Name from './Name.vue';

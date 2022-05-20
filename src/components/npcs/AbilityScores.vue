@@ -45,8 +45,8 @@
 </template>
 
 <script>
-	import { general } from '@/mixins/general.js';
-	import { abilities } from '@/mixins/abilities.js';
+	import { general } from 'src/mixins/general.js';
+	import { abilities } from 'src/mixins/abilities.js';
 
 	export default {
 		name: 'npc-AbilityScores',

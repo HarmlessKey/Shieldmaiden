@@ -12,7 +12,6 @@
       <div class="card-body overflow-x-hidden">
         <hk-video />
         <p class="neutral-2 mt-3 text-center">Try the most advanced initiative tracker on the internet.</p>
-
         <router-link class="btn btn-block btn-sm bg-green" to="/demo">Demo encounter</router-link>
       </div>
     </hk-card>
@@ -27,6 +26,21 @@
       </div>
       <div class="card-body">
        <PlayerLink :qr="false" :title="false" :info="false" />
+      </div>
+    </hk-card>
+
+    <!-- HOMEBREW CREATION -->
+    <hk-card v-if="false">
+      <div 
+        slot="image"
+        class="card-image" 
+        :style="{ backgroundImage: `url(${require('src/assets/_img/homebrew-creation.webp')})`}"
+      >
+        <div class="image-title">Homebrew creation</div>
+      </div>
+      <div class="card-body">
+        <p class="text-center">Need a free adventure template, or help forming the basic idea of your adventure?</p>
+        <a class="btn btn-block btn-sm" href="http://homebrewcreation.com" rel="noopener" target="_blank">Start creating</a>
       </div>
     </hk-card>
 
@@ -59,7 +73,14 @@
     <hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
       <div slot="header" class="card-header">
         Subscription
-        <b>{{ tier.name }}</b>
+        <hk-popover 
+          v-if="pending_payment"
+          header="Pending"
+          content="Your Patreon payment is pending, this might take a few minutes." 
+        >
+          Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
+        </hk-popover>
+        <strong v-else>{{ tier.name }}</strong>
       </div>
       <q-linear-progress 
         v-if="tier.name !== 'Deity'"
@@ -92,9 +113,9 @@ export default {
     page: String
   },
   components: {
-    PlayerLink: () => import("@/components/PlayerLink"),
-    HkVideo: () => import("@/components/hk-components/hk-video"),
-    Tier: () => import("@/components/userContent/Tier"),
+    PlayerLink: () => import("src/components/PlayerLink"),
+    HkVideo: () => import("src/components/hk-components/hk-video"),
+    Tier: () => import("src/components/userContent/Tier"),
   },
   data() {
     return {
@@ -129,9 +150,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["user", "tier", "slots_used"]),
+    ...mapGetters(["user", "tier", "slots_used", "userInfo"]),
     filtered_content() {
       return this.content.filter(item => item.value !== this.page);
+    },
+    pending_payment() {
+      return this.userInfo && this.userInfo.patron && this.userInfo.patron.last_charge_status === "Pending";
     }
   },
   methods: {
@@ -144,3 +168,21 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .hk-card {
+    .card-image {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+
+      .image-title {
+        font-size: 30px;
+        line-height: 35px;
+        opacity: 1;
+        font-weight: bold;
+        text-shadow: 2px 2px 5px $black;
+      }
+    }
+  }
+</style>

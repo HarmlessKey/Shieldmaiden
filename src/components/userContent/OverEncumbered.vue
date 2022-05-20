@@ -1,7 +1,7 @@
 <template>
 	<q-banner class="bg-red mb-3 white" rounded inline-actions>
 		<q-icon slot="avatar" name="fas fa-box-full" />
-		<b>You're over encumbered!</b><br/>
+		<strong>You're over encumbered!</strong><br/>
 		<small>
 			You have more content than your current subscription allows.<br/>
 			Some functionality is unavailable until you resolve this.

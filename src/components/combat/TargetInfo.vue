@@ -16,10 +16,10 @@
 <script>
 	import { mapGetters } from 'vuex'
 	import ViewEntity from './ViewEntity.vue';
-	import Conditions from '@/components/combat/Conditions.vue';
-	import Reminders from '@/components/combat/Reminders.vue';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import DeathSaves from '@/components/combat/DeathSaves.vue';
+	import Conditions from 'src/components/combat/Conditions.vue';
+	import Reminders from 'src/components/combat/Reminders.vue';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import DeathSaves from 'src/components/combat/DeathSaves.vue';
 
 	export default {
 		name: 'TargetInfo',

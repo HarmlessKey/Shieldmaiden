@@ -202,7 +202,7 @@
 </template>
 
 <script>
-import EffectsForm from '@/components/EffectsForm';
+import EffectsForm from 'src/components/EffectsForm';
 import numeral from 'numeral';
 
 export default {

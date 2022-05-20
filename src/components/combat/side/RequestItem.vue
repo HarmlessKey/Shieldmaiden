@@ -110,7 +110,7 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import { setHP } from '@/mixins/HpManipulations.js';
+	import { setHP } from 'src/mixins/HpManipulations.js';
 
 	export default {
 		name: 'RequestItem',

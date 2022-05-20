@@ -145,7 +145,6 @@
 		
 		.q-carousel {
 			max-width: 750px;
-			width: 750px;
 			height: 250px;
 			font-size: 12px;
 
@@ -160,6 +159,13 @@
 					margin-bottom: 10px !important;
 					line-height: 18px;
 				}
+			}
+		}
+	}
+	@media only screen and (min-width: 900px) {
+		.feedback{
+			.q-carousel {
+				width: 750px;
 			}
 		}
 	}

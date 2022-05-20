@@ -95,8 +95,8 @@
 
 <script>
 	import { mapGetters } from "vuex";
-	import { setHP } from "@/mixins/HpManipulations.js";
-	import { damage_types } from "@/mixins/damageTypes.js";
+	import { setHP } from "src/mixins/HpManipulations.js";
+	import { damage_types } from "src/mixins/damageTypes.js";
 
 	export default {
 		name: "Manual",

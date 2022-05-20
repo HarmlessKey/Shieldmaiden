@@ -13,7 +13,7 @@
 					<div class="video-wrapper">
 						<div class="video">
 							<video 
-								src="@/assets/_img/home/track-encounter.mp4" 
+								src="~assets/_img/home/track-encounter.mp4" 
 								muted autoplay playsinline alt="Share initative screen Harmless Key D&amp;D Combat Tracker" loop
 							/>
 							<div class="info">An example of how your players can follow your encounters.</div>

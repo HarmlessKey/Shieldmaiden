@@ -534,13 +534,13 @@
 </template>
 
 <script>
-	import { general } from '@/mixins/general.js';
-	import { abilities } from '@/mixins/abilities.js';
-	import { damage_types } from '@/mixins/damageTypes.js';
-	import { monsterMixin } from '@/mixins/monster.js';
-	import ActionRoll from '@/components/ActionRoll';
+	import { general } from 'src/mixins/general.js';
+	import { abilities } from 'src/mixins/abilities.js';
+	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { monsterMixin } from 'src/mixins/monster.js';
+	import ActionRoll from 'src/components/ActionRoll';
 	import { mapActions } from 'vuex';
-	import { dice } from '@/mixins/dice.js';
+	import { dice } from 'src/mixins/dice.js';
 	
 	export default {
 		name: 'npc-Actions',

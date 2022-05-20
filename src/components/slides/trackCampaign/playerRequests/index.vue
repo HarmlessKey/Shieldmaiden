@@ -71,9 +71,9 @@
 
 <script>
 	import DamageHealing from './DamageHealing';
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
-	import Avatar from '@/components/trackCampaign/live/Avatar.vue';
-	import Name from '@/components/trackCampaign/live/Name.vue';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
+	import Avatar from 'src/components/trackCampaign/live/Avatar.vue';
+	import Name from 'src/components/trackCampaign/live/Name.vue';
 
 	export default {
 		name: 'playerRequests',

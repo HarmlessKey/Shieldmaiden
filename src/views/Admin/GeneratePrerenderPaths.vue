@@ -28,14 +28,14 @@
 		},
 
 		methods: {
-			...mapActions("api_monsters", ["get_monsters",]),
-			...mapActions("api_items", ["get_api_items",]),
-			...mapActions("api_spells", ["get_api_spells",]),
-			...mapActions("api_conditions", ["get_conditions",]),
+			...mapActions("api_monsters", ["fetch_monsters",]),
+			...mapActions("api_items", ["fetch_api_items",]),
+			...mapActions("api_spells", ["fetch_api_spells",]),
+			...mapActions("api_conditions", ["fetch_conditions",]),
 			async downloadJson() {
 
 				// CONDITIONS
-				const conditions = await this.get_conditions({
+				const conditions = await this.fetch_conditions({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]
@@ -46,7 +46,7 @@
 				}
 
 				// ITEMS
-				const items = await this.get_api_items({
+				const items = await this.fetch_api_items({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]
@@ -57,7 +57,7 @@
 				}
 
 				// MONSTERS
-				const monsters = await this.get_monsters({
+				const monsters = await this.fetch_monsters({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]
@@ -68,7 +68,7 @@
 				}
 
 				// SPELLS
-				const spells = await this.get_api_spells({
+				const spells = await this.fetch_api_spells({
 					pageNumber: 1,
 					pageSize: 0,
 					fields: ["url"]

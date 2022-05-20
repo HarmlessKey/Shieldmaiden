@@ -1,22 +1,24 @@
 <template>
-	<a 
-		v-if="share_available" 
-		class="btn bg-neutral-5" 
-		:class="size ? `btn-${size}` : ``"
-		@click="share"
-	>
-		<i aria-hidden="true" class="fas fa-share-alt" />
-	</a>
-	<span v-else>
+	<q-no-ssr>
 		<a 
+			v-if="share_available" 
 			class="btn bg-neutral-5" 
 			:class="size ? `btn-${size}` : ``"
-			@click="copy"
+			@click="share"
 		>
 			<i aria-hidden="true" class="fas fa-share-alt" />
 		</a>
-		<input :value="link" id="copy" type="hidden" />
-	</span>
+		<span v-else>
+			<a 
+				class="btn bg-neutral-5" 
+				:class="size ? `btn-${size}` : ``"
+				@click="copy"
+			>
+				<i aria-hidden="true" class="fas fa-share-alt" />
+			</a>
+			<input :value="link" id="copy" type="hidden" />
+		</span>
+	</q-no-ssr>
 </template>
 
 <script>
@@ -43,12 +45,12 @@ export default {
 	},
 	data() {
 		return {
-			link: this.url || `${window.origin}${this.$route.path}`
+			link: this.url
 		}
 	},
 	computed: {
 		share_available() {
-			return navigator.share !== undefined;
+			return process.browser && navigator.share !== undefined;
 		}
 	},
 	methods: {
@@ -84,6 +86,11 @@ export default {
 				.catch((error) => console.log('Error sharing', error));
 			}
 		},
+	},
+	mounted() {
+		if(!this.url) {
+			this.link = `${window.origin}${this.$route.path}`;
+		}
 	}
 }
 </script>

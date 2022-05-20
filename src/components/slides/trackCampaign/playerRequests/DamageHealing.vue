@@ -78,7 +78,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
+	import { db } from 'src/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	
 	export default {

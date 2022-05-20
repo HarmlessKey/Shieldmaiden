@@ -319,9 +319,9 @@
 
 <script>
 import { mapActions } from "vuex";
-import { damage_types } from '@/mixins/damageTypes.js';
-import { dice } from '@/mixins/dice';
-import { setHP } from '@/mixins/HpManipulations';
+import { damage_types } from 'src/mixins/damageTypes.js';
+import { dice } from 'src/mixins/dice';
+import { setHP } from 'src/mixins/HpManipulations';
 
 export default {
 	name: 'hk-single-roll',

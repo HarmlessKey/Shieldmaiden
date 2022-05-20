@@ -45,7 +45,7 @@
 </template>
 
 <script>
-	import { damage_types } from "@/mixins/damageTypes.js";
+	import { damage_types } from "src/mixins/damageTypes.js";
 
 	export default {
 		name: 'hk-dmg-type-select',

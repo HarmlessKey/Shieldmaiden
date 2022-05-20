@@ -159,7 +159,7 @@
 
 <script>
 	import _ from 'lodash';
-	import { db } from '@/firebase';
+	import { db } from 'src/firebase';
 
 	import Turns from './Turns.vue';
 	import Initiative from './Initiative.vue';
@@ -175,7 +175,7 @@
 			RollForInitiative,
 			Shares: () => import('../Shares'),
 			Rewards: () => import('./Rewards'),
-			Weather: () => import('@/components/weather')
+			Weather: () => import('src/components/weather')
 		},
 		props: [
 			"encounter", 

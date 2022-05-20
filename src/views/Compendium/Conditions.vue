@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header">
 			<h1><i aria-hidden="true" class="fas fa-flame mr-1"></i> Conditions</h1>
 			<span class="neutral-3">
-				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+				Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
 			</span>
 		</div>
 		<div class="card-body">
@@ -83,7 +83,7 @@
 </template>
 
 <script>
-	import ViewCondition from '@/components/compendium/Condition.vue';
+	import ViewCondition from 'src/components/compendium/Condition.vue';
 	import { mapActions } from "vuex";
 
 	export default {
@@ -117,7 +117,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_conditions", ["get_conditions"]),
+			...mapActions("api_conditions", ["fetch_conditions"]),
 			filter() {
 				this.loading = true;
 				this.conditions = [];
@@ -132,7 +132,7 @@
 				this.fetchSpells();		
 			},
 			async fetchSpells() {
-				await this.get_conditions({
+				await this.fetch_conditions({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

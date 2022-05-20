@@ -118,8 +118,8 @@
 <script>
 	import _ from 'lodash';
 	import { mapGetters, mapActions } from 'vuex';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import TargetMenu from '@/components/combat/TargetMenu.vue';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import TargetMenu from 'src/components/combat/TargetMenu.vue';
 
 	export default {
 		name: 'Targets',

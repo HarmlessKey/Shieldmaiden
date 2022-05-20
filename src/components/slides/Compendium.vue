@@ -69,10 +69,10 @@
 </template>
 
 <script>
-	import ViewMonster from '@/components/compendium/Monster.vue';
-	import Item from '@/components/compendium/Item.vue';
-	import Spell from '@/components/compendium/Spell.vue';
-	import Condition from '@/components/compendium/Condition.vue';
+	import ViewMonster from 'src/components/compendium/Monster.vue';
+	import Item from 'src/components/compendium/Item.vue';
+	import Spell from 'src/components/compendium/Spell.vue';
+	import Condition from 'src/components/compendium/Condition.vue';
 	import { mapActions } from "vuex";
 
 	export default {
@@ -98,10 +98,10 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monsters"]),
-			...mapActions("api_items", ["get_api_items"]),
-			...mapActions("api_spells", ["get_api_spells"]),
-			...mapActions("api_conditions", ["get_conditions"]),
+			...mapActions("api_monsters", ["fetch_monsters"]),
+			...mapActions("api_items", ["fetch_api_items"]),
+			...mapActions("api_spells", ["fetch_api_spells"]),
+			...mapActions("api_conditions", ["fetch_conditions"]),
 			setType(type) {
 				this.show = undefined //clear the previous selected item
 				this.current = type;
@@ -115,10 +115,10 @@
 				this.searchResults = [] //clear old search results
 				let data;
 
-				if(this.current === "monsters") { data = this.get_monsters; }
-				if(this.current === "items") { data = this.get_api_items; }
-				if(this.current === "spells") { data = this.get_api_spells; }
-				if(this.current === "conditions") { data = this.get_conditions; }
+				if(this.current === "monsters") { data = this.fetch_monsters; }
+				if(this.current === "items") { data = this.fetch_api_items; }
+				if(this.current === "spells") { data = this.fetch_api_spells; }
+				if(this.current === "conditions") { data = this.fetch_conditions; }
 				
 				data({ query: { search: this.search }}).then(results => {
 					if(results.meta.count === 0) {

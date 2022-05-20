@@ -212,10 +212,10 @@
 </template>
 
 <script>
-	import { skills } from '@/mixins/skills.js';
+	import { skills } from 'src/mixins/skills.js';
 	import { mapActions, mapGetters } from 'vuex';
-	import { general } from '@/mixins/general.js';
-	import CopyContent from "@/components/CopyContent";
+	import { general } from 'src/mixins/general.js';
+	import CopyContent from "src/components/CopyContent";
 
 	export default {
 		name: 'EditItem',

@@ -76,8 +76,8 @@
 </template>
 
 <script>
-	import Meters from "@/components/trackCampaign/Meters.vue";
-	import ViewPlayers from "@/components/campaign/Players.vue";
+	import Meters from "src/components/trackCampaign/Meters.vue";
+	import ViewPlayers from "src/components/campaign/Players.vue";
 
 	export default {
 		name: "Players",

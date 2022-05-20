@@ -194,7 +194,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import schema from "@/schemas/hk-npc-schema.json";
+import schema from "src/schemas/hk-npc-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 

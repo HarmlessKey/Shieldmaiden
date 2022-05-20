@@ -5,7 +5,7 @@
 			<template v-for="(coin, key) in copperToPretty(currency['.value'])">
 				<div v-if="coin" :key="key">
 					{{ coin }}
-					<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
+					<img :src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
 				</div>
 			</template>
 		</div>
@@ -36,7 +36,7 @@
 							</a>
 						</div>
 						<q-slide-transition>
-							<div v-show="showItem" class="full-item">
+							<div v-if="Object.keys(data.row.full_linked_item).length" v-show="showItem" class="full-item">
 								<ViewItem :data="data.row.full_linked_item"/>
 							</div>
 						</q-slide-transition>
@@ -48,9 +48,9 @@
 </template>
 
 <script>
-	import { currencyMixin } from '@/mixins/currency.js';
-	import { db } from '@/firebase';
-	import ViewItem from '@/components/compendium/Item.vue';
+	import { currencyMixin } from 'src/mixins/currency.js';
+	import { db } from 'src/firebase';
+	import ViewItem from 'src/components/compendium/Item.vue';
 
 	export default {
 		mixins: [currencyMixin],
@@ -94,14 +94,14 @@
 					items[key]['.key'] = key;
 
 					//Get Linked item
-					let linkedItem = db.ref(`items/${item.linked_item}`)
+					let linkedItem = db.ref(`items/${item.linked_item.key}`)
 					await linkedItem.on('value', (result) => {
 						if(result.val()) {
 							items[key].full_linked_item = result.val();
 						}
 					});
 					//Get Linked item
-					let linkedCustomItem = db.ref(`custom_items/${this.userId}/${item.linked_item}`)
+					let linkedCustomItem = db.ref(`custom_items/${this.userId}/${item.linked_item.key}`)
 					await linkedCustomItem.on('value', (result) => {
 						if(result.val()) {
 							items[key].full_linked_item = result.val();

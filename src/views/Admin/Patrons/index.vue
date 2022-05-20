@@ -81,10 +81,10 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import Patron from '@/components/Admin/Patrons/Patron.vue';
-	import Notifications from '@/components/Admin/Patrons/Notifications.vue';
-	import { general } from '@/mixins/general.js';
+	import { db } from 'src/firebase';
+	import Patron from 'src/components/Admin/Patrons/Patron.vue';
+	import Notifications from 'src/components/Admin/Patrons/Notifications.vue';
+	import { general } from 'src/mixins/general.js';
 
 	export default {
 		name: 'Patrons',

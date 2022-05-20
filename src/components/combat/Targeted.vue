@@ -186,7 +186,7 @@
 				</template>
 				<div v-else class="noTargetInfo">
 					<h3 class="red">No target selected</h3>
-					<p> Select at least 1 target from the target list to perform targeted actions.</p>
+					<p>Select at least 1 target from the target list to perform targeted actions.</p>
 
 					<p><strong>Selecing a target</strong><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
 					<p><strong>Multi-targeting</strong><br/>Hold down shift and click on multiple entities to target them all at once.</p>
@@ -199,11 +199,11 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex'
-	import { dice } from '@/mixins/dice.js';
-	import { abilities } from '@/mixins/abilities.js';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import TargetInfo from '@/components/combat/TargetInfo.vue';
-	import { experience } from '@/mixins/experience.js';
+	import { dice } from 'src/mixins/dice.js';
+	import { abilities } from 'src/mixins/abilities.js';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import TargetInfo from 'src/components/combat/TargetInfo.vue';
+	import { experience } from 'src/mixins/experience.js';
 	
 
 	export default {
@@ -229,10 +229,8 @@
 			shares() {
 				return this.broadcast.shares || [];
 			},
-			target: function() {
-				if(this.targeted.length === 1) {
-					return this.entities[this.targeted[0]];
-				}
+			target() {
+				return (this.targeted.length === 1) ? this.entities[this.targeted[0]] : undefined;
 			},
 			death_fails() {
 				let fails = 0;

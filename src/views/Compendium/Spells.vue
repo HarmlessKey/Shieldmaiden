@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header">
 			<h1><i aria-hidden="true" class="fas fa-wand-magic"></i> Spells</h1>
 			<span class="neutral-3">
-				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+				Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
 			</span>
 		</div>
 		<div class="card-body">
@@ -83,7 +83,7 @@
 </template>
 
 <script>
-	import ViewSpell from "@/components/compendium/Spell.vue";
+	import ViewSpell from "src/components/compendium/Spell.vue";
 	import { mapActions } from "vuex";
 
 	export default {
@@ -125,7 +125,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_spells", ["get_api_spells"]),
+			...mapActions("api_spells", ["fetch_api_spells"]),
 			filter() {
 				this.loading = true;
 				this.spells = [];
@@ -140,7 +140,7 @@
 				this.fetchSpells();		
 			},
 			async fetchSpells() {
-				await this.get_api_spells({
+				await this.fetch_api_spells({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

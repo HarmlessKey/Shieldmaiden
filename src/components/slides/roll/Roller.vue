@@ -39,7 +39,7 @@
 </template>
 
 <script>
-	import { dice } from '@/mixins/dice.js'
+	import { dice } from 'src/mixins/dice.js'
 	import Rolls from './Rolls';
 	import { mapGetters } from "vuex";
 

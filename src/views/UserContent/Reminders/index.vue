@@ -68,7 +68,7 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import ContentHeader from "@/components/userContent/ContentHeader";
+	import ContentHeader from "src/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Reminders',

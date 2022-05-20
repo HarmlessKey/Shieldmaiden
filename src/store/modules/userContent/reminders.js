@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { reminderServices } from "@/services/reminders"; 
+import { reminderServices } from "src/services/reminders"; 
 import _ from "lodash";
 
 // Converts a full reminder to a search_reminder
@@ -17,12 +17,12 @@ const convert_reminder = (reminder) => {
 	return returnReminder;
 }
 
-const reminder_state = {
+const reminder_state = () => ({
 	reminder_services: null,
 	cached_reminders: {},
 	reminder_count: 0,
 	reminders: undefined
-}
+});
 
 const reminder_getters = {
 	reminders: (state) => {
@@ -35,11 +35,11 @@ const reminder_getters = {
   },
 	reminder_count: (state) => { return state.reminder_count },
 	reminder_services: (state) => { return state.reminder_services },
-}
+};
 
 const reminder_actions = {
 	async get_reminder_services({ getters, commit }) {
-		if (getters.reminder_services === null) {
+		if (getters.reminder_services === null || !Object.keys(getters.reminder_services).length) {
 			commit("SET_REMINDER_SERVICES", new reminderServices);
 		}
 		return getters.reminder_services;

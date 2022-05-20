@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { playerServices } from "@/services/players"; 
+import { playerServices } from "src/services/players"; 
 import _ from 'lodash';
 
 // Converts a full player to a search_player
@@ -20,13 +20,13 @@ const convert_player = (player) => {
 	return returnPlayer;
 }
 
-const player_state = {
+const player_state = () => ({
   player_services: null,
   players: undefined,
   player_count: 0,
   cached_players: {},
   characters: undefined
-};
+});
 
 const player_getters = {
   players: (state) => {
@@ -51,7 +51,7 @@ const player_getters = {
 
 const player_actions = {
   async get_player_services({ getters, commit }) {
-    if(getters.player_services === null) {
+    if(getters.player_services === null || !Object.keys(getters.player_services).length) {
       commit("SET_PLAYER_SERVICES", new playerServices);
     }
     return getters.player_services;

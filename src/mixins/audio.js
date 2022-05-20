@@ -27,7 +27,6 @@ export const audio = {
 	},
 	methods: {
 		open_audio_link(url) {
-			console.log(url)
 			window.open(url, '_blank');
 		}
 	}

@@ -65,5 +65,12 @@
 				}
 			}
 		}
+
+		.google {
+			background-color: $white;
+			color: $neutral-4;
+			border-color: transparent;
+			box-shadow: 1px 1px 1px $neutral-8;
+		}
 	}
 }

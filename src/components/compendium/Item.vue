@@ -67,12 +67,12 @@
 				this.item = this.data;
 				this.loading = false;
 			} else {
-				this.item = await this.get_api_item(this.id);
+				this.item = await this.fetch_api_item(this.id);
 				this.loading = false;
 			}			
 		},
 		methods: {
-			...mapActions("api_items", ["get_api_item"]),
+			...mapActions("api_items", ["fetch_api_item"]),
 		}
 	};
 </script>

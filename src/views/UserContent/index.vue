@@ -1,50 +1,6 @@
 <template>
 	<div>
-		<q-banner
-			:dark="$store.getters.theme !== 'light'"
-			rounded inline-actions
-			class="mb-3"
-		>
-			Welcome {{ userInfo.username }}
-			<template slot="action">
-				<q-btn 
-					size="sm" 
-					flat padding="sm"
-					color="neutral-2"
-					no-caps 
-					icon="fas fa-cogs" 
-					to="/settings" 
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						Settings
-					</q-tooltip>
-				</q-btn>
-				<q-btn 
-					size="sm" 
-					flat padding="sm"
-					color="neutral-2"
-					no-caps 
-					icon="fas fa-user" 
-					to="/profile" 
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						Profile
-					</q-tooltip>
-				</q-btn>
-				<q-btn 
-					size="sm" 
-					flat padding="sm"
-					color="neutral-2"
-					no-caps 
-					icon="fas fa-sign-out" 
-					@click="signOut" 
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						Sign out
-					</q-tooltip>
-				</q-btn>
-			</template>
-		</q-banner>
+		<user-banner />
 		<!-- Continue Campaign -->
 		<hk-card class="banner">
 			<div 
@@ -54,8 +10,9 @@
 				:style="[
 					active_campaign && active_campaign.background
 					? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
-					: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
-			]">
+					: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
+				]"
+			>
 				<a 
 					v-if="!active_campaign || !active_campaign.background" 
 					class="white text-shadow-3 link" 
@@ -69,7 +26,7 @@
 				<div>
 					<div class="neutral-4 mb-1">Continue</div>
 					<h3 class="neutral-1">
-						<b>{{ active_campaign.name }}</b><br/>
+						<strong>{{ active_campaign.name }}</strong><br/>
 					</h3>
 					<p class="neutral-3">Dive right back into your adventure.</p>
 				</div>
@@ -83,7 +40,7 @@
 				<div>
 					<div class="neutral-4 mb-1">Campaigns</div>
 					<h3 class="neutral-1">
-						<b>No campaigns</b><br/>
+						<strong>No campaigns</strong><br/>
 					</h3>
 					<p class="neutral-3">Start your first adventure.</p>
 				</div>
@@ -148,11 +105,15 @@
 
 <script>
 	import { mapGetters, mapActions } from "vuex";
-	import { general } from "@/mixins/general.js";
+	import { general } from "src/mixins/general.js";
+	import UserBanner from 'src/components/userContent/UserBanner';
 
 	export default {
 		name: "UserContent",
 		mixins: [general],
+  	components: { 
+			UserBanner
+		},
 		data() {
 			return {
 				campaigns: {},
@@ -236,15 +197,8 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				"setSlide",
-				"sign_out"
-			]),
-			...mapActions("campaigns", ["get_campaigns"]),
-			signOut() {
-				this.$router.replace("/");
-				this.sign_out();
-			}
+			...mapActions(["setSlide"]),
+			...mapActions("campaigns", ["get_campaigns"])
 		}
 	}
 </script>
@@ -308,11 +262,6 @@
 		}
 	}
 	@media only screen and (max-width: 576px) {
-		.hk-card {
-			.card-body {
-				font-size: 25px;
-			}
-		}
 		.q-item {
 			padding: 18px 20px;
 			font-size: 16px;

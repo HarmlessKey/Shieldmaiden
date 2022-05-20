@@ -41,8 +41,8 @@
 </template>
 
 <script>
-	import { general } from '@/mixins/general.js';
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import { general } from 'src/mixins/general.js';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
 
 	export default {
 		name: 'Health',

@@ -91,9 +91,6 @@
 
 <style lang="scss" scoped>
 .hk-dice-text {
-	white-space: pre-line;
-	word-wrap: pre;
-
 	.rollable {
 		cursor: pointer;
 		user-select: none;

@@ -184,8 +184,8 @@
 </template>
 
 <script>
-	import { abilities } from '@/mixins/abilities.js';
-	import CopyContent from "@/components/CopyContent";
+	import { abilities } from 'src/mixins/abilities.js';
+	import CopyContent from "src/components/CopyContent";
 	
 	export default {
 		name: 'npc-SpellCasting',

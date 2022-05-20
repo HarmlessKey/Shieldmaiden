@@ -159,10 +159,10 @@
 
 <script>
 	import { mapGetters, mapActions } from "vuex";
-	import { dice } from "@/mixins/dice.js";
-	import { setHP } from "@/mixins/HpManipulations.js";
-	import { damage_types } from "@/mixins/damageTypes.js";
-	import Spell from "@/components/compendium/Spell";
+	import { dice } from "src/mixins/dice.js";
+	import { setHP } from "src/mixins/HpManipulations.js";
+	import { damage_types } from "src/mixins/damageTypes.js";
+	import Spell from "src/components/compendium/Spell";
 
 	export default {
 		name: "Spellcasting",

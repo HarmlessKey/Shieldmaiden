@@ -72,23 +72,21 @@
 					<br/>
 				</p>
 				<p>
-					<vue-markdown name="description" :source="spell.description"></vue-markdown>
+					<!-- <vue-markdown name="description" :source="spell.description"></vue-markdown> -->
 				</p>
 			</template>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import SpellEdit from '@/components/contribute/spell/edit.vue'
+	import { db } from 'src/firebase'
 	import { mapGetters } from 'vuex'
-	import VueMarkdown from 'vue-markdown'
+	// import VueMarkdown from 'vue-markdown'
 
 	export default {
 		name: 'Spell',
 		components: {
-			SpellEdit,
-			VueMarkdown,
+			// VueMarkdown,
 		},
 		props: ['id'],
 		data() {

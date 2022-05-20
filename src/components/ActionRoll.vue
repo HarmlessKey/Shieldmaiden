@@ -287,7 +287,7 @@
 
 <script>
 import numeral from 'numeral';
-import { damage_types } from '@/mixins/damageTypes.js';
+import { damage_types } from 'src/mixins/damageTypes.js';
 
 export default {
 	name: 'monster-action-modifier',

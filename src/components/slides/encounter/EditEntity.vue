@@ -284,7 +284,7 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import TargetItem from '@/components/combat/TargetItem.vue';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'EditEntity',

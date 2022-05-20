@@ -33,7 +33,7 @@
 <script>
 	import _ from 'lodash';
 	import { mapGetters, mapActions } from 'vuex';
-	import Request from '@/components/combat/side/RequestItem.vue';
+	import Request from 'src/components/combat/side/RequestItem.vue';
 
 	export default {
 		name: 'Requests',

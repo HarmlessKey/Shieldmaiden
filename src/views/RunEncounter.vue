@@ -1,5 +1,5 @@
 <template>
-	<div v-if="!loading">
+	<div v-if="!loading && encounter_initialized">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>
@@ -97,28 +97,26 @@
 	import _ from "lodash";
 	import { mapActions, mapGetters } from "vuex";
 
-	import { audio } from "@/mixins/audio";
+	import { audio } from "src/mixins/audio";
 	
-	import Finished from "@/components/combat/Finished.vue";
-	import DemoFinished from "@/components/combat/DemoFinished.vue";
-	import Actions from "@/components/combat/actions/Actions.vue";
-	import Turns from "@/components/combat/Turns.vue";
-	import Menu from "@/components/combat/mobile/Menu.vue";
-	import Current from "@/components/combat/Current.vue";
-	import CurrentMobile from "@/components/combat/mobile/Current.vue";
-	import Targets from "@/components/combat/Targets.vue";
-	import Targeted from "@/components/combat/Targeted.vue";
-	import Side from "@/components/combat/side/Side.vue";
-	import SetInitiative from "@/components/combat/initiative";
-	import OverEncumbered from "@/components/userContent/OverEncumbered.vue";
-	import DemoOverlay from "@/components/combat/DemoOverlay.vue";
+	import Finished from "src/components/combat/Finished.vue";
+	import DemoFinished from "src/components/combat/DemoFinished.vue";
+	import Turns from "src/components/combat/Turns.vue";
+	import Menu from "src/components/combat/mobile/Menu.vue";
+	import Current from "src/components/combat/Current.vue";
+	import CurrentMobile from "src/components/combat/mobile/Current.vue";
+	import Targets from "src/components/combat/Targets.vue";
+	import Targeted from "src/components/combat/Targeted.vue";
+	import Side from "src/components/combat/side/Side.vue";
+	import SetInitiative from "src/components/combat/initiative";
+	import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
+	import DemoOverlay from "src/components/combat/DemoOverlay.vue";
 
 	export default {
 		name: "RunEncounter",
 		components: {
 			Finished,
 			DemoFinished,
-			Actions,
 			Turns,
 			Menu,
 			Current,

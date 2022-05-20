@@ -28,7 +28,7 @@
 									:style="[
 										campaign.background
 										? { backgroundImage: 'url(\'' +campaign.background + '\')' }
-										: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
+										: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
 									]">
 									<div class="d-flex justify-content-between">
 										<i aria-hidden="true" 
@@ -236,10 +236,10 @@
 
 <script>	
 	import { mapGetters, mapActions } from 'vuex';
-	import { general } from '@/mixins/general.js';
+	import { general } from 'src/mixins/general.js';
 	import EditCampaign from "./EditCampaign";
 	import AddPlayers from "./AddPlayers";
-	import ContentHeader from "@/components/userContent/ContentHeader";
+	import ContentHeader from "src/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Campaigns',
@@ -367,7 +367,7 @@
 						width: 100%;
 						display: block;
 						color:$neutral-1 !important;
-						text-shadow: 5px 5px 5pxrgba(0, 0, 0, .5);
+						text-shadow: 5px 5px 5px rgba(0, 0, 0, .5);
 	
 						&:hover {
 							text-decoration: none;

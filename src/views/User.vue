@@ -1,104 +1,98 @@
 <template>
-<div v-if="!loadingCampaigns">
-	<div class="content" v-if="!$route.params.campid">
-		<div class="top">
-			<span>
-				<Follow v-if="user"/>
-				{{ username['.value'] }}
-			</span>
-		</div>
-		<div class="row q-col-gutter-md">		
-			<div class="col-12 col-md-9">		
-				<hk-card>
-					<div slot="header" class="card-header">
-						<span>
-							<i aria-hidden="true" class="fas fa-dungeon mr-1" />
-							Campaigns
-						</span>
-					</div>
-					<div class="card-body">
-						<!-- CAMPAIGNS -->
-						<div v-if="campaigns" class="row q-col-gutter-md">
-							<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign['.key']">
-								<hk-card class="campaign">
-									<div 
-										slot="image" 
-										class="card-image" 
-										:style="[
-											campaign.background
-											? { backgroundImage: 'url(\'' +campaign.background + '\')' }
-											: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
-										]">
-										<span class="live active" v-if="live['.value'] == campaign['.key']">live</span>
-										<a 
-											v-if="!campaign.background" 
-											class="neutral-2 text-shadow-3 link" 
-											target="_blank" rel="noopener"
-											href="https://www.vecteezy.com/free-vector/fantasy-landscape">
-											Image by Vecteezy
-										</a>
-									</div>
-
-									<div class="card-body">
-										
-										<!-- SHOW PLAYERS -->
-										<div v-if="campaign.players" class="players">
-											<div 
-												v-for="(player, key) in campaign.players" 
-												:key="key"
-												class="img"
-											>
-												<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-												<i aria-hidden="true" v-else class="hki-player" />
-												<q-tooltip anchor="top middle" self="center middle">
-													{{ player.character_name }}
-												</q-tooltip>
-											</div>
+	<div>
+		<div class="content">
+			<div class="top">
+				<span>
+					<Follow v-if="user"/>
+					{{ username['.value'] }}
+				</span>
+			</div>
+			<div class="row q-col-gutter-md">		
+				<div class="col-12 col-md-9">		
+					<hk-card>
+						<div slot="header" class="card-header">
+							<span>
+								<i aria-hidden="true" class="fas fa-dungeon mr-1" />
+								Campaigns
+							</span>
+						</div>
+						<div class="card-body" v-if="!loadingCampaigns">
+							<!-- CAMPAIGNS -->
+							<div v-if="campaigns" class="row q-col-gutter-md">
+								<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign['.key']">
+									<hk-card class="campaign">
+										<div 
+											slot="image" 
+											class="card-image" 
+											:style="[
+												campaign.background
+												? { backgroundImage: 'url(\'' +campaign.background + '\')' }
+												: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
+											]">
+											<span class="live active" v-if="live['.value'] == campaign['.key']">live</span>
+											<a 
+												v-if="!campaign.background" 
+												class="neutral-2 text-shadow-3 link" 
+												target="_blank" rel="noopener"
+												href="https://www.vecteezy.com/free-vector/fantasy-landscape">
+												Image by Vecteezy
+											</a>
 										</div>
-										
-										<h2 class="truncate" :class="{ 'no-players': !campaign.players }">		
-											{{ campaign.name }}
-										</h2>
-										<div class="d-flex justify-content-center">
-											<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
-										</div>						
-									</div>
-			
-									<div slot="footer" class="card-footer neutral-3">
-										Started: {{ makeDate(campaign.timestamp) }}
-									</div>
-								</hk-card>
+
+										<div class="card-body">
+											
+											<!-- SHOW PLAYERS -->
+											<div v-if="campaign.players" class="players">
+												<template v-for="(player, key) in campaign.players">
+													<div v-if="player" :key="key" class="img">
+														<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+														<i aria-hidden="true" v-else class="hki-player" />
+														<q-tooltip anchor="top middle" self="center middle">
+															{{ player.character_name }}
+														</q-tooltip>
+													</div>
+												</template>
+											</div>
+											
+											<h2 class="truncate" :class="{ 'no-players': !campaign.players }">		
+												{{ campaign.name }}
+											</h2>
+											<div class="d-flex justify-content-center">
+												<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
+											</div>						
+										</div>
+				
+										<div slot="footer" class="card-footer neutral-3">
+											Started: {{ makeDate(campaign.timestamp) }}
+										</div>
+									</hk-card>
+								</div>
+							</div>
+							<div v-else>
+								<p>This user has no public campaigns.</p>
 							</div>
 						</div>
-						<div v-else>
-							<p>This user has no public campaigns.</p>
-						</div>
-					</div>
-				</hk-card>
+						<hk-loader v-else />
+					</hk-card>
+				</div>
+				<div class="col-12 col-md-3">
+					<ContentSideRight />
+				</div>
 			</div>
-			<div class="col-12 col-md-3">
-				<ContentSideRight />
-			</div>
-    </div>
+		</div>
 	</div>
-
-	<trackCampaign v-else />
-
-</div>
 </template>
 
 <script>
-	import { db } from "@/firebase"
-	import trackCampaign from "@/components/trackCampaign"
-	import { general } from "@/mixins/general.js"
-	import ContentSideRight from "@/components/ContentSideRight";
+	import { db } from "src/firebase"
+	import { general } from "src/mixins/general.js"
+	import ContentSideRight from "src/components/ContentSideRight";
 
-	import Follow from "@/components/trackCampaign/Follow.vue"
+	import Follow from "src/components/trackCampaign/Follow.vue"
 
 	export default {
 		name: "TrackUser",
 		components: {
-			trackCampaign,
 			Follow,
 			ContentSideRight
 		},
@@ -124,7 +118,7 @@
 			}
 		},
 		mounted() {
-			var campaigns_ref = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
+			const campaigns_ref = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
 			campaigns_ref.on('value', async (snapshot) => {
 				let campaigns = snapshot.val();
 				

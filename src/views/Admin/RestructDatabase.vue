@@ -25,9 +25,9 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { monsterMixin } from "@/mixins/monster";
-	import { skills} from "@/mixins/skills";
+	import { db } from 'src/firebase';
+	import { monsterMixin } from "src/mixins/monster";
+	import { skills} from "src/mixins/skills";
 
 	export default {
 		name: 'GenerateSearchTable',

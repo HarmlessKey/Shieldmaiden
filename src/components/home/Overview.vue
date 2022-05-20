@@ -4,7 +4,7 @@
 			<div class="deck">
 					<hk-card>
 						<template #image>
-							<img class="card-image" src="@/assets/_img/home/general.png" alt="Harmless Key general"/>
+							<img class="card-image" src="~assets/_img/home/general.png" alt="Harmless Key general"/>
 						</template>
 						<div slot="header" class="card-header">Combat Tracker</div>
 						We track everything in combat you can think of.
@@ -14,7 +14,7 @@
 					</hk-card>
 					<hk-card>
 						<template #image>
-							<img class="card-image" src="@/assets/_img/home/builder.png" alt="Harmless Key encounter builder"/>
+							<img class="card-image" src="~assets/_img/home/builder.png" alt="Harmless Key encounter builder"/>
 						</template>
 						<div slot="header" class="card-header">Encounter Builder</div>
 							Quickly create your encounters with ease.
@@ -24,7 +24,7 @@
 					</hk-card>
 					<hk-card>
 						<template #image>
-							<img class="card-image" src="@/assets/_img/home/share.png" alt="Harmless Key share initiative"/>
+							<img class="card-image" src="~assets/_img/home/share.png" alt="Harmless Key share initiative"/>
 						</template>
 						<div slot="header" class="card-header">Share Initiative</div>
 						On a second screen, or with anyone in the world.
@@ -34,7 +34,7 @@
 					</hk-card>
 					<hk-card>
 						<template #image>
-							<img class="card-image" src="@/assets/_img/home/campaign.png" alt="Harmless Key campaign tracker"/>
+							<img class="card-image" src="~assets/_img/home/campaign.png" alt="Harmless Key campaign tracker"/>
 						</template>
 						<div slot="header" class="card-header">Campaign Manager</div>
 							Manage more than just your encounters.

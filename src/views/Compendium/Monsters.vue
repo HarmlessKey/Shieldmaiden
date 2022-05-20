@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header">
 			<h1><i aria-hidden="true" class="fas fa-dragon"></i> Monsters</h1>
 			<span class="neutral-3">
-				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+				Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
 			</span>
 		</div>
 		<div class="card-body">
@@ -150,8 +150,8 @@
 </template>
 
 <script>
-	import ViewMonster from "@/components/compendium/Monster.vue";
-	import { monsterMixin } from "@/mixins/monster.js";
+	import ViewMonster from "src/components/compendium/Monster.vue";
+	import { monsterMixin } from "src/mixins/monster.js";
 	import { mapActions } from "vuex";
 
 	export default {
@@ -212,7 +212,7 @@
 			}
 		},
 		methods: {
-			...mapActions("api_monsters", ["get_monsters"]),
+			...mapActions("api_monsters", ["fetch_monsters"]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
@@ -242,7 +242,7 @@
 				this.fetchMonsters();		
 			},
 			async fetchMonsters() {
-				await this.get_monsters({
+				await this.fetch_monsters({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,

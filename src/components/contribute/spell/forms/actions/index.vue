@@ -131,7 +131,7 @@
 
 <script>
 import Rolls from './Rolls.vue';
-import { abilities } from '@/mixins/abilities.js';
+import { abilities } from 'src/mixins/abilities.js';
 
 export default {
 	name: 'spells-Actions',

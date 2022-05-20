@@ -9,7 +9,7 @@
 			</div>
 
 			<video 
-				class="video" src="@/assets/_img/home/encounter-builder.mp4" 
+				class="video" src="~assets/_img/home/encounter-builder.mp4" 
 				muted autoplay playsinline alt="Harmless Key logo animation" loop
 			/>
 

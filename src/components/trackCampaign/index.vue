@@ -5,7 +5,9 @@
 				<!-- NOT LIVE -->
 				<div class="track-wrapper" v-if="!encounter || broadcasting['.value'] !== $route.params.campid">
 					<div class="top">
-						<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i aria-hidden="true" class="fas fa-chevron-left"></i> Back</router-link>
+						<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`">
+							<i aria-hidden="true" class="fas fa-chevron-left"></i> Back
+						</router-link>
 						<span class="title truncate">{{ campaign.campaign }}</span>
 						<span>
 							<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
@@ -38,14 +40,18 @@
 			</template>
 			<div v-else>
 				<div class="top d-flex justify-content-between">
-					<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i aria-hidden="true" class="fas fa-chevron-left"></i> Back</router-link>
+					<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`">
+						<i aria-hidden="true" class="fas fa-chevron-left"></i> Back
+					</router-link>
 					Not found
 				</div>
 				<div class="container-fluid">
 					<div class="container entities">
 						<h2>Perception check failed</h2>
-						<p>It seems we rolled a little low, this campaign can't be found.<br/>
-							It is possible the campaign is set to private.</p>
+						<p>
+							It seems we rolled a little low, this campaign can't be found.<br/>
+							It is possible the campaign is set to private.
+						</p>
 					</div>
 				</div>
 			</div>
@@ -66,19 +72,14 @@
 
 <script>
 	import _ from "lodash";
-	import { db } from '@/firebase';
-
-	import Follow from '@/components/trackCampaign/Follow.vue';
-	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue';
-	import ViewPlayers from '@/components/campaign/Players.vue';
+	import { db } from 'src/firebase';
+	import CampaignOverview from 'src/components/trackCampaign/CampaignOverview.vue';
 	import Live from './live';
 
 	export default {
 		name: 'Trackcampaign',
 		components: {
-			Follow,
 			CampaignOverview,
-			ViewPlayers,
 			Live
 		},
 		data() {
@@ -107,9 +108,7 @@
 		},
 		computed: {
 			shared() {
-				if(this.campaign && this.broadcasting[".value"]) {
-					return this.campaign.shares;
-				}
+				return (this.campaign && this.broadcasting[".value"]) ? this.campaign.shares : {};
 			}
 		},
 		watch: {

@@ -9,7 +9,7 @@
 						label="Name"
 						autocomplete="off"
 						class="mb-3"
-						v-model="encounter.name"
+						v-model="editableEncounter.name"
 						:error="invalid && validated"
 						:error-message="errors[0]"
 					/>
@@ -32,7 +32,7 @@
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Audio"
 								autocomplete="off" 
-								v-model="encounter.audio" 
+								v-model="editableEncounter.audio" 
 								placeholder="Audio URL"
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -58,7 +58,7 @@
 									:dark="$store.getters.theme === 'dark'" filled square
 									label="Background"
 									autocomplete="off" 
-									v-model="encounter.background" 
+									v-model="editableEncounter.background" 
 									class="mb-2"
 									placeholder="Background URL"
 									:error="invalid && validated"
@@ -117,7 +117,7 @@
 	import { mapActions } from "vuex";
 
 	import EditWeather from './Weather';
-	import { audio } from '@/mixins/audio';
+	import { audio } from 'src/mixins/audio';
 
 	export default {
 		name: 'General',
@@ -133,7 +133,7 @@
 		},
 		components: {
 			EditWeather,
-			Weather: () => import('@/components/weather')
+			Weather: () => import('src/components/weather')
 		},
 		mixins: [audio],
 		data() {
@@ -151,6 +151,7 @@
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
 					fog: { name: "Fog", icon: "fas fa-fog" }
 				},
+				editableEncounter: this.encounter
 			} 
 		},
 		mounted() {
@@ -161,12 +162,12 @@
 		methods: {
 			...mapActions("encounters", ["edit_encounter"]),
 			edit() {
-				this.encounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
+				this.editableEncounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
 
 				this.edit_encounter({
 					campaignId: this.campaignId,
 					encounterId: this.encounterId,
-					value: this.encounter
+					value: this.editableEncounter
 				}).then(() => {
 					this.$snotify.success('Saved.', 'Critical hit!', {
 						position: "rightTop"

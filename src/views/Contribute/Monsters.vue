@@ -229,8 +229,8 @@
 
 <script>
 	import _ from 'lodash';
-	import { db } from '@/firebase';
-	import Footer from '@/components/Footer.vue';
+	import { db } from 'src/firebase';
+	import Footer from 'src/components/Footer.vue';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {

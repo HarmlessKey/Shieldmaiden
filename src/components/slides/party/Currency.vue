@@ -5,7 +5,7 @@
 		<div class="currency">
 			<div v-for="(coin, key) in currencies" :key="key">
 					<span class="coins" :class="coin.color">
-						<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" :alt="coin.name" />
+						<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" :alt="coin.name" />
 						<q-tooltip anchor="top middle" self="center middle">
 							{{ coin.name }}
 						</q-tooltip>
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-	import { currencyMixin } from "@/mixins/currency.js";
+	import { currencyMixin } from "src/mixins/currency.js";
 	import { mapActions } from "vuex";
 
 	export default {

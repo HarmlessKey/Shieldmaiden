@@ -2,7 +2,15 @@
 	<div>
 		<div class="share" :class="{ small: is_small }">
 			<div class="qr-wrapper" v-if="qr">
-				<vue-qr class="qr" :text="url" qid="testid" :size="110" colorLight="true" :margin="5" />
+				<vue-qr 
+					class="qr" 
+					:text="url" 
+					qid="playerLink" 
+					:size="120" 
+					:margin="5"
+					:logoSrc="require('src/assets/_img/logo/logo-icon-no-shield-cyan.svg')"
+					:logoScale="0.25"
+				/>
 			</div>
 			<div>
 				<h2 v-if="title" class="mb-2">Share live initiative list</h2>
@@ -33,7 +41,7 @@
 </template>
 
 <script>
-	import VueQr from 'vue-qr'
+	import VueQr from 'vue-qr';
 	
 	export default {
 		name: 'PlayerLink',
@@ -58,12 +66,12 @@
 			return {
 				is_small: false,
 				showInfo: false,
-				url: window.origin + '/user/' + this.$store.getters.user.uid,
+				url: "",
 			}
 		},
 		computed: {
 			share_available() {
-				return navigator.share !== undefined;
+				return process.browser && navigator.share !== undefined;
 			}
 		},
 		methods: {
@@ -76,6 +84,9 @@
 				//sets new width on resize
 				this.width = width;
 			},		
+		},
+		mounted() {
+			this.url = window.origin + '/user/' + this.$store.getters.user.uid;
 		}
 	}
 </script>

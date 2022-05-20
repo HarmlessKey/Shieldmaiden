@@ -1,16 +1,21 @@
 <template>
 	<div>
-		<h1 class="mb-3 d-flex justify-content-between">
+		<h1 class="mb-3 d-flex justify-content-between items-center">
 			{{ campaign.name }}
-			<span 
-				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId } })" 
-				class="live" 
-				:class="{'active': broadcast.live === campaignId }"
+			<div 
+				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId, private: campaign.private } })" 
+				class="live pointer" 
+				:class="{
+					'active': broadcast.live === campaignId,
+					'disabled': campaign.private
+				}"
 			>
 				{{ broadcast.live === campaignId ? "" : "go" }} live
-			</span>
+				<q-tooltip anchor="center left" self="center right">
+					Private campaign
+				</q-tooltip>
+			</div>
 		</h1>
-
 		<div class="row q-col-gutter-md">
 			<!-- SHOW ENCOUNTERS -->
 			<div class="col-12 col-md-7">
@@ -88,6 +93,7 @@
 								<q-table
 									:data="active_encounters"
 									:columns="columns"
+									:visible-columns="visibleColumns"
 									row-key="key"
 									card-class="bg-none"
 									flat
@@ -148,6 +154,7 @@
 									<div slot="no-data" />
 								</q-table>
 							</template>
+							<q-resize-observer @resize="setSize" />
 						</div>
 					</hk-card>
 
@@ -305,23 +312,19 @@
 </template>
 
 <script>
-	import Crumble from "@/components/crumble";
-	import PlayerLink from "@/components/PlayerLink.vue";
-	import Players from "@/components/campaign/Players.vue";
-
+	import Players from "src/components/campaign/Players.vue";
 	import { mapGetters, mapActions } from "vuex";
 
 	export default {
 		name: "Encounters",
 		components: {
-			Crumble,
-			PlayerLink,
 			Players
 		},
 		data() {
 			return {
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
+				card_width: 0,
 				encounters: {},
 				loading_campaign: true,
 				loading_active: true,
@@ -403,6 +406,11 @@
 				"broadcast"
 			]),
 			...mapGetters("encounters", ["get_encounters", "get_encounter_count"]),
+			visibleColumns() {
+				return (this.card_width > 450) ? 
+					["name", "entities", "round", "turn", "actions"] : 
+					["name", "actions"];
+			},
 			encounter_count() {
 				return this.get_encounter_count(this.campaignId);
 			},
@@ -428,6 +436,9 @@
 				"set_active_campaign"
 			]),
 			...mapActions("players", ["get_player"]),
+			setSize(e) {
+				this.card_width = e.width;
+			},
 			async getFinishedEncounters() {
 				this.loading_finished = true;
 				await this.get_campaign_encounters({ campaignId: this.campaignId, finished: true });

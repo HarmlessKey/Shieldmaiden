@@ -198,7 +198,7 @@
 </template>
 
 <script>
-import ReminderForm from '@/components/ReminderForm';
+import ReminderForm from 'src/components/ReminderForm';
 import numeral from 'numeral';
 
 export default {

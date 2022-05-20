@@ -70,7 +70,7 @@
 </template>
 
 <script>
-	import { experience } from '@/mixins/experience.js';
+	import { experience } from 'src/mixins/experience.js';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {

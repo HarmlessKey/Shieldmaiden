@@ -15,7 +15,7 @@
 					<div class="currency-wrapper">
 						<div class="currency animated bounceIn">
 							<div v-for="(coin, key) in currencies" :key="key">
-								<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+								<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" />
 								<q-input 
 									:dark="$store.getters.theme === 'dark'" filled square dense
 									disable
@@ -24,7 +24,7 @@
 									autocomplete="off" 
 									type="number" min="0" 
 									name="name" 
-									v-model="encounter.currency[key]"
+									:value="encounter.currency[key]"
 								/>
 							</div>
 						</div>
@@ -49,8 +49,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { currencyMixin } from '@/mixins/currency.js';
+	import { db } from 'src/firebase';
+	import { currencyMixin } from 'src/mixins/currency.js';
 
 	export default {
 		name: 'app',

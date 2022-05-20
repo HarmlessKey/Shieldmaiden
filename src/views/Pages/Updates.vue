@@ -14,7 +14,7 @@
 </template>
 
 <script>
-	import Footer from '@/components/Footer.vue'
+	import Footer from 'src/components/Footer.vue'
 
 	export default {
 		name: 'Updates',

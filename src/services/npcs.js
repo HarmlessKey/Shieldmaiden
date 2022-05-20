@@ -1,4 +1,4 @@
-import { db } from "@/firebase";
+import { db } from "src/firebase";
 
 const NPCS_REF = db.ref("npcs");
 const SEARCH_NPCS_REF = db.ref("search_npcs");

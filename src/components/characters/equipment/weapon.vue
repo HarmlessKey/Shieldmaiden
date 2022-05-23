@@ -145,8 +145,8 @@
 </template>
 
 <script>
-	import { abilities } from '@/mixins/abilities.js';
-	import { damage_types } from '@/mixins/damageTypes.js';
+	import { abilities } from 'src/mixins/abilities.js';
+	import { damage_types } from 'src/mixins/damageTypes.js';
 
 	export default {
 		name: 'Weapon',

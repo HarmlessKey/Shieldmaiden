@@ -34,7 +34,7 @@
 					class="image"
 					:style="[
 						character.avatar ? { backgroundImage: 'url(\'' + character.avatar + '\')' } : 
-						{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
+						{ backgroundImage: `url(${require('src/assets/_img/styles/player.svg')})`}
 					]"
 			/>
 			<div>
@@ -76,8 +76,7 @@
 
 <script>
 	import { mapActions } from "vuex";
-	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
-	import { db } from '@/firebase';
+	import { db } from 'src/firebase';
 
 	export default {
 		name: 'CharacterGeneral',
@@ -87,9 +86,6 @@
 			"playerId", 
 			"userId"
 		],
-		components: {
-			GiveCharacterControl
-		},
 		data() {
 			return {
 				advancement_options: [

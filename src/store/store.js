@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { auth } from '@/firebase';
-import { general_module } from '@/store/modules/general';
-import { tips_module } from '@/store/modules/tips';
-import { encounter_module } from '@/store/modules/encounter';
-import { content_module } from '@/store/modules/content';
-import { content_spells } from '@/store/modules/content/spells.js';
-import { content_characters } from '@/store/modules/content/characters.js';
+import { auth } from 'src/firebase';
+import { general_module } from 'src/store/modules/general';
+import { tips_module } from 'src/store/modules/tips';
+import { encounter_module } from 'src/store/modules/encounter';
+import { content_module } from 'src/store/modules/content';
+import { content_spells } from 'src/store/modules/content/spells.js';
+import { content_characters } from 'src/store/modules/content/characters.js';
 
 Vue.use(Vuex);
 

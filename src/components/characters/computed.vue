@@ -15,7 +15,7 @@
 						class="image"
 						:style="[
 							avatar ? { backgroundImage: 'url(\'' + avatar + '\')' } : 
-							{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
+							{ backgroundImage: `url(${require('src/assets/_img/styles/player.svg')})`}
 						]"
 					/>
 				</q-avatar>
@@ -201,8 +201,8 @@
 
 <script>
 	import { mapActions } from 'vuex';
-	import { general } from '@/mixins/general.js';
-	import { abilities } from '@/mixins/abilities.js';
+	import { general } from 'src/mixins/general.js';
+	import { abilities } from 'src/mixins/abilities.js';
 
 	export default {
 		name: 'CharacterComputed',

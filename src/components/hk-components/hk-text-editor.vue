@@ -363,10 +363,10 @@
 
 <style lang="scss" scope>
 	.hk-text-editor {
-		border: solid 1px $gray-hover;
+		border: solid 1px $neutral-2;
 
 		.menubar {
-			border-bottom: solid 1px $gray-hover;
+			border-bottom: solid 1px $neutral-2;
 			display: flex;
 			justify-content: flex-start;
 			flex-wrap: wrap;
@@ -375,7 +375,7 @@
 			.group {
 				display: flex;
 				justify-content: flex-start;
-				border-right: solid 1px $gray-hover;
+				border-right: solid 1px $neutral-2;
 				padding: 3px;
 
 				&:last-child {
@@ -400,7 +400,7 @@
 						color: $blue;
 					}
 					&:hover {
-						background-color: $gray-hover;
+						background-color: $neutral-2;
 					}
 				}
 
@@ -442,7 +442,7 @@
 	
 							th, td {
 								padding: 5px;
-								background: $gray-hover;
+								background: $neutral-2;
 								vertical-align: top;
 								position: relative;
 								color: $white;
@@ -454,7 +454,7 @@
 							th {
 								text-align: left;
 								font-weight: bold;
-								background: $gray-dark;
+								background: $neutral-8;
 							}
 						}
 					}

@@ -204,10 +204,10 @@
 <script>
 	import ModifierTable from '../modifier-table.vue';
 	import Modifier from '../modifier.vue';
-	import { db } from '@/firebase';
-	import { abilities } from '@/mixins/abilities.js';
-	import { weapons } from '@/mixins/armorAndWeapons.js';
-	import { damage_types } from '@/mixins/damageTypes.js';
+	import { db } from 'src/firebase';
+	import { abilities } from 'src/mixins/abilities.js';
+	import { weapons } from 'src/mixins/armorAndWeapons.js';
+	import { damage_types } from 'src/mixins/damageTypes.js';
 	import Weapon from './weapon.vue'
 	import Armor from './armor.vue'
 

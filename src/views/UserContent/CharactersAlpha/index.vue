@@ -6,7 +6,7 @@
 			<h2 class="mt-3 d-flex justify-content-between">
 				<span>Characters</span>
 				<a @click="addCharacter">
-					<i class="fas fa-plus green"></i> New Character
+					<i class="fas fa-plus green" aria-hidden="true"/> New Character
 				</a>
 			</h2>
 			
@@ -17,11 +17,11 @@
 			>
 				<template slot="avatar" slot-scope="data">
 					<div class="image" v-if="data.row.general.avatar" :style="{ backgroundImage: 'url(\'' + data.row.general.avatar + '\')' }"></div>
-					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+					<img v-else class="image" src="src/assets/_img/styles/player.svg" alt="Player icon" />
 				</template>
 
 				<template slot="character_name" slot-scope="data">
-					<router-link class="mx-2" :to="'/characters-alpha/' + data.row['.key']">
+					<router-link class="mx-2" :to="`${$route.path}/${data.row['.key']}`">
 						{{ data.row.general.character_name }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
@@ -34,14 +34,14 @@
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" :to="'/characters-alpha/' + data.row['.key']">
-						<i class="fas fa-pencil"></i>
+					<router-link class="gray-hover mx-1" :to="`${$route.path}/${data.row['.key']}`">
+						<i class="fas fa-pencil" aria-hidden="true"/>
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
 						</q-tooltip>
 					</router-link>
 					<a class="gray-hover" @click="confirmDelete(data.row['.key'], data.row.general)">
-							<i class="fas fa-trash-alt"></i>
+							<i class="fas fa-trash-alt" aria-hidden="true"/>
 							<q-tooltip anchor="top middle" self="center middle">
 								Delete
 							</q-tooltip>
@@ -54,20 +54,14 @@
 
 <script>
 	import _ from 'lodash';
-	import OverEncumbered from '@/components/OverEncumbered.vue';
-	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { db } from '@/firebase';
-	import { experience } from '@/mixins/experience.js';
+	import { db } from 'src/firebase';
+	import { experience } from 'src/mixins/experience.js';
 
 	export default {
 		name: 'Characters',
 		mixins: [experience],
 		metaInfo: {
 			title: 'Characters Alpha'
-		},
-		components: {
-			OverEncumbered,
-			OutOfSlots
 		},
 		data() {
 			return {
@@ -134,7 +128,7 @@
 						//Returns the key of the added entry
 						const key = res.getKey();
 
-						this.$router.replace(`/characters-alpha/${key}`)
+						this.$router.replace(`${this.$route.path}/${key}`)
 					});
 				}
 			},
@@ -169,12 +163,12 @@
 <style lang="scss" scoped>
 	.container-fluid {
 		h2 {
-			border-bottom: solid 1px $gray-light;
+			border-bottom: solid 1px $neutral-2;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 
 				&:hover {
 					text-decoration: none;

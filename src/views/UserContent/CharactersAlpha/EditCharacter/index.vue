@@ -46,7 +46,7 @@
 		>
 			<div class="tabs">
 				<router-link to="/characters-alpha">
-				<i class="fas fa-chevron-left mr-1" />
+				<i class="fas fa-chevron-left mr-1" aria-hidden="true" />
 					Back
 				</router-link>
 				<q-tabs
@@ -124,30 +124,28 @@
 </template>
 
 <script>
-	import OverEncumbered from "@/components/OverEncumbered.vue";
-	import { characterMixin } from "@/mixins/character.js";
-	import { experience } from "@/mixins/experience.js";
-	import { general } from "@/mixins/general.js";
-	import { dice } from "@/mixins/dice.js";
-	import { spellSlots } from "@/mixins/spellSlots.js";
-	import { skills } from "@/mixins/skills.js";
+	import { characterMixin } from "src/mixins/character.js";
+	import { experience } from "src/mixins/experience.js";
+	import { general } from "src/mixins/general.js";
+	import { dice } from "src/mixins/dice.js";
+	import { spellSlots } from "src/mixins/spellSlots.js";
+	import { skills } from "src/mixins/skills.js";
 	import { mapGetters, mapActions } from "vuex";
-	import { db } from "@/firebase";
-	import Computed from "@/components/characters/computed";
-	import General from "@/components/characters/general";
-	import Race from "@/components/characters/race";
-	import Class from "@/components/characters/class";
-	import Abilities from "@/components/characters/abilities";
-	import Equipment from "@/components/characters/equipment";
+	import { db } from "src/firebase";
+	import Computed from "src/components/characters/computed";
+	import General from "src/components/characters/general";
+	import Race from "src/components/characters/race";
+	import Class from "src/components/characters/class";
+	import Abilities from "src/components/characters/abilities";
+	import Equipment from "src/components/characters/equipment";
 	
 	export default {
-		name: "Players",
+		name: "EditCharacter",
 		metaInfo: {
 			title: "Character"
 		},
 		mixins: [characterMixin, experience, general, dice, spellSlots, skills],
 		components: {
-			OverEncumbered,
 			Computed,
 			General,
 			Race,
@@ -176,7 +174,7 @@
 		},
 		async beforeMount() {
 			// Is it the user's character or someone elses
-			if(this.$route.name === "Edit Character") {
+			if(this.$route.name === "EditCharacterAlpha") {
 				let user = db.ref(`character_control/${this.$store.getters.user.uid}/${this.$route.params.id}`);
 				user.on("value" , (snapshot) => {
 					this.userId = snapshot.val().user

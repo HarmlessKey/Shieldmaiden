@@ -57,7 +57,7 @@
 </template>
 
 <script>
-	import { dice } from '@/mixins/dice.js';
+	import { dice } from 'src/mixins/dice.js';
 
 	export default {
 		name: 'HitPoints',

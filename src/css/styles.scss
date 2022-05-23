@@ -1078,7 +1078,7 @@ html body {
 
 			.hk-table {
 				.hk-table-column {
-					background-color: $gray-dark;
+					background-color: $neutral-9;
 				}
 			}
 		}
@@ -1314,7 +1314,7 @@ html body {
 
 		/*== speech bubble ==*/
 		.hk-tooltip::after {
-			background: $gray-hover;
+			background: $neutral-6;
 			border-radius: 5px;
 			font-weight: normal;
 			bottom: 100%;
@@ -2219,21 +2219,21 @@ html body {
 		.q-tab {
 			min-height: 35px;
 
-				&__icon {
-					font-size: 15px;
-				}
-			}
-			.q-tabs__arrow {
-				line-height: 35px;
+			&__icon {
+				font-size: 15px;
 			}
 		}
 		.q-tabs__arrow {
-			line-height: 48px;
-			font-size: 30px;
-			text-shadow: 0px 0px 3px #000;
-			color: $neutral-1;
+			line-height: 35px;
 		}
 	}
+	.q-tabs__arrow {
+		line-height: 48px;
+		font-size: 30px;
+		text-shadow: 0px 0px 3px #000;
+		color: $neutral-1;
+	}
+	
 
 	.q-notification {
 		border-radius: $border-radius;

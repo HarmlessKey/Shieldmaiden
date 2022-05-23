@@ -192,8 +192,8 @@
 </template>
 
 <script>
-	import { abilities } from "@/mixins/abilities.js";
-	import { dice } from "@/mixins/dice.js";
+	import { abilities } from "src/mixins/abilities.js";
+	import { dice } from "src/mixins/dice.js";
 	import { mapActions } from "vuex";
 import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 
@@ -482,7 +482,7 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 		margin: -5px;
 
 		.score {
-			background-color: $gray-dark;
+			background-color: $neutral-8;
 			margin: 5px;
 			min-width: 230px;
 
@@ -493,7 +493,7 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 				padding: 10px;
 
 				.roll {
-					background: $gray-darker;
+					background: $neutral-9;
 					width: 30px;
 					height: 30px;
 					text-align: center;

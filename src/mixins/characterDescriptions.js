@@ -1,5 +1,5 @@
 import { mapGetters } from "vuex";
-import { general } from '@/mixins/general.js';
+import { general } from 'src/mixins/general.js';
 
 export const characterDescriptions = {
 	mixins: [general],

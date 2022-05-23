@@ -113,7 +113,7 @@
 							</div>
 							<div class="col-3">
 								<a @click="scaling = true" class="btn btn-block">
-									<i class="far fa-chart-line"/>
+									<i class="far fa-chart-line" aria-hidden="true"/>
 									<q-tooltip anchor="top middle" self="center middle">
 										Level scaling
 									</q-tooltip>
@@ -124,7 +124,7 @@
 						<p class="mt-1" v-if="modifier.scale_size && modifier.scale_value">
 							<span v-html="scalingText()"/>
 							<a @click="deleteScaling" class="red ml-1">
-								<i class="fas fa-times"/>
+								<i class="fas fa-times" aria-hidden="true"/>
 								<q-tooltip anchor="top middle" self="center middle">
 									Remove scaling
 								</q-tooltip>
@@ -166,7 +166,7 @@
 			<div v-else>
 				<a @click="scaling = false"><i class="fas fa-chevron-left"></i> Edit modifier</a>
 				<p class="mt-3">
-					<b>{{ modifier.name }} level scaling</b><br/>
+					<strong>{{ modifier.name }} level scaling</strong><br/>
 					Set how the value of this modifier changes as your character levels.
 				</p>
 
@@ -252,9 +252,9 @@
 </template>
 
 <script>
-	import { skills } from '@/mixins/skills.js';
-	import { abilities } from '@/mixins/abilities.js';
-	import { weapons } from '@/mixins/armorAndWeapons.js';
+	import { skills } from 'src/mixins/skills.js';
+	import { abilities } from 'src/mixins/abilities.js';
+	import { weapons } from 'src/mixins/armorAndWeapons.js';
 	import numeral from 'numeral';
 	import { mapActions } from 'vuex';
 
@@ -423,6 +423,7 @@
 					}
 					return returnString;
 				}
+				return undefined;
 			}
 		},
 		methods: {

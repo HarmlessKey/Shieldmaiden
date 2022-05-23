@@ -161,12 +161,12 @@
 </template>
 
 <script>
-	import { abilities } from "@/mixins/abilities.js";
+	import { abilities } from "src/mixins/abilities.js";
 	import { mapActions } from "vuex";
 	import Modifier from "../modifier.vue";
 	import ModifierTable from "../modifier-table.vue";
-	import HkTextEditor from "@/components/hk-components/hk-text-editor";
-	import { characterDescriptions } from '@/mixins/characterDescriptions.js';
+	import HkTextEditor from "src/components/hk-components/hk-text-editor";
+	import { characterDescriptions } from 'src/mixins/characterDescriptions.js';
 
 	export default {
 		name: "CharacterClassFeatures",

@@ -151,6 +151,35 @@ const routes = [
 					}
 				]
 			},
+
+			// Character builder
+			{
+				path: "characters-alpha",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Characters"
+				},
+				children: [
+					{
+						path: "",
+						name: "CharactersAlpha",
+						component: () => import("src/views/UserContent/CharactersAlpha"),
+						meta: {
+							description: "Your Characters on Harmless Key.",
+							title: "Characters"
+						},
+					},
+					{
+						path: ":id",
+						name: "EditCharacterAlpha",
+						component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter"),
+						meta: {
+							title: "Edit character",
+							description: "Edit an existing character on Harmless Key."
+						}
+					}
+				]
+			},
 			// NPCs
 			{
 				path: "npcs",

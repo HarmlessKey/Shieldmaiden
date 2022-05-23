@@ -3,8 +3,8 @@
 		<!-- EXPERIENCE -->
 		<div class="form-item mb-3" v-if="advancement === 'experience'">
 			<h3 class="pointer text-center" @click="experience_modal = !experience_modal">
-				Experience points: <b><hk-animated-integer :value="Class.experience_points" /></b> 
-				<small class="ml-2"><i class="fas fa-pencil-alt"></i></small>
+				Experience points: <strong><hk-animated-integer :value="Class.experience_points" /></strong> 
+				<small class="ml-2"><i class="fas fa-pencil-alt" aria-hidden="true" /></small>
 			</h3>
 			<div class="xp-bar" v-if="calculatedLevel(Class.experience_points) < 20">
 				<div class="xp-level">
@@ -34,13 +34,13 @@
 			<div>
 				<h3 @click="setShowClass(classKey)" class="pointer" :class="{ 'hidden-class': classKey !== showClass}">
 					Level {{ subclass.level }} {{ subclass.name }}
-					<i class="fas fa-chevron-down"/>
+					<i class="fas fa-chevron-down" aria-hidden="true"/>
 					<a 
 						v-if="advancement === 'experience' && calculatedLevel(Class.experience_points) > computed.display.level" 
 						class="level-up"
 						@click.stop="levelUp(classKey)"
 					>
-						Level up <i class="fas fa-arrow-circle-up"/>
+						Level up <i class="fas fa-arrow-circle-up" aria-hidden="true"/>
 					</a>
 				</h3>
 
@@ -101,7 +101,7 @@
 							>
 								<template v-slot:header>
 									<q-item-section avatar>
-										<i class="fas fa-heart"></i>
+										<i class="fas fa-heart" aria-hidden="true" />
 									</q-item-section>
 									<q-item-section>
 										Hit points
@@ -127,7 +127,7 @@
 												<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 													<q-card dark square>
 														<q-card-section class="bg-gray-active">
-															<b>{{ subclass.name }} Hit Points</b>
+															<strong>{{ subclass.name }} Hit Points</strong>
 														</q-card-section>
 														<q-card-section>
 															<div v-html="classTotalHP(classKey, 'info')" />
@@ -148,7 +148,7 @@
 											:key="`d${value}-${classKey}`"
 											:class="{ active: subclass.hit_dice === value }"
 											>
-											<i :class="`fas fa-dice-d${value}`"></i>
+											<i :class="`fas fa-dice-d${value}`" aria-hidden="true" />
 											{{ text }}
 										</a>
 									</div>
@@ -159,7 +159,7 @@
 											<span class="val">
 												{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
 											</span>
-											<i class="fas fa-pencil"></i>
+											<i class="fas fa-pencil" aria-hidden="true" />
 										</div>
 									</div>
 								</div>
@@ -172,7 +172,7 @@
 							>
 								<template v-slot:header>
 									<q-item-section avatar>
-										<i class="fas fa-hand-holding-magic"/>
+										<i class="fas fa-hand-holding-magic" aria-hidden="true" />
 									</q-item-section>
 									<q-item-section>
 										Spell casting
@@ -182,17 +182,17 @@
 											<hk-popover :header="`${subclass.name} spell attack`">
 												{{ computed.sheet.classes[classKey].spell_attack > 0 ? "+" : "" }}{{ computed.sheet.classes[classKey].spell_attack }}
 												<template #content>
-													{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
-													Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
+													{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</strong><br/>
+													Proficiency bonus: <strong>{{ computed.display.proficiency }}</strong>
 												</template>
 											</hk-popover>
 											<q-separator vertical dark class="mx-2" />
 											<hk-popover :header="`${subclass.name} spell save DC`">
 												{{ computed.sheet.classes[classKey].spell_save_dc }}
 												<template #content>
-													Base: <b>8</b><br/>
-													{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
-													Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
+													Base: <strong>8</strong><br/>
+													{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</strong><br/>
+													Proficiency bonus: <strong>{{ computed.display.proficiency }}</strong>
 												</template>
 											</hk-popover>
 										</div>
@@ -246,7 +246,7 @@
 							>
 								<template v-slot:header>
 									<q-item-section avatar>
-										<i class="fas fa-sparkles"/>
+										<i class="fas fa-sparkles" aria-hidden="true"/>
 									</q-item-section>
 									<q-item-section>
 										Proficiencies
@@ -360,7 +360,7 @@
 			@click="addClass()" 
 			class="d-block mt-4"
 		>
-			<i class="fas fa-plus"/> Add a class
+			<i class="fas fa-plus" aria-hidden="true"/> Add a class
 		</a>
 
 		<!-- ROLLED HP MODAL -->
@@ -469,16 +469,14 @@
 
 <script>
 	import { mapActions } from 'vuex';
-	import VueMarkdown from 'vue-markdown';
-	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
-	import { abilities } from '@/mixins/abilities.js';
-	import { weapons } from '@/mixins/armorAndWeapons.js';
-	import { skills } from '@/mixins/skills.js';
-	import { spellSlots } from '@/mixins/spellSlots.js';
-	import { experience } from '@/mixins/experience.js';
-	import { general } from '@/mixins/general.js';
-	import { db } from '@/firebase';
-	import { dice } from '@/mixins/dice.js';
+	import { abilities } from 'src/mixins/abilities.js';
+	import { weapons } from 'src/mixins/armorAndWeapons.js';
+	import { skills } from 'src/mixins/skills.js';
+	import { spellSlots } from 'src/mixins/spellSlots.js';
+	import { experience } from 'src/mixins/experience.js';
+	import { general } from 'src/mixins/general.js';
+	import { db } from 'src/firebase';
+	import { dice } from 'src/mixins/dice.js';
 	import Features from "./features";
 
 	export default {
@@ -502,8 +500,6 @@
 			"computed"
 		],
 		components: {
-			VueMarkdown,
-			GiveCharacterControl,
 			Features
 		},
 		data() {

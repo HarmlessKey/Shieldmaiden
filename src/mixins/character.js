@@ -1,8 +1,8 @@
-import { experience } from "@/mixins/experience.js";
-import { general } from "@/mixins/general.js";
-import { dice } from "@/mixins/dice.js";
-import { spellSlots } from "@/mixins/spellSlots.js";
-import { skills } from "@/mixins/skills.js";
+import { experience } from "src/mixins/experience.js";
+import { general } from "src/mixins/general.js";
+import { dice } from "src/mixins/dice.js";
+import { spellSlots } from "src/mixins/spellSlots.js";
+import { skills } from "src/mixins/skills.js";
 
 export const characterMixin = {
 	mixins: [experience, general, dice, spellSlots, skills],

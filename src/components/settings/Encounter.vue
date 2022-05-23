@@ -1,20 +1,20 @@
 <template>
-	<div>
+	<div class="card-body">
 		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
 			<q-select 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-for="(setting, index) in type_settings" 
 				:options="setting.options"
 				:value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item dark slot="selected">
+				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
 					<q-item-section avatar>
-						<q-icon :name="setting.icon" class="gray-light" size="large" />
+						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
-					<q-item-section class="gray-light truncate">
+					<q-item-section class="neutral-2 truncate">
 						<q-item-label>{{ setting.name }}</q-item-label>
 						<q-item-label caption>
 							{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
@@ -37,36 +37,22 @@
 						@click="setSetting(setting.key, scope.opt.value)"
 					>
 						<q-item-section>
-							<q-item-label v-html="scope.opt.name"/>
+							<q-item-label v-text="scope.opt.name"/>
 						</q-item-section>
 						<q-item-section avatar>
 							<q-icon :name="scope.opt.icon" size="small" :class="scope.opt.color" />
 						</q-item-section>
 					</q-item>
 				</template>
-				<span slot="after" v-if="setting.info">
-					<a @click.stop>
-						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
-										<b>{{ setting.name }}</b>
-									</q-card-section>
-
-									<q-card-section>
-										<div v-html="setting.info" />
-										<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
-									</q-card-section>
-								</q-card>
-							</q-menu>
-						</q-icon>
-					</a>
-				</span>
+				<hk-popover v-if="setting.info" slot="after" :header="setting.name">
+					<q-icon name="info" size="sm" color="neutral-3" />
+					<div v-html="setting.info" slot="content" />
+				</hk-popover>
 			</q-select>
 			
 			<div class="timer">
 				<q-input 
-					dark square filled
+					:dark="$store.getters.theme === 'dark'" square filled
 					type="number"
 					label="Minutes"
 					:value="timer.minutes"
@@ -76,43 +62,34 @@
 					<template #append>:</template>
 				</q-input>
 				<q-input 
-					dark square filled
+					:dark="$store.getters.theme === 'dark'" square filled
 					type="number"
 					max="59"
 					label="Seconds"
 					:value="timer.seconds"
 					@input="setTimer($event, 'seconds')"
 				>
-					<span slot="after" >
-						<a @click.stop>
-						<q-icon name="info" size="medium">
-							<q-menu square anchor="top middle" self="bottom middle" :max-width="'250px'">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
-										<b>Turn timer</b>
-									</q-card-section>
-
-									<q-card-section>
-										<p>When a time is entered, the turn timer will count down from the time you entered.</p>
-										<p>Set to 0 or clear the value to have the timer count up again.</p>		
-									</q-card-section>
-								</q-card>
-							</q-menu>
-						</q-icon>
-					</a>
-					</span>
+					<hk-popover slot="after" header="Turn timer">
+						<q-icon name="info" size="sm" color="neutral-3" />
+						<template #content>
+							<p>When a time is entered, the turn timer will count down from the time you entered.</p>
+							<p>Set to 0 or clear the value to have the timer count up again.</p>		
+						</template>
+					</hk-popover>
 				</q-input>
 			</div>
 		</div>
-		<a class="btn mt-3" @click="setDefault()">Reset to default</a>
+		<a class="btn mt-3 bg-neutral-5" @click="set_default_settings('encounter')">
+			Reset to default
+		</a>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
+	import { mapGetters, mapActions } from "vuex";
 
 	export default {
-		name: 'Track',
+		name: 'EncounterSettings',
 		data(){
 			return {
 				userId: this.$store.getters.user.uid,
@@ -151,8 +128,8 @@
 								icon: 'fas fa-arrows-alt-v',
 								info: 'Change the order of initiative.',
 								options: [
-									{ value: undefined, name: 'Descend', action: 'Descend', icon: 'fas fa-long-arrow-alt-down', color: 'gray-light' },
-									{ value: true, name: 'Ascend', action: 'Ascend', icon: 'fas fa-long-arrow-alt-up', color: 'gray-light' },
+									{ value: undefined, name: 'Descend', action: 'Descend', icon: 'fas fa-long-arrow-alt-down', color: 'neutral-2' },
+									{ value: true, name: 'Ascend', action: 'Ascend', icon: 'fas fa-long-arrow-alt-up', color: 'neutral-2' },
 								]
 							},
 							{ 
@@ -161,8 +138,8 @@
 								icon: 'far fa-crosshairs',
 								info: 'How do you want critical hits to be handled?<br/> <b>Roll</b>: all the damage dice are rolled twice.<br/> <b>Double</b>: the rolled damage is doubled.',
 								options: [
-									{ value: undefined, name: 'Roll', action: 'Roll', icon: 'fas fa-dice-d20', color: 'gray-light' },
-									{ value: true, name: 'Double', action: 'Double', icon: 'fas fa-chevron-double-up', color: 'gray-light' },
+									{ value: undefined, name: 'Roll', action: 'Roll', icon: 'fas fa-dice-d20', color: 'neutral-2' },
+									{ value: true, name: 'Double', action: 'Double', icon: 'fas fa-chevron-double-up', color: 'neutral-2' },
 								]
 							},
 							{ 
@@ -171,8 +148,8 @@
 								icon: 'fas fa-sword',
 								info: 'Set what tab shows by default when it is an NPC\'s turn. It either shows the tab for rolling damage, or doing manual damage.',
 								options: [
-									{ value: undefined, name: 'Roll', action: 'Roll', icon: 'fas fa-dice-d20', color: 'gray-light' },
-									{ value: true, name: 'Manual', action: 'Manual', icon: 'fas fa-hand-paper', color: 'gray-light' },
+									{ value: undefined, name: 'Roll', action: 'Roll', icon: 'fas fa-dice-d20', color: 'neutral-2' },
+									{ value: true, name: 'Manual', action: 'Manual', icon: 'fas fa-hand-paper', color: 'neutral-2' },
 								]
 							},
 						]
@@ -180,15 +157,11 @@
 				}
 			}
 		},
-		firebase() {
-			return {
-				settings: {
-					source: db.ref(`settings/${this.userId}/encounter`),
-					asObject: true,
-				},
-			}
-		},
 		computed: {
+			...mapGetters(["userSettings"]),
+			settings() {
+				return this.userSettings.encounter || {};
+			},
 			timer() {
 				const total = this.settings.timer ? this.settings.timer : 0;
 				const minutes = Math.floor(total/60);
@@ -198,27 +171,19 @@
 					minutes,
 					seconds
 				};
-			}
+			},
 		},
 		methods: {
+			...mapActions([
+				"update_settings",
+				"set_default_settings"
+			]),
 			setSetting(type, value) {
-				if(value == undefined) {
-					db.ref(`settings/${this.userId}/encounter/${type}`).remove();
-				} else {
-					db.ref(`settings/${this.userId}/encounter/${type}`).set(value);
-				}
-			},
-			setDefault() {
-				db.ref(`settings/${this.userId}/encounter`).remove();
-			},
-			displaySetting(type, key, value) {
-				let options = this.types[type].type_settings.filter(item => {
-					return item.key === key;
-				})[0].options;
-				const selected = options.filter(item => {
-					return item.value === value;
-				})[0];
-				return selected;
+				this.update_settings({
+					category: "encounter",
+					type,
+					value
+				});
 			},
 			setTimer(value, type) {
 				value = (value === "") ? 0 : value;
@@ -230,8 +195,21 @@
 				} else {
 					total = parseInt(this.timer.seconds + parseInt(value)*60);
 				}
-				db.ref(`settings/${this.userId}/encounter/timer`).set(total);
-			}
+				this.update_settings({
+					category: "encounter",
+					type: "timer",
+					value: total
+				});
+			},
+			displaySetting(type, key, value) {
+				let options = this.types[type].type_settings.filter(item => {
+					return item.key === key;
+				})[0].options;
+				const selected = options.filter(item => {
+					return item.value === value;
+				})[0];
+				return selected;
+			},
 		}
 	}
 </script>
@@ -242,7 +220,14 @@
 			width: 100%;
 		}
 	}
+	.q-item.no-wrap {
+		flex-wrap: wrap;
+	}
 	.timer {
 		display: flex;
+
+		.q-field {
+			width: 100%;
+		}
 	}
 </style>

@@ -5,7 +5,9 @@
 				<!-- NOT LIVE -->
 				<div class="track-wrapper" v-if="!encounter || broadcasting['.value'] !== $route.params.campid">
 					<div class="top">
-						<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+						<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`">
+							<i aria-hidden="true" class="fas fa-chevron-left"></i> Back
+						</router-link>
 						<span class="title truncate">{{ campaign.campaign }}</span>
 						<span>
 							<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
@@ -20,7 +22,7 @@
 					<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 						<CampaignOverview 
 							:players="players" 
-							:campaign-players="campaign.players" 
+							:campaign="campaign" 
 							:width="width" 
 							:shares="shares"
 							:live="broadcasting['.value'] === $route.params.campid"
@@ -38,14 +40,18 @@
 			</template>
 			<div v-else>
 				<div class="top d-flex justify-content-between">
-					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+					<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`">
+						<i aria-hidden="true" class="fas fa-chevron-left"></i> Back
+					</router-link>
 					Not found
 				</div>
 				<div class="container-fluid">
 					<div class="container entities">
 						<h2>Perception check failed</h2>
-						<p>It seems we rolled a little low, this campaign can't be found.<br/>
-							It is possible the campaign is set to private.</p>
+						<p>
+							It seems we rolled a little low, this campaign can't be found.<br/>
+							It is possible the campaign is set to private.
+						</p>
 					</div>
 				</div>
 			</div>
@@ -66,23 +72,15 @@
 
 <script>
 	import _ from "lodash";
-	import { db } from '@/firebase';
-
-	import Follow from '@/components/trackCampaign/Follow.vue';
-	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue';
-	import ViewPlayers from '@/components/campaign/Players.vue';
+	import { db } from 'src/firebase';
+	import CampaignOverview from 'src/components/trackCampaign/CampaignOverview.vue';
 	import Live from './live';
 
 	export default {
 		name: 'Trackcampaign',
 		components: {
-			Follow,
 			CampaignOverview,
-			ViewPlayers,
 			Live
-		},
-		metaInfo: {
-			title: 'Harmless Key'
 		},
 		data() {
 			return {
@@ -110,9 +108,7 @@
 		},
 		computed: {
 			shared() {
-				if(this.campaign && this.broadcasting[".value"]) {
-					return this.campaign.shares;
-				}
+				return (this.campaign && this.broadcasting[".value"]) ? this.campaign.shares : {};
 			}
 		},
 		watch: {
@@ -179,8 +175,8 @@
 
 						let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
 
-						encounter.on('value' , (snapshot) => {
-							let enc = snapshot.val();
+						encounter.on('value' , (result) => {
+							let enc = result.val();
 							if(enc) {
 								enc.key = encId;
 							}
@@ -190,8 +186,8 @@
 					//Get campaign for player curHP/tempHP/ACBonus/Dead/Stable/DeathSaves
 					let fetchCampaign = db.ref(`campaigns/${this.userId}/${campId}`);
 
-					fetchCampaign.on('value' , (snapshot) => {				
-						this.campaign = snapshot.val();
+					fetchCampaign.on('value' , (result) => {				
+						this.campaign = result.val();
 					});
 				});
 			},
@@ -199,13 +195,8 @@
 				const target = e.target.parentNode.parentNode.parentNode.parentNode;
 
 				this.$q.fullscreen.toggle(target)
-					.then(() => {
-						// success!
-					})
 					.catch((err) => {
-						alert(err)
-						// uh, oh, error!!
-						// console.error(err)
+						alert(err);
 					})
 			},
 			checkShare(key) {
@@ -226,17 +217,17 @@
 		height: calc(100vh - 50px);
 		background-size: cover;
 		background-position: center bottom;
-		background-color:$gray-dark;
+		background-color: $neutral-5;
 		width: 100vw;
 		position: relative;
 
 		.top {
 			grid-area: top;
-			background: rgba(38, 38, 38, .9);
+			background: $neutral-8;
 			text-transform: uppercase;
 			height: 60px;
-			line-height: 40px;
-			padding: 10px;
+			line-height: 30px;
+			padding: 15px 10px;
 			display: grid;
 			grid-template-columns: max-content auto max-content;
 
@@ -246,7 +237,7 @@
 			}
 			.full {
 				font-size: 25px;
-				color: $gray-light;
+				color: $neutral-2;
 				margin-left: 10px;
 			}
 		}
@@ -263,7 +254,7 @@
 			width: 100%;
 			text-align: center;
 			font-size: 100px;
-			color: $white;
+			color: $neutral-1;
 			font-weight: bold;
 			text-shadow: 0 0  5px $black;
 			letter-spacing: -2px;

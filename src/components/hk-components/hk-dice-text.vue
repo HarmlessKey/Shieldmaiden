@@ -53,7 +53,6 @@
 							.map((line) => ({value: line, dice: this.makeDice(line)}))
 				// Filter out undefined
 				let ret = output.filter((val) => !!val);
-				// console.log(ret)
 				return ret
 			},
 			makeDice(input) {
@@ -92,9 +91,6 @@
 
 <style lang="scss" scoped>
 .hk-dice-text {
-	white-space: pre-line;
-	word-wrap: pre;
-
 	.rollable {
 		cursor: pointer;
 		user-select: none;

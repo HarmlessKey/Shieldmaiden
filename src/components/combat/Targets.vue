@@ -1,25 +1,22 @@
 <template>
-	<div id="targets">
+	<div id="targets" class="bg-neutral-6-transparent">
 		<h2 
 			class="componentHeader d-flex justify-content-between" 
 			:class="{ shadow : setShadow > 0 }">
 			<span>
-				<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+				<i aria-hidden="true" class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
 			</span>
 			<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 				v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
-				class="gray-hover text-capitalize">
-				<i class="fas fa-plus green"></i>
-				<span class="d-none d-md-inline ml-1">
+				class="btn btn-sm bg-neutral-5">
+				<i aria-hidden="true" class="fas fa-plus green"></i>
+				<span class="ml-1">
 					Add
-					<span v-if="showKeybinds.keyBinds === undefined" class="gray-hover d-none d-sm-inline text-lowercase">[a]</span>
+					<span v-if="!showKeybinds" class="d-none d-sm-inline">[a]</span>
 				</span>
-				<q-tooltip anchor="top middle" self="center middle">
-					Add NPC
-				</q-tooltip>
 			</a>
 		</h2>
-		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
 			<div v-shortkey="{
 				downSingle: ['arrowdown'], 
 				downMultiple: ['shift', 'arrowdown'],
@@ -30,7 +27,7 @@
 			>
 				<template v-for="{group, targets} in groups">
 					<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
-						<i v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
+						<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
 					</h2>
 					<transition-group
 						:key="group"
@@ -63,7 +60,7 @@
 										</q-tooltip>
 									</span>
 									<span class="red" v-if="Object.keys(_activeDown).length > 0">
-										<span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}
+										<span class="neutral-3 mx-1">|</span>- {{ Object.keys(_activeDown).length }}
 										<q-tooltip anchor="top middle" self="center middle">
 											Removed next round
 										</q-tooltip>
@@ -77,12 +74,39 @@
 								v-shortkey="[i]" @shortkey="set_targeted({ type: 'single', key: entity.key })">
 								<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
 							</div>
+
+							<div v-if="!entity.active" class="d-flex">
+								<a class="btn btn-sm btn-clear mx-1" 
+									v-if="entity.addNextRound"
+									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
+									<i aria-hidden="true" class="fas fa-check green"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Will be added next round
+									</q-tooltip>
+								</a>
+								<a class="btn btn-sm btn-clear mx-1" 
+									v-if="!entity.addNextRound"
+									v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
+									<i aria-hidden="true" class="fas fa-check neutral-2"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Click to add next round
+									</q-tooltip>
+								</a>
+								<a class="btn btn-sm bg-neutral-5" 
+									@click="add_next_round({key: entity.key, action: 'set'})">
+									<i aria-hidden="true" class="fas fa-arrow-up"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Add now
+									</q-tooltip>
+								</a>
+							</div>
 							<a class="options">
-								<i class="fal fa-ellipsis-v"></i>
-								<q-popup-proxy square dark anchor="bottom right" self="top right" :breakpoint="576">
+								<i aria-hidden="true" class="fal fa-ellipsis-v"></i>
+								<q-popup-proxy :dark="$store.getters.theme === 'dark'" anchor="bottom right" self="top right" :breakpoint="576">
 									<target-menu :entity="entity" />
 								</q-popup-proxy>
 							</a>
+
 						</li>
 					</transition-group>
 				</template>
@@ -93,10 +117,9 @@
 
 <script>
 	import _ from 'lodash';
-	import { db, auth } from '@/firebase';
 	import { mapGetters, mapActions } from 'vuex';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import TargetMenu from '@/components/combat/TargetMenu.vue';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import TargetMenu from 'src/components/combat/TargetMenu.vue';
 
 	export default {
 		name: 'Targets',
@@ -104,7 +127,7 @@
 		props: ['_active','_idle'],
 		data() {
 			return {
-				userId: (auth.currentUser) ? auth.currentUser.uid : undefined,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				currentTarget: {},
 				setShadow: 0
 			}
@@ -116,6 +139,7 @@
 				'encounter',
 				'entities',
 				'targeted',
+				'userSettings'
 			]),
 			groups() {
 				return [
@@ -143,7 +167,7 @@
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
 						entity.key = key
-						return entity.down == true;
+						return !!entity.down;
 					})
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
@@ -162,19 +186,14 @@
 			_addedNextRound: function() {
 				return _.chain(this._idle)
 					.filter(function(entity) {
-						return entity.addNextRound == true;
+						return !!entity.addNextRound;
 					})
 					.sortBy('name' , 'desc')
 					.value()
 			},
-		},
-		firebase() {
-			return {
-				showKeybinds: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				}
-			}
+			showKeybinds() {
+				return (this.userSettings && this.userSettings.general) ? this.userSettings.general.keyBinds : undefined;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -183,6 +202,7 @@
 				'set_targeted',
 				'set_stable',
 				'remove_entity',
+				'add_next_round',
 			]),
 			setHidden(key, hidden) {
 				if(key) {
@@ -201,8 +221,8 @@
 			remove(key, name) {
 				this.$snotify.error('Are you sure you want to remove "' + name + '" from this encounter?', 'Delete character', {
 					buttons: [
-					{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
@@ -218,8 +238,8 @@
 				const lastSelected = this.targeted[this.targeted.length - 1];
 				const type = (event.srcKey === 'upSingle' || event.srcKey === 'downSingle') ? "single" : "multi"; //Multitarget or not
 				//Create array with keys of all targets
-				const targetsArray = this._targets.map(function (target) {
-					return target.key;
+				const targetsArray = this._targets.map((item) => {
+					return item.key;
 				});
 				const current = targetsArray.indexOf(lastSelected); //Set the target from where we're gonna select the next
 
@@ -246,7 +266,6 @@
 <style lang="scss" scoped>
 
 #targets {
-	background: rgba(38, 38, 38, .9);
 	grid-area: targets;
 	overflow: hidden;
 
@@ -255,15 +274,18 @@
 	}
 
 	h2 {
-		padding-left: 10px;
+		padding-left: 15px;
 		margin-bottom: 5px;
+		font-size: 18px;
 
 		&.componentHeader {
+			background-color: $neutral-8-transparent;
 			padding: 10px 15px;
 			margin-bottom: 0 !important;
+			line-height: 31px;
 
 			&.shadow {
-				box-shadow: 0 0 10px rgba(0,0,0,0.9); 
+				box-shadow: 0 0 10px rgba(0,0,0, 0.9); 
 			}
 		}
 	}
@@ -274,7 +296,7 @@
 		text-align: center;
 		width: 25px;
 		font-size: 18px;
-		color: $gray-light !important;
+		color: $neutral-1 !important;
 
 		&:hover {
 			color: $blue !important;
@@ -301,21 +323,23 @@ ul.targets {
 	padding: 10px 15px 10px 10px !important;
 
 	li {
-		// height: 32px;
 		margin-bottom: 8px;
 		border: solid 1px transparent;
 		cursor: pointer;
-		background:$gray-dark;
+		background: $neutral-8;
+		border-radius: $border-radius-small;
 
 		&.targeted {
 			border-color: $blue !important;
-			box-shadow: 0px 0px 10px rgba(44, 151, 222, .5);
+		}
+		.target-item-wrapper {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
 		}
 	}
 	&.active_targets li:first-child {
 		margin-bottom: 20px;
 		border-color: $green;
-		box-shadow: 0px 0px 10px rgba(131, 181, 71, .5);
 	}
 	li.top {
 		position: relative;
@@ -328,7 +352,7 @@ ul.targets {
 			width: 100%;
 			position: absolute;
 			top: -25px;
-			border-bottom: solid 1px $gray-light;
+			border-bottom: solid 1px $neutral-1;
 		}
 	}
 }

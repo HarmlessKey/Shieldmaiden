@@ -1,11 +1,11 @@
 <template>
-	<div class="turns d-flex justify-content-center bg-gray-darker">
+	<div class="turns d-flex justify-content-center bg-neutral-8">
 		<h2 v-if="encounter.finished">
 			Finished
 		</h2>
 		<template v-else>
 			<div class="timer">
-				<i class="fas fa-stopwatch" />
+				<i aria-hidden="true" class="fas fa-stopwatch" />
 				<hk-timer :value="timer || 0" :key="encounter.turn" />
 			</div >
 			<div class="round-info d-flex justify-content-center" v-if="encounter.round">
@@ -16,7 +16,7 @@
 				<div>
 					<div>Turn</div>
 					<div class="number">
-						{{ turn + 1 }}<span class="small gray-hover">/{{ entities_len }}</span>
+						{{ turn + 1 }}<span class="small neutral-4">/{{ entities_len }}</span>
 					</div>
 				</div>
 			</div>
@@ -45,26 +45,26 @@
 					|| (current.entityType == 'npc' && displayNPCField('health', current) === 'obscured')
 				">
 					<template v-if="current.curHp == 0">
-						<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+						<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 					</template>
 					<span v-else>
 						
-					<i  class="fas" :class="{
+					<i aria-hidden="true"  class="fas" :class="{
 							'green fa-heart': percentage(current.curHp, current.maxHp) == 100,
 							'orange fa-heart-broken': percentage(current.curHp, current.maxHp) < 100 && percentage(current.curHp, current.maxHp) > 33,
 							'red fa-heartbeat': percentage(current.curHp, current.maxHp) <= 33,
 						}"></i>
 					</span>
 				</template>
-				<span v-else class="gray-hover">
+				<span v-else class="neutral-4">
 					? ? ?
 				</span>
 			</h2>
 		</template>
 		<span class="actions">
 			<a @click="setWeather" class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length > 0">
-				<i v-if="weather" class="fas fa-cloud-showers"></i>
-				<i v-else class="fas fa-cloud hide"></i>
+				<i aria-hidden="true" v-if="weather" class="fas fa-cloud-showers"></i>
+				<i aria-hidden="true" v-else class="fas fa-cloud hide"></i>
 			</a>
 			<a @click="$q.fullscreen.toggle()" class="full">
 				<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />
@@ -77,8 +77,8 @@
 </template>
 
 <script>
-	import { general } from '@/mixins/general.js';
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import { general } from 'src/mixins/general.js';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
 	import Health from './Health.vue';
 	import Name from './Name.vue';
 	import Avatar from './Avatar.vue';
@@ -162,6 +162,10 @@
 			width: 40px;
 			height: 40px;
 			margin-left: 15px;
+
+			.avatar {
+				font-size: 29px;
+			}
 		}
 		h2 {
 			line-height: 40px;
@@ -180,7 +184,7 @@
 				width: 60px;
 				line-height: 60px;
 				text-align: center;
-				color: $white;
+				color: $neutral-1;
 				font-size: 25px;
 
 				.hide {
@@ -195,7 +199,7 @@
 				line-height: 60px;
 				font-size: 25px;
 				text-align: center;
-				color: $gray-light;
+				color: $neutral-2;
 				
 				i {
 					vertical-align: -2px;

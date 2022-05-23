@@ -1,0 +1,11 @@
+{
+  "extends": "@quasar/app-webpack/tsconfig-preset",
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": ".",
+    "typeRoots": [
+      "src/typings",
+      "node_modules/@types"
+    ]
+  }
+}

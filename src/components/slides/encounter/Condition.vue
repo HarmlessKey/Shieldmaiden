@@ -1,13 +1,11 @@
 <template>
 	<div class="pb-5">
 		<h2>
-			<icon :icon="cond.value" class="icon" />
+			<i aria-hidden="true" :class="`hki-${cond.value}`" />
 			{{ cond.name }}
 		</h2>
 
-		<span class="bg-gray-dark">
-			<TargetItem  :item="entity.key" />
-		</span>
+		<TargetItem  :item="entity.key" />
 
 		<hr>
 
@@ -25,10 +23,10 @@
 				<tr v-for="(effect, index) in effects" :key="index">
 					<td><a :class="{'active': entity.conditions['exhaustion'] >= index + 1}" 
 					@click="setExhausted(index + 1)">
-					<span v-if="entity.conditions['exhaustion'] >= index + 1"><i class="fas fa-check"></i></span>
+					<span v-if="entity.conditions['exhaustion'] >= index + 1"><i aria-hidden="true" class="fas fa-check"></i></span>
 					<span v-else>{{ index + 1 }}</span>
 					</a></td>
-					<td :class="{'gray-hover': entity.conditions['exhaustion'] < index + 1}">{{ effect }}</td>
+					<td :class="{'neutral-2': entity.conditions['exhaustion'] < index + 1}">{{ effect }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -42,8 +40,8 @@
 
 <script>
 	import { mapActions } from 'vuex';
-	import { conditions } from '@/mixins/conditions.js';
-	import TargetItem from '@/components/combat/TargetItem.vue';
+	import { conditions } from 'src/mixins/conditions.js';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Condition',
@@ -66,14 +64,6 @@
 					"Speed reduced to 0",
 					"Death",
 				]
-			}
-		},
-		firebase() {
-			return {
-				// cond: {
-				// 	source: db.ref(`conditions/${this.condition}`),
-				// 	asObject: true
-				// }
 			}
 		},
 		computed: {
@@ -117,28 +107,27 @@
 			margin-bottom: 10px;
 		}
 	}
-	svg {
-		width: 23px;
-		height: 23px;
-		color: $gray-light;
-		fill: $gray-light;
+	h2 {
+		i {
+			vertical-align: -2px;
+		}
 	}
 	.table {
 
 		td {
-			background:$gray-active;
+			background: $neutral-9;
 
 			a {
-				color: $gray-light !important;
-				background: #494747;
+				color: $neutral-6 !important;
+				background: $neutral-2;
 				line-height: 30px;
 				height: 30px;
 				display: block;
 				text-align: center;
 
 				&.active {
-					background: $gray-light;
-					color:$gray-active !important;
+					background: $red;
+					color: $white !important;
 				}
 			}
 		}

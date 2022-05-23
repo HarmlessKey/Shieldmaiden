@@ -1,6 +1,6 @@
 <template>
 	<div id="current" v-if="current">
-		<div class="bg-gray-active current">
+		<div class="bg-neutral-6 current">
 			<div>Up now:</div>
 			<TargetItem :item="current.key" />
 			<a 
@@ -14,7 +14,7 @@
 			</a>
 		</div>
 		<div 
-			class="saves bg-gray-active" 
+			class="saves bg-neutral-8" 
 			v-if="(current.entityType === 'player' || current.entityType === 'companion') && current.curHp === 0 && !current.stable && !current.dead"
 		>
 			<DeathSaves :target="current" />
@@ -24,8 +24,8 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import DeathSaves from '@/components/combat/DeathSaves.vue';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import DeathSaves from 'src/components/combat/DeathSaves.vue';
 
 	export default {
 		name: 'Current',
@@ -81,7 +81,7 @@
 		padding: 10px;
 
 		a {
-			color:  $gray-light;
+			color:  $neutral-2;
 			line-height: 35px;
 			width: 35px;
 			text-align: right;

@@ -3,7 +3,7 @@
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				placeholder="Search"
 				type="text" 
 				class="mb-2"
@@ -60,8 +60,8 @@
 						>
 							<span v-html="column.label"></span>
 							<span class="sort">
-								<i class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
-								<i class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
+								<i aria-hidden="true" class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
+								<i aria-hidden="true" class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
 							</span>
 							<q-tooltip v-if="column.tooltip" anchor="top middle" self="center middle">
 								{{ column.tooltip }}
@@ -81,7 +81,7 @@
 					:key="`collapse-action-${index}`"
 					:class="{ shown: showCollapsed === index }"
 				>
-					<i class="fas fa-chevron-down" />
+					<i aria-hidden="true" class="fas fa-chevron-down" />
 				</div>
 				
 				<template v-for="(column, key) in columns">
@@ -346,14 +346,15 @@
 				text-align: right;
 			}
 			&.hk-table-column-sortable {
+				user-select: none;
 				cursor: pointer;
 				display: flex;
-				justify-content: flex-start;
+				justify-content: space-between;
 
 				.sort {
 					width: 25px;
 					position: relative;
-					color: #494747;
+					color: $neutral-3;
 
 
 					.fas {
@@ -371,11 +372,11 @@
 			}
 		}
 		.hk-collapsed-column {
-			padding: 10px;
+			padding: 20px;
 
 			pre {
 				overflow: hidden;
-				color: #494747;
+				color: $neutral-8;
 			}
 		}
 	}

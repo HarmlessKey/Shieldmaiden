@@ -9,7 +9,7 @@
 			<!-- MOBILE -->
 			<div v-if="screenWidth <= 576">
 				<q-tabs
-					dark
+					:dark="$store.getters.theme === 'dark'"
 					inline-label
 					no-caps
 					indicator-color="transparent"
@@ -24,7 +24,7 @@
 
 			<!-- DESKTOP -->
 			<template v-else>
-				<div>
+				<div class="text-shadow">
 					<span v-if="targeted.length === 0">Select a target to perform actions</span>
 					<span v-else>
 						{{ targeted.length }} {{ targeted.length > 1 ? 'targets' : 'target' }}
@@ -34,7 +34,7 @@
 					<a 
 						v-if="targeted.length > 0"
 						@click="damageRequest()">
-						<i class="fas fa-sword"></i>
+						<i aria-hidden="true" class="fas fa-sword white"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Do damage or healing
 						</q-tooltip>
@@ -44,15 +44,15 @@
 		</div>
 
 		<!-- INITIATIVE LIST -->
-		<q-scroll-area dark :thumb-style="{ width: '5px'}">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
 			<div>
 				<table class="initiative-list targets">
 					<thead class='white text-shadow'>
 						<th class="init">In.</th>
 						<th class="image"></th>
-						<th class="ac"><i class="fas fa-shield"></i></th>
+						<th class="ac"><i aria-hidden="true" class="fas fa-shield"></i></th>
 						<th>Name</th>
-						<th class="hp"><i class="fas fa-heart"></i></th>
+						<th class="hp"><i aria-hidden="true" class="fas fa-heart"></i></th>
 						<th class="conditions"></th>
 					</thead>
 					<tbody 
@@ -72,8 +72,8 @@
 								v-touch-hold.mouse="event => target(event, 'multi', entity.key)"
 								@click="target($event, 'single', entity.key)"
 							>
-								<td class="init">
-									<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
+								<td class="init white">
+									<i aria-hidden="true" v-if="targeted.includes(entity.key)" class="fas fa-crosshairs"></i>
 									<template v-else>{{ entity.initiative }}</template>
 								</td>
 							
@@ -82,7 +82,7 @@
 								</td>
 								<td class="ac">
 									<div class="ac_wrapper">
-										<i class="fas fa-shield" ></i>
+										<i aria-hidden="true" class="fas fa-shield" ></i>
 										<template v-if="
 											(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
 											|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
@@ -135,9 +135,9 @@
 									|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
 								">
 								<template v-if="entity.curHp == 0">
-									<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+									<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 									</template>
-									<i v-else class="fas" :class="{
+									<i aria-hidden="true" v-else class="fas" :class="{
 											'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
 											'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
 											'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
@@ -145,14 +145,14 @@
 									/>
 								</template>
 								<template v-else>
-									<span class="gray-hover">
+									<span class="neutral-2">
 										<template v-if="entity.curHp == 0">
-											<i class="fas fa-skull-crossbones red"></i>
+											<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 										</template>
 										<template v-else>? ? ?</template>
 									</span>
 								</template>
-							</td>		
+							</td>
 
 							<td 
 								class="conditions" 
@@ -171,14 +171,14 @@
 											<span class="n" v-if="value === 'exhaustion'">
 												{{ entity.conditions[value] }}
 											</span>
-											<icon :icon="value" class="img" fill="#cc3e4a" />
+											<i aria-hidden="true" :class="`hki-${value}`" />
 											<q-tooltip anchor="top middle" self="center middle">
 												{{ name }}
 												{{ value === 'exhaustion' ? entity.conditions[value] : "" }}
 											</q-tooltip>
 										</div>
 									</template>
-									<b 
+									<strong 
 										v-if="Object.keys(entity.conditions).length > conditionCount"
 										class="condtion"
 										:key="`more-conditions-${entity.key}`"
@@ -188,11 +188,11 @@
 											{{ Object.keys(entity.conditions).length - conditionCount }}
 											more conditions
 										</q-tooltip>
-									</b>
+									</strong>
 
 									<!-- All conditions -->
 									<q-popup-proxy square prevent>
-										<div class="bg-gray gray-light">
+										<div class="bg-neutral-8">
 											<q-list>
 												<q-item>
 													<q-item-section>
@@ -214,14 +214,14 @@
 													:key="`condition-list-${entity.key}-${value}`"
 												>
 													<q-item-section avatar>
-														<icon :icon="value" fill="#cc3e4a" />
+														<i aria-hidden="true" :class="`hki-${value}`" />
 													</q-item-section>
 													<q-item-section>
 														<span>
 															{{ name }}
-															<b v-if="value === 'exhaustion'">
+															<strong v-if="value === 'exhaustion'">
 																{{ entity.conditions[value] }}
-															</b>
+															</strong>
 														</span>
 													</q-item-section>
 												</q-item>
@@ -240,11 +240,11 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { general } from '@/mixins/general.js';
+	import { db } from 'src/firebase';
+	import { general } from 'src/mixins/general.js';
 	import { mapActions } from 'vuex';
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
-	import { conditions } from '@/mixins/conditions.js';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
+	import { conditions } from 'src/mixins/conditions.js';
 
 	import Health from './Health.vue';
 	import Name from './Name.vue';
@@ -377,9 +377,9 @@
 					}
 				})
 			},
-			returnConditions(conditions) {
+			returnConditions(entity_conditions) {
 				let returnConditions = [];
-				for(const key in conditions) {
+				for(const key in entity_conditions) {
 					returnConditions.push(
 						this.conditionList.filter(item => {
 							return item.value === key;
@@ -406,10 +406,11 @@
 		height: 35px;
 		line-height: 35px;
 		border-bottom: solid 2px $white;
+		color: $white;
 
 		.right {
 			a {
-				color:$white !important;
+				color: $neutral-1 !important;
 				margin-left: 10px;
 			}
 		}
@@ -437,7 +438,7 @@
 					width: 44px;
 				}
 				th.image {
-					width: 43px;
+					width: 44px;
 				}
 				th.conditions {
 					max-width: 200px;
@@ -447,11 +448,12 @@
 					
 					tr.top {
 						td {
-							font-size: 12px;
+							font-size: 15px;
 							padding: 10px 0 5px 0;
 							border: none;
 							border-bottom: solid 1px $white;
 							cursor: default;
+							color: $white !important;
 
 							&:hover {
 								border-left: none;
@@ -464,7 +466,7 @@
 						cursor: pointer;
 
 						td {
-							background: rgba(0, 0, 0, .7);
+							background: $neutral-8-transparent-8;
 							border-top: solid 1px transparent;
 							border-bottom: solid 1px transparent;
 							backdrop-filter: blur(1px);
@@ -496,11 +498,11 @@
 								}
 								i {
 									font-size: 35px;
-									color: #5c5757;
+									color: $neutral-4;
 								}
 								.value {
 									font-weight: bold;
-									color: #fff;
+									color: $white;
 									margin-top: -1px;
 								}
 							}
@@ -515,18 +517,14 @@
 							max-width: 0;
 						}
 						td.image {
-							background-color: $black;
 							padding: 0;
 							max-width: 43px;
 
 							.img {
-								width: 42px;
-								height: 42px;
+								width: 44px;
+								height: 44px;
+								font-size: 32px;
 							}
-							svg.img {
-								margin-bottom: -6px;
-							}
-
 						}
 						td.conditions {
 							max-width: 200px;
@@ -539,13 +537,13 @@
 						&:hover {
 							@media only screen and (min-width: 576px) {
 								td {
-									border-color:$white;
+									border-color: $blue;
 								}
 							}
 						}
 					}
 					tr td:first-child, thead th {
-						color:$white;
+						color: $neutral-1;
 						background: none;
 						text-shadow: 0 0 3px $black;
 					}
@@ -562,12 +560,6 @@
 					cursor: pointer;
 					user-select: none;
 					
-					.img {
-						margin-right: 5px;
-						display: block;
-						width: 20px;
-						height: 20px;
-					}
 					.n {
 						font-size: 13px;
 						line-height: 13px;
@@ -593,7 +585,8 @@
 			position: fixed;
 			bottom: 0;
 			z-index: 90;
-			background:$gray-dark;
+			background: $neutral-9;
+			color: $neutral-1;
 			left: 0;
 			width: 100%;
 			border: none;
@@ -603,55 +596,57 @@
 		}
 		.q-scrollarea {
 			height: 100%;
+
+			.initiative-list {
+				margin: 0 !important;
+
+				th {
+					padding: 5px 0;
+
+					&.ac {
+						width: 35px;
+					}
+				}
+				tbody {
+					tr {
+						td {
+							padding: 5px;
+			
+							&.image {
+								width: 43px;
+								vertical-align: top;
+			
+								.img {
+									width: 44px;
+									height: 44px;
+								}
+							}
+							&.init {
+								width: 35px;
+							}
+							&.ac {
+								.ac_wrapper {
+									height: 31px;
+							
+									i, .value {
+										line-height: 31px;
+									}
+									i {
+										font-size: 22px;
+									}
+									.value {
+										font-size: 18px;
+									}
+								}
+							}
+						}			
+					}
+				}
+			}
 		}
-		.initiative-list {
-			margin: 0 !important;
-
-			th {
-				padding: 5px 0;
-
-				&.ac {
-					width: 33px;
-				}
-			}
-			tbody {
-				tr {
-					td {
-						padding: 5px 0;
-		
-						&.image {
-							width: 35px;
-		
-							.img {
-								width: 33px;
-								height: 33px;
-							}
-						}
-						&.init {
-							width: 35px;
-						}
-						&.ac {
-							.ac_wrapper {
-								height: 31px;
-						
-								i, .value {
-									line-height: 31px;
-								}
-								i {
-									font-size: 22px;
-								}
-								.value {
-									font-size: 18px;
-								}
-							}
-						}
-					}			
-				}
-				}
-			}
-	}
-	.q-tabs {
-		height: 60px;
+		.q-tabs {
+			height: 60px;
+		}
 	}
 }
 @media only screen and (min-width: 1250px) {
@@ -682,6 +677,7 @@
 									.img {
 										width: 57px;
 										height: 57px;
+										font-size: 42px;
 									}
 									svg.img {
 										margin-bottom: -9px;

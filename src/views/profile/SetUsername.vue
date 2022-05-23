@@ -1,43 +1,55 @@
 <template>
-	<div class="content container" v-if="user">
+	<div class="content" v-if="user">
 		<template v-if="!userInfo || !userInfo.username">
 			<hk-card header="Username">
-				<p>To continue, please first enter a username.</p>
-					<q-input 
-						dark filled square dense
-						type="text" 
-						autocomplete="off"
-						label="Username" 
-						max-length="1" 
-						v-validate="'required|alpha_num|min:3'"
-						data-vv-as="Username" 
-						name="username"
-						v-model="username" @keyup.native="checkUsername()" />
-					<button class="btn" :class="{
-						'disabled': check == 'unavailable' || errors.has('username'), 
-						}" @click="setUsername()"><i class="fas fa-check"></i> Save</button>
-				<p class="validate red pl-1" v-if="errors.has('username')">{{ errors.first('username') }}</p>
-				<p v-if="username" class="pl-1">
-					<span :class="{'green': check == 'available', 'red': check == 'unavailable'}">{{ username }}</span> is {{ check }}
-				</p>
+				<div class="card-body">
+					<h3>
+						Thank you for creating a <strong>Harmless Key</strong> account!</h3>
+					<p>To continue, please first enter a username.</p>
+					<ValidationProvider rules="required|alpha_num|min:3|max:20|username" name="Username" v-slot="{ errors, invalid, validated }">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							type="text" 
+							class="mb-2"
+							autocomplete="off"
+							label="Username" 
+							maxlength="20"
+							minlength="3"
+							v-model="username"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+						<button 
+							class="btn btn-block" 
+							:class="{'disabled': check === 'unavailable' || invalid }" 
+							@click="setUsername(!invalid)"
+						>
+							Save
+						</button>
+					</ValidationProvider>
+				</div>
 			</hk-card>
 		</template>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'	
-	import { mapGetters } from 'vuex'
+	import { db } from 'src/firebase'	
+	import { mapActions, mapGetters } from 'vuex'
 
 export default {
 		name: 'Username',
-		metaInfo: {
-			title: 'Username'
-		},
 		data() {
 			return {
 				username: undefined,
 				check: 'available',
+			}
+		},
+		preFetch({ store, redirect }) {
+      if(!store.getters.user) {
+				redirect('/sign-in');
+			} else if (store.getters.userInfo.username) {
+				redirect('/profile')
 			}
 		},
 		computed: {
@@ -48,63 +60,40 @@ export default {
 			])
 		},
 		methods: {
-			checkUsername() {
-				
-				let username = db.ref(`search_users`).orderByChild('username').equalTo(this.username.toLowerCase());
-
-				// Check username
-				username.on('value' , (snapshot) => {
-					if(snapshot.exists()) {
-						this.check = 'unavailable';
-						return
-					} else {
-						this.check = 'available';
+			...mapActions([ 'reinitialize' ]),
+			async setUsername(valid) {
+				if (valid && this.check === "available") {
+					let user = {
+						username: this.username,
+						email: this.user.email
 					}
-				});
 
-			},
-			setUsername() {
-				this.$validator.validateAll().then((result) => {
-					if (result && this.check === 'available') {
-						let user = {
-							username: this.username,
-							email: this.user.email
-						}
-						if (this.poster) user.poster = true;
+					db.ref(`users/${this.user.uid}`).update(user);
 
-						db.ref(`users/${this.user.uid}`).update(user);
+					//Save searchable results in search_user
+					db.ref(`search_users`).child(this.user.uid).set({
+						username: this.username.toLowerCase(),
+						email: this.user.email.toLowerCase()
+					});
 
-						//Save searchable results in search_user
-						db.ref(`search_users`).child(this.user.uid).set({
-							username: this.username.toLowerCase(),
-							email: this.user.email.toLowerCase()
-						});
-
-						this.$snotify.success('Username saved.', 'Critical hit!', {
-							position: "centerTop"
-						});
-						this.$router.replace('/profile');
-					}
-				})
-			},
+					this.$snotify.success('Username saved.', 'Critical hit!', {
+						position: "centerTop"
+					});
+					await this.reinitialize();
+					this.$router.replace('/profile');
+				}
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.img {
-		width: 100px;
-		height: 100px;
-		margin-bottom: 20px;
-		border-radius: 50%;
-		display: block;
-		background-size: cover;
-		background-position: center top;
+.content {
+	max-width: 400px !important;
+
+	h3 {
+		font-size: 18px;
+		max-width: 250px;
 	}
-	.info {
-		span {
-			width: 80px;
-			display: inline-block;
-		}
-	}
+}
 </style>

@@ -1,6 +1,6 @@
-import { db } from '@/firebase';
+import { db } from 'src/firebase';
 import { mapActions, mapGetters } from 'vuex';
-import { remindersMixin } from '@/mixins/reminders';
+import { remindersMixin } from 'src/mixins/reminders';
 
 export const setHP = {
 	mixins: [remindersMixin],
@@ -45,19 +45,19 @@ export const setHP = {
 		 * and an object with the defenses of the target
 		 * This is for logging purposes, it holds information about damage types
 		 */
-		setHP(amounts, target, current, config) {
+		async setHP(amounts, target, current, config) {
 			for(let [type, amount] of Object.entries(amounts)) {
-				amount = parseInt(amount);
+				const int_amount = parseInt(amount);
 
 				if(type === "damage") {
-					this.isDamage(amount, target, current, config);
+					await this.isDamage(int_amount, target, current, config);
 				} else {
-					this.isHealing(amount, target, current, config);
+					await this.isHealing(int_amount, target, current, config);
 				}
 			}
 		},
 
-		isDamage(amount, target, current, config) {
+		async isDamage(amount, target, current, config) {
 			var maxHp = parseInt(target.maxHp);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
@@ -117,7 +117,7 @@ export const setHP = {
 			if(rest_amount > 0) {
 				var newhp = parseInt(curHp - rest_amount);
 
-				if(newhp <= 0) {
+				if(newhp <= 0 && target.entityType !== "npc") {
 					this.set_stable({
 						key: target.key,
 						action: 'unset',
@@ -138,10 +138,7 @@ export const setHP = {
 					}
 					//Character dies if the overkill is >= maxHp
 					if(over >= maxHp && (target.entityType === 'player' || target.entityType === 'companion')) {
-						this.set_dead({
-							key: target.key,
-							action: 'set',
-						})
+						this.set_dead({ key: target.key })
 					}
 				}
 				this.set_hp({
@@ -173,56 +170,67 @@ export const setHP = {
 			//Add to damagemeters
 			//undo holds the value of ovherhealing, if there was any
 			if(config.undo) {
-				amount = -amount
+				amount = -amount;
 				over = (config.undo !== true) ? -config.undo : 0;
-				type = 'healing'
 			}
 			
-			//Campaign wide damage meters (no need to go through store)
 			if(!this.demo) {
 				if(!config.undo) {
-					this.set_meters({key: current.key, type: 'damage', amount}) //Damage done
-					this.set_meters({key: current.key, type: 'overkill', amount: over}) //Over damage done
-					this.set_meters({key: target.key, type: 'damageTaken', amount}) //Damage taken
-					this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Over damage taken
-	
-					if(current.entityType === 'player' || current.entityType === 'companion') {
-						this.damageMeters(current.key, 'damage', amount, current.entityType); //Damage done
-						this.damageMeters(current.key, 'overkill', over, current.entityType); //Over damage done
-						this.damageMeters(target.key, 'damageTaken', amount, current.entityType); //damage taken
-						this.damageMeters(target.key, 'overkillTaken', over, current.entityType); //Over damage taken
+					await this.set_meters({key: current.key, type: 'damage', amount}) //Damage done
+					await this.set_meters({key: current.key, type: 'overkill', amount: over}) //Over damage done
+					await this.set_meters({key: target.key, type: 'damageTaken', amount}) //Damage taken
+					await this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Over damage taken
+					
+					// Campaign wide damage meters (no need to go through store)
+					// Damage done by players
+					if(["player", "companion"].includes(current.entityType)) {
+						await this.damageMeters(current.key, 'damage', amount, current.entityType); //Damage done
+						await this.damageMeters(current.key, 'overkill', over, current.entityType); //Over damage done
+					}
+					
+					// Damage taken by players
+					if(["player", "companion"].includes(target.entityType)) {
+						await this.damageMeters(target.key, 'damageTaken', amount, target.entityType); //damage taken
+						await this.damageMeters(target.key, 'overkillTaken', over, target.entityType); //Over damage taken
 					}
 				} 
 				//To undo, run same function with opposite types 
 				else {
-					this.set_meters({key: current.key, type: 'healing', amount}) //Undo damage done
-					this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Undo Over damage done
-					this.set_meters({key: target.key, type: 'healingTaken', amount}) //Undo damage taken
-					this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Undo Over damage taken
-	
-					if(current.entityType === 'player' || current.entityType === 'companion') {
-						this.damageMeters(current.key, 'healing', amount, current.entityType); //Undo Damage done
-						this.damageMeters(current.key, 'overhealing', over, current.entityType); //Undo Over damage done
-						this.damageMeters(target.key, 'healingTaken', amount, current.entityType); //Undo damage taken
-						this.damageMeters(target.key, 'overhealingTaken', over, current.entityType); //Undo Over damage taken
+					await this.set_meters({key: current.key, type: 'healing', amount}) //Undo damage done
+					await this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Undo Over damage done
+					await this.set_meters({key: target.key, type: 'healingTaken', amount}) //Undo damage taken
+					await this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Undo Over damage taken
+					
+					// Campaign wide damage meters (no need to go through store)
+					// Undo damage done by players
+					if(["player", "companion"].includes(current.entityType)) {
+						await this.damageMeters(current.key, 'healing', amount, current.entityType); //Undo Damage done
+						await this.damageMeters(current.key, 'overhealing', over, current.entityType); //Undo Over damage done
+					}
+					if(["player", "companion"].includes(target.entityType)) {
+						await this.damageMeters(target.key, 'healingTaken', amount, target.entityType); //Undo damage taken
+						await this.damageMeters(target.key, 'overhealingTaken', over, target.entityType); //Undo Over damage taken
 					}
 				}
 			}
 		},
-		isHealing(amount, target, current, config) {
+		async isHealing(amount, target, current, config) {
+			let maxHp;
+			let curHp;
+			let pool;
 			if(target.transformed == true) {
-				var maxHp = parseInt(target.transformedMaxHp);
-				var curHp = parseInt(target.transformedCurHp);
-				var pool = 'transformed';
+				maxHp = parseInt(target.transformedMaxHp);
+				curHp = parseInt(target.transformedCurHp);
+				pool = 'transformed';
 			}
 			else {
 				maxHp = parseInt(target.maxHp);
 				curHp = parseInt(target.curHp);
 				pool = '';
 			}
-			var newhp = parseInt(curHp + amount);
-			var type = 'healing'
-			var over = 0
+			let newhp = parseInt(curHp + amount);
+			let type = 'healing';
+			let over = 0;
 
 			//If the target is a player and the curHp was 0, saves need to be reset
 			if((target.entityType === 'player' || target.entityType === 'companion') && curHp === 0) {
@@ -232,7 +240,7 @@ export const setHP = {
 				})
 				this.set_dead({
 					key: target.key,
-					action: 'unset',
+					action: "unset"
 				})
 			}
 
@@ -271,36 +279,48 @@ export const setHP = {
 			if(config.undo) {
 				amount = -amount
 				over = (config.undo !== true) ? -config.undo : 0;
-				type = 'damage'
 			}
 
-			//Campaign wide healing meters (no need to go through store)
+			// Update the healing meters
 			if(!this.demo) {
 				if(!config.undo) {
-					this.set_meters({key: current.key, type: 'healing', amount}) //Healing done
-					this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Over healing done
-					this.set_meters({key: target.key, type: 'healingTaken', amount}) //Healing taken
-					this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Over healing taken
+					// Meters for the encounter
+					await this.set_meters({key: current.key, type: 'healing', amount}) //Healing done
+					await this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Over healing done
+					await this.set_meters({key: target.key, type: 'healingTaken', amount}) //Healing taken
+					await this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Over healing taken
+					
+					// Campaign wide healing meters (no need to go through store)
+					// Healing done by players
+					if(["player", "companion"].includes(current.entityType)) {
+						await this.damageMeters(current.key, 'healing', amount, current.entityType); //Healing done
+						await this.damageMeters(current.key, 'overhealing', over, current.entityType); //Over healing done
+					}
 
-					if((current.entityType === 'player' || current.entityType === 'companion')) {
-						this.damageMeters(current.key, 'healing', amount, current.entityType); //Healing done
-						this.damageMeters(current.key, 'overhealing', over, current.entityType); //Over healing done
-						this.damageMeters(target.key, 'healingTaken', amount, current.entityType); //Healing taken
-						this.damageMeters(target.key, 'overhealingTaken', over, current.entityType); //Over healing taken
+					// Healing taken by players
+					if(["player", "companion"].includes(target.entityType)) {
+						await this.damageMeters(target.key, 'healingTaken', amount, target.entityType); //Healing taken
+						await this.damageMeters(target.key, 'overhealingTaken', over, target.entityType); //Over healing taken
 					}
 				}
-				//To undo, run same function with opposite types 
+				// To undo, run same function with opposite types 
 				else {
-					this.set_meters({key: current.key, type: 'damage', amount}) //Undo Healing done
-					this.set_meters({key: current.key, type: 'overkill', amount: over}) //Undo Over Healing done
-					this.set_meters({key: target.key, type: 'damageTaken', amount}) //Undo Healing taken
-					this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Undo Over Healing taken
-
-					if((current.entityType === 'player' || current.entityType === 'companion')) {
-						this.damageMeters(current.key, 'damage', amount, current.entityType); //Undo Healing done
-						this.damageMeters(current.key, 'overkill', over, current.entityType); //Undo Over healing done
-						this.damageMeters(target.key, 'damageTaken', amount, current.entityType); //Undo Healing taken
-						this.damageMeters(target.key, 'overkillTaken', over, current.entityType); //Undo overhealing taken
+					await this.set_meters({key: current.key, type: 'damage', amount}) //Undo Healing done
+					await this.set_meters({key: current.key, type: 'overkill', amount: over}) //Undo Over Healing done
+					await this.set_meters({key: target.key, type: 'damageTaken', amount}) //Undo Healing taken
+					await this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Undo Over Healing taken
+					
+					// Campaign wide healing meters (no need to go through store)
+					// Undo healing done by players
+					if(["player", "companion"].includes(current.entityType)) {
+						await this.damageMeters(current.key, 'damage', amount, current.entityType); //Undo Healing done
+						await this.damageMeters(current.key, 'overkill', over, current.entityType); //Undo Over healing done
+					}
+					
+					// Undo healing taken by players
+					if(["player", "companion"].includes(target.entityType)) {
+						await this.damageMeters(target.key, 'damageTaken', amount, target.entityType); //Undo Healing taken
+						await this.damageMeters(target.key, 'overkillTaken', over, target.entityType); //Undo overhealing taken
 					}
 				}
 			}
@@ -347,11 +367,11 @@ export const setHP = {
 			let currentAmount = await targetMeters.once('value').then(function(snapshot) {
 				return snapshot.val()
 			})
-			if(currentAmount === null) { currentAmount = 0; } //if there is no healing done/taken yet
-			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
+			if(currentAmount === null) { currentAmount = 0; } // if there is no healing done/taken yet
+			let newAmount = parseInt(currentAmount) + parseInt(amount); // calculate the new amount
 
 			//Set the new amount
-			db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`).set(newAmount);
+			await db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`).set(newAmount.positive());
 		}
 	}
 }

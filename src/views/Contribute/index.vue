@@ -1,13 +1,12 @@
 <template>
 <div class="grid">
 	<div class="container">
-		<Crumble />
 		<h1>Contribute</h1>
 		
 		<ul class="entities hasImg">
 			<template v-for="(item, index) in items">
 				<li v-if="userInfo.contribute.includes(item.url)" :key="index">
-					<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path.replace(/\/$/, '')+'/'+item.url">{{ item.name }}</router-link>
+					<i aria-hidden="true" class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path.replace(/\/$/, '')+'/'+item.url">{{ item.name }}</router-link>
 				</li>
 			</template>
 		</ul>
@@ -17,17 +16,12 @@
 </template>
 
 <script>
-	import Footer from '@/components/Footer.vue'
-	import Crumble from '@/components/crumble/Compendium.vue'
+	import Footer from 'src/components/Footer.vue'
 
 	export default {
 		name: 'Contribute',
 		components: {
-			Crumble,
 			Footer,
-		},
-		metaInfo: {
-			title: 'Contribute'
 		},
 		data() {
 			return {
@@ -45,12 +39,7 @@
 					},
 				},
 			}
-		},
-		beforeMount() {
-			//Because the component is loaded in another view, 
-			//the scroll needs to be reset to 0
-			window.scrollTo(0,0);
-		},
+		}
 	}
 </script>
 

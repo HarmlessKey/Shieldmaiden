@@ -1,18 +1,18 @@
 <template>
 	<q-expansion-item
 		class="request" 
-		dark switch-toggle-side
+		:dark="$store.getters.theme === 'dark'" 
 		group="requests"
 	>
 		<template #header>
 			<q-item-section>
-				<q-item-label caption class="blue">{{ players[request.player].character_name }}</q-item-label>
+				<q-item-label caption>{{ entities[request.player].name }}</q-item-label>
 				<q-item-label>
 					{{ totalAmount }} <span :class="request.type === 'healing' ? 'green' : 'red'">{{ request.type }}</span>
 				</q-item-label> 
 			</q-item-section>
-			<q-item-label class="text-right">
-				<q-item-label caption>
+			<q-item-label class="text-right neutral-3">
+				<q-item-label caption class="text-right neutral-3">
 					Round: {{ request.round }}
 				</q-item-label>	
 				<q-item-label>
@@ -27,15 +27,15 @@
 					<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
 					<div class="targets">
 						<template v-for="(target, key) in result.targets">
-							<div class="name truncate bg-gray-dark" :key="`name-${key}-${i}`" v-if="entities[key]">
+							<div class="name truncate bg-neutral-8" :key="`name-${key}-${i}`" v-if="entities[key]">
 								{{ entities[key].name.capitalizeEach() }}
 							</div>
 
-							<div class="amount bg-gray-dark" :key="`amount-${key}-${i}`">
+							<div class="amount bg-neutral-8" :key="`amount-${key}-${i}`">
 								{{ target.amount }}
 							</div>
 
-							<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
+							<div class="defenses bg-neutral-8" :key="`defenses-${key}-${i}`">
 								<div 
 									v-for="({name}, defense_key) in defenses"
 									:key="defense_key"
@@ -43,7 +43,7 @@
 									@click.stop="setDefense(defense_key, index, key)"
 									:class="[{active: target.defense === defense_key}, defense_key]"
 								>
-									<i class="fas fa-shield"></i>
+									<i aria-hidden="true" class="fas fa-shield"></i>
 									<span>{{ defense_key.capitalize() }}</span>
 									<q-tooltip anchor="top middle" self="center middle">
 										{{ name }}
@@ -59,20 +59,20 @@
 				<div class="damage">Final values</div>
 				<div class="targets">
 					<template v-for="(final, key) in final_results">
-						<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
+						<div class="name truncate bg-neutral-8" v-if="entities[key]" :key="`final-name-${key}`">
 							{{ entities[key].name }}
 						</div>
-						<div class="amount bg-gray-dark red" :key="`final-amount-${key}`">
+						<div class="amount bg-neutral-8 red" :key="`final-amount-${key}`">
 							{{ Math.floor(final * intensity[key]) }}
 						</div>
-						<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
+						<div class="defenses bg-neutral-8" :key="`final-options-${key}`">
 							<div
 								v-for="{multiplier, name, label} in multipliers"
 								@click="setIntensity(key, multiplier)"
 								:class="{blue: intensity[key] === multiplier}"
 								:key="multiplier"
 							>
-								<i class="fas fa-circle"></i>
+								<i aria-hidden="true" class="fas fa-circle"></i>
 								<span>{{ name }}</span>
 								<q-tooltip anchor="top middle" self="center middle">
 									{{ label }}
@@ -94,7 +94,7 @@
 				<div class="damage">Targets</div>
 				<div class="targets healing">
 					<div v-for="target in request.targets" :key="target">
-						<div class="name truncate bg-gray-dark" v-if="entities[target]">
+						<div class="name truncate bg-neutral-8" v-if="entities[target]">
 							{{ entities[target].name }}
 						</div>
 					</div>
@@ -109,9 +109,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapGetters } from 'vuex';
-	import { setHP } from '@/mixins/HpManipulations.js';
+	import { mapGetters, mapActions } from 'vuex';
+	import { setHP } from 'src/mixins/HpManipulations.js';
 
 	export default {
 		name: 'RequestItem',
@@ -138,8 +137,7 @@
 		},
 		computed: {
 			...mapGetters([
-				'players',
-				'entities'
+				"entities"
 			]),
 			totalAmount() {
 				let amount = 0;
@@ -193,6 +191,7 @@
 			this.final_results = this.setFinal(this.results);
 		},
 		methods: {
+			...mapActions(["delete_request"]),
 			setFinal(results) {
 				let final = this.final_results;
 
@@ -236,7 +235,7 @@
 				this.$set(this.intensity, target, value);
 				this.$forceUpdate();
 			},
-			apply(type) {
+			async apply(type) {
 				for(let key in this.final_results) {
 					let amount = {};
 					amount[type] = Math.floor(this.final_results[key] * this.intensity[key]);
@@ -261,25 +260,29 @@
 						}
 						config.actions[0].rolls.push(roll);
 					}
-
-					this.setHP(amount, this.entities[key], this.entities[this.request.player], config);
+					await this.setHP(amount, this.entities[key], this.entities[this.request.player], config);
 				}
 				this.remove();
 			},
 			remove() {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/requests/${this.request.key}`).remove();
+				this.delete_request(this.request.key);
 			}
 		},
 	}
 </script>
 
 <style lang="scss" scoped>
+	.q-expansion-item {
+		background-color: $neutral-8;
+		margin-bottom: 1px;
+	}
 	.accordion-body {
-		background-color: rgba(0, 0, 0, .1) !important;
+		padding: 10px;
+		background-color: $neutral-9;
 
 		.damage {
 			font-size: 15px;
-			border-bottom: solid 1px #494747;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 2px;
 		}
 		.targets {
@@ -323,14 +326,14 @@
 						line-height: 28px;
 						top: 0;
 						left: 0;
-						color:$gray-dark;
+						color: $neutral-9;
 					}
 
 					&.active {
 						&.i, &.r { color: $green; }
 						&.v { color: $red; }
 						span {
-							color: $white;
+							color: $neutral-1;
 						}
 					}
 				}

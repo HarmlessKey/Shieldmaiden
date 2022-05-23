@@ -1,39 +1,37 @@
 <template>
 	<div class="content">
-		<Crumble :name="(spell.changed) ? spell.name : oldSpell.name"/>
 		<h2 class="spellTitle d-flex justify-content-between" v-if="oldSpell">
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
 			<span v-if="canEdit()">
 				<router-link :to="'/contribute/spells/' + spellId + '/edit'" class="mx-2">
-					<i class="fas fa-pencil-alt"></i>
+					<i aria-hidden="true" class="fas fa-pencil-alt"></i>
 					<q-tooltip anchor="center right" self="center left">
 						Edit
 					</q-tooltip>
 				</router-link>
-				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
 			</span>
 		</h2>
 
 			<!-- SHOW THE OLD SPELL IF SPELL IS NOT CHANGED YET -->
 			<template v-if="oldSpell.school && !spell.changed">
-				<i class="mb-3 d-block">
+				<i aria-hidden="true" class="mb-3 d-block">
 					{{ levels[oldSpell.level] }}
 					{{ oldSpell.school.name }}
 				</i>
 
 				<p>
-					<b>Casting time:</b> {{ oldSpell.casting_time }}<br/>
-					<b>Range:</b> {{ oldSpell.range }}<br/>
-					<b>Components:</b> 
+					<strong>Casting time:</strong> {{ oldSpell.casting_time }}<br/>
+					<strong>Range:</strong> {{ oldSpell.range }}<br/>
+					<strong>Components:</strong> 
 					<template v-for="(component, index) in oldSpell.components">
 						{{ component }}<template v-if="Object.keys(oldSpell.components).length > index + 1">, </template>
 					</template>
 					<template v-if="oldSpell.material"> ({{ oldSpell.material }})</template>
 					<br/>
-					<b>Duration:</b>
+					<strong>Duration:</strong>
 						<template v-if="oldSpell.concentration == 'yes'"> Concentration, </template>
 						{{ oldSpell.duration }}<br/>
-					<b>Classes:</b> 
+					<strong>Classes:</strong> 
 					<template v-for="(_class, index) in oldSpell.classes">
 						{{ _class.name }}<template v-if="Object.keys(oldSpell.classes).length > index + 1">, </template>
 					</template>
@@ -52,47 +50,43 @@
 			</template>
 			<template v-else-if="spell && spell.changed">
 				<!-- {{ spell }} -->
-				<i class="mb-3 d-block">
+				<i aria-hidden="true" class="mb-3 d-block">
 					{{ levels[spell.level] }}
 					{{ spell.school }}
 				</i>
 
 				<p>
-					<b>Casting time:</b> {{ spell.cast_time_nr }} {{spell.cast_time_type}}<br/>
-					<b>Range:</b> {{ (spell.range_type == "Ranged") ? spell.range + " feet" : spell.range_type}}<br/>
-					<b>Components:</b> 
+					<strong>Casting time:</strong> {{ spell.cast_time_nr }} {{spell.cast_time_type}}<br/>
+					<strong>Range:</strong> {{ (spell.range_type == "Ranged") ? spell.range + " feet" : spell.range_type}}<br/>
+					<strong>Components:</strong> 
 					<template v-for="(val, component) in spell.components">
 						{{ val ? component.charAt(0).toUpperCase() : ""}}
 					</template>
 					<template v-if="spell.material_desciption"> ({{ spell.material_desciption }})</template>
 					<br/>
-					<b>Duration:</b> {{ spell.duration_type }}<br>
-					<b>Classes:</b> 
+					<strong>Duration:</strong> {{ spell.duration_type }}<br>
+					<strong>Classes:</strong> 
 					<template v-for="(_class, index) in spell.classes">
 						{{ _class }}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
 					</template>
 					<br/>
 				</p>
 				<p>
-					<vue-markdown name="description" :source="spell.description"></vue-markdown>
+					<!-- <vue-markdown name="description" :source="spell.description"></vue-markdown> -->
 				</p>
 			</template>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import SpellEdit from '@/components/contribute/spell/edit.vue'
+	import { db } from 'src/firebase'
 	import { mapGetters } from 'vuex'
-	import VueMarkdown from 'vue-markdown'
+	// import VueMarkdown from 'vue-markdown'
 
 	export default {
 		name: 'Spell',
 		components: {
-			Crumble,
-			SpellEdit,
-			VueMarkdown,
+			// VueMarkdown,
 		},
 		props: ['id'],
 		data() {
@@ -161,7 +155,7 @@
  .spellTitle {
 		font-size: 18px !important;
 		text-transform: none !important;
-		border-bottom: solid 1px$gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		padding-bottom: 5px;
 		margin-bottom: 5px;
 

@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2 class="d-flex justify-content-between">
-			<span><i class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
+			<span><i aria-hidden="true" class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
 			<a 
-				class="gray-light text-capitalize" 
+				class="neutral-2 text-capitalize" 
 				@click="add_effect()"
 			>
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 				<q-tooltip anchor="center right" self="center left">
 					Add effect
@@ -14,11 +14,11 @@
 			</a>
 		</h2>
 
-		<q-list dark square :class="`accordion`">
+		<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 			<q-expansion-item
 				v-for="(effect, eff_index) in effects"
 				:key="`effect-${eff_index}`"
-				dark switch-toggle-side
+				:dark="$store.getters.theme === 'dark'" switch-toggle-side
 				group="effects"
 			>
 				<template v-slot:header>
@@ -28,8 +28,8 @@
 						{{ effect.effect.subtype }}
 					</q-item-section>
 					<q-item-section avatar>
-						<a @click="remove_effect(eff_index)" class="gray-hover text-capitalize">
-							<i class="fas fa-trash-alt red"></i>
+						<a @click="remove_effect(eff_index)" class="neutral-2 text-capitalize">
+							<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove effect
 							</q-tooltip>
@@ -42,7 +42,7 @@
 					<div class="row q-col-gutter-md mt-3">
 						<div class="col-12 col-md-6">
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								emit-value
 								map-options
 								label="Application"
@@ -56,9 +56,9 @@
 							>
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Apply effect</b>
 												</q-card-section>
 
@@ -75,7 +75,7 @@
 						<!-- TARGETS -->
 						<div class="col-12 col-md-6">
 							<q-select
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Target"
 								v-model="effect.target"
 								:options="targets"
@@ -87,9 +87,9 @@
 							>							
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Target</b>
 												</q-card-section>
 												<q-card-section>
@@ -110,10 +110,10 @@
 								Scaling
 								<a 
 									v-if="level_tier_addable(eff_index)"
-									class="gray-hover text-capitalize" 
+									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(eff_index)"
 								>
-									<i class="fas fa-plus green"></i>
+									<i aria-hidden="true" class="fas fa-plus green"></i>
 									<q-tooltip anchor="center right" self="center left">
 										Add level tier
 									</q-tooltip>
@@ -124,7 +124,7 @@
 								<!-- HL LEVEL SCALE -->
 								<div class="col-12 col-md-2">
 									<q-input 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										:label="level_scaling.capitalizeEach()"
 										v-model="level_tier.level"
 										autocomplete="off"
@@ -140,7 +140,7 @@
 								<!-- HL DICE COUNT -->
 								<div class="col-12 col-md-2">
 									<q-input 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										label="Dice count"
 										v-model="level_tier.dice_count"
 										autocomplete="off"
@@ -153,7 +153,7 @@
 								<div class="col-12 col-md-3">
 									<label for="dice_type">Dice Type</label>
 									<q-select 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										emit-value
 										map-options
 										label="Dice type"
@@ -168,7 +168,7 @@
 								<div class="col-12 col-md-3">
 									<div class="d-flex justify-content-between">
 										<q-input 
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											emit-value
 											map-options
 											label="Fixed value"
@@ -180,7 +180,7 @@
 										/>
 
 										<a @click="remove_level_tier(eff_index, tier_index)" class="remove">
-											<i class="fas fa-trash-alt red"></i>
+											<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 											<q-tooltip anchor="center right" self="center left">
 												Remove
 											</q-tooltip>
@@ -202,7 +202,7 @@
 </template>
 
 <script>
-import EffectsForm from '@/components/EffectsForm';
+import EffectsForm from 'src/components/EffectsForm';
 import numeral from 'numeral';
 
 export default {
@@ -237,12 +237,10 @@ export default {
 		application() {
 			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
 
-			let application = [
+			return [
 				{ label: "Always", value: "always" },
 				hitFail
 			];
-
-			return application;
 		},
 		effects: {
 			get() {
@@ -296,12 +294,9 @@ export default {
 			this.$forceUpdate();
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "spell scale" && 
+			return !(this.level_scaling == "spell scale" && 
 					this.effects[index].level_tiers &&
-					this.effects[index].level_tiers.length >= 1) {
-				return false;
-			}
-			return true;
+					this.effects[index].level_tiers.length >= 1);
 		},
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
@@ -314,7 +309,10 @@ export default {
 					let level_txt = `At ${numeral(tier.level).format('0o')} level`;
 					let effect_txt = 'the value of this effect is ';
 					effect_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-					effect_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+					if(tier.fixed_val) {
+						effect_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`
+					}
 	
 					let new_line = `${tier.dice_count ? level_txt.capitalize()+',' : level_txt}`;
 					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`;
@@ -331,7 +329,10 @@ export default {
 				// Effect text
 				let effect_txt = 'the value of this effect increases by ';
 				effect_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-				effect_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+				if(tier.fixed_val) {
+						effect_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`
+					}
 
 				// Spell slot text
 				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`;
@@ -370,14 +371,14 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px$gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 5px;
 }
 label {
 	display: flex;
 	justify-content: flex-start;
 	&.var {
-		border-bottom: solid 1px$gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		padding-bottom: 5px;
 	}
 }
@@ -388,7 +389,7 @@ label {
 .card {
 	.card-header {
 		cursor: pointer;
-		background-color:$gray-dark;
+		background-color: $neutral-8;
 
 		.caret {
 			display: inline-block;
@@ -403,7 +404,7 @@ label {
 		}
 	}
 	.card-body {
-		background-color: $gray-darker;
+		background-color: $neutral-6;
 	}
 }
 </style>

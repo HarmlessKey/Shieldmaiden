@@ -2,13 +2,13 @@
 	<div>
 		<h2 class="d-flex justify-content-between">
 			<span>
-				<i class="fas fa-flame"/> Conditions <template v-if="conditions">( {{conditions.length }} )</template>
+				<i aria-hidden="true" class="fas fa-flame"/> Conditions <template v-if="conditions">( {{conditions.length }} )</template>
 			</span>
 			<a 
-				class="gray-light text-capitalize" 
+				class="neutral-2 text-capitalize" 
 				@click="add_condition()"
 			>
-				<i class="fas fa-plus green"></i>
+				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 				<q-tooltip anchor="top middle" self="center middle">
 					Add condition
@@ -16,11 +16,11 @@
 			</a>
 		</h2>
 
-		<q-list dark square :class="`accordion`">
+		<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 			<q-expansion-item
 				v-for="(condition, con_index) in conditions"
 				:key="`condition-${con_index}`"
-				dark switch-toggle-side
+				:dark="$store.getters.theme === 'dark'" switch-toggle-side
 				group="conditions"
 			>
 				<template v-slot:header>
@@ -29,7 +29,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a @click="remove_condition(con_index)" class="remove">
-							<i class="fas fa-trash-alt red" />
+							<i aria-hidden="true" class="fas fa-trash-alt red" />
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove
 							</q-tooltip>
@@ -42,7 +42,7 @@
 						<!-- CONDITION -->
 						<div class="col-12 col-md-6">
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								map-options
 								emit-value
 								option-label="name"
@@ -61,7 +61,7 @@
 						<!-- APPLIED WHEN -->
 						<div class="col-12 col-md-6">
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								map-options
 								emit-value
 								label="Application"
@@ -75,9 +75,9 @@
 							>
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Apply condition</b>
 												</q-card-section>
 
@@ -91,13 +91,12 @@
 							</q-select>
 							<p class="validate red" v-if="errors.has(`application-${con_index}`)">{{ errors.first(`application-${con_index}`) }}</p>
 						</div>
-						<!-- <span>{{ condition.application }}</span> -->
 					</div>
 					<template v-if="condition.application == 'hitpoint_based'">
 						<div class="row q-col-gutter-md">
 							<div class="col-12 col-md-3">
 								<q-input 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									label="Dice count"
 									v-model="condition.dice_count"
 									autocomplete="off"
@@ -113,7 +112,7 @@
 							<div class="col-12 col-md-3">
 								<!-- HITPOINTS DICE TYPE -->
 								<q-select 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									emit-value
 									map-options
 									label="Dice type"
@@ -131,7 +130,7 @@
 							<div class="col-12 col-md-3">
 								<!-- HITPOINTS FIXED VALUE -->
 								<q-input 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									label="Fixed value"
 									v-model="condition.fixed_val"
 									autocomplete="off"
@@ -143,9 +142,9 @@
 								>
 									<template v-slot:append>
 										<q-icon name="info" @click.stop>
-											<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-												<q-card dark square>
-													<q-card-section class="bg-gray-active">
+											<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+												<q-card :dark="$store.getters.theme === 'dark'" >
+													<q-card-section class="bg-neutral-8">
 														<b>Fixed value</b>
 													</q-card-section>
 													<q-card-section>
@@ -160,7 +159,7 @@
 							<div class="col-12 col-md-3">
 								<!-- HITPOINTS ORDER VALUE -->
 								<q-select 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									emit-value
 									map-options
 									label="Order"
@@ -184,9 +183,9 @@
 									Scaling
 									<a 
 									v-if="level_tier_addable(con_index)"
-									class="gray-hover text-capitalize" 
+									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(con_index)">
-										<i class="fas fa-plus green"></i>
+										<i aria-hidden="true" class="fas fa-plus green"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add level tier
 										</q-tooltip>
@@ -197,7 +196,7 @@
 									<!-- HL LEVEL SCALE -->
 									<div class="col-12 col-md-3">
 										<q-input 
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											:label="level_scaling.capitalizeEach()"
 											autocomplete="off"
 											:name="`level-${con_index}`"
@@ -213,7 +212,7 @@
 									<!-- HL DICE COUNT -->
 									<div class="col-12 col-md-3">
 										<q-input 
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											label="Dice count"
 											v-model="level_tier.dice_count"
 											autocomplete="off"
@@ -229,7 +228,7 @@
 									<div class="col-12 col-md-3">
 										<!-- HL CONDITION DICETYPE -->
 										<q-select 
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											emit-value
 											map-options
 											:options="dice_type"
@@ -245,7 +244,7 @@
 										<!-- HL CONDITION FIXED VALUE -->
 										<div class="d-flex justify-content-between">
 											<q-input 
-												dark filled square dense
+												:dark="$store.getters.theme === 'dark'" filled square dense
 												label="Fixed value"
 												v-model="level_tier.fixed_val"
 												autocomplete="off"
@@ -256,7 +255,7 @@
 												@keyup="$forceUpdate()"
 											/>
 											<a @click="remove_level_tier(con_index, tier_index)" class="remove">
-												<i class="fas fa-trash-alt red"></i>
+												<i aria-hidden="true" class="fas fa-trash-alt red"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Remove
 												</q-tooltip>
@@ -265,11 +264,6 @@
 									</div>
 								</div>
 							</template>
-							<!-- <p v-if="condition.level_tiers && condition.level_tiers.length > 0">
-								<span v-for="(line, i) in create_spell_level_tier_description(condition.level_tiers)" :key="`tier-${i}`">
-									{{line}}<br>
-								</span>
-							</p> -->
 						</template>
 					</template>
 				</div>
@@ -279,7 +273,7 @@
 </template>
 
 <script>
-import { conditions } from '@/mixins/conditions.js';
+import { conditions } from 'src/mixins/conditions.js';
 
 export default {
 	name: 'spell-action-conditions',
@@ -294,13 +288,11 @@ export default {
 		application() {
 			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
 
-			let application = [
+			return [
 				{ label: "Always", value: "always" },
 				{ label: "Hitpoint based", value: "hitpoint_based" },
 				hitFail,
 			];
-
-			return application;
 		},
 		conditions: {
 			get() {
@@ -339,12 +331,12 @@ export default {
 	},
 	methods: {
 		add_condition() {
-			let conditions = this.conditions;
-			if(conditions === undefined) {
-				conditions = []
+			let condition_list = this.conditions;
+			if(condition_list === undefined) {
+				condition_list = []
 			}
-			conditions.push({});
-			this.$emit("input", conditions)
+			condition_list.push({});
+			this.$emit("input", condition_list)
 			this.$forceUpdate(); //IMPORTANT
 		},
 		remove_condition(index) {
@@ -363,12 +355,9 @@ export default {
 			this.$forceUpdate()
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "spell scale" && 
+			return !(this.level_scaling == "spell scale" && 
 					this.conditions[index].level_tiers &&
-					this.conditions[index].level_tiers.length >= 1) {
-				return false
-			}
-			return true
+					this.conditions[index].level_tiers.length >= 1);
 		},
 	},
 	watch: {
@@ -389,7 +378,7 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px$gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 5px;
 }
 .card-header {
@@ -402,7 +391,7 @@ label {
 .card {
 	.card-header {
 		cursor: pointer;
-		background-color:$gray-dark;
+		background-color: $neutral-8;
 
 		.caret {
 			display: inline-block;
@@ -417,7 +406,7 @@ label {
 		}
 	}
 	.card-body {
-		background-color: $gray-darker;
+		background-color: $neutral-6;
 	}
 }
 </style>

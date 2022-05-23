@@ -1,24 +1,29 @@
 <template>
-	<div  class="roll">
-		<div class="header">
+	<hk-card>
+		<div slot="header" class="card-header">
 			<div class="truncate">
 				{{ roll.name }}
 			</div>
-			<a @click="removeActionRoll(index)">
-				<i class="fas fa-times" />
+			<a class="btn btn-sm btn-clear" @click="removeActionRoll(index)">
+				<i aria-hidden="true" class="fas fa-times" />
 			</a>
 		</div>
 
-		<div class="body">
+		<div class="card-body">
 			<!-- TARGET -->
 			<div class="target-item" v-if="roll.target">
-				<icon v-if="['monster', 'player', 'companion'].includes(roll.target.img)" class="img" :icon="roll.target.img" :fill="roll.target.color_label" :style="roll.target.color_label ? `border-color: ${roll.target.color_label}` : ``" />
 				<span 
-					v-else class="img" 
-					:style="{ 'background-image': 'url(' + roll.target.img + ')' }"
-				/>
+					class="img" 
+					:style="{ 
+						'background-image': 'url(' + roll.target.img + ')',
+						'border-color': roll.target.color_label ? roll.target.color_label : ``,
+						'color': roll.target.color_label ? roll.target.color_label : ``
+					}"
+				>
+					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(roll.target.img)" :class="`hki-${roll.target.img}`" />
+				</span>
 				<div class="ac_wrapper">
-					<i class="fas fa-shield" ></i>
+					<i aria-hidden="true" class="fas fa-shield" ></i>
 					<span 
 						v-if="roll.target.ac_bonus"
 						class="ac" 
@@ -47,7 +52,7 @@
 							To hit: 
 							<span class="advantage" v-if="action.toHit.ignored">
 								<span v-html="advantage(action.toHit.advantage_disadvantage)"/> 
-								<span class="ignored gray-hover">
+								<span class="ignored neutral-4">
 									{{ action.toHit.ignored }}
 								</span>
 							</span>{{ action.toHit.throwsTotal }}
@@ -83,10 +88,10 @@
 					</div>
 					<q-btn-toggle
 						v-model="hitOrMiss[action_index]"
-						class="mb-3"
-						spread no-caps dark dense square
+						class="mb-3 neutral-1"
+						spread no-caps :dark="$store.getters.theme === 'dark'" dense
 						toggle-color="primary"
-						color="gray"
+						color="neutral-9"
 						:options="[
 							{label: 'Hit', value: 'hit'},
 							{label: 'Miss', value: 'miss'}
@@ -101,7 +106,7 @@
 							{{ action.save_ability.capitalize() }} save
 						</div>
 						<div>
-							<span class="gray-hover">DC</span>
+							<span class="neutral-2">DC</span>
 							<span 
 								class="total" 
 								:class="{
@@ -115,10 +120,10 @@
 					</div>
 					<q-btn-toggle
 						v-model="savingThrowResult[action_index]"
-						class="mb-3"
-						spread no-caps dark dense square
+						class="mb-3 neutral-1"
+						spread no-caps :dark="$store.getters.theme === 'dark'" dense square
 						toggle-color="primary"
-						color="gray"
+						color="neutral-9"
 						:options="[
 							{label: 'Fail', value: 'fail'},
 							{label: 'Save', value: 'save'}
@@ -127,17 +132,17 @@
 				</template>
 
 				<!-- DAMAGE / HEALING ROLLS -->
-				<q-list dark square :class="`accordion`">
+				<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 					<q-expansion-item
 						v-for="(rolled, rolled_index) in action.rolls" 
 						:key="`rolled-${rolled_index}`"
-						dark switch-toggle-side
+						:dark="$store.getters.theme === 'dark'" switch-toggle-side
 						:group="`rolled-${index}`"
 					>
 						<template #header>
 							<q-item-section v-if="action.type === 'healing'">
 								<span class="type truncate green">
-										<i class="fas fa-heart"/> 
+										<i aria-hidden="true" class="fas fa-heart"/> 
 										Healing
 									</span>
 							</q-item-section>
@@ -150,7 +155,7 @@
 										@click.stop="setDefense(rolled.damage_type, key, roll.key)"
 										:class="[{active: resistances && resistances[rolled.damage_type] === key}, key]"
 									>
-										<i class="fas fa-shield"></i>
+										<i aria-hidden="true" class="fas fa-shield"></i>
 										<span>{{ key.capitalize() }}</span>
 										<q-tooltip anchor="top middle" self="center middle">
 											{{ name }}
@@ -160,7 +165,7 @@
 										class="type truncate"
 										:class="rolled.damage_type"
 									>
-										<i :class="damage_type_icons[rolled.damage_type]"/> 
+										<i aria-hidden="true" :class="damage_type_icons[rolled.damage_type]"/> 
 										{{ rolled.damage_type }}
 									</span>
 								</div>
@@ -206,12 +211,12 @@
 									</div>
 									<div class="d-flex justify-content-end">
 										<template v-if="parseInt(rolled.modifierRoll.mod)">
-											<q-separator vertical dark />
+											<q-separator vertical :dark="$store.getters.theme === 'dark'" />
 											<div class="throws-modifier">
 												{{ rolled.modifierRoll.mod }}
 											</div>
 										</template>
-										<q-separator vertical dark />
+										<q-separator vertical :dark="$store.getters.theme === 'dark'" />
 										<div class="throws-total">
 											<hk-animated-integer :value="rolled.modifierRoll.total" />
 										</div>
@@ -301,20 +306,22 @@
 			</template>
 		</div>
 
-		<div class="footer" v-if="roll.target">
-			<q-btn color="gray" class="full-width" label="Full" no-caps @click="apply(1)" />
-			<q-btn color="gray" class="full-width" label="Half" no-caps @click="apply(.5)" />
-			<q-btn color="gray" class="full-width" label="Double" no-caps @click="apply(2)" />
-			<q-btn color="gray" class="full-width" icon="fas fa-times" no-caps @click="removeActionRoll(index)" size="sm" />
+		<div slot="footer" class="card-footer" v-if="roll.target">
+			<q-btn color="neutral-9" class="full-width neutral-1" label="Full" no-caps @click="apply(1)" />
+			<q-btn color="neutral-9" class="full-width neutral-1" label="Half" no-caps @click="apply(.5)" />
+			<q-btn color="neutral-9" class="full-width neutral-1" label="Double" no-caps @click="apply(2)" />
+			<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeActionRoll(index)">
+				<i aria-hidden="true" class="fas fa-times" />
+			</q-btn>
 		</div>
-	</div>
+	</hk-card>
 </template>
 
 <script>
 import { mapActions } from "vuex";
-import { damage_types } from '@/mixins/damageTypes.js';
-import { dice } from '@/mixins/dice';
-import { setHP } from '@/mixins/HpManipulations';
+import { damage_types } from 'src/mixins/damageTypes.js';
+import { dice } from 'src/mixins/dice';
+import { setHP } from 'src/mixins/HpManipulations';
 
 export default {
 	name: 'hk-single-roll',
@@ -403,7 +410,7 @@ export default {
 			const color = (type === "A") ? "green" : "red";
 			return `<b class="${color}">${type}</b>`;
 		},
-		apply(multiplier) {
+		async apply(multiplier) {
 			// Create the info object for the log
 			let config = {
 				log: true,
@@ -454,7 +461,7 @@ export default {
 			if(totalHealing !== undefined) totalValue.healing = Math.floor(totalHealing * multiplier);
 
 			// Apply the rolled damage/healing
-			this.setHP(totalValue, this.roll.target, this.roll.current, config);
+			await this.setHP(totalValue, this.roll.target, this.roll.current, config);
 
 			// Apply the special events
 			for(const special of specials) {
@@ -472,7 +479,7 @@ export default {
 							}
 						]
 					};
-					this.setHP({ healing: event[1] }, this.roll.current, this.roll.current, event_config);
+					await this.setHP({ healing: event[1] }, this.roll.current, this.roll.current, event_config);
 				} else if(event[0] === "drain") {
 					const value = (this.roll.target.maxHpMod) ? this.roll.target.maxHpMod - event[1] : -event[1];
 					this.edit_entity_prop({
@@ -613,14 +620,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	.roll {
-		background: $gray-dark;
-		border: solid 1px $gray-darker;
-		margin-bottom: 15px;
-		box-shadow: 0 1px 5px $black;
-
-		.body {
-			padding: 15px;
+	.hk-card {
+		pointer-events: auto;
+		.card-body {
 
 			h2 {
 				text-transform: none !important;
@@ -632,11 +634,10 @@ export default {
 
 			.target-item {
 				margin-bottom: 15px;
-				background-color: $gray;
-				border: solid 1px $gray-active;
+				background-color: $neutral-8;
 
 				.ac_wrapper {
-					background-color: $gray-darker;
+					background-color: $neutral-9;
 				}
 			}
 
@@ -696,7 +697,7 @@ export default {
 					font-size: 18px;
 					text-align: center;
 					line-height: 28px;
-					color: $gray-light;
+					color: $neutral-2;
 
 					span {
 						font-size: 12px;
@@ -707,7 +708,7 @@ export default {
 						line-height: 28px;
 						top: 0;
 						left: 0;
-						color: $gray-dark;
+						color: $neutral-9;
 					}
 
 					&.active {
@@ -726,16 +727,17 @@ export default {
 				margin-right: 5px;
 
 				.throw {
-					border: solid 1px $gray-hover;
+					border: solid 1px $neutral-4;
 					padding: 1px 0;
 					width: 23px;
 					text-align: center;
 					margin-right: 2px;
 					cursor: pointer;
 					user-select: none;
+					border-radius: $border-radius-small;
 
 					&:hover {
-						border-color: $gray-light;
+						border-color: $neutral-3;
 					}
 					&.rotate {
 						animation: spin .2s linear;
@@ -753,6 +755,13 @@ export default {
 				font-weight: bold;
 				font-size: 18px;
 				padding-right: 0;
+			}
+		}
+		.card-footer {
+			padding: 0;
+
+			.q-btn {
+				border-radius: 0;
 			}
 		}
 	}

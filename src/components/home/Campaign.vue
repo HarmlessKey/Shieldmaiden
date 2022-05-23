@@ -11,7 +11,7 @@
 			<div class="row q-col-gutter-xl mb-5">
 				<div class="col-12 col-md-6">
 					<video 
-						class="video" src="@/assets/_img/home/player-overview.mp4" 
+						class="video" src="~assets/_img/home/player-overview.mp4" 
 						muted autoplay playsinline alt="D&D Combat Tracker Harmless Key player overview" loop
 					/>
 				</div>
@@ -26,13 +26,13 @@
 							@click="setDialog(name)"
 						>
 							<q-item-section avatar>
-								<i :class="icon" />
+								<i aria-hidden="true" :class="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								{{ title }}
 							</q-item-section>
 							<q-item-section avatar>
-								<i class="fas fa-eye gray-hover" />
+								<i aria-hidden="true" class="fas fa-eye neutral-3" />
 							</q-item-section>
 						</q-item>
 					</q-list>
@@ -108,7 +108,7 @@
 <style lang="scss" scoped>
 	.campaign {
 		padding-bottom: 75px;
-		background-color: #181818;
+		background-color: $neutral-8;
 
 		ul {
 			margin-bottom: 30px;

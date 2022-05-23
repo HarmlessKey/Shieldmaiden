@@ -13,11 +13,11 @@
 			<div class="row q-col-gutter-xl mb-5">
 				<div class="col-12 col-md-8">
 					<video 
-						class="video" src="@/assets/_img/home/multitargeting.mp4" 
+						class="video" src="~assets/_img/home/multitargeting.mp4" 
 						muted autoplay playsinline alt="Initiative tracker Harmless Key multitargeting demo" loop
 					/>
 				</div>
-				<div class="col-12 col-md-4">					
+				<div class="col-12 col-md-4">			
 					<q-list>
 						<q-item 
 							v-for="({name, icon, title}, index) in items"
@@ -26,13 +26,13 @@
 							@click="setDialog(name)"
 						>
 							<q-item-section avatar>
-								<i :class="icon" />
+								<i aria-hidden="true" :class="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								{{ title }}
 							</q-item-section>
 							<q-item-section avatar>
-								<i class="fas fa-eye gray-hover" />
+								<i aria-hidden="true" class="fas fa-eye neutral-3" />
 							</q-item-section>
 						</q-item>
 					</q-list>
@@ -43,7 +43,7 @@
 			</div>
 		</div>
 
-		<q-dialog v-model="dialog" square>
+		<q-dialog v-model="dialog">
 			<Carousel :slides="items" :slide="slide" />
 		</q-dialog>
 	</div>
@@ -144,7 +144,7 @@
 	.general {
 		padding-bottom: 100px;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: $gray-darker;
+		background-color: $neutral-9;
 
 		ul {
 			margin-bottom: 30px;

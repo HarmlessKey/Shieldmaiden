@@ -3,8 +3,8 @@
 		<hk-card >
 			<div slot="header" class="card-header d-flex justify-content-between">
 				Spell actions
-				<a class="gray-hover text-capitalize" @click="add_action()">
-					<i class="fas fa-plus green"></i>
+				<a class="neutral-2 text-capitalize" @click="add_action()">
+					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Add action
@@ -17,11 +17,11 @@
 				encounters to quickly apply damage or healing.
 			</p>
 			
-			<q-list dark square :class="`accordion`">
+			<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 				<q-expansion-item
 					v-for="(action, action_index) in spell.actions" 
 					:key="`action-${action_index}`"
-					dark switch-toggle-side
+					:dark="$store.getters.theme === 'dark'" switch-toggle-side
 					group="actions"
 				>
 					<template v-slot:header>
@@ -30,7 +30,7 @@
 						</q-item-section>
 						<q-item-section avatar>
 							<a @click="remove_action(action_index)" class="remove">
-								<i class="fas fa-trash-alt red" />
+								<i aria-hidden="true" class="fas fa-trash-alt red" />
 								<q-tooltip anchor="top middle" self="center middle">
 									Remove
 								</q-tooltip>
@@ -43,7 +43,7 @@
 							<!-- ACTION TYPE -->
 							<div class="col-12 col-md-3">
 								<q-select 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									map-options
 									emit-value
 									label="Attack type"
@@ -57,7 +57,7 @@
 							<!-- ACTION NAME -->
 							<div class="col-12 col-md-3">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Action name"
 									v-model="action.name"
 									autocomplete="off"
@@ -70,7 +70,7 @@
 							<!-- SAVE -->
 							<div class="col-12 col-md-2">
 								<q-select 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									map-options
 									emit-value
 									label="Save"
@@ -85,7 +85,7 @@
 							<div class="col-12 col-md-2">
 								<q-checkbox 
 									size="lg" 
-									dark 
+									:dark="$store.getters.theme === 'dark'" 
 									v-model="action.free" 
 									label="Free" 
 									:false-value="null" 
@@ -100,7 +100,7 @@
 							<!-- Seperate cast -->
 							<div class="col-12 col-md-2">
 								<q-checkbox 
-									size="lg" dark 
+									size="lg" :dark="$store.getters.theme === 'dark'" 
 									v-model="action.seperate" 
 									label="Seperate" 
 									:false-value="null" 
@@ -131,7 +131,7 @@
 
 <script>
 import Rolls from './Rolls.vue';
-import { abilities } from '@/mixins/abilities.js';
+import { abilities } from 'src/mixins/abilities.js';
 
 export default {
 	name: 'spells-Actions',
@@ -187,6 +187,3 @@ export default {
 	},
 };
 </script>
-
-<style lang="scss" scoped>
-</style>

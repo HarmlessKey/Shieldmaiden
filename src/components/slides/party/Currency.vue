@@ -5,13 +5,13 @@
 		<div class="currency">
 			<div v-for="(coin, key) in currencies" :key="key">
 					<span class="coins" :class="coin.color">
-						<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+						<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" :alt="coin.name" />
 						<q-tooltip anchor="top middle" self="center middle">
 							{{ coin.name }}
 						</q-tooltip>
 					</span>
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						:label="coin.name"
 						class="text-center"
 						autocomplete="off" 
@@ -32,14 +32,12 @@
 </template>
 
 <script>
-	import { currencyMixin } from '@/mixins/currency.js';
-	import { db } from '@/firebase';
+	import { currencyMixin } from "src/mixins/currency.js";
+	import { mapActions } from "vuex";
 
 	export default {
 		mixins: [currencyMixin],
-		props: [
-			'data',
-		],
+		props: ["data"],
 		data() {
 			return {
 				user: this.$store.getters.user,
@@ -50,12 +48,13 @@
 			}
 		},
 		methods: {
+			...mapActions("campaigns", ["set_campaign_currency"]),
 			setCurrency(type) {
 				let newValue;
 				let amount = this.currencyToCopper(this.add);
 				let validated = true;
 
-				if(type === 'add') {
+				if(type === "add") {
 					newValue = this.currentValue + amount;
 					this.error = undefined;
 				} else {
@@ -63,13 +62,16 @@
 					this.error = undefined;
 					if(newValue < 0) {
 						validated = false;
-						this.error = 'Party doesn\'t own enough';
+						this.error = "Party doesn't own enough";
 					}
 				}
 				newValue = (newValue > this.maxCurrencyAmount) ? this.maxCurrencyAmount : newValue;
 
 				if(validated) {	
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`).set(newValue);
+					this.set_campaign_currency({
+						campaignId: this.campaignId,
+						value: newValue
+					});
 					this.add = {};
 					this.currentValue = newValue;
 				}

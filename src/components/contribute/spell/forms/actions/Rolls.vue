@@ -3,12 +3,12 @@
 	<div>
 		<div class="hk-card mt-3 rolls">
 			<div class="card-header d-flex justify-content-between">
-				<span><i class="fas fa-dice-d20"/> Rolls</span>
+				<span><i aria-hidden="true" class="fas fa-dice-d20"/> Rolls</span>
 				<a 
-					class="gray-light text-capitalize" 
+					class="neutral-2 text-capitalize" 
 					@click="newRoll()"
 				>
-					<i class="fas fa-plus green"></i>
+					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Add roll
@@ -31,11 +31,11 @@
 
 			<span slot="type" slot-scope="data">
 				<span v-if="action_type === 'healing'" class="healing">
-					<i class="fas fa-heart" /> Healing
+					<i aria-hidden="true" class="fas fa-heart" /> Healing
 				</span>
 				<template v-else>
 					<span :class="data.row.damage_type">
-						<i :class="damage_type_icons[data.row.damage_type]" /> 
+						<i aria-hidden="true" :class="damage_type_icons[data.row.damage_type]" /> 
 						{{ data.row.damage_type.capitalize() }} 
 					</span> damage
 				</template>
@@ -52,13 +52,13 @@
 			<!-- ACTIONS -->
 			<div slot="actions" slot-scope="data" class="actions">
 				<a class="ml-2" @click="editRoll(data.index)">
-					<i class="fas fa-pencil-alt"></i>
+					<i aria-hidden="true" class="fas fa-pencil-alt"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Edit
 					</q-tooltip>
 				</a>
 				<a class="ml-2" @click="removeRoll(data.index)">
-					<i class="fas fa-trash-alt"></i>
+					<i aria-hidden="true" class="fas fa-trash-alt"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Delete
 					</q-tooltip>
@@ -80,8 +80,8 @@
 							@input="$forceUpdate()"
 						/>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
-							<q-btn color="primary" type="submit" :label="(edit_index !== undefined) ? 'Save' : 'Add'" />
+							<q-btn no-caps class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
+							<q-btn no-caps color="primary" type="submit" :label="(edit_index !== undefined) ? 'Save' : 'Add'" />
 						</div>
 					</hk-card>
 				</q-form>
@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import { damage_types } from '@/mixins/damageTypes.js';
-import ActionRoll from "@/components/ActionRoll"
+import { damage_types } from 'src/mixins/damageTypes.js';
+import ActionRoll from "src/components/ActionRoll"
 
 export default {
 	name: 'spell-action-rolls',

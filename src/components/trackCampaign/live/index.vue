@@ -9,7 +9,7 @@
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"
-				:entities_len="Object.keys(_turnCount).length"
+				:entities_len="Object.keys(_non_hidden).length"
 				:turn="turn"
 				:campPlayers="campaign.players"
 				:campCompanions="campaign.companions"
@@ -22,13 +22,13 @@
 			/>
 
 			<!-- DESKTOP -->
-			<div class="track desktop" v-if="width > 576">
+			<div class="track desktop" :class="{ 'no-meters': playerSettings.meters !== undefined }" v-if="width > 576">
 				<div class="initiative">
 					<Initiative 
 						v-if="!encounter.finished"
 						:encounter="encounter" 
 						:targets="_non_hidden_targets"
-						:allEntities="_turnCount"
+						:allEntities="_non_hidden"
 						:turn="turn"
 						:campPlayers="campaign.players"
 						:campCompanions="campaign.companions"
@@ -40,11 +40,10 @@
 					/>
 					<Rewards v-else :encounter="encounter"/>
 				</div>
-				<div class="side">
-					<q-scroll-area dark :thumb-style="{ width: '5px'}" class="during-encounter">
+				<div class="side" v-if="playerSettings.meters === undefined">
+					<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" class="during-encounter">
 						<div class="meters-wrapper">
-							<Meters 
-								v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
+							<Meters
 								:entities="encounter.entities" 
 								:npcs="npcs" 
 								:players="players"
@@ -55,7 +54,7 @@
 				</div>
 				<div class="shares-bar" :class="{ shown: showShares }">
 					<div class="show" @click="showShares = !showShares">
-						<i class="fas fa-chevron-left" />
+						<i aria-hidden="true" class="fas fa-chevron-left" />
 					</div>
 					<Shares 
 						:shares="shares" 
@@ -70,9 +69,9 @@
 
 			<!-- MOBILE -->
 			<div v-else class="track mobile">
-				<div class="bg-gray-dark">
+				<div class="bg-neutral-6">
 					<q-select
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						v-model="panel"
 						:options="panels"
 					>
@@ -82,7 +81,7 @@
 									<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
 								</q-item-section>
 								<q-item-section>
-									<q-item-label v-html="panels.filter( item => { return item.value === panel })[0].label"/>
+									<q-item-label v-text="panels.filter( item => { return item.value === panel })[0].label"/>
 								</q-item-section>
 							</q-item>
 						</template>
@@ -97,7 +96,7 @@
 								<q-item-section avatar>
 									<q-icon :name="scope.opt.icon"/>
 								</q-item-section>
-									<q-item-label v-html="scope.opt.label"/>
+									<q-item-label v-text="scope.opt.label"/>
 								<q-item-section>
 								</q-item-section>
 							</q-item>
@@ -116,7 +115,7 @@
 							v-if="!encounter.finished"
 							:encounter="encounter" 
 							:targets="_non_hidden_targets"
-							:allEntities="_turnCount"
+							:allEntities="_non_hidden"
 							:turn="turn"
 							:campPlayers="campaign.players"
 							:campCompanions="campaign.companions"
@@ -160,7 +159,7 @@
 
 <script>
 	import _ from 'lodash';
-	import { db } from '@/firebase';
+	import { db } from 'src/firebase';
 
 	import Turns from './Turns.vue';
 	import Initiative from './Initiative.vue';
@@ -176,7 +175,7 @@
 			RollForInitiative,
 			Shares: () => import('../Shares'),
 			Rewards: () => import('./Rewards'),
-			Weather: () => import('@/components/weather')
+			Weather: () => import('src/components/weather')
 		},
 		props: [
 			"encounter", 
@@ -189,7 +188,6 @@
 			return {
 				userId: this.$route.params.userid,
 				panel: "initiative",
-				setSideDisplay: undefined,
 				counter: 0,
 				rolls: [],
 				weather: true,
@@ -234,21 +232,6 @@
 			}
 		},
 		computed: {
-			//All entities, without hidden entities
-			_turnCount() {
-				return _.chain(this.encounter.entities)
-				.filter(function(entity, key) {
-					entity.key = key
-					return entity.active && !entity.down && !entity.hidden;
-				})
-				.orderBy(function(entity) {
-					return entity.name
-				}, 'asc')
-				.orderBy(function(entity){
-					return Number(entity.initiative)
-				} , 'desc')
-				.value()
-			},
 			_allEntities() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -269,6 +252,7 @@
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._allEntities[i])
 			},
+			//All entities, without hidden entities
 			_non_hidden() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -324,17 +308,6 @@
 					icon: "fas fa-dice-d20",
 				});
 				return tabs;
-			},
-			sideDisplay: {
-				get() {
-					if(this.setSideDisplay) {
-						return this.setSideDisplay;
-					}
-					return (this.playerSettings.meters === undefined) ? 'damage' : 'rolls';
-				},
-				set(newValue) {
-					this.setSideDisplay = newValue;
-				}
 			}
 		},
 		methods: {
@@ -405,13 +378,17 @@
 				width: 100%;
 			}
 		}
+
+		&.no-meters {
+			grid-template-columns: 1fr minmax(200px, 250px);
+		}
 	}
 	&.mobile {
 		grid-template-rows: 60px 1fr;
 		grid-template-columns: 1fr;
 
 		.transparent-bg {
-			background: rgba(38, 38, 38, .3);
+			background: none;
 		}
 		.q-tab-panel {
 			padding: 0 15px;
@@ -446,7 +423,7 @@
 
 			.show {
 				background-color: $blue;
-				color: $white;
+				color: $neutral-1;
 				display: block;
 				width: 18px;
 				text-align: center;
@@ -472,11 +449,22 @@
 				}
 			}
 		}
+		&.no-meters {
+			grid-template-columns: 1fr !important;
+
+			.initiative {
+				padding-right: 15px;
+			}
+		}
 	}
 }
 @media only screen and (max-width: 992px) {
 	.track.desktop {
 		grid-template-columns: 3fr 1fr minmax(180px, 200px);
+
+		&.no-meters {
+			grid-template-columns: 1fr minmax(180px, 200px);
+		}
 	}
 }
 @media only screen and (min-width: 1250px) {
@@ -486,6 +474,10 @@
 
 		.initiative {
 			padding-left: 30px;
+		}
+
+		&.no-meters {
+			grid-template-columns: 1fr minmax(180px, 200px);
 		}
 	}
 }

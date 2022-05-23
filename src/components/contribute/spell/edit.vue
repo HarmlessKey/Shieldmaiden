@@ -1,6 +1,5 @@
 <template>
 	<div class="content">
-		<Crumble :name="(spell.changed) ? spell.name : old_spell.name"/>
 		<h2 class="spellTitle d-flex justify-content-between" v-if="old_spell">
 			{{ (spell.changed) ? spell.name : old_spell.name }}
 		</h2>
@@ -12,7 +11,7 @@
 					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-4" id="old_spell">
 							<hk-card header="Old Spell Description" v-if="loading">
-								<div  class="loader"> <span>Loading old_spell...</span></div>
+								<hk-loader name="old spell" />
 							</hk-card>
 							<hk-card class="old_spell" v-else>
 								
@@ -21,33 +20,32 @@
 									<a @click="preview('new')" :class="preview_spell=='new' ? 'selected' : ''">New Spell Description</a>
 								</div>
 								<div v-if="preview_spell == 'old'">
-								<!-- <hk-card class="old_spell" header="Old Spell Description" v-else> -->
 									<a 
 										class="btn btn-block mb-3" 
 										@click="parse_old_spell()">
-											<i class="fas fa-wand-magic"></i>
+											<i aria-hidden="true" class="fas fa-wand-magic"></i>
 											<span class="d-none d-md-inline ml-1">Parse to new spell</span>
 									</a>
 
 									<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank" rel="noopener">{{ old_spell.name }}</a></h1>
-									<i class="mb-3 d-block" v-if="old_spell.school">
+									<i aria-hidden="true" class="mb-3 d-block" v-if="old_spell.school">
 										{{ spell_levels[old_spell.level] }}
 										{{ old_spell.school.name }}
 									</i>
 
 									<p>
-										<b>Casting time:</b> {{ old_spell.casting_time }}<br/>
-										<b>Range:</b> {{ old_spell.range }}<br/>
-										<b>Components:</b> 
+										<strong>Casting time:</strong> {{ old_spell.casting_time }}<br/>
+										<strong>Range:</strong> {{ old_spell.range }}<br/>
+										<strong>Components:</strong> 
 										<template v-for="(component, index) in old_spell.components">
 											{{ component }}<template v-if="Object.keys(old_spell.components).length > index + 1">, </template>
 										</template>
 										<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
 										<br/>
-										<b>Duration:</b>
+										<strong>Duration:</strong>
 											<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
 											{{ old_spell.duration }}<br/>
-										<b>Classes:</b> 
+										<strong>Classes:</strong> 
 										<template v-for="(_class, index) in old_spell.classes">
 											{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
 										</template>
@@ -78,13 +76,13 @@
 					<div class="save">
 						<div class="d-flex justify-content-start">
 							<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-								<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+								<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
 							</div>	
-							<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+							<a v-if="unsaved_changes" class="btn bg-neutral-5" @click="cancel_changes()">Revert</a>
 						</div>
 						<div>
-							<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary"/>
+							<router-link :to="`/contribute/spells/${id}`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+							<q-btn label="Save" no-caps type="submit" color="primary"/>
 						</div>
 					</div>
 				</q-form>
@@ -94,30 +92,20 @@
 </template>
 
 <script>
-import { db } from '@/firebase';
-import Crumble from '@/components/crumble/Compendium.vue';
-import EditSpell from '@/components/contribute/spell/forms';
-import ViewSpell from '@/components/ViewSpell.vue';
-import { general } from '@/mixins/general';
-import { spells } from '@/mixins/spells';
+import { db } from 'src/firebase';
+import EditSpell from 'src/components/contribute/spell/forms';
+import ViewSpell from './ViewSpell.vue';
+import { general } from 'src/mixins/general';
+import { spells } from 'src/mixins/spells';
 import { mapGetters } from 'vuex';
 
 export default {
 	name: 'ContribSpellEdit',
 	components: {
-		Crumble,
 		ViewSpell,
 		EditSpell,
 	},
 	mixins: [general, spells],
-	metaInfo() {
-		return {
-			title: this.old_spell.name + ' | D&D 5th Edition',
-			meta: [
-				{ vmid: 'description', name: 'description', content: 'D&D 5th Edition Spell: ' + this.old_spell.name }
-			]
-		}
-	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
@@ -139,15 +127,6 @@ export default {
 	},
 	firebase() {
 		return {
-			// spell: {
-			// 	source: db.ref(`new_spells/${this.id}`),
-			// 	asObject: true,
-			// 	readyCallback: () => {
-			// 		this.loading = false
-			// 		this.fb_spell_json = JSON.stringify(this.spell);
-			// 		this.unsaved_changes = false
-			// 	}
-			// },
 			old_spell: {
 				source: db.ref(`spells/${this.id}`),
 				asObject: true,
@@ -433,7 +412,7 @@ export default {
 			display: flex;
 			justify-content: space-between;
 			padding: 10px 0;
-			border-top: solid 1px$gray-hover;
+			border-top: solid 1px $neutral-4;
 	
 			.unsaved_changes {
 				padding: 10px;

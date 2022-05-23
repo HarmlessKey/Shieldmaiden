@@ -1,10 +1,9 @@
 <template>
 	<div class="content">
 		<template v-if="!$route.params.id">
-			<Crumble />
-			<h2><i class="fas fa-dragons"></i> Contribute to Monsters</h2>
+			<h2><i aria-hidden="true" class="fas fa-dragons"></i> Contribute to Monsters</h2>
 
-			<q-linear-progress dark stripe rounded size="25px" :value="Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
+			<q-linear-progress :dark="$store.getters.theme === 'dark'" stripe rounded size="25px" :value="Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
 			<div class="absolute-full flex flex-center white">
         {{ Object.keys(allFinishedMonsters).length }} / {{ Object.keys(allMonsters).length }} ({{ Math.floor(Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length * 100) }}%)
       </div>
@@ -31,7 +30,7 @@
 							>
 								<span>{{ data.item }}</span>
 								<a v-if="isDifficult(data.row)" class="ml-2">
-									<i class="fas fa-exclamation-triangle"></i>
+									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Dificult
 									</q-tooltip>
@@ -42,7 +41,7 @@
 									v-if="Object.keys(taggedMonster).length === 0"
 									@click="tag(data.row['.key'], data.row.name)"
 								>
-									<i class="fas fa-plus"></i>
+									<i aria-hidden="true" class="fas fa-plus"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Tag
 									</q-tooltip>
@@ -72,19 +71,19 @@
 								<router-link 
 									:to="'/contribute/monsters/' + data.row['.key']+'/edit'"
 								>
-									<i class="fas fa-pencil"></i>
+									<i aria-hidden="true" class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a @click="setSlide({show: true, type: 'contribute/monster/ViewMonster', data: data.row })">
-									<i class="fas fa-eye"></i>
+									<i aria-hidden="true" class="fas fa-eye"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Preview
 									</q-tooltip>
 								</a>
 								<a @click="markDifficult(data.row)">
-									<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+									<i aria-hidden="true" class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Mark difficult
 									</q-tooltip>
@@ -92,20 +91,20 @@
 								<a 
 									@click="confirmFinish(data.row['.key'], data.row.name)"
 								>
-									<i class="fas fa-check"></i>
+									<i aria-hidden="true" class="fas fa-check"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Finish
 									</q-tooltip>
 								</a>
 								<a @click="unTag(data.row['.key'])">
-									<i class="fas fa-times"></i>
+									<i aria-hidden="true" class="fas fa-times"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Untag
 									</q-tooltip>
 								</a>
 								<a v-if="key === 'allTagged'">
-									<i class="fas fa-info"></i>
-									<q-popup-proxy dark square>
+									<i aria-hidden="true" class="fas fa-info"></i>
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
 										<hk-card header="Info" class="mb-0">
 											Tagged by: {{ getPlayerName(data.row.metadata.tagged) }}<br/>
 										</hk-card>
@@ -126,7 +125,7 @@
 
 						<q-checkbox
 							v-if="userInfo.admin"
-							dark
+							:dark="$store.getters.theme === 'dark'"
 							label="Only finished by others"
 							v-model="othersFinished"
 							indeterminate-value="Something else"
@@ -143,7 +142,7 @@
 							<div slot="name" slot-scope="data" :class="isDifficult(data.row) ? 'red' : ''">
 								<span>{{ data.item.capitalizeEach() }}</span>
 								<a v-if="isDifficult(data.row)" class="ml-2">
-									<i class="fas fa-exclamation-triangle"></i>
+									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Difficult
 									</q-tooltip>
@@ -151,7 +150,7 @@
 							</div>
 							<div slot="actions" slot-scope="data" class="actions">
 								<a v-if="isDifficult(data.row)" @click="markDifficult(data.row)">
-									<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+									<i aria-hidden="true" class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Unmark difficult
 									</q-tooltip>
@@ -160,27 +159,27 @@
 									v-if="userInfo.admin"
 									:to="'/contribute/monsters/' + data.row['.key']"
 								>
-									<i class="fas fa-pencil"></i>
+									<i aria-hidden="true" class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a @click="setSlide({ show: true, type: 'contribute/monster/ViewMonster', data: data.row })">
-									<i class="fas fa-eye"></i>
+									<i aria-hidden="true" class="fas fa-eye"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Preview
 									</q-tooltip>
 								</a>
 								<a v-if="userInfo.admin">
-									<i class="fas fa-info"></i>
-									<q-popup-proxy dark square>
+									<i aria-hidden="true" class="fas fa-info"></i>
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
 										<hk-card header="Info" class="mb-0">
 											Finished by: {{ getPlayerName(data.row.metadata.finished_by) }}
 										</hk-card>
 									</q-popup-proxy>
 								</a>
 								<a v-if="userInfo.admin && userId !== data.row.metadata.finished_by" @click="approve(data.row['.key'])">
-									<i class="fas fa-check white"></i>
+									<i aria-hidden="true" class="fas fa-check white"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Approve
 									</q-tooltip>
@@ -188,7 +187,7 @@
 							</div>
 						</hk-table>
 
-						<h3><i class="fas fa-check green"/> Approved monsters</h3>
+						<h3><i aria-hidden="true" class="fas fa-check green"/> Approved monsters</h3>
 						<hk-table
 							:items="approvedMonsters"
 							:columns="untaggedColumns"
@@ -199,14 +198,14 @@
 							</div>
 							<div slot="actions" slot-scope="data" class="actions">
 								<a @click="setSlide({ show: true, type: 'contribute/monster/ViewMonster', data: data.row })">
-									<i class="fas fa-eye"></i>
+									<i aria-hidden="true" class="fas fa-eye"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Preview
 									</q-tooltip>
 								</a>
 								<a v-if="userInfo.admin">
-									<i class="fas fa-info"></i>
-									<q-popup-proxy dark square>
+									<i aria-hidden="true" class="fas fa-info"></i>
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
 										<hk-card header="Info" class="mb-0">
 											Approved by: {{ getPlayerName(data.row.metadata.approved) }}<br/>
 											Finished by: {{ getPlayerName(data.row.metadata.finished_by) }}
@@ -214,7 +213,7 @@
 									</q-popup-proxy>
 								</a>
 								<a v-if="userInfo.admin && userId !== data.row.metadata.finished_by" @click="disApprove(data.row['.key'])">
-									<i class="fas fa-times white"></i>
+									<i aria-hidden="true" class="fas fa-times white"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Disapprove
 									</q-tooltip>
@@ -230,23 +229,14 @@
 
 <script>
 	import _ from 'lodash';
-	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
-	import Footer from '@/components/Footer.vue';
-	import Monster from '@/components/compendium/Monster.vue';
-	import ViewMonster from '@/components/ViewMonster.vue';
+	import { db } from 'src/firebase';
+	import Footer from 'src/components/Footer.vue';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		name: 'Monsters',
 		components: {
-			Crumble,
-			Footer,
-			Monster,
-			ViewMonster
-		},
-		metaInfo: {
-			title: 'Monsters'
+			Footer
 		},
 		data() {
 			return {
@@ -259,7 +249,7 @@
 						truncate: true
 					},
 					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
+						label: '<i aria-hidden="true" class="far fa-ellipsis-h"></i>',
 						noPadding: true,
 						right: true,
 						maxContent: true
@@ -271,7 +261,7 @@
 						truncate: true
 					},
 					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
+						label: '<i aria-hidden="true" class="far fa-ellipsis-h"></i>',
 						noPadding: true,
 						right: true,
 						maxContent: true

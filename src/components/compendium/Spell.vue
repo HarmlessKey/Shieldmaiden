@@ -1,14 +1,13 @@
 <template>
-	<div v-if="spell">
-		<h1 class="spellTitle" v-if="title">{{ spell.name }}</h1>
-		<i class="mb-3 d-block">
+	<div v-if="!loading">
+		<h2 class="mb-1">{{ spell.name }}</h2>
+		<i aria-hidden="true" class="mb-3 d-block">
 			<template v-if="spell.level > 0">
-				{{ spell. level | numeral("oO") }} level
+				{{ spell.level | numeral("oO") }} level
 			</template>
 			<template v-else>Cantrip</template>
 			<span v-if="spell.school"> {{ spell.school.name }}</span>
 		</i>
-
 		<p>
 			<b>Casting time:</b> {{ spell.casting_time }}<br/>
 			<b>Range:</b> {{ spell.range }}<br/>
@@ -42,42 +41,41 @@
 			</template>
 		</p>
 	</div>
-	<hk-loader v-else name="Loading spell" />
+	<hk-loader v-else name="spell" />
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
+	import { mapActions } from "vuex";
 
 	export default {
 		name: "Spell",
 		props: {
-			id: {
-				type: String,
-				required: true
+			// If the spell is fetched in a parent component you can send the full spell object in de data prop
+			data: {
+				type: Object
 			},
-			title: {
-				type: Boolean,
-				default: true
+			// If the id prop is passed, the spell is fetched in the Spell component
+			id: {
+				type: String
 			}
 		},
-		computed: {
-			...mapGetters([
-				"get_spell",
-				"spells"
-			]),
-			spell() {
-				return this.get_spell(this.id);
+		data() {
+			return {
+				spell: {},
+				loading: true
 			}
 		},
-		beforeMount() {
-			if(!this.spells[this.id]) {
-				this.set_spell(this.id);
-			}
+		async beforeMount() {
+			if(this.data) {
+				this.spell = this.data;		
+				this.loading = false;
+			} else {
+				this.spell = await this.fetch_api_spell(this.id);
+				this.loading = false;
+			}			
 		},
 		methods: {
-			...mapActions([
-				"set_spell"
-			]),
+			...mapActions("api_spells", ["fetch_api_spell"]),
 			parse_spell_str(text) {
 				// map to replace weird character with real character 
 				let rules = [
@@ -114,17 +112,5 @@
 				return text.trim();
 			},
 		}
-	}
+	};
 </script>
-
-<style lang="scss" scoped>
- .spellTitle {
-		font-size: 18px;
-		margin-bottom: 5px;
- }
- .url {
-	display: block;
-	margin-bottom: 15px;
-	word-break: break-all;
-}
-</style>

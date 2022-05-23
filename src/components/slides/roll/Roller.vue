@@ -8,13 +8,13 @@
 			<span>Result</span>
 		</div>
 		<div v-for="(item, die) in dice" class="roller" :key="die">
-			<q-input dark filled square dense v-if="die === 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
+			<q-input :dark="$store.getters.theme === 'dark'" filled square dense v-if="die === 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
-				<i :class="item.icon"></i>
-				<span class="ml-1 gray-hover">d{{die}}</span>
+				<i aria-hidden="true" :class="item.icon"></i>
+				<span class="ml-1 neutral-2">d{{die}}</span>
 			</div>
-			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
-			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
+			<q-input :dark="$store.getters.theme === 'dark'" filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
+			<q-input :dark="$store.getters.theme === 'dark'" filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
 			
 			<hk-roll 
 				tooltip="1d20 roll"
@@ -22,11 +22,11 @@
 				@roll="roll($event, die, item)"
 			>
 				<button class="btn">
-					<i :class="item.icon"></i>
+					<i aria-hidden="true" :class="item.icon"></i>
 				</button>
 			</hk-roll>
 
-			<button v-else class="btn" @click="roll($event, die, item)"><i :class="item.icon"></i></button>
+			<button v-else class="btn" @click="roll($event, die, item)"><i aria-hidden="true" :class="item.icon"></i></button>
 			
 			<span class="blue">{{ item.result }}</span>
 		</div>
@@ -39,7 +39,7 @@
 </template>
 
 <script>
-	import { dice } from '@/mixins/dice.js'
+	import { dice } from 'src/mixins/dice.js'
 	import Rolls from './Rolls';
 	import { mapGetters } from "vuex";
 

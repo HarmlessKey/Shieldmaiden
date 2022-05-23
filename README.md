@@ -1,29 +1,26 @@
-# Harmless Key Encounter Tracker
-More readme is needed
-## Project setup
-```
+# Quasar App (hkq)
+
+A Quasar Framework app
+
+## Install the dependencies
+```bash
 npm install
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
+### Start the app in development mode (hot-code reloading, error reporting, etc.)
+```bash
+quasar dev
 ```
 
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
+### Lint the files
+```bash
 npm run lint
 ```
 
+### Build the app for production
+```bash
+quasar build
+```
 
-add more stuff here
+### Customize the configuration
+See [Configuring quasar.conf.js](https://v1.quasar.dev/quasar-cli/quasar-conf-js).

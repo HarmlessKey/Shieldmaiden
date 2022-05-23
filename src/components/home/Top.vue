@@ -2,47 +2,33 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<div v-if="play_animation"
-					@click="replay()"
-					@mouseover="video_hover = true" 
-					@mouseleave="video_hover = false"
-				>
-					<div class="video-controls" v-if="video_hover">
-						<span>
-							<i @click.stop="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
-							<q-tooltip anchor="bottom middle" self="center middle">
-								Mute
-							</q-tooltip>
-						</span>
-						<span>
-							<i @click="replay()" class="fas fa-redo-alt"></i>
-							<q-tooltip anchor="bottom middle" self="center middle">
-								Replay
-							</q-tooltip>
-						</span>
-					</div>
-					<video 
-						ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
-						:muted="muted" autoplay playsinline alt="Harmless Key logo animation"
-					/>
-				</div>
-				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
+				<hk-video />
 				<div class="content-box">
-					<div class="text">
-						<template>
-							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
-							<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
-							<h3>The online tool for offline play.</h3>
-						</template>
+					<div class="text" v-if="!maintenance">
+						<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
+						<h3>The online tool for offline play.</h3>
 
 						<div class="button-container">
-							<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<div v-if="!$store.getters.user">
+								<q-btn to="/demo" color="primary" size="xl" no-caps push>Try demo encounter</q-btn>
+								<div><small>
+									<i aria-hidden="true" class="neutral-4">No download required</i>
+								</small></div>
+							</div>
+							<router-link v-else to="/content" class="btn btn-lg bg-green">My content</router-link>
 						</div>
 						
 						<!-- PATREON -->
 						<div>
-							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
+							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red btn btn-lg btn-clear">
+								<i aria-hidden="true" class="fab fa-patreon"></i> Support us on Patreon
+							</a>
 						</div>
+					</div>
+					<div v-else>
+						<h1>Closed for maintenance</h1>
+						<h3>We expect to back in:</h3>
+						<FlipCountdown :deadline="maintenance" />
 					</div>
 				</div>
 			</div>
@@ -51,28 +37,17 @@
 </template>
 
 <script>
+	import HkVideo from "src/components/hk-components/hk-video";
+	import FlipCountdown from 'vue2-flip-countdown';
+
 	export default {
 		name: 'Top',
-		data() {
-			return {
-				play_animation: true,
-				muted: true,
-				video_hover: false
-			}
+		props: {
+			maintenance: [Boolean, String]
 		},
-		methods: {
-			replay() {
-				const player = this.$refs.video;
-				player.currentTime = 0;
-				player.play();
-			}
-		},
-		mounted() {
-			const navigator = window.navigator;
-			const ua = navigator.userAgent.toLowerCase()
-			const hasMediaCapabilities = !!(navigator.mediaCapabilities && navigator.mediaCapabilities.decodingInfo)
-			const isSafari = ((ua.indexOf('safari') != -1) && (!(ua.indexOf('chrome')!= -1) && (ua.indexOf('version/')!= -1)))
-			this.play_animation = !(isSafari && hasMediaCapabilities);
+		components: {
+			HkVideo,
+			FlipCountdown
 		}
 	}
 </script>
@@ -80,32 +55,12 @@
 <style lang="scss" scoped>
 	.top {
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color:$white;
 		background-position: top center;
 		padding: 0 0 75px 0;
 		min-height: calc(100vh - 50px - 55px);
-		background-color:$black;
+		background-color: $neutral-11;
 		overflow: hidden;
-
-		.animated-video {
-			width: 100%;
-			margin: -8% 0 -15%;
-			pointer-events: none;
-		}
-		.video-controls {
-			position: absolute;
-			left: 50%;
-			transform: translateX(-50%);
-			margin-top: 20px;
-			z-index: 10;
-			opacity: .3;
-			
-			i {
-				padding: 5px;
-				cursor: pointer;
-			}
-		}
-
+		
 		.logo {
 			display: block;
 			margin-left: auto;
@@ -125,7 +80,6 @@
 					margin: auto;
 					max-width: 800px;
 					padding: 25px 20px 20px 20px;
-					text-shadow: 2px 2px 1px$black;
 
 					h1 {
 						font-family: 'Fredericka the Great', cursive;
@@ -151,7 +105,7 @@
 						margin-top: 20px;
 
 						a {
-							color:$white !important;
+							color: $neutral-1 !important;
 						}
 					}
 					.share {
@@ -180,7 +134,7 @@
 						}
 						.large-link {
 							text-shadow: none;
-							box-shadow: 2px 2px 1px$black;
+							box-shadow: 2px 2px 1px $black;
 							font-size: 20px;
 	
 							&.not-logged {
@@ -203,13 +157,20 @@
 			}
 		}
 	}
+
+	[data-theme="light"] {
+		.top {
+			background-image: none;
+			background-color: $neutral-9;
+		}
+	}
+
 	@media only screen and (max-width: 767px) {
 		.top {
-			.animated-video {
-					width: 150%;
-					margin: -14% 0 -20% -25%;
-					pointer-events: none;
-				}
+			.video {
+				width: 150%;
+				margin: -5% 0 0 -25%;
+			}
 		}
 	}
 	@media only screen and (max-width: 567px) {
@@ -231,9 +192,9 @@
 				display: flex;
 				justify-content: space-between;
 			}
-			.animated-video {
+			.video {
 				width: 170%;
-				margin: -14% 0 -20% -35%;
+				margin: -5% 0 0 -35%;
 				pointer-events: none;
 			}
 			.container-fluid {

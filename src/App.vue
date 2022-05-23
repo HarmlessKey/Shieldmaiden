@@ -1,15 +1,21 @@
 <template>
-	<div id="app" class="container-fluid" @click="setSideSmallScreen(false)">
+	<div id="q-app" @click="setSideSmallScreen(false)">
 		<div>
-			<nav-main/>
-			<PaymentDeclined v-if="user !== null" />
-			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash"></i> No internet connection</div>
-			<div :class="{ hasSide: $route.meta.sidebar !== false }">
-				<Sidebar />
-				<div class="scrollable-content">
-					<router-view/>
-				</div>
+			<nav-main :maintenance="maintenance" />
+			<div class="offline" v-if="connection === 'offline'"><i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
+			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
+				<Sidebar 
+					v-if="(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen" 
+					:small-screen="small_screen" 
+				/>
+				<q-scroll-area 
+					class="scrollable-content" 
+					:dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}"
+				>
+					<router-view />
+				</q-scroll-area>
 			</div>
+			<Home v-else :maintenance="maintenance" />
 		</div>
 		<transition 
 			enter-active-class="animated animate__slideInRight" 
@@ -20,7 +26,7 @@
 					v-shortkey="['esc']" @shortkey="hideSlide()"
 					class="hide" 
 				>
-					<i class="far fa-chevron-double-right"></i> <span class="gray-hover ml-2 d-none d-sm-inline">[esc]</span>
+					<i aria-hidden="true" class="far fa-chevron-double-right"></i> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
 					<q-tooltip anchor="bottom middle" self="center middle">
 						Hide [esc]
 					</q-tooltip>
@@ -40,10 +46,11 @@
 				<template v-slot:avatar>
 					<q-icon name="info" />
 				</template>
-				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
+				<h3 class="mb-1">Nothing to see here</h3>
+				<p><strong>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</strong></p>
 				<p>No announcement</p>
 				<template v-slot:action>
-					<q-btn flat icon="close" @click="closeAnnouncement()" />
+					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
 				</template>
 			</q-banner>
 		</q-dialog>
@@ -53,7 +60,7 @@
       <q-card class="install-prompt">
         <q-card-section class="d-flex justify-content-start">
 					<div class="logo">
-						<img src="@/assets/_img/logo/logo-icon-cyan.svg" />
+						<img src="~assets/_img/logo/logo-icon-cyan.svg" alt="Logo Harmless Key" />
 					</div>
 					<div>
 						<h4>Install our app</h4>
@@ -66,12 +73,17 @@
 				<q-card-section>
 					<div class="d-flex justify-content-end">
 						<q-btn @click="install(false)" label="No thanks" class="mr-1" flat no-caps />
-						<img v-if="isAndroid" @click="install(true, 'android')" src="@/assets/_img/google-play-badge.png" class="play-store" />
+						<img 
+							v-if="isAndroid" @click="install(true, 'android')" 
+							src="~assets/_img/google-play-badge.png" class="play-store"
+							alt="Google Play"
+						/>
 						<q-btn v-else @click="install(true, 'pwa')" label="Install" color="primary" no-caps />
 					</div>
 				</q-card-section>
       </q-card>
     </q-dialog>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -80,10 +92,13 @@
 	import Header from './components/Header.vue';
 	import Sidebar from './components/Sidebar.vue';
 	import Slide from './components/Slide.vue';
-	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
 	import HkRolls from './components/hk-components/hk-rolls';
 	import { general } from './mixins/general';
+	import Home from "./views/Home";
+
+	import { Cookies } from 'quasar';
+	import jwt_decode from 'jwt-decode';
 
 
 	export default {
@@ -93,58 +108,110 @@
 		navMain: Header,
 		Sidebar,
 		Slide,
-		PaymentDeclined,
-		HkRolls
+		HkRolls,
+		Home
 	},
-	metaInfo() {
-		return {
-			title: 'Combat Tracker D&D | Harmless Key',
-			author: 'Harmless Key',
-			htmlAttrs: {
-				lang: "en"
+	meta() {
+		const meta = {
+			title: {
+				name: "title",
+				content: this.$route.meta.title || "D&D Combat Tracker",
 			},
-			meta: [
-				{ charset: 'utf-8' },
-				{ 
-					vmid: 'description', 
-					name: 'description', 
-					content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.'
-				},
-				{ name: "twitter:card", content: "summary" },
-				{ name: "twitter:title", content: "Combat Tracker D&D | Harmless Key" },
-				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full.png"  },
-				{
-					name: "twitter:description",
-					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
-				},
-				{ name: "twitter:site", content: "@KeyHarmless" },
+			description: {
+				name: "description",
+				content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
+			},
 
-				{ property: "og:title", content: "Combat Tracker D&D | Harmless Key" },
-				{	property: "og:site_name", content: "harmlesskey.com" },
-				{	property: "og:type", content: "website" },
-				{
-					property: "og:description",
-					name: "description",
-					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
-				},
-				{	property: "og:url", content: `https://harmlesskey.com${this.$route.path}` },
-				{	property: "og:image", name: "image", content: `https://harmlesskey.com/linkedin.png` },
-				{	property: "og:image:type", content: "image/png" },
-				{	property: "og:image:alt", content: "Harmless Key Logo" },
-			]
+			// TWITTER
+			twitterCard: {
+				property: "twitter:card",
+				content: "summary"
+			},
+			twitterTitle: {
+				name: "twitter:title",
+				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
+			},
+			twitterDescription: {
+				name: "twitter:description",
+				content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
+			},
+			twitterImage: {
+				name: "twitter:image",
+				content: "https://harmlesskey.com/harmless_key_logo_full.png" 
+			},
+			twitterSite: {
+				name: "twitter:site", 
+				content: "@KeyHarmless"
+			},
+
+			// OG
+			ogTitle: {
+				property: "og:title",
+				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
+			},
+			ogDescription: {
+				property: "og:description",
+				content: this.$route.meta.description || "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play."
+			},
+			ogSiteName: {
+				property: "og:site_name",
+				content: "Harmless Key"
+			},
+			ogType: {
+				property: "og:type",
+				content: "website"
+			},
+			ogUrl: {
+				property: "og:url", 
+				content: `https://harmlesskey.com${this.$route.path}`
+			},
+			ogImage: {	
+				property: "og:image", 
+				content: `https://harmlesskey.com/linkedin.png` 
+			},
+			ogImageType: {	
+				property: "og:image:type", 
+				content: "image/png"
+			},
+			ogImageAlt: {	
+				property: "og:image:alt", 
+				content: "Harmless Key Logo"
+			}
+		};
+
+		// NoIndex on non-production environments
+		if(process.env.VUE_APP_ENV_NAME !== "live") {
+			meta.noindex = {
+				name: "robots",
+				content: "noindex, nofollow"
+			};
+		}
+
+		return {
+			title: this.$route.meta.title || "D&D Combat Tracker",
+			titleTemplate: title => `${title} | Harmless Key`,
+			link: {
+				canonical: {
+					rel: "canonical",
+					href: `https://harmlesskey.com${this.$route.path}`
+				}
+			},
+			meta: meta
 		}
 	},
 	data() {
 		return {
-			user: auth.currentUser,
-			connection: navigator.onLine ? 'online' : 'offline',
+			width: 0,
+			small_screen: true,
 			announcementSetter: false,
 			announcement_cookie: false,
 			install_cookie: false,
 			broadcast: undefined,
 			deferredPrompt: null,
 			install_dialog: false,
-			never_show_install: false
+			never_show_install: false,
+			maintenance: false,
+			connection: process.browser && !navigator.onLine ? 'offline' : 'online'
 		}
 	},
 	watch: {
@@ -176,9 +243,14 @@
 			slide: 'getSlide',
 			storeBroadcast: 'broadcast'
 		}),
+		...mapGetters([
+			"initialized",
+			"theme",
+			"user"
+		]),
 		announcement: {
 			get() {
-				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
+				const announcement = (this.user && !this.announcement_cookie) ? true : false;
 				return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
 			},
 			set(newVal) {
@@ -186,11 +258,47 @@
 			}
 		},
 		isAndroid() {
-			const userAgent = navigator.userAgent.toLowerCase();
+			const userAgent = process.browser ? navigator.userAgent.toLowerCase() : "";
 			return userAgent.indexOf("android") > -1;
 		}
 	},
-	created() {
+	async preFetch({ store, ssrContext}) {
+		const cookies = Cookies.parseSSR(ssrContext);
+		const access_token = cookies.get('access_token')
+		if (!access_token) return;
+
+		const user = jwt_decode(access_token);
+		if (!user && !user.user_id) return;
+
+		const transform = {
+			'uid': 'user_id',
+			'displayName': 'name',
+			'photoURL': 'picture',
+			'email': 'email',
+			'emailVerified': 'email_verified',
+		}
+
+		const transformed_user = {}
+		for (const [k, v] of Object.entries(transform)) {
+			transformed_user[k] = user[v];
+		}
+
+		await store.dispatch("setUser", transformed_user);
+		await store.dispatch("setUserInfo");
+		await store.dispatch("initialize");
+	},
+	async mounted() {
+		auth.onAuthStateChanged(user => {
+			if (user) {
+				auth.currentUser.getIdToken(true).then(async token => {
+					this.$q.cookies.set('access_token', token);
+				})
+			}
+			else {
+				this.$q.cookies.remove('access_token');
+			}
+		});
+
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {
@@ -202,29 +310,17 @@
 				this.install_cookie = true;
 			}
 		}
-		window.addEventListener('offline', () => { this.connection = "offline" });
-		window.addEventListener('online', () => { this.connection = "online" });
-		this.setTips();
-
-		if(auth.currentUser !== null) {
-			this.setUser();
-			this.setUserInfo();
-			this.setUserSettings();
-			// players need prio!
-			this.fetchPlayers();
-			this.fetchNpcs();
-			this.fetchCampaigns();
-			this.fetchAllEncounters();
-		}
-	},
-	mounted() {
-		if(auth.currentUser !== null){
+		
+		if(this.user){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
 				this.broadcast = snapshot.val();
 				this.$forceUpdate();
 			});
 		}
+
+		window.addEventListener('offline', () => { this.connection = "offline" });
+		window.addEventListener('online', () => { this.connection = "online" });
 
 		// Install prompt
 		window.addEventListener('beforeinstallprompt', (e) => {
@@ -240,18 +336,17 @@
 	},
 	methods: {
 		...mapActions([
-			"setTips",
-			"fetchCampaigns",
-			"fetchAllEncounters",
-			"fetchPlayers",
-			"fetchNpcs",
-			"setUser",
-			"setUserInfo",
-			"setUserSettings",
 			"setSlide",
 			"setSideSmallScreen",
-			"setLive"
+			"setLive",
+			"initialize",
+			"reinitialize",
+			"setUser"
 		]),
+		setSize(size) {
+			this.small_screen = size.width < 576;
+			this.width = size.width;
+		},
 		hideSlide() {
 			this.setSlide(false)
 		},
@@ -292,7 +387,3 @@
 	}
 };
 </script>
-
-<style lang="scss" src="./css/styles.scss">
-
-</style>

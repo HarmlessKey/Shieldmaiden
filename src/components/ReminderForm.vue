@@ -1,54 +1,65 @@
 <template>
 	<div>
-		<q-input 
-			dark filled square
-			label="Title"
-			type="text"
-			autocomplete="off"
-			v-model="reminder.title"
-			v-validate="'required|max:30|variable_check'"
-			maxLength="30"
-			name="title"
-		/>
-		<p class="validate red" v-if="errors.has('title')">{{ errors.first('title') }}</p>
+		<ValidationProvider 
+			name="Title" 
+			:rules="{
+				required: true,
+				max: 30,
+				variable_check: [reminder.variables]
+			}" 
+			v-slot="{ errors, invalid, validated }"
+		>
+			<q-input 
+				:dark="$store.getters.theme === 'dark'" filled square
+				label="Title"
+				type="text"
+				autocomplete="off"
+				v-model="reminder.title"
+				maxLength="30"
+				:error="invalid && validated"
+				:error-message="errors[0]"
+			/>
+		</ValidationProvider>
 
 		<div class="colors d-flex justify-content-between my-3">
 			<a v-for="(color, index) in colors" :key="index" class="color" :class="'bg-'+color" @click="setColor(color)">
-				<span v-show="color == reminder.color"><i class="fas fa-check"></i></span>
+				<span v-show="color == reminder.color"><i aria-hidden="true" class="fas fa-check"></i></span>
 			</a>
 		</div>
 
-		<q-select 
-			dark filled square
-			map-options
-			emit-value
-			label="Trigger"
-			:options="triggers"
-			type="text" 
-			v-model="reminder.trigger"
-			v-validate="'required'"
-			name="trigger"
-		/>
-		<p class="validate red" v-if="errors.has('trigger')">{{ errors.first('trigger') }}</p>
+		<ValidationProvider name="Trigger" rules="required" v-slot="{ errors, invalid, validated }">
+			<q-select 
+				:dark="$store.getters.theme === 'dark'" filled square
+				map-options
+				emit-value
+				label="Trigger"
+				:options="triggers"
+				type="text" 
+				v-model="reminder.trigger"
+				:error="invalid && validated"
+				:error-message="errors[0]"
+			/>
+		</ValidationProvider>
 
 		<div v-if="reminder.trigger === 'timed'" class="my-2">
-			<q-input 
-				dark filled square
-				label="Rounds"
-				name="rounds"
-				type="number" 
-				v-model="reminder.rounds"
-				v-validate="'required|max_value:99'"
-				min="1"
-				max="99"
-				hint="One minute is 10 rounds"
-			/>
-			<p class="validate red" v-if="errors.has('rounds')">{{ errors.first('rounds') }}</p>
+			<ValidationProvider name="Rounds" rules="required|max_value:99" v-slot="{ errors, invalid, validated }">
+				<q-input 
+					:dark="$store.getters.theme === 'dark'" filled square
+					label="Rounds"
+					type="number" 
+					v-model="reminder.rounds"
+					min="1"
+					max="99"
+					hint="One round is 6 seconds"
+					:error="invalid && validated"
+					:error-message="errors[0]"
+				/>
+			</ValidationProvider>
 		</div>
 
 		<div class="mb-3">
 			<q-field
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				:hint="
 					reminder.action == 'notify' 
 					? 'You\'ll get the option to keep or remove the reminder.'
@@ -56,7 +67,7 @@
 				"
 			>
 				<q-option-group
-					dark
+					:dark="$store.getters.theme === 'dark'"
 					:options="actions"
 					label="Action"
 					type="radio"
@@ -64,17 +75,26 @@
 				/>
 			</q-field>
 			
-			<q-input 
-				dark filled square
-				label="Notification"
-				class="mt-3"
-				name="notification" 
-				v-validate="'max:999|variable_check'" 
-				maxLength="999"
-				v-model="reminder.notify"
-				autogrow
-			/>
-			<p class="validate red" v-if="errors.has('notification')">{{ errors.first('notification') }}</p>
+			<ValidationProvider 
+				name="Notification" 
+				:rules="{
+					max: 999,
+					variable_check: [reminder.variables]
+				}" 
+				v-slot="{ errors, invalid, validated }"
+			>
+				<q-input 
+					:dark="$store.getters.theme === 'dark'" filled square
+					label="Notification"
+					class="mt-3"
+					name="notification" 
+					maxLength="999"
+					v-model="reminder.notify"
+					autogrow
+					:error="invalid && validated"
+					:error-message="errors[0]"
+				/>
+			</ValidationProvider>
 		</div>
 
 		<!-- VARIABLES -->
@@ -86,38 +106,45 @@
 				</hk-popover>
 			</label>
 			<div class="mb-3">
-				<q-input 
-					dark filled square
-					label="New variable name"
-					name="var_name"
-					type="text" 
-					autocomplete="off" 
-					v-model="newVar"
-					v-validate="'alpha_dash'"
-					data-vv-as="variable name"
-					placeholder="New Variable name" 
-				>
-					<a slot="append">
-						<q-icon name="fas fa-plus-circle" class="blue" @click="addVariable()" :class="{ disabled: !newVar || errors.has('var_name') }"/>
-					</a>
-				</q-input>
+				<ValidationProvider name="Variable" rules="alpha_dash" v-slot="{ errors, invalid, validated }">
+					<q-input 
+						:dark="$store.getters.theme === 'dark'" filled square
+						label="New variable name"
+						name="var_name"
+						type="text" 
+						autocomplete="off" 
+						v-model="newVar"
+						placeholder="New Variable name"
+						:error="invalid && validated"
+						:error-message="errors[0]"
+					>
+						<a 
+							slot="after" 
+							class="btn bg-neutral-5" 
+							@click="addVariable()" 
+							:class="{ disabled: !newVar || errors[0] || (reminder.variables && Object.keys(reminder.variables).includes(newVar)) }"
+						>
+							<q-icon name="fas fa-plus" />
+						</a>
+					</q-input>
+				</ValidationProvider>
 			</div>
-			<p class="validate red" v-if="errors.has('var_name')">{{ errors.first('var_name') }}</p>
+
 			<div v-for="(variable, key) in reminder.variables" :key="`var-${key}`" class="var">
 
 				<div class="d-flex justify-content-between var-title">
 					<span>{{ key }}</span>
 					<div>
-						<a @click="addOption(key)" class="mr-2">
-							<i class="fas fa-plus green"></i>
-							<q-tooltip anchor="top middle" self="bottom middle">
-								Add option
-							</q-tooltip>
-						</a>
-						<a @click="removeVar(key)">
-							<i class="fas fa-trash-alt red"></i>
+						<a @click="removeVar(key)" class="btn btn-sm bg-neutral-5">
+							<i aria-hidden="true" class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="bottom middle">
 								Remove variable
+							</q-tooltip>
+						</a>
+						<a @click="addOption(key)" class="btn btn-sm bg-neutral-5 ml-2">
+							<i aria-hidden="true" class="fas fa-plus"></i>
+							<q-tooltip anchor="top middle" self="bottom middle">
+								Add option
 							</q-tooltip>
 						</a>
 					</div>
@@ -125,37 +152,37 @@
 
 				<!-- Options -->
 				<div v-for="(option, i) in variable" :key="`${key}-option-${i}`" class="option">
-					<div class="input-group-prepend" v-if="selectOptions">
-						<button class="btn btn-sm bg-gray" @click="setOption(key, reminder.variables[key][i])">
-							<i class="fas fa-check" :class="{ green: reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
-						</button>
-					</div>
-					<q-input 
-						dark filled square
-						label="Option"
-						:disable="selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]"
-						:name="'option'+key"
-						type="text" 
-						autocomplete="off" 
-						v-model="reminder.variables[key][i]"
-						v-validate="'required|max: 30'"
-						maxLength="30"
-						data-vv-as="option"
-					>
-						<template slot="append">
-							<q-icon 
-								name="fas fa-trash-alt" 
-								class="red pointer" size="xs" 
-								@click="(selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]) ? null : removeOption(key, i)"
-							>
-								<q-tooltip anchor="top middle" self="center middle">
-									Remove option
-								</q-tooltip>
-							</q-icon>
-						</template>
-					</q-input>
+					<ValidationProvider name="Option" rules="required|max:30" v-slot="{ errors, invalid, validated }">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							:label="`Option ${i+1}`"
+							:disable="selectOptions && reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i]"
+							type="text" 
+							autocomplete="off" 
+							v-model="reminder.variables[key][i]"
+							maxLength="30"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						>
+							<div slot="before" v-if="selectOptions">
+								<button class="btn btn-sm bg-neutral-4" @click="setOption(key, reminder.variables[key][i])">
+									<i aria-hidden="true" class="fas fa-check" :class="{ green: reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
+								</button>
+							</div>
+							<template slot="append">
+								<q-icon 
+									name="fas fa-trash-alt" 
+									class="red pointer" size="xs" 
+									@click="(selectOptions && reminder.selectedVars && reminder.selectedVars[key] === reminder.variables[key][i]) ? null : removeOption(key, i)"
+								>
+									<q-tooltip anchor="top middle" self="center middle">
+										Remove option
+									</q-tooltip>
+								</q-icon>
+							</template>
+						</q-input>
+					</ValidationProvider>
 				</div>
-				<small class="validate red" v-if="errors.has('option'+key)">{{ errors.first('option'+key) }}</small>
 			</div>
 		</div>
 	</div>
@@ -165,7 +192,10 @@
 export default {
 	name: "ReminderForm",
 	props: {
-		value: Object,
+		value: {
+			type: Object,
+			required: true
+		},
 		variables: {
 			type: Boolean,
 			default: true
@@ -211,59 +241,32 @@ export default {
 			}
 		}
 	},
-	watch: {
-		reminder: {
-			handler() {
-				//Emits validation on every change
-				this.$emit('validation', this.$validator);
-			},
-			deep: true
-		}
-	},
 	mounted() {
 		if(Object.keys(this.value).length === 0) {
 			//Set default values
 			this.$set(this.reminder, 'color', 'green-light');
 			this.$set(this.reminder, 'action', 'remove');
 		}
-		this.$validator.extend('variable_check', {
-			getMessage: field => `The ${field} contains undefined variables.`,
-			validate: value => {
-				let regexpr = /\[(\w+)\]/g;
-				let text_vars = value.match(regexpr, "$1");
-				if (!text_vars)
-					return true;
-				for (let v of text_vars) {
-					let stripped = v.slice(1,-1);
-					if (!this.reminder.variables || !Object.keys(this.reminder.variables).includes(stripped))
-						return false
-				}
-				return true;
-			}
-		})
-		// this.$validator.extend('falsy', (value) => ! value);
-		this.$emit('validation', this.$validator);
 	},
 	methods: {
 		setColor(color) {
 			this.$set(this.reminder, 'color', color);
 		},
 		addVariable() {
-			if(!this.reminder.variables) {
-				this.$set(this.reminder, 'variables', {});
-			}
 			if(this.newVar) {
+				if(!this.reminder.variables) {
+					this.$set(this.reminder, 'variables', {});
+				}
 				this.$set(this.reminder.variables, this.newVar, [""]);
 				this.newVar = undefined;
 			}
+			this.$forceUpdate();
 		},
 		addOption(key) {
 			this.reminder.variables[key].push("");
 			this.$forceUpdate();
 		},
 		removeOption(key, i) {
-			
-			// let options = this.reminder.variables[key].splice(i, 1);
 			this.$delete(this.reminder.variables[key], i);
 			this.$forceUpdate();
 		},
@@ -278,6 +281,9 @@ export default {
 			this.$forceUpdate();
 		},
 		setOption(key, i) {
+			if(!this.reminder.selectedVars) {
+				this.$set(this.reminder, "selectedVars", {});
+			}
 			this.reminder.selectedVars[key] = i;
 			this.$forceUpdate();
 		}
@@ -296,7 +302,7 @@ export default {
 			width: 25px;
 			height: 25px;
 			padding: 2px 5px;
-			color:$white !important;
+			color:$neutral-1 !important;
 			margin-right: 5px;
 
 			&:last-child {
@@ -308,7 +314,7 @@ export default {
 		margin-bottom: 15px;
 
 		.var-title {
-			border-bottom: solid 1px$gray-hover;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 3px;
 			margin-bottom: 10px;
 		}

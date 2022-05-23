@@ -2,7 +2,7 @@
 	<div class="side">
 		<q-tabs
 			v-model="tab"
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			indicator-color="transparent"
 			dense
 			align="left"
@@ -10,8 +10,8 @@
 			<q-tab name="log" icon="fas fa fa-scroll-old" />
 			<q-tab name="damage" icon="fas fa-swords" />
 			<q-tab name="requests" icon="fas fa-bell">
-				<div class="notifications bg-red white animated zoomIn" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
-					<div>{{ Object.keys(encounter.requests).length }}</div>
+				<div class="notifications bg-red white animated zoomIn" v-if="requests && Object.keys(requests).length">
+					<div>{{ Object.keys(requests).length }}</div>
 				</div>
 			</q-tab>
 		</q-tabs>
@@ -32,13 +32,13 @@
 </template>
 
 <script>
-	import Dmg from '@/components/combat/side/Dmg.vue';
-	import Log from '@/components/combat/side/Log.vue';
-	import Requests from '@/components/combat/side/Requests.vue';
-	import { mapGetters } from 'vuex';
+	import Dmg from "src/components/combat/side/Dmg.vue";
+	import Log from "src/components/combat/side/Log.vue";
+	import Requests from "src/components/combat/side/Requests.vue";
+	import { mapGetters } from "vuex";
 
 	export default {
-		name: 'Side',
+		name: "Side",
 		components: {
 			Dmg,
 			Log,
@@ -51,7 +51,8 @@
 		},
 		computed: {
 			...mapGetters([
-				'encounter'
+				"encounter",
+				"requests"
 			])
 		}
 	}
@@ -63,13 +64,13 @@
 }
 .q-tabs {
 	.q-tab {
-		padding-top: 5px;
-		padding-bottom: 5px;
-		background: rgba(25, 25, 25, .9);
+		padding-top: 10px;
+		padding-bottom: 9px;
+		background: $neutral-8-transparent;
 		position: relative;
 
 		&.q-tab--active {
-			background: rgba(38, 38, 38, .9) !important;
+			background: $neutral-6-transparent !important;
 			color: $blue;
 		}
 		.notifications {		
@@ -92,41 +93,9 @@
 		}
 	}
 }
-.nav {
-	.nav-item {
-		position: relative;
-	
-		.nav-link {
-			background: rgba(25, 25, 25, .9);
-		
-			&.active {
-				background: rgba(38, 38, 38, .9) !important;
-			}
-		}
-	
-		.notifications {		
-			user-select: none;
-			position: absolute;
-			top: -5px;
-			right: -8px;
-			height: 20px;
-			width: 20px;
-			border-radius: 50%;
-			
-			div {
-				position: absolute;
-				width: inherit;
-				height: inherit;
-				line-height: 20px;
-				text-align: center;
-				font-size: 13px;
-			}
-		}
-	}
-}
 .q-scrollarea { 
 	height: calc(100% - 30px);
-	background: rgba(38, 38, 38, .9);
+	background: $neutral-6-transparent;
 }
 
 .tab-content {

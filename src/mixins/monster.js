@@ -29,6 +29,7 @@ export const monsterMixin = {
 				15:  { proficiency: 5,  xp: 13000 },
 				16:  { proficiency: 5,  xp: 15000 },
 				17:  { proficiency: 6,  xp: 18000 },
+				18:  { proficiency: 6,  xp: 20000 },
 				19:  { proficiency: 6,  xp: 22000 },
 				20:  { proficiency: 6,  xp: 25000 },
 				21:  { proficiency: 7,  xp: 33000 },
@@ -81,7 +82,7 @@ export const monsterMixin = {
 				]
 			},
 			monster_types: [
-				"Abberation",
+				"Aberration",
 				"Beast",
 				"Celestial",
 				"Construct",
@@ -100,9 +101,9 @@ export const monsterMixin = {
 			monster_alignment: [
 				"Any",
 				"Unaligned",
-				"Lawful Good",
-				"Neutral Good",
-				"Chaotic Good",
+				"Lawful good",
+				"Neutral good",
+				"Chaotic good",
 				"Lawful neutral",
 				"Neutral",
 				"Chaotic neutral",
@@ -115,7 +116,24 @@ export const monsterMixin = {
 				"darkvision",
 				"tremorsense",
 				"truesight"
-			]
+			],
+			conditions: [
+				"blinded",
+				"charmed",
+				"deafened",
+				"exhaustion",
+				"frightened",
+				"grappled",
+				"incapacitated",
+				"invisible",
+				"paralyzed",
+				"petrified",
+				"poisoned",
+				"prone",
+				"restrained",
+				"stunned",
+				"unconscious"
+			],
 		}
 	},
 	methods: {
@@ -124,30 +142,48 @@ export const monsterMixin = {
 		 * @param {object} monster The old monster object
 		 * @returns {object} The new monster object
 		 */
-		parseMonster(monster) {
+		parseMonster(monster, uid, key) {
 			let new_monster = {};
 			new_monster.name = (monster.name) ? monster.name.toLowerCase() : "monster name"; // required
-			new_monster.challenge_rating = (monster.challenge_rating) ? monster.challenge_rating : 1; // required
-			if(monster.size) new_monster.size = monster.size.toLowerCase().capitalize();
-			if(monster.type) new_monster.type = monster.type.toLowerCase().capitalize();
+			new_monster.challenge_rating = (Number(monster.challenge_rating) && !isNaN(monster.challenge_rating)) ? monster.challenge_rating : 1; // required
+			if(monster.size) new_monster.size = monster.size.toLowerCase().capitalize(); // required
+			if(monster.type) new_monster.type = monster.type.toLowerCase().capitalize();	// required
 			if(monster.subtype) new_monster.subtype = monster.subtype.toLowerCase().capitalize();
 			if(monster.alignment) new_monster.alignment = monster.alignment.toLowerCase().capitalize();
 			if(monster.avatar) new_monster.avatar = monster.avatar;
+			
 			new_monster.armor_class = (monster.ac) ? parseInt(monster.ac) : 1; // required
+			new_monster.armor_class = Math.min(new_monster.armor_class, 99); // limit AC to max 99
+			new_monster.armor_class = Math.max(new_monster.armor_class, 1); // limit AC to min 1
+
 			new_monster.hit_points = (monster.maxHp) ? parseInt(monster.maxHp) : 1; // required
+			new_monster.hit_points = Math.min(new_monster.hit_points, 9999); // limit HP to max 9999
+			new_monster.hit_points = Math.max(new_monster.hit_points, 1); // limit HP to min 1
+			
 			if(monster.hit_dice) new_monster.hit_dice = monster.hit_dice;
 			if(monster.friendly) new_monster.friendly = true;
+			
+			let proficiency = 0
+			if(!this.monster_challenge_rating[new_monster.challenge_rating]) console.log(uid, key)
+			if (this.monster_challenge_rating[new_monster.challenge_rating].proficiency) {
+				proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency
+			} else {
+				console.log("challenge_rating",  new_monster.challenge_rating)
+			}
 
-			const proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency;
-
-			if(monster.name === "b") {
-				new_monster.test = undefined;
+			if(!new_monster.size || !this.monster_sizes.includes(new_monster.size)) {
+				new_monster.size = "Medium";
+			}
+			if(!new_monster.type || !this.monster_types.includes(new_monster.type)) {
+				new_monster.type = "Beast";
 			}
 
 			// Abilities & Saving Throws
 			new_monster.saving_throws = [];
 			for(const ability of this.abilities) {
 				new_monster[ability] = monster[ability] || 10;
+				new_monster[ability] = Math.min(new_monster[ability], 99)
+				new_monster[ability] = Math.max(new_monster[ability], 0)
 
 				if(monster[`${ability}_save`]) {
 					new_monster.saving_throws.push(ability);
@@ -163,7 +199,7 @@ export const monsterMixin = {
 
 				// Save proficiency
 				if(modifier) {
-					new_monster.skills.push(skill.value).value;
+					new_monster.skills.push(skill.value);
 
 					// Check for expertise
 					// If the modifier in old_monster is higher than the ability_mod + proficiency
@@ -177,12 +213,6 @@ export const monsterMixin = {
 			if(new_monster.skills_expertise.length === 0) delete new_monster.skills_expertise;
 
 			// Speed
-			
-			// const speeds = (monster.speed) ? monster.speed.match(/(\d)+\D*/g) : null;
-			
-			// const speed = (monster.speed) ? monster.speed.split(",") : null;
-			// console.log("speeds", speed)
-			// console.log("old speed", monster.speed)
 			if (monster.speed) {
 				const speed_types = ["swim", "fly", "burrow", "climb"];
 				let match = [];
@@ -221,7 +251,6 @@ export const monsterMixin = {
 
 			// Senses
 			const senses = (monster.senses) ? monster.senses.split(",") : null;
-			
 			if(senses) {
 				new_monster.senses = {};
 				for(const sense of senses) {
@@ -231,7 +260,7 @@ export const monsterMixin = {
 							new_sense[monster_sense] = true;
 							
 							if(sense.match(/([0-9])+/g)) {
-								new_sense.range = sense.match(/([0-9])+/g)[0];
+								new_sense.range = parseInt(sense.match(/([0-9])+/g)[0]);
 							}
 							new_monster.senses[monster_sense] = new_sense;
 						}
@@ -245,7 +274,6 @@ export const monsterMixin = {
 				damage_vulnerabilities: monster.damage_vulnerabilities,
 				damage_immunities: monster.damage_immunities,
 			}
-			const condition_immunities = (monster.condition_immunities) ? monster.condition_immunities.split(",") : null;
 
 			const resistances = [
 				"damage_resistances",
@@ -266,17 +294,20 @@ export const monsterMixin = {
 				if(new_monster[resistance_type].length === 0) delete new_monster[resistance_type];
 			}
 
+			const condition_immunities = (monster.condition_immunities) ? monster.condition_immunities.split(",") : null;
+
+
 			if(condition_immunities) {
 				new_monster.condition_immunities = [];
-				for(const immunity of condition_immunities) {
+				for(let immunity of condition_immunities) {
 					if(immunity) {
-						new_monster.condition_immunities.push(
-							immunity.trim().toLowerCase()
-						);
+						const trimmed_immunity = immunity.trim().toLowerCase();
+						if(this.conditions.includes(trimmed_immunity)) {
+							new_monster.condition_immunities.push(trimmed_immunity);
+						}
 					}
 				}
 			}
-
 
 			// Abilities
 			for(const action_type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
@@ -288,6 +319,9 @@ export const monsterMixin = {
 						// We will use only 1 action now, for damage or healing
 						// But later we might want to add conditions and reminders
 						// These might be applied in a different way, so with a different action
+						if (!ability) {
+							continue;
+						}
 						const newAbility = {
 							name: ability.name || "Unnamed Ability",
 							desc: ability.desc || null,
@@ -304,24 +338,24 @@ export const monsterMixin = {
 						// Find recharge, limit and legendary cost
 						if(ability.name && ability.name.match(/\((.*?)\)/g)) {
 							const type = ability.name.match(/\((.*?)\)/g)[0];
-
+							
 							if(type.toLowerCase().includes("recharge")){
 								if(type.match(/[0-9]+(-[0-9]+)*/)) {
 									newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
 								} else {
 									newAbility.recharge = "rest";
-								}
+								}								
 							}
 							if(type.toLowerCase().includes("day")){
-								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
 								newAbility.limit_type = "day";
 							}
 							if(type.toLowerCase().includes("turn")){
-								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
 								newAbility.limit_type = "turn";
 							}
 							if(action_type === "legendary_actions" && type.toLowerCase().includes("costs")){
-								newAbility.legendary_cost = type.match(/([0-9])+/g)[0];
+								newAbility.legendary_cost = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
 							}
 							newAbility.name = newAbility.name.replace(type, "").trim();
 						}
@@ -331,7 +365,7 @@ export const monsterMixin = {
 							const reach = (ability.desc) ? ability.desc.toLowerCase().match(/reach\s?([0-9]+(?:\/[0-9]+)?)/) : null;
 							const range = (ability.desc) ? ability.desc.toLowerCase().match(/range\s?([0-9]+(?:\/[0-9]+)?)/) : null;
 
-							if(reach) newAbility.reach = reach[1];
+							if(reach) newAbility.reach = parseInt(reach[1]);
 							if(range) newAbility.range = range[1];
 
 							// Check if it's a targeted action or saving throw
@@ -348,7 +382,7 @@ export const monsterMixin = {
 
 								const save_dc = (ability.desc) ? ability.desc.match(/DC\s?([0-9]+)/) : null;
 								if(save_dc) {
-									newAbility.action_list[0].save_dc = save_dc[1];
+									newAbility.action_list[0].save_dc = parseInt(save_dc[1]);
 								}
 
 								// Find the ability
@@ -360,15 +394,15 @@ export const monsterMixin = {
 							}
 
 							// Create an array of damage types found in the description
-							let damage_types = [];
+							let types = [];
 							for(const type of this.damage_types) {
 								const position = (ability.desc) ? ability.desc.toLowerCase().search(type) : -1;
-								if(position > -1 && !damage_types.includes(type)) {
+								if(position > -1 && !types.includes(type)) {
 									// Make sure they're in the correct order
-									if(damage_types[0] && position > ability.desc.toLowerCase().search(damage_types[0])) {
-										damage_types.push(type);
+									if(types[0] && position > ability.desc.toLowerCase().search(types[0])) {
+										types.push(type);
 									} else {
-										damage_types.unshift(type);
+										types.unshift(type);
 									}
 								}
 							}
@@ -378,30 +412,33 @@ export const monsterMixin = {
 							if(ability.damage_dice) {
 								ability.damage_dice.split("+").forEach((damage, index) => {
 
-									const damage_type = (damage_types[index]) ? damage_types[index] : "slashing";
+									const damage_type = (types[index]) ? types[index] : "slashing";
 									let newRoll = {
 										damage_type
 									};
 
 									const input = damage.split("d");
 									if (input.length == 2) {
-										newRoll.dice_count = input[0]
-										newRoll.dice_type = input[1]
+										newRoll.dice_count = parseInt(input[0]);
+										newRoll.dice_type = parseInt(input[1]);
+										if (isNaN(newRoll.dice_count)) {
+											console.log(damage)
+										}
 									} else {
 										actually_fixed = parseInt(input[0]) || null;
 									}
 									
-									newRoll.fail_miss = (fail_miss === "miss_mod") ? 0 : 0.5;
+									newRoll[fail_miss] = (fail_miss === "miss_mod") ? 0 : 0.5;
 
 									newAbility.action_list[0].rolls.push(newRoll);
-								})
+								});
 
 								// Check if there is a damage bonus
 								// Add it only once (to the first roll by default, this might be wrong in some cases)
 								if(ability.damage_bonus && newAbility.action_list[0].rolls.length > 0) {
-									newAbility.action_list[0].rolls[0].fixed_val = ability.damage_bonus;
+									newAbility.action_list[0].rolls[0].fixed_val = parseInt(ability.damage_bonus);
 								} else if (actually_fixed) {
-									newAbility.action_list[0].rolls[0].fixed_val = actually_fixed;
+									newAbility.action_list[0].rolls[0].fixed_val = parseInt(actually_fixed);
 								}
 							}
 						}

@@ -1,5 +1,4 @@
 import { mapActions, mapGetters } from "vuex";
-import { db } from "@/firebase";
 
 export const dice = {
 	data() {
@@ -11,8 +10,7 @@ export const dice = {
 	},
 	computed: {
 		...mapGetters([
-			"broadcast",
-			"user"
+			"broadcast"
 		]),
 		critSettings() {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
@@ -36,9 +34,8 @@ export const dice = {
 		}
 	},
 	methods: {
-		...mapActions([
-			"setRoll"
-		]),
+		...mapActions(["setRoll"]),
+		...mapActions("campaigns", ["set_share"]),
 		rollD(e, d=20, n=1, m=0, title, entity_name=undefined, notify=false, advantage_disadvantage={}, share=null) {
 			m = parseInt(m); //Removes + from modifier
 			const add = (a, b) => a + b;
@@ -106,7 +103,7 @@ export const dice = {
 				if(ignored) {
 					const type = Object.keys(advantage_disadvantage)[0].charAt(0).capitalize();
 					const color = (type === "A") ? "green" : "red";
-					advantage = `<b class="${color}">${type}</b> <span class="gray-hover">${ignored}</span> `;
+					advantage = `<b class="${color}">${type}</b> <span class="neutral-2">${ignored}</span> `;
 				}
 
 				this.animateTrigger = !this.animateTrigger;
@@ -148,8 +145,8 @@ export const dice = {
 				if(share.encounter_id) share_object.encounter_id = share.encounter_id;
 				if(share.entity_key) share_object.entity_key = share.entity_key;
 				
-				// Push the roll
-				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share_object);
+				// Share the roll
+				this.set_share({ id: this.broadcast.live, share: share_object })
 			}
 
 			this.setRoll(roll);

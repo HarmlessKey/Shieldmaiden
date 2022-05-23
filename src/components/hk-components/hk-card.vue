@@ -5,6 +5,8 @@
 		:class="[
 			noMargin ? 'no-margin' : '',
 			small ? 'small' : '',
+			banner ? 'banner' : '',
+			bannerSmall ? 'banner-small' : ''
 		]"
 		:style="[
 			width ? { 'width': `${width}px` } : '',
@@ -19,9 +21,10 @@
 			</div>
 		</slot>
 
-		<div class="card-body">
-			<slot/>
+		<div v-if="!hasBody && body" class="card-body">
+			{{ body }}
 		</div>
+		<slot/>
 
 		<slot name="footer">
 			<div v-if="footer" class="card-footer">
@@ -36,6 +39,10 @@
 		name: 'hk-card',
 		props: {
 			header: {
+				type: String,
+				default: undefined
+			},
+			body: {
 				type: String,
 				default: undefined
 			},
@@ -62,6 +69,19 @@
 			small: {
 				type: Boolean,
 				default: false
+			},
+			banner: {
+				type: Boolean,
+				default: false
+			},
+			bannerSmall: {
+				type: Boolean,
+				default: false
+			},
+		},
+		computed: {
+			hasBody() {
+				return !!this.$slots.default || !!this.$scopedSlots.default;
 			}
 		},
 		methods: {

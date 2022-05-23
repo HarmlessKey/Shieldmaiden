@@ -1,17 +1,16 @@
 <template>
 	<q-scroll-area 
 		class="home" 
-		v-if="!$store.getters.user || $route.path === '/home'" 
-		dark :thumb-style="{ width: '10px'}"
+		:dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '10px'}"
 		v-on:scroll="handleScroll"
 	>
 		<template v-if="diceColors.length > 0">
 			<section id="top">
-				<Top />
+				<Top :maintenance="maintenance" />
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -21,7 +20,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -31,7 +30,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -41,7 +40,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -51,7 +50,7 @@
 				<span 
 					class="die" 
 					:style="{ 
-						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
+						backgroundImage: 'url(' + require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
 						transform: `rotate(${scrolled}deg)`
 					}">
 				</span>
@@ -60,55 +59,37 @@
 				<Campaign />
 			</section>
 			<Footer />
-			<div class="bottom-actions d-flex justify-content-center">
-				<template v-if="!$store.getters.user">
-					<router-link to="/sign-up" class="btn btn-lg">Create Account</router-link>
-					<router-link to="/demo" class="ml-2 btn btn-lg bg-green">Demo Encounter</router-link>
-				</template>
-				<router-link v-else to="/content" class="ml-2 btn btn-lg bg-green">
-					<i class="fas fa-treasure-chest"/>
-					My content
-				</router-link>
-			</div>
 		</template>
 	</q-scroll-area>
-	<SignedIn v-else />
 </template>
 
 <script>
-	import Top from '@/components/home/Top.vue';
-	import Overview from '@/components/home/Overview.vue';
-	import Feedback from '@/components/home/Feedback.vue';
-	import General from '@/components/home/General.vue';
-	import Share from '@/components/home/Share.vue';
-	import Builder from '@/components/home/Builder.vue';
-	import Campaign from '@/components/home/Campaign.vue';
-	import Footer from '@/components/Footer.vue';
-	import SignedIn from '@/components/home/SignedIn.vue';
+	import Top from 'src/components/home/Top.vue';
+	import Feedback from 'src/components/home/Feedback.vue';
+	import General from 'src/components/home/General.vue';
+	import Share from 'src/components/home/Share.vue';
+	import Builder from 'src/components/home/Builder.vue';
+	import Campaign from 'src/components/home/Campaign.vue';
+	import Footer from 'src/components/Footer.vue';
 
 	export default {
 		name: 'home',
+		props: {
+			maintenance: [Boolean, String]
+		},
 		components: {
 			Top,
-			Overview,
 			Feedback,
 			General,
 			Share,
 			Builder,
 			Campaign,
-			Footer,
-			SignedIn
+			Footer
 		},
 		data() {
 			return {
 				scrolled: 0
 			}
-		},
-		metaInfo: {
-			title: 'Combat Tracker D&D | Harmless Key',
-			meta: [
-				{ vmid: 'description', name: 'description', content: 'Initiative tracker for D&D 5e. Our tool keeps track of everything in encounters so even during combat you can give your players the attention they deserve.' }
-			]
 		},
 		computed: {
 			diceColors() {
@@ -142,9 +123,7 @@
 <style lang="scss" scoped>
 
 .home {
-	padding-bottom: 85px;
-	overflow-y: scroll;
-	height: calc(100vh + 85px);
+	height: calc(100vh - #{$header-height});
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -164,17 +143,6 @@
 		background-position: center;
 		background-repeat: no-repeat;
 		z-index: 97;
-	}
-	.bottom-actions {
-		background: rgba(0, 0, 0, .3);
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		padding: 20px 10px;
-		height: 85px;
-		line-height: 33px;
-		z-index: 97;
-		backdrop-filter: blur(3px);
 	}
 }
 </style>

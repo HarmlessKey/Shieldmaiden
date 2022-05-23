@@ -1,18 +1,14 @@
 <template>
-	<icon 
-		v-if="['monster', 'player', 'companion'].includes(displayImg(entity))"
-		class="avatar"
-		:icon="displayImg(entity)" 
-		:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-	/>
 	<div 
-		v-else 
 		class="avatar"			 
 		:style="{ 
 		backgroundImage: 'url(\'' + displayImg(entity) + '\')',
-		'border-color': entity.color_label ? entity.color_label : ''
+		'border-color': entity.color_label ? entity.color_label : '',
+		'color': entity.color_label ? entity.color_label : ''
 		}"
-	/>
+	>
+		<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(displayImg(entity))" :class="`hki-${displayImg(entity)}`" />
+	</div>
 </template>
 
 <script>
@@ -39,9 +35,10 @@
 			displayImg(entity) {
 			//Check what image should be displayed
 			let encounterImg = (entity) ? entity.avatar : undefined; //img linked within the encounter
+			let img;
 
 			if(encounterImg) {
-				var img = encounterImg;
+				img = encounterImg;
 			} else {
 				if(!entity.entityType) {
 					let playerImg = (this.players && this.players[entity.key]) ? this.players[entity.key].avatar : entity.avatar;
@@ -81,12 +78,23 @@
 
 <style lang="scss" scoped>
 	.avatar {
-		background-color: $gray-dark;
+		background-color: $neutral-9;
 		background-position: center top;
 		background-repeat: no-repeat;
 		background-size: cover;
 		width: 100%; 
 		height: 100%;
 		border: solid 1px transparent;
+		color: $neutral-2;
+		font-size: 42px;
+		overflow: hidden;
+		text-align: center;
+	}
+
+	[data-theme="light"] {
+		.avatar {
+			background-color: $neutral-1;
+			color: $neutral-7;
+		}
 	}
 </style>

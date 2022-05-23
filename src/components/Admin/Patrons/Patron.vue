@@ -1,27 +1,25 @@
 <template>
 	<div>
-		<Crumble :name="patron.email" />
-
 		<div v-if="loading" class="loader"> <span>Loading patron....</span></div>
 
 		<h1 class="d-flex justify-content-between">
 			{{ patron.full_name }}
 			<span>
 				<a v-if="!edit" @click="setEdit(true)" class="mx-2">
-					<i class="fas fa-pencil-alt"></i>
+					<i aria-hidden="true" class="fas fa-pencil-alt"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Edit
 					</q-tooltip>
 				</a>
 				<a v-else @click="setEdit(false)" class="mx-2">
-					<i class="fas fa-times"></i>
+					<i aria-hidden="true" class="fas fa-times"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Cancel
 					</q-tooltip>
 				</a>
 			</span>
 		</h1>
-		<p><i class="gray-hover">{{ patron['.key'] }}</i></p>
+		<p><i aria-hidden="true" class="neutral-2">{{ patron['.key'] }}</i></p>
 
 		<template v-if="!edit">
 			<div class="row q-col-gutter-md mb-2">
@@ -56,7 +54,7 @@
 				</div>
 				<div class="col">
 					<span :class="{ 'red': patron.last_charge_status == 'Declined', 'green': patron.last_charge_status == 'Paid' }">{{ patron.last_charge_status }}</span>
-					<span class="gray-hover"> ({{ makeDate(patron.last_charge_date) }})</span>
+					<span class="neutral-2"> ({{ makeDate(patron.last_charge_date) }})</span>
 				</div>
 			</div>
 
@@ -94,29 +92,17 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import { general } from '@/mixins/general.js'
-	import EditPatron from '@/views/Admin/Patrons/New.vue'
+	import { db } from 'src/firebase'
+	import { general } from 'src/mixins/general.js'
+	import EditPatron from 'src/views/Admin/Patrons/New.vue'
 
 	export default {
 		name: 'Patron',
 		components: {
-			Crumble,
 			EditPatron
 		},
 		mixins: [general],
 		props: ['id'],
-		metaInfo() {
-			return {
-				title: 'Patron | ' + this.patron.email,
-			}
-		},
-		beforeMount() {
-			//Because the component is loaded in another view, 
-			//the scroll needs to be reset to 0
-			window.scrollTo(0,0);
-		},
 		data() {
 			return {
 				loading: true,
@@ -159,7 +145,7 @@
 	.tiers {
 		&::after {
 			content: ', ';
-			color: $gray-light;
+			color: $neutral-1;
 		}
 		&:last-child::after {
 			content: '';

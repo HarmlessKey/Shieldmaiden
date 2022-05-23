@@ -13,7 +13,7 @@
 					<div class="video-wrapper">
 						<div class="video">
 							<video 
-								src="@/assets/_img/home/track-encounter.mp4" 
+								src="~assets/_img/home/track-encounter.mp4" 
 								muted autoplay playsinline alt="Share initative screen Harmless Key D&amp;D Combat Tracker" loop
 							/>
 							<div class="info">An example of how your players can follow your encounters.</div>
@@ -31,13 +31,13 @@
 							@click="setDialog(name)"
 						>
 							<q-item-section avatar>
-								<i :class="icon" />
+								<i aria-hidden="true" :class="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								{{ title }}
 							</q-item-section>
 							<q-item-section avatar>
-								<i class="fas fa-eye gray-hover" />
+								<i aria-hidden="true" class="fas fa-eye neutral-3" />
 							</q-item-section>
 						</q-item>
 					</q-list>
@@ -139,7 +139,7 @@
 <style lang="scss" scoped>
 	.share {
 		padding-bottom: 100px;
-		background-color: #111111;
+		background-color: $neutral-9;
 
 		.video-wrapper {
 			padding: 0 80px;

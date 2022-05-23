@@ -1,52 +1,66 @@
 <template>
-	<div 
-        v-if="tier && userInfo && userInfo.patron && userInfo.patron.last_charge_status === 'Declined' && new Date(userInfo.patron.pledge_end) > new Date()" 
-        class="bg-red declined white"
-        :class="{'hide_declined': hide}"
-    >
-        <div>
-            <b>Payment declined!</b><br/>
-            Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
-            Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
-        </div>
-        <a @click="hide = true"><i class="fas fa-times"></i></a>
-	</div>
+	<q-banner v-if="declined_payment" class="bg-orange mb-3 white" rounded inline-actions>
+		<q-icon slot="avatar" name="fas fa-ban" size="sm" />
+		<strong>Payment declined</strong><br/>
+		<small>
+			Your last payment on Patreon was declined, your subscription will automatically be cancelled on <strong>{{ makeDate(userInfo.patron.pledge_end) }}</strong>.<br/>
+			Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
+		</small>
+		<template slot="action">
+			<q-btn flat color="white" no-caps icon="fas fa-times" size="sm" padding="sm" @click="hide_declined = true"  />
+		</template>
+	</q-banner>
+	<q-banner v-else-if="pending_payment" class="bg-blue mb-3 white" rounded inline-actions>
+		<q-icon slot="avatar" name="fas fa-sync" size="sm" />
+		<strong>Payment pending</strong><br/>
+		<small>
+			Thanks for your subscription! We're still waiting on data from Patreon, this might take a few minutes.<br/>
+			It might be needed to refresh the page for your subscription to update.
+		</small>
+		<template slot="action">
+			<q-btn flat color="white" no-caps icon="fas fa-times" size="sm" padding="sm" @click="hide_pending = true"  />
+		</template>
+	</q-banner>
 </template>
 
 <script>
-    import { mapGetters } from 'vuex';
-    import { general } from '@/mixins/general.js';
+	import { mapGetters } from 'vuex';
+	import { general } from 'src/mixins/general.js';
 
 	export default {
-        data() {
-            return {
-                hide: false
-            }
-        },
-        mixins: [general],
-        computed: {
-            ...mapGetters([
-                'tier',
-				'userInfo',
-            ])
-        }
+		data() {
+			return {
+				hide_declined: false,
+				hide_pending: false
+			}
+		},
+		mixins: [general],
+		computed: {
+			...mapGetters([
+				'tier',
+				'userInfo'
+			]),
+			declined_payment() {
+				return !this.hide_declined && this.tier && this.userInfo && this.userInfo.patron && this.userInfo.patron.last_charge_status === 'Declined' && new Date(this.userInfo.patron.pledge_end) > new Date();
+			},
+			pending_payment() {
+				return !this.hide_pending && this.userInfo && this.userInfo.patron && this.userInfo.patron.last_charge_status === "Pending";
+			}
+		}
 	};
 </script>
 
 <style lang="scss" scoped>
-    .declined {
-        position: fixed;
-        width: 100%;
-        z-index: 9999;
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
+	.declined {
+		position: fixed;
+		width: 100%;
+		z-index: 9999;
+		padding: 10px;
+		display: flex;
+		justify-content: space-between;
 
-        a {
-            color:$white !important;
-        }
-    }
-    .hide_declined {
-        display:none;
-    }
+		a {
+			color:$neutral-1 !important;
+		}
+	}
 </style>

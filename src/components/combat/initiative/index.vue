@@ -1,23 +1,22 @@
 <template>
 	<div id="container" v-if="width > 576">
-		<!-- <Turns /> -->
 		<Turns 
 			:next="_active[0]"
 		/>
 		<div class="players">
 			<h2 
 				class="componentHeader" :class="{ shadow : setShadowPlayer > 0 }">
-				<span><i class="fas fa-helmet-battle"></i> Players</span>
+				<span><i aria-hidden="true" class="fas fa-helmet-battle"></i> Players</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
 				<Players :players="_players" />
 			</q-scroll-area>
 		</div>
 		<div class="npcs">
 			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
-				<span><i class="fas fa-dragon"></i> NPC's</span>
+				<span><i aria-hidden="true" class="fas fa-dragon"></i> NPC's</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
 				<NPCs :npcs="_npcs" />	
 			</q-scroll-area>
 		</div>
@@ -25,7 +24,7 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadowOverview > 0 }">
 				<span>Active entities</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollOverview">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollOverview">
 				<Overview :active="_active" :idle="_idle" />
 			</q-scroll-area>
 		</div>
@@ -35,9 +34,9 @@
 	<div v-else class="mobile-init">
 		<Turns />
 		
-		<div class="menu bg-gray-dark">
+		<div class="menu bg-neutral-8">
 			<q-select
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-model="panel"
 				:options="panels"
 			>
@@ -47,7 +46,7 @@
 							<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="panels.filter( item => { return item.value === panel })[0].label"/>
+							<q-item-label v-text="panels.filter( item => { return item.value === panel })[0].label"/>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -63,7 +62,7 @@
 							<q-icon :name="scope.opt.icon"/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="scope.opt.label"/>
+							<q-item-label v-text="scope.opt.label"/>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -75,7 +74,7 @@
       animated
       swipeable
       infinite
-      class="transparent-bg"
+      class="bg-neutral-6-transparent"
     >
       <q-tab-panel name="players">
 				<h2>Players</h2>
@@ -99,7 +98,7 @@
 	import _ from 'lodash'
 	import { mapActions, mapGetters } from 'vuex';
 
-	import Turns from '@/components/combat/Turns.vue';
+	import Turns from 'src/components/combat/Turns.vue';
 	import Players from './Players.vue';
 	import NPCs from './NPCs.vue';
 	import Overview from './Overview.vue';
@@ -193,7 +192,7 @@
 #container {
 	padding: 5px;
 	width: 100vw;
-	height: calc(100% - 50px);
+	height: 100%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 60px auto;
@@ -204,7 +203,7 @@
 	position: absolute;
 
 	.q-scrollarea{
-		padding:0 0 15px 0;
+		padding:15px;
 		height: calc(100% - 45px);
 	}
 	
@@ -214,6 +213,7 @@
 		&.componentHeader {
 			padding: 10px 15px !important;
 			margin-bottom: 0 !important;
+			background-color: $neutral-8-transparent;
 
 			&.shadow {
 				box-shadow: 0 0 10px rgba(0,0,0,0.9); 
@@ -221,7 +221,7 @@
 		}
 	}
 	.players, .npcs, .set {
-		background: rgba(38, 38, 38, .8);
+		background: $neutral-6-transparent;
 		overflow: hidden;
 	}
 	.players {
@@ -277,14 +277,6 @@
 		}
 		.menu {
 			grid-area: menu;
-		}
-	}
-	.transparent-bg {
-		background: rgba(38, 38, 38, .8);
-	}
-	ul.entities {
-		li {
-			background-color:$gray-dark !important;
 		}
 	}
 }

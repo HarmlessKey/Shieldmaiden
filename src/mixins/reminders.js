@@ -112,9 +112,10 @@ export const remindersMixin = {
 			}
 
 			//Create buttons for notification
+			let buttons;
 			if(target.reminders[key].action !== 'remove') {
-				notify = target.reminders[key].notify !== undefined ? target.reminders[key].notify : 'Keep reminder?';
-				var buttons = [
+				notify = notify !== undefined ? notify : 'Keep reminder?';
+				buttons = [
 					{ 
 						text: 'Keep Reminder', 
 						action: (toast) => { 
@@ -134,7 +135,6 @@ export const remindersMixin = {
 					},
 				]
 			} else {
-				console.log(target.reminders[key])
 				notify = target.reminders[key].notify !== undefined ? target.reminders[key].notify : 'Reminder removed';
 				buttons = '';
 			}

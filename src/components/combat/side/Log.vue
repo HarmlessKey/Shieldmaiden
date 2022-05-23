@@ -1,114 +1,112 @@
 <template>
-		<div>
-			<template v-if="log">
-				<h2 v-if="!encounter.finished">Combat log</h2>
-				<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
-					<li v-for="(item, key) in log" :key="`item-${key}`">
-						<!-- Metadata -->
-						<div class="d-flex justify-content-between head">
-							<span>
-								Round: {{ item.round }}
-								Turn: {{ item.turn }}
-							</span>
-							{{ item.time }}
-						</div>
+		<div v-if="log">
+			<h2 v-if="!encounter.finished">Combat log</h2>
+			<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
+				<li v-for="(item, key) in log" :key="`item-${key}`">
+					<!-- Metadata -->
+					<div class="d-flex justify-content-between head">
+						<span>
+							Round: {{ item.round }}
+							Turn: {{ item.turn }}
+						</span>
+						{{ item.time }}
+					</div>
 
-						<!-- TOTAL -->
-						<div class="d-flex justify-between">
-							<div>
-								<b :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
-									{{ item.amount }} {{ item.type }}
-								</b>
+					<!-- TOTAL -->
+					<div class="d-flex justify-between">
+						<div>
+							<strong :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
+								{{ item.amount }} {{ item.type }}
+							</strong>
 
-								<!-- OVER -->
-								<span v-if="item.over > 0">
-									- {{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }}
-								</span>
-							</div>
-							<small v-if="item.multiplier && item.multiplier !== 1" class="blue"><b>
-								{{ (item.multiplier === .5) ? "HALVED" : "DOUBLED" }}
-							</b></small>
-						</div>
-
-						<!-- ACTIONS -->
-						<div v-if="item.actions">
-							<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
-								<!-- Manual -->
-								<span v-if="(action.manual || action.request) && action.type === 'damage'">
-									<b>{{ item.by_name.capitalizeEach() }}s</b> {{ item.ability }} did
-								</span>
-
-								<!-- To hit -->
-								<span v-else-if="action.hitOrMiss">
-									<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `s ${item.ability}` : `` }}
-									<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
-										{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
-									</span>
-									<b>{{ item.target_name.capitalizeEach() }}</b> for
-								</span>
-
-								<!-- Saving throw -->
-								<span v-else-if="action.savingThrowResult">
-									<b>{{item.target_name.capitalizeEach() }}</b> had a
-									<span :class="action.savingThrowResult === 'save' ? 'green' : 'red'">
-										{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
-									</span>
-									save {{ item.ability ? `on ${item.ability}` : `` }} and took
-								</span>
-
-								<!-- Healing -->
-								<span v-else-if="action.type === 'healing'">
-									<b>{{item.by_name.capitalizeEach() }}s</b> {{ item.ability }} healed
-									<b>{{item.target_name.capitalizeEach() }}</b> for
-								</span>
-
-								<!-- Damage rolls with no to hit or save -->
-								<span v-else>
-									<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `s ${item.ability}` : `` }}
-									damaged <b>{{ item.target_name.capitalizeEach() }}</b> for
-								</span>
-
-								<!-- Rolls -->
-								<span v-for="(roll, roll_index) in action.rolls" :key="`roll-${key}-${index}-${roll_index}`">
-									<span :class="action.type === 'healing' ? 'green' : roll.damage_type ? roll.damage_type : 'red'">
-										<b>{{ roll.value }}</b> 
-										{{ action.type !== "healing" ? roll.damage_type : "" }}
-									</span>
-									{{ roll_index+1 &lt; action.rolls.length ? "and" : action.type !== "healing" ? "damage" : "healing" }}
-								</span>
-
-								<!-- MANUAL END -->
-								<span v-if="(action.manual || action.request) && action.type === 'damage'">
-									to <b>{{ item.target_name.capitalizeEach() }}</b>
-								</span>
+							<!-- OVER -->
+							<span v-if="item.over > 0">
+								- {{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }}
 							</span>
 						</div>
+						<small v-if="item.multiplier && item.multiplier !== 1" class="blue"><strong>
+							{{ (item.multiplier === .5) ? "HALVED" : "DOUBLED" }}
+						</strong></small>
+					</div>
 
-						<!-- UNDO -->
-						<div class="undo" v-if="key == 0 && !encounter.finished">
-							<a 
-								@click="undo(key, item.amount, item.over, item.target, item.by, item.type)"
-								v-shortkey="['ctrl', 'z']" 
-								@shortkey="undo(key, item.amount, item.over, item.target, item.by, item.type)"
-							>
-								Undo
-								<template v-if="showKeybinds.keyBinds === undefined"> [ctrl] + [z]</template>
-							</a>
-						</div>
-					</li>
-				</transition-group>
-				<p v-else>
-					<b>There is no log yet.</b><br/>
-					Log items are created by doing damage or healing. From this log you can undo mistakes.
-				</p>
-			</template>
+					<!-- ACTIONS -->
+					<div v-if="item.actions">
+						<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
+							<!-- Manual -->
+							<span v-if="(action.manual || action.request) && action.type === 'damage'">
+								<strong>{{ item.by_name.capitalizeEach() }}s</strong> {{ item.ability }} did
+							</span>
+
+							<!-- To hit -->
+							<span v-else-if="action.hitOrMiss">
+								<strong>{{ item.by_name.capitalizeEach() }}</strong>{{ item.ability ? `s ${item.ability}` : `` }}
+								<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
+									{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
+								</span>
+								<strong>{{ item.target_name.capitalizeEach() }}</strong> for
+							</span>
+
+							<!-- Saving throw -->
+							<span v-else-if="action.savingThrowResult">
+								<strong>{{item.target_name.capitalizeEach() }}</strong> had a
+								<span :class="action.savingThrowResult === 'save' ? 'green' : 'red'">
+									{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
+								</span>
+								save {{ item.ability ? `on ${item.ability}` : `` }} and took
+							</span>
+
+							<!-- Healing -->
+							<span v-else-if="action.type === 'healing'">
+								<strong>{{item.by_name.capitalizeEach() }}s</strong> {{ item.ability }} healed
+								<strong>{{item.target_name.capitalizeEach() }}</strong> for
+							</span>
+
+							<!-- Damage rolls with no to hit or save -->
+							<span v-else>
+								<strong>{{ item.by_name.capitalizeEach() }}</strong>{{ item.ability ? `s ${item.ability}` : `` }}
+								damaged <strong>{{ item.target_name.capitalizeEach() }}</strong> for
+							</span>
+
+							<!-- Rolls -->
+							<span v-for="(roll, roll_index) in action.rolls" :key="`roll-${key}-${index}-${roll_index}`">
+								<span :class="action.type === 'healing' ? 'green' : roll.damage_type ? roll.damage_type : 'red'">
+									<strong>{{ roll.value }}</strong> 
+									{{ action.type !== "healing" ? roll.damage_type : "" }}
+								</span>
+								{{ roll_index+1 &lt; action.rolls.length ? "and" : action.type !== "healing" ? "damage" : "healing" }}
+							</span>
+
+							<!-- MANUAL END -->
+							<span v-if="(action.manual || action.request) && action.type === 'damage'">
+								to <strong>{{ item.target_name.capitalizeEach() }}</strong>
+							</span>
+						</span>
+					</div>
+
+					<!-- UNDO -->
+					<div class="undo" v-if="key == 0 && !encounter.finished">
+						<a 
+							class="btn btn-sm bg-red"
+							@click="undo(key, item.amount, item.over, item.target, item.by, item.type)"
+							v-shortkey="['ctrl', 'z']" 
+							@shortkey="undo(key, item.amount, item.over, item.target, item.by, item.type)"
+						>
+							Undo
+							<template v-if="!showKeybinds"> [ctrl] + [z]</template>
+						</a>
+					</div>
+				</li>
+			</transition-group>
+			<p v-else>
+				<strong>There is no log yet.</strong><br/>
+				Log items are created by doing damage or healing. From this log you can undo mistakes.
+			</p>
 		</div>
 </template>
 
 <script>
 	import { mapGetters } from 'vuex';
-	import { setHP } from '@/mixins/HpManipulations.js';
-	import { db } from '@/firebase';
+	import { setHP } from 'src/mixins/HpManipulations.js';
 
 	export default {
 		name: 'Log',
@@ -122,20 +120,16 @@
 				},
 			}
 		},
-		firebase() {
-			return {
-				showKeybinds: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				}
-			}
-		},
 		computed: {
 			...mapGetters([
 				'encounter',
 				'log',
 				'entities',
+				'userSettings',
 			]),
+			showKeybinds() {
+				return (this.userSettings && this.userSettings.general) ? this.userSettings.general.keyBinds : undefined;
+			},
 		},
 		methods: {
 			setLog() {
@@ -143,14 +137,14 @@
 					this.log = this.storageLog
 				}
 			},
-			undo(key, value, over, target, by, type) {
+			async undo(key, value, over, target, by, type) {
 				type = (type == 'damage') ? 'healing' : 'damage';
 				let undo = (over > 0) ? over : true; //Send the over value as undo true/false
 				let doneBy = (by === 'environment') ? this.environment : this.entities[by];
 				let amount = {};
 				amount[type] = value;
 				
-				this.setHP(amount, this.entities[target], doneBy, { undo });
+				await this.setHP(amount, this.entities[target], doneBy, { undo });
 				this.set_log({
 					action: 'unset',
 					value: key
@@ -167,7 +161,7 @@ ul {
 
 	li {
 		padding:10px 3px;
-		border-bottom: solid 1px #494747;
+		border-bottom: solid 1px $neutral-3;
 		position: relative;
 
 		.head {
@@ -185,9 +179,9 @@ ul {
 			display: none;
 
 			a {
-				background:$red;
+				background: $red;
 				text-align: center;
-				color:$white !important;
+				color: $neutral-1 !important;
 				display: block;
 				position: absolute;
 				line-height: 28px;

@@ -2,34 +2,28 @@
 	<div id="actions">
 		<template v-if="selectEntity">
 			<p>Action performed by:</p>
+
 			<q-select 
-				dark filled square dense
-				name="doneBy"
+				:dark="$store.getters.theme === 'dark'" filled square
 				:value="doneBy"
 				:options="_active"
-				v-validate="'required'"
 			>
 				<template v-slot:selected>
 					<q-item v-if="doneBy" class="selected">
 						<q-item-section avatar>
-							<icon 
-								class="img" 
-								v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" 
-								:icon="entitiesList[doneBy].img" 
-								:fill="entitiesList[doneBy].color_label" 
-								:style="entitiesList[doneBy].color_label ? `border-color: ${entitiesList[doneBy].color_label}` : ``" 
-							/>
 							<span 
-								v-else 
 								class="img" 
 								:style="{
 									'background-image': 'url(' + entitiesList[doneBy].img + ')',
-									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
+									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``,
+									'color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
 								}
-							"/>
+							">
+								<i aria-hidden="true" v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" :class="`hki-${entitiesList[doneBy].img}`" />
+							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="entitiesList[doneBy].name.capitalizeEach()"/>
+							<q-item-label v-text="entitiesList[doneBy].name.capitalizeEach()"/>
 						</q-item-section>
 					</q-item>
 					<span v-else>
@@ -45,23 +39,23 @@
 						@click="doneBy = scope.opt.key"
 					>
 						<q-item-section avatar>
-							<icon v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" class="img" :icon="scope.opt.img" :fill="scope.opt.color_label" :style="scope.opt.color_label ? `border-color: ${scope.opt.color_label}` : ``" />
 							<span 
-								v-else 
 								class="img" 
 								:style="{
 									'background-image': 'url(' + scope.opt.img + ')',
-									'border-color': scope.opt.color_label ? scope.opt.color_label : ``
+									'border-color': scope.opt.color_label ? scope.opt.color_label : ``,
+									'color': scope.opt.color_label ? scope.opt.color_label : ``
 								}
-							"/>
+							">
+								<i aria-hidden="true" v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" :class="`hki-${scope.opt.img}`" />
+							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="scope.opt.name.capitalizeEach()"/>
+							<q-item-label v-text="scope.opt.name.capitalizeEach()"/>
 						</q-item-section>
 					</q-item>
 				</template>
 			</q-select>
-			<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
 
 			<div 
 				v-if="doneBy && entitiesList[doneBy].reminders && entitiesList[doneBy].reminders.reaction"
@@ -77,7 +71,7 @@
 			<template #content>
 				<p class="mt-2">
 					On desktop<br/>
-					Hold <b>SHIFT</b> to roll with <span class="green">advantage</span>, <b>CTRL</b> for <span class="red">disadvantage</span>.				
+					Hold <strong>SHIFT</strong> to roll with <span class="green">advantage</span>, <strong>CTRL</strong> for <span class="red">disadvantage</span>.				
 				</p>
 				<span>
 					On touch screens<br/>
@@ -86,54 +80,55 @@
 			</template>
 		</hk-tip>
 
-		<template v-if="doneBy">
+		<template v-if="doneBy && entitiesList[doneBy]">
 			<q-tabs
 				v-model="tab"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				inline-label
 				dense
 				no-caps
-				class="bg-gray-light gray-dark"
+				class="bg-neutral-3 neutral-10"
 			>
 				<q-tab 
 					v-for="({name, icon, label}, index) in tabs"
 					:key="`tab-${index}`" 
 					:name="name" 
 					:icon="icon"
-					:label="label"
-				/>
+					:label="width > 300 ? label : null"
+				>
+					<q-tooltip v-if="width <= 300" anchor="top middle" self="center middle">
+						{{ label }}
+					</q-tooltip>
+				</q-tab>
 			</q-tabs>
-
 			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
 					<Custom v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
 					<template v-if="name === 'roll'">
-						<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
-						<Roll v-else :current="entitiesList[doneBy]" />
+						<Roll :current="entitiesList[doneBy]" />
 					</template>
 					<Spellcasting v-if="name === 'spells'" :current="entitiesList[doneBy]" />
 				</q-tab-panel>
 			</q-tab-panels>
 		</template>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
 <script>
 	import _ from 'lodash';
 	import { mapGetters } from 'vuex';
-	import { setHP } from '@/mixins/HpManipulations.js';
+	import { setHP } from 'src/mixins/HpManipulations.js';
 
-	import Custom from '@/components/combat/actions/custom';
-	import RollDeprecated from '@/components/combat/actions/RollDeprecated.vue';
-	import Roll from '@/components/combat/actions/Roll.vue';
-	import Spellcasting from '@/components/combat/actions/Spellcasting.vue';
-	import { damage_types } from '@/mixins/damageTypes.js';
+	import Custom from 'src/components/combat/actions/custom';
+	import Roll from 'src/components/combat/actions/Roll.vue';
+	import Spellcasting from 'src/components/combat/actions/Spellcasting.vue';
+	import { damage_types } from 'src/mixins/damageTypes.js';
 
 	export default {
-		name: 'Actions',
+		name: "Actions",
 		components: {
 			Custom,
-			RollDeprecated,
 			Roll,
 			Spellcasting
 		},
@@ -149,14 +144,22 @@
 		},
 		data() {
 			return {
-				tabSetter: undefined,
-				doneBySetter: undefined
+				tab: "manual",
+				tabs: [{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }],
+				doneBySetter: undefined,
+				settingsSetter: undefined,
+				width: 0,
 			}
+		},
+		mounted() {
+			this.tab = this.returnTab(this.entitiesList[this.doneBy]);
+			this.tabs = this.returnTabs(this.entitiesList[this.doneBy]);
 		},
 		computed: {
 			...mapGetters([
-				'entities',
-				'targeted',
+				"entities",
+				"targeted",
+				"userSettings"
 			]),
 			_active: function() {
 				let active = _.chain(this.entities)
@@ -164,7 +167,7 @@
 					entity.key = key
 					return !entity.down;
 				})
-				.sortBy('name' , 'asc')
+				.sortBy("name", "asc")
 				.value();
 				active.unshift({
 					key: "environment",
@@ -183,19 +186,6 @@
 				};
 				return list;
 			},
-			tabs() {
-				const current = this.entitiesList[this.doneBy];
-				let tabs = [
-					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }
-				];
-				if(current.special_abilities || current.actions || current.legendary_actions || current.reactions) {
-					tabs.push({ name: "roll", label: "Actions", icon: "fas fa-dice-d20" })
-				}
-				if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
-					tabs.push({ name: "spells", label: "Spells", icon: "fas fa-wand-magic" })
-				}
-				return tabs;
-			},
 			doneBy: {
 				get() {
 					const key = (this.current) ? this.current.key : undefined;
@@ -205,18 +195,47 @@
 					this.doneBySetter = newValue;
 				}
 			},
-			tab: {
+			settings: {
 				get() {
-					const tab = (
-						(this.current && (this.current.entityType === 'player' || 
-						this.current.entityType === 'companion')) || 
-						this.settings.npcDamageTab
-					) ? "manual" : "roll";
-
-					return (this.tabSetter) ? this.tabSetter : tab;
+					const settings = (this.userSettings && this.userSettings.encounter) ? this.userSettings.encounter : {};
+					return (this.settingsSetter) ? this.settingsSetter : settings;
 				},
 				set(newValue) {
-					this.tabSetter = newValue;
+					this.settingsSetter = newValue;
+				}
+			}
+		},
+		methods: {
+			setSize(size) {
+				this.width = size.width;
+			},
+			returnTabs(current) {
+				let tabs = [
+					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }
+				];
+				if(current) {
+					if(current.special_abilities || current.actions || current.legendary_actions || current.reactions) {
+						tabs.push({ name: "roll", label: "Actions", icon: "fas fa-dice-d20" })
+					}
+					if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
+						tabs.push({ name: "spells", label: "Spells", icon: "fas fa-wand-magic" })
+					}
+				}
+				return tabs;
+			},
+			returnTab(current) {
+				return ((current && (["player", "companion", "environment"].includes(current.entityType))) || 
+						this.settings.npcDamageTab
+					) ? "manual" : "roll";
+			}
+		},
+		watch: {
+			doneBy: {
+				deep: true,
+				handler(newVal) {
+					const current = this.entitiesList[newVal];
+					this.tab = this.returnTab(current);
+					this.tabs = this.returnTabs(current);
 				}
 			}
 		}
@@ -249,12 +268,27 @@
 		height: 35px;
 		background-size: cover;
 		background-position: top center;
-		border: solid 1px $gray-light;
+		border: solid 1px $neutral-2;
+		font-size: 27px;
+		line-height: 35px;
+		background-color: $neutral-9;
+		color: $neutral-2;
+		
+		i {
+			vertical-align: 5px !important;
+		}
 	}
 	.reaction-used {
 		font-size: 15px;
 		i {
 			margin: 4px 5px 0 0;
+		}
+	}
+
+	[data-theme="light"] {
+		.img {
+			background-color: $neutral-2;
+			color: $neutral-8;
 		}
 	}
 </style>

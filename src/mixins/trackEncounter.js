@@ -23,7 +23,7 @@ export const trackEncounter = {
 					}
 				} else if (entity.entityType === 'companion') {
 					stats = {
-						ac: parseInt(npc.ac),
+						ac: parseInt(npc.armor_class),
 						bonus: parseInt(camp_data.ac_bonus),
 					}
 				} else {
@@ -38,9 +38,10 @@ export const trackEncounter = {
 		displayImg(entity, player, npc) {
 			//Check what image should be displayed
 			let encounterImg = (entity) ? entity.avatar : undefined; //img linked within the encounter
+			let img;
 
 			if(encounterImg) {
-				var img = encounterImg;
+				img = encounterImg;
 			} else {
 				if(!entity.entityType) {
 					let playerImg = player.avatar;

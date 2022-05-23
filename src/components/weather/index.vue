@@ -1,5 +1,5 @@
 <template>
-	<div class="light" :class="(background && lightning && showWeather) ? `bg-white` : `bg-gray-dark`">
+	<div class="light" :class="(background && lightning && showWeather) ? `bg-white` : `bg-neutral-5`">
 		<div 
 			class="weather-wrapper" 
 			:style="{ backgroundImage: 'url(\'' + background + '\')' }"
@@ -57,19 +57,19 @@ export default {
 				const intensities = ["light", "medium", "heavy"];
 				const index = this.weather.lightning - 1;
 				return intensities[index];	
-			} return false;
+			} return undefined;
 		},
 		thunder_interval() {
 			if(this.weather && this.weather.lightning > 0) {
 				const intervals = [360000, 180000, 60000];
 				const index = this.weather.lightning - 1;
 				return intervals[index];
-			} return false;
+			} return undefined;
 		}
 	},
 	mounted() {
 		if(this.audio && this.weather && this.weather.lightning > 0) {
-			// this.thunder_audio = require("@/assets/_audio/weather/thunder.wav");
+			// this.thunder_audio = require("src/assets/_audio/weather/thunder.wav");
 			this.thunder();
 		}
 	},
@@ -101,17 +101,16 @@ export default {
 			background-position: center top;
 			animation: imagezoom 30s ease-in-out infinite;
 			animation-direction: alternate-reverse;
-			overflow: hidden;
 
 			&.light {
 				animation: lightnings 360s linear infinite;
 				@keyframes lightnings {
 					0% { filter: brightness(1); opacity: 1; background-color: unset; }
 					0.87% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.9% { filter: brightness(2); opacity: .3; background-color:$white; }
+					0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					0.93% { filter: brightness(1); opacity: 1; background-color: unset; }
 					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.99% { filter: brightness(2); opacity: .3; background-color:$white; }
+					0.99% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					1% { filter: brightness(1); opacity: 1; background-color: unset; }
 					100% { filter: brightness(1); opacity: 1; background-color: unset; }
 				}
@@ -121,10 +120,10 @@ export default {
 				@keyframes lightningm {
 					0% { filter: brightness(1); opacity: 1; background-color: unset; }
 					0.85% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.9% { filter: brightness(2); opacity: .3; background-color:$white; }
+					0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
 					1% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1.05% { filter: brightness(2); opacity: .3; background-color:$white; }
+					1.05% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					1.1% { filter: brightness(1); opacity: 1; background-color: unset; }
 					100% { filter: brightness(1); opacity: 1; background-color: unset; }
 				}
@@ -134,10 +133,10 @@ export default {
 				@keyframes lightning {
 					0% { filter: brightness(1); opacity: 1; background-color: unset; }
 					1.8% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1.9% { filter: brightness(2); opacity: .3; background-color:$white; }
+					1.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					2% { filter: brightness(1); opacity: 1; background-color: unset; }
 					2.4% { filter: brightness(1); opacity: 1; background-color: unset; }
-					2.6% { filter: brightness(2); opacity: .3; background-color:$white; }
+					2.6% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					2.9% { filter: brightness(1); opacity: 1; background-color: unset; }
 					100% { filter: brightness(1); opacity: 1; background-color: unset;}
 				}

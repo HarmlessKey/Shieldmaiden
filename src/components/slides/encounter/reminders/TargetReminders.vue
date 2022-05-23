@@ -16,7 +16,7 @@
 
 			<q-tabs
 				v-model="tab"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				inline-label
 				dense
 				no-caps
@@ -38,7 +38,7 @@
 						:class="'bg-'+reminder.color">
 						<div class="title">{{ reminder.title }}</div>
 						<a class="green add" @click="addReminder('premade', reminder)">
-							<i class="fas fa-plus"></i>
+							<i aria-hidden="true" class="fas fa-plus"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Set
 							</q-tooltip>
@@ -46,43 +46,66 @@
 					</li>
 				</ul>
 
-				<template v-if="personalReminders.length > 0">
+				<template v-if="personalReminders">
 					<h3>Personal</h3>
 					<ul class="premade">
 						<li v-for="(reminder, key) in personalReminders" :key="key">
 							<div class="d-flex justify-content-between" :class="'bg-'+reminder.color">
 								<div class="title">{{ reminder.title }}</div>
-								<a class="add" @click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)">
-									<i :class="reminder.variables ? 'fas fa-caret-right gray-light' : 'fas fa-plus green'"></i>
+								<a 
+									class="add" 
+									@click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)"
+									:class="{ open: varOptions === key }"
+								>
+									<i aria-hidden="true" :class="reminder.variables ? 'fas fa-chevron-down' : 'fas fa-plus green'"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Set
 									</q-tooltip>
 								</a>
 							</div>
-							<div v-if="varOptions === key" class="variables">
-								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
-									<q-select 
-										dark filled square dense
-										:label="var_key"
-										:options="variable"
-										type="text" 
-										v-validate="'required'"
-										v-model="selectedVars[var_key]"
-										:name="var_key"
-									/>
-									<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
+							<q-slide-transition>
+								<div v-if="varOptions === key" class="variables">
+									Select variable values
+									<ValidationObserver v-slot="{ valid }">
+										<ValidationProvider 
+											rules="required" 
+											:name="var_key" 
+											v-slot="{ errors, invalid, validated }"
+											v-for="(variable, var_key) in reminder.variables" :key="var_key"
+										>
+											<div class="mb-2">
+												<q-select 
+													:dark="$store.getters.theme === 'dark'" filled square dense
+													:label="var_key"
+													:options="variable"
+													type="text" 
+													v-model="selectedVars[var_key]"
+													:error="invalid && validated"
+													:error-message="errors[0]"
+												/>
+											</div>
+										</ValidationProvider>
+										<a 
+											@click="valid ? addReminder('premade', reminder, selectedVars) : null"
+											:disabled="!valid"
+											class="btn btn-sm btn-clear"
+										>
+											<i aria-hidden="true" class="fas fa-plus green"></i> Add reminder
+										</a>
+									</ValidationObserver>
 								</div>
-								<a @click="addReminder('premade', reminder, selectedVars)" class="gray-light d-block mt-3">
-									<i class="fas fa-plus green"></i> Add reminder
-								</a>
-							</div>
+							</q-slide-transition>
 						</li>
 					</ul>
 				</template>
 				</q-tab-panel>
 				<q-tab-panel name="custom">
-					<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
-					<button class="btn btn-block" @click="addReminder('custom')">Set</button>
+					<ValidationObserver v-slot="{ handleSubmit, valid }">
+						<q-form @submit="handleSubmit(valid ? addReminder('custom') : null)">
+							<reminder-form v-model="customReminder" :variables="false"/>
+							<q-btn color="blue" class="full-width" no-caps type="submit" :disabled="!valid">Set reminder</q-btn>
+						</q-form>
+					</ValidationObserver>
 				</q-tab-panel>
 			</q-tab-panels>
 		</template>
@@ -94,11 +117,10 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import { db } from '@/firebase';
-	import ReminderForm from '@/components/ReminderForm';
-	import { remindersMixin } from '@/mixins/reminders';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import Reminders from '@/components/combat/Reminders.vue';
+	import ReminderForm from 'src/components/ReminderForm';
+	import { remindersMixin } from 'src/mixins/reminders';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import Reminders from 'src/components/combat/Reminders.vue';
 
 	export default {
 		name: 'TargetReminders',
@@ -114,6 +136,7 @@
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
+				personalReminders: undefined,
 				action: 'remove',
 				tab: "premade",
 				tabs: [
@@ -127,27 +150,26 @@
 				selectedVars: {}
 			}
 		},
-		firebase() {
-			return {
-				personalReminders: db.ref(`reminders/${this.userId}`)
-			}
-		},
 		computed: {
 			...mapGetters([
 				'entities',
 				'targeted'
 			]),
-			reminder_targets: function() {
+			reminder_targets() {
 				if (this.data !== undefined && this.data.length > 0)
 					return this.data;
 				return this.targeted;
 			}
 		},
+		async mounted() {
+			this.personalReminders = await this.get_full_reminders();
+		},
 		methods: {
 			...mapActions([
 				'set_targetReminder',
 			]),
-			addReminder(type, reminder = false, selectedVars=undefined) {
+			...mapActions("reminders", ["get_full_reminders"]),
+			async addReminder(type, reminder = false, selectedVars=undefined) {
 				if(type === 'premade') {
 					for(const target of this.reminder_targets) {
 						let key = reminder['.key'] || reminder.key;
@@ -157,7 +179,7 @@
 							reminder.selectedVars = selectedVars;
 						}
 
-						this.set_targetReminder({
+						await this.set_targetReminder({
 							action: 'add',
 							entity: target,
 							key,
@@ -168,30 +190,17 @@
 					}
 				}
 				else if(type === 'custom') {
-					this.validation.validateAll().then((result) => {	
-						if (result) {
-							for(const target of this.reminder_targets) {
-								this.set_targetReminder({
-									action: 'add',
-									entity: target,
-									type: 'custom',
-									reminder: this.customReminder
-								});
-							}
-							this.customReminder = {};
-						}
-					});
+					for(const target of this.reminder_targets) {
+						await this.set_targetReminder({
+							action: 'add',
+							entity: target,
+							type: 'custom',
+							reminder: this.customReminder
+						});
+					}
+					this.tab = "premade";
+					this.customReminder = {};
 				}
-			},
-			setValidation(validate) {
-				this.validation = validate;
-			},
-			removeReminder(key) {
-				this.set_targetReminder({
-					action: 'remove',
-					entity: this.reminder_targets[0],
-					key: key,
-				})
 			},
 			showVariableOptions(key) {
 				this.varOptions = (this.varOptions !== key) ? key : undefined;
@@ -216,7 +225,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
 		}
 	}
 
@@ -225,26 +233,37 @@
 	}
 
 	ul.premade {
-		color:$white;
+		color: $neutral-1;
 		list-style: none;
 		padding: 0;
 
 		li {
 			margin-bottom: 3px;
-			background-color:$gray-dark;
+			background-color: $neutral-9;
 
 			.title {
 				padding: 5px;
 			}
 			a.add {
 				display: block;
-				background:$gray-dark;
+				background: $neutral-9;
 				padding: 5px 0;
 				width: 30px;
 				text-align: center;
+				color: $neutral-1;
+
+				i {
+					transition: transform .2s linear;
+				}
+
+				&.open {
+					i {
+						transform: rotate(180deg);
+					}
+				}
 			}
 			.variables {
-				border-top: solid 3px$gray;
+				border-top: solid 3px $neutral-8;
 				padding: 10px;
 			}
 		}
@@ -254,7 +273,7 @@
 		font-size: 11px;
 
 		a {
-			color:$white !important;
+			color: $neutral-1 !important;
 			position: relative;
 			padding: 3px;
 
@@ -266,7 +285,7 @@
 				.delete {
 					position: absolute;
 					right: 5px;
-					color:$white !important;
+					color: $neutral-1 !important;
 					font-size: 12px;
 					display: inline-block;
 					

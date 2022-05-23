@@ -3,7 +3,7 @@
 		<div class="mb-3" v-if="characters.length > 1">
 			<h5 class="mb-2">Who performs the action?</h5>
 			<q-select 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				name="doneBy"
 				:value="player" 
 				:options="characters"
@@ -12,15 +12,15 @@
 				<template v-slot:selected>
 					<q-item v-if="player" class="selected">
 						<q-item-section avatar>
-							<icon v-if="!players[player].avatar" class="img" icon="player" />
 							<span 
-								v-else 
 								class="img" 
 								:style="{'background-image': 'url(' + players[player].avatar + ')'}
-							"/>
+							">
+								<i aria-hidden="true" v-if="!players[player].avatar" class="hki-player" />
+							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="players[player].character_name"/>
+							<q-item-label v-text="players[player].character_name"/>
 						</q-item-section>
 					</q-item>
 					<span v-else>
@@ -36,15 +36,15 @@
 						@click="player = scope.opt"
 					>
 						<q-item-section avatar>
-							<icon v-if="!players[scope.opt].avatar" class="img" icon="player" />
-							<span 
-								v-else 
+							<span  
 								class="img" 
 								:style="{'background-image': 'url(' + players[scope.opt].avatar + ')'}
-							"/>
+							">
+								<i aria-hidden="true" v-if="!players[scope.opt].avatar" class="hki-player" />
+							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="players[scope.opt].character_name"/>
+							<q-item-label v-text="players[scope.opt].character_name"/>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -53,30 +53,15 @@
 		
 		<h5>Targets</h5>
 		<ul class="targeted">
-			<li v-for="(key) in targeted" :key="`target-${key}`" class="bg-gray-dark">
-				<icon 
-					v-if="displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) === 'monster' || displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) === 'player'" class="img" 
-					:icon="displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id])" 
-					:fill="displayTargeted[key].color_label" :style="displayTargeted[key].color_label ? `border-color: ${displayTargeted[key].color_label}` : ``"
-				/>
-				<div 
-					v-else
-					class="img" 
-					:style="{ 
-						backgroundImage: 'url(\'' + displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) + '\')',
-						'border-color': displayTargeted[key].color_label ? displayTargeted[key].color_label : ''
-					}"
-				/>
+			<li v-for="(key) in targeted" :key="`target-${key}`" class="bg-neutral-9">
+				<Avatar class="img" :entity="displayTargeted[key]" :players="players" :npcs="npcs" />		
 				<div class="name truncate">
-					<template v-if="displayTargeted[key].entityType === 'npc'">
-						<template v-if="displayNPCField('name', displayTargeted[key])">
-							{{ displayTargeted[key].name }}
-						</template>
-						<template v-else>
-							? ? ?
-						</template>
-					</template>
-					<template v-else>{{ players[key].character_name }}</template>
+					<Name 
+						:entity="displayTargeted[key]" 
+						:players="players" 
+						:npcs="npcs" 
+						:npcSettings="npcSettings"
+					/>
 				</div>
 			</li>
 		</ul>
@@ -86,13 +71,17 @@
 
 <script>
 	import DamageHealing from './DamageHealing';
-	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import { trackEncounter } from 'src/mixins/trackEncounter.js';
+	import Avatar from 'src/components/trackCampaign/live/Avatar.vue';
+	import Name from 'src/components/trackCampaign/live/Name.vue';
 
 	export default {
 		name: 'playerRequests',
 		mixins: [trackEncounter],
 		components: {
 			DamageHealing,
+			Avatar,
+			Name
 		},
 		props: [
 		'data',
@@ -140,7 +129,8 @@
 				height: 30px;
 				background-size: cover;
 				background-position: center top;
-				border: solid 1px$white;
+				border: solid 1px $neutral-1;
+				font-size: 21px;
 			}
 			.name {
 				padding: 6px 10px;
@@ -165,7 +155,17 @@
 		height: 35px;
 		background-size: cover;
 		background-position: top center;
-		border: solid 1px $gray-light;
+		border: solid 1px $neutral-1;
+		font-size: 27px;
+		text-align: center;
+		background-color: $neutral-9;
+		color: $neutral-2;
+	}
+	[data-theme="light"] {
+		.img {
+			background-color: $neutral-2;
+			color: $neutral-8;
+		}
 	}
 	
 </style>

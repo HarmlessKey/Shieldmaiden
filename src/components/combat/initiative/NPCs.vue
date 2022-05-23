@@ -1,40 +1,36 @@
 <template>
 	<div>
 		<hk-tip 
-			class="mx-3"
 			value="initiative-decimals" 
-			title="Initiateve decimals" 
+			title="Initiative decimals" 
 			content="Use decimals when multiple entities have the same initiative to change the order."
 		/>
 		
 		<ul class="entities hasImg">
 			<li v-for="(entity, i) in npcs" :key="entity.key">
-				<icon 
-					v-if="['monster', 'player', 'companion'].includes(entity.img)" 
-					class="img pointer" 
-					:icon="entity.img" 
-					:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-				/>
 				<span 
-					v-else class="img pointer" 
+					class="img pointer" 
 					:style="{
 						'background-image': 'url(' + entity.img + ')',
-						'border-color': entity.color_label ? entity.color_label : ``
+						'border-color': entity.color_label ? entity.color_label : ``,
+						'color': entity.color_label ? entity.color_label : ``
 					}"
-				/>
+				>
+					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+				</span>
 				<div class="truncate">
-					<q-checkbox dark v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
+					<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
 				</div>
 				
 				<div class="actions">
-					<a @click="setSlide({show: true, type: 'ViewEntity', data: entity })">
-						<i class="fas fa-info"></i>
+					<a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'combat/ViewEntity', data: entity })">
+						<i aria-hidden="true" class="fas fa-info"></i>
 						<q-tooltip anchor="top middle" self="center middle">
-							SHow info
+							Show info
 						</q-tooltip>
 					</a>
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						type="number" 
 						class="ml-3" 
 						min="0" 
@@ -59,12 +55,12 @@
 
 			</li>
 		</ul>
-		<div class="pl-2 pr-3">
+		<div>
 			<hk-roll 
 				@roll="(selected.length === 0) ? rollAll($event) : rollGroup($event)"
 			>
 				<a class="btn btn-block">
-					<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
+					<i aria-hidden="true" class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
 				</a>
 			</hk-roll>
 		</div>
@@ -73,8 +69,8 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import { dice } from '@/mixins/dice.js';
-	import { general } from '@/mixins/general.js';
+	import { dice } from 'src/mixins/dice.js';
+	import { general } from 'src/mixins/general.js';
 
 	export default {
 		name: 'SetInitiativeNPC',
@@ -123,13 +119,10 @@
 				}
 			},
 			rollGroup(e) {
-				let dex = Infinity
-				let i
-				let key
-				let entity
-				for(i in this.selected) {
-					key = this.selected[i]
-					entity = this.npcs[key]
+				let dex = Infinity;
+				let entity;
+				for(const key of this.selected) {
+					entity = this.npcs[key];
 
 					//Find lowest Dex
 					if(entity.dexterity < dex) {
@@ -147,8 +140,7 @@
 					this.share ? { encounter_id: this.encounterId } : null
 				).total;
 
-				for(let i in this.selected) {
-					key = this.selected[i];
+				for(const key in this.selected) {
 					entity = this.npcs[key];
 					entity.initiative = roll;
 
@@ -157,68 +149,22 @@
 						initiative: entity.initiative
 					});
 				}
-				this.selected = []
+				this.selected = [];
 			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-#container {
-	padding: 10px;
-	width: 100vw;
-	height: calc(100% - 50px);
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-rows: 60px auto;
-	grid-gap: 10px;
-	grid-template-areas: 
-	"turns turns turns"
-	"players npcs set";
-	position: absolute;
-
-	.q-scrollarea{
-		padding:0 0 15px 0;
-		height: calc(100% - 45px);
-	}
-	
-	h2 {
-		padding-left: 10px;
-
-		&.componentHeader {
-			padding: 10px 15px !important;
-			margin-bottom: 0 !important;
-
-			&.shadow {
-				box-shadow: 0 0 10px rgba(0,0,0,0.9); 
-			}
-		}
-	}
-
 	ul.entities {
-		padding:0 15px 0 10px;
+		margin-top: 0;
 
 		li {
-			border: solid 1px transparent;
-			background:$gray-dark;
-
-			&:hover {
-				background: #141414 !important;
-			}
-
-			&.selected {
-				border-color: $blue;
-			}
-			.img {
-				font-size: 20px;
-				line-height: 44px;
-				text-align: center;
-			}
-			.advantage a:hover {
-				color: $green !important;
-			}
-			.disadvantage a:hover {
-				color:$red !important;
+			padding-right: 3px;
+			
+			.actions {
+				align-items: center;
+				padding: 0;
 			}
 		}
 	}
@@ -228,23 +174,4 @@
 	.disadvantage .btn:hover {
 		background-color:$red;
 	}
-}
-.initiative-move {
-  transition: transform .5s;
-}
-@media only screen and (max-width: 600px) {
-	#container {
-		grid-template-columns: auto;
-		grid-template-rows: 60px 1fr 1fr 1fr;
-		grid-gap: 10px;
-		grid-template-areas:
-		"turns"
-		"players"
-		"npcs"
-		"set";
-	}
-	.players, .npcs, .set, .q-scrollarea {
-		overflow: visible !important;
-	}
-}
 </style>

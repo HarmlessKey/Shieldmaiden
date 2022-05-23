@@ -1,17 +1,23 @@
 {
-  "name": "dnd_combat_emulator",
-  "version": "0.1.0",
+  "version": "2.3.0",
+  "name": "harmless_key",
+  "description": "A Dungeons and Dragons Combat Tracker",
+  "productName": "Harmless Key",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": "quasar dev",
+    "ssr": "quasar dev -m ssr",
+    "build": "quasar build -m ssr",
+    "lint": "eslint --ext .js,.vue ./",
+    "test": "echo \"No test specified\" && exit 0",
+    "docker-build": "docker build -t harmlesskey/harmlesskey .",
+    "docker-push": "docker push harmlesskey/harmlesskey:latest",
+    "docker-run": "docker run -p 8081:80 -d --name Harmlesskey harmlesskey/harmlesskey"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.13",
-    "@fortawesome/free-solid-svg-icons": "^5.7.0",
-    "@fortawesome/vue-fontawesome": "^0.1.5",
     "@quasar/extras": "^1.0.0",
+    "ajv": "^8.10.0",
+    "ajv-formats": "^2.1.1",
     "@tiptap/extension-table": "^2.0.0-beta.25",
     "@tiptap/extension-table-cell": "^2.0.0-beta.13",
     "@tiptap/extension-table-header": "^2.0.0-beta.15",
@@ -20,70 +26,49 @@
     "@tiptap/starter-kit": "^2.0.0-beta.82",
     "@tiptap/vue-2": "^2.0.0-beta.39",
     "animate.css": "^4.1.1",
-    "axios": "^0.21.1",
-    "firebase": "^5.8.6",
+    "axios": "^0.21.4",
+    "core-js": "^3.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "firebase": "^8.0.0",
+    "helmet": "^5.0.2",
+    "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
-    "node": "^11.0.0",
     "quasar": "^1.0.0",
-    "register-service-worker": "^1.7.1",
-    "vee-validate": "^2.1.0-beta.11",
-    "vue": "^2.5.17",
+    "vee-validate": "^3.4.14",
     "vue-analytics": "^5.22.1",
-    "vue-cookies": "^1.5.7",
-    "vue-markdown": "^2.2.4",
-    "vue-meta": "^2.4.0",
-    "vue-numeral-filter": "^1.1.1",
-    "vue-qr": "^1.5.3",
-    "vue-router": "^3.0.1",
-    "vue-shortkey": "^3.1.6",
+    "vue-cookies": "^1.7.4",
+    "vue-numeral-filter": "^2.2.0",
+    "vue-qr": "^3.2.4",
+    "vue-shortkey": "^3.1.7",
     "vue-snotify": "^3.2.1",
-    "vuebar": "0.0.20",
+    "vue2-flip-countdown": "^0.12.1",
     "vuefire": "^1.4.5",
-    "vuex": "^3.0.1",
-    "workbox-sw": "^6.0.2"
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^5.7.0",
-    "@fortawesome/fontawesome-pro": "^5.13.1",
-    "@vue/cli-plugin-babel": "^3.0.5",
-    "@vue/cli-plugin-eslint": "^3.0.5",
-    "@vue/cli-plugin-pwa": "^4.5.10",
-    "@vue/cli-service": "^4.5.9",
-    "babel-plugin-transform-imports": "1.5.0",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^8.0.0",
-    "style-loader": "^0.23.1",
-    "vue-cli-plugin-quasar": "~2.0.2",
-    "vue-template-compiler": "^2.5.17"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "rules": {
-      "no-console": "off"
-    },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
+    "@quasar/app": "^2.3.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^7.21.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-vue": "^7.7.0",
+    "eslint-webpack-plugin": "^2.4.0",
+    "workbox-webpack-plugin": "^5.1.4"
   },
   "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
   ],
   "engines": {
-    "node": "8.10.0",
-    "npm": "6.4.1"
+    "node": ">= 10.18.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
   }
 }

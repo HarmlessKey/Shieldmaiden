@@ -2,7 +2,6 @@
 	<div class="container-fluid" :class="{'p-4': $route.path === '/admin/patrons/new'}" v-if="patron">
 		
 		<template v-if="$route.path === '/admin/patrons/new'">
-			<Crumble />
 			<h1>New Patron</h1>
 		</template>
 
@@ -10,7 +9,7 @@
 			<div class="col-12 col-md-4">
 				<template v-if="$route.path === '/admin/patrons/new'">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Patron ID"
 						autocomplete="off" 
 						id="patron_id"
@@ -26,7 +25,7 @@
 
 				<label for="email" class="mt-4">Email</label>
 				<q-input 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="Patron ID"
 					autocomplete="off" 
 					type="text"
@@ -72,18 +71,11 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
+	import { db } from 'src/firebase'
 
 	export default {
 		name: 'NewPatron',
 		props: ["editPatron"],
-		components: {
-			Crumble,
-		},
-		metaInfo: {
-			title: 'Admin | New Patron'
-		},
 		firebase() {
 			return {
 				tiers: {
@@ -119,8 +111,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-
-
-</style>

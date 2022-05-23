@@ -1,11 +1,11 @@
 <template>
-	<div id="targeted">
+	<div id="targeted" class="bg-neutral-6-transparent">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 
 			<div class="d-flex justify-content-between">
-				<span><i class="fas fa-crosshairs"></i> Targeted</span>
+				<span><i aria-hidden="true" class="fas fa-crosshairs"></i> Targeted</span>
 				<a v-if="targeted.length > 0" @click="set_targeted({type: 'untarget', key: 'all'})">
-					<i class="fas fa-times red"></i>
+					<i aria-hidden="true" class="fas fa-times red"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Untarget all
 					</q-tooltip>
@@ -16,14 +16,14 @@
 			<div class="options d-flex justify-content-between" v-if="target">
 				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing' })"
 					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing' })">
-					<span class="icon"><i class="fas fa-swords"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-swords"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[d] Do damage / healing
 					</q-tooltip>
 				</a>
 				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions'})">
-					<span class="icon"><i class="fas fa-flame"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-flame"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[c] Conditions
 					</q-tooltip>
@@ -31,7 +31,7 @@
 				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 				>
-					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-stopwatch"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[m] Reminders
 					</q-tooltip>
@@ -39,7 +39,7 @@
 				<a @click="setSlide({show: true, type: 'slides/Transform', data: target })"
 					v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: target })"
 				>
-					<span class="icon"><i class="fas fa-paw-claws"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-paw-claws"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[t] Transform
 					</q-tooltip>
@@ -48,7 +48,7 @@
 				<a @click="setHidden()"
 					v-shortkey="['h']" @shortkey="setHidden()"
 				>
-					<span class="icon"><i class="fas fa-eye"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-eye"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[h] Hide
 					</q-tooltip>
@@ -58,7 +58,7 @@
 					@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })" 
 					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 				>
-					<span class="icon"><i class="fas fa-pencil"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-pencil"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[e] Edit
 					</q-tooltip>
@@ -70,7 +70,7 @@
 				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
 					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
 				>
-					<span class="icon"><i class="fas fa-swords"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-swords"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[d] Do damage / healing
 					</q-tooltip>
@@ -79,7 +79,7 @@
 					@click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 				>
-					<span class="icon"><i class="fas fa-flame"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-flame"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[c] Conditions
 					</q-tooltip>
@@ -88,7 +88,7 @@
 					@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
 					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
 				>
-					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-stopwatch"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[m] Reminders
 					</q-tooltip>
@@ -97,7 +97,7 @@
 				<a @click="setHidden()"
 					v-shortkey="['h']" @shortkey="setHidden()"
 				>
-					<span class="icon"><i class="fas fa-eye"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-eye"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[h] Hide
 					</q-tooltip>
@@ -107,14 +107,14 @@
 					@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })" 
 					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 				>
-					<span class="icon"><i class="fas fa-pencil"></i></span>
+					<span class="icon"><i aria-hidden="true" class="fas fa-pencil"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[e] Edit
 					</q-tooltip>
 				</a>
 			</div>
 		</h2>
-		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
 			<div class="current">
 				<!-- SINGLE TARGET -->
 				<template v-if="targeted.length === 1">
@@ -126,8 +126,8 @@
 					<div v-for="key in targeted" :key="`target-${key}`" class="target">
 						<div class="health">
 							<TargetItem :item="key" />
-							<a class="clear bg-gray-dark" @click="set_targeted({type: 'untarget', key})">
-								<i class="fas fa-times red"></i>
+							<a class="clear" @click="set_targeted({type: 'untarget', key})">
+								<i aria-hidden="true" class="fas fa-times red"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Untarget
 								</q-tooltip>
@@ -156,8 +156,8 @@
 										} : null"
 									>
 										<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
-										<div class="mod bg-gray-dark">
-											{{ modifier(entities[key][ability]) }}
+										<div class="mod bg-neutral-8">
+											{{ modifier(entities[key][ability]) > 0 ? `+${modifier(entities[key][ability])}` : modifier(entities[key][ability]) }}
 										</div>
 									</hk-roll>
 									<hk-roll
@@ -175,7 +175,7 @@
 											entity_key: key
 										} : null"
 									>
-										<div class="mod bg-gray-dark">
+										<div class="mod bg-neutral-8">
 											{{ savingThrow(entities[key], ability) }}
 										</div>
 									</hk-roll>
@@ -186,11 +186,11 @@
 				</template>
 				<div v-else class="noTargetInfo">
 					<h3 class="red">No target selected</h3>
-					<p> Select at least 1 target from the target list to perform targeted actions.</p>
+					<p>Select at least 1 target from the target list to perform targeted actions.</p>
 
-					<p><b>Selecing a target</b><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
-					<p><b>Multi-targeting</b><br/>Hold down shift and click on multiple entities to target them all at once.</p>
-					<p><b>Cycle through targets</b><br/>Use the up and down arrow keys on your keyboard to cycle through the targets. Hold shift to select multiple targets in a row.</p>
+					<p><strong>Selecing a target</strong><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
+					<p><strong>Multi-targeting</strong><br/>Hold down shift and click on multiple entities to target them all at once.</p>
+					<p><strong>Cycle through targets</strong><br/>Use the up and down arrow keys on your keyboard to cycle through the targets. Hold shift to select multiple targets in a row.</p>
 				</div>
 			</div>
 		</q-scroll-area>
@@ -199,11 +199,11 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex'
-	import { dice } from '@/mixins/dice.js';
-	import { abilities } from '@/mixins/abilities.js';
-	import TargetItem from '@/components/combat/TargetItem.vue';
-	import TargetInfo from '@/components/combat/TargetInfo.vue';
-	import { experience } from '@/mixins/experience.js';
+	import { dice } from 'src/mixins/dice.js';
+	import { abilities } from 'src/mixins/abilities.js';
+	import TargetItem from 'src/components/combat/TargetItem.vue';
+	import TargetInfo from 'src/components/combat/TargetInfo.vue';
+	import { experience } from 'src/mixins/experience.js';
 	
 
 	export default {
@@ -229,10 +229,8 @@
 			shares() {
 				return this.broadcast.shares || [];
 			},
-			target: function() {
-				if(this.targeted.length === 1) {
-					return this.entities[this.targeted[0]];
-				}
+			target() {
+				return (this.targeted.length === 1) ? this.entities[this.targeted[0]] : undefined;
 			},
 			death_fails() {
 				let fails = 0;
@@ -249,44 +247,10 @@
 				'set_targeted',
 				'setSlide',
 				'set_save',
-				'set_dead',
 				'set_stable',
 				'set_targetReminder',
 				'set_hidden'
 			]),
-			showCondition(show) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'condition',
-					condition: show,
-					entity: this.target
-				})
-			},
-			edit(key, entityType) {
-				let editType = undefined;
-				switch(entityType) {
-					case 'player':
-						editType = 'slides/EditPlayer';
-						break;
-					case 'companion':
-						editType = 'slides/encounter/EditCompanion';
-						break;
-					case 'npc':
-						editType = 'slides/encounter/EditNpc';
-						break;
-				}
-
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: editType,
-					data: {
-						key: key,
-						location: 'encounter'
-					}
-				})
-			},
 			setHidden() {
 				for(const key of this.targeted) {
 					this.set_hidden({
@@ -294,10 +258,6 @@
 						hidden: !this.entities[key].hidden
 					});
 				}
-			},
-			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollPosition;
@@ -309,13 +269,6 @@
 					index
 				})
 			},
-			kill_revive(action) {
-				this.set_dead({
-					key: this.target.key,
-					action: action,
-					revive: true
-				})
-			},
 			stabilize() {
 				this.set_stable({
 					key: this.target.key,
@@ -324,7 +277,7 @@
 			},
 			displayStats(target) {
 				var stats = '';
-				if(target.transformed == true) {
+				if(target.transformed) {
 					stats = {
 						ac: target.transformedAc,
 						maxHp: target.transformedMaxHp,
@@ -341,8 +294,7 @@
 				return stats
 			},
 			modifier(score) {
-				let mod = Math.floor((score - 10) / 2);
-				return (mod > 0) ? `+${mod}` : mod;
+				return Math.floor((score - 10) / 2);
 			},
 			savingThrow(entity, ability) {
 				let proficiency;
@@ -362,7 +314,6 @@
 
 <style lang="scss" scoped>
 #targeted {
-	background: rgba(38, 38, 38, .9);
 	grid-area: targeted;
 	overflow: hidden;
 	
@@ -380,6 +331,9 @@
 	h2.componentHeader {
 		padding: 10px 15px 10px 10px !important;
 		margin-bottom: 0 !important;
+		line-height: 31px;
+		background-color: $neutral-8-transparent;
+		font-size: 18px;
 
 		&.shadow {
 			box-shadow: 0 0 10px rgba(0,0,0,0.9); 
@@ -393,7 +347,7 @@
 		grid-template-columns: 1fr 35px;
 		grid-template-rows: 35px;
 		grid-gap: 0;
-		background:$gray-dark;
+		background: $neutral-8;
 
 		.clear {
 			display: block;
@@ -406,7 +360,9 @@
 	}
 	.target {
 		margin-bottom: 10px;
-		border: solid 1px$gray-dark;
+		border: solid 1px $neutral-5;
+		border-radius: $border-radius-small;
+		background-color: $neutral-6;
 		
 		.scores {
 			width: 100%;
@@ -428,12 +384,12 @@
 					margin-top: 1px;
 				}
 				.advantage .mod:hover {
-					color:$white;
+					color: $neutral-1;
 					background-color: $green !important;
 				}
 				.disadvantage .mod:hover {
-					color:$white;
-					background-color:$red !important;
+					color: $neutral-1;
+					background-color: $red !important;
 				}
 			}
 		}
@@ -442,18 +398,19 @@
 		margin: 20px -3px 0 -3px;
 
 		a {
-			background-color: $gray-light;
+			background-color: $neutral-3;
 			margin: 0 3px;
 			display: block;
 			width: 100%;
 			text-align: center;
-			color:$gray-dark !important;
+			color: $neutral-10 !important;
 			line-height: 35px;
 			font-size: 15px;
+			border-radius: $border-radius-small;
 
 			&:hover {
-				background:$gray-hover;
-				color:$white !important;
+				background: $neutral-4;
+				color: $neutral-2 !important;
 			}
 		}
 	}
@@ -471,9 +428,9 @@
 			height: 30px;
 			line-height: 26px;
 			text-align: center;
-			fill:$red;
-			color:$red;
-			background-color:$gray-active;
+			fill: $red;
+			color: $red;
+			background-color: $neutral-7;
 			padding: 2px;
 			cursor: pointer;
 		}

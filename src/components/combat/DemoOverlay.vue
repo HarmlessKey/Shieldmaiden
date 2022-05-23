@@ -4,16 +4,16 @@
 			enter-active-class="animated animate__slideInBottom" 
 			leave-active-class="animated animate__slideOutBottom"
 		>
-			<div class="grid bg-gray-dark" :class="{ hide: !showInfo }">
+			<div class="grid bg-neutral-8" :class="{ hide: !showInfo }">
 				<div class="">
 					<h3>
-						Demo Encounter 
-						<a @click="reload">
-							<i class="far fa-sync-alt"></i>
+						<a class="btn btn-sm bg-neutral-5" @click="reset_demo()">
+							<i aria-hidden="true" class="far fa-sync-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Reset
 							</q-tooltip>
 						</a>
+						Demo Encounter 
 					</h3>
 					This demo encounter has all the functionality our encounter tracker has. If you create an account you can make your own encounters and run them just like this, but with your custom content.<br/>
 					Create your personal account now and run your D&D encounters smoother than ever.
@@ -24,13 +24,15 @@
 			</div>
 		</transition>
 		<div class="toggle bg-blue" @click="showInfo = !showInfo">
-			<i class="fas fa-times" v-if="showInfo"></i>
-			<i class="fas fa-chevron-up" v-else></i>
+			<i aria-hidden="true" class="fas fa-times" v-if="showInfo"></i>
+			<i aria-hidden="true" class="fas fa-chevron-up" v-else></i>
 		</div>
 	</div>
 </template>
 
 <script>
+	import  { mapActions } from "vuex";
+
 	export default {
 		name: 'DemoOverlay',
 		data () {
@@ -39,9 +41,7 @@
 			}
 		},
 		methods: {
-			reload() {
-				this.$router.go();
-			}
+			...mapActions(["reset_demo"])
 		}		
 	}
 </script>
@@ -60,7 +60,7 @@
 		grid-template-columns: 1fr max-content;
 		grid-template-rows: max-content;
 		padding: 20px;
-		box-shadow: 0px 0px 15px$black;
+		box-shadow: 0px 0px 15px $black;
 		transition: bottom .5s linear;
 		grid-gap: 20px;
 
@@ -83,7 +83,7 @@
         display: block;
         cursor: pointer;
         line-height: 50px;
-        color:$white !important;
+        color:$neutral-1 !important;
 
         i {
             transition: transform .5s linear;

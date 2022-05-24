@@ -195,7 +195,7 @@
 	import { abilities } from "src/mixins/abilities.js";
 	import { dice } from "src/mixins/dice.js";
 	import { mapActions } from "vuex";
-import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
+import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
 
 	export default {
   components: { hkAnimatedInteger },

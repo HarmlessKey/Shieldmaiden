@@ -203,6 +203,7 @@ const user_actions = {
 		
 		count.campaigns = rootGetters["campaigns/campaign_count"];
 		count.players = rootGetters["players/player_count"];
+		count.characters = rootGetters["characters/character_count"];
 		count.npcs = rootGetters["npcs/npc_count"];
 		count.items = rootGetters["items/item_count"];
 		count.reminders = rootGetters["reminders/reminder_count"];
@@ -238,7 +239,8 @@ const user_actions = {
 				count.npcs > benefits.npcs ||
 				count.items > benefits.items ||
 				count.reminders > benefits.reminders ||
-				count.players > benefits.players
+				count.players > benefits.players ||
+				count.characters > benefits.characters
 			);
 			commit("SET_SLOTS_USED", { available_slots, used_slots });
 		}

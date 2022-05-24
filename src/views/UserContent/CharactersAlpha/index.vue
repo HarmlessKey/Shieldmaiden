@@ -1,138 +1,130 @@
 <template>
-	<div class="content">
-		<h1>Your characters</h1>
+	<hk-card>
+		<ContentHeader type="characters" @add="addCharacter" />
 
-		<template v-if="characters">
-			<h2 class="mt-3 d-flex justify-content-between">
-				<span>Characters</span>
-				<a @click="addCharacter">
-					<i class="fas fa-plus green" aria-hidden="true"/> New Character
-				</a>
-			</h2>
-			
-			<hk-table
-				:columns="columns"
-				:items="_characters"
-				:search="['character_name', 'campaign_name']"
-			>
-				<template slot="avatar" slot-scope="data">
-					<div class="image" v-if="data.row.general.avatar" :style="{ backgroundImage: 'url(\'' + data.row.general.avatar + '\')' }"></div>
-					<img v-else class="image" src="src/assets/_img/styles/player.svg" alt="Player icon" />
-				</template>
-
-				<template slot="character_name" slot-scope="data">
-					<router-link class="mx-2" :to="`${$route.path}/${data.row['.key']}`">
-						{{ data.row.general.character_name }}
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit
-						</q-tooltip>
-					</router-link>
-				</template>
-
-				<template slot="level" slot-scope="data">
-					{{ data.row.general.level }}
-				</template>
-
-				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" :to="`${$route.path}/${data.row['.key']}`">
-						<i class="fas fa-pencil" aria-hidden="true"/>
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit
-						</q-tooltip>
-					</router-link>
-					<a class="gray-hover" @click="confirmDelete(data.row['.key'], data.row.general)">
-							<i class="fas fa-trash-alt" aria-hidden="true"/>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-					</a>
-				</div>
-			</hk-table>
-		</template>
-	</div>
+		<div class="card-body">
+			<template v-if="characters">	
+				<q-table
+					:data="characters"
+					:columns="columns"
+					row-key="key"
+					card-class="bg-none"
+					flat
+					:dark="$store.getters.theme !== 'light'"
+					:loading="loading_characters"
+					separator="none"
+					:pagination="{ rowsPerPage: 15 }"
+					wrap-cells
+				>	
+					<template v-slot:body-cell="props">
+						<q-td 
+							v-if="props.col.name === 'avatar'" 
+							class="avatar"
+							:style="props.value ? `background-image: url('${props.value}')` : ''"
+						>
+							<i aria-hidden="true" v-if="!props.value" class="hki-player" />
+						</q-td>
+						<q-td v-else-if="props.col.name !== 'actions'">
+							<div  class="truncate-cell">
+								<div class="truncate">
+									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+										{{ props.row.character_name }}
+									</router-link>
+									<template v-else>
+										{{ props.row.character_name }}
+									</template>
+								</div>
+							</div>
+						</q-td>
+						<q-td v-else class="text-right d-flex justify-content-between">
+							<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+								<i aria-hidden="true" class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
+							</router-link>
+							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row.general)">
+								<i aria-hidden="true" class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Delete
+								</q-tooltip>
+							</a>
+						</q-td>
+					</template>
+					<div slot="no-data" />
+					<hk-loader slot="loading" name="characters" />
+				</q-table>
+			</template>
+		</div>
+	</hk-card>
 </template>
 
 <script>
 	import _ from 'lodash';
 	import { db } from 'src/firebase';
 	import { experience } from 'src/mixins/experience.js';
+	import { mapGetters, mapActions } from "vuex";
+	import ContentHeader from "src/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Characters',
 		mixins: [experience],
+		components: {
+			ContentHeader
+		},
 		metaInfo: {
 			title: 'Characters Alpha'
 		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
-				columns: {
-					avatar: {
-						width: 46,
-						noPadding: true
+				loading_characters: true,
+				columns: [
+					{
+						name: "avatar",
+						label: "",
+						field: "avatar",
+						align: "left"
 					},
-					character_name: {
-						label: 'Character Name',
-						truncate: true,
+					{
+						name: "name",
+						label: "Name",
+						field: "character_name",
 						sortable: true,
+						align: "left"
 					},
-					level: {
-						label: 'Level',
-						// center: true,
-						// sortable: true,
-					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true,
-						maxContent: true
+					{
+						name: "actions",
+						label: "",
+						align: "right"
 					}
-				}
-			}
-		},
-		firebase() {
-			return {
-				characters: db.ref(`characters_base/${this.userId}`)
+				]
 			}
 		},
 		computed: {
-			_characters: function() {
-				return _.chain(this.characters)
-				.filter(function(character) {
-					return character;
-				})
-				.orderBy("character_name", 'asc')
-				.value()
-			}
+			...mapGetters([
+				'tier',
+				'overencumbered',
+			]),
+			...mapGetters("characters", ["characters"])
+		},
+		async mounted() {
+			await this.get_characters();
+			this.loading_characters = false;
 		},
 		methods: {
-			addCharacter() {
-				const character_base = {
-					general: {
-						character_name: "Unnamed Character",
-						advancement: "milestone",
-						hit_point_type: "fixed"
-					},
-					class: {
-						classes: {
-							0: {
-								level: 1
-							}
-						}
-					}
-				}
-
-				//Add if not overencumbered
-				if(!this.overencumbered) {
-					db.ref(`characters_base/${this.userId}`).push(character_base).then(res => {
-						//Returns the key of the added entry
-						const key = res.getKey();
-
-						this.$router.replace(`${this.$route.path}/${key}`)
+			...mapActions("characters", ["get_characters", "add_character", "delete_character"]),
+			async addCharacter() {
+				await this.add_character().then(key => {
+					this.$router.replace(`${this.$route.path}/${key}`);
+				}).catch(error => {
+					this.$snotify.error('Couldn\'t create character.', 'Save failed', {
+						position: "rightTop"
 					});
-				}
+					console.error(error);
+				});
 			},
-			confirmDelete(key, character) {
+			confirmDelete(e, key, character) {
 				this.$snotify.error('Are you sure you want to delete ' + character.character_name + '?', 'Delete character', {
 					timeout: false,
 					buttons: [
@@ -159,22 +151,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	.container-fluid {
-		h2 {
-			border-bottom: solid 1px $neutral-2;
-			padding-bottom: 10px;
-
-			a {
-				text-transform: none;
-				color: $neutral-2 !important;
-
-				&:hover {
-					text-decoration: none;
-				}
-			}
-		}
-	}
-
-</style>

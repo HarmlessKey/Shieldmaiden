@@ -1,71 +1,17 @@
 <template>
 	<div v-if="base_values">
-		<div v-if="base_values.general && !base_values.general.build" class="build-type">
-			<h3>How do you want to do this?</h3>
-			<div class="types">
-				<hk-card class="pointer" header="Advanced" @click="build = 'advanced'" :class="{ active: build === 'advanced' }">
-					<p>Create a complete character sheet that you can use as a player in your games.</p>
-					<div @click="build = 'advanced'" class="card-footer" slot="footer">
-						<a>Select</a>
-					</div>
-				</hk-card>
-				<hk-card class="pointer" header="Simple" @click="build = 'simple'" :class="{ active: build === 'simple' }">
-					<p>
-						Create a character with only basic stats needed for use in Harmless Key. 
-						This can't be used as a full character reference in your games, 
-						but just works for our combat tracker.
-					</p>
-					<div @click="build = 'simple'" class="card-footer" slot="footer">
-						<a>Select</a>
-					</div>
-				</hk-card>
-				<hk-card class="disabled" header="Import">
-					<p>(Coming soon)</p>
-					<p>
-						Import a character from DnDBeyond. 
-						Copy your character sheet over, 
-						so it can be used in our combat tracker.
-					</p>
-					<div class="card-footer" slot="footer">
-						<a class="disabled">Select</a>
-					</div>
-				</hk-card>
-			</div>
-			<div class="d-flex justify-content-center mt-5">
-				<a class="btn btn-lg" @click="setBuildType('advanced')">Create {{ build }} character</a>
-			</div>
-		</div>
+
 
 		<div 
-			v-else-if="base_values.general && base_values.general.build === 'advanced'"
 			class="content"
 			:class="{
 				medium: width <= 1100 && width > 576,
 				small: width <= 576
 			}"
 		>
-			<div class="tabs">
-				<router-link to="/characters-alpha">
-				<i class="fas fa-chevron-left mr-1" aria-hidden="true" />
-					Back
-				</router-link>
-				<q-tabs
-					v-model="current_tab"
-					dark
-					align="left"
-					no-caps
-				>
-					<q-tab 
-						v-for="({value, label}, i) in tabs" 
-						:name="value"
-						:label="label"
-						:key="`tab-${i}`"
-					/>
-				</q-tabs>
-			</div>
 			<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
 				<div class="tab-content" v-if="base_values.class">
-					<General 
+					<!-- <General 
 						v-if="current_tab === 'general'"
 						:general="base_values.general" 
 						:character_class="base_values.class"
@@ -110,7 +56,7 @@
 						:modifiers="equipment_modifiers"
 						:proficiencies="computed_values.sheet.proficiencies"
 						@change="compute"
-					/>
+					/> -->
 				</div>
 			</q-scroll-area>
 			<Computed 
@@ -133,11 +79,11 @@
 	import { mapGetters, mapActions } from "vuex";
 	import { db } from "src/firebase";
 	import Computed from "src/components/characters/computed";
-	import General from "src/components/characters/general";
-	import Race from "src/components/characters/race";
-	import Class from "src/components/characters/class";
-	import Abilities from "src/components/characters/abilities";
-	import Equipment from "src/components/characters/equipment";
+	// import General from "src/components/characters/general";
+	// import Race from "src/components/characters/race";
+	// import Class from "src/components/characters/class";
+	// import Abilities from "src/components/characters/abilities";
+	// import Equipment from "src/components/characters/equipment";
 	
 	export default {
 		name: "EditCharacter",
@@ -147,29 +93,18 @@
 		mixins: [characterMixin, experience, general, dice, spellSlots, skills],
 		components: {
 			Computed,
-			General,
-			Race,
-			Class,
-			Abilities,
-			Equipment
+			// General,
+			// Race,
+			// Class,
+			// Abilities,
+			// Equipment
 		},
 		data() {
 			return {
 				playerId: this.$route.params.id,
 				advantage_disadvantage: {},
 				base_values: {},
-				width: 0,
-				build: "advanced",
-				tabs: [
-					{ value: "general", label: "General" },
-					{ value: "race", label: "Race" },
-					{ value: "class", label: "Class" },
-					{ value: "abilities", label: "Abilities" },
-					{ value: "equipment", label: "Equipment" },
-					{ value: "actions", label: "Actions" },
-					{ value: "background", label: "Background" },
-				],
-				current_tab: "general"
+				width: 0
 			}
 		},
 		async beforeMount() {
@@ -200,7 +135,8 @@
 			...mapGetters([
 				"tier",
 				"players",
-				"overencumbered",
+			]),
+			...mapGetters("characters", [
 				"characters",
 				"computed_characters",
 				"get_character",
@@ -238,15 +174,12 @@
 			}
 		},
 		methods: {
-			...mapActions([
+			...mapActions("characters", [
 				"set_character",
 				"set_computed_character"
 			]),
 			setSize(size) {
 				this.width = size.width;
-			},
-			setBuild(type) {
-				this.build = type;
 			},
 			setBuildType() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/build`).set(this.build);

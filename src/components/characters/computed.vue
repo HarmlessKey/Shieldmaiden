@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<div class="computed" :class="{ show: showOverview }">
+	<hk-card :header="character_name">
+		<div class="computed">
 			<q-circular-progress
 				show-value
 				class="q-ma-md"
@@ -11,16 +11,12 @@
 				track-color="positive"
 			>
 				<q-avatar size="118px">
-					<div 
-						class="image"
-						:style="[
-							avatar ? { backgroundImage: 'url(\'' + avatar + '\')' } : 
-							{ backgroundImage: `url(${require('src/assets/_img/styles/player.svg')})`}
-						]"
-					/>
+					<div class="image">
+						<i class="hki-player" aria-hidden="true" />
+					</div>
 				</q-avatar>
 			</q-circular-progress>
-			<div class="general">
+			<div class="general" v-if="character.display">
 				<h4>{{ character_name || "Unnamed Character" }}</h4>
 				Level {{ character.display.level }} &bull; {{ race ? race.race_name : "" }}
 				<template v-if="character.sheet && character.sheet.classes">
@@ -35,68 +31,71 @@
 				</template>
 			</div>
 
-			<hr>
-			
-			<div class="stats">
-				<div class="armor_class" v-if="character.display.armor_class">
-					<h6>Armor Class</h6>
-					<div class="value">
-						{{ character.display.armor_class }}
+			<template v-if="character.display">
+				<hr>
+				<div class="stats">
+					<div class="armor_class" v-if="character.display.armor_class">
+						<h6>Armor Class</h6>
+						<div class="value">
+							{{ character.display.armor_class }}
+						</div>
+					</div>
+					<div 
+						class="hit_points" 
+						v-if="character.display.hit_points" 
+						@click="setSlide({
+							show: true, 
+							type: 'slides/characterBuilder/HitPoints',
+							data: {
+								total: character.display.hit_points,
+								hit_point_type,
+								level: character.display.level,
+								con_mod: character.sheet ? calcMod(character.sheet.abilities.constitution) : 0,
+								modifiers: hp_modifiers,
+								classes,
+							}
+						})
+					">
+						<h6>Hit Points</h6>
+						<div class="value">
+							{{ character.display.hit_points }}
+						</div>
+					</div>
+					<div class="speed" v-if="character.display.speed">
+						<h6>Speed</h6>
+						<div class="value">
+							{{ character.display.speed }}<span class="ft gray-hover">ft.</span>
+						</div>
+					</div>
+					<div class="initiative" v-if="character.display.initiative">
+						<h6>Initiative</h6>
+						<div class="value">
+							<hk-roll
+								tooltip="Roll"
+								:roll="{
+									d: 20,
+									n: 1,
+									m: character.display.initiative,
+									title: 'Initiative roll',
+									notify: true,
+									advantage: checkAdvantage('initiative')
+								}"
+							>
+								<span class="gray-hover">
+									{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
+									<span 
+										class="int"
+										:class="Object.keys(checkAdvantage('initiative')).length === 1 ? Object.keys(checkAdvantage('initiative'))[0] : ''"
+									>{{ Math.abs(character.display.initiative) }}</span>
+							</hk-roll>
+						</div>
 					</div>
 				</div>
-				<div 
-					class="hit_points" 
-					v-if="character.display.hit_points" 
-					@click="setSlide({
-						show: true, 
-						type: 'slides/characterBuilder/HitPoints',
-						data: {
-							total: character.display.hit_points,
-							hit_point_type,
-							level: character.display.level,
-							con_mod: character.sheet ? calcMod(character.sheet.abilities.constitution) : 0,
-							modifiers: hp_modifiers,
-							classes,
-						}
-					})
-				">
-					<h6>Hit Points</h6>
-					<div class="value">
-						{{ character.display.hit_points }}
-					</div>
-				</div>
-				<div class="speed" v-if="character.display.speed">
-					<h6>Speed</h6>
-					<div class="value">
-						{{ character.display.speed }}<span class="ft gray-hover">ft.</span>
-					</div>
-				</div>
-				<div class="initiative" v-if="character.display.initiative">
-					<h6>Initiative</h6>
-					<div class="value">
-						<hk-roll
-							tooltip="Roll"
-							:roll="{
-								d: 20,
-								n: 1,
-								m: character.display.initiative,
-								title: 'Initiative roll',
-								notify: true,
-								advantage: checkAdvantage('initiative')
-							}"
-						>
-							<span class="gray-hover">
-								{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
-								<span 
-									class="int"
-									:class="Object.keys(checkAdvantage('initiative')).length === 1 ? Object.keys(checkAdvantage('initiative'))[0] : ''"
-								>{{ Math.abs(character.display.initiative) }}</span>
-						</hk-roll>
-					</div>
-				</div>
+				<hr>
+			</template>
+			<div v-else class="neutral-2">
+				As you build your character a preview of your stats as they will be on the character sheet shows here.
 			</div>
-
-			<hr>
 
 			<template v-if="computed.sheet && computed.sheet.abilities">
 				<div class="abilities">
@@ -192,11 +191,7 @@
 				{{ character }}
 			</pre> -->
 		</div>
-		<div class="toggle bg-gray-dark" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
-			<i v-if="!showOverview" class="fal fa-file-spreadsheet"></i>
-			<i v-else class="fas fa-times"></i>
-		</div>
-	</div>
+	</hk-card>
 </template>
 
 <script>
@@ -207,34 +202,36 @@
 	export default {
 		name: 'CharacterComputed',
 		mixins: [general, abilities],
-		props: [
-			"base_values",
-			"modifiers",
-			"computed"
-		],
 		data() {
 			return {
 				showOverview: false
 			}
 		},
+		inject: ["characterState"],
 		computed: {
+			computed() {
+				return this.characterState.computed_values || {}
+			},
+			modifiers() {
+				return this.characterState.modifierArray
+			},
 			character() {
 				return (this.computed) ? this.computed : {};
 			},
 			race() {
-				return this.base_values.race;
+				return this.characterState.base_values.race;
 			},
 			hit_point_type() {
-				return this.base_values.general.hit_point_type;
+				return this.characterState.base_values.general.hit_point_type;
 			},
 			classes() {
-				return this.base_values.class.classes;
+				return this.characterState.base_values.class.classes;
 			},
 			avatar() {
-				return this.base_values.general.avatar;
+				return this.characterState.base_values.general.avatar;
 			},
 			character_name() {
-				return this.base_values.general.character_name;
+				return this.characterState.base_values.general.character_name;
 			},
 			saving_throws() {
 				let saving_throws = {};
@@ -296,170 +293,137 @@
 </script>
 
 <style lang="scss" scoped>
-	.computed {
-		background-image: url('../../assets/_img/styles/paper-bg.png');
-		background-position: top left;
-		padding: 15px;
-		position: fixed;
-		top: 50px;
-		right: -350px; 
-		height: calc(100vh - 50px);
-		z-index: 96;
-		background-color: #000;
-		overflow: auto;
-		width: 350px;
-		transition: right .5s linear,
-		box-shadow .5s linear;
-
-		h4 {
-			font-family: 'Fredericka the Great', cursive !important;
-			font-size: 22px;
-			margin: 0px;
-		}
-
-		&.show {
-			right: 0;
-			box-shadow: 0 10px 15px #000;
-		}
-
-		.q-circular-progress {
-			margin: 0 0 10px -5px;
-		}
-		.image {
-			width: 118px;
-			height: 118px;
-			border: solid 1px #5c5757;
-			border-radius: 50%;
-			background-position: center top;
-			background-repeat: no-repeat;
-			background-size: cover;
-		}
-		.general {
-			
-		}
-		.abilities {
-			display: flex;
-			justify-content: space-between;
-			text-align: center;
-			user-select: none;
-			width: 100%;
-			margin: 20px 0;
-
-			> div {
-				cursor: pointer;
-
-				.ability, .score {
-					font-size: 15px;
-					text-transform: uppercase;
-					height: 15px;
-					margin: 0;
-				}
-				.mod {
-					height: 55px;
-					line-height: 60px;
-					font-size: 35px;
-					font-weight: bold;
-					font-family: 'Fredericka the Great', cursive !important;
-					color: #fff;
-				}
+	.hk-card {
+		position: sticky;
+		top: 0;
+		margin-top: 48px;
+		
+		.computed {
+			padding: 15px;
+	
+			h4 {
+				font-family: 'Fredericka the Great', cursive !important;
+				font-size: 22px;
+				margin: 0px;
 			}
-		}
-		.stats {
-			display: flex;
-			justify-content: space-between;
-			user-select: none;
-
-			.armor_class, .hit_points, .speed, .initiative  {
+	
+			.q-circular-progress {
+				margin: 0 0 10px -5px;
+			}
+			.image {
+				width: 118px;
+				height: 118px;
+				border: solid 1px $neutral-4;
+				background-color: $neutral-9;
+				color: $neutral-2;
+				border-radius: 50%;
+				background-position: center top;
+				background-repeat: no-repeat;
+				background-size: cover;
+				line-height: 118px;
 				text-align: center;
-				cursor: pointer;
-
-				h6 {
-					font-size: 12px;
-					text-transform: uppercase;
-					height: 15px;
-					line-height: 15px;
-					margin: 0;
-				}
-				.value {
-					height: 60px;
-					line-height: 60px;
-					font-size: 45px;
-					font-weight: bold;
-					font-family: 'Fredericka the Great', cursive !important;
-					color: #fff;
-				}
-				.ft {
-					font-size: 15px;
-				}
+				font-size: 90px;
 			}
-		}
-		.list {
-			list-style: none;
-			padding: 0;
-			margin: 0 0 20px 0;
-
-			li {
+			.general {
+				
+			}
+			.abilities {
 				display: flex;
 				justify-content: space-between;
-				line-height: 35px;
-				border-bottom: solid 1px #b2b2b2;
-
-				.value {
-					font-family: 'Fredericka the Great', cursive !important;
-					font-size: 20px;
-					color: #fff;
+				text-align: center;
+				user-select: none;
+				width: 100%;
+				margin: 20px 0;
+	
+				> div {
+					cursor: pointer;
+	
+					.ability, .score {
+						font-size: 15px;
+						text-transform: uppercase;
+						height: 15px;
+						margin: 0;
+					}
+					.mod {
+						height: 55px;
+						line-height: 60px;
+						font-size: 35px;
+						font-weight: bold;
+						font-family: 'Fredericka the Great', cursive !important;
+						color: #fff;
+					}
 				}
 			}
-		}
-		.columns {
-			height: 128px;
-			column-count: 2;
-			column-gap: 15px;
-			column-rule: 1px solid #5c5757;
-		}
-		.advantage {
-			color: #83b547 !important;
-			&:hover .int {
+			.stats {
+				display: flex;
+				justify-content: space-between;
+				user-select: none;
+	
+				.armor_class, .hit_points, .speed, .initiative  {
+					text-align: center;
+					cursor: pointer;
+	
+					h6 {
+						font-size: 12px;
+						text-transform: uppercase;
+						height: 15px;
+						line-height: 15px;
+						margin: 0;
+					}
+					.value {
+						height: 60px;
+						line-height: 60px;
+						font-size: 45px;
+						font-weight: bold;
+						font-family: 'Fredericka the Great', cursive !important;
+						color: #fff;
+					}
+					.ft {
+						font-size: 15px;
+					}
+				}
+			}
+			.list {
+				list-style: none;
+				padding: 0;
+				margin: 0 0 20px 0;
+	
+				li {
+					display: flex;
+					justify-content: space-between;
+					line-height: 35px;
+					border-bottom: solid 1px #b2b2b2;
+	
+					.value {
+						font-family: 'Fredericka the Great', cursive !important;
+						font-size: 20px;
+						color: #fff;
+					}
+				}
+			}
+			.columns {
+				height: 128px;
+				column-count: 2;
+				column-gap: 15px;
+				column-rule: 1px solid #5c5757;
+			}
+			.advantage {
 				color: #83b547 !important;
+				&:hover .int {
+					color: #83b547 !important;
+				}
 			}
-		}
-		.disadvantage {
-			color: #cc3e4a;
-			&:hover .int {
-				color: #cc3e4a !important;
+			.disadvantage {
+				color: #cc3e4a;
+				&:hover .int {
+					color: #cc3e4a !important;
+				}
 			}
-		}
-		.neutral {
-			&:hover .int {
-				color: inherit !important;
+			.neutral {
+				&:hover .int {
+					color: inherit !important;
+				}
 			}
 		}
 	}
-	.toggle {
-		position: fixed;
-		top: 50px;
-		right: 0;
-		height: 48px;
-		line-height: 48px;
-		width: 48px;
-		z-index: 97;
-		text-align: center;
-		transition: right .5s linear;
-		display: block;
-		cursor: pointer;
-		color: #fff !important;
-		font-size: 30px;
-
-		i {
-			transition: transform .5s linear;
-		}    
-
-		&.show {
-			right: 350px;
-
-			// i {
-			// 	transform: rotate(180deg);
-			// }
-		}
-	} 
 </style>

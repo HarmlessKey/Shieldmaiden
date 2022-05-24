@@ -163,8 +163,8 @@
 <script>
 	import { abilities } from "src/mixins/abilities.js";
 	import { mapActions } from "vuex";
-	import Modifier from "../modifier.vue";
-	import ModifierTable from "../modifier-table.vue";
+	import Modifier from "src/components/characters/modifier.vue";
+	import ModifierTable from "src/components/characters/modifier-table.vue";
 	import HkTextEditor from "src/components/hk-components/hk-text-editor";
 	import { characterDescriptions } from 'src/mixins/characterDescriptions.js';
 

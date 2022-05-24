@@ -171,12 +171,44 @@ const routes = [
 					},
 					{
 						path: ":id",
-						name: "EditCharacterAlpha",
-						component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter"),
+						component: () => import("src/layouts/character-builder"),
 						meta: {
 							title: "Edit character",
-							description: "Edit an existing character on Harmless Key."
-						}
+							description: "Edit an existing character on Harmless Key.",
+							side: false
+						},
+						children: [
+							{
+								path: "",
+								name: "EditCharacterGeneral",
+								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/general"),
+								meta: {
+									description: "Edit your character's general information",
+									title: "General",
+									side: false
+								},
+							},
+							{
+								path: "general",
+								name: "EditCharacterGeneralTab",
+								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/general"),
+								meta: {
+									description: "Edit your character's general information",
+									title: "General",
+									side: false
+								},
+							},
+							{
+								path: "race",
+								name: "EditRace",
+								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/race"),
+								meta: {
+									title: "Race",
+									description: "Edit your character's race",
+									side: false
+								}
+							}
+						],
 					}
 				]
 			},

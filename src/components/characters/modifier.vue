@@ -279,7 +279,7 @@
 				type: String,
 				required: true
 			},
-			playerId: {
+			characterId: {
 				type: String,
 				required: true
 			}
@@ -441,7 +441,7 @@
 
 					this.edit_modifier({
 						userId: this.userId,
-						key: this.playerId,
+						key: this.characterId,
 						modifier_key: key,
 						modifier
 					});
@@ -450,7 +450,7 @@
 				else {
 					this.add_modifier({
 						userId: this.userId,
-						key: this.playerId,
+						key: this.characterId,
 						modifier
 					});
 				}

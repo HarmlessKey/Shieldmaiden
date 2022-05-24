@@ -202,8 +202,8 @@
 </template>
 
 <script>
-	import ModifierTable from '../modifier-table.vue';
-	import Modifier from '../modifier.vue';
+	import ModifierTable from 'src/components/characters/modifier-table.vue';
+	import Modifier from 'src/components/characters/modifier.vue';
 	import { db } from 'src/firebase';
 	import { abilities } from 'src/mixins/abilities.js';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';

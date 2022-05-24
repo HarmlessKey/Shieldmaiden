@@ -9,9 +9,9 @@
 					<q-icon name="info blue" />
 				</hk-popover>
 			</span>
-			<a @click="newModifier(origin), modal = true">
+			<a class="btn btn-sm btn-clear" @click="newModifier(origin), modal = true">
 				<i class="fas fa-plus green" />
-				Add Modifier
+				Add modifier
 			</a>
 		</h4>
 
@@ -65,7 +65,7 @@
 				type: String,
 				required: true
 			},
-			playerId: {
+			characterId: {
 				type: String,
 				required: true
 			},
@@ -118,7 +118,7 @@
 			deleteModifier(key) {
 				this.delete_modifier({
 					userId: this.userId,
-					key: this.playerId,
+					key: this.characterId,
 					modifier_key: key
 				});
 				this.$emit("change", "modifier.deleted");

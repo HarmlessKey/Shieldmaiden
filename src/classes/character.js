@@ -1,9 +1,12 @@
-export class character {
+export class Character {
   general = {
     character_name: undefined,
     advancement: undefined,
     hit_point_type: undefined,
     build: "new"
+  };
+  race = {
+
   };
   class = {
     classes: {
@@ -18,9 +21,12 @@ export class character {
     this.general = character.general || this.general;
     this.general.advancement = character.general.advancement || "milestone";
     this.general.hit_point_type = character.general.hit_point_type || "fixed";
-    this.class = character.class || this.class;
+    this.class = character.class || {};
+    this.class.classes = character.class.classes || { 0: { level: 1 }};
+    this.race = character.race || {};
   }
 
+  // GENERAL
   get build() {
     return this.general.build;
   }
@@ -61,5 +67,37 @@ export class character {
   }
   set hit_point_type(value) {
     this.general.hit_point_type = value;
+
+    // Make sure there are rolled hit points for every class
+    if(value === "rolled") {
+      for(const classKey in this.class.classes) {
+        const Class = this.class.classes[classKey];
+        const level = (classKey === 0) ? 2 : 1;
+        if(!Class.rolled_hit_points) {
+          this.class.classes[classKey].rolled_hit_points = { [level]: 0 };
+        }
+      }
+    }
+  }
+
+  // RACE
+
+  // CLASS
+  get experience_points() {
+    return this.class.experience_points || 0;
+  }
+  set experience_points(value) {
+    this.class.experience_points = value;
+  }
+
+  // MODIFIERS
+  get modifier_array() {
+    let returnArray = [];
+    for(const [key, value] of Object.entries(this.modifiers)) {
+      const mod = value;
+      mod['.key'] = key;
+      returnArray.push(mod);
+    }
+    return returnArray;
   }
 }

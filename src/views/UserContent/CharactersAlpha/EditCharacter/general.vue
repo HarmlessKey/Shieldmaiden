@@ -1,15 +1,26 @@
 <template>
-	<hk-card header="General Character Info">
+	<hk-card>
+		<div class="card-header" slot="header">
+			<span>General characer info</span>
+			<small class="saved green" v-if="saved" @animationend="saved = false">
+				<i aria-hidden="true" class="fas fa-check" />
+				Saved
+			</small>
+			<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+				<i aria-hidden="true" class="fas fa-times" />
+				Couldn't save
+			</small>
+		</div>
 		<div class="card-body">
-			<ValidationObserver>
-				<q-form greedy>
+			<ValidationObserver v-slot="{ valid }">
+				<q-form greedy>	
 					<ValidationProvider rules="required|max:30" name="Player name" v-slot="{ errors, invalid, validated }">
 						<q-input 
 							dark filled square
 							label="Player name"
-							@change="saveProp('general', 'player_name', character.player_name, !invalid)"
 							autocomplete="off"  
 							type="text" 
+							@change="save(valid)"
 							v-model="character.player_name" 
 							maxlength="30"
 							class="mb-2"
@@ -21,9 +32,9 @@
 						<q-input 
 							dark filled square
 							label="Character name"
-							@change="saveProp('general', 'character_name', character.character_name, !invalid)"
 							autocomplete="off"  
 							type="text" 
+							@change="save(valid)"
 							v-model="character.character_name" 
 							maxlength="35"
 							class="mb-2"
@@ -39,9 +50,9 @@
 							<q-input
 								dark filled square
 								label="Avatar"
-								@change="saveProp('general', 'avatar', character.avatar, !invalid)"
 								autocomplete="off"
 								type="text"
+								@change="save(valid)"
 								v-model="character.avatar"
 								maxlength="2000"
 								:error="invalid && validated"
@@ -51,7 +62,7 @@
 					</div>
 					<q-select 
 						dark filled square map-options emit-value
-						@input="saveAdvancement()"
+						@input="save(valid)"
 						v-model="character.advancement" 
 						:options="advancement_options" 
 						label="Advancement" 
@@ -59,7 +70,7 @@
 					/>
 					<q-select 
 						dark filled square map-options emit-value
-						@input="saveHpType()"
+						@input="save(valid)"
 						v-model="character.hit_point_type" 
 						:options="hit_point_options" 
 						label="Hit point type"
@@ -73,15 +84,19 @@
 <script>
 	import { mapActions } from "vuex";
 	import { db } from 'src/firebase';
+	import { Character } from "src/classes/character";
 
 	export default {
 		name: 'CharacterGeneral',
 		props: [
-			"characterId", 
+			"characterId",
 			"userId"
 		],
 		data() {
 			return {
+				saved: false,
+				invalid: false,
+				character_copy: undefined,
 				advancement_options: [
 					{
 						value: "experience",
@@ -107,63 +122,37 @@
 		inject: ["characterState"],
 		computed: {
 			character() {
-				return (this.characterState.base_values) ? this.characterState.base_values : {};
+				return this.characterState.character;
 			},
 			character_class() {
-				return (this.characterState.base_values.class) ? this.characterState.base_values.class : {};
+				return (this.characterState.character.class) ? this.characterState.character.class : {};
 			}
 		},
 		methods: {
 			...mapActions("characters", ["set_character_prop", "update_character"]),
-			async saveProp(category, property, value, valid) {
+			async save(valid) {
 				if(valid) {
 					await this.update_character({
 						uid: this.userId,
 						id: this.characterId,
 						character: this.character
 					});
+					this.character_copy = JSON.parse(JSON.stringify(this.character));
+					this.saved = true;
+				} else {
+					this.invalid = true;
 				}
-			},
-			saveAdvancement() {
-				if(this.character.advancement === "experience" && !this.character_class.experience_points) {
-					this.set_character_prop({
-						userId: this.userId,
-						key: this.characterId,
-						category: "class",
-						property: "experience_points",
-						value: 0
-					});
-				}
-
-				this.set_character_prop({
-					userId: this.userId,
-					key: this.characterId,
-					category: "general",
-					property: "advancement",
-					value: this.character.advancement
-				});
-				this.$emit("change", "general.advancement");
-			},
-			saveHpType() {
-				//Make sure the rolled HP object exists when type is rolled
-				if(this.character.hit_point_type === "rolled") {
-					for(const classKey in this.character_class.classes) {
-						const Class = this.character_class.classes[classKey];
-						const level = (classKey === 0) ? 2 : 1;
-						if(!Class.rolled_hit_points) {
-							db.ref(`characters_base/${this.userId}/${this.characterId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(0);
-						}
-					}
-				}
-				this.set_character_prop({
-					userId: this.userId,
-					key: this.characterId,
-					category: "general",
-					property: "hit_point_type",
-					value: this.character.hit_point_type
-				});
-				this.$emit("change", "general.advancementhit_point_type");
 			}
+		},
+		mounted() {
+			this.character_copy = JSON.parse(JSON.stringify(this.characterState.character));
+		},
+		beforeRouteLeave(to, from, next) {
+			// Reset unsaved changes when the route is changed
+			if(JSON.stringify(this.character) !== JSON.stringify(this.character_copy)) {
+				this.characterState.character = new Character(this.character_copy);
+			}
+			next();
 		}
 	}
 </script>

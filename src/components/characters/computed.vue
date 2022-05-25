@@ -1,7 +1,7 @@
 <template>
 	<hk-card :header="character_name">
 		<div class="computed">
-			<q-circular-progress
+			<!-- <q-circular-progress
 				show-value
 				class="q-ma-md"
 				:value="character.hit_points"
@@ -185,11 +185,11 @@
 						</span>
 					</li>
 				</ul>
-			</div>
+			</div> -->
 
-			<!-- <pre>
-				{{ character }}
-			</pre> -->
+			<pre>
+				{{ characterState.character }}
+			</pre>
 		</div>
 	</hk-card>
 </template>
@@ -219,19 +219,19 @@
 				return (this.computed) ? this.computed : {};
 			},
 			race() {
-				return this.characterState.base_values.race;
+				return this.characterState.character.race;
 			},
 			hit_point_type() {
-				return this.characterState.base_values.general.hit_point_type;
+				return this.characterState.character.hit_point_type;
 			},
 			classes() {
-				return this.characterState.base_values.class.classes;
+				return this.characterState.character.class.classes;
 			},
 			avatar() {
-				return this.characterState.base_values.general.avatar;
+				return this.characterState.character.avatar;
 			},
 			character_name() {
-				return this.characterState.base_values.general.character_name;
+				return this.characterState.character.character_name;
 			},
 			saving_throws() {
 				let saving_throws = {};

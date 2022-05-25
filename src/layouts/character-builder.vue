@@ -1,14 +1,14 @@
 <template>
 	<div v-if="!loading">
 		<build-type-select 
-			v-if="base_values.build === 'new'"
+			v-if="character.build === 'new'"
 			:user-id="userId"
 			:character-id="characterId"
 		/>
 	
 		<div 
-			v-else-if="base_values.build === 'advanced'"
-			class="row q-col-gutter-md"
+			v-else-if="character.build === 'advanced'"
+			class="row q-col-gutter-md content__edit"
 		>
 			<div class="col-12" :class="{ 'col-md-9': width > 978 }">
 				<div class="tabs">
@@ -48,7 +48,7 @@
 	import { characterMixin } from "src/mixins/character.js";
 	import BuildTypeSelect from "src/components/characters/build-type-select";
 	import Computed from "src/components/characters/computed";
-	import { character } from "src/classes/character";
+	import { Character } from "src/classes/character";
 
 	export default {
 		name: "CharacterBuilderLayout",
@@ -62,7 +62,7 @@
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				characterId: this.$route.params.id,
 				loading: true,
-				base_values: {},
+				character: {},
 				width: 0,
 				tabs: [
 					{ value: "general", label: "General" },
@@ -78,7 +78,7 @@
 		},
 		async mounted() {
 			const char = await this.get_character({ uid: this.userId, id: this.characterId });
-			this.base_values = new character(char);
+			this.character = new Character(char);
 			this.loading = false;
 		},
 		provide() {
@@ -88,15 +88,24 @@
 		},
 		computed: {
 			computed_values() {
-				return this.get_computed_character(this.userId, this.playerId);
+				// return this.get_computed_character(this.userId, this.characterId);
+				return {}
 			},
 			race_modifiers() {
-				const modifiers = this.modifierArray(this.base_values.modifiers).filter(mod => {
+				const modifiers = this.modifierArray(this.character.modifiers).filter(mod => {
 					const origin = mod.origin.split(".");
 					return origin[0] === 'race';
 				});
 				return modifiers;
 			},
+		},
+		watch: {
+			character: {
+				deep: true,
+				handler(newVal) {
+					// console.log(newVal)
+				}
+			}
 		},
 		methods: {
 			...mapActions("characters", [

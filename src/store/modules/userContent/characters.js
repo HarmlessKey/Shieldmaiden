@@ -384,7 +384,6 @@ const character_mutations = {
     } else {
       Vue.set(state.cached_characters, uid, { [id]: character });
     }
-    console.log("FInished set cached")
   },
   SET_CHARACTER_PROP(state, {userId, key, category, property, value}) {
     if(!state.characters[userId][key][category]) {

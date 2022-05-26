@@ -32,6 +32,7 @@
 					<router-view
 						:character-id="characterId"
 						:user-id="userId"
+						@save="save"
 					/>
 				</div>
 			</div>
@@ -61,6 +62,7 @@
 			return {
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				characterId: this.$route.params.id,
+				character_copy: undefined,
 				loading: true,
 				character: {},
 				width: 0,
@@ -76,14 +78,15 @@
 				current_tab: this.$route.path.split("/").length > 4 ? this.$route.path.split("/").pop() : "general"
 			}
 		},
-		async mounted() {
+		async created() {
 			const char = await this.get_character({ uid: this.userId, id: this.characterId });
 			this.character = new Character(char);
+			this.character_copy = JSON.parse(JSON.stringify(this.character));
 			this.loading = false;
 		},
 		provide() {
 			return {
-				characterState: this
+				characterState: this,
 			}
 		},
 		computed: {
@@ -110,10 +113,26 @@
 		methods: {
 			...mapActions("characters", [
 				"get_character",
+				"update_character"
 			]),
 			setSize(size) {
 				this.width = size.width;
+			},
+			async save() {
+				await this.update_character({
+					uid: this.userId,
+					id: this.characterId,
+					character: this.character
+				});
+				this.character_copy = JSON.parse(JSON.stringify(this.character));
 			}
+		},
+		beforeRouteUpdate(to, from, next) {
+			// Reset unsaved changes when the route is updated
+			if(JSON.stringify(this.character) !== JSON.stringify(this.character_copy)) {
+				this.character = new Character(this.character_copy);
+			}
+			next();
 		}
 	}
 </script>

@@ -1,14 +1,25 @@
 <template>
 	<div>
-		<hk-card header="Race">
-			<div class="card-body">
-				<ValidationObserver>
-					<q-form greedy>
+		<ValidationObserver v-slot="{ valid }">
+			<q-form greedy>
+				<hk-card>
+					<div class="card-header" slot="header">
+						<span>Race</span>
+						<small class="saved green" v-if="saved" @animationend="saved = false">
+							<i aria-hidden="true" class="fas fa-check" />
+							Saved
+						</small>
+						<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+							<i aria-hidden="true" class="fas fa-times" />
+							Couldn't save
+						</small>
+					</div>
+					<div class="card-body">
 						<ValidationProvider rules="required|max:30" name="Race" v-slot="{ errors, invalid, validated }">
 							<q-input
 								dark filled square
 								label="Race" 
-								@change="saveRaceName(!invalid)"
+								@change="save(valid)"
 								autocomplete="off"  
 								type="text" 
 								v-model="race.race_name" 
@@ -22,7 +33,7 @@
 							<q-input
 								dark filled square
 								label="Base walking speed" 
-								@change="saveRaceSpeed(!invalid)"
+								@change="save(valid)"
 								autocomplete="off"  
 								type="number" 
 								v-model="race.walking_speed" 
@@ -37,77 +48,80 @@
 							dark filled square
 							type="textarea"
 							label="Race description"
-							@change="saveRaceDescription(!invalid)"
+							@change="save(valid)"
 							v-model="race.race_description"
 							autogrow
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
 						</ValidationProvider>
-					</q-form>
-				</ValidationObserver>
-			</div>
-		</hk-card>
+					</div>
+				</hk-card>
 
-		<!-- Traits -->
-		<hk-card>
-			<div class="card-header" slot="header">
-				Traits
-				<button class="btn btn-sm bg-neutral-5" @click="addTrait()">
-					<i class="fas fa-plus green" aria-hidden="true" />
-					Add trait
-				</button>
-			</div>
-			<div class="card-body">
-				<q-list dark square class="accordion">
-					<q-expansion-item
-						v-for="(trait, key, index) in race.traits" 
-						:key="`trait-${key}`" 
-						dark switch-toggle-side
-						group="traits"
-					>
-						<template v-slot:header>
-							<q-item-section>
-								{{ trait.name }}
-							</q-item-section>
-							<q-item-section avatar>
-								<div class="actions">
-									<a class="btn btn-sm bg-neutral-5" @click.stop="confirmDelete(key)">
-										<i class="fas fa-trash-alt"></i>
-									</a>
+				<!-- Traits -->
+				<hk-card>
+					<div class="card-header" slot="header">
+						Traits
+						<button class="btn btn-sm bg-neutral-5" @click.prevent="addTrait(valid)">
+							<i class="fas fa-plus green" aria-hidden="true" />
+							Add trait
+						</button>
+					</div>
+					<div class="card-body">
+						<q-list dark square class="accordion">
+							<q-expansion-item
+								v-for="(trait, index) in race.traits" 
+								:key="`trait-${index}`" 
+								dark switch-toggle-side
+								group="traits"
+							>
+								<template v-slot:header>
+									<q-item-section>
+										{{ trait.name }}
+									</q-item-section>
+									<q-item-section avatar>
+										<div class="actions">
+											<a class="btn btn-sm bg-neutral-5" @click.stop="confirmDelete(index, trait.name, valid)">
+												<i class="fas fa-trash-alt"></i>
+											</a>
+										</div>
+									</q-item-section>
+								</template>
+
+								<div class="accordion-body">
+									<div class="form-item mb-3">
+										<ValidationProvider rules="required|max:30" name="Trait name" v-slot="{ errors, invalid, validated }">
+											<q-input
+												dark filled square
+												@change="save(valid)"
+												autocomplete="off"
+												type="text"
+												v-model="race.traits[index].name"
+												label="Trait name"
+												:error="invalid && validated"
+												:error-message="errors[0]"
+											/>
+										</ValidationProvider>
+									</div>
+
+									<!-- Modifiers -->
+									<Modifier-table 
+										:modifiers="trait_modifiers(index)" 
+										:origin="`race.trait.${index}`"
+										:userId="userId"
+										:characterId="characterId"
+										@edit="editModifier"
+									/>
 								</div>
-							</q-item-section>
-						</template>
-
-						<div class="accordion-body">
-							<div class="form-item mb-3">
-								<q-input
-									dark filled square
-									@change="editTrait(key, 'name')"
-									autocomplete="off"
-									:id="`name-${index}`"
-									type="text"
-									v-model="race.traits[key].name"
-									label="Trait name"/>
-							</div>
-
-							<!-- Modifiers -->
-							<Modifier-table 
-								:modifiers="trait_modifiers(key)" 
-								:origin="`race.trait.${key}`"
-								:userId="userId"
-								:characterId="characterId"
-								@edit="editModifier"
-							/>
-						</div>
-					</q-expansion-item>
-				</q-list>
-			</div>
-		</hk-card>
-
-		<q-dialog v-model="modal">
-      <Modifier :value="modifier" :userId="userId" :characterId="characterId" @save="modifierSaved" />
-		</q-dialog>
+							</q-expansion-item>
+						</q-list>
+					</div>
+				</hk-card>
+				<q-dialog v-model="modal">
+					<Modifier :value="modifier" :userId="userId" :characterId="characterId" @save="modifierSaved($event, valid)" />
+				</q-dialog>
+			</q-form>
+		</ValidationObserver>
 	</div>
 </template>
 
@@ -134,21 +148,20 @@
 		},
 		data() {
 			return {
+				saved: false,
+				invalid: false,
 				modifier: {},
 				modal: false
 			}
 		},
 		inject: ["characterState"],
 		computed: {
+			character() {
+				return this.characterState.character;
+			},
 			race() {
-				return (this.character_race) ? this.character_race : {};
-			},
-			character_race() {
-				return this.characterState.base_values.race;
-			},
-			modifiers() {
-				return this.characterState.race_modifiers;
-			} 
+				return this.characterState.character.race;
+			}
 		},
 		methods: {
 			...mapActions("characters", [
@@ -156,61 +169,27 @@
 				"add_trait",
 				"edit_trait",
 				"delete_trait",
-				"delete_modifier"
+				"delete_modifier",
+				"update_character"
 			]),
-			trait_modifiers(key) {
-				const modifiers = this.modifiers.filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[1] === "trait" && origin[2] === key;
-				});
-				return modifiers;
+			async save(valid) {
+				if(valid) {
+					this.$emit("save");
+					this.saved = true;
+				} else {
+					this.invalid = true;
+				}
+			},
+			trait_modifiers(index) {
+				return this.character.filtered_modifiers_trait(index);
 			},
 			editModifier(e) {
 				this.modal = true;
 				this.modifier = e.modifier;
 			},
-			saveRaceName(valid) {
-				if(valid) {
-					this.set_character_prop({
-						userId: this.userId,
-						key: this.characterId,
-						category: "race",
-						property: "race_name",
-						value: this.race.race_name
-					});
-				}
-			},
-			saveRaceSpeed(valid) {
-				if(valid) {
-					this.set_character_prop({
-						userId: this.userId,
-						key: this.characterId,
-						category: "race",
-						property: "walking_speed",
-						value: this.race.walking_speed
-					});
-					this.$emit("change", "race.speed");
-				}
-			},
-			saveRaceDescription(valid) {
-				if(valid) {
-					this.set_character_prop({
-						userId: this.userId,
-						key: this.characterId,
-						category: "race",
-						property: "race_description",
-						value: this.race.race_description
-					});
-				}
-			},
-			addTrait() {
-				const trait = { name: "New Trait" };
-
-				this.add_trait({
-					userId: this.userId,
-					key: this.characterId,
-					trait
-				});
+			addTrait(valid) {
+				this.character.add_trait();
+				this.save(valid);
 			},
 			editTrait(key, property) {
 				const value = this.race.traits[key][property];
@@ -222,37 +201,39 @@
 					value
 				});
 			},
-			deleteTrait(key) {
+			deleteTrait(index, valid) {
+				this.character.delete_trait(index);
+				this.save(valid);
 				//Delete all modifiers linked to this feat
-				const linked_modifiers = this.trait_modifiers(key);
+				// const linked_modifiers = this.trait_modifiers(key);
 
-				for(const modifier of linked_modifiers) {
-					this.delete_modifier({
-						userId: this.userId,
-						key: this.characterId,
-						modifier_key: modifier['.key']
-					});
-				}
+				// for(const modifier of linked_modifiers) {
+				// 	this.delete_modifier({
+				// 		userId: this.userId,
+				// 		key: this.characterId,
+				// 		modifier_key: modifier['.key']
+				// 	});
+				// }
 
-				//Delete trait
-				this.delete_trait({
-					userId: this.userId,
-					key: this.characterId,
-					trait_key: key
-				});
-				this.$emit("change", "race.trait_removed");
+				// //Delete trait
+				// this.delete_trait({
+				// 	userId: this.userId,
+				// 	key: this.characterId,
+				// 	trait_key: key
+				// });
+				// this.$emit("change", "race.trait_removed");
 			},
-			confirmDelete(key, name) {
+			confirmDelete(index, name, valid) {
 				this.$snotify.error('Are you sure you want to delete the the trait "' + name + '"?', 'Delete trait', {
 					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteTrait(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Yes', action: (toast) => { this.deleteTrait(index, valid); this.$snotify.remove(toast.id); }, bold: false},
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
-			modifierSaved() {
+			modifierSaved(valid) {
 				this.modal = false;
-				this.$emit("change", "modifier.saved");
+				this.save(valid);
 			}
 		}
 	}

@@ -83,8 +83,6 @@
 
 <script>
 	import { mapActions } from "vuex";
-	import { db } from 'src/firebase';
-	import { Character } from "src/classes/character";
 
 	export default {
 		name: 'CharacterGeneral',
@@ -123,36 +121,18 @@
 		computed: {
 			character() {
 				return this.characterState.character;
-			},
-			character_class() {
-				return (this.characterState.character.class) ? this.characterState.character.class : {};
 			}
 		},
 		methods: {
-			...mapActions("characters", ["set_character_prop", "update_character"]),
+			...mapActions("characters", ["update_character"]),
 			async save(valid) {
 				if(valid) {
-					await this.update_character({
-						uid: this.userId,
-						id: this.characterId,
-						character: this.character
-					});
-					this.character_copy = JSON.parse(JSON.stringify(this.character));
+					this.$emit("save");
 					this.saved = true;
 				} else {
 					this.invalid = true;
 				}
 			}
-		},
-		mounted() {
-			this.character_copy = JSON.parse(JSON.stringify(this.characterState.character));
-		},
-		beforeRouteLeave(to, from, next) {
-			// Reset unsaved changes when the route is changed
-			if(JSON.stringify(this.character) !== JSON.stringify(this.character_copy)) {
-				this.characterState.character = new Character(this.character_copy);
-			}
-			next();
 		}
 	}
 </script>

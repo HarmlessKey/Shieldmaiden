@@ -29,14 +29,14 @@
 				<template v-else-if="data.row.type === 'expertise'">Expertise</template>
 			</template>
 			<div slot="actions" slot-scope="data" class="actions">
-				<a class="gray-hover mx-1" 
+				<a class="btn btn-sm bg-neutral-5 mx-1" 
 					@click="editModifier(data.row)">
 					<i class="fas fa-pencil"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Edit modifier
 					</q-tooltip>
 				</a>
-				<a class="gray-hover" @click="deleteModifier(data.row['.key'])">
+				<a class="btn btn-sm bg-neutral-5" @click="deleteModifier(data.row.index)">
 					<i class="fas fa-trash-alt"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Delete modifier
@@ -100,6 +100,12 @@
 				}
 			}
 		},
+		inject: ["characterState"],
+		computed: {
+			character() {
+				return this.characterState.character;
+			}
+		},
 		methods: {
 			...mapActions([
 				"delete_modifier"
@@ -115,16 +121,11 @@
 				}
 				this.$emit('edit', { modifier, origin: this.origin });
 			},
-			deleteModifier(key) {
-				this.delete_modifier({
-					userId: this.userId,
-					key: this.characterId,
-					modifier_key: key
-				});
-				this.$emit("change", "modifier.deleted");
+			deleteModifier(index) {
+				this.character.delete_modifier(index);
 			},
 			editModifier(modifier) {
-				modifier = { ...modifier};
+				modifier = { ...modifier };
 				this.$emit('edit', { modifier, origin: this.origin });
 			}
 		}

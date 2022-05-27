@@ -43,8 +43,8 @@
 						/>
 					</ValidationProvider>
 					<div class="avatar mb-2">
-						<div class="image">
-							<i class="hki-player" aria-hidden="true" />
+						<div class="image" :style="character.avatar ? `background-image: url('${character.avatar}')` : ''">
+							<i v-if="!character.avatar" class="hki-player" aria-hidden="true" />
 						</div>
 						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
 							<q-input
@@ -150,6 +150,8 @@
 			font-size: 40px;
 			border: solid 1px $neutral-2;
 			text-align: center;
+			background-position: center top;
+			background-size: cover;
 		}
 	}
 </style>

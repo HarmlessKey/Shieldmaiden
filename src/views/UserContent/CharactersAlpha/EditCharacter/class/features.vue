@@ -5,9 +5,9 @@
 				<template v-if="subclass.level >= level">
 					<h4 class="feature-title">
 						Level {{ level }}
-						<a @click="addFeature(classKey, level)" class="gray-light">
+						<a @click="addFeature(classKey, level)" class="btn btn-sm bg-neutral-5">
+							<i class="fas fa-plus green mr-1" />
 							Add feature
-							<i class="fas fa-plus green" />
 						</a>
 					</h4>
 					<template v-if="subclass.features">

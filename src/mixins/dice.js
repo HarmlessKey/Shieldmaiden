@@ -3,7 +3,6 @@ import { mapActions, mapGetters } from "vuex";
 export const dice = {
 	data() {
 		return {
-			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			animateTrigger: false,
 			rolled: 0
 		}

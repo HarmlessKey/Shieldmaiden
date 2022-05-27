@@ -13,17 +13,6 @@ export const characterMixin = {
 		}
 	},
 	methods: {
-		modifierArray(modifiers) {
-			if(modifiers) {
-				let returnArray = [];
-				for(const [key, value] of Object.entries(modifiers)) {
-					let mod = value;
-					mod['.key'] = key;
-					returnArray.push(mod);
-				}
-				return returnArray;
-			} return [];
-		},
 		modifierFilter(modifiers, type) {
 			const filtered = modifiers.filter(mod => {
 				return mod.target === type;
@@ -34,14 +23,16 @@ export const characterMixin = {
 		/**
 		 * Computes the base values of a character into display values
 		 * 
-		 * @param {object} base_character Base stats of the character
+		 * @param {object} character Base stats of the character
 		 * @param {string} origin Origin from where the compute action is called.
 		 *
 		 * @returns {object} computed_character
 		 */
-		compute_character(base_character, origin) {
+		compute_character(character, origin) {
 			// eslint-disable-next-line
 			console.log("Character computed. Origin: ", origin);
+
+			const base_character = {...character};
 
 			const computed_character = {
 				display: {
@@ -59,7 +50,7 @@ export const characterMixin = {
 			}
 
 			origin = origin.split(".");
-			let modifiers = [...this.modifierArray(base_character.modifiers)]; //Copy the modifiers so they can be manipulated during the compute
+			let modifiers = base_character.modifiers; //Copy the modifiers so they can be manipulated during the compute
 			let armor = undefined;
 			let shield = undefined;
 

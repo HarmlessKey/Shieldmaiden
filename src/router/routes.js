@@ -207,6 +207,36 @@ const routes = [
 									description: "Edit your character's race",
 									side: false
 								}
+							},
+							{
+								path: "class",
+								name: "EditClass",
+								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/class"),
+								meta: {
+									title: "Class",
+									description: "Edit your character's classes",
+									side: false
+								}
+							},
+							{
+								path: "abilities",
+								name: "EditAbilities",
+								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/abilities"),
+								meta: {
+									title: "Abilities",
+									description: "Edit your character's abilities",
+									side: false
+								}
+							},
+							{
+								path: "equipment",
+								name: "EditEquipment",
+								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/equipment"),
+								meta: {
+									title: "Equipment",
+									description: "Edit your character's equipment",
+									side: false
+								}
 							}
 						],
 					}

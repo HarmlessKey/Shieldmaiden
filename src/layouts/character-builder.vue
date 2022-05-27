@@ -63,6 +63,7 @@
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				characterId: this.$route.params.id,
 				character_copy: undefined,
+				computed_character: {},
 				loading: true,
 				character: {},
 				width: 0,
@@ -82,25 +83,21 @@
 			const char = await this.get_character({ uid: this.userId, id: this.characterId });
 			this.character = new Character(char);
 			this.character_copy = JSON.parse(JSON.stringify(this.character));
+
+			// Compute character
+			this.computed_character = this.compute_character(this.character, "initialize");
+			this.set_computed_character({
+				userId: this.userId,
+				key: this.playerId,
+				character: this.computed_character
+			});
+
 			this.loading = false;
 		},
 		provide() {
 			return {
 				characterState: this,
 			}
-		},
-		computed: {
-			computed_values() {
-				// return this.get_computed_character(this.userId, this.characterId);
-				return {}
-			},
-			race_modifiers() {
-				const modifiers = this.modifierArray(this.character.modifiers).filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[0] === 'race';
-				});
-				return modifiers;
-			},
 		},
 		watch: {
 			character: {
@@ -113,17 +110,20 @@
 		methods: {
 			...mapActions("characters", [
 				"get_character",
-				"update_character"
+				"update_character",
+				"set_computed_character"
 			]),
 			setSize(size) {
 				this.width = size.width;
 			},
 			async save() {
+				console.log("saving: ", this.character)
 				await this.update_character({
 					uid: this.userId,
 					id: this.characterId,
 					character: this.character
 				});
+				this.computed_character = this.compute_character(this.character, "save");
 				this.character_copy = JSON.parse(JSON.stringify(this.character));
 			}
 		},

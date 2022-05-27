@@ -97,17 +97,6 @@ const character_actions = {
     return character;
   },
 
-  // async set_character({ state, commit }, { userId, key }) {
-  //   const character = characters_ref.child(userId).child(key);
-    
-  //   if(!state.characters[userId] || !state.characters[userId][key]) {
-  //     await character.once('value', snapshot => {
-  //       const character = snapshot.val();
-  //       commit('SET_CHARACTER', { userId, key, character });
-  //     });
-  //   }
-  // },
-
   /**
    * Adds a newly created character for a user
    * A user can only add characters for themselves so we use the uid from the store

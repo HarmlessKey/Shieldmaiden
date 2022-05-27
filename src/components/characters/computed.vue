@@ -1,41 +1,33 @@
 <template>
 	<hk-card :header="character_name">
-		<div class="computed">
-			<!-- <q-circular-progress
-				show-value
-				class="q-ma-md"
-				:value="character.hit_points"
-				size="130px"
-				:thickness=".1"
-				color="primary"
-				track-color="positive"
-			>
-				<q-avatar size="118px">
-					<div class="image">
-						<i class="hki-player" aria-hidden="true" />
-					</div>
-				</q-avatar>
-			</q-circular-progress>
-			<div class="general" v-if="character.display">
-				<h4>{{ character_name || "Unnamed Character" }}</h4>
-				Level {{ character.display.level }} &bull; {{ race ? race.race_name : "" }}
-				<template v-if="character.sheet && character.sheet.classes">
-					<div v-for="( subclass, index) in classes" :key="`class-${index}`">
-					{{ (subclass.level &lt; character.display.level) ? `${subclass.level}` : `` }}
-					<b>{{ subclass.name }}</b>
-					<template v-if="subclass.subclass">
-						<span class="blue mx-1">&bull;</span>
-						<i>{{ subclass.subclass }}</i>
-					</template>
-					</div>
-				</template>
+		<div class="card-header" slot="header">
+			<div class="image" :style="avatar ? `background-image: url('${avatar}')` : ''">
+				<i v-if="!avatar" class="hki-player" aria-hidden="true" />
 			</div>
-
+			<div>
+				<div class="name truncate">
+					<strong>{{ character_name || "Unnamed Character" }}</strong>
+				</div>
+				<div>
+					Level {{ character.display.level }} &bull; {{ race ? race.race_name : "" }}
+					<template v-if="character.sheet && character.sheet.classes">
+						<div v-for="( subclass, index) in classes" :key="`class-${index}`">
+						{{ (subclass.level &lt; character.display.level) ? `${subclass.level}` : `` }}
+						<b>{{ subclass.name }}</b>
+						<template v-if="subclass.subclass">
+							<span class="blue mx-1">&bull;</span>
+							<i>{{ subclass.subclass }}</i>
+						</template>
+						</div>
+					</template>
+				</div>
+			</div>
+		</div>
+		<div class="computed">
 			<template v-if="character.display">
-				<hr>
 				<div class="stats">
 					<div class="armor_class" v-if="character.display.armor_class">
-						<h6>Armor Class</h6>
+						<h6>AC</h6>
 						<div class="value">
 							{{ character.display.armor_class }}
 						</div>
@@ -56,7 +48,7 @@
 							}
 						})
 					">
-						<h6>Hit Points</h6>
+						<h6>HP</h6>
 						<div class="value">
 							{{ character.display.hit_points }}
 						</div>
@@ -142,7 +134,7 @@
 										Proficient
 									</q-tooltip>
 								</i>
-								{{ key.capitalize() }}
+								{{ key.substring(0, 3).toUpperCase() }}
 							</span>
 							<span class="value">
 								<hk-roll
@@ -185,11 +177,17 @@
 						</span>
 					</li>
 				</ul>
-			</div> -->
+			</div>
 
+			<!-- <p>Base values</p>
 			<pre>
 				{{ characterState.character }}
 			</pre>
+
+			<p>Computed values</p>
+			<pre>
+				{{ computed }}
+			</pre> -->
 		</div>
 	</hk-card>
 </template>
@@ -210,7 +208,7 @@
 		inject: ["characterState"],
 		computed: {
 			computed() {
-				return this.characterState.computed_values || {}
+				return this.characterState.computed_character || {}
 			},
 			modifiers() {
 				return this.characterState.modifierArray
@@ -297,6 +295,27 @@
 		position: sticky;
 		top: 0;
 		margin-top: 48px;
+
+		.card-header {
+			padding: 0;
+			justify-content: flex-start;
+			line-height: 20px;
+			font-size: 12px;
+
+			.image {
+				height: 62px;
+				width: 62px;
+				border-right: solid 1px $neutral-5;
+				color: $neutral-2;
+				background-color: $neutral-9;
+				text-align: center;
+				line-height: 62px;
+				font-size: 45px;
+				margin-right: 10px;
+				background-position: center top;
+				background-size: cover;
+			}
+		}
 		
 		.computed {
 			padding: 15px;
@@ -307,26 +326,6 @@
 				margin: 0px;
 			}
 	
-			.q-circular-progress {
-				margin: 0 0 10px -5px;
-			}
-			.image {
-				width: 118px;
-				height: 118px;
-				border: solid 1px $neutral-4;
-				background-color: $neutral-9;
-				color: $neutral-2;
-				border-radius: 50%;
-				background-position: center top;
-				background-repeat: no-repeat;
-				background-size: cover;
-				line-height: 118px;
-				text-align: center;
-				font-size: 90px;
-			}
-			.general {
-				
-			}
 			.abilities {
 				display: flex;
 				justify-content: space-between;
@@ -343,14 +342,14 @@
 						text-transform: uppercase;
 						height: 15px;
 						margin: 0;
+						color: $neutral-2;
 					}
 					.mod {
 						height: 55px;
 						line-height: 60px;
-						font-size: 35px;
+						font-size: 30px;
 						font-weight: bold;
 						font-family: 'Fredericka the Great', cursive !important;
-						color: #fff;
 					}
 				}
 			}
@@ -369,14 +368,14 @@
 						height: 15px;
 						line-height: 15px;
 						margin: 0;
+						color: $neutral-2;
 					}
 					.value {
-						height: 60px;
-						line-height: 60px;
-						font-size: 45px;
+						height: 40px;
+						line-height: 40px;
+						font-size: 35px;
 						font-weight: bold;
 						font-family: 'Fredericka the Great', cursive !important;
-						color: #fff;
 					}
 					.ft {
 						font-size: 15px;
@@ -392,12 +391,11 @@
 					display: flex;
 					justify-content: space-between;
 					line-height: 35px;
-					border-bottom: solid 1px #b2b2b2;
+					border-bottom: solid 1px $neutral-3;
 	
 					.value {
 						font-family: 'Fredericka the Great', cursive !important;
 						font-size: 20px;
-						color: #fff;
 					}
 				}
 			}
@@ -405,7 +403,7 @@
 				height: 128px;
 				column-count: 2;
 				column-gap: 15px;
-				column-rule: 1px solid #5c5757;
+				column-rule: 1px solid $neutral-3;
 			}
 			.advantage {
 				color: #83b547 !important;

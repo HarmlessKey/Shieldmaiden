@@ -204,24 +204,6 @@
 			deleteTrait(index, valid) {
 				this.character.delete_trait(index);
 				this.save(valid);
-				//Delete all modifiers linked to this feat
-				// const linked_modifiers = this.trait_modifiers(key);
-
-				// for(const modifier of linked_modifiers) {
-				// 	this.delete_modifier({
-				// 		userId: this.userId,
-				// 		key: this.characterId,
-				// 		modifier_key: modifier['.key']
-				// 	});
-				// }
-
-				// //Delete trait
-				// this.delete_trait({
-				// 	userId: this.userId,
-				// 	key: this.characterId,
-				// 	trait_key: key
-				// });
-				// this.$emit("change", "race.trait_removed");
 			},
 			confirmDelete(index, name, valid) {
 				this.$snotify.error('Are you sure you want to delete the the trait "' + name + '"?', 'Delete trait', {

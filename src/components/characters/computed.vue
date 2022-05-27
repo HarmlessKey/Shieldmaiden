@@ -1,18 +1,18 @@
 <template>
-	<hk-card :header="character_name">
+	<hk-card :header="computed.character_name">
 		<div class="card-header" slot="header">
-			<div class="image" :style="avatar ? `background-image: url('${avatar}')` : ''">
-				<i v-if="!avatar" class="hki-player" aria-hidden="true" />
+			<div class="image" :style="computed.avatar ? `background-image: url('${computed.avatar}')` : ''">
+				<i v-if="!computed.avatar" class="hki-player" aria-hidden="true" />
 			</div>
 			<div>
 				<div class="name truncate">
-					<strong>{{ character_name || "Unnamed Character" }}</strong>
+					<strong>{{ computed.character_name || "Unnamed Character" }}</strong>
 				</div>
 				<div>
-					Level {{ character.display.level }} &bull; {{ race ? race.race_name : "" }}
-					<template v-if="character.sheet && character.sheet.classes">
+					Level {{ computed.level }} &bull; {{ computed.race.race_name }}
+					<template v-if="computed.classes">
 						<div v-for="( subclass, index) in classes" :key="`class-${index}`">
-						{{ (subclass.level &lt; character.display.level) ? `${subclass.level}` : `` }}
+						{{ (subclass.level &lt; computed.level) ? `${subclass.level}` : `` }}
 						<b>{{ subclass.name }}</b>
 						<template v-if="subclass.subclass">
 							<span class="blue mx-1">&bull;</span>
@@ -24,24 +24,24 @@
 			</div>
 		</div>
 		<div class="computed">
-			<template v-if="character.display">
+			<template>
 				<div class="stats">
-					<div class="armor_class" v-if="character.display.armor_class">
+					<div class="armor_class" v-if="computed.armor_class">
 						<h6>AC</h6>
 						<div class="value">
-							{{ character.display.armor_class }}
+							{{ computed.armor_class }}
 						</div>
 					</div>
 					<div 
 						class="hit_points" 
-						v-if="character.display.hit_points" 
+						v-if="computed.hit_points" 
 						@click="setSlide({
 							show: true, 
 							type: 'slides/characterBuilder/HitPoints',
 							data: {
-								total: character.display.hit_points,
+								total: computed.hit_points,
 								hit_point_type,
-								level: character.display.level,
+								level: computed.level,
 								con_mod: character.sheet ? calcMod(character.sheet.abilities.constitution) : 0,
 								modifiers: hp_modifiers,
 								classes,
@@ -50,16 +50,16 @@
 					">
 						<h6>HP</h6>
 						<div class="value">
-							{{ character.display.hit_points }}
+							{{ computed.hit_points }}
 						</div>
 					</div>
-					<div class="speed" v-if="character.display.speed">
+					<div class="speed" v-if="computed.speed">
 						<h6>Speed</h6>
 						<div class="value">
-							{{ character.display.speed }}<span class="ft gray-hover">ft.</span>
+							{{ computed.speed }}<span class="ft gray-hover">ft.</span>
 						</div>
 					</div>
-					<div class="initiative" v-if="character.display.initiative">
+					<div class="initiative" v-if="computed.initiative">
 						<h6>Initiative</h6>
 						<div class="value">
 							<hk-roll
@@ -67,29 +67,29 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: character.display.initiative,
+									m: computed.initiative,
 									title: 'Initiative roll',
 									notify: true,
 									advantage: checkAdvantage('initiative')
 								}"
 							>
 								<span class="gray-hover">
-									{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
+									{{ computed.initiative >= 0 ? "+" : "-" }}</span>
 									<span 
 										class="int"
 										:class="Object.keys(checkAdvantage('initiative')).length === 1 ? Object.keys(checkAdvantage('initiative'))[0] : ''"
-									>{{ Math.abs(character.display.initiative) }}</span>
+									>{{ Math.abs(computed.initiative) }}</span>
 							</hk-roll>
 						</div>
 					</div>
 				</div>
 				<hr>
 			</template>
-			<div v-else class="neutral-2">
+			<!-- <div v-else class="neutral-2">
 				As you build your character a preview of your stats as they will be on the character sheet shows here.
-			</div>
+			</div> -->
 
-			<template v-if="computed.sheet && computed.sheet.abilities">
+			<template>
 				<div class="abilities">
 					<div v-for="{value, label} in abilities" :key="`score-${value}`">
 						<div class="ability">{{ label.substring(0, 3) }}</div>
@@ -99,20 +99,20 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: calcMod(computed.sheet.abilities[value]),
+									m: calcMod(computed.abilities[value]),
 									title: `${value.capitalize()} check`,
 									notify: true,
 									advantage: checkAdvantage('abilities', value)
 								}"
 							>
-								<span class="gray-hover" v-if="calcMod(computed.sheet.abilities[value]) !== 0">
-									{{ calcMod(computed.sheet.abilities[value]) > 0 ? "+" : "-" }}</span>
+								<span class="gray-hover" v-if="calcMod(computed.abilities[value]) !== 0">
+									{{ calcMod(computed.abilities[value]) > 0 ? "+" : "-" }}</span>
 								<span class="int"
 									:class="Object.keys(checkAdvantage('abilities', value)).length === 1 ? Object.keys(checkAdvantage('abilities', value))[0] : ''"
-								>{{ Math.abs(calcMod(computed.sheet.abilities[value])) }}</span>
+								>{{ Math.abs(calcMod(computed.abilities[value])) }}</span>
 							</hk-roll>
 						</div>
-						<div class="score">{{ computed.sheet.abilities[value] }}</div>
+						<div class="score">{{ computed.abilities[value] }}</div>
 					</div>
 				</div>
 
@@ -158,10 +158,10 @@
 				</div>
 			</template>
 
-			<div v-if="character.sheet && character.sheet.senses">
+			<div>
 				<h4>Senses</h4>
 				<ul class="list">
-					<li v-for="(sense, key) in character.sheet.senses" :key="key">
+					<li v-for="(sense, key) in computed.senses" :key="key">
 						<span class="type">
 							<i 
 								class="mr-2"
@@ -233,33 +233,31 @@
 			},
 			saving_throws() {
 				let saving_throws = {};
-				if(this.computed.sheet && this.computed.sheet.abilities && this.computed.sheet.saving_throws) {
-					const proficiencies = this.computed.sheet.saving_throws.proficiencies || {};
-					const bonuses = this.computed.sheet.saving_throws.bonuses || {};
-					const advantage_disadvantage = (this.computed.sheet.advantage_disadvantage) ? this.computed.sheet.advantage_disadvantage.saving_throws : {};
+				const proficiencies = this.computed.saving_throws.proficiencies || {};
+				const bonuses = this.computed.saving_throws.bonuses || {};
+				const advantage_disadvantage = (this.computed.advantage_disadvantage) ? this.computed.advantage_disadvantage.saving_throws : {};
 
-					for(const ability of Object.values(this.abilities)) {
-						let saving_throw = {};
-						let score = this.computed.sheet.abilities[ability.value];
-						const proficient = proficiencies[ability.value];
-						const bonus = bonuses[ability.value] || 0;
-						saving_throw.mod = this.calcMod(score) + bonus;
+				for(const ability of Object.values(this.abilities)) {
+					let saving_throw = {};
+					let score = this.computed.abilities[ability.value];
+					const proficient = proficiencies[ability.value];
+					const bonus = bonuses[ability.value] || 0;
+					saving_throw.mod = this.calcMod(score) + bonus;
 
-						//Check advantage/disadvantage
-						if(advantage_disadvantage) {
-							saving_throw.advantage_disadvantage = (advantage_disadvantage[ability.value]) ? advantage_disadvantage[ability.value] : {};
-						} else {
-							saving_throw.advantage_disadvantage = {};
-						}
-
-						//Check and add proficiency bonus
-						if(proficient) {
-							saving_throw.proficient = true;
-							saving_throw.mod = saving_throw.mod + this.computed.display.proficiency;
-						}
-
-						saving_throws[ability.value] = saving_throw;
+					//Check advantage/disadvantage
+					if(advantage_disadvantage) {
+						saving_throw.advantage_disadvantage = (advantage_disadvantage[ability.value]) ? advantage_disadvantage[ability.value] : {};
+					} else {
+						saving_throw.advantage_disadvantage = {};
 					}
+
+					//Check and add proficiency bonus
+					if(proficient) {
+						saving_throw.proficient = true;
+						saving_throw.mod = saving_throw.mod + this.computed.display.proficiency;
+					}
+
+					saving_throws[ability.value] = saving_throw;
 				}
 				return saving_throws;
 			},

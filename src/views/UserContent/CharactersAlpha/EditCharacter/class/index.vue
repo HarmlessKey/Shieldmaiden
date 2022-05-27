@@ -478,7 +478,6 @@
 	import { abilities } from 'src/mixins/abilities.js';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';
 	import { skills } from 'src/mixins/skills.js';
-	import { spellSlots } from 'src/mixins/spellSlots.js';
 	import { experience } from 'src/mixins/experience.js';
 	import { general } from 'src/mixins/general.js';
 	import { db } from 'src/firebase';
@@ -493,7 +492,6 @@
 			weapons, 
 			skills, 
 			dice, 
-			spellSlots, 
 			experience
 		],
 		props: [

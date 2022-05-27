@@ -46,14 +46,12 @@
 
 <script>
 	import { mapActions } from "vuex";
-	import { characterMixin } from "src/mixins/character.js";
 	import BuildTypeSelect from "src/components/characters/build-type-select";
 	import Computed from "src/components/characters/computed";
-	import { Character } from "src/classes/character";
+	import { Character, ComputedCharacter } from "src/classes/character";
 
 	export default {
 		name: "CharacterBuilderLayout",
-		mixins: [characterMixin],
 		components: {
 			BuildTypeSelect,
 			Computed
@@ -83,9 +81,7 @@
 			const char = await this.get_character({ uid: this.userId, id: this.characterId });
 			this.character = new Character(char);
 			this.character_copy = JSON.parse(JSON.stringify(this.character));
-
-			// Compute character
-			this.computed_character = this.compute_character(this.character, "initialize");
+			this.computed_character = new ComputedCharacter(this.character);
 			this.set_computed_character({
 				userId: this.userId,
 				key: this.playerId,
@@ -117,13 +113,15 @@
 				this.width = size.width;
 			},
 			async save() {
-				console.log("saving: ", this.character)
+				console.log("saving: ", this.character);
+
+				this.computed_character = new ComputedCharacter(this.character);
+
 				await this.update_character({
 					uid: this.userId,
 					id: this.characterId,
 					character: this.character
 				});
-				this.computed_character = this.compute_character(this.character, "save");
 				this.character_copy = JSON.parse(JSON.stringify(this.character));
 			}
 		},

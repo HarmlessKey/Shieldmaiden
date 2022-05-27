@@ -74,7 +74,6 @@
 	import { experience } from "src/mixins/experience.js";
 	import { general } from "src/mixins/general.js";
 	import { dice } from "src/mixins/dice.js";
-	import { spellSlots } from "src/mixins/spellSlots.js";
 	import { skills } from "src/mixins/skills.js";
 	import { mapGetters, mapActions } from "vuex";
 	import { db } from "src/firebase";
@@ -90,7 +89,7 @@
 		metaInfo: {
 			title: "Character"
 		},
-		mixins: [characterMixin, experience, general, dice, spellSlots, skills],
+		mixins: [characterMixin, experience, general, dice, skills],
 		components: {
 			Computed,
 			// General,

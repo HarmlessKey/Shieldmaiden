@@ -1,14 +1,15 @@
 import { experience } from "src/mixins/experience.js";
 import { general } from "src/mixins/general.js";
 import { dice } from "src/mixins/dice.js";
-import { spellSlots } from "src/mixins/spellSlots.js";
 import { skills } from "src/mixins/skills.js";
+import { experience_table, spell_slot_table } from "src/utils/character";
+
 
 export const characterMixin = {
-	mixins: [experience, general, dice, spellSlots, skills],
+	mixins: [experience, general, dice, skills],
 	data() {
 		return {
-			dvantage_disadvantage: {},
+			advantage_disadvantage: {},
 			proficiency_tracker: []
 		}
 	},
@@ -57,18 +58,18 @@ export const characterMixin = {
 			const hit_point_type = base_character.general.hit_point_type;
 
 			//Level HP and Spells
-			let classes = {};
+			let classes = [];
 			let computed_level = 0;
 			let computed_hp = (base_character.class.classes[0].hit_dice) ? base_character.class.classes[0].hit_dice : 0;
 			let caster_levels = []; //A caster level is needed to determine spell slots with the caster table (phb 165)
 
 			//Set level specific stats HP/Spells
-			for(const [key, value] of Object.entries(base_character.class.classes)) {
+			base_character.class.classes.forEach((value, index) => {
 				const level = value.level;
 				computed_level = computed_level + level;
 				
 				//Create class object for sheet
-				classes[key] = {
+				classes[index] = {
 					class: value.name || null,
 					subclass: value.subclass || null,
 					level
@@ -88,9 +89,9 @@ export const characterMixin = {
 						return die.value === value.hit_dice;
 					});
 					//For the main class only set fixed HP for the levels after first
-					computed_hp = (key == 0) ? computed_hp + ((level - 1) * hit_dice[0].average) : computed_hp + (level * hit_dice[0].average);
+					computed_hp = (index == 0) ? computed_hp + ((level - 1) * hit_dice[0].average) : computed_hp + (level * hit_dice[0].average);
 				}
-
+	
 				//Spell slots
 				if(value.caster_type) {
 					//For multiclassing in multiple casters the total caster level changes depening on the caster type (pbp 164)
@@ -100,19 +101,25 @@ export const characterMixin = {
 					} else if(value.caster_type === 'third') {
 						multiplier = 3;
 					}
-
+	
 					caster_levels.push((level/multiplier));
-					classes[key].spells_known = base_character.class.classes[key].spells_known.spells[level] || 0;
-					classes[key].cantrips_known = base_character.class.classes[key].spells_known.cantrips[level] || 0;
+					classes[index].spells_known = base_character.class.classes[index].spells_known.spells[level] || 0;
+					classes[index].cantrips_known = base_character.class.classes[index].spells_known.cantrips[level] || 0;
 				}
-			}
+			});
+
 			//save classes
 			computed_character.sheet.classes = classes;
-			// db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/classes`).set(classes);
 
 			//Save total level
 			computed_character.display.level = computed_level;
-			// db.ref(`characters_computed/${this.userId}/${this.playerId}/display/level`).set(computed_level);
+
+			//Set proficiency bonus
+			const proficiency = experience_table[computed_level].proficiency;
+			computed_character.display.proficiency = proficiency;
+
+			//Update classes
+			computed_character.sheet.classes = classes;
 
 			//Check if there is a caster level and determine the spell slots based on caster spell slot table (phb 164)
 			if(caster_levels.length >= 1) {
@@ -129,7 +136,7 @@ export const characterMixin = {
 					caster_level = Math.ceil(caster_levels[0]);
 				}
 
-				const spell_slots = this.spell_slot_table[caster_level];
+				const spell_slots = spell_slot_table[caster_level];
 				computed_character.sheet.spell_slots = spell_slots;
 				// db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/spell_slots`).set(spell_slots);
 			}
@@ -281,23 +288,15 @@ export const characterMixin = {
 			computed_character.display.hit_points = computed_hp;
 			// db.ref(`characters_computed/${this.userId}/${this.playerId}/display/hit_points`).set(computed_hp);
 
-			//Set proficiency bonus
-			const proficiency = this.xpTable[computed_level].proficiency;
-			computed_character.display.proficiency = proficiency;
-			// db.ref(`characters_computed/${this.userId}/${this.playerId}/display/proficiency`).set(proficiency);
-
-			//Set spellcasting variables Spell Attack / Spell Save DC
-			//Proficiency bonus is needed for this
+			// Set spellcasting variables Spell Attack / Spell Save DC
+			// Ability scores are needed for this
 			for(const [key, value] of Object.entries(base_character.class.classes)) {
 				if(value.casting_ability) {
 					classes[key].spell_attack = proficiency + this.calcMod(ability_scores[value.casting_ability]);
 					classes[key].spell_save_dc = 8 + proficiency + this.calcMod(ability_scores[value.casting_ability]);
 				}
 			}
-			//Update classes
-			computed_character.sheet.classes = classes;
-			// db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/classes`).update(classes);
-			
+				
 			//Initiative
 			let initiative = this.calcMod(ability_scores.dexterity);
 

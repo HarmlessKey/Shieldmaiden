@@ -101,11 +101,11 @@
 
 				<!-- SAVING THROW -->
 				<template v-if="action.type === 'save'">
-					<div class="toHit">
-						<div>
+					<div class="toHit" v-if="action.save_ability || action.save_dc">
+						<div v-if="action.save_ability">
 							{{ action.save_ability.capitalize() }} save
 						</div>
-						<div>
+						<div v-if="action.save_dc">
 							<span class="neutral-2">DC</span>
 							<span 
 								class="total" 

@@ -337,18 +337,22 @@
 													<!-- SAVE -->
 													<template v-if="action.type === 'save'">
 														<div class="col">
-															<q-select 
-																:dark="$store.getters.theme === 'dark'" filled square
-																map-options
-																emit-value
-																label="Save ability"
-																:options="abilities"
-																v-model="action.save_ability"
-																@input="$forceUpdate()"
-															/>
+															<ValidationProvider rules="required" name="Save DC" v-slot="{ errors, invalid, validated }">
+																<q-select 
+																	:dark="$store.getters.theme === 'dark'" filled square
+																	map-options
+																	emit-value
+																	label="Save ability"
+																	:options="abilities"
+																	v-model="action.save_ability"
+																	@input="$forceUpdate()"
+																	:error="invalid && validated"
+																	:error-message="errors[0]"
+																/>
+															</ValidationProvider>
 														</div>
 														<div class="col">
-															<ValidationProvider rules="between:1,99" name="Save DC" v-slot="{ errors, invalid, validated }">
+															<ValidationProvider rules="required|between:1,99" name="Save DC" v-slot="{ errors, invalid, validated }">
 																<q-input
 																	:dark="$store.getters.theme === 'dark'" filled square
 																	type="number"

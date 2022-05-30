@@ -1,476 +1,495 @@
 <template>
-	<hk-card>
-		<div class="card-header" slot="header">
-			Class
-			<button class="btn btn-sm bg-neutral-5" v-if="character.advancement === 'experience'" @click="experience_modal = !experience_modal">
-				<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
-				Experience
-			</button>
-		</div>
-		<!-- EXPERIENCE -->
-		<div v-if="character.advancement === 'experience'">
-			<div class="xp-bar" v-if="calculatedLevel(Class.experience_points) < 20">
-				<div class="xp-level">
-					{{ calculatedLevel(Class.experience_points) }}
-				</div>
-				<q-linear-progress size="25px" :value="levelAdvancement(Class.experience_points)" color="primary">
-					<div class="absolute-full d-flex justify-between">
-						<q-separator color="neutral-5" vertical v-for="i in 11" :key="i" />
+<div>
+	<ValidationObserver v-slot="{ valid }">
+		<q-form greedy>
+			<hk-card>
+				<div class="card-header" slot="header">
+					<span>Class</span>
+					<div>
+						<small class="saved green" v-if="saved" @animationend="saved = false">
+							<i aria-hidden="true" class="fas fa-check" />
+							Saved
+						</small>
+						<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+							<i aria-hidden="true" class="fas fa-times" />
+							Couldn't save
+						</small>
+						<button class="btn btn-sm bg-neutral-5" v-if="character.advancement === 'experience'" @click.prevent="experience_modal = !experience_modal">
+							<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
+							Experience
+						</button>
 					</div>
-					<div class="absolute-full flex flex-center">
-						<div class="value neutral-1 text-shadow-3">
-							<hk-animated-integer :value="levelProgress(Class.experience_points)" /> /
-							{{ levelRequired(Class.experience_points) }}
-							({{ Math.floor(levelAdvancement(Class.experience_points) * 100) }}%)
-						</div>
-					</div>				
-				</q-linear-progress>
-				<div class="xp-level" v-if="calculatedLevel(Class.experience_points) < 20">
-					{{ calculatedLevel(Class.experience_points) + 1 }}
 				</div>
-			</div>
-		</div>
-
-		<!-- CLASSES -->
-		<div class="card-body">
-			<div v-for="(subclass, classKey) in classes" :key="`class-${classKey}`">
-				<div>
-					<h3 @click="setShowClass(classKey)" class="pointer" :class="{ 'hidden-class': classKey !== showClass}">
-						Level {{ subclass.level }} {{ subclass.name }}
-						<i class="fas fa-chevron-down" aria-hidden="true"/>
-						<a 
-							v-if="character.advancement === 'experience' && calculatedLevel(Class.experience_points) > computed.display.level" 
-							class="level-up"
-							@click.stop="levelUp(classKey)"
-						>
-							Level up <i class="fas fa-arrow-circle-up" aria-hidden="true"/>
-						</a>
-					</h3>
-
-					<q-slide-transition>
-						<div class="p-3" v-show="showClass === classKey">
-							<a v-if="classKey != 0" @click="confirmDeleteClass(classKey, subclass.class)" class="red mb-4 d-block"><i class="fas fa-trash-alt"/> Delete class</a>
-							<div class="level">
-								<div class="form-item mb-3">
-									<q-input
-										dark filled square
-										label="Class"
-										@change="saveClassProp(subclass.name, classKey, 'name')"
-										autocomplete="off"
-										:id="`${classKey}-class`"
-										type="text"
-										v-model="subclass.name"
-									/>
-								</div>
-								<div class="form-item mb-3">
-									<q-input
-										dark filled square
-										label="Subclass"
-										@change="saveClassProp(subclass.subclass, classKey, 'subclass')"
-										autocomplete="off"
-										:id="`${classKey}-subclass`"
-										type="text"
-										v-model="subclass.subclass"
-									/>
-								</div>
-								<div class="form-item mb-3">
-									<q-select
-										dark filled square
-										label="Level"
-										v-model="subclass.level"
-										:options="levels"
-									>
-										<template v-slot:option="scope">
-											<q-item 
-												clickable 
-												v-ripple 
-												v-close-popup
-												:active="subclass.level === scope.opt"
-												@click="saveClassLevel(classKey, scope.opt)"
-												:disable="levelAvailable(subclass, scope.opt)"
-											>
-												{{ scope.opt }}
-											</q-item>
-										</template>
-									</q-select>
-								</div>
+				<!-- EXPERIENCE -->
+				<div v-if="character.advancement === 'experience'">
+					<div class="xp-bar" v-if="calculatedLevel(Class.experience_points) < 20">
+						<div class="xp-level">
+							{{ calculatedLevel(Class.experience_points) }}
+						</div>
+						<q-linear-progress size="25px" :value="levelAdvancement(Class.experience_points)" color="primary">
+							<div class="absolute-full d-flex justify-between">
+								<q-separator color="neutral-5" vertical v-for="i in 11" :key="i" />
 							</div>
+							<div class="absolute-full flex flex-center">
+								<div class="value neutral-1 text-shadow-3">
+									<hk-animated-integer :value="levelProgress(Class.experience_points)" /> /
+									{{ levelRequired(Class.experience_points) }}
+									({{ Math.floor(levelAdvancement(Class.experience_points) * 100) }}%)
+								</div>
+							</div>				
+						</q-linear-progress>
+						<div class="xp-level" v-if="calculatedLevel(Class.experience_points) < 20">
+							{{ calculatedLevel(Class.experience_points) + 1 }}
+						</div>
+					</div>
+				</div>
 
-							<!-- HIT POINTS -->
-							<q-list dark square class="accordion hit_points mb-3">
-								<q-expansion-item
-									dark switch-toggle-side
-									:group="`${classKey}`"
+				<!-- CLASSES -->
+				<div class="card-body">
+					<div v-for="(subclass, classIndex) in classes" :key="`class-${classIndex}`">
+						<div>
+							<h3 @click="setShowClass(classIndex)" class="pointer" :class="{ 'hidden-class': classIndex !== showClass}">
+								Level {{ subclass.level }} {{ subclass.name }}
+								<i class="fas fa-chevron-down" aria-hidden="true"/>
+								<a 
+									v-if="character.advancement === 'experience' && calculatedLevel(Class.experience_points) > computed.level" 
+									class="level-up"
+									@click.stop="levelUp(classIndex, valid)"
 								>
-									<template v-slot:header>
-										<q-item-section avatar>
-											<i class="fas fa-heart" aria-hidden="true" />
-										</q-item-section>
-										<q-item-section>
-											Hit points
-										</q-item-section>
-										<q-item-section avatar>
-											<div class="d-flex justify-content-end">
-												<div v-if="subclass.hit_dice">
-													{{ subclass.level }}d{{ subclass.hit_dice }}
-													<q-tooltip anchor="top middle" self="center middle">
-														Hit dice
-													</q-tooltip>
-												</div>
-												<q-separator vertical dark class="mx-2" />
-												<div v-if="computed.sheet && computed.sheet.abilities && computed.sheet.abilities.constitution">
-													{{ calcMod(computed.sheet.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.sheet.abilities.constitution) }}
-													<q-tooltip anchor="top middle" self="center middle">
-														Constitution modifier
-													</q-tooltip>
-												</div>
-												<q-separator vertical dark class="mx-2" />
-												<div>
-													{{ classTotalHP(classKey, 'total') }}
-													<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-														<q-card dark square>
-															<q-card-section class="bg-gray-active">
-																<strong>{{ subclass.name }} Hit Points</strong>
-															</q-card-section>
-															<q-card-section>
-																<div v-html="classTotalHP(classKey, 'info')" />
-															</q-card-section>
-														</q-card>
-													</q-menu>
-												</div>
-											</div>
-										</q-item-section>
-									</template>
+									Level up <i class="fas fa-arrow-circle-up" aria-hidden="true"/>
+								</a>
+							</h3>
 
-									<div class="accordion-body">
-										<p>Hit dice</p>
-										<div class="hit-dice">
-											<a 
-												v-for="{value, text} in dice_types" 
-												@click="saveClassProp(value, classKey, 'hit_dice', true)" 
-												:key="`d${value}-${classKey}`"
-												:class="{ active: subclass.hit_dice === value }"
-												>
-												<i :class="`fas fa-dice-d${value}`" aria-hidden="true" />
-												{{ text }}
-											</a>
-										</div>
-										
-										<div v-if="character.hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 0)" class="mt-3">
-											<p>Rolled hit points</p>
-											<div class="rolled" @click="rollHitPoints(classKey)">
-												<span class="val">
-													{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
-												</span>
-												<i class="fas fa-pencil" aria-hidden="true" />
-											</div>
-										</div>
-									</div>
-								</q-expansion-item>
-								
-								<!-- CASTER -->
-								<q-expansion-item
-									dark switch-toggle-side
-									:group="`${classKey}`"
-								>
-									<template v-slot:header>
-										<q-item-section avatar>
-											<i class="fas fa-hand-holding-magic" aria-hidden="true" />
-										</q-item-section>
-										<q-item-section>
-											Spell casting
-										</q-item-section>
-										<q-item-section avatar>
-											<div class="d-flex justify-content-end" v-if="subclass.casting_ability">
-												<hk-popover :header="`${subclass.name} spell attack`">
-													{{ computed.sheet.classes[classKey].spell_attack > 0 ? "+" : "" }}{{ computed.sheet.classes[classKey].spell_attack }}
-													<template #content>
-														{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</strong><br/>
-														Proficiency bonus: <strong>{{ computed.display.proficiency }}</strong>
-													</template>
-												</hk-popover>
-												<q-separator vertical dark class="mx-2" />
-												<hk-popover :header="`${subclass.name} spell save DC`">
-													{{ computed.sheet.classes[classKey].spell_save_dc }}
-													<template #content>
-														Base: <strong>8</strong><br/>
-														{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</strong><br/>
-														Proficiency bonus: <strong>{{ computed.display.proficiency }}</strong>
-													</template>
-												</hk-popover>
-											</div>
-										</q-item-section>
-									</template>
-
-									<div class="accordion-body">
+							<q-slide-transition>
+								<div class="p-3" v-show="showClass === classIndex">
+									<a v-if="classIndex != 0" @click="confirmDeleteClass(classIndex, subclass.class)" class="red mb-4 d-block"><i class="fas fa-trash-alt"/> Delete class</a>
+									<div class="level">
 										<div class="form-item mb-3">
-											<q-select 
+											<q-input
 												dark filled square
-												label="Caster type"
-												v-model="subclass.caster_type" 
-												:options="caster_types" 
-												emit-value
-												map-options
-												@input="saveCasterType(classKey)"
+												label="Class"
+												@change="save(valid)"
+												autocomplete="off"
+												:id="`${classIndex}-class`"
+												type="text"
+												v-model="subclass.name"
 											/>
 										</div>
 										<div class="form-item mb-3">
-											<q-select 
+											<q-input
 												dark filled square
-												label="Spell casting ability"
-												v-model="subclass.casting_ability"
-												emit-value
-												map-options
-												:options="abilities" 
-												@input="saveCastingAbility(classKey)"
+												label="Subclass"
+												@change="save(valid)"
+												autocomplete="off"
+												:id="`${classIndex}-subclass`"
+												type="text"
+												v-model="subclass.subclass"
 											/>
 										</div>
 										<div class="form-item mb-3">
-											<q-select 
+											<q-select
 												dark filled square
-												label="Spell knowledge"
-												v-model="subclass.spell_knowledge"
-												emit-value
-												map-options
-												:options="spell_knowledge_types" 
-												@input="saveSpellKnowledge(classKey)"
-											/>
-										</div>
-										<div class="form-item mb-3" v-if="subclass.caster_type">
-											<a @click="spellsKnown(classKey)">Spells known</a>
-										</div>
-									</div>
-								</q-expansion-item>
-
-								<!-- PROFICIENCIES -->
-								<q-expansion-item
-									dark switch-toggle-side
-									:group="`${classKey}`"
-								>
-									<template v-slot:header>
-										<q-item-section avatar>
-											<i class="fas fa-sparkles" aria-hidden="true"/>
-										</q-item-section>
-										<q-item-section>
-											Proficiencies
-										</q-item-section>
-										<q-item-section avatar>
-											+{{ computed.display.proficiency }}
-										</q-item-section>
-									</template>
-
-									<div class="accordion-body">
-										<!-- ARMOR -->
-										<div class="form-item mb-3">
-											<q-select 
-												dark filled square
-												emit-value map-options 
-												label="Armor"
-												multiple
-												:options="armor_types" 
-												:value="proficiencies[classKey].armor" 
-												@input="setProficiencies($event, classKey, 'armor')"
-											/>
-										</div>
-
-										<!-- WEAPONS -->
-										<div class="form-item mb-3">
-											<q-select 
-												dark 
-												filled 
-												square 
-												multiple 
-												:value="proficiencies[classKey].weapon" 
-												:options="weaponList" 
-												label="Weapon"
+												label="Level"
+												v-model="subclass.level"
+												:options="levels"
 											>
-												<template v-slot:selected v-if="proficiencies[classKey].weapon.length !== 0">
-													<span v-for="(key, index) in proficiencies[classKey].weapon" :key="key" class="mr-1">
-														{{ displayWeapon(key).label }}{{ index &lt; (proficiencies[classKey].weapon.length - 1) ? "," : ""  }}
-													</span>
-												</template>
 												<template v-slot:option="scope">
-													<q-item :key="`weapon-category-${scope.index}`">
-														<q-item-section>
-															<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.category }}</q-item-label>
-														</q-item-section>
+													<q-item 
+														clickable 
+														v-ripple 
+														v-close-popup
+														:active="subclass.level === scope.opt"
+														@click="saveClassLevel(classIndex, scope.opt, valid)"
+														:disable="levelAvailable(subclass, scope.opt)"
+													>
+														{{ scope.opt }}
 													</q-item>
-
-													<template v-for="weapon in scope.opt.weapons">
-														<q-item
-															:key="weapon.value"
-															clickable
-															v-ripple
-															@click="setWeaponProficiencies(weapon.value, classKey)" 
-															:active="proficiencies[classKey].weapon.includes(weapon.value)"
-														>
-															<q-item-section>
-																<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
-															</q-item-section>
-														</q-item>
-													</template>
-													<q-separator />
 												</template>
 											</q-select>
 										</div>
-										<div class="form-item mb-3">
-											<q-select 
-												dark filled square
-												emit-value map-options 
-												label="Skills"
-												multiple
-												option-value="value"
-												option-label="skill"
-												:options="Object.values(skillList)" 
-												:value="proficiencies[classKey].skill" 
-												@input="setProficiencies($event, classKey, 'skill')"
-											/>
-										</div>
-										<div class="form-item mb-3" v-if="classKey == 0">
-											<q-select 
-												dark filled square
-												emit-value map-options 
-												label="Saving throws"
-												multiple
-												:options="abilities" 
-												:value="proficiencies[classKey].saving_throw" 
-												@input="setProficiencies($event, classKey, 'saving_throw')"
-											/>
-										</div>
 									</div>
-								</q-expansion-item>
-							</q-list>
 
-							<!-- CLASS FEATURES -->
-							<h3>{{ subclass.name || "Class" }} features</h3>
-							<Features 
-								:playerId="playerId" 
-								:userId="userId" 
-								:subclass="subclass" 
-								:classKey="classKey" 
-								:modifiers="modifiers"
-								:classes="classes"
-								@change="emitChange"
-							/>
-						</div>
-					</q-slide-transition>
-				</div>
-			</div>
+									<!-- HIT POINTS -->
+									<q-list dark square class="accordion hit_points mb-3">
+										<q-expansion-item
+											dark switch-toggle-side
+											:group="`${classIndex}`"
+										>
+											<template v-slot:header>
+												<q-item-section avatar>
+													<i class="fas fa-heart" aria-hidden="true" />
+												</q-item-section>
+												<q-item-section>
+													Hit points
+												</q-item-section>
+												<q-item-section avatar>
+													<div class="d-flex justify-content-end">
+														<div v-if="subclass.hit_dice">
+															{{ subclass.level }}d{{ subclass.hit_dice }}
+															<q-tooltip anchor="top middle" self="center middle">
+																Hit dice
+															</q-tooltip>
+														</div>
+														<q-separator vertical dark class="mx-2" />
+														<div >
+															{{ calcMod(computed.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.abilities.constitution) }}
+															<q-tooltip anchor="top middle" self="center middle">
+																Constitution modifier
+															</q-tooltip>
+														</div>
+														<q-separator vertical dark class="mx-2" />
+														<hk-popover :header="`${subclass.name} hit points`">
+															<strong>{{ character.total_class_hp(classIndex, computed.abilities.constitution).hp }}</strong>
+															<div slot="content" v-html="character.total_class_hp(classIndex, computed.abilities.constitution).info" />
+														</hk-popover>
+													</div>
+												</q-item-section>
+											</template>
 
-			<!-- ADD CLASS -->
-			<a 
-				v-if="levelAvailable()"
-				@click="addClass()" 
-				class="btn bg-neutral-5"
-			>
-				<i class="fas fa-plus" aria-hidden="true"/> Add a class
-			</a>
-		</div>
+											<div class="accordion-body">
+												<p>
+													<strong>Hit dice</strong><br/>
+													Select the the <em>Hit Point Dice</em> for this class <span class="neutral-2">(phb 12)</span>
+												</p>
+												<div class="hit-dice">
+													<a 
+														v-for="{value, text} in dice_types" 
+														@click="setHitDice(classIndex, value, valid)" 
+														:key="`d${value}-${classIndex}`"
+														:class="{ active: subclass.hit_dice === value }"
+														>
+														<i :class="`fas fa-dice-d${value}`" aria-hidden="true" />
+														{{ text }}
+													</a>
+												</div>
+												
+												<div v-if="character.hit_point_type === 'rolled' && (subclass.level > 1 || classIndex !== 0)" class="mt-3">
+													<p>
+														<strong>Rolled hit points</strong><br/>
+														Every time you gain a level, you can roll your <em>Hit Dice</em> 
+														and add the outcome plus the Constitution modifier to your total hit points 
+														(minimum of 1). (php 15)<br/>
+													</p>
+													<div class="rolled" @click="rollHitPoints(classIndex)">
+														<span class="val">
+															{{ character.total_rolled_hp(classIndex) }}
+														</span>
+														<i class="fas fa-pencil" aria-hidden="true" />
+													</div>
+												</div>
+											</div>
+										</q-expansion-item>
+										
+										<!-- CASTER -->
+										<q-expansion-item
+											dark switch-toggle-side
+											:group="`${classIndex}`"
+										>
+											<template v-slot:header>
+												<q-item-section avatar>
+													<i class="fas fa-hand-holding-magic" aria-hidden="true" />
+												</q-item-section>
+												<q-item-section>
+													Spell casting
+												</q-item-section>
+												<q-item-section avatar>
+													<div class="d-flex justify-content-end" v-if="subclass.casting_ability">
+														<hk-popover :header="`${subclass.name} spell attack`">
+															{{ computed.classes[classIndex].spell_attack > 0 ? "+" : "" }}{{ computed.classes[classIndex].spell_attack }}
+															<template #content>
+																{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
+																Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
+															</template>
+														</hk-popover>
+														<q-separator vertical dark class="mx-2" />
+														<hk-popover :header="`${subclass.name} spell save DC`">
+															{{ computed.classes[classIndex].spell_save_dc }}
+															<template #content>
+																Base: <strong>8</strong><br/>
+																{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
+																Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
+															</template>
+														</hk-popover>
+													</div>
+												</q-item-section>
+											</template>
 
-		<!-- ROLLED HP MODAL -->
-		<q-dialog v-model="roll_hp_modal" v-if="character.hit_point_type === 'rolled'">
-			<hk-card>
-				<div slot="header" class="card-header d-flex justify-content-between">
-					<span>
-						Rolled HP {{ classes[editClass].name }}
-					</span>
-					<q-btn flat v-close-popup round icon="close" />
-				</div>
+											<div class="accordion-body">
+												<div class="form-item mb-3">
+													<q-select 
+														dark filled square
+														label="Caster type"
+														v-model="subclass.caster_type" 
+														:options="caster_types" 
+														emit-value
+														map-options
+														@input="saveCasterType(classIndex)"
+													/>
+												</div>
+												<div class="form-item mb-3">
+													<q-select 
+														dark filled square
+														label="Spell casting ability"
+														v-model="subclass.casting_ability"
+														emit-value
+														map-options
+														:options="abilities" 
+														@input="saveCastingAbility(classIndex)"
+													/>
+												</div>
+												<div class="form-item mb-3">
+													<q-select 
+														dark filled square
+														label="Spell knowledge"
+														v-model="subclass.spell_knowledge"
+														emit-value
+														map-options
+														:options="spell_knowledge_types" 
+														@input="saveSpellKnowledge(classIndex)"
+													/>
+												</div>
+												<div class="form-item mb-3" v-if="subclass.caster_type">
+													<a @click="spellsKnown(classIndex)">Spells known</a>
+												</div>
+											</div>
+										</q-expansion-item>
 
-				<template v-if="classes[editClass].hit_dice">
-					<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
-						<q-input 
-							dark filled square
-							@change="setRolledHP($event.target.value, editClass, level)"
-							autocomplete="off" 
-							:id="`level-${level}`" 
-							type="number"
-							:value="classes[editClass].rolled_hit_points ? classes[editClass].rolled_hit_points[level] : 0" 
-							:label="`Level ${level}`"
-						>
-							<a 
-								slot="after"
-								:class="{ hidden: classes[editClass].rolled_hit_points && classes[editClass].rolled_hit_points[level] }"
-								class="btn"
-								@click="rollHitDice(editClass, level)"
-							>
-								Roll
-							</a>
-						</q-input>
-					</div>
-				</template>
-				<p v-else class="red">
-					First set the class' hit dice.
-				</p>
-			</hk-card>
-		</q-dialog>
+										<!-- PROFICIENCIES -->
+										<q-expansion-item
+											dark switch-toggle-side
+											:group="`${classIndex}`"
+										>
+											<template v-slot:header>
+												<q-item-section avatar>
+													<i class="fas fa-sparkles" aria-hidden="true"/>
+												</q-item-section>
+												<q-item-section>
+													Proficiencies
+												</q-item-section>
+												<q-item-section avatar>
+													+{{ computed.proficiency }}
+												</q-item-section>
+											</template>
 
-		<!-- EXPERIENCE MODAL -->
-		<q-dialog v-model="experience_modal">
-			<hk-card>
-				<div slot="header" class="card-header d-flex justify-content-between">
-					<span>
-						Experience points
-					</span>
-					<q-btn flat v-close-popup round icon="close" />
-				</div>
-				<div class="card-body">
-					<h3 class="xp">
-						<hk-animated-integer :value="Class.experience_points" /><small>xp</small>
-					</h3>
-					<div class="handle-xp">
-						<q-input 
-							dark filled square
-							autocomplete="off"
-							id="xp" 
-							type="number"
-							v-model="xp"
-							placeholder="Amount"
-						/>
-						<div>
-							<a @click="handleXP('add')" class="btn bg-green">Add</a>
-							<a @click="handleXP('remove')" class="btn bg-red">Remove</a>
-						</div>
-					</div>
-				</div>
-			</hk-card>
-		</q-dialog>
+											<div class="accordion-body">
+												<!-- ARMOR -->
+												<div class="form-item mb-3">
+													<q-select 
+														dark filled square
+														emit-value map-options 
+														label="Armor"
+														multiple
+														:options="armor_types" 
+														:value="proficiencies[classIndex].armor" 
+														@input="setProficiencies($event, classIndex, 'armor')"
+													/>
+												</div>
 
-		<!-- SPELLS KNOWN MODAL -->
-		<q-dialog v-model="spells_known_modal">
-			<hk-card>
-				<div slot="header" class="card-header d-flex justify-content-between">
-					<span>
-						Spells known 
-					</span>
-					<q-btn flat v-close-popup round icon="close" />
-				</div>
-				<div class="spells-known" v-if="classes[editClass].spells_known">
-					<h3>Cantrips & Spells known</h3>
-						<div class="columns">
-							<div>Level</div><div>Cantrips</div><div>Spells</div>
-							<template v-for="i in 20">
-								<div :key="`level-${i}`">
-									{{ i }}
+												<!-- WEAPONS -->
+												<div class="form-item mb-3">
+													<q-select 
+														dark 
+														filled 
+														square 
+														multiple 
+														:value="proficiencies[classIndex].weapon" 
+														:options="weaponList" 
+														label="Weapon"
+													>
+														<template v-slot:selected v-if="proficiencies[classIndex].weapon.length !== 0">
+															<span v-for="(key, index) in proficiencies[classIndex].weapon" :key="key" class="mr-1">
+																{{ displayWeapon(key).label }}{{ index &lt; (proficiencies[classIndex].weapon.length - 1) ? "," : ""  }}
+															</span>
+														</template>
+														<template v-slot:option="scope">
+															<q-item :key="`weapon-category-${scope.index}`">
+																<q-item-section>
+																	<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.category }}</q-item-label>
+																</q-item-section>
+															</q-item>
+
+															<template v-for="weapon in scope.opt.weapons">
+																<q-item
+																	:key="weapon.value"
+																	clickable
+																	v-ripple
+																	@click="setWeaponProficiencies(weapon.value, classIndex)" 
+																	:active="proficiencies[classIndex].weapon.includes(weapon.value)"
+																>
+																	<q-item-section>
+																		<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+																	</q-item-section>
+																</q-item>
+															</template>
+															<q-separator />
+														</template>
+													</q-select>
+												</div>
+												<div class="form-item mb-3">
+													<q-select 
+														dark filled square
+														emit-value map-options 
+														label="Skills"
+														multiple
+														option-value="value"
+														option-label="skill"
+														:options="Object.values(skillList)" 
+														:value="proficiencies[classIndex].skill" 
+														@input="setProficiencies($event, classIndex, 'skill')"
+													/>
+												</div>
+												<div class="form-item mb-3" v-if="classIndex == 0">
+													<q-select 
+														dark filled square
+														emit-value map-options 
+														label="Saving throws"
+														multiple
+														:options="abilities" 
+														:value="proficiencies[classIndex].saving_throw" 
+														@input="setProficiencies($event, classIndex, 'saving_throw')"
+													/>
+												</div>
+											</div>
+										</q-expansion-item>
+									</q-list>
+
+									<!-- CLASS FEATURES -->
+									<h3>{{ subclass.name || "Class" }} features</h3>
+									<Features 
+										:playerId="playerId" 
+										:userId="userId" 
+										:subclass="subclass" 
+										:classIndex="classIndex" 
+										:modifiers="modifiers"
+										:classes="classes"
+										@change="emitChange"
+									/>
 								</div>
-								<q-input 
-									dark filled square
-									v-model="classes[editClass].spells_known.cantrips[i]" 
-									:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
-									:tabindex="`1${i < 10 ? `0${i}` : i}`"
-								/>
-								<q-input 
-									dark filled square
-									v-model="classes[editClass].spells_known.spells[i]"
-									:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
-									:tabindex="`2${i < 10 ? `0${i}` : i}`"
-								/>
-							</template>
+							</q-slide-transition>
 						</div>
+					</div>
+
+					<!-- ADD CLASS -->
+					<a 
+						v-if="levelAvailable()"
+						@click="addClass()" 
+						class="btn bg-neutral-5"
+					>
+						<i class="fas fa-plus" aria-hidden="true"/> Add a class
+					</a>
 				</div>
+
+				<!-- ROLLED HP MODAL -->
+				<q-dialog v-model="roll_hp_modal" v-if="character.hit_point_type === 'rolled'">
+					<hk-card>
+						<div slot="header" class="card-header d-flex justify-content-between">
+							<span>
+								Rolled HP {{ classes[editClass].name }}
+							</span>
+							<q-btn flat v-close-popup round icon="close" size="sm" />
+						</div>
+
+						<div class="card-body">
+							<template v-if="classes[editClass].hit_dice">
+								<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
+									<ValidationProvider :rules="{ between: [0, classes[editClass].hit_dice]}" name="Value" v-slot="{ errors, invalid, validated }">
+										<q-input 
+											dark filled square
+											@change="setRolledHP($event.target.value, editClass, level, valid)"
+											autocomplete="off" 
+											type="number"
+											:value="classes[editClass].rolled_hit_points ? classes[editClass].rolled_hit_points[level] : 0" 
+											:label="`Level ${level}`"
+											:error="invalid && validated"
+											:error-message="errors[0]"
+										>
+											<button 
+												slot="after"
+												class="btn"
+												:disabled="classes[editClass].rolled_hit_points && classes[editClass].rolled_hit_points[level]"
+												@click.stop="rollHitDice(editClass, level, valid)"
+											>
+												Roll
+											</button>
+										</q-input>
+									</ValidationProvider>
+								</div>
+							</template>
+							<div v-else class="red">
+								First set the class' hit dice.
+							</div>
+						</div>
+					</hk-card>
+				</q-dialog>
+
+				<!-- EXPERIENCE MODAL -->
+				<q-dialog v-model="experience_modal">
+					<hk-card>
+						<div slot="header" class="card-header d-flex justify-content-between">
+							<span>
+								Experience points
+							</span>
+							<q-btn flat v-close-popup round icon="close" size="sm" />
+						</div>
+						<div class="card-body">
+							<h3 class="xp">
+								<hk-animated-integer :value="Class.experience_points" /><small>xp</small>
+							</h3>
+							<div class="handle-xp">
+								<q-input 
+									dark filled square
+									autocomplete="off"
+									type="number"
+									v-model="xp"
+									placeholder="Amount"
+								/>
+								<div>
+									<a @click="handleXP('add', valid)" class="btn bg-green">Add</a>
+									<a @click="handleXP('remove', valid)" class="btn bg-red">Remove</a>
+								</div>
+							</div>
+						</div>
+					</hk-card>
+				</q-dialog>
+
+				<!-- SPELLS KNOWN MODAL -->
+				<q-dialog v-model="spells_known_modal">
+					<hk-card>
+						<div slot="header" class="card-header d-flex justify-content-between">
+							<span>
+								Spells known 
+							</span>
+							<q-btn flat v-close-popup round icon="close" size="sm" />
+						</div>
+						<div class="spells-known" v-if="classes[editClass].spells_known">
+							<h3>Cantrips & Spells known</h3>
+								<div class="columns">
+									<div>Level</div><div>Cantrips</div><div>Spells</div>
+									<template v-for="i in 20">
+										<div :key="`level-${i}`">
+											{{ i }}
+										</div>
+										<q-input 
+											dark filled square
+											v-model="classes[editClass].spells_known.cantrips[i]" 
+											:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
+											:tabindex="`1${i < 10 ? `0${i}` : i}`"
+										/>
+										<q-input 
+											dark filled square
+											v-model="classes[editClass].spells_known.spells[i]"
+											:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
+											:tabindex="`2${i < 10 ? `0${i}` : i}`"
+										/>
+									</template>
+								</div>
+						</div>
+					</hk-card>
+				</q-dialog>
 			</hk-card>
-		</q-dialog>
-	</hk-card>
+		</q-form>
+	</ValidationObserver>
+</div>
 </template>
 
 <script>
@@ -504,6 +523,8 @@
 		inject: ["characterState"],
 		data() {
 			return {
+				saved: false,
+				invalid: false,
 				modifier_modal: false,
 				roll_hp_modal: false,
 				experience_modal: false,
@@ -546,7 +567,7 @@
 				return this.character.class;
 			},
 			classes() {
-				return this.character.class.classes;
+				return this.character.classes;
 			},
 			modifiers() {
 				return this.character.filtered_modifiers_origin("class");
@@ -562,13 +583,13 @@
 				let returnModifiers = {};
 				const types = ["armor", "weapon", "skill", "saving_throw"];
 		
-				for(const classKey in this.classes) {
-					returnModifiers[classKey] = {};
+				for(const classIndex in this.classes) {
+					returnModifiers[classIndex] = {};
 
 					for(const type of types) {
-						returnModifiers[classKey][type] = this.modifiers.filter(mod => {
+						returnModifiers[classIndex][type] = this.modifiers.filter(mod => {
 							const origin = mod.origin.split(".");
-							return origin[1] === classKey && origin[2] === "proficiencies" && origin[3] === type;
+							return origin[1] === classIndex && origin[2] === "proficiencies" && origin[3] === type;
 						}).map(obj => {
 							return obj.subtarget;
 						});
@@ -596,76 +617,86 @@
 				"delete_modifier",
 				"add_feature"
 			]),
+			save(valid) {
+				if(valid) {
+					this.$emit("save");
+					this.saved = true;
+				} else {
+					this.invalid = true;
+				}
+			},
 			emitChange(value) {
 				this.$emit("change", value)
 			},
-			setShowClass(classKey){
-				this.showClass = (classKey === this.showClass) ? undefined : classKey; 
+			setShowClass(classIndex){
+				this.showClass = (classIndex === this.showClass) ? undefined : classIndex; 
 			},
 			levelAvailable(subclass, level) {
 				// Check if a level is available for a certain class (to disable unavailable levels in dropdown)
 				if(subclass && level) {
-					return (this.character.advancement === 'experience' && level > (subclass.level + (this.calculatedLevel(this.Class.experience_points) - this.computed.display.level)))
-						|| (this.character.advancement === 'milestone' && level > (subclass.level + (20 - this.computed.display.level)) )
+					return (this.character.advancement === 'experience' && level > (subclass.level + (this.calculatedLevel(this.Class.experience_points) - this.computed.level)))
+						|| (this.character.advancement === 'milestone' && level > (subclass.level + (20 - this.computed.level)) )
 				} 
 				// Check if levels are available at all for the character (to hide "Add class" button)
 				else {
-					return (this.character.advancement === 'experience' && this.calculatedLevel(this.Class.experience_points) > this.computed.display.level)
-					|| (this.character.advancement === 'milestone' && this.computed.display.level < 20)
+					return (this.character.advancement === 'experience' && this.calculatedLevel(this.Class.experience_points) > this.computed.level)
+					|| (this.character.advancement === 'milestone' && this.computed.level < 20)
 				}
 			},
-			handleXP(type) {
+			handleXP(type, valid) {
 				if(this.xp) {
 					this.character.set_xp(this.xp, type);
 					this.xp = undefined;
+					this.save(valid);
 				}
 			},
-			saveClassProp(value, classKey, property, compute=false) {
+			saveClassProp(value, classIndex, property, compute=false) {
 				this.set_class_prop({
 					userId: this.userId,
 					key: this.playerId,
-					classKey,
+					classIndex,
 					property,
 					value
 				});
 				if(compute) {
-					this.$emit("change", `class.${classKey}.${property}`);
+					this.$emit("change", `class.${classIndex}.${property}`);
 				}
 			},
-			levelUp(classKey) {
-				const value = parseInt(this.classes[classKey].level) + 1; 
-
+			saveClassLevel(index, value, valid) {
 				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
-				this.setAsiFeature(classKey, value);
+				this.setAsiFeature(index, value);
 
-				this.set_class_prop({
-					userId: this.userId,
-					key: this.playerId,
-					classKey,
-					property: "level",
-					value
-				});
+				this.classes[index].level = parseInt(value);
+
+				this.save(valid);
+			},
+			levelUp(classIndex, valid) {
+				const value = parseInt(this.classes[classIndex].level) + 1; 
+
+				this.saveClassLevel(classIndex, value, valid)
 
 				//Open modal to roll HP
-				if(this.characer.hit_point_type === "rolled") {
-					this.editClass = classKey;
-					this.rolled_hp_modal = true;
+				if(this.character.hit_point_type === "rolled") {
+					this.rollHitPoints(classIndex);
 				}
-				this.$emit("change", "class.level_up");
 			},
-			setAsiFeature(classKey, value) {
+			setHitDice(classIndex, value, valid) {
+				this.classes[classIndex].hit_dice = value;
+				this.save(valid);
+			},
+			setAsiFeature(classIndex, value) {
 				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
 				if(value >= 4) {
 					const levels = [4, 8, 12, 16, 19];
 					for(const level of levels) {
 						if(value >= level) {
 							//If the object doesn't exist, create it
-							if(!this.classes[classKey].features || !this.classes[classKey].features[`level_${level}`] || !this.classes[classKey].features[`level_${level}`]['--asi']) {
+							if(!this.classes[classIndex].features || !this.classes[classIndex].features[`level_${level}`] || !this.classes[classIndex].features[`level_${level}`]['--asi']) {
 								const feature = { type: "asi" };
 								this.add_feature({
 									userId: this.userId,
 									key: this.playerId,
-									classKey,
+									classIndex,
 									level,
 									feature,
 									feature_key: "--asi"
@@ -675,70 +706,32 @@
 					}
 				}
 			},
-			classTotalHP(classKey, type) {
-				const hit_dice = this.dice_types.filter(dice => {
-					return dice.value === this.classes[classKey].hit_dice;
-				});
-				const average = (hit_dice[0]) ? hit_dice[0].average : 0;
-				const level = this.classes[classKey].level;
-				const total_rolled = (classKey == 0) ? level - 1 : level;
-
-				//Return the total HP of class
-				if(type === 'total') {
-					let total = (classKey == 0) ? this.classes[classKey].hit_dice : 0;
-					if(this.character.hit_point_type === 'rolled') {
-						total = total + this.totalRolled(classKey);
-					} else {
-						total = total + total_rolled * average;
-					}
-					return total;
-				}
-				// Return info about the total HP
-				else if(type === 'info') {
-					let info = (classKey == 0) ? "<p>Your main class starts with 1 full hit die and no average or rolled hit die for the first level.</p>" : "";
-					if(classKey == 0) info += `Starting: <b>${this.classes[classKey].hit_dice}</b><br/>`;
-					if(this.character.hit_point_type === 'rolled') info += `Rolled ${total_rolled}d${this.classes[classKey].hit_dice}: <b>${this.totalRolled(classKey)}</b>`;
-					else info += `${total_rolled} average hit dice: ${total_rolled} x ${average} = <b>${total_rolled * average}</b>`;
-					return info;
-				}
-			},
-			totalRolled(classKey) {
-				let totalRolled = 0;
-				if(this.classes[classKey].rolled_hit_points) {
-					for(const [key, value] of Object.entries(this.classes[classKey].rolled_hit_points)) {
-						if(this.classes[classKey].level >= key && value) {
-							totalRolled = totalRolled + parseInt(value);
-						}
-					}
-				}
-				return totalRolled;
-			},
-			saveCasterType(classKey) {
-				const value = this.classes[classKey].caster_type;
+			saveCasterType(classIndex) {
+				const value = this.classes[classIndex].caster_type;
 				if(value) {
 					let spells_known = {
 						cantrips: { 1: 0 },
 						spells: { 1: 0 }
 					}
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known`).set(spells_known);
+					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/spells_known`).set(spells_known);
 				} else {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known`).remove();
+					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/spells_known`).remove();
 				}
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/caster_type`).set(value);
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/caster_type`).set(value);
 				this.$emit("change", "class.caster_type");
 			},
-			saveCastingAbility(classKey) {
-				const value = this.classes[classKey].casting_ability;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/casting_ability`).set(value);
+			saveCastingAbility(classIndex) {
+				const value = this.classes[classIndex].casting_ability;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/casting_ability`).set(value);
 				this.$emit("change", "class.casting_ability");
 			},
-			saveSpellKnowledge(classKey) {
-				const value = this.classes[classKey].spell_knowledge;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spell_knowledge`).set(value);
+			saveSpellKnowledge(classIndex) {
+				const value = this.classes[classIndex].spell_knowledge;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/spell_knowledge`).set(value);
 				this.$emit("change", "class.spell_knowledge");
 			},
-			setProficiencies(newVal, classKey, type) {
-				const current = this.proficiencies[classKey][type];
+			setProficiencies(newVal, classIndex, type) {
+				const current = this.proficiencies[classIndex][type];
 				
 				//Remove
 				for(const prof of current) {
@@ -746,7 +739,7 @@
 						//Get the key of the proficiency that needs to be removed
 						const key = this.modifiers.filter(mod => {
 							const origin = mod.origin.split(".");
-							return origin[1] == classKey && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
+							return origin[1] == classIndex && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
 						}).map(obj => {
 							return obj['.key'];
 						});
@@ -757,7 +750,7 @@
 				for(const prof of newVal) {
 					if(!current.includes(prof)) {
 						const newModifier = {
-							origin: `class.${classKey}.proficiencies.${type}`,
+							origin: `class.${classIndex}.proficiencies.${type}`,
 							type: "proficiency",
 							target: type,
 							subtarget: prof
@@ -767,15 +760,15 @@
 				}
 				this.$emit("change", "class.proficiencies_updated");
 			},
-			setWeaponProficiencies(weapon, classKey) {
-				const current = this.proficiencies[classKey]['weapon'];
+			setWeaponProficiencies(weapon, classIndex) {
+				const current = this.proficiencies[classIndex]['weapon'];
 				
 				//Remove
 				if(current.includes(weapon)) {
 					//Get the key of the proficiency that needs to be removed
 					const key = this.modifiers.filter(mod => {
 						const origin = mod.origin.split(".");
-						return origin[1] == classKey && origin[2] === "proficiencies" && origin[3] === 'weapon' && mod.subtarget === weapon;
+						return origin[1] == classIndex && origin[2] === "proficiencies" && origin[3] === 'weapon' && mod.subtarget === weapon;
 					}).map(obj => {
 						return obj['.key'];
 					});
@@ -785,7 +778,7 @@
 				//Add
 				if(!current.includes(weapon)) {
 					const newModifier = {
-						origin: `class.${classKey}.proficiencies.weapon`,
+						origin: `class.${classIndex}.proficiencies.weapon`,
 						type: "proficiency",
 						target: 'weapon',
 						subtarget: weapon
@@ -793,59 +786,41 @@
 					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
 				}
 			},
-			rollHitPoints(classKey) {
-				this.editClass = classKey;
+			rollHitPoints(classIndex) {
+				this.editClass = classIndex;
 				this.roll_hp_modal = true;
 			},
-			spellsKnown(classKey) {
-				this.editClass = classKey;
+			spellsKnown(classIndex) {
+				this.editClass = classIndex;
 				this.spells_known_modal = true;
 			},
-			setRolledHP(value, classKey, level) {
+			setRolledHP(value, classIndex, level, valid) {
 				//Set rolled HP manually
 				value = parseInt(value) || 0;
 
-				this.set_rolled_hp({
-					userId: this.userId,
-					key: this.playerId,
-					classKey,
-					level,
-					value
-				});
-				this.$emit("change", "class.rolled_hit_points");
+				this.classes[classIndex].rolled_hit_points[level] = value;
+
+				this.save(valid);
 			},
-			rollHitDice(classKey, level) {
+			rollHitDice(classIndex, level, valid) {
 				//Roll HP digitally
-				const hit_dice = this.classes[classKey].hit_dice;
+				const hit_dice = this.classes[classIndex].hit_dice;
 				const value = this.rollD({}, hit_dice, 1, 0).total;
 
-				this.setRolledHP(value, classKey, level);
+				this.setRolledHP(value, classIndex, level, valid);
 			},
-			setSpellsKnown(classKey, type, level) {
+			setSpellsKnown(classIndex, type, level) {
 				//Set spells known
-				const value = parseInt(this.classes[classKey].spells_known[type][level]) || 0;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known/${type}/${level}`).set(value);
+				const value = parseInt(this.classes[classIndex].spells_known[type][level]) || 0;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/spells_known/${type}/${level}`).set(value);
 				this.$emit("change", "class.spells_known");
 			},
-			saveClassLevel(key, value) {
-				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
-				this.setAsiFeature(key, value);
-
-				this.set_class_prop({
-					userId: this.userId,
-					key: this.playerId,
-					classKey: key,
-					property: "level",
-					value
-				});
-				this.$emit("change", "class.level");
-			},
-			confirmDeleteClass(classKey, name) {
+			confirmDeleteClass(classIndex, name) {
 				this.$snotify.error(
 					`Are you sure you want to delete ${name ? `the class "${name}"` : `this class`}? All linked features and modifiers will be removed.`, `Delete class`, 
 					{
 						buttons: [
-							{ text: 'Yes', action: (toast) => { this.deleteClass(classKey); this.$snotify.remove(toast.id); }, bold: false},
+							{ text: 'Yes', action: (toast) => { this.deleteClass(classIndex); this.$snotify.remove(toast.id); }, bold: false},
 							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 						]
 					});
@@ -858,13 +833,13 @@
 
 				this.$emit("change", "class.added_class");
 			},
-			deleteClass(classKey) {
-				if(classKey !== 0) {
+			deleteClass(classIndex) {
+				if(classIndex !== 0) {
 					//Delete all linked modifiers
 					for(const modifier of this.modifiers) {
 						const origin = modifier.origin.split(".");
 
-						if(origin[1] === classKey) {
+						if(origin[1] === classIndex) {
 							this.delete_modifier({
 								userId: this.userId,
 								key: this.playerId,
@@ -877,7 +852,7 @@
 					this.delete_class({
 						userId: this.userId,
 						key: this.playerId,
-						class_key: classKey
+						class_key: classIndex
 					});
 					this.$emit("change", "class.delete_class");
 				}
@@ -981,11 +956,14 @@
 			margin: 0 -10px 0 -10px;
 
 			a {
-				color: $neutral-2 !important;
+				color: $neutral-4;
 				padding: 0 10px;
 
+				&:hover {
+					color: $neutral-2;
+				}
 				&.active {
-					color: $white!important;
+					color: $white;
 				}
 				i {
 					font-size: 25px;

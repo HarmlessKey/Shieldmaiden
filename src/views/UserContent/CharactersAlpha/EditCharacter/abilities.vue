@@ -25,144 +25,149 @@
 				@input="confirmMethodChange($event)"
 			/>
 
-			<template v-if="method">
-				<h3 class="text-center">
-					Base ability scores
-				</h3>
-				<div class="d-flex justify-content-center mb-4" v-if="method === 'manual'">
-					<a class="btn" @click="roll_dialog = !roll_dialog">
-						<i class="fas fa-dice-d20" /> Roll scores
-					</a>
-				</div>
-
-				<!-- STANDARD ARRAY -->
-				<div v-if="method === 'standard_array'" class="base_abilities input">
-					<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-						<div>{{ label }}</div>
-						<q-select
-							dark filled square
-							placeholder="-"
-							:value="ability_scores[value]"
-							:options="standard_array"
-							emit-value
-							map-options
-							:option-disable="standardArrayDisable"
-							@input="saveAbility($event, value)"
-							clearable
-						/>
+			<ValidationObserver v-if="method" v-slot="{ valid }">
+				<q-form greedy>
+					<h3 class="text-center">
+						Base ability scores
+					</h3>
+					<div class="d-flex justify-content-center mb-4" v-if="method === 'manual'">
+						<a class="btn" @click="roll_dialog = !roll_dialog">
+							<i class="fas fa-dice-d20" /> Roll scores
+						</a>
 					</div>
-				</div>
 
-				<!-- POINT BUY -->
-				<template v-if="method === 'point_buy'">
-					<div class="base_abilities input">
+					<!-- STANDARD ARRAY -->
+					<div v-if="method === 'standard_array'" class="base_abilities input">
 						<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
 							<div>{{ label }}</div>
 							<q-select
 								dark filled square
 								placeholder="-"
 								:value="ability_scores[value]"
-								:options="point_buy.map(item => item.score)"
-								:option-label="label"
+								:options="standard_array"
 								emit-value
 								map-options
-								:option-disable="opt => pointBuyDisable(opt, ability_scores[value])"
-								@input="saveAbility($event, value)"
+								:option-disable="standardArrayDisable"
+								@input="saveAbility($event, value, valid)"
+								clearable
 							/>
 						</div>
 					</div>
-					<h3 class="text-center mb-1">Points remaining</h3>
-					<h3 class="text-center mt-0">
-						<span class="white">{{ point_buy_remaining }}</span>/{{ point_buy_max }}
-					</h3>
-				</template>
 
-				<!-- MANUAL -->
-				<div v-if="method === 'manual'" class="base_abilities input">
-					<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-						<div>{{ label }}</div>
-						<q-input
-							dark filled square
-							placeholder="-"
-							:id="value" 
-							@change="saveAbility($event.target.value, value)"
-							autocomplete="off"  
-							type="number"
-							:value="ability_scores[value]"
-						/>
-					</div>
-
-					<q-dialog v-model="roll_dialog">
-						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span>
-									Roll ability scores
-								</span>
-								<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
+					<!-- POINT BUY -->
+					<template v-if="method === 'point_buy'">
+						<div class="base_abilities input">
+							<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
+								<div>{{ label }}</div>
+								<q-select
+									dark filled square
+									placeholder="-"
+									:value="ability_scores[value]"
+									:options="point_buy.map(item => item.score)"
+									:option-label="label"
+									emit-value
+									map-options
+									:option-disable="opt => pointBuyDisable(opt, ability_scores[value])"
+									@input="saveAbility($event, value, valid)"
+								/>
 							</div>
+						</div>
+						<h3 class="text-center mb-1">Points remaining</h3>
+						<h3 class="text-center mt-0">
+							<span class="white">{{ point_buy_remaining }}</span>/{{ point_buy_max }}
+						</h3>
+					</template>
 
-							<div class="card-body">
-								<button 
-									v-if="!rolls.filter(score => score.results.length).length"
-									class="btn btn-block mb-3" 
-									@click="rollAllAbilityScores()"
-								>
-									Roll all
-								</button>
-								<button v-else class="btn bg-red btn-block mb-3" @click="clearAllRolls()">Clear all</button>
+					<!-- MANUAL -->
+					<div v-if="method === 'manual'" class="base_abilities input">
+						<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
+							<div>{{ label }}</div>
+							<ValidationProvider rules="between:1,20" :name="label" v-slot="{ errors, invalid, validated }">
+								<q-input
+									dark filled square
+									placeholder="-"
+									@change="saveAbility($event.target.value, value, valid)"
+									autocomplete="off"  
+									type="number"
+									v-model="ability_scores[value]"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
 
-								<div class="ability-rolls">
-									<div v-for="i in [0, 1, 2, 3, 4, 5]" :key="`score-${i}`" class="score">
-										<div class="rolls">
-											<div class="d-flex justify-content-start">
-												<div 
-													v-for="roll in [0, 1, 2, 3]" 
-													class="roll"
-													:class="{ 
-														rolled: rolls[i].results[roll],
-														ignore: lowestRoll(rolls[i].results) === roll
-													}"
-													:key="`roll-${roll}`"
-												>
-													<hk-animated-integer v-if="rolls[i].results.length" :value="rolls[i].results[roll]" on-mount />
-													<template v-else>-</template>
+						<q-dialog v-model="roll_dialog">
+							<hk-card>
+								<div slot="header" class="card-header d-flex justify-content-between">
+									<span>
+										Roll ability scores
+									</span>
+									<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
+								</div>
+
+								<div class="card-body">
+									<button 
+										v-if="!rolls.filter(score => score.results.length).length"
+										class="btn btn-block mb-3" 
+										@click="rollAllAbilityScores()"
+									>
+										Roll all
+									</button>
+									<button v-else class="btn bg-red btn-block mb-3" @click="clearAllRolls()">Clear all</button>
+
+									<div class="ability-rolls">
+										<div v-for="i in [0, 1, 2, 3, 4, 5]" :key="`score-${i}`" class="score">
+											<div class="rolls">
+												<div class="d-flex justify-content-start">
+													<div 
+														v-for="roll in [0, 1, 2, 3]" 
+														class="roll"
+														:class="{ 
+															rolled: rolls[i].results[roll],
+															ignore: lowestRoll(rolls[i].results) === roll
+														}"
+														:key="`roll-${roll}`"
+													>
+														<hk-animated-integer v-if="rolls[i].results.length" :value="rolls[i].results[roll]" on-mount />
+														<template v-else>-</template>
+													</div>
 												</div>
+												<q-btn v-if="!rolls[i].results.length" flat size="sm" @click="rollAbilityScore(i)" icon="fas fa-dice-d20" />
+												<hk-animated-integer v-else class="total" :value="rolledTotal(i)" on-mount />
 											</div>
-											<q-btn v-if="!rolls[i].results.length" flat size="sm" @click="rollAbilityScore(i)" icon="fas fa-dice-d20" />
-											<hk-animated-integer v-else class="total" :value="rolledTotal(i)" on-mount />
-										</div>
 
-										<q-select 
-											dark filled square dense
-											clearable
-											map-options
-											emit-value
-											:options="filterAbilities(i)"
-											v-model="rolls[i].ability"
-										/>
+											<q-select 
+												dark filled square dense
+												clearable
+												map-options
+												emit-value
+												:options="filterAbilities(i)"
+												v-model="rolls[i].ability"
+											/>
+										</div>
 									</div>
 								</div>
-							</div>
 
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<button class="btn bg-gray mr-2" @click="roll_dialog = false">Cancel</button>
-								<button class="btn bg-green" @click="applyRolledScores()" :disabled="rolls.filter(score => score.ability && score.results.length).length < 6">Apply</button>
-							</div>
-						</hk-card>
-					</q-dialog>
-				</div>
-				<h3 class="text-center">Computed ability scores</h3>
-				<div class="base_abilities">
-					<div class="ability computed" v-for="{value, label} in abilities" :key="`base-${value}`">
-						<div class="label">
-							{{ label.substring(3, 0).toUpperCase() }}
-						</div>
-						<h2 class="score">
-							{{ computed.sheet.abilities[value] || 0 }}
-						</h2>
+								<div slot="footer" class="card-footer d-flex justify-content-end">
+									<button class="btn bg-gray mr-2" @click="roll_dialog = false">Cancel</button>
+									<button class="btn bg-green" @click="applyRolledScores()" :disabled="rolls.filter(score => score.ability && score.results.length).length < 6">Apply</button>
+								</div>
+							</hk-card>
+						</q-dialog>
 					</div>
-				</div>
-			</template>
+					<h3 class="text-center">Computed ability scores</h3>
+					<div class="base_abilities">
+						<div class="ability computed" v-for="{value, label} in abilities" :key="`base-${value}`">
+							<div class="label">
+								{{ label.substring(3, 0).toUpperCase() }}
+							</div>
+							<h2 class="score">
+								{{ computed.abilities[value] || 0 }}
+							</h2>
+						</div>
+					</div>
+				</q-form>
+			</ValidationObserver>
 			
 			<template v-else>
 				<h3>What method would you like to use?</h3>
@@ -335,9 +340,13 @@
 			...mapActions([
 				"set_character_prop"
 			]),
-			save(origin) {
-				this.$emit("save", origin);
-				this.saved = true;
+			save(origin, valid) {
+				if(valid) {
+					this.$emit("save", origin);
+					this.saved = true;
+				} else {
+					this.invalid = true;
+				}
 			},
 			standardArrayDisable(value) {
 				return (this.ability_scores) ? Object.values(this.ability_scores).includes(value) : false;
@@ -370,13 +379,14 @@
 
 				// Set the method
 				this.character.ability_score_method = method;
-				this.$emit("save");
+				this.save("abilities.method", true);
 			},
-			saveAbility(score, ability) {
+			saveAbility(score, ability, valid) {
 				score = (score !== null) ? parseInt(score) : score;
 
-				this.$set(this.character.abilities, ability, score); 
-				this.save(`abilities.${ability}`);
+				this.$set(this.character.abilities, ability, score);
+
+				this.save(`abilities.${ability}`, valid);
 			},
 			rollAbilityScore(i) {
 				const roll = this.rollD({}, 6, 4, 0, "Ability score roll");

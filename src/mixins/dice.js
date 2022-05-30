@@ -16,7 +16,7 @@ export const dice = {
 				return this.$store.getters.userSettings.encounter.critical;
 			} return undefined; // Default = undefined = roll twice
 		},
-		dice_types() {		
+		dice_types() {
 			return [
 				{ value: 4, text: "d4", average: this.calcAverage(4) },
 				{ value: 6, text: "d6", average: this.calcAverage(6) },

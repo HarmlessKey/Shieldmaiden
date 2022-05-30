@@ -1,4 +1,4 @@
-import { experience_table } from "src/utils/character"
+import { experience_table } from "src/utils/characterConstants"
 
 export const experience = {
 	methods: {
@@ -30,7 +30,7 @@ export const experience = {
 			} else {
 				const level = this.calculatedLevel(xp);
 				const currentAmount = xp - experience_table[level].xp;
-				const neededAmount = experience_table[level + 1].xp - this.xpTable[level].xp;
+				const neededAmount = experience_table[level + 1].xp - experience_table[level].xp;
 
 				return currentAmount / neededAmount;
 			}

@@ -172,7 +172,7 @@
 				"delete_modifier",
 				"update_character"
 			]),
-			async save(valid) {
+			save(valid) {
 				if(valid) {
 					this.$emit("save");
 					this.saved = true;

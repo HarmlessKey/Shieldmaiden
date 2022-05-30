@@ -1,5 +1,6 @@
-import { experience_table, spell_slot_table } from "src/utils/character";
-import { skills } from "src/utils/skills";
+import { experience_table, spell_slot_table } from "src/utils/characterConstants";
+import { calc_dice_average, calc_mod } from "src/utils/generalFunctions";
+import { skills } from "src/utils/skillsConstants";
 
 export class Character {
   general = {
@@ -140,6 +141,78 @@ export class Character {
     this.class.experience_points = value;
   }
 
+  total_rolled_hp(classIndex) {
+    const Class = this.classes[classIndex];
+    let total = 0;
+
+    if(Class.rolled_hit_points) {
+      for(const [key, value] of Object.entries(Class.rolled_hit_points)) {
+        if(Class.level >= key && value) {
+          total = total + parseInt(value);
+        }
+      }
+    }
+    return total;
+  }
+
+  total_class_hp(classIndex, con) {
+    const Class = this.classes[classIndex];
+    const hit_dice = Class.hit_dice || 0;
+    const total_rolled = (classIndex == 0) ? Class.level - 1 : Class.level;
+
+    const total_hp = {
+      hp: 0,
+      info: (classIndex == 0) ? `<p>Your main class starts with the highest roll of your <em>Hit Dice</em> (${hit_dice}) plus your <em>Constitution</em> modifier (${calc_mod(con)}) at first level. (pbp 12)</p>` : ""
+    };
+
+    // Return the total HP of class
+    for(let level =  1; level <= Class.level; level++) {
+      if(this.hit_point_type === 'rolled') {
+        // For the main class set a full hit die as starting hit points (php 12)
+        const rolled = (classIndex == 0 && level === 1) ? Class.hit_dice : Class.rolled_hit_points[level] || 0;
+
+        // Add the CON modifier for every level as well (php 15)
+        let rolled_hit_points = rolled + calc_mod(con);
+
+        // The rolled value has a minimum of 1 (php 15)
+        rolled_hit_points = (rolled_hit_points < 1) ? 1 : rolled_hit_points;
+
+        // Add the hit points to the total
+        total_hp.hp = total_hp.hp + rolled_hit_points;
+      } else {
+        // For the main class set a full hit die as starting hit points (php 12)
+        const average = (classIndex == 0 && level === 1) ? Class.hit_dice : calc_dice_average(hit_dice);
+
+        // Add the CON modifier for every level as well (php 15)
+        let average_hit_points = average + calc_mod(con);
+        
+        // The rolled value has a minimum of 1 (php 15)
+        average_hit_points = (average_hit_points < 1) ? 1 : average_hit_points;
+        
+        // Add the hit points to the total
+        total_hp.hp = total_hp.hp + average_hit_points;
+      }
+    }
+
+    // Setup info about the total HP
+    if(this.hit_point_type === "rolled") {
+      total_hp.info += (classIndex == 0) ? 
+        "<p>For each level after first the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
+        "<p>For each level you the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
+    } else {
+      total_hp.info += (classIndex == 0) ? 
+        "<p>For each level after first the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
+        "<p>For each level you the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
+    }
+    
+
+    if(classIndex == 0) total_hp.info += `Starting: <b>${hit_dice} + ${calc_mod(con)} = ${hit_dice + calc_mod(con)}</b><br/>`;
+    if(this.hit_point_type === 'rolled') total_hp.info += `Rolled ${total_rolled}d${hit_dice}: <b>${this.total_rolled_hp(classIndex)}</b>`;
+    else total_hp.info += `${total_rolled} average hit dice: (${calc_dice_average(hit_dice)} + ${calc_mod(con)}) x ${total_rolled} = <b>${(calc_dice_average(hit_dice) + calc_mod(con)) * total_rolled}</b>`;
+
+    return total_hp;
+  }
+
   set_xp(value, type) {
     const change = parseInt(value);
     let newValue;
@@ -216,12 +289,12 @@ export class ComputedCharacter {
   initiative = 0;
   classes = [];
   abilities = {
-    strength: null,
-    dexterity: null,
-    constitution: null,
-    intelligence: null,
-    wisdom: null,
-    charisma: null
+    strength: 0,
+    dexterity: 0,
+    constitution: 0,
+    intelligence: 0,
+    wisdom: 0,
+    charisma: 0
   }
   saving_throws = {
     proficiencies: {},
@@ -251,11 +324,6 @@ export class ComputedCharacter {
     this.compute_character(character);
   }
 
-  _calc_mod(val) {
-    return (val) ? Math.floor((val - 10) / 2) : 0;
-  }
-
-
   /**
    * Computes the character adding modifiers to all stats
    * 
@@ -283,23 +351,23 @@ export class ComputedCharacter {
       })
     });
     
-    this._compute_equipment(base_character);
-
     this._compute_abilities(base_character);
 
+    this._compute_hit_points(base_character);
+    
     // Set spellcasting variables Spell Attack / Spell Save DC
     // Ability scores are needed for this
     for(const [key, value] of Object.entries(character.classes)) {
       if(value.casting_ability) {
-        classes[key].spell_attack = proficiency + this._calc_mod(this.abilities[value.casting_ability]);
-        classes[key].spell_save_dc = 8 + proficiency + this._calc_mod(this.abilities[value.casting_ability]);
+        classes[key].spell_attack = proficiency + calc_mod(this.abilities[value.casting_ability]);
+        classes[key].spell_save_dc = 8 + proficiency + calc_mod(this.abilities[value.casting_ability]);
       }
     }
-
-    this._compute_hit_points(base_character);
-
+    
     this._compute_initiative(base_character);
 
+    this._compute_equipment(base_character);
+    
     this._compute_armor_class(base_character);
 
     this._compute_speed(base_character);
@@ -314,7 +382,6 @@ export class ComputedCharacter {
   // Computes Proficiency, Level, HP and spells
   _compute_classes(character) {
     const classes = [];
-    this.hit_points = (character.classes[0].hit_dice) ? character.classes[0].hit_dice : 0;
     let caster_levels = []; //A caster level is needed to determine spell slots with the caster table (phb 165)
 
     //Set level specific stats HP/Spells
@@ -329,23 +396,6 @@ export class ComputedCharacter {
         level
       }
       
-      //Check if the HP is rolled
-      if(character.hit_point_type === 'rolled' && value.rolled_hit_points) {
-        let totalRolled = 0;
-        for(const [key, rolled] of Object.entries(value.rolled_hit_points)) {
-          if(value.level >= key && rolled) {
-            totalRolled = totalRolled + parseInt(rolled);
-          }
-        }
-        this.hit_points = this.hit_points + parseInt(totalRolled);
-      } else if(character.hit_point_type === 'fixed' && value.hit_dice) {
-        const hit_dice = this.dice_types.filter(die => {
-          return die.value === value.hit_dice;
-        });
-        //For the main class only set fixed HP for the levels after first
-        this.hit_points = (index == 0) ? this.hit_points + ((level - 1) * hit_dice[0].average) : this.hit_points + (level * hit_dice[0].average);
-      }
-
       //Spell slots
       if(value.caster_type) {
         //For multiclassing in multiple casters the total caster level changes depening on the caster type (pbp 164)
@@ -385,6 +435,74 @@ export class ComputedCharacter {
 
       this.spell_slots = spell_slot_table[caster_level];
     }
+  }
+
+  _compute_abilities(character) {
+    //Ability score maximums
+    const ability_max = {
+      strength: 20,
+      dexterity: 20,
+      constitution: 20,
+      intelligence: 20,
+      wisdom: 20,
+      charisma: 20
+    }
+    
+    this.abilities = character.abilities;
+
+    /**
+     * 
+     * TODO!
+     * Set maximum modifiers
+     * 
+     **/
+
+    // Add Ability Score Modifiers
+    for(let [key, value] of Object.entries(this.abilities)) {
+      for(const modifier of character.filtered_modifiers_target("ability")) {
+        if(modifier.subtarget === key && modifier.type === 'bonus') {
+          value = value + parseInt(modifier.value);
+        }
+      }
+      this.abilities[key] = value;
+
+      //Set score to maximum if it is higher than its maximum
+      if(this.abilities[key] > ability_max[key]) {
+        this.abilities[key] = ability_max[key];
+      }
+    }
+
+    /**
+     * 
+     * TODO!
+     * Ability Set Score Modifiers
+     * 
+     **/
+  }
+
+  _compute_hit_points(character) {
+    const con = this.abilities.constitution;
+
+    for(const classIndex in character.classes) {
+      this.hit_points = character.total_class_hp(classIndex, con).hp;
+    };
+
+    //Add HP modifiers
+    for(const modifier of character.filtered_modifiers_target("hp")) {
+      this.hit_points = this._add_modifier(character, this.hit_points, modifier);
+    }
+    this.hit_points = this.hit_points;
+  }
+
+  _compute_initiative(character) {
+    //Initiative
+    let initiative = calc_mod(this.abilities.dexterity);
+
+    //Add Initiative Modifiers	
+    for(const modifier of character.filtered_modifiers_target("initiative")) {
+      initiative = this.addModifier(character, initiative, modifier);
+    }
+    this.initiative = initiative;
   }
 
   _compute_equipment(character) {
@@ -467,77 +585,12 @@ export class ComputedCharacter {
     }
   }
 
-  _compute_abilities(character) {   
-    //Ability score maximums
-			const ability_max = {
-				strength: 20,
-				dexterity: 20,
-				constitution: 20,
-				intelligence: 20,
-				wisdom: 20,
-				charisma: 20
-			}
-      
-      this.abilities = character.abilities;
-
-      /**
-			 * 
-			 * TODO!
-			 * Set maximum modifiers
-			 * 
-			 **/
-
-			// Add Ability Score Modifiers
-			for(let [key, value] of Object.entries(this.abilities)) {
-				for(const modifier of character.filtered_modifiers_target("ability")) {
-					if(modifier.subtarget === key && modifier.type === 'bonus') {
-						value = value + parseInt(modifier.value);
-					}
-				}
-				this.abilities[key] = value;
-
-				//Set score to maximum if it is higher than its maximum
-				if(this.abilities[key] > ability_max[key]) {
-					this.abilities[key] = ability_max[key];
-				}
-			}
-
-			/**
-			 * 
-			 * TODO!
-			 * Ability Set Score Modifiers
-			 * 
-			 **/
-  }
-
-  _compute_hit_points(character) {
-    //Add CON modifier * level to computed HP
-    this.hit_points = this.hit_points + (this.level * this._calc_mod(this.abilities.constitution));
-
-    //Add HP modifiers
-    for(const modifier of character.filtered_modifiers_target("hp")) {
-      this.hit_points = this._add_modifier(character, this.hit_points, modifier);
-    }
-    this.hit_points = this.hit_points;
-  }
-
-  _compute_initiative(character) {
-    //Initiative
-    let initiative = this._calc_mod(this.abilities.dexterity);
-
-    //Add Initiative Modifiers	
-    for(const modifier of character.filtered_modifiers_target("initiative")) {
-      initiative = this.addModifier(character, initiative, modifier);
-    }
-    this.initiative = initiative;
-  }
-
   _compute_armor_class(character) {
     //Armor Class
     let armor_class = (this.armor) ? this.armor.armor_class : 10; //Base is always 10 (phb 14)
 
     //Check if armor and or shield is equiped
-    let ac_dex_mod = this._calc_mod(this.abilities.dexterity);
+    let ac_dex_mod = calc_mod(this.abilities.dexterity);
     let shield_mod = 0;
 
     if(this.armor) {
@@ -619,9 +672,9 @@ export class ComputedCharacter {
     for(const [skill, value] of Object.entries(this.senses)) {
       //Ad ability modifier
       if(skill === 'investigation') {
-        this.senses[skill] = (value + this._calc_mod(this.abilities.intelligence));
+        this.senses[skill] = (value + calc_mod(this.abilities.intelligence));
       } else {
-        this.senses[skill] = (value + this._calc_mod(this.abilities.wisdom));
+        this.senses[skill] = (value + calc_mod(this.abilities.wisdom));
       }
 
       //Add proficiency
@@ -679,7 +732,7 @@ export class ComputedCharacter {
       }
     }
     if(modifier.type === 'ability') {
-      newValue = newValue + this._calc_mod(this.abilities[modifier.ability_modifier]);
+      newValue = newValue + calc_mod(this.abilities[modifier.ability_modifier]);
     }
     if(['advantage', 'disadvantage'].includes(modifier.type)) {
 

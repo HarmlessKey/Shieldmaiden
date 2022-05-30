@@ -2,7 +2,7 @@ import { experience } from "src/mixins/experience.js";
 import { general } from "src/mixins/general.js";
 import { dice } from "src/mixins/dice.js";
 import { skills } from "src/mixins/skills.js";
-import { experience_table, spell_slot_table } from "src/utils/character";
+import { experience_table, spell_slot_table } from "src/utils/characterConstants";
 
 
 export const characterMixin = {

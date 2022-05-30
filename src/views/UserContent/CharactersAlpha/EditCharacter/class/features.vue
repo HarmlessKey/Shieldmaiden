@@ -1,11 +1,11 @@
 <template>
 	<div>
 		<template >
-			<q-list dark square class="accordion hit_points" v-for="level in 20" :key="`features-${classKey}-${level}`">
+			<q-list dark square class="accordion hit_points" v-for="level in 20" :key="`features-${classIndex}-${level}`">
 				<template v-if="subclass.level >= level">
 					<h4 class="feature-title">
 						Level {{ level }}
-						<a @click="addFeature(classKey, level)" class="btn btn-sm bg-neutral-5">
+						<a @click="addFeature(classIndex, level)" class="btn btn-sm bg-neutral-5">
 							<i class="fas fa-plus green mr-1" />
 							Add feature
 						</a>
@@ -15,7 +15,7 @@
 							v-for="(feature, key, index) in subclass.features[`level_${level}`]"
 							:key="`feature-${key}`"
 							dark switch-toggle-side
-							:group="`features-${classKey}-${level}`"
+							:group="`features-${classIndex}-${level}`"
 						>
 							<template v-slot:header>
 								<q-item-section avatar>
@@ -40,7 +40,7 @@
 										<a 
 											class="gray-light ml-3" 
 											v-if="key !== '--asi'" 
-											@click.stop="confirmDeleteFeature(classKey, level, key, feature.name)"
+											@click.stop="confirmDeleteFeature(classIndex, level, key, feature.name)"
 										>
 											<i class="fas fa-trash-alt"/>
 										</a>
@@ -67,7 +67,7 @@
 											{ value: 'asi', label: 'Abilitiy Score Increase' }, 
 											{ value: 'feat', label: 'Feat' }
 										]"
-										@input="saveFeatureType(classKey, level, $event)"
+										@input="saveFeatureType(classIndex, level, $event)"
 										:value="subclass.features[`level_${level}`][key].type"
 									/>
 								</template>
@@ -82,9 +82,9 @@
 											:options="abilities"
 											emit-value
 											map-options
-											:value="asi_modifier(classKey, level, key, i).subtarget"
+											:value="asi_modifier(classIndex, level, key, i).subtarget"
 											name="asi"
-											@input="saveASI($event, classKey, level, key, i)"
+											@input="saveASI($event, classIndex, level, key, i)"
 										/>
 									</div>
 								</div>
@@ -98,13 +98,13 @@
 											label="Display on character sheet" 
 											:false-value="null" 
 											indeterminate-value="something-else" 
-											@input="editFeature(classKey, level, key, 'display', $event)"
+											@input="editFeature(classIndex, level, key, 'display', $event)"
 										/>
 									</div>
 									<div class="form-item mb-3">
 										<q-input 
 											dark filled square
-											@change="editFeature(classKey, level, key, 'name', $event.target.value)"
+											@change="editFeature(classIndex, level, key, 'name', $event.target.value)"
 											autocomplete="off"  
 											:id="`name-${level}-${index}`" 
 											type="text" 
@@ -113,7 +113,7 @@
 										/>
 									</div>
 
-									<div :for="`${classKey}-${level}-description`" class="mb-2">
+									<div :for="`${classIndex}-${level}-description`" class="mb-2">
 										Description
 										<a v-if="edit_description === `${level}-${key}`" @click="edit_description = undefined" class="ml-2">
 											<i class="fas fa-times red" />
@@ -132,14 +132,14 @@
 										v-if="edit_description === `${level}-${key}`"
 										:value="subclass.features[`level_${level}`][key].description"
 										:toolbar="['bold', 'italic', 'underline', 'ul', 'ol', 'table', 'character']"
-										@save="editFeature(classKey, level, key, 'description', $event), edit_description = undefined"
+										@save="editFeature(classIndex, level, key, 'description', $event), edit_description = undefined"
 									/>
-									<div v-else class="description" v-html="replaceDescriptionStats(subclass.features[`level_${level}`][key].description, classKey)" />
+									<div v-else class="description" v-html="replaceDescriptionStats(subclass.features[`level_${level}`][key].description, classIndex)" />
 
 									<!-- Modifiers -->
 									<Modifier-table 
-										:modifiers="feature_modifiers(classKey, level, key)" 
-										:origin="`class.${classKey}.${level}.${key}`"
+										:modifiers="feature_modifiers(classIndex, level, key)" 
+										:origin="`class.${classIndex}.${level}.${key}`"
 										:userId="userId"
 										:playerId="playerId"
 										:info="featureModInfo"
@@ -175,7 +175,7 @@
 			"playerId",
 			"userId",
 			"subclass",
-			"classKey",
+			"classIndex",
 			"modifiers",
 			"classes"
 		],
@@ -201,17 +201,17 @@
 				"add_modifier",
 				"edit_modifier"
 			]),
-			feature_modifiers(classKey, level, key) {
+			feature_modifiers(classIndex, level, key) {
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
-					return origin[1] == classKey && origin[2] == level && origin[3] === key;
+					return origin[1] == classIndex && origin[2] == level && origin[3] === key;
 				});
 				return modifiers;
 			},
-			asi_modifier(classKey, level, key, index) {
+			asi_modifier(classIndex, level, key, index) {
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
-					return origin[1] == classKey && origin[2] == level && origin[3] == key && origin[4] == index;
+					return origin[1] == classIndex && origin[2] == level && origin[3] == key && origin[4] == index;
 				});
 				return modifiers[0] || modifiers;
 			},
@@ -222,17 +222,17 @@
 				this.set_feature({
 					userId: this.userId,
 					key: this.playerId,
-					classKey: key,
+					classIndex: key,
 					level,
 					feature
 				});
 			},
 
-			editFeature(classKey, level, feature_key, property, value) {
+			editFeature(classIndex, level, feature_key, property, value) {
 				this.set_feature_prop({
 					userId: this.userId,
 					key: this.playerId,
-					classKey,
+					classIndex,
 					level,
 					feature_key,
 					property,
@@ -241,17 +241,17 @@
 				this.$emit("change", "class.edit_feature");
 			},
 
-			confirmDeleteFeature(classKey, level, key, name) {
+			confirmDeleteFeature(classIndex, level, key, name) {
 				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
 					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteFeature(classKey, level, key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Yes', action: (toast) => { this.deleteFeature(classIndex, level, key); this.$snotify.remove(toast.id); }, bold: false},
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
-			deleteFeature(classKey, level, key) {
+			deleteFeature(classIndex, level, key) {
 				//Delete all modifiers linked to this feature
-				const linked_modifiers = this.feature_modifiers(classKey, level, key);
+				const linked_modifiers = this.feature_modifiers(classIndex, level, key);
 
 				for(const modifier of linked_modifiers) {
 					this.delete_modifier({
@@ -265,7 +265,7 @@
 				this.delete_feature({
 					userId: this.userId,
 					key: this.playerId,
-					classKey,
+					classIndex,
 					level,
 					feature_key: key
 				});
@@ -276,8 +276,8 @@
 			 * Save the type of feature that is chosen at levels 4, 8, 12, 16, 19
 			 * Eiter Ability Score Improvement or Feat 
 			 **/
-			saveFeatureType(classKey, level, value) {
-				const linked_modifiers = this.feature_modifiers(classKey, level, '--asi');
+			saveFeatureType(classIndex, level, value) {
+				const linked_modifiers = this.feature_modifiers(classIndex, level, '--asi');
 
 				//Delete linked modifiers when changing type
 				for(const modifier of linked_modifiers) {
@@ -291,7 +291,7 @@
 				this.set_feature({
 					userId: this.userId,
 					key: this.playerId,
-					classKey,
+					classIndex,
 					level,
 					feature: { type: value },
 					feature_key: "--asi"
@@ -300,17 +300,17 @@
 				this.$emit("change", `class.edit_feature_level_${level}`);
 			},
 			
-			saveASI(value, classKey, level, featureKey, index) {
+			saveASI(value, classIndex, level, featureKey, index) {
 				const ability = (value) ? value : null;
 				const newModifier = {
-					origin: `class.${classKey}.${level}.${featureKey}.${index}`,
+					origin: `class.${classIndex}.${level}.${featureKey}.${index}`,
 					type: "bonus",
 					target: "ability",
 					subtarget: ability,
 					value: 1
 				}
-				if(this.asi_modifier(classKey, level, featureKey, index).subtarget) {
-					const modifier_key = this.asi_modifier(classKey, level, featureKey, index)['.key'];
+				if(this.asi_modifier(classIndex, level, featureKey, index).subtarget) {
+					const modifier_key = this.asi_modifier(classIndex, level, featureKey, index)['.key'];
 
 					this.edit_modifier({
 						userId: this.userId,

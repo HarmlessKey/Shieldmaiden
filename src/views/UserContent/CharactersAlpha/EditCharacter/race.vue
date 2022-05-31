@@ -111,6 +111,7 @@
 										:userId="userId"
 										:characterId="characterId"
 										@edit="editModifier"
+										@delete="save(valid)"
 									/>
 								</div>
 							</q-expansion-item>

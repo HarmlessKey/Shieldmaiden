@@ -123,6 +123,7 @@
 			},
 			deleteModifier(index) {
 				this.character.delete_modifier(index);
+				this.$emit('delete');
 			},
 			editModifier(modifier) {
 				modifier = { ...modifier };

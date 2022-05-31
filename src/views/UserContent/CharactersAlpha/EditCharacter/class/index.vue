@@ -62,29 +62,38 @@
 
 							<q-slide-transition>
 								<div class="p-3" v-show="showClass === classIndex">
-									<a v-if="classIndex != 0" @click="confirmDeleteClass(classIndex, subclass.class)" class="red mb-4 d-block"><i class="fas fa-trash-alt"/> Delete class</a>
+									<a v-if="classIndex != 0" @click="confirmDeleteClass(classIndex, subclass.class)" class="btn btn-sm bg-neutral-5">
+										<i class="fas fa-trash-alt red" aria-hidden="true" /> Delete class
+									</a>
 									<div class="level">
 										<div class="form-item mb-3">
-											<q-input
-												dark filled square
-												label="Class"
-												@change="save(valid)"
-												autocomplete="off"
-												:id="`${classIndex}-class`"
-												type="text"
-												v-model="subclass.name"
-											/>
+											<ValidationProvider rules="required|max:30" name="Class name" v-slot="{ errors, invalid, validated }">
+												<q-input
+													dark filled square
+													label="Class"
+													@change="save(valid)"
+													autocomplete="off"
+													type="text"
+													v-model="subclass.name"
+													:error="invalid && validated"
+													:error-message="errors[0]"
+												/>
+											</ValidationProvider>
 										</div>
 										<div class="form-item mb-3">
-											<q-input
-												dark filled square
-												label="Subclass"
-												@change="save(valid)"
-												autocomplete="off"
-												:id="`${classIndex}-subclass`"
-												type="text"
-												v-model="subclass.subclass"
-											/>
+											<ValidationProvider rules="required|max:50" name="Subclass" v-slot="{ errors, invalid, validated }">
+												<q-input
+													dark filled square
+													label="Subclass"
+													@change="save(valid)"
+													autocomplete="off"
+													:id="`${classIndex}-subclass`"
+													type="text"
+													v-model="subclass.subclass"
+													:error="invalid && validated"
+													:error-message="errors[0]"
+												/>
+											</ValidationProvider>
 										</div>
 										<div class="form-item mb-3">
 											<q-select
@@ -109,8 +118,8 @@
 										</div>
 									</div>
 
-									<!-- HIT POINTS -->
 									<q-list dark square class="accordion hit_points mb-3">
+										<!-- HIT POINTS -->
 										<q-expansion-item
 											dark switch-toggle-side
 											:group="`${classIndex}`"
@@ -223,7 +232,7 @@
 														:options="caster_types" 
 														emit-value
 														map-options
-														@input="saveCasterType(classIndex)"
+														@input="saveCasterType(classIndex, valid)"
 													/>
 												</div>
 												<div class="form-item mb-3">
@@ -234,7 +243,7 @@
 														emit-value
 														map-options
 														:options="abilities" 
-														@input="saveCastingAbility(classIndex)"
+														@input="save(valid)"
 													/>
 												</div>
 												<div class="form-item mb-3">
@@ -245,7 +254,7 @@
 														emit-value
 														map-options
 														:options="spell_knowledge_types" 
-														@input="saveSpellKnowledge(classIndex)"
+														@input="save(valid)"
 													/>
 												</div>
 												<div class="form-item mb-3" v-if="subclass.caster_type">
@@ -267,7 +276,7 @@
 													Proficiencies
 												</q-item-section>
 												<q-item-section avatar>
-													+{{ computed.proficiency }}
+													<span>+<strong>{{ computed.proficiency }}</strong></span>
 												</q-item-section>
 											</template>
 
@@ -281,7 +290,7 @@
 														multiple
 														:options="armor_types" 
 														:value="proficiencies[classIndex].armor" 
-														@input="setProficiencies($event, classIndex, 'armor')"
+														@input="setProficiencies($event, classIndex, 'armor', valid)"
 													/>
 												</div>
 
@@ -303,8 +312,8 @@
 														</template>
 														<template v-slot:option="scope">
 															<q-item :key="`weapon-category-${scope.index}`">
-																<q-item-section>
-																	<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.category }}</q-item-label>
+																<q-item-section class="neutral-2">
+																	{{ scope.opt.category }}
 																</q-item-section>
 															</q-item>
 
@@ -313,7 +322,7 @@
 																	:key="weapon.value"
 																	clickable
 																	v-ripple
-																	@click="setWeaponProficiencies(weapon.value, classIndex)" 
+																	@click="setWeaponProficiencies(weapon.value, classIndex, valid)"
 																	:active="proficiencies[classIndex].weapon.includes(weapon.value)"
 																>
 																	<q-item-section>
@@ -321,7 +330,7 @@
 																	</q-item-section>
 																</q-item>
 															</template>
-															<q-separator />
+															<q-separator dark />
 														</template>
 													</q-select>
 												</div>
@@ -335,7 +344,7 @@
 														option-label="skill"
 														:options="Object.values(skillList)" 
 														:value="proficiencies[classIndex].skill" 
-														@input="setProficiencies($event, classIndex, 'skill')"
+														@input="setProficiencies($event, classIndex, 'skill', valid)"
 													/>
 												</div>
 												<div class="form-item mb-3" v-if="classIndex == 0">
@@ -346,7 +355,7 @@
 														multiple
 														:options="abilities" 
 														:value="proficiencies[classIndex].saving_throw" 
-														@input="setProficiencies($event, classIndex, 'saving_throw')"
+														@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
 													/>
 												</div>
 											</div>
@@ -392,7 +401,7 @@
 						<div class="card-body">
 							<template v-if="classes[editClass].hit_dice">
 								<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
-									<ValidationProvider :rules="{ between: [0, classes[editClass].hit_dice]}" name="Value" v-slot="{ errors, invalid, validated }">
+									<ValidationProvider :rules="{ between: [1, classes[editClass].hit_dice]}" name="Value" v-slot="{ errors, invalid, validated }">
 										<q-input 
 											dark filled square
 											@change="setRolledHP($event.target.value, editClass, level, valid)"
@@ -461,28 +470,28 @@
 							</span>
 							<q-btn flat v-close-popup round icon="close" size="sm" />
 						</div>
-						<div class="spells-known" v-if="classes[editClass].spells_known">
+						<div class="spells-known card-body" v-if="classes[editClass].spells_known">
 							<h3>Cantrips & Spells known</h3>
-								<div class="columns">
-									<div>Level</div><div>Cantrips</div><div>Spells</div>
-									<template v-for="i in 20">
-										<div :key="`level-${i}`">
-											{{ i }}
-										</div>
-										<q-input 
-											dark filled square
-											v-model="classes[editClass].spells_known.cantrips[i]" 
-											:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
-											:tabindex="`1${i < 10 ? `0${i}` : i}`"
-										/>
-										<q-input 
-											dark filled square
-											v-model="classes[editClass].spells_known.spells[i]"
-											:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
-											:tabindex="`2${i < 10 ? `0${i}` : i}`"
-										/>
-									</template>
-								</div>
+							<div class="columns">
+								<div>Level</div><div>Cantrips</div><div>Spells</div>
+								<template v-for="i in 20">
+									<div :key="`level-${i}`">
+										{{ i }}
+									</div>
+									<q-input 
+										dark filled square
+										v-model="classes[editClass].spells_known.cantrips[i]" 
+										:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
+										:tabindex="`1${i < 10 ? `0${i}` : i}`"
+									/>
+									<q-input 
+										dark filled square
+										v-model="classes[editClass].spells_known.spells[i]"
+										:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
+										:tabindex="`2${i < 10 ? `0${i}` : i}`"
+									/>
+								</template>
+							</div>
 						</div>
 					</hk-card>
 				</q-dialog>
@@ -580,22 +589,7 @@
 				return levels;
 			},
 			proficiencies() {
-				let returnModifiers = {};
-				const types = ["armor", "weapon", "skill", "saving_throw"];
-		
-				for(const classIndex in this.classes) {
-					returnModifiers[classIndex] = {};
-
-					for(const type of types) {
-						returnModifiers[classIndex][type] = this.modifiers.filter(mod => {
-							const origin = mod.origin.split(".");
-							return origin[1] === classIndex && origin[2] === "proficiencies" && origin[3] === type;
-						}).map(obj => {
-							return obj.subtarget;
-						});
-					}
-				}
-				return returnModifiers;
+				return this.character.proficiencies;
 			},
 			reversedLevels() {
 				let levelArray = [];
@@ -617,9 +611,9 @@
 				"delete_modifier",
 				"add_feature"
 			]),
-			save(valid) {
+			save(valid, source="class") {
 				if(valid) {
-					this.$emit("save");
+					this.$emit("save", source);
 					this.saved = true;
 				} else {
 					this.invalid = true;
@@ -650,22 +644,7 @@
 					this.save(valid);
 				}
 			},
-			saveClassProp(value, classIndex, property, compute=false) {
-				this.set_class_prop({
-					userId: this.userId,
-					key: this.playerId,
-					classIndex,
-					property,
-					value
-				});
-				if(compute) {
-					this.$emit("change", `class.${classIndex}.${property}`);
-				}
-			},
 			saveClassLevel(index, value, valid) {
-				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
-				this.setAsiFeature(index, value);
-
 				this.classes[index].level = parseInt(value);
 
 				this.save(valid);
@@ -684,107 +663,19 @@
 				this.classes[classIndex].hit_dice = value;
 				this.save(valid);
 			},
-			setAsiFeature(classIndex, value) {
-				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
-				if(value >= 4) {
-					const levels = [4, 8, 12, 16, 19];
-					for(const level of levels) {
-						if(value >= level) {
-							//If the object doesn't exist, create it
-							if(!this.classes[classIndex].features || !this.classes[classIndex].features[`level_${level}`] || !this.classes[classIndex].features[`level_${level}`]['--asi']) {
-								const feature = { type: "asi" };
-								this.add_feature({
-									userId: this.userId,
-									key: this.playerId,
-									classIndex,
-									level,
-									feature,
-									feature_key: "--asi"
-								});
-							}
-						}
-					}
-				}
-			},
-			saveCasterType(classIndex) {
+			saveCasterType(classIndex, valid) {
 				const value = this.classes[classIndex].caster_type;
-				if(value) {
-					let spells_known = {
-						cantrips: { 1: 0 },
-						spells: { 1: 0 }
-					}
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/spells_known`).set(spells_known);
-				} else {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/spells_known`).remove();
-				}
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/caster_type`).set(value);
-				this.$emit("change", "class.caster_type");
+				this.classes[classIndex].spells_known = (value) ? { cantrips: { 1: 0 }, spells: { 1: 0 } } : null;
+				this.save(valid, "class.caster_type");
 			},
-			saveCastingAbility(classIndex) {
-				const value = this.classes[classIndex].casting_ability;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/casting_ability`).set(value);
-				this.$emit("change", "class.casting_ability");
+			setProficiencies(selected, classIndex, type, valid) {
+				this.character.set_proficiency(selected, classIndex, type);
+				this.save(valid, "class.proficiencies_updated");
 			},
-			saveSpellKnowledge(classIndex) {
-				const value = this.classes[classIndex].spell_knowledge;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classIndex}/spell_knowledge`).set(value);
-				this.$emit("change", "class.spell_knowledge");
-			},
-			setProficiencies(newVal, classIndex, type) {
-				const current = this.proficiencies[classIndex][type];
-				
-				//Remove
-				for(const prof of current) {
-					if(!newVal.includes(prof)) {
-						//Get the key of the proficiency that needs to be removed
-						const key = this.modifiers.filter(mod => {
-							const origin = mod.origin.split(".");
-							return origin[1] == classIndex && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
-						}).map(obj => {
-							return obj['.key'];
-						});
-						db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
-					}
-				}
-				//Add
-				for(const prof of newVal) {
-					if(!current.includes(prof)) {
-						const newModifier = {
-							origin: `class.${classIndex}.proficiencies.${type}`,
-							type: "proficiency",
-							target: type,
-							subtarget: prof
-						}
-						db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
-					}
-				}
-				this.$emit("change", "class.proficiencies_updated");
-			},
-			setWeaponProficiencies(weapon, classIndex) {
+			setWeaponProficiencies(weapon, classIndex, valid) {
 				const current = this.proficiencies[classIndex]['weapon'];
-				
-				//Remove
-				if(current.includes(weapon)) {
-					//Get the key of the proficiency that needs to be removed
-					const key = this.modifiers.filter(mod => {
-						const origin = mod.origin.split(".");
-						return origin[1] == classIndex && origin[2] === "proficiencies" && origin[3] === 'weapon' && mod.subtarget === weapon;
-					}).map(obj => {
-						return obj['.key'];
-					});
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
-				}
-				
-				//Add
-				if(!current.includes(weapon)) {
-					const newModifier = {
-						origin: `class.${classIndex}.proficiencies.weapon`,
-						type: "proficiency",
-						target: 'weapon',
-						subtarget: weapon
-					}
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
-				}
+				const selected = (current.includes(weapon)) ? current.filter(item => item !== weapon) : [...current, weapon];
+				this.setProficiencies(selected, classIndex, "weapon", valid);
 			},
 			rollHitPoints(classIndex) {
 				this.editClass = classIndex;

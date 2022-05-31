@@ -179,7 +179,7 @@
 				</ul>
 			</div>
 
-			<!-- <p>Base values</p>
+			<p>Base values</p>
 			<pre>
 				{{ characterState.character }}
 			</pre>
@@ -187,7 +187,7 @@
 			<p>Computed values</p>
 			<pre>
 				{{ computed }}
-			</pre> -->
+			</pre>
 		</div>
 	</hk-card>
 </template>

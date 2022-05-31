@@ -197,12 +197,12 @@ export class Character {
     // Setup info about the total HP
     if(this.hit_point_type === "rolled") {
       total_hp.info += (classIndex == 0) ? 
-        "<p>For each level after first the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
-        "<p>For each level you the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
+        "<p>For each level after the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
+        "<p>For each level the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
     } else {
       total_hp.info += (classIndex == 0) ? 
-        "<p>For each level after first the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
-        "<p>For each level you the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
+        "<p>For each level after the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
+        "<p>For each level the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
     }
     
 
@@ -231,6 +231,57 @@ export class Character {
     return this.class.classes;
   }
 
+  // Gets all proficiency modifiers for every class
+  get proficiencies() {
+    const proficiencies = {};
+    const types = ["armor", "weapon", "skill", "saving_throw"];
+
+    for(const classIndex in this.classes) {
+      proficiencies[classIndex] = {};
+
+      for(const type of types) {
+        proficiencies[classIndex][type] = this.modifiers.filter(mod => {
+          const origin = mod.origin.split(".");
+          return origin[1] === classIndex && origin[2] === "proficiencies" && origin[3] === type;
+        }).map(obj => {
+          return obj.subtarget;
+        });
+      }
+      return proficiencies;
+    }
+  }
+
+  set_proficiency(selected, classIndex, type) {
+    const current = this.proficiencies[classIndex][type];
+    console.log(current)
+    
+    // Remove
+    for(const prof of current) {
+      if(!selected.includes(prof)) {
+        //Get the key of the proficiency that needs to be removed
+        const index = this.all_modifiers.filter(mod => {
+          const origin = mod.origin.split(".");
+          return origin[1] == classIndex && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
+        }).map(obj => {
+          return obj.index;
+        });
+        this.delete_modifier(index);
+      }
+    }
+
+    // Add
+    for(const prof of selected) {
+      if(!current.includes(prof)) {
+        this.add_modifier({
+          origin: `class.${classIndex}.proficiencies.${type}`,
+          type: "proficiency",
+          target: type,
+          subtarget: prof
+        });
+      }
+    }
+  }
+
   // MODIFIERS
   get all_modifiers() {
     return this.modifiers.map((mod, i) => ({ ...mod, index: i }));
@@ -241,7 +292,7 @@ export class Character {
   }
 
   add_modifier(modifier) {
-    this.modifiers.push(modifier)
+    this.modifiers = [...this.modifiers, modifier];
   }
 
   edit_modifier(modifier) {
@@ -331,12 +382,12 @@ export class ComputedCharacter {
    **/
   compute_character(character) {
     const base_character = new Character(JSON.parse(JSON.stringify(character)));
-    this.character_name = character.character_name;
-    this.avatar = character.avatar;
-    this.race = character.race;
+    this.character_name = base_character.character_name;
+    this.avatar = base_character.avatar;
+    this.race = base_character.race;
     base_character.proficiency_tracker = [];
 
-    console.log(base_character)
+    console.log(character)
 
     // Compute classes
     this._compute_classes(base_character);
@@ -345,7 +396,7 @@ export class ComputedCharacter {
     // If modifiers are linked to a class feature and the class is not the required level for that feature,
     // the modifier must not be added, so remove these modifiers from the modifier list.
     this.classes.forEach((value, index) => {
-      character.modifiers = character.modifiers.filter((modifier) => {
+      base_character.modifiers = base_character.modifiers.filter((modifier) => {
         const origin = modifier.origin.split(".");
         return origin[0] !== "class" || origin[1] != index || parseInt(origin[2]) > parseInt(value.level);
       })
@@ -357,10 +408,10 @@ export class ComputedCharacter {
     
     // Set spellcasting variables Spell Attack / Spell Save DC
     // Ability scores are needed for this
-    for(const [key, value] of Object.entries(character.classes)) {
+    for(const [key, value] of Object.entries(base_character.classes)) {
       if(value.casting_ability) {
-        classes[key].spell_attack = proficiency + calc_mod(this.abilities[value.casting_ability]);
-        classes[key].spell_save_dc = 8 + proficiency + calc_mod(this.abilities[value.casting_ability]);
+        this.classes[key].spell_attack = this.proficiency + calc_mod(this.abilities[value.casting_ability]);
+        this.classes[key].spell_save_dc = 8 + this.proficiency + calc_mod(this.abilities[value.casting_ability]);
       }
     }
     
@@ -381,7 +432,6 @@ export class ComputedCharacter {
 
   // Computes Proficiency, Level, HP and spells
   _compute_classes(character) {
-    const classes = [];
     let caster_levels = []; //A caster level is needed to determine spell slots with the caster table (phb 165)
 
     //Set level specific stats HP/Spells
@@ -390,7 +440,7 @@ export class ComputedCharacter {
       this.level = this.level + level;
       
       //Create class object for sheet
-      classes[index] = {
+      this.classes[index] = {
         class: value.name || null,
         subclass: value.subclass || null,
         level
@@ -407,16 +457,13 @@ export class ComputedCharacter {
         }
 
         caster_levels.push((level/multiplier));
-        classes[index].spells_known = character.classes[index].spells_known.spells[level] || 0;
-        classes[index].cantrips_known = character.classes[index].spells_known.cantrips[level] || 0;
+        this.classes[index].spells_known = character.classes[index].spells_known.spells[level] || 0;
+        this.classes[index].cantrips_known = character.classes[index].spells_known.cantrips[level] || 0;
       }
     });
 
     //Set proficiency bonus
     this.proficiency = experience_table[this.level].proficiency;
-
-    // Save classes
-    this.classes = classes;
 
     //Check if there is a caster level and determine the spell slots based on caster spell slot table (phb 164)
     if(caster_levels.length >= 1) {

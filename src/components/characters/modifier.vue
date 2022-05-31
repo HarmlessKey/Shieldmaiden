@@ -265,7 +265,6 @@
 	import { abilities } from 'src/mixins/abilities.js';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';
 	import numeral from 'numeral';
-	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'CharacterClass',
@@ -439,10 +438,6 @@
 		},
 		inject: ["characterState"],
 		methods: {
-			...mapActions([
-				"add_modifier",
-				"edit_modifier"
-			]),
 			saveModifier() {
 				const modifier = this.modifier;
 

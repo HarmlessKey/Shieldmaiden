@@ -115,13 +115,12 @@
 			async save() {
 				console.log("saving: ", this.character);
 
-				this.computed_character = new ComputedCharacter(this.character);
-
 				await this.update_character({
 					uid: this.userId,
 					id: this.characterId,
 					character: this.character
 				});
+				this.computed_character = new ComputedCharacter({...this.character});
 				this.character_copy = JSON.parse(JSON.stringify(this.character));
 			}
 		},

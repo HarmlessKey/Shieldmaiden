@@ -60,7 +60,6 @@
 </template>
 
 <script>
-	import _ from 'lodash';
 	import { db } from 'src/firebase';
 	import { experience } from 'src/mixins/experience.js';
 	import { mapGetters, mapActions } from "vuex";

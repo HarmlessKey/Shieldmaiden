@@ -254,7 +254,7 @@
 					//Check and add proficiency bonus
 					if(proficient) {
 						saving_throw.proficient = true;
-						saving_throw.mod = saving_throw.mod + this.computed.display.proficiency;
+						saving_throw.mod = saving_throw.mod + this.computed.proficiency;
 					}
 
 					saving_throws[ability.value] = saving_throw;

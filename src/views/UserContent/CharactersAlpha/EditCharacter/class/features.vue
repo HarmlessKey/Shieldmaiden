@@ -1,188 +1,197 @@
 <template>
 	<div>
-		<template >
-			<q-list dark square class="accordion hit_points" v-for="level in 20" :key="`features-${classIndex}-${level}`">
-				<template v-if="subclass.level >= level">
-					<h4 class="feature-title">
-						Level {{ level }}
-						<a @click="addFeature(classIndex, level)" class="btn btn-sm bg-neutral-5">
-							<i class="fas fa-plus green mr-1" />
-							Add feature
-						</a>
-					</h4>
-					<template v-if="subclass.features">
-						<q-expansion-item
-							v-for="(feature, key, index) in subclass.features[`level_${level}`]"
-							:key="`feature-${key}`"
-							dark switch-toggle-side
-							:group="`features-${classIndex}-${level}`"
-						>
-							<template v-slot:header>
-								<q-item-section avatar>
-									<q-icon size="xs" :name="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'">
-										<q-tooltip anchor="top middle" self="center middle">
-											{{ subclass.features[`level_${level}`][key].display ? "Displayed on Sheet" : "Hidden on Sheet" }}
-										</q-tooltip>
-									</q-icon>
-								</q-item-section>
-								<q-item-section>
-									{{
-										key === "--asi" 
-										? `${subclass.features[`level_${level}`][key].type === 'asi' 
-										? `Ability Score Increase` 
-										: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
-										: feature.name 
-									}}
-								</q-item-section>
-								<q-item-section avatar>
-									<div class="actions">
-										<a class="gray-light"><i class="fas fa-pencil-alt"/></a>
-										<a 
-											class="gray-light ml-3" 
-											v-if="key !== '--asi'" 
-											@click.stop="confirmDeleteFeature(classIndex, level, key, feature.name)"
-										>
-											<i class="fas fa-trash-alt"/>
-										</a>
-									</div>
-								</q-item-section>
+		<q-select
+			v-if="subclass.class === 'custom'"
+			dark filled square
+			label="Ability Score Improvements"
+			v-model="subclass.asi"
+			:options="levels"
+			multiple
+			@input="save(valid)"
+		/>
+		<q-list dark square class="accordion" v-for="level in 20" :key="`features-${classIndex}-${level}`">
+			<template v-if="subclass.level >= level">
+				<h4 class="feature-title">
+					Level {{ level }}
+					<a @click="addFeature(classIndex, level)" class="btn btn-sm bg-neutral-5">
+						<i class="fas fa-plus green mr-1" />
+						Add feature
+					</a>
+				</h4>
+				<template v-if="subclass.features">
+					<q-expansion-item
+						v-for="(feature, index) in character.level_features(classIndex, level)"
+						:key="`feature-${level}-${index}`"
+						dark switch-toggle-side
+						:group="`features-${classIndex}-${level}`"
+					>
+						<template v-slot:header>
+							<q-item-section avatar>
+								<q-icon size="small" :name="feature.display ? 'fas fa-eye' : 'fas fa-eye-slash'">
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ feature.display ? "Displayed on Sheet" : "Hidden on Sheet" }}
+									</q-tooltip>
+								</q-icon>
+							</q-item-section>
+							<q-item-section>
+								{{ feature.name	}}
+							</q-item-section>
+							<q-item-section avatar>
+								<div class="actions" v-if="!isNaN(feature.index)">
+									<a 
+										class="btn btn-sm bg-neutral-5" 
+										@click.stop="confirmDeleteFeature(classIndex, level, feature.index, feature.name, valid)"
+									>
+										<i class="fas fa-trash-alt"/>
+									</a>
+								</div>
+								<span v-else class="neutral-2">{{ feature.source }}</span>
+							</q-item-section>
+						</template>
+
+						<div class="accordion-body">
+							<!-- ASI / FEAT -->
+							<template  v-if="feature.asi">
+								<p>
+									{{ asi_text }} <span class="neutral-2">(phb 15)</span>
+								</p>
+								<p>
+									Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. 
+									<span class="neutral-2">(phb 165)</span>
+								</p>
+
+								<!-- <q-select
+									dark filled square
+									class="mb-3"
+									placeholder="ASI or Feat"
+									emit-value
+									map-options
+									:options="[
+										{ value: 'asi', label: 'Ability Score Increase' }, 
+										{ value: 'feat', label: 'Feat' }
+									]"
+									@input="saveFeatureType(classIndex, level, $event)"
+									:value="subclass.features[feature.index].type"
+								/> -->
 							</template>
 
-							<div class="accordion-body">
-								<!-- FORCED FEATURE ON LEVELS 4, 8 12 16 and 19 -->
-								<template  v-if="key === '--asi'">
-									<p>
-										When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
-										You can’t increase an ability score above 20. (phb 15)
-									</p>
-									<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
-
+							<!-- ASI -->
+							<div v-if="feature.asi">
+								<p>Choose 2 abilities to increase with 1 point</p>
+								<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
 									<q-select
 										dark filled square
-										class="mb-3"
-										placeholder="ASI or Feat"
+										:label="`Ability ${i}`"
+										:options="abilities"
 										emit-value
 										map-options
-										:options="[
-											{ value: 'asi', label: 'Abilitiy Score Increase' }, 
-											{ value: 'feat', label: 'Feat' }
-										]"
-										@input="saveFeatureType(classIndex, level, $event)"
-										:value="subclass.features[`level_${level}`][key].type"
+										:value="asi_modifier(classIndex, level, i)"
+										name="asi"
+										@input="saveASI($event, classIndex, level, i, valid)"
 									/>
-								</template>
-
-								<!-- ASI -->
-								<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
-									<p>Choose 2 abilities to increase with 1 point</p>
-									<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
-										<q-select
-											dark filled square
-											:label="`Ability ${i}`"
-											:options="abilities"
-											emit-value
-											map-options
-											:value="asi_modifier(classIndex, level, key, i).subtarget"
-											name="asi"
-											@input="saveASI($event, classIndex, level, key, i)"
-										/>
-									</div>
 								</div>
+							</div>
 
-								<!-- CUSTOM FEATURE -->
-								<template v-else>
-									<div class="form-item mb-3">
-										<q-checkbox 
-											dark 
-											:value="subclass.features[`level_${level}`][key].display"
-											label="Display on character sheet" 
-											:false-value="null" 
-											indeterminate-value="something-else" 
-											@input="editFeature(classIndex, level, key, 'display', $event)"
-										/>
-									</div>
-									<div class="form-item mb-3">
+							<!-- CUSTOM FEATURE -->
+							<template v-else>
+								<template v-if="!isNaN(feature.index)">
+									<q-checkbox 
+										dark 
+										v-model="subclass.features[feature.index].display"
+										label="Display on character sheet" 
+										:false-value="null" 
+										indeterminate-value="something-else" 
+										@input="save(valid)"
+									/>
+									<ValidationProvider rules="required|max:30" name="Feature name" v-slot="{ errors, invalid, validated }">
 										<q-input 
 											dark filled square
-											@change="editFeature(classIndex, level, key, 'name', $event.target.value)"
+											@change="save(valid)"
 											autocomplete="off"  
-											:id="`name-${level}-${index}`" 
 											type="text" 
-											:value="subclass.features[`level_${level}`][key].name" 
-											:placeholder="key === 'asi' ? 'Feat name' : 'Feature name'"
+											v-model="subclass.features[feature.index].name" 
+											:placeholder="index === 'asi' ? 'Feat name' : 'Feature name'"
+											:error="invalid && validated"
+											:error-message="errors[0]"
 										/>
-									</div>
+									</ValidationProvider>
 
-									<div :for="`${classIndex}-${level}-description`" class="mb-2">
-										Description
-										<a v-if="edit_description === `${level}-${key}`" @click="edit_description = undefined" class="ml-2">
-											<i class="fas fa-times red" />
-											<q-tooltip anchor="top middle" self="center middle">
-												Cancel
-											</q-tooltip>
-										</a>
-										<a v-else @click="edit_description = `${level}-${key}`" class="ml-2">
-											<i class="fas fa-pencil-alt" />
-											<q-tooltip anchor="top middle" self="center middle">
-												Edit
-											</q-tooltip>
-										</a>
-									</div>
-									<hk-text-editor
-										v-if="edit_description === `${level}-${key}`"
-										:value="subclass.features[`level_${level}`][key].description"
-										:toolbar="['bold', 'italic', 'underline', 'ul', 'ol', 'table', 'character']"
-										@save="editFeature(classIndex, level, key, 'description', $event), edit_description = undefined"
-									/>
-									<div v-else class="description" v-html="replaceDescriptionStats(subclass.features[`level_${level}`][key].description, classIndex)" />
-
-									<!-- Modifiers -->
-									<Modifier-table 
-										:modifiers="feature_modifiers(classIndex, level, key)" 
-										:origin="`class.${classIndex}.${level}.${key}`"
-										:userId="userId"
-										:playerId="playerId"
-										:info="featureModInfo"
-										@edit="editModifier"
-									/>
+									<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
+										<div class="d-flex justify-content-between">
+											<div>
+												<i class="fab fa-markdown" aria-hidden="true" />
+												Description
+												<q-tooltip anchor="top middle" self="center middle">
+													Field accepts markdown
+												</q-tooltip>
+											</div>
+											<button class="btn btn-sm btn-clear">
+												<i class="fas fa-eye" aria-hidden="true" />
+												<q-tooltip anchor="top middle" self="center middle">
+													Preview
+												</q-tooltip>
+											</button>
+										</div>
+										<q-input
+											dark filled square
+											type="textarea"
+											label="Description"
+											@change="save(valid)"
+											v-model="subclass.features[feature.index].description"
+											autogrow
+											:error="invalid && validated"
+											:error-message="errors[0]"
+										/>
+									</ValidationProvider>
 								</template>
-							</div>
-						</q-expansion-item>
-					</template>
+								<character-descriptions v-else v-model="feature.description" />
+
+								<!-- Modifiers -->
+								<Modifier-table 
+									v-if="!isNaN(feature.index)"
+									:modifiers="character.filtered_modifiers_feature(classIndex, level, index)" 
+									:origin="`class.${classIndex}.${level}.${index}`"
+									:userId="userId"
+									:characterId="characterId"
+									:info="featureModInfo"
+									@edit="editModifier"
+								/>
+							</template>
+						</div>
+					</q-expansion-item>
 				</template>
-			</q-list>
-		</template>
+			</template>
+		</q-list>
 
 		<!-- MODIFIER MODAL -->
 		<q-dialog v-model="modifier_modal">
-      <Modifier :value="modifier" :userId="userId" :playerId="playerId" :classes="classes" @save="modifierSaved" />
+      <Modifier :value="modifier" :userId="userId" :characterId="characterId" @save="modifierSaved" />
 		</q-dialog>
 	</div>
 </template>
 
 <script>
+	import numeral from "numeral";
 	import { abilities } from "src/mixins/abilities.js";
 	import { mapActions } from "vuex";
 	import Modifier from "src/components/characters/modifier.vue";
 	import ModifierTable from "src/components/characters/modifier-table.vue";
-	import HkTextEditor from "src/components/hk-components/hk-text-editor";
 	import { characterDescriptions } from 'src/mixins/characterDescriptions.js';
+	import CharacterDescriptions from "src/components/characters/character-descriptions"
 
 	export default {
 		name: "CharacterClassFeatures",
 		mixins: [abilities, characterDescriptions],
 		props: [
-			"playerId",
+			"characterId",
 			"userId",
-			"subclass",
 			"classIndex",
-			"modifiers",
-			"classes"
+			"valid"
 		],
 		components: {
 			Modifier,
 			ModifierTable,
-			HkTextEditor
+			CharacterDescriptions
 		},
 		data() {
 			return {
@@ -190,6 +199,39 @@
 				edit_description: false,
 				modifier: {},
 				featureModInfo: "These modifiers only apply to your character if it meets the level requirement for this class.",
+			}
+		},
+		inject: ["characterState"],
+		computed: {
+			character() {
+				return this.characterState.character;
+			},
+			subclass() {
+				return this.character.classes[this.classIndex];
+			},
+			modifiers() {
+				return this.character.filtered_modifiers_origin("class");
+			},
+			levels() {
+				return Array.from({ length: 20}, (_, i) => i + 1);
+			},
+			asi_text() {
+				const levels = this.subclass.asi || [];
+				let text = "When you reach ";
+				levels.forEach((level, index) => {
+					if(index === 0) {
+						text += `${numeral(level).format('0o')} level, `;
+						if(levels.length > 1) text += "and again at "
+					} else if(index > 0 && index !== levels.length - 1) {
+						text += `${numeral(level).format('0o')}, `;
+					} else {
+						text += `and ${numeral(level).format('0o')} level, `
+					}
+				});
+				text += "you can increase one ability score of your choice by 2, "+
+					"or you can increase two ability scores of your choice by 1.\n"+
+					"You can't increase an ability score above 20."
+				return text;
 			}
 		},
 		methods: {
@@ -201,6 +243,9 @@
 				"add_modifier",
 				"edit_modifier"
 			]),
+			save(valid) {
+				this.$emit("save", valid);
+			},
 			feature_modifiers(classIndex, level, key) {
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
@@ -208,30 +253,19 @@
 				});
 				return modifiers;
 			},
-			asi_modifier(classIndex, level, key, index) {
-				const modifiers = this.modifiers.filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[1] == classIndex && origin[2] == level && origin[3] == key && origin[4] == index;
-				});
-				return modifiers[0] || modifiers;
+			asi_modifier(classIndex, level, index) {
+				const modifier = this.character.single_modifier_origin(`class.${classIndex}.${level}.asi.${index}`);
+				return (modifier) ? modifier.subtarget : null;
 			},
-			addFeature(key, level, feature=undefined) {
-				if(!feature) {
-					feature = { name: `Level ${level} feature` }
-				}
-				this.set_feature({
-					userId: this.userId,
-					key: this.playerId,
-					classIndex: key,
-					level,
-					feature
-				});
+			addFeature(classIndex, level, feature=undefined) {
+				this.character.add_feature(classIndex, level);
+				this.save(true)
 			},
 
 			editFeature(classIndex, level, feature_key, property, value) {
 				this.set_feature_prop({
 					userId: this.userId,
-					key: this.playerId,
+					key: this.characterId,
 					classIndex,
 					level,
 					feature_key,
@@ -241,40 +275,22 @@
 				this.$emit("change", "class.edit_feature");
 			},
 
-			confirmDeleteFeature(classIndex, level, key, name) {
+			confirmDeleteFeature(classIndex, level, index, name, valid) {
 				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
 					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteFeature(classIndex, level, key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Yes', action: (toast) => { this.deleteFeature(classIndex, level, index, valid); this.$snotify.remove(toast.id); }, bold: false},
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
-			deleteFeature(classIndex, level, key) {
-				//Delete all modifiers linked to this feature
-				const linked_modifiers = this.feature_modifiers(classIndex, level, key);
-
-				for(const modifier of linked_modifiers) {
-					this.delete_modifier({
-						userId: this.userId,
-						key: this.playerId,
-						modifier_key: modifier['.key']
-					});
-				}
-
-				//Delete feature
-				this.delete_feature({
-					userId: this.userId,
-					key: this.playerId,
-					classIndex,
-					level,
-					feature_key: key
-				});
-				this.$emit("change", "class.delete_feature");
+			deleteFeature(classIndex, level, index, valid) {
+				this.character.delete_feature(classIndex, level, index);
+				this.save(valid, "class.delete_feature");
 			},
 
 			/**
-			 * Save the type of feature that is chosen at levels 4, 8, 12, 16, 19
-			 * Eiter Ability Score Improvement or Feat 
+			 * Save the type of feature that is chosen
+			 * Either Ability Score Improvement or Feat 
 			 **/
 			saveFeatureType(classIndex, level, value) {
 				const linked_modifiers = this.feature_modifiers(classIndex, level, '--asi');
@@ -283,14 +299,14 @@
 				for(const modifier of linked_modifiers) {
 					this.delete_modifier({
 						userId: this.userId,
-						key: this.playerId,
+						key: this.characterId,
 						modifier_key: modifier['.key']
 					});
 				}
 				
 				this.set_feature({
 					userId: this.userId,
-					key: this.playerId,
+					key: this.characterId,
 					classIndex,
 					level,
 					feature: { type: value },
@@ -300,32 +316,33 @@
 				this.$emit("change", `class.edit_feature_level_${level}`);
 			},
 			
-			saveASI(value, classIndex, level, featureKey, index) {
-				const ability = (value) ? value : null;
-				const newModifier = {
-					origin: `class.${classIndex}.${level}.${featureKey}.${index}`,
-					type: "bonus",
-					target: "ability",
-					subtarget: ability,
-					value: 1
-				}
-				if(this.asi_modifier(classIndex, level, featureKey, index).subtarget) {
-					const modifier_key = this.asi_modifier(classIndex, level, featureKey, index)['.key'];
+			saveASI(value, classIndex, level, index, valid) {
+				this.character.save_asi(value, classIndex, level, index)
+				// const ability = (value) ? value : null;
+				// const newModifier = {
+				// 	origin: `class.${classIndex}.${level}.${featureKey}.${index}`,
+				// 	type: "bonus",
+				// 	target: "ability",
+				// 	subtarget: ability,
+				// 	value: 1
+				// }
+				// if(this.asi_modifier(classIndex, level, featureKey, index).subtarget) {
+				// 	const modifier_key = this.asi_modifier(classIndex, level, featureKey, index)['.key'];
 
-					this.edit_modifier({
-						userId: this.userId,
-						key: this.playerId,
-						modifier_key,
-						modifier: newModifier
-					});
-				} else {
-					this.add_modifier({
-						userId: this.userId,
-						key: this.playerId,
-						modifier: newModifier
-					});
-				}
-				this.$emit("change", `class.set_asi.${level}`);
+				// 	this.edit_modifier({
+				// 		userId: this.userId,
+				// 		key: this.characterId,
+				// 		modifier_key,
+				// 		modifier: newModifier
+				// 	});
+				// } else {
+				// 	this.add_modifier({
+				// 		userId: this.userId,
+				// 		key: this.characterId,
+				// 		modifier: newModifier
+				// 	});
+				// }
+				this.save(valid, `class.set_asi.${level}`);
 			},
 			
 			editModifier(e) {

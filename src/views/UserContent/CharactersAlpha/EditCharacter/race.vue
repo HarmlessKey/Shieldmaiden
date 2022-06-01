@@ -44,16 +44,16 @@
 							/>
 						</ValidationProvider>
 						<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
-						<q-input
-							dark filled square
-							type="textarea"
-							label="Race description"
-							@change="save(valid)"
-							v-model="race.race_description"
-							autogrow
-							:error="invalid && validated"
-							:error-message="errors[0]"
-						/>
+							<q-input
+								dark filled square
+								type="textarea"
+								label="Race description"
+								@change="save(valid)"
+								v-model="race.race_description"
+								autogrow
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
 						</ValidationProvider>
 					</div>
 				</hk-card>

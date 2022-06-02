@@ -14,7 +14,7 @@
 				<h4 class="feature-title">
 					Level {{ level }}
 					<a @click="addFeature(classIndex, level)" class="btn btn-sm bg-neutral-5">
-						<i class="fas fa-plus green mr-1" />
+						<i class="fas fa-plus green mr-1" aria-hidden="true" />
 						Add feature
 					</a>
 				</h4>
@@ -42,7 +42,7 @@
 										class="btn btn-sm bg-neutral-5" 
 										@click.stop="confirmDeleteFeature(classIndex, level, feature.index, feature.name, valid)"
 									>
-										<i class="fas fa-trash-alt"/>
+										<i class="fas fa-trash-alt" aria-hidden="true" />
 									</a>
 								</div>
 								<span v-else class="neutral-2">{{ feature.source }}</span>
@@ -119,13 +119,26 @@
 									<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
 										<div class="d-flex justify-content-between">
 											<div>
-												<i class="fab fa-markdown" aria-hidden="true" />
-												Description
-												<q-tooltip anchor="top middle" self="center middle">
-													Field accepts markdown
-												</q-tooltip>
+												<span>
+													<i class="fab fa-markdown" aria-hidden="true" />
+													Description
+													<q-tooltip anchor="top middle" self="center middle">
+														Field accepts markdown
+													</q-tooltip>
+												</span>
+												<i 
+													class="fas fa-info-circle pointer" 
+													aria-hidden="true"							
+													@click="setSlide({
+														show: true,
+														type: 'slides/characterBuilder/Descriptions'
+													})"/>
 											</div>
-											<button class="btn btn-sm btn-clear">
+											<button 
+												v-if="subclass.features[feature.index].description" 
+												class="btn btn-sm btn-clear" 
+												@click.prevent="show_description(subclass.features[feature.index])"
+											>
 												<i class="fas fa-eye" aria-hidden="true" />
 												<q-tooltip anchor="top middle" self="center middle">
 													Preview
@@ -167,6 +180,18 @@
 		<q-dialog v-model="modifier_modal">
       <Modifier :value="modifier" :userId="userId" :characterId="characterId" @save="modifierSaved" />
 		</q-dialog>
+
+		<!-- MODIFIER MODAL -->
+		<q-dialog v-model="description_preview.show">
+      <hk-card :min-width="300">
+				<div class="card-header" slot="header">
+					{{ description_preview.feature.name }}
+				</div>
+				<div class="card-body">
+					<character-descriptions v-model="description_preview.feature.description" />
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -176,12 +201,11 @@
 	import { mapActions } from "vuex";
 	import Modifier from "src/components/characters/modifier.vue";
 	import ModifierTable from "src/components/characters/modifier-table.vue";
-	import { characterDescriptions } from 'src/mixins/characterDescriptions.js';
 	import CharacterDescriptions from "src/components/characters/character-descriptions"
 
 	export default {
 		name: "CharacterClassFeatures",
-		mixins: [abilities, characterDescriptions],
+		mixins: [abilities],
 		props: [
 			"characterId",
 			"userId",
@@ -196,7 +220,10 @@
 		data() {
 			return {
 				modifier_modal: false,
-				edit_description: false,
+				description_preview: {
+					show: false,
+					feature: {}
+				},
 				modifier: {},
 				featureModInfo: "These modifiers only apply to your character if it meets the level requirement for this class.",
 			}
@@ -236,12 +263,7 @@
 		},
 		methods: {
 			...mapActions([
-				"set_feature",
-				"set_feature_prop",
-				"delete_feature",
-				"delete_modifier",
-				"add_modifier",
-				"edit_modifier"
+				"setSlide"
 			]),
 			save(valid) {
 				this.$emit("save", valid);
@@ -318,31 +340,15 @@
 			
 			saveASI(value, classIndex, level, index, valid) {
 				this.character.save_asi(value, classIndex, level, index)
-				// const ability = (value) ? value : null;
-				// const newModifier = {
-				// 	origin: `class.${classIndex}.${level}.${featureKey}.${index}`,
-				// 	type: "bonus",
-				// 	target: "ability",
-				// 	subtarget: ability,
-				// 	value: 1
-				// }
-				// if(this.asi_modifier(classIndex, level, featureKey, index).subtarget) {
-				// 	const modifier_key = this.asi_modifier(classIndex, level, featureKey, index)['.key'];
-
-				// 	this.edit_modifier({
-				// 		userId: this.userId,
-				// 		key: this.characterId,
-				// 		modifier_key,
-				// 		modifier: newModifier
-				// 	});
-				// } else {
-				// 	this.add_modifier({
-				// 		userId: this.userId,
-				// 		key: this.characterId,
-				// 		modifier: newModifier
-				// 	});
-				// }
 				this.save(valid, `class.set_asi.${level}`);
+			},
+
+			show_description(feature) {
+				console.log(feature)
+				this.description_preview = {
+					show: true,
+					feature: feature
+				}
 			},
 			
 			editModifier(e) {

@@ -53,6 +53,7 @@ module.exports = function (/* ctx */) {
       scssLoaderOptions: {
         additionalData: '@import "src/css/variables.scss";'
       },
+      vueCompiler: true,
 
       transpile: true,
 

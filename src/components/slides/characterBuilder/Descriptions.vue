@@ -13,7 +13,7 @@
 			</thead>
 			<tbody>
 				<tr v-for="(markdown, index) in markdownInfo" :key="`markdown-${index}`">
-					<td>{{ markdown }}</td>
+					<td v-html="markdown"/>
 				</tr>
 			</tbody>
 		</table>
@@ -106,7 +106,10 @@
 						"__Underline__",
 						"- Unordered list item",
 						"1. Ordered list item",
-						"| table | columns |"
+						"Tables:<br/>"+
+						"| header | header |<br/>"+
+						"| ----------- | ----------- |<br/>"+
+						"| column | column |<br/>"
 				],
 				ability_scores: [
 					{

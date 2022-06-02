@@ -216,7 +216,7 @@ export const classes = Object.freeze({
         name: "Unarmored Defense",
         display: true,
         level: 1,
-        description: "Beginning at first level, while you are wearing no armor and not wielding a shield, your AC equals 10 + Dexterity modifier + your Wisdom modifier.",
+        description: "Beginning at first level, while you are wearing no armor and not wielding a shield, your AC equals 10 + [dex_mod] + [wis_mod].",
         source: "phb 78",
         index: "unarmored-defense"
       },

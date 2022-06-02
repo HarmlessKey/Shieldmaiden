@@ -627,8 +627,7 @@ html body {
 		height: 46px;
 		line-height: 46px;
 		margin-top: 1px;
-		color: #fff;
-		border: dashed 1px #5c5757;
+		border: dashed 1px $neutral-2;
 
 		&.none {
 			font-size: 20px;
@@ -762,6 +761,16 @@ html body {
 			}
 		}
 	}
+
+	.character-description {
+    .stat {
+      font-weight: bold;
+      cursor: default;
+    }
+		:last-child {
+			margin-bottom: 0;
+		}
+  }
 
 	.validate {
 		margin-top: 5px;

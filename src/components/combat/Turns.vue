@@ -11,12 +11,12 @@
 							</q-item-section>
 						</q-item>
 						<q-separator />
-						<q-item 
+						<q-item
 							v-if="!demo" clickable v-close-popup
 							@click="setSlide({
-								show: true, 
-								type: 'slides/Broadcast', 
-								data: { 
+								show: true,
+								type: 'slides/Broadcast',
+								data: {
 									campaign_id: $route.params.campid,
 									encounter_id: $route.params.encid
 								}
@@ -39,7 +39,7 @@
 						</q-item>
 						<q-item v-if="!demo" clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 							<q-item-section avatar><i aria-hidden="true" class="fas fa-desktop"></i></q-item-section>
-							<q-item-section>Public initiatve settings</q-item-section>
+							<q-item-section>Public initiative settings</q-item-section>
 						</q-item>
 						<q-item clickable v-close-popup v-if="demo" @click="reset_demo()">
 							<q-item-section avatar><i aria-hidden="true" class="far fa-sync-alt"></i></q-item-section>
@@ -62,13 +62,13 @@
 		</div>
 
 		<!-- TURNS & ROUNDS -->
-		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">	
+		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">
 			<a
-				class="handler neutral-2" 
+				class="handler neutral-2"
 				@click="prevTurn()"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()"
 			>
-				<i aria-hidden="true" class="fas fa-step-backward"></i> 
+				<i aria-hidden="true" class="fas fa-step-backward"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Previous turn
 				</q-tooltip>
@@ -87,8 +87,8 @@
 				</div>
 			</template>
 
-			<a class="handler neutral-2" 
-				@click="nextTurn()" 
+			<a class="handler neutral-2"
+				@click="nextTurn()"
 				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
 				<i aria-hidden="true" class="fas fa-step-forward"></i>
 				<q-tooltip anchor="top middle" self="center middle">
@@ -100,7 +100,7 @@
 			Set Intitative
 		</div>
 
-		
+
 		<div class="d-flex justify-content-end center">
 			<span v-if="encounter.round > 0" class="timer">
 				<hk-timer :value="timer || 0" :key="encounter.turn" />
@@ -108,26 +108,26 @@
 			</span>
 
 			<!-- BROADCASTING -->
-			<span 
+			<span
 				v-if="!demo"
 				@click="setSlide({
-					show: true, 
-					type: 'slides/Broadcast', 
-					data: { 
+					show: true,
+					type: 'slides/Broadcast',
+					data: {
 						campaign_id: $route.params.campid,
 						encounter_id: $route.params.encid
 					}
-				})" 
-				class="live" 
+				})"
+				class="live"
 				:class="{'active': broadcast.live === $route.params.campid }"
 			>
 					{{ broadcast.live === $route.params.campid ? "" : "go" }} live
 			</span>
 
 			<template v-if="encounter.round > 0">
-				<div 
+				<div
 					v-if="requests && Object.keys(requests).length"
-					class="requests d-none d-md-block" 
+					class="requests d-none d-md-block"
 					@click="setSlide({show: true, type: 'combat/side/Requests'})"
 				>
 					<i aria-hidden="true" class="fas fa-bell"></i>
@@ -136,7 +136,7 @@
 					</div>
 				</div>
 
-				<div 
+				<div
 					class="info" @click="setSlide({
 						show: true,
 						type: 'combat/side/Side'
@@ -149,13 +149,13 @@
 			<template v-else>
 				<span class="d-none d-md-block">
 					<router-link v-if="!demo" :to="'/content/campaigns/' + $route.params.campid" class="btn bg-neutral-8 ml-2">
-						<i aria-hidden="true" class="fas fa-arrow-left"></i> 
+						<i aria-hidden="true" class="fas fa-arrow-left"></i>
 						Leave
 					</router-link>
 				</span>
 				<a class="btn ml-2" @click="startEncounter()">
-					Start 
-					<span class="ml-1 d-none d-md-inline"> 
+					Start
+					<span class="ml-1 d-none d-md-inline">
 						encounter <i aria-hidden="true" class="fas fa-arrow-right"></i>
 					</span>
 				</a>
@@ -289,7 +289,7 @@
 		font-size: 11px;
 		text-align: center;
 
-		.number { 
+		.number {
 			font-weight: bold;
 			font-size: 30px;
 			line-height: 30px;
@@ -310,7 +310,7 @@
 			height: 20px;
 			width: 20px;
 			border-radius: 50%;
-			
+
 			div {
 				position: absolute;
 				width: inherit;
@@ -349,8 +349,8 @@
 			.header {
 				margin-top: 17px;
 			}
-	
-			.number { 
+
+			.number {
 				font-weight: bold;
 				font-size: 18px !important;
 				line-height: 18px !important;
@@ -368,7 +368,7 @@
 			transform: translateX(-50%);
 			border-bottom: solid 1px $neutral-4;
 			padding: 0 10px;
-	
+
 			i {
 				margin-right: 5px;
 				line-height: 20px;

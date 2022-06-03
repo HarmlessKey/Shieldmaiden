@@ -377,14 +377,18 @@ export class Character {
 
   // MODIFIERS
   get all_modifiers() {
-    let class_modifiers = [];
-    for(const Class of this.classes) {
-      if(Class.class !== "custom") {
-        class_modifiers = classes[Class.class].modifiers;
-      }
-    }
+    let all_modifiers;
     const custom = this.modifiers.map((mod, i) => ({ ...mod, index: i }));
-    return [...class_modifiers, ...custom];
+
+    // Add class modifiers
+    this.classes.forEach((Class, classIndex) => {
+      if(Class.class !== "custom") {
+        all_modifiers = custom.concat(classes[Class.class].modifiers);
+      }
+      // Filter out the modifiers that the class is not high enough level for
+      all_modifiers = this.filtered_modifiers_level(Class, classIndex, all_modifiers);
+    });
+    return all_modifiers;
   }
 
   set all_modifiers(value) {
@@ -431,6 +435,22 @@ export class Character {
       return origin[1] == classIndex && origin[2] == level && origin[3] === index;
     });
   }
+  // Returns only modifiers that the class is a high enough level for
+  filtered_modifiers_level(Class, classIndex, modifiers) {
+    return modifiers.filter((modifier) => {
+      const origin = modifier.origin.split(".");
+      
+      // Modifiers coming from the class have the class name instead of the class classIndex in the origin
+      // let's replace that
+      if(origin[0] === "class" && isNaN(origin[1])) {
+        modifier.origin = modifier.origin.replace(Class.class.toLowerCase(), classIndex);
+        origin[1] = (Class.class.toLowerCase() === origin[1]) ? classIndex : origin[1];
+      }
+
+      // Return modifier of the allowed levels
+      return !(origin[0] === "class" && origin[1] == classIndex && parseInt(origin[2]) > parseInt(Class.level));
+    });
+  }
   // Gets back a single modifier using an origin we know is unique
   single_modifier_origin(origin) {
     return this.all_modifiers.filter(mod => mod.origin === origin)[0];
@@ -455,7 +475,7 @@ export class ComputedCharacter {
     charisma: 0
   }
   saving_throws = {
-    proficiencies: {},
+    proficiencies: [],
     bonuses: {}
   };
   spell_slots = {};
@@ -464,8 +484,8 @@ export class ComputedCharacter {
     weapon: [],
   }
   skills = {
-    proficiencies: {},
-    expertise: {},
+    proficiencies: [],
+    expertise: [],
     bonuses: {}
   }
   senses = {
@@ -499,24 +519,8 @@ export class ComputedCharacter {
     // Compute classes
     this._compute_classes(base_character);
 
-    // REMOVE MODIFIERS
-    // If modifiers are linked to a class feature and the class is not the required level for that feature,
-    // the modifier must not be added, so remove these modifiers from the modifier list.
-    this.classes.forEach((value, index) => {
-      base_character.all_modifiers.filter((modifier) => {
-        const origin = modifier.origin.split(".");
-        
-        // Modifiers coming from the class have the class name instead of the class index in the origin
-        // let's replace that
-        if(origin[0] === "class" && isNaN(origin[1])) {
-          modifier.origin = modifier.origin.replace(value.class.toLowerCase(), index);
-          origin[1] = (value.class.toLowerCase() === origin[1]) ? index : origin[1];
-        }
-
-        // Return modifier of the allowed levels
-        return origin[0] !== "class" || origin[1] != index || isNaN(origin[2]) || parseInt(origin[2]) <= parseInt(value.level);
-      });
-    });
+    // Compute equipment now, cause we need to know if a shield or armor is worn for certain modifiers
+    this._compute_equipment(base_character);
 
     this._compute_abilities(base_character);
 
@@ -532,8 +536,6 @@ export class ComputedCharacter {
     }
     
     this._compute_initiative(base_character);
-
-    this._compute_equipment(base_character);
     
     this._compute_armor_class(base_character);
 
@@ -598,74 +600,6 @@ export class ComputedCharacter {
 
       this.spell_slots = spell_slot_table[caster_level];
     }
-  }
-
-  _compute_abilities(character) {
-    //Ability score maximums
-    const ability_max = {
-      strength: 20,
-      dexterity: 20,
-      constitution: 20,
-      intelligence: 20,
-      wisdom: 20,
-      charisma: 20
-    }
-    
-    this.abilities = character.abilities;
-
-    /**
-     * 
-     * TODO!
-     * Set maximum modifiers
-     * 
-     **/
-
-    // Add Ability Score Modifiers
-    for(let [key, value] of Object.entries(this.abilities)) {
-      for(const modifier of character.filtered_modifiers_target("ability")) {
-        if(modifier.subtarget === key && modifier.type === 'bonus') {
-          value = value + parseInt(modifier.value);
-        }
-      }
-      this.abilities[key] = value;
-
-      //Set score to maximum if it is higher than its maximum
-      if(this.abilities[key] > ability_max[key]) {
-        this.abilities[key] = ability_max[key];
-      }
-    }
-
-    /**
-     * 
-     * TODO!
-     * Ability Set Score Modifiers
-     * 
-     **/
-  }
-
-  _compute_hit_points(character) {
-    const con = this.abilities.constitution;
-
-    for(const classIndex in character.classes) {
-      this.hit_points = character.total_class_hp(classIndex, con).hp;
-    };
-
-    //Add HP modifiers
-    for(const modifier of character.filtered_modifiers_target("hp")) {
-      this.hit_points = this._add_modifier(character, this.hit_points, modifier);
-    }
-    this.hit_points = this.hit_points;
-  }
-
-  _compute_initiative(character) {
-    //Initiative
-    let initiative = calc_mod(this.abilities.dexterity);
-
-    //Add Initiative Modifiers	
-    for(const modifier of character.filtered_modifiers_target("initiative")) {
-      initiative = this.addModifier(character, initiative, modifier);
-    }
-    this.initiative = initiative;
   }
 
   _compute_equipment(character) {
@@ -748,6 +682,74 @@ export class ComputedCharacter {
     }
   }
 
+  _compute_abilities(character) {
+    //Ability score maximums
+    const ability_max = {
+      strength: 20,
+      dexterity: 20,
+      constitution: 20,
+      intelligence: 20,
+      wisdom: 20,
+      charisma: 20
+    }
+    
+    this.abilities = character.abilities;
+
+    /**
+     * 
+     * TODO!
+     * Set maximum modifiers
+     * 
+     **/
+
+    // Add Ability Score Modifiers
+    for(let [key, value] of Object.entries(this.abilities)) {
+      for(const modifier of character.filtered_modifiers_target("ability")) {
+        if(modifier.subtarget === key && modifier.type === 'bonus') {
+          value = value + parseInt(modifier.value);
+        }
+      }
+      this.abilities[key] = value;
+
+      //Set score to maximum if it is higher than its maximum
+      if(this.abilities[key] > ability_max[key]) {
+        this.abilities[key] = ability_max[key];
+      }
+    }
+
+    /**
+     * 
+     * TODO!
+     * Ability Set Score Modifiers
+     * 
+     **/
+  }
+
+  _compute_hit_points(character) {
+    const con = this.abilities.constitution;
+
+    for(const classIndex in character.classes) {
+      this.hit_points = character.total_class_hp(classIndex, con).hp;
+    };
+
+    //Add HP modifiers
+    for(const modifier of character.filtered_modifiers_target("hp")) {
+      this.hit_points = this._add_modifier(character, this.hit_points, modifier);
+    }
+    this.hit_points = this.hit_points;
+  }
+
+  _compute_initiative(character) {
+    //Initiative
+    let initiative = calc_mod(this.abilities.dexterity);
+
+    //Add Initiative Modifiers	
+    for(const modifier of character.filtered_modifiers_target("initiative")) {
+      initiative = this.addModifier(character, initiative, modifier);
+    }
+    this.initiative = initiative;
+  }
+
   _compute_armor_class(character) {
     //Armor Class
     let armor_class = (this.armor) ? this.armor.armor_class : 10; //Base is always 10 (phb 14)
@@ -800,10 +802,10 @@ export class ComputedCharacter {
         // This way expertise can easily only be added if the proficiency is also true
         // It's also easier to show front-end what skills have proficiency and expertise
         if(skill === modifier.subtarget) {
-          if(modifier.type === "proficiency") {
-            this.skills.proficiencies[skill] = true;
-          } else if(modifier.type === "expertise") {
-            this.skills.expertise[skill] = true;
+          if(modifier.type === "proficiency" && !this.skills.proficiencies.includes(skill)) {
+            this.skills.proficiencies.push(skill);
+          } else if(modifier.type === "expertise" && !this.skills.expertise.includes(skill)) {
+            this.skills.expertise(skill);
           } else {
             const value = (this.skills.bonuses[skill]) ? this.skills.bonuses[skill] : 0;
             this.skills.bonuses[skill] = this._add_modifier(character, value, modifier);
@@ -820,8 +822,8 @@ export class ComputedCharacter {
         //This get's calculated front end
         //This way it's easy to show what saving throws have proficiency
         if(ability === modifier.subtarget) {
-          if(modifier.type === "proficiency") {
-            this.saving_throws.proficiencies[ability] = true;
+          if(modifier.type === "proficiency" && !this.saving_throws.proficiencies.includes(ability)) {
+            this.saving_throws.proficiencies.push(ability);
           } else {
             let value = (this.saving_throws.bonuses[ability]) ? this.saving_throws.bonuses[ability] : 0;
             this.saving_throws.bonuses[ability] = this.addModifier(character, value, modifier);
@@ -856,7 +858,6 @@ export class ComputedCharacter {
    * @returns {*} new value for the stat
    */
   _add_modifier(character, value, modifier) {
-    console.log("add modifier", modifier.origin)
     let newValue = parseInt(value);
     let modifier_value = parseInt(modifier.value);
 

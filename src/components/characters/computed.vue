@@ -240,7 +240,7 @@
 				for(const ability of Object.values(this.abilities)) {
 					let saving_throw = {};
 					let score = this.computed.abilities[ability.value];
-					const proficient = proficiencies[ability.value];
+					const proficient = proficiencies.includes(ability.value);
 					const bonus = bonuses[ability.value] || 0;
 					saving_throw.mod = this.calcMod(score) + bonus;
 

@@ -54,7 +54,6 @@ module.exports = function (/* ctx */) {
         additionalData: '@import "src/css/variables.scss";'
       },
       vueCompiler: true,
-
       transpile: true,
 
       // Add dependencies for transpiling with Babel (Array of string/regex)

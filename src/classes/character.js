@@ -245,6 +245,7 @@ export class Character {
         const selected = classes[Class.class];
         Class.hit_dice = selected.hit_dice;
         Class.asi = selected.asi;
+        Class.skill_count = selected.skill_count;
         Class.saving_throws = selected.saving_throws;
         Class.caster_type = selected.caster_type;
         Class.casting_ability = selected.casting_ability;
@@ -263,7 +264,7 @@ export class Character {
       proficiencies[classIndex] = {};
 
       for(const type of types) {
-        proficiencies[classIndex][type] = this.modifiers.filter(mod => {
+        proficiencies[classIndex][type] = this.all_modifiers.filter(mod => {
           const origin = mod.origin.split(".");
           return origin[1] === classIndex && origin[2] === "proficiencies" && origin[3] === type;
         }).map(obj => {

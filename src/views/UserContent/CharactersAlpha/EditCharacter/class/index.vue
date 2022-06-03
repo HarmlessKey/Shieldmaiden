@@ -363,12 +363,12 @@
 														/>
 													</template>
 													<div v-else class="mb-3">
-														<strong>Armor</strong> {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].armor.join(", ") : "None" }}<br/>
-														<strong>Weapons</strong> {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].weapon.join(", ") : "None" }}<br/>
+														<strong>Armor</strong>: {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].armor.join(", ") : "None" }}<br/>
+														<strong>Weapons</strong>: {{ proficiencies[classIndex].weapon.length ? proficiencies[classIndex].weapon.join(", ") : "None" }}<br/>
 														<template v-if="classIndex == 0">
-															<strong>Saving throws</strong> {{ proficiencies[classIndex].saving_throw.join(", ") }}<br/>
+															<strong>Saving throws</strong>: {{ proficiencies[classIndex].saving_throw.join(", ") }}<br/>
 														</template>
-														<strong>Skills</strong> {{ proficiencies[classIndex].skill.join(", ") ? proficiencies[classIndex].skill.join(", ") : `Select ${subclass.class.skill_count} below` }}<br/>
+														<strong>Skills</strong>: {{ proficiencies[classIndex].skill.join(", ") ? proficiencies[classIndex].skill.join(", ") : `Select ${subclass.class.skill_count} below` }}<br/>
 													</div>
 
 													<q-select 
@@ -378,7 +378,7 @@
 														multiple
 														option-value="value"
 														option-label="skill"
-														:max-values="subclass.skill_count || 0"
+														:max-values="subclass.skill_count || null"
 														:options="Object.values(skillList)" 
 														:value="proficiencies[classIndex].skill" 
 														@input="setProficiencies($event, classIndex, 'skill', valid)"

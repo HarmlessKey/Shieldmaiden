@@ -198,6 +198,7 @@ export const classes = Object.freeze({
   fighter: {},
   monk: {
     hit_dice: 8,
+    caster_type: null,
     skills: [
       "acrobatics",
       "athletics",
@@ -206,6 +207,7 @@ export const classes = Object.freeze({
       "religion",
       "stealth"
     ],
+    skill_count: 2,
     saving_throws: [
       "strength",
       "dexterity"
@@ -214,14 +216,14 @@ export const classes = Object.freeze({
     features: [
       {
         name: "Unarmored Defense",
-        display: true,
+        source: "phb 78",
         level: 1,
         description: "Beginning at first level, while you are wearing no armor and not wielding a shield, your AC equals 10 + [dex_mod] + [wis_mod].",
-        source: "phb 78",
         index: "unarmored-defense"
       },
       {
         name: "Martial Arts",
+        source: "php 78",
         level: 1,
         description: "At 1st level, your practice of martial arts gives you mastery of combat styles that use unarmed strikes and monk weapons, which are shortswords and any simple melee weapons that don't have the two-handed or heavy property.\n"+
           "You gain the following benefits while you are unarmed or wielding only monk weapons and you aren't wearing armor or wielding a shield:\n"+
@@ -229,21 +231,47 @@ export const classes = Object.freeze({
           "- You can roll a d4 in place of the normal damage of your unarmed strike or monk weapon. This die changes as you gain monk levels, as shown in the Martial Arts column of the Monk table.\n"+
           "- When you use the Attack action with an unarmed strike or a monk weapon on your turn, you can make one unarmed strike as a bonus action. For example, if you take the Attack action and attack with a quarterstaff, you can also make an unarmed strike as a bonus action, assuming you haven't already taken a bonus action this turn.\n"+
           "Certain monasteries use specialized forms of the monk weapons. For example, you might use a club that is two lengths of wood connected by a short chain (called a nunchaku) or a sickle with a shorter, straighter blade (called a kama). Whatever name you use for a monk weapon, you can use the game statistics provided for the weapon in the Weapons section.",
-        source: "php 78",
         index: "martial-arts"
         },
         {
           name: "Ki",
-          level: 1
+          source: "phb 78",
+          level: 1,
+          index: "ki"
         },
         {
           name: "Unarmored Movement",
           level: 2,
+          source: "phb 78",
           description: "Starting at 2nd level, your speed increases by 10 feet while you are not wearing armor or wielding a shield. This bonus increases when you reach certain monk levels, as shown in the Monk table.\n"+
             "At 9th level, you gain the ability to move along vertical surfaces and across liquids on your turn without falling during the move."
         }
     ],
     modifiers: [
+      {
+        origin: "class.monk.proficiencies.weapon",
+        subtarget: "simple_melee",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.monk.proficiencies.weapon",
+        subtarget: "short_sword",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.monk.proficiencies.saving_throw",
+        subtarget: "strength",
+        target: "saving_throw",
+        type: "proficiency"
+      },
+      {
+        origin: "class.monk.proficiencies.saving_throw",
+        subtarget: "dexterity",
+        target: "saving_throw",
+        type: "proficiency"
+      },
       {
         origin: "class.monk.1.0",
         name: "Unarmored Defense",
@@ -257,6 +285,7 @@ export const classes = Object.freeze({
       },
       {
         origin: "class.monk.2.3",
+        name: "Unarmored Movement",
         type: "bonus",
         target: "speed",
         subtarget: null,
@@ -265,7 +294,6 @@ export const classes = Object.freeze({
           "no_armor",
           "no_shield"
         ],
-        name: "Unarmored Movement",
         value: 10,
         scaling_start: 2,
         scaling_type: "scale",

@@ -46,7 +46,7 @@
 
 					<!-- CLASSES -->
 					<div class="card-body">
-						<div v-for="(subclass, classIndex) in classes" :key="`class-${classIndex}`">
+						<div v-for="(subclass, classIndex) in character_classes" :key="`class-${classIndex}`">
 							<div>
 								<h3 @click="setShowClass(classIndex)" class="pointer" :class="{ 'hidden-class': classIndex !== showClass}">
 									Level {{ subclass.level }} {{ subclass.name }}
@@ -94,12 +94,14 @@
 												</template>
 											</q-select>
 										</div>
+
+										<!-- Custom class name -->
 										<div v-if="subclass.class === 'custom'">
 											<ValidationProvider rules="required|max:30" name="Class name" v-slot="{ errors, invalid, validated }">
 												<q-input
 													dark filled square
 													label="Class"
-													@change="save(valid)"
+													@change="saveProp(subclass.name, classIndex, 'name', valid)"
 													autocomplete="off"
 													type="text"
 													v-model="subclass.name"
@@ -111,7 +113,7 @@
 												<q-input
 													dark filled square
 													label="Subclass"
-													@change="save(valid)"
+													@change="saveProp(subclass.subclass, classIndex, 'subclass', valid)"
 													autocomplete="off"
 													:id="`${classIndex}-subclass`"
 													type="text"
@@ -162,18 +164,27 @@
 												<div class="accordion-body">
 													<p>
 														<strong>Hit dice</strong><br/>
-														Select the the <em>Hit Point Dice</em> for this class <span class="neutral-2">(phb 12)</span>
+														<template v-if="subclass.class !== 'custom'">
+															Select the the <em>Hit Point Dice</em> for this class <span class="neutral-2">(phb 12)</span>
+														</template>
 													</p>
 													<div class="hit-dice">
-														<a 
-															v-for="{value, text} in dice_types" 
-															@click="setHitDice(classIndex, value, valid)" 
-															:key="`d${value}-${classIndex}`"
-															:class="{ active: subclass.hit_dice === value }"
-															>
-															<i :class="`fas fa-dice-d${value}`" aria-hidden="true" />
-															{{ text }}
-														</a>
+														<template v-if="subclass.class === 'custom'">
+															<a 
+																v-for="{value, text} in dice_types" 
+																@click="setHitDice(classIndex, value, valid)" 
+																:key="`d${value}-${classIndex}`"
+																class="hit_die"
+																:class="{ active: subclass.hit_dice === value }"
+																>
+																<i :class="`fas fa-dice-d${value}`" aria-hidden="true" />
+																{{ text }}
+															</a>
+														</template>
+														<div v-else class="active hit_die">
+															<i :class="`fas fa-dice-d${subclass.hit_dice}`" aria-hidden="true" />
+															d{{ subclass.hit_dice }}
+														</div>
 													</div>
 													
 													<div v-if="character.hit_point_type === 'rolled' && (subclass.level > 1 || classIndex !== 0)" class="mt-3">
@@ -187,7 +198,7 @@
 															<span class="val">
 																{{ character.total_rolled_hp(classIndex) }}
 															</span>
-															<i class="fas fa-pencil" aria-hidden="true" />
+															<i class="fas fa-dice-d20" aria-hidden="true" />
 														</div>
 													</div>
 												</div>
@@ -195,6 +206,7 @@
 											
 											<!-- CASTER -->
 											<q-expansion-item
+												v-if="subclass.class === 'custom' || subclass.caster_type"
 												dark switch-toggle-side
 												:group="`${classIndex}`"
 											>
@@ -228,7 +240,7 @@
 												</template>
 
 												<div class="accordion-body">
-													<div class="form-item mb-3">
+													<template v-if="subclass.class !== 'custom'">
 														<q-select 
 															dark filled square
 															label="Caster type"
@@ -236,34 +248,37 @@
 															:options="caster_types" 
 															emit-value
 															map-options
+															class="mb-3"
 															@input="saveCasterType(classIndex, valid)"
 														/>
-													</div>
-													<div class="form-item mb-3">
 														<q-select 
 															dark filled square
 															label="Spell casting ability"
 															v-model="subclass.casting_ability"
 															emit-value
 															map-options
+															class="mb-3"
 															:options="abilities" 
-															@input="save(valid)"
+															@input="saveProp(subclass.casting_ability, classIndex, 'casting_ability', valid)"
 														/>
-													</div>
-													<div class="form-item mb-3">
 														<q-select 
 															dark filled square
 															label="Spell knowledge"
 															v-model="subclass.spell_knowledge"
 															emit-value
 															map-options
+															class="mb-3"
 															:options="spell_knowledge_types" 
-															@input="save(valid)"
+															@input="saveProp(subclass.spell_knowledge, classIndex, 'spell_knowledge', valid)"
 														/>
-													</div>
-													<div class="form-item mb-3" v-if="subclass.caster_type">
-														<a @click="spellsKnown(classIndex)">Spells known</a>
-													</div>
+														<div class="form-item mb-3" v-if="subclass.caster_type">
+															<a @click="spellsKnown(classIndex)">Spells known</a>
+														</div>
+													</template>
+													<template v-else>
+														<strong>Caster type</strong> {{ subclass.caster_type }}<br/>
+														<strong>Casting ability</strong> {{ subclass.casting_ability }}
+													</template>
 												</div>
 											</q-expansion-item>
 
@@ -285,8 +300,8 @@
 												</template>
 
 												<div class="accordion-body">
-													<!-- ARMOR -->
-													<div class="form-item mb-3">
+													<template v-if="subclass.class === 'custom'">
+														<!-- ARMOR -->
 														<q-select 
 															dark filled square
 															emit-value map-options 
@@ -294,12 +309,11 @@
 															multiple
 															:options="armor_types" 
 															:value="proficiencies[classIndex].armor" 
+															class="mb-3"
 															@input="setProficiencies($event, classIndex, 'armor', valid)"
 														/>
-													</div>
 
-													<!-- WEAPONS -->
-													<div class="form-item mb-3">
+														<!-- WEAPONS -->			
 														<q-select 
 															dark 
 															filled 
@@ -337,22 +351,8 @@
 																<q-separator dark />
 															</template>
 														</q-select>
-													</div>
-													<div class="form-item mb-3">
 														<q-select 
-															dark filled square
-															emit-value map-options 
-															label="Skills"
-															multiple
-															option-value="value"
-															option-label="skill"
-															:options="Object.values(skillList)" 
-															:value="proficiencies[classIndex].skill" 
-															@input="setProficiencies($event, classIndex, 'skill', valid)"
-														/>
-													</div>
-													<div class="form-item mb-3" v-if="classIndex == 0">
-														<q-select 
+															v-if="classIndex == 0"
 															dark filled square
 															emit-value map-options 
 															label="Saving throws"
@@ -361,7 +361,28 @@
 															:value="proficiencies[classIndex].saving_throw" 
 															@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
 														/>
+													</template>
+													<div v-else class="mb-3">
+														<strong>Armor</strong> {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].armor.join(", ") : "None" }}<br/>
+														<strong>Weapons</strong> {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].weapon.join(", ") : "None" }}<br/>
+														<template v-if="classIndex == 0">
+															<strong>Saving throws</strong> {{ proficiencies[classIndex].saving_throw.join(", ") }}<br/>
+														</template>
+														<strong>Skills</strong> {{ proficiencies[classIndex].skill.join(", ") ? proficiencies[classIndex].skill.join(", ") : `Select ${subclass.class.skill_count} below` }}<br/>
 													</div>
+
+													<q-select 
+														dark filled square
+														emit-value map-options 
+														label="Skills"
+														multiple
+														option-value="value"
+														option-label="skill"
+														:max-values="subclass.skill_count || 0"
+														:options="Object.values(skillList)" 
+														:value="proficiencies[classIndex].skill" 
+														@input="setProficiencies($event, classIndex, 'skill', valid)"
+													/>
 												</div>
 											</q-expansion-item>
 										</q-list>
@@ -395,21 +416,21 @@
 						<hk-card>
 							<div slot="header" class="card-header d-flex justify-content-between">
 								<span>
-									Rolled HP {{ classes[editClass].name }}
+									Rolled HP {{ character_classes[editClass].name }}
 								</span>
 								<q-btn flat v-close-popup round icon="close" size="sm" />
 							</div>
 
 							<div class="card-body">
-								<template v-if="classes[editClass].hit_dice">
+								<template v-if="character_classes[editClass].hit_dice">
 									<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
-										<ValidationProvider :rules="{ between: [1, classes[editClass].hit_dice]}" name="Value" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider :rules="{ between: [1, character_classes[editClass].hit_dice]}" name="Value" v-slot="{ errors, invalid, validated }">
 											<q-input 
 												dark filled square
 												@change="setRolledHP($event.target.value, editClass, level, valid)"
 												autocomplete="off" 
 												type="number"
-												:value="classes[editClass].rolled_hit_points ? classes[editClass].rolled_hit_points[level] : 0" 
+												:value="character_classes[editClass].rolled_hit_points ? character_classes[editClass].rolled_hit_points[level] : 0" 
 												:label="`Level ${level}`"
 												:error="invalid && validated"
 												:error-message="errors[0]"
@@ -417,7 +438,7 @@
 												<button 
 													slot="after"
 													class="btn"
-													:disabled="classes[editClass].rolled_hit_points && classes[editClass].rolled_hit_points[level]"
+													:disabled="character_classes[editClass].rolled_hit_points && character_classes[editClass].rolled_hit_points[level]"
 													@click.stop="rollHitDice(editClass, level, valid)"
 												>
 													Roll
@@ -472,7 +493,7 @@
 								</span>
 								<q-btn flat v-close-popup round icon="close" size="sm" />
 							</div>
-							<div class="spells-known card-body" v-if="classes[editClass].spells_known">
+							<div class="spells-known card-body" v-if="character_classes[editClass].spells_known">
 								<h3>Cantrips & Spells known</h3>
 								<div class="columns">
 									<div>Level</div><div>Cantrips</div><div>Spells</div>
@@ -482,13 +503,13 @@
 										</div>
 										<q-input 
 											dark filled square
-											v-model="classes[editClass].spells_known.cantrips[i]" 
+											v-model="character_classes[editClass].spells_known.cantrips[i]" 
 											:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
 											:tabindex="`1${i < 10 ? `0${i}` : i}`"
 										/>
 										<q-input 
 											dark filled square
-											v-model="classes[editClass].spells_known.spells[i]"
+											v-model="character_classes[editClass].spells_known.spells[i]"
 											:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
 											:tabindex="`2${i < 10 ? `0${i}` : i}`"
 										/>
@@ -578,7 +599,7 @@
 			Class() {
 				return this.character.class;
 			},
-			classes() {
+			character_classes() {
 				return this.character.classes;
 			},
 			modifiers() {
@@ -596,7 +617,7 @@
 			reversedLevels() {
 				let levelArray = [];
 
-				for(let i = 1; i <= this.classes[this.editClass].level; i++) {
+				for(let i = 1; i <= this.character_classes[this.editClass].level; i++) {
 					levelArray.push(i);
 				}
 				return levelArray.reverse();
@@ -621,6 +642,11 @@
 					this.invalid = true;
 				}
 			},
+			saveProp(value, classIndex, property, valid) {
+				console.log(value)
+				this.$set(this.Class.classes[classIndex], property, value);
+				this.save(valid, `classes.${classIndex}.${property}`);
+			},
 			setShowClass(classIndex){
 				this.showClass = (classIndex === this.showClass) ? undefined : classIndex; 
 			},
@@ -644,12 +670,12 @@
 				}
 			},
 			saveClassLevel(index, value, valid) {
-				this.classes[index].level = parseInt(value);
+				this.Class.classes[index].level = parseInt(value);
 
 				this.save(valid);
 			},
 			levelUp(classIndex, valid) {
-				const value = parseInt(this.classes[classIndex].level) + 1; 
+				const value = parseInt(this.Class.classes[classIndex].level) + 1; 
 
 				this.saveClassLevel(classIndex, value, valid)
 
@@ -659,12 +685,12 @@
 				}
 			},
 			setHitDice(classIndex, value, valid) {
-				this.classes[classIndex].hit_dice = value;
+				this.Class.classes[classIndex].hit_dice = value;
 				this.save(valid);
 			},
 			saveCasterType(classIndex, valid) {
-				const value = this.classes[classIndex].caster_type;
-				this.classes[classIndex].spells_known = (value) ? { cantrips: { 1: 0 }, spells: { 1: 0 } } : null;
+				const value = this.Class.classes[classIndex].caster_type;
+				this.Class.classes[classIndex].spells_known = (value) ? { cantrips: { 1: 0 }, spells: { 1: 0 } } : null;
 				this.save(valid, "class.caster_type");
 			},
 			setProficiencies(selected, classIndex, type, valid) {
@@ -688,20 +714,20 @@
 				//Set rolled HP manually
 				value = parseInt(value) || 0;
 
-				this.classes[classIndex].rolled_hit_points[level] = value;
+				this.Class.classes[classIndex].rolled_hit_points[level] = value;
 
 				this.save(valid);
 			},
 			rollHitDice(classIndex, level, valid) {
 				// Roll HP digitally
-				const hit_dice = this.classes[classIndex].hit_dice;
+				const hit_dice = this.Class.classes[classIndex].hit_dice;
 				const value = this.rollD({}, hit_dice, 1, 0).total;
 
 				this.setRolledHP(value, classIndex, level, valid);
 			},
 			setSpellsKnown(classIndex, type, level) {
 				//Set spells known
-				const value = parseInt(this.classes[classIndex].spells_known[type][level]) || 0;
+				const value = parseInt(this.Class.classes[classIndex].spells_known[type][level]) || 0;
 				db.ref(`characters_base/${this.userId}/${this.characterId}/class/classes/${classIndex}/spells_known/${type}/${level}`).set(value);
 				this.$emit("change", "class.spells_known");
 			},
@@ -845,7 +871,7 @@
 			text-align: center;
 			margin: 0 -10px 0 -10px;
 
-			a {
+			.hit_die {
 				color: $neutral-4;
 				padding: 0 10px;
 

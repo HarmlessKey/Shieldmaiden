@@ -45,7 +45,6 @@ export class Character {
       }
     }
 
-
     this.race = character.race || {};
     this.race.traits = (character.race && character.race.traits) ? character.race.traits : [];
     this.abilities = character.abilities || {};
@@ -239,7 +238,20 @@ export class Character {
   }
 
   get classes() {
-    return this.class.classes;
+    const character_classes = JSON.parse(JSON.stringify(this.class.classes));
+
+    for(const Class of character_classes) {
+      if(Class.class !== "custom") {
+        const selected = classes[Class.class];
+        Class.hit_dice = selected.hit_dice;
+        Class.asi = selected.asi;
+        Class.saving_throws = selected.saving_throws;
+        Class.caster_type = selected.caster_type;
+        Class.casting_ability = selected.casting_ability;
+        Class.spell_knowledge = selected.spell_knowledge;
+      }
+    }
+    return character_classes;
   }
 
   // Gets all proficiency modifiers for every class
@@ -438,17 +450,19 @@ export class Character {
   // Returns only modifiers that the class is a high enough level for
   filtered_modifiers_level(Class, classIndex, modifiers) {
     return modifiers.filter((modifier) => {
-      const origin = modifier.origin.split(".");
-      
-      // Modifiers coming from the class have the class name instead of the class classIndex in the origin
-      // let's replace that
-      if(origin[0] === "class" && isNaN(origin[1])) {
-        modifier.origin = modifier.origin.replace(Class.class.toLowerCase(), classIndex);
-        origin[1] = (Class.class.toLowerCase() === origin[1]) ? classIndex : origin[1];
+      if(modifier && modifier.origin) {
+        const origin = modifier.origin.split(".");
+        
+        // Modifiers coming from the class have the class name instead of the class classIndex in the origin
+        // let's replace that
+        if(origin[0] === "class" && isNaN(origin[1])) {
+          modifier.origin = modifier.origin.replace(Class.class.toLowerCase(), classIndex);
+          origin[1] = (Class.class.toLowerCase() === origin[1]) ? classIndex : origin[1];
+        }
+  
+        // Return modifier of the allowed levels
+        return !(origin[0] === "class" && origin[1] == classIndex && parseInt(origin[2]) > parseInt(Class.level));
       }
-
-      // Return modifier of the allowed levels
-      return !(origin[0] === "class" && origin[1] == classIndex && parseInt(origin[2]) > parseInt(Class.level));
     });
   }
   // Gets back a single modifier using an origin we know is unique
@@ -826,7 +840,7 @@ export class ComputedCharacter {
             this.saving_throws.proficiencies.push(ability);
           } else {
             let value = (this.saving_throws.bonuses[ability]) ? this.saving_throws.bonuses[ability] : 0;
-            this.saving_throws.bonuses[ability] = this.addModifier(character, value, modifier);
+            this.saving_throws.bonuses[ability] = this._add_modifier(character, value, modifier);
           }
         }
       }

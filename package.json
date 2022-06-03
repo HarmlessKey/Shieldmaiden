@@ -5,7 +5,7 @@
   "productName": "Harmless Key",
   "private": true,
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
+    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions",
     "serve": "quasar dev",
     "ssr": "quasar dev -m ssr",
     "build": "quasar build -m ssr",

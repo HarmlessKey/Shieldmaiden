@@ -255,6 +255,10 @@ export class Character {
     return character_classes;
   }
 
+  set classes(value) {
+    this.class.classes = value;
+  }
+
   // Gets all proficiency modifiers for every class
   get proficiencies() {
     const proficiencies = {};
@@ -308,15 +312,14 @@ export class Character {
 
   // Class features
   class_features(classIndex) {
-    const asi_features = [];
-    let class_features = [];
+    let features = [];
     const Class = this.classes[classIndex];
     const asi = (Class.class === "custom") ? Class.asi : classes[Class.class].asi;
 
     // Add ASI features
     if(asi) {
       for(const level of asi) {
-        asi_features.push({
+        features.push({
           level: level,
           asi: true,
           name: "Ability Score Improvement",
@@ -327,30 +330,20 @@ export class Character {
 
     // Add class features
     if(Class.class !== "custom") {
-      class_features = classes[Class.class].features;
+      features = features.concat(classes[Class.class].features);
     }
 
     // Add custom features
-    const custom = (Class.features) 
-      ? Class.features.map((mod, i) => ({ ...mod, index: i }))
-      : [];
-
-      return [...asi_features, ...class_features, ...custom];
+    features = features.concat(Class.features.map((mod, i) => ({ ...mod, index: i })));
+    return features;
   }
 
-  add_feature(classIndex, level, feature=undefined) {
-    if(!feature) {
-      feature = { 
-        name: `Level ${level} feature`,
-        level: level
-      }
+  add_feature(classIndex, level) {
+    const feature = { 
+      name: `Level ${level} feature`,
+      level: level
     }
-
-    if(!this.classes[classIndex].features) {
-      this.classes[classIndex].features = [];
-    }
-
-    this.classes[classIndex].features.push(feature);
+    this.class.classes[classIndex].features.push(feature);
   }
 
   delete_feature(classIndex, level, index) {
@@ -360,7 +353,7 @@ export class Character {
     for(const mod of linked_modifiers) {
       this.delete_modifier(mod.index);
     }
-    this.classes[classIndex].features.splice(index, 1);
+    this.class.classes[classIndex].features.splice(index, 1);
   }
 
   level_features(classIndex, level) {

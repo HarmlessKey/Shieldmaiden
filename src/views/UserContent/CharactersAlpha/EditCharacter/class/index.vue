@@ -67,7 +67,7 @@
 										</a>
 										<div class="level mb-3">
 											<q-select
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												label="Class"
 												v-model="subclass.class"
 												:options="class_list"
@@ -75,7 +75,7 @@
 											</q-select>
 
 											<q-select
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												label="Level"
 												v-model="subclass.level"
 												:options="levels"
@@ -99,7 +99,7 @@
 										<div v-if="subclass.class === 'custom'">
 											<ValidationProvider rules="required|max:30" name="Class name" v-slot="{ errors, invalid, validated }">
 												<q-input
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													label="Class"
 													@change="saveProp(subclass.name, classIndex, 'name', valid)"
 													autocomplete="off"
@@ -111,7 +111,7 @@
 											</ValidationProvider>
 											<ValidationProvider rules="required|max:50" name="Subclass" v-slot="{ errors, invalid, validated }">
 												<q-input
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													label="Subclass"
 													@change="saveProp(subclass.subclass, classIndex, 'subclass', valid)"
 													autocomplete="off"
@@ -124,10 +124,10 @@
 											</ValidationProvider>
 										</div>
 
-										<q-list dark square class="accordion hit_points mb-3">
+										<q-list :dark="$store.getters.theme === 'dark'" square class="accordion hit_points mb-3">
 											<!-- HIT POINTS -->
 											<q-expansion-item
-												dark switch-toggle-side
+												:dark="$store.getters.theme === 'dark'" switch-toggle-side
 												:group="`${classIndex}`"
 											>
 												<template v-slot:header>
@@ -145,14 +145,14 @@
 																	Hit dice
 																</q-tooltip>
 															</div>
-															<q-separator vertical dark class="mx-2" />
+															<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
 															<div >
 																{{ calcMod(computed.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.abilities.constitution) }}
 																<q-tooltip anchor="top middle" self="center middle">
 																	Constitution modifier
 																</q-tooltip>
 															</div>
-															<q-separator vertical dark class="mx-2" />
+															<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
 															<hk-popover :header="`${subclass.name} hit points`">
 																<strong>{{ character.total_class_hp(classIndex, computed.abilities.constitution).hp }}</strong>
 																<div slot="content" v-html="character.total_class_hp(classIndex, computed.abilities.constitution).info" />
@@ -207,7 +207,7 @@
 											<!-- CASTER -->
 											<q-expansion-item
 												v-if="subclass.class === 'custom' || subclass.caster_type"
-												dark switch-toggle-side
+												:dark="$store.getters.theme === 'dark'" switch-toggle-side
 												:group="`${classIndex}`"
 											>
 												<template v-slot:header>
@@ -226,7 +226,7 @@
 																	Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
 																</template>
 															</hk-popover>
-															<q-separator vertical dark class="mx-2" />
+															<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
 															<hk-popover :header="`${subclass.name} spell save DC`">
 																{{ computed.classes[classIndex].spell_save_dc }}
 																<template #content>
@@ -242,7 +242,7 @@
 												<div class="accordion-body">
 													<template v-if="subclass.class !== 'custom'">
 														<q-select 
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															label="Caster type"
 															v-model="subclass.caster_type" 
 															:options="caster_types" 
@@ -252,7 +252,7 @@
 															@input="saveCasterType(classIndex, valid)"
 														/>
 														<q-select 
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															label="Spell casting ability"
 															v-model="subclass.casting_ability"
 															emit-value
@@ -262,7 +262,7 @@
 															@input="saveProp(subclass.casting_ability, classIndex, 'casting_ability', valid)"
 														/>
 														<q-select 
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															label="Spell knowledge"
 															v-model="subclass.spell_knowledge"
 															emit-value
@@ -284,7 +284,7 @@
 
 											<!-- PROFICIENCIES -->
 											<q-expansion-item
-												dark switch-toggle-side
+												:dark="$store.getters.theme === 'dark'" switch-toggle-side
 												:group="`${classIndex}`"
 											>
 												<template v-slot:header>
@@ -303,23 +303,23 @@
 													<template v-if="subclass.class === 'custom'">
 														<!-- ARMOR -->
 														<q-select 
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															emit-value map-options 
 															label="Armor"
 															multiple
 															:options="armor_types" 
-															:value="proficiencies[classIndex].armor" 
+															v-model="proficiencies[classIndex].armor" 
 															class="mb-3"
 															@input="setProficiencies($event, classIndex, 'armor', valid)"
 														/>
 
 														<!-- WEAPONS -->			
 														<q-select 
-															dark 
+															:dark="$store.getters.theme === 'dark'" 
 															filled 
 															square 
 															multiple 
-															:value="proficiencies[classIndex].weapon" 
+															v-model="proficiencies[classIndex].weapon" 
 															:options="weaponList" 
 															label="Weapon"
 														>
@@ -348,17 +348,17 @@
 																		</q-item-section>
 																	</q-item>
 																</template>
-																<q-separator dark />
+																<q-separator :dark="$store.getters.theme === 'dark'" />
 															</template>
 														</q-select>
 														<q-select 
 															v-if="classIndex == 0"
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															emit-value map-options 
 															label="Saving throws"
 															multiple
 															:options="abilities" 
-															:value="proficiencies[classIndex].saving_throw" 
+															v-model="proficiencies[classIndex].saving_throw" 
 															@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
 														/>
 													</template>
@@ -372,7 +372,7 @@
 													</div>
 
 													<q-select 
-														dark filled square
+														:dark="$store.getters.theme === 'dark'" filled square
 														emit-value map-options 
 														label="Skills"
 														multiple
@@ -380,7 +380,7 @@
 														option-label="skill"
 														:max-values="subclass.skill_count || null"
 														:options="Object.values(skillList)" 
-														:value="proficiencies[classIndex].skill" 
+														v-model="proficiencies[classIndex].skill" 
 														@input="setProficiencies($event, classIndex, 'skill', valid)"
 													/>
 												</div>
@@ -426,7 +426,7 @@
 									<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
 										<ValidationProvider :rules="{ between: [1, character_classes[editClass].hit_dice]}" name="Value" v-slot="{ errors, invalid, validated }">
 											<q-input 
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												@change="setRolledHP($event.target.value, editClass, level, valid)"
 												autocomplete="off" 
 												type="number"
@@ -469,7 +469,7 @@
 								</h3>
 								<div class="handle-xp">
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										autocomplete="off"
 										type="number"
 										v-model="xp"
@@ -502,13 +502,13 @@
 											{{ i }}
 										</div>
 										<q-input 
-											dark filled square
+											:dark="$store.getters.theme === 'dark'" filled square
 											v-model="character_classes[editClass].spells_known.cantrips[i]" 
 											:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
 											:tabindex="`1${i < 10 ? `0${i}` : i}`"
 										/>
 										<q-input 
-											dark filled square
+											:dark="$store.getters.theme === 'dark'" filled square
 											v-model="character_classes[editClass].spells_known.spells[i]"
 											:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
 											:tabindex="`2${i < 10 ? `0${i}` : i}`"
@@ -626,13 +626,8 @@
 		methods: {
 			...mapActions("characters", [
 				"setSlide",
-				"set_xp",
-				"set_class_prop",
-				"set_rolled_hp",
 				"add_class",
 				"delete_class",
-				"delete_modifier",
-				"add_feature"
 			]),
 			save(valid, source="class") {
 				if(valid) {

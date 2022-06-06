@@ -2,177 +2,175 @@
 	<div>
 		<q-select
 			v-if="subclass.class === 'custom'"
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Ability Score Improvements"
 			v-model="subclass.asi"
 			:options="levels"
 			multiple
 			@input="save(valid)"
 		/>
-		<q-list dark square class="accordion" v-for="level in 20" :key="`features-${classIndex}-${level}`">
+		<q-list :dark="$store.getters.theme === 'dark'" square class="accordion" v-for="level in 20" :key="`features-${classIndex}-${level}`">
 			<template v-if="subclass.level >= level">
 				<h4 class="feature-title">
 					Level {{ level }}
-					<a @click="addFeature(classIndex, level)" class="btn btn-sm bg-neutral-5">
+					<a @click="addFeature(classIndex, level, valid)" class="btn btn-sm bg-neutral-5">
 						<i class="fas fa-plus green mr-1" aria-hidden="true" />
 						Add feature
 					</a>
 				</h4>
-				<template v-if="subclass.features">
-					<q-expansion-item
-						v-for="(feature, index) in character.level_features(classIndex, level)"
-						:key="`feature-${level}-${index}`"
-						dark switch-toggle-side
-						:group="`features-${classIndex}-${level}`"
-					>
-						<template v-slot:header>
-							<q-item-section avatar>
-								<q-icon size="small" :name="feature.display ? 'fas fa-eye' : 'fas fa-eye-slash'">
-									<q-tooltip anchor="top middle" self="center middle">
-										{{ feature.display ? "Displayed on Sheet" : "Hidden on Sheet" }}
-									</q-tooltip>
-								</q-icon>
-							</q-item-section>
-							<q-item-section>
-								{{ feature.name	}}
-							</q-item-section>
-							<q-item-section avatar>
-								<div class="actions" v-if="!isNaN(feature.index)">
-									<a 
-										class="btn btn-sm bg-neutral-5" 
-										@click.stop="confirmDeleteFeature(classIndex, level, feature.index, feature.name, valid)"
-									>
-										<i class="fas fa-trash-alt" aria-hidden="true" />
-									</a>
-								</div>
-								<span v-else class="neutral-2">{{ feature.source }}</span>
-							</q-item-section>
+				<q-expansion-item
+					v-for="(feature, index) in character.level_features(classIndex, level)"
+					:key="`feature-${level}-${index}`"
+					:dark="$store.getters.theme === 'dark'" switch-toggle-side
+					:group="`features-${classIndex}-${level}`"
+				>
+					<template v-slot:header>
+						<q-item-section avatar>
+							<q-icon size="small" :name="feature.display ? 'fas fa-eye' : 'fas fa-eye-slash'">
+								<q-tooltip anchor="top middle" self="center middle">
+									{{ feature.display ? "Displayed on Sheet" : "Hidden on Sheet" }}
+								</q-tooltip>
+							</q-icon>
+						</q-item-section>
+						<q-item-section>
+							{{ feature.name	}}
+						</q-item-section>
+						<q-item-section avatar>
+							<div class="actions" v-if="!isNaN(feature.index)">
+								<a 
+									class="btn btn-sm bg-neutral-5" 
+									@click.stop="confirmDeleteFeature(classIndex, level, feature.index, feature.name, valid)"
+								>
+									<i class="fas fa-trash-alt" aria-hidden="true" />
+								</a>
+							</div>
+							<span v-else class="neutral-2">{{ feature.source }}</span>
+						</q-item-section>
+					</template>
+
+					<div class="accordion-body">
+						<!-- ASI / FEAT -->
+						<template  v-if="feature.asi">
+							<p>
+								{{ asi_text }} <span class="neutral-2">(phb 15)</span>
+							</p>
+							<p>
+								Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. 
+								<span class="neutral-2">(phb 165)</span>
+							</p>
+
+							<!-- <q-select
+								:dark="$store.getters.theme === 'dark'" filled square
+								class="mb-3"
+								placeholder="ASI or Feat"
+								emit-value
+								map-options
+								:options="[
+									{ value: 'asi', label: 'Ability Score Increase' }, 
+									{ value: 'feat', label: 'Feat' }
+								]"
+								@input="saveFeatureType(classIndex, level, $event)"
+								:value="subclass.features[feature.index].type"
+							/> -->
 						</template>
 
-						<div class="accordion-body">
-							<!-- ASI / FEAT -->
-							<template  v-if="feature.asi">
-								<p>
-									{{ asi_text }} <span class="neutral-2">(phb 15)</span>
-								</p>
-								<p>
-									Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. 
-									<span class="neutral-2">(phb 165)</span>
-								</p>
-
-								<!-- <q-select
-									dark filled square
-									class="mb-3"
-									placeholder="ASI or Feat"
+						<!-- ASI -->
+						<div v-if="feature.asi">
+							<p>Choose 2 abilities to increase with 1 point</p>
+							<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
+								<q-select
+									:dark="$store.getters.theme === 'dark'" filled square
+									:label="`Ability ${i}`"
+									:options="abilities"
 									emit-value
 									map-options
-									:options="[
-										{ value: 'asi', label: 'Ability Score Increase' }, 
-										{ value: 'feat', label: 'Feat' }
-									]"
-									@input="saveFeatureType(classIndex, level, $event)"
-									:value="subclass.features[feature.index].type"
-								/> -->
-							</template>
-
-							<!-- ASI -->
-							<div v-if="feature.asi">
-								<p>Choose 2 abilities to increase with 1 point</p>
-								<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
-									<q-select
-										dark filled square
-										:label="`Ability ${i}`"
-										:options="abilities"
-										emit-value
-										map-options
-										:value="asi_modifier(classIndex, level, i)"
-										name="asi"
-										@input="saveASI($event, classIndex, level, i, valid)"
-									/>
-								</div>
-							</div>
-
-							<!-- CUSTOM FEATURE -->
-							<template v-else>
-								<template v-if="!isNaN(feature.index)">
-									<q-checkbox 
-										dark 
-										v-model="subclass.features[feature.index].display"
-										label="Display on character sheet" 
-										:false-value="null" 
-										indeterminate-value="something-else" 
-										@input="save(valid)"
-									/>
-									<ValidationProvider rules="required|max:30" name="Feature name" v-slot="{ errors, invalid, validated }">
-										<q-input 
-											dark filled square
-											@change="save(valid)"
-											autocomplete="off"  
-											type="text" 
-											v-model="subclass.features[feature.index].name" 
-											:placeholder="index === 'asi' ? 'Feat name' : 'Feature name'"
-											:error="invalid && validated"
-											:error-message="errors[0]"
-										/>
-									</ValidationProvider>
-
-									<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
-										<div class="d-flex justify-content-between">
-											<div>
-												<span>
-													<i class="fab fa-markdown" aria-hidden="true" />
-													Description
-													<q-tooltip anchor="top middle" self="center middle">
-														Field accepts markdown
-													</q-tooltip>
-												</span>
-												<i 
-													class="fas fa-info-circle pointer" 
-													aria-hidden="true"							
-													@click="setSlide({
-														show: true,
-														type: 'slides/characterBuilder/Descriptions'
-													})"/>
-											</div>
-											<button 
-												v-if="subclass.features[feature.index].description" 
-												class="btn btn-sm btn-clear" 
-												@click.prevent="show_description(subclass.features[feature.index])"
-											>
-												<i class="fas fa-eye" aria-hidden="true" />
-												<q-tooltip anchor="top middle" self="center middle">
-													Preview
-												</q-tooltip>
-											</button>
-										</div>
-										<q-input
-											dark filled square
-											type="textarea"
-											label="Description"
-											@change="save(valid)"
-											v-model="subclass.features[feature.index].description"
-											autogrow
-											:error="invalid && validated"
-											:error-message="errors[0]"
-										/>
-									</ValidationProvider>
-								</template>
-								<character-descriptions v-else v-model="feature.description" />
-
-								<!-- Modifiers -->
-								<Modifier-table 
-									v-if="!isNaN(feature.index)"
-									:modifiers="character.filtered_modifiers_feature(classIndex, level, index)" 
-									:origin="`class.${classIndex}.${level}.${index}`"
-									:userId="userId"
-									:characterId="characterId"
-									:info="featureModInfo"
-									@edit="editModifier"
+									:value="asi_modifier(classIndex, level, i)"
+									name="asi"
+									@input="saveASI($event, classIndex, level, i, valid)"
 								/>
-							</template>
+							</div>
 						</div>
-					</q-expansion-item>
-				</template>
+
+						<!-- CUSTOM FEATURE -->
+						<template v-else>
+							<template v-if="!isNaN(feature.index)">
+								<q-checkbox 
+									:dark="$store.getters.theme === 'dark'" 
+									v-model="character.class.classes[classIndex].features[feature.index].display"
+									label="Display on character sheet" 
+									:false-value="null" 
+									indeterminate-value="something-else" 
+									@input="save(valid)"
+								/>
+								<ValidationProvider rules="required|max:30" name="Feature name" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										@change="save(valid)"
+										autocomplete="off"  
+										type="text" 
+										v-model="character.class.classes[classIndex].features[feature.index].name" 
+										:placeholder="index === 'asi' ? 'Feat name' : 'Feature name'"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+
+								<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
+									<div class="d-flex justify-content-between">
+										<div>
+											<span>
+												<i class="fab fa-markdown" aria-hidden="true" />
+												Description
+												<q-tooltip anchor="top middle" self="center middle">
+													Field accepts markdown
+												</q-tooltip>
+											</span>
+											<i 
+												class="fas fa-info-circle pointer" 
+												aria-hidden="true"							
+												@click="setSlide({
+													show: true,
+													type: 'slides/characterBuilder/Descriptions'
+												})"/>
+										</div>
+										<button 
+											v-if="character.class.classes[classIndex].features[feature.index].description" 
+											class="btn btn-sm btn-clear" 
+											@click.prevent="show_description(character.class.classes[classIndex].features[feature.index])"
+										>
+											<i class="fas fa-eye" aria-hidden="true" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Preview
+											</q-tooltip>
+										</button>
+									</div>
+									<q-input
+										:dark="$store.getters.theme === 'dark'" filled square
+										type="textarea"
+										label="Description"
+										@change="save(valid)"
+										v-model="character.class.classes[classIndex].features[feature.index].description"
+										autogrow
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+							</template>
+							<character-descriptions v-else v-model="feature.description" />
+
+							<!-- Modifiers -->
+							<Modifier-table 
+								v-if="!isNaN(feature.index)"
+								:modifiers="character.filtered_modifiers_feature(classIndex, level, index)" 
+								:origin="`class.${classIndex}.${level}.${index}`"
+								:userId="userId"
+								:characterId="characterId"
+								:info="featureModInfo"
+								@edit="editModifier"
+							/>
+						</template>
+					</div>
+				</q-expansion-item>
 			</template>
 		</q-list>
 
@@ -279,9 +277,10 @@
 				const modifier = this.character.single_modifier_origin(`class.${classIndex}.${level}.asi.${index}`);
 				return (modifier) ? modifier.subtarget : null;
 			},
-			addFeature(classIndex, level, feature=undefined) {
+			addFeature(classIndex, level, valid) {
 				this.character.add_feature(classIndex, level);
-				this.save(true)
+				this.$forceUpdate();
+				this.save(valid);
 			},
 
 			editFeature(classIndex, level, feature_key, property, value) {
@@ -307,6 +306,7 @@
 			},
 			deleteFeature(classIndex, level, index, valid) {
 				this.character.delete_feature(classIndex, level, index);
+				this.$forceUpdate();
 				this.save(valid, "class.delete_feature");
 			},
 
@@ -339,12 +339,12 @@
 			},
 			
 			saveASI(value, classIndex, level, index, valid) {
-				this.character.save_asi(value, classIndex, level, index)
+				this.character.save_asi(value, classIndex, level, index);
+				this.$forceUpdate();
 				this.save(valid, `class.set_asi.${level}`);
 			},
 
 			show_description(feature) {
-				console.log(feature)
 				this.description_preview = {
 					show: true,
 					feature: feature

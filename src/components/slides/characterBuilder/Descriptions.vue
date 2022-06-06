@@ -21,7 +21,7 @@
 		<h3>Character stats</h3>
 		<p>
 			You can add stats of your character into the description. 
-			Simply enter the reference of the desired stat, as shown in the tables below, into the description field. 
+			Simply enter the reference of the desired stat (as shown in the tables below) into the description field. 
 			The actual value will be shown when the description is displayed. The brackets are required.
 		</p>
 		
@@ -40,9 +40,7 @@
 					<td>{{ ref }}</td>
 				</tr>
 			</tbody>
-		</table>
 
-		<table class="table">
 			<thead>
 				<th>
 					Ability modifiers
@@ -57,9 +55,7 @@
 					<td>{{ ref }}</td>
 				</tr>
 			</tbody>
-		</table>
 
-		<table class="table">
 			<thead>
 				<th>
 					Character
@@ -74,9 +70,7 @@
 					<td>{{ ref }}</td>
 				</tr>
 			</tbody>
-		</table>
 
-		<table class="table">
 			<thead>
 				<th>
 					Class

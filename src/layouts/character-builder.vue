@@ -20,11 +20,12 @@
 						no-caps
 					>
 						<q-route-tab
-							v-for="({value, label, icon}, i) in tabs" 
+							v-for="({value, label, icon, disabled}, i) in tabs" 
 							exact replace
 							:icon="icon"
 							:label="label"
 							:name="value"
+							:disabled="disabled"
 							:to="`/content/characters-alpha/${characterId}/${value}`"
 							:key="`tab-${i}`"
 						/>
@@ -70,9 +71,9 @@
 					{ value: "race", label: "Race" },
 					{ value: "class", label: "Class" },
 					{ value: "abilities", label: "Abilities" },
-					{ value: "equipment", label: "Equipment" },
-					{ value: "actions", label: "Actions" },
-					{ value: "background", label: "Background" },
+					{ value: "equipment", label: "Equipment", disabled: true },
+					{ value: "actions", label: "Actions", disabled: true },
+					{ value: "background", label: "Background", disabled: true },
 				],
 				current_tab: this.$route.path.split("/").length > 4 ? this.$route.path.split("/").pop() : "general"
 			}

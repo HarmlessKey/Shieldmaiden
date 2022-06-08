@@ -32,23 +32,23 @@
 					</h3>
 					<div class="d-flex justify-content-center mb-4" v-if="method === 'manual'">
 						<a class="btn" @click="roll_dialog = !roll_dialog">
-							<i class="fas fa-dice-d20" /> Roll scores
+							<i class="fas fa-dice-d20" aria-hidden="true" /> Roll scores
 						</a>
 					</div>
 
 					<!-- STANDARD ARRAY -->
 					<div v-if="method === 'standard_array'" class="base_abilities input">
-						<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-							<div>{{ label }}</div>
+						<div class="ability" v-for="ability in abilities" :key="`base-${ability}`">
+							<div>{{ ability.capitalize() }}</div>
 							<q-select
 								dark filled square
 								placeholder="-"
-								:value="ability_scores[value]"
+								:value="ability_scores[ability]"
 								:options="standard_array"
 								emit-value
 								map-options
 								:option-disable="standardArrayDisable"
-								@input="saveAbility($event, value, valid)"
+								@input="saveAbility($event, ability, valid)"
 								clearable
 							/>
 						</div>
@@ -57,18 +57,18 @@
 					<!-- POINT BUY -->
 					<template v-if="method === 'point_buy'">
 						<div class="base_abilities input">
-							<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-								<div>{{ label }}</div>
+							<div class="ability" v-for="ability in abilities" :key="`base-${ability}`">
+								<div>{{ ability.capitalize() }}</div>
 								<q-select
 									dark filled square
 									placeholder="-"
-									:value="ability_scores[value]"
+									:value="ability_scores[ability]"
 									:options="point_buy.map(item => item.score)"
-									:option-label="label"
+									:option-label="ability"
 									emit-value
 									map-options
-									:option-disable="opt => pointBuyDisable(opt, ability_scores[value])"
-									@input="saveAbility($event, value, valid)"
+									:option-disable="opt => pointBuyDisable(opt, ability_scores[ability])"
+									@input="saveAbility($event, ability, valid)"
 								/>
 							</div>
 						</div>
@@ -80,16 +80,16 @@
 
 					<!-- MANUAL -->
 					<div v-if="method === 'manual'" class="base_abilities input">
-						<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-							<div>{{ label }}</div>
-							<ValidationProvider rules="between:1,20" :name="label" v-slot="{ errors, invalid, validated }">
+						<div class="ability" v-for="ability in abilities" :key="`base-${ability}`">
+							<div>{{ ability.capitalize() }}</div>
+							<ValidationProvider rules="between:1,20" :name="ability" v-slot="{ errors, invalid, validated }">
 								<q-input
 									dark filled square
 									placeholder="-"
-									@change="saveAbility($event.target.value, value, valid)"
+									@change="saveAbility($event.target.value, ability, valid)"
 									autocomplete="off"  
 									type="number"
-									v-model="ability_scores[value]"
+									v-model="ability_scores[ability]"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								/>
@@ -157,12 +157,12 @@
 					</div>
 					<h3 class="text-center">Computed ability scores</h3>
 					<div class="base_abilities">
-						<div class="ability computed" v-for="{value, label} in abilities" :key="`base-${value}`">
+						<div class="ability computed" v-for="ability in abilities" :key="`computed-${ability}`">
 							<div class="label">
-								{{ label.substring(3, 0).toUpperCase() }}
+								{{ ability.substring(3, 0).toUpperCase() }}
 							</div>
 							<h2 class="score">
-								{{ computed.abilities[value] || 0 }}
+								{{ computed.abilities[ability] || 0 }}
 							</h2>
 						</div>
 					</div>
@@ -206,7 +206,7 @@
 </template>
 
 <script>
-	import { abilities } from "src/mixins/abilities.js";
+	import { abilities } from "src/utils/generalConstants";
 	import { dice } from "src/mixins/dice.js";
 	import { mapActions } from "vuex";
 	import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
@@ -222,6 +222,7 @@
 		data() {
 			return {
 				modifier: {},
+				abilities: abilities,
 				saved: false,
 				invalid: false,
 				roll_dialog: false,
@@ -374,7 +375,7 @@
 
 				// Reset ability scores
 				for(const ability of this.abilities) {
-					this.character.abilities[ability.value] = value;
+					this.character.abilities[ability] = value;
 				}
 
 				// Set the method
@@ -405,7 +406,7 @@
 				const used = this.rolls.filter(roll => roll.ability).map(roll => roll.ability);
 
 				return this.abilities.filter(ability => {
-					return !used.includes(ability.value) || this.rolls[i].ability === ability.value;
+					return !used.includes(ability) || this.rolls[i].ability === ability;
 				});
 			},
 			rolledTotal(i) {

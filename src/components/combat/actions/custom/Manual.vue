@@ -96,14 +96,16 @@
 <script>
 	import { mapGetters } from "vuex";
 	import { setHP } from "src/mixins/HpManipulations.js";
-	import { damage_types } from "src/mixins/damageTypes.js";
+	import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 
 	export default {
 		name: "Manual",
-		mixins: [setHP, damage_types],
+		mixins: [setHP],
 		props: ["current"],
 		data() {
 			return {
+				damage_types: damage_types,
+				damage_type_icons: damage_type_icons,
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,

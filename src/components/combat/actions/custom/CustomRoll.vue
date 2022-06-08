@@ -95,20 +95,22 @@
 	import { mapGetters } from "vuex";
 	import { dice } from "src/mixins/dice.js";
 	import { setHP } from "src/mixins/HpManipulations.js";
-	import { damage_types } from "src/mixins/damageTypes.js";
-	import { abilities } from "src/mixins/abilities.js";
+	import { damage_types } from "src/utils/generalConstants";
+	import { abilities } from "src/utils/generalConstants";
 	import { runEncounter } from 'src/mixins/runEncounter.js';
 
 	export default {
 		name: "CustomRoll",
-		mixins: [setHP, dice, damage_types, abilities, runEncounter],
+		mixins: [setHP, dice, runEncounter],
 		props: ["current"],
 		data() {
 			return {
+				damage_types: damage_types,
 				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				abilities: abilities,
 				roll_type: "attack",
 				save_dc: 10,
 				save_ability: "strength",

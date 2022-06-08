@@ -319,7 +319,7 @@
 
 <script>
 import { mapActions } from "vuex";
-import { damage_types } from 'src/mixins/damageTypes.js';
+import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
 import { dice } from 'src/mixins/dice';
 import { setHP } from 'src/mixins/HpManipulations';
 
@@ -335,9 +335,11 @@ export default {
 			required: true
 		}
 	},
-	mixins: [damage_types, dice, setHP],
+	mixins: [dice, setHP],
 	data() {
 		return {
+			damage_types: damage_types,
+			damage_type_icons: damage_type_icons,
 			defenses: {
 				v: { name: "Vulnerable", value: "double" },
 				r: { name: "Resistant", value: "half" },

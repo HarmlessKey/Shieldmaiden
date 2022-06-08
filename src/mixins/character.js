@@ -1,14 +1,15 @@
 import { experience } from "src/mixins/experience.js";
 import { general } from "src/mixins/general.js";
 import { dice } from "src/mixins/dice.js";
-import { skills } from "src/mixins/skills.js";
+import { skills } from "src/utils/generalConstants";
 import { experience_table, spell_slot_table } from "src/utils/characterConstants";
 
 
 export const characterMixin = {
-	mixins: [experience, general, dice, skills],
+	mixins: [experience, general, dice],
 	data() {
 		return {
+			skillList: skills,
 			advantage_disadvantage: {},
 			proficiency_tracker: []
 		}

@@ -436,15 +436,15 @@
 	import GiveCharacterControl from './GiveCharacterControl.vue';
 	import { mapGetters, mapActions } from 'vuex';
 	import { experience } from 'src/mixins/experience.js';
-	import { skills } from 'src/mixins/skills.js';
 	import { general } from 'src/mixins/general.js';
 	import Defenses from './Defenses';
 	import CopyContent from '../../../components/CopyContent.vue';
-	import { abilities } from "src/mixins/abilities";
+	import { abilities, skills } from "src/utils/generalConstants";
+	import { calc_skill_mod } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'EditPlayer',
-		mixins: [experience, skills, general, abilities],
+		mixins: [experience, general],
 		components: {
 			GiveCharacterControl,
 			Defenses,
@@ -452,6 +452,8 @@
 		},
 		data() {
 			return {
+				abilities: abilities,
+				skillList: skills,
 				playerId: this.$route.params.id,
 				userId: undefined,
 				companion_dialog: false,
@@ -635,15 +637,18 @@
 				}
 			},
 			skillMod(skill, key) {
-				const mod = this.calculateSkillModifier(
-					this.calcMod(this.player[skill.ability]),
-					this.player.skills ? (
-					this.player.skills.includes(key) ? 
-					this.returnProficiency(this.player.level ? this.player.level : this.calculatedLevel(this.player.experience))
-					: 0) : 0,
-					this.player.skills_expertise ? this.player.skills_expertise.includes(key) : false
+				const ability_mod = this.calcMod(this.player[skill.ability]);
+				const proficiency = this.returnProficiency(this.player.level ? this.player.level : this.calculatedLevel(this.player.experience));
+				const proficient = this.player.skills ? this.player.skills.includes(key) : false;
+				const expertise = this.player.skills_expertise ? this.player.skills_expertise.includes(key) : false;
+				
+				return calc_skill_mod(
+					ability_mod,
+					proficiency,
+					0,
+					proficient,
+					expertise
 				);
-				return parseInt(mod);
 			}
 		}
 	}

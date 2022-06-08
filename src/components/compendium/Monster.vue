@@ -347,20 +347,19 @@
 <script>
 	import { general } from 'src/mixins/general.js';
 	import { dice } from 'src/mixins/dice.js';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 	import { monsterMixin } from 'src/mixins/monster.js';
-	import { skills } from 'src/mixins/skills.js';
 	import { mapActions, mapGetters } from 'vuex';
-	import Spell from "src/components/compendium/Spell"
+	import Spell from "src/components/compendium/Spell";
+	import { skills } from "src/utils/generalConstants";
+	import { calc_skill_mod } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'ViewMonster',
 		mixins: [
 			general, 
 			dice,
-			abilities,
-			monsterMixin,
-			skills
+			monsterMixin
 		],
 		components: {
 			Spell
@@ -380,6 +379,8 @@
 				width: 0,
 				monster: {},
 				loading: true,
+				abilities: abilities,
+				skillList: skills,
 				actions: [
 					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
 					{ category: 'actions', name: 'Actions', name_single: 'Action' },
@@ -465,19 +466,19 @@
 				}).map(item => { return item[1] });
 			},
 			skillModifier(ability, skill) {
-				let mod = this.calculateSkillModifier(
-					this.calcMod(this.monster[ability]),
-					this.monster.skills ? (
-					this.monster.skills.includes(skill) ? 
-					(this.monster.challenge_rating ? this.monster.proficiency : '')
-					: 0) : 0,
-					this.monster.skills_expertise ? this.monster.skills_expertise.includes(skill) : false
+				const ability_mod = this.calcMod(this.monster[ability]);
+				const proficiency = this.monster.challenge_rating ? this.monster.proficiency : 0;
+				const bonus = (this.monster.skill_modifiers && this.monster.skill_modifiers[skill]) ? this.monster.skill_modifiers[skill] : 0;
+				const proficient = this.monster.skills ? this.monster.skills.includes(skill) : false;
+				const expertise = this.monster.skills_expertise ? this.monster.skills_expertise.includes(skill) : false;
+				
+				return calc_skill_mod(
+					ability_mod,
+					proficiency,
+					bonus,
+					proficient,
+					expertise
 				);
-
-				if(this.monster.skill_modifiers && this.monster.skill_modifiers[skill]) {
-					mod = parseInt(mod) + parseInt(this.monster.skill_modifiers[skill]);
-				}
-				return parseInt(mod);
 			}
 		}
 	};

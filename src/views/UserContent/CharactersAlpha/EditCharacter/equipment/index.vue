@@ -205,15 +205,15 @@
 	import ModifierTable from 'src/components/characters/modifier-table.vue';
 	import Modifier from 'src/components/characters/modifier.vue';
 	import { db } from 'src/firebase';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';
-	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { damage_types } from 'src/utils/generalConstants';
 	import Weapon from './weapon.vue'
 	import Armor from './armor.vue'
 
 	export default {
 		name: 'Equipment',
-		mixins: [abilities, weapons, damage_types],
+		mixins: [weapons],
 		props: [
 			"equipment",
 			"modifiers",
@@ -229,6 +229,8 @@
 		},
 		data() {
 			return {
+				abilities: abilities,
+				damage_types: damage_types,
 				addModal: false,
 				modifier_modal: false,
 				modifier: {},

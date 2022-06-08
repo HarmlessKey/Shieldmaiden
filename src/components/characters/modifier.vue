@@ -43,7 +43,7 @@
 								<q-select dark filled square map-options emit-value v-model="modifier.target" :options="modifier_targets" label="Modifier target" />
 							</div>
 
-							<!-- ABILITES -->
+							<!-- ABILITIES -->
 							<div class="form-item mb-3" v-if="['ability', 'saving_throw'].includes(modifier.target)">
 								<q-select 
 									dark filled square 
@@ -261,14 +261,14 @@
 </template>
 
 <script>
-	import { skills } from 'src/mixins/skills.js';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';
 	import numeral from 'numeral';
+	import { skills } from "src/utils/generalConstants";
 
 	export default {
 		name: 'CharacterClass',
-		mixins: [skills, abilities, weapons],
+		mixins: [weapons],
 		props: {
 			value: {
 				type: Object,
@@ -293,6 +293,8 @@
 		},
 		data() {
 			return {
+				abilities: abilities,
+				skillList: skills,
 				scaling: false,
 				modifier_setter: undefined,
 				modifier_types: [

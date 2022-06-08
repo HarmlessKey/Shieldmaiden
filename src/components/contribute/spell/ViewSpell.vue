@@ -112,11 +112,11 @@
 <script>
 	import { spells } from 'src/mixins/spells.js';
 	// import VueMarkdown from 'vue-markdown';
-	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { damage_types } from 'src/utils/generalConstants';
 
 	export default {
 		name: 'Spell',
-		mixins: [spells, damage_types],
+		mixins: [spells],
 		components: {
 			// VueMarkdown
 		},
@@ -126,6 +126,7 @@
 		],
 		data() {
 			return {
+				damage_types: damage_types,
 				spell: this.data,
 				selectedLevel: this.data.level,
 				casterLevel: undefined,

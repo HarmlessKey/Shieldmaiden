@@ -2203,6 +2203,16 @@ html body {
 		}
 	}
 
+	.q-dialog__inner {
+		.hk-card {
+			.card-header {
+				position: sticky;
+				top: 0;
+				z-index: 1;
+			}
+		}
+	}
+
 	.sticky-header-table {
 		max-height: 300px;
 

@@ -1,6 +1,6 @@
 import { experience_table, spell_slot_table, classes } from "src/utils/characterConstants";
 import { calc_dice_average, calc_mod } from "src/utils/generalFunctions";
-import { skills } from "src/utils/skillsConstants";
+import { skills } from "src/utils/generalConstants";
 
 export class Character {
   general = {

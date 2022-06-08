@@ -82,8 +82,6 @@
 									:dark="$store.getters.theme === 'dark'" filled square
 									:label="`Ability ${i}`"
 									:options="abilities"
-									emit-value
-									map-options
 									:value="asi_modifier(classIndex, level, i)"
 									name="asi"
 									@input="saveASI($event, classIndex, level, i, valid)"
@@ -195,7 +193,7 @@
 
 <script>
 	import numeral from "numeral";
-	import { abilities } from "src/mixins/abilities.js";
+	import { abilities } from "src/utils/generalConstants";
 	import { mapActions } from "vuex";
 	import Modifier from "src/components/characters/modifier.vue";
 	import ModifierTable from "src/components/characters/modifier-table.vue";
@@ -203,7 +201,6 @@
 
 	export default {
 		name: "CharacterClassFeatures",
-		mixins: [abilities],
 		props: [
 			"characterId",
 			"userId",
@@ -217,6 +214,7 @@
 		},
 		data() {
 			return {
+				abilities: abilities,
 				modifier_modal: false,
 				description_preview: {
 					show: false,

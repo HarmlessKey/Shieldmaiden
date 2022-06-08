@@ -91,12 +91,11 @@
 </template>
 
 <script>
-import { damage_types } from 'src/mixins/damageTypes.js';
+import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
 import ActionRoll from "src/components/ActionRoll"
 
 export default {
 	name: 'spell-action-rolls',
-	mixins: [damage_types],
 	components: {
 		ActionRoll
 	},
@@ -120,6 +119,8 @@ export default {
 
 	data() {
 		return {
+			damage_types: damage_types,
+			damage_type_icons: damage_type_icons,
 			edit_index: undefined,
 			roll_dialog: false,
 			roll: undefined,

@@ -26,11 +26,10 @@
 <script>
 	import { db } from 'src/firebase';
 	import { monsterMixin } from "src/mixins/monster";
-	import { skills} from "src/mixins/skills";
 
 	export default {
 		name: 'ExportDatabases',
-		mixins: [monsterMixin, skills],
+		mixins: [monsterMixin],
 		data() {
 			return {
 				loading: false,

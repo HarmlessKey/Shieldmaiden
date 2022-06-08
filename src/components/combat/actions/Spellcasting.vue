@@ -161,18 +161,19 @@
 	import { mapGetters, mapActions } from "vuex";
 	import { dice } from "src/mixins/dice.js";
 	import { setHP } from "src/mixins/HpManipulations.js";
-	import { damage_types } from "src/mixins/damageTypes.js";
+	import { damage_types } from "src/utils/generalConstants";
 	import Spell from "src/components/compendium/Spell";
 
 	export default {
 		name: "Spellcasting",
-		mixins: [setHP, dice, damage_types],
+		mixins: [setHP, dice],
 		props: ["current"],
 		components: {
 			Spell
 		},
 		data() {
 			return {
+				damage_types: damage_types,
 				displaySetter: undefined,
 				showSpell: undefined,
 				tabSetter: undefined

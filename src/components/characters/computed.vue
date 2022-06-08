@@ -91,28 +91,28 @@
 
 			<template>
 				<div class="abilities">
-					<div v-for="{value, label} in abilities" :key="`score-${value}`">
-						<div class="ability">{{ label.substring(0, 3) }}</div>
+					<div v-for="ability in abilities" :key="`score-${ability}`">
+						<div class="ability">{{ ability.substring(0, 3) }}</div>
 						<div class="mod">
 							<hk-roll
 								tooltip="Roll"
 								:roll="{
 									d: 20,
 									n: 1,
-									m: calcMod(computed.abilities[value]),
-									title: `${value.capitalize()} check`,
+									m: calcMod(computed.abilities[ability]),
+									title: `${ability.capitalize()} check`,
 									notify: true,
-									advantage: checkAdvantage('abilities', value)
+									advantage: checkAdvantage('abilities', ability)
 								}"
 							>
-								<span class="gray-hover" v-if="calcMod(computed.abilities[value]) !== 0">
-									{{ calcMod(computed.abilities[value]) > 0 ? "+" : "-" }}</span>
+								<span class="gray-hover" v-if="calcMod(computed.abilities[ability]) !== 0">
+									{{ calcMod(computed.abilities[ability]) > 0 ? "+" : "-" }}</span>
 								<span class="int"
-									:class="Object.keys(checkAdvantage('abilities', value)).length === 1 ? Object.keys(checkAdvantage('abilities', value))[0] : ''"
-								>{{ Math.abs(calcMod(computed.abilities[value])) }}</span>
+									:class="Object.keys(checkAdvantage('abilities', ability)).length === 1 ? Object.keys(checkAdvantage('abilities', ability))[0] : ''"
+								>{{ Math.abs(calcMod(computed.abilities[ability])) }}</span>
 							</hk-roll>
 						</div>
-						<div class="score">{{ computed.abilities[value] }}</div>
+						<div class="score">{{ computed.abilities[ability] }}</div>
 					</div>
 				</div>
 
@@ -164,6 +164,7 @@
 					<li v-for="(sense, key) in computed.senses" :key="key">
 						<span class="type">
 							<i 
+								aria-hidden="true"
 								class="mr-2"
 								:class="{
 								'fas fa-eye': key === 'perception',
@@ -195,14 +196,15 @@
 <script>
 	import { mapActions } from 'vuex';
 	import { general } from 'src/mixins/general.js';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 
 	export default {
 		name: 'CharacterComputed',
-		mixins: [general, abilities],
+		mixins: [general],
 		data() {
 			return {
-				showOverview: false
+				showOverview: false,
+				abilities: abilities
 			}
 		},
 		inject: ["characterState"],
@@ -237,16 +239,16 @@
 				const bonuses = this.computed.saving_throws.bonuses || {};
 				const advantage_disadvantage = (this.computed.advantage_disadvantage) ? this.computed.advantage_disadvantage.saving_throws : {};
 
-				for(const ability of Object.values(this.abilities)) {
+				for(const ability of this.abilities) {
 					let saving_throw = {};
-					let score = this.computed.abilities[ability.value];
-					const proficient = proficiencies.includes(ability.value);
-					const bonus = bonuses[ability.value] || 0;
+					let score = this.computed.abilities[ability];
+					const proficient = proficiencies.includes(ability);
+					const bonus = bonuses[ability] || 0;
 					saving_throw.mod = this.calcMod(score) + bonus;
 
 					//Check advantage/disadvantage
 					if(advantage_disadvantage) {
-						saving_throw.advantage_disadvantage = (advantage_disadvantage[ability.value]) ? advantage_disadvantage[ability.value] : {};
+						saving_throw.advantage_disadvantage = (advantage_disadvantage[ability]) ? advantage_disadvantage[ability] : {};
 					} else {
 						saving_throw.advantage_disadvantage = {};
 					}
@@ -257,7 +259,7 @@
 						saving_throw.mod = saving_throw.mod + this.computed.proficiency;
 					}
 
-					saving_throws[ability.value] = saving_throw;
+					saving_throws[ability] = saving_throw;
 				}
 				return saving_throws;
 			},

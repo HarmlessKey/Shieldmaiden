@@ -71,6 +71,7 @@
 												label="Class"
 												v-model="subclass.class"
 												:options="class_list"
+												@input="selectClass($event, valid)"
 											>
 											</q-select>
 
@@ -135,7 +136,15 @@
 														<i class="fas fa-heart" aria-hidden="true" />
 													</q-item-section>
 													<q-item-section>
-														Hit points
+														Hit points															
+													</q-item-section>
+													<q-item-section v-if="character.hit_point_type === 'rolled' && roll_hp_check(classIndex)" avatar>
+														<button
+																class="btn btn-sm bg-green"
+																@click.prevent.stop="rollHitPoints(classIndex)"
+															>
+																Roll
+															</button>
 													</q-item-section>
 													<q-item-section avatar>
 														<div class="d-flex justify-content-end">
@@ -255,10 +264,8 @@
 															:dark="$store.getters.theme === 'dark'" filled square
 															label="Spell casting ability"
 															v-model="subclass.casting_ability"
-															emit-value
-															map-options
 															class="mb-3"
-															:options="abilities" 
+															:options="abilities"
 															@input="saveProp(subclass.casting_ability, classIndex, 'casting_ability', valid)"
 														/>
 														<q-select 
@@ -354,7 +361,6 @@
 														<q-select 
 															v-if="classIndex == 0"
 															:dark="$store.getters.theme === 'dark'" filled square
-															emit-value map-options 
 															label="Saving throws"
 															multiple
 															:options="abilities" 
@@ -424,13 +430,13 @@
 							<div class="card-body">
 								<template v-if="character_classes[editClass].hit_dice">
 									<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
-										<ValidationProvider :rules="{ between: [1, character_classes[editClass].hit_dice]}" name="Value" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider :rules="{ between: [1, character_classes[editClass].hit_dice] }" :name="`Level ${level}`" v-slot="{ errors, invalid, validated }">
 											<q-input 
-												:dark="$store.getters.theme === 'dark'" filled square
+												:dark="$store.getters.theme === 'dark'" filled square dense
 												@change="setRolledHP($event.target.value, editClass, level, valid)"
 												autocomplete="off" 
 												type="number"
-												:value="character_classes[editClass].rolled_hit_points ? character_classes[editClass].rolled_hit_points[level] : 0" 
+												:value="character_classes[editClass].rolled_hit_points[level]" 
 												:label="`Level ${level}`"
 												:error="invalid && validated"
 												:error-message="errors[0]"
@@ -526,13 +532,12 @@
 
 <script>
 	import { mapActions } from 'vuex';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities, skills } from 'src/utils/generalConstants';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';
-	import { skills } from 'src/mixins/skills.js';
 	import { experience } from 'src/mixins/experience.js';
 	import { general } from 'src/mixins/general.js';
-	import { db } from 'src/firebase';
 	import { dice } from 'src/mixins/dice.js';
+	import { db } from 'src/firebase';
 	import Features from "./features";
 	import { classes } from "src/utils/characterConstants";
 
@@ -540,9 +545,7 @@
 		name: 'CharacterClass',
 		mixins: [
 			general,
-			abilities, 
 			weapons, 
-			skills, 
 			dice, 
 			experience
 		],
@@ -556,6 +559,8 @@
 		inject: ["characterState"],
 		data() {
 			return {
+				abilities: abilities,
+				skillList: skills,
 				saved: false,
 				invalid: false,
 				modifier_modal: false,
@@ -637,8 +642,10 @@
 					this.invalid = true;
 				}
 			},
+			selectClass(Class, valid) {
+				console.log(Class)
+			},
 			saveProp(value, classIndex, property, valid) {
-				console.log(value)
 				this.$set(this.Class.classes[classIndex], property, value);
 				this.save(valid, `classes.${classIndex}.${property}`);
 			},
@@ -709,16 +716,22 @@
 				//Set rolled HP manually
 				value = parseInt(value) || 0;
 
-				this.Class.classes[classIndex].rolled_hit_points[level] = value;
+				this.$set(this.Class.classes[classIndex].rolled_hit_points, level, value);
 
-				this.save(valid);
+				this.save(valid, "class.rolled_hp");
 			},
 			rollHitDice(classIndex, level, valid) {
 				// Roll HP digitally
-				const hit_dice = this.Class.classes[classIndex].hit_dice;
+				const hit_dice = this.character_classes[classIndex].hit_dice;
 				const value = this.rollD({}, hit_dice, 1, 0).total;
 
 				this.setRolledHP(value, classIndex, level, valid);
+			},
+			roll_hp_check(classIndex) {
+				const Class = this.character_classes[classIndex];
+				const max = (classIndex === 0) ? Class.level - 1 : Class.level;
+				const rolled_levels = Object.keys(Class.rolled_hit_points).filter(level => level <= Class.level).length;
+				return max > rolled_levels;
 			},
 			setSpellsKnown(classIndex, type, level) {
 				//Set spells known

@@ -1,5 +1,4 @@
-import { skills } from "src/mixins/skills";
-import { abilities } from "src/mixins/abilities";
+import { abilities, skills } from "src/utils/generalConstants";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
 import Vue from "vue";
@@ -317,7 +316,7 @@ const run_encounter_actions = {
 				
 				entity.saving_throws = [];
 				// Ability scores
-				for(const ability of abilities.data().abilities) {
+				for(const ability of abilities) {
 					entity[ability] = db_player[ability];
 					
 					// Saving throws
@@ -431,7 +430,7 @@ const run_encounter_actions = {
 					if(data_npc.source) entity.source = data_npc.source;
 					
 					// Ability scores
-					for(const ability of abilities.data().abilities) {
+					for(const ability of abilities) {
 						entity[ability] = data_npc[ability];
 					}
 					
@@ -439,11 +438,11 @@ const run_encounter_actions = {
 					if(data_npc.old) {
 						entity.speed = data_npc.speed;
 
-						for(const ability of abilities.data().abilities) {
+						for(const ability of abilities) {
 							entity[`${ability}_save`] = data_npc[`${ability}_save`];
 						}
 					
-						for(const skill in skills.data().skillList) {
+						for(const skill in skills) {
 							if(entity[skill]) {
 								entity[skill] = data_npc[skill];
 							}

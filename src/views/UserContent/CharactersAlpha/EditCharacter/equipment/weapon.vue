@@ -145,12 +145,10 @@
 </template>
 
 <script>
-	import { abilities } from 'src/mixins/abilities.js';
-	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { abilities, damage_types } from 'src/utils/generalConstants';
 
 	export default {
 		name: 'Weapon',
-		mixins: [abilities, damage_types],
 		props: {
 			value: {
 				type: Object,
@@ -163,6 +161,8 @@
 		},
 		data() {
 			return {
+				abilities: abilities,
+				damage_types: damage_types
 			}
 		},
 		computed: {

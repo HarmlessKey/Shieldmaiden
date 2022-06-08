@@ -123,7 +123,7 @@
 	import Custom from 'src/components/combat/actions/custom';
 	import Roll from 'src/components/combat/actions/Roll.vue';
 	import Spellcasting from 'src/components/combat/actions/Spellcasting.vue';
-	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { damage_types } from 'src/utils/generalConstants';
 
 	export default {
 		name: "Actions",
@@ -132,7 +132,7 @@
 			Roll,
 			Spellcasting
 		},
-		mixins: [setHP, damage_types],
+		mixins: [setHP],
 		props: {
 			current: {
 				type: Object
@@ -144,6 +144,7 @@
 		},
 		data() {
 			return {
+				damage_types: damage_types,
 				tab: "manual",
 				tabs: [{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }],
 				doneBySetter: undefined,

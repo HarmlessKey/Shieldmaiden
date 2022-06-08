@@ -1,12 +1,12 @@
-import { abilities } from "./abilities";
-import { skills } from "./skills";
+import { abilities } from "src/utils/generalConstants";
 import { general } from "./general";
-import { damage_types } from "./damageTypes";
+import { damage_types, skills } from "src/utils/generalConstants";
 
 export const monsterMixin = {
-	mixins: [abilities, skills, general, damage_types],
+	mixins: [general],
 	data() {
 		return {
+			abilities: abilities,
 			monster_challenge_rating: {
 				0:  { proficiency: 2,  xp: 10 },
 				0.125:  { proficiency: 2,  xp: 25 },
@@ -194,7 +194,7 @@ export const monsterMixin = {
 			// Skills
 			new_monster.skills = [];
 			new_monster.skills_expertise = [];
-			for(const skill of Object.values(this.skillList)) {
+			for(const skill of Object.values(skills)) {
 				const modifier = monster[skill.value];
 
 				// Save proficiency
@@ -285,7 +285,7 @@ export const monsterMixin = {
 				new_monster[resistance_type] = [];
 
 				if(defenses[resistance_type]) {
-					for(const type of this.damage_types) {
+					for(const type of damage_types) {
 						if(defenses[resistance_type].toLowerCase().search(type) > -1 && !new_monster[resistance_type].includes(type)) {
 							new_monster[resistance_type].push(type);
 						}
@@ -395,7 +395,7 @@ export const monsterMixin = {
 
 							// Create an array of damage types found in the description
 							let types = [];
-							for(const type of this.damage_types) {
+							for(const type of damage_types) {
 								const position = (ability.desc) ? ability.desc.toLowerCase().search(type) : -1;
 								if(position > -1 && !types.includes(type)) {
 									// Make sure they're in the correct order

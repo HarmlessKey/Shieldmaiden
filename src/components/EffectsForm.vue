@@ -230,12 +230,12 @@
 
 <script>
 import { effects } from '../mixins/effects';
-import { abilities } from '../mixins/abilities';
-import { skills } from '../mixins/skills';
+import { abilities, damage_types, dice_types } from 'src/utils/generalConstants';
+import { skills } from "src/utils/generalConstants";
 
 export default {
 	name: "EffectsForm",
-	mixins: [effects, abilities, skills],
+	mixins: [effects],
 	props: {
 		value: Object,
 		variables: {
@@ -249,16 +249,10 @@ export default {
 	},
 	data() {
 		return {
-			damage_types: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
-				"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
-			dice_type: [
-				{ label: "d4", value: 4 }, 
-				{ label: "d6", value: 6 },
-				{ label: "d8", value: 8 }, 
-				{ label: "d10", value: 10 },
-				{ label: "d12", value: 12 },
-				{ label: "d20", value: 20 }
-			],
+			damage_types: damage_types,
+			skillList: skills,
+			abilities: abilities,
+			dice_type: dice_types,
 			dur_time: [
 				{ label: "Round", value: "round" },
 				{ label: "Minute", value: "minute" },

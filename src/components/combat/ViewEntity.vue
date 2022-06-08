@@ -504,12 +504,13 @@
 	import { mapGetters, mapActions } from "vuex";
 	import { general } from 'src/mixins/general.js';
 	import { dice } from 'src/mixins/dice.js';
-	import { skills } from 'src/mixins/skills.js';
 	import { monsterMixin } from 'src/mixins/monster.js';
 	import { experience } from 'src/mixins/experience.js';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 	import { runEncounter } from 'src/mixins/runEncounter.js';
 	import Spell from "src/components/compendium/Spell";
+	import { damage_type_icons, skills } from "src/utils/generalConstants";
+	import { calc_skill_mod } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'ViewEntity',
@@ -517,9 +518,7 @@
 			general, 
 			dice, 
 			experience, 
-			skills, 
 			monsterMixin,
-			abilities,
 			runEncounter
 		],
 		components: {
@@ -538,6 +537,9 @@
 		data() {
 			return {
 				is_small: false,
+				abilities: abilities,
+				damage_type_icons: damage_type_icons,
+				skillList: skills,
 				width: 0,
 				is_current: this.current,
 				actions: [
@@ -618,18 +620,19 @@
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
 			},
 			skillModifier(skill, key) {
-				let mod = this.calculateSkillModifier(
-					this.calcMod(this.data[skill.ability]),
-					this.entity.skills ? (
-					this.entity.skills.includes(key) ? 
-					this.returnProficiency(this.entity.level ? this.entity.level : this.calculatedLevel(this.entity.experience)): 0) 
-					: 0,
-					this.entity.skills_expertise ? this.entity.skills_expertise.includes(key) : false
+				const ability_mod = this.calcMod(this.data[skill.ability]);
+				const proficiency = this.returnProficiency(this.entity.level ? this.entity.level : this.calculatedLevel(this.entity.experience));
+				const bonus = (this.entity.skill_modifiers && this.entity.skill_modifiers[skill]) ? this.entity.skill_modifiers[skill] : 0;
+				const proficient = this.entity.skills ? this.entity.skills.includes(key) : false;
+				const expertise = this.entity.skills_expertise ? this.entity.skills_expertise.includes(key) : false;
+				
+				return calc_skill_mod(
+					ability_mod,
+					proficiency,
+					bonus,
+					proficient,
+					expertise
 				);
-				if(this.entity.skill_modifiers && this.entity.skill_modifiers[skill]) {
-					mod = parseInt(mod) + parseInt(this.entity.skill_modifiers[skill]);
-				}
-				return mod;
 			},
 			spellsForLevel(level) {
 				return Object.entries(this.entity.caster_spells).filter(([key, item]) => { 

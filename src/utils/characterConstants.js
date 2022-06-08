@@ -173,15 +173,42 @@ export const spell_slot_table = Object.freeze({
 });
 
 export const races = Object.freeze({
-  dwarf: {},
-  elf: {},
-  halfling: {},
-  human: {},
-  dragonborn: {},
-  gnome: {},
-  "half-elf": {},
-  "half-orc": {},
-  tiefling: {}
+  dwarf: {
+    description: "",
+    traits: []
+  },
+  elf: {
+    description: "",
+    traits: []
+  },
+  halfling: {
+    description: "",
+    traits: []
+  },
+  human: {
+    description: "",
+    traits: []
+  },
+  dragonborn: {
+    description: "",
+    traits: []
+  },
+  gnome: {
+    description: "",
+    traits: []
+  },
+  "half-elf": {
+    description: "",
+    traits: []
+  },
+  "half-orc": {
+    description: "",
+    traits: []
+  },
+  tiefling: {
+    description: "",
+    traits: []
+  }
 });
 
 export const classes = Object.freeze({

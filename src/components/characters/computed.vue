@@ -13,182 +13,200 @@
 					<template v-if="computed.classes">
 						<div v-for="( subclass, index) in classes" :key="`class-${index}`">
 						{{ (subclass.level &lt; computed.level) ? `${subclass.level}` : `` }}
-						<b>{{ subclass.name }}</b>
+						<strong>{{ subclass.name }}</strong>
 						<template v-if="subclass.subclass">
 							<span class="blue mx-1">&bull;</span>
-							<i>{{ subclass.subclass }}</i>
+							<em>{{ subclass.subclass }}</em>
 						</template>
 						</div>
 					</template>
 				</div>
 			</div>
 		</div>
+		<q-tabs 
+			v-model="tab" 
+			dense 
+			inline-label 
+			no-caps 
+			align="justify"
+			class="bg-neutral-9"
+		>
+			<q-tab name="sheet" label="Sheet" />
+        <q-tab name="base-json" label="Base" />
+        <q-tab name="computed-json" label="Computed" />
+		</q-tabs>
 		<div class="computed">
-			<template>
-				<div class="stats">
-					<div class="armor_class" v-if="computed.armor_class">
-						<h6>AC</h6>
-						<div class="value">
-							{{ computed.armor_class }}
+			<q-tab-panels v-model="tab" class="bg-transparent" >
+				<q-tab-panel name="sheet" class="p-0">
+					<template>
+						<div class="stats">
+							<div class="armor_class" v-if="computed.armor_class">
+								<h6>AC</h6>
+								<div class="value">
+									{{ computed.armor_class }}
+								</div>
+							</div>
+							<div 
+								class="hit_points" 
+								@click="setSlide({
+									show: true, 
+									type: 'slides/characterBuilder/HitPoints',
+									data: {
+										total: computed.hit_points,
+										hit_point_type,
+										level: computed.level,
+										con_mod: character.sheet ? calcMod(character.sheet.abilities.constitution) : 0,
+										modifiers: hp_modifiers,
+										classes,
+									}
+								})
+							">
+								<h6>HP</h6>
+								<div class="value">
+									{{ computed.hit_points }}
+								</div>
+							</div>
+							<div class="speed">
+								<h6>Speed</h6>
+								<div class="value">
+									{{ computed.speed }}<span class="ft gray-hover">ft.</span>
+								</div>
+							</div>
+							<div class="initiative">
+								<h6>Initiative</h6>
+								<div class="value">
+									<hk-roll
+										tooltip="Roll"
+										:roll="{
+											d: 20,
+											n: 1,
+											m: computed.initiative,
+											title: 'Initiative roll',
+											notify: true,
+											advantage: checkAdvantage('initiative')
+										}"
+									>
+										<span class="gray-hover">
+											{{ computed.initiative >= 0 ? "+" : "-" }}</span>
+											<span 
+												class="int"
+												:class="Object.keys(checkAdvantage('initiative')).length === 1 ? Object.keys(checkAdvantage('initiative'))[0] : ''"
+											>{{ Math.abs(computed.initiative) }}</span>
+									</hk-roll>
+								</div>
+							</div>
 						</div>
-					</div>
-					<div 
-						class="hit_points" 
-						v-if="computed.hit_points" 
-						@click="setSlide({
-							show: true, 
-							type: 'slides/characterBuilder/HitPoints',
-							data: {
-								total: computed.hit_points,
-								hit_point_type,
-								level: computed.level,
-								con_mod: character.sheet ? calcMod(character.sheet.abilities.constitution) : 0,
-								modifiers: hp_modifiers,
-								classes,
-							}
-						})
-					">
-						<h6>HP</h6>
-						<div class="value">
-							{{ computed.hit_points }}
+						<hr>
+					</template>
+					<!-- <div v-else class="neutral-2">
+						As you build your character a preview of your stats as they will be on the character sheet shows here.
+					</div> -->
+
+					<template>
+						<div class="abilities">
+							<div v-for="ability in abilities" :key="`score-${ability}`">
+								<div class="ability">{{ ability.substring(0, 3) }}</div>
+								<div class="mod">
+									<hk-roll
+										tooltip="Roll"
+										:roll="{
+											d: 20,
+											n: 1,
+											m: calcMod(computed.abilities[ability]),
+											title: `${ability.capitalize()} check`,
+											notify: true,
+											advantage: checkAdvantage('abilities', ability)
+										}"
+									>
+										<span class="gray-hover" v-if="calcMod(computed.abilities[ability]) !== 0">
+											{{ calcMod(computed.abilities[ability]) > 0 ? "+" : "-" }}</span>
+										<span class="int"
+											:class="Object.keys(checkAdvantage('abilities', ability)).length === 1 ? Object.keys(checkAdvantage('abilities', ability))[0] : ''"
+										>{{ Math.abs(calcMod(computed.abilities[ability])) }}</span>
+									</hk-roll>
+								</div>
+								<div class="score">{{ computed.abilities[ability] || 0 }}</div>
+							</div>
 						</div>
-					</div>
-					<div class="speed" v-if="computed.speed">
-						<h6>Speed</h6>
-						<div class="value">
-							{{ computed.speed }}<span class="ft gray-hover">ft.</span>
+
+						<hr>
+
+						<h4>Saving throws</h4>
+						<div class="columns">
+							<ul class="list">
+								<li v-for="({mod, proficient, advantage_disadvantage}, key) in saving_throws" :key="`saving_throw-${key}`" class="pointer">
+									<span class="type">
+										<i 
+											class="mr-2"
+											:class="{
+												'far fa-circle': !proficient,
+												'far fa-dot-circle': proficient
+											}"
+											aria-hidden="true"
+										>
+											<q-tooltip anchor="top middle" self="center middle" v-if="proficient">
+												Proficient
+											</q-tooltip>
+										</i>
+										{{ key.substring(0, 3).toUpperCase() }}
+									</span>
+									<span class="value">
+										<hk-roll
+											tooltip="Roll"
+											:roll="{
+												d: 20,
+												n: 1,
+												m: mod,
+												title: `${key.capitalize()} save`,
+												notify: true,
+												advantage: advantage_disadvantage
+											}"
+										>
+											{{ mod >= 0 ? "+" : "-" }}<span class="int"
+												:class="Object.keys(advantage_disadvantage).length === 1 ? Object.keys(advantage_disadvantage)[0] : ''"
+											>{{ mod }}</span>
+										</hk-roll>
+									</span>
+								</li>
+							</ul>
 						</div>
+					</template>
+
+					<div>
+						<h4>Senses</h4>
+						<ul class="list">
+							<li v-for="(sense, key) in computed.senses" :key="key">
+								<span class="type">
+									<i 
+										aria-hidden="true"
+										class="mr-2"
+										:class="{
+										'fas fa-eye': key === 'perception',
+										'fas fa-search': key === 'investigation',
+										'fas fa-lightbulb-on': key === 'insight'
+									}" />
+									{{ key.capitalize() }}
+								</span>
+								<span class="value">
+									{{ sense }}
+								</span>
+							</li>
+						</ul>
 					</div>
-					<div class="initiative" v-if="computed.initiative">
-						<h6>Initiative</h6>
-						<div class="value">
-							<hk-roll
-								tooltip="Roll"
-								:roll="{
-									d: 20,
-									n: 1,
-									m: computed.initiative,
-									title: 'Initiative roll',
-									notify: true,
-									advantage: checkAdvantage('initiative')
-								}"
-							>
-								<span class="gray-hover">
-									{{ computed.initiative >= 0 ? "+" : "-" }}</span>
-									<span 
-										class="int"
-										:class="Object.keys(checkAdvantage('initiative')).length === 1 ? Object.keys(checkAdvantage('initiative'))[0] : ''"
-									>{{ Math.abs(computed.initiative) }}</span>
-							</hk-roll>
-						</div>
-					</div>
-				</div>
-				<hr>
-			</template>
-			<!-- <div v-else class="neutral-2">
-				As you build your character a preview of your stats as they will be on the character sheet shows here.
-			</div> -->
+				</q-tab-panel>
 
-			<template>
-				<div class="abilities">
-					<div v-for="ability in abilities" :key="`score-${ability}`">
-						<div class="ability">{{ ability.substring(0, 3) }}</div>
-						<div class="mod">
-							<hk-roll
-								tooltip="Roll"
-								:roll="{
-									d: 20,
-									n: 1,
-									m: calcMod(computed.abilities[ability]),
-									title: `${ability.capitalize()} check`,
-									notify: true,
-									advantage: checkAdvantage('abilities', ability)
-								}"
-							>
-								<span class="gray-hover" v-if="calcMod(computed.abilities[ability]) !== 0">
-									{{ calcMod(computed.abilities[ability]) > 0 ? "+" : "-" }}</span>
-								<span class="int"
-									:class="Object.keys(checkAdvantage('abilities', ability)).length === 1 ? Object.keys(checkAdvantage('abilities', ability))[0] : ''"
-								>{{ Math.abs(calcMod(computed.abilities[ability])) }}</span>
-							</hk-roll>
-						</div>
-						<div class="score">{{ computed.abilities[ability] }}</div>
-					</div>
-				</div>
+				<q-tab-panel name="base-json" class="p-0">
+					<pre>
+						{{ characterState.character }}
+					</pre>
+				</q-tab-panel>
 
-				<hr>
-
-				<h4>Saving throws</h4>
-				<div class="columns">
-					<ul class="list">
-						<li v-for="({mod, proficient, advantage_disadvantage}, key) in saving_throws" :key="`saving_throw-${key}`" class="pointer">
-							<span class="type">
-								<i 
-									class="mr-2"
-									:class="{
-										'far fa-circle': !proficient,
-										'far fa-dot-circle': proficient
-									}"
-								>
-									<q-tooltip anchor="top middle" self="center middle" v-if="proficient">
-										Proficient
-									</q-tooltip>
-								</i>
-								{{ key.substring(0, 3).toUpperCase() }}
-							</span>
-							<span class="value">
-								<hk-roll
-									tooltip="Roll"
-									:roll="{
-										d: 20,
-										n: 1,
-										m: mod,
-										title: `${key.capitalize()} save`,
-										notify: true,
-										advantage: advantage_disadvantage
-									}"
-								>
-									{{ mod >= 0 ? "+" : "-" }}<span class="int"
-										:class="Object.keys(advantage_disadvantage).length === 1 ? Object.keys(advantage_disadvantage)[0] : ''"
-									>{{ mod }}</span>
-								</hk-roll>
-							</span>
-						</li>
-					</ul>
-				</div>
-			</template>
-
-			<div>
-				<h4>Senses</h4>
-				<ul class="list">
-					<li v-for="(sense, key) in computed.senses" :key="key">
-						<span class="type">
-							<i 
-								aria-hidden="true"
-								class="mr-2"
-								:class="{
-								'fas fa-eye': key === 'perception',
-								'fas fa-search': key === 'investigation',
-								'fas fa-lightbulb-on': key === 'insight'
-							}" />
-							{{ key.capitalize() }}
-						</span>
-						<span class="value">
-							{{ sense }}
-						</span>
-					</li>
-				</ul>
-			</div>
-
-			<p>Base values</p>
-			<pre>
-				{{ characterState.character }}
-			</pre>
-
-			<p>Computed values</p>
-			<pre>
-				{{ computed }}
-			</pre>
+				<q-tab-panel name="computed-json" class="p-0">
+					<pre>
+						{{ computed }}
+					</pre>
+				</q-tab-panel>
+			</q-tab-panels>
 		</div>
 	</hk-card>
 </template>
@@ -204,7 +222,8 @@
 		data() {
 			return {
 				showOverview: false,
-				abilities: abilities
+				abilities: abilities,
+				tab: "sheet"
 			}
 		},
 		inject: ["characterState"],

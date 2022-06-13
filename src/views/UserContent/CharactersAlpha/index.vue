@@ -28,10 +28,10 @@
 							<div  class="truncate-cell">
 								<div class="truncate">
 									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
-										{{ props.row.character_name }}
+										{{ props.value }}
 									</router-link>
 									<template v-else>
-										{{ props.row.character_name }}
+										{{ props.value }}
 									</template>
 								</div>
 							</div>
@@ -89,6 +89,13 @@
 						name: "name",
 						label: "Name",
 						field: "character_name",
+						sortable: true,
+						align: "left"
+					},
+					{
+						name: "level",
+						label: "Level",
+						field: "level",
 						sortable: true,
 						align: "left"
 					},

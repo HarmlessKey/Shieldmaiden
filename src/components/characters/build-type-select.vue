@@ -10,14 +10,14 @@
           <button class="btn btn-block">Select</button>
         </div>
       </hk-card>
-      <hk-card class="pointer" header="Simple" @click="build = 'simple'" :class="{ active: build === 'simple' }">
+      <hk-card class="disabled" header="Simple" :class="{ active: build === 'simple' }">
         <div class="card-body">
           Create a character with only basic stats needed for use in Harmless Key. 
           This can't be used as a full character reference in your games, 
           but just works for our combat tracker.
         </div>
         <div slot="footer">
-          <button class="btn btn-block">Select</button>
+          <button class="btn btn-block disabled">Select</button>
         </div>
       </hk-card>
       <hk-card class="disabled" header="Import">
@@ -33,7 +33,7 @@
       </hk-card>
     </div>
     <div class="d-flex justify-content-center mt-5">
-      <a class="btn btn-lg" @click="setBuildType('advanced')">Create {{ build }} character</a>
+      <a class="btn btn-lg" @click="setBuildType()">Create {{ build }} character</a>
     </div>
   </div>
 </template>
@@ -56,9 +56,16 @@ export default {
       build: "advanced",
     }
   },
+  inject: ["characterState"],
+  computed: {
+    character() {
+      return this.characterState.character;
+    }
+  },
   methods: {
     setBuildType() {
-      db.ref(`characters_base/${this.userId}/${this.characterId}/general/build`).set(this.build);
+      this.character.build = this.build;
+      this.$emit("save", "build_type");
     },
   }
 }

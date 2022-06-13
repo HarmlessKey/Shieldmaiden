@@ -170,36 +170,54 @@
 			</ValidationObserver>
 			
 			<template v-else>
-				<h3>What method would you like to use?</h3>
-				<p class="mt-3">Your DM probably told you what method you should use.</p>
+				<div class="text-center">
+					<h3>What method would you like to use?</h3>
+					<p class="mt-3">Your DM probably told you what method you should use.</p>
+				</div>
 
-				<h4>1. Standard array (phb 13)</h4>
-				<p>
-					You get a standard set of scores you can divide over the abilities.<br/>
-					<strong>15</strong> | <strong>14</strong> | <strong>13</strong> | <strong>12</strong> | <strong>10</strong> | <strong>8</strong>
-				</p>
+				<hk-card-deck>
+					<hk-card>
+						<div class="card-header" slot="header">
+							<span>1. Standard array</span>
+							<span class="neutral-2">phb 13</span>
+						</div>
+						<div class="card-body">
+							You get a standard set of scores you can divide over the abilities.<br/>
+							<strong>15</strong> | <strong>14</strong> | <strong>13</strong> | <strong>12</strong> | <strong>10</strong> | <strong>8</strong>
+						</div>
+					</hk-card>
+					<hk-card>
+						<div class="card-header" slot="header">
+							<span>2. Point buy</span>
+							<span class="neutral-2">phb 13</span>
+						</div>
+						<div class="card-body">
+							<p>
+								You get 27 points to spend on your ability scores. The cost of each score is shown in the table below.<br/>
+								With this method, 15 is the highest ability score you can end up with and you can't have a score lower than 8.
+							</p>
+							<table class="table">
+								<tr>
+									<th>Score</th>
+									<th>Cost</th>
+								</tr>
+								<tbody>
+									<tr v-for="{score, cost} in point_buy" :key="score">
+										<td>{{ score }}</td>
+										<td>{{ cost }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>					
+					</hk-card>
 
-				<h4>2. Point buy (phb 13)</h4>
-				<p>
-					You get 27 points to spend on your ability scores. The cost of each score is shown in the table below.<br/>
-					With this method, 15 is the highest ability score you can end up with and you can't have a score lower than 8.
-				</p>
-
-				<table class="table">
-					<tr>
-						<th>Score</th>
-						<th>Cost</th>
-					</tr>
-					<tbody>
-						<tr v-for="{score, cost} in point_buy" :key="score">
-							<td>{{ score }}</td>
-							<td>{{ cost }}</td>
-						</tr>
-					</tbody>
-				</table>
-
-				<h4>3. Manual</h4>
-				<p>Manually input the scores for each ability.</p>
+					<hk-card>
+						<div class="card-header" slot="header">
+							<span>3. Manual</span>
+						</div>
+						<div class="card-body">Manually input the scores for each ability.</div>
+					</hk-card>
+				</hk-card-deck>
 			</template>
 		</div>
 	</hk-card>
@@ -209,10 +227,8 @@
 	import { abilities } from "src/utils/generalConstants";
 	import { dice } from "src/mixins/dice.js";
 	import { mapActions } from "vuex";
-	import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
 
 	export default {
-  components: { hkAnimatedInteger },
 		name: "CharacterAbilities",
 		mixins: [abilities, dice],
 		props: [
@@ -227,6 +243,7 @@
 				invalid: false,
 				roll_dialog: false,
 				point_buy_max: 27,
+				methodSetter: undefined,
 				ability_score_methods: [
 					{
 						label: "Standard array",
@@ -322,8 +339,13 @@
 			ability_scores() {
 				return (this.character.abilities) ? this.character.abilities : {};
 			},
-			method() {
-				return this.character.ability_score_method;
+			method: {
+				get() {
+					return this.methodSetter ? this.methodSetter : this.character.ability_score_method;
+				},
+				set(value) {
+					this.methodSetter = value;
+				}
 			},
 			point_buy_remaining() {
 				let points = this.point_buy_max;
@@ -379,7 +401,8 @@
 				}
 
 				// Set the method
-				this.character.ability_score_method = method;
+				this.$set(this.character, "ability_score_method", method);
+				this.method = method;
 				this.save("abilities.method", true);
 			},
 			saveAbility(score, ability, valid) {

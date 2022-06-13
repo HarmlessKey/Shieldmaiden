@@ -14,7 +14,7 @@
 								<i aria-hidden="true" class="fas fa-times" />
 								Couldn't save
 							</small>
-							<button class="btn btn-sm bg-neutral-5" v-if="character.advancement === 'experience'" @click.prevent="experience_modal = !experience_modal">
+							<button class="btn btn-sm bg-neutral-5 ml-1" v-if="character.advancement === 'experience'" @click.prevent="experience_modal = !experience_modal">
 								<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
 								Experience
 							</button>
@@ -48,16 +48,22 @@
 					<div class="card-body">
 						<div v-for="(subclass, classIndex) in character_classes" :key="`class-${classIndex}`">
 							<div>
-								<h3 @click="setShowClass(classIndex)" class="pointer" :class="{ 'hidden-class': classIndex !== showClass}">
-									Level {{ subclass.level }} {{ subclass.name }}
-									<i class="fas fa-chevron-down" aria-hidden="true"/>
-									<a 
+								<h3 
+									@click="setShowClass(classIndex)" 
+									class="pointer d-flex justify-content-between items-center" 
+									:class="{ 'hidden-class': classIndex !== showClass}"
+								>
+									<div>
+										<i class="fas fa-chevron-down" aria-hidden="true"/>
+										Level {{ subclass.level }} {{ subclass.class && subclass.class !== "custom" ? subclass.class.capitalize() : subclass.name }}
+									</div>
+									<button 
 										v-if="character.advancement === 'experience' && calculatedLevel(Class.experience_points) > computed.level" 
-										class="level-up"
-										@click.stop="levelUp(classIndex, valid)"
+										class="btn bg-green"
+										@click.prevent.stop="levelUp(classIndex, valid)"
 									>
 										Level up <i class="fas fa-arrow-circle-up" aria-hidden="true"/>
-									</a>
+									</button>
 								</h3>
 
 								<q-slide-transition>
@@ -125,283 +131,285 @@
 											</ValidationProvider>
 										</div>
 
-										<q-list :dark="$store.getters.theme === 'dark'" square class="accordion hit_points mb-3">
-											<!-- HIT POINTS -->
-											<q-expansion-item
-												:dark="$store.getters.theme === 'dark'" switch-toggle-side
-												:group="`${classIndex}`"
-											>
-												<template v-slot:header>
-													<q-item-section avatar>
-														<i class="fas fa-heart" aria-hidden="true" />
-													</q-item-section>
-													<q-item-section>
-														Hit points															
-													</q-item-section>
-													<q-item-section v-if="character.hit_point_type === 'rolled' && roll_hp_check(classIndex)" avatar>
-														<button
-																class="btn btn-sm bg-green"
-																@click.prevent.stop="rollHitPoints(classIndex)"
-															>
-																Roll
-															</button>
-													</q-item-section>
-													<q-item-section avatar>
-														<div class="d-flex justify-content-end">
-															<div v-if="subclass.hit_dice">
-																{{ subclass.level }}d{{ subclass.hit_dice }}
-																<q-tooltip anchor="top middle" self="center middle">
-																	Hit dice
-																</q-tooltip>
-															</div>
-															<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
-															<div >
-																{{ calcMod(computed.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.abilities.constitution) }}
-																<q-tooltip anchor="top middle" self="center middle">
-																	Constitution modifier
-																</q-tooltip>
-															</div>
-															<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
-															<hk-popover :header="`${subclass.name} hit points`">
-																<strong>{{ character.total_class_hp(classIndex, computed.abilities.constitution).hp }}</strong>
-																<div slot="content" v-html="character.total_class_hp(classIndex, computed.abilities.constitution).info" />
-															</hk-popover>
-														</div>
-													</q-item-section>
-												</template>
-
-												<div class="accordion-body">
-													<p>
-														<strong>Hit dice</strong><br/>
-														<template v-if="subclass.class !== 'custom'">
-															Select the the <em>Hit Point Dice</em> for this class <span class="neutral-2">(phb 12)</span>
-														</template>
-													</p>
-													<div class="hit-dice">
-														<template v-if="subclass.class === 'custom'">
-															<a 
-																v-for="{value, text} in dice_types" 
-																@click="setHitDice(classIndex, value, valid)" 
-																:key="`d${value}-${classIndex}`"
-																class="hit_die"
-																:class="{ active: subclass.hit_dice === value }"
+										<template v-if="subclass.class">
+											<q-list :dark="$store.getters.theme === 'dark'" square class="accordion hit_points mb-3">
+												<!-- HIT POINTS -->
+												<q-expansion-item
+													:dark="$store.getters.theme === 'dark'" switch-toggle-side
+													:group="`${classIndex}`"
+												>
+													<template v-slot:header>
+														<q-item-section avatar>
+															<i class="fas fa-heart" aria-hidden="true" />
+														</q-item-section>
+														<q-item-section>
+															Hit points															
+														</q-item-section>
+														<q-item-section v-if="character.hit_point_type === 'rolled' && roll_hp_check(classIndex)" avatar>
+															<button
+																	class="btn btn-sm bg-green"
+																	@click.prevent.stop="rollHitPoints(classIndex)"
 																>
-																<i :class="`fas fa-dice-d${value}`" aria-hidden="true" />
-																{{ text }}
-															</a>
-														</template>
-														<div v-else class="active hit_die">
-															<i :class="`fas fa-dice-d${subclass.hit_dice}`" aria-hidden="true" />
-															d{{ subclass.hit_dice }}
-														</div>
-													</div>
-													
-													<div v-if="character.hit_point_type === 'rolled' && (subclass.level > 1 || classIndex !== 0)" class="mt-3">
+																	Roll
+																</button>
+														</q-item-section>
+														<q-item-section avatar>
+															<div class="d-flex justify-content-end">
+																<div v-if="subclass.hit_dice">
+																	{{ subclass.level }}d{{ subclass.hit_dice }}
+																	<q-tooltip anchor="top middle" self="center middle">
+																		Hit dice
+																	</q-tooltip>
+																</div>
+																<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
+																<div >
+																	{{ calcMod(computed.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.abilities.constitution) }}
+																	<q-tooltip anchor="top middle" self="center middle">
+																		Constitution modifier
+																	</q-tooltip>
+																</div>
+																<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
+																<hk-popover :header="`${subclass.name} hit points`">
+																	<strong>{{ character.total_class_hp(classIndex, computed.abilities.constitution).hp }}</strong>
+																	<div slot="content" v-html="character.total_class_hp(classIndex, computed.abilities.constitution).info" />
+																</hk-popover>
+															</div>
+														</q-item-section>
+													</template>
+
+													<div class="accordion-body">
 														<p>
-															<strong>Rolled hit points</strong><br/>
-															Every time you gain a level, you can roll your <em>Hit Dice</em> 
-															and add the outcome plus the Constitution modifier to your total hit points 
-															(minimum of 1). (php 15)<br/>
+															<strong>Hit dice</strong><br/>
+															<template v-if="subclass.class !== 'custom'">
+																Select the the <em>Hit Point Dice</em> for this class <span class="neutral-2">(phb 12)</span>
+															</template>
 														</p>
-														<div class="rolled" @click="rollHitPoints(classIndex)">
-															<span class="val">
-																{{ character.total_rolled_hp(classIndex) }}
-															</span>
-															<i class="fas fa-dice-d20" aria-hidden="true" />
+														<div class="hit-dice">
+															<template v-if="subclass.class === 'custom'">
+																<a 
+																	v-for="{value, text} in dice_types" 
+																	@click="setHitDice(classIndex, value, valid)" 
+																	:key="`d${value}-${classIndex}`"
+																	class="hit_die"
+																	:class="{ active: subclass.hit_dice === value }"
+																	>
+																	<i :class="`fas fa-dice-d${value}`" aria-hidden="true" />
+																	{{ text }}
+																</a>
+															</template>
+															<div v-else class="active hit_die">
+																<i :class="`fas fa-dice-d${subclass.hit_dice}`" aria-hidden="true" />
+																d{{ subclass.hit_dice }}
+															</div>
+														</div>
+														
+														<div v-if="character.hit_point_type === 'rolled' && (subclass.level > 1 || classIndex !== 0)" class="mt-3">
+															<p>
+																<strong>Rolled hit points</strong><br/>
+																Every time you gain a level, you can roll your <em>Hit Dice</em> 
+																and add the outcome plus the Constitution modifier to your total hit points 
+																(minimum of 1). (php 15)<br/>
+															</p>
+															<div class="rolled" @click="rollHitPoints(classIndex)">
+																<span class="val">
+																	{{ character.total_rolled_hp(classIndex) }}
+																</span>
+																<i class="fas fa-dice-d20" aria-hidden="true" />
+															</div>
 														</div>
 													</div>
-												</div>
-											</q-expansion-item>
-											
-											<!-- CASTER -->
-											<q-expansion-item
-												v-if="subclass.class === 'custom' || subclass.caster_type"
-												:dark="$store.getters.theme === 'dark'" switch-toggle-side
-												:group="`${classIndex}`"
-											>
-												<template v-slot:header>
-													<q-item-section avatar>
-														<i class="fas fa-hand-holding-magic" aria-hidden="true" />
-													</q-item-section>
-													<q-item-section>
-														Spell casting
-													</q-item-section>
-													<q-item-section avatar>
-														<div class="d-flex justify-content-end" v-if="subclass.casting_ability">
-															<hk-popover :header="`${subclass.name} spell attack`">
-																{{ computed.classes[classIndex].spell_attack > 0 ? "+" : "" }}{{ computed.classes[classIndex].spell_attack }}
-																<template #content>
-																	{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
-																	Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
-																</template>
-															</hk-popover>
-															<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
-															<hk-popover :header="`${subclass.name} spell save DC`">
-																{{ computed.classes[classIndex].spell_save_dc }}
-																<template #content>
-																	Base: <strong>8</strong><br/>
-																	{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
-																	Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
-																</template>
-															</hk-popover>
-														</div>
-													</q-item-section>
-												</template>
-
-												<div class="accordion-body">
-													<template v-if="subclass.class !== 'custom'">
-														<q-select 
-															:dark="$store.getters.theme === 'dark'" filled square
-															label="Caster type"
-															v-model="subclass.caster_type" 
-															:options="caster_types" 
-															emit-value
-															map-options
-															class="mb-3"
-															@input="saveCasterType(classIndex, valid)"
-														/>
-														<q-select 
-															:dark="$store.getters.theme === 'dark'" filled square
-															label="Spell casting ability"
-															v-model="subclass.casting_ability"
-															class="mb-3"
-															:options="abilities"
-															@input="saveProp(subclass.casting_ability, classIndex, 'casting_ability', valid)"
-														/>
-														<q-select 
-															:dark="$store.getters.theme === 'dark'" filled square
-															label="Spell knowledge"
-															v-model="subclass.spell_knowledge"
-															emit-value
-															map-options
-															class="mb-3"
-															:options="spell_knowledge_types" 
-															@input="saveProp(subclass.spell_knowledge, classIndex, 'spell_knowledge', valid)"
-														/>
-														<div class="form-item mb-3" v-if="subclass.caster_type">
-															<a @click="spellsKnown(classIndex)">Spells known</a>
-														</div>
+												</q-expansion-item>
+												
+												<!-- CASTER -->
+												<q-expansion-item
+													v-if="subclass.class === 'custom' || subclass.caster_type"
+													:dark="$store.getters.theme === 'dark'" switch-toggle-side
+													:group="`${classIndex}`"
+												>
+													<template v-slot:header>
+														<q-item-section avatar>
+															<i class="fas fa-hand-holding-magic" aria-hidden="true" />
+														</q-item-section>
+														<q-item-section>
+															Spell casting
+														</q-item-section>
+														<q-item-section avatar>
+															<div class="d-flex justify-content-end" v-if="subclass.casting_ability">
+																<hk-popover :header="`${subclass.name} spell attack`">
+																	{{ computed.classes[classIndex].spell_attack > 0 ? "+" : "" }}{{ computed.classes[classIndex].spell_attack }}
+																	<template #content>
+																		{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
+																		Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
+																	</template>
+																</hk-popover>
+																<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
+																<hk-popover :header="`${subclass.name} spell save DC`">
+																	{{ computed.classes[classIndex].spell_save_dc }}
+																	<template #content>
+																		Base: <strong>8</strong><br/>
+																		{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
+																		Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
+																	</template>
+																</hk-popover>
+															</div>
+														</q-item-section>
 													</template>
-													<template v-else>
-														<strong>Caster type</strong> {{ subclass.caster_type }}<br/>
-														<strong>Casting ability</strong> {{ subclass.casting_ability }}
+
+													<div class="accordion-body">
+														<template v-if="subclass.class !== 'custom'">
+															<q-select 
+																:dark="$store.getters.theme === 'dark'" filled square
+																label="Caster type"
+																v-model="subclass.caster_type" 
+																:options="caster_types" 
+																emit-value
+																map-options
+																class="mb-3"
+																@input="saveCasterType(classIndex, valid)"
+															/>
+															<q-select 
+																:dark="$store.getters.theme === 'dark'" filled square
+																label="Spell casting ability"
+																v-model="subclass.casting_ability"
+																class="mb-3"
+																:options="abilities"
+																@input="saveProp(subclass.casting_ability, classIndex, 'casting_ability', valid)"
+															/>
+															<q-select 
+																:dark="$store.getters.theme === 'dark'" filled square
+																label="Spell knowledge"
+																v-model="subclass.spell_knowledge"
+																emit-value
+																map-options
+																class="mb-3"
+																:options="spell_knowledge_types" 
+																@input="saveProp(subclass.spell_knowledge, classIndex, 'spell_knowledge', valid)"
+															/>
+															<div class="form-item mb-3" v-if="subclass.caster_type">
+																<a @click="spellsKnown(classIndex)">Spells known</a>
+															</div>
+														</template>
+														<template v-else>
+															<strong>Caster type</strong> {{ subclass.caster_type }}<br/>
+															<strong>Casting ability</strong> {{ subclass.casting_ability }}
+														</template>
+													</div>
+												</q-expansion-item>
+
+												<!-- PROFICIENCIES -->
+												<q-expansion-item
+													:dark="$store.getters.theme === 'dark'" switch-toggle-side
+													:group="`${classIndex}`"
+												>
+													<template v-slot:header>
+														<q-item-section avatar>
+															<i class="fas fa-sparkles" aria-hidden="true"/>
+														</q-item-section>
+														<q-item-section>
+															Proficiencies
+														</q-item-section>
+														<q-item-section avatar>
+															<span>+<strong>{{ computed.proficiency }}</strong></span>
+														</q-item-section>
 													</template>
-												</div>
-											</q-expansion-item>
 
-											<!-- PROFICIENCIES -->
-											<q-expansion-item
-												:dark="$store.getters.theme === 'dark'" switch-toggle-side
-												:group="`${classIndex}`"
-											>
-												<template v-slot:header>
-													<q-item-section avatar>
-														<i class="fas fa-sparkles" aria-hidden="true"/>
-													</q-item-section>
-													<q-item-section>
-														Proficiencies
-													</q-item-section>
-													<q-item-section avatar>
-														<span>+<strong>{{ computed.proficiency }}</strong></span>
-													</q-item-section>
-												</template>
+													<div class="accordion-body">
+														<template v-if="subclass.class === 'custom'">
+															<!-- ARMOR -->
+															<q-select 
+																:dark="$store.getters.theme === 'dark'" filled square
+																emit-value map-options 
+																label="Armor"
+																multiple
+																:options="armor_types" 
+																v-model="proficiencies[classIndex].armor" 
+																class="mb-3"
+																@input="setProficiencies($event, classIndex, 'armor', valid)"
+															/>
 
-												<div class="accordion-body">
-													<template v-if="subclass.class === 'custom'">
-														<!-- ARMOR -->
+															<!-- WEAPONS -->			
+															<q-select 
+																:dark="$store.getters.theme === 'dark'" 
+																filled 
+																square 
+																multiple 
+																v-model="proficiencies[classIndex].weapon" 
+																:options="weaponList" 
+																label="Weapon"
+															>
+																<template v-slot:selected v-if="proficiencies[classIndex].weapon.length !== 0">
+																	<span v-for="(key, index) in proficiencies[classIndex].weapon" :key="key" class="mr-1">
+																		{{ displayWeapon(key).label }}{{ index &lt; (proficiencies[classIndex].weapon.length - 1) ? "," : ""  }}
+																	</span>
+																</template>
+																<template v-slot:option="scope">
+																	<q-item :key="`weapon-category-${scope.index}`">
+																		<q-item-section class="neutral-2">
+																			{{ scope.opt.category }}
+																		</q-item-section>
+																	</q-item>
+
+																	<template v-for="weapon in scope.opt.weapons">
+																		<q-item
+																			:key="weapon.value"
+																			clickable
+																			v-ripple
+																			@click="setWeaponProficiencies(weapon.value, classIndex, valid)"
+																			:active="proficiencies[classIndex].weapon.includes(weapon.value)"
+																		>
+																			<q-item-section>
+																				<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+																			</q-item-section>
+																		</q-item>
+																	</template>
+																	<q-separator :dark="$store.getters.theme === 'dark'" />
+																</template>
+															</q-select>
+															<q-select 
+																v-if="classIndex == 0"
+																:dark="$store.getters.theme === 'dark'" filled square
+																label="Saving throws"
+																multiple
+																:options="abilities" 
+																v-model="proficiencies[classIndex].saving_throw" 
+																@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
+															/>
+														</template>
+														<div v-else class="mb-3">
+															<strong>Armor</strong>: {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].armor.join(", ") : "None" }}<br/>
+															<strong>Weapons</strong>: {{ proficiencies[classIndex].weapon.length ? proficiencies[classIndex].weapon.join(", ") : "None" }}<br/>
+															<template v-if="classIndex == 0">
+																<strong>Saving throws</strong>: {{ proficiencies[classIndex].saving_throw.join(", ") }}<br/>
+															</template>
+															<strong>Skills</strong>: {{ proficiencies[classIndex].skill.join(", ") ? proficiencies[classIndex].skill.join(", ") : `Select ${subclass.class.skill_count} below` }}<br/>
+														</div>
+
 														<q-select 
 															:dark="$store.getters.theme === 'dark'" filled square
 															emit-value map-options 
-															label="Armor"
+															label="Skills"
 															multiple
-															:options="armor_types" 
-															v-model="proficiencies[classIndex].armor" 
-															class="mb-3"
-															@input="setProficiencies($event, classIndex, 'armor', valid)"
+															option-value="value"
+															option-label="skill"
+															:max-values="subclass.skill_count || null"
+															:options="Object.values(skillList)" 
+															v-model="proficiencies[classIndex].skill" 
+															@input="setProficiencies($event, classIndex, 'skill', valid)"
 														/>
-
-														<!-- WEAPONS -->			
-														<q-select 
-															:dark="$store.getters.theme === 'dark'" 
-															filled 
-															square 
-															multiple 
-															v-model="proficiencies[classIndex].weapon" 
-															:options="weaponList" 
-															label="Weapon"
-														>
-															<template v-slot:selected v-if="proficiencies[classIndex].weapon.length !== 0">
-																<span v-for="(key, index) in proficiencies[classIndex].weapon" :key="key" class="mr-1">
-																	{{ displayWeapon(key).label }}{{ index &lt; (proficiencies[classIndex].weapon.length - 1) ? "," : ""  }}
-																</span>
-															</template>
-															<template v-slot:option="scope">
-																<q-item :key="`weapon-category-${scope.index}`">
-																	<q-item-section class="neutral-2">
-																		{{ scope.opt.category }}
-																	</q-item-section>
-																</q-item>
-
-																<template v-for="weapon in scope.opt.weapons">
-																	<q-item
-																		:key="weapon.value"
-																		clickable
-																		v-ripple
-																		@click="setWeaponProficiencies(weapon.value, classIndex, valid)"
-																		:active="proficiencies[classIndex].weapon.includes(weapon.value)"
-																	>
-																		<q-item-section>
-																			<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
-																		</q-item-section>
-																	</q-item>
-																</template>
-																<q-separator :dark="$store.getters.theme === 'dark'" />
-															</template>
-														</q-select>
-														<q-select 
-															v-if="classIndex == 0"
-															:dark="$store.getters.theme === 'dark'" filled square
-															label="Saving throws"
-															multiple
-															:options="abilities" 
-															v-model="proficiencies[classIndex].saving_throw" 
-															@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
-														/>
-													</template>
-													<div v-else class="mb-3">
-														<strong>Armor</strong>: {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].armor.join(", ") : "None" }}<br/>
-														<strong>Weapons</strong>: {{ proficiencies[classIndex].weapon.length ? proficiencies[classIndex].weapon.join(", ") : "None" }}<br/>
-														<template v-if="classIndex == 0">
-															<strong>Saving throws</strong>: {{ proficiencies[classIndex].saving_throw.join(", ") }}<br/>
-														</template>
-														<strong>Skills</strong>: {{ proficiencies[classIndex].skill.join(", ") ? proficiencies[classIndex].skill.join(", ") : `Select ${subclass.class.skill_count} below` }}<br/>
 													</div>
+												</q-expansion-item>
+											</q-list>
 
-													<q-select 
-														:dark="$store.getters.theme === 'dark'" filled square
-														emit-value map-options 
-														label="Skills"
-														multiple
-														option-value="value"
-														option-label="skill"
-														:max-values="subclass.skill_count || null"
-														:options="Object.values(skillList)" 
-														v-model="proficiencies[classIndex].skill" 
-														@input="setProficiencies($event, classIndex, 'skill', valid)"
-													/>
-												</div>
-											</q-expansion-item>
-										</q-list>
-
-										<!-- CLASS FEATURES -->
-										<h3>{{ subclass.name || "Class" }} features</h3>
-										<Features 
-											:characterId="characterId" 
-											:userId="userId" 
-											:classIndex="classIndex"
-											:valid="valid"
-											@save="save"
-										/>
+											<!-- CLASS FEATURES -->
+											<h3>{{ subclass.name || "Class" }} features</h3>
+											<Features 
+												:characterId="characterId" 
+												:userId="userId" 
+												:classIndex="classIndex"
+												:valid="valid"
+												@save="save"
+											/>
+										</template>
 									</div>
 								</q-slide-transition>
 							</div>
@@ -413,12 +421,16 @@
 							@click="addClass()" 
 							class="btn bg-neutral-5"
 						>
-							<i class="fas fa-plus" aria-hidden="true"/> Add a class
+							<i class="fas fa-plus green" aria-hidden="true"/> Add a class
 						</a>
 					</div>
 
 					<!-- ROLLED HP MODAL -->
-					<q-dialog v-model="roll_hp_modal" v-if="character.hit_point_type === 'rolled'">
+					<q-dialog 
+						v-if="character.hit_point_type === 'rolled'"
+						v-model="roll_hp_modal"
+						@before-hide="clear_invalid_rolls(valid)"
+					>
 						<hk-card>
 							<div slot="header" class="card-header d-flex justify-content-between">
 								<span>
@@ -436,7 +448,7 @@
 												@change="setRolledHP($event.target.value, editClass, level, valid)"
 												autocomplete="off" 
 												type="number"
-												:value="character_classes[editClass].rolled_hit_points[level]" 
+												v-model="character_classes[editClass].rolled_hit_points[level]" 
 												:label="`Level ${level}`"
 												:error="invalid && validated"
 												:error-message="errors[0]"
@@ -565,6 +577,7 @@
 				invalid: false,
 				modifier_modal: false,
 				roll_hp_modal: false,
+				rolled_hp_copy: undefined,
 				experience_modal: false,
 				spells_known_modal: false,
 				feature_preview: {},
@@ -706,6 +719,7 @@
 			},
 			rollHitPoints(classIndex) {
 				this.editClass = classIndex;
+				this.rolled_hp_copy = JSON.parse(JSON.stringify(this.character_classes[classIndex].rolled_hit_points));
 				this.roll_hp_modal = true;
 			},
 			spellsKnown(classIndex) {
@@ -732,6 +746,12 @@
 				const max = (classIndex === 0) ? Class.level - 1 : Class.level;
 				const rolled_levels = Object.keys(Class.rolled_hit_points).filter(level => level <= Class.level).length;
 				return max > rolled_levels;
+			},
+			clear_invalid_rolls(valid) {
+				if(!valid) {
+					this.$set(this.Class.classes[this.editClass], "rolled_hit_points", this.rolled_hp_copy);
+				}
+				this.rolled_hp_copy = undefined;
 			},
 			setSpellsKnown(classIndex, type, level) {
 				//Set spells known

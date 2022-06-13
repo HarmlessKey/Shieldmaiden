@@ -189,6 +189,16 @@ const routes = [
 								},
 							},
 							{
+								path: "info",
+								name: "EditCharacterInfoTab",
+								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/info"),
+								meta: {
+									description: "Character builder information",
+									title: "Info",
+									side: false
+								},
+							},
+							{
 								path: "general",
 								name: "EditCharacterGeneralTab",
 								component: () => import("src/views/UserContent/CharactersAlpha/EditCharacter/general"),

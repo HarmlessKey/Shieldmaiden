@@ -247,8 +247,26 @@ html body {
 		}
 	}
 
-	//MARGINGS
+	//MARGINS
 	.m {
+		&-0 {
+			margin: 0 !important;
+		}
+		&-1 {
+			margin: 0.25rem !important;
+		}
+		&-2 {
+			margin: 0.5rem !important;
+		}
+		&-3 {
+			margin: 1rem !important;
+		}
+		&-4 {
+			margin: 1.5rem !important;
+		}
+		&-5 {
+			margin: 3rem !important;
+		}
 		&b, &y {
 			&-0 {
 				margin-bottom: 0 !important;
@@ -333,6 +351,24 @@ html body {
 
 	//PADDINGS
 	.p {
+		&-0 {
+			padding: 0 !important;
+		}
+		&-1 {
+			padding: 0.25rem !important;
+		}
+		&-2 {
+			padding: 0.5rem !important;
+		}
+		&-3 {
+			padding: 1rem !important;
+		}
+		&-4 {
+			padding: 1.5rem !important;
+		}
+		&-5 {
+			padding: 3rem !important;
+		}
 		&b, &y {
 			&-0 {
 				padding-bottom: 0 !important;

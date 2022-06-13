@@ -49,94 +49,113 @@ export const damage_type_icons = Object.freeze({
 });
 
 export const skills = Object.freeze({
-  'acrobatics': { 
-    skill: 'Acrobatics', 
+  acrobatics: { 
+    skill: "Acrobatics", 
     value: "acrobatics", 
-    ability: 'dexterity'
+    ability: "dexterity"
   },
-  'animal Handling': { 
-    skill: 'Animal Handling', 
+  "animal Handling": { 
+    skill: "Animal Handling", 
     value: "animal Handling", 
-    ability: 'wisdom'
+    ability: "wisdom"
   },
-  'arcana': { 
-    skill: 'Arcana', 
+  arcana: { 
+    skill: "Arcana", 
     value: "arcana", 
-    ability: 'intelligence'
+    ability: "intelligence"
   },
-  'athletics': { 
-    skill: 'Athletics', 
+  athletics: { 
+    skill: "Athletics", 
     value: "athletics", 
-    ability: 'strength'
+    ability: "strength"
   },
-  'deception': { 
-    skill: 'Deception', 
+  deception: { 
+    skill: "Deception", 
     value: "deception",
-    ability: 'charisma'
+    ability: "charisma"
   },
-  'history': { 
-    skill: 'History', 
+  history: { 
+    skill: "History", 
     value: "history", 
-    ability: 'intelligence'
+    ability: "intelligence"
   },
-  'insight': { 
-    skill: 'Insight',
+  insight: { 
+    skill: "Insight",
     value: "insight",
-    ability: 'wisdom'
+    ability: "wisdom"
   },
-  'intimidation': { 
-    skill: 'Intimidation', 
+  intimidation: { 
+    skill: "Intimidation", 
     value: "intimidation", 
-    ability: 'charisma'
+    ability: "charisma"
   },
-  'investigation': { 
-    skill: 'Investigation', 
+  investigation: { 
+    skill: "Investigation", 
     value: "investigation", 
-    ability: 'intelligence'
+    ability: "intelligence"
   },
-  'medicine': { 
-    skill: 'Medicine',
+  medicine: { 
+    skill: "Medicine",
     value: "medicine",
-    ability: 'wisdom'
+    ability: "wisdom"
   },
-  'nature': { 
-    skill: 'Nature',
+  nature: { 
+    skill: "Nature",
     value: "nature",
-    ability: 'intelligence'
+    ability: "intelligence"
   },
-  'perception': { 
-    skill: 'Perception',
+  perception: { 
+    skill: "Perception",
     value: "perception",
-    ability: 'wisdom'
+    ability: "wisdom"
   },
-  'performance': { 
-    skill: 'Performance',
+  performance: { 
+    skill: "Performance",
     value: "performance",
-    ability: 'charisma'
+    ability: "charisma"
   },
-  'persuasion': { 
-    skill: 'Persuasion',
+  persuasion: { 
+    skill: "Persuasion",
     value: "persuasion",
-    ability: 'charisma'
+    ability: "charisma"
   },
-  'religion': { 
-    skill: 'Religion',
+  religion: { 
+    skill: "Religion",
     value: "religion",
-    ability: 'intelligence'
+    ability: "intelligence"
   },
-  'sleight of Hand': { 
-    skill: 'Sleight Of Hand', 
+  "sleight of Hand": { 
+    skill: "Sleight Of Hand", 
     value: "sleight of Hand", 
-    ability: 'dexterity'
+    ability: "dexterity"
   },
-  'stealth': { 
-    skill: 'Stealth',
+  stealth: { 
+    skill: "Stealth",
     value: "stealth",
-    ability: 'dexterity'
+    ability: "dexterity"
   },
-  'survival': { 
-    skill: 'Survival',  
+  survival: { 
+    skill: "Survival",  
     value: "survival", 
-    ability: 'wisdom'
+    ability: "wisdom"
   },
 });
+
+export const languages = Object.freeze([
+  "Common",
+  "Dwarvish",
+  "Elvish",
+  "Giant",
+  "Gnomish",
+  "Goblin",
+  "Halfling",
+  "Orc",
+  "Abyssal",
+  "Celestial",
+  "Draconic",
+  "Deep Speech",
+  "Infernal",
+  "Primordial",
+  "Sylvan",
+  "Undercommon"
+]);

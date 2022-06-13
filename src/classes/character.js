@@ -37,7 +37,7 @@ export class Character {
     this.general.hit_point_type = character.general.hit_point_type || "fixed";
     this.general.ability_score_method = character.general.ability_score_method || null;
     this.class = character.class || {};
-    this.class.classes = character.class.classes || { 0: { level: 1, features: [] }};
+    this.class.classes = character.class && character.class.classes ? character.class.classes : [{ level: 1, features: [] }];
 
     for(const Class of this.class.classes) {
       if(!("features" in Class)) {
@@ -241,7 +241,7 @@ export class Character {
     const character_classes = JSON.parse(JSON.stringify(this.class.classes));
 
     for(const Class of character_classes) {
-      if(Class.class !== "custom") {
+      if(Class.class && Class.class !== "custom") {
         const selected = classes[Class.class];
         Class.hit_dice = selected.hit_dice;
         Class.asi = selected.asi;
@@ -329,7 +329,7 @@ export class Character {
     }
 
     // Add class features
-    if(Class.class !== "custom") {
+    if(Class.class && Class.class !== "custom") {
       features = features.concat(classes[Class.class].features);
     }
 
@@ -388,7 +388,7 @@ export class Character {
 
     // Add class modifiers
     this.classes.forEach((Class, classIndex) => {
-      if(Class.class !== "custom") {
+      if(Class.class && Class.class !== "custom") {
         all_modifiers = custom.concat(classes[Class.class].modifiers);
       }
       // Filter out the modifiers that the class is not high enough level for
@@ -443,7 +443,7 @@ export class Character {
   }
   // Returns only modifiers that the class is a high enough level for
   filtered_modifiers_level(Class, classIndex, modifiers) {
-    return modifiers.filter((modifier) => {
+    return modifiers ? modifiers.filter((modifier) => {
       if(modifier && modifier.origin) {
         const origin = modifier.origin.split(".");
         
@@ -457,7 +457,7 @@ export class Character {
         // Return modifier of the allowed levels
         return !(origin[0] === "class" && origin[1] == classIndex && parseInt(origin[2]) > parseInt(Class.level));
       }
-    });
+    }) : [];
   }
   // Gets back a single modifier using an origin we know is unique
   single_modifier_origin(origin) {
@@ -560,7 +560,7 @@ export class ComputedCharacter {
   _compute_classes(character) {
     let caster_levels = []; //A caster level is needed to determine spell slots with the caster table (phb 165)
 
-    //Set level specific stats HP/Spells
+    // Set level specific stats HP/Spells
     character.classes.forEach((value, index) => {
       const level = value.level;
       this.level = this.level + level;
@@ -572,9 +572,9 @@ export class ComputedCharacter {
         level
       }
       
-      //Spell slots
+      // Spell slots
       if(value.caster_type) {
-        //For multiclassing in multiple casters the total caster level changes depening on the caster type (pbp 164)
+        // For multiclassing in multiple casters the total caster level changes depending on the caster type (pbp 164)
         let multiplier = 1;
         if(value.caster_type === 'half') {
           multiplier = 2;
@@ -588,20 +588,20 @@ export class ComputedCharacter {
       }
     });
 
-    //Set proficiency bonus
+    // Set proficiency bonus
     this.proficiency = experience_table[this.level].proficiency;
 
-    //Check if there is a caster level and determine the spell slots based on caster spell slot table (phb 164)
+    // Check if there is a caster level and determine the spell slots based on caster spell slot table (phb 164)
     if(caster_levels.length >= 1) {
       let caster_level;
 
-      //For a multiclasser, round down the third and half caster levels
+      // For a multiclasser, round down the third and half caster levels
       if(caster_levels.length > 1) {
         caster_level = caster_levels.reduce((a, b) => {
           return Math.floor(a) + Math.floor(b);
         }, 0);
       }
-      //For a single caster round up the third or half caster level
+      // For a single caster round up the third or half caster level
       else {
         caster_level = Math.ceil(caster_levels[0]);
       }
@@ -744,7 +744,7 @@ export class ComputedCharacter {
     for(const modifier of character.filtered_modifiers_target("hp")) {
       this.hit_points = this._add_modifier(character, this.hit_points, modifier);
     }
-    this.hit_points = this.hit_points;
+    this.hit_points = this.hit_points || 0;
   }
 
   _compute_initiative(character) {

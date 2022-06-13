@@ -4,6 +4,7 @@
 			v-if="character.build === 'new'"
 			:user-id="userId"
 			:character-id="characterId"
+			@save="save"
 		/>
 	
 		<div 
@@ -13,7 +14,6 @@
 			<div class="col-12" :class="{ 'col-md-9': width > 978 }">
 				<div class="tabs">
 					<q-tabs
-						v-model="current_tab"
 						dark
 						inline-label
 						align="left"
@@ -67,6 +67,7 @@
 				character: {},
 				width: 0,
 				tabs: [
+					{ value: "info", label: "", icon: "fas fa-info-circle" },
 					{ value: "general", label: "General" },
 					{ value: "race", label: "Race" },
 					{ value: "class", label: "Class" },
@@ -75,7 +76,6 @@
 					{ value: "actions", label: "Actions", disabled: true },
 					{ value: "background", label: "Background", disabled: true },
 				],
-				current_tab: this.$route.path.split("/").length > 4 ? this.$route.path.split("/").pop() : "general"
 			}
 		},
 		async created() {
@@ -83,11 +83,6 @@
 			this.character = new Character(char);
 			this.character_copy = JSON.parse(JSON.stringify(this.character));
 			this.computed_character = new ComputedCharacter(this.character);
-			this.set_computed_character({
-				userId: this.userId,
-				key: this.playerId,
-				character: this.computed_character
-			});
 
 			this.loading = false;
 		},
@@ -107,8 +102,7 @@
 		methods: {
 			...mapActions("characters", [
 				"get_character",
-				"update_character",
-				"set_computed_character"
+				"update_character"
 			]),
 			setSize(size) {
 				this.width = size.width;
@@ -116,12 +110,13 @@
 			async save() {
 				console.log("saving: ", this.character);
 
+				this.computed_character = new ComputedCharacter({...this.character});
 				await this.update_character({
 					uid: this.userId,
 					id: this.characterId,
-					character: this.character
+					character: this.character,
+					computed_character: this.computed_character
 				});
-				this.computed_character = new ComputedCharacter({...this.character});
 				this.character_copy = JSON.parse(JSON.stringify(this.character));
 			}
 		},

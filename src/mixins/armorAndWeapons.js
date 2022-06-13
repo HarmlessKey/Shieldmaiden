@@ -249,8 +249,8 @@ export const weapons = {
 						two_handed: true
 					},
 					{ 
-						value: "scimtar",
-						label: "Scimtar",
+						value: "scimitar",
+						label: "Scimitar",
 						type: "martial_melee",
 						damage: "1d6",
 						damage_type: "slashing",
@@ -404,7 +404,7 @@ export const weapons = {
 							armor_class: 12,
 							dex_mod: true,
 							dex_max: 2,
-							weigth: 12
+							weight: 12
 						},
 						{
 							type: "medium",
@@ -414,7 +414,7 @@ export const weapons = {
 							armor_class: 13,
 							dex_mod: true,
 							dex_max: 2,
-							weigth: 20
+							weight: 20
 						},
 						{
 							type: "medium",
@@ -425,7 +425,7 @@ export const weapons = {
 							dex_mod: true,
 							dex_max: 2,
 							stealth_disadvantage: true,
-							weigth: 45
+							weight: 45
 						},
 						{
 							type: "medium",
@@ -435,7 +435,7 @@ export const weapons = {
 							armor_class: 14,
 							dex_mod: true,
 							dex_max: 2,
-							weigth: 20
+							weight: 20
 						},
 						{
 							type: "medium",
@@ -446,7 +446,7 @@ export const weapons = {
 							dex_mod: true,
 							dex_max: 2,
 							stealth_disadvantage: true,
-							weigth: 40
+							weight: 40
 						},
 					]
 				},
@@ -461,7 +461,7 @@ export const weapons = {
 							cost: 3000,
 							armor_class: 14,
 							stealth_disadvantage: true,
-							weigth: 40
+							weight: 40
 						},
 						{
 							type: "heavy",
@@ -471,7 +471,7 @@ export const weapons = {
 							armor_class: 16,
 							strength_required: 13,
 							stealth_disadvantage: true,
-							weigth: 55
+							weight: 55
 						},
 						{
 							type: "heavy",
@@ -481,7 +481,7 @@ export const weapons = {
 							armor_class: 17,
 							strength_required: 15,
 							stealth_disadvantage: true,
-							weigth: 60
+							weight: 60
 						},
 						{
 							type: "heavy",
@@ -491,12 +491,12 @@ export const weapons = {
 							armor_class: 18,
 							strength_required: 15,
 							stealth_disadvantage: true,
-							weigth: 65
+							weight: 65
 						},
 					]
 				},
 				{ 
-					value: "shield", 
+					value: "shield",
 					label: "Shield",
 					armor: [
 						{

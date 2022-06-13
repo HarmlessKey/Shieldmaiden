@@ -58,8 +58,9 @@ export class characterServices {
   /**
    * Updates an existing character
    */
-  async updateCharacter(uid, id, character) {
+  async updateCharacter(uid, id, character, search_character) {
     CHARACTERS_REF.child(`${uid}/${id}`).update(character).then(() => {
+      SEARCH_CHARACTERS_REF.child(`${uid}/results/${id}`).update(search_character);
     }).catch((error) => {
       throw error;
     });

@@ -13,7 +13,7 @@
 			<template v-if="subclass.level >= level">
 				<h4 class="feature-title">
 					Level {{ level }}
-					<a @click="addFeature(classIndex, level, valid)" class="btn btn-sm bg-neutral-5">
+					<a @click="addFeature(level, valid)" class="btn btn-sm bg-neutral-5">
 						<i class="fas fa-plus green mr-1" aria-hidden="true" />
 						Add feature
 					</a>
@@ -22,7 +22,7 @@
 					v-for="(feature, index) in character.level_features(classIndex, level)"
 					:key="`feature-${level}-${index}`"
 					:dark="$store.getters.theme === 'dark'" switch-toggle-side
-					:group="`features-${classIndex}-${level}`"
+					:group="`features-${level}`"
 				>
 					<template v-slot:header>
 						<q-item-section avatar>
@@ -39,7 +39,7 @@
 							<div class="actions" v-if="!isNaN(feature.index)">
 								<a 
 									class="btn btn-sm bg-neutral-5" 
-									@click.stop="confirmDeleteFeature(classIndex, level, feature.index, feature.name, valid)"
+									@click.stop="confirmDeleteFeature(level, feature.index, feature.name, valid)"
 								>
 									<i class="fas fa-trash-alt" aria-hidden="true" />
 								</a>
@@ -50,7 +50,7 @@
 
 					<div class="accordion-body">
 						<!-- ASI / FEAT -->
-						<template  v-if="feature.asi">
+						<template v-if="feature.asi">
 							<p>
 								{{ asi_text }} <span class="neutral-2">(phb 15)</span>
 							</p>
@@ -59,19 +59,19 @@
 								<span class="neutral-2">(phb 165)</span>
 							</p>
 
-							<!-- <q-select
+							<q-select
 								:dark="$store.getters.theme === 'dark'" filled square
 								class="mb-3"
 								placeholder="ASI or Feat"
 								emit-value
 								map-options
 								:options="[
-									{ value: 'asi', label: 'Ability Score Increase' }, 
+									{ value: 'asi', label: 'Ability Score Improvement' }, 
 									{ value: 'feat', label: 'Feat' }
 								]"
-								@input="saveFeatureType(classIndex, level, $event)"
-								:value="subclass.features[feature.index].type"
-							/> -->
+								@input="saveFeatureType(level, $event)"
+								:value="asiOrFeat(level)"
+							/>
 						</template>
 
 						<!-- ASI -->
@@ -82,9 +82,9 @@
 									:dark="$store.getters.theme === 'dark'" filled square
 									:label="`Ability ${i}`"
 									:options="abilities"
-									:value="asi_modifier(classIndex, level, i)"
+									:value="asi_modifier(level, i)"
 									name="asi"
-									@input="saveASI($event, classIndex, level, i, valid)"
+									@input="saveASI($event, level, i, valid)"
 								/>
 							</div>
 						</div>
@@ -159,7 +159,7 @@
 							<!-- Modifiers -->
 							<Modifier-table 
 								v-if="!isNaN(feature.index)"
-								:modifiers="character.filtered_modifiers_feature(classIndex, level, index)" 
+								:modifiers="character.filtered_modifiers_feature(level, index)" 
 								:origin="`class.${classIndex}.${level}.${index}`"
 								:userId="userId"
 								:characterId="characterId"
@@ -264,46 +264,26 @@
 			save(valid) {
 				this.$emit("save", valid);
 			},
-			feature_modifiers(classIndex, level, key) {
-				const modifiers = this.modifiers.filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[1] == classIndex && origin[2] == level && origin[3] === key;
-				});
-				return modifiers;
-			},
-			asi_modifier(classIndex, level, index) {
-				const modifier = this.character.single_modifier_origin(`class.${classIndex}.${level}.asi.${index}`);
+			asi_modifier(level, index) {
+				const modifier = this.character.single_modifier_origin(`class.${this.classIndex}.${level}.asi.${index}`);
 				return (modifier) ? modifier.subtarget : null;
 			},
-			addFeature(classIndex, level, valid) {
-				this.character.add_feature(classIndex, level);
+			addFeature(level, valid) {
+				this.character.add_feature(this.classIndex, level);
 				this.$forceUpdate();
 				this.save(valid);
 			},
 
-			editFeature(classIndex, level, feature_key, property, value) {
-				this.set_feature_prop({
-					userId: this.userId,
-					key: this.characterId,
-					classIndex,
-					level,
-					feature_key,
-					property,
-					value
-				});
-				this.$emit("change", "class.edit_feature");
-			},
-
-			confirmDeleteFeature(classIndex, level, index, name, valid) {
+			confirmDeleteFeature(level, index, name, valid) {
 				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
 					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteFeature(classIndex, level, index, valid); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Yes', action: (toast) => { this.deleteFeature(level, index, valid); this.$snotify.remove(toast.id); }, bold: false},
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
-			deleteFeature(classIndex, level, index, valid) {
-				this.character.delete_feature(classIndex, level, index);
+			deleteFeature(level, index, valid) {
+				this.character.delete_feature(this.classIndex, level, index);
 				this.$forceUpdate();
 				this.save(valid, "class.delete_feature");
 			},
@@ -312,32 +292,32 @@
 			 * Save the type of feature that is chosen
 			 * Either Ability Score Improvement or Feat 
 			 **/
-			saveFeatureType(classIndex, level, value) {
-				const linked_modifiers = this.feature_modifiers(classIndex, level, '--asi');
+			saveFeatureType(level, value) {
+				const linked_modifiers = this.character.filtered_modifiers_feature(level, "asi");
 
 				//Delete linked modifiers when changing type
 				for(const modifier of linked_modifiers) {
-					this.delete_modifier({
-						userId: this.userId,
-						key: this.characterId,
-						modifier_key: modifier['.key']
-					});
+					this.character.delete_modifier(modifier.index);
 				}
 				
-				this.set_feature({
-					userId: this.userId,
-					key: this.characterId,
-					classIndex,
-					level,
-					feature: { type: value },
-					feature_key: "--asi"
-				});
+				// this.set_feature({
+				// 	userId: this.userId,
+				// 	key: this.characterId,
+				// 	classIndex: this.classIndex,
+				// 	level,
+				// 	feature: { type: value },
+				// 	feature_key: "--asi"
+				// });
 
 				this.$emit("change", `class.edit_feature_level_${level}`);
 			},
+
+			asiOrFeat(level) {
+				return "asi";
+			},
 			
-			saveASI(value, classIndex, level, index, valid) {
-				this.character.save_asi(value, classIndex, level, index);
+			saveASI(value, level, index, valid) {
+				this.character.save_asi(value, this.classIndex, level, index);
 				this.$forceUpdate();
 				this.save(valid, `class.set_asi.${level}`);
 			},

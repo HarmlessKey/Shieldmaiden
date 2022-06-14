@@ -8,6 +8,10 @@ import { marked } from "marked";
 import { calc_mod } from "src/utils/generalFunctions";
 import HkTooltip from "../hk-components/hk-tooltip.vue";
 
+marked.setOptions({
+  breaks: true
+});
+
 export default {
   name: "CharacterDescription",
   props: {

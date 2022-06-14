@@ -15,7 +15,7 @@
 		<div class="card-body">
 			<q-select
 				class="method"
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Method"
 				placeholder="Select method"
 				:value="method" 
@@ -41,7 +41,7 @@
 						<div class="ability" v-for="ability in abilities" :key="`base-${ability}`">
 							<div>{{ ability.capitalize() }}</div>
 							<q-select
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								placeholder="-"
 								:value="ability_scores[ability]"
 								:options="standard_array"
@@ -60,7 +60,7 @@
 							<div class="ability" v-for="ability in abilities" :key="`base-${ability}`">
 								<div>{{ ability.capitalize() }}</div>
 								<q-select
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									placeholder="-"
 									:value="ability_scores[ability]"
 									:options="point_buy.map(item => item.score)"
@@ -84,7 +84,7 @@
 							<div>{{ ability.capitalize() }}</div>
 							<ValidationProvider rules="between:1,20" :name="ability" v-slot="{ errors, invalid, validated }">
 								<q-input
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									placeholder="-"
 									@change="saveAbility($event.target.value, ability, valid)"
 									autocomplete="off"  
@@ -137,7 +137,7 @@
 											</div>
 
 											<q-select 
-												dark filled square dense
+												:dark="$store.getters.theme === 'dark'" filled square dense
 												clearable
 												map-options
 												emit-value

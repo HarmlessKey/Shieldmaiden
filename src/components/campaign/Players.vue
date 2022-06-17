@@ -54,7 +54,7 @@
 							show: true,
 							type: 'slides/party/Inventory'
 						})">
-						<i aria-hidden="true" class="fas fa-treasure-chest"></i>
+						<i aria-hidden="true" class="fas fa-treasure-chest" />
 						<q-tooltip anchor="top middle" self="center middle">
 							Party Inventory
 						</q-tooltip>
@@ -122,7 +122,7 @@
 					<div 
 						class="image" 
 						:key="'image-'+key" 
-						:style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"
+						:style="{ backgroundImage: players[key].avatar ? 'url(\'' + players[key].avatar + '\')' : '' }"
 					>
 						<div class="transformed" v-if="player.transformed">
 							<i aria-hidden="true" class="fas fa-paw-claws green"></i>

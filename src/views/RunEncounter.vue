@@ -1,13 +1,13 @@
 <template>
-	<div v-if="!loading && encounter_initialized">
+	<q-no-ssr v-if="!loading && encounter_initialized">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>
-		<div 
+		<div
 			class="combat-wrapper"
-			v-else-if="encounter && (players || demo)"  
+			v-else-if="encounter && (players || demo)"
 			:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
-		>	
+		>
 			<template v-if="encounter.finished">
 				<Finished v-if="!demo" :encounter="encounter"/>
 				<DemoFinished v-else />
@@ -20,30 +20,30 @@
 				</template>
 
 				<template v-else>
-					<SetInitiative 
+					<SetInitiative
 						v-if="encounter.round === 0"
 						:_active="_active"
 						:_idle="_idle"
 						:width="width"
 					/>
 					<div v-else class="desktop">
-						<Turns 
+						<Turns
 							:active_len="Object.keys(_active).length"
 							:current="_active[encounter.turn]"
 							:next="_active[encounter.turn + 1]"
 							:settings="settings"
 						/>
-						<Current 
+						<Current
 							:current="_active[encounter.turn]"
 							:next="next"
 							:settings="settings"
 						/>
-						<Targets 
+						<Targets
 							:_active = "_active"
 							:_idle = "_idle"
 						/>
 						<Targeted />
-						<div id="side_container"> 
+						<div id="side_container">
 							<Side />
 						</div>
 					</div>
@@ -54,29 +54,29 @@
 
 			<!-- MOBILE -->
 			<template v-else>
-				<SetInitiative 
+				<SetInitiative
 					v-if="encounter.round === 0"
 					:_active="_active"
 					:_idle="_idle"
 					:width="width"
 				/>
 				<div v-else class="mobile">
-					<Turns 
+					<Turns
 						:active_len="Object.keys(_active).length"
 						:current="_active[encounter.turn]"
 						:next="_active[encounter.turn + 1]"
 						:settings="settings"
 					/>
 
-					<CurrentMobile 
+					<CurrentMobile
 						:current="_active[encounter.turn]"
 						:next="next"
 						:settings="settings"
 					/>
-					
+
 					<Targets
-						:_active = "_active"
-						:_idle = "_idle"
+						:_active="_active"
+						:_idle="_idle"
 					/>
 
 					<div>
@@ -86,11 +86,11 @@
 			</template>
 		</div>
 		<q-resize-observer @resize="setSize" />
-	</div>
-	<div v-else class="combat-wrapper">
+	</q-no-ssr>
+	<q-no-ssr v-else class="combat-wrapper">
 		<hk-loader name="encounter" />
 		<q-resize-observer @resize="setSize" />
-	</div>
+	</q-no-ssr>
 </template>
 
 <script>
@@ -98,7 +98,7 @@
 	import { mapActions, mapGetters } from "vuex";
 
 	import { audio } from "src/mixins/audio";
-	
+
 	import Finished from "src/components/combat/Finished.vue";
 	import DemoFinished from "src/components/combat/DemoFinished.vue";
 	import Turns from "src/components/combat/Turns.vue";
@@ -133,7 +133,7 @@
 			return {
 				userId:  this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				demo: this.$route.name === "Demo",
-				campaignId: this.$route.params.campid, 
+				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				target: undefined,
 				width: 0,
@@ -152,7 +152,7 @@
 				await this.get_encounter({ uid: this.userId, campaignId: this.campaignId, id: this.encounterId });
 			}
 			await this.init_Encounter({
-				cid: this.campaignId, 
+				cid: this.campaignId,
 				eid: this.encounterId,
 				demo: this.demo
 			});
@@ -174,7 +174,7 @@
 				return (this.userSettings && this.userSettings.general) ? this.userSettings.general : {};
 			},
 			_active: function() {
-				let order = (this.settings && this.settings.initOrder) ? "asc" : "desc"; 
+				let order = (this.settings && this.settings.initOrder) ? "asc" : "desc";
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -258,21 +258,21 @@
 					if((newValue && oldValue) && (Object.keys(newValue).length > Object.keys(oldValue).length)) {
 							this.$snotify.warning(
 							"A new player request was made.",
-							"New request", 
+							"New request",
 							{
 								timeout: 5000,
 								buttons: [
-									{ 
-										text: "Show requests", 
-										action: (toast) => { 
+									{
+										text: "Show requests",
+										action: (toast) => {
 											this.setSlide({show: true, type: "combat/side/Requests"});
-											this.$snotify.remove(toast.id); 
+											this.$snotify.remove(toast.id);
 										}, bold: false
 									},
-									{ 
-										text: "Close", 
-										action: (toast) => { 
-											this.$snotify.remove(toast.id); 
+									{
+										text: "Close",
+										action: (toast) => {
+											this.$snotify.remove(toast.id);
 										}, bold: false
 									}
 								]

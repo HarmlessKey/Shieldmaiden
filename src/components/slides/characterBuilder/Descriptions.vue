@@ -2,21 +2,13 @@
 	<div class="pb-5">
 		<h2>Description fields</h2>
 
-		<h3>Markdown</h3>
-		<p>The description field allows markdown</p>
+		<h3>Markdown guide</h3>
 
-		<table class="table">
-			<thead>
-				<th>
-					Markdown info
-				</th>
-			</thead>
-			<tbody>
-				<tr v-for="(markdown, index) in markdownInfo" :key="`markdown-${index}`">
-					<td v-html="markdown"/>
-				</tr>
-			</tbody>
-		</table>
+		<hk-card v-for="(info, key) in markdownInfo" :key="key" small :header="info.header">
+			<div class="card-body">
+				<pre v-html="info.content" />
+			</div>
+		</hk-card>
 
 		<h3>Character stats</h3>
 		<p>
@@ -25,67 +17,81 @@
 			The actual value will be shown when the description is displayed. The brackets are required.
 		</p>
 		
-		<table class="table">
-			<thead>
-				<th>
-					Ability scores
-				</th>
-				<th>
-					Reference
-				</th>
-			</thead>
-			<tbody>
-				<tr v-for="({stat, ref}, index) in ability_scores" :key="`ability-${index}`">
-					<td>{{ stat }}</td>
-					<td>{{ ref }}</td>
-				</tr>
-			</tbody>
+		<hk-card header="Ability scores" small>
+			<table class="table mb-0">
+				<thead>
+					<th>
+						Ability
+					</th>
+					<th>
+						Reference
+					</th>
+				</thead>
+				<tbody>
+					<tr v-for="({stat, ref}, index) in ability_scores" :key="`ability-${index}`">
+						<td>{{ stat }}</td>
+						<td>{{ ref }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</hk-card>
 
-			<thead>
-				<th>
-					Ability modifiers
-				</th>
-				<th>
-					Reference
-				</th>
-			</thead>
-			<tbody>
-				<tr v-for="({stat, ref}, index) in ability_mods" :key="`mod-${index}`">
-					<td>{{ stat }}</td>
-					<td>{{ ref }}</td>
-				</tr>
-			</tbody>
+		<hk-card header="Ability modifiers" small>
+			<table class="table mb-0">
+				<thead>
+					<th>
+						Ability
+					</th>
+					<th>
+						Reference
+					</th>
+				</thead>
+				<tbody>
+					<tr v-for="({stat, ref}, index) in ability_mods" :key="`mod-${index}`">
+						<td>{{ stat }}</td>
+						<td>{{ ref }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</hk-card>
 
-			<thead>
-				<th>
-					Character
-				</th>
-				<th>
-					Reference
-				</th>
-			</thead>
-			<tbody>
-				<tr v-for="({stat, ref}, index) in character" :key="`character-${index}`">
-					<td>{{ stat }}</td>
-					<td>{{ ref }}</td>
-				</tr>
-			</tbody>
+		<hk-card header="Character values" small>
+			<table class="table mb-0">
+				<thead>
+					<th>
+						Value
+					</th>
+					<th>
+						Reference
+					</th>
+				</thead>
+				<tbody>
+					<tr v-for="({stat, ref}, index) in character" :key="`character-${index}`">
+						<td>{{ stat }}</td>
+						<td>{{ ref }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</hk-card>
 
-			<thead>
-				<th>
-					Class
-				</th>
-				<th>
-					Reference
-				</th>
-			</thead>
-			<tbody>
-				<tr v-for="({stat, ref}, index) in Class" :key="`class-${index}`">
-					<td>{{ stat }}</td>
-					<td>{{ ref }}</td>
-				</tr>
-			</tbody>
-		</table>
+		<hk-card header="Class values" small>
+			<table class="table mb-0">
+				<thead>
+					<th>
+						Value
+					</th>
+					<th>
+						Reference
+					</th>
+				</thead>
+				<tbody>
+					<tr v-for="({stat, ref}, index) in Class" :key="`class-${index}`">
+						<td>{{ stat }}</td>
+						<td>{{ ref }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</hk-card>
 	</div>
 </template>
 
@@ -94,17 +100,43 @@
 		name: 'Descriptions',
 		data() {
 			return {
-				markdownInfo: [
-						"*Italic*",
-						"**Bold**",
-						"__Underline__",
-						"- Unordered list item",
-						"1. Ordered list item",
-						"Tables:<br/>"+
-						"| header | header |<br/>"+
-						"| ----------- | ----------- |<br/>"+
-						"| column | column |<br/>"
-				],
+				markdownInfo: {
+					emphasis: {
+						header: "Emphasis",
+						content: "**<strong>Bold</strong>**\n"+
+							"*<em>Italic</em>*\n"+
+							"__<u>Underline</u>__\n"+
+							"~~<s>Strikethrough</s>~~"
+					},
+					headers: {
+						header: "Headers",
+						content: "# Big header\n"+
+							"## Medium header\n"+
+							"### Small header\n"+
+							"#### Tiny header\n"
+					},
+					lists: {
+						header: "Lists",
+						content: "* Unordered list item\n"+
+						"* Unordered list item\n"+
+						"* Unordered list item\n\n"+
+						"1. Ordered list item\n"+
+						"2. Ordered list item\n"+
+						"3. Ordered list item"
+					},
+					tables: {
+						header: "Tables",
+						content: "| Column 1 | Column 2 | Column 3 |\n"+
+							"| -------- | -------- | -------- |\n"+
+							"| 5th      | Human    | Rogue    |\n"+
+							"| 8th      | Dwarf    | Cleric   |\n\n"+
+							"Column alignment is not required\n\n"+
+							"| Column 1 | Column 2 | Column 3 |\n"+
+							"| - | - | - |\n"+
+							"| 5th | Human | Rogue |\n"+
+							"| 8th | Dwarf | Cleric |"
+					}
+				},
 				ability_scores: [
 					{
 						stat: "Strength",
@@ -133,27 +165,27 @@
 				],
 				ability_mods: [
 					{
-						stat: "Strength mod",
+						stat: "Strength",
 						ref: "[str_mod]"
 					},
 					{
-						stat: "Dexterity mod",
+						stat: "Dexterity",
 						ref: "[dex_mod]"
 					},
 					{
-						stat: "Constitution mod",
+						stat: "Constitution",
 						ref: "[con_mod]"
 					},
 					{
-						stat: "Intelligence mod",
+						stat: "Intelligence",
 						ref: "[int_mod]"
 					},
 					{
-						stat: "Wisdom mod",
+						stat: "Wisdom",
 						ref: "[wis_mod]"
 					},
 					{
-						stat: "Charisma mod",
+						stat: "Charisma",
 						ref: "[cha_mod]"
 					},
 				],
@@ -185,7 +217,3 @@
 		}
 	};
 </script>
-
-<style scoped>
-
-</style>

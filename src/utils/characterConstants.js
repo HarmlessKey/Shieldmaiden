@@ -214,15 +214,614 @@ export const races = Object.freeze({
 export const classes = Object.freeze({
   barbarian: {
     hit_dice: 12,
+    caster_type: null,
+    skill_count: 2,
+    skills: [
+      "animal Handling",
+      "athletics",
+      "intimidation",
+      "nature",
+      "perception", 
+      "survival"
+    ],
+    asi: [4, 8, 12, 16, 19],
+    features: [
+      {
+        name: "Rage",
+        level: 1,
+        source: "",
+        description: "In battle, you fight with primal ferocity. On your turn, "+
+          "you can enter a rage as a bonus action.\n"+
+          "While raging, you gain the following benefits if you "+
+          "aren't wearing heavy armor:"+
+          "* You have advantage on Strength checks and "+
+          "Strength saving throws.\n"+
+          "* When you make a melee weapon attack using "+
+          "Strength, you gain a bonus to the damage roll that "+
+          "increases as you gain levels as a barbarian, as "+
+          "shown in the Rage Damage column of the "+
+          "Barbarian table.\n"+
+          "* You have resistance to bludgeoning, piercing, and "+
+          "slashing damage.\n\n"+
+          "If you are able to cast spells, you can’t cast them or "+
+          "concentrate on them while raging.\n"+
+          "Your rage lasts for 1 minute. It ends early if you"+ 
+          "are knocked unconscious or if your turn ends and "+
+          "you haven't attacked a hostile creature since your "+
+          "last turn or taken damage since then. You can also "+
+          "end your rage on your turn as a bonus action.\n"+
+          "Once you have raged the number of times shown "+
+          "for your barbarian level in the Rages column of the "+
+          "Barbarian table, you must finish a long rest before "+
+          "you can rage again.",
+        index: "rage"
+      },
+      {
+        name: "Unarmored Defense",
+        level: 1,
+        source: "phb 48",
+        description: "While you are not wearing any armor, your Armor "+
+          "Class equals 10 + your Dexterity modifier ([dex_mod]) + your "+
+          "Constitution modifier ([con_mod]). You can use a shield and still "+
+          "gain this benefit.",
+        index: "unarmored-defense"
+      },
+      {
+        name: "Reckless Attack",
+        level: 2,
+        source: "phb 48",
+        description: "You can throw aside all concern "+
+          "for defense to attack with fierce desperation. When "+
+          "you make your first attack on your turn, you can "+
+          "decide to attack recklessly. Doing so gives you "+
+          "advantage on melee weapon attack rolls using "+
+          "Strength during this turn, but attack rolls against "+
+          "you have advantage until your next turn.",
+        index: "reckless-attack"
+      },
+      {
+        name: "Danger Sense",
+        level: 2,
+        source: "phb 48",
+        description: "At 2nd level, you gain an uncanny sense of when "+
+          "things nearby aren't as they should be, giving you an "+
+          "edge when you dodge away from danger.\n"+
+          "You have advantage on Dexterity saving throws "+
+          "against effects that you can see, such as traps and "+
+          "spells. To gain this benefit, you can't be blinded, "+
+          "deafened, or incapacitated.",
+        index: "danger-sense"
+      },
+      {
+        name: "Primal Path",
+        level: 3,
+        source: "php 48",
+        description: "At 3rd level, you choose a path that shapes the "+
+          "nature of your rage. Choose the Path of the Berserker "+
+          "or the Path of the Totem Warrior, both "+
+          "detailed at the end of the class description. Your "+
+          "choice grants you features at 3rd level and again at "+
+          "6th, 10th, and 14th levels.",
+        index: "primal-path"
+      },
+      {
+        name: "Extra Attack",
+        level: 5,
+        source: "php 49",
+        description: "Beginning at 5th level, you can attack twice, instead "+
+          "of once, whenever you take the Attack action on your turn",
+        index: "extra-attack"
+      },
+      {
+        name: "Fast Movement",
+        level: 5,
+        source: "php 49",
+        description: "Your speed increases by 10 feet "+
+          "while you aren't wearing heavy armor.",
+        index: "fast-movement"
+      },
+      {
+        name: "Feral Instinct",
+        level: 7,
+        source: "php 49",
+        description: "Your instincts are so honed that you "+
+          "have advantage on initiative rolls.\n"+
+          "Additionally, if you are surprised at the beginning "+
+          "of combat and aren't incapacitated, you can act "+
+          "normally on your first turn, but only if you enter "+
+          "your rage before doing anything else on that turn",
+        index: "feral-instinct"
+      },
+      {
+        name: "Brutal Critical",
+        level: 9,
+        source: "php 49",
+        description: "You can roll one additional "+
+          "weapon damage die when determining the extra "+
+          "damage for a critical hit with a melee attack.\n"+
+          "This increases to two additional dice at 13th level "+
+          "and three additional dice at 17th level.",
+        index: "brutal-critical"
+      },
+      {
+        name: "Relentless Rage",
+        level: 11,
+        source: "php 49",
+        description: "Your rage can keep you "+
+          "fighting despite grievous wounds. If you drop to 0 hit "+
+          "points while you're raging and don't die outright, "+
+          "you can make a DC 10 Constitution saving throw. If "+
+          "you succeed, you drop to 1 hit point instead.\n"+
+          "Each time you use this feature after the first, the "+
+          "DC increases by 5. When you finish a short or long "+
+          "rest, the DC resets to 10.",
+        index: "relentless-rage"
+      },
+      {
+        name: "Persistent Rage",
+        level: 15,
+        source: "php 49",
+        description: "Your rage is so fierce that it "+
+          "ends early only if you fall unconscious or if you choose to end it.",
+        index: "persistent-rage"
+      },
+      {
+        name: "Indomitable Might",
+        level: 18,
+        source: "php 49",
+        description: "If your total for a Strength "+
+          "check is less than your Strength score, you can use "+
+          "that score in place of the total",
+        index: "indomitable-might"
+      },
+      {
+        name: "Primal Champion",
+        level: 20,
+        source: "php 49",
+        description: "At 20th level, you embody the power of the wilds. "+
+          "Your Strength and Constitution scores increase by 4. "+
+          "Your maximum for those scores is now 24.",
+        index: "primal-champion"
+      },
+    ],
+    modifiers: [
+      {
+        origin: "class.barbarian.proficiencies.armor",
+        subtarget: "light",
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.armor",
+        subtarget: "medium",
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.armor",
+        subtarget: "shield",
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.weapon",
+        subtarget: "simple_melee",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.weapon",
+        subtarget: "simple_ranged",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.weapon",
+        subtarget: "martial_melee",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.weapon",
+        subtarget: "martial_ranged",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.saving_throw",
+        subtarget: "strength",
+        target: "saving_throw",
+        type: "proficiency"
+      },
+      {
+        origin: "class.barbarian.proficiencies.saving_throw",
+        subtarget: "constitution",
+        target: "saving_throw",
+        type: "proficiency"
+      },
+    ]
+  },
+  bard: {
+    hit_dice: 8,
+    caster_type: "full",
+    casting_ability: "charisma",
+    spell_knowledge: "learn",
+    ritual_casting: true,
+    spellcasting_focus: "You can use a musical instrument as a spellcasting focus for your bard spells.",
+    skills: ["*"],
+    skill_count: 3,
+    asi: [4, 8, 12, 16, 19],
+    features: [
+      {
+        name: "Bardic Inspiration",
+        level: 1,
+        source: "phb 53",
+        description: "You can inspire others through stirring words or "+
+          "music. To do so, you use a bonus action on your turn "+
+          "to choose one creature other than yourself within 60 "+
+          "feet of you who can hear you. That creature gains "+
+          "one Bardic Inspiration die, a d6.\n"+
+          "Once within the next 10 minutes, the creature can "+
+          "roll the die and add the number rolled to one ability "+
+          "check, attack roll, or saving throw it makes. The "+
+          "creature can wait until after it rolls the d20 before "+
+          "deciding to use the Bardic Inspiration die, but must "+
+          "decide before the GM says whether the roll succeeds "+
+          "or fails. Once the Bardic Inspiration die is rolled, it is "+
+          "lost. A creature can have only one Bardic Inspiration "+
+          "die at a time.\n"+
+          "You can use this feature a number of times equal "+
+          "to your Charisma modifier (a minimum of once). You "+
+          "regain any expended uses when you finish a long "+
+          "rest.\n"+
+          "Your Bardic Inspiration die changes when you "+
+          "reach certain levels in this class. The die becomes a"+
+          "d8 at 5th level, a d10 at 10th level, and a d12 at 15th "+
+          "level.",
+        index: "bardic-inspiration"
+      },
+      {
+        name: "Jack of All Trades",
+        level: 2,
+        source: "phb 54",
+        description: "You can add half your "+
+          "proficiency bonus, rounded down, to any ability "+
+          "check you make that doesn't already include your "+
+          "proficiency bonus.",
+        index: "jack-of-all-trades"
+      },
+      {
+        name: "Song of Rest",
+        level: 2,
+        source: "phb 54",
+        description: "You can use soothing music "+
+          "or oration to help revitalize your wounded allies "+
+          "during a short rest. If you or any friendly creatures "+
+          "who can hear your performance regain hit points at "+
+          "the end of the short rest by spending one or more "+
+          "Hit Dice, each of those creatures regains an extra "+
+          "1d6 hit points.\n"+
+          "The extra hit points increase when you reach "+
+          "certain levels in this class: to 1d8 at 9th level, to "+
+          "1d10 at 13th level, and to 1d12 at 17th level.",
+        index: "song-of-rest"
+      },
+      {
+        name: "Bard College",
+        level: 3,
+        source: "phb 54",
+        description: "You delve into the advanced techniques "+
+          "of a bard college of your choice, such as the College "+
+          "of Lore. Your choice grants you features at 3rd level "+
+          "and again at 6th and 14th level.",
+        index: "bard-college"
+      },
+      {
+        name: "Expertise",
+        level: 3,
+        source: "phb 54",
+        description: "Choose two of your skill proficiencies. "+
+          "Your proficiency bonus is doubled for any ability "+
+          "check you make that uses either of the chosen "+
+          "proficiencies.\n"+
+          "At 10th level, you can choose another two skill "+
+          "proficiencies to gain this benefit.",
+        index: "expertise"
+      },
+      {
+        name: "Font of Inspiration",
+        level: 5,
+        source: "phb 54",
+        description: "You regain all of "+
+          "your expended uses of Bardic Inspiration when you "+
+          "finish a short or long rest.",
+        index: "font-of-inspiration"
+      },
+      {
+        name: "Countercharm",
+        level: 6,
+        source: "phb 54",
+        description: "You gain the ability to use musical notes "+
+          "or words of power to disrupt mind-influencing "+
+          "effects. As an action, you can start a performance "+
+          "that lasts until the end of your next turn. During that "+
+          "time, you and any friendly creatures within 30 feet "+
+          "of you have advantage on saving throws against "+
+          "being frightened or charmed. A creature must be "+
+          "able to hear you to gain this benefit. The"+
+          "performance ends early if you are incapacitated or "+
+          "silenced or if you voluntarily end it (no action required).",
+        index: "countercharm"
+      },
+      {
+        name: "Magical Secrets",
+        level: 10,
+        source: "phb 54",
+        description: "You have plundered magical "+
+          "knowledge from a wide spectrum of disciplines. "+
+          "Choose two spells from any class, including this one. "+
+          "A spell you choose must be of a level you can cast, as "+
+          "shown on the Bard table, or a cantrip.\n"+
+          "The chosen spells count as bard spells for you and "+
+          "are included in the number in the Spells Known "+
+          "column of the Bard table.\n"+
+          "You learn two additional spells from any class at "+
+          "14th level and again at 18th level.",
+        index: "magical-secrets"
+      },
+      {
+        name: "Superior Inspiration",
+        level: 20,
+        source: "phb 54",
+        description: "When you roll initiative and have no "+
+          "uses of Bardic Inspiration left, you regain one use.",
+        index: "superior-inspiration"
+      },
+    ],
+    modifiers: [
+      {
+        origin: "class.bard.proficiencies.armor",
+        subtarget: "light",
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.weapon",
+        subtarget: "simple_melee",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.weapon",
+        subtarget: "simple_ranged",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.weapon",
+        subtarget: "hand_crossbow",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.weapon",
+        subtarget: "longsword",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.weapon",
+        subtarget: "rapier",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.weapon",
+        subtarget: "shortsword",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.saving_throw",
+        subtarget: "dexterity",
+        target: "saving_throw",
+        type: "proficiency"
+      },
+      {
+        origin: "class.bard.proficiencies.saving_throw",
+        subtarget: "charisma",
+        target: "saving_throw",
+        type: "proficiency"
+      },
+    ]
+  },
+  cleric: {
+    hit_dice: 8,
+    caster_type: "full",
+    casting_ability: "wisdom",
+    spell_knowledge: "know_prepare",
+    ritual_casting: true,
+    spellcasting_focus: "You can use a holy symbol as a spellcasting focus for your cleric spells.",
+    skills: [
+      "history", 
+      "insight",
+      "medicine",
+      "persuasion",
+      "religion"
+    ],
+    skill_count: 2,
+    asi: [4, 8, 12, 16, 19],
+    features: [
+      {
+        name: "Divine Domain",
+        level: 1,
+        source: "phb 58",
+        description: "Choose one domain related to your deity, such as "+
+          "Life. Each domain is detailed at the end of the class "+
+          "description, and each one provides examples of gods "+
+          "associated with it. Your choice grants you domain "+
+          "spells and other features when you choose it at 1st "+
+          "level. It also grants you additional ways to use "+
+          "Channel Divinity when you gain that feature at 2nd "+
+          "level, and additional benefits at 6th, 8th, and 17th "+
+          "levels."+
+          "## Domain Spells"+
+          "Each domain has a list of spells—its domain spells—"+
+          "that you gain at the cleric levels noted in the domain "+
+          "description. Once you gain a domain spell, you "+
+          "always have it prepared, and it doesn't count against "+
+          "the number of spells you can prepare each day."+
+          "If you have a domain spell that doesn't appear on "+
+          "the cleric spell list, the spell is nonetheless a cleric "+
+          "spell for you.",
+        index: "divine-domain"
+      },
+      {
+        name: "Channel Divinity",
+        level: 2,
+        source: "phb 59",
+        description: "At 2nd level, you gain the ability to channel divine "+
+          "energy directly from your deity, using that energy to "+
+          "fuel magical effects. You start with two such effects: "+
+          "Turn Undead and an effect determined by your "+
+          "domain. Some domains grant you additional effects "+
+          "as you advance in levels, as noted in the domain "+
+          "description.\n"+
+          "When you use your Channel Divinity, you choose "+
+          "which effect to create. You must then finish a short "+
+          "or long rest to use your Channel Divinity again."+
+          "Some Channel Divinity effects require saving "+
+          "throws. When you use such an effect from this class, "+
+          "the DC equals your cleric spell save DC.\n"+
+          "Beginning at 6th level, you can use your Channel "+
+          "Divinity twice between rests, and beginning at 18th "+
+          "level, you can use it three times between rests. When "+
+          "you finish a short or long rest, you regain your "+
+          "expended uses.",
+        index: "channel-divinity"
+      },
+      {
+        name: "Channel Divinity: Turn Undead",
+        level: 2,
+        source: "phb 59",
+        description: "As an action, you present your holy symbol and "+
+          "speak a prayer censuring the undead. Each undead "+
+          "that can see or hear you within 30 feet of you must "+
+          "make a Wisdom saving throw. If the creature fails its "+
+          "saving throw, it is turned for 1 minute or until it "+
+          "takes any damage.\n"+
+          "A turned creature must spend its turns trying to "+
+          "move as far away from you as it can, and it can't "+
+          "willingly move to a space within 30 feet of you. It "+
+          "also can't take reactions. For its action, it can use "+
+          "only the Dash action or try to escape from an effect "+
+          "that prevents it from moving. If there's nowhere to "+
+          "move, the creature can use the Dodge action.",
+        index: "turn-undead"
+      },
+      {
+        name: "Destroy Undead",
+        level: 5,
+        source: "phb 59",
+        description: "When an undead fails its saving "+
+          "throw against your Turn Undead feature, the "+
+          "creature is instantly destroyed if its challenge rating "+
+          "is at or below a certain threshold, as shown in the "+
+          "Destroy Undead table."+
+          "### Destroy Undead"+
+          "| Cleric Level | Destroys Undead of CR... |"+
+          "|--------------|--------------------------|"+
+          "|      5th     | 1/2 or lower             |"+
+          "|      8th     | 1 or lower               |"+
+          "|      11th    | 2 or lower               |"+
+          "|      14th    | 3 or lower               |"+
+          "|      17th    | 4 or lower               |",
+        index: "destroy-undead"
+      },
+      {
+        name: "Divine Intervention",
+        level: 1,
+        source: "phb 59",
+        description: "You can call on your deity to "+
+          "intervene on your behalf when your need is great.\n"+
+          "Imploring your deity's aid requires you to use "+
+          "your action. Describe the assistance you seek, and "+
+          "roll percentile dice. If you roll a number equal to or "+
+          "lower than your cleric level, your deity intervenes. "+
+          "The GM chooses the nature of the intervention; the "+
+          "effect of any cleric spell or cleric domain spell would "+
+          "be appropriate.\n"+
+          "If your deity intervenes, you can't use this feature "+
+          "again for 7 days. Otherwise, you can use it again "+
+          "after you finish a long rest.\n"+
+          "At 20th level, your call for intervention succeeds "+
+          "automatically, no roll required",
+        index: "divine-intervention"
+      }, 
+    ],
+    modifiers: [
+      {
+        origin: "class.cleric.proficiencies.armor",
+        subtarget: "light",
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.cleric.proficiencies.armor",
+        subtarget: "medium",
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.cleric.proficiencies.armor",
+        subtarget: "shield",
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.cleric.proficiencies.weapon",
+        subtarget: "simple_melee",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.cleric.proficiencies.weapon",
+        subtarget: "simple_ranged",
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.cleric.proficiencies.saving_throw",
+        subtarget: "wisdom",
+        target: "saving_throw",
+        type: "proficiency"
+      },
+      {
+        origin: "class.cleric.proficiencies.saving_throw",
+        subtarget: "charisma",
+        target: "saving_throw",
+        type: "proficiency"
+      },
+    ]
+  },
+  druid: {
+    hit_dice: 8,
+    caster_type: null,
     skills: [],
+    skill_count: 2,
     asi: [],
     features: [],
     modifiers: []
   },
-  bard: {}, 
-  cleric: {},
-  druid: {},
-  fighter: {},
+  fighter: {
+    hit_dice: 10,
+    caster_type: null,
+    skills: [],
+    skill_count: 2,
+    asi: [],
+    features: [],
+    modifiers: []
+  },
   monk: {
     hit_dice: 8,
     caster_type: null,
@@ -265,7 +864,7 @@ export const classes = Object.freeze({
           "- When you use the Attack action with an unarmed strike or a monk weapon on your turn, "+
           "you can make one unarmed strike as a bonus action. For example, if you take the Attack "+
           "action and attack with a quarterstaff, you can also make an unarmed strike as a bonus action, "+
-          "assuming you haven't already taken a bonus action this turn.\n"+
+          "assuming you haven't already taken a bonus action this turn.\n\n"+
           "Certain monasteries use specialized forms of the monk weapons. For example, you might use "+
           "a club that is two lengths of wood connected by a short chain (called a nunchaku) or a "+
           "sickle with a shorter, straighter blade (called a kama). Whatever name you use for a monk weapon, "+
@@ -293,7 +892,7 @@ export const classes = Object.freeze({
             "meditating to regain your ki points.\n"+
             "Some of your ki features require your target to"+ 
             "make a saving throw to resist the feature's effects. "+
-            "The saving throw DC is calculated as follows: \n\n"+
+            "The saving throw DC is calculated as follows:\n\n"+
             "**Ki save DC** = 8 + your proficiency bonus ([proficiency]) + your Wisdom modifier ([wis_mod])",
           index: "ki"
         },
@@ -330,7 +929,7 @@ export const classes = Object.freeze({
           name: "Unarmored Movement",
           level: 2,
           source: "phb 78",
-          description: "Starting at 2nd level, your speed increases by 10 feet while "+
+          description: "Your speed increases by 10 feet while "+
           "you are not wearing armor or wielding a shield. This bonus increases when "+
           "you reach certain monk levels, as shown in the Monk table.\n"+
             "At 9th level, you gain the ability to move along vertical surfaces and across "+
@@ -338,9 +937,9 @@ export const classes = Object.freeze({
         },
         {
           name: "Monastic Tradition",
-          source: "pbh 78",
+          source: "phb 78",
           level: 3,
-          description: "When you reach 3rd level, you commit yourself to a "+
+          description: "You commit yourself to a "+
             "monastic tradition, such as the Way of the Open "+
             "Hand. Your tradition grants you features at 3rd level "+
             "and again at 6th, 11th, and 17th level.",
@@ -348,13 +947,13 @@ export const classes = Object.freeze({
         },
         {
           name: "Deflect Missiles",
-          source: "pbh 78",
+          source: "phb 78",
           level: 3,
-          description: "Starting at 3rd level, you can use your reaction to "+
+          description: "You can use your reaction to "+
             "deflect or catch the missile when you are hit by a "+
             "ranged weapon attack. When you do so, the damage "+
             "you take from the attack is reduced by 1d10 + your "+
-            "Dexterity modifier + your monk level."+
+            "Dexterity modifier + your monk level.\n"+
             "If you reduce the damage to 0, you can catch the "+
             "missile if it is small enough for you to hold in one "+
             "hand and you have at least one hand free. If you "+
@@ -370,26 +969,26 @@ export const classes = Object.freeze({
         },
         {
           name: "Slow Fall",
-          source: "pbh 78",
+          source: "phb 78",
           level: 4,
-          description: "Beginning at 4th level, you can use your reaction "+
+          description: "You can use your reaction "+
             "when you fall to reduce any falling damage you take "+
             "by an amount equal to five times your monk level.",
           index: "slow-fall"
         },
         {
           name: "Extra Attack",
-          source: "pbh 79",
+          source: "phb 79",
           level: 5,
-          description: "Beginning at 5th level, you can attack twice, instead "+
+          description: "You can attack twice, instead "+
             "of once, whenever you take the Attack action on your turn.",
           index: "extra-attack"
         },
         {
           name: "Stunning Strike",
-          source: "pbh 79",
+          source: "phb 79",
           level: 5,
-          description: "Starting at 5th level, you can interfere with the flow "+
+          description: "You can interfere with the flow "+
             "of ki in an opponent's body. When you hit another "+
             "creature with a melee weapon attack, you can spend "+
             "1 ki point to attempt a stunning strike. The target "+
@@ -399,18 +998,18 @@ export const classes = Object.freeze({
         },
         {
           name: "Ki-Empowered Strikes",
-          source: "pbh 79",
+          source: "phb 79",
           level: 6,
-          description: "Starting at 6th level, your unarmed strikes count as "+
+          description: "Your unarmed strikes count as "+
             "magical for the purpose of overcoming resistance "+
             "and immunity to nonmagical attacks and damage.",
           index: "ki-empowered-strikes"
         },
         {
           name: "Evasion",
-          source: "pbh 79",
+          source: "phb 79",
           level: 7,
-          description: "At 7th level, your instinctive agility lets you dodge "+
+          description: "Your instinctive agility lets you dodge "+
             "out of the way of certain area effects, such as a blue "+
             "dragon's lightning breath or a fireball spell. When "+
             "you are subjected to an effect that allows you to "+
@@ -421,26 +1020,26 @@ export const classes = Object.freeze({
         },
         {
           name: "Stillness of Mind",
-          source: "pbh 79",
+          source: "phb 79",
           level: 7,
-          description: "Starting at 7th level, you can use your action to end "+
+          description: "You can use your action to end "+
            "one effect on yourself that is causing you to be "+
             "charmed or frightened.",
           index: "stillness-of-mind"
         },
         {
           name: "Purity of Body",
-          source: "pbh 79",
+          source: "phb 79",
           level: 10,
-          description: "At 10th level, your mastery of the ki flowing through "+
+          description: "Your mastery of the ki flowing through "+
             "you makes you immune to disease and poison.",
           index: "purity-of-body"
         },
         {
           name: "Tongue of the Sun and Moon",
-          source: "pbh 79",
+          source: "phb 79",
           level: 13,
-          description: "Starting at 13th level, you learn to touch the ki of "+
+          description: "You learn to touch the ki of "+
             "other minds so that you understand all spoken "+
             "languages. Moreover, any creature that can "+
             "understand a language can understand what you say.",
@@ -448,9 +1047,9 @@ export const classes = Object.freeze({
         },
         {
           name: "Diamond Soul",
-          source: "pbh 79",
+          source: "phb 79",
           level: 14,
-          description: "Beginning at 14th level, your mastery of ki grants "+
+          description: "Your mastery of ki grants "+
             "you proficiency in all saving throws.\n"+
             "Additionally, whenever you make a saving throw "+
             "and fail, you can spend 1 ki point to reroll it and take "+
@@ -459,9 +1058,9 @@ export const classes = Object.freeze({
         },
         {
           name: "Timeless Body",
-          source: "pbh 79",
+          source: "phb 79",
           level: 15,
-          description: "At 15th level, your ki sustains you so that you suffer "+
+          description: "Your ki sustains you so that you suffer "+
             "none of the frailty of old age, and you can't be aged "+
             "magically. You can still die of old age, however. In "+
             "addition, you no longer need food or water.",
@@ -469,9 +1068,9 @@ export const classes = Object.freeze({
         },
         {
           name: "Empty Body",
-          source: "pbh 79",
+          source: "phb 79",
           level: 18,
-          description: "Beginning at 18th level, you can use your action to "+
+          description: "You can use your action to "+
             "spend 4 ki points to become invisible for 1 minute. "+
             "During that time, you also have resistance to all "+
             "damage but force damage.\n"+
@@ -483,9 +1082,9 @@ export const classes = Object.freeze({
         },
         {
           name: "Perfect Self",
-          source: "pbh 79",
+          source: "phb 79",
           level: 20,
-          description: "At 20th level, when you roll for initiative and have "+
+          description: "When you roll for initiative and have "+
             "no ki points remaining, you regain 4 ki points.",
           index: "perfect-self"
         },
@@ -545,10 +1144,57 @@ export const classes = Object.freeze({
       }
     ]
   },
-  paladin: {},
-  ranger: {},
-  rogue: {},
-  sorcerer: {},
-  warlock: {},
-  wizard: {}
+  paladin: {
+    hit_dice: 10,
+    caster_type: null,
+    skills: [],
+    skill_count: 2,
+    asi: [],
+    features: [],
+    modifiers: []
+  },
+  ranger: {
+    hit_dice: 10,
+    caster_type: null,
+    skills: [],
+    skill_count: 2,
+    asi: [],
+    features: [],
+    modifiers: []
+  },
+  rogue: {
+    hit_dice: 8,
+    caster_type: null,
+    skills: [],
+    skill_count: 2,
+    asi: [],
+    features: [],
+    modifiers: []
+  },
+  sorcerer: {
+    hit_dice: 6,
+    caster_type: null,
+    skills: [],
+    skill_count: 2,
+    asi: [],
+    features: [],
+    modifiers: []
+  },
+  warlock: {
+    hit_dice: 8,
+    caster_type: null,
+    skills: [],
+    skill_count: 2,
+    asi: [],
+    features: [],
+    modifiers: []
+  },
+  wizard: {
+    hit_dice: 6,
+    caster_type: null,
+    skills: [],
+    skill_count: 2,
+    asi: [],
+    features: [],
+    modifiers: []}
 });

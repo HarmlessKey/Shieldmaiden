@@ -334,6 +334,20 @@
 			}
 		});
 	},
+	destroyed() {
+		window.removeEventListener('offline', () => { this.connection = "offline" });
+		window.removeEventListener('online', () => { this.connection = "online" });
+		window.removeEventListener('beforeinstallprompt', (e) => {
+			// Prevent the mini-infobar from appearing on mobile
+			e.preventDefault();
+			// Stash the event so it can be triggered later.
+			if(!this.install_cookie) {
+				this.deferredPrompt = e;
+				// Update UI notify the user they can install the PWA
+				this.install_dialog = true;
+			}
+		});
+	},
 	methods: {
 		...mapActions([
 			"setSlide",

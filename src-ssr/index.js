@@ -12,11 +12,13 @@
  */
 
 const express = require('express')
+const morgan = require('morgan');
 const compression = require('compression')
 
 const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()
+app.use(morgan('combined'));
 
 app.disable('x-powered-by');
 
@@ -76,6 +78,7 @@ app.get(ssr.resolveUrl('*'), (req, res) => {
 
   ssr.renderToString({ req, res }, (err, html) => {
     if (err) {
+      console.log("SSR-error", err);
       if (err.url) {
         if (err.code) res.redirect(err.code, err.url)
         else res.redirect(err.url)

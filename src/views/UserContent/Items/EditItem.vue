@@ -29,9 +29,9 @@
 					
 						<!-- IMAGE -->
 						<div class="avatar">
-							<div class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></div>
+							<div class="img" v-if="item.image" :style="{ backgroundImage: item.image ? 'url(\'' + item.image + '\')' : '' }"></div>
 							<div class="img" v-else>
-								<i aria-hidden="true" class="hki-axe" />
+								<i v-if="!item.image" aria-hidden="true" class="hki-axe" />
 							</div>
 							<div>
 								<ValidationProvider rules="url" name="Image" v-slot="{ errors, invalid, validated }">

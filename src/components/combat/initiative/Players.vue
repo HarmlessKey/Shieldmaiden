@@ -5,10 +5,10 @@
 				<span 
 					class="img" 
 					:style="{
-						'background-image': 'url(' + entity.img + ')',
+						'background-image': entity.img ? 'url(' + entity.img + ')' : '',
 						'border-color': entity.color_label ? entity.color_label : ``
 					}">
-						<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+						<i aria-hidden="true" v-if="!entity.img" :class="`hki-player`" />
 					</span>
 				<div class="truncate">
 					{{ entity.name }}

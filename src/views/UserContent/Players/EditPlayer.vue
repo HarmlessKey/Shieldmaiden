@@ -44,7 +44,7 @@
 								</ValidationProvider>
 			
 								<div class="avatar">
-									<div class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
+									<div class="img" :style="{ backgroundImage: player.avatar ? 'url(\'' + player.avatar + '\')' : '' }">
 										<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 									</div>
 									<div>

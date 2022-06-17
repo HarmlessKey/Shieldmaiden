@@ -1,5 +1,5 @@
 <template>
-	<div v-if="!loading && encounter_initialized">
+	<q-no-ssr v-if="!loading && encounter_initialized">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>
@@ -75,8 +75,8 @@
 					/>
 					
 					<Targets
-						:_active = "_active"
-						:_idle = "_idle"
+						:_active="_active"
+						:_idle="_idle"
 					/>
 
 					<div>
@@ -86,11 +86,11 @@
 			</template>
 		</div>
 		<q-resize-observer @resize="setSize" />
-	</div>
-	<div v-else class="combat-wrapper">
+	</q-no-ssr>
+	<q-no-ssr v-else class="combat-wrapper">
 		<hk-loader name="encounter" />
 		<q-resize-observer @resize="setSize" />
-	</div>
+	</q-no-ssr>
 </template>
 
 <script>

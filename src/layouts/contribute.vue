@@ -1,10 +1,10 @@
 <template>
-	<div class="hk-layout">
+	<q-no-ssr class="hk-layout">
 		<div class="content">
 			<Crumble />
 			<router-view />
 		</div>
-	</div>
+	</q-no-ssr>
 </template>
 
 <script>

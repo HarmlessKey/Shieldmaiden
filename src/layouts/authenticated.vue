@@ -1,5 +1,5 @@
 <template>
-	<div class="hk-layout">
+	<q-no-ssr class="hk-layout">
 		<div class="content">
 			<Crumble />
 			<PaymentDeclined />
@@ -15,7 +15,7 @@
 			<q-resize-observer @resize="setSize" />
 		</div>
 		<Footer />
-	</div>
+	</q-no-ssr>
 </template>
 
 <script>

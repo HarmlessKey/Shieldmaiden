@@ -11,7 +11,7 @@
 			<div class="card-body">
 				<ul class="entities hasImg" v-if="campaign_players.length">
 					<li v-for="player in campaign_players" :key="player.key">	
-						<span class="img" :style="{ backgroundImage: 'url(\''+ player.avatar + '\')' }">
+						<span class="img" :style="{ backgroundImage: player.avatar ? 'url(\''+ player.avatar + '\')' : '' }">
 							<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 						</span>
 
@@ -54,7 +54,7 @@
 				<div class="card-body">
 					<ul class="entities hasImg">
 						<li v-for="player in players" :key="player.key">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
+							<span class="img" :style="{ backgroundImage: player.avatar ? 'url(\'' + player.avatar + '\')' : '' }">
 								<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
 							</span>
 

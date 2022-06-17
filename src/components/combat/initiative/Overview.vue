@@ -13,7 +13,7 @@
 				</p>
 				<span>
 					<i aria-hidden="true" class="fas fa-minus white" /> 
-					Moves the entity to a seperate initiative 
+					Moves the entity to a separate initiative 
 					list that is hidden for your players, from which they can quickly be added.
 				</span>
 			</template>
@@ -26,12 +26,12 @@
 					<span 
 						class="img pointer" 
 						:style="{
-							'background-image': 'url(' + entity.img + ')',
+							'background-image': entity.img ? 'url(' + entity.img + ')' : '',
 							'border-color': entity.color_label ? entity.color_label : ``,
 							'color': entity.color_label ? entity.color_label : ``
 						}"
 					>
-						<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+						<i aria-hidden="true" v-if="!entity.img" :class="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`" />
 					</span>
 				</template>
 				<div class="overview-item">

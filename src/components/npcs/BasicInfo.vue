@@ -36,7 +36,7 @@
 
 				<!-- AVATAR -->
 				<div class="avatar mb-2">
-					<div class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }">
+					<div class="img" :style="{ backgroundImage: npc.avatar ? 'url(\'' + npc.avatar + '\')' : '' }">
 						<i aria-hidden="true" v-if="!npc.avatar" class="hki-monster" />
 					</div>
 					<div>

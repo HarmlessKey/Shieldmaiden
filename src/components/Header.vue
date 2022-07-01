@@ -93,7 +93,7 @@
 										<q-item-section avatar><i aria-hidden="true" class="fas fa-treasure-chest"></i></q-item-section>
 										<q-item-section>My content</q-item-section>
 									</q-item>
-									<q-item clickable v-close-popup to="/settings">
+									<q-item clickable v-close-popup to="/content/settings">
 										<q-item-section avatar><i aria-hidden="true" class="fas fa-cogs"></i></q-item-section>
 										<q-item-section>Settings</q-item-section>
 									</q-item>

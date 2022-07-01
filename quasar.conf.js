@@ -21,9 +21,9 @@ module.exports = function (/* ctx */) {
     // https://v1.quasar.dev/quasar-cli/boot-files
     boot: [
       'plugins',
-      'firebase-auth',
       'hk-components',
       'vee-validate',
+      { path: 'firebase-auth', server: false },
       { path: "vue-shortkey", server: false }
     ],
 

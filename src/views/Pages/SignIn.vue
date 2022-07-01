@@ -36,7 +36,6 @@
 			</form>
 			<hk-loader v-else prefix="Signing you in" noBackground />
 		</div>
-
 	</div>
 </template>
 
@@ -57,7 +56,7 @@
 			}
 		},
 		preFetch({ store, redirect }) {
-      		if(store.getters.user) {
+			if(store.getters.user) {
 				redirect('/content');
 			}
 		},

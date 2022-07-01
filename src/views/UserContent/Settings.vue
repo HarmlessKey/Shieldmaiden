@@ -1,6 +1,5 @@
 <template>
-	<div class="container">
-		<h1><i aria-hidden="true" class="fas fa-cogs"></i> Settings</h1>
+	<div>
 		<hk-card header="General Settings" id="general">
 			<General />
 		</hk-card>
@@ -27,14 +26,3 @@
 		}
 	}
 </script>
-
-<style lang="scss">
-	.container {
-		padding-top:20px;
-
-		h1 {
-			margin-bottom: 20px;
-			font-size: 40px;
-		}
-	}
-</style>

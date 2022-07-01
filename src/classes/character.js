@@ -245,11 +245,14 @@ export class Character {
         const selected = classes[Class.class];
         Class.hit_dice = selected.hit_dice;
         Class.asi = selected.asi;
+        Class.skills = selected.skills;
         Class.skill_count = selected.skill_count;
         Class.saving_throws = selected.saving_throws;
         Class.caster_type = selected.caster_type;
         Class.casting_ability = selected.casting_ability;
         Class.spell_knowledge = selected.spell_knowledge;
+        Class.spellcasting_focus = selected.spellcasting_focus;
+        Class.ritual_casting = selected.ritual_casting;
       }
     }
     return character_classes;
@@ -271,9 +274,7 @@ export class Character {
         proficiencies[classIndex][type] = this.all_modifiers.filter(mod => {
           const origin = mod.origin.split(".");
           return origin[1] === classIndex && origin[2] === "proficiencies" && origin[3] === type;
-        }).map(obj => {
-          return obj.subtarget;
-        });
+        })[0] || {};
       }
       return proficiencies;
     }
@@ -281,31 +282,23 @@ export class Character {
 
   set_proficiency(selected, classIndex, type) {
     const current = this.proficiencies[classIndex][type];
-    console.log(current)
     
     // Remove
-    for(const prof of current) {
-      if(!selected.includes(prof)) {
-        //Get the key of the proficiency that needs to be removed
-        const index = this.all_modifiers.filter(mod => {
-          const origin = mod.origin.split(".");
-          return origin[1] == classIndex && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
-        }).map(obj => {
-          return obj.index;
-        });
-        this.delete_modifier(index);
-      }
+    if(!selected || !selected.length) {
+      this.delete_modifier(current.index);
     }
-
     // Add
-    for(const prof of selected) {
-      if(!current.includes(prof)) {
+    else {
+      if(!current.subtarget) {
         this.add_modifier({
           origin: `class.${classIndex}.proficiencies.${type}`,
           type: "proficiency",
           target: type,
-          subtarget: prof
+          subtarget: selected
         });
+      } else {
+        current.subtarget = selected;
+        this.edit_modifier(current);
       }
     }
   }
@@ -408,7 +401,7 @@ export class Character {
   edit_modifier(modifier) {
     const index = modifier.index;
     delete modifier.index;
-    this.modifiers[index] = modifier
+    this.modifiers[index] = modifier;
   }
 
   delete_modifier(index) {
@@ -522,7 +515,7 @@ export class ComputedCharacter {
     this.race = base_character.race;
     base_character.proficiency_tracker = [];
 
-    console.log("COMPUTING")
+    console.log("COMPUTING", base_character);
 
     // Compute classes
     this._compute_classes(base_character);
@@ -583,8 +576,14 @@ export class ComputedCharacter {
         }
 
         caster_levels.push((level/multiplier));
-        this.classes[index].spells_known = character.classes[index].spells_known.spells[level] || 0;
-        this.classes[index].cantrips_known = character.classes[index].spells_known.cantrips[level] || 0;
+
+        if(character.classes[index].spells_known) {
+          this.classes[index].spells_known = (character.classes[index].spells_known.spells) ? character.classes[index].spells_known.spells[level] || 0 : 0;
+          this.classes[index].cantrips_known = (character.classes[index].spells_known.cantrips) ? character.classes[index].spells_known.cantrips[level] || 0 : 0;
+        } else {
+          this.classes[index].spells_known = 0;
+          this.classes[index].cantrips_known = 0;
+        }
       }
     });
 
@@ -651,15 +650,14 @@ export class ComputedCharacter {
     for(const type of ["weapon", "armor"]) {
       for(const modifier of character.filtered_modifiers_target(type)) {
         if(modifier.type === 'proficiency') {
-          this.proficiencies[type].push(modifier.subtarget);
+          for(const subtarget of modifier.subtarget) {
+            this.proficiencies[type].push(subtarget);
+          }
         }
       }
     }
 
     // Set disadvantages if not proficient
-    // Advantage/disadvantage is saved as an integer
-    // Every advantage adds 1 and every disadvantage removes 1
-    // A postive end result results in advantage a negative in disadvantage
     if(this.armor && !proficiencies.armor.includes(this.armor.armor_type) || this.shield && !proficiencies.armor.includes("shield")) {
       this.advantage_disadvantage = {
         abilities: {
@@ -713,8 +711,10 @@ export class ComputedCharacter {
     // Add Ability Score Modifiers
     for(let [key, value] of Object.entries(this.abilities)) {
       for(const modifier of character.filtered_modifiers_target("ability")) {
-        if(modifier.subtarget === key && modifier.type === 'bonus') {
-          value = value + parseInt(modifier.value);
+        for(const subtarget of modifier.subtarget) {
+          if(subtarget === key && modifier.type === 'bonus') {
+            value = value + parseInt(modifier.value);
+          }
         }
       }
       this.abilities[key] = value;
@@ -762,12 +762,12 @@ export class ComputedCharacter {
     //Armor Class
     let armor_class = (this.armor) ? this.armor.armor_class : 10; //Base is always 10 (phb 14)
 
-    //Check if armor and or shield is equiped
+    //Check if armor and or shield is equipped
     let ac_dex_mod = calc_mod(this.abilities.dexterity);
     let shield_mod = 0;
 
     if(this.armor) {
-      ac_dex_mod = (this.armor.dex_mod) ? ac_dex_mod : 0; //Set the dex modifier to 0 if the armor does not allow Dex.
+      ac_dex_mod = (this.armor.dex_mod) ? ac_dex_mod : 0; // Set the dex modifier to 0 if the armor does not allow Dex.
       
       //If the armor allows dex but there is a maximum, reduce the dex mod to that maximum when it is higher
       if(this.armor.dex_max && ac_dex_mod > this.armor.dex_max) {
@@ -780,7 +780,7 @@ export class ComputedCharacter {
 
     armor_class = armor_class + ac_dex_mod + shield_mod;
 
-    //Add AC Modifiers	
+    // Add AC Modifiers	
     for(const modifier of character.filtered_modifiers_target("ac")) {
       armor_class = this._add_modifier(character, armor_class, modifier);
     }
@@ -809,14 +809,16 @@ export class ComputedCharacter {
         // This gets calculated front end, same goes for expertise
         // This way expertise can easily only be added if the proficiency is also true
         // It's also easier to show front-end what skills have proficiency and expertise
-        if(skill === modifier.subtarget) {
-          if(modifier.type === "proficiency" && !this.skills.proficiencies.includes(skill)) {
-            this.skills.proficiencies.push(skill);
-          } else if(modifier.type === "expertise" && !this.skills.expertise.includes(skill)) {
-            this.skills.expertise(skill);
-          } else {
-            const value = (this.skills.bonuses[skill]) ? this.skills.bonuses[skill] : 0;
-            this.skills.bonuses[skill] = this._add_modifier(character, value, modifier);
+        for(const subtarget of modifier.subtarget) {
+          if(skill === subtarget) {
+            if(modifier.type === "proficiency" && !this.skills.proficiencies.includes(skill)) {
+              this.skills.proficiencies.push(skill);
+            } else if(modifier.type === "expertise" && !this.skills.expertise.includes(skill)) {
+              this.skills.expertise(skill);
+            } else {
+              const value = (this.skills.bonuses[skill]) ? this.skills.bonuses[skill] : 0;
+              this.skills.bonuses[skill] = this._add_modifier(character, value, modifier);
+            }
           }
         }
       }
@@ -829,12 +831,14 @@ export class ComputedCharacter {
         //Save saving throw proficiencies as a boolean, don't save the bonus
         //This get's calculated front end
         //This way it's easy to show what saving throws have proficiency
-        if(ability === modifier.subtarget) {
-          if(modifier.type === "proficiency" && !this.saving_throws.proficiencies.includes(ability)) {
-            this.saving_throws.proficiencies.push(ability);
-          } else {
-            let value = (this.saving_throws.bonuses[ability]) ? this.saving_throws.bonuses[ability] : 0;
-            this.saving_throws.bonuses[ability] = this._add_modifier(character, value, modifier);
+        for(const subtarget of modifier.subtarget) {
+          if(ability === subtarget) {
+            if(modifier.type === "proficiency" && !this.saving_throws.proficiencies.includes(ability)) {
+              this.saving_throws.proficiencies.push(ability);
+            } else {
+              let value = (this.saving_throws.bonuses[ability]) ? this.saving_throws.bonuses[ability] : 0;
+              this.saving_throws.bonuses[ability] = this._add_modifier(character, value, modifier);
+            }
           }
         }
       }
@@ -890,12 +894,14 @@ export class ComputedCharacter {
       newValue = newValue + parseInt(modifier_value);
     }
     if(modifier.type === 'proficiency') {
-      //Keep track of what subtargets have had proficiency added
-      //proficiency can only be added once
+      // Keep track of what subtargets have had proficiency added
+      // proficiency can only be added once
       let added_before = false;
       for(const prof of character.proficiency_tracker) {
-        if(prof === `${modifier.target}.${modifier.subtarget}`) {
-          added_before = true;
+        for(const subtarget of modifier.subtarget) {
+          if(prof === `${modifier.target}.${subtarget}`) {
+            added_before = true;
+          }
         }
       }
       //If proficiency wasn't added before, add it and track that it was added
@@ -909,16 +915,18 @@ export class ComputedCharacter {
     }
     if(['advantage', 'disadvantage'].includes(modifier.type)) {
 
-      //Check if there is a subtarget
-      if(modifier.subtarget) {
-        if(this.advantage_disadvantage[modifier.target]) {
-          if(this.advantage_disadvantage[modifier.target][modifier.subtarget]) {
-            this.advantage_disadvantage[modifier.target][modifier.subtarget][modifier.type] = true;
+      // Check if there is a subtarget
+      if(modifier.subtarget && modifier.subtarget.length) {
+        for(const subtarget of modifier.subtarget) {
+          if(this.advantage_disadvantage[modifier.target]) {
+            if(this.advantage_disadvantage[modifier.target][subtarget]) {
+              this.advantage_disadvantage[modifier.target][subtarget][modifier.type] = true;
+            } else {
+              this.advantage_disadvantage[modifier.target][subtarget] = { [modifier.type]: true };
+            }
           } else {
-            this.advantage_disadvantage[modifier.target][modifier.subtarget] = { [modifier.type]: true };
+            this.advantage_disadvantage[modifier.target] = { [subtarget]: { [modifier.type]: true }};
           }
-        } else {
-          this.advantage_disadvantage[modifier.target] = { [modifier.subtarget]: { [modifier.type]: true }};
         }
       } else {
         if(this.advantage_disadvantage[modifier.target]) {

@@ -143,9 +143,6 @@ export default {
         }
       ];
     }
-  },
-  methods: {
-    
   }
 }
 </script>

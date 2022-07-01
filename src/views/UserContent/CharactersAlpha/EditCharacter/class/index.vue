@@ -77,11 +77,12 @@
 												label="Class"
 												v-model="subclass.class"
 												:options="class_list"
-												@input="selectClass($event, valid)"
+												@input="selectClass($event, classIndex, valid)"
 											>
 											</q-select>
 
 											<q-select
+												:disable="!subclass.class"
 												:dark="$store.getters.theme === 'dark'" filled square
 												label="Level"
 												v-model="subclass.level"
@@ -169,7 +170,7 @@
 																	</q-tooltip>
 																</div>
 																<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
-																<hk-popover :header="`${subclass.name} hit points`">
+																<hk-popover :header="`${subclass.class === 'custom' ? subclass.name : subclass.class.capitalize()} hit points`">
 																	<strong>{{ character.total_class_hp(classIndex, computed.abilities.constitution).hp }}</strong>
 																	<div slot="content" v-html="character.total_class_hp(classIndex, computed.abilities.constitution).info" />
 																</hk-popover>
@@ -235,19 +236,19 @@
 														</q-item-section>
 														<q-item-section avatar>
 															<div class="d-flex justify-content-end" v-if="subclass.casting_ability">
-																<hk-popover :header="`${subclass.name} spell attack`">
+																<hk-popover :header="`${subclass.class === 'custom' ? subclass.name : subclass.class.capitalize()} spell attack`">
 																	{{ computed.classes[classIndex].spell_attack > 0 ? "+" : "" }}{{ computed.classes[classIndex].spell_attack }}
 																	<template #content>
-																		{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
+																		{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities[subclass.casting_ability]) }}</strong><br/>
 																		Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
 																	</template>
 																</hk-popover>
 																<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
-																<hk-popover :header="`${subclass.name} spell save DC`">
+																<hk-popover :header="`${subclass.class === 'custom' ? subclass.name : subclass.class.capitalize()} spell save DC`">
 																	{{ computed.classes[classIndex].spell_save_dc }}
 																	<template #content>
 																		Base: <strong>8</strong><br/>
-																		{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities.wisdom) }}</strong><br/>
+																		{{ subclass.casting_ability.capitalize() }} modifier: <strong>{{ calcMod(computed.abilities[subclass.casting_ability]) }}</strong><br/>
 																		Proficiency bonus: <strong>{{ computed.proficiency }}</strong>
 																	</template>
 																</hk-popover>
@@ -256,7 +257,7 @@
 													</template>
 
 													<div class="accordion-body">
-														<template v-if="subclass.class !== 'custom'">
+														<template v-if="subclass.class === 'custom'">
 															<q-select 
 																:dark="$store.getters.theme === 'dark'" filled square
 																label="Caster type"
@@ -291,7 +292,11 @@
 														</template>
 														<template v-else>
 															<strong>Caster type</strong> {{ subclass.caster_type }}<br/>
-															<strong>Casting ability</strong> {{ subclass.casting_ability }}
+															<strong>Casting ability</strong> {{ subclass.casting_ability }}<br/>
+															<strong>Spellcasting focus</strong> You can use a {{ subclass.spellcasting_focus }} as a spellcasting focus for your {{ subclass.class }} spells.
+															<template v-if="subclass.ritual_casting"><br/>
+																<strong>Ritual Casting</strong> You can cast a {{ subclass.class }} spell as a ritual if that spell has the ritual tag.
+															</template>
 														</template>
 													</div>
 												</q-expansion-item>
@@ -376,14 +381,18 @@
 															/>
 														</template>
 														<div v-else class="mb-3">
-															<strong>Armor</strong>: {{ proficiencies[classIndex].armor.length ? proficiencies[classIndex].armor.join(", ") : "None" }}<br/>
-															<strong>Weapons</strong>: {{ proficiencies[classIndex].weapon.length ? proficiencies[classIndex].weapon.join(", ") : "None" }}<br/>
+															<strong>Armor</strong>: {{ proficiencies[classIndex].armor.subtarget ? proficiencies[classIndex].armor.subtarget.join(", ") : "None" }}<br/>
+															<strong>Weapons</strong>: {{ proficiencies[classIndex].weapon.subtarget ? proficiencies[classIndex].weapon.subtarget.join(", ") : "None" }}<br/>
 															<template v-if="classIndex == 0">
-																<strong>Saving throws</strong>: {{ proficiencies[classIndex].saving_throw.join(", ") }}<br/>
+																<strong>Saving throws</strong>: {{ proficiencies[classIndex].saving_throw.subtarget.join(", ") }}<br/>
 															</template>
-															<strong>Skills</strong>: {{ proficiencies[classIndex].skill.join(", ") ? proficiencies[classIndex].skill.join(", ") : `Select ${subclass.class.skill_count} below` }}<br/>
+															<strong>Skills</strong>: 
+															{{ 
+																proficiencies[classIndex].skill.subtarget 
+																	? proficiencies[classIndex].skill.subtarget.join(", ") 
+																	: `Select ${subclass.skill_count} below` 
+															}}
 														</div>
-
 														<q-select 
 															:dark="$store.getters.theme === 'dark'" filled square
 															emit-value map-options 
@@ -392,8 +401,8 @@
 															option-value="value"
 															option-label="skill"
 															:max-values="subclass.skill_count || null"
-															:options="Object.values(skillList)" 
-															v-model="proficiencies[classIndex].skill" 
+															:options="filtered_skills(subclass.class, subclass.skills)" 
+															v-model="proficiencies[classIndex].skill.subtarget" 
 															@input="setProficiencies($event, classIndex, 'skill', valid)"
 														/>
 													</div>
@@ -655,8 +664,31 @@
 					this.invalid = true;
 				}
 			},
-			selectClass(Class, valid) {
-				console.log(Class)
+			selectClass(Class, classIndex, valid) {
+				if(this.Class.classes[classIndex].class) {
+					this.$snotify.error(
+					`Are you sure you want to change the class? Rolled Hit Points and custom Features & linked Modifiers will be lost.`, `Change class`, 
+					{
+						buttons: [
+							{ text: 'Yes', action: (toast) => { this.setClass(Class, classIndex, valid); this.$snotify.remove(toast.id); }, bold: false},
+							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						]
+					});
+				} else {
+					this.setClass(Class, classIndex, valid);
+				}
+			},
+			setClass(Class, classIndex, valid) {
+				this.$set(this.Class.classes[classIndex], "class", Class);
+				this.save(valid, `classes.class`);
+			},
+			filtered_skills(Class, skills) {
+				const skill_array = Object.values(this.skillList);
+				if(Class === "custom" || skills.includes("*")) {
+					return skill_array;
+				} else {
+					return skill_array.filter(skill => skills.includes(skill.value));
+				}
 			},
 			saveProp(value, classIndex, property, valid) {
 				this.$set(this.Class.classes[classIndex], property, value);
@@ -694,7 +726,7 @@
 
 				this.saveClassLevel(classIndex, value, valid)
 
-				//Open modal to roll HP
+				// Open modal to roll HP
 				if(this.character.hit_point_type === "rolled") {
 					this.rollHitPoints(classIndex);
 				}

@@ -387,55 +387,24 @@ export const classes = Object.freeze({
     modifiers: [
       {
         origin: "class.barbarian.proficiencies.armor",
-        subtarget: "light",
-        target: "armor",
-        type: "proficiency"
-      },
-      {
-        origin: "class.barbarian.proficiencies.armor",
-        subtarget: "medium",
-        target: "armor",
-        type: "proficiency"
-      },
-      {
-        origin: "class.barbarian.proficiencies.armor",
-        subtarget: "shield",
+        subtarget: ["light", "medium", "shield"],
         target: "armor",
         type: "proficiency"
       },
       {
         origin: "class.barbarian.proficiencies.weapon",
-        subtarget: "simple_melee",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.barbarian.proficiencies.weapon",
-        subtarget: "simple_ranged",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.barbarian.proficiencies.weapon",
-        subtarget: "martial_melee",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.barbarian.proficiencies.weapon",
-        subtarget: "martial_ranged",
+        subtarget: [
+          "simple_melee", 
+          "simple_ranged", 
+          "martial_melee",
+          "martial_ranged"
+        ],
         target: "weapon",
         type: "proficiency"
       },
       {
         origin: "class.barbarian.proficiencies.saving_throw",
-        subtarget: "strength",
-        target: "saving_throw",
-        type: "proficiency"
-      },
-      {
-        origin: "class.barbarian.proficiencies.saving_throw",
-        subtarget: "constitution",
+        subtarget: ["strength", "constitution"],
         target: "saving_throw",
         type: "proficiency"
       },
@@ -447,7 +416,7 @@ export const classes = Object.freeze({
     casting_ability: "charisma",
     spell_knowledge: "learn",
     ritual_casting: true,
-    spellcasting_focus: "You can use a musical instrument as a spellcasting focus for your bard spells.",
+    spellcasting_focus: "musical instrument",
     skills: ["*"],
     skill_count: 3,
     asi: [4, 8, 12, 16, 19],
@@ -581,55 +550,26 @@ export const classes = Object.freeze({
     modifiers: [
       {
         origin: "class.bard.proficiencies.armor",
-        subtarget: "light",
+        subtarget: ["light"],
         target: "armor",
         type: "proficiency"
       },
       {
         origin: "class.bard.proficiencies.weapon",
-        subtarget: "simple_melee",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.bard.proficiencies.weapon",
-        subtarget: "simple_ranged",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.bard.proficiencies.weapon",
-        subtarget: "hand_crossbow",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.bard.proficiencies.weapon",
-        subtarget: "longsword",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.bard.proficiencies.weapon",
-        subtarget: "rapier",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.bard.proficiencies.weapon",
-        subtarget: "shortsword",
+        subtarget: [
+          "simple_melee",
+          "simple_ranged",
+          "hand_crossbow",
+          "longsword",
+          "rapier",
+          "shortsword"
+        ],
         target: "weapon",
         type: "proficiency"
       },
       {
         origin: "class.bard.proficiencies.saving_throw",
-        subtarget: "dexterity",
-        target: "saving_throw",
-        type: "proficiency"
-      },
-      {
-        origin: "class.bard.proficiencies.saving_throw",
-        subtarget: "charisma",
+        subtarget: ["dexterity", "charisma"],
         target: "saving_throw",
         type: "proficiency"
       },
@@ -641,9 +581,9 @@ export const classes = Object.freeze({
     casting_ability: "wisdom",
     spell_knowledge: "know_prepare",
     ritual_casting: true,
-    spellcasting_focus: "You can use a holy symbol as a spellcasting focus for your cleric spells.",
+    spellcasting_focus: "holy symbol",
     skills: [
-      "history", 
+      "history",
       "insight",
       "medicine",
       "persuasion",
@@ -727,14 +667,14 @@ export const classes = Object.freeze({
           "throw against your Turn Undead feature, the "+
           "creature is instantly destroyed if its challenge rating "+
           "is at or below a certain threshold, as shown in the "+
-          "Destroy Undead table."+
-          "### Destroy Undead"+
-          "| Cleric Level | Destroys Undead of CR... |"+
-          "|--------------|--------------------------|"+
-          "|      5th     | 1/2 or lower             |"+
-          "|      8th     | 1 or lower               |"+
-          "|      11th    | 2 or lower               |"+
-          "|      14th    | 3 or lower               |"+
+          "Destroy Undead table.\n"+
+          "### Destroy Undead\n"+
+          "| Cleric Level | Destroys Undead of CR... |\n"+
+          "|--------------|--------------------------|\n"+
+          "|      5th     | 1/2 or lower             |\n"+
+          "|      8th     | 1 or lower               |\n"+
+          "|      11th    | 2 or lower               |\n"+
+          "|      14th    | 3 or lower               |\n"+
           "|      17th    | 4 or lower               |",
         index: "destroy-undead"
       },
@@ -762,43 +702,19 @@ export const classes = Object.freeze({
     modifiers: [
       {
         origin: "class.cleric.proficiencies.armor",
-        subtarget: "light",
-        target: "armor",
-        type: "proficiency"
-      },
-      {
-        origin: "class.cleric.proficiencies.armor",
-        subtarget: "medium",
-        target: "armor",
-        type: "proficiency"
-      },
-      {
-        origin: "class.cleric.proficiencies.armor",
-        subtarget: "shield",
+        subtarget: ["light", "medium", "shield"],
         target: "armor",
         type: "proficiency"
       },
       {
         origin: "class.cleric.proficiencies.weapon",
-        subtarget: "simple_melee",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.cleric.proficiencies.weapon",
-        subtarget: "simple_ranged",
+        subtarget: ["simple_melee", "simple_ranged"],
         target: "weapon",
         type: "proficiency"
       },
       {
         origin: "class.cleric.proficiencies.saving_throw",
-        subtarget: "wisdom",
-        target: "saving_throw",
-        type: "proficiency"
-      },
-      {
-        origin: "class.cleric.proficiencies.saving_throw",
-        subtarget: "charisma",
+        subtarget: ["wisdom", "charisma"],
         target: "saving_throw",
         type: "proficiency"
       },
@@ -806,21 +722,216 @@ export const classes = Object.freeze({
   },
   druid: {
     hit_dice: 8,
-    caster_type: null,
-    skills: [],
+    caster_type: "full",
+    casting_ability: "wisdom",
+    spell_knowledge: "know_prepare",
+    ritual_casting: true,
+    spellcasting_focus: "druidic focus",
+    skills: [
+      "arcana",
+      "animal Handling",
+      "insight",
+      "medicine",
+      "nature",
+      "perception",
+      "religion",
+      "survival"
+    ],
     skill_count: 2,
-    asi: [],
-    features: [],
-    modifiers: []
+    asi: [4, 8, 12, 16, 19],
+    features: [
+      {
+        name: "Wild Shape",
+        level: 2,
+        source: "phb 66",
+        description: "You can use your action to "+
+          "magically assume the shape of a beast that you have "+
+          "seen before. You can use this feature twice. You "+
+          "regain expended uses when you finish a short or "+
+          "long rest.\n"+
+          "Your druid level determines the beasts you can "+
+          "transform into, as shown in the Beast Shapes table. "+
+          "At 2nd level, for example, you can transform into any "+
+          "beast that has a challenge rating of 1/4 or lower that "+
+          "doesn't have a flying or swimming speed.\n"+
+          "### Beast Shapes\n"+
+          "| Level | Max. CR |          Limitations        |   Example   |\n"+
+          "| ----- | ------- | --------------------------- | ----------- |\n"+
+          "|  2nd  |   1/4   | No flying or swimming speed |     Wolf    |\n"+
+          "|  4th  |   1/2   |        No flying speed      |  Crocodile  |\n"+
+          "|  8th  |    1    |               —             | Giant eagle |\n\n"+
+          "You can stay in a beast shape for a number of "+
+          "hours equal to half your druid level (rounded down). "+
+          "You then revert to your normal form unless you "+
+          "expend another use of this feature. You can revert to "+
+          "your normal form earlier by using a bonus action on "+
+          "your turn. You automatically revert if you fall "+
+          "unconscious, drop to 0 hit points, or die.\n"+
+          "While you are transformed, the following rules "+
+          "apply:\n\n"+
+          "* Your game statistics are replaced by the statistics "+
+          "of the beast, but you retain your alignment, "+
+          "personality, and Intelligence, Wisdom, and "+
+          "Charisma scores. You also retain all of your skill "+
+          "and saving throw proficiencies, in addition to "+
+          "gaining those of the creature. If the creature has "+
+          "the same proficiency as you and the bonus in its "+
+          "stat block is higher than yours, use the creature's "+
+          "bonus instead of yours. If the creature has any "+
+          "legendary or lair actions, you can't use them.\n"+
+          "* When you transform, you assume the beast's hit "+
+          "points and Hit Dice. When you revert to your "+
+          "normal form, you return to the number of hit "+
+          "points you had before you transformed. However, "+
+          "if you revert as a result of dropping to 0 hit points, "+
+          "any excess damage carries over to your normal "+
+          "form. For example, if you take 10 damage in "+
+          "animal form and have only 1 hit point left, you "+
+          "revert and take 9 damage. As long as the excess "+
+          "damage doesn't reduce your normal form to 0 hit "+
+          "points, you aren't knocked unconscious.\n"+
+          "* You can't cast spells, and your ability to speak or "+
+          "take any action that requires hands is limited to "+
+          "the capabilities of your beast form. Transforming "+
+          "doesn't break your concentration on a spell you've "+
+          "already cast, however, or prevent you from taking "+
+          "actions that are part of a spell, such as call "+
+          "lightning, that you've already cast.\n"+
+          "* You retain the benefit of any features from your "+
+          "class, race, or other source and can use them if the "+
+          "new form is physically capable of doing so. "+
+          "However, you can't use any of your special senses, "+
+          "such as darkvision, unless your new form also has "+
+          "that sense.\n"+
+          "* You choose whether your equipment falls to the "+
+          "ground in your space, merges into your new form, "+
+          "or is worn by it. Worn equipment functions as "+
+          "normal, but the GM decides whether it is practical "+
+          "for the new form to wear a piece of equipment, "+
+          "based on the creature's shape and size. Your "+
+          "equipment doesn't change size or shape to match "+
+          "the new form, and any equipment that the new "+
+          "form can't wear must either fall to the ground or "+
+          "merge with it. Equipment that merges with the "+
+          "form has no effect until you leave the form",
+        index: "wild-shape"
+      },
+      {
+        name: "Druid Circle",
+        level: 2,
+        source: "phb 67",
+        description: "You choose to identify with a circle of "+
+          "druids, such as the Circle of the Land. Your choice "+
+          "grants you features at 2nd level and again at 6th, 10th, and 14th level.",
+        index: "druid-circle"
+      },
+      {
+        name: "Timeless Body",
+        level: 18,
+        source: "phb 67",
+        description: "The primal magic that you "+
+          "wield causes you to age more slowly. For every 10 "+
+          "years that pass, your body ages only 1 year.",
+        index: "timeless-body"
+      },
+      {
+        name: "Beast Spells",
+        level: 18,
+        source: "phb 67",
+        description: "Beginning at 18th level, you can cast many of your "+
+          "druid spells in any shape you assume using Wild "+
+          "Shape. You can perform the somatic and verbal "+
+          "components of a druid spell while in a beast shape, "+
+          "but you aren't able to provide material components.",
+        index: "beast-spells"
+      },
+      {
+        name: "Archdruid",
+        level: 20,
+        source: "phb 67",
+        description: "You can use your Wild Shape an "+
+          "unlimited number of times.\n"+
+          "Additionally, you can ignore the verbal and "+
+          "somatic components of your druid spells, as well as "+
+          "any material components that lack a cost and aren't "+
+          "consumed by a spell. You gain this benefit in both "+
+          "your normal shape and your beast shape from Wild Shape.",
+        index: "archdruid"
+      },
+    ],
+    modifiers: [
+      {
+        origin: "class.druid.proficiencies.armor",
+        subtarget: ["light", "medium", "shield"],
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.druid.proficiencies.weapon",
+        subtarget: [
+          "club",
+          "dagger",
+          "dart",
+          "javelin",
+          "mace",
+          "quarterstaff",
+          "scimitar",
+          "sickle",
+          "sling",
+          "spear"
+        ],
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.druid.proficiencies.saving_throw",
+        subtarget: ["intelligence", "wisdom"],
+        target: "saving_throw",
+        type: "proficiency"
+      },
+    ]
   },
   fighter: {
     hit_dice: 10,
     caster_type: null,
-    skills: [],
+    skills: [
+      "acrobatics",	
+      "animal	Handling",
+      "athletics",
+      "history",
+      "insight",
+      "intimidation",	
+      "perception",
+      "survival"
+    ],
     skill_count: 2,
-    asi: [],
+    asi: [4, 6, 8, 12, 14, 16, 19],
     features: [],
-    modifiers: []
+    modifiers: [
+      {
+        origin: "class.fighter.proficiencies.armor",
+        subtarget: ["*"],
+        target: "armor",
+        type: "proficiency"
+      },
+      {
+        origin: "class.fighter.proficiencies.weapon",
+        subtarget: [
+          "simple_melee", 
+          "simple_ranged",
+          "martial_melee",
+          "martial_ranged"
+        ],
+        target: "weapon",
+        type: "proficiency"
+      },
+      {
+        origin: "class.fighter.proficiencies.saving_throw",
+        subtarget: ["strength", "constitution"],
+        target: "saving_throw",
+        type: "proficiency"
+      },
+    ]
   },
   monk: {
     hit_dice: 8,
@@ -1092,25 +1203,13 @@ export const classes = Object.freeze({
     modifiers: [
       {
         origin: "class.monk.proficiencies.weapon",
-        subtarget: "simple_melee",
-        target: "weapon",
-        type: "proficiency"
-      },
-      {
-        origin: "class.monk.proficiencies.weapon",
-        subtarget: "short_sword",
+        subtarget: ["simple_melee", "simple_ranged", "short_sword"],
         target: "weapon",
         type: "proficiency"
       },
       {
         origin: "class.monk.proficiencies.saving_throw",
-        subtarget: "strength",
-        target: "saving_throw",
-        type: "proficiency"
-      },
-      {
-        origin: "class.monk.proficiencies.saving_throw",
-        subtarget: "dexterity",
+        subtarget: ["strength", "dexterity"],
         target: "saving_throw",
         type: "proficiency"
       },
@@ -1130,8 +1229,6 @@ export const classes = Object.freeze({
         name: "Unarmored Movement",
         type: "bonus",
         target: "speed",
-        subtarget: null,
-        ability_modifier: null,
         restrictions: [
           "no_armor",
           "no_shield"

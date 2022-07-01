@@ -35,7 +35,7 @@
 						<div class="form-item">
 							<q-select dark filled square map-options emit-value v-model="modifier.type" :options="modifier_types" label="Type" />
 						</div>
-						<small class="d-block mt-1" v-if="modifier.type"><b>{{ modifier.type.capitalize() }}</b>: {{ type_info[modifier.type] }}</small>
+						<small class="d-block mt-1" v-if="modifier.type"><strong>{{ modifier.type.capitalize() }}</strong>: {{ type_info[modifier.type] }}</small>
 
 						<template v-if="modifier.type">
 							<!-- TARGET -->
@@ -50,6 +50,7 @@
 									map-options emit-value 
 									v-model="modifier.subtarget" 
 									:options="abilities" 
+									multiple
 									label="Ability"
 								/>
 							</div>
@@ -62,6 +63,7 @@
 									map-options emit-value 
 									option-value="value"
 									option-label="skill" v-model="modifier.subtarget" 
+									multiple
 									:options="Object.values(skillList)" 
 									label="Skill"
 								/>
@@ -98,7 +100,14 @@
 
 							<!-- ARMOR -->
 							<div class="form-item mb-3" v-if="modifier.target === 'armor'">
-								<q-select dark filled square map-options emit-value v-model="modifier.subtarget" :options="armor_types" label="Armor" />
+								<q-select 
+									dark filled square 
+									map-options emit-value 
+									v-model="modifier.subtarget" 
+									:options="armor_types" 
+									multiple
+									label="Armor"
+								/>
 							</div>
 							
 							<!-- VALUE -->
@@ -138,7 +147,7 @@
 								</p>
 							</div>
 
-							<!-- ABILITES -->
+							<!-- ABILITIES -->
 							<div class="form-item mb-3" v-if="modifier.type === 'ability'">
 								<q-select 
 									dark filled square 
@@ -170,7 +179,7 @@
 
 					<!-- SCALING -->
 					<div v-else>
-						<a @click="scaling = false"><i class="fas fa-chevron-left"></i> Edit modifier</a>
+						<a @click="scaling = false"><i class="fas fa-chevron-left" aria-hidden="true" /> Edit modifier</a>
 						<p class="mt-3">
 							<strong>{{ modifier.name }} level scaling</strong><br/>
 							Set how the value of this modifier changes as your character levels.
@@ -208,7 +217,13 @@
 
 						<!-- SCALING TYPE -->
 						<div class="form-item mb-3">
-							<q-select dark filled square map-options emit-value v-model="modifier.scaling_type" :options="scaling_types" label="Scaling type" />
+							<q-select 
+								dark filled square 
+								map-options emit-value 
+								v-model="modifier.scaling_type" 
+								:options="scaling_types" 
+								label="Scaling type"
+							/>
 						</div>
 						
 						<!-- LEVEL SCALING -->
@@ -444,7 +459,7 @@
 				const modifier = this.modifier;
 
 				// If there is an index property present we know we have to edit an existing modifier
-				if(modifier.index) {
+				if(modifier.hasOwnProperty("index")) {
 					this.character.edit_modifier(modifier);
 				}
 				// Create new

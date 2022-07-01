@@ -4,8 +4,6 @@ import { Cookies } from 'quasar';
 export default async ({ app, router, store, Vue }) => {	
 	// Check if user is connected
 	auth.onAuthStateChanged(user => {
-		console.log("onAuthStateChanged")
-
 		if(user) {
 			const uid = user.uid;
 			const userStatusDatabaseRef = db.ref(`/status/${uid}`);

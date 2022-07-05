@@ -25,16 +25,16 @@ jobs:
           cache: 'npm'
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
-      
+
       - name: Create env file
         run: |
             cat << EOF >> .env.production.local
             ${{ secrets.STAGING_ENV_FILE }}
             EOF
-      
+
       # - run: npm run build in debug mode --if-present
       - run: quasar build -m ssr -d --if-present
-      
+
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry Docker Hub
@@ -60,5 +60,7 @@ jobs:
           context: .
           push: true
           tags: harmlesskey/harmlesskey_staging
-
+          secrets: |
+            "PM2_PUBLIC=${{ secrets.PM2_PUBLIC }}"
+            "PM2_SECRET=${{ secrets.PM2_SECRET }}"
 

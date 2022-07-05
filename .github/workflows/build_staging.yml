@@ -23,7 +23,6 @@ jobs:
         with:
           node-version: '12'
           cache: 'npm'
-      - run: node -v
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
 

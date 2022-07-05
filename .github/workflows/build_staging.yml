@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: '12'
           cache: 'npm'
+      - run: node -v
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
 
@@ -60,7 +61,4 @@ jobs:
           context: .
           push: true
           tags: harmlesskey/harmlesskey_staging
-          secrets: |
-            "PM2_PUBLIC=${{ secrets.PM2_PUBLIC }}"
-            "PM2_SECRET=${{ secrets.PM2_SECRET }}"
 

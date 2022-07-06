@@ -24,7 +24,8 @@ module.exports = function (/* ctx */) {
       'hk-components',
       'vee-validate',
       { path: 'firebase-auth', server: false },
-      { path: "vue-shortkey", server: false }
+      { path: "vue-shortkey", server: false },
+      { path: "vue-snotify", server: false }
     ],
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

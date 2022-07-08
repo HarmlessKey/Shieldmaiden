@@ -37,8 +37,10 @@
 			</div>
 		</transition>
 		
-		<vue-snotify />
-		<HkRolls />
+		<no-ssr>
+			<vue-snotify />
+			<HkRolls />
+		</no-ssr>
 
 		<!-- Announcements -->
 		<q-dialog v-model="announcement" position="top" persistent>
@@ -288,17 +290,6 @@
 		await store.dispatch("initialize");
 	},
 	async mounted() {
-		auth.onAuthStateChanged(user => {
-			if (user) {
-				auth.currentUser.getIdToken(true).then(async token => {
-					this.$q.cookies.set('access_token', token);
-				})
-			}
-			else {
-				this.$q.cookies.remove('access_token');
-			}
-		});
-
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {

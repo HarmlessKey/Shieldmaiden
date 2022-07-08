@@ -15,6 +15,8 @@ const express = require('express')
 const morgan = require('morgan');
 const compression = require('compression')
 
+const heapdump = require('heapdump')
+
 const ssr = require('quasar-ssr')
 const extension = require('./extension')
 const app = express()

@@ -1,5 +1,5 @@
 {
-  "version": "2.3.4",
+  "version": "2.3.10",
   "name": "harmless_key",
   "description": "A Dungeons and Dragons Combat Tracker",
   "productName": "Harmless Key",
@@ -32,6 +32,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "firebase": "^8.0.0",
+    "heapdump": "^0.3.15",
     "helmet": "^5.0.2",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",

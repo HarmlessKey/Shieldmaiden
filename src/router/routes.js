@@ -5,7 +5,6 @@ const Documentation = () => import('src/views/Pages/Documentation.vue');
 const Updates = () => import('src/views/Pages/Updates.vue');
 const SignIn = () => import('src/views/Pages/SignIn.vue');
 const SignUp = () => import('src/views/Pages/SignUp.vue');
-const Settings = () => import('src/views/UserContent/Settings.vue');
 const ResetPassword = () => import('src/views/Pages/ResetPassword.vue');
 const Patreon = () => import('src/views/Pages/Patreon.vue');
 const WeatherDemo = () => import('src/views/Pages/WeatherDemo.vue');
@@ -446,6 +445,26 @@ const routes = [
 						meta: {
 							title: "Followed users",
 							description: "Other users you're following on Harmless Key."
+						}
+					}
+				]
+			},
+
+			// Settings
+			{
+				path: 'settings',
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: 'Settings',
+				},
+				children: [
+					{
+						path: '',
+						name: "Settings",
+						component: () => import('src/views/UserContent/Settings.vue'),
+						meta: {
+							title: "Settings",
+							description: "Your custom settings for Harmless Key."
 						}
 					}
 				]
@@ -963,16 +982,6 @@ const routes = [
 		}
 	},
 	{
-		path: '/settings',
-		name: 'settings',
-		component: Settings,
-		meta: {
-			basePath: '/settings',
-			title: 'Settings',
-			requiresAuth: true
-		}
-	},
-	{
 		path: '/set-username',
 		name: 'Username',
 		component: Username,
@@ -1030,6 +1039,7 @@ const routes = [
 	{ path: "/items", redirect: "/content/items" },
 	{ path: "/encounters/*", redirect: "/content/campaigns" },
 	{ path: "/followed", redirect: "/content/followed" },
+	{ path: "/settings", redirect: "/content/settings" },
 
   // Always leave this as last one,
   // but you can also remove it

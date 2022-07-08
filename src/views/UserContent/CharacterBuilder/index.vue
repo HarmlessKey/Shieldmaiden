@@ -66,14 +66,19 @@
 	import ContentHeader from "src/components/userContent/ContentHeader";
 
 	export default {
-		name: 'Characters',
+		name: 'CharacterBuilder',
 		mixins: [experience],
 		components: {
 			ContentHeader
 		},
-		metaInfo: {
-			title: 'Characters Alpha'
-		},
+		preFetch({ store, redirect }) {
+			if(store.getters.userInfo && store.getters.userInfo.admin) {
+				return;
+			}
+      if(!store.getters.userInfo || !store.getters.userInfo.contribute || !store.getters.userInfo.contribute.includes("character-builder")) {
+				redirect('/');
+			} 
+    },
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,

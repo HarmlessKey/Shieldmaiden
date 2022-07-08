@@ -26,7 +26,7 @@
 							:label="label"
 							:name="value"
 							:disabled="disabled"
-							:to="`/content/characters-alpha/${characterId}/${value}`"
+							:to="`/content/character-builder/${characterId}/${value}`"
 							:key="`tab-${i}`"
 						/>
 					</q-tabs>

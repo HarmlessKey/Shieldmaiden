@@ -384,7 +384,7 @@
 															<strong>Armor</strong>: {{ proficiencies[classIndex].armor.subtarget ? proficiencies[classIndex].armor.subtarget.join(", ") : "None" }}<br/>
 															<strong>Weapons</strong>: {{ proficiencies[classIndex].weapon.subtarget ? proficiencies[classIndex].weapon.subtarget.join(", ") : "None" }}<br/>
 															<template v-if="classIndex == 0">
-																<strong>Saving throws</strong>: {{ proficiencies[classIndex].saving_throw.subtarget.join(", ") }}<br/>
+																<strong>Saving throws</strong>: {{ proficiencies[classIndex].saving_throw ? proficiencies[classIndex].saving_throw.subtarget.join(", ") : "None" }}<br/>
 															</template>
 															<strong>Skills</strong>: 
 															{{ 

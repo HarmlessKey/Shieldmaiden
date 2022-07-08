@@ -72,14 +72,14 @@
 								Characters
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/content/characters-alpha">
+						<q-item clickable v-ripple to="/content/character-builder" v-if="userInfo && ((userInfo.contribute && userInfo.contribute.includes('character-builder')) || userInfo.admin)">
 							<q-item-section avatar>
 								<i class="fad fa-helmet-battle" aria-hidden="true" />
 							</q-item-section>
 							<q-item-section class="title">Character builder</q-item-section>
 							<q-item-section avatar><q-badge>Alpha</q-badge></q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-								Characters builder
+								Character builder
 							</q-tooltip>
 						</q-item>
 						<q-item clickable v-ripple to="/content/followed">
@@ -191,6 +191,7 @@
 		props: ["smallScreen"],
 		data() {
 			return {
+				userInfo: this.$store.getters.userInfo,
 				man_col: false,
 				social_media: [
 					{

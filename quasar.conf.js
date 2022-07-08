@@ -20,9 +20,9 @@ module.exports = function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v1.quasar.dev/quasar-cli/boot-files
     boot: [
-      'plugins',
-      'hk-components',
-      'vee-validate',
+      { path: 'plugins', server: false },
+      { path: 'hk-components', server: false },
+      { path: 'vee-validate', server: false },
       { path: 'firebase-auth', server: false },
       { path: "vue-shortkey", server: false },
       { path: "vue-snotify", server: false }

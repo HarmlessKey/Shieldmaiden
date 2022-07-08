@@ -895,18 +895,138 @@ export const classes = Object.freeze({
     hit_dice: 10,
     caster_type: null,
     skills: [
-      "acrobatics",	
-      "animal	Handling",
+      "acrobatics",
+      "animal Handling",
       "athletics",
       "history",
       "insight",
-      "intimidation",	
+      "intimidation", 
       "perception",
       "survival"
     ],
     skill_count: 2,
     asi: [4, 6, 8, 12, 14, 16, 19],
-    features: [],
+    features: [
+      {
+        name: "Fighting Style",
+        level: 1,
+        source: "phb 72",
+        description: "You adopt a particular style of fighting as your "+
+          "specialty. Choose one of the following options. You "+
+          "can't take a Fighting Style option more than once, "+
+          "even if you later get to choose again.",
+        options: [
+          "archery",
+          "defense",
+          "dueling",
+          "great-weapon-fighting",
+          "protection",
+          "two-weapon-fighting"
+        ],
+        option_limit: 1,
+        index: "fighting-style"
+      },
+      {
+        name: "Second Wind",
+        level: 1,
+        source: "phb 72",
+        description: "You have a limited well of stamina that you can draw "+
+          "on to protect yourself from harm. On your turn, you "+
+          "can use a bonus action to regain hit points equal to "+
+          "1d10 + your fighter level ([class_level]). Once you use this feature, "+
+          "you must finish a short or long rest before you can "+
+          "use it again.",
+        index: "second-wind"
+      },
+      {
+        name: "Action Surge",
+        level: 2,
+        source: "phb 72",
+        description: "You can push yourself beyond "+
+          "your normal limits for a moment. On your turn, you "+
+          "can take one additional action on top of your regular "+
+          "action and a possible bonus action.\n"+
+          "Once you use this feature, you must finish a short "+
+          "or long rest before you can use it again. Starting at "+
+          "17th level, you can use it twice before a rest, but only "+
+          "once on the same turn.",
+        index: "action-surge"
+      },
+      {
+        name: "Martial Archetype",
+        level: 3,
+        source: "phb 72",
+        description: "You choose an archetype that you strive "+
+          "to emulate in your combat styles and techniques, "+
+          "such as Champion. The archetype you choose grants "+
+          "you features at 3rd level and again at 7th, 10th, 15th, "+
+          "and 18th level.",
+        index: "martial-archetype"
+      },
+      {
+        name: "Extra Attack",
+        level: 5,
+        source: "phb 72",
+        description: "You can attack twice, instead "+
+          "of once, whenever you take the Attack action on your "+
+          "turn.\n"+
+          "The number of attacks increases to three when "+
+          "you reach 11th level in this class and to four when "+
+          "you reach 20th level in this class.",
+        index: "extra-attack"
+      },
+      {
+        name: "Indomitable",
+        level: 9,
+        source: "phb 72",
+        description: "You can reroll a saving throw "+
+          "that you fail. If you do so, you must use the new roll, "+
+          "and you can't use this feature again until you finish a "+
+          "long rest.\n"+
+          "You can use this feature twice between long rests "+
+          "starting at 13th level and three times between long "+
+          "rests starting at 17th level.",
+        index: "indomitable"
+      },
+    ],
+    feature_options: {
+      archery: {
+        name: "Archery",
+        description: "You gain a +2 bonus to attack rolls you make with ranged weapons."
+      },
+      defense: {
+        name: "Defense",
+        description: "While you are wearing armor, you gain a +1 bonus to AC."
+      },
+      archery: {
+        name: "Archery",
+        description: "When you are wielding a melee weapon in one hand "+
+          "and no other weapons, you gain a +2 bonus to "+
+          "damage rolls with that weapon."
+      },
+      archery: {
+        name: "Archery",
+        description: "When you roll a 1 or 2 on a damage die for an attack "+
+          "you make with a melee weapon that you are "+
+          "wielding with two hands, you can reroll the die and "+
+          "must use the new roll, even if the new roll is a 1 or a "+
+          "2. The weapon must have the two-handed or "+
+          "versatile property for you to gain this benefit"
+      },
+      archery: {
+        name: "Archery",
+        description: "When a creature you can see attacks a target other "+
+          "than you that is within 5 feet of you, you can use "+
+          "your reaction to impose disadvantage on the attack "+
+          "roll. You must be wielding a shield."
+      },
+      archery: {
+        name: "Archery",
+        description: "When you engage in two-weapon fighting, you can "+
+          "add your ability modifier to the damage of the "+
+          "second attack."
+      },
+    },
     modifiers: [
       {
         origin: "class.fighter.proficiencies.armor",

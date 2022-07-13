@@ -36,7 +36,7 @@
 
 				<!-- AVATAR -->
 				<div class="avatar mb-2">
-					<div class="img" :style="{ backgroundImage: npc.avatar ? 'url(\'' + npc.avatar + '\')' : '' }">
+					<div class="img" @click="avatar_dialog = true" :style="{ backgroundImage: npc.avatar ? 'url(\'' + npc.avatar + '\')' : '' }">
 						<i aria-hidden="true" v-if="!npc.avatar" class="hki-monster" />
 					</div>
 					<div>
@@ -318,6 +318,32 @@
 				</div>
 			</div>
 		</hk-card>
+
+		<q-dialog v-model="avatar_dialog">
+			<hk-card :min-width="300">
+				<div slot="header" class="card-header">
+					Add avatar
+					<q-btn icon="close" no-caps flat dense v-close-popup />
+				</div>
+				<div class="card-body">
+					<hk-image-uploader />
+					<hr />
+					Enter an image url
+					<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							label="Image URL"
+							autocomplete="off"  
+							type="text" 
+							v-model="npc.avatar" 
+							maxLength="2000"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+					</ValidationProvider>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -334,6 +360,12 @@
 			monsterMixin,
 			languages,
 		],
+		data() {
+			return {
+				avatar_dialog: false,
+				upload: {}
+			}
+		},
 		computed: {
 			npc: {
 				get() {
@@ -382,9 +414,13 @@
 			color: $neutral-2;
 			background-color: $neutral-9;
 			font-size: 45px;
+			cursor: pointer;
 
 			i::before {
 				vertical-align: 5px;
+			}
+			&:hover {
+				border-color: $blue;
 			}
 		}
 	}

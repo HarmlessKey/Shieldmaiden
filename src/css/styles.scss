@@ -21,6 +21,7 @@
 	7. Snotify overrides
 	8. Custom scrollbars
 	9. Number field
+	10. Croppa
 */
 
 /* 2. Defaults */
@@ -2066,11 +2067,20 @@ html body {
 		-moz-appearance: textfield;
 	}
 
+	/* 10. CROPPA */
+	/*********************************************/
+	.croppa-container {
+		canvas {
+			border: solid 1px $neutral-2;
+			background-color: $neutral-8 !important;
+		}
+	}
 
-	/* QUASAR */
+	/* 11. QUASAR */
 	/*********************************************/
 	.q-pagination {
 		justify-content: center;
+
 		.q-btn {
 			background-color: $neutral-8;
 			margin-left: 1px;
@@ -2158,6 +2168,8 @@ html body {
 	.q-notifications__list--top {
 		top: 120px;
 	}
+
+
 
 	//RESPONSIVENESS
 	/*-----------------------------------*/

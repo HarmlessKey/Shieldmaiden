@@ -37,10 +37,10 @@
 			</div>
 		</transition>
 		
-		<no-ssr>
+		<q-no-ssr>
 			<vue-snotify />
 			<HkRolls />
-		</no-ssr>
+		</q-no-ssr>
 
 		<!-- Announcements -->
 		<q-dialog v-model="announcement" position="top" persistent>

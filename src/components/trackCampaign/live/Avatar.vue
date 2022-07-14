@@ -41,27 +41,25 @@
 				img = encounterImg;
 			} else {
 				if(!entity.entityType) {
-					let playerImg = (this.players && this.players[entity.key]) ? this.players[entity.key].avatar : entity.avatar;
+					let playerImg = (this.players && this.players[entity.key]) ? this.players[entity.key].storage_avatar || this.players[entity.key].avatar : entity.avatar;
 					img = playerImg || 'player';
 				}
 				else if(entity.id) {
 					if(entity.entityType == 'player') {
 						const player = this.players[entity.key];
-						let playerImg = (player) ? player.avatar : undefined;
+						let playerImg = (player) ? player.storage_avatar || player.avatar : undefined;
 						img = playerImg || 'player';
 					}
 					if(entity.entityType == 'companion') {
 						const npc = this.npcs[entity.key];
-						let companionImg = (npc) ? npc.avatar : undefined;
+						let companionImg = (npc) ? npc.storage_avatar || npc.avatar : undefined;
 						img = companionImg || 'companion';
-						
 					}
 					if(entity.entityType == 'npc') {		
-						const npc = this.npcs[entity.key];				
+						const npc = this.npcs[entity.id];				
 						if(entity.npc == 'custom') {
-							let npcImg = (npc) ? npc.avatar : undefined;
+							let npcImg = (npc) ? npc.storage_avatar || npc.avatar : undefined;
 							img = npcImg || 'monster';
-
 						} else {
 							img = 'monster';
 						}

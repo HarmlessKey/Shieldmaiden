@@ -2,22 +2,21 @@
 	<div>
 		<div class="label">
 			Upload an image
-			<div v-if="type === 'upload'">
-				<q-btn no-caps flat icon="info" @click="info" size="sm" />
-				<q-btn no-caps flat icon="close" @click="upload.remove()" size="sm" />
+			<div v-if="using_upload">
+				<q-btn no-caps flat dense icon="close" size="sm" @click="stopUpload" class="red" />
 			</div>
 		</div>
-		<div class="d-flex">
+		<div>
 			<croppa 
 				v-model="upload"
-				:width="240"
-				:height="240"
+				:width="250"
+				:height="250"
 				placeholder="Choose an image"
 				:placeholder-font-size="0"
 				:disabled="false"
 				:prevent-white-space="true"
 				:show-remove-button="false"
-				@file-choose="type = 'upload'"
+				@file-choose="startUpload"
 				@image-remove="type = 'url'"
 			/>
 			<!-- <q-slider
@@ -29,7 +28,7 @@
         reverse
       /> -->
 		</div>
-		<div class="d-flex justify-content-center" v-if="type === 'upload'">
+		<div class="d-flex justify-content-center" v-if="using_upload">
 			<q-btn no-caps flat icon="fas fa-undo" @click="upload.rotate(-1)" size="sm">
 				<q-tooltip anchor="top middle" self="center middle">
 					Rotate
@@ -46,13 +45,10 @@
 				</q-tooltip>
 			</q-btn>
 		</div>
-		<img v-if="img" :src="img" alt="Preview" />
 	</div>
 </template>
 
 <script>
-	import { storage } from "src/firebase";
-
 	export default {
 		name: "hk-image-uploader",
 		props: {
@@ -67,34 +63,43 @@
 		},
 		data() {
 			return {
-				type: "url",
+				using_upload: false,
 				upload: {},
-				blob: undefined,
 				img: undefined,
 				zoom: 0
 			}
 		},
 		methods: {
-			info() {
-				const img = new Image();
+			startUpload() {
+				this.using_upload = true;
+				this.$emit("using-upload", true);
+			},
+			stopUpload() {
+				this.upload.remove();
+				this.using_upload = false;
+				this.$emit("using-upload", false);
+			},
+			async accept() {
+				console.log("accept")
+				const img = new Image(); // Create a new blank image
+
+				// Set the cropped image as the src for the blank image
 				img.src = this.upload.generateDataUrl("image/webp");
-				const canvas = document.createElement('canvas');
 
-				canvas.width = this.width;
-				canvas.height = this.height;
-				const ctx = canvas.getContext('2d');
-				ctx.drawImage(img, 0, 0, this.width, this.height);
-
-				this.img = canvas.toDataURL();
-				canvas.toBlob((blob) => {
-					this.blob = blob;
-				}, "image/webp");
-
-				const storageRef = storage.ref();
-				const imageRef = storageRef.child("npcs/test.webp");
-				imageRef.put(this.blob).then((snapshot) => {
-					console.log("uploaded blob");
-				}); 
+				// Resize the image to given dimensions and emit the blob + dataUrl
+				// The blob can be uploaded to firebase
+				// The dataUrl can be used to show a preview
+				img.onload = () => {
+					const canvas = document.createElement('canvas');
+					canvas.width = this.width;
+					canvas.height = this.height;
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(img, 0, 0, this.width, this.height);
+	
+					canvas.toBlob((blob) => {
+						this.$emit("accept", { blob: blob, dataUrl: canvas.toDataURL() });
+					}, "image/webp");
+				}
 			}
 		}
 	}

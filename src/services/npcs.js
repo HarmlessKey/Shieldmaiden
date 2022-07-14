@@ -1,7 +1,8 @@
-import { db } from "src/firebase";
+import { db, storage } from "src/firebase";
 
 const NPCS_REF = db.ref("npcs");
 const SEARCH_NPCS_REF = db.ref("search_npcs");
+const STORAGE_REF = storage.ref("npcs");
 
 /**
  * NPC Firebase Service
@@ -68,8 +69,19 @@ export class npcServices {
   async addNpc(uid, npc, search_npc) {
     try {
       npc.name = npc.name.toLowerCase();
-      const newNpc = await NPCS_REF.child(uid).push(npc);
+
+      // If there is an image upload save the blob in separate prop en then delete it from the NPC
+      const blob = npc.blob;
+      delete npc.blob;
       
+      // Save the new NPC
+      const newNpc = await NPCS_REF.child(uid).push(npc);
+
+      // Upload image
+      if(blob) {
+        STORAGE_REF.child(`${uid}/${newNpc.key}.webp`).put(blob);
+      }
+    
       // Update search_npcs
       SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
 
@@ -89,7 +101,25 @@ export class npcServices {
    */
   async editNpc(uid, id, npc, search_npc) {
     try {
+      npc.name = npc.name.toLowerCase();
+
+      // If there is an image upload save the blob in separate prop en then delete it from the NPC
+      const blob = npc.blob;
+      delete npc.blob;
+      
       await NPCS_REF.child(uid).child(id).set(npc);
+
+      // Upload image
+      const image_ref = STORAGE_REF.child(`${uid}/${id}.webp`);
+      if(blob) {
+        image_ref.put(blob);
+      }
+      
+      // Delete the image when there is no blob and !storage_avatar
+      else if(!npc.storage_avatar) {
+        image_ref.delete();
+      }
+
       await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
     } catch(error) {
       throw error;
@@ -124,9 +154,15 @@ export class npcServices {
   async deleteNpc(uid, id) {
     try {
       NPCS_REF.child(uid).child(id).remove();
-
-      //Update search_npcs
+      
+      // Update search_npcs
       SEARCH_NPCS_REF.child(`${uid}/results`).child(id).remove();
+
+      // Delete any linked image
+      STORAGE_REF.child(`${uid}/${id}.webp`).delete().then(() => {
+        console.log("Image deleted");
+      });
+
       return;
     } catch(error){
       throw error;

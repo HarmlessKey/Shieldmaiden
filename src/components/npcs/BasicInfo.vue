@@ -1,6 +1,19 @@
 <template>
 	<div>
-		<hk-card header="Basic Info">
+		<hk-card>
+			<div class="card-header p-0" slot="header">
+				<div class="d-flex justify-content-start items-center">
+					<div 
+						class="img" 
+						@click="avatar_dialog = true" 
+						:style="{ 
+							backgroundImage: background_image 
+						}">
+						<i aria-hidden="true" v-if="!npc.avatar && !preview_new_upload && !npc.storage_avatar" class="hki-monster" />
+					</div>
+					Basic info
+				</div>
+			</div>
 			<div class="card-body">
 
 				<!-- NAME -->
@@ -27,28 +40,6 @@
 								maxlength="20"
 								autocomplete="off"  
 								v-model="npc.source"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</ValidationProvider>
-					</div>
-				</div>
-
-				<!-- AVATAR -->
-				<div class="avatar mb-2">
-					<div class="img" @click="avatar_dialog = true" :style="{ backgroundImage: npc.avatar ? 'url(\'' + npc.avatar + '\')' : '' }">
-						<i aria-hidden="true" v-if="!npc.avatar" class="hki-monster" />
-					</div>
-					<div>
-						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								label="Avatar"
-								autocomplete="off"  
-								type="text" 
-								v-model="npc.avatar" 
-								placeholder="Image URL"
-								maxLength="2000"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
@@ -323,24 +314,57 @@
 			<hk-card :min-width="300">
 				<div slot="header" class="card-header">
 					Add avatar
-					<q-btn icon="close" no-caps flat dense v-close-popup />
+					<q-btn icon="close" no-caps flat dense @click="cancelAvatar" />
+				</div>
+				<div 
+					v-if="npc.storage_avatar || npc.avatar || preview_new_upload"
+					class="current-avatar"
+				>
+					<div class="d-flex justify-content-start items-center">
+						<div 
+							class="img" 
+							@click="avatar_dialog = true" 
+							:style="{ 
+								backgroundImage: background_image 
+							}"/>
+						Current avatar
+					</div>
+					<button class="btn btn-sm bg-neutral-5 my-2" @click="clearAvatar">
+						<i class="fas fa-trash-alt" aria-hidden="true" />
+					</button>
 				</div>
 				<div class="card-body">
-					<hk-image-uploader />
-					<hr />
-					Enter an image url
-					<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square
-							label="Image URL"
-							autocomplete="off"  
-							type="text" 
-							v-model="npc.avatar" 
-							maxLength="2000"
-							:error="invalid && validated"
-							:error-message="errors[0]"
-						/>
-					</ValidationProvider>
+					<hk-image-uploader 
+						ref="upload"
+						@using-upload="using_upload = $event"
+						@accept="saveBlob"
+					/>
+					<template v-if="!using_upload">
+						<hr />
+						Enter an image url
+						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Image URL"
+								autocomplete="off"  
+								type="text" 
+								v-model="npc.avatar" 
+								maxLength="2000"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
+					</template>
+				</div>
+				<div slot="footer" class="card-footer">
+					<q-btn flat class="bg-neutral-8 mr-1" no-caps @click="cancelAvatar">Cancel</q-btn>
+					<q-btn
+						color="green"
+						no-caps
+						@click="acceptAvatar"
+					>
+						Accept
+					</q-btn>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -362,8 +386,10 @@
 		],
 		data() {
 			return {
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				avatar_dialog: false,
-				upload: {}
+				using_upload: false,
+				preview_new_upload: undefined
 			}
 		},
 		computed: {
@@ -381,6 +407,18 @@
 					crs.push(Number(cr));
 				}
 				return crs.sort(function(a, b){return a-b});
+			},
+			background_image() {
+				let image = this.npc.avatar;
+
+				if(this.npc.storage_avatar) {
+					image = this.npc.storage_avatar;
+				}
+				if(this.preview_new_upload) {
+					image = this.preview_new_upload;
+				}
+
+				return `url('${image}')`;
 			}
 		},
 		methods: {
@@ -391,41 +429,81 @@
 					this.$set(object, property, parseInt(value));
 				}
 			},
-			// Capitalizes every word in the name of the Npc
+			// Capitalizes every word in the name of the NPC
 			capitalizeName(val) {
 				this.npc.name = val.capitalizeEach();
+			},
+			acceptAvatar() {
+				if(this.using_upload) {
+					this.$refs.upload.accept();
+				} else {
+					this.$set(this.npc, "storage_avatar", false);
+					this.$set(this.npc, "blob", null);
+					this.preview_new_upload = undefined;
+					this.avatar_dialog = false;
+				}
+			},
+			cancelAvatar() {
+				this.avatar_dialog = false;
+				this.using_upload = false;
+			},
+			saveBlob(value) {
+				// Clear the image url
+				this.$set(this.npc, "avatar", null);
+				this.$set(this.npc, "storage_avatar", true);
+				this.$set(this.npc, "blob", value.blob);
+				this.preview_new_upload = value.dataUrl;
+				this.using_upload = false;
+				this.avatar_dialog = false;
+			},
+			clearAvatar() {
+				this.$delete(this.npc, "blob");
+				this.$delete(this.npc, "avatar");
+				this.$delete(this.npc, "storage_avatar");
+				this.preview_new_upload = undefined;
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.avatar {
-		display: grid;
-		grid-template-columns: 56px 1fr;
-		grid-column-gap: 10px;
+	.img {
+		border: solid 1px $neutral-3;
+		width: 62px;
+		height: 62px;
+		background-size: cover;
+		background-position: center top;
+		color: $neutral-2;
+		background-color: $neutral-9;
+		font-size: 50px;
+		cursor: pointer;
+		border-top-left-radius: $border-radius;
+		margin-right: 15px;
+
+		i::before {
+			vertical-align: 5px;
+		}
+		&:hover {
+			border-color: $blue;
+			color: $blue-light;
+		}
+	}
+	.current-avatar {
+		background-color: $neutral-7;
+		border-bottom: solid 1px $neutral-5;
+		display: flex;
+		justify-content: space-between;
+		padding-right: 0.5rem;
 
 		.img {
-			border: solid 1px $neutral-3;
-			width: 56px;
-			height: 56px;
-			background-size: cover;
-			background-position: center top;
-			color: $neutral-2;
-			background-color: $neutral-9;
-			font-size: 45px;
-			cursor: pointer;
-
-			i::before {
-				vertical-align: 5px;
-			}
-			&:hover {
-				border-color: $blue;
-			}
+			border-radius: 0;
+			width: 47px;
+			height: 47px;
+			cursor: default;
 		}
 	}
 	[data-theme="light"] {
-		.avatar .img {
+		.img {
 			background-color: $neutral-2;
 			color: $neutral-8;
 		}

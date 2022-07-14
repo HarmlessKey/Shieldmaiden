@@ -90,7 +90,7 @@
 </template>
 
 <script>
-	import { auth, db } from './firebase'
+	import { db } from './firebase'
 	import Header from './components/Header.vue';
 	import Sidebar from './components/Sidebar.vue';
 	import Slide from './components/Slide.vue';

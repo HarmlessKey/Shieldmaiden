@@ -161,7 +161,7 @@
             ".validate": "newData.isString() && newData.val().length <= 2000"
           },
           "storage_avatar": {
-            ".validate": "newData.isBoolean()"
+            ".validate": "newData.isString() && newData.val().length <= 2000"
           },
           "size": {
             ".validate": "newData.isString() && newData.val().matches(/^(Tiny|Small|Medium|Large|Huge|Gargantuan)$/)"

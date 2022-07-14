@@ -309,7 +309,7 @@ const run_encounter_actions = {
 				//get other values from the player
 				let db_player = (!state.demo) ? await dispatch("players/get_player", { uid, id: key }) : demoPlayers[key];
 
-				entity.img = db_player.avatar;
+				entity.img = db_player.storage_avatar || db_player.avatar;
 				
 				entity.name = db_player.character_name;
 				entity.ac = parseInt(db_player.ac);
@@ -359,7 +359,7 @@ const run_encounter_actions = {
 					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
 
 					entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
-					entity.img = data_npc.avatar;
+					entity.img = data_npc.storage_avatar || data_npc.avatar;
 
 					//Get player transformed from campaign
 					if(campaignCompanion.transformed) {
@@ -405,14 +405,13 @@ const run_encounter_actions = {
 						entity.transformed = false;
 					}
 					if(!entity.avatar) {
-						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : undefined;
-					}
-					else {
+						entity.img = (data_npc) ? data_npc.storage_avatar || data_npc.avatar : undefined;
+					} else {
 						entity.img = entity.avatar;
 					}
 				}
 
-				//if an entity is quicly added during an ecnounter
+				//if an entity is quickly added during an encounter
 				//without copying an existing
 				//it won't have data_npc
 				if(data_npc) {

@@ -45,9 +45,9 @@
 							<q-td 
 								v-if="props.col.name === 'avatar'" 
 								class="avatar"
-								:style="props.value ? `background-image: url('${props.value}')` : ''"
+								:style="avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
 							>
-								<i aria-hidden="true" v-if="!props.value" class="hki-monster" />
+								<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-monster" />
 							</q-td>
 							<q-td v-else-if="props.col.name !== 'actions'">
 								<div  class="truncate-cell">
@@ -200,6 +200,9 @@
 					(val == 0.25) ? "1/4" :
 					(val == 0.5) ? "1/2" :
 					val;
+			},
+			avatar(npc) {
+				return npc.storage_avatar || npc.avatar;
 			},
 			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held

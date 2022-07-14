@@ -9,7 +9,7 @@
 						:style="{ 
 							backgroundImage: background_image 
 						}">
-						<i aria-hidden="true" v-if="!npc.avatar && !preview_new_upload && !npc.storage_avatar" class="hki-monster" />
+						<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
 					</div>
 					Basic info
 				</div>
@@ -362,6 +362,7 @@
 						color="green"
 						no-caps
 						@click="acceptAvatar"
+						:disable="!npc.avatar && !using_upload"
 					>
 						Accept
 					</q-btn>
@@ -437,8 +438,8 @@
 				if(this.using_upload) {
 					this.$refs.upload.accept();
 				} else {
-					this.$set(this.npc, "storage_avatar", false);
-					this.$set(this.npc, "blob", null);
+					this.$delete(this.npc, "blob");
+					this.$delete(this.npc, "storage_avatar");
 					this.preview_new_upload = undefined;
 					this.avatar_dialog = false;
 				}
@@ -449,8 +450,7 @@
 			},
 			saveBlob(value) {
 				// Clear the image url
-				this.$set(this.npc, "avatar", null);
-				this.$set(this.npc, "storage_avatar", true);
+				this.$delete(this.npc, "avatar");
 				this.$set(this.npc, "blob", value.blob);
 				this.preview_new_upload = value.dataUrl;
 				this.using_upload = false;

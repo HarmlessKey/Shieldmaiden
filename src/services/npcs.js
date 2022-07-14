@@ -3,6 +3,7 @@ import { db, storage } from "src/firebase";
 const NPCS_REF = db.ref("npcs");
 const SEARCH_NPCS_REF = db.ref("search_npcs");
 const STORAGE_REF = storage.ref("npcs");
+const DOWNLOAD_URL_BASE = "https://firebasestorage.googleapis.com/v0/b/dndcombat-71e41.appspot.com/o"
 
 /**
  * NPC Firebase Service
@@ -73,18 +74,25 @@ export class npcServices {
       // If there is an image upload save the blob in separate prop en then delete it from the NPC
       const blob = npc.blob;
       delete npc.blob;
-      
+
       // Save the new NPC
       const newNpc = await NPCS_REF.child(uid).push(npc);
-
+      
       // Upload image
       if(blob) {
-        STORAGE_REF.child(`${uid}/${newNpc.key}.webp`).put(blob);
-      }
-    
-      // Update search_npcs
-      SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+        STORAGE_REF.child(`${uid}/${newNpc.key}.webp`).put(blob).then((snapshot) => {
+          snapshot.ref.getDownloadURL().then(url => {
+            search_npc.storage_avatar = url;
 
+            // Update NPC
+            NPCS_REF.child(`${uid}/${newNpc.key}/storage_avatar`).set(url);
+            SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+          });
+        });
+      } else {
+        // Update search_npcs
+        SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+      }
       return newNpc.key;
     } catch(error) {
       throw error;
@@ -107,20 +115,31 @@ export class npcServices {
       const blob = npc.blob;
       delete npc.blob;
       
-      await NPCS_REF.child(uid).child(id).set(npc);
-
       // Upload image
       const image_ref = STORAGE_REF.child(`${uid}/${id}.webp`);
-      if(blob) {
-        image_ref.put(blob);
-      }
-      
-      // Delete the image when there is no blob and !storage_avatar
-      else if(!npc.storage_avatar) {
-        image_ref.delete();
-      }
 
-      await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+      if(blob) {
+        await image_ref.put(blob).then(async (snapshot) => {
+          await snapshot.ref.getDownloadURL().then(async (url) => {
+            npc.storage_avatar = url;
+            search_npc.storage_avatar = url;
+            
+            // Save the NPC
+            await NPCS_REF.child(uid).child(id).set(npc);
+            await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+          });
+        });
+      }
+      // Delete the image when there is no blob and no storage_avatar
+      else {
+        if(!npc.storage_avatar) {
+          image_ref.delete();
+        }
+
+        // Save the NPC
+        await NPCS_REF.child(uid).child(id).set(npc);
+        await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+      }
     } catch(error) {
       throw error;
     }
@@ -159,9 +178,7 @@ export class npcServices {
       SEARCH_NPCS_REF.child(`${uid}/results`).child(id).remove();
 
       // Delete any linked image
-      STORAGE_REF.child(`${uid}/${id}.webp`).delete().then(() => {
-        console.log("Image deleted");
-      });
+      STORAGE_REF.child(`${uid}/${id}.webp`).delete();
 
       return;
     } catch(error){

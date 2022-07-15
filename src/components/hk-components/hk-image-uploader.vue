@@ -209,8 +209,6 @@
 		.img {
 			margin-right: 10px;
 			border: solid 1px $neutral-3;
-			width: 62px;
-			height: 62px;
 			background-size: cover;
 			background-position: center top;
 			color: $neutral-2;

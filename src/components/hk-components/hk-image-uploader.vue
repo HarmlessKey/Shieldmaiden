@@ -1,57 +1,125 @@
 <template>
 	<div>
-		<div class="label">
-			Upload an image
-			<div v-if="using_upload">
-				<q-btn no-caps flat dense icon="close" size="sm" @click="stopUpload" class="red" />
-			</div>
-		</div>
-		<div>
-			<croppa 
-				v-model="upload"
-				:width="250"
-				:height="250"
-				placeholder="Choose an image"
-				:placeholder-font-size="0"
-				:disabled="false"
-				:prevent-white-space="true"
-				:show-remove-button="false"
-				@file-choose="startUpload"
-				@image-remove="type = 'url'"
-			/>
-			<!-- <q-slider
-        v-model="zoom"
-        :min="0"
-        :max="100"
-        color="blue"
-        vertical
-        reverse
-      /> -->
-		</div>
-		<div class="d-flex justify-content-center" v-if="using_upload">
-			<q-btn no-caps flat icon="fas fa-undo" @click="upload.rotate(-1)" size="sm">
-				<q-tooltip anchor="top middle" self="center middle">
-					Rotate
-				</q-tooltip>
-			</q-btn>
-			<q-btn no-caps flat icon="fas fa-arrow-up" @click="upload.flipY()" size="sm">
-				<q-tooltip anchor="top middle" self="center middle">
-					Flip Y
-				</q-tooltip>
-			</q-btn>
-			<q-btn no-caps flat icon="fas fa-arrow-right" @click="upload.flipX()" size="sm">
-				<q-tooltip anchor="top middle" self="center middle">
-					Flip X
-				</q-tooltip>
-			</q-btn>
-		</div>
+		<ValidationObserver v-slot="{ valid }">
+			<hk-card :min-width="300">
+				<div slot="header" class="card-header">
+					Add avatar
+					<q-btn icon="close" no-caps flat dense @click="cancel" />
+				</div>
+				<div 
+					v-if="current_avatar"
+					class="current-avatar"
+				>
+					<div class="d-flex justify-content-start items-center">
+						<div 
+							class="img" 
+							:style="{ 
+								backgroundImage: `url('${current_avatar}')` 
+							}"/>
+						Current avatar
+					</div>
+					<button class="btn btn-sm bg-neutral-5 my-2" @click="clear">
+						<i class="fas fa-trash-alt" aria-hidden="true" />
+					</button>
+				</div>
+				<div class="card-body">
+					<q-form>
+						<div v-if="tier && tier.name !== 'Free'">
+							<div class="label">
+								Crop and upload image
+								<div v-if="using_crop">
+									<q-btn no-caps flat dense icon="close" size="sm" @click="stopCrop" class="red" />
+								</div>
+							</div>
+							<croppa 
+								v-model="crop"
+								:width="250"
+								:height="250"
+								placeholder="Choose an image"
+								:placeholder-font-size="0"
+								:disabled="false"
+								:prevent-white-space="true"
+								:show-remove-button="false"
+								@file-choose="startCrop"
+								@image-remove="stopCrop"
+							/>
+							<div v-if="using_crop" class="d-flex justify-content-center">
+								<q-btn no-caps flat icon="fas fa-undo" @click="crop.rotate(-1)" size="sm">
+									<q-tooltip anchor="top middle" self="center middle">
+										Rotate
+									</q-tooltip>
+								</q-btn>
+								<q-btn no-caps flat icon="fas fa-arrow-up" @click="crop.flipY()" size="sm">
+									<q-tooltip anchor="top middle" self="center middle">
+										Flip Y
+									</q-tooltip>
+								</q-btn>
+								<q-btn no-caps flat icon="fas fa-arrow-right" @click="crop.flipX()" size="sm">
+									<q-tooltip anchor="top middle" self="center middle">
+										Flip X
+									</q-tooltip>
+								</q-btn>
+							</div>
+						</div>
+						<div v-else>
+							<p>
+								Do you want to <strong>crop</strong> and <strong>upload</strong> avatars?
+							</p>
+
+							<a class="btn btn-block bg-patreon-red" href="https://www.patreon.com/join/harmlesskey" rel="noopener" target="_blank">
+							<i class="fab fa-patreon black" aria-hidden="true" />
+								Support us on Patreon
+							</a>
+						</div>
+						<template v-if="!using_crop">
+							<hr />
+							Enter an image url
+							<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Image URL"
+									autocomplete="off"  
+									type="text" 
+									v-model="url" 
+									maxLength="2000"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</template>
+					</q-form>
+				</div>
+				<div slot="footer" class="card-footer">
+					<q-btn flat class="bg-neutral-8 mr-1" no-caps @click="cancel">Cancel</q-btn>
+					<q-btn
+						color="green"
+						no-caps
+						@click="acceptAvatar(valid)"
+						:disable="!valid || (!url && !using_crop)"
+					>
+						Accept
+					</q-btn>
+				</div>
+			</hk-card>
+		</ValidationObserver>
 	</div>
 </template>
 
 <script>
+	import { mapGetters } from "vuex";
+
 	export default {
 		name: "hk-image-uploader",
 		props: {
+			avatar: {
+				type: String,
+			},
+			storage_avatar: {
+				type: String,
+			},
+			preview_new_upload: {
+				type: String
+			},
 			width: {
 				type: Number,
 				default: 60
@@ -63,28 +131,37 @@
 		},
 		data() {
 			return {
-				using_upload: false,
-				upload: {},
-				img: undefined,
-				zoom: 0
+				using_crop: false,
+				url: this.avatar || undefined,
+				crop: {}
+			}
+		},
+		computed: {
+			...mapGetters(["tier"]),
+			current_avatar() {
+				return this.preview_new_upload || this.storage_avatar || this.avatar;
 			}
 		},
 		methods: {
-			startUpload() {
-				this.using_upload = true;
-				this.$emit("using-upload", true);
+			startCrop() {
+				this.using_crop = true;
 			},
-			stopUpload() {
-				this.upload.remove();
-				this.using_upload = false;
-				this.$emit("using-upload", false);
+			stopCrop() {
+				this.crop.remove();
+				this.using_crop = false;
 			},
-			async accept() {
-				console.log("accept")
+			acceptAvatar(valid) {
+				if(this.using_crop) {
+					this.acceptCrop();
+				} else {
+					this.acceptUrl(valid);
+				}
+			},
+			async acceptCrop() {
 				const img = new Image(); // Create a new blank image
 
 				// Set the cropped image as the src for the blank image
-				img.src = this.upload.generateDataUrl("image/webp");
+				img.src = this.crop.generateDataUrl("image/webp");
 
 				// Resize the image to given dimensions and emit the blob + dataUrl
 				// The blob can be uploaded to firebase
@@ -97,9 +174,20 @@
 					ctx.drawImage(img, 0, 0, this.width, this.height);
 	
 					canvas.toBlob((blob) => {
-						this.$emit("accept", { blob: blob, dataUrl: canvas.toDataURL() });
+						this.$emit("crop", { blob: blob, dataUrl: canvas.toDataURL() });
 					}, "image/webp");
 				}
+			},
+			acceptUrl(valid) {
+				if(valid) {
+					this.$emit("url", this.url);
+				}
+			},
+			cancel() {
+				this.$emit("cancel");
+			},
+			clear() {
+				this.$emit("clear");
 			}
 		}
 	}
@@ -110,5 +198,26 @@
 		display: flex;
 		justify-content: space-between;
 		margin-bottom: 5px;
+	}
+	.current-avatar {
+		background-color: $neutral-7;
+		border-bottom: solid 1px $neutral-5;
+		display: flex;
+		justify-content: space-between;
+		padding-right: 0.5rem;
+
+		.img {
+			margin-right: 10px;
+			border: solid 1px $neutral-3;
+			width: 62px;
+			height: 62px;
+			background-size: cover;
+			background-position: center top;
+			color: $neutral-2;
+			background-color: $neutral-9;
+			border-radius: 0;
+			width: 47px;
+			height: 47px;
+		}
 	}
 </style>

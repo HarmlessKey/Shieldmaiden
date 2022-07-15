@@ -3,7 +3,6 @@ import { db, storage } from "src/firebase";
 const NPCS_REF = db.ref("npcs");
 const SEARCH_NPCS_REF = db.ref("search_npcs");
 const STORAGE_REF = storage.ref("npcs");
-const DOWNLOAD_URL_BASE = "https://firebasestorage.googleapis.com/v0/b/dndcombat-71e41.appspot.com/o"
 
 /**
  * NPC Firebase Service

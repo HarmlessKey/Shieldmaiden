@@ -7,7 +7,7 @@
 						class="img" 
 						@click="avatar_dialog = true" 
 						:style="{ 
-							backgroundImage: background_image 
+							backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
 						}">
 						<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
 					</div>
@@ -310,64 +310,17 @@
 			</div>
 		</hk-card>
 
+		<!-- AVATAR -->
 		<q-dialog v-model="avatar_dialog">
-			<hk-card :min-width="300">
-				<div slot="header" class="card-header">
-					Add avatar
-					<q-btn icon="close" no-caps flat dense @click="cancelAvatar" />
-				</div>
-				<div 
-					v-if="npc.storage_avatar || npc.avatar || preview_new_upload"
-					class="current-avatar"
-				>
-					<div class="d-flex justify-content-start items-center">
-						<div 
-							class="img" 
-							@click="avatar_dialog = true" 
-							:style="{ 
-								backgroundImage: background_image 
-							}"/>
-						Current avatar
-					</div>
-					<button class="btn btn-sm bg-neutral-5 my-2" @click="clearAvatar">
-						<i class="fas fa-trash-alt" aria-hidden="true" />
-					</button>
-				</div>
-				<div class="card-body">
-					<hk-image-uploader 
-						ref="upload"
-						@using-upload="using_upload = $event"
-						@accept="saveBlob"
-					/>
-					<template v-if="!using_upload">
-						<hr />
-						Enter an image url
-						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								label="Image URL"
-								autocomplete="off"  
-								type="text" 
-								v-model="npc.avatar" 
-								maxLength="2000"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</ValidationProvider>
-					</template>
-				</div>
-				<div slot="footer" class="card-footer">
-					<q-btn flat class="bg-neutral-8 mr-1" no-caps @click="cancelAvatar">Cancel</q-btn>
-					<q-btn
-						color="green"
-						no-caps
-						@click="acceptAvatar"
-						:disable="!npc.avatar && !using_upload"
-					>
-						Accept
-					</q-btn>
-				</div>
-			</hk-card>
+			<hk-image-uploader 
+				:avatar="npc.avatar"
+				:storage_avatar="npc.storage_avatar"
+				:preview_new_upload="preview_new_upload"
+				@crop="saveBlob"
+				@url="saveUrl"
+				@cancel="avatar_dialog = false"
+				@clear="clearAvatar"
+			/>
 		</q-dialog>
 	</div>
 </template>
@@ -389,7 +342,6 @@
 			return {
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				avatar_dialog: false,
-				using_upload: false,
 				preview_new_upload: undefined
 			}
 		},
@@ -409,17 +361,8 @@
 				}
 				return crs.sort(function(a, b){return a-b});
 			},
-			background_image() {
-				let image = this.npc.avatar;
-
-				if(this.npc.storage_avatar) {
-					image = this.npc.storage_avatar;
-				}
-				if(this.preview_new_upload) {
-					image = this.preview_new_upload;
-				}
-
-				return `url('${image}')`;
+			current_avatar() {
+				return this.preview_new_upload || this.npc.storage_avatar || this.npc.avatar;
 			}
 		},
 		methods: {
@@ -434,33 +377,25 @@
 			capitalizeName(val) {
 				this.npc.name = val.capitalizeEach();
 			},
-			acceptAvatar() {
-				if(this.using_upload) {
-					this.$refs.upload.accept();
-				} else {
-					this.$delete(this.npc, "blob");
-					this.$delete(this.npc, "storage_avatar");
-					this.preview_new_upload = undefined;
-					this.avatar_dialog = false;
-				}
-			},
-			cancelAvatar() {
-				this.avatar_dialog = false;
-				this.using_upload = false;
-			},
 			saveBlob(value) {
 				// Clear the image url
 				this.$delete(this.npc, "avatar");
 				this.$set(this.npc, "blob", value.blob);
 				this.preview_new_upload = value.dataUrl;
-				this.using_upload = false;
+				this.avatar_dialog = false;
+			},
+			saveUrl(value) {
+				this.$delete(this.npc, "storage_avatar");
+				this.$set(this.npc, "avatar", value);
+				this.preview_new_upload = undefined;
 				this.avatar_dialog = false;
 			},
 			clearAvatar() {
-				this.$delete(this.npc, "blob");
 				this.$delete(this.npc, "avatar");
 				this.$delete(this.npc, "storage_avatar");
+				this.$delete(this.npc, "blob");
 				this.preview_new_upload = undefined;
+				this.avatar_dialog = false;
 			}
 		}
 	}

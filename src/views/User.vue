@@ -45,7 +45,7 @@
 											<div v-if="campaign.players" class="players">
 												<template v-for="(player, key) in campaign.players">
 													<div v-if="player" :key="key" class="img">
-														<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+														<div v-if="avatar(player)" :style="{ backgroundImage: 'url(\'' + avatar(player) + '\')' }"></div>
 														<i aria-hidden="true" v-else class="hki-player" />
 														<q-tooltip anchor="top middle" self="center middle">
 															{{ player.character_name }}
@@ -115,6 +115,11 @@
 					source: db.ref(`broadcast/${this.dmId}/live`),
 					asObject: true,
 				}
+			}
+		},
+		methods: {
+			avatar(player) {
+				return player.storage_avatar || player.avatar;
 			}
 		},
 		mounted() {

@@ -54,7 +54,7 @@
 							show: true,
 							type: 'slides/party/Inventory'
 						})">
-						<i aria-hidden="true" class="fas fa-treasure-chest"></i>
+						<i aria-hidden="true" class="fas fa-treasure-chest" />
 						<q-tooltip anchor="top middle" self="center middle">
 							Party Inventory
 						</q-tooltip>
@@ -122,7 +122,7 @@
 					<div 
 						class="image" 
 						:key="'image-'+key" 
-						:style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"
+						:style="{ backgroundImage: avatar(players[key]) ? 'url(\'' + (avatar(players[key])) + '\')' : '' }"
 					>
 						<div class="transformed" v-if="player.transformed">
 							<i aria-hidden="true" class="fas fa-paw-claws green"></i>
@@ -130,7 +130,7 @@
 								Transformed
 							</q-tooltip>
 						</div>
-						<i aria-hidden="true" v-if="!players[key].avatar" class="hki-player" />
+						<i aria-hidden="true" v-if="!avatar(players[key])" class="hki-player" />
 					</div>
 					<div class="col ac" :key="'ac-'+key">
 						<i aria-hidden="true" class="fas fa-shield" ></i>
@@ -377,6 +377,9 @@
 
 				//sets new width on resize
 				this.width = size.width;
+			},
+			avatar(player) {
+				return player.storage_avatar || player.avatar;
 			},
 			percentage(current, max) {
 				return Math.floor(current / max * 100);

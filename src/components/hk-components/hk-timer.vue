@@ -18,7 +18,8 @@
 				minutes: "00",
 				seconds: "00",
 				hours: "00",
-				totalSeconds: this.value
+				totalSeconds: this.value,
+        interval: undefined
 			}
 		},
 		computed: {
@@ -49,9 +50,12 @@
 		},
 		mounted() {
 			this.countTimer(true);
-			window.setInterval(() => {
+			this.interval = window.setInterval(() => {
 				this.countTimer()
 			}, 1000);
-		}
+		},
+    async destroyed() {
+      window.clearInterval(this.interval);
+    },
 	}
 </script>

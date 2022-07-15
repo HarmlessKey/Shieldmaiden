@@ -11,8 +11,8 @@
 			<div class="card-body">
 				<ul class="entities hasImg" v-if="campaign_players.length">
 					<li v-for="player in campaign_players" :key="player.key">	
-						<span class="img" :style="{ backgroundImage: 'url(\''+ player.avatar + '\')' }">
-							<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
+						<span class="img" :style="{ backgroundImage: player_avatar(player) ? 'url(\''+ player_avatar(player) + '\')' : '' }">
+							<i aria-hidden="true" v-if="!player_avatar(player)" class="hki-player" />
 						</span>
 
 						<div :class="{ 'red': inOtherCampaign(player.campaign_id) }">
@@ -54,8 +54,8 @@
 				<div class="card-body">
 					<ul class="entities hasImg">
 						<li v-for="player in players" :key="player.key">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
-								<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
+							<span class="img" :style="{ backgroundImage: player_avatar(player) ? 'url(\'' + player_avatar(player) + '\')' : '' }">
+								<i aria-hidden="true" v-if="!player_avatar(player)" class="hki-player" />
 							</span>
 
 							{{ player.character_name }}
@@ -128,6 +128,9 @@
 				"update_player_count"
 			]),
 			...mapActions("players", ["get_players"]),
+			player_avatar(player) {
+				return player.storage_avatar || player.avatar;
+			},
 			addPlayer(id) {
 				// Set the current HP
 				this.add_player({

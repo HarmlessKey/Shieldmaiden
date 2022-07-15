@@ -164,11 +164,8 @@ export const monsterMixin = {
 			if(monster.friendly) new_monster.friendly = true;
 			
 			let proficiency = 0
-			if(!this.monster_challenge_rating[new_monster.challenge_rating]) console.log(uid, key)
 			if (this.monster_challenge_rating[new_monster.challenge_rating].proficiency) {
 				proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency
-			} else {
-				console.log("challenge_rating",  new_monster.challenge_rating)
 			}
 
 			if(!new_monster.size || !this.monster_sizes.includes(new_monster.size)) {

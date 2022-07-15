@@ -37,8 +37,10 @@
 			</div>
 		</transition>
 		
-		<vue-snotify />
-		<HkRolls />
+		<q-no-ssr>
+			<vue-snotify />
+			<HkRolls />
+		</q-no-ssr>
 
 		<!-- Announcements -->
 		<q-dialog v-model="announcement" position="top" persistent>
@@ -88,7 +90,7 @@
 </template>
 
 <script>
-	import { auth, db } from './firebase'
+	import { db } from './firebase'
 	import Header from './components/Header.vue';
 	import Sidebar from './components/Sidebar.vue';
 	import Slide from './components/Slide.vue';
@@ -288,17 +290,6 @@
 		await store.dispatch("initialize");
 	},
 	async mounted() {
-		auth.onAuthStateChanged(user => {
-			if (user) {
-				auth.currentUser.getIdToken(true).then(async token => {
-					this.$q.cookies.set('access_token', token);
-				})
-			}
-			else {
-				this.$q.cookies.remove('access_token');
-			}
-		});
-
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {
@@ -324,6 +315,20 @@
 
 		// Install prompt
 		window.addEventListener('beforeinstallprompt', (e) => {
+			// Prevent the mini-infobar from appearing on mobile
+			e.preventDefault();
+			// Stash the event so it can be triggered later.
+			if(!this.install_cookie) {
+				this.deferredPrompt = e;
+				// Update UI notify the user they can install the PWA
+				this.install_dialog = true;
+			}
+		});
+	},
+	destroyed() {
+		window.removeEventListener('offline', () => { this.connection = "offline" });
+		window.removeEventListener('online', () => { this.connection = "online" });
+		window.removeEventListener('beforeinstallprompt', (e) => {
 			// Prevent the mini-infobar from appearing on mobile
 			e.preventDefault();
 			// Stash the event so it can be triggered later.

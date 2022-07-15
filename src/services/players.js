@@ -1,8 +1,9 @@
-import { db } from "src/firebase";
+import { db, storage } from "src/firebase";
 
 const PLAYERS_REF = db.ref("players");
 const SEARCH_PLAYERS_REF = db.ref("search_players");
 const CHARACTER_CONTROL_REF = db.ref("character_control");
+const STORAGE_REF = storage.ref("players");
 
 export class playerServices {
 
@@ -76,8 +77,21 @@ export class playerServices {
     try {
       const newPlayer = await PLAYERS_REF.child(uid).push(player);
 
-      // Update search_players
-      SEARCH_PLAYERS_REF.child(`${uid}/results/${newPlayer.key}`).set(search_player);
+      // Upload image
+      if(blob) {
+        STORAGE_REF.child(`${uid}/${newPlayer.key}.webp`).put(blob).then((snapshot) => {
+          snapshot.ref.getDownloadURL().then(url => {
+            search_player.storage_avatar = url;
+
+            // Update NPC
+            PLAYERS_REF.child(`${uid}/${newPlayer.key}/storage_avatar`).set(url);
+            SEARCH_PLAYERS_REF.child(`${uid}/results/${newPlayer.key}`).set(search_player);
+          });
+        });
+      } else {
+        // Update search_players
+        SEARCH_PLAYERS_REF.child(`${uid}/results/${newPlayer.key}`).set(search_player);
+      }
 
       return newPlayer.key;
     } catch(error) {
@@ -86,11 +100,39 @@ export class playerServices {
   }
 
   async editPlayer(uid, id, player, search_player) {
-    PLAYERS_REF.child(uid).child(id).set(player).then(() => {
-      SEARCH_PLAYERS_REF.child(`${uid}/results/${id}`).set(search_player);
-    }).catch((error) => {
+    try {
+      // If there is an image upload save the blob in separate prop en then delete it from the player
+      const blob = player.blob;
+      delete player.blob;
+      
+      // Upload image
+      const image_ref = STORAGE_REF.child(`${uid}/${id}.webp`);
+
+      if(blob) {
+        await image_ref.put(blob).then(async (snapshot) => {
+          await snapshot.ref.getDownloadURL().then(async (url) => {
+            player.storage_avatar = url;
+            search_player.storage_avatar = url;
+            
+            // Save the player
+            await PLAYERS_REF.child(uid).child(id).set(player);
+            await SEARCH_PLAYERS_REF.child(`${uid}/results/${id}`).set(search_player);
+          });
+        });
+      }
+      // Delete the image when there is no blob and no storage_avatar
+      else {
+        if(!player.storage_avatar) {
+          image_ref.delete();
+        }
+
+        // Save the player
+        await PLAYERS_REF.child(uid).child(id).set(player);
+        await SEARCH_PLAYERS_REF.child(`${uid}/results/${id}`).set(search_player);
+      }
+    } catch(error) {
       throw error;
-    });
+    }
   }
 
   /**

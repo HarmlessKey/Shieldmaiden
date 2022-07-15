@@ -10,6 +10,7 @@ import HkDmgTypeSelect from '../components/hk-components/hk-dmg-type-select';
 import HkTip from '../components/hk-components/hk-tip';
 import HkTimer from '../components/hk-components/hk-timer';
 import HkShare from '../components/hk-components/hk-share-button';
+import HkImageUploader from '../components/hk-components/hk-image-uploader';
 
 export default async ({ Vue }) => {
 	Vue.component('hk-table', HkTable);
@@ -24,4 +25,5 @@ export default async ({ Vue }) => {
   Vue.component('hk-tip', HkTip);
   Vue.component('hk-timer', HkTimer);
   Vue.component('hk-share', HkShare);
+  Vue.component('hk-image-uploader', HkImageUploader);
 };

@@ -6,12 +6,19 @@ const USERS_REF = db.ref("users");
 
 export class campaignServices {
 
-  async getCampaigns(uid) {
+  async getCampaigns(uid, active=false) {
     try {
-      const campaigns = await SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).once('value', snapshot => {
-        return snapshot;
-      });
-      return campaigns.val();
+      if(active) {
+        const campaigns = await SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).orderByChild("private").equalTo(null).once('value', snapshot => {
+          return snapshot;
+        });
+        return campaigns.val();
+      } else {
+        const campaigns = await SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).once('value', snapshot => {
+          return snapshot;
+        });
+        return campaigns.val();
+      }
     } catch(error) {
       throw error;
     }

@@ -84,11 +84,12 @@
 </template>
 
 <script>
-	import { db } from "src/firebase"
-	import { general } from "src/mixins/general.js"
+	import { db } from "src/firebase";
+	import { mapGetters, mapActions } from "vuex";
+	import { general } from "src/mixins/general.js";
 	import ContentSideRight from "src/components/ContentSideRight";
 
-	import Follow from "src/components/trackCampaign/Follow.vue"
+	import Follow from "src/components/trackCampaign/Follow.vue";
 
 	export default {
 		name: "TrackUser",
@@ -101,9 +102,11 @@
 			return {
 				user: this.$store.getters ? this.$store.getters.user : undefined,
 				dmId: this.$route.params.userid,
-				campaigns: undefined,
 				loadingCampaigns: true
 			}
+		},
+		computed: {
+			...mapGetters("trackCampaign", ["campaigns"]),
 		},
 		firebase() {
 			return {
@@ -118,29 +121,14 @@
 			}
 		},
 		methods: {
+			...mapActions("trackCampaign", ["get_campaigns"]),
 			avatar(player) {
 				return player.storage_avatar || player.avatar;
 			}
 		},
-		mounted() {
-			const campaigns_ref = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
-			campaigns_ref.on('value', async (snapshot) => {
-				let campaigns = snapshot.val();
-				
-				//Get Players
-				for(let key in snapshot.val()) {
-					campaigns[key]['.key'] = key;
-
-					for(let playerKey in campaigns[key].players) {
-						let getPlayer = db.ref(`players/${this.dmId}/${playerKey}`);
-						await getPlayer.on('value', (result) => {
-							campaigns[key].players[playerKey] = result.val()
-						});
-					}
-				}
-				this.campaigns = campaigns;
-				this.loadingCampaigns = false;
-			});
+		async mounted() {
+			await this.get_campaigns(this.dmId);
+			this.loading_campaigns = false;
 		}
 	}
 </script>

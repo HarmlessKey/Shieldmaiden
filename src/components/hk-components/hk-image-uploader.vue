@@ -28,7 +28,14 @@
 							<div class="label">
 								Crop and upload image
 								<div v-if="using_crop">
-									<q-btn no-caps flat dense icon="close" size="sm" @click="stopCrop" class="red" />
+									<hk-popover class="mr-2" header="Cropping">
+										<i class="fas fa-info-circle" aria-hidden="true" />
+										<template #content>
+											You can use scroll to <em>zoom</em> and <em>position</em> <br/>
+											the image by dragging it.
+										</template>
+									</hk-popover>
+									<q-btn  no-caps flat dense icon="close" size="sm" @click="stopCrop" class="red" />
 								</div>
 							</div>
 							<croppa 
@@ -107,8 +114,10 @@
 
 <script>
 	import { mapGetters } from "vuex";
+import hkPopover from './hk-popover.vue';
 
 	export default {
+  components: { hkPopover },
 		name: "hk-image-uploader",
 		props: {
 			avatar: {
@@ -198,6 +207,13 @@
 		display: flex;
 		justify-content: space-between;
 		margin-bottom: 5px;
+		align-items: center;
+		line-height: 25px;
+		padding-right: 8px;
+
+		.hk-popover i {
+			vertical-align: -1px;
+		}
 	}
 	.current-avatar {
 		background-color: $neutral-7;

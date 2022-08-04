@@ -8,6 +8,7 @@ const convert_npc = (npc) => {
 		"name",
 		"challenge_rating",
     "avatar",
+    "storage_avatar",
 		"type"
 	];
   const returnNpc = {};
@@ -178,6 +179,7 @@ const npc_actions = {
         "name",
         "challenge_rating",
         "avatar",
+        "storage_avatar",
         "type"
       ].includes(property);
       try {

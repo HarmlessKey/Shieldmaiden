@@ -20,9 +20,9 @@
 					<q-td 
 						v-if="props.col.name === 'avatar'" 
 						class="avatar"
-						:style="props.value ? `background-image: url('${props.value}')` : ''"
+						:style="avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
 					>
-						<i aria-hidden="true" v-if="!props.value" class="hki-player" />
+						<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-player" />
 					</q-td>
 					<q-td v-else-if="props.col.name !== 'actions'">
 						<div  class="truncate-cell">
@@ -115,6 +115,9 @@
 				"get_characters", 
 				"remove_control"
 			]),
+			avatar(character) {
+				return character.storage_avatar || character.avatar;
+			},
 			confirmDelete(e, key, player) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {

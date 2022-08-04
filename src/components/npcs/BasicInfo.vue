@@ -1,6 +1,19 @@
 <template>
 	<div>
-		<hk-card header="Basic Info">
+		<hk-card>
+			<div class="card-header p-0" slot="header">
+				<div class="d-flex justify-content-start items-center">
+					<div 
+						class="img" 
+						@click="avatar_dialog = true" 
+						:style="{ 
+							backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
+						}">
+						<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
+					</div>
+					Basic info
+				</div>
+			</div>
 			<div class="card-body">
 
 				<!-- NAME -->
@@ -27,28 +40,6 @@
 								maxlength="20"
 								autocomplete="off"  
 								v-model="npc.source"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</ValidationProvider>
-					</div>
-				</div>
-
-				<!-- AVATAR -->
-				<div class="avatar mb-2">
-					<div class="img" :style="{ backgroundImage: npc.avatar ? 'url(\'' + npc.avatar + '\')' : '' }">
-						<i aria-hidden="true" v-if="!npc.avatar" class="hki-monster" />
-					</div>
-					<div>
-						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								label="Avatar"
-								autocomplete="off"  
-								type="text" 
-								v-model="npc.avatar" 
-								placeholder="Image URL"
-								maxLength="2000"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
@@ -318,6 +309,19 @@
 				</div>
 			</div>
 		</hk-card>
+
+		<!-- AVATAR -->
+		<q-dialog v-model="avatar_dialog">
+			<hk-image-uploader 
+				:avatar="npc.avatar"
+				:storage_avatar="npc.storage_avatar"
+				:preview_new_upload="preview_new_upload"
+				@crop="saveBlob"
+				@url="saveUrl"
+				@cancel="avatar_dialog = false"
+				@clear="clearAvatar"
+			/>
+		</q-dialog>
 	</div>
 </template>
 
@@ -334,6 +338,13 @@
 			monsterMixin,
 			languages,
 		],
+		data() {
+			return {
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+				avatar_dialog: false,
+				preview_new_upload: undefined
+			}
+		},
 		computed: {
 			npc: {
 				get() {
@@ -349,6 +360,9 @@
 					crs.push(Number(cr));
 				}
 				return crs.sort(function(a, b){return a-b});
+			},
+			current_avatar() {
+				return this.preview_new_upload || this.npc.storage_avatar || this.npc.avatar;
 			}
 		},
 		methods: {
@@ -359,37 +373,72 @@
 					this.$set(object, property, parseInt(value));
 				}
 			},
-			// Capitalizes every word in the name of the Npc
+			// Capitalizes every word in the name of the NPC
 			capitalizeName(val) {
 				this.npc.name = val.capitalizeEach();
+			},
+			saveBlob(value) {
+				// Clear the image url
+				this.$delete(this.npc, "avatar");
+				this.$set(this.npc, "blob", value.blob);
+				this.preview_new_upload = value.dataUrl;
+				this.avatar_dialog = false;
+			},
+			saveUrl(value) {
+				this.$delete(this.npc, "storage_avatar");
+				this.$set(this.npc, "avatar", value);
+				this.preview_new_upload = undefined;
+				this.avatar_dialog = false;
+			},
+			clearAvatar() {
+				this.$delete(this.npc, "avatar");
+				this.$delete(this.npc, "storage_avatar");
+				this.$delete(this.npc, "blob");
+				this.preview_new_upload = undefined;
+				this.avatar_dialog = false;
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.avatar {
-		display: grid;
-		grid-template-columns: 56px 1fr;
-		grid-column-gap: 10px;
+	.img {
+		border: solid 1px $neutral-3;
+		width: 62px;
+		height: 62px;
+		background-size: cover;
+		background-position: center top;
+		color: $neutral-2;
+		background-color: $neutral-9;
+		font-size: 50px;
+		cursor: pointer;
+		border-top-left-radius: $border-radius;
+		margin-right: 15px;
+
+		i::before {
+			vertical-align: 5px;
+		}
+		&:hover {
+			border-color: $blue;
+			color: $blue-light;
+		}
+	}
+	.current-avatar {
+		background-color: $neutral-7;
+		border-bottom: solid 1px $neutral-5;
+		display: flex;
+		justify-content: space-between;
+		padding-right: 0.5rem;
 
 		.img {
-			border: solid 1px $neutral-3;
-			width: 56px;
-			height: 56px;
-			background-size: cover;
-			background-position: center top;
-			color: $neutral-2;
-			background-color: $neutral-9;
-			font-size: 45px;
-
-			i::before {
-				vertical-align: 5px;
-			}
+			border-radius: 0;
+			width: 47px;
+			height: 47px;
+			cursor: default;
 		}
 	}
 	[data-theme="light"] {
-		.avatar .img {
+		.img {
 			background-color: $neutral-2;
 			color: $neutral-8;
 		}

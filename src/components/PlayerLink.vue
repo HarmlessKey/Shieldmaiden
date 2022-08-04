@@ -85,7 +85,7 @@
 				this.width = width;
 			},		
 		},
-		mounted() {
+		beforeMount() {
 			this.url = window.origin + '/user/' + this.$store.getters.user.uid;
 		}
 	}

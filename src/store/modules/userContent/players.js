@@ -7,6 +7,7 @@ const convert_player = (player) => {
 	const properties = [
     "character_name",
     "avatar",
+    "storage_avatar",
     "campaign_id",
     "companions"
 	];

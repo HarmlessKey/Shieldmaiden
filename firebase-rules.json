@@ -414,6 +414,9 @@
               "name": {
                 ".validate": "newData.isString() && newData.val().length <= 50"
               },
+              "key": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
               "$other": { ".validate": false }
             }
           },

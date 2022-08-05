@@ -7,6 +7,7 @@
 		>
 			<template v-if="weather && showWeather">
 				<Fog v-if="weather.fog > 0" :intensity="weather.fog" :smoke="weather.smoke" :audio="audio" />
+				<Sand v-if="weather.sand > 0" :intensity="weather.sand" :audio="audio" />
 				<Rain v-if="weather.rain > 0" :intensity="weather.rain" :audio="audio" />
 				<Hail v-if="weather.hail > 0" :intensity="weather.hail" :audio="audio" />
 				<Snow v-if="weather.snow > 0" :intensity="weather.snow" :audio="audio" />
@@ -44,6 +45,7 @@ export default {
 		Hail: () => import('./Hail'),
 		Snow: () => import('./Snow'),
 		Ash: () => import('./Ash'),
+		Sand: () => import('./Sand'),
 	},
 	data() {
 		return {

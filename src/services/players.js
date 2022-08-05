@@ -75,6 +75,10 @@ export class playerServices {
 
   async addPlayer(uid, player, search_player) {
     try {
+      // If there is an image upload save the blob in separate prop en then delete it from the player
+      const blob = player.blob;
+      delete player.blob;
+
       const newPlayer = await PLAYERS_REF.child(uid).push(player);
 
       // Upload image
@@ -82,6 +86,7 @@ export class playerServices {
         STORAGE_REF.child(`${uid}/${newPlayer.key}.webp`).put(blob).then((snapshot) => {
           snapshot.ref.getDownloadURL().then(url => {
             search_player.storage_avatar = url;
+            player.storage_avatar = url;
 
             // Update NPC
             PLAYERS_REF.child(`${uid}/${newPlayer.key}/storage_avatar`).set(url);

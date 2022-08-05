@@ -82,6 +82,7 @@ export class npcServices {
         STORAGE_REF.child(`${uid}/${newNpc.key}.webp`).put(blob).then((snapshot) => {
           snapshot.ref.getDownloadURL().then(url => {
             search_npc.storage_avatar = url;
+            npc.storage_avatar = url;
 
             // Update NPC
             NPCS_REF.child(`${uid}/${newNpc.key}/storage_avatar`).set(url);

@@ -3,34 +3,40 @@
 		<hk-card-deck v-if="tier">
 			<hk-card :header="t.name" v-for="(t, key) in tiers" :key="key" :class="{ 'current': t.name == tier.name }">
 				<div class="card-body">
-					<h2>{{ t.price }}</h2>
-					<i aria-hidden="true" v-if="t.price == 'Free'" class="neutral-3 sub">forever</i>
-					<i aria-hidden="true" v-else class="neutral-3 sub">per month</i>
+					<div class="top">
+						<h2>{{ t.price }}</h2>
+						<em v-if="t.price == 'Free'" class="neutral-3 sub">forever</em>
+						<em v-else class="neutral-3 sub">per month</em>
+					</div>
 					<ul>
 						<li v-for="(benefit, key) in t.benefits" :key="key">
 							<template v-if="key == 'campaigns'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
 								<span v-else class="green">{{ benefit }}</span> Campaign slots
 							</template>
 							<template v-if="key == 'encounters'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
 								<span v-else class="green">{{ benefit }}</span> Encounter slots
 							</template>
 							<template v-if="key == 'players'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
 								<span v-else class="green">{{ benefit }}</span> Player slots
 							</template>
 							<template v-if="key == 'npcs'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
 								<span v-else class="green">{{ benefit }}</span> NPC slots
 							</template>
 							<template v-if="key == 'items'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
 								<span v-else class="green">{{ benefit }}</span> Item slots
 							</template>
 							<template v-if="key == 'reminders'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
 								<span v-else class="green">{{ benefit }}</span> Reminder slots
+							</template>
+							<template v-if="key == 'avatars'">
+								<i aria-hidden="true" class="fas" :class="benefit ? 'fa-check green' : 'fa-times red'" />
+							 	Avatar crop &amp; upload
 							</template>
 						</li>
 					</ul>
@@ -48,11 +54,6 @@
 	import { db } from 'src/firebase'	
 
 	export default {
-		data() {
-			return {
-
-			}
-		},
 		firebase() {
 			return {
 				tiers: db.ref('tiers').orderByChild('order'),
@@ -62,9 +63,6 @@
 			...mapGetters([
 				'tier',
 			]),
-		},
-		methods: {
-
 		}
 	};
 </script>
@@ -74,16 +72,34 @@
 			&.current {
 				border-color: $patreon-red !important;
 			}
-			h2 {
-				margin-bottom: 0 !important;
-			}
-			i.sub {
-				display: block;
-				margin-bottom: 15px;
-			}
-			ul {
-				list-style: none;
+			.card-body {
 				padding: 0;
+
+				.top {
+					padding: 15px;
+					h2 {
+						margin-bottom: 0 !important;
+					}
+					i.sub {
+						display: block;
+					}
+				}
+				
+				ul {
+					list-style: none;
+					padding: 0;
+
+					li {
+						display: grid;
+						grid-template-columns: 30px 1fr;
+						line-height: 35px;
+						align-items: center;
+						font-size: 15px;
+						padding: 0 5px 0 15px;
+						color: $neutral-1;
+						margin-bottom: 1px;
+					}
+				}
 			}
 		}
 </style>

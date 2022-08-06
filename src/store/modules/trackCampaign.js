@@ -1,25 +1,35 @@
 import Vue from 'vue';
-import { campaignServices } from "src/services/campaigns"; 
+import { campaignServices } from "src/services/campaigns";
+import { db } from "src/firebase";
 import _ from 'lodash';
 
+const CAMPAIGNS_REF = db.ref("campaigns");
+const SEARCH_CAMPAIGNS_REF = db.ref("search_campaigns");
+const USERS_REF = db.ref("users");
+const SETTINGS_REF = db.ref("settings");
+const LIVE_REF = db.ref("broadcast");
 
 const track_campaign_state = () => ({
   campaign_services: null,
+  users: {},
   cached_campaigns: {},
-  track_campaigns: {},
+  track_search_campaigns: {},
   campaign_count: 0
 });
 
 const track_campaign_getters = {
-  track_campaigns: (state) => (uid) => { 
+  track_user: (state) => (uid) => {
+    return state.users[uid];
+  },
+  track_search_campaigns: (state) => (uid) => { 
     // Convert object to sorted array
-    return _.chain(state.track_campaigns[uid])
+    return _.chain(state.track_search_campaigns[uid])
     .filter((campaign, key) => {
       campaign.key = key;
       return campaign;
     }).orderBy((campaign) => {
       return parseInt(campaign.timestamp)
-    } , 'asc')
+    }, 'desc')
     .value();
   },
   campaign_services: (state) => { return state.campaign_services; }
@@ -36,19 +46,25 @@ const track_campaign_actions = {
   /**
    * Fetches all the info of a user
    */
-   async get_user({ state, dispatch, commit }, uid) {
+   async get_user({ state, commit }, uid) {
     let user = (state.users) ? state.users[uid] : undefined;
     
     if(!user) {
-      const services = await dispatch("get_campaign_services");
       try {
-        campaigns = await services.getCampaigns(uid, true);
-        commit("SET_CAMPAIGNS", campaigns || {});
+        USERS_REF.child(uid).on("value", (snapshot) => {
+          commit("SET_USER", { uid, user: snapshot.val() });
+        });
+        SETTINGS_REF.child(`${uid}/encounter`).on("value", (snapshot) => {
+          commit("SET_USER_SETTINGS", { uid, settings: snapshot.val() });
+        });
+        LIVE_REF.child(`${uid}/live`).on("value", (snapshot) => {
+          commit("SET_USER_LIVE", { uid, live: snapshot.val() });
+        });
       } catch(error) {
         throw error;
       }
     }
-    return campaigns;
+    return state.users[uid];
   },
 
   /**
@@ -56,18 +72,18 @@ const track_campaign_actions = {
    * and stores them in track_campaigns
    */
    async get_campaigns({ state, dispatch, commit }, uid) {
-    let campaigns = (state.track_campaigns) ? state.track_campaigns[uid] : undefined;
+    let campaigns = (state.track_search_campaigns) ? state.track_search_campaigns[uid] : undefined;
     
     if(!campaigns) {
-      const services = await dispatch("get_campaign_services");
       try {
-        campaigns = await services.getCampaigns(uid, true);
-        commit("SET_CAMPAIGNS", campaigns || {});
+        SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).orderByChild("private").equalTo(null).on("value", (snapshot) => {
+          commit("SET_CAMPAIGNS", { uid, campaigns: snapshot.val() });
+        });
       } catch(error) {
         throw error;
       }
     }
-    return campaigns;
+    return state.track_search_campaigns[uid];
   },
 
  
@@ -108,7 +124,10 @@ const track_campaign_actions = {
 };
 const track_campaign_mutations = {
   SET_CAMPAIGN_SERVICES(state, payload) { Vue.set(state, "campaign_services", payload); },
-  SET_CAMPAIGNS(state, payload) { Vue.set(state, "campaigns", payload); },
+  SET_USER(state, { uid, user }) { Vue.set(state.users, uid, user); },
+  SET_USER_SETTINGS(state, { uid, settings }) { Vue.set(state.users[uid], "settings", settings); },
+  SET_USER_LIVE(state, { uid, live }) { Vue.set(state.users[uid], "live", live); },
+  SET_CAMPAIGNS(state, { uid, campaigns}) { Vue.set(state.track_search_campaigns, uid, campaigns); },
   SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) { 
     if(state.cached_campaigns[uid]) {
       Vue.set(state.cached_campaigns[uid], id, campaign);

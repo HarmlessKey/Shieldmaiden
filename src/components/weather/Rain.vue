@@ -1,11 +1,9 @@
 <template>
 	<div class="wrapper" :class="intensityClass">
-		<div class="rain layer1 a"></div>
-		<div class="rain layer1"></div> 
-		<div class="rain layer2 a"></div>
-		<div class="rain layer2"></div>
-		<div class="rain layer3 a"></div>
-		<div class="rain layer3"></div>
+		<template v-for="i in 3">
+			<div  class="rain a" :class="`layer${i}`" :key="`${i}-a`" />
+			<div class="rain" :class="`layer${i}`" :key="i"/>
+		</template>
 		<!-- <audio v-if="audio" :src="audio_file" autoplay loop /> -->
 	</div>
 </template>
@@ -134,10 +132,7 @@
 
 		// Heavy
 		&.heavy {
-			// transform: rotate(-15deg);
-
 			.layer1 {
-				width: 1px;
 				height: 160px;
 				animation-duration: .3s;
 

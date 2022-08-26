@@ -3,6 +3,18 @@
 		<ContentHeader type="characters" @add="addCharacter" />
 
 		<div class="card-body">
+			<h3>Thank you <strong>{{ userInfo.username }}</strong> for helping us test our Character Builder!</h3>
+
+			<h4>Disclaimer</h4>
+			<p>
+				This is an early phase of our Character Builder and it will definitely not be bug free.<br/>
+				If you find a <strong>bug</strong>, please report it on our Discord in the designated channel 
+				<a href="https://discord.com/channels/654675574488563714/982257934153166858" target="_blank" rel="noopener">#character-builder</a>.
+			</p>
+			<p>
+				During our closed alpha phase we might at any time delete all characters of all users. We will send a notification on Discord whenever we do this.
+			</p>
+
 			<template v-if="characters">	
 				<q-table
 					:data="characters"
@@ -115,6 +127,7 @@
 			...mapGetters([
 				'tier',
 				'overencumbered',
+				"userInfo"
 			]),
 			...mapGetters("characters", ["characters"])
 		},

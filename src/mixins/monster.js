@@ -1,6 +1,5 @@
-import { abilities } from "src/utils/generalConstants";
+import { abilities, damage_types, skills } from "src/utils/generalConstants";
 import { general } from "./general";
-import { damage_types, skills } from "src/utils/generalConstants";
 
 export const monsterMixin = {
 	mixins: [general],

@@ -240,15 +240,17 @@
 <script>
 	import { mapGetters, mapActions } from "vuex";
 	import { setHP } from "src/mixins/HpManipulations.js";
-	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
 	import { runEncounter } from 'src/mixins/runEncounter.js';
 
 	export default {
 		name: "Roll",
-		mixins: [setHP, damage_types, runEncounter],
+		mixins: [setHP, runEncounter],
 		props: ["current"],
 		data() {
 			return {
+				damage_types: damage_types,
+				damage_type_icons: damage_type_icons,
 				rollInfo: false,
 				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,

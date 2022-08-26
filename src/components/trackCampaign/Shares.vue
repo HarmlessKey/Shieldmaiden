@@ -110,13 +110,13 @@
 
 <script>
 	import { trackEncounter } from 'src/mixins/trackEncounter.js';
-	import { damage_types } from "src/mixins/damageTypes.js";
+	import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 	import Name from "./live/Name";
 	import Avatar from "./live/Avatar";
 
 	export default {
 		name: "Shares",
-		mixins: [trackEncounter, damage_types],
+		mixins: [trackEncounter],
 		props: {
 			shares: {
 				type: Array,
@@ -141,6 +141,12 @@
 			npcSettings: {
 				type: Object,
 				default: undefined
+			}
+		},
+		data() {
+			return {
+				damage_types: damage_types,
+				damage_type_icons: damage_type_icons
 			}
 		},
 		components: {

@@ -248,7 +248,7 @@ html body {
 		}
 	}
 
-	//MARGINGS
+	//MARGINS
 	.m {
 		&-0 {
 			margin: 0 !important;
@@ -664,8 +664,7 @@ html body {
 		height: 46px;
 		line-height: 46px;
 		margin-top: 1px;
-		color: #fff;
-		border: dashed 1px #5c5757;
+		border: dashed 1px $neutral-2;
 
 		&.none {
 			font-size: 20px;
@@ -800,6 +799,16 @@ html body {
 		}
 	}
 
+	.character-description {
+    .stat {
+      font-weight: bold;
+      cursor: default;
+    }
+		:last-child {
+			margin-bottom: 0;
+		}
+  }
+
 	.validate {
 		margin-top: 5px;
 		font-size: 11px;
@@ -886,9 +895,6 @@ html body {
 	}
 
 	label.required:after {
-		// content: '\f069';
-		// font-family: FontAwesome;
-		// // font-
 		content: '*';
 		color: $red;
 		font-size: 25px;
@@ -1115,6 +1121,12 @@ html body {
 		.accordion-body {
 			background-color: $neutral-8;
 			padding: 20px;
+
+			.hk-table {
+				.hk-table-column {
+					background-color: $neutral-9;
+				}
+			}
 		}
 	}
 
@@ -1304,6 +1316,28 @@ html body {
 		}
 	}
 
+
+	// In character creator -> class -> xp dialog
+	.handle-xp {
+		display: flex;
+		justify-content: center;
+
+		.q-field {
+			height: 77px;
+			margin-right: 1px;
+			max-width: 150px;
+
+			&__control {
+				height: 77px;
+
+				input {
+					text-align: center;
+					font-size: 20px;
+				}
+			}
+		}
+	}
+
 	/* HK TABLE */
 	.hk-table {
 
@@ -1449,12 +1483,17 @@ html body {
 		border-collapse: separate !important; 
 		border-spacing: 0 1px;
 		width: 100%;
+		margin-bottom: 20px;
+
+		p {
+			margin: 0;
+		}
 		
 		thead {
 			margin-bottom: 1px !important;
 
 			th {
-				text-align: left;
+				text-align: left !important;
 				padding: 10px;
 				border: none;
 			}
@@ -1462,6 +1501,12 @@ html body {
 		tbody {
 			tr {
 				margin-bottom: 1px !important;
+
+				th {
+					text-align: left;
+					padding: 10px;
+					border: none;
+				}
 
 				td {
 					width: max-content;
@@ -2161,6 +2206,16 @@ html body {
 		}
 	}
 
+	.q-dialog__inner {
+		.hk-card {
+			.card-header {
+				position: sticky;
+				top: 0;
+				z-index: 1;
+			}
+		}
+	}
+
 	.sticky-header-table {
 		max-height: 300px;
 
@@ -2192,11 +2247,15 @@ html body {
 		}
 		.q-tabs__arrow {
 			line-height: 35px;
-			font-size: 30px;
-			text-shadow: 0px 0px 3px #000;
-			color: $neutral-1;
 		}
 	}
+	.q-tabs__arrow {
+		line-height: 48px;
+		font-size: 30px;
+		text-shadow: 0px 0px 3px #000;
+		color: $neutral-1;
+	}
+	
 
 	.q-notification {
 		border-radius: $border-radius;
@@ -2204,6 +2263,7 @@ html body {
 	.q-notifications__list--top {
 		top: 120px;
 	}
+	
 
 
 

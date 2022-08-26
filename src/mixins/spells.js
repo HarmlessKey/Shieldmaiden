@@ -1,7 +1,4 @@
-import { dice } from 'src/mixins/dice.js';
-
 export const spells = {
-	mixins: [dice],
 	data() {
 		return {
 			spell_levels: [

@@ -16,7 +16,7 @@
 							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
 								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-8">
-										<b>{{ effect.type.capitalize() }}</b>
+										<strong>{{ effect.type.capitalize() }}</strong>
 									</q-card-section>
 
 									<q-card-section>
@@ -56,7 +56,7 @@
 						v-validate="'max:999'"
 						class="mb-2"
 						title="Duration"
-						data-vv-as="Duriation"
+						data-vv-as="Duration"
 					/>
 					<p class="validate red" v-if="errors.has('duration')">{{ errors.first('duration') }}</p>
 				</div>
@@ -123,7 +123,7 @@
 								<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
 									<q-card :dark="$store.getters.theme === 'dark'">
 										<q-card-section class="bg-neutral-8">
-											<b>Fixed value</b>
+											<strong>Fixed value</strong>
 										</q-card-section>
 										<q-card-section>
 											If the effect has a fixed number, set it here.
@@ -161,7 +161,7 @@
 					label="Description"
 					name="description"
 					autogrow
-					data-vv-as="Desciption"
+					data-vv-as="Description"
 					v-validate="'required|max:100'"
 					maxlength="101"
 					@change="$forceUpdate()"
@@ -230,12 +230,11 @@
 
 <script>
 import { effects } from '../mixins/effects';
-import { abilities } from '../mixins/abilities';
-import { skills } from '../mixins/skills';
+import { abilities, damage_types, dice_types, skills } from 'src/utils/generalConstants';
 
 export default {
 	name: "EffectsForm",
-	mixins: [effects, abilities, skills],
+	mixins: [effects],
 	props: {
 		value: Object,
 		variables: {
@@ -249,16 +248,10 @@ export default {
 	},
 	data() {
 		return {
-			damage_types: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
-				"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
-			dice_type: [
-				{ label: "d4", value: 4 }, 
-				{ label: "d6", value: 6 },
-				{ label: "d8", value: 8 }, 
-				{ label: "d10", value: 10 },
-				{ label: "d12", value: 12 },
-				{ label: "d20", value: 20 }
-			],
+			damage_types: damage_types,
+			skillList: skills,
+			abilities: abilities,
+			dice_type: dice_types,
 			dur_time: [
 				{ label: "Round", value: "round" },
 				{ label: "Minute", value: "minute" },

@@ -1,9 +1,7 @@
 <template>
-	<q-no-ssr class="hk-layout">
-		<div class="content">
-			<Crumble />
-			<router-view />
-		</div>
+	<q-no-ssr class="content">
+		<Crumble />
+		<router-view />
 	</q-no-ssr>
 </template>
 

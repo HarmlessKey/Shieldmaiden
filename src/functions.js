@@ -22,6 +22,10 @@ Number.prototype.positive = function() {
 	return (this >= 0) ? this : 0;
 }
 
+Array.min = function( array ){
+	return Math.min.apply( Math, array );
+};
+
 /**
  * Returns the browser type
  * @return {string} browser: Opera, Firefox, Safari, IE, edge, chrome

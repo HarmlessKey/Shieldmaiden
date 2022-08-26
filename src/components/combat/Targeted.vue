@@ -200,7 +200,7 @@
 <script>
 	import { mapActions, mapGetters } from 'vuex'
 	import { dice } from 'src/mixins/dice.js';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 	import TargetItem from 'src/components/combat/TargetItem.vue';
 	import TargetInfo from 'src/components/combat/TargetInfo.vue';
 	import { experience } from 'src/mixins/experience.js';
@@ -208,7 +208,7 @@
 
 	export default {
 		name: 'Targeted',
-		mixins: [dice, experience, abilities],
+		mixins: [dice, experience],
 		components: {
 			TargetItem,
 			TargetInfo
@@ -216,6 +216,7 @@
 		data() {
 			return {
 				setShadow: 0,
+				abilities: abilities
 			}
 		},
 		computed: {

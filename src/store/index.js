@@ -14,6 +14,7 @@ import items from './modules/userContent/items.js';
 import reminders from './modules/userContent/reminders.js';
 import players from './modules/userContent/players.js';
 import encounters from './modules/userContent/encounters.js';
+import characters from './modules/userContent/characters.js';
 
 Vue.use(Vuex);
 
@@ -42,6 +43,7 @@ export default function () {
 			reminders: reminders,
 			players: players,
 			encounters: encounters,
+			characters: characters,
 			tips: tips
     },
     // enable strict mode (adds overhead!)

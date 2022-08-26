@@ -108,7 +108,7 @@
         }
       }
     },
-    "characters_computed": {
+    "characters": {
       "$uid": {
         "$characterId": {
           	".write": "
@@ -117,18 +117,15 @@
        			"
         }, 
         ".read": true
-      },
-      ".read": true
+      }
     },
-    "characters_base": {
+    "search_characters": {
+      ".read": true,
       "$uid": {
-        "$characterId": {
-          	".write": "
-              $uid === auth.uid || 
-              root.child('character_control').child(auth.uid).child($characterId).child('user').val() === $uid
-       			"
-        }, 
-        ".read": true
+        ".write": "$uid === auth.uid",
+        "results": {
+          ".indexOn": ["character_name"]
+        }
       }
     },
     "character_control": {
@@ -412,6 +409,9 @@
                 ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 9"
               },
               "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "key": {
                 ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "$other": { ".validate": false }

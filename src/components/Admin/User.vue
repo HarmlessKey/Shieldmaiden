@@ -164,7 +164,8 @@
 				],
 				contributes: [
 					"monsters",
-					"spells"
+					"spells",
+					"character-builder"
 				]
 			}
 		},

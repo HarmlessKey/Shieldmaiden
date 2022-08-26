@@ -46,17 +46,15 @@
 
 <script>
 	import { general } from 'src/mixins/general.js';
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 
 	export default {
 		name: 'npc-AbilityScores',
 		props: ['value'],
-		mixins: [
-			general,
-			abilities
-		],
+		mixins: [general],
 		data() {
 			return {
+				abilities: abilities
 			}
 		},
 		computed: {

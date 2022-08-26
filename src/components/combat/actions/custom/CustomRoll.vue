@@ -15,14 +15,14 @@
 		<q-form>
 			<q-input
 				v-if="roll_type === 'attack'"
-				:dark="$store.getters.theme === 'dark'" dennse filled square dense
+				:dark="$store.getters.theme === 'dark'" dense filled square 
 				type="number"
 				v-model="attack_bonus"
 				label="Attack bonus"
 			/>
 			<div v-if="roll_type === 'save'" class="d-flex justify-content-between">
 				<q-select 
-					:dark="$store.getters.theme === 'dark'" filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square
 					map-options
 					emit-value
 					label="Save ability"
@@ -31,7 +31,7 @@
 					class="mr-1"
 				/>
 				<q-input
-					:dark="$store.getters.theme === 'dark'" dennse filled square dense
+					:dark="$store.getters.theme === 'dark'" dense filled square
 					type="number"
 					v-model="save_dc"
 					label="Save DC"
@@ -95,8 +95,7 @@
 	import { mapGetters } from "vuex";
 	import { dice } from "src/mixins/dice.js";
 	import { setHP } from "src/mixins/HpManipulations.js";
-	import { damage_types } from "src/utils/generalConstants";
-	import { abilities } from "src/utils/generalConstants";
+	import { damage_types, abilities } from "src/utils/generalConstants";
 	import { runEncounter } from 'src/mixins/runEncounter.js';
 
 	export default {

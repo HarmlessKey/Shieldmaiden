@@ -52,7 +52,7 @@
 				{{ modifier.name }}
 			</div>
 			<div class="value">
-				{{ modifierValue(modifier) }}
+				{{ modifierValue(modifier) > 0 ? `+${modifierValue(modifier)}` : modifierValue(modifier) }}
 			</div>
 		</div>
 	</div>
@@ -88,12 +88,10 @@
 				return totalRolled;
 			},
 			average(hit_die) {
-				const hit_dice = dice_types.filter(dice => {
-					return dice.value === hit_die;
+				const hit_dice = dice_types.filter(d => {
+					return d.value === hit_die;
 				});
-				const average = (hit_dice[0]) ? hit_dice[0].average : 0;
-
-				return average;
+				return (hit_dice[0]) ? hit_dice[0].average : 0;
 			},
 			classHP(key, level, hit_dice) {
 				let classHp = {
@@ -126,8 +124,7 @@
 						//define how step scaling is handled
 					}
 				}
-
-				return (value >= 0) ? `+${value}` : value;
+				return value;
 			}
 		}
 	};

@@ -1338,49 +1338,6 @@ html body {
 		}
 	}
 
-	.description {
-		.hk-tooltip {
-			position: relative;
-			cursor: default;
-		}
-
-		/*== common styles for both parts of tool tip ==*/
-		.hk-tooltip::after {
-			left: 50%;
-			opacity: 0;
-			position: absolute;
-			z-index: -100;
-		}
-
-		.hk-tooltip:hover::after,
-		.hk-tooltip:focus::after {
-			opacity: 1;
-			z-index: 100; 
-		}
-
-		/*== speech bubble ==*/
-		.hk-tooltip::after {
-			background: $neutral-6;
-			border-radius: 5px;
-			font-weight: normal;
-			bottom: 100%;
-			color: $white;
-			content: attr(data-content);
-			padding: 8px;
-			transition: all .65s;
-			transform:  translate(-50%, 0);
-			font-size: 10px;
-			text-align: center;
-			min-width: 90px;
-			max-width: 150px;
-		}
-
-		.hk-tooltip:hover::after,
-		.hk-tooltip:focus::after  {
-			transition: all .65s;
-		}
-	}
-
 	/* HK TABLE */
 	.hk-table {
 

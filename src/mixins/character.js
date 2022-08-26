@@ -4,7 +4,6 @@ import { dice } from "src/mixins/dice.js";
 import { skills } from "src/utils/generalConstants";
 import { experience_table, spell_slot_table } from "src/utils/characterConstants";
 
-
 export const characterMixin = {
 	mixins: [experience, general, dice],
 	data() {
@@ -16,10 +15,9 @@ export const characterMixin = {
 	},
 	methods: {
 		modifierFilter(modifiers, type) {
-			const filtered = modifiers.filter(mod => {
+			return modifiers.filter(mod => {
 				return mod.target === type;
 			});
-			return filtered;
 		},
 
 		/**
@@ -51,7 +49,6 @@ export const characterMixin = {
 				}
 			}
 
-			origin = origin.split(".");
 			let modifiers = base_character.modifiers; //Copy the modifiers so they can be manipulated during the compute
 			let armor = undefined;
 			let shield = undefined;

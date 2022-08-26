@@ -3,7 +3,7 @@ import { db } from "src/firebase";
 const CHARACTERS_REF = db.ref("characters");
 const SEARCH_CHARACTERS_REF = db.ref("search_characters");
 
-export class characterServices {
+export class CharacterServices {
 
   async getCharacters(uid) {
     try {

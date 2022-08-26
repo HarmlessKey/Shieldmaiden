@@ -19,7 +19,3 @@ export default {
   name: "CharacterBuilderInfo"
 }
 </script>
-
-<style>
-
-</style>

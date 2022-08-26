@@ -506,10 +506,9 @@
 	import { dice } from 'src/mixins/dice.js';
 	import { monsterMixin } from 'src/mixins/monster.js';
 	import { experience } from 'src/mixins/experience.js';
-	import { abilities } from 'src/utils/generalConstants';
+	import { abilities, damage_type_icons, skills } from 'src/utils/generalConstants';
 	import { runEncounter } from 'src/mixins/runEncounter.js';
 	import Spell from "src/components/compendium/Spell";
-	import { damage_type_icons, skills } from "src/utils/generalConstants";
 	import { calc_skill_mod } from "src/utils/generalFunctions";
 
 	export default {

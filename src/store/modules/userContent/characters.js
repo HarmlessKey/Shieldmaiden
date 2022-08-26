@@ -1,9 +1,6 @@
-import { db } from 'src/firebase';
-import { characterServices } from "src/services/characters";
+import { CharacterServices } from "src/services/characters";
 import Vue from 'vue';
 import _ from 'lodash';
-
-const characters_ref = db.ref('characters');
 
 const character_state = () => ({
   character_services: null,
@@ -35,7 +32,7 @@ const character_getters = {
 const character_actions = {
   async get_character_services({ getters, commit }) {
     if(getters.character_services === null || !Object.keys(getters.character_services).length) {
-      commit("SET_CHARACTER_SERVICES", new characterServices);
+      commit("SET_CHARACTER_SERVICES", new CharacterServices);
     }
     return getters.character_services;
   },

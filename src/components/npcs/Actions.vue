@@ -539,8 +539,7 @@
 
 <script>
 	import { general } from 'src/mixins/general.js';
-	import { abilities } from 'src/utils/generalConstants';
-	import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
+	import { abilities, damage_types, damage_type_icons } from 'src/utils/generalConstants';
 	import { monsterMixin } from 'src/mixins/monster.js';
 	import ActionRoll from 'src/components/ActionRoll';
 	import { mapActions } from 'vuex';

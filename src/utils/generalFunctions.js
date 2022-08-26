@@ -17,7 +17,7 @@ export function calc_dice_average(value, amount = 1) {
  */
 export function calc_mod(value) {
   return (value) ? Math.floor((value - 10) / 2) : 0;
-};
+}
 
 /**
  * Returns the modifier for a given skill

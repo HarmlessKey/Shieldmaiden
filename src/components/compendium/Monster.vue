@@ -347,11 +347,10 @@
 <script>
 	import { general } from 'src/mixins/general.js';
 	import { dice } from 'src/mixins/dice.js';
-	import { abilities } from 'src/utils/generalConstants';
 	import { monsterMixin } from 'src/mixins/monster.js';
 	import { mapActions, mapGetters } from 'vuex';
 	import Spell from "src/components/compendium/Spell";
-	import { skills } from "src/utils/generalConstants";
+	import { skills, abilities } from "src/utils/generalConstants";
 	import { calc_skill_mod } from "src/utils/generalFunctions";
 
 	export default {

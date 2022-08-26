@@ -144,31 +144,27 @@
 				return this.get_computed_character(this.userId, this.playerId);
 			},
 			race_modifiers() {
-				const modifiers = this.modifierArray(this.base_values.modifiers).filter(mod => {
+				return this.modifierArray(this.base_values.modifiers).filter(mod => {
 					const origin = mod.origin.split(".");
 					return origin[0] === 'race';
 				});
-				return modifiers;
 			},
 			class_modifiers() {
-				const modifiers = this.modifierArray(this.base_values.modifiers).filter(mod => {
+				return this.modifierArray(this.base_values.modifiers).filter(mod => {
 					const origin = mod.origin.split(".");
 					return origin[0] === 'class';
 				});
-				return modifiers;
 			},
 			equipment_modifiers() {
-				const modifiers = this.modifierArray(this.base_values.modifiers).filter(mod => {
+				return this.modifierArray(this.base_values.modifiers).filter(mod => {
 					const origin = mod.origin.split(".");
 					return origin[0] === 'equipment';
 				});
-				return modifiers;
 			},
 			ability_modifiers() {
-				const modifiers = this.modifierArray(this.base_values.modifiers).filter(mod => {
+				return this.modifierArray(this.base_values.modifiers).filter(mod => {
 					return mod.target === 'ability';
 				});
-				return modifiers;
 			}
 		},
 		methods: {

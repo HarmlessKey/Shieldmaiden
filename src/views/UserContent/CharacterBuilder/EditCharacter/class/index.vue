@@ -581,7 +581,6 @@
 		data() {
 			return {
 				abilities: abilities,
-				skillList: skills,
 				saved: false,
 				invalid: false,
 				modifier_modal: false,
@@ -682,12 +681,12 @@
 				this.$set(this.Class.classes[classIndex], "class", Class);
 				this.save(valid, `classes.class`);
 			},
-			filtered_skills(Class, skills) {
-				const skill_array = Object.values(this.skillList);
-				if(Class === "custom" || skills.includes("*")) {
+			filtered_skills(Class, _skills) {
+				const skill_array = Object.values(skills);
+				if(Class === "custom" || _skills.includes("*")) {
 					return skill_array;
 				} else {
-					return skill_array.filter(skill => skills.includes(skill.value));
+					return skill_array.filter(skill => _skills.includes(skill.value));
 				}
 			},
 			saveProp(value, classIndex, property, valid) {

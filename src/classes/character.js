@@ -709,15 +709,16 @@ export class ComputedCharacter {
      **/
 
     // Add Ability Score Modifiers
-    for(let [key, value] of Object.entries(this.abilities)) {
+    for(const [key, value] of Object.entries(this.abilities)) {
+      let score = value;
       for(const modifier of character.filtered_modifiers_target("ability")) {
         for(const subtarget of modifier.subtarget) {
           if(subtarget === key && modifier.type === 'bonus') {
-            value = value + parseInt(modifier.value);
+            score = score + parseInt(modifier.value);
           }
         }
       }
-      this.abilities[key] = value;
+      this.abilities[key] = score;
 
       //Set score to maximum if it is higher than its maximum
       if(this.abilities[key] > ability_max[key]) {
@@ -738,7 +739,7 @@ export class ComputedCharacter {
 
     for(const classIndex in character.classes) {
       this.hit_points = character.total_class_hp(classIndex, con).hp;
-    };
+    }
 
     //Add HP modifiers
     for(const modifier of character.filtered_modifiers_target("hp")) {

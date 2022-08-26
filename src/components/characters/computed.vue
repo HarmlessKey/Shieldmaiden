@@ -276,10 +276,7 @@
 				return saving_throws;
 			},
 			hp_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					return mod.target === 'hp';
-				});
-				return modifiers;
+				return this.modifiers.filter(mod => mod.target === 'hp');
 			},
 		},
 		methods: {

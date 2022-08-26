@@ -276,10 +276,9 @@
 </template>
 
 <script>
-	import { abilities } from 'src/utils/generalConstants';
+	import { abilities, skills } from 'src/utils/generalConstants';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';
 	import numeral from 'numeral';
-	import { skills } from "src/utils/generalConstants";
 
 	export default {
 		name: 'CharacterClass',
@@ -474,14 +473,23 @@
 					
 					if(this.modifier.origin.split('.')[0] === 'class') {
 						const class_name = this.character.classes[this.modifier.origin.split('.')[1]].name;
-						text += `${this.modifier.scale_size > 1 ? `${this.modifier.scale_size} ${class_name} levels` : `${class_name} level`} above `;
+						if(this.modifier.scale_size > 1) {
+							text += `${this.modifier.scale_size} ${class_name} levels`;
+						} else {
+							text += `${class_name} level`;
+						}
+						text += " above "
 						text += numeral(this.modifier.origin.split('.')[2]).format('0o');
 					}	else {
-						text += `${this.modifier.scale_size > 1 ? `${this.modifier.scale_size} character levels` : `character level`} above `;
+						if(this.modifier.scale_size > 1) {
+							text += `${this.modifier.scale_size} character levels`;
+						} else {
+							text += `character level`;
+						}
+						text += " above "
 						text += numeral(this.modifier.scaling_start).format('0o');
 					}
-					text += ".";
-					return text;
+					return text+".";
 				}
 			},
 			deleteScaling() {
@@ -492,7 +500,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	
-</style>

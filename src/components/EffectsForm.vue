@@ -16,7 +16,7 @@
 							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
 								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-8">
-										<b>{{ effect.type.capitalize() }}</b>
+										<strong>{{ effect.type.capitalize() }}</strong>
 									</q-card-section>
 
 									<q-card-section>
@@ -56,7 +56,7 @@
 						v-validate="'max:999'"
 						class="mb-2"
 						title="Duration"
-						data-vv-as="Duriation"
+						data-vv-as="Duration"
 					/>
 					<p class="validate red" v-if="errors.has('duration')">{{ errors.first('duration') }}</p>
 				</div>
@@ -123,7 +123,7 @@
 								<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
 									<q-card :dark="$store.getters.theme === 'dark'">
 										<q-card-section class="bg-neutral-8">
-											<b>Fixed value</b>
+											<strong>Fixed value</strong>
 										</q-card-section>
 										<q-card-section>
 											If the effect has a fixed number, set it here.
@@ -161,7 +161,7 @@
 					label="Description"
 					name="description"
 					autogrow
-					data-vv-as="Desciption"
+					data-vv-as="Description"
 					v-validate="'required|max:100'"
 					maxlength="101"
 					@change="$forceUpdate()"
@@ -230,8 +230,7 @@
 
 <script>
 import { effects } from '../mixins/effects';
-import { abilities, damage_types, dice_types } from 'src/utils/generalConstants';
-import { skills } from "src/utils/generalConstants";
+import { abilities, damage_types, dice_types, skills } from 'src/utils/generalConstants';
 
 export default {
 	name: "EffectsForm",

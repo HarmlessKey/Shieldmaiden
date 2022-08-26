@@ -205,9 +205,8 @@
 	import ModifierTable from 'src/components/characters/modifier-table.vue';
 	import Modifier from 'src/components/characters/modifier.vue';
 	import { db } from 'src/firebase';
-	import { abilities } from 'src/utils/generalConstants';
+	import { abilities, damage_types } from 'src/utils/generalConstants';
 	import { weapons } from 'src/mixins/armorAndWeapons.js';
-	import { damage_types } from 'src/utils/generalConstants';
 	import Weapon from './weapon.vue'
 	import Armor from './armor.vue'
 
@@ -240,7 +239,7 @@
 		},
 		computed: {
 			types() {
-				const types = [
+				return [
 					{
 						value: "weapon",
 						label: "Weapons",
@@ -260,14 +259,13 @@
 						items: this.items
 					},
 				];
-				return types;
 			},
 			money() {
 				return this.equipment.money;
 			},
 			weapons() {
 				if(this.equipment && this.equipment.items) {
-					const weapons = Object.entries(this.equipment.items).filter(item => {
+					return Object.entries(this.equipment.items).filter(item => {
 						return item[1].type === 'weapon';
 					}).map(obj => {
 						let weapon = obj[1];
@@ -281,12 +279,11 @@
 
 						return weapon;
 					});
-					return weapons;
 				} return [];
 			},
 			armor() {
 				if(this.equipment && this.equipment.items) {
-					const armor = Object.entries(this.equipment.items).filter(item => {
+					return Object.entries(this.equipment.items).filter(item => {
 						return ["armor", "shield"].includes(item[1].type);
 					}).map(obj => {
 						let armor = obj[1];
@@ -300,12 +297,11 @@
 
 						return armor;
 					});
-					return armor;
 				} return [];
 			},
 			items() {
 				if(this.equipment && this.equipment.items) {
-					const items = Object.entries(this.equipment.items).filter(item => {
+					return Object.entries(this.equipment.items).filter(item => {
 						return item[1].type === 'item';
 					}).map(obj => {
 						let item = obj[1];
@@ -319,7 +315,6 @@
 
 						return item;
 					});
-					return items;
 				} return [];
 			}
 		},

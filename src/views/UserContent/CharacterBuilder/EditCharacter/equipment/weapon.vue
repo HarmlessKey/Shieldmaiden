@@ -7,6 +7,7 @@
 					'fas fa-check green': proficient,
 					'fas fa-times red': !proficient
 				}"
+				aria-hidden="true"
 			>
 				<q-tooltip anchor="top middle" self="bottom middle">
 					{{ proficient ? "Proficient" : "Not proficient" }}
@@ -35,7 +36,7 @@
 					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 						<q-card dark square>
 							<q-card-section class="bg-gray-active">
-								<b>Dexterity maximum</b>
+								<strong>Dexterity maximum</strong>
 							</q-card-section>
 
 							<q-card-section>

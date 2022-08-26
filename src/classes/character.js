@@ -102,7 +102,7 @@ export class Character {
     if(value === "rolled") {
       for(const classKey in this.class.classes) {
         const Class = this.class.classes[classKey];
-        const level = (classKey === 0) ? 2 : 1;
+        const level = (classKey == 0) ? 2 : 1;
         if(!Class.rolled_hit_points) {
           this.class.classes[classKey].rolled_hit_points = { [level]: 0 };
         }

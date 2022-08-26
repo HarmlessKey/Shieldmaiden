@@ -1,9 +1,9 @@
 <template>
-<hk-card header="contribute">
+<hk-card header="Contribute">
 	<div class="card-body">
 		<ul class="entities hasImg">
-			<template v-for="(item, index) in items">
-				<li v-if="userInfo.admin || userInfo.contribute.includes(item.url)" :key="index">
+			<template v-for="(item, key) in items">
+				<li v-if="userInfo.admin || userInfo.contribute.includes(key)" :key="key">
 					<i aria-hidden="true" class="icon mr-2" :class="item.icon" />
 					<router-link :to="item.url">{{ item.name }}</router-link>
 				</li>

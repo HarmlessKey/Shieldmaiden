@@ -7,11 +7,13 @@
 
 		<h3>
 			Constitution
-			<i v-b-popover.hover.top="'For every character level, you add the constitution modifier to the hit points.'" title="Constitution" class="fas fa-info-circle blue"/>
+			<hk-popover header="Constitution" content="For every character level, you add the constitution modifier to the hit points.">
+			<i class="fas fa-info-circle blue" aria-hidden="true" />
+			</hk-popover>
 		</h3>
 		<div class="modifier">
 			<div class="truncate">
-				Level ({{ data.level }}) <i class="fas fa-times mx-2" /> Constitution modifier ({{ data.con_mod }})
+				Level ({{ data.level }}) <i class="fas fa-times mx-2" aria-hidden="true" /> Constitution modifier ({{ data.con_mod }})
 			</div>
 			<div class="value">
 				{{ constitution }}
@@ -20,7 +22,7 @@
 
 		<h3 class="mt-3">Classes</h3>
 		<div v-for="(subclass, key) in data.classes" :key="key" class="mt-3">
-			<b>Level {{ subclass.level }} {{ subclass.name || "Subclass" }}: ({{ classHP(key, subclass.level, subclass.hit_dice).total }})</b>
+			<strong>Level {{ subclass.level }} {{ subclass.name || "Subclass" }}: ({{ classHP(key, subclass.level, subclass.hit_dice).total }})</strong>
 			<div class="modifier" v-if="key == 0">
 				<div class="truncate">
 					Full hit die at level 1
@@ -58,6 +60,7 @@
 
 <script>
 	import { dice } from 'src/mixins/dice.js';
+	import { dice_types } from 'src/utils/generalConstants';
 
 	export default {
 		name: 'HitPoints',
@@ -85,7 +88,7 @@
 				return totalRolled;
 			},
 			average(hit_die) {
-				const hit_dice = this.dice_types.filter(dice => {
+				const hit_dice = dice_types.filter(dice => {
 					return dice.value === hit_die;
 				});
 				const average = (hit_dice[0]) ? hit_dice[0].average : 0;

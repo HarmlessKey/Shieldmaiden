@@ -222,10 +222,10 @@
 		inject: ["characterState"],
 		computed: {
 			computed() {
-				return this.characterState.computed_character || {}
+				return this.characterState.computed_character || {};
 			},
 			modifiers() {
-				return this.characterState.modifierArray
+				return this.characterState.modifierArray || [];
 			},
 			character() {
 				return (this.computed) ? this.computed : {};

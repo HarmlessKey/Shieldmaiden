@@ -82,7 +82,7 @@
 									<q-item-section avatar>
 										<div class="actions">
 											<a class="btn btn-sm bg-neutral-5" @click.stop="confirmDelete(index, trait.name, valid)">
-												<i class="fas fa-trash-alt"></i>
+												<i class="fas fa-trash-alt" aria-hidden="true" />
 											</a>
 										</div>
 									</q-item-section>

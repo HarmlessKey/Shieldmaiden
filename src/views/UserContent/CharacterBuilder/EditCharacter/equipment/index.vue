@@ -7,10 +7,10 @@
 		<div v-for="{value, label, icon, items} in types" :key="`type-${value}`" :class="value">
 			<h3>
 				<span>
-					<i :class="icon"/> {{ label }}
+					<i :class="icon" aria-hidden="true"/> {{ label }}
 				</span>
 				<a @click="newItem(value)">
-					<i class="fas fa-plus green" />
+					<i class="fas fa-plus green"  aria-hidden="true"/>
 				</a>
 			</h3>
 			<q-list dark square class="accordion">
@@ -36,7 +36,7 @@
 							</q-checkbox>
 						</q-item-section>
 						<q-item-section avatar v-if="value === 'weapon'">
-							<i :class="item.weapon_type.split('_')[1] === 'melee' ? 'fas fa-sword' : 'fas fa-bow-arrow'">
+							<i :class="item.weapon_type.split('_')[1] === 'melee' ? 'fas fa-sword' : 'fas fa-bow-arrow'" aria-hidden="true">
 								<q-tooltip anchor="top middle" self="center middle">
 									{{ item.weapon_type.split("_")[1].capitalize() }}
 								</q-tooltip>
@@ -47,9 +47,9 @@
 						</q-item-section>
 						<q-item-section avatar>
 							<div class="actions">
-								<a class="gray-light mr-2"><i class="fas fa-pencil-alt"/></a>
+								<a class="gray-light mr-2"><i class="fas fa-pencil-alt" aria-hidden="true" /></a>
 								<a class="gray-light" @click.stop="removeItem(item['.key'])">
-									<i class="fas fa-trash-alt"/>
+									<i class="fas fa-trash-alt" aria-hidden="true" />
 								</a>
 							</div>
 						</q-item-section>
@@ -137,7 +137,7 @@
 											:active="new_item.name === weapon.label"
 										>
 											<q-item-section>
-												<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+												<q-item-label v-text="weapon.label" class="q-ml-lg" />
 											</q-item-section>
 										</q-item>
 									</template>
@@ -169,11 +169,11 @@
 											:active="new_item.name === armor.label"
 										>
 											<q-item-section>
-												<q-item-label v-html="armor.label" class="q-ml-lg" ></q-item-label>
+												<q-item-label v-text="armor.label" class="q-ml-lg" />
 											</q-item-section>
 											<q-item-section avatar>
 												<div class="ac_wrapper">
-													<i class="fas fa-shield" ></i>
+													<i class="fas fa-shield" aria-hidden="true" />
 													<span class="ac">
 														{{ armor.armor_class_mod ? `+${armor.armor_class_mod}` : armor.armor_class }}
 													</span>

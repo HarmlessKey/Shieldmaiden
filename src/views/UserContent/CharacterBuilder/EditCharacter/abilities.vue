@@ -192,11 +192,11 @@
 							<span class="neutral-2">phb 13</span>
 						</div>
 						<div class="card-body">
-							<p>
+							<p id="tableDesc">
 								You get 27 points to spend on your ability scores. The cost of each score is shown in the table below.<br/>
 								With this method, 15 is the highest ability score you can end up with and you can't have a score lower than 8.
 							</p>
-							<table class="table">
+							<table class="table" aria-describedby="tableDesc">
 								<tr>
 									<th>Score</th>
 									<th>Cost</th>

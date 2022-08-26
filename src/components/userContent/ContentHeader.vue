@@ -26,7 +26,7 @@
 					<span class="d-none d-md-inline-block ml-1">New {{ type.slice(0, -1) }}</span>
 				</a>
 				<template v-else>
-					<button v-if="type === 'characters'" @click="add">
+					<button v-if="type === 'characters'" @click="add" class="btn btn-sm bg-neutral-5">
 						<i aria-hidden="true" class="fas fa-plus green" /> 
 						<span class="d-none d-md-inline-block ml-1">New {{ type.slice(0, -1) }}</span>
 					</button>

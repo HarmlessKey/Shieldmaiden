@@ -363,7 +363,7 @@
 																			:active="proficiencies[classIndex].weapon.includes(weapon.value)"
 																		>
 																			<q-item-section>
-																				<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+																				<q-item-label v-text="weapon.label" class="q-ml-lg" />
 																			</q-item-section>
 																		</q-item>
 																	</template>

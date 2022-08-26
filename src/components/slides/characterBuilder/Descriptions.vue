@@ -17,8 +17,11 @@
 			The actual value will be shown when the description is displayed. The brackets are required.
 		</p>
 		
-		<hk-card header="Ability scores" small>
-			<table class="table mb-0">
+		<hk-card small>
+			<div class="card-header" slot="header" id="ASDesc">
+				Ability scores
+			</div>
+			<table class="table mb-0" aria-describedby="ASDesc">
 				<thead>
 					<th>
 						Ability
@@ -36,8 +39,11 @@
 			</table>
 		</hk-card>
 
-		<hk-card header="Ability modifiers" small>
-			<table class="table mb-0">
+		<hk-card small>
+			<div class="card-header" slot="header" id="AMDesc">
+				Ability modifiers
+			</div>
+			<table class="table mb-0" aria-describedby="AMDesc">
 				<thead>
 					<th>
 						Ability
@@ -56,7 +62,10 @@
 		</hk-card>
 
 		<hk-card header="Character values" small>
-			<table class="table mb-0">
+			<div class="card-header" slot="header" id="CVDesc">
+				Character values
+			</div>
+			<table class="table mb-0" aria-describedby="CVDesc">
 				<thead>
 					<th>
 						Value
@@ -75,7 +84,10 @@
 		</hk-card>
 
 		<hk-card header="Class values" small>
-			<table class="table mb-0">
+			<div class="card-header" slot="header" id="ClVDesc">
+				Class values
+			</div>
+			<table class="table mb-0" aria-describedby="ClVDesc">
 				<thead>
 					<th>
 						Value

@@ -10,7 +10,7 @@
 				</hk-popover>
 			</span>
 			<a class="btn btn-sm btn-clear" @click="newModifier(origin), modal = true">
-				<i class="fas fa-plus green" />
+				<i class="fas fa-plus green" aria-hidden="true" />
 				Add modifier
 			</a>
 		</h4>
@@ -31,13 +31,13 @@
 			<div slot="actions" slot-scope="data" class="actions">
 				<a class="btn btn-sm bg-neutral-5 mx-1" 
 					@click="editModifier(data.row)">
-					<i class="fas fa-pencil"></i>
+					<i class="fas fa-pencil" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Edit modifier
 					</q-tooltip>
 				</a>
 				<a class="btn btn-sm bg-neutral-5" @click="deleteModifier(data.row.index)">
-					<i class="fas fa-trash-alt"></i>
+					<i class="fas fa-trash-alt" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Delete modifier
 					</q-tooltip>

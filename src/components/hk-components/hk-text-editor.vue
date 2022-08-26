@@ -8,7 +8,7 @@
 					:class="{ 'is-active': editor.isActive('bold') }"
 					@click="editor.chain().focus().toggleBold().run()" 
 				>
-					<i class="fas fa-bold" />
+					<i class="fas fa-bold" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Bold
 					</q-tooltip>
@@ -19,7 +19,7 @@
 					:class="{ 'is-active': editor.isActive('italic') }"
 					@click="editor.chain().focus().toggleItalic().run()" 
 				>
-					<i class="fas fa-italic" />
+					<i class="fas fa-italic" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Italic
 					</q-tooltip>
@@ -30,7 +30,7 @@
 					:class="{ 'is-active': editor.isActive('underline') }"
 					@click="editor.chain().focus().toggleUnderline().run()" 
 				>
-					<i class="fas fa-underline" />
+					<i class="fas fa-underline" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Underline
 					</q-tooltip>
@@ -40,13 +40,13 @@
 			<!-- LISTS -->
 			<div class="group" v-if="toolbar.some(item => ['ul', 'ol'].includes(item))">
 				<button @click="editor.chain().focus().toggleBulletList().run()" class="module" :class="{ 'is-active': editor.isActive('bulletList') }">
-					<i class="fas fa-list-ul" />
+					<i class="fas fa-list-ul" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Bullet list
 					</q-tooltip>
 				</button>
 				<button @click="editor.chain().focus().toggleOrderedList().run()" class="module" :class="{ 'is-active': editor.isActive('orderedList') }">
-					<i class="fas fa-list-ol" />
+					<i class="fas fa-list-ol" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Ordered list
 					</q-tooltip>
@@ -56,7 +56,7 @@
 			<!-- TABLES -->
 			<div class="group" v-if="toolbar.includes('table')">
 				<button @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()" class="module">
-					<i class="fas fa-table" />
+					<i class="fas fa-table" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Insert table
 					</q-tooltip>
@@ -151,7 +151,7 @@
 					</div>
 				</q-btn-dropdown>
 				<button @click="editor.chain().focus().deleteTable().run()" class="module" v-show="editor.can().deleteTable()">
-					<i class="fas fa-trash-alt" />
+					<i class="fas fa-trash-alt" aria-hidden="true" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Delete table
 					</q-tooltip>
@@ -190,7 +190,7 @@
 
 			<div class="group actions" v-if="this.value !== this.newValue">
 				<button class="module" @click="save">
-					<i class="fas fa-check green mr-1" /> Save
+					<i class="fas fa-check green mr-1" aria-hidden="true" /> Save
 				</button>
 			</div>
 		</div>

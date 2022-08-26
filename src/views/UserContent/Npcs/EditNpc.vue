@@ -157,7 +157,7 @@
 			},
 			copy({ result }) {
 				this.copy_dialog = false;
-				this.npc = result;
+				this.npc = {...result};
 			},
 			revert_changes() {
 				this.npc = JSON.parse(this.npc_copy);

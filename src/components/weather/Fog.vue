@@ -88,12 +88,9 @@
   }
 
   &.smoke {
-    #foglayer_01 {
-    filter: invert(1);
-  }
-  #foglayer_02, #foglayer_03 {
-    filter: invert(1);
-  }
+    #foglayer_01, #foglayer_02, #foglayer_03 {
+      filter: invert(1);
+    }
   }
 
   /* ---------- Moving Fog ---------- */

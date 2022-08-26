@@ -157,6 +157,9 @@
           "avatar": {
             ".validate": "newData.isString() && newData.val().length <= 2000"
           },
+          "storage_avatar": {
+            ".validate": "newData.isString() && newData.val().length <= 2000"
+          },
           "size": {
             ".validate": "newData.isString() && newData.val().matches(/^(Tiny|Small|Medium|Large|Huge|Gargantuan)$/)"
           },
@@ -406,6 +409,9 @@
                 ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 9"
               },
               "name": {
+                ".validate": "newData.isString() && newData.val().length <= 50"
+              },
+              "key": {
                 ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "$other": { ".validate": false }

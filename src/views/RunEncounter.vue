@@ -171,7 +171,7 @@
 			]),
 			...mapGetters("players", ["players"]),
 			settings() {
-				return (this.userSettings && this.userSettings.general) ? this.userSettings.general : {};
+				return (this.userSettings && this.userSettings.encounter) ? this.userSettings.encounter : {};
 			},
 			_active: function() {
 				let order = (this.settings && this.settings.initOrder) ? "asc" : "desc";

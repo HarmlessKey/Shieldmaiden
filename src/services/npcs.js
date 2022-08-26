@@ -1,7 +1,8 @@
-import { db } from "src/firebase";
+import { db, storage } from "src/firebase";
 
 const NPCS_REF = db.ref("npcs");
 const SEARCH_NPCS_REF = db.ref("search_npcs");
+const STORAGE_REF = storage.ref("npcs");
 
 /**
  * NPC Firebase Service
@@ -68,11 +69,30 @@ export class npcServices {
   async addNpc(uid, npc, search_npc) {
     try {
       npc.name = npc.name.toLowerCase();
+
+      // If there is an image upload save the blob in separate prop en then delete it from the NPC
+      const blob = npc.blob;
+      delete npc.blob;
+
+      // Save the new NPC
       const newNpc = await NPCS_REF.child(uid).push(npc);
       
-      // Update search_npcs
-      SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+      // Upload image
+      if(blob) {
+        STORAGE_REF.child(`${uid}/${newNpc.key}.webp`).put(blob).then((snapshot) => {
+          snapshot.ref.getDownloadURL().then(url => {
+            search_npc.storage_avatar = url;
+            npc.storage_avatar = url;
 
+            // Update NPC
+            NPCS_REF.child(`${uid}/${newNpc.key}/storage_avatar`).set(url);
+            SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+          });
+        });
+      } else {
+        // Update search_npcs
+        SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+      }
       return newNpc.key;
     } catch(error) {
       throw error;
@@ -89,8 +109,37 @@ export class npcServices {
    */
   async editNpc(uid, id, npc, search_npc) {
     try {
-      await NPCS_REF.child(uid).child(id).set(npc);
-      await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+      npc.name = npc.name.toLowerCase();
+
+      // If there is an image upload save the blob in separate prop en then delete it from the NPC
+      const blob = npc.blob;
+      delete npc.blob;
+      
+      // Upload image
+      const image_ref = STORAGE_REF.child(`${uid}/${id}.webp`);
+
+      if(blob) {
+        await image_ref.put(blob).then(async (snapshot) => {
+          await snapshot.ref.getDownloadURL().then(async (url) => {
+            npc.storage_avatar = url;
+            search_npc.storage_avatar = url;
+            
+            // Save the NPC
+            await NPCS_REF.child(uid).child(id).set(npc);
+            await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+          });
+        });
+      }
+      // Delete the image when there is no blob and no storage_avatar
+      else {
+        if(!npc.storage_avatar) {
+          image_ref.delete();
+        }
+
+        // Save the NPC
+        await NPCS_REF.child(uid).child(id).set(npc);
+        await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+      }
     } catch(error) {
       throw error;
     }
@@ -124,9 +173,13 @@ export class npcServices {
   async deleteNpc(uid, id) {
     try {
       NPCS_REF.child(uid).child(id).remove();
-
-      //Update search_npcs
+      
+      // Update search_npcs
       SEARCH_NPCS_REF.child(`${uid}/results`).child(id).remove();
+
+      // Delete any linked image
+      STORAGE_REF.child(`${uid}/${id}.webp`).delete();
+
       return;
     } catch(error){
       throw error;

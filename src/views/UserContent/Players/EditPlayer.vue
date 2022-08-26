@@ -12,7 +12,20 @@
 					</hk-card>
 
 					<hk-card-deck>
-						<hk-card header="Basic Info" >
+						<hk-card>
+							<div class="card-header p-0" slot="header">
+								<div class="d-flex justify-content-start items-center">
+									<div 
+										class="img" 
+										@click="avatar_dialog = true" 
+										:style="{ 
+											backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
+										}">
+										<i aria-hidden="true" v-if="!player.storage_avatar && !player.avatar && !preview_new_upload" class="hki-player" />
+									</div>
+									Basic info
+								</div>
+							</div>
 							<div class="card-body">
 								<ValidationProvider rules="max:15|required" name="Name" v-slot="{ errors, invalid, validated }">
 									<q-input 
@@ -42,26 +55,6 @@
 										:error-message="errors[0]"
 									/>
 								</ValidationProvider>
-			
-								<div class="avatar">
-									<div class="img" :style="{ backgroundImage: player.avatar ? 'url(\'' + player.avatar + '\')' : '' }">
-										<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
-									</div>
-									<div>
-										<ValidationProvider rules="url" name="Avatar" v-slot="{ errors, invalid, validated }">
-											<q-input 
-												:dark="$store.getters.theme === 'dark'" filled square
-												label="Avatar"
-												autocomplete="off"  
-												type="text" 
-												v-model="player.avatar"
-												placeholder="Image URL"
-												:error="invalid && validated"
-												:error-message="errors[0]"
-											/>
-										</ValidationProvider>
-									</div>
-								</div>
 							</div>
 						</hk-card>
 						<hk-card header="Level & Base Stats">
@@ -428,6 +421,19 @@
 				</div>
 			</hk-card>
 		</q-dialog>
+
+		<!-- AVATAR -->
+		<q-dialog v-model="avatar_dialog">
+			<hk-image-uploader 
+				:avatar="player.avatar"
+				:storage_avatar="player.storage_avatar"
+				:preview_new_upload="preview_new_upload"
+				@crop="saveBlob"
+				@url="saveUrl"
+				@cancel="avatar_dialog = false"
+				@clear="clearAvatar"
+			/>
+		</q-dialog>
 	</div>
 	<hk-loader v-else name="player" />
 </template>
@@ -456,6 +462,8 @@
 				skillList: skills,
 				playerId: this.$route.params.id,
 				userId: undefined,
+				avatar_dialog: false,
+				preview_new_upload: undefined,
 				companion_dialog: false,
 				player: {},
 				loading: false,
@@ -486,6 +494,9 @@
 			]),
 			...mapGetters("npcs", ["npc_count"]),
 			...mapGetters("players", ["player_count", "players"]),
+			current_avatar() {
+				return this.preview_new_upload || this.player.storage_avatar || this.player.avatar;
+			},
 			skills: {
 				get() {
 					return this.player.skills ? this.player.skills : [];
@@ -649,6 +660,26 @@
 					proficient,
 					expertise
 				);
+				return parseInt(mod);
+			},
+			saveBlob(value) {
+				this.$delete(this.player, "avatar");
+				this.$set(this.player, "blob", value.blob);
+				this.preview_new_upload = value.dataUrl;
+				this.avatar_dialog = false;
+			},
+			saveUrl(value) {
+				this.$delete(this.player, "storage_avatar");
+				this.$set(this.player, "avatar", value);
+				this.preview_new_upload = undefined;
+				this.avatar_dialog = false;
+			},
+			clearAvatar() {
+				this.$delete(this.player, "avatar");
+				this.$delete(this.player, "storage_avatar");
+				this.$delete(this.player, "blob");
+				this.preview_new_upload = undefined;
+				this.avatar_dialog = false;
 			}
 		}
 	}
@@ -671,27 +702,46 @@ label {
 		height: 20px;
 	}
 }
-.avatar {
-	display: grid;
-	grid-template-columns: 56px 1fr;
-	grid-column-gap: 10px;
 
-	.img {
-		border: solid 1px $neutral-4;
-		display: block;
-		width: 56px;
-		height: 56px;
-		background-size: cover;
-		background-position: center top;
-		font-size: 45px;
-		color: $neutral-2;
-		background-color: $neutral-9;
 
-		i::before {
-			vertical-align: 5px;
-		}
+.img {
+	border: solid 1px $neutral-4;
+	display: block;
+	width: 62px;
+	height: 62px;
+	background-size: cover;
+	background-position: center top;
+	color: $neutral-2;
+	background-color: $neutral-9;
+	font-size: 50px;
+	cursor: pointer;
+	border-top-left-radius: $border-radius;
+	margin-right: 15px;
+
+	i::before {
+		vertical-align: 5px;
+	}
+	&:hover {
+		border-color: $blue;
+		color: $blue-light;
 	}
 }
+
+.current-avatar {
+	background-color: $neutral-7;
+	border-bottom: solid 1px $neutral-5;
+	display: flex;
+	justify-content: space-between;
+	padding-right: 0.5rem;
+
+	.img {
+		border-radius: 0;
+		width: 47px;
+		height: 47px;
+		cursor: default;
+	}
+}
+
 .skills {
 	columns: 3;
 

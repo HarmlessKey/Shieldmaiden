@@ -13,7 +13,7 @@
 							<q-icon name="info" size="sm" color="neutral-2 mr-1" />
 							Difficulty 
 						</div>
-						<b 
+						<strong 
 							:class="{ 
 								'green': encDifficulty[0] == 'easy',
 								'yellow': encDifficulty[0] == 'medium',
@@ -22,7 +22,7 @@
 							}"
 						>
 							{{ encDifficulty[0].capitalize() }}
-						</b>
+						</strong>
 					</div>
 					<div class="progress-area">
 						<q-linear-progress 
@@ -38,7 +38,7 @@
 									{{ encDifficulty[1] }}
 									<template v-if="encDifficulty['easy']">
 										<div class="mb-3">
-											<div class="neutral-2"><b>Party XP tresholds</b></div>
+											<div class="neutral-2"><strong>Party XP thresholds</strong></div>
 											<div :class="{ 'green': encDifficulty[0] === 'easy'}">
 												<span class="left">Easy:</span> <hk-animated-integer :value="encDifficulty['easy']"/>
 											</div>
@@ -92,19 +92,19 @@
 								<!-- Player avatar -->
 								<span 
 									v-if="data.row.entityType === 'player'" 
-									:style="{ backgroundImage: 'url(\'' + campaign_players[data.row.id].avatar + '\')' }"
+									:style="{ backgroundImage: avatar(data.row, campaign_players) ? 'url(\'' + avatar(data.row, campaign_players) + '\')' : '' }"
 									class="image"
 								>
-									<i aria-hidden="true" v-if="!campaign_players[data.row.id].avatar" class="hki-player" />
+									<i aria-hidden="true" v-if="!avatar(data.row, campaign_players)" class="hki-player" />
 								</span>
 
 								<!-- Companion avatar -->
 								<span 
 									v-if="data.row.entityType === 'companion'" 
-									:style="{ backgroundImage: 'url(\'' + entity_data[data.row.id].avatar + '\')' }"
+									:style="{ backgroundImage: avatar(data.row, entity_data) ? 'url(\'' + avatar(data.row, entity_data) + '\')' : '' }"
 									class="image"
 								>
-									<i aria-hidden="true" v-if="!data.row.id || !entity_data[data.row.id].avatar" class="hki-companion" />
+									<i aria-hidden="true" v-if="!avatar(data.row, entity_data)" class="hki-companion" />
 								</span>
 
 								<!-- Friendly NPC avatar -->
@@ -112,12 +112,12 @@
 									v-else-if="data.row.entityType === 'npc'"
 									class="image" 
 									:style="{ 
-										backgroundImage: 'url(\'' + (data.row.avatar || (data.row.id && entity_data[data.row.id].avatar)) + '\')', 
+										backgroundImage: npcAvatar(data.row, entity_data) ? 'url(\'' + (npcAvatar(data.row, entity_data)) + '\')' : '', 
 										'border-color': data.row.color_label ? data.row.color_label : ``,
 										'color': data.row.color_label ? data.row.color_label : ``
 									}"
 								>
-									<i aria-hidden="true" v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
+									<i aria-hidden="true" v-if="!npcAvatar(data.row, entity_data)" class="hki-monster" />
 								</span>
 							</div>
 
@@ -160,12 +160,12 @@
 								slot-scope="data"
 								class="image" 
 								:style="{ 
-									backgroundImage: 'url(\'' + (data.row.avatar || (data.row.id && entity_data[data.row.id].avatar)) + '\')', 
+									backgroundImage: npcAvatar(data.row, entity_data) ? 'url(\'' + (npcAvatar(data.row, entity_data)) + '\')' : '', 
 									'border-color': data.row.color_label ? data.row.color_label : ``,
 									'color': data.row.color_label ? data.row.color_label : ``
 								}"
 							>
-								<i aria-hidden="true" v-if="!data.row.id || (!data.row.avatar && (!entity_data[data.row.id] || !entity_data[data.row.id].avatar))" class="hki-monster" />
+								<i aria-hidden="true" v-if="!npcAvatar(data.row, entity_data)" class="hki-monster" />
 								
 							</span>
 
@@ -321,6 +321,17 @@
 			...mapActions("players", ["get_player"]),
 			...mapActions("npcs", ["get_npc"]),
 			...mapActions("api_monsters", ["fetch_monster"]),
+			avatar(entity, entity_data) {
+				return (entity_data[entity.id]) ? entity_data[entity.id].storage_avatar || entity_data[entity.id].avatar : null;
+			},
+			npcAvatar(npc, entity_data) {
+				if(npc.avatar) {
+					return npc.avatar;
+				}
+				else {
+					return (npc.id && entity_data[npc.id]) ? entity_data[npc.id].storage_avatar || entity_data[npc.id].avatar : null;
+				}
+			},
 			async remove(id) {
 				await this.delete_entity({
 					campaignId: this.campaignId,

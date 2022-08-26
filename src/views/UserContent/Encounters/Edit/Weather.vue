@@ -10,7 +10,7 @@
 			<q-item-section>
 				<q-item-label caption>
 					<div class="d-flex justify-between">
-						<span><b>{{ name }}</b>: {{ intensity(key) }}</span>
+						<span><strong>{{ name }}</strong>: {{ intensity(key) }}</span>
 						<q-toggle
 							v-if="key === 'fog'"
 							label="Smoke"
@@ -51,6 +51,7 @@
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
 					fog: { name: "Fog", icon: "fas fa-fog" },
 					ash: { name: "Ash rain", icon: "fas fa-fire" },
+					sand: { name: "Sandstorm", icon: "fas fa-tornado" },
 				}
 			} 
 		},
@@ -67,18 +68,25 @@
 		methods: {
 			intensity(type) {
 				const value = this.weather[type];
-				if(value === 0) return "Off";
+				const intensity = [
+					"Off",
+					"Light",
+					"Medium",
+					"Heavy"
+				];
+
+				const interval = [
+					"Off",
+					"6 minute interval",
+					"3 minute interval",
+					"1 minute interval"
+				];
+
 
 				if(type === 'lightning') {
-					if(value === 1) return "6 minute interval";
-					if(value === 2) return "3 minute interval";
-					if(value === 3) return "1 minute interval";
+					return interval[value];
 				}
-				else {
-					if(value === 1) return "Light";
-					if(value === 2) return "Medium";
-					if(value === 3) return "Heavy";
-				}	
+				return intensity[value];
 			}
 		}
 	}

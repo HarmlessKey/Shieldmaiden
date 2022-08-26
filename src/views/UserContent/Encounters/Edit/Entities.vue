@@ -11,8 +11,8 @@
 			>
 			<div class="d-flex justify-content-left">
 				<template v-if="!player_in_encounter(key)">
-					<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
-						<i aria-hidden="true" v-if="!player.avatar" class="hki-player" />
+					<span class="img" :style="{ backgroundImage: player_avatar(player) ? 'url(\'' + player_avatar(player) + '\')' : '' }">
+						<i aria-hidden="true" v-if="!player_avatar(player)" class="hki-player" />
 					</span>
 				</template>
 			</div>
@@ -408,6 +408,9 @@
 				"add_player_encounter", 
 				"add_npc_encounter"
 			]),
+			player_avatar(player) {
+				return player.storage_avatar || player.avatar;
+			},
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :

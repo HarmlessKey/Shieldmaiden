@@ -44,6 +44,7 @@ export default {
 							dispatch("setTheme"),
 							dispatch("setSideCollapsed"),
 							dispatch("players/fetch_player_count"),
+							dispatch("characters/fetch_character_count"),
 							dispatch("npcs/fetch_npc_count"),
 							dispatch("items/fetch_item_count"),
 							dispatch("campaigns/fetch_campaign_count"),

@@ -97,19 +97,20 @@
 
 <script>
 	import { general } from 'src/mixins/general.js';
-	import { skills } from 'src/mixins/skills.js';
 	import { monsterMixin } from 'src/mixins/monster.js';
+	import { skills } from "src/utils/generalConstants";
+	import { calc_skill_mod } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'npc-Skills',
 		props: ['value'],
 		mixins: [
 			general,
-			skills,
 			monsterMixin
 		],
 		data() {
 			return {
+				skillList: skills,
 				modifier_dialog: false,
 				saved: []
 			}
@@ -160,19 +161,19 @@
 				}
 			},
 			skillModifier(skill, key) {
-				let mod = this.calculateSkillModifier(
-					this.calcMod(this.npc[skill.ability]),
-					this.npc.skills ? (
-					this.npc.skills.includes(key) ? 
-					(this.npc.challenge_rating ? this. monster_challenge_rating[this.npc.challenge_rating].proficiency : '')
-					: 0) : 0,
-					this.npc.skills_expertise ? this.npc.skills_expertise.includes(key) : false
+				const ability_mod = this.calcMod(this.npc[skill.ability]);
+				const proficiency = this.npc.challenge_rating ? this.monster_challenge_rating[this.npc.challenge_rating].proficiency : 0;
+				const bonus = (this.npc.skill_modifiers && this.npc.skill_modifiers[key]) ? this.npc.skill_modifiers[key] : 0;
+				const proficient = this.npc.skills ? this.npc.skills.includes(key) : false;
+				const expertise = this.npc.skills_expertise ? this.npc.skills_expertise.includes(key) : false;
+				
+				return calc_skill_mod(
+					ability_mod,
+					proficiency,
+					bonus,
+					proficient,
+					expertise
 				);
-
-				if(this.npc.skill_modifiers && this.npc.skill_modifiers[key]) {
-					mod = parseInt(mod) + parseInt(this.npc.skill_modifiers[key]);
-				}
-				return parseInt(mod);
 			}
 		}
 	}

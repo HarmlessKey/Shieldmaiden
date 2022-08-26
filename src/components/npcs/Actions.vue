@@ -539,8 +539,7 @@
 
 <script>
 	import { general } from 'src/mixins/general.js';
-	import { abilities } from 'src/mixins/abilities.js';
-	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { abilities, damage_types, damage_type_icons } from 'src/utils/generalConstants';
 	import { monsterMixin } from 'src/mixins/monster.js';
 	import ActionRoll from 'src/components/ActionRoll';
 	import { mapActions } from 'vuex';
@@ -551,9 +550,7 @@
 		props: ['value'],
 		mixins: [
 			general, 
-			abilities, 
 			monsterMixin,
-			damage_types,
 			dice
 		],
 		components: {
@@ -561,6 +558,9 @@
 		},
 		data() {
 			return {
+				damage_types: damage_types,
+				damage_type_icons: damage_type_icons,
+				abilities: abilities,
 				action_dialog: false,
 				edit_action: {},
 				edit_roll_index: undefined,

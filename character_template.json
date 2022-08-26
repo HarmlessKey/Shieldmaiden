@@ -1,0 +1,113 @@
+{
+    "character_computed": {
+        "display": {
+            "name": "String",
+            "avatar": "String",
+            "hit_points": "Integer",
+            "armor_class": "Integer",
+            "level": "Integer",
+            "proficiency": "Integer",
+            "initiative": "Integer",
+            "speed": {
+                "walking": "Integer"
+            }
+        },
+        "sheet": {
+            "abilities": {
+                "strength": "Integer",
+                "dexterity": "Integer",
+                "constitution": "Integer",
+                "intelligence": "Integer",
+                "wisdom": "Integer",
+                "charisma": "Integer"
+            },
+            "classes": {
+                "main": {
+                    "class": "String",
+                    "subclass": "String",
+                    "level": "Integer",
+                    "spells_known": "Integer",
+                    "cantrips_known": "Integer",
+                    "spell_save_dc": "Integer",
+                    "spell_attack_modifier": "Integer"
+                },
+                "subclass_id": {
+                    
+                }
+            },
+            "spell_slots": {
+                "1": "Integer",
+                "2": "Integer"
+            },
+            "saving_throws": {
+                "strength": "Integer"
+            },
+            "skills": {
+                "history": "Integer"
+            },
+            "senses": {
+                "perception": "Integer",
+                "investigation": "Integer",
+                "insight": "Integer"
+            },
+            "defenses": {
+                "resistant": "Boolean"
+            }
+        }
+    },
+    "character_base": {
+        "general": {
+            "control": "String",
+            "player_name": "String",
+            "character_name": "String",
+            "avatar": "String",
+            "advancement": "Milestone/Experience",
+            "hit_point_type": "fixed/rolled"
+        },
+        "race": {
+            "race_name": "String",
+            "race_description": "String"
+        },
+        "class": {
+            "experience": "Integer",
+            "classes": [
+                {
+                    "main": "Boolean",
+                    "name": "Barbarian",
+                    "level": "Integer",
+                    "hit_dice": "Integer",
+                    "rolled_hit_points": {
+                        "2": "Integer"
+                    },
+                    "spell_casting_ability": "String",
+                    "speed": {
+                        "walking": {
+                            "base": "Integer"
+                        }
+                    },
+                    "armor_class": {
+                        "base": "Integer",
+                        "dexterity": "Boolean"
+                    }
+                }
+            ]
+        },
+        "abilities": {
+            "strength": "Integer",
+            "dexterity": "Integer",
+            "constitution": "Integer",
+            "intelligence": "Integer",
+            "wisdom": "Integer",
+            "charisma": "Integer"
+        },
+        "modifiers": [
+            {
+                "type": "Bonus/Set Score/proficiency/expertise",
+                "name": "String",
+                "value": "Integer",
+                "ref": "ability.strength",
+                "origin": "race"
+            }
+        ]
+    }
+}

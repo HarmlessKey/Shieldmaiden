@@ -45,11 +45,10 @@
 </template>
 
 <script>
-	import { damage_types } from "src/mixins/damageTypes.js";
+	import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 
 	export default {
 		name: 'hk-dmg-type-select',
-		mixins: [damage_types],
 		props: {
 			value: {
 				type: String,
@@ -91,7 +90,8 @@
 		},
 		data() {
 			return {
-				filtered_damage_types: this.damage_types,
+				damage_type_icons: damage_type_icons,
+				filtered_damage_types: damage_types,
 				hide_selected: false
 			}
 		},
@@ -99,14 +99,14 @@
 			filterTypes(val, update) {
 				if (val === '') {
 					update(() => {
-						this.filtered_damage_types = this.damage_types;
+						this.filtered_damage_types = damage_types;
 					})
 					return
 				}
 
 				update(() => {
 					const needle = val.toLowerCase();
-					this.filtered_damage_types = this.damage_types.filter(v => v.toLowerCase().indexOf(needle) > -1);
+					this.filtered_damage_types = damage_types.filter(v => v.toLowerCase().indexOf(needle) > -1);
 				});
 			}
 		}

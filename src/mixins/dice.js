@@ -3,7 +3,6 @@ import { mapActions, mapGetters } from "vuex";
 export const dice = {
 	data() {
 		return {
-			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			animateTrigger: false,
 			rolled: 0
 		}
@@ -16,7 +15,16 @@ export const dice = {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
 				return this.$store.getters.userSettings.encounter.critical;
 			} return undefined; // Default = undefined = roll twice
-		}
+		},
+		dice_types() {
+			return [
+				{ value: 4, text: "d4", average: this.calcAverage(4) },
+				{ value: 6, text: "d6", average: this.calcAverage(6) },
+				{ value: 8, text: "d8", average: this.calcAverage(8) },
+				{ value: 10, text: "d10", average: this.calcAverage(10) },
+				{ value: 12, text: "d12", average: this.calcAverage(12) },
+			];
+		} 
 	},
 	watch: {
 		animateTrigger() {
@@ -355,6 +363,9 @@ export const dice = {
 							clearInterval(timer);
 					}
 			}, stepTime);
+		},
+		calcAverage(value, amount = 1) {
+			return Math.ceil(((value + 1)/2)*amount);
 		}
 	}
 }

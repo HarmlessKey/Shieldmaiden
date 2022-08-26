@@ -29,8 +29,10 @@
     "helmet": "^5.0.2",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
+    "marked": "^4.0.16",
     "morgan": "^1.10.0",
     "quasar": "^1.0.0",
+    "sanitize-html": "^2.7.0",
     "vee-validate": "^3.4.14",
     "vue-analytics": "^5.22.1",
     "vue-cookies": "^1.7.4",
@@ -46,6 +48,7 @@
   },
   "devDependencies": {
     "@quasar/app": "^2.3.0",
+    "@types/sanitize-html": "^2.6.2",
     "babel-eslint": "^10.0.1",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",

@@ -1,6 +1,7 @@
 <template>
 	<div 
 		class="hk-card"
+		@click="emit"
 		:class="[
 			noMargin ? 'no-margin' : '',
 			small ? 'small' : '',
@@ -81,6 +82,11 @@
 		computed: {
 			hasBody() {
 				return !!this.$slots.default || !!this.$scopedSlots.default;
+			}
+		},
+		methods: {
+			emit() {
+				this.$emit('click');
 			}
 		}
 	}

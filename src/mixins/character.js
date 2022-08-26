@@ -253,12 +253,13 @@ export const characterMixin = {
 
 			//Add Ability Score Modifiers
 			for(let [key, value] of Object.entries(ability_scores)) {
+				let score = value;
 				for(const modifier of this.modifierFilter(modifiers, "ability")) {
 					if(modifier.subtarget === key && modifier.type === 'bonus') {
-						value = value + parseInt(modifier.value);
+						score = score + parseInt(modifier.value);
 					}
 				}
-				ability_scores[key] = value;
+				ability_scores[key] = score;
 
 				//Set score to maximum if it is higher than it's maximum
 				if(ability_scores[key] > ability_max[key]) {

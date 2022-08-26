@@ -66,14 +66,9 @@ export class CharacterServices {
     });
   }
 
-  async deleteCharacter(uid, id, control) {
+  async deleteCharacter(uid, id) {
     try {
       CHARACTERS_REF.child(uid).child(id).remove();
-
-      // Remove from controlled characters
-      if(control) {
-        CHARACTER_CONTROL_REF.child(control).child(id).remove();
-      }
 
       //Update search_characters
       SEARCH_CHARACTERS_REF.child(`${uid}/results`).child(id).remove();

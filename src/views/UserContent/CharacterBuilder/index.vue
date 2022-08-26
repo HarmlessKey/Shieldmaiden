@@ -43,7 +43,7 @@
 									Edit
 								</q-tooltip>
 							</router-link>
-							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row.general)">
+							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
 								<i aria-hidden="true" class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
@@ -136,28 +136,32 @@
 				});
 			},
 			confirmDelete(e, key, character) {
-				this.$snotify.error('Are you sure you want to delete ' + character.character_name + '?', 'Delete character', {
-					timeout: false,
-					buttons: [
-						{
-							text: 'Yes', action: (toast) => { 
-								this.deleteCharacter(key)
-								this.$snotify.remove(toast.id); 
-							}, 
-							bold: false
-						},
-						{
-							text: 'No', action: (toast) => { 
-								this.$snotify.remove(toast.id); 
-							}, 
-							bold: false
-						}
-						]
-				});
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					this.deletePlayer(key);
+				} else {
+					this.$snotify.error('Are you sure you want to delete ' + character.character_name + '?', 'Delete character', {
+						timeout: false,
+						buttons: [
+							{
+								text: 'Yes', action: (toast) => { 
+									this.deleteCharacter(key)
+									this.$snotify.remove(toast.id); 
+								}, 
+								bold: false
+							},
+							{
+								text: 'No', action: (toast) => { 
+									this.$snotify.remove(toast.id); 
+								}, 
+								bold: false
+							}
+							]
+					});
+				}
 			},
 			deleteCharacter(key) {
-				//Remove character
-				db.ref('characters_base/' + this.userId).child(key).remove(); 
+				this.delete_character(key);
 			}
 		}
 	}

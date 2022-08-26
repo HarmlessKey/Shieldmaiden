@@ -98,7 +98,7 @@ const character_actions = {
    * Adds a newly created character for a user
    * A user can only add characters for themselves so we use the uid from the store
    * 
-   * @param {object} character 
+   * @param {object} character
    * @returns {string} the id of the newly added character
    */
    async add_character({ rootGetters, commit, dispatch }) {
@@ -159,7 +159,33 @@ const character_actions = {
         throw error;
       }
     }
-  }
+  },
+
+  /**
+   * Deletes an existing character
+   * A user can only delete their own character's so use uid from the store
+   * 
+   * @param {string} id 
+   */
+   async delete_character({ rootGetters, commit, dispatch }, id) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_character_services");
+      try {
+        await services.deleteCharacter(uid, id);
+
+        commit("REMOVE_CHARACTER", id);
+        commit("REMOVE_CACHED_CHARACTER", { uid, id });
+
+        const new_count = await services.updateCharacterCount(uid, -1);
+        commit("SET_CHARACTER_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
 };
   
 const character_mutations = {
@@ -179,7 +205,15 @@ const character_mutations = {
     } else {
       Vue.set(state.cached_characters, uid, { [id]: character });
     }
-  } 
+  },
+  REMOVE_CHARACTER(state, id) { 
+    Vue.delete(state.characters, id);
+  },
+  REMOVE_CACHED_CHARACTER(state, { uid, id }) { 
+    if(state.cached_characters[uid]) {
+      Vue.delete(state.cached_characters[uid], id);
+    }
+  },
 };
 
   export default {

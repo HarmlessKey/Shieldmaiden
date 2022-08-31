@@ -355,18 +355,18 @@ export class Character {
 
   save_asi(value, classIndex, level, index) {
     const ability = (value) ? value : null;
-    const origin = `class.${classIndex}.${level}.asi.${index}`;
+    const origin = `class.${classIndex}.${level}.asi`;
     const existing_modifier = this.single_modifier_origin(origin);
   
     if(existing_modifier) {
-      existing_modifier.subtarget = ability;
+      existing_modifier.subtarget[index] = ability;
       this.edit_modifier(existing_modifier);
     } else {
       const modifier = {
         origin: origin,
         type: "bonus",
         target: "ability",
-        subtarget: ability,
+        subtarget: [ability],
         value: 1
       };
       this.add_modifier(modifier);
@@ -376,13 +376,12 @@ export class Character {
 
   // MODIFIERS
   get all_modifiers() {
-    let all_modifiers;
-    const custom = this.modifiers.map((mod, i) => ({ ...mod, index: i }));
+    let all_modifiers = this.modifiers.map((mod, i) => ({ ...mod, index: i }));
 
     // Add class modifiers
     this.classes.forEach((Class, classIndex) => {
       if(Class.class && Class.class !== "custom") {
-        all_modifiers = custom.concat(classes[Class.class].modifiers);
+        all_modifiers = all_modifiers.concat(classes[Class.class].modifiers);
       }
       // Filter out the modifiers that the class is not high enough level for
       all_modifiers = this.filtered_modifiers_level(Class, classIndex, all_modifiers);

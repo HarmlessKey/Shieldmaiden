@@ -190,6 +190,7 @@
 			},
 			addTrait(valid) {
 				this.character.add_trait();
+				this.$forceUpdate();
 				this.save(valid);
 			},
 			editTrait(key, property) {
@@ -204,6 +205,7 @@
 			},
 			deleteTrait(index, valid) {
 				this.character.delete_trait(index);
+				this.$forceUpdate();
 				this.save(valid);
 			},
 			confirmDelete(index, name, valid) {

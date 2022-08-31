@@ -77,12 +77,12 @@
 						<!-- ASI -->
 						<div v-if="feature.asi">
 							<p>Choose 2 abilities to increase with 1 point</p>
-							<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
+							<div v-for="i in [0, 1]" :key="`asi-${level}-${i}`" class="asi mb-1">
 								<q-select
 									:dark="$store.getters.theme === 'dark'" filled square
 									:label="`Ability ${i}`"
 									:options="abilities"
-									:value="asi_modifier(level, i)"
+									:value="asi_modifiers(level)[i]"
 									name="asi"
 									@input="saveASI($event, level, i, valid)"
 								/>
@@ -125,7 +125,7 @@
 											</span>
 											<i 
 												class="fas fa-info-circle pointer" 
-												aria-hidden="true"							
+												aria-hidden="true"
 												@click="setSlide({
 													show: true,
 													type: 'slides/characterBuilder/Descriptions'
@@ -264,9 +264,9 @@
 			save(valid) {
 				this.$emit("save", valid);
 			},
-			asi_modifier(level, index) {
-				const modifier = this.character.single_modifier_origin(`class.${this.classIndex}.${level}.asi.${index}`);
-				return (modifier) ? modifier.subtarget : null;
+			asi_modifiers(level) {
+				const modifier = this.character.single_modifier_origin(`class.${this.classIndex}.${level}.asi`);
+				return (modifier) ? modifier.subtarget : [];
 			},
 			addFeature(level, valid) {
 				this.character.add_feature(this.classIndex, level);
@@ -290,7 +290,7 @@
 
 			/**
 			 * Save the type of feature that is chosen
-			 * Either Ability Score Improvement or Feat 
+			 * Either 'Ability Score Improvement' or 'Feat' 
 			 **/
 			saveFeatureType(level, value) {
 				const linked_modifiers = this.character.filtered_modifiers_feature(level, "asi");
@@ -319,7 +319,7 @@
 			saveASI(value, level, index, valid) {
 				this.character.save_asi(value, this.classIndex, level, index);
 				this.$forceUpdate();
-				this.save(valid, `class.set_asi.${level}`);
+				this.save(valid, `class.set_asi`);
 			},
 
 			show_description(feature) {

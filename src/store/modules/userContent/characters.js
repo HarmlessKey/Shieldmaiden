@@ -145,7 +145,7 @@ const character_actions = {
       const services = await dispatch("get_character_services");
       try {       
         const search_character = {
-          character_name: computed_character.character_name,
+          character_name: computed_character.character_name || "Unnamed Character",
           level: computed_character.level,
           build: character.general.build,
           avatar: computed_character.avatar || null

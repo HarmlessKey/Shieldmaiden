@@ -440,7 +440,7 @@
 			},
 			applyRolledScores() {
 				this.rolls.forEach((roll, i) => {
-					this.saveAbility(this.rolledTotal(i), roll.ability);
+					this.saveAbility(this.rolledTotal(i), roll.ability, true);
 				});
 				this.clearAllRolls();
 				this.roll_dialog = false;

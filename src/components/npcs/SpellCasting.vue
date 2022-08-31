@@ -184,18 +184,18 @@
 </template>
 
 <script>
-	import { abilities } from 'src/mixins/abilities.js';
+	import { abilities } from 'src/utils/generalConstants';
 	import CopyContent from "src/components/CopyContent";
 	
 	export default {
 		name: 'npc-SpellCasting',
 		props: ['value'],
-		mixins: [abilities],
 		components: {
 			CopyContent
 		},
 		data() {
 			return {
+				abilities: abilities,
 				spells_dialog: false,
 				category: undefined,
 				spell_name: undefined,

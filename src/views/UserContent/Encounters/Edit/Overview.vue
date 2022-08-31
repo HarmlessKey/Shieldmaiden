@@ -421,7 +421,6 @@
 			top: 50px;
 			right: -300px; 
 			height: calc(100vh - 50px);
-			overflow: scroll;
 			z-index: 96;
 			background: $neutral-6;
 			width: 300px;

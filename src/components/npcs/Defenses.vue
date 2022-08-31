@@ -81,17 +81,18 @@
 
 <script>
 	import { conditions } from 'src/mixins/conditions.js';
-	import { damage_types } from 'src/mixins/damageTypes.js';
+	import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
 
 	export default {
 		name: 'npc-Defenses',
 		props: ['value'],
 		mixins: [
 			conditions,
-			damage_types
 		],
 		data() {
 			return {
+				damage_types: damage_types,
+				damage_type_icons: damage_type_icons
 			}
 		},
 		computed: {

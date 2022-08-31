@@ -287,7 +287,7 @@
 
 <script>
 import numeral from 'numeral';
-import { damage_types } from 'src/mixins/damageTypes.js';
+import { damage_types, dice_types } from 'src/utils/generalConstants';
 
 export default {
 	name: 'monster-action-modifier',
@@ -303,7 +303,6 @@ export default {
 			default: undefined
 		},
 	},
-	mixins: [damage_types],
 	computed: {
 		roll: {
 			get() {
@@ -358,19 +357,13 @@ export default {
 	},
 	data() {
 		return {
+			damage_types: damage_types,
 			tab: 0,
 			modifier_type: [
 				{label: "Damage", value: "damage"},
 				{label: "Healing", value: "healing"}
 			],
-			dice_type: [
-				{ label: "d4", value: 4 }, 
-				{ label: "d6", value: 6 },
-				{ label: "d8", value: 8 }, 
-				{ label: "d10", value: 10 },
-				{ label: "d12", value: 12 },
-				{ label: "d20", value: 20 }
-			],
+			dice_type: dice_types,
 			save_fail_mod: [
 				{ label: "No effect", value: 0},
 				{ label: "Half damage", value: 0.5},

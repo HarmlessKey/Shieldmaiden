@@ -150,6 +150,107 @@ const routes = [
 					}
 				]
 			},
+
+			// Character builder
+			{
+				path: "character-builder",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Character builder"
+				},
+				children: [
+					{
+						path: "",
+						name: "CharacterBuilder",
+						component: () => import("src/views/UserContent/CharacterBuilder"),
+						meta: {
+							description: "Your Characters on Harmless Key.",
+							title: "Character builder"
+						},
+					},
+					{
+						path: ":id",
+						component: () => import("src/layouts/character-builder"),
+						meta: {
+							title: "Edit character",
+							description: "Edit an existing character on Harmless Key.",
+							side: false
+						},
+						children: [
+							{
+								path: "",
+								name: "EditCharacterGeneral",
+								component: () => import("src/views/UserContent/CharacterBuilder/EditCharacter/general"),
+								meta: {
+									description: "Edit your character's general information",
+									title: "General",
+									side: false
+								},
+							},
+							{
+								path: "info",
+								name: "EditCharacterInfoTab",
+								component: () => import("src/views/UserContent/CharacterBuilder/EditCharacter/info"),
+								meta: {
+									description: "Character builder information",
+									title: "Info",
+									side: false
+								},
+							},
+							{
+								path: "general",
+								name: "EditCharacterGeneralTab",
+								component: () => import("src/views/UserContent/CharacterBuilder/EditCharacter/general"),
+								meta: {
+									description: "Edit your character's general information",
+									title: "General",
+									side: false
+								},
+							},
+							{
+								path: "race",
+								name: "EditRace",
+								component: () => import("src/views/UserContent/CharacterBuilder/EditCharacter/race"),
+								meta: {
+									title: "Race",
+									description: "Edit your character's race",
+									side: false
+								}
+							},
+							{
+								path: "class",
+								name: "EditClass",
+								component: () => import("src/views/UserContent/CharacterBuilder/EditCharacter/class"),
+								meta: {
+									title: "Class",
+									description: "Edit your character's classes",
+									side: false
+								}
+							},
+							{
+								path: "abilities",
+								name: "EditAbilities",
+								component: () => import("src/views/UserContent/CharacterBuilder/EditCharacter/abilities"),
+								meta: {
+									title: "Abilities",
+									description: "Edit your character's abilities",
+									side: false
+								}
+							},
+							{
+								path: "equipment",
+								name: "EditEquipment",
+								component: () => import("src/views/UserContent/CharacterBuilder/EditCharacter/equipment"),
+								meta: {
+									title: "Equipment",
+									description: "Edit your character's equipment",
+									side: false
+								}
+							}
+						],
+					}
+				]
+			},
 			// NPCs
 			{
 				path: "npcs",

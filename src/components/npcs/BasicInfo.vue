@@ -327,7 +327,7 @@
 
 <script>
 	import { general } from 'src/mixins/general.js';
-	import { languages } from 'src/mixins/languages.js';
+	import { languages } from 'src/utils/generalConstants';
 	import { monsterMixin } from 'src/mixins/monster.js';
 
 	export default {
@@ -336,11 +336,10 @@
 		mixins: [
 			general, 
 			monsterMixin,
-			languages,
 		],
 		data() {
 			return {
-				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+				languages: languages,
 				avatar_dialog: false,
 				preview_new_upload: undefined
 			}

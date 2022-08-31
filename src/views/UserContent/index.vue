@@ -80,7 +80,7 @@
 				<div class="card-body">
 					<q-list :dark="$store.getters.theme === 'dark'">
 						<q-item 
-							v-for="({path, icon, label, caption}, index) in player_tabs" 
+							v-for="({path, icon, label, caption, badge}, index) in player_tabs" 
 							clickable v-ripple 
 							:to="path"
 							:key="`player-${index}`"
@@ -92,6 +92,7 @@
 								<q-item-label>{{ label }}</q-item-label>
 								<q-item-label caption>{{ caption }}</q-item-label>
 							</q-item-section>
+							<q-item-section avatar v-if="badge"><q-badge>{{ badge }}</q-badge></q-item-section>
 							<q-item-section side>
 								<q-icon name="fas fa-chevron-right" />
 							</q-item-section>
@@ -149,20 +150,6 @@
 						caption: "Your custom items"
 					}
 				],
-				player_tabs: [
-					{
-						path: "/content/characters",
-						label: "Characters",
-						icon: "fas fa-helmet-battle",
-						caption: "Characters you play"
-					},
-					{
-						path: "/content/followed",
-						label: "Following",
-						icon: "fas fa-users",
-						caption: "Other users you're following"
-					}
-				]
 			}
 		},
 		async mounted() {
@@ -194,6 +181,33 @@
 				else {
 					return undefined;
 				}
+			},
+			player_tabs() {
+				const tabs = [
+					{
+						path: "/content/characters",
+						label: "Characters",
+						icon: "fas fa-helmet-battle",
+						caption: "Characters you play"
+					},
+					{
+						path: "/content/followed",
+						label: "Following",
+						icon: "fas fa-users",
+						caption: "Other users you're following"
+					}
+				];
+
+				if(this.userInfo && ((this.userInfo.contribute && this.userInfo.contribute.includes('character-builder')) || this.userInfo.admin)) {
+					tabs.push({
+						path: "/content/character-builder",
+						label: "Character builder",
+						icon: "fad fa-helmet-battle",
+						caption: "Test our character builder",
+						badge: "Alpha"
+					});
+				}
+				return tabs;
 			}
 		},
 		methods: {

@@ -221,7 +221,7 @@
 					</q-td>
 				</q-tr>
 				<q-tr v-if="props.expand" :props="props">
-					<q-td colspan="100%" class="px-0 py-0" auto-width>
+					<q-td colspan="100%" class="p-0" auto-width>
 						<ViewMonster :id="props.key" />
 					</q-td>
 				</q-tr>

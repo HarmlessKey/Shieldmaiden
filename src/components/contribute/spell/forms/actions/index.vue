@@ -131,11 +131,10 @@
 
 <script>
 import Rolls from './Rolls.vue';
-import { abilities } from 'src/mixins/abilities.js';
+import { abilities } from 'src/utils/generalConstants';
 
 export default {
 	name: 'spells-Actions',
-	mixins: [abilities],
 	props: {
 		value: Object,
 	},
@@ -146,6 +145,7 @@ export default {
 		return {
 			editing: false,
 			edit_index: undefined,
+			abilities: abilities,
 			attack_type: [
 				{ label: "Melee Weapon", value: "melee_weapon" },
 				{ label: "Ranged Weapon", value: "ranged_weapon" },

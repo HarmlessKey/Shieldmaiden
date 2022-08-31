@@ -26,7 +26,7 @@
 					v-shortkey="['esc']" @shortkey="hideSlide()"
 					class="hide" 
 				>
-					<i aria-hidden="true" class="far fa-chevron-double-right"></i> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
+					<i aria-hidden="true" class="far fa-chevron-double-right" /> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
 					<q-tooltip anchor="bottom middle" self="center middle">
 						Hide [esc]
 					</q-tooltip>

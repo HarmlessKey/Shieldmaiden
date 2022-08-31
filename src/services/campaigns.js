@@ -7,7 +7,7 @@ const USERS_REF = db.ref("users");
 export class campaignServices {
 
   async getCampaigns(uid) {
-    try {
+    try {   
       const campaigns = await SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).once('value', snapshot => {
         return snapshot;
       });

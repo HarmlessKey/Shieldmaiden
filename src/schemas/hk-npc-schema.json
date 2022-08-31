@@ -18,7 +18,7 @@
     "source": {
       "title": "Source",
       "type": "string",
-      "maxLength": 20
+      "maxLength": 200
     },
     "avatar": {
       "title": "Avatar",
@@ -62,7 +62,7 @@
     "subtype": {
       "title": "Subtype",
       "type": "string",
-      "maxLength": 25
+      "maxLength": 100
     },
     "alignment": {
       "title": "Alignment",
@@ -663,7 +663,7 @@
     "action-name": {
       "title": "Ability name",
       "type": "string",
-      "maxLength": 50
+      "maxLength": 100
     },
     "action-recharge": {
       "title": "Recharge",
@@ -687,7 +687,7 @@
     "action-desc": {
       "title": "Description",
       "type": "string",
-      "maxLength": 2000
+      "maxLength": 5000
     },
     "action-reach": {
       "title": "Reach",

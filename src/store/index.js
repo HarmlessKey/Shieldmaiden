@@ -15,6 +15,7 @@ import reminders from './modules/userContent/reminders.js';
 import players from './modules/userContent/players.js';
 import encounters from './modules/userContent/encounters.js';
 import characters from './modules/userContent/characters.js';
+import trackCampaign from './modules/trackCampaign.js';
 
 Vue.use(Vuex);
 
@@ -44,7 +45,7 @@ export default function () {
 			players: players,
 			encounters: encounters,
 			characters: characters,
-			tips: tips
+			trackCampaign: trackCampaign
     },
     // enable strict mode (adds overhead!)
     // for dev mode only

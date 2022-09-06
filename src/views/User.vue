@@ -1,94 +1,80 @@
 <template>
-	<div>
-		<div class="content">
-			<div class="top">
-				<span>
-					<Follow v-if="user"/>
-					{{ username['.value'] }}
-				</span>
-			</div>
-			<div class="row q-col-gutter-md">		
-				<div class="col-12 col-md-9">		
-					<hk-card>
-						<div slot="header" class="card-header">
-							<span>
-								<i aria-hidden="true" class="fas fa-dungeon mr-1" />
-								Campaigns
-							</span>
-						</div>
-						<div class="card-body" v-if="!loadingCampaigns">
-							<!-- CAMPAIGNS -->
-							<div v-if="campaigns" class="row q-col-gutter-md">
-								<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign['.key']">
-									<hk-card class="campaign">
-										<div 
-											slot="image" 
-											class="card-image" 
-											:style="[
-												campaign.background
-												? { backgroundImage: 'url(\'' +campaign.background + '\')' }
-												: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
-											]">
-											<span class="live active" v-if="live['.value'] == campaign['.key']">live</span>
-											<a 
-												v-if="!campaign.background" 
-												class="neutral-2 text-shadow-3 link" 
-												target="_blank" rel="noopener"
-												href="https://www.vecteezy.com/free-vector/fantasy-landscape">
-												Image by Vecteezy
-											</a>
-										</div>
+	<q-no-ssr class="content">
+		<div class="top">
+			<span v-if="!loading && user">
+				<Follow v-if="viewer"/>
+				{{ user.username }}
+			</span>
+			<span v-else class="loader"> Loading user</span>
+		</div>
+		<div class="row q-col-gutter-md">		
+			<div class="col-12 col-md-9">		
+				<hk-card>
+					<div slot="header" class="card-header">
+						<span>
+							<i aria-hidden="true" class="fas fa-dungeon mr-1" />
+							Campaigns
+						</span>
+					</div>
+					<div class="card-body" v-if="!loading">
+						<!-- CAMPAIGNS -->
+						<div v-if="campaigns.length" class="row q-col-gutter-md">
+							<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign.key">
+								<hk-card class="campaign">
+									<div 
+										slot="image" 
+										class="card-image" 
+										:style="[
+											campaign.background
+											? { backgroundImage: 'url(\'' +campaign.background + '\')' }
+											: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
+										]">
+										<span class="live active" v-if="user.live == campaign.key">live</span>
+										<a 
+											v-if="!campaign.background" 
+											class="neutral-2 text-shadow-3 link" 
+											target="_blank" rel="noopener"
+											href="https://www.vecteezy.com/free-vector/fantasy-landscape">
+											Image by Vecteezy
+										</a>
+									</div>
 
-										<div class="card-body">
-											
-											<!-- SHOW PLAYERS -->
-											<div v-if="campaign.players" class="players">
-												<template v-for="(player, key) in campaign.players">
-													<div v-if="player" :key="key" class="img">
-														<div v-if="avatar(player)" :style="{ backgroundImage: 'url(\'' + avatar(player) + '\')' }"></div>
-														<i aria-hidden="true" v-else class="hki-player" />
-														<q-tooltip anchor="top middle" self="center middle">
-															{{ player.character_name }}
-														</q-tooltip>
-													</div>
-												</template>
-											</div>
-											
-											<h2 class="truncate" :class="{ 'no-players': !campaign.players }">		
-												{{ campaign.name }}
-											</h2>
-											<div class="d-flex justify-content-center">
-												<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
-											</div>						
-										</div>
-				
-										<div slot="footer" class="card-footer neutral-3">
-											Started: {{ makeDate(campaign.timestamp) }}
-										</div>
-									</hk-card>
-								</div>
-							</div>
-							<div v-else>
-								<p>This user has no public campaigns.</p>
+									<div class="card-body">
+										
+										<h2 class="truncate">		
+											{{ campaign.name }}
+										</h2>
+										<div class="d-flex justify-content-center">
+											<router-link :to="`/user/${dmId}/${campaign.key}`" class="btn">View Campaign</router-link>
+										</div>						
+									</div>
+			
+									<div slot="footer" class="card-footer neutral-3">
+										Started: {{ makeDate(campaign.timestamp) }}
+									</div>
+								</hk-card>
 							</div>
 						</div>
-						<hk-loader v-else />
-					</hk-card>
-				</div>
-				<div class="col-12 col-md-3">
-					<ContentSideRight />
-				</div>
+						<div v-else>
+							<p>This user has no public campaigns.</p>
+						</div>
+					</div>
+					<hk-loader v-else />
+				</hk-card>
+			</div>
+			<div class="col-12 col-md-3">
+				<ContentSideRight />
 			</div>
 		</div>
-	</div>
+	</q-no-ssr>
 </template>
 
 <script>
-	import { db } from "src/firebase"
-	import { general } from "src/mixins/general.js"
+	import { mapGetters, mapActions } from "vuex";
+	import { general } from "src/mixins/general.js";
 	import ContentSideRight from "src/components/ContentSideRight";
 
-	import Follow from "src/components/trackCampaign/Follow.vue"
+	import Follow from "src/components/trackCampaign/Follow.vue";
 
 	export default {
 		name: "TrackUser",
@@ -99,48 +85,30 @@
 		mixins: [general],
 		data() {
 			return {
-				user: this.$store.getters ? this.$store.getters.user : undefined,
+				viewer: this.$store.getters ? this.$store.getters.user : undefined,
 				dmId: this.$route.params.userid,
-				campaigns: undefined,
-				loadingCampaigns: true
+				loading: true
 			}
 		},
-		firebase() {
-			return {
-				username: {
-					source: db.ref(`users/${this.dmId}/username`),
-					asObject: true,
-				},
-				live: {
-					source: db.ref(`broadcast/${this.dmId}/live`),
-					asObject: true,
-				}
+		computed: {
+			...mapGetters("trackCampaign", ["track_user", "track_search_campaigns"]),
+			user() {
+				return this.track_user(this.dmId);
+			},
+			campaigns() {
+				return this.track_search_campaigns(this.dmId);
 			}
 		},
 		methods: {
+			...mapActions("trackCampaign", ["get_user", "get_campaigns"]),
 			avatar(player) {
 				return player.storage_avatar || player.avatar;
 			}
 		},
-		mounted() {
-			const campaigns_ref = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
-			campaigns_ref.on('value', async (snapshot) => {
-				let campaigns = snapshot.val();
-				
-				//Get Players
-				for(let key in snapshot.val()) {
-					campaigns[key]['.key'] = key;
-
-					for(let playerKey in campaigns[key].players) {
-						let getPlayer = db.ref(`players/${this.dmId}/${playerKey}`);
-						await getPlayer.on('value', (result) => {
-							campaigns[key].players[playerKey] = result.val()
-						});
-					}
-				}
-				this.campaigns = campaigns;
-				this.loadingCampaigns = false;
-			});
+		async mounted() {
+			await this.get_user(this.dmId);
+			await this.get_campaigns(this.dmId);
+			this.loading = false;
 		}
 	}
 </script>
@@ -174,11 +142,6 @@
 
 			h2 {
 				text-align: center;
-				margin-bottom: 20px;
-
-				&.no-players {
-					margin-top: 20px;
-				}
 			}
 			.players {
 				margin-top: -40px;

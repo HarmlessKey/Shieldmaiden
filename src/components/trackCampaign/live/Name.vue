@@ -4,7 +4,7 @@
 			{{ displayNPCField('name', entity) ? entity.name.capitalizeEach() : "? ? ?" }}
 		</span>
 		<template v-else>
-			{{ (entity.entityType == 'companion' && npcs) ? npcs[entity.key].name : players[entity.key].character_name }}
+			{{ name() }}
 		</template>
 	</span>
 </template>
@@ -31,6 +31,14 @@
 			npcSettings: {
 				type: Object,
 				required: true
+			}
+		},
+		methods: {
+			name() {
+				if(this.entity.entityType == 'companion' && this.npcs) {
+					return (this.npcs[this.entity.key]) ? this.npcs[this.entity.key].name : "";
+				} 
+				return (this.players[this.entity.key]) ? this.players[this.entity.key].character_name : "";
 			}
 		}
 	}

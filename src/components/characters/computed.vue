@@ -51,12 +51,8 @@
 								show: true, 
 								type: 'slides/characterBuilder/HitPoints',
 								data: {
-									total: computed.hit_points,
-									hit_point_type,
-									level: computed.level,
-									con_mod: character.sheet ? calcMod(character.sheet.abilities.constitution) : 0,
-									modifiers: hp_modifiers,
-									classes,
+									computed,
+									character
 								}
 							})
 						">
@@ -228,22 +224,22 @@
 				return this.characterState.modifierArray || [];
 			},
 			character() {
-				return (this.computed) ? this.computed : {};
+				return (this.characterState) ? this.characterState.character : {};
 			},
 			race() {
-				return this.characterState.character.race;
+				return this.character.race;
 			},
 			hit_point_type() {
-				return this.characterState.character.hit_point_type;
+				return this.character.hit_point_type;
 			},
 			classes() {
-				return this.characterState.character.class.classes;
+				return this.character.class.classes;
 			},
 			avatar() {
-				return this.characterState.character.avatar;
+				return this.character.avatar;
 			},
 			character_name() {
-				return this.characterState.character.character_name;
+				return this.character.character_name;
 			},
 			saving_throws() {
 				let saving_throws = {};
@@ -274,10 +270,7 @@
 					saving_throws[ability] = saving_throw;
 				}
 				return saving_throws;
-			},
-			hp_modifiers() {
-				return this.modifiers.filter(mod => mod.target === 'hp');
-			},
+			}
 		},
 		methods: {
 			...mapActions([

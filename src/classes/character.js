@@ -185,7 +185,7 @@ export class Character {
         let rolled_hit_points = rolled + calc_mod(con);
 
         // The rolled value has a minimum of 1 (php 15)
-        rolled_hit_points = (rolled_hit_points < 1) ? 1 : rolled_hit_points;
+        rolled_hit_points = rolled_hit_points.min(1);
 
         // Add the hit points to the total
         total_hp.hp = total_hp.hp + rolled_hit_points;
@@ -197,7 +197,7 @@ export class Character {
         let average_hit_points = average + calc_mod(con);
         
         // The rolled value has a minimum of 1 (php 15)
-        average_hit_points = (average_hit_points < 1) ? 1 : average_hit_points;
+        average_hit_points = average_hit_points.min(1);
         
         // Add the hit points to the total
         total_hp.hp = total_hp.hp + average_hit_points;
@@ -205,15 +205,13 @@ export class Character {
     }
 
     // Setup info about the total HP
+    let fixed_roll = "the average of the";
     if(this.hit_point_type === "rolled") {
-      total_hp.info += (classIndex == 0) ? 
-        "<p>For each level after the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
-        "<p>For each level the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
-    } else {
-      total_hp.info += (classIndex == 0) ? 
-        "<p>For each level after the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
-        "<p>For each level the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
+      fixed_roll = "the roll of a";
     }
+    total_hp.info += (classIndex == 0) ? 
+      `<p>For each level after, ${fixed_roll} Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>` :
+      `<p>For each level ${fixed_roll} Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>`;
     
 
     if(classIndex == 0) total_hp.info += `Starting: <b>${hit_dice} + ${calc_mod(con)} = ${hit_dice + calc_mod(con)}</b><br/>`;

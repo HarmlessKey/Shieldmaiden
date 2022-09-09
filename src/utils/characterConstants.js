@@ -243,7 +243,7 @@ export const classes = Object.freeze({
           "Barbarian table.\n"+
           "* You have resistance to bludgeoning, piercing, and "+
           "slashing damage.\n\n"+
-          "If you are able to cast spells, you can’t cast them or "+
+          "If you are able to cast spells, you can't cast them or "+
           "concentrate on them while raging.\n"+
           "Your rage lasts for 1 minute. It ends early if you"+ 
           "are knocked unconscious or if your turn ends and "+
@@ -254,6 +254,19 @@ export const classes = Object.freeze({
           "for your barbarian level in the Rages column of the "+
           "Barbarian table, you must finish a long rest before "+
           "you can rage again.",
+        charges: {
+          value: 2,
+          scaling: {
+            type: "steps",
+            steps: [
+              { level: 3, value: 3 },
+              { level: 6, value: 4 },
+              { level: 12, value: 5 },
+              { level: 17, value: 6 },
+              { level: 20, value: Infinity },
+            ]
+          }
+        },
         index: "rage"
       },
       {
@@ -408,6 +421,17 @@ export const classes = Object.freeze({
         target: "saving_throw",
         type: "proficiency"
       },
+      {
+        origin: "class.barbarian.1.unarmored-defense",
+        name: "Unarmored Defense",
+        type: "ability",
+        target: "ac",
+        ability_modifier: "constitution",
+        restrictions: [
+          "no_armor",
+          "no_shield"
+        ]
+      }
     ]
   },
   bard: {
@@ -1084,8 +1108,8 @@ export const classes = Object.freeze({
         source: "php 78",
         level: 1,
         description: "At 1st level, your practice of martial arts gives you mastery "+
-        "of combat styles that use unarmed strikes and monk weapons, which are shortswords "+
-        "and any simple melee weapons that don't have the two-handed or heavy property."+
+          "of combat styles that use unarmed strikes and monk weapons, which are shortswords "+
+          "and any simple melee weapons that don't have the two-handed or heavy property."+
           "You gain the following benefits while you are unarmed or wielding only monk weapons "+
           "and you aren't wearing armor or wielding a shield:\n"+
           "- You can use Dexterity instead of Strength for the attack and damage rolls of your "+
@@ -1125,6 +1149,16 @@ export const classes = Object.freeze({
             "make a saving throw to resist the feature's effects. "+
             "The saving throw DC is calculated as follows:\n\n"+
             "**Ki save DC** = 8 + your proficiency bonus ([proficiency]) + your Wisdom modifier ([wis_mod])",
+          charges: {
+            value: 2,
+            scaling: {
+              type: "scale",
+              scale: {
+                size: 1,
+                value: 1
+              }
+            }
+          },
           index: "ki"
         },
         {

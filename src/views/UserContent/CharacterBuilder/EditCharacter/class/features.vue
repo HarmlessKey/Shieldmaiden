@@ -126,6 +126,12 @@
 								</ValidationProvider>
 							</template>
 							<character-descriptions v-else v-model="feature.description" />
+							
+							<!-- Charges -->
+							<div class="my-3" v-if="feature.charges">
+								You have <strong>{{ charges(feature.charges, level) }}</strong> charges on level {{ classLevel }}.
+							</div>
+
 							<!-- Modifiers -->
 							<Modifier-table 
 								v-if="!isNaN(feature.index)"
@@ -183,6 +189,9 @@
 			character() {
 				return this.characterState.character;
 			},
+			classLevel() {
+				return this.character.class.classes[this.classIndex].level
+			},
 			subclass() {
 				return this.character.classes[this.classIndex];
 			},
@@ -217,6 +226,21 @@
 			]),
 			save(valid) {
 				this.$emit("save", valid);
+			},
+			charges(charges, starting_level) {
+				let count = charges.value;
+				if(charges.scaling ) {
+					if(charges.scaling.type === "scale") {
+						const increase = parseInt(Math.floor((this.classLevel - starting_level) / charges.scaling.scale.size));
+						count = charges.value + increase;
+					} else if(charges.scaling.type === "steps") {
+						const values = charges.scaling.steps.filter(item => {
+							return this.classLevel >= item.level;
+						});
+						count = values[values.length - 1].value;
+					}
+				}
+				return (count === Infinity) ? "unlimited" : count;
 			},
 			asi_modifiers(level) {
 				const modifier = this.character.single_modifier_origin(`class.${this.classIndex}.${level}.asi`);

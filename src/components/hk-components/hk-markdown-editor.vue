@@ -56,8 +56,7 @@
 		name: 'hk-markdown-editor',
 		props: {
 			value: {
-				type: String,
-				required: true
+				type: String
 			},
 			label: {
 				type: String

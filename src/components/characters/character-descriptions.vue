@@ -1,5 +1,5 @@
 <template>
-  <div :is="html" />
+  <div class="hk-character-description" :is="html" />
 </template>
 
 <script>

@@ -428,7 +428,7 @@ export class Character {
     const modifiers = this.filtered_modifiers_origin("class");
     return modifiers.filter(mod => {
       const origin = mod.origin.split(".");
-      return origin[1] == classIndex && origin[2] == level && origin[3] === index;
+      return origin[1] == classIndex && origin[2] == level && origin[3] == index;
     });
   }
   // Returns only modifiers that the class is a high enough level for
@@ -872,18 +872,18 @@ export class ComputedCharacter {
     let modifier_value = parseInt(modifier.value);
 
     //Check for scaling
-    if(modifier.scaling_type) {
-      if(modifier.scaling_type === 'scale') {
+    if(modifier.scaling) {
+      if(modifier.scaling.type === 'scale' && modifier.scaling.scale) {
         const classIndex = modifier.origin.split(".")[1];
-        const starting_level = (modifier.origin.split(".")[0] === 'class') ? modifier.origin.split(".")[2] : modifier.scaling_start;
+        const starting_level = (modifier.origin.split(".")[0] === 'class') ? modifier.origin.split(".")[2] : modifier.scaling.start;
         const current_level = (modifier.origin.split(".")[0] === 'class') ? this.classes[classIndex].level : character.level;
 
         //Calculate the increase based on starting level, character-/class-level and the scale
-        const increase = parseInt(Math.floor((current_level - starting_level) / modifier.scale_size));
+        const increase = parseInt(Math.floor((current_level - starting_level) / modifier.scaling.scale.size));
 
         //Add the increase to the starting value
-        modifier_value = modifier_value + increase * parseInt(modifier.scale_value);
-      } else if(modifier.scaling_type === 'steps') {
+        modifier_value = modifier_value + increase * parseInt(modifier.scaling.scale.value);
+      } else if(modifier.scaling.type === 'steps') {
         //define how step scaling is handled
       }
     }

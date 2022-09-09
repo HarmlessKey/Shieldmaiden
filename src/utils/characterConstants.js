@@ -1334,7 +1334,7 @@ export const classes = Object.freeze({
         type: "proficiency"
       },
       {
-        origin: "class.monk.1.0",
+        origin: "class.monk.1.unarmored-defense",
         name: "Unarmored Defense",
         target: "ac",
         type: "ability",
@@ -1345,7 +1345,7 @@ export const classes = Object.freeze({
         ]
       },
       {
-        origin: "class.monk.2.3",
+        origin: "class.monk.2.unarmored-movement",
         name: "Unarmored Movement",
         type: "bonus",
         target: "speed",
@@ -1354,10 +1354,14 @@ export const classes = Object.freeze({
           "no_shield"
         ],
         value: 10,
-        scaling_start: 2,
-        scaling_type: "scale",
-        scale_size: 4,
-        scale_value: 5
+        scaling: {
+          start: 2,
+          type: "scale",
+          scale: {
+            size: 4,
+            value: 5
+          }
+        }
       }
     ]
   },

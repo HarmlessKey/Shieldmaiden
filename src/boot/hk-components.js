@@ -11,6 +11,7 @@ import HkTip from '../components/hk-components/hk-tip';
 import HkTimer from '../components/hk-components/hk-timer';
 import HkShare from '../components/hk-components/hk-share-button';
 import HkImageUploader from '../components/hk-components/hk-image-uploader';
+import HkMarkdownEditor from '../components/hk-components/hk-markdown-editor';
 
 export default async ({ Vue }) => {
 	Vue.component('hk-table', HkTable);
@@ -26,4 +27,5 @@ export default async ({ Vue }) => {
   Vue.component('hk-timer', HkTimer);
   Vue.component('hk-share', HkShare);
   Vue.component('hk-image-uploader', HkImageUploader);
+  Vue.component('hk-markdown-editor', HkMarkdownEditor);
 };

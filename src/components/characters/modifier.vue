@@ -112,31 +112,27 @@
 							
 							<!-- VALUE -->
 							<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
-								<div class="row q-col-gutter-md">
-									<div class="col-9">
-										<ValidationProvider rules="required" name="Value" v-slot="{ errors, invalid, validated }">
-											<q-input 
-												dark filled square
-												label="Value"
-												autocomplete="off"  
-												id="value" 
-												type="number" 
-												v-model="modifier.value" 
-												:error="invalid && validated"
-												:error-message="errors[0]"
-											/>
-										</ValidationProvider>
-									</div>
-									<div class="col-3">
-										<a @click="scaling = true" class="btn btn-block">
+								<ValidationProvider rules="required" name="Value" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										dark filled square
+										label="Value"
+										autocomplete="off"  
+										id="value" 
+										type="number" 
+										v-model="modifier.value" 
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									>
+										<a slot="after" @click="addScaling" class="btn btn-block">
 											<i class="far fa-chart-line" aria-hidden="true"/>
 											<q-tooltip anchor="top middle" self="center middle">
 												Level scaling
 											</q-tooltip>
 										</a>
-									</div>
-								</div>
-								<p class="mt-1" v-if="modifier.scale_size && modifier.scale_value">
+									</q-input>
+								</ValidationProvider>
+								
+								<p class="mt-1" v-if="modifier.scaling && modifier.scaling.scale && modifier.scaling.scale.size && modifier.scaling.scale.value">
 									<span v-html="scalingText()"/>
 									<a @click="deleteScaling" class="red ml-1">
 										<i class="fas fa-times" aria-hidden="true"/>
@@ -191,9 +187,9 @@
 								<q-input 
 									dark filled square
 									label="Initial value"
-									autocomplete="off"  
-									type="number" 
-									v-model="modifier.value" 
+									autocomplete="off"
+									type="number"
+									v-model="modifier.value"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								/>
@@ -208,7 +204,7 @@
 									label="Starting level"
 									autocomplete="off"  
 									type="number"
-									v-model="modifier.scaling_start"
+									v-model="modifier.scaling.start"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								/>
@@ -220,14 +216,15 @@
 							<q-select 
 								dark filled square 
 								map-options emit-value 
-								v-model="modifier.scaling_type" 
+								:value="modifier.scaling.type" 
 								:options="scaling_types" 
 								label="Scaling type"
+								@input="setScalingType"
 							/>
 						</div>
 						
 						<!-- LEVEL SCALING -->
-						<div v-if="modifier.scaling_type === 'scale'" class="form-item mb-3">
+						<div v-if="modifier.scaling.type === 'scale'" class="form-item mb-3">
 							<div class="row q-col-gutter-md mb-2">
 								<div class="col-6">
 									<ValidationProvider rules="required" name="Size" v-slot="{ errors, invalid, validated }">
@@ -236,7 +233,7 @@
 											label="Scale size"
 											autocomplete="off"  
 											type="number" 
-											v-model="modifier.scale_size" 
+											v-model="modifier.scaling.scale.size" 
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										/>
@@ -249,7 +246,7 @@
 											label="Scale value"
 											autocomplete="off"  
 											type="number" 
-											v-model="modifier.scale_value" 
+											v-model="modifier.scaling.scale.value" 
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										/>
@@ -257,11 +254,11 @@
 								</div>
 							</div>
 							
-							<p v-if="modifier.scale_size && modifier.scale_value" v-html="scalingText()"/>
+							<p v-if="modifier.scaling.scale.size && modifier.scaling.scale.value" v-html="scalingText()"/>
 						</div>
 
 						<!-- STEPS -->
-						<div v-if="modifier.scaling_type === 'steps'">
+						<div v-if="modifier.scaling.type === 'steps'">
 						</div>
 					</div>
 				</div>
@@ -468,35 +465,48 @@
 				this.$emit("save", "modifier.saved");
 			},
 			scalingText() {
-				if(this.modifier.scaling_type === 'scale') {
-					let text = `This modifier increases with <b>${this.modifier.scale_value}</b> for every `;
+				if(this.modifier.scaling.type === "scale" && this.modifier.scaling.scale) {
+					let text = `This modifier increases with <b>${this.modifier.scaling.scale.value}</b> for every `;
 					
 					if(this.modifier.origin.split('.')[0] === 'class') {
-						const class_name = this.character.classes[this.modifier.origin.split('.')[1]].name;
-						if(this.modifier.scale_size > 1) {
-							text += `${this.modifier.scale_size} ${class_name} levels`;
+						const class_name = this.character.classes[this.modifier.origin.split('.')[1]].class;
+						if(this.modifier.scaling.scale.size > 1) {
+							text += `${this.modifier.scaling.scale.size} ${class_name} levels`;
 						} else {
 							text += `${class_name} level`;
 						}
 						text += " above "
 						text += numeral(this.modifier.origin.split('.')[2]).format('0o');
 					}	else {
-						if(this.modifier.scale_size > 1) {
-							text += `${this.modifier.scale_size} character levels`;
+						if(this.modifier.scaling.scale.size > 1) {
+							text += `${this.modifier.scaling.scale.size} character levels`;
 						} else {
 							text += `character level`;
 						}
 						text += " above "
-						text += numeral(this.modifier.scaling_start).format('0o');
+						text += numeral(this.modifier.scaling.start).format('0o');
 					}
 					return text+".";
 				}
 			},
+			addScaling() {
+				if(!this.modifier.scaling) {
+					this.$set(this.modifier, "scaling", {});
+				}
+				this.scaling = true;
+			},
+			setScalingType(type) {
+				this.$set(this.modifier.scaling, "type", type);
+				if(type === "scale") {
+					this.$set(this.modifier.scaling, "scale", {});
+				} else {
+					this.$set(this.modifier.scaling, "steps", []);
+				}
+				this.$forceUpdate();
+			},
 			deleteScaling() {
-				this.modifier.scaling_type = null;
-				this.modifier.scale_value = null;
-				this.modifier.scale_size = null;
-			}
+				this.$set(this.modifier, "scaling", null);
+			},
 		}
 	}
 </script>

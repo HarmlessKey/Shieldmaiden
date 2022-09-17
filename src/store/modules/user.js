@@ -49,18 +49,18 @@ const user_actions = {
 	},
 	async setUserInfo({ commit, dispatch, rootGetters }) {
 		if(rootGetters.user) {
-			const user = await users_ref.child(rootGetters.user.uid)
+			const user = users_ref.child(rootGetters.user.uid);
 			user.on("value", async user_snapshot => {
 				const user_info = user_snapshot.val();
 				
 				if(user_info) {			
 					//Fetch patron info with email
-					const email = (user_info.patreon_email) ? user_info.patreon_email : user_info.email;
+					const email = (user_info.patreon_email) ? user_info.patreon_email.toLowerCase() : user_info.email.toLowerCase();
 
 					// User always basic reward tier
 					let path = `tiers/basic`;
 					
-					// Use firebise serverTimeOffset to get the date from the server and not the client.
+					// Use firebase serverTimeOffset to get the date from the server and not the client.
 					// https://firebase.google.com/docs/database/web/offline-capabilities#clock-skew
 					let time_ms = 0
 					await db.ref("/.info/serverTimeOffset")

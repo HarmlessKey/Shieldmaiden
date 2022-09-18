@@ -93,7 +93,7 @@ html body {
 		margin: 0;  
 	}
 	h1 {
-		font-family: 'Fredericka the Great', cursive;
+		font-family: $text-written;
 		font-size: 25px;
 		line-height: 40px;
 		margin-bottom: 15px;
@@ -759,7 +759,7 @@ html body {
 				text-align: center;
 
 				h2 {
-					font-family: 'Fredericka the Great', cursive;
+					font-family: $text-written;
 					font-size: 30px !important;
 					line-height: 50px;
 					text-align: center;

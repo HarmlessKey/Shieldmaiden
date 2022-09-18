@@ -457,7 +457,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		font-family: 'Fredericka the Great', cursive !important;
+		font-family: $text-written !important;
 		font-size: 25px !important;
 		margin: 40px 0 20px 0 !important;
 	}
@@ -493,7 +493,7 @@
 				font-weight: bold;
 			}
 			.score {
-				font-family: 'Fredericka the Great', cursive !important;
+				font-family: $text-written !important;
 				font-size: 45px;
 				color: $white;
 			}

@@ -99,7 +99,7 @@
 
 <style lang="scss" scoped>
 	h2 {
-		font-family: 'Fredericka the Great', cursive !important;
+		font-family: $text-written !important;
 		text-transform: none !important;
 		display: flex;
 		justify-content: space-between;
@@ -121,7 +121,7 @@
 		.value {
 			color: #fff;
 			font-size: 20px;
-			font-family: 'Fredericka the Great', cursive !important;
+			font-family: $text-written !important;
 		}
 	}
 

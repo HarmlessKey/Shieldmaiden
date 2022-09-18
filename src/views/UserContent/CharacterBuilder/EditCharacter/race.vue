@@ -226,7 +226,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		font-family: 'Fredericka the Great', cursive !important;
+		font-family: $text-written !important;
 		font-size: 25px !important;
 		margin: 0 0 20px 0 !important;
 	}

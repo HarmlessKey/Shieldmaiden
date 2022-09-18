@@ -70,7 +70,7 @@
 				margin-bottom: 20px;
 				
 				.card-header {
-					font-family: 'Fredericka the Great', cursive;
+					font-family: $text-written;
 					color:$neutral-1;
 				}
 				.card-footer {

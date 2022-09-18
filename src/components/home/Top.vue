@@ -82,7 +82,7 @@
 					padding: 25px 20px 20px 20px;
 
 					h1 {
-						font-family: 'Fredericka the Great', cursive;
+						font-family: $text-written;
 						font-size: 40px;
 						text-transform: none;
 					}
@@ -110,7 +110,7 @@
 					}
 					.share {
 						h2 {
-							font-family: 'Fredericka the Great', cursive;
+							font-family: $text-written;
 							text-align: center;
 							font-size: 25px;
 						}

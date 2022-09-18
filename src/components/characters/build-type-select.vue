@@ -75,7 +75,7 @@ export default {
   .build-type {
 		
 		> h3 {
-			font-family: 'Fredericka the Great', cursive !important;
+			font-family: $text-written !important;
 			text-align: center;
 			font-size: 25px !important;
 			margin: 40px 0 30px 0 !important;

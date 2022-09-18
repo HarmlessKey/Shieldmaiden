@@ -23,6 +23,7 @@
 				</div>
 			</div>
 		</div>
+		<hk-xp-bar :xp="character.class.experience_points" :height="5" />
 		<q-tabs 
 			v-model="tab" 
 			dense 
@@ -323,7 +324,7 @@
 			padding: 15px;
 	
 			h4 {
-				font-family: 'Fredericka the Great', cursive !important;
+				font-family: $text-written !important;
 				font-size: 22px;
 				margin: 0px;
 			}
@@ -351,7 +352,7 @@
 						line-height: 60px;
 						font-size: 30px;
 						font-weight: bold;
-						font-family: 'Fredericka the Great', cursive !important;
+						font-family: $text-written !important;
 					}
 				}
 			}
@@ -377,7 +378,7 @@
 						line-height: 40px;
 						font-size: 35px;
 						font-weight: bold;
-						font-family: 'Fredericka the Great', cursive !important;
+						font-family: $text-written !important;
 					}
 					.ft {
 						font-size: 15px;
@@ -396,7 +397,7 @@
 					border-bottom: solid 1px $neutral-3;
 	
 					.value {
-						font-family: 'Fredericka the Great', cursive !important;
+						font-family: $text-written !important;
 						font-size: 20px;
 					}
 				}

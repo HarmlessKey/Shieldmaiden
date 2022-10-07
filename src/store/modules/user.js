@@ -59,7 +59,7 @@ const user_actions = {
 
 					// User always basic reward tier
 					let path = `tiers/basic`;
-					
+
 					// Use firebase serverTimeOffset to get the date from the server and not the client.
 					// https://firebase.google.com/docs/database/web/offline-capabilities#clock-skew
 					let time_ms = 0
@@ -374,11 +374,15 @@ const user_actions = {
   },
 
   async set_active_voucher({ commit, dispatch, rootGetters }, voucher) {
+    const vouchers = await this.dispatch("get_valid_vouchers");
 
+    const intersection = vouchers.filter(v => v.voucher == voucher)
+
+    return intersection.length > 0;
   },
 
-  async get_active_vouchers({ commit, dispatch }) {
-    voucher_object = {
+  async get_valid_vouchers({ commit, dispatch }) {
+    const voucher_object = {
       voucher: "BESTE_APP",
       valid_until: new Date("2022-10-1"),
       duration: 2 // in months

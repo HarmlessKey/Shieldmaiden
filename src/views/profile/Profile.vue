@@ -61,11 +61,11 @@
                 <div class="dflex justify-between">
                   <q-input
                     :dark="$store.getters.theme === 'dark'" filled square
-                    v-model="text" label="Voucher code">
+                    v-model="voucher_input_text" label="Voucher code">
 
 
                     <template v-slot:after>
-                      <button class="btn">
+                      <button class="btn" @click="addVoucher">
                         <i class="fas fa-plus" />
                       </button>
                     </template>
@@ -115,7 +115,7 @@
 	import PlayerLink from "src/components/PlayerLink.vue";
 	import { auth } from "src/firebase";
 	import { general } from "src/mixins/general.js";
-	import { mapGetters } from "vuex";
+	import { mapActions, mapGetters } from "vuex";
 	import Content from "src/components/userContent/Content";
 	import Tier from "src/components/userContent/Tier";
 	import UserBanner from "src/components/userContent/UserBanner"
@@ -143,6 +143,7 @@ export default {
 				error: "",
 				resetError: undefined,
 				resetSuccess: undefined,
+        voucher_input_text: undefined,
 				content_types: [
 					{
 						type: "campaigns",
@@ -177,6 +178,9 @@ export default {
 			])
 		},
 		methods: {
+      ...mapActions([
+        'set_active_voucher'
+      ]),
 			resetPassword() {
 				var vm = this;
 				var emailAddress = this.user.email;
@@ -192,7 +196,12 @@ export default {
 			},
 			valid(end) {
 				return new Date(end).toISOString() > new Date().toISOString();
-			}
+			},
+      async addVoucher() {
+        const valid = await this.set_active_voucher(this.voucher_input_text);
+        console.log(`Voucher validity is: ${valid}`)
+
+      }
 		}
 	}
 </script>

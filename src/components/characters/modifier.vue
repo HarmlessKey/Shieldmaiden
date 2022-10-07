@@ -62,7 +62,8 @@
 									dark filled square 
 									map-options emit-value 
 									option-value="value"
-									option-label="skill" v-model="modifier.subtarget" 
+									option-label="skill" 
+									v-model="modifier.subtarget" 
 									multiple
 									:options="Object.values(skillList)" 
 									label="Skill"
@@ -111,15 +112,15 @@
 							</div>
 							
 							<!-- VALUE -->
-							<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
+							<div class="form-item mb-3" v-if="['bonus', 'set'].includes(modifier.type)">
 								<ValidationProvider rules="required" name="Value" v-slot="{ errors, invalid, validated }">
 									<q-input 
 										dark filled square
 										label="Value"
 										autocomplete="off"  
-										id="value" 
 										type="number" 
-										v-model="modifier.value" 
+										v-model.number="modifier.value"
+										@input="parseInt($event)" 
 										:error="invalid && validated"
 										:error-message="errors[0]"
 									>
@@ -153,6 +154,19 @@
 									:options="abilities" 
 									label="Ability modifier"
 								/>
+							</div>
+
+							<!-- MULTIPLIER -->
+							<div v-if="['ability', 'proficiency_bonus'].includes(modifier.type)">
+								<q-input 
+										dark filled square
+										label="Multiplier"
+										autocomplete="off"  
+										type="number" 
+										step="0.5"
+										v-model.number="modifier.multiplier"
+										@input="Number($event)" 
+									/>
 							</div>
 
 							<hr>
@@ -189,7 +203,8 @@
 									label="Initial value"
 									autocomplete="off"
 									type="number"
-									v-model="modifier.value"
+									v-model.number="modifier.value"
+									@input="parseInt($event)"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								/>
@@ -204,7 +219,8 @@
 									label="Starting level"
 									autocomplete="off"  
 									type="number"
-									v-model="modifier.scaling.start"
+									v-model.number="modifier.scaling.start"
+									@input="parseInt($event)"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								/>
@@ -233,7 +249,8 @@
 											label="Scale size"
 											autocomplete="off"  
 											type="number" 
-											v-model="modifier.scaling.scale.size" 
+											v-model.number="modifier.scaling.scale.size"
+											@input="parseInt($event)"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										/>
@@ -246,7 +263,8 @@
 											label="Scale value"
 											autocomplete="off"  
 											type="number" 
-											v-model="modifier.scaling.scale.value" 
+											v-model.number="modifier.scaling.scale.value" 
+											@input="parseInt($event)"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										/>
@@ -322,6 +340,10 @@
 						label: "Proficiency"
 					},
 					{
+						value: "proficiency_bonus",
+						label: "Proficiency bonus"
+					},
+					{
 						value: "ability",
 						label: "Ability modifier"
 					},
@@ -341,7 +363,8 @@
 				type_info: {
 					bonus: "Input a number value to add as a bonus.",
 					set: "Input a number that target value will be set to, it is not added like a bonus.",
-					proficiency: "Add the your proficiency as a bonus.",
+					proficiency: "Become proficient.",
+					proficiency_bonus: "Add your proficiency bonus.",
 					ability: "Add an ability modifier as a bonus",
 					expertise: "Double the proficiency bonus of a skill. Only works on proficient skills."
 				},
@@ -404,7 +427,7 @@
 						{
 							value: "ac",
 							label: "Armor Class",
-							disable: ["advantage", "disadvantage"].includes(this.modifier.type)
+							disable: ["proficiency", "advantage", "disadvantage"].includes(this.modifier.type)
 						},
 						{
 							value: "hp",
@@ -428,7 +451,8 @@
 						},
 						{
 							value: "initiative",
-							label: "Initiative"
+							label: "Initiative",
+							disable: ["proficiency"].includes(this.modifier.type)
 						}
 					]
 			},

@@ -870,13 +870,14 @@ export class ComputedCharacter {
   _add_modifier(character, value, modifier) {
     let newValue = parseInt(value);
     let modifier_value = parseInt(modifier.value);
+    const modifier_multiplier = modifier.multiplier || 1;
 
     //Check for scaling
     if(modifier.scaling) {
       if(modifier.scaling.type === 'scale' && modifier.scaling.scale) {
         const classIndex = modifier.origin.split(".")[1];
         const starting_level = (modifier.origin.split(".")[0] === 'class') ? modifier.origin.split(".")[2] : modifier.scaling.start;
-        const current_level = (modifier.origin.split(".")[0] === 'class') ? this.classes[classIndex].level : character.level;
+        const current_level = (modifier.origin.split(".")[0] === 'class') ? this.classes[classIndex].level : this.level;
 
         //Calculate the increase based on starting level, character-/class-level and the scale
         const increase = parseInt(Math.floor((current_level - starting_level) / modifier.scaling.scale.size));
@@ -908,8 +909,11 @@ export class ComputedCharacter {
         character.proficiency_tracker.push(`${modifier.target}.${modifier.subtarget}`);
       }
     }
+    if(modifier.type === "proficiency_bonus") {
+      newValue = Math.floor(newValue + modifier_multiplier * this.proficiency);
+    }
     if(modifier.type === 'ability') {
-      newValue = newValue + calc_mod(this.abilities[modifier.ability_modifier]);
+      newValue = Math.floor(newValue + modifier_multiplier * calc_mod(this.abilities[modifier.ability_modifier]));
     }
     if(['advantage', 'disadvantage'].includes(modifier.type)) {
 

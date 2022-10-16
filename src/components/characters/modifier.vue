@@ -362,11 +362,11 @@
 				],
 				type_info: {
 					bonus: "Input a number value to add as a bonus.",
-					set: "Input a number that target value will be set to, it is not added like a bonus.",
-					proficiency: "Become proficient.",
+					set: "Input a number that a target value will be set to.",
+					proficiency: "Become proficient in something.",
 					proficiency_bonus: "Add your proficiency bonus.",
 					ability: "Add an ability modifier as a bonus",
-					expertise: "Double the proficiency bonus of a skill. Only works on proficient skills."
+					expertise: "Double the proficiency bonus of a skill. (Only works on proficient skills)"
 				},
 				modifier_restrictions: [
 					{
@@ -374,8 +374,16 @@
 						label: "Must wear armor"
 					},
 					{
+						value: "no_heavy_armor",
+						label: "Can't wear heavy armor"
+					},
+					{
+						value: "no_medium_armor",
+						label: "Can't wear medium armor"
+					},
+					{
 						value: "no_armor",
-						label: "Can't wear armor"
+						label: "Can't wear any armor"
 					},
 					{
 						value: "shield",

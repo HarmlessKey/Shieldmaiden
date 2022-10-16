@@ -174,8 +174,46 @@ export const spell_slot_table = Object.freeze({
 
 export const races = Object.freeze({
   dwarf: {
+    name: "Dwarf",
     description: "",
-    traits: []
+    walking_speed: "25",
+    size: "medium",
+    traits: [
+      {
+        name: "Ability Score Increase",
+        description: "Your Constitution score increases by 2.",
+        index: "ability-score-increase"
+      },
+      {
+        name: "Darkvision",
+        description: "",
+        index: "darkvision"
+      },
+      {
+        name: "Dwarven Resilience",
+        description: "",
+        index: "dwarven-resilience"
+      },
+      {
+        
+        name: "Dwarven Combat Training",
+        description: "",
+        index: "dwarven-combat-training"
+      },
+      {
+        name: "Stonecunning",
+        description: "",
+        index: "stone-cunning"
+      },
+    ],
+    alignment: "",
+    languages: [
+      "common",
+      "dwarvish"
+    ],
+    subraces: [
+      "hill-dwarf"
+    ]
   },
   elf: {
     description: "",
@@ -209,6 +247,10 @@ export const races = Object.freeze({
     description: "",
     traits: []
   }
+});
+
+export const subraces = Object.freeze({
+  "hill-dwarf": {}
 });
 
 export const classes = Object.freeze({
@@ -1747,7 +1789,7 @@ export const classes = Object.freeze({
     spellcasting_focus: "arcane focus",
     skills: [
       "arcana",
-      "deception",	
+      "deception", 
       "history",
       "intimidation",
       "investigation",

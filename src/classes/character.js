@@ -1,4 +1,4 @@
-import { experience_table, spell_slot_table, classes } from "src/utils/characterConstants";
+import { experience_table, spell_slot_table, classes, races, subraces } from "src/utils/characterConstants";
 import { calc_dice_average, calc_mod } from "src/utils/generalFunctions";
 import { skills } from "src/utils/generalConstants";
 
@@ -118,8 +118,33 @@ export class Character {
   }
 
   // RACE
+  get race() {
+    const race = JSON.parse(JSON.stringify(this.race));
+
+    if(race.race && race.race !== "custom") {
+      const selected = races[race.race];
+      race.walking_speed = selected.walking_speed;
+      race.size = selected.size;
+    }
+    return race;
+  }
+
   get traits() {
-    return this.race.traits;
+    let traits = [];
+    const race = this.race;
+
+    // Add custom features
+    traits = traits.concat(race.traits.map((mod, i) => ({ ...mod, index: i })));
+
+    // Add race traits
+    if(race.race && race.race !== "custom") {
+      traits = traits.concat(race.traits);
+    }
+    // Add subrace traits
+    if(race.subrace) {
+      traits = traits.concat(race.subrace.traits);
+    }
+    return traits;
   }
 
   set traits(value) {
@@ -371,7 +396,6 @@ export class Character {
     }
   }
 
-
   // MODIFIERS
   get all_modifiers() {
     let all_modifiers = this.modifiers.map((mod, i) => ({ ...mod, index: i }));
@@ -384,6 +408,15 @@ export class Character {
       // Filter out the modifiers that the class is not high enough level for
       all_modifiers = this.filtered_modifiers_level(Class, classIndex, all_modifiers);
     });
+
+    // Add race modifiers
+    if(this.race.race && this.race.race !== "custom") {
+      all_modifiers = all_modifiers.concat(races[this.race.race].modifiers);
+    }
+    // Add subrace modifiers
+    if(this.race.subrace) {
+      all_modifiers = all_modifiers.concat(subraces[this.race.subrace].modifiers);
+    }
     return all_modifiers;
   }
 
@@ -903,7 +936,7 @@ export class ComputedCharacter {
           }
         }
       }
-      //If proficiency wasn't added before, add it and track that it was added
+      // If proficiency wasn't added before, add it and track that it was added
       if(!added_before) {
         newValue = newValue + parseInt(this.proficiency);
         character.proficiency_tracker.push(`${modifier.target}.${modifier.subtarget}`);

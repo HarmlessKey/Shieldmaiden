@@ -176,7 +176,7 @@ export const races = Object.freeze({
   dwarf: {
     name: "Dwarf",
     description: "",
-    walking_speed: "25",
+    walking_speed: 25,
     size: "medium",
     traits: [
       {
@@ -186,23 +186,36 @@ export const races = Object.freeze({
       },
       {
         name: "Darkvision",
-        description: "",
+        description: "Accustomed to life underground, you "+
+          "have superior vision in dark and dim conditions. You "+
+          "can see in dim light within 60 feet of you as if it were "+
+          "bright light, and in darkness as if it were dim light. "+
+          "You can't discern color in darkness, only shades of "+
+          "gray.",
         index: "darkvision"
       },
       {
         name: "Dwarven Resilience",
-        description: "",
+        description: "You have advantage on "+
+          "saving throws against poison, and you have "+
+          "resistance against poison damage.",
         index: "dwarven-resilience"
       },
       {
-        
         name: "Dwarven Combat Training",
-        description: "",
+        description: "You have proficiency "+
+          "with the battleaxe, handaxe, light hammer, and "+
+          "warhammer.",
         index: "dwarven-combat-training"
       },
       {
         name: "Stonecunning",
-        description: "",
+        description: "Whenever you make an "+
+          "Intelligence (History) check related to the origin of "+
+          "stonework, you are considered proficient in the "+
+          "History skill and add double your proficiency bonus "+
+          "to the check, instead of your normal proficiency "+
+          "bonus.",
         index: "stone-cunning"
       },
     ],
@@ -211,46 +224,70 @@ export const races = Object.freeze({
       "common",
       "dwarvish"
     ],
+    modifiers: [
+      {
+        origin: "race.trait.dwarven-combat-training",
+        subtarget: [
+          "battleaxe",
+          "handaxe",
+          "light_hammer",
+          "warhammer"
+        ],
+        target: "weapon",
+        type: "proficiency"
+      },
+    ],
     subraces: [
       "hill-dwarf"
     ]
   },
   elf: {
+    name: "Elf",
     description: "",
     traits: []
   },
   halfling: {
+    name: "Halfling",
     description: "",
     traits: []
   },
   human: {
+    name: "Human",
     description: "",
     traits: []
   },
   dragonborn: {
+    name: "Dragonborn",
     description: "",
     traits: []
   },
   gnome: {
+    name: "Gnome",
     description: "",
     traits: []
   },
   "half-elf": {
+    name: "Half Elf",
     description: "",
     traits: []
   },
   "half-orc": {
+    name: "Half Orc",
     description: "",
     traits: []
   },
   tiefling: {
+    name: "Tiefling",
     description: "",
     traits: []
   }
 });
 
 export const subraces = Object.freeze({
-  "hill-dwarf": {}
+  "hill-dwarf": {
+    name: "Hill Dwarf",
+    modifiers: []
+  }
 });
 
 export const classes = Object.freeze({

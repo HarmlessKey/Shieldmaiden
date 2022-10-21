@@ -1,7 +1,8 @@
-import { db } from 'src/firebase';
-import { serverUtils } from "src/services/serverUtils";
+import { db } from 'src/firebase'
+import { serverUtils } from 'src/services/serverUtils'
 
-const VOUCHER_REF = db.ref("vouchers");
+const VOUCHER_REF = db.ref('vouchers');
+const TIERS_REF = db.ref('tiers');
 
 /*
  * Voucher Firebase Service
@@ -9,19 +10,17 @@ const VOUCHER_REF = db.ref("vouchers");
  * Updates 'vouchers' and 'voucher_history'
  */
 export class voucherService {
-  async getValidVouchers() {
+  static async getValidVouchers() {
     const voucher_object = {
-      voucher: "BESTE_APP",
-      valid_until: new Date("2022-10-1"),
-      duration: 2 // in months
+      voucher: 'BESTE_APP',
+      valid_until: new Date('2022-11-1 UTC'),
+      duration: 2, // in months,
+      tier: 3403171
     }
     return [voucher_object]
   }
 
-  async setValidVoucher(voucher_object) {
-    const serverTime = await serverUtils.getServerTime();
-    if (voucher_object.valid_until >= new Date()) {
-
-    }
+  static async setValidVoucher(voucher_object) {
+    const serverTime = await serverUtils.getServerTime()
   }
 }

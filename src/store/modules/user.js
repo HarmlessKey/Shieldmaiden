@@ -1,6 +1,9 @@
 import { Cookies } from 'quasar';
 import { db, auth } from 'src/firebase';
 import { userServices } from "src/services/user";
+import { voucherService } from 'src/services/vouchers';
+import { serverUtils } from 'src/services/serverUtils'
+
 import Vue from 'vue';
 
 const users_ref = db.ref('users');
@@ -373,21 +376,30 @@ const user_actions = {
 
   },
 
-  async set_active_voucher({ commit, dispatch, rootGetters }, voucher) {
+  async set_active_voucher({ commit, dispatch, rootGetters }, voucher_string) {
+    const voucher = await this.dispatch("get_valid_voucher_by_string", voucher_string);
+
+    if (voucher) {
+      console.log(voucher)
+    }
+
+  },
+
+  async get_valid_voucher_by_string({ commit, dispatch }, voucher_string) {
     const vouchers = await this.dispatch("get_valid_vouchers");
+    const server_time = await serverUtils.getServerTime();
+    const intersection = vouchers.filter(v => v.voucher == voucher_string)
 
-    const intersection = vouchers.filter(v => v.voucher == voucher)
-
-    return intersection.length > 0;
+    for (const v of intersection) {
+      if (v.valid_until > server_time) {
+        return v;
+      }
+    }
+    return false;
   },
 
   async get_valid_vouchers({ commit, dispatch }) {
-    const voucher_object = {
-      voucher: "BESTE_APP",
-      valid_until: new Date("2022-10-1"),
-      duration: 2 // in months
-    }
-    return [voucher_object]
+    return await voucherService.getValidVouchers();
   }
 };
 

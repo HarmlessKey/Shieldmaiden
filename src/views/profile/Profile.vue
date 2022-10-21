@@ -198,9 +198,7 @@ export default {
 				return new Date(end).toISOString() > new Date().toISOString();
 			},
       async addVoucher() {
-        const valid = await this.set_active_voucher(this.voucher_input_text);
-        console.log(`Voucher validity is: ${valid}`)
-
+        const valid_voucher = await this.set_active_voucher(this.voucher_input_text);
       }
 		}
 	}

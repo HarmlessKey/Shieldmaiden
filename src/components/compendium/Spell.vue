@@ -9,19 +9,19 @@
 			<span v-if="spell.school"> {{ spell.school.name }}</span>
 		</i>
 		<p>
-			<b>Casting time:</b> {{ spell.casting_time }}<br/>
-			<b>Range:</b> {{ spell.range }}<br/>
-			<b>Components:</b> 
+			<strong>Casting time:</strong> {{ spell.casting_time }}<br/>
+			<strong>Range:</strong> {{ spell.range }}<br/>
+			<strong>Components:</strong> 
 			<template v-for="(component, index) in spell.components">
 				{{ component }}<template v-if="Object.keys(spell.components).length > index + 1">, </template>
 			</template>
-			<template v-if="spell.material"> ({{ spell.material }})</template>
+			<template v-if="spell.material"> ({{ parse_spell_str(spell.material) }})</template>
 			<br/>
-			<b>Duration:</b>
+			<strong>Duration:</strong>
 				<template v-if="spell.concentration == 'yes'"> Concentration, </template>
 				{{ spell.duration }}<br/>
 			<template v-if="spell.classes">
-				<b>Classes:</b> 
+				<strong>Classes:</strong> 
 				<template v-for="(_class, index) in spell.classes">
 					{{ _class.name }}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
 				</template>

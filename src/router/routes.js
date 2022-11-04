@@ -18,7 +18,7 @@ const RunEncounter = () => import('src/views/RunEncounter.vue');
 const User = () => import('src/views/User.vue');
 
 // This is where you add all your site routes
-// Each route is set as an obect in the array
+// Each route is set as an object in the array
 // For a the most basic route just set
 // the path & component to load
 
@@ -469,6 +469,62 @@ const routes = [
 					}
 				]
 			},
+		]
+	},
+
+	// TOOLS
+	{
+		path: "/tools",
+		component: () => import('src/layouts/default'),
+		meta: { 
+			title: "Tools"
+		},
+		children: [
+			{
+				path: "",
+				name: "Tools",
+				component: () => import('src/views/Tools'),
+				meta: {
+					title: "D&D 5e Tools",
+					description: "Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nCharacter Builder \nCompendium"
+				}
+			},
+			{
+				path: "combat-tracker",
+				name: "ToolsCombatTracker",
+				component: () => import('src/views/Tools/CombatTracker'),
+				meta: {
+					title: "Dungeons & Dragons Combat Tracker",
+					description: "An advanced initiative tracker for Dungeons and Dragons 5th edition."
+				}
+			},
+			{
+				path: "encounter-builder",
+				name: "ToolsEncounterBuilder",
+				component: () => import('src/views/Tools/EncounterBuilder'),
+				meta: {
+					title: "Dungeons & Dragons Encounter Builder",
+					description: "An advanced encounter builder for Dungeons and Dragons 5th edition. Calculates the difficulty of your encounter."
+				}
+			},
+			{
+				path: "monster-creator",
+				name: "ToolsMonsterCreator",
+				component: () => import('src/views/Tools/MonsterCreator'),
+				meta: {
+					title: "Dungeons & Dragons Monster Creator",
+					description: "An advanced monster creator for Dungeons and Dragons 5th edition. Create a stat block with easy to roll actions."
+				}
+			},
+			{
+				path: "character-builder",
+				name: "ToolsCharacterBuilder",
+				component: () => import('src/views/Tools/CharacterBuilder'),
+				meta: {
+					title: "Dungeons & Dragons Character Builder",
+					description: "An advanced character builder for Dungeons and Dragons 5th edition. Create a character sheet for you character."
+				}
+			}
 		]
 	},
 

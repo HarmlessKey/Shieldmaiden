@@ -193,7 +193,7 @@ html body {
 
 	.healing { color: $green; }
 	.acid { color: $acid; }
-	.bludgeoning { color: $bludgening; }
+	.bludgeoning { color: $bludgeoning; }
 	.cold { color: $cold; }
 	.fire { color: $fire; }
 	.force{ color: $force; }
@@ -212,6 +212,10 @@ html body {
 		&-small {
 			border-radius: $border-radius-small;
 		}
+	}
+
+	.written {
+		font-family: 'Fredericka the Great', cursive;	
 	}
 
 	.overflow {

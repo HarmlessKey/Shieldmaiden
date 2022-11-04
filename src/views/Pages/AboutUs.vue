@@ -236,7 +236,6 @@
 			width: 100px;
 		}
 		.written {
-			font-family: 'Fredericka the Great', cursive;	
 			font-size: 30px;
 		}
 

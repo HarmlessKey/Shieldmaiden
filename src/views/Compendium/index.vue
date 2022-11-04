@@ -7,7 +7,7 @@
 			</span>
 		</div>
 		<div class="card-body">
-			<h1 class="d-none">Compendium Dungeons and Dragons 5e</h1>
+			<h2 class="d-none">Compendium Dungeons and Dragons 5e</h2>
 			
 			<ul class="entities hasImg">
 				<li v-for="(item, index) in items" :key="index">

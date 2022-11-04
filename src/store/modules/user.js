@@ -102,7 +102,11 @@ const user_actions = {
 							// If user patron check if patron tier is higher than voucher/basic tier
 							if(patron_snapshot.val()) {
 								const patron_data = Object.values(patron_snapshot.val())[0];
-								const pledge_end = new Date(patron_data.pledge_end).toISOString();
+
+								// Set pledge to expired if there is no pledge_end present
+								const expired = new Date(time_ms);
+								expired.setDate(expired.getDate() - 1);
+								const pledge_end = patron_data.pledge_end ? new Date(patron_data.pledge_end).toISOString() : expired.toISOString();
 
 								// Compare patron tiers to find highest tier checking order in FB
 								let highest_order = 0;

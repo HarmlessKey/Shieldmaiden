@@ -403,13 +403,7 @@ const user_actions = {
     const server_time = await serverUtils.getServerTime();
 
     const intersection = vouchers.filter(v => v.voucher == voucher_string.toUpperCase());
-    console.log(vouchers)
-    for (const v of intersection) {
-      if (new Date(v.valid_until) > server_time) {
-        return v;
-      }
-    }
-    return false;
+    return intersection.length ? intersection[0] : false;
   },
 
   async get_valid_vouchers({ commit, dispatch }) {

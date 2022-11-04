@@ -123,7 +123,7 @@ export class userServices {
 
     await Promise.all([
       USERS_REF.child(uid).child('voucher').set(fbVoucher),
-      // USERS_REF.child(uid).child('voucher_history').child(voucherHistItem.voucher).set(voucherHistItem)
+      USERS_REF.child(uid).child('voucher_history').child(voucherHistItem.voucher).set(voucherHistItem)
     ])
     return {fbVoucher, activeVoucher: voucherHistItem};
   }

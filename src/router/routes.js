@@ -63,16 +63,16 @@ const routes = [
 					title: "Manage content"
 				},
 			},
-			
+
 			// Cammpaigns
 			{
 				path: "campaigns",
 				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Campaigns"		
+					title: "Campaigns"
 				},
 				children: [
-					{	
+					{
 						path: "",
 						name: "Campaigns",
 						component: () => import("src/views/UserContent/Campaigns/Campaigns.vue"),
@@ -112,7 +112,7 @@ const routes = [
 					}
 				]
 			},
-			
+
 			// Players
 			{
 				path: "players",
@@ -476,7 +476,7 @@ const routes = [
 	{
 		path: '/compendium',
 		component: () => import('src/layouts/default'),
-		meta: { 
+		meta: {
 			title: "Compendium"
 		},
 		children: [
@@ -665,6 +665,20 @@ const routes = [
 					},
 				]
 			},
+      {
+				path: 'vouchers',
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Vouchers"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Vouchers',
+						component: () => import('src/views/Admin/Vouchers.vue')
+					},
+				]
+			},
 			{
 				path: "export",
 				component: { render (c) { return c('router-view') }},
@@ -789,7 +803,7 @@ const routes = [
 			description: "Add weather effects to your encounters with Harmless Key, a Dungeons & Dragons Combat Tracker."
 		},
 	},
-	
+
 
 	// CONTRIBUTE
 	{
@@ -1029,7 +1043,7 @@ const routes = [
 		name: 'Offline',
 		component: Offline
 	},
-	
+
 	// REDIRECT OLD PATHS
 	{ path: "/campaigns", redirect: "/content/campaigns" },
 	{ path: "/players", redirect: "/content/players" },

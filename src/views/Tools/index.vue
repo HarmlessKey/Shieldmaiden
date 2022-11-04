@@ -54,7 +54,7 @@
           'Compendium': {
             title: "Compendium",
             description: "Quickly reference Monsters, Spells, Conditions and Items.",
-            image: "",
+            image: "compendium.jpg",
             url: "/compendium",
             icon: "fas fa-book-spells"
           },

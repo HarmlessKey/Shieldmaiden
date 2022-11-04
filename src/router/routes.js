@@ -509,12 +509,31 @@ const routes = [
 			},
 			{
 				path: "monster-creator",
-				name: "ToolsMonsterCreator",
-				component: () => import('src/views/Tools/MonsterCreator'),
+				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Dungeons & Dragons Monster Creator",
+					title: "Monster creator",
 					description: "An advanced monster creator for Dungeons and Dragons 5th edition. Create a stat block with easy to roll actions."
-				}
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsMonsterCreator",
+						component: () => import('src/views/Tools/MonsterCreator'),
+						meta: {
+							title: "Dungeons & Dragons Monster Creator",
+							description: "An advanced monster creator for Dungeons and Dragons 5th edition. Create a stat block with easy to roll actions."
+						}
+					},
+					{
+						path: "create-monster",
+						name: "ToolsCreateMonster",
+						component: () => import('src/views/UserContent/Npcs/EditNpc'),
+						meta: {
+							title: "Create monster",
+							description: "Create your custom D&D 5e monster."
+						}
+					}
+				]
 			},
 			{
 				path: "character-builder",

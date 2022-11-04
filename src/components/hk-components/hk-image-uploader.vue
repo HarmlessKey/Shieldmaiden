@@ -68,7 +68,7 @@
 								</q-btn>
 							</div>
 						</div>
-						<div v-else>
+						<div v-else-if="tier">
 							<p>
 								Do you want to <strong>crop</strong> and <strong>upload</strong> avatars?
 							</p>

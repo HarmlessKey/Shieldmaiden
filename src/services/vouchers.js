@@ -11,13 +11,9 @@ const TIERS_REF = db.ref('tiers');
  */
 export class voucherService {
   static async getValidVouchers() {
-    const voucher_object = {
-      voucher: 'BESTE_APP',
-      valid_until: new Date('2022-11-1 UTC'),
-      duration: 2, // in months,
-      tier: 3403171
-    }
-    return [voucher_object]
+    const vouchers = (await VOUCHER_REF.once('value')).val();
+    const serverTime = await serverUtils.getServerTime()
+    return Object.values(vouchers).filter(voucher => serverTime < new Date(voucher.valid_until))
   }
 
   static async setValidVoucher(voucher_object) {

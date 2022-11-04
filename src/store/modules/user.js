@@ -187,11 +187,7 @@ const user_actions = {
 		// 	}, 1000)
 		// });
 	},
-	remove_voucher( { rootGetters }) {
-		if(rootGetters.user) {
-			db.ref(`users/${rootGetters.user.uid}/voucher`).remove();
-		}
-	},
+
 	setPoster({ state }) {
 		db.ref('posters').once('value', snapshot => {
 			let count = snapshot.val();
@@ -361,14 +357,18 @@ const user_actions = {
 		await auth.signOut();
 	},
 
-  async add_player_voucher({ commit, dispatch, rootGetters }, voucher_string) {
+  async remove_voucher( { rootGetters }) {
+		userServices.removeVoucher(rootGetters.user.uid).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    })
+	},
+
+  async add_voucher_to_player({ commit, dispatch, rootGetters }, voucher) {
     const uid = rootGetters.user.uid;
 
-    const active_vouchers = await dispatch("get_active_vouchers");
 
-    const matched_vouchers = active_vouchers.filter(voucher => {
-      voucher.voucher == voucher_string
-    })
 
     if (matched_vouchers.length > 0) {
 
@@ -380,18 +380,32 @@ const user_actions = {
     const voucher = await this.dispatch("get_valid_voucher_by_string", voucher_string);
 
     if (voucher) {
-      console.log(voucher)
+      return userServices.setActiveVoucher(rootGetters.user.uid, voucher).then(async ({fbVoucher, activeVoucher}) => {
+        const tiers_ref = db.ref(`tiers/${fbVoucher.id}`);
+        return tiers_ref.once("value", snapshot => {
+          const tier = snapshot.val();
+          const current_tier = rootGetters.tier
+          if (tier.order > current_tier.order) {
+            commit("SET_TIER", tier)
+            commit("SET_VOUCHER", fbVoucher);
+          }
+        }).then(() => {
+          return activeVoucher;
+        })
+      }).catch(error => {
+        throw error;
+      })
     }
-
   },
 
   async get_valid_voucher_by_string({ commit, dispatch }, voucher_string) {
     const vouchers = await this.dispatch("get_valid_vouchers");
     const server_time = await serverUtils.getServerTime();
-    const intersection = vouchers.filter(v => v.voucher == voucher_string)
 
+    const intersection = vouchers.filter(v => v.voucher == voucher_string.toUpperCase());
+    console.log(vouchers)
     for (const v of intersection) {
-      if (v.valid_until > server_time) {
+      if (new Date(v.valid_until) > server_time) {
         return v;
       }
     }

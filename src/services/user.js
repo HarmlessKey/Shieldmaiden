@@ -1,4 +1,5 @@
 import { db } from "src/firebase";
+import { serverUtils } from "./serverUtils";
 
 const USERS_REF = db.ref("users");
 const SETTINGS_REF = db.ref("settings");
@@ -94,15 +95,44 @@ export class userServices {
   /*
    *
    */
-  async getVoucherHistory(uid) {
+  static async getVoucherHistory(uid) {
 
   }
 
-  async getActiveVoucher(uid) {
+  static async getActiveVoucher(uid) {
 
   }
 
-  async setActiveVoucher(uid, voucher_object) {
+  static async setActiveVoucher(uid, voucher_object) {
+    let date = await serverUtils.getServerTime();
+    date.setMonth(date.getMonth() + voucher_object.duration);
 
+    const fbVoucher = {
+      id: voucher_object.tier,
+      date: date.toLocaleDateString('en-US')
+    }
+    const voucherHistItem = {
+      ...voucher_object,
+      applied_on: (await serverUtils.getServerTime()).toLocaleDateString('en-US')
+    }
+
+    const usedBefore = await USERS_REF.child(uid).child('voucher_history').child(voucherHistItem.voucher).once('value');
+    if (usedBefore.val()) {
+      throw "Voucher has already been redeemed.";
+    }
+
+    await Promise.all([
+      USERS_REF.child(uid).child('voucher').set(fbVoucher),
+      // USERS_REF.child(uid).child('voucher_history').child(voucherHistItem.voucher).set(voucherHistItem)
+    ])
+    return {fbVoucher, activeVoucher: voucherHistItem};
+  }
+
+  static async removeVoucher(uid) {
+    USERS_REF.child(uid).child('voucher').remove().then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
   }
 }

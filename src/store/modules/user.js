@@ -365,50 +365,32 @@ const user_actions = {
     })
 	},
 
-  async add_voucher_to_player({ commit, dispatch, rootGetters }, voucher) {
-    const uid = rootGetters.user.uid;
-
-
-
-    if (matched_vouchers.length > 0) {
-
-    }
-
-  },
-
   async set_active_voucher({ commit, dispatch, rootGetters }, voucher_string) {
     const voucher = await this.dispatch("get_valid_voucher_by_string", voucher_string);
 
     if (voucher) {
-      return userServices.setActiveVoucher(rootGetters.user.uid, voucher).then(async ({fbVoucher, activeVoucher}) => {
-        const tiers_ref = db.ref(`tiers/${fbVoucher.id}`);
-        return tiers_ref.once("value", snapshot => {
-          const tier = snapshot.val();
-          const current_tier = rootGetters.tier
-          if (tier.order > current_tier.order) {
-            commit("SET_TIER", tier)
+      const voucher_tier = (await db.ref(`tiers/${voucher.tier}`).once('value')).val();
+      const current_tier = rootGetters.tier
+      if (voucher_tier.order > current_tier.order) {
+
+        return userServices.setActiveVoucher(rootGetters.user.uid, voucher)
+          .then(async ({fbVoucher}) => {
+            commit("SET_TIER", voucher_tier)
             commit("SET_VOUCHER", fbVoucher);
-          }
-        }).then(() => {
-          return activeVoucher;
+        }).catch(error => {
+          throw error;
         })
-      }).catch(error => {
-        throw error;
-      })
+      }
+      throw "Voucher is lower than current subscription tier."
     }
+    throw "No valid voucher found.";
   },
 
   async get_valid_voucher_by_string({ commit, dispatch }, voucher_string) {
-    const vouchers = await this.dispatch("get_valid_vouchers");
-    const server_time = await serverUtils.getServerTime();
-
+    const vouchers = await voucherService.getValidVouchers();
     const intersection = vouchers.filter(v => v.voucher == voucher_string.toUpperCase());
     return intersection.length ? intersection[0] : false;
   },
-
-  async get_valid_vouchers({ commit, dispatch }) {
-    return await voucherService.getValidVouchers();
-  }
 };
 
 const	user_mutations = {

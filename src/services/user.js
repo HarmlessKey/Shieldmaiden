@@ -95,13 +95,6 @@ export class userServices {
   /*
    *
    */
-  static async getVoucherHistory(uid) {
-
-  }
-
-  static async getActiveVoucher(uid) {
-
-  }
 
   static async setActiveVoucher(uid, voucher_object) {
     let date = await serverUtils.getServerTime();
@@ -125,7 +118,7 @@ export class userServices {
       USERS_REF.child(uid).child('voucher').set(fbVoucher),
       USERS_REF.child(uid).child('voucher_history').child(voucherHistItem.voucher).set(voucherHistItem)
     ])
-    return {fbVoucher, activeVoucher: voucherHistItem};
+    return fbVoucher;
   }
 
   static async removeVoucher(uid) {

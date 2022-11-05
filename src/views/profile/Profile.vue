@@ -61,12 +61,12 @@
                 <div class="dflex justify-between">
                   <q-input
                     :dark="$store.getters.theme === 'dark'" filled square
-                    v-model="voucher_input_text" label="Voucher code">
-
-
+                    v-model="voucher_input_text" label="Voucher code"
+                    v-on:keyup.enter="addVoucher"
+                  >
                     <template v-slot:after>
                       <button class="btn" @click="addVoucher">
-                        <i class="fas fa-plus" />
+                        <i aria-hidden="true" class="fas fa-plus" />
                       </button>
                     </template>
                   </q-input>
@@ -198,8 +198,8 @@ export default {
 				return new Date(end).toISOString() > new Date().toISOString();
 			},
       async addVoucher() {
-        this.set_active_voucher(this.voucher_input_text).then((activeVoucher) => {
-          this.$snotify.success(`Successfully added ${activeVoucher.voucher} voucher.`)
+        this.set_active_voucher(this.voucher_input_text).then(() => {
+          this.$snotify.success(`Successfully added ${this.voucher_input_text.toUpperCase()} voucher.`)
           this.voucher_input_text = null;
         }).catch(error => {
           this.$snotify.error(error);

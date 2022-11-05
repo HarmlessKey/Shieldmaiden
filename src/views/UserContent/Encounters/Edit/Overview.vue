@@ -129,7 +129,7 @@
 							<!-- ACTIONS -->
 							<div slot="actions" slot-scope="data" class="actions">
 								<a v-if="data.row.entityType === 'npc'" 
-									@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
+									@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: { npc: data.row, encounter } })" 
 									class="mr-2 btn btn-sm bg-neutral-5" 
 								>
 									<i aria-hidden="true" class="fas fa-pencil"></i>
@@ -165,8 +165,7 @@
 									'color': data.row.color_label ? data.row.color_label : ``
 								}"
 							>
-								<i aria-hidden="true" v-if="!npcAvatar(data.row, entity_data)" class="hki-monster" />
-								
+								<i aria-hidden="true" v-if="!npcAvatar(data.row, entity_data)" class="hki-monster" />				
 							</span>
 
 							<!-- NAME -->
@@ -175,7 +174,7 @@
 							</span>
 
 							<div slot="actions" slot-scope="data" class="actions">
-								<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 btn btn-sm bg-neutral-5">
+								<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: { npc: data.row, encounter } })" class="mr-2 btn btn-sm bg-neutral-5">
 								<q-tooltip anchor="top middle" self="center middle">
 									Edit
 								</q-tooltip>
@@ -193,7 +192,7 @@
 					<template v-else>
 						<h3>Add entities</h3>
 						<p>Add players and monsters to create your encounter.</p>
-						<button class="btn btn-block" @click="$emit('add-players')">Add all players</button>
+						<button v-if="!demo" class="btn btn-block" @click="$emit('add-players')">Add all players</button>
 					</template>
 				</div>
 			</template>
@@ -230,9 +229,10 @@
 		mixins: [difficulty],
 		data() {
 			return {
+				demo: this.$route.name === "ToolsBuildEncounter",
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.user,
+				user: this.$store.getters ? this.$store.getters.user : undefined,
 				slide: this.$store.getters.getSlide,
 				showOverview: false,
 				encDifficulty: undefined,
@@ -333,11 +333,15 @@
 				}
 			},
 			async remove(id) {
-				await this.delete_entity({
-					campaignId: this.campaignId,
-					encounterId: this.encounterId,
-					entityId: id
-				});
+				if(!this.demo) {
+					await this.delete_entity({
+						campaignId: this.campaignId,
+						encounterId: this.encounterId,
+						entityId: id
+					});
+				} else {
+					this.$delete(this.encounter.entities, id);
+				}
 			},
 			async setDifficulty() {
 				this.encDifficulty = await this.difficulty(this.encounter.entities);
@@ -356,10 +360,10 @@
 						if (entity.id in entities) {
 							continue
 						}
-						if (entity.entityType == 'player') {
+						if (entity.entityType == 'player' && !this.demo) {
 							entities[entity.id] = await this.get_player({ uid: this.user.uid, id: key });
 						}
-						else if (entity.npc === 'custom') {
+						else if (entity.npc === 'custom' && !this.demo) {
 							entities[entity.id] = await this.get_npc({ uid: this.user.uid, id: entity.id })
 						}
 						else if (entity.npc === 'api' || entity.npc === 'srd') {

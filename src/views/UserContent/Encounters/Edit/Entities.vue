@@ -1,35 +1,40 @@
 <template>
-	<div>
+<div>
+	<!-- PLAYERS -->
+	<template v-if="!demo">
 		<h3>Players</h3>
-
-		<!-- PLAYERS -->
 		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players && addable > 0">
 			<div 
 				v-for="(player, key) in campaign_players" 
 				:key="key"
 				@click="add($event, key, 'player', player.character_name)" 
 			>
-			<div class="d-flex justify-content-left">
-				<template v-if="!player_in_encounter(key)">
-					<span class="img" :style="{ backgroundImage: player_avatar(player) ? 'url(\'' + player_avatar(player) + '\')' : '' }">
-						<i aria-hidden="true" v-if="!player_avatar(player)" class="hki-player" />
-					</span>
-				</template>
+				<div class="d-flex justify-content-left">
+					<template v-if="!player_in_encounter(key)">
+						<span class="img" :style="{ backgroundImage: player_avatar(player) ? 'url(\'' + player_avatar(player) + '\')' : '' }">
+							<i aria-hidden="true" v-if="!player_avatar(player)" class="hki-player" />
+						</span>
+					</template>
+				</div>
+				<q-tooltip v-if="!player_in_encounter(key)" anchor="top middle" self="center middle">
+					Add {{ player.character_name }}
+				</q-tooltip>
 			</div>
-			<q-tooltip v-if="!player_in_encounter(key)" anchor="top middle" self="center middle">
-				Add {{ player.character_name }}
-			</q-tooltip>
-		</div>
 
-		<div v-if="campaign && campaign.players === undefined">
-			<h3 class="red"><i aria-hidden="true" class="fas fa-users"></i> No Players Yet</h3>
-			<p>Add players to your campaign first.</p>
-			<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
+			<div v-if="campaign && campaign.players === undefined">
+				<h3 class="red"><i aria-hidden="true" class="fas fa-users"></i> No Players Yet</h3>
+				<p>Add players to your campaign first.</p>
+				<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
+			</div>
+			<a v-else class="btn" @click="addAllPlayers($event)">Add all</a>
 		</div>
-		<a v-else class="btn" @click="addAllPlayers($event)">Add all</a>
-	</div>
-	<p><small>Missing players? <router-link to="/content/campaigns">Add them to your campaign first</router-link>.</small></p>
-	<hr>
+		<p><small>Missing players? <router-link to="/content/campaigns">Add them to your campaign first</router-link>.</small></p>
+		<hr>
+	</template>
+	<button class="btn btn-block mb-3" @click="player_dialog = true">
+		<i class="fas fa-user-plus" aria-hidden="true" />
+		Add players
+	</button>
 
 	<!-- MONSTERS -->
 	<q-btn-toggle
@@ -229,6 +234,66 @@
 		</q-table>
 	</template>
 	<q-resize-observer @resize="setSize" />
+
+	<q-dialog v-model="player_dialog">
+		<div>
+			<ValidationObserver  v-slot="{ handleSubmit, valid }">
+				<q-form @submit="handleSubmit(add($event, generateUUID(), 'player', player.name))" greedy>
+					<hk-card header="Add players" :min-width="300">
+						<div class="card-body">
+							<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated}">
+								<q-input
+									:dark="$store.getters.theme === 'dark'" 
+									filled square 
+									label="Name"
+									v-model="player.name"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+							<ValidationProvider rules="required|between:1,20" name="Level" v-slot="{ errors, invalid, validated}">
+								<q-input
+									:dark="$store.getters.theme === 'dark'" 
+									filled square 
+									label="Level"
+									type="number"
+									v-model="player.level"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+							<ValidationProvider rules="required|between:1,9999" name="Max HP" v-slot="{ errors, invalid, validated}">
+								<q-input
+									:dark="$store.getters.theme === 'dark'" 
+									filled square 
+									label="Hit Point Maximum"
+									type="number"
+									v-model="player.maxHp"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+							<ValidationProvider rules="required|between:1,99" name="AC" v-slot="{ errors, invalid, validated}">
+								<q-input
+									:dark="$store.getters.theme === 'dark'" 
+									filled square 
+									label="Armor Class"
+									type="number"
+									v-model="player.ac"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</div>
+						<div slot="footer" class="card-footer">
+							<q-btn flat no-caps v-close-popup label="Cancel" />
+							<q-btn type="submit" label="Add" class="ml-1" no-caps color="primary" :disable="!valid" />
+						</div>
+					</hk-card>
+				</q-form>
+			</ValidationObserver>
+		</div>
+	</q-dialog>
 </div>
 </template>
 
@@ -238,6 +303,7 @@
 	import { dice } from 'src/mixins/dice.js';
 	import { general } from 'src/mixins/general.js';
 	import ViewMonster from 'src/components/compendium/Monster.vue';
+	import { uuid } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'Entities',
@@ -265,12 +331,15 @@
 		},
 		data() {
 			return {
+				demo: this.$route.name === "ToolsBuildEncounter",
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.user,
+				user: this.$store.getters ? this.$store.getters.user : undefined,
 				width: 0,
 				auto_npcs: [],
 				viewNPC: [],
+				player_dialog: false,
+				player: {},
 				slide: this.$store.getters.getSlide,
 				to_add: {},
 				typeFilter: [],
@@ -411,6 +480,9 @@
 			player_avatar(player) {
 				return player.storage_avatar || player.avatar;
 			},
+			generateUUID() {
+				return uuid();
+			},
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
@@ -455,7 +527,7 @@
 				// Notification for NPCs
 				if(type === 'npc') {				
 					this.$snotify.success(
-						`${this.to_add[id]} NPC${this.to_add > 1? 's': ''} added succesfully`, 
+						`${this.to_add[id]} NPC${this.to_add > 1? 's': ''} added successfully`, 
 						"NPC added",
 						{ position: "centerTop" }
 					);
@@ -538,38 +610,59 @@
 							entity.maxHp = (npc_data.old) ? npc_data.maxHp : npc_data.hit_points;
 						}
 					}
-					await this.add_npc_encounter({
-						campaignId: this.campaignId,
-						encounterId: this.encounterId,
-						npc: entity
-					});
+					if(!this.demo) {
+						await this.add_npc_encounter({
+							campaignId: this.campaignId,
+							encounterId: this.encounterId,
+							npc: entity
+						});
+					} else {
+						this.add_demo_entity(entity);
+					}
 				}
 
 				// PLAYER
 				else if (type === 'player') {
-					await this.add_player_encounter({
-						campaignId: this.campaignId,
-						encounterId: this.encounterId,
-						playerId: id,
-						player: entity
-					});
-					const companions = this.campaign_players[id].companions;
-					for (const key in companions) {
-						const companion = await this.get_npc({ uid: this.user.uid, id: key });
-						await this.add(e, key, 'companion', companion.name, true, false, id);
-					}
+					if(!this.demo) {
+						await this.add_player_encounter({
+							campaignId: this.campaignId,
+							encounterId: this.encounterId,
+							playerId: id,
+							player: entity
+						});
+						// Add player companions
+						const companions = this.campaign_players[id].companions;
+						for (const key in companions) {
+							const companion = await this.get_npc({ uid: this.user.uid, id: key });
+							await this.add(e, key, 'companion', companion.name, true, false, id);
+						}
+					} else {
+						entity = {
+							...entity,
+							level: this.player.level,
+							ac: this.player.ac,
+							maxHp: this.player.maxHp,
+							curHp: this.player.curHp
+						}
+						this.add_demo_entity(entity);
+						this.player = {};
+					}			
 				}
 
 				// COMPANION
 				else if (type === 'companion') {
 					entity.npc = 'custom';
 					entity.player = companion_of;
-					await this.add_player_encounter({
-						campaignId: this.campaignId,
-						encounterId: this.encounterId,
-						playerId: id,
-						player: entity
-					});
+					if(!this.demo) {
+						await this.add_player_encounter({
+							campaignId: this.campaignId,
+							encounterId: this.encounterId,
+							playerId: id,
+							player: entity
+						});
+					} else {
+						this.add_demo_entity(entity);
+					}
 				}
 
 				// NOTIFICATION
@@ -601,6 +694,9 @@
 					return false
 				}
 			},
+			add_demo_entity(entity) {
+				this.encounter.entities ? this.$set(this.encounter.entities, uuid(), entity) : this.$set(this.encounter, "entities", {[uuid()]: entity });
+			},
 			setSize(e) {
 				this.width = e.width;
 			}
@@ -621,11 +717,24 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 
 	.multi_nr {
 		width: 45px;
-		height: 30px;
+		height: 31px;
 		text-align: center;
 		margin-left: 4px;
+
+		&::v-deep .q-field__inner {			
+			.row {
+				height: 31px;
+			}
+			input {
+				height: 31px;
+				line-height: 31px;
+			}
+		}
 	}
 }
+// .multi_nr::v-deep .q-field__inner {
+// 	display: none;
+// }
 
 .players {
 	display: flex;
@@ -648,9 +757,6 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 	}
 }
 
-.hk-table {
-	margin-bottom: 30px;
-}
 [data-theme="light"] {
 	.players .img {
 		background-color: $neutral-2;

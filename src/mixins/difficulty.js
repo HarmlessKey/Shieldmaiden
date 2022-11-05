@@ -6,7 +6,8 @@ export const difficulty = {
 	mixins: [experience],
 	data() {
 		return {
-			uid: this.$store.getters.user.uid,
+			demo: this.$route.name === "ToolsBuildEncounter",
+			uid: this.$store.getters ? this.$store.getters.user : undefined,
 			difficulties: [
 				'easy',
 				'medium',
@@ -178,7 +179,7 @@ export const difficulty = {
 
 				//Calculate Player tresholds
 				if(entity.entityType === 'player') {
-					const player = await this.get_player({ uid: this.uid, id: entity.id });
+					const player = (!this.demo) ? await this.get_player({ uid: this.uid, id: entity.id }) : entity;
 					let playerLevel = (!player.level) ? this.calculatedLevel(player.experience) : player.level;
 
 					//If there is a player without a level, return an error

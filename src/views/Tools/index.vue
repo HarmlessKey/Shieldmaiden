@@ -7,14 +7,20 @@
 			<div v-for="(tool, key) in tools" class="col-12 col-sm-6 col-md-4" :key="key">
         <router-link :to="tool.url">
           <hk-card class="full-height tool">
-            <div slot="image" class="card-image" :style="[ tool.image ? { backgroundImage: `url(${require(`src/assets/_img/${tool.image}`)})` } : '' ]" />
+            <div slot="image" class="card-image" :style="[ tool.image ? { backgroundImage: `url(${require(`src/assets/_img/${tool.image}`)})` } : '' ]">
+              <i :class="tool.icon" aria-hidden="true" />
+            </div>
+            <div slot="header" class="card-header written">
+              {{ tool.title }}
+            </div>
             <div class="card-body">
-              <h2 class="written">{{ tool.title }}</h2>
-              <em>{{ tool.description }}</em>
+              {{ tool.description }}
             </div>
             <div slot="footer" class="card-footer">
               <div v-if="tool.under_development" class="red full-width text-center">Under development</div>
-              <q-btn v-else color="blue" no-caps push class="full-width" :icon="tool.icon" :label="`Use ${tool.title}`" />
+              <button v-else class="btn btn-block">
+                Use {{ tool.title }}
+              </button>
             </div>
           </hk-card>
         </router-link>
@@ -42,7 +48,7 @@
             description: "Build encounters and see their difficulty for your party. You can run your encounters in our combat tracker.",
             image: "",
             url: "/tools/encounter-builder",
-            icon: "fas fa-swords"
+            icon: "fas fa-hammer-war"
           },
           'monster-creator': {
             title: "Monster Creator",
@@ -80,19 +86,26 @@ a {
 .hk-card.tool {
   transition: all .5s ease-in;
 
-  h2 {
+  .card-header {
+    transition: all .5s ease-in;
+    min-height: 32px;
     font-size: 21px;
   }
-
   .card-image {
     filter: grayscale(100%);
     transition: all .5s ease-in-out;
-
+    font-size: 95px;
+    text-align: center;
+    line-height: 180px;
+    text-shadow: 0 0 20px $black;
   }
   &:hover {
     background-color: $neutral-5;
     border-color: $neutral-4;
     
+    .card-header {
+      background-color: $neutral-7;
+    }
     .card-image {
       filter: grayscale(0%);
     }

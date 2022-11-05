@@ -494,18 +494,38 @@ const routes = [
 				name: "ToolsCombatTracker",
 				component: () => import('src/views/Tools/CombatTracker'),
 				meta: {
-					title: "Dungeons & Dragons Combat Tracker",
+					title: "Combat Tracker",
 					description: "An advanced initiative tracker for Dungeons and Dragons 5th edition."
 				}
 			},
 			{
 				path: "encounter-builder",
-				name: "ToolsEncounterBuilder",
-				component: () => import('src/views/Tools/EncounterBuilder'),
+				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Dungeons & Dragons Encounter Builder",
+					title: "Encounter Builder",
 					description: "An advanced encounter builder for Dungeons and Dragons 5th edition. Calculates the difficulty of your encounter."
-				}
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsEncounterBuilder",
+						component: () => import('src/views/Tools/EncounterBuilder'),
+						meta: {
+							title: "Encounter Builder",
+							description: "An advanced encounter builder for Dungeons and Dragons 5th edition. Calculates the difficulty of your encounter."
+						}
+					},
+					{
+						path: "build-encounter",
+						name: "ToolsBuildEncounter",
+						component: () => import('src/views/UserContent/Encounters/Edit'),
+						meta: {
+							title: "Build encounter",
+							description: "Create your custom D&D 5e monster.",
+							side: false
+						}
+					}
+				]
 			},
 			{
 				path: "monster-creator",

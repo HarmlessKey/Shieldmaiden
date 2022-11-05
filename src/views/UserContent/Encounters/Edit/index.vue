@@ -30,7 +30,7 @@
 								icon="fas fa-arrow-left"
 								class="pl-0"
 								name="back"
-								:to="'/content/campaigns/' + $route.params.campid"
+								:to="demo ? `/tools/encounter-builder` : `/content/campaigns/${$route.params.campid}`"
 							/>
 							<q-tab 
 								v-for="({name, icon, label}, index) in tabs"
@@ -98,7 +98,8 @@
 		},
 		data() {
 			return {
-				user: this.$store.getters.user,
+				demo: this.$route.name === "ToolsBuildEncounter",
+				user: this.$store.getters ? this.$store.getters.user : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				campaign: {},
@@ -126,19 +127,21 @@
 			}
 		},
 		async	mounted() {
-			this.campaign = await this.get_campaign({
-				uid: this.user.uid,
-				id: this.campaignId
-			})
+			if(!this.demo) {
+				this.campaign = await this.get_campaign({
+					uid: this.user.uid,
+					id: this.campaignId
+				})
 
-			this.encounter = await this.get_encounter({
-				uid: this.user.uid,
-				campaignId: this.campaignId, 
-				id: this.encounterId
-			});
+				this.encounter = await this.get_encounter({
+					uid: this.user.uid,
+					campaignId: this.campaignId, 
+					id: this.encounterId
+				});
 
-			for (const playerId in this.campaign.players) {
-				this.campaign_players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId })
+				for (const playerId in this.campaign.players) {
+					this.campaign_players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId })
+				}
 			}
 
 			this.loading = false;

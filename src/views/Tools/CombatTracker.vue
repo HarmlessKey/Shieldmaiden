@@ -1,11 +1,14 @@
 <template>
 	<hk-card>
 		<div class="card-header" slot="header">
-			<h1><i aria-hidden="true" class="fas fa-swords mr-2" /> Combat Tracker D&D 5e</h1>
+			<h1><i aria-hidden="true" class="fas fa-swords mr-2" /> Combat Tracker for D&D 5e</h1>
 		</div>
+    <div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/dragon-encounter.jpg`)})` }">
+      D&D Combat Tracker
+    </div>
 		<div class="card-body">
       <p>
-        Our combat Tracker is probably the most advanced <strong>D&D Combat Tracker</strong> you can find online.<br/>
+        Our initiative Tracker is probably the most advanced <strong>D&D Combat Tracker</strong> you can find online.<br/>
         During combat it tracks almost anything you can think of, making running encounters so much easier and more fun to do.
       </p>
 
@@ -23,14 +26,22 @@
 		name: 'ToolsCombatTracker',
 		data() {
 			return {
-        tools: {
-         
-        }
       }
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-
+.hk-card {
+  .card-image {
+    font-size: 50px;
+    line-height: 55px;
+    text-shadow: 1px 1px 10px $black;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+}
 </style>

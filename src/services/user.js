@@ -109,14 +109,14 @@ export class userServices {
       applied_on: (await serverUtils.getServerTime()).toLocaleDateString('en-US')
     }
 
-    const usedBefore = await USERS_REF.child(uid).child('voucher_history').child(voucherHistItem.voucher).once('value');
+    const usedBefore = await VOUCHER_HISTORY_REF.child(uid).child(voucherHistItem.voucher).once('value');
     if (usedBefore.val()) {
       throw "Voucher has already been redeemed.";
     }
 
     await Promise.all([
       USERS_REF.child(uid).child('voucher').set(fbVoucher),
-      USERS_REF.child(uid).child('voucher_history').child(voucherHistItem.voucher).set(voucherHistItem)
+      VOUCHER_HISTORY_REF.child(uid).child(voucherHistItem.voucher).set(voucherHistItem)
     ])
     return fbVoucher;
   }

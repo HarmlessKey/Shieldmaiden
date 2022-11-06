@@ -1,6 +1,13 @@
 <template>
   <div>
 		<h3>General settings</h3>
+
+		<p v-if="demo">
+			These setting are mostly to add some atmosphere to the live initiative list that you can share with your players.
+			When you have an account you can share a live initiative list of your active encounter with your players 
+			and while building the encounter, you can add a <strong>background</strong> and <strong>weather effects</strong> that will show on this shared list.
+		</p>
+
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)" greedy>
 				<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
@@ -78,7 +85,7 @@
 				</h3>
 				<EditWeather v-model="weather" />
 
-				<div class="d-flex justify-content-start items-center mt-3">
+				<div v-if="!demo" class="d-flex justify-content-start items-center mt-3">
 					<q-btn color="primary" type="submit" no-caps>Save</q-btn>
 					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
 						<q-tooltip anchor="top middle" self="center middle">
@@ -138,19 +145,13 @@
 		mixins: [audio],
 		data() {
 			return {
+				demo: this.$route.name === "ToolsBuildEncounter",
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.user,
 				image: false,
 				weatherSetter: undefined,
 				weather: {},
-				weather_effects: {
-					rain: { name: "Rain", icon: "fas fa-cloud-showers" },
-					snow: { name: "Snow", icon: "fas fa-cloud-snow" },
-					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
-					lightning: { name: "Lightning", icon: "fas fa-bolt" },
-					fog: { name: "Fog", icon: "fas fa-fog" }
-				},
 				editableEncounter: this.encounter
 			} 
 		},

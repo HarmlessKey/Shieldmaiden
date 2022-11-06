@@ -85,6 +85,19 @@
 				</div>
 			</template>
 		</div>
+		<q-dialog v-model="demo_dialog" persistent>
+			<hk-card header="Choose encounter">
+				<div class="card-body text-center">
+					<p>Would you like to use our demo encounter or build your own custom encounter?</p>
+					<button class="btn btn-block mb-2" @click="demo_dialog = false">
+						Use demo encounter
+					</button>
+					<router-link to="/tools/encounter-builder/build-encounter" class="btn btn-block">
+						Build custom encounter
+					</router-link>
+				</div>
+			</hk-card>
+		</q-dialog>
 		<q-resize-observer @resize="setSize" />
 	</q-no-ssr>
 	<q-no-ssr v-else class="combat-wrapper">
@@ -96,9 +109,7 @@
 <script>
 	import _ from "lodash";
 	import { mapActions, mapGetters } from "vuex";
-
 	import { audio } from "src/mixins/audio";
-
 	import Finished from "src/components/combat/Finished.vue";
 	import DemoFinished from "src/components/combat/DemoFinished.vue";
 	import Turns from "src/components/combat/Turns.vue";
@@ -139,6 +150,7 @@
 				width: 0,
 				audio_notification: false,
 				loading: true,
+				demo_dialog: false
 			}
 		},
 		beforeMount() {
@@ -150,6 +162,8 @@
 			if(!this.demo) {
 				await this.get_campaign({ uid: this.userId, id: this.campaignId });
 				await this.get_encounter({ uid: this.userId, campaignId: this.campaignId, id: this.encounterId });
+			} else {
+				this.demo_dialog = !this.demo_encounter;
 			}
 			await this.init_Encounter({
 				cid: this.campaignId,
@@ -170,6 +184,7 @@
 				"userSettings"
 			]),
 			...mapGetters("players", ["players"]),
+			...mapGetters("encounters", ["demo_encounter"]),
 			settings() {
 				return (this.userSettings && this.userSettings.encounter) ? this.userSettings.encounter : {};
 			},

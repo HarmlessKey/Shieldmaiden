@@ -639,10 +639,11 @@
 					} else {
 						entity = {
 							...entity,
-							level: this.player.level,
-							ac: this.player.ac,
-							maxHp: this.player.maxHp,
-							curHp: this.player.curHp
+							character_name: entity.name,
+							level: parseInt(this.player.level),
+							ac: parseInt(this.player.ac),
+							maxHp: parseInt(this.player.maxHp),
+							curHp: parseInt(this.player.maxHp)
 						}
 						this.add_demo_entity(entity);
 						this.player = {};

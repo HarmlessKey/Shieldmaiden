@@ -1,5 +1,5 @@
 <template>
-	<hk-card v-if="overencumbered" header="You're over encumbered">
+	<hk-card v-if="overencumbered && !demo" header="You're over encumbered">
 		<div class="card-body">
 			<p>
 				You can't edit an encounter when you are over encumbered, 
@@ -12,6 +12,15 @@
 		</div>
 	</hk-card>
 	<div v-else>
+		<div v-if="demo" class="d-flex justify-between items-center mb-3">
+			<h1 class="written mb-0">
+				Encounter builder for D&D
+			</h1>
+			<button class="btn" :disabled="!validEncounter" @click="runEncounter">
+				Run encounter
+				<i class="fas fa-sword ml-2 rotate" aria-hidden="true" />
+			</button>
+		</div>
 		<div class="wrapper">
 			<hk-card>
 				<template v-if="!loading">
@@ -114,16 +123,27 @@
 			...mapGetters([
 				"overencumbered"
 			]),
+			...mapGetters("encounters", ["demo_encounter"]),
 			tabs() {
 				let tabs = {
 					entities: { name: "entities", label: "Entities", icon: "fas fa-helmet-battle" },
-					general: { name: "general", label: "General" },
-					loot: { name: "loot", label: "Loot", icon: "fas fa-treasure-chest" }
+					general: { name: "general", label: "General", icon: "fas fa-sliders-h" }
+				}
+				if(!this.demo) {
+					tabs.loot = { name: "loot", label: "Loot", icon: "fas fa-treasure-chest" };
 				}
 				if(this.campaign.advancement === "experience") {
 					tabs.xp = { name: "xp", label: "XP", icon: "fas fa-sparkles" };
 				}
 				return tabs;
+			},
+			validEncounter() {
+				// A valid encounter has at least 1 player and 1 npc
+				if(!this.encounter.entities) {
+					return false;
+				}
+				return Object.values(this.encounter.entities).filter(entity => entity.entityType === "player").length 
+					&& Object.values(this.encounter.entities).filter(entity => entity.entityType === "npc").length
 			}
 		},
 		async	mounted() {
@@ -142,17 +162,25 @@
 				for (const playerId in this.campaign.players) {
 					this.campaign_players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId })
 				}
+			} else {
+				this.encounter = this.demo_encounter || {};
 			}
 
 			this.loading = false;
 		},
 		methods: {
 			...mapActions("campaigns", ["get_campaign"]),
-			...mapActions("encounters", ["get_encounter"]),
+			...mapActions("encounters", ["get_encounter", "set_demo_encounter"]),
 			...mapActions("players", ["get_player"]),
 			// Triggered from Overview component, to execute addAllPlayers() in Entities component
 			trigger() {
 				this.addPlayersTriggered = true;
+			},
+			async runEncounter() {
+				if(this.validEncounter) {
+					await this.set_demo_encounter(this.encounter);
+					this.$router.replace("/demo");
+				}
 			}
 		}
 	}
@@ -189,8 +217,15 @@
 			}
 		}
 	}
+	h1 {
+		font-size: 20px;
+	}
 	.faded {
 		opacity: .3;
+	}
+	.rotate {
+		transform: rotate(45deg);
+		vertical-align: -1px;
 	}
 
 	@media only screen and (max-width: 850px) {

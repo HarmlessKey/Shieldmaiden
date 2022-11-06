@@ -80,7 +80,14 @@
 				<!-- ENTITIES -->
 				<div class="overview">          
 					<template v-if="encounter.entities">
-						<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
+						<h3 class="d-flex justify-between">
+							<span>Players and friendlies</span>
+							<q-chip v-if="Object.keys(_friendlies).length" square :dark="$store.getters.theme !== 'light'">
+								<strong>
+									<hk-animated-integer :value="Object.keys(_friendlies).length" />
+								</strong>
+							</q-chip>
+						</h3>
 
 						<hk-table
 							class="mb-4" 
@@ -146,7 +153,14 @@
 							</div>
 						</hk-table>
 
-						<h3>{{ Object.keys(_monsters).length }} Monsters</h3>
+						<h3 class="d-flex justify-between">
+							<span>Monsters</span>
+							<q-chip v-if="Object.keys(_monsters).length" square :dark="$store.getters.theme !== 'light'">
+								<strong>
+									<hk-animated-integer :value="Object.keys(_monsters).length" />
+								</strong>
+							</q-chip>
+						</h3>
 
 						<!-- Enemy monsters -->
 						<hk-table 
@@ -197,7 +211,6 @@
 				</div>
 			</template>
 			<hk-loader v-else />
-
 		</hk-card>
 		<div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
 			<i aria-hidden="true" class="fas fa-chevron-left"></i>

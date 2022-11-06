@@ -35,7 +35,7 @@
 
 <script>
 	export default {
-		name: 'General',
+		name: 'EditWeather',
 		props: {
 			value: {
 				type: Object,

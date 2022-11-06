@@ -1,128 +1,120 @@
 import { abilities, skills } from "src/utils/generalConstants";
+import { uuid } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
 import Vue from "vue";
 
-const demoPlayers = {
-	"playerone": {
-		character_name: "Barbarian",
-		maxHp: 41,
-		maxHpMod: 0,
-		curHp: 41,
-		ac: 15,
-		strength: 20,
-		dexterity: 14,
-		constitution: 16,
-		intelligence: 6,
-		wisdom: 8,
-		charisma:10,
-		experience: 2700,
-		skills: ["athletics", "intimidation"]
-	},
-	"playertwo": {
-		character_name: "Warlock",
-		maxHp: 31,
-		maxHpMod: 0,
-		curHp: 31,
-		ac: 16,
-		strength: 8,
-		dexterity: 14,
-		constitution: 14,
-		intelligence: 11,
-		wisdom: 14,
-		charisma:18,
-		tempHp: 6,
-		experience: 2700,
-		skills: ["persuasion", "stealth"]
-	},
-	"playerthree": {
-		character_name: "Druid",
-		maxHp: 34,
-		maxHpMod: 0,
-		curHp: 34,
-		ac: 16,
-		strength: 8,
-		dexterity: 14,
-		constitution: 14,
-		intelligence: 11,
-		wisdom: 18,
-		charisma:11,
-		transformed: {
-			ac: 14,
-			maxHp: 37,
-			curHp: 37
-		},
-		experience: 2700,
-		skills: ["animal Handling", "medicine"]
-	}
-}
 const demoEncounter = {
-	"name" : "Demo Encounter",
-	"entities" : {
-		"playerone" : {
-			"active" : true,		
-			"entityType" : "player",
-			"initiative" : 0,
-			"conditions": {
+	name: "Demo Encounter",
+	entities: {
+		playerone: {
+			active: true,		
+			entityType: "player",
+			initiative: 0,
+			conditions: {
 				exhaustion: 1
-			}
+			},
+			character_name: "Barbarian",
+			maxHp: 41,
+			maxHpMod: 0,
+			curHp: 41,
+			ac: 15,
+			strength: 20,
+			dexterity: 14,
+			constitution: 16,
+			intelligence: 6,
+			wisdom: 8,
+			charisma:10,
+			experience: 2700,
+			skills: ["athletics", "intimidation"]
 		},
-		"playertwo" : {
-			"active" : true,		
-			"entityType" : "player",
-			"initiative" : 0,
+		playertwo: {
+			active: true,		
+			entityType: "player",
+			initiative: 0,
+			character_name: "Warlock",
+			maxHp: 31,
+			maxHpMod: 0,
+			curHp: 31,
+			ac: 16,
+			strength: 8,
+			dexterity: 14,
+			constitution: 14,
+			intelligence: 11,
+			wisdom: 14,
+			charisma:18,
+			tempHp: 6,
+			experience: 2700,
+			skills: ["persuasion", "stealth"]
 		},
-		"playerthree" : {
-			"active" : true,		
-			"entityType" : "player",
-			"initiative" : 0,
+		playerthree: {
+			active: true,		
+			entityType: "player",
+			initiative: 0,
+			character_name: "Druid",
+			maxHp: 34,
+			maxHpMod: 0,
+			curHp: 34,
+			ac: 16,
+			strength: 8,
+			dexterity: 14,
+			constitution: 14,
+			intelligence: 11,
+			wisdom: 18,
+			charisma:11,
+			transformed: {
+				ac: 14,
+				maxHp: 37,
+				curHp: 37
+			},
+			experience: 2700,
+			skills: ["animal Handling", "medicine"]
 		},
-		"monsterone" : {
-			"ac" : 13,
-			"active" : true,		
-			"curHp" : 21,
-			"entityType" : "npc",
-			"id" : "216",
-			"initiative" : 0,
-			"key" : "monsterone",
-			"maxHp" : 21,
-			"name" : "Orc (1)",
-			"npc" : "srd"
+		monsterone: {
+			ac: 13,
+			active: true,		
+			curHp: 21,
+			entityType: "npc",
+			id: "216",
+			initiative: 0,
+			key: "monsterone",
+			maxHp: 21,
+			name: "Orc (1)",
+			npc: "srd"
 		},
-		"monstertwo" : {
-			"ac" : 13,
-			"active" : true,		
-			"curHp" : 12,
-			"entityType" : "npc",
-			"id" : "216",
-			"initiative" : 0,
-			"key" : "monstertwo",
-			"maxHp" : 12,
-			"name" : "Orc (2)",
-			"npc" : "srd"
+		monstertwo: {
+			ac: 13,
+			active: true,		
+			curHp: 12,
+			entityType: "npc",
+			id: "216",
+			initiative: 0,
+			key: "monstertwo",
+			maxHp: 12,
+			name: "Orc (2)",
+			npc: "srd"
 		},
-		"monsterthree" : {
-			"ac" : 11,
-			"active" : true,		
-			"curHp" : 72,
-			"entityType" : "npc",
-			"id" : "213",
-			"initiative" : 0,
-			"key" : "monstertwo",
-			"maxHp" : 72,
-			"name" : "Ogre",
-			"npc" : "srd"
+		monsterthree: {
+			ac: 11,
+			active: true,		
+			curHp: 72,
+			entityType: "npc",
+			id: "213",
+			initiative: 0,
+			key: "monstertwo",
+			maxHp: 72,
+			name: "Ogre",
+			npc: "srd"
 		},
 	},
-	"finished" : false,
-	"round" : 0,
-	"turn" : 0
+	finished: false,
+	round: 0,
+	turn: 0
 }
 
 
 const getDefaultState = () => ({
 		demo: false,
-		demoEntities: demoEncounter.entities,
 		uid: undefined,
 		entities: {},
 		targeted: [],
@@ -141,7 +133,6 @@ const run_encounter_state = getDefaultState();
 
 const run_encounter_getters = {
 	entities(state) { return state.entities },
-	demoEntities(state) { return state.demoEntities },
 	track(state) { return state.track },
 	active(state) { return state.active },
 	idle(state) { return state.idle },
@@ -213,8 +204,9 @@ const run_encounter_actions = {
 				}
 			} 
 			else {
-				commit('SET_ENCOUNTER', {...demoEncounter});
-				for (let key in demoEncounter.entities) {
+				const demo = rootGetters["encounters/demo_encounter"] || demoEncounter;
+				commit('SET_ENCOUNTER', {...demo});
+				for (let key in demo.entities) {
 					await dispatch("add_entity", key);
 				}
 			}
@@ -232,8 +224,9 @@ const run_encounter_actions = {
 	},
 
 	async add_entity({ state, commit, rootGetters, dispatch }, key) {
+		const demo_entities = rootGetters["encounters/demo_encounter"] ? rootGetters["encounters/demo_encounter"].entities : demoEncounter.entities;
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];
+		let db_entity = (!state.demo) ? state.encounter.entities[key] : demo_entities[key];
 		const campaign = (!state.demo) ? await dispatch("campaigns/get_campaign", { uid, id: state.campaignId }) : undefined;
 
 		let entity = {
@@ -281,7 +274,7 @@ const run_encounter_actions = {
 
 		switch(entity.entityType) {
 			case 'player': {
-				const campaignPlayer = (!state.demo) ? campaign.players[key] : demoPlayers[key];
+				const campaignPlayer = (!state.demo) ? campaign.players[key] : db_entity;
 
 				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
 				if(campaignPlayer) {
@@ -306,7 +299,7 @@ const run_encounter_actions = {
 				}
 
 				//get other values from the player
-				let db_player = (!state.demo) ? await dispatch("players/get_player", { uid, id: key }) : demoPlayers[key];
+				let db_player = (!state.demo) ? await dispatch("players/get_player", { uid, id: key }) : db_entity;
 
 				entity.img = db_player.storage_avatar || db_player.avatar;
 				
@@ -1410,10 +1403,14 @@ const run_encounter_actions = {
 			commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedAc', value: entity.ac });
 		}
 	},
-	add_entity_demo({ dispatch }, entity) { 
+	add_entity_demo({ dispatch, rootGetters }, entity) { 
 		//generate semi random id
-		let key = Date.now() + Math.random().toString(36).substring(4);
-		Vue.set(demoEncounter.entities, key, entity);
+		const key = uuid();
+		if(rootGetters["encounters/demo_encounter"]) {
+			dispatch("encounters/add_demo_entity", { key, entity })
+		} else {
+			Vue.set(demoEncounter.entities, key, entity);
+		}
 
 		dispatch("add_entity", key);
 	},

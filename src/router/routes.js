@@ -503,7 +503,7 @@ const routes = [
 				component: { render (c) { return c('router-view') }},
 				meta: {
 					title: "Encounter Builder",
-					description: "An advanced encounter builder for Dungeons and Dragons 5th edition. Calculates the difficulty of your encounter."
+					description: "An encounter builder for Dungeons and Dragons 5th edition. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker."
 				},
 				children: [
 					{
@@ -512,7 +512,7 @@ const routes = [
 						component: () => import('src/views/Tools/EncounterBuilder'),
 						meta: {
 							title: "Encounter Builder",
-							description: "An advanced encounter builder for Dungeons and Dragons 5th edition. Calculates the difficulty of your encounter."
+							description: "An encounter builder for Dungeons and Dragons 5th edition. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker."
 						}
 					},
 					{
@@ -521,7 +521,7 @@ const routes = [
 						component: () => import('src/views/UserContent/Encounters/Edit'),
 						meta: {
 							title: "Build encounter",
-							description: "Create your custom D&D 5e monster.",
+							description: "Create an encounter for D&D 5e and find out it's difficulty. Once you're finished you can run it in our Combat Tracker.",
 							side: false
 						}
 					}
@@ -1104,7 +1104,7 @@ const routes = [
 		meta: {
 			basePath: '/user',
 			title: 'User page',
-			description: "Follow the live initiative lists of your DM with Harmless Key, a Dungeons & Dragons Initiavive Tracker."
+			description: "Follow the live initiative lists of your DM with Harmless Key, a Dungeons & Dragons Initiative Tracker."
 		}
 	},
 	{
@@ -1115,7 +1115,7 @@ const routes = [
 			basePath: '/user',
 			title: 'Campaign',
 			sidebar: false,
-			description: "Campaign with live initiative list of the encounters with Harmless Key, a Dungeons & Dragons Initiavive Tracker."
+			description: "Campaign with live initiative list of the encounters with Harmless Key, a Dungeons & Dragons Initiative Tracker."
 		}
 	},
 	{ path: '/track-encounter/:userid', redirect: '/user/:userid' },
@@ -1136,8 +1136,9 @@ const routes = [
 	{ path: "/followed", redirect: "/content/followed" },
 	{ path: "/settings", redirect: "/content/settings" },
 
-  // Always leave this as last one,
-  // but you can also remove it
+	{ path: "/combat-tracker", redirect: "/demo" },
+	{ path: "/encounter-builder", redirect: "/tools/encounter-builder/build-encounter" },
+
   {
     path: '*',
     component: () => import('src/views/Pages/Error404.vue')

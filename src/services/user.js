@@ -1,5 +1,6 @@
 import { db } from "src/firebase";
 import { serverUtils } from "./serverUtils";
+import { voucherService } from "./vouchers";
 
 const USERS_REF = db.ref("users");
 const SETTINGS_REF = db.ref("settings");
@@ -116,7 +117,8 @@ export class userServices {
 
     await Promise.all([
       USERS_REF.child(uid).child('voucher').set(fbVoucher),
-      VOUCHER_HISTORY_REF.child(uid).child(voucherHistItem.voucher).set(voucherHistItem)
+      VOUCHER_HISTORY_REF.child(uid).child(voucherHistItem.voucher).set(voucherHistItem),
+      voucherService.incrementVoucherUsage(voucherHistItem.voucher)
     ])
     return fbVoucher;
   }

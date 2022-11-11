@@ -190,6 +190,13 @@
             align: 'left',
             sortable: true
           },
+          {
+            name: 'times_used',
+            label: 'Times Used',
+            field: 'times_used',
+            align: 'left',
+            sortable: true
+          }
         ]
       }
 		},

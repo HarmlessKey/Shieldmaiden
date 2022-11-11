@@ -31,7 +31,7 @@
 		<p><small>Missing players? <router-link to="/content/campaigns">Add them to your campaign first</router-link>.</small></p>
 		<hr>
 	</template>
-	<button class="btn btn-block mb-3" @click="player_dialog = true">
+	<button v-else class="btn btn-block mb-3" @click="player_dialog = true">
 		<i class="fas fa-user-plus" aria-hidden="true" />
 		Add players
 	</button>

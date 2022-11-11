@@ -7,7 +7,7 @@ export const difficulty = {
 	data() {
 		return {
 			demo: this.$route.name === "ToolsBuildEncounter",
-			uid: this.$store.getters ? this.$store.getters.user : undefined,
+			uid: this.$store.getters && this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			difficulties: [
 				'easy',
 				'medium',

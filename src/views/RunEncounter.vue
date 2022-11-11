@@ -6,7 +6,7 @@
 		<div
 			class="combat-wrapper"
 			v-else-if="encounter && (players || demo)"
-			:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
+			:style="[settings.background && getBackground(encounter) ?  {'background': 'url(\'' + getBackground(encounter) + '\')'} : {'background': ''}]"
 		>
 			<template v-if="encounter.finished">
 				<Finished v-if="!demo" :encounter="encounter"/>
@@ -333,6 +333,11 @@
 			finish() {
 				this.set_finished();
 			},
+			getBackground(encounter) {
+				if(encounter.background) return encounter.background;
+				if(encounter.hk_background) return require(`src/assets/_img/atmosphere/${encounter.hk_background}.jpg`);
+				return undefined;
+			}
 		}
 	}
 </script>

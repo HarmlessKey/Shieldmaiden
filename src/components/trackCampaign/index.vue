@@ -33,7 +33,7 @@
 				<!-- LIVE -->
 				<div 
 					v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
-					:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
+					:style="{ backgroundImage: getBackground(encounter) ? 'url(\'' + getBackground(encounter) + '\')' : '' }"
 				>
 					<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" :shares="shares" />
 				</div>
@@ -204,9 +204,9 @@
 					return item.key === key;
 				})[0];
 			},
-			getBackground(campaign) {
-				if(campaign && campaign.background) return campaign.background;
-				if(campaign && campaign.hk_background) return require(`src/assets/_img/atmosphere/medium/${campaign.hk_background}-medium.jpg`);
+			getBackground(object) {
+				if(object && object.background) return object.background;
+				if(object && object.hk_background) return require(`src/assets/_img/atmosphere/${object.hk_background}.jpg`);
 				return undefined;
 			}
 		},

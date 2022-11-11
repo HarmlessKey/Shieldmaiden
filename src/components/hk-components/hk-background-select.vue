@@ -53,6 +53,7 @@
         },
         set(newVal) {
           this.$emit("input", newVal);
+          this.$forceUpdate();
         }
       }
     },

@@ -48,6 +48,14 @@
 					</div>
 				</ValidationProvider>
 
+				<hk-background-select 
+					v-model="editableEncounter.hk_background"
+					label="Background" 
+					:disable="!!editableEncounter.background"
+					@input="setBackground($event)"
+					class="mb-3" 
+				/>
+
 				<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
 					<div class="background mb-3">
 						<div 
@@ -61,16 +69,17 @@
 							<q-icon name="fas fa-image"/>
 						</div>
 						<div>
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square
-									label="Background"
-									autocomplete="off" 
-									v-model="editableEncounter.background" 
-									class="mb-2"
-									placeholder="Background URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Background"
+								autocomplete="off" 
+								v-model="editableEncounter.background" 
+								class="mb-2"
+								placeholder="Background URL"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+								@input="editableEncounter.hk_background = null"
+							/>
 						</div>
 					</div>
 				</ValidationProvider>
@@ -113,7 +122,7 @@
 
 				</q-toolbar>
 				<div class="preview">
-					<Weather :weather="weather" :key="JSON.stringify(weather)" :background="encounter.background" />				
+					<Weather :weather="weather" :key="JSON.stringify(weather)" :background="getBackground(editableEncounter)" />				
 				</div>
 			</q-card>
 		</q-dialog>
@@ -159,6 +168,9 @@
 			if(this.encounter && this.encounter.weather) {
 				this.weather = this.encounter.weather;
 			}
+			if(this.editableEncounter && !this.editableEncounter.hk_background) {
+				this.$set(this.editableEncounter, "hk_background", null);
+			}
 		},
 		methods: {
 			...mapActions("encounters", ["edit_encounter"]),
@@ -193,6 +205,13 @@
 					if(value === 2) return "Medium";
 					if(value === 3) return "Heavy";
 				}
+			},
+			setBackground(value) {
+				this.$set(this.editableEncounter, 'hk_background', value);
+			},
+			getBackground(encounter) {
+				if(encounter.background) return encounter.background;
+				if(encounter.hk_background) return require(`src/assets/_img/atmosphere/${encounter.hk_background}.jpg`);
 			}
 		},
 	}

@@ -15,7 +15,47 @@ export const backgrounds = Object.freeze([
   {
     name: "Snowy Mountains",
     value: "winter-landscape"
-  }
+  },
+  {
+    name: "Desert",
+    value: "desert"
+  },
+  {
+    name: "Dragon Attack",
+    value: "dragon-attack"
+  },
+  {
+    name: "Dragon Encounter",
+    value: "dragon-encounter"
+  },
+  {
+    name: "Elven City",
+    value: "elven-city"
+  },
+  {
+    name: "Undead Army",
+    value: "encounter-builder"
+  },
+  {
+    name: "Fire Dragon",
+    value: "fire-dragon"
+  },
+  {
+    name: "Forest Graveyard",
+    value: "forest-graveyard"
+  },
+  {
+    name: "Winged Monster",
+    value: "monster"
+  },
+  {
+    name: "Mountaintop Castle",
+    value: "mountaintop-castle"
+  },
+  {
+    name: "Snowy Mountains",
+    value: "winter-landscape"
+  },
 ]);
 
 export const abilities = Object.freeze([

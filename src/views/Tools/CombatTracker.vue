@@ -3,7 +3,7 @@
 		<div class="card-header" slot="header">
 			<h1><i aria-hidden="true" class="fas fa-swords mr-2" /> Combat Tracker for D&D 5e</h1>
 		</div>
-    <div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require('assets/_img/atmosphere/banner/dragon-encounter-banner.jpg')})` }">
+    <div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require('assets/_img/atmosphere/tool-header/dragon-encounter-tool-header.jpg')})` }">
       D&D Combat Tracker
     </div>
 		<div class="card-body">

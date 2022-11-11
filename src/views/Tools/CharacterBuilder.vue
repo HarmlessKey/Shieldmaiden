@@ -3,7 +3,7 @@
 		<div class="card-header" slot="header">
 			<h1>Character builder</h1>
 		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/banner/characters-banner.jpg`)})` }">
+		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/tool-header/characters-tool-header.jpg`)})` }">
       D&D Character builder
     </div>
 		<div class="card-body">

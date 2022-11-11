@@ -3,7 +3,7 @@
 		<div class="card-header" slot="header">
 			<h1>Encounter builder</h1>
 		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/banner/encounter-builder-banner.jpg`)})` }">
+		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/tool-header/encounter-builder-tool-header.jpg`)})` }">
       D&D Encounter builder
     </div>
 		<div class="card-body">

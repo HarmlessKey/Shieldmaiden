@@ -60,6 +60,7 @@
               <template>
                 <div class="dflex justify-between">
                   <q-input
+                    class="text-uppercase"
                     :dark="$store.getters.theme === 'dark'" filled square
                     v-model="voucher_input_text" label="Voucher code"
                     v-on:keyup.enter="addVoucher"

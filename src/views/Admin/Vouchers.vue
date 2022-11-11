@@ -24,22 +24,44 @@
 					<div slot="no-data" />
 					<hk-loader slot="loading" name="players" />
           <template v-slot:body="props">
-            <q-tr :props="props">
+            <q-tr :props="props" :class="props.row.disabled ? 'text-neutral-3' : ''">
               <q-td
               v-for="col in props.cols"
               :key="col.name"
               :props="props"
               >
               {{ col.value }}
-            </q-td>
-            <q-td auto-width>
-              <a class="btn btn-sm bg-neutral-5" @click="deleteVoucher(props.row.voucher)">
-                <i class="fas fa-trash-alt" aria-hidden="true" />
-                <q-tooltip anchor="top middle" self="center middle">
-                  Delete voucher
-                </q-tooltip>
-              </a>
-            </q-td>
+              </q-td>
+              <q-td auto-width>
+                <div class="d-flex justify-right">
+                  <a class="btn btn-sm bg-neutral-5  mr-2" @click="editVoucher(props.row)">
+                    <i class="fas fa-pencil" aria-hidden="true" />
+                    <q-tooltip anchor="top middle" self="center middle">
+                      Edit voucher
+                    </q-tooltip>
+                  </a>
+                  <template>
+                    <a v-if="!props.row.disabled" class="btn btn-sm bg-neutral-5  mr-2" @click="disableVoucher(props.row.voucher)">
+                      <i class="fas fa-times-square" aria-hidden="true" />
+                      <q-tooltip anchor="top middle" self="center middle">
+                        Disable voucher
+                      </q-tooltip>
+                    </a>
+                    <a v-else class="btn btn-sm bg-neutral-5  mr-2" @click="enableVoucher(props.row.voucher)">
+                      <i class="fas fa-check-square" aria-hidden="true" />
+                      <q-tooltip anchor="top middle" self="center middle">
+                        Enable voucher
+                      </q-tooltip>
+                    </a>
+                  </template>
+                  <a class="btn btn-sm bg-neutral-5" @click="deleteVoucher(props.row.voucher)">
+                    <i class="fas fa-trash-alt" aria-hidden="true" />
+                    <q-tooltip anchor="top middle" self="center middle">
+                      Delete voucher
+                    </q-tooltip>
+                  </a>
+                </div>
+              </q-td>
             </q-tr>
           </template>
 				</q-table>
@@ -55,6 +77,7 @@
                   <q-input
                     class="mb-2"
                     :dark="$store.getters.theme === 'dark'" filled square
+                    :disable="update_voucher"
                     type="text"
                     autocomplete="off"
                     v-model="newVoucher.voucher"
@@ -82,6 +105,7 @@
                     v-model.number="newVoucher.duration"
                     :rules="[val => !!val || 'Field is required']"
                     label="Duration"
+                    suffix="Months"
                   />
 
                   <q-input class="mb-2"
@@ -134,6 +158,7 @@
         loading_vouchers: true,
         loading_tiers: true,
         newVoucher: {},
+        update_voucher: false,
         tierMap: {},
         columns: [
           {
@@ -183,17 +208,29 @@
         try {
           await voucherService.addNewVoucher(this.newVoucher)
           this.add = false;
+          this.update_voucher = false;
           this.newVoucher = {}
         } catch (error) {
           this.$snotify.error(error);
         }
-
       },
       async getTierName(id) {
         return await voucherService.getTierName(id);
       },
       async deleteVoucher(voucher_name) {
         await voucherService.deleteVoucher(voucher_name)
+      },
+      async editVoucher(voucher) {
+        this.add = true;
+        this.update_voucher = true;
+        this.newVoucher = voucher;
+        console.log(newVoucher, voucher);
+      },
+      async enableVoucher(voucher_name) {
+        await voucherService.enableVoucher(voucher_name)
+      },
+      async disableVoucher(voucher_name) {
+        await voucherService.disableVoucher(voucher_name)
       },
       setVouchers(snapshot) {
         this.vouchers = snapshot.val() ? Object.values(snapshot.val()) : [];

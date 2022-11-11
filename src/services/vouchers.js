@@ -24,16 +24,35 @@ export class voucherService {
     return Object.values(vouchers).filter(voucher => {
       const valid_until = new Date(voucher.valid_until);
       valid_until.setDate(valid_until.getDate() + 1);
-      return server_time < valid_until;
+      return voucher.disabled === undefined && server_time < valid_until;
     });
   }
 
   static async addNewVoucher(voucher_object) {
+    voucher_object.voucher = voucher_object.voucher.toUpperCase();
+    voucher_object.times_used = 0;
     return VOUCHER_REF.child(voucher_object.voucher).set(voucher_object);
   }
 
   static async deleteVoucher(voucher_name) {
     return VOUCHER_REF.child(voucher_name).remove();
+  }
+
+  static async disableVoucher(voucher_name) {
+    return VOUCHER_REF.child(voucher_name).child('disabled').set(true);
+  }
+
+  static async enableVoucher(voucher_name) {
+    return VOUCHER_REF.child(voucher_name).child('disabled').remove();
+  }
+
+  static async incrementVoucherUsage(voucher_name) {
+    return VOUCHER_REF.child(voucher_name).transaction((voucher) => {
+      if (voucher) {
+        voucher.times_used++
+      }
+      return voucher;
+    })
   }
 
   static async getVoucherTiers() {

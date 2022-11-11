@@ -560,7 +560,7 @@ const routes = [
 				name: "ToolsCharacterBuilder",
 				component: () => import('src/views/Tools/CharacterBuilder'),
 				meta: {
-					title: "Dungeons & Dragons Character Builder",
+					title: "Character Builder",
 					description: "An advanced character builder for Dungeons and Dragons 5th edition. Create a character sheet for you character."
 				}
 			}
@@ -1137,6 +1137,7 @@ const routes = [
 	{ path: "/settings", redirect: "/content/settings" },
 
 	{ path: "/combat-tracker", redirect: "/demo" },
+	{ path: "/monster-creator", redirect: "/tools/monster-creator/create-monster" },
 	{ path: "/encounter-builder", redirect: "/tools/encounter-builder/build-encounter" },
 
   {

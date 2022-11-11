@@ -3,12 +3,12 @@
 		<div class="card-header" slot="header">
 			<h1>Encounter builder</h1>
 		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/solar.jpg`)})` }">
+		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/banner/encounter-builder-banner.jpg`)})` }">
       D&D Encounter builder
     </div>
 		<div class="card-body">
       <p>
-        
+        Easily add monsters and players to create an encounter that you can run in our Combat Tracker. We calculate the difficulty of your encounter. 
       </p>
 
       <p class="mb-0">To save encounters, you need an account.</p> 
@@ -40,6 +40,7 @@
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
+    background-size: auto;
   }
 }
 </style>

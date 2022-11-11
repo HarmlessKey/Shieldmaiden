@@ -7,7 +7,7 @@
 			<div v-for="(tool, key) in tools" class="col-12 col-sm-6 col-md-4" :key="key">
         <router-link :to="tool.url">
           <hk-card class="full-height tool">
-            <div slot="image" class="card-image" :style="[ tool.image ? { backgroundImage: `url(${require(`src/assets/_img/${tool.image}`)})` } : '' ]">
+            <div slot="image" class="card-image" :style="[ tool.image ? { backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${tool.image}`)})` } : '' ]">
               <i :class="tool.icon" aria-hidden="true" />
             </div>
             <div slot="header" class="card-header written">
@@ -39,35 +39,35 @@
           'combat-tracker': {
             title: "Combat Tracker",
             description: "Track everything in your encounters and share initiative with your players.",
-            image: "dragon-encounter.jpg",
+            image: "dragon-encounter-medium.jpg",
             url: "/tools/combat-tracker",
             icon: "fas fa-swords"
           },
           'encounter-builder': {
             title: "Encounter Builder",
             description: "Build encounters and see their difficulty for your party. You can run your encounters in our combat tracker.",
-            image: "",
+            image: "encounter-builder-medium.jpg",
             url: "/tools/encounter-builder",
             icon: "fas fa-hammer-war"
           },
           'monster-creator': {
             title: "Monster Creator",
             description: "Build custom monster stat blocks with easy to roll actions. You can use your monsters in our combat tracker.",
-            image: "solar.jpg",
+            image: "monster-medium.jpg",
             url: "/tools/monster-creator",
             icon: "fas fa-dragon"
           },
           'Compendium': {
             title: "Compendium",
             description: "Quickly reference Monsters, Spells, Conditions and Items.",
-            image: "compendium.jpg",
+            image: "compendium-medium.jpg",
             url: "/compendium",
             icon: "fas fa-book-spells"
           },
           'Character Builder': {
             title: "Character Builder",
             description: "Build your character and get an online character sheet.",
-            image: "",
+            image: "characters-medium.jpg",
             url: "/tools/character-builder",
             under_development: true,
             icon: "fas fa-helmet-battle"
@@ -92,7 +92,7 @@ a {
     font-size: 21px;
   }
   .card-image {
-    filter: grayscale(100%);
+    filter: grayscale(50%);
     transition: all .5s ease-in-out;
     font-size: 95px;
     text-align: center;

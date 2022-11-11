@@ -28,7 +28,7 @@
 									:style="[
 										campaign.background
 										? { backgroundImage: 'url(\'' +campaign.background + '\')' }
-										: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
+										: { backgroundImage: `url(${require('src/assets/_img/atmosphere/medium/campaign-background-medium.jpg')})` }
 									]">
 									<div class="d-flex justify-content-between">
 										<i aria-hidden="true" 

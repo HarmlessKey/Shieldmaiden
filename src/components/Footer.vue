@@ -16,6 +16,12 @@
 							<li><router-link to="/documentation">Documentation</router-link></li>
 							<li><router-link to="/about-us">About us</router-link></li>
 						</ul>
+						<h2 class="neutral-2">Tools</h2>
+						<ul>
+							<li><router-link to="/combat-tracker">Combat tracker</router-link></li>
+							<li><router-link to="/encounter-builder">Encounter builder</router-link></li>
+							<li><router-link to="/monster-creator">Monster creator</router-link></li>
+						</ul>
 					</div>
 					<div>
 						<h2 class="neutral-2">Follow us</h2>
@@ -126,8 +132,13 @@
 				justify-content: flex-start;
 				flex-wrap: wrap;
 
-				div {
-					width: 130px;
+				> div {
+					width: max-content;
+					padding-right: 20px;
+
+					&:last-child {
+						padding: 0;
+					}
 
 					ul {
 						padding: 0;
@@ -151,28 +162,28 @@
 				}
 			}
 		
-			
-
 			h2 {
 				font-weight: bold !important;
 				font-size: 13px !important;
 				line-height: 25px;
 				margin-bottom: 10px;
 			}
-
-			
 		}
 		.bottom {
 			background-color: $neutral-10;
 		}
 	}
-	@media (max-width: 854px) {
+	@media (max-width: 745px) {
 		.footer .top .content {
 			justify-content: center;
 
 			.links {
 				justify-content: center;
 				text-align: center;
+
+				> div {
+					padding: 0 10px;
+				}
 			}
 		}
 	}

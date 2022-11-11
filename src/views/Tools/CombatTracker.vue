@@ -3,7 +3,7 @@
 		<div class="card-header" slot="header">
 			<h1><i aria-hidden="true" class="fas fa-swords mr-2" /> Combat Tracker for D&D 5e</h1>
 		</div>
-    <div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/dragon-encounter.jpg`)})` }">
+    <div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require('assets/_img/atmosphere/banner/dragon-encounter-banner.jpg')})` }">
       D&D Combat Tracker
     </div>
 		<div class="card-body">
@@ -15,7 +15,7 @@
       <p class="mb-0">To fully use our Combat Tracker you need an account, but you can try out all it has to offer in our demo encounter.</p> 
     </div>
     <div slot="footer" class="card-footer">
-      <q-btn color="green" class="full-width" no-caps push to="/demo">Try Demo Encounter</q-btn>
+      <q-btn color="primary" class="full-width" no-caps push to="/demo">Try Demo Encounter</q-btn>
     </div>
 	</hk-card>
 </template>
@@ -42,6 +42,7 @@
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
+    background-size: auto;
   }
 }
 </style>

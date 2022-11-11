@@ -10,7 +10,7 @@
 				:style="[
 					active_campaign && active_campaign.background
 					? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
-					: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
+					: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.jpg')})` }
 				]"
 			>
 				<a 

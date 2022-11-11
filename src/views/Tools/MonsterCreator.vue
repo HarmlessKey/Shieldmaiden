@@ -1,20 +1,22 @@
 <template>
 	<hk-card>
 		<div class="card-header" slot="header">
-			<h1>Monster Creator for D&D 5e</h1>
+			<h1><i aria-hidden="true" class="fas fa-dragon mr-2" /> Monster Creator for D&D 5e</h1>
 		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/solar.jpg`)})` }">
+		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/banner/monster-banner.jpg`)})` }">
       D&D Monster Creator
     </div>
 		<div class="card-body">
       <p>
-        
+        With our monster creator you can create stat blocks for custom monsters. 
+        You can create actions for you monster that can be rolled from the stat block. 
+        Results of rolled actions can directly be applied when used in our <router-link to="/tools/combat-tracker">combat tracker</router-link>.
       </p>
 
-      <p class="mb-0">To save a monster, you need an account, but you can always download your creations.</p> 
+      <span>To save a monster, you need an account, but you can always download your creations.</span> 
     </div>
     <div slot="footer" class="card-footer">
-      <q-btn color="green" class="full-width" no-caps push to="/tools/monster-creator/create-monster">Create custom monster</q-btn>
+      <q-btn color="primary" class="full-width" no-caps push to="/tools/monster-creator/create-monster">Create custom monster</q-btn>
     </div>
 	</hk-card>
 </template>

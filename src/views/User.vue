@@ -27,7 +27,7 @@
 										:style="[
 											campaign.background
 											? { backgroundImage: 'url(\'' +campaign.background + '\')' }
-											: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.webp')})` }
+											: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.jpg')})` }
 										]">
 										<span class="live active" v-if="user.live == campaign.key">live</span>
 										<a 

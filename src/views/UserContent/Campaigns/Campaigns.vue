@@ -25,11 +25,8 @@
 								<div 
 									slot="image" 
 									class="card-image" 
-									:style="[
-										campaign.background
-										? { backgroundImage: 'url(\'' +campaign.background + '\')' }
-										: { backgroundImage: `url(${require('src/assets/_img/atmosphere/medium/campaign-background-medium.jpg')})` }
-									]">
+									:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
+								>
 									<div class="d-flex justify-content-between">
 										<i aria-hidden="true" 
 											class="px-1 py-2"
@@ -68,14 +65,6 @@
 											</a>
 										</div>
 									</div>
-									<a 
-										v-if="!campaign.background" 
-										class="white text-shadow-3 link" 
-										target="_blank" rel="noopener"
-										href="https://www.vecteezy.com/free-vector/fantasy-landscape"
-									>
-										Image by Vecteezy
-									</a>
 								</div>
 
 								<div class="card-body">
@@ -321,6 +310,11 @@
 						]
 					});
 				}
+			},
+			getBackground(campaign) {
+				if(campaign.background) return campaign.background;
+				if(campaign.hk_background) return require(`src/assets/_img/atmosphere/medium/${campaign.hk_background}-medium.jpg`);
+				return require('src/assets/_img/atmosphere/medium/campaign-background-medium.jpg');
 			}
 		}
 	}

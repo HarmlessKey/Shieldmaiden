@@ -27,6 +27,13 @@
 							:options="advancement_options" 
 						/>
 
+						<hk-background-select 
+							v-model="editCampaign.hk_background"
+							label="Background" 
+							:disable="!!editCampaign.background" 
+							class="mb-3" 
+						/>
+
 						<div class="background mt-2">
 							<div 
 								class="img pointer" 
@@ -45,13 +52,22 @@
 										autocomplete="off" 
 										type="text" 
 										v-model="editCampaign.background"
-										placeholder="Background URL"
+										placeholder="Custom background URL"
 										:error="invalid && validated"
 										:error-message="errors[0]"
-									/>
+										@input="editCampaign.hk_background = null"
+									>
+										<hk-popover slot="append" header="Custom background">
+											<i class="fas fa-info-circle" aria-hidden="true" />
+											<template #content>
+												Setting a custom background will overwrite your selected background.
+											</template>
+										</hk-popover>
+									</q-input>
 								</ValidationProvider>
 							</div>
 						</div>
+
 						<div class="mt-3 neutral-2 pointer">
 							<span class="btn btn-clear" @click="$set(editCampaign, 'private', null)">
 								<span :class="!editCampaign.private ? 'green' : 'neutral-2'">
@@ -72,14 +88,13 @@
 								<i aria-hidden="true" class="fas fa-info-circle blue" />
 								<template #content>
 									<p>
-										You can only share the inititiave list with your 
+										You can only share the initiative list with your 
 										players if your campaign is set to public.
 									</p>
 									Private campaigns are hidden from your followers.
 								</template>
 							</hk-popover>
 						</div>
-
 					</div>
 					<div slot="footer" class="card-footer">
 						<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">

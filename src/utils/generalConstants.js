@@ -7,6 +7,17 @@ export const dice_types = Object.freeze([
   { value: 20, label: "d20" },
 ]);
 
+export const backgrounds = Object.freeze([
+  { 
+    name: "Forest",
+    value: "campaign-background"
+  },
+  {
+    name: "Snowy Mountains",
+    value: "winter-landscape"
+  }
+]);
+
 export const abilities = Object.freeze([
   "strength",
   "dexterity",
@@ -30,7 +41,7 @@ export const damage_types = Object.freeze([
   "radiant",
   "slashing",
   "thunder"
-],);
+]);
 
 export const damage_type_icons = Object.freeze({
   "acid": "fas fa-tint",

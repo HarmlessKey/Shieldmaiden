@@ -7,19 +7,8 @@
 				slot="image"
 				class="card-image"
 				:class="{ 'no-campaign': !active_campaign }"
-				:style="[
-					active_campaign && active_campaign.background
-					? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
-					: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.jpg')})` }
-				]"
+				:style="{ backgroundImage: 'url(\'' + getBackground(active_campaign) + '\'' }"
 			>
-				<a 
-					v-if="!active_campaign || !active_campaign.background" 
-					class="white text-shadow-3 link" 
-					target="_blank" rel="noopener"
-					href="https://www.vecteezy.com/free-vector/fantasy-landscape">
-					Image by Vecteezy
-				</a>
 			</div>
 			<!-- Active campaign -->
 			<div class="card-body" v-if="active_campaign">
@@ -35,7 +24,7 @@
 					Continue <span class="d-none d-md-inline">campaign</span>
 				</router-link>
 			</div>
-			<!-- No acive campaign -->
+			<!-- No active campaign -->
 			<div v-else class="card-body">
 				<div>
 					<div class="neutral-4 mb-1">Campaigns</div>
@@ -212,7 +201,12 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("campaigns", ["get_campaigns"])
+			...mapActions("campaigns", ["get_campaigns"]),
+			getBackground(campaign) {
+				if(campaign && campaign.background) return campaign.background;
+				if(campaign && campaign.hk_background) return require(`src/assets/_img/atmosphere/banner/${campaign.hk_background}-banner.jpg`);
+				return require('src/assets/_img/atmosphere/banner/campaign-background-banner.jpg');
+			}
 		}
 	}
 </script>

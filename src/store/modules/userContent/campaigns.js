@@ -7,6 +7,7 @@ const convert_campaign = (campaign) => {
 	const properties = [
     "name",
     "background",
+    "hk_background",
     "player_count",
     "advancement",
     "timestamp",

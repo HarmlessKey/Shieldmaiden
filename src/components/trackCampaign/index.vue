@@ -19,7 +19,7 @@
 							</a>
 						</span>
 					</div>
-					<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+					<div class="campaign" :style="{ backgroundImage: getBackground(campaign) ? 'url(\'' + getBackground(campaign) + '\')' : '' }">
 						<CampaignOverview 
 							:players="players" 
 							:campaign="campaign" 
@@ -203,6 +203,11 @@
 				return !!this.shares.filter(item => {
 					return item.key === key;
 				})[0];
+			},
+			getBackground(campaign) {
+				if(campaign && campaign.background) return campaign.background;
+				if(campaign && campaign.hk_background) return require(`src/assets/_img/atmosphere/medium/${campaign.hk_background}-medium.jpg`);
+				return undefined;
 			}
 		},
 		beforeDestroy() {

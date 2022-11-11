@@ -24,19 +24,9 @@
 									<div 
 										slot="image" 
 										class="card-image" 
-										:style="[
-											campaign.background
-											? { backgroundImage: 'url(\'' +campaign.background + '\')' }
-											: { backgroundImage: `url(${require('src/assets/_img/atmosphere/campaign-background.jpg')})` }
-										]">
+										:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
+									>
 										<span class="live active" v-if="user.live == campaign.key">live</span>
-										<a 
-											v-if="!campaign.background" 
-											class="neutral-2 text-shadow-3 link" 
-											target="_blank" rel="noopener"
-											href="https://www.vecteezy.com/free-vector/fantasy-landscape">
-											Image by Vecteezy
-										</a>
 									</div>
 
 									<div class="card-body">
@@ -103,6 +93,11 @@
 			...mapActions("trackCampaign", ["get_user", "get_campaigns"]),
 			avatar(player) {
 				return player.storage_avatar || player.avatar;
+			},
+			getBackground(campaign) {
+				if(campaign && campaign.background) return campaign.background;
+				if(campaign && campaign.hk_background) return require(`src/assets/_img/atmosphere/medium/${campaign.hk_background}-medium.jpg`);
+				return require('src/assets/_img/atmosphere/medium/campaign-background-medium.jpg');
 			}
 		},
 		async mounted() {

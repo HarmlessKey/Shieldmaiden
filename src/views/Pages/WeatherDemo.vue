@@ -37,9 +37,6 @@
 		:background="image ? image : background"
 		:audio="audio"
 	/>
-	<a v-if="!image" class="link text-shadow-3" href="https://www.vecteezy.com/free-vector/tree" target="_blank" rel="noopener">
-		Image by Vecteezy
-	</a>
 </div>
 </template>
 
@@ -54,7 +51,7 @@
 		},
 		data() {
 			return {
-				background: require("../../assets/_img/atmosphere/winter-landscape.webp"),
+				background: require("../../assets/_img/atmosphere/winter-landscape.jpg"),
 				audio: false,
 				image: null,
 				weather: {

@@ -14,6 +14,10 @@ export class voucherService {
     return (await VOUCHER_REF.once('value')).val();
   }
 
+  static getVouchersWithCallback(callback) {
+    return VOUCHER_REF.on('value', callback);
+  }
+
   static async getValidVouchers() {
     const vouchers = (await VOUCHER_REF.once('value')).val();
     const server_time = await serverUtils.getServerTime();

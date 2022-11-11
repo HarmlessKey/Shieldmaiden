@@ -61,9 +61,8 @@
                     name="voucher"
                     label="Voucher"
                     :rules="[val => !!val || 'Field is required']"
-                  />
-                  <!-- <p class="validate red" v-if="errors.has('voucher')">{{ errors.first('voucher') }}</p> -->
-                  <q-select
+                    />
+                    <q-select
                     class="mb-2"
                     :dark="$store.getters.theme === 'dark'" filled square
                     :options="tier_select"
@@ -72,14 +71,16 @@
                     type="text"
                     autocomplete="off"
                     v-model="newVoucher.tier"
+                    :rules="[val => !!val || 'Field is required']"
                     label="Tier"
-                  />
-                  <q-input
+                    />
+                    <q-input
                     class="mb-2"
                     :dark="$store.getters.theme === 'dark'" filled square
                     type="number"
                     autocomplete="off"
                     v-model.number="newVoucher.duration"
+                    :rules="[val => !!val || 'Field is required']"
                     label="Duration"
                   />
 
@@ -128,9 +129,10 @@
 		data() {
 			return {
         add: false,
-        loading: true,
         vouchers: [],
         tiers: [],
+        loading_vouchers: true,
+        loading_tiers: true,
         newVoucher: {},
         tierMap: {},
         columns: [
@@ -170,8 +172,10 @@
       tier_select() {
         let tier_list = this.tiers
         tier_list.sort((a,b) => a.order - b.order)
-        console.log(tier_list.filter(tier => tier.order > 0).map(tier => ({"label": tier.name, 'value': tier.id})))
         return tier_list.filter(tier => tier.order > 0).map(tier => ({"label": tier.name, 'value': tier.id}))
+      },
+      loading() {
+        return this.loading_vouchers || this.loading_tiers
       }
     },
 		methods: {
@@ -179,7 +183,6 @@
         try {
           await voucherService.addNewVoucher(this.newVoucher)
           this.add = false;
-          this.vouchers.push(this.newVoucher)
           this.newVoucher = {}
         } catch (error) {
           this.$snotify.error(error);
@@ -187,32 +190,25 @@
 
       },
       async getTierName(id) {
-        const name = await voucherService.getTierName(id);
-        console.log("Name in component", name)
-        return name
+        return await voucherService.getTierName(id);
       },
       async deleteVoucher(voucher_name) {
         await voucherService.deleteVoucher(voucher_name)
-
+      },
+      setVouchers(snapshot) {
+        this.vouchers = snapshot.val() ? Object.values(snapshot.val()) : [];
+        this.loading_vouchers = false;
       }
     },
     async created() {
       const tiers = await voucherService.getVoucherTiers()
-      this.tierMap = Object.entries(tiers).reduce((acc, [id, tier]) => ({...acc, [id]:tier.name}), {})
     },
     async mounted() {
-      const vouchers_promise = voucherService.getAllVouchers();
-      const tiers_promise = voucherService.getVoucherTiers();
-
-
-      this.vouchers = Object.values(await vouchers_promise);
-      this.tiers = Object.entries(await tiers_promise).map(([id, vals]) => {
-        return {
-          id,
-          ...vals
-        }
-      });
-      this.loading = false;
+      voucherService.getVouchersWithCallback(this.setVouchers);
+      const tiers_promise = await voucherService.getVoucherTiers();
+      this.tiers = Object.entries(tiers_promise).map(([id, vals]) => ({...vals, id }))
+      this.tierMap = Object.entries(tiers_promise).reduce((acc, [id, tier]) => ({...acc, [id]:tier.name}), {})
+      this.loading_tiers = false
     },
 	}
 </script>

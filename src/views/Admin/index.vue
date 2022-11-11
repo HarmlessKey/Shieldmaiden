@@ -21,32 +21,37 @@
 		data() {
 			return {
 				items: {
-					'users': { 
+					'users': {
 						name: 'Users',
 						url: 'users',
 						icon: 'fas fa-users',
 					},
-					'patrons': { 
+					'patrons': {
 						name: 'Patrons',
 						url: 'patrons',
 						icon: 'fab fa-patreon',
 					},
+          'vouchers': {
+            name: 'Vouchers',
+            url: 'vouchers',
+            icon: 'fas fa-ticket'
+          },
 					"export": {
 						name: "Export databases",
 						url: "export",
 						icon: "fas fa-file-export"
 					},
-					'xml': { 
+					'xml': {
 						name: 'Generate XML sitemap',
 						url: 'xml',
 						icon: 'fas fa-file-code',
 					},
-					'prerender': { 
+					'prerender': {
 						name: 'Generate prerender paths JSON',
 						url: 'prerender',
 						icon: 'fas fa-brackets-curly',
 					},
-					'monster-update': { 
+					'monster-update': {
 						name: 'Update monsters',
 						url: 'monster-update',
 						icon: 'fas fa-file-edit',

@@ -29,7 +29,7 @@
 										Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
 									</p>
 								</div>
-								<div v-if="!valid(userInfo.patron.pledge_end)"> 
+								<div v-if="!valid(userInfo.patron.pledge_end)">
 									<p>Your subscription <strong class="red">expired</strong></p>
 									<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-neutral-5" rel="noopener">
 										<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Renew
@@ -39,26 +39,44 @@
 								<hr>
 							</div>
 
-							<!-- VOUCHER -->
-							<div v-if="voucher">
-								<h3><i aria-hidden="true" class="fas fa-ticket-alt"></i> Voucher subscription</h3>
-								<p v-if="voucher.message" class="green">{{ voucher.message }}</p>
-								<p >Your voucher ends on: 
-									<span class="red" v-if="voucher.date">{{ makeDate(voucher.date, false) }}</span>
-									<i aria-hidden="true" v-else>never</i>.
-								</p>
-								<hr>
-							</div>
 						</template>
 						<!-- TIER -->
 						<h3 class="mb-1">Subscription tier: <span class="patreon-red">{{ tier.name }}</span></h3>
-						<p v-if="tier.name == 'Deity'" class="neutral-2">You have unlimited power.</p>					
+						<p v-if="tier.name == 'Deity'" class="neutral-2">You have unlimited power.</p>
 
 						<Tier />
 						<router-link v-if="tier.name === 'Free'" class="btn btn-block bg-patreon-red mt-4" to="/patreon">
 							Support us for more slots
 						</router-link>
+            <div class="mt-3">
+              <h3><i aria-hidden="true" class="fas fa-ticket-alt"></i> Voucher subscription</h3>
+              <template v-if="voucher">
+                <p v-if="voucher.message" class="green">{{ voucher.message }}</p>
+                <p >Your voucher ends on:
+                  <span class="red" v-if="voucher.date">{{ makeDate(voucher.date, false) }}</span>
+                  <i aria-hidden="true" v-else>never</i>.
+                </p>
+              </template>
+              <template>
+                <div class="dflex justify-between">
+                  <q-input
+                    class="text-uppercase"
+                    :dark="$store.getters.theme === 'dark'" filled square
+                    v-model="voucher_input_text" label="Voucher code"
+                    v-on:keyup.enter="addVoucher"
+                  >
+                    <template v-slot:after>
+                      <button class="btn" @click="addVoucher">
+                        <i aria-hidden="true" class="fas fa-plus" />
+                      </button>
+                    </template>
+                  </q-input>
+                </div>
+              </template>
+              <hr>
+            </div>
 					</div>
+          <!-- VOUCHER -->
 				</hk-card>
 			</div>
 
@@ -98,7 +116,7 @@
 	import PlayerLink from "src/components/PlayerLink.vue";
 	import { auth } from "src/firebase";
 	import { general } from "src/mixins/general.js";
-	import { mapGetters } from "vuex";
+	import { mapActions, mapGetters } from "vuex";
 	import Content from "src/components/userContent/Content";
 	import Tier from "src/components/userContent/Tier";
 	import UserBanner from "src/components/userContent/UserBanner"
@@ -126,6 +144,7 @@ export default {
 				error: "",
 				resetError: undefined,
 				resetSuccess: undefined,
+        voucher_input_text: undefined,
 				content_types: [
 					{
 						type: "campaigns",
@@ -160,6 +179,9 @@ export default {
 			])
 		},
 		methods: {
+      ...mapActions([
+        'set_active_voucher'
+      ]),
 			resetPassword() {
 				var vm = this;
 				var emailAddress = this.user.email;
@@ -175,7 +197,15 @@ export default {
 			},
 			valid(end) {
 				return new Date(end).toISOString() > new Date().toISOString();
-			}
+			},
+      async addVoucher() {
+        this.set_active_voucher(this.voucher_input_text).then(() => {
+          this.$snotify.success(`Successfully added ${this.voucher_input_text.toUpperCase()} voucher.`)
+          this.voucher_input_text = null;
+        }).catch(error => {
+          this.$snotify.error(error);
+        })
+      }
 		}
 	}
 </script>
@@ -185,7 +215,7 @@ export default {
 		.user {
 			display: grid;
 			grid-template-columns: 120px 1fr;
-			
+
 			.img {
 				width: 100px;
 				height: 100px;

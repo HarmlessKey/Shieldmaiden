@@ -1,6 +1,9 @@
 import { Cookies } from 'quasar';
 import { db, auth } from 'src/firebase';
-import { userServices } from "src/services/user"; 
+import { userServices } from "src/services/user";
+import { voucherService } from 'src/services/vouchers';
+import { serverUtils } from 'src/services/serverUtils'
+
 import Vue from 'vue';
 
 const users_ref = db.ref('users');
@@ -43,7 +46,7 @@ const user_actions = {
 		}
 		return getters.user_services;
 	},
-	
+
 	setUser({ commit }, user) {
 		commit("SET_USER", user);
 	},
@@ -52,14 +55,14 @@ const user_actions = {
 			const user = users_ref.child(rootGetters.user.uid);
 			user.on("value", async user_snapshot => {
 				const user_info = user_snapshot.val();
-				
-				if(user_info) {			
+
+				if(user_info) {
 					//Fetch patron info with email
 					const email = (user_info.patreon_email) ? user_info.patreon_email.toLowerCase() : user_info.email.toLowerCase();
 
 					// User always basic reward tier
 					let path = `tiers/basic`;
-					
+
 					// Use firebase serverTimeOffset to get the date from the server and not the client.
 					// https://firebase.google.com/docs/database/web/offline-capabilities#clock-skew
 					let time_ms = 0
@@ -70,7 +73,7 @@ const user_actions = {
 						}, (err) => {
 						return err;
 					});
-					
+
 					const server_time = new Date(time_ms).toISOString();
 
 					// If user has voucher use this
@@ -81,7 +84,7 @@ const user_actions = {
 							path = `tiers/${user_info.voucher.id}`;
 						} else {
 							const end_date = new Date(user_info.voucher.date).toISOString();
-							
+
 							if (server_time > end_date) {
 								dispatch("remove_voucher", rootGetters.user.uid);
 								voucher = undefined;
@@ -95,7 +98,7 @@ const user_actions = {
 					vouch_tiers.once("value", voucher_snap => {
 						// Get the order of voucher/basic
 						let voucher_order = voucher_snap.val().order;
-						
+
 						// Search email in patrons
 						let patrons = db.ref("new_patrons").orderByChild("email").equalTo(email)
 						patrons.on("value" , async patron_snapshot => {
@@ -116,7 +119,7 @@ const user_actions = {
 								// Just hand out free tier for pending status
 								if(patron_data.tiers) {
 									const patron_tierlist = Object.keys(patron_data.tiers);
-									
+
 									if (patron_tierlist.length > 1) {
 										for (let i in patron_tierlist) {
 											let tier_id = patron_tierlist[i]
@@ -188,11 +191,7 @@ const user_actions = {
 		// 	}, 1000)
 		// });
 	},
-	remove_voucher( { rootGetters }) {
-		if(rootGetters.user) {
-			db.ref(`users/${rootGetters.user.uid}/voucher`).remove();
-		}
-	},
+
 	setPoster({ state }) {
 		db.ref('posters').once('value', snapshot => {
 			let count = snapshot.val();
@@ -204,7 +203,7 @@ const user_actions = {
 	async checkEncumbrance({ state, commit, rootGetters }) {
 		let count = {};
 		let overencumbered = false;
-		
+
 		count.campaigns = rootGetters["campaigns/campaign_count"];
 		count.players = rootGetters["players/player_count"];
 		count.characters = rootGetters["characters/character_count"];
@@ -216,7 +215,7 @@ const user_actions = {
 		let used_slots = Object.values(count).reduce((sum, count) => sum + count, 0);
 
 		// Count encounters for every campaign
-		// Save the highest count 
+		// Save the highest count
 		for (const encounter_count of Object.values(rootGetters["encounters/encounter_count"])) {
 			let n = encounter_count || 0;
 			used_slots = used_slots + n; // Add every encounter to the total used slots
@@ -224,11 +223,11 @@ const user_actions = {
 				count.encounters = n;
 			}
 		}
-		
+
 		if(state.tier) {
 			let benefits = state.tier.benefits;
 			let available_slots = Object.values(benefits).reduce((sum, count) => sum + count, 0);
-			
+
 			// Add encounter slots for every campaign above 1
 			const more_encounters = benefits.campaigns - 1;
 			if(more_encounters) {
@@ -236,7 +235,7 @@ const user_actions = {
 					available_slots = available_slots + benefits.encounters;
 				}
 			}
-			
+
 			// Check overencumbrance
 			overencumbered =  (count.campaigns > benefits.campaigns ||
 				count.encounters > benefits.encounters ||
@@ -301,11 +300,11 @@ const user_actions = {
 
 	/**
 	 * Update settings
-	 * 
-	 * @param {string} category general|encounter|track 
+	 *
+	 * @param {string} category general|encounter|track
 	 * @param {string} sub_category undefined|npcs|players
-	 * @param {string} type  
-	 * @param {any} value  
+	 * @param {string} type
+	 * @param {any} value
 	 */
 	async update_settings({ commit, dispatch, rootGetters }, {category, sub_category, type, value}) {
 		const uid = rootGetters.user.uid;
@@ -326,8 +325,8 @@ const user_actions = {
 	/**
 	 * Restores default settings for a category
 	 * Default settings have no value, so we just delete the category from settings
-	 * 
-	 * @param {string} category general|encounter|track 
+	 *
+	 * @param {string} category general|encounter|track
 	 * @param {string} sub_category undefined|npcs|players
 	 */
 	async set_default_settings({ commit, dispatch, rootGetters }, category) {
@@ -360,7 +359,42 @@ const user_actions = {
 		// Sign out from firebase
 		Cookies.remove("access_token");
 		await auth.signOut();
-	}
+	},
+
+  async remove_voucher( { rootGetters }) {
+		userServices.removeVoucher(rootGetters.user.uid).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    })
+	},
+
+  async set_active_voucher({ commit, dispatch, rootGetters }, voucher_string) {
+    const voucher = await this.dispatch("get_valid_voucher_by_string", voucher_string);
+
+    if (voucher) {
+      const voucher_tier = (await db.ref(`tiers/${voucher.tier}`).once('value')).val();
+      const current_tier = rootGetters.tier
+      if (voucher_tier.order > current_tier.order) {
+
+        return userServices.setActiveVoucher(rootGetters.user.uid, voucher)
+          .then(async ({fbVoucher}) => {
+            commit("SET_TIER", voucher_tier)
+            commit("SET_VOUCHER", fbVoucher);
+        }).catch(error => {
+          throw error;
+        })
+      }
+      throw "Voucher is lower than current subscription tier."
+    }
+    throw "No valid voucher found.";
+  },
+
+  async get_valid_voucher_by_string({ commit, dispatch }, voucher_string) {
+    const vouchers = await voucherService.getValidVouchers();
+    const intersection = vouchers.filter(v => v.voucher == voucher_string.toUpperCase());
+    return intersection.length ? intersection[0] : false;
+  },
 };
 
 const	user_mutations = {
@@ -371,13 +405,13 @@ const	user_mutations = {
 	UPDATE_USER_SETTINGS(state, { category, sub_category, type, value }) {
 		if(!sub_category) {
 			if(state.userSettings && state.userSettings[category]) {
-				Vue.set(state.userSettings[category], type, value); 
+				Vue.set(state.userSettings[category], type, value);
 			} else {
 				Vue.set(state.userSettings, category, { [type]: value });
 			}
 		} else if(state.userSettings && state.userSettings[category]) {
 			if(state.userSettings[category][sub_category]) {
-				Vue.set(state.userSettings[category][sub_category], type, value); 
+				Vue.set(state.userSettings[category][sub_category], type, value);
 			} else {
 				Vue.set(state.userSettings[category], sub_category, { [type]: value });
 			}
@@ -387,10 +421,10 @@ const	user_mutations = {
 	},
 	SET_DEFAULT_SETTINGS(state, category) { Vue.delete(state.userSettings, category); },
 	SET_TIER(state, payload) { Vue.set(state, "tier", payload); },
-	SET_VOUCHER(state, payload) { Vue.set(state, "voucher", payload); },	
+	SET_VOUCHER(state, payload) { Vue.set(state, "voucher", payload); },
 	SET_ENCUMBRANCE(state, value) { Vue.set(state, "overencumbered", value); },
 	SET_CONTENT_COUNT(state, value) { Vue.set(state, "content_count", value); },
-	SET_SLOTS_USED(state, { available_slots, used_slots }) { 
+	SET_SLOTS_USED(state, { available_slots, used_slots }) {
 		Vue.set(state, "slots_used", { available_slots, used_slots });
 	},
 	SET_FOLLOWED(state, payload) { Vue.set(state, "followed", payload); },
@@ -399,7 +433,7 @@ const	user_mutations = {
 	SET_BROADCAST_SHARES(state, payload) { Vue.set(state.broadcast, "shares", payload) },
 	CLEAR_USER(state) {
 		Vue.set(state, "user", undefined);
-		Vue.set(state, "userInfo", undefined);	
+		Vue.set(state, "userInfo", undefined);
 		Vue.set(state, "tier", undefined);
 		Vue.set(state, "voucher", undefined);
 		Vue.set(state, "overencumbered", undefined);

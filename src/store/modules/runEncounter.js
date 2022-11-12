@@ -204,9 +204,9 @@ const run_encounter_actions = {
 				}
 			} 
 			else {
-				const demo = rootGetters["encounters/demo_encounter"] || demoEncounter;
-				commit('SET_ENCOUNTER', {...demo});
-				for (let key in demo.entities) {
+				const demo_encounter = rootGetters["encounters/demo_encounter"] || demoEncounter;
+				commit('SET_ENCOUNTER', {...demo_encounter});
+				for (let key in demo_encounter.entities) {
 					await dispatch("add_entity", key);
 				}
 			}

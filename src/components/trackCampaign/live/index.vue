@@ -1,5 +1,9 @@
 <template>
-	<div class="track-wrapper" :class="{ 'rolling-initiative': encounter.round === 0 }">
+	<div 
+		class="track-wrapper" 
+		:class="{ 'rolling-initiative': encounter.round === 0 }"
+		:style="{ backgroundImage: getBackground(encounter) ? 'url(\'' + getBackground(encounter) + '\')' : '' }"
+	>
 		
 		<!-- ROLL FOR INITIATIVE -->
 		<RollForInitiative v-if="encounter.round === 0" />
@@ -333,7 +337,7 @@
 	width: 100%;
 	pointer-events: none;
 	background-size: cover;
-	background-position: center top;
+	background-position: bottom center;
 }
 .rolling-initiative {
 	.weather {

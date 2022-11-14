@@ -68,9 +68,9 @@
 <style lang="scss" scoped>
 .q-item {
   height: 100px;
-  background-size: cover;
+  background-size: 400px auto;
   background-repeat: no-repeat;
-  background-position: bottom center;
+  background-position: center right;
   text-shadow: 0 0 5px $black;
 }
 </style>

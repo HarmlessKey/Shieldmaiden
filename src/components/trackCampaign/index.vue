@@ -31,12 +31,14 @@
 				</div>
 
 				<!-- LIVE -->
-				<div 
-					v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
-					:style="{ backgroundImage: getBackground(encounter) ? 'url(\'' + getBackground(encounter) + '\')' : '' }"
-				>
-					<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" :shares="shares" />
-				</div>
+				<Live 
+					v-else-if="encounter && broadcasting['.value'] === $route.params.campid"  
+					:encounter="encounter" 
+					:campaign="campaign" 
+					:players="players" 
+					:width="width" 
+					:shares="shares"
+				/>
 			</template>
 			<div v-else>
 				<div class="top d-flex justify-content-between">
@@ -218,11 +220,11 @@
 
 <style lang="scss" scoped>
 .track {
+	background-color: $neutral-5;
 	.track-wrapper {
 		height: calc(100vh - 50px);
 		background-size: cover;
-		background-position: center bottom;
-		background-color: $neutral-5;
+		background-position: bottom center;
 		width: 100vw;
 		position: relative;
 
@@ -249,7 +251,7 @@
 		.campaign {
 			height: calc(100% - 60px);
 			background-size: cover;
-			background-position: top center;
+			background-position: bottom center;
 		}
 	}
 	.xp-wrapper {

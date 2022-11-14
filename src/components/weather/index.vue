@@ -100,7 +100,7 @@ export default {
 			width: 100%;
 			height: 100%;
 			background-size: cover;
-			background-position: center top;
+			background-position: center bottom;
 			animation: imagezoom 30s ease-in-out infinite;
 			animation-direction: alternate-reverse;
 

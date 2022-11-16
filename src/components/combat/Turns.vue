@@ -97,7 +97,7 @@
 			</a>
 		</div>
 		<div v-else>
-			Set Intitative
+			Set Initiative
 		</div>
 
 
@@ -334,14 +334,19 @@
 	}
 }
 
-@media only screen and (max-width: 576px) {
+@media only screen and (max-width: 1000px) {
 	#turns {
-		.live {
+		.live { 
 			display: none;
 		}
 		.info {
-			display: block !important;
+			display: block;
 		}
+	}
+}
+
+@media only screen and (max-width: 576px) {
+	#turns {
 		.edit {
 			color: $neutral-3;
 		}

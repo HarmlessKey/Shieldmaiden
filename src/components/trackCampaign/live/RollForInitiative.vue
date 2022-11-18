@@ -36,7 +36,6 @@
 		width: 100%;
 		left: 0;
 		position: fixed;
-		top: 50px;
 		background: rgba(38, 38, 38, .5);
 		text-align: center;
 

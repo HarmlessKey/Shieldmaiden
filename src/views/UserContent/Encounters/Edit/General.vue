@@ -1,6 +1,13 @@
 <template>
   <div>
 		<h3>General settings</h3>
+
+		<p v-if="demo">
+			These setting are mostly to add some atmosphere to the live initiative list that you can share with your players.
+			When you have an account you can share a live initiative list of your active encounter with your players 
+			and while building the encounter, you can add a <strong>background</strong> and <strong>weather effects</strong> that will show on this shared list.
+		</p>
+
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)" greedy>
 				<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
@@ -41,6 +48,24 @@
 					</div>
 				</ValidationProvider>
 
+				<hk-background-select 
+					v-if="demo || (tier && tier.name !== 'Free')"
+					v-model="editableEncounter.hk_background"
+					label="Background" 
+					:disable="!!editableEncounter.background"
+					@input="setBackground($event)"
+					class="mb-3" 
+				/>
+				<div v-else class="mb-3 flex justify-between items-center">
+					<span class="my-1">
+						With a subscription you have access to our background selector. 
+						<a class="btn btn-sm btn-clear" @click="setSlide({show: true, type: 'slides/BackgroundsOverview'})">
+							<i class="fas fa-eye" aria-hidden="true" />
+						</a>
+					</span>
+					<router-link class="btn bg-patreon-red" to="/patreon">Get a subscription</router-link>
+				</div>
+
 				<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
 					<div class="background mb-3">
 						<div 
@@ -54,16 +79,24 @@
 							<q-icon name="fas fa-image"/>
 						</div>
 						<div>
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square
-									label="Background"
-									autocomplete="off" 
-									v-model="editableEncounter.background" 
-									class="mb-2"
-									placeholder="Background URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Background"
+								autocomplete="off" 
+								v-model="editableEncounter.background" 
+								class="mb-2"
+								placeholder="Background URL"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+								@input="editableEncounter.hk_background = null"
+							>
+							<hk-popover slot="append" header="Custom background" v-if="demo || (tier && tier.name !== 'Free')">
+									<i class="fas fa-info-circle" aria-hidden="true" />
+									<template #content>
+										Setting a custom background will overwrite your selected background.
+									</template>
+								</hk-popover>
+							</q-input>
 						</div>
 					</div>
 				</ValidationProvider>
@@ -78,7 +111,7 @@
 				</h3>
 				<EditWeather v-model="weather" />
 
-				<div class="d-flex justify-content-start items-center mt-3">
+				<div v-if="!demo" class="d-flex justify-content-start items-center mt-3">
 					<q-btn color="primary" type="submit" no-caps>Save</q-btn>
 					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
 						<q-tooltip anchor="top middle" self="center middle">
@@ -106,7 +139,7 @@
 
 				</q-toolbar>
 				<div class="preview">
-					<Weather :weather="weather" :key="JSON.stringify(weather)" :background="encounter.background" />				
+					<Weather :weather="weather" :key="JSON.stringify(weather)" :background="getBackground(editableEncounter)" />				
 				</div>
 			</q-card>
 		</q-dialog>
@@ -114,7 +147,7 @@
 </template>
 
 <script>
-	import { mapActions } from "vuex";
+	import { mapActions, mapGetters } from "vuex";
 
 	import EditWeather from './Weather';
 	import { audio } from 'src/mixins/audio';
@@ -138,29 +171,30 @@
 		mixins: [audio],
 		data() {
 			return {
+				demo: this.$route.name === "ToolsBuildEncounter",
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.user,
 				image: false,
 				weatherSetter: undefined,
 				weather: {},
-				weather_effects: {
-					rain: { name: "Rain", icon: "fas fa-cloud-showers" },
-					snow: { name: "Snow", icon: "fas fa-cloud-snow" },
-					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
-					lightning: { name: "Lightning", icon: "fas fa-bolt" },
-					fog: { name: "Fog", icon: "fas fa-fog" }
-				},
 				editableEncounter: this.encounter
 			} 
+		},
+		computed: {
+			...mapGetters(["tier"]),
 		},
 		mounted() {
 			if(this.encounter && this.encounter.weather) {
 				this.weather = this.encounter.weather;
 			}
+			if(this.editableEncounter && !this.editableEncounter.hk_background) {
+				this.$set(this.editableEncounter, "hk_background", null);
+			}
 		},
 		methods: {
 			...mapActions("encounters", ["edit_encounter"]),
+			...mapActions(['setSlide']),
 			edit() {
 				this.editableEncounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
 
@@ -192,6 +226,13 @@
 					if(value === 2) return "Medium";
 					if(value === 3) return "Heavy";
 				}
+			},
+			setBackground(value) {
+				this.$set(this.editableEncounter, 'hk_background', value);
+			},
+			getBackground(encounter) {
+				if(encounter.background) return encounter.background;
+				if(encounter.hk_background) return require(`src/assets/_img/atmosphere/${encounter.hk_background}.jpg`);
 			}
 		},
 	}

@@ -4,7 +4,7 @@
 		<p>We might have failed a perception check, cause this slide can not be found...</p>
 
 		<small class="neutral-3">
-			You tried to acces: {{ type }}<br/>
+			You tried to access: {{ type }}<br/>
 			With the data: <br/>
 			{{ data }}
 		</small>

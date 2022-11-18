@@ -10,10 +10,10 @@
 					:dark="$store.getters.theme === 'dark'" inline-label dense no-caps
 				>
 					<template v-for="({name, label, type}, index) in action_types">
-						<q-tab 
+						<q-tab
 							v-if="current[type] && current[type].length"
-							:key="`tab-${index}`" 
-							:name="name" 
+							:key="`tab-${index}`"
+							:name="name"
 							:label="label"
 						/>
 					</template>
@@ -23,11 +23,11 @@
 					<q-tab-panel :name="name" v-for="({name, type}, type_index) in action_types" :key="`panel-${type_index}`">
 
 						<div v-if="type === 'legendary_actions' && current.legendary_count" class="limited">
-							Actions used 
+							Actions used
 							<div class="slots">
-								<span 
-									v-for="i in current.legendary_count" 
-									:key="`legendary-${i}`" 
+								<span
+									v-for="i in current.legendary_count"
+									:key="`legendary-${i}`"
 									class="mr-1"
 									@click="
 										current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
@@ -41,7 +41,7 @@
 										"
 									/>
 									<q-tooltip anchor="top middle" self="center middle">
-										{{ 
+										{{
 											current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
 											? "Regain action" : "Spend action"
 										}}
@@ -51,8 +51,8 @@
 						</div>
 
 						<q-list v-if="current[type]" :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
-							<q-expansion-item 
-								v-for="(action, action_index) in current[type]" 
+							<q-expansion-item
+								v-for="(action, action_index) in current[type]"
 								:key="`action-${action_index}`"
 								:dark="$store.getters.theme === 'dark'" switch-toggle-side
 								expand-icon-class="hidden-toggle"
@@ -76,7 +76,7 @@
 													(<i aria-hidden="true" :class="[
 														action.action_list[0].type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
 														roll.damage_type
-														]" /> 
+														]" />
 													{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``}}<template v-if="roll.fixed_val && roll.dice_count">
 														{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`  }})
 													</template><template v-else>{{ roll.fixed_val }})</template>
@@ -130,39 +130,27 @@
 													</q-item>
 													<q-separator />
 													<q-list :dark="$store.getters.theme === 'dark'">
-														<q-item clickable v-close-popup>
-															<q-item-section avatar>1</q-item-section>
-															<q-item-section>
-																<hk-roll 
-																	:tooltip="`${action.name} (${action.versatile_one || 'Option 1'})`"
-																	tooltipPosition="right"
-																	@roll="roll($event, acion_index, action, type, 0)"
-																	:disabled="!checkAvailable(type, action_index, action)"
-																>
-																	{{ action.versatile_one || 'Option 1' }}
-																</hk-roll>
-															</q-item-section>
-														</q-item>
-														<q-item clickable v-close-popup>
-															<q-item-section avatar>2</q-item-section>
-															<q-item-section>
-																<hk-roll 
-																	:tooltip="`${action.name} (${action.versatile_two || 'Option 2'})`"
-																	tooltipPosition="right"
-																	@roll="roll($event, action_index, action, type, 1)"
-																	:disabled="!checkAvailable(type, action_index, action)"
-																>
-																	{{ action.versatile_two || 'Option 2' }}
-																</hk-roll>
-															</q-item-section>
-														</q-item>
+                            <hk-roll
+                              v-for="i in [0, 1]" :key="`${i}-verstile-roll`"
+                              :tooltip="`${action.name} (${getVersatile(action, i)})`"
+                              tooltipPosition="right"
+                              @roll="roll($event, acion_index, action, type, i)"
+                              :disabled="!checkAvailable(type, action_index, action)"
+                            >
+                              <q-item clickable v-close-popup>
+                                <q-item-section avatar>{{ i + 1 }}</q-item-section>
+                                <q-item-section>
+																	{{ getVersatile(action, i) }}
+                                </q-item-section>
+                              </q-item>
+                            </hk-roll>
 													</q-list>
 												</div>
 											</q-popup-proxy>
 										</span>
-										<hk-roll 
+										<hk-roll
 											v-else
-											:tooltip="`Roll ${action.name}`" 
+											:tooltip="`Roll ${action.name}`"
 											@roll="roll($event, action_index, action, type)"
 											:disabled="!checkAvailable(type, action_index, action)"
 										>
@@ -172,11 +160,11 @@
 									<!-- Spend limited actions that can't be rolled -->
 									<q-item-section v-else-if="action.limit || action.recharge || action.legendary_cost" avatar>
 										<template v-if="action.legendary_cost || action.recharge">
-											<div 
+											<div
 												v-if="checkAvailable(type, action_index, action)"
 												class="blue"
 												@click.stop="spendLimited(
-													type, 
+													type,
 													action.legendary_cost ? 'legendaries_used' : action_index,
 													false,
 													action.legendary_cost ? action.legendary_cost : 1
@@ -187,9 +175,9 @@
 											<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
 										</template>
 										<div v-else class="slots">
-											<span 
-												v-for="i in parseInt(action.limit)" 
-												:key="`legendary-${i}`" 
+											<span
+												v-for="i in parseInt(action.limit)"
+												:key="`legendary-${i}`"
 												class="mr-1"
 												@click.stop="
 													current.limited_uses[type] && current.limited_uses[type][action_index] >= i
@@ -203,7 +191,7 @@
 													"
 												/>
 												<q-tooltip anchor="top middle" self="center middle">
-													{{ 
+													{{
 														current.limited_uses[type] && current.limited_uses[type][action_index] >= i
 														? "Regain" : "Spend"
 													}}
@@ -215,8 +203,8 @@
 
 								<div class="accordion-body description" v-if="action.desc">
 									<hk-dice-text :input_text="action.desc"/>
-									<div 
-										class="blue pointer mt-2" 
+									<div
+										class="blue pointer mt-2"
 										v-if="!checkAvailable(type, action_index, action) && action.recharge"
 										@click="spendLimited(type, action_index, true)"
 									>
@@ -228,7 +216,7 @@
 						<p v-else>Nothing found.</p>
 					</q-tab-panel>
 				</q-tab-panels>
-				
+
 			</template>
 		</template>
 		<p v-else>
@@ -277,7 +265,7 @@
 				],
 				action_types: [
 					{ label: "Special", name: "special", type: "special_abilities" },
-					{ label: "Actions", name: "actions", type: "actions" }, 
+					{ label: "Actions", name: "actions", type: "actions" },
 					{ label: "Legendary", name: "legendary", type: "legendary_actions" },
 					{ label: "Reactions", name: "reactions", type: "reactions" }
 				],
@@ -300,7 +288,7 @@
 								tab = "reactions";
 							}
 						}
-					} 
+					}
 					return this.tabSetter ? this.tabSetter : tab;
 				},
 				set(newVal) {
@@ -336,8 +324,8 @@
 
 				// Otherwise, check if the ability is available and can be used
 				if(action.legendary_cost) {
-					return !this.current.limited_uses[category] || 
-						!this.current.limited_uses[category].legendaries_used || 
+					return !this.current.limited_uses[category] ||
+						!this.current.limited_uses[category].legendaries_used ||
 						(action.legendary_cost <= (this.current.legendary_count - this.current.limited_uses['legendary_actions'].legendaries_used));
 				}
 				if(action.limit) {
@@ -346,7 +334,11 @@
 				if(action.recharge) {
 					return !this.current.limited_uses[category] || !this.current.limited_uses[category][index];
 				}
-			}
+			},
+      getVersatile(ability, i) {
+        return ability[`versatile_${i ? 'two' : 'one'}`] || `Option ${i + 1}`;
+      },
+
 		}
 	}
 </script>

@@ -32,6 +32,7 @@ export default function () {
   return new Vuex.Store({
     modules: {
       general: general,
+			tips: tips,
 			user: user,
 			encounter: run_encounter,
 			api_spells: api_spells,

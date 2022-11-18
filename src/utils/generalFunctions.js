@@ -36,3 +36,37 @@ export function calc_skill_mod(ability_mod, proficiency, bonus=0, proficient=fal
   }
   return parseInt(mod) + parseInt(bonus);
 }
+
+/**
+ * Downloads a JSON file
+ * 
+ * @param {data} data
+ */
+export function downloadJSON(data) {
+  let filename;
+  if (data instanceof Array) {
+    filename = "harmlesskey_npcs.json";
+  }
+  else {
+    filename = data.name.trim() + ".json";
+  }
+
+  var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null ,2)); 
+  var downloadAnchorNode = document.createElement('a'); 
+  downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", filename);
+  document.body.appendChild(downloadAnchorNode);  // required for firefox 
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+}
+
+/**
+ * Generates a UUID
+ * 
+ * @param {data} data
+ */
+export function uuid(mask = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx') {
+  return `${mask}`.replace(/[xy]/g, function(c) {
+      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+      return v.toString(16);
+  });
+}

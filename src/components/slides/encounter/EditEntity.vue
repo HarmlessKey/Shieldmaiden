@@ -271,7 +271,7 @@
 
 			<p class="mt-4">
 				These values will be set for all targeted entities. 
-				If one of the entities allready has this value set,
+				If one of the entities all ready has this value set,
 				it will be <span class="red">overwritten</span> with the new value.
 			</p>
 		</template>
@@ -295,7 +295,7 @@
 		data() {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				maxHpMod: undefined,

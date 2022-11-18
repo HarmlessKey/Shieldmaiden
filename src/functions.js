@@ -17,9 +17,9 @@ String.prototype.formatUnicorn = function() {
 	return e
 }
 
-// Returns a positive number, or 0
-Number.prototype.positive = function() {
-	return (this >= 0) ? this : 0;
+// Returns a number equal to or higher than a given minimum
+Number.prototype.min = function(min=0) {
+	return (this >= min) ? this : min;
 }
 
 Array.min = function( array ){

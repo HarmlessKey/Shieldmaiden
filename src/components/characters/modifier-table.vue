@@ -1,14 +1,14 @@
 <template>
 	<div>
 		<h4 class="title">
-			<span>
+			<div>
 				{{ title ? title : "Modifiers" }} 
 				{{ modifiers.length > 0 ? `( ${modifiers.length} )` : `` }}
 
 				<hk-popover v-if="info" :header="title ? title : 'Modifiers'" :content="info">
-					<q-icon name="info blue" />
+					<q-icon name="info" />
 				</hk-popover>
-			</span>
+			</div>
 			<a class="btn btn-sm btn-clear" @click="newModifier(origin), modal = true">
 				<i class="fas fa-plus green" aria-hidden="true" />
 				Add modifier
@@ -137,6 +137,7 @@
 	h4 {
 		font-size: 16px;
 		margin: 15px 0 !important;
+		padding-bottom: 1px;
 		border-bottom: solid 1px #5c5757;
 		display: flex;
 		justify-content: space-between;

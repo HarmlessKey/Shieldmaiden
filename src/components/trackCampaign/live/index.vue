@@ -1,5 +1,9 @@
 <template>
-	<div class="track-wrapper" >
+	<div 
+		class="track-wrapper" 
+		:class="{ 'rolling-initiative': encounter.round === 0 }"
+		:style="{ backgroundImage: getBackground(encounter) ? 'url(\'' + getBackground(encounter) + '\')' : '' }"
+	>
 		
 		<!-- ROLL FOR INITIATIVE -->
 		<RollForInitiative v-if="encounter.round === 0" />
@@ -152,7 +156,7 @@
 			v-if="encounter.background || (encounter.weather && Object.keys(encounter.weather).length && weather)"
 			class="weather" 
 		>
-			<Weather :weather="encounter.weather" :background="encounter.background" :show-weather="weather" />
+			<Weather :weather="encounter.weather" :background="getBackground(encounter)" :show-weather="weather" />
 		</div>
 	</div>
 </template>
@@ -313,6 +317,11 @@
 		methods: {
 			setWeather(value) {
 				this.weather = value;
+			},
+			getBackground(encounter) {
+				if(encounter && encounter.background) return encounter.background;
+				if(encounter && encounter.hk_background) return require(`src/assets/_img/atmosphere/${encounter.hk_background}.jpg`);
+				return undefined;
 			}
 		}
 	}
@@ -328,7 +337,13 @@
 	width: 100%;
 	pointer-events: none;
 	background-size: cover;
-	background-position: center top;
+	background-position: bottom center;
+}
+.rolling-initiative {
+	.weather {
+		top: 0;
+		height: 100%;
+	}
 }
 .track {
 	margin: auto;

@@ -14,7 +14,7 @@
 			/>
 
 			<div class="text-center">
-				<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
+				<router-link to="/encounter-builder" class="btn btn-lg">Try our encounter builder</router-link>
 			</div>
 		</div>
 	</div>

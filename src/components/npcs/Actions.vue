@@ -12,9 +12,9 @@
 					<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 						<div class="bg-neutral-9">
 							<q-list>
-								<q-item 
+								<q-item
 									v-for="{category, name_single} in actions" :key="`add-${category}`"
-									clickable 
+									clickable
 									v-close-popup
 									@click="add(category)"
 								>
@@ -60,7 +60,7 @@
 									:dark="$store.getters.theme === 'dark'" switch-toggle-side
 									:group="name"
 									:name="name"
-									enter-active-class="animated animate__fadeIn" 
+									enter-active-class="animated animate__fadeIn"
 									leave-active-class="animated animate__fadeOut"
 								>
 									<template v-slot:header>
@@ -79,28 +79,23 @@
 																<b>{{ ability.name }}</b>
 															</q-item-section>
 														</q-item>
-														<q-item clickable v-close-popup>
-															<q-item-section avatar>1</q-item-section>
-															<q-item-section>
-																<hk-roll @roll="rollAbility($event, ability, 0)">
-																	{{ ability.versatile_one || 'Option 1' }}
-																</hk-roll>
-															</q-item-section>
-														</q-item>
-														<q-item clickable v-close-popup>
-															<q-item-section avatar>2</q-item-section>
-															<q-item-section>
-																<hk-roll @roll="rollAbility($event, ability, 1)">
-																	{{ ability.versatile_two || 'Option 2' }}
-																</hk-roll>
-															</q-item-section>
-														</q-item>
+                            <hk-roll
+                              v-for="i in [0,1]" :key="`${i}-versatile-roll`"
+                              @roll="rollAbility($event, ability, i)"
+                            >
+                              <q-item clickable v-close-popup>
+                                <q-item-section avatar>{{ i + 1 }}</q-item-section>
+                                <q-item-section>
+																	{{ getVersatile(ability, i) }}
+                                </q-item-section>
+                              </q-item>
+                            </hk-roll>
 													</q-list>
 												</q-popup-proxy>
 											</span>
-											<hk-roll 
+											<hk-roll
 												v-else
-												:tooltip="`Roll ${ability.name}`" 
+												:tooltip="`Roll ${ability.name}`"
 												@roll="rollAbility($event, ability)"
 											>
 												<span class="roll-button" />
@@ -124,13 +119,13 @@
 
 									<div class="accordion-body">
 										<ValidationProvider v-if="category === 'legendary_actions'" rules="between:1,9|required" name="Legendary actions" v-slot="{ errors, invalid, validated }">
-											<q-input 
+											<q-input
 												:dark="$store.getters.theme === 'dark'" filled square
 												label="Legendary actions"
-												autocomplete="off" 
-												type="number" 
-												class="mb-3" 
-												v-model.number="ability.legendary_cost" 
+												autocomplete="off"
+												type="number"
+												class="mb-3"
+												v-model.number="ability.legendary_cost"
 												hint="How many legendary actions does this cost?"
 												@input="parseToInt($event, ability, 'legendary_cost')"
 												@keyup="$forceUpdate()"
@@ -140,11 +135,11 @@
 										</ValidationProvider>
 
 										<ValidationProvider rules="max:50|required" name="Name" v-slot="{ errors, invalid, validated }">
-											<q-input 
+											<q-input
 												:dark="$store.getters.theme === 'dark'" filled square
 												label="Name"
-												autocomplete="off" 
-												class="mb-3" 
+												autocomplete="off"
+												class="mb-3"
 												maxlength="51"
 												v-model="ability.name"
 												@keyup="$forceUpdate()"
@@ -159,8 +154,8 @@
 													<q-input
 														:dark="$store.getters.theme === 'dark'" filled square
 														label="Recharge"
-														autocomplete="off" 
-														v-model="ability.recharge" 
+														autocomplete="off"
+														v-model="ability.recharge"
 														@keyup="$forceUpdate()"
 														:error="invalid && validated"
 														:error-message="errors[0]"
@@ -170,11 +165,11 @@
 											<div class="col">
 												<div class="d-flex justify-content-start limit">
 													<ValidationProvider rules="between:1,9" name="Limited" v-slot="{ errors, invalid, validated }">
-														<q-input 
+														<q-input
 															:dark="$store.getters.theme === 'dark'" filled square
 															label="Limited uses"
-															autocomplete="off" 
-															type="number" 
+															autocomplete="off"
+															type="number"
 															v-model.number="ability.limit"
 															@input="parseToInt($event, ability, 'limit')"
 															@keyup="$forceUpdate()"
@@ -200,8 +195,8 @@
 												:dark="$store.getters.theme === 'dark'" filled square
 												counter
 												label="Description"
-												autocomplete="off" 
-												v-model="ability.desc" 
+												autocomplete="off"
+												v-model="ability.desc"
 												name="desc"
 												maxlength="2000"
 												autogrow
@@ -244,7 +239,7 @@
 													</ValidationProvider>
 												</div>
 												<div class="col">
-													<q-select 
+													<q-select
 														:dark="$store.getters.theme === 'dark'" filled square clearable
 														emit-value
 														map-options
@@ -256,7 +251,7 @@
 												</div>
 												<div class="col">
 													<ValidationProvider rules="between:0,999" name="AOE size" v-slot="{ errors, invalid, validated }">
-														<q-input 
+														<q-input
 															:dark="$store.getters.theme === 'dark'" filled square
 															label="AOE size"
 															type="number"
@@ -275,11 +270,11 @@
 											<!-- VERSATILE -->
 											<div class="row q-col-gutter-md">
 													<div class="col-4 col-sm-3">
-														<q-checkbox 
+														<q-checkbox
 															:dark="$store.getters.theme === 'dark'"
-															v-model="ability.versatile" 
-															label="Versatile" 
-															:false-value="null" 
+															v-model="ability.versatile"
+															label="Versatile"
+															:false-value="null"
 															indeterminate-value="Questionable"
 															@input="$forceUpdate()"
 														/>
@@ -322,7 +317,7 @@
 												<div class="row q-col-gutter-md">
 													<!-- ACTION TYPE -->
 													<div class="col">
-														<q-select 
+														<q-select
 															:dark="$store.getters.theme === 'dark'" filled square
 															map-options
 															emit-value
@@ -338,7 +333,7 @@
 													<template v-if="action.type === 'save'">
 														<div class="col">
 															<ValidationProvider rules="required" name="Save DC" v-slot="{ errors, invalid, validated }">
-																<q-select 
+																<q-select
 																	:dark="$store.getters.theme === 'dark'" filled square
 																	map-options
 																	emit-value
@@ -390,8 +385,8 @@
 													<div class="hk-card mt-3 rolls">
 														<div class="card-header d-flex justify-content-between">
 															<span><i aria-hidden="true" class="fas fa-dice-d20"/> Rolls</span>
-															<a 
-																class="btn btn-sm bg-neutral-5" 
+															<a
+																class="btn btn-sm bg-neutral-5"
 																@click="newRoll(ability_index, ability, category, action_index, action)"
 															>
 																<i aria-hidden="true" class="fas fa-plus green"></i>
@@ -400,7 +395,7 @@
 														</div>
 
 														<!-- ROLLS TABLE -->
-														<hk-table 
+														<hk-table
 															v-if="action.rolls"
 															:items="action.rolls"
 															:columns="rollColumns"
@@ -419,11 +414,11 @@
 																	</q-tooltip>
 																</span>
 																<span v-if="ability.versatile && versatileRoll(data.row)">
-																	| {{ 
+																	| {{
 																		calcAverage(
-																			data.row.versatile_dice_type || data.row.dice_type, 
-																			data.row.versatile_dice_count || data.row.dice_count, 
-																			data.row.versatile_fixed_val || data.row.fixed_val) 
+																			data.row.versatile_dice_type || data.row.dice_type,
+																			data.row.versatile_dice_count || data.row.dice_count,
+																			data.row.versatile_fixed_val || data.row.fixed_val)
 																		}}
 																	({{ versatileRoll(data.row) }})
 																	<q-tooltip anchor="top middle" self="bottom middle">
@@ -438,18 +433,18 @@
 																</span>
 																<template v-else-if="data.row.damage_type">
 																	<span :class="data.row.damage_type">
-																		<i aria-hidden="true" :class="damage_type_icons[data.row.damage_type]" /> 
-																		{{ data.row.damage_type.capitalize() }} 
+																		<i aria-hidden="true" :class="damage_type_icons[data.row.damage_type]" />
+																		{{ data.row.damage_type.capitalize() }}
 																		<q-tooltip v-if="ability.versatile" anchor="top middle" self="bottom middle">
 																			{{ ability.versatile_two || "Enter versatile option" }}
 																		</q-tooltip>
 																	</span>
-																	<template 
-																		v-if="ability.versatile && (data.row.versatile_damage_type && data.row.versatile_damage_type !== data.row.damage_type)" 
+																	<template
+																		v-if="ability.versatile && (data.row.versatile_damage_type && data.row.versatile_damage_type !== data.row.damage_type)"
 																	>
 																		| <span :class="data.row.versatile_damage_type">
 																			<i aria-hidden="true" :class="damage_type_icons[data.row.versatile_damage_type]" />
-																			{{ data.row.versatile_damage_type.capitalize() }} 
+																			{{ data.row.versatile_damage_type.capitalize() }}
 																			<q-tooltip anchor="top middle" self="bottom middle">
 																				{{ ability.versatile_two || "Enter versatile option" }}
 																			</q-tooltip>
@@ -460,9 +455,9 @@
 															</span>
 
 															<template slot="fail" slot-scope="data" v-if="!['healing', 'damage'].includes(action.type)">
-																{{ 
-																	action.type === "save" 
-																	? `Save: ${application[data.row.save_fail_mod]}` 
+																{{
+																	action.type === "save"
+																	? `Save: ${application[data.row.save_fail_mod]}`
 																	: `Miss: ${application[data.row.miss_mod]}`
 																}}
 															</template>
@@ -471,10 +466,10 @@
 															<div slot="actions" slot-scope="data" class="actions">
 																<a class="ml-2 btn btn-sm bg-neutral-5"
 																		@click="editRoll(
-																			ability_index, 
+																			ability_index,
 																			ability,
-																			category, 
-																			action_index, 
+																			category,
+																			action_index,
 																			action,
 																			data.index,
 																			data.row
@@ -515,7 +510,7 @@
 								<p>
 									{{ npc[edit_action.category][edit_action.ability_index].desc }}
 								</p>
-								<ActionRoll 
+								<ActionRoll
 									v-if="roll && edit_action.type"
 									v-model="roll"
 									:action_type="edit_action.type"
@@ -544,12 +539,12 @@
 	import ActionRoll from 'src/components/ActionRoll';
 	import { mapActions } from 'vuex';
 	import { dice } from 'src/mixins/dice.js';
-	
+
 	export default {
 		name: 'npc-Actions',
 		props: ['value'],
 		mixins: [
-			general, 
+			general,
 			monsterMixin,
 			dice
 		],
@@ -601,38 +596,38 @@
 					{ label: "Square Feet", value: "square feet" },
 				],
 				attack_type: {
-					"melee_weapon": { 
-						label: "Melee weapon", 
+					"melee_weapon": {
+						label: "Melee weapon",
 						value: "melee_weapon",
 						hint: "A melee weapon attack"
 					},
-					"ranged_weapon": { 
-						label: "Ranged weapon", 
+					"ranged_weapon": {
+						label: "Ranged weapon",
 						value: "ranged_weapon",
 						hint: "A ranged weapon attack"
 					},
-					"spell_attack": { 
-						label: "Spell attack", 
+					"spell_attack": {
+						label: "Spell attack",
 						value: "spell_attack",
 						hint: "A spell attack that has to hit"
 					},
-					"save": { 
-						label: "Save", 
+					"save": {
+						label: "Save",
 						value: "save",
 						hint: "An attack that requires a saving throw"
 					},
-					"damage": { 
-						label: "Damage", 
+					"damage": {
+						label: "Damage",
 						value: "damage",
 						hint: "Damage without a to hit or saving throw"
 					},
-					"healing": { 
-						label: "Healing", 
+					"healing": {
+						label: "Healing",
 						value: "healing",
 						hint: "Restores hit points to a target"
 					},
-					"other": { 
-						label: "Other", 
+					"other": {
+						label: "Other",
 						value: "other",
 						hint: "An action without damage or healing"
 					},
@@ -647,7 +642,7 @@
 			npc: {
 				get() {
 					return this.value;
-				},	
+				},
 				set(newValue) {
 					this.$emit('input', newValue);
 				}
@@ -666,7 +661,7 @@
 			},
 			/**
 			 * Add a new action
-			 * 
+			 *
 			 * @param {string} category actions / lengedary_actions / special_abilities
 			 */
 			add(category) {
@@ -695,7 +690,7 @@
 
 			/**
 			 * Remove an action
-			 * 
+			 *
 			 * @param {integer} index index of the action
 			 * @param {string} category actions / lengedary_actions / special_abilities
 			 */
@@ -706,7 +701,7 @@
 
 			/**
 			 * Add a new roll object to an action or legendary action
-			 * 
+			 *
 			 * @param {Integer} ability_index index of the ability
 			 * @param {string} category actions / legendary_actions
 			 * @param {Integer} action_index index of the action
@@ -732,7 +727,7 @@
 
 			/**
 			 * Edit a roll object of an action or legendary action
-			 * 
+			 *
 			 * @param {integer} ability_index index of the ability
 			 * @param {string} category actions / legendary_actions
 			 * @param {integer} action_index index of the action
@@ -778,9 +773,9 @@
 					return undefined;
 				} else {
 					let returnRoll = {};
-	
-					returnRoll.dice_count = (roll.versatile_dice_count) ? roll.versatile_dice_count : roll.dice_count; 
-					returnRoll.dice_type = (roll.versatile_dice_type) ? roll.versatile_dice_type : roll.dice_type; 
+
+					returnRoll.dice_count = (roll.versatile_dice_count) ? roll.versatile_dice_count : roll.dice_count;
+					returnRoll.dice_type = (roll.versatile_dice_type) ? roll.versatile_dice_type : roll.dice_type;
 					returnRoll.fixed_val = (roll.versatile_fixed_val) ? roll.versatile_fixed_val : roll.fixed_val;
 
 					let fixed;
@@ -792,7 +787,7 @@
 				}
 			},
 			calcAverage(dice_type=0, dice_count=0, modifier=0) {
-				return (dice_type) 
+				return (dice_type)
 					? Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier)
 					: parseInt(modifier);
 			},
@@ -803,6 +798,9 @@
 				}
 				this.setActionRoll(this.rollAction(e, action, config));
 			},
+      getVersatile(ability, i) {
+        return ability[`versatile_${i ? 'two' : 'one'}`] || `Option ${i + 1}`;
+      },
 		}
 	}
 </script>
@@ -833,7 +831,7 @@
 			}
 			.roll {
 				cursor: default;
-				
+
 				span:hover {
 					color: $neutral-2;
 				}

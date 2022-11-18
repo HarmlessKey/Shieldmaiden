@@ -144,7 +144,7 @@
 				for(let key in users) {
 					users[key]['.key'] = key;
 					users[key].status = users[key].status ? users[key].status : 'offline';
-					let email = (users[key].patreon_email) ? users[key].patreon_email : users[key].email;
+					let email = (users[key].patreon_email) ? users[key].patreon_email.toLowerCase() : users[key].email.toLowerCase();
 
 					//Get Patreon
 					let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);

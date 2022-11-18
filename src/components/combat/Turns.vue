@@ -2,7 +2,7 @@
 	<div id="turns" class="d-flex justify-content-between">
 		<div>
 			<a class="btn btn-clear">
-				<i aria-hidden="true" class="fas fa-cog"></i>
+				<i aria-hidden="true" class="fas fa-cog" />
 				<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
 					<q-list class="bg-neutral-8">
 						<q-item>
@@ -23,7 +23,7 @@
 							})"
 						>
 							<q-item-section avatar>
-								<i aria-hidden="true" class="far fa-dot-circle" :class="{ red: broadcast.live === $route.params.campid }"></i>
+								<i aria-hidden="true" class="far fa-dot-circle" :class="{ red: broadcast.live === $route.params.campid }" />
 							</q-item-section>
 							<q-item-section>
 								{{ broadcast.live !== $route.params.campid ? "Go live" : "Stop broadcast" }}
@@ -34,24 +34,28 @@
 							<q-item-section>Audio Link</q-item-section>
 						</q-item>
 						<q-item v-if="!demo" clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
-							<q-item-section avatar><i aria-hidden="true" class="fas fa-cogs"></i></q-item-section>
+							<q-item-section avatar><i aria-hidden="true" class="fas fa-cogs" /></q-item-section>
 							<q-item-section>Settings</q-item-section>
 						</q-item>
 						<q-item v-if="!demo" clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
-							<q-item-section avatar><i aria-hidden="true" class="fas fa-desktop"></i></q-item-section>
+							<q-item-section avatar><i aria-hidden="true" class="fas fa-desktop" /></q-item-section>
 							<q-item-section>Public initiative settings</q-item-section>
 						</q-item>
+						<q-item clickable v-close-popup v-if="demo"  @click="$router.replace('/tools/encounter-builder/build-encounter')">
+							<q-item-section avatar><i aria-hidden="true" class="fas fa-hammer-war" /></q-item-section>
+							<q-item-section>Build encounter</q-item-section>
+						</q-item>
 						<q-item clickable v-close-popup v-if="demo" @click="reset_demo()">
-							<q-item-section avatar><i aria-hidden="true" class="far fa-sync-alt"></i></q-item-section>
+							<q-item-section avatar><i aria-hidden="true" class="far fa-sync-alt" /></q-item-section>
 							<q-item-section>Reset encounter</q-item-section>
 						</q-item>
 						<q-item clickable v-close-popup @click="confirmFinish()">
-							<q-item-section avatar><i aria-hidden="true" class="fas fa-check"></i></q-item-section>
+							<q-item-section avatar><i aria-hidden="true" class="fas fa-check" /></q-item-section>
 							<q-item-section>Finish encounter</q-item-section>
 						</q-item>
 						<q-separator />
-						<q-item clickable v-close-popup :to="demo ? `/` : `/content/campaigns/${$route.params.campid}`">
-							<q-item-section avatar><i aria-hidden="true" class="fas fa-chevron-left"></i></q-item-section>
+						<q-item clickable v-close-popup @click="$router.replace(demo ? `/` : `/content/campaigns/${$route.params.campid}`)">
+							<q-item-section avatar><i aria-hidden="true" class="fas fa-chevron-left" /></q-item-section>
 							<q-item-section>Leave encounter</q-item-section>
 						</q-item>
 					</q-list>
@@ -68,7 +72,7 @@
 				@click="prevTurn()"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()"
 			>
-				<i aria-hidden="true" class="fas fa-step-backward"></i>
+				<i aria-hidden="true" class="fas fa-step-backward" />
 				<q-tooltip anchor="top middle" self="center middle">
 					Previous turn
 				</q-tooltip>
@@ -90,7 +94,7 @@
 			<a class="handler neutral-2"
 				@click="nextTurn()"
 				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
-				<i aria-hidden="true" class="fas fa-step-forward"></i>
+				<i aria-hidden="true" class="fas fa-step-forward" />
 				<q-tooltip anchor="top middle" self="center middle">
 					Next turn
 				</q-tooltip>
@@ -130,7 +134,7 @@
 					class="requests d-none d-md-block"
 					@click="setSlide({show: true, type: 'combat/side/Requests'})"
 				>
-					<i aria-hidden="true" class="fas fa-bell"></i>
+					<i aria-hidden="true" class="fas fa-bell" />
 					<div class="notifications bg-red white animated zoomIn">
 						<div>{{ Object.keys(requests).length }}</div>
 					</div>
@@ -149,14 +153,14 @@
 			<template v-else>
 				<span class="d-none d-md-block">
 					<router-link v-if="!demo" :to="'/content/campaigns/' + $route.params.campid" class="btn bg-neutral-8 ml-2">
-						<i aria-hidden="true" class="fas fa-arrow-left"></i>
+						<i aria-hidden="true" class="fas fa-arrow-left" />
 						Leave
 					</router-link>
 				</span>
 				<a class="btn ml-2" @click="startEncounter()">
 					Start
 					<span class="ml-1 d-none d-md-inline">
-						encounter <i aria-hidden="true" class="fas fa-arrow-right"></i>
+						encounter <i aria-hidden="true" class="fas fa-arrow-right" />
 					</span>
 				</a>
 			</template>

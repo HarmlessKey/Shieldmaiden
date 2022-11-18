@@ -57,6 +57,7 @@
 
 <script>
 	import Carousel from "./Carousel";
+	import { live_initiative_texts } from "src/utils/generalConstants";
 
 	export default {
 		name: 'Share',
@@ -67,64 +68,7 @@
 			return {
 				dialog: false,
 				slide: "hp",
-				items: [
-					{
-						name: "initiative",
-						icon: "fas fa-list",
-						title: "Initiative",
-						text: "Show the initiative list on a separate screen so your players always know what's going on."
-					},
-					{
-						name: "live",
-						icon: "fas fa-sync",
-						title: "Live updates",
-						text: "Every action you perform instantly updates the shared initiative list."
-					},
-					{
-						name: "status",
-						icon: "fas fa-heartbeat",
-						title: "Status",
-						text: "The current status of entities is displayed. "+
-							"Think of hit points, armor class, conditions, etc."
-					},
-					{
-						name: "rolls",
-						icon: "fas fa-dice-d20",
-						title: "Rolls",
-						text: "You can choose to share your rolls and instantly display them on the shared "+
-							"initiative list.<br/>"+
-							"Scare your players when you roll that natural 20!"
-					},
-					{
-						name: "meters",
-						icon: "fas fa-swords",
-						title: "Damage/healing meters",
-						text: "Give your players a little insight into their character's worth by showing them "+
-							"how much damage and healing they have done."
-					},
-					{
-						name: "atmosphere",
-						icon: "fas fa-image",
-						title: "Atmosphere",
-						text: "Add awesome background images that create the perfect atmosphere for your "+
-							"encounters, allowing your players to fully immerse themselves in your combat."
-					},
-					{
-						name: "weather",
-						icon: "fas fa-cloud-showers",
-						title: "Weather effects",
-						text: "Add a layer with weather effects to your background. "+
-							"Isn't that battle in a winter landscape even better with intense snowfall? "+
-							"Or what about ash raining down during combat in a burning village?"
-					},
-					{
-						name: "customization",
-						icon: "fas fa-cogs",
-						title: "Customization",
-						text: "Through loads of settings you can create the shared initiative screen "+
-							"that is perfect for your games. You decide what you want to show to or hide from your players."
-					},
-				]
+				items: live_initiative_texts
 			}
 		},
 		methods: {

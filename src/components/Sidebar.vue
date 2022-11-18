@@ -119,6 +119,15 @@
 				</template>
 
 				<q-list @click="setSideSmallScreen(false)">
+					<q-item clickable v-ripple to="/tools">
+						<q-item-section avatar>
+							<i aria-hidden="true" class="fas fa-tools" />
+						</q-item-section>
+						<q-item-section class="title">Tools</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Tools
+						</q-tooltip>
+					</q-item>
 					<q-item clickable v-ripple to="/compendium">
 						<q-item-section avatar>
 							<i aria-hidden="true" class="fas fa-book-spells" />

@@ -118,6 +118,7 @@
 	import { monsterMixin } from "src/mixins/monster";
 	import ImportNPC from "src/components/ImportNPC.vue";
 	import ContentHeader from "src/components/userContent/ContentHeader";
+	import { downloadJSON } from "src/utils/generalFunctions";
 
 	export default {
 		name: "Npcs",
@@ -244,29 +245,13 @@
 				}
 
 				const json_export = Object.values(all_npcs);
-				this.downloadJSON(json_export);
+				downloadJSON(json_export);
 			},
 			async exportNPC(id) {
 				const npc = await this.get_npc({ uid: this.userId, id });
 				npc.harmless_key = id;
-				this.downloadJSON(npc);
-			},
-			async downloadJSON(data) {
-				let filename;
-				if (data instanceof Array) {
-					filename = "harmlesskey_npcs.json";
-				}
-				else {
-					filename = data.name.trim() + ".json";
-				}
-
-				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null ,2)); 
-				var downloadAnchorNode = document.createElement('a'); 
-				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", filename);
-				document.body.appendChild(downloadAnchorNode);  // required for firefox 
-				downloadAnchorNode.click();
-				downloadAnchorNode.remove();
-			},
+				downloadJSON(npc);
+			}
 		}
 	}
 </script>

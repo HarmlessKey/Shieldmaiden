@@ -39,17 +39,20 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
-							<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary" no-caps />
+							<router-link :to="userId ? `/content/npcs` : `/tools/monster-creator`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+							<q-btn v-if="userId" label="Save" type="submit" color="primary" no-caps />
+							<q-btn v-else :disabled="!valid" color="primary" no-caps @click="download">
+								Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+							</q-btn>
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">
 							<template v-if="unsaved_changes">
-								<div  class="orange truncate mr-2 d-none d-md-block">
+								<div v-if="userId" class="orange truncate mr-2 d-none d-md-block">
 									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>	
-								<a class="btn btn-sm bg-neutral-5" @click="revert_changes()">
+								<a class="btn btn-sm bg-neutral-5" @click="userId ? revert_changes() : reset()">
 									<i aria-hidden="true" class="fas fa-undo" />
-									Revert
+									{{ userId ? "Revert" : "Reset" }}
 								</a>
 							</template>
 						</div>
@@ -87,6 +90,7 @@
 	import SpellCasting from 'src/components/npcs/SpellCasting';
 	import Actions from 'src/components/npcs/Actions';
 	import CopyContent from "src/components/CopyContent";
+	import { downloadJSON } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'EditNpc',
@@ -103,7 +107,7 @@
 		},
 		data() {
 			return {
-				userId: this.$route.params.userid || this.$store.getters.user.uid,
+				userId: this.$store.getters && this.$store.getters.user ? this.$route.params.userid || this.$store.getters.user.uid : undefined,
 				npcId: this.$route.params.id,
 				npc: {},
 				loading: false,
@@ -118,7 +122,7 @@
 			if(this.npcId) {
 				this.loading = true;
 				await this.get_npc({ uid: this.userId, id: this.npcId }).then(npc => {
-					npc.name = npc.name.capitalizeEach();
+					npc.name = npc.name ? npc.name.capitalizeEach() : undefined;
 					this.npc = npc;
 					this.npc_copy = JSON.stringify(npc);
 					this.unsaved_changes = false;
@@ -144,7 +148,7 @@
 					}
 					
 					// Capitalize name
-					this.npc.name = this.npc.name.capitalizeEach();
+					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
 				}
 			}
 		},
@@ -155,9 +159,15 @@
 			isOwner() {
 				return this.$route.name !== 'Edit Companion';
 			},
+			download() {
+				downloadJSON(this.npc);
+			},
 			copy({ result }) {
 				this.copy_dialog = false;
 				this.npc = {...result};
+			},
+			reset() {
+				this.npc = {};
 			},
 			revert_changes() {
 				this.npc = JSON.parse(this.npc_copy);
@@ -184,8 +194,8 @@
 						position: "rightTop"
 					});
 
-					// Capitalize before stringyfy so changes found isn't triggered
-					this.npc.name = this.npc.name.capitalizeEach();
+					// Capitalize before stringify so changes found isn't triggered
+					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
 					this.npc_copy = JSON.stringify(this.npc);
 					this.unsaved_changes = false;
 				}).catch(error => {
@@ -208,8 +218,8 @@
 
 					this.unsaved_changes = false;
 	
-					// Capitalize before stringyfy so changes found isn't triggered
-					this.npc.name = this.npc.name.capitalizeEach();
+					// Capitalize before stringify so changes found isn't triggered
+					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
 					this.npc_copy = JSON.stringify(this.npc);
 				});
 			},

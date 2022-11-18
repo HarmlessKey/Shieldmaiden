@@ -17,7 +17,7 @@
       </p>
 
       <section>
-        <h3>Actions</h3>
+        <h2>Actions</h2>
         <p>
           Advanced actions that can be rolled with one click can easily be created for a monster.<br/>
           Different types of damage can be added as separate rolls and this allows us to apply different damage types separately.
@@ -38,44 +38,35 @@
           alt="Spear attack action"
           fit="contain"
         >
-          <div class="absolute-full flex flex-center">
-            <button class="btn">
-              Roll example action
-              <q-popup-proxy :dark="$store.getters.theme === 'dark'">
-                <div class="bg-neutral-8">
-                  <q-item>
-                    <q-item-section>
-                      <strong>Burning Spear</strong>
-                    </q-item-section>
-                  </q-item>
-                  <q-list :dark="$store.getters.theme === 'dark'">
-                    <q-item clickable v-close-popup>
-                      <q-item-section avatar>1</q-item-section>
-                      <q-item-section>
-                        <hk-roll @roll="roll($event, action, 0)">
-                          1 handed
-                        </hk-roll>
-                      </q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup>
-                      <q-item-section avatar>2</q-item-section>
-                      <q-item-section>
-                        <hk-roll @roll="roll($event, action, 1)">
-                          2 handed
-                        </hk-roll>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </div>
-              </q-popup-proxy>
-            </button>
+      </q-img>
+      <button class="btn full-width">
+        <i aria-hidden="true" class="fas fa-dice-d20" />
+        Roll example action
+        <q-popup-proxy :dark="$store.getters.theme === 'dark'">
+          <div class="bg-neutral-8">
+            <q-item>
+              <q-item-section>
+                <strong>Burning Spear</strong>
+              </q-item-section>
+            </q-item>
+            <q-list :dark="$store.getters.theme === 'dark'">
+              <hk-roll v-for="i in [0,1]" @roll="roll($event, action, i)" :key="`${i}-versatile-roll`">
+                <q-item clickable v-close-popup>
+                  <q-item-section avatar>{{ i + 1 }}</q-item-section>
+                  <q-item-section>
+                    {{ action.action_list[0][`versatile_${i ? 'two' : 'one'}`]}}
+                  </q-item-section>
+                </q-item>
+              </hk-roll>
+            </q-list>
           </div>
-        </q-img>
+        </q-popup-proxy>
+      </button>
       </section>
 
       <section class="mt-5">
         <div>
-          <h3>Resistances and Vulnerabilities</h3>
+          <h2>Resistances and Vulnerabilities</h2>
           <p>
             You can define what types of damage the monster is <em>vulnerable</em>, <em>resistant</em> or <em>immune</em> to.<br/>
             When you apply damage to the monster in our combat tracker, the amount is automatically adjusted based on these resistances.

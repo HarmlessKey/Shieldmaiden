@@ -51,6 +51,11 @@
     text-transform: uppercase;
     background-size: auto;
   }
+  &::v-deep h2 {
+    font-size: 25px;
+    border-bottom: solid 1px $neutral-3;
+    font-family: 'Fredericka the Great', cursive;
+  }
 }
 
 

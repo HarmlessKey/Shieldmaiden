@@ -16,7 +16,7 @@
     </template>
 
     <section>
-      <h3>Encounter Builder</h3>
+      <h2>Encounter Builder</h2>
       <p>
         Easily add monsters and players to create an encounter that you can run in our Combat Tracker.
       </p>
@@ -34,7 +34,7 @@
 
     <section class="d-lg-flex justify-between mt-5">
       <div>
-        <h3>Difficulty</h3>
+        <h2>Difficulty</h2>
         <p>Encounter difficulty is calculated as you add or remove monsters to your encounter</p>
       </div>
       <video

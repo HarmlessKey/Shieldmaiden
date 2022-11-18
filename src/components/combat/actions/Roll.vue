@@ -130,22 +130,20 @@
 													</q-item>
 													<q-separator />
 													<q-list :dark="$store.getters.theme === 'dark'">
-                            <q-item
-                                v-for="i in [0, 1]" :key="`${i}-verstile-roll`"
-                               clickable v-close-popup
-                               >
-                              <q-item-section avatar>{{ i + 1 }}</q-item-section>
-                              <q-item-section>
-                                <hk-roll
-                                  :tooltip="`${action.name} (${getVersatile(action, i)})`"
-                                  tooltipPosition="right"
-                                  @roll="roll($event, acion_index, action, type, i)"
-                                  :disabled="!checkAvailable(type, action_index, action)"
-                                >
+                            <hk-roll
+                              v-for="i in [0, 1]" :key="`${i}-verstile-roll`"
+                              :tooltip="`${action.name} (${getVersatile(action, i)})`"
+                              tooltipPosition="right"
+                              @roll="roll($event, acion_index, action, type, i)"
+                              :disabled="!checkAvailable(type, action_index, action)"
+                            >
+                              <q-item clickable v-close-popup>
+                                <q-item-section avatar>{{ i + 1 }}</q-item-section>
+                                <q-item-section>
 																	{{ getVersatile(action, i) }}
-                                </hk-roll>
                                 </q-item-section>
                               </q-item>
+                            </hk-roll>
 													</q-list>
 												</div>
 											</q-popup-proxy>

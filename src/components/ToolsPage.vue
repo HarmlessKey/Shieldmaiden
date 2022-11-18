@@ -46,32 +46,14 @@
     text-transform: uppercase;
     background-size: auto;
   }
-
 }
 
-.hk-card::v-deep .media {
-  display: block;
-  margin: 30px auto;
-
-  .large {
-    width: 100%;
-    max-width: 600px;
-  }
-  .small {
-    width: 50%;
-    max-width: 300px;
-  }
-}
 
 
 @media only screen and (max-width: $md-breakpoint) {
   .hk-card .card-image {
     font-size: 30px;
     line-height: 30px;
-  }
-
-  .media-small {
-    width: 100%;
   }
 }
 

@@ -1,7 +1,8 @@
 <template>
   <ToolsPage
     title="Encounter Builder"
-    :bg_img="require(`src/assets/_img/atmosphere/tool-header/encounter-builder-tool-header.jpg`)">
+    :bg_img="require(`src/assets/_img/atmosphere/tool-header/encounter-builder-tool-header.jpg`)"
+  >
 
     <template v-slot:create_btn="{ btn_classes }">
       <q-btn
@@ -65,4 +66,29 @@ import ToolsPage from 'src/components/ToolsPage.vue';
 
 <style lang="scss" scoped>
 
+.media {
+  display: block;
+  margin: 30px auto;
+}
+.media.large {
+  width: 100%;
+  max-width: 600px;
+}
+.media.small {
+  width: 50%;
+  max-width: 300px;
+  margin-left: 20px;
+}
+
+
+@media only screen and (max-width: $md-breakpoint) {
+  .hk-card .card-image {
+    font-size: 30px;
+    line-height: 30px;
+  }
+
+  .media.small {
+    width: 100%;
+  }
+}
 </style>

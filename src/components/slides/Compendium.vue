@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h2>Compendium</h2>
-		<i>What are you looking for?</i>
+		<em>What are you looking for?</em>
 
 		<q-tabs
 				v-model="current"

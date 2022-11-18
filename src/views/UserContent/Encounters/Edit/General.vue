@@ -49,12 +49,22 @@
 				</ValidationProvider>
 
 				<hk-background-select 
+					v-if="demo || (tier && tier.name !== 'Free')"
 					v-model="editableEncounter.hk_background"
 					label="Background" 
 					:disable="!!editableEncounter.background"
 					@input="setBackground($event)"
 					class="mb-3" 
 				/>
+				<div v-else class="mb-3 flex justify-between items-center">
+					<span class="my-1">
+						With a subscription you have access to our background selector. 
+						<a class="btn btn-sm btn-clear" @click="setSlide({show: true, type: 'slides/BackgroundsOverview'})">
+							<i class="fas fa-eye" aria-hidden="true" />
+						</a>
+					</span>
+					<router-link class="btn bg-patreon-red" to="/patreon">Get a subscription</router-link>
+				</div>
 
 				<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
 					<div class="background mb-3">
@@ -79,7 +89,14 @@
 								:error="invalid && validated"
 								:error-message="errors[0]"
 								@input="editableEncounter.hk_background = null"
-							/>
+							>
+							<hk-popover slot="append" header="Custom background" v-if="demo || (tier && tier.name !== 'Free')">
+									<i class="fas fa-info-circle" aria-hidden="true" />
+									<template #content>
+										Setting a custom background will overwrite your selected background.
+									</template>
+								</hk-popover>
+							</q-input>
 						</div>
 					</div>
 				</ValidationProvider>
@@ -130,7 +147,7 @@
 </template>
 
 <script>
-	import { mapActions } from "vuex";
+	import { mapActions, mapGetters } from "vuex";
 
 	import EditWeather from './Weather';
 	import { audio } from 'src/mixins/audio';
@@ -164,6 +181,9 @@
 				editableEncounter: this.encounter
 			} 
 		},
+		computed: {
+			...mapGetters(["tier"]),
+		},
 		mounted() {
 			if(this.encounter && this.encounter.weather) {
 				this.weather = this.encounter.weather;
@@ -174,6 +194,7 @@
 		},
 		methods: {
 			...mapActions("encounters", ["edit_encounter"]),
+			...mapActions(['setSlide']),
 			edit() {
 				this.editableEncounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
 

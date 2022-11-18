@@ -13,10 +13,6 @@ export const backgrounds = Object.freeze([
     value: "campaign-background"
   },
   {
-    name: "Snowy Mountains",
-    value: "winter-landscape"
-  },
-  {
     name: "Desert",
     value: "desert"
   },

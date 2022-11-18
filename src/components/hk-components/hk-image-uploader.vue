@@ -114,7 +114,7 @@
 
 <script>
 	import { mapGetters } from "vuex";
-import hkPopover from './hk-popover.vue';
+	import hkPopover from './hk-popover.vue';
 
 	export default {
   components: { hkPopover },

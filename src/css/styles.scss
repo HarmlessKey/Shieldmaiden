@@ -38,7 +38,7 @@ html body {
 	&::-webkit-scrollbar {
 		display: none;
 	}
-	
+
 
 	.container-fluid {
 		padding: 0;
@@ -88,9 +88,9 @@ html body {
 
 /* 3. Heading */
 /*********************************************/
-	h1, h2, h3, h4, h5, h6 { 
-		font-weight:normal; 
-		margin: 0;  
+	h1, h2, h3, h4, h5, h6 {
+		font-weight:normal;
+		margin: 0;
 	}
 	h1 {
 		font-family: $text-written;
@@ -119,7 +119,7 @@ html body {
 	/* 4. Classes */
 	/*********************************************/
 	.white { color: $white !important; }
-	
+
 	.neutral-1, .text-neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
 	.neutral-2, .text-neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
 	.neutral-3, .text-neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
@@ -159,7 +159,7 @@ html body {
 	.bg-neutral-3 { background-color: $neutral-3 !important; }
 	.bg-neutral-4 { background-color: $neutral-4 !important; }
 	.bg-neutral-5 { background-color: $neutral-5 !important; }
-	.bg-neutral-6 { 
+	.bg-neutral-6 {
 		background-color: $neutral-6 !important;
 
 		&-transparent {
@@ -215,7 +215,7 @@ html body {
 	}
 
 	.written {
-		font-family: 'Fredericka the Great', cursive;	
+		font-family: 'Fredericka the Great', cursive;
 	}
 
 	.overflow {
@@ -518,13 +518,13 @@ html body {
 
 		.hk-ad {
 			background-color: $neutral-10;
-	
+
 			.card-body {
 				padding: 10px 15px;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-		
+
 				img {
 					margin: 0 15px 0 -5px;
 					width: 80px;
@@ -535,7 +535,7 @@ html body {
 					align-items: center;
 					flex-wrap: wrap;
 					width: 100%;
-		
+
 					.title {
 						font-weight: bold;
 						font-size: 20px;
@@ -585,7 +585,7 @@ html body {
 			}
 		}
 	}
-	
+
 	.disabled {
 		cursor: forbidden !important;
 		opacity: .5 !important;
@@ -706,7 +706,7 @@ html body {
 					border: solid 1px $neutral-8;
 					border-radius: $border-radius;
 					flex-direction: row-reverse;
-			
+
 					.unsaved_changes {
 						margin: 0 10px 0 0;
 						line-height: 31px;
@@ -755,9 +755,9 @@ html body {
 			margin: auto;
 		}
 		section {
-			font-size: 18px; 
+			font-size: 18px;
 			line-height: 30px;
-			
+
 			.head {
 				padding: 100px 0 75px 0;
 				text-align: center;
@@ -791,10 +791,10 @@ html body {
 				i {
 					font-size: 35px;
 				}
-		
+
 				&:hover {
 					text-decoration: none;
-		
+
 					i {
 						font-size: 45px;
 					}
@@ -861,7 +861,7 @@ html body {
 		line-height: normal;
 		text-transform: uppercase;
 
-		&::before { 
+		&::before {
 			content: "";
 			background-color: $neutral-1;
 			display: inline-block;
@@ -870,7 +870,7 @@ html body {
 			border-radius: 50%;
 			margin-right: 5px;
 		}
-		
+
 		&:hover {
 			background-color: $neutral-4;
 		}
@@ -969,10 +969,10 @@ html body {
     padding: 0.375rem 0.75rem;
     font-size: 1rem;
     line-height: 1.5;
-		transition: 
-			color 0.15s ease-in-out, 
+		transition:
+			color 0.15s ease-in-out,
 			background-color 0.15s ease-in-out;
-		
+
 		&:focus, &.active {
 			outline: none;
 			box-shadow: none;
@@ -1022,16 +1022,16 @@ html body {
 		}
 	}
 
-	a.logout { 
+	a.logout {
 		color: $neutral-2 !important;
 		font-size: 20px;
 		cursor: pointer;
-		
+
 		&:hover {
 			color: $blue !important;
 		}
 	}
- 	
+
 
 	/* 5. Components*/
 	/*********************************************/
@@ -1062,7 +1062,7 @@ html body {
 			position: relative;
 			box-shadow: 5px 5px 10px #000;
 			border-radius: $border-radius;
-		
+
 			h1, h2 {
 				text-transform: none !important;
 				text-align: center;
@@ -1094,7 +1094,7 @@ html body {
 		align-items: center;
 		cursor: pointer;
 		border: solid 1px $google-blue;
-	
+
 		&::before {
 			content: "";
 			background-image: url("../assets/_img/styles/google.png");
@@ -1148,7 +1148,7 @@ html body {
 		overflow: auto;
 		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, .125), 0 6px 2px 0 rgba(0, 0, 0, .1);
 		border: solid 1px $neutral-5;
-		
+
 		&::-webkit-scrollbar {
 			display: none !important;
 		}
@@ -1181,7 +1181,7 @@ html body {
 			flex: 1 1 auto;
 			min-height: 1px;
 			padding: 1.25rem;
-			
+
 			&:empty {
 				display: none;
 			}
@@ -1202,7 +1202,7 @@ html body {
 			background-size: cover;
 			box-shadow: inset 0 -5px 25px rgba(0, 0, 0, 1);
 			padding: 10px;
-			
+
 			h2, .image-title {
 				font-size: 20px;
 				text-align: center;
@@ -1252,7 +1252,7 @@ html body {
 		}
 		&.small {
 			font-size: 12px;
-			
+
 			.card-body {
 				padding: 1rem;
 			}
@@ -1372,7 +1372,7 @@ html body {
 				display: flex;
 				justify-content: flex-end;
 				padding: 9px 12px;
-				user-select: none;			
+				user-select: none;
 			}
 			.q-field {
 				width: 60px;
@@ -1409,7 +1409,7 @@ html body {
 		display: grid;
 		grid-template-columns: auto;
 		grid-template-rows: 40px auto;
-		grid-template-areas: 
+		grid-template-areas:
 		"hide"
 		"content";
 
@@ -1484,7 +1484,7 @@ html body {
 	}
 
 	table.table, table {
-		border-collapse: separate !important; 
+		border-collapse: separate !important;
 		border-spacing: 0 1px;
 		width: 100%;
 		margin-bottom: 20px;
@@ -1492,7 +1492,7 @@ html body {
 		p {
 			margin: 0;
 		}
-		
+
 		thead {
 			margin-bottom: 1px !important;
 
@@ -1518,11 +1518,11 @@ html body {
 					border-top: none;
 					background-color: $neutral-8;
 					position: relative;
-		
+
 					.actions {
 						padding: 5px 0.75rem;
 					}
-		
+
 					.actions-dropdown {
 						width: 30px;
 						text-align: center;
@@ -1562,14 +1562,14 @@ html body {
 						background-position: top center;
 						background-color: $black;
 						border: solid 1px $neutral-3 !important;
-				
+
 						img {
 							width: 40px;
 							height: 40px;
 						}
 					}
 				}
-				
+
 				&:focus {
 					td {
 						background-color: $neutral-9;
@@ -1579,11 +1579,11 @@ html body {
 					}
 				}
 				&.openSlot {
-					td {	
+					td {
 						background: none;
 						border: dashed 1px $neutral-4 !important;
-			
-						.slot {	
+
+						.slot {
 							display: flex;
 							justify-content: space-between;
 						}
@@ -1592,7 +1592,7 @@ html body {
 			}
 		}
 		&.table-sm {
-			font-size: 13px; 
+			font-size: 13px;
 			td, th {
 				padding: 5px;
 			}
@@ -1623,7 +1623,7 @@ html body {
 		user-select: none;
 		border-radius: $border-radius-small;
 		width: 100%;
-	
+
 		&.hasInitiative {
 			grid-template-columns: 35px 35px 35px 1fr;
 		}
@@ -1634,7 +1634,7 @@ html body {
 		.ac_wrapper {
 			position: relative;
 			cursor: pointer;
-	
+
 			i, .ac {
 				position: absolute;
 				line-height: 35px;
@@ -1663,19 +1663,19 @@ html body {
 			line-height: 35px;
 			overflow: hidden;
 			border: solid 1px transparent;
-			
+
 			[class^="hki-"], [class*=" hki-"] {
 				font-size: 28px;
 				margin-left: -1px;
 			}
-	
+
 			span {
 				position: relative;
 			}
 		}
-		
+
 		.q-linear-progress {
-			.health-bar { 
+			.health-bar {
 				padding-left: 5px;
 				font-size: 13px;
 				display: grid;
@@ -1684,12 +1684,12 @@ html body {
 				line-height: 35px;
 				margin-right: 5px;
 				color: $neutral-1;
-		
+
 				.conditions {
 					position: absolute;
 					right: 0;
 					top: 0;
-		
+
 					.condition {
 						display: block;
 						width: 12px;
@@ -1699,8 +1699,8 @@ html body {
 						cursor: pointer;
 					}
 				}
-		
-				.hp {					
+
+				.hp {
 					.health, .temp {
 						text-align: right;
 						cursor: pointer;
@@ -1774,7 +1774,7 @@ html body {
 	ul.entities {
 		list-style: none;
 		padding: 0;
-		
+
 		li {
 			display: grid;
 			background-color: $neutral-7;
@@ -1801,7 +1801,7 @@ html body {
 			}
 			&:hover {
 				background-color: $neutral-9;
-				
+
 				.hover-hide {
 					display: none;
 				}
@@ -1832,7 +1832,7 @@ html body {
 					display: grid;
 					grid-template-columns: auto 20px;
 					grid-gap: 5px;
-				}	
+				}
 			}
 		}
 	}
@@ -1841,7 +1841,7 @@ html body {
 	.manual-input {
 		height: 110px;
 		font-size:50px;
-		
+
 		.q-field {
 			height: 90px;
 
@@ -1869,10 +1869,10 @@ html body {
 	//VIEW MONSTER
 	.q-table {
 		border-spacing: 0 1px;
-		
+
 		.q-field {
 			width: 60px;
-	
+
 			.row {
 				padding: 0;
 			}
@@ -1920,12 +1920,12 @@ html body {
 		background-color: #f7e4ba !important;
 		background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
 	}
-	@media only screen and (max-width: 1530px) { 
+	@media only screen and (max-width: 1530px) {
 		.monster-table {
 			.hk-table {
 				.hk-collapsed-column {
 					.monster {
-						column-count: 1;			
+						column-count: 1;
 					}
 				}
 			}
@@ -1991,7 +1991,7 @@ html body {
 			.snotifyToast__title {
 				color: $neutral-2 !important;
 				width: 100%;
-				
+
 				.target {
 					display: grid;
 					grid-template-columns: 30px 30px 1fr;
@@ -2001,7 +2001,7 @@ html body {
 					text-transform: none !important;
 					background-color: $neutral-10;
 					position: relative;
-					
+
 					.ac {
 						text-align: center;
 						background-color: $neutral-10;
@@ -2025,8 +2025,8 @@ html body {
 			}
 			.snotifyToast__body {
 				color: $neutral-2 !important;
-				width: 100%; 
-				
+				width: 100%;
+
 				h2 {
 					text-transform: none !important;
 					margin-bottom: 5px !important;
@@ -2043,7 +2043,7 @@ html body {
 					justify-content: center;
 					width: 100%;
 					margin-bottom: 10px;
-					
+
 					div.roll {
 						border: solid 1px $neutral-3;
 						text-align: center;
@@ -2175,7 +2175,7 @@ html body {
 	.q-btn {
 		border-radius: $border-radius;
 	}
-	.q-menu {		
+	.q-menu {
 		.q-list {
 			.q-item {
 				&__section--avatar {
@@ -2184,7 +2184,7 @@ html body {
 			}
 			a.q-item {
 				color: $neutral-2 !important;
-		
+
 				&:hover {
 					color: $blue !important;
 				}
@@ -2227,7 +2227,7 @@ html body {
 		.q-table__bottom,
 		thead tr:first-child th {
 				background-color: $neutral-6;
-		} 
+		}
 
 		thead tr th {
 			position: sticky;
@@ -2259,7 +2259,7 @@ html body {
 		text-shadow: 0px 0px 3px #000;
 		color: $neutral-1;
 	}
-	
+
 
 	.q-notification {
 		border-radius: $border-radius;
@@ -2267,7 +2267,7 @@ html body {
 	.q-notifications__list--top {
 		top: 120px;
 	}
-	
+
 
 
 
@@ -2275,7 +2275,7 @@ html body {
 	/*-----------------------------------*/
 
 	//XS
-	@media only screen and (max-width: 576px) {
+	@media only screen and (max-width: $sm-breakpoint) {
 		.d-xs {
 			&-flex {
 				display: flex !important;
@@ -2291,7 +2291,7 @@ html body {
 			}
 			&-inline {
 				display: inline !important;
-	
+
 				&-block {
 					display: inline-block !important;
 				}
@@ -2324,7 +2324,7 @@ html body {
 							 &.flex {
 								 overflow: hidden;
 								 text-overflow: ellipsis;
-							 }							
+							 }
 						}
 					}
 				}
@@ -2336,7 +2336,7 @@ html body {
 		.hk-card {
 			&.banner {
 				flex-direction: column;
-	
+
 				.card-body {
 					width: unset;
 					max-width: unset;
@@ -2346,7 +2346,7 @@ html body {
 	}
 
 	//SM
-	@media only screen and (min-width: 576px) {
+	@media only screen and (min-width: $sm-breakpoint) {
 		.container {
 			max-width: 540px;
 		}
@@ -2365,7 +2365,7 @@ html body {
 			}
 			&-inline {
 				display: inline !important;
-	
+
 				&-block {
 					display: inline-block !important;
 				}
@@ -2374,7 +2374,7 @@ html body {
 	}
 
 	//MD
-	@media only screen and (min-width: 768px) {
+	@media only screen and (min-width: $md-breakpoint) {
 		.container {
 			max-width: 720px;
 		}
@@ -2393,7 +2393,7 @@ html body {
 			}
 			&-inline {
 				display: inline !important;
-	
+
 				&-block {
 					display: inline-block !important;
 				}
@@ -2402,7 +2402,7 @@ html body {
 	}
 
 	//LG
-	@media only screen and (min-width: 992px) {
+	@media only screen and (min-width: $lg-breakpoint) {
 		.container {
 			max-width: 960px;
 		}
@@ -2421,7 +2421,7 @@ html body {
 			}
 			&-inline {
 				display: inline !important;
-	
+
 				&-block {
 					display: inline-block !important;
 				}
@@ -2436,7 +2436,7 @@ html body {
 	}
 
 	//XL
-	@media only screen and (min-width: 1200px) {
+	@media only screen and (min-width: $xl-breakpoint) {
 		.container {
 			max-width: 1140px;
 		}
@@ -2455,7 +2455,7 @@ html body {
 			}
 			&-inline {
 				display: inline !important;
-	
+
 				&-block {
 					display: inline-block !important;
 				}

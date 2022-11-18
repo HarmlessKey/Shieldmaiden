@@ -9,101 +9,102 @@
 				<pre v-html="info.content" />
 			</div>
 		</hk-card>
-
-		<h3>Character stats</h3>
-		<p>
-			You can add stats of your character into the description. 
-			Simply enter the reference of the desired stat (as shown in the tables below) into the description field. 
-			The actual value will be shown when the description is displayed. The brackets are required.
-		</p>
-		
-		<hk-card small>
-			<div class="card-header" slot="header" id="ASDesc">
-				Ability scores
-			</div>
-			<table class="table mb-0" aria-describedby="ASDesc">
-				<thead>
-					<th>
-						Ability
-					</th>
-					<th>
-						Reference
-					</th>
-				</thead>
-				<tbody>
-					<tr v-for="({stat, ref}, index) in ability_scores" :key="`ability-${index}`">
-						<td>{{ stat }}</td>
-						<td>{{ ref }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</hk-card>
-
-		<hk-card small>
-			<div class="card-header" slot="header" id="AMDesc">
-				Ability modifiers
-			</div>
-			<table class="table mb-0" aria-describedby="AMDesc">
-				<thead>
-					<th>
-						Ability
-					</th>
-					<th>
-						Reference
-					</th>
-				</thead>
-				<tbody>
-					<tr v-for="({stat, ref}, index) in ability_mods" :key="`mod-${index}`">
-						<td>{{ stat }}</td>
-						<td>{{ ref }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</hk-card>
-
-		<hk-card header="Character values" small>
-			<div class="card-header" slot="header" id="CVDesc">
-				Character values
-			</div>
-			<table class="table mb-0" aria-describedby="CVDesc">
-				<thead>
-					<th>
-						Value
-					</th>
-					<th>
-						Reference
-					</th>
-				</thead>
-				<tbody>
-					<tr v-for="({stat, ref}, index) in character" :key="`character-${index}`">
-						<td>{{ stat }}</td>
-						<td>{{ ref }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</hk-card>
-
-		<hk-card header="Class values" small>
-			<div class="card-header" slot="header" id="ClVDesc">
-				Class values
-			</div>
-			<table class="table mb-0" aria-describedby="ClVDesc">
-				<thead>
-					<th>
-						Value
-					</th>
-					<th>
-						Reference
-					</th>
-				</thead>
-				<tbody>
-					<tr v-for="({stat, ref}, index) in Class" :key="`class-${index}`">
-						<td>{{ stat }}</td>
-						<td>{{ ref }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</hk-card>
+		<template v-if="$route.path.split('/')[2] === 'character-builder'">
+			<h3>Character stats</h3>
+			<p>
+				You can add stats of your character into the description. 
+				Simply enter the reference of the desired stat (as shown in the tables below) into the description field. 
+				The actual value will be shown when the description is displayed. The brackets are required.
+			</p>
+			
+			<hk-card small>
+				<div class="card-header" slot="header" id="ASDesc">
+					Ability scores
+				</div>
+				<table class="table mb-0" aria-describedby="ASDesc">
+					<thead>
+						<th>
+							Ability
+						</th>
+						<th>
+							Reference
+						</th>
+					</thead>
+					<tbody>
+						<tr v-for="({stat, ref}, index) in ability_scores" :key="`ability-${index}`">
+							<td>{{ stat }}</td>
+							<td>{{ ref }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</hk-card>
+	
+			<hk-card small>
+				<div class="card-header" slot="header" id="AMDesc">
+					Ability modifiers
+				</div>
+				<table class="table mb-0" aria-describedby="AMDesc">
+					<thead>
+						<th>
+							Ability
+						</th>
+						<th>
+							Reference
+						</th>
+					</thead>
+					<tbody>
+						<tr v-for="({stat, ref}, index) in ability_mods" :key="`mod-${index}`">
+							<td>{{ stat }}</td>
+							<td>{{ ref }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</hk-card>
+	
+			<hk-card header="Character values" small>
+				<div class="card-header" slot="header" id="CVDesc">
+					Character values
+				</div>
+				<table class="table mb-0" aria-describedby="CVDesc">
+					<thead>
+						<th>
+							Value
+						</th>
+						<th>
+							Reference
+						</th>
+					</thead>
+					<tbody>
+						<tr v-for="({stat, ref}, index) in character" :key="`character-${index}`">
+							<td>{{ stat }}</td>
+							<td>{{ ref }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</hk-card>
+	
+			<hk-card header="Class values" small>
+				<div class="card-header" slot="header" id="ClVDesc">
+					Class values
+				</div>
+				<table class="table mb-0" aria-describedby="ClVDesc">
+					<thead>
+						<th>
+							Value
+						</th>
+						<th>
+							Reference
+						</th>
+					</thead>
+					<tbody>
+						<tr v-for="({stat, ref}, index) in Class" :key="`class-${index}`">
+							<td>{{ stat }}</td>
+							<td>{{ ref }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</hk-card>
+		</template>
 	</div>
 </template>
 

@@ -236,6 +236,7 @@
 			width: 100px;
 		}
 		.written {
+			font-family: $text-written;	
 			font-size: 30px;
 		}
 
@@ -267,7 +268,7 @@
 							margin-left: -10px;
 							font-size: 40px;
 							line-height: 40px;
-							font-family: 'Fredericka the Great', cursive;	
+							font-family: $text-written;	
 						}
 					}
 				}
@@ -302,7 +303,7 @@
 								font-size: 13px;
 							}
 							.score {
-								font-family: 'Fredericka the Great', cursive;	
+								font-family: $text-written;	
 							}
 						}
 					}
@@ -322,7 +323,7 @@
 								text-align: center;
 								display: inline-block;
 								background-color: $neutral-9;
-								font-family: 'Fredericka the Great', cursive;	
+								font-family: $text-written;	
 								// border: solid 1px $neutral-4;
 							}
 						}

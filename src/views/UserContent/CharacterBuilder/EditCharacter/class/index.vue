@@ -21,27 +21,8 @@
 						</div>
 					</div>
 					<!-- EXPERIENCE -->
-					<div v-if="character.advancement === 'experience'">
-						<div class="xp-bar" v-if="calculatedLevel(Class.experience_points) < 20">
-							<div class="xp-level">
-								{{ calculatedLevel(Class.experience_points) }}
-							</div>
-							<q-linear-progress size="25px" :value="levelAdvancement(Class.experience_points)" color="primary">
-								<div class="absolute-full d-flex justify-between">
-									<q-separator color="neutral-5" vertical v-for="i in 11" :key="i" />
-								</div>
-								<div class="absolute-full flex flex-center">
-									<div class="value neutral-1 text-shadow-3">
-										<hk-animated-integer :value="levelProgress(Class.experience_points)" /> /
-										{{ levelRequired(Class.experience_points) }}
-										({{ Math.floor(levelAdvancement(Class.experience_points) * 100) }}%)
-									</div>
-								</div>				
-							</q-linear-progress>
-							<div class="xp-level" v-if="calculatedLevel(Class.experience_points) < 20">
-								{{ calculatedLevel(Class.experience_points) + 1 }}
-							</div>
-						</div>
+					<div v-if="character.advancement === 'experience' && calculatedLevel(Class.experience_points) < 20">
+						<hk-xp-bar class="bg-neutral-9" :xp="Class.experience_points" :height="25" />
 					</div>
 
 					<!-- CLASSES -->
@@ -839,36 +820,11 @@
 <style lang="scss" scoped>
 	.accordion {
 		.q-item {
-			font-family: 'Fredericka the Great', cursive !important;
-		}
-	}
-	.xp-bar {
-		display: flex;
-		justify-content: space-between;
-		padding: 0 10px;
-		background-color: $neutral-9;
-
-		.xp-level {
-			font-family: 'Fredericka the Great', cursive !important;
-			font-size: 18px;
-
-			&:first-child {
-				padding-right: 10px;
-			}
-			&:last-child {
-				padding-left: 10px;
-			}
-		}
-
-		.q-linear-progress {
-			.value {
-				line-height: 25px;
-				font-size: 15px;
-			}
+			font-family: $text-written !important;
 		}
 	}
 	h3 {
-		font-family: 'Fredericka the Great', cursive !important;
+		font-family: $text-written !important;
 		font-size: 25px !important;
 		margin: 0 0 20px 0 !important;
 
@@ -963,7 +919,7 @@
 	.rolled {
 		cursor: pointer;
 		line-height: 38px;
-		font-family: 'Fredericka the Great', cursive !important;
+		font-family: $text-written !important;
 
 		.val {
 			font-size: 30px;

@@ -1,4 +1,4 @@
-import { experience_table, spell_slot_table, classes } from "src/utils/characterConstants";
+import { experience_table, spell_slot_table, classes, races, subraces } from "src/utils/characterConstants";
 import { calc_dice_average, calc_mod } from "src/utils/generalFunctions";
 import { skills } from "src/utils/generalConstants";
 
@@ -118,8 +118,33 @@ export class Character {
   }
 
   // RACE
+  get race() {
+    const race = JSON.parse(JSON.stringify(this.race));
+
+    if(race.race && race.race !== "custom") {
+      const selected = races[race.race];
+      race.walking_speed = selected.walking_speed;
+      race.size = selected.size;
+    }
+    return race;
+  }
+
   get traits() {
-    return this.race.traits;
+    let traits = [];
+    const race = this.race;
+
+    // Add custom features
+    traits = traits.concat(race.traits.map((mod, i) => ({ ...mod, index: i })));
+
+    // Add race traits
+    if(race.race && race.race !== "custom") {
+      traits = traits.concat(race.traits);
+    }
+    // Add subrace traits
+    if(race.subrace) {
+      traits = traits.concat(race.subrace.traits);
+    }
+    return traits;
   }
 
   set traits(value) {
@@ -185,7 +210,7 @@ export class Character {
         let rolled_hit_points = rolled + calc_mod(con);
 
         // The rolled value has a minimum of 1 (php 15)
-        rolled_hit_points = (rolled_hit_points < 1) ? 1 : rolled_hit_points;
+        rolled_hit_points = rolled_hit_points.min(1);
 
         // Add the hit points to the total
         total_hp.hp = total_hp.hp + rolled_hit_points;
@@ -197,7 +222,7 @@ export class Character {
         let average_hit_points = average + calc_mod(con);
         
         // The rolled value has a minimum of 1 (php 15)
-        average_hit_points = (average_hit_points < 1) ? 1 : average_hit_points;
+        average_hit_points = average_hit_points.min(1);
         
         // Add the hit points to the total
         total_hp.hp = total_hp.hp + average_hit_points;
@@ -205,15 +230,13 @@ export class Character {
     }
 
     // Setup info about the total HP
+    let fixed_roll = "the average of the";
     if(this.hit_point_type === "rolled") {
-      total_hp.info += (classIndex == 0) ? 
-        "<p>For each level after the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
-        "<p>For each level the roll of a Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
-    } else {
-      total_hp.info += (classIndex == 0) ? 
-        "<p>For each level after the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>" :
-        "<p>For each level the average of the Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>";
+      fixed_roll = "the roll of a";
     }
+    total_hp.info += (classIndex == 0) ? 
+      `<p>For each level after, ${fixed_roll} Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>` :
+      `<p>For each level ${fixed_roll} Hit Die plus your <em>Constitution</em> modifier (minimum of 1) is added to the hit point maximum. (phb 15)</p>`;
     
 
     if(classIndex == 0) total_hp.info += `Starting: <b>${hit_dice} + ${calc_mod(con)} = ${hit_dice + calc_mod(con)}</b><br/>`;
@@ -373,7 +396,6 @@ export class Character {
     }
   }
 
-
   // MODIFIERS
   get all_modifiers() {
     let all_modifiers = this.modifiers.map((mod, i) => ({ ...mod, index: i }));
@@ -386,6 +408,15 @@ export class Character {
       // Filter out the modifiers that the class is not high enough level for
       all_modifiers = this.filtered_modifiers_level(Class, classIndex, all_modifiers);
     });
+
+    // Add race modifiers
+    if(this.race.race && this.race.race !== "custom") {
+      all_modifiers = all_modifiers.concat(races[this.race.race].modifiers);
+    }
+    // Add subrace modifiers
+    if(this.race.subrace) {
+      all_modifiers = all_modifiers.concat(subraces[this.race.subrace].modifiers);
+    }
     return all_modifiers;
   }
 
@@ -430,7 +461,7 @@ export class Character {
     const modifiers = this.filtered_modifiers_origin("class");
     return modifiers.filter(mod => {
       const origin = mod.origin.split(".");
-      return origin[1] == classIndex && origin[2] == level && origin[3] === index;
+      return origin[1] == classIndex && origin[2] == level && origin[3] == index;
     });
   }
   // Returns only modifiers that the class is a high enough level for
@@ -872,20 +903,21 @@ export class ComputedCharacter {
   _add_modifier(character, value, modifier) {
     let newValue = parseInt(value);
     let modifier_value = parseInt(modifier.value);
+    const modifier_multiplier = modifier.multiplier || 1;
 
     //Check for scaling
-    if(modifier.scaling_type) {
-      if(modifier.scaling_type === 'scale') {
+    if(modifier.scaling) {
+      if(modifier.scaling.type === 'scale' && modifier.scaling.scale) {
         const classIndex = modifier.origin.split(".")[1];
-        const starting_level = (modifier.origin.split(".")[0] === 'class') ? modifier.origin.split(".")[2] : modifier.scaling_start;
-        const current_level = (modifier.origin.split(".")[0] === 'class') ? this.classes[classIndex].level : character.level;
+        const starting_level = (modifier.origin.split(".")[0] === 'class') ? modifier.origin.split(".")[2] : modifier.scaling.start;
+        const current_level = (modifier.origin.split(".")[0] === 'class') ? this.classes[classIndex].level : this.level;
 
         //Calculate the increase based on starting level, character-/class-level and the scale
-        const increase = parseInt(Math.floor((current_level - starting_level) / modifier.scale_size));
+        const increase = parseInt(Math.floor((current_level - starting_level) / modifier.scaling.scale.size));
 
         //Add the increase to the starting value
-        modifier_value = modifier_value + increase * parseInt(modifier.scale_value);
-      } else if(modifier.scaling_type === 'steps') {
+        modifier_value = modifier_value + increase * parseInt(modifier.scaling.scale.value);
+      } else if(modifier.scaling.type === 'steps') {
         //define how step scaling is handled
       }
     }
@@ -904,14 +936,17 @@ export class ComputedCharacter {
           }
         }
       }
-      //If proficiency wasn't added before, add it and track that it was added
+      // If proficiency wasn't added before, add it and track that it was added
       if(!added_before) {
         newValue = newValue + parseInt(this.proficiency);
         character.proficiency_tracker.push(`${modifier.target}.${modifier.subtarget}`);
       }
     }
+    if(modifier.type === "proficiency_bonus") {
+      newValue = Math.floor(newValue + modifier_multiplier * this.proficiency);
+    }
     if(modifier.type === 'ability') {
-      newValue = newValue + calc_mod(this.abilities[modifier.ability_modifier]);
+      newValue = Math.floor(newValue + modifier_multiplier * calc_mod(this.abilities[modifier.ability_modifier]));
     }
     if(['advantage', 'disadvantage'].includes(modifier.type)) {
 

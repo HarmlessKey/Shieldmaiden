@@ -371,7 +371,7 @@ export const setHP = {
 			let newAmount = parseInt(currentAmount) + parseInt(amount); // calculate the new amount
 
 			//Set the new amount
-			await db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`).set(newAmount.positive());
+			await db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`).set(newAmount.min());
 		}
 	}
 }

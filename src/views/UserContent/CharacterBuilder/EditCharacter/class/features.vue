@@ -80,7 +80,7 @@
 							<div v-for="i in [0, 1]" :key="`asi-${level}-${i}`" class="asi mb-1">
 								<q-select
 									:dark="$store.getters.theme === 'dark'" filled square
-									:label="`Ability ${i}`"
+									:label="`Ability ${i+1}`"
 									:options="abilities"
 									:value="asi_modifiers(level)[i]"
 									name="asi"
@@ -114,53 +114,29 @@
 								</ValidationProvider>
 
 								<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
-									<div class="d-flex justify-content-between">
-										<div>
-											<span>
-												<i class="fab fa-markdown" aria-hidden="true" />
-												Description
-												<q-tooltip anchor="top middle" self="center middle">
-													Field accepts markdown
-												</q-tooltip>
-											</span>
-											<i 
-												class="fas fa-info-circle pointer" 
-												aria-hidden="true"
-												@click="setSlide({
-													show: true,
-													type: 'slides/characterBuilder/Descriptions'
-												})"/>
-										</div>
-										<button 
-											v-if="character.class.classes[classIndex].features[feature.index].description" 
-											class="btn btn-sm btn-clear" 
-											@click.prevent="show_description(character.class.classes[classIndex].features[feature.index])"
-										>
-											<i class="fas fa-eye" aria-hidden="true" />
-											<q-tooltip anchor="top middle" self="center middle">
-												Preview
-											</q-tooltip>
-										</button>
-									</div>
-									<q-input
-										:dark="$store.getters.theme === 'dark'" filled square
-										type="textarea"
-										label="Description"
-										@change="save(valid)"
+									<hk-markdown-editor 
 										v-model="character.class.classes[classIndex].features[feature.index].description"
-										autogrow
+										@change="save(valid)"
 										:error="invalid && validated"
 										:error-message="errors[0]"
-									/>
+										label="Description"
+									>
+										<character-descriptions class="description-preview" v-model="feature.description" />
+									</hk-markdown-editor>
 								</ValidationProvider>
 							</template>
 							<character-descriptions v-else v-model="feature.description" />
+							
+							<!-- Charges -->
+							<div class="my-3" v-if="feature.charges">
+								You have <strong>{{ charges(feature.charges, level) }}</strong> charges on level {{ classLevel }}.
+							</div>
 
 							<!-- Modifiers -->
 							<Modifier-table 
 								v-if="!isNaN(feature.index)"
-								:modifiers="character.filtered_modifiers_feature(level, index)" 
-								:origin="`class.${classIndex}.${level}.${index}`"
+								:modifiers="character.filtered_modifiers_feature(classIndex, level, feature.index)" 
+								:origin="`class.${classIndex}.${level}.${feature.index}`"
 								:userId="userId"
 								:characterId="characterId"
 								:info="featureModInfo"
@@ -175,18 +151,6 @@
 		<!-- MODIFIER MODAL -->
 		<q-dialog v-model="modifier_modal">
       <Modifier :value="modifier" :userId="userId" :characterId="characterId" @save="modifierSaved" />
-		</q-dialog>
-
-		<!-- MODIFIER MODAL -->
-		<q-dialog v-model="description_preview.show">
-      <hk-card :min-width="300">
-				<div class="card-header" slot="header">
-					{{ description_preview.feature.name }}
-				</div>
-				<div class="card-body">
-					<character-descriptions v-model="description_preview.feature.description" />
-				</div>
-			</hk-card>
 		</q-dialog>
 	</div>
 </template>
@@ -216,10 +180,6 @@
 			return {
 				abilities: abilities,
 				modifier_modal: false,
-				description_preview: {
-					show: false,
-					feature: {}
-				},
 				modifier: {},
 				featureModInfo: "These modifiers only apply to your character if it meets the level requirement for this class.",
 			}
@@ -228,6 +188,9 @@
 		computed: {
 			character() {
 				return this.characterState.character;
+			},
+			classLevel() {
+				return this.character.class.classes[this.classIndex].level
 			},
 			subclass() {
 				return this.character.classes[this.classIndex];
@@ -263,6 +226,21 @@
 			]),
 			save(valid) {
 				this.$emit("save", valid);
+			},
+			charges(charges, starting_level) {
+				let count = charges.value;
+				if(charges.scaling ) {
+					if(charges.scaling.type === "scale") {
+						const increase = parseInt(Math.floor((this.classLevel - starting_level) / charges.scaling.scale.size));
+						count = charges.value + increase;
+					} else if(charges.scaling.type === "steps") {
+						const values = charges.scaling.steps.filter(item => {
+							return this.classLevel >= item.level;
+						});
+						count = values[values.length - 1].value;
+					}
+				}
+				return (count === Infinity) ? "unlimited" : count;
 			},
 			asi_modifiers(level) {
 				const modifier = this.character.single_modifier_origin(`class.${this.classIndex}.${level}.asi`);
@@ -321,13 +299,6 @@
 				this.$forceUpdate();
 				this.save(valid, `class.set_asi`);
 			},
-
-			show_description(feature) {
-				this.description_preview = {
-					show: true,
-					feature: feature
-				}
-			},
 			
 			editModifier(e) {
 				this.modifier_modal = true;
@@ -335,7 +306,7 @@
 			},
 			modifierSaved() {
 				this.modifier_modal = false;
-				this.$emit("change", "modifier.saved");
+				this.save(true, `class.modifier.saved`);
 			},
 		}
 	}
@@ -351,5 +322,18 @@
 		padding-bottom: 5px;
 		margin-bottom: 1px;
 		border-bottom: solid 1px #5c5757;
+	}
+	.description-preview {
+		display: inline-block;
+		min-height: 56px;
+		margin-bottom: 20px;
+		background-color: rgba(225, 225, 225, 0.05);
+		padding: 16px 12px 6px 12px;
+		width: 100%;
+	}
+	[data-theme="light"] {
+		.description-preview {
+			background-color: rgba(0, 0, 0, 0.03);
+		}
 	}
 </style>

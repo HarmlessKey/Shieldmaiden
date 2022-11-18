@@ -1,10 +1,10 @@
 <template>
   <ToolsPage
     title="Encounter Builder"
-    :bg_img="require(`src/assets/_img/atmosphere/tool-header/encounter-builder-tool-header.jpg`)"
+    bg_img="encounter-builder-tool-header.jpg"
   >
 
-    <template v-slot:create_btn="{ btn_classes }">
+    <template v-slot:action_btn="{ btn_classes }">
       <q-btn
         color="primary"
         :class="btn_classes"
@@ -44,7 +44,6 @@
     </section>
 
     <em class="mb-0">To save encounters, you need an account.</em>
-
 
   </ToolsPage>
 </template>

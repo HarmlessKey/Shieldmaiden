@@ -3,9 +3,9 @@
 		<div class="card-header" slot="header">
 
 			<h1>{{ title }} for D&D 5e</h1>
-      <slot name='create_btn'/>
+      <slot name='action_btn'/>
 		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${bg_img})` }">
+		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${img})` }">
       D&D {{ title }}
     </div>
 		<div class="card-body">
@@ -14,7 +14,7 @@
 
     </div>
     <div slot="footer" class="card-footer">
-      <slot btn_classes="full-width" name='create_btn' />
+      <slot btn_classes="full-width" name='action_btn' />
 		</div>
 	</hk-card>
 </template>
@@ -25,6 +25,11 @@
     props: {
       title: String,
       bg_img: String,
+    },
+    computed: {
+      img() {
+        return require(`assets/_img/atmosphere/tool-header/${this.bg_img}`)
+      }
     },
 		data() {
 			return {

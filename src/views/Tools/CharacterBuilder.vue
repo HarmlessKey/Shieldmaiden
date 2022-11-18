@@ -1,30 +1,31 @@
 <template>
-	<hk-card>
-		<div class="card-header" slot="header">
-			<h1>Character builder</h1>
-		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/tool-header/characters-tool-header.jpg`)})` }">
-      D&D Character builder
-    </div>
-		<div class="card-body">
-			Our Character Builder is currently under development. Join our <a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a> to stay up to date on our progress.
-		</div>
-		<div slot="footer" class="card-footer">
-      <a class="btn btn-block bg-discord-purple" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">
+  <ToolsPage
+    title="Character Builder"
+    bg_img="characters-tool-header.jpg"
+  >
+
+    <template v-slot:action_btn="{ btn_classes }">
+      <a v-if="btn_classes" :class="`btn bg-discord-purple ${btn_classes}`" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">
 				<i class="fab fa-discord mr-2" aria-hidden="true" /> Join Discord
 			</a>
-		</div>
-	</hk-card>
+    </template>
+
+    <span>Our Character Builder is currently under development. Join our <a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a> to stay up to date on our progress.</span>
+  </ToolsPage>
 </template>
 
 <script>
+import ToolsPage from "src/components/ToolsPage.vue"
 
 	export default {
 		name: 'ToolsCharacterBuilder',
+    components: {
+      ToolsPage
+    },
 		data() {
 			return {
         tools: {
-         
+
         }
       }
 		}

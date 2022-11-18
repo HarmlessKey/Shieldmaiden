@@ -1,18 +1,10 @@
 <template>
-	<!-- <hk-card> -->
-		<!-- <div class="card-header" slot="header">
-			<h1><i aria-hidden="true" class="fas fa-dragon mr-2" /> Monster Creator for D&D 5e</h1>
-		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/tool-header/monster-tool-header.jpg`)})` }">
-      D&D Monster Creator
-    </div>
-		<div class="card-body"> -->
     <ToolsPage
       title="Monster Creator"
-      :bg_img="require(`src/assets/_img/atmosphere/tool-header/monster-tool-header.jpg`)"
+      bg_img="monster-tool-header.jpg"
     >
 
-      <template v-slot:create_btn="{ btn_classes }">
+      <template v-slot:action_btn="{ btn_classes }">
         <q-btn
           color="primary"
           :class="btn_classes"
@@ -80,8 +72,6 @@
           </div>
         </q-img>
       </section>
-
-
 
       <section class="mt-5">
         <div>

@@ -18,7 +18,7 @@ const RunEncounter = () => import('src/views/RunEncounter.vue');
 const User = () => import('src/views/User.vue');
 
 // This is where you add all your site routes
-// Each route is set as an obect in the array
+// Each route is set as an object in the array
 // For a the most basic route just set
 // the path & component to load
 
@@ -469,6 +469,101 @@ const routes = [
 					}
 				]
 			},
+		]
+	},
+
+	// TOOLS
+	{
+		path: "/tools",
+		component: () => import('src/layouts/default'),
+		meta: { 
+			title: "Tools"
+		},
+		children: [
+			{
+				path: "",
+				name: "Tools",
+				component: () => import('src/views/Tools'),
+				meta: {
+					title: "D&D 5e Tools",
+					description: "Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nCharacter Builder \nCompendium"
+				}
+			},
+			{
+				path: "combat-tracker",
+				name: "ToolsCombatTracker",
+				component: () => import('src/views/Tools/CombatTracker'),
+				meta: {
+					title: "Combat Tracker",
+					description: "An advanced initiative tracker for Dungeons and Dragons 5th edition."
+				}
+			},
+			{
+				path: "encounter-builder",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Encounter Builder",
+					description: "An encounter builder for Dungeons and Dragons 5th edition. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker."
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsEncounterBuilder",
+						component: () => import('src/views/Tools/EncounterBuilder'),
+						meta: {
+							title: "Encounter Builder",
+							description: "An encounter builder for Dungeons and Dragons 5th edition. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker."
+						}
+					},
+					{
+						path: "build-encounter",
+						name: "ToolsBuildEncounter",
+						component: () => import('src/views/UserContent/Encounters/Edit'),
+						meta: {
+							title: "Build encounter",
+							description: "Create an encounter for D&D 5e and find out it's difficulty. Once you're finished you can run it in our Combat Tracker.",
+							side: false
+						}
+					}
+				]
+			},
+			{
+				path: "monster-creator",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Monster creator",
+					description: "An advanced monster creator for Dungeons and Dragons 5th edition. Create a stat block with easy to roll actions."
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsMonsterCreator",
+						component: () => import('src/views/Tools/MonsterCreator'),
+						meta: {
+							title: "Dungeons & Dragons Monster Creator",
+							description: "An advanced monster creator for Dungeons and Dragons 5th edition. Create a stat block with easy to roll actions."
+						}
+					},
+					{
+						path: "create-monster",
+						name: "ToolsCreateMonster",
+						component: () => import('src/views/UserContent/Npcs/EditNpc'),
+						meta: {
+							title: "Create monster",
+							description: "Create your custom D&D 5e monster."
+						}
+					}
+				]
+			},
+			{
+				path: "character-builder",
+				name: "ToolsCharacterBuilder",
+				component: () => import('src/views/Tools/CharacterBuilder'),
+				meta: {
+					title: "Character Builder",
+					description: "An advanced character builder for Dungeons and Dragons 5th edition. Create a character sheet for you character."
+				}
+			}
 		]
 	},
 
@@ -1023,7 +1118,7 @@ const routes = [
 		meta: {
 			basePath: '/user',
 			title: 'User page',
-			description: "Follow the live initiative lists of your DM with Harmless Key, a Dungeons & Dragons Initiavive Tracker."
+			description: "Follow the live initiative lists of your DM with Harmless Key, a Dungeons & Dragons Initiative Tracker."
 		}
 	},
 	{
@@ -1034,7 +1129,7 @@ const routes = [
 			basePath: '/user',
 			title: 'Campaign',
 			sidebar: false,
-			description: "Campaign with live initiative list of the encounters with Harmless Key, a Dungeons & Dragons Initiavive Tracker."
+			description: "Campaign with live initiative list of the encounters with Harmless Key, a Dungeons & Dragons Initiative Tracker."
 		}
 	},
 	{ path: '/track-encounter/:userid', redirect: '/user/:userid' },
@@ -1055,8 +1150,10 @@ const routes = [
 	{ path: "/followed", redirect: "/content/followed" },
 	{ path: "/settings", redirect: "/content/settings" },
 
-  // Always leave this as last one,
-  // but you can also remove it
+	{ path: "/combat-tracker", redirect: "/demo" },
+	{ path: "/monster-creator", redirect: "/tools/monster-creator/create-monster" },
+	{ path: "/encounter-builder", redirect: "/tools/encounter-builder/build-encounter" },
+
   {
     path: '*',
     component: () => import('src/views/Pages/Error404.vue')

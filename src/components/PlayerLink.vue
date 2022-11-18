@@ -131,7 +131,7 @@
 			}
 			h2 {
 				font-size: 25px;
-				font-family: 'Fredericka the Great', cursive;
+				font-family: $text-written;
 			}
 			small {
 				line-height: initial;

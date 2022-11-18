@@ -19,7 +19,7 @@
 							</a>
 						</span>
 					</div>
-					<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+					<div class="campaign" :style="{ backgroundImage: getBackground(campaign) ? 'url(\'' + getBackground(campaign) + '\')' : '' }">
 						<CampaignOverview 
 							:players="players" 
 							:campaign="campaign" 
@@ -31,12 +31,14 @@
 				</div>
 
 				<!-- LIVE -->
-				<div 
-					v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
-					:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
-				>
-					<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" :shares="shares" />
-				</div>
+				<Live 
+					v-else-if="encounter && broadcasting['.value'] === $route.params.campid"  
+					:encounter="encounter" 
+					:campaign="campaign" 
+					:players="players" 
+					:width="width" 
+					:shares="shares"
+				/>
 			</template>
 			<div v-else>
 				<div class="top d-flex justify-content-between">
@@ -203,6 +205,11 @@
 				return !!this.shares.filter(item => {
 					return item.key === key;
 				})[0];
+			},
+			getBackground(object) {
+				if(object && object.background) return object.background;
+				if(object && object.hk_background) return require(`src/assets/_img/atmosphere/${object.hk_background}.jpg`);
+				return undefined;
 			}
 		},
 		beforeDestroy() {
@@ -213,11 +220,11 @@
 
 <style lang="scss" scoped>
 .track {
+	background-color: $neutral-5;
 	.track-wrapper {
 		height: calc(100vh - 50px);
 		background-size: cover;
-		background-position: center bottom;
-		background-color: $neutral-5;
+		background-position: bottom center;
 		width: 100vw;
 		position: relative;
 
@@ -244,7 +251,7 @@
 		.campaign {
 			height: calc(100% - 60px);
 			background-size: cover;
-			background-position: top center;
+			background-position: bottom center;
 		}
 	}
 	.xp-wrapper {

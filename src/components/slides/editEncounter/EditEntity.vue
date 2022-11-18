@@ -2,7 +2,7 @@
 
 <template>
 	<div class="pb-5">
-		<h2>Edit <b>{{ npc.name.capitalize() }}</b></h2>
+		<h2>Edit <strong>{{ npc.name.capitalize() }}</strong></h2>
 
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)" greedy>
@@ -113,8 +113,8 @@
 			</q-form>
 		</ValidationObserver>
 		<small>
-			Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, 
-			use our <router-link to="/content/npcs">NPC creator</router-link>.
+			Slightly tweak your NPC for the current encounter. <span v-if="!demo">If you want to make a completely unique NPC, 
+			use our <router-link to="/content/npcs">NPC creator</router-link>.</span>
 		</small>
 	</div>
 </template>
@@ -129,9 +129,11 @@
 		],
 		data() {
 			return {
+				demo: this.$route.name === "ToolsBuildEncounter",
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				npc: {...this.data},
+				npc: {...this.data.npc},
+				encounter: this.data.encounter,
 				hkColors: [
 					"#88b3ce",
 					"#9ac16a",
@@ -150,14 +152,19 @@
 			edit() {
 				this.npc.curHp = this.npc.maxHp;
 
-				this.edit_entity({
-					campaignId: this.campaignId,
-					encounterId: this.encounterId,
-					entityId: this.npc.key,
-					entity: this.npc
-				}).then(() => {
-					this.setSlide(false);	
-				});
+				if(!this.demo) {
+					this.edit_entity({
+						campaignId: this.campaignId,
+						encounterId: this.encounterId,
+						entityId: this.npc.key,
+						entity: this.npc
+					}).then(() => {
+						this.setSlide(false);	
+					});
+				} else {
+					this.encounter.entities[this.npc.key] = this.npc;
+					this.setSlide(false);
+				}
 			}
 		}
 	};

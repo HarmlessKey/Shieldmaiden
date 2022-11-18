@@ -24,7 +24,8 @@ const encounter_state = () => ({
   encounter_services: null,
   cached_encounters: {},
   encounters: {},
-  encounter_count: {}
+  encounter_count: {},
+  demo_encounter: undefined
 });
 
 const encounter_getters = {
@@ -42,7 +43,8 @@ const encounter_getters = {
   },
   encounter_count: (state) => { return state.encounter_count; },
   get_encounter_count: (state) => (campaignId) => { return state.encounter_count[campaignId] || 0; },
-  encounter_services: (state) => { return state.encounter_services; }
+  encounter_services: (state) => { return state.encounter_services; },
+  demo_encounter: (state) => { return state.demo_encounter },
 };
 
 const encounter_actions = {
@@ -857,6 +859,27 @@ const encounter_actions = {
     }
   },
 
+  /**
+   * Save a custom created encounter to run in the combat tracker demo
+   * 
+   * @param {object}} encounter 
+   */
+  async set_demo_encounter({ commit }, encounter) {
+    encounter = {
+      ...encounter,
+      name: encounter.name || "Custom encounter",
+      finished: false,
+      round: 0,
+      turn: 0
+    }
+
+    commit("SAVE_DEMO", encounter);
+  },
+
+  async add_demo_entity({ commit }, { key, entity }) {
+    commit("ADD_DEMO_ENTITY", { key, entity });
+  },
+
   clear_encounter_store({ commit, rootGetters }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
@@ -1060,6 +1083,12 @@ const encounter_mutations = {
     if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][id]) {
       Vue.set(state.cached_encounters[uid][campaignId][id], "finished", finished);
     }
+  },
+  SAVE_DEMO(state, encounter) {
+    Vue.set(state, "demo_encounter", encounter);
+  },
+  ADD_DEMO_ENTITY(state, { key, entity }) {
+    Vue.set(state.demo_encounter.entities, key, entity);
   },
   CLEAR_STORE(state) {
     Vue.set(state, "encounters", {});

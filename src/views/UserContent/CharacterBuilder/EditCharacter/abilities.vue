@@ -176,7 +176,7 @@
 				</div>
 
 				<hk-card-deck>
-					<hk-card>
+					<hk-card @click="confirmMethodChange('standard_array')" class="pointer">
 						<div class="card-header" slot="header">
 							<span>1. Standard array</span>
 							<span class="neutral-2">phb 13</span>
@@ -186,7 +186,8 @@
 							<strong>15</strong> | <strong>14</strong> | <strong>13</strong> | <strong>12</strong> | <strong>10</strong> | <strong>8</strong>
 						</div>
 					</hk-card>
-					<hk-card>
+
+					<hk-card @click="confirmMethodChange('point_buy')" class="pointer">
 						<div class="card-header" slot="header">
 							<span>2. Point buy</span>
 							<span class="neutral-2">phb 13</span>
@@ -211,7 +212,7 @@
 						</div>					
 					</hk-card>
 
-					<hk-card>
+					<hk-card @click="confirmMethodChange('manual')" class="pointer">
 						<div class="card-header" slot="header">
 							<span>3. Manual</span>
 						</div>
@@ -355,7 +356,6 @@
 					const cost = this.point_buy.filter(item => item.score === score).map(item => item.cost)[0];
 					points = (cost !== undefined) ? points - cost : points;
 				}
-
 				return points;
 			}
 		},
@@ -397,7 +397,7 @@
 
 				// Reset ability scores
 				for(const ability of this.abilities) {
-					this.character.abilities[ability] = value;
+					this.$set(this.character.abilities, ability, value);
 				}
 
 				// Set the method
@@ -457,7 +457,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		font-family: 'Fredericka the Great', cursive !important;
+		font-family: $text-written !important;
 		font-size: 25px !important;
 		margin: 40px 0 20px 0 !important;
 	}
@@ -493,7 +493,7 @@
 				font-weight: bold;
 			}
 			.score {
-				font-family: 'Fredericka the Great', cursive !important;
+				font-family: $text-written !important;
 				font-size: 45px;
 				color: $white;
 			}

@@ -15,46 +15,55 @@
 						</small>
 					</div>
 					<div class="card-body">
-						<ValidationProvider rules="required|max:30" name="Race" v-slot="{ errors, invalid, validated }">
-							<q-input
-								dark filled square
-								label="Race" 
-								@change="save(valid)"
-								autocomplete="off"  
-								type="text" 
-								v-model="race.race_name" 
-								placeholder="Race"
-								class="mb-2"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</ValidationProvider>				
-						<ValidationProvider rules="required|between:1,99" name="Speed" v-slot="{ errors, invalid, validated }">
-							<q-input
-								dark filled square
-								label="Base walking speed" 
-								@change="save(valid)"
-								autocomplete="off"  
-								type="number" 
-								v-model="race.walking_speed" 
-								placeholder="Speed"
-								class="mb-2"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</ValidationProvider>
-						<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
-							<q-input
-								dark filled square
-								type="textarea"
-								label="Race description"
-								@change="save(valid)"
-								v-model="race.race_description"
-								autogrow
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</ValidationProvider>
+						<q-select
+							:dark="$store.getters.theme === 'dark'" filled square
+							label="Race"
+							:value="race.race"
+							:options="race_list"
+							@input="selectRace($event, valid)"
+						/>
+						<template v-if="race.race === 'custom'">
+							<ValidationProvider rules="required|max:30" name="Race name" v-slot="{ errors, invalid, validated }">
+								<q-input
+									dark filled square
+									label="Race name" 
+									@change="save(valid)"
+									autocomplete="off"  
+									type="text" 
+									v-model="race.race_name" 
+									placeholder="Race"
+									class="mb-2"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>				
+							<ValidationProvider rules="required|between:1,99" name="Speed" v-slot="{ errors, invalid, validated }">
+								<q-input
+									dark filled square
+									label="Base walking speed" 
+									@change="save(valid)"
+									autocomplete="off"  
+									type="number" 
+									v-model="race.walking_speed" 
+									placeholder="Speed"
+									class="mb-2"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+							<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
+								<q-input
+									dark filled square
+									type="textarea"
+									label="Race description"
+									@change="save(valid)"
+									v-model="race.race_description"
+									autogrow
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</ValidationProvider>
+						</template>
 					</div>
 				</hk-card>
 
@@ -128,6 +137,7 @@
 
 <script>
 	import { mapActions } from "vuex";
+	import { races, subraces } from "src/utils/characterConstants";
 	import ModifierTable from "src/components/characters/modifier-table.vue";
 	import Modifier from "src/components/characters/modifier.vue";
 
@@ -162,6 +172,28 @@
 			},
 			race() {
 				return this.characterState.character.race;
+			},
+			race_list() {
+				const return_races = [{ label: "Custom Race", race: "custom"}];
+				
+				for(const [race_key, race] of Object.entries(races)) {
+					if(race.subraces) {
+						for(const subrace_key of race.subraces) {
+							return_races.push({
+								label: subraces[subrace_key].name,
+								race: race_key,
+								subrace: subrace_key
+							});
+						}
+					} else {
+						return_races.push({
+							label: race.name,
+							race: race_key
+						})
+					}
+				}
+
+				return return_races;
 			}
 		},
 		methods: {
@@ -173,13 +205,43 @@
 				"delete_modifier",
 				"update_character"
 			]),
-			save(valid) {
+			save(valid, source="race") {
+				console.log(valid)
 				if(valid) {
-					this.$emit("save");
+					this.$emit("save", source);
 					this.saved = true;
 				} else {
 					this.invalid = true;
 				}
+			},
+			selectRace(value, valid) {
+				if(this.race.race) {
+					this.$snotify.error(
+					`Are you sure you want to change the race? All traits will be reset.`, `Change race`, 
+					{
+						buttons: [
+							{ text: 'Yes', action: (toast) => { this.setRace(value, valid); this.$snotify.remove(toast.id); }, bold: false},
+							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						]
+					});
+				} else {
+					this.setRace(value, valid);
+				}
+			},
+			setRace(value, valid) {
+				if(value.race !== this.race.race) {
+					delete value.label;
+					
+					// Delete all existing custom traits
+					for(const i in this.race.traits) {
+						this.deleteTrait(i, valid);
+					}
+
+					this.$set(this.character, "race", {
+						...value
+					});
+				}
+				this.save(valid);
 			},
 			trait_modifiers(index) {
 				return this.character.filtered_modifiers_trait(index);
@@ -226,7 +288,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		font-family: 'Fredericka the Great', cursive !important;
+		font-family: $text-written !important;
 		font-size: 25px !important;
 		margin: 0 0 20px 0 !important;
 	}

@@ -75,7 +75,7 @@ export class campaignServices {
    * @param {String} uid ID of active user
    * @param {String} id ID of campaign to edit
    * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
-   * @param {object} value Object with { proptery: value }
+   * @param {object} value Object with { property: value }
    * @param {boolean} update_search Wether or not search_campaigns must be updated
    */
   async updateCampaign(uid, id, path, value, update_search=false) {

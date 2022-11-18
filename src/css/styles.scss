@@ -103,7 +103,7 @@ html body {
 		margin: 0;
 	}
 	h1 {
-		font-family: 'Fredericka the Great', cursive;
+		font-family: $text-written;
 		font-size: 25px;
 		line-height: 40px;
 		margin-bottom: 15px;
@@ -203,7 +203,7 @@ html body {
 
 	.healing { color: $green; }
 	.acid { color: $acid; }
-	.bludgeoning { color: $bludgening; }
+	.bludgeoning { color: $bludgeoning; }
 	.cold { color: $cold; }
 	.fire { color: $fire; }
 	.force{ color: $force; }
@@ -222,6 +222,10 @@ html body {
 		&-small {
 			border-radius: $border-radius-small;
 		}
+	}
+
+	.written {
+		font-family: 'Fredericka the Great', cursive;
 	}
 
 	.overflow {
@@ -769,7 +773,7 @@ html body {
 				text-align: center;
 
 				h2 {
-					font-family: 'Fredericka the Great', cursive;
+					font-family: $text-written;
 					font-size: 30px !important;
 					line-height: 50px;
 					text-align: center;
@@ -1202,7 +1206,6 @@ html body {
 		}
 		.card-image {
 			position: relative;
-			width: 100%;
 			min-height: 180px;
 			background-position: center;
 			background-size: cover;
@@ -2281,7 +2284,7 @@ html body {
 	/*-----------------------------------*/
 
 	//XS
-	@media only screen and (max-width: 576px) {
+	@media only screen and (max-width: $sm-breakpoint) {
 		.d-xs {
 			&-flex {
 				display: flex !important;
@@ -2352,7 +2355,7 @@ html body {
 	}
 
 	//SM
-	@media only screen and (min-width: 576px) {
+	@media only screen and (min-width: $sm-breakpoint) {
 		.container {
 			max-width: 540px;
 		}
@@ -2380,7 +2383,7 @@ html body {
 	}
 
 	//MD
-	@media only screen and (min-width: 768px) {
+	@media only screen and (min-width: $md-breakpoint) {
 		.container {
 			max-width: 720px;
 		}
@@ -2408,7 +2411,7 @@ html body {
 	}
 
 	//LG
-	@media only screen and (min-width: 992px) {
+	@media only screen and (min-width: $lg-breakpoint) {
 		.container {
 			max-width: 960px;
 		}
@@ -2442,7 +2445,7 @@ html body {
 	}
 
 	//XL
-	@media only screen and (min-width: 1200px) {
+	@media only screen and (min-width: $xl-breakpoint) {
 		.container {
 			max-width: 1140px;
 		}

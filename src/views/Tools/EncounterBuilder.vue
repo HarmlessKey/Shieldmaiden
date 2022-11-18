@@ -1,27 +1,61 @@
 <template>
-	<hk-card>
-		<div class="card-header" slot="header">
-			<h1>Encounter builder</h1>
-		</div>
-		<div slot="image" class="card-image written" :style="{ backgroundImage: `url(${require(`src/assets/_img/atmosphere/tool-header/encounter-builder-tool-header.jpg`)})` }">
-      D&D Encounter builder
-    </div>
-		<div class="card-body">
+  <ToolsPage
+    title="Encounter Builder"
+    :bg_img="require(`src/assets/_img/atmosphere/tool-header/encounter-builder-tool-header.jpg`)">
+
+    <template v-slot:create_btn="{ btn_classes }">
+      <q-btn
+        color="primary"
+        :class="btn_classes"
+        no-caps push
+        to="/tools/encounter-builder/build-encounter"
+      >
+        Create encounter
+      </q-btn>
+    </template>
+
+    <section>
+      <h3>Encounter Builder</h3>
       <p>
-        Easily add monsters and players to create an encounter that you can run in our Combat Tracker. We calculate the difficulty of your encounter. 
+        Easily add monsters and players to create an encounter that you can run in our Combat Tracker.
+      </p>
+      <p>
+        Use the average monster HP or roll HP based on hit dice.
       </p>
 
-      <p class="mb-0">To save encounters, you need an account.</p> 
-    </div>
-    <div slot="footer" class="card-footer">
-      <q-btn color="primary" class="full-width" no-caps push to="/tools/encounter-builder/build-encounter">Create encounter</q-btn>
-		</div>
-	</hk-card>
+      <q-img
+        class="media large"
+        src="~assets/_img/tools/encounter-builder/example-encounter.png"
+        alt="Example encounter"
+        fit="contain"
+      />
+    </section>
+
+    <section class="d-lg-flex justify-between mt-5">
+      <div>
+        <h3>Difficulty</h3>
+        <p>Encounter difficulty is calculated as you add or remove monsters to your encounter</p>
+      </div>
+      <video
+        class="video media small" src="~assets/_img/tools/encounter-builder/difficulty.mp4"
+        muted autoplay playsinline alt="Harmless Key logo animation" loop
+      />
+    </section>
+
+    <em class="mb-0">To save encounters, you need an account.</em>
+
+
+  </ToolsPage>
 </template>
 
 <script>
+import ToolsPage from 'src/components/ToolsPage.vue';
+
 	export default {
 		name: 'ToolsEncounterBuilder',
+    components: {
+      ToolsPage
+    },
 		data() {
 			return {
       }
@@ -30,17 +64,5 @@
 </script>
 
 <style lang="scss" scoped>
-.hk-card {
-  .card-image {
-    font-size: 50px;
-    line-height: 55px;
-    text-shadow: 1px 1px 10px $black;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-transform: uppercase;
-    background-size: auto;
-  }
-}
+
 </style>

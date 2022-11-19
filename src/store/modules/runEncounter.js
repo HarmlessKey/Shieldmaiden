@@ -1115,24 +1115,26 @@ const run_encounter_actions = {
 				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedCurHp" });
 				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedAc" });
 			} else {
-				if(type === "npcs") {
-					await dispatch("encounters/set_transformed_prop", { 
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entityId: key,
-						property: "curHp",
-						value: null
-					}, { root: true });
-				} else {
-					//Player & companion transformed is stored under campaign
-					await dispatch("campaigns/update_transformed_entity", {
-						uid: rootGetters.user.uid,
-						campaignId: state.campaignId,
-						type,
-						id: key,
-						property: "curHp",
-						value: newHp
-					}, { root: true });
+				if(!state.demo) {
+					if(type === "npcs") {
+						await dispatch("encounters/set_transformed_prop", { 
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entityId: key,
+							property: "curHp",
+							value: null
+						}, { root: true });
+					} else {
+						//Player & companion transformed is stored under campaign
+						await dispatch("campaigns/update_transformed_entity", {
+							uid: rootGetters.user.uid,
+							campaignId: state.campaignId,
+							type,
+							id: key,
+							property: "curHp",
+							value: newHp
+						}, { root: true });
+					}
 				}
 				commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedCurHp', value: newHp });
 			}

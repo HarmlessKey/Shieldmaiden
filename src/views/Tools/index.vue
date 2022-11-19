@@ -3,7 +3,7 @@
 		<div class="card-header" slot="header">
 			<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D 5e Tools</h1>
 		</div>
-		<div class="card-body row q-col-gutter-md">	
+		<div class="card-body row q-col-gutter-md">
 			<div v-for="(tool, key) in tools" class="col-12 col-sm-6 col-md-4" :key="key">
         <router-link :to="tool.url">
           <hk-card class="full-height tool">
@@ -95,6 +95,7 @@ a {
     filter: grayscale(50%);
     transition: all .5s ease-in-out;
     font-size: 95px;
+    width:inherit;
     text-align: center;
     line-height: 180px;
     text-shadow: 0 0 20px $black;
@@ -102,7 +103,7 @@ a {
   &:hover {
     background-color: $neutral-5;
     border-color: $neutral-4;
-    
+
     .card-header {
       background-color: $neutral-7;
     }

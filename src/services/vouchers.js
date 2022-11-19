@@ -47,11 +47,8 @@ export class voucherService {
   }
 
   static async incrementVoucherUsage(voucher_name) {
-    return VOUCHER_REF.child(voucher_name).transaction((voucher) => {
-      if (voucher) {
-        voucher.times_used++
-      }
-      return voucher;
+    return VOUCHER_REF.child(voucher_name).child('times_used').transaction((value) => {
+      return value++;
     })
   }
 

@@ -13,13 +13,11 @@ TO UPDATE THE FONT
 @font-face {
 	font-family: 'harmless-key, sans-serif';
 	src: url('../assets/hk-icon-font/harmless-key.eot?29559614');
-	src: url('../assets/hk-icon-font/harmless-key.eot?29559614#iefix')
-			format('embedded-opentype'),
+	src: url('../assets/hk-icon-font/harmless-key.eot?29559614#iefix') format('embedded-opentype'),
 		url('../assets/hk-icon-font/harmless-key.woff2?29559614') format('woff2'),
 		url('../assets/hk-icon-font/harmless-key.woff?29559614') format('woff'),
 		url('../assets/hk-icon-font/harmless-key.ttf?29559614') format('truetype'),
-		url('../assets/hk-icon-font/harmless-key.svg?29559614#harmless-key')
-			format('svg');
+		url('../assets/hk-icon-font/harmless-key.svg?29559614#harmless-key') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }

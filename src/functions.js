@@ -12,10 +12,7 @@ String.prototype.formatUnicorn = function () {
 	var e = this.toString();
 	if (!arguments.length) return e;
 	var t = typeof arguments[0],
-		n =
-			'string' === t || 'number' === t
-				? Array.prototype.slice.call(arguments)
-				: arguments[0];
+		n = 'string' === t || 'number' === t ? Array.prototype.slice.call(arguments) : arguments[0];
 	for (var o in n) e = e.replace(new RegExp('\\{' + o + '\\}', 'gi'), n[o]);
 	return e;
 };
@@ -37,9 +34,7 @@ Array.min = function (array) {
 	if (process.browser) {
 		// Opera 8.0+
 		const isOpera =
-			(!!window.opr && !!opr.addons) ||
-			!!window.opera ||
-			navigator.userAgent.indexOf(' OPR/') >= 0;
+			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
 
 		// Firefox 1.0+
 		const isFirefox = typeof InstallTrigger !== 'undefined';
@@ -49,10 +44,7 @@ Array.min = function (array) {
 			/constructor/i.test(window.HTMLElement) ||
 			(function (p) {
 				return p.toString() === '[object SafariRemoteNotification]';
-			})(
-				!window['safari'] ||
-					(typeof safari !== 'undefined' && window['safari'].pushNotification)
-			);
+			})(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
 
 		// Internet Explorer 6-11
 		const isIE = /*@cc_on!@*/ false || !!document.documentMode;
@@ -61,8 +53,7 @@ Array.min = function (array) {
 		const isEdge = !isIE && !!window.StyleMedia;
 
 		// Chrome 1 - 79
-		const isChrome =
-			!!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+		const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
 		// Edge (based on chromium) detection
 		const isEdgeChromium = isChrome && navigator.userAgent.indexOf('Edg') != -1;

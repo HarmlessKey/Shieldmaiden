@@ -3,17 +3,12 @@
 		<div>
 			<nav-main :maintenance="maintenance" />
 			<div class="offline" v-if="connection === 'offline'">
-				<i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet
-				connection
+				<i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection
 			</div>
-			<div
-				v-if="!maintenance"
-				:class="{ hasSide: $route.meta.sidebar !== false }"
-			>
+			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar
 					v-if="
-						(!small_screen && $route.meta.sidebar !== false) ||
-						$store.getters.side_small_screen
+						(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen
 					"
 					:small-screen="small_screen"
 				/>
@@ -32,17 +27,10 @@
 			leave-active-class="animated animate__slideOutRight"
 		>
 			<div v-if="slide.show == true" class="slide">
-				<a
-					@click="hideSlide()"
-					v-shortkey="['esc']"
-					@shortkey="hideSlide()"
-					class="hide"
-				>
+				<a @click="hideSlide()" v-shortkey="['esc']" @shortkey="hideSlide()" class="hide">
 					<i aria-hidden="true" class="far fa-chevron-double-right" />
 					<span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
-					<q-tooltip anchor="bottom middle" self="center middle">
-						Hide [esc]
-					</q-tooltip>
+					<q-tooltip anchor="bottom middle" self="center middle"> Hide [esc] </q-tooltip>
 				</a>
 				<div class="content" :class="slide.classes">
 					<Slide />
@@ -77,10 +65,7 @@
 			<q-card class="install-prompt">
 				<q-card-section class="d-flex justify-content-start">
 					<div class="logo">
-						<img
-							src="~assets/_img/logo/logo-icon-cyan.svg"
-							alt="Logo Harmless Key"
-						/>
+						<img src="~assets/_img/logo/logo-icon-cyan.svg" alt="Logo Harmless Key" />
 					</div>
 					<div>
 						<h4>Install our app</h4>
@@ -95,13 +80,7 @@
 				</q-card-section>
 				<q-card-section>
 					<div class="d-flex justify-content-end">
-						<q-btn
-							@click="install(false)"
-							label="No thanks"
-							class="mr-1"
-							flat
-							no-caps
-						/>
+						<q-btn @click="install(false)" label="No thanks" class="mr-1" flat no-caps />
 						<img
 							v-if="isAndroid"
 							@click="install(true, 'android')"
@@ -109,13 +88,7 @@
 							class="play-store"
 							alt="Google Play"
 						/>
-						<q-btn
-							v-else
-							@click="install(true, 'pwa')"
-							label="Install"
-							color="primary"
-							no-caps
-						/>
+						<q-btn v-else @click="install(true, 'pwa')" label="Install" color="primary" no-caps />
 					</div>
 				</q-card-section>
 			</q-card>
@@ -306,20 +279,15 @@ export default {
 		...mapGetters(['initialized', 'theme', 'user']),
 		announcement: {
 			get() {
-				const announcement =
-					this.user && !this.announcement_cookie ? true : false;
-				return this.announcementSetter !== undefined
-					? this.announcementSetter
-					: announcement;
+				const announcement = this.user && !this.announcement_cookie ? true : false;
+				return this.announcementSetter !== undefined ? this.announcementSetter : announcement;
 			},
 			set(newVal) {
 				this.announcementSetter = newVal;
 			},
 		},
 		isAndroid() {
-			const userAgent = process.browser
-				? navigator.userAgent.toLowerCase()
-				: '';
+			const userAgent = process.browser ? navigator.userAgent.toLowerCase() : '';
 			return userAgent.indexOf('android') > -1;
 		},
 	},
@@ -429,9 +397,7 @@ export default {
 			this.announcement = false;
 		},
 		async install(install, type) {
-			const cookie_duration = this.never_show_install
-				? 10 * 365 * 24 * 60 * 60
-				: 30 * 24 * 60 * 60;
+			const cookie_duration = this.never_show_install ? 10 * 365 * 24 * 60 * 60 : 30 * 24 * 60 * 60;
 
 			// If the user clicked install
 			if (install) {

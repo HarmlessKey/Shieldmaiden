@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway');
-@import "~vue-snotify/styles/material.css";
+@import '~vue-snotify/styles/material.css';
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-@import "hk-icons.scss";
-@import "./variables.scss";
+@import 'hk-icons.scss';
+@import './variables.scss';
 
 /* 2. Themes */
 /*********************************************/
-@import "./light.scss";
+@import './light.scss';
 
 /*
 	Table of content
@@ -39,7 +39,6 @@ html body {
 		display: none;
 	}
 
-
 	.container-fluid {
 		padding: 0;
 	}
@@ -56,7 +55,7 @@ html body {
 		width: 100%;
 		background: $neutral-7;
 		border-bottom: solid 1px transparent;
-		position:fixed;
+		position: fixed;
 		top: 0;
 		z-index: 999;
 	}
@@ -96,10 +95,15 @@ html body {
 		}
 	}
 
-/* 3. Heading */
-/*********************************************/
-	h1, h2, h3, h4, h5, h6 {
-		font-weight:normal;
+	/* 3. Heading */
+	/*********************************************/
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-weight: normal;
 		margin: 0;
 	}
 	h1 {
@@ -125,50 +129,217 @@ html body {
 		line-height: 30px;
 	}
 
-
 	/* 4. Classes */
 	/*********************************************/
-	.white { color: $white !important; }
+	.white {
+		color: $white !important;
+	}
 
-	.neutral-1, .text-neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
-	.neutral-2, .text-neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
-	.neutral-3, .text-neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
-	.neutral-4, .text-neutral-4 { color: $neutral-4 !important; path { fill: $neutral-4 !important;} }
-	.neutral-5, .text-neutral-5 { color: $neutral-5 !important; path { fill: $neutral-5 !important;} }
-	.neutral-6, .text-neutral-6 { color: $neutral-6 !important; path { fill: $neutral-6 !important;} }
-	.neutral-7, .text-neutral-7 { color: $neutral-7 !important; path { fill: $neutral-7 !important;} }
-	.neutral-8, .text-neutral-8 { color: $neutral-8 !important; path { fill: $neutral-8 !important;} }
-	.neutral-9, .text-neutral-9 { color: $neutral-9 !important; path { fill: $neutral-9 !important;} }
-	.neutral-10, .text-neutral-10 { color: $neutral-10 !important; path { fill: $neutral-10 !important;} }
-	.neutral-11, .text-neutral-11 { color: $neutral-11 !important; path { fill: $neutral-11 !important;} }
+	.neutral-1,
+	.text-neutral-1 {
+		color: $neutral-1 !important;
+		path {
+			fill: $neutral-1 !important;
+		}
+	}
+	.neutral-2,
+	.text-neutral-2 {
+		color: $neutral-2 !important;
+		path {
+			fill: $neutral-2 !important;
+		}
+	}
+	.neutral-3,
+	.text-neutral-3 {
+		color: $neutral-3 !important;
+		path {
+			fill: $neutral-3 !important;
+		}
+	}
+	.neutral-4,
+	.text-neutral-4 {
+		color: $neutral-4 !important;
+		path {
+			fill: $neutral-4 !important;
+		}
+	}
+	.neutral-5,
+	.text-neutral-5 {
+		color: $neutral-5 !important;
+		path {
+			fill: $neutral-5 !important;
+		}
+	}
+	.neutral-6,
+	.text-neutral-6 {
+		color: $neutral-6 !important;
+		path {
+			fill: $neutral-6 !important;
+		}
+	}
+	.neutral-7,
+	.text-neutral-7 {
+		color: $neutral-7 !important;
+		path {
+			fill: $neutral-7 !important;
+		}
+	}
+	.neutral-8,
+	.text-neutral-8 {
+		color: $neutral-8 !important;
+		path {
+			fill: $neutral-8 !important;
+		}
+	}
+	.neutral-9,
+	.text-neutral-9 {
+		color: $neutral-9 !important;
+		path {
+			fill: $neutral-9 !important;
+		}
+	}
+	.neutral-10,
+	.text-neutral-10 {
+		color: $neutral-10 !important;
+		path {
+			fill: $neutral-10 !important;
+		}
+	}
+	.neutral-11,
+	.text-neutral-11 {
+		color: $neutral-11 !important;
+		path {
+			fill: $neutral-11 !important;
+		}
+	}
 
-	.green { color: $green !important; path { fill: $green !important;} }
-	.blue { color: $blue!important; path { fill: $blue!important;} }
-	.red { color: $red !important; path { fill: $red !important;} }
-	.black { color: $black !important; path { fill: $black !important;} }
-	.patreon-red { color: $patreon-red !important; path { fill: $patreon-red !important;} }
-	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
-	.orange { color: $orange !important; path { fill: $orange !important;} }
-	.yellow { color: $yellow !important; path { fill: $yellow !important;} }
-	.purple { color: $purple !important; path { fill: $purple !important;} }
-	.blue-light { color: $blue-light !important; path { fill: $blue-light !important;} }
-	.facebook-blue { color: $facebook-blue !important; path { fill: $facebook-blue !important;} }
-	.green-light { color: $green-light !important; path { fill: $green-light !important;} }
-	.orange-light { color: $orange-light !important; path { fill: $orange-light !important;} }
-	.red-light { color: $red-light !important; path { fill: $red-light !important;} }
-	.yellow-light { color: $yellow-light !important; path { fill: $yellow-light !important;} }
+	.green {
+		color: $green !important;
+		path {
+			fill: $green !important;
+		}
+	}
+	.blue {
+		color: $blue !important;
+		path {
+			fill: $blue !important;
+		}
+	}
+	.red {
+		color: $red !important;
+		path {
+			fill: $red !important;
+		}
+	}
+	.black {
+		color: $black !important;
+		path {
+			fill: $black !important;
+		}
+	}
+	.patreon-red {
+		color: $patreon-red !important;
+		path {
+			fill: $patreon-red !important;
+		}
+	}
+	.discord-purple {
+		color: $discord-purple !important;
+		path {
+			fill: $discord-purple !important;
+		}
+	}
+	.orange {
+		color: $orange !important;
+		path {
+			fill: $orange !important;
+		}
+	}
+	.yellow {
+		color: $yellow !important;
+		path {
+			fill: $yellow !important;
+		}
+	}
+	.purple {
+		color: $purple !important;
+		path {
+			fill: $purple !important;
+		}
+	}
+	.blue-light {
+		color: $blue-light !important;
+		path {
+			fill: $blue-light !important;
+		}
+	}
+	.facebook-blue {
+		color: $facebook-blue !important;
+		path {
+			fill: $facebook-blue !important;
+		}
+	}
+	.green-light {
+		color: $green-light !important;
+		path {
+			fill: $green-light !important;
+		}
+	}
+	.orange-light {
+		color: $orange-light !important;
+		path {
+			fill: $orange-light !important;
+		}
+	}
+	.red-light {
+		color: $red-light !important;
+		path {
+			fill: $red-light !important;
+		}
+	}
+	.yellow-light {
+		color: $yellow-light !important;
+		path {
+			fill: $yellow-light !important;
+		}
+	}
 
-	.copper { color: $copper !important; fill: $copper !important; }
-	.silver { color: $silver !important; fill: $silver !important; }
-	.electrum { color: $electrum !important; fill: $electrum !important; }
-	.gold { color: $gold !important; fill: $gold !important; }
-	.platinum { color: $platinum !important; fill: $platinum !important; }
+	.copper {
+		color: $copper !important;
+		fill: $copper !important;
+	}
+	.silver {
+		color: $silver !important;
+		fill: $silver !important;
+	}
+	.electrum {
+		color: $electrum !important;
+		fill: $electrum !important;
+	}
+	.gold {
+		color: $gold !important;
+		fill: $gold !important;
+	}
+	.platinum {
+		color: $platinum !important;
+		fill: $platinum !important;
+	}
 
-	.bg-neutral-1 { background-color: $neutral-1 !important; }
-	.bg-neutral-2 { background-color: $neutral-2 !important; }
-	.bg-neutral-3 { background-color: $neutral-3 !important; }
-	.bg-neutral-4 { background-color: $neutral-4 !important; }
-	.bg-neutral-5 { background-color: $neutral-5 !important; }
+	.bg-neutral-1 {
+		background-color: $neutral-1 !important;
+	}
+	.bg-neutral-2 {
+		background-color: $neutral-2 !important;
+	}
+	.bg-neutral-3 {
+		background-color: $neutral-3 !important;
+	}
+	.bg-neutral-4 {
+		background-color: $neutral-4 !important;
+	}
+	.bg-neutral-5 {
+		background-color: $neutral-5 !important;
+	}
 	.bg-neutral-6 {
 		background-color: $neutral-6 !important;
 
@@ -176,45 +347,114 @@ html body {
 			background-color: $neutral-6-transparent !important;
 		}
 	}
-	.bg-neutral-7 { background-color: $neutral-7 !important; }
-	.bg-neutral-8 { background-color: $neutral-8 !important; }
-	.bg-neutral-9 { background-color: $neutral-9 !important; }
-	.bg-neutral-10 { background-color: $neutral-10 !important; }
-	.bg-neutral-11 { background-color: $neutral-11 !important; }
+	.bg-neutral-7 {
+		background-color: $neutral-7 !important;
+	}
+	.bg-neutral-8 {
+		background-color: $neutral-8 !important;
+	}
+	.bg-neutral-9 {
+		background-color: $neutral-9 !important;
+	}
+	.bg-neutral-10 {
+		background-color: $neutral-10 !important;
+	}
+	.bg-neutral-11 {
+		background-color: $neutral-11 !important;
+	}
 
-	.bg-white { background-color: $white !important; }
-	.bg-black { background-color: $black !important; }
-	.bg-none { background: none !important; }
+	.bg-white {
+		background-color: $white !important;
+	}
+	.bg-black {
+		background-color: $black !important;
+	}
+	.bg-none {
+		background: none !important;
+	}
 
-	.bg-green { background-color: $green !important; }
-	.bg-blue { background-color: $blue !important; }
-	.bg-red { background-color: $red !important; }
-	.bg-patreon-red { background-color: $patreon-red !important; }
-	.bg-orange { background-color: $orange !important; }
-	.bg-yellow { background-color: $yellow !important; }
-	.bg-purple { background-color: $purple !important; }
-	.bg-discord-purple { background-color: $discord-purple !important; }
-	.bg-blue-light { background-color: $blue-light !important; }
-	.bg-green-light { background-color: $green-light !important; }
-	.bg-orange-light { background-color: $orange-light !important; }
-	.bg-red-light { background-color: $red-light !important; }
-	.bg-yellow-light { background-color: $yellow-light !important; }
+	.bg-green {
+		background-color: $green !important;
+	}
+	.bg-blue {
+		background-color: $blue !important;
+	}
+	.bg-red {
+		background-color: $red !important;
+	}
+	.bg-patreon-red {
+		background-color: $patreon-red !important;
+	}
+	.bg-orange {
+		background-color: $orange !important;
+	}
+	.bg-yellow {
+		background-color: $yellow !important;
+	}
+	.bg-purple {
+		background-color: $purple !important;
+	}
+	.bg-discord-purple {
+		background-color: $discord-purple !important;
+	}
+	.bg-blue-light {
+		background-color: $blue-light !important;
+	}
+	.bg-green-light {
+		background-color: $green-light !important;
+	}
+	.bg-orange-light {
+		background-color: $orange-light !important;
+	}
+	.bg-red-light {
+		background-color: $red-light !important;
+	}
+	.bg-yellow-light {
+		background-color: $yellow-light !important;
+	}
 
-
-	.healing { color: $green; }
-	.acid { color: $acid; }
-	.bludgeoning { color: $bludgeoning; }
-	.cold { color: $cold; }
-	.fire { color: $fire; }
-	.force{ color: $force; }
-	.lightning { color: $lightning; }
-	.necrotic { color: $necrotic; }
-	.piercing { color: $piercing; }
-	.poison { color: $poison; }
-	.psychic { color: $psychic; }
-	.radiant { color: $radiant; }
-	.slashing { color: $slashing; }
-	.thunder { color: $thunder; }
+	.healing {
+		color: $green;
+	}
+	.acid {
+		color: $acid;
+	}
+	.bludgeoning {
+		color: $bludgeoning;
+	}
+	.cold {
+		color: $cold;
+	}
+	.fire {
+		color: $fire;
+	}
+	.force {
+		color: $force;
+	}
+	.lightning {
+		color: $lightning;
+	}
+	.necrotic {
+		color: $necrotic;
+	}
+	.piercing {
+		color: $piercing;
+	}
+	.poison {
+		color: $poison;
+	}
+	.psychic {
+		color: $psychic;
+	}
+	.radiant {
+		color: $radiant;
+	}
+	.slashing {
+		color: $slashing;
+	}
+	.thunder {
+		color: $thunder;
+	}
 
 	.border-radius {
 		border-radius: $border-radius;
@@ -282,7 +522,8 @@ html body {
 		&-5 {
 			margin: 3rem !important;
 		}
-		&b, &y {
+		&b,
+		&y {
 			&-0 {
 				margin-bottom: 0 !important;
 			}
@@ -302,7 +543,8 @@ html body {
 				margin-bottom: 3rem !important;
 			}
 		}
-		&t, &y {
+		&t,
+		&y {
 			&-0 {
 				margin-top: 0 !important;
 			}
@@ -322,7 +564,8 @@ html body {
 				margin-top: 3rem !important;
 			}
 		}
-		&l, &x {
+		&l,
+		&x {
 			&-0 {
 				margin-left: 0 !important;
 			}
@@ -342,7 +585,8 @@ html body {
 				margin-left: 3rem !important;
 			}
 		}
-		&r, &x {
+		&r,
+		&x {
 			&-0 {
 				margin-right: 0 !important;
 			}
@@ -384,7 +628,8 @@ html body {
 		&-5 {
 			padding: 3rem !important;
 		}
-		&b, &y {
+		&b,
+		&y {
 			&-0 {
 				padding-bottom: 0 !important;
 			}
@@ -404,7 +649,8 @@ html body {
 				padding-bottom: 3rem !important;
 			}
 		}
-		&t, &y {
+		&t,
+		&y {
 			&-0 {
 				padding-top: 0 !important;
 			}
@@ -424,7 +670,8 @@ html body {
 				padding-top: 3rem !important;
 			}
 		}
-		&l, &x {
+		&l,
+		&x {
 			&-0 {
 				padding-left: 0 !important;
 			}
@@ -444,7 +691,8 @@ html body {
 				padding-left: 3rem !important;
 			}
 		}
-		&r, &x {
+		&r,
+		&x {
 			&-0 {
 				padding-right: 0 !important;
 			}
@@ -580,13 +828,16 @@ html body {
 	}
 
 	.saved {
-		animation: fadeout .3s linear;
+		animation: fadeout 0.3s linear;
 		animation-delay: 2s;
 	}
 
 	.flip-clock {
 		.flip-card {
-			&__top, &__bottom, &__back, &__back-bottom {
+			&__top,
+			&__bottom,
+			&__back,
+			&__back-bottom {
 				color: $blue !important;
 
 				&:before {
@@ -598,7 +849,7 @@ html body {
 
 	.disabled {
 		cursor: forbidden !important;
-		opacity: .5 !important;
+		opacity: 0.5 !important;
 	}
 
 	.content-count {
@@ -615,7 +866,9 @@ html body {
 		}
 	}
 
-	.invert { filter: invert(1); }
+	.invert {
+		filter: invert(1);
+	}
 
 	.pointer {
 		cursor: pointer !important;
@@ -692,7 +945,6 @@ html body {
 	.scrollable-content {
 		height: calc(100vh - #{$header-height});
 
-
 		&::-webkit-scrollbar {
 			display: none;
 		}
@@ -741,7 +993,7 @@ html body {
 		.video {
 			.animated-video {
 				margin-left: -2%;
-				transform:scale(1.8);
+				transform: scale(1.8);
 			}
 			.video-controls {
 				width: 100%;
@@ -827,7 +1079,8 @@ html body {
 		margin-top: 5px;
 		font-size: 11px;
 	}
-	.error, .error:focus {
+	.error,
+	.error:focus {
 		border-color: $red !important;
 	}
 
@@ -838,8 +1091,8 @@ html body {
 		color: $neutral-2;
 
 		&:before {
-			content: "";
-			background-image: url("../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+			content: '';
+			background-image: url('../assets/_img/logo/logo-icon-no-shield-cyan.svg');
 			background-size: cover;
 			box-sizing: border-box;
 			position: absolute;
@@ -850,8 +1103,8 @@ html body {
 		}
 		&:after {
 			display: inline-block;
-			animation: ellipsis steps(1,end) 1s infinite;
-			content: "";
+			animation: ellipsis steps(1, end) 1s infinite;
+			content: '';
 		}
 	}
 
@@ -872,7 +1125,7 @@ html body {
 		text-transform: uppercase;
 
 		&::before {
-			content: "";
+			content: '';
 			background-color: $neutral-1;
 			display: inline-block;
 			height: 10px;
@@ -896,7 +1149,7 @@ html body {
 			}
 		}
 		&.disabled {
-			opacity: .8;
+			opacity: 0.8;
 			cursor: not-allowed !important;
 		}
 	}
@@ -904,7 +1157,7 @@ html body {
 	.grow {
 		&:hover {
 			animation-name: grow;
-			animation-duration: .5s;
+			animation-duration: 0.5s;
 		}
 	}
 
@@ -917,41 +1170,71 @@ html body {
 		margin-left: 5px;
 	}
 
-
-
 	/* 4. Animations */
 	/*********************************************/
 	@keyframes spinit {
-		0% { top: 0em; }
-		50% { top: -5em; }
-		100% { top: -9em; }
+		0% {
+			top: 0em;
+		}
+		50% {
+			top: -5em;
+		}
+		100% {
+			top: -9em;
+		}
 	}
 
 	@keyframes grow {
-		0% { width: 0; }
-		100% { width: 100%; }
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 100%;
+		}
 	}
 	@keyframes spinner {
-		0% { transform: rotate(0deg); }
-		100% { transform: rotate(360deg); }
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
 	}
 	@keyframes fadeinout {
-		0%,100% { opacity: 0; }
-		50% { opacity: 1; }
+		0%,
+		100% {
+			opacity: 0;
+		}
+		50% {
+			opacity: 1;
+		}
 	}
 	@keyframes fadeout {
-		0% { opacity: 1; }
-		100% { opacity: 0; }
+		0% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+		}
 	}
 
 	@keyframes ellipsis {
-		0%   { content: ''; }
-		25%  { content: '.'; }
-		50%  { content: '..'; }
-		75%  { content: '...'; }
-		100% { content: ''; }
-}
-
+		0% {
+			content: '';
+		}
+		25% {
+			content: '.';
+		}
+		50% {
+			content: '..';
+		}
+		75% {
+			content: '...';
+		}
+		100% {
+			content: '';
+		}
+	}
 
 	/* 4. Buttons and Links */
 	/*********************************************/
@@ -979,17 +1262,16 @@ html body {
 		padding: 0.375rem 0.75rem;
 		font-size: 1rem;
 		line-height: 1.5;
-		transition:
-			color 0.15s ease-in-out,
-			background-color 0.15s ease-in-out;
+		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 
-		&:focus, &.active {
+		&:focus,
+		&.active {
 			outline: none;
 			box-shadow: none;
 		}
 		&.disabled {
 			cursor: not-allowed;
-			opacity: .3;
+			opacity: 0.3;
 			color: $neutral-1;
 		}
 		&:hover {
@@ -1018,14 +1300,30 @@ html body {
 				background-color: $neutral-5 !important;
 			}
 		}
-		&.bg-green:hover { background-color: $green-hover !important; }
-		&.bg-red:hover { background-color: $red-hover !important; }
-		&.bg-neutral-4:hover { background-color: $neutral-3 !important; }
-		&.bg-neutral-5:hover { background-color: $neutral-4 !important; }
-		&.bg-neutral-6:hover { background-color: $neutral-5 !important; }
-		&.bg-neutral-7:hover { background-color: $neutral-6 !important; }
-		&.bg-neutral-8:hover { background-color: $neutral-7 !important; }
-		&.bg-neutral-9:hover { background-color: $neutral-8 !important; }
+		&.bg-green:hover {
+			background-color: $green-hover !important;
+		}
+		&.bg-red:hover {
+			background-color: $red-hover !important;
+		}
+		&.bg-neutral-4:hover {
+			background-color: $neutral-3 !important;
+		}
+		&.bg-neutral-5:hover {
+			background-color: $neutral-4 !important;
+		}
+		&.bg-neutral-6:hover {
+			background-color: $neutral-5 !important;
+		}
+		&.bg-neutral-7:hover {
+			background-color: $neutral-6 !important;
+		}
+		&.bg-neutral-8:hover {
+			background-color: $neutral-7 !important;
+		}
+		&.bg-neutral-9:hover {
+			background-color: $neutral-8 !important;
+		}
 
 		&.btn-square {
 			border-radius: 0;
@@ -1041,7 +1339,6 @@ html body {
 			color: $blue !important;
 		}
 	}
-
 
 	/* 5. Components*/
 	/*********************************************/
@@ -1073,7 +1370,8 @@ html body {
 			box-shadow: 5px 5px 10px #000;
 			border-radius: $border-radius;
 
-			h1, h2 {
+			h1,
+			h2 {
 				text-transform: none !important;
 				text-align: center;
 				margin-bottom: 20px;
@@ -1106,8 +1404,8 @@ html body {
 		border: solid 1px $google-blue;
 
 		&::before {
-			content: "";
-			background-image: url("../assets/_img/styles/google.png");
+			content: '';
+			background-image: url('../assets/_img/styles/google.png');
 			background-color: $white;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -1156,7 +1454,7 @@ html body {
 		margin-bottom: 20px;
 		border-radius: $border-radius;
 		overflow: auto;
-		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, .125), 0 6px 2px 0 rgba(0, 0, 0, .1);
+		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.125), 0 6px 2px 0 rgba(0, 0, 0, 0.1);
 		border: solid 1px $neutral-5;
 
 		&::-webkit-scrollbar {
@@ -1178,9 +1476,11 @@ html body {
 				&:hover {
 					background-color: $neutral-4;
 				}
-				transition: background-color .2s linear;
+				transition: background-color 0.2s linear;
 			}
-			h1, h2, h3 {
+			h1,
+			h2,
+			h3 {
 				font-size: $font-size;
 				font-family: 'Open Sans', sans-serif;
 				line-height: normal;
@@ -1213,11 +1513,12 @@ html body {
 			box-shadow: inset 0 -5px 25px rgba(0, 0, 0, 1);
 			padding: 10px;
 
-			h2, .image-title {
+			h2,
+			.image-title {
 				font-size: 20px;
 				text-align: center;
 				font-family: unset;
-				opacity: .8;
+				opacity: 0.8;
 				text-shadow: 0 0 3px $black;
 			}
 			.link {
@@ -1225,7 +1526,7 @@ html body {
 				bottom: 10px;
 				left: 10px;
 				font-size: 12px;
-				opacity: .5;
+				opacity: 0.5;
 
 				&:hover {
 					opacity: 1;
@@ -1268,7 +1569,7 @@ html body {
 			}
 			.card-header {
 				font-size: 15px;
-				padding: 0.50rem 1rem;
+				padding: 0.5rem 1rem;
 				min-height: 52px;
 			}
 		}
@@ -1297,7 +1598,7 @@ html body {
 	/* HK ROLLS */
 	.hk-roll {
 		&.disabled {
-			opacity: .5;
+			opacity: 0.5;
 			cursor: not-allowed;
 		}
 	}
@@ -1330,7 +1631,6 @@ html body {
 		}
 	}
 
-
 	// In character creator -> class -> xp dialog
 	.handle-xp {
 		display: flex;
@@ -1354,7 +1654,6 @@ html body {
 
 	/* HK TABLE */
 	.hk-table {
-
 		&-column {
 			background: $neutral-8;
 
@@ -1420,8 +1719,8 @@ html body {
 		grid-template-columns: auto;
 		grid-template-rows: 40px auto;
 		grid-template-areas:
-		"hide"
-		"content";
+			'hide'
+			'content';
 
 		a.hide {
 			grid-area: hide;
@@ -1451,7 +1750,8 @@ html body {
 		}
 
 		.hk-table {
-			.hk-table-column, .hk-collapsed-column {
+			.hk-table-column,
+			.hk-collapsed-column {
 				background: $neutral-9;
 
 				&.hk-table-header {
@@ -1481,10 +1781,11 @@ html body {
 				&:hover {
 					background-color: $neutral-7;
 				}
-				transition: background-color .2s linear;
+				transition: background-color 0.2s linear;
 			}
 		}
-		table, .table {
+		table,
+		.table {
 			tr {
 				td {
 					background-color: $neutral-8;
@@ -1493,7 +1794,8 @@ html body {
 		}
 	}
 
-	table.table, table {
+	table.table,
+	table {
 		border-collapse: separate !important;
 		border-spacing: 0 1px;
 		width: 100%;
@@ -1551,12 +1853,14 @@ html body {
 						text-align: center;
 					}
 					&.actions {
-						router-link, a, .disabled {
+						router-link,
+						a,
+						.disabled {
 							font-size: 15px;
 							line-height: 0px;
 						}
 						.disabled {
-							opacity: .3;
+							opacity: 0.3;
 						}
 					}
 
@@ -1603,7 +1907,8 @@ html body {
 		}
 		&.table-sm {
 			font-size: 13px;
-			td, th {
+			td,
+			th {
 				padding: 5px;
 			}
 		}
@@ -1637,7 +1942,9 @@ html body {
 		&.hasInitiative {
 			grid-template-columns: 35px 35px 35px 1fr;
 		}
-		.initiative, .ac, .img {
+		.initiative,
+		.ac,
+		.img {
 			text-align: center;
 			height: 35px;
 		}
@@ -1645,7 +1952,8 @@ html body {
 			position: relative;
 			cursor: pointer;
 
-			i, .ac {
+			i,
+			.ac {
 				position: absolute;
 				line-height: 35px;
 				width: 100%;
@@ -1674,7 +1982,8 @@ html body {
 			overflow: hidden;
 			border: solid 1px transparent;
 
-			[class^="hki-"], [class*=" hki-"] {
+			[class^='hki-'],
+			[class*=' hki-'] {
 				font-size: 28px;
 				margin-left: -1px;
 			}
@@ -1711,7 +2020,8 @@ html body {
 				}
 
 				.hp {
-					.health, .temp {
+					.health,
+					.temp {
 						text-align: right;
 						cursor: pointer;
 						border-radius: $border-radius-small;
@@ -1721,7 +2031,7 @@ html body {
 							font-weight: bold;
 						}
 						.max {
-							opacity: .8;
+							opacity: 0.8;
 						}
 					}
 					.save {
@@ -1747,7 +2057,7 @@ html body {
 			margin-right: 5px;
 
 			&:last-child {
-					margin-right: 0;
+				margin-right: 0;
 			}
 		}
 		.q-field {
@@ -1850,7 +2160,7 @@ html body {
 	// Q-INPUT FIELDS
 	.manual-input {
 		height: 110px;
-		font-size:50px;
+		font-size: 50px;
 
 		.q-field {
 			height: 90px;
@@ -1874,7 +2184,6 @@ html body {
 			}
 		}
 	}
-
 
 	//VIEW MONSTER
 	.q-table {
@@ -1955,7 +2264,6 @@ html body {
 	}
 
 	@media only screen and (max-width: 575px) {
-
 		table tr td .actions {
 			display: none !important;
 			background-color: $neutral-9;
@@ -1971,7 +2279,9 @@ html body {
 	.snotifyToast {
 		border-radius: $border-radius !important;
 	}
-	.snotify-leftTop, .snotify-centerTop, .snotify-rightTop {
+	.snotify-leftTop,
+	.snotify-centerTop,
+	.snotify-rightTop {
 		top: 60px !important;
 	}
 
@@ -2070,10 +2380,11 @@ html body {
 							line-height: 50px;
 							font-weight: bold;
 						}
-						.top, .bottom {
+						.top,
+						.bottom {
 							font-size: 15px;
 							height: 20px;
-							line-height: 20px;;
+							line-height: 20px;
 						}
 						.advantage {
 							position: absolute;
@@ -2153,7 +2464,8 @@ html body {
 	/*********************************************/
 
 	// Remove arrows from number field
-	input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']::-webkit-inner-spin-button {
 		-webkit-appearance: none;
 		margin: 0;
 	}
@@ -2236,7 +2548,7 @@ html body {
 		.q-table__top,
 		.q-table__bottom,
 		thead tr:first-child th {
-				background-color: $neutral-6;
+			background-color: $neutral-6;
 		}
 
 		thead tr th {
@@ -2270,16 +2582,12 @@ html body {
 		color: $neutral-1;
 	}
 
-
 	.q-notification {
 		border-radius: $border-radius;
 	}
 	.q-notifications__list--top {
 		top: 120px;
 	}
-
-
-
 
 	//RESPONSIVENESS
 	/*-----------------------------------*/
@@ -2331,10 +2639,10 @@ html body {
 						white-space: nowrap;
 
 						:not(:first-child):not(:last-child) {
-							 &.flex {
-								 overflow: hidden;
-								 text-overflow: ellipsis;
-							 }
+							&.flex {
+								overflow: hidden;
+								text-overflow: ellipsis;
+							}
 						}
 					}
 				}

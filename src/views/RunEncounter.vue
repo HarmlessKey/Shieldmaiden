@@ -1,6 +1,6 @@
 <template>
 	<q-no-ssr v-if="!loading && encounter_initialized">
-		<div v-if="overencumbered && demo">
+		<div v-if="overencumbered && !demo">
 			<OverEncumbered/>
 		</div>
 		<div

@@ -134,7 +134,7 @@
                               v-for="i in [0, 1]" :key="`${i}-verstile-roll`"
                               :tooltip="`${action.name} (${getVersatile(action, i)})`"
                               tooltipPosition="right"
-                              @roll="roll($event, acion_index, action, type, i)"
+                              @roll="roll($event, action_index, action, type, i)"
                               :disabled="!checkAvailable(type, action_index, action)"
                             >
                               <q-item clickable v-close-popup>

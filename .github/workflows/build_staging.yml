@@ -5,32 +5,30 @@ name: Deploy Staging
 
 on:
   push:
-    branches: [ develop ]
+    branches: [develop]
   pull_request:
-    branches: [ develop ]
+    branches: [develop]
   workflow_dispatch:
-
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Node.js 12
+      - name: Setup Node.js 16
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '16'
           cache: 'npm'
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
 
       - name: Create env file
         run: |
-            cat << EOF >> .env.production.local
-            ${{ secrets.STAGING_ENV_FILE }}
-            EOF
+          cat << EOF >> .env.production.local
+          ${{ secrets.STAGING_ENV_FILE }}
+          EOF
 
       # - run: npm run build in debug mode --if-present
       - run: quasar build -m ssr -d --if-present
@@ -60,4 +58,3 @@ jobs:
           context: .
           push: true
           tags: harmlesskey/harmlesskey_staging
-

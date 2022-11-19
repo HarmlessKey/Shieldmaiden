@@ -1,4 +1,4 @@
-[data-theme="light"] {
+[data-theme='light'] {
 	body {
 		background: $neutral-10;
 
@@ -12,7 +12,8 @@
 					color: $neutral-11;
 				}
 			}
-			&.bg-neutral-8, &.bg-neutral-9 {
+			&.bg-neutral-8,
+			&.bg-neutral-9 {
 				color: $neutral-2;
 			}
 		}
@@ -28,7 +29,7 @@
 				background-color: $neutral-11;
 			}
 
-			&.active {	
+			&.active {
 				&::before {
 					background-color: $neutral-11;
 				}

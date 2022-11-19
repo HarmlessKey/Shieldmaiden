@@ -1,98 +1,97 @@
 :root {
-  color-scheme: dark;
-  --neutral-11: #080808; // custom
-  --neutral-10: #191a1c; //custom
-  --neutral-9: #202225; // Server sidebar
-  --neutral-8: #292B2F; // Sidebar Bottom
-  --neutral-7: #2F3136; // Sidebar
-  --neutral-6: #36393F; // Main background
-  --neutral-5: #3E4249;
-  --neutral-4: #72767D; // Sidebar icon
-  --neutral-3: #8E9297; // Sidebar text
-  --neutral-2: #B9BBBE; // Icons header
-  --neutral-1: #FFFFFF; // Text
+	color-scheme: dark;
+	--neutral-11: #080808; // custom
+	--neutral-10: #191a1c; //custom
+	--neutral-9: #202225; // Server sidebar
+	--neutral-8: #292b2f; // Sidebar Bottom
+	--neutral-7: #2f3136; // Sidebar
+	--neutral-6: #36393f; // Main background
+	--neutral-5: #3e4249;
+	--neutral-4: #72767d; // Sidebar icon
+	--neutral-3: #8e9297; // Sidebar text
+	--neutral-2: #b9bbbe; // Icons header
+	--neutral-1: #ffffff; // Text
 
-  --neutral-6-transparent: rgba(54, 57, 63, .9);
-  --neutral-6-transparent-8: rgba(54, 57, 63, .8);
-  --neutral-6-transparent-7: rgba(54, 57, 63, .7);
+	--neutral-6-transparent: rgba(54, 57, 63, 0.9);
+	--neutral-6-transparent-8: rgba(54, 57, 63, 0.8);
+	--neutral-6-transparent-7: rgba(54, 57, 63, 0.7);
 
-  --neutral-8-transparent: rgba(41, 43, 47, .9);
-  --neutral-8-transparent-8: rgba(41, 43, 47, .8);
+	--neutral-8-transparent: rgba(41, 43, 47, 0.9);
+	--neutral-8-transparent-8: rgba(41, 43, 47, 0.8);
 
-  --black: #000;
-  --white: #FFF;
+	--black: #000;
+	--white: #fff;
 
-  --green: #83b547;
-  --green-hover: #9ddb51;
-  --blue: #2c97de;
-  --blue-hover: #36a9f5;
-  --facebook-blue: #3C5A99;
-  --google-blue: #4285F4;
-  --red: #cc3e4a;
-  --red-hover: #e8414f;
-  --patreon-red: #e85b46;
-  --discord-purple: #7289DA;
-  --orange: #e76d3b;
-  --yellow: #c1b947;
-  --purple: #9b7aba;
-  --blue-light: #88b3ce;
-  --green-light: #9ac16a;
-  --orange-light: #db815e;
-  --red-light: #c45e66;
-  --yellow-light: #e2da5f;
+	--green: #83b547;
+	--green-hover: #9ddb51;
+	--blue: #2c97de;
+	--blue-hover: #36a9f5;
+	--facebook-blue: #3c5a99;
+	--google-blue: #4285f4;
+	--red: #cc3e4a;
+	--red-hover: #e8414f;
+	--patreon-red: #e85b46;
+	--discord-purple: #7289da;
+	--orange: #e76d3b;
+	--yellow: #c1b947;
+	--purple: #9b7aba;
+	--blue-light: #88b3ce;
+	--green-light: #9ac16a;
+	--orange-light: #db815e;
+	--red-light: #c45e66;
+	--yellow-light: #e2da5f;
 
-  --copper: #e76d3b;
-  --silver: #dbdbdb;
-  --electrum: #a2bade;
-  --gold: #e2da5f;
-  --platinum: #fff;
+	--copper: #e76d3b;
+	--silver: #dbdbdb;
+	--electrum: #a2bade;
+	--gold: #e2da5f;
+	--platinum: #fff;
 
-  //damage type colors
-  --acid: #83b547;
-  --bludgeoning: #72767D;
-  --cold: #3b93ce;
-  --fire:  #e63f21;
-  --force:  #772caa;
-  --lightning:  #88b3ce;
-  --necrotic:  #614c75;
-  --piercing:  #72767D;
-  --poison:  #83b547;
-  --psychic:  #e63f21;
-  --radiant:  #e2da5f;
-  --slashing:  #72767D;
-  --thunder:  #e63f21;
+	//damage type colors
+	--acid: #83b547;
+	--bludgeoning: #72767d;
+	--cold: #3b93ce;
+	--fire: #e63f21;
+	--force: #772caa;
+	--lightning: #88b3ce;
+	--necrotic: #614c75;
+	--piercing: #72767d;
+	--poison: #83b547;
+	--psychic: #e63f21;
+	--radiant: #e2da5f;
+	--slashing: #72767d;
+	--thunder: #e63f21;
 
-  // Styling
-  --font-size: 15px;
-  --header-height: 50px;
-  --border-radius: 4px;
-  --border-radius-small: 3px;
-
+	// Styling
+	--font-size: 15px;
+	--header-height: 50px;
+	--border-radius: 4px;
+	--border-radius-small: 3px;
 }
 
 // Possible light theme
-[data-theme="light"] {
-  color-scheme: light;
-  --neutral-11: #FFFFFF;
-  --neutral-10: #eeeeee;
-  --neutral-9: #e3e5e8;
-  --neutral-8: #dcdee0;
-  --neutral-7: #f2f3f5;
-  --neutral-6: #FFFFFF;
-  --neutral-5: #9ea5b1;
-  --neutral-4: #747f8d;
-  --neutral-3: #6a7480;
-  --neutral-2: #4f5660;
-  --neutral-1: #060607;
+[data-theme='light'] {
+	color-scheme: light;
+	--neutral-11: #ffffff;
+	--neutral-10: #eeeeee;
+	--neutral-9: #e3e5e8;
+	--neutral-8: #dcdee0;
+	--neutral-7: #f2f3f5;
+	--neutral-6: #ffffff;
+	--neutral-5: #9ea5b1;
+	--neutral-4: #747f8d;
+	--neutral-3: #6a7480;
+	--neutral-2: #4f5660;
+	--neutral-1: #060607;
 
-  --neutral-6-transparent: rgba(255, 255, 255, .9);
-  --neutral-6-transparent-8: rgba(255, 255, 255, .8);
-  --neutral-6-transparent-7: rgba(255, 255, 255, .7);
+	--neutral-6-transparent: rgba(255, 255, 255, 0.9);
+	--neutral-6-transparent-8: rgba(255, 255, 255, 0.8);
+	--neutral-6-transparent-7: rgba(255, 255, 255, 0.7);
 
-  --neutral-8-transparent: rgba(220, 222, 224, .9);
-  --neutral-8-transparent-8: rgba(220, 222, 224, .8);
+	--neutral-8-transparent: rgba(220, 222, 224, 0.9);
+	--neutral-8-transparent-8: rgba(220, 222, 224, 0.8);
 
-  --radiant:  #e2da5f;
+	--radiant: #e2da5f;
 }
 
 /* 1. Variables */
@@ -148,16 +147,16 @@ $platinum: var(--platinum);
 $acid: var(--acid);
 $bludgeoning: var(--bludgeoning);
 $cold: var(--cold);
-$fire:  var(--fire);
-$force:  var(--force);
-$lightning:  var(--lightning);
-$necrotic:  var(--necrotic);
-$piercing:  var(--piercing);
-$poison:  var(--poison);
-$psychic:  var(--psychic);
-$radiant:  var(--radiant);
-$slashing:  var(--slashing);
-$thunder:  var(--thunder);
+$fire: var(--fire);
+$force: var(--force);
+$lightning: var(--lightning);
+$necrotic: var(--necrotic);
+$piercing: var(--piercing);
+$poison: var(--poison);
+$psychic: var(--psychic);
+$radiant: var(--radiant);
+$slashing: var(--slashing);
+$thunder: var(--thunder);
 
 // Styling
 $font-size: var(--font-size);
@@ -165,7 +164,6 @@ $header-height: var(--header-height);
 $border-radius: var(--border-radius);
 $border-radius-small: var(--border-radius-small);
 $text-written: 'Fredericka the Great', cursive;
-
 
 // Breakpoints
 $sm-breakpoint: 576px;

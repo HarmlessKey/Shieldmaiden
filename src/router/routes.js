@@ -1018,14 +1018,22 @@ const routes = [
 		]
 	},
 	{
-		path: '/updates',
-		name: 'Updates',
-		component: Updates,
+		path: "/updates",
+		component: () => import("src/layouts/default"),
 		meta: {
-			offline: true,
-			title: "Updates",
-			description: "Follow update on Harmless Key, a Combat Tracker for D&D."
-		}
+			title: "Updates"
+		},
+		children: [
+			{
+				path: "",
+				name: "Updates",
+				component: () => import("src/views/Pages/Updates"),
+				meta: {
+					title: "Updates",
+					description: "Latest releases of D&D 5e Combat Tracker Harmless Key."
+				}
+			}
+		]
 	},
 	{
 		path: '/sign-in',

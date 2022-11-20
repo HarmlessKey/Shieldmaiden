@@ -1,25 +1,35 @@
 <template>
-	<div>
-		<div class="content">
+	<hk-card>
+		<div class="card-header" slot="header">
 			<h1>Updates</h1>
-			<p>Check the latest updates on our Discord.</p>
-
-			<a href="https://discord.gg/gCXJZCs" target="_blank" rel="noopener" class="btn btn-lg bg-discord-purple">
-			<i aria-hidden="true" class="fab fa-discord mr-2"/>
-				Harmless Key Discord
-			</a>
 		</div>
-		<Footer />
-	</div>
+		<hk-loader name="releases" v-if="loading" />
+		<div v-else class="card-body">
+			{{ releases }}
+		</div>
+	</hk-card>
 </template>
 
 <script>
-	import Footer from 'src/components/Footer.vue'
+	// import { Octokit } from "octokit";
+	// const octokit = new Octokit();
 
 	export default {
 		name: 'Updates',
-		components: {
-			Footer,
+		data() {
+			return {
+				loading: true,
+				releases: []
+			}
+		},
+		async mounted() {
+			// this.releases = await octokit.request('GET /repos/{owner}/{repo}/releases', {
+			// 	owner: 'HarmlessKey',
+			// 	repo: 'HarmlessKey'
+			// }).catch((e) => {
+			// 	console.log(e)
+			// });
+			// this.loading = false;
 		}
 	}
 </script>

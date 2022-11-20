@@ -29,7 +29,14 @@
 					"https://harmlesskey.com/compendium/conditions",
 					"https://harmlesskey.com/compendium/monsters",
 					"https://harmlesskey.com/compendium/spells",
-					"https://harmlesskey.com/compendium/items"
+					"https://harmlesskey.com/compendium/items",
+					"https://harmlesskey.com/tools",
+					"https://harmlesskey.com/tools/combat-tracker",
+					"https://harmlesskey.com/tools/encounter-builder",
+					"https://harmlesskey.com/tools/encounter-builder/build-encounter",
+					"https://harmlesskey.com/tools/monster-creator",
+					"https://harmlesskey.com/tools/monster-creator/create-monster",
+					"https://harmlesskey.com/tools/character-builder",
 				]
 			}
 		},

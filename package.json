@@ -16,6 +16,7 @@
 		"prepare": "husky install"
 	},
 	"dependencies": {
+		"@octokit/rest": "^19.0.5",
 		"@quasar/extras": "^1.0.0",
 		"ajv": "^8.10.0",
 		"ajv-formats": "^2.1.1",
@@ -30,7 +31,6 @@
 		"lodash": "^4.17.21",
 		"marked": "^4.0.16",
 		"morgan": "^1.10.0",
-		"octokit": "^2.0.10",
 		"quasar": "^1.0.0",
 		"sanitize-html": "^2.7.0",
 		"vee-validate": "^3.4.14",

@@ -12,7 +12,7 @@
 						<ul>
 							<li><router-link to="/compendium">Compendium</router-link></li>
 							<li><router-link to="/feedback">Feedback</router-link></li>
-							<li><router-link to="/updates">Updates</router-link></li>
+							<li><router-link to="/changelog">Changelog</router-link></li>
 							<li><router-link to="/documentation">Documentation</router-link></li>
 							<li><router-link to="/about-us">About us</router-link></li>
 						</ul>
@@ -27,22 +27,30 @@
 						<h2 class="neutral-2">Follow us</h2>
 						<ul>
 							<li>
-								<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">Patreon</a>
+								<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener"
+									>Patreon</a
+								>
 							</li>
 							<li>
 								<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a>
 							</li>
 							<li>
-								<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener">Instagram</a>
+								<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener"
+									>Instagram</a
+								>
 							</li>
 							<li>
 								<a href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">Twitter</a>
 							</li>
 							<li>
-								<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener">Facebook</a>
+								<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener"
+									>Facebook</a
+								>
 							</li>
 							<li>
-								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener">Reddit</a>
+								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener"
+									>Reddit</a
+								>
 							</li>
 						</ul>
 					</div>
@@ -77,114 +85,126 @@
 		<div class="bottom">
 			<div class="content">
 				<small class="d-flex justify-content-between mb-3">
-					<span>Icons made by Delapouite, Lorc and Skoll. Available on <a target="_blank" rel="noopener" href="https://game-icons.net">https://game-icons.net</a>.</span>
+					<span
+						>Icons made by Delapouite, Lorc and Skoll. Available on
+						<a target="_blank" rel="noopener" href="https://game-icons.net"
+							>https://game-icons.net</a
+						>.</span
+					>
 					<router-link to="/privacy-policy">Privacy Policy</router-link>
 				</small>
 				<small>
-					©{{ year }} Harmless Key | All Rights Reserved<br/>
-					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.<br/>
-					All content is provided under terms of the <a href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">Open Gaming License version 1.0a.</a>
+					©{{ year }} Harmless Key | All Rights Reserved<br />
+					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are
+					property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{
+						year
+					}}
+					Wizards.<br />
+					All content is provided under terms of the
+					<a
+						href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
+						target="_blank"
+						rel="noopener"
+						>Open Gaming License version 1.0a.</a
+					>
 				</small>
 			</div>
 		</div>
-
 	</div>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				user: this.$store.getters.user,
-				year: (new Date()).getFullYear(),
-			}
-		},
-		methods: {
-
-		}
-	};
+export default {
+	data() {
+		return {
+			user: this.$store.getters.user,
+			year: new Date().getFullYear(),
+		};
+	},
+	methods: {},
+};
 </script>
 
 <style lang="scss" scoped>
-	.footer {
-		background-color: $neutral-9;
+.footer {
+	background-color: $neutral-9;
 
-		.top {
-			.content {
-				padding-top: 30px;
-				display: flex;
-				justify-content: space-between;
-				flex-wrap: wrap;
+	.top {
+		.content {
+			padding-top: 30px;
+			display: flex;
+			justify-content: space-between;
+			flex-wrap: wrap;
 
-				.logo-container {
-					display: flex;
-					justify-content: flex-start;
-					height: 200px;
-	
-					.logo {
-						margin-top: -40px;
-						width: 250px;
-					}
-				}
-			}
-			.links {
+			.logo-container {
 				display: flex;
 				justify-content: flex-start;
-				flex-wrap: wrap;
+				height: 200px;
 
-				> div {
-					width: max-content;
-					padding-right: 20px;
+				.logo {
+					margin-top: -40px;
+					width: 250px;
+				}
+			}
+		}
+		.links {
+			display: flex;
+			justify-content: flex-start;
+			flex-wrap: wrap;
 
-					&:last-child {
-						padding: 0;
-					}
+			> div {
+				width: max-content;
+				padding-right: 20px;
 
-					ul {
-						padding: 0;
-						list-style: none;
-						margin: 0 0 30px 0;
+				&:last-child {
+					padding: 0;
+				}
 
-						a {
-							font-size: 12px;
-							color: $neutral-3;
-							text-transform: uppercase;
+				ul {
+					padding: 0;
+					list-style: none;
+					margin: 0 0 30px 0;
 
-							&:hover {
-								color: $neutral-1;
-							}
-							&.active {
-								font-weight: bold;
-								color: $neutral-1;
-							}
+					a {
+						font-size: 12px;
+						color: $neutral-3;
+						text-transform: uppercase;
+
+						&:hover {
+							color: $neutral-1;
+						}
+						&.active {
+							font-weight: bold;
+							color: $neutral-1;
 						}
 					}
 				}
 			}
-		
-			h2 {
-				font-weight: bold !important;
-				font-size: 13px !important;
-				line-height: 25px;
-				margin-bottom: 10px;
-			}
 		}
-		.bottom {
-			background-color: $neutral-10;
+
+		h2 {
+			font-weight: bold !important;
+			font-size: 13px !important;
+			line-height: 25px;
+			margin-bottom: 10px;
 		}
 	}
-	@media (max-width: 745px) {
-		.footer .top .content {
+	.bottom {
+		background-color: $neutral-10;
+	}
+}
+@media (max-width: 745px) {
+	.footer .top .content {
+		justify-content: center;
+
+		.links {
 			justify-content: center;
+			text-align: center;
 
-			.links {
-				justify-content: center;
-				text-align: center;
-
-				> div {
-					padding: 0 10px;
-				}
+			> div {
+				padding: 0 10px;
 			}
 		}
 	}
+}
 </style>

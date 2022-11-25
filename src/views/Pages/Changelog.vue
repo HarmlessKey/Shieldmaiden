@@ -1,7 +1,7 @@
 <template>
 	<hk-card>
 		<div class="card-header" slot="header">
-			<h1>Updates</h1>
+			<h1>Changelog</h1>
 		</div>
 		<hk-loader name="releases" v-if="loading" />
 		<div v-else class="card-body">
@@ -42,7 +42,7 @@ import { makeDate } from "src/utils/generalFunctions";
 const octokit = new Octokit();
 
 export default {
-	name: "Updates",
+	name: "Changelog",
 	data() {
 		return {
 			loading: true,

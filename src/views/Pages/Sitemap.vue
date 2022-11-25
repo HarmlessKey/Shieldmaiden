@@ -10,7 +10,7 @@
 			<li><router-link to="/sign-in">Sign In</router-link></li>
 			<li><router-link to="/documentation">Documentation</router-link></li>
 			<li><router-link to="/feedback">Feedback</router-link></li>
-			<li><router-link to="/updates">Updates</router-link></li>
+			<li><router-link to="/changelog">Changelog</router-link></li>
 			<li><router-link to="/planned">Planned</router-link></li>
 			<li><router-link to="/privacy-policy">Privacy Policy</router-link></li>
 			<li>
@@ -29,13 +29,19 @@
 					<li>
 						<router-link to="/tools/encounter-builder">Encounter Builder</router-link>
 						<ul>
-							<li><router-link to="/tools/encounter-builder/build-encounter">Build Encounter</router-link></li>
+							<li>
+								<router-link to="/tools/encounter-builder/build-encounter"
+									>Build Encounter</router-link
+								>
+							</li>
 						</ul>
 					</li>
 					<li>
 						<router-link to="/tools/monster-creator">Monster Creator</router-link>
 						<ul>
-							<li><router-link to="/tools/monster-creator/create-monster">Create Monster</router-link></li>
+							<li>
+								<router-link to="/tools/monster-creator/create-monster">Create Monster</router-link>
+							</li>
 						</ul>
 					</li>
 					<li><router-link to="/tools/character-builder">Character Builder</router-link></li>
@@ -46,8 +52,7 @@
 </template>
 
 <script>
-
-	export default {
-		name: 'Sitemap'
-	}
+export default {
+	name: "Sitemap",
+};
 </script>

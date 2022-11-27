@@ -1,9 +1,14 @@
 <template>
-	<div class="light" :class="(background && lightning && showWeather) ? `bg-white` : `bg-neutral-5`">
+	<div 
+		class="light" 
+		:class="(background && lightning && showWeather) ? `bg-white` : `bg-neutral-5`" 
+		:style="{ '--backgroundImage': 'url(\'' + background + '\')' }">
 		<div 
-			class="weather-wrapper" 
-			:style="{ backgroundImage: 'url(\'' + background + '\')' }"
-			:class="(lightning && showWeather) ? lightning : ''"
+			class="weather-wrapper" 		
+			:class="[
+				(lightning && showWeather) ? `lightning-${lightning}` : '',
+				(quake && showWeather) ? `quake-${quake}` : ''
+			]"
 		>
 			<template v-if="weather && showWeather">
 				<Fog v-if="weather.fog > 0" :intensity="weather.fog" :smoke="weather.smoke" :audio="audio" />
@@ -61,6 +66,13 @@ export default {
 				return intensities[index];	
 			} return undefined;
 		},
+		quake() {
+			if(this.weather && this.weather.quake > 0) {
+				const intensities = ["light", "medium", "heavy"];
+				const index = this.weather.quake - 1;
+				return intensities[index];	
+			} return undefined;
+		},
 		thunder_interval() {
 			if(this.weather && this.weather.lightning > 0) {
 				const intervals = [360000, 180000, 60000];
@@ -99,48 +111,126 @@ export default {
 			overflow: hidden;
 			width: 100%;
 			height: 100%;
-			background-size: cover;
-			background-position: center bottom;
-			animation: imagezoom 30s ease-in-out infinite;
+			position: relative;
 			animation-direction: alternate-reverse;
+			
+			&::before {
+				content: "";
+				width: 100%;
+				height: 100%;
+				left: 0;
+				top: 0;
+				background-image: var(--backgroundImage);
+				background-size: cover;
+				position: absolute;
+				background-repeat: no-repeat;
+				background-position: center bottom;
+			}
 
-			&.light {
-				animation: lightnings 360s linear infinite;
-				@keyframes lightnings {
-					0% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.87% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
-					0.93% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.99% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
-					1% { filter: brightness(1); opacity: 1; background-color: unset; }
-					100% { filter: brightness(1); opacity: 1; background-color: unset; }
+			&.lightning {
+				&-light {
+					animation: lightnings 360s linear infinite;
+					@keyframes lightnings {
+						0% { filter: brightness(1); opacity: 1; background-color: unset; }
+						0.87% { filter: brightness(1); opacity: 1; background-color: unset; }
+						0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
+						0.93% { filter: brightness(1); opacity: 1; background-color: unset; }
+						0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
+						0.99% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
+						1% { filter: brightness(1); opacity: 1; background-color: unset; }
+						100% { filter: brightness(1); opacity: 1; background-color: unset; }
+					}
+				}
+				&-medium {
+					animation: lightningm 180s linear infinite;
+					@keyframes lightningm {
+						0% { filter: brightness(1); opacity: 1; background-color: unset; }
+						0.85% { filter: brightness(1); opacity: 1; background-color: unset; }
+						0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
+						0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
+						1% { filter: brightness(1); opacity: 1; background-color: unset; }
+						1.05% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
+						1.1% { filter: brightness(1); opacity: 1; background-color: unset; }
+						100% { filter: brightness(1); opacity: 1; background-color: unset; }
+					}
+				}
+				&-heavy {
+					animation: lightning 60s linear infinite;
+					@keyframes lightning {
+						0% { filter: brightness(1); opacity: 1; background-color: unset; }
+						1.8% { filter: brightness(1); opacity: 1; background-color: unset; }
+						1.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
+						2% { filter: brightness(1); opacity: 1; background-color: unset; }
+						2.4% { filter: brightness(1); opacity: 1; background-color: unset; }
+						2.6% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
+						2.9% { filter: brightness(1); opacity: 1; background-color: unset; }
+						100% { filter: brightness(1); opacity: 1; background-color: unset;}
+					}
 				}
 			}
-			&.medium {
-				animation: lightningm 180s linear infinite;
-				@keyframes lightningm {
-					0% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.85% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
-					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1.05% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
-					1.1% { filter: brightness(1); opacity: 1; background-color: unset; }
-					100% { filter: brightness(1); opacity: 1; background-color: unset; }
+			&.quake {
+				&-light {
+					transform: scale(1.05);
+
+					&::before {
+						animation: quake .8s linear infinite;
+						
+						@keyframes quake {
+							0% { background-position: 5px 5px; transform: rotate(0deg); }
+							10% { background-position: -5px -10px; transform: rotate(-1deg); }
+							20% { background-position: -15px 0px; transform: rotate(1deg); }
+							30% { background-position: 15px 10px; transform: rotate(0deg); }
+							40% { background-position: 5px -5px; transform: rotate(1deg); }
+							50% { background-position: -5px 10px; transform: rotate(-1deg); }
+							60% { background-position: -15px 5px; transform: rotate(0deg); }
+							70% { background-position: 15px 5px; transform: rotate(-1deg); }
+							80% { background-position: -5px -5px; transform: rotate(1deg); }
+							90% { background-position: 5px 10px; transform: rotate(0deg); }
+							100% { background-position: 5px -10px; transform: rotate(-1deg); }
+						}
+					}
 				}
-			}
-			&.heavy {
-				animation: lightning 60s linear infinite;
-				@keyframes lightning {
-					0% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1.8% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
-					2% { filter: brightness(1); opacity: 1; background-color: unset; }
-					2.4% { filter: brightness(1); opacity: 1; background-color: unset; }
-					2.6% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
-					2.9% { filter: brightness(1); opacity: 1; background-color: unset; }
-					100% { filter: brightness(1); opacity: 1; background-color: unset;}
+				&-medium {
+					transform: scale(1.05);
+
+					&::before {
+						animation: quake .8s linear infinite;
+						
+						@keyframes quake {
+							0% { background-position: 5px 5px; transform: rotate(0deg); }
+							10% { background-position: -5px -10px; transform: rotate(-1deg); }
+							20% { background-position: -15px 0px; transform: rotate(1deg); }
+							30% { background-position: 15px 10px; transform: rotate(0deg); }
+							40% { background-position: 5px -5px; transform: rotate(1deg); }
+							50% { background-position: -5px 10px; transform: rotate(-1deg); }
+							60% { background-position: -15px 5px; transform: rotate(0deg); }
+							70% { background-position: 15px 5px; transform: rotate(-1deg); }
+							80% { background-position: -5px -5px; transform: rotate(1deg); }
+							90% { background-position: 5px 10px; transform: rotate(0deg); }
+							100% { background-position: 5px -10px; transform: rotate(-1deg); }
+						}
+					}
+				}
+				&-heavy {
+					transform: scale(1.05);
+
+					&::before {
+						animation: quake .8s linear infinite;
+						
+						@keyframes quake {
+							0% { background-position: 5px 5px; transform: rotate(0deg); }
+							10% { background-position: -5px -10px; transform: rotate(-1deg); }
+							20% { background-position: -15px 0px; transform: rotate(1deg); }
+							30% { background-position: 15px 10px; transform: rotate(0deg); }
+							40% { background-position: 5px -5px; transform: rotate(1deg); }
+							50% { background-position: -5px 10px; transform: rotate(-1deg); }
+							60% { background-position: -15px 5px; transform: rotate(0deg); }
+							70% { background-position: 15px 5px; transform: rotate(-1deg); }
+							80% { background-position: -5px -5px; transform: rotate(1deg); }
+							90% { background-position: 5px 10px; transform: rotate(0deg); }
+							100% { background-position: 5px -10px; transform: rotate(-1deg); }
+						}
+					}
 				}
 			}
 		}

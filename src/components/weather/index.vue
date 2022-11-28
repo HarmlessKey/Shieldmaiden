@@ -179,10 +179,74 @@ export default {
 					transform: scale(1.05);
 
 					&::before {
-						animation: quake-l .6s ease-in infinite;
+						animation: quake-l 180s ease-in infinite;
 						opacity: (.6);
 						
 						@keyframes quake-l {
+							0% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+							.06% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							.12% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.18% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
+							.24% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							.3% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							.36% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							.42% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							.48% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.54% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
+							.6% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							.66% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.72% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
+							.78% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							.84% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							.90% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							.96% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							1.02% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							1.08% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
+							1.14% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+							100% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+						}
+					}
+				}
+				&-medium {
+					transform: scale(1.05);
+
+					&::before {
+						animation: quake-m 60s ease-in infinite;
+						opacity: (.6);
+						
+						@keyframes quake-m {
+							0% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+							.2% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							.4% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.6% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
+							.8% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							1% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							1.2% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							1.4% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							1.6% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							1.8% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
+							2% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							2.2% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							2.4% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
+							2.6% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							2.8% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							3% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							3.2% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							3.4% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							3.6% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
+							3.8% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+							100% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+						}
+					}
+				}
+				&-heavy {
+					transform: scale(1.05);
+
+					&::before {
+						animation: quake-h .6s ease-in infinite;
+						opacity: (.6);
+						
+						@keyframes quake-h {
 							0% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
 							11% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
 							22% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
@@ -193,48 +257,6 @@ export default {
 							77% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
 							88% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
 							99% { transform: translate(0px, 0) rotate(1deg); filter: blur(3px); }
-						}
-					}
-				}
-				&-medium {
-					transform: scale(1.05);
-
-					&::before {
-						animation: quake-m .8s linear infinite;
-						
-						@keyframes quake-m {
-							0% { background-position: 5px 5px; transform: rotate(0deg); }
-							10% { background-position: -5px -10px; transform: rotate(-1deg); }
-							20% { background-position: -15px 0px; transform: rotate(1deg); }
-							30% { background-position: 15px 10px; transform: rotate(0deg); }
-							40% { background-position: 5px -5px; transform: rotate(1deg); }
-							50% { background-position: -5px 10px; transform: rotate(-1deg); }
-							60% { background-position: -15px 5px; transform: rotate(0deg); }
-							70% { background-position: 15px 5px; transform: rotate(-1deg); }
-							80% { background-position: -5px -5px; transform: rotate(1deg); }
-							90% { background-position: 5px 10px; transform: rotate(0deg); }
-							100% { background-position: 5px -10px; transform: rotate(-1deg); }
-						}
-					}
-				}
-				&-heavy {
-					transform: scale(1.05);
-
-					&::before {
-						animation: quake-h .8s linear infinite;
-						
-						@keyframes quake-h {
-							0% { background-position: 5px 5px; transform: rotate(0deg); }
-							10% { background-position: -5px -10px; transform: rotate(-1deg); }
-							20% { background-position: -15px 0px; transform: rotate(1deg); }
-							30% { background-position: 15px 10px; transform: rotate(0deg); }
-							40% { background-position: 5px -5px; transform: rotate(1deg); }
-							50% { background-position: -5px 10px; transform: rotate(-1deg); }
-							60% { background-position: -15px 5px; transform: rotate(0deg); }
-							70% { background-position: 15px 5px; transform: rotate(-1deg); }
-							80% { background-position: -5px -5px; transform: rotate(1deg); }
-							90% { background-position: 5px 10px; transform: rotate(0deg); }
-							100% { background-position: 5px -10px; transform: rotate(-1deg); }
 						}
 					}
 				}

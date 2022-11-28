@@ -6,8 +6,8 @@
 		<div 
 			class="weather-wrapper" 		
 			:class="[
-				(lightning && showWeather) ? `lightning-${lightning}` : '',
-				(quake && showWeather) ? `quake-${quake}` : ''
+				(lightning && showWeather) ? `lightning lightning-${lightning}` : '',
+				(quake && showWeather) ? `quake quake-${quake}` : ''
 			]"
 		>
 			<template v-if="weather && showWeather">
@@ -113,6 +113,9 @@ export default {
 			height: 100%;
 			position: relative;
 			animation-direction: alternate-reverse;
+			background-size: cover;
+			background-repeat: no-repeat;
+			background-position: center bottom;
 			
 			&::before {
 				content: "";
@@ -120,9 +123,9 @@ export default {
 				height: 100%;
 				left: 0;
 				top: 0;
+				position: absolute;
 				background-image: var(--backgroundImage);
 				background-size: cover;
-				position: absolute;
 				background-repeat: no-repeat;
 				background-position: center bottom;
 			}
@@ -169,24 +172,27 @@ export default {
 				}
 			}
 			&.quake {
+				background-image: var(--backgroundImage);
+				transform: scale(1.05);
+
 				&-light {
 					transform: scale(1.05);
 
 					&::before {
-						animation: quake .8s linear infinite;
+						animation: quake-l .6s ease-in infinite;
+						opacity: (.6);
 						
-						@keyframes quake {
-							0% { background-position: 5px 5px; transform: rotate(0deg); }
-							10% { background-position: -5px -10px; transform: rotate(-1deg); }
-							20% { background-position: -15px 0px; transform: rotate(1deg); }
-							30% { background-position: 15px 10px; transform: rotate(0deg); }
-							40% { background-position: 5px -5px; transform: rotate(1deg); }
-							50% { background-position: -5px 10px; transform: rotate(-1deg); }
-							60% { background-position: -15px 5px; transform: rotate(0deg); }
-							70% { background-position: 15px 5px; transform: rotate(-1deg); }
-							80% { background-position: -5px -5px; transform: rotate(1deg); }
-							90% { background-position: 5px 10px; transform: rotate(0deg); }
-							100% { background-position: 5px -10px; transform: rotate(-1deg); }
+						@keyframes quake-l {
+							0% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							11% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							22% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							33% { transform: translate(0px, 0) rotate(-1deg); filter: blur(3px); }
+							44% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							55% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							66% { transform: translate(0px, 0) rotate(0deg); filter: blur(1px); }
+							77% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							88% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							99% { transform: translate(0px, 0) rotate(1deg); filter: blur(3px); }
 						}
 					}
 				}
@@ -194,9 +200,9 @@ export default {
 					transform: scale(1.05);
 
 					&::before {
-						animation: quake .8s linear infinite;
+						animation: quake-m .8s linear infinite;
 						
-						@keyframes quake {
+						@keyframes quake-m {
 							0% { background-position: 5px 5px; transform: rotate(0deg); }
 							10% { background-position: -5px -10px; transform: rotate(-1deg); }
 							20% { background-position: -15px 0px; transform: rotate(1deg); }
@@ -215,9 +221,9 @@ export default {
 					transform: scale(1.05);
 
 					&::before {
-						animation: quake .8s linear infinite;
+						animation: quake-h .8s linear infinite;
 						
-						@keyframes quake {
+						@keyframes quake-h {
 							0% { background-position: 5px 5px; transform: rotate(0deg); }
 							10% { background-position: -5px -10px; transform: rotate(-1deg); }
 							20% { background-position: -15px 0px; transform: rotate(1deg); }

@@ -183,27 +183,27 @@ export default {
 						opacity: (.6);
 						
 						@keyframes quake-l {
-							0% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
-							.06% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
-							.12% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							.18% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
-							.24% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
-							.3% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
-							.36% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
-							.42% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
-							.48% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							.54% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
-							.6% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
-							.66% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							.72% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
-							.78% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
-							.84% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
-							.90% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
-							.96% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
-							1.02% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							1.08% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
-							1.14% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
-							100% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+							0% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							.04% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							.08% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.12% { transform: translate(0px, 0) rotate(-1deg); filter: blur(3px); }
+							.16% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							.20% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							.24% { transform: translate(0px, 0) rotate(0deg); filter: blur(1px); }
+							.28% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							.32% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.36% { transform: translate(0px, 0) rotate(1deg); filter: blur(3px); }
+							.40% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							.44% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.48% { transform: translate(0px, 0) rotate(-1deg); filter: blur(3px); }
+							.52% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							.56% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							.60% { transform: translate(0px, 0) rotate(0deg); filter: blur(1px); }
+							.64% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							.68% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.72% { transform: translate(0px, 0) rotate(1deg); filter: blur(3px); }
+							.76% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							100% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
 						}
 					}
 				}
@@ -215,27 +215,27 @@ export default {
 						opacity: (.6);
 						
 						@keyframes quake-m {
-							0% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
-							.2% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
-							.4% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							.6% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
-							.8% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
-							1% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
-							1.2% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
-							1.4% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
-							1.6% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							1.8% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
-							2% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
-							2.2% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							2.4% { transform: translate(0, 0) rotate(-1deg); filter: blur(3px); }
-							2.6% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
-							2.8% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
-							3% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
-							3.2% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
-							3.4% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
-							3.6% { transform: translate(0, 0) rotate(1deg); filter: blur(3px); }
-							3.8% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
-							100% { transform: translate(0, 0) rotate(0deg); filter: blur(0); }
+							0% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							.11% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							.22% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.33% { transform: translate(0px, 0) rotate(-1deg); filter: blur(3px); }
+							.44% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							.55% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							.66% { transform: translate(0px, 0) rotate(0deg); filter: blur(1px); }
+							.77% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							.88% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							.99% { transform: translate(0px, 0) rotate(1deg); filter: blur(3px); }
+							1.11% { transform: translate(8px, 0) rotate(1deg); filter: blur(3px); }
+							1.22% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							1.33% { transform: translate(0px, 0) rotate(-1deg); filter: blur(3px); }
+							1.44% { transform: translate(8px, 0) rotate(0deg); filter: blur(1px); }
+							1.55% { transform: translate(-8px, 0) rotate(1deg); filter: blur(3px); }
+							1.66% { transform: translate(0px, 0) rotate(0deg); filter: blur(1px); }
+							1.77% { transform: translate(8px, 0) rotate(-1deg); filter: blur(3px); }
+							1.88% { transform: translate(-8px, 0) rotate(0deg); filter: blur(1px); }
+							1.99% { transform: translate(0px, 0) rotate(1deg); filter: blur(3px); }
+							2% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
+							100% { transform: translate(0, 0) rotate(0deg); filter: blur(1px); }
 						}
 					}
 				}

@@ -1,7 +1,6 @@
 <template>
 	<hk-card>
 		<div class="card-header" slot="header">
-
 			<h1>{{ title }} for D&D 5e</h1>
       <slot name='action_btn'/>
 		</div>
@@ -9,9 +8,8 @@
       D&D {{ title }}
     </div>
 		<div class="card-body">
-
+      <SignedIn v-if="user" />
       <slot />
-
     </div>
     <div slot="footer" class="card-footer">
       <slot btn_classes="full-width" name='action_btn' />
@@ -20,21 +18,24 @@
 </template>
 
 <script>
+  import { mapGetters } from "vuex";
+  import SignedIn from "./userContent/SignedIn.vue";
+
 	export default {
 		name: 'ToolsPage',
+    components: {
+      SignedIn
+    },
     props: {
       title: String,
       bg_img: String,
     },
     computed: {
+      ...mapGetters(["user"]),
       img() {
         return require(`assets/_img/atmosphere/tool-header/${this.bg_img}`)
       }
-    },
-		data() {
-			return {
-      }
-		}
+    }
 	}
 </script>
 

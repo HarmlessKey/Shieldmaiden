@@ -12,6 +12,7 @@
 		</div>
 	</hk-card>
 	<div v-else>
+		<SignedIn v-if="user && demo" />
 		<div v-if="demo" class="d-flex justify-between items-center mb-3">
 			<h1 class="written mb-0">
 				Encounter builder for D&D
@@ -95,6 +96,7 @@
 	import Overview from "./Overview.vue";
 	import General from "./General.vue";
 	import { mapGetters, mapActions } from "vuex";
+	import SignedIn from "src/components/userContent/SignedIn.vue";
 
 	export default {
 		name: "EditEncounter",
@@ -104,6 +106,7 @@
 			Entities,
 			Overview,
 			General,
+			SignedIn,
 		},
 		data() {
 			return {

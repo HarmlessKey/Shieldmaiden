@@ -3,36 +3,47 @@
 		<div class="card-header" slot="header">
 			<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D 5e Tools</h1>
 		</div>
-		<div class="card-body row q-col-gutter-md">
-			<div v-for="(tool, key) in tools" class="col-12 col-sm-6 col-md-4" :key="key">
-        <router-link :to="tool.url">
-          <hk-card class="full-height tool">
-            <div slot="image" class="card-image" :style="[ tool.image ? { backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${tool.image}`)})` } : '' ]">
-              <i :class="tool.icon" aria-hidden="true" />
-            </div>
-            <div slot="header" class="card-header written">
-              {{ tool.title }}
-            </div>
-            <div class="card-body">
-              {{ tool.description }}
-            </div>
-            <div slot="footer" class="card-footer">
-              <div v-if="tool.under_development" class="red full-width text-center">Under development</div>
-              <button v-else class="btn btn-block">
-                Use {{ tool.title }}
-              </button>
-            </div>
-          </hk-card>
-        </router-link>
+		<div class="card-body">
+      <SignedIn v-if="user" />
+      <div class="row q-col-gutter-md">
+        <div v-for="(tool, key) in tools" class="col-12 col-sm-6 col-md-4" :key="key">
+          <router-link :to="tool.url">
+            <hk-card class="full-height tool">
+              <div slot="image" class="card-image" :style="[ tool.image ? { backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${tool.image}`)})` } : '' ]">
+                <i :class="tool.icon" aria-hidden="true" />
+              </div>
+              <div slot="header" class="card-header written">
+                {{ tool.title }}
+              </div>
+              <div class="card-body">
+                {{ tool.description }}
+              </div>
+              <div slot="footer" class="card-footer">
+                <div v-if="tool.under_development" class="red full-width text-center">Under development</div>
+                <button v-else class="btn btn-block">
+                  Use {{ tool.title }}
+                </button>
+              </div>
+            </hk-card>
+          </router-link>
+        </div>
       </div>
 		</div>
 	</hk-card>
 </template>
 
 <script>
+  import { mapGetters } from "vuex";
+  import SignedIn from "src/components/userContent/SignedIn.vue";
 
 	export default {
 		name: 'ToolsOverview',
+    components: {
+      SignedIn
+    },
+    computed: {
+      ...mapGetters(["user"])
+    },
 		data() {
 			return {
         tools: {

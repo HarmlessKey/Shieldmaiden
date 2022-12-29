@@ -1,6 +1,7 @@
 <template>
-	<div class="content" v-if="tier && userInfo">
+	<q-no-ssr class="content" v-if="tier && userInfo">
 		<user-banner />
+		<Tutorial v-if="show_tutorial" />
 		<div class="row q-col-gutter-md">
 			<div class="col-12 col-md-6">
 				<!-- Content -->
@@ -80,7 +81,7 @@
 				</hk-card>
 			</div>
 
-			<!-- PUBLIC INITIATIE LINK -->
+			<!-- PUBLIC INITIATIVE LINK -->
 			<div class="col">
 				<hk-card>
 					<div class="card-header" slot="header">
@@ -109,7 +110,7 @@
 				</div>
 			</div>
 		</hk-card>
-	</div>
+	</q-no-ssr>
 </template>
 
 <script>
@@ -119,8 +120,8 @@
 	import { mapActions, mapGetters } from "vuex";
 	import Content from "src/components/userContent/Content";
 	import Tier from "src/components/userContent/Tier";
-	import UserBanner from "src/components/userContent/UserBanner"
-
+	import UserBanner from "src/components/userContent/UserBanner";
+	import Tutorial from "src/components/userContent/Tutorial"
 
 export default {
 		name: "Profile",
@@ -128,7 +129,8 @@ export default {
 			UserBanner,
 			PlayerLink,
 			Content,
-			Tier
+			Tier,
+			Tutorial
 		},
 		preFetch({ store, redirect }) {
       if(!store.getters.user) {
@@ -176,7 +178,10 @@ export default {
 				"tier",
 				"voucher",
 				"content_count"
-			])
+			]),
+			show_tutorial() {
+				return !this.content_count.campaigns || !this.content_count.players || !this.content_count.encounters;
+			}
 		},
 		methods: {
       ...mapActions([

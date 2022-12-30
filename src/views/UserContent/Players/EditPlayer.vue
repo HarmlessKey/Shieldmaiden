@@ -16,7 +16,7 @@
 							<div class="card-header p-0" slot="header">
 								<div class="d-flex justify-content-start items-center">
 									<div 
-										class="img" 
+										class="img player-avatar" 
 										@click="avatar_dialog = true" 
 										:style="{ 
 											backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
@@ -75,7 +75,7 @@
 												:error-message="errors[0]" 
 											>
 												<template v-slot:append>
-													<small><span class="neutral-2">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
+													<small><span class="neutral-2">level:</span> <span class="level">{{ player.level ? player.level : calculatedLevel(player.experience) }}</span></small>
 													<q-icon name="info" class="ml-1 pointer blue" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
 												</template>
 											</q-input>
@@ -154,7 +154,43 @@
 											</q-input>
 										</ValidationProvider>
 									</div>
+
+									<!-- Speed & Initiative -->
+									<div class="col-12 col-md-6">
+										<ValidationProvider rules="numeric|between:1,999" name="Speed" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Speed"
+												autocomplete="off"
+												type="number" 
+												min="1"
+												max="999"
+												:value="player.speed" 
+												placeholder="Speed"
+												@input="parseToInt($event, player, 'speed')"
+												:error="invalid && validated"
+												:error-message="errors[0]" 
+											/>
+										</ValidationProvider>
+									</div>
+									<div class="col-12 col-md-6">
+										<ValidationProvider rules="numeric|between:1,99" name="Initiative" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Initiative"
+												autocomplete="off"  
+												min="1"
+												max="99"
+												type="number" 
+												:value="player.initiative" 
+												@input="parseToInt($event, player, 'initiative')"
+												:error="invalid && validated"
+												:error-message="errors[0]"
+											/>
+										</ValidationProvider>
+									</div>
 								</div>
+
 							</div>
 						</hk-card>
 					</hk-card-deck>

@@ -1,12 +1,13 @@
 <template>
   <q-select 
+    class="hk-background-select"
     v-bind="$attrs"
     :dark="$store.getters.theme === 'dark'" filled square
     v-model="background"
     :options="background_options"
     map-options
     emit-value
-    clearable
+    :clearable="clearable"
   >
     <template v-slot:selected>
       <span v-if="background" class="truncate">
@@ -40,6 +41,10 @@
         type: String,
         default: undefined
       },
+      clearable: {
+        type: Boolean,
+        default: true
+      }
     },
     data() {
       return {

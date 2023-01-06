@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<hk-card-deck v-if="tier">
+		<hk-card-deck v-if="tier && !loading">
 			<hk-card :header="t.name" v-for="(t, key) in tiers" :key="key" :class="{ 'current': t.name == tier.name }">
 				<div class="card-body">
 					<div class="top">
@@ -9,34 +9,40 @@
 						<em v-else class="neutral-3 sub">per month</em>
 					</div>
 					<ul>
-						<li v-for="(benefit, key) in t.benefits" :key="key">
-							<template v-if="key == 'campaigns'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ benefit }}</span> Campaign slots
+						<li v-for="(benefit, key) in benefits" :key="key">
+							<i v-if="typeof t.benefits[key] === 'boolean'" aria-hidden="true" class="fas" :class="t.benefits[key] ? 'fa-check green' : 'fa-times neutral-3'" />
+							<template v-else>
+								<i aria-hidden="true" v-if="t.benefits[key] === 'infinite'" class="green far fa-infinity" />
+								<strong v-else :class="t.benefits[key] === '-' ? 'neutral-3' : 'green'">{{ t.benefits[key] }}</strong>
 							</template>
-							<template v-if="key == 'encounters'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ benefit }}</span> Encounter slots
+							{{ benefit.title }}
+						</li>
+					</ul>
+					<ul class="storage">
+						<li v-for="(storage_type) in storage" :key="storage_type">
+							<template v-if="storage_type == 'campaigns'">
+								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Campaign slots
 							</template>
-							<template v-if="key == 'players'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ benefit }}</span> Player slots
+							<template v-if="storage_type == 'encounters'">
+								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+								<span v-else class="green">{{ t.benefits[storage_type] }}</span> <span>Encounter slots <span class="neutral-3">(per campaign)</span></span>
 							</template>
-							<template v-if="key == 'npcs'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ benefit }}</span> NPC slots
+							<template v-if="storage_type == 'players'">
+								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Player slots
 							</template>
-							<template v-if="key == 'items'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ benefit }}</span> Item slots
+							<template v-if="storage_type == 'npcs'">
+								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+								<span v-else class="green">{{ t.benefits[storage_type] }}</span> NPC slots
 							</template>
-							<template v-if="key == 'reminders'">
-								<i aria-hidden="true" v-if="benefit == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ benefit }}</span> Reminder slots
+							<template v-if="storage_type == 'items'">
+								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Item slots
 							</template>
-							<template v-if="key == 'avatars'">
-								<i aria-hidden="true" class="fas" :class="benefit ? 'fa-check green' : 'fa-times red'" />
-							 	Avatar crop &amp; upload
+							<template v-if="storage_type == 'reminders'">
+								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Reminder slots
 							</template>
 						</li>
 					</ul>
@@ -46,17 +52,47 @@
 				</div>
 			</hk-card>
 		</hk-card-deck>
+		<hk-loader v-else name="tiers" />
 	</div>
 </template>
 
 <script>
-	import { mapGetters } from 'vuex'
-	import { db } from 'src/firebase'	
+	import { mapGetters } from 'vuex';
+	import { db } from 'src/firebase';
 
 	export default {
+		name: "Tiers",
+		data() {
+			return {
+				loading: true,
+				show_storage: false,
+				benefits: {
+					avatars: {
+						title: "Avatar crop & upload"
+					}, 
+					background: {
+						title: "Background effects"
+					},
+					storage: {
+						title: "Storage"
+					},	
+				},
+				storage: [
+					"campaigns",
+					"encounters",
+					"players",
+					"npcs",
+					"reminders",
+					"items"
+				]
+			}
+		},
 		firebase() {
 			return {
-				tiers: db.ref('tiers').orderByChild('order'),
+				tiers: {
+					source: db.ref('tiers').orderByChild('order'),
+					readyCallback: () => this.loading = false
+				},
 			}
 		},
 		computed: {
@@ -88,6 +124,7 @@
 				ul {
 					list-style: none;
 					padding: 0;
+					margin: 0;
 
 					li {
 						display: grid;
@@ -98,6 +135,16 @@
 						padding: 0 5px 0 15px;
 						color: $neutral-1;
 						margin-bottom: 1px;
+
+					}
+					&.storage {
+						padding-left: 20px;
+						margin-bottom: 15px;
+
+						li {
+							font-size: 13px;
+							line-height: 25px;
+						}
 					}
 				}
 			}

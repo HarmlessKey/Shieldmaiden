@@ -52,6 +52,7 @@
 					fog: { name: "Fog", icon: "fas fa-fog" },
 					ash: { name: "Ash rain", icon: "fas fa-fire" },
 					sand: { name: "Sandstorm", icon: "fas fa-tornado" },
+					quake: { name: "Quakes", icon: "fas fa-waveform-path" },
 				}
 			} 
 		},
@@ -82,9 +83,18 @@
 					"1 minute interval"
 				];
 
+				const quakes = [
+					"Off",
+					"3 minute interval",
+					"1 minute interval",
+					"constant"
+				];
 
 				if(type === 'lightning') {
 					return interval[value];
+				}
+				if(type === "quake") {
+					return quakes[value];
 				}
 				return intensity[value];
 			}

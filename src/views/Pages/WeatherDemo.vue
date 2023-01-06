@@ -6,19 +6,10 @@
 				<i aria-hidden="true" class="fas fa-chevron-left" />
 				Back
 			</router-link>
-			<q-separator vertical :dark="$store.getters.theme === 'dark'" class="mx-2" />
-			<q-input 
-				:dark="$store.getters.theme === 'dark'" square dense clearable
-				v-model="image"
-				placeholder="Background image URL"
-				borderless
-			/>
+			<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-2" />
+			<hk-background-select v-model="background" placeholder="Select background" borderless :clearable="false" />
 		</div>
 		<div class="right">
-			<!-- <a @click="audio = !audio">
-				<i aria-hidden="true" :class="audio ? 'fas fa-volume-up' : 'fas fa-volume-mute'" />
-			</a>
-			<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-3" /> -->
 			<q-btn-dropdown stretch no-caps flat :dark="$store.getters.theme === 'dark'" square>
 				<template #label>
 					<i aria-hidden="true" class="fas fa-cloud" />
@@ -34,7 +25,7 @@
 	<Weather 
 		:weather="weather" 
 		:key="JSON.stringify(weather)" 
-		:background="image ? image : background"
+		:background="require(`../../assets/_img/atmosphere/${background}.jpg`)"
 		:audio="audio"
 	/>
 </div>
@@ -51,7 +42,7 @@
 		},
 		data() {
 			return {
-				background: require("../../assets/_img/atmosphere/winter-landscape.jpg"),
+				background: "winter-landscape",
 				audio: false,
 				image: null,
 				weather: {
@@ -100,6 +91,17 @@
 			.left {
 				display: flex;
 				justify-content: flex-start;
+
+				&::v-deep .q-field {
+					.row, .q-field__control, .q-field__inner {
+						min-height: 0;
+						max-height: 36px;
+					}
+					input {
+						height: 36px;
+						line-height: 36px;
+					}
+				}
 			}
 			.right {
 				display: flex;

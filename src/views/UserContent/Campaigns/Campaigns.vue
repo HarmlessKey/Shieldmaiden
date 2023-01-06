@@ -1,175 +1,168 @@
 <template>
 	<div v-if="tier">
-		<template>
-			<hk-card>
-				<ContentHeader type="campaigns" @add="add = !add" />
+		<Tutorial v-if="show_tutorial" />
+		<hk-card>
+			<ContentHeader type="campaigns" @add="add = !add" />
 
-				<div class="card-body" v-if="!loading_campaigns">
-					<!-- NO PLAYERS YET -->
-					<div class="first-campaign pb-4" v-if="campaign_count && !player_count">
-						<h2>Create players for your campaigns</h2>
-						<router-link to="/content/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
-					</div>
-
-					<transition-group 
-						v-if="campaigns && campaign_count"
-						tag="div" 
-						class="row q-col-gutter-md" 
-						name="campaigns" 
-						enter-active-class="animated animate__fadeIn" 
-						leave-active-class="animated animate__fadeOut"
-					>
-						<div class="col-12 col-sm-6 col-md-4" v-for="campaign in campaigns" :key="campaign.key">
-							<hk-card>
-								<!-- Image -->
-								<div 
-									slot="image" 
-									class="card-image" 
-									:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
-								>
-									<div class="d-flex justify-content-between">
-										<i aria-hidden="true" 
-											class="px-1 py-2"
-											:class="{
-												'fas fa-eye text-shadow-6 white': !campaign.private,
-												'fas fa-eye-slash text-shadow-6 white': campaign.private 
-											}"
-										>
-											<q-tooltip anchor="top middle" self="bottom middle">
-												{{ campaign.private ? "Private campaign" : "Public campaign" }}
-											</q-tooltip>
-										</i>
-										<div class="campaign-actions">
-											<template v-if="!overencumbered">
-												<a class="btn btn-sm btn-clear white" @click="edit_players = { show: true, campaign: campaign }">
-													<i aria-hidden="true" class="fas fa-user-plus"></i>
-													<q-tooltip anchor="top middle" self="bottom middle">
-														Add players
-													</q-tooltip>
-												</a>
-												<a class="btn btn-sm btn-clear white" @click="edit_campaign = { show: true, campaign: campaign }">
-													<i aria-hidden="true" class="fas fa-pencil"></i>
-													<q-tooltip anchor="top middle" self="bottom middle">
-														Edit
-													</q-tooltip>
-												</a>
-											</template>
-											<a
-												class="btn btn-sm btn-clear white"
-												@click="confirmDelete($event, campaign.key, campaign.name)"
-											>
-												<i aria-hidden="true" class="fas fa-trash-alt"></i>
+			<div class="card-body" v-if="!loading_campaigns">
+				<transition-group 
+					v-if="campaigns && campaign_count"
+					tag="div" 
+					class="row q-col-gutter-md" 
+					name="campaigns" 
+					enter-active-class="animated animate__fadeIn" 
+					leave-active-class="animated animate__fadeOut"
+				>
+					<div class="col-12 col-sm-6 col-md-4" v-for="campaign in campaigns" :key="campaign.key">
+						<hk-card>
+							<!-- Image -->
+							<div 
+								slot="image" 
+								class="card-image" 
+								:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
+							>
+								<div class="d-flex justify-content-between">
+									<i aria-hidden="true" 
+										class="px-1 py-2"
+										:class="{
+											'fas fa-eye text-shadow-6 white': !campaign.private,
+											'fas fa-eye-slash text-shadow-6 white': campaign.private 
+										}"
+									>
+										<q-tooltip anchor="top middle" self="bottom middle">
+											{{ campaign.private ? "Private campaign" : "Public campaign" }}
+										</q-tooltip>
+									</i>
+									<div class="campaign-actions">
+										<template v-if="!overencumbered">
+											<a class="btn btn-sm btn-clear white" @click="edit_players = { show: true, campaign: campaign }">
+												<i aria-hidden="true" class="fas fa-user-plus"></i>
 												<q-tooltip anchor="top middle" self="bottom middle">
-													Delete
+													Add players
 												</q-tooltip>
 											</a>
-										</div>
-									</div>
-								</div>
-
-								<div class="card-body">
-									<div class="neutral-4 mb-2"> 
-										{{ campaign.advancement !== "milestone" ? "Experience" : "Milestone" }} advancement
-									</div>
-									<h3 class="truncate">
-										{{ campaign.name }}
-									</h3>
-
-									<div class="mb-1">
-										<a 
-											class="btn btn-clear btn-sm" 
-											@click="!overencumbered ? edit_players = { show: true, campaign: campaign } : null"
-											:disabled="overencumbered"
+											<a class="btn btn-sm btn-clear white" @click="edit_campaign = { show: true, campaign: campaign }">
+												<i aria-hidden="true" class="fas fa-pencil"></i>
+												<q-tooltip anchor="top middle" self="bottom middle">
+													Edit
+												</q-tooltip>
+											</a>
+										</template>
+										<a
+											class="btn btn-sm btn-clear white"
+											@click="confirmDelete($event, campaign.key, campaign.name)"
 										>
-											<i aria-hidden="true" class="fas fa-users mr-1 neutral-2" />
-											{{ campaign.player_count ? campaign.player_count : "0" }}
-											player{{ campaign.player_count === 1 ? "" : "s" }}
+											<i aria-hidden="true" class="fas fa-trash-alt"></i>
+											<q-tooltip anchor="top middle" self="bottom middle">
+												Delete
+											</q-tooltip>
 										</a>
 									</div>
-									
-									<router-link class="btn btn-clear btn-sm" :to="`${$route.path}/${campaign.key}`">
-										<i aria-hidden="true" class="fas fa-swords mr-2 neutral-2" />
-											<span 
-												:class="{ 
-													'green': get_encounter_count(campaign.key), 
-													'red': get_encounter_count(campaign.key) > tier.benefits.encounters 
-												}"
-											>
-												{{ get_encounter_count(campaign.key) || 0 }}
-											</span>
-											encounter{{ get_encounter_count(campaign.key) === 1 ? "" : "s" }}
+								</div>
+							</div>
+
+							<div class="card-body">
+								<div class="neutral-4 mb-2"> 
+									{{ campaign.advancement !== "milestone" ? "Experience" : "Milestone" }} advancement
+								</div>
+								<h3 class="truncate">
+									{{ campaign.name }}
+								</h3>
+
+								<div class="mb-1">
+									<a 
+										class="btn btn-clear btn-sm" 
+										@click="!overencumbered ? edit_players = { show: true, campaign: campaign } : null"
+										:disabled="overencumbered"
+									>
+										<i aria-hidden="true" class="fas fa-users mr-1 neutral-2" />
+										{{ campaign.player_count ? campaign.player_count : "0" }}
+										player{{ campaign.player_count === 1 ? "" : "s" }}
+									</a>
+								</div>
+								
+								<router-link class="btn btn-clear btn-sm" :to="`${$route.path}/${campaign.key}`">
+									<i aria-hidden="true" class="fas fa-swords mr-2 neutral-2" />
+										<span 
+											:class="{ 
+												'green': get_encounter_count(campaign.key), 
+												'red': get_encounter_count(campaign.key) > tier.benefits.encounters 
+											}"
+										>
+											{{ get_encounter_count(campaign.key) || 0 }}
+										</span>
+										encounter{{ get_encounter_count(campaign.key) === 1 ? "" : "s" }}
+								</router-link>
+								
+								<div class="mt-4" v-if="!overencumbered">
+									<router-link to="/content/players" v-if="!content_count.players" class="btn ">
+										<i aria-hidden="true" class="fas fa-user"></i> Create players
 									</router-link>
-									
-									<div class="mt-4" v-if="!overencumbered">
-										<router-link to="/content/players" v-if="!player_count" class="btn ">
-											<i aria-hidden="true" class="fas fa-user"></i> Create players
-										</router-link>
-										<a 
-											v-else-if="!campaign.player_count" class="btn"
-											@click="edit_players = { show: true, campaign: campaign }" 
-										>
-											<i aria-hidden="true" class="fas fa-plus"></i> Add players
-										</a>
-										<router-link 
-											v-else-if="!get_encounter_count(campaign.key)" class="btn"
-											:to="`${$route.path}/${campaign.key}`" 
-										>
-											<i aria-hidden="true" class="fas fa-swords"></i> Add encounters
-										</router-link>
-										<router-link :to="`${$route.path}/${campaign.key}`" v-else class="btn bg-green">
-											Continue
-										</router-link>
-									</div>
-									<div v-else class="mt-4">
-										<router-link 
-											v-if="get_encounter_count(campaign.key) > tier.benefits.encounters"
-											:to="`${$route.path}/${campaign.key}`" class="btn bg-red"
-										>
-											Too many encounters
-										</router-link>
-										<router-link :to="`${$route.path}/${campaign.key}`" class="btn bg-neutral-5">
-											View campaign
-										</router-link>
-									</div>
+									<a 
+										v-else-if="!campaign.player_count" class="btn"
+										@click="edit_players = { show: true, campaign: campaign }" 
+									>
+										<i aria-hidden="true" class="fas fa-plus"></i> Add players
+									</a>
+									<router-link 
+										v-else-if="!get_encounter_count(campaign.key)" class="btn"
+										:to="`${$route.path}/${campaign.key}`" 
+									>
+										<i aria-hidden="true" class="fas fa-swords"></i> Add encounters
+									</router-link>
+									<router-link :to="`${$route.path}/${campaign.key}`" v-else class="btn bg-green">
+										Continue
+									</router-link>
 								</div>
-								<div slot="footer" class="card-footer">
-									<small class="text-center neutral-3"><span class="">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
+								<div v-else class="mt-4">
+									<router-link 
+										v-if="get_encounter_count(campaign.key) > tier.benefits.encounters"
+										:to="`${$route.path}/${campaign.key}`" class="btn bg-red"
+									>
+										Too many encounters
+									</router-link>
+									<router-link :to="`${$route.path}/${campaign.key}`" class="btn bg-neutral-5">
+										View campaign
+									</router-link>
 								</div>
-							</hk-card>
-						</div>
-					</transition-group>
-
-					<!-- CREATE FIRST CAMPAIGN -->
-					<div class="first-campaign" v-else>
-						<q-form @submit="addCampaign">
-							<h2 class="mt-0">Create your first campaign</h2>
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								type="text" 
-								autocomplete="off"
-								v-model="newCampaign" 
-								name="firstCampaign"
-								label="Title of your first campaign"
-								:rules="[ val => val && val.length > 0 || 'Enter a title for your campaign']"
-							/>
-							<q-select 
-								:dark="$store.getters.theme === 'dark'" filled square
-								map-options
-								emit-value
-								label="Advancement"
-								class="mt-2" 
-								v-model="advancement" 
-								:options="advancement_options"
-							/>
-							
-							<q-btn class="btn btn-lg bg-green btn-block mt-4" padding="xs" no-caps type="submit" label="Create campaign" />
-						</q-form>
+							</div>
+							<div slot="footer" class="card-footer">
+								<small class="text-center neutral-3"><span class="">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
+							</div>
+						</hk-card>
 					</div>
-				</div>
-				<hk-loader v-else name="campaigns" />
-			</hk-card>
+				</transition-group>
 
-		</template>
+				<!-- CREATE FIRST CAMPAIGN -->
+				<div class="first-campaign" v-else>
+					<q-form @submit="addCampaign">
+						<h2 class="mt-0">Create your first campaign</h2>
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							type="text" 
+							autocomplete="off"
+							v-model="newCampaign" 
+							name="firstCampaign"
+							label="Title of your first campaign"
+							:rules="[ val => val && val.length > 0 || 'Enter a title for your campaign']"
+						/>
+						<q-select 
+							:dark="$store.getters.theme === 'dark'" filled square
+							map-options
+							emit-value
+							label="Advancement"
+							class="mt-2" 
+							v-model="advancement" 
+							:options="advancement_options"
+						/>
+						
+						<q-btn class="btn btn-lg bg-green btn-block mt-4" padding="xs" no-caps type="submit" label="Create campaign" />
+					</q-form>
+				</div>
+			</div>
+			<hk-loader v-else name="campaigns" />
+		</hk-card>
+
 		<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
 			
 		<!-- New campaign dialog -->
@@ -229,6 +222,7 @@
 	import EditCampaign from "./EditCampaign";
 	import AddPlayers from "./AddPlayers";
 	import ContentHeader from "src/components/userContent/ContentHeader";
+	import Tutorial from "src/components/userContent/Tutorial";
 
 	export default {
 		name: 'Campaigns',
@@ -236,7 +230,8 @@
 		components: {
 			EditCampaign,
 			AddPlayers,
-			ContentHeader
+			ContentHeader,
+			Tutorial
 		},
 		data() {
 			return {
@@ -270,14 +265,17 @@
 		},
 		computed: {
 			...mapGetters([
-				'user',
-				'tier',
-				'userInfo',
-				'overencumbered'
+				"user",
+				"tier",
+				"userInfo",
+				"overencumbered",
+				"content_count"
 			]),
-			...mapGetters("players", ["player_count"]),
 			...mapGetters("campaigns", ["campaign_count", "campaigns"]),
-			...mapGetters("encounters", ["get_encounter_count"])
+			...mapGetters("encounters", ["get_encounter_count"]),
+			show_tutorial() {
+				return !this.content_count.campaigns || !this.content_count.players || !this.content_count.encounters;
+			}
 		},
 		methods: {
 			...mapActions("campaigns", ["get_campaigns", "add_campaign", "delete_campaign"]),

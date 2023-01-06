@@ -1,5 +1,7 @@
 <template>
   <div class="content-side">
+    <Tutorial v-if="show_tutorial" vertical />
+
     <hk-card v-if="$route.path === '/content'" class="bg-neutral-9 overflow-hidden">
       <hk-video />
     </hk-card>
@@ -116,6 +118,7 @@ export default {
     PlayerLink: () => import("src/components/PlayerLink"),
     HkVideo: () => import("src/components/hk-components/hk-video"),
     Tier: () => import("src/components/userContent/Tier"),
+    Tutorial: () => import("src/components/userContent/Tutorial.vue"),
   },
   data() {
     return {
@@ -150,12 +153,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["user", "tier", "slots_used", "userInfo"]),
+    ...mapGetters(["user", "tier", "slots_used", "userInfo", "content_count"]),
     filtered_content() {
       return this.content.filter(item => item.value !== this.page);
     },
     pending_payment() {
       return this.userInfo && this.userInfo.patron && this.userInfo.patron.last_charge_status === "Pending";
+    },
+    show_tutorial() {
+      return this.$route.path.split('/')[1] === 'content' && 
+        this.$route.path !== "/content/campaigns" &&
+        this.content_count.campaigns &&
+        (!this.content_count.players || !this.content_count.encounters);
     }
   },
   methods: {

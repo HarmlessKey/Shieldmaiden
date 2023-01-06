@@ -1,8 +1,9 @@
 <template>
 	<div>
 		<user-banner />
+		<Tutorial v-if="!content_count.campaigns" />
 		<!-- Continue Campaign -->
-		<hk-card class="banner">
+		<hk-card v-else class="banner">
 			<div 
 				slot="image"
 				class="card-image"
@@ -29,13 +30,13 @@
 				<div>
 					<div class="neutral-4 mb-1">Campaigns</div>
 					<h3 class="neutral-1">
-						<strong>No campaigns</strong><br/>
+						<strong>No active campaign</strong><br/>
 					</h3>
 					<p class="neutral-3">Start your first adventure.</p>
 				</div>
 
 				<router-link to="campaigns" class="btn btn-sm bg-green">
-					Create <span class="d-none d-md-inline">campaign</span>
+					Campaign overview
 				</router-link>
 			</div>
 		</hk-card>
@@ -97,12 +98,14 @@
 	import { mapGetters, mapActions } from "vuex";
 	import { general } from "src/mixins/general.js";
 	import UserBanner from 'src/components/userContent/UserBanner';
+	import Tutorial from "src/components/userContent/Tutorial.vue";
 
 	export default {
 		name: "UserContent",
 		mixins: [general],
   	components: { 
-			UserBanner
+			UserBanner,
+			Tutorial
 		},
 		data() {
 			return {

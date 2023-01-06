@@ -1,5 +1,5 @@
 {
-	"version": "2.7.2",
+	"version": "2.7.3",
 	"name": "harmless_key",
 	"description": "A Dungeons and Dragons Combat Tracker",
 	"productName": "Harmless Key",
@@ -16,6 +16,7 @@
 		"prepare": "husky install"
 	},
 	"dependencies": {
+		"@octokit/rest": "^19.0.5",
 		"@quasar/extras": "^1.0.0",
 		"ajv": "^8.10.0",
 		"ajv-formats": "^2.1.1",

@@ -29,6 +29,10 @@
 						<br/><strong>Speed</strong>: 
 						<span> {{ entity.speed }}</span>
 					</template>
+					<template v-if="entity.initiative">
+						<br/><strong>Initiative</strong>: 
+						<span> {{ entity.initiative > 0 ? `+${entity.initiative}` : entity.initiative }}</span>
+					</template>
 				</template>
 				<template v-else>
 					<br/><strong>Speed</strong>: {{ entity.walk_speed ? entity.walk_speed : 0 }} ft.{{ 

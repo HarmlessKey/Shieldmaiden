@@ -304,6 +304,8 @@ const run_encounter_actions = {
 				entity.img = db_player.storage_avatar || db_player.avatar;
 				
 				entity.name = db_player.character_name;
+				entity.speed = db_player.speed || 0;
+				entity.initiative = db_player.initiative || 0;
 				entity.ac = parseInt(db_player.ac);
 				entity.maxHp = (entity.maxHpMod) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
 				

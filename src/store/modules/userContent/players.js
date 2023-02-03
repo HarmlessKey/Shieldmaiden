@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { playerServices } from "src/services/players"; 
+import { getCharacterSyncCharacter } from 'src/utils/generalFunctions';
 import _ from 'lodash';
 
 // Converts a full player to a search_player
@@ -9,6 +10,7 @@ const convert_player = (player) => {
     "avatar",
     "storage_avatar",
     "campaign_id",
+    "sync_character",
     "companions"
 	];
   const returnPlayer = {};
@@ -294,7 +296,7 @@ const player_actions = {
    async set_player_prop({ commit, dispatch }, { uid, id, property, value }) {
     if(uid) {
       const services = await dispatch("get_player_services");
-      const update_search = ["character_name", "avater", "campaign_id"].includes(property);
+      const update_search = ["character_name", "avatar", "campaign_id", "sync_character"].includes(property);
       try {
         await services.updatePlayer(uid, id, "", { [property]: value }, update_search);
         commit("SET_PLAYER_PROP", { uid, id, property, value, update_search });
@@ -410,6 +412,43 @@ const player_actions = {
   },
 
   /**
+   * Update character with data from Character Sync Extension
+   * 
+   * @param {string} user_id
+   * @param {string} id 
+   */
+  async sync_player({ commit, dispatch }, { uid, id, sync_character }) {
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        const character = await getCharacterSyncCharacter(sync_character);
+
+        const player = { sync_character };
+        if(character.armor_class !== undefined) player.ac = character.armor_class;
+        if(character.avatar !== undefined) player.avatar = character.avatar;
+        if(character.name !== undefined) player.character_name = character.name;
+        if(character.strength !== undefined) player.strength = character.strength;
+        if(character.dexterity !== undefined) player.dexterity = character.dexterity;
+        if(character.constitution !== undefined) player.constitution = character.constitution;
+        if(character.intelligence !== undefined) player.intelligence = character.intelligence;
+        if(character.level !== undefined) player.level = character.level;
+        if(character.max_hit_points !== undefined) player.maxHp = character.max_hit_points;
+        if(character.walking_speed !== undefined) player.speed = character.walking_speed;
+        if(character.initiative !== undefined) player.initiative = character.initiative;
+        
+        const search_player = convert_player(player);
+
+        await services.syncPlayer(uid, id, player, search_player);
+        commit("UPDATE_SEARCH_PLAYER", { id, search_player });
+        commit("PATCH_CACHED_PLAYER", { uid, id, player });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
    * Removes the character control of a player
    * - control property on the player must be removed too
    * 
@@ -451,7 +490,7 @@ const player_mutations = {
   },
   UPDATE_SEARCH_PLAYER(state, { id, search_player }) {
     if(state.players && state.players[id]) {
-      Vue.set(state.players, id, search_player);
+      Vue.set(state.players, id, {...state.players[id], ...search_player });
     }
   },
   REMOVE_PLAYER(state, id) { 
@@ -465,6 +504,11 @@ const player_mutations = {
       Vue.set(state.cached_players[uid], id, player);
     } else {
       Vue.set(state.cached_players, uid, { [id]: player });
+    }
+  },
+  PATCH_CACHED_PLAYER(state, { uid, id, player }) { 
+    if(state.cached_players[uid]) {
+      Vue.set(state.cached_players[uid], id, {...state.cached_players[uid][id], ...player });
     }
   },
   REMOVE_CACHED_PLAYER(state, { uid, id }) { 

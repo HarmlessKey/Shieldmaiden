@@ -1,4 +1,5 @@
 import numeral from "numeral";
+import { character_sync_id } from "./generalConstants";
 /**
  * Calculate the average value of given dice
  *
@@ -112,4 +113,39 @@ export function makeDate(input, showTime = false, short = false) {
 		return date + " at " + time;
 	}
 	return date;
+}
+
+/**
+ * Gets all characters from "D&D Character SYnc" Chrome Extension
+ */
+export async function getCharacterSyncStorage() {
+	return new Promise((resolve, reject) => {
+		chrome.runtime.sendMessage(
+			character_sync_id,
+			{ request_content: ["characters"] },
+			(response) => {
+				if (response.characters) {
+					resolve(response.characters);
+				} else {
+					reject('Something went wrong getting data from Character Sync extension.');
+				}
+			}
+		);
+	});
+}
+
+export async function getCharacterSyncCharacter(url) {
+	return new Promise((resolve, reject) => {
+		chrome.runtime.sendMessage(
+			character_sync_id,
+			{ request_content: ["characters"] },
+			(response) => {
+				if (response.characters && url in response.characters) {
+					resolve(response.characters[url]);
+				} else {
+					reject(`Character not found in Character Sync Extension`);
+				}
+			}
+		);
+	});
 }

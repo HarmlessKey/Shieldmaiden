@@ -7,6 +7,10 @@ export const dice_types = Object.freeze([
   { value: 20, label: "d20" },
 ]);
 
+/** Id of extension @see https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg */
+export const character_sync_id = "nlcbmcblcjlhbihffndcgbkkapcfmifa";
+// export const character_sync_id = "bhloogpkokdihhmfolpdfjhfhnlebhhl";
+
 export const backgrounds = Object.freeze([
   { 
     name: "Forest",

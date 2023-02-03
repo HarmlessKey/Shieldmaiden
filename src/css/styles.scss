@@ -1111,6 +1111,9 @@ html body {
 	.spin {
 		animation: spinner 1s ease infinite;
 	}
+	.rotate {
+		animation: spinner 1s ease;
+	}
 
 	.live {
 		font-family: 'Open Sans', sans-serif;

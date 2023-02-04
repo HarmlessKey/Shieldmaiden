@@ -420,31 +420,27 @@ const player_actions = {
   async sync_player({ commit, dispatch }, { uid, id, sync_character }) {
     if(uid) {
       const services = await dispatch("get_player_services");
-      try {
-        const character = await getCharacterSyncCharacter(sync_character);
+      const character = await getCharacterSyncCharacter(sync_character);
 
-        const player = { sync_character };
-        if(character.armor_class !== undefined) player.ac = character.armor_class;
-        if(character.avatar !== undefined) player.avatar = character.avatar;
-        if(character.name !== undefined) player.character_name = character.name;
-        if(character.strength !== undefined) player.strength = character.strength;
-        if(character.dexterity !== undefined) player.dexterity = character.dexterity;
-        if(character.constitution !== undefined) player.constitution = character.constitution;
-        if(character.intelligence !== undefined) player.intelligence = character.intelligence;
-        if(character.level !== undefined) player.level = character.level;
-        if(character.max_hit_points !== undefined) player.maxHp = character.max_hit_points;
-        if(character.walking_speed !== undefined) player.speed = character.walking_speed;
-        if(character.initiative !== undefined) player.initiative = character.initiative;
-        
-        const search_player = convert_player(player);
+      const player = { sync_character };
+      if(character.armor_class !== undefined) player.ac = character.armor_class;
+      if(character.avatar !== undefined) player.avatar = character.avatar;
+      if(character.name !== undefined) player.character_name = character.name;
+      if(character.strength !== undefined) player.strength = character.strength;
+      if(character.dexterity !== undefined) player.dexterity = character.dexterity;
+      if(character.constitution !== undefined) player.constitution = character.constitution;
+      if(character.intelligence !== undefined) player.intelligence = character.intelligence;
+      if(character.level !== undefined) player.level = character.level;
+      if(character.max_hit_points !== undefined) player.maxHp = character.max_hit_points;
+      if(character.walking_speed !== undefined) player.speed = character.walking_speed;
+      if(character.initiative !== undefined) player.initiative = character.initiative;
+      
+      const search_player = convert_player(player);
 
-        await services.syncPlayer(uid, id, player, search_player);
-        commit("UPDATE_SEARCH_PLAYER", { id, search_player });
-        commit("PATCH_CACHED_PLAYER", { uid, id, player });
-        return;
-      } catch(error) {
-        throw error;
-      }
+      await services.syncPlayer(uid, id, player, search_player);
+      commit("UPDATE_SEARCH_PLAYER", { id, search_player });
+      commit("PATCH_CACHED_PLAYER", { uid, id, player });
+      return;
     }
   },
 

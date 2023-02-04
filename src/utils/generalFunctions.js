@@ -172,7 +172,7 @@ export async function getCharacterSyncCharacter(url) {
 				if (response.characters && url in response.characters) {
 					resolve(response.characters[url]);
 				} else {
-					reject(`Character not found in Character Sync Extension`);
+					reject(`Character not found in D&D Character Sync Extension`);
 				}
 			}
 		);

@@ -8,8 +8,7 @@ export const dice_types = Object.freeze([
 ]);
 
 /** Id of extension @see https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg */
-export const character_sync_id = "nlcbmcblcjlhbihffndcgbkkapcfmifa";
-// export const character_sync_id = "bhloogpkokdihhmfolpdfjhfhnlebhhl";
+export const character_sync_id = "jgcbbmbchbkdjbgiiheminkkkecjohpg";
 
 export const backgrounds = Object.freeze([
   { 

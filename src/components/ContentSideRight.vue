@@ -9,34 +9,14 @@
           Character Sync
         </span>
       </div>
-      <div class="card-body">
+      <div class="card-body text-center">
         <p>
-          Sync your player's character sheets from other resources in Harmless Key *.
+          Sync your player's character sheets from other resources in 
+          <span class="whitespace-nowrap">Harmless Key</span><span v-if="tier.name === 'Free'" class="neutral-3"> *</span>.
         </p>
         
-        <span v-if="browser !== 'Chrome'">
-          Requires 
-          <a 
-            href="https://www.google.com/chrome/?brand=YTUH&gclid=CjwKCAiA_vKeBhAdEiwAFb_nrYRccvf1_qpCfbQDMBu6lPJiPGohPJn0u1EqUMHQ4s8ZenCwPUHlzBoCvtkQAvD_BwE&gclsrc=aw.ds"
-            target="_blank"
-            rel="noopener"
-          >
-            Chrome
-          </a> 
-          as your browser.
-        </span>
-        <a 
-          v-else-if="!hasExtension" 
-          class="btn btn-block"
-          href="https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg"
-          target="_blank"
-          rel="noopener"
-        >
-          Install Extension
-        </a>
         <button 
-          v-else 
-          class="btn btn-block" 
+          class="btn btn-block bg-green" 
           @click="setSlide({
             show: true,
             type: 'slides/CharacterSync'
@@ -45,7 +25,7 @@
         </button>
         
       </div>
-      <small slot="footer" class="card-footer justify-content-start">* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key required.</small>
+      <small v-if="tier.name === 'Free'" slot="footer" class="card-footer justify-content-start neutral-3">* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key required.</small>
     </hk-card>
 
     <hk-card v-if="$route.path === '/content'" class="bg-neutral-9 overflow-hidden">
@@ -155,7 +135,6 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { extensionInstalled } from "src/utils/generalFunctions";
-import { browserDetect } from 'src/functions';
 
 export default {
   name: "ContentSideRight",
@@ -172,7 +151,6 @@ export default {
     return {
       width: 0,
       hasExtension: false,
-      browser: browserDetect(),
       social_media: [
 					{
 						name: "Patreon",

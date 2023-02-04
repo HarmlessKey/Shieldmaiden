@@ -67,6 +67,9 @@
 				loading: true,
 				show_storage: false,
 				benefits: {
+					character_sync: {
+						title: "Character sync"
+					}, 
 					avatars: {
 						title: "Avatar crop & upload"
 					}, 

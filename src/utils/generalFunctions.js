@@ -116,7 +116,29 @@ export function makeDate(input, showTime = false, short = false) {
 }
 
 /**
- * Gets all characters from "D&D Character SYnc" Chrome Extension
+ * Check if the "D&D Character Sync" extension is installed
+ * 
+ * @param {string} url 
+ * @returns 
+ */
+export async function extensionInstalled() {
+	return new Promise((resolve) => {
+		chrome.runtime.sendMessage(
+			character_sync_id,
+			{ request_content: ["characters"] },
+			(response) => {
+				if (response) {
+					resolve(true)
+				} else {
+					return false;
+				}
+			}
+		);
+	});
+}
+
+/**
+ * Gets all characters from "D&D Character Sync" Chrome Extension
  */
 export async function getCharacterSyncStorage() {
 	return new Promise((resolve, reject) => {
@@ -124,7 +146,7 @@ export async function getCharacterSyncStorage() {
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
-				if (response.characters) {
+				if (response && response.characters) {
 					resolve(response.characters);
 				} else {
 					reject('Something went wrong getting data from Character Sync extension.');
@@ -134,6 +156,13 @@ export async function getCharacterSyncStorage() {
 	});
 }
 
+
+/**
+ * Get a single character from the "D&D Character Sync" Chrome Extension
+ * 
+ * @param {string} url 
+ * @returns 
+ */
 export async function getCharacterSyncCharacter(url) {
 	return new Promise((resolve, reject) => {
 		chrome.runtime.sendMessage(

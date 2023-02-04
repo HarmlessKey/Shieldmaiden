@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3 @click="open">Character Sync</h3>
+		<h3>Character Sync</h3>
 		<div v-if="browser !== 'Chrome'" class="red mb-2">
 			Google 
 			<a 
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-	import { extensionInstalled, openCharacterSyncPopup } from "src/utils/generalFunctions";
+	import { extensionInstalled } from "src/utils/generalFunctions";
 	import { browserDetect } from 'src/functions';
 	import { mapGetters } from "vuex";
 
@@ -70,7 +70,6 @@
     	return {
 				hasExtension: false,
 				browser: browserDetect(),
-				open: openCharacterSyncPopup,
 				step: 0,
 				steps: [
 					{

@@ -2,9 +2,9 @@
 	<div>
 		<h3>Character Sync</h3>
 		<div v-if="browser !== 'Chrome'" class="red mb-2">
-			Google 
-			<a 
-				href="https://www.google.com/chrome/?brand=YTUH&gclid=CjwKCAiA_vKeBhAdEiwAFb_nrYRccvf1_qpCfbQDMBu6lPJiPGohPJn0u1EqUMHQ4s8ZenCwPUHlzBoCvtkQAvD_BwE&gclsrc=aw.ds"
+			Google
+			<a
+				href="https://chrome.google.com"
 				target="_blank"
 				rel="noopener"
 			>Chrome</a>
@@ -14,7 +14,7 @@
 			<p>
 				A Google Chrome Extension is needed to Sync your characters from other resources.
 			</p>
-			<a  
+			<a
 				class="btn btn-block"
 				href="https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg"
 				target="_blank"

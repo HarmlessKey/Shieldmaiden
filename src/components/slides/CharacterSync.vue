@@ -108,7 +108,7 @@
 			}
 		},
 		async mounted() {
-			console.log("CharacterSync mounted() chrome.runtime", chrome.runtime)
+			console.log("CharacterSync mounted() window.chrome.runtime", window.chrome.runtime)
 			this.hasExtension = await extensionInstalled();
 		}
 	};

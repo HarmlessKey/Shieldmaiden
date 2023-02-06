@@ -105,7 +105,7 @@
               ".validate": "newData.isString() && newData.val().length <= 15"
             },
             "character_name": {
-              ".validate": "newData.isString() && newData.val().length <= 35"
+              ".validate": "newData.isString() && newData.val().length <= 100"
             },
             "avatar": {
               ".validate": "newData.isString() && newData.val().length <= 2000"

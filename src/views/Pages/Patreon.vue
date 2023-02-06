@@ -4,7 +4,8 @@
 			<div class="content">
 				<h1 class="text-center">Get a Harmless Key subscription</h1>
 				<p class="text-center">
-					We use Patreon for our subscriptions. Once you make a choice, you will be redirected to patreon.com to finish payment.<br/>
+					We use Patreon for our subscriptions. Once you make a choice, 
+					you will be redirected to <a class="patreon-red" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">Patreon</a> to finish payment.<br/>
 				</p>
 				<Tiers class="mb-4" />
 				<hk-card header="Why do you have to pay?">
@@ -23,7 +24,7 @@
 						<p>
 							Our goal is not to earn money, our goal is to create an initiative tracker that is useful for the entire community. <br/>
 							To reach this goal, we will need support. This is why we have set up a Patreon. 
-							This way you can help us in achieving this goal and benifit from the extra's that come with it.
+							This way you can help us in achieving this goal and benefit from the extra's that come with it.
 						</p>
 
 						<a class="btn bg-patreon-red btn-block" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">

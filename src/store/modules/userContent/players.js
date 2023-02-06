@@ -21,9 +21,9 @@ const numberValues = [
   "charisma"
 ];
 const parseInts = (player) => {
-  for(let [key, value] of Object.entries(player)) {
+  for(const [key, value] of Object.entries(player)) {
     if(numberValues.includes(key) && value !== undefined && value !== null) {
-      value = parseInt(value);
+      player[key] = parseInt(value);
     }
   }
   return player;

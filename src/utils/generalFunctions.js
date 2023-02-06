@@ -122,11 +122,10 @@ export function makeDate(input, showTime = false, short = false) {
  */
 export async function extensionInstalled() {
 	return new Promise((resolve) => {
-		window.chrome.runtime.sendMessage(
+		chrome.runtime.sendMessage(
 			character_sync_id,
 			{ request_content: ["version"] },
 			(response) => {
-				console.log("Get version response", response);
 				if (response) {
 					resolve(true)
 				} else {
@@ -142,7 +141,7 @@ export async function extensionInstalled() {
  */
 export async function getCharacterSyncStorage() {
 	return new Promise((resolve, reject) => {
-		window.chrome.runtime.sendMessage(
+		chrome.runtime.sendMessage(
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
@@ -166,7 +165,7 @@ export async function getCharacterSyncStorage() {
  */
 export async function getCharacterSyncCharacter(url) {
 	return new Promise((resolve, reject) => {
-		window.chrome.runtime.sendMessage(
+		chrome.runtime.sendMessage(
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {

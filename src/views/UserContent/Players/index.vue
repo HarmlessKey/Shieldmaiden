@@ -197,7 +197,6 @@
 			await this.get_players();
 			this.loading_players = false;
 			
-			console.log("Players mounted() chrome.runtime", chrome.runtime)
 			this.sync_characters = await getCharacterSyncStorage();
 		},
 		methods: {

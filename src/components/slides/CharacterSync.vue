@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<q-no-ssr>
 		<h3>Character Sync</h3>
 		<div v-if="browser !== 'Chrome'" class="red mb-2">
 			Google
@@ -56,7 +56,7 @@
 			<p>This feature is only available with a subscription.</p>
 			<router-link to="/patreon" class="btn btn-block bg-patreon-red">Get a subscription</router-link>
 		</template>
-	</div>
+	</q-no-ssr>
 </template>
 
 <script>
@@ -108,6 +108,7 @@
 			}
 		},
 		async mounted() {
+			console.log("CharacterSync mounted() chrome.runtime", chrome.runtime)
 			this.hasExtension = await extensionInstalled();
 		}
 	};

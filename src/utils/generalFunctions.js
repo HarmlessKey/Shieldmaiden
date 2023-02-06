@@ -119,14 +119,14 @@ export function makeDate(input, showTime = false, short = false) {
  * Check if the "D&D Character Sync" extension is installed
  * 
  * @param {string} url 
- * @returns 
  */
 export async function extensionInstalled() {
 	return new Promise((resolve) => {
 		chrome.runtime.sendMessage(
 			character_sync_id,
-			{ request_content: ["characters"] },
+			{ request_content: ["version"] },
 			(response) => {
+				console.log("Get version response", response);
 				if (response) {
 					resolve(true)
 				} else {
@@ -146,6 +146,7 @@ export async function getCharacterSyncStorage() {
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
+				console.log("Get characters response", response)
 				if (response && response.characters) {
 					resolve(response.characters);
 				} else {

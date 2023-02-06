@@ -9,8 +9,8 @@ export const dice_types = Object.freeze([
 
 /** Id of extension @see https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg */
 export const character_sync_id =
-	process.env.VUE_APP_ENV_NAME !== "develop"
-		? "nlcbmcblcjlhbihffndcgbkkapcfmifa"
+	process.env.VUE_APP_ENV_NAME === "develop"
+		? process.env.LOCAL_CHARACTER_SYNC_ID
 		: "jgcbbmbchbkdjbgiiheminkkkecjohpg";
 
 export const backgrounds = Object.freeze([

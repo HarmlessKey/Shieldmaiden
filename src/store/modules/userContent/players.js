@@ -391,27 +391,6 @@ const player_actions = {
   },
 
   /**
-   * Give control over a player to another user
-   * 
-   * @param {string} user_id
-   * @param {string} id 
-   */
-   async give_out_control({ commit, dispatch, rootGetters }, { user_id, id }) {
-    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
-      const services = await dispatch("get_player_services");
-      try {
-        await services.updatePlayer(uid, id, "", { "control": user_id });
-        await services.giveControl(uid, id, user_id);
-        commit("SET_CONTROL", { uid, id, user_id });
-        return;
-      } catch(error) {
-        throw error;
-      }
-    }
-  },
-
-  /**
    * Update character with data from Character Sync Extension
    * 
    * @param {string} user_id
@@ -429,6 +408,27 @@ const player_actions = {
       commit("UPDATE_SEARCH_PLAYER", { id, search_player });
       commit("PATCH_CACHED_PLAYER", { uid, id, player });
       return;
+    }
+  },
+
+  /**
+   * Give control over a player to another user
+   * 
+   * @param {string} user_id
+   * @param {string} id 
+   */
+  async give_out_control({ commit, dispatch, rootGetters }, { user_id, id }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        await services.updatePlayer(uid, id, "", { "control": user_id });
+        await services.giveControl(uid, id, user_id);
+        commit("SET_CONTROL", { uid, id, user_id });
+        return;
+      } catch(error) {
+        throw error;
+      }
     }
   },
 
@@ -481,7 +481,9 @@ const player_mutations = {
     Vue.delete(state.players, id);
   },
   REMOVE_CHARACTER(state, id) { 
-    Vue.delete(state.characters, id);
+    if(state.characters) {
+      Vue.delete(state.characters, id);
+    }
   },
   SET_CACHED_PLAYER(state, { uid, id, player }) { 
     if(state.cached_players[uid]) {

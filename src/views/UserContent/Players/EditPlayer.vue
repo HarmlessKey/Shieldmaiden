@@ -4,16 +4,9 @@
 			<q-form @submit="handleSubmit(savePlayer)">
 				<div id="players" v-if="($route.name == 'Edit Character' && player.control === $store.getters.user.uid) || $route.name != 'Edit Character'">
 
-					<!-- GIVE OUT CONTROL -->
-					<hk-card header="Give out control" v-if="$route.name !== 'Add player' && $route.name !== 'Edit character'">
-						<div class="card-body">
-							<GiveCharacterControl :playerId="playerId" :control="player.control" />
-						</div>
-					</hk-card>
-
 					<hk-card-deck>
 						<hk-card>
-							<div class="card-header p-0" slot="header">
+							<div class="card-header p-0 pr-4" slot="header">
 								<div class="d-flex justify-content-start items-center">
 									<div 
 										class="img player-avatar" 
@@ -25,6 +18,7 @@
 									</div>
 									Basic info
 								</div>
+								<i v-if="syncing" class="fas fa-sync-alt green rotate" aria-hidden="true" @animationend="syncing = false" />
 							</div>
 							<div class="card-body">
 								<ValidationProvider v-if="$route.name !== 'Edit character'" rules="max:15|required" name="Name" v-slot="{ errors, invalid, validated }">
@@ -54,6 +48,15 @@
 										:error-message="errors[0]"
 									/>
 								</ValidationProvider>
+								
+								<!-- Give Player Control -->
+								<GiveCharacterControl 
+									v-if="$route.name !== 'Add player' && $route.name !== 'Edit character'" 
+									:playerId="playerId" 
+									:control="player.control"
+									@set="$set(player, 'control', $event)"
+									@remove="$set(player, 'control', null)"
+								/>
 
 								<!-- Character Sync -->
 								<template v-if="tier.name !== 'Free' && $route.name !== 'Edit character'">
@@ -61,6 +64,7 @@
 										<q-input
 											v-if="linked_character"
 											:dark="$store.getters.theme === 'dark'" filled square
+											class="mt-4"
 											label="Linked character"
 											type="text" 
 											:value="linked_character ? linked_character.name : 'Not found'" 
@@ -82,7 +86,7 @@
 											</button>
 										</q-input>
 									</div>
-									<button v-else-if="sync_characters" class="btn btn-block bg-neutral-5" @click.stop.prevent="link_dialog = true">
+									<button v-else-if="sync_characters" class="btn btn-block bg-neutral-5 mt-4" @click.stop.prevent="link_dialog = true">
 										<i class="fas fa-link" aria-hidden="true" />
 										Link character
 									</button>
@@ -532,6 +536,7 @@
 		data() {
 			return {
 				abilities: abilities,
+				syncing: false,
 				link_dialog: false,
 				linked_character: undefined,
 				sync_characters: undefined,
@@ -542,7 +547,7 @@
 				preview_new_upload: undefined,
 				companion_dialog: false,
 				player: {},
-				loading: false,
+				loading: true,
 				companions_to_delete: [],
 				companions: [],
 				columns: {
@@ -672,6 +677,7 @@
 				this.player.sync_character = null;
 			},
 			async sync() {
+				this.syncing = true;
 				const character = await getCharacterSyncCharacter(this.player.sync_character);
 				if(character) {
 					const new_player = characterToPlayer(character);

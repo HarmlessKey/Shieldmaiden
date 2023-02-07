@@ -10,19 +10,35 @@
 			>Chrome</a>
 			is needed for this feature to work.
 		</div>
-		<template v-if="!hasExtension">
+
+		<!-- No extension -->
+		<template v-if="!extensionVersion">
 			<p>
 				A Google Chrome Extension is needed to Sync your characters from other resources.
 			</p>
 			<a
 				class="btn btn-block"
-				href="https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg"
+				:href="`https://chrome.google.com/webstore/detail/dd-character-sync/${extension_id}`"
 				target="_blank"
 				rel="noopener"
 			>
 				Install D&D Character Sync
 			</a>
 		</template>
+
+		<!-- Version too low -->
+		<template v-if="extensionVersion < '0.2.1'">
+			<strong class="orange">Version too low</strong> <span class="neutral-3"> (0.2.1 or higher required)</span>
+			<p>
+				A newer version of the <strong>D&D Character Sync</strong> extension is required
+			</p>
+			<div class="extension-icon mb-1" />
+			- Right click on the extension's icon<br/>
+			- Click <strong>Manage extension</strong> and then the <strong>Update</strong> button
+			- Refresh this page
+		</template>
+
+		<!-- Has extension and correct version -->
 		<q-stepper
 			v-else
 			:dark="$store.getters.theme === 'dark'"
@@ -63,12 +79,14 @@
 	import { extensionInstalled } from "src/utils/generalFunctions";
 	import { browserDetect } from 'src/functions';
 	import { mapGetters } from "vuex";
+	import { character_sync_id } from "src/utils/generalConstants";
 
 	export default {
 		name: 'CharacterSync',
 		data() {
     	return {
-				hasExtension: false,
+				extensionVersion: false,
+				extension_id: character_sync_id,
 				browser: browserDetect(),
 				step: 0,
 				steps: [
@@ -108,7 +126,7 @@
 			}
 		},
 		async mounted() {
-			this.hasExtension = await extensionInstalled();
+			this.extensionVersion = await extensionInstalled();
 		}
 	};
 </script>

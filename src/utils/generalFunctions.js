@@ -127,9 +127,9 @@ export async function extensionInstalled() {
 			{ request_content: ["version"] },
 			(response) => {
 				if (response) {
-					resolve(true)
+					resolve(response.version)
 				} else {
-					return false;
+					return undefined;
 				}
 			}
 		);
@@ -145,7 +145,6 @@ export async function getCharacterSyncStorage() {
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
-				console.log("Get characters response", response)
 				if (response && response.characters) {
 					resolve(response.characters);
 				} else {

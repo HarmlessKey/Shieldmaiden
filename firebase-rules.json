@@ -234,7 +234,7 @@
     "character_control": {
       "$uid": {
         "$playerid": {
-        	".write": "data.exists() || newData.child('user').val() === auth.uid"
+        	".write": "data.exists() || newData.child('user').val() === auth.uid || data.child('user').val() === auth.uid"
         },
         ".read": true
       }

@@ -116,6 +116,30 @@ export function makeDate(input, showTime = false, short = false) {
 }
 
 /**
+ * Turns a character object from D&D Character Sync into a HK player object
+ * 
+ * @param {object} character
+ * @returns {object} player
+ */
+export function characterToPlayer(character) {
+	const player = {};
+
+	if(character.armor_class !== undefined) player.ac = parseInt(character.armor_class);
+	if(character.avatar !== undefined) player.avatar = character.avatar;
+	if(character.name !== undefined) player.character_name = character.name;
+	if(character.strength !== undefined) player.strength = parseInt(character.strength);
+	if(character.dexterity !== undefined) player.dexterity = parseInt(character.dexterity);
+	if(character.constitution !== undefined) player.constitution = parseInt(character.constitution);
+	if(character.intelligence !== undefined) player.intelligence = parseInt(character.intelligence);
+	if(character.level !== undefined) player.level = parseInt(character.level);
+	if(character.max_hit_points !== undefined) player.maxHp = parseInt(character.max_hit_points);
+	if(character.walking_speed !== undefined) player.speed = parseInt(character.walking_speed);
+	if(character.initiative !== undefined) player.initiative = parseInt(character.initiative);
+
+	return player;
+}
+
+/**
  * Check if the "D&D Character Sync" extension is installed
  * 
  * @param {string} url 

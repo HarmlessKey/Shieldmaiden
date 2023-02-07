@@ -27,15 +27,14 @@
 								</div>
 							</div>
 							<div class="card-body">
-								<ValidationProvider rules="max:15|required" name="Name" v-slot="{ errors, invalid, validated }">
+								<ValidationProvider v-if="$route.name !== 'Edit character'" rules="max:15|required" name="Name" v-slot="{ errors, invalid, validated }">
 									<q-input 
-										v-if="$route.name !== 'Edit Character'"
 										:dark="$store.getters.theme === 'dark'" filled square
 										label="Player name *"
-										autocomplete="off"  
-										type="text" 
-										class="mb-2" 
-										v-model="player.player_name" 
+										autocomplete="off"
+										type="text"
+										class="mb-2"
+										v-model="player.player_name"
 										maxlength="15"
 										:error="invalid && validated"
 										:error-message="errors[0]"
@@ -55,6 +54,39 @@
 										:error-message="errors[0]"
 									/>
 								</ValidationProvider>
+
+								<!-- Character Sync -->
+								<template v-if="tier.name !== 'Free' && $route.name !== 'Edit character'">
+									<div v-if="player.sync_character">
+										<q-input
+											v-if="linked_character"
+											:dark="$store.getters.theme === 'dark'" filled square
+											label="Linked character"
+											type="text" 
+											:value="linked_character ? linked_character.name : 'Not found'" 
+											readonly
+											:error="!linked_character"
+											error-message="Character not found in extension"
+										>
+											<button slot="prepend" class="btn bg-neutral-5" @click="unlink">
+												<i class="fas fa-unlink red" aria-hidden="true" />
+												<q-tooltip anchor="top middle" self="center middle">
+													Unlink
+												</q-tooltip>
+											</button>
+											<button v-if="linked_character" slot="append" class="btn bg-neutral-5" @click="sync">
+												<i class="fas fa-sync-alt" aria-hidden="true" />
+												<q-tooltip anchor="top middle" self="center middle">
+													Sync character
+												</q-tooltip>
+											</button>
+										</q-input>
+									</div>
+									<button v-else-if="sync_characters" class="btn btn-block bg-neutral-5" @click.stop.prevent="link_dialog = true">
+										<i class="fas fa-link" aria-hidden="true" />
+										Link character
+									</button>
+								</template>
 							</div>
 						</hk-card>
 						<hk-card header="Level & Base Stats">
@@ -470,6 +502,11 @@
 				@clear="clearAvatar"
 			/>
 		</q-dialog>
+
+		<!-- LINK CHARACTER -->
+		<q-dialog v-if="tier.name !== 'Free'" v-model="link_dialog">
+			<hk-link-character @link="linkCharacter" />
+		</q-dialog>
 	</div>
 	<hk-loader v-else name="player" />
 </template>
@@ -482,7 +519,7 @@
 	import Defenses from './Defenses';
 	import CopyContent from '../../../components/CopyContent.vue';
 	import { abilities, skills } from "src/utils/generalConstants";
-	import { calc_skill_mod } from "src/utils/generalFunctions";
+	import { calc_skill_mod, getCharacterSyncCharacter, getCharacterSyncStorage, characterToPlayer } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'EditPlayer',
@@ -495,6 +532,9 @@
 		data() {
 			return {
 				abilities: abilities,
+				link_dialog: false,
+				linked_character: undefined,
+				sync_characters: undefined,
 				skillList: skills,
 				playerId: this.$route.params.id,
 				userId: undefined,
@@ -580,7 +620,7 @@
 			if(this.playerId) {
 				this.loading = true;
 				await this.get_player({ uid: this.userId, id: this.playerId }).then(async (player) => {
-					this.player = player;
+					this.player = {...player};
 
 					let comps = [];
 					for (let key in player.companions) {
@@ -599,6 +639,11 @@
 					this.loading = false;
 				});
 			}
+
+			if(this.player.sync_character) {
+				this.linked_character = await getCharacterSyncCharacter(this.player.sync_character);
+			}
+			this.sync_characters = await getCharacterSyncStorage();
 		},
 		methods: {
 			...mapActions([
@@ -616,6 +661,22 @@
 			...mapActions("campaigns", ["get_campaign"]),
 			isOwner() {
 				return (this.$route.name !== 'Edit character');
+			},
+			async linkCharacter(url) {
+				this.$set(this.player, "sync_character", url);
+				this.linked_character = await getCharacterSyncCharacter(this.player.sync_character);
+				this.link_dialog = false;
+			},
+			unlink() {
+				this.linked_character = undefined;
+				this.player.sync_character = null;
+			},
+			async sync() {
+				const character = await getCharacterSyncCharacter(this.player.sync_character);
+				if(character) {
+					const new_player = characterToPlayer(character);
+					this.player = { ...this.player, ...new_player };
+				}
 			},
 			savePlayer() {
 				if(this.$route.name === "Add player") {

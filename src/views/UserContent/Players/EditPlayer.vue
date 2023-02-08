@@ -49,47 +49,61 @@
 									/>
 								</ValidationProvider>
 								
-								<!-- Give Player Control -->
-								<GiveCharacterControl 
-									v-if="$route.name !== 'Add player' && $route.name !== 'Edit character'" 
-									:playerId="playerId" 
-									:control="player.control"
-									@set="$set(player, 'control', $event)"
-									@remove="$set(player, 'control', null)"
-								/>
-
-								<!-- Character Sync -->
-								<template v-if="tier.name !== 'Free' && $route.name !== 'Edit character'">
-									<div v-if="player.sync_character">
-										<q-input
-											v-if="linked_character"
-											:dark="$store.getters.theme === 'dark'" filled square
-											class="mt-4"
-											label="Linked character"
-											type="text" 
-											:value="linked_character ? linked_character.name : 'Not found'" 
-											readonly
-											:error="!linked_character"
-											error-message="Character not found in extension"
-										>
-											<button slot="prepend" class="btn bg-neutral-5" @click="unlink">
-												<i class="fas fa-unlink red" aria-hidden="true" />
-												<q-tooltip anchor="top middle" self="center middle">
-													Unlink
-												</q-tooltip>
-											</button>
-											<button v-if="linked_character" slot="append" class="btn bg-neutral-5" @click="sync">
-												<i class="fas fa-sync-alt" aria-hidden="true" />
-												<q-tooltip anchor="top middle" self="center middle">
-													Sync character
-												</q-tooltip>
-											</button>
-										</q-input>
-									</div>
-									<button v-else-if="sync_characters" class="btn btn-block bg-neutral-5 mt-4" @click.stop.prevent="link_dialog = true">
-										<i class="fas fa-link" aria-hidden="true" />
-										Link character
-									</button>
+								<template v-if="$route.name !== 'Edit character'">
+									<!-- Give Player Control -->
+									<GiveCharacterControl 
+										v-if="$route.name !== 'Add player'" 
+										:playerId="playerId" 
+										:control="player.control"
+										@set="$set(player, 'control', $event)"
+										@remove="$set(player, 'control', null)"
+									/>
+	
+									<!-- Character Sync -->
+									<template v-if="tier.name !== 'Free'">
+										<div v-if="player.sync_character">
+											<q-input
+												v-if="linked_character"
+												:dark="$store.getters.theme === 'dark'" filled square
+												class="mt-4"
+												label="Linked character"
+												type="text" 
+												:value="linked_character ? linked_character.name : 'Not found'" 
+												readonly
+												:error="!linked_character"
+												error-message="Character not found in extension"
+											>
+												<button slot="prepend" class="btn bg-neutral-5" @click="unlink">
+													<i class="fas fa-unlink red" aria-hidden="true" />
+													<q-tooltip anchor="top middle" self="center middle">
+														Unlink
+													</q-tooltip>
+												</button>
+												<button v-if="linked_character" slot="append" class="btn bg-neutral-5" @click="sync">
+													<i class="fas fa-sync-alt" aria-hidden="true" />
+													<q-tooltip anchor="top middle" self="center middle">
+														Sync character
+													</q-tooltip>
+												</button>
+											</q-input>
+										</div>
+										<button v-else-if="sync_characters" class="btn btn-block bg-neutral-5 mt-4" @click.stop.prevent="link_dialog = true">
+											<i class="fas fa-link" aria-hidden="true" />
+											Link character
+										</button>
+									</template>
+									<template v-else>
+										<button 
+											class="btn btn-block bg-neutral-5"
+											@click.prevent="setSlide({
+												show: true,
+												type: 'slides/CharacterSync'
+											})">
+											<i class="fas fa-sync-alt" aria-hidden="true" />
+											Sync with external character
+										</button>
+										<small class="neutral-3"><router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key required.</small>
+									</template>
 								</template>
 							</div>
 						</hk-card>
@@ -512,7 +526,9 @@
 			<hk-link-character @link="linkCharacter" />
 		</q-dialog>
 	</div>
-	<hk-loader v-else name="player" />
+	<hk-card v-else header="Player">
+		<hk-loader name="player" />
+	</hk-card>
 </template>
 
 <script>
@@ -547,7 +563,7 @@
 				preview_new_upload: undefined,
 				companion_dialog: false,
 				player: {},
-				loading: true,
+				loading: this.$route.name === 'Edit player',
 				companions_to_delete: [],
 				companions: [],
 				columns: {

@@ -18,7 +18,7 @@
 									</div>
 									Basic info
 								</div>
-								<i v-if="syncing" class="fas fa-sync-alt green rotate" aria-hidden="true" @animationend="syncing = false" />
+								<!-- <i v-if="syncing" class="fas fa-sync-alt green rotate" aria-hidden="true" @animationend="syncing = false" /> -->
 							</div>
 							<div class="card-body">
 								<ValidationProvider v-if="$route.name !== 'Edit character'" rules="max:15|required" name="Name" v-slot="{ errors, invalid, validated }">
@@ -72,6 +72,7 @@
 												readonly
 												:error="!linked_character"
 												error-message="Character not found in extension"
+												:hint="playerEqualsLinkedCharacter() ? 'Up to date' : 'Update available'"
 											>
 												<template #append>
 													<button class="btn btn-sm bg-neutral-5" @click="unlink">
@@ -86,10 +87,15 @@
 															Open to update
 														</q-tooltip>
 													</button>
-													<button v-if="linked_character" class="btn btn-sm bg-neutral-5 ml-2" @click="sync">
-														<i class="fas fa-sync-alt" aria-hidden="true" />
+													<button 
+														v-if="linked_character" 
+														class="btn btn-sm ml-2" 
+														@click="sync"
+														:class="{ 'bg-neutral-5': playerEqualsLinkedCharacter() }"
+													>
+														<i class="fas fa-sync-alt" aria-hidden="true" :class="{ rotate: syncing }" @animationend="syncing = false"  />
 														<q-tooltip anchor="top middle" self="center middle">
-															Sync character
+															No update
 														</q-tooltip>
 													</button>
 												</template>
@@ -110,7 +116,9 @@
 											<i class="fas fa-sync-alt" aria-hidden="true" />
 											Sync with external character
 										</button>
-										<small class="neutral-3"><router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key required.</small>
+										<small class="neutral-3">
+											<router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key required.
+										</small>
 									</template>
 								</template>
 							</div>
@@ -547,7 +555,7 @@
 	import Defenses from './Defenses';
 	import CopyContent from '../../../components/CopyContent.vue';
 	import { abilities, skills } from "src/utils/generalConstants";
-	import { calc_skill_mod, getCharacterSyncCharacter, getCharacterSyncStorage, characterToPlayer } from "src/utils/generalFunctions";
+	import { calc_skill_mod, getCharacterSyncCharacter, getCharacterSyncStorage, characterToPlayer, comparePlayerToCharacter } from "src/utils/generalFunctions";
 
 	export default {
 		name: 'EditPlayer',
@@ -691,6 +699,9 @@
 			isOwner() {
 				return (this.$route.name !== 'Edit character');
 			},
+			playerEqualsLinkedCharacter() {
+				return comparePlayerToCharacter(this.linked_character, this.player);
+			},
 			async linkCharacter(url) {
 				this.$set(this.player, "sync_character", url);
 				this.linked_character = await getCharacterSyncCharacter(this.player.sync_character);
@@ -702,9 +713,9 @@
 			},
 			async sync() {
 				this.syncing = true;
-				const character = await getCharacterSyncCharacter(this.player.sync_character);
-				if(character) {
-					const new_player = characterToPlayer(character);
+				this.linked_character = await getCharacterSyncCharacter(this.player.sync_character);
+				if(this.linked_character) {
+					const new_player = characterToPlayer(this.linked_character);
 					this.player = { ...this.player, ...new_player };
 				}
 			},

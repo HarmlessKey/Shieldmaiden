@@ -1,5 +1,7 @@
 import numeral from "numeral";
 import { character_sync_id } from "./generalConstants";
+import _ from "lodash";
+
 /**
  * Calculate the average value of given dice
  *
@@ -137,6 +139,22 @@ export function characterToPlayer(character) {
 	if(character.initiative !== undefined) player.initiative = parseInt(character.initiative);
 
 	return player;
+}
+
+/**
+ * Compares player with linked character
+ * 
+ * @param {object} player
+ * @returns {boolean}
+ */
+export function comparePlayerToCharacter(sync_character, player) {
+	const character = characterToPlayer(sync_character);
+	const compare_player = {};
+
+	for(const key of Object.keys(character)) {
+		compare_player[key] = player[key];
+	}
+	return _.isEqual(compare_player, character);
 }
 
 /**

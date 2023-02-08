@@ -7,7 +7,7 @@
 			:value="controlUser.username"
 			readonly
 		>
-			<button slot="append" class="btn bg-neutral-5" @click="removeControl()">
+			<button slot="append" class="btn btn-sm bg-neutral-5" @click="removeControl()">
 				<i aria-hidden="true" class="fas fa-times red" />
 				<q-tooltip anchor="top middle" self="center middle">
 					Remove control
@@ -25,7 +25,7 @@
 				:error="foundUser === false && findUser !== ''"
 				:error-message="`User not found`"
 			>
-				<button slot="append" class="btn bg-neutral-5" @click="find_user()">
+				<button slot="append" class="btn btn-sm bg-neutral-5" @click="find_user()">
 					<i aria-hidden="true" class="fas fa-search" />
 				</button>
 

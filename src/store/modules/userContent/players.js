@@ -407,7 +407,6 @@ const player_actions = {
       await services.syncPlayer(uid, id, player, search_player);
       commit("UPDATE_SEARCH_PLAYER", { id, search_player });
       commit("PATCH_CACHED_PLAYER", { uid, id, player });
-      return;
     }
   },
 

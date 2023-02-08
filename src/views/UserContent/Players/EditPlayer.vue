@@ -73,18 +73,26 @@
 												:error="!linked_character"
 												error-message="Character not found in extension"
 											>
-												<button slot="prepend" class="btn bg-neutral-5" @click="unlink">
-													<i class="fas fa-unlink red" aria-hidden="true" />
-													<q-tooltip anchor="top middle" self="center middle">
-														Unlink
-													</q-tooltip>
-												</button>
-												<button v-if="linked_character" slot="append" class="btn bg-neutral-5" @click="sync">
-													<i class="fas fa-sync-alt" aria-hidden="true" />
-													<q-tooltip anchor="top middle" self="center middle">
-														Sync character
-													</q-tooltip>
-												</button>
+												<template #append>
+													<button class="btn btn-sm bg-neutral-5" @click="unlink">
+														<i class="fas fa-unlink red" aria-hidden="true" />
+														<q-tooltip anchor="top middle" self="center middle">
+															Unlink
+														</q-tooltip>
+													</button>
+													<button class="btn btn-sm bg-neutral-5 ml-2" @click="openUrl(player.sync_character)">
+														<i class="fas fa-external-link" aria-hidden="true" />
+														<q-tooltip anchor="top middle" self="center middle">
+															Open to update
+														</q-tooltip>
+													</button>
+													<button v-if="linked_character" class="btn btn-sm bg-neutral-5 ml-2" @click="sync">
+														<i class="fas fa-sync-alt" aria-hidden="true" />
+														<q-tooltip anchor="top middle" self="center middle">
+															Sync character
+														</q-tooltip>
+													</button>
+												</template>
 											</q-input>
 										</div>
 										<button v-else-if="sync_characters" class="btn btn-block bg-neutral-5 mt-4" @click.stop.prevent="link_dialog = true">
@@ -772,7 +780,7 @@
 				const proficient = this.player.skills ? this.player.skills.includes(key) : false;
 				const expertise = this.player.skills_expertise ? this.player.skills_expertise.includes(key) : false;
 				
-				return calc_skill_mod(
+				const mod = calc_skill_mod(
 					ability_mod,
 					proficiency,
 					0,
@@ -799,6 +807,9 @@
 				this.$delete(this.player, "blob");
 				this.preview_new_upload = undefined;
 				this.avatar_dialog = false;
+			},
+			openUrl(url) {
+				window.open(url, '_blank').opener = null;
 			}
 		}
 	}

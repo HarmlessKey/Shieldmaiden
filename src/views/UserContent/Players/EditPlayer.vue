@@ -66,14 +66,17 @@
 												v-if="linked_character"
 												:dark="$store.getters.theme === 'dark'" filled square
 												class="mt-4"
-												label="Linked character"
 												type="text" 
 												:value="linked_character ? linked_character.name : 'Not found'" 
 												readonly
+												label-slot
 												:error="!linked_character"
 												error-message="Character not found in extension"
-												:hint="playerEqualsLinkedCharacter() ? 'Up to date' : 'Update available'"
 											>
+												<template #label>
+													Linked character
+													<q-chip v-if="!playerEqualsLinkedCharacter()" class="white" color="neutral-6">Update available</q-chip>
+												</template>
 												<template #append>
 													<button class="btn btn-sm bg-neutral-5" @click="unlink">
 														<i class="fas fa-unlink red" aria-hidden="true" />

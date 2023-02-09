@@ -102,7 +102,7 @@
               ".validate": "newData.isString() && newData.val().length <= 100"
             },
             "player_name": {
-              ".validate": "newData.isString() && newData.val().length <= 15"
+              ".validate": "newData.isString() && newData.val().length <= 100"
             },
             "character_name": {
               ".validate": "newData.isString() && newData.val().length <= 100"
@@ -129,7 +129,7 @@
               ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
             },
             "speed": {
-              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
             },
             "initiative": {
               ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"

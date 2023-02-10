@@ -2,7 +2,7 @@ String.prototype.capitalize = function () {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
-String.prototype.capitalizeEach = function (sep = ' ') {
+String.prototype.capitalizeEach = function (sep = " ") {
 	return this.split(sep)
 		.map((s) => s.capitalize())
 		.join(sep);
@@ -12,8 +12,8 @@ String.prototype.formatUnicorn = function () {
 	var e = this.toString();
 	if (!arguments.length) return e;
 	var t = typeof arguments[0],
-		n = 'string' === t || 'number' === t ? Array.prototype.slice.call(arguments) : arguments[0];
-	for (var o in n) e = e.replace(new RegExp('\\{' + o + '\\}', 'gi'), n[o]);
+		n = "string" === t || "number" === t ? Array.prototype.slice.call(arguments) : arguments[0];
+	for (var o in n) e = e.replace(new RegExp("\\{" + o + "\\}", "gi"), n[o]);
 	return e;
 };
 
@@ -29,8 +29,7 @@ Number.prototype.max = function (max = Infinity) {
 
 // Returns a number equal to or higher than a given minimum and lower than or equal to a given maximum
 Number.prototype.between = function (min = 0, max = Infinity) {
-	let value = this;
-	value = this >= min ? this : min;
+	let value = this >= min ? this : min;
 	value = this <= max ? this : max;
 	return value;
 };
@@ -47,17 +46,17 @@ Array.min = function (array) {
 	if (process.browser) {
 		// Opera 8.0+
 		const isOpera =
-			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(" OPR/") >= 0;
 
 		// Firefox 1.0+
-		const isFirefox = typeof InstallTrigger !== 'undefined';
+		const isFirefox = typeof InstallTrigger !== "undefined";
 
 		// Safari 3.0+ "[object HTMLElementConstructor]"
 		const isSafari =
 			/constructor/i.test(window.HTMLElement) ||
 			(function (p) {
-				return p.toString() === '[object SafariRemoteNotification]';
-			})(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+				return p.toString() === "[object SafariRemoteNotification]";
+			})(!window["safari"] || (typeof safari !== "undefined" && window["safari"].pushNotification));
 
 		// Internet Explorer 6-11
 		const isIE = /*@cc_on!@*/ false || !!document.documentMode;
@@ -69,23 +68,23 @@ Array.min = function (array) {
 		const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
 		// Edge (based on chromium) detection
-		const isEdgeChromium = isChrome && navigator.userAgent.indexOf('Edg') != -1;
+		const isEdgeChromium = isChrome && navigator.userAgent.indexOf("Edg") != -1;
 
 		return isOpera
-			? 'Opera'
+			? "Opera"
 			: isFirefox
-			? 'Firefox'
+			? "Firefox"
 			: isSafari
-			? 'Safari'
+			? "Safari"
 			: isEdgeChromium
-			? 'Edge'
+			? "Edge"
 			: isChrome
-			? 'Chrome'
+			? "Chrome"
 			: isIE
-			? 'IE'
+			? "IE"
 			: isEdge
-			? 'Edge'
+			? "Edge"
 			: "Don't know";
 	}
-	return 'Not a browser';
+	return "Not a browser";
 }

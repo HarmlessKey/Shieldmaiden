@@ -41,7 +41,7 @@
         },
         "patreon_email": {
           ".write": "root.child('users').child(auth.uid).child('admin').exists()"
-        },
+        }
       },
       ".read": true,
       ".indexOn": ["username", "email", "admin", "contribute"]
@@ -49,7 +49,7 @@
     "search_users": {
       ".read": true,
       "$uid": {
-        ".write": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
       },
       ".indexOn": ["username", "email"]
     },
@@ -60,7 +60,7 @@
     },
     "posters": {
       ".write": true,
-      ".read": true,
+      ".read": true
   	},
     "patrons": {
       ".write": true,
@@ -79,7 +79,7 @@
     },
     "tiers": {
       ".write": true,
-      ".read": true,
+      ".read": true
     },
     "settings": {
       "$uid": {
@@ -90,10 +90,113 @@
     "players": {
       "$uid": {
         "$playerid": {
-          	".write": "
-              $uid === auth.uid || 
-              root.child('character_control').child(auth.uid).child($playerid).child('user').val() === $uid
-       			"
+          	".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child($playerid).child('user').val() === $uid",
+            ".validate": "newData.hasChildren(['player_name', 'character_name', 'maxHp', 'ac'])",
+            "sync_character": {
+              ".validate": "newData.isString() && newData.val().length <= 2000"
+            },
+            "control": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "campaign_id": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "player_name": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "character_name": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "avatar": {
+              ".validate": "newData.isString() && newData.val().length <= 2000"
+            },
+            "storage_avatar": {
+              ".validate": "newData.isString() && newData.val().length <= 2000"
+            },
+            "experience": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 355000"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+            },
+            "maxHp": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+            },
+            "ac": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "spell_save_dc": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "speed": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+            },
+            "initiative": {
+              ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+            },
+            "strength": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "dexterity": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "constitution": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "intelligence": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "wisdom": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "charisma": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "passive_insight": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "passive_investigation": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "passive_perception": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            },
+            "damage_vulnerabilities": {
+              "$vulnerabilityIndex": {
+                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+              }
+            },
+            "damage_resistances": {
+              "$resistanceIndex": {
+                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+              }
+            },
+            "damage_immunities": {
+              "$immunityIndex": {
+                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+              }
+            },
+            "condition_immunities": {
+              "$conditionImmunityIndex": {
+                ".validate": "newData.isString() && newData.val().matches(/^(blinded|charmed|deafened|exhaustion|frightened|grappled|incapacitated|invisible|paralyzed|petrified|poisoned|prone|restrained|stunned|unconscious)$/)"
+              }
+            },
+            "skills": {
+              "$skillIndex": {
+                ".validate": "newData.isString() && newData.val().matches(/^(acrobatics|animal Handling|arcana|athletics|deception|history|insight|intimidation|investigation|medicine|nature|perception|performance|persuasion|religion|sleight of Hand|stealth|survival)$/)"
+              }
+            },
+            "skills_expertise": {
+              "$skillIndex": {
+                ".validate": "newData.isString() && newData.val().matches(/^(acrobatics|animal Handling|arcana|athletics|deception|history|insight|intimidation|investigation|medicine|nature|perception|performance|persuasion|religion|sleight of Hand|stealth|survival)$/)"
+              }
+            },
+            "companions": {
+              "$npcId": {
+                ".validate": "newData.isBoolean()"
+              }
+            },
+            "$other": { ".validate": false }
         }, 
         ".read": true
       },
@@ -104,6 +207,9 @@
       "$uid": {
         ".write": "$uid === auth.uid",
         "results": {
+          "$playerid": {
+          	".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child($playerid).child('user').val() === $uid",
+          },
           ".indexOn": ["character_name"]
         }
       }
@@ -111,10 +217,7 @@
     "characters": {
       "$uid": {
         "$characterId": {
-          	".write": "
-              $uid === auth.uid || 
-              root.child('character_control').child(auth.uid).child($characterId).child('user').val() === $uid
-       			"
+          	".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child($characterId).child('user').val() === $uid"
         }, 
         ".read": true
       }
@@ -131,7 +234,7 @@
     "character_control": {
       "$uid": {
         "$playerid": {
-        	".write": "data.exists() || newData.child('user').val() === auth.uid"
+        	".write": "data.exists() || newData.child('user').val() === auth.uid || data.child('user').val() === auth.uid"
         },
         ".read": true
       }
@@ -139,15 +242,11 @@
     "npcs": {
       "$uid": {
         "$npcId": {
-          ".write": "
-          	$uid === auth.uid ||
-            root.child('character_control').child(auth.uid).child( data.child('player_id').val() ).child('user').val() === $uid
-          ",
+          ".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child( data.child('player_id').val() ).child('user').val() === $uid",
           ".validate": "newData.hasChildren(['name', 'size', 'type', 'challenge_rating', 'armor_class', 'hit_points', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'])",
           "harmless_key": {
             ".validate": "newData.isString() && newData.val().length <= 100"
           },
-          // BASIC INFO
           "name": {
             ".validate": "newData.isString() && newData.val().length <= 100"
           },
@@ -214,7 +313,6 @@
             ".validate": "newData.isString() && newData.val().length <= 10 && (newData.val().length === 0 ||newData.val().matches(/^[0-9]+d[0-9]+$/))"
           },
 
-          // SENSES
           "senses": {
             "blindsight": {
               "blindsight": {
@@ -266,7 +364,6 @@
             }
           },
 
-          // ABILITYSCORES
           "strength": {
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
@@ -292,7 +389,6 @@
             }
           },
 
-          // SKILLS
           "skills": {
             "$skillIndex": {
               ".validate": "newData.isString() && newData.val().matches(/^(acrobatics|animal Handling|arcana|athletics|deception|history|insight|intimidation|investigation|medicine|nature|perception|performance|persuasion|religion|sleight of Hand|stealth|survival)$/)"
@@ -363,7 +459,6 @@
             }
           },
 
-          // DEFENSES
           "damage_vulnerabilities": {
             "$vulnerabilityIndex": {
               ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
@@ -385,7 +480,6 @@
             }
           },
 
-          // SPELLCASTING
           "caster_ability": {
             ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
           },
@@ -439,7 +533,6 @@
             }
           },
 
-          // ABILITIES
           "special_abilities": {
             "$abilityIndex": {
               ".validate": "newData.hasChildren(['name'])",
@@ -926,13 +1019,13 @@
     },
     "track": {
       "$uid": {
-        ".write": true,
+        ".write": true
       },
         ".read": true
     },
     "broadcast": {
       "$uid": {
-        ".write": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
       },
       ".read": true
     },

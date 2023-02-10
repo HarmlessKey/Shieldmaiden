@@ -5,12 +5,13 @@
 			<p class="neutral-2">These are the players you can use in your campaigns.</p>
 
 			<template v-if="players.length">
-				<q-input 
-					:dark="$store.getters.theme !== 'light'" 
+				<q-input
+					:dark="$store.getters.theme !== 'light'"
 					v-model="search"
-					borderless 
-					filled square
-					debounce="300" 
+					borderless
+					filled
+					square
+					debounce="300"
 					clearable
 					placeholder="Search players"
 				>
@@ -29,17 +30,17 @@
 					:pagination="{ rowsPerPage: 15 }"
 					:filter="search"
 					wrap-cells
-				>	
+				>
 					<template v-slot:body-cell="props">
-						<q-td 
-							v-if="props.col.name === 'avatar'" 
+						<q-td
+							v-if="props.col.name === 'avatar'"
 							class="avatar"
 							:style="avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
 						>
 							<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-player" />
 						</q-td>
 						<q-td v-else-if="props.col.name !== 'actions'">
-							<div  class="truncate-cell">
+							<div class="truncate-cell">
 								<div class="truncate">
 									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
 										{{ props.value }}
@@ -52,30 +53,41 @@
 						</q-td>
 						<q-td v-else>
 							<div class="text-right d-flex justify-content-end">
-								<template v-if="tier.name !== 'Free' && Object.keys(sync_characters).length">			
-									<button v-if="(!props.row.sync_character || !(props.row.sync_character in sync_characters))" class="btn btn-sm bg-neutral-5" @click="linkDialog(props.key)">
+								<template v-if="tier.name !== 'Free' && Object.keys(sync_characters).length">
+									<button
+										v-if="
+											!props.row.sync_character || !(props.row.sync_character in sync_characters)
+										"
+										class="btn btn-sm bg-neutral-5"
+										@click="linkDialog(props.key)"
+									>
 										<i class="fas fa-link" aria-hidden="true" />
 										<q-tooltip anchor="top middle" self="center middle">
 											Link Character to Sync with
 										</q-tooltip>
 									</button>
 									<template v-else>
-										<a class="btn btn-sm bg-neutral-5" :href="props.row.sync_character" target="_blank" rel="noopener">
+										<a
+											class="btn btn-sm bg-neutral-5"
+											:href="props.row.sync_character"
+											target="_blank"
+											rel="noopener"
+										>
 											<i class="fas fa-external-link" aria-hidden="true" />
 											<q-tooltip anchor="top middle" self="center middle">
 												Open linked character sheet
 											</q-tooltip>
 										</a>
-										<button 
-											class="btn btn-sm bg-neutral-5 ml-2" 
+										<button
+											class="btn btn-sm bg-neutral-5 ml-2"
 											@click="syncCharacter(props.key, props.row.sync_character)"
 										>
-											<i 
+											<i
 												class="fas fa-sync-alt fade-color"
-												:class="{ 
-													'rotate': props.key in syncing,
-													'green': syncing[props.key] === 'success',
-													'red': syncing[props.key] === 'error'
+												:class="{
+													rotate: props.key in syncing,
+													green: syncing[props.key] === 'success',
+													red: syncing[props.key] === 'error',
 												}"
 												aria-hidden="true"
 											/>
@@ -86,18 +98,20 @@
 									</template>
 									<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-2" />
 								</template>
-	
-								<router-link class="btn btn-sm bg-neutral-5 mx-2" :to="`${$route.path}/${props.key}`">
+
+								<router-link
+									class="btn btn-sm bg-neutral-5 mx-2"
+									:to="`${$route.path}/${props.key}`"
+								>
 									<i aria-hidden="true" class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Edit
-									</q-tooltip>
+									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 								</router-link>
-								<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, props.key, props.row)">
+								<a
+									class="btn btn-sm bg-neutral-5"
+									@click="confirmDelete($event, props.key, props.row)"
+								>
 									<i aria-hidden="true" class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Delete
-									</q-tooltip>
+									<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
 								</a>
 							</div>
 						</q-td>
@@ -107,10 +121,18 @@
 				</q-table>
 			</template>
 
-			<router-link v-if="!players.length && !overencumbered" class="btn btn-lg bg-neutral-5" to="/content/players/add-player">
+			<router-link
+				v-if="!players.length && !overencumbered"
+				class="btn btn-lg bg-neutral-5"
+				to="/content/players/add-player"
+			>
 				<i aria-hidden="true" class="fas fa-plus green mr-1" /> Create your first player
 			</router-link>
-			<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+			<router-link
+				v-else-if="tier.name === 'Free'"
+				class="btn bg-neutral-8 btn-block"
+				to="/patreon"
+			>
 				Get more player slots
 			</router-link>
 		</div>
@@ -123,127 +145,130 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex';
-	import { experience } from 'src/mixins/experience.js';
-	import ContentHeader from "src/components/userContent/ContentHeader";
-	import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { mapGetters, mapActions } from "vuex";
+import { experience } from "src/mixins/experience.js";
+import ContentHeader from "src/components/userContent/ContentHeader";
+import { getCharacterSyncStorage, extensionInstalled } from "src/utils/generalFunctions";
 
-	export default {
-		name: 'Players',
-		mixins: [experience],
-		components: {
-			ContentHeader
+export default {
+	name: "Players",
+	mixins: [experience],
+	components: {
+		ContentHeader,
+	},
+	data() {
+		return {
+			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+			loading_players: true,
+			sync_characters: {},
+			link_character: undefined,
+			link_dialog: false,
+			syncing: {},
+			search: "",
+			columns: [
+				{
+					name: "avatar",
+					label: "",
+					field: "avatar",
+					align: "left",
+				},
+				{
+					name: "name",
+					label: "Name",
+					field: "character_name",
+					sortable: true,
+					align: "left",
+				},
+				{
+					name: "actions",
+					label: "",
+					align: "right",
+				},
+			],
+		};
+	},
+	computed: {
+		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters("players", ["players"]),
+	},
+	async mounted() {
+		await this.get_players();
+		this.loading_players = false;
+		this.sync_characters = await getCharacterSyncStorage();
+	},
+	methods: {
+		...mapActions("players", ["get_players", "delete_player", "set_player_prop", "sync_player"]),
+		avatar(player) {
+			return player.storage_avatar || player.avatar;
 		},
-		data() {
-			return {
-				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
-				loading_players: true,
-				sync_characters: {},
-				link_character: undefined,
-				link_dialog: false,
-				syncing: {},
-				search: "",
-				columns: [
+		confirmDelete(e, key, player) {
+			//Instantly delete when shift is held
+			if (e.shiftKey) {
+				this.deletePlayer(key);
+			} else {
+				this.$snotify.error(
+					"Are you sure you want to delete " + player.character_name + "?",
+					"Delete player",
 					{
-						name: "avatar",
-						label: "",
-						field: "avatar",
-						align: "left"
-					},
-					{
-						name: "name",
-						label: "Name",
-						field: "character_name",
-						sortable: true,
-						align: "left"
-					},
-					{
-						name: "actions",
-						label: "",
-						align: "right"
-					}
-				]
-			}
-		},
-		computed: {
-			...mapGetters([
-				'tier',
-				'overencumbered',
-			]),
-			...mapGetters("players", ["players"])
-		},
-		async mounted() {
-			await this.get_players();
-			this.sync_characters = await getCharacterSyncStorage();
-			this.loading_players = false;		
-		},
-		methods: {
-			...mapActions("players", [
-				"get_players", 
-				"delete_player", 
-				"set_player_prop",
-				"sync_player"
-			]),
-			avatar(player) {
-				return player.storage_avatar || player.avatar;
-			},
-			confirmDelete(e, key, player) {
-				//Instantly delete when shift is held
-				if(e.shiftKey) {
-					this.deletePlayer(key);
-				} else {
-					this.$snotify.error('Are you sure you want to delete ' + player.character_name + '?', 'Delete player', {
 						timeout: false,
 						buttons: [
 							{
-								text: 'Yes', action: (toast) => { 
-								this.deletePlayer(key)
-								this.$snotify.remove(toast.id); 
-								}, 
-								bold: false
+								text: "Yes",
+								action: (toast) => {
+									this.deletePlayer(key);
+									this.$snotify.remove(toast.id);
+								},
+								bold: false,
 							},
 							{
-								text: 'No', action: (toast) => { 
-									this.$snotify.remove(toast.id); 
-								}, 
-								bold: true
+								text: "No",
+								action: (toast) => {
+									this.$snotify.remove(toast.id);
+								},
+								bold: true,
 							},
-						]
-					});
-				}
-			},
-			deletePlayer(key) {
-				this.delete_player(key);
-			},
-			linkDialog(key) {
-				this.link_character = key;
-				this.link_dialog = true;
-			},
-			async linkCharacter(url) {
-				await this.set_player_prop({ uid: this.userId, id: this.link_character, property: "sync_character", value: url });
-				await this.syncCharacter(this.link_character, url);
-				this.link_dialog = false;
-			},
-			async syncCharacter(id, sync_character) {
-				this.$set(this.syncing, id, "syncing");
-				try {
-					await this.sync_player({ uid: this.userId, id, sync_character });
-					this.$set(this.syncing, id, "success");
-				} catch (e) {
-					this.syncing[id] = "error";
-					this.$snotify.error(e, 'Sync failed', {});
-				} finally {
-					setTimeout(() => {
-						this.$delete(this.syncing, id);
-					}, 2000);
-				}
+						],
+					}
+				);
 			}
-		}
-	}
+		},
+		deletePlayer(key) {
+			this.delete_player(key);
+		},
+		linkDialog(key) {
+			this.link_character = key;
+			this.link_dialog = true;
+		},
+		async linkCharacter(url) {
+			await this.set_player_prop({
+				uid: this.userId,
+				id: this.link_character,
+				property: "sync_character",
+				value: url,
+			});
+			await this.syncCharacter(this.link_character, url);
+			this.link_dialog = false;
+		},
+		async syncCharacter(id, sync_character) {
+			this.$set(this.syncing, id, "syncing");
+			try {
+				await this.sync_player({ uid: this.userId, id, sync_character });
+				this.$set(this.syncing, id, "success");
+			} catch (e) {
+				this.syncing[id] = "error";
+				this.$snotify.error(e, "Sync failed", {});
+			} finally {
+				setTimeout(() => {
+					this.$delete(this.syncing, id);
+				}, 2000);
+			}
+		},
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.fade-color {
-		transition: all .5s;
-	}
+.fade-color {
+	transition: all 0.5s;
+}
 </style>

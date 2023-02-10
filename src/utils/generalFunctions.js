@@ -126,17 +126,17 @@ export function makeDate(input, showTime = false, short = false) {
 export function characterToPlayer(character) {
 	const player = {};
 
-	if(character.armor_class !== undefined) player.ac = parseInt(character.armor_class);
-	if(character.avatar !== undefined) player.avatar = character.avatar;
-	if(character.name !== undefined) player.character_name = character.name;
-	if(character.strength !== undefined) player.strength = parseInt(character.strength);
-	if(character.dexterity !== undefined) player.dexterity = parseInt(character.dexterity);
-	if(character.constitution !== undefined) player.constitution = parseInt(character.constitution);
-	if(character.intelligence !== undefined) player.intelligence = parseInt(character.intelligence);
-	if(character.level !== undefined) player.level = parseInt(character.level);
-	if(character.max_hit_points !== undefined) player.maxHp = parseInt(character.max_hit_points);
-	if(character.walking_speed !== undefined) player.speed = parseInt(character.walking_speed);
-	if(character.initiative !== undefined) player.initiative = parseInt(character.initiative);
+	if(character.armor_class !== undefined) player.ac = parseInt(character.armor_class.between(1, 99));
+	if(character.avatar !== undefined) player.avatar = (character.avatar.length <= 2000) ? character.avatar : character.avatar.subString(0, 2000);
+	if(character.name !== undefined) player.character_name = (character.name.length <= 100) ? character.name : character.name.subString(0, 100);
+	if(character.strength !== undefined) player.strength = parseInt(character.strength.between(1, 99));
+	if(character.dexterity !== undefined) player.dexterity = parseInt(character.dexterity.between(1, 99));
+	if(character.constitution !== undefined) player.constitution = parseInt(character.constitution.between(1, 99));
+	if(character.intelligence !== undefined) player.intelligence = parseInt(character.intelligence.between(1, 99));
+	if(character.level !== undefined) player.level = parseInt(character.level.between(1, 20));
+	if(character.max_hit_points !== undefined) player.maxHp = parseInt(character.max_hit_points.between(1, 999));
+	if(character.walking_speed !== undefined) player.speed =  parseInt(character.walking_speed.between(0, 999));
+	if(character.initiative !== undefined) player.initiative = parseInt(character.initiative.between(-10, 99));
 
 	return player;
 }

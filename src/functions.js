@@ -22,6 +22,19 @@ Number.prototype.min = function (min = 0) {
 	return this >= min ? this : min;
 };
 
+// Returns a number equal to or higher than a given minimum
+Number.prototype.max = function (max = Infinity) {
+	return this <= max ? this : max;
+};
+
+// Returns a number equal to or higher than a given minimum and lower than or equal to a given maximum
+Number.prototype.between = function (min = 0, max = Infinity) {
+	let value = this;
+	value = this >= min ? this : min;
+	value = this <= max ? this : max;
+	return value;
+};
+
 Array.min = function (array) {
 	return Math.min.apply(Math, array);
 };

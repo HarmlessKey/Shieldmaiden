@@ -3,6 +3,33 @@ import { playerServices } from "src/services/players";
 import { getCharacterSyncCharacter, characterToPlayer } from 'src/utils/generalFunctions';
 import _ from 'lodash';
 
+// Parse number values to ints
+const numberValues = [
+  "ac", 
+  "experience",
+  "initiative",
+  "level",
+  "maxHp",
+  "passive_insight",
+  "passive_investigation",
+  "passive_perception",
+  "speed",
+  "strength", 
+  "dexterity", 
+  "constitution", 
+  "intelligence", 
+  "wisdom", 
+  "charisma"
+];
+const parseInts = (player) => {
+  for(const [key, value] of Object.entries(player)) {
+    if(numberValues.includes(key) && value !== undefined && value !== null) {
+      player[key] = parseInt(value);
+    }
+  }
+  return player;
+}
+
 // Converts a full player to a search_player
 const convert_player = (player) => {
 	const properties = [
@@ -195,6 +222,7 @@ const player_actions = {
         throw "Not enough slots";
       }
       try {
+        player = parseInts(player);
         const search_player = convert_player(player);
         const id = await services.addPlayer(uid, player, search_player);
 
@@ -235,6 +263,7 @@ const player_actions = {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
+        player = parseInts(player);
         const search_player = convert_player(player);
         await services.editPlayer(uid, id, player, search_player);
         
@@ -298,6 +327,7 @@ const player_actions = {
       const services = await dispatch("get_player_services");
       const update_search = ["character_name", "avatar", "campaign_id", "sync_character"].includes(property);
       try {
+        value = (numberValues.includes(value) && value !== null) ? parseInt(value) : value;
         await services.updatePlayer(uid, id, "", { [property]: value }, update_search);
         commit("SET_PLAYER_PROP", { uid, id, property, value, update_search });
         return;
@@ -333,7 +363,7 @@ const player_actions = {
    * A user can only delete their own player's so use uid from the store
    * 
    * - Deletes player from the campaign it's in
-   * - Deletes companions from the campaing (if the player had companions)
+   * - Deletes companions from the campaign (if the player had companions)
    * - Removes the player from character_control
    * 
    * @param {string} id 

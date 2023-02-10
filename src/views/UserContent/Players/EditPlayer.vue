@@ -226,13 +226,13 @@
 
 									<!-- Speed & Initiative -->
 									<div class="col-12 col-md-6">
-										<ValidationProvider rules="numeric|between:1,999" name="Speed" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider rules="numeric|between:0,999" name="Speed" v-slot="{ errors, invalid, validated }">
 											<q-input 
 												:dark="$store.getters.theme === 'dark'" filled square
 												label="Speed"
 												autocomplete="off"
 												type="number" 
-												min="1"
+												min="0"
 												max="999"
 												:value="player.speed" 
 												placeholder="Speed"
@@ -243,12 +243,12 @@
 										</ValidationProvider>
 									</div>
 									<div class="col-12 col-md-6">
-										<ValidationProvider rules="numeric|between:1,99" name="Initiative" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider rules="between:-10,99" name="Initiative" v-slot="{ errors, invalid, validated }">
 											<q-input 
 												:dark="$store.getters.theme === 'dark'" filled square
 												label="Initiative"
 												autocomplete="off"  
-												min="1"
+												min="-10"
 												max="99"
 												type="number" 
 												:value="player.initiative" 
@@ -313,7 +313,8 @@
 											type="number"
 											min="1"
 											max="99"
-											v-model="player.passive_perception" 
+											v-model="player.passive_perception"
+											@input="parseToInt($event, player, 'passive_perception')"
 											placeholder="Perception"
 											:error="invalid && validated"
 											:error-message="errors[0]"
@@ -332,6 +333,7 @@
 											min="1"
 											max="99"
 											v-model="player.passive_investigation" 
+											@input="parseToInt($event, player, 'passive_investigation')"
 											placeholder="Investigation"
 											:error="invalid && validated"
 											:error-message="errors[0]"
@@ -350,6 +352,7 @@
 											min="1"
 											max="99"
 											v-model="player.passive_insight" 
+											@input="parseToInt($event, player, 'passive_insight')"
 											placeholder="Insight"
 											:error="invalid && validated"
 											:error-message="errors[0]"

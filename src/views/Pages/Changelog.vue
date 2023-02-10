@@ -67,7 +67,6 @@ export default {
 				.catch((e) => {
 					console.log(e);
 				});
-			console.log(response);
 			this.loading = false;
 			return response.data;
 		},

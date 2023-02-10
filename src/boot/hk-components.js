@@ -14,6 +14,7 @@ import HkImageUploader from '../components/hk-components/hk-image-uploader';
 import HkBackgroundSelect from '../components/hk-components/hk-background-select';
 import HkMarkdownEditor from '../components/hk-components/hk-markdown-editor';
 import HkXpBar from '../components/hk-components/hk-xp-bar';
+import HkLinkCharacter from '../components/hk-components/hk-link-character';
 
 export default async ({ Vue }) => {
 	Vue.component('hk-table', HkTable);
@@ -32,4 +33,5 @@ export default async ({ Vue }) => {
   Vue.component('hk-background-select', HkBackgroundSelect);
   Vue.component('hk-markdown-editor', HkMarkdownEditor);
   Vue.component('hk-xp-bar', HkXpBar);
+  Vue.component('hk-link-character', HkLinkCharacter);
 };

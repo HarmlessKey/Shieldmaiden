@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway');
 @import '~vue-snotify/styles/material.css';
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 @import 'hk-icons.scss';
 @import './variables.scss';
@@ -747,7 +747,7 @@ html body {
 			justify-content: center;
 		}
 		&-start {
-			justify-content: flex-start;
+			justify-content: flex-start !important;
 		}
 		&-end {
 			justify-content: flex-end;
@@ -765,6 +765,23 @@ html body {
 		}
 		&-end {
 			align-items: end;
+		}
+	}
+	.whitespace {
+		&-normal {
+			white-space: normal;
+		}
+		&-nowrap {
+			white-space: nowrap;
+		}
+		&-pre {
+			white-space: pre;
+		}
+		&-pre-line {
+			white-space: pre-line;
+		}
+		&-pre-wrap {
+			white-space: pre-wrap;
 		}
 	}
 
@@ -1110,6 +1127,9 @@ html body {
 
 	.spin {
 		animation: spinner 1s ease infinite;
+	}
+	.rotate {
+		animation: spinner 1s ease;
 	}
 
 	.live {

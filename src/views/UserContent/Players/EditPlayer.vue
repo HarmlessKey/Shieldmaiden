@@ -920,10 +920,11 @@ export default {
 			if (value === undefined || value === null || value === "") {
 				this.$set(object, property, null);
 			} else {
+				value = parseInt(value);
 				if (property === "level") {
-					value = value > 20 ? 20 : value < 1 ? 1 : value;
+					value = value.between(1, 20);
 				}
-				this.$set(object, property, parseInt(value));
+				this.$set(object, property, value);
 			}
 		},
 		skillMod(skill, key) {

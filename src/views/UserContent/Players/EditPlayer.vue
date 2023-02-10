@@ -711,6 +711,7 @@
 			async linkCharacter(url) {
 				this.$set(this.player, "sync_character", url);
 				this.linked_character = await getCharacterSyncCharacter(this.player.sync_character);
+				await this.sync();
 				this.link_dialog = false;
 			},
 			unlink() {

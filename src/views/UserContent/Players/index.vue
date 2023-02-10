@@ -50,54 +50,56 @@
 								</div>
 							</div>
 						</q-td>
-						<q-td v-else class="text-right d-flex justify-content-between">
-							<template v-if="tier.name !== 'Free' && Object.keys(sync_characters).length">			
-								<button v-if="(!props.row.sync_character || !(props.row.sync_character in sync_characters))" class="btn btn-sm bg-neutral-5" @click="linkDialog(props.key)">
-									<i class="fas fa-link" aria-hidden="true" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Link Character to Sync with
-									</q-tooltip>
-								</button>
-								<template v-else>
-									<a class="btn btn-sm bg-neutral-5" :href="props.row.sync_character" target="_blank" rel="noopener">
-										<i class="fas fa-external-link" aria-hidden="true" />
+						<q-td v-else>
+							<div class="text-right d-flex justify-content-end">
+								<template v-if="tier.name !== 'Free' && Object.keys(sync_characters).length">			
+									<button v-if="(!props.row.sync_character || !(props.row.sync_character in sync_characters))" class="btn btn-sm bg-neutral-5" @click="linkDialog(props.key)">
+										<i class="fas fa-link" aria-hidden="true" />
 										<q-tooltip anchor="top middle" self="center middle">
-											Open linked character sheet
-										</q-tooltip>
-									</a>
-									<button 
-										class="btn btn-sm bg-neutral-5 ml-2" 
-										@click="syncCharacter(props.key, props.row.sync_character)"
-									>
-										<i 
-											class="fas fa-sync-alt fade-color"
-											:class="{ 
-												'rotate': props.key in syncing,
-												'green': syncing[props.key] === 'success',
-												'red': syncing[props.key] === 'error'
-											}"
-											aria-hidden="true"
-										/>
-										<q-tooltip anchor="top middle" self="center middle">
-											Update with Character Sync
+											Link Character to Sync with
 										</q-tooltip>
 									</button>
+									<template v-else>
+										<a class="btn btn-sm bg-neutral-5" :href="props.row.sync_character" target="_blank" rel="noopener">
+											<i class="fas fa-external-link" aria-hidden="true" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Open linked character sheet
+											</q-tooltip>
+										</a>
+										<button 
+											class="btn btn-sm bg-neutral-5 ml-2" 
+											@click="syncCharacter(props.key, props.row.sync_character)"
+										>
+											<i 
+												class="fas fa-sync-alt fade-color"
+												:class="{ 
+													'rotate': props.key in syncing,
+													'green': syncing[props.key] === 'success',
+													'red': syncing[props.key] === 'error'
+												}"
+												aria-hidden="true"
+											/>
+											<q-tooltip anchor="top middle" self="center middle">
+												Update with Character Sync
+											</q-tooltip>
+										</button>
+									</template>
+									<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-2" />
 								</template>
-								<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-2" />
-							</template>
-
-							<router-link class="btn btn-sm bg-neutral-5 mx-2" :to="`${$route.path}/${props.key}`">
-								<i aria-hidden="true" class="fas fa-pencil"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Edit
-								</q-tooltip>
-							</router-link>
-							<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, props.key, props.row)">
-								<i aria-hidden="true" class="fas fa-trash-alt"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Delete
-								</q-tooltip>
-							</a>
+	
+								<router-link class="btn btn-sm bg-neutral-5 mx-2" :to="`${$route.path}/${props.key}`">
+									<i aria-hidden="true" class="fas fa-pencil"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
+								</router-link>
+								<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, props.key, props.row)">
+									<i aria-hidden="true" class="fas fa-trash-alt"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Delete
+									</q-tooltip>
+								</a>
+							</div>
 						</q-td>
 					</template>
 					<div slot="no-data" />
@@ -219,6 +221,7 @@
 			},
 			async linkCharacter(url) {
 				await this.set_player_prop({ uid: this.userId, id: this.link_character, property: "sync_character", value: url });
+				await this.syncCharacter(this.link_character, url);
 				this.link_dialog = false;
 			},
 			async syncCharacter(id, sync_character) {

@@ -36,27 +36,29 @@
 							</div>
 						</div>
 					</q-td>
-					<q-td v-else class="text-right d-flex justify-content-between">
-						<router-link 
-							v-if="props.row.campaign_id" 
-							class="btn btn-sm bg-neutral-9 mr-2"
-							:to="`/user/${props.row.user_id}/${props.row.campaign_id}`"
-						>
-							<i aria-hidden="true" class="fas fa-dungeon neutral-2 mr-1" />
-							Campaign
-						</router-link>
-						<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-							<i aria-hidden="true" class="fas fa-pencil"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-						<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
-							<i aria-hidden="true" class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-						</a>
+					<q-td v-else class="whitespace-nowrap">
+						<div class="d-flex justify-content-end items-center">
+							<router-link 
+								v-if="props.row.campaign_id" 
+								class="btn btn-sm bg-neutral-9"
+								:to="`/user/${props.row.user_id}/${props.row.campaign_id}`"
+							>
+								<i aria-hidden="true" class="fas fa-dungeon neutral-2 mr-1" />
+								Campaign
+							</router-link>
+							<router-link class="btn btn-sm bg-neutral-5 mx-2" :to="`${$route.path}/${props.key}`">
+								<i aria-hidden="true" class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
+							</router-link>
+							<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, props.key, props.row)">
+								<i aria-hidden="true" class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Delete
+								</q-tooltip>
+							</a>
+						</div>
 					</q-td>
 				</template>
 				<div slot="no-data" />

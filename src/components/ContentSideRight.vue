@@ -2,6 +2,32 @@
   <div class="content-side">
     <Tutorial v-if="show_tutorial" vertical />
 
+    <hk-card v-if="$route.path.startsWith('/content/players')">
+      <div class="card-header" slot="header">
+        <span>
+          <i class="fas fa-sync-alt" aria-hidden="true" />
+          Character Sync
+        </span>
+      </div>
+      <div class="card-body text-center">
+        <p>
+          Sync your player's character sheets from other resources in 
+          <span class="whitespace-nowrap">Harmless Key</span><span v-if="tier.name === 'Free'" class="neutral-3"> *</span>.
+        </p>
+        
+        <button 
+          class="btn btn-block bg-green" 
+          @click="setSlide({
+            show: true,
+            type: 'slides/CharacterSync'
+          })">
+          <i class="fas fa-sync-alt" aria-hidden="true" /> Start Syncing
+        </button>
+        
+      </div>
+      <small v-if="tier.name === 'Free'" slot="footer" class="card-footer justify-content-start neutral-3">* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key required.</small>
+    </hk-card>
+
     <hk-card v-if="$route.path === '/content'" class="bg-neutral-9 overflow-hidden">
       <hk-video />
     </hk-card>
@@ -108,6 +134,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { extensionInstalled } from "src/utils/generalFunctions";
 
 export default {
   name: "ContentSideRight",
@@ -123,6 +150,7 @@ export default {
   data() {
     return {
       width: 0,
+      hasExtension: false,
       social_media: [
 					{
 						name: "Patreon",
@@ -173,6 +201,11 @@ export default {
     ]),
     setWidth(size) {
       this.width = size.width;
+    }
+  },
+  async mounted() {
+    if(this.$route.path.startsWith("/content/players")) {
+      this.hasExtension = await extensionInstalled();
     }
   }
 }

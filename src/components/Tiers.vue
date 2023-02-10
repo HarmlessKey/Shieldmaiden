@@ -1,57 +1,66 @@
 <template>
 	<div>
-		<hk-card-deck v-if="tier && !loading">
-			<hk-card :header="t.name" v-for="(t, key) in tiers" :key="key" :class="{ 'current': t.name == tier.name }">
-				<div class="card-body">
-					<div class="top">
-						<h2>{{ t.price }}</h2>
-						<em v-if="t.price == 'Free'" class="neutral-3 sub">forever</em>
-						<em v-else class="neutral-3 sub">per month</em>
+		<div v-if="tier && !loading">
+			<hk-card-deck>
+				<hk-card :header="t.name" v-for="(t, key) in tiers" :key="key" :class="{ 'current': t.name == tier.name }">
+					<div class="card-body">
+						<div class="top">
+							<h2>{{ t.price }}</h2>
+							<em v-if="t.price == 'Free'" class="neutral-3 sub">forever</em>
+							<em v-else class="neutral-3 sub">per month</em>
+						</div>
+						<ul>
+							<li v-for="(benefit, key) in benefits" :key="key">
+								<i v-if="typeof t.benefits[key] === 'boolean'" aria-hidden="true" class="fas" :class="t.benefits[key] ? 'fa-check green' : 'fa-times neutral-3'" />
+								<template v-else>
+									<i aria-hidden="true" v-if="t.benefits[key] === 'infinite'" class="green far fa-infinity" />
+									<strong v-else :class="t.benefits[key] === '-' ? 'neutral-3' : 'green'">{{ t.benefits[key] }}</strong>
+								</template>
+								<span>
+									{{ benefit.title }} <span v-if="key === 'character_sync'" class="neutral-3">*</span>
+								</span>
+							</li>
+						</ul>
+						<ul class="storage">
+							<li v-for="(storage_type) in storage" :key="storage_type">
+								<template v-if="storage_type == 'campaigns'">
+									<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Campaign slots
+								</template>
+								<template v-if="storage_type == 'encounters'">
+									<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+									<span v-else class="green">{{ t.benefits[storage_type] }}</span> <span>Encounter slots <span class="neutral-3">(per campaign)</span></span>
+								</template>
+								<template v-if="storage_type == 'players'">
+									<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Player slots
+								</template>
+								<template v-if="storage_type == 'npcs'">
+									<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+									<span v-else class="green">{{ t.benefits[storage_type] }}</span> NPC slots
+								</template>
+								<template v-if="storage_type == 'items'">
+									<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Item slots
+								</template>
+								<template v-if="storage_type == 'reminders'">
+									<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
+									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Reminder slots
+								</template>
+							</li>
+						</ul>
 					</div>
-					<ul>
-						<li v-for="(benefit, key) in benefits" :key="key">
-							<i v-if="typeof t.benefits[key] === 'boolean'" aria-hidden="true" class="fas" :class="t.benefits[key] ? 'fa-check green' : 'fa-times neutral-3'" />
-							<template v-else>
-								<i aria-hidden="true" v-if="t.benefits[key] === 'infinite'" class="green far fa-infinity" />
-								<strong v-else :class="t.benefits[key] === '-' ? 'neutral-3' : 'green'">{{ t.benefits[key] }}</strong>
-							</template>
-							{{ benefit.title }}
-						</li>
-					</ul>
-					<ul class="storage">
-						<li v-for="(storage_type) in storage" :key="storage_type">
-							<template v-if="storage_type == 'campaigns'">
-								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Campaign slots
-							</template>
-							<template v-if="storage_type == 'encounters'">
-								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ t.benefits[storage_type] }}</span> <span>Encounter slots <span class="neutral-3">(per campaign)</span></span>
-							</template>
-							<template v-if="storage_type == 'players'">
-								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Player slots
-							</template>
-							<template v-if="storage_type == 'npcs'">
-								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ t.benefits[storage_type] }}</span> NPC slots
-							</template>
-							<template v-if="storage_type == 'items'">
-								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Item slots
-							</template>
-							<template v-if="storage_type == 'reminders'">
-								<i aria-hidden="true" v-if="t.benefits[storage_type] == 'infinite'" class="green far fa-infinity" />
-								<span v-else class="green">{{ t.benefits[storage_type] }}</span> Reminder slots
-							</template>
-						</li>
-					</ul>
-				</div>
-				<div slot="footer" v-if="t.price != 'Free'">
-					<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+t['.key']" target="_blank" rel="noopener" class="btn btn-block btn-square bg-patreon-red">Join {{ t.price }} tier</a>
-				</div>
-			</hk-card>
-		</hk-card-deck>
+					<div slot="footer" v-if="t.price != 'Free'">
+						<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+t['.key']" target="_blank" rel="noopener" class="btn btn-block btn-square bg-patreon-red">Join {{ t.price }} tier</a>
+					</div>
+				</hk-card>
+			</hk-card-deck>
+			<small class="d-block text-center">
+				<span class="neutral-3">*</span> Character Sync requires <strong>Chrome</strong> as your browser and the 
+				<a href="https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg" target="_blank" rel="noopener">
+					D&D Character Sync Chrome Extension</a>.
+			</small>
+		</div>
 		<hk-loader v-else name="tiers" />
 	</div>
 </template>
@@ -67,6 +76,9 @@
 				loading: true,
 				show_storage: false,
 				benefits: {
+					character_sync: {
+						title: "Character sync"
+					}, 
 					avatars: {
 						title: "Avatar crop & upload"
 					}, 

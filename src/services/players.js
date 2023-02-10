@@ -146,7 +146,7 @@ export class playerServices {
    * @param {String} uid ID of active user
    * @param {String} id ID of player to edit
    * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
-   * @param {object} value Object with { proptery: value }
+   * @param {object} value Object with { property: value }
    * @param {boolean} update_search Wether or not search_players must be updated
    */
   async updatePlayer(uid, id, path, value, update_search=false) {
@@ -154,6 +154,23 @@ export class playerServices {
       if(update_search) {
         SEARCH_PLAYERS_REF.child(`${uid}/results/${id}${path}`).update(value);
       }
+    }).catch((error) => {
+      throw error;
+    });
+  }
+
+  /**
+   * Sync player with Character Sync Extension data
+   * 
+   * @param {string} uid 
+   * @param {string} id 
+   * @param {*} player
+   * @param {*} search_player
+   * @returns 
+   */
+  async syncPlayer(uid, id, player, search_player) {
+    PLAYERS_REF.child(`${uid}/${id}`).update(player).then(() => {
+      SEARCH_PLAYERS_REF.child(`${uid}/results/${id}`).update(search_player);
     }).catch((error) => {
       throw error;
     });

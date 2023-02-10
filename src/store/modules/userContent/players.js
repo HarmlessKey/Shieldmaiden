@@ -1,6 +1,34 @@
 import Vue from 'vue';
 import { playerServices } from "src/services/players"; 
+import { getCharacterSyncCharacter, characterToPlayer } from 'src/utils/generalFunctions';
 import _ from 'lodash';
+
+// Parse number values to ints
+const numberValues = [
+  "ac", 
+  "experience",
+  "initiative",
+  "level",
+  "maxHp",
+  "passive_insight",
+  "passive_investigation",
+  "passive_perception",
+  "speed",
+  "strength", 
+  "dexterity", 
+  "constitution", 
+  "intelligence", 
+  "wisdom", 
+  "charisma"
+];
+const parseInts = (player) => {
+  for(const [key, value] of Object.entries(player)) {
+    if(numberValues.includes(key) && value !== undefined && value !== null) {
+      player[key] = parseInt(value);
+    }
+  }
+  return player;
+}
 
 // Converts a full player to a search_player
 const convert_player = (player) => {
@@ -9,6 +37,7 @@ const convert_player = (player) => {
     "avatar",
     "storage_avatar",
     "campaign_id",
+    "sync_character",
     "companions"
 	];
   const returnPlayer = {};
@@ -193,6 +222,7 @@ const player_actions = {
         throw "Not enough slots";
       }
       try {
+        player = parseInts(player);
         const search_player = convert_player(player);
         const id = await services.addPlayer(uid, player, search_player);
 
@@ -233,6 +263,7 @@ const player_actions = {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
+        player = parseInts(player);
         const search_player = convert_player(player);
         await services.editPlayer(uid, id, player, search_player);
         
@@ -294,8 +325,9 @@ const player_actions = {
    async set_player_prop({ commit, dispatch }, { uid, id, property, value }) {
     if(uid) {
       const services = await dispatch("get_player_services");
-      const update_search = ["character_name", "avater", "campaign_id"].includes(property);
+      const update_search = ["character_name", "avatar", "campaign_id", "sync_character"].includes(property);
       try {
+        value = (numberValues.includes(value) && value !== null) ? parseInt(value) : value;
         await services.updatePlayer(uid, id, "", { [property]: value }, update_search);
         commit("SET_PLAYER_PROP", { uid, id, property, value, update_search });
         return;
@@ -331,7 +363,7 @@ const player_actions = {
    * A user can only delete their own player's so use uid from the store
    * 
    * - Deletes player from the campaign it's in
-   * - Deletes companions from the campaing (if the player had companions)
+   * - Deletes companions from the campaign (if the player had companions)
    * - Removes the player from character_control
    * 
    * @param {string} id 
@@ -389,12 +421,32 @@ const player_actions = {
   },
 
   /**
+   * Update character with data from Character Sync Extension
+   * 
+   * @param {string} user_id
+   * @param {string} id 
+   */
+  async sync_player({ commit, dispatch }, { uid, id, sync_character }) {
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      const character = await getCharacterSyncCharacter(sync_character);
+      
+      const player = characterToPlayer(character);
+      const search_player = convert_player(player);
+
+      await services.syncPlayer(uid, id, player, search_player);
+      commit("UPDATE_SEARCH_PLAYER", { id, search_player });
+      commit("PATCH_CACHED_PLAYER", { uid, id, player });
+    }
+  },
+
+  /**
    * Give control over a player to another user
    * 
    * @param {string} user_id
    * @param {string} id 
    */
-   async give_out_control({ commit, dispatch, rootGetters }, { user_id, id }) {
+  async give_out_control({ commit, dispatch, rootGetters }, { user_id, id }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_player_services");
@@ -451,20 +503,27 @@ const player_mutations = {
   },
   UPDATE_SEARCH_PLAYER(state, { id, search_player }) {
     if(state.players && state.players[id]) {
-      Vue.set(state.players, id, search_player);
+      Vue.set(state.players, id, {...state.players[id], ...search_player });
     }
   },
   REMOVE_PLAYER(state, id) { 
     Vue.delete(state.players, id);
   },
   REMOVE_CHARACTER(state, id) { 
-    Vue.delete(state.characters, id);
+    if(state.characters) {
+      Vue.delete(state.characters, id);
+    }
   },
   SET_CACHED_PLAYER(state, { uid, id, player }) { 
     if(state.cached_players[uid]) {
       Vue.set(state.cached_players[uid], id, player);
     } else {
       Vue.set(state.cached_players, uid, { [id]: player });
+    }
+  },
+  PATCH_CACHED_PLAYER(state, { uid, id, player }) { 
+    if(state.cached_players[uid]) {
+      Vue.set(state.cached_players[uid], id, {...state.cached_players[uid][id], ...player });
     }
   },
   REMOVE_CACHED_PLAYER(state, { uid, id }) { 

@@ -208,7 +208,7 @@
         ".write": "$uid === auth.uid",
         "results": {
           "$playerid": {
-          	".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child($playerid).child('user').val() === $uid",
+          	".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child($playerid).child('user').val() === $uid"
           },
           ".indexOn": ["character_name"]
         }
@@ -591,6 +591,9 @@
                       "damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
+                      "magical": {
+                        ".validate": "newData.isBoolean()"
+                      },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
@@ -602,6 +605,9 @@
                       },
                       "versatile_damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
+                      },
+                      "versatile_magical": {
+                        ".validate": "newData.isBoolean()"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -694,6 +700,9 @@
                       "damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
+                      "magical": {
+                        ".validate": "newData.isBoolean()"
+                      },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
@@ -705,6 +714,9 @@
                       },
                       "versatile_damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
+                      },
+                      "versatile_magical": {
+                        ".validate": "newData.isBoolean()"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -803,6 +815,9 @@
                       "damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
+                      "magical": {
+                        ".validate": "newData.isBoolean()"
+                      },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
@@ -814,6 +829,9 @@
                       },
                       "versatile_damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
+                      },
+                      "versatile_magical": {
+                        ".validate": "newData.isBoolean()"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -906,6 +924,9 @@
                       "damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
+                      "magical": {
+                        ".validate": "newData.isBoolean()"
+                      },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
@@ -917,6 +938,9 @@
                       },
                       "versatile_damage_type": {
                         ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
+                      },
+                      "versatile_magical": {
+                        ".validate": "newData.isBoolean()"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -988,7 +1012,6 @@
         ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
         ".read": true,
           
-        // Allow all to write to requests
         "$campaignId": {
           ".indexOn": "entities/id",
           "$encounterId": {

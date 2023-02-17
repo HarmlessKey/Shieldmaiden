@@ -77,6 +77,10 @@
 				required: false,
 				default: ""
 			},
+			nonMagical: {
+				type: Boolean,
+				default: false
+			}
 		},
 		computed: {
 			damage_type: {
@@ -86,6 +90,12 @@
 				set(newVal) {
 					this.$emit("input", newVal);
 				}
+			},
+			damage_types() {
+				if(!this.nonMagical) {
+					return damage_types.filter(type => !type.startsWith("non_magical"));
+				}
+				return damage_types;
 			}
 		},
 		data() {
@@ -103,14 +113,14 @@
 			filterTypes(val, update) {
 				if (val === '') {
 					update(() => {
-						this.filtered_damage_types = damage_types;
+						this.filtered_damage_types = this.damage_types;
 					})
-					return
+					return;
 				}
 
 				update(() => {
 					const needle = val.toLowerCase();
-					this.filtered_damage_types = damage_types.filter(v => v.toLowerCase().indexOf(needle) > -1);
+					this.filtered_damage_types = this.damage_types.filter(v => v.toLowerCase().indexOf(needle) > -1);
 				});
 			}
 		}

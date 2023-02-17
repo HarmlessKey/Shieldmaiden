@@ -2,9 +2,15 @@
 	<div>
 		<h3 v-if="targeted.length === 0" class="red text-center">Select a target</h3>
 		<template v-else>
+			
+			<hk-dmg-type-select v-model="damage_type" placeholder="Damage type" clearable dense/>
 			<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="crit" label="Critical hit" indeterminate-value="something-else" />
-
-			<hk-dmg-type-select v-model="damage_type" placeholder="Damage type" clearable dense class="mb-2"/>
+			<q-checkbox 
+				:dark="$store.getters.theme === 'dark'"
+				v-model="magical" 
+				label="Magical"
+				indeterminate-value="something-else"
+			/>
 
 			<ValidationProvider rules="min_value:0" name="Input" v-slot="{ errors, invalid, validated}">
 				<div class="manual">
@@ -111,6 +117,7 @@
 				encounterId: this.$route.params.encid,
 				manualAmount: '',
 				damage_type: undefined,
+				magical: false,
 				crit: false,
 				log: undefined,
 				multiplierSetter: undefined,
@@ -177,13 +184,23 @@
 				for(const target of this.targeted) {
 					this.checkDefenses(target);
 				}
-			}
+			},
+			magical() {
+				this.resistances = {};
+				for(const target of this.targeted) {
+					this.checkDefenses(target);
+				}
+			},
 		},
 		methods: {
 			checkDefenses(target) {
-				const entity = this.entities[target];
+				const entity = JSON.parse(JSON.stringify(this.entities[target]));
 				for(const [key, defense] of Object.entries(this.defenses)) {
-					if(entity[defense.value] && entity[defense.value].includes(this.damage_type)) {			
+					let resistances = entity[defense.value];
+					if(resistances) {
+						resistances.forEach((resistance , i) => resistances[i] = this.magical ? resistance : resistance.replace(/non_magical_/, ""));
+					}
+					if(resistances && resistances.includes(this.damage_type)) {
 						this.$set(this.resistances, target, key);
 					}
 				}
@@ -205,7 +222,7 @@
 				}
 			},
 			calculateAmount(target, type) {
-				let value = parseInt(this.manualAmount);
+				let value = this.manualAmount ? parseInt(this.manualAmount) : 0;
 				value = value * this.multiplier[target];
 
 				if((!type || type === "damage") && this.resistances[target]) {

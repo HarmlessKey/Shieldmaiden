@@ -20,13 +20,26 @@
 				:key="`verstatile-panel-${index}`"
 				:name="option.name"
 			>
-				<hk-dmg-type-select 
-					v-if="action_type !== 'healing'"
-					class="mb-3"
-					:label="`Damage type ${index == 1 ? option.label : '*'}`"
-					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
-					:validation-rules="index === 0 ? 'required' : ''"
-				/>
+				<template v-if="action_type !== 'healing'">
+					<hk-dmg-type-select 
+						class="mb-3"
+						:label="`Damage type ${index == 1 ? option.label : '*'}`"
+						v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
+						:validation-rules="index === 0 ? 'required' : ''"
+					/>
+					<q-checkbox 
+						:dark="$store.getters.theme === 'dark'"
+						v-model="roll[`${index === 1 ? 'versatile_' : '' }magical`]" 
+						:label="`${index == 1 ? option.label : ''} Magical`"
+						:false-value="null" 
+						indeterminate-value="something-else"
+						class="mb-2"
+					>
+						<q-tooltip anchor="top middle" self="center middle">
+							Damage counts as magical
+						</q-tooltip>
+					</q-checkbox>
+				</template>
 
 				<!-- ROLLS -->
 				<div class="row q-col-gutter-md mb-3">

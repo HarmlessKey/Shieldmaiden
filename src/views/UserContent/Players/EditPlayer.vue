@@ -689,7 +689,7 @@ import GiveCharacterControl from "./GiveCharacterControl.vue";
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { general } from "src/mixins/general.js";
-import Defenses from "./Defenses";
+import Defenses from "src/components/npcs/Defenses";
 import CopyContent from "../../../components/CopyContent.vue";
 import { abilities, skills } from "src/utils/generalConstants";
 import {

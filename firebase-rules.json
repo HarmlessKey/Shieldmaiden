@@ -163,17 +163,17 @@
             },
             "damage_vulnerabilities": {
               "$vulnerabilityIndex": {
-                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
               }
             },
             "damage_resistances": {
               "$resistanceIndex": {
-                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
               }
             },
             "damage_immunities": {
               "$immunityIndex": {
-                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
               }
             },
             "condition_immunities": {
@@ -461,17 +461,17 @@
 
           "damage_vulnerabilities": {
             "$vulnerabilityIndex": {
-              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
             }
           },
           "damage_resistances": {
             "$resistanceIndex": {
-              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
             }
           },
           "damage_immunities": {
             "$immunityIndex": {
-              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+              ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
             }
           },
           "condition_immunities": {
@@ -589,7 +589,7 @@
                   "rolls": {
                     "$rollIndex": {
                       "damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -601,7 +601,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
                       },
                       "versatile_damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -692,7 +692,7 @@
                   "rolls": {
                     "$rollIndex": {
                       "damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -704,7 +704,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
                       },
                       "versatile_damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -801,7 +801,7 @@
                   "rolls": {
                     "$rollIndex": {
                       "damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -813,7 +813,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
                       },
                       "versatile_damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -904,7 +904,7 @@
                   "rolls": {
                     "$rollIndex": {
                       "damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
@@ -916,7 +916,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
                       },
                       "versatile_damage_type": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder)$/)"
+                        ".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
                       },
                       "versatile_dice_count": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"

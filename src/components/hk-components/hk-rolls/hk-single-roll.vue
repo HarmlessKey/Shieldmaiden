@@ -12,27 +12,31 @@
 		<div class="card-body">
 			<!-- TARGET -->
 			<div class="target-item" v-if="roll.target">
-				<span 
-					class="img" 
-					:style="{ 
+				<span
+					class="img bg-neutral-8"
+					:style="{
 						'background-image': 'url(' + roll.target.img + ')',
 						'border-color': roll.target.color_label ? roll.target.color_label : ``,
-						'color': roll.target.color_label ? roll.target.color_label : ``
+						color: roll.target.color_label ? roll.target.color_label : ``,
 					}"
 				>
-					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(roll.target.img)" :class="`hki-${roll.target.img}`" />
+					<i
+						v-if="!roll.target.img"
+						:class="`hki-${roll.target.entityType === 'npc' ? 'monster' : roll.target.entityType}`"
+						aria-hidden="true"
+					/>
 				</span>
 				<div class="ac_wrapper">
-					<i aria-hidden="true" class="fas fa-shield" ></i>
-					<span 
+					<i aria-hidden="true" class="fas fa-shield"></i>
+					<span
 						v-if="roll.target.ac_bonus"
-						class="ac" 
-						:class="{ 
-							'green': roll.target.ac_bonus > 0,
-							'red': roll.target.ac_bonus < 0 
-						}" 
+						class="ac"
+						:class="{
+							green: roll.target.ac_bonus > 0,
+							red: roll.target.ac_bonus < 0,
+						}"
 					>
-						{{ displayStats(roll.target).ac + roll.target.ac_bonus}}
+						{{ displayStats(roll.target).ac + roll.target.ac_bonus }}
 					</span>
 					<span class="ac" v-else>
 						{{ displayStats(roll.target).ac }}
@@ -49,15 +53,19 @@
 				<template v-if="action.toHit">
 					<div class="toHit">
 						<div>
-							To hit: 
+							To hit:
 							<span class="advantage" v-if="action.toHit.ignored">
-								<span v-html="advantage(action.toHit.advantage_disadvantage)"/> 
+								<span v-html="advantage(action.toHit.advantage_disadvantage)" />
 								<span class="ignored neutral-4">
 									{{ action.toHit.ignored }}
-								</span>
-							</span>{{ action.toHit.throwsTotal }}
+								</span> </span
+							>{{ action.toHit.throwsTotal }}
 							<template v-if="parseInt(action.toHit.mod) !== 0">
-								{{ parseInt(action.toHit.mod) > 0 ? `+ ${parseInt(action.toHit.mod)}` : `- ${Math.abs(action.toHit.mod)}` }}
+								{{
+									parseInt(action.toHit.mod) > 0
+										? `+ ${parseInt(action.toHit.mod)}`
+										: `- ${Math.abs(action.toHit.mod)}`
+								}}
 							</template>
 						</div>
 						<transition
@@ -67,7 +75,7 @@
 							appear
 						>
 							<div class="total crit red">
-								Crit 
+								Crit
 								<b><hk-animated-integer :value="1" onMount /></b>
 							</div>
 						</transition>
@@ -78,7 +86,7 @@
 							appear
 						>
 							<div class="total crit green">
-								Crit 
+								Crit
 								<b><hk-animated-integer :value="20" onMount /></b>
 							</div>
 						</transition>
@@ -89,12 +97,15 @@
 					<q-btn-toggle
 						v-model="hitOrMiss[action_index]"
 						class="mb-3 neutral-1"
-						spread no-caps :dark="$store.getters.theme === 'dark'" dense
+						spread
+						no-caps
+						:dark="$store.getters.theme === 'dark'"
+						dense
 						toggle-color="primary"
 						color="neutral-9"
 						:options="[
-							{label: 'Hit', value: 'hit'},
-							{label: 'Miss', value: 'miss'}
+							{ label: 'Hit', value: 'hit' },
+							{ label: 'Miss', value: 'miss' },
 						]"
 					/>
 				</template>
@@ -102,16 +113,14 @@
 				<!-- SAVING THROW -->
 				<template v-if="action.type === 'save'">
 					<div class="toHit" v-if="action.save_ability || action.save_dc">
-						<div v-if="action.save_ability">
-							{{ action.save_ability.capitalize() }} save
-						</div>
+						<div v-if="action.save_ability">{{ action.save_ability.capitalize() }} save</div>
 						<div v-if="action.save_dc">
 							<span class="neutral-2">DC</span>
-							<span 
-								class="total" 
+							<span
+								class="total"
 								:class="{
 									green: savingThrowResult[action_index] === 'fail',
-									red: savingThrowResult[action_index] === 'save'
+									red: savingThrowResult[action_index] === 'save',
 								}"
 							>
 								{{ action.save_dc }}
@@ -121,12 +130,16 @@
 					<q-btn-toggle
 						v-model="savingThrowResult[action_index]"
 						class="mb-3 neutral-1"
-						spread no-caps :dark="$store.getters.theme === 'dark'" dense square
+						spread
+						no-caps
+						:dark="$store.getters.theme === 'dark'"
+						dense
+						square
 						toggle-color="primary"
 						color="neutral-9"
 						:options="[
-							{label: 'Fail', value: 'fail'},
-							{label: 'Save', value: 'save'}
+							{ label: 'Fail', value: 'fail' },
+							{ label: 'Save', value: 'save' },
 						]"
 					/>
 				</template>
@@ -134,26 +147,30 @@
 				<!-- DAMAGE / HEALING ROLLS -->
 				<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 					<q-expansion-item
-						v-for="(rolled, rolled_index) in action.rolls" 
+						v-for="(rolled, rolled_index) in action.rolls"
 						:key="`rolled-${rolled_index}`"
-						:dark="$store.getters.theme === 'dark'" switch-toggle-side
+						:dark="$store.getters.theme === 'dark'"
+						switch-toggle-side
 						:group="`rolled-${index}`"
 					>
 						<template #header>
 							<q-item-section v-if="action.type === 'healing'">
 								<span class="type truncate green">
-										<i aria-hidden="true" class="fas fa-heart"/> 
-										Healing
-									</span>
+									<i aria-hidden="true" class="fas fa-heart" />
+									Healing
+								</span>
 							</q-item-section>
 							<q-item-section v-else>
 								<div class="defenses">
-									<div 
-										v-for="({name}, key) in defenses"
+									<div
+										v-for="({ name }, key) in defenses"
 										:key="key"
 										class="option"
 										@click.stop="setDefense(rolled.damage_type, key, roll.key)"
-										:class="[{active: resistances && resistances[rolled.damage_type] === key}, key]"
+										:class="[
+											{ active: checkDefenses(rolled.damage_type, rolled.magical, key) },
+											key,
+										]"
 									>
 										<i aria-hidden="true" class="fas fa-shield"></i>
 										<span>{{ key.capitalize() }}</span>
@@ -161,21 +178,25 @@
 											{{ name }}
 										</q-tooltip>
 									</div>
-									<span 
-										class="type truncate"
-										:class="rolled.damage_type"
-									>
-										<i aria-hidden="true" :class="damage_type_icons[rolled.damage_type]"/> 
+									<span class="type truncate" :class="rolled.damage_type">
+										<span class="type__icon-wrapper">
+											<i :class="damage_type_icons[rolled.damage_type]" aria-hidden="true" />
+											<i v-if="rolled.magical" class="fas fa-sparkles" aria-hidden="true">
+												<q-tooltip anchor="top middle" self="center middle">Magical</q-tooltip>
+											</i>
+										</span>
 										{{ rolled.damage_type }}
 									</span>
 								</div>
 							</q-item-section>
 							<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
 								<q-item-label>
-									<b><hk-animated-integer :value="totalRollValue(action, action_index, rolled)" /></b>
+									<b
+										><hk-animated-integer :value="totalRollValue(action, action_index, rolled)"
+									/></b>
 								</q-item-label>
 								<q-tooltip anchor="top middle" self="center middle">
-										{{ rolled.modifierRoll.roll }}
+									{{ rolled.modifierRoll.roll }}
 								</q-tooltip>
 							</q-item-section>
 						</template>
@@ -184,26 +205,27 @@
 								<b>Rolls: </b>
 								<template v-if="action.toHit && action.toHit.throwsTotal == 20">
 									<b class="green">Crit!</b>
-									{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values"}}
-								</template><br/>
+									{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values" }} </template
+								><br />
 								{{ rolled.modifierRoll.roll }}
 								<div class="d-flex justify-content-between">
 									<div class="throws">
-										<div 
+										<div
 											v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
 											:key="`throw-${Throw}-${throw_index}`"
 											class="throw"
 											:class="{
-												red: Throw === 1, green: Throw == rolled.modifierRoll.d,
-												rotate: animateRoll === roll.key+rolled_index+throw_index
+												red: Throw === 1,
+												green: Throw == rolled.modifierRoll.d,
+												rotate: animateRoll === roll.key + rolled_index + throw_index,
 											}"
 											@click="
-												animateRoll = roll.key+rolled_index+throw_index,
-												reroll($event, rolled.modifierRoll, throw_index)
+												(animateRoll = roll.key + rolled_index + throw_index),
+													reroll($event, rolled.modifierRoll, throw_index)
 											"
 											@animationend="animateRoll = undefined"
 										>
-											<hk-animated-integer :value="Throw" onMount/>
+											<hk-animated-integer :value="Throw" onMount />
 											<q-tooltip anchor="top middle" self="bottom middle">
 												Reroll {{ Throw }}
 											</q-tooltip>
@@ -224,61 +246,80 @@
 								</div>
 							</div>
 							<div v-if="rolled.scaledRoll" class="mt-3">
-								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} = <b>{{ rolled.scaledRoll.total }}</b><br/>
+								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} =
+								<b>{{ rolled.scaledRoll.total }}</b
+								><br />
 								{{ rolled.scaledRoll.throws }}
 							</div>
 							<div v-if="rolled.scaledRoll" class="mt-3">
-								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} = <b>{{ rolled.scaledRoll.total }}</b><br/>
+								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} =
+								<b>{{ rolled.scaledRoll.total }}</b
+								><br />
 								{{ rolled.scaledRoll.throws }}
 							</div>
 							<div v-if="savingThrowResult[action_index] === 'save'" class="mt-3">
-								Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, 'text') }}</b>
+								Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
 							</div>
 							<div v-if="hitOrMiss[action_index] === 'miss'" class="mt-3">
-								Missed attack: <b>{{ missSaveEffect(rolled.missSave, 'text') }}</b>
+								Missed attack: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
 							</div>
-							<template v-for="({name, value}, key) in defenses">
-								<div 
-									v-if="resistances && resistances[rolled.damage_type] === key" 
+							<template v-for="({ name, modifier }, key) in defenses">
+								<div
+									v-if="checkDefenses(rolled.damage_type, rolled.magical, key)"
 									class="mt-3"
 									:key="`defense-${name}`"
 								>
-									{{ name }} to {{ rolled.damage_type }}: <b>{{ value }} damage</b>
+									{{ name }} to {{ rolled.damage_type }}: <b>{{ modifier }} damage</b>
 								</div>
 							</template>
-							<hr>
+							<hr />
 							<div>
-								<b>Final result</b><br/>	
-								(<hk-animated-integer :value="rolled.modifierRoll.total" /><span v-if="rolled.scaledRoll"> + 
-								{{ rolled.scaledRoll.total }}</span>)
-								<span v-if="savingThrowResult[action_index] === 'save' || hitOrMiss[action_index] === 'miss'">
-									{{ missSaveEffect(rolled.missSave, 'calc') }}
+								<b>Final result</b><br />
+								(<hk-animated-integer :value="rolled.modifierRoll.total" /><span
+									v-if="rolled.scaledRoll"
+								>
+									+ {{ rolled.scaledRoll.total }}</span
+								>)
+								<span
+									v-if="
+										savingThrowResult[action_index] === 'save' || hitOrMiss[action_index] === 'miss'
+									"
+								>
+									{{ missSaveEffect(rolled.missSave, "calc") }}
 								</span>
 								<template v-if="resistances">
-									<span v-if="resistances[rolled.damage_type] === 'v'"> * 2</span>
-									<span v-if="resistances[rolled.damage_type] === 'r'"> / 2</span>
-									<span v-if="resistances[rolled.damage_type] === 'i'"> no effect</span>
+									<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'v')"> * 2</span>
+									<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'r')"> / 2</span>
+									<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'i')">
+										no effect</span
+									>
 								</template>
-								<span> = <b :class="action.type === 'healing' ? 'green' : rolled.damage_type">
-									<hk-animated-integer :value="totalRollValue(action, action_index, rolled)" />
-								</b> 
-								{{ action.type === "healing" ? "healing" : rolled.damage_type }}
+								<span>
+									=
+									<b :class="action.type === 'healing' ? 'green' : rolled.damage_type">
+										<hk-animated-integer :value="totalRollValue(action, action_index, rolled)" />
+									</b>
+									{{ action.type === "healing" ? "healing" : rolled.damage_type }}
 								</span>
 							</div>
 
 							<!-- Special events -->
-							<div 
-								v-if="rolled.special && (savingThrowResult[action_index] === 'fail' || hitOrMiss[action_index] === 'hit')" 
+							<div
+								v-if="
+									rolled.special &&
+									(savingThrowResult[action_index] === 'fail' || hitOrMiss[action_index] === 'hit')
+								"
 								class="mt-3"
 							>
-								<b>Events on {{ action.toHit ? "hit" : "failed save" }}</b><br/>	
+								<b>Events on {{ action.toHit ? "hit" : "failed save" }}</b
+								><br />
 								<div v-for="(event, event_index) in rolled.special" :key="`event-${event_index}`">
 									{{ eventValues(event, totalRollValue(action, action_index, rolled)).name }}
 									<b :class="event === 'drain' ? 'red' : 'green'">
 										{{ eventValues(event, totalRollValue(action, action_index, rolled)).value }}
 									</b>
 									<q-tooltip anchor="center left" self="center right">
-										{{ event === "drain" ? "Reduces targets max HP" : "Heals caster"}}
+										{{ event === "drain" ? "Reduces targets max HP" : "Heals caster" }}
 									</q-tooltip>
 								</div>
 							</div>
@@ -307,10 +348,33 @@
 		</div>
 
 		<div slot="footer" class="card-footer" v-if="roll.target">
-			<q-btn color="neutral-9" class="full-width neutral-1" label="Full" no-caps @click="apply(1)" />
-			<q-btn color="neutral-9" class="full-width neutral-1" label="Half" no-caps @click="apply(.5)" />
-			<q-btn color="neutral-9" class="full-width neutral-1" label="Double" no-caps @click="apply(2)" />
-			<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeActionRoll(index)">
+			<q-btn
+				color="neutral-9"
+				class="full-width neutral-1"
+				label="Full"
+				no-caps
+				@click="apply(1)"
+			/>
+			<q-btn
+				color="neutral-9"
+				class="full-width neutral-1"
+				label="Half"
+				no-caps
+				@click="apply(0.5)"
+			/>
+			<q-btn
+				color="neutral-9"
+				class="full-width neutral-1"
+				label="Double"
+				no-caps
+				@click="apply(2)"
+			/>
+			<q-btn
+				color="neutral-9"
+				class="full-width neutral-1"
+				no-caps
+				@click="removeActionRoll(index)"
+			>
 				<i aria-hidden="true" class="fas fa-times" />
 			</q-btn>
 		</div>
@@ -319,21 +383,21 @@
 
 <script>
 import { mapActions } from "vuex";
-import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
-import { dice } from 'src/mixins/dice';
-import { setHP } from 'src/mixins/HpManipulations';
+import { damage_types, damage_type_icons } from "src/utils/generalConstants";
+import { dice } from "src/mixins/dice";
+import { setHP } from "src/mixins/HpManipulations";
 
 export default {
-	name: 'hk-single-roll',
+	name: "hk-single-roll",
 	props: {
 		value: {
 			type: Object,
-			required: true
+			required: true,
 		},
 		index: {
 			type: Number,
-			required: true
-		}
+			required: true,
+		},
 	},
 	mixins: [dice, setHP],
 	data() {
@@ -341,67 +405,63 @@ export default {
 			damage_types: damage_types,
 			damage_type_icons: damage_type_icons,
 			defenses: {
-				v: { name: "Vulnerable", value: "double" },
-				r: { name: "Resistant", value: "half" },
-				i: { name: "Immune", value: "no" }
+				v: { name: "Vulnerable", value: "damage_vulnerabilities", modifier: "double" },
+				r: { name: "Resistant", value: "damage_resistances", modifier: "half" },
+				i: { name: "Immune", value: "damage_immunities", modifier: "no" },
 			},
 			savingThrowResult: {},
 			hitOrMiss: {},
 			animateRoll: undefined,
 			resultColumns: {
 				total: {
-					maxContent: true
+					maxContent: true,
 				},
 				type: {
-					truncate: true
-				}
-			}
-		}
+					truncate: true,
+				},
+			},
+		};
 	},
 	computed: {
 		roll() {
 			return this.value;
 		},
 		resistances() {
-			if(this.roll.target) {
-				let defenses = {};
-				let resistances = {
-					v: "damage_vulnerabilities",
-					r: "damage_resistances",
-					i: "damage_immunities"
-				}
-				// Defenses
-				for(const [key, defense] of Object.entries(resistances)) {
-					if(this.roll.target[defense]) {
-						for(const damage_type of this.roll.target[defense]) {
-							defenses[damage_type] = key;
+			if (this.roll.target) {
+				const resistances = {};
+
+				// Resistances
+				for (const [key, defense] of Object.entries(this.defenses)) {
+					if (this.roll.target[defense.value]) {
+						for (const damage_type of this.roll.target[defense.value]) {
+							resistances[damage_type] = key;
 						}
 					}
 				}
-				return defenses;
-			} return {};
+				return resistances;
+			}
+			return {};
 		},
 		critSettings() {
-			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
+			if (this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
 				return this.$store.getters.userSettings.encounter.critical; // Double rolled values
-			} return undefined; // Default = undefined = roll twice
+			}
+			return undefined; // Default = undefined = roll twice
 		},
 	},
 	mounted() {
 		this.checkHitOrMiss();
 	},
 	methods: {
-		...mapActions([
-			"removeActionRoll",
-			"edit_entity_prop",
-		]),
+		...mapActions(["removeActionRoll", "edit_entity_prop"]),
 		checkHitOrMiss() {
 			this.roll.actions.forEach((action, index) => {
-				if(action.toHit) {
-					if(action.toHit.throwsTotal === 20) this.$set(this.hitOrMiss, index, "hit");
-					else if(action.toHit.throwsTotal === 1) this.$set(this.hitOrMiss, index, "miss");
-					else if(this.roll.target) {
-						if(this.displayStats(this.roll.target).ac <= action.toHit.total) this.$set(this.hitOrMiss, index, "hit");
+				if (action.toHit) {
+					if (action.toHit.throwsTotal === 20) this.$set(this.hitOrMiss, index, "hit");
+					else if (action.toHit.throwsTotal === 1) this.$set(this.hitOrMiss, index, "miss");
+					else if (this.roll.target) {
+						if (this.displayStats(this.roll.target).ac <= action.toHit.total)
+							this.$set(this.hitOrMiss, index, "hit");
 						else this.$set(this.hitOrMiss, index, "miss");
 					}
 				}
@@ -409,8 +469,23 @@ export default {
 		},
 		advantage(input) {
 			const type = Object.keys(input)[0].charAt(0).capitalize();
-			const color = (type === "A") ? "green" : "red";
+			const color = type === "A" ? "green" : "red";
 			return `<b class="${color}">${type}</b>`;
+		},
+		/**
+		 * Check if the target is resistant do the damage type of a roll
+		 * @param {string} damage_type
+		 * @param {boolean} magical
+		 * @param {string} defense_key v/r/i
+		 *
+		 * @returns {boolean}
+		 */
+		checkDefenses(damage_type, magical, defense_key) {
+			if (damage_type) {
+				damage_type = magical ? damage_type : damage_type.replace(/non_magical_/, "");
+				return this.resistances && this.resistances[damage_type] === defense_key;
+			}
+			return false;
 		},
 		async apply(multiplier) {
 			// Create the info object for the log
@@ -418,33 +493,36 @@ export default {
 				log: true,
 				ability: this.roll.name,
 				defenses: this.resistances,
-				multiplier
+				multiplier,
 			};
 			let actions = [];
 			let specials = [];
 
 			this.roll.actions.forEach((action, index) => {
 				let new_action = {
-					type: action.type
+					type: action.type,
 				};
-				if(action.toHit) {
+				if (action.toHit) {
 					new_action.hitOrMiss = this.hitOrMiss[index];
-					if(action.toHit.throwsTotal === 20) new_action.crit = true;
+					if (action.toHit.throwsTotal === 20) new_action.crit = true;
 				}
-				if(action.type === "save") new_action.savingThrowResult = this.savingThrowResult[index];
+				if (action.type === "save") new_action.savingThrowResult = this.savingThrowResult[index];
 
 				new_action.rolls = [];
-				for(const rolled of action.rolls) {
+				for (const rolled of action.rolls) {
 					let roll = {};
-					if(action.type !== "healing") roll.damage_type = rolled.damage_type;
+					if (action.type !== "healing") roll.damage_type = rolled.damage_type;
 					roll.value = Math.floor(this.totalRollValue(action, index, rolled) * multiplier);
 
 					// Special events | only on a hit or failed save
-					if(rolled.special && (this.savingThrowResult[index] === "fail" || this.hitOrMiss[index] === "hit" )) {
-						for(const event of rolled.special) {
+					if (
+						rolled.special &&
+						(this.savingThrowResult[index] === "fail" || this.hitOrMiss[index] === "hit")
+					) {
+						for (const event of rolled.special) {
 							const special = {};
 							special[event] = this.eventValues(event, roll.value).value;
-							specials.push(special)
+							specials.push(special);
 						}
 					}
 
@@ -459,36 +537,41 @@ export default {
 			const totalHealing = this.totalValue("healing");
 			let totalValue = {};
 
-			if(totalDamage !== undefined) totalValue.damage = Math.floor(totalDamage * multiplier);
-			if(totalHealing !== undefined) totalValue.healing = Math.floor(totalHealing * multiplier);
+			if (totalDamage !== undefined) totalValue.damage = Math.floor(totalDamage * multiplier);
+			if (totalHealing !== undefined) totalValue.healing = Math.floor(totalHealing * multiplier);
 
 			// Apply the rolled damage/healing
 			await this.setHP(totalValue, this.roll.target, this.roll.current, config);
 
 			// Apply the special events
-			for(const special of specials) {
+			for (const special of specials) {
 				const event = Object.entries(special)[0];
-				if(event[0].includes("siphon")) {
+				if (event[0].includes("siphon")) {
 					const event_config = {
 						log: true,
 						ability: `${this.roll.name}: Siphon`,
 						actions: [
 							{
 								type: "healing",
-								rolls: [
-									{ value: event[1] }
-								]
-							}
-						]
+								rolls: [{ value: event[1] }],
+							},
+						],
 					};
-					await this.setHP({ healing: event[1] }, this.roll.current, this.roll.current, event_config);
-				} else if(event[0] === "drain") {
-					const value = (this.roll.target.maxHpMod) ? this.roll.target.maxHpMod - event[1] : -event[1];
+					await this.setHP(
+						{ healing: event[1] },
+						this.roll.current,
+						this.roll.current,
+						event_config
+					);
+				} else if (event[0] === "drain") {
+					const value = this.roll.target.maxHpMod
+						? this.roll.target.maxHpMod - event[1]
+						: -event[1];
 					this.edit_entity_prop({
-						key: this.roll.target.key, 
+						key: this.roll.target.key,
 						entityType: this.roll.target.entityType,
-						prop: 'maxHpMod',
-						value
+						prop: "maxHpMod",
+						value,
 					});
 				}
 			}
@@ -498,22 +581,22 @@ export default {
 		totalRollValue(action, action_index, rolls) {
 			let total = parseInt(rolls.modifierRoll.total);
 
-			if(rolls.scaledRoll) {
+			if (rolls.scaledRoll) {
 				total = total + rolls.scaledRoll.total;
 			}
-			if(action.type === 'save' && this.savingThrowResult[action_index] === 'save') {
+			if (action.type === "save" && this.savingThrowResult[action_index] === "save") {
 				total = total * rolls.missSave;
 			}
-			if(action.toHit && this.hitOrMiss[action_index] === 'miss') {
+			if (action.toHit && this.hitOrMiss[action_index] === "miss") {
 				total = total * rolls.missSave;
 			}
-			if(this.resistances && this.resistances[rolls.damage_type] === 'v') {
+			if (this.checkDefenses(rolls.damage_type, rolls.magical, "v")) {
 				total = total * 2;
 			}
-			if(this.resistances && this.resistances[rolls.damage_type] === 'r') {
+			if (this.checkDefenses(rolls.damage_type, rolls.magical, "r")) {
 				total = total / 2;
 			}
-			if(this.resistances && this.resistances[rolls.damage_type] === 'i') {
+			if (this.checkDefenses(rolls.damage_type, rolls.magical, "i")) {
 				total = 0;
 			}
 			return Math.floor(total);
@@ -528,32 +611,31 @@ export default {
 		totalValue(type) {
 			let total = undefined;
 			let actions = [];
-			
-			if(type === "healing") {
+
+			if (type === "healing") {
 				// Separate damage and healing
 				actions = this.roll.actions.filter((action, index) => {
 					action.index = index;
-					return action.type === 'healing';
+					return action.type === "healing";
 				});
-			}
-			else {
+			} else {
 				actions = this.roll.actions.filter((action, index) => {
 					action.index = index;
-					return action.type !== 'healing';
+					return action.type !== "healing";
 				});
 			}
 
-			if(actions.length > 0) {
+			if (actions.length > 0) {
 				total = 0;
-				for(const action of actions) {
+				for (const action of actions) {
 					total = total + this.totalActionValue(action, action.index);
 				}
 			}
 			return total;
 		},
 		setDefense(type, resistance, key) {
-			if(!this.resistances) this.$set(this.resistances, key, {});
-			if(this.resistances[type] === resistance) {
+			if (!this.resistances) this.$set(this.resistances, key, {});
+			if (this.resistances[type] === resistance) {
 				this.$delete(this.resistances, type);
 			} else {
 				this.$set(this.resistances, type, resistance);
@@ -568,210 +650,231 @@ export default {
 			this.$set(roll, "total", roll.throwsTotal + parseInt(roll.mod));
 		},
 		missSaveEffect(effect, type) {
-			if(type === 'text') {
-				if(effect === 1) return 'full damage';
-				if(effect === .5)	return 'half damage';
-				if(effect === 0) return 'no damage';
+			if (type === "text") {
+				if (effect === 1) return "full damage";
+				if (effect === 0.5) return "half damage";
+				if (effect === 0) return "no damage";
 			} else {
-				if(effect === 1) return '';
-				if(effect === .5) return '/ 2';
-				if(effect === 0) return 'no effect';
+				if (effect === 1) return "";
+				if (effect === 0.5) return "/ 2";
+				if (effect === 0) return "no effect";
 			}
 		},
 		displayStats(target) {
-			let stats = '';
-			if(target.transformed) {
+			let stats = "";
+			if (target.transformed) {
 				stats = {
 					ac: target.transformedAc,
 					maxHp: target.transformedMaxHp,
 					maxHpMod: target.transformedMaxHpMod,
 					curHp: target.transformedCurHp,
-				}
-			}
-			else {
+				};
+			} else {
 				stats = {
 					ac: target.ac,
 					maxHp: target.maxHp,
 					maxHpMod: target.maxHpMod,
 					curHp: target.curHp,
-				}
+				};
 			}
-			return stats
+			return stats;
 		},
 		eventValues(event, value) {
 			let returnObj = {
 				name: "",
-				value
+				value,
 			};
 
-			if(event) {
+			if (event) {
 				// Drain = redus Max HP
-				if(event === "drain") {
+				if (event === "drain") {
 					returnObj.name = "Drain";
 				}
 				// Siphon = caster heals for damage done
-				if(event.includes("siphon")) {
+				if (event.includes("siphon")) {
 					returnObj.name = "Siphon";
-					returnObj.value = (event === "siphon_half") ? Math.floor(value/2) : value;
+					returnObj.value = event === "siphon_half" ? Math.floor(value / 2) : value;
 				}
 			}
 			return returnObj;
-		}
-	}
-}
+		},
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.hk-card {
-		pointer-events: auto;
-		.card-body {
+.hk-card {
+	pointer-events: auto;
+	.card-body {
+		h2 {
+			text-transform: none !important;
+			font-size: 20px;
+		}
+		h3 {
+			font-size: 15px;
+		}
 
-			h2 {
-				text-transform: none !important;
-				font-size: 20px;
+		.target-item {
+			margin-bottom: 15px;
+			background-color: $neutral-8;
+
+			.ac_wrapper {
+				background-color: $neutral-9;
 			}
-			h3 {
-				font-size: 15px;
+		}
+
+		.save {
+			a {
+				margin-left: 5px;
 			}
+		}
+		.toHit {
+			position: relative;
+			display: flex;
+			justify-content: space-between;
+			font-size: 18px;
+			margin-bottom: 10px;
+			line-height: 30px;
+			padding: 0 5px;
+			z-index: 99;
 
-			.target-item {
-				margin-bottom: 15px;
-				background-color: $neutral-8;
-
-				.ac_wrapper {
-					background-color: $neutral-9;
-				}
-			}
-
-			.save {
-				a {
-					margin-left: 5px;
-				}
-			}
-			.toHit {
-				position: relative;
-				display: flex;
-				justify-content: space-between;
-				font-size: 18px;
-				margin-bottom: 10px;
-				line-height: 30px;
-				padding: 0 5px;
-				z-index: 99;
-
-				.total {
-					font-size: 25px;
-					font-weight: bold;
-				}
-			}
-			.total-damage, .total-action-damage {
-				display: flex;
-				justify-content: space-between;
-				line-height: 30px;
-				padding: 0 5px;
-
-				.total {
-					font-weight: bold;
-				}
-			}
-			.total-damage {
-				font-size: 20px;
-				margin-top: 10px;
-
-				.total {
-					font-size: 28px;
-				}
-			}
-			.defenses {
-				display: grid;
-				grid-template-columns: 18px 18px 18px auto;
-				grid-column-gap: 5px;
-				user-select: none;
-				line-height: 28px;
-
-				.type {
-					padding-left: 10px;
-				}
-
-				.option {
-					cursor: pointer;
-					position: relative;
-					width: 18px;
-					font-size: 18px;
-					text-align: center;
-					line-height: 28px;
-					color: $neutral-2;
-
-					span {
-						font-size: 12px;
-						text-align: center;
-						font-weight: bold;
-						position: absolute;
-						width: 18px;
-						line-height: 28px;
-						top: 0;
-						left: 0;
-						color: $neutral-9;
-					}
-
-					&.active {
-						&.i, &.r { color: $green; }
-						&.v { color: $red; }
-						span {
-							color: $white;
-						}
-					}
-				}
-			}
-			.throws {
-				display: flex;
-				flex-wrap: wrap;
-				margin-top: 5px;
-				margin-right: 5px;
-
-				.throw {
-					border: solid 1px $neutral-4;
-					padding: 1px 0;
-					width: 23px;
-					text-align: center;
-					margin-right: 2px;
-					cursor: pointer;
-					user-select: none;
-					border-radius: $border-radius-small;
-
-					&:hover {
-						border-color: $neutral-3;
-					}
-					&.rotate {
-						animation: spin .2s linear;
-					}
-					&.green {
-						font-weight: bold;
-					}
-				}
-			}
-			.throws-modifier, .throws-total {
-				padding: 0 10px;
-				align-self: center;
-			}
-			.throws-total {
+			.total {
+				font-size: 25px;
 				font-weight: bold;
-				font-size: 18px;
-				padding-right: 0;
 			}
 		}
-		.card-footer {
-			padding: 0;
+		.total-damage,
+		.total-action-damage {
+			display: flex;
+			justify-content: space-between;
+			line-height: 30px;
+			padding: 0 5px;
 
-			.q-btn {
-				border-radius: 0;
+			.total {
+				font-weight: bold;
 			}
 		}
+		.total-damage {
+			font-size: 20px;
+			margin-top: 10px;
+
+			.total {
+				font-size: 28px;
+			}
+		}
+		.defenses {
+			display: grid;
+			grid-template-columns: 18px 18px 18px auto;
+			grid-column-gap: 5px;
+			user-select: none;
+			line-height: 28px;
+
+			.type {
+				padding-left: 10px;
+
+				&__icon-wrapper {
+					position: relative;
+
+					.fa-sparkles {
+						position: absolute;
+						top: -3px;
+						left: -5px;
+						color: $blue-light;
+						font-size: 12px;
+					}
+				}
+			}
+
+			.option {
+				cursor: pointer;
+				position: relative;
+				width: 18px;
+				font-size: 18px;
+				text-align: center;
+				line-height: 28px;
+				color: $neutral-2;
+
+				span {
+					font-size: 12px;
+					text-align: center;
+					font-weight: bold;
+					position: absolute;
+					width: 18px;
+					line-height: 28px;
+					top: 0;
+					left: 0;
+					color: $neutral-9;
+				}
+
+				&.active {
+					&.i,
+					&.r {
+						color: $green;
+					}
+					&.v {
+						color: $red;
+					}
+					span {
+						color: $white;
+					}
+				}
+			}
+		}
+		.throws {
+			display: flex;
+			flex-wrap: wrap;
+			margin-top: 5px;
+			margin-right: 5px;
+
+			.throw {
+				border: solid 1px $neutral-4;
+				padding: 1px 0;
+				width: 23px;
+				text-align: center;
+				margin-right: 2px;
+				cursor: pointer;
+				user-select: none;
+				border-radius: $border-radius-small;
+
+				&:hover {
+					border-color: $neutral-3;
+				}
+				&.rotate {
+					animation: spin 0.2s linear;
+				}
+				&.green {
+					font-weight: bold;
+				}
+			}
+		}
+		.throws-modifier,
+		.throws-total {
+			padding: 0 10px;
+			align-self: center;
+		}
+		.throws-total {
+			font-weight: bold;
+			font-size: 18px;
+			padding-right: 0;
+		}
 	}
-	.animate__heartBeat {
-		animation-delay: .2s;
+	.card-footer {
+		padding: 0;
+
+		.q-btn {
+			border-radius: 0;
+		}
 	}
-	.animate__hinge {
-		animation-delay: .5s;
+}
+.animate__heartBeat {
+	animation-delay: 0.2s;
+}
+.animate__hinge {
+	animation-delay: 0.5s;
+}
+@keyframes spin {
+	100% {
+		transform: rotate(360deg);
 	}
-	@keyframes spin { 100% { transform: rotate(360deg); } }
+}
 </style>

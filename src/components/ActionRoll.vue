@@ -1,15 +1,10 @@
 <template>
 	<div>
-		<q-tabs
-			v-if="options.length > 1"
-			v-model="tab"
-			dark
-			no-caps
-		>
-			<q-tab 
+		<q-tabs v-if="options.length > 1" v-model="tab" dark no-caps>
+			<q-tab
 				v-for="(option, index) in options"
 				:key="`verstatile-tab-${index}`"
-				:name="option.name" 
+				:name="option.name"
 				:label="option.label"
 			/>
 		</q-tabs>
@@ -21,43 +16,55 @@
 				:name="option.name"
 			>
 				<template v-if="action_type !== 'healing'">
-					<hk-dmg-type-select 
-						class="mb-3"
-						:label="`Damage type ${index == 1 ? option.label : '*'}`"
-						v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
-						:validation-rules="index === 0 ? 'required' : ''"
-					/>
-					<q-checkbox 
-						:dark="$store.getters.theme === 'dark'"
-						v-model="roll[`${index === 1 ? 'versatile_' : '' }magical`]" 
-						:label="`${index == 1 ? option.label : ''} Magical`"
-						:false-value="null" 
-						indeterminate-value="something-else"
+					<hk-dmg-type-select
 						class="mb-2"
-					>
-						<q-tooltip anchor="top middle" self="center middle">
-							Damage counts as magical
-						</q-tooltip>
-					</q-checkbox>
+						:label="`Damage type ${index == 1 ? option.label : '*'}`"
+						v-model="roll[`${index === 1 ? 'versatile_' : ''}damage_type`]"
+						:validation-rules="index === 0 ? 'required' : ''"
+						@input="reset_magical($event, index)"
+					/>
+					<div class="d-flex items-center mb-2">
+						<q-checkbox
+							:dark="$store.getters.theme === 'dark'"
+							v-model="roll[`${index === 1 ? 'versatile_' : ''}magical`]"
+							:label="`${index == 1 ? option.label : ''} Magical`"
+							:disable="
+								!['bludgeoning', 'piercing', 'slashing'].includes(
+									roll[`${index === 1 ? 'versatile_' : ''}damage_type`]
+								)
+							"
+							:false-value="null"
+							indeterminate-value="something-else"
+						/>
+						<hk-popover header="Magical damage">
+							<i class="fas fa-info-circle ml-2 neutral-2" aria-hidden="true" />
+							<template #content>
+								The damage counts as <strong>magical</strong> to overcome resistances to non magical
+								bludgeoning, piercing or slashing damage.
+							</template>
+						</hk-popover>
+					</div>
 				</template>
 
 				<!-- ROLLS -->
 				<div class="row q-col-gutter-md mb-3">
 					<!-- DICE COUNT -->
 					<div class="col">
-						<ValidationProvider 
+						<ValidationProvider
 							:rules="{
 								between: [1, 99],
-								required: !!roll[`${index === 1 ? 'versatile_' : '' }dice_type`]
-							}" 
-							:name="`Dice count ${index == 1 ? option.label : ''}`" 
+								required: !!roll[`${index === 1 ? 'versatile_' : ''}dice_type`],
+							}"
+							:name="`Dice count ${index == 1 ? option.label : ''}`"
 							v-slot="{ errors, invalid, validated }"
 						>
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
 								:label="`Dice count ${index == 1 ? option.label : '*'}`"
-								v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
-								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
+								v-model.number="roll[`${index === 1 ? 'versatile_' : ''}dice_count`]"
+								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : ''}dice_count`)"
 								min="1"
 								max="99"
 								autocomplete="off"
@@ -71,24 +78,33 @@
 					</div>
 					<div class="col">
 						<!-- DICE TYPE -->
-						<q-select 
-							:dark="$store.getters.theme === 'dark'" filled square
-							map-options emit-value
+						<q-select
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							map-options
+							emit-value
 							clearable
 							:label="`Dice type ${index == 1 ? option.label : ''}`"
 							:options="dice_type"
-							v-model="roll[`${index === 1 ? 'versatile_' : '' }dice_type`]"
+							v-model="roll[`${index === 1 ? 'versatile_' : ''}dice_type`]"
 							class="mb-2"
 						/>
 					</div>
 					<div class="col">
 						<!-- MODIFIER FIXED VALUE -->
-						<ValidationProvider rules="between:-99,99" name="Fixed value" v-slot="{ errors, invalid, validated }">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
+						<ValidationProvider
+							rules="between:-99,99"
+							name="Fixed value"
+							v-slot="{ errors, invalid, validated }"
+						>
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
 								:label="`Fixed value ${index == 1 ? option.label : ''}`"
-								v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
-								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
+								v-model="roll[`${index === 1 ? 'versatile_' : ''}fixed_val`]"
+								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : ''}fixed_val`)"
 								autocomplete="off"
 								class="mb-2"
 								type="number"
@@ -96,7 +112,7 @@
 								:error-message="errors[0]"
 							>
 								<template v-slot:append>
-									<hk-popover 
+									<hk-popover
 										header="Fixed value"
 										content="Set the fixed value that is added on top of the rolled value."
 									>
@@ -109,11 +125,12 @@
 
 					<!-- PRIMARY STAT -->
 					<div class="col" v-if="spell">
-						<q-checkbox 
-							size="lg" dark 
-							v-model="roll[`${index === 1 ? 'versatile_' : '' }primary`]" 
+						<q-checkbox
+							size="lg"
+							dark
+							v-model="roll[`${index === 1 ? 'versatile_' : ''}primary`]"
 							:label="`Primary ${index == 1 ? option.label : ''}`"
-							:false-value="null" 
+							:false-value="null"
 							indeterminate-value="something-else"
 							class="mb-2"
 						>
@@ -127,9 +144,11 @@
 		</q-tab-panels>
 
 		<!-- PROJECTILE COUNT -->
-		<q-input 
+		<q-input
 			v-if="action_type !== 'healing'"
-			:dark="$store.getters.theme === 'dark'" filled square
+			:dark="$store.getters.theme === 'dark'"
+			filled
+			square
 			label="Projectile count"
 			v-model="roll.projectile_count"
 			@input="parseToInt($event, roll, 'projectile_count')"
@@ -142,18 +161,25 @@
 				<hk-popover header="Projectile count">
 					<q-icon name="info" />
 					<template slot="content">
-						Number of projectiles that are cast. <br/>
-						Think of spells like <b>Magic Missile</b> (phb 257), 
-						where multiple projectiles are created for a single cast.
+						Number of projectiles that are cast. <br />
+						Think of spells like <b>Magic Missile</b> (phb 257), where multiple projectiles are
+						created for a single cast.
 					</template>
 				</hk-popover>
 			</template>
 		</q-input>
 
 		<!-- FAIL MODIFIER -->
-		<ValidationProvider v-if="action_type === 'save'" rules="required" name="Fixed value" v-slot="{ invalid, validated }">
-			<q-select 		
-				:dark="$store.getters.theme === 'dark'" filled square
+		<ValidationProvider
+			v-if="action_type === 'save'"
+			rules="required"
+			name="Fixed value"
+			v-slot="{ invalid, validated }"
+		>
+			<q-select
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
 				map-options
 				emit-value
 				label="Succesful save *"
@@ -165,9 +191,16 @@
 				error-message="What happens on a succesful save?"
 			/>
 		</ValidationProvider>
-		<ValidationProvider v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)" rules="required" name="Fixed value" v-slot="{ invalid, validated }">
-			<q-select 	
-				:dark="$store.getters.theme === 'dark'" filled square
+		<ValidationProvider
+			v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
+			rules="required"
+			name="Fixed value"
+			v-slot="{ invalid, validated }"
+		>
+			<q-select
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
 				map-options
 				emit-value
 				label="Miss modifier *"
@@ -181,11 +214,14 @@
 		</ValidationProvider>
 
 		<template v-if="action_type !== 'healing'">
-			<hr>
+			<hr />
 			<!-- SPECIAL ACTIONS -->
 			<div class="col-12 col-md-3">
-				<q-select 
-					:dark="$store.getters.theme === 'dark'" filled square multiple
+				<q-select
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					multiple
 					map-options
 					emit-value
 					label="Special events"
@@ -194,7 +230,7 @@
 					class="mb-3"
 					clearable
 					hint="Select the special events that happens on a hit"
-					:option-disable="opt => Object(opt) === opt ? opt.disable === true : true"
+					:option-disable="(opt) => (Object(opt) === opt ? opt.disable === true : true)"
 				/>
 			</div>
 		</template>
@@ -203,26 +239,24 @@
 		<template v-if="spell && spell.scaling !== undefined && spell.scaling !== 'none'">
 			<!-- HIGHER LEVEL MODIFIER -->
 			<h2 class="d-flex justify-content-between mt-3">
-				<span>
-					<i aria-hidden="true" class="fas fa-chart-line"></i> Scaling
-				</span>
-				<a 
-					v-if="level_tier_addable()"
-					class="neutral-2 text-capitalize" 
-					@click="add_level_tier()"
-				>
+				<span> <i aria-hidden="true" class="fas fa-chart-line"></i> Scaling </span>
+				<a v-if="level_tier_addable()" class="neutral-2 text-capitalize" @click="add_level_tier()">
 					<i aria-hidden="true" class="fas fa-plus green"></i>
-					<q-tooltip anchor="center right" self="center left">
-						Add level tier
-					</q-tooltip>
+					<q-tooltip anchor="center right" self="center left"> Add level tier </q-tooltip>
 				</a>
 			</h2>
 			<template v-for="(level_tier, tier_index) in roll.level_tiers">
-				<div class="d-flex justify-content-between" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+				<div
+					class="d-flex justify-content-between"
+					v-if="tier_index < shown_level_tiers"
+					:key="`level-tier-${tier_index}`"
+				>
 					<!-- HL LEVEL SCALE -->
 					<div>
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square
+						<q-input
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
 							label="Scale size"
 							v-model="level_tier.level"
 							autocomplete="off"
@@ -236,8 +270,10 @@
 						<div class="row q-col-gutter-sm mb-0">
 							<!-- HL DICE COUNT -->
 							<div class="col">
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square
+								<q-input
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
 									label="Dice count"
 									v-model="level_tier.dice_count"
 									autocomplete="off"
@@ -248,8 +284,10 @@
 							</div>
 							<div class="col">
 								<!-- HL MODIFIER DICETYPE -->
-								<q-select 
-									:dark="$store.getters.theme === 'dark'" filled square
+								<q-select
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
 									map-options
 									emit-value
 									label="Dice type"
@@ -260,27 +298,30 @@
 								/>
 							</div>
 							<div class="col">
-								<q-input 
-										:dark="$store.getters.theme === 'dark'" filled square
-										label="Fixed value"
-										v-model="level_tier.fixed_val"
-										autocomplete="off"
-										class="mb-2"
-										type="number"
-										@keyup="$forceUpdate()"
-									/>
+								<q-input
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									label="Fixed value"
+									v-model="level_tier.fixed_val"
+									autocomplete="off"
+									class="mb-2"
+									type="number"
+									@keyup="$forceUpdate()"
+								/>
 							</div>
 						</div>
 
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square
+						<q-input
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
 							label="Projectile count"
 							v-model="level_tier.projectile_count"
 							autocomplete="off"
 							type="number"
 							@keyup="$forceUpdate()"
 						/>
-						
 					</div>
 					<div>
 						<a @click="remove_level_tier(tier_index)" class="remove">
@@ -290,8 +331,11 @@
 				</div>
 			</template>
 			<p v-if="roll.level_tiers && roll.level_tiers.length > 0">
-				<span v-for="(line, i) in create_spell_level_tier_description(roll.level_tiers)" :key="`tier-${i}`">
-					{{line}}<br/>
+				<span
+					v-for="(line, i) in create_spell_level_tier_description(roll.level_tiers)"
+					:key="`tier-${i}`"
+				>
+					{{ line }}<br />
 				</span>
 			</p>
 		</template>
@@ -299,21 +343,23 @@
 </template>
 
 <script>
-import numeral from 'numeral';
-import { damage_types, dice_types } from 'src/utils/generalConstants';
+import numeral from "numeral";
+import { damage_types, dice_types } from "src/utils/generalConstants";
 
 export default {
-	name: 'monster-action-modifier',
+	name: "monster-action-modifier",
 	props: {
 		value: Object,
 		action_type: String,
 		versatile_options: {
 			type: Object,
-			default: () => { return {}; }
+			default: () => {
+				return {};
+			},
 		},
 		spell: {
 			type: Object,
-			default: undefined
+			default: undefined,
 		},
 	},
 	computed: {
@@ -322,48 +368,62 @@ export default {
 				return this.value;
 			},
 			set(newValue) {
-				this.$emit('input', newValue);
-			}
+				this.$emit("input", newValue);
+			},
 		},
 		shown_level_tiers() {
 			if (this.spell && this.spell.scaling == "spell_scale") {
 				return 1;
-			} return 100;
+			}
+			return 100;
 		},
 		specials() {
 			let specials = {
-				siphon_full: { label: "Heal caster full", value: "siphon_full", info: "On a hit, the caster is healed for all of the damage done." },
-				siphon_half: { label: "Heal caster half", value: "siphon_half", info: "On a hit, the caster is healed for half of the damage done." },
-				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
+				siphon_full: {
+					label: "Heal caster full",
+					value: "siphon_full",
+					info: "On a hit, the caster is healed for all of the damage done.",
+				},
+				siphon_half: {
+					label: "Heal caster half",
+					value: "siphon_half",
+					info: "On a hit, the caster is healed for half of the damage done.",
+				},
+				drain: {
+					label: "Reduce max HP",
+					value: "drain",
+					info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done.",
+				},
 			};
-			if(this.special) {
-				if(this.special.includes("siphon_full")) specials.siphon_half.disable = true;
-				if(this.special.includes("siphon_half")) specials.siphon_full.disable = true;
+			if (this.special) {
+				if (this.special.includes("siphon_full")) specials.siphon_half.disable = true;
+				if (this.special.includes("siphon_half")) specials.siphon_full.disable = true;
 			}
 			return specials;
 		},
 		special: {
 			get() {
-				if(this.roll.special && typeof this.roll.special === "string") {
+				if (this.roll.special && typeof this.roll.special === "string") {
 					return [this.roll.special];
-				} return this.roll.special;
+				}
+				return this.roll.special;
 			},
 			set(newVal) {
 				this.$set(this.roll, "special", newVal);
-			}
+			},
 		},
 		options() {
 			let options = [
 				{
 					name: 0,
-				}
+				},
 			];
-			if(this.versatile_options.versatile) {
+			if (this.versatile_options.versatile) {
 				options[0].label = this.versatile_options.versatile_one || "Option 1";
 				options[1] = {
 					name: 1,
-					label: this.versatile_options.versatile_two || "Option 2"
-				}
+					label: this.versatile_options.versatile_two || "Option 2",
+				};
 			}
 			return options;
 		},
@@ -373,33 +433,35 @@ export default {
 			damage_types: damage_types,
 			tab: 0,
 			modifier_type: [
-				{label: "Damage", value: "damage"},
-				{label: "Healing", value: "healing"}
+				{ label: "Damage", value: "damage" },
+				{ label: "Healing", value: "healing" },
 			],
 			dice_type: dice_types,
 			save_fail_mod: [
-				{ label: "No effect", value: 0},
-				{ label: "Half damage", value: 0.5},
-				{ label: "Full damage", value: 1},
+				{ label: "No effect", value: 0 },
+				{ label: "Half damage", value: 0.5 },
+				{ label: "Full damage", value: 1 },
 			],
 		};
 	},
 	methods: {
 		parseToInt(value, object, property) {
-			if(value === undefined || value === "") {
+			if (value === undefined || value === "") {
 				this.$delete(object, property);
 			} else {
 				this.$set(object, property, parseInt(value));
 			}
 		},
 		level_tier_addable() {
-			return !(this.spell &&
-				this.spell.scaling === "spell_scale" && 
+			return !(
+				this.spell &&
+				this.spell.scaling === "spell_scale" &&
 				this.roll.level_tiers &&
-				this.roll.level_tiers.length >= 1);
+				this.roll.level_tiers.length >= 1
+			);
 		},
 		add_level_tier() {
-			if(!this.roll.level_tiers) {
+			if (!this.roll.level_tiers) {
 				this.roll.level_tiers = [];
 			}
 			this.roll.level_tiers.push({});
@@ -409,64 +471,89 @@ export default {
 			this.$delete(this.roll.level_tiers, tier_index);
 			this.$forceUpdate();
 		},
+		reset_magical(value, versatile) {
+			const prop = versatile === 1 ? "versatile_magical" : "magical";
+
+			if (!["bludgeoning", "piercing", "slashing"].includes(value)) {
+				this.$set(this.roll, prop, null);
+			}
+		},
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
 			let description = [];
 			if (this.spell.scaling === "character_level") {
-				description = ["This spell's damage/projectiles increases when your character reaches a higher level."]
+				description = [
+					"This spell's damage/projectiles increases when your character reaches a higher level.",
+				];
 				for (let index in level_tiers) {
-					let tier = level_tiers[index]
-					let count_txt = `${tier.projectile_count} projectile${tier.projectile_count > 1 ? 's' : ''}`
-					let level_txt = `at ${numeral(tier.level).format('0o')} level`
-					let damage_txt = 'this spell roll does ';
-					damage_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+					let tier = level_tiers[index];
+					let count_txt = `${tier.projectile_count} projectile${
+						tier.projectile_count > 1 ? "s" : ""
+					}`;
+					let level_txt = `at ${numeral(tier.level).format("0o")} level`;
+					let damage_txt = "this spell roll does ";
+					damage_txt +=
+						tier.dice_count || tier.dice_type
+							? `${tier.dice_count || "..."}d${tier.dice_type || "..."}`
+							: "";
 
-					if(tier.fixed_val) {
-						damage_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`;
+					if (tier.fixed_val) {
+						damage_txt += `${tier.dice_count || tier.dice_type ? "+" : ""}${tier.fixed_val || ""}`;
 					}
 
-					let new_line = `${tier.projectile_count ? count_txt : ''} `
-					new_line += `${!tier.projectile_count && tier.dice_count ? level_txt.capitalize()+'s,' : level_txt}`
-					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`
-					new_line += `${tier.dice_count ? damage_txt : ''}`
-					description.push(new_line)
+					let new_line = `${tier.projectile_count ? count_txt : ""} `;
+					new_line += `${
+						!tier.projectile_count && tier.dice_count ? level_txt.capitalize() + "s," : level_txt
+					}`;
+					new_line += `${tier.projectile_count && tier.dice_count ? ", and " : "."}`;
+					new_line += `${tier.dice_count ? damage_txt : ""}`;
+					description.push(new_line);
 				}
-			} 
-			else if (this.spell.scaling == "spell_scale") {
-				let tier = level_tiers[0]
+			} else if (this.spell.scaling == "spell_scale") {
+				let tier = level_tiers[0];
 				// Opening line
-				let level_txt = "When you cast this spell using a spell slot of "
-				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`
+				let level_txt = "When you cast this spell using a spell slot of ";
+				level_txt += `${numeral(parseInt(this.level) + 1).format("0o")} level or higher,`;
 
 				// Damage modifier text
-				let damage_txt = 'the damage of this roll increases by '
-				damage_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+				let damage_txt = "the damage of this roll increases by ";
+				damage_txt +=
+					tier.dice_count || tier.dice_type
+						? `${tier.dice_count || "..."}d${tier.dice_type || "..."}`
+						: "";
 
-				if(tier.fixed_val) {
-					damage_txt += `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}`;
+				if (tier.fixed_val) {
+					damage_txt += `${tier.dice_count || tier.dice_type ? "+" : ""}${tier.fixed_val || ""}`;
 				}
 
 				// Projectile count text
-				let count_txt = `the spell creates ${tier.projectile_count} more projectile${tier.projectile_count > 1 ? "s" : ""}`
+				let count_txt = `the spell creates ${tier.projectile_count} more projectile${
+					tier.projectile_count > 1 ? "s" : ""
+				}`;
 				// Spell slot text
-				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`
-				
-				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${tier.dice_count ? damage_txt : ''} ${slot_txt}`
-				description = [text]
-			} 
-			else if (this.spell.scaling == "spell_level") {
-				for (let index in level_tiers) {
-					let tier = level_tiers[index]
-					let new_line = "When you cast this spell using a "
-					new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell roll does `
-					new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+				let slot_txt = `for ${
+					tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"
+				} above ${numeral(this.level).format("0o")}.`;
 
-					description.push(new_line)
+				let text = `${level_txt} ${tier.projectile_count ? count_txt : ""} ${
+					tier.projectile_count && tier.dice_count ? "and " : ""
+				}${tier.dice_count ? damage_txt : ""} ${slot_txt}`;
+				description = [text];
+			} else if (this.spell.scaling == "spell_level") {
+				for (let index in level_tiers) {
+					let tier = level_tiers[index];
+					let new_line = "When you cast this spell using a ";
+					new_line += `${numeral(tier.level).format("0o")}-level spell slot, this spell roll does `;
+					new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${
+						tier.fixed_val ? "+" : ""
+					}${tier.fixed_val || ""} damage.`;
+
+					description.push(new_line);
 				}
 			}
 			return description;
-		}
-	}
+		},
+	},
 };
 </script>
 

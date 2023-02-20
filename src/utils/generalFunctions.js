@@ -119,39 +119,51 @@ export function makeDate(input, showTime = false, short = false) {
 
 /**
  * Turns a character object from D&D Character Sync into a HK player object
- * 
+ *
  * @param {object} character
  * @returns {object} player
  */
 export function characterToPlayer(character) {
 	const player = {};
 
-	if(character.armor_class !== undefined) player.ac = parseInt(character.armor_class.between(1, 99));
-	if(character.avatar !== undefined) player.avatar = (character.avatar.length <= 2000) ? character.avatar : character.avatar.subString(0, 2000);
-	if(character.name !== undefined) player.character_name = (character.name.length <= 100) ? character.name : character.name.subString(0, 100);
-	if(character.strength !== undefined) player.strength = parseInt(character.strength.between(1, 99));
-	if(character.dexterity !== undefined) player.dexterity = parseInt(character.dexterity.between(1, 99));
-	if(character.constitution !== undefined) player.constitution = parseInt(character.constitution.between(1, 99));
-	if(character.intelligence !== undefined) player.intelligence = parseInt(character.intelligence.between(1, 99));
-	if(character.level !== undefined) player.level = parseInt(character.level.between(1, 20));
-	if(character.max_hit_points !== undefined) player.maxHp = parseInt(character.max_hit_points.between(1, 999));
-	if(character.walking_speed !== undefined) player.speed =  parseInt(character.walking_speed.between(0, 999));
-	if(character.initiative !== undefined) player.initiative = parseInt(character.initiative.between(-10, 99));
+	if (character.armor_class != undefined)
+		player.ac = parseInt(character.armor_class.between(1, 99));
+	if (character.avatar != undefined)
+		player.avatar =
+			character.avatar.length <= 2000 ? character.avatar : character.avatar.subString(0, 2000);
+	if (character.name != undefined)
+		player.character_name =
+			character.name.length <= 100 ? character.name : character.name.subString(0, 100);
+	if (character.strength != undefined)
+		player.strength = parseInt(character.strength.between(1, 99));
+	if (character.dexterity != undefined)
+		player.dexterity = parseInt(character.dexterity.between(1, 99));
+	if (character.constitution != undefined)
+		player.constitution = parseInt(character.constitution.between(1, 99));
+	if (character.intelligence != undefined)
+		player.intelligence = parseInt(character.intelligence.between(1, 99));
+	if (character.level != undefined) player.level = parseInt(character.level.between(1, 20));
+	if (character.max_hit_points != undefined)
+		player.maxHp = parseInt(character.max_hit_points.between(1, 999));
+	if (character.walking_speed != undefined)
+		player.speed = parseInt(character.walking_speed.between(0, 999));
+	if (character.initiative != undefined)
+		player.initiative = parseInt(character.initiative.between(-10, 99));
 
 	return player;
 }
 
 /**
  * Compares player with linked character
- * 
+ *
  * @param {object} player
  * @returns {boolean}
  */
 export function comparePlayerToCharacter(sync_character, player) {
-	const character = characterToPlayer(sync_character);
+	const character = sync_character ? characterToPlayer(sync_character) : {};
 	const compare_player = {};
 
-	for(const key of Object.keys(character)) {
+	for (const key of Object.keys(character)) {
 		compare_player[key] = player[key];
 	}
 	return _.isEqual(compare_player, character);
@@ -159,22 +171,18 @@ export function comparePlayerToCharacter(sync_character, player) {
 
 /**
  * Check if the "D&D Character Sync" extension is installed
- * 
- * @param {string} url 
+ *
+ * @param {string} url
  */
 export async function extensionInstalled() {
 	return new Promise((resolve) => {
-		chrome.runtime.sendMessage(
-			character_sync_id,
-			{ request_content: ["version"] },
-			(response) => {
-				if (response) {
-					resolve(response.version)
-				} else {
-					return undefined;
-				}
+		chrome.runtime.sendMessage(character_sync_id, { request_content: ["version"] }, (response) => {
+			if (response) {
+				resolve(response.version);
+			} else {
+				return undefined;
 			}
-		);
+		});
 	});
 }
 
@@ -190,19 +198,18 @@ export async function getCharacterSyncStorage() {
 				if (response && response.characters) {
 					resolve(response.characters);
 				} else {
-					reject('Something went wrong getting data from Character Sync extension.');
+					reject("Something went wrong getting data from Character Sync extension.");
 				}
 			}
 		);
 	});
 }
 
-
 /**
  * Get a single character from the "D&D Character Sync" Chrome Extension
- * 
- * @param {string} url 
- * @returns 
+ *
+ * @param {string} url
+ * @returns
  */
 export async function getCharacterSyncCharacter(url) {
 	return new Promise((resolve, reject) => {

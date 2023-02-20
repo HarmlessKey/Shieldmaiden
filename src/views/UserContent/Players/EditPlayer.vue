@@ -85,7 +85,6 @@
 									<template v-if="tier.name !== 'Free'">
 										<div v-if="player.sync_character">
 											<q-input
-												v-if="linked_character"
 												:dark="$store.getters.theme === 'dark'"
 												filled
 												square
@@ -133,7 +132,7 @@
 															@animationend="syncing = false"
 														/>
 														<q-tooltip anchor="top middle" self="center middle">
-															No update
+															{{ playerEqualsLinkedCharacter() ? "Update" : "No update" }}
 														</q-tooltip>
 													</button>
 												</template>

@@ -33,7 +33,7 @@ export default {
 			// Delete existing analytics cookies
 			if (!value) {
 				for (const cookie of this.analytics_cookies) {
-					Cookies.remove(cookie, { path: "/" });
+					Cookies.remove(cookie, { domain: ".harmlesskey.com", path: "/" });
 				}
 			} else {
 				bootstrap().then((gtag) => {

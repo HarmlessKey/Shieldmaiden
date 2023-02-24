@@ -126,28 +126,31 @@ export function makeDate(input, showTime = false, short = false) {
 export function characterToPlayer(character) {
 	const player = {};
 
-	if (character.armor_class != undefined)
+	if (character.armor_class != undefined && character.armor_class !== "")
 		player.ac = parseInt(character.armor_class.between(1, 99));
-	if (character.avatar != undefined)
+	if (character.avatar != undefined && character.avatar !== "")
 		player.avatar =
 			character.avatar.length <= 2000 ? character.avatar : character.avatar.subString(0, 2000);
-	if (character.name != undefined)
+	if (character.name != undefined && character.name !== "")
 		player.character_name =
 			character.name.length <= 100 ? character.name : character.name.subString(0, 100);
-	if (character.strength != undefined)
+	if (character.strength != undefined && character.strength !== "")
 		player.strength = parseInt(character.strength.between(1, 99));
-	if (character.dexterity != undefined)
+	if (character.dexterity != undefined && character.dexterity !== "")
 		player.dexterity = parseInt(character.dexterity.between(1, 99));
-	if (character.constitution != undefined)
+	if (character.constitution != undefined && character.constitution !== "")
 		player.constitution = parseInt(character.constitution.between(1, 99));
-	if (character.intelligence != undefined)
+	if (character.intelligence != undefined && character.intelligence !== "")
 		player.intelligence = parseInt(character.intelligence.between(1, 99));
-	if (character.level != undefined) player.level = parseInt(character.level.between(1, 20));
-	if (character.max_hit_points != undefined)
+	if (character.xp != undefined && character.xp !== "")
+		player.experience = parseInt(character.xp.between(0, 355000));
+	else if (character.level != undefined && character.level !== "")
+		player.level = parseInt(character.level.between(1, 20));
+	if (character.max_hit_points != undefined && character.max_hit_points !== "")
 		player.maxHp = parseInt(character.max_hit_points.between(1, 999));
-	if (character.walking_speed != undefined)
+	if (character.walking_speed != undefined && character.walking_speed !== "")
 		player.speed = parseInt(character.walking_speed.between(0, 999));
-	if (character.initiative != undefined)
+	if (character.initiative != undefined && character.initiative !== "")
 		player.initiative = parseInt(character.initiative.between(-10, 99));
 
 	return player;

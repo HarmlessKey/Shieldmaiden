@@ -37,7 +37,7 @@
 					".write": "$uid === auth.uid"
 				},
 				"voucher": {
-					".write": "root.child('users').child(auth.uid).child('admin').exists()"
+					".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()"
 				},
 				"patreon_email": {
 					".write": "root.child('users').child(auth.uid).child('admin').exists()"
@@ -1120,6 +1120,21 @@
 				"results": {
 					".indexOn": ["name"]
 				}
+			}
+		},
+		"vouchers": {
+			".read": true,
+			".write": "root.child('users').child(auth.uid).child('admin').exists()",
+			"$voucherId": {
+				"count": {
+					".write": true
+				}
+			}
+		},
+		"voucher_history": {
+			"$uid": {
+				".read": "$uid === auth.uid",
+				".write": "$uid === auth.uid"
 			}
 		}
 	}

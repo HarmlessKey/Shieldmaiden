@@ -1,42 +1,45 @@
-import { auth, db, firebase } from '../firebase';
-import { Cookies } from 'quasar';
+import { auth, db, firebase } from "../firebase";
+import { Cookies } from "quasar";
 
-export default async ({ app, router, store, Vue }) => {	
+export default async ({ app, router, store, Vue }) => {
 	// Check if user is connected
-	auth.onAuthStateChanged(user => {
-		if(user) {
+	auth.onAuthStateChanged((user) => {
+		if (user) {
 			const uid = user.uid;
 			const userStatusDatabaseRef = db.ref(`/status/${uid}`);
 			const userLiveDatabaseRef = db.ref(`/broadcast/${uid}`);
-			
+
 			// Set Cookie
-			user.getIdToken(true).then(async token => {
-				Cookies.set('access_token', token, { expires: 31 });
+			user.getIdToken(true).then(async (token) => {
+				Cookies.set("access_token", token, { expires: 31, path: "/" });
 			});
 
 			const isOfflineForDatabase = {
-				state: 'offline',
-				last_change: firebase.database.ServerValue.TIMESTAMP
-			}
+				state: "offline",
+				last_change: firebase.database.ServerValue.TIMESTAMP,
+			};
 
 			const isOnlineForDatabase = {
-				state: 'online',
-				lastt_changed: firebase.database.ServerValue.TIMESTAMP
-			}
+				state: "online",
+				last_changed: firebase.database.ServerValue.TIMESTAMP,
+			};
 
-			db.ref('.info/connected').on('value', function(snapshot) {
-				if(!snapshot.val()) return;
-			
-				userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
-					userStatusDatabaseRef.set(isOnlineForDatabase);
-				});
-				
+			db.ref(".info/connected").on("value", function (snapshot) {
+				if (!snapshot.val()) return;
+
+				userStatusDatabaseRef
+					.onDisconnect()
+					.set(isOfflineForDatabase)
+					.then(function () {
+						userStatusDatabaseRef.set(isOnlineForDatabase);
+					});
+
 				// Stop broadcast when connection is lost
 				userLiveDatabaseRef.onDisconnect().remove();
 			});
 		} else {
 			// Delete the cookie
-			Cookies.remove('access_token');
+			Cookies.remove("access_token", { path: "/" });
 		}
 	});
-}
+};

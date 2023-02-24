@@ -155,17 +155,20 @@
 					</span>
 				</template>
 				<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
-					<strong>Damage vulnerabilities</strong> {{ entity.damage_vulnerabilities.join(", ")
-					}}<br />
+					<strong>Damage vulnerabilities</strong>
+					{{ defensesDisplay(entity.damage_vulnerabilities).join(", ") }}<br />
 				</template>
 				<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
-					<strong>Damage resistances</strong> {{ entity.damage_resistances.join(", ") }}<br />
+					<strong>Damage resistances</strong>
+					{{ defensesDisplay(entity.damage_resistances).join(", ") }}<br />
 				</template>
 				<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
-					<strong>Damage immunities</strong> {{ entity.damage_immunities.join(", ") }}<br />
+					<strong>Damage immunities</strong>
+					{{ defensesDisplay(entity.damage_immunities).join(", ") }}<br />
 				</template>
 				<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
-					<strong>Condition immunities</strong> {{ entity.condition_immunities.join(", ") }}<br />
+					<strong>Condition immunities</strong>
+					{{ entity.condition_immunities.join(", ") }}<br />
 				</template>
 
 				<strong>Senses</strong>
@@ -568,6 +571,11 @@
 									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 									}}<template v-if="roll.fixed_val && roll.dice_count">
 										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+
+
+
+
+
 										}}) </template
 									><template v-else>{{ roll.fixed_val }})</template>
 									{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}

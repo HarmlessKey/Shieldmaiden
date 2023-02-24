@@ -79,17 +79,17 @@
 																<b>{{ ability.name }}</b>
 															</q-item-section>
 														</q-item>
-                            <hk-roll
-                              v-for="i in [0,1]" :key="`${i}-versatile-roll`"
-                              @roll="rollAbility($event, ability, i)"
-                            >
-                              <q-item clickable v-close-popup>
-                                <q-item-section avatar>{{ i + 1 }}</q-item-section>
-                                <q-item-section>
-																	{{ getVersatile(ability, i) }}
-                                </q-item-section>
-                              </q-item>
-                            </hk-roll>
+															<hk-roll
+																v-for="i in [0,1]" :key="`${i}-versatile-roll`"
+																@roll="rollAbility($event, ability, i)"
+															>
+																<q-item clickable v-close-popup>
+																<q-item-section avatar>{{ i + 1 }}</q-item-section>
+																<q-item-section>
+																									{{ getVersatile(ability, i) }}
+																</q-item-section>
+																</q-item>
+															</hk-roll>
 													</q-list>
 												</q-popup-proxy>
 											</span>
@@ -454,6 +454,14 @@
 																</template>
 															</span>
 
+															<template slot="magical" slot-scope="data">
+																<i v-if="data.row.magical || data.row.versatile_magical" class="fas fa-sparkles" aria-hidden="true">
+																	<q-tooltip anchor="center right" self="center left">
+																		Magical
+																	</q-tooltip>
+																</i>
+															</template>
+
 															<template slot="fail" slot-scope="data" v-if="!['healing', 'damage'].includes(action.type)">
 																{{
 																	action.type === "save"
@@ -565,6 +573,9 @@
 						maxContent: true
 					},
 					type: {
+						truncate: true
+					},
+					magical: {
 						truncate: true
 					},
 					fail: {
@@ -798,9 +809,9 @@
 				}
 				this.setActionRoll(this.rollAction(e, action, config));
 			},
-      getVersatile(ability, i) {
-        return ability[`versatile_${i ? 'two' : 'one'}`] || `Option ${i + 1}`;
-      },
+	  getVersatile(ability, i) {
+		return ability[`versatile_${i ? 'two' : 'one'}`] || `Option ${i + 1}`;
+	  },
 		}
 	}
 </script>

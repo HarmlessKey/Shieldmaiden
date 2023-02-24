@@ -1166,6 +1166,24 @@ const routes = [
 		],
 	},
 	{
+		path: "/cookies",
+		component: () => import("src/layouts/default"),
+		meta: {
+			title: "Cookies",
+		},
+		children: [
+			{
+				path: "",
+				name: "Cookies",
+				component: () => import("src/views/Pages/Cookies"),
+				meta: {
+					title: "Cookies",
+					description: "Cookie information for Harmless Key.",
+				},
+			},
+		],
+	},
+	{
 		path: "/sign-in",
 		name: "signIn",
 		component: SignIn,

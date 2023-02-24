@@ -482,7 +482,14 @@ export default {
 		 */
 		checkDefenses(damage_type, magical, defense_key) {
 			if (damage_type) {
-				damage_type = magical ? damage_type : damage_type.replace(/non_magical_/, "");
+				if (!magical && ["slashing", "piercing", "bludgeoning"].includes(damage_type)) {
+					const non_magical_damage_type = `non_magical_${damage_type}`;
+					return (
+						this.resistances &&
+						(this.resistances[non_magical_damage_type] === defense_key ||
+							this.resistances[damage_type] === defense_key)
+					);
+				}
 				return this.resistances && this.resistances[damage_type] === defense_key;
 			}
 			return false;

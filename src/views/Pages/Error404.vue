@@ -48,7 +48,6 @@
 						<ul>
 							<li><router-link to="/compendium">Compendium</router-link></li>
 							<li><router-link to="/feedback">Feedback</router-link></li>
-							<li><router-link to="/planned">Planned</router-link></li>
 							<li><router-link to="/changelog">Changelog</router-link></li>
 							<li><router-link to="/documentation">Documentation</router-link></li>
 							<li><router-link to="/about-us">About us</router-link></li>

@@ -70,34 +70,40 @@ export const abilities = Object.freeze([
 ]);
 
 export const damage_types = Object.freeze([
-	"acid",
+	"non_magical_bludgeoning",
+	"non_magical_piercing",
+	"non_magical_slashing",
 	"bludgeoning",
+	"piercing",
+	"slashing",
+	"acid",
 	"cold",
 	"fire",
 	"force",
 	"lightning",
 	"necrotic",
-	"piercing",
 	"poison",
 	"psychic",
 	"radiant",
-	"slashing",
 	"thunder",
 ]);
 
 export const damage_type_icons = Object.freeze({
-	acid: "fas fa-tint",
+	non_magical_bludgeoning: "fas fa-hammer-war",
+	non_magical_piercing: "far fa-bow-arrow",
+	non_magical_slashing: "fas fa-sword",
 	bludgeoning: "fas fa-hammer-war",
+	piercing: "far fa-bow-arrow",
+	slashing: "fas fa-sword",
+	acid: "fas fa-tint",
 	cold: "far fa-snowflake",
 	fire: "fas fa-flame",
 	force: "fas fa-sparkles",
 	lightning: "fas fa-bolt",
 	necrotic: "fas fa-skull",
-	piercing: "far fa-bow-arrow",
 	poison: "fas fa-flask-poison",
 	psychic: "fas fa-brain",
 	radiant: "fas fa-sun",
-	slashing: "fas fa-sword",
 	thunder: "far fa-waveform-path",
 });
 

@@ -14,7 +14,7 @@
 							autocomplete="off"  
 							multiple
 							:options="damage_types"
-							v-model="npc[type]" 
+							v-model="entity[type]" 
 							:hint="resistanceInfo(type)"
 						>
 							<template slot="prepend">
@@ -25,18 +25,23 @@
 									</span>
 								</div>
 							</template>
+							<template v-slot:selected v-if="entity[type]">
+								<q-chip v-for="dmg_type in entity[type]" :key="`${type}-${dmg_type}`" :dark="$store.getters.theme === 'dark'">
+									<span class="truncate">{{ typeLabel(dmg_type) }}</span>
+								</q-chip>
+							</template>
 							<template v-slot:option="scope">
 								<q-item
 									clickable
 									v-ripple
-									:active="npc[type] && npc[type].includes(scope.opt)"
+									:active="entity[type] && entity[type].includes(scope.opt)"
 									@click="setResistance(type, scope.opt)"
 								>
 									<q-item-section avatar>
 										<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
 									</q-item-section>
 									<q-item-section>
-										<q-item-label v-text="scope.opt.capitalize()"/>
+										<q-item-label v-text="typeLabel(scope.opt)"/>
 									</q-item-section>
 								</q-item>
 							</template>
@@ -52,17 +57,22 @@
 					class="mt-3 mb-2" 
 					multiple
 					:options="condition_list"
-					v-model="npc.condition_immunities" 
+					v-model="entity.condition_immunities" 
 					name="condition_immunities" 
 				>
 					<template slot="prepend">
 						<i aria-hidden="true" class="fas fa-fist-raised" />
 					</template>
+					<template v-slot:selected v-if="entity.condition_immunities">
+						<q-chip v-for="condition in entity.condition_immunities" :key="`conditions-${condition}`" :dark="$store.getters.theme === 'dark'">
+							<span class="truncate">{{ condition.capitalize() }}</span>
+						</q-chip>
+					</template>
 					<template v-slot:option="scope">
 						<q-item
 							clickable
 							v-ripple
-							:active="npc.condition_immunities && npc.condition_immunities.includes(scope.opt)"
+							:active="entity.condition_immunities && entity.condition_immunities.includes(scope.opt)"
 							@click="setCondition(scope.opt)"
 						>
 							<q-item-section avatar>
@@ -84,7 +94,7 @@
 	import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
 
 	export default {
-		name: 'npc-Defenses',
+		name: 'Defenses',
 		props: ['value'],
 		mixins: [
 			conditions,
@@ -96,7 +106,7 @@
 			}
 		},
 		computed: {
-			npc: {
+			entity: {
 				get() {
 					return this.value;
 				},	
@@ -111,6 +121,10 @@
 			}
 		},
 		methods: {
+			typeLabel(value) {
+				value = value.split("_");
+				return value.join(" ").capitalizeEach();
+			},
 			resistanceInfo(type) {
 				if(type === "damage_resistances") {
 					return "Half of the damage is taken"
@@ -121,21 +135,21 @@
 				return "No damage is taken"
 			},
 			setResistance(type, value) {
-				if(!this.npc[type]) {
-					this.$set(this.npc, type, [value]);
-				} else if(this.npc[type].includes(value)) {
-					this.$delete(this.npc[type], this.npc[type].indexOf(value));
+				if(!this.entity[type]) {
+					this.$set(this.entity, type, [value]);
+				} else if(this.entity[type].includes(value)) {
+					this.$delete(this.entity[type], this.entity[type].indexOf(value));
 				} else {
-					this.npc[type].push(value);
+					this.entity[type].push(value);
 				}
 			},
 			setCondition(value) {
-				if(!this.npc.condition_immunities) {
-					this.$set(this.npc, "condition_immunities", [value]);
-				} else if(this.npc.condition_immunities.includes(value)) {
-					this.$delete(this.npc.condition_immunities, this.npc.condition_immunities.indexOf(value));
+				if(!this.entity.condition_immunities) {
+					this.$set(this.entity, "condition_immunities", [value]);
+				} else if(this.entity.condition_immunities.includes(value)) {
+					this.$delete(this.entity.condition_immunities, this.entity.condition_immunities.indexOf(value));
 				} else {
-					this.npc.condition_immunities.push(value);
+					this.entity.condition_immunities.push(value);
 				}
 			},
 		}

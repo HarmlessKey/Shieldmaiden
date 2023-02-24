@@ -241,8 +241,8 @@ export const monsterMixin = {
 							let new_sense = {};
 							new_sense[monster_sense] = true;
 
-							if (sense.match(/([0-9])+/g)) {
-								new_sense.range = parseInt(sense.match(/([0-9])+/g)[0]);
+							if (sense.match(/(\d)+/g)) {
+								new_sense.range = parseInt(sense.match(/(\d)+/g)[0]);
 							}
 							new_monster.senses[monster_sense] = new_sense;
 						}
@@ -327,24 +327,22 @@ export const monsterMixin = {
 							const type = ability.name.match(/\((.*?)\)/g)[0];
 
 							if (type.toLowerCase().includes("recharge")) {
-								if (type.match(/[0-9]+(-[0-9]+)*/)) {
-									newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
+								if (type.match(/\d+(-\d+)*/)) {
+									newAbility.recharge = type.match(/\d+(-\d+)*/)[0];
 								} else {
 									newAbility.recharge = "rest";
 								}
 							}
 							if (type.toLowerCase().includes("day")) {
-								newAbility.limit = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
+								newAbility.limit = type.match(/(\d)+/g) ? type.match(/(\d)+/g)[0] : 1;
 								newAbility.limit_type = "day";
 							}
 							if (type.toLowerCase().includes("turn")) {
-								newAbility.limit = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
+								newAbility.limit = type.match(/(\d)+/g) ? type.match(/(\d)+/g)[0] : 1;
 								newAbility.limit_type = "turn";
 							}
 							if (action_type === "legendary_actions" && type.toLowerCase().includes("costs")) {
-								newAbility.legendary_cost = type.match(/([0-9])+/g)
-									? type.match(/([0-9])+/g)[0]
-									: 1;
+								newAbility.legendary_cost = type.match(/(\d)+/g) ? type.match(/(\d)+/g)[0] : 1;
 							}
 							newAbility.name = newAbility.name.replace(type, "").trim();
 						}
@@ -355,10 +353,10 @@ export const monsterMixin = {
 						) {
 							// Find the range
 							const reach = ability.desc
-								? ability.desc.toLowerCase().match(/reach\s?([0-9]+(?:\/[0-9]+)?)/)
+								? ability.desc.toLowerCase().match(/reach\s?(\d+(?:\/\d+)?)/)
 								: null;
 							const range = ability.desc
-								? ability.desc.toLowerCase().match(/range\s?([0-9]+(?:\/[0-9]+)?)/)
+								? ability.desc.toLowerCase().match(/range\s?(\d+(?:\/\d+)?)/)
 								: null;
 
 							if (reach) newAbility.reach = parseInt(reach[1]);
@@ -378,7 +376,7 @@ export const monsterMixin = {
 								newAbility.action_list[0].type = "save";
 								fail_miss = "save_fail_mod";
 
-								const save_dc = ability.desc ? ability.desc.match(/DC\s?([0-9]+)/) : null;
+								const save_dc = ability.desc ? ability.desc.match(/DC\s?(\d+)/) : null;
 								if (save_dc) {
 									newAbility.action_list[0].save_dc = parseInt(save_dc[1]);
 								}

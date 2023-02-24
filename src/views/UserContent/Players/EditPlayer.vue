@@ -862,6 +862,7 @@ export default {
 			}
 		},
 		savePlayer() {
+			console.log(this.player);
 			if (this.$route.name === "Add player") {
 				this.addPlayer();
 			} else {

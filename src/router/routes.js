@@ -354,6 +354,48 @@ const routes = [
 				],
 			},
 
+			// Spells
+			{
+				path: "spells",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Spells",
+				},
+				children: [
+					{
+						path: "",
+						name: "Spells",
+						component: () => import("src/views/UserContent/Spells/Spells.vue"),
+						meta: {
+							title: "Spells",
+							description: "Your custom spells on Harmless Key.",
+						},
+					},
+					{
+						path: "add-spell",
+						name: "Add Spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Add spell",
+							description: "Create a new spell on Harmless Key.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Edit spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Edit spell",
+							description: "Edit an existing spell on Harmless Key.",
+						},
+					},
+				],
+			},
+
 			// Reminders
 			{
 				path: "reminders",

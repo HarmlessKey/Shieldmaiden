@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import BasicInfo from "src/components/contribute/spell/forms/BasicInfo";
-import SpellActions from "src/components/contribute/spell/forms/actions";
+import BasicInfo from "src/components/spells/BasicInfo";
+import SpellActions from "src/components/spells/actions";
 
 export default {
 	name: "EditSpell",

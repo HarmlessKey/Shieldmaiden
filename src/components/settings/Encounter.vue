@@ -174,7 +174,10 @@ export default {
 							key: "critical",
 							name: "Critical Hits",
 							icon: "far fa-crosshairs",
-							info: "How do you want critical hits to be handled?<br/> <b>Roll</b>: all the damage dice are rolled twice.<br/> <b>Double</b>: the rolled damage is doubled.",
+							info: `How do you want critical hits to be handled?<br/>
+                <b>Roll</b>: all the damage dice are rolled twice.<br/>
+                <b>Double</b>: the rolled damage is doubled.
+                <b>Max+Roll</b>: the max damage is added to the rolled damage.`,
 							options: [
 								{
 									value: undefined,

@@ -1,6 +1,6 @@
 <template>
 	<div class="content__edit" v-if="!loading">
-		<ValidationObserver  v-slot="{ handleSubmit, valid }">
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
@@ -39,7 +39,11 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
-							<router-link :to="userId ? `/content/npcs` : `/tools/monster-creator`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+							<router-link
+								:to="userId ? `/content/npcs` : `/tools/monster-creator`"
+								class="btn bg-neutral-5 mr-2"
+								>Cancel</router-link
+							>
 							<q-btn v-if="userId" label="Save" type="submit" color="primary" no-caps />
 							<q-btn v-else :disabled="!valid" color="primary" no-caps @click="download">
 								Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
@@ -49,7 +53,7 @@
 							<template v-if="unsaved_changes">
 								<div v-if="userId" class="orange truncate mr-2 d-none d-md-block">
 									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
-								</div>	
+								</div>
 								<a class="btn btn-sm bg-neutral-5" @click="userId ? revert_changes() : reset()">
 									<i aria-hidden="true" class="fas fa-undo" />
 									{{ userId ? "Revert" : "Reset" }}
@@ -80,168 +84,187 @@
 </template>
 
 <script>
-	import { mapActions, mapGetters } from 'vuex';
-	import { general } from 'src/mixins/general.js';
-	import BasicInfo from 'src/components/npcs/BasicInfo';
-	import Senses from 'src/components/npcs/Senses';
-	import AbilityScores from 'src/components/npcs/AbilityScores';
-	import Skills from 'src/components/npcs/Skills';
-	import Defenses from 'src/components/npcs/Defenses';
-	import SpellCasting from 'src/components/npcs/SpellCasting';
-	import Actions from 'src/components/npcs/Actions';
-	import CopyContent from "src/components/CopyContent";
-	import { downloadJSON } from "src/utils/generalFunctions";
+import { mapActions, mapGetters } from "vuex";
+import { general } from "src/mixins/general.js";
+import BasicInfo from "src/components/npcs/BasicInfo";
+import Senses from "src/components/npcs/Senses";
+import AbilityScores from "src/components/npcs/AbilityScores";
+import Skills from "src/components/npcs/Skills";
+import Defenses from "src/components/npcs/Defenses";
+import SpellCasting from "src/components/npcs/SpellCasting";
+import Actions from "src/components/npcs/Actions";
+import CopyContent from "src/components/CopyContent";
+import { downloadJSON } from "src/utils/generalFunctions";
 
-	export default {
-		name: 'EditNpc',
-		mixins: [general],
-		components: {
-			BasicInfo,
-			Senses,
-			AbilityScores,
-			Skills,
-			Defenses,
-			SpellCasting,
-			Actions,
-			CopyContent
-		},
-		data() {
-			return {
-				userId: this.$store.getters && this.$store.getters.user ? this.$route.params.userid || this.$store.getters.user.uid : undefined,
-				npcId: this.$route.params.id,
-				npc: {},
-				loading: false,
-				npc_copy: {},
-				copy_dialog: false,
-				copy_resource_setter: undefined,
-				import_dialog: false,
-				unsaved_changes: false
-			}
-		},
-		async mounted() {
-			if(this.npcId) {
-				this.loading = true;
-				await this.get_npc({ uid: this.userId, id: this.npcId }).then(npc => {
-					npc.name = npc.name ? npc.name.capitalizeEach() : undefined;
-					this.npc = npc;
-					this.npc_copy = JSON.stringify(npc);
-					this.unsaved_changes = false;
-					this.loading = false;
-				});
-			}
-		},
-		computed: {
-			...mapGetters([
-				'tier',
-				'overencumbered',
-			]),
-			...mapGetters("npcs", ["npc_count"])
-		},
-		watch: {
-			npc: {
-				deep: true,
-				handler(newVal) {
-					if (JSON.stringify(newVal) !== this.npc_copy) {
-						this.unsaved_changes = true;
-					} else {
-						this.unsaved_changes = false;
-					}
-					
-					// Capitalize name
-					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
-				}
-			}
-		},
-		methods: {
-			...mapActions(["setSlide"]),
-			...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
-			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
-			isOwner() {
-				return this.$route.name !== 'Edit Companion';
-			},
-			download() {
-				downloadJSON(this.npc);
-			},
-			copy({ result }) {
-				this.copy_dialog = false;
-				this.npc = {...result};
-			},
-			reset() {
-				this.npc = {};
-			},
-			revert_changes() {
-				this.npc = JSON.parse(this.npc_copy);
-				this.npc_copy = JSON.stringify(this.npc);
+export default {
+	name: "EditNpc",
+	mixins: [general],
+	components: {
+		BasicInfo,
+		Senses,
+		AbilityScores,
+		Skills,
+		Defenses,
+		SpellCasting,
+		Actions,
+		CopyContent,
+	},
+	data() {
+		return {
+			userId:
+				this.$store.getters && this.$store.getters.user
+					? this.$route.params.userid || this.$store.getters.user.uid
+					: undefined,
+			npcId: this.$route.params.id,
+			npc: {},
+			loading: false,
+			npc_copy: {},
+			copy_dialog: false,
+			copy_resource_setter: undefined,
+			import_dialog: false,
+			unsaved_changes: false,
+		};
+	},
+	async mounted() {
+		if (this.npcId) {
+			this.loading = true;
+			await this.get_npc({ uid: this.userId, id: this.npcId }).then((npc) => {
+				npc.name = npc.name ? npc.name.capitalizeEach() : undefined;
+				this.npc = npc;
+				this.npc_copy = JSON.stringify(npc);
 				this.unsaved_changes = false;
-			},
-			/**
-			 * Checks if a new NPC must be added, or an existing NPC must be saved.
-			**/
-			saveNpc() {
-				if(this.$route.name === "Add NPC" && !this.npcId) {
-					this.addNpc();
+				this.loading = false;
+			});
+		}
+	},
+	computed: {
+		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters("npcs", ["npc_count"]),
+	},
+	watch: {
+		npc: {
+			deep: true,
+			handler(newVal) {
+				if (JSON.stringify(newVal) !== this.npc_copy) {
+					this.unsaved_changes = true;
 				} else {
-					this.editNpc();
+					this.unsaved_changes = false;
 				}
+
+				// Capitalize name
+				this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
 			},
-			addNpc() {
-				this.add_npc(this.npc).then((res) => {
+		},
+	},
+	methods: {
+		...mapActions(["setSlide"]),
+		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
+		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
+		isOwner() {
+			return this.$route.name !== "Edit Companion";
+		},
+		download() {
+			downloadJSON(this.npc);
+		},
+		copy({ result }) {
+			this.copy_dialog = false;
+			this.npc = { ...result };
+		},
+		reset() {
+			this.npc = {};
+		},
+		revert_changes() {
+			this.npc = JSON.parse(this.npc_copy);
+			this.npc_copy = JSON.stringify(this.npc);
+			this.unsaved_changes = false;
+		},
+		/**
+		 * Checks if a new NPC must be added, or an existing NPC must be saved.
+		 **/
+		saveNpc() {
+			if (this.$route.name === "Add NPC" && !this.npcId) {
+				this.addNpc();
+			} else {
+				this.editNpc();
+			}
+		},
+		addNpc() {
+			this.add_npc(this.npc)
+				.then((res) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
 					this.$set(this, "npcId", res);
 
-					this.$snotify.success('Monster Saved.', 'Critical hit!', {
-						position: "rightTop"
+					this.$snotify.success("Monster Saved.", "Critical hit!", {
+						position: "rightTop",
 					});
 
 					// Capitalize before stringify so changes found isn't triggered
 					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
 					this.npc_copy = JSON.stringify(this.npc);
 					this.unsaved_changes = false;
-				}).catch(error => {
-					this.$snotify.error('Couldn\'t save mosnter.', 'Save failed', {
-						position: "rightTop"
+				})
+				.catch((error) => {
+					this.$snotify.error("Couldn't save monster.", "Save failed", {
+						position: "rightTop",
 					});
 					console.error(error);
 					console.log(this.npc);
 				});
-			},
-			editNpc() {
-				this.edit_npc({ 
-					uid: this.userId,
-					id: this.npcId,
-					npc: this.npc
-				}).then(() => {
-					this.$snotify.success('Monster Saved.', 'Critical hit!', {
-						position: "rightTop"
-					});
+		},
+		editNpc() {
+			this.edit_npc({
+				uid: this.userId,
+				id: this.npcId,
+				npc: this.npc,
+			}).then(() => {
+				this.$snotify.success("Monster Saved.", "Critical hit!", {
+					position: "rightTop",
+				});
 
-					this.unsaved_changes = false;
-	
-					// Capitalize before stringify so changes found isn't triggered
-					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
-					this.npc_copy = JSON.stringify(this.npc);
-				});
-			},
+				this.unsaved_changes = false;
+
+				// Capitalize before stringify so changes found isn't triggered
+				this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
+				this.npc_copy = JSON.stringify(this.npc);
+			});
 		},
-		beforeRouteLeave(to, from, next) {
-			if (this.unsaved_changes) {
-				this.$snotify.error('There are unsaved changes in the form.\n Would you like to continue?', 'Unsaved Changes', {
+	},
+	beforeRouteLeave(to, from, next) {
+		if (this.unsaved_changes) {
+			this.$snotify.error(
+				"There are unsaved changes in the form.\n Would you like to continue?",
+				"Unsaved Changes",
+				{
 					buttons: [
-					{ text: 'Leave', action: (toast) => { next(); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'Stay', action: (toast) => { next(false); this.$snotify.remove(toast.id); }, bold: true},
-					]
-				});
-			} else {
-				next()
-			}
-		},
-	}
+						{
+							text: "Leave",
+							action: (toast) => {
+								next();
+								this.$snotify.remove(toast.id);
+							},
+							bold: false,
+						},
+						{
+							text: "Stay",
+							action: (toast) => {
+								next(false);
+								this.$snotify.remove(toast.id);
+							},
+							bold: true,
+						},
+					],
+				}
+			);
+		} else {
+			next();
+		}
+	},
+};
 </script>
 
 <style lang="scss" scoped>
 .content__edit {
-
 	.top {
 		display: flex;
 		justify-content: flex-end;
@@ -264,8 +287,5 @@
 			}
 		}
 	}
-	
 }
-
-
 </style>

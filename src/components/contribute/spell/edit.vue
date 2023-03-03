@@ -1,118 +1,92 @@
 <template>
 	<div class="content">
 		<h2 class="spellTitle d-flex justify-content-between" v-if="old_spell">
-			{{ spell.changed ? spell.name : old_spell.name }}
+			{{ old_spell.name }}
 		</h2>
 
 		<div class="spell-wrapper" v-if="canEdit()">
-			<template v-if="old_spell && spell">
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
-					<q-form @submit="handleSubmit(store_spell)" greedy>
-						<div class="row q-col-gutter-md">
-							<div class="col-12 col-md-4" id="old_spell">
-								<hk-card header="Old Spell Description" v-if="loading">
-									<hk-loader name="old spell" />
-								</hk-card>
-								<hk-card class="old_spell" v-else>
-									<div class="card-header d-flex justify-content-between" slot="header">
-										<a @click="preview('old')" :class="preview_spell == 'old' ? 'selected' : ''"
-											>Old Spell Description</a
-										>
-										<a @click="preview('new')" :class="preview_spell == 'new' ? 'selected' : ''"
-											>New Spell Description</a
-										>
-									</div>
-									<div v-if="preview_spell == 'old'">
-										<a class="btn btn-block mb-3" @click="parse_old_spell()">
-											<i aria-hidden="true" class="fas fa-wand-magic"></i>
-											<span class="d-none d-md-inline ml-1">Parse to new spell</span>
-										</a>
-
-										<h1 class="spellTitle">
-											<a
-												v-if="old_spell.name"
-												:href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`"
-												target="_blank"
-												rel="noopener"
-												>{{ old_spell.name }}</a
-											>
-										</h1>
-										<i aria-hidden="true" class="mb-3 d-block" v-if="old_spell.school">
-											{{ spell_levels[old_spell.level] }}
-											{{ old_spell.school.name }}
-										</i>
-
-										<p>
-											<strong>Casting time:</strong> {{ old_spell.casting_time }}<br />
-											<strong>Range:</strong> {{ old_spell.range }}<br />
-											<strong>Components:</strong>
-											<template v-for="(component, index) in old_spell.components">
-												{{ component
-												}}<template v-if="Object.keys(old_spell.components).length > index + 1"
-													>,
-												</template>
-											</template>
-											<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
-											<br />
-											<strong>Duration:</strong>
-											<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
-											{{ old_spell.duration }}<br />
-											<strong>Classes:</strong>
-											<template v-for="(_class, index) in old_spell.classes">
-												{{ _class.name
-												}}<template v-if="Object.keys(old_spell.classes).length > index + 1"
-													>,
-												</template>
-											</template>
-											<br />
-										</p>
-										<p v-for="(desc, index) in old_spell.desc" :key="index">
-											{{ desc }}
-										</p>
-
-										<p v-if="old_spell.higher_level">
-											At higher levels.
-											<template v-for="higher in old_spell.higher_level">
-												{{ higher }}
-											</template>
-										</p>
-									</div>
-									<!-- card-body -->
-									<!-- New spell preview active -->
-									<div v-else>
-										<ViewSpell :data="spell" :no_roll="true" />
-									</div>
-								</hk-card>
-							</div>
-
-							<div class="col-12 col-md-8">
-								<EditSpell :spell="spell" />
-							</div>
-						</div>
-						<div class="save">
-							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
-								<q-tooltip anchor="top middle" self="center middle">
-									There are validation errors
-								</q-tooltip>
-							</q-icon>
-							<div class="d-flex justify-content-start">
-								<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> There are unsaved
-									changes in the spell
-								</div>
-								<a v-if="unsaved_changes" class="btn bg-neutral-5" @click="cancel_changes()"
-									>Revert</a
+			<template v-if="old_spell">
+				<div class="row q-col-gutter-md">
+					<div class="col-12 col-md-4" id="old_spell">
+						<hk-card header="Old Spell Description" v-if="loading">
+							<hk-loader name="old spell" />
+						</hk-card>
+						<hk-card class="old_spell" v-else>
+							<div class="card-header d-flex justify-content-between" slot="header">
+								<a @click="preview('old')" :class="preview_spell == 'old' ? 'selected' : ''"
+									>Old Spell Description</a
+								>
+								<a @click="preview('new')" :class="preview_spell == 'new' ? 'selected' : ''"
+									>New Spell Description</a
 								>
 							</div>
-							<div>
-								<router-link :to="`/contribute/spells/${id}`" class="btn bg-neutral-5 mr-2"
-									>Cancel</router-link
-								>
-								<q-btn label="Save" no-caps type="submit" color="primary" />
+							<div v-if="preview_spell == 'old'">
+								<a class="btn btn-block mb-3" @click="parse_old_spell()">
+									<i aria-hidden="true" class="fas fa-wand-magic"></i>
+									<span class="d-none d-md-inline ml-1">Parse to new spell</span>
+								</a>
+
+								<h1 class="spellTitle">
+									<a
+										v-if="old_spell.name"
+										:href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`"
+										target="_blank"
+										rel="noopener"
+										>{{ old_spell.name }}</a
+									>
+								</h1>
+								<i aria-hidden="true" class="mb-3 d-block" v-if="old_spell.school">
+									{{ spell_levels[old_spell.level] }}
+									{{ old_spell.school.name }}
+								</i>
+
+								<p>
+									<strong>Casting time:</strong> {{ old_spell.casting_time }}<br />
+									<strong>Range:</strong> {{ old_spell.range }}<br />
+									<strong>Components:</strong>
+									<template v-for="(component, index) in old_spell.components">
+										{{ component
+										}}<template v-if="Object.keys(old_spell.components).length > index + 1"
+											>,
+										</template>
+									</template>
+									<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
+									<br />
+									<strong>Duration:</strong>
+									<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
+									{{ old_spell.duration }}<br />
+									<strong>Classes:</strong>
+									<template v-for="(_class, index) in old_spell.classes">
+										{{ _class.name
+										}}<template v-if="Object.keys(old_spell.classes).length > index + 1"
+											>,
+										</template>
+									</template>
+									<br />
+								</p>
+								<p v-for="(desc, index) in old_spell.desc" :key="index">
+									{{ desc }}
+								</p>
+
+								<p v-if="old_spell.higher_level">
+									At higher levels.
+									<template v-for="higher in old_spell.higher_level">
+										{{ higher }}
+									</template>
+								</p>
 							</div>
-						</div>
-					</q-form>
-				</ValidationObserver>
+							<!-- card-body -->
+							<!-- New spell preview active -->
+							<div v-else>
+								<!-- <ViewSpell :data="spell" :no_roll="true" /> -->
+							</div>
+						</hk-card>
+					</div>
+
+					<div class="col-12 col-md-8">
+						<EditSpell :id="id" @set-unsaved="setUnsaved" ref="editForm" />
+					</div>
+				</div>
 			</template>
 		</div>
 	</div>
@@ -120,8 +94,8 @@
 
 <script>
 import { db } from "src/firebase";
-import EditSpell from "src/components/contribute/spell/forms";
-import ViewSpell from "./ViewSpell.vue";
+import EditSpell from "src/views/userContent/Spells/EditSpell";
+// import ViewSpell from "./ViewSpell.vue";
 import { general } from "src/mixins/general";
 import { spells } from "src/mixins/spells";
 import { mapGetters } from "vuex";
@@ -129,7 +103,6 @@ import { mapGetters } from "vuex";
 export default {
 	name: "ContribSpellEdit",
 	components: {
-		ViewSpell,
 		EditSpell,
 	},
 	mixins: [general, spells],
@@ -138,9 +111,7 @@ export default {
 			userId: this.$store.getters.user.uid,
 			id: this.$route.params.id,
 			loading: true,
-
 			validators: {},
-			spell: {},
 			unsaved_changes: false,
 			fb_spell_json: {},
 			preview_spell: "old",
@@ -158,13 +129,6 @@ export default {
 			},
 		};
 	},
-	mounted() {
-		const spell_ref = db.ref(`new_spells/${this.id}`);
-		spell_ref.once("value", (snapshot) => {
-			this.spell = snapshot.val() || {};
-			this.spell.components = {};
-		});
-	},
 	methods: {
 		canEdit() {
 			return (
@@ -172,64 +136,68 @@ export default {
 				this.userInfo.admin
 			);
 		},
+		setUnsaved(value) {
+			this.unsaved_changes = value;
+		},
 		preview(type) {
 			this.preview_spell = type;
 		},
 		parse_old_spell() {
+			const spell = {};
 			// Parse values from old_spell object to new spell object
 
 			// TODO:
 			// Check if the parsed value is actually a valid value (e.g. available in dropdown)
 
 			// Parse simple values
-			this.spell.name = this.old_spell.name;
-			this.spell.school = this.old_spell.school.name.toLowerCase();
-			this.spell.ritual = this.old_spell.ritual == "yes" ? true : null;
-			this.spell.level = this.old_spell.level == -1 ? 0 : this.old_spell.level;
-			this.spell.level_scaling = this.old_spell.higher_level ? undefined : "none";
+			spell.name = this.old_spell.name;
+			spell.school = this.old_spell.school.name.toLowerCase();
+			spell.ritual = this.old_spell.ritual == "yes" ? true : null;
+			spell.level = this.old_spell.level == -1 ? 0 : this.old_spell.level;
+			spell.level_scaling = this.old_spell.higher_level ? undefined : "none";
 
 			// Parse range options
 			if (parseInt(this.old_spell.range)) {
-				this.spell.range_type = "ranged";
+				spell.range_type = "ranged";
 				let range_list = this.old_spell.range.split(" ");
 				let rangeN = parseInt(range_list[0]);
 				// Parse miles to feet
 				if (range_list[1].includes("mile")) {
 					rangeN *= 5280;
 				}
-				this.spell.range = rangeN;
+				spell.range = rangeN;
 			} else {
-				this.spell.range_type = this.old_spell.range.toLowerCase();
-				delete this.spell.range;
+				spell.range_type = this.old_spell.range.toLowerCase();
+				delete spell.range;
 			}
 
 			// Parse casting time
 			let cast_time = this.old_spell.casting_time.split(" ");
-			this.spell.cast_time_nr = parseInt(cast_time[0]);
+			spell.cast_time_nr = parseInt(cast_time[0]);
 			let cast_type = cast_time[1];
 
 			if (cast_type[cast_type.length - 1] == "s") {
 				cast_type = cast_type.substring(0, cast_type.length - 1);
 			}
-			this.spell.cast_time_type = cast_type;
-			delete this.spell.casting_time;
+			spell.cast_time_type = cast_type;
+			delete spell.casting_time;
 
 			// Parse components
-			this.spell.components = [];
+			spell.components = [];
 			for (let i in this.old_spell.components) {
 				if (this.old_spell.components[i] == "V") {
-					this.spell.components.push("verbal");
+					spell.components.push("verbal");
 				}
 				if (this.old_spell.components[i] == "S") {
-					this.spell.components.push("somatic");
+					spell.components.push("somatic");
 				}
 				if (this.old_spell.components[i] == "M") {
-					this.spell.components.push("material");
+					spell.components.push("material");
 				}
 			}
 			if (this.old_spell.material) {
-				this.spell.material_description = this.parse_spell_str(this.old_spell.material);
-				delete this.spell.material;
+				spell.material_description = this.parse_spell_str(this.old_spell.material);
+				delete spell.material;
 			}
 
 			// Parse duration
@@ -237,35 +205,35 @@ export default {
 			if (/\d/.test(this.old_spell.duration)) {
 				let duration_list = this.old_spell.duration.split(" ");
 				if (this.old_spell.concentration == "yes") {
-					this.spell.duration_type = "concentration";
+					spell.duration_type = "concentration";
 					duration_list = duration_list.slice(2);
 				} else {
-					this.spell.duration_type = "time";
+					spell.duration_type = "time";
 				}
 
 				// Find duration time number and scale
-				this.spell.duration_n = parseInt(duration_list[0]);
+				spell.duration_n = parseInt(duration_list[0]);
 				// Calculate time scale
 				let scale = duration_list[1];
 				scale = scale.charAt(0).toUpperCase() + scale.substring(1);
 				if (scale[scale.length - 1] == "s") {
 					scale = scale.substring(0, scale.length - 1);
 				}
-				this.spell.duration_scale = scale.toLowerCase();
+				spell.duration_scale = scale.toLowerCase();
 			} else {
-				this.spell.duration_type = this.old_spell.duration.toLowerCase();
+				spell.duration_type = this.old_spell.duration.toLowerCase();
 			}
 
 			// Parse Description
-			this.spell.description = "";
+			spell.description = "";
 			for (let i in this.old_spell.desc) {
-				if (i != 0) this.spell.description += "\n\n"; // Add white line before each paragraph after first
-				this.spell.description += this.parse_spell_str(this.old_spell.desc[i]);
+				if (i != 0) spell.description += "\n\n"; // Add white line before each paragraph after first
+				spell.description += this.parse_spell_str(this.old_spell.desc[i]);
 			}
 
-			this.spell.higher_level = "";
+			spell.higher_level = "";
 			for (let i in this.old_spell.higher_level) {
-				this.spell.higher_level += this.parse_spell_str(this.old_spell.higher_level[i]);
+				spell.higher_level += this.parse_spell_str(this.old_spell.higher_level[i]);
 			}
 
 			// Parse classes
@@ -273,17 +241,13 @@ export default {
 			for (let index in this.old_spell.classes) {
 				classes.push(this.old_spell.classes[index].name.toLowerCase());
 			}
-			this.spell.classes = classes;
+			spell.classes = classes;
 
 			// Source book
-			this.spell.source = this.old_spell.page;
+			spell.source = this.old_spell.page;
 
 			// Make spell responsive
-			this.spell = Object.assign({}, this.spell);
-
-			this.$nextTick(function () {
-				this.$refs.spellFormRef.validate();
-			});
+			this.$refs.editForm.setSpell(spell);
 		},
 		parse_spell_str(text) {
 			// map to replace weird character with real character
@@ -319,75 +283,6 @@ export default {
 			});
 
 			return text.trim();
-		},
-		update() {
-			this.$forceUpdate();
-		},
-		// setValidators(validators) {
-		// 	// Receives validator lists from basic info and spell actions
-		// 	for (let v in validators) {
-		// 		this.validators[v] = validators[v];
-		// 	}
-		// },
-		// async validate_validators() {
-		// 	// loops through all available validators to check if the forms
-		// 	// are all valid. This happens async.
-		// 	for (let v in this.validators) {
-		// 		let validator = this.validators[v];
-		// 		let temp = await validator.validateAll()
-		// 		if (temp == false) return false;
-		// 	}
-		// 	return true;
-		// },
-
-		store_spell() {
-			console.log("Store spell called");
-			delete this.spell[".value"];
-			delete this.spell[".key"];
-
-			this.spell.changed = true;
-			this.spell.checked = false;
-
-			// Firebase can't be searched without case sensitivity
-			this.spell.name = this.spell.name.toLowerCase();
-
-			if (this.spell.cast_time_nr) {
-				parseInt(this.spell.cast_time_nr);
-			}
-			if (this.spell.duration_n) {
-				parseInt(this.spell.duration_n);
-			}
-
-			console.log(this.spell);
-
-			// if (await this.validate_validators() === true) {
-			// 	db.ref(`new_spells/${this.id}`).set(this.spell);
-			// 	this.$snotify.success('Spell Saved.', 'Critical hit!', {
-			// 		position: "rightTop"
-			// 	});
-			// 	this.validators = {};
-			// 	this.unsaved_changes = false;
-			// 	this.fb_spell_json = JSON.stringify(this.spell);
-			// } else {
-			// 	this.$snotify.error('Form Not Valid', 'Critical miss!', {
-			// 		position: "rightTop"
-			// 	});
-			// }
-			console.log(this.$ref.spellFormRef.submit());
-		},
-		cancel_changes() {
-			this.spell = JSON.parse(this.fb_spell_json);
-			this.unsaved_changes = false;
-		},
-	},
-	watch: {
-		spell: {
-			deep: true,
-			handler() {
-				// Emits validation on every change
-				if (JSON.stringify(this.spell) !== this.fb_spell_json) this.unsaved_changes = true;
-				else this.unsaved_changes = false;
-			},
 		},
 	},
 	beforeRouteLeave(to, from, next) {

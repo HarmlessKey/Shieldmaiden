@@ -375,24 +375,24 @@ const routes = [
 							description: "Your custom spells on Harmless Key.",
 						},
 					},
-					{
-						path: "add-spell",
-						name: "Add Spell",
-						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
-						meta: {
-							title: "Add spell",
-							description: "Create a new spell on Harmless Key.",
-						},
-					},
-					{
-						path: ":id",
-						name: "Edit spell",
-						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
-						meta: {
-							title: "Edit spell",
-							description: "Edit an existing spell on Harmless Key.",
-						},
-					},
+					// {
+					// 	path: "add-spell",
+					// 	name: "Add Spell",
+					// 	component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+					// 	meta: {
+					// 		title: "Add spell",
+					// 		description: "Create a new spell on Harmless Key.",
+					// 	},
+					// },
+					// {
+					// 	path: ":id",
+					// 	name: "Edit spell",
+					// 	component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+					// 	meta: {
+					// 		title: "Edit spell",
+					// 		description: "Edit an existing spell on Harmless Key.",
+					// 	},
+					// },
 				],
 			},
 
@@ -1090,7 +1090,7 @@ const routes = [
 				children: [
 					{
 						path: "",
-						name: "Spells",
+						name: "ContributeSpells",
 						component: () => import("src/views/Contribute/Spells.vue"),
 					},
 					{
@@ -1111,7 +1111,7 @@ const routes = [
 							},
 							{
 								path: "edit",
-								name: "Edit spell",
+								name: "Edit contribute spell",
 								component: () => import("src/components/contribute/spell/edit.vue"),
 							},
 						],

@@ -81,6 +81,28 @@
 								Items
 							</q-tooltip>
 						</q-item>
+						<q-item
+							clickable
+							v-ripple
+							to="/content/spells"
+							v-if="
+								userInfo &&
+								((userInfo.contribute && userInfo.contribute.includes('character-builder')) ||
+									userInfo.admin)
+							"
+						>
+							<q-item-section avatar>
+								<i aria-hidden="true" class="fas fa-wand-magic" />
+							</q-item-section>
+							<q-item-section class="title">Spells</q-item-section>
+							<q-tooltip
+								v-if="$store.getters.side_collapsed"
+								anchor="center right"
+								self="center left"
+							>
+								Spells
+							</q-tooltip>
+						</q-item>
 					</q-list>
 					<hr />
 					<h3>Player Content</h3>

@@ -342,11 +342,30 @@
 			</div>
 
 			<!-- TOTALS OF ALL ACTIONS -->
-			<template v-for="type in ['damage', 'healing']">
-				<div class="total-damage" :key="type" v-if="totalValue(type) !== undefined">
-					<div>Total {{ type }}</div>
-					<div class="total" :class="type === 'healing' ? 'green' : 'red'">
-						<hk-animated-integer :value="totalValue(type)" onMount />
+			<template v-for="dmg_type in ['damage', 'healing']">
+				<div class="total-damage" :key="dmg_type" v-if="totalValue(dmg_type) !== undefined">
+					<div>Total {{ dmg_type }}</div>
+					<div
+						v-if="!edit_total"
+						class="total"
+						:class="dmg_type === 'healing' ? 'green' : 'red'"
+						@click="edit_total = true"
+					>
+						<hk-animated-integer :value="totalValue(dmg_type)" onMount />
+					</div>
+					<div v-else>
+						<q-input
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							dense
+							v-model="custom_total"
+							type="number"
+							autocomplete="off"
+							name="duration"
+							class="mb-2"
+							title="Override"
+						/>
 					</div>
 				</div>
 			</template>
@@ -407,6 +426,8 @@ export default {
 	mixins: [dice, setHP],
 	data() {
 		return {
+			edit_total: false,
+			custom_total: 0,
 			damage_types: damage_types,
 			damage_type_icons: damage_type_icons,
 			defenses: {

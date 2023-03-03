@@ -640,8 +640,8 @@ export default {
 						);
 
 						// minimum starting health of NPC is 1
-						entity.curHp = Math.max(HP.total, 1);
-						entity.maxHp = Math.max(HP.total, 1);
+						entity.curHp = HP.total.min(1);
+						entity.maxHp = HP.total.min(1);
 					} else {
 						entity.curHp = npc_data.hit_points;
 						entity.maxHp = npc_data.hit_points;
@@ -673,8 +673,8 @@ export default {
 						);
 
 						// minimum starting health of NPC is 1
-						entity.curHp = Math.max(HP.total, 1);
-						entity.maxHp = Math.max(HP.total, 1);
+						entity.curHp = HP.total.min(1);
+						entity.maxHp = HP.total.min(1);
 					} else {
 						entity.curHp = npc_data.old ? npc_data.maxHp : npc_data.hit_points;
 						entity.maxHp = npc_data.old ? npc_data.maxHp : npc_data.hit_points;

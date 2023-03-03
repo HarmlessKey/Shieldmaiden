@@ -418,6 +418,7 @@ export default {
 				undefined: "Rolled dice twice",
 				double: "Doubled rolled values",
 				max: "Added max damage to roll",
+				disabled: "Auto crits are disabled",
 			},
 			savingThrowResult: {},
 			hitOrMiss: {},

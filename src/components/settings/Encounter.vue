@@ -200,6 +200,13 @@ export default {
 									icon: "fas fa-axe-battle",
 									color: "neutral-2",
 								},
+								{
+									value: "disabled",
+									name: "Disabled",
+									action: "Disabled",
+									icon: "fas fa-times-square",
+									color: "neutral-2",
+								},
 							],
 						},
 						{

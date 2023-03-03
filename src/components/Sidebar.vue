@@ -87,8 +87,7 @@
 							to="/content/spells"
 							v-if="
 								userInfo &&
-								((userInfo.contribute && userInfo.contribute.includes('character-builder')) ||
-									userInfo.admin)
+								((userInfo.contribute && userInfo.contribute.includes('spells')) || userInfo.admin)
 							"
 						>
 							<q-item-section avatar>

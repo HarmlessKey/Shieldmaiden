@@ -184,10 +184,17 @@ export default {
 									color: "neutral-2",
 								},
 								{
-									value: true,
+									value: "double",
 									name: "Double",
 									action: "Double",
 									icon: "fas fa-chevron-double-up",
+									color: "neutral-2",
+								},
+								{
+									value: "max",
+									name: "Max + Roll",
+									action: "Max + Roll",
+									icon: "fas fa-axe-battle",
 									color: "neutral-2",
 								},
 							],

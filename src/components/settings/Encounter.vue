@@ -204,7 +204,7 @@ export default {
 									value: "disabled",
 									name: "Disabled",
 									action: "Disabled",
-									icon: "fas fa-times-square",
+									icon: "fas fa-ban",
 									color: "neutral-2",
 								},
 							],

@@ -391,31 +391,19 @@
 							map-options
 							:options="level_scaling"
 							label="Spell scaling"
-							v-model="spell.level_scaling"
+							v-model="spell.scaling"
 							class="mb-2"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 							@change="$forceUpdate()"
 						>
-							<template v-slot:append>
-								<q-icon name="info" @click.stop>
-									<q-menu
-										:dark="$store.getters.theme === 'dark'"
-										anchor="top middle"
-										self="bottom middle"
-										max-width="250px"
-									>
-										<q-card :dark="$store.getters.theme === 'dark'">
-											<q-card-section class="bg-neutral-8">
-												<strong>At higher levels</strong>
-											</q-card-section>
-											<q-card-section>
-												Set in what way the spell changes at higher levels.
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
-							</template>
+							<hk-popover
+								slot="append"
+								header="At higher levels"
+								content="In what way does the spell change at higher levels?"
+							>
+								<q-icon name="info" />
+							</hk-popover>
 						</q-select>
 					</ValidationProvider>
 				</div>
@@ -480,6 +468,7 @@
 <script>
 import { mapActions } from "vuex";
 import spell_constants from "src/utils/spellConstants";
+import { aoe_types } from "src/utils/actionConstants";
 
 export default {
 	name: "spells-BasicInfo",
@@ -496,7 +485,7 @@ export default {
 			spell_duration_types: spell_constants.spell_duration_types,
 			spell_duration_types_time: spell_constants.spell_duration_types_time,
 			spell_duration_times: spell_constants.spell_duration_times,
-			aoe_types: spell_constants.aoe_types,
+			aoe_types: aoe_types,
 			level_scaling: spell_constants.level_scaling,
 			classes: [
 				{ label: "Bard", value: "bard" },
@@ -556,16 +545,6 @@ export default {
 }
 .row {
 	margin-bottom: 20px;
-}
-
-pre {
-	white-space: pre-wrap; /* Since CSS 2.1 */
-	white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-	white-space: -pre-wrap; /* Opera 4-6 */
-	white-space: -o-pre-wrap; /* Opera 7 */
-	word-wrap: break-word; /* Internet Explorer 5.5+ */
-	font-family: inherit;
-	text-align: justify;
 }
 
 label {

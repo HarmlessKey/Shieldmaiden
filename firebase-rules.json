@@ -1099,7 +1099,7 @@
 		},
 		"new_spells": {
 			"$spellId": {
-				".validate": "newData.hasChildren(['name', 'level', 'school', 'cast_time', 'cast_time_type', 'range_type', 'range', 'duration_type', 'duration', 'duration_scale', 'aoe_type', 'level_scaling'])",
+				".validate": "newData.hasChildren(['name', 'level', 'school', 'cast_time', 'cast_time_type', 'range_type', 'range', 'duration_type', 'duration', 'duration_scale', 'aoe_type', 'scaling'])",
 				"harmless_key": {
 					".validate": "newData.isString() && newData.val().length <= 100"
 				},
@@ -1161,7 +1161,7 @@
 				"ritual": {
 					".validate": "newData.isBoolean()"
 				},
-				"level_scaling": {
+				"scaling": {
 					".validate": "newData.isString() && newData.val().matches(/^(none|character_level|spell_scale|spell_level)$/i)"
 				},
 				"description": {
@@ -1169,7 +1169,59 @@
 				},
 				"higher_level": {
 					".validate": "newData.isString() && newData.val().length <= 1000"
-				}
+				},
+				"actions": {
+					"$actionIndex": {
+						"type": {
+							".validate": "newData.isString() && newData.val().matches(/^(melee_weapon|ranged_weapon|spell_attack|save|damage|healing|other)$/)"
+						},
+						"attack_bonus": {
+							".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
+						},
+						"save_ability": {
+							".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
+						},
+						"save_dc": {
+							".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+						},
+						"rolls": {
+							"$rollIndex": {
+								"damage_type": {
+									".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
+								},
+								"magical": {
+									".validate": "newData.isBoolean()"
+								},
+								"dice_count": {
+									".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+								},
+								"dice_type": {
+									".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+								},
+								"fixed_val": {
+									".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+								},
+								"projectile_count": {
+									".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+								},
+								"miss_mod": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+								},
+								"save_fail_mod": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
+								},
+								"special": {
+									"$specialIndex": {
+										".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+									}
+								},
+								"$other": { ".validate": false }
+							}
+						},
+						"$other": { ".validate": false }
+					}
+				},
+				"$other": { ".validate": false }
 			},
 			".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
 			".read": true,

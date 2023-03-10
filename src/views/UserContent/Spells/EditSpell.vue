@@ -53,7 +53,7 @@
 <script>
 import { db } from "src/firebase";
 import BasicInfo from "src/components/spells/BasicInfo";
-import SpellActions from "src/components/spells/actions";
+import SpellActions from "src/components/spells/Actions";
 
 export default {
 	name: "EditSpell",

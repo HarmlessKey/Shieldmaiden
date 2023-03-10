@@ -203,9 +203,9 @@
 						<div class="accordion-body">
 							<div>
 								<b>Rolls: </b>
-								<template v-if="action.toHit && action.toHit.throwsTotal == 20">
+								<template v-if="action.toHit && action.toHit.throwsTotal === 20">
 									<b class="green">Crit!</b>
-									{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values" }} </template
+									{{ crit_description[critSettings] }} </template
 								><br />
 								{{ rolled.modifierRoll.roll }}
 								<div class="d-flex justify-content-between">
@@ -221,7 +221,12 @@
 											}"
 											@click="
 												(animateRoll = roll.key + rolled_index + throw_index),
-													reroll($event, rolled.modifierRoll, throw_index)
+													reroll(
+														$event,
+														rolled.modifierRoll,
+														throw_index,
+														action.toHit.throwsTotal === 20
+													)
 											"
 											@animationend="animateRoll = undefined"
 										>
@@ -408,6 +413,12 @@ export default {
 				v: { name: "Vulnerable", value: "damage_vulnerabilities", modifier: "double" },
 				r: { name: "Resistant", value: "damage_resistances", modifier: "half" },
 				i: { name: "Immune", value: "damage_immunities", modifier: "no" },
+			},
+			crit_description: {
+				undefined: "Rolled dice twice",
+				double: "Doubled rolled values",
+				max: "Added max damage to roll",
+				disabled: "Auto crits are disabled",
 			},
 			savingThrowResult: {},
 			hitOrMiss: {},
@@ -649,12 +660,23 @@ export default {
 			}
 			this.$forceUpdate();
 		},
-		reroll(e, roll, throw_index) {
+		reroll(e, roll, throw_index, crit) {
 			const add = (a, b) => a + b;
 			const newRoll = this.rollD(e, roll.d, 1, 0, `Reroll 1d${roll.d}`);
+
 			this.$set(roll.throws, throw_index, newRoll.total);
 			this.$set(roll, "throwsTotal", roll.throws.reduce(add));
-			this.$set(roll, "total", roll.throwsTotal + parseInt(roll.mod));
+			let new_total = roll.throwsTotal + roll.m;
+			// Add total thrown to total when crit
+			if (crit && this.critSettings === "double") {
+				new_total = new_total + roll.throwsTotal;
+			}
+			// Add the max damage output of the roll to the total when crit and setting is max
+			if (crit && this.critSettings === "max") {
+				new_total = new_total + roll.n * roll.d;
+			}
+
+			this.$set(roll, "total", new_total);
 		},
 		missSaveEffect(effect, type) {
 			if (type === "text") {

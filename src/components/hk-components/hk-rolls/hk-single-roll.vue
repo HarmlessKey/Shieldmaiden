@@ -735,7 +735,6 @@ export default {
 					total = total + this.totalActionValue(action, action.index);
 				}
 			}
-			// this.custom_total = total;
 			return total;
 		},
 		setDefense(type, resistance, key) {

@@ -117,6 +117,11 @@
 							:options="spell_cast_time_types"
 							v-model="spell.cast_time_type"
 							class="mb-2"
+							@input="
+								(value) => {
+									if (value !== 'reaction') $delete(spell, 'cast_time_react_desc');
+								}
+							"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
@@ -204,6 +209,11 @@
 							:options="spell_range_types"
 							v-model="spell.range_type"
 							class="mb-2"
+							@input="
+								(value) => {
+									if (value !== 'ranged') $delete(spell, 'range');
+								}
+							"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
@@ -213,7 +223,10 @@
 				<!-- RANGE -->
 				<div class="col-12 col-md-4">
 					<ValidationProvider
-						rules="required|between:0,999"
+						:rules="{
+							required: spell.range_type === 'ranged',
+							between: [0, 999],
+						}"
 						name="Range"
 						v-slot="{ errors, invalid, validated }"
 					>
@@ -221,7 +234,7 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="Range ft."
+							label="Range"
 							v-model="spell.range"
 							:disable="spell.range_type !== 'ranged'"
 							autocomplete="off"
@@ -229,7 +242,9 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-						/>
+						>
+							<span slot="append" class="neutral-2">ft.</span>
+						</q-input>
 					</ValidationProvider>
 				</div>
 
@@ -249,7 +264,7 @@
 				</div>
 			</div>
 			<div class="row q-col-gutter-md">
-				<!-- DURATION -->
+				<!-- DURATION TYPE -->
 				<div class="col-12 col-md-4">
 					<ValidationProvider
 						rules="required"
@@ -266,16 +281,27 @@
 							:options="spell_duration_types"
 							v-model="spell.duration_type"
 							class="mb-2"
+							@input="
+								(value) => {
+									if (!spell_duration_types_time.includes(value)) {
+										$delete(spell, 'duration');
+										$delete(spell, 'duration_scale');
+									}
+								}
+							"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
 					</ValidationProvider>
 				</div>
 
-				<!-- DURATION N -->
+				<!-- DURATION -->
 				<div class="col-12 col-md-4">
 					<ValidationProvider
-						rules="required|between:1,999"
+						:rules="{
+							required: spell_duration_types_time.includes(spell.duration_type),
+							between: [1, 999],
+						}"
 						name="Duration"
 						v-slot="{ errors, invalid, validated }"
 					>
@@ -283,7 +309,9 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="Duration *"
+							:label="`Duration ${
+								spell_duration_types_time.includes(spell.duration_type) ? '*' : ''
+							}`"
 							v-model="spell.duration"
 							:disable="!spell_duration_types_time.includes(spell.duration_type)"
 							autocomplete="off"
@@ -298,8 +326,10 @@
 				<!-- DURATION SCALE -->
 				<div class="col-12 col-md-4">
 					<ValidationProvider
-						rules="required"
-						name="Time scale *"
+						:rules="{
+							required: spell_duration_types_time.includes(spell.duration_type),
+						}"
+						name="Time scale"
 						v-slot="{ errors, invalid, validated }"
 					>
 						<q-select
@@ -308,7 +338,9 @@
 							square
 							emit-value
 							map-options
-							label="Time scale"
+							:label="`Time scale ${
+								spell_duration_types_time.includes(spell.duration_type) ? '*' : ''
+							}`"
 							:options="spell_duration_times"
 							v-model="spell.duration_scale"
 							:disable="!spell_duration_types_time.includes(spell.duration_type)"
@@ -337,6 +369,11 @@
 							:options="aoe_types"
 							v-model="spell.aoe_type"
 							class="mb-2"
+							@input="
+								(value) => {
+									if (value === 'none') $delete(spell, 'aoe_size');
+								}
+							"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
@@ -344,7 +381,10 @@
 				</div>
 				<div class="col-12 col-md-6">
 					<ValidationProvider
-						rules="required|between:1,999"
+						:rules="{
+							required: spell.aoe_type !== 'none',
+							between: [1, 999],
+						}"
 						name="AOE size"
 						v-slot="{ errors, invalid, validated }"
 					>
@@ -352,7 +392,7 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="AOE size ft."
+							label="AOE size"
 							v-model="spell.aoe_size"
 							:disable="spell.aoe_type === 'none'"
 							autocomplete="off"
@@ -360,7 +400,9 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-						/>
+						>
+							<span slot="append" class="neutral-2">ft.</span>
+						</q-input>
 					</ValidationProvider>
 				</div>
 			</div>

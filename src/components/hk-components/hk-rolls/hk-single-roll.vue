@@ -342,14 +342,65 @@
 			</div>
 
 			<!-- TOTALS OF ALL ACTIONS -->
-			<template v-for="type in ['damage', 'healing']">
-				<div class="total-damage" :key="type" v-if="totalValue(type) !== undefined">
-					<div>Total {{ type }}</div>
-					<div class="total" :class="type === 'healing' ? 'green' : 'red'">
-						<hk-animated-integer :value="totalValue(type)" onMount />
+			<div v-for="dmg_type in ['damage', 'healing']" :key="dmg_type">
+				<template v-if="totalValue(dmg_type) !== undefined">
+					<div
+						class="total-damage cursor-pointer"
+						v-if="!edit_total[dmg_type]"
+						@click="toggleOverride(dmg_type)"
+					>
+						<div>
+							<span class="mr-2">Total {{ dmg_type }}</span>
+							<i aria-hidden="true" class="fas fa-pencil-alt neutral-3" style="font-size: 14px">
+								<q-tooltip anchor="top middle" self="center middle">
+									Override rolled value.
+								</q-tooltip>
+							</i>
+						</div>
+						<div class="total" :class="dmg_type === 'healing' ? 'green' : 'red'">
+							<hk-animated-integer :value="totalValue(dmg_type)" onMount />
+						</div>
 					</div>
-				</div>
-			</template>
+					<template v-else>
+						<q-input
+							v-if="dmg_type === 'damage'"
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							clearable
+							@clear="toggleOverride(dmg_type)"
+							:label="`Total ${dmg_type}`"
+							v-model="overrideDamage"
+							type="number"
+							autocomplete="off"
+							name="duration"
+							class="my-2 full-width"
+							title="Override"
+							min="0"
+						>
+							<strong slot="append" class="pl-3 red">{{ overrideDamage }}</strong>
+						</q-input>
+						<q-input
+							v-else
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							clearable
+							@clear="toggleOverride(dmg_type)"
+							:label="`Total ${dmg_type}`"
+							v-model="overrideHealing"
+							type="number"
+							autocomplete="off"
+							name="duration"
+							class="my-2 full-width"
+							title="Override"
+							min="0"
+						>
+							<strong slot="append" class="pl-3 red">{{ overrideHealing }}</strong>
+						</q-input>
+					</template>
+				</template>
+			</div>
 		</div>
 
 		<div slot="footer" class="card-footer" v-if="roll.target">
@@ -407,6 +458,15 @@ export default {
 	mixins: [dice, setHP],
 	data() {
 		return {
+			edit_total: {
+				damage: false,
+				healing: false,
+			},
+			override: {
+				damage: undefined,
+				healing: undefined,
+			},
+
 			damage_types: damage_types,
 			damage_type_icons: damage_type_icons,
 			defenses: {
@@ -436,6 +496,28 @@ export default {
 	computed: {
 		roll() {
 			return this.value;
+		},
+		overrideDamage: {
+			get() {
+				if (this.override.damage === undefined) {
+					return this.totalValue("damage");
+				}
+				return this.override.damage;
+			},
+			set(value) {
+				this.override.damage = value;
+			},
+		},
+		overrideHealing: {
+			get() {
+				if (this.override.healing === undefined) {
+					return this.totalValue("healing");
+				}
+				return this.override.healing;
+			},
+			set(value) {
+				this.override.healing = value;
+			},
 		},
 		resistances() {
 			if (this.roll.target) {
@@ -551,12 +633,16 @@ export default {
 			config.actions = actions;
 
 			// Set the total value object
-			const totalDamage = this.totalValue("damage");
-			const totalHealing = this.totalValue("healing");
+			const totalDamage = this.override.damage ? this.override.damage : this.totalValue("damage");
+			const totalHealing = this.override.healing
+				? this.override.healing
+				: this.totalValue("healing");
 			let totalValue = {};
 
-			if (totalDamage !== undefined) totalValue.damage = Math.floor(totalDamage * multiplier);
-			if (totalHealing !== undefined) totalValue.healing = Math.floor(totalHealing * multiplier);
+			if (totalDamage !== undefined)
+				totalValue.damage = Math.floor(totalDamage * multiplier).min(0);
+			if (totalHealing !== undefined)
+				totalValue.healing = Math.floor(totalHealing * multiplier).min(0);
 
 			// Apply the rolled damage/healing
 			await this.setHP(totalValue, this.roll.target, this.roll.current, config);
@@ -726,6 +812,11 @@ export default {
 				}
 			}
 			return returnObj;
+		},
+		toggleOverride(dmg_type) {
+			console.log("override", dmg_type);
+			this.override[dmg_type] = undefined;
+			this.edit_total[dmg_type] = !this.edit_total[dmg_type];
 		},
 	},
 };

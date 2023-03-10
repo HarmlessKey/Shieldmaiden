@@ -1,3 +1,4 @@
+import firebase from "firebase/app";
 import { db } from "src/firebase";
 import { serverUtils } from "src/services/serverUtils";
 
@@ -49,9 +50,7 @@ export class voucherService {
 	static async incrementVoucherUsage(voucher_name) {
 		return VOUCHER_REF.child(voucher_name)
 			.child("times_used")
-			.transaction((value) => {
-				return value++;
-			});
+			.set(firebase.database.ServerValue.increment(1));
 	}
 
 	static async getVoucherTiers() {

@@ -6,14 +6,13 @@
 				<a class="btn btn-sm bg-neutral-5">
 					<i aria-hidden="true" class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
-					<q-tooltip anchor="top middle" self="center middle">
-						Add
-					</q-tooltip>
+					<q-tooltip anchor="top middle" self="center middle"> Add </q-tooltip>
 					<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 						<div class="bg-neutral-9">
 							<q-list>
 								<q-item
-									v-for="{category, name_single} in actions" :key="`add-${category}`"
+									v-for="{ category, name_single } in actions"
+									:key="`add-${category}`"
 									clickable
 									v-close-popup
 									@click="add(category)"
@@ -30,7 +29,7 @@
 			</div>
 
 			<div class="card-body">
-				<template v-for="{name, category, name_single} in actions">
+				<template v-for="{ name, category, name_single } in actions">
 					<div v-if="npc[category] && npc[category].length > 0" :key="category">
 						<h3 class="d-flex justify-content-between">
 							{{ name }}
@@ -39,9 +38,16 @@
 								<span class="d-none d-md-inline ml-1">Add {{ name_single }}</span>
 							</a>
 						</h3>
-						<ValidationProvider v-if="category === 'legendary_actions'" rules="between:1,9|required" name="Count" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider
+							v-if="category === 'legendary_actions'"
+							rules="between:1,9|required"
+							name="Count"
+							v-slot="{ errors, invalid, validated }"
+						>
 							<q-input
-								:dark="$store.getters.theme === 'dark'" filled square
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
 								label="Count"
 								:value="npc.legendary_count"
 								type="number"
@@ -55,9 +61,14 @@
 
 						<!-- ABILITIES -->
 						<q-list :dark="$store.getters.theme === 'dark'" class="accordion">
-							<ValidationObserver v-for="(ability, ability_index) in npc[category]" v-slot="{ valid }" :key="`ability-${ability_index}`">
+							<ValidationObserver
+								v-for="(ability, ability_index) in npc[category]"
+								v-slot="{ valid }"
+								:key="`ability-${ability_index}`"
+							>
 								<q-expansion-item
-									:dark="$store.getters.theme === 'dark'" switch-toggle-side
+									:dark="$store.getters.theme === 'dark'"
+									switch-toggle-side
 									:group="name"
 									:name="name"
 									enter-active-class="animated animate__fadeIn"
@@ -70,7 +81,15 @@
 												Validation errors
 											</q-tooltip>
 										</q-item-section>
-										<q-item-section avatar v-if="ability.action_list && ability.action_list[0] && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
+										<q-item-section
+											avatar
+											v-if="
+												ability.action_list &&
+												ability.action_list[0] &&
+												ability.action_list[0].type !== 'other' &&
+												ability.action_list[0].rolls
+											"
+										>
 											<span v-if="ability.versatile" class="roll-button" @click.stop>
 												<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 													<q-list :dark="$store.getters.theme === 'dark'">
@@ -79,17 +98,18 @@
 																<b>{{ ability.name }}</b>
 															</q-item-section>
 														</q-item>
-															<hk-roll
-																v-for="i in [0,1]" :key="`${i}-versatile-roll`"
-																@roll="rollAbility($event, ability, i)"
-															>
-																<q-item clickable v-close-popup>
+														<hk-roll
+															v-for="i in [0, 1]"
+															:key="`${i}-versatile-roll`"
+															@roll="rollAbility($event, ability, i)"
+														>
+															<q-item clickable v-close-popup>
 																<q-item-section avatar>{{ i + 1 }}</q-item-section>
 																<q-item-section>
-																									{{ getVersatile(ability, i) }}
+																	{{ getVersatile(ability, i) }}
 																</q-item-section>
-																</q-item>
-															</hk-roll>
+															</q-item>
+														</hk-roll>
 													</q-list>
 												</q-popup-proxy>
 											</span>
@@ -103,24 +123,47 @@
 										</q-item-section>
 										<q-item-section>
 											{{ ability.name }}
-											{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : `` }}
-											{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize() : `Day`})` : `` }}
-											{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : `` }}
+											{{
+												ability.recharge
+													? `(Recharge ${
+															ability.recharge === "rest"
+																? "after a Short or Long Rest"
+																: ability.recharge
+													  })`
+													: ``
+											}}
+											{{
+												ability.limit
+													? `(${ability.limit}/${
+															ability.limit_type ? ability.limit_type.capitalize() : `Day`
+													  })`
+													: ``
+											}}
+											{{
+												ability.legendary_cost > 1
+													? `(Costs ${ability.legendary_cost} Actions)`
+													: ``
+											}}
 										</q-item-section>
 										<q-item-section avatar>
 											<a @click.stop="remove(ability_index, category)" class="remove">
 												<i aria-hidden="true" class="fas fa-trash-alt red" />
-												<q-tooltip anchor="top middle" self="center middle">
-													Remove
-												</q-tooltip>
+												<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
 											</a>
 										</q-item-section>
 									</template>
 
 									<div class="accordion-body">
-										<ValidationProvider v-if="category === 'legendary_actions'" rules="between:1,9|required" name="Legendary actions" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider
+											v-if="category === 'legendary_actions'"
+											rules="between:1,9|required"
+											name="Legendary actions"
+											v-slot="{ errors, invalid, validated }"
+										>
 											<q-input
-												:dark="$store.getters.theme === 'dark'" filled square
+												:dark="$store.getters.theme === 'dark'"
+												filled
+												square
 												label="Legendary actions"
 												autocomplete="off"
 												type="number"
@@ -134,9 +177,15 @@
 											/>
 										</ValidationProvider>
 
-										<ValidationProvider rules="max:50|required" name="Name" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider
+											rules="max:50|required"
+											name="Name"
+											v-slot="{ errors, invalid, validated }"
+										>
 											<q-input
-												:dark="$store.getters.theme === 'dark'" filled square
+												:dark="$store.getters.theme === 'dark'"
+												filled
+												square
 												label="Name"
 												autocomplete="off"
 												class="mb-3"
@@ -150,9 +199,15 @@
 
 										<div class="row q-col-gutter-md mb-2" v-if="category !== 'legendary_actions'">
 											<div class="col">
-												<ValidationProvider rules="recharge" name="Recharge" v-slot="{ errors, invalid, validated }">
+												<ValidationProvider
+													rules="recharge"
+													name="Recharge"
+													v-slot="{ errors, invalid, validated }"
+												>
 													<q-input
-														:dark="$store.getters.theme === 'dark'" filled square
+														:dark="$store.getters.theme === 'dark'"
+														filled
+														square
 														label="Recharge"
 														autocomplete="off"
 														v-model="ability.recharge"
@@ -164,9 +219,15 @@
 											</div>
 											<div class="col">
 												<div class="d-flex justify-content-start limit">
-													<ValidationProvider rules="between:1,9" name="Limited" v-slot="{ errors, invalid, validated }">
+													<ValidationProvider
+														rules="between:1,9"
+														name="Limited"
+														v-slot="{ errors, invalid, validated }"
+													>
 														<q-input
-															:dark="$store.getters.theme === 'dark'" filled square
+															:dark="$store.getters.theme === 'dark'"
+															filled
+															square
 															label="Limited uses"
 															autocomplete="off"
 															type="number"
@@ -178,7 +239,9 @@
 														/>
 													</ValidationProvider>
 													<q-select
-														:dark="$store.getters.theme === 'dark'" filled square
+														:dark="$store.getters.theme === 'dark'"
+														filled
+														square
 														bottom-slots
 														label="Limit type"
 														class="limit-type"
@@ -190,9 +253,15 @@
 												</div>
 											</div>
 										</div>
-										<ValidationProvider rules="max:2000" name="Description" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider
+											rules="max:2000"
+											name="Description"
+											v-slot="{ errors, invalid, validated }"
+										>
 											<q-input
-												:dark="$store.getters.theme === 'dark'" filled square
+												:dark="$store.getters.theme === 'dark'"
+												filled
+												square
 												counter
 												label="Description"
 												autocomplete="off"
@@ -210,9 +279,15 @@
 											<label class="group mt-3">Range & area of effect</label>
 											<div class="row q-col-gutter-sm">
 												<div class="col">
-													<ValidationProvider rules="between:0,999" name="Reach" v-slot="{ errors, invalid, validated }">
+													<ValidationProvider
+														rules="between:0,999"
+														name="Reach"
+														v-slot="{ errors, invalid, validated }"
+													>
 														<q-input
-															:dark="$store.getters.theme === 'dark'" filled square
+															:dark="$store.getters.theme === 'dark'"
+															filled
+															square
 															class="reach"
 															label="Reach"
 															v-model.number="ability.reach"
@@ -226,9 +301,15 @@
 													</ValidationProvider>
 												</div>
 												<div class="col">
-													<ValidationProvider rules="range" name="Range" v-slot="{ errors, invalid, validated }">
+													<ValidationProvider
+														rules="range"
+														name="Range"
+														v-slot="{ errors, invalid, validated }"
+													>
 														<q-input
-															:dark="$store.getters.theme === 'dark'" filled square
+															:dark="$store.getters.theme === 'dark'"
+															filled
+															square
 															label="Range"
 															v-model="ability.range"
 															suffix="ft."
@@ -240,7 +321,10 @@
 												</div>
 												<div class="col">
 													<q-select
-														:dark="$store.getters.theme === 'dark'" filled square clearable
+														:dark="$store.getters.theme === 'dark'"
+														filled
+														square
+														clearable
 														emit-value
 														map-options
 														label="AOE type"
@@ -250,9 +334,15 @@
 													/>
 												</div>
 												<div class="col">
-													<ValidationProvider rules="between:0,999" name="AOE size" v-slot="{ errors, invalid, validated }">
+													<ValidationProvider
+														rules="between:0,999"
+														name="AOE size"
+														v-slot="{ errors, invalid, validated }"
+													>
 														<q-input
-															:dark="$store.getters.theme === 'dark'" filled square
+															:dark="$store.getters.theme === 'dark'"
+															filled
+															square
 															label="AOE size"
 															type="number"
 															v-model.number="ability.aoe_size"
@@ -269,60 +359,79 @@
 
 											<!-- VERSATILE -->
 											<div class="row q-col-gutter-md">
-													<div class="col-4 col-sm-3">
-														<q-checkbox
-															:dark="$store.getters.theme === 'dark'"
-															v-model="ability.versatile"
-															label="Versatile"
-															:false-value="null"
-															indeterminate-value="Questionable"
-															@input="$forceUpdate()"
-														/>
-													</div>
-													<template v-if="ability.versatile">
-														<div class="col">
-															<ValidationProvider rules="max:25|required" name="Option 1" v-slot="{ errors, invalid, validated }">
-																<q-input
-																	:dark="$store.getters.theme === 'dark'" filled square dense
-																	type="text"
-																	label="Option 1 name *"
-																	maxlength="25"
-																	v-model="ability.versatile_one"
-																	@keyup="$forceUpdate()"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
-																/>
-															</ValidationProvider>
-														</div>
-														<div class="col">
-															<ValidationProvider rules="max:25|required" name="Option 2" v-slot="{ errors, invalid, validated }">
-																<q-input
-																	:dark="$store.getters.theme === 'dark'" filled square dense
-																	type="text"
-																	label="Option 2 name *"
-																	maxlength="25"
-																	v-model="ability.versatile_two"
-																	@keyup="$forceUpdate()"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
-																/>
-															</ValidationProvider>
-														</div>
-													</template>
+												<div class="col-4 col-sm-3">
+													<q-checkbox
+														:dark="$store.getters.theme === 'dark'"
+														v-model="ability.versatile"
+														label="Versatile"
+														:false-value="null"
+														indeterminate-value="Questionable"
+														@input="$forceUpdate()"
+													/>
 												</div>
+												<template v-if="ability.versatile">
+													<div class="col">
+														<ValidationProvider
+															rules="max:25|required"
+															name="Option 1"
+															v-slot="{ errors, invalid, validated }"
+														>
+															<q-input
+																:dark="$store.getters.theme === 'dark'"
+																filled
+																square
+																dense
+																type="text"
+																label="Option 1 name *"
+																maxlength="25"
+																v-model="ability.versatile_one"
+																@keyup="$forceUpdate()"
+																:error="invalid && validated"
+																:error-message="errors[0]"
+															/>
+														</ValidationProvider>
+													</div>
+													<div class="col">
+														<ValidationProvider
+															rules="max:25|required"
+															name="Option 2"
+															v-slot="{ errors, invalid, validated }"
+														>
+															<q-input
+																:dark="$store.getters.theme === 'dark'"
+																filled
+																square
+																dense
+																type="text"
+																label="Option 2 name *"
+																maxlength="25"
+																v-model="ability.versatile_two"
+																@keyup="$forceUpdate()"
+																:error="invalid && validated"
+																:error-message="errors[0]"
+															/>
+														</ValidationProvider>
+													</div>
+												</template>
+											</div>
 
 											<!-- ACTIONS -->
-											<div v-for="(action, action_index) in ability.action_list" :key="`action-${action_index}`">
+											<div
+												v-for="(action, action_index) in ability.action_list"
+												:key="`action-${action_index}`"
+											>
 												<label class="group mt-3">Type of action</label>
 												<div class="row q-col-gutter-md">
 													<!-- ACTION TYPE -->
 													<div class="col">
 														<q-select
-															:dark="$store.getters.theme === 'dark'" filled square
+															:dark="$store.getters.theme === 'dark'"
+															filled
+															square
 															map-options
 															emit-value
 															label="Action type"
-															:options="Object.values(attack_type)"
+															:options="Object.values(attack_types)"
 															v-model="action.type"
 															class="mb-2"
 															@input="$forceUpdate()"
@@ -332,9 +441,15 @@
 													<!-- SAVE -->
 													<template v-if="action.type === 'save'">
 														<div class="col">
-															<ValidationProvider rules="required" name="Save DC" v-slot="{ errors, invalid, validated }">
+															<ValidationProvider
+																rules="required"
+																name="Save DC"
+																v-slot="{ errors, invalid, validated }"
+															>
 																<q-select
-																	:dark="$store.getters.theme === 'dark'" filled square
+																	:dark="$store.getters.theme === 'dark'"
+																	filled
+																	square
 																	map-options
 																	emit-value
 																	label="Save ability"
@@ -347,9 +462,15 @@
 															</ValidationProvider>
 														</div>
 														<div class="col">
-															<ValidationProvider rules="required|between:1,99" name="Save DC" v-slot="{ errors, invalid, validated }">
+															<ValidationProvider
+																rules="required|between:1,99"
+																name="Save DC"
+																v-slot="{ errors, invalid, validated }"
+															>
 																<q-input
-																	:dark="$store.getters.theme === 'dark'" filled square
+																	:dark="$store.getters.theme === 'dark'"
+																	filled
+																	square
 																	type="number"
 																	label="Save DC"
 																	v-model.number="action.save_dc"
@@ -362,11 +483,19 @@
 														</div>
 													</template>
 
-													<template v-else-if="!['healing', 'damage', 'other'].includes(action.type)">
+													<template
+														v-else-if="!['healing', 'damage', 'other'].includes(action.type)"
+													>
 														<div class="col">
-															<ValidationProvider rules="between:-10,99" name="Attack modifier" v-slot="{ errors, invalid, validated }">
+															<ValidationProvider
+																rules="between:-10,99"
+																name="Attack modifier"
+																v-slot="{ errors, invalid, validated }"
+															>
 																<q-input
-																	:dark="$store.getters.theme === 'dark'" filled square
+																	:dark="$store.getters.theme === 'dark'"
+																	filled
+																	square
 																	type="number"
 																	label="Attack modifier"
 																	v-model.number="action.attack_bonus"
@@ -384,10 +513,12 @@
 													<!-- ACTION ROLLS -->
 													<div class="hk-card mt-3 rolls">
 														<div class="card-header d-flex justify-content-between">
-															<span><i aria-hidden="true" class="fas fa-dice-d20"/> Rolls</span>
+															<span><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span>
 															<a
 																class="btn btn-sm bg-neutral-5"
-																@click="newRoll(ability_index, ability, category, action_index, action)"
+																@click="
+																	newRoll(ability_index, ability, category, action_index, action)
+																"
 															>
 																<i aria-hidden="true" class="fas fa-plus green"></i>
 																<span class="d-none d-md-inline ml-1">Add roll</span>
@@ -395,107 +526,24 @@
 														</div>
 
 														<!-- ROLLS TABLE -->
-														<hk-table
+														<hk-action-rolls-table
 															v-if="action.rolls"
-															:items="action.rolls"
-															:columns="rollColumns"
-															:showHeader="false"
-														>
-															<div slot="roll" slot-scope="data" class="roll">
-																<span>
-																	{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
-																	({{ data.row.dice_count || '' }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
-																	<template v-if="data.row.fixed_val && data.row.dice_count">
-																		{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }})
-																	</template>
-																	<template v-else>{{ data.row.fixed_val }})</template>
-																	<q-tooltip v-if="ability.versatile" anchor="top middle" self="bottom middle">
-																		{{ ability.versatile_one || "Enter versatile option" }}
-																	</q-tooltip>
-																</span>
-																<span v-if="ability.versatile && versatileRoll(data.row)">
-																	| {{
-																		calcAverage(
-																			data.row.versatile_dice_type || data.row.dice_type,
-																			data.row.versatile_dice_count || data.row.dice_count,
-																			data.row.versatile_fixed_val || data.row.fixed_val)
-																		}}
-																	({{ versatileRoll(data.row) }})
-																	<q-tooltip anchor="top middle" self="bottom middle">
-																		{{ ability.versatile_two || "Enter versatile option" }}
-																	</q-tooltip>
-																</span>
-															</div>
-
-															<span slot="type" slot-scope="data">
-																<span v-if="action.type === 'healing'" class="healing">
-																	<i aria-hidden="true" class="fas fa-heart" /> Healing
-																</span>
-																<template v-else-if="data.row.damage_type">
-																	<span :class="data.row.damage_type">
-																		<i aria-hidden="true" :class="damage_type_icons[data.row.damage_type]" />
-																		{{ data.row.damage_type.capitalize() }}
-																		<q-tooltip v-if="ability.versatile" anchor="top middle" self="bottom middle">
-																			{{ ability.versatile_two || "Enter versatile option" }}
-																		</q-tooltip>
-																	</span>
-																	<template
-																		v-if="ability.versatile && (data.row.versatile_damage_type && data.row.versatile_damage_type !== data.row.damage_type)"
-																	>
-																		| <span :class="data.row.versatile_damage_type">
-																			<i aria-hidden="true" :class="damage_type_icons[data.row.versatile_damage_type]" />
-																			{{ data.row.versatile_damage_type.capitalize() }}
-																			<q-tooltip anchor="top middle" self="bottom middle">
-																				{{ ability.versatile_two || "Enter versatile option" }}
-																			</q-tooltip>
-																		</span>
-																	</template>
-																	damage
-																</template>
-															</span>
-
-															<template slot="magical" slot-scope="data">
-																<i v-if="data.row.magical || data.row.versatile_magical" class="fas fa-sparkles" aria-hidden="true">
-																	<q-tooltip anchor="center right" self="center left">
-																		Magical
-																	</q-tooltip>
-																</i>
-															</template>
-
-															<template slot="fail" slot-scope="data" v-if="!['healing', 'damage'].includes(action.type)">
-																{{
-																	action.type === "save"
-																	? `Save: ${application[data.row.save_fail_mod]}`
-																	: `Miss: ${application[data.row.miss_mod]}`
-																}}
-															</template>
-
-															<!-- ACTIONS -->
-															<div slot="actions" slot-scope="data" class="actions">
-																<a class="ml-2 btn btn-sm bg-neutral-5"
-																		@click="editRoll(
-																			ability_index,
-																			ability,
-																			category,
-																			action_index,
-																			action,
-																			data.index,
-																			data.row
-																		)"
-																	>
-																	<i aria-hidden="true" class="fas fa-pencil-alt"></i>
-																	<q-tooltip anchor="top middle" self="center middle">
-																		Edit
-																	</q-tooltip>
-																</a>
-																<a class="ml-2 btn btn-sm bg-neutral-5" @click="deleteRoll(ability_index, category, action_index, data.index)">
-																	<i aria-hidden="true" class="fas fa-trash-alt"></i>
-																	<q-tooltip anchor="top middle" self="center middle">
-																		Delete
-																	</q-tooltip>
-																</a>
-															</div>
-														</hk-table>
+															:rolls="action.rolls"
+															:type="action.type"
+															:versatile="ability.versatile"
+															:versatile-options="[ability.versatile_one, ability.versatile_two]"
+															@edit="
+																editRoll(
+																	$event,
+																	ability_index,
+																	ability,
+																	category,
+																	action_index,
+																	action
+																)
+															"
+															@delete="deleteRoll($event, ability_index, category, action_index)"
+														/>
 													</div>
 												</template>
 											</div>
@@ -513,24 +561,31 @@
 			<div v-if="Object.keys(edit_action).length > 0">
 				<ValidationObserver v-slot="{ handleSubmit, valid }">
 					<q-form @submit="handleSubmit(saveRoll)">
-						<hk-card :header="(edit_roll_index !== undefined) ? 'Edit roll' : 'New roll'" class="mb-0">
+						<hk-card
+							:header="edit_roll_index !== undefined ? 'Edit roll' : 'New roll'"
+							class="mb-0"
+						>
 							<div class="card-body">
 								<p>
 									{{ npc[edit_action.category][edit_action.ability_index].desc }}
 								</p>
-								<ActionRoll
+								<hk-action-roll-form
 									v-if="roll && edit_action.type"
 									v-model="roll"
 									:action_type="edit_action.type"
 									:versatile_options="edit_action.versatile"
 								/>
-								<div v-else>
-									Select an action type first
-								</div>
+								<div v-else>Select an action type first</div>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
 								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
-								<q-btn color="primary" type="submit" no-caps :disabled="!valid" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
+								<q-btn
+									color="primary"
+									type="submit"
+									no-caps
+									:disabled="!valid"
+									:label="edit_roll_index !== undefined ? 'Save' : 'Add'"
+								/>
 							</div>
 						</hk-card>
 					</q-form>
@@ -541,347 +596,263 @@
 </template>
 
 <script>
-	import { general } from 'src/mixins/general.js';
-	import { abilities, damage_types, damage_type_icons } from 'src/utils/generalConstants';
-	import { monsterMixin } from 'src/mixins/monster.js';
-	import ActionRoll from 'src/components/ActionRoll';
-	import { mapActions } from 'vuex';
-	import { dice } from 'src/mixins/dice.js';
+import { general } from "src/mixins/general.js";
+import { abilities, damage_types } from "src/utils/generalConstants";
+import { monsterMixin } from "src/mixins/monster.js";
+import { mapActions } from "vuex";
+import { dice } from "src/mixins/dice.js";
+import { attack_types } from "src/utils/actionConstants";
 
-	export default {
-		name: 'npc-Actions',
-		props: ['value'],
-		mixins: [
-			general,
-			monsterMixin,
-			dice
-		],
-		components: {
-			ActionRoll
+export default {
+	name: "npc-Actions",
+	props: ["value"],
+	mixins: [general, monsterMixin, dice],
+	data() {
+		return {
+			damage_types: damage_types,
+			attack_types: attack_types,
+			abilities: abilities,
+			action_dialog: false,
+			edit_action: {},
+			edit_roll_index: undefined,
+			roll: undefined,
+			actions: [
+				{
+					category: "special_abilities",
+					name: "Special Abilities",
+					name_single: "Special ability",
+				},
+				{ category: "actions", name: "Actions", name_single: "Action" },
+				{
+					category: "legendary_actions",
+					name: "Legendary Actions",
+					name_single: "Legendary action",
+				},
+				{ category: "reactions", name: "Reactions", name_single: "Reaction" },
+			],
+			aoe_types: [
+				{ label: "Cone", value: "cone" },
+				{ label: "Cube", value: "cube" },
+				{ label: "Cylinder", value: "cylinder" },
+				{ label: "Line", value: "line" },
+				{ label: "Sphere", value: "sphere" },
+				{ label: "Square", value: "square" },
+				{ label: "Square Feet", value: "square feet" },
+			],
+			limit_types: ["day", "turn"],
+		};
+	},
+	computed: {
+		npc: {
+			get() {
+				return this.value;
+			},
+			set(newValue) {
+				this.$emit("input", newValue);
+			},
 		},
-		data() {
-			return {
-				damage_types: damage_types,
-				damage_type_icons: damage_type_icons,
-				abilities: abilities,
-				action_dialog: false,
-				edit_action: {},
-				edit_roll_index: undefined,
-				roll: undefined,
-				rollColumns: {
-					roll: {
-						maxContent: true
-					},
-					type: {
-						truncate: true
-					},
-					magical: {
-						truncate: true
-					},
-					fail: {
-						truncate: true
-					},
-					actions: {
-						noPadding: true,
-						maxContent: true
-					}
-				},
-				application: {
-					0: "No effect",
-					0.5: "Half damage",
-					1: "Full damage"
-				},
-				actions: [
-					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
-					{ category: 'actions', name: 'Actions', name_single: 'Action' },
-					{ category: 'legendary_actions', name: 'Legendary Actions', name_single: 'Legendary action' },
-					{ category: 'reactions', name: 'Reactions', name_single: 'Reaction' }
-				],
-				aoe_types: [
-					{ label: "Cone", value: "cone" },
-					{ label: "Cube", value: "cube" },
-					{ label: "Cylinder", value: "cylinder" },
-					{ label: "Line", value: "line" },
-					{ label: "Sphere", value: "sphere" },
-					{ label: "Square", value: "square" },
-					{ label: "Square Feet", value: "square feet" },
-				],
-				attack_type: {
-					"melee_weapon": {
-						label: "Melee weapon",
-						value: "melee_weapon",
-						hint: "A melee weapon attack"
-					},
-					"ranged_weapon": {
-						label: "Ranged weapon",
-						value: "ranged_weapon",
-						hint: "A ranged weapon attack"
-					},
-					"spell_attack": {
-						label: "Spell attack",
-						value: "spell_attack",
-						hint: "A spell attack that has to hit"
-					},
-					"save": {
-						label: "Save",
-						value: "save",
-						hint: "An attack that requires a saving throw"
-					},
-					"damage": {
-						label: "Damage",
-						value: "damage",
-						hint: "Damage without a to hit or saving throw"
-					},
-					"healing": {
-						label: "Healing",
-						value: "healing",
-						hint: "Restores hit points to a target"
-					},
-					"other": {
-						label: "Other",
-						value: "other",
-						hint: "An action without damage or healing"
-					},
-				},
-				limit_types: [
-					"day",
-					"turn"
-				]
+	},
+	methods: {
+		...mapActions(["setActionRoll"]),
+		parseToInt(value, object, property) {
+			if (value === undefined || value === "") {
+				this.$delete(object, property);
+			} else {
+				this.$set(object, property, parseInt(value));
 			}
 		},
-		computed: {
-			npc: {
-				get() {
-					return this.value;
-				},
-				set(newValue) {
-					this.$emit('input', newValue);
-				}
+		/**
+		 * Add a new action
+		 *
+		 * @param {string} category actions / lengedary_actions / special_abilities
+		 */
+		add(category) {
+			let type;
+			if (category === "actions") {
+				type = "melee_weapon";
+			} else if (category === "legendary_actions") {
+				type = "save";
+			} else {
+				type = "other";
 			}
+
+			const action = {
+				name: "New",
+				action_list: [
+					{
+						type,
+					},
+				],
+			};
+
+			if (this.npc[category] === undefined) {
+				this.npc[category] = [];
+			}
+			this.npc[category].push(action);
+			this.$forceUpdate();
 		},
-		methods: {
-			...mapActions([
-				"setActionRoll"
-			]),
-			parseToInt(value, object, property) {
-				if(value === undefined || value === "") {
-					this.$delete(object, property);
-				} else {
-					this.$set(object, property, parseInt(value));
-				}
-			},
-			/**
-			 * Add a new action
-			 *
-			 * @param {string} category actions / lengedary_actions / special_abilities
-			 */
-			add(category) {
-				let type;
-				if(category === "actions") {
-					type = "melee_weapon";
-				} else if(category === "legendary_actions") {
-					type = "save";
-				} else {
-					type = "other";
-				}
 
-				const action = {
-					name: "New",
-					action_list: [{
-						type
-					}]
-				};
+		/**
+		 * Remove an action
+		 *
+		 * @param {integer} index index of the action
+		 * @param {string} category actions / lengedary_actions / special_abilities
+		 */
+		remove(index, category) {
+			this.$delete(this.npc[category], index);
+			this.$forceUpdate();
+		},
 
-				if(this.npc[category] === undefined) {
-					this.npc[category] = [];
-				}
-				this.npc[category].push(action);
-				this.$forceUpdate();
-			},
+		/**
+		 * Add a new roll object to an action or legendary action
+		 *
+		 * @param {Integer} ability_index index of the ability
+		 * @param {string} category actions / legendary_actions
+		 * @param {Integer} action_index index of the action
+		 * @param {string} action full action object
+		 */
+		newRoll(ability_index, ability, category, action_index, action) {
+			// We need some information about the action the roll is stored under
+			this.edit_action = {
+				category,
+				ability_index,
+				action_index,
+				type: action.type,
+				versatile: {
+					versatile: ability.versatile,
+					versatile_one: ability.versatile_one,
+					versatile_two: ability.versatile_two,
+				},
+			};
+			this.edit_roll_index = undefined; // It's new, so no edit index
+			this.roll = {}; // Create an empty new roll
+			this.action_dialog = true;
+		},
 
-			/**
-			 * Remove an action
-			 *
-			 * @param {integer} index index of the action
-			 * @param {string} category actions / lengedary_actions / special_abilities
-			 */
-			remove(index, category) {
-				this.$delete(this.npc[category], index);
-				this.$forceUpdate();
-			},
+		/**
+		 * Edit a roll object of an action or legendary action
+		 *
+		 * @param {integer} ability_index index of the ability
+		 * @param {string} category actions / legendary_actions
+		 * @param {integer} action_index index of the action
+		 * @param {string} type type of the action 'melee_weapon' etc.
+		 * @param {index} roll_index of the roll
+		 * @param {object} roll the object to edit
+		 */
+		editRoll(roll, ability_index, ability, category, action_index, action) {
+			// We need some information about the action the roll is stored under
+			this.edit_action = {
+				category,
+				ability_index,
+				action_index,
+				type: action.type,
+				versatile: {
+					versatile: ability.versatile,
+					versatile_one: ability.versatile_one,
+					versatile_two: ability.versatile_two,
+				},
+			};
+			this.edit_roll_index = roll.roll_index;
+			this.roll = { ...roll.roll };
+			this.action_dialog = true;
+		},
+		saveRoll() {
+			const ability = this.npc[this.edit_action.category][this.edit_action.ability_index];
+			let action = ability.action_list[this.edit_action.action_index];
 
-			/**
-			 * Add a new roll object to an action or legendary action
-			 *
-			 * @param {Integer} ability_index index of the ability
-			 * @param {string} category actions / legendary_actions
-			 * @param {Integer} action_index index of the action
-			 * @param {string} action full action object
-			 */
-			newRoll(ability_index, ability, category, action_index, action) {
-				// We need some information about the action the roll is stored under
-				this.edit_action = {
-					category,
-					ability_index,
-					action_index,
-					type: action.type,
-					versatile: {
-						versatile: ability.versatile,
-						versatile_one: ability.versatile_one,
-						versatile_two: ability.versatile_two
-					}
-				}
-				this.edit_roll_index = undefined; // It's new, so no edit index
-				this.roll = {}; // Create an empty new roll
-				this.action_dialog = true;
-			},
-
-			/**
-			 * Edit a roll object of an action or legendary action
-			 *
-			 * @param {integer} ability_index index of the ability
-			 * @param {string} category actions / legendary_actions
-			 * @param {integer} action_index index of the action
-			 * @param {string} type type of the action 'melee_weapon' etc.
-			 * @param {index} roll_index of the roll
-			 * @param {object} roll the object to edit
-			 */
-			editRoll(ability_index, ability, category, action_index, action, roll_index, roll) {
-				// We need some information about the action the roll is stored under
-				this.edit_action = {
-					category,
-					ability_index,
-					action_index,
-					type: action.type,
-					versatile: {
-						versatile: ability.versatile,
-						versatile_one: ability.versatile_one,
-						versatile_two: ability.versatile_two
-					}
-				}
-				this.edit_roll_index = roll_index;
-				this.roll = {...roll};
-				this.action_dialog = true;
-			},
-			saveRoll() {
-				const ability = this.npc[this.edit_action.category][this.edit_action.ability_index];
-				let action = ability.action_list[this.edit_action.action_index];
-
-				if(this.edit_roll_index === undefined) {
-					action.rolls = (!action.rolls) ? [] : action.rolls;
-					action.rolls.push(this.roll);
-				} else {
-					this.$set(action.rolls, this.edit_roll_index, this.roll);
-				}
-				this.action_dialog = false;
-			},
-			deleteRoll(ability_index, category, action_index, roll_index) {
-				this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
-				this.$forceUpdate();
-			},
-			versatileRoll(roll) {
-				if(!roll.versatile_dice_count && !roll.versatile_dice_type && !roll.versatile_fixed_val) {
-					return undefined;
-				} else {
-					let returnRoll = {};
-
-					returnRoll.dice_count = (roll.versatile_dice_count) ? roll.versatile_dice_count : roll.dice_count;
-					returnRoll.dice_type = (roll.versatile_dice_type) ? roll.versatile_dice_type : roll.dice_type;
-					returnRoll.fixed_val = (roll.versatile_fixed_val) ? roll.versatile_fixed_val : roll.fixed_val;
-
-					let fixed;
-					if(returnRoll.fixed_val !== undefined) {
-						fixed = (returnRoll.fixed_val < 0) ? ` - ${Math.abs(returnRoll.fixed_val)}` : ` + ${returnRoll.fixed_val}`;
-					}
-
-					return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`
-				}
-			},
-			calcAverage(dice_type=0, dice_count=0, modifier=0) {
-				return (dice_type)
-					? Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier)
-					: parseInt(modifier);
-			},
-			rollAbility(e, action, versatile) {
-				const config = {
-					type: "monster_action",
-					versatile
-				}
-				this.setActionRoll(this.rollAction(e, action, config));
-			},
-	  getVersatile(ability, i) {
-		return ability[`versatile_${i ? 'two' : 'one'}`] || `Option ${i + 1}`;
-	  },
-		}
-	}
+			if (this.edit_roll_index === undefined) {
+				action.rolls = !action.rolls ? [] : action.rolls;
+				action.rolls.push(this.roll);
+			} else {
+				this.$set(action.rolls, this.edit_roll_index, this.roll);
+			}
+			this.action_dialog = false;
+		},
+		deleteRoll(roll_index, ability_index, category, action_index) {
+			this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
+			this.$forceUpdate();
+		},
+		rollAbility(e, action, versatile) {
+			const config = {
+				type: "monster_action",
+				versatile,
+			};
+			this.setActionRoll(this.rollAction(e, action, config));
+		},
+		getVersatile(ability, i) {
+			return ability[`versatile_${i ? "two" : "one"}`] || `Option ${i + 1}`;
+		},
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	label.group {
-		display: block;
-		line-height: 30px;
-		margin-bottom: 10px;
-		border-bottom: solid 1px $neutral-5;
+label.group {
+	display: block;
+	line-height: 30px;
+	margin-bottom: 10px;
+	border-bottom: solid 1px $neutral-5;
+	width: 100%;
+}
+h3 {
+	border-bottom: solid 1px $neutral-4;
+	font-size: 15px;
+	margin-bottom: 1px;
+}
+.accordion {
+	margin-bottom: 20px;
+}
+.hk-card {
+	&.rolls {
+		margin-bottom: 0;
+
+		.card-header {
+			padding: 12px 10px;
+			margin-bottom: 1px;
+		}
+		.roll {
+			cursor: default;
+
+			span:hover {
+				color: $neutral-2;
+			}
+		}
+	}
+}
+.limit {
+	.q-field,
+	> span {
 		width: 100%;
 	}
-	h3 {
-		border-bottom: solid 1px $neutral-4;
-		font-size: 15px;
-		margin-bottom: 1px;
+	.limit-type {
+		width: 150px;
+		margin-left: 1px;
 	}
-	.accordion {
-		margin-bottom: 20px;
+}
+.range {
+	.q-field {
+		width: 50%;
 	}
-	.hk-card {
-		&.rolls {
-			margin-bottom: 0;
-
-			.card-header {
-				padding: 12px 10px;
-				margin-bottom: 1px;
-			}
-			.roll {
-				cursor: default;
-
-				span:hover {
-					color: $neutral-2;
-				}
-			}
-		}
+	.reach {
+		width: calc(50% - 1px);
+		margin-right: 1px;
 	}
-	.limit {
-		.q-field, > span {
-			width: 100%;
-		}
-		.limit-type {
-			width: 150px;
-			margin-left: 1px;
-		}
-	}
-	.range {
-		.q-field {
-			width: 50%;
-		}
-		.reach {
-			width: calc(50% - 1px);
-			margin-right: 1px;
-		}
-	}
-	.roll-button {
-		display: inline-block;
-		cursor: pointer;
-		background-image: url('../../assets/_img/logo/logo-icon-no-shield-cyan.svg');
-		height: 20px;
-		width: 20px;
-		background-position: center;
-		background-size: cover;
-		vertical-align: -5px;
-		user-select: none;
-	}
-	.advantage .roll-button:hover {
-		background-image: url('../../assets/_img/logo/logo-icon-no-shield-green.svg');
-	}
-	.disadvantage .roll-button:hover {
-		background-image: url('../../assets/_img/logo/logo-icon-no-shield-red.svg');
-	}
+}
+.roll-button {
+	display: inline-block;
+	cursor: pointer;
+	background-image: url("../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+	height: 20px;
+	width: 20px;
+	background-position: center;
+	background-size: cover;
+	vertical-align: -5px;
+	user-select: none;
+}
+.advantage .roll-button:hover {
+	background-image: url("../../assets/_img/logo/logo-icon-no-shield-green.svg");
+}
+.disadvantage .roll-button:hover {
+	background-image: url("../../assets/_img/logo/logo-icon-no-shield-red.svg");
+}
 </style>

@@ -64,17 +64,6 @@ export const spell_duration_times = Object.freeze([
 	{ label: "Day", value: "day" },
 ]);
 
-export const aoe_types = Object.freeze([
-	{ label: "None", value: "none" },
-	{ label: "Cone", value: "cone" },
-	{ label: "Cube", value: "cube" },
-	{ label: "Cylinder", value: "cylinder" },
-	{ label: "Line", value: "line" },
-	{ label: "Sphere", value: "sphere" },
-	{ label: "Square", value: "square" },
-	{ label: "Square Feet", value: "square feet" },
-]);
-
 export const level_scaling = Object.freeze([
 	{ label: "None", value: "none" },
 	{ label: "Character Level", value: "character_level" },
@@ -91,6 +80,5 @@ export default {
 	spell_duration_types,
 	spell_duration_types_time,
 	spell_duration_times,
-	aoe_types,
 	level_scaling,
 };

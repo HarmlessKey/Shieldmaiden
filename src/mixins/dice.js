@@ -100,7 +100,10 @@ export const dice = {
 			const roll = {
 				title,
 				roll: showRoll,
+				n,
 				d,
+				s,
+				m,
 				mod: s + m,
 				throws: throws,
 				throwsTotal: sumThrows,
@@ -252,8 +255,7 @@ export const dice = {
 				for (let modifier of action.rolls) {
 					let damage_type = modifier.damage_type;
 					let dice_type = modifier.dice_type;
-					let dice_count =
-						crit && !this.critSettings ? modifier.dice_count * 2 : modifier.dice_count;
+					let dice_count = modifier.dice_count;
 					let fixed_val = modifier.fixed_val ? modifier.fixed_val : 0;
 					let modifierRoll = undefined;
 					let scaledRoll = undefined;
@@ -278,6 +280,7 @@ export const dice = {
 						fixed_val = modifier.versatile_fixed_val ? modifier.versatile_fixed_val : fixed_val;
 						magical = modifier.versatile_magical;
 					}
+					dice_count = this.getDiceCount(crit, dice_count);
 
 					// Check if the action scales with the current roll
 					let tiers = modifier.level_tiers;
@@ -292,9 +295,7 @@ export const dice = {
 
 						// Roll the scaledModifier
 						if (scaledModifier) {
-							// Double the dice count when it's a crit and crit settings are set to roll twice
-							if (crit && !this.critSettings)
-								scaledModifier.dice_count = scaledModifier.dice_count * 2;
+							scaledModifier.dice_count = this.getDiceCount(crit, scaledModifier.dice_count);
 							if (scaledModifier.dice_type && scaledModifier.dice_count)
 								scaledRoll = this.rollD(
 									e.e,
@@ -337,11 +338,19 @@ export const dice = {
 							};
 					}
 
-					// Double the rolled damage (without the modifier [trhowsTotal])
+					// Double the rolled damage (without the modifier [throwsTotal])
 					// simply add [trhowsTotal] once more to the [total]
-					// Only when it's a crit and crit settings are set to doulbe
-					if (crit && this.critSettings) {
+					// Only when it's a crit and crit settings are set to double
+					if (crit && this.critSettings === "double") {
 						modifierRoll.total = modifierRoll.total + modifierRoll.throwsTotal;
+						const { n, d, m, s } = modifierRoll;
+						modifierRoll.roll = m !== 0 ? `2x(${n}d${d})${s}${m}` : `2x(${n}d${d})`;
+					}
+					// Add the max damage output of the roll to the total when crit and setting is max
+					if (crit && this.critSettings === "max") {
+						const { n, d, m, s } = modifierRoll;
+						modifierRoll.total = modifierRoll.total + n * d;
+						modifierRoll.roll = m !== 0 ? `(${n}d${d}+${n * d})${s}${m}` : `(${n}d${d}+${n * d}) `;
 					}
 
 					// Push the rolled modifier to the array with all rolled modifiers
@@ -418,6 +427,14 @@ export const dice = {
 		},
 		calcAverage(value, amount = 1) {
 			return Math.ceil(((value + 1) / 2) * amount);
+		},
+		getDiceCount(crit, dice_count) {
+			// Crit and setting is roll damage twice
+			if (crit && this.critSettings === undefined) {
+				return dice_count * 2;
+			}
+
+			return dice_count;
 		},
 	},
 };

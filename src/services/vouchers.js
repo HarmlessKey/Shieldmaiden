@@ -54,7 +54,6 @@ export class voucherService {
 	}
 
 	static async getVoucherTiers() {
-		const all_tiers = (await TIERS_REF.once("value")).val();
-		return all_tiers;
+		return (await TIERS_REF.once("value")).val();
 	}
 }

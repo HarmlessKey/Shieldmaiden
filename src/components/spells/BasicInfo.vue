@@ -2,8 +2,11 @@
 	<hk-card>
 		<div slot="header" class="card-header d-flex justify-content-between">
 			<span>Basic Info</span>
-			<a @click="setSlide({ show: true, type: 'ViewSpell', data: spell })">
-				<i aria-hidden="true" class="fas fa-eye"></i>
+			<a
+				class="btn btn-sm bg-neutral-5"
+				@click="setSlide({ show: true, type: 'ViewSpell', data: spell })"
+			>
+				<i aria-hidden="true" class="fas fa-eye" />
 			</a>
 		</div>
 
@@ -20,7 +23,7 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="Name"
+							label="Name *"
 							v-model="spell.name"
 							class="mb-2"
 							maxlength="101"
@@ -40,7 +43,7 @@
 							square
 							emit-value
 							map-options
-							label="Level"
+							label="Level *"
 							:options="spell_levels"
 							v-model="spell.level"
 							class="mb-2"
@@ -64,7 +67,7 @@
 							emit-value
 							map-options
 							:options="spell_schools"
-							label="School"
+							label="School *"
 							v-model="spell.school"
 							class="mb-2"
 							:error="invalid && validated"
@@ -86,8 +89,8 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="Cast time"
-							v-model="spell.cast_time_nr"
+							label="Cast time *"
+							v-model="spell.cast_time"
 							autocomplete="off"
 							class="mb-2"
 							type="number"
@@ -110,7 +113,7 @@
 							square
 							emit-value
 							map-options
-							label="Cast type"
+							label="Cast type *"
 							:options="spell_cast_time_types"
 							v-model="spell.cast_time_type"
 							class="mb-2"
@@ -210,7 +213,7 @@
 				<!-- RANGE -->
 				<div class="col-12 col-md-4">
 					<ValidationProvider
-						rules="required|between:1,999"
+						rules="required|between:0,999"
 						name="Range"
 						v-slot="{ errors, invalid, validated }"
 					>
@@ -259,7 +262,7 @@
 							square
 							emit-value
 							map-options
-							label="Duration type"
+							label="Duration type *"
 							:options="spell_duration_types"
 							v-model="spell.duration_type"
 							class="mb-2"
@@ -280,8 +283,8 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="Duration #"
-							v-model="spell.duration_n"
+							label="Duration *"
+							v-model="spell.duration"
 							:disable="!spell_duration_types_time.includes(spell.duration_type)"
 							autocomplete="off"
 							class="mb-2"
@@ -296,7 +299,7 @@
 				<div class="col-12 col-md-4">
 					<ValidationProvider
 						rules="required"
-						name="Time scale"
+						name="Time scale *"
 						v-slot="{ errors, invalid, validated }"
 					>
 						<q-select
@@ -330,7 +333,7 @@
 							square
 							emit-value
 							map-options
-							label="AOE type"
+							label="AOE type *"
 							:options="aoe_types"
 							v-model="spell.aoe_type"
 							class="mb-2"
@@ -341,7 +344,7 @@
 				</div>
 				<div class="col-12 col-md-6">
 					<ValidationProvider
-						rules="required"
+						rules="required|between:1,999"
 						name="AOE size"
 						v-slot="{ errors, invalid, validated }"
 					>
@@ -475,21 +478,26 @@
 </template>
 
 <script>
-// import VueMarkdown from 'vue-markdown';
 import { mapActions } from "vuex";
-import { spells } from "src/mixins/spells";
+import spell_constants from "src/utils/spellConstants";
 
 export default {
 	name: "spells-BasicInfo",
 	props: {
 		value: Object,
 	},
-	mixins: [spells],
-	components: {
-		// VueMarkdown
-	},
 	data() {
 		return {
+			spell_levels: spell_constants.spell_levels,
+			spell_components: spell_constants.spell_components,
+			spell_schools: spell_constants.spell_schools,
+			spell_cast_time_types: spell_constants.spell_cast_time_types,
+			spell_range_types: spell_constants.spell_range_types,
+			spell_duration_types: spell_constants.spell_duration_types,
+			spell_duration_types_time: spell_constants.spell_duration_types_time,
+			spell_duration_times: spell_constants.spell_duration_times,
+			aoe_types: spell_constants.aoe_types,
+			level_scaling: spell_constants.level_scaling,
 			classes: [
 				{ label: "Bard", value: "bard" },
 				{ label: "Barbarian", value: "barbarian" },
@@ -528,8 +536,6 @@ export default {
 			},
 		},
 	},
-	// watch: {
-	// },
 };
 </script>
 

@@ -1098,6 +1098,79 @@
 			".indexOn": ["metadata/tagged", "name"]
 		},
 		"new_spells": {
+			"$spellId": {
+				".validate": "newData.hasChildren(['name', 'level', 'school', 'cast_time', 'cast_time_type', 'range_type', 'range', 'duration_type', 'duration', 'duration_scale', 'aoe_type', 'level_scaling'])",
+				"harmless_key": {
+					".validate": "newData.isString() && newData.val().length <= 100"
+				},
+				"name": {
+					".validate": "newData.isString() && newData.val().length <= 100"
+				},
+				"source": {
+					".validate": "newData.isString() && newData.val().length <= 30"
+				},
+				"level": {
+					".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9"
+				},
+				"school": {
+					".validate": "newData.isString() && newData.val().matches(/^(abjuration|conjuration|divination|enchantment|evocation|illusion|necromancy|transmutation)$/i)"
+				},
+				"cast_time": {
+					".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+				},
+				"cast_time_type": {
+					".validate": "newData.isString() && newData.val().matches(/^(action|bonus_action|reaction|minute|hour|no_action|special)$/i)"
+				},
+				"cast_time_react_desc": {
+					".validate": "newData.isString() && newData.val().length <= 200"
+				},
+				"components": {
+					"$componentIndex": {
+						".validate": "newData.isString() && newData.val().matches(/^(verbal|somatic|material)$/i)"
+					}
+				},
+				"material_description": {
+					".validate": "newData.isString() && newData.val().length <= 500"
+				},
+				"range_type": {
+					".validate": "newData.isString() && newData.val().matches(/^(self|touch|ranged|sight|unlimited)$/i)"
+				},
+				"range": {
+					".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+				},
+				"classes": {
+					"$classIndex": {
+						".validate": "newData.isString() && newData.val().matches(/^(bard|barbarian|cleric|druid|fighter|monk|paladin|ranger|rogue|sorcerer|warlock|wizard)$/i)"
+					}
+				},
+				"duration_type": {
+					".validate": "newData.isString() && newData.val().matches(/^(concentration|instantaneous|special|time|until_dispelled|until_dispelled_or_triggered)$/i)"
+				},
+				"duration": {
+					".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+				},
+				"duration_scale": {
+					".validate": "newData.isString() && newData.val().matches(/^(round|minute|hour|day)$/i)"
+				},
+				"aoe_type": {
+					".validate": "newData.isString() && newData.val().matches(/^(none|cone|cube|cylinder|line|sphere|square|square feet)$/i)"
+				},
+				"aoe_size": {
+					".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+				},
+				"ritual": {
+					".validate": "newData.isBoolean()"
+				},
+				"level_scaling": {
+					".validate": "newData.isString() && newData.val().matches(/^(none|character_level|spell_scale|spell_level)$/i)"
+				},
+				"description": {
+					".validate": "newData.isString() && newData.val().length <= 5000"
+				},
+				"higher_level": {
+					".validate": "newData.isString() && newData.val().length <= 1000"
+				}
+			},
 			".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
 			".read": true,
 			".indexOn": ["metadata/tagged", "metadata/finished"]
@@ -1123,13 +1196,13 @@
 			}
 		},
 		"vouchers": {
-			".read": true,
-			".write": "root.child('users').child(auth.uid).child('admin').exists()",
 			"$voucherId": {
-				"count": {
+				"times_used": {
 					".write": true
 				}
-			}
+			},
+			".read": true,
+			".write": "root.child('users').child(auth.uid).child('admin').exists()"
 		},
 		"voucher_history": {
 			"$uid": {

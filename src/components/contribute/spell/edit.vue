@@ -1,9 +1,5 @@
 <template>
 	<div class="content">
-		<h2 class="spellTitle d-flex justify-content-between" v-if="old_spell">
-			{{ old_spell.name }}
-		</h2>
-
 		<div class="spell-wrapper" v-if="canEdit()">
 			<template v-if="old_spell">
 				<div class="row q-col-gutter-md">
@@ -11,74 +7,25 @@
 						<hk-card header="Old Spell Description" v-if="loading">
 							<hk-loader name="old spell" />
 						</hk-card>
-						<hk-card class="old_spell" v-else>
-							<div class="card-header d-flex justify-content-between" slot="header">
-								<a @click="preview('old')" :class="preview_spell == 'old' ? 'selected' : ''"
-									>Old Spell Description</a
+						<hk-card v-else class="old_spell">
+							<div slot="header" class="card-header">
+								{{ old_spell.name }}
+								<a
+									v-if="old_spell.name"
+									class="btn btn-sm bg-neutral-5"
+									:href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`"
+									target="_blank"
+									rel="noopener"
 								>
-								<a @click="preview('new')" :class="preview_spell == 'new' ? 'selected' : ''"
-									>New Spell Description</a
-								>
+									<i class="fas fa-external-link" aria-hidden="true" />
+								</a>
 							</div>
-							<div v-if="preview_spell == 'old'">
+							<div class="card-body">
 								<a class="btn btn-block mb-3" @click="parse_old_spell()">
 									<i aria-hidden="true" class="fas fa-wand-magic"></i>
 									<span class="d-none d-md-inline ml-1">Parse to new spell</span>
 								</a>
-
-								<h1 class="spellTitle">
-									<a
-										v-if="old_spell.name"
-										:href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`"
-										target="_blank"
-										rel="noopener"
-										>{{ old_spell.name }}</a
-									>
-								</h1>
-								<i aria-hidden="true" class="mb-3 d-block" v-if="old_spell.school">
-									{{ spell_levels[old_spell.level] }}
-									{{ old_spell.school.name }}
-								</i>
-
-								<p>
-									<strong>Casting time:</strong> {{ old_spell.casting_time }}<br />
-									<strong>Range:</strong> {{ old_spell.range }}<br />
-									<strong>Components:</strong>
-									<template v-for="(component, index) in old_spell.components">
-										{{ component
-										}}<template v-if="Object.keys(old_spell.components).length > index + 1"
-											>,
-										</template>
-									</template>
-									<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
-									<br />
-									<strong>Duration:</strong>
-									<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
-									{{ old_spell.duration }}<br />
-									<strong>Classes:</strong>
-									<template v-for="(_class, index) in old_spell.classes">
-										{{ _class.name
-										}}<template v-if="Object.keys(old_spell.classes).length > index + 1"
-											>,
-										</template>
-									</template>
-									<br />
-								</p>
-								<p v-for="(desc, index) in old_spell.desc" :key="index">
-									{{ desc }}
-								</p>
-
-								<p v-if="old_spell.higher_level">
-									At higher levels.
-									<template v-for="higher in old_spell.higher_level">
-										{{ higher }}
-									</template>
-								</p>
-							</div>
-							<!-- card-body -->
-							<!-- New spell preview active -->
-							<div v-else>
-								<!-- <ViewSpell :data="spell" :no_roll="true" /> -->
+								<ViewSpell :data="old_spell" :id="id" />
 							</div>
 						</hk-card>
 					</div>
@@ -95,17 +42,17 @@
 <script>
 import { db } from "src/firebase";
 import EditSpell from "src/views/userContent/Spells/EditSpell";
-// import ViewSpell from "./ViewSpell.vue";
 import { general } from "src/mixins/general";
-import { spells } from "src/mixins/spells";
 import { mapGetters } from "vuex";
+import ViewSpell from "src/components/compendium/Spell";
 
 export default {
 	name: "ContribSpellEdit",
 	components: {
 		EditSpell,
+		ViewSpell,
 	},
-	mixins: [general, spells],
+	mixins: [general],
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
@@ -114,7 +61,6 @@ export default {
 			validators: {},
 			unsaved_changes: false,
 			fb_spell_json: {},
-			preview_spell: "old",
 		};
 	},
 	computed: {
@@ -138,9 +84,6 @@ export default {
 		},
 		setUnsaved(value) {
 			this.unsaved_changes = value;
-		},
-		preview(type) {
-			this.preview_spell = type;
 		},
 		parse_old_spell() {
 			const spell = {};

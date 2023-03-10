@@ -6,7 +6,7 @@
 // Configuration for your app
 // https://v1.quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-env node */
-const ESLintPlugin = require('eslint-webpack-plugin');
+const ESLintPlugin = require("eslint-webpack-plugin");
 
 module.exports = function (/* ctx */) {
 	return {
@@ -20,16 +20,16 @@ module.exports = function (/* ctx */) {
 		// --> boot files are part of "main.js"
 		// https://v1.quasar.dev/quasar-cli/boot-files
 		boot: [
-			{ path: 'plugins', server: false },
-			{ path: 'hk-components', server: false },
-			{ path: 'vee-validate', server: false },
-			{ path: 'firebase-auth', server: false },
-			{ path: 'vue-shortkey', server: false },
-			{ path: 'vue-snotify', server: false },
+			{ path: "plugins", server: false },
+			{ path: "hk-components", server: false },
+			{ path: "vee-validate", server: false },
+			{ path: "firebase-auth", server: false },
+			{ path: "vue-shortkey", server: false },
+			{ path: "vue-snotify", server: false },
 		],
 
 		// https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-		css: ['styles.scss'],
+		css: ["styles.scss"],
 
 		// https://github.com/quasarframework/quasar/tree/dev/extras
 		extras: [
@@ -41,24 +41,27 @@ module.exports = function (/* ctx */) {
 			// 'line-awesome',
 			// 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
-			'roboto-font', // optional, you are not bound to it
-			'material-icons', // optional, you are not bound to it
+			"roboto-font", // optional, you are not bound to it
+			"material-icons", // optional, you are not bound to it
 		],
 
 		// Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
 		build: {
-			vueRouterMode: 'history', // available values: 'hash', 'history'
-			env: require('dotenv').config({ path: `.env.${process.env.NODE_ENV}.local` }).parsed,
+			vueRouterMode: "history", // available values: 'hash', 'history'
+			env: require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` }).parsed,
 			scssLoaderOptions: {
 				additionalData: '@import "src/css/variables.scss";',
 			},
 			vueCompiler: true,
 			transpile: true,
 
+			// debugger
+			devtool: "source-map",
+
 			// Add dependencies for transpiling with Babel (Array of string/regex)
 			// (from node_modules, which are by default not transpiled).
 			// Applies only if "transpile" is set to true.
-			transpileDependencies: ['vee-validate/dist/rules', 'vue-numeral-filter'],
+			transpileDependencies: ["vee-validate/dist/rules", "vue-numeral-filter"],
 
 			// rtl: false, // https://v1.quasar.dev/options/rtl-support
 			// preloadChunks: true,
@@ -72,7 +75,7 @@ module.exports = function (/* ctx */) {
 			// https://v1.quasar.dev/quasar-cli/handling-webpack
 			// "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
 			chainWebpack(chain) {
-				chain.plugin('eslint-webpack-plugin').use(ESLintPlugin, [{ extensions: ['js', 'vue'] }]);
+				chain.plugin("eslint-webpack-plugin").use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
 			},
 		},
 
@@ -85,14 +88,14 @@ module.exports = function (/* ctx */) {
 
 		// https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
 		framework: {
-			iconSet: 'material-icons', // Quasar icon set
-			lang: 'en-us', // Quasar language pack
+			iconSet: "material-icons", // Quasar icon set
+			lang: "en-us", // Quasar language pack
 			config: {},
 
 			// Possible values for "importStrategy":
 			// * 'auto' - (DEFAULT) Auto-import needed Quasar components & directives
 			// * 'all'  - Manually specify what to import
-			importStrategy: 'auto',
+			importStrategy: "auto",
 
 			// For special cases outside of where "auto" importStrategy can have an impact
 			// (like functional components as one of the examples),
@@ -102,7 +105,7 @@ module.exports = function (/* ctx */) {
 			// directives: [],
 
 			// Quasar plugins
-			plugins: ['AppFullscreen', 'Notify', 'Cookies', 'Meta'],
+			plugins: ["AppFullscreen", "Notify", "Cookies", "Meta"],
 		},
 
 		// animations: 'all', // --- includes all animations
@@ -116,108 +119,108 @@ module.exports = function (/* ctx */) {
 
 		// https://v1.quasar.dev/quasar-cli/developing-pwa/configuring-pwa
 		pwa: {
-			workboxPluginMode: 'GenerateSW',
+			workboxPluginMode: "GenerateSW",
 			workboxOptions: {
 				skipWaiting: true,
 				clientsClaim: true,
 			},
 			manifest: {
-				name: 'Harmless Key',
-				short_name: 'Harmless Key',
-				start_url: '.',
+				name: "Harmless Key",
+				short_name: "Harmless Key",
+				start_url: ".",
 				description:
-					'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.',
-				orientation: 'portrait',
-				theme_color: '#191a1c',
-				background_color: '#191a1c',
-				display: 'standalone',
-				categories: ['games', 'entertainment'],
+					"Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+				orientation: "portrait",
+				theme_color: "#191a1c",
+				background_color: "#191a1c",
+				display: "standalone",
+				categories: ["games", "entertainment"],
 				icons: [
 					{
-						src: 'img/icons/transparent-512x512.png',
-						sizes: '512x512',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/transparent-512x512.png",
+						sizes: "512x512",
+						type: "image/png",
+						purpose: "any",
 					},
 					{
-						src: 'img/icons/maskable-512x512.png',
-						sizes: '512x512',
-						type: 'image/png',
-						purpose: 'maskable',
+						src: "img/icons/maskable-512x512.png",
+						sizes: "512x512",
+						type: "image/png",
+						purpose: "maskable",
 					},
 					{
-						src: 'img/icons/transparent-192x192.png',
-						sizes: '192x192',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/transparent-192x192.png",
+						sizes: "192x192",
+						type: "image/png",
+						purpose: "any",
 					},
 					{
-						src: 'img/icons/maskable-192x192.png',
-						sizes: '192x192',
-						type: 'image/png',
-						purpose: 'maskable',
+						src: "img/icons/maskable-192x192.png",
+						sizes: "192x192",
+						type: "image/png",
+						purpose: "maskable",
 					},
 					{
-						src: 'img/icons/ms/app-icon-44x44.png',
-						sizes: '44x44',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/ms/app-icon-44x44.png",
+						sizes: "44x44",
+						type: "image/png",
+						purpose: "any",
 					},
 					{
-						src: 'img/icons/ms/small-tile-71x71.png',
-						sizes: '71x71',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/ms/small-tile-71x71.png",
+						sizes: "71x71",
+						type: "image/png",
+						purpose: "any",
 					},
 					{
-						src: 'img/icons/ms/wide-tile-350x150.png',
-						sizes: '350x150',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/ms/wide-tile-350x150.png",
+						sizes: "350x150",
+						type: "image/png",
+						purpose: "any",
 					},
 					{
-						src: 'img/icons/ms/large-tile-310x310.png',
-						sizes: '310x310',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/ms/large-tile-310x310.png",
+						sizes: "310x310",
+						type: "image/png",
+						purpose: "any",
 					},
 					{
-						src: 'img/icons/ms/store-logo-50x50.png',
-						sizes: '50x50',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/ms/store-logo-50x50.png",
+						sizes: "50x50",
+						type: "image/png",
+						purpose: "any",
 					},
 					{
-						src: 'img/icons/ms/splash-screen-620x300.png',
-						sizes: '620x300',
-						type: 'image/png',
-						purpose: 'any',
+						src: "img/icons/ms/splash-screen-620x300.png",
+						sizes: "620x300",
+						type: "image/png",
+						purpose: "any",
 					},
 				],
 				shortcuts: [
 					{
-						name: 'Campaigns',
-						description: 'The campaigns you are running.',
-						url: '/content/campaigns',
+						name: "Campaigns",
+						description: "The campaigns you are running.",
+						url: "/content/campaigns",
 						icons: [
 							{
-								src: '/img/icons/shortcuts/campaigns-512x512.png',
-								sizes: '512x512',
-								type: 'image/png',
-								purpose: 'any',
+								src: "/img/icons/shortcuts/campaigns-512x512.png",
+								sizes: "512x512",
+								type: "image/png",
+								purpose: "any",
 							},
 						],
 					},
 					{
-						name: 'Characters',
-						description: 'Your player characters.',
-						url: '/content/characters',
+						name: "Characters",
+						description: "Your player characters.",
+						url: "/content/characters",
 						icons: [
 							{
-								src: '/img/icons/shortcuts/characters-512x512.png',
-								sizes: '512x512',
-								type: 'image/png',
-								purpose: 'any',
+								src: "/img/icons/shortcuts/characters-512x512.png",
+								sizes: "512x512",
+								type: "image/png",
+								purpose: "any",
 							},
 						],
 					},
@@ -237,7 +240,7 @@ module.exports = function (/* ctx */) {
 
 		// Full list of options: https://v1.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
 		electron: {
-			bundler: 'packager', // 'packager' or 'builder'
+			bundler: "packager", // 'packager' or 'builder'
 
 			packager: {
 				// https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
@@ -253,7 +256,7 @@ module.exports = function (/* ctx */) {
 			builder: {
 				// https://www.electron.build/configuration/configuration
 
-				appId: 'hkq',
+				appId: "hkq",
 			},
 
 			// More info: https://v1.quasar.dev/quasar-cli/developing-electron-apps/node-integration

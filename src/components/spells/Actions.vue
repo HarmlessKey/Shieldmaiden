@@ -23,9 +23,27 @@
 					v-for="(action, action_index) in spell.actions"
 					:key="`action-${action_index}`"
 				>
+					<ValidationProvider
+						rules="required|max:100"
+						name="Attack type"
+						v-slot="{ errors, invalid, validated }"
+					>
+						<q-input
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							label="Action name"
+							v-model="action.name"
+							autocomplete="off"
+							class="mb-2"
+							@keyup="$forceUpdate()"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+					</ValidationProvider>
 					<div class="row q-col-gutter-md">
 						<!-- ACTION TYPE -->
-						<div class="col-12 col-md-4">
+						<div class="col-12 col-md-6">
 							<ValidationProvider
 								rules="required"
 								name="Attack type"
@@ -47,29 +65,9 @@
 								/>
 							</ValidationProvider>
 						</div>
-						<!-- ACTION NAME -->
-						<div class="col-12 col-md-4">
-							<ValidationProvider
-								rules="required|max:100"
-								name="Attack type"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									label="Action name"
-									v-model="action.name"
-									autocomplete="off"
-									class="mb-2"
-									@keyup="$forceUpdate()"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
-							</ValidationProvider>
-						</div>
+
 						<!-- SAVE -->
-						<div class="col-12 col-md-4">
+						<div class="col-12 col-md-6">
 							<q-select
 								:dark="$store.getters.theme === 'dark'"
 								filled
@@ -78,7 +76,7 @@
 								emit-value
 								label="Save ability"
 								:options="abilities"
-								v-model="action.save"
+								v-model="action.save_ability"
 								:disable="action.type !== 'save'"
 								class="mb-2"
 								@input="$forceUpdate()"

@@ -278,13 +278,13 @@ export default {
 			});
 		},
 		displaySetting(type, key, value) {
-			let options = this.types[type].type_settings.filter((item) => {
+			let options = this.types[type].type_settings.find((item) => {
 				return item.key === key;
-			})[0].options;
-			const selected = options.filter((item) => {
+			}).options;
+
+			return options.find((item) => {
 				return item.value === value;
-			})[0];
-			return selected;
+			});
 		},
 	},
 };

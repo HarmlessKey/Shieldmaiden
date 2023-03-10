@@ -3,7 +3,7 @@
 		<user-banner />
 		<Tutorial v-if="show_tutorial" />
 		<div class="row q-col-gutter-md">
-			<div class="col-12 col-md-6">
+			<div class="col-12">
 				<!-- Content -->
 				<hk-card header="Your content">
 					<div class="card-body">
@@ -120,18 +120,6 @@
 					<!-- VOUCHER -->
 				</hk-card>
 			</div>
-
-			<!-- PUBLIC INITIATIVE LINK -->
-			<div class="col">
-				<hk-card>
-					<div class="card-header" slot="header">
-						<i aria-hidden="true" class="fas fa-link"></i> Public initiative link
-					</div>
-					<div class="card-body">
-						<PlayerLink />
-					</div>
-				</hk-card>
-			</div>
 		</div>
 
 		<!-- ACTIONS -->
@@ -158,7 +146,6 @@
 </template>
 
 <script>
-import PlayerLink from "src/components/PlayerLink.vue";
 import { auth } from "src/firebase";
 import { general } from "src/mixins/general.js";
 import { mapActions, mapGetters } from "vuex";
@@ -171,7 +158,6 @@ export default {
 	name: "Profile",
 	components: {
 		UserBanner,
-		PlayerLink,
 		Content,
 		Tier,
 		Tutorial,

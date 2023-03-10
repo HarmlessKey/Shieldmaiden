@@ -4,20 +4,6 @@
 		<Tutorial v-if="show_tutorial" />
 		<div class="row q-col-gutter-md">
 			<div class="col-12">
-				<!-- Content -->
-				<hk-card header="Your content">
-					<div class="card-body">
-						<Content />
-						<router-link
-							v-if="tier.name != 'Deity'"
-							class="btn btn-block bg-neutral-5 mt-3"
-							to="/patreon"
-						>
-							Need more slots?
-						</router-link>
-					</div>
-				</hk-card>
-
 				<hk-card header="Your subscription">
 					<div class="card-body">
 						<!-- HAS A SUBSCRIPTION -->
@@ -118,6 +104,19 @@
 						</div>
 					</div>
 					<!-- VOUCHER -->
+				</hk-card>
+				<!-- Content -->
+				<hk-card header="Your content">
+					<div class="card-body">
+						<Content />
+						<router-link
+							v-if="tier.name != 'Deity'"
+							class="btn btn-block bg-neutral-5 mt-3"
+							to="/patreon"
+						>
+							Need more slots?
+						</router-link>
+					</div>
 				</hk-card>
 			</div>
 		</div>

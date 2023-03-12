@@ -85,26 +85,23 @@
 					</div>
 
 					<!-- ROLLS -->
-					<hk-card class="mt-3 rolls">
-						<div slot="header" class="card-header">
-							<span><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span>
-							<a class="btn btn-sm bg-neutral-5" @click="newRoll(action)">
-								<i aria-hidden="true" class="fas fa-plus green"></i>
-								<span class="d-none d-md-inline ml-1">Add</span>
-								<q-tooltip anchor="top middle" self="center middle"> Add roll </q-tooltip>
-							</a>
-						</div>
-						<div v-if="action.rolls" class="card-header">
-							<hk-action-rolls-table
-								:rolls="action.rolls"
-								:level_scaling="spell.scaling"
-								:level="spell.level"
-								:type="action.type"
-								@edit="editRoll($event, action)"
-								@delete="deleteRoll($event, action_index)"
-							/>
-						</div>
-					</hk-card>
+					<div class="d-flex justify-content-between mb-2">
+						<span><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span>
+						<a class="btn btn-sm bg-neutral-5" @click="newRoll(action, action_index)">
+							<i aria-hidden="true" class="fas fa-plus green"></i>
+							<span class="d-none d-md-inline ml-1">Add</span>
+							<q-tooltip anchor="top middle" self="center middle"> Add roll </q-tooltip>
+						</a>
+					</div>
+					<hk-action-rolls-table
+						v-if="action.rolls"
+						:rolls="action.rolls"
+						:scaling="spell.scaling"
+						:level="spell.level"
+						:type="action.type"
+						@edit="editRoll($event, action, action_index)"
+						@delete="deleteRoll($event, action_index)"
+					/>
 				</ValidationObserver>
 			</div>
 		</hk-card>
@@ -115,17 +112,7 @@
 					<q-form @submit="handleSubmit(saveRoll)">
 						<hk-card :header="edit_index !== undefined ? 'Edit roll' : 'New roll'" class="mb-0">
 							<div class="card-body">
-								<p>
-									{{ spell.description }}
-								</p>
-								<hk-action-roll-form
-									v-model="roll"
-									:action_type="action_type"
-									:spell="{
-										level: spell.level,
-										scaling: spell.scaling,
-									}"
-								/>
+								<hk-action-roll-form v-model="roll" :action_type="action_type" :spell="spell" />
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
 								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
@@ -160,6 +147,7 @@ export default {
 			roll_dialog: false,
 			roll: undefined,
 			action_type: undefined,
+			action_index: undefined,
 			edit_index: undefined,
 			abilities: abilities,
 			attack_types: attack_types,
@@ -190,32 +178,39 @@ export default {
 		remove_action(index) {
 			this.$delete(this.spell.actions, index);
 		},
-		newRoll(action) {
+		newRoll(action, action_index) {
 			this.edit_index = undefined; // It's new, so no edit index
+			this.action_index = action_index;
 			this.action_type = action.type;
 			this.roll = {}; // Create an empty new roll
 			this.roll_dialog = true;
 		},
-		editRoll(roll, action) {
+		editRoll(roll, action, action_index) {
 			this.edit_index = roll.roll_index;
+			this.action_index = action_index;
 			this.action_type = action.type;
-			this.roll = this.rolls[index];
+			this.roll = this.spell.actions[action_index].rolls[roll.roll_index];
 			this.roll_dialog = true;
 		},
 		saveRoll() {
 			if (this.edit_index === undefined) {
-				let rolls = !this.rolls ? [] : this.rolls;
+				const rolls = !this.spell.actions[this.action_index].rolls
+					? []
+					: this.spell.actions[this.action_index].rolls;
 				rolls.push(this.roll);
-				this.rolls = rolls;
+				this.$set(this.spell.actions[this.action_index], "rolls", rolls);
 			} else {
-				this.$set(this.rolls, this.edit_index, this.roll);
+				this.$set(this.spell.actions[this.action_index].rolls, this.edit_index, this.roll);
 			}
 			this.roll = {};
+			this.edit_index = undefined;
+			this.action_index = undefined;
 			this.roll_dialog = false;
 		},
 		cancelRoll() {
 			this.roll_dialog = false;
 			this.edit_index = undefined;
+			this.action_index = undefined;
 			this.roll = undefined;
 		},
 		removeRoll(index) {

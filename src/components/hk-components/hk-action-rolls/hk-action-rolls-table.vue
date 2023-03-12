@@ -80,6 +80,18 @@
 			}}
 		</template>
 
+		<!-- SCALING -->
+		<hk-popover
+			v-if="scaling && level && data.row.level_tiers && data.row.level_tiers.length"
+			slot="scaling"
+			slot-scope="data"
+		>
+			<i class="fas fa-chart-line" aria-hidden="true" />
+			<template #content>
+				{{ scalingDesc(data.row.level_tiers, scaling, level) }}
+			</template>
+		</hk-popover>
+
 		<!-- ACTIONS -->
 		<div slot="actions" slot-scope="data" class="actions">
 			<a
@@ -99,6 +111,7 @@
 
 <script>
 import { damage_type_icons } from "src/utils/generalConstants";
+import { spellScalingDescription } from "src/utils/spellFunctions";
 
 export default {
 	name: "HkActionRollsTable",
@@ -113,6 +126,12 @@ export default {
 		versatile: {
 			type: Boolean,
 			default: false,
+		},
+		scaling: {
+			type: String,
+		},
+		level: {
+			type: Number,
 		},
 		versatileOptions: {
 			type: Array,
@@ -134,6 +153,9 @@ export default {
 				},
 				fail: {
 					truncate: true,
+				},
+				scaling: {
+					maxContent: true,
 				},
 				actions: {
 					noPadding: true,
@@ -175,6 +197,9 @@ export default {
 
 				return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`;
 			}
+		},
+		scalingDesc(tiers, scaling, level) {
+			return spellScalingDescription(tiers, scaling, level);
 		},
 	},
 };

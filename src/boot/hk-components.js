@@ -15,8 +15,9 @@ import HkBackgroundSelect from "../components/hk-components/hk-background-select
 import HkMarkdownEditor from "../components/hk-components/hk-markdown-editor";
 import HkXpBar from "../components/hk-components/hk-xp-bar";
 import HkLinkCharacter from "../components/hk-components/hk-link-character";
-import HkActionRollForm from "../components/hk-components/hk-action-roll-form";
-import HkActionRollsTable from "../components/hk-components/hk-action-rolls-table";
+import HkActionRollForm from "../components/hk-components/hk-action-rolls/hk-action-roll-form";
+import HkActionRollsTable from "../components/hk-components/hk-action-rolls/hk-action-rolls-table";
+import HkActionRollScaling from "../components/hk-components/hk-action-rolls/hk-action-roll-scaling";
 
 export default async ({ Vue }) => {
 	Vue.component("hk-table", HkTable);
@@ -38,4 +39,5 @@ export default async ({ Vue }) => {
 	Vue.component("hk-link-character", HkLinkCharacter);
 	Vue.component("hk-action-roll-form", HkActionRollForm);
 	Vue.component("hk-action-rolls-table", HkActionRollsTable);
+	Vue.component("hk-action-roll-scaling", HkActionRollScaling);
 };

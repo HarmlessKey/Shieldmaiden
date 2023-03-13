@@ -1212,6 +1212,27 @@
 										".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
 									}
 								},
+								"scaling": {
+									"$scalingIndex": {
+										".validate": "newData.hasChildren(['level'])",
+										"level": {
+											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+										},
+										"dice_count": {
+											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 25"
+										},
+										"dice_type": {
+											".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+										},
+										"fixed_val": {
+											".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+										},
+										"projectile_count": {
+											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+										},
+										"$other": { ".validate": false }
+									}
+								},
 								"$other": { ".validate": false }
 							}
 						},

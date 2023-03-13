@@ -11,7 +11,7 @@
 			<small class="neutral-2">At higher levels description</small><br />
 			{{ spell.higher_level }}
 		</p>
-		<template v-for="(level_tier, tier_index) in roll.level_tiers">
+		<template v-for="(level_tier, tier_index) in roll.scaling">
 			<div
 				class="d-flex justify-content-between"
 				v-if="tier_index < shown_level_tiers"
@@ -21,14 +21,14 @@
 				<div>
 					<ValidationProvider
 						rules="required"
-						:name="`Scale size ${tier_index}`"
+						:name="`${scaling} ${tier_index}`"
 						v-slot="{ errors, invalid, validated }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="Scale size"
+							:label="scaling"
 							v-model="level_tier.level"
 							autocomplete="off"
 							class="mb-2"
@@ -135,9 +135,9 @@
 				</div>
 			</div>
 		</template>
-		<p v-if="roll.level_tiers && roll.level_tiers.length > 0" class="bg-neutral-7 p-2 mt-3">
-			<small class="neutral-2">Generated description</small><br />
-			{{ scalingDesc(roll.level_tiers, spell.scaling, spell.level) }}
+		<p v-if="roll.scaling && roll.scaling.length > 0" class="bg-neutral-7 p-2 mt-3 desc">
+			<small class="neutral-2">Generated description</small>
+			{{ scalingDesc(roll.scaling, spell.scaling, spell.level) }}
 		</p>
 	</div>
 </template>
@@ -186,19 +186,19 @@ export default {
 		levelTierAddable() {
 			return !(
 				this.spell.scaling === "spell_scale" &&
-				this.roll.level_tiers &&
-				this.roll.level_tiers.length >= 1
+				this.roll.scaling &&
+				this.roll.scaling.length >= 1
 			);
 		},
 		addLevelTier() {
-			if (!this.roll.level_tiers) {
-				this.$set(this.roll, "level_tiers", []);
+			if (!this.roll.scaling) {
+				this.$set(this.roll, "scaling", []);
 			}
-			this.roll.level_tiers.push({});
+			this.roll.scaling.push({});
 			this.$forceUpdate();
 		},
 		removeLevelTier(tier_index) {
-			this.$delete(this.roll.level_tiers, tier_index);
+			this.$delete(this.roll.scaling, tier_index);
 			this.$forceUpdate();
 		},
 		scalingDesc(tiers, scaling, level) {
@@ -207,3 +207,9 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.desc {
+	white-space: pre-line;
+}
+</style>

@@ -156,8 +156,8 @@
 					readonly
 					autogrow
 					:value="
-						roll.level_tiers && roll.level_tiers.length
-							? scalingDesc(roll.level_tiers, spell.scaling, spell.level)
+						roll.scaling && roll.scaling.length
+							? scalingDesc(roll.scaling, spell.scaling, spell.level)
 							: 'No scaling set'
 					"
 				>
@@ -169,7 +169,7 @@
 					>
 						<i
 							class="fas"
-							:class="roll.level_tiers && roll.level_tiers.length ? 'fa-pencil' : 'fa-plus'"
+							:class="roll.scaling && roll.scaling.length ? 'fa-pencil' : 'fa-plus'"
 							aria-hidden="true"
 						/>
 					</button>

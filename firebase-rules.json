@@ -1170,6 +1170,20 @@
 				"higher_level": {
 					".validate": "newData.isString() && newData.val().length <= 1000"
 				},
+				"metadata": {
+					"tagged": {
+						".validate": "newData.isString() && newData.val().length <= 100"
+					},
+					"changed": {
+						".validate": "newData.isBoolean()"
+					},
+					"checked": {
+						".validate": "newData.isBoolean()"
+					},
+					"finished": {
+						".validate": "newData.isBoolean()"
+					}
+				},
 				"actions": {
 					"$actionIndex": {
 						"name": {
@@ -1219,7 +1233,7 @@
 											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
 										},
 										"dice_count": {
-											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 25"
+											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
 										},
 										"dice_type": {
 											".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
@@ -1239,9 +1253,9 @@
 						"$other": { ".validate": false }
 					}
 				},
-				"$other": { ".validate": false }
+				"$other": { ".validate": false },
+				".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('spells').child($spellId).child('metadata').child('tagged').val() === auth.uid"
 			},
-			".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
 			".read": true,
 			".indexOn": ["metadata/tagged", "metadata/finished"]
 		},

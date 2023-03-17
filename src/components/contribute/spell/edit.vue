@@ -97,7 +97,7 @@ export default {
 			spell.school = this.old_spell.school.name.toLowerCase();
 			spell.ritual = this.old_spell.ritual == "yes" ? true : null;
 			spell.level = this.old_spell.level == -1 ? 0 : this.old_spell.level;
-			spell.level_scaling = this.old_spell.higher_level ? undefined : "none";
+			spell.scaling = this.old_spell.higher_level ? null : "none";
 
 			// Parse range options
 			if (parseInt(this.old_spell.range)) {
@@ -116,7 +116,7 @@ export default {
 
 			// Parse casting time
 			let cast_time = this.old_spell.casting_time.split(" ");
-			spell.cast_time_nr = parseInt(cast_time[0]);
+			spell.cast_time = parseInt(cast_time[0]);
 			let cast_type = cast_time[1];
 
 			if (cast_type[cast_type.length - 1] == "s") {
@@ -155,7 +155,7 @@ export default {
 				}
 
 				// Find duration time number and scale
-				spell.duration_n = parseInt(duration_list[0]);
+				spell.duration = parseInt(duration_list[0]);
 				// Calculate time scale
 				let scale = duration_list[1];
 				scale = scale.charAt(0).toUpperCase() + scale.substring(1);

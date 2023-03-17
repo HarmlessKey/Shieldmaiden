@@ -79,6 +79,7 @@ export default {
 		const spell_ref = db.ref(`new_spells/${this.id}`);
 		await spell_ref.once("value", (snapshot) => {
 			this.spell = snapshot.val() || {};
+			this.spell_copy = JSON.stringify(this.spell);
 		});
 		this.loading = false;
 	},
@@ -97,33 +98,32 @@ export default {
 	},
 	methods: {
 		setSpell(spell) {
-			this.spell = spell;
+			this.spell = { ...this.spell, ...spell };
 		},
 		revertChanges() {
 			this.spell = this.spell_copy;
 		},
 		saveSpell() {
-			console.log("Store spell called");
-			delete this.spell[".value"];
-			delete this.spell[".key"];
+			console.log("Store spell called", this.spell);
 
-			this.spell.changed = true;
-			this.spell.checked = false;
+			this.spell.metadata.changed = true;
+			this.spell.metadata.checked = false;
 
-			if (this.spell.cast_time_nr) {
-				parseInt(this.spell.cast_time_nr);
-			}
-			if (this.spell.duration_n) {
-				parseInt(this.spell.duration_n);
-			}
-
-			console.log(this.spell);
-
-			db.ref(`new_spells/${this.id}`).set(this.spell);
-			this.$snotify.success("Spell Saved.", "Critical hit!", {
-				position: "rightTop",
-			});
+			db.ref(`new_spells/${this.id}`)
+				.set(this.spell)
+				.then(() => {
+					this.$snotify.success("Spell Saved.", "Critical hit!", {
+						position: "rightTop",
+					});
+				})
+				.catch((e) => {
+					this.$snotify.error(e, "Save failed!", {
+						position: "rightTop",
+					});
+				});
 			this.spell_copy = JSON.stringify(this.spell);
+			this.unsaved_changes = false;
+			this.$emit("set-unsaved", this.unsaved_changes);
 		},
 	},
 

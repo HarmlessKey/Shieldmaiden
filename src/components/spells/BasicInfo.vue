@@ -432,7 +432,7 @@
 							emit-value
 							map-options
 							:options="level_scaling"
-							label="Spell scaling"
+							label="Spell scaling *"
 							v-model="spell.scaling"
 							class="mb-2"
 							:error="invalid && validated"

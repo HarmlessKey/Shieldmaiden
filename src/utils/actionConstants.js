@@ -4,6 +4,7 @@ export const aoe_types = Object.freeze([
 	{ label: "Cube", value: "cube" },
 	{ label: "Cylinder", value: "cylinder" },
 	{ label: "Line", value: "line" },
+	{ label: "Radius", value: "radius" },
 	{ label: "Sphere", value: "sphere" },
 	{ label: "Square", value: "square" },
 	{ label: "Square Feet", value: "square feet" },

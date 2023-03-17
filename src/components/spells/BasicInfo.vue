@@ -96,6 +96,9 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
+							@input="
+								(value) => $set(spell, 'cast_time', value != undefined ? parseInt(value) : value)
+							"
 						/>
 					</ValidationProvider>
 				</div>
@@ -242,6 +245,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
+							@input="(value) => $set(spell, 'range', value != undefined ? parseInt(value) : value)"
 						>
 							<span slot="append" class="neutral-2">ft.</span>
 						</q-input>
@@ -398,6 +402,9 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
+							@input="
+								(value) => $set(spell, 'aoe_size', value != undefined ? parseInt(value) : value)
+							"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						>

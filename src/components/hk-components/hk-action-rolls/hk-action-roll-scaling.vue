@@ -20,7 +20,7 @@
 				<!-- HL LEVEL SCALE -->
 				<div>
 					<ValidationProvider
-						rules="required"
+						rules="required|between:1,20"
 						:name="`${scaling} ${tier_index}`"
 						v-slot="{ errors, invalid, validated }"
 					>
@@ -33,9 +33,14 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
+							min="1"
+							max="20"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 							@keyup="$forceUpdate()"
+							@input="
+								(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
+							"
 						/>
 					</ValidationProvider>
 
@@ -56,9 +61,15 @@
 									autocomplete="off"
 									class="mb-2"
 									type="number"
+									min="1"
+									max="99"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 									@keyup="$forceUpdate()"
+									@input="
+										(value) =>
+											$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
+									"
 								/>
 							</ValidationProvider>
 						</div>
@@ -100,9 +111,15 @@
 									autocomplete="off"
 									class="mb-2"
 									type="number"
+									min="-99"
+									max="99"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 									@keyup="$forceUpdate()"
+									@input="
+										(value) =>
+											$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
+									"
 								/>
 							</ValidationProvider>
 						</div>

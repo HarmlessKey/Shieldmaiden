@@ -5,7 +5,12 @@
 				{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
 				({{ data.row.dice_count || "" }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
 				<template v-if="data.row.fixed_val && data.row.dice_count">
-					{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`
+					{{ 
+						(data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`
+
+
+
+
 
 					}})
 				</template>
@@ -29,6 +34,16 @@
 				</q-tooltip>
 			</span>
 		</div>
+
+		<!-- SCALING -->
+		<hk-popover
+			v-if="scaling && level !== undefined && data.row.scaling && data.row.scaling.length"
+			slot="scaling"
+			slot-scope="data"
+		>
+			<i class="fas fa-chart-line" aria-hidden="true" />
+			<span slot="content" v-html="scalingDesc(data.row.scaling, scaling, level)" />
+		</hk-popover>
 
 		<span slot="type" slot-scope="data">
 			<span v-if="type === 'healing'" class="healing">
@@ -80,18 +95,6 @@
 			}}
 		</template>
 
-		<!-- SCALING -->
-		<hk-popover
-			v-if="scaling && level && data.row.level_tiers && data.row.level_tiers.length"
-			slot="scaling"
-			slot-scope="data"
-		>
-			<i class="fas fa-chart-line" aria-hidden="true" />
-			<template #content>
-				{{ scalingDesc(data.row.level_tiers, scaling, level) }}
-			</template>
-		</hk-popover>
-
 		<!-- ACTIONS -->
 		<div slot="actions" slot-scope="data" class="actions">
 			<a
@@ -120,15 +123,15 @@ export default {
 			type: Array,
 			required: true,
 		},
+		scaling: {
+			type: String,
+		},
 		type: {
 			type: String,
 		},
 		versatile: {
 			type: Boolean,
 			default: false,
-		},
-		scaling: {
-			type: String,
 		},
 		level: {
 			type: Number,
@@ -145,6 +148,9 @@ export default {
 				roll: {
 					maxContent: true,
 				},
+				scaling: {
+					maxContent: true,
+				},
 				type: {
 					truncate: true,
 				},
@@ -153,9 +159,6 @@ export default {
 				},
 				fail: {
 					truncate: true,
-				},
-				scaling: {
-					maxContent: true,
 				},
 				actions: {
 					noPadding: true,

@@ -163,7 +163,11 @@
 								</a>
 							</div>
 							<div slot="actions" slot-scope="data" class="actions">
-								<a v-if="isDifficult(data.row)" @click="markDifficult(data.row)">
+								<a
+									class="btn btn-sm bg-neutral-5"
+									v-if="isDifficult(data.row)"
+									@click="markDifficult(data.row)"
+								>
 									<i
 										aria-hidden="true"
 										class="fas fa-exclamation"
@@ -171,11 +175,16 @@
 									/>
 									<q-tooltip anchor="top middle" self="center middle">Unmark difficult</q-tooltip>
 								</a>
-								<router-link v-if="userInfo.admin" :to="'/contribute/spells/' + data.row['.key']">
+								<router-link
+									v-if="userInfo.admin"
+									:to="'/contribute/spells/' + data.row['.key']"
+									class="btn btn-sm bg-neutral-5 mx-1"
+								>
 									<i aria-hidden="true" class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
 								</router-link>
 								<a
+									class="btn btn-sm bg-neutral-5"
 									@click="
 										setSlide({
 											show: true,
@@ -191,9 +200,12 @@
 									header="Finished by"
 									:content="getPlayerName(data.row.metadata.finished_by)"
 								>
-									<i aria-hidden="true" class="fas fa-info" />
+									<span class="btn btn-sm bg-neutral-5 ml-1">
+										<i aria-hidden="true" class="fas fa-info" />
+									</span>
 								</hk-popover>
 								<a
+									class="btn btn-sm bg-neutral-5 ml-1"
 									v-if="userInfo.admin && userId !== data.row.metadata.finished_by"
 									@click="approve(data.row['.key'])"
 								>
@@ -355,15 +367,18 @@ export default {
 			return row.metadata && row.metadata.difficult;
 		},
 		tag(key, name) {
-			db.ref(`spells/${key}/metadata`).update({
-				tagged: this.userId,
-			});
-			db.ref(`new_spells/${key}`).update({
-				name,
-			});
-			db.ref(`new_spells/${key}/metadata`).update({
-				tagged: this.userId,
-			});
+			db.ref(`spells/${key}/metadata`)
+				.update({
+					tagged: this.userId,
+				})
+				.then(() => {
+					db.ref(`new_spells/${key}`).update({
+						name,
+						metadata: {
+							tagged: this.userId,
+						},
+					});
+				});
 		},
 		unTag(key) {
 			db.ref(`new_spells/${key}/metadata/tagged`).remove();

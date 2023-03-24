@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import { general } from "src/mixins/general.js";
 import BasicInfo from "src/components/npcs/BasicInfo";
@@ -131,7 +132,7 @@ export default {
 			await this.get_npc({ uid: this.userId, id: this.npcId }).then((npc) => {
 				npc.name = npc.name ? npc.name.capitalizeEach() : undefined;
 				this.npc = npc;
-				this.npc_copy = JSON.stringify(npc);
+				this.npc_copy = JSON.parse(JSON.stringify(npc));
 				this.unsaved_changes = false;
 				this.loading = false;
 			});
@@ -145,7 +146,7 @@ export default {
 		npc: {
 			deep: true,
 			handler(newVal) {
-				if (JSON.stringify(newVal) !== this.npc_copy) {
+				if (!_.isEqual(newVal, this.npc_copy)) {
 					this.unsaved_changes = true;
 				} else {
 					this.unsaved_changes = false;
@@ -175,7 +176,7 @@ export default {
 		},
 		revert_changes() {
 			this.npc = JSON.parse(this.npc_copy);
-			this.npc_copy = JSON.stringify(this.npc);
+			this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			this.unsaved_changes = false;
 		},
 		/**
@@ -201,7 +202,7 @@ export default {
 
 					// Capitalize before stringify so changes found isn't triggered
 					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
-					this.npc_copy = JSON.stringify(this.npc);
+					this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 					this.unsaved_changes = false;
 				})
 				.catch((error) => {
@@ -226,7 +227,7 @@ export default {
 
 				// Capitalize before stringify so changes found isn't triggered
 				this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
-				this.npc_copy = JSON.stringify(this.npc);
+				this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			});
 		},
 	},

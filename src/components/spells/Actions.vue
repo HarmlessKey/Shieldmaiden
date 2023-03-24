@@ -12,6 +12,11 @@
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle"> Add action </q-tooltip>
 				</a>
+				<a v-else class="btn btn-sm bg-neutral-5" @click="remove_action()">
+					<i aria-hidden="true" class="fas fa-trash red"></i>
+					<span class="d-none d-md-inline ml-1">Remove</span>
+					<q-tooltip anchor="top middle" self="center middle"> Remove action </q-tooltip>
+				</a>
 			</div>
 			<div class="card-body">
 				<p>
@@ -175,8 +180,8 @@ export default {
 			});
 			this.$forceUpdate();
 		},
-		remove_action(index) {
-			this.$delete(this.spell.actions, index);
+		remove_action() {
+			this.$delete(this.spell, "actions");
 		},
 		newRoll(action, action_index) {
 			this.edit_index = undefined; // It's new, so no edit index

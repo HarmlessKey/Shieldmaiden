@@ -142,6 +142,10 @@
 							:error="invalid && validated"
 							:error-message="errors[0]"
 							@keyup="$forceUpdate()"
+							@input="
+								(value) =>
+									$set(level_tier, 'projectile_count', value != undefined ? parseInt(value) : value)
+							"
 						/>
 					</ValidationProvider>
 				</div>

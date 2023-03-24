@@ -190,8 +190,9 @@ export default {
 				"square",
 				"radius",
 			];
-			const range_reg = /(\d+)(?:-foot| feet)/;
+			const range_reg = /(\d+)[-\s](?:foot|feet|ft)/;
 			const lc_desc = spell.description.toLowerCase();
+			spell.aoe_type = "none";
 			for (const aoe_type of aoe_types) {
 				if (lc_desc.includes(aoe_type)) {
 					spell.aoe_type = aoe_type;

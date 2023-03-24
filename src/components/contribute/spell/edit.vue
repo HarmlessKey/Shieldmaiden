@@ -115,15 +115,16 @@ export default {
 			}
 
 			// Parse casting time
-			let cast_time = this.old_spell.casting_time.split(" ");
-			spell.cast_time = parseInt(cast_time[0]);
-			let cast_type = cast_time[1];
+			const cast_reg = /(\d+)\s(\D+)/;
+			const cast_match = this.old_spell.casting_time.match(cast_reg);
+			spell.cast_time = parseInt(cast_match[1]);
+			let cast_type = cast_match[2].trim().replace(" ", "_");
+			console.log(cast_type, cast_match);
 
 			if (cast_type[cast_type.length - 1] == "s") {
 				cast_type = cast_type.substring(0, cast_type.length - 1);
 			}
 			spell.cast_time_type = cast_type;
-			delete spell.casting_time;
 
 			// Parse components
 			spell.components = [];

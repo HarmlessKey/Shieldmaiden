@@ -76,7 +76,7 @@
 						<div class="col">
 							<!-- HL MODIFIER DICE TYPE -->
 							<ValidationProvider
-								:rules="{ required: level_tier.dice_count }"
+								:rules="{ required: !!level_tier.dice_count }"
 								:name="`Dice count ${tier_index}`"
 								v-slot="{ errors, invalid, validated }"
 							>

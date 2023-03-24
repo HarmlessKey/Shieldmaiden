@@ -745,6 +745,48 @@ html body {
 			}
 		}
 	}
+	.gap {
+		&-1 {
+			gap: .5rem;
+		}
+		&-2 {
+			gap: 1rem;
+		}
+		&-3 {
+			gap: 1.5rem;
+		}
+		&-4 {
+			gap: 2rem;
+		}
+		&-x {
+			&-1 {
+				column-gap: .5rem;
+			}
+			&-2 {
+				column-gap: 1rem;
+			}
+			&-3 {
+				column-gap: 1.5rem;
+			}
+			&-4 {
+				column-gap: 2rem;
+			}
+		}
+		&-y {
+			&-1 {
+				row-gap: .5rem;
+			}
+			&-2 {
+				row-gap: 1rem;
+			}
+			&-3 {
+				row-gap: 1.5rem;
+			}
+			&-4 {
+				row-gap: 2rem;
+			}
+		}
+	}
 	.justify-content {
 		&-between {
 			justify-content: space-between;

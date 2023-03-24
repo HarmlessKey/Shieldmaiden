@@ -228,7 +228,7 @@
 					<ValidationProvider
 						:rules="{
 							required: spell.range_type === 'ranged',
-							between: [0, 999],
+							between: [0, 99999],
 						}"
 						name="Range"
 						v-slot="{ errors, invalid, validated }"

@@ -13,12 +13,12 @@
 		</p>
 		<template v-for="(level_tier, tier_index) in roll.scaling">
 			<div
-				class="d-flex justify-content-between"
+				class="d-flex justify-content-between gap-x-1"
 				v-if="tier_index < shown_level_tiers"
 				:key="`level-tier-${tier_index}`"
 			>
 				<!-- HL LEVEL SCALE -->
-				<div>
+				<div class="full-width">
 					<ValidationProvider
 						rules="required|between:1,20"
 						:name="`${scaling} ${tier_index}`"

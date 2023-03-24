@@ -24,9 +24,9 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
-							<router-link to="/contribute/spells" class="btn bg-neutral-5 mr-2"
-								>Cancel</router-link
-							>
+							<router-link to="/contribute/spells" class="btn bg-neutral-5 mr-2">{{
+								unsaved_changes ? "Cancel" : "Back"
+							}}</router-link>
 							<q-btn label="Save" type="submit" color="primary" no-caps />
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">

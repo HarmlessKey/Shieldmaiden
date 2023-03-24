@@ -4,7 +4,7 @@
 			<span>Basic Info</span>
 			<a
 				class="btn btn-sm bg-neutral-5"
-				@click="setSlide({ show: true, type: 'ViewSpell', data: spell })"
+				@click="setSlide({ show: true, type: 'contribute/spell/ViewSpell', data: spell })"
 			>
 				<i aria-hidden="true" class="fas fa-eye" />
 			</a>

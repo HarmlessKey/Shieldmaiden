@@ -250,18 +250,12 @@
 									</div>
 								</div>
 							</div>
-							<div v-if="rolled.scaledRoll" class="mt-3">
-								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} =
+							<!-- <div v-if="rolled.scaledRoll" class="mt-3">
+								Scale ({{ roll.cast_level }}): {{ rolled.scaledRoll.roll }} =
 								<b>{{ rolled.scaledRoll.total }}</b
 								><br />
 								{{ rolled.scaledRoll.throws }}
-							</div>
-							<div v-if="rolled.scaledRoll" class="mt-3">
-								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} =
-								<b>{{ rolled.scaledRoll.total }}</b
-								><br />
-								{{ rolled.scaledRoll.throws }}
-							</div>
+							</div> -->
 							<div v-if="savingThrowResult[action_index] === 'save'" class="mt-3">
 								Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
 							</div>

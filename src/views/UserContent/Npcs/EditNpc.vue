@@ -42,7 +42,7 @@
 							<router-link
 								:to="userId ? `/content/npcs` : `/tools/monster-creator`"
 								class="btn bg-neutral-5 mr-2"
-								>{{ unsaved_chagnes ? "Cancel" : "Back" }}</router-link
+								>{{ unsaved_changes ? "Cancel" : "Back" }}</router-link
 							>
 							<q-btn v-if="userId" label="Save" type="submit" color="primary" no-caps />
 							<q-btn v-else :disabled="!valid" color="primary" no-caps @click="download">

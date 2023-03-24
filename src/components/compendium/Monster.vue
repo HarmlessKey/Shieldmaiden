@@ -507,6 +507,7 @@ export default {
 				type: "monster_action",
 				versatile,
 			};
+			console.log(action)
 			this.setActionRoll(this.rollAction(e, action, config));
 		},
 		passivePerception() {

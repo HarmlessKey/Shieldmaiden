@@ -387,7 +387,7 @@
 					<ValidationProvider
 						:rules="{
 							required: spell.aoe_type !== 'none',
-							between: [1, 999],
+							between: [1, 99999],
 						}"
 						name="AOE size"
 						v-slot="{ errors, invalid, validated }"

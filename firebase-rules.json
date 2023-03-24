@@ -1156,7 +1156,7 @@
 					".validate": "newData.isString() && newData.val().matches(/^(none|cone|cube|cylinder|line|radius|sphere|square|square feet)$/i)"
 				},
 				"aoe_size": {
-					".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+					".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99999"
 				},
 				"ritual": {
 					".validate": "newData.isBoolean()"

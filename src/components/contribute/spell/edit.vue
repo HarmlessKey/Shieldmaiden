@@ -179,6 +179,30 @@ export default {
 				spell.higher_level += this.parse_spell_str(this.old_spell.higher_level[i]);
 			}
 
+			// Parse AOE Note: Order is important due to wording in description
+			const aoe_types = [
+				"cone",
+				"cube",
+				"cylinder",
+				"sphere",
+				"line",
+				"square feet",
+				"square",
+				"radius",
+			];
+			const range_reg = /(\d+)-foot/;
+			const lc_desc = spell.description.toLowerCase();
+			for (const aoe_type of aoe_types) {
+				if (lc_desc.includes(aoe_type)) {
+					spell.aoe_type = aoe_type;
+					const range_matched = lc_desc.match(range_reg);
+					if (range_matched) {
+						spell.aoe_size = parseInt(range_matched[1]);
+					}
+					break;
+				}
+			}
+
 			// Parse classes
 			let classes = [];
 			for (let index in this.old_spell.classes) {

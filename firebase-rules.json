@@ -1136,7 +1136,7 @@
 					".validate": "newData.isString() && newData.val().matches(/^(self|touch|ranged|sight|unlimited)$/i)"
 				},
 				"range": {
-					".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+					".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99999"
 				},
 				"classes": {
 					"$classIndex": {

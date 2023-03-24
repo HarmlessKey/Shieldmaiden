@@ -164,7 +164,7 @@ export default {
 				}
 				spell.duration_scale = scale.toLowerCase();
 			} else {
-				spell.duration_type = this.old_spell.duration.toLowerCase();
+				spell.duration_type = this.old_spell.duration.toLowerCase().replace(" ", "_");
 			}
 
 			// Parse Description

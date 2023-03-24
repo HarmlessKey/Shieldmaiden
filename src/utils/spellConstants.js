@@ -44,6 +44,7 @@ export const spell_range_types = Object.freeze([
 	{ label: "Ranged", value: "ranged" },
 	{ label: "Sight", value: "sight" },
 	{ label: "Unlimited", value: "unlimited" },
+	{ label: "Special", value: "special" },
 ]);
 
 export const spell_duration_types = Object.freeze([

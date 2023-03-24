@@ -1133,7 +1133,7 @@
 					".validate": "newData.isString() && newData.val().length <= 500"
 				},
 				"range_type": {
-					".validate": "newData.isString() && newData.val().matches(/^(self|touch|ranged|sight|unlimited)$/i)"
+					".validate": "newData.isString() && newData.val().matches(/^(self|touch|ranged|sight|unlimited|special)$/i)"
 				},
 				"range": {
 					".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99999"

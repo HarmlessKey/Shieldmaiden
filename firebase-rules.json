@@ -1212,6 +1212,9 @@
 								"fixed_val": {
 									".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
 								},
+								"primary": {
+									".validate": "newData.isBoolean()"
+								},
 								"projectile_count": {
 									".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
 								},

@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { db } from "src/firebase";
 import BasicInfo from "src/components/spells/BasicInfo";
 import SpellActions from "src/components/spells/Actions";
@@ -79,7 +80,7 @@ export default {
 		const spell_ref = db.ref(`new_spells/${this.id}`);
 		await spell_ref.once("value", (snapshot) => {
 			this.spell = snapshot.val() || {};
-			this.spell_copy = JSON.stringify(this.spell);
+			this.spell_copy = JSON.parse(JSON.stringify(this.spell));
 		});
 		this.loading = false;
 	},
@@ -87,7 +88,7 @@ export default {
 		spell: {
 			deep: true,
 			handler(newVal) {
-				if (JSON.stringify(newVal) !== this.spell_copy) {
+				if (!_.isEqual(newVal, this.spell_copy)) {
 					this.unsaved_changes = true;
 				} else {
 					this.unsaved_changes = false;
@@ -121,7 +122,7 @@ export default {
 						position: "rightTop",
 					});
 				});
-			this.spell_copy = JSON.stringify(this.spell);
+			this.spell_copy = JSON.parse(JSON.stringify(this.spell));
 			this.unsaved_changes = false;
 			this.$emit("set-unsaved", this.unsaved_changes);
 		},
@@ -130,7 +131,6 @@ export default {
 	// This is now handled in contribute/spells/edit
 	// Eventually this will be needed here too
 	beforeRouteLeave(to, from, next) {
-		console.log("before route leave");
 		if (this.unsaved_changes) {
 			this.$snotify.error(
 				"There are unsaved changes in the form.\n Would you like to continue?",

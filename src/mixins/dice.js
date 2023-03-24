@@ -189,7 +189,7 @@ export const dice = {
 		 *
 		 * @param {object} e Event, holds info for advantage/disadvantege
 		 * @param {object} ability Full ability object
-		 * @param {object} config Holds configuration options {type, castLevel, casterLevel, toHitModifier, versatile}
+		 * @param {object} config Holds configuration options {type, cast_level, caster_level, toHitModifier, versatile}
 		 *
 		 * @returns {object}
 		 */
@@ -216,14 +216,14 @@ export const dice = {
 			}
 
 			const actions = ability.action_list; // All actions in the ability
-			const scaleType = ability.level_scaling; // Only for spells
-			const spellLevel = ability.level; // Only for spells
+			const scale_type = ability.scaling; // Only for spells
+			const spell_level = ability.level; // Only for spells
 
 			let i = 0;
 			// LOOP OVER ALL ACTIONS
 			for (let action of actions) {
 				let type = action.type;
-				let attack_bonus = action.attack_bonus || config.toHitModifier;
+				let attack_bonus = action.attack_bonus || config.attack_bonus;
 				let toHit = false;
 				let crit = false;
 				returnRoll.actions[i] = { type, rolls: [] };
@@ -249,7 +249,7 @@ export const dice = {
 				// For a saving throw set the ability and DC for display
 				if (type === "save") {
 					returnRoll.actions[i].save_ability = action.save_ability;
-					returnRoll.actions[i].save_dc = action.save_dc;
+					returnRoll.actions[i].save_dc = action.save_dc || 10;
 				}
 
 				for (let modifier of action.rolls) {
@@ -283,14 +283,14 @@ export const dice = {
 					dice_count = this.getDiceCount(crit, dice_count);
 
 					// Check if the action scales with the current roll
-					let tiers = modifier.level_tiers;
+					const tiers = modifier.scaling;
 					if (tiers) {
 						scaledModifier = this.__levelScaling__(
 							tiers,
-							config.castLevel,
-							spellLevel,
-							config.casterLevel,
-							scaleType
+							config.cast_level,
+							spell_level,
+							config.caster_level,
+							scale_type
 						);
 
 						// Roll the scaledModifier
@@ -319,15 +319,15 @@ export const dice = {
 
 					// Roll the modifier
 					// If the modifier scales with character level, overwrite the modifierRoll with the scaledRoll
-					if (scaleType === "character_level" && scaledModifier) {
+					if (scale_type === "character_level" && scaledModifier) {
 						modifierRoll = scaledRoll;
 						scaledRoll = undefined; //Only return the scaled modifierRoll
 					} else {
-						if (dice_type && dice_count)
+						if (dice_type && dice_count) {
 							modifierRoll = this.rollD(e.e, dice_type, dice_count, fixed_val, `${ability.name}`);
 						// When there is nothing to roll, but only a fixed value
 						// still a roll must be created
-						else
+						} else {
 							modifierRoll = {
 								title: ability.name,
 								roll: fixed_val,
@@ -336,6 +336,7 @@ export const dice = {
 								throwsTotal: 0,
 								total: parseInt(fixed_val),
 							};
+						}
 					}
 
 					// Double the rolled damage (without the modifier [throwsTotal])
@@ -367,18 +368,18 @@ export const dice = {
 			}
 			return returnRoll;
 		},
-		__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType) {
+		__levelScaling__(tiers, cast_level, spell_level, caster_level, scale_type) {
 			let scaledModifier = undefined;
 
 			// SPELL SCALE
-			if (scaleType === "spell_scale") {
-				let scale = tiers[0].level;
-				let dice_type = tiers[0].dice_type;
-				let dice_count = tiers[0].dice_count;
-				let fixed_val = tiers[0].fixed_val;
+			if (scale_type === "spell_scale") {
+				const scale = tiers[0].level;
+				const dice_type = tiers[0].dice_type;
+				const dice_count = tiers[0].dice_count;
+				const fixed_val = tiers[0].fixed_val;
 
 				// Calculate the increase based on spell level, on what level the spell is cast and the scale
-				let increase = parseInt(Math.floor((castLevel - spellLevel) / scale));
+				const increase = parseInt(Math.floor((cast_level - spell_level) / scale));
 
 				// If there is an increase,
 				if (increase) {
@@ -393,11 +394,11 @@ export const dice = {
 				}
 			}
 			// CHARACTER LEVEL
-			if (scaleType === "character_level") {
+			if (scale_type === "character_level") {
 				tiers.sort((a, b) => (parseInt(a.level) > parseInt(b.level) ? 1 : -1));
 
 				for (let tier of tiers) {
-					if (parseInt(casterLevel) >= parseInt(tier.level)) {
+					if (parseInt(caster_level) >= parseInt(tier.level)) {
 						scaledModifier = {
 							dice_count: tier.dice_count,
 							dice_type: tier.dice_type,

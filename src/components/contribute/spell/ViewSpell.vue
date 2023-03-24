@@ -12,8 +12,11 @@
 		</div>
 
 		<div class="spell__info">
-			<b>Casting time:</b> {{ spell.cast_time_nr }} {{ spell.cast_time_type }}<br />
+			<b>Casting time:</b> {{ spell.cast_time }} {{ spell.cast_time_type }}<br />
 			<b>Range:</b> {{ range }}<br />
+			<template v-if="spell.ritual">
+				<b>Ritual:</b> Yes<br />
+			</template>
 			<b>Components: </b>
 			<template v-if="spell.components.verbal">V </template>
 			<template v-if="spell.components.somatic">S </template>
@@ -30,71 +33,38 @@
 		</div>
 
 		<div class="spell__description">
-			<!-- <vue-markdown name="description" :source="spell.description"/> -->
+		<p v-html="spell.description" />
 			<div v-if="spell.higher_level">
-				<b class="pl-2"><i>At Higher Levels.</i></b> {{ spell.higher_level }}
+				<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 			</div>
 		</div>
 
-		<div class="actions" v-if="spell.actions && !no_roll">
+		<div class="actions" v-if="spell.actions">
 			<h4 class="mb-3">Roll spell</h4>
 
-			<div class="input" v-if="spell.level_scaling === 'character_level'">
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					dense
-					label="Character level"
-					id="casterLevel"
-					type="number"
-					v-validate="'required|numeric|max_value:20'"
-					name="casterLevel"
-					data-vv-as="caster level"
-					v-model="casterLevel"
-				/>
-				<div class="validate red" v-if="errors.has('casterLevel')">
-					{{ errors.first("casterLevel") }}
-				</div>
-			</div>
+			<q-input
+				v-if="spell.scaling === 'character_level'"
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
+				class="mb-3"
+				label="Caster level"
+				type="number"
+				v-model="caster_level"
+			/>
 
 			<!-- TO HIT MODIFIER INPUT -->
-			<div class="input" v-if="isToHit">
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					dense
-					label="To hit modifier"
-					id="toHit"
-					type="text"
-					v-validate="'required|numeric'"
-					name="toHit"
-					data-vv-as="To hit modifier"
-					v-model="toHitModifier"
-				/>
-				<div class="validate red" v-if="errors.has('toHit')">{{ errors.first("toHit") }}</div>
-			</div>
+			<q-input
+				v-if="isToHit"
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
+				class="mb-3"
+				label="Spell attack"
+				type="text"
+				v-model="attack_bonus"
+			/>
 
-			<!-- ADVANTAGE INPUT -->
-			<div v-if="isToHit" class="advantage d-flex justify-content-between">
-				<button
-					class="btn btn-sm bg-neutral-5"
-					:class="{ 'bg-green': advantage == 'advantage' }"
-					@click="setAdvantage('advantage')"
-				>
-					<i aria-hidden="true" v-if="advantage == 'advantage'" class="fas fa-check"></i>
-					Advantage
-				</button>
-				<button
-					class="btn btn-sm bg-neutral-5"
-					:class="{ 'bg-green': advantage == 'disadvantage' }"
-					@click="setAdvantage('disadvantage')"
-				>
-					<i aria-hidden="true" v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
-					Disadvantage
-				</button>
-			</div>
 
 			<!-- SPELL LEVEL INPUT -->
 			<template v-if="spell.level > 0">
@@ -103,7 +73,7 @@
 					<div
 						class="level"
 						:class="{
-							selected: selectedLevel === i,
+							selected: cast_level === i,
 							disabled: i < spell.level,
 						}"
 						v-for="i in 9"
@@ -116,43 +86,33 @@
 			</template>
 
 			<!-- ROLL SPELL -->
-			<button
-				:disabled="(errors.items && errors.items.length > 0) || missingRequired"
-				class="btn btn-block mt-3"
-				@click="roll(spell, selectedLevel, casterLevel, toHitModifier)"
+			<hk-roll 
+				@roll="roll($event)"
 			>
-				Roll
-			</button>
+				<button class="btn btn-block mt-3">
+					Roll
+				</button>
+			</hk-roll>
 		</div>
 	</div>
 </template>
 
 <script>
 import { damage_types } from "src/utils/generalConstants";
+import { mapActions } from "vuex";
+import { dice } from "src/mixins/dice.js";
 
 export default {
-	name: "Spell",
+	name: "ViewSpell",
 	props: ["data", "no_roll"],
+	mixins:[dice],
 	data() {
 		return {
 			damage_types: damage_types,
 			spell: this.data,
-			selectedLevel: this.data.level,
-			casterLevel: undefined,
-			toHitModifier: undefined,
-			advantage: false,
-			rolled: undefined,
-			savingThrow: undefined,
-			hitOrMiss: undefined,
-			resistances: {},
-			resultColumns: {
-				total: {
-					maxContent: true,
-				},
-				type: {
-					truncate: true,
-				},
-			},
+			cast_level: this.data.level,
+			caster_level: undefined,
+			attack_bonus: undefined,
 		};
 	},
 	computed: {
@@ -195,93 +155,29 @@ export default {
 				}
 			}
 			return toHit;
-		},
-		missingRequired() {
-			let missing = false;
-
-			if (this.isToHit && this.toHitModifier === undefined) {
-				missing = true;
-			}
-			if (this.spell.level_scaling === "character_level" && this.casterLevel === undefined) {
-				missing = true;
-			}
-			return missing;
-		},
+		}
 	},
 	methods: {
+		...mapActions(["setActionRoll"]),
 		selectLevel(i) {
-			this.selectedLevel = i;
+			this.cast_level = i;
 		},
-		roll(spell, selectedLevel, casterLevel, toHitModifier) {
-			this.rolled = this.rollSpell(
-				spell,
-				selectedLevel,
-				casterLevel,
-				toHitModifier,
-				this.advantage
-			);
-		},
-		totalDamage(action, rolls) {
-			let total = parseInt(rolls.modifierRoll.total);
+		roll(e) {
+			const action = { 
+				action_list: this.spell.actions,
+				name: this.spell.name,
+				scaling: this.spell.scaling,
+				level: this.spell.level
+			}
 
-			if (rolls.scaledRoll) {
-				total = total + rolls.scaledRoll.total;
+			const config = {
+				type: "spell",
+				attack_bonus: this.attack_bonus,
+				cast_level: this.cast_level,
+				caster_level: this.caster_level
 			}
-			if (action.type === "spell_save" && this.savingThrow === "save") {
-				total = Math.floor(total * rolls.missSave);
-			}
-			if (action.toHit && this.hitOrMiss === "miss") {
-				total = Math.floor(total * rolls.missSave);
-			}
-			if (this.resistances[rolls.subtype] === "v") {
-				total = total * 2;
-			}
-			if (this.resistances[rolls.subtype] === "r") {
-				total = Math.floor(total / 2);
-			}
-			if (this.resistances[rolls.subtype] === "i") {
-				total = 0;
-			}
-			return total;
-		},
-		setSave(save) {
-			this.savingThrow = save !== this.savingThrow ? save : undefined;
-		},
-		setHitOrMiss(result) {
-			this.hitOrMiss = result !== this.hitOrMiss ? result : undefined;
-		},
-		setAdvantage(value) {
-			this.advantage = value !== this.advantage ? value : false;
-		},
-		setDefense(type, resistance) {
-			if (this.resistances[type] === resistance) {
-				this.$delete(this.resistances, type);
-			} else {
-				this.$set(this.resistances, type, resistance);
-			}
-		},
-		missSaveEffect(effect, type) {
-			if (type === "text") {
-				if (effect === 1) {
-					return "full damage";
-				}
-				if (effect === 0.5) {
-					return "half damage";
-				}
-				if (effect === 0) {
-					return "no damage";
-				}
-			} else {
-				if (effect === 1) {
-					return "";
-				}
-				if (effect === 0.5) {
-					return "/ 2";
-				}
-				if (effect === 0) {
-					return "no effect";
-				}
-			}
+
+			this.setActionRoll(this.rollAction(e, action, config));
 		},
 	},
 };
@@ -309,25 +205,20 @@ export default {
 
 	.advantage {
 		.btn {
-			width: 48%;
+			background-color: $green;
+		}
+	}
+	.disadvantage {
+		.btn {
+			background-color: $red;
 		}
 	}
 	.actions {
 		margin-bottom: 15px;
 
-		.input {
-			display: grid;
-			grid-template-columns: 1fr 50px;
-			margin-bottom: 10px;
-
-			.validate {
-				grid-column: span 2;
-			}
-		}
-
 		&__levels {
 			display: flex;
-			justify-content: flex-start;
+			justify-content: center;
 			margin: 0 -5px;
 
 			.level {
@@ -336,7 +227,7 @@ export default {
 				line-height: 30px;
 				text-align: center;
 				cursor: pointer;
-				background-color: $neutral-8;
+				background-color: $neutral-6;
 				user-select: none;
 				margin: 0 3px;
 
@@ -347,62 +238,6 @@ export default {
 				&.disabled {
 					opacity: 0.4;
 					cursor: not-allowed;
-				}
-			}
-		}
-	}
-
-	.rolled {
-		h2 {
-			text-transform: none !important;
-			font-size: 25px;
-		}
-
-		.save {
-			a {
-				margin-left: 5px;
-			}
-		}
-		.defenses {
-			display: grid;
-			grid-template-columns: 1fr 18px 18px 18px;
-			grid-column-gap: 5px;
-			user-select: none;
-			margin-bottom: 1px;
-			padding: 2px 5px;
-
-			&:hover {
-				background-color: $neutral-8;
-			}
-			.icon {
-				padding: 3px 0;
-			}
-			.option {
-				cursor: pointer;
-				position: relative;
-				width: 18px;
-				font-size: 18px;
-				text-align: center;
-				line-height: 28px;
-
-				span {
-					font-size: 12px;
-					text-align: center;
-					font-weight: bold;
-					position: absolute;
-					width: 18px;
-					line-height: 28px;
-					top: 0;
-					left: 0;
-					color: $neutral-8;
-				}
-
-				&.green,
-				&.red,
-				&.blue {
-					span {
-						color: $neutral-1;
-					}
 				}
 			}
 		}

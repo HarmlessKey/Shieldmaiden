@@ -244,6 +244,11 @@ export default {
 					// eslint-disable-next-line
 					replacement: "\-\-",
 				},
+				{
+					regex: /Ã—/g,
+					// eslint-disable-next-line
+					replacement: "×",
+				},
 			];
 			rules.forEach(function (rule) {
 				text = text.replace(rule.regex, rule.replacement);

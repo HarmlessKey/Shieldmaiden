@@ -1170,7 +1170,7 @@
 				"higher_level": {
 					".validate": "newData.isString() && newData.val().length <= 1000"
 				},
-				"projectile_count": {
+				"projectiles": {
 					".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
 				},
 				"projectile_scaling": {
@@ -1179,11 +1179,8 @@
 						"level": {
 							".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
 						},
-						"dice_type": {
-							".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
-						},
-						"fixed_val": {
-							".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+						"projectile_count": {
+							".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 25"
 						},
 						"$other": { ".validate": false }
 					}
@@ -1258,8 +1255,8 @@
 										"level": {
 											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
 										},
-										"dice_type": {
-											".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+										"dice_count": {
+											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
 										},
 										"fixed_val": {
 											".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"

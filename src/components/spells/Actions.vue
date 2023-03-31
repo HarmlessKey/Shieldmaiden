@@ -8,11 +8,6 @@
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle"> Add action </q-tooltip>
 				</a>
-				<!-- <a class="btn btn-sm bg-neutral-5" @click="remove_action()">
-					<i aria-hidden="true" class="fas fa-trash red"></i>
-					<span class="d-none d-md-inline ml-1">Remove</span>
-					<q-tooltip anchor="top middle" self="center middle"> Remove action </q-tooltip>
-				</a> -->
 			</div>
 			<div class="card-body">
 				<p>
@@ -20,7 +15,7 @@
 					spell, it can be used during encounters to quickly apply damage or healing.
 				</p>
 				<ValidationProvider
-					rules="between:2,25"
+					rules="between:1,25"
 					name="Projectiles"
 					v-slot="{ errors, invalid, validated }"
 				>
@@ -31,10 +26,15 @@
 						label="Projectiles"
 						v-model="spell.projectiles"
 						autocomplete="off"
+						type="number"
 						class="mb-2"
-						@keyup="$forceUpdate()"
 						:error="invalid && validated"
 						:error-message="errors[0]"
+						@keyup="$forceUpdate()"
+						@input="
+							(value) =>
+								$set(spell, 'projectiles', value != undefined ? parseInt(value) : value)
+						"
 					>
 						<hk-popover slot="append" header="Action options">
 							<i class="fas fa-info-circle" aria-hidden="true" />
@@ -44,7 +44,7 @@
 							</template>
 						</hk-popover>
 						<button
-							v-if="spell.scaling && spell.scaling != 'none'"
+							v-if="spell.projectiles && spell.scaling && spell.scaling != 'none'"
 							slot="after"
 							@click.prevent="scaling_dialog = true"
 							class="btn bg-neutral-5"
@@ -196,7 +196,7 @@
 									<a class="btn btn-sm bg-neutral-5" @click="newRoll(action, action_index)">
 										<i aria-hidden="true" class="fas fa-plus green"></i>
 										<span class="d-none d-md-inline ml-1">Add</span>
-										<q-tooltip anchor="top middle" self="center middle"> Add roll </q-tooltip>
+										<q-tooltip anchor="top middle" self="center middle">Add roll</q-tooltip>
 									</a>
 								</div>
 								<hk-action-rolls-table
@@ -240,13 +240,20 @@
 		</q-dialog>
 
 		<q-dialog v-model="scaling_dialog">
-			<ValidationObserver v-slot="{}">
-				<q-form>
-					<hk-card header="Projectile scaling" class="mb-0">
-						<div class="card-body"></div>
-					</hk-card>
-				</q-form>
-			</ValidationObserver>
+			<div>
+				<ValidationObserver>
+					<q-form>
+						<hk-card header="Projectile scaling" class="mb-0">
+							<div class="card-body">
+								<hk-action-roll-scaling v-model="spell.projectile_scaling" type="projectile" :spell="spell" @input="$forceUpdate()" />
+							</div>
+							<div slot="footer" class="card-footer d-flex justify-content-end">
+								<q-btn class="mr-1" v-close-popup no-caps>Close</q-btn>
+							</div>
+						</hk-card>
+					</q-form>
+				</ValidationObserver>
+			</div>
 		</q-dialog>
 	</div>
 </template>

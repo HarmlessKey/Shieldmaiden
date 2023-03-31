@@ -243,7 +243,7 @@
 			</template>
 		</div>
 		<ValidationObserver v-if="set_scaling" v-slot="{ valid }">
-			<hk-action-roll-scaling v-model="roll" :spell="spell" @input="$forceUpdate()" />
+			<hk-action-roll-scaling v-model="roll.scaling" :roll="roll" :spell="spell" @input="$forceUpdate()" />
 			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!valid" />
 		</ValidationObserver>
 	</div>

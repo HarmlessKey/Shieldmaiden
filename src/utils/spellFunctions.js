@@ -9,7 +9,7 @@ import numeral from "numeral";
  *
  * @returns {string}
  * */
-export function spellScalingDescription(tiers, scaling, level) {
+export function spellScalingDescription(tiers, scaling, level, dice_type) {
 	let description = [];
 
 	// CHARACTER LEVEL
@@ -22,12 +22,12 @@ export function spellScalingDescription(tiers, scaling, level) {
 			let level_txt = `at ${numeral(tier.level).format("0o")} level`;
 			let damage_txt = "this spell roll does ";
 			damage_txt +=
-				tier.dice_count || tier.dice_type
-					? `${tier.dice_count || "..."}d${tier.dice_type || "..."}`
+				tier.dice_count || dice_type
+					? `${tier.dice_count || "..."}d${dice_type || "..."}`
 					: "";
 
 			if (tier.fixed_val) {
-				damage_txt += `${tier.dice_count || tier.dice_type ? "+" : ""}${tier.fixed_val || ""}`;
+				damage_txt += `${tier.dice_count || dice_type ? "+" : ""}${tier.fixed_val || ""}`;
 			}
 
 			let new_line = `${tier.projectile_count ? count_txt : ""} `;
@@ -50,12 +50,12 @@ export function spellScalingDescription(tiers, scaling, level) {
 		// Damage modifier text
 		let damage_txt = "the damage of this roll increases by ";
 		damage_txt +=
-			tier.dice_count || tier.dice_type
-				? `${tier.dice_count || "..."}d${tier.dice_type || "..."}`
+			tier.dice_count || dice_type
+				? `${tier.dice_count || "..."}d${dice_type || "..."}`
 				: "";
 
 		if (tier.fixed_val) {
-			damage_txt += `${tier.dice_count || tier.dice_type ? "+" : ""}${tier.fixed_val || ""}`;
+			damage_txt += `${tier.dice_count || dice_type ? "+" : ""}${tier.fixed_val || ""}`;
 		}
 
 		// Projectile count text
@@ -78,7 +78,7 @@ export function spellScalingDescription(tiers, scaling, level) {
 		for (let tier of tiers) {
 			let new_line = "When you cast this spell using a ";
 			new_line += `${numeral(tier.level).format("0o")}-level spell slot, this spell roll does `;
-			new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${
+			new_line += `${tier.dice_count || "..."}d${dice_type || "..."}${
 				tier.fixed_val ? "+" : ""
 			}${tier.fixed_val || ""} damage.`;
 

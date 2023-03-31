@@ -36,7 +36,7 @@
 								$set(spell, 'projectiles', value != undefined ? parseInt(value) : value)
 						"
 					>
-						<hk-popover slot="append" header="Action options">
+						<hk-popover slot="append" header="Projectiles">
 							<i class="fas fa-info-circle" aria-hidden="true" />
 							<template #content>
 								Some spells, like Magic Missiles (phb 257) have multiple projectiles that can be
@@ -221,7 +221,7 @@
 					<q-form @submit="handleSubmit(saveRoll)">
 						<hk-card :header="edit_index !== undefined ? 'Edit roll' : 'New roll'" class="mb-0">
 							<div class="card-body">
-								<hk-action-roll-form v-model="roll" :action_type="action_type" :spell="spell" />
+								<hk-action-roll-form v-model="roll" :options="spell.options" :action_type="action_type" :spell="spell" />
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
 								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>

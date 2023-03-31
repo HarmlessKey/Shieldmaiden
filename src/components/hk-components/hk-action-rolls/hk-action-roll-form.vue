@@ -2,39 +2,46 @@
 	<div>
 		<div v-show="!set_scaling">
 			<p>{{ spell.description }}</p>
-			<q-tabs v-if="options.length > 1" v-model="tab" dark no-caps>
+			<q-tabs v-if="action_options.length > 1" v-model="tab" dark no-caps>
 				<q-tab
-					v-for="(option, index) in options"
-					:key="`versatile-tab-${index}`"
-					:name="option.name"
-					:label="option.label"
+					v-for="(option, index) in action_options"
+					:key="`option-tab-${index}`"
+					:name="index"
+					:label="option"
 				/>
 			</q-tabs>
 
 			<q-tab-panels v-model="tab" class="bg-transparent" keep-alive>
 				<q-tab-panel
-					v-for="(option, index) in options"
-					:key="`versatile-panel-${index}`"
-					:name="option.name"
+					v-for="(option, index) in action_options"
+					:key="`option-panel-${index}`"
+					:name="index"
 				>
 					<template v-if="action_type !== 'healing'">
-						<hk-dmg-type-select
-							class="mb-2"
-							:label="`Damage type ${index == 1 ? option.label : '*'}`"
-							v-model="roll[`${index === 1 ? 'versatile_' : ''}damage_type`]"
-							:validation-rules="index === 0 ? 'required' : ''"
-							@input="reset_magical($event, index)"
-						/>
+						<ValidationProvider 
+							:rules="{
+								required: index === 0,
+							}"
+							:name="`Dice count ${index == 1 ? option.label : ''}`"
+						>
+							<hk-dmg-type-select
+								class="mb-2"
+								:label="`Damage type ${index != 0 ? option : `${option} *`}`"
+								:value="getValue('damage_type', index)"
+								@input="setValue($event, 'damage_type', index)"
+							/>
+						</ValidationProvider>
 						<div class="d-flex items-center mb-2">
 							<q-checkbox
 								:dark="$store.getters.theme === 'dark'"
-								v-model="roll[`${index === 1 ? 'versatile_' : ''}magical`]"
+								:value="getValue('magical', index)"
 								:label="`${index == 1 ? option.label : ''} Magical`"
 								:disable="
 									!['bludgeoning', 'piercing', 'slashing'].includes(
-										roll[`${index === 1 ? 'versatile_' : ''}damage_type`]
+										getValue('damage_type', index)
 									)
 								"
+								@input="setValue($event, 'magical', index)"
 								:false-value="null"
 								indeterminate-value="something-else"
 							/>
@@ -55,18 +62,18 @@
 							<ValidationProvider
 								:rules="{
 									between: [1, 99],
-									required: !!roll[`${index === 1 ? 'versatile_' : ''}dice_type`],
+									required: !!getValue('dice_type', index),
 								}"
-								:name="`Dice count ${index == 1 ? option.label : ''}`"
+								:name="`Dice count ${option}`"
 								v-slot="{ errors, invalid, validated }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
-									:label="`Dice count ${index == 1 ? option.label : '*'}`"
-									v-model.number="roll[`${index === 1 ? 'versatile_' : ''}dice_count`]"
-									@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : ''}dice_count`)"
+									:label="`Dice count ${option} ${index == 0 ? '*' : ''}`"
+									:value="getValue('dice_count', index)"
+									@input="setValue($event, 'dice_count', index)"
 									min="1"
 									max="99"
 									autocomplete="off"
@@ -87,9 +94,10 @@
 								map-options
 								emit-value
 								clearable
-								:label="`Dice type ${index == 1 ? option.label : ''}`"
+								:label="`Dice type ${option}`"
 								:options="dice_type"
-								v-model="roll[`${index === 1 ? 'versatile_' : ''}dice_type`]"
+								:value="getValue('dice_type', index)"
+								@input="setValue($event, 'dice_type', index)"
 								class="mb-2"
 							/>
 						</div>
@@ -105,8 +113,8 @@
 									filled
 									square
 									:label="`Fixed value ${index == 1 ? option.label : ''}`"
-									v-model="roll[`${index === 1 ? 'versatile_' : ''}fixed_val`]"
-									@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : ''}fixed_val`)"
+									:value="getValue('fixed_val', index)"
+									@input="setValue($event, 'fixed_val', index)"
 									autocomplete="off"
 									class="mb-2"
 									type="number"
@@ -118,7 +126,7 @@
 											header="Fixed value"
 											content="Set the fixed value that is added on top of the rolled value."
 										>
-											<q-icon name="info" />
+											<q-icon name="fas fa-info-circle" />
 										</hk-popover>
 									</template>
 								</q-input>
@@ -130,9 +138,10 @@
 							<q-checkbox
 								size="lg"
 								dark
-								v-model="roll[`${index === 1 ? 'versatile_' : ''}primary`]"
-								:label="`Primary ${index == 1 ? option.label : ''}`"
+								v-model="roll.primary"
+								label="Primary"
 								:false-value="null"
+								:disable="index > 0"
 								indeterminate-value="something-else"
 								class="mb-2"
 							>
@@ -252,119 +261,150 @@
 <script>
 import { damage_types, dice_types } from "src/utils/generalConstants";
 import { spellScalingDescription } from "src/utils/spellFunctions";
+import { ValidationProvider } from "vee-validate";
 
 export default {
-	name: "HkActionRollForm",
-	props: {
-		value: Object,
-		action_type: String,
-		versatile_options: {
-			type: Object,
-			default: () => {
-				return {};
-			},
-		},
-		spell: {
-			type: Object,
-			default: undefined,
-		},
-	},
-	data() {
-		return {
-			damage_types: damage_types,
-			set_scaling: false,
-			tab: 0,
-			modifier_type: [
-				{ label: "Damage", value: "damage" },
-				{ label: "Healing", value: "healing" },
-			],
-			dice_type: dice_types,
-			save_fail_mod: [
-				{ label: "No effect", value: 0 },
-				{ label: "Half damage", value: 0.5 },
-				{ label: "Full damage", value: 1 },
-			],
-		};
-	},
-	computed: {
-		roll: {
-			get() {
-				return this.value;
-			},
-			set(newValue) {
-				this.$emit("input", newValue);
-			},
-		},
-		specials() {
-			let specials = {
-				siphon_full: {
-					label: "Heal caster full",
-					value: "siphon_full",
-					info: "On a hit, the caster is healed for all of the damage done.",
+    name: "HkActionRollForm",
+    props: {
+        value: Object,
+        action_type: String,
+        versatile_options: {
+            type: Object,
+            default: () => {
+                return {};
+            },
+        },
+        options: {
+            type: Array,
+            default: undefined
+        },
+        spell: {
+            type: Object,
+            default: undefined,
+        },
+    },
+    data() {
+        return {
+            damage_types: damage_types,
+            set_scaling: false,
+            tab: 0,
+            modifier_type: [
+                { label: "Damage", value: "damage" },
+                { label: "Healing", value: "healing" },
+            ],
+            dice_type: dice_types,
+            save_fail_mod: [
+                { label: "No effect", value: 0 },
+                { label: "Half damage", value: 0.5 },
+                { label: "Full damage", value: 1 },
+            ],
+        };
+    },
+    computed: {
+        roll: {
+            get() {
+                return this.value;
+            },
+            set(newValue) {
+                this.$emit("input", newValue);
+            },
+        },
+        specials() {
+            let specials = {
+                siphon_full: {
+                    label: "Heal caster full",
+                    value: "siphon_full",
+                    info: "On a hit, the caster is healed for all of the damage done.",
+                },
+                siphon_half: {
+                    label: "Heal caster half",
+                    value: "siphon_half",
+                    info: "On a hit, the caster is healed for half of the damage done.",
+                },
+                drain: {
+                    label: "Reduce max HP",
+                    value: "drain",
+                    info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done.",
+                },
+            };
+            if (this.special) {
+                if (this.special.includes("siphon_full"))
+                    specials.siphon_half.disable = true;
+                if (this.special.includes("siphon_half"))
+                    specials.siphon_full.disable = true;
+            }
+            return specials;
+        },
+        special: {
+            get() {
+                if (this.roll.special && typeof this.roll.special === "string") {
+                    return [this.roll.special];
+                }
+                return this.roll.special;
+            },
+            set(newVal) {
+                this.$set(this.roll, "special", newVal);
+            },
+        },
+        action_options() {
+            return this.options || [""];
+        }
+        // options() {
+        // 	let options = [
+        // 		{
+        // 			name: 0,
+        // 		},
+        // 	];
+        // 	if (this.versatile_options.versatile) {
+        // 		options[0].label = this.versatile_options.versatile_one || "Option 1";
+        // 		options[1] = {
+        // 			name: 1,
+        // 			label: this.versatile_options.versatile_two || "Option 2",
+        // 		};
+        // 	}
+        // 	return options;
+        // },
+    },
+    methods: {
+        parseToInt(value, object, property) {
+            if (value === undefined || value === "") {
+                this.$delete(object, property);
+            }
+            else {
+                this.$set(object, property, parseInt(value));
+            }
+        },
+        reset_magical(value, versatile) {
+            const prop = versatile === 1 ? "versatile_magical" : "magical";
+            if (!["bludgeoning", "piercing", "slashing"].includes(value)) {
+                this.$set(this.roll, prop, null);
+            }
+        },
+        scalingDesc(tiers, scaling, level) {
+            return spellScalingDescription(tiers, scaling, level);
+        },
+				getValue(prop, index) {
+					if(index == 0) {
+						return this.roll[prop];
+					} else if(this.roll.options) {
+						return this.roll.options[index] ? this.roll.options[index][prop] : null;
+					}
 				},
-				siphon_half: {
-					label: "Heal caster half",
-					value: "siphon_half",
-					info: "On a hit, the caster is healed for half of the damage done.",
-				},
-				drain: {
-					label: "Reduce max HP",
-					value: "drain",
-					info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done.",
-				},
-			};
-			if (this.special) {
-				if (this.special.includes("siphon_full")) specials.siphon_half.disable = true;
-				if (this.special.includes("siphon_half")) specials.siphon_full.disable = true;
-			}
-			return specials;
-		},
-		special: {
-			get() {
-				if (this.roll.special && typeof this.roll.special === "string") {
-					return [this.roll.special];
+				setValue(value, prop, index) {
+					value = ["dice_count", "fixed_val"].includes(prop) && value != undefined ? parseInt(value) : value; 
+					if(index === 0) {
+						this.$set(this.roll, prop, value);
+					} else if(this.roll.options) {
+						this.$set(this.roll.options, index, value)
+					} else {
+						this.$set(this.roll, "options", { [index]: value });
+					}
+					if(prop === 'damage_type') {
+						this.reset_magical(value, index);
+					}
 				}
-				return this.roll.special;
-			},
-			set(newVal) {
-				this.$set(this.roll, "special", newVal);
-			},
-		},
-		options() {
-			let options = [
-				{
-					name: 0,
-				},
-			];
-			if (this.versatile_options.versatile) {
-				options[0].label = this.versatile_options.versatile_one || "Option 1";
-				options[1] = {
-					name: 1,
-					label: this.versatile_options.versatile_two || "Option 2",
-				};
-			}
-			return options;
-		},
-	},
-	methods: {
-		parseToInt(value, object, property) {
-			if (value === undefined || value === "") {
-				this.$delete(object, property);
-			} else {
-				this.$set(object, property, parseInt(value));
-			}
-		},
-		reset_magical(value, versatile) {
-			const prop = versatile === 1 ? "versatile_magical" : "magical";
-
-			if (!["bludgeoning", "piercing", "slashing"].includes(value)) {
-				this.$set(this.roll, prop, null);
-			}
-		},
-		scalingDesc(tiers, scaling, level) {
-			return spellScalingDescription(tiers, scaling, level);
-		},
-	},
+    },
+    components: { ValidationProvider }
 };
 </script>
 

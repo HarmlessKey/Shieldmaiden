@@ -1170,6 +1170,29 @@
 				"higher_level": {
 					".validate": "newData.isString() && newData.val().length <= 1000"
 				},
+				"projectile_count": {
+					".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+				},
+				"projectile_scaling": {
+					"$scalingIndex": {
+						".validate": "newData.hasChildren(['level'])",
+						"level": {
+							".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+						},
+						"dice_type": {
+							".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+						},
+						"fixed_val": {
+							".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+						},
+						"$other": { ".validate": false }
+					}
+				},
+				"options": {
+					"$optionIndex": {
+						".validate": "newData.isString() && newData.val().length <= 30"
+					}
+				},
 				"metadata": {
 					"tagged": {
 						".validate": "newData.isString() && newData.val().length <= 100"
@@ -1195,6 +1218,9 @@
 						"save_ability": {
 							".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
 						},
+						"optional": {
+							".validate": "newData.isBoolean()"
+						},
 						"rolls": {
 							"$rollIndex": {
 								"damage_type": {
@@ -1215,9 +1241,6 @@
 								"primary": {
 									".validate": "newData.isBoolean()"
 								},
-								"projectile_count": {
-									".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
-								},
 								"miss_mod": {
 									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
 								},
@@ -1235,17 +1258,11 @@
 										"level": {
 											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
 										},
-										"dice_count": {
-											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
-										},
 										"dice_type": {
 											".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
 										},
 										"fixed_val": {
 											".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
-										},
-										"projectile_count": {
-											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
 										},
 										"$other": { ".validate": false }
 									}

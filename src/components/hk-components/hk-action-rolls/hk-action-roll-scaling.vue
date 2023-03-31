@@ -17,137 +17,89 @@
 				v-if="tier_index < shown_level_tiers"
 				:key="`level-tier-${tier_index}`"
 			>
-				<!-- HL LEVEL SCALE -->
-				<div class="full-width">
-					<ValidationProvider
-						rules="required|between:1,20"
-						:name="`${scaling} ${tier_index}`"
-						v-slot="{ errors, invalid, validated }"
-					>
-						<q-input
-							:dark="$store.getters.theme === 'dark'"
-							filled
-							square
-							:label="scaling"
-							v-model="level_tier.level"
-							autocomplete="off"
-							class="mb-2"
-							type="number"
-							min="1"
-							max="20"
-							:error="invalid && validated"
-							:error-message="errors[0]"
-							@keyup="$forceUpdate()"
-							@input="
-								(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
-							"
-						/>
-					</ValidationProvider>
-
-					<div class="row q-col-gutter-sm mb-0">
-						<!-- HL DICE COUNT -->
-						<div class="col">
-							<ValidationProvider
-								rules="between:1,99"
-								:name="`Dice count ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									label="Dice count"
-									v-model="level_tier.dice_count"
-									autocomplete="off"
-									class="mb-2"
-									type="number"
-									min="1"
-									max="99"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-									@keyup="$forceUpdate()"
-									@input="
-										(value) =>
-											$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
-									"
-								/>
-							</ValidationProvider>
-						</div>
-						<div class="col">
-							<!-- HL MODIFIER DICE TYPE -->
-							<ValidationProvider
-								:rules="{ required: !!level_tier.dice_count }"
-								:name="`Dice count ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-select
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									map-options
-									emit-value
-									:label="`Dice type ${level_tier.dice_count ? '*' : ''}`"
-									:options="dice_type"
-									v-model="level_tier.dice_type"
-									class="mb-2"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-									@input="$forceUpdate()"
-								/>
-							</ValidationProvider>
-						</div>
-						<div class="col">
-							<ValidationProvider
-								rules="between:-99,99"
-								:name="`Fixed value ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									label="Fixed value"
-									v-model="level_tier.fixed_val"
-									autocomplete="off"
-									class="mb-2"
-									type="number"
-									min="-99"
-									max="99"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-									@keyup="$forceUpdate()"
-									@input="
-										(value) =>
-											$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
-									"
-								/>
-							</ValidationProvider>
-						</div>
+				<div class="row q-col-gutter-sm mb-0 full-width">
+					<div class="col">
+						<ValidationProvider
+							rules="required|between:1,20"
+							:name="`${scaling} ${tier_index}`"
+							v-slot="{ errors, invalid, validated }"
+						>
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								:label="scaling"
+								v-model="level_tier.level"
+								autocomplete="off"
+								class="mb-2"
+								type="number"
+								min="1"
+								max="20"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+								@keyup="$forceUpdate()"
+								@input="
+									(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
+								"
+							/>
+						</ValidationProvider>
 					</div>
-
-					<!-- HL PROJECTILE COUNT -->
-					<ValidationProvider
-						rules="between:1,10"
-						:name="`Projectile count ${tier_index}`"
-						v-slot="{ errors, invalid, validated }"
-					>
-						<q-input
-							:dark="$store.getters.theme === 'dark'"
-							filled
-							square
-							label="Projectile count"
-							v-model="level_tier.projectile_count"
-							autocomplete="off"
-							type="number"
-							:error="invalid && validated"
-							:error-message="errors[0]"
-							@keyup="$forceUpdate()"
-							@input="
-								(value) =>
-									$set(level_tier, 'projectile_count', value != undefined ? parseInt(value) : value)
-							"
-						/>
-					</ValidationProvider>
+					<div class="col">
+						<ValidationProvider
+							rules="between:1,99"
+							:name="`Dice count ${tier_index}`"
+							v-slot="{ errors, invalid, validated }"
+						>
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								label="Dice count"
+								v-model="level_tier.dice_count"
+								autocomplete="off"
+								class="mb-2"
+								type="number"
+								min="1"
+								max="99"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+								@keyup="$forceUpdate()"
+								@input="
+									(value) =>
+										$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
+								"
+							>
+								<small slot="append">d{{ roll.dice_type }}</small>
+							</q-input>
+						</ValidationProvider>
+					</div>
+					<div class="col">
+						<ValidationProvider
+							rules="between:-99,99"
+							:name="`Fixed value ${tier_index}`"
+							v-slot="{ errors, invalid, validated }"
+						>
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								label="Fixed value"
+								v-model="level_tier.fixed_val"
+								autocomplete="off"
+								class="mb-2"
+								type="number"
+								min="-99"
+								max="99"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+								@keyup="$forceUpdate()"
+								@input="
+									(value) =>
+										$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
+								"
+							/>
+						</ValidationProvider>
+					</div>
 				</div>
 				<div>
 					<a @click="removeLevelTier(tier_index)" class="btn btn-sm bg-neutral-5">

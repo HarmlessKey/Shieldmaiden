@@ -176,32 +176,6 @@
 				</q-input>
 			</template>
 
-			<!-- PROJECTILE COUNT -->
-			<q-input
-				v-if="action_type !== 'healing'"
-				:dark="$store.getters.theme === 'dark'"
-				filled
-				square
-				label="Projectile count"
-				v-model="roll.projectile_count"
-				@input="parseToInt($event, roll, 'projectile_count')"
-				autocomplete="off"
-				class="mb-4"
-				type="number"
-				@keyup="$forceUpdate()"
-			>
-				<template v-slot:append>
-					<hk-popover header="Projectile count">
-						<q-icon name="info" />
-						<template slot="content">
-							Number of projectiles that are cast. <br />
-							Think of spells like <b>Magic Missile</b> (phb 257), where multiple projectiles are
-							created for a single cast.
-						</template>
-					</hk-popover>
-				</template>
-			</q-input>
-
 			<!-- FAIL MODIFIER -->
 			<ValidationProvider
 				v-if="action_type === 'save'"

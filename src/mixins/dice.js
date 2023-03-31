@@ -195,7 +195,7 @@ export const dice = {
 		 */
 		rollAction(e, ability, config = {}) {
 			let returnRoll = {
-				name: ability.name,
+				name: this.getAbilityName(ability, config),
 				actions: [],
 			};
 
@@ -216,8 +216,6 @@ export const dice = {
 			}
 
 			const actions = ability.action_list; // All actions in the ability
-			const scale_type = ability.scaling; // Only for spells
-			const spell_level = ability.level; // Only for spells
 
 			let i = 0;
 			// LOOP OVER ALL ACTIONS
@@ -240,7 +238,7 @@ export const dice = {
 						false,
 						advantage_object
 					);
-					if (returnRoll.actions[i].toHit.throwsTotal === 20) {
+					if (returnRoll.actions[i].toHit.throwsTotal >= 1) {
 						returnRoll.actions[i].crit = true;
 						crit = true;
 					}
@@ -252,113 +250,85 @@ export const dice = {
 					returnRoll.actions[i].save_dc = action.save_dc || 10;
 				}
 
-				for (let modifier of action.rolls) {
-					let damage_type = modifier.damage_type;
-					let dice_type = modifier.dice_type;
-					let dice_count = modifier.dice_count;
-					let fixed_val = modifier.fixed_val ? modifier.fixed_val : 0;
-					let modifierRoll = undefined;
-					let scaledRoll = undefined;
-					let scaledModifier = undefined;
-					let missSave = toHit ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
+				for (const roll of action.rolls) {
+					// Create editable Roll object with important props from roll object via anonymous function
+					let editableRoll = (({ damage_type, dice_count, dice_type, fixed_val }) => ({
+						damage_type,
+						dice_count,
+						dice_type,
+						fixed_val,
+					}))(roll);
+
+					const missSave = toHit ? roll.miss_mod : roll.save_fail_mod; //what happens on miss/failed save
 					const special =
-						!modifier.special || modifier.length === 0
+						!roll.special || roll.length === 0
 							? undefined
-							: modifier.special && Array.isArray(modifier.special)
-							? modifier.special
-							: [modifier.special];
-					let magical = !!modifier.magical;
+							: roll.special && Array.isArray(roll.special)
+							? roll.special
+							: [roll.special];
+					let magical = !!roll.magical;
 
 					// Check for versatile. 1 is the alternative option
 					// Changes only have to be made if the versatile roll is the alternative (1)
 					if (config.versatile === 1) {
-						damage_type = modifier.versatile_damage_type
-							? modifier.versatile_damage_type
-							: damage_type;
-						dice_type = modifier.versatile_dice_type ? modifier.versatile_dice_type : dice_type;
-						dice_count = modifier.versatile_dice_count ? modifier.versatile_dice_count : dice_count;
-						fixed_val = modifier.versatile_fixed_val ? modifier.versatile_fixed_val : fixed_val;
-						magical = modifier.versatile_magical;
+						editableRoll.damage_type = roll.versatile_damage_type || editableRoll.damage_type;
+						editableRoll.dice_type = roll.versatile_dice_type || editableRoll.dice_type;
+						editableRoll.dice_count = roll.versatile_dice_count || editableRoll.dice_count;
+						editableRoll.fixed_val = roll.versatile_fixed_val || editableRoll.fixed_val;
+						magical = roll.versatile_magical;
 					}
-					dice_count = this.getDiceCount(crit, dice_count);
 
 					// Check if the action scales with the current roll
-					const tiers = modifier.scaling;
-					if (tiers) {
-						scaledModifier = this.__levelScaling__(
-							tiers,
-							config.cast_level,
-							spell_level,
-							config.caster_level,
-							scale_type
-						);
-
-						// Roll the scaledModifier
-						if (scaledModifier) {
-							scaledModifier.dice_count = this.getDiceCount(crit, scaledModifier.dice_count);
-							if (scaledModifier.dice_type && scaledModifier.dice_count)
-								scaledRoll = this.rollD(
-									e.e,
-									scaledModifier.dice_type,
-									scaledModifier.dice_count,
-									scaledModifier.fixed_val
-								);
-							// When there is nothing to roll, but only a fixed value
-							// still a roll must be created
-							else
-								scaledRoll = {
-									title: ability.name,
-									roll: fixed_val,
-									mod: fixed_val,
-									throws: [],
-									throwsTotal: 0,
-									total: parseInt(fixed_val),
-								};
-						}
+					const tiers = roll.scaling;
+					if (roll.scaling) {
+						editableRoll = this.__levelScaling__(tiers, editableRoll, ability, config);
 					}
 
-					// Roll the modifier
-					// If the modifier scales with character level, overwrite the modifierRoll with the scaledRoll
-					if (scale_type === "character_level" && scaledModifier) {
-						modifierRoll = scaledRoll;
-						scaledRoll = undefined; //Only return the scaled modifierRoll
-					} else {
-						if (dice_type && dice_count) {
-							modifierRoll = this.rollD(e.e, dice_type, dice_count, fixed_val, `${ability.name}`);
+					// check crits
+					editableRoll.dice_count = this.getDiceCount(crit, editableRoll.dice_count);
+
+					// Roll the roll
+					let rollResult = undefined;
+					if (editableRoll.dice_type && editableRoll.dice_count) {
+						rollResult = this.rollD(
+							e.e,
+							editableRoll.dice_type,
+							editableRoll.dice_count,
+							editableRoll.fixed_val,
+							`${editableRoll.name}`
+						);
 						// When there is nothing to roll, but only a fixed value
 						// still a roll must be created
-						} else {
-							modifierRoll = {
-								title: ability.name,
-								roll: fixed_val,
-								mod: fixed_val,
-								throws: [],
-								throwsTotal: 0,
-								total: parseInt(fixed_val),
-							};
-						}
+					} else {
+						rollResult = {
+							title: editableRoll.name,
+							roll: editableRoll.fixed_val,
+							mod: editableRoll.fixed_val,
+							throws: [],
+							throwsTotal: 0,
+							total: parseInt(editableRoll.fixed_val),
+						};
 					}
 
 					// Double the rolled damage (without the modifier [throwsTotal])
 					// simply add [trhowsTotal] once more to the [total]
 					// Only when it's a crit and crit settings are set to double
 					if (crit && this.critSettings === "double") {
-						modifierRoll.total = modifierRoll.total + modifierRoll.throwsTotal;
-						const { n, d, m, s } = modifierRoll;
-						modifierRoll.roll = m !== 0 ? `2x(${n}d${d})${s}${m}` : `2x(${n}d${d})`;
+						rollResult.total = rollResult.total + rollResult.throwsTotal;
+						const { n, d, m, s } = rollResult;
+						rollResult.roll = m !== 0 ? `2x(${n}d${d})${s}${m}` : `2x(${n}d${d})`;
 					}
 					// Add the max damage output of the roll to the total when crit and setting is max
 					if (crit && this.critSettings === "max") {
-						const { n, d, m, s } = modifierRoll;
-						modifierRoll.total = modifierRoll.total + n * d;
-						modifierRoll.roll = m !== 0 ? `(${n}d${d}+${n * d})${s}${m}` : `(${n}d${d}+${n * d}) `;
+						const { n, d, m, s } = rollResult;
+						rollResult.total = rollResult.total + n * d;
+						rollResult.roll = m !== 0 ? `(${n}d${d}+${n * d})${s}${m}` : `(${n}d${d}+${n * d}) `;
 					}
 
 					// Push the rolled modifier to the array with all rolled modifiers
 					returnRoll.actions[i].rolls.push({
-						modifierRoll,
-						damage_type,
-						scaledRoll,
+						rollResult,
+						damage_type: editableRoll.damage_type,
 						missSave,
 						magical,
 						special,
@@ -368,48 +338,40 @@ export const dice = {
 			}
 			return returnRoll;
 		},
-		__levelScaling__(tiers, cast_level, spell_level, caster_level, scale_type) {
-			let scaledModifier = undefined;
-
+		__levelScaling__(tiers, roll, ability, config) {
 			// SPELL SCALE
-			if (scale_type === "spell_scale") {
+			if (ability.scaling === "spell_scale") {
 				const scale = tiers[0].level;
-				const dice_type = tiers[0].dice_type;
 				const dice_count = tiers[0].dice_count;
 				const fixed_val = tiers[0].fixed_val;
 
 				// Calculate the increase based on spell level, on what level the spell is cast and the scale
-				const increase = parseInt(Math.floor((cast_level - spell_level) / scale));
+				const increase = parseInt(Math.floor((config.cast_level - ability.level) / scale));
 
 				// If there is an increase,
 				if (increase) {
-					scaledModifier = {};
-					scaledModifier.dice_count = increase * dice_count;
-					scaledModifier.dice_type = dice_type;
-
-					// Check if there is a fixed value
-					// If there is one, add it for every scale level
-					// If the spell scales with 1 and is cast 3 levels higer, multiply the fixed value by 3
-					scaledModifier.fixed_val = fixed_val ? increase * fixed_val : 0;
+					roll.dice_count += increase * dice_count;
+					if (roll.fixed_val) roll.fixed_val += fixed_val ? increase * fixed_val : 0;
 				}
 			}
 			// CHARACTER LEVEL
-			if (scale_type === "character_level") {
+			else if (ability.scaling === "character_level") {
 				tiers.sort((a, b) => (parseInt(a.level) > parseInt(b.level) ? 1 : -1));
 
 				for (let tier of tiers) {
-					if (parseInt(caster_level) >= parseInt(tier.level)) {
-						scaledModifier = {
-							dice_count: tier.dice_count,
-							dice_type: tier.dice_type,
-						};
-						if (tier.fixed_val) {
-							scaledModifier.fixed_val = tier.fixed_val;
-						}
+					if (parseInt(config.caster_level) >= parseInt(tier.level)) {
+						roll.dice_count = tier.dice_count;
+						roll.fixed_val = tier.fixed_val || 0;
 					}
 				}
 			}
-			return scaledModifier;
+			return roll;
+		},
+		getAbilityName(ability, config) {
+			if (config.cast_level) {
+				return `${ability.name} (${config.cast_level.toOrdinal()})`;
+			}
+			return ability.name;
 		},
 		animateValue(id, start, end, duration) {
 			if (start === end) return;

@@ -32,6 +32,12 @@ Number.prototype.between = function (min = 0, max = Infinity) {
 	return Math.max(Math.min(this, max), min);
 };
 
+Number.prototype.toOrdinal = function () {
+	const s = ["th", "st", "nd", "rd"];
+	const v = this % 100;
+	return this + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
 Array.min = function (array) {
 	return Math.min.apply(Math, array);
 };

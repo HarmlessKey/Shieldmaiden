@@ -32,8 +32,7 @@
 						:error-message="errors[0]"
 						@keyup="$forceUpdate()"
 						@input="
-							(value) =>
-								$set(spell, 'projectiles', value != undefined ? parseInt(value) : value)
+							(value) => $set(spell, 'projectiles', value != undefined ? parseInt(value) : value)
 						"
 					>
 						<hk-popover slot="append" header="Projectiles">
@@ -62,6 +61,9 @@
 					use-chips
 					label="Options"
 					v-model="spell.options"
+					:option-disable="
+						(opt) => spell.options && spell.options.length > 1 && opt === spell.options[0]
+					"
 					class="mb-4"
 					new-value-mode="add-unique"
 				>
@@ -221,7 +223,12 @@
 					<q-form @submit="handleSubmit(saveRoll)">
 						<hk-card :header="edit_index !== undefined ? 'Edit roll' : 'New roll'" class="mb-0">
 							<div class="card-body">
-								<hk-action-roll-form v-model="roll" :options="spell.options" :action_type="action_type" :spell="spell" />
+								<hk-action-roll-form
+									v-model="roll"
+									:options="spell.options"
+									:action_type="action_type"
+									:spell="spell"
+								/>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
 								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
@@ -245,7 +252,12 @@
 					<q-form>
 						<hk-card header="Projectile scaling" class="mb-0">
 							<div class="card-body">
-								<hk-action-roll-scaling v-model="spell.projectile_scaling" type="projectile" :spell="spell" @input="$forceUpdate()" />
+								<hk-action-roll-scaling
+									v-model="spell.projectile_scaling"
+									type="projectile"
+									:spell="spell"
+									@input="$forceUpdate()"
+								/>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
 								<q-btn class="mr-1" v-close-popup no-caps>Close</q-btn>

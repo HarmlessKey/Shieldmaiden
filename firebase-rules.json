@@ -1235,6 +1235,25 @@
 								"fixed_val": {
 									".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
 								},
+								"options": {
+									"$optionKey": {
+										"damage_type": {
+											".validate": "newData.isString() && newData.val().matches(/^(acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder|non_magical_bludgeoning|non_magical_piercing|non_magical_slashing)$/)"
+										},
+										"magical": {
+											".validate": "newData.isBoolean()"
+										},
+										"dice_count": {
+											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+										},
+										"dice_type": {
+											".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
+										},
+										"fixed_val": {
+											".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+										}
+									}
+								},
 								"primary": {
 									".validate": "newData.isBoolean()"
 								},

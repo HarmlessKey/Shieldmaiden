@@ -65,7 +65,8 @@
 						(opt) => spell.options && spell.options.length > 1 && opt === spell.options[0]
 					"
 					class="mb-4"
-					new-value-mode="add-unique"
+					@new-value="addOption"
+					@remove="removeOption"
 				>
 					<hk-popover slot="append" header="Action options">
 						<i class="fas fa-info-circle" aria-hidden="true" />
@@ -271,6 +272,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { abilities } from "src/utils/generalConstants";
 import { attack_types } from "src/utils/actionConstants";
 
@@ -354,6 +356,33 @@ export default {
 		},
 		removeRoll(index) {
 			this.$delete(this.rolls, index);
+		},
+
+		/**
+		 * Remove " and '  from option values
+		 * @param {string} value
+		 * @param {function} done (value, behavior)
+		 */
+		addOption(value, done) {
+			done(value.replace(/["']/g, ""), "add-unique");
+		},
+
+		/**
+		 * Remove the option from all rolls
+		 * @param {object} details { index, value }
+		 */
+		removeOption(details) {
+			if (this.spell.actions) {
+				for (const action of this.spell.actions) {
+					if (action.rolls) {
+						for (const roll of action.rolls) {
+							if (roll.options) {
+								this.$delete(roll.options, details.value);
+							}
+						}
+					}
+				}
+			}
 		},
 	},
 };

@@ -1,5 +1,5 @@
 <template>
-	<div class="hk-markdown">
+	<div class="hk-markdown" v-if="!readOnly">
 		<div class="hk-markdown__header">
 			<div>
 				<span>
@@ -41,6 +41,7 @@
 			<div class="hk-markdown__preview" v-html="marked" />
 		</slot>
 	</div>
+	<div v-else class="hk-markdown__read-only" v-html="marked" />
 </template>
 
 <script>
@@ -66,6 +67,10 @@ export default {
 		},
 		errorMessage: {
 			type: String,
+		},
+		readOnly: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {

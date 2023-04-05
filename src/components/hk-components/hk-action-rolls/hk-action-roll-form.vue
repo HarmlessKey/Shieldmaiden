@@ -1,7 +1,15 @@
 <template>
 	<div>
 		<div v-show="!set_scaling">
-			<p>{{ spell.description }}</p>
+			<button
+				class="btn btn-sm btn-block bg-neutral-5 mb-2"
+				@click.prevent="show_description = !show_description"
+			>
+				Description
+			</button>
+			<q-slide-transition>
+				<hk-markdown-editor v-if="show_description" :value="spell.description" read-only />
+			</q-slide-transition>
 			<q-tabs v-if="action_options.length > 1" v-model="tab" dark no-caps>
 				<q-tab
 					v-for="(option, index) in action_options"
@@ -290,6 +298,7 @@ export default {
 	},
 	data() {
 		return {
+			show_description: false,
 			damage_types: damage_types,
 			set_scaling: false,
 			tab: 0,

@@ -358,7 +358,7 @@ const player_actions = {
 					}
 				}
 
-				commit("UPDATE_SEARCH_PLAYER", { id, search_player });
+				commit("SET_PLAYER", { id, search_player });
 				commit("SET_CACHED_PLAYER", { uid, id, player });
 				return;
 			} catch (error) {

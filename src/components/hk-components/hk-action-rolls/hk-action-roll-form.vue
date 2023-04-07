@@ -8,7 +8,11 @@
 				Description
 			</button>
 			<q-slide-transition>
-				<hk-markdown-editor v-if="show_description" :value="spell.description" read-only />
+				<hk-markdown-editor
+					v-if="show_description"
+					:value="description || spell.description"
+					read-only
+				/>
 			</q-slide-transition>
 			<q-tabs v-if="action_options.length > 1" v-model="tab" dark no-caps>
 				<q-tab
@@ -315,6 +319,9 @@ export default {
 		spell: {
 			type: Object,
 			default: undefined,
+		},
+		description: {
+			type: String,
 		},
 	},
 	data() {

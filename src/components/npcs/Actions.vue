@@ -330,63 +330,36 @@
 												</div>
 											</div>
 
-											<!-- VERSATILE -->
-											<div class="row q-col-gutter-md">
-												<div class="col-4 col-sm-3">
-													<q-checkbox
-														:dark="$store.getters.theme === 'dark'"
-														v-model="ability.versatile"
-														label="Versatile"
-														:false-value="null"
-														indeterminate-value="Questionable"
-														@input="$forceUpdate()"
-													/>
-												</div>
-												<template v-if="ability.versatile">
-													<div class="col">
-														<ValidationProvider
-															rules="max:25|required"
-															name="Option 1"
-															v-slot="{ errors, invalid, validated }"
-														>
-															<q-input
-																:dark="$store.getters.theme === 'dark'"
-																filled
-																square
-																dense
-																type="text"
-																label="Option 1 name *"
-																maxlength="25"
-																v-model="ability.versatile_one"
-																@keyup="$forceUpdate()"
-																:error="invalid && validated"
-																:error-message="errors[0]"
-															/>
-														</ValidationProvider>
-													</div>
-													<div class="col">
-														<ValidationProvider
-															rules="max:25|required"
-															name="Option 2"
-															v-slot="{ errors, invalid, validated }"
-														>
-															<q-input
-																:dark="$store.getters.theme === 'dark'"
-																filled
-																square
-																dense
-																type="text"
-																label="Option 2 name *"
-																maxlength="25"
-																v-model="ability.versatile_two"
-																@keyup="$forceUpdate()"
-																:error="invalid && validated"
-																:error-message="errors[0]"
-															/>
-														</ValidationProvider>
-													</div>
-												</template>
-											</div>
+											<!-- OPTIONS -->
+											<q-select
+												:dark="$store.getters.theme === 'dark'"
+												filled
+												square
+												multiple
+												use-input
+												use-chips
+												label="Options"
+												v-model="ability.options"
+												:option-disable="
+													(opt) =>
+														ability.options &&
+														ability.options.length > 1 &&
+														opt === ability.options[0]
+												"
+												class="mb-4"
+												@new-value="addOption"
+												@remove="removeOption($event, category, ability_index)"
+											>
+												<hk-popover slot="append" header="Action options">
+													<i class="fas fa-info-circle" aria-hidden="true" />
+													<template #content>
+														Options allow you to create slightly different rolls for the actions and
+														choose to use this action with one of the options. Think of versatile
+														weapon attacks where you roll a different damage die for 1- or 2-handed
+														attacks.
+													</template>
+												</hk-popover>
+											</q-select>
 
 											<!-- ACTIONS -->
 											<div
@@ -539,14 +512,12 @@
 							class="mb-0"
 						>
 							<div class="card-body">
-								<p>
-									{{ npc[edit_action.category][edit_action.ability_index].desc }}
-								</p>
 								<hk-action-roll-form
 									v-if="roll && edit_action.type"
 									v-model="roll"
+									:options="edit_action.options"
+									:description="npc[edit_action.category][edit_action.ability_index].desc"
 									:action_type="edit_action.type"
-									:versatile_options="edit_action.versatile"
 								/>
 								<div v-else>Select an action type first</div>
 							</div>
@@ -669,7 +640,7 @@ export default {
 		 * Remove an action
 		 *
 		 * @param {integer} index index of the action
-		 * @param {string} category actions / lengedary_actions / special_abilities
+		 * @param {string} category actions / legendary_actions / special_abilities
 		 */
 		remove(index, category) {
 			this.$delete(this.npc[category], index);
@@ -691,11 +662,7 @@ export default {
 				ability_index,
 				action_index,
 				type: action.type,
-				versatile: {
-					versatile: ability.versatile,
-					versatile_one: ability.versatile_one,
-					versatile_two: ability.versatile_two,
-				},
+				options: ability.options,
 			};
 			this.edit_roll_index = undefined; // It's new, so no edit index
 			this.roll = {}; // Create an empty new roll
@@ -719,11 +686,7 @@ export default {
 				ability_index,
 				action_index,
 				type: action.type,
-				versatile: {
-					versatile: ability.versatile,
-					versatile_one: ability.versatile_one,
-					versatile_two: ability.versatile_two,
-				},
+				options: ability.options,
 			};
 			this.edit_roll_index = roll.roll_index;
 			this.roll = { ...roll.roll };
@@ -745,15 +708,36 @@ export default {
 			this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
 			this.$forceUpdate();
 		},
-		rollAbility(e, action, versatile) {
-			const config = {
-				type: "monster_action",
-				versatile,
-			};
-			this.setActionRoll(this.rollAction(e, action, config));
+
+		/**
+		 * Remove " and '  from option values
+		 * @param {string} value
+		 * @param {function} done (value, behavior)
+		 */
+		addOption(value, done) {
+			done(value.replace(/["']/g, ""), "add-unique");
 		},
-		getVersatile(ability, i) {
-			return ability[`versatile_${i ? "two" : "one"}`] || `Option ${i + 1}`;
+
+		/**
+		 * Remove the option from all rolls
+		 * @param {object} details { index, value }
+		 */
+		removeOption(details, category, ability_index) {
+			if (
+				this.npc[category] &&
+				this.npc[category][ability_index] &&
+				this.npc[category][ability_index].action_list
+			) {
+				for (const action of this.npc[category][ability_index].action_list) {
+					if (action.rolls) {
+						for (const roll of action.rolls) {
+							if (roll.options) {
+								this.$delete(roll.options, details.value);
+							}
+						}
+					}
+				}
+			}
 		},
 	},
 };

@@ -187,7 +187,7 @@ export const dice = {
 		/**
 		 * Roll any spell or monster action
 		 *
-		 * @param {object} e Event, holds info for advantage/disadvantege
+		 * @param {object} e Event, holds info for advantage/disadvantage
 		 * @param {object} ability Full ability object
 		 * @param {object} config Holds configuration options {type, cast_level, caster_level, toHitModifier, versatile}
 		 *
@@ -200,13 +200,13 @@ export const dice = {
 			};
 
 			if (config.option !== undefined) {
-				if (ability.versatile) {
+				if (ability.options && ability.options.length) {
+					returnRoll.name = `${ability.name} (${config.option})`;
+				} else if (ability.versatile) {
 					returnRoll.name =
 						config.option === 0
 							? `${ability.name} (${ability.versatile_one || "Option 1"})`
 							: `${ability.name} (${ability.versatile_two || "Option 2"})`;
-				} else if (ability.options && ability.options.length) {
-					returnRoll.name = `${ability.name} (${config.option})`;
 				}
 			}
 

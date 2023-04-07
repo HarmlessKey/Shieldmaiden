@@ -142,6 +142,7 @@
 
 
 
+
 														}}) </template
 													><template v-else>{{ roll.fixed_val }})</template>
 													{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
@@ -360,7 +361,7 @@ export default {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
-		roll(e, option, action_index, action, category) {
+		roll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted && this.targeted.length) {
 				this.roll_action({
 					e,
@@ -369,6 +370,7 @@ export default {
 					category,
 					entity: this.current,
 					targets: this.targeted,
+					projectiles,
 					option,
 				});
 			}

@@ -531,6 +531,7 @@
 									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 									}}<template v-if="roll.fixed_val && roll.dice_count">
 										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+
 										}}) </template
 									><template v-else>{{ roll.fixed_val }})</template>
 									{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
@@ -736,7 +737,7 @@ export default {
 					return item[1];
 				});
 		},
-		roll(e, option, action_index, action, category) {
+		roll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted && this.targeted.length) {
 				this.roll_action({
 					e,
@@ -745,6 +746,7 @@ export default {
 					category,
 					entity: this.entity,
 					targets: this.targeted,
+					projectiles,
 					option,
 				});
 			} else {

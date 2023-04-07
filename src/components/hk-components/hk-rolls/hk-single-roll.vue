@@ -670,7 +670,7 @@ export default {
 			let total = parseInt(roll.rollResult.total);
 
 			if (action.type === "save" && this.savingThrowResult[action_index] === "save") {
-				total = total * roll.missSave;
+				total = total * (roll.missSave || 0);
 			}
 			if (action.toHit && this.hitOrMiss[action_index] === "miss") {
 				total = total * roll.missSave;

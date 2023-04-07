@@ -322,7 +322,7 @@
 					<p v-if="monster.legendary_count && category === 'legendary_actions'">
 						{{ monster.name.capitalizeEach() }} can take {{ monster.legendary_count }} legendary
 						actions, choosing from the options below. Only one legendary action option can be used
-						at a time and only at the end of another creature’s turn. {{ monster.name }} regains
+						at a time and only at the end of another creature's turn. {{ monster.name }} regains
 						spent legendary actions at the start of their turn.
 					</p>
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
@@ -336,36 +336,9 @@
 								ability.action_list[0].rolls.length
 							"
 						>
-							<span v-if="ability.versatile" class="roll-button" @click.stop>
-								<q-popup-proxy :dark="$store.getters.theme === 'dark'">
-									<div class="bg-neutral-8">
-										<q-item>
-											<q-item-section>
-												<strong>{{ ability.name }}</strong>
-											</q-item-section>
-										</q-item>
-										<q-list :dark="$store.getters.theme === 'dark'">
-											<hk-roll
-												v-for="i in [0, 1]"
-												:key="`${i}-versatile-roll`"
-												:tooltip="`${ability.name} (${getVersatile(ability, i)})`"
-												tooltipPosition="right"
-												@roll="roll($event, ability, i)"
-											>
-												<q-item clickable v-close-popup>
-													<q-item-section avatar>{{ i + 1 }}</q-item-section>
-													<q-item-section>
-														{{ getVersatile(ability, i) }}
-													</q-item-section>
-												</q-item>
-											</hk-roll>
-										</q-list>
-									</div>
-								</q-popup-proxy>
-							</span>
-							<hk-roll v-else :tooltip="`Roll ${ability.name}`" @roll="roll($event, ability)">
+							<hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability">
 								<span class="roll-button" />
-							</hk-roll>
+							</hk-roll-action>
 						</template>
 						<strong
 							><em>
@@ -495,20 +468,8 @@ export default {
 	},
 	methods: {
 		...mapActions("api_monsters", ["fetch_monster"]),
-		...mapActions(["setActionRoll"]),
 		setSize(size) {
 			this.width = size.width;
-		},
-		getVersatile(ability, i) {
-			return ability[`versatile_${i ? "two" : "one"}`] || `Option ${i + 1}`;
-		},
-		roll(e, action, versatile) {
-			const config = {
-				type: "monster_action",
-				versatile,
-			};
-			console.log(action)
-			this.setActionRoll(this.rollAction(e, action, config));
 		},
 		passivePerception() {
 			return 10 + parseInt(this.skillModifier("wisdom", "perception"));

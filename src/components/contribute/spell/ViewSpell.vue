@@ -83,22 +83,25 @@
 			</template>
 
 			<!-- ROLL SPELL -->
-			<hk-roll @roll="roll($event)">
+			<hk-roll-action
+				:action="spell"
+				type="spell"
+				:attack-bonus="attack_bonus"
+				:cast-level="cast_level"
+				:caster-level="caster_level"
+			>
 				<button class="btn btn-block mt-3">Roll</button>
-			</hk-roll>
+			</hk-roll-action>
 		</div>
 	</div>
 </template>
 
 <script>
 import { damage_types } from "src/utils/generalConstants";
-import { mapActions } from "vuex";
-import { dice } from "src/mixins/dice.js";
 
 export default {
 	name: "ViewSpell",
 	props: ["data", "no_roll"],
-	mixins: [dice],
 	data() {
 		return {
 			damage_types: damage_types,
@@ -151,26 +154,8 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setActionRoll"]),
 		selectLevel(i) {
 			this.cast_level = i;
-		},
-		roll(e) {
-			const action = {
-				action_list: this.spell.actions,
-				name: this.spell.name,
-				scaling: this.spell.scaling,
-				level: this.spell.level,
-			};
-
-			const config = {
-				type: "spell",
-				attack_bonus: this.attack_bonus,
-				cast_level: this.cast_level,
-				caster_level: this.caster_level,
-			};
-
-			this.setActionRoll(this.rollAction(e, action, config));
 		},
 	},
 };

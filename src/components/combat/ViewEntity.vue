@@ -417,54 +417,14 @@
 									action.action_list[0].rolls.length
 								"
 							>
-								<span v-if="action.versatile" class="roll-button" @click.stop>
-									<q-popup-proxy :dark="$store.getters.theme === 'dark'">
-										<div class="bg-neutral-8">
-											<q-item>
-												<q-item-section>
-													<strong>{{ action.name }}</strong>
-												</q-item-section>
-											</q-item>
-											<q-separator />
-											<q-list :dark="$store.getters.theme === 'dark'">
-												<q-item clickable v-close-popup>
-													<q-item-section avatar>1</q-item-section>
-													<q-item-section>
-														<hk-roll
-															:tooltip="`${action.name} (${action.versatile_one || 'Option 1'})`"
-															tooltipPosition="right"
-															@roll="roll($event, acion_index, action, category, 0)"
-															:disabled="!checkAvailable(category, action_index, action)"
-														>
-															{{ action.versatile_one || "Option 1" }}
-														</hk-roll>
-													</q-item-section>
-												</q-item>
-												<q-item clickable v-close-popup>
-													<q-item-section avatar>2</q-item-section>
-													<q-item-section>
-														<hk-roll
-															:tooltip="`${action.name} (${action.versatile_two || 'Option 2'})`"
-															tooltipPosition="right"
-															@roll="roll($event, action_index, action, category, 1)"
-															:disabled="!checkAvailable(category, action_index, action)"
-														>
-															{{ action.versatile_two || "Option 2" }}
-														</hk-roll>
-													</q-item-section>
-												</q-item>
-											</q-list>
-										</div>
-									</q-popup-proxy>
-								</span>
-								<hk-roll
-									v-else
+								<hk-roll-action
+									:action="action"
 									:tooltip="`Roll ${action.name}`"
-									@roll="roll($event, action_index, action, category)"
+									@roll="roll(...arguments, action_index, action, category)"
 									:disabled="!checkAvailable(category, action_index, action)"
 								>
 									<span class="roll-button" />
-								</hk-roll>
+								</hk-roll-action>
 							</template>
 							<div class="monster-action-title__name">
 								<strong
@@ -571,11 +531,6 @@
 									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 									}}<template v-if="roll.fixed_val && roll.dice_count">
 										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
-
-
-
-
-
 										}}) </template
 									><template v-else>{{ roll.fixed_val }})</template>
 									{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
@@ -781,7 +736,7 @@ export default {
 					return item[1];
 				});
 		},
-		roll(e, action_index, action, category, versatile) {
+		roll(e, option, action_index, action, category) {
 			if (this.targeted && this.targeted.length) {
 				this.roll_action({
 					e,
@@ -790,7 +745,7 @@ export default {
 					category,
 					entity: this.entity,
 					targets: this.targeted,
-					versatile,
+					option,
 				});
 			} else {
 				this.$q.notify({

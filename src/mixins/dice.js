@@ -199,11 +199,15 @@ export const dice = {
 				actions: [],
 			};
 
-			if (config.versatile !== undefined) {
-				returnRoll.name =
-					config.versatile === 0
-						? `${ability.name} (${ability.versatile_one || "Option 1"})`
-						: `${ability.name} (${ability.versatile_two || "Option 2"})`;
+			if (config.option !== undefined) {
+				if (ability.versatile) {
+					returnRoll.name =
+						config.option === 0
+							? `${ability.name} (${ability.versatile_one || "Option 1"})`
+							: `${ability.name} (${ability.versatile_two || "Option 2"})`;
+				} else if (ability.options && ability.options.length) {
+					returnRoll.name = `${ability.name} (${config.option})`;
+				}
 			}
 
 			// Check for advantage/disadvantage in the $event
@@ -238,7 +242,7 @@ export const dice = {
 						false,
 						advantage_object
 					);
-					if (returnRoll.actions[i].toHit.throwsTotal >= 1) {
+					if (returnRoll.actions[i].toHit.throwsTotal >= 20) {
 						returnRoll.actions[i].crit = true;
 						crit = true;
 					}
@@ -268,9 +272,22 @@ export const dice = {
 							: [roll.special];
 					let magical = !!roll.magical;
 
+					// Check for options
+					if (ability.options && config.option && roll.options && roll.options[config.option]) {
+						const option = roll.options[config.option];
+						if (option.ignore) {
+							editableRoll = {};
+						} else {
+							editableRoll.damage_type = option.damage_type || editableRoll.damage_type;
+							editableRoll.dice_type = option.dice_type || editableRoll.dice_type;
+							editableRoll.dice_count = option.dice_count || editableRoll.dice_count;
+							editableRoll.fixed_val = option.fixed_val || editableRoll.fixed_val;
+							magical = option.magical;
+						}
+					}
 					// Check for versatile. 1 is the alternative option
 					// Changes only have to be made if the versatile roll is the alternative (1)
-					if (config.versatile === 1) {
+					else if (ability.versatile && config.option === 1) {
 						editableRoll.damage_type = roll.versatile_damage_type || editableRoll.damage_type;
 						editableRoll.dice_type = roll.versatile_dice_type || editableRoll.dice_type;
 						editableRoll.dice_count = roll.versatile_dice_count || editableRoll.dice_count;
@@ -311,7 +328,7 @@ export const dice = {
 					}
 
 					// Double the rolled damage (without the modifier [throwsTotal])
-					// simply add [trhowsTotal] once more to the [total]
+					// simply add [throwsTotal] once more to the [total]
 					// Only when it's a crit and crit settings are set to double
 					if (crit && this.critSettings === "double") {
 						rollResult.total = rollResult.total + rollResult.throwsTotal;

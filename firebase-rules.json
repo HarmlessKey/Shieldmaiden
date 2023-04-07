@@ -95,6 +95,12 @@
 					"sync_character": {
 						".validate": "newData.isString() && newData.val().length <= 2000"
 					},
+					"created": {
+						".validate": "newData.isNumber()"
+					},
+					"updated": {
+						".validate": "newData.isNumber()"
+					},
 					"control": {
 						".validate": "newData.isString() && newData.val().length <= 100"
 					},
@@ -1251,6 +1257,9 @@
 										},
 										"fixed_val": {
 											".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
+										},
+										"ignore": {
+											".validate": "newData.isBoolean()"
 										}
 									}
 								},

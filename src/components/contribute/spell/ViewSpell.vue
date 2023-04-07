@@ -14,14 +14,12 @@
 		<div class="spell__info">
 			<b>Casting time:</b> {{ spell.cast_time }} {{ spell.cast_time_type }}<br />
 			<b>Range:</b> {{ range }}<br />
-			<template v-if="spell.ritual">
-				<b>Ritual:</b> Yes<br />
+			<template v-if="spell.ritual"> <b>Ritual:</b> Yes<br /> </template>
+			<template v-if="spell.components">
+				<b>Components:</b>
+				{{ spell.components.map((comp) => comp.charAt(0).toUpperCase()).join(", ") }}
+				{{ spell.material_description ? `(${spell.material_description})` : "" }}
 			</template>
-			<b>Components: </b>
-			<template v-if="spell.components.verbal">V </template>
-			<template v-if="spell.components.somatic">S </template>
-			<template v-if="spell.components.material">M </template>
-			{{ spell.material_description ? `(${spell.material_description})` : "" }}
 			<br />
 			<b>Duration:</b> {{ duration }}<br />
 			<template v-if="spell.classes">
@@ -33,7 +31,7 @@
 		</div>
 
 		<div class="spell__description">
-		<p v-html="spell.description" />
+			<hk-markdown-editor :value="spell.description" read-only />
 			<div v-if="spell.higher_level">
 				<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 			</div>
@@ -65,7 +63,6 @@
 				v-model="attack_bonus"
 			/>
 
-
 			<!-- SPELL LEVEL INPUT -->
 			<template v-if="spell.level > 0">
 				<p>Select Casting level</p>
@@ -86,12 +83,8 @@
 			</template>
 
 			<!-- ROLL SPELL -->
-			<hk-roll 
-				@roll="roll($event)"
-			>
-				<button class="btn btn-block mt-3">
-					Roll
-				</button>
+			<hk-roll @roll="roll($event)">
+				<button class="btn btn-block mt-3">Roll</button>
 			</hk-roll>
 		</div>
 	</div>
@@ -105,7 +98,7 @@ import { dice } from "src/mixins/dice.js";
 export default {
 	name: "ViewSpell",
 	props: ["data", "no_roll"],
-	mixins:[dice],
+	mixins: [dice],
 	data() {
 		return {
 			damage_types: damage_types,
@@ -155,7 +148,7 @@ export default {
 				}
 			}
 			return toHit;
-		}
+		},
 	},
 	methods: {
 		...mapActions(["setActionRoll"]),
@@ -163,19 +156,19 @@ export default {
 			this.cast_level = i;
 		},
 		roll(e) {
-			const action = { 
+			const action = {
 				action_list: this.spell.actions,
 				name: this.spell.name,
 				scaling: this.spell.scaling,
-				level: this.spell.level
-			}
+				level: this.spell.level,
+			};
 
 			const config = {
 				type: "spell",
 				attack_bonus: this.attack_bonus,
 				cast_level: this.cast_level,
-				caster_level: this.caster_level
-			}
+				caster_level: this.caster_level,
+			};
 
 			this.setActionRoll(this.rollAction(e, action, config));
 		},

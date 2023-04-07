@@ -1,4 +1,4 @@
-import { db, storage } from "src/firebase";
+import { firebase, db, storage } from "src/firebase";
 
 const NPCS_REF = db.ref("npcs");
 const SEARCH_NPCS_REF = db.ref("search_npcs");
@@ -73,6 +73,9 @@ export class npcServices {
 			const blob = npc.blob;
 			delete npc.blob;
 
+			npc.created = firebase.database.ServerValue.TIMESTAMP;
+			npc.updated = firebase.database.ServerValue.TIMESTAMP;
+
 			// Save the new NPC
 			const newNpc = await NPCS_REF.child(uid).push(npc);
 
@@ -115,6 +118,8 @@ export class npcServices {
 			// If there is an image upload save the blob in separate prop en then delete it from the NPC
 			const blob = npc.blob;
 			delete npc.blob;
+
+			npc.updated = firebase.database.ServerValue.TIMESTAMP;
 
 			// Upload image
 			const image_ref = STORAGE_REF.child(`${uid}/${id}.webp`);
@@ -166,6 +171,7 @@ export class npcServices {
 			.catch((error) => {
 				throw error;
 			});
+		NPCS_REF.child(`${uid}/${id}/updated`).update(firebase.database.ServerValue.TIMESTAMP);
 	}
 
 	/**

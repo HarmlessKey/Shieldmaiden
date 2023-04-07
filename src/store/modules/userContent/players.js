@@ -34,8 +34,11 @@ function filterSkills(playerSkills) {
 }
 function parseInts(player) {
 	for (const [key, value] of Object.entries(player)) {
-		if (numberValues.includes(key) && value !== undefined && value !== null) {
+		if (numberValues.includes(key) && value !== undefined && value !== null && value !== "") {
 			player[key] = parseInt(value);
+		}
+		if (numberValues.includes(key) && value === "") {
+			player[key] = null;
 		}
 	}
 	return player;

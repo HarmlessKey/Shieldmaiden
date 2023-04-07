@@ -181,7 +181,7 @@
 									<span class="type truncate" :class="rolled.damage_type">
 										<span class="type__icon-wrapper">
 											<i :class="damage_type_icons[rolled.damage_type]" aria-hidden="true" />
-											<i v-if="rolled.magical" class="fas fa-sparkles" aria-hidden="true">
+											<i v-if="rolled.magical" class="fas fa-sparkles magical" aria-hidden="true">
 												<q-tooltip anchor="top middle" self="center middle">Magical</q-tooltip>
 											</i>
 										</span>
@@ -728,7 +728,6 @@ export default {
 			this.$forceUpdate();
 		},
 		reroll(e, roll, throw_index, crit) {
-			console.log("reroll", roll);
 			const add = (a, b) => a + b;
 			const newRoll = this.rollD(e, roll.d, 1, 0, `Reroll 1d${roll.d}`);
 
@@ -783,7 +782,7 @@ export default {
 			};
 
 			if (event) {
-				// Drain = redus Max HP
+				// Drain = reduce Max HP
 				if (event === "drain") {
 					returnObj.name = "Drain";
 				}
@@ -796,7 +795,6 @@ export default {
 			return returnObj;
 		},
 		toggleOverride(dmg_type) {
-			console.log("override", dmg_type);
 			this.override[dmg_type] = undefined;
 			this.edit_total[dmg_type] = !this.edit_total[dmg_type];
 		},
@@ -877,7 +875,7 @@ export default {
 				&__icon-wrapper {
 					position: relative;
 
-					.fa-sparkles {
+					.magical {
 						position: absolute;
 						top: -3px;
 						left: -5px;

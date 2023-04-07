@@ -25,140 +25,161 @@
 					:key="`option-panel-${index}`"
 					:name="index"
 				>
-					<template v-if="action_type !== 'healing'">
-						<ValidationProvider
-							:rules="{
-								required: index === 0,
-							}"
-							:name="`Dice count ${key}`"
-						>
-							<hk-dmg-type-select
-								class="mb-2"
-								:label="`Damage type ${index != 0 ? key : `${key} *`}`"
-								:value="getValue('damage_type', { key, index })"
-								@input="setValue($event, 'damage_type', { key, index })"
-							/>
-						</ValidationProvider>
-						<div class="d-flex items-center mb-2">
-							<q-checkbox
-								:dark="$store.getters.theme === 'dark'"
-								:value="getValue('magical', { key, index })"
-								:label="`${index > 0 ? key : ''} Magical`"
-								:disable="
-									!['bludgeoning', 'piercing', 'slashing'].includes(
-										getValue('damage_type', { key, index })
-									)
-								"
-								@input="setValue($event, 'magical', { key, index })"
-								:false-value="null"
-								indeterminate-value="something-else"
-							/>
-							<hk-popover header="Magical damage">
-								<i class="fas fa-info-circle ml-2 neutral-2" aria-hidden="true" />
-								<template #content>
-									The damage counts as <strong>magical</strong> to overcome resistances to non
-									magical bludgeoning, piercing or slashing damage.
-								</template>
-							</hk-popover>
-						</div>
-					</template>
-
-					<!-- ROLLS -->
-					<div class="row q-col-gutter-md mb-3">
-						<!-- DICE COUNT -->
-						<div class="col">
+					<!-- Ignore Roll for option -->
+					<div v-if="index" class="d-flex items-center mb-2">
+						<q-checkbox
+							:dark="$store.getters.theme === 'dark'"
+							:value="getValue('ignore', { key, index })"
+							:label="`Ignore for ${key}`"
+							@input="setValue($event, 'ignore', { key, index })"
+							:false-value="null"
+							indeterminate-value="something-else"
+						/>
+						<hk-popover header="Ignore roll">
+							<i class="fas fa-info-circle ml-2 neutral-2" aria-hidden="true" />
+							<template #content>
+								Ignore this roll for the <strong>{{ key }}</strong> option.
+							</template>
+						</hk-popover>
+					</div>
+					<template
+						v-if="!index || !roll.options || !roll.options[key] || !roll.options[key].ignore"
+					>
+						<template v-if="action_type !== 'healing'">
 							<ValidationProvider
 								:rules="{
-									between: [1, 99],
-									required: !!getValue('dice_type', { key, index }),
+									required: index === 0,
 								}"
 								:name="`Dice count ${key}`"
-								v-slot="{ errors, invalid, validated }"
 							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									:label="`Dice count ${key} ${index == 0 ? '*' : ''}`"
-									:value="getValue('dice_count', { key, index })"
-									@input="setValue($event, 'dice_count', { key, index })"
-									min="1"
-									max="99"
-									autocomplete="off"
-									name="dice_count"
+								<hk-dmg-type-select
 									class="mb-2"
-									type="number"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:label="`Damage type ${index ? key : `${key} *`}`"
+									:value="getValue('damage_type', { key, index })"
+									@input="setValue($event, 'damage_type', { key, index })"
 								/>
 							</ValidationProvider>
-						</div>
-						<div class="col">
-							<!-- DICE TYPE -->
-							<q-select
-								:dark="$store.getters.theme === 'dark'"
-								filled
-								square
-								map-options
-								emit-value
-								clearable
-								:label="`Dice type ${key}`"
-								:options="dice_type"
-								:value="getValue('dice_type', { key, index })"
-								@input="setValue($event, 'dice_type', { key, index })"
-								class="mb-2"
-							/>
-						</div>
-						<div class="col">
-							<!-- MODIFIER FIXED VALUE -->
-							<ValidationProvider
-								rules="between:-99,99"
-								name="Fixed value"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
+							<div class="d-flex items-center mb-2">
+								<q-checkbox
+									:dark="$store.getters.theme === 'dark'"
+									:value="getValue('magical', { key, index })"
+									:label="`${index ? key : ''} Magical`"
+									:disable="
+										!['bludgeoning', 'piercing', 'slashing'].includes(
+											getValue('damage_type', { key, index })
+										)
+									"
+									@input="setValue($event, 'magical', { key, index })"
+									:false-value="null"
+									indeterminate-value="something-else"
+								/>
+								<hk-popover header="Magical damage">
+									<i class="fas fa-info-circle ml-2 neutral-2" aria-hidden="true" />
+									<template #content>
+										The damage counts as <strong>magical</strong> to overcome resistances to non
+										magical bludgeoning, piercing or slashing damage.
+									</template>
+								</hk-popover>
+							</div>
+						</template>
+
+						<!-- ROLLS -->
+						<div class="row q-col-gutter-md mb-3">
+							<!-- DICE COUNT -->
+							<div class="col">
+								<ValidationProvider
+									:rules="{
+										between: [1, 99],
+										required: !!getValue('dice_type', { key, index }),
+									}"
+									:name="`Dice count ${key}`"
+									v-slot="{ errors, invalid, validated }"
+								>
+									<q-input
+										:dark="$store.getters.theme === 'dark'"
+										filled
+										square
+										:label="`Dice count ${key} ${!index ? '*' : ''}`"
+										:value="getValue('dice_count', { key, index })"
+										@input="setValue($event, 'dice_count', { key, index })"
+										min="1"
+										max="99"
+										autocomplete="off"
+										name="dice_count"
+										class="mb-2"
+										type="number"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+							</div>
+							<div class="col">
+								<!-- DICE TYPE -->
+								<q-select
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
-									:label="`Fixed value ${index > 0 ? key : ''}`"
-									:value="getValue('fixed_val', { key, index })"
-									@input="setValue($event, 'fixed_val', { key, index })"
-									autocomplete="off"
+									map-options
+									emit-value
+									clearable
+									:label="`Dice type ${key}`"
+									:options="dice_type"
+									:value="getValue('dice_type', { key, index })"
+									@input="setValue($event, 'dice_type', { key, index })"
 									class="mb-2"
-									type="number"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+								/>
+							</div>
+							<div class="col">
+								<!-- MODIFIER FIXED VALUE -->
+								<ValidationProvider
+									rules="between:-99,99"
+									name="Fixed value"
+									v-slot="{ errors, invalid, validated }"
 								>
-									<template v-slot:append>
-										<hk-popover
-											header="Fixed value"
-											content="Set the fixed value that is added on top of the rolled value."
-										>
-											<q-icon name="fas fa-info-circle" />
-										</hk-popover>
-									</template>
-								</q-input>
-							</ValidationProvider>
-						</div>
+									<q-input
+										:dark="$store.getters.theme === 'dark'"
+										filled
+										square
+										:label="`Fixed value ${index > 0 ? key : ''}`"
+										:value="getValue('fixed_val', { key, index })"
+										@input="setValue($event, 'fixed_val', { key, index })"
+										autocomplete="off"
+										class="mb-2"
+										type="number"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									>
+										<template v-slot:append>
+											<hk-popover
+												header="Fixed value"
+												content="Set the fixed value that is added on top of the rolled value."
+											>
+												<q-icon name="fas fa-info-circle" />
+											</hk-popover>
+										</template>
+									</q-input>
+								</ValidationProvider>
+							</div>
 
-						<!-- PRIMARY STAT -->
-						<div class="col" v-if="spell">
-							<q-checkbox
-								size="lg"
-								dark
-								v-model="roll.primary"
-								label="Primary"
-								:false-value="null"
-								:disable="index > 0"
-								indeterminate-value="something-else"
-								class="mb-2"
-							>
-								<q-tooltip anchor="top middle" self="center middle">
-									Add primary stat modifier
-								</q-tooltip>
-							</q-checkbox>
+							<!-- PRIMARY STAT -->
+							<div class="col" v-if="spell">
+								<q-checkbox
+									size="lg"
+									dark
+									v-model="roll.primary"
+									label="Primary"
+									:false-value="null"
+									:disable="index > 0"
+									indeterminate-value="something-else"
+									class="mb-2"
+								>
+									<q-tooltip anchor="top middle" self="center middle">
+										Add primary stat modifier
+									</q-tooltip>
+								</q-checkbox>
+							</div>
 						</div>
-					</div>
+					</template>
 				</q-tab-panel>
 			</q-tab-panels>
 
@@ -392,7 +413,11 @@ export default {
 			if (option.index === 0) {
 				this.$set(this.roll, prop, value);
 			} else if (this.roll.options) {
-				this.$set(this.roll.options, option.key, { [prop]: value });
+				if (this.roll.options[option.key]) {
+					this.$set(this.roll.options[option.key], prop, value);
+				} else {
+					this.$set(this.roll.options, option.key, { [prop]: value });
+				}
 			} else {
 				this.$set(this.roll, "options", { [option.key]: { [prop]: value } });
 			}

@@ -268,6 +268,12 @@
 				"$npcId": {
 					".write": "$uid === auth.uid || root.child('character_control').child(auth.uid).child( data.child('player_id').val() ).child('user').val() === $uid",
 					".validate": "newData.hasChildren(['name', 'size', 'type', 'challenge_rating', 'armor_class', 'hit_points', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'])",
+					"created": {
+						".validate": "newData.isNumber()"
+					},
+					"updated": {
+						".validate": "newData.isNumber()"
+					},
 					"harmless_key": {
 						".validate": "newData.isString() && newData.val().length <= 100"
 					},

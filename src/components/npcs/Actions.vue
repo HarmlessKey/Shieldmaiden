@@ -90,36 +90,9 @@
 												ability.action_list[0].rolls
 											"
 										>
-											<span v-if="ability.versatile" class="roll-button" @click.stop>
-												<q-popup-proxy :dark="$store.getters.theme === 'dark'">
-													<q-list :dark="$store.getters.theme === 'dark'">
-														<q-item>
-															<q-item-section>
-																<b>{{ ability.name }}</b>
-															</q-item-section>
-														</q-item>
-														<hk-roll
-															v-for="i in [0, 1]"
-															:key="`${i}-versatile-roll`"
-															@roll="rollAbility($event, ability, i)"
-														>
-															<q-item clickable v-close-popup>
-																<q-item-section avatar>{{ i + 1 }}</q-item-section>
-																<q-item-section>
-																	{{ getVersatile(ability, i) }}
-																</q-item-section>
-															</q-item>
-														</hk-roll>
-													</q-list>
-												</q-popup-proxy>
-											</span>
-											<hk-roll
-												v-else
-												:tooltip="`Roll ${ability.name}`"
-												@roll="rollAbility($event, ability)"
-											>
+											<hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability">
 												<span class="roll-button" />
-											</hk-roll>
+											</hk-roll-action>
 										</q-item-section>
 										<q-item-section>
 											{{ ability.name }}

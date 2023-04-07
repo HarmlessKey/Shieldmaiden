@@ -2,7 +2,6 @@ import { Cookies } from "quasar";
 import { db, auth } from "src/firebase";
 import { userServices } from "src/services/user";
 import { voucherService } from "src/services/vouchers";
-import { serverUtils } from "src/services/serverUtils";
 
 import Vue from "vue";
 
@@ -242,6 +241,7 @@ const user_actions = {
 		count.npcs = rootGetters["npcs/npc_count"];
 		count.items = rootGetters["items/item_count"];
 		count.reminders = rootGetters["reminders/reminder_count"];
+		count.spells = rootGetters["spells/spell_count"];
 		count.encounters = 0;
 
 		let used_slots = Object.values(count).reduce((sum, count) => sum + count, 0);
@@ -276,6 +276,7 @@ const user_actions = {
 				count.items > benefits.items ||
 				count.reminders > benefits.reminders ||
 				count.players > benefits.players ||
+				count.spells > benefits.spells ||
 				count.characters > benefits.characters;
 			commit("SET_SLOTS_USED", { available_slots, used_slots });
 		}
@@ -389,6 +390,7 @@ const user_actions = {
 		await dispatch("npcs/clear_npc_store", {}, { root: true });
 		await dispatch("reminders/clear_reminder_store", {}, { root: true });
 		await dispatch("items/clear_item_store", {}, { root: true });
+		await dispatch("items/clear_spell_store", {}, { root: true });
 		await commit("CLEAR_USER", undefined);
 
 		// Sign out from firebase

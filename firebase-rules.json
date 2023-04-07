@@ -1217,6 +1217,15 @@
 			".read": true,
 			".indexOn": ["metadata/tagged", "metadata/finished"]
 		},
+		"search_spells": {
+			".read": true,
+			"$uid": {
+				".write": "$uid === auth.uid",
+				"results": {
+					".indexOn": ["name"]
+				}
+			}
+		},
 		"spells": {
 			"$uid": {
 				"$spellId": {

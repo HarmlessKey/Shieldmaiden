@@ -134,7 +134,7 @@ export class npcServices {
 			// Delete the image when there is no blob and no storage_avatar
 			else {
 				if (!npc.storage_avatar) {
-					image_ref.delete();
+					image_ref.delete().catch(); // Catch 404 image not found
 				}
 
 				// Save the NPC

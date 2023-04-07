@@ -32,12 +32,25 @@ function filterSkills(playerSkills) {
 	}
 	return returnArray;
 }
+function filterUnusedAttributes(player) {
+	const unused_attributes = ["ac_bonus", "curHp", "tempHp", "maxHpMod"];
+
+	Object.keys(player).forEach((attribute) => {
+		if (unused_attributes.includes(attribute)) {
+			player[attribute] = null;
+		}
+	});
+	return player;
+}
 function parseInts(player) {
-	for (const [key, value] of Object.entries(player)) {
-		if (numberValues.includes(key) && value !== undefined && value !== null) {
+	Object.entries(player).forEach(([key, value]) => {
+		if (numberValues.includes(key) && value !== undefined && value !== null && value !== "") {
 			player[key] = parseInt(value);
 		}
-	}
+		if (numberValues.includes(key) && value === "") {
+			player[key] = null;
+		}
+	});
 	return player;
 }
 
@@ -241,6 +254,7 @@ const player_actions = {
 				throw "Not enough slots";
 			}
 			try {
+				player = filterUnusedAttributes(player);
 				player = parseInts(player);
 
 				if (player.skills) {
@@ -294,6 +308,7 @@ const player_actions = {
 		if (uid) {
 			const services = await dispatch("get_player_services");
 			try {
+				player = filterUnusedAttributes(player);
 				player = parseInts(player);
 
 				if (player.skills) {
@@ -358,7 +373,7 @@ const player_actions = {
 					}
 				}
 
-				commit("UPDATE_SEARCH_PLAYER", { id, search_player });
+				commit("SET_PLAYER", { id, search_player });
 				commit("SET_CACHED_PLAYER", { uid, id, player });
 				return;
 			} catch (error) {

@@ -134,9 +134,7 @@ export class playerServices {
 			// Delete the image when there is no blob and no storage_avatar
 			else {
 				if (!player.storage_avatar) {
-					image_ref.delete().catch((error) => {
-						// NO Image found to delete :thumbsup:
-					});
+					image_ref.delete().catch(); // Catch 404 image not found
 				}
 				// Save the player
 				await PLAYERS_REF.child(uid).child(id).set(player);

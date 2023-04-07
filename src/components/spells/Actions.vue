@@ -72,7 +72,7 @@
 						<i class="fas fa-info-circle" aria-hidden="true" />
 						<template #content>
 							Options allow you to create slightly different rolls for the actions and choose to use
-							this spell for one of the options. Think of versatile weapon attacks where you roll a
+							this spell with one of the options. Think of versatile weapon attacks where you roll a
 							different damage die for 1- or 2-handed attacks.
 						</template>
 					</hk-popover>

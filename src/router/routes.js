@@ -375,24 +375,24 @@ const routes = [
 							description: "Your custom spells on Harmless Key.",
 						},
 					},
-					// {
-					// 	path: "add-spell",
-					// 	name: "Add Spell",
-					// 	component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
-					// 	meta: {
-					// 		title: "Add spell",
-					// 		description: "Create a new spell on Harmless Key.",
-					// 	},
-					// },
-					// {
-					// 	path: ":id",
-					// 	name: "Edit spell",
-					// 	component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
-					// 	meta: {
-					// 		title: "Edit spell",
-					// 		description: "Edit an existing spell on Harmless Key.",
-					// 	},
-					// },
+					{
+						path: "add-spell",
+						name: "Add Spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Add spell",
+							description: "Create a new spell on Harmless Key.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Edit spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Edit spell",
+							description: "Edit an existing spell on Harmless Key.",
+						},
+					},
 				],
 			},
 

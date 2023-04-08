@@ -31,7 +31,7 @@
 					</div>
 
 					<div class="col-12 col-md-8">
-						<EditSpell :id="id" @set-unsaved="setUnsaved" ref="editForm" />
+						<!-- <EditSpell :id="id" @set-unsaved="setUnsaved" ref="editForm" /> -->
 					</div>
 				</div>
 			</template>
@@ -41,7 +41,7 @@
 
 <script>
 import { db } from "src/firebase";
-import EditSpell from "src/views/userContent/Spells/EditSpell";
+// import EditSpell from "src/views/userContent/Spells/EditSpell";
 import { general } from "src/mixins/general";
 import { mapGetters } from "vuex";
 import ViewSpell from "src/components/compendium/Spell";
@@ -49,7 +49,6 @@ import ViewSpell from "src/components/compendium/Spell";
 export default {
 	name: "ContribSpellEdit",
 	components: {
-		EditSpell,
 		ViewSpell,
 	},
 	mixins: [general],

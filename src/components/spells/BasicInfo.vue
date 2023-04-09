@@ -2,12 +2,6 @@
 	<hk-card>
 		<div slot="header" class="card-header d-flex justify-content-between">
 			<span>Basic Info</span>
-			<a
-				class="btn btn-sm bg-neutral-5"
-				@click="setSlide({ show: true, type: 'contribute/spell/ViewSpell', data: spell })"
-			>
-				<i aria-hidden="true" class="fas fa-eye" />
-			</a>
 		</div>
 
 		<div class="card-body">
@@ -96,9 +90,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="
-								(value) => $set(spell, 'cast_time', value != undefined ? parseInt(value) : value)
-							"
+							@input="(value) => parseToInt(value, spell, 'cast_time')"
 						/>
 					</ValidationProvider>
 				</div>
@@ -208,7 +200,7 @@
 							square
 							emit-value
 							map-options
-							label="Range type"
+							label="Range type *"
 							:options="spell_range_types"
 							v-model="spell.range_type"
 							class="mb-2"
@@ -237,7 +229,7 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
-							label="Range"
+							:label="`Range ${spell.range_type === 'ranged' ? '*' : ''}`"
 							v-model="spell.range"
 							:disable="spell.range_type !== 'ranged'"
 							autocomplete="off"
@@ -245,7 +237,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="(value) => $set(spell, 'range', value != undefined ? parseInt(value) : value)"
+							@input="(value) => parseToInt(value, spell, 'range')"
 						>
 							<span slot="append" class="neutral-2">ft.</span>
 						</q-input>
@@ -323,6 +315,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
+							@input="(value) => parseToInt(value, spell, 'duration')"
 						/>
 					</ValidationProvider>
 				</div>
@@ -402,9 +395,7 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
-							@input="
-								(value) => $set(spell, 'aoe_size', value != undefined ? parseInt(value) : value)
-							"
+							@input="(value) => parseToInt(value, spell, 'aoe_size')"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						>
@@ -515,7 +506,6 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
 import spell_constants from "src/utils/spellConstants";
 import { aoe_types } from "src/utils/actionConstants";
 
@@ -554,7 +544,13 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		parseToInt(value, object, property) {
+			if (value === undefined || value === "") {
+				this.$delete(object, property);
+			} else {
+				this.$set(object, property, parseInt(value));
+			}
+		},
 		setRitual() {
 			let yn = ["yes", "no"];
 			if (yn.includes(this.spell.ritual)) {

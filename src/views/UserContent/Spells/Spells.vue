@@ -1,7 +1,15 @@
 <template>
 	<div v-if="tier">
 		<hk-card>
-			<ContentHeader type="spells" />
+			<ContentHeader type="spells">
+				<button
+					slot="actions-right"
+					class="btn btn-sm bg-neutral-5 mx-2"
+					@click="import_dialog = true"
+				>
+					Import spells
+				</button>
+			</ContentHeader>
 
 			<div class="card-body" v-if="!loading_spells">
 				<p class="neutral-2">These are your custom spells.</p>
@@ -53,13 +61,17 @@
 									<i aria-hidden="true" class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
 								</router-link>
-								<a
+								<button class="btn btn-sm bg-neutral-5 mx-2" @click="exportSpell(props.key)">
+									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
+									<q-tooltip anchor="top middle" self="center middle"> Download </q-tooltip>
+								</button>
+								<button
 									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete($event, props.key, props.row)"
 								>
 									<i aria-hidden="true" class="fas fa-trash-alt" />
 									<q-tooltip anchor="top middle" self="center middle">Delete</q-tooltip>
-								</a>
+								</button>
 							</q-td>
 						</template>
 						<div slot="no-data" />
@@ -84,21 +96,39 @@
 			</div>
 			<hk-loader v-else name="spells" />
 		</hk-card>
+
+		<!-- Bulk import dialog -->
+		<q-dialog v-model="import_dialog">
+			<hk-card :minWidth="400">
+				<div slot="header" class="card-header">
+					<span>Import spells from JSON</span>
+					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+				</div>
+				<div class="card-body">
+					<ImportNPC v-model="import_dialog" />
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
 <script>
+import numeral from "numeral";
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
+import ImportNPC from "src/components/ImportNPC.vue";
+import { downloadJSON } from "src/utils/generalFunctions";
 
 export default {
 	name: "Spells",
 	components: {
 		ContentHeader,
+		ImportNPC,
 	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
+			import_dialog: false,
 			loading_spells: true,
 			search: "",
 			columns: [
@@ -109,6 +139,22 @@ export default {
 					sortable: true,
 					align: "left",
 					format: (val) => val.capitalizeEach(),
+				},
+				{
+					name: "school",
+					label: "School",
+					field: "school",
+					sortable: true,
+					align: "left",
+					format: (val) => val.capitalize(),
+				},
+				{
+					name: "level",
+					label: "Level",
+					field: "level",
+					sortable: true,
+					align: "left",
+					format: (val) => this.spellLevel(val),
 				},
 				{
 					name: "actions",
@@ -128,8 +174,10 @@ export default {
 	},
 	methods: {
 		...mapActions(["setSlide"]),
-		...mapActions("spells", ["get_spells", "delete_spell"]),
-
+		...mapActions("spells", ["get_spells", "get_spell", "delete_spell"]),
+		spellLevel(level) {
+			return level === 0 ? "Cantrip" : numeral(level).format("0o");
+		},
 		confirmDelete(e, key, spell) {
 			//Instantly delete when shift is held
 			if (e.shiftKey) {
@@ -159,6 +207,11 @@ export default {
 		},
 		deleteSpell(key) {
 			this.delete_spell(key);
+		},
+		async exportSpell(id) {
+			const spell = await this.get_spell({ uid: this.userId, id });
+			spell.harmless_key = id;
+			downloadJSON(spell);
 		},
 	},
 };

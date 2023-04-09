@@ -9,6 +9,16 @@
 								There are validation errors
 							</q-tooltip>
 						</q-icon>
+						<button v-if="!spellId" class="btn bg-neutral-5" @click.prevent="copy_dialog = true">
+							<i aria-hidden="true" class="fas fa-copy mr-2"></i>
+							Copy
+						</button>
+						<button
+							class="btn bg-neutral-5 ml-2"
+							@click.prevent="setSlide({ show: true, type: 'compendium/Spell', data: spell })"
+						>
+							<i aria-hidden="true" class="fas fa-eye" />
+						</button>
 					</div>
 
 					<div class="form">
@@ -24,19 +34,24 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
-							<router-link to="/contribute/spells" class="btn bg-neutral-5 mr-2">{{
-								unsaved_changes ? "Cancel" : "Back"
-							}}</router-link>
-							<q-btn label="Save" type="submit" color="primary" no-caps />
+							<router-link
+								:to="userId ? `/content/spells` : `/tools/spell-creator`"
+								class="btn bg-neutral-5 mr-2"
+								>{{ unsaved_changes ? "Cancel" : "Back" }}</router-link
+							>
+							<q-btn v-if="userId" label="Save" type="submit" color="primary" no-caps />
+							<q-btn v-else :disabled="!valid" color="primary" no-caps @click="download">
+								Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+							</q-btn>
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">
 							<template v-if="unsaved_changes">
-								<div class="orange truncate mr-2 d-none d-md-block">
+								<div v-if="userId" class="orange truncate mr-2 d-none d-md-block">
 									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>
-								<a class="btn btn-sm bg-neutral-5" @click="revertChanges()">
+								<a class="btn btn-sm bg-neutral-5" @click="userId ? revertChanges() : reset()">
 									<i aria-hidden="true" class="fas fa-undo" />
-									Revert
+									{{ userId ? "Revert" : "Reset" }}
 								</a>
 							</template>
 						</div>
@@ -44,6 +59,19 @@
 				</div>
 			</q-form>
 		</ValidationObserver>
+
+		<!-- COPY DIALOG -->
+		<q-dialog v-model="copy_dialog">
+			<hk-card :minWidth="320">
+				<div slot="header" class="card-header">
+					<span>Copy existing Spell</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
+				<div class="card-body">
+					<CopyContent @copy="copy" type="spell" />
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 	<hk-card v-else>
 		<hk-loader />
@@ -52,37 +80,46 @@
 
 <script>
 import _ from "lodash";
-import { db } from "src/firebase";
+import { mapActions, mapGetters } from "vuex";
 import BasicInfo from "src/components/spells/BasicInfo";
 import SpellActions from "src/components/spells/Actions";
+import CopyContent from "src/components/CopyContent";
+import { downloadJSON } from "src/utils/generalFunctions";
 
 export default {
 	name: "EditSpell",
 	components: {
 		BasicInfo,
 		SpellActions,
-	},
-	props: {
-		id: {
-			type: String,
-			required: true,
-		},
+		CopyContent,
 	},
 	data() {
 		return {
-			loading: true,
-			spell_copy: undefined,
+			userId:
+				this.$store.getters && this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+			spellId: this.$route.params.id,
 			spell: {},
+			loading: false,
+			spell_copy: {},
+			copy_dialog: false,
 			unsaved_changes: false,
 		};
 	},
 	async mounted() {
-		const spell_ref = db.ref(`new_spells/${this.id}`);
-		await spell_ref.once("value", (snapshot) => {
-			this.spell = snapshot.val() || {};
-			this.spell_copy = JSON.parse(JSON.stringify(this.spell));
-		});
-		this.loading = false;
+		if (this.spellId) {
+			this.loading = true;
+			await this.get_spell({ uid: this.userId, id: this.spellId }).then((spell) => {
+				spell.name = spell.name ? spell.name.capitalizeEach() : undefined;
+				this.spell = spell;
+				this.spell_copy = JSON.parse(JSON.stringify(spell));
+				this.unsaved_changes = false;
+				this.loading = false;
+			});
+		}
+	},
+	computed: {
+		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters("spells", ["spell_count"]),
 	},
 	watch: {
 		spell: {
@@ -98,33 +135,72 @@ export default {
 		},
 	},
 	methods: {
-		setSpell(spell) {
-			this.spell = { ...this.spell, ...spell };
+		...mapActions(["setSlide"]),
+		...mapActions("api_spells", ["fetch_spells", "fetch_spell"]),
+		...mapActions("spells", ["add_spell", "edit_spell", "get_spell"]),
+		download() {
+			downloadJSON(this.spell);
+		},
+		copy({ result }) {
+			this.copy_dialog = false;
+			this.spell = { ...result };
+		},
+		reset() {
+			this.spell = {};
 		},
 		revertChanges() {
 			this.spell = this.spell_copy;
 		},
+		/**
+		 * Checks if a new Spell must be added, or an existing Spell must be saved.
+		 **/
 		saveSpell() {
-			console.log("Store spell called", this.spell);
+			if (!this.spellId) {
+				this.addSpell();
+			} else {
+				this.editSpell();
+			}
+		},
+		addSpell() {
+			console.log(this.spell);
+			this.add_spell(this.spell)
+				.then((key) => {
+					// Set the spellId, so we know there is an existing spell
+					// even though we are on the AddSpell route, this we won't create multiple when hitting save again
+					this.$set(this, "spellId", key);
 
-			this.spell.metadata.changed = true;
-			this.spell.metadata.checked = false;
-
-			db.ref(`new_spells/${this.id}`)
-				.set(this.spell)
-				.then(() => {
 					this.$snotify.success("Spell Saved.", "Critical hit!", {
 						position: "rightTop",
 					});
+
+					this.spell.name = this.spell.name ? this.spell.name.capitalizeEach() : undefined;
+					this.spell_copy = JSON.parse(JSON.stringify(this.spell));
+					this.unsaved_changes = false;
 				})
-				.catch((e) => {
-					this.$snotify.error(e, "Save failed!", {
+				.catch((error) => {
+					this.$snotify.error("Couldn't save spell.", "Save failed", {
 						position: "rightTop",
 					});
+					console.error(error);
+					console.log(this.spell);
 				});
-			this.spell_copy = JSON.parse(JSON.stringify(this.spell));
-			this.unsaved_changes = false;
-			this.$emit("set-unsaved", this.unsaved_changes);
+		},
+		editSpell() {
+			console.log(this.spell);
+			this.edit_spell({
+				id: this.spellId,
+				spell: this.spell,
+			}).then(() => {
+				this.$snotify.success("Spell Saved.", "Critical hit!", {
+					position: "rightTop",
+				});
+
+				this.unsaved_changes = false;
+
+				// Capitalize before stringify so changes found isn't triggered
+				this.spell.name = this.spell.name ? this.spell.name.capitalizeEach() : undefined;
+				this.spell_copy = JSON.parse(JSON.stringify(this.spell));
+			});
 		},
 	},
 

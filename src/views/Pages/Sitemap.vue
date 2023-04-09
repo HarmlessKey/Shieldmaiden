@@ -43,6 +43,7 @@
 							</li>
 						</ul>
 					</li>
+					<li><router-link to="/tools/spell-creator">Spell Creator</router-link></li>
 					<li><router-link to="/tools/character-builder">Character Builder</router-link></li>
 				</ul>
 			</li>

@@ -1,4 +1,4 @@
-import { db } from "src/firebase";
+import { firebase, db } from "src/firebase";
 
 const SPELLS_REF = db.ref("spells");
 const SEARCH_SPELLS_REF = db.ref("search_spells");
@@ -78,6 +78,9 @@ export class spellServices {
 		try {
 			spell.name = spell.name.toLowerCase();
 			const newSpell = await SPELLS_REF.child(uid).push(spell);
+
+			spell.created = firebase.database.ServerValue.TIMESTAMP;
+			spell.updated = firebase.database.ServerValue.TIMESTAMP;
 
 			//Update search_custom_spells
 			SEARCH_SPELLS_REF.child(`${uid}/results/${newSpell.key}`).set(search_spell);

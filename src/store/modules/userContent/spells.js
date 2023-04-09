@@ -4,7 +4,7 @@ import _ from "lodash";
 
 // Converts a full spell to a search_spell
 const convert_spell = (spell) => {
-	const properties = ["name"];
+	const properties = ["name", "school", "level"];
 	const returnSpell = {};
 
 	for (const prop of properties) {
@@ -141,7 +141,7 @@ const spell_actions = {
 
 	/**
 	 * Updates and existing spell
-	 * A user can only delete their own spells so use uid from the store
+	 * A user can only edit their own spells so use uid from the store
 	 *
 	 * @param {string} uid
 	 * @param {string} id

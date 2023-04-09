@@ -54,7 +54,7 @@
 								<div v-if="userId" class="orange truncate mr-2 d-none d-md-block">
 									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>
-								<a class="btn btn-sm bg-neutral-5" @click="userId ? revert_changes() : reset()">
+								<a class="btn btn-sm bg-neutral-5" @click="userId ? revertChanges() : reset()">
 									<i aria-hidden="true" class="fas fa-undo" />
 									{{ userId ? "Revert" : "Reset" }}
 								</a>
@@ -121,8 +121,6 @@ export default {
 			loading: false,
 			npc_copy: {},
 			copy_dialog: false,
-			copy_resource_setter: undefined,
-			import_dialog: false,
 			unsaved_changes: false,
 		};
 	},
@@ -174,7 +172,7 @@ export default {
 		reset() {
 			this.npc = {};
 		},
-		revert_changes() {
+		revertChanges() {
 			this.npc = JSON.parse(this.npc_copy);
 			this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			this.unsaved_changes = false;
@@ -183,7 +181,7 @@ export default {
 		 * Checks if a new NPC must be added, or an existing NPC must be saved.
 		 **/
 		saveNpc() {
-			if (this.$route.name === "Add NPC" && !this.npcId) {
+			if (!this.npcId) {
 				this.addNpc();
 			} else {
 				this.editNpc();
@@ -191,10 +189,10 @@ export default {
 		},
 		addNpc() {
 			this.add_npc(this.npc)
-				.then((res) => {
+				.then((key) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
-					this.$set(this, "npcId", res);
+					this.$set(this, "npcId", key);
 
 					this.$snotify.success("Monster Saved.", "Critical hit!", {
 						position: "rightTop",

@@ -1229,9 +1229,15 @@
 		"spells": {
 			"$uid": {
 				"$spellId": {
-					".validate": "newData.hasChildren(['name', 'level', 'school', 'cast_time', 'cast_time_type', 'range_type', 'range', 'duration_type', 'aoe_type', 'scaling'])",
+					".validate": "newData.hasChildren(['name', 'level', 'school', 'cast_time', 'cast_time_type', 'range_type', 'duration_type', 'aoe_type', 'scaling'])",
 					"harmless_key": {
 						".validate": "newData.isString() && newData.val().length <= 100"
+					},
+					"created": {
+						".validate": "newData.isNumber()"
+					},
+					"updated": {
+						".validate": "newData.isNumber()"
 					},
 					"name": {
 						".validate": "newData.isString() && newData.val().length <= 100"

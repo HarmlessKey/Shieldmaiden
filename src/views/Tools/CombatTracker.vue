@@ -5,17 +5,16 @@
 		</template>
 
 		<p>
-			Harmless Key is probably the most advanced and effective combat trackers for Dungeons &
-			Dragons. Designed specifically for in-person play, our tools can be of some use to almost any
-			dungeon master.
+			Harmless Key is probably the most advanced combat tracker for Dungeons & Dragons. Designed
+			specifically for in-person play, our tools can be of some use to almost any dungeon master.
 		</p>
 		<p>
-			One of the key features that sets Harmless Key apart, aside from its ability to easily track
-			basic stats, like initiative and hit points, is the tracking of important details like bonuses
+			Of course basic stats basic stats, like initiative and hit points are tracked, but one of the
+			key features that sets Harmless Key apart, is the tracking of important details like bonuses
 			and setting reminders. With just a few clicks, you can add or remove combatants, track damage,
 			and manage other aspects of the battle. This saves time and ensures that combat encounters run
-			smoothly and efficiently and you have time to focus more on the what's really important in
-			your games.
+			smoothly and efficiently and you have time to focus more on what's really important in your
+			games.
 		</p>
 		<p>
 			Overall, Harmless Key is a versatile tool that can enhance your Dungeons & Dragons gameplay

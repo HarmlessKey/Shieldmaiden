@@ -31,9 +31,7 @@
 						:error="invalid && validated"
 						:error-message="errors[0]"
 						@keyup="$forceUpdate()"
-						@input="
-							(value) => $set(spell, 'projectiles', value != undefined ? parseInt(value) : value)
-						"
+						@input="(value) => parseToInt(value, spell, 'projectiles')"
 					>
 						<hk-popover slot="append" header="Projectiles">
 							<i class="fas fa-info-circle" aria-hidden="true" />
@@ -306,6 +304,13 @@ export default {
 	},
 
 	methods: {
+		parseToInt(value, object, property) {
+			if (value === undefined || value === "") {
+				this.$delete(object, property);
+			} else {
+				this.$set(object, property, parseInt(value));
+			}
+		},
 		add_action() {
 			if (this.spell.actions == undefined) {
 				this.spell.actions = [];

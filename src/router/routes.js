@@ -377,7 +377,7 @@ const routes = [
 					},
 					{
 						path: "add-spell",
-						name: "Add Spell",
+						name: "Add spell",
 						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
 						meta: {
 							title: "Add spell",

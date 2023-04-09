@@ -1,47 +1,98 @@
 <template>
-	<div v-if="!loading">
-		<h2 class="mb-1">{{ spell.name }}</h2>
-		<i aria-hidden="true" class="mb-3 d-block">
-			<template v-if="spell.level > 0"> {{ spell.level | numeral("oO") }} level </template>
-			<template v-else>Cantrip</template>
-			<span v-if="spell.school"> {{ spell.school.name }}</span>
-		</i>
-		<p>
-			<strong>Casting time:</strong> {{ spell.casting_time }}<br />
-			<strong>Range:</strong> {{ spell.range }}<br />
-			<strong>Components:</strong>
-			<template v-for="(component, index) in spell.components">
-				{{ component
-				}}<template v-if="Object.keys(spell.components).length > index + 1">, </template>
+	<div v-if="!loading" class="spell">
+		<div class="spell__title">
+			<h3>
+				{{ spell.name }} <span class="source neutral-2">{{ spell.source }}</span>
+			</h3>
+			<i>
+				<template v-if="spell.level === 0">Cantrip </template>
+				<template v-else>{{ spell.level | numeral("0o") }}-level </template>
+				{{ spell.school }}
+			</i>
+		</div>
+
+		<div class="spell__info">
+			<b>Casting time:</b> {{ spell.cast_time }} {{ spell.cast_time_type }}<br />
+			<b>Range:</b> {{ range }}<br />
+			<template v-if="spell.ritual"> <b>Ritual:</b> Yes<br /> </template>
+			<template v-if="spell.components">
+				<b>Components:</b>
+				{{ spell.components.map((comp) => comp.charAt(0).toUpperCase()).join(", ") }}
+				{{ spell.material_description ? `(${spell.material_description})` : "" }}
 			</template>
-			<template v-if="spell.material"> ({{ parse_spell_str(spell.material) }})</template>
 			<br />
-			<template v-if="spell.ritual === 'yes'"> <b>Ritual:</b> {{ spell.ritual }}<br /> </template>
-
-			<strong>Duration:</strong>
-			<template v-if="spell.concentration == 'yes'"> Concentration, </template>
-			{{ spell.duration }}<br />
+			<b>Duration:</b> {{ duration }}<br />
 			<template v-if="spell.classes">
-				<strong>Classes:</strong>
+				<b>Classes:</b>
 				<template v-for="(_class, index) in spell.classes">
-					{{ _class.name
-					}}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
+					{{ _class }}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
 				</template>
-				<br />
 			</template>
-		</p>
-		<hk-dice-text
-			v-for="(desc, index) in spell.desc"
-			:input_text="parse_spell_str(desc)"
-			:key="index"
-		/>
+		</div>
 
-		<p v-if="spell.higher_level">
-			At higher levels.
-			<template v-for="higher in spell.higher_level">
-				{{ parse_spell_str(higher) }}
+		<div class="spell__description">
+			<hk-markdown-editor :value="spell.description" read-only />
+			<div v-if="spell.higher_level">
+				<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
+			</div>
+		</div>
+
+		<div class="actions" v-if="spell.actions">
+			<h4 class="mb-3">Roll spell</h4>
+
+			<q-input
+				v-if="spell.scaling === 'character_level'"
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
+				class="mb-3"
+				label="Caster level"
+				type="number"
+				v-model="caster_level"
+			/>
+
+			<!-- TO HIT MODIFIER INPUT -->
+			<q-input
+				v-if="isToHit"
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
+				class="mb-3"
+				label="Spell attack"
+				type="text"
+				v-model="attack_bonus"
+			/>
+
+			<!-- SPELL LEVEL INPUT -->
+			<template v-if="spell.level > 0">
+				<p>Select Casting level</p>
+				<div class="actions__levels">
+					<div
+						class="level"
+						:class="{
+							selected: cast_level === i,
+							disabled: i < spell.level,
+						}"
+						v-for="i in 9"
+						:key="i"
+						@click="spell.level <= i ? selectLevel(i) : null"
+					>
+						{{ i }}
+					</div>
+				</div>
 			</template>
-		</p>
+
+			<!-- ROLL SPELL -->
+			<hk-roll-action
+				:action="spell"
+				type="spell"
+				:attack-bonus="attack_bonus"
+				:cast-level="cast_level"
+				:caster-level="caster_level"
+			>
+				<button class="btn btn-block mt-3">Roll</button>
+			</hk-roll-action>
+		</div>
 	</div>
 	<hk-loader v-else name="spell" />
 </template>
@@ -67,6 +118,33 @@ export default {
 			loading: true,
 		};
 	},
+	computed: {
+		duration() {
+			const type = this.spell.duration_type;
+			const n = this.spell.duration_n;
+			const scale = this.spell.duration_scale;
+
+			if (type === "concentration") {
+				let dur_scale = n === 1 ? scale : scale + "s";
+				return `Concentration, up to ${n} ${dur_scale}`;
+			}
+			if (type === "Time") {
+				let dur_scale = n === 1 ? scale : scale + "s";
+				return `${n} ${dur_scale}`;
+			}
+			return type;
+		},
+		range() {
+			const type = this.spell.range_type;
+			const range = this.spell.range;
+
+			if (type === "ranged") {
+				return `${range} feet`;
+			}
+
+			return type;
+		},
+	},
 	async beforeMount() {
 		if (this.data) {
 			this.spell = this.data;
@@ -78,41 +156,71 @@ export default {
 	},
 	methods: {
 		...mapActions("api_spells", ["fetch_api_spell"]),
-		parse_spell_str(text) {
-			// map to replace weird character with real character
-			let rules = [
-				{
-					regex: /â€™/g,
-					// eslint-disable-next-line
-					replacement: "'",
-				},
-				{
-					regex: /â€”/g,
-					// eslint-disable-next-line
-					replacement: "\-\-",
-				},
-				{
-					regex: /â€�/g,
-					// eslint-disable-next-line
-					replacement: '"',
-				},
-				{
-					regex: /â€œ/g,
-					// eslint-disable-next-line
-					replacement: '"',
-				},
-				{
-					regex: /â€“/g,
-					// eslint-disable-next-line
-					replacement: "\-\-",
-				},
-			];
-			rules.forEach(function (rule) {
-				text = text.replace(rule.regex, rule.replacement);
-			});
-
-			return text.trim();
+		selectLevel(i) {
+			this.cast_level = i;
 		},
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.spell {
+	&__title {
+		margin-bottom: 15px;
+
+		h3 {
+			margin-bottom: 5px;
+
+			.source {
+				font-size: 12px;
+			}
+		}
+	}
+	&__info {
+		margin-bottom: 15px;
+	}
+	&__description {
+		margin-bottom: 15px;
+	}
+
+	.advantage {
+		.btn {
+			background-color: $green;
+		}
+	}
+	.disadvantage {
+		.btn {
+			background-color: $red;
+		}
+	}
+	.actions {
+		margin-bottom: 15px;
+
+		&__levels {
+			display: flex;
+			justify-content: center;
+			margin: 0 -5px;
+
+			.level {
+				width: 30px;
+				height: 30px;
+				line-height: 30px;
+				text-align: center;
+				cursor: pointer;
+				background-color: $neutral-6;
+				user-select: none;
+				margin: 0 3px;
+
+				&.selected {
+					background-color: $blue;
+					color: $neutral-1;
+				}
+				&.disabled {
+					opacity: 0.4;
+					cursor: not-allowed;
+				}
+			}
+		}
+	}
+}
+</style>

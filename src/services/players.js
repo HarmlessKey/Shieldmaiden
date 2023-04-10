@@ -165,7 +165,7 @@ export class playerServices {
 			.catch((error) => {
 				throw error;
 			});
-		PLAYERS_REF.child(`${uid}/${id}/updated`).update(firebase.database.ServerValue.TIMESTAMP);
+		PLAYERS_REF.child(`${uid}/${id}/updated`).set(firebase.database.ServerValue.TIMESTAMP);
 	}
 
 	/**

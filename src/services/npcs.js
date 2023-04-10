@@ -171,7 +171,7 @@ export class npcServices {
 			.catch((error) => {
 				throw error;
 			});
-		NPCS_REF.child(`${uid}/${id}/updated`).update(firebase.database.ServerValue.TIMESTAMP);
+		NPCS_REF.child(`${uid}/${id}/updated`).set(firebase.database.ServerValue.TIMESTAMP);
 	}
 
 	/**

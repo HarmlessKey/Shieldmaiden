@@ -1326,20 +1326,6 @@
 							".validate": "newData.isString() && newData.val().length <= 30"
 						}
 					},
-					"metadata": {
-						"tagged": {
-							".validate": "newData.isString() && newData.val().length <= 100"
-						},
-						"changed": {
-							".validate": "newData.isBoolean()"
-						},
-						"checked": {
-							".validate": "newData.isBoolean()"
-						},
-						"finished": {
-							".validate": "newData.isBoolean()"
-						}
-					},
 					"actions": {
 						"$actionIndex": {
 							"name": {

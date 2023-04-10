@@ -82,7 +82,7 @@ export class spellServices {
 			spell.created = firebase.database.ServerValue.TIMESTAMP;
 			spell.updated = firebase.database.ServerValue.TIMESTAMP;
 
-			//Update search_custom_spells
+			// Update search_spells
 			SEARCH_SPELLS_REF.child(`${uid}/results/${newSpell.key}`).set(search_spell);
 
 			return newSpell.key;
@@ -100,6 +100,9 @@ export class spellServices {
 	 * @param {Object} search_spell Compressed spell
 	 */
 	async editSpell(uid, id, spell, search_spell) {
+		spell.name = spell.name.toLowerCase();
+		spell.updated = firebase.database.ServerValue.TIMESTAMP;
+
 		SPELLS_REF.child(uid)
 			.child(id)
 			.set(spell)

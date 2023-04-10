@@ -117,7 +117,7 @@
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<ImportNPC v-model="import_dialog" />
+					<ImportContent type="npcs" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -127,7 +127,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { monsterMixin } from "src/mixins/monster";
-import ImportNPC from "src/components/ImportNPC.vue";
+import ImportContent from "src/components/ImportContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import { downloadJSON } from "src/utils/generalFunctions";
 
@@ -135,7 +135,7 @@ export default {
 	name: "Npcs",
 	mixins: [monsterMixin],
 	components: {
-		ImportNPC,
+		ImportContent,
 		ContentHeader,
 	},
 	data() {

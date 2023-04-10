@@ -9,6 +9,14 @@
 			"type": "string",
 			"maxLength": 100
 		},
+		"created": {
+			"title": "Created",
+			"type": "integer"
+		},
+		"updated": {
+			"title": "Updated",
+			"type": "integer"
+		},
 		"name": {
 			"title": "Name",
 			"type": "string",
@@ -477,6 +485,7 @@
 					"range": { "$ref": "#/$defs/action-range" },
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
+					"options": { "$ref": "#/$defs/action-options" },
 					"versatile": { "$ref": "#/$defs/action-versatile" },
 					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
 					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
@@ -501,6 +510,7 @@
 					"range": { "$ref": "#/$defs/action-range" },
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
+					"options": { "$ref": "#/$defs/action-options" },
 					"versatile": { "$ref": "#/$defs/action-versatile" },
 					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
 					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
@@ -538,6 +548,7 @@
 					"range": { "$ref": "#/$defs/action-range" },
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
+					"options": { "$ref": "#/$defs/action-options" },
 					"versatile": { "$ref": "#/$defs/action-versatile" },
 					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
 					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
@@ -562,6 +573,7 @@
 					"range": { "$ref": "#/$defs/action-range" },
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
+					"options": { "$ref": "#/$defs/action-options" },
 					"versatile": { "$ref": "#/$defs/action-versatile" },
 					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
 					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
@@ -677,13 +689,20 @@
 		"action-aoe-type": {
 			"title": "AOE type",
 			"type": "string",
-			"enum": ["cone", "cube", "cylinder", "line", "sphere", "square", "square feet"]
+			"enum": ["cone", "cube", "cylinder", "line", "radius", "sphere", "square", "square feet"]
 		},
 		"action-aoe-size": {
 			"title": "AOE size",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 999
+		},
+		"action-options": {
+			"title": "Options",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
 		},
 		"action-versatile": {
 			"title": "versatile",
@@ -761,6 +780,44 @@
 									"type": "integer",
 									"minimum": -99,
 									"maximum": 99
+								},
+								"options": {
+									"title": "Options",
+									"type": "object",
+									"additionalProperties": true,
+									"properties": {
+										"^[A-Za-z0-9\\._%\\+-]+@[A-Za-z0-9\\.-]+\\.[A-Za-z]{2,6}$": {
+											"type": "object",
+											"additionalProperties": false,
+											"properties": {
+												"ignore": {
+													"title": "Ignore",
+													"type": "boolean"
+												},
+												"damage_type": {
+													"$ref": "#/$defs/damage-type-select"
+												},
+												"dice_count": {
+													"title": "Dice count",
+													"type": "integer",
+													"minimum": 1,
+													"maximum": 99
+												},
+												"dice_type": {
+													"title": "Dice type",
+													"type": "integer",
+													"minimum": 1,
+													"maximum": 20
+												},
+												"fixed_val": {
+													"title": "Fixed val",
+													"type": "integer",
+													"minimum": -99,
+													"maximum": 99
+												}
+											}
+										}
+									}
 								},
 								"versatile_damage_type": {
 									"$ref": "#/$defs/damage-type-select"

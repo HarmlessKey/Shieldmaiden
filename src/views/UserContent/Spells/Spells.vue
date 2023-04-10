@@ -105,7 +105,7 @@
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<ImportNPC v-model="import_dialog" />
+					<ImportContent type="spells" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -116,14 +116,14 @@
 import numeral from "numeral";
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
-import ImportNPC from "src/components/ImportNPC.vue";
+import ImportContent from "src/components/ImportContent.vue";
 import { downloadJSON } from "src/utils/generalFunctions";
 
 export default {
 	name: "Spells",
 	components: {
 		ContentHeader,
-		ImportNPC,
+		ImportContent,
 	},
 	data() {
 		return {

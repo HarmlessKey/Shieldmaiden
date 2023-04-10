@@ -1,9 +1,10 @@
 <template>
 	<div>
 		<template v-if="!parsed && !parsing">
-			<q-file 
-				:dark="$store.getters.theme === 'dark'" 
-				filled square 
+			<q-file
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
 				accept=".json"
 				v-model="json_file"
 				@input="loadJSON()"
@@ -14,15 +15,14 @@
 				</template>
 			</q-file>
 
-			<h4 class="my-3 text-center">
-				OR
-			</h4>
-			<ValidationObserver  v-slot="{ handleSubmit }">
+			<h4 class="my-3 text-center">OR</h4>
+			<ValidationObserver v-slot="{ handleSubmit }">
 				<q-form @submit="handleSubmit(parseJSON)">
-					<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated}">
+					<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated }">
 						<q-input
-							:dark="$store.getters.theme === 'dark'" 
-							filled square 
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
 							type="textarea"
 							label="JSON Input"
 							v-model="json_input"
@@ -30,7 +30,13 @@
 							:error-message="errors[0]"
 						/>
 					</ValidationProvider>
-					<q-btn class="full-width my-2" color="primary" no-caps type="submit" :disabled="!json_input">
+					<q-btn
+						class="full-width my-2"
+						color="primary"
+						no-caps
+						type="submit"
+						:disabled="!json_input"
+					>
 						Parse Input
 					</q-btn>
 				</q-form>
@@ -41,15 +47,19 @@
 			<template v-for="type in Object.keys(imports)">
 				<div v-if="imports[type].length" class="mb-4" :key="type">
 					<p>
-						Found <span :class="type === 'unique' ? 'green' : 'orange'">
+						Found
+						<span :class="type === 'unique' ? 'green' : 'orange'">
 							{{ imports[type].length }} {{ type === "unique" ? "new" : "duplicate" }}
-						</span> NPCs
+						</span>
+						NPCs
 					</p>
 					<q-table
 						class="sticky-header-table mb-2"
 						:virtual-scroll-sticky-size-start="48"
 						:dark="$store.getters.theme !== 'light'"
-						flat dense square
+						flat
+						dense
+						square
 						:data="imports[type]"
 						:columns="columns"
 						row-key="index"
@@ -66,11 +76,15 @@
 									<q-icon name="error" class="red" />
 									<div slot="content">
 										<ol class="px-3">
-											<li v-for="(error, i) in props.row.errors" :key="`${props.row.index}-error-${i}`" class="red">
+											<li
+												v-for="(error, i) in props.row.errors"
+												:key="`${props.row.index}-error-${i}`"
+												class="red"
+											>
 												<strong v-if="error.instancePath" class="neutral-1">
 													{{ error.instancePath }}
 												</strong>
-												{{ error.message.capitalize() }} 
+												{{ error.message.capitalize() }}
 											</li>
 										</ol>
 									</div>
@@ -78,16 +92,17 @@
 							</td>
 						</template>
 					</q-table>
-					<q-toggle 
+					<q-toggle
 						v-if="type === 'duplicate'"
-						v-model="overwrite" 
-						label="Overwrite duplicates" 
+						v-model="overwrite"
+						label="Overwrite duplicates"
 						unchecked-icon="none"
 					/>
 				</div>
 			</template>
 			<div v-if="importTotal > availableSlots">
-				Insufficient slots. You're trying to import <strong class="red">{{ importTotal }}</strong> NPCs,<br/> 
+				Insufficient slots. You're trying to import
+				<strong class="red">{{ importTotal }}</strong> NPCs,<br />
 				but have only <strong class="red">{{ availableSlots }}</strong> slots available.
 			</div>
 
@@ -95,12 +110,15 @@
 				<div>
 					<strong>{{ selected.unique.length + selected.duplicate.length }}</strong> selected
 				</div>
-				<q-form @submit="import_npcs">
-					<q-btn 
-						color="primary" 
-						no-caps 
+				<q-form @submit="importData">
+					<q-btn
+						color="primary"
+						no-caps
 						type="submit"
-						:disabled="(!selected.unique.length && !selected.duplicate.length) || importTotal > availableSlots"
+						:disabled="
+							(!selected.unique.length && !selected.duplicate.length) ||
+							importTotal > availableSlots
+						"
 					>
 						Import NPCs
 					</q-btn>
@@ -111,11 +129,13 @@
 			<h3 class="text-center">
 				{{ (imported &lt; importing) ? "Importing" : "Imported" }} {{ importing }} NPCs
 			</h3>
-			<q-linear-progress 
-				:dark="$store.getters.theme !== 'light'" 
-				stripe rounded size="20px" 
-				:value="imported/importing" 
-				color="primary" 
+			<q-linear-progress
+				:dark="$store.getters.theme !== 'light'"
+				stripe
+				rounded
+				size="20px"
+				:value="imported / importing"
+				color="primary"
 				class="mb-4"
 			/>
 
@@ -138,11 +158,15 @@
 									<q-icon name="error" class="red" />
 									<div slot="content">
 										<ol class="px-3">
-											<li v-for="(error, index) in failed.errors" :key="`${i}-error-${index}`" class="red">
+											<li
+												v-for="(error, index) in failed.errors"
+												:key="`${i}-error-${index}`"
+												class="red"
+											>
 												<strong v-if="error.instancePath" class="neutral-1">
 													{{ error.instancePath }}
 												</strong>
-												{{ error.message.capitalize() }} 
+												{{ error.message.capitalize() }}
 											</li>
 										</ol>
 									</div>
@@ -151,7 +175,7 @@
 						</q-item>
 					</q-list>
 					<p>
-						Make sure there are no validation errors.<br/>
+						Make sure there are no validation errors.<br />
 						<a @click="showSchema = true">Compare with our schema.</a>
 					</p>
 				</div>
@@ -161,9 +185,7 @@
 				<hk-animated-integer :value="imported" /> / {{ importing }} imported.
 			</p>
 			<div v-else>
-				<p class="text-center green">
-					Finished import!
-				</p>
+				<p class="text-center green">Finished import!</p>
 				<q-btn no-caps label="Close" color="neutral-5" class="full-width" v-close-popup />
 			</div>
 		</div>
@@ -175,17 +197,22 @@
 				</div>
 				<div class="card-body">
 					<p>
-						You can use <a href="https://www.jsonschemavalidator.net/" target="_blank" rel="noopener">this schema validator</a> to find errors in your NPC.<br/>
+						You can use
+						<a href="https://www.jsonschemavalidator.net/" target="_blank" rel="noopener"
+							>this schema validator</a
+						>
+						to find errors in your NPC.<br />
 						Paste our schema in the left field and the JSON of your NPC in the right.
 					</p>
 					<a class="btn btn-sm mb-2" @click="copySchema">Copy schema</a>
 					<h3>HK NPC Schema</h3>
 					<div class="bg-neutral-8 px-2 py-2 overflow-auto">
 						<pre>
-							{{ schema }}
-						</pre>
+							{{ this.schema }}
+						</pre
+						>
 					</div>
-					<input :value="JSON.stringify(schema)" id="copy" type="hidden" />
+					<input :value="JSON.stringify(this.schema)" id="copy" type="hidden" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -194,7 +221,8 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import schema from "src/schemas/hk-npc-schema.json";
+import npcSchema from "src/schemas/hk-npc-schema.json";
+import spellSchema from "src/schemas/hk-spell-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
@@ -202,10 +230,16 @@ const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
 
 export default {
-	name: "ImportNPCs",
-	data() { 
+	name: "ImportContent",
+	props: {
+		type: {
+			type: String,
+			default: "npcs",
+			required: true,
+		},
+	},
+	data() {
 		return {
-			schema: schema,
 			showSchema: false,
 			json_file: undefined,
 			json_input: undefined,
@@ -217,11 +251,11 @@ export default {
 			imported: 0,
 			imports: {
 				unique: [],
-				duplicate: []
+				duplicate: [],
 			},
 			selected: {
 				unique: [],
-				duplicate: []
+				duplicate: [],
 			},
 			uid: this.$store.getters.user.uid,
 			columns: [
@@ -231,140 +265,174 @@ export default {
 					field: "name",
 					sortable: true,
 					align: "left",
-					format: val => val.capitalizeEach()
+					format: (val) => val.capitalizeEach(),
 				},
 				{
 					name: "invalid",
 					label: "",
 					field: "errors",
-					align: "right"
-				}
+					align: "right",
+				},
 			],
-			pagination: { 
-				rowsPerPage: 0
-			}
-		}
+			pagination: {
+				rowsPerPage: 0,
+			},
+		};
 	},
 	computed: {
 		...mapGetters(["tier"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
+		...mapGetters("spells", ["spells", "spell_count"]),
+		schema() {
+			return this.type === "npcs" ? npcSchema : spellSchema;
+		},
+		data() {
+			return this.type === "npcs" ? this.npcs : this.spells;
+		},
+		content_count() {
+			return type === "npcs" ? this.npc_count : this.spell_count;
+		},
 		availableSlots() {
-			return (this.tier.benefits.npcs === "infinite") ? Infinity : this.tier.benefits.npcs - this.npc_count;
+			return this.tier.benefits[this.type] === "infinite"
+				? Infinity
+				: this.tier.benefits[this.type] - this.content_count;
 		},
 		importTotal() {
-			return (!this.overwrite) ? this.selected.unique.length + this.selected.duplicate.length : this.selected.unique.length;
-		}
+			return !this.overwrite
+				? this.selected.unique.length + this.selected.duplicate.length
+				: this.selected.unique.length;
+		},
 	},
 	async mounted() {
-		await this.get_npcs();
+		this.type === "npcs" ? await this.get_npcs() : await this.get_spells();
 	},
 	methods: {
-		...mapActions("npcs", [
-			"add_npc",
-			"edit_npc",
-			"get_npcs",
-			"get_npc"
-		]),
+		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc"]),
+		...mapActions("spells", ["add_spell", "edit_spell", "get_spells", "get_spell"]),
+		async getItem(id) {
+			return this.type === "npcs"
+				? await this.get_npc({ uid: this.uid, id })
+				: await this.get_spell({ uid: this.uid, id });
+		},
+		async addItem(item) {
+			this.type === "npcs" ? await this.add_npc(item) : await this.add_spell(item);
+		},
+		async editItem(id, item) {
+			this.type === "npcs"
+				? await this.edit_npc({ uid: this.uid, id, npc: item })
+				: await this.edit_spell({ id, spell: item });
+		},
 		loadJSON() {
 			const fr = new FileReader();
 
-			fr.onload = e => {
-				let result = JSON.parse(e.target.result)
+			fr.onload = (e) => {
+				let result = JSON.parse(e.target.result);
 				this.parse(result);
-			}
+			};
 
-			fr.readAsText(this.json_file)
+			fr.readAsText(this.json_file);
 		},
 		parseJSON() {
 			try {
 				const result = JSON.parse(this.json_input);
 				this.parse(result);
-			}
-			catch {
+			} catch {
 				this.$snotify.error("Invalid JSON");
-			} 
+			}
 		},
 
-		async parse(npcs) {
+		async parse(data) {
 			this.parsing = true;
-			if (!(npcs instanceof Array)) {
-				npcs = [npcs];
+			if (!(data instanceof Array)) {
+				data = [data];
 			}
 
-			// Validate NPCs
-			for(const npc of npcs) {
+			// Validate items
+			for (const item of data) {
 				// Delete damage_vulnerability property.
-				delete npc.damage_vulnerability;
+				delete item.damage_vulnerability;
+				delete item.created;
+				delete item.updated;
 
-				const valid = ajv.validate(schema, npc);
+				const valid = ajv.validate(this.schema, item);
 
-				if(!valid) {
-					npc.errors = ajv.errors;
+				if (!valid) {
+					item.errors = ajv.errors;
 				}
 			}
 
-			// Filter out duplicate NPCs
-			this.imports.duplicate = npcs.filter(npc => {
-				return this.npcs.map(item => { return item.name.toLowerCase() }).includes(npc.name.toLowerCase());
+			// Filter out duplicate items
+			this.imports.duplicate = data.filter((filter_item) => {
+				return this.data
+					.map((map_item) => {
+						return map_item.name.toLowerCase();
+					})
+					.includes(filter_item.name.toLowerCase());
 			});
 			// Add index for selection
 			this.imports.duplicate.forEach((row, index) => {
-				row.index = index
+				row.index = index;
 			});
 
 			// Filter out new NPCs
-			this.imports.unique = npcs.filter(npc => {
-				return !this.npcs.map(item => { return item.name.toLowerCase() }).includes(npc.name.toLowerCase());
+			this.imports.unique = data.filter((filter_item) => {
+				return !this.data
+					.map((map_item) => {
+						return map_item.name.toLowerCase();
+					})
+					.includes(filter_item.name.toLowerCase());
 			});
 			// Add index for selection
 			this.imports.unique.forEach((row, index) => {
-				row.index = index
+				row.index = index;
 			});
 
 			this.parsed = true;
 		},
-		async import_npcs() {
-			if(this.importTotal <= this.availableSlots) {
+		async importData() {
+			if (this.importTotal <= this.availableSlots) {
 				this.importing = this.selected.unique.length + this.selected.duplicate.length;
-				for (const npc of this.selected.unique) {
-					delete npc.index; // Was added for selecion
-					delete npc.player_id; // Should never be imported. Account related property.
+				for (const item of this.selected.unique) {
+					delete item.index; // Was added for selection
+					delete item.player_id; // Should never be imported. Account related property.
+
 					try {
-						await this.add_npc(npc);
+						await this.addItem(item);
 					} catch {
-						this.failed_imports.push(npc);
+						this.failed_imports.push(item);
 					}
 					this.imported++;
 				}
-	
-				for (const npc of this.selected.duplicate) {
-					delete npc.index; // Was added for selecion
-					delete npc.player_id; // Should never be imported. Account related property.
-					if(this.overwrite) {
+
+				for (const item of this.selected.duplicate) {
+					delete item.index; // Was added for selection
+					delete item.player_id; // Should never be imported. Account related property.
+
+					if (this.overwrite) {
 						// Get the id of the existing NPC with the same name
-						const id = this.npcs.filter(item => { return item.name.toLowerCase() === npc.name.toLowerCase()})[0].key;
+						const id = this.data.filter((item) => {
+							return item.name.toLowerCase() === item.name.toLowerCase();
+						})[0].key;
 						try {
-							// Fetch the full existing NPC
-							const existing_npc = await this.get_npc({ uid: this.uid, id });
+							// Fetch the full existing item
+							const existing_item = this.getItem(id);
 
 							// Keep the player_id of the existing NPC, or remove it if the existing has no player_id
 							// This is an account related property for companions that shouldn't change with imports
-							npc.player_id = (existing_npc.player_id) ? existing_npc.player_id : null;
+							if (this.type === "npcs") {
+								item.player_id = existing_item.player_id ? existing_item.player_id : null;
+							}
 
-							// Edit the NPC
-							await this.edit_npc({
-								uid: this.uid,
-								id,
-								npc
-							});
+							// Edit the item
+							await this.editItem(id, item);
 						} catch {
-							this.failed_imports.push(npc);
+							this.failed_imports.push(item);
 						}
 					} else {
 						try {
-							await this.add_npc(npc);
+							await this.addItem(item);
 						} catch {
-							this.failed_imports.push(npc);
+							this.failed_imports.push(item);
 						}
 					}
 					this.imported++;
@@ -372,33 +440,33 @@ export default {
 			}
 		},
 		copySchema() {
-			const toCopy = document.querySelector('#copy')
-			toCopy.setAttribute('type', 'text') //hidden
-			toCopy.select()
+			const toCopy = document.querySelector("#copy");
+			toCopy.setAttribute("type", "text"); //hidden
+			toCopy.select();
 
 			try {
-				const successful = document.execCommand('copy');
-				const msg = successful ? 'Successful' : 'Unsuccessful';
+				const successful = document.execCommand("copy");
+				const msg = successful ? "Successful" : "Unsuccessful";
 
-				this.$snotify.success(msg, 'Schema copied', {
-					position: "rightTop"
+				this.$snotify.success(msg, "Schema copied", {
+					position: "rightTop",
 				});
 			} catch (err) {
-				this.$snotify.error("Unsuccessful", 'Schema not copied', {
-					position: "rightTop"
+				this.$snotify.error("Unsuccessful", "Schema not copied", {
+					position: "rightTop",
 				});
 			}
 
 			/* unselect the range */
-			toCopy.setAttribute('type', 'hidden')
-			window.getSelection().removeAllRanges()
+			toCopy.setAttribute("type", "hidden");
+			window.getSelection().removeAllRanges();
 		},
-	}
-}
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.q-expansion-item {
-		background-color: $neutral-9;
-	}
+.q-expansion-item {
+	background-color: $neutral-9;
+}
 </style>

@@ -42,7 +42,7 @@
 				</q-form>
 			</ValidationObserver>
 		</template>
-		<hk-loader v-else-if="!parsed" prefix="Validating" title="NPCs" />
+		<hk-loader v-else-if="!parsed" prefix="Validating" :title="type_label" />
 		<div v-else-if="!importing">
 			<template v-for="type in Object.keys(imports)">
 				<div v-if="imports[type].length" class="mb-4" :key="type">
@@ -51,7 +51,7 @@
 						<span :class="type === 'unique' ? 'green' : 'orange'">
 							{{ imports[type].length }} {{ type === "unique" ? "new" : "duplicate" }}
 						</span>
-						NPCs
+						{{ type_label }}
 					</p>
 					<q-table
 						class="sticky-header-table mb-2"
@@ -102,7 +102,7 @@
 			</template>
 			<div v-if="importTotal > availableSlots">
 				Insufficient slots. You're trying to import
-				<strong class="red">{{ importTotal }}</strong> NPCs,<br />
+				<strong class="red">{{ importTotal }}</strong> {{ type_label }},<br />
 				but have only <strong class="red">{{ availableSlots }}</strong> slots available.
 			</div>
 
@@ -120,14 +120,14 @@
 							importTotal > availableSlots
 						"
 					>
-						Import NPCs
+						Import
 					</q-btn>
 				</q-form>
 			</div>
 		</div>
 		<div v-else>
 			<h3 class="text-center">
-				{{ (imported &lt; importing) ? "Importing" : "Imported" }} {{ importing }} NPCs
+				{{ (imported &lt; importing) ? "Importing" : "Imported" }} {{ importing }} {{ type_label }}
 			</h3>
 			<q-linear-progress
 				:dark="$store.getters.theme !== 'light'"
@@ -147,7 +147,7 @@
 					<q-item-section class="red">Failed imports</q-item-section>
 				</template>
 				<div class="bg-neutral-8 px-3 py-2">
-					<p>Import failed for these NPCs</p>
+					<p>Import failed for these {{ type_label }}</p>
 					<q-list dense class="mb-2">
 						<q-item v-for="(failed, i) in failed_imports" :key="`failed-${i}`" class="bg-neutral-9">
 							<q-item-section>
@@ -190,9 +190,9 @@
 			</div>
 		</div>
 		<q-dialog v-model="showSchema">
-			<hk-card header="NPC Schema">
+			<hk-card :header="`${type_label} Schema`">
 				<div slot="header" class="card-header">
-					<span>NPC Schema</span>
+					<span>{{ type_label }} Schema</span>
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" v-close-popup />
 				</div>
 				<div class="card-body">
@@ -201,11 +201,11 @@
 						<a href="https://www.jsonschemavalidator.net/" target="_blank" rel="noopener"
 							>this schema validator</a
 						>
-						to find errors in your NPC.<br />
-						Paste our schema in the left field and the JSON of your NPC in the right.
+						to find errors in your {{ type_label }}.<br />
+						Paste our schema in the left field and the JSON of your {{ type_label }} in the right.
 					</p>
 					<a class="btn btn-sm mb-2" @click="copySchema">Copy schema</a>
-					<h3>HK NPC Schema</h3>
+					<h3>HK {{ type_label }} Schema</h3>
 					<div class="bg-neutral-8 px-2 py-2 overflow-auto">
 						<pre>
 							{{ this.schema }}
@@ -283,6 +283,9 @@ export default {
 		...mapGetters(["tier"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
 		...mapGetters("spells", ["spells", "spell_count"]),
+		type_label() {
+			return this.type === "npcs" ? "NPCs" : "Spells";
+		},
 		schema() {
 			return this.type === "npcs" ? npcSchema : spellSchema;
 		},
@@ -374,7 +377,7 @@ export default {
 				row.index = index;
 			});
 
-			// Filter out new NPCs
+			// Filter out new items
 			this.imports.unique = data.filter((filter_item) => {
 				return !this.data
 					.map((map_item) => {
@@ -409,7 +412,7 @@ export default {
 					delete item.player_id; // Should never be imported. Account related property.
 
 					if (this.overwrite) {
-						// Get the id of the existing NPC with the same name
+						// Get the id of the existing item with the same name
 						const id = this.data.filter((item) => {
 							return item.name.toLowerCase() === item.name.toLowerCase();
 						})[0].key;

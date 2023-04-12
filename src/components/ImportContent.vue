@@ -193,7 +193,7 @@
 			<hk-card :header="`${type_label} Schema`">
 				<div slot="header" class="card-header">
 					<span>{{ type_label }} Schema</span>
-					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" v-close-popup />
+					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
 				</div>
 				<div class="card-body">
 					<p>
@@ -351,11 +351,16 @@ export default {
 			}
 
 			// Validate items
-			for (const item of data) {
+			for (let item of data) {
 				// Delete damage_vulnerability property.
 				delete item.damage_vulnerability;
 				delete item.created;
 				delete item.updated;
+
+				// Parse versatile to options for NPCs
+				if (this.type === "npcs") {
+					item = this.versatileToOptions(item);
+				}
 
 				const valid = ajv.validate(this.schema, item);
 
@@ -463,6 +468,57 @@ export default {
 			/* unselect the range */
 			toCopy.setAttribute("type", "hidden");
 			window.getSelection().removeAllRanges();
+		},
+
+		/**
+		 * Turn old versatile abilities into abilities with options
+		 * @param {object} npc
+		 */
+		versatileToOptions(npc) {
+			const ability_types = ["special_abilities", "actions", "legendary_actions", "reactions"];
+			const versatile_options = ["damage_type", "magical", "dice_count", "dice_type", "fixed_val"];
+
+			// Check all rolls in all actions in all ability types of an NPC
+			for (const type of ability_types) {
+				if (npc[type]) {
+					for (const ability of npc[type]) {
+						if (ability.versatile) {
+							// Turn versatile into options
+							this.$set(ability, "options", [
+								ability.versatile_one || "Option 1",
+								ability.versatile_two || "Option 2",
+							]);
+							// Remove versatile
+							this.$delete(ability, "versatile");
+							this.$delete(ability, "versatile_one");
+							this.$delete(ability, "versatile_two");
+
+							// In the actions find rolls with versatile options set
+							if (ability.action_list && ability.action_list.length) {
+								for (const action of ability.action_list) {
+									if (action.rolls) {
+										let options;
+										for (const roll of action.rolls) {
+											for (const option of versatile_options) {
+												if (
+													roll[`versatile_${option}`] !== undefined &&
+													roll[`versatile_${option}`] !== roll[option]
+												) {
+													options = !options ? { [ability.options[1]]: {} } : options;
+													options[ability.options[1]][option] = roll[`versatile_${option}`];
+												}
+												this.$delete(roll, `versatile_${option}`);
+											}
+											this.$set(roll, "options", options);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			return npc;
 		},
 	},
 };

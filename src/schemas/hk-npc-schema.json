@@ -486,9 +486,6 @@
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
 					"options": { "$ref": "#/$defs/action-options" },
-					"versatile": { "$ref": "#/$defs/action-versatile" },
-					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
-					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
 					"action_list": { "$ref": "#/$defs/action-list" }
 				},
 				"required": ["name"]
@@ -511,9 +508,6 @@
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
 					"options": { "$ref": "#/$defs/action-options" },
-					"versatile": { "$ref": "#/$defs/action-versatile" },
-					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
-					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
 					"action_list": { "$ref": "#/$defs/action-list" }
 				},
 				"required": ["name"]
@@ -549,9 +543,6 @@
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
 					"options": { "$ref": "#/$defs/action-options" },
-					"versatile": { "$ref": "#/$defs/action-versatile" },
-					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
-					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
 					"action_list": { "$ref": "#/$defs/action-list" }
 				},
 				"required": ["name", "legendary_cost"]
@@ -574,9 +565,6 @@
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
 					"options": { "$ref": "#/$defs/action-options" },
-					"versatile": { "$ref": "#/$defs/action-versatile" },
-					"versatile_one": { "$ref": "#/$defs/action-versatile-one" },
-					"versatile_two": { "$ref": "#/$defs/action-versatile-two" },
 					"action_list": { "$ref": "#/$defs/action-list" }
 				},
 				"required": ["name"]
@@ -704,20 +692,6 @@
 				"type": "string"
 			}
 		},
-		"action-versatile": {
-			"title": "versatile",
-			"type": "boolean"
-		},
-		"action-versatile-one": {
-			"title": "Versatile one",
-			"type": "string",
-			"maxLength": 25
-		},
-		"action-versatile-two": {
-			"title": "Versatile two",
-			"type": "string",
-			"maxLength": 25
-		},
 		"action-list": {
 			"title": "Action list",
 			"type": "array",
@@ -818,27 +792,6 @@
 											}
 										}
 									}
-								},
-								"versatile_damage_type": {
-									"$ref": "#/$defs/damage-type-select"
-								},
-								"versatile_dice_count": {
-									"title": "versatile dice count",
-									"type": "integer",
-									"minimum": 1,
-									"maximum": 99
-								},
-								"versatile_dice_type": {
-									"title": "Versatile dice type",
-									"type": "integer",
-									"minimum": 1,
-									"maximum": 20
-								},
-								"versatile_fixed_val": {
-									"title": "Versatile fixed val",
-									"type": "integer",
-									"minimum": -99,
-									"maximum": 99
 								},
 								"projectile_count": {
 									"title": "Projectile count",

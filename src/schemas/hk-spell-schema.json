@@ -55,7 +55,7 @@
 			"title": "Cast time",
 			"type": "integer",
 			"minimum": 0,
-			"maximum": 9
+			"maximum": 999
 		},
 		"cast_time_react_desc": {
 			"title": "Cast time reaction description",

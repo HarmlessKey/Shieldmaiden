@@ -1202,30 +1202,6 @@
 			".write": false,
 			".read": true
 		},
-		"monsters": {
-			".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
-			".read": true,
-			".indexOn": "metadata/tagged"
-		},
-		"new_monsters": {
-			".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
-			".read": true,
-			".indexOn": ["metadata/tagged", "metadata/finished"]
-		},
-		"new_spells": {
-			".write": "root.child('users').child(auth.uid).child('admin').exists() || root.child('users').child(auth.uid).child('contribute').exists()",
-			".read": true,
-			".indexOn": ["metadata/tagged", "metadata/finished"]
-		},
-		"search_spells": {
-			".read": true,
-			"$uid": {
-				".write": "$uid === auth.uid",
-				"results": {
-					".indexOn": ["name"]
-				}
-			}
-		},
 		"spells": {
 			"$uid": {
 				"$spellId": {
@@ -1422,9 +1398,14 @@
 				".indexOn": ["metadata/tagged", "metadata/finished"]
 			}
 		},
-		"challenge": {
-			".write": false,
-			".read": true
+		"search_spells": {
+			".read": true,
+			"$uid": {
+				".write": "$uid === auth.uid",
+				"results": {
+					".indexOn": ["name"]
+				}
+			}
 		},
 		"reminders": {
 			"$uid": {

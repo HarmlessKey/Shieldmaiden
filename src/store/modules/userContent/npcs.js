@@ -122,7 +122,7 @@ const npc_actions = {
 			const used_slots = await services.getNpcCount(uid);
 
 			if (used_slots >= available_slots) {
-				throw "Not enough slots";
+				return "Not enough slots";
 			}
 			try {
 				const search_npc = convert_npc(npc);

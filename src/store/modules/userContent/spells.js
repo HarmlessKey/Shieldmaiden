@@ -95,9 +95,8 @@ const spell_actions = {
 		if (!spell) {
 			const services = await dispatch("get_spell_services");
 			try {
-				const spell = await services.getSpell(uid, id);
+				spell = await services.getSpell(uid, id);
 				commit("SET_CACHED_SPELL", { uid, id, spell });
-				return spell;
 			} catch (error) {
 				throw error;
 			}
@@ -121,7 +120,7 @@ const spell_actions = {
 			const used_slots = await services.getSpellCount(uid);
 
 			if (used_slots >= available_slots) {
-				throw "Not enough slots";
+				return "Not enough slots";
 			}
 			try {
 				const search_spell = convert_spell(spell);

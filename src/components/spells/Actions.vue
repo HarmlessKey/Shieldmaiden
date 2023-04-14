@@ -129,24 +129,6 @@
 											/>
 										</ValidationProvider>
 									</div>
-									<!-- <div class="col-12 col-md-4">
-										<q-checkbox
-											:dark="$store.getters.theme === 'dark'"
-											v-model="action.optional"
-											size="xl"
-											:false-value="null"
-											indeterminate-value="something-else"
-											@input="$forceUpdate()"
-										>
-											<span class="mr-2">Optional</span>
-											<hk-popover
-												header="Optional action"
-												content="When rolling this ability you can choose to roll one of the optional actions provided. Non-optional actions are always rolled."
-											>
-												<i class="fas fa-info-circle" aria-hidden="true" />
-											</hk-popover>
-										</q-checkbox>
-									</div> -->
 								</div>
 								<div class="row q-col-gutter-md">
 									<!-- ACTION TYPE -->

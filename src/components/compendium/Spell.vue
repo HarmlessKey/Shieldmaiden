@@ -1,5 +1,65 @@
 <template>
 	<div v-if="!loading" class="spell">
+		<hk-popover 
+			v-if="spell.actions && $route.name !== 'RunEncounter'" 
+			:header="`Roll ${spell.name}`"
+		>
+			<button class="btn bg-neutral-5 btn-block mb-2">Roll</button>
+			<template #content>
+				<q-input
+					v-if="spell.scaling === 'character_level'"
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					class="mb-3"
+					label="Caster level"
+					type="number"
+					v-model="caster_level"
+				/>
+
+				<!-- TO HIT MODIFIER INPUT -->
+				<q-input
+					v-if="isToHit"
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					class="mb-3"
+					label="Spell attack"
+					type="text"
+					v-model="attack_bonus"
+				/>
+
+				<!-- SPELL LEVEL INPUT -->
+				<template v-if="spell.level > 0">
+					<strong>Select Casting level</strong>
+					<div class="caster__levels">
+						<div
+							class="level"
+							:class="{
+								selected: cast_level === i,
+								disabled: i < spell.level,
+							}"
+							v-for="i in 9"
+							:key="i"
+							@click="spell.level <= i ? selectLevel(i) : null"
+						>
+							{{ i }}
+						</div>
+					</div>
+				</template>
+
+				<!-- ROLL SPELL -->
+				<hk-roll-action
+					:action="spell"
+					type="spell"
+					:attack-bonus="attack_bonus"
+					:cast-level="cast_level"
+					:caster-level="caster_level"
+				>
+					<button class="btn btn-block">Roll</button>
+				</hk-roll-action>
+			</template>
+		</hk-popover>
 		<div class="spell__title">
 			<h3>
 				{{ spell.name.capitalizeEach() }} <span class="source neutral-2">{{ spell.source }}</span>
@@ -36,63 +96,6 @@
 			<div v-if="spell.higher_level">
 				<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 			</div>
-		</div>
-
-		<div class="actions" v-if="spell.actions && $route.name !== 'RunEncounter'">
-			<h3 class="mb-3">Roll spell</h3>
-
-			<q-input
-				v-if="spell.scaling === 'character_level'"
-				:dark="$store.getters.theme === 'dark'"
-				filled
-				square
-				class="mb-3"
-				label="Caster level"
-				type="number"
-				v-model="caster_level"
-			/>
-
-			<!-- TO HIT MODIFIER INPUT -->
-			<q-input
-				v-if="isToHit"
-				:dark="$store.getters.theme === 'dark'"
-				filled
-				square
-				class="mb-3"
-				label="Spell attack"
-				type="text"
-				v-model="attack_bonus"
-			/>
-
-			<!-- SPELL LEVEL INPUT -->
-			<template v-if="spell.level > 0">
-				<p>Select Casting level</p>
-				<div class="actions__levels">
-					<div
-						class="level"
-						:class="{
-							selected: cast_level === i,
-							disabled: i < spell.level,
-						}"
-						v-for="i in 9"
-						:key="i"
-						@click="spell.level <= i ? selectLevel(i) : null"
-					>
-						{{ i }}
-					</div>
-				</div>
-			</template>
-
-			<!-- ROLL SPELL -->
-			<hk-roll-action
-				:action="spell"
-				type="spell"
-				:attack-bonus="attack_bonus"
-				:cast-level="cast_level"
-				:caster-level="caster_level"
-			>
-				<button class="btn btn-block mt-3">Roll</button>
-			</hk-roll-action>
 		</div>
 	</div>
 	<hk-loader v-else name="spell" />
@@ -214,33 +217,29 @@ export default {
 			background-color: $red;
 		}
 	}
-	.actions {
-		margin-bottom: 15px;
+}
+.caster__levels {
+	display: flex;
+	justify-content: center;
+	column-gap: 3px;
+	margin: 10px 0;
 
-		&__levels {
-			display: flex;
-			justify-content: center;
-			margin: 0 -5px;
+	.level {
+		width: 30px;
+		height: 30px;
+		line-height: 30px;
+		text-align: center;
+		cursor: pointer;
+		background-color: $neutral-8;
+		user-select: none;
 
-			.level {
-				width: 30px;
-				height: 30px;
-				line-height: 30px;
-				text-align: center;
-				cursor: pointer;
-				background-color: $neutral-6;
-				user-select: none;
-				margin: 0 3px;
-
-				&.selected {
-					background-color: $blue;
-					color: $neutral-1;
-				}
-				&.disabled {
-					opacity: 0.4;
-					cursor: not-allowed;
-				}
-			}
+		&.selected {
+			background-color: $blue;
+			color: $neutral-1;
+		}
+		&.disabled {
+			opacity: 0.4;
+			cursor: not-allowed;
 		}
 	}
 }

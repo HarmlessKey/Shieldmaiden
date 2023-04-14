@@ -1,0 +1,383 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Harmless Key Spell",
+	"description": "JSON Schema for importing Harmless Key spells",
+	"additionalProperties": false,
+	"type": "object",
+	"properties": {
+		"harmless_key": {
+			"type": "string",
+			"maxLength": 100
+		},
+		"created": {
+			"title": "Created",
+			"type": "integer"
+		},
+		"updated": {
+			"title": "Updated",
+			"type": "integer"
+		},
+		"name": {
+			"title": "Name",
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 100
+		},
+		"source": {
+			"title": "Source",
+			"type": "string",
+			"maxLength": 30
+		},
+		"level": {
+			"title": "Source",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9
+		},
+		"school": {
+			"type": "string",
+			"enum": [
+				"abjuration",
+				"conjuration",
+				"divination",
+				"enchantment",
+				"evocation",
+				"illusion",
+				"necromancy",
+				"transmutation"
+			]
+		},
+		"cast_time_type": {
+			"type": "string",
+			"enum": ["action", "bonus_action", "reaction", "minute", "hour", "no_action", "special"]
+		},
+		"cast_time": {
+			"title": "Cast time",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 999
+		},
+		"cast_time_react_desc": {
+			"title": "Cast time reaction description",
+			"type": "string",
+			"maxLength": 200
+		},
+		"components": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"enum": ["verbal", "somatic", "material"]
+			}
+		},
+		"material_description": {
+			"title": "Material description",
+			"type": "string",
+			"maxLength": 500
+		},
+		"range_type": {
+			"type": "string",
+			"enum": ["self", "touch", "ranged", "sight", "unlimited", "special"]
+		},
+		"range": {
+			"title": "Range",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9999999
+		},
+		"classes": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"enum": [
+					"bard",
+					"barbarian",
+					"cleric",
+					"druid",
+					"fighter",
+					"monk",
+					"paladin",
+					"ranger",
+					"rogue",
+					"sorcerer",
+					"warlock",
+					"wizard"
+				]
+			}
+		},
+		"duration_type": {
+			"type": "string",
+			"enum": [
+				"concentration",
+				"instantaneous",
+				"special",
+				"time",
+				"until_dispelled",
+				"until_dispelled_or_triggered"
+			]
+		},
+		"duration": {
+			"title": "Range",
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 999
+		},
+		"duration_scale": {
+			"type": "string",
+			"enum": ["round", "minute", "hour", "day"]
+		},
+		"aoe_type": {
+			"title": "AOE type",
+			"type": "string",
+			"enum": [
+				"none",
+				"cone",
+				"cube",
+				"cylinder",
+				"line",
+				"radius",
+				"sphere",
+				"square",
+				"square feet"
+			]
+		},
+		"aoe_size": {
+			"title": "AOE Size",
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 99999
+		},
+		"ritual": {
+			"type": "boolean"
+		},
+		"scaling": {
+			"title": "Scaling",
+			"type": "string",
+			"enum": ["none", "character_level", "spell_scale", "spell_level"]
+		},
+		"description": {
+			"title": "Description",
+			"type": "string",
+			"maxLength": 5000
+		},
+		"higher_level": {
+			"title": "At higher levels",
+			"type": "string",
+			"maxLength": 1000
+		},
+		"projectiles": {
+			"title": "Projectiles",
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 99
+		},
+		"projectile_scaling": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"level": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 20
+					},
+					"projectile_count": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 25
+					}
+				}
+			}
+		},
+		"options": {
+			"title": "Options",
+			"type": "array",
+			"items": {
+				"type": "string",
+				"maxLength": 30
+			}
+		},
+		"actions": {
+			"title": "Action list",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string",
+						"maxLength": 100
+					},
+					"type": {
+						"title": "type",
+						"type": "string",
+						"enum": [
+							"melee_weapon",
+							"ranged_weapon",
+							"spell_attack",
+							"save",
+							"damage",
+							"healing",
+							"other"
+						]
+					},
+					"save_ability": {
+						"$ref": "#/$defs/ability-select"
+					},
+					"rolls": {
+						"title": "Rolls",
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"damage_type": {
+									"$ref": "#/$defs/damage-type-select"
+								},
+								"dice_count": {
+									"title": "Dice count",
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 99
+								},
+								"dice_type": {
+									"title": "Dice type",
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 20
+								},
+								"fixed_val": {
+									"title": "Fixed val",
+									"type": "integer",
+									"minimum": -99,
+									"maximum": 99
+								},
+								"primary": {
+									"title": "Primary stat modifier",
+									"type": "boolean"
+								},
+								"options": {
+									"title": "Options",
+									"type": "object",
+									"additionalProperties": true,
+									"properties": {
+										"^[A-Za-z0-9\\._%\\+-]+@[A-Za-z0-9\\.-]+\\.[A-Za-z]{2,6}$": {
+											"type": "object",
+											"additionalProperties": false,
+											"properties": {
+												"ignore": {
+													"title": "Ignore",
+													"type": "boolean"
+												},
+												"damage_type": {
+													"$ref": "#/$defs/damage-type-select"
+												},
+												"dice_count": {
+													"title": "Dice count",
+													"type": "integer",
+													"minimum": 1,
+													"maximum": 99
+												},
+												"dice_type": {
+													"title": "Dice type",
+													"type": "integer",
+													"minimum": 1,
+													"maximum": 20
+												},
+												"fixed_val": {
+													"title": "Fixed val",
+													"type": "integer",
+													"minimum": -99,
+													"maximum": 99
+												}
+											}
+										}
+									}
+								},
+								"miss_mod": {
+									"title": "Miss modifier",
+									"type": "number",
+									"minimum": 0,
+									"maximum": 2
+								},
+								"save_fail_mod": {
+									"title": "Save fail modifier",
+									"type": "number",
+									"minimum": 0,
+									"maximum": 2
+								},
+								"special": {
+									"title": "special",
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": ["siphon_full", "siphon_half", "drain"]
+									}
+								},
+								"scaling": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"additionalProperties": false,
+										"properties": {
+											"level": {
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 20
+											},
+											"dice_count": {
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 99
+											},
+											"fixed_val": {
+												"type": "integer",
+												"minimum": -99,
+												"maximum": 99
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"required": [
+		"name",
+		"level",
+		"school",
+		"cast_time",
+		"cast_time_type",
+		"range_type",
+		"duration_type",
+		"aoe_type",
+		"scaling"
+	],
+	"$defs": {
+		"ability-select": {
+			"type": "string",
+			"enum": ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+		},
+		"damage-type-select": {
+			"type": "string",
+			"enum": [
+				"acid",
+				"bludgeoning",
+				"cold",
+				"fire",
+				"force",
+				"lightning",
+				"necrotic",
+				"piercing",
+				"poison",
+				"psychic",
+				"radiant",
+				"slashing",
+				"thunder"
+			]
+		}
+	}
+}

@@ -39,6 +39,8 @@ export default {
 				"https://harmlesskey.com/tools/encounter-builder/build-encounter",
 				"https://harmlesskey.com/tools/monster-creator",
 				"https://harmlesskey.com/tools/monster-creator/create-monster",
+				"https://harmlesskey.com/tools/spell-creator",
+				"https://harmlesskey.com/tools/spell-creator/create-spell",
 				"https://harmlesskey.com/tools/character-builder",
 			],
 		};

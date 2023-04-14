@@ -354,6 +354,48 @@ const routes = [
 				],
 			},
 
+			// Spells
+			{
+				path: "spells",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Spells",
+				},
+				children: [
+					{
+						path: "",
+						name: "Spells",
+						component: () => import("src/views/UserContent/Spells/Spells.vue"),
+						meta: {
+							title: "Spells",
+							description: "Your custom spells on Harmless Key.",
+						},
+					},
+					{
+						path: "add-spell",
+						name: "Add spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Add spell",
+							description: "Create a new spell on Harmless Key.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Edit spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Edit spell",
+							description: "Edit an existing spell on Harmless Key.",
+						},
+					},
+				],
+			},
+
 			// Reminders
 			{
 				path: "reminders",
@@ -536,7 +578,7 @@ const routes = [
 				meta: {
 					title: "D&D 5e Tools",
 					description:
-						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nCharacter Builder \nCompendium",
+						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
 				},
 			},
 			{
@@ -592,7 +634,7 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5eMonster creator",
+					title: "D&D 5e Monster creator",
 					description:
 						"An advanced monster creator for D&D 5e. Create a stat block with easy to roll actions.",
 				},
@@ -614,6 +656,41 @@ const routes = [
 						meta: {
 							title: "Create monster",
 							description: "Create your custom D&D 5e monster.",
+						},
+					},
+				],
+			},
+			{
+				path: "spell-creator",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "D&D 5e Spell creator",
+					description:
+						"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsSpellCreator",
+						component: () => import("src/views/Tools/SpellCreator"),
+						meta: {
+							title: "Dungeons & Dragons Spell Creator",
+							description:
+								"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+						},
+					},
+					{
+						path: "create-spell",
+						name: "ToolsCreateSpell",
+						component: () => import("src/views/UserContent/Spells/EditSpell"),
+						meta: {
+							title: "Create spell",
+							description:
+								"Create your custom D&D 5e spell to roll directly or use in your custom spellcaster monsters.",
 						},
 					},
 				],
@@ -1048,7 +1125,7 @@ const routes = [
 				children: [
 					{
 						path: "",
-						name: "Spells",
+						name: "ContributeSpells",
 						component: () => import("src/views/Contribute/Spells.vue"),
 					},
 					{
@@ -1069,7 +1146,7 @@ const routes = [
 							},
 							{
 								path: "edit",
-								name: "Edit spell",
+								name: "Edit contribute spell",
 								component: () => import("src/components/contribute/spell/edit.vue"),
 							},
 						],

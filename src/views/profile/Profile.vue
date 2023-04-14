@@ -82,7 +82,7 @@
 								</p>
 							</template>
 							<template>
-								<div class="dflex justify-between">
+								<div class="d-flex justify-between">
 									<q-input
 										class="text-uppercase"
 										:dark="$store.getters.theme === 'dark'"
@@ -187,6 +187,10 @@ export default {
 				{
 					type: "npcs",
 					icon: "fa-dragon",
+				},
+				{
+					type: "spells",
+					icon: "fa-wand-magic",
 				},
 				{
 					type: "reminders",

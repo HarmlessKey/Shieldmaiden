@@ -181,7 +181,7 @@
 									<span class="type truncate" :class="rolled.damage_type">
 										<span class="type__icon-wrapper">
 											<i :class="damage_type_icons[rolled.damage_type]" aria-hidden="true" />
-											<i v-if="rolled.magical" class="fas fa-sparkles" aria-hidden="true">
+											<i v-if="rolled.magical" class="fas fa-sparkles magical" aria-hidden="true">
 												<q-tooltip anchor="top middle" self="center middle">Magical</q-tooltip>
 											</i>
 										</span>
@@ -196,7 +196,7 @@
 									/></b>
 								</q-item-label>
 								<q-tooltip anchor="top middle" self="center middle">
-									{{ rolled.modifierRoll.roll }}
+									{{ rolled.rollResult.roll }}
 								</q-tooltip>
 							</q-item-section>
 						</template>
@@ -207,25 +207,25 @@
 									<b class="green">Crit!</b>
 									{{ crit_description[critSettings] }} </template
 								><br />
-								{{ rolled.modifierRoll.roll }}
+								{{ rolled.rollResult.roll }}
 								<div class="d-flex justify-content-between">
 									<div class="throws">
 										<div
-											v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
+											v-for="(Throw, throw_index) in rolled.rollResult.throws"
 											:key="`throw-${Throw}-${throw_index}`"
 											class="throw"
 											:class="{
 												red: Throw === 1,
-												green: Throw == rolled.modifierRoll.d,
+												green: Throw == rolled.rollResult.d,
 												rotate: animateRoll === roll.key + rolled_index + throw_index,
 											}"
 											@click="
 												(animateRoll = roll.key + rolled_index + throw_index),
 													reroll(
 														$event,
-														rolled.modifierRoll,
+														rolled.rollResult,
 														throw_index,
-														action.toHit.throwsTotal === 20
+														action.toHit && action.toHit.throwsTotal === 20
 													)
 											"
 											@animationend="animateRoll = undefined"
@@ -237,30 +237,18 @@
 										</div>
 									</div>
 									<div class="d-flex justify-content-end">
-										<template v-if="parseInt(rolled.modifierRoll.mod)">
+										<template v-if="parseInt(rolled.rollResult.mod)">
 											<q-separator vertical :dark="$store.getters.theme === 'dark'" />
 											<div class="throws-modifier">
-												{{ rolled.modifierRoll.mod }}
+												{{ rolled.rollResult.mod }}
 											</div>
 										</template>
 										<q-separator vertical :dark="$store.getters.theme === 'dark'" />
 										<div class="throws-total">
-											<hk-animated-integer :value="rolled.modifierRoll.total" />
+											<hk-animated-integer :value="rolled.rollResult.total" />
 										</div>
 									</div>
 								</div>
-							</div>
-							<div v-if="rolled.scaledRoll" class="mt-3">
-								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} =
-								<b>{{ rolled.scaledRoll.total }}</b
-								><br />
-								{{ rolled.scaledRoll.throws }}
-							</div>
-							<div v-if="rolled.scaledRoll" class="mt-3">
-								Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} =
-								<b>{{ rolled.scaledRoll.total }}</b
-								><br />
-								{{ rolled.scaledRoll.throws }}
 							</div>
 							<div v-if="savingThrowResult[action_index] === 'save'" class="mt-3">
 								Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
@@ -280,11 +268,7 @@
 							<hr />
 							<div>
 								<b>Final result</b><br />
-								(<hk-animated-integer :value="rolled.modifierRoll.total" /><span
-									v-if="rolled.scaledRoll"
-								>
-									+ {{ rolled.scaledRoll.total }}</span
-								>)
+								(<hk-animated-integer :value="rolled.rollResult.total" />)
 								<span
 									v-if="
 										savingThrowResult[action_index] === 'save' || hitOrMiss[action_index] === 'miss'
@@ -682,25 +666,22 @@ export default {
 			// Remove the roll
 			this.removeActionRoll(this.index);
 		},
-		totalRollValue(action, action_index, rolls) {
-			let total = parseInt(rolls.modifierRoll.total);
+		totalRollValue(action, action_index, roll) {
+			let total = parseInt(roll.rollResult.total);
 
-			if (rolls.scaledRoll) {
-				total = total + rolls.scaledRoll.total;
-			}
 			if (action.type === "save" && this.savingThrowResult[action_index] === "save") {
-				total = total * rolls.missSave;
+				total = total * (roll.missSave || 0);
 			}
 			if (action.toHit && this.hitOrMiss[action_index] === "miss") {
-				total = total * rolls.missSave;
+				total = total * roll.missSave;
 			}
-			if (this.checkDefenses(rolls.damage_type, rolls.magical, "v")) {
+			if (this.checkDefenses(roll.damage_type, roll.magical, "v")) {
 				total = total * 2;
 			}
-			if (this.checkDefenses(rolls.damage_type, rolls.magical, "r")) {
+			if (this.checkDefenses(roll.damage_type, roll.magical, "r")) {
 				total = total / 2;
 			}
-			if (this.checkDefenses(rolls.damage_type, rolls.magical, "i")) {
+			if (this.checkDefenses(roll.damage_type, roll.magical, "i")) {
 				total = 0;
 			}
 			return Math.floor(total);
@@ -801,7 +782,7 @@ export default {
 			};
 
 			if (event) {
-				// Drain = redus Max HP
+				// Drain = reduce Max HP
 				if (event === "drain") {
 					returnObj.name = "Drain";
 				}
@@ -814,7 +795,6 @@ export default {
 			return returnObj;
 		},
 		toggleOverride(dmg_type) {
-			console.log("override", dmg_type);
 			this.override[dmg_type] = undefined;
 			this.edit_total[dmg_type] = !this.edit_total[dmg_type];
 		},
@@ -895,7 +875,7 @@ export default {
 				&__icon-wrapper {
 					position: relative;
 
-					.fa-sparkles {
+					.magical {
 						position: absolute;
 						top: -3px;
 						left: -5px;

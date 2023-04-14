@@ -12,11 +12,20 @@ export const runEncounter = {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
-		roll_action({ e, action_index, action, category, entity, targets, versatile = undefined }) {
+		roll_action({
+			e,
+			action_index,
+			action,
+			category,
+			entity,
+			targets,
+			projectiles = 1,
+			option = undefined,
+		}) {
 			let roll;
 			const config = {
 				type: "monster_action",
-				versatile,
+				option,
 			};
 
 			// Roll once for AOE

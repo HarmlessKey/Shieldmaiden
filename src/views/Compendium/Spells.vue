@@ -94,7 +94,6 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" auto-width>
-							{{ props }}
 							<ViewSpell :id="props.key" />
 						</q-td>
 					</q-tr>
@@ -228,7 +227,7 @@ export default {
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,
-				fields: ["name", "level", "url"],
+				fields: ["name", "school", "level", "url"],
 				sortBy: this.pagination.sortBy,
 				descending: this.pagination.descending,
 			}).then((result) => {

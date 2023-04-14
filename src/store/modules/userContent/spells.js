@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { spellServices } from "src/services/spells";
+import { SpellServices } from "src/services/spells";
 import _ from "lodash";
 
 // Converts a full spell to a search_spell
@@ -44,7 +44,7 @@ const spell_getters = {
 const spell_actions = {
 	async get_spell_services({ getters, commit }) {
 		if (getters.spell_services === null || !Object.keys(getters.spell_services).length) {
-			commit("SET_SPELL_SERVICES", new spellServices());
+			commit("SET_SPELL_SERVICES", new SpellServices());
 		}
 		return getters.spell_services;
 	},

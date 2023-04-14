@@ -324,16 +324,16 @@ export default {
 		...mapActions("spells", ["add_spell", "edit_spell", "get_spells", "get_spell"]),
 		async getItem(id) {
 			return this.type === "npcs"
-				? await this.get_npc({ uid: this.uid, id })
-				: await this.get_spell({ uid: this.uid, id });
+				? this.get_npc({ uid: this.uid, id })
+				: this.get_spell({ uid: this.uid, id });
 		},
 		async addItem(item) {
 			this.type === "npcs" ? await this.add_npc(item) : await this.add_spell(item);
 		},
 		async editItem(id, item) {
 			this.type === "npcs"
-				? await this.edit_npc({ uid: this.uid, id, npc: item })
-				: await this.edit_spell({ id, spell: item });
+				? this.edit_npc({ uid: this.uid, id, npc: item })
+				: this.edit_spell({ id, spell: item });
 		},
 		loadJSON() {
 			const fr = new FileReader();

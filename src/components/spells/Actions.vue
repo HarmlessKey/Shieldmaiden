@@ -252,7 +252,6 @@
 </template>
 
 <script>
-import _ from "lodash";
 import { abilities } from "src/utils/generalConstants";
 import { attack_types } from "src/utils/actionConstants";
 

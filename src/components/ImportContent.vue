@@ -1,7 +1,8 @@
 <template>
 	<div>
 		<template v-if="!parsed && !parsing">
-			<p>Import Harmless Key {{ type_label }}.<br/>
+			<p>
+				Import Harmless Key {{ type_label }}.<br />
 				<small><em>Content from other sources can't be imported</em></small>
 			</p>
 			<q-file
@@ -426,8 +427,8 @@ export default {
 
 					if (this.overwrite) {
 						// Get the id of the existing item with the same name
-						const id = this.data.filter((item) => {
-							return item.name.toLowerCase() === item.name.toLowerCase();
+						const id = this.data.filter((i) => {
+							return i.name.toLowerCase() === item.name.toLowerCase();
 						})[0].key;
 						try {
 							// Fetch the full existing item

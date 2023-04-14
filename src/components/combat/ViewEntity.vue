@@ -155,17 +155,20 @@
 					</span>
 				</template>
 				<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
-					<strong>Damage vulnerabilities</strong> {{ entity.damage_vulnerabilities.join(", ")
-					}}<br />
+					<strong>Damage vulnerabilities</strong>
+					{{ defensesDisplay(entity.damage_vulnerabilities).join(", ") }}<br />
 				</template>
 				<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
-					<strong>Damage resistances</strong> {{ entity.damage_resistances.join(", ") }}<br />
+					<strong>Damage resistances</strong>
+					{{ defensesDisplay(entity.damage_resistances).join(", ") }}<br />
 				</template>
 				<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
-					<strong>Damage immunities</strong> {{ entity.damage_immunities.join(", ") }}<br />
+					<strong>Damage immunities</strong>
+					{{ defensesDisplay(entity.damage_immunities).join(", ") }}<br />
 				</template>
 				<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
-					<strong>Condition immunities</strong> {{ entity.condition_immunities.join(", ") }}<br />
+					<strong>Condition immunities</strong>
+					{{ entity.condition_immunities.join(", ") }}<br />
 				</template>
 
 				<strong>Senses</strong>
@@ -414,54 +417,14 @@
 									action.action_list[0].rolls.length
 								"
 							>
-								<span v-if="action.versatile" class="roll-button" @click.stop>
-									<q-popup-proxy :dark="$store.getters.theme === 'dark'">
-										<div class="bg-neutral-8">
-											<q-item>
-												<q-item-section>
-													<strong>{{ action.name }}</strong>
-												</q-item-section>
-											</q-item>
-											<q-separator />
-											<q-list :dark="$store.getters.theme === 'dark'">
-												<q-item clickable v-close-popup>
-													<q-item-section avatar>1</q-item-section>
-													<q-item-section>
-														<hk-roll
-															:tooltip="`${action.name} (${action.versatile_one || 'Option 1'})`"
-															tooltipPosition="right"
-															@roll="roll($event, acion_index, action, category, 0)"
-															:disabled="!checkAvailable(category, action_index, action)"
-														>
-															{{ action.versatile_one || "Option 1" }}
-														</hk-roll>
-													</q-item-section>
-												</q-item>
-												<q-item clickable v-close-popup>
-													<q-item-section avatar>2</q-item-section>
-													<q-item-section>
-														<hk-roll
-															:tooltip="`${action.name} (${action.versatile_two || 'Option 2'})`"
-															tooltipPosition="right"
-															@roll="roll($event, action_index, action, category, 1)"
-															:disabled="!checkAvailable(category, action_index, action)"
-														>
-															{{ action.versatile_two || "Option 2" }}
-														</hk-roll>
-													</q-item-section>
-												</q-item>
-											</q-list>
-										</div>
-									</q-popup-proxy>
-								</span>
-								<hk-roll
-									v-else
+								<hk-roll-action
+									:action="action"
 									:tooltip="`Roll ${action.name}`"
-									@roll="roll($event, action_index, action, category)"
+									@roll="roll(...arguments, action_index, action, category)"
 									:disabled="!checkAvailable(category, action_index, action)"
 								>
 									<span class="roll-button" />
-								</hk-roll>
+								</hk-roll-action>
 							</template>
 							<div class="monster-action-title__name">
 								<strong
@@ -568,6 +531,7 @@
 									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 									}}<template v-if="roll.fixed_val && roll.dice_count">
 										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+
 										}}) </template
 									><template v-else>{{ roll.fixed_val }})</template>
 									{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
@@ -773,7 +737,7 @@ export default {
 					return item[1];
 				});
 		},
-		roll(e, action_index, action, category, versatile) {
+		roll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted && this.targeted.length) {
 				this.roll_action({
 					e,
@@ -782,7 +746,8 @@ export default {
 					category,
 					entity: this.entity,
 					targets: this.targeted,
-					versatile,
+					projectiles,
+					option,
 				});
 			} else {
 				this.$q.notify({

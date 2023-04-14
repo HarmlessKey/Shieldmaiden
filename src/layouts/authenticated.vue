@@ -4,9 +4,9 @@
 			<Crumble />
 			<PaymentDeclined />
 			<OverEncumbered v-if="show_overencumbered" />
-			<div class="row q-col-gutter-md">		
-				<div class="col-12" :class="{ 'col-md-9': width > 978 &&  $route.meta.side !== false }">
-					<router-view />
+			<div class="row q-col-gutter-md">
+				<div class="col-12" :class="{ 'col-md-9': width > 978 && $route.meta.side !== false }">
+					<router-view :key="$route.fullPath" />
 				</div>
 				<div class="col-12 col-md-3" v-if="width > 978 && $route.meta.side !== false">
 					<ContentSideRight />
@@ -19,52 +19,49 @@
 </template>
 
 <script>
-	import { mapGetters} from "vuex";
-	import Footer from "src/components/Footer";
-	import Crumble from "src/components/crumble";
-	import ContentSideRight from "src/components/ContentSideRight";
-	import OverEncumbered from "src/components/userContent/OverEncumbered";
-	import PaymentDeclined from 'src/components/PaymentDeclined.vue';
+import { mapGetters } from "vuex";
+import Footer from "src/components/Footer";
+import Crumble from "src/components/crumble";
+import ContentSideRight from "src/components/ContentSideRight";
+import OverEncumbered from "src/components/userContent/OverEncumbered";
+import PaymentDeclined from "src/components/PaymentDeclined.vue";
 
-	export default {
-		name: "AuthenticatedLayout",
-		components: {
-			Crumble,
-			Footer,
-			ContentSideRight,
-			OverEncumbered,
-			PaymentDeclined
-		},
-		preFetch({ store, redirect }) {
-      if(!store.getters.user) {
-				redirect('/sign-in');
-			}
-			else if(!store.getters.userInfo) {
-				redirect("/set-username");
-			}
-    },
-		data() {
-			return {
-				width: 0
-			}
-		},
-		computed: {
-			...mapGetters([
-				"overencumbered"
-			]),
-			show_overencumbered() {
-				const pathArray = this.$route.path.split("/");
-				return pathArray[1] === "content" && this.overencumbered;
-			},
-			show_mobile_ad() {
-				const pathArray = this.$route.path.split("/");
-				return pathArray[1] !== "content" && this.width <= 978;
-			}
-		},
-		methods: {
-			setSize(size) {
-				this.width = size.width;
-			}
+export default {
+	name: "AuthenticatedLayout",
+	components: {
+		Crumble,
+		Footer,
+		ContentSideRight,
+		OverEncumbered,
+		PaymentDeclined,
+	},
+	preFetch({ store, redirect }) {
+		if (!store.getters.user) {
+			redirect("/sign-in");
+		} else if (!store.getters.userInfo) {
+			redirect("/set-username");
 		}
-	}
+	},
+	data() {
+		return {
+			width: 0,
+		};
+	},
+	computed: {
+		...mapGetters(["overencumbered"]),
+		show_overencumbered() {
+			const pathArray = this.$route.path.split("/");
+			return pathArray[1] === "content" && this.overencumbered;
+		},
+		show_mobile_ad() {
+			const pathArray = this.$route.path.split("/");
+			return pathArray[1] !== "content" && this.width <= 978;
+		},
+	},
+	methods: {
+		setSize(size) {
+			this.width = size.width;
+		},
+	},
+};
 </script>

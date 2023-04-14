@@ -19,19 +19,23 @@ String.prototype.formatUnicorn = function () {
 
 // Returns a number equal to or higher than a given minimum
 Number.prototype.min = function (min = 0) {
-	return this >= min ? this : min;
+	return Math.max(this, min);
 };
 
 // Returns a number equal to or higher than a given minimum
 Number.prototype.max = function (max = Infinity) {
-	return this <= max ? this : max;
+	return Math.min(this, max);
 };
 
 // Returns a number equal to or higher than a given minimum and lower than or equal to a given maximum
 Number.prototype.between = function (min = 0, max = Infinity) {
-	let value = this >= min ? this : min;
-	value = this <= max ? this : max;
-	return value;
+	return Math.max(Math.min(this, max), min);
+};
+
+Number.prototype.toOrdinal = function () {
+	const s = ["th", "st", "nd", "rd"];
+	const v = this % 100;
+	return this + (s[(v - 20) % 10] || s[v] || s[0]);
 };
 
 Array.min = function (array) {

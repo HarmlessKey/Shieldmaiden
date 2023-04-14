@@ -354,6 +354,48 @@ const routes = [
 				],
 			},
 
+			// Spells
+			{
+				path: "spells",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Spells",
+				},
+				children: [
+					{
+						path: "",
+						name: "Spells",
+						component: () => import("src/views/UserContent/Spells/Spells.vue"),
+						meta: {
+							title: "Spells",
+							description: "Your custom spells on Harmless Key.",
+						},
+					},
+					{
+						path: "add-spell",
+						name: "Add spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Add spell",
+							description: "Create a new spell on Harmless Key.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Edit spell",
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
+						meta: {
+							title: "Edit spell",
+							description: "Edit an existing spell on Harmless Key.",
+						},
+					},
+				],
+			},
+
 			// Reminders
 			{
 				path: "reminders",
@@ -536,7 +578,7 @@ const routes = [
 				meta: {
 					title: "D&D 5e Tools",
 					description:
-						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nCharacter Builder \nCompendium",
+						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
 				},
 			},
 			{
@@ -544,7 +586,7 @@ const routes = [
 				name: "ToolsCombatTracker",
 				component: () => import("src/views/Tools/CombatTracker"),
 				meta: {
-					title: "Combat Tracker",
+					title: "D&D 5e Combat Tracker",
 					description: "An advanced initiative tracker for Dungeons and Dragons 5th edition.",
 				},
 			},
@@ -556,9 +598,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "Encounter Builder",
+					title: "D&D 5e Encounter Builder",
 					description:
-						"An encounter builder for Dungeons and Dragons 5th edition. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
+						"An encounter builder for D&D 5e. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
 				},
 				children: [
 					{
@@ -566,9 +608,9 @@ const routes = [
 						name: "ToolsEncounterBuilder",
 						component: () => import("src/views/Tools/EncounterBuilder"),
 						meta: {
-							title: "Encounter Builder",
+							title: "D&D 5e Encounter Builder",
 							description:
-								"An encounter builder for Dungeons and Dragons 5th edition. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
+								"An encounter builder for D&D 5e. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
 						},
 					},
 					{
@@ -576,7 +618,7 @@ const routes = [
 						name: "ToolsBuildEncounter",
 						component: () => import("src/views/UserContent/Encounters/Edit"),
 						meta: {
-							title: "Build encounter",
+							title: "Build encounter for D&D 5e",
 							description:
 								"Create an encounter for D&D 5e and find out it's difficulty. Once you're finished you can run it in our Combat Tracker.",
 							side: false,
@@ -592,9 +634,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "Monster creator",
+					title: "D&D 5e Monster creator",
 					description:
-						"An advanced monster creator for Dungeons and Dragons 5th edition. Create a stat block with easy to roll actions.",
+						"An advanced monster creator for D&D 5e. Create a stat block with easy to roll actions.",
 				},
 				children: [
 					{
@@ -604,7 +646,7 @@ const routes = [
 						meta: {
 							title: "Dungeons & Dragons Monster Creator",
 							description:
-								"An advanced monster creator for Dungeons and Dragons 5th edition. Create a stat block with easy to roll actions.",
+								"An advanced monster creator for D&D 5e. Create a stat block with easy to roll actions.",
 						},
 					},
 					{
@@ -619,13 +661,48 @@ const routes = [
 				],
 			},
 			{
+				path: "spell-creator",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "D&D 5e Spell creator",
+					description:
+						"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsSpellCreator",
+						component: () => import("src/views/Tools/SpellCreator"),
+						meta: {
+							title: "Dungeons & Dragons Spell Creator",
+							description:
+								"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+						},
+					},
+					{
+						path: "create-spell",
+						name: "ToolsCreateSpell",
+						component: () => import("src/views/UserContent/Spells/EditSpell"),
+						meta: {
+							title: "Create spell",
+							description:
+								"Create your custom D&D 5e spell to roll directly or use in your custom spellcaster monsters.",
+						},
+					},
+				],
+			},
+			{
 				path: "character-builder",
 				name: "ToolsCharacterBuilder",
 				component: () => import("src/views/Tools/CharacterBuilder"),
 				meta: {
 					title: "Character Builder",
 					description:
-						"An advanced character builder for Dungeons and Dragons 5th edition. Create a character sheet for you character.",
+						"An advanced character builder for D&D 5e. Create a character sheet for you character.",
 				},
 			},
 		],
@@ -1048,7 +1125,7 @@ const routes = [
 				children: [
 					{
 						path: "",
-						name: "Spells",
+						name: "ContributeSpells",
 						component: () => import("src/views/Contribute/Spells.vue"),
 					},
 					{
@@ -1069,7 +1146,7 @@ const routes = [
 							},
 							{
 								path: "edit",
-								name: "Edit spell",
+								name: "Edit contribute spell",
 								component: () => import("src/components/contribute/spell/edit.vue"),
 							},
 						],
@@ -1161,6 +1238,24 @@ const routes = [
 				meta: {
 					title: "Changelog",
 					description: "Changelog of D&D 5e Combat Tracker Harmless Key.",
+				},
+			},
+		],
+	},
+	{
+		path: "/cookies",
+		component: () => import("src/layouts/default"),
+		meta: {
+			title: "Cookies",
+		},
+		children: [
+			{
+				path: "",
+				name: "Cookies",
+				component: () => import("src/views/Pages/Cookies"),
+				meta: {
+					title: "Cookies",
+					description: "Cookie information for Harmless Key.",
 				},
 			},
 		],

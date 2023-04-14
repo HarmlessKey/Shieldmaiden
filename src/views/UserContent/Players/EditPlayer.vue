@@ -85,7 +85,6 @@
 									<template v-if="tier.name !== 'Free'">
 										<div v-if="player.sync_character">
 											<q-input
-												v-if="linked_character"
 												:dark="$store.getters.theme === 'dark'"
 												filled
 												square
@@ -133,7 +132,7 @@
 															@animationend="syncing = false"
 														/>
 														<q-tooltip anchor="top middle" self="center middle">
-															No update
+															{{ playerEqualsLinkedCharacter() ? "Update" : "No update" }}
 														</q-tooltip>
 													</button>
 												</template>
@@ -689,7 +688,7 @@ import GiveCharacterControl from "./GiveCharacterControl.vue";
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { general } from "src/mixins/general.js";
-import Defenses from "./Defenses";
+import Defenses from "src/components/npcs/Defenses";
 import CopyContent from "../../../components/CopyContent.vue";
 import { abilities, skills } from "src/utils/generalConstants";
 import {
@@ -862,6 +861,7 @@ export default {
 			}
 		},
 		savePlayer() {
+			console.log(this.player);
 			if (this.$route.name === "Add player") {
 				this.addPlayer();
 			} else {

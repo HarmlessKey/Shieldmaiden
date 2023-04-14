@@ -11,7 +11,6 @@
 			<li><router-link to="/documentation">Documentation</router-link></li>
 			<li><router-link to="/feedback">Feedback</router-link></li>
 			<li><router-link to="/changelog">Changelog</router-link></li>
-			<li><router-link to="/planned">Planned</router-link></li>
 			<li><router-link to="/privacy-policy">Privacy Policy</router-link></li>
 			<li>
 				<router-link to="/compendium">Compendium</router-link>
@@ -44,6 +43,7 @@
 							</li>
 						</ul>
 					</li>
+					<li><router-link to="/tools/spell-creator">Spell Creator</router-link></li>
 					<li><router-link to="/tools/character-builder">Character Builder</router-link></li>
 				</ul>
 			</li>

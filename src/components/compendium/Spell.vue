@@ -2,12 +2,12 @@
 	<div v-if="!loading" class="spell">
 		<div class="spell__title">
 			<h3>
-				{{ spell.name }} <span class="source neutral-2">{{ spell.source }}</span>
+				{{ spell.name.capitalizeEach() }} <span class="source neutral-2">{{ spell.source }}</span>
 			</h3>
 			<i>
 				<template v-if="spell.level === 0">Cantrip </template>
 				<template v-else>{{ spell.level | numeral("0o") }}-level </template>
-				{{ spell.school }}
+				{{ spell.school.capitalize() }}
 			</i>
 		</div>
 
@@ -25,7 +25,8 @@
 			<template v-if="spell.classes">
 				<b>Classes:</b>
 				<template v-for="(_class, index) in spell.classes">
-					{{ _class }}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
+					{{ _class.capitalize()
+					}}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
 				</template>
 			</template>
 		</div>
@@ -116,7 +117,7 @@ export default {
 		return {
 			spell: {},
 			loading: true,
-			cast_level: this.data.level,
+			cast_level: undefined,
 			caster_level: undefined,
 			attack_bonus: undefined,
 		};
@@ -166,9 +167,11 @@ export default {
 	async beforeMount() {
 		if (this.data) {
 			this.spell = this.data;
+			this.cast_level = this.data.level;
 			this.loading = false;
 		} else {
 			this.spell = await this.fetch_api_spell(this.id);
+			this.cast_level = this.spell.level;
 			this.loading = false;
 		}
 	},

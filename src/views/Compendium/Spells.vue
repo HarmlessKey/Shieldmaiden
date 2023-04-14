@@ -116,6 +116,17 @@
 						:options="spell_schools"
 					>
 					</q-select>
+
+					<!-- Level -->
+					<strong class="block mb-5">Level</strong>
+					<q-range
+						v-model="levels"
+						label-always
+						:min="0"
+						:max="9"
+						:left-label-value="minLevelMarker"
+						:right-label-value="maxLevelMarker"
+					/>
 				</div>
 				<div slot="footer" class="card-footer">
 					<button class="btn bg-neutral-5" @click="clearFilter">
@@ -136,6 +147,8 @@
 import ViewSpell from "src/components/compendium/Spell.vue";
 import { mapActions } from "vuex";
 import { spell_schools } from "src/utils/spellConstants";
+import _ from "lodash";
+import numeral from "numeral";
 
 export default {
 	name: "Spells",
@@ -149,6 +162,8 @@ export default {
 			query: null,
 			filter_dialog: false,
 			filter: {},
+			schools: [],
+			levels: { min: 0, max: 9 },
 			pagination: {
 				sortBy: "name",
 				descending: false,
@@ -156,7 +171,6 @@ export default {
 				rowsPerPage: 15,
 				rowsNumber: 0,
 			},
-			schools: [],
 			spell_schools: spell_schools,
 			columns: [
 				{
@@ -173,6 +187,7 @@ export default {
 					field: "school",
 					sortable: true,
 					align: "left",
+					format: (val) => val.capitalizeEach(),
 				},
 				{
 					name: "level",
@@ -186,6 +201,14 @@ export default {
 			loading: true,
 		};
 	},
+	computed: {
+		minLevelMarker() {
+			return this.levels.min ? numeral(this.levels.min).format("0o") : "Cantrip";
+		},
+		maxLevelMarker() {
+			return this.levels.max ? numeral(this.levels.max).format("0o") : "Cantrip";
+		},
+	},
 	methods: {
 		...mapActions("api_spells", ["fetch_api_spells"]),
 		filterSpells() {
@@ -194,24 +217,44 @@ export default {
 			this.pagination.page = 1;
 			this.query = {
 				search: this.search,
-				schools: this.schools,
+				schools: this.filter.schools,
+				levels: this.filter.levels,
 			};
 			this.fetchSpells();
 		},
 		setFilter() {
 			this.filter_dialog = false;
 
-			// Set school filter
+			this.setSchoolFilter();
+			this.setLevelFilter();
+
+			this.filterSpells();
+		},
+		setSchoolFilter() {
+			console.log(this.schools);
 			if (
 				!this.schools ||
 				!this.schools.length ||
 				this.schools.length === this.spell_schools.length
 			) {
 				this.$delete(this.filter, "schools");
-			} else {
-				this.$set(this.filter, "schools", this.schools);
+				return;
 			}
-			this.filterSpells();
+			this.$set(
+				this.filter,
+				"schools",
+				this.schools.map((x) => x.value)
+			);
+		},
+		setLevelFilter() {
+			if (this.levels.min === 0 && this.levels.max === 9) {
+				this.$delete(this.filter, "levels");
+				return;
+			}
+
+			const levels = _.range(this.levels.min, this.levels.max + 1);
+			console.log(levels);
+			this.$set(this.filter, "levels", levels);
 		},
 		clearFilter() {
 			this.filter_dialog = false;
@@ -227,7 +270,7 @@ export default {
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,
-				fields: ["name", "school", "level", "url"],
+				fields: ["name", "school", "level", "classes", "url"],
 				sortBy: this.pagination.sortBy,
 				descending: this.pagination.descending,
 			}).then((result) => {

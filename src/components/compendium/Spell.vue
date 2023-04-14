@@ -37,8 +37,8 @@
 			</div>
 		</div>
 
-		<div class="actions" v-if="spell.actions">
-			<h4 class="mb-3">Roll spell</h4>
+		<div class="actions" v-if="spell.actions && $route.name !== 'RunEncounter'">
+			<h3 class="mb-3">Roll spell</h3>
 
 			<q-input
 				v-if="spell.scaling === 'character_level'"
@@ -116,12 +116,15 @@ export default {
 		return {
 			spell: {},
 			loading: true,
+			cast_level: this.data.level,
+			caster_level: undefined,
+			attack_bonus: undefined,
 		};
 	},
 	computed: {
 		duration() {
 			const type = this.spell.duration_type;
-			const n = this.spell.duration_n;
+			const n = this.spell.duration;
 			const scale = this.spell.duration_scale;
 
 			if (type === "concentration") {
@@ -143,6 +146,21 @@ export default {
 			}
 
 			return type;
+		},
+		isToHit() {
+			//Checks if there is an action with to hit.
+			let toHit = false;
+
+			for (let action of this.spell.actions) {
+				if (
+					action.type === "melee_weapon" ||
+					action.type === "ranged_weapon" ||
+					action.type === "spell_attack"
+				) {
+					toHit = true;
+				}
+			}
+			return toHit;
 		},
 	},
 	async beforeMount() {

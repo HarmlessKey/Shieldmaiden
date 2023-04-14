@@ -24,7 +24,7 @@ export function spellScalingDescription(tiers, scaling, level, dice_type) {
 
 	// SPELL LEVEL
 	else if (scaling === "spell_level") {
-		description = getDescriptionForSpellLevel(tiers, level, dice_type);
+		description = getDescriptionForSpellLevel(tiers, dice_type);
 	}
 	return description.join("\n");
 }
@@ -86,7 +86,7 @@ function getDescriptionForSpellScaling(tiers, level, dice_type) {
 	return [text];
 }
 
-function getDescriptionForSpellLevel() {
+function getDescriptionForSpellLevel(tiers, dice_type) {
 	const description = [];
 	for (let tier of tiers) {
 		let new_line = "When you cast this spell using a ";

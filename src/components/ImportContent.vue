@@ -361,18 +361,19 @@ export default {
 			}
 
 			// Validate items
-			for (let item of data) {
+			for (const item of data) {
 				// Delete damage_vulnerability property.
 				delete item.damage_vulnerability;
 				delete item.created;
 				delete item.updated;
 
+				let checkable_item = item;
 				// Parse versatile to options for NPCs
 				if (this.type === "npcs") {
-					const checkable_item = this.versatileToOptions(item);
+					checkable_item = this.versatileToOptions(item);
 				}
 
-				const valid = ajv.validate(this.schema, checkable_item || item);
+				const valid = ajv.validate(this.schema, checkable_item);
 
 				if (!valid) {
 					item.errors = ajv.errors;

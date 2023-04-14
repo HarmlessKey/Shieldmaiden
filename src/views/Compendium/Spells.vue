@@ -24,10 +24,26 @@
 				clearable
 				placeholder="Search"
 			>
-				<q-icon slot="append" name="search" />
-				<button slot="after" class="btn" @click="filter()">Filter</button>
+				<button slot="append" class="btn bg-neutral-5" @click="filterSpells">
+					<q-icon name="search" />
+				</button>
+				<q-btn slot="after" color="primary" no-caps @click="filter_dialog = true">
+					Filter
+					<i class="fas fa-filter ml-2" aria-hidden="true" />
+					<q-badge
+						v-if="Object.keys(filter).length"
+						floating
+						rounded
+						color="red"
+						:label="Object.keys(filter).length"
+					/>
+				</q-btn>
 			</q-input>
-
+			<p v-if="!loading && pagination.rowsNumber === 0" class="red">
+				Nothing found
+				<template v-if="query.search"> for "{{ query.search }}" </template>
+				<template v-if="schools"> with a type of {{ schools.join(" or ") }} </template>
+			</p>
 			<q-table
 				:data="spells"
 				:columns="columns"
@@ -78,18 +94,49 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" auto-width>
+							{{ props }}
 							<ViewSpell :id="props.key" />
 						</q-td>
 					</q-tr>
 				</template>
 			</q-table>
 		</div>
+		<q-dialog v-model="filter_dialog">
+			<hk-card header="Filter spells" :min-width="300">
+				<div class="card-body">
+					<q-select
+						:dark="$store.getters.theme !== 'light'"
+						filled
+						square
+						class="mb-3"
+						label="Type"
+						v-model="schools"
+						use-chips
+						multiple
+						clearable
+						:options="spell_schools"
+					>
+					</q-select>
+				</div>
+				<div slot="footer" class="card-footer">
+					<button class="btn bg-neutral-5" @click="clearFilter">
+						<i class="fas fa-times" aria-hidden="true" />
+						Clear filter
+					</button>
+					<button class="btn ml-2" @click="setFilter">
+						<i class="fas fa-filter" aria-hidden="true" />
+						Set filter
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</hk-card>
 </template>
 
 <script>
 import ViewSpell from "src/components/compendium/Spell.vue";
 import { mapActions } from "vuex";
+import { spell_schools } from "src/utils/spellConstants";
 
 export default {
 	name: "Spells",
@@ -101,6 +148,8 @@ export default {
 			spells: [],
 			search: "",
 			query: null,
+			filter_dialog: false,
+			filter: {},
 			pagination: {
 				sortBy: "name",
 				descending: false,
@@ -108,6 +157,8 @@ export default {
 				rowsPerPage: 15,
 				rowsNumber: 0,
 			},
+			schools: [],
+			spell_schools: spell_schools,
 			columns: [
 				{
 					name: "name",
@@ -116,6 +167,13 @@ export default {
 					sortable: true,
 					align: "left",
 					format: (val) => val.capitalizeEach(),
+				},
+				{
+					name: "school",
+					label: "School",
+					field: "school",
+					sortable: true,
+					align: "left",
 				},
 				{
 					name: "level",
@@ -131,14 +189,35 @@ export default {
 	},
 	methods: {
 		...mapActions("api_spells", ["fetch_api_spells"]),
-		filter() {
+		filterSpells() {
 			this.loading = true;
 			this.spells = [];
 			this.pagination.page = 1;
 			this.query = {
 				search: this.search,
+				schools: this.schools,
 			};
 			this.fetchSpells();
+		},
+		setFilter() {
+			this.filter_dialog = false;
+
+			// Set school filter
+			if (
+				!this.schools ||
+				!this.schools.length ||
+				this.schools.length === this.spell_schools.length
+			) {
+				this.$delete(this.filter, "schools");
+			} else {
+				this.$set(this.filter, "schools", this.schools);
+			}
+			this.filterSpells();
+		},
+		clearFilter() {
+			this.filter_dialog = false;
+			this.$set(this, "filter", {});
+			this.filterSpells();
 		},
 		request(req) {
 			this.pagination = req.pagination;

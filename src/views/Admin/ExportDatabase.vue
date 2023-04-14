@@ -49,6 +49,22 @@ export default {
 						delete entry["metadata"];
 						delete entry["changed"];
 
+						if (this.ref === "new_spells" && entry.actions) {
+							for (const action of entry.actions) {
+								if (action.rolls) {
+									for (const roll of action.rolls) {
+										if (roll.scaling) {
+											for (const scale of roll.scaling) {
+												if (scale.dice_type) {
+													delete scale.dice_type;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+
 						entry.name = entry.name.toLowerCase();
 
 						entry.url = entry.name.toLowerCase().replace(/[\s/]/g, "-").replace(/['()]/g, "");

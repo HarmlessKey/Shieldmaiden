@@ -24,6 +24,21 @@ export class itemServices {
       if(query.search) {
         queryParams.push(`name=${query.search}`);
       }
+      if(query.schools && query.schools.length) {
+        for(const school of query.schools) {
+          queryParams.push(`school[]=${school}`);
+        }
+      }
+      if(query.classes && query.classes.length) {
+        for(const cls of query.classes) {
+          queryParams.push(`classes[]=${cls}`);
+        }
+      }
+      if(query.level && query.level.length) {
+        for(const lvl of query.level) {
+          queryParams.push(`level[]=${lvl}`);
+        }
+      }
 
       params += `&${queryParams.join("&")}`;
     }

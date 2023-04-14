@@ -27,12 +27,14 @@ export class spellServices {
 
 		if (query) {
 			const queryParams = [];
+			console.log(query);
 
 			if (query.search) {
 				queryParams.push(`name=${query.search}`);
 			}
 			if (query.schools && query.schools.length) {
 				for (const school of query.schools) {
+					console.log(school);
 					queryParams.push(`school[]=${school}`);
 				}
 			}
@@ -41,8 +43,8 @@ export class spellServices {
 					queryParams.push(`classes[]=${cls}`);
 				}
 			}
-			if (query.level && query.level.length) {
-				for (const lvl of query.level) {
+			if (query.levels && query.levels.length) {
+				for (const lvl of query.levels) {
 					queryParams.push(`level[]=${lvl}`);
 				}
 			}

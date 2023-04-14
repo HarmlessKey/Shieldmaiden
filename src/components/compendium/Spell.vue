@@ -1,65 +1,64 @@
 <template>
 	<div v-if="!loading" class="spell">
-		<hk-popover 
-			v-if="spell.actions && $route.name !== 'RunEncounter'" 
-			:header="`Roll ${spell.name}`"
-		>
-			<button class="btn bg-neutral-5 btn-block mb-2">Roll</button>
-			<template #content>
-				<q-input
-					v-if="spell.scaling === 'character_level'"
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					class="mb-3"
-					label="Caster level"
-					type="number"
-					v-model="caster_level"
-				/>
-
-				<!-- TO HIT MODIFIER INPUT -->
-				<q-input
-					v-if="isToHit"
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					class="mb-3"
-					label="Spell attack"
-					type="text"
-					v-model="attack_bonus"
-				/>
-
-				<!-- SPELL LEVEL INPUT -->
-				<template v-if="spell.level > 0">
-					<strong>Select Casting level</strong>
-					<div class="caster__levels">
-						<div
-							class="level"
-							:class="{
-								selected: cast_level === i,
-								disabled: i < spell.level,
-							}"
-							v-for="i in 9"
-							:key="i"
-							@click="spell.level <= i ? selectLevel(i) : null"
-						>
-							{{ i }}
+		<template v-if="spell.actions && $route.name !== 'RunEncounter'">
+			<button class="btn bg-neutral-5 btn-block mb-2" @click="show_roll_input = !show_roll_input">Roll</button>
+			<q-slide-transition>
+				<div v-if="show_roll_input" class="roll">
+					<q-input
+						v-if="spell.scaling === 'character_level'"
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						class="mb-3"
+						label="Caster level"
+						type="number"
+						v-model="caster_level"
+					/>
+	
+					<!-- TO HIT MODIFIER INPUT -->
+					<q-input
+						v-if="isToHit"
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						class="mb-3"
+						label="Spell attack"
+						type="text"
+						v-model="attack_bonus"
+					/>
+	
+					<!-- SPELL LEVEL INPUT -->
+					<template v-if="spell.level > 0">
+						<strong>Select Casting level</strong>
+						<div class="caster__levels">
+							<div
+								class="level"
+								:class="{
+									selected: cast_level === i,
+									disabled: i < spell.level,
+								}"
+								v-for="i in 9"
+								:key="i"
+								@click="spell.level <= i ? selectLevel(i) : null"
+							>
+								{{ i }}
+							</div>
 						</div>
-					</div>
-				</template>
-
-				<!-- ROLL SPELL -->
-				<hk-roll-action
-					:action="spell"
-					type="spell"
-					:attack-bonus="attack_bonus"
-					:cast-level="cast_level"
-					:caster-level="caster_level"
-				>
-					<button class="btn btn-block">Roll</button>
-				</hk-roll-action>
-			</template>
-		</hk-popover>
+					</template>
+	
+					<!-- ROLL SPELL -->
+					<hk-roll-action
+						:action="spell"
+						type="spell"
+						:attack-bonus="attack_bonus"
+						:cast-level="cast_level"
+						:caster-level="caster_level"
+					>
+						<button class="btn btn-block">Roll</button>
+					</hk-roll-action>
+				</div>
+			</q-slide-transition>
+		</template>
 		<div class="spell__title">
 			<h3>
 				{{ spell.name.capitalizeEach() }} <span class="source neutral-2">{{ spell.source }}</span>
@@ -119,6 +118,7 @@ export default {
 	data() {
 		return {
 			spell: {},
+			show_roll_input: false,
 			loading: true,
 			cast_level: undefined,
 			caster_level: undefined,
@@ -218,28 +218,35 @@ export default {
 		}
 	}
 }
-.caster__levels {
-	display: flex;
-	justify-content: center;
-	column-gap: 3px;
-	margin: 10px 0;
 
-	.level {
-		width: 30px;
-		height: 30px;
-		line-height: 30px;
-		text-align: center;
-		cursor: pointer;
-		background-color: $neutral-8;
-		user-select: none;
-
-		&.selected {
-			background-color: $blue;
-			color: $neutral-1;
-		}
-		&.disabled {
-			opacity: 0.4;
-			cursor: not-allowed;
+.roll {
+	width: 100%;
+	padding: 10px;
+	border-radius: 5px;
+	background-color: $neutral-6;
+	.caster__levels {
+		display: flex;
+		justify-content: center;
+		column-gap: 3px;
+		margin: 10px 0;
+	
+		.level {
+			width: 30px;
+			height: 30px;
+			line-height: 30px;
+			text-align: center;
+			cursor: pointer;
+			background-color: $neutral-8;
+			user-select: none;
+	
+			&.selected {
+				background-color: $blue;
+				color: $neutral-1;
+			}
+			&.disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
 		}
 	}
 }

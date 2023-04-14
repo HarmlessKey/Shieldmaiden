@@ -20,11 +20,6 @@ export default {
 		return {
 			userInfo: this.$store.getters.userInfo,
 			items: {
-				spells: {
-					name: "Spells",
-					url: "/contribute/spells",
-					icon: "fas fa-wand-magic",
-				},
 				"character-builder": {
 					name: "Character builder",
 					url: "/content/character-builder",

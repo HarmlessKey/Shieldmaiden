@@ -7,72 +7,26 @@
 			</span>
 		</div>
 		<div class="card-body">
-			<div class="row q-col-gutter-md mb-2">
-				<div class="col-12 col-md-6 col-sm-4">
-					<q-input 
-						:dark="$store.getters.theme !== 'light'" 
-						v-model="search"
-						borderless 
-						filled square
-						debounce="300" 
-						clearable
-						placeholder="Search">
-						<q-icon slot="append" name="search" />
-					</q-input>
-				</div>
-				<div class="col-12 col-md-2 col-sm-3">
-					<q-select
-						:dark="$store.getters.theme !== 'light'" filled square
-						label="Type"
-						v-model="types"
-						multiple
-						clearable
-						:options="monster_types"
-					>
-						<template v-slot:selected v-if="types && types.length">
-								<span class="mr-1">
-									{{ types[0] }}
-								</span>
-								<span class="neutral-2" v-if="types.length > 1">
-									(+{{ types.length-1 }})
-								</span>
-						</template>
-					</q-select>
-				</div>
-				<div class="col-12 col-md-2 col-sm-3">
-					<q-select 
-						:dark="$store.getters.theme !== 'light'" filled square
-						label="Challenge rating"
-						v-model="challenge_rating" 
-						:options="challenge_ratings"
-						multiple
-					>
-						<template v-slot:selected v-if="challenge_rating && challenge_rating.length">
-								<span class="mr-1">
-									{{ challenge_rating[0] }}
-								</span>
-								<span class="neutral-2" v-if="challenge_rating.length > 1">
-									(+{{ challenge_rating.length-1 }})
-								</span>
-						</template>
-						<template v-slot:option="scope">
-							<q-list :dark="$store.getters.theme !== 'light'">
-								<q-item clickable v-ripple @click="selectCR(scope.opt)" :class="{ 'q-item--active': challenge_rating.includes(scope.opt) }">
-									<q-item-section>{{ 
-										(scope.opt == 0.125) ? "1/8" : 
-										(scope.opt == 0.25) ? "1/4" :
-										(scope.opt == 0.5) ? "1/2" :
-										scope.opt
-									}}</q-item-section>
-								</q-item>
-							</q-list>
-						</template>
-					</q-select>
-				</div>
-				<div class="col-12 col-md-2 col-sm-2 d-flex justify-content-end items-center">
-					<button class="btn" @click="filter()">Filter</button>
-				</div>
-			</div>
+			<q-input 
+				:dark="$store.getters.theme !== 'light'" 
+				v-model="search"
+				borderless 
+				filled square
+				debounce="300" 
+				clearable
+				placeholder="Search"
+				@keyup.enter="filterMonsters"
+				@clear="filterMonsters"
+			>
+				<button slot="append" class="btn bg-neutral-5" @click="filterMonsters">
+					<q-icon name="search" />
+				</button>
+				<q-btn slot="after" color="primary" no-caps @click="filter_dialog = true">
+					Filter
+					<i class="fas fa-filter ml-2" aria-hidden="true" />
+					<q-badge v-if="Object.keys(filter).length" floating rounded color="red" :label="Object.keys(filter).length" />
+				</q-btn>
+			</q-input>
 			<p v-if="!loading && pagination.rowsNumber === 0" class="red">
 				Nothing found 
 				<template v-if="query.search">
@@ -81,8 +35,8 @@
 				<template v-if="types">
 					with a type of {{ types.join(" or ")}}
 				</template>
-				<template v-if="challenge_rating && challenge_rating.length">
-					{{ types ? "and a" : "with a" }} CR of {{ challenge_rating.join(" or ")}}
+				<template v-if="cr.min > 0 || cr.max < 30">
+					{{ types ? "and a" : "with a" }} CR between {{ cr.min }} and {{  cr.max }}
 				</template>
 			</p>
 
@@ -146,6 +100,50 @@
 				</template>
 			</q-table>
 		</div>
+
+		<q-dialog v-model="filter_dialog">
+			<hk-card header="Filter monsters" :min-width="300">
+				<div class="card-body">
+					<q-select
+						:dark="$store.getters.theme !== 'light'" filled square
+						class="mb-3"
+						label="Type"
+						v-model="types"
+						use-chips
+						multiple
+						clearable
+						:options="monster_types"
+					>
+						<!-- <template v-slot:selected v-if="types && types.length">
+								<span class="mr-1">
+									{{ types[0] }}
+								</span>
+								<span class="neutral-2" v-if="types.length > 1">
+									(+{{ types.length-1 }})
+								</span>
+						</template> -->
+					</q-select>
+
+					<strong class="block mb-5">Challenge rating</strong>
+					<q-range
+						v-model="cr"
+						label-always
+						:min="0"
+						:max="30"
+					/>
+				</div>
+				<div slot="footer" class="card-footer">
+					<button class="btn bg-neutral-5" @click="clearFilter">
+						<i class="fas fa-times" aria-hidden="true" />
+						Clear filter
+					</button>
+					<button class="btn ml-2" @click="setFilter">
+						<i class="fas fa-filter" aria-hidden="true" />
+						Set filter
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</hk-card>
 </template>
 
@@ -153,6 +151,7 @@
 	import ViewMonster from "src/components/compendium/Monster.vue";
 	import { monsterMixin } from "src/mixins/monster.js";
 	import { mapActions } from "vuex";
+	import _ from  "lodash";
 
 	export default {
 		name: "Monsters",
@@ -163,10 +162,12 @@
 		data() {
 			return {
 				monsters: [],
+				filter_dialog: false,
+				filter: {},
 				search: "",
 				query: null,
-				challenge_rating: [],
-				types: null,
+				cr: { min: 0, max: 30 },
+				types: [],
 				pagination: {
 					sortBy: "name",
 					descending: false,
@@ -196,7 +197,7 @@
 						field: "challenge_rating",
 						align: "left",
 						sortable: true,
-						format: val => this.cr(val)
+						format: val => this.cr_label(val)
 					}
 				],
 				loading: true,
@@ -209,31 +210,53 @@
 					crs.push(Number(cr));
 				}
 				return crs.sort(function(a, b){return a-b});
+			},
+			type_options() {
+				return this.monster_types.map(type => { return { label: type, value: type } });
 			}
 		},
 		methods: {
 			...mapActions("api_monsters", ["fetch_monsters"]),
-			cr(val) {
+			cr_label(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
 					(val == 0.5) ? "1/2" :
 					val;
 			},
-			selectCR(cr) {
-				if(!this.challenge_rating || !this.challenge_rating.includes(cr)) {
-					this.challenge_rating.push(cr);
+			setFilter() {
+				this.filter_dialog = false;
+				// Set CR filter
+				if(this.cr.min > 0 || this.cr.max < 30) {
+					const cr = _.range(this.cr.min, this.cr.max+1);
+					if(this.cr.min === 0) {
+						cr.unshift([0.125, 0.25, 0.5]);
+					}
+					this.$set(this.filter, "cr", cr);
 				} else {
-					this.challenge_rating = this.challenge_rating.filter(item => item !== cr);
+					this.$delete(this.filter, "cr");
 				}
+				
+				// Set type filter
+				if(!this.types || !this.types.length || this.types.length === this.monster_types.length) {
+					this.$delete(this.filter, "types");
+				} else {
+					this.$set(this.filter, "types", this.types);
+				}
+				this.filterMonsters();
 			},
-			filter() {
+			clearFilter() {
+				this.filter_dialog = false;
+				this.$set(this, "filter", {});
+				this.filterMonsters();
+			},
+			filterMonsters() {
 				this.loading = true;
 				this.monsters = [];
 				this.pagination.page = 1;
 				this.query = {
 					search: this.search,
-					types: this.types,
-					challenge_ratings: this.challenge_rating
+					types: this.filter.types,
+					challenge_ratings: this.filter.cr
 				}
 				this.fetchMonsters();
 			},

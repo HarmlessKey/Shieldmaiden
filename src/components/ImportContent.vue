@@ -1,6 +1,9 @@
 <template>
 	<div>
 		<template v-if="!parsed && !parsing">
+			<p>Import Harmless Key {{ type_label }}.<br/>
+				<small><em>Content from other sources can't be imported</em></small>
+			</p>
 			<q-file
 				:dark="$store.getters.theme === 'dark'"
 				filled
@@ -23,12 +26,17 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
+							label-slot
 							type="textarea"
-							label="JSON Input"
 							v-model="json_input"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-						/>
+						>
+							<template #label>
+								<i class="fas fa-brackets-curly mr-1" aria-hidden="true" />
+								JSON Input
+							</template>
+						</q-input>
 					</ValidationProvider>
 					<q-btn
 						class="full-width my-2"

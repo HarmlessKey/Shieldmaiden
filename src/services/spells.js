@@ -7,10 +7,8 @@ const SEARCH_SPELLS_REF = db.ref("search_spells");
  * Spell Firebase Service
  * CRUD interface implementation for Firebase
  * Updates both 'custom_spells' and 'search_custom_spells' ref on CRUD
- *
- * ToDo: change name of custom_spells to spells
  */
-export class spellServices {
+export class SpellServices {
 	/**
 	 * Get all the spells from the search_custom_spells reference
 	 *
@@ -108,7 +106,6 @@ export class spellServices {
 			.set(spell)
 			.then(() => {
 				SEARCH_SPELLS_REF.child(`${uid}/results/${id}`).set(search_spell);
-				return;
 			})
 			.catch((error) => {
 				throw error;

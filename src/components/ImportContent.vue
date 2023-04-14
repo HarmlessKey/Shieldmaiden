@@ -136,7 +136,8 @@
 		</div>
 		<div v-else>
 			<h3 class="text-center">
-				{{ (imported &lt; importing) ? "Importing" : "Imported" }} {{ importing }} {{ type_label }}
+				<!-- eslint-disable-next-line vue/no-parsing-error -->
+				{{ imported < importing ? "Importing" : "Imported" }} {{ importing }} {{ type_label }}
 			</h3>
 			<q-linear-progress
 				:dark="$store.getters.theme !== 'light'"
@@ -368,10 +369,10 @@ export default {
 
 				// Parse versatile to options for NPCs
 				if (this.type === "npcs") {
-					item = this.versatileToOptions(item);
+					const checkable_item = this.versatileToOptions(item);
 				}
 
-				const valid = ajv.validate(this.schema, item);
+				const valid = ajv.validate(this.schema, checkable_item || item);
 
 				if (!valid) {
 					item.errors = ajv.errors;

@@ -113,16 +113,7 @@
 						multiple
 						clearable
 						:options="monster_types"
-					>
-						<!-- <template v-slot:selected v-if="types && types.length">
-								<span class="mr-1">
-									{{ types[0] }}
-								</span>
-								<span class="neutral-2" v-if="types.length > 1">
-									(+{{ types.length-1 }})
-								</span>
-						</template> -->
-					</q-select>
+					/>
 
 					<strong class="block mb-5">Challenge rating</strong>
 					<q-range

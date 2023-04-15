@@ -303,7 +303,7 @@ export default {
 			return this.type === "npcs" ? this.npcs : this.spells;
 		},
 		content_count() {
-			return type === "npcs" ? this.npc_count : this.spell_count;
+			return this.type === "npcs" ? this.npc_count : this.spell_count;
 		},
 		availableSlots() {
 			return this.tier.benefits[this.type] === "infinite"

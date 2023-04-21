@@ -477,6 +477,44 @@ const campaign_actions = {
 	},
 
 	/**
+	 * Updates a damage meters for a campaign entity
+	 *
+	 * @param {string} campaignId
+	 * @param {string} entityType player|companion
+	 * @param {string} id entityId
+	 * @param {string} property damage|healing|damageDone|damageTaken
+	 * @param {number} value
+	 */
+	async update_damage_meters(
+		{ dispatch, rootGetters },
+		{ campaignId, entityType, id, property, value }
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			entityType = `${entityType}s`;
+			const campaign = await dispatch("get_campaign", { uid, id: campaignId });
+			const entities = campaign[entityType];
+			const meters = entities[id].meters || {};
+			const current_value = meters[property] || 0;
+			const new_value = parseInt(current_value) + parseInt(value);
+			Vue.set(meters, property, new_value.min());
+
+			try {
+				await dispatch("update_campaign_entity", {
+					uid,
+					campaignId,
+					type: entityType,
+					id,
+					property: "meters",
+					value: meters,
+				});
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
 	 * Updates a transformed player or companion
 	 *
 	 * @param {string} uid

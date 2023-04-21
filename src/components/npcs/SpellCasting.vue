@@ -292,7 +292,10 @@ export default {
 				this.$set(this.npc, `${this.category}_spells`, {});
 			}
 
-			let spell = { name: result.name, type: resource };
+			let spell = { name: result.name };
+			if (resource === "custom") {
+				spell.custom = true;
+			}
 			if (this.category === "innate") spell.limit = 0;
 			if (this.category === "caster") spell.level = result.level;
 

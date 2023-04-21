@@ -98,12 +98,32 @@ const npc_actions = {
 			const services = await dispatch("get_npc_services");
 			try {
 				npc = await services.getNpc(uid, id);
+				if (npc.caster_spells) {
+					dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.caster_spells });
+				}
+				if (npc.innate_spells) {
+					dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.innate_spells });
+				}
+
 				commit("SET_CACHED_NPC", { uid, id, npc });
 			} catch (error) {
 				throw error;
 			}
 		}
 		return npc;
+	},
+
+	async cacheNpcSpell({ dispatch }, { uid, npc_id, spell_list }) {
+		for (const [spell_key, spell] of Object.entries(spell_list)) {
+			if (spell.custom) {
+				dispatch("spells/get_spell", { uid, id: spell_key }, { root: true }).then((spell) => {
+					// get_spell dispatch returns false when spell was not found
+					if (spell === false) {
+						dispatch("remove_spell_from_npc", { uid, npc_id, spell_id: spell_key });
+					}
+				});
+			}
+		}
 	},
 
 	/**
@@ -189,6 +209,26 @@ const npc_actions = {
 			} catch (error) {
 				throw error;
 			}
+		}
+	},
+
+	/**
+	 * Remove spell from spell lists of NPC
+	 * A user can only edit their own NPC's so use uid from the store
+	 *
+	 * @param {string} uid
+	 * @param {string} npc_id
+	 * @param {string} spell_id
+	 */
+	async remove_spell_from_npc({ commit, dispatch }, { uid, npc_id, spell_id }) {
+		const services = await dispatch("get_npc_services");
+		try {
+			await services.updateNpc(uid, npc_id, "/caster_spells", { [spell_id]: null });
+			commit("REMOVE_NPC_SPELL", { uid, id: npc_id, spell_list: "caster_spells", spell_id });
+			await services.updateNpc(uid, npc_id, "/innate_spells", { [spell_id]: null });
+			commit("REMOVE_NPC_SPELL", { uid, id: npc_id, spell_list: "innate_spells", spell_id });
+		} catch (error) {
+			throw error;
 		}
 	},
 
@@ -296,6 +336,15 @@ const npc_mutations = {
 		}
 		if (update_search && state.npcs && state.npcs[id]) {
 			Vue.set(state.npcs[id], property, value);
+		}
+	},
+	REMOVE_NPC_SPELL(state, { uid, id, spell_list, spell_id }) {
+		if (
+			state.cached_npcs[uid] &&
+			state.cached_npcs[uid][id] &&
+			state.cached_npcs[uid][id][spell_list]
+		) {
+			delete state.cached_npcs[uid][id][spell_list][spell_id];
 		}
 	},
 	SET_NPC(state, { id, search_npc }) {

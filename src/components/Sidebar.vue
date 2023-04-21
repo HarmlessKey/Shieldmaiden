@@ -362,9 +362,6 @@ export default {
 	padding-bottom: 40px;
 	scrollbar-width: none;
 
-	&::-webkit-scrollbar {
-	}
-
 	h3 {
 		padding-left: 10px;
 		text-transform: uppercase;

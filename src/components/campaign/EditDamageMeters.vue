@@ -116,6 +116,7 @@ export default {
 		icon(type) {
 			switch (type) {
 				case "healing":
+				case "overhealing":
 					return "fa-heart";
 				case "overkill":
 					return "fa-skull";

@@ -450,7 +450,7 @@ const campaign_actions = {
 	},
 
 	/**
-	 * Updates a single property for a player or compantion
+	 * Updates a single property for a player or companion
 	 *
 	 * @param {string} uid
 	 * @param {string} campaignId

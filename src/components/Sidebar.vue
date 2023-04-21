@@ -357,9 +357,13 @@ export default {
 	transition: width 0.5s linear;
 	z-index: 98;
 	border-right: 1px solid $neutral-5;
-	overflow-y: scroll;
+	overflow-y: auto;
 	overflow-x: hidden;
 	padding-bottom: 40px;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+	}
 
 	h3 {
 		padding-left: 10px;

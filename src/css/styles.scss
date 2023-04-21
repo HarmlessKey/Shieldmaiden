@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css?family=Raleway');
-@import '~vue-snotify/styles/material.css';
-@import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-@import 'hk-icons.scss';
-@import './variables.scss';
+@import url("https://fonts.googleapis.com/css?family=Raleway");
+@import "~vue-snotify/styles/material.css";
+@import url("https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import "hk-icons.scss";
+@import "./variables.scss";
 
 /* 2. Themes */
 /*********************************************/
-@import './light.scss';
+@import "./light.scss";
 
 /*
 	Table of content
@@ -31,9 +31,9 @@ html body {
 	background: $neutral-11;
 	color: $neutral-1;
 	font-size: $font-size;
-	font-family: 'Open Sans', sans-serif;
+	font-family: "Open Sans", sans-serif;
 	position: relative;
-	background-image: url('../assets/_img/styles/paper-bg.png');
+	background-image: url("../assets/_img/styles/paper-bg.png");
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -474,7 +474,7 @@ html body {
 	}
 
 	.written {
-		font-family: 'Fredericka the Great', cursive;
+		font-family: "Fredericka the Great", cursive;
 	}
 
 	.overflow {
@@ -747,7 +747,7 @@ html body {
 	}
 	.gap {
 		&-1 {
-			gap: .5rem;
+			gap: 0.5rem;
 		}
 		&-2 {
 			gap: 1rem;
@@ -760,7 +760,7 @@ html body {
 		}
 		&-x {
 			&-1 {
-				column-gap: .5rem;
+				column-gap: 0.5rem;
 			}
 			&-2 {
 				column-gap: 1rem;
@@ -774,7 +774,7 @@ html body {
 		}
 		&-y {
 			&-1 {
-				row-gap: .5rem;
+				row-gap: 0.5rem;
 			}
 			&-2 {
 				row-gap: 1rem;
@@ -940,6 +940,17 @@ html body {
 
 	.pointer {
 		cursor: pointer !important;
+	}
+	.cursor {
+		&-pointer {
+			cursor: pointer !important;
+		}
+		&-default {
+			cursor: default !important;
+		}
+		&-not-allowed {
+			cursor: not-allowed !important;
+		}
 	}
 
 	.truncate-cell {
@@ -1159,8 +1170,8 @@ html body {
 		color: $neutral-2;
 
 		&:before {
-			content: '';
-			background-image: url('../assets/_img/logo/logo-icon-no-shield-cyan.svg');
+			content: "";
+			background-image: url("../assets/_img/logo/logo-icon-no-shield-cyan.svg");
 			background-size: cover;
 			box-sizing: border-box;
 			position: absolute;
@@ -1172,7 +1183,7 @@ html body {
 		&:after {
 			display: inline-block;
 			animation: ellipsis steps(1, end) 1s infinite;
-			content: '';
+			content: "";
 		}
 	}
 
@@ -1184,7 +1195,7 @@ html body {
 	}
 
 	.live {
-		font-family: 'Open Sans', sans-serif;
+		font-family: "Open Sans", sans-serif;
 		user-select: none;
 		display: inline-block;
 		background-color: $neutral-5;
@@ -1196,7 +1207,7 @@ html body {
 		text-transform: uppercase;
 
 		&::before {
-			content: '';
+			content: "";
 			background-color: $neutral-1;
 			display: inline-block;
 			height: 10px;
@@ -1233,7 +1244,7 @@ html body {
 	}
 
 	label.required:after {
-		content: '*';
+		content: "*";
 		color: $red;
 		font-size: 25px;
 		line-height: 15px;
@@ -1291,19 +1302,19 @@ html body {
 
 	@keyframes ellipsis {
 		0% {
-			content: '';
+			content: "";
 		}
 		25% {
-			content: '.';
+			content: ".";
 		}
 		50% {
-			content: '..';
+			content: "..";
 		}
 		75% {
-			content: '...';
+			content: "...";
 		}
 		100% {
-			content: '';
+			content: "";
 		}
 	}
 
@@ -1461,7 +1472,7 @@ html body {
 	}
 	.google {
 		background-color: $google-blue;
-		font-family: 'Roboto', sans-serif;
+		font-family: "Roboto", sans-serif;
 		height: 40px;
 		padding: 0 8px 0 0;
 		line-height: 40px;
@@ -1475,8 +1486,8 @@ html body {
 		border: solid 1px $google-blue;
 
 		&::before {
-			content: '';
-			background-image: url('../assets/_img/styles/google.png');
+			content: "";
+			background-image: url("../assets/_img/styles/google.png");
 			background-color: $white;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -1553,7 +1564,7 @@ html body {
 			h2,
 			h3 {
 				font-size: $font-size;
-				font-family: 'Open Sans', sans-serif;
+				font-family: "Open Sans", sans-serif;
 				line-height: normal;
 				margin: 0;
 			}
@@ -1790,8 +1801,8 @@ html body {
 		grid-template-columns: auto;
 		grid-template-rows: 40px auto;
 		grid-template-areas:
-			'hide'
-			'content';
+			"hide"
+			"content";
 
 		a.hide {
 			grid-area: hide;
@@ -1813,7 +1824,7 @@ html body {
 
 			&.monster-card {
 				background-color: #f7e4ba !important;
-				background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
+				background-image: url("../assets/_img/styles/monster-card-bg.png") !important;
 			}
 			&::-webkit-scrollbar {
 				display: none !important;
@@ -2053,8 +2064,8 @@ html body {
 			overflow: hidden;
 			border: solid 1px transparent;
 
-			[class^='hki-'],
-			[class*=' hki-'] {
+			[class^="hki-"],
+			[class*=" hki-"] {
 				font-size: 28px;
 				margin-left: -1px;
 			}
@@ -2308,7 +2319,7 @@ html body {
 	}
 	.monster-card {
 		background-color: #f7e4ba !important;
-		background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
+		background-image: url("../assets/_img/styles/monster-card-bg.png") !important;
 	}
 	@media only screen and (max-width: 1530px) {
 		.monster-table {
@@ -2515,7 +2526,7 @@ html body {
 		}
 	}
 	.snotify-icon.snotify-icon--error {
-		background-image: url('../assets/_img/styles/sword-break.png');
+		background-image: url("../assets/_img/styles/sword-break.png");
 		background-size: cover;
 	}
 	.snotify-success {
@@ -2527,7 +2538,7 @@ html body {
 		}
 	}
 	.snotify-icon.snotify-icon--success {
-		background-image: url('../assets/_img/styles/d20-white.png');
+		background-image: url("../assets/_img/styles/d20-white.png");
 		background-size: cover;
 	}
 
@@ -2535,13 +2546,13 @@ html body {
 	/*********************************************/
 
 	// Remove arrows from number field
-	input[type='number']::-webkit-outer-spin-button,
-	input[type='number']::-webkit-inner-spin-button {
+	input[type="number"]::-webkit-outer-spin-button,
+	input[type="number"]::-webkit-inner-spin-button {
 		-webkit-appearance: none;
 		margin: 0;
 	}
 
-	input[type='number'] {
+	input[type="number"] {
 		-moz-appearance: textfield;
 	}
 

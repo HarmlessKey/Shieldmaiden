@@ -9,6 +9,8 @@
 					v-model="tab"
 					:dark="$store.getters.theme === 'dark'"
 					inline-label
+					outside-arrows
+					mobile-arrows
 					dense
 					no-caps
 				>
@@ -135,6 +137,7 @@
 													{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 													}}<template v-if="roll.fixed_val && roll.dice_count">
 														{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+
 
 
 

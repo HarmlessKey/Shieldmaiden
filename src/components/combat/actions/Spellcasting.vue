@@ -1,34 +1,29 @@
 <template>
 	<div v-if="entity">
-		<hk-tip 
-			value="spells-development" 
-			title="Spells under development" 
-		>
-			<template slot="content">
-				Rollable spells are currently under development. Join our 
-				<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a> 
-				to stay up to date on all our updates.
-			</template>
-		</hk-tip>
 		<q-tabs
 			v-model="tab"
-			:dark="$store.getters.theme === 'dark'" inline-label dense no-caps
+			:dark="$store.getters.theme === 'dark'"
+			inline-label
+			outside-arrows
+			mobile-arrows
+			dense
+			no-caps
 			:indicator-color="tabs.length === 1 ? 'transparent' : 'neutral-2'"
 		>
-			<q-tab 
-				v-for="({name, label}, index) in tabs"
-				:key="`tab-${index}`" 
-				:name="name" 
+			<q-tab
+				v-for="({ name, label }, index) in tabs"
+				:key="`tab-${index}`"
+				:name="name"
 				:label="label"
 			/>
 		</q-tabs>
 
-		<q-tab-panels v-model="tab" class="bg-transparent">
-			<q-tab-panel :name="name" v-for="({name}, type_index) in tabs" :key="`panel-${type_index}`">
+		<q-tab-panels v-model="tab" class="bg-transparent" v-if="!loading">
+			<q-tab-panel :name="name" v-for="({ name }, type_index) in tabs" :key="`panel-${type_index}`">
 				<div class="caster-info">
 					<div>
 						<div>Casting ability</div>
-						<div class="value">{{ entity[`${name}_ability`].substring(0,3).toUpperCase() }}</div>
+						<div class="value">{{ entity[`${name}_ability`].substring(0, 3).toUpperCase() }}</div>
 					</div>
 					<div class="mx-3">
 						<div>Save DC</div>
@@ -36,109 +31,155 @@
 					</div>
 					<div>
 						<div>Attack modifier</div>
-						<div class="value">{{ (entity[`${name}_spell_attack`] > 0) ? `+${entity[`${name}_spell_attack`]}` : entity[`${name}_spell_attack`] }}</div>
+						<div class="value">
+							{{
+								entity[`${name}_spell_attack`] > 0
+									? `+${entity[`${name}_spell_attack`]}`
+									: entity[`${name}_spell_attack`]
+							}}
+						</div>
 					</div>
 				</div>
 
 				<div v-if="tab === 'caster'" class="display-levels">
-					<div 
-						class="level" @click="displayLevels = [...spell_levels]"
+					<div
+						class="level"
+						@click="displayLevels = [...spell_levels]"
 						:class="{ active: displayLevels.length === spell_levels.length }"
 					>
 						Show all
 					</div>
-					<div 
-						v-for="level in spell_levels" 
-						:key="`display-${level}`" 
+					<div
+						v-for="level in spell_levels"
+						:key="`display-${level}`"
 						class="level"
-						:class="{ active: (displayLevels.includes(level) && displayLevels.length !== spell_levels.length) }"
+						:class="{
+							active: displayLevels.includes(level) && displayLevels.length !== spell_levels.length,
+						}"
 						@click="setDisplayLevels(level)"
 					>
-						{{ (level === 0) ? "Cantrips" : level }}
+						{{ level === 0 ? "Cantrips" : level }}
 					</div>
 				</div>
-				
+
 				<!-- SPELLS -->
 				<template v-for="level in spell_levels">
 					<div v-if="displayLevels.includes(level)" :key="`spell-${level}`">
 						<div v-if="level == 0 || level === Infinity" class="spell-level">
-							{{ (tab === "caster") ? "Cantrips" : "At will" }}
+							{{ tab === "caster" ? "Cantrips" : "At will" }}
 						</div>
 						<div v-else-if="tab === 'caster'" class="spell-level">
-							{{ level | numeral('Oo') }} level
+							{{ level | numeral("Oo") }} level
 							<div class="slots">
-								<span 
-									v-for="i in entity[`${tab}_spell_slots`][level]" 
-									:key="`slot-${i}`" 
+								<span
+									v-for="i in entity[`${tab}_spell_slots`][level]"
+									:key="`slot-${i}`"
 									class="ml-1"
 									@click="
-										(entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i)
-										? useSpellSlot(level, tab, true)
-										: useSpellSlot(level, tab)
+										entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i
+											? useSpellSlot(level, tab, true)
+											: useSpellSlot(level, tab)
 									"
 								>
-									<i aria-hidden="true" class="far" :class="
-										entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i
-										? 'fa-dot-circle'
-										: 'fa-circle'
+									<i
+										aria-hidden="true"
+										class="far"
+										:class="
+											entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i
+												? 'fa-dot-circle'
+												: 'fa-circle'
 										"
 									/>
 									<q-tooltip anchor="top middle" self="center middle">
-										{{ 
+										{{
 											entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i
-											? "Regain slot"
-											: "Spend slot"
+												? "Regain slot"
+												: "Spend slot"
 										}}
 									</q-tooltip>
 								</span>
 							</div>
 						</div>
-						<div v-else>
-							{{ level }} each
-						</div>
+						<div v-else>{{ level }} each</div>
 						<q-list :dark="$store.getters.theme === 'dark'" square class="accordion mb-3">
-							<q-expansion-item 
-								v-for="spell in spellsForLevel(tab, level)" 
+							<q-expansion-item
+								v-for="spell in spellsForLevel(tab, level)"
 								:key="`${level}-${spell.key}`"
-								:dark="$store.getters.theme === 'dark'" switch-toggle-side
+								:dark="$store.getters.theme === 'dark'"
+								switch-toggle-side
 								expand-icon-class="hidden-toggle"
 								@show="showSpell = `${level}-${spell.key}`"
 								:group="tab"
 								:name="name"
 							>
 								<template v-slot:header>
-									<q-item-section :class="checkAvailable(tab, level, spell.key) ? '' : 'is-disabled'">
+									<q-item-section
+										:class="checkAvailable(tab, level, spell.key) ? '' : 'is-disabled'"
+									>
 										<q-item-label>
 											{{ spell.name.capitalizeEach() }}
 										</q-item-label>
 									</q-item-section>
-									<q-item-section avatar v-if="tab === 'caster' && level > 0">
-										<a v-if="checkAvailable(tab, level, spell.key)" @click.stop="useSpellSlot(level, tab)">
+									<q-item-section avatar v-if="tab === 'caster'">
+										<hk-roll-action
+											v-if="spell.actions && spell.actions.length"
+											:action="spell"
+											:tooltip="`Roll ${spell.name}`"
+											type="spell"
+											:attack-bonus="entity[`${name}_spell_attack`]"
+											:cast-level="level"
+											:caster-level="entity[`${name}_level`]"
+											@roll="roll(...arguments, level, spell, tab)"
+											:disabled="!checkAvailable(tab, level, spell.key)"
+										>
+											<span class="roll-button" />
+										</hk-roll-action>
+										<a
+											v-else-if="checkAvailable(tab, level, spell.key) && level > 0"
+											class="neutral-1"
+											@click.stop="useSpellSlot(level, tab)"
+										>
 											Cast
 										</a>
 									</q-item-section>
-									<q-item-section avatar v-else-if="level < Infinity">
-										<div class="slots">
-											<span 
-												v-for="i in level" :key="`limited-${i}`" 
+									<q-item-section avatar v-else>
+										<hk-roll-action
+											v-if="spell.actions && spell.actions.length"
+											:action="spell"
+											:tooltip="`Roll ${spell.name}`"
+											type="spell"
+											:attack-bonus="entity[`${name}_spell_attack`]"
+											:cast-level="spell.level"
+											@roll="roll(...arguments, level, spell, tab)"
+											:disabled="!checkAvailable(tab, level, spell.key)"
+										>
+											<span class="roll-button" />
+										</hk-roll-action>
+										<div v-if="level < Infinity" class="slots">
+											<span
+												v-for="i in level"
+												:key="`limited-${i}`"
 												class="ml-1"
 												@click.stop="
-													(entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i)
-													? useSpellSlot(spell.key, tab, true)
-													: useSpellSlot(spell.key, tab)
+													entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i
+														? useSpellSlot(spell.key, tab, true)
+														: useSpellSlot(spell.key, tab)
 												"
 											>
-												<i aria-hidden="true" class="far" :class="
-													entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i
-													? 'fa-dot-circle'
-													: 'fa-circle'
+												<i
+													aria-hidden="true"
+													class="far"
+													:class="
+														entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i
+															? 'fa-dot-circle'
+															: 'fa-circle'
 													"
 												/>
 												<q-tooltip anchor="top middle" self="center middle">
-													{{ 
+													{{
 														entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i
-														? "Regain"
-														: "Spend"
+															? "Regain"
+															: "Spend"
 													}}
 												</q-tooltip>
 											</span>
@@ -146,10 +187,14 @@
 									</q-item-section>
 								</template>
 								<div class="accordion-body description">
-									<Spell :id="spell.key" :title="false" v-if="showSpell === `${level}-${spell.key}`" />
+									<Spell
+										:data="spell"
+										:title="false"
+										v-if="showSpell === `${level}-${spell.key}`"
+									/>
 								</div>
 							</q-expansion-item>
-						</q-list>				
+						</q-list>
 					</div>
 				</template>
 			</q-tab-panel>
@@ -158,193 +203,267 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
-	import { dice } from "src/mixins/dice.js";
-	import { setHP } from "src/mixins/HpManipulations.js";
-	import { damage_types } from "src/utils/generalConstants";
-	import Spell from "src/components/compendium/Spell";
+import { mapGetters, mapActions } from "vuex";
+import { dice } from "src/mixins/dice.js";
+import { setHP } from "src/mixins/HpManipulations.js";
+import { damage_types } from "src/utils/generalConstants";
+import Spell from "src/components/compendium/Spell";
+import { runEncounter } from "src/mixins/runEncounter.js";
 
-	export default {
-		name: "Spellcasting",
-		mixins: [setHP, dice],
-		props: ["current"],
-		components: {
-			Spell
+export default {
+	name: "Spellcasting",
+	mixins: [setHP, dice, runEncounter],
+	props: ["current"],
+	components: {
+		Spell,
+	},
+	data() {
+		return {
+			damage_types: damage_types,
+			displaySetter: undefined,
+			showSpell: undefined,
+			tabSetter: undefined,
+			spells: {},
+			loading: true,
+		};
+	},
+	computed: {
+		...mapGetters(["encounter", "targeted"]),
+		entity() {
+			return JSON.parse(JSON.stringify(this.current));
 		},
-		data() {
-			return {
-				damage_types: damage_types,
-				displaySetter: undefined,
-				showSpell: undefined,
-				tabSetter: undefined
-			}
-		},
-		computed: {
-			...mapGetters([
-				"spells"
-			]),
-			entity() {
-				return JSON.parse(JSON.stringify(this.current));
-			},
-			tabs() {
-				let tabs = [];
-				if(this.entity.innate_ability) tabs.push({
+		tabs() {
+			let tabs = [];
+			if (this.entity.innate_ability)
+				tabs.push({
 					name: "innate",
-					label: "Innate spellcasting"
+					label: "Innate spellcasting",
 				});
-				if(this.entity.caster_ability) tabs.push({
+			if (this.entity.caster_ability)
+				tabs.push({
 					name: "caster",
-					label: "Spellcasting"
+					label: "Spellcasting",
 				});
-				return tabs;
+			return tabs;
+		},
+		tab: {
+			get() {
+				const tab = this.tabs.length > 1 ? "innate" : this.tabs[0].name;
+				return this.tabSetter ? this.tabSetter : tab;
 			},
-			tab: {
-				get() {
-					const tab = (this.tabs.length > 1) ? "innate" : this.tabs[0].name;
-					return (this.tabSetter) ? this.tabSetter : tab;
-				},
-				set(newVal) {
-					this.tabSetter = newVal;
-				}
+			set(newVal) {
+				this.tabSetter = newVal;
 			},
-			spell_levels() {
-				let levels = [];
+		},
+		displayLevels: {
+			get() {
+				return this.displaySetter ? this.displaySetter : [...this.spell_levels];
+			},
+			set(newValue) {
+				this.displaySetter = newValue;
+			},
+		},
+		spell_levels() {
+			let levels = [];
 
-				if(this.entity[`${this.tab}_spells`]) {
-					if(this.tab === "caster") {
-						for(const spell of Object.values(this.entity[`${this.tab}_spells`])) {
-							if(!levels.includes(spell.level)) levels.push(spell.level);
-						}
-						levels = levels.sort();
-					} else {
-						for(const spell of Object.values(this.entity[`${this.tab}_spells`])) {
-							if(spell.limit == 0) spell.limit = Infinity;
-							if(!levels.includes(spell.limit)) levels.push(spell.limit);
-						}
-						levels = levels.sort();
-						levels = levels.reverse();
+			if (Object.values(this.entity[`${this.tab}_spells`])) {
+				if (this.tab === "caster") {
+					for (const spell of Object.values(this.entity[`${this.tab}_spells`])) {
+						if (!levels.includes(spell.level)) levels.push(spell.level);
 					}
-				} 
-				return levels;
-			},
-			displayLevels: {
-				get() {
-					return (this.displaySetter) ? this.displaySetter : [...this.spell_levels];
-				},
-				set(newValue) {
-					this.displaySetter = newValue;
+					levels = levels.sort();
+				} else {
+					for (const spell of Object.values(this.entity[`${this.tab}_spells`])) {
+						if (spell.limit == 0) spell.limit = Infinity;
+						if (!levels.includes(spell.limit)) levels.push(spell.limit);
+					}
+					levels = levels.sort();
+					levels = levels.reverse();
 				}
 			}
+			return levels;
 		},
-		methods: {
-			...mapActions([
-				"set_limitedUses"
-			]),
-			spellsForLevel(type, level) {
-				if(type === "caster") {
-					return Object.entries(this.entity[`${type}_spells`]).filter(([key, item]) => { 
-						item.key = key;
-						return item.level <= level;
-					}).map(item => { return item[1] });
+	},
+	methods: {
+		...mapActions(["set_limitedUses"]),
+		...mapActions("api_spells", ["fetch_api_spell"]),
+		async fetchSpells() {
+			const spells = {};
+
+			for (const type of this.tabs) {
+				spells[type.name] = await Promise.all(
+					Object.entries(this.entity[`${type.name}_spells`]).map(async ([key, value]) => {
+						const spell = await this.fetch_api_spell(key);
+						spell.key = key;
+
+						if (type.name === "innate") {
+							spell.limit = value.limit == 0 ? Infinity : value.limit;
+						} else {
+							spell.level = value.level;
+						}
+
+						return spell;
+					})
+				);
+			}
+			return spells;
+		},
+		spellsForLevel(type, level) {
+			if (this.spells[type]) {
+				if (type === "caster") {
+					return this.spells[type].filter((spell) => {
+						if (level === 0) {
+							return spell.level == level;
+						} else {
+							return spell.level > 0 && spell.level <= level;
+						}
+					});
 				} else {
-					return Object.entries(this.entity[`${type}_spells`]).filter(([key, item]) => {
-						item.key = key;
-						return item.limit == level;
-					}).map(item => { return item[1] });
+					return this.spells[type].filter((spell) => spell.limit == level);
 				}
-			},
-			setDisplayLevels(level) {
-				if(this.displayLevels.length === this.spell_levels.length) {
-					this.displayLevels = [level];
-				} else {
-					if(this.displayLevels.includes(level)) this.$delete(this.displayLevels, this.displayLevels.indexOf(level));
-					else this.displayLevels.push(level);
-				}
-				this.$forceUpdate();
-			},
-			useSpellSlot(index, category, regain=false) {
-				this.set_limitedUses({
-					key: this.entity.key, 
-					index, 
-					category, 
-					regain 
+			}
+			return [];
+		},
+		setDisplayLevels(level) {
+			if (this.displayLevels.length === this.spell_levels.length) {
+				this.displayLevels = [level];
+			} else {
+				if (this.displayLevels.includes(level))
+					this.$delete(this.displayLevels, this.displayLevels.indexOf(level));
+				else this.displayLevels.push(level);
+			}
+			this.$forceUpdate();
+		},
+		useSpellSlot(index, category, regain = false) {
+			this.set_limitedUses({
+				key: this.entity.key,
+				index,
+				category,
+				regain,
+			});
+		},
+		checkAvailable(type, level, key) {
+			if (type === "caster") {
+				return (
+					!this.entity.limited_uses ||
+					!this.entity.limited_uses[type] ||
+					!this.entity.limited_uses[type][level] ||
+					this.entity.limited_uses[type][level] < this.entity[`${type}_spell_slots`][level]
+				);
+			} else {
+				return (
+					!this.entity.limited_uses ||
+					!this.entity.limited_uses[type] ||
+					!this.entity.limited_uses[type][key] ||
+					this.entity.limited_uses[type][key] < level
+				);
+			}
+		},
+		roll(e, projectiles, option, level, spell, category) {
+			if (this.targeted && this.targeted.length) {
+				this.roll_action({
+					e,
+					action_index: level,
+					action: spell,
+					category,
+					entity: this.current,
+					targets: this.targeted,
+					projectiles,
+					option,
 				});
-			},
-			checkAvailable(type, level, key) {
-				if(type === 'caster') {
-					return !this.entity.limited_uses 
-						|| !this.entity.limited_uses[type] 
-						|| !this.entity.limited_uses[type][level]
-						|| this.entity.limited_uses[type][level] < this.entity[`${type}_spell_slots`][level]
-				} else {
-					return !this.entity.limited_uses 
-						|| !this.entity.limited_uses[type] 
-						|| !this.entity.limited_uses[type][key]
-						|| this.entity.limited_uses[type][key] < level
-				}
+			} else {
+				this.$q.notify({
+					message: "Select a target first.",
+					color: "warning",
+					position: "top",
+					timeout: 1000,
+				});
 			}
 		},
-	}
+	},
+	async mounted() {
+		this.spells = await this.fetchSpells();
+		this.loading = false;
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.q-tab-panel {
-		padding: 15px 0;
+.q-tab-panel {
+	padding: 15px 0;
 
-		.caster-info {
-			text-align: center;
-			display: flex;
-			justify-content: center;
-			margin-bottom: 15px;
+	.caster-info {
+		text-align: center;
+		display: flex;
+		justify-content: center;
+		margin-bottom: 15px;
 
-			.value {
-				font-size: 18px;
-				font-weight: bold;
-				color: $neutral-1;
-			}
-		}
-		.display-levels {
-			display: flex;
-			justify-content: center;
-			margin-bottom: 15px;
-			line-height: 20px;
-
-			.level {
-				background-color: $neutral-5;
-				padding: 0 6px;
-				margin-right: 3px;
-				cursor: pointer;
-				user-select: none;
-
-				&.active {
-					background-color: $blue;
-					color: $neutral-1;
-
-					&:hover {
-						background: $blue-hover;
-					}
-				}
-				&:hover {
-					background: $neutral-4;
-				}
-			}
-		}
-		.spell-level {
-			display: flex;
-			justify-content: space-between;
-			line-height: 25px;
-			margin-bottom: 2px;
-		}
-		.slots {
-			span {
-				cursor: pointer;
-				&:hover {
-					color: $blue;
-				}
-			}
-		}
-		.is-disabled {
-			opacity: .3;
+		.value {
+			font-size: 18px;
+			font-weight: bold;
+			color: $neutral-1;
 		}
 	}
+	.display-levels {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 15px;
+		line-height: 20px;
+		flex-wrap: wrap;
+		gap: 3px;
+
+		.level {
+			background-color: $neutral-5;
+			padding: 0 6px;
+			cursor: pointer;
+			user-select: none;
+
+			&.active {
+				background-color: $blue;
+				color: $neutral-1;
+
+				&:hover {
+					background: $blue-hover;
+				}
+			}
+			&:hover {
+				background: $neutral-4;
+			}
+		}
+	}
+	.spell-level {
+		display: flex;
+		justify-content: space-between;
+		line-height: 25px;
+		margin-bottom: 2px;
+	}
+	.slots {
+		span {
+			cursor: pointer;
+			&:hover {
+				color: $blue;
+			}
+		}
+	}
+	.is-disabled {
+		opacity: 0.3;
+	}
+	.roll-button {
+		display: inline-block;
+		cursor: pointer;
+		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+		height: 20px;
+		width: 20px;
+		background-position: center;
+		background-size: cover;
+		vertical-align: -5px;
+		user-select: none;
+	}
+	.advantage .roll-button:hover {
+		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-green.svg");
+	}
+	.disadvantage .roll-button:hover {
+		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-red.svg");
+	}
+}
 </style>

@@ -23,10 +23,20 @@ export const runEncounter = {
 			option = undefined,
 		}) {
 			let roll;
+			const is_spell = ["innate", "caster"].includes(category);
 			const config = {
-				type: "monster_action",
+				type: is_spell ? "spell" : "monster_action",
 				option,
 			};
+
+			if (is_spell) {
+				action.action_list = action.actions;
+				config.attack_bonus = entity[`${category}_spell_attack`];
+				config.caster_level = entity[`${category}_level`];
+
+				// Innate spells are cast at the lowest possible level
+				config.cast_level = category === "innate" ? action.level : action_index;
+			}
 
 			// Roll once for AOE
 			if (action.aoe_type) {
@@ -35,7 +45,7 @@ export const runEncounter = {
 			}
 
 			// Check for limited uses
-			if (action.limit || action.recharge) {
+			if (action.limit || action.recharge || (is_spell && action_index)) {
 				this.set_limitedUses({
 					key: entity.key,
 					index: action_index,

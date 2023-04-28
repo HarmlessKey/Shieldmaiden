@@ -285,10 +285,8 @@
 						</template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
-								{{ spell.name }}
-								<template #content>
-									<Spell :id="spell.key" />
-								</template> </hk-popover
+								{{ spell.name
+								}}<template #content> <Spell :id="spell.key" /> </template></hk-popover
 							>{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
 						</i>
 					</div>
@@ -531,6 +529,9 @@
 									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 									}}<template v-if="roll.fixed_val && roll.dice_count">
 										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+
+
+
 
 
 

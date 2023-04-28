@@ -1,6 +1,6 @@
 <template>
 	<div v-if="current">
-		<h3 v-if="targeted.length === 0" class="red text-center">Select a target</h3>
+		<h3 v-if="targeted.length === 0" class="red text-center">Select one or more targets</h3>
 		<template v-else-if="current.entityType !== 'player'">
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
 				<!-- ACTIONS -->
@@ -137,6 +137,7 @@
 													{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 													}}<template v-if="roll.fixed_val && roll.dice_count">
 														{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+
 
 
 

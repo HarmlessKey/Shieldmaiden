@@ -295,13 +295,17 @@ export default {
 	methods: {
 		...mapActions(["set_limitedUses"]),
 		...mapActions("api_spells", ["fetch_api_spell"]),
+		...mapActions("spells", ["get_spell"]),
 		async fetchSpells() {
 			const spells = {};
 
 			for (const type of this.tabs) {
 				spells[type.name] = await Promise.all(
 					Object.entries(this.entity[`${type.name}_spells`]).map(async ([key, value]) => {
-						const spell = await this.fetch_api_spell(key);
+						const spell = value.custom
+							? // userId comes from setHP mixin
+							  await this.get_spell({ uid: this.userId, id: key })
+							: await this.fetch_api_spell(key);
 						spell.key = key;
 
 						if (type.name === "innate") {

@@ -1,26 +1,26 @@
 <template>
 	<div class="hk-rolls center-top" v-if="action_rolls && action_rolls.length > 0">
-		<transition-group 
+		<transition-group
 			tag="div"
 			class="rolls"
 			name="rolls"
-			enter-active-class="animated animate__fadeInDown" 
+			enter-active-class="animated animate__fadeInDown"
 			leave-active-class="animated animate__fadeOutUp"
 		>
-			<q-btn 
+			<q-btn
 				v-if="action_rolls && action_rolls.length > 1"
 				:key="`clear-button`"
 				@click="clearRolls"
-				color="neutral-9" 
-				class="full-width mb-2 neutral-1" 
-				label="Clear all" 
-				icon="fas fa-times" 
+				color="neutral-9"
+				class="full-width mb-2 neutral-1"
+				label="Clear all"
+				icon="fas fa-times"
 				no-caps
 			/>
-			<hk-single-roll 
-				v-for="(roll, index) in action_rolls" 
-				:key="`roll-${roll.key}`" 
-				:value="roll" 
+			<hk-single-roll
+				v-for="(roll, index) in action_rolls"
+				:key="`roll-${roll.key}`"
+				:value="roll"
 				:index="index"
 			/>
 		</transition-group>
@@ -33,18 +33,22 @@ import hkSingleRoll from "./hk-single-roll.vue";
 
 export default {
 	name: "hk-rolls",
-  components: { 
-		hkSingleRoll
+	components: {
+		hkSingleRoll,
 	},
 	computed: {
-		...mapGetters([
-			"action_rolls"
-		]),
+		...mapGetters(["action_rolls"]),
 	},
 	methods: {
 		clearRolls() {
 			this.$store.commit("CLEAR_ACTION_ROLLS");
-		}
-	}
-}
+		},
+	},
+};
 </script>
+
+<style lang="scss" scoped>
+.animated {
+	animation-duration: 0.4s !important;
+}
+</style>

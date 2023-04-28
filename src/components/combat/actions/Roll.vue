@@ -146,6 +146,11 @@
 
 
 
+
+
+
+
+
 														}}) </template
 													><template v-else>{{ roll.fixed_val }})</template>
 													{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
@@ -206,7 +211,7 @@
 										<hk-roll-action
 											:action="action"
 											:tooltip="`Roll ${action.name}`"
-											@roll="roll(...arguments, action_index, action, type)"
+											@roll="startRoll(...arguments, action_index, action, type)"
 											:disabled="!checkAvailable(type, action_index, action)"
 										>
 											<span class="roll-button" />
@@ -290,54 +295,43 @@
 			Most players want to roll their own attacks, you probably shouldn't take that away from them.
 			;)
 		</p>
+
+		<q-dialog v-model="projectile_dialog">
+			<Projectiles :projectile-count="rollObject.projectiles" @cancel="cancelRoll" @roll="roll" />
+		</q-dialog>
 	</div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
-import { damage_types, damage_type_icons } from "src/utils/generalConstants";
+import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
+import Projectiles from "./Projectiles";
 
 export default {
 	name: "Roll",
 	mixins: [setHP, runEncounter],
+	components: {
+		Projectiles,
+	},
 	props: ["current"],
 	data() {
 		return {
-			damage_types: damage_types,
 			damage_type_icons: damage_type_icons,
-			rollInfo: false,
 			demo: this.$route.name === "Demo",
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
 			tabSetter: undefined,
-			active_action: undefined,
-			rollOptions: ["toHit", "damage"],
-			setToHit: undefined,
-			rollOnce: true,
-			animateTrigger: false,
-			rolledDamage: 0,
-			rolledToHit: 0,
-			custom_roll: {
-				name: "Custom Roll",
-				attack_bonus: undefined,
-				damage_dice: undefined,
-				damage_bonus: undefined,
-			},
-			options: [
-				{ label: "To hit", value: "toHit" },
-				{ label: "Damage", value: "damage" },
-				{ label: "Modifiers", value: "modifiers" },
-			],
 			action_types: [
 				{ label: "Special", name: "special", type: "special_abilities" },
 				{ label: "Actions", name: "actions", type: "actions" },
 				{ label: "Legendary", name: "legendary", type: "legendary_actions" },
 				{ label: "Reactions", name: "reactions", type: "reactions" },
 			],
-			aoeRoll: undefined,
+			rollObject: {},
+			projectile_dialog: false,
 		};
 	},
 	computed: {
@@ -364,19 +358,38 @@ export default {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
-		roll(e, projectiles, option, action_index, action, category) {
+		startRoll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted && this.targeted.length) {
-				this.roll_action({
+				this.rollObject = {
 					e,
+					projectiles,
+					option,
 					action_index,
 					action,
 					category,
-					entity: this.current,
-					targets: this.targeted,
-					projectiles,
-					option,
-				});
+				};
+				if (projectiles && projectiles > 1) {
+					this.projectile_dialog = true;
+				} else {
+					this.roll();
+				}
 			}
+		},
+		roll(assigned_projectiles) {
+			this.roll_action({
+				e: this.rollObject.e,
+				action_index: this.rollObject.action_index,
+				action: this.rollObject.action,
+				category: this.rollObject.category,
+				entity: this.current,
+				targets: assigned_projectiles || this.targeted,
+				option: this.rollObject.option,
+			});
+			this.cancelRoll();
+		},
+		cancelRoll() {
+			this.projectile_dialog = false;
+			this.rollObject = {};
 		},
 		spendLimited(category, index, regain = false, cost = 1) {
 			this.set_limitedUses({ key: this.current.key, index, category, regain, cost });

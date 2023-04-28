@@ -420,7 +420,7 @@
 								<hk-roll-action
 									:action="action"
 									:tooltip="`Roll ${action.name}`"
-									@roll="roll(...arguments, action_index, action, category)"
+									@roll="startRoll(...arguments, action_index, action, category)"
 									:disabled="!checkAvailable(category, action_index, action)"
 								>
 									<span class="roll-button" />
@@ -532,6 +532,9 @@
 									}}<template v-if="roll.fixed_val && roll.dice_count">
 										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
 
+
+
+
 										}}) </template
 									><template v-else>{{ roll.fixed_val }})</template>
 									{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
@@ -576,6 +579,10 @@
 			</div>
 		</div>
 		<q-resize-observer @resize="setSize" />
+
+		<q-dialog v-model="projectile_dialog">
+			<Projectiles :projectile-count="rollObject.projectiles" @cancel="cancelRoll" @roll="roll" />
+		</q-dialog>
 	</div>
 	<div v-else>
 		There is no monster card for this entity.<br />
@@ -593,12 +600,14 @@ import { abilities, damage_type_icons, skills } from "src/utils/generalConstants
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Spell from "src/components/compendium/Spell";
 import { calc_skill_mod } from "src/utils/generalFunctions";
+import Projectiles from "./actions/Projectiles";
 
 export default {
 	name: "ViewEntity",
 	mixins: [general, dice, experience, monsterMixin, runEncounter],
 	components: {
 		Spell,
+		Projectiles,
 	},
 	props: {
 		data: {
@@ -632,6 +641,8 @@ export default {
 				},
 				{ category: "reactions", name: "Reactions", name_single: "Reaction" },
 			],
+			rollObject: {},
+			projectile_dialog: false,
 		};
 	},
 	computed: {
@@ -737,18 +748,21 @@ export default {
 					return item[1];
 				});
 		},
-		roll(e, projectiles, option, action_index, action, category) {
+		startRoll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted && this.targeted.length) {
-				this.roll_action({
+				this.rollObject = {
 					e,
+					projectiles,
+					option,
 					action_index,
 					action,
 					category,
-					entity: this.entity,
-					targets: this.targeted,
-					projectiles,
-					option,
-				});
+				};
+				if (projectiles && projectiles > 1) {
+					this.projectile_dialog = true;
+				} else {
+					this.roll();
+				}
 			} else {
 				this.$q.notify({
 					message: "Select a target first.",
@@ -757,6 +771,22 @@ export default {
 					timeout: 1000,
 				});
 			}
+		},
+		roll(assigned_projectiles) {
+			this.roll_action({
+				e: this.rollObject.e,
+				action_index: this.rollObject.action_index,
+				action: this.rollObject.action,
+				category: this.rollObject.category,
+				entity: this.current,
+				targets: assigned_projectiles || this.targeted,
+				option: this.rollObject.option,
+			});
+			this.cancelRoll();
+		},
+		cancelRoll() {
+			this.projectile_dialog = false;
+			this.rollObject = {};
 		},
 		spendLimited(category, index, regain = false, cost = 1) {
 			this.set_limitedUses({ key: this.entity.key, index, category, regain, cost });

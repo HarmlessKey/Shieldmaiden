@@ -12,22 +12,18 @@ export const runEncounter = {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
-		roll_action({
-			e,
-			action_index,
-			action,
-			category,
-			entity,
-			targets,
-			projectiles = 1,
-			option = undefined,
-		}) {
+		roll_action({ e, action_index, action, category, entity, targets, option = undefined }) {
 			let roll;
 			const is_spell = ["innate", "caster"].includes(category);
 			const config = {
 				type: is_spell ? "spell" : "monster_action",
 				option,
 			};
+
+			// Create projectile object if target = array
+			if (Array.isArray(targets)) {
+				targets = targets.reduce((acc, cur) => ({ ...acc, [cur]: 1 }), {});
+			}
 
 			if (is_spell) {
 				action.action_list = action.actions;
@@ -61,20 +57,23 @@ export const runEncounter = {
 				});
 			}
 
-			for (const key of targets) {
-				let newRoll = { ...roll };
+			for (const [key, projectiles] of Object.entries(targets)) {
+				for (let i = 1; i <= projectiles; i++) {
+					console.log(action.aoe_type);
+					let newRoll = { ...roll };
 
-				// Reroll for each target if it's not AOE
-				if (!action.aoe_type) {
-					newRoll = this.rollAction(e, action, config);
-					if (this._share) this.shareRoll(newRoll, entity, [key]);
+					// Reroll for each target if it's not AOE
+					if (!action.aoe_type || action.aoe_type === "none") {
+						newRoll = this.rollAction(e, action, config);
+						if (this._share) this.shareRoll(newRoll, entity, [key]);
+					}
+
+					// Set the target and current
+					this.$set(newRoll, "target", this.entities[key]);
+					this.$set(newRoll, "current", entity);
+
+					this.setActionRoll(newRoll);
 				}
-
-				// Set the target and current
-				this.$set(newRoll, "target", this.entities[key]);
-				this.$set(newRoll, "current", entity);
-
-				this.setActionRoll(newRoll);
 			}
 		},
 		shareRoll(roll, entity, targets) {

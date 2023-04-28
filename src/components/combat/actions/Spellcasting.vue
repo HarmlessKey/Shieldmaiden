@@ -398,8 +398,7 @@ export default {
 				action: this.rollObject.spell,
 				category: this.rollObject.category,
 				entity: this.current,
-				targets: this.targeted,
-				projectiles: assigned_projectiles,
+				targets: assigned_projectiles || this.targeted,
 				option: this.rollObject.option,
 			});
 			this.cancelRoll();

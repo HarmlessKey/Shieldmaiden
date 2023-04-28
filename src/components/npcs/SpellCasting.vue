@@ -124,7 +124,13 @@
 						<template v-if="npc[`${casting.category}_spells`]">
 							<label class="d-block mb-2">Spells</label>
 							<q-list :dark="$store.getters.theme === 'dark'">
-								<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
+								<q-item
+									v-for="(spell, key) in orderedSpells(
+										npc[`${casting.category}_spells`],
+										casting.category
+									)"
+									:key="key"
+								>
 									<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
 										{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
 										<q-popup-edit
@@ -214,6 +220,7 @@
 <script>
 import { abilities } from "src/utils/generalConstants";
 import CopyContent from "src/components/CopyContent";
+import _ from "lodash";
 
 export default {
 	name: "npc-SpellCasting",
@@ -307,6 +314,11 @@ export default {
 		},
 		removeSpell(key, category) {
 			this.$delete(this.npc[`${category}_spells`], key);
+		},
+		orderedSpells(spell_list, category) {
+			const key = category === "caster" ? "level" : "limit";
+			const sorted = Object.entries(spell_list).sort((a, b) => a[1][key] - b[1][key]);
+			return sorted.reduce((acc, [key, spell]) => ({ ...acc, [key]: spell }), {});
 		},
 	},
 };

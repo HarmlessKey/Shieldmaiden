@@ -12,21 +12,39 @@ export const runEncounter = {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
-		roll_action({
-			e,
-			action_index,
-			action,
-			category,
-			entity,
-			targets,
-			projectiles = 1,
-			option = undefined,
-		}) {
+		/**
+		 * Rolls an action or spell in run encounter
+		 *
+		 * @param {Event} e Event
+		 * @param {number} action_index or spell_level used to track limited uses
+		 * @param {object} action full action or spell
+		 * @param {category} action actions | reactions | legendary_actions | special_abilities | innate | caster
+		 * @param {object} entity the caster of the action
+		 * @param {array|object} targets array of keys or object with { [key]: projectile_count }
+		 * @param {string} option if an action/spell has options, this is the selected option
+		 */
+		roll_action({ e, action_index, action, category, entity, targets, option = undefined }) {
 			let roll;
+			const is_spell = ["innate", "caster"].includes(category);
 			const config = {
-				type: "monster_action",
+				type: is_spell ? "spell" : "monster_action",
 				option,
 			};
+
+			// Create projectile object if target = array
+			if (Array.isArray(targets)) {
+				targets = targets.reduce((acc, cur) => ({ ...acc, [cur]: 1 }), {});
+			}
+
+			if (is_spell) {
+				action.action_list = action.actions;
+				config.attack_bonus = entity[`${category}_spell_attack`];
+				config.caster_level = entity[`${category}_level`];
+				config.save_dc = entity[`${category}_save_dc`];
+
+				// Innate spells are cast at the lowest possible level
+				config.cast_level = category === "innate" ? action.level : action_index;
+			}
 
 			// Roll once for AOE
 			if (action.aoe_type) {
@@ -35,7 +53,7 @@ export const runEncounter = {
 			}
 
 			// Check for limited uses
-			if (action.limit || action.recharge) {
+			if (action.limit || action.recharge || (is_spell && action_index)) {
 				this.set_limitedUses({
 					key: entity.key,
 					index: action_index,
@@ -51,20 +69,22 @@ export const runEncounter = {
 				});
 			}
 
-			for (const key of targets) {
-				let newRoll = { ...roll };
+			for (const [key, projectiles] of Object.entries(targets)) {
+				for (let i = 1; i <= projectiles; i++) {
+					let newRoll = { ...roll };
 
-				// Reroll for each target if it's not AOE
-				if (!action.aoe_type) {
-					newRoll = this.rollAction(e, action, config);
-					if (this._share) this.shareRoll(newRoll, entity, [key]);
+					// Reroll for each target if it's not AOE
+					if (!action.aoe_type || action.aoe_type === "none") {
+						newRoll = this.rollAction(e, action, config);
+						if (this._share) this.shareRoll(newRoll, entity, [key]);
+					}
+
+					// Set the target and current
+					this.$set(newRoll, "target", this.entities[key]);
+					this.$set(newRoll, "current", entity);
+
+					this.setActionRoll(newRoll);
 				}
-
-				// Set the target and current
-				this.$set(newRoll, "target", this.entities[key]);
-				this.$set(newRoll, "current", entity);
-
-				this.setActionRoll(newRoll);
 			}
 		},
 		shareRoll(roll, entity, targets) {

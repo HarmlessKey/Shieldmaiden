@@ -4,18 +4,23 @@
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"
 			indicator-color="transparent"
+			outside-arrows
+			mobile-arrows
 			dense
 			align="left"
 		>
 			<q-tab name="log" icon="fas fa fa-scroll-old" />
 			<q-tab name="damage" icon="fas fa-swords" />
 			<q-tab name="requests" icon="fas fa-bell">
-				<div class="notifications bg-red white animated zoomIn" v-if="requests && Object.keys(requests).length">
+				<div
+					class="notifications bg-red white animated zoomIn"
+					v-if="requests && Object.keys(requests).length"
+				>
 					<div>{{ Object.keys(requests).length }}</div>
 				</div>
 			</q-tab>
 		</q-tabs>
-		<q-scroll-area dark :thumb-style="{ width: '5px'}">
+		<q-scroll-area dark :thumb-style="{ width: '5px' }">
 			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel name="log">
 					<Log />
@@ -32,30 +37,27 @@
 </template>
 
 <script>
-	import Dmg from "src/components/combat/side/Dmg.vue";
-	import Log from "src/components/combat/side/Log.vue";
-	import Requests from "src/components/combat/side/Requests.vue";
-	import { mapGetters } from "vuex";
+import Dmg from "src/components/combat/side/Dmg.vue";
+import Log from "src/components/combat/side/Log.vue";
+import Requests from "src/components/combat/side/Requests.vue";
+import { mapGetters } from "vuex";
 
-	export default {
-		name: "Side",
-		components: {
-			Dmg,
-			Log,
-			Requests
-		},
-		data() {
-			return {
-				tab: "log"
-			}
-		},
-		computed: {
-			...mapGetters([
-				"encounter",
-				"requests"
-			])
-		}
-	}
+export default {
+	name: "Side",
+	components: {
+		Dmg,
+		Log,
+		Requests,
+	},
+	data() {
+		return {
+			tab: "log",
+		};
+	},
+	computed: {
+		...mapGetters(["encounter", "requests"]),
+	},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -63,17 +65,17 @@
 	height: 100%;
 }
 .q-tabs {
+	background: $neutral-8-transparent;
 	.q-tab {
 		padding-top: 10px;
 		padding-bottom: 9px;
-		background: $neutral-8-transparent;
 		position: relative;
 
 		&.q-tab--active {
-			background: $neutral-6-transparent !important;
+			background: $neutral-6-transparent;
 			color: $blue;
 		}
-		.notifications {		
+		.notifications {
 			user-select: none;
 			position: absolute;
 			top: -5px;
@@ -81,7 +83,7 @@
 			height: 20px;
 			width: 20px;
 			border-radius: 50%;
-			
+
 			div {
 				position: absolute;
 				width: inherit;
@@ -93,7 +95,7 @@
 		}
 	}
 }
-.q-scrollarea { 
+.q-scrollarea {
 	height: calc(100% - 30px);
 	background: $neutral-6-transparent;
 }

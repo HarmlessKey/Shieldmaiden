@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3 v-if="targeted.length === 0" class="red text-center">Select a target</h3>
+		<h3 v-if="targeted.length === 0" class="red text-center">Select one or more targets</h3>
 		<template v-else>
 			<hk-dmg-type-select v-model="damage_type" placeholder="Damage type" clearable dense />
 			<q-checkbox

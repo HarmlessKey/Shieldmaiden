@@ -61,7 +61,7 @@ export const dice = {
 					advantage_disadvantage[type] = true;
 				}
 
-				//Only roll with advantage/disadvantage if only 1 is present they cancel eachother out
+				//Only roll with advantage/disadvantage if only 1 is present they cancel each other out
 				if (Object.keys(advantage_disadvantage).length === 1) {
 					n = 2;
 				}
@@ -251,7 +251,7 @@ export const dice = {
 				// For a saving throw set the ability and DC for display
 				if (type === "save") {
 					returnRoll.actions[i].save_ability = action.save_ability;
-					returnRoll.actions[i].save_dc = action.save_dc || 10;
+					returnRoll.actions[i].save_dc = config.save_dc || action.save_dc || 10;
 				}
 
 				for (const roll of action.rolls) {

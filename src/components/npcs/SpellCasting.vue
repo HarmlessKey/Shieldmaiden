@@ -287,7 +287,6 @@ export default {
 			this.spells_dialog = true;
 		},
 		addSpell({ result, id, resource }) {
-			console.log(result, id, resource);
 			if (!this.npc[`${this.category}_spells`]) {
 				this.$set(this.npc, `${this.category}_spells`, {});
 			}

@@ -98,32 +98,53 @@ const npc_actions = {
 			const services = await dispatch("get_npc_services");
 			try {
 				npc = await services.getNpc(uid, id);
-				if (npc.caster_spells) {
-					dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.caster_spells });
-				}
-				if (npc.innate_spells) {
-					dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.innate_spells });
-				}
-
-				commit("SET_CACHED_NPC", { uid, id, npc });
 			} catch (error) {
 				throw error;
 			}
 		}
+
+		if (npc.caster_spells) {
+			await dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.caster_spells }).then(
+				(to_delete) => {
+					to_delete.forEach((spell_key) => {
+						delete npc.caster_spells[spell_key];
+					});
+				}
+			);
+		}
+		if (npc.innate_spells) {
+			await dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.innate_spells }).then(
+				(to_delete) => {
+					to_delete.forEach((spell_key) => {
+						delete npc.innate_spells[spell_key];
+					});
+				}
+			);
+		}
+
+		commit("SET_CACHED_NPC", { uid, id, npc });
 		return npc;
 	},
 
 	async cacheNpcSpell({ dispatch }, { uid, npc_id, spell_list }) {
-		for (const [spell_key, spell] of Object.entries(spell_list)) {
-			if (spell.custom) {
-				dispatch("spells/get_spell", { uid, id: spell_key }, { root: true }).then((spell) => {
-					// get_spell dispatch returns false when spell was not found
-					if (spell === false) {
-						dispatch("remove_spell_from_npc", { uid, npc_id, spell_id: spell_key });
-					}
-				});
-			}
-		}
+		const spells_to_delete = [];
+
+		await Promise.all(
+			Object.entries(spell_list).map(([spell_key, spell]) => {
+				if (spell.custom) {
+					return dispatch("spells/get_spell", { uid, id: spell_key }, { root: true }).then(
+						(spell) => {
+							// get_spell dispatch returns false when spell was not found
+							if (spell === false) {
+								spells_to_delete.push(spell_key);
+								dispatch("remove_spell_from_npc", { uid, npc_id, spell_id: spell_key });
+							}
+						}
+					);
+				}
+			})
+		);
+		return spells_to_delete;
 	},
 
 	/**

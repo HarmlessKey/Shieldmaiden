@@ -370,6 +370,7 @@ export default {
 				let checkable_item = item;
 				// Parse versatile to options for NPCs
 				if (this.type === "npcs") {
+					checkable_item = this.removeCustomSpells(item);
 					checkable_item = this.versatileToOptions(item);
 				}
 
@@ -529,6 +530,21 @@ export default {
 					}
 				}
 			}
+			return npc;
+		},
+		removeCustomSpells(npc) {
+			delete npc.custom_spells;
+			for (const spell_list_type of ["caster_spells", "innate_spells"]) {
+				if (npc[spell_list_type]) {
+					const spell_list = Object.assign({}, npc[spell_list_type]);
+					for (const [spell_key, spell] of Object.entries(spell_list)) {
+						if (spell.custom) {
+							delete npc[spell_list_type][spell_key];
+						}
+					}
+				}
+			}
+
 			return npc;
 		},
 	},

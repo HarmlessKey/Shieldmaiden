@@ -78,8 +78,8 @@ export default {
 	},
 	methods: {
 		divide() {
-			for (const [i, key] of this.targeted.entries()) {
-				const extra = this.projectileCount % this.targeted.length > i;
+			for (const [index, key] of this.targeted.entries()) {
+				const extra = this.projectileCount % this.targeted.length > index;
 				const target_projectiles = Math.floor(this.projectileCount / this.targeted.length) + extra;
 
 				for (let i = 0; i < target_projectiles; i++) {

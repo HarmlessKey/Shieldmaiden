@@ -220,7 +220,6 @@
 <script>
 import { abilities } from "src/utils/generalConstants";
 import CopyContent from "src/components/CopyContent";
-import _ from "lodash";
 
 export default {
 	name: "npc-SpellCasting",
@@ -316,8 +315,10 @@ export default {
 			this.$delete(this.npc[`${category}_spells`], key);
 		},
 		orderedSpells(spell_list, category) {
-			const key = category === "caster" ? "level" : "limit";
-			const sorted = Object.entries(spell_list).sort((a, b) => a[1][key] - b[1][key]);
+			const category_key = category === "caster" ? "level" : "limit";
+			const sorted = Object.entries(spell_list).sort(
+				(a, b) => a[1][category_key] - b[1][category_key]
+			);
 			return sorted.reduce((acc, [key, spell]) => ({ ...acc, [key]: spell }), {});
 		},
 	},

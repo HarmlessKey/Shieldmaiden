@@ -126,7 +126,6 @@
 											:action="spell"
 											:tooltip="`Roll ${spell.name}`"
 											type="spell"
-											:attack-bonus="entity[`${name}_spell_attack`]"
 											:cast-level="level"
 											:caster-level="entity[`${name}_level`]"
 											@roll="startRoll(...arguments, level, spell, tab)"
@@ -142,20 +141,12 @@
 											Cast
 										</a>
 									</q-item-section>
-									<q-item-section avatar v-else>
-										<hk-roll-action
-											v-if="spell.actions && spell.actions.length"
-											:action="spell"
-											:tooltip="`Roll ${spell.name}`"
-											type="spell"
-											:attack-bonus="entity[`${name}_spell_attack`]"
-											:cast-level="spell.level"
-											@roll="startRoll(...arguments, level, spell, tab)"
-											:disabled="!checkAvailable(tab, level, spell.key)"
-										>
-											<span class="roll-button" />
-										</hk-roll-action>
-										<div v-if="level < Infinity" class="slots">
+									<q-item-section
+										v-else
+										class="d-flex flex-row items-center gap-1 justify-content-start"
+										avatar
+									>
+										<span v-if="level < Infinity" class="slots">
 											<span
 												v-for="i in level"
 												:key="`limited-${i}`"
@@ -183,7 +174,17 @@
 													}}
 												</q-tooltip>
 											</span>
-										</div>
+										</span>
+										<hk-roll-action
+											v-if="spell.actions && spell.actions.length"
+											:action="spell"
+											:tooltip="`Roll ${spell.name}`"
+											type="spell"
+											@roll="startRoll(...arguments, spell.key, spell, tab)"
+											:disabled="!checkAvailable(tab, level, spell.key)"
+										>
+											<span class="roll-button" />
+										</hk-roll-action>
 									</q-item-section>
 								</template>
 								<div class="accordion-body description">
@@ -346,6 +347,7 @@ export default {
 			this.$forceUpdate();
 		},
 		useSpellSlot(index, category, regain = false) {
+			console.log(index);
 			this.set_limitedUses({
 				key: this.entity.key,
 				index,

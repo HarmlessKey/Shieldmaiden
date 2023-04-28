@@ -745,6 +745,14 @@ html body {
 			}
 		}
 	}
+	.flex {
+		&-col {
+			flex-direction: column;
+		}
+		&-row {
+			flex-direction: row;
+		}
+	}
 	.gap {
 		&-1 {
 			gap: 0.5rem;
@@ -806,16 +814,16 @@ html body {
 	}
 	.items {
 		&-start {
-			align-items: start;
+			align-items: start !important;
 		}
 		&-baseline {
-			align-items: baseline;
+			align-items: baseline !important;
 		}
 		&-center {
-			align-items: center;
+			align-items: center !important;
 		}
 		&-end {
-			align-items: end;
+			align-items: end !important;
 		}
 	}
 	.whitespace {

@@ -82,8 +82,6 @@ export default {
 				const extra = this.projectileCount % this.targeted.length > i;
 				const target_projectiles = Math.floor(this.projectileCount / this.targeted.length) + extra;
 
-				console.log(target_projectiles, this.targeted.length, this.projectileCount);
-
 				for (let i = 0; i < target_projectiles; i++) {
 					this.setProjectile(true, key);
 				}

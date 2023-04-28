@@ -27,14 +27,12 @@ export class spellServices {
 
 		if (query) {
 			const queryParams = [];
-			console.log(query);
 
 			if (query.search) {
 				queryParams.push(`name=${query.search}`);
 			}
 			if (query.schools && query.schools.length) {
 				for (const school of query.schools) {
-					console.log(school);
 					queryParams.push(`school[]=${school}`);
 				}
 			}

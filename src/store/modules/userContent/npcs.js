@@ -133,9 +133,9 @@ const npc_actions = {
 			Object.entries(spell_list).map(([spell_key, spell]) => {
 				if (spell.custom) {
 					return dispatch("spells/get_spell", { uid, id: spell_key }, { root: true }).then(
-						(spell) => {
-							// get_spell dispatch returns false when spell was not found
-							if (spell === false) {
+						(spell_info) => {
+							// get_spell dispatch returns false when spell_info was not found
+							if (spell_info === false) {
 								spells_to_delete.push(spell_key);
 								dispatch("remove_spell_from_npc", { uid, npc_id, spell_id: spell_key });
 							}

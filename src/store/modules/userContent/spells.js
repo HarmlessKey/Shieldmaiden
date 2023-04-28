@@ -90,12 +90,14 @@ const spell_actions = {
 
 	async get_spell({ state, commit, dispatch }, { uid, id }) {
 		let spell = state.cached_spells[uid] ? state.cached_spells[uid][id] : undefined;
-
 		// The spell is not in the store and needs to be fetched from the database
 		if (!spell) {
 			const services = await dispatch("get_spell_services");
 			try {
 				spell = await services.getSpell(uid, id);
+				if (spell === null) {
+					return false;
+				}
 				commit("SET_CACHED_SPELL", { uid, id, spell });
 			} catch (error) {
 				throw error;

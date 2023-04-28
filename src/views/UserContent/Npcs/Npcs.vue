@@ -204,6 +204,7 @@ export default {
 	methods: {
 		...mapActions(["setSlide"]),
 		...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs", "add_npc"]),
+		...mapActions("spells", ["get_spell"]),
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;
 		},
@@ -248,6 +249,7 @@ export default {
 			const all_npcs = await this.get_full_npcs();
 			for (const key in all_npcs) {
 				all_npcs[key].harmless_key = key;
+				this.addCustomSpellToExport(all_npcs[key]);
 			}
 
 			const json_export = Object.values(all_npcs);
@@ -255,8 +257,34 @@ export default {
 		},
 		async exportNPC(id) {
 			const npc = await this.get_npc({ uid: this.userId, id });
-			npc.harmless_key = id;
-			downloadJSON(npc);
+			const exportableNpc = Object.assign({}, npc);
+			exportableNpc.harmless_key = id;
+			await this.addCustomSpellToExport(exportableNpc);
+			downloadJSON(exportableNpc);
+		},
+		async addCustomSpellToExport(npc) {
+			const [custom_caster_spells, custom_innate_spells] = await Promise.all([
+				this.parseNpcSpellList(npc, "caster_spells"),
+				this.parseNpcSpellList(npc, "innate_spells"),
+			]);
+
+			const custom_spells = custom_caster_spells
+				.concat(custom_innate_spells)
+				.reduce((acc, [key, spell]) => ({ ...acc, [key]: spell }), {});
+			npc.custom_spells = custom_spells;
+		},
+		async parseNpcSpellList(npc, spell_list_name) {
+			const custom_spell_list = [];
+			if (npc[spell_list_name]) {
+				const npc_spell_list = Object.assign({}, npc[spell_list_name]);
+				for (const [spell_key, spell] of Object.entries(npc_spell_list)) {
+					if (spell.custom) {
+						const full_spell = await this.get_spell({ uid: this.userId, id: spell_key });
+						custom_spell_list.push([spell_key, full_spell]);
+					}
+				}
+			}
+			return custom_spell_list;
 		},
 	},
 };

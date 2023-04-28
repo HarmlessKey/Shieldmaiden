@@ -119,7 +119,6 @@ export default {
 		...mapGetters("items", ["items"]),
 		...mapGetters("spells", ["spells"]),
 		custom_content() {
-			console.log(this.spells);
 			let content = [];
 			if (this.type === "monster") {
 				content = this.npcs;
@@ -152,6 +151,9 @@ export default {
 			if (this.type === "item") {
 				await this.get_items();
 			}
+			if (this.type === "spell") {
+				await this.get_spells();
+			}
 		}
 	},
 	methods: {
@@ -160,7 +162,7 @@ export default {
 		...mapActions("api_items", ["fetch_api_items", "fetch_api_item"]),
 		...mapActions("items", ["get_items", "get_item"]),
 		...mapActions("api_spells", ["fetch_api_spells", "fetch_api_spell"]),
-		...mapActions("spells", ["get_spell"]),
+		...mapActions("spells", ["get_spells", "get_spell"]),
 		changeCopyResource(value) {
 			this.copy_resource = value;
 			this.query = "";

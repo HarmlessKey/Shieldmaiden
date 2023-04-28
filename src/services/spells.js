@@ -53,9 +53,7 @@ export class SpellServices {
 		try {
 			const spell = await SPELLS_REF.child(uid)
 				.child(id)
-				.once("value", (snapshot) => {
-					return snapshot;
-				});
+				.once("value", (snapshot) => snapshot);
 			return spell.val();
 		} catch (error) {
 			throw error;

@@ -1,7 +1,9 @@
 <template>
 	<div v-if="!loading" class="spell">
 		<template v-if="spell.actions && $route.name !== 'RunEncounter'">
-			<button class="btn bg-neutral-5 btn-block mb-2" @click="show_roll_input = !show_roll_input">Roll</button>
+			<button class="btn bg-neutral-5 btn-block mb-2" @click="show_roll_input = !show_roll_input">
+				Roll
+			</button>
 			<q-slide-transition>
 				<div v-if="show_roll_input" class="roll">
 					<q-input
@@ -14,7 +16,7 @@
 						type="number"
 						v-model="caster_level"
 					/>
-	
+
 					<!-- TO HIT MODIFIER INPUT -->
 					<q-input
 						v-if="isToHit"
@@ -26,7 +28,7 @@
 						type="text"
 						v-model="attack_bonus"
 					/>
-	
+
 					<!-- SPELL LEVEL INPUT -->
 					<template v-if="spell.level > 0">
 						<strong>Select Casting level</strong>
@@ -45,7 +47,7 @@
 							</div>
 						</div>
 					</template>
-	
+
 					<!-- ROLL SPELL -->
 					<hk-roll-action
 						:action="spell"
@@ -114,9 +116,14 @@ export default {
 		id: {
 			type: String,
 		},
+		custom: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
+			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			spell: {},
 			show_roll_input: false,
 			loading: true,
@@ -173,7 +180,9 @@ export default {
 			this.cast_level = this.data.level;
 			this.loading = false;
 		} else {
-			this.spell = await this.fetch_api_spell(this.id);
+			this.spell = this.custom
+				? await this.get_spell({ uid: this.userId, id: this.id })
+				: await this.fetch_api_spell(this.id);
 			this.cast_level = this.spell.level;
 			this.loading = false;
 		}
@@ -229,7 +238,7 @@ export default {
 		justify-content: center;
 		column-gap: 3px;
 		margin: 10px 0;
-	
+
 		.level {
 			width: 30px;
 			height: 30px;
@@ -238,7 +247,7 @@ export default {
 			cursor: pointer;
 			background-color: $neutral-8;
 			user-select: none;
-	
+
 			&.selected {
 				background-color: $blue;
 				color: $neutral-1;

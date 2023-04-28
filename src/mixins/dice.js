@@ -61,7 +61,7 @@ export const dice = {
 					advantage_disadvantage[type] = true;
 				}
 
-				//Only roll with advantage/disadvantage if only 1 is present they cancel eachother out
+				//Only roll with advantage/disadvantage if only 1 is present they cancel each other out
 				if (Object.keys(advantage_disadvantage).length === 1) {
 					n = 2;
 				}

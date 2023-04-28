@@ -129,7 +129,7 @@
 											:attack-bonus="entity[`${name}_spell_attack`]"
 											:cast-level="level"
 											:caster-level="entity[`${name}_level`]"
-											@roll="roll(...arguments, level, spell, tab)"
+											@roll="startRoll(...arguments, level, spell, tab)"
 											:disabled="!checkAvailable(tab, level, spell.key)"
 										>
 											<span class="roll-button" />
@@ -150,7 +150,7 @@
 											type="spell"
 											:attack-bonus="entity[`${name}_spell_attack`]"
 											:cast-level="spell.level"
-											@roll="roll(...arguments, level, spell, tab)"
+											@roll="startRoll(...arguments, level, spell, tab)"
 											:disabled="!checkAvailable(tab, level, spell.key)"
 										>
 											<span class="roll-button" />
@@ -199,6 +199,10 @@
 				</template>
 			</q-tab-panel>
 		</q-tab-panels>
+
+		<q-dialog v-model="projectile_dialog">
+			<Projectiles :projectile-count="rollObject.projectiles" @cancel="cancelRoll" @roll="roll" />
+		</q-dialog>
 	</div>
 </template>
 
@@ -208,6 +212,7 @@ import { dice } from "src/mixins/dice.js";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_types } from "src/utils/generalConstants";
 import Spell from "src/components/compendium/Spell";
+import Projectiles from "./Projectiles";
 import { runEncounter } from "src/mixins/runEncounter.js";
 
 export default {
@@ -216,6 +221,7 @@ export default {
 	props: ["current"],
 	components: {
 		Spell,
+		Projectiles,
 	},
 	data() {
 		return {
@@ -225,6 +231,8 @@ export default {
 			tabSetter: undefined,
 			spells: {},
 			loading: true,
+			rollObject: {},
+			projectile_dialog: false,
 		};
 	},
 	computed: {
@@ -359,18 +367,21 @@ export default {
 				);
 			}
 		},
-		roll(e, projectiles, option, level, spell, category) {
+		startRoll(e, projectiles, option, level, spell, category) {
 			if (this.targeted && this.targeted.length) {
-				this.roll_action({
+				this.rollObject = {
 					e,
-					action_index: level,
-					action: spell,
-					category,
-					entity: this.current,
-					targets: this.targeted,
 					projectiles,
 					option,
-				});
+					level,
+					spell,
+					category,
+				};
+				if (projectiles && projectiles > 1) {
+					this.projectile_dialog = true;
+				} else {
+					this.roll();
+				}
 			} else {
 				this.$q.notify({
 					message: "Select a target first.",
@@ -379,6 +390,23 @@ export default {
 					timeout: 1000,
 				});
 			}
+		},
+		roll(assigned_projectiles) {
+			this.roll_action({
+				e: this.rollObject.e,
+				action_index: this.rollObject.level,
+				action: this.rollObject.spell,
+				category: this.rollObject.category,
+				entity: this.current,
+				targets: this.targeted,
+				projectiles: assigned_projectiles,
+				option: this.rollObject.option,
+			});
+			this.cancelRoll();
+		},
+		cancelRoll() {
+			this.projectile_dialog = false;
+			this.rollObject = {};
 		},
 	},
 	async mounted() {

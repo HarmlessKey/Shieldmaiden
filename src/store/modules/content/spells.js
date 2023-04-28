@@ -46,7 +46,7 @@ const spell_actions = {
 		const cached = state.cached_spells;
 		let spell = undefined;
 
-		// SRD Spells
+		// SRD Monsters
 		if (isNaN(id)) {
 			spell = Object.values(cached).filter((item) => {
 				return item.url === id;

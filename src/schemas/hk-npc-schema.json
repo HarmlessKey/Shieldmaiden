@@ -430,6 +430,9 @@
 					"name": {
 						"type": "string",
 						"maxLength": 50
+					},
+					"custom": {
+						"type": "boolean"
 					}
 				},
 				"required": ["level", "name"]
@@ -464,6 +467,9 @@
 					"name": {
 						"type": "string",
 						"maxLength": 50
+					},
+					"custom": {
+						"type": "boolean"
 					}
 				},
 				"required": ["limit", "name"]

@@ -248,15 +248,37 @@ export default {
 			const all_npcs = await this.get_full_npcs();
 			for (const key in all_npcs) {
 				all_npcs[key].harmless_key = key;
+				this.removeCustomSpellsFromNPC(all_npcs[key]);
 			}
 
 			const json_export = Object.values(all_npcs);
 			downloadJSON(json_export);
 		},
 		async exportNPC(id) {
-			const npc = await this.get_npc({ uid: this.userId, id });
+			let npc = await this.get_npc({ uid: this.userId, id });
 			npc.harmless_key = id;
+			this.removeCustomSpellsFromNPC(npc);
 			downloadJSON(npc);
+		},
+		removeCustomSpellsFromNPC(npc) {
+			// Removes custom spells from NPC inline.
+			if (npc.caster_spells) {
+				const caster_spell_list = Object.assign({}, npc.caster_spells);
+				for (const [spell_key, spell] of Object.entries(caster_spell_list)) {
+					if (spell.custom) {
+						delete npc.caster_spells[spell_key];
+					}
+				}
+			}
+
+			if (npc.innate_spells) {
+				const innate_spell_list = Object.assign({}, npc.innate_spells);
+				for (const [spell_key, spell] of Object.entries(innate_spell_list)) {
+					if (spell.custom) {
+						delete npc.innate_spells[spell_key];
+					}
+				}
+			}
 		},
 	},
 };

@@ -103,7 +103,7 @@ const npc_actions = {
 			}
 		}
 
-		if (npc.caster_spells) {
+		if (npc && npc.caster_spells) {
 			await dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.caster_spells }).then(
 				(to_delete) => {
 					to_delete.forEach((spell_key) => {
@@ -112,7 +112,7 @@ const npc_actions = {
 				}
 			);
 		}
-		if (npc.innate_spells) {
+		if (npc && npc.innate_spells) {
 			await dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.innate_spells }).then(
 				(to_delete) => {
 					to_delete.forEach((spell_key) => {

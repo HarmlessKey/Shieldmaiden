@@ -1,9 +1,21 @@
 <template>
-	<hk-card header="Projectiles" :min-width="300">
+	<hk-card :min-width="300">
+		<div slot="header" class="card-header">
+			Projectiles
+			<span class="btn btn-sm bg-neutral-5">{{ available_projectiles }}/{{ projectileCount }}</span>
+		</div>
 		<div class="card-body">
-			<p>Assign {{ available_projectiles }} projectiles.</p>
+			<button
+				class="btn btn-block mb-3"
+				@click="divide"
+				:disabled="available_projectiles < projectileCount"
+			>
+				Divide {{ projectileCount }} projectiles over {{ targeted.length }} target{{
+					targeted.length > 1 ? "s" : ""
+				}}
+			</button>
 			<div v-for="key in targeted" :key="`target-${key}`" class="target">
-				<span class="btn btn-sm bg-neutral-5 mr-1">
+				<span class="btn btn-sm bg-neutral-8 mr-1">
 					{{ assigned_projectiles[key] || 0 }}
 				</span>
 				<TargetItem :item="key" />
@@ -65,6 +77,18 @@ export default {
 		},
 	},
 	methods: {
+		divide() {
+			for (const [i, key] of this.targeted.entries()) {
+				const extra = this.projectileCount % this.targeted.length > i;
+				const target_projectiles = Math.floor(this.projectileCount / this.targeted.length) + extra;
+
+				console.log(target_projectiles, this.targeted.length, this.projectileCount);
+
+				for (let i = 0; i < target_projectiles; i++) {
+					this.setProjectile(true, key);
+				}
+			}
+		},
 		setProjectile(add, key) {
 			const count = this.assigned_projectiles[key];
 			let new_value = count || 0;

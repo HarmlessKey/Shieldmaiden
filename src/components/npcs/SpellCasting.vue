@@ -181,7 +181,11 @@
 
 		<q-dialog square v-model="spells_dialog">
 			<div>
-				<hk-card :header="category === 'caster' ? 'Add spells' : 'Add innate spells'" class="mb-0">
+				<hk-card
+					:header="category === 'caster' ? 'Add spells' : 'Add innate spells'"
+					class="mb-0"
+					:minWidth="320"
+				>
 					<div class="card-body">
 						<CopyContent
 							type="spell"

@@ -205,6 +205,12 @@ export default {
 			background-size: cover;
 			background-position: center top;
 			border: solid 1px $neutral-4;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 28px;
+			color: $neutral-2;
+			background-color: $neutral-8;
 		}
 		&-name {
 			flex-grow: 1;

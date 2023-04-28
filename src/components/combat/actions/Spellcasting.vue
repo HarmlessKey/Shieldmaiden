@@ -309,7 +309,6 @@ export default {
 						} else {
 							spell.level = value.level;
 						}
-
 						return spell;
 					})
 				);

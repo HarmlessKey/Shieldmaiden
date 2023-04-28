@@ -12,6 +12,17 @@ export const runEncounter = {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
+		/**
+		 * Rolls an action or spell in run encounter
+		 *
+		 * @param {Event} e Event
+		 * @param {number} action_index or spell_level used to track limited uses
+		 * @param {object} action full action or spell
+		 * @param {category} action actions | reactions | legendary_actions | special_abilities | innate | caster
+		 * @param {object} entity the caster of the action
+		 * @param {array|object} targets array of keys or object with { [key]: projectile_count }
+		 * @param {string} option if an action/spell has options, this is the selected option
+		 */
 		roll_action({ e, action_index, action, category, entity, targets, option = undefined }) {
 			let roll;
 			const is_spell = ["innate", "caster"].includes(category);
@@ -29,6 +40,7 @@ export const runEncounter = {
 				action.action_list = action.actions;
 				config.attack_bonus = entity[`${category}_spell_attack`];
 				config.caster_level = entity[`${category}_level`];
+				config.save_dc = entity[`${category}_save_dc`];
 
 				// Innate spells are cast at the lowest possible level
 				config.cast_level = category === "innate" ? action.level : action_index;
@@ -59,7 +71,6 @@ export const runEncounter = {
 
 			for (const [key, projectiles] of Object.entries(targets)) {
 				for (let i = 1; i <= projectiles; i++) {
-					console.log(action.aoe_type);
 					let newRoll = { ...roll };
 
 					// Reroll for each target if it's not AOE

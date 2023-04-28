@@ -251,7 +251,7 @@ export const dice = {
 				// For a saving throw set the ability and DC for display
 				if (type === "save") {
 					returnRoll.actions[i].save_ability = action.save_ability;
-					returnRoll.actions[i].save_dc = action.save_dc || 10;
+					returnRoll.actions[i].save_dc = config.save_dc || action.save_dc || 10;
 				}
 
 				for (const roll of action.rolls) {

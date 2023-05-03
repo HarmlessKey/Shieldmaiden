@@ -113,9 +113,10 @@
 						>
 							<span class="save">
 								{{ ability.substring(0, 3).capitalize() }}
-								+{{ calcMod(data[ability]) + entity.proficiency
-								}}{{ 
-									index+1 &lt; entity.saving_throws.length ? "," : ""
+								+{{ calcMod(data[ability]) + entity.proficiency }}
+								{{
+									// eslint-disable-next-line vue/no-parsing-error
+									index + 1 < entity.saving_throws.length ? "," : ""
 								}}
 							</span>
 						</hk-roll>
@@ -147,8 +148,10 @@
 							"
 						>
 							<span class="save">
-								{{ skill }} {{ skillModifier(skillList[skill].ability, skill)
-								}}{{ index+1 &lt; entity.skills.length ? "," : "" }}
+								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}
+
+								<!-- eslint-disable-next-line vue/no-parsing-error -->
+								{{ index + 1 < entity.skills.length ? "," : "" }}
 							</span>
 						</hk-roll>
 						<br />
@@ -285,9 +288,11 @@
 						</template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
-								{{ spell.name
-								}}<template #content> <Spell :id="spell.key" /> </template></hk-popover
-							>{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
+								{{ spell.name }}
+								<template #content> <Spell :id="spell.key" /> </template
+							></hk-popover>
+							<!-- eslint-disable-next-line vue/no-parsing-error -->
+							{{ index + 1 < spellsForLevel(level).length ? "," : "" }}
 						</i>
 					</div>
 				</template>
@@ -342,8 +347,10 @@
 								{{ spell.name }}
 								<template #content>
 									<Spell :id="spell.key" />
-								</template> </hk-popover
-							>{{ index+1 &lt; spellsForLimit(limit).length ? "," : "" }}
+								</template>
+							</hk-popover>
+							<!-- eslint-disable-next-line vue/no-parsing-error -->
+							{{ index + 1 < spellsForLimit(limit).length ? "," : "" }}
 						</i>
 					</div>
 				</template>
@@ -526,19 +533,16 @@
 											roll.damage_type,
 										]"
 									/>
-									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
-									}}<template v-if="roll.fixed_val && roll.dice_count">
-										{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
-
-
-
-
-
-
-
-										}}) </template
-									><template v-else>{{ roll.fixed_val }})</template>
-									{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
+									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : `` }}
+									<template v-if="roll.fixed_val && roll.dice_count">
+										{{
+											// eslint-disable-next-line vue/no-parsing-error
+											roll.fixed_val < 0 ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+										}})
+									</template>
+									<template v-else>{{ roll.fixed_val }})</template>
+									<!-- eslint-disable-next-line vue/no-parsing-error -->
+									{{ roll_index + 1 < action.action_list[0].rolls.length ? "+" : "" }}
 									<q-tooltip anchor="top middle" self="center middle">
 										{{
 											action.action_list[0].type === "healing"
@@ -726,7 +730,9 @@ export default {
 				? this.entity.skills_expertise.includes(key)
 				: false;
 
-			return calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise);
+			const jack_oa_trades = this.entity.skills_jack_of_all_trades;
+
+			return calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise, jack_oa_trades);
 		},
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)

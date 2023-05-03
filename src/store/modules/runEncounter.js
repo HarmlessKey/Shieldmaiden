@@ -368,6 +368,7 @@ const run_encounter_actions = {
 
 				entity.skills = db_player.skills;
 				entity.skills_expertise = db_player.skills_expertise;
+				entity.skills_jack_of_all_trades = db_player.skills_jack_of_all_trades;
 				entity.experience = db_player.experience;
 				entity.level = db_player.level;
 				break;

@@ -215,6 +215,9 @@
 							".validate": "newData.isString() && newData.val().matches(/^(acrobatics|animal Handling|arcana|athletics|deception|history|insight|intimidation|investigation|medicine|nature|perception|performance|persuasion|religion|sleight of Hand|stealth|survival)$/)"
 						}
 					},
+					"skills_jack_of_all_trades": {
+						".validate": "newData.isBoolean()"
+					},
 					"companions": {
 						"$npcId": {
 							".validate": "newData.isBoolean()"

@@ -38,11 +38,14 @@ export function calc_skill_mod(
 	proficiency,
 	bonus = 0,
 	proficient = false,
-	expertise = false
+	expertise = false,
+	jack_of_all_trades = false
 ) {
 	let mod = ability_mod;
 	if (proficient) {
 		mod = expertise ? mod + proficiency * 2 : mod + proficiency;
+	} else if (jack_of_all_trades) {
+		mod += Math.floor(proficiency / 2);
 	}
 	return parseInt(mod) + parseInt(bonus);
 }

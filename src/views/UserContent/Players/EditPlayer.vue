@@ -487,13 +487,32 @@
 					<!-- SKILLS -->
 					<hk-card header="Skills">
 						<div class="card-body">
-							<h5>
-								Proficiency Bonus: +<strong class="blue">{{
-									returnProficiency(
-										player.level ? player.level : calculatedLevel(player.experience)
-									)
-								}}</strong>
-							</h5>
+							<div class="d-flex justify-between">
+								<h5>
+									Proficiency Bonus: +<strong class="blue">{{
+										returnProficiency(
+											player.level ? player.level : calculatedLevel(player.experience)
+										)
+									}}</strong>
+								</h5>
+								<q-checkbox
+									size="s"
+									:dark="$store.getters.theme === 'dark'"
+									:false-value="null"
+									v-model="player.skills_jack_of_all_trade"
+									indeterminate-value="something-else"
+									left-label
+								>
+									<template slot:label>
+										<q-icon name="info" class="mr-2 pointer blue" size="xs">
+											<q-tooltip anchor="top middle" self="center middle">
+												Adds ½ proficiency modifier to skill you are not profficient in.
+											</q-tooltip>
+										</q-icon>
+										<span>Jack of all Trades</span>
+									</template>
+								</q-checkbox>
+							</div>
 
 							<div class="skills">
 								<div
@@ -720,6 +739,7 @@ export default {
 			avatar_dialog: false,
 			preview_new_upload: undefined,
 			companion_dialog: false,
+			skills_jack_of_all_trade: false,
 			player: {},
 			loading: this.$route.name === "Edit player",
 			companions_to_delete: [],
@@ -932,12 +952,18 @@ export default {
 			const proficiency = this.returnProficiency(
 				this.player.level ? this.player.level : this.calculatedLevel(this.player.experience)
 			);
+
 			const proficient = this.player.skills ? this.player.skills.includes(key) : false;
 			const expertise = this.player.skills_expertise
 				? this.player.skills_expertise.includes(key)
 				: false;
 
-			const mod = calc_skill_mod(ability_mod, proficiency, 0, proficient, expertise);
+			let bonus = 0;
+			if (proficient === false) {
+				bonus = this.player.skills_jack_of_all_trade ? Math.floor(proficiency / 2) : 0;
+			}
+
+			const mod = calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise);
 			return parseInt(mod);
 		},
 		saveBlob(value) {

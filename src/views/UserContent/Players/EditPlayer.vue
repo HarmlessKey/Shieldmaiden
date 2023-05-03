@@ -499,7 +499,7 @@
 									size="s"
 									:dark="$store.getters.theme === 'dark'"
 									:false-value="null"
-									v-model="player.skills_jack_of_all_trade"
+									v-model="player.skills_jack_of_all_trades"
 									indeterminate-value="something-else"
 									left-label
 								>
@@ -739,7 +739,7 @@ export default {
 			avatar_dialog: false,
 			preview_new_upload: undefined,
 			companion_dialog: false,
-			skills_jack_of_all_trade: false,
+			skills_jack_of_all_trades: false,
 			player: {},
 			loading: this.$route.name === "Edit player",
 			companions_to_delete: [],
@@ -957,13 +957,16 @@ export default {
 			const expertise = this.player.skills_expertise
 				? this.player.skills_expertise.includes(key)
 				: false;
+			const jack_oa_trades = this.player.skills_jack_of_all_trades;
 
-			let bonus = 0;
-			if (proficient === false) {
-				bonus = this.player.skills_jack_of_all_trade ? Math.floor(proficiency / 2) : 0;
-			}
-
-			const mod = calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise);
+			const mod = calc_skill_mod(
+				ability_mod,
+				proficiency,
+				0,
+				proficient,
+				expertise,
+				jack_oa_trades
+			);
 			return parseInt(mod);
 		},
 		saveBlob(value) {

@@ -730,7 +730,9 @@ export default {
 				? this.entity.skills_expertise.includes(key)
 				: false;
 
-			return calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise);
+			const jack_oa_trades = this.entity.skills_jack_of_all_trades;
+
+			return calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise, jack_oa_trades);
 		},
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)

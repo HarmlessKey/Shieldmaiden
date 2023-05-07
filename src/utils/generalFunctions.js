@@ -129,14 +129,23 @@ export function makeDate(input, showTime = false, short = false) {
 export function characterToPlayer(character) {
 	const player = {};
 
-	if (character.armor_class != undefined && character.armor_class !== "")
-		player.ac = parseInt(character.armor_class.between(1, 99));
 	if (character.avatar != undefined && character.avatar !== "")
 		player.avatar =
 			character.avatar.length <= 2000 ? character.avatar : character.avatar.subString(0, 2000);
 	if (character.name != undefined && character.name !== "")
 		player.character_name =
 			character.name.length <= 100 ? character.name : character.name.subString(0, 100);
+
+	if (character.xp != undefined && character.xp !== "")
+		player.experience = parseInt(character.xp.between(0, 355000));
+	else if (character.level != undefined && character.level !== "")
+		player.level = parseInt(character.level.between(1, 20));
+
+	if (character.armor_class != undefined && character.armor_class !== "")
+		player.ac = parseInt(character.armor_class.between(1, 99));
+	if (character.max_hit_points != undefined && character.max_hit_points !== "")
+		player.maxHp = parseInt(character.max_hit_points.between(1, 999));
+
 	if (character.strength != undefined && character.strength !== "")
 		player.strength = parseInt(character.strength.between(1, 99));
 	if (character.dexterity != undefined && character.dexterity !== "")
@@ -145,12 +154,11 @@ export function characterToPlayer(character) {
 		player.constitution = parseInt(character.constitution.between(1, 99));
 	if (character.intelligence != undefined && character.intelligence !== "")
 		player.intelligence = parseInt(character.intelligence.between(1, 99));
-	if (character.xp != undefined && character.xp !== "")
-		player.experience = parseInt(character.xp.between(0, 355000));
-	else if (character.level != undefined && character.level !== "")
-		player.level = parseInt(character.level.between(1, 20));
-	if (character.max_hit_points != undefined && character.max_hit_points !== "")
-		player.maxHp = parseInt(character.max_hit_points.between(1, 999));
+	if (character.wisdom != undefined && character.wisdom !== "")
+		player.wisdom = parseInt(character.wisdom.between(1, 99));
+	if (character.charsima != undefined && character.charsima !== "")
+		player.charsima = parseInt(character.charsima.between(1, 99));
+
 	if (character.walking_speed != undefined && character.walking_speed !== "")
 		player.speed = parseInt(character.walking_speed.between(0, 999));
 	if (character.initiative != undefined && character.initiative !== "")

@@ -156,8 +156,8 @@ export function characterToPlayer(character) {
 		player.intelligence = parseInt(character.intelligence.between(1, 99));
 	if (character.wisdom != undefined && character.wisdom !== "")
 		player.wisdom = parseInt(character.wisdom.between(1, 99));
-	if (character.charsima != undefined && character.charsima !== "")
-		player.charsima = parseInt(character.charsima.between(1, 99));
+	if (character.charisma != undefined && character.charisma !== "")
+		player.charisma = parseInt(character.charisma.between(1, 99));
 
 	if (character.walking_speed != undefined && character.walking_speed !== "")
 		player.speed = parseInt(character.walking_speed.between(0, 999));

@@ -19,6 +19,7 @@ import HkLinkCharacter from "../components/hk-components/hk-link-character";
 import HkActionRollForm from "../components/hk-components/hk-action-rolls/hk-action-roll-form";
 import HkActionRollsTable from "../components/hk-components/hk-action-rolls/hk-action-rolls-table";
 import HkActionRollScaling from "../components/hk-components/hk-action-rolls/hk-action-roll-scaling";
+import HkEffectsForm from "../components/hk-components/hk-effects-form";
 
 export default async ({ Vue }) => {
 	Vue.component("hk-table", HkTable);
@@ -42,4 +43,5 @@ export default async ({ Vue }) => {
 	Vue.component("hk-action-roll-form", HkActionRollForm);
 	Vue.component("hk-action-rolls-table", HkActionRollsTable);
 	Vue.component("hk-action-roll-scaling", HkActionRollScaling);
+	Vue.component("hk-effects-form", HkEffectsForm);
 };

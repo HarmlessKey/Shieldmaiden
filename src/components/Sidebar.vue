@@ -68,6 +68,19 @@
 								Spells
 							</q-tooltip>
 						</q-item>
+						<q-item clickable v-ripple to="/content/effects">
+							<q-item-section avatar>
+								<i aria-hidden="true" class="fas fa-transporter" />
+							</q-item-section>
+							<q-item-section class="title">Effects</q-item-section>
+							<q-tooltip
+								v-if="$store.getters.side_collapsed"
+								anchor="center right"
+								self="center left"
+							>
+								Effects
+							</q-tooltip>
+						</q-item>
 						<q-item clickable v-ripple to="/content/reminders">
 							<q-item-section avatar>
 								<i aria-hidden="true" class="fas fa-stopwatch" />

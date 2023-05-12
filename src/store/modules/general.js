@@ -66,6 +66,7 @@ export default {
 							dispatch("campaigns/fetch_campaign_count"),
 							dispatch("encounters/fetch_encounter_count"),
 							dispatch("reminders/fetch_reminder_count"),
+							dispatch("effects/fetch_effect_count"),
 							dispatch("spells/fetch_spell_count"),
 						]);
 					})

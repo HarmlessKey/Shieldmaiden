@@ -1414,6 +1414,26 @@
 				}
 			}
 		},
+		"effects": {
+			"$uid": {
+				"$effectId": {
+					"$other": { ".validate": false },
+					".write": "$uid === auth.uid"
+				},
+				".write": "root.child('users').child(auth.uid).child('admin').exists()",
+				".read": true,
+				".indexOn": ["metadata/tagged", "metadata/finished"]
+			}
+		},
+		"search_effects": {
+			".read": true,
+			"$uid": {
+				".write": "$uid === auth.uid",
+				"results": {
+					".indexOn": ["name"]
+				}
+			}
+		},
 		"reminders": {
 			"$uid": {
 				".write": "$uid === auth.uid",

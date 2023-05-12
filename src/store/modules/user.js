@@ -239,9 +239,10 @@ const user_actions = {
 		count.players = rootGetters["players/player_count"];
 		count.characters = rootGetters["characters/character_count"];
 		count.npcs = rootGetters["npcs/npc_count"];
+		count.spells = rootGetters["spells/spell_count"];
+		count.effects = rootGetters["effects/effect_count"];
 		count.items = rootGetters["items/item_count"];
 		count.reminders = rootGetters["reminders/reminder_count"];
-		count.spells = rootGetters["spells/spell_count"];
 		count.encounters = 0;
 
 		let used_slots = Object.values(count).reduce((sum, count) => sum + count, 0);
@@ -273,10 +274,11 @@ const user_actions = {
 				count.campaigns > benefits.campaigns ||
 				count.encounters > benefits.encounters ||
 				count.npcs > benefits.npcs ||
+				count.spells > benefits.spells ||
+				count.effects > benefits.effects ||
 				count.items > benefits.items ||
 				count.reminders > benefits.reminders ||
 				count.players > benefits.players ||
-				count.spells > benefits.spells ||
 				count.characters > benefits.characters;
 			commit("SET_SLOTS_USED", { available_slots, used_slots });
 		}

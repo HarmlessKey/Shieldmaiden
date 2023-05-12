@@ -396,6 +396,48 @@ const routes = [
 				],
 			},
 
+			// Effects
+			{
+				path: "effects",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Effects",
+				},
+				children: [
+					{
+						path: "",
+						name: "Effects",
+						component: () => import("src/views/UserContent/Effects"),
+						meta: {
+							title: "Effects",
+							description: "Your custom effects for Harmless Key.",
+						},
+					},
+					{
+						path: "add-effect",
+						name: "Add effect",
+						component: () => import("src/views/UserContent/Effects/EditEffect.vue"),
+						meta: {
+							title: "Add effect",
+							description: "Add a new effect on Harmless Key.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Edit effect",
+						component: () => import("src/views/UserContent/Effects/EditEffect.vue"),
+						meta: {
+							title: "Edit effect",
+							description: "Edit an existing effect Harmless Key.",
+						},
+					},
+				],
+			},
+
 			// Reminders
 			{
 				path: "reminders",

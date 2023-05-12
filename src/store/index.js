@@ -12,6 +12,7 @@ import campaigns from "./modules/userContent/campaigns.js";
 import npcs from "./modules/userContent/npcs.js";
 import items from "./modules/userContent/items.js";
 import spells from "./modules/userContent/spells.js";
+import effects from "./modules/userContent/effects.js";
 import reminders from "./modules/userContent/reminders.js";
 import players from "./modules/userContent/players.js";
 import encounters from "./modules/userContent/encounters.js";
@@ -44,6 +45,7 @@ export default function () {
 			npcs: npcs,
 			items: items,
 			spells: spells,
+			effects: effects,
 			reminders: reminders,
 			players: players,
 			encounters: encounters,

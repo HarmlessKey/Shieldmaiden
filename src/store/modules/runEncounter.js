@@ -429,6 +429,7 @@ const run_encounter_actions = {
 					entity.tempHp = db_entity.tempHp;
 					entity.maxHpMod = db_entity.maxHpMod;
 					entity.ac_bonus = db_entity.ac_bonus;
+					entity.friendly = !!db_entity.friendly;
 					entity.maxHp = entity.maxHpMod
 						? parseInt(db_entity.maxHp + entity.maxHpMod)
 						: parseInt(db_entity.maxHp);

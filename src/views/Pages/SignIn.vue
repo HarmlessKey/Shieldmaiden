@@ -90,7 +90,7 @@ export default {
 		googleSignIn() {
 			const provider = new firebase.auth.GoogleAuthProvider();
 			this.loading = true;
-			if (this.browser === "Edge") {
+			if (this.browser === "Edge" || this.browser === "Safari") {
 				auth
 					.signInWithRedirect(provider)
 					.then(async (result) => {

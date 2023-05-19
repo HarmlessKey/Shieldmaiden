@@ -3,7 +3,6 @@ import { uuid } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
 import Vue from "vue";
-import router from "src/router";
 
 const demoEncounter = {
 	name: "Demo Encounter",

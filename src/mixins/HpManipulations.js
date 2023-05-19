@@ -6,7 +6,6 @@ export const setHP = {
 	mixins: [remindersMixin],
 	data() {
 		return {
-			demo: this.$route.name === "Demo",
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 		};
@@ -20,7 +19,7 @@ export const setHP = {
 		};
 	},
 	computed: {
-		...mapGetters(["encounter"]),
+		...mapGetters(["encounter", "demo", "test"]),
 	},
 	methods: {
 		...mapActions(["set_save", "set_stable", "set_hp", "set_dead", "set_log", "set_meters"]),
@@ -171,43 +170,41 @@ export const setHP = {
 				over = config.undo !== true ? -config.undo : 0;
 			}
 
-			if (!this.demo) {
-				if (!config.undo) {
-					await this.set_meters({ key: current.key, type: "damage", amount }); //Damage done
-					await this.set_meters({ key: current.key, type: "overkill", amount: over }); //Over damage done
-					await this.set_meters({ key: target.key, type: "damageTaken", amount }); //Damage taken
-					await this.set_meters({ key: target.key, type: "overkillTaken", amount: over }); //Over damage taken
+			if (!config.undo) {
+				await this.set_meters({ key: current.key, type: "damage", amount }); //Damage done
+				await this.set_meters({ key: current.key, type: "overkill", amount: over }); //Over damage done
+				await this.set_meters({ key: target.key, type: "damageTaken", amount }); //Damage taken
+				await this.set_meters({ key: target.key, type: "overkillTaken", amount: over }); //Over damage taken
 
-					// Campaign wide damage meters (no need to go through store)
-					// Damage done by players
-					if (["player", "companion"].includes(current.entityType)) {
-						await this.damageMeters(current.key, "damage", amount, current.entityType); //Damage done
-						await this.damageMeters(current.key, "overkill", over, current.entityType); //Over damage done
-					}
-
-					// Damage taken by players
-					if (["player", "companion"].includes(target.entityType)) {
-						await this.damageMeters(target.key, "damageTaken", amount, target.entityType); //damage taken
-						await this.damageMeters(target.key, "overkillTaken", over, target.entityType); //Over damage taken
-					}
+				// Campaign wide damage meters (no need to go through store)
+				// Damage done by players
+				if (["player", "companion"].includes(current.entityType)) {
+					await this.damageMeters(current.key, "damage", amount, current.entityType); //Damage done
+					await this.damageMeters(current.key, "overkill", over, current.entityType); //Over damage done
 				}
-				//To undo, run same function with opposite types
-				else {
-					await this.set_meters({ key: current.key, type: "healing", amount }); //Undo damage done
-					await this.set_meters({ key: current.key, type: "overhealing", amount: over }); //Undo Over damage done
-					await this.set_meters({ key: target.key, type: "healingTaken", amount }); //Undo damage taken
-					await this.set_meters({ key: target.key, type: "overhealingTaken", amount: over }); //Undo Over damage taken
 
-					// Campaign wide damage meters (no need to go through store)
-					// Undo damage done by players
-					if (["player", "companion"].includes(current.entityType)) {
-						await this.damageMeters(current.key, "healing", amount, current.entityType); //Undo Damage done
-						await this.damageMeters(current.key, "overhealing", over, current.entityType); //Undo Over damage done
-					}
-					if (["player", "companion"].includes(target.entityType)) {
-						await this.damageMeters(target.key, "healingTaken", amount, target.entityType); //Undo damage taken
-						await this.damageMeters(target.key, "overhealingTaken", over, target.entityType); //Undo Over damage taken
-					}
+				// Damage taken by players
+				if (["player", "companion"].includes(target.entityType)) {
+					await this.damageMeters(target.key, "damageTaken", amount, target.entityType); //damage taken
+					await this.damageMeters(target.key, "overkillTaken", over, target.entityType); //Over damage taken
+				}
+			}
+			//To undo, run same function with opposite types
+			else {
+				await this.set_meters({ key: current.key, type: "healing", amount }); //Undo damage done
+				await this.set_meters({ key: current.key, type: "overhealing", amount: over }); //Undo Over damage done
+				await this.set_meters({ key: target.key, type: "healingTaken", amount }); //Undo damage taken
+				await this.set_meters({ key: target.key, type: "overhealingTaken", amount: over }); //Undo Over damage taken
+
+				// Campaign wide damage meters (no need to go through store)
+				// Undo damage done by players
+				if (["player", "companion"].includes(current.entityType)) {
+					await this.damageMeters(current.key, "healing", amount, current.entityType); //Undo Damage done
+					await this.damageMeters(current.key, "overhealing", over, current.entityType); //Undo Over damage done
+				}
+				if (["player", "companion"].includes(target.entityType)) {
+					await this.damageMeters(target.key, "healingTaken", amount, target.entityType); //Undo damage taken
+					await this.damageMeters(target.key, "overhealingTaken", over, target.entityType); //Undo Over damage taken
 				}
 			}
 		},
@@ -278,46 +275,45 @@ export const setHP = {
 			}
 
 			// Update the healing meters
-			if (!this.demo) {
-				if (!config.undo) {
-					// Meters for the encounter
-					await this.set_meters({ key: current.key, type: "healing", amount }); //Healing done
-					await this.set_meters({ key: current.key, type: "overhealing", amount: over }); //Over healing done
-					await this.set_meters({ key: target.key, type: "healingTaken", amount }); //Healing taken
-					await this.set_meters({ key: target.key, type: "overhealingTaken", amount: over }); //Over healing taken
 
-					// Campaign wide healing meters (no need to go through store)
-					// Healing done by players
-					if (["player", "companion"].includes(current.entityType)) {
-						await this.damageMeters(current.key, "healing", amount, current.entityType); //Healing done
-						await this.damageMeters(current.key, "overhealing", over, current.entityType); //Over healing done
-					}
+			if (!config.undo) {
+				// Meters for the encounter
+				await this.set_meters({ key: current.key, type: "healing", amount }); //Healing done
+				await this.set_meters({ key: current.key, type: "overhealing", amount: over }); //Over healing done
+				await this.set_meters({ key: target.key, type: "healingTaken", amount }); //Healing taken
+				await this.set_meters({ key: target.key, type: "overhealingTaken", amount: over }); //Over healing taken
 
-					// Healing taken by players
-					if (["player", "companion"].includes(target.entityType)) {
-						await this.damageMeters(target.key, "healingTaken", amount, target.entityType); //Healing taken
-						await this.damageMeters(target.key, "overhealingTaken", over, target.entityType); //Over healing taken
-					}
+				// Campaign wide healing meters (no need to go through store)
+				// Healing done by players
+				if (["player", "companion"].includes(current.entityType)) {
+					await this.damageMeters(current.key, "healing", amount, current.entityType); //Healing done
+					await this.damageMeters(current.key, "overhealing", over, current.entityType); //Over healing done
 				}
-				// To undo, run same function with opposite types
-				else {
-					await this.set_meters({ key: current.key, type: "damage", amount }); //Undo Healing done
-					await this.set_meters({ key: current.key, type: "overkill", amount: over }); //Undo Over Healing done
-					await this.set_meters({ key: target.key, type: "damageTaken", amount }); //Undo Healing taken
-					await this.set_meters({ key: target.key, type: "overkillTaken", amount: over }); //Undo Over Healing taken
 
-					// Campaign wide healing meters (no need to go through store)
-					// Undo healing done by players
-					if (["player", "companion"].includes(current.entityType)) {
-						await this.damageMeters(current.key, "damage", amount, current.entityType); //Undo Healing done
-						await this.damageMeters(current.key, "overkill", over, current.entityType); //Undo Over healing done
-					}
+				// Healing taken by players
+				if (["player", "companion"].includes(target.entityType)) {
+					await this.damageMeters(target.key, "healingTaken", amount, target.entityType); //Healing taken
+					await this.damageMeters(target.key, "overhealingTaken", over, target.entityType); //Over healing taken
+				}
+			}
+			// To undo, run same function with opposite types
+			else {
+				await this.set_meters({ key: current.key, type: "damage", amount }); //Undo Healing done
+				await this.set_meters({ key: current.key, type: "overkill", amount: over }); //Undo Over Healing done
+				await this.set_meters({ key: target.key, type: "damageTaken", amount }); //Undo Healing taken
+				await this.set_meters({ key: target.key, type: "overkillTaken", amount: over }); //Undo Over Healing taken
 
-					// Undo healing taken by players
-					if (["player", "companion"].includes(target.entityType)) {
-						await this.damageMeters(target.key, "damageTaken", amount, target.entityType); //Undo Healing taken
-						await this.damageMeters(target.key, "overkillTaken", over, target.entityType); //Undo overhealing taken
-					}
+				// Campaign wide healing meters (no need to go through store)
+				// Undo healing done by players
+				if (["player", "companion"].includes(current.entityType)) {
+					await this.damageMeters(current.key, "damage", amount, current.entityType); //Undo Healing done
+					await this.damageMeters(current.key, "overkill", over, current.entityType); //Undo Over healing done
+				}
+
+				// Undo healing taken by players
+				if (["player", "companion"].includes(target.entityType)) {
+					await this.damageMeters(target.key, "damageTaken", amount, target.entityType); //Undo Healing taken
+					await this.damageMeters(target.key, "overkillTaken", over, target.entityType); //Undo overhealing taken
 				}
 			}
 		},
@@ -356,13 +352,15 @@ export const setHP = {
 			});
 		},
 		async damageMeters(key, type, amount, entityType) {
-			await this.update_damage_meters({
-				campaignId: this.campaignId,
-				entityType,
-				id: key,
-				property: type,
-				value: amount,
-			});
+			if (!this.demo && !this.test) {
+				await this.update_damage_meters({
+					campaignId: this.campaignId,
+					entityType,
+					id: key,
+					property: type,
+					value: amount,
+				});
+			}
 		},
 	},
 };

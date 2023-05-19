@@ -53,30 +53,30 @@
 		</template>
 		<hk-loader v-else-if="!parsed" prefix="Validating" :title="type_label" />
 		<div v-else-if="!importing">
-			<template v-for="type in Object.keys(imports)">
-				<div v-if="imports[type].length" class="mb-4" :key="type">
+			<template v-for="import_type in Object.keys(imports)">
+				<div v-if="imports[import_type].length" class="mb-4" :key="import_type">
 					<p>
 						Found
-						<span :class="type === 'unique' ? 'green' : 'orange'">
-							{{ imports[type].length }} {{ type === "unique" ? "new" : "duplicate" }}
+						<span :class="import_type === 'unique' ? 'green' : 'orange'">
+							{{ imports[import_type].length }} {{ import_type === "unique" ? "new" : "duplicate" }}
 						</span>
 						{{ type_label }}
 					</p>
 					<q-table
-						class="sticky-header-table mb-2"
+						class="sticky-header-table mb-2 no-table-margin"
 						:virtual-scroll-sticky-size-start="48"
 						:dark="$store.getters.theme !== 'light'"
 						flat
 						dense
 						square
-						:data="imports[type]"
+						:data="imports[import_type]"
 						:columns="columns"
 						row-key="index"
 						virtual-scroll
 						:pagination.sync="pagination"
 						:rows-per-page-options="[0]"
 						selection="multiple"
-						:selected.sync="selected[type]"
+						:selected.sync="selected[import_type]"
 						hide-bottom
 					>
 						<template v-slot:body-cell-invalid="props">
@@ -102,12 +102,69 @@
 						</template>
 					</q-table>
 					<q-toggle
-						v-if="type === 'duplicate'"
+						v-if="import_type === 'duplicate'"
 						v-model="overwrite"
 						label="Overwrite duplicates"
 						unchecked-icon="none"
 					/>
 				</div>
+			</template>
+			<template v-if="Object.values(custom_spells).length">
+				<p>
+					Found
+					<span class="yellow"> {{ Object.values(custom_spells).length }}</span>
+					Custom Spells
+					<q-toggle
+						v-model="import_custom_spells"
+						label="Import custom spells"
+						unchecked-icon="none"
+					/>
+				</p>
+				<template v-if="import_custom_spells">
+					<q-table
+						class="sticky-header-table mb-2 no-table-margin"
+						:virtual-scroll-sticky-size-start="48"
+						:dark="$store.getters.theme !== 'light'"
+						flat
+						dense
+						square
+						virtual-scroll
+						:pagination.sync="pagination"
+						:rows-per-page-options="[0]"
+						:data="Object.values(custom_spells)"
+						:columns="columns"
+						row-key="index"
+						hide-bottom
+					>
+						<template v-slot:body-cell-invalid="props">
+							<td class="text-right">
+								<hk-popover v-if="props.row.errors" header="Validation errors">
+									<q-icon name="error" class="red" />
+									<div slot="content">
+										<ol class="px-3">
+											<li
+												v-for="(error, i) in props.row.errors"
+												:key="`${props.row.index}-error-${i}`"
+												class="red"
+											>
+												<strong v-if="error.instancePath" class="neutral-1">
+													{{ error.instancePath }}
+												</strong>
+												{{ error.message.capitalize() }}
+											</li>
+										</ol>
+									</div>
+								</hk-popover>
+							</td>
+						</template>
+					</q-table>
+					<div v-if="Object.keys(this.custom_spells).length > this.availableSpellSlots">
+						Insufficient spell slots. You're trying to import
+						<strong class="red">{{ Object.keys(this.custom_spells).length }}</strong> spells,<br />
+						but have only <strong class="red">{{ availableSpellSlots }}</strong> slots available.
+						You can still import the selected NPCs if you deselect
+					</div>
+				</template>
 			</template>
 			<div v-if="importTotal > availableSlots">
 				Insufficient slots. You're trying to import
@@ -256,6 +313,9 @@ export default {
 			overwrite: true,
 			parsing: false,
 			parsed: false,
+			map_old_to_custom: {},
+			custom_spells: {},
+			import_custom_spells: true,
 			failed_imports: [],
 			importing: undefined,
 			imported: 0,
@@ -310,6 +370,11 @@ export default {
 				? Infinity
 				: this.tier.benefits[this.type] - this.content_count;
 		},
+		availableSpellSlots() {
+			return this.tier.benefits["spells"] === "infinite"
+				? Infinity
+				: this.tier.benefits["spells"] - this.spell_count;
+		},
 		importTotal() {
 			return !this.overwrite
 				? this.selected.unique.length + this.selected.duplicate.length
@@ -321,7 +386,14 @@ export default {
 	},
 	methods: {
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc"]),
-		...mapActions("spells", ["add_spell", "edit_spell", "get_spells", "get_spell"]),
+		...mapActions("spells", [
+			"add_spell",
+			"edit_spell",
+			"get_spells",
+			"get_spell",
+			"get_spell_id_by_name",
+			"reserve_spell_id",
+		]),
 		async getItem(id) {
 			return this.type === "npcs"
 				? this.get_npc({ uid: this.uid, id })
@@ -370,7 +442,7 @@ export default {
 				let checkable_item = item;
 				// Parse versatile to options for NPCs
 				if (this.type === "npcs") {
-					checkable_item = this.removeCustomSpells(item);
+					checkable_item = await this.parseCustomSpells(item);
 					checkable_item = this.versatileToOptions(item);
 				}
 
@@ -410,6 +482,21 @@ export default {
 			this.parsed = true;
 		},
 		async importData() {
+			// First check if there are custom spells from imported NPCs that need to be added.
+			if (
+				this.import_custom_spells &&
+				this.custom_spells &&
+				Object.keys(this.custom_spells).length <= this.availableSpellSlots
+			) {
+				for (const [key, spell] of Object.entries(this.custom_spells)) {
+					try {
+						await this.edit_spell({ id: key, spell: spell });
+					} catch (error) {
+						this.failed_imports.push(spell);
+					}
+				}
+			}
+
 			if (this.importTotal <= this.availableSlots) {
 				this.importing = this.selected.unique.length + this.selected.duplicate.length;
 				for (const item of this.selected.unique) {
@@ -532,19 +619,32 @@ export default {
 			}
 			return npc;
 		},
-		removeCustomSpells(npc) {
-			delete npc.custom_spells;
+		async parseCustomSpells(npc) {
+			for (const [old_key, spell] of Object.entries(npc.custom_spells)) {
+				// Check if there already is a spell with name
+				let spell_id = await this.get_spell_id_by_name({ name: spell.name });
+				if (!spell_id) {
+					// Generate a id for the spell so when we can link the spell in NPC to a future spell
+					const new_spell_id = await this.reserve_spell_id();
+					spell_id = new_spell_id;
+					this.$set(this.custom_spells, spell_id, spell);
+				}
+
+				this.map_old_to_custom[old_key] = spell_id;
+			}
+
 			for (const spell_list_type of ["caster_spells", "innate_spells"]) {
 				if (npc[spell_list_type]) {
 					const spell_list = Object.assign({}, npc[spell_list_type]);
 					for (const [spell_key, spell] of Object.entries(spell_list)) {
-						if (spell.custom) {
+						if (spell.custom && spell_key in this.map_old_to_custom) {
+							npc[spell_list_type][this.map_old_to_custom[spell_key]] = { ...spell };
 							delete npc[spell_list_type][spell_key];
 						}
 					}
 				}
 			}
-
+			delete npc.custom_spells;
 			return npc;
 		},
 	},
@@ -554,5 +654,8 @@ export default {
 <style lang="scss" scoped>
 .q-expansion-item {
 	background-color: $neutral-9;
+}
+.no-table-margin::v-deep table {
+	margin-bottom: 0;
 }
 </style>

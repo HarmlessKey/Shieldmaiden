@@ -106,6 +106,23 @@ const spell_actions = {
 		return spell;
 	},
 
+	async get_spell_id_by_name({ rootGetters, dispatch }, { name }) {
+		console.log("store", name);
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_spell_services");
+			try {
+				const spells = await services.getSearchSpellByName(uid, name);
+				if (spells === null) {
+					return null;
+				}
+				return Object.keys(spells)[0];
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Adds a newly created SPELL for a user
 	 * A user can only add SPELLS for themselves so we use the uid from the store
@@ -183,6 +200,21 @@ const spell_actions = {
 				commit("SET_SPELL_COUNT", new_count);
 				dispatch("checkEncumbrance", "", { root: true });
 				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Reserve Spell id for future usage
+	 */
+	async reserve_spell_id({ rootGetters, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_spell_services");
+			try {
+				return await services.reserveSpellId(uid);
 			} catch (error) {
 				throw error;
 			}

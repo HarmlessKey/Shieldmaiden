@@ -60,6 +60,20 @@ export class SpellServices {
 		}
 	}
 
+	async getSearchSpellByName(uid, name) {
+		try {
+			const spell = await SEARCH_SPELLS_REF.child(uid)
+				.child("results")
+				.orderByChild("name")
+				.equalTo(name)
+				.get();
+
+			return spell.val();
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	/**
 	 * Adds an spell to the 'custom_spells' ref and the 'search_custom_spells' ref.
 	 * Also updates the count metadata in 'search_custom_spells'
@@ -126,6 +140,19 @@ export class SpellServices {
 		} catch (error) {
 			throw error;
 		}
+	}
+
+	/**
+	 * Reserve an ID for a spell that might be stored in the future
+	 * Useful when you don't know yet if you want to store a spell, but want to be able to link to it
+	 * from different db entries
+	 *
+	 * E.g. New NPC has Custom Spells that need to be stored, but you store both NPC and Spell at same time.
+	 *
+	 * @param {String} uid ID of active user
+	 */
+	async reserveSpellId(uid) {
+		return (await SPELLS_REF.child(uid).push()).key;
 	}
 
 	/**

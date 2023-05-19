@@ -3,6 +3,7 @@ import { uuid } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
 import Vue from "vue";
+import router from "src/router";
 
 const demoEncounter = {
 	name: "Demo Encounter",
@@ -114,6 +115,7 @@ const demoEncounter = {
 
 const getDefaultState = () => ({
 	demo: false,
+	test: false,
 	uid: undefined,
 	entities: {},
 	targeted: [],
@@ -131,6 +133,12 @@ const getDefaultState = () => ({
 const run_encounter_state = getDefaultState();
 
 const run_encounter_getters = {
+	test(state) {
+		return state.test;
+	},
+	demo(state) {
+		return state.demo;
+	},
 	entities(state) {
 		return state.entities;
 	},
@@ -175,7 +183,7 @@ const run_encounter_getters = {
 	},
 	log(state) {
 		//If there is a storage log, set it in the store
-		if (localStorage.getItem(state.encounterId)) {
+		if (localStorage.getItem(state.encounterId) && !state.test) {
 			state.log = JSON.parse(localStorage.getItem(state.encounterId));
 		}
 		return state.log;
@@ -196,12 +204,13 @@ const run_encounter_actions = {
 	 * @param {string} eid Encounter id
 	 * @param {boolean} demo Wether this is the demo encounter
 	 */
-	async init_Encounter({ commit, rootGetters, dispatch }, { cid, eid, demo }) {
+	async init_Encounter({ commit, rootGetters, dispatch }, { cid, eid, demo, test }) {
 		// Create the path to the encounter in firebase
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const path = `${uid}/${cid}/${eid}`;
 
 		commit("SET_DEMO", demo);
+		commit("SET_TEST", test);
 		commit("SET_UID", uid);
 		commit("SET_CAMPAIGN_ID", cid);
 		commit("SET_ENCOUNTER_ID", eid);
@@ -217,6 +226,13 @@ const run_encounter_actions = {
 					campaignId: cid,
 					id: eid,
 				});
+
+				// For tests, set round to 0
+				if (test) {
+					encounter.round = 0;
+					encounter.turn = 1;
+				}
+
 				commit("SET_ENCOUNTER", encounter);
 
 				// Setup the requests connection
@@ -262,7 +278,7 @@ const run_encounter_actions = {
 		let entity = {
 			name: db_entity.name,
 			id: db_entity.id,
-			initiative: db_entity.initiative,
+			initiative: state.test ? null : db_entity.initiative,
 			entityType: db_entity.entityType,
 			maxHp: db_entity.maxHp,
 			ac: parseInt(db_entity.ac),
@@ -282,7 +298,7 @@ const run_encounter_actions = {
 		entity.color_label = db_entity.color_label ? db_entity.color_label : null;
 		entity.limited_uses = db_entity.limited_uses ? db_entity.limited_uses : {};
 
-		if (db_entity.meters) {
+		if (!state.test && db_entity.meters) {
 			entity.damage = db_entity.meters.damage ? db_entity.meters.damage : 0;
 			entity.healing = db_entity.meters.healing ? db_entity.meters.healing : 0;
 			entity.overkill = db_entity.meters.overkill ? db_entity.meters.overkill : 0;
@@ -311,9 +327,9 @@ const run_encounter_actions = {
 				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
 				if (campaignPlayer) {
 					entity.curHp = campaignPlayer.curHp;
-					entity.tempHp = campaignPlayer.tempHp;
-					entity.ac_bonus = campaignPlayer.ac_bonus;
-					entity.maxHpMod = campaignPlayer.maxHpMod;
+					entity.tempHp = state.test ? 0 : campaignPlayer.tempHp;
+					entity.ac_bonus = state.test ? 0 : campaignPlayer.ac_bonus;
+					entity.maxHpMod = state.test ? 0 : campaignPlayer.maxHpMod;
 					entity.saves = campaignPlayer.saves ? campaignPlayer.saves : {};
 					entity.stable = campaignPlayer.stable ? campaignPlayer.stable : false;
 					entity.dead = campaignPlayer.dead ? campaignPlayer.dead : false;
@@ -331,7 +347,7 @@ const run_encounter_actions = {
 				}
 
 				//get other values from the player
-				let db_player = !state.demo
+				const db_player = !state.demo
 					? await dispatch("players/get_player", { uid, id: key })
 					: db_entity;
 
@@ -344,7 +360,7 @@ const run_encounter_actions = {
 				entity.maxHp = entity.maxHpMod
 					? parseInt(db_player.maxHp + entity.maxHpMod)
 					: parseInt(db_player.maxHp);
-
+				entity.curHp = state.test ? entity.maxHp : entity.curHp;
 				entity.saving_throws = [];
 				// Ability scores
 				for (const ability of abilities) {
@@ -425,7 +441,6 @@ const run_encounter_actions = {
 					}
 
 					// Values from encounter
-					entity.curHp = parseInt(db_entity.curHp);
 					entity.tempHp = db_entity.tempHp;
 					entity.maxHpMod = db_entity.maxHpMod;
 					entity.ac_bonus = db_entity.ac_bonus;
@@ -433,6 +448,7 @@ const run_encounter_actions = {
 					entity.maxHp = entity.maxHpMod
 						? parseInt(db_entity.maxHp + entity.maxHpMod)
 						: parseInt(db_entity.maxHp);
+					entity.curHp = state.test ? parseInt(entity.maxHp) : parseInt(db_entity.curHp);
 					entity.settings = db_entity.settings;
 
 					if (db_entity.transformed) {
@@ -555,6 +571,7 @@ const run_encounter_actions = {
 					campaignId: state.campaignId,
 					encounterId: state.encounterId,
 					npc,
+					test: state.test,
 				},
 				{ root: true }
 			);
@@ -579,6 +596,7 @@ const run_encounter_actions = {
 					encounterId: state.encounterId,
 					playerId: id,
 					player: entity,
+					test: state.test,
 				},
 				{ root: true }
 			);
@@ -589,13 +607,31 @@ const run_encounter_actions = {
 	},
 
 	/**
+	 * Adds a player or companion during an encounter
+	 *
+	 * @param {id} id
+	 * @param {object} entity player or companion object
+	 */
+	add_entity_demo({ dispatch, rootGetters }, entity) {
+		//generate semi random id
+		const key = uuid();
+		if (rootGetters["encounters/demo_encounter"]) {
+			dispatch("encounters/add_demo_entity", { key, entity });
+		} else {
+			Vue.set(demoEncounter.entities, key, entity);
+		}
+
+		dispatch("add_entity", key);
+	},
+
+	/**
 	 * Update turn and round
 	 *
 	 * @param {integer} turn
 	 * @param {integer} round
 	 */
 	async set_turn({ state, commit, dispatch }, { turn, round }) {
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			for (const property of ["turn", "round"]) {
 				const value = property === "turn" ? turn : round;
 				await dispatch(
@@ -711,7 +747,7 @@ const run_encounter_actions = {
 			if (curHp > valueIncMod) {
 				curHp = valueIncMod;
 
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					if (entityType === "npc") {
 						const update_path = entity.transformed ? "set_transformed_prop" : "set_entity_prop";
 						await dispatch(
@@ -798,7 +834,7 @@ const run_encounter_actions = {
 				const newValue = hpType === "maxHp" ? maxHp : curHp;
 
 				// Save new curHp in firebase
-				if (hpType === "curHp" && !state.demo) {
+				if (hpType === "curHp" && !state.demo && !state.test) {
 					if (entityType === "npc") {
 						const update_path = entity.transformed ? "set_transformed_prop" : "set_entity_prop";
 						await dispatch(
@@ -836,7 +872,7 @@ const run_encounter_actions = {
 		}
 
 		// UPDATE FIREBASE
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			// Transformed
 			if (
 				["transformedMaxHp", "transformedCurHp", "transformedAc", "transformedMaxHpMod"].includes(
@@ -985,7 +1021,7 @@ const run_encounter_actions = {
 			}
 
 			//Save the new values in Firebase and the store
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"encounters/set_entity_meters",
 					{
@@ -1009,7 +1045,7 @@ const run_encounter_actions = {
 	 * @param {boolean} active active or not
 	 */
 	async set_active({ state, commit, dispatch }, { key, active }) {
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/set_entity_prop",
 				{
@@ -1032,7 +1068,7 @@ const run_encounter_actions = {
 	 * @param {boolean} hidden hidden or not
 	 */
 	async set_hidden({ state, commit, dispatch }, { key, hidden }) {
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/set_entity_prop",
 				{
@@ -1099,7 +1135,7 @@ const run_encounter_actions = {
 	async set_initiative({ commit, state, dispatch }, { key, initiative }) {
 		initiative = !initiative ? 0 : Number(initiative);
 
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/set_entity_prop",
 				{
@@ -1125,7 +1161,7 @@ const run_encounter_actions = {
 
 			// Set NPCs with 0 hp as down
 			if (e.curHp <= 0 && e.entityType === "npc") {
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					await dispatch(
 						"encounters/set_entity_prop",
 						{
@@ -1142,7 +1178,7 @@ const run_encounter_actions = {
 			}
 			// If an entity has more than 0 hp, but is marked as down, remove the down mark
 			if (e.curHp > 0 && e.down) {
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					await dispatch(
 						"encounters/set_entity_prop",
 						{
@@ -1159,7 +1195,7 @@ const run_encounter_actions = {
 			}
 			// Check if the entity is not yet active, but needs to be added in the new round
 			if (e.addNextRound) {
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					await dispatch(
 						"encounters/set_entity_prop",
 						{
@@ -1181,7 +1217,7 @@ const run_encounter_actions = {
 		if (action === "tag") {
 			commit("SET_ENTITY_PROPERTY", { key, prop: "addNextRound", value });
 		} else if (action === "set") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"encounters/set_entity_prop",
 					{
@@ -1227,7 +1263,7 @@ const run_encounter_actions = {
 			//if the damage was higher than the amount of tempHp, remove the tempHp
 			//Save the rest amount to put into transformed or curHp later
 			newHp = newHp <= 0 ? null : newHp;
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				//NPC tempHp is stored under encounter
 				if (type === "npcs") {
 					await dispatch(
@@ -1263,7 +1299,7 @@ const run_encounter_actions = {
 		else if (pool === "transformed") {
 			// Update the store
 			if (newHp <= 0) {
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					if (type === "npcs") {
 						await dispatch(
 							"encounters/set_entity_prop",
@@ -1299,7 +1335,7 @@ const run_encounter_actions = {
 				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedCurHp" });
 				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedAc" });
 			} else {
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					if (type === "npcs") {
 						await dispatch(
 							"encounters/set_transformed_prop",
@@ -1334,7 +1370,7 @@ const run_encounter_actions = {
 		//when target has no tempHp or is not transformed, set curHP
 		//Also put rest damage here
 		else {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				//NPC curHp is stored under encounter
 				if (type === "npcs") {
 					await dispatch(
@@ -1378,7 +1414,7 @@ const run_encounter_actions = {
 	 */
 	async set_condition({ state, commit, dispatch }, { action, key, condition, level }) {
 		const value = action === "remove" ? null : condition === "exhaustion" ? level : true;
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/set_entity_condition",
 				{
@@ -1408,7 +1444,7 @@ const run_encounter_actions = {
 	async set_save({ state, commit, rootGetters, dispatch }, { key, check, index }) {
 		let type = state.entities[key].entityType + "s";
 		if (check == "reset") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				for (const property of ["stable", "saves"]) {
 					await dispatch(
 						"campaigns/update_campaign_entity",
@@ -1427,7 +1463,7 @@ const run_encounter_actions = {
 			commit("SET_ENTITY_PROPERTY", { key, prop: "saves", value: {} });
 			commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: false });
 		} else if (check === "unset") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"campaigns/set_death_save",
 					{
@@ -1443,7 +1479,7 @@ const run_encounter_actions = {
 			commit("DELETE_SAVE", { key, index });
 		} else {
 			const i = parseInt(index + 1);
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"campaigns/set_death_save",
 					{
@@ -1469,7 +1505,7 @@ const run_encounter_actions = {
 	async set_stable({ state, commit, rootGetters, dispatch }, { key, action }) {
 		let type = state.entities[key].entityType + "s";
 		if (action === "set") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"campaigns/stabilize_entity",
 					{
@@ -1485,7 +1521,7 @@ const run_encounter_actions = {
 			commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
 			commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: true });
 		} else if (action === "unset") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"campaigns/update_campaign_entity",
 					{
@@ -1511,7 +1547,7 @@ const run_encounter_actions = {
 	 * @param {any} value
 	 */
 	async set_entity_setting({ state, rootGetters, commit, dispatch }, { entityId, key, value }) {
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/set_entity_setting",
 				{
@@ -1534,7 +1570,7 @@ const run_encounter_actions = {
 	 * @param {string} entityId Entity key
 	 */
 	async clear_entity_settings({ state, rootGetters, commit, dispatch }, entityId) {
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/clear_entity_settings",
 				{
@@ -1558,7 +1594,7 @@ const run_encounter_actions = {
 	 */
 	async transform_entity({ state, rootGetters, commit, dispatch }, { key, entity, remove }) {
 		if (remove) {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				if (state.entities[key].entityType === "npc") {
 					await dispatch(
 						"encounters/set_entity_prop",
@@ -1604,7 +1640,7 @@ const run_encounter_actions = {
 			commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedCurHp" });
 			commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedAc" });
 		} else {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				if (state.entities[key].entityType === "npc") {
 					await dispatch(
 						"encounters/set_entity_prop",
@@ -1652,17 +1688,7 @@ const run_encounter_actions = {
 			commit("SET_ENTITY_PROPERTY", { key, prop: "transformedAc", value: entity.ac });
 		}
 	},
-	add_entity_demo({ dispatch, rootGetters }, entity) {
-		//generate semi random id
-		const key = uuid();
-		if (rootGetters["encounters/demo_encounter"]) {
-			dispatch("encounters/add_demo_entity", { key, entity });
-		} else {
-			Vue.set(demoEncounter.entities, key, entity);
-		}
 
-		dispatch("add_entity", key);
-	},
 	async remove_entity({ commit, state, dispatch }, key) {
 		// First untarget if targeted
 		const targeted = state.targeted.filter((target) => {
@@ -1671,7 +1697,7 @@ const run_encounter_actions = {
 		commit("SET_TARGETED", targeted);
 
 		// Then remove from encounter
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/delete_entity",
 				{
@@ -1696,7 +1722,7 @@ const run_encounter_actions = {
 		let type = state.entities[key].entityType + "s";
 		if (action === "revive") {
 			commit("SET_ENTITY_PROPERTY", { key, prop: "curHp", value: 1 });
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"campaigns/revive_entity",
 					{
@@ -1725,7 +1751,7 @@ const run_encounter_actions = {
 			);
 		} else {
 			//SET DEAD
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"campaigns/kill_entity",
 					{
@@ -1741,7 +1767,7 @@ const run_encounter_actions = {
 		}
 	},
 	async set_finished({ state, dispatch, commit }) {
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/finish_encounter",
 				{
@@ -1767,7 +1793,7 @@ const run_encounter_actions = {
 		// Add a new reminder
 		if (action === "add") {
 			if (type === "premade") {
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					await dispatch(
 						"encounters/set_reminder",
 						{
@@ -1783,7 +1809,7 @@ const run_encounter_actions = {
 				commit("SET_REMINDER", { entityKey: entity, key, reminder });
 			}
 			if (type === "custom") {
-				if (!state.demo) {
+				if (!state.demo && !state.test) {
 					key = await dispatch(
 						"encounters/add_reminder",
 						{
@@ -1804,7 +1830,7 @@ const run_encounter_actions = {
 
 		// Remove a reminder
 		else if (action === "remove") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"encounters/set_reminder",
 					{
@@ -1822,7 +1848,7 @@ const run_encounter_actions = {
 
 		// Update an existing reminder
 		else if (action === "update") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"encounters/set_reminder",
 					{
@@ -1840,7 +1866,7 @@ const run_encounter_actions = {
 
 		// Update only the rounds property
 		else if (action === "update-timer") {
-			if (!state.demo) {
+			if (!state.demo && !state.test) {
 				await dispatch(
 					"encounters/update_reminder",
 					{
@@ -1864,7 +1890,7 @@ const run_encounter_actions = {
 	 * @param {string} id Request ID
 	 */
 	async delete_request({ state, rootGetters, commit, dispatch }, id) {
-		if (!state.demo) {
+		if (!state.demo && !state.test) {
 			await dispatch(
 				"encounters/delete_request",
 				{
@@ -1950,9 +1976,12 @@ const run_encounter_actions = {
 };
 
 const run_encounter_mutations = {
-	//INITATIALIZE ENCOUNTER
+	//INITIALIZE ENCOUNTER
 	TRACK(state, value) {
 		Vue.set(state, "track", value);
+	},
+	SET_TEST(state, value) {
+		Vue.set(state, "test", value);
 	},
 	SET_DEMO(state, value) {
 		Vue.set(state, "demo", value);
@@ -2059,20 +2088,20 @@ const run_encounter_mutations = {
 		Vue.set(state, "show_monster_card", value);
 	},
 	SET_LOG(state, { action, value }) {
-		if (localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
+		if (!state.test && localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
 			state.log = JSON.parse(localStorage.getItem(state.encounterId));
 		}
 		if (action === "set") {
 			state.log.unshift(value);
 
 			const parsed = JSON.stringify(state.log);
-			if (!state.demo) localStorage.setItem(state.encounterId, parsed);
+			if (!state.demo && !state.test) localStorage.setItem(state.encounterId, parsed);
 		}
 		if (action == "unset") {
 			Vue.delete(state.log, value);
 
 			const parsed = JSON.stringify(state.log);
-			if (!state.demo) localStorage.setItem(state.encounterId, parsed);
+			if (!state.demo && !state.test) localStorage.setItem(state.encounterId, parsed);
 		}
 	},
 };

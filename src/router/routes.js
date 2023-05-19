@@ -1346,6 +1346,17 @@ const routes = [
 		},
 	},
 	{
+		path: "/test-encounter/:campid/:encid",
+		name: "TestEncounter",
+		component: RunEncounter,
+		meta: {
+			title: "Test encounter",
+			requiresAuth: true,
+			sidebar: false,
+			description: "Test your encounter in Harmless Key, a Combat Tracker for D&D 5e.",
+		},
+	},
+	{
 		path: "/user/:userid",
 		name: "Follow user",
 		component: User,

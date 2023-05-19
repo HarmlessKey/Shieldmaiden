@@ -443,7 +443,7 @@ export default {
 				// Parse versatile to options for NPCs
 				if (this.type === "npcs") {
 					checkable_item = await this.parseCustomSpells(item);
-					checkable_item = this.versatileToOptions(item);
+					checkable_item = this.versatileToOptions(checkable_item);
 				}
 
 				const valid = ajv.validate(this.schema, checkable_item);
@@ -488,8 +488,13 @@ export default {
 				this.custom_spells &&
 				Object.keys(this.custom_spells).length <= this.availableSpellSlots
 			) {
+				console.log("spells to add", this.custom_spells);
 				for (const [key, spell] of Object.entries(this.custom_spells)) {
 					try {
+						// TODO: use parse function to filter out spells
+						delete spell.key;
+						delete spell.updated;
+						delete spell.created;
 						await this.edit_spell({ id: key, spell: spell });
 					} catch (error) {
 						this.failed_imports.push(spell);

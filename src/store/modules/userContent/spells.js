@@ -107,7 +107,6 @@ const spell_actions = {
 	},
 
 	async get_spell_id_by_name({ rootGetters, dispatch }, { name }) {
-		console.log("store", name);
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_spell_services");

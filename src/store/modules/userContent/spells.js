@@ -54,11 +54,11 @@ const spell_actions = {
 	 * Stores those spells in spells store
 	 * Returns an Array of spells, ordered by name.
 	 */
-	async get_spells({ state, rootGetters, dispatch, commit }) {
+	async get_spells({ state, getters, rootGetters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let spells = state.spells ? state.spells : undefined;
 
-		if (!spells && uid) {
+		if ((!spells || getters.spell_count > Object.keys(spells).length) && uid) {
 			const services = await dispatch("get_spell_services");
 			try {
 				spells = await services.getSpells(uid);

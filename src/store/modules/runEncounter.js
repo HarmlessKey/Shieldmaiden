@@ -2,6 +2,7 @@ import { abilities, skills } from "src/utils/generalConstants";
 import { uuid } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
+import { calc_mod } from "src/utils/generalFunctions";
 import Vue from "vue";
 
 const demoEncounter = {
@@ -277,7 +278,7 @@ const run_encounter_actions = {
 		let entity = {
 			name: db_entity.name,
 			id: db_entity.id,
-			initiative: state.test ? null : db_entity.initiative,
+			initiative: state.test ? 0 : db_entity.initiative,
 			entityType: db_entity.entityType,
 			maxHp: db_entity.maxHp,
 			ac: parseInt(db_entity.ac),
@@ -369,6 +370,11 @@ const run_encounter_actions = {
 					if (db_player[`${ability}-save-profficient`]) {
 						entity.saving_throws.push(ability);
 					}
+				}
+
+				// In test mode auto roll initiative
+				if (state.test) {
+					entity.initiative = Math.ceil(Math.random() * 20) + (entity.initiative_bons || 0);
 				}
 
 				// Defenses
@@ -489,6 +495,10 @@ const run_encounter_actions = {
 					// Ability scores
 					for (const ability of abilities) {
 						entity[ability] = data_npc[ability];
+					}
+
+					if (state.test) {
+						entity.initiative = Math.ceil(Math.random() * 20) + calc_mod(entity.dexterity);
 					}
 
 					// Old NPC format values

@@ -25,12 +25,12 @@
 							>
 								<i
 									aria-hidden="true"
-									v-if="
-										['monster', 'player', 'companion', 'environment'].includes(
-											entitiesList[doneBy].img
-										)
-									"
-									:class="`hki-${entitiesList[doneBy].img}`"
+									v-if="!entitiesList[doneBy].img"
+									:class="`hki-${
+										entitiesList[doneBy].entityType === 'npc'
+											? 'monster'
+											: entitiesList[doneBy].entityType
+									}`"
 								/>
 							</span>
 						</q-item-section>
@@ -59,8 +59,10 @@
 							>
 								<i
 									aria-hidden="true"
-									v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)"
-									:class="`hki-${scope.opt.img}`"
+									v-if="!scope.opt.img"
+									:class="`hki-${
+										scope.opt.entityType === 'npc' ? 'monster' : scope.opt.entityType
+									}`"
 								/>
 							</span>
 						</q-item-section>
@@ -187,7 +189,7 @@ export default {
 			active.unshift({
 				key: "environment",
 				name: "Environment",
-				img: "environment",
+				entityType: "environment",
 			});
 			return active;
 		},
@@ -196,7 +198,6 @@ export default {
 			list.environment = {
 				key: "environment",
 				name: "Environment",
-				img: "environment",
 				entityType: "environment",
 			};
 			return list;

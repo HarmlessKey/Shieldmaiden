@@ -152,6 +152,7 @@
 
 
 
+
 														}}) </template
 													><template v-else>{{ roll.fixed_val }})</template>
 													{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
@@ -320,7 +321,6 @@ export default {
 	data() {
 		return {
 			damage_type_icons: damage_type_icons,
-			demo: this.$route.name === "Demo",
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,

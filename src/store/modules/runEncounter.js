@@ -1,8 +1,7 @@
 import { abilities, skills } from "src/utils/generalConstants";
-import { uuid } from "src/utils/generalFunctions";
+import { uuid, calc_mod } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
-import { calc_mod } from "src/utils/generalFunctions";
 import Vue from "vue";
 
 const demoEncounter = {

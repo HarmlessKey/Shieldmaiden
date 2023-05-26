@@ -98,8 +98,7 @@ export default {
 				var amount = this._meters[type][key][type];
 				total = total + amount;
 			}
-			var percentage = Math.floor((input / total) * 100);
-			return percentage;
+			return Math.floor((input / total) * 100);
 		},
 	},
 };

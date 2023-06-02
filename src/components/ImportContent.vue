@@ -406,7 +406,7 @@ export default {
 				: this.get_spell({ uid: this.uid, id });
 		},
 		async addItem(item) {
-			this.type === "npcs" ? await this.add_npc(item) : await this.add_spell(item);
+			this.type === "npcs" ? await this.add_npc(item) : await this.add_spell({ spell: item });
 		},
 		async editItem(id, item) {
 			this.type === "npcs"

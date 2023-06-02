@@ -95,7 +95,7 @@ export class SpellServices {
 			if (predefined_key) {
 				await SPELLS_REF.child(uid).child(predefined_key).set(spell);
 			} else {
-				newSpell = await SPELLS_REF.child(uid).push(spell);
+				const newSpell = await SPELLS_REF.child(uid).push(spell);
 				spell_key = newSpell.key;
 			}
 

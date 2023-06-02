@@ -141,6 +141,7 @@ const spell_actions = {
 				return "Not enough slots";
 			}
 			try {
+				console.log(spell);
 				const search_spell = convert_spell(spell);
 				const id = await services.addSpell(uid, spell, search_spell, predefined_key);
 				commit("SET_SPELL", { id, search_spell });

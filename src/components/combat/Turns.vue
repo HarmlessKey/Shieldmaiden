@@ -88,7 +88,7 @@
 							/></q-item-section>
 							<q-item-section>Reset encounter</q-item-section>
 						</q-item>
-						<q-item clickable v-close-popup @click="confirmFinish()">
+						<q-item v-if="!test" clickable v-close-popup @click="confirmFinish()">
 							<q-item-section avatar><i aria-hidden="true" class="fas fa-check" /></q-item-section>
 							<q-item-section>Finish encounter</q-item-section>
 						</q-item>

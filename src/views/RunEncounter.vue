@@ -146,6 +146,7 @@ export default {
 		return {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			demo: this.$route.name === "Demo",
+			test: this.$route.name === "TestEncounter",
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
 			target: undefined,
@@ -157,7 +158,7 @@ export default {
 		};
 	},
 	beforeMount() {
-		if (this.$route.name !== "Demo" && this.broadcast.live === this.campaignId) {
+		if (!this.demo && !this.test && this.broadcast.live === this.campaignId) {
 			this.setLiveEncounter(this.encounterId);
 		}
 	},
@@ -176,6 +177,7 @@ export default {
 			cid: this.campaignId,
 			eid: this.encounterId,
 			demo: this.demo,
+			test: this.test,
 		});
 		this.loading = false;
 	},

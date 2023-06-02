@@ -3,14 +3,14 @@
 		<hk-card>
 			<ContentHeader type="npcs">
 				<button slot="actions-left" class="btn btn-sm bg-neutral-5" @click="exportAll()">
-					Export NPCs
+					Export
 				</button>
 				<button
 					slot="actions-right"
 					class="btn btn-sm bg-neutral-5 mx-2"
 					@click="import_dialog = true"
 				>
-					Import NPCs
+					Import
 				</button>
 			</ContentHeader>
 

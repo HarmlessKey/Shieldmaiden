@@ -11,6 +11,12 @@
 			reminders) is only applied in the copy.
 		</p>
 		<p>Test mode is an ideal way to test if your encounter is maybe too easy or too difficult.</p>
+		<router-link
+			:to="`/content/campaigns/${this.$route.params.campid}/${this.$route.params.encid}`"
+			class="btn btn-block btn-square bg-orange"
+		>
+			Leave Test Mode
+		</router-link>
 	</div>
 </template>
 

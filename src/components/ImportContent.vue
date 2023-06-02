@@ -158,15 +158,18 @@
 							</td>
 						</template>
 					</q-table>
-					<div v-if="Object.keys(this.custom_spells).length > this.availableSpellSlots">
-						Insufficient spell slots. You're trying to import
-						<strong class="red">{{ Object.keys(this.custom_spells).length }}</strong> spells,<br />
-						but have only <strong class="red">{{ availableSpellSlots }}</strong> slots available.
-					</div>
-					<router-link class="btn btn-sm bg-patreon-red my-2" to="/patreon">
-						<i aria-hidden="true" class="fab fa-patreon white mr-1" />
-						Get more slots
-					</router-link>
+					<template v-if="Object.keys(this.custom_spells).length > this.availableSpellSlots">
+						<div>
+							Insufficient spell slots. You're trying to import
+							<strong class="red">{{ Object.keys(this.custom_spells).length }}</strong>
+							spells,<br />
+							but have only <strong class="red">{{ availableSpellSlots }}</strong> slots available.
+						</div>
+						<router-link class="btn btn-sm bg-patreon-red my-2" to="/patreon">
+							<i aria-hidden="true" class="fab fa-patreon white mr-1" />
+							Get more slots
+						</router-link>
+					</template>
 				</template>
 			</template>
 			<div v-if="importTotal > availableSlots">

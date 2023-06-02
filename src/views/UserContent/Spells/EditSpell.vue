@@ -163,7 +163,7 @@ export default {
 		},
 		addSpell() {
 			console.log(this.spell);
-			this.add_spell(this.spell)
+			this.add_spell({ spell: this.spell })
 				.then((key) => {
 					// Set the spellId, so we know there is an existing spell
 					// even though we are on the AddSpell route, this we won't create multiple when hitting save again

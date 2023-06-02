@@ -278,6 +278,7 @@ export default {
 		await store.dispatch("initialize");
 	},
 	async mounted() {
+		this.setTips();
 		const cookies = document.cookie.split(";");
 
 		for (let cookie of cookies) {
@@ -318,6 +319,7 @@ export default {
 			"initialize",
 			"reinitialize",
 			"setUser",
+			"setTips",
 		]),
 		setSize(size) {
 			this.small_screen = size.width < 576;

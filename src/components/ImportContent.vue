@@ -494,14 +494,10 @@ export default {
 				this.custom_spells &&
 				Object.keys(this.custom_spells).length <= this.availableSpellSlots
 			) {
-				console.log("spells to add", this.custom_spells);
 				for (const [key, spell] of Object.entries(this.custom_spells)) {
 					try {
 						// TODO: use parse function to filter out spells
-						delete spell.key;
-						delete spell.updated;
-						delete spell.created;
-						await this.edit_spell({ id: key, spell: spell });
+						await this.add_spell({ spell: spell, predefined_key: key });
 					} catch (error) {
 						this.failed_imports.push(spell);
 					}
@@ -631,31 +627,43 @@ export default {
 			return npc;
 		},
 		async parseCustomSpells(npc) {
-			for (const [old_key, spell] of Object.entries(npc.custom_spells)) {
-				// Check if there already is a spell with name
-				let spell_id = await this.get_spell_id_by_name({ name: spell.name });
-				if (!spell_id) {
-					// Generate a id for the spell so when we can link the spell in NPC to a future spell
-					const new_spell_id = await this.reserve_spell_id();
-					spell_id = new_spell_id;
-					this.$set(this.custom_spells, spell_id, spell);
+			if (npc.custom_spells) {
+				for (const [old_key, spell] of Object.entries(npc.custom_spells)) {
+					// Check if there already is a spell with name
+					delete spell.key;
+					delete spell.updated;
+					delete spell.created;
+					const valid = ajv.validate(spellSchema, spell);
+					if (!valid) {
+						spell.errors = ajv.errors;
+					}
+					// Check if spell is already known to importer
+					if (!Object.keys(this.map_old_to_custom).includes(old_key)) {
+						let spell_id = await this.get_spell_id_by_name({ name: spell.name });
+						if (!spell_id) {
+							// Generate a id for the spell so when we can link the spell in NPC to a future spell
+							const new_spell_id = await this.reserve_spell_id();
+							spell_id = new_spell_id;
+							this.$set(this.custom_spells, spell_id, spell);
+						}
+
+						this.map_old_to_custom[old_key] = spell_id;
+					}
 				}
 
-				this.map_old_to_custom[old_key] = spell_id;
-			}
-
-			for (const spell_list_type of ["caster_spells", "innate_spells"]) {
-				if (npc[spell_list_type]) {
-					const spell_list = Object.assign({}, npc[spell_list_type]);
-					for (const [spell_key, spell] of Object.entries(spell_list)) {
-						if (spell.custom && spell_key in this.map_old_to_custom) {
-							npc[spell_list_type][this.map_old_to_custom[spell_key]] = { ...spell };
-							delete npc[spell_list_type][spell_key];
+				for (const spell_list_type of ["caster_spells", "innate_spells"]) {
+					if (npc[spell_list_type]) {
+						const spell_list = Object.assign({}, npc[spell_list_type]);
+						for (const [spell_key, spell] of Object.entries(spell_list)) {
+							if (spell.custom && spell_key in this.map_old_to_custom) {
+								npc[spell_list_type][this.map_old_to_custom[spell_key]] = { ...spell };
+								delete npc[spell_list_type][spell_key];
+							}
 						}
 					}
 				}
+				delete npc.custom_spells;
 			}
-			delete npc.custom_spells;
 			return npc;
 		},
 	},

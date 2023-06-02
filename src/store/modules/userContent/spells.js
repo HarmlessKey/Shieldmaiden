@@ -129,7 +129,7 @@ const spell_actions = {
 	 * @param {object} spell
 	 * @returns {string} the id of the newly added spell
 	 */
-	async add_spell({ rootGetters, commit, dispatch }, spell) {
+	async add_spell({ rootGetters, commit, dispatch }, { spell, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.spells;
 
@@ -142,7 +142,7 @@ const spell_actions = {
 			}
 			try {
 				const search_spell = convert_spell(spell);
-				const id = await services.addSpell(uid, spell, search_spell);
+				const id = await services.addSpell(uid, spell, search_spell, predefined_key);
 				commit("SET_SPELL", { id, search_spell });
 				commit("SET_CACHED_SPELL", { uid, id, spell });
 
@@ -212,8 +212,8 @@ const spell_actions = {
 				const new_count = await services.updateSpellCount(uid, value);
 				commit("SET_SPELL_COUNT", new_count);
 				dispatch("checkEncumbrance", "", { root: true });
-			} catch(error) {
-				throw(error);
+			} catch (error) {
+				throw error;
 			}
 		}
 	},

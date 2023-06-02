@@ -249,7 +249,7 @@ export default {
 			const all_npcs = await this.get_full_npcs();
 			for (const key in all_npcs) {
 				all_npcs[key].harmless_key = key;
-				this.addCustomSpellToExport(all_npcs[key]);
+				await this.addCustomSpellToExport(all_npcs[key]);
 			}
 
 			const json_export = Object.values(all_npcs);

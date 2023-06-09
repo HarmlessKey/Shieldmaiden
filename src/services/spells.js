@@ -65,7 +65,7 @@ export class SpellServices {
 			const spell = await SEARCH_SPELLS_REF.child(uid)
 				.child("results")
 				.orderByChild("name")
-				.equalTo(name)
+				.equalTo(name.toLowerCase())
 				.get();
 
 			return spell.val();

@@ -1,6 +1,6 @@
 <template>
-	<div 
-		v-if="targets && allEntities && players && campPlayers && characters" 
+	<div
+		v-if="targets && allEntities && players && campPlayers && characters"
 		class="initiative-wrapper"
 		ref="initiative"
 	>
@@ -14,11 +14,7 @@
 					no-caps
 					indicator-color="transparent"
 				>
-					<q-tab 
-						name="Damage" 
-						icon="fas fa-swords"
-						@click="damageRequest"
-					/>
+					<q-tab name="Damage" icon="fas fa-swords" @click="damageRequest" />
 				</q-tabs>
 			</div>
 
@@ -27,27 +23,23 @@
 				<div class="text-shadow">
 					<span v-if="targeted.length === 0">Select a target to perform actions</span>
 					<span v-else>
-						{{ targeted.length }} {{ targeted.length > 1 ? 'targets' : 'target' }}
+						{{ targeted.length }} {{ targeted.length > 1 ? "targets" : "target" }}
 					</span>
 				</div>
 				<div class="right">
-					<a 
-						v-if="targeted.length > 0"
-						@click="damageRequest()">
+					<a v-if="targeted.length > 0" @click="damageRequest()">
 						<i aria-hidden="true" class="fas fa-sword white"></i>
-						<q-tooltip anchor="top middle" self="center middle">
-							Do damage or healing
-						</q-tooltip>
+						<q-tooltip anchor="top middle" self="center middle"> Do damage or healing </q-tooltip>
 					</a>
 				</div>
 			</template>
 		</div>
 
 		<!-- INITIATIVE LIST -->
-		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px' }">
 			<div>
 				<table class="initiative-list targets">
-					<thead class='white text-shadow'>
+					<thead class="white text-shadow">
 						<th class="init">In.</th>
 						<th class="image"></th>
 						<th class="ac"><i aria-hidden="true" class="fas fa-shield"></i></th>
@@ -55,7 +47,7 @@
 						<th class="hp"><i aria-hidden="true" class="fas fa-heart"></i></th>
 						<th class="conditions"></th>
 					</thead>
-					<tbody 
+					<tbody
 						class="entities"
 						name="entities"
 						is="transition-group"
@@ -63,42 +55,102 @@
 						leave-active-class="animated animate__fadeOut"
 					>
 						<template v-for="(entity, index) in targets">
-							<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
+							<tr v-if="allEntities[0].key == entity.key && turn > 0" :key="index" class="top">
 								<td colspan="6">Top of the round</td>
 							</tr>
-							<tr 
-								:key="entity.key" 
-								:class="{ pointer: characters.length !== 0, 'targeted': targeted.includes(entity.key) }"
-								v-touch-hold.mouse="event => target(event, 'multi', entity.key)"
+							<tr
+								:key="entity.key"
+								:class="{
+									pointer: characters.length !== 0,
+									targeted: targeted.includes(entity.key),
+								}"
+								v-touch-hold.mouse="(event) => target(event, 'multi', entity.key)"
 								@click="target($event, 'single', entity.key)"
 							>
 								<td class="init white">
-									<i aria-hidden="true" v-if="targeted.includes(entity.key)" class="fas fa-crosshairs"></i>
+									<i
+										aria-hidden="true"
+										v-if="targeted.includes(entity.key)"
+										class="fas fa-crosshairs"
+									></i>
 									<template v-else>{{ entity.initiative }}</template>
 								</td>
-							
+
 								<td class="image">
 									<Avatar class="img" :entity="entity" :players="players" :npcs="npcs" />
 								</td>
 								<td class="ac">
 									<div class="ac_wrapper">
-										<i aria-hidden="true" class="fas fa-shield" ></i>
-										<template v-if="
-											(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
-											|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
-											<span class="value" :class="{ 
-													'green': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus > 0, 
-													'red': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus < 0 
-												}"  
-												v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus"
+										<i aria-hidden="true" class="fas fa-shield"></i>
+										<template
+											v-if="
+												(playerSettings.ac === undefined &&
+													(entity.entityType === 'player' || entity.entityType === 'companion')) ||
+												(entity.entityType == 'npc' && displayNPCField('ac', entity) == true)
+											"
+										>
+											<span
+												class="value"
+												:class="{
+													green:
+														displayAc(
+															entity,
+															players[entity.key],
+															npcs[entity.key],
+															camp_data(entity)
+														).bonus > 0,
+													red:
+														displayAc(
+															entity,
+															players[entity.key],
+															npcs[entity.key],
+															camp_data(entity)
+														).bonus < 0,
+												}"
+												v-if="
+													displayAc(
+														entity,
+														players[entity.key],
+														npcs[entity.key],
+														camp_data(entity)
+													).bonus
+												"
 											>
-												{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+												{{
+													displayAc(
+														entity,
+														players[entity.key],
+														npcs[entity.key],
+														camp_data(entity)
+													).ac +
+													displayAc(
+														entity,
+														players[entity.key],
+														npcs[entity.key],
+														camp_data(entity)
+													).bonus
+												}}
 												<q-tooltip anchor="top middle" self="center middle">
-													Armor Class + {{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+													Armor Class +
+													{{
+														displayAc(
+															entity,
+															players[entity.key],
+															npcs[entity.key],
+															camp_data(entity)
+														).bonus
+													}}
 												</q-tooltip>
 											</span>
 											<span class="value" v-else>
-												{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}
+												{{
+													displayAc(
+														entity,
+														players[entity.key],
+														npcs[entity.key],
+														camp_data(entity)
+													).ac
+												}}
 												<q-tooltip anchor="top middle" self="center middle">
 													Armor class
 												</q-tooltip>
@@ -109,290 +161,266 @@
 								</td>
 
 								<td class="name">
-									<Name 
-										:entity="entity" 
-										:players="players" 
-										:npcs="npcs" 
+									<Name
+										:entity="entity"
+										:players="players"
+										:npcs="npcs"
 										:npcSettings="npcSettings"
 									/>
 								</td>
 
-							<td class="hp">
-								<template v-if="
-									(playerSettings.health === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
-									|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
-								">
-									<Health	
-										:entity="entity" 
-										:campPlayers="campPlayers" 
+								<td class="hp">
+									<Health
+										:entity="entity"
+										:campPlayers="campPlayers"
 										:campCompanions="campCompanions"
 										:players="players"
-										:npcs="npcs" 
+										:npcs="npcs"
+										:npcSettings="npcSettings"
+										:playerSettings="playerSettings"
 									/>
-								</template>
-								<template v-else-if="
-									(playerSettings.health === 'obscured' && (entity.entityType === 'player' || entity.entityType === 'companion'))
-									|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
-								">
-								<template v-if="entity.curHp == 0">
-									<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
-									</template>
-									<i aria-hidden="true" v-else class="fas" :class="{
-											'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
-											'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
-											'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
-										}"
-									/>
-								</template>
-								<template v-else>
-									<span class="neutral-2">
-										<template v-if="entity.curHp == 0">
-											<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
-										</template>
-										<template v-else>? ? ?</template>
-									</span>
-								</template>
-							</td>
+								</td>
 
-							<td 
-								class="conditions" 
-								v-if="
-									((playerSettings.conditions === undefined && (entity.entityType === 'player' 
-									|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
-									|| entity.entityType === 'companion'))
-							">
-								<div class="d-flex justify-content-end" v-if="entity.conditions">
-									<template v-for="({value, name}, index) in returnConditions(entity.conditions)">
-										<div 
-											class="condition" 
-											:key="`condition-${entity.key}-${value}`"
-											v-if="index+1 <= conditionCount"
+								<td
+									class="conditions"
+									v-if="
+										(playerSettings.conditions === undefined &&
+											(entity.entityType === 'player' ||
+												(entity.entityType == 'npc' && npcSettings.conditions === undefined))) ||
+										entity.entityType === 'companion'
+									"
+								>
+									<div class="d-flex justify-content-end" v-if="entity.conditions">
+										<template
+											v-for="({ value, name }, index) in returnConditions(entity.conditions)"
 										>
-											<span class="n" v-if="value === 'exhaustion'">
-												{{ entity.conditions[value] }}
-											</span>
-											<i aria-hidden="true" :class="`hki-${value}`" />
+											<div
+												class="condition"
+												:key="`condition-${entity.key}-${value}`"
+												v-if="index + 1 <= conditionCount"
+											>
+												<span class="n" v-if="value === 'exhaustion'">
+													{{ entity.conditions[value] }}
+												</span>
+												<i aria-hidden="true" :class="`hki-${value}`" />
+												<q-tooltip anchor="top middle" self="center middle">
+													{{ name }}
+													{{ value === "exhaustion" ? entity.conditions[value] : "" }}
+												</q-tooltip>
+											</div>
+										</template>
+										<strong
+											v-if="Object.keys(entity.conditions).length > conditionCount"
+											class="condtion"
+											:key="`more-conditions-${entity.key}`"
+										>
+											+{{ Object.keys(entity.conditions).length - conditionCount }}
 											<q-tooltip anchor="top middle" self="center middle">
-												{{ name }}
-												{{ value === 'exhaustion' ? entity.conditions[value] : "" }}
+												{{ Object.keys(entity.conditions).length - conditionCount }}
+												more conditions
 											</q-tooltip>
-										</div>
-									</template>
-									<strong 
-										v-if="Object.keys(entity.conditions).length > conditionCount"
-										class="condtion"
-										:key="`more-conditions-${entity.key}`"
-									>
-										+{{ Object.keys(entity.conditions).length - conditionCount }}
-										<q-tooltip anchor="top middle" self="center middle">
-											{{ Object.keys(entity.conditions).length - conditionCount }}
-											more conditions
-										</q-tooltip>
-									</strong>
+										</strong>
 
-									<!-- All conditions -->
-									<q-popup-proxy square prevent>
-										<div class="bg-neutral-8">
-											<q-list>
-												<q-item>
-													<q-item-section>
-														<Name 
-															:entity="entity" 
-															:players="players" 
-															:npcs="npcs" 
-															:npcSettings="npcSettings"
-														/>
-													</q-item-section>
-													<q-item-section avatar>
+										<!-- All conditions -->
+										<q-popup-proxy square prevent>
+											<div class="bg-neutral-8">
+												<q-list>
+													<q-item>
+														<q-item-section>
+															<Name
+																:entity="entity"
+																:players="players"
+																:npcs="npcs"
+																:npcSettings="npcSettings"
+															/>
+														</q-item-section>
+														<q-item-section avatar>
 															{{ Object.keys(entity.conditions).length }}
-													</q-item-section>
-												</q-item>
-												<q-separator/>
-												<q-item 
-													clickable v-close-popup 
-													v-for="({value, name}) in returnConditions(entity.conditions)"
-													:key="`condition-list-${entity.key}-${value}`"
-												>
-													<q-item-section avatar>
-														<i aria-hidden="true" :class="`hki-${value}`" />
-													</q-item-section>
-													<q-item-section>
-														<span>
-															{{ name }}
-															<strong v-if="value === 'exhaustion'">
-																{{ entity.conditions[value] }}
-															</strong>
-														</span>
-													</q-item-section>
-												</q-item>
-											</q-list>
-										</div>
-									</q-popup-proxy>
-								</div>
-							</td>
-						</tr>
-					</template>
-				</tbody>
-			</table>
-		</div>
-	</q-scroll-area>
-</div>
+														</q-item-section>
+													</q-item>
+													<q-separator />
+													<q-item
+														clickable
+														v-close-popup
+														v-for="{ value, name } in returnConditions(entity.conditions)"
+														:key="`condition-list-${entity.key}-${value}`"
+													>
+														<q-item-section avatar>
+															<i aria-hidden="true" :class="`hki-${value}`" />
+														</q-item-section>
+														<q-item-section>
+															<span>
+																{{ name }}
+																<strong v-if="value === 'exhaustion'">
+																	{{ entity.conditions[value] }}
+																</strong>
+															</span>
+														</q-item-section>
+													</q-item>
+												</q-list>
+											</div>
+										</q-popup-proxy>
+									</div>
+								</td>
+							</tr>
+						</template>
+					</tbody>
+				</table>
+			</div>
+		</q-scroll-area>
+	</div>
 </template>
 
 <script>
-	import { db } from 'src/firebase';
-	import { general } from 'src/mixins/general.js';
-	import { mapActions } from 'vuex';
-	import { trackEncounter } from 'src/mixins/trackEncounter.js';
-	import { conditions } from 'src/mixins/conditions.js';
+import { db } from "src/firebase";
+import { general } from "src/mixins/general.js";
+import { mapActions } from "vuex";
+import { trackEncounter } from "src/mixins/trackEncounter.js";
+import { conditions } from "src/mixins/conditions.js";
 
-	import Health from './Health.vue';
-	import Name from './Name.vue';
-	import Avatar from './Avatar.vue';
+import Health from "./Health.vue";
+import Name from "./Name.vue";
+import Avatar from "./Avatar.vue";
 
-	export default {
-		name: 'Initiative',
-		mixins: [general, trackEncounter, conditions],
-		components: {
-			Health,
-			Name,
-			Avatar
+export default {
+	name: "Initiative",
+	mixins: [general, trackEncounter, conditions],
+	components: {
+		Health,
+		Name,
+		Avatar,
+	},
+	props: [
+		"encounter",
+		"targets",
+		"allEntities",
+		"turn",
+		"campPlayers",
+		"campCompanions",
+		"players",
+		"playerSettings",
+		"npcs",
+		"npcSettings",
+		"screenWidth",
+	],
+	data() {
+		return {
+			dmId: this.$route.params.userid,
+			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+			width: 0,
+			characters: [],
+			targeted: [],
+		};
+	},
+	computed: {
+		/**
+		 * Returns how many conditions can be shown
+		 */
+		conditionCount() {
+			if (this.width < 400) return 1;
+			if (this.width < 450) return 2;
+			if (this.width < 550) return 3;
+			if (this.width < 600) return 4;
+			if (this.width < 750) return 5;
+			if (this.width < 850) return 6;
+			if (this.width < 900) return 7;
+			return 9;
 		},
-		props: [
-			'encounter',
-			'targets',
-			'allEntities',
-			'turn',
-			'campPlayers',
-			'campCompanions',
-			'players',
-			'playerSettings',
-			'npcs',
-			'npcSettings',
-			'screenWidth'
-		],
-		data() {
-			return {
-				dmId: this.$route.params.userid,
-				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
-				width: 0,
-				characters: [],
-				targeted: []
-			}
-		},
-		computed: {
-			/**
-			 * Returns how many conditions can be shown
-			 */
-			conditionCount() {
-				if(this.width < 400) return 1;
-				if(this.width < 450) return 2;
-				if(this.width < 550) return 3;
-				if(this.width < 600) return 4;
-				if(this.width < 750) return 5;
-				if(this.width < 850) return 6;
-				if(this.width < 900) return 7;
-				return 9;
-			}
-		},
-		mounted() {
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.setSize);
-				//Init
-				this.setSize();
+	},
+	mounted() {
+		this.$nextTick(function () {
+			window.addEventListener("resize", this.setSize);
+			//Init
+			this.setSize();
+		});
+
+		//Check if user has control over a character in the campaign
+		if (this.userId) {
+			const allCampaignPlayers = Object.keys(this.campPlayers);
+			const getCharacters = db.ref(`character_control/${this.userId}`);
+			getCharacters.on("value", async (snapshot) => {
+				let controlledCharacters = snapshot.val();
+
+				for (let key in controlledCharacters) {
+					if (allCampaignPlayers.includes(key)) {
+						this.characters.push(key);
+					}
+				}
 			});
-
-			//Check if user has control over a character in the campaign
-			if(this.userId) {
-				const allCampaignPlayers = Object.keys(this.campPlayers);
-				const getCharacters = db.ref(`character_control/${this.userId}`);
-				getCharacters.on('value', async (snapshot) => {
-					let controlledCharacters = snapshot.val();
-
-					for(let key in controlledCharacters) {
-						if(allCampaignPlayers.includes(key)) {
-							this.characters.push(key);
-						}
-					}
-				});
-			}
-		},
-		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			setSize() {
-				this.width = this.$refs.initiative.clientWidth;
-			},
-			target(e, type, key) {
-				//Select the target
-				let targeted = this.targeted;
-
-				if(type === "multi" || e.shiftKey) {
-					if(!targeted.includes(key)) {
-						targeted.push(key);
-					} else {
-						targeted = targeted.filter(function(value){
-							return value != key;
-						});
-					}
-				} else {
-					if(targeted.length === 0 || targeted[0] !== key) {
-						targeted = [key];
-					} else {
-						targeted = [];
-					}
-				}
-				this.targeted = targeted;
-				this.setSlide({ show: false });
-			},
-			camp_data(entity) {
-				let key = entity.key
-				if (entity.entityType === 'player')
-					return this.campPlayers[key];
-
-				if (entity.entityType === 'companion')
-					return this.campCompanions[key];
-
-				return undefined;
-			},
-			damageRequest() {
-				this.setSlide({
-					show: true,
-					type: 'slides/trackCampaign/playerRequests/index',
-					data: {
-						characters: this.characters,
-						targeted: this.targeted,
-						targets: this.targets,
-						players: this.players,
-						campPlayers: this.campPlayers,
-						npcSettings: this.npcSettings,
-						npcs: this.npcs,
-						encounter: { 
-							key: this.encounter.key, 
-							turn: this.encounter.turn, 
-							round: this.encounter.round
-						},
-						type: 'manual'
-					}
-				})
-			},
-			returnConditions(entity_conditions) {
-				let returnConditions = [];
-				for(const key in entity_conditions) {
-					returnConditions.push(
-						this.conditionList.filter(item => {
-							return item.value === key;
-						})[0]
-					);
-				}
-				return returnConditions;
-			},
-		},
-		beforeDestroy() {
-			window.removeEventListener('resize', this.setSize);
 		}
-	}
+	},
+	methods: {
+		...mapActions(["setSlide"]),
+		setSize() {
+			this.width = this.$refs.initiative.clientWidth;
+		},
+		target(e, type, key) {
+			//Select the target
+			let targeted = this.targeted;
+
+			if (type === "multi" || e.shiftKey) {
+				if (!targeted.includes(key)) {
+					targeted.push(key);
+				} else {
+					targeted = targeted.filter(function (value) {
+						return value != key;
+					});
+				}
+			} else {
+				if (targeted.length === 0 || targeted[0] !== key) {
+					targeted = [key];
+				} else {
+					targeted = [];
+				}
+			}
+			this.targeted = targeted;
+			this.setSlide({ show: false });
+		},
+		camp_data(entity) {
+			let key = entity.key;
+			if (entity.entityType === "player") return this.campPlayers[key];
+
+			if (entity.entityType === "companion") return this.campCompanions[key];
+
+			return undefined;
+		},
+		damageRequest() {
+			this.setSlide({
+				show: true,
+				type: "slides/trackCampaign/playerRequests/index",
+				data: {
+					characters: this.characters,
+					targeted: this.targeted,
+					targets: this.targets,
+					players: this.players,
+					campPlayers: this.campPlayers,
+					npcSettings: this.npcSettings,
+					npcs: this.npcs,
+					encounter: {
+						key: this.encounter.key,
+						turn: this.encounter.turn,
+						round: this.encounter.round,
+					},
+					type: "manual",
+				},
+			});
+		},
+		returnConditions(entity_conditions) {
+			let returnConditions = [];
+			for (const key in entity_conditions) {
+				returnConditions.push(
+					this.conditionList.filter((item) => {
+						return item.value === key;
+					})[0]
+				);
+			}
+			return returnConditions;
+		},
+	},
+	beforeDestroy() {
+		window.removeEventListener("resize", this.setSize);
+	},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -423,7 +451,7 @@
 
 			.initiative-list {
 				margin: 20px 0;
-				border-collapse: separate; 
+				border-collapse: separate;
 				width: 100%;
 				border-spacing: 0 5px;
 				user-select: none;
@@ -445,7 +473,6 @@
 				}
 
 				tbody {
-					
 					tr.top {
 						td {
 							font-size: 15px;
@@ -483,14 +510,15 @@
 							text-align: center;
 						}
 						td.ac {
-							padding: 0 5px; 
+							padding: 0 5px;
 							width: 45px;
 
 							.ac_wrapper {
 								height: 44px;
 								position: relative;
-						
-								i, .value {
+
+								i,
+								.value {
 									width: 100%;
 									position: absolute;
 									line-height: 44px;
@@ -542,12 +570,14 @@
 							}
 						}
 					}
-					tr td:first-child, thead th {
+					tr td:first-child,
+					thead th {
 						color: $neutral-1;
 						background: none;
 						text-shadow: 0 0 3px $black;
 					}
-					tr td:first-child, thead th:first-child {
+					tr td:first-child,
+					thead th:first-child {
 						text-align: center;
 					}
 				}
@@ -559,7 +589,7 @@
 					position: relative;
 					cursor: pointer;
 					user-select: none;
-					
+
 					.n {
 						font-size: 13px;
 						line-height: 13px;
@@ -569,10 +599,9 @@
 						left: 2px;
 					}
 				}
-				
 			}
 			.entities-move {
-				transition: transform .6s;
+				transition: transform 0.6s;
 			}
 		}
 	}
@@ -611,11 +640,11 @@
 					tr {
 						td {
 							padding: 5px;
-			
+
 							&.image {
 								width: 43px;
 								vertical-align: top;
-			
+
 								.img {
 									width: 44px;
 									height: 44px;
@@ -627,8 +656,9 @@
 							&.ac {
 								.ac_wrapper {
 									height: 31px;
-							
-									i, .value {
+
+									i,
+									.value {
 										line-height: 31px;
 									}
 									i {
@@ -639,7 +669,7 @@
 									}
 								}
 							}
-						}			
+						}
 					}
 				}
 			}
@@ -668,7 +698,7 @@
 						}
 					}
 
-					tbody {			
+					tbody {
 						tr {
 							td {
 								&.image {
@@ -686,8 +716,9 @@
 								&.ac {
 									.ac_wrapper {
 										height: 44px;
-								
-										i, .value {
+
+										i,
+										.value {
 											line-height: 44px;
 										}
 										i {
@@ -705,7 +736,7 @@
 				.conditions {
 					padding-right: 15px;
 
-					.condition {				
+					.condition {
 						.img {
 							width: 40px;
 							height: 40px;

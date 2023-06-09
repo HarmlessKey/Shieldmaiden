@@ -1,7 +1,7 @@
 <template>
 	<div class="card-body">
 		<p>
-			The public initiative list is accessable through a link you can share with your party, or you
+			The public initiative list is accessible through a link you can share with your party, or you
 			can put it up on a second screen for your party to see. In here players can follow the
 			encounter, see who's turn it is and what the status of the entities within the encounter is.
 			Below you can determine what should be visible on the public initiative list.
@@ -345,13 +345,8 @@ export default {
 			return value === current;
 		},
 		displaySetting(type, key, value) {
-			let options = this.types[type].type_settings.filter((item) => {
-				return item.key === key;
-			})[0].options;
-			const selected = options.filter((item) => {
-				return item.value === value;
-			})[0];
-			return selected;
+			let options = this.types[type].type_settings.find((item) => item.key === key).options;
+			return options.find((item) => item.value === value);
 		},
 	},
 };

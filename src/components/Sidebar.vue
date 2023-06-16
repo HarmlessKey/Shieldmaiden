@@ -219,7 +219,7 @@
 							anchor="center right"
 							self="center left"
 						>
-							Feedback
+							Support
 						</q-tooltip>
 					</q-item>
 					<q-item clickable v-ripple to="/feedback">

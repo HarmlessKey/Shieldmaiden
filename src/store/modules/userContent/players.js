@@ -123,11 +123,11 @@ const player_actions = {
 	 * Fetches all the search_players for a user
 	 * and stores them in players
 	 */
-	async get_players({ state, rootGetters, dispatch, commit }) {
+	async get_players({ state, getters, rootGetters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let players = state.players ? state.players : undefined;
 
-		if (!players && uid) {
+		if ((!players || getters.player_count > Object.keys(players).length) && uid) {
 			const services = await dispatch("get_player_services");
 			try {
 				players = await services.getPlayers(uid);

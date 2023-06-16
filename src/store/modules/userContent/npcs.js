@@ -53,11 +53,11 @@ const npc_actions = {
 	 * Fetches all the search_npcs for a user
 	 * and stores them in npcs
 	 */
-	async get_npcs({ state, rootGetters, dispatch, commit }) {
+	async get_npcs({ state, getters, rootGetters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let npcs = state.npcs ? state.npcs : undefined;
 
-		if (!npcs && uid) {
+		if ((!npcs || getters.npc_count > Object.keys(npcs).length) && uid) {
 			const services = await dispatch("get_npc_services");
 			try {
 				npcs = await services.getNpcs(uid);

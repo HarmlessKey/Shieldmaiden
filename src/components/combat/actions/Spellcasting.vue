@@ -275,7 +275,7 @@ export default {
 		spell_levels() {
 			let levels = [];
 
-			if (Object.values(this.entity[`${this.tab}_spells`])) {
+			if (this.entity[`${this.tab}_spells`]) {
 				if (this.tab === "caster") {
 					for (const spell of Object.values(this.entity[`${this.tab}_spells`])) {
 						if (!levels.includes(spell.level)) levels.push(spell.level);
@@ -301,22 +301,24 @@ export default {
 			const spells = {};
 
 			for (const type of this.tabs) {
-				spells[type.name] = await Promise.all(
-					Object.entries(this.entity[`${type.name}_spells`]).map(async ([key, value]) => {
-						const spell = value.custom
-							? // userId comes from setHP mixin
-							  await this.get_spell({ uid: this.userId, id: key })
-							: await this.fetch_api_spell(key);
-						spell.key = key;
+				if (this.entity[`${type.name}_spells`]) {
+					spells[type.name] = await Promise.all(
+						Object.entries(this.entity[`${type.name}_spells`]).map(async ([key, value]) => {
+							const spell = value.custom
+								? // userId comes from setHP mixin
+								  await this.get_spell({ uid: this.userId, id: key })
+								: await this.fetch_api_spell(key);
+							spell.key = key;
 
-						if (type.name === "innate") {
-							spell.limit = value.limit == 0 ? Infinity : value.limit;
-						} else {
-							spell.level = value.level;
-						}
-						return spell;
-					})
-				);
+							if (type.name === "innate") {
+								spell.limit = value.limit == 0 ? Infinity : value.limit;
+							} else {
+								spell.level = value.level;
+							}
+							return spell;
+						})
+					);
+				}
 			}
 			return spells;
 		},

@@ -45,8 +45,6 @@ export default {
 		async initialize({ state, dispatch, commit, rootGetters }) {
 			if (state.initialized) return;
 
-			dispatch("setTips");
-
 			// In main.js before the Vue instance is rendered
 			// it's checked if there is a firebase authorization present.
 			// Therefore we can check here with 'auth' if there is a user.

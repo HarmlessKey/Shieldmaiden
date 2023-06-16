@@ -392,7 +392,7 @@ const user_actions = {
 		await dispatch("npcs/clear_npc_store", {}, { root: true });
 		await dispatch("reminders/clear_reminder_store", {}, { root: true });
 		await dispatch("items/clear_item_store", {}, { root: true });
-		await dispatch("items/clear_spell_store", {}, { root: true });
+		await dispatch("spells/clear_spell_store", {}, { root: true });
 		await commit("CLEAR_USER", undefined);
 
 		// Sign out from firebase

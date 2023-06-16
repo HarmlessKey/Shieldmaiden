@@ -54,11 +54,11 @@ const spell_actions = {
 	 * Stores those spells in spells store
 	 * Returns an Array of spells, ordered by name.
 	 */
-	async get_spells({ state, rootGetters, dispatch, commit }) {
+	async get_spells({ state, getters, rootGetters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let spells = state.spells ? state.spells : undefined;
 
-		if (!spells && uid) {
+		if ((!spells || getters.spell_count > Object.keys(spells).length) && uid) {
 			const services = await dispatch("get_spell_services");
 			try {
 				spells = await services.getSpells(uid);
@@ -106,6 +106,22 @@ const spell_actions = {
 		return spell;
 	},
 
+	async get_spell_id_by_name({ rootGetters, dispatch }, { name }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_spell_services");
+			try {
+				const spells = await services.getSearchSpellByName(uid, name);
+				if (spells === null) {
+					return null;
+				}
+				return Object.keys(spells)[0];
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Adds a newly created SPELL for a user
 	 * A user can only add SPELLS for themselves so we use the uid from the store
@@ -113,7 +129,7 @@ const spell_actions = {
 	 * @param {object} spell
 	 * @returns {string} the id of the newly added spell
 	 */
-	async add_spell({ rootGetters, commit, dispatch }, spell) {
+	async add_spell({ rootGetters, commit, dispatch }, { spell, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.spells;
 
@@ -125,14 +141,13 @@ const spell_actions = {
 				return "Not enough slots";
 			}
 			try {
+				console.log(spell);
 				const search_spell = convert_spell(spell);
-				const id = await services.addSpell(uid, spell, search_spell);
+				const id = await services.addSpell(uid, spell, search_spell, predefined_key);
 				commit("SET_SPELL", { id, search_spell });
 				commit("SET_CACHED_SPELL", { uid, id, spell });
 
-				const new_count = await services.updateSpellCount(uid, 1);
-				commit("SET_SPELL_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				await dispatch("update_spell_count", 1);
 				return id;
 			} catch (error) {
 				throw error;
@@ -179,10 +194,40 @@ const spell_actions = {
 				commit("REMOVE_SPELL", id);
 				commit("REMOVE_CACHED_SPELL", { uid, id });
 
-				const new_count = await services.updateSpellCount(uid, -1);
+				await dispatch("update_spell_count", -1);
+				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Update spell count
+	 */
+	async update_spell_count({ rootGetters, dispatch, commit }, value) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_spell_services");
+			try {
+				const new_count = await services.updateSpellCount(uid, value);
 				commit("SET_SPELL_COUNT", new_count);
 				dispatch("checkEncumbrance", "", { root: true });
-				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Reserve Spell id for future usage
+	 */
+	async reserve_spell_id({ rootGetters, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_spell_services");
+			try {
+				return await services.reserveSpellId(uid);
 			} catch (error) {
 				throw error;
 			}

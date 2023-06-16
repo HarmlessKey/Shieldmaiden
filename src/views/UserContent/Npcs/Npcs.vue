@@ -3,14 +3,14 @@
 		<hk-card>
 			<ContentHeader type="npcs">
 				<button slot="actions-left" class="btn btn-sm bg-neutral-5" @click="exportAll()">
-					Export NPCs
+					Export
 				</button>
 				<button
 					slot="actions-right"
 					class="btn btn-sm bg-neutral-5 mx-2"
 					@click="import_dialog = true"
 				>
-					Import NPCs
+					Import
 				</button>
 			</ContentHeader>
 
@@ -249,7 +249,7 @@ export default {
 			const all_npcs = await this.get_full_npcs();
 			for (const key in all_npcs) {
 				all_npcs[key].harmless_key = key;
-				this.addCustomSpellToExport(all_npcs[key]);
+				await this.addCustomSpellToExport(all_npcs[key]);
 			}
 
 			const json_export = Object.values(all_npcs);

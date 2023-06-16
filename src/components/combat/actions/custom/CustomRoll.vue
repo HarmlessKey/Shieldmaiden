@@ -116,7 +116,6 @@ export default {
 	data() {
 		return {
 			damage_types: damage_types,
-			demo: this.$route.name === "Demo",
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,

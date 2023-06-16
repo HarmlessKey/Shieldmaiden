@@ -2,7 +2,7 @@
 	<hk-card>
 		<div slot="header" class="card-header">
 			Give feedback
-			<a class="btn btn-sm bg-discord-purple" href="https://discord.gg/UY63AY8Ae6" target="_blank">
+			<a class="btn btn-sm bg-discord-purple" href="https://discord.gg/UY63AY8Ae6" rel="noopener" target="_blank">
 				<i class="fab fa-discord mr-1" aria-hidden="true" /> Join Discord
 			</a>
 		</div>

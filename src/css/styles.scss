@@ -1063,6 +1063,7 @@ html body {
 					.buttons {
 						display: flex;
 						justify-content: flex-end;
+						align-items: center;
 					}
 					@media only screen and (max-width: 343px) {
 						.buttons {

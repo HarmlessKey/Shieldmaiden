@@ -3,16 +3,16 @@
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveEffect)" greedy>
 				<div>
-					<div class="top">
-						<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
-							<q-tooltip anchor="top middle" self="center middle">
-								There are validation errors
-							</q-tooltip>
-						</q-icon>
-					</div>
-
 					<div class="form">
 						<hk-card header="Custom effect">
+							<div slot="header" class="card-header">
+								Custom effect
+								<q-icon v-if="!valid" name="error" size="sm" class="mr-2 red">
+									<q-tooltip anchor="top middle" self="center middle">
+										There are validation errors
+									</q-tooltip>
+								</q-icon>
+							</div>
 							<div class="card-body">
 								<hk-effects-form v-model="effect" />
 							</div>
@@ -22,7 +22,7 @@
 					<!-- HANDLING -->
 					<div class="save">
 						<div class="buttons">
-							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+							<q-icon v-if="!valid" name="error" size="md" class="mr-2 red">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
 								</q-tooltip>
@@ -197,30 +197,3 @@ export default {
 	},
 };
 </script>
-
-<style lang="scss" scoped>
-.content__edit {
-	.top {
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-		margin-bottom: 10px;
-
-		.name {
-			user-select: none;
-			justify-content: flex-end;
-			line-height: 35px;
-
-			.img {
-				width: 31px;
-				height: 31px;
-				background-position: center top;
-				background-size: cover;
-				border: solid 1px $neutral-4;
-				margin: 2px 0 2px 5px;
-				border-radius: 50%;
-			}
-		}
-	}
-}
-</style>

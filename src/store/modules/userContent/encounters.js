@@ -2,6 +2,16 @@ import Vue from "vue";
 import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
+/**
+ * @typedef {Object} Encounter
+ * @property {Array} entities
+ * @property {boolean} finished
+ * @property {string} name
+ * @property {number} round
+ * @property {number} turn
+ *
+ */
+
 // Converts a full encounter to a search_encounter
 const convert_encounter = (encounter) => {
 	const properties = ["name", "round", "turn", "finished"];
@@ -124,6 +134,8 @@ const encounter_actions = {
 	 * @param {string} uid userId
 	 * @param {string} campaignId campaignId
 	 * @param {string} id encounterId
+	 *
+	 * @return {Encounter}
 	 */
 	async get_encounter({ state, commit, dispatch }, { uid, campaignId, id }) {
 		let encounter =

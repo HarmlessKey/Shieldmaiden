@@ -1,3 +1,5 @@
+import HkInput from "../components/hk-components/hk-input";
+import HkSelect from "../components/hk-components/hk-select";
 import HkTable from "../components/hk-components/hk-table";
 import HkCard from "../components/hk-components/hk-card";
 import HkCardDeck from "../components/hk-components/hk-card-deck";
@@ -22,6 +24,8 @@ import HkActionRollScaling from "../components/hk-components/hk-action-rolls/hk-
 import HkEffectsForm from "../components/hk-components/hk-effects-form";
 
 export default async ({ Vue }) => {
+	Vue.component("hk-input", HkInput);
+	Vue.component("hk-select", HkSelect);
 	Vue.component("hk-table", HkTable);
 	Vue.component("hk-card", HkCard);
 	Vue.component("hk-card-deck", HkCardDeck);

@@ -1,19 +1,19 @@
 export const triggers = Object.freeze([
 	{
+		label: "Start of targets turn",
+		value: "start_turn_target",
+	},
+	{
+		label: "End of targets turn",
+		value: "end_turn_target",
+	},
+	{
 		label: "Start of casters turn",
 		value: "start_turn_caster",
 	},
 	{
 		label: "End of casters turn",
 		value: "end_turn_caster",
-	},
-	{
-		label: "End of targets turn",
-		value: "end_turn_target",
-	},
-	{
-		label: "End of targets turn",
-		value: "end_turn_target",
 	},
 	{
 		label: "On damage taken",
@@ -32,7 +32,7 @@ export const duration_types = Object.freeze([
 	},
 	{
 		label: "Until trigger",
-		value: "saved",
+		value: "trigger",
 	},
 	{
 		label: "Concentration break",
@@ -46,18 +46,21 @@ export const effect_types = Object.freeze({
 		value: "bonus",
 		description: "Add a bonus value",
 		subtypes: ["ac", "max_hp", "attack", "damage", "ability", "skill", "save", "speed"],
+		number_value: true,
 	},
 	base: {
 		label: "Set base value",
 		value: "base",
 		description: "Set a value to a base value, other modifiers still apply",
-		subtypes: ["ac", "max_hp", "attack", "damage", "ability", "skill", "save", "speed"],
+		subtypes: ["ac", "max_hp", "damage", "ability", "speed"],
+		number_value: true,
 	},
 	fixed: {
 		label: "Fixed value",
 		value: "fixed",
 		description: "Set a value to a fixed value, other modifiers no longer apply",
-		subtypes: ["ac", "max_hp", "temp_hp", "attack", "damage", "ability", "skill", "save", "speed"],
+		subtypes: ["ac", "max_hp", "temp_hp", "damage", "ability", "speed"],
+		number_value: true,
 	},
 	defense: {
 		label: "Defenses",
@@ -83,12 +86,14 @@ export const effect_types = Object.freeze({
 		value: "damage",
 		description: "The target takes damage",
 		subtypes: ["roll", "fixed_value"],
+		trigger: true,
 	},
 	healing: {
 		label: "Healing",
 		value: "healing",
 		description: "The target receives healing",
 		subtypes: ["roll", "fixed_value"],
+		trigger: true,
 	},
 	auto_fail: {
 		label: "Auto fail",

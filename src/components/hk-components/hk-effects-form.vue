@@ -1,77 +1,49 @@
 <template>
 	<div>
-		<ValidationProvider
+		<hk-input
+			v-model="effect.name"
 			rules="max:100|required"
+			label="Name *"
 			name="Name"
-			v-slot="{ errors, invalid, validated }"
-		>
-			<q-input
-				:dark="$store.getters.theme === 'dark'"
-				filled
-				square
-				label="Name *"
-				v-model="effect.name"
-				class="mb-2"
-				maxlength="101"
-				autocomplete="off"
-				:error="invalid && validated"
-				:error-message="errors[0]"
-			/>
-		</ValidationProvider>
-		<ValidationProvider rules="max:500" name="Description" v-slot="{ errors, invalid, validated }">
-			<q-input
-				:dark="$store.getters.theme === 'dark'"
-				label="Description"
-				filled
-				square
-				type="textarea"
-				v-model="effect.description"
-				autogrow
-				:error="invalid && validated"
-				:error-message="errors[0]"
-			/>
-		</ValidationProvider>
-
-		<q-select
-			:dark="$store.getters.theme === 'dark'"
-			filled
-			square
-			emit-value
-			map-options
-			label="Duration type"
 			class="mb-3"
-			clearable
-			v-model="effect.duration_type"
-			:options="duration_types"
+			maxlength="101"
+		/>
+		<hk-input
+			v-model="effect.description"
+			rules="max:1"
+			label="Description"
+			name="Description"
+			type="textarea"
+			autogrow
 		/>
 
-		<ValidationProvider
+		<hk-select
+			v-model="effect.duration_type"
+			:options="duration_types"
+			label="Duration type"
+			class="mb-3"
+			emit-value
+			map-options
+			clearable
+		/>
+
+		<hk-input
 			v-if="effect.duration_type === 'time'"
+			v-model="effect.duration"
 			rules="between:0,99"
 			name="Duration"
-			v-slot="{ errors, invalid, validated }"
+			label="Duration (in rounds)"
+			type="number"
+			class="mb-2"
+			hint="1 round is 6 seconds"
+			@keyup="$forceUpdate()"
+			@input="(value) => parseToInt(value, effect, 'duration')"
 		>
-			<q-input
-				:dark="$store.getters.theme === 'dark'"
-				filled
-				square
-				label="Duration (in rounds)"
-				v-model="effect.duration"
-				autocomplete="off"
-				type="number"
-				class="mb-2"
-				hint="1 round is 6 seconds"
-				:error="invalid && validated"
-				:error-message="errors[0]"
-				@keyup="$forceUpdate()"
-				@input="(value) => parseToInt(value, effect, 'duration')"
-			>
-				<hk-popover slot="append" header="Duration">
-					<i class="fas fa-info-circle neutral-2" aria-hidden="true" />
-					<template #content>For how long is the effect applied to the target?</template>
-				</hk-popover>
-			</q-input>
-		</ValidationProvider>
+			<hk-popover slot="append" header="Duration">
+				<i class="fas fa-info-circle neutral-2" aria-hidden="true" />
+				<template #content>For how long is the effect applied to the target?</template>
+			</hk-popover>
+		</hk-input>
 
 		<h3 class="d-flex justify-content-between mt-3">
 			Effects
@@ -99,6 +71,9 @@
 							<q-icon name="error" color="red" />
 							<q-tooltip anchor="top middle" self="center middle"> Validation errors </q-tooltip>
 						</q-item-section>
+						<q-item-section v-if="subeffect.value" avatar>
+							<span class="bonus-value">{{ displayValue(subeffect) }}</span>
+						</q-item-section>
 						<q-item-section class="truncate">
 							{{ subeffectTitle(subeffect) }}
 						</q-item-section>
@@ -111,68 +86,61 @@
 					</template>
 
 					<div class="accordion-body">
-						<ValidationProvider
-							rules="required"
+						<hk-select
+							v-model="subeffect.type"
+							:options="Object.values(effect_types)"
+							label="Type"
 							name="Type"
-							v-slot="{ errors, invalid, validated }"
-						>
-							<q-select
-								:dark="$store.getters.theme === 'dark'"
-								filled
-								square
-								emit-value
-								map-options
-								label="Type"
-								class="mb-3"
-								v-model="subeffect.type"
-								:hint="subeffect.type ? effect_types[subeffect.type].description : ''"
-								:options="Object.values(effect_types)"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-								@input="$delete(effect.subeffects[i], 'subtype')"
-							/>
-						</ValidationProvider>
-
-						<ValidationProvider
 							rules="required"
-							name="Type"
-							v-slot="{ errors, invalid, validated }"
-						>
-							<q-select
-								:dark="$store.getters.theme === 'dark'"
-								filled
-								square
-								emit-value
-								map-options
-								label="Subtype"
-								class="mb-3"
-								v-model="subeffect.subtype"
-								:options="subTypes(subeffect.type)"
-								:disable="!subeffect.type"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</ValidationProvider>
-
-						<q-select
-							:dark="$store.getters.theme === 'dark'"
-							filled
-							square
 							emit-value
 							map-options
-							label="Trigger"
 							class="mb-3"
-							clearable
-							v-model="effect.trigger"
+							:hint="subeffect.type ? effect_types[subeffect.type].description : ''"
+							@input="clearValues(i)"
+						/>
+
+						<hk-select
+							v-model="subeffect.subtype"
+							:options="subTypes(subeffect.type)"
+							rules="required"
+							label="Subtype"
+							name="Subtype"
+							class="mb-2"
+							emit-value
+							map-options
+							:disable="!subeffect.type"
+						/>
+
+						<hk-input
+							v-if="subeffect.type && effect_types[subeffect.type].number_value"
+							v-model="subeffect.value"
+							rules="required|between:-99,99"
+							label="Value"
+							name="Value"
+							type="number"
+							@keyup="$forceUpdate()"
+							@input="(value) => parseToInt(value, effect.subeffects[i], 'value')"
+						/>
+
+						<hk-select
+							v-if="subeffect.type && effect_types[subeffect.type].trigger"
+							v-model="subeffect.trigger"
 							:options="triggers"
+							rules="required"
+							label="Trigger"
+							name="Trigger"
+							class="mt-3"
+							emit-value
+							map-options
+							clearable
 						>
 							<hk-popover slot="append" header="Triggers">
 								<i class="fas fa-info-circle neutral-2" aria-hidden="true" />
 								<template #content>
-									With a trigger, this effect can be applied when a certain condition is met.
+									With a trigger, this effect will be applied when a certain condition is met.
 								</template>
 							</hk-popover>
-						</q-select>
+						</hk-select>
 					</div>
 				</q-expansion-item>
 			</ValidationObserver>
@@ -237,8 +205,33 @@ export default {
 		removeSubeffect(i) {
 			this.$delete(this.effect.subeffects, i);
 		},
+		/**
+		 * Clear the values of a subeffect that are related to the type
+		 */
+		clearValues(i) {
+			const props = ["subtype", "trigger", "value"];
+			for (const prop of props) {
+				this.$delete(this.effect.subeffects[i], prop);
+			}
+		},
+		displayValue(subeffect) {
+			if (subeffect.value) {
+				if (subeffect.type === "bonus") {
+					return subeffect.value > 0 ? `+${subeffect.value}` : subeffect.value;
+				}
+				return subeffect.value;
+			}
+			return undefined;
+		},
 	},
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.bonus-value {
+	text-align: center;
+	background-color: $neutral-6;
+	padding: 3px 10px;
+	border-radius: $border-radius;
+}
+</style>

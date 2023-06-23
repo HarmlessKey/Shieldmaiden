@@ -52,6 +52,7 @@ export default {
 		...mapActions("campaigns", ["get_campaign"]),
 		...mapActions("encounters", ["get_encounter", "get_campaign_encounters"]),
 		async downloadContent() {
+			let filename = "harmlesskey";
 			if (this.content_type === "campaign") {
 				await Promise.all([
 					this.exportCampaign(this.content_id),
@@ -59,9 +60,33 @@ export default {
 				]);
 				await this.exportNpcArray([...this.exportQueue.npcs]);
 				await this.exportSpellArray([...this.exportQueue.spells]);
-
-				console.log("DATA", this.exportData);
+				filename = this.exportData.campaigns[this.content_id].name;
 			}
+
+			this.downloadJson(filename);
+		},
+		async downloadJson(filename) {
+			filename = `${filename}.json`;
+
+			const json = this.cleanExportData();
+			console.log("json to download", json);
+
+			const blob = new Blob([json], { type: "application/json" });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = filename;
+			a.click();
+			URL.revokeObjectURL(url);
+		},
+		cleanExportData() {
+			return JSON.stringify(
+				Object.fromEntries(
+					Object.entries(this.exportData).filter(([key, val]) => Object.keys(val).length)
+				),
+				null,
+				2
+			);
 		},
 		async exportCampaign(campaign_id) {
 			await this.get_campaign({ uid: this.uid, id: campaign_id }).then((campaign) => {

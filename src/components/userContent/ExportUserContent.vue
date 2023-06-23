@@ -190,6 +190,7 @@ export default {
 			encounter.turn = 0;
 
 			delete encounter.timestamp;
+			delete encounter.loot;
 
 			encounter.harmless_key = encounter_id;
 

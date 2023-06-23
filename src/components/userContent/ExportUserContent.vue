@@ -56,10 +56,9 @@ export default {
 			}
 		},
 		async exportCampaign(campaign_id) {
-			console.log("export campaign ", campaign_id);
-			const campaign = await this.get_campaign({ uid: this.uid, id: campaign_id });
-
-			this.addCampaignToExport(campaign);
+			await this.get_campaign({ uid: this.uid, id: campaign_id }).then((campaign) => {
+				this.addCampaignToExport(campaign_id, campaign);
+			});
 		},
 		async exportCampaignEncounters(campaign_id) {
 			await Promise.all([
@@ -76,7 +75,6 @@ export default {
 				const encounters = not_finished.concat(finished);
 				await Promise.all(
 					encounters.map(async (encounter) => {
-						console.log("campaign id inside encounters", campaign_id);
 						await this.exportEncounter(campaign_id, encounter.key);
 					})
 				);
@@ -88,7 +86,6 @@ export default {
 				campaignId: campaign_id,
 				id: encounter_id,
 			}).then(async (encounter) => {
-				console.log("encounter", encounter);
 				this.addEncounterToExport(campaign_id, encounter_id, encounter);
 				await Promise.all(
 					Object.values(encounter.entities).map(async (entity) => {
@@ -104,8 +101,7 @@ export default {
 			console.log("npc", npc);
 		},
 		async exportSpell(spell_id) {},
-		addCampaignToExport(campaign) {
-			const campaign_id = campaign.key;
+		addCampaignToExport(campaign_id, campaign) {
 			delete campaign.key;
 			delete campaign.advancement;
 			delete campaign.companions;
@@ -113,28 +109,38 @@ export default {
 			delete campaign.player_count;
 			delete campaign.players;
 			delete campaign.timestamp;
+			delete campaign.shares;
+			// Option to export inventory and currency in future
+			delete campaign.inventory;
+			delete campaign.currency;
+			campaign.harmless_key = campaign.harmless_key ?? campaign_id;
 
 			this.exportData.campaigns[campaign_id] = campaign;
 		},
 
 		addEncounterToExport(campaign_id, encounter_id, encounter) {
-			console.log("add encounter", encounter);
 			const entities = Object.entries(encounter.entities).filter(([_, entity]) => {
-				console.log(entity);
 				return entity.entityType === "npc";
 			});
 			encounter.entities = Object.fromEntries(entities);
-			console.log("encounter", encounter.entities);
 			encounter.finished = false;
 			encounter.round = 0;
 			encounter.turn = 0;
 
 			delete encounter.timestamp;
 
-			if (this.exportData[campaign_id] === undefined) {
-				this.exportData[campaign_id] = {};
+			encounter.harmless_key = encounter.harmless_key ?? encounter_id;
+
+			if (this.exportData.encounters[campaign_id] === undefined) {
+				this.exportData.encounters[campaign_id] = {};
 			}
 			this.exportData.encounters[campaign_id][encounter_id] = encounter;
+		},
+
+		addNpcToExport(npc_id, npc) {
+			console.log(npc_id, npc);
+			delete npc.player_id;
+			npc.harmless_key = npc.harmless_key ?? npc_id;
 		},
 	},
 };

@@ -114,21 +114,16 @@ export default {
 			await this.get_npc({ uid: this.uid, id: npc_id }).then(async (npc) => {
 				this.addNpcToExport(npc_id, npc);
 
-				let spells = [];
-				if (npc.caster_spells) {
-					spells.concat(Object.entries(npc.caster_spells));
-				}
-				if (npc.innate_spells) {
-					spells.concat(Object.entries(npc.innate_spells));
-				}
-				await Promise.all(
-					spells.map(async (spell_id, spell) => {
-						console.log("add spell to Q", spell);
-						if (spell.custom) {
-							this.exportQueue.spells.add(spell_id);
-						}
-					})
-				);
+				const spell_types = ["caster_spells", "innate_spells"];
+				spell_types.map((spell_type) => {
+					if (npc[spell_type]) {
+						Object.entries(npc[spell_type]).filter(([spell_id, spell]) => {
+							if (spell.custom === true) {
+								this.exportQueue.spells.add(spell_id);
+							}
+						});
+					}
+				});
 			});
 		},
 		async exportSpellArray(spell_id_array) {
@@ -184,12 +179,12 @@ export default {
 			npc.harmless_key = npc_id;
 
 			this.exportData.npcs[npc_id] = npc;
-			console.log("custom npc added", npc_id, npc);
 		},
 
-		addSpellToExport(spell_id, npc) {
+		addSpellToExport(spell_id, spell) {
+			spell.harmless_key = spell_id;
+
 			this.exportData.spells[spell_id] = spell;
-			console.log("custom spell added", spell_id, spell);
 		},
 	},
 };

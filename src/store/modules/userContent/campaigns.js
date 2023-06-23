@@ -110,7 +110,6 @@ const campaign_actions = {
 	 * @param {string} id campaignId
 	 */
 	async get_campaign({ state, commit, dispatch }, { uid, id }) {
-		console.log("in store", uid, id);
 		let campaign = state.cached_campaigns[uid] ? state.cached_campaigns[uid][id] : undefined;
 		const services = await dispatch("get_campaign_services");
 

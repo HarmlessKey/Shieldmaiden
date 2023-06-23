@@ -11,7 +11,8 @@
 		>
 			<q-tab name="log" icon="fas fa fa-scroll-old" />
 			<q-tab name="damage" icon="fas fa-swords" />
-			<q-tab name="requests" icon="fas fa-bell">
+			<q-tab v-if="!demo && !test" name="inventory" icon="fas fa-treasure-chest" />
+			<q-tab v-if="!demo && !test" name="requests" icon="fas fa-bell">
 				<div
 					class="notifications bg-red white animated zoomIn"
 					v-if="requests && Object.keys(requests).length"
@@ -28,7 +29,10 @@
 				<q-tab-panel name="damage">
 					<Dmg />
 				</q-tab-panel>
-				<q-tab-panel name="requests">
+				<q-tab-panel v-if="!demo && !test" name="inventory">
+					<Inventory />
+				</q-tab-panel>
+				<q-tab-panel v-if="!demo && !test" name="requests">
 					<Requests />
 				</q-tab-panel>
 			</q-tab-panels>
@@ -40,6 +44,7 @@
 import Dmg from "src/components/combat/side/Dmg.vue";
 import Log from "src/components/combat/side/Log.vue";
 import Requests from "src/components/combat/side/Requests.vue";
+import Inventory from "src/components/slides/party/Inventory.vue";
 import { mapGetters } from "vuex";
 
 export default {
@@ -48,6 +53,7 @@ export default {
 		Dmg,
 		Log,
 		Requests,
+		Inventory,
 	},
 	data() {
 		return {
@@ -55,7 +61,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["encounter", "requests"]),
+		...mapGetters(["encounter", "requests", "demo", "test"]),
 	},
 };
 </script>

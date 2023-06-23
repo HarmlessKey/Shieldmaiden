@@ -209,6 +209,19 @@
 							Compendium
 						</q-tooltip>
 					</q-item>
+					<q-item clickable v-ripple to="/support">
+						<q-item-section avatar>
+							<i aria-hidden="true" class="fas fa-user-headset" />
+						</q-item-section>
+						<q-item-section class="title">Support</q-item-section>
+						<q-tooltip
+							v-if="$store.getters.side_collapsed"
+							anchor="center right"
+							self="center left"
+						>
+							Support
+						</q-tooltip>
+					</q-item>
 					<q-item clickable v-ripple to="/feedback">
 						<q-item-section avatar>
 							<i aria-hidden="true" class="fas fa-comment-alt" />

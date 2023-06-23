@@ -9,6 +9,7 @@
 			<li><router-link to="/sign-up">Sign Up</router-link></li>
 			<li><router-link to="/sign-in">Sign In</router-link></li>
 			<li><router-link to="/documentation">Documentation</router-link></li>
+			<li><router-link to="/support">Support</router-link></li>
 			<li><router-link to="/feedback">Feedback</router-link></li>
 			<li><router-link to="/changelog">Changelog</router-link></li>
 			<li><router-link to="/privacy-policy">Privacy Policy</router-link></li>

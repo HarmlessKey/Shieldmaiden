@@ -2,10 +2,12 @@ changelog:
   categories:
     - title: New Features 🚀
       labels:
-        - "new"
+        - "Feature"
     - title: Improvements 🦾
       labels:
         - "improvement"
+        - "enhancement"
     - title: Bugfixes 🐛
       labels:
         - "bugfix"
+        - "bug"

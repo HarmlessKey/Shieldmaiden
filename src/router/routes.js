@@ -1206,6 +1206,25 @@ const routes = [
 		},
 	},
 	{
+		path: "/support",
+		component: () => import("src/layouts/default"),
+		meta: {
+			offline: true,
+			title: "Support",
+		},
+		children: [
+			{
+				path: "",
+				name: "Support",
+				component: () => import("src/views/Pages/Support"),
+				meta: {
+					title: "Support",
+					description: "Get support with Harmless Key issues.",
+				},
+			},
+		],
+	},
+	{
 		path: "/feedback",
 		component: () => import("src/layouts/default"),
 		meta: {

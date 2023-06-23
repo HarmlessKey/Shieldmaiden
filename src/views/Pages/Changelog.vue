@@ -49,7 +49,6 @@ export default {
 			releases: [],
 		};
 	},
-	computed: {},
 	methods: {
 		makeDate(date_input) {
 			return makeDate(date_input);

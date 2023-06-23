@@ -106,7 +106,7 @@ export default {
 			}
 			const projectiles = this.projectileScaling(config);
 
-			if (this.$listeners["roll"]) {
+			if (this.$listeners && this.$listeners["roll"]) {
 				this.$emit("roll", e, projectiles, option);
 			} else {
 				[...Array(projectiles).keys()].forEach(() => {

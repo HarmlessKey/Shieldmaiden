@@ -124,8 +124,8 @@ export const runEncounter = {
 				action.rolls.forEach((item, roll_index) => {
 					share.notification.actions[action_index].rolls[roll_index] = {
 						damage_type: item.damage_type || null,
-						roll: item.modifierRoll.roll,
-						total: item.modifierRoll.total,
+						roll: item.rollResult.roll,
+						total: item.rollResult.total,
 					};
 				});
 			});

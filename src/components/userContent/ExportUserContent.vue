@@ -36,6 +36,10 @@ export default {
 				spells: {},
 				items: {},
 			},
+			exportQueue: {
+				npcs: new Set(),
+				spells: new Set(),
+			},
 		};
 	},
 	mounted() {
@@ -44,6 +48,7 @@ export default {
 
 	methods: {
 		...mapActions("npcs", ["get_npc"]),
+		...mapActions("spells", ["get_spell"]),
 		...mapActions("campaigns", ["get_campaign"]),
 		...mapActions("encounters", ["get_encounter", "get_campaign_encounters"]),
 		async downloadContent() {
@@ -52,6 +57,9 @@ export default {
 					this.exportCampaign(this.content_id),
 					this.exportCampaignEncounters(this.content_id),
 				]);
+				await this.exportNpcArray([...this.exportQueue.npcs]);
+				await this.exportSpellArray([...this.exportQueue.spells]);
+
 				console.log("DATA", this.exportData);
 			}
 		},
@@ -71,7 +79,6 @@ export default {
 					finished: true,
 				}),
 			]).then(async ([not_finished, finished]) => {
-				// TODO check what goes wrong when encounters not cached in store.
 				const encounters = not_finished.concat(finished);
 				await Promise.all(
 					encounters.map(async (encounter) => {
@@ -90,17 +97,52 @@ export default {
 				await Promise.all(
 					Object.values(encounter.entities).map(async (entity) => {
 						if (entity.entityType === "npc" && entity.npc === "custom") {
-							await this.exportNpc(entity.id);
+							this.exportQueue.npcs.add(entity.id);
 						}
 					})
 				);
 			});
 		},
-		async exportNpc(npc_id) {
-			const npc = await this.get_npc({ uid: this.uid, id: npc_id });
-			console.log("npc", npc);
+		async exportNpcArray(npc_id_array) {
+			await Promise.all(
+				npc_id_array.map(async (npc_id) => {
+					await this.exportNpc(npc_id);
+				})
+			);
 		},
-		async exportSpell(spell_id) {},
+		async exportNpc(npc_id) {
+			await this.get_npc({ uid: this.uid, id: npc_id }).then(async (npc) => {
+				this.addNpcToExport(npc_id, npc);
+
+				let spells = [];
+				if (npc.caster_spells) {
+					spells.concat(Object.entries(npc.caster_spells));
+				}
+				if (npc.innate_spells) {
+					spells.concat(Object.entries(npc.innate_spells));
+				}
+				await Promise.all(
+					spells.map(async (spell_id, spell) => {
+						console.log("add spell to Q", spell);
+						if (spell.custom) {
+							this.exportQueue.spells.add(spell_id);
+						}
+					})
+				);
+			});
+		},
+		async exportSpellArray(spell_id_array) {
+			await Promise.all(
+				spell_id_array.map(async (spell_id) => {
+					this.exportSpell(spell_id);
+				})
+			);
+		},
+		async exportSpell(spell_id) {
+			await this.get_spell({ uid: this.uid, id: spell_id }).then((spell) => {
+				this.addSpellToExport(spell_id, spell);
+			});
+		},
 		addCampaignToExport(campaign_id, campaign) {
 			delete campaign.key;
 			delete campaign.advancement;
@@ -113,7 +155,7 @@ export default {
 			// Option to export inventory and currency in future
 			delete campaign.inventory;
 			delete campaign.currency;
-			campaign.harmless_key = campaign.harmless_key ?? campaign_id;
+			campaign.harmless_key = campaign_id;
 
 			this.exportData.campaigns[campaign_id] = campaign;
 		},
@@ -129,7 +171,7 @@ export default {
 
 			delete encounter.timestamp;
 
-			encounter.harmless_key = encounter.harmless_key ?? encounter_id;
+			encounter.harmless_key = encounter_id;
 
 			if (this.exportData.encounters[campaign_id] === undefined) {
 				this.exportData.encounters[campaign_id] = {};
@@ -138,9 +180,16 @@ export default {
 		},
 
 		addNpcToExport(npc_id, npc) {
-			console.log(npc_id, npc);
 			delete npc.player_id;
-			npc.harmless_key = npc.harmless_key ?? npc_id;
+			npc.harmless_key = npc_id;
+
+			this.exportData.npcs[npc_id] = npc;
+			console.log("custom npc added", npc_id, npc);
+		},
+
+		addSpellToExport(spell_id, npc) {
+			this.exportData.spells[spell_id] = spell;
+			console.log("custom spell added", spell_id, spell);
 		},
 	},
 };

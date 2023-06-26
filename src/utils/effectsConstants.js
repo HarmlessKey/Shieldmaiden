@@ -120,84 +120,89 @@ export const effect_types = Object.freeze({
 	},
 });
 
-export const effect_subtypes = Object.freeze([
-	{
+export const effect_subtypes = Object.freeze({
+	ac: {
 		label: "Armor class",
 		value: "ac",
 	},
-	{
+	max_hp: {
 		label: "Hit Point Maximum",
 		value: "max_hp",
 	},
-	{
+	temp_hp: {
 		label: "Temporary Hit Point",
 		value: "temp_hp",
 	},
-	{
+	attack: {
 		label: "Attack",
 		value: "attack",
 	},
-	{
+	skill: {
 		label: "Skill",
 		value: "skill",
+		select: ["skills"],
 	},
-	{
+	save: {
 		label: "Saving throw",
 		value: "save",
+		select: ["abilities"],
 	},
-	{
+	speed: {
 		label: "Speed",
 		value: "speed",
 	},
-	{
+	v: {
 		label: "Vulnerable",
 		value: "v",
+		select: ["damage_types"],
 	},
-	{
+	r: {
 		label: "Resistant",
 		value: "r",
+		select: ["damage_types"],
 	},
-	{
+	i: {
 		label: "Immune",
 		value: "i",
+		select: ["damage_types", "conditions"],
 	},
-	{
+	death_save: {
 		label: "Death save",
 		value: "death_save",
 	},
-	{
+	max_damage: {
 		label: "Maximum damage",
 		value: "max_damage",
 	},
-	{
+	max_healing: {
 		label: "Maximum healing",
 		value: "max_healing",
 	},
-	{
+	descriptive: {
 		label: "Descriptive",
 		value: "descriptive",
 	},
-	{
+	roll: {
 		label: "Roll",
 		value: "roll",
 	},
-	{
+	fixed_value: {
 		label: "Fixed value",
 		value: "fixed_value",
 	},
-	{
+	crit: {
 		label: "Crit",
 		value: "crit",
 	},
-	{
+	action: {
 		label: "Action",
 		value: "action",
 	},
-	{
+	reaction: {
 		label: "Reaction",
 		value: "reaction",
 	},
-]);
+});
 
 export default {
 	triggers,

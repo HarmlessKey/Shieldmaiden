@@ -1,24 +1,24 @@
 <template>
-	<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
-		<q-select
-			v-bind="$attrs"
-			v-model="modelValue"
-			:dark="$store.getters.theme === 'dark'"
-			:filled="filled"
-			:square="square"
-			:autocomplete="autocomplete"
-			:error="invalid && validated"
-			:error-message="errors[0]"
-		>
-			<slot name="label" slot="label" />
-			<slot name="before" slot="before" />
-			<slot name="prepend" slot="prepend" />
-			<slot name="append" slot="append" />
-			<slot name="after" slot="after" />
-			<slot name="counter" slot="counter" />
-			<slot name="loading" slot="loading" />
-		</q-select>
-	</ValidationProvider>
+	<div>
+		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
+			<q-select
+				v-bind="$attrs"
+				v-on="$listeners"
+				v-model="modelValue"
+				:dark="$store.getters.theme === 'dark'"
+				:filled="filled"
+				:square="square"
+				:autocomplete="autocomplete"
+				:error="invalid && validated"
+				:error-message="errors[0]"
+			>
+				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
+				<template v-for="slot in Object.keys($scopedSlots)" :slot="slot" slot-scope="scope">
+					<slot :name="slot" v-bind="scope" />
+				</template>
+			</q-select>
+		</ValidationProvider>
+	</div>
 </template>
 
 <script>
@@ -26,7 +26,7 @@ export default {
 	name: "hk-select",
 	props: {
 		value: {
-			type: [String, Number],
+			type: [String, Array],
 		},
 		filled: {
 			type: Boolean,

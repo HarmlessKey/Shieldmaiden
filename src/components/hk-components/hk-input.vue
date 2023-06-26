@@ -1,24 +1,21 @@
 <template>
-	<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
-		<q-input
-			v-bind="$attrs"
-			v-model="modelValue"
-			:dark="$store.getters.theme === 'dark'"
-			:filled="filled"
-			:square="square"
-			:autocomplete="autocomplete"
-			:error="invalid && validated"
-			:error-message="errors[0]"
-		>
-			<slot name="label" slot="label" />
-			<slot name="before" slot="before" />
-			<slot name="prepend" slot="prepend" />
-			<slot name="append" slot="append" />
-			<slot name="after" slot="after" />
-			<slot name="counter" slot="counter" />
-			<slot name="loading" slot="loading" />
-		</q-input>
-	</ValidationProvider>
+	<div>
+		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
+			<q-input
+				v-bind="$attrs"
+				v-on="$listeners"
+				v-model="modelValue"
+				:dark="$store.getters.theme === 'dark'"
+				:filled="filled"
+				:square="square"
+				:autocomplete="autocomplete"
+				:error="invalid && validated"
+				:error-message="errors[0]"
+			>
+				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
+			</q-input>
+		</ValidationProvider>
+	</div>
 </template>
 
 <script>

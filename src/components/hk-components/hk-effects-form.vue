@@ -105,7 +105,7 @@
 							rules="required"
 							label="Subtype"
 							name="Subtype"
-							class="mb-2"
+							class="mb-3"
 							emit-value
 							map-options
 							:disable="!subeffect.type"
@@ -120,6 +120,16 @@
 							type="number"
 							@keyup="$forceUpdate()"
 							@input="(value) => parseToInt(value, effect.subeffects[i], 'value')"
+						/>
+
+						<hk-dmg-type-select
+							v-if="showSelect('damage_types', subeffect.subtype)"
+							v-model="subeffect.damage_type"
+							label="Damage type"
+							name="Damage type"
+							rules="required"
+							multiple
+							non-magical
 						/>
 
 						<hk-select
@@ -193,13 +203,13 @@ export default {
 		},
 		subTypes(type) {
 			const subtypes = type ? this.effect_types[type].subtypes : [];
-			return this.effect_subtypes.filter((subtype) => subtypes.includes(subtype.value));
+			return Object.values(this.effect_subtypes).filter((subtype) =>
+				subtypes.includes(subtype.value)
+			);
 		},
 		subeffectTitle(subeffect) {
 			let title = subeffect.type ? this.effect_types[subeffect.type].label : "";
-			title += subeffect.subtype
-				? ` → ${this.effect_subtypes.find((type) => type.value === subeffect.subtype).label}`
-				: "";
+			title += subeffect.subtype ? ` → ${this.effect_subtypes[subeffect.subtype].label}` : "";
 			return title;
 		},
 		removeSubeffect(i) {
@@ -222,6 +232,13 @@ export default {
 				return subeffect.value;
 			}
 			return undefined;
+		},
+		showSelect(select, subtype) {
+			return (
+				subtype &&
+				this.effect_subtypes[subtype].select &&
+				this.effect_subtypes[subtype].select.includes(select)
+			);
 		},
 	},
 };

@@ -55,8 +55,8 @@
 										</template>
 										<ExportUserContent
 											class="btn-sm btn-clear white"
-											content_type="campaign"
-											:content_id="campaign.key"
+											content-type="campaign"
+											:content-id="campaign.key"
 										/>
 										<a
 											class="btn btn-sm btn-clear white"

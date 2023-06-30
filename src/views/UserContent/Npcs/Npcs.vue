@@ -2,9 +2,14 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="npcs">
-				<button slot="actions-left" class="btn btn-sm bg-neutral-5" @click="exportAll()">
-					Export
-				</button>
+				<ExportUserContent
+					slot="actions-left"
+					class="btn-sm bg-neutral-5"
+					content-type="npc"
+					:content-id="npcIds"
+				>
+					<span>Export</span>
+				</ExportUserContent>
 				<button
 					slot="actions-right"
 					class="btn btn-sm bg-neutral-5 mx-2"
@@ -74,8 +79,8 @@
 								</router-link>
 								<ExportUserContent
 									class="btn-sm bg-neutral-5 mx-2"
-									content_type="npc"
-									:content_id="props.key"
+									content-type="npc"
+									:content-id="props.key"
 								/>
 
 								<!-- <a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
@@ -204,10 +209,16 @@ export default {
 				? ["avatar", "name", "type", "actions"]
 				: ["avatar", "name", "actions"];
 		},
+		npcIds() {
+			const ids = this.npcs.map((npc) => npc.key);
+			console.log(ids);
+			return ids;
+		},
 	},
 	async mounted() {
 		await this.get_npcs();
 		this.loading_npcs = false;
+		console.log(this.npcs);
 	},
 	methods: {
 		...mapActions(["setSlide"]),
@@ -252,47 +263,6 @@ export default {
 
 		setSize(e) {
 			this.card_width = e.width;
-		},
-		async exportAll() {
-			const all_npcs = await this.get_full_npcs();
-			for (const key in all_npcs) {
-				all_npcs[key].harmless_key = key;
-				await this.addCustomSpellToExport(all_npcs[key]);
-			}
-
-			const json_export = Object.values(all_npcs);
-			downloadJSON(json_export);
-		},
-		async exportNPC(id) {
-			const npc = await this.get_npc({ uid: this.userId, id });
-			const exportableNpc = Object.assign({}, npc);
-			exportableNpc.harmless_key = id;
-			await this.addCustomSpellToExport(exportableNpc);
-			downloadJSON(exportableNpc);
-		},
-		async addCustomSpellToExport(npc) {
-			const [custom_caster_spells, custom_innate_spells] = await Promise.all([
-				this.parseNpcSpellList(npc, "caster_spells"),
-				this.parseNpcSpellList(npc, "innate_spells"),
-			]);
-
-			const custom_spells = custom_caster_spells
-				.concat(custom_innate_spells)
-				.reduce((acc, [key, spell]) => ({ ...acc, [key]: spell }), {});
-			npc.custom_spells = custom_spells;
-		},
-		async parseNpcSpellList(npc, spell_list_name) {
-			const custom_spell_list = [];
-			if (npc[spell_list_name]) {
-				const npc_spell_list = Object.assign({}, npc[spell_list_name]);
-				for (const [spell_key, spell] of Object.entries(npc_spell_list)) {
-					if (spell.custom) {
-						const full_spell = await this.get_spell({ uid: this.userId, id: spell_key });
-						custom_spell_list.push([spell_key, full_spell]);
-					}
-				}
-			}
-			return custom_spell_list;
 		},
 	},
 };

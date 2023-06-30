@@ -2,7 +2,7 @@
 	<button class="btn" @click="downloadContent()">
 		<slot>
 			<i aria-hidden="true" class="fas fa-arrow-alt-down"></i>
-			<q-tooltip anchor="top middle" self="bottom middle"> Export {{ content_type }} </q-tooltip>
+			<q-tooltip anchor="top middle" self="bottom middle"> Export {{ contentType }} </q-tooltip>
 		</slot>
 	</button>
 </template>
@@ -14,12 +14,12 @@ export default {
 	name: "ExportUserContent",
 
 	props: {
-		content_type: {
+		contentType: {
 			type: String,
 			required: true,
 		},
-		content_id: {
-			type: String,
+		contentId: {
+			type: [String, Array],
 			required: true,
 		},
 	},
@@ -51,18 +51,21 @@ export default {
 		...mapActions("encounters", ["get_encounter", "get_campaign_encounters"]),
 		async downloadContent() {
 			let filename = "harmlesskey";
-			if (this.content_type === "campaign") {
+			if (this.contentType === "campaign") {
 				await Promise.all([
-					this.exportCampaign(this.content_id),
-					this.exportCampaignEncounters(this.content_id),
+					this.exportCampaign(this.contentId),
+					this.exportCampaignEncounters(this.contentId),
 				]);
 				await this.exportNpcArray([...this.exportQueue.npcs]);
 				await this.exportSpellArray([...this.exportQueue.spells]);
-				filename = this.exportData.campaigns[this.content_id].name;
-			} else if (this.content_type === "npc") {
-				await this.exportNpcArray([this.content_id]);
+				filename = this.exportData.campaigns[this.contentId].name;
+			} else if (this.contentType === "npc") {
+				const npc_ids = Array.isArray(this.contentId) ? this.contentId : [this.contentId];
+				await this.exportNpcArray(npc_ids);
 				await this.exportSpellArray([...this.exportQueue.spells]);
-				filename = this.exportData.npcs[this.content_id].name;
+				filename = Array.isArray(this.contentId)
+					? "harmless_key_npcs"
+					: this.exportData.npcs[this.contentId].name;
 			}
 
 			this.downloadJson(filename);
@@ -71,7 +74,6 @@ export default {
 			filename = `${filename}.json`;
 
 			const json = this.cleanExportData();
-			console.log("json to download", json);
 
 			const blob = new Blob([json], { type: "application/json" });
 			const url = URL.createObjectURL(blob);

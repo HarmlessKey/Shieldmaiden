@@ -60,12 +60,18 @@ export default {
 				await this.exportSpellArray([...this.exportQueue.spells]);
 				filename = this.exportData.campaigns[this.contentId].name;
 			} else if (this.contentType === "npc") {
-				const npc_ids = Array.isArray(this.contentId) ? this.contentId : [this.contentId];
+				const npc_ids = this.inputIsArray() ? this.contentId : [this.contentId];
 				await this.exportNpcArray(npc_ids);
 				await this.exportSpellArray([...this.exportQueue.spells]);
-				filename = Array.isArray(this.contentId)
+				filename = this.inputIsArray()
 					? "harmless_key_npcs"
 					: this.exportData.npcs[this.contentId].name;
+			} else if (this.contentType === "spell") {
+				const spell_ids = this.inputIsArray() ? this.contentId : [this.contentId];
+				await this.exportSpellArray(spell_ids);
+				filename = this.inputIsArray()
+					? "harmless_key_spells"
+					: this.exportData.spells[this.contentId].name;
 			}
 
 			this.downloadJson(filename);
@@ -91,6 +97,9 @@ export default {
 				null,
 				2
 			);
+		},
+		inputIsArray() {
+			return Array.isArray(this.contentId);
 		},
 		async exportCampaign(campaign_id) {
 			await this.get_campaign({ uid: this.uid, id: campaign_id }).then((campaign) => {

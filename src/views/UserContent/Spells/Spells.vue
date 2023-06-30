@@ -61,10 +61,15 @@
 									<i aria-hidden="true" class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
 								</router-link>
-								<button class="btn btn-sm bg-neutral-5 mx-2" @click="exportSpell(props.key)">
+								<ExportUserContent
+									class="btn-sm bg-neutral-5 mx-2"
+									content-type="spell"
+									:content-id="props.key"
+								/>
+								<!-- <button class="btn btn-sm bg-neutral-5 mx-2" @click="exportSpell(props.key)">
 									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
 									<q-tooltip anchor="top middle" self="center middle"> Download </q-tooltip>
-								</button>
+								</button> -->
 								<button
 									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete($event, props.key, props.row)"
@@ -118,12 +123,14 @@ import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import ImportContent from "src/components/ImportContent.vue";
 import { downloadJSON } from "src/utils/generalFunctions";
+import ExportUserContent from "src/components/userContent/ExportUserContent";
 
 export default {
 	name: "Spells",
 	components: {
 		ContentHeader,
 		ImportContent,
+		ExportUserContent,
 	},
 	data() {
 		return {
@@ -207,11 +214,6 @@ export default {
 		},
 		deleteSpell(key) {
 			this.delete_spell(key);
-		},
-		async exportSpell(id) {
-			const spell = await this.get_spell({ uid: this.userId, id });
-			spell.harmless_key = id;
-			downloadJSON(spell);
 		},
 	},
 };

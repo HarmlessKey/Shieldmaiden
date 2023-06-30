@@ -61,6 +61,7 @@ export default {
 				filename = this.exportData.campaigns[this.content_id].name;
 			} else if (this.content_type === "npc") {
 				await this.exportNpcArray([this.content_id]);
+				await this.exportSpellArray([...this.exportQueue.spells]);
 				filename = this.exportData.npcs[this.content_id].name;
 			}
 

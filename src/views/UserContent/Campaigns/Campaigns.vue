@@ -53,7 +53,11 @@
 												<q-tooltip anchor="top middle" self="bottom middle"> Edit </q-tooltip>
 											</a>
 										</template>
-										<ExportUserContent content_type="campaign" :content_id="campaign.key" />
+										<ExportUserContent
+											class="btn-sm btn-clear white"
+											content_type="campaign"
+											:content_id="campaign.key"
+										/>
 										<a
 											class="btn btn-sm btn-clear white"
 											@click="confirmDelete($event, campaign.key, campaign.name)"

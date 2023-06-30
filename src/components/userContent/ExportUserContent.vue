@@ -1,12 +1,10 @@
 <template>
-	<span @click="downloadContent()">
-		<slot name="button">
-			<button class="btn btn-sm btn-clear white">
-				<i aria-hidden="true" class="fas fa-arrow-alt-down"></i>
-				<q-tooltip anchor="top middle" self="bottom middle"> Export {{ content_type }} </q-tooltip>
-			</button>
+	<button class="btn" @click="downloadContent()">
+		<slot>
+			<i aria-hidden="true" class="fas fa-arrow-alt-down"></i>
+			<q-tooltip anchor="top middle" self="bottom middle"> Export {{ content_type }} </q-tooltip>
 		</slot>
-	</span>
+	</button>
 </template>
 
 <script>
@@ -61,6 +59,9 @@ export default {
 				await this.exportNpcArray([...this.exportQueue.npcs]);
 				await this.exportSpellArray([...this.exportQueue.spells]);
 				filename = this.exportData.campaigns[this.content_id].name;
+			} else if (this.content_type === "npc") {
+				await this.exportNpcArray([this.content_id]);
+				filename = this.exportData.npcs[this.content_id].name;
 			}
 
 			this.downloadJson(filename);

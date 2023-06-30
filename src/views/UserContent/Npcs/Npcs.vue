@@ -72,10 +72,16 @@
 									<i aria-hidden="true" class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 								</router-link>
-								<a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
+								<ExportUserContent
+									class="btn-sm bg-neutral-5 mx-2"
+									content_type="npc"
+									:content_id="props.key"
+								/>
+
+								<!-- <a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
 									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
 									<q-tooltip anchor="top middle" self="center middle"> Download </q-tooltip>
-								</a>
+								</a> -->
 								<a
 									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete($event, props.key, props.row)"
@@ -130,6 +136,7 @@ import { monsterMixin } from "src/mixins/monster";
 import ImportContent from "src/components/ImportContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import { downloadJSON } from "src/utils/generalFunctions";
+import ExportUserContent from "src/components/userContent/ExportUserContent";
 
 export default {
 	name: "Npcs",
@@ -137,6 +144,7 @@ export default {
 	components: {
 		ImportContent,
 		ContentHeader,
+		ExportUserContent,
 	},
 	data() {
 		return {

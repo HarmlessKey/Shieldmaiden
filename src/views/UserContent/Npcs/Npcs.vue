@@ -82,11 +82,6 @@
 									content-type="npc"
 									:content-id="props.key"
 								/>
-
-								<!-- <a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
-									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
-									<q-tooltip anchor="top middle" self="center middle"> Download </q-tooltip>
-								</a> -->
 								<a
 									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete($event, props.key, props.row)"

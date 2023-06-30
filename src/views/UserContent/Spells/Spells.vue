@@ -2,12 +2,20 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="spells">
+				<ExportUserContent
+					slot="actions-left"
+					class="btn-sm bg-neutral-5"
+					content-type="spell"
+					:content-id="spellIds"
+				>
+					<span>Export</span>
+				</ExportUserContent>
 				<button
 					slot="actions-right"
 					class="btn btn-sm bg-neutral-5 mx-2"
 					@click="import_dialog = true"
 				>
-					Import spells
+					Import
 				</button>
 			</ContentHeader>
 
@@ -174,6 +182,10 @@ export default {
 	computed: {
 		...mapGetters(["tier", "overencumbered"]),
 		...mapGetters("spells", ["spells"]),
+		spellIds() {
+			console.log(this.spells.map((spell) => spell.key));
+			return this.spells.map((spell) => spell.key);
+		},
 	},
 	async mounted() {
 		await this.get_spells();

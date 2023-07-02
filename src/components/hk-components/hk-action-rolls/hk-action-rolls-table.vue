@@ -5,13 +5,11 @@
 				{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
 				({{ data.row.dice_count || "" }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
 				<template v-if="data.row.fixed_val && data.row.dice_count">
-					{{ 
-						(data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`
-
-
-
-
-
+					{{
+						// eslint-disable-next-line vue/no-parsing-error
+						data.row.fixed_val < 0
+							? `- ${Math.abs(data.row.fixed_val)}`
+							: `+ ${data.row.fixed_val}`
 					}})
 				</template>
 				<template v-else>{{ data.row.fixed_val }})</template>

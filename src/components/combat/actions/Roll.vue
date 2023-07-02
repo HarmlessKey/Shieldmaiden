@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-parsing-error -->
 <template>
 	<div v-if="current">
 		<h3 v-if="targeted.length === 0" class="red text-center">Select one or more targets</h3>
@@ -136,26 +137,13 @@
 													/>
 													{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 													}}<template v-if="roll.fixed_val && roll.dice_count">
-														{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+														{{
+															roll.fixed_val < 0
+																? `- ${Math.abs(roll.fixed_val)}`
+																: `+ ${roll.fixed_val}`
 														}}) </template
 													><template v-else>{{ roll.fixed_val }})</template>
-													{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
+													{{ roll_index + 1 < action.action_list[0].rolls.length ? "+" : "" }}
 													<q-tooltip anchor="top middle" self="center middle">
 														{{
 															action.action_list[0].type === "healing"

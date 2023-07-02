@@ -182,10 +182,28 @@ export default {
 			if (npc.actions.length > 0) {
 				for (const action of npc.actions) {
 					if (action.versatile === true) {
+						const versTwoName = action.versatile_two;
 						action.options = [action.versatile_one, action.versatile_two];
 						delete action.versatile;
 						delete action.versatile_one;
 						delete action.versatile_two;
+
+						for (const sub_action of action.action_list) {
+							for (const roll of sub_action.rolls) {
+								roll.options = {
+									[versTwoName]: {
+										damage_type: roll.versatile_damage_type,
+										dice_count: roll.versatile_dice_count,
+										dice_type: roll.versatile_dice_type,
+										fixed_val: roll.versatile_fixed_val,
+									},
+								};
+								delete roll.versatile_damage_type;
+								delete roll.versatile_dice_count;
+								delete roll.versatile_dice_type;
+								delete roll.versatile_fixed_val;
+							}
+						}
 					}
 				}
 			}

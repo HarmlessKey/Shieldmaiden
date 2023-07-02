@@ -168,6 +168,7 @@ export default {
 		copy({ result }) {
 			this.copy_dialog = false;
 			this.npc = { ...result };
+			this.npc = this.convertVersatileToOptions(this.npc);
 		},
 		reset() {
 			this.npc = {};
@@ -176,6 +177,19 @@ export default {
 			this.npc = JSON.parse(this.npc_copy);
 			this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			this.unsaved_changes = false;
+		},
+		convertVersatileToOptions(npc) {
+			if (npc.actions.length > 0) {
+				for (const action of npc.actions) {
+					if (action.versatile === true) {
+						action.options = [action.versatile_one, action.versatile_two];
+						delete action.versatile;
+						delete action.versatile_one;
+						delete action.versatile_two;
+					}
+				}
+			}
+			return npc;
 		},
 		/**
 		 * Checks if a new NPC must be added, or an existing NPC must be saved.

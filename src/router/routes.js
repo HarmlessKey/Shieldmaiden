@@ -83,39 +83,6 @@ const routes = [
 							title: "Campaigns",
 						},
 					},
-					{
-						path: ":campid",
-						component: {
-							render(c) {
-								return c("router-view");
-							},
-						},
-						meta: {
-							title: "Run campaign",
-						},
-						children: [
-							{
-								path: "",
-								name: "Run campaign",
-								component: () => import("src/views/UserContent/Encounters"),
-								meta: {
-									description: "Run your campaign on Harmless Key.",
-									title: "Run campaign",
-									side: false,
-								},
-							},
-							{
-								path: ":encid",
-								name: "EditEncounter",
-								component: EditEncounter,
-								meta: {
-									title: "Edit encounter",
-									description: "Edit your Harmless Key encounter.",
-									side: false,
-								},
-							},
-						],
-					},
 				],
 			},
 
@@ -559,6 +526,40 @@ const routes = [
 						},
 					},
 				],
+			},
+		],
+	},
+
+	// DM SCREEN
+	{
+		path: "/content/campaigns/:campid",
+		component: () => import("src/layouts/run-campaign"),
+		meta: {
+			requiresAuth: true,
+			title: "Run campaign",
+		},
+		meta: {
+			title: "Run campaign",
+		},
+		children: [
+			{
+				path: "",
+				name: "Run campaign",
+				component: () => import("src/views/UserContent/Campaigns/RunCampaign"),
+				meta: {
+					description: "Run your campaign on Harmless Key.",
+					title: "Run campaign",
+				},
+			},
+			{
+				path: ":encid",
+				name: "EditEncounter",
+				component: EditEncounter,
+				meta: {
+					title: "Edit encounter",
+					description: "Edit your Harmless Key encounter.",
+					side: false,
+				},
 			},
 		],
 	},

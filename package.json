@@ -33,6 +33,7 @@
 		"morgan": "^1.10.0",
 		"quasar": "^1.0.0",
 		"sanitize-html": "^2.7.0",
+		"splitpanes": "^2.4.1",
 		"vee-validate": "^3.4.14",
 		"vue": "^2.7.14",
 		"vue-analytics": "^5.22.1",

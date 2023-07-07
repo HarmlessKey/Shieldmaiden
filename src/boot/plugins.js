@@ -5,6 +5,8 @@ import numeral from "vue-numeral-filter";
 import "animate.css";
 import Croppa from "vue-croppa";
 import { Cookies } from "quasar";
+import { Splitpanes, Pane } from "splitpanes";
+// import "splitpanes/dist/splitpanes.css";
 
 export default async ({ router, Vue }) => {
 	Vue.config.productionTip = false;
@@ -13,6 +15,9 @@ export default async ({ router, Vue }) => {
 	Vue.use(VueCookies);
 	Vue.use(numeral, { locale: "en" });
 	Vue.use(Croppa);
+
+	Vue.component("Splitpanes", Splitpanes);
+	Vue.component("Pane", Pane);
 
 	require("../functions.js");
 

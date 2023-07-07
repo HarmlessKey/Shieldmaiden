@@ -34,46 +34,16 @@
 					</div>
 				</div>
 
-				<hk-select
+				<hk-condition-select
 					v-model="entity.condition_immunities"
-					:options="condition_list"
 					label="Condition immunities"
-					autocomplete="off"
-					type="text"
 					class="mt-3 mb-2"
 					multiple
 				>
 					<template slot="prepend">
 						<i aria-hidden="true" class="fas fa-fist-raised" />
 					</template>
-					<template v-if="entity.condition_immunities" slot="selected-item" slot-scope="scope">
-						<q-chip
-							:key="`conditions-${scope.opt}`"
-							:dark="$store.getters.theme === 'dark'"
-							removable
-							@remove="setCondition(scope.opt)"
-						>
-							<span class="truncate">{{ scope.opt.capitalize() }}</span>
-						</q-chip>
-					</template>
-					<template v-slot:option="scope">
-						<q-item
-							clickable
-							v-ripple
-							:active="
-								entity.condition_immunities && entity.condition_immunities.includes(scope.opt)
-							"
-							@click="setCondition(scope.opt)"
-						>
-							<q-item-section avatar>
-								<i aria-hidden="true" :class="`hki-${scope.opt}`" />
-							</q-item-section>
-							<q-item-section>
-								<q-item-label v-text="scope.opt.capitalize()" />
-							</q-item-section>
-						</q-item>
-					</template>
-				</hk-select>
+				</hk-condition-select>
 			</div>
 		</hk-card>
 	</div>

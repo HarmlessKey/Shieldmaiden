@@ -75,7 +75,7 @@ export const effect_types = Object.freeze({
 		description: "The target has advantage on specific rolls",
 		subtypes: ["attack", "ability", "skill", "save", "death_save"],
 	},
-	advantage: {
+	disadvantage: {
 		label: "Disadvantage",
 		value: "advantage",
 		description: "The target has disadvantage on specific rolls",
@@ -136,6 +136,15 @@ export const effect_subtypes = Object.freeze({
 	attack: {
 		label: "Attack",
 		value: "attack",
+	},
+	damage: {
+		label: "Damage",
+		value: "damage",
+	},
+	ability: {
+		label: "Ability",
+		value: "ability",
+		select: ["abilities"],
 	},
 	skill: {
 		label: "Skill",

@@ -10,6 +10,7 @@ import HkDiceText from "../components/hk-components/hk-dice-text";
 import HkPopover from "../components/hk-components/hk-popover";
 import HkLoader from "../components/hk-components/hk-loader";
 import HkDmgTypeSelect from "../components/hk-components/hk-dmg-type-select";
+import HkConditionSelect from "../components/hk-components/hk-condition-select";
 import HkTip from "../components/hk-components/hk-tip";
 import HkTimer from "../components/hk-components/hk-timer";
 import HkShare from "../components/hk-components/hk-share-button";
@@ -36,6 +37,7 @@ export default async ({ Vue }) => {
 	Vue.component("hk-dice-text", HkDiceText);
 	Vue.component("hk-popover", HkPopover);
 	Vue.component("hk-dmg-type-select", HkDmgTypeSelect);
+	Vue.component("hk-condition-select", HkConditionSelect);
 	Vue.component("hk-tip", HkTip);
 	Vue.component("hk-timer", HkTimer);
 	Vue.component("hk-share", HkShare);

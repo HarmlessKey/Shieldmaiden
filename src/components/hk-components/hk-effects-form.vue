@@ -126,10 +126,25 @@
 							v-if="showSelect('damage_types', subeffect.subtype)"
 							v-model="subeffect.damage_type"
 							label="Damage type"
-							name="Damage type"
-							rules="required"
 							multiple
 							non-magical
+						/>
+
+						<hk-condition-select
+							v-if="showSelect('conditions', subeffect.subtype)"
+							v-model="subeffect.condition"
+							label="Condition immunities"
+							multiple
+						/>
+
+						<hk-select
+							v-if="showSelect('abilities', subeffect.subtype)"
+							v-model="subeffect.ability"
+							:options="abilities"
+							label="Ability"
+							map-options
+							emit-value
+							multiple
 						/>
 
 						<hk-select
@@ -160,6 +175,7 @@
 
 <script>
 import effect_constants from "src/utils/effectsConstants";
+import { abilities } from "src/utils/generalConstants";
 
 export default {
 	name: "hk-effects-form",
@@ -175,6 +191,7 @@ export default {
 			duration_types: effect_constants.duration_types,
 			effect_types: effect_constants.effect_types,
 			effect_subtypes: effect_constants.effect_subtypes,
+			abilities: abilities,
 		};
 	},
 	computed: {

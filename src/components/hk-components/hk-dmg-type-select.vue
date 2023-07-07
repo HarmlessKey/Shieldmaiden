@@ -5,14 +5,13 @@
 		:multiple="multiple"
 		:use-input="hide_selected"
 		input-debounce="0"
-		:label="label"
 		:options="filtered_damage_types"
 		@filter="filterTypes"
 		@focus="hide_selected = true"
 		@blur="hide_selected = false"
 	>
 		<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
-		<template slot="selected-item" scope="scope">
+		<template slot="selected-item" slot-scope="scope">
 			<q-chip
 				v-if="multiple"
 				:dark="$store.getters.theme === 'dark'"
@@ -54,10 +53,6 @@ export default {
 	props: {
 		value: {
 			type: [String, Array],
-			default: undefined,
-		},
-		label: {
-			type: String,
 			default: undefined,
 		},
 		placeholder: {

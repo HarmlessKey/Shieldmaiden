@@ -1,6 +1,6 @@
 <template>
 	<tag :is="cardView ? 'hk-card' : 'div'" :class="!cardView ? 'normal-view' : ''">
-		<div slot="header" :class="cardView ? 'card-header' : 'top-menu'">
+		<div slot="header" class="pane__header top-menu">
 			<div
 				class="money"
 				:class="{ red: currency >= maxCurrencyAmount }"
@@ -98,259 +98,271 @@
 				</button>
 			</div>
 		</div>
-		<div
-			v-if="!loading"
-			class="players"
-			:class="{ xp: isXpAdvancement, large: is_large, 'card-body': cardView }"
-			:style="{ 'grid-template-columns': templateColumns }"
-		>
-			<div class="header"></div>
-			<div class="col header ac"></div>
-			<div class="col header name"></div>
-			<div
-				class="col header text-center pp"
-				v-if="
-					userSettings.general &&
-					userSettings.general.passive_perception === undefined &&
-					!is_medium
-				"
-			>
-				<i aria-hidden="true" class="fas fa-eye"></i>
-				<q-tooltip anchor="top middle" self="center middle"> Passive perception </q-tooltip>
-			</div>
-			<div
-				class="col header text-center pinv"
-				v-if="
-					userSettings.general &&
-					userSettings.general.passive_investigation === undefined &&
-					!is_medium
-				"
-			>
-				<i aria-hidden="true" class="fas fa-search"></i>
-				<q-tooltip anchor="top middle" self="center middle"> Passive investigation </q-tooltip>
-			</div>
-			<div
-				class="col header text-center pins"
-				v-if="
-					userSettings.general && userSettings.general.passive_insight === undefined && !is_medium
-				"
-			>
-				<i aria-hidden="true" class="fas fa-lightbulb-on"></i>
-				<q-tooltip anchor="top middle" self="center middle"> Passive insight </q-tooltip>
-			</div>
-			<div
-				class="col header text-center save"
-				v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
-			>
-				<i aria-hidden="true" class="fas fa-hand-holding-magic"></i>
-				<q-tooltip anchor="top middle" self="center middle"> Save DC </q-tooltip>
-			</div>
-			<div class="col header text-center">
-				<i aria-hidden="true" class="fas fa-heart"></i>
-				<q-tooltip anchor="top middle" self="center middle"> Health </q-tooltip>
-			</div>
-			<div class="col header text-right" v-if="viewerIsUser">
-				<i aria-hidden="true" class="far fa-ellipsis-h"></i>
-			</div>
 
-			<template v-for="(player, key) in campaign.players">
-				<template v-if="players[key] && player.curHp !== undefined"
-					><!-- make sure incomplete players aren't displayed -->
-					<div
-						class="image"
-						:key="'image-' + key"
-						:style="{
-							backgroundImage: avatar(players[key]) ? 'url(\'' + avatar(players[key]) + '\')' : '',
-						}"
-					>
-						<div class="transformed" v-if="player.transformed">
-							<i aria-hidden="true" class="fas fa-paw-claws green"></i>
-							<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
-						</div>
-						<i aria-hidden="true" v-if="!avatar(players[key])" class="hki-player" />
-					</div>
-					<div class="col ac" :key="'ac-' + key">
-						<i aria-hidden="true" class="fas fa-shield"></i>
-						<span
-							v-if="player.ac_bonus"
-							class="value"
-							:class="{
-								green: player.ac_bonus > 0,
-								red: player.ac_bonus < 0,
+		<div class="pane__content">
+			<div
+				v-if="!loading"
+				class="players"
+				:class="{ xp: isXpAdvancement, large: is_large, 'card-body': cardView }"
+				:style="{ 'grid-template-columns': templateColumns }"
+			>
+				<div class="header"></div>
+				<div class="col header ac"></div>
+				<div class="col header name"></div>
+				<div
+					class="col header text-center pp"
+					v-if="
+						userSettings.general &&
+						userSettings.general.passive_perception === undefined &&
+						!is_medium
+					"
+				>
+					<i aria-hidden="true" class="fas fa-eye"></i>
+					<q-tooltip anchor="top middle" self="center middle"> Passive perception </q-tooltip>
+				</div>
+				<div
+					class="col header text-center pinv"
+					v-if="
+						userSettings.general &&
+						userSettings.general.passive_investigation === undefined &&
+						!is_medium
+					"
+				>
+					<i aria-hidden="true" class="fas fa-search"></i>
+					<q-tooltip anchor="top middle" self="center middle"> Passive investigation </q-tooltip>
+				</div>
+				<div
+					class="col header text-center pins"
+					v-if="
+						userSettings.general && userSettings.general.passive_insight === undefined && !is_medium
+					"
+				>
+					<i aria-hidden="true" class="fas fa-lightbulb-on"></i>
+					<q-tooltip anchor="top middle" self="center middle"> Passive insight </q-tooltip>
+				</div>
+				<div
+					class="col header text-center save"
+					v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
+				>
+					<i aria-hidden="true" class="fas fa-hand-holding-magic"></i>
+					<q-tooltip anchor="top middle" self="center middle"> Save DC </q-tooltip>
+				</div>
+				<div class="col header text-center">
+					<i aria-hidden="true" class="fas fa-heart"></i>
+					<q-tooltip anchor="top middle" self="center middle"> Health </q-tooltip>
+				</div>
+				<div class="col header text-right" v-if="viewerIsUser">
+					<i aria-hidden="true" class="far fa-ellipsis-h"></i>
+				</div>
+
+				<template v-for="(player, key) in campaign.players">
+					<template v-if="players[key] && player.curHp !== undefined"
+						><!-- make sure incomplete players aren't displayed -->
+						<div
+							class="image"
+							:key="'image-' + key"
+							:style="{
+								backgroundImage: avatar(players[key])
+									? 'url(\'' + avatar(players[key]) + '\')'
+									: '',
 							}"
 						>
-							{{ (player.transformed ? player.transformed.ac : players[key].ac) + player.ac_bonus }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Armor Class {{ player.ac_bonus }}
-							</q-tooltip>
-						</span>
-						<span v-else class="value">{{
-							player.transformed ? player.transformed.ac : players[key].ac
-						}}</span>
-					</div>
-					<div class="col name" :key="'name-' + key">
-						{{ players[key].character_name }}
-					</div>
-
-					<div
-						class="col pp"
-						v-if="
-							userSettings.general &&
-							userSettings.general.passive_perception === undefined &&
-							!is_medium
-						"
-						:key="'pp-' + key"
-					>
-						{{ players[key].passive_perception }}
-					</div>
-					<div
-						class="col pinv"
-						v-if="
-							userSettings.general &&
-							userSettings.general.passive_investigation === undefined &&
-							!is_medium
-						"
-						:key="'pinv-' + key"
-					>
-						{{ players[key].passive_investigation }}
-					</div>
-					<div
-						class="col pins"
-						v-if="
-							userSettings.general &&
-							userSettings.general.passive_insight === undefined &&
-							!is_medium
-						"
-						:key="'pins-' + key"
-					>
-						{{ players[key].passive_insight }}
-					</div>
-					<div
-						class="col save"
-						v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
-						:key="'save-' + key"
-					>
-						{{ players[key].spell_save_dc }}
-					</div>
-
-					<div class="col health" :key="'health-' + key">
-						<template v-if="player.curHp <= 0">
-							<div v-if="player.stable" class="green">
-								<span><i aria-hidden="true" class="fas fa-fist-raised"></i> Stable</span>
+							<div class="transformed" v-if="player.transformed">
+								<i aria-hidden="true" class="fas fa-paw-claws green"></i>
+								<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
 							</div>
-							<div v-else-if="player.dead" class="red">
-								<span><i aria-hidden="true" class="fas fa-skull-crossbones"></i> Dead</span>
-							</div>
-							<div v-else class="saves d-flex justify-content-end">
-								<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
-									<span v-show="check === 'succes'" class="green"
-										><i aria-hidden="true" class="fas fa-check"></i
-									></span>
-									<span v-show="check === 'fail'" class="red"
-										><i aria-hidden="true" class="fas fa-times"></i
-									></span>
-								</div>
-							</div>
-						</template>
-						<template v-else>
-							<span class="hit-points">
-								<template v-if="player.transformed">
-									<span
-										class="current"
-										:class="{
-											red: percentage(player.transformed.curHp, player.transformed.maxHp) <= 33,
-											orange:
-												percentage(player.transformed.curHp, player.transformed.maxHp) > 33 &&
-												percentage(player.transformed.curHp, player.transformed.maxHp) <= 76,
-											green: percentage(player.transformed.curHp, player.transformed.maxHp) > 76,
-										}"
-										>{{ player.transformed.curHp }}</span
-									>
-									<span class="neutral-2 mx-1">/</span>
-									<span>
-										{{ player.transformed.maxHp }}
-									</span>
-								</template>
-								<template v-else>
-									<span
-										class="current"
-										:class="{
-											red:
-												percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33,
-											orange:
-												percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 &&
-												percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 76,
-											green:
-												percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 76,
-										}"
-										>{{ player.curHp }}</span
-									>
-									<span class="neutral-2 mx-1">/</span>
-									<span
-										:class="{
-											green: player.maxHpMod > 0,
-											red: player.maxHpMod < 0,
-										}"
-										v-if="player.maxHpMod"
-									>
-										{{ maxHp(players[key].maxHp, player.maxHpMod) }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Max HP + {{ player.maxHpMod }}
-										</q-tooltip>
-									</span>
-									<span v-else class="neutral-2">{{ players[key].maxHp }}</span>
-								</template>
-							</span>
-							<span v-if="player.tempHp > 0" class="hit-points ml-1">
-								+{{ player.tempHp }}
-								<q-tooltip anchor="top middle" self="center middle"> Temporary HP </q-tooltip>
-							</span>
-						</template>
-					</div>
-					<div class="col actions" :key="'actions-' + key" v-if="viewerIsUser">
-						<a
-							class="btn btn-sm bg-neutral-5"
-							@click="
-								setSlide({
-									show: true,
-									type: 'slides/EditPlayer',
-									data: { key, location: 'overview' },
-								})
-							"
-						>
-							<i aria-hidden="true" class="fas fa-pencil"></i>
-							<q-tooltip anchor="top middle" self="center middle"> Edit player </q-tooltip>
-						</a>
-					</div>
-					<div
-						class="xp-bar"
-						:key="'xp-' + key"
-						:style="{ 'grid-column': 'span ' + calcColspan }"
-						v-if="isXpAdvancement"
-					>
-						<div class="level" :class="{ red: isXpAdvancement && players[key].level }">
-							{{
-								players[key].level ? players[key].level : calculatedLevel(players[key].experience)
-							}}
-							<q-tooltip anchor="top middle" self="center middle" v-if="players[key].level">
-								Level is overwritten
-							</q-tooltip>
+							<i aria-hidden="true" v-if="!avatar(players[key])" class="hki-player" />
 						</div>
-						<q-linear-progress
-							size="3px"
-							:value="levelAdvancement(players[key].experience)"
-							color="primary"
-							class="bg-neutral-3"
-						/>
-					</div>
+						<div class="col ac" :key="'ac-' + key">
+							<i aria-hidden="true" class="fas fa-shield"></i>
+							<span
+								v-if="player.ac_bonus"
+								class="value"
+								:class="{
+									green: player.ac_bonus > 0,
+									red: player.ac_bonus < 0,
+								}"
+							>
+								{{
+									(player.transformed ? player.transformed.ac : players[key].ac) + player.ac_bonus
+								}}
+								<q-tooltip anchor="top middle" self="center middle">
+									Armor Class {{ player.ac_bonus }}
+								</q-tooltip>
+							</span>
+							<span v-else class="value">{{
+								player.transformed ? player.transformed.ac : players[key].ac
+							}}</span>
+						</div>
+						<div class="col name" :key="'name-' + key">
+							{{ players[key].character_name }}
+						</div>
+
+						<div
+							class="col pp"
+							v-if="
+								userSettings.general &&
+								userSettings.general.passive_perception === undefined &&
+								!is_medium
+							"
+							:key="'pp-' + key"
+						>
+							{{ players[key].passive_perception }}
+						</div>
+						<div
+							class="col pinv"
+							v-if="
+								userSettings.general &&
+								userSettings.general.passive_investigation === undefined &&
+								!is_medium
+							"
+							:key="'pinv-' + key"
+						>
+							{{ players[key].passive_investigation }}
+						</div>
+						<div
+							class="col pins"
+							v-if="
+								userSettings.general &&
+								userSettings.general.passive_insight === undefined &&
+								!is_medium
+							"
+							:key="'pins-' + key"
+						>
+							{{ players[key].passive_insight }}
+						</div>
+						<div
+							class="col save"
+							v-if="
+								userSettings.general && userSettings.general.save_dc === undefined && !is_medium
+							"
+							:key="'save-' + key"
+						>
+							{{ players[key].spell_save_dc }}
+						</div>
+
+						<div class="col health" :key="'health-' + key">
+							<template v-if="player.curHp <= 0">
+								<div v-if="player.stable" class="green">
+									<span><i aria-hidden="true" class="fas fa-fist-raised"></i> Stable</span>
+								</div>
+								<div v-else-if="player.dead" class="red">
+									<span><i aria-hidden="true" class="fas fa-skull-crossbones"></i> Dead</span>
+								</div>
+								<div v-else class="saves d-flex justify-content-end">
+									<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
+										<span v-show="check === 'succes'" class="green"
+											><i aria-hidden="true" class="fas fa-check"></i
+										></span>
+										<span v-show="check === 'fail'" class="red"
+											><i aria-hidden="true" class="fas fa-times"></i
+										></span>
+									</div>
+								</div>
+							</template>
+							<template v-else>
+								<span class="hit-points">
+									<template v-if="player.transformed">
+										<span
+											class="current"
+											:class="{
+												red: percentage(player.transformed.curHp, player.transformed.maxHp) <= 33,
+												orange:
+													percentage(player.transformed.curHp, player.transformed.maxHp) > 33 &&
+													percentage(player.transformed.curHp, player.transformed.maxHp) <= 76,
+												green: percentage(player.transformed.curHp, player.transformed.maxHp) > 76,
+											}"
+											>{{ player.transformed.curHp }}</span
+										>
+										<span class="neutral-2 mx-1">/</span>
+										<span>
+											{{ player.transformed.maxHp }}
+										</span>
+									</template>
+									<template v-else>
+										<span
+											class="current"
+											:class="{
+												red:
+													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <=
+													33,
+												orange:
+													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) >
+														33 &&
+													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <=
+														76,
+												green:
+													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 76,
+											}"
+											>{{ player.curHp }}</span
+										>
+										<span class="neutral-2 mx-1">/</span>
+										<span
+											:class="{
+												green: player.maxHpMod > 0,
+												red: player.maxHpMod < 0,
+											}"
+											v-if="player.maxHpMod"
+										>
+											{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Max HP + {{ player.maxHpMod }}
+											</q-tooltip>
+										</span>
+										<span v-else class="neutral-2">{{ players[key].maxHp }}</span>
+									</template>
+								</span>
+								<span v-if="player.tempHp > 0" class="hit-points ml-1">
+									+{{ player.tempHp }}
+									<q-tooltip anchor="top middle" self="center middle"> Temporary HP </q-tooltip>
+								</span>
+							</template>
+						</div>
+						<div class="col actions" :key="'actions-' + key" v-if="viewerIsUser">
+							<a
+								class="btn btn-sm bg-neutral-5"
+								@click="
+									setSlide({
+										show: true,
+										type: 'slides/EditPlayer',
+										data: { key, location: 'overview' },
+									})
+								"
+							>
+								<i aria-hidden="true" class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle"> Edit player </q-tooltip>
+							</a>
+						</div>
+						<div
+							class="xp-bar"
+							:key="'xp-' + key"
+							:style="{ 'grid-column': 'span ' + calcColspan }"
+							v-if="isXpAdvancement"
+						>
+							<div class="level" :class="{ red: isXpAdvancement && players[key].level }">
+								{{
+									players[key].level ? players[key].level : calculatedLevel(players[key].experience)
+								}}
+								<q-tooltip anchor="top middle" self="center middle" v-if="players[key].level">
+									Level is overwritten
+								</q-tooltip>
+							</div>
+							<q-linear-progress
+								size="3px"
+								:value="levelAdvancement(players[key].experience)"
+								color="primary"
+								class="bg-neutral-3"
+							/>
+						</div>
+					</template>
 				</template>
-			</template>
-		</div>
-		<hk-loader v-else name="players" />
-		<div slot="footer" v-if="viewerIsUser && page !== 'user'">
-			<button class="btn btn-block btn-square" @click="reset()">
-				<i aria-hidden="true" class="fas fa-undo-alt"></i> Reset player health
-			</button>
+			</div>
+			<hk-loader v-else name="players" />
+			<div slot="footer" v-if="viewerIsUser && page !== 'user'">
+				<button class="btn btn-block btn-square" @click="reset()">
+					<i aria-hidden="true" class="fas fa-undo-alt"></i> Reset player health
+				</button>
+			</div>
 		</div>
 		<q-resize-observer @resize="onResize" />
 	</tag>
@@ -549,16 +561,6 @@ export default {
 	.top-menu {
 		display: flex;
 		justify-content: space-between;
-		border-bottom: solid 2px $white;
-		padding-bottom: 2px;
-		margin-bottom: 23px;
-
-		.money {
-			text-shadow: 0 0 3px $black;
-			border-radius: $border-radius-small;
-			padding-left: 10px;
-			color: $white;
-		}
 	}
 	.players {
 		.col.header {

@@ -1,5 +1,10 @@
 <template>
-	<div class="dm-screen">
+	<div
+		class="dm-screen"
+		:style="[
+			background_image ? { background: 'url(\'' + background_image + '\')' } : { background: '' },
+		]"
+	>
 		<template v-if="!loading_campaign">
 			<div class="dm-screen__header">
 				{{ campaign.name }}
@@ -25,9 +30,16 @@
 			</div>
 			<Splitpanes class="default-theme">
 				<Pane>
-					<Encounters />
+					<Splitpanes horizontal>
+						<hk-pane>
+							<Encounters />
+						</hk-pane>
+						<hk-pane>
+							<Media />
+						</hk-pane>
+					</Splitpanes>
 				</Pane>
-				<Pane>
+				<hk-pane>
 					<Players
 						v-if="!loading_campaign"
 						:userId="user.uid"
@@ -35,6 +47,16 @@
 						:campaign="campaign"
 						:players="players"
 					/>
+				</hk-pane>
+				<Pane>
+					<Splitpanes horizontal>
+						<hk-pane>
+							<Compendium />
+						</hk-pane>
+						<hk-pane>
+							<Share />
+						</hk-pane>
+					</Splitpanes>
 				</Pane>
 			</Splitpanes>
 		</template>
@@ -43,15 +65,22 @@
 </template>
 
 <script>
-import Players from "src/components/campaign/Players.vue";
 import Encounters from "../Encounters";
+import Players from "src/components/campaign/Players.vue";
+import Media from "src/components/campaign/Media.vue";
+import Share from "src/components/campaign/Share.vue";
+import Compendium from "src/components/slides/Compendium.vue";
+
 import { mapGetters, mapActions } from "vuex";
 
 export default {
 	name: "RunCampaign",
 	components: {
-		Players,
 		Encounters,
+		Players,
+		Media,
+		Share,
+		Compendium,
 	},
 	data() {
 		return {
@@ -83,6 +112,11 @@ export default {
 	},
 	computed: {
 		...mapGetters(["broadcast"]),
+		background_image() {
+			return this.campaign.hk_background
+				? require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`)
+				: this.campaign.background;
+		},
 	},
 	methods: {
 		...mapActions(["setSlide"]),
@@ -94,7 +128,11 @@ export default {
 
 <style lang="scss" scoped>
 .dm-screen {
-	height: calc(100vh - 115px);
+	display: flex;
+	flex-direction: column;
+	background-size: cover;
+	background-position: center bottom;
+	height: calc(100vh - 50px);
 	padding: 5px;
 
 	&__header {
@@ -105,6 +143,26 @@ export default {
 		padding: 10px;
 		background-color: $neutral-8-transparent;
 		margin-bottom: 5px;
+	}
+
+	.splitpanes__pane {
+		&::v-deep {
+			.pane {
+				&__header {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					background-color: $neutral-8;
+					padding: 10px;
+					position: sticky;
+					top: 0;
+					z-index: 10;
+				}
+				&__content {
+					padding: 10px;
+				}
+			}
+		}
 	}
 }
 </style>

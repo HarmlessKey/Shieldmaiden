@@ -1,156 +1,153 @@
 <template>
-	<div>
+	<div v-if="!loading_active">
 		<!-- SHOW ENCOUNTERS -->
-		<template v-if="!loading_active">
-			<div>
+		<div class="pane__header">
+			<span>
 				<span>
-					<span>
-						<span class="content-count">
-							<span
-								:class="
-									encounter_count > tier.benefits.encounters
-										? 'red'
-										: encounter_count == tier.benefits.encounters
-										? 'neutral-2'
-										: 'green'
-								"
-							>
-								{{ encounter_count || 0 }}
-							</span>
-							/
-							<i
-								aria-hidden="true"
-								v-if="tier.benefits.encounters === 'infinite'"
-								class="far fa-infinity"
-							/>
-							<template v-else>{{ tier.benefits.encounters }}</template>
+					<span class="content-count">
+						<span
+							:class="
+								encounter_count > tier.benefits.encounters
+									? 'red'
+									: encounter_count == tier.benefits.encounters
+									? 'neutral-2'
+									: 'green'
+							"
+						>
+							{{ encounter_count || 0 }}
 						</span>
+						/
+						<i
+							aria-hidden="true"
+							v-if="tier.benefits.encounters === 'infinite'"
+							class="far fa-infinity"
+						/>
+						<template v-else>{{ tier.benefits.encounters }}</template>
 					</span>
-					Encounters
 				</span>
-				<a
-					v-if="
-						tier.benefits.encounters === 'infinite' ||
-						(!overencumbered && encounter_count < tier.benefits.encounters)
-					"
-					@click="add = !add"
-					class="btn btn-sm"
-				>
-					<i aria-hidden="true" class="fas fa-plus green" />
-					New encounter
-				</a>
-				<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">
-					<i aria-hidden="true" class="fas fa-box-full red mr-1" />
-					Over encumbered
-				</router-link>
-				<router-link v-else class="btn btn-sm ml-1" to="/patreon">
-					<i aria-hidden="true" class="fab fa-patreon patreon-red mr-1" />
-					Get more slots
-				</router-link>
-			</div>
+				Encounters
+			</span>
+			<button
+				v-if="
+					tier.benefits.encounters === 'infinite' ||
+					(!overencumbered && encounter_count < tier.benefits.encounters)
+				"
+				@click="add = !add"
+				class="btn btn-sm bg-neutral-5"
+			>
+				<i aria-hidden="true" class="fas fa-plus green" />
+				New encounter
+			</button>
+			<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">
+				<i aria-hidden="true" class="fas fa-box-full red mr-1" />
+				Over encumbered
+			</router-link>
+			<router-link v-else class="btn btn-sm ml-1" to="/patreon">
+				<i aria-hidden="true" class="fab fa-patreon patreon-red mr-1" />
+				Get more slots
+			</router-link>
+		</div>
 
-			<div>
-				<div class="first-encounter" v-if="!encounter_count">
-					<q-form @submit="addEncounter">
-						<h2 class="mt-0">First encounter</h2>
-						<q-input
-							:dark="$store.getters.theme === 'dark'"
-							filled
-							square
-							label="Encounter title"
-							type="text"
-							autocomplete="off"
-							v-model="newEncounter"
-							:rules="[(val) => (val && val.length > 0) || 'Enter a title']"
-						/>
-
-						<q-btn
-							class="btn btn-lg bg-green btn-block mt-4"
-							label="Create encounter"
-							no-caps
-							type="submit"
-							padding="0"
-						/>
-					</q-form>
-				</div>
-
-				<!-- ACTIVE ENCOUNTERS -->
-				<template v-if="active_encounters.length">
+		<div class="pane__content">
+			<div class="first-encounter" v-if="!encounter_count">
+				<q-form @submit="addEncounter">
+					<h2 class="mt-0">First encounter</h2>
 					<q-input
-						:dark="$store.getters.theme !== 'light'"
-						v-model="search"
-						borderless
+						:dark="$store.getters.theme === 'dark'"
 						filled
 						square
-						debounce="300"
-						clearable
-						placeholder="Search encounter"
-					>
-						<q-icon slot="prepend" name="search" />
-					</q-input>
-					<q-table
-						:data="active_encounters"
-						:columns="columns"
-						:visible-columns="visibleColumns"
-						row-key="key"
-						card-class="bg-none"
-						flat
-						:dark="$store.getters.theme !== 'light'"
-						separator="none"
-						:pagination="{ rowsPerPage: 15 }"
-						:filter="search"
-						wrap-cells
-					>
-						<template v-slot:body-cell="props">
-							<q-td v-if="props.col.name !== 'actions'">
-								<div class="truncate-cell">
-									<div class="truncate">
-										<router-link
-											v-if="!overencumbered && props.col.name === 'name' && props.row.entity_count"
-											:to="`/run-encounter/${campaignId}/${props.key}`"
-										>
-											{{ props.value }}
-										</router-link>
-										<template v-else>
-											{{ props.value }}
-										</template>
-									</div>
-								</div>
-							</q-td>
-							<q-td v-else class="text-right d-flex justify-content-between">
-								<router-link
-									v-if="props.row.entity_count && !overencumbered"
-									class="btn btn-sm bg-neutral-5 mr-1"
-									:to="'/run-encounter/' + campaignId + '/' + props.key"
-								>
-									<i aria-hidden="true" class="fas fa-play"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Run encounter </q-tooltip>
-								</router-link>
-								<a v-else class="disabled btn btn-sm mr-1 bg-neutral-5">
-									<i aria-hidden="true" class="fas fa-play"></i>
-								</a>
-								<router-link
-									v-if="!overencumbered"
-									class="mr-1 btn btn-sm bg-neutral-5"
-									:to="'/content/campaigns/' + campaignId + '/' + props.key"
-								>
-									<i aria-hidden="true" class="fas fa-pencil-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-								</router-link>
-								<a
-									class="btn btn-sm bg-neutral-5"
-									@click="deleteEncounter($event, props.key, props.row.name)"
-								>
-									<i aria-hidden="true" class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
-								</a>
-							</q-td>
-						</template>
-						<div slot="no-data" />
-					</q-table>
-				</template>
-				<q-resize-observer @resize="setSize" />
+						label="Encounter title"
+						type="text"
+						autocomplete="off"
+						v-model="newEncounter"
+						:rules="[(val) => (val && val.length > 0) || 'Enter a title']"
+					/>
+
+					<q-btn
+						class="btn btn-lg bg-green btn-block mt-4"
+						label="Create encounter"
+						no-caps
+						type="submit"
+						padding="0"
+					/>
+				</q-form>
 			</div>
+
+			<!-- ACTIVE ENCOUNTERS -->
+			<template v-if="active_encounters.length">
+				<q-input
+					:dark="$store.getters.theme !== 'light'"
+					v-model="search"
+					borderless
+					filled
+					square
+					debounce="300"
+					clearable
+					placeholder="Search encounter"
+				>
+					<q-icon slot="prepend" name="search" />
+				</q-input>
+				<q-table
+					:data="active_encounters"
+					:columns="columns"
+					:visible-columns="visibleColumns"
+					row-key="key"
+					card-class="bg-none"
+					flat
+					:dark="$store.getters.theme !== 'light'"
+					separator="none"
+					:pagination="{ rowsPerPage: 15 }"
+					:filter="search"
+					wrap-cells
+				>
+					<template v-slot:body-cell="props">
+						<q-td v-if="props.col.name !== 'actions'">
+							<div class="truncate-cell">
+								<div class="truncate">
+									<router-link
+										v-if="!overencumbered && props.col.name === 'name' && props.row.entity_count"
+										:to="`/run-encounter/${campaignId}/${props.key}`"
+									>
+										{{ props.value }}
+									</router-link>
+									<template v-else>
+										{{ props.value }}
+									</template>
+								</div>
+							</div>
+						</q-td>
+						<q-td v-else class="text-right d-flex justify-content-between">
+							<router-link
+								v-if="props.row.entity_count && !overencumbered"
+								class="btn btn-sm bg-neutral-5 mr-1"
+								:to="'/run-encounter/' + campaignId + '/' + props.key"
+							>
+								<i aria-hidden="true" class="fas fa-play"></i>
+								<q-tooltip anchor="top middle" self="center middle"> Run encounter </q-tooltip>
+							</router-link>
+							<a v-else class="disabled btn btn-sm mr-1 bg-neutral-5">
+								<i aria-hidden="true" class="fas fa-play"></i>
+							</a>
+							<router-link
+								v-if="!overencumbered"
+								class="mr-1 btn btn-sm bg-neutral-5"
+								:to="'/content/campaigns/' + campaignId + '/' + props.key"
+							>
+								<i aria-hidden="true" class="fas fa-pencil-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+							</router-link>
+							<a
+								class="btn btn-sm bg-neutral-5"
+								@click="deleteEncounter($event, props.key, props.row.name)"
+							>
+								<i aria-hidden="true" class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
+							</a>
+						</q-td>
+					</template>
+					<div slot="no-data" />
+				</q-table>
+			</template>
 
 			<!-- FINISHED ENCOUNTERS -->
 			<template v-if="finished_encounters.length">
@@ -263,8 +260,8 @@
 					<hk-loader name="encounters" />
 				</hk-card>
 			</template>
-		</template>
-		<hk-loader v-else name="encounters" />
+			<q-resize-observer @resize="setSize" />
+		</div>
 
 		<!-- New encounter dialog -->
 		<q-dialog
@@ -299,6 +296,7 @@
 			</div>
 		</q-dialog>
 	</div>
+	<hk-loader v-else name="encounters" />
 </template>
 
 <script>

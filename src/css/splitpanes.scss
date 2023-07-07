@@ -68,6 +68,10 @@
 
 .splitpanes.default-theme .splitpanes__pane {
 	background-color: $neutral-6-transparent;
+
+	&:has(.splitpanes) {
+		background: none;
+	}
 }
 
 .splitpanes.default-theme .splitpanes__splitter {
@@ -133,7 +137,6 @@
 .default-theme.splitpanes--horizontal > .splitpanes__splitter,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter {
 	height: 7px;
-	border-top: 1px solid #eee;
 	margin-top: -1px;
 }
 

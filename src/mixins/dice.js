@@ -277,6 +277,7 @@ export const dice = {
 						const option = roll.options[config.option];
 						if (option.ignore) {
 							editableRoll = {};
+							continue;
 						} else {
 							editableRoll.damage_type = option.damage_type || editableRoll.damage_type;
 							editableRoll.dice_type = option.dice_type || editableRoll.dice_type;

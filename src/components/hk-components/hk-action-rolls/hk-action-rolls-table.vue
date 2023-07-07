@@ -15,19 +15,11 @@
 				<template v-else>{{ data.row.fixed_val }})</template>
 			</span>
 			<span v-if="data.row.options && versatileRoll(data.row)">
-				|
-				{{
-					calcAverage(
-						data.row.versatile_dice_type || data.row.dice_type,
-						data.row.versatile_dice_count || data.row.dice_count,
-						data.row.versatile_fixed_val || data.row.fixed_val
-					)
-				}}
-				({{ versatileRoll(data.row) }})
+				| {{ versatileRoll(data.row) }}
 			</span>
 			<span v-if="Object.values(data.row.options).length > 1">
 				<span>| ...</span>
-				<q-tooltip anchor="top middle" self="bottom middle"> More then two Options </q-tooltip>
+				<q-tooltip anchor="top middle" self="bottom middle">More than two Options</q-tooltip>
 			</span>
 		</div>
 
@@ -175,14 +167,12 @@ export default {
 				: parseInt(modifier);
 		},
 		versatileRoll(roll) {
-			console.log(roll);
 			if (!roll.options) {
 				return undefined;
 			}
 
 			const firstOption = Object.values(roll.options)[0];
-
-			let returnRoll = {};
+			const returnRoll = {};
 
 			returnRoll.dice_count = firstOption.dice_count ? firstOption.dice_count : roll.dice_count;
 			returnRoll.dice_type = firstOption.dice_type ? firstOption.dice_type : roll.dice_type;
@@ -197,7 +187,13 @@ export default {
 						: ` + ${returnRoll.fixed_val}`;
 			}
 
-			return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`;
+			const average = this.calcAverage(
+				returnRoll.dice_type,
+				returnRoll.dice_count,
+				returnRoll.fixed_val
+			);
+
+			return `${average} (${returnRoll.dice_count}d${returnRoll.dice_type}${fixed})`;
 		},
 		scalingDesc(tiers, scaling, level) {
 			return spellScalingDescription(tiers, scaling, level);

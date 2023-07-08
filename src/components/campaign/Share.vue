@@ -1,10 +1,9 @@
 <template>
-	<div>
+	<div v-if="broadcast.live">
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"
 			indicator-color="transparent"
-			align="left"
 			inline-label
 			outside-arrows
 			mobile-arrows
@@ -80,18 +79,30 @@
 			</q-tab-panel>
 		</q-tab-panels>
 	</div>
+	<div class="not-live" v-else>
+		<p>
+			This panel gives options for the live initiative screen and is therefore only useful if you
+			are broadcasting.
+		</p>
+
+		<Broadcast :data="{ campaign_id: campaignId }" />
+	</div>
 </template>
 
 <script>
 import Weather from "src/views/UserContent/Encounters/Edit/Weather";
+import Broadcast from "src/components/drawers/Broadcast.vue";
+import { mapGetters } from "vuex";
 
 export default {
 	name: "CampaignShare",
 	components: {
 		Weather,
+		Broadcast,
 	},
 	data() {
 		return {
+			campaignId: this.$route.params.campid,
 			tab: "background",
 			tabs: [
 				{
@@ -113,6 +124,9 @@ export default {
 			weather: {},
 		};
 	},
+	computed: {
+		...mapGetters(["broadcast"]),
+	},
 };
 </script>
 
@@ -128,5 +142,9 @@ export default {
 			color: $blue;
 		}
 	}
+}
+.not-live {
+	padding: 10px;
+	text-align: center;
 }
 </style>

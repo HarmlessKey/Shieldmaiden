@@ -4,7 +4,6 @@
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"
 			indicator-color="transparent"
-			align="left"
 			inline-label
 			outside-arrows
 			mobile-arrows

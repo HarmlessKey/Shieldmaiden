@@ -1,6 +1,13 @@
 <template>
 	<div>
-		<q-tabs v-model="current" :dark="$store.getters.theme === 'dark'" no-caps class="mb-2">
+		<q-tabs
+			v-model="current"
+			:dark="$store.getters.theme === 'dark'"
+			outside-arrows
+			mobile-arrows
+			no-caps
+			class="mb-2"
+		>
 			<q-tab
 				v-for="({ name, label, icon }, index) in types"
 				:name="name"

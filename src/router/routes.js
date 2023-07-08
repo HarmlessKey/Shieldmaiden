@@ -621,7 +621,7 @@ const routes = [
 						meta: {
 							title: "Build encounter for D&D 5e",
 							description:
-								"Create an encounter for D&D 5e and find out it's difficulty. Once you're finished you can run it in our Combat Tracker.",
+								"Create an encounter for D&D 5e and find out its difficulty. Once you're finished you can run it in our Combat Tracker.",
 							side: false,
 						},
 					},

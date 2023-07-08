@@ -61,7 +61,7 @@ const encounter_actions = {
 
 	/**
 	 * Gets all encounters for a single campaign
-	 * first try to find it in the store, then fetch if wasn't present
+	 * first try to find it in the store, then fetch if it wasn't present
 	 *
 	 * @param {string} uid userId
 	 * @param {string} id encounterId

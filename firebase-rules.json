@@ -16,6 +16,24 @@
 				}
 			}
 		},
+		"campaign_notes": {
+			"$uid": {
+				"campaignId": {
+					"title": {
+						".validate": "newData.isString() && newData.val().length <= 100"
+					},
+					"description": {
+						".validate": "newData.isString() && newData.val().length <= 1000"
+					},
+					"created": {
+						".validate": "newData.isNumber()"
+					},
+					".indexOn": ["created"]
+				},
+				".read": "$uid === auth.uid",
+				".write": "$uid === auth.uid"
+			}
+		},
 		"users": {
 			"$uid": {
 				"username": {

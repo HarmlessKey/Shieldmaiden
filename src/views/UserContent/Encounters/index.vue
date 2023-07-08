@@ -307,7 +307,6 @@ export default {
 			user: this.$store.getters.user,
 			campaignId: this.$route.params.campid,
 			card_width: 0,
-			encounters: {},
 			loading_active: true,
 			loading_finished: false,
 			finished_fetched: false,

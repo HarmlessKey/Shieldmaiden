@@ -1,7 +1,10 @@
 <template>
 	<hk-card :header="computed.character_name">
 		<div class="card-header" slot="header">
-			<div class="image" :style="computed.avatar ? `background-image: url('${computed.avatar}')` : ''">
+			<div
+				class="image"
+				:style="computed.avatar ? `background-image: url('${computed.avatar}')` : ''"
+			>
 				<i v-if="!computed.avatar" class="hki-player" aria-hidden="true" />
 			</div>
 			<div>
@@ -11,33 +14,26 @@
 				<div>
 					Level {{ computed.level }} &bull; {{ computed.race.race_name }}
 					<template v-if="computed.classes">
-						<div v-for="( subclass, index) in classes" :key="`class-${index}`">
-						{{ (subclass.level &lt; computed.level) ? `${subclass.level}` : `` }}
-						<strong>{{ subclass.name }}</strong>
-						<template v-if="subclass.subclass">
-							<span class="blue mx-1">&bull;</span>
-							<em>{{ subclass.subclass }}</em>
-						</template>
+						<div v-for="(subclass, index) in classes" :key="`class-${index}`">
+							{{ (subclass.level &lt; computed.level) ? `${subclass.level}` : `` }}
+							<strong>{{ subclass.name }}</strong>
+							<template v-if="subclass.subclass">
+								<span class="blue mx-1">&bull;</span>
+								<em>{{ subclass.subclass }}</em>
+							</template>
 						</div>
 					</template>
 				</div>
 			</div>
 		</div>
 		<hk-xp-bar :xp="character.class.experience_points" :height="5" />
-		<q-tabs 
-			v-model="tab" 
-			dense 
-			inline-label 
-			no-caps 
-			align="justify"
-			class="bg-neutral-9"
-		>
+		<q-tabs v-model="tab" dense inline-label no-caps align="justify" class="bg-neutral-9">
 			<q-tab name="sheet" label="Sheet" />
-        <q-tab name="base-json" label="Base" />
-        <q-tab name="computed-json" label="Computed" />
+			<q-tab name="base-json" label="Base" />
+			<q-tab name="computed-json" label="Computed" />
 		</q-tabs>
 		<div class="computed">
-			<q-tab-panels v-model="tab" class="bg-transparent" >
+			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel name="sheet" class="p-0">
 					<div class="stats">
 						<div class="armor_class" v-if="computed.armor_class">
@@ -46,17 +42,19 @@
 								{{ computed.armor_class }}
 							</div>
 						</div>
-						<div 
-							class="hit_points" 
-							@click="setSlide({
-								show: true, 
-								type: 'slides/characterBuilder/HitPoints',
-								data: {
-									computed,
-									character
-								}
-							})
-						">
+						<div
+							class="hit_points"
+							@click="
+								setDrawer({
+									show: true,
+									type: 'drawers/characterBuilder/HitPoints',
+									data: {
+										computed,
+										character,
+									},
+								})
+							"
+						>
 							<h6>HP</h6>
 							<div class="value">
 								{{ computed.hit_points }}
@@ -64,9 +62,7 @@
 						</div>
 						<div class="speed">
 							<h6>Speed</h6>
-							<div class="value">
-								{{ computed.speed }}<span class="ft gray-hover">ft.</span>
-							</div>
+							<div class="value">{{ computed.speed }}<span class="ft gray-hover">ft.</span></div>
 						</div>
 						<div class="initiative">
 							<h6>Initiative</h6>
@@ -79,20 +75,24 @@
 										m: computed.initiative,
 										title: 'Initiative roll',
 										notify: true,
-										advantage: checkAdvantage('initiative')
+										advantage: checkAdvantage('initiative'),
 									}"
 								>
-									<span class="gray-hover">
-										{{ computed.initiative >= 0 ? "+" : "-" }}</span>
-										<span 
-											class="int"
-											:class="Object.keys(checkAdvantage('initiative')).length === 1 ? Object.keys(checkAdvantage('initiative'))[0] : ''"
-										>{{ Math.abs(computed.initiative) }}</span>
+									<span class="gray-hover"> {{ computed.initiative >= 0 ? "+" : "-" }}</span>
+									<span
+										class="int"
+										:class="
+											Object.keys(checkAdvantage('initiative')).length === 1
+												? Object.keys(checkAdvantage('initiative'))[0]
+												: ''
+										"
+										>{{ Math.abs(computed.initiative) }}</span
+									>
 								</hk-roll>
 							</div>
 						</div>
 					</div>
-					<hr>
+					<hr />
 
 					<div class="abilities">
 						<div v-for="ability in abilities" :key="`score-${ability}`">
@@ -106,32 +106,43 @@
 										m: calcMod(computed.abilities[ability]),
 										title: `${ability.capitalize()} check`,
 										notify: true,
-										advantage: checkAdvantage('abilities', ability)
+										advantage: checkAdvantage('abilities', ability),
 									}"
 								>
 									<span class="gray-hover" v-if="calcMod(computed.abilities[ability]) !== 0">
-										{{ calcMod(computed.abilities[ability]) > 0 ? "+" : "-" }}</span>
-									<span class="int"
-										:class="Object.keys(checkAdvantage('abilities', ability)).length === 1 ? Object.keys(checkAdvantage('abilities', ability))[0] : ''"
-									>{{ Math.abs(calcMod(computed.abilities[ability])) }}</span>
+										{{ calcMod(computed.abilities[ability]) > 0 ? "+" : "-" }}</span
+									>
+									<span
+										class="int"
+										:class="
+											Object.keys(checkAdvantage('abilities', ability)).length === 1
+												? Object.keys(checkAdvantage('abilities', ability))[0]
+												: ''
+										"
+										>{{ Math.abs(calcMod(computed.abilities[ability])) }}</span
+									>
 								</hk-roll>
 							</div>
 							<div class="score">{{ computed.abilities[ability] || 0 }}</div>
 						</div>
 					</div>
 
-					<hr>
+					<hr />
 
 					<h4>Saving throws</h4>
 					<div class="columns">
 						<ul class="list">
-							<li v-for="({mod, proficient, advantage_disadvantage}, key) in saving_throws" :key="`saving_throw-${key}`" class="pointer">
+							<li
+								v-for="({ mod, proficient, advantage_disadvantage }, key) in saving_throws"
+								:key="`saving_throw-${key}`"
+								class="pointer"
+							>
 								<span class="type">
-									<i 
+									<i
 										class="mr-2"
 										:class="{
 											'far fa-circle': !proficient,
-											'far fa-dot-circle': proficient
+											'far fa-dot-circle': proficient,
 										}"
 										aria-hidden="true"
 									>
@@ -150,12 +161,19 @@
 											m: mod,
 											title: `${key.capitalize()} save`,
 											notify: true,
-											advantage: advantage_disadvantage
+											advantage: advantage_disadvantage,
 										}"
 									>
-										{{ mod >= 0 ? "+" : "-" }}<span class="int"
-											:class="Object.keys(advantage_disadvantage).length === 1 ? Object.keys(advantage_disadvantage)[0] : ''"
-										>{{ mod }}</span>
+										{{ mod >= 0 ? "+" : "-"
+										}}<span
+											class="int"
+											:class="
+												Object.keys(advantage_disadvantage).length === 1
+													? Object.keys(advantage_disadvantage)[0]
+													: ''
+											"
+											>{{ mod }}</span
+										>
 									</hk-roll>
 								</span>
 							</li>
@@ -167,14 +185,15 @@
 						<ul class="list">
 							<li v-for="(sense, key) in computed.senses" :key="key">
 								<span class="type">
-									<i 
+									<i
 										aria-hidden="true"
 										class="mr-2"
 										:class="{
-										'fas fa-eye': key === 'perception',
-										'fas fa-search': key === 'investigation',
-										'fas fa-lightbulb-on': key === 'insight'
-									}" />
+											'fas fa-eye': key === 'perception',
+											'fas fa-search': key === 'investigation',
+											'fas fa-lightbulb-on': key === 'insight',
+										}"
+									/>
 									{{ key.capitalize() }}
 								</span>
 								<span class="value">
@@ -188,13 +207,15 @@
 				<q-tab-panel name="base-json" class="p-0">
 					<pre>
 						{{ characterState.character }}
-					</pre>
+					</pre
+					>
 				</q-tab-panel>
 
 				<q-tab-panel name="computed-json" class="p-0">
 					<pre>
 						{{ computed }}
-					</pre>
+					</pre
+					>
 				</q-tab-panel>
 			</q-tab-panels>
 		</div>
@@ -202,229 +223,235 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
-	import { general } from 'src/mixins/general.js';
-	import { abilities } from 'src/utils/generalConstants';
+import { mapActions } from "vuex";
+import { general } from "src/mixins/general.js";
+import { abilities } from "src/utils/generalConstants";
 
-	export default {
-		name: 'CharacterComputed',
-		mixins: [general],
-		data() {
-			return {
-				showOverview: false,
-				abilities: abilities,
-				tab: "sheet"
-			}
+export default {
+	name: "CharacterComputed",
+	mixins: [general],
+	data() {
+		return {
+			showOverview: false,
+			abilities: abilities,
+			tab: "sheet",
+		};
+	},
+	inject: ["characterState"],
+	computed: {
+		computed() {
+			return this.characterState.computed_character || {};
 		},
-		inject: ["characterState"],
-		computed: {
-			computed() {
-				return this.characterState.computed_character || {};
-			},
-			modifiers() {
-				return this.characterState.modifierArray || [];
-			},
-			character() {
-				return (this.characterState) ? this.characterState.character : {};
-			},
-			race() {
-				return this.character.race;
-			},
-			hit_point_type() {
-				return this.character.hit_point_type;
-			},
-			classes() {
-				return this.character.class.classes;
-			},
-			avatar() {
-				return this.character.avatar;
-			},
-			character_name() {
-				return this.character.character_name;
-			},
-			saving_throws() {
-				let saving_throws = {};
-				const proficiencies = this.computed.saving_throws.proficiencies || {};
-				const bonuses = this.computed.saving_throws.bonuses || {};
-				const advantage_disadvantage = (this.computed.advantage_disadvantage) ? this.computed.advantage_disadvantage.saving_throws : {};
-
-				for(const ability of this.abilities) {
-					let saving_throw = {};
-					let score = this.computed.abilities[ability];
-					const proficient = proficiencies.includes(ability);
-					const bonus = bonuses[ability] || 0;
-					saving_throw.mod = this.calcMod(score) + bonus;
-
-					//Check advantage/disadvantage
-					if(advantage_disadvantage) {
-						saving_throw.advantage_disadvantage = (advantage_disadvantage[ability]) ? advantage_disadvantage[ability] : {};
-					} else {
-						saving_throw.advantage_disadvantage = {};
-					}
-
-					//Check and add proficiency bonus
-					if(proficient) {
-						saving_throw.proficient = true;
-						saving_throw.mod = saving_throw.mod + this.computed.proficiency;
-					}
-
-					saving_throws[ability] = saving_throw;
-				}
-				return saving_throws;
-			}
+		modifiers() {
+			return this.characterState.modifierArray || [];
 		},
-		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			checkAdvantage(type, subtype=undefined) {
-				const sheet = this.computed.sheet;
-				let returnObj;
-				if(sheet && sheet.advantage_disadvantage && sheet.advantage_disadvantage[type]) {
-					if(subtype) {
-						returnObj = sheet.advantage_disadvantage[type][subtype];
-					} else {
-						returnObj = sheet.advantage_disadvantage[type];
-					}
+		character() {
+			return this.characterState ? this.characterState.character : {};
+		},
+		race() {
+			return this.character.race;
+		},
+		hit_point_type() {
+			return this.character.hit_point_type;
+		},
+		classes() {
+			return this.character.class.classes;
+		},
+		avatar() {
+			return this.character.avatar;
+		},
+		character_name() {
+			return this.character.character_name;
+		},
+		saving_throws() {
+			let saving_throws = {};
+			const proficiencies = this.computed.saving_throws.proficiencies || {};
+			const bonuses = this.computed.saving_throws.bonuses || {};
+			const advantage_disadvantage = this.computed.advantage_disadvantage
+				? this.computed.advantage_disadvantage.saving_throws
+				: {};
+
+			for (const ability of this.abilities) {
+				let saving_throw = {};
+				let score = this.computed.abilities[ability];
+				const proficient = proficiencies.includes(ability);
+				const bonus = bonuses[ability] || 0;
+				saving_throw.mod = this.calcMod(score) + bonus;
+
+				//Check advantage/disadvantage
+				if (advantage_disadvantage) {
+					saving_throw.advantage_disadvantage = advantage_disadvantage[ability]
+						? advantage_disadvantage[ability]
+						: {};
+				} else {
+					saving_throw.advantage_disadvantage = {};
 				}
-				return (returnObj) ? returnObj : {};
+
+				//Check and add proficiency bonus
+				if (proficient) {
+					saving_throw.proficient = true;
+					saving_throw.mod = saving_throw.mod + this.computed.proficiency;
+				}
+
+				saving_throws[ability] = saving_throw;
 			}
-		}
-	}
+			return saving_throws;
+		},
+	},
+	methods: {
+		...mapActions(["setDrawer"]),
+		checkAdvantage(type, subtype = undefined) {
+			const sheet = this.computed.sheet;
+			let returnObj;
+			if (sheet && sheet.advantage_disadvantage && sheet.advantage_disadvantage[type]) {
+				if (subtype) {
+					returnObj = sheet.advantage_disadvantage[type][subtype];
+				} else {
+					returnObj = sheet.advantage_disadvantage[type];
+				}
+			}
+			return returnObj ? returnObj : {};
+		},
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.hk-card {
-		position: sticky;
-		top: 0;
-		margin-top: 48px;
+.hk-card {
+	position: sticky;
+	top: 0;
+	margin-top: 48px;
 
-		.card-header {
-			padding: 0;
-			justify-content: flex-start;
-			line-height: 20px;
-			font-size: 12px;
+	.card-header {
+		padding: 0;
+		justify-content: flex-start;
+		line-height: 20px;
+		font-size: 12px;
 
-			.image {
-				height: 62px;
-				width: 62px;
-				border-right: solid 1px $neutral-5;
-				color: $neutral-2;
-				background-color: $neutral-9;
-				text-align: center;
-				line-height: 62px;
-				font-size: 45px;
-				margin-right: 10px;
-				background-position: center top;
-				background-size: cover;
+		.image {
+			height: 62px;
+			width: 62px;
+			border-right: solid 1px $neutral-5;
+			color: $neutral-2;
+			background-color: $neutral-9;
+			text-align: center;
+			line-height: 62px;
+			font-size: 45px;
+			margin-right: 10px;
+			background-position: center top;
+			background-size: cover;
+		}
+	}
+
+	.computed {
+		padding: 15px;
+
+		h4 {
+			font-family: $text-written !important;
+			font-size: 22px;
+			margin: 0px;
+		}
+
+		.abilities {
+			display: flex;
+			justify-content: space-between;
+			text-align: center;
+			user-select: none;
+			width: 100%;
+			margin: 20px 0;
+
+			> div {
+				cursor: pointer;
+
+				.ability,
+				.score {
+					font-size: 15px;
+					text-transform: uppercase;
+					height: 15px;
+					margin: 0;
+					color: $neutral-2;
+				}
+				.mod {
+					height: 55px;
+					line-height: 60px;
+					font-size: 30px;
+					font-weight: bold;
+					font-family: $text-written !important;
+				}
 			}
 		}
-		
-		.computed {
-			padding: 15px;
-	
-			h4 {
-				font-family: $text-written !important;
-				font-size: 22px;
-				margin: 0px;
-			}
-	
-			.abilities {
-				display: flex;
-				justify-content: space-between;
+		.stats {
+			display: flex;
+			justify-content: space-between;
+			user-select: none;
+
+			.armor_class,
+			.hit_points,
+			.speed,
+			.initiative {
 				text-align: center;
-				user-select: none;
-				width: 100%;
-				margin: 20px 0;
-	
-				> div {
-					cursor: pointer;
-	
-					.ability, .score {
-						font-size: 15px;
-						text-transform: uppercase;
-						height: 15px;
-						margin: 0;
-						color: $neutral-2;
-					}
-					.mod {
-						height: 55px;
-						line-height: 60px;
-						font-size: 30px;
-						font-weight: bold;
-						font-family: $text-written !important;
-					}
+				cursor: pointer;
+
+				h6 {
+					font-size: 12px;
+					text-transform: uppercase;
+					height: 15px;
+					line-height: 15px;
+					margin: 0;
+					color: $neutral-2;
+				}
+				.value {
+					height: 40px;
+					line-height: 40px;
+					font-size: 35px;
+					font-weight: bold;
+					font-family: $text-written !important;
+				}
+				.ft {
+					font-size: 15px;
 				}
 			}
-			.stats {
+		}
+		.list {
+			list-style: none;
+			padding: 0;
+			margin: 0 0 20px 0;
+
+			li {
 				display: flex;
 				justify-content: space-between;
-				user-select: none;
-	
-				.armor_class, .hit_points, .speed, .initiative  {
-					text-align: center;
-					cursor: pointer;
-	
-					h6 {
-						font-size: 12px;
-						text-transform: uppercase;
-						height: 15px;
-						line-height: 15px;
-						margin: 0;
-						color: $neutral-2;
-					}
-					.value {
-						height: 40px;
-						line-height: 40px;
-						font-size: 35px;
-						font-weight: bold;
-						font-family: $text-written !important;
-					}
-					.ft {
-						font-size: 15px;
-					}
+				line-height: 35px;
+				border-bottom: solid 1px $neutral-3;
+
+				.value {
+					font-family: $text-written !important;
+					font-size: 20px;
 				}
 			}
-			.list {
-				list-style: none;
-				padding: 0;
-				margin: 0 0 20px 0;
-	
-				li {
-					display: flex;
-					justify-content: space-between;
-					line-height: 35px;
-					border-bottom: solid 1px $neutral-3;
-	
-					.value {
-						font-family: $text-written !important;
-						font-size: 20px;
-					}
-				}
-			}
-			.columns {
-				height: 128px;
-				column-count: 2;
-				column-gap: 15px;
-				column-rule: 1px solid $neutral-3;
-			}
-			.advantage {
+		}
+		.columns {
+			height: 128px;
+			column-count: 2;
+			column-gap: 15px;
+			column-rule: 1px solid $neutral-3;
+		}
+		.advantage {
+			color: #83b547 !important;
+			&:hover .int {
 				color: #83b547 !important;
-				&:hover .int {
-					color: #83b547 !important;
-				}
 			}
-			.disadvantage {
-				color: #cc3e4a;
-				&:hover .int {
-					color: #cc3e4a !important;
-				}
+		}
+		.disadvantage {
+			color: #cc3e4a;
+			&:hover .int {
+				color: #cc3e4a !important;
 			}
-			.neutral {
-				&:hover .int {
-					color: inherit !important;
-				}
+		}
+		.neutral {
+			&:hover .int {
+				color: inherit !important;
 			}
 		}
 	}
+}
 </style>

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import Compendium from "src/components/slides/Compendium.vue";
+import Compendium from "src/components/drawers/Compendium.vue";
 import Notes from "./Notes.vue";
 
 export default {

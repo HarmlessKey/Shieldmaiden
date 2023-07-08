@@ -214,7 +214,7 @@
 				</q-popup-proxy>
 			</div>
 
-			<!-- HEALT BAR -->
+			<!-- HEALTH BAR -->
 			<q-linear-progress
 				size="35px"
 				:value="percentage(displayStats().curHp, displayStats().maxHp)"
@@ -509,7 +509,7 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"setSlide",
+			"setDrawer",
 			"add_next_round",
 			"set_initiative",
 			"edit_entity_prop",

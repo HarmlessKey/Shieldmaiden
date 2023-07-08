@@ -10,9 +10,9 @@
 				{{ campaign.name }}
 				<div
 					@click="
-						setSlide({
+						setDrawer({
 							show: true,
-							type: 'slides/Broadcast',
+							type: 'drawers/Broadcast',
 							data: { campaign_id: campaignId, private: campaign.private },
 						})
 					"
@@ -118,7 +118,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
 		...mapActions("players", ["get_player"]),
 	},

@@ -98,9 +98,9 @@
 											v-if="!encounter.xp_awarded"
 											class="btn"
 											@click="
-												setSlide({
+												setDrawer({
 													show: true,
-													type: 'slides/party/xp',
+													type: 'drawers/party/xp',
 													data: {
 														amount: xpAmount,
 														entities: players,
@@ -292,7 +292,7 @@ export default {
 		});
 	},
 	methods: {
-		...mapActions(["setSlide", "init_Encounter", "reset_store"]),
+		...mapActions(["setDrawer", "init_Encounter", "reset_store"]),
 		...mapActions("encounters", [
 			"reset_encounter",
 			"finish_encounter",

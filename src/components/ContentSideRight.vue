@@ -19,9 +19,9 @@
 				<button
 					class="btn btn-block bg-green"
 					@click="
-						setSlide({
+						setDrawer({
 							show: true,
-							type: 'slides/CharacterSync',
+							type: 'drawers/CharacterSync',
 						})
 					"
 				>
@@ -62,7 +62,7 @@
 					Share initiative
 					<i class="fas fa-external-link blue-light" aria-hidden="true" />
 				</a>
-				<a class="btn btn-sm bg-neutral-5" @click="setSlide({ show: true, type: 'PlayerLink' })">
+				<a class="btn btn-sm bg-neutral-5" @click="setDrawer({ show: true, type: 'PlayerLink' })">
 					<i aria-hidden="true" class="fas fa-qrcode" />
 				</a>
 			</div>
@@ -228,7 +228,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		setWidth(size) {
 			this.width = size.width;
 		},

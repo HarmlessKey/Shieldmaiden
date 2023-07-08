@@ -16,9 +16,9 @@
 							clickable
 							v-close-popup
 							@click="
-								setSlide({
+								setDrawer({
 									show: true,
-									type: 'slides/Broadcast',
+									type: 'drawers/Broadcast',
 									data: {
 										campaign_id: $route.params.campid,
 										encounter_id: $route.params.encid,
@@ -55,7 +55,7 @@
 							v-if="!demo"
 							clickable
 							v-close-popup
-							@click="setSlide({ show: true, type: 'settings/Encounter' })"
+							@click="setDrawer({ show: true, type: 'settings/Encounter' })"
 						>
 							<q-item-section avatar><i aria-hidden="true" class="fas fa-cogs" /></q-item-section>
 							<q-item-section>Settings</q-item-section>
@@ -64,7 +64,7 @@
 							v-if="!demo && !test"
 							clickable
 							v-close-popup
-							@click="setSlide({ show: true, type: 'settings/TrackEncounter' })"
+							@click="setDrawer({ show: true, type: 'settings/TrackEncounter' })"
 						>
 							<q-item-section avatar
 								><i aria-hidden="true" class="fas fa-desktop"
@@ -156,9 +156,9 @@
 			<span
 				v-if="!demo && !test"
 				@click="
-					setSlide({
+					setDrawer({
 						show: true,
-						type: 'slides/Broadcast',
+						type: 'drawers/Broadcast',
 						data: {
 							campaign_id: $route.params.campid,
 							encounter_id: $route.params.encid,
@@ -174,9 +174,9 @@
 				v-if="test"
 				class="btn btn-sm bg-orange"
 				@click="
-					setSlide({
+					setDrawer({
 						show: true,
-						type: 'slides/encounter/TestMode',
+						type: 'drawers/encounter/TestMode',
 					})
 				"
 			>
@@ -188,7 +188,7 @@
 				<div
 					v-if="requests && Object.keys(requests).length"
 					class="requests d-none d-md-block"
-					@click="setSlide({ show: true, type: 'combat/side/Requests' })"
+					@click="setDrawer({ show: true, type: 'combat/side/Requests' })"
 				>
 					<i aria-hidden="true" class="fas fa-bell" />
 					<div class="notifications bg-red white animated zoomIn">
@@ -199,7 +199,7 @@
 				<div
 					class="info"
 					@click="
-						setSlide({
+						setDrawer({
 							show: true,
 							type: 'combat/side/Side',
 						})
@@ -266,7 +266,7 @@ export default {
 			"set_turn",
 			"update_round",
 			"set_targeted",
-			"setSlide",
+			"setDrawer",
 			"set_finished",
 			"reset_demo",
 		]),

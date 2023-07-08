@@ -26,14 +26,14 @@
 			enter-active-class="animated animate__slideInRight"
 			leave-active-class="animated animate__slideOutRight"
 		>
-			<div v-if="slide.show == true" class="slide">
+			<div v-if="drawer.show == true" class="drawer">
 				<a @click="hideSlide()" v-shortkey="['esc']" @shortkey="hideSlide()" class="hide">
 					<i aria-hidden="true" class="far fa-chevron-double-right" />
 					<hk-show-keybind class="neutral-2 ml-2 d-none d-sm-inline" :binds="['esc']" />
 					<q-tooltip anchor="bottom middle" self="center middle"> Hide [esc] </q-tooltip>
 				</a>
-				<div class="content" :class="slide.classes">
-					<Slide />
+				<div class="content" :class="drawer.classes">
+					<Drawer />
 				</div>
 			</div>
 		</transition>
@@ -68,7 +68,7 @@
 import { db } from "./firebase";
 import Header from "./components/Header.vue";
 import Sidebar from "./components/Sidebar.vue";
-import Slide from "./components/Slide.vue";
+import Drawer from "./components/Drawer.vue";
 import CookieConsent from "./components/CookieConsent.vue";
 import { mapActions, mapGetters } from "vuex";
 import HkRolls from "./components/hk-components/hk-rolls";
@@ -84,7 +84,7 @@ export default {
 	components: {
 		navMain: Header,
 		Sidebar,
-		Slide,
+		Drawer,
 		CookieConsent,
 		HkRolls,
 		Home,
@@ -238,7 +238,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			slide: "getSlide",
+			drawer: "getDrawer",
 			storeBroadcast: "broadcast",
 		}),
 		...mapGetters(["initialized", "theme", "user", "action_rolls"]),
@@ -313,7 +313,7 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"setSlide",
+			"setDrawer",
 			"setSideSmallScreen",
 			"setLive",
 			"initialize",
@@ -326,7 +326,7 @@ export default {
 			this.width = size.width;
 		},
 		hideSlide() {
-			this.setSlide(false);
+			this.setDrawer(false);
 		},
 		closeAnnouncement() {
 			const max_age = 24 * 60 * 60; // 24 hours in seconds

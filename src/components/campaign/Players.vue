@@ -6,9 +6,9 @@
 				:class="{ red: currency >= maxCurrencyAmount }"
 				@click="
 					viewerIsUser
-						? setSlide({
+						? setDrawer({
 								show: true,
-								type: 'slides/party/Currency',
+								type: 'drawers/party/Currency',
 								data: { current: currency },
 						  })
 						: null
@@ -33,7 +33,7 @@
 					<button
 						class="btn btn-sm mr-1"
 						@click="
-							setSlide({
+							setDrawer({
 								show: true,
 								type: 'campaign/EditDamageMeters',
 							})
@@ -45,9 +45,9 @@
 					<button
 						class="btn btn-sm mr-1"
 						@click="
-							setSlide({
+							setDrawer({
 								show: true,
-								type: 'slides/party/health',
+								type: 'drawers/party/health',
 							})
 						"
 					>
@@ -58,9 +58,9 @@
 						class="btn btn-sm mr-1"
 						v-if="isXpAdvancement"
 						@click="
-							setSlide({
+							setDrawer({
 								show: true,
-								type: 'slides/party/xp',
+								type: 'drawers/party/xp',
 							})
 						"
 					>
@@ -72,9 +72,9 @@
 					<button
 						class="btn btn-sm"
 						@click="
-							setSlide({
+							setDrawer({
 								show: true,
-								type: 'slides/party/Inventory',
+								type: 'drawers/party/Inventory',
 							})
 						"
 					>
@@ -86,9 +86,9 @@
 					class="btn btn-sm bg-neutral-5"
 					v-else-if="campaign.inventory && campaign.inventory.items"
 					@click="
-						setSlide({
+						setDrawer({
 							show: true,
-							type: 'slides/party/ViewInventory',
+							type: 'drawers/party/ViewInventory',
 						})
 					"
 				>
@@ -322,9 +322,9 @@
 							<a
 								class="btn btn-sm bg-neutral-5"
 								@click="
-									setSlide({
+									setDrawer({
 										show: true,
-										type: 'slides/EditPlayer',
+										type: 'drawers/EditPlayer',
 										data: { key, location: 'overview' },
 									})
 								"
@@ -487,7 +487,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
 		onResize(size) {
 			let width = size.width;

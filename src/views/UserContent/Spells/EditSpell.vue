@@ -15,7 +15,7 @@
 						</button>
 						<button
 							class="btn bg-neutral-5 ml-2"
-							@click.prevent="setSlide({ show: true, type: 'compendium/Spell', data: spell })"
+							@click.prevent="setDrawer({ show: true, type: 'compendium/Spell', data: spell })"
 						>
 							<i aria-hidden="true" class="fas fa-eye" />
 						</button>
@@ -135,7 +135,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("api_spells", ["fetch_spells", "fetch_spell"]),
 		...mapActions("spells", ["add_spell", "edit_spell", "get_spell"]),
 		download() {

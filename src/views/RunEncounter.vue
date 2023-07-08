@@ -340,7 +340,7 @@ export default {
 							{
 								text: "Show requests",
 								action: (toast) => {
-									this.setSlide({ show: true, type: "combat/side/Requests" });
+									this.setDrawer({ show: true, type: "combat/side/Requests" });
 									this.$snotify.remove(toast.id);
 								},
 								bold: false,
@@ -373,7 +373,7 @@ export default {
 			"init_Encounter",
 			"set_finished",
 			"reset_store",
-			"setSlide",
+			"setDrawer",
 			"setLiveEncounter",
 		]),
 		...mapActions("campaigns", ["get_campaign"]),

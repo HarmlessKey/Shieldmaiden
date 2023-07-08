@@ -398,7 +398,7 @@ export default {
 			viewNPC: [],
 			player_dialog: false,
 			player: {},
-			slide: this.$store.getters.getSlide,
+			drawer: this.$store.getters.getDrawer,
 			to_add: {},
 			typeFilter: [],
 			monsterFields: {
@@ -529,7 +529,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 		...mapActions("npcs", ["get_npcs", "get_npc"]),
 		...mapActions("players", ["get_players", "get_player"]),

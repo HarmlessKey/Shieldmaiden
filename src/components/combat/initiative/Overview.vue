@@ -9,7 +9,7 @@
 				<p>
 					<i aria-hidden="true" class="fas fa-eye-slash white" />
 					Hides the entity from your players on the
-					<a @click="setSlide({ show: true, type: 'PlayerLink' })">public initiative list</a>.
+					<a @click="setDrawer({ show: true, type: 'PlayerLink' })">public initiative list</a>.
 				</p>
 				<span>
 					<i aria-hidden="true" class="fas fa-minus white" />
@@ -150,7 +150,7 @@ export default {
 			"set_initiative",
 			"set_condition",
 			"set_targetReminder",
-			"setSlide",
+			"setDrawer",
 		]),
 		setSurprised(entity_key, value) {
 			const reminder = this.premade.surprised;

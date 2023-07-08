@@ -84,7 +84,7 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(["setSlide", "transform_entity"]),
+		...mapActions(["setDrawer", "transform_entity"]),
 		edit() {
 			let transform = {
 				ac: parseInt(this.transAc),
@@ -96,7 +96,7 @@ export default {
 				key: this.entity.key,
 				entity: transform,
 			});
-			this.setSlide(false);
+			this.setDrawer(false);
 		},
 		remove() {
 			this.transform_entity({

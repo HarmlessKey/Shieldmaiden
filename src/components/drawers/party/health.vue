@@ -119,7 +119,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign", "update_campaign_entity"]),
 		...mapActions("players", ["get_player"]),
 		async setHpModifiers() {
@@ -200,7 +200,7 @@ export default {
 			}
 			this.tempHp = undefined;
 			this.maxHpMod = undefined;
-			this.setSlide(false);
+			this.setDrawer(false);
 		},
 	},
 };

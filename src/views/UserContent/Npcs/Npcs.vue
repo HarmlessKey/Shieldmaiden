@@ -202,7 +202,7 @@ export default {
 		this.loading_npcs = false;
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs", "add_npc"]),
 		...mapActions("spells", ["get_spell"]),
 		cr(val) {

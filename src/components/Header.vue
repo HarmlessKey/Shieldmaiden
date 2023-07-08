@@ -67,7 +67,7 @@
 						class="icon d-none d-md-block"
 						aria-label="Keybindings"
 						:tabindex="tabindex"
-						@click="setSlide({ show: true, type: 'slides/Keybindings', data: { sm: true } })"
+						@click="setDrawer({ show: true, type: 'drawers/Keybindings', data: { sm: true } })"
 					>
 						<i aria-hidden="true" class="fas fa-keyboard" />
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
@@ -78,7 +78,7 @@
 						class="icon"
 						aria-label="Compendium"
 						:tabindex="tabindex"
-						@click="setSlide({ show: true, type: 'slides/Compendium' })"
+						@click="setDrawer({ show: true, type: 'drawers/Compendium' })"
 					>
 						<i aria-hidden="true" class="fas fa-book-spells"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
@@ -90,7 +90,7 @@
 						aria-label="Live initiative link"
 						class="icon"
 						:tabindex="tabindex"
-						@click="setSlide({ show: true, type: 'PlayerLink' })"
+						@click="setDrawer({ show: true, type: 'PlayerLink' })"
 					>
 						<i aria-hidden="true" class="fas fa-share-alt"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
@@ -102,8 +102,8 @@
 						aria-label="Dice roller"
 						v-shortkey="['r']"
 						:tabindex="tabindex"
-						@shortkey="setSlide({ show: true, type: 'slides/roll/index' })"
-						@click="setSlide({ show: true, type: 'slides/roll/index' })"
+						@shortkey="setDrawer({ show: true, type: 'drawers/roll/index' })"
+						@click="setDrawer({ show: true, type: 'drawers/roll/index' })"
 					>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Dice roller
@@ -198,13 +198,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide", "setSideSmallScreen", "setTheme", "sign_out"]),
-		showSlide(type) {
-			this.setSlide({
-				show: true,
-				type,
-			});
-		},
+		...mapActions(["setDrawer", "setSideSmallScreen", "setTheme", "sign_out"]),
 		signOut() {
 			if (this.$route.path !== "/") this.$router.replace("/");
 			this.sign_out();

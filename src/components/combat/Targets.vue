@@ -9,8 +9,8 @@
 				tabindex="-1"
 				:class="{ disabled: test }"
 				v-shortkey="['a']"
-				@click="test ? null : setSlide({ show: true, type: 'slides/encounter/AddNpc' })"
-				@shortkey="test ? null : setSlide({ show: true, type: 'slides/encounter/AddNpc' })"
+				@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
+				@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
 			>
 				<i aria-hidden="true" class="fas fa-plus green" />
 				<span class="ml-1">
@@ -221,7 +221,7 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"setSlide",
+			"setDrawer",
 			"set_hidden",
 			"set_targeted",
 			"set_stable",

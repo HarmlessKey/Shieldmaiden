@@ -1,72 +1,68 @@
 <template>
 	<div>
-		<h2 class="pane__header">Compendium</h2>
-		<div class="pane__content">
-			<em>What are you looking for?</em>
+		<q-tabs v-model="current" :dark="$store.getters.theme === 'dark'" no-caps class="my-3">
+			<q-tab
+				v-for="({ name, label, icon }, index) in types"
+				:name="name"
+				:icon="icon"
+				@click="setType(name)"
+				:key="`tab-${index}`"
+			>
+				<q-tooltip anchor="top middle" self="center middle">
+					{{ label }}
+				</q-tooltip>
+			</q-tab>
+		</q-tabs>
 
-			<q-tabs v-model="current" :dark="$store.getters.theme === 'dark'" no-caps class="my-3">
-				<q-tab
-					v-for="({ name, label, icon }, index) in types"
-					:name="name"
-					:icon="icon"
-					@click="setType(name)"
-					:key="`tab-${index}`"
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						{{ label }}
-					</q-tooltip>
-				</q-tab>
-			</q-tabs>
+		<template v-if="current">
+			<q-input
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
+				:placeholder="`Search ${current}`"
+				type="text"
+				class="mb-2"
+				clearable
+				autocomplete="off"
+				v-model="search"
+				@keyup="searchType()"
+				:error="!!noResult"
+				:error-message="noResult"
+			>
+				<q-icon
+					slot="append"
+					name="fas fa-search"
+					size="xs"
+					class="pointer"
+					@click="searchType()"
+				/>
+			</q-input>
 
-			<template v-if="current">
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					:placeholder="`Search ${current}`"
-					type="text"
-					class="mb-2"
-					autocomplete="off"
-					v-model="search"
-					@keyup="searchType()"
-					:error="!!noResult"
-					:error-message="noResult"
-				>
-					<q-icon
-						slot="append"
-						name="fas fa-search"
-						size="xs"
-						class="pointer"
-						@click="searchType()"
-					/>
-				</q-input>
-
-				<!-- SHOW SEARCH RESULTS -->
-				<ul v-if="!show" class="results">
-					<li v-for="(result, index) in searchResults" :key="index" class="truncate">
-						<a @click="show = result['_id']">
-							{{ result.name.capitalizeEach() }}
-							<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
-						</a>
-					</li>
-				</ul>
-
-				<!-- SHOW SELECTED RESULT -->
-				<div v-if="show">
-					<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">
-						<i aria-hidden="true" class="fas fa-times red mr-1" />
-						Close
+			<!-- SHOW SEARCH RESULTS -->
+			<ul v-if="!show" class="results">
+				<li v-for="(result, index) in searchResults" :key="index" class="truncate">
+					<a @click="show = result['_id']">
+						{{ result.name.capitalizeEach() }}
+						<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
 					</a>
-					<ViewMonster v-if="current == 'monsters'" :id="show" />
-					<Spell v-if="current == 'spells'" :id="show" />
-					<Condition v-if="current == 'conditions'" :id="show" />
-					<Item v-if="current == 'items'" :id="show" />
-				</div>
-			</template>
-			<router-link v-else class="btn bg-neutral-5 mt-3 btn-block" to="/compendium">
-				View entire compendium
-			</router-link>
-		</div>
+				</li>
+			</ul>
+
+			<!-- SHOW SELECTED RESULT -->
+			<div v-if="show">
+				<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">
+					<i aria-hidden="true" class="fas fa-times red mr-1" />
+					Close
+				</a>
+				<ViewMonster v-if="current == 'monsters'" :id="show" />
+				<Spell v-if="current == 'spells'" :id="show" />
+				<Condition v-if="current == 'conditions'" :id="show" />
+				<Item v-if="current == 'items'" :id="show" />
+			</div>
+		</template>
+		<router-link v-else class="btn bg-neutral-5 mt-3 btn-block" to="/compendium">
+			View entire compendium
+		</router-link>
 	</div>
 </template>
 

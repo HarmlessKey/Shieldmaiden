@@ -78,8 +78,6 @@
 				<q-input
 					:dark="$store.getters.theme !== 'light'"
 					v-model="search"
-					borderless
-					filled
 					square
 					debounce="300"
 					clearable

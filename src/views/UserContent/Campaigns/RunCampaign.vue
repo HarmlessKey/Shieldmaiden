@@ -41,7 +41,6 @@
 				</Pane>
 				<hk-pane>
 					<Players
-						v-if="!loading_campaign"
 						:userId="user.uid"
 						:campaignId="campaignId"
 						:campaign="campaign"
@@ -51,7 +50,7 @@
 				<Pane>
 					<Splitpanes horizontal>
 						<hk-pane>
-							<Compendium />
+							<Resources />
 						</hk-pane>
 						<hk-pane>
 							<Share />
@@ -69,7 +68,7 @@ import Encounters from "../Encounters";
 import Players from "src/components/campaign/Players.vue";
 import Media from "src/components/campaign/Media.vue";
 import Share from "src/components/campaign/Share.vue";
-import Compendium from "src/components/slides/Compendium.vue";
+import Resources from "src/components/campaign/resources";
 
 import { mapGetters, mapActions } from "vuex";
 
@@ -80,7 +79,7 @@ export default {
 		Players,
 		Media,
 		Share,
-		Compendium,
+		Resources,
 	},
 	data() {
 		return {

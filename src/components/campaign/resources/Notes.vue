@@ -30,6 +30,7 @@
 					square
 					v-model="note.description"
 					type="textarea"
+					@blur="updateNote($event, key)"
 				/>
 			</q-expansion-item>
 		</q-list>
@@ -109,7 +110,7 @@ export default {
 		this.loading_active = false;
 	},
 	methods: {
-		...mapActions("campaigns", ["get_campaign_notes", "add_note", "delete_note"]),
+		...mapActions("campaigns", ["get_campaign_notes", "add_note", "delete_note", "update_note"]),
 		addNote() {
 			this.add_note({
 				campaignId: this.campaignId,
@@ -120,6 +121,9 @@ export default {
 		},
 		deleteNote(key) {
 			this.delete_note({ campaignId: this.campaignId, key });
+		},
+		updateNote(e, id) {
+			this.update_note({ campaignId: this.campaignId, id, note: { description: e.target.value } });
 		},
 	},
 };

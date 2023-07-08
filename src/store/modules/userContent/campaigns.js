@@ -850,6 +850,20 @@ const campaign_actions = {
 		}
 	},
 
+	async update_note({ rootGetters, commit, dispatch }, { campaignId, id, note }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+
+			try {
+				await services.updateNote(uid, campaignId, id, note);
+				commit("UPDATE_NOTE", { campaignId, id, note });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Deletes a note from a campaign
 	 *
@@ -1021,6 +1035,10 @@ const campaign_mutations = {
 		} else {
 			Vue.set(state.notes, campaignId, { [id]: note });
 		}
+	},
+	UPDATE_NOTE(state, { campaignId, id, note }) {
+		const current = state.notes[campaignId][id];
+		Vue.set(state.notes[campaignId], id, { ...current, ...note });
 	},
 	DELETE_NOTE(state, { campaignId, key }) {
 		Vue.delete(state.notes[campaignId], key);

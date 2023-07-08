@@ -248,6 +248,14 @@ export class campaignServices {
 		}
 	}
 
+	async updateNote(uid, campaignId, id, note) {
+		try {
+			await NOTES_REF.child(`${uid}/${campaignId}`).child(id).update(note);
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	async deleteNote(uid, campaignId, key) {
 		try {
 			NOTES_REF.child(`${uid}/${campaignId}`).child(key).remove();

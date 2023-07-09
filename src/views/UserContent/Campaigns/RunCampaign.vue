@@ -29,9 +29,9 @@
 				</div>
 			</div>
 			<Splitpanes class="default-theme">
-				<Pane>
+				<Pane size="30" min-size="20">
 					<Splitpanes horizontal>
-						<hk-pane>
+						<hk-pane size="70">
 							<Encounters />
 						</hk-pane>
 						<hk-pane>
@@ -39,7 +39,7 @@
 						</hk-pane>
 					</Splitpanes>
 				</Pane>
-				<hk-pane>
+				<hk-pane size="40" min-size="20">
 					<Players
 						:userId="user.uid"
 						:campaignId="campaignId"
@@ -47,12 +47,12 @@
 						:players="players"
 					/>
 				</hk-pane>
-				<Pane>
+				<Pane size="30" min-size="20">
 					<Splitpanes horizontal>
-						<hk-pane>
+						<hk-pane min-size="20">
 							<Resources />
 						</hk-pane>
-						<hk-pane>
+						<hk-pane v-if="!campaign.private" size="60" min-size="20">
 							<Share />
 						</hk-pane>
 					</Splitpanes>
@@ -67,7 +67,7 @@
 import Encounters from "../Encounters";
 import Players from "src/components/campaign/Players.vue";
 import Media from "src/components/campaign/Media.vue";
-import Share from "src/components/campaign/Share.vue";
+import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
 
 import { mapGetters, mapActions } from "vuex";
@@ -108,6 +108,17 @@ export default {
 			this.loading_campaign = false;
 		});
 		this.set_active_campaign(this.campaignId);
+	},
+	provide() {
+		const provided_campaign = {};
+
+		Object.defineProperty(provided_campaign, "campaign", {
+			enumerable: true,
+			get: () => this.campaign,
+		});
+		return {
+			provided_campaign,
+		};
 	},
 	computed: {
 		...mapGetters(["broadcast"]),
@@ -152,6 +163,7 @@ export default {
 					justify-content: space-between;
 					align-items: center;
 					background-color: $neutral-8;
+					min-height: 51px;
 					padding: 10px;
 					position: sticky;
 					top: 0;

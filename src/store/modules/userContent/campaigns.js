@@ -727,7 +727,7 @@ const campaign_actions = {
 
 	/**
 	 * Update the "share" property with the latest value
-	 * Shares can be seen by players on the public intiative list
+	 * Shares can be seen by players on the public initiative list
 	 *
 	 * @param {string} id campaignId
 	 * @param {object} share Share object

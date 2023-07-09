@@ -31,7 +31,7 @@
 			<div class="d-flex justify-content-end">
 				<template v-if="viewerIsUser && page !== 'user'">
 					<button
-						class="btn btn-sm mr-1"
+						class="btn btn-sm bg-neutral-5 mr-1"
 						@click="
 							setDrawer({
 								show: true,
@@ -43,7 +43,7 @@
 						<q-tooltip anchor="top middle" self="center middle">Damage Meters</q-tooltip>
 					</button>
 					<button
-						class="btn btn-sm mr-1"
+						class="btn btn-sm mr-1 bg-neutral-5"
 						@click="
 							setDrawer({
 								show: true,
@@ -70,7 +70,7 @@
 						</q-tooltip>
 					</button>
 					<button
-						class="btn btn-sm"
+						class="btn btn-sm bg-neutral-5"
 						@click="
 							setDrawer({
 								show: true,
@@ -359,7 +359,7 @@
 			</div>
 			<hk-loader v-else name="players" />
 			<div slot="footer" v-if="viewerIsUser && page !== 'user'">
-				<button class="btn btn-block btn-square" @click="reset()">
+				<button class="btn btn-block mt-2" @click="reset()">
 					<i aria-hidden="true" class="fas fa-undo-alt"></i> Reset player health
 				</button>
 			</div>

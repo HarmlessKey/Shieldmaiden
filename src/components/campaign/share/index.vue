@@ -131,6 +131,7 @@
 						name="Share message"
 						type="textarea"
 						rules="max:1000"
+						maxlength="1001"
 						class="mb-2"
 						clearable
 						:disable="disableShare('message')"

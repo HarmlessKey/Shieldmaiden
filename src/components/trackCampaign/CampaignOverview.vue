@@ -9,6 +9,7 @@
 		:background-youtube="background_youtube"
 		class="full-height"
 	>
+		<Sharing v-if="campaign.sharing && live" :sharing="campaign.sharing" />
 		<div v-if="width > 576" class="track desktop" :class="{ isLive: live }">
 			<div class="players">
 				<h3 class="text-shadow">Campaign Players</h3>
@@ -104,6 +105,7 @@
 <script>
 import Meters from "src/components/trackCampaign/Meters.vue";
 import ViewPlayers from "src/components/campaign/Players.vue";
+import Sharing from "./Sharing.vue";
 import Weather from "src/components/weather";
 
 export default {
@@ -113,6 +115,7 @@ export default {
 		Meters,
 		ViewPlayers,
 		Shares: () => import("./Shares"),
+		Sharing,
 		Weather,
 	},
 	data() {
@@ -266,6 +269,7 @@ h3 {
 				display: flex;
 				justify-content: center;
 				transition: all 0.5s linear;
+				z-index: 2;
 
 				.show {
 					background-color: $blue;

@@ -18,6 +18,9 @@
 			v-if="provided_campaign.campaign.sharing.image"
 			:src="provided_campaign.campaign.sharing.image"
 		/>
+		<div v-if="provided_campaign.campaign.sharing.message" class="message">
+			{{ provided_campaign.campaign.sharing.message.trim() }}
+		</div>
 	</div>
 </template>
 
@@ -35,6 +38,7 @@ export default {
 	top: 0;
 	height: 100%;
 	width: 100%;
+	overflow: hidden;
 
 	&__content {
 		position: absolute;
@@ -62,6 +66,16 @@ export default {
 		height: 100%;
 		object-fit: cover;
 		object-position: top;
+	}
+	.message {
+		font-family: Helvetica, sans-serif, serif;
+		background-image: url("~assets/_img/styles/monster-card-bg.png");
+		background-color: #f7e4ba;
+		color: $black;
+		margin: auto;
+		padding: 2rem;
+		white-space: pre-line;
+		height: 100%;
 	}
 }
 </style>

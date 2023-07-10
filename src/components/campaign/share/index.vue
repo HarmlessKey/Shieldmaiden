@@ -21,65 +21,66 @@
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
 			<q-tab-panel name="background">
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					clearable
-					v-model="background.image"
-					label="Background image"
-					class="mb-3"
-					:disable="disableBackground('image')"
-					@input="
-						(value) => {
-							if (!value) {
-								$delete(background, 'image');
+				<ValidationObserver v-slot="{ valid }">
+					<hk-input
+						v-model="background.image"
+						label="Background image"
+						name="Background image"
+						rules="url"
+						class="mb-2"
+						clearable
+						:disable="disableBackground('image')"
+						@input="
+							(value) => {
+								if (!value) {
+									$delete(background, 'image');
+								}
 							}
-						}
-					"
-				>
-					<i slot="prepend" class="fas fa-image" aria-hidden="true" />
-				</q-input>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					clearable
-					v-model="background.video"
-					label="Background video"
-					class="mb-3"
-					:disable="disableBackground('video')"
-					@input="
-						(value) => {
-							if (!value) {
-								$delete(background, 'video');
+						"
+					>
+						<i slot="prepend" class="fas fa-image" aria-hidden="true" />
+					</hk-input>
+					<hk-input
+						v-model="background.video"
+						label="Background video"
+						name="Background video"
+						rules="url"
+						class="mb-2"
+						clearable
+						:disable="disableBackground('video')"
+						@input="
+							(value) => {
+								if (!value) {
+									$delete(background, 'video');
+								}
 							}
-						}
-					"
-				>
-					<i slot="prepend" class="fas fa-video" aria-hidden="true" />
-				</q-input>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					clearable
-					v-model="background.youtube"
-					label="Background Youtube video"
-					class="mb-3"
-					:disable="disableBackground('youtube')"
-					@input="
-						(value) => {
-							if (!value) {
-								$delete(background, 'youtube');
+						"
+					>
+						<i slot="prepend" class="fas fa-video" aria-hidden="true" />
+					</hk-input>
+					<hk-input
+						v-model="background.youtube"
+						label="Background Youtube video"
+						name="Background youtube"
+						rules="url"
+						class="mb-2"
+						clearable
+						:disable="disableBackground('youtube')"
+						@input="
+							(value) => {
+								if (!value) {
+									$delete(background, 'youtube');
+								}
 							}
-						}
-					"
-				>
-					<i slot="prepend" class="fab fa-youtube" aria-hidden="true" />
-				</q-input>
-				<button class="btn bg-neutral-5 mr-2" @click="clearBackground">Clear</button>
-				<button class="btn" @click="setBackground">Set</button>
+						"
+					>
+						<i slot="prepend" class="fab fa-youtube" aria-hidden="true" />
+					</hk-input>
+					<button class="btn bg-neutral-5 mr-2" @click="clearBackground">Clear</button>
+					<button class="btn" @click="valid ? setBackground() : null" :disabled="!valid">
+						Set
+					</button>
+				</ValidationObserver>
 			</q-tab-panel>
 
 			<q-tab-panel name="share">

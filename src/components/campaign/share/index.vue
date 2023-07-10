@@ -77,70 +77,79 @@
 						<i slot="prepend" class="fab fa-youtube" aria-hidden="true" />
 					</hk-input>
 					<button class="btn bg-neutral-5 mr-2" @click="clearBackground">Clear</button>
-					<button class="btn" @click="valid ? setBackground() : null" :disabled="!valid">
+					<button
+						class="btn"
+						@click="valid ? setBackground() : null"
+						:disabled="isEmpty(background) || !valid"
+					>
 						Set
 					</button>
 				</ValidationObserver>
 			</q-tab-panel>
 
 			<q-tab-panel name="share">
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					clearable
-					v-model="share.image"
-					label="Share image"
-					class="mb-3"
-					:disable="disableShare('image')"
-					@input="
-						(value) => {
-							if (!value) {
-								$delete(share, 'image');
+				<ValidationObserver v-slot="{ valid }">
+					<hk-input
+						v-model="share.image"
+						label="Share image"
+						name="Share image"
+						rules="url"
+						class="mb-2"
+						clearable
+						:disable="disableShare('image')"
+						@input="
+							(value) => {
+								if (!value) {
+									$delete(share, 'image');
+								}
 							}
-						}
-					"
-				>
-					<i slot="prepend" class="fas fa-image" aria-hidden="true" />
-				</q-input>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					clearable
-					v-model="share.youtube"
-					label="Share Youtube video"
-					class="mb-3"
-					:disable="disableShare('youtube')"
-					@input="
-						(value) => {
-							if (!value) {
-								$delete(share, 'youtube');
+						"
+					>
+						<i slot="prepend" class="fas fa-image" aria-hidden="true" />
+					</hk-input>
+					<hk-input
+						v-model="share.youtube"
+						label="Share Youtube video"
+						name="Share Youtube video"
+						rules="url"
+						class="mb-2"
+						clearable
+						:disable="disableShare('youtube')"
+						@input="
+							(value) => {
+								if (!value) {
+									$delete(share, 'youtube');
+								}
 							}
-						}
-					"
-				>
-					<i slot="prepend" class="fab fa-youtube" aria-hidden="true" />
-				</q-input>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					clearable
-					v-model="share.message"
-					label="Share message"
-					type="textarea"
-					class="mb-3"
-					:disable="disableShare('message')"
-					@input="
-						(value) => {
-							if (!value) {
-								$delete(share, 'message');
+						"
+					>
+						<i slot="prepend" class="fab fa-youtube" aria-hidden="true" />
+					</hk-input>
+					<hk-input
+						v-model="share.message"
+						label="Share message"
+						name="Share message"
+						type="textarea"
+						rules="max:1000"
+						class="mb-2"
+						clearable
+						:disable="disableShare('message')"
+						@input="
+							(value) => {
+								if (!value) {
+									$delete(share, 'message');
+								}
 							}
-						}
-					"
-				/>
-				<button class="btn btn-block" :disabled="isEmpty(share)" @click="startShare">Share</button>
+						"
+					/>
+					<button
+						class="btn btn-block"
+						:disabled="isEmpty(share) || !valid"
+						@click="valid ? startShare() : null"
+					>
+						Share
+					</button>
+				</ValidationObserver>
 			</q-tab-panel>
 
 			<q-tab-panel name="weather">

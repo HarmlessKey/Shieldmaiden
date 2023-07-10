@@ -2,7 +2,10 @@
 	<div
 		class="light"
 		:class="background && lightning && showWeather ? `bg-white` : `bg-neutral-5`"
-		:style="{ '--backgroundImage': 'url(\'' + background + '\')' }"
+		:style="{
+			'--backgroundImage':
+				background && !backgroundVideo && !backgroundYoutube ? 'url(\'' + background + '\')' : '',
+		}"
 	>
 		<div
 			class="weather-wrapper"
@@ -175,7 +178,8 @@ export default {
 			}
 		}
 
-		&::before {
+		&::before,
+		&::after {
 			content: "";
 			width: 100%;
 			height: 100%;
@@ -341,12 +345,9 @@ export default {
 		}
 		&.quake {
 			background-image: var(--backgroundImage);
-			transform: scale(1.05);
 
 			&-light {
-				transform: scale(1.05);
-
-				&::before {
+				&::after {
 					animation: quake-l 180s ease-in infinite;
 					opacity: (0.6);
 
@@ -439,9 +440,7 @@ export default {
 				}
 			}
 			&-medium {
-				transform: scale(1.05);
-
-				&::before {
+				&::after {
 					animation: quake-m 60s ease-in infinite;
 					opacity: (0.6);
 
@@ -534,9 +533,7 @@ export default {
 				}
 			}
 			&-heavy {
-				transform: scale(1.05);
-
-				&::before {
+				&::after {
 					animation: quake-h 0.6s ease-in infinite;
 					opacity: (0.6);
 

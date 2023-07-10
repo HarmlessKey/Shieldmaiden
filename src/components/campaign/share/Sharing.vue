@@ -10,7 +10,7 @@
 
 		<iframe
 			v-if="provided_campaign.campaign.sharing.youtube"
-			:src="`${provided_campaign.campaign.sharing.youtube}?&autoplay=1&mute=1&playsinline=1`"
+			:src="`${provided_campaign.campaign.sharing.youtube}`"
 			title="YouTube video player"
 			class="youtube-player"
 		/>

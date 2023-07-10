@@ -7,7 +7,7 @@
 		<div
 			class="weather-wrapper"
 			:class="[
-				lightning && showWeather ? `lightning lightning-${lightning}` : '',
+				lightning && showWeather ? `lightning-effect lightning-effect__${lightning}` : '',
 				quake && showWeather ? `quake quake-${quake}` : '',
 			]"
 		>
@@ -25,6 +25,26 @@
 				<Snow v-if="weather.snow > 0" :intensity="weather.snow" :audio="audio" />
 				<Ash v-if="weather.ash > 0" :intensity="weather.ash" :audio="audio" />
 			</template>
+			<video
+				v-if="backgroundVideo"
+				:src="backgroundVideo"
+				alt="Background video"
+				class="bg-video"
+				playsinline
+				autoplay
+				loop
+				:muted="muted"
+			/>
+			<iframe
+				ref="youtube"
+				v-if="backgroundYoutube"
+				:src="`${backgroundYoutube}?autoplay=1&mute=${mute_youtube}&playsinline=1&controls=0`"
+				title="YouTube video player"
+				class="youtube-player"
+				frameborder="0"
+				allow="autoplay"
+			/>
+			<q-resize-observer v-if="backgroundYoutube" @resize="setSize" />
 		</div>
 		<audio v-if="audio && thunder_interval" :src="thunder_audio" ref="thunder" autoplay />
 	</div>
@@ -42,11 +62,23 @@ export default {
 			type: String,
 			required: false,
 		},
+		backgroundVideo: {
+			type: String,
+			required: false,
+		},
+		backgroundYoutube: {
+			type: String,
+			required: false,
+		},
 		showWeather: {
 			type: Boolean,
 			default: true,
 		},
 		audio: {
+			type: Boolean,
+			default: false,
+		},
+		muted: {
 			type: Boolean,
 			default: false,
 		},
@@ -90,6 +122,9 @@ export default {
 			}
 			return undefined;
 		},
+		mute_youtube() {
+			return this.muted ? 1 : 0;
+		},
 	},
 	mounted() {
 		if (this.audio && this.weather && this.weather.lightning > 0) {
@@ -103,6 +138,12 @@ export default {
 			setInterval(function () {
 				vm.$refs.thunder.play();
 			}, vm.thunder_interval);
+		},
+		setSize(size) {
+			const req_height = size.width * (9 / 16);
+			const req_width = size.height * (16 / 9);
+			this.$refs.youtube.style.width = `${Math.ceil(req_width)}px`;
+			this.$refs.youtube.style.height = `${Math.ceil(req_height)}px`;
 		},
 	},
 };
@@ -145,10 +186,24 @@ export default {
 			background-size: cover;
 			background-repeat: no-repeat;
 			background-position: center bottom;
+			z-index: -2;
 		}
 
-		&.lightning {
-			&-light {
+		.bg-video,
+		.youtube-player {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			min-width: 100%;
+			min-height: 100%;
+			z-index: -2;
+
+			transition: all 0.3s linear;
+		}
+
+		&.lightning-effect {
+			&__light {
 				animation: lightnings 360s linear infinite;
 				@keyframes lightnings {
 					0% {
@@ -193,7 +248,7 @@ export default {
 					}
 				}
 			}
-			&-medium {
+			&__medium {
 				animation: lightningm 180s linear infinite;
 				@keyframes lightningm {
 					0% {
@@ -238,7 +293,7 @@ export default {
 					}
 				}
 			}
-			&-heavy {
+			&__heavy {
 				animation: lightning 60s linear infinite;
 				@keyframes lightning {
 					0% {

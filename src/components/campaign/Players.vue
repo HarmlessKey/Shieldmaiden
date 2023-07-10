@@ -565,6 +565,7 @@ export default {
 	.players {
 		.col.header {
 			color: $white;
+			padding: 0 12px;
 		}
 	}
 }
@@ -594,8 +595,8 @@ export default {
 	user-select: none;
 
 	.image {
-		width: 46px;
-		height: 46px;
+		width: 49px;
+		height: 49px;
 		background-size: cover;
 		background-position: top center;
 		background-color: $neutral-9;
@@ -681,6 +682,12 @@ export default {
 				height: 33px;
 				display: inline-block;
 			}
+		}
+		&.pp,
+		&.pinv,
+		&.pins,
+		&.save {
+			text-align: center;
 		}
 		.saves {
 			.save {

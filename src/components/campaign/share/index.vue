@@ -35,7 +35,6 @@
 							if (!value) {
 								$delete(background, 'image');
 							}
-							$forceUpdate();
 						}
 					"
 				>
@@ -55,7 +54,6 @@
 							if (!value) {
 								$delete(background, 'video');
 							}
-							$forceUpdate();
 						}
 					"
 				>
@@ -75,7 +73,6 @@
 							if (!value) {
 								$delete(background, 'youtube');
 							}
-							$forceUpdate();
 						}
 					"
 				>
@@ -204,14 +201,12 @@ export default {
 			],
 			share: {},
 			weather: this.provided_campaign.campaign.weather || {},
+			background: this.provided_campaign.campaign.temporary_background || {},
 		};
 	},
 	inject: ["provided_campaign"],
 	computed: {
 		...mapGetters(["broadcast"]),
-		background() {
-			return this.provided_campaign.campaign.temporary_background || {};
-		},
 	},
 	methods: {
 		...mapActions("campaigns", ["set_campaign_prop"]),
@@ -227,8 +222,11 @@ export default {
 		},
 		modifyYoutubeUrl(url) {
 			url = url.replace("youtu.be", "youtube.com");
-			url = !url.match(/\/embed/) ? url.replace("youtube.com", "youtube.com/embed") : url; // add embed
-			url = url.replace(/(watch\?v=)(.*?)(&)/g, "$2$3"); // get the id set it directly after the /
+			url = url.replace("youtube.com", "youtube-nocookie.com");
+			url = !url.match(/\/embed/)
+				? url.replace("youtube-nocookie.com", "youtube-nocookie.com/embed")
+				: url; // add embed
+			url = url.replace(/(watch\?v=)(.*?)(&)/g, "$2$3"); // get the id and set it directly after the /
 			url = url.replace(/\?.*/g, ""); // remove params from url
 			return url.replace(/&.*/g, "");
 		},
@@ -256,8 +254,8 @@ export default {
 			});
 		},
 		setBackground() {
-			if (this.share.youtube) {
-				this.share.youtube = this.modifyYoutubeUrl(this.share.youtube);
+			if (this.background.youtube) {
+				this.background.youtube = this.modifyYoutubeUrl(this.background.youtube);
 			}
 			this.set_campaign_prop({
 				id: this.campaignId,
@@ -271,6 +269,7 @@ export default {
 				property: "temporary_background",
 				value: null,
 			});
+			this.background = {};
 		},
 		setWeather() {
 			this.set_campaign_prop({

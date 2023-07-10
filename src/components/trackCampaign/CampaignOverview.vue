@@ -1,5 +1,14 @@
 <template>
-	<component :is="live ? 'Weather' : 'div'" :weather="campaign.weather" class="full-height">
+	<component
+		:is="live ? 'Weather' : 'div'"
+		:show-weather="showWeather"
+		:muted="muted"
+		:weather="campaign.weather"
+		:background="background_image"
+		:background-video="background_video"
+		:background-youtube="background_youtube"
+		class="full-height"
+	>
 		<div v-if="width > 576" class="track desktop" :class="{ isLive: live }">
 			<div class="players">
 				<h3 class="text-shadow">Campaign Players</h3>
@@ -99,7 +108,7 @@ import Weather from "src/components/weather";
 
 export default {
 	name: "Players",
-	props: ["players", "campaign", "width", "shares", "live"],
+	props: ["players", "campaign", "width", "shares", "live", "showWeather", "muted"],
 	components: {
 		Meters,
 		ViewPlayers,
@@ -125,20 +134,43 @@ export default {
 			],
 		};
 	},
+	computed: {
+		background_image() {
+			if (this.campaign.temporary_background && this.campaign.temporary_background.image)
+				return this.campaign.temporary_background.image;
+			if (this.campaign.background) return this.campaign.background;
+			if (this.campaign.hk_background)
+				return require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`);
+			return undefined;
+		},
+		background_video() {
+			return this.campaign.temporary_background
+				? this.campaign.temporary_background.video
+				: undefined;
+		},
+		background_youtube() {
+			return this.campaign.temporary_background
+				? this.campaign.temporary_background.youtube
+				: undefined;
+		},
+	},
 	methods: {},
 };
 </script>
 
 <style lang="scss" scoped>
 h3 {
+	position: relative;
 	color: $white;
 	margin-bottom: 20px !important;
+	z-index: 1;
 }
 .track {
 	margin: auto;
 	width: 100%;
 	height: 100%;
 	display: grid;
+	z-index: 0;
 
 	&.desktop {
 		grid-template-columns: 3fr 1fr;

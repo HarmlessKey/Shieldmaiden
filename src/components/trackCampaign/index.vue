@@ -3,24 +3,34 @@
 		<template v-if="campaign">
 			<template v-if="!campaign.private">
 				<!-- NOT LIVE -->
-				<div
-					class="track-wrapper"
-					v-if="!encounter || broadcasting['.value'] !== $route.params.campid"
-				>
+				<div class="track-wrapper" v-if="!encounter || !isLive">
 					<div class="top">
-						<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`">
+						<router-link class="btn btn-sm btn-clear" :to="`/user/${userId}`">
 							<i aria-hidden="true" class="fas fa-chevron-left"></i> Back
 						</router-link>
-						<span class="title truncate">{{ campaign.campaign }}</span>
-						<span>
-							<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }"
+						<span class="title written truncate">{{ campaign.name }}</span>
+						<div class="d-flex justify-content-end items-center gap-2">
+							<span class="live" :class="{ active: broadcasting['.value'] == campaignId }"
 								>live</span
 							>
+							<a v-if="show_mute" aria-label="Toggle sound" class="mute" @click="muted = !muted">
+								<i aria-hidden="true" v-if="muted" class="fas fa-volume-mute neutral-3" />
+								<i aria-hidden="true" v-else class="fas fa-volume" />
+							</a>
+							<a
+								v-if="!isEmpty(campaign.weather) && isLive"
+								aria-label="Toggle weather effects"
+								class="weather"
+								@click="show_weather = !show_weather"
+							>
+								<i aria-hidden="true" v-if="show_weather" class="fas fa-cloud-showers" />
+								<i aria-hidden="true" v-else class="fas fa-cloud hide" />
+							</a>
 							<a @click="toggleFullscreen" class="full">
 								<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />
-								<q-tooltip anchor="bottom middle" self="top middle"> Fullscreen </q-tooltip>
+								<q-tooltip anchor="bottom middle" self="top middle">Fullscreen</q-tooltip>
 							</a>
-						</span>
+						</div>
 					</div>
 					<div
 						class="campaign"
@@ -35,14 +45,16 @@
 							:campaign="campaign"
 							:width="width"
 							:shares="shares"
-							:live="broadcasting['.value'] === $route.params.campid"
+							:show-weather="show_weather"
+							:live="isLive"
+							:muted="muted"
 						/>
 					</div>
 				</div>
 
 				<!-- LIVE -->
 				<Live
-					v-else-if="encounter && broadcasting['.value'] === $route.params.campid"
+					v-else-if="encounter && isLive"
 					:encounter="encounter"
 					:campaign="campaign"
 					:players="players"
@@ -94,7 +106,7 @@ import CampaignOverview from "src/components/trackCampaign/CampaignOverview.vue"
 import Live from "./live";
 
 export default {
-	name: "Trackcampaign",
+	name: "TrackCampaign",
 	components: {
 		CampaignOverview,
 		Live,
@@ -103,12 +115,16 @@ export default {
 		return {
 			user: this.$store.getters.user,
 			userId: this.$route.params.userid,
+			campaignId: this.$route.params.campid,
 			encounter: undefined,
 			campaign: undefined,
 			tier: undefined,
 			width: 0,
 			shares: [],
 			xpAward: [],
+			isEmpty: _.isEmpty,
+			show_weather: true,
+			muted: false,
 		};
 	},
 	firebase() {
@@ -126,6 +142,16 @@ export default {
 	computed: {
 		shared() {
 			return this.campaign && this.broadcasting[".value"] ? this.campaign.shares : {};
+		},
+		isLive() {
+			return this.broadcasting[".value"] === this.campaignId;
+		},
+		show_mute() {
+			return (
+				this.campaign.temporary_background &&
+				this.isLive &&
+				(this.campaign.temporary_background.video || this.campaign.temporary_background.youtube)
+			);
 		},
 	},
 	watch: {
@@ -189,7 +215,7 @@ export default {
 		fetch_encounter() {
 			var track = db.ref(`broadcast/${this.userId}`);
 			track.on("value", (snapshot) => {
-				let campId = this.$route.params.campid;
+				let campId = this.campaignId;
 
 				if (snapshot.val()) {
 					let encId = snapshot.val().encounter;
@@ -250,7 +276,6 @@ export default {
 		.top {
 			grid-area: top;
 			background: $neutral-8;
-			text-transform: uppercase;
 			height: 60px;
 			line-height: 30px;
 			padding: 15px 10px;
@@ -260,11 +285,23 @@ export default {
 			.title {
 				text-align: center;
 				padding: 0 10px;
+				font-size: 20px;
+				line-height: 33px;
+				text-transform: none;
 			}
-			.full {
+			.full,
+			.mute,
+			.weather {
 				font-size: 25px;
 				color: $neutral-2;
-				margin-left: 10px;
+			}
+			.weather .hide {
+				font-size: 19px;
+				vertical-align: 7px;
+				opacity: 0.5;
+			}
+			.full i {
+				vertical-align: -2px;
 			}
 		}
 		.campaign {

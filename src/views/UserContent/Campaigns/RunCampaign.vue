@@ -1,13 +1,14 @@
 <template>
 	<div
 		class="dm-screen"
+		:class="{ small: container_width < sm }"
 		:style="[
 			background_image ? { background: 'url(\'' + background_image + '\')' } : { background: '' },
 		]"
 	>
 		<template v-if="!loading_campaign">
 			<div class="dm-screen__header">
-				{{ campaign.name }}
+				{{ campaign.name }} {{ container_width }}
 				<div
 					@click="
 						setDrawer({
@@ -28,18 +29,25 @@
 					</q-tooltip>
 				</div>
 			</div>
-			<Splitpanes class="default-theme">
-				<Pane size="30" min-size="20">
+			<Splitpanes v-if="container_width >= sm" class="default-theme">
+				<Pane :size="paneSize('left')" min-size="20">
 					<Splitpanes horizontal>
-						<hk-pane size="70">
+						<hk-pane :size="paneSize('left-top')">
 							<Encounters />
 						</hk-pane>
-						<hk-pane>
-							<Media />
+						<hk-pane :size="paneSize('left-bottom')">
+							<Media v-if="container_width > md" />
+							<Players
+								v-else
+								:userId="user.uid"
+								:campaignId="campaignId"
+								:campaign="campaign"
+								:players="players"
+							/>
 						</hk-pane>
 					</Splitpanes>
 				</Pane>
-				<hk-pane size="40" min-size="20">
+				<hk-pane v-if="container_width > md" :size="paneSize('mid')" min-size="20">
 					<Players
 						:userId="user.uid"
 						:campaignId="campaignId"
@@ -47,7 +55,7 @@
 						:players="players"
 					/>
 				</hk-pane>
-				<Pane size="30" min-size="20">
+				<Pane v-if="container_width > lg" :size="paneSize('right')" min-size="20">
 					<Splitpanes horizontal>
 						<hk-pane min-size="20">
 							<Resources />
@@ -58,8 +66,43 @@
 					</Splitpanes>
 				</Pane>
 			</Splitpanes>
+
+			<div v-else class="mobile">
+				<hk-select
+					v-model="mobile_tab"
+					:options="mobile_tabs"
+					:filled="false"
+					borderless
+					map-options
+					emit-value
+					class="px-2"
+				/>
+				<q-tab-panels v-model="mobile_tab" class="bg-transparent" animated swipeable infinite>
+					<q-tab-panel name="encounters">
+						<Encounters />
+					</q-tab-panel>
+					<q-tab-panel name="players">
+						<Players
+							:userId="user.uid"
+							:campaignId="campaignId"
+							:campaign="campaign"
+							:players="players"
+						/>
+					</q-tab-panel>
+					<q-tab-panel name="resources" class="p-0">
+						<Resources />
+					</q-tab-panel>
+					<q-tab-panel name="share">
+						<Share />
+					</q-tab-panel>
+					<q-tab-panel name="media" class="p-0">
+						<Media />
+					</q-tab-panel>
+				</q-tab-panels>
+			</div>
 		</template>
 		<hk-loader v-else name="campaign" />
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -85,9 +128,37 @@ export default {
 		return {
 			user: this.$store.getters.user,
 			campaignId: this.$route.params.campid,
+			container_width: 0,
 			loading_campaign: true,
 			campaign: {},
 			players: {},
+			mobile_tab: "encounters",
+			mobile_tabs: [
+				{
+					label: "Encounters",
+					value: "encounters",
+				},
+				{
+					label: "Players",
+					value: "players",
+				},
+				{
+					label: "Resources",
+					value: "resources",
+				},
+				{
+					label: "Share",
+					value: "share",
+				},
+				{
+					label: "Media",
+					value: "media",
+				},
+			],
+			sm: 576,
+			md: 768,
+			lg: 992,
+			xl: 1200,
 		};
 	},
 	async mounted() {
@@ -132,6 +203,23 @@ export default {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
 		...mapActions("players", ["get_player"]),
+		setSize(size) {
+			this.container_width = size.width;
+		},
+		paneSize(pane) {
+			switch (pane) {
+				case "left":
+					return this.container_width > this.md ? "30" : "50";
+				case "mid":
+					return this.container_width > this.md ? "40" : "50";
+				case "right":
+					return this.container_width > this.md ? "30" : "50";
+				case "left-top":
+					return this.container_width > this.md ? "70" : "50";
+				case "left-top":
+					return this.container_width > this.md ? "30" : "50";
+			}
+		},
 	},
 };
 </script>
@@ -145,6 +233,18 @@ export default {
 	height: calc(100vh - 50px);
 	padding: 5px;
 
+	&.small {
+		padding: 0;
+
+		.dm-screen__header {
+			margin: 0;
+		}
+		.mobile {
+			background: $neutral-8-transparent;
+			height: 100%;
+		}
+	}
+
 	&__header {
 		display: flex;
 		justify-content: space-between;
@@ -155,7 +255,9 @@ export default {
 		margin-bottom: 5px;
 	}
 
-	.splitpanes__pane {
+	.splitpanes__pane,
+	.q-tab-panel {
+		padding: 0;
 		&::v-deep {
 			.pane {
 				&__header {

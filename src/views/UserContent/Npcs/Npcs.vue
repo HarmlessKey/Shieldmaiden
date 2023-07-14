@@ -135,7 +135,6 @@ import { mapActions, mapGetters } from "vuex";
 import { monsterMixin } from "src/mixins/monster";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader";
-import { downloadJSON } from "src/utils/generalFunctions";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
 
 export default {

@@ -8,8 +8,7 @@
 </template>
 
 <script>
-import campaigns from "src/store/modules/userContent/campaigns";
-import { mapGetters, mapActions } from "vuex";
+import { mapActions } from "vuex";
 export default {
 	name: "ExportUserContent",
 
@@ -179,6 +178,7 @@ export default {
 		addCampaignToExport(campaign_id, campaign) {
 			delete campaign.key;
 			delete campaign.advancement;
+			delete campaign.private;
 			delete campaign.companions;
 			delete campaign.players;
 			delete campaign.player_count;
@@ -194,9 +194,24 @@ export default {
 		},
 
 		addEncounterToExport(campaign_id, encounter_id, encounter) {
-			const entities = Object.entries(encounter.entities).filter(([_, entity]) => {
-				return entity.entityType === "npc";
-			});
+			const entities = Object.entries(encounter.entities)
+				.filter(([_, entity]) => {
+					return entity.entityType === "npc";
+				})
+				.map(([entity_id, entity]) => {
+					entity.curHp = entity.maxHp;
+					entity.initiative = 0;
+					delete entity.key;
+					delete entity.tempHp;
+					delete entity.maxHpMod;
+					delete entity.ac_bonus;
+					delete entity.reminders;
+					delete entity.settings;
+					delete entity.surprised;
+					delete entity.tempHp;
+					delete entity.meters;
+					return [entity_id, entity];
+				});
 			encounter.entities = Object.fromEntries(entities);
 			encounter.finished = false;
 			encounter.round = 0;

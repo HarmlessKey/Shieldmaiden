@@ -62,6 +62,16 @@ const routes = [
 				},
 			},
 
+			{
+				path: "import",
+				name: "Import content",
+				component: () => import("src/views/UserContent/ImportContent"),
+				meta: {
+					description: "Import content to Harmless Key.",
+					title: "Import content",
+				},
+			},
+
 			// Cammpaigns
 			{
 				path: "campaigns",

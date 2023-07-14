@@ -349,6 +349,7 @@
 												class="mb-4"
 												@new-value="addOption"
 												@remove="removeOption($event, category, ability_index)"
+												@input="$forceUpdate()"
 											>
 												<hk-popover slot="append" header="Action options">
 													<i class="fas fa-info-circle" aria-hidden="true" />

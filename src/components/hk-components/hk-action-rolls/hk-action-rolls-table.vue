@@ -5,33 +5,21 @@
 				{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
 				({{ data.row.dice_count || "" }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
 				<template v-if="data.row.fixed_val && data.row.dice_count">
-					{{ 
-						(data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`
-
-
-
-
-
+					{{
+						// eslint-disable-next-line vue/no-parsing-error
+						data.row.fixed_val < 0
+							? `- ${Math.abs(data.row.fixed_val)}`
+							: `+ ${data.row.fixed_val}`
 					}})
 				</template>
 				<template v-else>{{ data.row.fixed_val }})</template>
-				<q-tooltip v-if="versatile" anchor="top middle" self="bottom middle">
-					{{ versatileOptions[0] || "Enter versatile option" }}
-				</q-tooltip>
 			</span>
-			<span v-if="versatile && versatileRoll(data.row)">
-				|
-				{{
-					calcAverage(
-						data.row.versatile_dice_type || data.row.dice_type,
-						data.row.versatile_dice_count || data.row.dice_count,
-						data.row.versatile_fixed_val || data.row.fixed_val
-					)
-				}}
-				({{ versatileRoll(data.row) }})
-				<q-tooltip anchor="top middle" self="bottom middle">
-					{{ versatileOptions[1] || "Enter versatile option" }}
-				</q-tooltip>
+			<span v-if="data.row.options && versatileRoll(data.row)">
+				| {{ versatileRoll(data.row) }}
+			</span>
+			<span v-if="Object.values(data.row.options).length > 1">
+				<span>| ...</span>
+				<q-tooltip anchor="top middle" self="bottom middle">More than two Options</q-tooltip>
 			</span>
 		</div>
 
@@ -179,27 +167,33 @@ export default {
 				: parseInt(modifier);
 		},
 		versatileRoll(roll) {
-			if (!roll.versatile_dice_count && !roll.versatile_dice_type && !roll.versatile_fixed_val) {
+			if (!roll.options) {
 				return undefined;
-			} else {
-				let returnRoll = {};
-
-				returnRoll.dice_count = roll.versatile_dice_count
-					? roll.versatile_dice_count
-					: roll.dice_count;
-				returnRoll.dice_type = roll.versatile_dice_type ? roll.versatile_dice_type : roll.dice_type;
-				returnRoll.fixed_val = roll.versatile_fixed_val ? roll.versatile_fixed_val : roll.fixed_val;
-
-				let fixed;
-				if (returnRoll.fixed_val !== undefined) {
-					fixed =
-						returnRoll.fixed_val < 0
-							? ` - ${Math.abs(returnRoll.fixed_val)}`
-							: ` + ${returnRoll.fixed_val}`;
-				}
-
-				return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`;
 			}
+
+			const firstOption = Object.values(roll.options)[0];
+			const returnRoll = {};
+
+			returnRoll.dice_count = firstOption.dice_count ? firstOption.dice_count : roll.dice_count;
+			returnRoll.dice_type = firstOption.dice_type ? firstOption.dice_type : roll.dice_type;
+			returnRoll.fixed_val =
+				firstOption.fixed_val !== undefined ? firstOption.fixed_val : roll.fixed_val;
+
+			let fixed;
+			if (returnRoll.fixed_val !== undefined) {
+				fixed =
+					returnRoll.fixed_val < 0
+						? ` - ${Math.abs(returnRoll.fixed_val)}`
+						: ` + ${returnRoll.fixed_val}`;
+			}
+
+			const average = this.calcAverage(
+				returnRoll.dice_type,
+				returnRoll.dice_count,
+				returnRoll.fixed_val
+			);
+
+			return `${average} (${returnRoll.dice_count}d${returnRoll.dice_type}${fixed})`;
 		},
 		scalingDesc(tiers, scaling, level) {
 			return spellScalingDescription(tiers, scaling, level);

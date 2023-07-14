@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-parsing-error -->
 <template>
 	<div v-if="current">
 		<h3 v-if="targeted.length === 0" class="red text-center">Select one or more targets</h3>
@@ -120,6 +121,14 @@
 											"
 										>
 											<!-- Rolls -->
+											<span v-if="!isNil(action.action_list[0].attack_bonus)">
+												{{
+													action.action_list[0].attack_bonus < 0
+														? `-${Math.abs(action.action_list[0].attack_bonus)}`
+														: `+${action.action_list[0].attack_bonus}`
+												}}
+												to hit
+											</span>
 											<span v-if="action.action_list[0].rolls">
 												<span
 													v-for="(roll, roll_index) in action.action_list[0].rolls"
@@ -136,26 +145,13 @@
 													/>
 													{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 													}}<template v-if="roll.fixed_val && roll.dice_count">
-														{{ (roll.fixed_val &lt; 0) ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+														{{
+															roll.fixed_val < 0
+																? `- ${Math.abs(roll.fixed_val)}`
+																: `+ ${roll.fixed_val}`
 														}}) </template
 													><template v-else>{{ roll.fixed_val }})</template>
-													{{ roll_index+1 &lt; action.action_list[0].rolls.length ? "+" : "" }}
+													{{ roll_index + 1 < action.action_list[0].rolls.length ? "+" : "" }}
 													<q-tooltip anchor="top middle" self="center middle">
 														{{
 															action.action_list[0].type === "healing"
@@ -310,6 +306,7 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Projectiles from "./Projectiles";
+import { isNil } from "lodash";
 
 export default {
 	name: "Roll",
@@ -333,6 +330,7 @@ export default {
 			],
 			rollObject: {},
 			projectile_dialog: false,
+			isNil: isNil,
 		};
 	},
 	computed: {

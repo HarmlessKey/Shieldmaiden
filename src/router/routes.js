@@ -65,14 +65,35 @@ const routes = [
 			{
 				path: "import",
 				name: "Import content",
-				component: () => import("src/views/UserContent/ImportContent"),
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
 				meta: {
-					description: "Import content to Harmless Key.",
 					title: "Import content",
 				},
+				children: [
+					{
+						path: "",
+						component: () => import("src/views/UserContent/ImportContent"),
+						meta: {
+							description: "Import content to Harmless Key",
+							title: "Import Harmless Key  Content",
+						},
+					},
+					{
+						path: "hk_import",
+						component: () => import("src/views/UserContent/ImportContent/ImportHKContent"),
+						meta: {
+							description: "Import User Content from an HK export",
+							title: "Import Harmless Key Content",
+						},
+					},
+				],
 			},
 
-			// Cammpaigns
+			// Campaigns
 			{
 				path: "campaigns",
 				component: {

@@ -121,6 +121,14 @@
 											"
 										>
 											<!-- Rolls -->
+											<span v-if="!isNil(action.action_list[0].attack_bonus)">
+												{{
+													action.action_list[0].attack_bonus < 0
+														? `-${Math.abs(action.action_list[0].attack_bonus)}`
+														: `+${action.action_list[0].attack_bonus}`
+												}}
+												to hit
+											</span>
 											<span v-if="action.action_list[0].rolls">
 												<span
 													v-for="(roll, roll_index) in action.action_list[0].rolls"
@@ -298,6 +306,7 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Projectiles from "./Projectiles";
+import { isNil } from "lodash";
 
 export default {
 	name: "Roll",
@@ -321,6 +330,7 @@ export default {
 			],
 			rollObject: {},
 			projectile_dialog: false,
+			isNil: isNil,
 		};
 	},
 	computed: {

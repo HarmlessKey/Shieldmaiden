@@ -757,6 +757,9 @@ html body {
 		&-row {
 			flex-direction: row;
 		}
+		&-grow {
+			flex-grow: 1;
+		}
 	}
 	.gap {
 		&-1 {
@@ -1802,21 +1805,29 @@ html body {
 	}
 
 	.drawer {
-		position: fixed;
-		right: 0;
-		top: 50px;
-		height: calc(100vh - 50px);
-		width: 380px;
-		max-width: 95%;
-		z-index: 99;
-		box-shadow: 0 10px 15px $black;
-		background: $neutral-8;
+		&-wrapper {
+			position: fixed;
+			right: 0;
+			top: 50px;
+			height: calc(100vh - 50px);
+			width: 380px;
+			max-width: 95%;
+			z-index: 99;
+			box-shadow: 0 10px 15px $black;
+			background: $neutral-8;
+		}
+		height: 100%;
 		display: grid;
 		grid-template-columns: auto;
 		grid-template-rows: 40px auto;
 		grid-template-areas:
 			"hide"
 			"content";
+
+		.q-scrollarea {
+			height: 100%;
+			grid-area: content;
+		}
 
 		a.hide {
 			grid-area: hide;
@@ -1831,9 +1842,8 @@ html body {
 			background: $neutral-9;
 			color: $neutral-1 !important;
 		}
-		.content {
+		&__content {
 			padding: 15px;
-			grid-area: content;
 			overflow: auto;
 
 			&.monster-card {

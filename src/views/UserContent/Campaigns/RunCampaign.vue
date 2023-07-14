@@ -1,70 +1,114 @@
 <template>
 	<div
 		class="dm-screen"
-		:class="{ small: container_width < sm }"
+		:class="{ small: container.width < sm }"
 		:style="[
-			background_image ? { background: 'url(\'' + background_image + '\')' } : { background: '' },
+			background_image
+				? { backgroundImage: 'url(\'' + background_image + '\')' }
+				: { backgroundImage: '' },
 		]"
 	>
 		<template v-if="!loading_campaign">
 			<div class="dm-screen__header">
-				{{ campaign.name }} {{ container_width }}
-				<div
-					@click="
-						setDrawer({
-							show: true,
-							type: 'drawers/Broadcast',
-							data: { campaign_id: campaignId, private: campaign.private },
-						})
-					"
-					class="live pointer"
-					:class="{
-						active: broadcast.live === campaignId,
-						disabled: campaign.private,
-					}"
-				>
-					{{ broadcast.live === campaignId ? "" : "go" }} live
-					<q-tooltip v-if="campaign.private" anchor="center left" self="center right">
-						Private campaign
-					</q-tooltip>
+				<router-link to="/content/campaigns" class="btn btn-sm btn-clear">
+					<hk-icon icon="fas fa-arrow-left" class="mr-1" />
+					Leave
+				</router-link>
+				<div class="dm-screen__header-title written flex-grow truncate">
+					{{ campaign.name }} {{ container.width }}x{{ container.height }}
+				</div>
+				<div class="d-flex justify-content-end items-center gap-1">
+					<div
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/Broadcast',
+								data: { campaign_id: campaignId, private: campaign.private },
+							})
+						"
+						class="live pointer"
+						:class="{
+							active: broadcast.live === campaignId,
+							disabled: campaign.private,
+						}"
+					>
+						{{ broadcast.live === campaignId ? "" : "go" }} live
+						<q-tooltip v-if="campaign.private" anchor="center left" self="center right">
+							Private campaign
+						</q-tooltip>
+					</div>
+					<template v-if="container.width < lg && container.width > sm">
+						<button
+							class="btn btn-clear btn-sm"
+							@click="
+								setDrawer({
+									show: true,
+									type: 'campaign/share/index',
+									data: { campaign: campaign },
+									classes: 'p-0',
+								})
+							"
+						>
+							<hk-icon icon="fas fa-share-alt" />
+						</button>
+						<button
+							class="btn btn-clear btn-sm"
+							@click="
+								setDrawer({
+									show: true,
+									type: 'campaign/resources/index',
+									classes: 'p-0',
+								})
+							"
+						>
+							<hk-icon icon="fas fa-bars" />
+						</button>
+					</template>
 				</div>
 			</div>
-			<Splitpanes v-if="container_width >= sm" class="default-theme">
-				<Pane :size="paneSize('left')" min-size="20">
-					<Splitpanes horizontal>
-						<hk-pane :size="paneSize('left-top')">
-							<Encounters />
-						</hk-pane>
-						<hk-pane :size="paneSize('left-bottom')">
-							<Media v-if="container_width > md" />
+			<Splitpanes v-if="container.width >= sm" class="default-theme" horizontal>
+				<Pane>
+					<Splitpanes>
+						<Pane :size="paneSize('left')" min-size="20">
+							<Splitpanes horizontal>
+								<hk-pane :size="paneSize('left-top')">
+									<Encounters />
+								</hk-pane>
+								<hk-pane v-if="container.width >= lg" :size="paneSize('left-bottom')">
+									<Media />
+								</hk-pane>
+							</Splitpanes>
+						</Pane>
+						<hk-pane v-if="container.width >= md" :size="paneSize('mid')" min-size="20">
 							<Players
-								v-else
 								:userId="user.uid"
 								:campaignId="campaignId"
 								:campaign="campaign"
 								:players="players"
 							/>
 						</hk-pane>
+						<Pane v-if="container.width >= lg" :size="paneSize('right')" min-size="20">
+							<Splitpanes horizontal>
+								<hk-pane min-size="20">
+									<Resources />
+								</hk-pane>
+								<hk-pane v-if="!campaign.private" size="60" min-size="20">
+									<Share :campaign="campaign" />
+								</hk-pane>
+							</Splitpanes>
+						</Pane>
 					</Splitpanes>
 				</Pane>
-				<hk-pane v-if="container_width > md" :size="paneSize('mid')" min-size="20">
+				<hk-pane v-if="container.width < lg && container.height >= 780">
 					<Players
+						v-if="container.width < md"
 						:userId="user.uid"
 						:campaignId="campaignId"
 						:campaign="campaign"
 						:players="players"
 					/>
+					<Share :campaign="campaign" v-else />
 				</hk-pane>
-				<Pane v-if="container_width > lg" :size="paneSize('right')" min-size="20">
-					<Splitpanes horizontal>
-						<hk-pane min-size="20">
-							<Resources />
-						</hk-pane>
-						<hk-pane v-if="!campaign.private" size="60" min-size="20">
-							<Share />
-						</hk-pane>
-					</Splitpanes>
-				</Pane>
 			</Splitpanes>
 
 			<div v-else class="mobile">
@@ -75,8 +119,10 @@
 					borderless
 					map-options
 					emit-value
-					class="px-2"
-				/>
+					class="px-4 bg-neutral-9 tab-select"
+				>
+					<hk-icon slot="prepend" :icon="tab_icon" />
+				</hk-select>
 				<q-tab-panels v-model="mobile_tab" class="bg-transparent" animated swipeable infinite>
 					<q-tab-panel name="encounters">
 						<Encounters />
@@ -93,7 +139,7 @@
 						<Resources />
 					</q-tab-panel>
 					<q-tab-panel name="share">
-						<Share />
+						<Share :campaign="campaign" />
 					</q-tab-panel>
 					<q-tab-panel name="media" class="p-0">
 						<Media />
@@ -128,7 +174,10 @@ export default {
 		return {
 			user: this.$store.getters.user,
 			campaignId: this.$route.params.campid,
-			container_width: 0,
+			container: {
+				width: 0,
+				height: 0,
+			},
 			loading_campaign: true,
 			campaign: {},
 			players: {},
@@ -137,22 +186,27 @@ export default {
 				{
 					label: "Encounters",
 					value: "encounters",
+					icon: "fas fa-swords",
 				},
 				{
 					label: "Players",
 					value: "players",
+					icon: "fas fa-users",
 				},
 				{
 					label: "Resources",
 					value: "resources",
+					icon: "fas fa-book",
 				},
 				{
 					label: "Share",
 					value: "share",
+					icon: "fas fa-share-alt",
 				},
 				{
 					label: "Media",
 					value: "media",
+					icon: "fas fa-image",
 				},
 			],
 			sm: 576,
@@ -198,26 +252,29 @@ export default {
 				? require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`)
 				: this.campaign.background;
 		},
+		tab_icon() {
+			return this.mobile_tabs.find((tab) => tab.value === this.mobile_tab).icon;
+		},
 	},
 	methods: {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
 		...mapActions("players", ["get_player"]),
 		setSize(size) {
-			this.container_width = size.width;
+			this.container = size;
 		},
 		paneSize(pane) {
 			switch (pane) {
 				case "left":
-					return this.container_width > this.md ? "30" : "50";
+					return this.container.width > this.md ? "30" : "50";
 				case "mid":
-					return this.container_width > this.md ? "40" : "50";
+					return this.container.width > this.md ? "40" : "50";
 				case "right":
-					return this.container_width > this.md ? "30" : "50";
+					return this.container.width > this.md ? "30" : "50";
 				case "left-top":
-					return this.container_width > this.md ? "70" : "50";
-				case "left-top":
-					return this.container_width > this.md ? "30" : "50";
+					return this.container.width > this.lg ? "70" : "100";
+				case "left-bottom":
+					return this.container.width > this.md ? "30" : "0";
 			}
 		},
 	},
@@ -230,6 +287,7 @@ export default {
 	flex-direction: column;
 	background-size: cover;
 	background-position: center bottom;
+	background-repeat: no-repeat;
 	height: calc(100vh - 50px);
 	padding: 5px;
 
@@ -240,8 +298,15 @@ export default {
 			margin: 0;
 		}
 		.mobile {
-			background: $neutral-8-transparent;
+			background: $neutral-6-transparent;
 			height: 100%;
+
+			.tab-select {
+				margin: 1px 0;
+			}
+			.q-tab-panels {
+				height: 100%;
+			}
 		}
 	}
 
@@ -249,10 +314,16 @@ export default {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		gap: 0.5rem;
 		height: 60px;
 		padding: 10px;
 		background-color: $neutral-8-transparent;
 		margin-bottom: 5px;
+
+		&-title {
+			min-width: 0;
+			font-size: 20px;
+		}
 	}
 
 	.splitpanes__pane,

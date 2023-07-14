@@ -11,7 +11,6 @@ const Profile = () => import("src/views/profile/Profile.vue");
 const Username = () => import("src/views/profile/SetUsername.vue");
 const DeleteAccount = () => import("src/views/profile/DeleteAccount.vue");
 const Offline = () => import("src/views/Pages/Offline.vue");
-const EditEncounter = () => import("src/views/UserContent/Encounters/Edit");
 const RunEncounter = () => import("src/views/RunEncounter.vue");
 const User = () => import("src/views/User.vue");
 
@@ -554,7 +553,7 @@ const routes = [
 			{
 				path: ":encid",
 				name: "EditEncounter",
-				component: EditEncounter,
+				component: () => import("src/views/UserContent/Encounters/EditEncounter"),
 				meta: {
 					title: "Edit encounter",
 					description: "Edit your Harmless Key encounter.",
@@ -617,7 +616,7 @@ const routes = [
 					{
 						path: "build-encounter",
 						name: "ToolsBuildEncounter",
-						component: () => import("src/views/UserContent/Encounters/Edit"),
+						component: () => import("src/components/encounters"),
 						meta: {
 							title: "Build encounter for D&D 5e",
 							description:

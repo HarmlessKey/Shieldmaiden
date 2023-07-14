@@ -9,7 +9,7 @@
 				:filled="filled"
 				:square="square"
 				:autocomplete="autocomplete"
-				:error="invalid && validated"
+				:error="rules ? invalid && validated : null"
 				:error-message="errors[0]"
 			>
 				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />

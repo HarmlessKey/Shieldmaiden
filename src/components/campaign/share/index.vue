@@ -1,5 +1,5 @@
 <template>
-	<div v-if="broadcast.live && !provided_campaign.campaign.sharing" class="full-height">
+	<div v-if="broadcast.live && !campaign.sharing" class="full-height">
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"
@@ -38,7 +38,7 @@
 							}
 						"
 					>
-						<i slot="prepend" class="fas fa-image" aria-hidden="true" />
+						<hk-icon slot="prepend" icon="fas fa-image" />
 					</hk-input>
 					<hk-input
 						v-model="background.video"
@@ -56,7 +56,7 @@
 							}
 						"
 					>
-						<i slot="prepend" class="fas fa-video" aria-hidden="true" />
+						<hk-icon slot="prepend" icon="fas fa-video" />
 					</hk-input>
 					<hk-input
 						v-model="background.youtube"
@@ -74,7 +74,7 @@
 							}
 						"
 					>
-						<i slot="prepend" class="fab fa-youtube" aria-hidden="true" />
+						<hk-icon slot="prepend" icon="fab fa-youtube" />
 					</hk-input>
 					<button class="btn bg-neutral-5 mr-2" @click="clearBackground">Clear</button>
 					<button
@@ -105,7 +105,7 @@
 							}
 						"
 					>
-						<i slot="prepend" class="fas fa-image" aria-hidden="true" />
+						<hk-icon slot="prepend" icon="fas fa-image" />
 					</hk-input>
 					<hk-input
 						v-model="share.youtube"
@@ -123,7 +123,7 @@
 							}
 						"
 					>
-						<i slot="prepend" class="fab fa-youtube" aria-hidden="true" />
+						<hk-icon slot="prepend" icon="fab fa-youtube" />
 					</hk-input>
 					<hk-input
 						v-model="share.message"
@@ -160,22 +160,23 @@
 			</q-tab-panel>
 		</q-tab-panels>
 	</div>
-	<Sharing v-else-if="broadcast.live && provided_campaign.campaign.sharing" @stop="stopShare" />
-	<div class="not-live" v-else>
+	<Sharing v-else-if="broadcast.live && campaign.sharing" @stop="stopShare" />
+	<div v-else class="not-live">
 		<div class="pane__header">Live initiative</div>
 		<div class="pane__content">
 			<p>
 				This panel gives options for the live initiative screen and is therefore only useful if you
 				are broadcasting.
 			</p>
-
-			<Broadcast :data="{ campaign_id: campaignId }" />
+			<div class="not-live__broadcast">
+				<Broadcast :data="{ campaign_id: campaignId }" />
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import Weather from "src/views/UserContent/Encounters/Edit/Weather";
+import Weather from "src/components/encounters/Weather";
 import Broadcast from "src/components/drawers/Broadcast.vue";
 import Sharing from "./Sharing.vue";
 import { mapGetters, mapActions } from "vuex";
@@ -183,6 +184,11 @@ import { isEmpty } from "lodash";
 
 export default {
 	name: "CampaignShare",
+	props: {
+		campaign: {
+			type: Object,
+		},
+	},
 	components: {
 		Weather,
 		Broadcast,
@@ -211,11 +217,10 @@ export default {
 				},
 			],
 			share: {},
-			weather: this.provided_campaign.campaign.weather || {},
-			background: this.provided_campaign.campaign.temporary_background || {},
+			weather: this.campaign.weather || {},
+			background: this.campaign.temporary_background || {},
 		};
 	},
-	inject: ["provided_campaign"],
 	computed: {
 		...mapGetters(["broadcast"]),
 	},
@@ -224,11 +229,11 @@ export default {
 		showBadge(tab) {
 			switch (tab) {
 				case "background":
-					return !!this.provided_campaign.campaign.temporary_background;
+					return !!this.campaign.temporary_background;
 				case "share":
-					return !!this.provided_campaign.campaign.sharing;
+					return !!this.campaign.sharing;
 				case "weather":
-					return !!this.provided_campaign.campaign.weather;
+					return !!this.campaign.weather;
 			}
 		},
 		modifyYoutubeUrl(url) {
@@ -316,5 +321,9 @@ export default {
 }
 .not-live {
 	text-align: center;
+
+	&__broadcast {
+		padding: 10px;
+	}
 }
 </style>

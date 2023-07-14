@@ -6,10 +6,11 @@
 				v-on="$listeners"
 				v-model="modelValue"
 				:dark="$store.getters.theme === 'dark'"
+				:type="type"
 				:filled="filled"
 				:square="square"
 				:autocomplete="autocomplete"
-				:error="invalid && validated"
+				:error="rules ? invalid && validated : null"
 				:error-message="errors[0]"
 			>
 				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
@@ -19,6 +20,8 @@
 </template>
 
 <script>
+import { isNil } from "lodash";
+
 export default {
 	name: "hk-input",
 	props: {
@@ -43,6 +46,14 @@ export default {
 		rules: {
 			type: [Object, String],
 		},
+		type: {
+			type: String,
+			default: "text",
+		},
+		integer: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	computed: {
 		modelValue: {
@@ -50,6 +61,9 @@ export default {
 				return this.value;
 			},
 			set(newVal) {
+				if (this.type === "number" && !isNil(newVal)) {
+					newVal = this.integer ? parseInt(newVal) : Number(newVal);
+				}
 				this.$emit("input", newVal);
 			},
 		},

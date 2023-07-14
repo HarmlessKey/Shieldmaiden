@@ -10,8 +10,9 @@
 	</hk-card>
 	<div v-else>
 		<SignedIn v-if="user && demo" />
-		<div class="d-flex justify-between items-center mb-3">
-			<h1 class="written mb-0">
+		<div class="d-flex justify-between items-center gap-1 mb-3">
+			<slot />
+			<h1 class="written mb-0 flex-grow truncate">
 				{{ demo ? "Encounter builder for D&D" : encounter.name }}
 			</h1>
 			<button class="btn" :disabled="!validEncounter" @click="runEncounter">
@@ -24,17 +25,6 @@
 				<template v-if="!loading">
 					<div class="tabs">
 						<q-tabs v-model="tab" dark inline-label align="justify" :breakpoint="0" no-caps>
-							<q-route-tab
-								exact
-								replace
-								label="Back"
-								icon="fas fa-arrow-left"
-								class="pl-0"
-								name="back"
-								:to="
-									demo ? `/tools/encounter-builder` : `/content/campaigns/${$route.params.campid}`
-								"
-							/>
 							<q-tab
 								v-for="({ name, icon, label }, index) in tabs"
 								:key="`tab-${index}`"
@@ -212,6 +202,9 @@ export default {
 			height: calc(100% - 30px) !important;
 		}
 	}
+}
+.truncate {
+	min-width: 0;
 }
 ul.nav {
 	a.nav-link {

@@ -1,6 +1,6 @@
 <template>
 	<hk-card header="Manage your content">
-		<ImportUserContent />
+		<ImportUserContent class="card-body" />
 	</hk-card>
 </template>
 

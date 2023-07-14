@@ -2,7 +2,7 @@
 	<div>
 		<template v-if="!parsed && !parsing">
 			<p>
-				Import Harmless Key {{ type_label }}.<br />
+				Import Harmless Key Content.<br />
 				<small><em>Content from other sources can't be imported</em></small>
 			</p>
 			<q-file
@@ -294,6 +294,8 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import campaignSchema from "src/schemas/hk-campaign-schema.json";
+import encounterSchema from "src/schemas/hk-encounter-schema.json";
 import npcSchema from "src/schemas/hk-npc-schema.json";
 import spellSchema from "src/schemas/hk-spell-schema.json";
 import Ajv from "ajv";
@@ -304,15 +306,9 @@ addFormats(ajv, ["uri"]);
 
 export default {
 	name: "ImportUserContent",
-	props: {
-		type: {
-			type: String,
-			default: "npcs",
-			required: true,
-		},
-	},
 	data() {
 		return {
+			type: undefined,
 			showSchema: false,
 			json_file: undefined,
 			json_input: undefined,
@@ -434,6 +430,14 @@ export default {
 
 		async parse(data) {
 			this.parsing = true;
+			if (!data.meta) {
+				await parseOldExport(data);
+				this.parsing = false;
+				return;
+			}
+		},
+
+		async parseOldExport(data) {
 			if (!(data instanceof Array)) {
 				data = [data];
 			}
@@ -484,8 +488,6 @@ export default {
 			this.imports.unique.forEach((row, index) => {
 				row.index = index;
 			});
-
-			this.parsed = true;
 		},
 		async importData() {
 			// First check if there are custom spells from imported NPCs that need to be added.

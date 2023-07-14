@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
 	name: "ExportUserContent",
 
@@ -41,6 +41,9 @@ export default {
 	},
 	mounted() {
 		console.log("export mounted");
+	},
+	computed: {
+		...mapGetters(["userInfo"]),
 	},
 
 	methods: {
@@ -89,6 +92,11 @@ export default {
 			URL.revokeObjectURL(url);
 		},
 		cleanExportData() {
+			this.exportData.meta = {
+				export_version: "2.0",
+				export_date: new Date(),
+				author: this.userInfo.username,
+			};
 			return JSON.stringify(
 				Object.fromEntries(
 					Object.entries(this.exportData).filter(([key, val]) => Object.keys(val).length)

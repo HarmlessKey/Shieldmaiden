@@ -17,7 +17,7 @@
 			<span v-if="data.row.options && versatileRoll(data.row)">
 				| {{ versatileRoll(data.row) }}
 			</span>
-			<span v-if="Object.values(data.row.options).length > 1">
+			<span v-if="data.row.options && Object.values(data.row.options).length > 1">
 				<span>| ...</span>
 				<q-tooltip anchor="top middle" self="bottom middle">More than two Options</q-tooltip>
 			</span>

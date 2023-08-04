@@ -115,7 +115,9 @@
 				@shortkey="prevTurn()"
 			>
 				<i aria-hidden="true" class="fas fa-step-backward" />
-				<q-tooltip anchor="top middle" self="center middle"> Previous turn </q-tooltip>
+				<q-tooltip anchor="top middle" self="center middle"
+					>Previous turn [shift] + [&lt;]</q-tooltip
+				>
 			</a>
 
 			<template v-if="encounter.round">
@@ -139,7 +141,7 @@
 				@shortkey="nextTurn()"
 			>
 				<i aria-hidden="true" class="fas fa-step-forward" />
-				<q-tooltip anchor="top middle" self="center middle"> Next turn </q-tooltip>
+				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [>]</q-tooltip>
 			</a>
 		</div>
 		<div v-else>Set Initiative</div>

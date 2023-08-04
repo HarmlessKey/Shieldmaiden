@@ -31,7 +31,7 @@
 	--red: #cc3e4a;
 	--red-hover: #e8414f;
 	--patreon-red: #e85b46;
-	--discord-purple: #5865F2;
+	--discord-purple: #5865f2;
 	--orange: #e76d3b;
 	--yellow: #c1b947;
 	--purple: #9b7aba;
@@ -70,7 +70,7 @@
 }
 
 // Possible light theme
-[data-theme='light'] {
+[data-theme="light"] {
 	color-scheme: light;
 	--neutral-11: #ffffff;
 	--neutral-10: #eeeeee;
@@ -163,7 +163,8 @@ $font-size: var(--font-size);
 $header-height: var(--header-height);
 $border-radius: var(--border-radius);
 $border-radius-small: var(--border-radius-small);
-$text-written: 'Fredericka the Great', cursive;
+$text-written: "Fredericka the Great", cursive;
+$outline: var(--neutral-2) solid 3px;
 
 // Breakpoints
 $sm-breakpoint: 576px;

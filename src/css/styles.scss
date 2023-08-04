@@ -35,6 +35,10 @@ html body {
 	position: relative;
 	background-image: url("../assets/_img/styles/paper-bg.png");
 
+	*:focus {
+		outline-offset: 3px;
+	}
+
 	&::-webkit-scrollbar {
 		display: none;
 	}
@@ -1356,7 +1360,7 @@ html body {
 
 		&:focus,
 		&.active {
-			outline: none;
+			outline: $outline;
 			box-shadow: none;
 		}
 		&.disabled {

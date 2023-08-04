@@ -20,6 +20,7 @@
 				<div class="manual">
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
+						ref="input"
 						filled
 						square
 						type="number"
@@ -29,6 +30,7 @@
 						class="manual-input"
 						@keypress="submitManual($event, !invalid)"
 						autocomplete="off"
+						autofocus
 						:error="invalid && validated"
 						:error-message="errors[0]"
 					/>
@@ -36,6 +38,7 @@
 						class="btn dmg bg-red white"
 						:class="{ disabled: invalid || manualAmount === '' }"
 						@click="setManual('damage', !invalid)"
+						tabindex="-1"
 					>
 						Attack
 						<i aria-hidden="true" class="hki-sword-break ml-3" />
@@ -45,6 +48,7 @@
 						class="btn heal bg-green white"
 						:class="{ disabled: invalid || manualAmount === '' }"
 						@click="setManual('healing', !invalid)"
+						tabindex="-1"
 					>
 						Heal
 						<i aria-hidden="true" class="hki-heal" />
@@ -277,6 +281,7 @@ export default {
 				this.manualAmount = "";
 				this.damage_type = "";
 				this.crit = false;
+				this.$refs.input.blur();
 			}
 		},
 	},

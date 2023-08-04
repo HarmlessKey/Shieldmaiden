@@ -1,5 +1,5 @@
 <template>
-	<div class="side">
+	<div class="side" @focus="$emit('focus')">
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"

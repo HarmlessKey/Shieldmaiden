@@ -1,16 +1,35 @@
 <template>
 	<header>
-		<div id="header" class="d-flex justify-content-between items-center" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
+		<div
+			id="header"
+			class="d-flex justify-content-between items-center"
+			:class="{ 'hidden-sidebar': $route.meta.sidebar === false }"
+		>
 			<div>
-				<div 
-					class="menu"
-					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
-				>
-					<i aria-hidden="true" class="fas" :class="$store.getters.side_small_screen ? 'fa-times' : 'fa-bars'"/>
+				<div class="menu" @click.stop="setSideSmallScreen(!$store.getters.side_small_screen)">
+					<i
+						aria-hidden="true"
+						class="fas"
+						:class="$store.getters.side_small_screen ? 'fa-times' : 'fa-bars'"
+					/>
 				</div>
-				<router-link to="/" class="logo d-flex justify-content-start" :class="{ home: $route.meta.sidebar === false }">
-					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon" :class="{ 'd-none d-md-block': environment !== 'live' }" />
-					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
+				<router-link
+					to="/"
+					class="logo d-flex justify-content-start"
+					:class="{ home: $route.meta.sidebar === false }"
+					:tabindex="tabindex"
+				>
+					<img
+						class="icon"
+						src="../assets/_img/logo/logo-icon-cyan.svg"
+						alt="logo icon"
+						:class="{ 'd-none d-md-block': environment !== 'live' }"
+					/>
+					<img
+						class="wordmark d-none d-md-block"
+						src="../assets/_img/logo/logo-wordmark.svg"
+						alt="Harmless Key"
+					/>
 				</router-link>
 			</div>
 
@@ -21,49 +40,71 @@
 
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end" :class="{ 'mr-2': maintenance }">
-					<button class="icon" aria-label="Select theme">
-						<i aria-hidden="true" class="fas fa-moon"/>
+					<button class="icon" aria-label="Select theme" :tabindex="tabindex">
+						<i aria-hidden="true" class="fas fa-moon" />
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="theme">
-								<button @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }" aria-label="Dark theme">
+								<button
+									@click="setTheme('dark')"
+									:class="{ active: $store.getters.theme === 'dark' }"
+									aria-label="Dark theme"
+								>
 									<img src="~assets/_img/dark.webp" alt="Dark theme" />
 									Dark
 								</button>
-								<button @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }" aria-label="Light theme">
+								<button
+									@click="setTheme('light')"
+									:class="{ active: $store.getters.theme === 'light' }"
+									aria-label="Light theme"
+								>
 									<img src="~assets/_img/light.webp" alt="Light theme" />
 									Light
 								</button>
 							</div>
 						</q-popup-proxy>
 					</button>
-					<button class="icon d-none d-md-block" aria-label="Keybindings"
-						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
-						<i aria-hidden="true" class="fas fa-keyboard"/>
+					<button
+						class="icon d-none d-md-block"
+						aria-label="Keybindings"
+						:tabindex="tabindex"
+						@click="setSlide({ show: true, type: 'slides/Keybindings', data: { sm: true } })"
+					>
+						<i aria-hidden="true" class="fas fa-keyboard" />
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Keybindings
 						</q-tooltip>
 					</button>
-					<button class="icon" aria-label="Compendium"
-						@click="setSlide({show: true, type: 'slides/Compendium'})">
+					<button
+						class="icon"
+						aria-label="Compendium"
+						:tabindex="tabindex"
+						@click="setSlide({ show: true, type: 'slides/Compendium' })"
+					>
 						<i aria-hidden="true" class="fas fa-book-spells"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Compendium
 						</q-tooltip>
 					</button>
-					<button 
+					<button
 						v-if="user && !maintenance"
 						aria-label="Live initiative link"
 						class="icon"
-						@click="setSlide({show: true, type: 'PlayerLink'})">
+						:tabindex="tabindex"
+						@click="setSlide({ show: true, type: 'PlayerLink' })"
+					>
 						<i aria-hidden="true" class="fas fa-share-alt"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Public initiative
 						</q-tooltip>
 					</button>
-					<button class="icon roll" 
+					<button
+						class="icon roll"
 						aria-label="Dice roller"
-						v-shortkey="['r']" @shortkey="setSlide({show: true, type: 'slides/roll/index'})"
-						@click="setSlide({show: true, type: 'slides/roll/index'})">
+						v-shortkey="['r']"
+						:tabindex="tabindex"
+						@shortkey="setSlide({ show: true, type: 'slides/roll/index' })"
+						@click="setSlide({ show: true, type: 'slides/roll/index' })"
+					>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Dice roller
 						</q-tooltip>
@@ -72,34 +113,55 @@
 				<template v-if="!maintenance">
 					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 					<div v-if="user" class="user">
-						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<span
+							class="img"
+							v-if="user.photoURL"
+							:style="{ 'background-image': 'url(' + user.photoURL + ')' }"
+						></span>
 						<i aria-hidden="true" v-else class="fas fa-user"></i>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="bg-neutral-8">
 								<q-list>
 									<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
-										<q-item-section avatar><i aria-hidden="true" class="fas fa-crown"></i></q-item-section>
+										<q-item-section avatar
+											><i aria-hidden="true" class="fas fa-crown"></i
+										></q-item-section>
 										<q-item-section>Admin</q-item-section>
 									</q-item>
-									<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
-										<q-item-section avatar><i aria-hidden="true" class="fas fa-file-edit"></i></q-item-section>
+									<q-item
+										clickable
+										v-close-popup
+										to="/contribute"
+										v-if="userInfo && (userInfo.admin || userInfo.contribute)"
+									>
+										<q-item-section avatar
+											><i aria-hidden="true" class="fas fa-file-edit"></i
+										></q-item-section>
 										<q-item-section>Contribute</q-item-section>
 									</q-item>
 									<q-item clickable v-close-popup to="/profile">
-										<q-item-section avatar><i aria-hidden="true" class="fas fa-user"></i></q-item-section>
+										<q-item-section avatar
+											><i aria-hidden="true" class="fas fa-user"></i
+										></q-item-section>
 										<q-item-section>Profile</q-item-section>
 									</q-item>
 									<q-item clickable v-close-popup to="/content">
-										<q-item-section avatar><i aria-hidden="true" class="fas fa-treasure-chest"></i></q-item-section>
+										<q-item-section avatar
+											><i aria-hidden="true" class="fas fa-treasure-chest"></i
+										></q-item-section>
 										<q-item-section>My content</q-item-section>
 									</q-item>
 									<q-item clickable v-close-popup to="/content/settings">
-										<q-item-section avatar><i aria-hidden="true" class="fas fa-cogs"></i></q-item-section>
+										<q-item-section avatar
+											><i aria-hidden="true" class="fas fa-cogs"></i
+										></q-item-section>
 										<q-item-section>Settings</q-item-section>
 									</q-item>
 									<q-separator />
 									<q-item clickable v-close-popup @click="signOut()">
-										<q-item-section avatar><i aria-hidden="true" class="fas fa-sign-out-alt"></i></q-item-section>
+										<q-item-section avatar
+											><i aria-hidden="true" class="fas fa-sign-out-alt"></i
+										></q-item-section>
 										<q-item-section>Sign out</q-item-section>
 									</q-item>
 								</q-list>
@@ -114,46 +176,39 @@
 </template>
 
 <script>
-	import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters } from "vuex";
 
-	export default {
-		name: "Header",
-		props: {
-			maintenance: {
-				type: [Boolean, String],
-				default: false
-			}
+export default {
+	name: "Header",
+	props: {
+		maintenance: {
+			type: [Boolean, String],
+			default: false,
 		},
-		data() {
-			return {
-				environment: process.env.VUE_APP_ENV_NAME
-			}
+	},
+	data() {
+		return {
+			environment: process.env.VUE_APP_ENV_NAME,
+			tabindex: this.$route.name === "RunEncounter" ? -1 : 0,
+		};
+	},
+	computed: {
+		...mapGetters(["user", "userInfo"]),
+	},
+	methods: {
+		...mapActions(["setSlide", "setSideSmallScreen", "setTheme", "sign_out"]),
+		showSlide(type) {
+			this.setSlide({
+				show: true,
+				type,
+			});
 		},
-		computed: {
-			...mapGetters([
-				'user',
-				'userInfo'
-			]),
+		signOut() {
+			if (this.$route.path !== "/") this.$router.replace("/");
+			this.sign_out();
 		},
-		methods: {
-			...mapActions([
-				'setSlide',
-				'setSideSmallScreen',
-				'setTheme',
-				'sign_out'
-			]),
-			showSlide(type) {
-				this.setSlide({
-					show: true,
-					type,
-				})
-			},
-			signOut() {
-				if(this.$route.path !== "/") this.$router.replace('/');
-				this.sign_out();
-			}
-		}
-	};
+	},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -171,7 +226,7 @@
 	left: 5px;
 	top: 5px;
 	height: 40px;
-	transition: position .4s linear;
+	transition: position 0.4s linear;
 
 	.icon {
 		height: 40px;
@@ -181,7 +236,8 @@
 		height: 13px;
 	}
 }
-a.icon, button.icon {
+a.icon,
+button.icon {
 	cursor: pointer;
 	font-size: 18px;
 	text-align: center;
@@ -199,7 +255,7 @@ a.icon, button.icon {
 	}
 	&.roll {
 		margin-left: 5px;
-		background-image: url('../assets/_img/logo/logo-icon-no-shield-gray-no-border.svg');
+		background-image: url("../assets/_img/logo/logo-icon-no-shield-gray-no-border.svg");
 		background-size: 22px 22px;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -224,7 +280,8 @@ a.icon, button.icon {
 		padding: 3px;
 		color: $neutral-3;
 
-		&:hover, &.active {
+		&:hover,
+		&.active {
 			border-color: $blue;
 			color: $neutral-1;
 		}
@@ -234,12 +291,12 @@ a.icon, button.icon {
 		}
 	}
 }
-.user	{
+.user {
 	cursor: pointer;
 	font-size: 15px;
 	padding: 12px 15px 12px 10px;
 	line-height: 26px !important;
-	height: 50px ;
+	height: 50px;
 	display: block;
 
 	.img {
@@ -270,10 +327,11 @@ a.icon, button.icon {
 		width: 41px;
 		padding: 0 10px;
 	}
-	a.icon, button.icon {
+	a.icon,
+	button.icon {
 		font-size: 25px;
 		width: 30px;
-		
+
 		&.roll {
 			padding-left: 30px;
 			background-size: 27px 27px;
@@ -292,7 +350,7 @@ a.icon, button.icon {
 }
 [data-theme="light"] {
 	a.icon.roll {
-		background-image: url('../assets/_img/logo/logo-icon-no-shield-gray-dark-no-border.svg');
+		background-image: url("../assets/_img/logo/logo-icon-no-shield-gray-dark-no-border.svg");
 	}
 }
 </style>

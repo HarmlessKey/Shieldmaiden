@@ -1,5 +1,5 @@
 <template>
-	<div class="hk-rolls center-top" v-if="action_rolls && action_rolls.length > 0">
+	<div v-if="action_rolls && action_rolls.length > 0" class="hk-rolls center-top">
 		<transition-group
 			tag="div"
 			class="rolls"
@@ -7,22 +7,25 @@
 			enter-active-class="animated animate__fadeInDown"
 			leave-active-class="animated animate__fadeOutUp"
 		>
-			<q-btn
-				v-if="action_rolls && action_rolls.length > 1"
-				:key="`clear-button`"
-				@click="clearRolls"
-				color="neutral-9"
-				class="full-width mb-2 neutral-1"
-				label="Clear all"
-				icon="fas fa-times"
-				no-caps
-			/>
 			<hk-single-roll
 				v-for="(roll, index) in action_rolls"
 				:key="`roll-${roll.key}`"
 				:value="roll"
 				:index="index"
 			/>
+			<q-btn
+				v-if="action_rolls && action_rolls.length > 1"
+				:key="`clear-button`"
+				color="neutral-9"
+				class="full-width mb-2 neutral-1"
+				icon="fas fa-times"
+				no-caps
+				v-shortkey="['shift', 'esc']"
+				@shortkey="clearRolls"
+				@click="clearRolls"
+			>
+				Clear all <span class="ml-1 neutral-2">[shift]+[esc]</span>
+			</q-btn>
 		</transition-group>
 	</div>
 </template>
@@ -48,6 +51,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.hk-rolls {
+	&:focus {
+		outline: none;
+	}
+}
 .animated {
 	animation-duration: 0.4s !important;
 }

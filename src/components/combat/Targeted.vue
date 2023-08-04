@@ -25,15 +25,15 @@
 					ref="options"
 					tabindex="-1"
 					class="option"
-					:key="key"
-					v-shortkey="[key]"
+					:key="`option-${i}`"
+					v-shortkey="key"
 					@click="method"
 					@shortkey="method"
 					@keydown.left="cycleOptions(i, 'left')"
 					@keydown.right="cycleOptions(i, 'right')"
 				>
 					<i aria-hidden="true" class="fas" :class="icon" />
-					<q-tooltip anchor="top middle" self="center middle">[{{ key }}] {{ tooltip }}</q-tooltip>
+					<q-tooltip anchor="top middle" self="center middle">{{ tooltip }}</q-tooltip>
 				</button>
 			</div>
 
@@ -207,45 +207,45 @@ export default {
 				{
 					option: "damage",
 					method: () => this.setSlide({ show: true, type: "slides/encounter/DamageHealing" }),
-					key: "shift, d",
+					key: ["shift", "d"],
 					icon: "fa-swords",
-					tooltip: "Out of turn damage/healing",
+					tooltip: "[shift]+[d] Out of turn damage/healing",
 				},
 				{
 					option: "conditions",
 					method: () => this.setSlide({ show: true, type: "slides/encounter/Conditions" }),
-					key: "c",
+					key: ["c"],
 					icon: "fa-flame",
-					tooltip: "Conditions",
+					tooltip: "[c] Conditions",
 				},
 				{
 					option: "reminders",
 					method: () =>
 						this.setSlide({ show: true, type: "slides/encounter/reminders/TargetReminders" }),
-					key: "m",
+					key: ["m"],
 					icon: "fa-stopwatch",
-					tooltip: "Reminders",
+					tooltip: "[m] Reminders",
 				},
 				{
 					option: "transform",
 					method: () => this.setSlide({ show: true, type: "slides/Transform", data: this.target }),
-					key: "t",
+					key: ["t"],
 					icon: "fa-paw-claws",
-					tooltip: "Transform",
+					tooltip: "[t] Transform",
 				},
 				{
 					option: "hide",
 					method: () => this.setHidden(),
-					key: "h",
+					key: ["h"],
 					icon: "fa-eye",
-					tooltip: "Hide / Show",
+					tooltip: "[h] Hide / Show",
 				},
 				{
 					option: "edit",
 					method: () => this.setSlide({ show: true, type: "slides/encounter/EditEntity" }),
-					key: "e",
+					key: ["e"],
 					icon: "fa-pencil",
-					tooltip: "Edit",
+					tooltip: "[e] Edit",
 				},
 			],
 		};

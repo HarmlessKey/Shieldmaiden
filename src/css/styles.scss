@@ -1711,9 +1711,11 @@ html body {
 		.rolls {
 			pointer-events: auto;
 			width: 300px;
-			padding-top: 10px;
+			padding: 10px;
 			max-height: calc(100vh - 50px);
 			overflow-y: auto;
+			display: flex;
+			flex-direction: column-reverse;
 
 			.q-btn {
 				pointer-events: auto;

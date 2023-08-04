@@ -1,424 +1,437 @@
 <template>
-	<hk-card>
-		<div slot="header" class="card-header">
-			<div class="truncate">
-				{{ roll.name }}
+	<div
+		class="single-roll"
+		tabindex="0"
+		ref="roll"
+		@keydown.enter="shortkeyApply"
+		@keydown.esc="removeActionRoll(index)"
+	>
+		<hk-card>
+			<div slot="header" class="card-header">
+				<div class="truncate">{{ roll.name }} {{ index }}</div>
+				<button class="btn btn-sm btn-clear" @click="removeActionRoll(index)">
+					<i aria-hidden="true" class="fas fa-times" />
+				</button>
 			</div>
-			<a class="btn btn-sm btn-clear" @click="removeActionRoll(index)">
-				<i aria-hidden="true" class="fas fa-times" />
-			</a>
-		</div>
 
-		<div class="card-body">
-			<!-- TARGET -->
-			<div class="target-item" v-if="roll.target">
-				<span
-					class="img bg-neutral-8"
-					:style="{
-						'background-image': 'url(' + roll.target.img + ')',
-						'border-color': roll.target.color_label ? roll.target.color_label : ``,
-						color: roll.target.color_label ? roll.target.color_label : ``,
-					}"
-				>
-					<i
-						v-if="!roll.target.img"
-						:class="`hki-${roll.target.entityType === 'npc' ? 'monster' : roll.target.entityType}`"
-						aria-hidden="true"
-					/>
-				</span>
-				<div class="ac_wrapper">
-					<i aria-hidden="true" class="fas fa-shield"></i>
+			<div class="card-body">
+				<!-- TARGET -->
+				<div class="target-item" v-if="roll.target">
 					<span
-						v-if="roll.target.ac_bonus"
-						class="ac"
-						:class="{
-							green: roll.target.ac_bonus > 0,
-							red: roll.target.ac_bonus < 0,
+						class="img bg-neutral-8"
+						:style="{
+							'background-image': 'url(' + roll.target.img + ')',
+							'border-color': roll.target.color_label ? roll.target.color_label : ``,
+							color: roll.target.color_label ? roll.target.color_label : ``,
 						}"
 					>
-						{{ displayStats(roll.target).ac + roll.target.ac_bonus }}
+						<i
+							v-if="!roll.target.img"
+							:class="`hki-${
+								roll.target.entityType === 'npc' ? 'monster' : roll.target.entityType
+							}`"
+							aria-hidden="true"
+						/>
 					</span>
-					<span class="ac" v-else>
-						{{ displayStats(roll.target).ac }}
-					</span>
-				</div>
-				<div class="pl-2 truncate">
-					{{ roll.target.name }}
-				</div>
-			</div>
-
-			<!-- ALL ROLLED ACTIONS -->
-			<div v-for="(action, action_index) in roll.actions" :key="`action-${index}-${action_index}`">
-				<!-- TO HIT ROLL -->
-				<template v-if="action.toHit">
-					<div class="toHit">
-						<div>
-							To hit:
-							<span class="advantage" v-if="action.toHit.ignored">
-								<span v-html="advantage(action.toHit.advantage_disadvantage)" />
-								<span class="ignored neutral-4">
-									{{ action.toHit.ignored }}
-								</span> </span
-							>{{ action.toHit.throwsTotal }}
-							<template v-if="parseInt(action.toHit.mod) !== 0">
-								{{
-									parseInt(action.toHit.mod) > 0
-										? `+ ${parseInt(action.toHit.mod)}`
-										: `- ${Math.abs(action.toHit.mod)}`
-								}}
-							</template>
-						</div>
-						<transition
-							v-if="action.toHit.throwsTotal == 1"
-							:name="`${roll.key}`"
-							enter-active-class="animated animate__hinge"
-							appear
+					<div class="ac_wrapper">
+						<i aria-hidden="true" class="fas fa-shield"></i>
+						<span
+							v-if="roll.target.ac_bonus"
+							class="ac"
+							:class="{
+								green: roll.target.ac_bonus > 0,
+								red: roll.target.ac_bonus < 0,
+							}"
 						>
-							<div class="total crit red">
-								Crit
-								<b><hk-animated-integer :value="1" onMount /></b>
-							</div>
-						</transition>
-						<transition
-							v-else-if="action.toHit.throwsTotal == 20"
-							name="heartBeat"
-							enter-active-class="animated animate__heartBeat"
-							appear
-						>
-							<div class="total crit green">
-								Crit
-								<b><hk-animated-integer :value="20" onMount /></b>
-							</div>
-						</transition>
-						<div v-else class="total">
-							<hk-animated-integer :value="action.toHit.total" onMount />
-						</div>
+							{{ displayStats(roll.target).ac + roll.target.ac_bonus }}
+						</span>
+						<span class="ac" v-else>
+							{{ displayStats(roll.target).ac }}
+						</span>
 					</div>
-					<q-btn-toggle
-						v-model="hitOrMiss[action_index]"
-						class="mb-3 neutral-1"
-						spread
-						no-caps
-						:dark="$store.getters.theme === 'dark'"
-						dense
-						toggle-color="primary"
-						color="neutral-9"
-						:options="[
-							{ label: 'Hit', value: 'hit' },
-							{ label: 'Miss', value: 'miss' },
-						]"
-					/>
-				</template>
-
-				<!-- SAVING THROW -->
-				<template v-if="action.type === 'save'">
-					<div class="toHit" v-if="action.save_ability || action.save_dc">
-						<div v-if="action.save_ability">{{ action.save_ability.capitalize() }} save</div>
-						<div v-if="action.save_dc">
-							<span class="neutral-2">DC</span>
-							<span
-								class="total"
-								:class="{
-									green: savingThrowResult[action_index] === 'fail',
-									red: savingThrowResult[action_index] === 'save',
-								}"
-							>
-								{{ action.save_dc }}
-							</span>
-						</div>
+					<div class="pl-2 truncate">
+						{{ roll.target.name }}
 					</div>
-					<q-btn-toggle
-						v-model="savingThrowResult[action_index]"
-						class="mb-3 neutral-1"
-						spread
-						no-caps
-						:dark="$store.getters.theme === 'dark'"
-						dense
-						square
-						toggle-color="primary"
-						color="neutral-9"
-						:options="[
-							{ label: 'Fail', value: 'fail' },
-							{ label: 'Save', value: 'save' },
-						]"
-					/>
-				</template>
+				</div>
 
-				<!-- DAMAGE / HEALING ROLLS -->
-				<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
-					<q-expansion-item
-						v-for="(rolled, rolled_index) in action.rolls"
-						:key="`rolled-${rolled_index}`"
-						:dark="$store.getters.theme === 'dark'"
-						switch-toggle-side
-						:group="`rolled-${index}`"
-					>
-						<template #header>
-							<q-item-section v-if="action.type === 'healing'">
-								<span class="type truncate green">
-									<i aria-hidden="true" class="fas fa-heart" />
-									Healing
-								</span>
-							</q-item-section>
-							<q-item-section v-else>
-								<div class="defenses">
-									<div
-										v-for="({ name }, key) in defenses"
-										:key="key"
-										class="option"
-										@click.stop="setDefense(rolled.damage_type, key, roll.key)"
-										:class="[
-											{ active: checkDefenses(rolled.damage_type, rolled.magical, key) },
-											key,
-										]"
-									>
-										<i aria-hidden="true" class="fas fa-shield"></i>
-										<span>{{ key.capitalize() }}</span>
-										<q-tooltip anchor="top middle" self="center middle">
-											{{ name }}
-										</q-tooltip>
-									</div>
-									<span class="type truncate" :class="rolled.damage_type">
-										<span class="type__icon-wrapper">
-											<i :class="damage_type_icons[rolled.damage_type]" aria-hidden="true" />
-											<i v-if="rolled.magical" class="fas fa-sparkles magical" aria-hidden="true">
-												<q-tooltip anchor="top middle" self="center middle">Magical</q-tooltip>
-											</i>
-										</span>
-										{{ rolled.damage_type }}
-									</span>
-								</div>
-							</q-item-section>
-							<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
-								<q-item-label>
-									<b
-										><hk-animated-integer :value="totalRollValue(action, action_index, rolled)"
-									/></b>
-								</q-item-label>
-								<q-tooltip anchor="top middle" self="center middle">
-									{{ rolled.rollResult.roll }}
-								</q-tooltip>
-							</q-item-section>
-						</template>
-						<div class="accordion-body">
+				<!-- ALL ROLLED ACTIONS -->
+				<div
+					v-for="(action, action_index) in roll.actions"
+					:key="`action-${index}-${action_index}`"
+				>
+					<!-- TO HIT ROLL -->
+					<template v-if="action.toHit">
+						<div class="toHit">
 							<div>
-								<b>Rolls: </b>
-								<template v-if="action.toHit && action.toHit.throwsTotal === 20">
-									<b class="green">Crit!</b>
-									{{ crit_description[critSettings] }} </template
-								><br />
-								{{ rolled.rollResult.roll }}
-								<div class="d-flex justify-content-between">
-									<div class="throws">
+								To hit:
+								<span class="advantage" v-if="action.toHit.ignored">
+									<span v-html="advantage(action.toHit.advantage_disadvantage)" />
+									<span class="ignored neutral-4">
+										{{ action.toHit.ignored }}
+									</span> </span
+								>{{ action.toHit.throwsTotal }}
+								<template v-if="parseInt(action.toHit.mod) !== 0">
+									{{
+										parseInt(action.toHit.mod) > 0
+											? `+ ${parseInt(action.toHit.mod)}`
+											: `- ${Math.abs(action.toHit.mod)}`
+									}}
+								</template>
+							</div>
+							<transition
+								v-if="action.toHit.throwsTotal == 1"
+								:name="`${roll.key}`"
+								enter-active-class="animated animate__hinge"
+								appear
+							>
+								<div class="total crit red">
+									Crit
+									<b><hk-animated-integer :value="1" onMount /></b>
+								</div>
+							</transition>
+							<transition
+								v-else-if="action.toHit.throwsTotal == 20"
+								name="heartBeat"
+								enter-active-class="animated animate__heartBeat"
+								appear
+							>
+								<div class="total crit green">
+									Crit
+									<b><hk-animated-integer :value="20" onMount /></b>
+								</div>
+							</transition>
+							<div v-else class="total">
+								<hk-animated-integer :value="action.toHit.total" onMount />
+							</div>
+						</div>
+						<q-btn-toggle
+							v-model="hitOrMiss[action_index]"
+							class="mb-3 neutral-1"
+							spread
+							no-caps
+							:dark="$store.getters.theme === 'dark'"
+							dense
+							toggle-color="primary"
+							color="neutral-9"
+							:options="[
+								{ label: 'Hit', value: 'hit' },
+								{ label: 'Miss', value: 'miss' },
+							]"
+						/>
+					</template>
+
+					<!-- SAVING THROW -->
+					<template v-if="action.type === 'save'">
+						<div class="toHit" v-if="action.save_ability || action.save_dc">
+							<div v-if="action.save_ability">{{ action.save_ability.capitalize() }} save</div>
+							<div v-if="action.save_dc">
+								<span class="neutral-2">DC</span>
+								<span
+									class="total"
+									:class="{
+										green: savingThrowResult[action_index] === 'fail',
+										red: savingThrowResult[action_index] === 'save',
+									}"
+								>
+									{{ action.save_dc }}
+								</span>
+							</div>
+						</div>
+						<q-btn-toggle
+							v-model="savingThrowResult[action_index]"
+							class="mb-3 neutral-1"
+							spread
+							no-caps
+							:dark="$store.getters.theme === 'dark'"
+							dense
+							square
+							toggle-color="primary"
+							color="neutral-9"
+							:options="[
+								{ label: 'Fail', value: 'fail' },
+								{ label: 'Save', value: 'save' },
+							]"
+						/>
+					</template>
+
+					<!-- DAMAGE / HEALING ROLLS -->
+					<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
+						<q-expansion-item
+							v-for="(rolled, rolled_index) in action.rolls"
+							:key="`rolled-${rolled_index}`"
+							:dark="$store.getters.theme === 'dark'"
+							switch-toggle-side
+							:group="`rolled-${index}`"
+						>
+							<template #header>
+								<q-item-section v-if="action.type === 'healing'">
+									<span class="type truncate green">
+										<i aria-hidden="true" class="fas fa-heart" />
+										Healing
+									</span>
+								</q-item-section>
+								<q-item-section v-else>
+									<div class="defenses">
 										<div
-											v-for="(Throw, throw_index) in rolled.rollResult.throws"
-											:key="`throw-${Throw}-${throw_index}`"
-											class="throw"
-											:class="{
-												red: Throw === 1,
-												green: Throw == rolled.rollResult.d,
-												rotate: animateRoll === roll.key + rolled_index + throw_index,
-											}"
-											@click="
-												(animateRoll = roll.key + rolled_index + throw_index),
-													reroll(
-														$event,
-														rolled.rollResult,
-														throw_index,
-														action.toHit && action.toHit.throwsTotal === 20
-													)
-											"
-											@animationend="animateRoll = undefined"
+											v-for="({ name }, key) in defenses"
+											:key="key"
+											class="option"
+											@click.stop="setDefense(rolled.damage_type, key, roll.key)"
+											:class="[
+												{ active: checkDefenses(rolled.damage_type, rolled.magical, key) },
+												key,
+											]"
 										>
-											<hk-animated-integer :value="Throw" onMount />
-											<q-tooltip anchor="top middle" self="bottom middle">
-												Reroll {{ Throw }}
+											<i aria-hidden="true" class="fas fa-shield"></i>
+											<span>{{ key.capitalize() }}</span>
+											<q-tooltip anchor="top middle" self="center middle">
+												{{ name }}
 											</q-tooltip>
 										</div>
+										<span class="type truncate" :class="rolled.damage_type">
+											<span class="type__icon-wrapper">
+												<i :class="damage_type_icons[rolled.damage_type]" aria-hidden="true" />
+												<i v-if="rolled.magical" class="fas fa-sparkles magical" aria-hidden="true">
+													<q-tooltip anchor="top middle" self="center middle">Magical</q-tooltip>
+												</i>
+											</span>
+											{{ rolled.damage_type }}
+										</span>
 									</div>
-									<div class="d-flex justify-content-end">
-										<template v-if="parseInt(rolled.rollResult.mod)">
-											<q-separator vertical :dark="$store.getters.theme === 'dark'" />
-											<div class="throws-modifier">
-												{{ rolled.rollResult.mod }}
+								</q-item-section>
+								<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
+									<q-item-label>
+										<b
+											><hk-animated-integer :value="totalRollValue(action, action_index, rolled)"
+										/></b>
+									</q-item-label>
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ rolled.rollResult.roll }}
+									</q-tooltip>
+								</q-item-section>
+							</template>
+							<div class="accordion-body">
+								<div>
+									<b>Rolls: </b>
+									<template v-if="action.toHit && action.toHit.throwsTotal === 20">
+										<b class="green">Crit!</b>
+										{{ crit_description[critSettings] }} </template
+									><br />
+									{{ rolled.rollResult.roll }}
+									<div class="d-flex justify-content-between">
+										<div class="throws">
+											<div
+												v-for="(Throw, throw_index) in rolled.rollResult.throws"
+												:key="`throw-${Throw}-${throw_index}`"
+												class="throw"
+												:class="{
+													red: Throw === 1,
+													green: Throw == rolled.rollResult.d,
+													rotate: animateRoll === roll.key + rolled_index + throw_index,
+												}"
+												@click="
+													(animateRoll = roll.key + rolled_index + throw_index),
+														reroll(
+															$event,
+															rolled.rollResult,
+															throw_index,
+															action.toHit && action.toHit.throwsTotal === 20
+														)
+												"
+												@animationend="animateRoll = undefined"
+											>
+												<hk-animated-integer :value="Throw" onMount />
+												<q-tooltip anchor="top middle" self="bottom middle">
+													Reroll {{ Throw }}
+												</q-tooltip>
 											</div>
-										</template>
-										<q-separator vertical :dark="$store.getters.theme === 'dark'" />
-										<div class="throws-total">
-											<hk-animated-integer :value="rolled.rollResult.total" />
+										</div>
+										<div class="d-flex justify-content-end">
+											<template v-if="parseInt(rolled.rollResult.mod)">
+												<q-separator vertical :dark="$store.getters.theme === 'dark'" />
+												<div class="throws-modifier">
+													{{ rolled.rollResult.mod }}
+												</div>
+											</template>
+											<q-separator vertical :dark="$store.getters.theme === 'dark'" />
+											<div class="throws-total">
+												<hk-animated-integer :value="rolled.rollResult.total" />
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							<div v-if="savingThrowResult[action_index] === 'save'" class="mt-3">
-								Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
-							</div>
-							<div v-if="hitOrMiss[action_index] === 'miss'" class="mt-3">
-								Missed attack: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
-							</div>
-							<template v-for="({ name, modifier }, key) in defenses">
-								<div
-									v-if="checkDefenses(rolled.damage_type, rolled.magical, key)"
-									class="mt-3"
-									:key="`defense-${name}`"
-								>
-									{{ name }} to {{ rolled.damage_type }}: <b>{{ modifier }} damage</b>
+								<div v-if="savingThrowResult[action_index] === 'save'" class="mt-3">
+									Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
 								</div>
-							</template>
-							<hr />
-							<div>
-								<b>Final result</b><br />
-								(<hk-animated-integer :value="rolled.rollResult.total" />)
-								<span
-									v-if="
-										savingThrowResult[action_index] === 'save' || hitOrMiss[action_index] === 'miss'
-									"
-								>
-									{{ missSaveEffect(rolled.missSave, "calc") }}
-								</span>
-								<template v-if="resistances">
-									<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'v')"> * 2</span>
-									<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'r')"> / 2</span>
-									<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'i')">
-										no effect</span
+								<div v-if="hitOrMiss[action_index] === 'miss'" class="mt-3">
+									Missed attack: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
+								</div>
+								<template v-for="({ name, modifier }, key) in defenses">
+									<div
+										v-if="checkDefenses(rolled.damage_type, rolled.magical, key)"
+										class="mt-3"
+										:key="`defense-${name}`"
 									>
+										{{ name }} to {{ rolled.damage_type }}: <b>{{ modifier }} damage</b>
+									</div>
 								</template>
-								<span>
-									=
-									<b :class="action.type === 'healing' ? 'green' : rolled.damage_type">
-										<hk-animated-integer :value="totalRollValue(action, action_index, rolled)" />
-									</b>
-									{{ action.type === "healing" ? "healing" : rolled.damage_type }}
-								</span>
-							</div>
-
-							<!-- Special events -->
-							<div
-								v-if="
-									rolled.special &&
-									(savingThrowResult[action_index] === 'fail' || hitOrMiss[action_index] === 'hit')
-								"
-								class="mt-3"
-							>
-								<b>Events on {{ action.toHit ? "hit" : "failed save" }}</b
-								><br />
-								<div v-for="(event, event_index) in rolled.special" :key="`event-${event_index}`">
-									{{ eventValues(event, totalRollValue(action, action_index, rolled)).name }}
-									<b :class="event === 'drain' ? 'red' : 'green'">
-										{{ eventValues(event, totalRollValue(action, action_index, rolled)).value }}
-									</b>
-									<q-tooltip anchor="center left" self="center right">
-										{{ event === "drain" ? "Reduces targets max HP" : "Heals caster" }}
-									</q-tooltip>
+								<hr />
+								<div>
+									<b>Final result</b><br />
+									(<hk-animated-integer :value="rolled.rollResult.total" />)
+									<span
+										v-if="
+											savingThrowResult[action_index] === 'save' ||
+											hitOrMiss[action_index] === 'miss'
+										"
+									>
+										{{ missSaveEffect(rolled.missSave, "calc") }}
+									</span>
+									<template v-if="resistances">
+										<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'v')"> * 2</span>
+										<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'r')"> / 2</span>
+										<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'i')">
+											no effect</span
+										>
+									</template>
+									<span>
+										=
+										<b :class="action.type === 'healing' ? 'green' : rolled.damage_type">
+											<hk-animated-integer :value="totalRollValue(action, action_index, rolled)" />
+										</b>
+										{{ action.type === "healing" ? "healing" : rolled.damage_type }}
+									</span>
 								</div>
+
+								<!-- Special events -->
+								<div
+									v-if="
+										rolled.special &&
+										(savingThrowResult[action_index] === 'fail' ||
+											hitOrMiss[action_index] === 'hit')
+									"
+									class="mt-3"
+								>
+									<b>Events on {{ action.toHit ? "hit" : "failed save" }}</b
+									><br />
+									<div v-for="(event, event_index) in rolled.special" :key="`event-${event_index}`">
+										{{ eventValues(event, totalRollValue(action, action_index, rolled)).name }}
+										<b :class="event === 'drain' ? 'red' : 'green'">
+											{{ eventValues(event, totalRollValue(action, action_index, rolled)).value }}
+										</b>
+										<q-tooltip anchor="center left" self="center right">
+											{{ event === "drain" ? "Reduces targets max HP" : "Heals caster" }}
+										</q-tooltip>
+									</div>
+								</div>
+							</div>
+						</q-expansion-item>
+					</q-list>
+
+					<!-- TOTAL OF THE ACTION -->
+					<div class="total-action-damage" v-if="roll.actions.length > 1">
+						<div>Total {{ action.type === "healing" ? "healing" : "damage" }}</div>
+						<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
+							<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
+						</div>
+					</div>
+				</div>
+
+				<!-- TOTALS OF ALL ACTIONS -->
+				<div v-for="dmg_type in ['damage', 'healing']" :key="dmg_type">
+					<template v-if="totalValue(dmg_type) !== undefined">
+						<div
+							class="total-damage cursor-pointer"
+							v-if="!edit_total[dmg_type]"
+							@click="toggleOverride(dmg_type)"
+						>
+							<div>
+								<span class="mr-2">Total {{ dmg_type }}</span>
+								<i aria-hidden="true" class="fas fa-pencil-alt neutral-3" style="font-size: 14px">
+									<q-tooltip anchor="top middle" self="center middle">
+										Override rolled value.
+									</q-tooltip>
+								</i>
+							</div>
+							<div class="total" :class="dmg_type === 'healing' ? 'green' : 'red'">
+								<hk-animated-integer :value="totalValue(dmg_type)" onMount />
 							</div>
 						</div>
-					</q-expansion-item>
-				</q-list>
-
-				<!-- TOTAL OF THE ACTION -->
-				<div class="total-action-damage" v-if="roll.actions.length > 1">
-					<div>Total {{ action.type === "healing" ? "healing" : "damage" }}</div>
-					<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
-						<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
-					</div>
+						<template v-else>
+							<q-input
+								v-if="dmg_type === 'damage'"
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								clearable
+								@clear="toggleOverride(dmg_type)"
+								:label="`Total ${dmg_type}`"
+								v-model="overrideDamage"
+								type="number"
+								autocomplete="off"
+								name="duration"
+								class="my-2 full-width"
+								title="Override"
+								min="0"
+							>
+								<strong slot="append" class="pl-3 red">{{ overrideDamage }}</strong>
+							</q-input>
+							<q-input
+								v-else
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								clearable
+								@clear="toggleOverride(dmg_type)"
+								:label="`Total ${dmg_type}`"
+								v-model="overrideHealing"
+								type="number"
+								autocomplete="off"
+								name="duration"
+								class="my-2 full-width"
+								title="Override"
+								min="0"
+							>
+								<strong slot="append" class="pl-3 red">{{ overrideHealing }}</strong>
+							</q-input>
+						</template>
+					</template>
 				</div>
 			</div>
 
-			<!-- TOTALS OF ALL ACTIONS -->
-			<div v-for="dmg_type in ['damage', 'healing']" :key="dmg_type">
-				<template v-if="totalValue(dmg_type) !== undefined">
-					<div
-						class="total-damage cursor-pointer"
-						v-if="!edit_total[dmg_type]"
-						@click="toggleOverride(dmg_type)"
-					>
-						<div>
-							<span class="mr-2">Total {{ dmg_type }}</span>
-							<i aria-hidden="true" class="fas fa-pencil-alt neutral-3" style="font-size: 14px">
-								<q-tooltip anchor="top middle" self="center middle">
-									Override rolled value.
-								</q-tooltip>
-							</i>
-						</div>
-						<div class="total" :class="dmg_type === 'healing' ? 'green' : 'red'">
-							<hk-animated-integer :value="totalValue(dmg_type)" onMount />
-						</div>
-					</div>
-					<template v-else>
-						<q-input
-							v-if="dmg_type === 'damage'"
-							:dark="$store.getters.theme === 'dark'"
-							filled
-							square
-							clearable
-							@clear="toggleOverride(dmg_type)"
-							:label="`Total ${dmg_type}`"
-							v-model="overrideDamage"
-							type="number"
-							autocomplete="off"
-							name="duration"
-							class="my-2 full-width"
-							title="Override"
-							min="0"
-						>
-							<strong slot="append" class="pl-3 red">{{ overrideDamage }}</strong>
-						</q-input>
-						<q-input
-							v-else
-							:dark="$store.getters.theme === 'dark'"
-							filled
-							square
-							clearable
-							@clear="toggleOverride(dmg_type)"
-							:label="`Total ${dmg_type}`"
-							v-model="overrideHealing"
-							type="number"
-							autocomplete="off"
-							name="duration"
-							class="my-2 full-width"
-							title="Override"
-							min="0"
-						>
-							<strong slot="append" class="pl-3 red">{{ overrideHealing }}</strong>
-						</q-input>
-					</template>
-				</template>
+			<div slot="footer" class="card-footer" v-if="roll.target">
+				<q-btn
+					color="neutral-9"
+					class="full-width neutral-1"
+					label="Full"
+					no-caps
+					@click="apply(1)"
+				/>
+				<q-btn
+					color="neutral-9"
+					class="full-width neutral-1"
+					label="Half"
+					no-caps
+					@click="apply(0.5)"
+				/>
+				<q-btn
+					color="neutral-9"
+					class="full-width neutral-1"
+					label="Double"
+					no-caps
+					@click="apply(2)"
+				/>
+				<q-btn
+					color="neutral-9"
+					class="full-width neutral-1"
+					no-caps
+					@click="removeActionRoll(index)"
+				>
+					<i aria-hidden="true" class="fas fa-times" />
+				</q-btn>
 			</div>
-		</div>
-
-		<div slot="footer" class="card-footer" v-if="roll.target">
-			<q-btn
-				color="neutral-9"
-				class="full-width neutral-1"
-				label="Full"
-				no-caps
-				@click="apply(1)"
-			/>
-			<q-btn
-				color="neutral-9"
-				class="full-width neutral-1"
-				label="Half"
-				no-caps
-				@click="apply(0.5)"
-			/>
-			<q-btn
-				color="neutral-9"
-				class="full-width neutral-1"
-				label="Double"
-				no-caps
-				@click="apply(2)"
-			/>
-			<q-btn
-				color="neutral-9"
-				class="full-width neutral-1"
-				no-caps
-				@click="removeActionRoll(index)"
-			>
-				<i aria-hidden="true" class="fas fa-times" />
-			</q-btn>
-		</div>
-	</hk-card>
+		</hk-card>
+	</div>
 </template>
 
 <script>
@@ -527,6 +540,7 @@ export default {
 		},
 	},
 	mounted() {
+		this.$refs?.roll?.focus();
 		this.checkHitOrMiss();
 	},
 	methods: {
@@ -570,6 +584,15 @@ export default {
 				return this.resistances && this.resistances[damage_type] === defense_key;
 			}
 			return false;
+		},
+		shortkeyApply(e) {
+			if (e.shiftKey) {
+				this.apply(2);
+			} else if (e.ctrlKey) {
+				this.apply(0.5);
+			} else {
+				this.apply(1);
+			}
 		},
 		async apply(multiplier) {
 			// Create the info object for the log
@@ -803,8 +826,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.single-roll {
+	outline: none;
+
+	&:focus {
+		.hk-card {
+			outline: $neutral-2 solid 1px;
+		}
+	}
+}
 .hk-card {
 	pointer-events: auto;
+
 	.card-body {
 		h2 {
 			text-transform: none !important;

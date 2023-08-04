@@ -7,6 +7,7 @@
 		<div class="card-body">
 			<button
 				class="btn btn-block mb-3"
+				ref="divide"
 				@click="divide"
 				:disabled="available_projectiles < projectileCount"
 			>
@@ -75,6 +76,9 @@ export default {
 				this.projectileCount - Object.values(this.assigned_projectiles).reduce((a, b) => a + b, 0)
 			);
 		},
+	},
+	mounted() {
+		this.$refs.divide?.focus();
 	},
 	methods: {
 		divide() {

@@ -42,7 +42,7 @@
 					>
 						Attack
 						<i aria-hidden="true" class="hki-sword-break ml-3" />
-						<q-tooltip anchor="center right" self="center left"> Enter </q-tooltip>
+						<q-tooltip anchor="center right" self="center left">[enter]</q-tooltip>
 					</button>
 					<button
 						class="btn heal bg-green white"
@@ -52,7 +52,7 @@
 					>
 						Heal
 						<i aria-hidden="true" class="hki-heal" />
-						<q-tooltip anchor="center right" self="center left"> Shift + Enter </q-tooltip>
+						<q-tooltip anchor="center right" self="center left">[shift] + [enter]</q-tooltip>
 					</button>
 				</div>
 			</ValidationProvider>

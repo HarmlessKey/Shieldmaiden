@@ -81,6 +81,7 @@
 								expand-icon-class="hidden-toggle"
 								:group="type"
 								:name="name"
+								@focus="focusButton(action_index)"
 							>
 								<template v-slot:header>
 									<q-item-section
@@ -207,6 +208,7 @@
 										"
 									>
 										<hk-roll-action
+											:ref="action_index"
 											:action="action"
 											:tooltip="`Roll ${action.name}`"
 											@roll="startRoll(...arguments, action_index, action, type)"
@@ -357,6 +359,10 @@ export default {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
+		focusButton(i) {
+			const button = this.$refs[i]?.[0]?.$el;
+			button?.focus();
+		},
 		startRoll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted && this.targeted.length) {
 				this.rollObject = {
@@ -462,10 +468,21 @@ h3 {
 	vertical-align: -5px;
 	user-select: none;
 }
-.advantage .roll-button:hover {
+.hk-roll {
+	padding: 10px;
+	margin: -10px;
+	border-radius: 50%;
+
+	&:focus {
+		background: $neutral-5;
+	}
+}
+.advantage .roll-button:hover,
+.advantage.hk-roll:focus .roll-button {
 	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-green.svg");
 }
-.disadvantage .roll-button:hover {
+.disadvantage .roll-button:hover,
+.disadvantage.hk-roll:focus .roll-button {
 	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-red.svg");
 }
 </style>

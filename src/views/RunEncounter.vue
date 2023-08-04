@@ -417,34 +417,34 @@ export default {
 			return undefined;
 		},
 		focusDamage() {
-			const pane = this.$refs.current.$el;
+			const pane = this.$refs.current?.$el;
 			this.focused_pane = "current";
 
 			// Focus on the manual input
 			if (pane.querySelector('[name="Manual Input"]')) {
-				pane.querySelector('[name="Manual Input"]').focus();
+				pane.querySelector('[name="Manual Input"]')?.focus();
 			}
 			// Focus on the first ability/spell
 			else if (pane.getElementsByClassName("q-item")) {
-				pane.getElementsByClassName("q-item")[0].focus();
+				pane.getElementsByClassName("q-item")?.[0]?.focus();
 			} else {
-				pane.focus();
+				pane?.focus();
 			}
 		},
 		focusPane(name) {
-			const pane = this.$refs[name].$el;
+			const pane = this.$refs?.[name]?.$el;
 			this.focused_pane = name;
 
 			switch (name) {
 				case "current":
 				case "side":
-					pane.getElementsByClassName("q-tab")[0].focus();
+					pane.getElementsByClassName("q-tab")?.[0]?.focus();
 					break;
 				case "targets":
-					pane.getElementsByClassName("target-li")[0].focus();
+					pane.getElementsByClassName("target-li")?.[0]?.focus();
 					break;
 				case "targeted":
-					pane.getElementsByClassName("option")[0].focus();
+					pane.getElementsByClassName("option")?.[0]?.focus();
 					break;
 				default:
 					pane.focus();

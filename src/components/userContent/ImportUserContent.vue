@@ -308,28 +308,17 @@ export default {
 	name: "ImportUserContent",
 	data() {
 		return {
-			type: undefined,
-			showSchema: false,
+			uid: this.$store.getters.user.uid,
 			json_file: undefined,
 			json_input: undefined,
 			overwrite: true,
 			parsing: false,
 			parsed: false,
-			map_old_to_custom: {},
-			custom_spells: {},
-			import_custom_spells: true,
 			failed_imports: [],
 			importing: undefined,
 			imported: 0,
-			imports: {
-				unique: [],
-				duplicate: [],
-			},
-			selected: {
-				unique: [],
-				duplicate: [],
-			},
-			uid: this.$store.getters.user.uid,
+			import_key_map: {},
+
 			columns: [
 				{
 					name: "name",
@@ -387,6 +376,8 @@ export default {
 		this.type === "npcs" ? await this.get_npcs() : await this.get_spells();
 	},
 	methods: {
+		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
+		...mapActions("encounters", ["add_encounter", "get_encounter", "get_encounters"]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc"]),
 		...mapActions("spells", [
 			"add_spell",
@@ -396,19 +387,6 @@ export default {
 			"get_spell_id_by_name",
 			"reserve_spell_id",
 		]),
-		async getItem(id) {
-			return this.type === "npcs"
-				? this.get_npc({ uid: this.uid, id })
-				: this.get_spell({ uid: this.uid, id });
-		},
-		async addItem(item) {
-			this.type === "npcs" ? await this.add_npc(item) : await this.add_spell({ spell: item });
-		},
-		async editItem(id, item) {
-			this.type === "npcs"
-				? this.edit_npc({ uid: this.uid, id, npc: item })
-				: this.edit_spell({ id, spell: item });
-		},
 		loadJSON() {
 			const fr = new FileReader();
 
@@ -429,66 +407,79 @@ export default {
 		},
 
 		async parse(data) {
-			this.parsing = true;
+			// this.parsing = true;
 			if (!data.meta) {
-				await parseOldExport(data);
-				this.parsing = false;
-				return;
+				data = await this.mapOldToNew(data);
+				data.meta = { export_version: "1.0" };
+			}
+			if (["1.0", "2.0"].includes(data.meta.export_version)) {
+				await parseV2(data);
 			}
 		},
 
-		async parseOldExport(data) {
+		async mapOldToNew(data) {
+			const new_data = {
+				npcs: {},
+				spells: {},
+			};
+
 			if (!(data instanceof Array)) {
 				data = [data];
 			}
 
-			// Validate items
-			for (const item of data) {
-				// Delete damage_vulnerability property.
-				delete item.damage_vulnerability;
-				delete item.created;
-				delete item.updated;
-
-				let checkable_item = item;
-				// Parse versatile to options for NPCs
-				if (this.type === "npcs") {
-					checkable_item = await this.parseCustomSpells(item);
-					checkable_item = this.versatileToOptions(checkable_item);
-				}
-
-				const valid = ajv.validate(this.schema, checkable_item);
-
-				if (!valid) {
-					item.errors = ajv.errors;
+			let i = 0;
+			for (const entry of data) {
+				// use HK or a increasing new key to be changed later on.
+				const key = entry.harmless_key ?? `new_key-${++i}`;
+				if (entry.challenge_rating !== undefined) {
+					// Entry is NPC
+					if (Object.values(entry.custom_spells).length > 0) {
+						new_data.spells = { ...new_data.spells, ...entry.custom_spells };
+						delete entry.custom_spells;
+					}
+					new_data.npcs[key] = entry;
+				} else if (entry.school !== undefined) {
+					// Entry is Spell
+					new_data.spells[key] = entry;
 				}
 			}
-
-			// Filter out duplicate items
-			this.imports.duplicate = data.filter((filter_item) => {
-				return this.data
-					.map((map_item) => {
-						return map_item.name.toLowerCase();
-					})
-					.includes(filter_item.name.toLowerCase());
-			});
-			// Add index for selection
-			this.imports.duplicate.forEach((row, index) => {
-				row.index = index;
-			});
-
-			// Filter out new items
-			this.imports.unique = data.filter((filter_item) => {
-				return !this.data
-					.map((map_item) => {
-						return map_item.name.toLowerCase();
-					})
-					.includes(filter_item.name.toLowerCase());
-			});
-			// Add index for selection
-			this.imports.unique.forEach((row, index) => {
-				row.index = index;
-			});
+			return new_data;
 		},
+
+		async parseV2(data) {
+			if (data.spells) {
+				await Promise.all(
+					Object.entries(data.spells).forEach(([key, spell]) => {
+						this.parseSpell(key, spell);
+					})
+				);
+			}
+			if (data.npcs) {
+				await Promise.all(
+					Object.entries(data.npcs).forEach(([key, npc]) => {
+						this.parseNPC(key, npc);
+					})
+				);
+			}
+			if (data.campaigns && data.encounters) {
+				await Promise.all(
+					Object.entries(data.campaigns).forEach(([key, campaign]) => {
+						this.parseCampaign(key, campaign);
+					})
+				);
+				await Promise.all(
+					Object.entries(data.encounters).forEach(([key, encounter]) => {
+						this.parseEncounter(key, encounter);
+					})
+				);
+			}
+		},
+
+		async parseCampaign(key, spell) {},
+		async parseEncounter(key, spell) {},
+		async parseNPC(key, spell) {},
+		async parseSpell(key, spell) {},
+
 		async importData() {
 			// First check if there are custom spells from imported NPCs that need to be added.
 			if (

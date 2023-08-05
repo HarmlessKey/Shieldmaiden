@@ -2592,7 +2592,23 @@ html body {
 	}
 	.q-btn {
 		border-radius: $border-radius;
+
+		&:focus {
+			outline: $outline !important;
+		}
 	}
+
+	.q-btn-group {
+		.q-btn {
+			border: solid 1px transparent;
+
+			&:focus {
+				outline: none !important;
+				border-color: $neutral-2;
+			}
+		}
+	}
+
 	.q-menu {
 		.q-list {
 			.q-item {

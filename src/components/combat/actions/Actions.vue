@@ -106,18 +106,19 @@
 				inline-label
 				outside-arrows
 				mobile-arrows
-				dense
 				no-caps
-				class="bg-neutral-3 neutral-10"
+				dense
+				indicator-color="neutral-1"
+				class="modes"
 			>
 				<q-tab
 					v-for="({ name, icon, label }, index) in tabs"
 					:key="`tab-${index}`"
 					:name="name"
 					:icon="icon"
-					:label="width > 300 ? label : null"
+					class="bg-neutral-3 neutral-10"
 				>
-					<q-tooltip v-if="width <= 300" anchor="top middle" self="center middle">
+					<q-tooltip anchor="top middle" self="center middle">
 						{{ label }}
 					</q-tooltip>
 				</q-tab>
@@ -276,6 +277,27 @@ export default {
 				padding: 0;
 				min-height: 35px !important;
 				line-height: 35px !important;
+			}
+		}
+	}
+}
+
+.modes {
+	&::v-deep {
+		.q-tabs {
+			&__content {
+				padding: 10px;
+				margin: -10px;
+				gap: 0.5rem;
+
+				.q-tab {
+					border: solid 1px transparent;
+					border-radius: $border-radius;
+
+					&:focus {
+						outline: $outline;
+					}
+				}
 			}
 		}
 	}

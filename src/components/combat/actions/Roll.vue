@@ -6,7 +6,6 @@
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
 				<!-- ACTIONS -->
 				<q-tabs
-					class="mt-3"
 					v-model="tab"
 					:dark="$store.getters.theme === 'dark'"
 					inline-label

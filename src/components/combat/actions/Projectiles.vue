@@ -37,7 +37,7 @@
 			</div>
 		</div>
 		<div slot="footer" class="card-footer">
-			<q-btn label="Cancel" no-caps @click="cancel()" />
+			<q-btn label="Cancel" tabindex="-1" no-caps @click="cancel()" />
 			<q-btn
 				label="Roll"
 				color="primary"

@@ -9,19 +9,19 @@
 					class="btn btn-clear"
 				>
 					<i aria-hidden="true" class="fas fa-times red"></i>
-					<q-tooltip anchor="top middle" self="center middle"> Untarget all </q-tooltip>
+					<q-tooltip anchor="top middle" self="center middle">Untarget all</q-tooltip>
 				</button>
 			</div>
 
 			<!-- SINGLE TARGET OPTIONS -->
 			<div
-				v-if="target"
+				v-if="targeted.length"
 				class="options d-flex justify-content-between gap-1"
 				tabindex="0"
 				@focus="focusOptions"
 			>
 				<button
-					v-for="({ key, method, icon, tooltip }, i) in options"
+					v-for="({ key, method, icon, tooltip }, i) in display_options"
 					ref="options"
 					tabindex="-1"
 					class="option"
@@ -35,50 +35,6 @@
 					<i aria-hidden="true" class="fas" :class="icon" />
 					<q-tooltip anchor="top middle" self="center middle">{{ tooltip }}</q-tooltip>
 				</button>
-			</div>
-
-			<!-- MULTITARGET OPTIONS -->
-			<div class="options d-flex justify-content-between" v-else-if="targeted.length > 0">
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/DamageHealing' })"
-					v-shortkey="['shift', 'd']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/DamageHealing' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-swords"></i></span>
-					<q-tooltip anchor="top middle" self="center middle">
-						[shift + d] Out of turn damage/healing
-					</q-tooltip>
-				</a>
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/Conditions' })"
-					v-shortkey="['c']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/Conditions' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-flame"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [c] Conditions </q-tooltip>
-				</a>
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/reminders/TargetReminders' })"
-					v-shortkey="['m']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/reminders/TargetReminders' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-stopwatch"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [m] Reminders </q-tooltip>
-				</a>
-
-				<a @click="setHidden()" v-shortkey="['h']" @shortkey="setHidden()">
-					<span class="icon"><i aria-hidden="true" class="fas fa-eye"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [h] Hide </q-tooltip>
-				</a>
-
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/EditEntity' })"
-					v-shortkey="['e']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/EditEntity' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-pencil"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [e] Edit </q-tooltip>
-				</a>
 			</div>
 		</h2>
 		<q-scroll-area
@@ -267,6 +223,13 @@ export default {
 			}
 			return fails;
 		},
+		display_options() {
+			return this.targeted.length > 1
+				? this.options.filter((opt) => {
+						return !["transform"].includes(opt.option);
+				  })
+				: this.options;
+		},
 	},
 	methods: {
 		...mapActions([
@@ -418,10 +381,13 @@ export default {
 				.abilityName {
 					margin-bottom: 3px;
 				}
-				.mod {
-					cursor: pointer;
-					line-height: 25px;
-					margin-top: 1px;
+				.hk-roll {
+					width: 100%;
+					.mod {
+						cursor: pointer;
+						line-height: 25px;
+						margin-top: 1px;
+					}
 				}
 				.advantage .mod:hover {
 					color: $neutral-1;

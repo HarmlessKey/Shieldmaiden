@@ -189,11 +189,13 @@ export default {
 	data() {
 		return {
 			environment: process.env.VUE_APP_ENV_NAME,
-			tabindex: this.$route.name === "RunEncounter" ? -1 : 0,
 		};
 	},
 	computed: {
 		...mapGetters(["user", "userInfo"]),
+		tabindex() {
+			return this.$route.name === "RunEncounter" ? -1 : 0;
+		},
 	},
 	methods: {
 		...mapActions(["setSlide", "setSideSmallScreen", "setTheme", "sign_out"]),

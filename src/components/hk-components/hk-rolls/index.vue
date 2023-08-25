@@ -1,5 +1,5 @@
 <template>
-	<div v-if="action_rolls && action_rolls.length > 0" class="hk-rolls center-top">
+	<q-dialog v-model="show" persistent position="top">
 		<transition-group
 			tag="div"
 			class="rolls"
@@ -7,12 +7,6 @@
 			enter-active-class="animated animate__fadeInDown"
 			leave-active-class="animated animate__fadeOutUp"
 		>
-			<hk-single-roll
-				v-for="(roll, index) in action_rolls"
-				:key="`roll-${roll.key}`"
-				:value="roll"
-				:index="index"
-			/>
 			<q-btn
 				v-if="action_rolls && action_rolls.length > 1"
 				:key="`clear-button`"
@@ -20,14 +14,20 @@
 				class="full-width mb-2 neutral-1"
 				icon="fas fa-times"
 				no-caps
-				v-shortkey="['shift', 'esc']"
+				v-shortkey="['ctrl', 'esc']"
 				@shortkey="clearRolls"
 				@click="clearRolls"
 			>
-				Clear all <span class="ml-1 neutral-2">[shift]+[esc]</span>
+				Clear all <span class="ml-1 neutral-2">[ctrl]+[esc]</span>
 			</q-btn>
+			<hk-single-roll
+				v-for="(roll, index) in action_rolls"
+				:key="`roll-${roll.key}`"
+				:value="roll"
+				:index="index"
+			/>
 		</transition-group>
-	</div>
+	</q-dialog>
 </template>
 
 <script>
@@ -41,6 +41,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(["action_rolls"]),
+		show() {
+			return !!this.action_rolls?.length;
+		},
 	},
 	methods: {
 		clearRolls() {
@@ -51,11 +54,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.hk-rolls {
+.rolls {
+	padding: 10px;
+	box-shadow: none !important;
+	scrollbar-width: none;
+	height: 100vh;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
 	&:focus {
 		outline: none;
 	}
 }
+
 .animated {
 	animation-duration: 0.4s !important;
 }

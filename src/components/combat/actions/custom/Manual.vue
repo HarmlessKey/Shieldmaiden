@@ -30,7 +30,6 @@
 						class="manual-input"
 						@keypress="submitManual($event, !invalid)"
 						autocomplete="off"
-						autofocus
 						:error="invalid && validated"
 						:error-message="errors[0]"
 					/>

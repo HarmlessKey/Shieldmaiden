@@ -8,7 +8,7 @@
 	>
 		<hk-card>
 			<div slot="header" class="card-header">
-				<div class="truncate">{{ roll.name }} {{ index }}</div>
+				<div class="truncate">{{ roll.name }}</div>
 				<button class="btn btn-sm btn-clear" @click="removeRoll(index)">
 					<i aria-hidden="true" class="fas fa-times" />
 				</button>

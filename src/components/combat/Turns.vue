@@ -216,12 +216,17 @@
 						Leave
 					</router-link>
 				</span>
-				<a class="btn ml-2" @click="startEncounter()">
+				<button
+					class="btn ml-2" @click="startEncounter()"
+					v-shortkey="['shift', 'arrowright']"
+					@shortkey="startEncounter()"
+				>
 					Start
 					<span class="ml-1 d-none d-md-inline">
 						encounter <i aria-hidden="true" class="fas fa-arrow-right" />
 					</span>
-				</a>
+					<q-tooltip anchor="top middle" self="center middle">Start [shift] + [>]</q-tooltip>
+				</button>
 			</template>
 		</div>
 	</div>

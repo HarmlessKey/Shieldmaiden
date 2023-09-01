@@ -1,9 +1,23 @@
 <template>
-	<div id="container" v-if="width > 576">
+	<div 
+		v-if="width > 576"
+		id="container" 
+		v-shortkey="{
+			left: [','],
+			right: ['.'],
+		}"
+		@shortkey="cyclePanes"
+	>
 		<Turns 
 			:next="_active[0]"
 		/>
-		<div class="players">
+		<div 
+			ref="players"
+			tabindex="0"
+			class="pane players"
+			:class="{ focused: focused_pane === 'players' }"
+			@focus="focusPane('players')"
+		>
 			<h2 
 				class="componentHeader" :class="{ shadow : setShadowPlayer > 0 }">
 				<span><i aria-hidden="true" class="fas fa-helmet-battle"></i> Players</span>
@@ -12,7 +26,13 @@
 				<Players :players="_players" />
 			</q-scroll-area>
 		</div>
-		<div class="npcs">
+		<div 
+			ref="npcs"
+			tabindex="0"
+			class="pane npcs"
+			:class="{ focused: focused_pane === 'npcs' }"
+			@focus="focusPane('npcs')"
+		>
 			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
 				<span><i aria-hidden="true" class="fas fa-dragon"></i> NPC's</span>
 			</h2>
@@ -20,7 +40,13 @@
 				<NPCs :npcs="_npcs" />	
 			</q-scroll-area>
 		</div>
-		<div class="set">
+		<div
+			ref="overview"
+			tabindex="0"
+			class="pane set"
+			:class="{ focused: focused_pane === 'overview' }"
+			@focus="focusPane('overview')"
+		>
 			<h2 class="componentHeader" :class="{ shadow : setShadowOverview > 0 }">
 				<span>Active entities</span>
 			</h2>
@@ -119,6 +145,8 @@
 				setShadowPlayer: 0,
 				setShadowNPC: 0,
 				setShadowOverview: 0,
+				panes: ["players", "npcs", "overview"],
+				focused_pane: "players",
 				panel: "players",
 				panels: [
 					{
@@ -170,6 +198,33 @@
 			...mapActions([
 				'set_turn'
 			]),
+			cyclePanes(e) {
+				const key = e.srcKey;
+				const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;
+				let index;
+				if (key === "right") {
+					index = current < this.panes.length - 1 ? current + 1 : 0;
+				} else {
+					index = current > 0 ? current - 1 : this.panes.length - 1;
+				}
+				const name = this.panes[index];
+				this.focusPane(name);
+			},
+			focusPane(name) {
+				const pane = this.$refs?.[name];
+				this.focused_pane = name;
+
+				switch (name) {
+					case "npcs":
+						pane.getElementsByClassName("roll-all")?.[0]?.focus();
+						break;
+					case "overview":
+						pane.getElementsByClassName("entity")?.[0]?.focus();
+						break;
+					default:
+						pane.focus();
+				}
+			},
 			shadow() {
 				this.setShadowPlayer = this.$refs.scrollPlayer.scrollPosition;
 				this.setShadowNPC = this.$refs.scrollNPC.scrollPosition;
@@ -202,7 +257,7 @@
 	"players npcs set";
 	position: absolute;
 
-	.q-scrollarea{
+	.q-scrollarea {
 		padding:15px;
 		height: calc(100% - 45px);
 	}
@@ -220,18 +275,24 @@
 			}
 		}
 	}
-	.players, .npcs, .set {
+	.pane {
 		background: $neutral-6-transparent;
 		overflow: hidden;
-	}
-	.players {
-		grid-area: players;
-	}
-	.npcs {
-		grid-area: npcs;
-	}
-	.set {
-		grid-area: set;
+
+		&.players {
+			grid-area: players;
+		}
+		&.npcs {
+			grid-area: npcs;
+		}
+		&.set {
+			grid-area: set;
+		}
+		&.focused,
+		&:focus {
+			outline: $neutral-3 solid 1px;
+			outline-offset: 1px;
+		}
 	}
 }
 .initiative-move {

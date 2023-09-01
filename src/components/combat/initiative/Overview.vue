@@ -19,12 +19,20 @@
 			</template>
 		</hk-tip>
 		<ul class="entities hasImg">
-			<li v-for="(entity) in active" v-bind:key="entity.key">
+			<li 
+				v-for="(entity) in active"
+				v-bind:key="entity.key"
+				class="entity"
+				tabindex="0"
+				@keydown.s="setSurprised(entity.key, !entity.reminders.surprised)"
+				@keydown.h="set_hidden({key: entity.key, hidden: !entity.hidden})"
+				@keydown.a="set_active({key: entity.key, active: false})"
+			>
 				<span v-if="entity.hidden" class="img"><i aria-hidden="true" class="fas fa-eye-slash red"></i></span>
 				<span v-else-if="entity.reminders.surprised" class="img orange"><i aria-hidden="true" class="hki hki-surprised"></i></span>
 				<template v-else>
 					<span 
-						class="img pointer" 
+						class="img" 
 						:style="{
 							'background-image': entity.img ? 'url(' + entity.img + ')' : '',
 							'border-color': entity.color_label ? entity.color_label : ``,
@@ -43,32 +51,32 @@
 					<a v-if="!entity.reminders.surprised" class="btn btn-sm bg-neutral-5" @click="setSurprised(entity.key, true)">
 						<i aria-hidden="true" class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
-							Set surprised
+							Set surprised [s]
 						</q-tooltip>
 					</a>
 					<a v-else class="btn btn-sm bg-neutral-5" @click="setSurprised(entity.key, false)">
 						<i aria-hidden="true" class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
-							Remove surprised
+							Remove surprised [s]
 						</q-tooltip>
 					</a>
 					<!-- Hide / Unhide Entity -->
 					<a v-if="!entity.hidden" class="btn btn-sm bg-neutral-5" @click="set_hidden({key: entity.key, hidden: true})">
 						<i aria-hidden="true" class="fas fa-eye-slash"></i>
 						<q-tooltip anchor="top middle" self="center middle">
-							Set hidden
+							Set hidden [h]
 						</q-tooltip>
 					</a>
 					<a v-else class="btn btn-sm bg-neutral-5" @click="set_hidden({key: entity.key, hidden: false})">
 						<i aria-hidden="true" class="fas fa-eye"></i>
 						<q-tooltip anchor="top middle" self="center middle">
-							Unhide
+							Unhide [h]
 						</q-tooltip>
 					</a>
 					<a class="btn btn-sm bg-neutral-5" @click="set_active({key: entity.key, active: false})">
 						<i aria-hidden="true" class="fas fa-minus"></i>
 						<q-tooltip anchor="top middle" self="center middle">
-							Set inactive
+							Set inactive [a]
 						</q-tooltip>
 					</a>
 				</div>
@@ -78,26 +86,26 @@
 		<h2>Inactive</h2>
 
 		<ul class="entities hasImg">
-			<li v-for="(entity) in idle" v-bind:key="entity.key">
+			<li v-for="(entity) in idle" v-bind:key="entity.key" tabindex="0" @keydown.a="set_active({key: entity.key, active: true})">
 				<span 
-					class="img pointer" 
+					class="img" 
 					:style="{
-						'background-image': 'url(' + entity.img + ')',
-						'border-color': entity.color_label ? entity.color_label : ``,
-						'color': entity.color_label ? entity.color_label : ``
-					}"
+							'background-image': entity.img ? 'url(' + entity.img + ')' : '',
+							'border-color': entity.color_label ? entity.color_label : ``,
+							'color': entity.color_label ? entity.color_label : ``
+						}"
 				>
-					<i aria-hidden="true" v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+					<i aria-hidden="true" v-if="!entity.img" :class="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`" />
 				</span>
 				<span class="d-flex justify-content-between">
 					{{ entity.name }}
-					<span>{{ entity.initiative }}</span>
+					<strong class="blue initiative">{{ entity.initiative }}</strong>
 				</span>
 				<div class="actions">
 					<a class="btn btn-sm bg-neutral-5" @click="set_active({key: entity.key, active: true})">
 						<i aria-hidden="true" class="fas fa-plus"></i>
 						<q-tooltip anchor="top middle" self="center middle">
-							Set active
+							Set active [a]
 						</q-tooltip>
 					</a>
 				</div>
@@ -147,7 +155,12 @@
 
 		li {
 			padding-right: 3px;
+			background: $neutral-8;
 
+			&:focus {
+				outline: none;
+				background: $neutral-9;
+			}
 			.actions {
 				align-items: center;
 

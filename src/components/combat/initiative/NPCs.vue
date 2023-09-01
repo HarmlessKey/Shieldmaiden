@@ -24,6 +24,7 @@
 						v-model="selected"
 						:val="i"
 						:label="entity.name.capitalizeEach()"
+						tabindex="-1"
 					/>
 				</div>
 
@@ -48,9 +49,11 @@
 						name="npcInit"
 						@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
 						placeholder="0"
+						@keydown.enter="$refs?.[i]?.[0]?.$el?.click()"
 					>
 						<template v-slot:append>
 							<hk-roll
+								:ref="i"
 								:tooltip="`1d20 + ${calcMod(entity.dexterity)}`"
 								@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
 							>
@@ -63,14 +66,12 @@
 				</div>
 			</li>
 		</ul>
-		<div>
-			<hk-roll @roll="selected.length === 0 ? rollAll($event) : rollGroup($event)">
-				<a class="btn btn-block">
-					<i aria-hidden="true" class="fas fa-dice-d20"></i> Roll
-					{{ selected.length === 0 ? "all" : "selected" }}
-				</a>
-			</hk-roll>
-		</div>
+		<hk-roll class="full-width" @roll="selected.length === 0 ? rollAll($event) : rollGroup($event)">
+			<button class="btn btn-block full-width roll-all">
+				<i aria-hidden="true" class="fas fa-dice-d20"></i> Roll
+				{{ selected.length === 0 ? "all" : "selected" }}
+			</button>
+		</hk-roll>
 	</div>
 </template>
 
@@ -167,6 +168,7 @@ ul.entities {
 
 	li {
 		padding-right: 3px;
+		background: $neutral-8;
 
 		.actions {
 			align-items: center;

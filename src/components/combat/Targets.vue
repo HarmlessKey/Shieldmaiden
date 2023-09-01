@@ -15,7 +15,7 @@
 				<i aria-hidden="true" class="fas fa-plus green" />
 				<span class="ml-1">
 					Add
-					<span v-if="!showKeybinds" class="d-none d-sm-inline">[a]</span>
+					<hk-show-keybind class="d-none d-sm-inline" :binds="['a']" />
 				</span>
 				<q-tooltip v-if="test" anchor="top middle" self="center middle"
 					>Unavailable in test mode</q-tooltip
@@ -217,11 +217,6 @@ export default {
 				})
 				.sortBy("name", "desc")
 				.value();
-		},
-		showKeybinds() {
-			return this.userSettings && this.userSettings.general
-				? this.userSettings.general.keyBinds
-				: undefined;
 		},
 	},
 	methods: {

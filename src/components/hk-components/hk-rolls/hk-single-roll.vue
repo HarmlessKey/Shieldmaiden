@@ -4,12 +4,12 @@
 		tabindex="0"
 		ref="roll"
 		@keydown.enter="shortkeyApply"
-		@keydown.esc="removeActionRoll(index)"
+		@keydown.backspace="removeRoll(index)"
 	>
 		<hk-card>
 			<div slot="header" class="card-header">
 				<div class="truncate">{{ roll.name }} {{ index }}</div>
-				<button class="btn btn-sm btn-clear" @click="removeActionRoll(index)">
+				<button class="btn btn-sm btn-clear" @click="removeRoll(index)">
 					<i aria-hidden="true" class="fas fa-times" />
 				</button>
 			</div>
@@ -347,7 +347,13 @@
 						>
 							<div>
 								<span class="mr-2">Total {{ dmg_type }}</span>
-								<i aria-hidden="true" class="fas fa-pencil-alt neutral-3" style="font-size: 14px">
+								<i 
+									aria-hidden="true"
+									class="fas fa-pencil-alt neutral-3"
+									style="font-size: 14px;"
+									tabindex="0"
+									@focus="toggleOverride(dmg_type)"
+								>
 									<q-tooltip anchor="top middle" self="center middle">
 										Override rolled value.
 									</q-tooltip>
@@ -364,6 +370,7 @@
 								filled
 								square
 								clearable
+								autofocus
 								@clear="toggleOverride(dmg_type)"
 								:label="`Total ${dmg_type}`"
 								v-model="overrideDamage"
@@ -373,6 +380,7 @@
 								class="my-2 full-width"
 								title="Override"
 								min="0"
+								@keydown.backspace.stop
 							>
 								<strong slot="append" class="pl-3 red">{{ overrideDamage }}</strong>
 							</q-input>
@@ -382,6 +390,7 @@
 								filled
 								square
 								clearable
+								autofocus
 								@clear="toggleOverride(dmg_type)"
 								:label="`Total ${dmg_type}`"
 								v-model="overrideHealing"
@@ -391,6 +400,7 @@
 								class="my-2 full-width"
 								title="Override"
 								min="0"
+								@keydown.backspace.stop
 							>
 								<strong slot="append" class="pl-3 red">{{ overrideHealing }}</strong>
 							</q-input>
@@ -425,7 +435,7 @@
 					color="neutral-9"
 					class="full-width neutral-1"
 					no-caps
-					@click="removeActionRoll(index)"
+					@click="removeRoll(index)"
 				>
 					<i aria-hidden="true" class="fas fa-times" />
 				</q-btn>
@@ -540,7 +550,6 @@ export default {
 		},
 	},
 	mounted() {
-		this.$refs?.roll?.focus();
 		this.checkHitOrMiss();
 	},
 	methods: {
@@ -557,6 +566,10 @@ export default {
 					}
 				}
 			});
+		},
+		removeRoll(index) {
+			this.removeActionRoll(index);
+			this.$emit("remove", index);
 		},
 		advantage(input) {
 			const type = Object.keys(input)[0].charAt(0).capitalize();
@@ -687,7 +700,7 @@ export default {
 				}
 			}
 			// Remove the roll
-			this.removeActionRoll(this.index);
+			this.removeRoll(this.index);
 		},
 		totalRollValue(action, action_index, roll) {
 			let total = parseInt(roll.rollResult.total);

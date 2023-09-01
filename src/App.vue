@@ -241,7 +241,7 @@ export default {
 			slide: "getSlide",
 			storeBroadcast: "broadcast",
 		}),
-		...mapGetters(["initialized", "theme", "user"]),
+		...mapGetters(["initialized", "theme", "user", "action_rolls"]),
 		announcement: {
 			get() {
 				const announcement = this.user && !this.announcement_cookie ? true : false;

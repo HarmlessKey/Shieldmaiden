@@ -114,7 +114,7 @@ export default {
 						},
 						{
 							action: "Don't apply roll 'cancel'",
-							bind: ["esc"],
+							bind: ["backspace"],
 						},
 					],
 				},

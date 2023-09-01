@@ -1,5 +1,5 @@
 <template>
-	<q-dialog v-model="show" persistent position="top">
+	<q-dialog v-model="show" persistent position="top" @show="focusFirst">
 		<transition-group
 			tag="div"
 			class="rolls"
@@ -14,17 +14,19 @@
 				class="full-width mb-2 neutral-1"
 				icon="fas fa-times"
 				no-caps
-				v-shortkey="['ctrl', 'esc']"
+				v-shortkey="['esc']"
 				@shortkey="clearRolls"
 				@click="clearRolls"
 			>
-				Clear all <span class="ml-1 neutral-2">[ctrl]+[esc]</span>
+				Clear all <span class="ml-1 neutral-2">[esc]</span>
 			</q-btn>
 			<hk-single-roll
 				v-for="(roll, index) in action_rolls"
 				:key="`roll-${roll.key}`"
+				ref="rolls"
 				:value="roll"
 				:index="index"
+				@remove="removeEl"
 			/>
 		</transition-group>
 	</q-dialog>
@@ -45,10 +47,30 @@ export default {
 			return !!this.action_rolls?.length;
 		},
 	},
+	watch: {
+		action_rolls: {
+			handler() {
+				this.$refs?.rolls?.[0]?.$el.focus();
+			},
+			deep: true
+		}
+	},
 	methods: {
 		clearRolls() {
 			this.$store.commit("CLEAR_ACTION_ROLLS");
 		},
+		/**
+		 * Focuses the first roll
+		 */
+		focusFirst() {
+			this.$refs?.rolls?.[0]?.$el.focus();
+		},
+		/**
+		 * When a roll is deleted it is not automatically removed from the $refs
+		 */
+		removeEl(index) {
+			this.$delete(this.$refs?.rolls, index);
+		}
 	},
 };
 </script>

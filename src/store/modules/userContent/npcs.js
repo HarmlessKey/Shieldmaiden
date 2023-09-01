@@ -167,9 +167,10 @@ const npc_actions = {
 			}
 			try {
 				const search_npc = convert_npc(npc);
-				const id = await services.addNpc(uid, npc, search_npc);
+				const [new_npc, id] = await services.addNpc(uid, npc, search_npc);
+				console.log("store add npc", new_npc);
 				commit("SET_NPC", { id, search_npc });
-				commit("SET_CACHED_NPC", { uid, id, npc });
+				commit("SET_CACHED_NPC", { uid, id, new_npc });
 
 				const new_count = await services.updateNpcCount(uid, 1);
 				commit("SET_NPC_COUNT", new_count);

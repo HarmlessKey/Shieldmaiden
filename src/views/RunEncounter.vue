@@ -14,6 +14,7 @@
 			v-shortkey="{
 				left: [','],
 				right: ['.'],
+				clearSnotify: ['esc'],
 			}"
 			@shortkey="cyclePanes"
 		>
@@ -454,13 +455,19 @@ export default {
 			const key = e.srcKey;
 			const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;
 			let index;
-			if (key === "right") {
-				index = current < this.panes.length - 1 ? current + 1 : 0;
+
+			// Clear notifications
+			if (key === "clearSnotify") {
+				this.$snotify.clear();
 			} else {
-				index = current > 0 ? current - 1 : this.panes.length - 1;
+				if (key === "right") {
+					index = current < this.panes.length - 1 ? current + 1 : 0;
+				} else {
+					index = current > 0 ? current - 1 : this.panes.length - 1;
+				}
+				const name = this.panes[index];
+				this.focusPane(name);
 			}
-			const name = this.panes[index];
-			this.focusPane(name);
 		},
 	},
 };

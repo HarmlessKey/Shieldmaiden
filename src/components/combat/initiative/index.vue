@@ -1,43 +1,50 @@
 <template>
-	<div 
+	<div
 		v-if="width > 576"
-		id="container" 
+		id="container"
 		v-shortkey="{
 			left: [','],
 			right: ['.'],
 		}"
 		@shortkey="cyclePanes"
 	>
-		<Turns 
-			:next="_active[0]"
-		/>
-		<div 
+		<Turns :next="_active[0]" />
+		<div
 			ref="players"
 			tabindex="0"
 			class="pane players"
 			:class="{ focused: focused_pane === 'players' }"
 			@focus="focusPane('players')"
 		>
-			<h2 
-				class="componentHeader" :class="{ shadow : setShadowPlayer > 0 }">
+			<h2 class="componentHeader" :class="{ shadow: setShadowPlayer > 0 }">
 				<span><i aria-hidden="true" class="fas fa-helmet-battle"></i> Players</span>
 			</h2>
-			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
-				<Players :players="_players" />
+			<q-scroll-area
+				:dark="$store.getters.theme === 'dark'"
+				:thumb-style="{ width: '5px' }"
+				v-on:scroll="shadow()"
+				ref="scrollPlayer"
+			>
+				<Players :players="_players" class="p-3" />
 			</q-scroll-area>
 		</div>
-		<div 
+		<div
 			ref="npcs"
 			tabindex="0"
 			class="pane npcs"
 			:class="{ focused: focused_pane === 'npcs' }"
 			@focus="focusPane('npcs')"
 		>
-			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
+			<h2 class="componentHeader" :class="{ shadow: setShadowNPC > 0 }">
 				<span><i aria-hidden="true" class="fas fa-dragon"></i> NPC's</span>
 			</h2>
-			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
-				<NPCs :npcs="_npcs" />	
+			<q-scroll-area
+				:dark="$store.getters.theme === 'dark'"
+				:thumb-style="{ width: '5px' }"
+				v-on:scroll="shadow()"
+				ref="scrollNPC"
+			>
+				<NPCs :npcs="_npcs" class="p-3" />
 			</q-scroll-area>
 		</div>
 		<div
@@ -47,11 +54,16 @@
 			:class="{ focused: focused_pane === 'overview' }"
 			@focus="focusPane('overview')"
 		>
-			<h2 class="componentHeader" :class="{ shadow : setShadowOverview > 0 }">
+			<h2 class="componentHeader" :class="{ shadow: setShadowOverview > 0 }">
 				<span>Active entities</span>
 			</h2>
-			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollOverview">
-				<Overview :active="_active" :idle="_idle" />
+			<q-scroll-area
+				:dark="$store.getters.theme === 'dark'"
+				:thumb-style="{ width: '5px' }"
+				v-on:scroll="shadow()"
+				ref="scrollOverview"
+			>
+				<Overview :active="_active" :idle="_idle" class="p-3" />
 			</q-scroll-area>
 		</div>
 	</div>
@@ -59,20 +71,34 @@
 	<!-- MOBILE -->
 	<div v-else class="mobile-init">
 		<Turns />
-		
+
 		<div class="menu bg-neutral-8">
 			<q-select
-				:dark="$store.getters.theme === 'dark'" filled square
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
 				v-model="panel"
 				:options="panels"
 			>
 				<template v-slot:selected>
 					<q-item>
 						<q-item-section avatar>
-							<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
+							<q-icon
+								:name="
+									panels.filter((item) => {
+										return item.value === panel;
+									})[0].icon
+								"
+							/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="panels.filter( item => { return item.value === panel })[0].label"/>
+							<q-item-label
+								v-text="
+									panels.filter((item) => {
+										return item.value === panel;
+									})[0].label
+								"
+							/>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -85,162 +111,146 @@
 						@click="panel = scope.opt.value"
 					>
 						<q-item-section avatar>
-							<q-icon :name="scope.opt.icon"/>
+							<q-icon :name="scope.opt.icon" />
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="scope.opt.label"/>
+							<q-item-label v-text="scope.opt.label" />
 						</q-item-section>
 					</q-item>
 				</template>
 			</q-select>
 		</div>
 
-		<q-tab-panels
-      v-model="panel"
-      animated
-      swipeable
-      infinite
-      class="bg-neutral-6-transparent"
-    >
-      <q-tab-panel name="players">
+		<q-tab-panels v-model="panel" animated swipeable infinite class="bg-neutral-6-transparent">
+			<q-tab-panel name="players">
 				<h2>Players</h2>
-        <Players :players="_players" />
-      </q-tab-panel>
-      <q-tab-panel name="npcs">
+				<Players :players="_players" />
+			</q-tab-panel>
+			<q-tab-panel name="npcs">
 				<h2>NPC's</h2>
-        <NPCs :npcs="_npcs" />
-      </q-tab-panel>
-      <q-tab-panel name="overview">
-				<a class="btn btn-block mb-3" @click="set_turn({turn: 0, round: 1})">
-					Start encounter
-				</a>
-        <Overview :active="_active" :idle="_idle" />
-      </q-tab-panel>
+				<NPCs :npcs="_npcs" />
+			</q-tab-panel>
+			<q-tab-panel name="overview">
+				<a class="btn btn-block mb-3" @click="set_turn({ turn: 0, round: 1 })"> Start encounter </a>
+				<Overview :active="_active" :idle="_idle" />
+			</q-tab-panel>
 		</q-tab-panels>
 	</div>
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { mapActions, mapGetters } from 'vuex';
+import _ from "lodash";
+import { mapActions, mapGetters } from "vuex";
 
-	import Turns from 'src/components/combat/Turns.vue';
-	import Players from './Players.vue';
-	import NPCs from './NPCs.vue';
-	import Overview from './Overview.vue';
+import Turns from "src/components/combat/Turns.vue";
+import Players from "./Players.vue";
+import NPCs from "./NPCs.vue";
+import Overview from "./Overview.vue";
 
-	export default {
-		name: 'SetInitiative',
-		props: ['_active', '_idle', 'width'],
-		components: {
-			Turns,
-			Players,
-			NPCs,
-			Overview
+export default {
+	name: "SetInitiative",
+	props: ["_active", "_idle", "width"],
+	components: {
+		Turns,
+		Players,
+		NPCs,
+		Overview,
+	},
+	data() {
+		return {
+			demo: this.$route.name === "Demo",
+			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+			setShadowPlayer: 0,
+			setShadowNPC: 0,
+			setShadowOverview: 0,
+			panes: ["players", "npcs", "overview"],
+			focused_pane: "players",
+			panel: "players",
+			panels: [
+				{
+					label: "Players initiative",
+					value: "players",
+					icon: "fas fa-helmet-battle",
+				},
+				{
+					label: "NPC's initiative",
+					value: "npcs",
+					icon: "fas fa-dragon",
+				},
+				{
+					label: "Overview",
+					value: "overview",
+					icon: "fas fa-list-ul",
+				},
+			],
+		};
+	},
+	computed: {
+		...mapGetters(["campaignId", "encounterId", "encounter", "entities", "path"]),
+		_players: function () {
+			return _.chain(this.entities)
+				.filter(function (entity, key) {
+					entity.key = key;
+					return entity.entityType == "player" || entity.entityType == "companion";
+				})
+				.sortBy("name", "desc")
+				.value();
 		},
-		data () {
-			return {
-				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
-				setShadowPlayer: 0,
-				setShadowNPC: 0,
-				setShadowOverview: 0,
-				panes: ["players", "npcs", "overview"],
-				focused_pane: "players",
-				panel: "players",
-				panels: [
-					{
-						label: "Players initiative",
-						value: "players",
-						icon: "fas fa-helmet-battle"
-					},
-					{
-						label: "NPC's initiative",
-						value: "npcs",
-						icon: "fas fa-dragon"
-					},
-					{
-						label: "Overview",
-						value: "overview",
-						icon: "fas fa-list-ul"
-					}
-				]
+		_npcs: function () {
+			return _.chain(this.entities)
+				.filter(function (entity, key) {
+					entity.key = key;
+					return entity.entityType == "npc";
+				})
+				.sortBy("name", "desc")
+				.value();
+		},
+	},
+	methods: {
+		...mapActions(["set_turn"]),
+		cyclePanes(e) {
+			const key = e.srcKey;
+			const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;
+			let index;
+			if (key === "right") {
+				index = current < this.panes.length - 1 ? current + 1 : 0;
+			} else {
+				index = current > 0 ? current - 1 : this.panes.length - 1;
+			}
+			const name = this.panes[index];
+			this.focusPane(name);
+		},
+		focusPane(name) {
+			const pane = this.$refs?.[name];
+			this.focused_pane = name;
+
+			switch (name) {
+				case "npcs":
+					pane.getElementsByClassName("roll-all")?.[0]?.focus();
+					break;
+				case "overview":
+					pane.getElementsByClassName("entity")?.[0]?.focus();
+					break;
+				default:
+					pane.focus();
 			}
 		},
-		computed: {
-			...mapGetters([
-				'campaignId',
-				'encounterId',
-				'encounter',
-				'entities',
-				'path',
-			]),
-			_players: function() {
-				return _.chain(this.entities)
-					.filter(function(entity, key) {
-						entity.key = key
-						return entity.entityType == 'player' || entity.entityType == 'companion';
-					})
-					.sortBy('name' , 'desc')
-					.value()
-			},
-			_npcs: function() {
-				return _.chain(this.entities)
-					.filter(function(entity, key) {
-						entity.key = key
-						return entity.entityType == 'npc';
-					})
-					.sortBy('name' , 'desc')
-					.value()
-			},
+		shadow() {
+			this.setShadowPlayer = this.$refs.scrollPlayer.scrollPosition;
+			this.setShadowNPC = this.$refs.scrollNPC.scrollPosition;
+			this.setShadowOverview = this.$refs.scrollOverview.scrollPosition;
 		},
-		methods: {
-			...mapActions([
-				'set_turn'
-			]),
-			cyclePanes(e) {
-				const key = e.srcKey;
-				const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;
-				let index;
-				if (key === "right") {
-					index = current < this.panes.length - 1 ? current + 1 : 0;
-				} else {
-					index = current > 0 ? current - 1 : this.panes.length - 1;
-				}
-				const name = this.panes[index];
-				this.focusPane(name);
-			},
-			focusPane(name) {
-				const pane = this.$refs?.[name];
-				this.focused_pane = name;
-
-				switch (name) {
-					case "npcs":
-						pane.getElementsByClassName("roll-all")?.[0]?.focus();
-						break;
-					case "overview":
-						pane.getElementsByClassName("entity")?.[0]?.focus();
-						break;
-					default:
-						pane.focus();
-				}
-			},
-			shadow() {
-				this.setShadowPlayer = this.$refs.scrollPlayer.scrollPosition;
-				this.setShadowNPC = this.$refs.scrollNPC.scrollPosition;
-				this.setShadowOverview = this.$refs.scrollOverview.scrollPosition;
-			},
-			switchTab(direction) {
-				if(this.panel === "players") {
-					this.panel = (direction === "next") ? "npcs" : "players";
-				} else if(this.panel === "npcs") {
-					this.panel = (direction === "next") ? "overview" : "players";
-				} else if(this.panel === "overview") {
-					this.panel = (direction === "previous") ? "npcs" : "overview";
-				}
+		switchTab(direction) {
+			if (this.panel === "players") {
+				this.panel = direction === "next" ? "npcs" : "players";
+			} else if (this.panel === "npcs") {
+				this.panel = direction === "next" ? "overview" : "players";
+			} else if (this.panel === "overview") {
+				this.panel = direction === "previous" ? "npcs" : "overview";
 			}
-		}
-	}
+		},
+	},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -252,16 +262,15 @@
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 60px auto;
 	grid-gap: 5px;
-	grid-template-areas: 
-	"turns turns turns"
-	"players npcs set";
+	grid-template-areas:
+		"turns turns turns"
+		"players npcs set";
 	position: absolute;
 
 	.q-scrollarea {
-		padding:15px;
 		height: calc(100% - 45px);
 	}
-	
+
 	h2 {
 		padding-left: 10px;
 
@@ -271,7 +280,7 @@
 			background-color: $neutral-8-transparent;
 
 			&.shadow {
-				box-shadow: 0 0 10px rgba(0,0,0,0.9); 
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
 			}
 		}
 	}
@@ -296,7 +305,7 @@
 	}
 }
 .initiative-move {
-  transition: transform .5s;
+	transition: transform 0.5s;
 }
 @media only screen and (max-width: 900px) {
 	#container {
@@ -304,10 +313,10 @@
 		grid-template-rows: 60px 1fr 1fr 1fr;
 		grid-gap: 10px;
 		grid-template-areas:
-		"turns"
-		"players"
-		"npcs"
-		"set";
+			"turns"
+			"players"
+			"npcs"
+			"set";
 	}
 }
 

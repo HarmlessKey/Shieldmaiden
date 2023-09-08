@@ -30,6 +30,7 @@
 						class="manual-input"
 						@keypress="submitManual($event, !invalid)"
 						autocomplete="off"
+						:autofocus="autofocus"
 						:error="invalid && validated"
 						:error-message="errors[0]"
 					/>
@@ -114,7 +115,7 @@ import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 export default {
 	name: "Manual",
 	mixins: [setHP],
-	props: ["current"],
+	props: ["current", "autofocus"],
 	data() {
 		return {
 			damage_types: damage_types,

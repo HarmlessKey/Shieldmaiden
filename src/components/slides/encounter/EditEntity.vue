@@ -460,8 +460,7 @@ export default {
 		},
 		isActive(key, option) {
 			if (this.entity_settings && this.entity_settings[key] !== undefined) {
-				if (this.entity_settings[key] == option.value) return true;
-				else return false;
+				return this.entity_settings[key] == option.value;
 			} else if (
 				this.npcSettings &&
 				this.npcSettings[key] === undefined &&

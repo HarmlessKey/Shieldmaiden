@@ -9,7 +9,7 @@
 		<hk-card>
 			<div slot="header" class="card-header">
 				<div class="truncate">{{ roll.name }}</div>
-				<button class="btn btn-sm btn-clear" @click="removeRoll(index)">
+				<button class="btn btn-sm btn-clear" tabindex="-1" @click="removeRoll(index)">
 					<i aria-hidden="true" class="fas fa-times" />
 				</button>
 			</div>
@@ -117,6 +117,8 @@
 								{ label: 'Hit', value: 'hit' },
 								{ label: 'Miss', value: 'miss' },
 							]"
+							@keydown.enter="shortkeyApply"
+							@keydown.backspace="removeRoll(index)"
 						/>
 					</template>
 
@@ -151,6 +153,8 @@
 								{ label: 'Fail', value: 'fail' },
 								{ label: 'Save', value: 'save' },
 							]"
+							@keydown.enter="shortkeyApply"
+							@keydown.backspace="removeRoll(index)"
 						/>
 					</template>
 
@@ -347,10 +351,10 @@
 						>
 							<div>
 								<span class="mr-2">Total {{ dmg_type }}</span>
-								<i 
+								<i
 									aria-hidden="true"
 									class="fas fa-pencil-alt neutral-3"
-									style="font-size: 14px;"
+									style="font-size: 14px"
 									tabindex="0"
 									@focus="toggleOverride(dmg_type)"
 								>
@@ -431,12 +435,7 @@
 					no-caps
 					@click="apply(2)"
 				/>
-				<q-btn
-					color="neutral-9"
-					class="full-width neutral-1"
-					no-caps
-					@click="removeRoll(index)"
-				>
+				<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
 					<i aria-hidden="true" class="fas fa-times" />
 				</q-btn>
 			</div>

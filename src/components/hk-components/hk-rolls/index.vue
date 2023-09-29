@@ -15,6 +15,7 @@
 				icon="fas fa-times"
 				no-caps
 				v-shortkey="['esc']"
+				tabindex="-1"
 				@shortkey="clearRolls"
 				@click="clearRolls"
 			>
@@ -52,8 +53,8 @@ export default {
 			handler() {
 				this.$refs?.rolls?.[0]?.$el.focus();
 			},
-			deep: true
-		}
+			deep: true,
+		},
 	},
 	methods: {
 		clearRolls() {
@@ -70,7 +71,7 @@ export default {
 		 */
 		removeEl(index) {
 			this.$delete(this.$refs?.rolls, index);
-		}
+		},
 	},
 };
 </script>

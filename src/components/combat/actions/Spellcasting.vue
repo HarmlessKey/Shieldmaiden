@@ -1,5 +1,5 @@
 <template>
-	<div v-if="entity">
+	<div v-if="entity" tabindex="-1">
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"

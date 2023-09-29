@@ -124,6 +124,7 @@
 									<q-item-section avatar v-if="tab === 'caster'">
 										<hk-roll-action
 											v-if="spell.actions && spell.actions.length"
+											:ref="`${level}-${spell.key}`"
 											:action="spell"
 											:tooltip="`Roll ${spell.name}`"
 											type="spell"
@@ -300,7 +301,9 @@ export default {
 		...mapActions("api_spells", ["fetch_api_spell"]),
 		...mapActions("spells", ["get_spell"]),
 		focusButton(level, key) {
+			console.log(level, key);
 			const button = this.$refs[`${level}-${key}`]?.[0]?.$el;
+			console.log(this.$refs[`${level}-${key}`]);
 			button?.focus();
 		},
 		async fetchSpells() {
@@ -355,7 +358,6 @@ export default {
 			this.$forceUpdate();
 		},
 		useSpellSlot(index, category, regain = false) {
-			console.log(index);
 			this.set_limitedUses({
 				key: this.entity.key,
 				index,

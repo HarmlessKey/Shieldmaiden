@@ -62,7 +62,7 @@
 										@click="
 											reminder.variables
 												? showVariableOptions(key)
-												: addReminder('premade', reminder)
+												: addReminder('premade', reminder, null, key)
 										"
 										:class="{ open: varOptions === key }"
 									>
@@ -176,11 +176,12 @@ export default {
 	methods: {
 		...mapActions(["set_targetReminder"]),
 		...mapActions("reminders", ["get_full_reminders"]),
-		async addReminder(type, reminder = false, selectedVars = undefined) {
+		async addReminder(type, reminder = false, selectedVars = undefined, key = undefined) {
 			if (type === "premade") {
 				for (const target of this.reminder_targets) {
-					let key = reminder[".key"] || reminder.key;
+					key = key || reminder[".key"] || reminder.key;
 					delete reminder[".key"];
+					delete reminder.key;
 
 					if (selectedVars) {
 						reminder.selectedVars = selectedVars;
@@ -268,12 +269,6 @@ ul.premade {
 			button.add {
 				i {
 					transition: transform 0.2s linear;
-				}
-
-				&.open {
-					i {
-						transform: rotate(180deg);
-					}
 				}
 			}
 		}

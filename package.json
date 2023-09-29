@@ -1,5 +1,5 @@
 {
-	"version": "2.18.1",
+	"version": "2.18.2",
 	"name": "harmless_key",
 	"description": "A Dungeons and Dragons Combat Tracker",
 	"productName": "Harmless Key",
@@ -81,7 +81,7 @@
 		"last 5 Opera versions"
 	],
 	"engines": {
-		"node": ">= 12.0.0",
+		"node": ">= 16.0.0",
 		"npm": ">= 6.13.4",
 		"yarn": ">= 1.21.1"
 	}

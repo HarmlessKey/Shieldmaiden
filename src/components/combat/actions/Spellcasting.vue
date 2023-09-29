@@ -301,9 +301,7 @@ export default {
 		...mapActions("api_spells", ["fetch_api_spell"]),
 		...mapActions("spells", ["get_spell"]),
 		focusButton(level, key) {
-			console.log(level, key);
 			const button = this.$refs[`${level}-${key}`]?.[0]?.$el;
-			console.log(this.$refs[`${level}-${key}`]);
 			button?.focus();
 		},
 		async fetchSpells() {

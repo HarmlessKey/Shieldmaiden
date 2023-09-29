@@ -3,9 +3,9 @@
 		<h2>
 			Transform <span class="blue">{{ entity.name }}</span>
 		</h2>
-		<a v-if="entity.transformed" @click="remove()" class="btn btn-block bg-red"
-			>Remove transformation</a
-		>
+		<button v-if="entity.transformed" @click="remove()" autofocus class="btn btn-block bg-red">
+			Remove transformation
+		</button>
 		<ValidationObserver v-else v-slot="{ handleSubmit }">
 			<q-form @submit="handleSubmit(edit)">
 				<div class="row q-col-gutter-md">
@@ -21,6 +21,7 @@
 								filled
 								label="Armor class"
 								autocomplete="off"
+								autofocus
 								type="number"
 								class="mb-2"
 								v-model="transAc"

@@ -29,7 +29,7 @@
 			<div v-if="slide.show == true" class="slide">
 				<a @click="hideSlide()" v-shortkey="['esc']" @shortkey="hideSlide()" class="hide">
 					<i aria-hidden="true" class="far fa-chevron-double-right" />
-					<span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
+					<hk-show-keybind class="neutral-2 ml-2 d-none d-sm-inline" :binds="['esc']" />
 					<q-tooltip anchor="bottom middle" self="center middle"> Hide [esc] </q-tooltip>
 				</a>
 				<div class="content" :class="slide.classes">
@@ -241,7 +241,7 @@ export default {
 			slide: "getSlide",
 			storeBroadcast: "broadcast",
 		}),
-		...mapGetters(["initialized", "theme", "user"]),
+		...mapGetters(["initialized", "theme", "user", "action_rolls"]),
 		announcement: {
 			get() {
 				const announcement = this.user && !this.announcement_cookie ? true : false;

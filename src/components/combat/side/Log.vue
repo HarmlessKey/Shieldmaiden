@@ -92,7 +92,7 @@
 							@shortkey="undo(key, item.amount, item.over, item.target, item.by, item.type)"
 						>
 							Undo
-							<template v-if="!showKeybinds"> [ctrl] + [z]</template>
+							<hk-show-keybind :binds="['ctrl', 'z']" />
 						</a>
 					</div>
 				</li>
@@ -125,11 +125,7 @@
 				'encounter',
 				'log',
 				'entities',
-				'userSettings',
 			]),
-			showKeybinds() {
-				return (this.userSettings && this.userSettings.general) ? this.userSettings.general.keyBinds : undefined;
-			},
 		},
 		methods: {
 			setLog() {

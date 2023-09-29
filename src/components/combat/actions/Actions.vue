@@ -7,8 +7,13 @@
 				:dark="$store.getters.theme === 'dark'"
 				filled
 				square
-				:value="doneBy"
+				v-model="doneBy"
 				:options="_active"
+				option-value="key"
+				map-options
+				emit-value
+				autofocus
+				options-selected-class="blue"
 			>
 				<template v-slot:selected>
 					<q-item v-if="doneBy" class="selected">
@@ -41,13 +46,7 @@
 					<span v-else> Who performs the action? </span>
 				</template>
 				<template v-slot:option="scope">
-					<q-item
-						clickable
-						v-ripple
-						v-close-popup
-						:active="doneBy === scope.opt.key"
-						@click="doneBy = scope.opt.key"
-					>
+					<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
 						<q-item-section avatar>
 							<span
 								class="img"
@@ -67,14 +66,16 @@
 							</span>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="scope.opt.name.capitalizeEach()" />
+							<q-item-label v-text="scope.opt.name?.capitalizeEach()" />
 						</q-item-section>
 					</q-item>
 				</template>
 			</q-select>
 
 			<div
-				v-if="doneBy && entitiesList[doneBy].reminders && entitiesList[doneBy].reminders.reaction"
+				v-if="
+					doneBy && entitiesList[doneBy]?.reminders && entitiesList[doneBy]?.reminders?.reaction
+				"
 				class="reaction-used bg-red px-1 py-2 white mb-2 d-flex justify-between"
 			>
 				<span>Reaction used</span>
@@ -105,25 +106,31 @@
 				inline-label
 				outside-arrows
 				mobile-arrows
-				dense
 				no-caps
-				class="bg-neutral-3 neutral-10"
+				dense
+				indicator-color="neutral-1"
+				class="modes"
 			>
 				<q-tab
 					v-for="({ name, icon, label }, index) in tabs"
 					:key="`tab-${index}`"
 					:name="name"
 					:icon="icon"
-					:label="width > 300 ? label : null"
+					class="bg-neutral-3 neutral-10"
 				>
-					<q-tooltip v-if="width <= 300" anchor="top middle" self="center middle">
+					<q-tooltip anchor="top middle" self="center middle">
 						{{ label }}
 					</q-tooltip>
 				</q-tab>
 			</q-tabs>
 			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel :name="name" v-for="{ name } in tabs" :key="`panel-${name}`">
-					<Custom v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
+					<Custom
+						v-if="name === 'manual'"
+						:current="entitiesList[doneBy]"
+						:targeted="targeted"
+						:autofocus="selectEntity"
+					/>
 					<template v-if="name === 'roll'">
 						<Roll :current="entitiesList[doneBy]" />
 					</template>
@@ -275,6 +282,27 @@ export default {
 				padding: 0;
 				min-height: 35px !important;
 				line-height: 35px !important;
+			}
+		}
+	}
+}
+
+.modes {
+	&::v-deep {
+		.q-tabs {
+			&__content {
+				padding: 10px;
+				margin: -10px;
+				gap: 0.5rem;
+
+				.q-tab {
+					border: solid 1px transparent;
+					border-radius: $border-radius;
+
+					&:focus {
+						outline: $outline;
+					}
+				}
 			}
 		}
 	}

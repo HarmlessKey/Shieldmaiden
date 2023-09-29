@@ -1,5 +1,5 @@
 <template>
-	<div v-if="entity">
+	<div v-if="entity" tabindex="-1">
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"
@@ -111,6 +111,7 @@
 								@show="showSpell = `${level}-${spell.key}`"
 								:group="tab"
 								:name="name"
+								@focus="focusButton(level, spell.key)"
 							>
 								<template v-slot:header>
 									<q-item-section
@@ -123,6 +124,7 @@
 									<q-item-section avatar v-if="tab === 'caster'">
 										<hk-roll-action
 											v-if="spell.actions && spell.actions.length"
+											:ref="`${level}-${spell.key}`"
 											:action="spell"
 											:tooltip="`Roll ${spell.name}`"
 											type="spell"
@@ -177,6 +179,7 @@
 										</span>
 										<hk-roll-action
 											v-if="spell.actions && spell.actions.length"
+											:ref="`${level}-${spell.key}`"
 											:action="spell"
 											:tooltip="`Roll ${spell.name}`"
 											type="spell"
@@ -297,6 +300,10 @@ export default {
 		...mapActions(["set_limitedUses"]),
 		...mapActions("api_spells", ["fetch_api_spell"]),
 		...mapActions("spells", ["get_spell"]),
+		focusButton(level, key) {
+			const button = this.$refs[`${level}-${key}`]?.[0]?.$el;
+			button?.focus();
+		},
 		async fetchSpells() {
 			const spells = {};
 
@@ -349,7 +356,6 @@ export default {
 			this.$forceUpdate();
 		},
 		useSpellSlot(index, category, regain = false) {
-			console.log(index);
 			this.set_limitedUses({
 				key: this.entity.key,
 				index,
@@ -493,10 +499,21 @@ export default {
 		vertical-align: -5px;
 		user-select: none;
 	}
-	.advantage .roll-button:hover {
+	.hk-roll {
+		padding: 10px;
+		margin: -10px;
+		border-radius: 50%;
+
+		&:focus {
+			background: $neutral-5;
+		}
+	}
+	.advantage .roll-button:hover,
+	.advantage.hk-roll:focus .roll-button {
 		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-green.svg");
 	}
-	.disadvantage .roll-button:hover {
+	.disadvantage .roll-button:hover,
+	.disadvantage.hk-roll:focus .roll-button {
 		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-red.svg");
 	}
 }

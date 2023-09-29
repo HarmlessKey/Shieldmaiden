@@ -1,43 +1,42 @@
 <template>
-	<span>
-		<span
-			class="hk-roll"
-			:class="
-				disabled ? 'disabled' : Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : ''
-			"
-			@mousemove="checkAdvantage($event)"
-			@mouseout="clearAdvantage()"
-			v-touch-hold.mouse="!disabled ? showDialog : null"
-			@click.stop="disabled ? null : roll ? rollDice($event) : emit($event)"
+	<button
+		class="hk-roll"
+		tabindex="-1"
+		:class="
+			disabled ? 'disabled' : Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : ''
+		"
+		@mousemove="checkAdvantage($event)"
+		@mouseout="clearAdvantage()"
+		v-touch-hold.mouse="!disabled ? showDialog : null"
+		@click.stop="disabled ? null : roll ? rollDice($event) : emit($event)"
+	>
+		<slot name="default" />
+		<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">
+			{{ tooltip }}
+			{{ Object.keys(advantage).length === 1 ? `with ${Object.keys(advantage)[0]}` : `` }}
+		</q-tooltip>
+		<q-popup-proxy
+			:dark="$store.getters.theme === 'dark'"
+			no-parent-event
+			ref="rollPopup"
+			:breakpoint="576"
 		>
-			<slot name="default" />
-			<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">
-				{{ tooltip }}
-				{{ Object.keys(advantage).length === 1 ? `with ${Object.keys(advantage)[0]}` : `` }}
-			</q-tooltip>
-			<q-popup-proxy
-				:dark="$store.getters.theme === 'dark'"
-				no-parent-event
-				ref="rollPopup"
-				:breakpoint="576"
-			>
-				<q-list class="bg-neutral-8" :dark="$store.getters.theme === 'dark'">
-					<q-item>
-						<q-item-section>
-							<b>{{ roll ? roll.title : tooltip }}</b>
-						</q-item-section>
-					</q-item>
-					<q-separator />
-					<q-item clickable v-close-popup @click.prevent="rollDice($event, 'advantage')">
-						<q-item-section class="green">Advantage</q-item-section>
-					</q-item>
-					<q-item clickable v-close-popup @click.prevent="rollDice($event, 'disadvantage')">
-						<q-item-section class="red">Disadvantage</q-item-section>
-					</q-item>
-				</q-list>
-			</q-popup-proxy>
-		</span>
-	</span>
+			<q-list class="bg-neutral-8" :dark="$store.getters.theme === 'dark'">
+				<q-item>
+					<q-item-section>
+						<b>{{ roll ? roll.title : tooltip }}</b>
+					</q-item-section>
+				</q-item>
+				<q-separator />
+				<q-item clickable v-close-popup @click.prevent="rollDice($event, 'advantage')">
+					<q-item-section class="green">Advantage</q-item-section>
+				</q-item>
+				<q-item clickable v-close-popup @click.prevent="rollDice($event, 'disadvantage')">
+					<q-item-section class="red">Disadvantage</q-item-section>
+				</q-item>
+			</q-list>
+		</q-popup-proxy>
+	</button>
 </template>
 
 <script>
@@ -174,3 +173,15 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.hk-roll {
+	background: none;
+	border: none;
+	padding: 0;
+
+	&:focus {
+		outline: none;
+	}
+}
+</style>

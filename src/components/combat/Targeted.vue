@@ -1,104 +1,40 @@
 <template>
-	<div id="targeted" class="bg-neutral-6-transparent">
+	<div id="targeted" class="bg-neutral-6-transparent" @focus="$emit('focus')">
 		<h2 class="componentHeader" :class="{ shadow: setShadow > 0 }">
 			<div class="d-flex justify-content-between">
 				<span><i aria-hidden="true" class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted.length > 0" @click="set_targeted({ type: 'untarget', key: 'all' })">
+				<button
+					v-if="targeted.length > 0"
+					@click="set_targeted({ type: 'untarget', key: 'all' })"
+					class="btn btn-clear"
+				>
 					<i aria-hidden="true" class="fas fa-times red"></i>
-					<q-tooltip anchor="top middle" self="center middle"> Untarget all </q-tooltip>
-				</a>
+					<q-tooltip anchor="top middle" self="center middle">Untarget all</q-tooltip>
+				</button>
 			</div>
 
 			<!-- SINGLE TARGET OPTIONS -->
-			<div class="options d-flex justify-content-between" v-if="target">
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/DamageHealing' })"
-					v-shortkey="['d']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/DamageHealing' })"
+			<div
+				v-if="targeted.length"
+				class="options d-flex justify-content-between gap-1"
+				tabindex="0"
+				@focus="focusOptions"
+			>
+				<button
+					v-for="({ key, method, icon, tooltip }, i) in display_options"
+					ref="options"
+					tabindex="-1"
+					class="option"
+					:key="`option-${i}`"
+					v-shortkey="key"
+					@click="method"
+					@shortkey="method"
+					@keydown.left="cycleOptions(i, 'left')"
+					@keydown.right="cycleOptions(i, 'right')"
 				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-swords"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [d] Do damage / healing </q-tooltip>
-				</a>
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/Conditions' })"
-					v-shortkey="['c']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/Conditions' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-flame"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [c] Conditions </q-tooltip>
-				</a>
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/reminders/TargetReminders' })"
-					v-shortkey="['m']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/reminders/TargetReminders' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-stopwatch"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [m] Reminders </q-tooltip>
-				</a>
-				<a
-					@click="setSlide({ show: true, type: 'slides/Transform', data: target })"
-					v-shortkey="['t']"
-					@shortkey="setSlide({ show: true, type: 'slides/Transform', data: target })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-paw-claws"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [t] Transform </q-tooltip>
-				</a>
-
-				<a @click="setHidden()" v-shortkey="['h']" @shortkey="setHidden()">
-					<span class="icon"><i aria-hidden="true" class="fas fa-eye"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [h] Hide </q-tooltip>
-				</a>
-
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/EditEntity' })"
-					v-shortkey="['e']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/EditEntity' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-pencil"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [e] Edit </q-tooltip>
-				</a>
-			</div>
-
-			<!-- MULTITARGET OPTIONS -->
-			<div class="options d-flex justify-content-between" v-else-if="targeted.length > 0">
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/DamageHealing' })"
-					v-shortkey="['d']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/DamageHealing' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-swords"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [d] Do damage / healing </q-tooltip>
-				</a>
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/Conditions' })"
-					v-shortkey="['c']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/Conditions' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-flame"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [c] Conditions </q-tooltip>
-				</a>
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/reminders/TargetReminders' })"
-					v-shortkey="['m']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/reminders/TargetReminders' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-stopwatch"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [m] Reminders </q-tooltip>
-				</a>
-
-				<a @click="setHidden()" v-shortkey="['h']" @shortkey="setHidden()">
-					<span class="icon"><i aria-hidden="true" class="fas fa-eye"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [h] Hide </q-tooltip>
-				</a>
-
-				<a
-					@click="setSlide({ show: true, type: 'slides/encounter/EditEntity' })"
-					v-shortkey="['e']"
-					@shortkey="setSlide({ show: true, type: 'slides/encounter/EditEntity' })"
-				>
-					<span class="icon"><i aria-hidden="true" class="fas fa-pencil"></i></span>
-					<q-tooltip anchor="top middle" self="center middle"> [e] Edit </q-tooltip>
-				</a>
+					<i aria-hidden="true" class="fas" :class="icon" />
+					<q-tooltip anchor="top middle" self="center middle">{{ tooltip }}</q-tooltip>
+				</button>
 			</div>
 		</h2>
 		<q-scroll-area
@@ -223,6 +159,51 @@ export default {
 		return {
 			setShadow: 0,
 			abilities: abilities,
+			options: [
+				{
+					option: "damage",
+					method: () => this.setSlide({ show: true, type: "slides/encounter/DamageHealing" }),
+					key: ["shift", "d"],
+					icon: "fa-swords",
+					tooltip: "[shift]+[d] Out of turn damage/healing",
+				},
+				{
+					option: "conditions",
+					method: () => this.setSlide({ show: true, type: "slides/encounter/Conditions" }),
+					key: ["c"],
+					icon: "fa-flame",
+					tooltip: "[c] Conditions",
+				},
+				{
+					option: "reminders",
+					method: () =>
+						this.setSlide({ show: true, type: "slides/encounter/reminders/TargetReminders" }),
+					key: ["m"],
+					icon: "fa-stopwatch",
+					tooltip: "[m] Reminders",
+				},
+				{
+					option: "transform",
+					method: () => this.setSlide({ show: true, type: "slides/Transform", data: this.target }),
+					key: ["t"],
+					icon: "fa-paw-claws",
+					tooltip: "[t] Transform",
+				},
+				{
+					option: "hide",
+					method: () => this.setHidden(),
+					key: ["h"],
+					icon: "fa-eye",
+					tooltip: "[h] Hide / Show",
+				},
+				{
+					option: "edit",
+					method: () => this.setSlide({ show: true, type: "slides/encounter/EditEntity" }),
+					key: ["e"],
+					icon: "fa-pencil",
+					tooltip: "[e] Edit",
+				},
+			],
 		};
 	},
 	computed: {
@@ -242,6 +223,13 @@ export default {
 			}
 			return fails;
 		},
+		display_options() {
+			return this.targeted.length > 1
+				? this.options.filter((opt) => {
+						return !["transform"].includes(opt.option);
+				  })
+				: this.options;
+		},
 	},
 	methods: {
 		...mapActions([
@@ -252,6 +240,18 @@ export default {
 			"set_targetReminder",
 			"set_hidden",
 		]),
+		focusOptions() {
+			this.$refs.options[0].focus();
+		},
+		cycleOptions(i, dir) {
+			let select;
+			if (dir === "right") {
+				select = i < this.options.length - 1 ? i + 1 : 0;
+			} else {
+				select = i > 0 ? i - 1 : this.options.length - 1;
+			}
+			this.$refs.options[select].focus();
+		},
 		setHidden() {
 			for (const key of this.targeted) {
 				this.set_hidden({
@@ -381,10 +381,13 @@ export default {
 				.abilityName {
 					margin-bottom: 3px;
 				}
-				.mod {
-					cursor: pointer;
-					line-height: 25px;
-					margin-top: 1px;
+				.hk-roll {
+					width: 100%;
+					.mod {
+						cursor: pointer;
+						line-height: 25px;
+						margin-top: 1px;
+					}
 				}
 				.advantage .mod:hover {
 					color: $neutral-1;
@@ -400,20 +403,19 @@ export default {
 	.options {
 		margin: 20px -3px 0 -3px;
 
-		a {
+		button {
 			background-color: $neutral-3;
-			margin: 0 3px;
-			display: block;
 			width: 100%;
-			text-align: center;
 			color: $neutral-10 !important;
 			line-height: 35px;
 			font-size: 15px;
 			border-radius: $border-radius-small;
+			border: none;
+			cursor: pointer;
 
 			&:hover {
 				background: $neutral-4;
-				color: $neutral-2 !important;
+				color: $neutral-1 !important;
 			}
 		}
 	}

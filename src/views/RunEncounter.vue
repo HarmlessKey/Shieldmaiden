@@ -1,5 +1,5 @@
 <template>
-	<q-no-ssr v-if="!loading && encounter_initialized">
+	<q-no-ssr v-if="!loading && encounter_initialized" v-shortkey="['d']" @shortkey="focusDamage">
 		<div v-if="overencumbered && !demo">
 			<OverEncumbered />
 		</div>
@@ -11,6 +11,12 @@
 					? { background: 'url(\'' + getBackground(encounter) + '\')' }
 					: { background: '' },
 			]"
+			v-shortkey="{
+				left: [','],
+				right: ['.'],
+				clearSnotify: ['esc'],
+			}"
+			@shortkey="cyclePanes"
 		>
 			<template v-if="encounter.finished">
 				<Finished v-if="!demo" :encounter="encounter" />
@@ -37,12 +43,39 @@
 							:next="_active[encounter.turn + 1]"
 							:settings="settings"
 						/>
-						<Current :current="_active[encounter.turn]" :next="next" :settings="settings" />
-						<Targets :_active="_active" :_idle="_idle" />
-						<Targeted />
-						<div id="side_container">
-							<Side />
-						</div>
+						<Current
+							ref="current"
+							tabindex="0"
+							class="pane"
+							:current="_active[encounter.turn]"
+							:next="next"
+							:settings="settings"
+							:class="{ focused: focused_pane === 'current' }"
+							@focus="focusPane('current')"
+						/>
+						<Targets
+							ref="targets"
+							tabindex="0"
+							class="pane"
+							:_active="_active"
+							:_idle="_idle"
+							:class="{ focused: focused_pane === 'targets' }"
+							@focus="focusPane('targets')"
+						/>
+						<Targeted
+							ref="targeted"
+							tabindex="0"
+							class="pane"
+							:class="{ focused: focused_pane === 'targeted' }"
+							@focus="focusPane('targeted')"
+						/>
+						<Side
+							ref="side"
+							tabindex="0"
+							class="pane"
+							:class="{ focused: focused_pane === 'side' }"
+							@focus="focusPane('side')"
+						/>
 					</div>
 				</template>
 
@@ -155,6 +188,8 @@ export default {
 			loading: true,
 			demo_dialog: false,
 			continue_demo: false,
+			panes: ["current", "targets", "targeted", "side"],
+			focused_pane: null,
 		};
 	},
 	beforeMount() {
@@ -323,12 +358,12 @@ export default {
 			},
 		},
 	},
-	beforeRouteLeave(to, from, next) {
+	beforeRouteLeave(_to, _from, next) {
 		this.reset_store();
 		this.setLiveEncounter();
 		next();
 	},
-	beforeRouteUpdate(to, from, next) {
+	beforeRouteUpdate(_to, _from, next) {
 		this.reset_store();
 		this.setLiveEncounter();
 		next();
@@ -348,7 +383,7 @@ export default {
 		},
 		confirmFinish() {
 			this.$snotify.error(
-				"All NPC's seem to be dead. Do you want to finish the encounter?",
+				"All NPCs seem to be dead. Do you want to finish the encounter?",
 				"Finish Encounter",
 				{
 					position: "centerCenter",
@@ -381,6 +416,58 @@ export default {
 			if (encounter.hk_background)
 				return require(`src/assets/_img/atmosphere/${encounter.hk_background}.jpg`);
 			return undefined;
+		},
+		focusDamage() {
+			const pane = this.$refs.current?.$el;
+			this.focused_pane = "current";
+
+			// Focus on the manual input
+			if (pane.querySelector('[name="Manual Input"]')) {
+				pane.querySelector('[name="Manual Input"]')?.focus();
+			}
+			// Focus on the first ability/spell
+			else if (pane.getElementsByClassName("q-item")) {
+				pane.getElementsByClassName("q-item")?.[0]?.focus();
+			} else {
+				pane?.focus();
+			}
+		},
+		focusPane(name) {
+			const pane = this.$refs?.[name]?.$el;
+			this.focused_pane = name;
+
+			switch (name) {
+				case "current":
+				case "side":
+					pane.getElementsByClassName("q-tab")?.[0]?.focus();
+					break;
+				case "targets":
+					pane.getElementsByClassName("target-li")?.[0]?.focus();
+					break;
+				case "targeted":
+					pane.getElementsByClassName("option")?.[0]?.focus();
+					break;
+				default:
+					pane.focus();
+			}
+		},
+		cyclePanes(e) {
+			const key = e.srcKey;
+			const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;
+			let index;
+
+			// Clear notifications
+			if (key === "clearSnotify") {
+				this.$snotify.clear();
+			} else {
+				if (key === "right") {
+					index = current < this.panes.length - 1 ? current + 1 : 0;
+				} else {
+					index = current > 0 ? current - 1 : this.panes.length - 1;
+				}
+				const name = this.panes[index];
+				this.focusPane(name);
+			}
 		},
 	},
 };
@@ -424,9 +511,15 @@ export default {
 			margin-bottom: 15px !important;
 		}
 
-		#side_container {
-			padding-top: 5px;
-			margin-top: -5px;
+		.pane {
+			&.focused,
+			&:focus {
+				outline: $neutral-3 solid 1px;
+				outline-offset: 1px;
+			}
+		}
+
+		.side {
 			grid-area: side;
 			overflow: hidden;
 		}

@@ -1,20 +1,21 @@
 <template>
-	<div id="targets" class="bg-neutral-6-transparent">
+	<div id="targets" class="bg-neutral-6-transparent" @focus="$emit('focus')">
 		<h2 class="componentHeader d-flex justify-content-between" :class="{ shadow: setShadow > 0 }">
 			<span>
 				<i aria-hidden="true" class="fas fa-helmet-battle" /> Targets ({{ _targets.length }})
 			</span>
 			<button
-				@click="test ? null : setSlide({ show: true, type: 'slides/encounter/AddNpc' })"
-				v-shortkey="['a']"
-				@shortkey="test ? null : setSlide({ show: true, type: 'slides/encounter/AddNpc' })"
 				class="btn btn-sm bg-neutral-5"
+				tabindex="-1"
 				:class="{ disabled: test }"
+				v-shortkey="['a']"
+				@click="test ? null : setSlide({ show: true, type: 'slides/encounter/AddNpc' })"
+				@shortkey="test ? null : setSlide({ show: true, type: 'slides/encounter/AddNpc' })"
 			>
 				<i aria-hidden="true" class="fas fa-plus green" />
 				<span class="ml-1">
 					Add
-					<span v-if="!showKeybinds" class="d-none d-sm-inline">[a]</span>
+					<hk-show-keybind class="d-none d-sm-inline" :binds="['a']" />
 				</span>
 				<q-tooltip v-if="test" anchor="top middle" self="center middle"
 					>Unavailable in test mode</q-tooltip
@@ -52,12 +53,14 @@
 					>
 						<li
 							v-for="(entity, i) in targets"
-							class="d-flex justify-content-between"
+							class="d-flex justify-content-between target-li"
 							:key="entity.key"
 							:class="{
 								targeted: targeted.includes(entity.key),
 								top: _active[0].key === entity.key && encounter.turn !== 0,
 							}"
+							tabindex="0"
+							@keydown.space="selectTarget($event, 'single', entity.key)"
 						>
 							<span
 								class="topinfo d-flex justify-content-between"
@@ -215,11 +218,6 @@ export default {
 				.sortBy("name", "desc")
 				.value();
 		},
-		showKeybinds() {
-			return this.userSettings && this.userSettings.general
-				? this.userSettings.general.keyBinds
-				: undefined;
-		},
 	},
 	methods: {
 		...mapActions([
@@ -371,11 +369,15 @@ ul.targets {
 		border-radius: $border-radius-small;
 
 		&.targeted {
-			border-color: $blue !important;
+			outline: $blue solid 3px;
 		}
 		.target-item-wrapper {
 			border-top-right-radius: 0;
 			border-bottom-right-radius: 0;
+		}
+
+		&:focus &:not(&.targeted) {
+			outline: $outline;
 		}
 	}
 	&.active_targets li:first-child {

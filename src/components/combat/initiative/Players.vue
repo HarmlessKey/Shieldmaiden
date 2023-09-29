@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ul v-if="entities" class="entities hasImg">
-			<li v-for="entity in players" :key="entity.key">
+			<li v-for="(entity, index) in players" :key="entity.key">
 				<span 
 					class="img" 
 					:style="{
@@ -30,6 +30,7 @@
 						max="99" 
 						name="playerInit" 
 						placeholder="0"
+						:autofocus="index === 0"
 						@focus="$event.target.select()"
 						@input="set_initiative({key: entity.key, initiative: entity.initiative})" 
 					/>
@@ -67,6 +68,7 @@
 		margin: 0;
 		li {
 			padding-right: 3px;
+			background: $neutral-8;
 			
 			.actions {
 				align-items: center;

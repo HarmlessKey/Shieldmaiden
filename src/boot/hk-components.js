@@ -1,6 +1,7 @@
 import HkTable from "../components/hk-components/hk-table";
 import HkCard from "../components/hk-components/hk-card";
 import HkCardDeck from "../components/hk-components/hk-card-deck";
+import HkShowKeybind from "../components/hk-components/hk-show-keybind";
 import HkRoll from "../components/hk-components/hk-roll";
 import HkRollAction from "../components/hk-components/hk-action-rolls/hk-roll-action";
 import HkAnimatedInteger from "../components/hk-components/hk-animated-integer";
@@ -24,6 +25,7 @@ export default async ({ Vue }) => {
 	Vue.component("hk-table", HkTable);
 	Vue.component("hk-card", HkCard);
 	Vue.component("hk-card-deck", HkCardDeck);
+	Vue.component("hk-show-keybind", HkShowKeybind);
 	Vue.component("hk-animated-integer", HkAnimatedInteger);
 	Vue.component("hk-roll", HkRoll);
 	Vue.component("hk-roll-action", HkRollAction);

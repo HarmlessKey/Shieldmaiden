@@ -1,5 +1,5 @@
 <template>
-	<div class="pb-5" v-if="entities">
+	<div class="full-height" v-if="entities">
 		<h2>Set Reminders</h2>
 		<ul class="targets">
 			<li v-for="(target, i) in reminder_targets" :key="`target=${i}`">
@@ -14,30 +14,39 @@
 				class="mb-2"
 			/>
 
-			<q-tabs v-model="tab" :dark="$store.getters.theme === 'dark'" inline-label dense no-caps>
+			<q-tabs
+				v-model="tab"
+				ref="tabs"
+				:dark="$store.getters.theme === 'dark'"
+				inline-label
+				dense
+				no-caps
+			>
 				<q-tab
 					v-for="({ name, icon, label }, index) in tabs"
 					:key="`tab-${index}`"
+					ref="tab"
 					:name="name"
 					:icon="icon"
 					:label="label"
 				/>
 			</q-tabs>
 
-			<q-tab-panels v-model="tab" class="bg-transparent">
+			<q-tab-panels v-model="tab" class="bg-transparent full-height">
 				<q-tab-panel name="premade">
 					<ul class="premade">
-						<li
-							v-for="(reminder, key) in premade"
-							:key="key"
-							class="d-flex justify-content-between"
-							:class="'bg-' + reminder.color"
-						>
-							<div class="title">{{ reminder.title }}</div>
-							<a class="green add" @click="addReminder('premade', reminder)">
-								<i aria-hidden="true" class="fas fa-plus"></i>
-								<q-tooltip anchor="top middle" self="center middle"> Set </q-tooltip>
-							</a>
+						<li v-for="(reminder, key) in premade" :key="key">
+							<div class="header">
+								<div class="border" :class="'bg-' + reminder.color" />
+								<div class="title">{{ reminder.title }}</div>
+								<button
+									class="btn btn-sm bg-neutral-5 add"
+									@click="addReminder('premade', reminder)"
+								>
+									<i aria-hidden="true" class="fas fa-plus green"></i>
+									<q-tooltip anchor="top middle" self="center middle"> Set </q-tooltip>
+								</button>
+							</div>
 						</li>
 					</ul>
 
@@ -45,10 +54,11 @@
 						<h3>Personal</h3>
 						<ul class="premade">
 							<li v-for="(reminder, key) in personalReminders" :key="key">
-								<div class="d-flex justify-content-between" :class="'bg-' + reminder.color">
+								<div class="header">
+									<div class="border" :class="'bg-' + reminder.color" />
 									<div class="title">{{ reminder.title }}</div>
-									<a
-										class="add"
+									<button
+										class="btn btn-sm bg-neutral-5"
 										@click="
 											reminder.variables
 												? showVariableOptions(key)
@@ -61,11 +71,11 @@
 											:class="reminder.variables ? 'fas fa-chevron-down' : 'fas fa-plus green'"
 										></i>
 										<q-tooltip anchor="top middle" self="center middle"> Set </q-tooltip>
-									</a>
+									</button>
 								</div>
 								<q-slide-transition>
 									<div v-if="varOptions === key" class="variables">
-										Select variable values
+										<div class="mb-1">Select variable values</div>
 										<ValidationObserver v-slot="{ valid }">
 											<ValidationProvider
 												rules="required"
@@ -74,7 +84,7 @@
 												v-for="(variable, var_key) in reminder.variables"
 												:key="var_key"
 											>
-												<div class="mb-2">
+												<div class="mb-1">
 													<q-select
 														:dark="$store.getters.theme === 'dark'"
 														filled
@@ -89,13 +99,13 @@
 													/>
 												</div>
 											</ValidationProvider>
-											<a
+											<button
 												@click="valid ? addReminder('premade', reminder, selectedVars) : null"
 												:disabled="!valid"
-												class="btn btn-sm btn-clear"
+												class="btn btn-sm btn-block bg-neutral-5"
 											>
 												<i aria-hidden="true" class="fas fa-plus green"></i> Add reminder
-											</a>
+											</button>
 										</ValidationObserver>
 									</div>
 								</q-slide-transition>
@@ -160,6 +170,7 @@ export default {
 		},
 	},
 	async mounted() {
+		this.$refs.tab[0]?.$el.focus();
 		this.personalReminders = await this.get_full_reminders();
 	},
 	methods: {
@@ -231,36 +242,39 @@ ul.targets {
 ul.premade {
 	color: $neutral-1;
 	list-style: none;
-	padding: 0;
+	padding: 10px;
+	margin: -10px;
 
 	li {
-		margin-bottom: 3px;
-		background-color: $neutral-9;
-
-		.title {
+		.header {
+			margin-bottom: 3px;
+			background-color: $neutral-9;
+			border-left: 5px;
 			padding: 5px;
-		}
-		a.add {
-			display: block;
-			background: $neutral-9;
-			padding: 5px 0;
-			width: 30px;
-			text-align: center;
-			color: $neutral-1;
+			display: flex;
+			justify-content: space-between;
+			height: 42px;
+			gap: 0.5rem;
 
-			i {
-				transition: transform 0.2s linear;
+			.border {
+				width: 10px;
+				margin: -5px;
+				display: block;
 			}
 
-			&.open {
+			.title {
+				padding: 5px;
+				flex-grow: 1;
+			}
+			button.add {
 				i {
-					transform: rotate(180deg);
+					transition: transform 0.2s linear;
 				}
 			}
 		}
 		.variables {
-			border-top: solid 3px $neutral-8;
 			padding: 10px;
+			background: $neutral-9;
 		}
 	}
 }

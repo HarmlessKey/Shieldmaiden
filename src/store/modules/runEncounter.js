@@ -740,7 +740,7 @@ const run_encounter_actions = {
 			if (!value || value < 0) value = 1;
 		}
 
-		// Current hit poins
+		// Current hit points
 		if (prop === "curHp" || prop === "transformedCurHp") {
 			if (!value || value < 0) value = 0;
 			if (value > maxHpIncMod) value = maxHpIncMod;
@@ -1352,7 +1352,7 @@ const run_encounter_actions = {
 								encounterId: state.encounterId,
 								entityId: key,
 								property: "curHp",
-								value: null,
+								value: newHp,
 							},
 							{ root: true }
 						);

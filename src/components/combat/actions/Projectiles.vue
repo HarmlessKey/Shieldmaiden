@@ -7,6 +7,7 @@
 		<div class="card-body">
 			<button
 				class="btn btn-block mb-3"
+				ref="divide"
 				@click="divide"
 				:disabled="available_projectiles < projectileCount"
 			>
@@ -36,7 +37,7 @@
 			</div>
 		</div>
 		<div slot="footer" class="card-footer">
-			<q-btn label="Cancel" no-caps @click="cancel()" />
+			<q-btn label="Cancel" tabindex="-1" no-caps @click="cancel()" />
 			<q-btn
 				label="Roll"
 				color="primary"
@@ -75,6 +76,9 @@ export default {
 				this.projectileCount - Object.values(this.assigned_projectiles).reduce((a, b) => a + b, 0)
 			);
 		},
+	},
+	mounted() {
+		this.$refs.divide?.focus();
 	},
 	methods: {
 		divide() {

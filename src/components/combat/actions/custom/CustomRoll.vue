@@ -30,6 +30,7 @@
 			<div v-if="roll_type === 'save'" class="d-flex justify-content-between">
 				<q-select
 					:dark="$store.getters.theme === 'dark'"
+					dense
 					filled
 					square
 					map-options

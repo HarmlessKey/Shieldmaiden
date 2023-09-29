@@ -1161,7 +1161,7 @@ const encounter_mutations = {
 	SET_TRANSFORMED_PROP(state, { uid, campaignId, encounterId, entityId, property, value }) {
 		if (value === null) {
 			Vue.delete(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transoformed,
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed,
 				property
 			);
 		} else {

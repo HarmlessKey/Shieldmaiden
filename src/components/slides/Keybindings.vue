@@ -73,10 +73,6 @@ export default {
 							bind: ["arrow up/down"],
 						},
 						{
-							action: "Show target's info",
-							bind: ["I"],
-						},
-						{
 							action: "Edit target",
 							bind: ["E"],
 						},

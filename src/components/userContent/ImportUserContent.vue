@@ -75,22 +75,44 @@
 					>
 						<template v-slot:body-cell-duplicate="props">
 							<td>
-								<pre>{{ props.row.meta }}</pre>
 								<hk-popover v-if="props.row.meta.duplicate">
 									<q-icon name="fas fa-info-circle" class="orange" />
 									<div slot="content">
+										<pre>{{ props.row.meta }}</pre>
 										<pre>{{ props.row.meta.duplicate }}</pre>
 									</div>
 								</hk-popover>
-							</td>
-						</template>
-						<template v-slot:body-cell-overwrite="props">
-							<td>
-								<q-toggle
+								<q-btn-toggle
 									v-if="props.row.meta.duplicate"
 									v-model="props.row.meta.overwrite"
+									toggle-color="primary"
+									dense
+									flat
+									:options="[
+										{ value: 'overwrite', icon: 'fas fa-pen', slot: 'overwrite' },
+										{ value: 'duplicate', icon: 'fas fa-copy', slot: 'duplicate' },
+										{ value: false, icon: 'fas fa-ban', slot: 'skip' },
+									]"
+								>
+									<template v-slot:overwrite>
+										<q-tooltip>Overwrite</q-tooltip>
+									</template>
+									<template v-slot:duplicate>
+										<q-tooltip>Duplicate</q-tooltip>
+									</template>
+									<template v-slot:skip>
+										<q-tooltip>Skip</q-tooltip>
+									</template>
+								</q-btn-toggle>
+								<!-- <q-toggle
+									v-if="props.row.meta.duplicate"
+									toggle-indeterminate
+									true-value="overwrite"
+									false-value="duplicate"
+									:label="props.row.meta.overwrite || 'skip'"
+									v-model="props.row.meta.overwrite"
 									unchecked-icon="none"
-								/>
+								/> -->
 							</td>
 						</template>
 
@@ -282,14 +304,6 @@ export default {
 					name: "duplicate",
 					label: "Duplicate",
 					field: "duplicate",
-					align: "right",
-					style: "width: 0px",
-					headerStyle: "width: 0px",
-				},
-				{
-					name: "overwrite",
-					label: "Overwrite",
-					field: "overwrite",
 					align: "right",
 					style: "width: 0px",
 					headerStyle: "width: 0px",
@@ -640,15 +654,19 @@ export default {
 		},
 		async checkIfDuplicateNpc(npc) {
 			const npcs = await this.get_npcs();
-			const keys = Object.keys(npcs);
-			const names = Object.values(npcs).map((n) => n.name.toLowerCase());
-			return keys.includes(npc.meta.key) || names.includes(npc.name.toLowerCase());
+			const dupByKey = npcs[npc.meta.key];
+			const dupByName = Object.values(npcs).find(
+				(n) => n.name.toLowerCase() === npc.name.toLowerCase()
+			);
+			return dupByKey || dupByName || false;
 		},
 		async checkIfDuplicateSpell(spell) {
 			const spells = await this.get_spells();
-			const keys = Object.keys(spells);
-			const names = Object.values(spells).map((s) => s.name.toLowerCase());
-			return keys.includes(spell.meta.key) || names.includes(spell.name.toLowerCase());
+			const dupByKey = spells[spell.meta.key];
+			const dupByName = Object.values(spells).find(
+				(n) => n.name.toLowerCase() === spell.name.toLowerCase()
+			);
+			return dupByKey || dupByName || false;
 		},
 	},
 };

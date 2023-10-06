@@ -8,6 +8,14 @@
 				<router-link to="/content/import/hk_import" class="btn btn-block">Select</router-link>
 			</div>
 		</hk-card>
+		<hk-card header="Convert Old" class="disabled">
+			<div class="card-body">
+				<p>Convert your old exports to new format</p>
+			</div>
+			<div slot="footer">
+				<button class="btn btn-block">Select</button>
+			</div>
+		</hk-card>
 		<hk-card header="External Source" class="disabled">
 			<div class="card-body">
 				<p>Import from an external source</p>

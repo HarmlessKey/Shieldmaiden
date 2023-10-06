@@ -654,18 +654,39 @@ export default {
 		},
 		async checkIfDuplicateNpc(npc) {
 			const npcs = await this.get_npcs();
-			const dupByKey = npcs[npc.meta.key];
-			const dupByName = Object.values(npcs).find(
-				(n) => n.name.toLowerCase() === npc.name.toLowerCase()
+			const dupByKey = npcs[npc.meta.key]
+				? { ...npcs[npc.meta.key], old_key: npc.meta.key }
+				: undefined;
+			const dupByNameEntry = Object.entries(npcs).find(
+				([key, n]) => n.name.toLowerCase() === npc.name.toLowerCase()
 			);
+			let dupByName = undefined;
+			if (dupByNameEntry) {
+				const [key, val] = dupByNameEntry;
+				dupByName = {
+					old_key: key,
+					...val,
+				};
+			}
+
 			return dupByKey || dupByName || false;
 		},
 		async checkIfDuplicateSpell(spell) {
 			const spells = await this.get_spells();
-			const dupByKey = spells[spell.meta.key];
-			const dupByName = Object.values(spells).find(
-				(n) => n.name.toLowerCase() === spell.name.toLowerCase()
+			const dupByKey = spells[spell.meta.key]
+				? { ...spells[spell.meta.key], old_key: spell.meta.key }
+				: undefined;
+			const dupByNameEntry = Object.entries(spells).find(
+				([key, s]) => s.name.toLowerCase() === spell.name.toLowerCase()
 			);
+			let dupByName = undefined;
+			if (dupByNameEntry) {
+				const [key, val] = dupByNameEntry;
+				dupByName = {
+					old_key: key,
+					...val,
+				};
+			}
 			return dupByKey || dupByName || false;
 		},
 	},

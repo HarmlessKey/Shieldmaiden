@@ -51,17 +51,11 @@
 				</q-form>
 			</ValidationObserver>
 		</template>
-		<hk-loader v-else-if="!parsed" prefix="Validating" :title="type_label" />
+		<!-- <hk-loader v-else-if="!parsed" prefix="Validating" :title="type_label" /> -->
 		<div v-else-if="!importing">
-			<template v-for="import_type in Object.keys(imports)">
-				<div v-if="imports[import_type].length" class="mb-4" :key="import_type">
-					<p>
-						Found
-						<span :class="import_type === 'unique' ? 'green' : 'orange'">
-							{{ imports[import_type].length }} {{ import_type === "unique" ? "new" : "duplicate" }}
-						</span>
-						{{ type_label }}
-					</p>
+			<template v-for="import_type in Object.keys(parsed_data)">
+				<div v-if="parsed_data[import_type].length" class="mb-4" :key="import_type">
+					<h3>{{ import_type.capitalize() }}</h3>
 					<q-table
 						class="sticky-header-table mb-2 no-table-margin"
 						:virtual-scroll-sticky-size-start="48"
@@ -69,9 +63,9 @@
 						flat
 						dense
 						square
-						:data="imports[import_type]"
+						:data="parsed_data[import_type]"
 						:columns="columns"
-						row-key="index"
+						:row-key="(row) => `${row.meta.key}-${row.meta.overwrite}`"
 						virtual-scroll
 						:pagination.sync="pagination"
 						:rows-per-page-options="[0]"
@@ -79,14 +73,35 @@
 						:selected.sync="selected[import_type]"
 						hide-bottom
 					>
+						<template v-slot:body-cell-duplicate="props">
+							<td>
+								<pre>{{ props.row.meta }}</pre>
+								<hk-popover v-if="props.row.meta.duplicate">
+									<q-icon name="fas fa-info-circle" class="orange" />
+									<div slot="content">
+										<pre>{{ props.row.meta.duplicate }}</pre>
+									</div>
+								</hk-popover>
+							</td>
+						</template>
+						<template v-slot:body-cell-overwrite="props">
+							<td>
+								<q-toggle
+									v-if="props.row.meta.duplicate"
+									v-model="props.row.meta.overwrite"
+									unchecked-icon="none"
+								/>
+							</td>
+						</template>
+
 						<template v-slot:body-cell-invalid="props">
 							<td class="text-right">
-								<hk-popover v-if="props.row.errors" header="Validation errors">
+								<hk-popover v-if="props.row.meta.errors" header="Validation errors">
 									<q-icon name="error" class="red" />
 									<div slot="content">
 										<ol class="px-3">
 											<li
-												v-for="(error, i) in props.row.errors"
+												v-for="(error, i) in props.row.meta.errors"
 												:key="`${props.row.index}-error-${i}`"
 												class="red"
 											>
@@ -94,6 +109,9 @@
 													{{ error.instancePath }}
 												</strong>
 												{{ error.message.capitalize() }}
+												<template v-if="error.keyword == 'additionalProperties'">
+													<span> '{{ error.params.additionalProperty }}'</span>
+												</template>
 											</li>
 										</ol>
 									</div>
@@ -101,105 +119,28 @@
 							</td>
 						</template>
 					</q-table>
-					<q-toggle
-						v-if="import_type === 'duplicate'"
-						v-model="overwrite"
-						label="Overwrite duplicates"
-						unchecked-icon="none"
-					/>
 				</div>
 			</template>
-			<template v-if="Object.values(custom_spells).length">
-				<p>
-					Found
-					<span class="yellow"> {{ Object.values(custom_spells).length }}</span>
-					Custom Spells
-					<q-toggle
-						v-model="import_custom_spells"
-						label="Import custom spells"
-						unchecked-icon="none"
-					/>
-				</p>
-				<template v-if="import_custom_spells">
-					<q-table
-						class="sticky-header-table mb-2 no-table-margin"
-						:virtual-scroll-sticky-size-start="48"
-						:dark="$store.getters.theme !== 'light'"
-						flat
-						dense
-						square
-						virtual-scroll
-						:pagination.sync="pagination"
-						:rows-per-page-options="[0]"
-						:data="Object.values(custom_spells)"
-						:columns="columns"
-						row-key="index"
-						hide-bottom
-					>
-						<template v-slot:body-cell-invalid="props">
-							<td class="text-right">
-								<hk-popover v-if="props.row.errors" header="Validation errors">
-									<q-icon name="error" class="red" />
-									<div slot="content">
-										<ol class="px-3">
-											<li
-												v-for="(error, i) in props.row.errors"
-												:key="`${props.row.index}-error-${i}`"
-												class="red"
-											>
-												<strong v-if="error.instancePath" class="neutral-1">
-													{{ error.instancePath }}
-												</strong>
-												{{ error.message.capitalize() }}
-											</li>
-										</ol>
-									</div>
-								</hk-popover>
-							</td>
-						</template>
-					</q-table>
-					<template v-if="Object.keys(this.custom_spells).length > this.availableSpellSlots">
-						<div>
-							Insufficient spell slots. You're trying to import
-							<strong class="red">{{ Object.keys(this.custom_spells).length }}</strong>
-							spells,<br />
-							but have only <strong class="red">{{ availableSpellSlots }}</strong> slots available.
-						</div>
-						<router-link class="btn btn-sm bg-patreon-red my-2" to="/patreon">
-							<i aria-hidden="true" class="fab fa-patreon white mr-1" />
-							Get more slots
-						</router-link>
-					</template>
-				</template>
-			</template>
-			<div v-if="importTotal > availableSlots">
+
+			<!-- <div v-if="importTotal > availableSlots">
 				Insufficient slots. You're trying to import
 				<strong class="red">{{ importTotal }}</strong> {{ type_label }},<br />
 				but have only <strong class="red">{{ availableSlots }}</strong> slots available.
-			</div>
+			</div> -->
 
 			<div class="d-flex justify-content-between items-center pb-2">
 				<div>
-					<strong>{{ selected.unique.length + selected.duplicate.length }}</strong> selected
+					<strong>{{ countSelected }}</strong> selected
 				</div>
 				<q-form @submit="importData">
-					<q-btn
-						color="primary"
-						no-caps
-						type="submit"
-						:disabled="
-							(!selected.unique.length && !selected.duplicate.length) ||
-							importTotal > availableSlots
-						"
-					>
+					<q-btn color="primary" no-caps type="submit" :disabled="countSelected === 0">
 						Import
 					</q-btn>
 				</q-form>
 			</div>
 		</div>
-		<div v-else>
+		<!-- <div v-else>
 			<h3 class="text-center">
-				<!-- eslint-disable-next-line vue/no-parsing-error -->
 				{{ imported < importing ? "Importing" : "Imported" }} {{ importing }} {{ type_label }}
 			</h3>
 			<q-linear-progress
@@ -210,9 +151,9 @@
 				:value="imported / importing"
 				color="primary"
 				class="mb-4"
-			/>
+			/> -->
 
-			<q-expansion-item v-if="failed_imports.length" class="mb-4">
+		<!-- <q-expansion-item v-if="failed_imports.length" class="mb-4">
 				<template slot="header">
 					<q-item-section avatar>
 						<strong class="red">{{ failed_imports.length }}</strong>
@@ -261,8 +202,8 @@
 				<p class="text-center green">Finished import!</p>
 				<q-btn no-caps label="Close" color="neutral-5" class="full-width" v-close-popup />
 			</div>
-		</div>
-		<q-dialog v-model="showSchema">
+		</div> -->
+		<!-- <q-dialog v-model="showSchema">
 			<hk-card :header="`${type_label} Schema`">
 				<div slot="header" class="card-header">
 					<span>{{ type_label }} Schema</span>
@@ -288,7 +229,7 @@
 					<input :value="JSON.stringify(this.schema)" id="copy" type="hidden" />
 				</div>
 			</hk-card>
-		</q-dialog>
+		</q-dialog> -->
 	</div>
 </template>
 
@@ -314,11 +255,20 @@ export default {
 			overwrite: true,
 			parsing: false,
 			parsed: false,
+			showSchema: false,
 			failed_imports: [],
 			importing: undefined,
 			imported: 0,
 			import_key_map: {},
 
+			parsed_data: {
+				npcs: [],
+				spells: [],
+			},
+			selected: {
+				npcs: [],
+				spells: [],
+			},
 			columns: [
 				{
 					name: "name",
@@ -329,10 +279,28 @@ export default {
 					format: (val) => val.capitalizeEach(),
 				},
 				{
+					name: "duplicate",
+					label: "Duplicate",
+					field: "duplicate",
+					align: "right",
+					style: "width: 0px",
+					headerStyle: "width: 0px",
+				},
+				{
+					name: "overwrite",
+					label: "Overwrite",
+					field: "overwrite",
+					align: "right",
+					style: "width: 0px",
+					headerStyle: "width: 0px",
+				},
+				{
 					name: "invalid",
 					label: "",
-					field: "errors",
+					field: "error",
 					align: "right",
+					style: "width: 0px",
+					headerStyle: "width: 0px",
 				},
 			],
 			pagination: {
@@ -344,36 +312,28 @@ export default {
 		...mapGetters(["tier"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
 		...mapGetters("spells", ["spells", "spell_count"]),
-		type_label() {
-			return this.type === "npcs" ? "NPCs" : "Spells";
-		},
-		schema() {
-			return this.type === "npcs" ? npcSchema : spellSchema;
-		},
-		data() {
-			return this.type === "npcs" ? this.npcs : this.spells;
-		},
-		content_count() {
-			return this.type === "npcs" ? this.npc_count : this.spell_count;
-		},
-		availableSlots() {
-			return this.tier.benefits[this.type] === "infinite"
-				? Infinity
-				: this.tier.benefits[this.type] - this.content_count;
-		},
-		availableSpellSlots() {
-			return this.tier.benefits["spells"] === "infinite"
-				? Infinity
-				: this.tier.benefits["spells"] - this.spell_count;
-		},
-		importTotal() {
-			return !this.overwrite
-				? this.selected.unique.length + this.selected.duplicate.length
-				: this.selected.unique.length;
+
+		countSelected() {
+			return Object.values(this.selected).flat(1).length;
 		},
 	},
 	async mounted() {
 		this.type === "npcs" ? await this.get_npcs() : await this.get_spells();
+	},
+	watch: {
+		selected: {
+			handler(newValue) {
+				console.log("selected changed", newValue);
+				console.log("table data", this.parsed_data);
+			},
+			deep: true,
+		},
+		parsed_data: {
+			handler(newVal) {
+				console.log("parsed_data changed", newVal);
+			},
+			deep: true,
+		},
 	},
 	methods: {
 		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
@@ -387,6 +347,7 @@ export default {
 			"get_spell_id_by_name",
 			"reserve_spell_id",
 		]),
+
 		loadJSON() {
 			const fr = new FileReader();
 
@@ -407,14 +368,17 @@ export default {
 		},
 
 		async parse(data) {
-			// this.parsing = true;
+			this.parsing = true;
 			if (!data.meta) {
 				data = await this.mapOldToNew(data);
 				data.meta = { export_version: "1.0" };
+				console.log(data);
 			}
 			if (["1.0", "2.0"].includes(data.meta.export_version)) {
-				await parseV2(data);
+				await this.parseV2(data);
 			}
+			// this.parsing = false;
+			this.parsed = true;
 		},
 
 		async mapOldToNew(data) {
@@ -435,8 +399,8 @@ export default {
 					// Entry is NPC
 					if (Object.values(entry.custom_spells).length > 0) {
 						new_data.spells = { ...new_data.spells, ...entry.custom_spells };
-						delete entry.custom_spells;
 					}
+					delete entry.custom_spells;
 					new_data.npcs[key] = entry;
 				} else if (entry.school !== undefined) {
 					// Entry is Spell
@@ -448,37 +412,83 @@ export default {
 
 		async parseV2(data) {
 			if (data.spells) {
-				await Promise.all(
-					Object.entries(data.spells).forEach(([key, spell]) => {
-						this.parseSpell(key, spell);
-					})
-				);
+				Object.entries(data.spells).forEach(([key, spell]) => {
+					this.parseSpell(key, spell);
+				});
 			}
 			if (data.npcs) {
-				await Promise.all(
-					Object.entries(data.npcs).forEach(([key, npc]) => {
-						this.parseNPC(key, npc);
-					})
-				);
+				Object.entries(data.npcs).forEach(([key, npc]) => {
+					this.parseNPC(key, npc);
+				});
 			}
 			if (data.campaigns && data.encounters) {
-				await Promise.all(
-					Object.entries(data.campaigns).forEach(([key, campaign]) => {
-						this.parseCampaign(key, campaign);
-					})
-				);
-				await Promise.all(
-					Object.entries(data.encounters).forEach(([key, encounter]) => {
-						this.parseEncounter(key, encounter);
-					})
-				);
+				Object.entries(data.campaigns).forEach(([key, campaign]) => {
+					this.parseCampaign(key, campaign);
+				});
+				Object.entries(data.encounters).forEach(([key, encounter]) => {
+					this.parseEncounter(key, encounter);
+				});
 			}
+			console.log("to import", this.parsed_data);
 		},
 
-		async parseCampaign(key, spell) {},
-		async parseEncounter(key, spell) {},
-		async parseNPC(key, spell) {},
-		async parseSpell(key, spell) {},
+		async parseCampaign(key, campaign) {},
+		async parseEncounter(key, encounter) {},
+		async parseNPC(key, npc) {
+			/**
+			 * 1. Remove unwanted props
+			 * 2. Add meta prop to store errors and selection later on.
+			 * 3. Validate spell
+			 * 4. Store object in temp storage for later selection and import
+			 */
+
+			this.removeTimestamps(npc);
+
+			this.versatileToOptions(npc);
+			this.renameNpcProps(npc);
+
+			const valid = ajv.validate(npcSchema, npc);
+
+			npc.meta = { key };
+			npc.meta.duplicate = await this.checkIfDuplicateNpc(npc);
+			npc.meta.overwrite = false;
+
+			if (!valid) {
+				npc.meta.errors = ajv.errors;
+			}
+			this.parsed_data.npcs.push(npc);
+
+			console.log("parsed NPC", npc.name);
+		},
+		async parseSpell(key, spell) {
+			/**
+			 * 1. Remove unwanted props
+			 * 2. Add meta prop to store errors and selection later on.
+			 * 3. Validate spell
+			 * 4. Store object in temp storage for later selection and import
+			 */
+			delete spell.key;
+			this.removeTimestamps(spell);
+
+			const valid = ajv.validate(spellSchema, spell);
+
+			spell.meta = { key };
+			spell.meta.duplicate = await this.checkIfDuplicateSpell(spell);
+			spell.meta.overwrite = false;
+
+			if (!valid) {
+				spell.meta.errors = ajv.errors;
+			}
+
+			this.parsed_data.spells.push(spell);
+
+			console.log("parsed Spell", spell.name);
+		},
+
+		removeTimestamps(data) {
+			delete data.updated;
+			delete data.created;
+		},
 
 		async importData() {
 			// First check if there are custom spells from imported NPCs that need to be added.
@@ -619,45 +629,26 @@ export default {
 			}
 			return npc;
 		},
-		async parseCustomSpells(npc) {
-			if (npc.custom_spells) {
-				for (const [old_key, spell] of Object.entries(npc.custom_spells)) {
-					// Check if there already is a spell with name
-					delete spell.key;
-					delete spell.updated;
-					delete spell.created;
-					const valid = ajv.validate(spellSchema, spell);
-					if (!valid) {
-						spell.errors = ajv.errors;
-					}
-					// Check if spell is already known to importer
-					if (!Object.keys(this.map_old_to_custom).includes(old_key)) {
-						let spell_id = await this.get_spell_id_by_name({ name: spell.name });
-						if (!spell_id) {
-							// Generate a id for the spell so when we can link the spell in NPC to a future spell
-							const new_spell_id = await this.reserve_spell_id();
-							spell_id = new_spell_id;
-							this.$set(this.custom_spells, spell_id, spell);
-						}
-
-						this.map_old_to_custom[old_key] = spell_id;
-					}
-				}
-
-				for (const spell_list_type of ["caster_spells", "innate_spells"]) {
-					if (npc[spell_list_type]) {
-						const spell_list = Object.assign({}, npc[spell_list_type]);
-						for (const [spell_key, spell] of Object.entries(spell_list)) {
-							if (spell.custom && spell_key in this.map_old_to_custom) {
-								npc[spell_list_type][this.map_old_to_custom[spell_key]] = { ...spell };
-								delete npc[spell_list_type][spell_key];
-							}
-						}
-					}
-				}
-				delete npc.custom_spells;
+		async renameNpcProps(npc) {
+			const mapper = {
+				damage_vulnerability: "damage_vulnerabilities",
+			};
+			for (const [old_key, new_key] of Object.entries(mapper)) {
+				npc[new_key] = npc[old_key];
+				delete npc[old_key];
 			}
-			return npc;
+		},
+		async checkIfDuplicateNpc(npc) {
+			const npcs = await this.get_npcs();
+			const keys = Object.keys(npcs);
+			const names = Object.values(npcs).map((n) => n.name.toLowerCase());
+			return keys.includes(npc.meta.key) || names.includes(npc.name.toLowerCase());
+		},
+		async checkIfDuplicateSpell(spell) {
+			const spells = await this.get_spells();
+			const keys = Object.keys(spells);
+			const names = Object.values(spells).map((s) => s.name.toLowerCase());
+			return keys.includes(spell.meta.key) || names.includes(spell.name.toLowerCase());
 		},
 	},
 };

@@ -123,7 +123,7 @@
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<ImportUserContent type="npcs" />
+					<ImportContent type="npcs" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -133,7 +133,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { monsterMixin } from "src/mixins/monster";
-import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
+import ImportContent from "src/components/ImportContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
 
@@ -141,7 +141,7 @@ export default {
 	name: "Npcs",
 	mixins: [monsterMixin],
 	components: {
-		ImportUserContent,
+		ImportContent,
 		ContentHeader,
 		ExportUserContent,
 	},

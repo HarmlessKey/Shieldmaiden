@@ -76,43 +76,37 @@
 						<template v-slot:body-cell-duplicate="props">
 							<td>
 								<hk-popover v-if="props.row.meta.duplicate">
-									<q-icon name="fas fa-info-circle" class="orange" />
+									<q-icon
+										:name="duplicate_icon[props.row.meta.overwrite] || 'fas fa-info-circle'"
+										class="orange"
+									/>
 									<div slot="content">
 										<pre>{{ props.row.meta }}</pre>
 										<pre>{{ props.row.meta.duplicate }}</pre>
+										<q-btn-toggle
+											v-if="props.row.meta.duplicate"
+											v-model="props.row.meta.overwrite"
+											toggle-color="primary"
+											dense
+											flat
+											:options="[
+												{ value: 'overwrite', icon: 'fas fa-pen', slot: 'overwrite' },
+												{ value: 'duplicate', icon: 'fas fa-copy', slot: 'duplicate' },
+												{ value: 'skip', icon: 'fas fa-ban', slot: 'skip' },
+											]"
+										>
+											<template v-slot:overwrite>
+												<q-tooltip>Overwrite</q-tooltip>
+											</template>
+											<template v-slot:duplicate>
+												<q-tooltip>Duplicate</q-tooltip>
+											</template>
+											<template v-slot:skip>
+												<q-tooltip>Skip</q-tooltip>
+											</template>
+										</q-btn-toggle>
 									</div>
 								</hk-popover>
-								<q-btn-toggle
-									v-if="props.row.meta.duplicate"
-									v-model="props.row.meta.overwrite"
-									toggle-color="primary"
-									dense
-									flat
-									:options="[
-										{ value: 'overwrite', icon: 'fas fa-pen', slot: 'overwrite' },
-										{ value: 'duplicate', icon: 'fas fa-copy', slot: 'duplicate' },
-										{ value: false, icon: 'fas fa-ban', slot: 'skip' },
-									]"
-								>
-									<template v-slot:overwrite>
-										<q-tooltip>Overwrite</q-tooltip>
-									</template>
-									<template v-slot:duplicate>
-										<q-tooltip>Duplicate</q-tooltip>
-									</template>
-									<template v-slot:skip>
-										<q-tooltip>Skip</q-tooltip>
-									</template>
-								</q-btn-toggle>
-								<!-- <q-toggle
-									v-if="props.row.meta.duplicate"
-									toggle-indeterminate
-									true-value="overwrite"
-									false-value="duplicate"
-									:label="props.row.meta.overwrite || 'skip'"
-									v-model="props.row.meta.overwrite"
-									unchecked-icon="none"
-								/> -->
 							</td>
 						</template>
 
@@ -317,6 +311,11 @@ export default {
 					headerStyle: "width: 0px",
 				},
 			],
+			duplicate_icon: {
+				overwrite: "fas fa-pen",
+				duplicate: "fas fa-copy",
+				skip: "fas fa-ban",
+			},
 			pagination: {
 				rowsPerPage: 0,
 			},

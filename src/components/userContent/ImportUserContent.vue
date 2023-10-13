@@ -55,7 +55,26 @@
 		<div v-else-if="!importing">
 			<template v-for="import_type in Object.keys(parsed_data)">
 				<div v-if="parsed_data[import_type].length" class="mb-4" :key="import_type">
-					<h3>{{ import_type.capitalize() }}</h3>
+					<h3>
+						{{ import_type.capitalize() }}
+						<span
+							:class="
+								newContentCount(import_type) > tier.benefits[import_type]
+									? 'red'
+									: newContentCount(import_type) == tier.benefits[import_type]
+									? 'neutral-2'
+									: 'green'
+							"
+							>{{ newContentCount(import_type) }}</span
+						>
+						<span class="divider mx-1">/</span>
+						<i
+							aria-hidden="true"
+							v-if="tier.benefits[import_type] == 'infinite'"
+							class="far fa-infinity"
+						></i>
+						<template v-else>{{ tier.benefits[import_type] }}</template>
+					</h3>
 					<q-table
 						class="sticky-header-table mb-2 no-table-margin"
 						:virtual-scroll-sticky-size-start="48"
@@ -114,12 +133,6 @@
 					</q-table>
 				</div>
 			</template>
-
-			<!-- <div v-if="importTotal > availableSlots">
-				Insufficient slots. You're trying to import
-				<strong class="red">{{ importTotal }}</strong> {{ type_label }},<br />
-				but have only <strong class="red">{{ availableSlots }}</strong> slots available.
-			</div> -->
 
 			<div class="d-flex justify-content-between items-center pb-2">
 				<div>
@@ -304,7 +317,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier"]),
+		...mapGetters(["tier", "content_count", "overencumbered"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
 		...mapGetters("spells", ["spells", "spell_count"]),
 
@@ -672,6 +685,15 @@ export default {
 				};
 			}
 			return dupByKey || dupByName || false;
+		},
+
+		newContentCount(import_type) {
+			return (
+				this.content_count[import_type] +
+				this.selected[import_type].filter(
+					(item) => item.meta.overwrite === false || item.meta.overwrite === "duplicate"
+				).length
+			);
 		},
 	},
 };

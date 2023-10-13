@@ -8,13 +8,14 @@
 		</ul>
 		<hr />
 		<template v-if="condition_targets.length > 0">
-			<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
+			<q-list :dark="$store.getters.theme === 'dark'" autofocus square :class="`accordion`">
 				<q-expansion-item
 					v-for="({ value, name, condition, effects }, index) in conditionList"
 					:key="index"
 					:dark="$store.getters.theme === 'dark'"
 					switch-toggle-side
 					:group="name"
+					@focus="focusButton($event, index)"
 				>
 					<template v-slot:header>
 						<q-item-section>
@@ -24,16 +25,25 @@
 							</div>
 						</q-item-section>
 
-						<q-item-section v-if="value === 'exhaustion'" avatar>
-							<a @click.stop>
+						<q-item-section avatar>
+							<button
+								v-if="value === 'exhaustion'"
+								:ref="index"
+								class="btn btn-sm btn-clear"
+								@click.stop
+							>
 								<span class="exhaustion neutral-11" v-if="checkExhaustion() != undefined">
 									{{ checkExhaustion() }}
 								</span>
 								<i aria-hidden="true" v-else class="fas fa-plus-circle green" />
 
-								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+								<q-popup-proxy
+									:dark="$store.getters.theme === 'dark'"
+									ref="popup"
+									:breakpoint="576"
+								>
 									<div class="bg-neutral-8">
-										<q-list>
+										<q-list autofocus>
 											<q-item>
 												<q-item-section>Exhaustion</q-item-section>
 											</q-item>
@@ -44,28 +54,37 @@
 												v-for="index in 6"
 												:key="index"
 												@click="setExhausted(index)"
+												@keydown.space="setExhausted(index)"
 											>
 												<q-item-section>Level {{ index }}</q-item-section>
 											</q-item>
 											<q-separator />
-											<q-item clickable v-close-popup @click="setExhausted(0)">
+											<q-item
+												clickable
+												v-close-popup
+												@click="setExhausted(0)"
+												@keydown.space="setExhausted(index)"
+											>
 												<q-item-section>Remove</q-item-section>
 											</q-item>
 										</q-list>
 									</div>
 								</q-popup-proxy>
-							</a>
-						</q-item-section>
-
-						<q-item-section avatar v-else>
-							<a @click.stop="set(value)" :key="value">
+							</button>
+							<button
+								v-else
+								:ref="index"
+								:key="value"
+								class="btn btn-sm btn-clear"
+								@click.stop="set(value)"
+							>
 								<span v-if="!checkAll(value)"
 									><i aria-hidden="true" class="fas fa-plus-circle green" key="true"></i
 								></span>
 								<span v-if="checkAll(value)"
 									><i aria-hidden="true" class="fas fa-minus-circle red" key="true"></i
 								></span>
-							</a>
+							</button>
 						</q-item-section>
 					</template>
 
@@ -111,8 +130,18 @@ export default {
 			return this.targeted;
 		},
 	},
+	mounted() {
+		this.$refs[0]?.[0]?.focus();
+	},
 	methods: {
 		...mapActions(["setDrawer", "set_condition"]),
+		focusButton(e, i) {
+			if (e.view.shiftKey) {
+				i = i - 1;
+			}
+			const button = this.$refs[i.min(0)]?.[0];
+			button?.focus();
+		},
 		set(condition) {
 			const action = this.checkAll(condition) ? "remove" : "add";
 
@@ -135,6 +164,7 @@ export default {
 					level: level,
 				});
 			}
+			this.$refs.popup[0].hide();
 		},
 		check(condition, target) {
 			return this.entities[target].conditions.hasOwnProperty(condition);
@@ -175,17 +205,28 @@ export default {
 		font-size: 23px;
 		margin-right: 12px;
 	}
-}
-a .exhaustion {
-	display: block;
-	width: 15px;
-	height: 15px;
-	border-radius: 50%;
-	background: $red;
-	text-align: center;
-	font-size: 12px;
-	line-height: 15px;
-	font-weight: bold !important;
+	button {
+		border-radius: 50%;
+		height: 35px;
+		width: 35px;
+		margin: -8px;
+
+		&:focus {
+			outline: none;
+			background-color: $neutral-5 !important;
+		}
+		.exhaustion {
+			display: block;
+			width: 15px;
+			height: 15px;
+			border-radius: 50%;
+			background: $red;
+			text-align: center;
+			font-size: 12px;
+			line-height: 15px;
+			font-weight: bold !important;
+		}
+	}
 }
 ul.targets {
 	list-style: none;

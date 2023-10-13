@@ -4,7 +4,7 @@
 
 		<TargetItem :item="entity.key" />
 
-		<a class="btn btn-block bg-red my-3" @click="remove()"> Remove reminder </a>
+		<button class="btn btn-block bg-red my-3" @click="remove()">Remove reminder</button>
 
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(editReminder)">

@@ -213,6 +213,19 @@ export class npcServices {
 	}
 
 	/**
+	 * Reserve an ID for an npc that might be stored in the future
+	 * Useful when you don't know yet if you want to store a npc, but want to be able to link to it
+	 * from different db entries
+	 *
+	 * E.g. Reserve a key for an npc during importing so it can be linked to an encounter.
+	 *
+	 * @param {String} uid ID of active user
+	 */
+	async reserveNpcId(uid) {
+		return (await NPCS_REF.child(uid).push()).key;
+	}
+
+	/**
 	 * Update npc_count in the search table of search_npcs
 	 *
 	 * @param {String} uid User ID

@@ -325,6 +325,22 @@ const npc_actions = {
 		}
 	},
 
+	/**
+	 * Reserve Npc id for future usage
+	 */
+	async reserve_npc_id({ rootGetters, dispatch }) {
+		console.log("store reserving npc id");
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_npc_services");
+			try {
+				return await services.reserveNpcId(uid);
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	clear_npc_store({ commit, rootGetters }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {

@@ -141,7 +141,6 @@ const spell_actions = {
 				return "Not enough slots";
 			}
 			try {
-				console.log(spell);
 				const search_spell = convert_spell(spell);
 				const id = await services.addSpell(uid, spell, search_spell, predefined_key);
 				commit("SET_SPELL", { id, search_spell });
@@ -223,6 +222,7 @@ const spell_actions = {
 	 * Reserve Spell id for future usage
 	 */
 	async reserve_spell_id({ rootGetters, dispatch }) {
+		console.log("store reserving spell id");
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_spell_services");

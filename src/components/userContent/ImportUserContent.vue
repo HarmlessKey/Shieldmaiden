@@ -339,7 +339,7 @@ export default {
 	methods: {
 		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
 		...mapActions("encounters", ["add_encounter", "get_encounter", "get_encounters"]),
-		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc"]),
+		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc", "reserve_npc_id"]),
 		...mapActions("spells", [
 			"add_spell",
 			"edit_spell",
@@ -373,7 +373,6 @@ export default {
 			if (!data.meta) {
 				data = await this.mapOldToNew(data);
 				data.meta = { export_version: "1.0" };
-				console.log(data);
 			}
 			if (["1.0", "2.0"].includes(data.meta.export_version)) {
 				await this.parseV2(data);
@@ -491,19 +490,27 @@ export default {
 			delete data.created;
 		},
 
-		generateKeyMap() {
+		async generateKeyMap() {
+			const keyGenFnMap = {
+				spells: this.reserve_spell_id,
+				npcs: this.reserve_npc_id,
+			};
 			for (const [item_type, items] of Object.entries(this.selected)) {
-				items.forEach((item) => {
-					const imported_key = item.meta.key;
-					// Als skip gebruik existing key met existing data
-					// Als overwrite gebruik existing key met new data
-					// Als duplicate gebruik old key (imported key)
-					const new_key =
-						item.meta.overwrite === "skip" || item.meta.overwrite === "overwrite"
-							? item.meta.duplicate.key
-							: imported_key;
-					this.import_key_map[item_type][imported_key] = new_key;
-				});
+				await Promise.all(
+					items.map(async (item) => {
+						const imported_key = item.meta.key;
+						// Als skip gebruik existing key met existing data
+						// Als overwrite gebruik existing key met new data
+						// Als duplicate gebruik old key (imported key)
+						const new_key =
+							item.meta.overwrite === "duplicate"
+								? await keyGenFnMap[item_type]()
+								: item.meta.overwrite === "skip" || item.meta.overwrite === "overwrite"
+								? item.meta.duplicate.key
+								: imported_key;
+						this.import_key_map[item_type][imported_key] = new_key;
+					})
+				);
 			}
 		},
 
@@ -520,7 +527,7 @@ export default {
 			);
 		},
 		async importData() {
-			this.generateKeyMap();
+			await this.generateKeyMap();
 			console.log("key map generated", this.import_key_map);
 
 			/**

@@ -38,7 +38,11 @@
 				<i aria-hidden="true" class="fas fa-plus green" />
 				New encounter
 			</button>
-			<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">
+			<router-link
+				v-else-if="overencumbered"
+				class="btn btn-sm ml-1 bg-neutral-5"
+				to="/content/manage"
+			>
 				<i aria-hidden="true" class="fas fa-box-full red mr-1" />
 				Over encumbered
 			</router-link>

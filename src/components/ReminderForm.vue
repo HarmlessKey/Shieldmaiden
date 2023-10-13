@@ -229,7 +229,7 @@
 											: removeOption(key, i)
 									"
 								>
-									<q-tooltip anchor="top middle" self="center middle"> Remove option </q-tooltip>
+									<q-tooltip anchor="top middle" self="center middle">Remove option</q-tooltip>
 								</q-icon>
 							</template>
 						</q-input>

@@ -75,7 +75,7 @@
 									<Encounters />
 								</hk-pane>
 								<hk-pane v-if="container.width >= lg" :size="paneSize('left-bottom')">
-									<Media />
+									<SoundBoard />
 								</hk-pane>
 							</Splitpanes>
 						</Pane>
@@ -142,7 +142,7 @@
 						<Share :campaign="campaign" />
 					</q-tab-panel>
 					<q-tab-panel name="media" class="p-0">
-						<Media />
+						<SoundBoard />
 					</q-tab-panel>
 				</q-tab-panels>
 			</div>
@@ -155,7 +155,7 @@
 <script>
 import Encounters from "../Encounters";
 import Players from "src/components/campaign/Players.vue";
-import Media from "src/components/campaign/Media.vue";
+import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
 
@@ -166,7 +166,7 @@ export default {
 	components: {
 		Encounters,
 		Players,
-		Media,
+		SoundBoard,
 		Share,
 		Resources,
 	},
@@ -204,7 +204,7 @@ export default {
 					icon: "fas fa-share-alt",
 				},
 				{
-					label: "Media",
+					label: "SoundBoard",
 					value: "media",
 					icon: "fas fa-image",
 				},

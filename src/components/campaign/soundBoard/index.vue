@@ -17,28 +17,37 @@
 			/>
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
-			<q-tab-panel name="spotify"> </q-tab-panel>
-			<q-tab-panel name="youtube"> </q-tab-panel>
+			<q-tab-panel name="music">
+				<Board type="music" />
+			</q-tab-panel>
+			<q-tab-panel name="ambience">
+				<Board type="ambience" />
+			</q-tab-panel>
 		</q-tab-panels>
 	</div>
 </template>
 
 <script>
+import Board from "./Board.vue";
+
 export default {
 	name: "Media",
+	components: {
+		Board,
+	},
 	data() {
 		return {
-			tab: "spotify",
+			tab: "music",
 			tabs: [
 				{
-					name: "spotify",
-					label: "Spotify",
-					icon: "fab fa-spotify",
+					name: "music",
+					label: "Music",
+					icon: "fas fa-music",
 				},
 				{
-					name: "youtube",
-					label: "Youtube",
-					icon: "fab fa-youtube",
+					name: "ambience",
+					label: "Ambience",
+					icon: "fas fa-volume",
 				},
 			],
 		};
@@ -55,5 +64,14 @@ export default {
 			color: $blue;
 		}
 	}
+}
+.q-tab-panels {
+	height: 100%;
+	position: static;
+}
+.q-tab-panel {
+	padding: 10px;
+	min-height: 100%;
+	position: static;
 }
 </style>

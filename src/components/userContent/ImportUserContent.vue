@@ -275,7 +275,10 @@ export default {
 			failed_imports: [],
 			importing: undefined,
 			imported: 0,
-			import_key_map: {},
+			import_key_map: {
+				npcs: {},
+				spells: {},
+			},
 
 			parsed_data: {
 				npcs: [],
@@ -503,71 +506,91 @@ export default {
 			delete data.created;
 		},
 
+		generateKeyMap() {
+			for (const [item_type, items] of Object.entries(this.selected)) {
+				console.log(item_type, items);
+				items.forEach((item) => {
+					console.log(item);
+					const imported_key = item.meta.key;
+					// Als skip gebruik existing key met existing data
+					// Als overwrite gebruik existing key met new data
+					// Als duplicate gebruik old key (imported key)
+					const new_key =
+						item.meta.overwrite === "skip" || item.meta.overwrite === "overwrite"
+							? item.meta.duplicate.key
+							: imported_key;
+					this.import_key_map[item_type][imported_key] = new_key;
+				});
+			}
+			console.log("Key Map", this.import_key_map);
+		},
 		async importData() {
+			console.log("selected", this.selected);
+			this.generateKeyMap();
 			// First check if there are custom spells from imported NPCs that need to be added.
-			if (
-				this.import_custom_spells &&
-				this.custom_spells &&
-				Object.keys(this.custom_spells).length <= this.availableSpellSlots
-			) {
-				for (const [key, spell] of Object.entries(this.custom_spells)) {
-					try {
-						// TODO: use parse function to filter out spells
-						await this.add_spell({ spell: spell, predefined_key: key });
-					} catch (error) {
-						this.failed_imports.push(spell);
-					}
-				}
-			}
+			// if (
+			// 	this.import_custom_spells &&
+			// 	this.custom_spells &&
+			// 	Object.keys(this.custom_spells).length <= this.availableSpellSlots
+			// ) {
+			// 	for (const [key, spell] of Object.entries(this.custom_spells)) {
+			// 		try {
+			// 			// TODO: use parse function to filter out spells
+			// 			await this.add_spell({ spell: spell, predefined_key: key });
+			// 		} catch (error) {
+			// 			this.failed_imports.push(spell);
+			// 		}
+			// 	}
+			// }
 
-			if (this.importTotal <= this.availableSlots) {
-				this.importing = this.selected.unique.length + this.selected.duplicate.length;
-				for (const item of this.selected.unique) {
-					delete item.index; // Was added for selection
-					delete item.player_id; // Should never be imported. Account related property.
+			// if (this.importTotal <= this.availableSlots) {
+			// 	this.importing = this.selected.unique.length + this.selected.duplicate.length;
+			// 	for (const item of this.selected.unique) {
+			// 		delete item.index; // Was added for selection
+			// 		delete item.player_id; // Should never be imported. Account related property.
 
-					try {
-						await this.addItem(item);
-					} catch {
-						this.failed_imports.push(item);
-					}
-					this.imported++;
-				}
+			// 		try {
+			// 			await this.addItem(item);
+			// 		} catch {
+			// 			this.failed_imports.push(item);
+			// 		}
+			// 		this.imported++;
+			// 	}
 
-				for (const item of this.selected.duplicate) {
-					delete item.index; // Was added for selection
-					delete item.player_id; // Should never be imported. Account related property.
+			// 	for (const item of this.selected.duplicate) {
+			// 		delete item.index; // Was added for selection
+			// 		delete item.player_id; // Should never be imported. Account related property.
 
-					if (this.overwrite) {
-						// Get the id of the existing item with the same name
-						const id = this.data.filter((i) => {
-							return i.name.toLowerCase() === item.name.toLowerCase();
-						})[0].key;
-						try {
-							// Fetch the full existing item
-							const existing_item = this.getItem(id);
+			// 		if (this.overwrite) {
+			// 			// Get the id of the existing item with the same name
+			// 			const id = this.data.filter((i) => {
+			// 				return i.name.toLowerCase() === item.name.toLowerCase();
+			// 			})[0].key;
+			// 			try {
+			// 				// Fetch the full existing item
+			// 				const existing_item = this.getItem(id);
 
-							// Keep the player_id of the existing NPC, or remove it if the existing has no player_id
-							// This is an account related property for companions that shouldn't change with imports
-							if (this.type === "npcs") {
-								item.player_id = existing_item.player_id ? existing_item.player_id : null;
-							}
+			// 				// Keep the player_id of the existing NPC, or remove it if the existing has no player_id
+			// 				// This is an account related property for companions that shouldn't change with imports
+			// 				if (this.type === "npcs") {
+			// 					item.player_id = existing_item.player_id ? existing_item.player_id : null;
+			// 				}
 
-							// Edit the item
-							await this.editItem(id, item);
-						} catch {
-							this.failed_imports.push(item);
-						}
-					} else {
-						try {
-							await this.addItem(item);
-						} catch {
-							this.failed_imports.push(item);
-						}
-					}
-					this.imported++;
-				}
-			}
+			// 				// Edit the item
+			// 				await this.editItem(id, item);
+			// 			} catch {
+			// 				this.failed_imports.push(item);
+			// 			}
+			// 		} else {
+			// 			try {
+			// 				await this.addItem(item);
+			// 			} catch {
+			// 				this.failed_imports.push(item);
+			// 			}
+			// 		}
+			// 		this.imported++;
+			// 	}
+			// }
 		},
 		copySchema() {
 			const toCopy = document.querySelector("#copy");
@@ -654,7 +677,7 @@ export default {
 		async checkIfDuplicateNpc(npc) {
 			const npcs = await this.get_npcs();
 			const dupByKey = npcs[npc.meta.key]
-				? { ...npcs[npc.meta.key], old_key: npc.meta.key }
+				? { ...npcs[npc.meta.key], key: npc.meta.key }
 				: undefined;
 			const dupByNameEntry = Object.entries(npcs).find(
 				([key, n]) => n.name.toLowerCase() === npc.name.toLowerCase()
@@ -663,7 +686,7 @@ export default {
 			if (dupByNameEntry) {
 				const [key, val] = dupByNameEntry;
 				dupByName = {
-					old_key: key,
+					key,
 					...val,
 				};
 			}
@@ -673,7 +696,7 @@ export default {
 		async checkIfDuplicateSpell(spell) {
 			const spells = await this.get_spells();
 			const dupByKey = spells[spell.meta.key]
-				? { ...spells[spell.meta.key], old_key: spell.meta.key }
+				? { ...spells[spell.meta.key], key: spell.meta.key }
 				: undefined;
 			const dupByNameEntry = Object.entries(spells).find(
 				([key, s]) => s.name.toLowerCase() === spell.name.toLowerCase()
@@ -682,7 +705,7 @@ export default {
 			if (dupByNameEntry) {
 				const [key, val] = dupByNameEntry;
 				dupByName = {
-					old_key: key,
+					key,
 					...val,
 				};
 			}

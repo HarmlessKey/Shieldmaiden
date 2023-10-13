@@ -81,30 +81,7 @@
 										class="orange"
 									/>
 									<div slot="content">
-										<pre>{{ props.row.meta }}</pre>
-										<pre>{{ props.row.meta.duplicate }}</pre>
-										<q-btn-toggle
-											v-if="props.row.meta.duplicate"
-											v-model="props.row.meta.overwrite"
-											toggle-color="primary"
-											dense
-											flat
-											:options="[
-												{ value: 'overwrite', icon: 'fas fa-pen', slot: 'overwrite' },
-												{ value: 'duplicate', icon: 'fas fa-copy', slot: 'duplicate' },
-												{ value: 'skip', icon: 'fas fa-ban', slot: 'skip' },
-											]"
-										>
-											<template v-slot:overwrite>
-												<q-tooltip>Overwrite</q-tooltip>
-											</template>
-											<template v-slot:duplicate>
-												<q-tooltip>Duplicate</q-tooltip>
-											</template>
-											<template v-slot:skip>
-												<q-tooltip>Skip</q-tooltip>
-											</template>
-										</q-btn-toggle>
+										<DuplicateOptions v-model="props.row" />
 									</div>
 								</hk-popover>
 							</td>
@@ -257,12 +234,14 @@ import npcSchema from "src/schemas/hk-npc-schema.json";
 import spellSchema from "src/schemas/hk-spell-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
+import DuplicateOptions from "./importer/DuplicateOptions";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
 
 export default {
 	name: "ImportUserContent",
+	components: { DuplicateOptions },
 	data() {
 		return {
 			uid: this.$store.getters.user.uid,

@@ -65,7 +65,7 @@ export class npcServices {
 	 * @param {Object} search_npc Compressed NPC
 	 * @returns Key of the newly added NPC
 	 */
-	async addNpc(uid, npc, search_npc) {
+	async addNpc(uid, npc, search_npc, predefined_key = undefined) {
 		try {
 			npc.name = npc.name.toLowerCase();
 
@@ -77,11 +77,17 @@ export class npcServices {
 			npc.updated = firebase.database.ServerValue.TIMESTAMP;
 
 			// Save the new NPC
-			const newNpcRef = await NPCS_REF.child(uid).push(npc);
+			let npc_key = predefined_key;
+			if (predefined_key) {
+				await NPCS_REF.child(uid).child(predefined_key).set(npc);
+			} else {
+				const newNpc = await NPCS_REF.child(uid).push(npc);
+				npc_key = newNpc.key;
+			}
 
 			// Upload image
 			if (blob) {
-				STORAGE_REF.child(`${uid}/${newNpcRef.key}.webp`)
+				STORAGE_REF.child(`${uid}/${npc_key}.webp`)
 					.put(blob)
 					.then((snapshot) => {
 						snapshot.ref.getDownloadURL().then((url) => {
@@ -89,16 +95,16 @@ export class npcServices {
 							npc.storage_avatar = url;
 
 							// Update NPC
-							NPCS_REF.child(`${uid}/${newNpcRef.key}/storage_avatar`).set(url);
-							SEARCH_NPCS_REF.child(`${uid}/results/${newNpcRef.key}`).set(search_npc);
+							NPCS_REF.child(`${uid}/${npc_key}/storage_avatar`).set(url);
+							SEARCH_NPCS_REF.child(`${uid}/results/${npc_key}`).set(search_npc);
 						});
 					});
 			} else {
 				// Update search_npcs
-				SEARCH_NPCS_REF.child(`${uid}/results/${newNpcRef.key}`).set(search_npc);
+				SEARCH_NPCS_REF.child(`${uid}/results/${npc_key}`).set(search_npc);
 			}
-			const newNpc = await NPCS_REF.child(`${uid}/${newNpcRef.key}`).once("value");
-			return [newNpc.val(), newNpcRef.key];
+			const newNpc = await NPCS_REF.child(`${uid}/${npc_key}`).once("value");
+			return [newNpc.val(), npc_key];
 		} catch (error) {
 			throw error;
 		}

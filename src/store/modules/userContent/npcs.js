@@ -154,7 +154,7 @@ const npc_actions = {
 	 * @param {object} npc
 	 * @returns {string} the id of the newly added npc
 	 */
-	async add_npc({ rootGetters, commit, dispatch }, npc) {
+	async add_npc({ rootGetters, commit, dispatch }, { npc, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.npcs;
 
@@ -167,7 +167,7 @@ const npc_actions = {
 			}
 			try {
 				const search_npc = convert_npc(npc);
-				const [new_npc, id] = await services.addNpc(uid, npc, search_npc);
+				const [new_npc, id] = await services.addNpc(uid, npc, search_npc, predefined_key);
 				console.log("store add npc", new_npc);
 				commit("SET_NPC", { id, search_npc });
 				commit("SET_CACHED_NPC", { uid, id, new_npc });

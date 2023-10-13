@@ -336,21 +336,6 @@ export default {
 	async mounted() {
 		this.type === "npcs" ? await this.get_npcs() : await this.get_spells();
 	},
-	watch: {
-		selected: {
-			handler(newValue) {
-				console.log("selected changed", newValue);
-				console.log("table data", this.parsed_data);
-			},
-			deep: true,
-		},
-		parsed_data: {
-			handler(newVal) {
-				console.log("parsed_data changed", newVal);
-			},
-			deep: true,
-		},
-	},
 	methods: {
 		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
 		...mapActions("encounters", ["add_encounter", "get_encounter", "get_encounters"]),
@@ -508,9 +493,7 @@ export default {
 
 		generateKeyMap() {
 			for (const [item_type, items] of Object.entries(this.selected)) {
-				console.log(item_type, items);
 				items.forEach((item) => {
-					console.log(item);
 					const imported_key = item.meta.key;
 					// Als skip gebruik existing key met existing data
 					// Als overwrite gebruik existing key met new data
@@ -522,75 +505,68 @@ export default {
 					this.import_key_map[item_type][imported_key] = new_key;
 				});
 			}
-			console.log("Key Map", this.import_key_map);
+		},
+
+		async mapNpcSpellsObject(spell_obj) {
+			if (!spell_obj) {
+				return null;
+			}
+			return await Object.fromEntries(
+				Object.entries(spell_obj).map(([key, spell]) => {
+					return spell.custom && this.import_key_map.spells[key]
+						? [this.import_key_map.spells[key], spell]
+						: [key, spell];
+				})
+			);
 		},
 		async importData() {
-			console.log("selected", this.selected);
 			this.generateKeyMap();
-			// First check if there are custom spells from imported NPCs that need to be added.
-			// if (
-			// 	this.import_custom_spells &&
-			// 	this.custom_spells &&
-			// 	Object.keys(this.custom_spells).length <= this.availableSpellSlots
-			// ) {
-			// 	for (const [key, spell] of Object.entries(this.custom_spells)) {
-			// 		try {
-			// 			// TODO: use parse function to filter out spells
-			// 			await this.add_spell({ spell: spell, predefined_key: key });
-			// 		} catch (error) {
-			// 			this.failed_imports.push(spell);
-			// 		}
-			// 	}
-			// }
+			console.log("key map generated", this.import_key_map);
 
-			// if (this.importTotal <= this.availableSlots) {
-			// 	this.importing = this.selected.unique.length + this.selected.duplicate.length;
-			// 	for (const item of this.selected.unique) {
-			// 		delete item.index; // Was added for selection
-			// 		delete item.player_id; // Should never be imported. Account related property.
+			/**
+			 * Importing data to DB
+			 * 1. Spells
+			 * 2. NPCs
+			 *    - Update custom spell keys to correct keys
+			 * 3. Campaigns
+			 * 4. Encounters
+			 *    - Use campaign key
+			 *    - Update NPCs in encounter to correct keys
+			 */
 
-			// 		try {
-			// 			await this.addItem(item);
-			// 		} catch {
-			// 			this.failed_imports.push(item);
-			// 		}
-			// 		this.imported++;
-			// 	}
+			this.selected.spells.forEach(async (spell) => {
+				const key = this.import_key_map.spells[spell.meta.key];
+				const meta = { ...spell.meta };
+				delete spell.meta;
+				if (meta.overwrite !== "skip") {
+					try {
+						console.log("Will add spell:", spell, key, meta);
+						await this.add_spell({ spell, predefined_key: key });
+						console.log("Added spell");
+					} catch (error) {
+						this.failed_imports.push(spell);
+						console.log("Failed SPELL import", spell);
+					}
+				}
+			});
 
-			// 	for (const item of this.selected.duplicate) {
-			// 		delete item.index; // Was added for selection
-			// 		delete item.player_id; // Should never be imported. Account related property.
-
-			// 		if (this.overwrite) {
-			// 			// Get the id of the existing item with the same name
-			// 			const id = this.data.filter((i) => {
-			// 				return i.name.toLowerCase() === item.name.toLowerCase();
-			// 			})[0].key;
-			// 			try {
-			// 				// Fetch the full existing item
-			// 				const existing_item = this.getItem(id);
-
-			// 				// Keep the player_id of the existing NPC, or remove it if the existing has no player_id
-			// 				// This is an account related property for companions that shouldn't change with imports
-			// 				if (this.type === "npcs") {
-			// 					item.player_id = existing_item.player_id ? existing_item.player_id : null;
-			// 				}
-
-			// 				// Edit the item
-			// 				await this.editItem(id, item);
-			// 			} catch {
-			// 				this.failed_imports.push(item);
-			// 			}
-			// 		} else {
-			// 			try {
-			// 				await this.addItem(item);
-			// 			} catch {
-			// 				this.failed_imports.push(item);
-			// 			}
-			// 		}
-			// 		this.imported++;
-			// 	}
-			// }
+			this.selected.npcs.forEach(async (npc) => {
+				const key = this.import_key_map.npcs[npc.meta.key];
+				const meta = { ...npc.meta };
+				delete npc.meta;
+				if (meta.overwrite !== "skip") {
+					npc.caster_spells = await this.mapNpcSpellsObject(npc.caster_spells);
+					npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
+					try {
+						console.log("Will add npc:", { ...npc }, key, meta);
+						this.add_npc({ npc, predefined_key: key });
+						console.log("Added NPC");
+					} catch (error) {
+						this.failed_imports.push(npc);
+						console.log("Failed NPC import", npc);
+					}
+				}
+			});
 		},
 		copySchema() {
 			const toCopy = document.querySelector("#copy");

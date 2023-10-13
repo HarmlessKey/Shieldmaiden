@@ -151,6 +151,8 @@ export default {
 			set(newVal) {
 				this.showCardSetter = newVal;
 			},
+		},
+	},
 	methods: {
 		...mapActions(["remove_limitedUses", "set_show_monster_card"]),
 		percentage(current, max) {

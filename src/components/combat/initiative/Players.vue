@@ -2,8 +2,8 @@
 	<div>
 		<ul v-if="entities" class="entities hasImg">
 			<li v-for="(entity, index) in players" :key="entity.key">
-				<span 
-					class="img" 
+				<span
+					class="img"
 					:style="{
 						'background-image': entity.img ? 'url(' + entity.img + ')' : '',
 						'border-color': entity.color_label ? entity.color_label : ``,
@@ -65,16 +65,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	ul.entities {
-		margin: 0;
-		li {
-			padding-right: 3px;
-			background: $neutral-8;
-			
-			.actions {
-				align-items: center;
-				padding: 0;
-			}
+ul.entities {
+	margin: 0;
+	li {
+		padding-right: 3px;
+		background: $neutral-8;
+
+		.actions {
+			align-items: center;
+			padding: 0;
 		}
 	}
 }

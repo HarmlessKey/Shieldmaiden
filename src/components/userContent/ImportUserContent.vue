@@ -139,7 +139,12 @@
 					<strong>{{ countSelected }}</strong> selected
 				</div>
 				<q-form @submit="importData">
-					<q-btn color="primary" no-caps type="submit" :disabled="countSelected === 0">
+					<q-btn
+						color="primary"
+						no-caps
+						type="submit"
+						:disabled="countSelected === 0 || willBeOverencumbered()"
+					>
 						Import
 					</q-btn>
 				</q-form>
@@ -519,6 +524,18 @@ export default {
 			);
 		},
 		async importData() {
+			if (this.willBeOverencumbered()) {
+				console.log(
+					"%cYou rolled 1 on your stealth check!",
+					"color:red;font-family:system-ui;font-size:2rem;-webkit-text-stroke: 1px black;font-weight:bold"
+				);
+				console.warn(
+					"The developer sees that you're trying to import more than you are allowed by removing the disabled tag on the import button.",
+					"You have been reported to the city guard"
+				);
+				return;
+			}
+			this.importing = true;
 			await this.generateKeyMap();
 			console.log("key map generated", this.import_key_map);
 
@@ -532,7 +549,7 @@ export default {
 			 *    - Use campaign key
 			 *    - Update NPCs in encounter to correct keys
 			 */
-
+			console.log("before spells");
 			this.selected.spells.forEach(async (spell) => {
 				const key = this.import_key_map.spells[spell.meta.key];
 				const meta = { ...spell.meta };
@@ -548,7 +565,7 @@ export default {
 					}
 				}
 			});
-
+			console.log("after spells before npcs");
 			this.selected.npcs.forEach(async (npc) => {
 				const key = this.import_key_map.npcs[npc.meta.key];
 				const meta = { ...npc.meta };
@@ -566,6 +583,7 @@ export default {
 					}
 				}
 			});
+			console.log("after npcs");
 		},
 		copySchema() {
 			const toCopy = document.querySelector("#copy");
@@ -690,9 +708,18 @@ export default {
 		newContentCount(import_type) {
 			return (
 				this.content_count[import_type] +
-				this.selected[import_type].filter(
+				this.selected[import_type]?.filter(
 					(item) => item.meta.overwrite === false || item.meta.overwrite === "duplicate"
 				).length
+			);
+		},
+		willBeOverencumbered() {
+			const import_types = ["npcs", "spells", "encounters", "campaigns"];
+
+			return (
+				import_types.filter(
+					(import_type) => this.newContentCount(import_type) > this.tier.benefits[import_type]
+				).length > 0
 			);
 		},
 	},

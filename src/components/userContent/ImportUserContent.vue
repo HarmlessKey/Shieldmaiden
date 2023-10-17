@@ -448,7 +448,7 @@ export default {
 
 			npc.meta = { key };
 			npc.meta.duplicate = await this.checkIfDuplicateNpc(npc);
-			npc.meta.overwrite = false;
+			npc.meta.overwrite = "duplicate";
 
 			if (!valid) {
 				npc.meta.errors = ajv.errors;

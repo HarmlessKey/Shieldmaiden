@@ -575,7 +575,7 @@ export default {
 					npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
 					try {
 						console.log("Will add npc:", { ...npc }, key, meta);
-						this.add_npc({ npc, predefined_key: key });
+						await this.add_npc({ npc, predefined_key: key });
 						console.log("Added NPC");
 					} catch (error) {
 						this.failed_imports.push(npc);

@@ -663,8 +663,10 @@ export default {
 				damage_vulnerability: "damage_vulnerabilities",
 			};
 			for (const [old_key, new_key] of Object.entries(mapper)) {
-				npc[new_key] = npc[old_key];
-				delete npc[old_key];
+				if (npc[old_key]) {
+					npc[new_key] = npc[old_key];
+					delete npc[old_key];
+				}
 			}
 		},
 		async checkIfDuplicateNpc(npc) {

@@ -150,21 +150,22 @@
 				</q-form>
 			</div>
 		</div>
-		<!-- <div v-else>
+		<div v-else>
 			<h3 class="text-center">
-				{{ imported < importing ? "Importing" : "Imported" }} {{ importing }} {{ type_label }}
+				<!-- eslint-disable-next-line vue/no-parsing-error -->
+				{{ imported < countSelected ? "Importing" : "Imported" }} {{ countSelected }}
 			</h3>
 			<q-linear-progress
 				:dark="$store.getters.theme !== 'light'"
 				stripe
 				rounded
 				size="20px"
-				:value="imported / importing"
+				:value="imported / countSelected"
 				color="primary"
 				class="mb-4"
-			/> -->
+			/>
 
-		<!-- <q-expansion-item v-if="failed_imports.length" class="mb-4">
+			<!-- <q-expansion-item v-if="failed_imports.length" class="mb-4">
 				<template slot="header">
 					<q-item-section avatar>
 						<strong class="red">{{ failed_imports.length }}</strong>
@@ -204,17 +205,18 @@
 						<a @click="showSchema = true">Compare with our schema.</a>
 					</p>
 				</div>
-			</q-expansion-item>
+			</q-expansion-item> -->
 
-			<p v-if="imported < importing" class="text-center">
-				<hk-animated-integer :value="imported" /> / {{ importing }} imported.
+			<p v-if="imported < countSelected" class="text-center">
+				<hk-animated-integer :value="imported" /> / {{ countSelected }} imported.
 			</p>
 			<div v-else>
 				<p class="text-center green">Finished import!</p>
-				<q-btn no-caps label="Close" color="neutral-5" class="full-width" v-close-popup />
+				<q-btn no-caps label="Close" color="neutral-5" class="full-width" />
 			</div>
-		</div> -->
-		<!-- <q-dialog v-model="showSchema">
+		</div>
+
+		<q-dialog v-model="showSchema">
 			<hk-card :header="`${type_label} Schema`">
 				<div slot="header" class="card-header">
 					<span>{{ type_label }} Schema</span>
@@ -240,7 +242,7 @@
 					<input :value="JSON.stringify(this.schema)" id="copy" type="hidden" />
 				</div>
 			</hk-card>
-		</q-dialog> -->
+		</q-dialog>
 	</div>
 </template>
 
@@ -549,6 +551,7 @@ export default {
 			 *    - Use campaign key
 			 *    - Update NPCs in encounter to correct keys
 			 */
+
 			console.log("before spells");
 			this.selected.spells.forEach(async (spell) => {
 				const key = this.import_key_map.spells[spell.meta.key];
@@ -558,6 +561,7 @@ export default {
 					try {
 						console.log("Will add spell:", spell, key, meta);
 						await this.add_spell({ spell, predefined_key: key });
+						this.imported++;
 						console.log("Added spell");
 					} catch (error) {
 						this.failed_imports.push(spell);
@@ -576,6 +580,7 @@ export default {
 					try {
 						console.log("Will add npc:", { ...npc }, key, meta);
 						await this.add_npc({ npc, predefined_key: key });
+						this.imported++;
 						console.log("Added NPC");
 					} catch (error) {
 						this.failed_imports.push(npc);

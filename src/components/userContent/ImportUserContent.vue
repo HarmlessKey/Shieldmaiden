@@ -51,7 +51,7 @@
 				</q-form>
 			</ValidationObserver>
 		</template>
-		<!-- <hk-loader v-else-if="!parsed" prefix="Validating" :title="type_label" /> -->
+		<hk-loader v-else-if="!parsed" title="Validating JSON" />
 		<div v-else-if="!importing">
 			<template v-for="import_type in Object.keys(parsed_data)">
 				<div v-if="parsed_data[import_type].length" class="mb-4" :key="import_type">
@@ -220,6 +220,11 @@
 
 			<p v-if="imported < countSelected" class="text-center">
 				<hk-animated-integer :value="imported" /> / {{ countSelected }} imported.
+				<template v-if="failed_imports.length > 0">
+					<p v-for="failed in failed_imports" :key="failed.meta.key">
+						{{ failed }}
+					</p>
+				</template>
 			</p>
 			<div v-else>
 				<p class="text-center green">Finished import!</p>

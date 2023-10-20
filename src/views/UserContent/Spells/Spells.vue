@@ -74,10 +74,6 @@
 									content-type="spell"
 									:content-id="props.key"
 								/>
-								<!-- <button class="btn btn-sm bg-neutral-5 mx-2" @click="exportSpell(props.key)">
-									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
-									<q-tooltip anchor="top middle" self="center middle"> Download </q-tooltip>
-								</button> -->
 								<button
 									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete($event, props.key, props.row)"

@@ -91,23 +91,10 @@
 						selection="multiple"
 						:selected.sync="selected[import_type]"
 						hide-bottom
+						hide-top
 					>
-						<template v-slot:body-cell-duplicate="props">
+						<template v-slot:body-cell-name="props">
 							<td>
-								<hk-popover v-if="props.row.meta.duplicate">
-									<q-icon
-										:name="duplicate_icon[props.row.meta.overwrite] || 'fas fa-info-circle'"
-										class="orange"
-									/>
-									<div slot="content">
-										<DuplicateOptions v-model="props.row" />
-									</div>
-								</hk-popover>
-							</td>
-						</template>
-
-						<template v-slot:body-cell-invalid="props">
-							<td class="text-right">
 								<hk-popover v-if="props.row.meta.errors" header="Validation errors">
 									<q-icon name="error" class="red" />
 									<div slot="content">
@@ -126,6 +113,30 @@
 												</template>
 											</li>
 										</ol>
+									</div>
+								</hk-popover>
+								{{ props.row.name.capitalizeEach() }}
+							</td>
+						</template>
+
+						<template v-slot:body-cell-duplicate="props">
+							<td class="py-0 px-1">
+								<hk-popover
+									v-if="
+										props.row.meta.duplicate &&
+										selected[import_type].find((item) => item.meta.key === props.row.meta.key)
+									"
+									:header="props.row.name?.capitalizeEach()"
+								>
+									<button class="btn btn-sm bg-neutral-5">
+										<q-icon
+											:name="duplicate_icon[props.row.meta.overwrite] || 'fas fa-info-circle'"
+											class="mr-1"
+										/>
+										{{ props.row.meta.overwrite || "Select" }}
+									</button>
+									<div slot="content">
+										<DuplicateOptions v-model="props.row" />
 									</div>
 								</hk-popover>
 							</td>
@@ -300,14 +311,6 @@ export default {
 					name: "duplicate",
 					label: "Duplicate",
 					field: "duplicate",
-					align: "right",
-					style: "width: 0px",
-					headerStyle: "width: 0px",
-				},
-				{
-					name: "invalid",
-					label: "",
-					field: "error",
 					align: "right",
 					style: "width: 0px",
 					headerStyle: "width: 0px",
@@ -745,5 +748,14 @@ export default {
 }
 .no-table-margin::v-deep table {
 	margin-bottom: 0;
+}
+
+.q-table {
+	td {
+		.btn-sm {
+			padding: 2px 5px;
+			font-size: 12px;
+		}
+	}
 }
 </style>

@@ -1,15 +1,22 @@
 <template>
 	<div>
-		<div class="d-flex justify-content-between">
-			<DuplicateOptionItem :input="shortImported" />
-			<DuplicateOptionItem :input="existing" />
+		<div class="d-flex gap-1 justify-content-between mb-3">
+			<div>
+				<strong>New import</strong>
+				<DuplicateOptionItem :input="shortImported" />
+			</div>
+			<div>
+				<strong>Existing</strong>
+				<DuplicateOptionItem :input="existing" />
+			</div>
 		</div>
 		<q-btn-toggle
 			v-if="imported.meta.duplicate"
+			slot="footer"
 			v-model="imported.meta.overwrite"
 			toggle-color="primary"
 			dense
-			flat
+			spread
 			:options="[
 				{ value: 'overwrite', icon: 'fas fa-pen', slot: 'overwrite' },
 				{ value: 'duplicate', icon: 'fas fa-copy', slot: 'duplicate' },
@@ -72,4 +79,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.q-btn-toggle {
+	&::v-deep .q-icon {
+		font-size: 18px;
+	}
+}
+</style>

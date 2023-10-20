@@ -1,10 +1,10 @@
 <template>
-	<div class="mini-stat-block mx-1 p-2">
-		<strong class="name">{{ input.name.toLowerCase().capitalizeEach() }}</strong>
+	<div class="mini-stat-block p-2">
+		<div class="name truncate">{{ input.name.toLowerCase().capitalizeEach() }}</div>
 		<div v-for="stat in stat_properties" :key="stat.prop" class="d-flex justify-content-between">
 			<template v-if="input[stat.prop]">
 				<strong class="mr-1">{{ stat.label }}:</strong>
-				<span>{{ input[stat.prop].toString().capitalize() }}</span>
+				<span class="truncate">{{ input[stat.prop].toString().capitalize() }}</span>
 			</template>
 		</div>
 	</div>
@@ -35,14 +35,15 @@ export default {
 
 <style lang="scss" scoped>
 .mini-stat-block {
-	border: 1px black solid;
 	border-radius: $border-radius-small;
 	background-color: $neutral-5;
-}
 
-// .name {
-// 	overflow: hidden;
-// 	white-space: nowrap;
-// 	text-overflow: ellipsis;
-// }
+	.name {
+		border-bottom: solid 1px $neutral-2;
+		width: 100%;
+		font-weight: bold;
+		margin-bottom: 2px;
+		padding-bottom: 2px;
+	}
+}
 </style>

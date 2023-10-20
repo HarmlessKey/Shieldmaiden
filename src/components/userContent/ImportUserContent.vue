@@ -216,7 +216,7 @@
 			</div>
 		</div>
 
-		<q-dialog v-model="showSchema">
+		<!-- <q-dialog v-model="showSchema">
 			<hk-card :header="`${type_label} Schema`">
 				<div slot="header" class="card-header">
 					<span>{{ type_label }} Schema</span>
@@ -242,7 +242,7 @@
 					<input :value="JSON.stringify(this.schema)" id="copy" type="hidden" />
 				</div>
 			</hk-card>
-		</q-dialog>
+		</q-dialog> -->
 	</div>
 </template>
 
@@ -332,9 +332,6 @@ export default {
 			return Object.values(this.selected).flat(1).length;
 		},
 	},
-	async mounted() {
-		this.type === "npcs" ? await this.get_npcs() : await this.get_spells();
-	},
 	methods: {
 		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
 		...mapActions("encounters", ["add_encounter", "get_encounter", "get_encounters"]),
@@ -376,7 +373,6 @@ export default {
 			if (["1.0", "2.0"].includes(data.meta.export_version)) {
 				await this.parseV2(data);
 			}
-			// this.parsing = false;
 			this.parsed = true;
 		},
 
@@ -450,7 +446,7 @@ export default {
 
 			npc.meta = { key };
 			npc.meta.duplicate = await this.checkIfDuplicateNpc(npc);
-			npc.meta.overwrite = "duplicate";
+			npc.meta.overwrite = npc.meta.duplicate ? "duplicate" : undefined;
 
 			if (!valid) {
 				npc.meta.errors = ajv.errors;
@@ -473,7 +469,7 @@ export default {
 
 			spell.meta = { key };
 			spell.meta.duplicate = await this.checkIfDuplicateSpell(spell);
-			spell.meta.overwrite = "duplicate";
+			spell.meta.overwrite = spell.meta.duplicate ? "duplicate" : undefined;
 
 			if (!valid) {
 				spell.meta.errors = ajv.errors;
@@ -525,12 +521,14 @@ export default {
 			if (!spell_obj) {
 				return null;
 			}
-			return await Object.fromEntries(
-				Object.entries(spell_obj).map(([key, spell]) => {
-					return spell.custom && this.import_key_map.spells[key]
-						? [this.import_key_map.spells[key], spell]
-						: [key, spell];
-				})
+			return Object.fromEntries(
+				await Promise.all(
+					Object.entries(spell_obj).map(([key, spell]) => {
+						return spell.custom && this.import_key_map.spells[key]
+							? [this.import_key_map.spells[key], spell]
+							: [key, spell];
+					})
+				)
 			);
 		},
 		async importData() {
@@ -547,7 +545,6 @@ export default {
 			}
 			this.importing = true;
 			await this.generateKeyMap();
-			console.log("key map generated", this.import_key_map);
 
 			/**
 			 * Importing data to DB
@@ -560,49 +557,47 @@ export default {
 			 *    - Update NPCs in encounter to correct keys
 			 */
 
-			console.log("before spells");
-			this.selected.spells.forEach(async (spell) => {
-				const key = this.import_key_map.spells[spell.meta.key];
-				const meta = { ...spell.meta };
-				delete spell.meta;
-				if (meta.overwrite === "skip") {
-					// Skipped content is imported by default;
-					this.imported++;
-				} else {
-					try {
-						console.log("Will add spell:", spell, key, meta);
-						await this.add_spell({ spell, predefined_key: key });
+			await Promise.all(
+				this.selected.spells.map(async (spell) => {
+					const key = this.import_key_map.spells[spell.meta.key];
+					const meta = { ...spell.meta };
+					delete spell.meta;
+					if (meta.overwrite === "skip") {
+						// Skipped content is imported by default;
 						this.imported++;
-						console.log("Added spell");
-					} catch (error) {
-						this.failed_imports.push(spell);
-						console.log("Failed SPELL import", spell);
+					} else {
+						try {
+							await this.add_spell({ spell, predefined_key: key });
+							this.imported++;
+						} catch (error) {
+							this.failed_imports.push(spell);
+							console.log("Failed SPELL import", spell);
+						}
 					}
-				}
-			});
-			console.log("after spells before npcs");
-			this.selected.npcs.forEach(async (npc) => {
-				const key = this.import_key_map.npcs[npc.meta.key];
-				const meta = { ...npc.meta };
-				delete npc.meta;
-				if (meta.overwrite === "skip") {
-					// Skipped content is imported by default;
-					this.imported++;
-				} else {
-					npc.caster_spells = await this.mapNpcSpellsObject(npc.caster_spells);
-					npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
-					try {
-						console.log("Will add npc:", { ...npc }, key, meta);
-						await this.add_npc({ npc, predefined_key: key });
+				})
+			);
+
+			await Promise.all(
+				this.selected.npcs.map(async (npc) => {
+					const key = this.import_key_map.npcs[npc.meta.key];
+					const meta = { ...npc.meta };
+					delete npc.meta;
+					if (meta.overwrite === "skip") {
+						// Skipped content is imported by default;
 						this.imported++;
-						console.log("Added NPC");
-					} catch (error) {
-						this.failed_imports.push(npc);
-						console.log("Failed NPC import", npc);
+					} else {
+						npc.caster_spells = await this.mapNpcSpellsObject(npc.caster_spells);
+						npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
+						try {
+							await this.add_npc({ npc, predefined_key: key });
+							this.imported++;
+						} catch (error) {
+							this.failed_imports.push(npc);
+							console.log("Failed NPC import", npc);
+						}
 					}
-				}
-			});
-			console.log("after npcs");
+				})
+			);
 		},
 		copySchema() {
 			const toCopy = document.querySelector("#copy");

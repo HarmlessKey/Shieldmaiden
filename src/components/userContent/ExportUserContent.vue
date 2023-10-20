@@ -160,7 +160,7 @@ export default {
 				this.addNpcToExport(npc_id, npc);
 
 				const spell_types = ["caster_spells", "innate_spells"];
-				spell_types.map((spell_type) => {
+				spell_types.forEach((spell_type) => {
 					if (npc[spell_type]) {
 						Object.entries(npc[spell_type]).filter(([spell_id, spell]) => {
 							if (spell.custom === true) {
@@ -253,5 +253,3 @@ export default {
 	},
 };
 </script>
-
-<style lang="scss" scoped></style>

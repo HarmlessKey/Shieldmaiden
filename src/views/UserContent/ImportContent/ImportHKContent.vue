@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import ImportUserContent from "src/components/userContent/ImportUserContent";
 
 export default {

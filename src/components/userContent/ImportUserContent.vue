@@ -702,7 +702,20 @@ export default {
 						console.log("Failed NPC import", error, npc, key);
 					}
 				}
-			}
+			});
+
+			this.selected.campaigns.forEach(async (campaign) => {
+				const key = this.import_key_map[campaign.meta.key];
+				const meta = { ...campaign.meta };
+				delete campaign.meta;
+				try {
+					await this.add_campaign(campaign);
+					this.imported++;
+				} catch (error) {
+					this.failed_imports.push(campaign);
+					console.log("Failed Campaign import", error, campaign, key);
+				}
+			});
 		},
 		copySchema() {
 			try {

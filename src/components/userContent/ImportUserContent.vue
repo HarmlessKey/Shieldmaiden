@@ -431,7 +431,20 @@ export default {
 		},
 
 		async parseCampaign(key, campaign) {},
-		async parseEncounter(key, encounter) {},
+		async parseEncounter(key, campaign_key, encounter) {
+			delete encounter.key;
+			this.removeTimestamps(encounter);
+
+			const valid = ajv.validate(encounterSchema, encounter);
+
+			encounter.meta = { key, campaign_key };
+			encounter.meta.duplicate = await this.checkIfDuplicateEncounter(encounter);
+			encounter.meta.overwrite = encounter.meta.duplicate ? "duplicate" : undefined;
+
+			if (!valid) {
+				encounter.meta.errors = ajv.errors;
+			}
+		},
 		async parseNPC(key, npc) {
 			/**
 			 * 1. Remove unwanted props

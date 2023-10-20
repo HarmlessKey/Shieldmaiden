@@ -113,7 +113,7 @@ export default {
 				{
 					type: "ambience",
 					name: "Rain",
-					url: "https://www.youtube.com/watch?v=BATkn-OWXqM&ab_channel=RainSoundNatural",
+					url: "https://www.youtube.com/watch?v=mPZkdNFkNps&ab_channel=RelaxingAmbienceASMR",
 					image: "https://i.pinimg.com/originals/77/57/b0/7757b0e2f116e37f5ef887457a7a63b1.gif",
 					hk: true,
 				},

@@ -473,7 +473,7 @@ export default {
 
 			spell.meta = { key };
 			spell.meta.duplicate = await this.checkIfDuplicateSpell(spell);
-			spell.meta.overwrite = false;
+			spell.meta.overwrite = "duplicate";
 
 			if (!valid) {
 				spell.meta.errors = ajv.errors;

@@ -488,7 +488,7 @@ export default {
 			delete data.created;
 		},
 
-		getKey(item, item_type) {
+		async getKey(item, item_type) {
 			const keyGenFnMap = {
 				spells: this.reserve_spell_id,
 				npcs: this.reserve_npc_id,
@@ -500,24 +500,22 @@ export default {
 					return item.meta.duplicate.key;
 				case "duplicate":
 				default:
-					return keyGenFnMap[item_type]();
+					return await keyGenFnMap[item_type]();
 			}
 		},
 
 		async generateKeyMap() {
-			const keyGenFnMap = {
-				spells: this.reserve_spell_id,
-				npcs: this.reserve_npc_id,
-			};
-			for (const [item_type, items] of Object.entries(this.selected)) {
-				await Promise.all(
-					items.map(async (item) => {
-						const imported_key = item.meta.key;
-						const new_key = this.getKey(item, item_type);
-						this.import_key_map[item_type][imported_key] = new_key;
-					})
-				);
-			}
+			await Promise.all(
+				Object.entries(this.selected).map(async ([item_type, items]) => {
+					await Promise.all(
+						items.map(async (item) => {
+							const imported_key = item.meta.key;
+							const new_key = await this.getKey(item, item_type);
+							this.import_key_map[item_type][imported_key] = new_key;
+						})
+					);
+				})
+			);
 		},
 
 		async mapNpcSpellsObject(spell_obj) {
@@ -574,7 +572,7 @@ export default {
 							this.imported++;
 						} catch (error) {
 							this.failed_imports.push(spell);
-							console.log("Failed SPELL import", spell);
+							console.log("Failed SPELL import", error, spell);
 						}
 					}
 				})
@@ -596,7 +594,7 @@ export default {
 							this.imported++;
 						} catch (error) {
 							this.failed_imports.push(npc);
-							console.log("Failed NPC import", npc);
+							console.log("Failed NPC import", error, npc, key);
 						}
 					}
 				})

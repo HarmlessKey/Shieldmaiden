@@ -571,47 +571,43 @@ export default {
 			 *    - Update NPCs in encounter to correct keys
 			 */
 
-			await Promise.all(
-				this.selected.spells.map(async (spell) => {
-					const key = this.import_key_map.spells[spell.meta.key];
-					const meta = { ...spell.meta };
-					delete spell.meta;
-					if (meta.overwrite === "skip") {
-						// Skipped content is imported by default;
+			this.selected.spells.forEach(async (spell) => {
+				const key = this.import_key_map.spells[spell.meta.key];
+				const meta = { ...spell.meta };
+				delete spell.meta;
+				if (meta.overwrite === "skip") {
+					// Skipped content is imported by default;
+					this.imported++;
+				} else {
+					try {
+						await this.add_spell({ spell, predefined_key: key });
 						this.imported++;
-					} else {
-						try {
-							await this.add_spell({ spell, predefined_key: key });
-							this.imported++;
-						} catch (error) {
-							this.failed_imports.push(spell);
-							console.log("Failed SPELL import", error, spell);
-						}
+					} catch (error) {
+						this.failed_imports.push(spell);
+						console.log("Failed SPELL import", error, spell);
 					}
-				})
-			);
+				}
+			});
 
-			await Promise.all(
-				this.selected.npcs.map(async (npc) => {
-					const key = this.import_key_map.npcs[npc.meta.key];
-					const meta = { ...npc.meta };
-					delete npc.meta;
-					if (meta.overwrite === "skip") {
-						// Skipped content is imported by default;
+			this.selected.npcs.forEach(async (npc) => {
+				const key = this.import_key_map.npcs[npc.meta.key];
+				const meta = { ...npc.meta };
+				delete npc.meta;
+				if (meta.overwrite === "skip") {
+					// Skipped content is imported by default;
+					this.imported++;
+				} else {
+					npc.caster_spells = await this.mapNpcSpellsObject(npc.caster_spells);
+					npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
+					try {
+						await this.add_npc({ npc, predefined_key: key });
 						this.imported++;
-					} else {
-						npc.caster_spells = await this.mapNpcSpellsObject(npc.caster_spells);
-						npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
-						try {
-							await this.add_npc({ npc, predefined_key: key });
-							this.imported++;
-						} catch (error) {
-							this.failed_imports.push(npc);
-							console.log("Failed NPC import", error, npc, key);
-						}
+					} catch (error) {
+						this.failed_imports.push(npc);
+						console.log("Failed NPC import", error, npc, key);
 					}
-				})
-			);
+				}
+			});
 		},
 		copySchema() {
 			const toCopy = document.querySelector("#copy");

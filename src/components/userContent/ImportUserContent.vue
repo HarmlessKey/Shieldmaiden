@@ -557,7 +557,10 @@ export default {
 				const key = this.import_key_map.spells[spell.meta.key];
 				const meta = { ...spell.meta };
 				delete spell.meta;
-				if (meta.overwrite !== "skip") {
+				if (meta.overwrite === "skip") {
+					// Skipped content is imported by default;
+					this.imported++;
+				} else {
 					try {
 						console.log("Will add spell:", spell, key, meta);
 						await this.add_spell({ spell, predefined_key: key });
@@ -574,7 +577,10 @@ export default {
 				const key = this.import_key_map.npcs[npc.meta.key];
 				const meta = { ...npc.meta };
 				delete npc.meta;
-				if (meta.overwrite !== "skip") {
+				if (meta.overwrite === "skip") {
+					// Skipped content is imported by default;
+					this.imported++;
+				} else {
 					npc.caster_spells = await this.mapNpcSpellsObject(npc.caster_spells);
 					npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
 					try {

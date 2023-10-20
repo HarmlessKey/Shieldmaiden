@@ -139,13 +139,15 @@ export default {
 				id: encounter_id,
 			}).then(async (encounter) => {
 				this.addEncounterToExport(campaign_id, encounter_id, encounter);
-				await Promise.all(
-					Object.values(encounter.entities).map(async (entity) => {
-						if (entity.entityType === "npc" && entity.npc === "custom") {
-							this.exportQueue.npcs.add(entity.id);
-						}
-					})
-				);
+				if (encounter.entities) {
+					await Promise.all(
+						Object.values(encounter.entities).map(async (entity) => {
+							if (entity.entityType === "npc" && entity.npc === "custom") {
+								this.exportQueue.npcs.add(entity.id);
+							}
+						})
+					);
+				}
 			});
 		},
 		async exportNpcArray(npc_id_array) {

@@ -240,3 +240,28 @@ export async function getCharacterSyncCharacter(url) {
 		);
 	});
 }
+
+/**
+ * Check if a url is spotify or youtube
+ */
+export function urlType(url) {
+	switch (true) {
+		case !!url?.match(/^https?:\/\/(www.)?(youtube.)|(youtu.be)/):
+			return "youtube";
+		case !!url?.match(/^https?:\/\/(www.)?|(open.)spotify\./):
+			return "spotify";
+		default:
+			return "other";
+	}
+}
+
+export function modifyYoutubeUrl(url) {
+	url = url?.replace("youtu.be", "youtube.com");
+	url = url?.replace("youtube.com", "youtube-nocookie.com");
+	url = !url?.match(/\/embed/)
+		? url?.replace("youtube-nocookie.com", "youtube-nocookie.com/embed")
+		: url; // add embed
+	url = url?.replace(/(watch\?v=)(.*?)(&)/g, "$2$3"); // get the id and set it directly after the /
+	url = url?.replace(/\?.*/g, ""); // remove params from url
+	return url?.replace(/&.*/g, "");
+}

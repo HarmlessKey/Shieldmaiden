@@ -1,27 +1,35 @@
 <template>
 	<div class="sound-board">
 		<a
-			v-for="({ name, type, url, icon, image, hk }, i) in board"
-			:key="`${type}-${i}`"
-			:style="{ backgroundImage: image ? `url(${image})` : null }"
+			v-for="(sound, i) in board"
+			:key="`${sound.type}-${i}`"
+			:style="{ backgroundImage: sound.image ? `url(${sound.image})` : null }"
 			class="sound-board__button"
-			:href="url"
+			:href="sound.url"
 			target="_blank"
 			rel="noopener"
 		>
 			<img
-				v-if="hk"
+				v-if="sound.hk"
 				src="~assets/_img/logo/logo-icon-cyan.svg"
 				alt="hk logo"
 				class="sound-board__button-logo"
 			/>
-			<hk-icon :icon="icon" class="sound-board__button-icon" />
+			<hk-icon :icon="sound.icon" class="sound-board__button-icon" />
 			<div class="truncate sound-board__button-title">
-				{{ name }}
+				{{ sound.name }}
 			</div>
-			<q-tooltip anchor="top middle" self="center middle">{{ name }}</q-tooltip>
+			<q-tooltip anchor="top middle" self="center middle">{{ sound.name }}</q-tooltip>
 		</a>
-		<button class="btn btn-block bg-neutral-5 sound-board__add" @click="add_dialog = true">
+
+		<router-link
+			v-if="tier.name === 'Free'"
+			class="btn btn-block bg-patreon-red sound-board__add"
+			to="/patreon"
+		>
+			Add custom links
+		</router-link>
+		<button v-else class="btn btn-block bg-neutral-5 sound-board__add" @click="add_dialog = true">
 			<hk-icon icon="fas fa-plus" class="green" />
 			Add {{ type }}
 		</button>
@@ -68,6 +76,9 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
+import { urlType } from "src/utils/generalFunctions";
+
 export default {
 	name: "Media",
 	props: {
@@ -99,28 +110,28 @@ export default {
 				{
 					type: "music",
 					name: "Combat",
-					url: "",
+					url: "https://www.youtube.com/watch?v=WEel3jMmGo4",
 					image:
 						"https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/2286730/235e2d0743f744ec0ffda1d4a11324b76500d7c8.jpg",
 				},
 				{
 					type: "music",
-					name: "Town",
-					url: "https://open.spotify.com/playlist/0QRu6FvO8pN7aMQ38dZhLJ?si=fe46e4a741d742c6",
+					name: "Combat 2",
+					url: "https://www.youtube.com/watch?v=w0sUw735gRw",
 					image:
-						"https://www.oxpal.com/wp-content/uploads/2014/07/medieval_town_map_wpthumb-256x256.jpg",
+						"https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/2286730/235e2d0743f744ec0ffda1d4a11324b76500d7c8.jpg",
 				},
 				{
 					type: "ambience",
 					name: "Rain",
-					url: "https://www.youtube.com/watch?v=mPZkdNFkNps&ab_channel=RelaxingAmbienceASMR",
+					url: "https://www.youtube.com/watch?v=mPZkdNFkNps",
 					image: "https://i.pinimg.com/originals/77/57/b0/7757b0e2f116e37f5ef887457a7a63b1.gif",
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Snow",
-					url: "https://www.youtube.com/watch?v=sGkh1W5cbH4&ab_channel=RelaxingSoundzzz",
+					url: "https://www.youtube.com/watch?v=sGkh1W5cbH4",
 					image:
 						"https://cdn130.picsart.com/c7f29351-c222-4392-8866-cbc79945f2c5/407954039029201.jpg?type=webp&to=crop&r=256",
 					hk: true,
@@ -128,15 +139,58 @@ export default {
 				{
 					type: "ambience",
 					name: "Thunder",
-					url: "https://www.youtube.com/watch?v=fkFiIhDR_nc&ab_channel=Sounds4Sleeping",
+					url: "https://www.youtube.com/watch?v=fkFiIhDR_nc",
 					image:
 						"https://is4-ssl.mzstatic.com/image/thumb/Purple116/v4/0f/d9/75/0fd975d2-d544-0b98-3a0c-6fe64662d1e2/AppIcon-0-0-1x_U007emarketing-0-0-0-4-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/256x256bb.jpg",
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Forest by Day",
+					url: "https://www.youtube.com/watch?v=xNN7iTA57jM",
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Forest by Night",
+					url: "https://www.youtube.com/watch?v=ABCwX_ERUmw",
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Cave",
+					url: "https://www.youtube.com/watch?v=kxqJuc1HHbg",
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Campfire",
+					url: "https://www.youtube.com/watch?v=E77jmtut1Zc",
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Town by Day",
+					url: "https://www.youtube.com/watch?v=_52K0E_gNY0",
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Town by Night",
+					url: "https://www.youtube.com/watch?v=N9ghsVSTNuI&t=711s",
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Tavern",
+					url: "https://www.youtube.com/watch?v=rv3Nl-Od9YU",
 					hk: true,
 				},
 			],
 		};
 	},
 	computed: {
+		...mapGetters(["music", "tier"]),
 		board() {
 			return this.buttons
 				.filter((button) => button.type === this.type)
@@ -144,11 +198,12 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(["playMusic", "playAmbience"]),
 		getIcon(url, type) {
 			switch (true) {
-				case !!url.match(/^https?:\/\/(www.)?(youtube.)|(youtu.be)/):
+				case urlType(url) === "youtube":
 					return "fab fa-youtube";
-				case !!url.match(/^https?:\/\/(www.)?|(open.)spotify\./):
+				case urlType(url) === "spotify":
 					return "fab fa-spotify";
 				case type === "ambience":
 					return "fa fa-volume";
@@ -163,6 +218,13 @@ export default {
 				url: null,
 				image: null,
 			};
+		},
+		play(sound) {
+			if (sound.type === "music") {
+				this.playMusic(sound.url === this.music?.url ? null : sound);
+			} else {
+				this.playAmbience(sound);
+			}
 		},
 	},
 };
@@ -191,6 +253,7 @@ export default {
 		background-position: center;
 		font-size: 10px;
 		text-align: center;
+		background-color: $neutral-8;
 		gap: 0;
 
 		&-title {

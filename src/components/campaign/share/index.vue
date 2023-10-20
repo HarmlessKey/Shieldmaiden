@@ -176,6 +176,7 @@
 </template>
 
 <script>
+import { modifyYoutubeUrl } from "src/utils/generalFunctions";
 import Weather from "src/components/encounters/Weather";
 import Broadcast from "src/components/drawers/Broadcast.vue";
 import Sharing from "./Sharing.vue";
@@ -236,16 +237,6 @@ export default {
 					return !!this.campaign.weather;
 			}
 		},
-		modifyYoutubeUrl(url) {
-			url = url.replace("youtu.be", "youtube.com");
-			url = url.replace("youtube.com", "youtube-nocookie.com");
-			url = !url.match(/\/embed/)
-				? url.replace("youtube-nocookie.com", "youtube-nocookie.com/embed")
-				: url; // add embed
-			url = url.replace(/(watch\?v=)(.*?)(&)/g, "$2$3"); // get the id and set it directly after the /
-			url = url.replace(/\?.*/g, ""); // remove params from url
-			return url.replace(/&.*/g, "");
-		},
 		disableShare(property) {
 			return !isEmpty(this.share) && !Object.keys(this.share).includes(property);
 		},
@@ -254,7 +245,7 @@ export default {
 		},
 		startShare() {
 			if (this.share.youtube) {
-				this.share.youtube = this.modifyYoutubeUrl(this.share.youtube);
+				this.share.youtube = modifyYoutubeUrl(this.share.youtube);
 			}
 			this.set_campaign_prop({
 				id: this.campaignId,
@@ -271,7 +262,7 @@ export default {
 		},
 		setBackground() {
 			if (this.background.youtube) {
-				this.background.youtube = this.modifyYoutubeUrl(this.background.youtube);
+				this.background.youtube = modifyYoutubeUrl(this.background.youtube);
 			}
 			this.set_campaign_prop({
 				id: this.campaignId,

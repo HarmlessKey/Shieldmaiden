@@ -11,6 +11,8 @@ export default {
 		side_collapsed: true,
 		side_small_screen: false,
 		browser: browserDetect(),
+		music: null,
+		ambience: [],
 	}),
 
 	getters: {
@@ -37,6 +39,12 @@ export default {
 		},
 		browser(state) {
 			return state.browser;
+		},
+		music(state) {
+			return state.music;
+		},
+		ambience(state) {
+			return state.ambience;
 		},
 	},
 
@@ -200,6 +208,14 @@ export default {
 		setSideSmallScreen({ commit }, payload) {
 			commit("SET_SIDE_SMALL_SCREEN", payload);
 		},
+
+		playMusic({ commit }, payload) {
+			commit("SET_MUSIC", payload);
+		},
+
+		playAmbience({ commit }, payload) {
+			commit("SET_AMBIENCE", payload);
+		},
 	},
 
 	mutations: {
@@ -232,6 +248,18 @@ export default {
 		},
 		SET_SIDE_SMALL_SCREEN(state, payload) {
 			Vue.set(state, "side_small_screen", payload);
+		},
+		SET_MUSIC(state, payload) {
+			Vue.set(state, "music", payload);
+		},
+		SET_AMBIENCE(state, payload) {
+			let ambience = state.ambience;
+			if (ambience?.includes(payload)) {
+				ambience = ambience.filter((item) => item.url !== payload.url);
+			} else {
+				ambience.push(payload);
+			}
+			Vue.set(state, "ambience", ambience);
 		},
 	},
 };

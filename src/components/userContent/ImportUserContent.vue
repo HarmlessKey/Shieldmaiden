@@ -489,6 +489,22 @@ export default {
 			delete data.created;
 		},
 
+		getKey(item, item_type) {
+			const keyGenFnMap = {
+				spells: this.reserve_spell_id,
+				npcs: this.reserve_npc_id,
+			};
+
+			switch (item.meta.overwrite) {
+				case "skip":
+				case "overwrite":
+					return item.meta.duplicate.key;
+				case "duplicate":
+				default:
+					return keyGenFnMap[item_type]();
+			}
+		},
+
 		async generateKeyMap() {
 			const keyGenFnMap = {
 				spells: this.reserve_spell_id,
@@ -498,15 +514,7 @@ export default {
 				await Promise.all(
 					items.map(async (item) => {
 						const imported_key = item.meta.key;
-						// Als skip gebruik existing key met existing data
-						// Als overwrite gebruik existing key met new data
-						// Als duplicate gebruik old key (imported key)
-						const new_key =
-							item.meta.overwrite === "duplicate"
-								? await keyGenFnMap[item_type]()
-								: item.meta.overwrite === "skip" || item.meta.overwrite === "overwrite"
-								? item.meta.duplicate.key
-								: imported_key;
+						const new_key = this.getKey(item, item_type);
 						this.import_key_map[item_type][imported_key] = new_key;
 					})
 				);

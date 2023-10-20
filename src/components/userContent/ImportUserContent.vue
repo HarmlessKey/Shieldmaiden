@@ -307,14 +307,20 @@ export default {
 				spells: 0,
 			},
 			import_key_map: {
+				campaigns: {},
+				encounters: {},
 				npcs: {},
 				spells: {},
 			},
 			parsed_data: {
+				campaigns: [],
+				encounters: [],
 				npcs: [],
 				spells: [],
 			},
 			selected: {
+				campaigns: [],
+				encounters: [],
 				npcs: [],
 				spells: [],
 			},
@@ -379,7 +385,7 @@ export default {
 	},
 	methods: {
 		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
-		...mapActions("encounters", ["add_encounter", "get_encounter", "get_encounters"]),
+		...mapActions("encounters", ["add_encounter", "get_encounter", "get_campaign_encounters"]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc", "reserve_npc_id"]),
 		...mapActions("spells", [
 			"add_spell",
@@ -482,30 +488,57 @@ export default {
 					this.parseNPC(key, npc);
 				});
 			}
-			// if (data.campaigns && data.encounters) {
-			// 	Object.entries(data.campaigns).forEach(([key, campaign]) => {
-			// 		this.parseCampaign(key, campaign);
-			// 	});
-			// 	Object.entries(data.encounters).forEach(([key, encounter]) => {
-			// 		this.parseEncounter(key, encounter);
-			// 	});
-			// }
+			if (data.campaigns && data.encounters) {
+				console.log("Will parse encounters and campaigns");
+				console.log(data);
+				Object.entries(data.campaigns).forEach(([campaign_key, campaign]) => {
+					this.parseCampaign(campaign_key, campaign);
+					Object.entries(data.encounters[campaign_key]).forEach(([encounter_key, encounter]) => {
+						this.parseEncounter(encounter_key, campaign_key, encounter);
+					});
+				});
+			}
+			console.log("to import", this.parsed_data);
 		},
 
-		async parseCampaign(key, campaign) {},
+		async parseCampaign(key, campaign) {
+			console.log("Parsing campaign", campaign);
+			delete campaign.key;
+			this.removeTimestamps(campaign);
+
+			const valid = ajv.validate(campaignSchema, campaign);
+
+			campaign.meta = { key };
+			// Always duplicate an imported campaign
+			campaign.meta.duplicate = false;
+			campaign.meta.overwrite = undefined;
+
+			if (!valid) {
+				campaign.meta.errors = ajv.errors;
+			}
+
+			this.parsed_data.campaigns.push(campaign);
+			console.log("parsed Campaign", campaign.name);
+		},
 		async parseEncounter(key, campaign_key, encounter) {
+			console.log("Parsing encounter", encounter);
 			delete encounter.key;
 			this.removeTimestamps(encounter);
 
 			const valid = ajv.validate(encounterSchema, encounter);
+			console.log("Encounter", encounter.name, "is valid", valid);
 
 			encounter.meta = { key, campaign_key };
-			encounter.meta.duplicate = await this.checkIfDuplicateEncounter(encounter);
-			encounter.meta.overwrite = encounter.meta.duplicate ? "duplicate" : undefined;
+			// Always duplicate encounters and campaigns
+			encounter.meta.duplicate = false;
+			encounter.meta.overwrite = undefined;
 
 			if (!valid) {
 				encounter.meta.errors = ajv.errors;
 			}
+
+			this.parsed_data.encounters.push(encounter);
+			console.log("parsed Encounter", encounter.name);
 		},
 		async parseNPC(key, npc) {
 			/**

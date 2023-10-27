@@ -58,7 +58,6 @@ export default {
 		},
 		existing() {
 			const existing = this.imported.meta.duplicate;
-			delete existing.key;
 			return existing;
 		},
 		shortImported() {

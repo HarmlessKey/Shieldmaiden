@@ -154,7 +154,7 @@ const npc_actions = {
 	 * @param {object} npc
 	 * @returns {string} the id of the newly added npc
 	 */
-	async add_npc({ rootGetters, commit, dispatch }, { npc, predefined_key }) {
+	async add_npc({ rootGetters, commit, dispatch, state }, { npc, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.npcs;
 
@@ -172,7 +172,11 @@ const npc_actions = {
 				commit("SET_NPC", { id, search_npc });
 				commit("SET_CACHED_NPC", { uid, id, new_npc });
 
-				const new_count = await services.updateNpcCount(uid, 1);
+				const current_count = await services.getNpcCount(uid);
+				const state_count = Object.keys(state.npcs).length;
+				const count_diff = state_count - current_count;
+
+				const new_count = await services.updateNpcCount(uid, count_diff);
 				commit("SET_NPC_COUNT", new_count);
 				dispatch("checkEncumbrance", "", { root: true });
 				return id;

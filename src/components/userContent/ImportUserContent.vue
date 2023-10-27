@@ -176,7 +176,7 @@
 				class="mb-4"
 			/>
 
-			<!-- <q-expansion-item v-if="failed_imports.length" class="mb-4">
+			<q-expansion-item v-if="failed_imports.length" class="mb-4">
 				<template slot="header">
 					<q-item-section avatar>
 						<strong class="red">{{ failed_imports.length }}</strong>
@@ -184,7 +184,7 @@
 					<q-item-section class="red">Failed imports</q-item-section>
 				</template>
 				<div class="bg-neutral-8 px-3 py-2">
-					<p>Import failed for these {{ type_label }}</p>
+					<p>Import failed for following items</p>
 					<q-list dense class="mb-2">
 						<q-item v-for="(failed, i) in failed_imports" :key="`failed-${i}`" class="bg-neutral-9">
 							<q-item-section>
@@ -216,7 +216,7 @@
 						<a @click="showSchema = true">Compare with our schema.</a>
 					</p>
 				</div>
-			</q-expansion-item> -->
+			</q-expansion-item>
 
 			<p v-if="imported < countSelected" class="text-center">
 				<hk-animated-integer :value="imported" /> / {{ countSelected }} imported.
@@ -232,33 +232,33 @@
 			</div>
 		</div>
 
-		<!-- <q-dialog v-model="showSchema">
-			<hk-card :header="`${type_label} Schema`">
+		<q-dialog v-model="showSchema">
+			<hk-card>
 				<div slot="header" class="card-header">
-					<span>{{ type_label }} Schema</span>
+					<span>Schemas</span>
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
 				</div>
 				<div class="card-body">
 					<p>
 						You can use
 						<a href="https://www.jsonschemavalidator.net/" target="_blank" rel="noopener"
-							>this schema validator</a
+							>these schemas validator</a
 						>
-						to find errors in your {{ type_label }}.<br />
-						Paste our schema in the left field and the JSON of your {{ type_label }} in the right.
+						to find errors in your imported JSON.<br />
+						Paste our schema in the left field and the JSON of your imported JSON in the right.
 					</p>
 					<a class="btn btn-sm mb-2" @click="copySchema">Copy schema</a>
-					<h3>HK {{ type_label }} Schema</h3>
+					<h3>HK Schema</h3>
 					<div class="bg-neutral-8 px-2 py-2 overflow-auto">
 						<pre>
-							{{ this.schema }}
+							{{ schema }}
 						</pre
 						>
 					</div>
-					<input :value="JSON.stringify(this.schema)" id="copy" type="hidden" />
+					<!-- <input :value="JSON.stringify(this.npcSchema)" id="copy" type="hidden" /> -->
 				</div>
 			</hk-card>
-		</q-dialog> -->
+		</q-dialog>
 	</div>
 </template>
 
@@ -290,6 +290,7 @@ export default {
 			failed_imports: [],
 			importing: undefined,
 			imported: 0,
+			schema: npcSchema,
 			import_key_map: {
 				npcs: {},
 				spells: {},
@@ -424,15 +425,14 @@ export default {
 					this.parseNPC(key, npc);
 				});
 			}
-			if (data.campaigns && data.encounters) {
-				Object.entries(data.campaigns).forEach(([key, campaign]) => {
-					this.parseCampaign(key, campaign);
-				});
-				Object.entries(data.encounters).forEach(([key, encounter]) => {
-					this.parseEncounter(key, encounter);
-				});
-			}
-			console.log("to import", this.parsed_data);
+			// if (data.campaigns && data.encounters) {
+			// 	Object.entries(data.campaigns).forEach(([key, campaign]) => {
+			// 		this.parseCampaign(key, campaign);
+			// 	});
+			// 	Object.entries(data.encounters).forEach(([key, encounter]) => {
+			// 		this.parseEncounter(key, encounter);
+			// 	});
+			// }
 		},
 
 		async parseCampaign(key, campaign) {},
@@ -594,7 +594,7 @@ export default {
 				}
 			});
 
-			this.selected.npcs.forEach(async (npc) => {
+			for (const npc of this.selected.npcs) {
 				const key = this.import_key_map.npcs[npc.meta.key];
 				const meta = { ...npc.meta };
 				delete npc.meta;
@@ -612,7 +612,7 @@ export default {
 						console.log("Failed NPC import", error, npc, key);
 					}
 				}
-			});
+			}
 		},
 		copySchema() {
 			const toCopy = document.querySelector("#copy");
@@ -649,33 +649,38 @@ export default {
 			for (const type of ability_types) {
 				if (npc[type]) {
 					for (const ability of npc[type]) {
+						let is_versatile = false;
 						if (ability.versatile) {
 							// Turn versatile into options
+							is_versatile = true;
 							this.$set(ability, "options", [
 								ability.versatile_one || "Option 1",
 								ability.versatile_two || "Option 2",
 							]);
-							// Remove versatile
-							this.$delete(ability, "versatile");
-							this.$delete(ability, "versatile_one");
-							this.$delete(ability, "versatile_two");
+						}
+						// Remove versatile
+						this.$delete(ability, "versatile");
+						this.$delete(ability, "versatile_one");
+						this.$delete(ability, "versatile_two");
 
-							// In the actions find rolls with versatile options set
-							if (ability.action_list && ability.action_list.length) {
-								for (const action of ability.action_list) {
-									if (action.rolls) {
-										let options;
-										for (const roll of action.rolls) {
-											for (const option of versatile_options) {
-												if (
-													roll[`versatile_${option}`] !== undefined &&
-													roll[`versatile_${option}`] !== roll[option]
-												) {
-													options = !options ? { [ability.options[1]]: {} } : options;
-													options[ability.options[1]][option] = roll[`versatile_${option}`];
-												}
-												this.$delete(roll, `versatile_${option}`);
+						// In the actions find rolls with versatile options set
+						if (ability.action_list && ability.action_list.length) {
+							for (const action of ability.action_list) {
+								if (action.rolls) {
+									let options;
+									for (const roll of action.rolls) {
+										for (const option of versatile_options) {
+											if (
+												is_versatile &&
+												roll[`versatile_${option}`] !== undefined &&
+												roll[`versatile_${option}`] !== roll[option]
+											) {
+												options = !options ? { [ability.options[1]]: {} } : options;
+												options[ability.options[1]][option] = roll[`versatile_${option}`];
 											}
+											this.$delete(roll, `versatile_${option}`);
+										}
+										if (is_versatile) {
 											this.$set(roll, "options", options);
 										}
 									}
@@ -740,7 +745,7 @@ export default {
 			return (
 				this.content_count[import_type] +
 				this.selected[import_type]?.filter(
-					(item) => item.meta.overwrite === false || item.meta.overwrite === "duplicate"
+					(item) => item.meta.overwrite === undefined || item.meta.overwrite === "duplicate"
 				).length
 			);
 		},

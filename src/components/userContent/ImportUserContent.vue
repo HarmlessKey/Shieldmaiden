@@ -164,29 +164,33 @@
 		<div v-else>
 			<h3 class="text-center">
 				<!-- eslint-disable-next-line vue/no-parsing-error -->
-				{{ imported < countSelected ? "Importing" : "Imported" }} {{ countSelected }}
+				{{ countImported < countSelected ? "Importing" : "Imported" }} {{ selected2string }}
 			</h3>
 			<q-linear-progress
 				:dark="$store.getters.theme !== 'light'"
 				stripe
 				rounded
 				size="20px"
-				:value="imported / countSelected"
+				:value="countImported / countSelected"
 				color="primary"
 				class="mb-4"
 			/>
 
-			<q-expansion-item v-if="failed_imports.length" class="mb-4">
+			<q-expansion-item v-if="countFailed > 0" class="mb-4">
 				<template slot="header">
 					<q-item-section avatar>
-						<strong class="red">{{ failed_imports.length }}</strong>
+						<strong class="red">{{ countFailed }}</strong>
 					</q-item-section>
 					<q-item-section class="red">Failed imports</q-item-section>
 				</template>
-				<div class="bg-neutral-8 px-3 py-2">
-					<p>Import failed for following items</p>
+				<div
+					v-for="(failed_list, failed_type) in failed_imports"
+					:key="`failed-${failed_type}`"
+					class="bg-neutral-8 px-3 py-2"
+				>
+					<p>Import failed for following {{ failed_type }}</p>
 					<q-list dense class="mb-2">
-						<q-item v-for="(failed, i) in failed_imports" :key="`failed-${i}`" class="bg-neutral-9">
+						<q-item v-for="(failed, i) in failed_list" :key="`failed-${i}`" class="bg-neutral-9">
 							<q-item-section>
 								{{ failed.name.capitalizeEach() }}
 							</q-item-section>
@@ -213,14 +217,16 @@
 					</q-list>
 					<p>
 						Make sure there are no validation errors.<br />
-						<a @click="showSchema = true">Compare with our schema.</a>
+						<a @click="showSchemaDialog(failed_type)"
+							>Compare with our {{ failed_type.substring(0, failed_type.length - 1) }} schema.</a
+						>
 					</p>
 				</div>
 			</q-expansion-item>
 
-			<p v-if="imported < countSelected" class="text-center">
-				<hk-animated-integer :value="imported" /> / {{ countSelected }} imported.
-				<template v-if="failed_imports.length > 0">
+			<p v-if="countImported < countSelected" class="text-center">
+				<hk-animated-integer :value="countImported" /> / {{ countSelected }} imported.
+				<template v-if="hasFailedImports > 0">
 					<p v-for="failed in failed_imports" :key="failed.harmless_key">
 						{{ failed }}
 					</p>
@@ -271,6 +277,7 @@ import spellSchema from "src/schemas/hk-spell-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import DuplicateOptions from "./importer/DuplicateOptions";
+import { encounterServices } from "src/services/encounters";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
@@ -287,10 +294,16 @@ export default {
 			parsing: false,
 			parsed: false,
 			showSchema: false,
-			failed_imports: [],
+			failed_imports: {
+				npcs: [],
+				spells: [],
+			},
 			importing: undefined,
-			imported: 0,
-			schema: npcSchema,
+			imported: {
+				npcs: 0,
+				spells: 0,
+			},
+			schema: undefined,
 			import_key_map: {
 				npcs: {},
 				spells: {},
@@ -340,6 +353,26 @@ export default {
 		countSelected() {
 			return Object.values(this.selected).flat(1).length;
 		},
+		selected2string() {
+			console.log(this.selected);
+			const str = Object.entries(this.selected)
+				.filter(([T, list]) => list.length > 0)
+				.reduce((accumulator, [T, list]) => `${accumulator} ${list.length} ${T.capitalize()}`, "");
+			console.log(str);
+			return str;
+		},
+		countImported() {
+			return Object.values(this.imported).reduce((a, b) => a + b, 0);
+		},
+		countFailed() {
+			return Object.values(this.failed_imports).flat(1).length;
+		},
+
+		hasFailedImports() {
+			return Object.fromEntries(
+				Object.entries(this.failed_imports).filter(([T, list]) => list.length > 0)
+			);
+		},
 	},
 	methods: {
 		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
@@ -353,7 +386,23 @@ export default {
 			"get_spell_id_by_name",
 			"reserve_spell_id",
 		]),
-
+		showSchemaDialog(schema_type) {
+			this.showSchema = true;
+			switch (schema_type) {
+				case "npcs":
+					this.schema = npcSchema;
+					break;
+				case "spells":
+					this.schema = spellSchema;
+					break;
+				case "encounters":
+					this.schema = encounterSchema;
+					break;
+				case "campaigns":
+					this.schema = campaignSchema;
+					break;
+			}
+		},
 		loadJSON() {
 			const fr = new FileReader();
 
@@ -582,13 +631,13 @@ export default {
 				delete spell.meta;
 				if (meta.overwrite === "skip") {
 					// Skipped content is imported by default;
-					this.imported++;
+					this.imported.spells++;
 				} else {
 					try {
 						await this.add_spell({ spell, predefined_key: key });
-						this.imported++;
+						this.imported.spells++;
 					} catch (error) {
-						this.failed_imports.push(spell);
+						this.failed_imports.spells.push(spell);
 						console.log("Failed SPELL import", error, spell);
 					}
 				}
@@ -600,41 +649,31 @@ export default {
 				delete npc.meta;
 				if (meta.overwrite === "skip") {
 					// Skipped content is imported by default;
-					this.imported++;
+					this.imported.npcs++;
 				} else {
 					npc.caster_spells = await this.mapNpcSpellsObject(npc.caster_spells);
 					npc.innate_spells = await this.mapNpcSpellsObject(npc.innate_spells);
 					try {
 						await this.add_npc({ npc, predefined_key: key });
-						this.imported++;
+						this.imported.npcs++;
 					} catch (error) {
-						this.failed_imports.push(npc);
+						this.failed_imports.npcs.push(npc);
 						console.log("Failed NPC import", error, npc, key);
 					}
 				}
 			}
 		},
 		copySchema() {
-			const toCopy = document.querySelector("#copy");
-			toCopy.setAttribute("type", "text"); //hidden
-			toCopy.select();
-
 			try {
-				const successful = document.execCommand("copy");
-				const msg = successful ? "Successful" : "Unsuccessful";
-
-				this.$snotify.success(msg, "Schema copied", {
+				navigator.clipboard.writeText(JSON.stringify(this.schema));
+				this.$snotify.success("Successful", "Schema copied", {
 					position: "rightTop",
 				});
-			} catch (err) {
+			} catch {
 				this.$snotify.error("Unsuccessful", "Schema not copied", {
 					position: "rightTop",
 				});
 			}
-
-			/* unselect the range */
-			toCopy.setAttribute("type", "hidden");
-			window.getSelection().removeAllRanges();
 		},
 
 		/**

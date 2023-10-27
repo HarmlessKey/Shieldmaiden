@@ -234,7 +234,6 @@
 			</p>
 			<div v-else>
 				<p class="text-center green">Finished import!</p>
-				<q-btn no-caps label="Close" color="neutral-5" class="full-width" />
 			</div>
 		</div>
 

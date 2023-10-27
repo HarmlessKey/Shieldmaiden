@@ -146,7 +146,7 @@ const spell_actions = {
 				commit("SET_SPELL", { id, search_spell });
 				commit("SET_CACHED_SPELL", { uid, id, spell });
 
-				await dispatch("update_spell_count", 1);
+				await dispatch("update_spell_count");
 				return id;
 			} catch (error) {
 				throw error;
@@ -193,7 +193,7 @@ const spell_actions = {
 				commit("REMOVE_SPELL", id);
 				commit("REMOVE_CACHED_SPELL", { uid, id });
 
-				await dispatch("update_spell_count", -1);
+				await dispatch("update_spell_count");
 				return;
 			} catch (error) {
 				throw error;
@@ -204,12 +204,15 @@ const spell_actions = {
 	/**
 	 * Update spell count
 	 */
-	async update_spell_count({ rootGetters, dispatch, commit }, value) {
+	async update_spell_count({ state, rootGetters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_spell_services");
 			try {
-				const new_count = await services.updateSpellCount(uid, value);
+				const fb_count = await services.getSpellCount(uid);
+				const store_count = Object.keys(state.spells).length;
+				const count_diff = store_count - fb_count;
+				const new_count = await services.updateSpellCount(uid, count_diff);
 				commit("SET_SPELL_COUNT", new_count);
 				dispatch("checkEncumbrance", "", { root: true });
 			} catch (error) {

@@ -84,6 +84,7 @@ const routes = [
 					},
 					{
 						path: "hk_import",
+						name: "Import HK Content",
 						component: () => import("src/views/UserContent/ImportContent/ImportHKContent"),
 						meta: {
 							description: "Import User Content from an HK export",

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<template v-if="!parsed && !parsing">
+		<template v-if="import_state === 'start'">
 			<p>
 				Import Harmless Key Content.<br />
 				<small><em>Content from other sources can't be imported</em></small>
@@ -51,8 +51,8 @@
 				</q-form>
 			</ValidationObserver>
 		</template>
-		<hk-loader v-else-if="!parsed" title="Validating JSON" />
-		<div v-else-if="!importing">
+		<hk-loader v-else-if="import_state === 'parsing'" title="Validating JSON" />
+		<div v-else-if="import_state === 'selecting'">
 			<template v-for="import_type in Object.keys(parsed_data)">
 				<div v-if="parsed_data[import_type].length" class="mb-4" :key="import_type">
 					<h3>
@@ -234,6 +234,14 @@
 			</p>
 			<div v-else>
 				<p class="text-center green">Finished import!</p>
+				<q-btn
+					no-caps
+					:label="closeLabel"
+					@click="closeAction()"
+					color="neutral-5"
+					class="full-width"
+					v-close-popup="!isFullPage"
+				/>
 			</div>
 		</div>
 
@@ -277,6 +285,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import DuplicateOptions from "./importer/DuplicateOptions";
 import { encounterServices } from "src/services/encounters";
+import { ClosePopup } from "quasar";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
@@ -289,25 +298,21 @@ export default {
 			uid: this.$store.getters.user.uid,
 			json_file: undefined,
 			json_input: undefined,
-			overwrite: true,
-			parsing: false,
-			parsed: false,
 			showSchema: false,
+			schema: undefined,
+			import_state: "start",
 			failed_imports: {
 				npcs: [],
 				spells: [],
 			},
-			importing: undefined,
 			imported: {
 				npcs: 0,
 				spells: 0,
 			},
-			schema: undefined,
 			import_key_map: {
 				npcs: {},
 				spells: {},
 			},
-
 			parsed_data: {
 				npcs: [],
 				spells: [],
@@ -348,16 +353,19 @@ export default {
 		...mapGetters(["tier", "content_count", "overencumbered"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
 		...mapGetters("spells", ["spells", "spell_count"]),
-
+		isFullPage() {
+			return this.$route.name === "Import HK Content";
+		},
+		closeLabel() {
+			return this.isFullPage ? "Import more" : "Close";
+		},
 		countSelected() {
 			return Object.values(this.selected).flat(1).length;
 		},
 		selected2string() {
-			console.log(this.selected);
 			const str = Object.entries(this.selected)
 				.filter(([T, list]) => list.length > 0)
 				.reduce((accumulator, [T, list]) => `${accumulator} ${list.length} ${T.capitalize()}`, "");
-			console.log(str);
 			return str;
 		},
 		countImported() {
@@ -402,6 +410,11 @@ export default {
 					break;
 			}
 		},
+		closeAction() {
+			if (this.isFullPage) {
+				this.import_state = "start";
+			}
+		},
 		loadJSON() {
 			const fr = new FileReader();
 
@@ -422,7 +435,7 @@ export default {
 		},
 
 		async parse(data) {
-			this.parsing = true;
+			this.import_state = "parsing";
 			if (!data.meta) {
 				data = await this.mapOldToNew(data);
 				data.meta = { export_version: "1.0" };
@@ -430,7 +443,7 @@ export default {
 			if (["1.0", "2.0"].includes(data.meta.export_version)) {
 				await this.parseV2(data);
 			}
-			this.parsed = true;
+			this.import_state = "selecting";
 		},
 
 		async mapOldToNew(data) {
@@ -610,7 +623,7 @@ export default {
 				);
 				return;
 			}
-			this.importing = true;
+			this.import_state = "importing";
 			await this.generateKeyMap();
 
 			/**

@@ -94,6 +94,19 @@
 								Items
 							</q-tooltip>
 						</q-item>
+						<q-item clickable v-ripple to="/content/import">
+							<q-item-section avatar>
+								<i aria-hidden="true" class="fas fa-file-upload" />
+							</q-item-section>
+							<q-item-section class="title">Import</q-item-section>
+							<q-tooltip
+								v-if="$store.getters.side_collapsed"
+								anchor="center right"
+								self="center left"
+							>
+								Import
+							</q-tooltip>
+						</q-item>
 					</q-list>
 					<hr />
 					<h3>Player Content</h3>

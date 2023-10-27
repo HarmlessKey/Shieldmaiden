@@ -2,6 +2,16 @@ import Vue from "vue";
 import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
+/**
+ * @typedef {Object} Encounter
+ * @property {Array} entities
+ * @property {boolean} finished
+ * @property {string} name
+ * @property {number} round
+ * @property {number} turn
+ *
+ */
+
 // Converts a full encounter to a search_encounter
 const convert_encounter = (encounter) => {
 	const properties = ["name", "round", "turn", "finished"];
@@ -28,12 +38,12 @@ const encounter_getters = {
 		const encounters = state.encounters[campaignId];
 		// Convert object to sorted array
 		return _.chain(encounters)
-			.filter((campaign, key) => {
-				campaign.key = key;
-				return campaign.finished === finished;
+			.filter((encounter, key) => {
+				encounter.key = key;
+				return encounter.finished === finished;
 			})
-			.orderBy((campaign) => {
-				return parseInt(campaign.timestamp);
+			.orderBy((encounter) => {
+				return parseInt(encounter.timestamp);
 			}, "asc")
 			.value();
 	},
@@ -81,13 +91,14 @@ const encounter_actions = {
 			const services = await dispatch("get_encounter_services");
 			try {
 				encounters = await services.getCampaignEncounters(uid, campaignId, finished);
-				encounters = { ...campaign_encounters, ...encounters }; // Merge with encounters allready in the store
+				encounters = { ...campaign_encounters, ...encounters }; // Merge with encounters already in the store
 				commit("SET_ENCOUNTERS", { campaignId, encounters });
 			} catch (error) {
 				throw error;
 			}
 		}
-		return encounters;
+
+		return getters.get_encounters(campaignId, finished);
 	},
 
 	/**
@@ -124,6 +135,8 @@ const encounter_actions = {
 	 * @param {string} uid userId
 	 * @param {string} campaignId campaignId
 	 * @param {string} id encounterId
+	 *
+	 * @return {Encounter}
 	 */
 	async get_encounter({ state, commit, dispatch }, { uid, campaignId, id }) {
 		let encounter =
@@ -140,7 +153,6 @@ const encounter_actions = {
 				throw error;
 			}
 		}
-
 		// Check for non-existing NPCs, Companions and Players
 		// Remove them from the encounter if they don't exist
 		if (encounter.entities) {

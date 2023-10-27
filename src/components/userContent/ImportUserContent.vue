@@ -221,7 +221,7 @@
 			<p v-if="imported < countSelected" class="text-center">
 				<hk-animated-integer :value="imported" /> / {{ countSelected }} imported.
 				<template v-if="failed_imports.length > 0">
-					<p v-for="failed in failed_imports" :key="failed.meta.key">
+					<p v-for="failed in failed_imports" :key="failed.harmless_key">
 						{{ failed }}
 					</p>
 				</template>
@@ -650,7 +650,7 @@ export default {
 				if (npc[type]) {
 					for (const ability of npc[type]) {
 						let is_versatile = false;
-						if (ability.versatile) {
+						if (ability.versatile && !ability.options) {
 							// Turn versatile into options
 							is_versatile = true;
 							this.$set(ability, "options", [
@@ -680,7 +680,8 @@ export default {
 											}
 											this.$delete(roll, `versatile_${option}`);
 										}
-										if (is_versatile) {
+
+										if (is_versatile && options) {
 											this.$set(roll, "options", options);
 										}
 									}

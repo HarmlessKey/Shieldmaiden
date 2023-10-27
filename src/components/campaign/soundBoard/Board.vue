@@ -1,26 +1,30 @@
 <template>
 	<div class="sound-board">
-		<a
-			v-for="(sound, i) in board"
-			:key="`${sound.type}-${i}`"
-			:style="{ backgroundImage: sound.image ? `url(${sound.image})` : null }"
-			class="sound-board__button"
-			:href="sound.url"
-			target="_blank"
-			rel="noopener"
-		>
-			<img
-				v-if="sound.hk"
-				src="~assets/_img/logo/logo-icon-cyan.svg"
-				alt="hk logo"
-				class="sound-board__button-logo"
-			/>
-			<hk-icon :icon="sound.icon" class="sound-board__button-icon" />
-			<div class="truncate sound-board__button-title">
-				{{ sound.name }}
-			</div>
-			<q-tooltip anchor="top middle" self="center middle">{{ sound.name }}</q-tooltip>
-		</a>
+		<template v-for="(sound, i) in board">
+			<a
+				v-if="sound.url"
+				:key="`${sound.type}-${i}`"
+				class="sound-board__button"
+				:href="sound.url"
+				target="_blank"
+				rel="noopener"
+			>
+				<img				
+					v-if="sound.hk"
+					src="~assets/_img/logo/logo-icon-cyan.svg"
+					alt="sound board button background"
+					class="sound-board__button-logo"
+				/>
+				<hk-icon v-if="!sound.image" :icon="sound.icon" class="sound-board__button-icon" />
+				<div class="truncate sound-board__button-title">
+					{{ sound.name }}
+				</div>
+				<div v-if="sound.image" class="sound-board__button-bg">
+					<img :src="sound.image" />
+				</div>
+				<q-tooltip anchor="top middle" self="center middle">{{ sound.name }}</q-tooltip>
+			</a>
+		</template>
 
 		<router-link
 			v-if="tier.name === 'Free'"
@@ -98,12 +102,12 @@ export default {
 			},
 			toggle: [
 				{
-					value: "music",
-					label: "Music",
-				},
-				{
 					value: "ambience",
 					label: "Ambience",
+				},
+				{
+					value: "music",
+					label: "Music",
 				},
 			],
 			buttons: [
@@ -111,79 +115,141 @@ export default {
 					type: "music",
 					name: "Combat",
 					url: "https://www.youtube.com/watch?v=WEel3jMmGo4",
-					image:
-						"https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/2286730/235e2d0743f744ec0ffda1d4a11324b76500d7c8.jpg",
+					image: require("assets/_img/soundboard/combat_1.webp"),
+					hk: true,
 				},
 				{
 					type: "music",
 					name: "Combat 2",
 					url: "https://www.youtube.com/watch?v=w0sUw735gRw",
-					image:
-						"https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/2286730/235e2d0743f744ec0ffda1d4a11324b76500d7c8.jpg",
+					image: require("assets/_img/soundboard/combat_2.webp"),
+					hk: true,
 				},
+				{
+					type: "music",
+					name: "Tavern",
+					url: "https://www.youtube.com/watch?v=2EFpqObW9hY",
+					image: require("assets/_img/soundboard/tavern_music.webp"),
+					hk: true,
+				},
+				{
+					type: "music",
+					name: "Magical",
+					url: "https://www.youtube.com/watch?v=wrmwsM00QG4",
+					image: null,
+					hk: true,
+				},
+				{
+					type: "music",
+					name: "Mysterious",
+					url: "https://www.youtube.com/watch?v=SA1ZM5_UFhQ",
+					image: null,
+					hk: true,
+				},
+				{
+					type: "music",
+					name: "Eerie",
+					url: "https://www.youtube.com/watch?v=CDWtH8eHeEU",
+					image: require("assets/_img/soundboard/eerie_music.webp"),
+					hk: true,
+				},
+				{
+					type: "music",
+					name: "Suspense",
+					url: "https://www.youtube.com/watch?v=EApZmmYg_oQ",
+					image: null,
+					hk: true,
+				},
+				// AMBIENCE
 				{
 					type: "ambience",
 					name: "Rain",
-					url: "https://www.youtube.com/watch?v=mPZkdNFkNps",
-					image: "https://i.pinimg.com/originals/77/57/b0/7757b0e2f116e37f5ef887457a7a63b1.gif",
+					url: "https://www.youtube.com/watch?v=fGRh_hIpDt4",
+					image: require("assets/_img/soundboard/rain.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Snow",
 					url: "https://www.youtube.com/watch?v=sGkh1W5cbH4",
-					image:
-						"https://cdn130.picsart.com/c7f29351-c222-4392-8866-cbc79945f2c5/407954039029201.jpg?type=webp&to=crop&r=256",
+					image: require("assets/_img/soundboard/snow.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Thunder",
 					url: "https://www.youtube.com/watch?v=fkFiIhDR_nc",
-					image:
-						"https://is4-ssl.mzstatic.com/image/thumb/Purple116/v4/0f/d9/75/0fd975d2-d544-0b98-3a0c-6fe64662d1e2/AppIcon-0-0-1x_U007emarketing-0-0-0-4-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/256x256bb.jpg",
+					image: require("assets/_img/soundboard/thunder.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Forest by Day",
 					url: "https://www.youtube.com/watch?v=xNN7iTA57jM",
+					image: require("assets/_img/soundboard/forest_by_day.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Forest by Night",
 					url: "https://www.youtube.com/watch?v=ABCwX_ERUmw",
+					image: require("assets/_img/soundboard/forest_by_night.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Cave",
 					url: "https://www.youtube.com/watch?v=kxqJuc1HHbg",
+					image: require("assets/_img/soundboard/cave.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Campfire",
-					url: "https://www.youtube.com/watch?v=E77jmtut1Zc",
+					url: "https://www.youtube.com/watch?v=7KFoj-SOfHs",
+					image: require("assets/_img/soundboard/campfire.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Town by Day",
-					url: "https://www.youtube.com/watch?v=_52K0E_gNY0",
+					url: "https://www.youtube.com/watch?v=WJrqwa6tMQY",
+					image: require("assets/_img/soundboard/town_by_day.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Town by Night",
 					url: "https://www.youtube.com/watch?v=N9ghsVSTNuI&t=711s",
+					image: require("assets/_img/soundboard/town_by_night.webp"),
 					hk: true,
 				},
 				{
 					type: "ambience",
 					name: "Tavern",
 					url: "https://www.youtube.com/watch?v=rv3Nl-Od9YU",
+					image: require("assets/_img/soundboard/tavern.webp"),
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Battlefield",
+					url: "https://www.youtube.com/watch?v=VaKVLWZrG-4",
+					image: require("assets/_img/soundboard/battlefield.webp"),
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Battle",
+					url: "https://www.youtube.com/watch?v=Z98ZMt1zc94",
+					image: require("assets/_img/soundboard/battle.webp"),
+					hk: true,
+				},
+				{
+					type: "ambience",
+					name: "Eerie",
+					url: "https://www.youtube.com/watch?v=Jh9E7Cus7JA",
+					image: require("assets/_img/soundboard/eerie_ambience.webp"),
 					hk: true,
 				},
 			],
@@ -239,42 +305,66 @@ export default {
 	padding-bottom: 46px;
 
 	&__button {
-		width: 48px;
-		height: 48px;
+		width: 60px;
+		height: 60px;
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: flex-end;
 		color: $white;
 		text-shadow: 1px 1px 0px $black;
-		border-radius: $border-radius;
+		border-radius: 8px;
 		background-size: cover;
 		background-position: center;
 		font-size: 10px;
 		text-align: center;
 		background-color: $neutral-8;
+		transition: all 0.3s ease-in-out;
 		gap: 0;
 
 		&-title {
-			padding: 0 4px;
+			padding: 8px 4px 3px 4px;
 			width: 100%;
+			background: linear-gradient(180deg, rgba(215,215,215,0) 0%, rgba(0,0,0,0.7511379551820728) 100%);
+			border-bottom-left-radius: 8px;
+			border-bottom-right-radius: 8px;
+			z-index: 10;
 		}
 		&-icon {
 			font-size: 20px;
 			opacity: 0.7;
-			height: 30px;
-
-			&:before {
-				line-height: 30px;
-				vertical-align: -7px;
-			}
+			z-index: 10;
 		}
 		&-logo {
 			width: 14px;
 			position: absolute;
 			top: -3px;
 			right: -5px;
+			z-index: 20;
+		}
+		&-bg {
+			overflow: hidden;
+			position: absolute;
+			border-radius: inherit;
+			top: 0;
+			bottom: 0;
+
+			img {
+				transition: all 0.1s ease-in-out;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+		}
+		&:hover {
+			box-shadow: 0px 0px 8px 4px #0000006c;
+
+			.sound-board__button-bg {
+				img {
+					transform: scale(1.2);
+				}
+			}
 		}
 	}
 	&__add {

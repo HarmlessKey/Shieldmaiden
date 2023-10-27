@@ -40,14 +40,14 @@ export default {
 			tab: "music",
 			tabs: [
 				{
-					name: "music",
-					label: "Music",
-					icon: "fas fa-music",
-				},
-				{
 					name: "ambience",
 					label: "Ambience",
 					icon: "fas fa-volume",
+				},
+				{
+					name: "music",
+					label: "Music",
+					icon: "fas fa-music",
 				},
 			],
 		};

@@ -210,11 +210,20 @@ export default {
 	},
 	async mounted() {
 		await this.get_npcs();
+		this.update_npc_count();
+
 		this.loading_npcs = false;
 	},
 	methods: {
 		...mapActions(["setSlide"]),
-		...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs", "add_npc"]),
+		...mapActions("npcs", [
+			"get_npcs",
+			"delete_npc",
+			"get_npc",
+			"get_full_npcs",
+			"add_npc",
+			"update_npc_count",
+		]),
 		...mapActions("spells", ["get_spell"]),
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;

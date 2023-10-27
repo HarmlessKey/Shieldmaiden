@@ -185,11 +185,12 @@ export default {
 	},
 	async mounted() {
 		await this.get_spells();
+		this.update_spell_count();
 		this.loading_spells = false;
 	},
 	methods: {
 		...mapActions(["setSlide"]),
-		...mapActions("spells", ["get_spells", "get_spell", "delete_spell"]),
+		...mapActions("spells", ["get_spells", "get_spell", "delete_spell", "update_spell_count"]),
 		spellLevel(level) {
 			return level === 0 ? "Cantrip" : numeral(level).format("0o");
 		},

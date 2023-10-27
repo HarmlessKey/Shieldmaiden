@@ -204,8 +204,7 @@ export default {
 				: ["avatar", "name", "actions"];
 		},
 		npcIds() {
-			const ids = this.npcs.map((npc) => npc.key);
-			return ids;
+			return this.npcs.map((npc) => npc.key);
 		},
 	},
 	async mounted() {

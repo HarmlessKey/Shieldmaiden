@@ -57,8 +57,7 @@ export default {
 			},
 		},
 		existing() {
-			const existing = this.imported.meta.duplicate;
-			return existing;
+			return this.imported.meta.duplicate;
 		},
 		shortImported() {
 			return Object.fromEntries(

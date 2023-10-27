@@ -268,7 +268,6 @@
 						</pre
 						>
 					</div>
-					<!-- <input :value="JSON.stringify(this.npcSchema)" id="copy" type="hidden" /> -->
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -284,8 +283,6 @@ import spellSchema from "src/schemas/hk-spell-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import DuplicateOptions from "./importer/DuplicateOptions";
-import { encounterServices } from "src/services/encounters";
-import { ClosePopup } from "quasar";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
@@ -363,10 +360,9 @@ export default {
 			return Object.values(this.selected).flat(1).length;
 		},
 		selected2string() {
-			const str = Object.entries(this.selected)
+			return Object.entries(this.selected)
 				.filter(([T, list]) => list.length > 0)
 				.reduce((accumulator, [T, list]) => `${accumulator} ${list.length} ${T.capitalize()}`, "");
-			return str;
 		},
 		countImported() {
 			return Object.values(this.imported).reduce((a, b) => a + b, 0);

@@ -209,9 +209,10 @@ const spell_actions = {
 		if (uid) {
 			const services = await dispatch("get_spell_services");
 			try {
-				const fb_count = await services.getSpellCount(uid);
-				const store_count = Object.keys(state.spells).length;
-				const count_diff = store_count - fb_count;
+				const current_count = state.spell_count;
+				const table_length = Object.keys(state.spells).length;
+				const count_diff = table_length - current_count;
+
 				const new_count = await services.updateSpellCount(uid, count_diff);
 				commit("SET_SPELL_COUNT", new_count);
 				dispatch("checkEncumbrance", "", { root: true });

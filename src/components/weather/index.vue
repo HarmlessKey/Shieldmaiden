@@ -44,7 +44,6 @@
 				:src="`${backgroundYoutube}?autoplay=1&mute=${mute_youtube}&playsinline=1&controls=0`"
 				title="YouTube video player"
 				class="youtube-player"
-				frameborder="0"
 				allow="autoplay"
 			/>
 			<q-resize-observer v-if="backgroundYoutube" @resize="setSize" />

@@ -805,9 +805,6 @@ input[type="number"]::-webkit-inner-spin-button {
 		}
 	}
 }
-// .multi_nr::v-deep .q-field__inner {
-// 	display: none;
-// }
 
 .players {
 	display: flex;

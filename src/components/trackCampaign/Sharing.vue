@@ -6,7 +6,6 @@
 			:src="`${sharing.youtube}?autoplay=1&mute=0&playsinline=1`"
 			title="YouTube video player"
 			class="youtube-player"
-			frameborder="0"
 			allow="autoplay"
 		/>
 		<div v-if="sharing.message" class="message">{{ sharing.message.trim() }}</div>

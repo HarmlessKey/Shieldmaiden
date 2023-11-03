@@ -6,7 +6,6 @@
 			:src="`${music_url}?autoplay=1&mute=0&playsinline=1&controls=0`"
 			title="Music player"
 			class="music-player"
-			frameborder="0"
 			allow="autoplay"
 		/>
 		<iframe
@@ -15,7 +14,6 @@
 			:src="`${ambience_url(sound.url)}?autoplay=1&mute=0&playsinline=1&controls=0`"
 			title="Music player"
 			class="music-player"
-			frameborder="0"
 			allow="autoplay"
 		/>
 	</div>

@@ -257,10 +257,9 @@ export default {
 			let options = this.types[type].type_settings.filter((item) => {
 				return item.key === key;
 			})[0].options;
-			const selected = options.filter((item) => {
+			return options.filter((item) => {
 				return item.value === value;
 			})[0];
-			return selected;
 		},
 	},
 };

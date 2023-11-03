@@ -6,7 +6,6 @@ import "animate.css";
 import Croppa from "vue-croppa";
 import { Cookies } from "quasar";
 import { Splitpanes, Pane } from "splitpanes";
-// import "splitpanes/dist/splitpanes.css";
 
 export default async ({ router, Vue }) => {
 	Vue.config.productionTip = false;

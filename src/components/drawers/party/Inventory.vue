@@ -10,7 +10,7 @@
 					<div v-if="coin" :key="key">
 						<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral("0.0a") }} </template>
 						<template v-else>{{ coin }} </template>
-						<img :src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)" />
+						<img :src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
 					</div>
 				</template>
 			</div>
@@ -19,7 +19,7 @@
 				<div class="currency">
 					<div v-for="(coin, key) in currencies" :key="key">
 						<span class="coins" :class="coin.color">
-							<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" />
+							<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" :alt="coin.name" />
 							<q-tooltip anchor="top middle" self="center middle">
 								{{ coin.name }}
 							</q-tooltip>

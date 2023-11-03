@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<template v-for="({ name, keybindings }, index) in keybinbding_groups">
-			<h3 :key="`header-${index}`">{{ name }}</h3>
-			<table class="table mb-3" :key="`group-${index}`" :class="{ 'table-sm': data && data.sm }">
+			<h3 :key="`header-${index}`" id="KeybindTable">{{ name }}</h3>
+			<table class="table mb-3" :key="`group-${index}`" :class="{ 'table-sm': data && data.sm }" aria-describedby="KeybindTable">
 				<thead>
 					<th>Action</th>
 					<th><i aria-hidden="true" class="fas fa-keyboard"></i> Keybind</th>

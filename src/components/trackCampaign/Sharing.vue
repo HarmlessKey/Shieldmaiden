@@ -1,6 +1,6 @@
 <template>
 	<div class="sharing">
-		<img v-if="sharing.image" :src="sharing.image" class="image" />
+		<img v-if="sharing.image" :src="sharing.image" class="image" alt="Shared image"  />
 		<iframe
 			v-if="sharing.youtube"
 			:src="`${sharing.youtube}?autoplay=1&mute=0&playsinline=1`"

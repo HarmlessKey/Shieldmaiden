@@ -42,7 +42,7 @@
 						{{ sound.name }}
 					</div>
 					<div v-if="sound.image" class="board__button-bg">
-						<img :src="sound.image" />
+						<img :src="sound.image" :alt="`${sound.name} icon`" />
 					</div>
 					<q-tooltip anchor="top middle" self="center middle">{{ sound.name }}</q-tooltip>
 				</a>

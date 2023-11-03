@@ -1,6 +1,6 @@
 <template>
 	<div class="pb-5">
-		<h2>
+		<h2 :id="`${cond.value}Table`">
 			<i aria-hidden="true" :class="`hki-${cond.value}`" />
 			{{ cond.name }}
 		</h2>
@@ -14,7 +14,7 @@
 			@click="remove(cond.value)">
 			Remove condition</a>
 
-		<table v-if="cond.value === 'exhaustion'" class="table">
+		<table v-if="cond.value === 'exhaustion'" class="table" :aria-describedby="`${cond.value}Table`">
 			<thead>
 				<th>Current</th>
 				<th>Effect</th>

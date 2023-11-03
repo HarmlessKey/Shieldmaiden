@@ -17,6 +17,7 @@
 		<img
 			v-if="provided_campaign.campaign.sharing.image"
 			:src="provided_campaign.campaign.sharing.image"
+			alt="Shared image"
 		/>
 		<div v-if="provided_campaign.campaign.sharing.message" class="message">
 			{{ provided_campaign.campaign.sharing.message.trim() }}

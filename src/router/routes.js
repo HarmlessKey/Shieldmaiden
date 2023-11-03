@@ -569,9 +569,6 @@ const routes = [
 			requiresAuth: true,
 			title: "Run campaign",
 		},
-		meta: {
-			title: "Run campaign",
-		},
 		children: [
 			{
 				path: "",

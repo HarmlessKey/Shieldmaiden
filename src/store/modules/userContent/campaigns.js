@@ -273,10 +273,9 @@ const campaign_actions = {
 				const search_campaign = convert_campaign(campaign);
 				const id = await services.addCampaign(uid, campaign, search_campaign, predefined_key);
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
+				commit("SET_CACHED_CAMPAIGN", { uid, id, campaign });
 
-				const new_count = await services.updateCampaignCount(uid, 1);
-				commit("SET_CAMPAIGN_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_campaign_count");
 				return id;
 			} catch (error) {
 				console.log("caught error", error);
@@ -359,10 +358,8 @@ const campaign_actions = {
 				commit("REMOVE_CAMPAIGN", id);
 				commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
 
-				// Update campaign count
-				const new_count = await services.updateCampaignCount(uid, -1);
-				commit("SET_CAMPAIGN_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_campaign_count");
+
 				return;
 			} catch (error) {
 				throw error;

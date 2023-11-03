@@ -123,6 +123,26 @@ const encounter_actions = {
 		}
 	},
 
+	async update_encounter_count({ rootGetters, state, commit, dispatch }, { campaignId }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			try {
+				await dispatch("fetch_encounter_count");
+				const current_count = state.encounter_count[campaignId] || 0;
+				const table_length = Object.keys(state.encounters[campaignId]).length;
+				const count_diff = table_length - current_count;
+				console.log(current_count, table_length, count_diff);
+
+				const new_count = await services.updateEncounterCount(uid, campaignId, count_diff);
+				commit("SET_ENCOUNTER_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Get a single encounter
 	 * first try to find it in the store, then fetch if wasn't present
@@ -130,7 +150,7 @@ const encounter_actions = {
 	 * - Remove ghost NPCs
 	 * - Remove ghost Players
 	 * - Remove ghost Companions
-	 * - Remove gost item links
+	 * - Remove ghost item links
 	 *
 	 * @param {string} uid userId
 	 * @param {string} campaignId campaignId
@@ -234,6 +254,18 @@ const encounter_actions = {
 		return encounter;
 	},
 
+	async reserve_encounter_id({ rootGetters, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			try {
+				return await services.reserveEncounterId(uid);
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Adds a newly created encounter for a user
 	 * A user can only add encounters for themselves so we use the uid from the store
@@ -242,7 +274,10 @@ const encounter_actions = {
 	 * @param {object} encounter
 	 * @returns {string} the id of the newly added encounter
 	 */
-	async add_encounter({ rootGetters, dispatch, commit }, { campaignId, encounter }) {
+	async add_encounter(
+		{ rootGetters, dispatch, commit },
+		{ campaignId, encounter, predefined_key }
+	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.encounters;
 
@@ -255,12 +290,16 @@ const encounter_actions = {
 			}
 			try {
 				const search_encounter = convert_encounter(encounter);
-				const id = await services.addEncounter(uid, campaignId, encounter, search_encounter);
+				const id = await services.addEncounter(
+					uid,
+					campaignId,
+					encounter,
+					search_encounter,
+					predefined_key
+				);
 				commit("SET_ENCOUNTER", { uid, campaignId, id, encounter: search_encounter });
 
-				const new_count = await services.updateEncounterCount(uid, campaignId, 1);
-				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_encounter_count", { campaignId });
 				return id;
 			} catch (error) {
 				throw error;
@@ -988,9 +1027,7 @@ const encounter_actions = {
 				commit("REMOVE_ENCOUNTER", { campaignId, id });
 				commit("REMOVE_CACHED_ENCOUNTER", { uid, id });
 
-				const new_count = await services.updateEncounterCount(uid, campaignId, -1);
-				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_encounter_count", { campaignId });
 			} catch (error) {
 				throw error;
 			}
@@ -1018,8 +1055,7 @@ const encounter_actions = {
 					}
 
 					const diff = Object.keys(encounters).length;
-					const new_count = await services.updateEncounterCount(uid, campaignId, -diff);
-					commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+					dispatch("update_encounter_count", { campaignId });
 				}
 			} catch (error) {
 				throw error;

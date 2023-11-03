@@ -316,10 +316,14 @@ export default {
 			schema: undefined,
 			import_state: "start",
 			failed_imports: {
+				campaigns: [],
+				encounters: [],
 				npcs: [],
 				spells: [],
 			},
 			imported: {
+				campaigns: 0,
+				encounters: 0,
 				npcs: 0,
 				spells: 0,
 			},
@@ -747,15 +751,26 @@ export default {
 			}
 
 			this.selected.campaigns.forEach(async (campaign) => {
-				const key = this.import_key_map[campaign.meta.key];
-				const meta = { ...campaign.meta };
+				const key = this.import_key_map.campaigns[campaign.meta.key];
 				delete campaign.meta;
 				try {
 					await this.add_campaign({ campaign, predefined_key: key });
 					this.imported.campaigns++;
 				} catch (error) {
-					this.failed_imports.push(campaign);
+					this.failed_imports.campaigns.push(campaign);
 					console.log("Failed Campaign import", error, campaign, key);
+				}
+			});
+
+			this.selected.encounters.forEach(async (encounter) => {
+				const key = this.import_key_map.encounters[encounter.meta.key];
+				const campaign_key = this.import_key_map.campaigns[encounter.meta.campaign_key];
+				delete encounter.meta;
+				try {
+					await this.add_encounter({ campaignId: campaign_key, encounter, predefined_key: key });
+					this.imported.encounters++;
+				} catch (error) {
+					this.failed_imports.encounters.push(encounter);
 				}
 			});
 		},

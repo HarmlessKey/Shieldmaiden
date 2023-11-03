@@ -628,8 +628,10 @@ export default {
 
 		async getKey(item, item_type) {
 			const keyGenFnMap = {
-				spells: this.reserve_spell_id,
+				campaigns: this.reserve_campaign_id,
+				encounters: this.reserve_encounter_id,
 				npcs: this.reserve_npc_id,
+				spells: this.reserve_spell_id,
 			};
 
 			switch (item.meta.overwrite) {
@@ -739,7 +741,7 @@ export default {
 				const meta = { ...campaign.meta };
 				delete campaign.meta;
 				try {
-					await this.add_campaign(campaign);
+					await this.add_campaign({ campaign, predefined_key: key });
 					this.imported++;
 				} catch (error) {
 					this.failed_imports.push(campaign);

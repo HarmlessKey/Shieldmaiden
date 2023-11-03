@@ -320,7 +320,7 @@ export default {
 					timestamp: Date.now(),
 				};
 
-				await this.add_campaign(campaign);
+				await this.add_campaign({ campaign });
 
 				this.newCampaign = "";
 				this.$snotify.success("Campaign added.", "Critical hit!", {

@@ -98,6 +98,24 @@ const campaign_actions = {
 		}
 	},
 
+	async update_campaign_count({ rootGetters, state, commit, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				const current_count = state.campaign_count;
+				const table_length = Object.keys(state.campaigns).length;
+				const count_diff = table_length - current_count;
+
+				const new_count = await services.updateCampaignCount(uid, count_diff);
+				commit("SET_CAMPAIGN_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Get a single campaign
 	 * - first try to find it in the store, then fetch if wasn't present
@@ -240,7 +258,7 @@ const campaign_actions = {
 	 * @param {object} campaign
 	 * @returns {string} the id of the newly added campaign
 	 */
-	async add_campaign({ rootGetters, commit, dispatch }, campaign) {
+	async add_campaign({ rootGetters, commit, dispatch }, { campaign, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.campaigns;
 		if (uid) {
@@ -252,7 +270,12 @@ const campaign_actions = {
 			}
 			try {
 				const search_campaign = convert_campaign(campaign);
-				const id = await services.addCampaign(uid, campaign, search_campaign);
+				const [campaign, id] = await services.addCampaign(
+					uid,
+					campaign,
+					search_campaign,
+					predefined_key
+				);
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
 
 				const new_count = await services.updateCampaignCount(uid, 1);
@@ -287,6 +310,22 @@ const campaign_actions = {
 
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
 				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Reserve campaign id for future usage
+	 */
+	async reserve_campaign_id({ rootGetters, dispatch }) {
+		console.log("store reserving campaign id");
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_service");
+			try {
+				return await services.reserveCampaignId(uid);
 			} catch (error) {
 				throw error;
 			}

@@ -15,7 +15,7 @@
 					Leave
 				</router-link>
 				<div class="dm-screen__header-title written flex-grow truncate">
-					{{ campaign.name }} {{ container.width }}x{{ container.height }}
+					{{ campaign.name }}
 				</div>
 				<div class="d-flex justify-content-end items-center gap-1">
 					<div

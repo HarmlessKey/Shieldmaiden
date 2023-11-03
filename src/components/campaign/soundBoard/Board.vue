@@ -136,14 +136,14 @@ export default {
 					type: "music",
 					name: "Magical",
 					url: "https://www.youtube.com/watch?v=wrmwsM00QG4",
-					image: null,
+					image: require("assets/_img/soundboard/magical.webp"),
 					hk: true,
 				},
 				{
 					type: "music",
 					name: "Mysterious",
 					url: "https://www.youtube.com/watch?v=SA1ZM5_UFhQ",
-					image: null,
+					image: require("assets/_img/soundboard/mysterious.webp"),
 					hk: true,
 				},
 				{
@@ -157,7 +157,7 @@ export default {
 					type: "music",
 					name: "Suspense",
 					url: "https://www.youtube.com/watch?v=EApZmmYg_oQ",
-					image: null,
+					image: require("assets/_img/soundboard/suspense.webp"),
 					hk: true,
 				},
 				// AMBIENCE

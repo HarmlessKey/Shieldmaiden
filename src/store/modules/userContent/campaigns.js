@@ -258,7 +258,7 @@ const campaign_actions = {
 	 * @param {object} campaign
 	 * @returns {string} the id of the newly added campaign
 	 */
-	async add_campaign({ rootGetters, commit, dispatch }, { campaign, predefined_key }) {
+	async add_campaign({ rootGetters, commit, dispatch, state }, { campaign, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.campaigns;
 		if (uid) {

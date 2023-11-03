@@ -128,14 +128,12 @@ const encounter_actions = {
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
 			try {
-				await dispatch("fetch_encounter_count");
 				const current_count = state.encounter_count[campaignId] || 0;
 				const table_length = Object.keys(state.encounters[campaignId]).length;
 				const count_diff = table_length - current_count;
-				console.log(current_count, table_length, count_diff);
 
 				const new_count = await services.updateEncounterCount(uid, campaignId, count_diff);
-				commit("SET_ENCOUNTER_COUNT", new_count);
+				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
 				dispatch("checkEncumbrance", "", { root: true });
 			} catch (error) {
 				throw error;
@@ -298,8 +296,8 @@ const encounter_actions = {
 					predefined_key
 				);
 				commit("SET_ENCOUNTER", { uid, campaignId, id, encounter: search_encounter });
-
-				dispatch("update_encounter_count", { campaignId });
+				commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId: id, encounter });
+				await dispatch("update_encounter_count", { campaignId });
 				return id;
 			} catch (error) {
 				throw error;
@@ -1027,7 +1025,7 @@ const encounter_actions = {
 				commit("REMOVE_ENCOUNTER", { campaignId, id });
 				commit("REMOVE_CACHED_ENCOUNTER", { uid, id });
 
-				dispatch("update_encounter_count", { campaignId });
+				await dispatch("update_encounter_count", { campaignId });
 			} catch (error) {
 				throw error;
 			}
@@ -1055,7 +1053,7 @@ const encounter_actions = {
 					}
 
 					const diff = Object.keys(encounters).length;
-					dispatch("update_encounter_count", { campaignId });
+					await dispatch("update_encounter_count", { campaignId });
 				}
 			} catch (error) {
 				throw error;

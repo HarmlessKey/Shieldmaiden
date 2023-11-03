@@ -205,39 +205,41 @@
 					:key="`failed-${failed_type}`"
 					class="bg-neutral-8 px-3 py-2"
 				>
-					<p>Import failed for following {{ failed_type }}</p>
-					<q-list dense class="mb-2">
-						<q-item v-for="(failed, i) in failed_list" :key="`failed-${i}`" class="bg-neutral-9">
-							<q-item-section>
-								{{ failed.name.capitalizeEach() }}
-							</q-item-section>
-							<q-item-section avatar>
-								<hk-popover v-if="failed.errors" header="Validation errors">
-									<q-icon name="error" class="red" />
-									<div slot="content">
-										<ol class="px-3">
-											<li
-												v-for="(error, index) in failed.errors"
-												:key="`${i}-error-${index}`"
-												class="red"
-											>
-												<strong v-if="error.instancePath" class="neutral-1">
-													{{ error.instancePath }}
-												</strong>
-												{{ error.message.capitalize() }}
-											</li>
-										</ol>
-									</div>
-								</hk-popover>
-							</q-item-section>
-						</q-item>
-					</q-list>
-					<p>
-						Make sure there are no validation errors.<br />
-						<a @click="showSchemaDialog(failed_type)"
-							>Compare with our {{ failed_type.substring(0, failed_type.length - 1) }} schema.</a
-						>
-					</p>
+					<template v-if="failed_list.length">
+						<p>Import failed for following {{ failed_type }}</p>
+						<q-list dense class="mb-2">
+							<q-item v-for="(failed, i) in failed_list" :key="`failed-${i}`" class="bg-neutral-9">
+								<q-item-section>
+									{{ failed.name.capitalizeEach() }}
+								</q-item-section>
+								<q-item-section avatar>
+									<hk-popover v-if="failed.errors" header="Validation errors">
+										<q-icon name="error" class="red" />
+										<div slot="content">
+											<ol class="px-3">
+												<li
+													v-for="(error, index) in failed.errors"
+													:key="`${i}-error-${index}`"
+													class="red"
+												>
+													<strong v-if="error.instancePath" class="neutral-1">
+														{{ error.instancePath }}
+													</strong>
+													{{ error.message.capitalize() }}
+												</li>
+											</ol>
+										</div>
+									</hk-popover>
+								</q-item-section>
+							</q-item>
+						</q-list>
+						<p>
+							Make sure there are no validation errors.<br />
+							<a @click="showSchemaDialog(failed_type)"
+								>Compare with our {{ failed_type.substring(0, failed_type.length - 1) }} schema.</a
+							>
+						</p>
+					</template>
 				</div>
 			</q-expansion-item>
 
@@ -533,8 +535,6 @@ export default {
 				});
 			}
 			if (data.campaigns && data.encounters) {
-				console.log("Will parse encounters and campaigns");
-				console.log(data);
 				Object.entries(data.campaigns).forEach(([campaign_key, campaign]) => {
 					this.parseCampaign(campaign_key, campaign);
 					Object.entries(data.encounters[campaign_key]).forEach(([encounter_key, encounter]) => {
@@ -542,11 +542,9 @@ export default {
 					});
 				});
 			}
-			console.log("to import", this.parsed_data);
 		},
 
 		async parseCampaign(key, campaign) {
-			console.log("Parsing campaign", campaign);
 			delete campaign.key;
 			this.removeTimestamps(campaign);
 
@@ -565,12 +563,10 @@ export default {
 			console.log("parsed Campaign", campaign.name);
 		},
 		async parseEncounter(key, campaign_key, encounter) {
-			console.log("Parsing encounter", encounter);
 			delete encounter.key;
 			this.removeTimestamps(encounter);
 
 			const valid = ajv.validate(encounterSchema, encounter);
-			console.log("Encounter", encounter.name, "is valid", valid);
 
 			encounter.meta = { key, campaign_key };
 			// Always duplicate encounters and campaigns
@@ -712,7 +708,7 @@ export default {
 			 *    - Update NPCs in encounter to correct keys
 			 */
 
-			this.selected.spells.forEach(async (spell) => {
+			for (const spell of this.selected.spells) {
 				const key = this.import_key_map.spells[spell.meta.key];
 				const meta = { ...spell.meta };
 				delete spell.meta;
@@ -728,7 +724,7 @@ export default {
 						console.log("Failed SPELL import", error, spell);
 					}
 				}
-			});
+			}
 
 			for (const npc of this.selected.npcs) {
 				const key = this.import_key_map.npcs[npc.meta.key];
@@ -750,9 +746,10 @@ export default {
 				}
 			}
 
-			this.selected.campaigns.forEach(async (campaign) => {
+			for (const campaign of this.selected.campaigns) {
 				const key = this.import_key_map.campaigns[campaign.meta.key];
 				delete campaign.meta;
+				campaign.timestamp = Date.now();
 				try {
 					await this.add_campaign({ campaign, predefined_key: key });
 					this.imported.campaigns++;
@@ -760,9 +757,9 @@ export default {
 					this.failed_imports.campaigns.push(campaign);
 					console.log("Failed Campaign import", error, campaign, key);
 				}
-			});
+			}
 
-			this.selected.encounters.forEach(async (encounter) => {
+			for (const encounter of this.selected.encounters) {
 				const key = this.import_key_map.encounters[encounter.meta.key];
 				const campaign_key = this.import_key_map.campaigns[encounter.meta.campaign_key];
 				delete encounter.meta;
@@ -772,7 +769,7 @@ export default {
 				} catch (error) {
 					this.failed_imports.encounters.push(encounter);
 				}
-			});
+			}
 		},
 		copySchema() {
 			try {

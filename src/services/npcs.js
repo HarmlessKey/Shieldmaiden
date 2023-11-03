@@ -65,7 +65,7 @@ export class npcServices {
 	 * @param {Object} search_npc Compressed NPC
 	 * @returns Key of the newly added NPC
 	 */
-	async addNpc(uid, npc, search_npc) {
+	async addNpc(uid, npc, search_npc, predefined_key = undefined) {
 		try {
 			npc.name = npc.name.toLowerCase();
 
@@ -77,11 +77,17 @@ export class npcServices {
 			npc.updated = firebase.database.ServerValue.TIMESTAMP;
 
 			// Save the new NPC
-			const newNpc = await NPCS_REF.child(uid).push(npc);
+			let npc_key = predefined_key;
+			if (predefined_key) {
+				await NPCS_REF.child(uid).child(predefined_key).set(npc);
+			} else {
+				const newNpc = await NPCS_REF.child(uid).push(npc);
+				npc_key = newNpc.key;
+			}
 
 			// Upload image
 			if (blob) {
-				STORAGE_REF.child(`${uid}/${newNpc.key}.webp`)
+				STORAGE_REF.child(`${uid}/${npc_key}.webp`)
 					.put(blob)
 					.then((snapshot) => {
 						snapshot.ref.getDownloadURL().then((url) => {
@@ -89,15 +95,16 @@ export class npcServices {
 							npc.storage_avatar = url;
 
 							// Update NPC
-							NPCS_REF.child(`${uid}/${newNpc.key}/storage_avatar`).set(url);
-							SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+							NPCS_REF.child(`${uid}/${npc_key}/storage_avatar`).set(url);
+							SEARCH_NPCS_REF.child(`${uid}/results/${npc_key}`).set(search_npc);
 						});
 					});
 			} else {
 				// Update search_npcs
-				SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
+				SEARCH_NPCS_REF.child(`${uid}/results/${npc_key}`).set(search_npc);
 			}
-			return newNpc.key;
+			const newNpc = await NPCS_REF.child(`${uid}/${npc_key}`).once("value");
+			return [newNpc.val(), npc_key];
 		} catch (error) {
 			throw error;
 		}
@@ -131,8 +138,8 @@ export class npcServices {
 						search_npc.storage_avatar = url;
 
 						// Save the NPC
-						await NPCS_REF.child(uid).child(id).set(npc);
 						await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+						await NPCS_REF.child(uid).child(id).set(npc);
 					});
 				});
 			}
@@ -143,8 +150,8 @@ export class npcServices {
 				}
 
 				// Save the NPC
-				await NPCS_REF.child(uid).child(id).set(npc);
 				await SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
+				await NPCS_REF.child(uid).child(id).set(npc);
 			}
 		} catch (error) {
 			throw error;
@@ -203,6 +210,19 @@ export class npcServices {
 		} catch (error) {
 			throw error;
 		}
+	}
+
+	/**
+	 * Reserve an ID for an npc that might be stored in the future
+	 * Useful when you don't know yet if you want to store a npc, but want to be able to link to it
+	 * from different db entries
+	 *
+	 * E.g. Reserve a key for an npc during importing so it can be linked to an encounter.
+	 *
+	 * @param {String} uid ID of active user
+	 */
+	async reserveNpcId(uid) {
+		return (await NPCS_REF.child(uid).push()).key;
 	}
 
 	/**

@@ -87,6 +87,23 @@ const npc_actions = {
 		}
 	},
 
+	async update_npc_count({ rootGetters, state, commit, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_npc_services");
+			try {
+				const current_count = state.npc_count;
+				const table_length = Object.keys(state.npcs).length;
+				const count_diff = table_length - current_count;
+
+				const new_count = await services.updateNpcCount(uid, count_diff);
+				commit("SET_NPC_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
 	async get_npc({ state, commit, dispatch }, { uid, id }) {
 		let npc = state.cached_npcs[uid] ? state.cached_npcs[uid][id] : undefined;
 
@@ -154,7 +171,7 @@ const npc_actions = {
 	 * @param {object} npc
 	 * @returns {string} the id of the newly added npc
 	 */
-	async add_npc({ rootGetters, commit, dispatch }, npc) {
+	async add_npc({ rootGetters, commit, dispatch, state }, { npc, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.npcs;
 
@@ -167,13 +184,13 @@ const npc_actions = {
 			}
 			try {
 				const search_npc = convert_npc(npc);
-				const id = await services.addNpc(uid, npc, search_npc);
-				commit("SET_NPC", { id, search_npc });
-				commit("SET_CACHED_NPC", { uid, id, npc });
+				const [new_npc, id] = await services.addNpc(uid, npc, search_npc, predefined_key);
 
-				const new_count = await services.updateNpcCount(uid, 1);
-				commit("SET_NPC_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				commit("SET_NPC", { id, search_npc });
+				commit("SET_CACHED_NPC", { uid, id, new_npc });
+
+				await dispatch("update_npc_count");
+
 				return id;
 			} catch (error) {
 				throw error;
@@ -296,9 +313,7 @@ const npc_actions = {
 				commit("REMOVE_NPC", id);
 				commit("REMOVE_CACHED_NPC", { uid, id });
 
-				const new_count = await services.updateNpcCount(uid, -1);
-				commit("SET_NPC_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				await dispatch("update_npc_count");
 				return;
 			} catch (error) {
 				throw error;
@@ -318,6 +333,22 @@ const npc_actions = {
 				const all_npcs = await services.getFullNpcs(uid);
 				commit("SET_CACHED_NPCS", { uid, npcs: all_npcs });
 				return all_npcs;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Reserve Npc id for future usage
+	 */
+	async reserve_npc_id({ rootGetters, dispatch }) {
+		console.log("store reserving npc id");
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_npc_services");
+			try {
+				return await services.reserveNpcId(uid);
 			} catch (error) {
 				throw error;
 			}

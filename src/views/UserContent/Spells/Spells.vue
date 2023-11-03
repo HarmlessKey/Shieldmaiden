@@ -2,12 +2,20 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="spells">
+				<ExportUserContent
+					slot="actions-left"
+					class="btn-sm bg-neutral-5"
+					content-type="spell"
+					:content-id="spellIds"
+				>
+					<span>Export</span>
+				</ExportUserContent>
 				<button
 					slot="actions-right"
 					class="btn btn-sm bg-neutral-5 mx-2"
 					@click="import_dialog = true"
 				>
-					Import spells
+					Import
 				</button>
 			</ContentHeader>
 
@@ -61,10 +69,11 @@
 									<i aria-hidden="true" class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
 								</router-link>
-								<button class="btn btn-sm bg-neutral-5 mx-2" @click="exportSpell(props.key)">
-									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
-									<q-tooltip anchor="top middle" self="center middle"> Download </q-tooltip>
-								</button>
+								<ExportUserContent
+									class="btn-sm bg-neutral-5 mx-2"
+									content-type="spell"
+									:content-id="props.key"
+								/>
 								<button
 									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete($event, props.key, props.row)"
@@ -105,7 +114,7 @@
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<ImportContent type="spells" />
+					<ImportUserContent type="spells" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -116,14 +125,16 @@
 import numeral from "numeral";
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
-import ImportContent from "src/components/ImportContent.vue";
+import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import { downloadJSON } from "src/utils/generalFunctions";
+import ExportUserContent from "src/components/userContent/ExportUserContent";
 
 export default {
 	name: "Spells",
 	components: {
 		ContentHeader,
-		ImportContent,
+		ImportUserContent,
+		ExportUserContent,
 	},
 	data() {
 		return {
@@ -167,14 +178,19 @@ export default {
 	computed: {
 		...mapGetters(["tier", "overencumbered"]),
 		...mapGetters("spells", ["spells"]),
+		spellIds() {
+			console.log(this.spells.map((spell) => spell.key));
+			return this.spells.map((spell) => spell.key);
+		},
 	},
 	async mounted() {
 		await this.get_spells();
+		this.update_spell_count();
 		this.loading_spells = false;
 	},
 	methods: {
 		...mapActions(["setDrawer"]),
-		...mapActions("spells", ["get_spells", "get_spell", "delete_spell"]),
+		...mapActions("spells", ["get_spells", "get_spell", "delete_spell", "update_spell_count"]),
 		spellLevel(level) {
 			return level === 0 ? "Cantrip" : numeral(level).format("0o");
 		},
@@ -207,11 +223,6 @@ export default {
 		},
 		deleteSpell(key) {
 			this.delete_spell(key);
-		},
-		async exportSpell(id) {
-			const spell = await this.get_spell({ uid: this.userId, id });
-			spell.harmless_key = id;
-			downloadJSON(spell);
 		},
 	},
 };

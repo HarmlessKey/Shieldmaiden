@@ -234,6 +234,9 @@
 								"damage_type": {
 									"$ref": "#/$defs/damage-type-select"
 								},
+								"magical": {
+									"type": "boolean"
+								},
 								"dice_count": {
 									"title": "Dice count",
 									"type": "integer",
@@ -364,18 +367,21 @@
 		"damage-type-select": {
 			"type": "string",
 			"enum": [
-				"acid",
+				"non_magical_bludgeoning",
+				"non_magical_piercing",
+				"non_magical_slashing",
 				"bludgeoning",
+				"piercing",
+				"slashing",
+				"acid",
 				"cold",
 				"fire",
 				"force",
 				"lightning",
 				"necrotic",
-				"piercing",
 				"poison",
 				"psychic",
 				"radiant",
-				"slashing",
 				"thunder"
 			]
 		}

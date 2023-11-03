@@ -76,14 +76,16 @@
 					>
 						<hk-icon slot="prepend" icon="fab fa-youtube" />
 					</hk-input>
-					<button class="btn bg-neutral-5 mr-2" @click="clearBackground">Clear</button>
-					<button
-						class="btn"
-						@click="valid ? setBackground() : null"
-						:disabled="isEmpty(background) || !valid"
-					>
-						Set
-					</button>
+					<div class="actions">
+						<button class="btn bg-neutral-5" @click="clearBackground">Clear</button>
+						<button
+							class="btn"
+							@click="valid ? setBackground() : null"
+							:disabled="isEmpty(background) || !valid"
+						>
+							Set
+						</button>
+					</div>
 				</ValidationObserver>
 			</q-tab-panel>
 
@@ -143,20 +145,24 @@
 							}
 						"
 					/>
-					<button
-						class="btn btn-block"
-						:disabled="isEmpty(share) || !valid"
-						@click="valid ? startShare() : null"
-					>
-						Share
-					</button>
+					<div class="actions">
+						<button
+							class="btn btn-block"
+							:disabled="isEmpty(share) || !valid"
+							@click="valid ? startShare() : null"
+						>
+							Share
+						</button>
+					</div>
 				</ValidationObserver>
 			</q-tab-panel>
 
 			<q-tab-panel name="weather">
-				<Weather v-model="weather" />
-				<button class="btn bg-neutral-5 mr-2" @click="clearWeather">Clear</button>
-				<button class="btn" :disabled="isEmpty(weather)" @click="setWeather">Set</button>
+				<Weather v-model="weather" class="pb-4" />
+				<div class="actions">
+					<button class="btn bg-neutral-5" @click="clearWeather">Clear</button>
+					<button class="btn" :disabled="isEmpty(weather)" @click="setWeather">Set</button>
+				</div>
 			</q-tab-panel>
 		</q-tab-panels>
 	</div>
@@ -309,6 +315,27 @@ export default {
 			color: $blue;
 		}
 	}
+}
+.q-tab-panels {
+	position: static;
+}
+
+.q-tab-panel {
+	position: static;
+	padding-bottom: 40px;
+}
+.actions {
+	position: absolute;
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 8px;
+	width: 100% !important;
+	z-index: 40;
+	background: $neutral-6;
 }
 .not-live {
 	text-align: center;

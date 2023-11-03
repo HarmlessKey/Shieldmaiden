@@ -268,14 +268,10 @@ const campaign_actions = {
 			if (used_slots >= available_slots) {
 				throw "Not enough slots";
 			}
+			console.log("in campaign store", campaign);
 			try {
 				const search_campaign = convert_campaign(campaign);
-				const [campaign, id] = await services.addCampaign(
-					uid,
-					campaign,
-					search_campaign,
-					predefined_key
-				);
+				const id = await services.addCampaign(uid, campaign, search_campaign, predefined_key);
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
 
 				const new_count = await services.updateCampaignCount(uid, 1);
@@ -283,6 +279,7 @@ const campaign_actions = {
 				dispatch("checkEncumbrance", "", { root: true });
 				return id;
 			} catch (error) {
+				console.log("caught error", error);
 				throw error;
 			}
 		}
@@ -323,7 +320,7 @@ const campaign_actions = {
 		console.log("store reserving campaign id");
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
-			const services = await dispatch("get_campaign_service");
+			const services = await dispatch("get_campaign_services");
 			try {
 				return await services.reserveCampaignId(uid);
 			} catch (error) {

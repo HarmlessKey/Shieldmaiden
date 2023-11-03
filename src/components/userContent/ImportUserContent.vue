@@ -414,8 +414,18 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
-		...mapActions("encounters", ["add_encounter", "get_encounter", "get_campaign_encounters"]),
+		...mapActions("campaigns", [
+			"add_campaign",
+			"get_campaign",
+			"get_campaigns",
+			"reserve_campaign_id",
+		]),
+		...mapActions("encounters", [
+			"add_encounter",
+			"get_encounter",
+			"get_campaign_encounters",
+			"reserve_encounter_id",
+		]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc", "reserve_npc_id"]),
 		...mapActions("spells", [
 			"add_spell",
@@ -742,7 +752,7 @@ export default {
 				delete campaign.meta;
 				try {
 					await this.add_campaign({ campaign, predefined_key: key });
-					this.imported++;
+					this.imported.campaigns++;
 				} catch (error) {
 					this.failed_imports.push(campaign);
 					console.log("Failed Campaign import", error, campaign, key);

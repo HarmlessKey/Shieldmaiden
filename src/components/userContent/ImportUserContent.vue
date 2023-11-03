@@ -118,7 +118,24 @@
 								{{ props.row.name.capitalizeEach() }}
 							</td>
 						</template>
-
+						<template v-slot:body-cell-linked="props">
+							<td>
+								<hk-popover
+									v-if="import_type !== 'spells' && hasLinkedEntities(import_type, props.row)"
+									:header="`Linked ${linked_entity_map[import_type]}`"
+								>
+									<span>
+										{{ getLinkedEntities(import_type, props.row).length }}
+										{{ linked_entity_map[import_type] }}
+									</span>
+									<div slot="content">
+										<p v-for="item in getLinkedEntities(import_type, props.row)" :key="item.key">
+											{{ item.name }}
+										</p>
+									</div>
+								</hk-popover>
+							</td>
+						</template>
 						<template v-slot:body-cell-duplicate="props">
 							<td class="py-0 px-1">
 								<hk-popover
@@ -334,14 +351,27 @@ export default {
 					format: (val) => val.capitalizeEach(),
 				},
 				{
+					name: "linked",
+					label: "Linked",
+					field: "linked",
+					align: "right",
+					style: "width: 140px",
+					headerStyle: "width: 140px",
+				},
+				{
 					name: "duplicate",
 					label: "Duplicate",
 					field: "duplicate",
 					align: "right",
-					style: "width: 0px",
-					headerStyle: "width: 0px",
+					style: "width: 100px",
+					headerStyle: "width: 100px",
 				},
 			],
+			linked_entity_map: {
+				campaigns: "encounters",
+				encounters: "npcs",
+				npcs: "spells",
+			},
 			duplicate_icon: {
 				overwrite: "fas fa-pen",
 				duplicate: "fas fa-copy",
@@ -702,7 +732,7 @@ export default {
 						console.log("Failed NPC import", error, npc, key);
 					}
 				}
-			});
+			}
 
 			this.selected.campaigns.forEach(async (campaign) => {
 				const key = this.import_key_map[campaign.meta.key];
@@ -851,6 +881,58 @@ export default {
 					(import_type) => this.newContentCount(import_type) > this.tier.benefits[import_type]
 				).length > 0
 			);
+		},
+		hasLinkedEntities(import_type, entity) {
+			return this.getLinkedEntities(import_type, entity).length > 0;
+		},
+		getLinkedEntities(import_type, entity) {
+			switch (import_type) {
+				case "campaigns":
+					return this.selected.encounters
+						.filter((encounter) => encounter.meta.campaign_key === entity.meta.key)
+						.map((encounter) => ({
+							name: encounter.name,
+							key: encounter.meta.key,
+						}));
+				case "encounters":
+					if (!entity.entities) {
+						return [];
+					}
+					return this.selected.npcs
+						.filter((npc) => {
+							return Object.values(entity.entities)
+								.filter((enc_npc) => enc_npc?.npc === "custom" && enc_npc.id === npc.meta.key)
+								.map((enc_npc) => enc_npc.id)
+								.includes(npc.meta.key);
+						})
+						.map((npc) => ({
+							name: npc.name,
+							key: npc.meta.key,
+						}));
+				case "npcs":
+					const spell_lists = ["caster_spells", "innate_spells"];
+					return this.selected.spells
+						.filter((spell) =>
+							spell_lists
+								.reduce((acc, spell_type) => {
+									if (entity[spell_type]) {
+										return acc.concat(
+											Object.entries(entity[spell_type])
+												.filter(([_, s]) => s.custom)
+												.map(([sk, _]) => sk)
+										);
+									}
+									return acc;
+								}, [])
+								.includes(spell.meta.key)
+						)
+						.map((spell) => ({
+							name: spell.name,
+							key: spell.meta.key,
+						}));
+				default:
+					return [];
+			}
 		},
 	},
 };

@@ -130,7 +130,7 @@
 									</span>
 									<div slot="content">
 										<p v-for="item in getLinkedEntities(import_type, props.row)" :key="item.key">
-											{{ item.name }}
+											{{ item.name.capitalize() }}
 										</p>
 									</div>
 								</hk-popover>
@@ -891,8 +891,14 @@ export default {
 					return this.selected.encounters
 						.filter((encounter) => encounter.meta.campaign_key === entity.meta.key)
 						.map((encounter) => ({
-							name: encounter.name,
-							key: encounter.meta.key,
+							name:
+								encounter.meta.overwrite === "skip"
+									? encounter.meta.duplicate.name
+									: encounter.name,
+							key:
+								encounter.meta.overwrite === "duplicate"
+									? encounter.meta.key
+									: encounter.meta.duplicate.key,
 						}));
 				case "encounters":
 					if (!entity.entities) {
@@ -906,8 +912,8 @@ export default {
 								.includes(npc.meta.key);
 						})
 						.map((npc) => ({
-							name: npc.name,
-							key: npc.meta.key,
+							name: npc.meta.overwrite === "skip" ? npc.meta.duplicate.name : npc.name,
+							key: npc.meta.overwrite === "duplicate" ? npc.meta.key : npc.meta.duplicate.key,
 						}));
 				case "npcs":
 					const spell_lists = ["caster_spells", "innate_spells"];
@@ -927,8 +933,8 @@ export default {
 								.includes(spell.meta.key)
 						)
 						.map((spell) => ({
-							name: spell.name,
-							key: spell.meta.key,
+							name: spell.meta.overwrite === "skip" ? spell.meta.duplicate.name : spell.name,
+							key: spell.meta.overwrite === "duplicate" ? spell.meta.key : spell.meta.duplicate.key,
 						}));
 				default:
 					return [];

@@ -246,9 +246,9 @@ export async function getCharacterSyncCharacter(url) {
  */
 export function urlType(url) {
 	switch (true) {
-		case !!url?.match(/^https?:\/\/(www.)?(youtube.)|(youtu.be)/):
+		case !!url?.match(/^https?:\/\/(www.)?((youtube.)|(youtu.be))/):
 			return "youtube";
-		case !!url?.match(/^https?:\/\/(www.)?|(open.)spotify\./):
+		case !!url?.match(/^(https?:\/\/(www.)?|(open.))spotify\./):
 			return "spotify";
 		default:
 			return "other";

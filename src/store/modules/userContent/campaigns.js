@@ -68,7 +68,7 @@ const campaign_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let campaigns = state.campaigns ? state.campaigns : undefined;
 
-		if (!campaigns && uid) {
+		if ((!campaigns || getters.campaign_count > Object.keys(campaigns)) && uid) {
 			const services = await dispatch("get_campaign_services");
 			try {
 				campaigns = await services.getCampaigns(uid);
@@ -268,7 +268,6 @@ const campaign_actions = {
 			if (used_slots >= available_slots) {
 				throw "Not enough slots";
 			}
-			console.log("in campaign store", campaign);
 			try {
 				const search_campaign = convert_campaign(campaign);
 				const id = await services.addCampaign(uid, campaign, search_campaign, predefined_key);
@@ -316,7 +315,6 @@ const campaign_actions = {
 	 * Reserve campaign id for future usage
 	 */
 	async reserve_campaign_id({ rootGetters, dispatch }) {
-		console.log("store reserving campaign id");
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_campaign_services");

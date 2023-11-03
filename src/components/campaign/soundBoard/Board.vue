@@ -1,5 +1,14 @@
 <template>
 	<div class="soundboard">
+		<hk-input 
+			v-model="search" 
+			dense 
+			label="Search"
+			class="mb-2"
+			clearable>
+			<q-icon slot="prepend" name="search" />
+		</hk-input>
+		<p class="red" v-if="!filtered.length">Nothing found</p>
 		<transition-group 
 			tag="div"
 			name="board"
@@ -7,7 +16,7 @@
 			enter-active-class="animated animate__flipInX"
 			leave-active-class="animated animate__flipOutX"
 		>
-			<template v-for="(sound) in board">
+			<template v-for="(sound) in filtered">
 				<a
 					v-if="sound.url"
 					:key="`${sound.type}-${sound.key}`"
@@ -121,6 +130,7 @@ export default {
 			loading: false,
 			add_dialog: false,
 			edit: false,
+			search: null,
 			add: {
 				type: this.type,
 				name: null,
@@ -311,6 +321,9 @@ export default {
 			return board.filter((link) => link.type === this.type)
 				.map((item) => ({ ...item, icon: this.getIcon(item.url) }));
 		},
+		filtered() {
+			return this.search ? this.board.filter((link) => link.name?.toLowerCase().includes(this.search.toLowerCase())) : this.board;
+		}
 	},
 	async mounted() {
 		await this.get_soundboard();
@@ -424,7 +437,7 @@ export default {
 			&:hover {
 				box-shadow: 0px 0px 8px 4px #0000006c;
 	
-				.soundboard__button-bg {
+				.board__button-bg {
 					img {
 						transform: scale(1.2);
 					}

@@ -209,11 +209,11 @@ export default {
 			commit("SET_SIDE_SMALL_SCREEN", payload);
 		},
 
-		playMusic({ commit }, payload) {
+		play_music({ commit }, payload) {
 			commit("SET_MUSIC", payload);
 		},
 
-		playAmbience({ commit }, payload) {
+		play_ambience({ commit }, payload) {
 			commit("SET_AMBIENCE", payload);
 		},
 	},

@@ -58,6 +58,9 @@ export default {
 <style lang="scss" scoped>
 .q-tabs {
 	background-color: $neutral-8;
+	position: sticky;
+	top: 0;
+	z-index: 50;
 
 	.q-tab {
 		&--active {

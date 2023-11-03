@@ -15,11 +15,15 @@ export default {
 <style lang="scss" scoped>
 .q-scrollarea {
 	height: 100%;
-	position: relative;
+	position: static;
 
 	&::v-deep {
 		.q-scrollarea__content {
 			width: 100%;
+			position: static;
+		}
+		.q-scrollarea__container {
+			position: static;
 		}
 	}
 }

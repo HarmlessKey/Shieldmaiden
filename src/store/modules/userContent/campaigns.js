@@ -220,19 +220,18 @@ const campaign_actions = {
 	 * Gets all notes for a single campaign
 	 * first try to find it in the store, then fetch if it wasn't present
 	 *
-	 * @param {string} uid userId
-	 * @param {string} id encounterId
+	 * @param {string} campaignId campaignId
 	 */
-	async get_campaign_notes({ state, rootGetters, commit, dispatch }, payload) {
+	async get_campaign_notes({ state, rootGetters, commit, dispatch }, campaignId) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
-		let notes = state.notes[payload];
+		let notes = state.notes[campaignId];
 
 		// The notes are not in the store and need to be fetched from the database
 		if (!notes) {
 			const services = await dispatch("get_campaign_services");
 			try {
-				notes = await services.getCampaignNotes(uid, payload);
-				commit("SET_NOTES", { campaignId: payload, notes });
+				notes = await services.getCampaignNotes(uid, campaignId);
+				commit("SET_NOTES", { campaignId: campaignId, notes });
 			} catch (error) {
 				throw error;
 			}

@@ -17,6 +17,9 @@
 			/>
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
+			<q-tab-panel name="cheat_sheet">
+				<CheatSheet />
+			</q-tab-panel>
 			<q-tab-panel name="compendium">
 				<Compendium />
 			</q-tab-panel>
@@ -28,19 +31,26 @@
 </template>
 
 <script>
+import CheatSheet from "./CheatSheet.vue";
 import Compendium from "./Compendium.vue";
 import Notes from "./Notes.vue";
 
 export default {
 	name: "CampaignInfo",
 	components: {
+		CheatSheet,
 		Compendium,
 		Notes,
 	},
 	data() {
 		return {
-			tab: "compendium",
+			tab: "cheat_sheet",
 			tabs: [
+				{
+					name: "cheat_sheet",
+					label: "Cheat Sheet",
+					icon: "fas fa-file-search",
+				},
 				{
 					name: "compendium",
 					label: "Compendium",

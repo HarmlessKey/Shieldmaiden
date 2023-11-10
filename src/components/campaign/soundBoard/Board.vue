@@ -375,8 +375,8 @@ export default {
 		transition: transform 1s;
 
 		&__button {
-			width: 60px;
-			height: 60px;
+			width: 80px;
+			height: 80px;
 			position: relative;
 			display: flex;
 			flex-direction: column;
@@ -439,7 +439,7 @@ export default {
 	
 				.board__button-bg {
 					img {
-						transform: scale(1.2);
+						transform: scale(1.1);
 					}
 				}
 			}

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { modifyYoutubeUrl, urlType } from "src/utils/generalFunctions";
+import { generateYoutubeEmbedUrl, urlType } from "src/utils/generalFunctions";
 import { mapGetters } from "vuex";
 
 export default {
@@ -29,13 +29,13 @@ export default {
 		...mapGetters(["music", "ambience"]),
 		music_url() {
 			return urlType(this.music?.url) === "youtube"
-				? modifyYoutubeUrl(this.music?.url)
+				? generateYoutubeEmbedUrl(this.music?.url)
 				: this.music?.url;
 		},
 	},
 	methods: {
 		ambience_url(url) {
-			return urlType(url) === "youtube" ? modifyYoutubeUrl(url) : url;
+			return urlType(url) === "youtube" ? generateYoutubeEmbedUrl(url) : url;
 		},
 	},
 };

@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import { modifyYoutubeUrl } from "src/utils/generalFunctions";
+import { generateYoutubeEmbedUrl } from "src/utils/generalFunctions";
 import Weather from "src/components/encounters/Weather";
 import Broadcast from "src/components/drawers/Broadcast.vue";
 import Sharing from "./Sharing.vue";
@@ -251,7 +251,7 @@ export default {
 		},
 		startShare() {
 			if (this.share.youtube) {
-				this.share.youtube = modifyYoutubeUrl(this.share.youtube);
+				this.share.youtube = generateYoutubeEmbedUrl(this.share.youtube);
 			}
 			this.set_campaign_prop({
 				id: this.campaignId,
@@ -268,7 +268,7 @@ export default {
 		},
 		setBackground() {
 			if (this.background.youtube) {
-				this.background.youtube = modifyYoutubeUrl(this.background.youtube);
+				this.background.youtube = generateYoutubeEmbedUrl(this.background.youtube);
 			}
 			this.set_campaign_prop({
 				id: this.campaignId,

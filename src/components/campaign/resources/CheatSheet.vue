@@ -232,7 +232,7 @@ export default {
         {
           type: "reaction",
           name: "Readied Action",
-          caption: "Part of you Ready action",
+          caption: "Part of your Ready action",
           description: "Execute the reaction specified by your Ready action.",
           src: "phb 193",
         },

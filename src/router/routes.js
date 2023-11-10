@@ -607,7 +607,7 @@ const routes = [
 				meta: {
 					title: "D&D 5e Tools",
 					description:
-						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
+						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nDM Screen \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
 				},
 			},
 			{
@@ -653,6 +653,31 @@ const routes = [
 							side: false,
 						},
 					},
+				],
+			},
+			{
+				path: "dm-screen",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "D&D 5e DM Screen",
+					description:
+						"A DM Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsDmScreen",
+						component: () => import("src/views/Tools/DmScreen"),
+						meta: {
+							title: "D&D 5e DM Screen",
+							description:
+							"A Dungeon Master Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+						},
+					}
 				],
 			},
 			{

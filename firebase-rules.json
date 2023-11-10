@@ -1352,11 +1352,13 @@
 				"$campaignId": {
 					".indexOn": "entities/id",
 					"$encounterId": {
-						".validate": "newData.hasChildren(['name','round','turn'])",
 						"timestamp": {
 							".validate": "newData.isNumber()"
 						},
 						"name": {
+							".validate": "newData.isString() && newData.val().length <= 200"
+						},
+						"encounter": {
 							".validate": "newData.isString() && newData.val().length <= 200"
 						},
 						"turn": {
@@ -1379,7 +1381,7 @@
 						},
 						"currency": {
 							"$coin": {
-								".validate": "$coin.match(/^(cp|sp|ep|gp|pp)$/)"
+								".validate": "$coin.matches(/^(cp|sp|ep|gp|pp)$/)"
 							}
 						},
 						"loot": {
@@ -1440,7 +1442,7 @@
 									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
 								},
 								"ac": {
-									".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9999"
+									".validate": "(newData.isNumber() && newData.val() >= 1 && newData.val() <= 9999) || (newData.isString() && newData.val().length <= 10)"
 								},
 								"ac_bonus": {
 									".validate": "newData.isNumber() && newData.val() >= -999 && newData.val() <= 9999"
@@ -1465,7 +1467,7 @@
 										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6"
 									},
 									"$condition": {
-										".validate": "newData.isBoolean && $condition.matches(/^(blinded|charmed|deafened|exhaustion|frightened|grappled|incapacitated|invisible|paralyzed|petrified|poisoned|prone|restrained|stunned|unconscious)$/)"
+										".validate": "newData.isBoolean() && $condition.matches(/^(blinded|charmed|deafened|exhaustion|frightened|grappled|incapacitated|invisible|paralyzed|petrified|poisoned|prone|restrained|stunned|unconscious)$/)"
 									}
 								},
 								"reminders": {
@@ -1480,7 +1482,7 @@
 											".validate": "newData.isString() && newData.val().matches(/^(endTurn|startTurn|damage|timed)$/)"
 										},
 										"rounds": {
-											".validate": "newData.isString() && newData.val().length <= 5"
+											".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
 										},
 										"title": {
 											".validate": "newData.isString() && newData.val().length <= 999"
@@ -1560,7 +1562,8 @@
 						},
 						"requests": {
 							".write": true
-						}
+						},
+						"$other": { ".validate": false }
 					}
 				}
 			},

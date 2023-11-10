@@ -64,7 +64,7 @@ const campaign_actions = {
 	 * Fetches all the search_campaigns for a user
 	 * and stores them in campaigns
 	 */
-	async get_campaigns({ state, rootGetters, dispatch, commit }) {
+	async get_campaigns({ state, rootGetters, getters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let campaigns = state.campaigns ? state.campaigns : undefined;
 

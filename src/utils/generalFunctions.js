@@ -255,13 +255,9 @@ export function urlType(url) {
 	}
 }
 
-export function modifyYoutubeUrl(url) {
-	url = url?.replace("youtu.be", "youtube.com");
-	url = url?.replace("youtube.com", "youtube-nocookie.com");
-	url = !url?.match(/\/embed/)
-		? url?.replace("youtube-nocookie.com", "youtube-nocookie.com/embed")
-		: url; // add embed
-	url = url?.replace(/(watch\?v=)(.*?)(&)/g, "$2$3"); // get the id and set it directly after the /
-	url = url?.replace(/\?.*/g, ""); // remove params from url
-	return url?.replace(/&.*/g, "");
+export function generateYoutubeEmbedUrl(url) {
+	const regex = /(v=|embed\/|\.be\/|v\/)(?<id>[^&|/?]{11})/i
+	const { id } = regex.exec(url).groups;
+
+	return `https://www.youtube-nocookie.com/embed/${id}`;
 }

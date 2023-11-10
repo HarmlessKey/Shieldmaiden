@@ -16,6 +16,26 @@
 				}
 			}
 		},
+		"campaign_notes": {
+			"$uid": {
+				"$campaignId": {
+					"$noteId": {
+						"title": {
+							".validate": "newData.isString() && newData.val().length <= 100"
+						},
+						"description": {
+							".validate": "newData.isString() && newData.val().length <= 1000"
+						},
+						"created": {
+							".validate": "newData.isNumber()"
+						}
+					},
+					".indexOn": ["created"]
+				},
+				".read": "$uid === auth.uid",
+				".write": "$uid === auth.uid"
+			}
+		},
 		"users": {
 			"$uid": {
 				"username": {
@@ -1441,6 +1461,29 @@
 		},
 		"voucher_history": {
 			"$uid": {
+				".read": "$uid === auth.uid",
+				".write": "$uid === auth.uid"
+			}
+		},
+		"soundboard": {
+			"$uid": {
+				"$soundboardId": {
+					".validate": "newData.hasChildren(['type', 'name', 'url'])",
+					"type": {
+						".validate": "newData.isString() && newData.val().matches(/^(music|ambience)$/)"
+					},
+					"name": {
+						".validate": "newData.isString() && newData.val().length <= 20"
+					},
+					"url": {
+						".validate": "newData.isString() && newData.val().length <= 2000"
+					},
+					"image": {
+						".validate": "newData.isString() && newData.val().length <= 2000"
+					},
+					"$other": { ".validate": false }
+				},
+				".indexOn": ["type"],
 				".read": "$uid === auth.uid",
 				".write": "$uid === auth.uid"
 			}

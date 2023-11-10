@@ -162,14 +162,14 @@ export default {
 			options: [
 				{
 					option: "damage",
-					method: () => this.setDrawer({ show: true, type: "slides/encounter/DamageHealing" }),
+					method: () => this.setDrawer({ show: true, type: "drawers/encounter/DamageHealing" }),
 					key: ["shift", "d"],
 					icon: "fa-swords",
 					tooltip: "[shift]+[d] Out of turn damage/healing",
 				},
 				{
 					option: "conditions",
-					method: () => this.setDrawer({ show: true, type: "slides/encounter/Conditions" }),
+					method: () => this.setDrawer({ show: true, type: "drawers/encounter/Conditions" }),
 					key: ["c"],
 					icon: "fa-flame",
 					tooltip: "[c] Conditions",
@@ -177,14 +177,14 @@ export default {
 				{
 					option: "reminders",
 					method: () =>
-						this.setDrawer({ show: true, type: "slides/encounter/reminders/TargetReminders" }),
+						this.setDrawer({ show: true, type: "drawers/encounter/reminders/TargetReminders" }),
 					key: ["m"],
 					icon: "fa-stopwatch",
 					tooltip: "[m] Reminders",
 				},
 				{
 					option: "transform",
-					method: () => this.setDrawer({ show: true, type: "slides/Transform", data: this.target }),
+					method: () => this.setDrawer({ show: true, type: "drawers/Transform", data: this.target }),
 					key: ["t"],
 					icon: "fa-paw-claws",
 					tooltip: "[t] Transform",
@@ -198,7 +198,7 @@ export default {
 				},
 				{
 					option: "edit",
-					method: () => this.setDrawer({ show: true, type: "slides/encounter/EditEntity" }),
+					method: () => this.setDrawer({ show: true, type: "drawers/encounter/EditEntity" }),
 					key: ["e"],
 					icon: "fa-pencil",
 					tooltip: "[e] Edit",

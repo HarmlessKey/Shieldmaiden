@@ -518,7 +518,7 @@ export default {
 		showCondition(key) {
 			this.setSlide({
 				show: true,
-				type: "slides/encounter/Condition",
+				type: "drawers/encounter/Condition",
 				data: {
 					condition: key,
 					entity: this.entity,

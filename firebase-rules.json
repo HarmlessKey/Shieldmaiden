@@ -2,9 +2,9 @@
 	"rules": {
 		"campaigns": {
 			"$uid": {
+				".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
+				".indexOn": "private",
 				"$campaignId": {
-					".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
-					".indexOn": "private",
 					".validate": "newData.hasChildren(['name'])",
 					"timestamp": {
 						".validate": "newData.isNumber()"

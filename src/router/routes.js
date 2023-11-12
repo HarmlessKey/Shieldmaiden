@@ -901,6 +901,36 @@ const routes = [
 					},
 				],
 			},
+			{
+				path: "rules",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Rules",
+				},
+				children: [
+					{
+						path: "",
+						name: "CompendiumRules",
+						component: () => import("src/views/Compendium/Rules"),
+						meta: {
+							title: "Rules D&D 5e",
+							description: "Dungeons & Dragons 5th edition rules. Rules for playing D&D 5e.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Rule",
+						component: () => import("src/views/Compendium/view/Rule"),
+						meta: {
+							title: "Rule",
+						},
+					},
+				],
+			},
 		],
 	},
 

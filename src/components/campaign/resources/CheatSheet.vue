@@ -36,7 +36,7 @@
       >
         <template v-slot:header>
           <q-item-section>
-            <router-link v-if="compendium" :to="`/compendium/rules/${url}`" stop>
+            <router-link v-if="compendium" :to="`/compendium/rules/${url}`" stop.prevent>
              {{ name }}
             </router-link>
             <template v-else>{{ name }}</template>

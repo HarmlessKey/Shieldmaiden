@@ -1,5 +1,9 @@
 <template>
-	<ToolsPage title="DM Screen" bg_img="monster-tool-header.jpg">
+	<ToolsPage title="DM Screen" bg_img="dm-screen-tool-header.png">
+		<template v-slot:action_btn="{ btn_classes }">
+			<q-btn v-if="user" color="primary" :class="btn_classes" no-caps push to="/content/campaigns">Use DM Screen</q-btn>
+			<q-btn v-else color="primary" :class="btn_classes" no-caps push to="/sign-up">Create account</q-btn>
+		</template>
 
 		<h2>DM Screen</h2>
 		<p>
@@ -101,6 +105,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import ToolsPage from "src/components/ToolsPage.vue";
 
 export default {
@@ -108,12 +113,8 @@ export default {
 	components: {
 		ToolsPage,
 	},
-	data() {
-		return {
-			
-		};
-	},
-	methods: {
+	computed: {
+		...mapGetters(["user"]),
 	},
 };
 </script>

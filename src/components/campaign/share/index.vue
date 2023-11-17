@@ -172,10 +172,16 @@
 			</q-tab-panel>
 
 			<q-tab-panel name="weather">
-				<Weather v-model="weather" class="pb-4" />
+				<Weather v-model="weather" class="pb-4" :disabled="tier.name === 'Free'" />
 				<div class="actions">
-					<button class="btn bg-neutral-5" @click="clearWeather">Clear</button>
-					<button class="btn" :disabled="isEmpty(weather)" @click="setWeather">Set</button>
+					<template v-if="tier.name !== 'Free'">
+						<button class="btn bg-neutral-5" @click="clearWeather">Clear</button>
+						<button class="btn" :disabled="isEmpty(weather)" @click="setWeather">Set</button>
+					</template>
+					<template v-else>
+						<button v-if="!isEmpty(weather)" class="btn bg-neutral-5" @click="clearWeather">Clear</button>
+						<router-link v-else to="/patreon" class="btn bg-patreon-red">Get a subscription</router-link>
+					</template>
 				</div>
 			</q-tab-panel>
 		</q-tab-panels>
@@ -185,7 +191,7 @@
 
 <script>
 import { generateYoutubeEmbedUrl } from "src/utils/generalFunctions";
-import Weather from "src/components/encounters/Weather";
+import Weather from "src/components/encounters/Weather.vue";
 import Sharing from "./Sharing.vue";
 import { mapGetters, mapActions } from "vuex";
 import { isEmpty } from "lodash";
@@ -229,7 +235,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["broadcast"]),
+		...mapGetters(["broadcast", "tier"]),
 	},
 	methods: {
 		...mapActions(["setDrawer"]),

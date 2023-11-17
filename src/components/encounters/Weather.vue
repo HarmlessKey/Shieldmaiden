@@ -21,6 +21,7 @@
 							v-model="weather.smoke"
 							indeterminate-value="something-else"
 							:false-value="null"
+							:disable="disabled"
 						/>
 					</div>
 				</q-item-label>
@@ -30,6 +31,7 @@
 					:max="3"
 					markers
 					:dark="$store.getters.theme === 'dark'"
+					:disable="disabled"
 				/>
 			</q-item-section>
 		</q-item>
@@ -44,6 +46,10 @@ export default {
 			type: Object,
 			required: true,
 		},
+		disabled: {
+			type: Boolean,
+			default: false,
+		}
 	},
 	data() {
 		return {

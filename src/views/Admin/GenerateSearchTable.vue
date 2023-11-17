@@ -93,22 +93,32 @@ export default {
 								if (encounter.encounter !== undefined) {
 									if (encounter.name === undefined) {
 										// Encounter name stored in .encounter should be in .name
-										await db.ref(`encounters/${uid}/${cid}/${key}/name`).set(entry.encounter);
+										await db.ref(`encounters/${uid}/${cid}/${key}/name`).set(encounter.encounter);
+										encounter.name = encounter.encounter;
 									}
 									// .encounter should be removed
 									await db.ref(`encounters/${uid}/${cid}/${key}/encounter`).remove();
+									delete encounter.encounter;
 								}
 
-								// const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
-								// const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}/${key}`);
-								// try {
-								// 	// await search_ref.set(search_entry)
-								// } catch(error) {
-								// 	console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
-								// }
+								const search_entry = this.extractFields(encounter, this.search_fields[this.ref]);
+								const search_ref = db.ref(
+									`${this.search_ref[this.ref]}/${uid}/results/${cid}/${key}`
+								);
+								try {
+									await search_ref.set(search_entry);
+								} catch (error) {
+									console.error(
+										`Couldn't update ${this.search_ref[this.ref]} table`,
+										key,
+										encounter.name,
+										error,
+										search_entry
+									);
+								}
 							}
-							// const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/${cid}/count`);
-							// await count_ref.set(Object.keys(entries).length);
+							const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/${cid}/count`);
+							await count_ref.set(Object.keys(entries).length);
 						}
 						console.groupEnd();
 					} else if (this.ref === "campaigns") {

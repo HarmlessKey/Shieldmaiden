@@ -56,6 +56,18 @@
 							@click="
 								setDrawer({
 									show: true,
+									type: 'campaign/soundBoard/index',
+									classes: 'p-0',
+								})
+							"
+						>
+							<hk-icon icon="fas fa-music" />
+						</button>
+						<button
+							class="btn btn-clear btn-sm"
+							@click="
+								setDrawer({
+									show: true,
 									type: 'campaign/resources/index',
 									classes: 'p-0',
 								})
@@ -71,7 +83,7 @@
 					<Splitpanes>
 						<Pane :size="paneSize('left')" min-size="20">
 							<Splitpanes horizontal>
-								<hk-pane :size="paneSize('left-top')">
+								<hk-pane :size="paneSize('left-top')" min-size="20">
 									<Encounters />
 								</hk-pane>
 								<hk-pane v-if="container.width >= lg" :size="paneSize('left-bottom')">
@@ -79,24 +91,24 @@
 								</hk-pane>
 							</Splitpanes>
 						</Pane>
-						<hk-pane v-if="container.width >= md" :size="paneSize('mid')" min-size="20">
-							<Players
-								:userId="user.uid"
-								:campaignId="campaignId"
-								:campaign="campaign"
-								:players="players"
-							/>
-						</hk-pane>
-						<Pane v-if="container.width >= lg" :size="paneSize('right')" min-size="20">
+						<Pane v-if="container.width >= md" :size="paneSize('mid')" min-size="20">
 							<Splitpanes horizontal>
 								<hk-pane min-size="20">
-									<Resources />
+									<Players
+										:userId="user.uid"
+										:campaignId="campaignId"
+										:campaign="campaign"
+										:players="players"
+									/>
 								</hk-pane>
-								<hk-pane v-if="!campaign.private" size="60" min-size="20">
+								<hk-pane v-if="!campaign.private && container.width > lg" size="60" min-size="20">
 									<Share :campaign="campaign" />
 								</hk-pane>
 							</Splitpanes>
 						</Pane>
+						<hk-pane v-if="container.width >= lg" :size="paneSize('right')" min-size="20">		
+							<Resources />								
+						</hk-pane>
 					</Splitpanes>
 				</Pane>
 				<hk-pane v-if="container.width < lg && container.height >= 780">
@@ -265,16 +277,16 @@ export default {
 		},
 		paneSize(pane) {
 			switch (pane) {
-				case "left":
+				case "right":
 					return this.container.width > this.md ? "30" : "50";
 				case "mid":
 					return this.container.width > this.md ? "40" : "50";
-				case "right":
+				case "left":
 					return this.container.width > this.md ? "30" : "50";
 				case "left-top":
-					return this.container.width > this.lg ? "70" : "100";
+					return this.container.width > this.lg ? "50" : "100";
 				case "left-bottom":
-					return this.container.width > this.md ? "30" : "0";
+					return this.container.width > this.md ? "50" : "0";
 			}
 		},
 	},

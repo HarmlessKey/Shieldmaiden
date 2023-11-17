@@ -1,5 +1,19 @@
 <template>
-	<div v-if="broadcast.live && !campaign.sharing" class="full-height">
+	<div v-if="!campaign.sharing" class="full-height">
+		<div v-if="!broadcast.live" class="not-live">
+			<p>Go live to share with your players</p>
+			<div 
+				class="live pointer"
+				@click="
+					setDrawer({
+						show: true,
+						type: 'drawers/Broadcast',
+						data: { campaign_id: campaignId, private: campaign.private },
+					})
+				">
+				Go live
+			</div>
+		</div>
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"
@@ -166,25 +180,12 @@
 			</q-tab-panel>
 		</q-tab-panels>
 	</div>
-	<Sharing v-else-if="broadcast.live && campaign.sharing" @stop="stopShare" />
-	<div v-else class="not-live">
-		<div class="pane__header">Live initiative</div>
-		<div class="pane__content">
-			<p>
-				This panel gives options for the live initiative screen and is therefore only useful if you
-				are broadcasting.
-			</p>
-			<div class="not-live__broadcast">
-				<Broadcast :data="{ campaign_id: campaignId }" />
-			</div>
-		</div>
-	</div>
+	<Sharing v-else @stop="stopShare" />
 </template>
 
 <script>
 import { generateYoutubeEmbedUrl } from "src/utils/generalFunctions";
 import Weather from "src/components/encounters/Weather";
-import Broadcast from "src/components/drawers/Broadcast.vue";
 import Sharing from "./Sharing.vue";
 import { mapGetters, mapActions } from "vuex";
 import { isEmpty } from "lodash";
@@ -198,7 +199,6 @@ export default {
 	},
 	components: {
 		Weather,
-		Broadcast,
 		Sharing,
 	},
 	data() {
@@ -232,6 +232,7 @@ export default {
 		...mapGetters(["broadcast"]),
 	},
 	methods: {
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["set_campaign_prop"]),
 		showBadge(tab) {
 			switch (tab) {
@@ -339,9 +340,16 @@ export default {
 }
 .not-live {
 	text-align: center;
-
-	&__broadcast {
-		padding: 10px;
-	}
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #00000091;
+	z-index: 50;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 </style>

@@ -17,11 +17,11 @@
 			/>
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
-			<q-tab-panel name="music">
-				<Board type="music" />
-			</q-tab-panel>
 			<q-tab-panel name="ambience">
 				<Board type="ambience" />
+			</q-tab-panel>
+			<q-tab-panel name="music">
+				<Board type="music" />
 			</q-tab-panel>
 		</q-tab-panels>
 	</div>
@@ -37,7 +37,7 @@ export default {
 	},
 	data() {
 		return {
-			tab: "music",
+			tab: "ambience",
 			tabs: [
 				{
 					name: "ambience",

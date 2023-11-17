@@ -65,7 +65,7 @@
 					square
 					label="Rounds"
 					type="number"
-					v-model="reminder.rounds"
+					v-model.number="reminder.rounds"
 					min="1"
 					max="99"
 					hint="One round is 6 seconds"

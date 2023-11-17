@@ -69,15 +69,20 @@ export class campaignServices {
 				throw error;
 			});
 	}
-
-	async addCampaign(uid, campaign, search_campaign) {
+	async addCampaign(uid, campaign, search_campaign, predefined_key = undefined) {
 		try {
-			const newCampaign = await CAMPAIGNS_REF.child(uid).push(campaign);
+			let campaign_key = predefined_key;
+			if (predefined_key) {
+				await CAMPAIGNS_REF.child(uid).child(predefined_key).set(campaign);
+			} else {
+				const newCampaign = await CAMPAIGNS_REF.child(uid).push(campaign);
+				campaign_key = newCampaign.key;
+			}
 
 			// Update search_campaigns
-			SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${newCampaign.key}`).set(search_campaign);
+			SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${campaign_key}`).set(search_campaign);
 
-			return newCampaign.key;
+			return campaign_key;
 		} catch (error) {
 			throw error;
 		}
@@ -209,6 +214,17 @@ export class campaignServices {
 		} catch (error) {
 			throw error;
 		}
+	}
+
+	/**
+	 * Reserve an ID for a campaign that might be stored in the future
+	 * Useful when you don't know yet if you want to store a campaign, but want to be able to link to it
+	 * from different db entries
+	 * @param {String} uid ID of active user
+	 * @returns Generated key
+	 */
+	async reserveCampaignId(uid) {
+		return (await CAMPAIGNS_REF.child(uid).push()).key;
 	}
 
 	/**

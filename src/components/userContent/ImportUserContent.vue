@@ -118,7 +118,24 @@
 								{{ props.row.name.capitalizeEach() }}
 							</td>
 						</template>
-
+						<template v-slot:body-cell-linked="props">
+							<td>
+								<hk-popover
+									v-if="import_type !== 'spells' && hasLinkedEntities(import_type, props.row)"
+									:header="`Linked ${linked_entity_map[import_type]}`"
+								>
+									<span>
+										{{ getLinkedEntities(import_type, props.row).length }}
+										{{ linked_entity_map[import_type] }}
+									</span>
+									<div slot="content">
+										<p v-for="item in getLinkedEntities(import_type, props.row)" :key="item.key">
+											{{ item.name.capitalize() }}
+										</p>
+									</div>
+								</hk-popover>
+							</td>
+						</template>
 						<template v-slot:body-cell-duplicate="props">
 							<td class="py-0 px-1">
 								<hk-popover
@@ -188,39 +205,41 @@
 					:key="`failed-${failed_type}`"
 					class="bg-neutral-8 px-3 py-2"
 				>
-					<p>Import failed for following {{ failed_type }}</p>
-					<q-list dense class="mb-2">
-						<q-item v-for="(failed, i) in failed_list" :key="`failed-${i}`" class="bg-neutral-9">
-							<q-item-section>
-								{{ failed.name.capitalizeEach() }}
-							</q-item-section>
-							<q-item-section avatar>
-								<hk-popover v-if="failed.errors" header="Validation errors">
-									<q-icon name="error" class="red" />
-									<div slot="content">
-										<ol class="px-3">
-											<li
-												v-for="(error, index) in failed.errors"
-												:key="`${i}-error-${index}`"
-												class="red"
-											>
-												<strong v-if="error.instancePath" class="neutral-1">
-													{{ error.instancePath }}
-												</strong>
-												{{ error.message.capitalize() }}
-											</li>
-										</ol>
-									</div>
-								</hk-popover>
-							</q-item-section>
-						</q-item>
-					</q-list>
-					<p>
-						Make sure there are no validation errors.<br />
-						<a @click="showSchemaDialog(failed_type)"
-							>Compare with our {{ failed_type.substring(0, failed_type.length - 1) }} schema.</a
-						>
-					</p>
+					<template v-if="failed_list.length">
+						<p>Import failed for following {{ failed_type }}</p>
+						<q-list dense class="mb-2">
+							<q-item v-for="(failed, i) in failed_list" :key="`failed-${i}`" class="bg-neutral-9">
+								<q-item-section>
+									{{ failed.name.capitalizeEach() }}
+								</q-item-section>
+								<q-item-section avatar>
+									<hk-popover v-if="failed.errors" header="Validation errors">
+										<q-icon name="error" class="red" />
+										<div slot="content">
+											<ol class="px-3">
+												<li
+													v-for="(error, index) in failed.errors"
+													:key="`${i}-error-${index}`"
+													class="red"
+												>
+													<strong v-if="error.instancePath" class="neutral-1">
+														{{ error.instancePath }}
+													</strong>
+													{{ error.message.capitalize() }}
+												</li>
+											</ol>
+										</div>
+									</hk-popover>
+								</q-item-section>
+							</q-item>
+						</q-list>
+						<p>
+							Make sure there are no validation errors.<br />
+							<a @click="showSchemaDialog(failed_type)"
+								>Compare with our {{ failed_type.substring(0, failed_type.length - 1) }} schema.</a
+							>
+						</p>
+					</template>
 				</div>
 			</q-expansion-item>
 
@@ -299,22 +318,32 @@ export default {
 			schema: undefined,
 			import_state: "start",
 			failed_imports: {
+				campaigns: [],
+				encounters: [],
 				npcs: [],
 				spells: [],
 			},
 			imported: {
+				campaigns: 0,
+				encounters: 0,
 				npcs: 0,
 				spells: 0,
 			},
 			import_key_map: {
+				campaigns: {},
+				encounters: {},
 				npcs: {},
 				spells: {},
 			},
 			parsed_data: {
+				campaigns: [],
+				encounters: [],
 				npcs: [],
 				spells: [],
 			},
 			selected: {
+				campaigns: [],
+				encounters: [],
 				npcs: [],
 				spells: [],
 			},
@@ -328,14 +357,27 @@ export default {
 					format: (val) => val.capitalizeEach(),
 				},
 				{
+					name: "linked",
+					label: "Linked",
+					field: "linked",
+					align: "right",
+					style: "width: 140px",
+					headerStyle: "width: 140px",
+				},
+				{
 					name: "duplicate",
 					label: "Duplicate",
 					field: "duplicate",
 					align: "right",
-					style: "width: 0px",
-					headerStyle: "width: 0px",
+					style: "width: 100px",
+					headerStyle: "width: 100px",
 				},
 			],
+			linked_entity_map: {
+				campaigns: "encounters",
+				encounters: "npcs",
+				npcs: "spells",
+			},
 			duplicate_icon: {
 				overwrite: "fas fa-pen",
 				duplicate: "fas fa-copy",
@@ -378,8 +420,18 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions("campaigns", ["add_campaign", "get_campaign", "get_campaigns"]),
-		...mapActions("encounters", ["add_encounter", "get_encounter", "get_encounters"]),
+		...mapActions("campaigns", [
+			"add_campaign",
+			"get_campaign",
+			"get_campaigns",
+			"reserve_campaign_id",
+		]),
+		...mapActions("encounters", [
+			"add_encounter",
+			"get_encounter",
+			"get_campaign_encounters",
+			"reserve_encounter_id",
+		]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npcs", "get_npc", "reserve_npc_id"]),
 		...mapActions("spells", [
 			"add_spell",
@@ -482,17 +534,34 @@ export default {
 					this.parseNPC(key, npc);
 				});
 			}
-			// if (data.campaigns && data.encounters) {
-			// 	Object.entries(data.campaigns).forEach(([key, campaign]) => {
-			// 		this.parseCampaign(key, campaign);
-			// 	});
-			// 	Object.entries(data.encounters).forEach(([key, encounter]) => {
-			// 		this.parseEncounter(key, encounter);
-			// 	});
-			// }
+			if (data.campaigns && data.encounters) {
+				Object.entries(data.campaigns).forEach(([campaign_key, campaign]) => {
+					this.parseCampaign(campaign_key, campaign);
+					Object.entries(data.encounters[campaign_key]).forEach(([encounter_key, encounter]) => {
+						this.parseEncounter(encounter_key, campaign_key, encounter);
+					});
+				});
+			}
 		},
 
-		async parseCampaign(key, campaign) {},
+		async parseCampaign(key, campaign) {
+			delete campaign.key;
+			this.removeTimestamps(campaign);
+
+			const valid = ajv.validate(campaignSchema, campaign);
+
+			campaign.meta = { key };
+			// Always duplicate an imported campaign
+			campaign.meta.duplicate = false;
+			campaign.meta.overwrite = undefined;
+
+			if (!valid) {
+				campaign.meta.errors = ajv.errors;
+			}
+
+			this.parsed_data.campaigns.push(campaign);
+			console.log("parsed Campaign", campaign.name);
+		},
 		async parseEncounter(key, campaign_key, encounter) {
 			delete encounter.key;
 			this.removeTimestamps(encounter);
@@ -500,12 +569,16 @@ export default {
 			const valid = ajv.validate(encounterSchema, encounter);
 
 			encounter.meta = { key, campaign_key };
-			encounter.meta.duplicate = await this.checkIfDuplicateEncounter(encounter);
-			encounter.meta.overwrite = encounter.meta.duplicate ? "duplicate" : undefined;
+			// Always duplicate encounters and campaigns
+			encounter.meta.duplicate = false;
+			encounter.meta.overwrite = undefined;
 
 			if (!valid) {
 				encounter.meta.errors = ajv.errors;
 			}
+
+			this.parsed_data.encounters.push(encounter);
+			console.log("parsed Encounter", encounter.name);
 		},
 		async parseNPC(key, npc) {
 			/**
@@ -565,8 +638,10 @@ export default {
 
 		async getKey(item, item_type) {
 			const keyGenFnMap = {
-				spells: this.reserve_spell_id,
+				campaigns: this.reserve_campaign_id,
+				encounters: this.reserve_encounter_id,
 				npcs: this.reserve_npc_id,
+				spells: this.reserve_spell_id,
 			};
 
 			switch (item.meta.overwrite) {
@@ -633,7 +708,7 @@ export default {
 			 *    - Update NPCs in encounter to correct keys
 			 */
 
-			this.selected.spells.forEach(async (spell) => {
+			for (const spell of this.selected.spells) {
 				const key = this.import_key_map.spells[spell.meta.key];
 				const meta = { ...spell.meta };
 				delete spell.meta;
@@ -649,7 +724,7 @@ export default {
 						console.log("Failed SPELL import", error, spell);
 					}
 				}
-			});
+			}
 
 			for (const npc of this.selected.npcs) {
 				const key = this.import_key_map.npcs[npc.meta.key];
@@ -668,6 +743,31 @@ export default {
 						this.failed_imports.npcs.push(npc);
 						console.log("Failed NPC import", error, npc, key);
 					}
+				}
+			}
+
+			for (const campaign of this.selected.campaigns) {
+				const key = this.import_key_map.campaigns[campaign.meta.key];
+				delete campaign.meta;
+				campaign.timestamp = Date.now();
+				try {
+					await this.add_campaign({ campaign, predefined_key: key });
+					this.imported.campaigns++;
+				} catch (error) {
+					this.failed_imports.campaigns.push(campaign);
+					console.log("Failed Campaign import", error, campaign, key);
+				}
+			}
+
+			for (const encounter of this.selected.encounters) {
+				const key = this.import_key_map.encounters[encounter.meta.key];
+				const campaign_key = this.import_key_map.campaigns[encounter.meta.campaign_key];
+				delete encounter.meta;
+				try {
+					await this.add_encounter({ campaignId: campaign_key, encounter, predefined_key: key });
+					this.imported.encounters++;
+				} catch (error) {
+					this.failed_imports.encounters.push(encounter);
 				}
 			}
 		},
@@ -805,6 +905,64 @@ export default {
 					(import_type) => this.newContentCount(import_type) > this.tier.benefits[import_type]
 				).length > 0
 			);
+		},
+		hasLinkedEntities(import_type, entity) {
+			return this.getLinkedEntities(import_type, entity).length > 0;
+		},
+		getLinkedEntities(import_type, entity) {
+			switch (import_type) {
+				case "campaigns":
+					return this.selected.encounters
+						.filter((encounter) => encounter.meta.campaign_key === entity.meta.key)
+						.map((encounter) => ({
+							name:
+								encounter.meta.overwrite === "skip"
+									? encounter.meta.duplicate.name
+									: encounter.name,
+							key:
+								encounter.meta.overwrite === "duplicate"
+									? encounter.meta.key
+									: encounter.meta.duplicate.key,
+						}));
+				case "encounters":
+					if (!entity.entities) {
+						return [];
+					}
+					return this.selected.npcs
+						.filter((npc) => {
+							return Object.values(entity.entities)
+								.filter((enc_npc) => enc_npc?.npc === "custom" && enc_npc.id === npc.meta.key)
+								.map((enc_npc) => enc_npc.id)
+								.includes(npc.meta.key);
+						})
+						.map((npc) => ({
+							name: npc.meta.overwrite === "skip" ? npc.meta.duplicate.name : npc.name,
+							key: npc.meta.overwrite === "duplicate" ? npc.meta.key : npc.meta.duplicate.key,
+						}));
+				case "npcs":
+					const spell_lists = ["caster_spells", "innate_spells"];
+					return this.selected.spells
+						.filter((spell) =>
+							spell_lists
+								.reduce((acc, spell_type) => {
+									if (entity[spell_type]) {
+										return acc.concat(
+											Object.entries(entity[spell_type])
+												.filter(([_, s]) => s.custom)
+												.map(([sk, _]) => sk)
+										);
+									}
+									return acc;
+								}, [])
+								.includes(spell.meta.key)
+						)
+						.map((spell) => ({
+							name: spell.meta.overwrite === "skip" ? spell.meta.duplicate.name : spell.name,
+							key: spell.meta.overwrite === "duplicate" ? spell.meta.key : spell.meta.duplicate.key,
+						}));
+				default:
+					return [];
+			}
 		},
 	},
 };

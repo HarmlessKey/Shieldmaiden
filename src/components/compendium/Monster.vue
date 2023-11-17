@@ -520,6 +520,9 @@ export default {
 	padding: 20px;
 	color: $black;
 	font-family: Helvetica, sans-serif, serif;
+	.hk-roll {
+		color: $black;
+	}
 
 	h2 {
 		color: #6e1d10;

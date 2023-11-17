@@ -693,7 +693,7 @@ const run_encounter_actions = {
 		let maxHp = maxHpMod > 0 ? entity.maxHp - maxHpMod : entity.maxHp + Math.abs(maxHpMod);
 		let curHp = entity.curHp;
 
-		if (value === undefined) value = null;
+		if (value === undefined || value === "") value = null;
 		if (
 			value &&
 			[

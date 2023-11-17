@@ -115,7 +115,7 @@
 				</q-tab-panel>
 				<q-tab-panel name="custom">
 					<ValidationObserver v-slot="{ handleSubmit, valid }">
-						<q-form @submit="handleSubmit(valid ? addReminder('custom') : null)">
+						<q-form @submit="handleSubmit(valid ? addReminder('custom') : invalidReminder)">
 							<reminder-form v-model="customReminder" :variables="false" />
 							<q-btn color="blue" class="full-width" no-caps type="submit" :disabled="!valid"
 								>Set reminder</q-btn
@@ -176,7 +176,7 @@ export default {
 	methods: {
 		...mapActions(["set_targetReminder"]),
 		...mapActions("reminders", ["get_full_reminders"]),
-		async addReminder(type, reminder = false, selectedVars = undefined, key = undefined) {
+		addReminder(type, reminder = false, selectedVars = undefined, key = undefined) {
 			if (type === "premade") {
 				for (const target of this.reminder_targets) {
 					key = key || reminder[".key"] || reminder.key;
@@ -187,7 +187,7 @@ export default {
 						reminder.selectedVars = selectedVars;
 					}
 
-					await this.set_targetReminder({
+					this.set_targetReminder({
 						action: "add",
 						entity: target,
 						key,
@@ -198,7 +198,7 @@ export default {
 				}
 			} else if (type === "custom") {
 				for (const target of this.reminder_targets) {
-					await this.set_targetReminder({
+					this.set_targetReminder({
 						action: "add",
 						entity: target,
 						type: "custom",
@@ -219,6 +219,9 @@ export default {
 				title = this.replaceReminderVariables(title, reminder.selectedVars);
 			}
 			return title;
+		},
+		invalidReminder(obj) {
+			console.warn(obj);
 		},
 	},
 };

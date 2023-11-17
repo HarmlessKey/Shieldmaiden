@@ -58,16 +58,26 @@ export class encounterServices {
 		}
 	}
 
-	async addEncounter(uid, campaignId, encounter, search_encounter) {
+	async reserveEncounterId(uid) {
+		return (await ENCOUNTERS_REF.child(uid).push()).key;
+	}
+
+	async addEncounter(uid, campaignId, encounter, search_encounter, predefined_key = undefined) {
 		try {
-			const newEncounter = await ENCOUNTERS_REF.child(uid).child(campaignId).push(encounter);
+			let encounter_key = predefined_key;
+			if (predefined_key) {
+				await ENCOUNTERS_REF.child(uid).child(campaignId).child(predefined_key).set(encounter);
+			} else {
+				const newEncounter = await ENCOUNTERS_REF.child(uid).child(campaignId).push(encounter);
+				encounter_key = newEncounter.key;
+			}
 
 			// Update search_encounters
-			SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${newEncounter.key}`).set(
+			SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${encounter_key}`).set(
 				search_encounter
 			);
 
-			return newEncounter.key;
+			return encounter_key;
 		} catch (error) {
 			throw error;
 		}

@@ -216,11 +216,13 @@ export default {
 						delete entity.tempHp;
 						delete entity.maxHpMod;
 						delete entity.ac_bonus;
+						delete entity.conditions;
 						delete entity.reminders;
 						delete entity.settings;
-						delete entity.surprised;
 						delete entity.tempHp;
 						delete entity.meters;
+						delete entity.limited_uses;
+
 						return [entity_id, entity];
 					});
 				encounter.entities = Object.fromEntries(entities);

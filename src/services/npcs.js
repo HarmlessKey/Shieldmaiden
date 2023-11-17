@@ -220,6 +220,7 @@ export class npcServices {
 	 * E.g. Reserve a key for an npc during importing so it can be linked to an encounter.
 	 *
 	 * @param {String} uid ID of active user
+	 * @returns Generated key
 	 */
 	async reserveNpcId(uid) {
 		return (await NPCS_REF.child(uid).push()).key;

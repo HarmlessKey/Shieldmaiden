@@ -64,11 +64,11 @@ const campaign_actions = {
 	 * Fetches all the search_campaigns for a user
 	 * and stores them in campaigns
 	 */
-	async get_campaigns({ state, rootGetters, dispatch, commit }) {
+	async get_campaigns({ state, rootGetters, getters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let campaigns = state.campaigns ? state.campaigns : undefined;
 
-		if (!campaigns && uid) {
+		if ((!campaigns || getters.campaign_count > Object.keys(campaigns)) && uid) {
 			const services = await dispatch("get_campaign_services");
 			try {
 				campaigns = await services.getCampaigns(uid);
@@ -92,6 +92,24 @@ const campaign_actions = {
 				const count = (await services.getCampaignCount(uid)) || 0;
 				commit("SET_CAMPAIGN_COUNT", count);
 				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	async update_campaign_count({ rootGetters, state, commit, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				const current_count = state.campaign_count;
+				const table_length = Object.keys(state.campaigns).length;
+				const count_diff = table_length - current_count;
+
+				const new_count = await services.updateCampaignCount(uid, count_diff);
+				commit("SET_CAMPAIGN_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
 			} catch (error) {
 				throw error;
 			}
@@ -240,7 +258,7 @@ const campaign_actions = {
 	 * @param {object} campaign
 	 * @returns {string} the id of the newly added campaign
 	 */
-	async add_campaign({ rootGetters, commit, dispatch }, campaign) {
+	async add_campaign({ rootGetters, commit, dispatch, state }, { campaign, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.campaigns;
 		if (uid) {
@@ -252,14 +270,14 @@ const campaign_actions = {
 			}
 			try {
 				const search_campaign = convert_campaign(campaign);
-				const id = await services.addCampaign(uid, campaign, search_campaign);
+				const id = await services.addCampaign(uid, campaign, search_campaign, predefined_key);
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
+				commit("SET_CACHED_CAMPAIGN", { uid, id, campaign });
 
-				const new_count = await services.updateCampaignCount(uid, 1);
-				commit("SET_CAMPAIGN_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_campaign_count");
 				return id;
 			} catch (error) {
+				console.log("caught error", error);
 				throw error;
 			}
 		}
@@ -287,6 +305,21 @@ const campaign_actions = {
 
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
 				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Reserve campaign id for future usage
+	 */
+	async reserve_campaign_id({ rootGetters, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				return await services.reserveCampaignId(uid);
 			} catch (error) {
 				throw error;
 			}
@@ -323,10 +356,8 @@ const campaign_actions = {
 				commit("REMOVE_CAMPAIGN", id);
 				commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
 
-				// Update campaign count
-				const new_count = await services.updateCampaignCount(uid, -1);
-				commit("SET_CAMPAIGN_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_campaign_count");
+
 				return;
 			} catch (error) {
 				throw error;

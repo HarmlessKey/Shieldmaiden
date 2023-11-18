@@ -88,7 +88,7 @@
 								<a
 									class="btn btn-sm bg-neutral-5 mx-1"
 									@click="
-										setSlide({
+										setDrawer({
 											show: true,
 											type: 'contribute/spell/ViewSpell',
 											data: data.row,
@@ -186,7 +186,7 @@
 								<a
 									class="btn btn-sm bg-neutral-5"
 									@click="
-										setSlide({
+										setDrawer({
 											show: true,
 											type: 'contribute/spell/ViewSpell',
 											data: data.row,
@@ -223,7 +223,7 @@
 							<div slot="actions" slot-scope="data" class="actions">
 								<a
 									@click="
-										setSlide({
+										setDrawer({
 											show: true,
 											type: 'contribute/spell/ViewSpell',
 											data: data.row,
@@ -362,7 +362,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		isDifficult(row) {
 			return row.metadata && row.metadata.difficult;
 		},

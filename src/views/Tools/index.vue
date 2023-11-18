@@ -73,6 +73,13 @@ export default {
 					url: "/tools/encounter-builder",
 					icon: "fas fa-hammer-war",
 				},
+				"dm-screen": {
+					title: "DM Screen",
+					description: "Quick access to rules, a soundboard, your players, your custom encounters and more.",
+					image: "dm-screen-medium.png",
+					url: "/tools/dm-screen",
+					icon: "fas fa-map",
+				},
 				"monster-creator": {
 					title: "Monster Creator",
 					description:

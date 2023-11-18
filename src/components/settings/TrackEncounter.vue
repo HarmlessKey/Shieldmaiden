@@ -6,7 +6,7 @@
 			encounter, see who's turn it is and what the status of the entities within the encounter is.
 			Below you can determine what should be visible on the public initiative list.
 		</p>
-		<a @click="setSlide({ show: true, type: 'PlayerLink' })" class="btn bg-neutral-4 mb-3">
+		<a @click="setDrawer({ show: true, type: 'PlayerLink' })" class="btn bg-neutral-4 mb-3">
 			Share your adventures
 		</a>
 
@@ -332,7 +332,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide", "update_settings", "set_default_settings"]),
+		...mapActions(["setDrawer", "update_settings", "set_default_settings"]),
 		setSetting(sub_category, type, value) {
 			this.update_settings({
 				category: "track",

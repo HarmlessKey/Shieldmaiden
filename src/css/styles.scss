@@ -5,6 +5,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 @import "hk-icons.scss";
 @import "./variables.scss";
+@import "./splitpanes.scss";
 
 /* 2. Themes */
 /*********************************************/
@@ -515,6 +516,19 @@ html body {
 		}
 	}
 
+	.absolute {
+		position: absolute;
+	}
+	.static {
+		position: static;
+	}
+	.fixed {
+		position: fixed;
+	}
+	.sticky {
+		position: sticky;
+	}
+
 	//MARGINS
 	.m {
 		&-0 {
@@ -755,6 +769,9 @@ html body {
 		}
 		&-row {
 			flex-direction: row;
+		}
+		&-grow {
+			flex-grow: 1;
 		}
 	}
 	.gap {
@@ -1800,22 +1817,30 @@ html body {
 		}
 	}
 
-	.slide {
-		position: fixed;
-		right: 0;
-		top: 50px;
-		height: calc(100vh - 50px);
-		width: 380px;
-		max-width: 95%;
-		z-index: 99;
-		box-shadow: 0 10px 15px $black;
-		background: $neutral-8;
+	.drawer {
+		&-wrapper {
+			position: fixed;
+			right: 0;
+			top: 50px;
+			height: calc(100vh - 50px);
+			width: 420px;
+			max-width: 95%;
+			z-index: 99;
+			box-shadow: 0 10px 15px $black;
+			background: $neutral-8;
+		}
+		height: 100%;
 		display: grid;
 		grid-template-columns: auto;
 		grid-template-rows: 40px auto;
 		grid-template-areas:
 			"hide"
 			"content";
+
+		.q-scrollarea {
+			height: 100%;
+			grid-area: content;
+		}
 
 		a.hide {
 			grid-area: hide;
@@ -1830,9 +1855,8 @@ html body {
 			background: $neutral-9;
 			color: $neutral-1 !important;
 		}
-		.content {
+		&__content {
 			padding: 15px;
-			grid-area: content;
 			overflow: auto;
 
 			&.monster-card {
@@ -2869,7 +2893,7 @@ html body {
 		.container {
 			max-width: 1140px;
 		}
-		.slide {
+		.drawer {
 			width: 420px;
 		}
 		.d-xl {

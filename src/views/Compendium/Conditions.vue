@@ -125,13 +125,13 @@
 				this.query = {
 					search: this.search
 				}
-				this.fetchSpells();
+				this.fetchConditions();
 			},
 			request(req) {
 				this.pagination = req.pagination;
-				this.fetchSpells();		
+				this.fetchConditions();		
 			},
-			async fetchSpells() {
+			async fetchConditions() {
 				await this.fetch_conditions({
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
@@ -147,7 +147,7 @@
 			}
 		},
 		async mounted() {
-			await this.fetchSpells();
+			await this.fetchConditions();
 		}
 	}
 </script>

@@ -2,9 +2,14 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="npcs">
-				<button slot="actions-left" class="btn btn-sm bg-neutral-5" @click="exportAll()">
-					Export
-				</button>
+				<ExportUserContent
+					slot="actions-left"
+					class="btn-sm bg-neutral-5"
+					content-type="npc"
+					:content-id="npcIds"
+				>
+					<span>Export</span>
+				</ExportUserContent>
 				<button
 					slot="actions-right"
 					class="btn btn-sm bg-neutral-5 mx-2"
@@ -72,10 +77,11 @@
 									<i aria-hidden="true" class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 								</router-link>
-								<a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
-									<i aria-hidden="true" class="fas fa-arrow-alt-down" />
-									<q-tooltip anchor="top middle" self="center middle"> Download </q-tooltip>
-								</a>
+								<ExportUserContent
+									class="btn-sm bg-neutral-5 mx-2"
+									content-type="npc"
+									:content-id="props.key"
+								/>
 								<a
 									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete($event, props.key, props.row)"
@@ -117,7 +123,7 @@
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<ImportContent type="npcs" />
+					<ImportUserContent type="npcs" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -127,16 +133,17 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { monsterMixin } from "src/mixins/monster";
-import ImportContent from "src/components/ImportContent.vue";
+import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader";
-import { downloadJSON } from "src/utils/generalFunctions";
+import ExportUserContent from "src/components/userContent/ExportUserContent";
 
 export default {
 	name: "Npcs",
 	mixins: [monsterMixin],
 	components: {
-		ImportContent,
+		ImportUserContent,
 		ContentHeader,
+		ExportUserContent,
 	},
 	data() {
 		return {
@@ -196,14 +203,26 @@ export default {
 				? ["avatar", "name", "type", "actions"]
 				: ["avatar", "name", "actions"];
 		},
+		npcIds() {
+			return this.npcs.map((npc) => npc.key);
+		},
 	},
 	async mounted() {
 		await this.get_npcs();
+		this.update_npc_count();
+
 		this.loading_npcs = false;
 	},
 	methods: {
-		...mapActions(["setSlide"]),
-		...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs", "add_npc"]),
+		...mapActions(["setDrawer"]),
+		...mapActions("npcs", [
+			"get_npcs",
+			"delete_npc",
+			"get_npc",
+			"get_full_npcs",
+			"add_npc",
+			"update_npc_count",
+		]),
 		...mapActions("spells", ["get_spell"]),
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;
@@ -244,47 +263,6 @@ export default {
 
 		setSize(e) {
 			this.card_width = e.width;
-		},
-		async exportAll() {
-			const all_npcs = await this.get_full_npcs();
-			for (const key in all_npcs) {
-				all_npcs[key].harmless_key = key;
-				await this.addCustomSpellToExport(all_npcs[key]);
-			}
-
-			const json_export = Object.values(all_npcs);
-			downloadJSON(json_export);
-		},
-		async exportNPC(id) {
-			const npc = await this.get_npc({ uid: this.userId, id });
-			const exportableNpc = Object.assign({}, npc);
-			exportableNpc.harmless_key = id;
-			await this.addCustomSpellToExport(exportableNpc);
-			downloadJSON(exportableNpc);
-		},
-		async addCustomSpellToExport(npc) {
-			const [custom_caster_spells, custom_innate_spells] = await Promise.all([
-				this.parseNpcSpellList(npc, "caster_spells"),
-				this.parseNpcSpellList(npc, "innate_spells"),
-			]);
-
-			const custom_spells = custom_caster_spells
-				.concat(custom_innate_spells)
-				.reduce((acc, [key, spell]) => ({ ...acc, [key]: spell }), {});
-			npc.custom_spells = custom_spells;
-		},
-		async parseNpcSpellList(npc, spell_list_name) {
-			const custom_spell_list = [];
-			if (npc[spell_list_name]) {
-				const npc_spell_list = Object.assign({}, npc[spell_list_name]);
-				for (const [spell_key, spell] of Object.entries(npc_spell_list)) {
-					if (spell.custom) {
-						const full_spell = await this.get_spell({ uid: this.userId, id: spell_key });
-						custom_spell_list.push([spell_key, full_spell]);
-					}
-				}
-			}
-			return custom_spell_list;
 		},
 	},
 };

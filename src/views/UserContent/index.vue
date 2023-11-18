@@ -205,7 +205,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaigns"]),
 		getBackground(campaign) {
 			if (campaign && campaign.background) return campaign.background;

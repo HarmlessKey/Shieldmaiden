@@ -1,0 +1,183 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Harmless Key Encounter",
+	"description": "JSON Schema for importing Harmless Key Encounters",
+	"additionalProperties": false,
+	"type": "object",
+	"properties": {
+		"harmless_key": {
+			"type": "string",
+			"maxLength": 100
+		},
+		"name": {
+			"title": "Name",
+			"type": "string",
+			"maxLength": 100
+		},
+		"timestamp": {
+			"title": "Timestamp",
+			"type": "integer"
+		},
+		"round": {
+			"title": "Round",
+			"type": "integer"
+		},
+		"turn": {
+			"title": "Round",
+			"type": "integer"
+		},
+		"finished": {
+			"title": "Finished",
+			"type": "boolean"
+		},
+		"audio": {
+			"title": "Audio",
+			"type": "string",
+			"format": "uri",
+			"maxLength": 20000
+		},
+		"hk_background": {
+			"title": "HK Background",
+			"type": "string",
+			"maxLength": 200
+		},
+		"background": {
+			"title": "Background",
+			"type": "string",
+			"format": "uri",
+			"maxLength": 20000
+		},
+		"currency": {
+			"title": "Currency",
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"cp": { "$ref": "#/$defs/currency" },
+				"sp": { "$ref": "#/$defs/currency" },
+				"ep": { "$ref": "#/$defs/currency" },
+				"gp": { "$ref": "#/$defs/currency" },
+				"pp": { "$ref": "#/$defs/currency" }
+			}
+		},
+		"entities": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"id": {
+						"type": "string",
+						"maxLength": 50
+					},
+					"name": {
+						"type": "string",
+						"maxLength": 100
+					},
+					"entityType": {
+						"type": "string",
+						"enum": ["npc"]
+					},
+					"npc": {
+						"type": "string",
+						"enum": ["custom", "srd"]
+					},
+					"ac": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 99
+					},
+					"curHp": {
+						"title": "Current hit points",
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 9999
+					},
+					"maxHp": {
+						"title": "Hit points",
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 9999
+					},
+					"initiative": {},
+					"active": {
+						"type": "boolean"
+					},
+					"color_label": {
+						"type": "string",
+						"maxLength": 7
+					}
+				}
+			}
+		},
+		"loot": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"linked_item": {
+						"type": "object",
+						"properties": {
+							"key": {
+								"type": "string",
+								"maxLength": 100
+							},
+							"custom": {
+								"type": "boolean"
+							}
+						}
+					},
+					"public_name": {
+						"type": "string",
+						"maxLength": 200
+					},
+					"public_description": {
+						"type": "string",
+						"maxLength": 10000
+					}
+				}
+			}
+		},
+		"weather": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"ash": { "$ref": "#/$defs/weather_slide" },
+				"fog": { "$ref": "#/$defs/weather_slide" },
+				"hail": { "$ref": "#/$defs/weather_slide" },
+				"lightning": { "$ref": "#/$defs/weather_slide" },
+				"quake": { "$ref": "#/$defs/weather_slide" },
+				"rain": { "$ref": "#/$defs/weather_slide" },
+				"sand": { "$ref": "#/$defs/weather_slide" },
+				"snow": { "$ref": "#/$defs/weather_slide" },
+				"smoke": {
+					"type": "boolean"
+				}
+			}
+		},
+		"xp": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"calculated": {
+					"type": "integer"
+				},
+				"overwrite": {
+					"type": "string"
+				}
+			}
+		}
+	},
+
+	"$defs": {
+		"currency": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"weather_slide": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 3
+		}
+	}
+}

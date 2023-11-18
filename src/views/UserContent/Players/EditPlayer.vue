@@ -151,9 +151,9 @@
 										<button
 											class="btn btn-block bg-neutral-5"
 											@click.prevent="
-												setSlide({
+												setDrawer({
 													show: true,
-													type: 'slides/CharacterSync',
+													type: 'drawers/CharacterSync',
 												})
 											"
 										>
@@ -202,7 +202,7 @@
 														name="info"
 														class="ml-1 pointer blue"
 														size="xs"
-														@click="setSlide({ show: true, type: 'slides/xpTable' })"
+														@click="setDrawer({ show: true, type: 'drawers/xpTable' })"
 													/>
 												</template>
 											</q-input>
@@ -845,7 +845,7 @@ export default {
 		this.sync_characters = await getCharacterSyncStorage();
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("players", [
 			"get_player",
 			"get_owner_id",

@@ -350,7 +350,7 @@ export default {
 		}
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		setSize() {
 			this.width = this.$refs.initiative.clientWidth;
 		},
@@ -374,7 +374,7 @@ export default {
 				}
 			}
 			this.targeted = targeted;
-			this.setSlide({ show: false });
+			this.setDrawer({ show: false });
 		},
 		camp_data(entity) {
 			let key = entity.key;
@@ -385,9 +385,9 @@ export default {
 			return undefined;
 		},
 		damageRequest() {
-			this.setSlide({
+			this.setDrawer({
 				show: true,
-				type: "slides/trackCampaign/playerRequests/index",
+				type: "drawers/trackCampaign/playerRequests/index",
 				data: {
 					characters: this.characters,
 					targeted: this.targeted,

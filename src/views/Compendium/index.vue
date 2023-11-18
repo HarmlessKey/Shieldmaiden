@@ -45,6 +45,11 @@
 						url: 'spells',
 						icon: 'fas fa-wand-magic',
 					},
+					'rules': { 
+						name: 'Rules',
+						url: 'rules',
+						icon: 'fas fa-book',
+					},
 				},
 			}
 		}

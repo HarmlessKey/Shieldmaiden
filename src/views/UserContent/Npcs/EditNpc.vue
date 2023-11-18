@@ -156,7 +156,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 		isOwner() {
@@ -220,7 +220,7 @@ export default {
 			}
 		},
 		addNpc() {
-			this.add_npc(this.npc)
+			this.add_npc({ npc: this.npc })
 				.then((key) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again

@@ -240,3 +240,24 @@ export async function getCharacterSyncCharacter(url) {
 		);
 	});
 }
+
+/**
+ * Check if a url is spotify or youtube
+ */
+export function urlType(url) {
+	switch (true) {
+		case !!url?.match(/^https?:\/\/(www.)?((youtube.)|(youtu.be))/):
+			return "youtube";
+		case !!url?.match(/^(https?:\/\/(www.)?|(open.))spotify\./):
+			return "spotify";
+		default:
+			return "other";
+	}
+}
+
+export function generateYoutubeEmbedUrl(url) {
+	const regex = /(v=|embed\/|\.be\/|v\/)(?<id>[^&|/?]{11})/i
+	const { id } = regex.exec(url).groups;
+
+	return `https://www.youtube-nocookie.com/embed/${id}`;
+}

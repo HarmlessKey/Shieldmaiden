@@ -2,6 +2,16 @@ import Vue from "vue";
 import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
+/**
+ * @typedef {Object} Encounter
+ * @property {Array} entities
+ * @property {boolean} finished
+ * @property {string} name
+ * @property {number} round
+ * @property {number} turn
+ *
+ */
+
 // Converts a full encounter to a search_encounter
 const convert_encounter = (encounter) => {
 	const properties = ["name", "round", "turn", "finished"];
@@ -28,12 +38,12 @@ const encounter_getters = {
 		const encounters = state.encounters[campaignId];
 		// Convert object to sorted array
 		return _.chain(encounters)
-			.filter((campaign, key) => {
-				campaign.key = key;
-				return campaign.finished === finished;
+			.filter((encounter, key) => {
+				encounter.key = key;
+				return encounter.finished === finished;
 			})
-			.orderBy((campaign) => {
-				return parseInt(campaign.timestamp);
+			.orderBy((encounter) => {
+				return parseInt(encounter.timestamp);
 			}, "asc")
 			.value();
 	},
@@ -61,7 +71,7 @@ const encounter_actions = {
 
 	/**
 	 * Gets all encounters for a single campaign
-	 * first try to find it in the store, then fetch if wasn't present
+	 * first try to find it in the store, then fetch if it wasn't present
 	 *
 	 * @param {string} uid userId
 	 * @param {string} id encounterId
@@ -81,13 +91,14 @@ const encounter_actions = {
 			const services = await dispatch("get_encounter_services");
 			try {
 				encounters = await services.getCampaignEncounters(uid, campaignId, finished);
-				encounters = { ...campaign_encounters, ...encounters }; // Merge with encounters allready in the store
+				encounters = { ...campaign_encounters, ...encounters }; // Merge with encounters already in the store
 				commit("SET_ENCOUNTERS", { campaignId, encounters });
 			} catch (error) {
 				throw error;
 			}
 		}
-		return encounters;
+
+		return getters.get_encounters(campaignId, finished);
 	},
 
 	/**
@@ -112,6 +123,24 @@ const encounter_actions = {
 		}
 	},
 
+	async update_encounter_count({ rootGetters, state, commit, dispatch }, { campaignId }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			try {
+				const current_count = state.encounter_count[campaignId] || 0;
+				const table_length = Object.keys(state.encounters[campaignId]).length;
+				const count_diff = table_length - current_count;
+
+				const new_count = await services.updateEncounterCount(uid, campaignId, count_diff);
+				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+				dispatch("checkEncumbrance", "", { root: true });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Get a single encounter
 	 * first try to find it in the store, then fetch if wasn't present
@@ -119,11 +148,13 @@ const encounter_actions = {
 	 * - Remove ghost NPCs
 	 * - Remove ghost Players
 	 * - Remove ghost Companions
-	 * - Remove gost item links
+	 * - Remove ghost item links
 	 *
 	 * @param {string} uid userId
 	 * @param {string} campaignId campaignId
 	 * @param {string} id encounterId
+	 *
+	 * @return {Encounter}
 	 */
 	async get_encounter({ state, commit, dispatch }, { uid, campaignId, id }) {
 		let encounter =
@@ -140,7 +171,6 @@ const encounter_actions = {
 				throw error;
 			}
 		}
-
 		// Check for non-existing NPCs, Companions and Players
 		// Remove them from the encounter if they don't exist
 		if (encounter.entities) {
@@ -222,6 +252,18 @@ const encounter_actions = {
 		return encounter;
 	},
 
+	async reserve_encounter_id({ rootGetters, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			try {
+				return await services.reserveEncounterId(uid);
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Adds a newly created encounter for a user
 	 * A user can only add encounters for themselves so we use the uid from the store
@@ -230,7 +272,10 @@ const encounter_actions = {
 	 * @param {object} encounter
 	 * @returns {string} the id of the newly added encounter
 	 */
-	async add_encounter({ rootGetters, dispatch, commit }, { campaignId, encounter }) {
+	async add_encounter(
+		{ rootGetters, dispatch, commit },
+		{ campaignId, encounter, predefined_key }
+	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.encounters;
 
@@ -243,12 +288,16 @@ const encounter_actions = {
 			}
 			try {
 				const search_encounter = convert_encounter(encounter);
-				const id = await services.addEncounter(uid, campaignId, encounter, search_encounter);
+				const id = await services.addEncounter(
+					uid,
+					campaignId,
+					encounter,
+					search_encounter,
+					predefined_key
+				);
 				commit("SET_ENCOUNTER", { uid, campaignId, id, encounter: search_encounter });
-
-				const new_count = await services.updateEncounterCount(uid, campaignId, 1);
-				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
-				dispatch("checkEncumbrance", "", { root: true });
+				commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId: id, encounter });
+				await dispatch("update_encounter_count", { campaignId });
 				return id;
 			} catch (error) {
 				throw error;
@@ -976,9 +1025,7 @@ const encounter_actions = {
 				commit("REMOVE_ENCOUNTER", { campaignId, id });
 				commit("REMOVE_CACHED_ENCOUNTER", { uid, id });
 
-				const new_count = await services.updateEncounterCount(uid, campaignId, -1);
-				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
-				dispatch("checkEncumbrance", "", { root: true });
+				await dispatch("update_encounter_count", { campaignId });
 			} catch (error) {
 				throw error;
 			}
@@ -1006,8 +1053,7 @@ const encounter_actions = {
 					}
 
 					const diff = Object.keys(encounters).length;
-					const new_count = await services.updateEncounterCount(uid, campaignId, -diff);
-					commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+					await dispatch("update_encounter_count", { campaignId });
 				}
 			} catch (error) {
 				throw error;

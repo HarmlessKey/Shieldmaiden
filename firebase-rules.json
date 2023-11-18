@@ -3,7 +3,179 @@
 		"campaigns": {
 			"$uid": {
 				".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
-				".indexOn": "private"
+				".indexOn": "private",
+				"$campaignId": {
+					".validate": "newData.hasChildren(['name'])",
+					"timestamp": {
+						".validate": "newData.isNumber()"
+					},
+					"harmless_key": {
+						".validate": "newData.isString() && newData.val().length <= 100"
+					},
+					"name": {
+						".validate": "newData.isString() && newData.val().length <= 200"
+					},
+					"advancement": {
+						".validate": true
+					},
+					"private": {
+						".validate": "newData.isBoolean()"
+					},
+					"background": {
+						".validate": "newData.isString() && newData.val().length <= 2000"
+					},
+					"hk_background": {
+						".validate": "newData.isString() && newData.val().length <= 2000"
+					},
+					"inventory": {
+						"currency": {
+							".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4294967295"
+						},
+						"items": { ".validate": true }
+					},
+					"temporary_background": {
+						"image": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+						"youtube": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+						"video": { ".validate": "newData.isString() && newData.val().length <= 2000" }
+					},
+					"sharing": {
+						"image": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+						"youtube": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+						"message": { ".validate": "newData.isString() && newData.val().length <= 9999" }
+					},
+					"weather": {
+						"$idx": {
+							".validate": "$idx.matches(/^(ash|fog|hail|lightning|quake|rain|sand|smoke|snow)$/)"
+						}
+					},
+					"companions": {
+						"$companionId": {
+							"curHp": {
+								".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+							},
+							"tempHp": {
+								".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+							},
+							"ac_bonus": {
+								".validate": "newData.isNumber() && newData.val() >= -999 && newData.val() <= 999"
+							},
+							"maxHpMod": {
+								".validate": "newData.isNumber() && newData.val() >= -9999 && newData.val() <= 9999"
+							},
+							"saves": {
+								"$idx": {
+									".validate": "newData.isString() && newData.val().matches(/^(succes|fail)$/)"
+								}
+							},
+							"dead": { ".validate": "newData.isBoolean()" },
+							"stable": { ".validate": "newData.isBoolean()" },
+							"meters": {
+								"damage": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"damageTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overkill": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overkillTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"healing": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"healingTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overhealing": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overhealingTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								}
+							},
+							"transformed": {
+								"curHp": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								},
+								"maxHp": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								},
+								"ac": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								}
+							},
+							"$other": { ".validate": false }
+						}
+					},
+					"players": {
+						"$playerId": {
+							"curHp": {
+								".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+							},
+							"tempHp": {
+								".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+							},
+							"ac_bonus": {
+								".validate": "newData.isNumber() && newData.val() >= -999 && newData.val() <= 999"
+							},
+							"maxHpMod": {
+								".validate": "newData.isNumber() && newData.val() >= -9999 && newData.val() <= 9999"
+							},
+							"saves": {
+								"$idx": {
+									".validate": "newData.isString() && newData.val().matches(/^(succes|fail)$/)"
+								}
+							},
+							"dead": { ".validate": "newData.isBoolean()" },
+							"stable": { ".validate": "newData.isBoolean()" },
+							"meters": {
+								"damage": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"damageTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overkill": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overkillTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"healing": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"healingTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overhealing": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								},
+								"overhealingTaken": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+								}
+							},
+							"transformed": {
+								"curHp": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								},
+								"maxHp": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								},
+								"ac": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								}
+							},
+							"$other": { ".validate": false }
+						}
+					},
+					"player_count": {
+						".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+					},
+					"shares": { ".validate": true },
+					"$other": { ".validate": false }
+				}
 			},
 			".read": true
 		},
@@ -14,6 +186,26 @@
 				"results": {
 					".indexOn": ["name"]
 				}
+			}
+		},
+		"campaign_notes": {
+			"$uid": {
+				"$campaignId": {
+					"$noteId": {
+						"title": {
+							".validate": "newData.isString() && newData.val().length <= 100"
+						},
+						"description": {
+							".validate": "newData.isString() && newData.val().length <= 1000"
+						},
+						"created": {
+							".validate": "newData.isNumber()"
+						}
+					},
+					".indexOn": ["created"]
+				},
+				".read": "$uid === auth.uid",
+				".write": "$uid === auth.uid"
 			}
 		},
 		"users": {
@@ -1160,9 +1352,218 @@
 				"$campaignId": {
 					".indexOn": "entities/id",
 					"$encounterId": {
+						"timestamp": {
+							".validate": "newData.isNumber()"
+						},
+						"name": {
+							".validate": "newData.isString() && newData.val().length <= 200"
+						},
+						"encounter": {
+							".validate": "newData.isString() && newData.val().length <= 200"
+						},
+						"turn": {
+							".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+						},
+						"round": {
+							".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
+						},
+						"finished": {
+							".validate": "newData.isBoolean()"
+						},
+						"audio": {
+							".validate": "newData.isString() && newData.val().length <= 2000"
+						},
+						"background": {
+							".validate": "newData.isString() && newData.val().length <= 2000"
+						},
+						"hk_background": {
+							".validate": "newData.isString() && newData.val().length <= 2000"
+						},
+						"currency": {
+							"$coin": {
+								".validate": "$coin.matches(/^(cp|sp|ep|gp|pp)$/)"
+							}
+						},
+						"loot": {
+							"$itemId": {
+								"linked_item": {
+									"custom": {
+										".validate": "newData.isBoolean()"
+									},
+									"key": {
+										".validate": "newData.isString() && newData.val().length <= 100"
+									}
+								},
+								"public_name": {
+									".validate": "newData.isString() && newData.val().length <= 100"
+								},
+								"public_description": {
+									".validate": "newData.isString() && newData.val().length <= 9999"
+								}
+							}
+						},
+						"xp": {
+							"calculated": {
+								".validate": "newData.isNumber() && newData.val() >= 0"
+							},
+							"overwrite": {
+								".validate": "newData.isString() || newData.isNumber()"
+							}
+						},
+						"weather": {
+							"$idx": {
+								".validate": "$idx.matches(/^(ash|fog|hail|lightning|quake|rain|sand|smoke|snow)$/)"
+							}
+						},
+						"entities": {
+							"$entityId": {
+								"id": {
+									".validate": "newData.isString() && newData.val().length <= 100"
+								},
+								"key": {
+									".validate": "newData.isString() && newData.val().length <= 100"
+								},
+								"entityType": {
+									".validate": "newData.isString() && newData.val().matches(/^(player|npc|companion)$/)"
+								},
+								"npc": {
+									".validate": "newData.isString() && newData.val().matches(/^(srd|custom|api)$/)"
+								},
+								"name": {
+									".validate": "newData.isString() && newData.val().length <= 200"
+								},
+								"active": {
+									".validate": "newData.isBoolean()"
+								},
+								"hidden": {
+									".validate": "newData.isBoolean()"
+								},
+								"initiative": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								},
+								"ac": {
+									".validate": "(newData.isNumber() && newData.val() >= 1 && newData.val() <= 9999) || (newData.isString() && newData.val().length <= 10)"
+								},
+								"ac_bonus": {
+									".validate": "newData.isNumber() && newData.val() >= -999 && newData.val() <= 9999"
+								},
+								"curHp": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								},
+								"maxHp": {
+									".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9999"
+								},
+								"maxHpMod": {
+									".validate": "newData.isNumber() && newData.val() >= -9999 && newData.val() <= 9999"
+								},
+								"tempHp": {
+									".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999"
+								},
+								"color_label": {
+									".validate": "newData.isString() && newData.val().length <= 10"
+								},
+								"conditions": {
+									"exhaustion": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6"
+									},
+									"$condition": {
+										".validate": "newData.isBoolean() && $condition.matches(/^(blinded|charmed|deafened|exhaustion|frightened|grappled|incapacitated|invisible|paralyzed|petrified|poisoned|prone|restrained|stunned|unconscious)$/)"
+									}
+								},
+								"reminders": {
+									"$remindId": {
+										"action": {
+											".validate": "newData.isString() && newData.val().matches(/^(remove|notify)$/)"
+										},
+										"color": {
+											".validate": "newData.isString() && newData.val().matches(/^(green-light|yellow-light|orange-light|red-light|purple|blue-light)$/)"
+										},
+										"trigger": {
+											".validate": "newData.isString() && newData.val().matches(/^(endTurn|startTurn|damage|timed)$/)"
+										},
+										"rounds": {
+											".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
+										},
+										"title": {
+											".validate": "newData.isString() && newData.val().length <= 999"
+										},
+										"notify": {
+											".validate": "newData.isString() && newData.val().length <= 999"
+										},
+										"variables": {
+											"$varName": {
+												"$vi": {
+													".validate": "newData.isString() && newData.val().length <= 5"
+												}
+											}
+										}
+									}
+								},
+								"settings": {
+									"ac": {
+										".validate": "newData.isBoolean()"
+									},
+									"health": {
+										".validate": "newData.isBoolean() || newData.val().matches(/^(obscured)$/)"
+									},
+									"name": {
+										".validate": "newData.isBoolean()"
+									}
+								},
+								"meters": {
+									"damage": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									},
+									"damageTaken": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									},
+									"overkill": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									},
+									"overkillTaken": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									},
+									"healing": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									},
+									"healingTaken": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									},
+									"overhealing": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									},
+									"overhealingTaken": {
+										".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+									}
+								},
+								"limited_uses": {
+									"caster": {
+										"$lvl": {
+											".validate": "newData.isNumber() && newData.val() <= 100"
+										}
+									},
+									"innate": {
+										"$spellId": {
+											".validate": "newData.isNumber() && newData.val() <= 100"
+										}
+									},
+									"actions": {
+										"$actionId": {
+											".validate": "newData.isNumber() && newData.val() <= 100"
+										}
+									},
+									"legendary_actions": {
+										"legendaries_used": {
+											".validate": "newData.isNumber() && newData.val() <= 100"
+										}
+									}
+								}
+							}
+						},
 						"requests": {
 							".write": true
-						}
+						},
+						"$other": { ".validate": false }
 					}
 				}
 			},
@@ -1441,6 +1842,29 @@
 		},
 		"voucher_history": {
 			"$uid": {
+				".read": "$uid === auth.uid",
+				".write": "$uid === auth.uid"
+			}
+		},
+		"soundboard": {
+			"$uid": {
+				"$soundboardId": {
+					".validate": "newData.hasChildren(['type', 'name', 'url'])",
+					"type": {
+						".validate": "newData.isString() && newData.val().matches(/^(music|ambience)$/)"
+					},
+					"name": {
+						".validate": "newData.isString() && newData.val().length <= 20"
+					},
+					"url": {
+						".validate": "newData.isString() && newData.val().length <= 2000"
+					},
+					"image": {
+						".validate": "newData.isString() && newData.val().length <= 2000"
+					},
+					"$other": { ".validate": false }
+				},
+				".indexOn": ["type"],
 				".read": "$uid === auth.uid",
 				".write": "$uid === auth.uid"
 			}

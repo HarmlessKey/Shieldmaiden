@@ -21,6 +21,7 @@ const user_state = () => ({
 	poster: undefined,
 	broadcast: {},
 	followed: {},
+	soundboard: undefined,
 });
 
 const user_getters = {
@@ -59,6 +60,13 @@ const user_getters = {
 	},
 	followed(state) {
 		return state.followed;
+	},
+	soundboard: (state) => {
+		// Convert object to sorted array
+		return _.chain(state.soundboard)
+			.map((link, key) => ({ key, ...link }))
+			.orderBy("name", "asc")
+			.value();
 	},
 };
 
@@ -436,6 +444,71 @@ const user_actions = {
 		const intersection = vouchers.filter((v) => v.voucher == voucher_string.toUpperCase());
 		return intersection.length ? intersection[0] : false;
 	},
+
+	// SOUNDBOARD
+
+	/**
+	 * Gets all notes for a single campaign
+	 * first try to find it in the store, then fetch if it wasn't present
+	 */
+	async get_soundboard({ state, rootGetters, commit, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		let soundboard = state.notes;
+
+		// The notes are not in the store and need to be fetched from the database
+		if (!soundboard) {
+			const services = await dispatch("get_user_services");
+			try {
+				soundboard = await services.getSoundboard(uid);
+				commit("SET_SOUNDBOARD", soundboard);
+			} catch (error) {
+				throw error;
+			}
+		}
+		return soundboard;
+	},
+
+	/**
+	 * Adds a newly created soundboard link
+	 * A user can only add to the soundboard for themselves so we use the uid from the store
+	 *
+	 * @param {object} link
+	 * @returns {string} the id of the newly added campaign
+	 */
+	async add_soundboard_link({ rootGetters, commit, dispatch }, link) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_user_services");
+
+			try {
+				const id = await services.addSoundboardLink(uid, link);
+				commit("SET_SOUNDBOARD_LINK", { id, link });
+				return id;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Deletes a link from the soundboard
+	 *
+	 * @param {string} key link key
+	 */
+	async delete_soundboard_link({ rootGetters, commit, dispatch }, key) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				await services.deleteSoundboardLink(uid, key);
+				commit("DELETE_SOUNDBOARD_LINK",  key);
+				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 };
 
 const user_mutations = {
@@ -497,6 +570,19 @@ const user_mutations = {
 	},
 	SET_BROADCAST_SHARES(state, payload) {
 		Vue.set(state.broadcast, "shares", payload);
+	},
+	SET_SOUNDBOARD(state, soundboard) {
+		Vue.set(state, "soundboard", soundboard);
+	},
+	SET_SOUNDBOARD_LINK(state, { id, link }) {
+		if (state.soundboard) {
+			Vue.set(state.soundboard, id, link);
+		} else {
+			Vue.set(state, "soundboard", { [id]: link });
+		}
+	},
+	DELETE_SOUNDBOARD_LINK(state, key) {
+		Vue.delete(state.soundboard, key);
 	},
 	CLEAR_USER(state) {
 		Vue.set(state, "user", undefined);

@@ -11,7 +11,6 @@ const Profile = () => import("src/views/profile/Profile.vue");
 const Username = () => import("src/views/profile/SetUsername.vue");
 const DeleteAccount = () => import("src/views/profile/DeleteAccount.vue");
 const Offline = () => import("src/views/Pages/Offline.vue");
-const EditEncounter = () => import("src/views/UserContent/Encounters/Edit");
 const RunEncounter = () => import("src/views/RunEncounter.vue");
 const User = () => import("src/views/User.vue");
 
@@ -62,7 +61,39 @@ const routes = [
 				},
 			},
 
-			// Cammpaigns
+			{
+				path: "import",
+				name: "Import content",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Import content",
+				},
+				children: [
+					{
+						path: "",
+						component: () => import("src/views/UserContent/ImportContent"),
+						meta: {
+							description: "Import content to Harmless Key",
+							title: "Import Harmless Key  Content",
+						},
+					},
+					{
+						path: "hk_import",
+						name: "Import HK Content",
+						component: () => import("src/views/UserContent/ImportContent/ImportHKContent"),
+						meta: {
+							description: "Import User Content from an HK export",
+							title: "Import Harmless Key Content",
+						},
+					},
+				],
+			},
+
+			// Campaigns
 			{
 				path: "campaigns",
 				component: {
@@ -82,39 +113,6 @@ const routes = [
 							description: "Your campaigns on Harmless Key.",
 							title: "Campaigns",
 						},
-					},
-					{
-						path: ":campid",
-						component: {
-							render(c) {
-								return c("router-view");
-							},
-						},
-						meta: {
-							title: "Run campaign",
-						},
-						children: [
-							{
-								path: "",
-								name: "Run campaign",
-								component: () => import("src/views/UserContent/Encounters"),
-								meta: {
-									description: "Run your campaign on Harmless Key.",
-									title: "Run campaign",
-									side: false,
-								},
-							},
-							{
-								path: ":encid",
-								name: "EditEncounter",
-								component: EditEncounter,
-								meta: {
-									title: "Edit encounter",
-									description: "Edit your Harmless Key encounter.",
-									side: false,
-								},
-							},
-						],
 					},
 				],
 			},
@@ -563,6 +561,37 @@ const routes = [
 		],
 	},
 
+	// DM SCREEN
+	{
+		path: "/content/campaigns/:campid",
+		component: () => import("src/layouts/run-campaign"),
+		meta: {
+			requiresAuth: true,
+			title: "Run campaign",
+		},
+		children: [
+			{
+				path: "",
+				name: "Run campaign",
+				component: () => import("src/views/UserContent/Campaigns/RunCampaign"),
+				meta: {
+					description: "Run your campaign on Harmless Key.",
+					title: "Run campaign",
+				},
+			},
+			{
+				path: ":encid",
+				name: "EditEncounter",
+				component: () => import("src/views/UserContent/Encounters/EditEncounter"),
+				meta: {
+					title: "Edit encounter",
+					description: "Edit your Harmless Key encounter.",
+					side: false,
+				},
+			},
+		],
+	},
+
 	// TOOLS
 	{
 		path: "/tools",
@@ -578,7 +607,7 @@ const routes = [
 				meta: {
 					title: "D&D 5e Tools",
 					description:
-						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
+						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nDM Screen \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
 				},
 			},
 			{
@@ -616,14 +645,39 @@ const routes = [
 					{
 						path: "build-encounter",
 						name: "ToolsBuildEncounter",
-						component: () => import("src/views/UserContent/Encounters/Edit"),
+						component: () => import("src/components/encounters"),
 						meta: {
 							title: "Build encounter for D&D 5e",
 							description:
-								"Create an encounter for D&D 5e and find out it's difficulty. Once you're finished you can run it in our Combat Tracker.",
+								"Create an encounter for D&D 5e and find out its difficulty. Once you're finished you can run it in our Combat Tracker.",
 							side: false,
 						},
 					},
+				],
+			},
+			{
+				path: "dm-screen",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "D&D 5e DM Screen",
+					description:
+						"A DM Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsDmScreen",
+						component: () => import("src/views/Tools/DmScreen"),
+						meta: {
+							title: "D&D 5e DM Screen",
+							description:
+							"A Dungeon Master Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+						},
+					}
 				],
 			},
 			{
@@ -843,6 +897,36 @@ const routes = [
 						component: () => import("src/views/Compendium/view/Item"),
 						meta: {
 							title: "Item",
+						},
+					},
+				],
+			},
+			{
+				path: "rules",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Rules",
+				},
+				children: [
+					{
+						path: "",
+						name: "CompendiumRules",
+						component: () => import("src/views/Compendium/Rules"),
+						meta: {
+							title: "Rules D&D 5e",
+							description: "Dungeons & Dragons 5th edition rules. Rules for playing D&D 5e.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Rule",
+						component: () => import("src/views/Compendium/view/Rule"),
+						meta: {
+							title: "Rule",
 						},
 					},
 				],

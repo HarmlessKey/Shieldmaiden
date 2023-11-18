@@ -154,7 +154,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide", "remove_limitedUses", "set_show_monster_card"]),
+		...mapActions(["remove_limitedUses", "set_show_monster_card"]),
 		percentage(current, max) {
 			return Math.floor((current / max) * 100);
 		},

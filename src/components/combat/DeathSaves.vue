@@ -1,7 +1,10 @@
 <template>
 	<div>
 		<template v-if="target.curHp === 0 && !target.stable && !target.dead">
-			<a class="btn btn-sm btn-clear" @click="setSlide({ show: true, type: 'slides/DeathSaves' })">
+			<a
+				class="btn btn-sm btn-clear"
+				@click="setDrawer({ show: true, type: 'drawers/DeathSaves' })"
+			>
 				What is this <i aria-hidden="true" class="fas fa-question"></i>
 			</a>
 			<div class="px-1 my-3 d-flex justify-content-between saves">
@@ -78,7 +81,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide", "set_save", "set_dead", "set_stable"]),
+		...mapActions(["setDrawer", "set_save", "set_dead", "set_stable"]),
 		save(check, index) {
 			this.set_save({
 				key: this.target.key,

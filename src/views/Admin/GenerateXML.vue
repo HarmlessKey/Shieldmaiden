@@ -12,6 +12,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { rules } from "src/utils/generalConstants";
 
 export default {
 	name: "XML",
@@ -33,6 +34,7 @@ export default {
 				"https://harmlesskey.com/compendium/monsters",
 				"https://harmlesskey.com/compendium/spells",
 				"https://harmlesskey.com/compendium/items",
+				"https://harmlesskey.com/compendium/rules",
 				"https://harmlesskey.com/tools",
 				"https://harmlesskey.com/tools/combat-tracker",
 				"https://harmlesskey.com/tools/encounter-builder",
@@ -42,6 +44,7 @@ export default {
 				"https://harmlesskey.com/tools/spell-creator",
 				"https://harmlesskey.com/tools/spell-creator/create-spell",
 				"https://harmlesskey.com/tools/character-builder",
+				"https://harmlesskey.com/tools/dm-screen",
 			],
 		};
 	},
@@ -71,6 +74,26 @@ export default {
 				//Add loc element
 				let loc = xmlDoc.createElement("loc");
 				let url = xmlDoc.createTextNode(route);
+				loc.appendChild(url);
+				urlElement.appendChild(loc);
+
+				//Add lastmod element
+				let lastmod = xmlDoc.createElement("lastmod");
+				let date = xmlDoc.createTextNode(lastmodDate);
+				lastmod.appendChild(date);
+				urlElement.appendChild(lastmod);
+
+				//Add to urlset
+				urlset.appendChild(urlElement);
+			}
+
+			// RULES
+			for (const rule of rules) {
+				let urlElement = xmlDoc.createElement("url");
+
+				//Add loc element
+				let loc = xmlDoc.createElement("loc");
+				let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/rules/${rule.url}`);
 				loc.appendChild(url);
 				urlElement.appendChild(loc);
 

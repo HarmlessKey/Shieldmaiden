@@ -214,7 +214,7 @@
 				</q-popup-proxy>
 			</div>
 
-			<!-- HEALT BAR -->
+			<!-- HEALTH BAR -->
 			<q-linear-progress
 				size="35px"
 				:value="percentage(displayStats().curHp, displayStats().maxHp)"
@@ -509,7 +509,7 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"setSlide",
+			"setDrawer",
 			"add_next_round",
 			"set_initiative",
 			"edit_entity_prop",
@@ -518,7 +518,7 @@ export default {
 		showCondition(key) {
 			this.setSlide({
 				show: true,
-				type: "slides/encounter/Condition",
+				type: "drawers/encounter/Condition",
 				data: {
 					condition: key,
 					entity: this.entity,

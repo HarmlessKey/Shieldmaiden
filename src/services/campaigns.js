@@ -1,7 +1,8 @@
-import { db } from "src/firebase";
+import { firebase, db } from "src/firebase";
 
 const CAMPAIGNS_REF = db.ref("campaigns");
 const SEARCH_CAMPAIGNS_REF = db.ref("search_campaigns");
+const NOTES_REF = db.ref("campaign_notes");
 const USERS_REF = db.ref("users");
 
 export class campaignServices {
@@ -44,6 +45,19 @@ export class campaignServices {
 		}
 	}
 
+	async getCampaignNotes(uid, campaignId) {
+		try {
+			const notes = await NOTES_REF.child(`${uid}/${campaignId}`)
+				.orderByChild("created")
+				.once("value", (snapshot) => {
+					return snapshot;
+				});
+			return notes.val();
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	async setActiveCampaign(uid, id) {
 		USERS_REF.child(uid)
 			.child("active_campaign")
@@ -55,7 +69,6 @@ export class campaignServices {
 				throw error;
 			});
 	}
-
 	async addCampaign(uid, campaign, search_campaign, predefined_key = undefined) {
 		try {
 			let campaign_key = predefined_key;
@@ -231,7 +244,7 @@ export class campaignServices {
 	 * Update player_count in the search table of search_campaigns
 	 *
 	 * @param {String} uid User ID
-	 * @param {String} campaignId Campaing ID
+	 * @param {String} campaignId Campaign ID
 	 * @param {Int} diff Difference to add or subtract from player count
 	 */
 	async updatePlayerCount(uid, campaignId, diff) {
@@ -239,5 +252,32 @@ export class campaignServices {
 		let player_count = await SEARCH_CAMPAIGNS_REF.child(player_count_path).once("value");
 		await SEARCH_CAMPAIGNS_REF.child(player_count_path).set(player_count.val() + diff);
 		return player_count.val() + diff;
+	}
+
+	async addNote(uid, campaignId, note) {
+		try {
+			note.created = firebase.database.ServerValue.TIMESTAMP;
+			const newNote = await NOTES_REF.child(`${uid}/${campaignId}`).push(note);
+			return newNote.key;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async updateNote(uid, campaignId, id, note) {
+		try {
+			await NOTES_REF.child(`${uid}/${campaignId}`).child(id).update(note);
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async deleteNote(uid, campaignId, key) {
+		try {
+			NOTES_REF.child(`${uid}/${campaignId}`).child(key).remove();
+			return;
+		} catch (error) {
+			throw error;
+		}
 	}
 }

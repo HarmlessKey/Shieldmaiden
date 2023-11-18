@@ -6,6 +6,7 @@ const USERS_REF = db.ref("users");
 const SETTINGS_REF = db.ref("settings");
 const SEARCH_USERS_REF = db.ref("search_users");
 const VOUCHER_HISTORY_REF = db.ref("voucher_history");
+const SOUNDBOARD_REF = db.ref("soundboard");
 
 /**
  * User Firebase Service
@@ -141,5 +142,35 @@ export class userServices {
 			.catch((error) => {
 				throw error;
 			});
+	}
+
+	async getSoundboard(uid) {
+		try {
+			const soundboard = await SOUNDBOARD_REF.child(uid)
+				.once("value", (snapshot) => {
+					return snapshot;
+				});
+			return soundboard.val();
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async addSoundboardLink(uid, link) {
+		try {
+			const newLink = await SOUNDBOARD_REF.child(uid).push(link);
+			return newLink.key;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async deleteSoundboardLink(uid, key) {
+		try {
+			SOUNDBOARD_REF.child(uid).child(key).remove();
+			return;
+		} catch (error) {
+			throw error;
+		}
 	}
 }

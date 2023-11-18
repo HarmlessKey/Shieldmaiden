@@ -31,7 +31,7 @@
 				<div class="actions">
 					<a
 						class="btn btn-sm bg-neutral-5"
-						@click="setSlide({ show: true, type: 'combat/ViewEntity', data: entity })"
+						@click="setDrawer({ show: true, type: 'combat/ViewEntity', data: entity })"
 					>
 						<i aria-hidden="true" class="fas fa-info"></i>
 						<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
@@ -97,7 +97,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide", "set_initiative"]),
+		...mapActions(["setDrawer", "set_initiative"]),
 		rollMonster(e, key, entity, advantage_disadvantage) {
 			const advantage_object = advantage_disadvantage ? advantage_disadvantage : {};
 			let roll = this.rollD(

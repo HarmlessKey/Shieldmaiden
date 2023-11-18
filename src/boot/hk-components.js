@@ -1,3 +1,6 @@
+import HkInput from "../components/hk-components/hk-input";
+import HkSelect from "../components/hk-components/hk-select";
+import HkIcon from "../components/hk-components/hk-icon";
 import HkTable from "../components/hk-components/hk-table";
 import HkCard from "../components/hk-components/hk-card";
 import HkCardDeck from "../components/hk-components/hk-card-deck";
@@ -20,8 +23,12 @@ import HkLinkCharacter from "../components/hk-components/hk-link-character";
 import HkActionRollForm from "../components/hk-components/hk-action-rolls/hk-action-roll-form";
 import HkActionRollsTable from "../components/hk-components/hk-action-rolls/hk-action-rolls-table";
 import HkActionRollScaling from "../components/hk-components/hk-action-rolls/hk-action-roll-scaling";
+import HkPane from "../components/hk-components/hk-pane";
 
 export default async ({ Vue }) => {
+	Vue.component("hk-input", HkInput);
+	Vue.component("hk-select", HkSelect);
+	Vue.component("hk-icon", HkIcon);
 	Vue.component("hk-table", HkTable);
 	Vue.component("hk-card", HkCard);
 	Vue.component("hk-card-deck", HkCardDeck);
@@ -44,4 +51,5 @@ export default async ({ Vue }) => {
 	Vue.component("hk-action-roll-form", HkActionRollForm);
 	Vue.component("hk-action-rolls-table", HkActionRollsTable);
 	Vue.component("hk-action-roll-scaling", HkActionRollScaling);
+	Vue.component("hk-pane", HkPane);
 };

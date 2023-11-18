@@ -229,7 +229,7 @@
 											: removeOption(key, i)
 									"
 								>
-									<q-tooltip anchor="top middle" self="center middle"> Remove option </q-tooltip>
+									<q-tooltip anchor="top middle" self="center middle">Remove option</q-tooltip>
 								</q-icon>
 							</template>
 						</q-input>
@@ -272,7 +272,7 @@ export default {
 			colors: ["green-light", "yellow-light", "orange-light", "red-light", "purple", "blue-light"],
 			variableInfo:
 				"Variables are options for your description that you choose when the reminder is applied. " +
-				"To use a variable in your description add it's name between brackets, like this: [your_variable_name]. " +
+				"To use a variable in your description add its name between brackets, like this: [your_variable_name]. " +
 				"Variables can also be used in the title.",
 			newVar: undefined,
 		};

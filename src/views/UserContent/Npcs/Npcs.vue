@@ -214,7 +214,7 @@ export default {
 		this.loading_npcs = false;
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("npcs", [
 			"get_npcs",
 			"delete_npc",

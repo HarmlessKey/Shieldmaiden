@@ -245,7 +245,7 @@
 			<p v-if="!is_current">
 				<strong><em> Spellcasting </em></strong>
 				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral("Oo") }}-level
-				spellcaster. It's spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
+				spellcaster. its spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
 				save DC {{ entity.caster_save_dc }},
 				{{
 					entity.caster_spell_attack > 0

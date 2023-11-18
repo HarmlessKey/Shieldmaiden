@@ -29,6 +29,7 @@ const campaign_state = () => ({
 	cached_campaigns: {},
 	campaigns: undefined,
 	campaign_count: 0,
+	notes: {},
 });
 
 const campaign_getters = {
@@ -49,6 +50,9 @@ const campaign_getters = {
 	},
 	campaign_services: (state) => {
 		return state.campaign_services;
+	},
+	get_notes: (state) => (campaignId) => {
+		return state.notes[campaignId];
 	},
 };
 
@@ -227,8 +231,30 @@ const campaign_actions = {
 				}
 			}
 		}
-
 		return campaign;
+	},
+
+	/**
+	 * Gets all notes for a single campaign
+	 * first try to find it in the store, then fetch if it wasn't present
+	 *
+	 * @param {string} campaignId campaignId
+	 */
+	async get_campaign_notes({ state, rootGetters, commit, dispatch }, campaignId) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		let notes = state.notes[campaignId];
+
+		// The notes are not in the store and need to be fetched from the database
+		if (!notes) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				notes = await services.getCampaignNotes(uid, campaignId);
+				commit("SET_NOTES", { campaignId: campaignId, notes });
+			} catch (error) {
+				throw error;
+			}
+		}
+		return notes;
 	},
 
 	/**
@@ -731,7 +757,7 @@ const campaign_actions = {
 
 	/**
 	 * Update the "share" property with the latest value
-	 * Shares can be seen by players on the public intiative list
+	 * Shares can be seen by players on the public initiative list
 	 *
 	 * @param {string} id campaignId
 	 * @param {object} share Share object
@@ -814,8 +840,8 @@ const campaign_actions = {
 	/**
 	 * Deletes an item from a campaign inventory
 	 *
-	 * @param {string} id campaignId
-	 * @param {object} share Share object
+	 * @param {string} campaignId
+	 * @param {string} id itemId
 	 */
 	async delete_campaign_item({ rootGetters, commit, dispatch }, { campaignId, id }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
@@ -824,6 +850,63 @@ const campaign_actions = {
 			try {
 				await services.updateCampaign(uid, campaignId, `/inventory/items`, { [id]: null });
 				commit("DELETE_ITEM", { uid, campaignId, id });
+				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Adds a newly created note for a user
+	 * A user can only add notes for themselves so we use the uid from the store
+	 *
+	 * @param {string} campaignId
+	 * @param {object} note
+	 * @returns {string} the id of the newly added campaign
+	 */
+	async add_note({ rootGetters, commit, dispatch }, { campaignId, note }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+
+			try {
+				const id = await services.addNote(uid, campaignId, note);
+				commit("SET_NOTE", { campaignId, id, note });
+				return id;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	async update_note({ rootGetters, commit, dispatch }, { campaignId, id, note }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+
+			try {
+				await services.updateNote(uid, campaignId, id, note);
+				commit("UPDATE_NOTE", { campaignId, id, note });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Deletes a note from a campaign
+	 *
+	 * @param {string} campaignId
+	 * @param {string} key note key
+	 */
+	async delete_note({ rootGetters, commit, dispatch }, { campaignId, key }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				await services.deleteNote(uid, campaignId, key);
+				commit("DELETE_NOTE", { campaignId, key });
 				return;
 			} catch (error) {
 				throw error;
@@ -854,6 +937,9 @@ const campaign_mutations = {
 		} else {
 			Vue.set(state, "campaigns", { [id]: search_campaign });
 		}
+	},
+	SET_NOTES(state, { campaignId, notes }) {
+		Vue.set(state.notes, campaignId, notes);
 	},
 	REMOVE_CAMPAIGN(state, id) {
 		Vue.delete(state.campaigns, id);
@@ -973,10 +1059,25 @@ const campaign_mutations = {
 	DELETE_ITEM(state, { uid, campaignId, id }) {
 		Vue.delete(state.cached_campaigns[uid][campaignId].inventory.items, id);
 	},
+	SET_NOTE(state, { campaignId, id, note }) {
+		if (state.notes[campaignId]) {
+			Vue.set(state.notes[campaignId], id, note);
+		} else {
+			Vue.set(state.notes, campaignId, { [id]: note });
+		}
+	},
+	UPDATE_NOTE(state, { campaignId, id, note }) {
+		const current = state.notes[campaignId][id];
+		Vue.set(state.notes[campaignId], id, { ...current, ...note });
+	},
+	DELETE_NOTE(state, { campaignId, key }) {
+		Vue.delete(state.notes[campaignId], key);
+	},
 	CLEAR_STORE(state) {
 		Vue.set(state, "active_campaign", undefined);
 		Vue.set(state, "campaigns", undefined);
 		Vue.set(state, "campaign_count", 0);
+		Vue.set(state, "notes", {});
 	},
 };
 

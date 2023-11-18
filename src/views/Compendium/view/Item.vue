@@ -55,14 +55,14 @@
 		},
 		meta() {
 			return {
-				title: this.item.meta.title,
-				meta: this.generate_compendium_meta(this.item.meta)
+				title: this.item?.meta?.title,
+				meta: this.generate_compendium_meta(this.item?.meta)
 			}
 		},
 		mounted() {
 			if(this.item) {
 				this.loading = false;
-				this.$root.$emit('route-name', this.item.name.capitalizeEach())
+				this.$root.$emit('route-name', this.item?.name.capitalizeEach())
 			} else {
 				this.not_found = true;
 				this.loading = false;

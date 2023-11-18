@@ -233,7 +233,7 @@
 				<p>
 					<strong><em> Spellcasting </em></strong>
 					The {{ monster.name.capitalizeEach() }} is a
-					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. It's spellcasting ability is
+					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. its spellcasting ability is
 					{{ monster.caster_ability.capitalize() }} (spell save DC {{ monster.caster_save_dc }},
 					{{
 						monster.caster_spell_attack > 0

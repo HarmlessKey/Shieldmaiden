@@ -130,7 +130,7 @@ module.exports = function (/* ctx */) {
 				start_url: ".",
 				description:
 					"Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
-				orientation: "portrait",
+				orientation: "any",
 				theme_color: "#191a1c",
 				background_color: "#191a1c",
 				display: "standalone",

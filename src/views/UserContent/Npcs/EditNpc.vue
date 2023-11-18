@@ -156,7 +156,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 		isOwner() {

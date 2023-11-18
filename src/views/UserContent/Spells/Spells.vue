@@ -189,7 +189,7 @@ export default {
 		this.loading_spells = false;
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("spells", ["get_spells", "get_spell", "delete_spell", "update_spell_count"]),
 		spellLevel(level) {
 			return level === 0 ? "Cantrip" : numeral(level).format("0o");

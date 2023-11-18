@@ -192,7 +192,7 @@ export default {
 						entity: target,
 						key,
 						type: "premade",
-						reminder: reminder,
+						reminder: { ...reminder },
 					});
 					reminder[".key"] = key;
 				}

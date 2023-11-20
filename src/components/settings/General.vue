@@ -233,6 +233,28 @@ export default {
 								},
 							],
 						},
+						{
+							key: "legacy_campaign_layout",
+							name: "Campaign Layout",
+							icon: "fas fa-bars",
+							info: "Select whether or not you want to use the modern campaign layout, or if you want to switch to the old layout.",
+							options: [
+								{
+									value: true,
+									name: "Legacy",
+									action: "Legacy",
+									icon: "fas fa-columns",
+									color: "neutral-2",
+								},
+								{
+									value: undefined,
+									name: "DM Screen",
+									action: "DM Screen",
+									icon: "fas fa-map",
+									color: "neutral-2",
+								},
+							],
+						},
 					],
 				},
 			},

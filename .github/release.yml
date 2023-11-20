@@ -6,8 +6,12 @@ changelog:
     - title: Improvements 🦾
       labels:
         - "improvement"
+        - "Improvement"
         - "enhancement"
+        - "Enhancement"
     - title: Bugfixes 🐛
       labels:
         - "bugfix"
+        - "Bugfix"
         - "bug"
+        - "Bug"

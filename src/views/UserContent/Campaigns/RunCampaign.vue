@@ -297,7 +297,7 @@ export default {
 			return this.mobile_tabs.find((tab) => tab.value === this.mobile_tab).icon;
 		},
 		legacy_layout() {
-			return this.userSettings.general.legacy_campaign_layout;
+			return this.userSettings?.general?.legacy_campaign_layout;
 		},
 	},
 	methods: {

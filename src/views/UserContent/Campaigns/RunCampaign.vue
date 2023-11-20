@@ -95,20 +95,20 @@
 				<Splitpanes v-else-if="container.width >= lg" class="default-theme">
 					<Pane :size="paneSize('left')" min-size="20">
 						<Splitpanes horizontal>
-							<hk-pane :size="paneSize('left-top')">
+							<hk-pane>
 								<SoundBoard />
 							</hk-pane>
-							<hk-pane v-if="!campaign.private" :size="paneSize('left-bottom')" min-size="20">
+							<hk-pane v-if="!campaign.private" :size="100 - paneSize('left-top')" min-size="20">
 								<Share :campaign="campaign" />
 							</hk-pane>
 						</Splitpanes>
 					</Pane>
 					<Pane :size="paneSize('mid')" min-size="20">
 						<Splitpanes horizontal>
-							<hk-pane min-size="20">
+							<hk-pane :size="paneSize('mid-top')" min-size="20">
 								<Encounters />
 							</hk-pane>
-							<hk-pane min-size="20">
+							<hk-pane :size="100 - paneSize('mid-top')" min-size="20">
 								<Players
 									:userId="user.uid"
 									:campaignId="campaignId"
@@ -125,10 +125,10 @@
 				<Splitpanes v-else class="default-theme" horizontal>
 					<Pane size="60" min-size="20">
 						<Splitpanes>
-							<hk-pane min-size="20">
+							<hk-pane size="50" min-size="20">
 								<Encounters />
 							</hk-pane>
-							<hk-pane min-size="20" v-if="container.width >= md">
+							<hk-pane size="50" min-size="20" v-if="container.width >= md">
 								<Players
 									:userId="user.uid"
 									:campaignId="campaignId"
@@ -309,16 +309,16 @@ export default {
 		},
 		paneSize(pane) {
 			switch (pane) {
-				case "right":
-					return this.container.width > this.md ? "25" : "50";
-				case "mid":
-					return "50";
 				case "left":
-					return this.container.width > this.md ? "25" : "50";
+					return 25;
+				case "mid":
+					return 45;
+				case "right":
+					return 30;
 				case "left-top":
-					return this.container.width > this.lg ? "60" : "100";
-				case "left-bottom":
-					return this.container.width > this.md ? "50" : "0";
+					return 60;
+				case "mid-top":
+					return 50;
 			}
 		},
 	},

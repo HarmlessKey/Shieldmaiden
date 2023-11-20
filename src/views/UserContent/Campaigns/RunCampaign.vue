@@ -79,7 +79,7 @@
 				</div>
 			</div>
 			<template v-if="container.width >= sm">
-				<Splitpanes v-if="legacy_layout" class="default-theme">
+				<Splitpanes v-if="legacy_layout" class="default-theme" :horizontal="container.width < md">
 					<hk-pane min-size="30">
 						<Encounters />
 					</hk-pane>

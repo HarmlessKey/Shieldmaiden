@@ -105,7 +105,7 @@
 					<br />
 				</template>
 				<template v-if="monster.skills"
-					><strong>Skills</strong>
+					><strong>Skills </strong>
 					<span class="saves">
 						<hk-roll
 							v-for="(skill, index) in monster.skills"
@@ -129,12 +129,9 @@
 							"
 						>
 							<span class="save">
-								{{ skill }}
-								{{
-									skillModifier(skillList[skill].ability, skill) > 0
-										? `+${skillModifier(skillList[skill].ability, skill)}`
-										: skillModifier(skillList[skill].ability, skill)
-								}}{{ index+1 &lt; monster.skills.length ? "," : "" }}
+								{{ skill.capitalize() }}
+								{{ skillModifier2str(skillModifier(skillList[skill].ability, skill)) }}
+								{{ index+1 &lt; monster.skills.length ? "," : "" }}
 							</span>
 						</hk-roll>
 						<br />
@@ -217,11 +214,7 @@
 							<i aria-hidden="true" v-else class="far fa-circle"></i>
 							{{ skill.skill }}
 						</span>
-						<span>{{
-							skillModifier(skill.ability, key) > 0
-								? `+${skillModifier(skill.ability, key)}`
-								: skillModifier(skill.ability, key)
-						}}</span>
+						<span>{{ skillModifier2str(skillModifier(skill.ability, key)) }}</span>
 					</span>
 				</hk-roll>
 			</div>
@@ -260,7 +253,7 @@
 									<template #content>
 										<Spell :id="spell.key" />
 									</template> </hk-popover
-								>{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
+								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
 					</template>
@@ -296,7 +289,7 @@
 									<template #content>
 										<Spell :id="spell.key" />
 									</template> </hk-popover
-								>{{ index+1 &lt; spellsForLimit(limit).length ? "," : "" }}
+								>{{ index + 1 &lt; spellsForLimit(limit).length ? "," : "" }}
 							</i>
 						</div>
 					</template>
@@ -362,7 +355,11 @@
 								{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : `` }}
 							</em></strong
 						>
-						<hk-dice-text v-if="ability.desc" :input_text="ability.desc" />
+						<hk-dice-text
+							v-if="ability.desc"
+							class="action-description"
+							:input_text="ability.desc"
+						/>
 					</p>
 				</template>
 			</div>
@@ -509,6 +506,12 @@ export default {
 
 			return calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise);
 		},
+		skillModifier2str(mod_value) {
+			if (mod_value > 0) {
+				return `+${mod_value}`;
+			}
+			return `${mod_value}`;
+		},
 	},
 };
 </script>
@@ -520,8 +523,10 @@ export default {
 	padding: 20px;
 	color: $black;
 	font-family: Helvetica, sans-serif, serif;
-	.hk-roll {
-		color: $black;
+	&::v-deep {
+		.hk-roll {
+			color: $black !important;
+		}
 	}
 
 	h2 {

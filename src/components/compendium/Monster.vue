@@ -37,7 +37,7 @@
 				<hk-roll
 					v-for="(ability, index) in abilities"
 					:key="index"
-					tooltip="Roll"
+					:tooltip="`Roll ${ability}`"
 					:roll="{
 						d: 20,
 						n: 1,
@@ -56,25 +56,21 @@
 					"
 				>
 					<div v-if="monster[ability]" class="ability">
-						<div class="abilityName">{{ ability.substring(0, 3).toUpperCase() }}</div>
-						{{ monster[ability] }}
-						({{
-							calcMod(monster[ability]) > 0
-								? `+${calcMod(monster[ability])}`
-								: calcMod(monster[ability])
-						}})
+						<div class="abilityName">{{ ability2str(ability.toUpperCase()) }}</div>
+						<span>{{ monster[ability] }}</span>
+						<span>({{ mod2str(calcMod(monster[ability])) }})</span>
 					</div>
 				</hk-roll>
 			</div>
 			<hr />
 
 			<div class="stats mb-2">
-				<template v-if="monster.saving_throws">
+				<template v-if="monster.saving_throws?.length > 0">
 					<strong>Saving Throws </strong>
 					<span class="saves">
 						<hk-roll
-							tooltip="Roll save"
-							v-for="(ability, index) in monster.saving_throws"
+							:tooltip="`Roll ${ability} save`"
+							v-for="ability in monster.saving_throws"
 							:key="ability"
 							:roll="{
 								d: 20,
@@ -94,21 +90,18 @@
 							"
 						>
 							<span class="save">
-								{{ ability.substring(0, 3).capitalize() }}
-								+{{ calcMod(monster[ability]) + monster.proficiency
-								}}{{
-									index+1 &lt; monster.saving_throws.length ? "," : ""
-								}}
+								<span>{{ ability2str(ability.capitalize()) }}</span>
+								<span> {{ mod2str(calcMod(monster[ability]) + monster.proficiency) }}</span>
 							</span>
 						</hk-roll>
 					</span>
 					<br />
 				</template>
-				<template v-if="monster.skills"
+				<template v-if="monster.skills?.length > 0"
 					><strong>Skills </strong>
 					<span class="saves">
 						<hk-roll
-							v-for="(skill, index) in monster.skills"
+							v-for="skill in monster.skills"
 							:key="skill"
 							:tooltip="`Roll ${skill}`"
 							:roll="{
@@ -129,13 +122,12 @@
 							"
 						>
 							<span class="save">
-								{{ skill.capitalize() }}
-								{{ skillModifier2str(skillModifier(skillList[skill].ability, skill)) }}
-								{{ index+1 &lt; monster.skills.length ? "," : "" }}
+								<span>{{ skill.capitalize() }}</span>
+								<span> {{ mod2str(skillModifier(skillList[skill].ability, skill)) }}</span>
 							</span>
 						</hk-roll>
-						<br />
 					</span>
+					<br />
 				</template>
 				<template
 					v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0"
@@ -182,6 +174,7 @@
 			<div class="skills">
 				<hk-roll
 					v-for="(skill, key) in skillList"
+					class="d-block"
 					:key="key"
 					:tooltip="`Roll ${key}`"
 					:roll="{
@@ -214,7 +207,7 @@
 							<i aria-hidden="true" v-else class="far fa-circle"></i>
 							{{ skill.skill }}
 						</span>
-						<span>{{ skillModifier2str(skillModifier(skill.ability, key)) }}</span>
+						<span>{{ mod2str(skillModifier(skill.ability, key)) }}</span>
 					</span>
 				</hk-roll>
 			</div>
@@ -506,11 +499,14 @@ export default {
 
 			return calc_skill_mod(ability_mod, proficiency, bonus, proficient, expertise);
 		},
-		skillModifier2str(mod_value) {
+		mod2str(mod_value) {
 			if (mod_value > 0) {
 				return `+${mod_value}`;
 			}
 			return `${mod_value}`;
+		},
+		ability2str(ability) {
+			return ability.substring(0, 3);
 		},
 	},
 };
@@ -525,7 +521,10 @@ export default {
 	font-family: Helvetica, sans-serif, serif;
 	&::v-deep {
 		.hk-roll {
-			color: $black !important;
+			color: $black;
+			&:hover {
+				color: rgb(165, 42, 42);
+			}
 		}
 	}
 
@@ -608,7 +607,8 @@ export default {
 	}
 	.saves .hk-roll {
 		&::after {
-			content: ", ";
+			content: ",";
+			margin-right: 3px;
 		}
 		&:last-child::after {
 			content: "";

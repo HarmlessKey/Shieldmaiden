@@ -37,7 +37,7 @@
 							Private campaign
 						</q-tooltip>
 					</div>
-					<template v-if="container.width < lg && container.width > sm">
+					<template v-if="legacy_layout || (container.width < lg && container.width > sm)">
 						<button
 							class="btn btn-clear btn-sm"
 							@click="
@@ -78,50 +78,68 @@
 					</template>
 				</div>
 			</div>
-			<Splitpanes v-if="container.width >= sm" class="default-theme" horizontal>
-				<Pane>
-					<Splitpanes>
-						<Pane :size="paneSize('left')" min-size="20">
-							<Splitpanes horizontal>
-								<hk-pane :size="paneSize('left-top')" min-size="20">
-									<Encounters />
-								</hk-pane>
-								<hk-pane v-if="container.width >= lg" :size="paneSize('left-bottom')">
-									<SoundBoard />
-								</hk-pane>
-							</Splitpanes>
-						</Pane>
-						<Pane v-if="container.width >= md" :size="paneSize('mid')" min-size="20">
-							<Splitpanes horizontal>
-								<hk-pane min-size="20">
-									<Players
-										:userId="user.uid"
-										:campaignId="campaignId"
-										:campaign="campaign"
-										:players="players"
-									/>
-								</hk-pane>
-								<hk-pane v-if="!campaign.private && container.width > lg" size="60" min-size="20">
-									<Share :campaign="campaign" />
-								</hk-pane>
-							</Splitpanes>
-						</Pane>
-						<hk-pane v-if="container.width >= lg" :size="paneSize('right')" min-size="20">		
-							<Resources />								
-						</hk-pane>
-					</Splitpanes>
-				</Pane>
-				<hk-pane v-if="container.width < lg && container.height >= 780">
-					<Players
-						v-if="container.width < md"
-						:userId="user.uid"
-						:campaignId="campaignId"
-						:campaign="campaign"
-						:players="players"
-					/>
-					<Share :campaign="campaign" v-else />
-				</hk-pane>
-			</Splitpanes>
+			<template v-if="container.width >= sm">
+				<Splitpanes v-if="legacy_layout" class="default-theme">
+					<hk-pane min-size="30">
+						<Encounters />
+					</hk-pane>
+					<hk-pane min-size="30">
+						<Players
+							:userId="user.uid"
+							:campaignId="campaignId"
+							:campaign="campaign"
+							:players="players"
+						/>
+					</hk-pane>
+				</Splitpanes>
+				<Splitpanes v-else class="default-theme" horizontal>
+					<Pane>
+						<Splitpanes>
+							<Pane v-if="container.width >= lg" :size="paneSize('left')" min-size="20">
+								<Splitpanes horizontal>
+									<hk-pane :size="paneSize('left-top')">
+										<SoundBoard />
+									</hk-pane>
+									<hk-pane v-if="!campaign.private" min-size="20">
+										<Share :campaign="campaign" />
+									</hk-pane>
+								</Splitpanes>
+							</Pane>
+							<hk-pane v-else>
+								<Encounters />
+							</hk-pane>
+							<Pane v-if="container.width >= md" :size="paneSize('mid')" min-size="20">
+								<Splitpanes horizontal>
+									<hk-pane v-if="container.width >= lg" min-size="20">
+										<Encounters />
+									</hk-pane>
+									<hk-pane min-size="20">
+										<Players
+											:userId="user.uid"
+											:campaignId="campaignId"
+											:campaign="campaign"
+											:players="players"
+										/>
+									</hk-pane>
+								</Splitpanes>
+							</Pane>
+							<hk-pane v-if="container.width >= lg" :size="paneSize('right')" min-size="20">
+								<Resources />
+							</hk-pane>
+						</Splitpanes>
+					</Pane>
+					<hk-pane v-if="container.width < lg && container.height >= 780">
+						<Players
+							v-if="container.width < md"
+							:userId="user.uid"
+							:campaignId="campaignId"
+							:campaign="campaign"
+							:players="players"
+						/>
+						<Share :campaign="campaign" v-else />
+					</hk-pane>
+				</Splitpanes>
+			</template>
 
 			<div v-else class="mobile">
 				<hk-select
@@ -228,6 +246,7 @@ export default {
 		};
 	},
 	async mounted() {
+		console.log("settings", this.userSettings);
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,
@@ -258,7 +277,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["broadcast"]),
+		...mapGetters(["broadcast", "userSettings"]),
 		background_image() {
 			return this.campaign.hk_background
 				? require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`)
@@ -266,6 +285,9 @@ export default {
 		},
 		tab_icon() {
 			return this.mobile_tabs.find((tab) => tab.value === this.mobile_tab).icon;
+		},
+		legacy_layout() {
+			return this.userSettings.general.legacy_campaign_layout;
 		},
 	},
 	methods: {
@@ -278,13 +300,13 @@ export default {
 		paneSize(pane) {
 			switch (pane) {
 				case "right":
-					return this.container.width > this.md ? "30" : "50";
+					return this.container.width > this.md ? "25" : "50";
 				case "mid":
-					return this.container.width > this.md ? "40" : "50";
+					return this.container.width > this.md ? "50" : "50";
 				case "left":
-					return this.container.width > this.md ? "30" : "50";
+					return this.container.width > this.md ? "25" : "50";
 				case "left-top":
-					return this.container.width > this.lg ? "50" : "100";
+					return this.container.width > this.lg ? "60" : "100";
 				case "left-bottom":
 					return this.container.width > this.md ? "50" : "0";
 			}

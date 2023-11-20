@@ -92,19 +92,19 @@ export default {
 	computed: {
 		isMobile() {
 			// This only works for real mobiles, not for small desktop screens
-			return this.$q.platform.is.mobile
+			return this.$q.platform.is.mobile;
 		},
 		sheet() {
 			if (this.query) {
 				return this.cheatSheet.filter(
-						({ name, description }) =>
-							name.toLowerCase().includes(this.query.toLowerCase()) ||
-							description.toLowerCase().includes(this.query.toLowerCase())
-					)
+					({ name, description }) =>
+						name.toLowerCase().includes(this.query.toLowerCase()) ||
+						description.toLowerCase().includes(this.query.toLowerCase())
+				);
 			}
-			// if (this.tab_type) {
-			//   return this.cheatSheet.filter((item) => item.type === this.tab_type);
-			// }
+			if (this.tab_type) {
+				return this.cheatSheet.filter((item) => item.type === this.tab_type);
+			}
 			return this.cheatSheet;
 		},
 	},

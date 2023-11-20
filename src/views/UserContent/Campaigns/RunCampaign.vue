@@ -312,7 +312,7 @@ export default {
 				case "right":
 					return this.container.width > this.md ? "25" : "50";
 				case "mid":
-					return this.container.width > this.md ? "50" : "50";
+					return "50";
 				case "left":
 					return this.container.width > this.md ? "25" : "50";
 				case "left-top":

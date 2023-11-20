@@ -125,10 +125,10 @@
 				<Splitpanes v-else class="default-theme" horizontal>
 					<Pane size="60" min-size="20">
 						<Splitpanes>
-							<hk-pane size="50" min-size="20">
+							<hk-pane min-size="20">
 								<Encounters />
 							</hk-pane>
-							<hk-pane size="50" min-size="20">
+							<hk-pane min-size="20" v-if="container.width >= md">
 								<Players
 									:userId="user.uid"
 									:campaignId="campaignId"

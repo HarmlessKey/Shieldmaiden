@@ -92,43 +92,53 @@
 						/>
 					</hk-pane>
 				</Splitpanes>
-				<Splitpanes v-else class="default-theme" horizontal>
-					<Pane>
-						<Splitpanes>
-							<Pane v-if="container.width >= lg" :size="paneSize('left')" min-size="20">
-								<Splitpanes horizontal>
-									<hk-pane :size="paneSize('left-top')">
-										<SoundBoard />
-									</hk-pane>
-									<hk-pane v-if="!campaign.private" min-size="20">
-										<Share :campaign="campaign" />
-									</hk-pane>
-								</Splitpanes>
-							</Pane>
-							<hk-pane v-else>
-								<Encounters />
+				<Splitpanes v-else-if="container.width >= lg" class="default-theme">
+					<Pane :size="paneSize('left')" min-size="20">
+						<Splitpanes horizontal>
+							<hk-pane :size="paneSize('left-top')">
+								<SoundBoard />
 							</hk-pane>
-							<Pane v-if="container.width >= md" :size="paneSize('mid')" min-size="20">
-								<Splitpanes horizontal>
-									<hk-pane v-if="container.width >= lg" min-size="20">
-										<Encounters />
-									</hk-pane>
-									<hk-pane min-size="20">
-										<Players
-											:userId="user.uid"
-											:campaignId="campaignId"
-											:campaign="campaign"
-											:players="players"
-										/>
-									</hk-pane>
-								</Splitpanes>
-							</Pane>
-							<hk-pane v-if="container.width >= lg" :size="paneSize('right')" min-size="20">
-								<Resources />
+							<hk-pane v-if="!campaign.private" :size="paneSize('left-bottom')" min-size="20">
+								<Share :campaign="campaign" />
 							</hk-pane>
 						</Splitpanes>
 					</Pane>
-					<hk-pane v-if="container.width < lg && container.height >= 780">
+					<Pane :size="paneSize('mid')" min-size="20">
+						<Splitpanes horizontal>
+							<hk-pane min-size="20">
+								<Encounters />
+							</hk-pane>
+							<hk-pane min-size="20">
+								<Players
+									:userId="user.uid"
+									:campaignId="campaignId"
+									:campaign="campaign"
+									:players="players"
+								/>
+							</hk-pane>
+						</Splitpanes>
+					</Pane>
+					<hk-pane :size="paneSize('right')" min-size="20">
+						<Resources />
+					</hk-pane>
+				</Splitpanes>
+				<Splitpanes v-else class="default-theme" horizontal>
+					<Pane size="60" min-size="20">
+						<Splitpanes>
+							<hk-pane size="50" min-size="20">
+								<Encounters />
+							</hk-pane>
+							<hk-pane size="50" min-size="20">
+								<Players
+									:userId="user.uid"
+									:campaignId="campaignId"
+									:campaign="campaign"
+									:players="players"
+								/>
+							</hk-pane>
+						</Splitpanes>
+					</Pane>
+					<hk-pane size="40" min-size="20" v-if="container.width < lg && container.height >= 780">
 						<Players
 							v-if="container.width < md"
 							:userId="user.uid"
@@ -136,7 +146,7 @@
 							:campaign="campaign"
 							:players="players"
 						/>
-						<Share :campaign="campaign" v-else />
+						<Share v-else-if="!campaign.private" :campaign="campaign" />
 					</hk-pane>
 				</Splitpanes>
 			</template>

@@ -59,7 +59,7 @@ export default {
 	},
 	data() {
 		return {
-			tab_type: "action",
+			tab_type: undefined,
 			query: null,
 			types: [
 				{

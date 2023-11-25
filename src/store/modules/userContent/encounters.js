@@ -2,6 +2,29 @@ import Vue from "vue";
 import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
+// Parse entity number values to ints
+const numberValues = [
+	"ac",
+	"ac_bonus",
+	"curHp",
+	"initiative",
+	"maxHp",
+	"maxHpMod",
+	"tempHp",
+];
+
+function parseInts(entity) {
+	Object.entries(entity).forEach(([key, value]) => {
+		if (numberValues.includes(key) && value !== undefined && value !== null && value !== "") {
+			entity[key] = parseInt(value);
+		}
+		if (numberValues.includes(key) && value === "") {
+			entity[key] = null;
+		}
+	});
+	return entity;
+}
+
 /**
  * @typedef {Object} Encounter
  * @property {Array} entities
@@ -378,6 +401,8 @@ const encounter_actions = {
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
 			try {
+				entity = parseInts(entity);
+
 				await services.updateEncounter(uid, campaignId, encounterId, "/entities", {
 					[entityId]: entity,
 				});

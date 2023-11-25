@@ -510,7 +510,7 @@ export default {
 				const key = entry.harmless_key ?? `new_key-${++i}`;
 				if (entry.challenge_rating !== undefined) {
 					// Entry is NPC
-					if (Object.values(entry.custom_spells).length > 0) {
+					if (entry.custom_spells && Object.values(entry.custom_spells).length > 0) {
 						new_data.spells = { ...new_data.spells, ...entry.custom_spells };
 					}
 					delete entry.custom_spells;

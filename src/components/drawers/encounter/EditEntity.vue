@@ -401,7 +401,7 @@ export default {
 	computed: {
 		...mapGetters(["entities", "targeted", "userSettings"]),
 		edit_targets() {
-			if (this.data !== undefined && this.data.length > 0) {
+			if (this.data?.length > 0) {
 				return this.data;
 			}
 			return this.targeted;

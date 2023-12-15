@@ -9,7 +9,7 @@
 			<div class="drawer__content" :class="drawer.classes">
 				<component
 					v-if="component"
-					v-bind="drawer.data"
+					v-bind="!Array.isArray(drawer.data) ? drawer.data : null"
 					:is="component"
 					:data="drawer.data"
 					:type="drawer.type"

@@ -33,7 +33,7 @@
 			</p>
 			<p>
 				From the player panel you can easily update your players. 
-				Add temporary hit points or an AC modifier to multiple players at once for isntance.
+				Add temporary hit points or an AC modifier to multiple players at once for instance.
 			</p>
 		</section>
 
@@ -53,7 +53,7 @@
 		<section class="mb-3" id="soundboard">
 			<h2>Soundboard</h2>
 			<p>
-				Create the perfect ambiance at your table with easily accesible sounds and music.
+				Create the perfect ambiance at your table with easily accessible sounds and music.
 			</p>
 			<p>
 				Our first version of the soundboard is a Youtube link collection of music and ambience.

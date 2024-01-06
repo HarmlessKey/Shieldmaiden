@@ -36,7 +36,7 @@ html body {
 	position: relative;
 	background-image: url("../assets/_img/styles/paper-bg.png");
 
-	*:focus {
+	*:focus-visible {
 		outline-offset: 3px;
 	}
 
@@ -1375,7 +1375,7 @@ html body {
 		line-height: 1.5;
 		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 
-		&:focus {
+		&:focus-visible {
 			outline: $outline;
 			box-shadow: none;
 		}
@@ -2616,7 +2616,7 @@ html body {
 	.q-btn {
 		border-radius: $border-radius;
 
-		&:focus {
+		&:focus-visible {
 			outline: $outline !important;
 		}
 	}
@@ -2625,7 +2625,7 @@ html body {
 		.q-btn {
 			border: solid 1px transparent;
 
-			&:focus {
+			&:focus-visible {
 				outline: none !important;
 				border-color: $neutral-2;
 			}

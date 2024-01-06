@@ -607,7 +607,7 @@ const routes = [
 				meta: {
 					title: "D&D 5e Tools",
 					description:
-						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nDM Screen \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
+						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nDM Screen \nMonster builder \nSpell creator \nCharacter Builder \nCharacter Sync \nCompendium",
 				},
 			},
 			{
@@ -748,6 +748,16 @@ const routes = [
 						},
 					},
 				],
+			},
+			{
+				path: "character-sync",
+				name: "ToolsCharacterSync",
+				component: () => import("src/views/Tools/CharacterSync"),
+				meta: {
+					title: "Character Sync",
+					description:
+						"Sync the D&D 5e characters of your players in Harmless Key. Update the stats of your players characters with one click.",
+				},
 			},
 			{
 				path: "character-builder",

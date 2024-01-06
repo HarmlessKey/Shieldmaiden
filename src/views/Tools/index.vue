@@ -96,7 +96,14 @@ export default {
 					url: "/tools/spell-creator",
 					icon: "fas fa-wand-magic",
 				},
-				Compendium: {
+				"character-sync": {
+					title: "Character Sync",
+					description: "Access your characters from external resources and sync them with Harmless Key.",
+					image: "character-sync.png",
+					url: "/tools/character-sync",
+					icon: "fas fa-sync-alt",
+				},
+				compendium: {
 					title: "Compendium",
 					description: "Quickly reference Monsters, Spells, Conditions and Items.",
 					image: "compendium-medium.jpg",

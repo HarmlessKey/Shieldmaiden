@@ -37,7 +37,7 @@
 							Private campaign
 						</q-tooltip>
 					</div>
-					<template v-if="container.width < lg && container.width > sm">
+					<template v-if="legacy_layout || (container.width < lg && container.width > sm)">
 						<button
 							class="btn btn-clear btn-sm"
 							@click="
@@ -78,50 +78,78 @@
 					</template>
 				</div>
 			</div>
-			<Splitpanes v-if="container.width >= sm" class="default-theme" horizontal>
-				<Pane>
-					<Splitpanes>
-						<Pane :size="paneSize('left')" min-size="20">
-							<Splitpanes horizontal>
-								<hk-pane :size="paneSize('left-top')" min-size="20">
-									<Encounters />
-								</hk-pane>
-								<hk-pane v-if="container.width >= lg" :size="paneSize('left-bottom')">
-									<SoundBoard />
-								</hk-pane>
-							</Splitpanes>
-						</Pane>
-						<Pane v-if="container.width >= md" :size="paneSize('mid')" min-size="20">
-							<Splitpanes horizontal>
-								<hk-pane min-size="20">
-									<Players
-										:userId="user.uid"
-										:campaignId="campaignId"
-										:campaign="campaign"
-										:players="players"
-									/>
-								</hk-pane>
-								<hk-pane v-if="!campaign.private && container.width > lg" size="60" min-size="20">
-									<Share :campaign="campaign" />
-								</hk-pane>
-							</Splitpanes>
-						</Pane>
-						<hk-pane v-if="container.width >= lg" :size="paneSize('right')" min-size="20">		
-							<Resources />								
-						</hk-pane>
-					</Splitpanes>
-				</Pane>
-				<hk-pane v-if="container.width < lg && container.height >= 780">
-					<Players
-						v-if="container.width < md"
-						:userId="user.uid"
-						:campaignId="campaignId"
-						:campaign="campaign"
-						:players="players"
-					/>
-					<Share :campaign="campaign" v-else />
-				</hk-pane>
-			</Splitpanes>
+			<template v-if="container.width >= sm">
+				<Splitpanes v-if="legacy_layout" class="default-theme" :horizontal="container.width < md">
+					<hk-pane min-size="30">
+						<Encounters />
+					</hk-pane>
+					<hk-pane min-size="30">
+						<Players
+							:userId="user.uid"
+							:campaignId="campaignId"
+							:campaign="campaign"
+							:players="players"
+						/>
+					</hk-pane>
+				</Splitpanes>
+				<Splitpanes v-else-if="container.width >= lg" class="default-theme">
+					<Pane :size="paneSize('left')" min-size="20">
+						<Splitpanes horizontal>
+							<hk-pane>
+								<SoundBoard />
+							</hk-pane>
+							<hk-pane v-if="!campaign.private" :size="100 - paneSize('left-top')" min-size="20">
+								<Share :campaign="campaign" />
+							</hk-pane>
+						</Splitpanes>
+					</Pane>
+					<Pane :size="paneSize('mid')" min-size="20">
+						<Splitpanes horizontal>
+							<hk-pane :size="paneSize('mid-top')" min-size="20">
+								<Encounters />
+							</hk-pane>
+							<hk-pane :size="100 - paneSize('mid-top')" min-size="20">
+								<Players
+									:userId="user.uid"
+									:campaignId="campaignId"
+									:campaign="campaign"
+									:players="players"
+								/>
+							</hk-pane>
+						</Splitpanes>
+					</Pane>
+					<hk-pane :size="paneSize('right')" min-size="20">
+						<Resources />
+					</hk-pane>
+				</Splitpanes>
+				<Splitpanes v-else class="default-theme" horizontal>
+					<Pane size="60" min-size="20">
+						<Splitpanes>
+							<hk-pane size="50" min-size="20">
+								<Encounters />
+							</hk-pane>
+							<hk-pane size="50" min-size="20" v-if="container.width >= md">
+								<Players
+									:userId="user.uid"
+									:campaignId="campaignId"
+									:campaign="campaign"
+									:players="players"
+								/>
+							</hk-pane>
+						</Splitpanes>
+					</Pane>
+					<hk-pane size="40" min-size="20" v-if="container.width < lg && container.height >= 780">
+						<Players
+							v-if="container.width < md"
+							:userId="user.uid"
+							:campaignId="campaignId"
+							:campaign="campaign"
+							:players="players"
+						/>
+						<Share v-else-if="!campaign.private" :campaign="campaign" />
+					</hk-pane>
+				</Splitpanes>
+			</template>
 
 			<div v-else class="mobile">
 				<hk-select
@@ -228,6 +256,7 @@ export default {
 		};
 	},
 	async mounted() {
+		console.log("settings", this.userSettings);
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,
@@ -258,7 +287,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["broadcast"]),
+		...mapGetters(["broadcast", "userSettings"]),
 		background_image() {
 			return this.campaign.hk_background
 				? require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`)
@@ -266,6 +295,9 @@ export default {
 		},
 		tab_icon() {
 			return this.mobile_tabs.find((tab) => tab.value === this.mobile_tab).icon;
+		},
+		legacy_layout() {
+			return this.userSettings?.general?.legacy_campaign_layout;
 		},
 	},
 	methods: {
@@ -277,16 +309,16 @@ export default {
 		},
 		paneSize(pane) {
 			switch (pane) {
-				case "right":
-					return this.container.width > this.md ? "30" : "50";
-				case "mid":
-					return this.container.width > this.md ? "40" : "50";
 				case "left":
-					return this.container.width > this.md ? "30" : "50";
+					return 25;
+				case "mid":
+					return 45;
+				case "right":
+					return 30;
 				case "left-top":
-					return this.container.width > this.lg ? "50" : "100";
-				case "left-bottom":
-					return this.container.width > this.md ? "50" : "0";
+					return 60;
+				case "mid-top":
+					return 50;
 			}
 		},
 	},

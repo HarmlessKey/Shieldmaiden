@@ -5,12 +5,12 @@
 			<h2>Create an account</h2>
 			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 					
+			<button class="google mt-2" @click="googleSignIn()">
+				Sign up with Google
+			</button>
+			<hr>
 			<ValidationObserver v-slot="{ handleSubmit, valid }">
 				<q-form v-if="!loading" @submit="handleSubmit(signUp)">
-					<button class="google mt-2" @click="googleSignIn()">
-						Sign up with Google
-					</button>
-					<hr>
 
 					<h4 class="text-center neutral-2">
 						With email and password
@@ -21,12 +21,11 @@
 						name="Email" 
 						v-slot="{ errors, invalid, validated}"
 					>
-						<q-input
-							:dark="$store.getters.theme === 'dark'" filled square dense 
+						<hk-input
 							autocomplete="username" 
 							class="email mb-2"
 							type="email" 
-							placeholder="Email" 
+							label="Email" 
 							v-model="email"
 							:error="invalid && validated"
 							:error-message="errors[0]"
@@ -38,11 +37,9 @@
 						name="Username" 
 						v-slot="{ errors, invalid, validated }"
 					>
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square dense
+						<hk-input 
 							type="text" 
 							class="mb-2"
-							autocomplete="off"
 							label="Username" 
 							maxlength="20"
 							minlength="3"
@@ -59,11 +56,10 @@
 						name="Password"
 						v-slot="{ errors, invalid, validated}"
 					>
-						<q-input
-							:dark="$store.getters.theme === 'dark'" filled square dense 
+						<hk-input
 							autocomplete="new-password" 
 							class="mb-2"
-							type="password" 
+							type="password"
 							placeholder="Password" 
 							v-model="password" 
 							name="password"
@@ -77,8 +73,7 @@
 						name="Confirm Password"
 						v-slot="{ errors, invalid, validated}"
 					>
-						<q-input
-							:dark="$store.getters.theme === 'dark'" filled square dense 
+						<hk-input
 							autocomplete="new-password"
 							class="mb-2"
 							type="password" 

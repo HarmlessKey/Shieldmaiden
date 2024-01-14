@@ -99,7 +99,7 @@
 							type="number"
 							min="1"
 							max="99"
-							v-model="npc.ac"
+							v-model.number="npc.ac"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						>
@@ -123,7 +123,7 @@
 							type="number"
 							min="1"
 							max="999"
-							v-model="npc.maxHp"
+							v-model.number="npc.maxHp"
 							placeholder="Hit Points"
 							:error="invalid && validated"
 							:error-message="errors[0]"

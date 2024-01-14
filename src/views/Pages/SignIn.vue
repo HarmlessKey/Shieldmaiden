@@ -6,44 +6,44 @@
 			<p v-if="error" class="red">
 				<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}
 			</p>
-			<form v-if="!loading" v-on:submit.prevent>
-				<button class="google mb-2" @click="googleSignIn()">Sign in with Google</button>
-				<hr />
-				<h4 class="text-center neutral-2">With email and password</h4>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					dense
-					autocomplete="username"
-					type="text"
-					v-model="email"
-					name="email"
-					placeholder="Email"
-					class="email"
-				/>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					dense
-					autocomplete="off"
-					type="password"
-					v-model="password"
-					placeholder="password"
-					name="password"
-				/>
-				<button class="btn btn-block my-3" @click="signIn()">
-					Sign In <i aria-hidden="true" class="fas fa-sign-in-alt"></i>
-				</button>
-
-				<p class="text-center mb-1">
-					<small><router-link to="/forgot-password">Forgot password?</router-link></small>
-				</p>
-				<div class="text-center">
-					<small>No account yet? <router-link to="/sign-up">Create one here.</router-link></small>
-				</div>
-			</form>
+			<button class="google mb-2" @click="googleSignIn()">Sign in with Google</button>
+			<hr />
+			<ValidationObserver v-if="!loading" v-slot="{ handleSubmit }">
+				<q-form @submit="handleSubmit(signIn)" greedy>
+					<h4 class="text-center neutral-2">With email and password</h4>
+					<hk-input
+						v-model="email"
+						autocomplete="username"
+						type="text"
+						name="email"
+						placeholder="Email"
+						class="email"
+					/>
+					<hk-input
+						v-model="password"
+						placeholder="password"
+						autocomplete="password"
+						:type="showPw ? 'text' : 'password'"
+					>
+						<q-icon
+							slot="append"
+							:name="showPw ? 'fas fa-eye' : 'fas fa-eye-slash'"
+							class="cursor-pointer"
+							@click="showPw = !showPw"
+						/>
+      		</hk-input>
+					<button class="btn btn-block my-3" type="submit">
+						Sign In <i aria-hidden="true" class="fas fa-sign-in-alt"></i>
+					</button>
+	
+					<p class="text-center mb-1">
+						<small><router-link to="/forgot-password">Forgot password?</router-link></small>
+					</p>
+					<div class="text-center">
+						<small>No account yet? <router-link to="/sign-up">Create one here.</router-link></small>
+					</div>
+				</q-form>
+			</ValidationObserver>
 			<hk-loader v-else prefix="Signing you in" noBackground />
 		</div>
 	</div>
@@ -57,6 +57,7 @@ export default {
 	name: "SignIn",
 	data() {
 		return {
+			showPw: false,
 			email: "",
 			password: "",
 			error: "",

@@ -94,7 +94,7 @@
 										type="number"
 										min="1"
 										max="99"
-										v-model="entity.ac"
+										v-model.number="entity.ac"
 										no-error-icon
 										:error="invalid && validated"
 										:error-message="errors[0]"
@@ -116,7 +116,7 @@
 										type="number"
 										min="1"
 										max="9999"
-										v-model="entity.maxHp"
+										v-model.number="entity.maxHp"
 										no-error-icon
 										:error="invalid && validated"
 										:error-message="errors[0]"
@@ -162,7 +162,7 @@
 									dense
 									type="number"
 									placeholder="Initiative"
-									v-model="playerInitiative[key]"
+									v-model.number="playerInitiative[key]"
 									:error="!isValid(key)"
 									error-message="Set initiative"
 									no-error-icon

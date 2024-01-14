@@ -63,7 +63,7 @@
 										type="number"
 										min="0"
 										max="99"
-										v-model="entity.initiative"
+										v-model.number="entity.initiative"
 										no-error-icon
 										:error="invalid && validated"
 										:error-message="errors[0]"

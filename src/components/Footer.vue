@@ -81,6 +81,7 @@
 							<li><router-link to="/tools/encounter-builder">Encounter builder</router-link></li>
 							<li><router-link to="/tools/monster-creator">Monster creator</router-link></li>
 							<li><router-link to="/tools/spell-creator">Spell creator</router-link></li>
+							<li><router-link to="/tools/character-sync">Character sync</router-link></li>
 						</ul>
 					</div>
 				</div>

@@ -6,8 +6,8 @@
 	"private": true,
 	"scripts": {
 		"serve": "quasar dev",
-		"ssr": "quasar dev -m ssr",
-		"build": "quasar build -m ssr",
+		"ssr": "set NODE_OPTIONS=--openssl-legacy-provider && quasar dev -m ssr",
+		"build": "set NODE_OPTIONS=--openssl-legacy-provider && quasar build -m ssr",
 		"lint": "eslint --ext .js,.vue ./",
 		"test": "echo \"No test specified\" && exit 0",
 		"docker-build": "docker build -t harmlesskey/harmlesskey .",
@@ -75,8 +75,7 @@
 		"maintained node versions"
 	],
 	"engines": {
-		"node": ">= 16.0.0",
-		"npm": ">= 6.13.4",
-		"yarn": ">= 1.21.1"
+		"node": ">= 20.0.0",
+		"npm": ">= 10.1.0"
 	}
 }

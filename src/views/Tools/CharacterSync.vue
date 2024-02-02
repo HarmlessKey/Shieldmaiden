@@ -1,5 +1,9 @@
 <template>
-	<ToolsPage title="Character Sync" bg_img="character-sync-tool-header.png">
+	<ToolsPage
+		title="Character Sync"
+		bg_img="character-sync-tool-header.png"
+		:showSignedIn="false"
+	>
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn 
 				color="primary" 

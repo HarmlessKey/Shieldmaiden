@@ -37,7 +37,7 @@
 
 		<section class="d-lg-flex justify-between mt-5">
 			<div>
-				<h2>Difficulty</h2>
+				<h2>Encounter Difficulty Calculator</h2>
 				<p>
 					One of the features of our encounter builder is the built-in difficulty calculator. This
 					tool uses the official rules to analyze your encounter and calculate its difficulty level

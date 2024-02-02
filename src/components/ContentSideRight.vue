@@ -72,7 +72,7 @@
 		</hk-card>
 
 		<!-- HOMEBREW CREATION -->
-		<hk-card v-if="false">
+		<hk-card>
 			<div
 				slot="image"
 				class="card-image"
@@ -82,15 +82,16 @@
 			</div>
 			<div class="card-body">
 				<p class="text-center">
-					Need a free adventure template, or help forming the basic idea of your adventure?
+					Need a free adventure template, homebrew content or DMing inspiration?
 				</p>
 				<a
 					class="btn btn-block btn-sm"
 					href="http://homebrewcreation.com"
 					rel="noopener"
 					target="_blank"
-					>Start creating</a
 				>
+					Checkout HBC <hk-icon icon="fas fa-external-link" class="ml-2" />
+					</a>
 			</div>
 		</hk-card>
 

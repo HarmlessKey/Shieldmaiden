@@ -1,3 +1,4 @@
+
 const Sitemap = () => import("src/views/Pages/Sitemap.vue");
 const Privacy = () => import("src/views/Pages/Privacy.vue");
 const Documentation = () => import("src/views/Pages/Documentation.vue");
@@ -767,6 +768,16 @@ const routes = [
 					title: "Character Builder",
 					description:
 						"An advanced character builder for D&D 5e. Create a character sheet for you character.",
+				},
+			},
+			{
+				path: "homebrew-creation",
+				name: "ToolsHomebrewCreation",
+				component: () => import("src/views/Tools/HomebrewCreation"),
+				meta: {
+					title: "Homebrew Creation",
+					description:
+						"Homebrew Creation. Because the secret of D&D is: you can create everything yourself",
 				},
 			},
 		],

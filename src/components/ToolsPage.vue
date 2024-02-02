@@ -8,7 +8,7 @@
       D&D {{ title }}
     </div>
 		<div class="card-body">
-      <SignedIn v-if="user" />
+      <SignedIn v-if="user && showSignedIn" />
       <slot />
     </div>
     <div slot="footer" class="card-footer">
@@ -29,6 +29,10 @@
     props: {
       title: String,
       bg_img: String,
+      showSignedIn: {
+        type: Boolean,
+        default: true
+      }
     },
     computed: {
       ...mapGetters(["user"]),

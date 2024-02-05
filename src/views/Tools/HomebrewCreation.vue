@@ -24,6 +24,12 @@
 				His philosophy: "The secret of D&D is: you can create everything yourself"
 			</p>
 
+			<q-img
+				src="~assets/_img/tools/homebrew-creation/hbc-logo.webp"
+				alt="Harmless Key DM Screen"
+				fit="contain"
+			/>
+
 			<h3 class="text-bold mb-1">Adventure creation</h3>
 			<p>
 				A three step solution to help you create a one-shot or campaign. We've tried it ourselves and honestly, it was never easier or quicker to fully create a custom one-shot. 
@@ -71,24 +77,6 @@ export default {
 .q-img {
 	display: block;
 	margin: 30px auto;
-	width: 100%;
-
-	&::v-deep .q-img__content {
-		> div {
-			background: none;
-		}
-	}
-	&.res-vul {
-		width: 50%;
-		max-width: 300px;
-	}
-	&.action {
-		max-width: 600px;
-		cursor: pointer;
-	}
-	&.small {
-		max-width: 600px;
-		border-radius: $border-radius;
-	}
+	max-width: 300px;
 }
 </style>

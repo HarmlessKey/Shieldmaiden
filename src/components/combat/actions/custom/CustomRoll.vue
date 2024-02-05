@@ -16,90 +16,89 @@
 			]"
 			@input="setType"
 		/>
-		<q-form>
+		<q-input
+			v-if="roll_type === 'attack'"
+			:dark="$store.getters.theme === 'dark'"
+			dense
+			filled
+			square
+			type="number"
+			v-model="attack_bonus"
+			label="Attack bonus"
+		/>
+		<div v-if="roll_type === 'save'" class="d-flex justify-content-between">
+			<q-select
+				:dark="$store.getters.theme === 'dark'"
+				dense
+				filled
+				square
+				map-options
+				emit-value
+				label="Save ability"
+				:options="abilities"
+				v-model="save_ability"
+				class="mr-1"
+			/>
 			<q-input
-				v-if="roll_type === 'attack'"
 				:dark="$store.getters.theme === 'dark'"
 				dense
 				filled
 				square
 				type="number"
-				v-model="attack_bonus"
-				label="Attack bonus"
+				v-model="save_dc"
+				label="Save DC"
 			/>
-			<div v-if="roll_type === 'save'" class="d-flex justify-content-between">
-				<q-select
-					:dark="$store.getters.theme === 'dark'"
-					dense
-					filled
-					square
-					map-options
-					emit-value
-					label="Save ability"
-					:options="abilities"
-					v-model="save_ability"
-					class="mr-1"
-				/>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					dense
-					filled
-					square
-					type="number"
-					v-model="save_dc"
-					label="Save DC"
-				/>
-			</div>
+		</div>
 
-			<!-- CUSTOM ROLL -->
-			<h3>
-				Rolls
-				<a @click="addRoll">
-					<i aria-hidden="true" class="fas fa-plus green" />
-				</a>
-			</h3>
+		<!-- CUSTOM ROLL -->
+		<h3>
+			Rolls
+			<a @click="addRoll">
+				<i aria-hidden="true" class="fas fa-plus green" />
+			</a>
+		</h3>
 
-			<div v-for="(roll, index) in custom_rolls" class="custom-roll" :key="`roll-${index}`">
-				<q-input
-					:ref="index"
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					dense
-					label="Roll"
-					autocomplete="off"
-					v-model="custom_rolls[index].roll"
-					lazy-rules
-					:rules="[
-						(val) => !!val || 'Roll is required',
-						(val) => val.match(/^[0-9]+d[0-9]+(\+[0-9])?$/) || 'Allowed format: 2d6 or 2d6+1',
-					]"
-				/>
+		<div v-for="(roll, index) in custom_rolls" class="custom-roll" :key="`roll-${index}`">
+			<q-input
+				:ref="index"
+				:dark="$store.getters.theme === 'dark'"
+				filled
+				square
+				dense
+				label="Roll"
+				autocomplete="off"
+				v-model="custom_rolls[index].roll"
+				lazy-rules
+				:rules="[
+					(val) => !!val || 'Roll is required',
+					(val) => val.match(/^[0-9]+d[0-9]+(\+[0-9])?$/) || 'Allowed format: 2d6 or 2d6+1',
+				]"
+			/>
 
-				<hk-dmg-type-select
-					v-if="roll_type !== 'heal'"
-					dense
-					required
-					v-model="custom_rolls[index].damage_type"
-					label="Damage type"
-					class="ml-1"
-				/>
+			<hk-dmg-type-select
+				v-if="roll_type !== 'heal'"
+				dense
+				required
+				v-model="custom_rolls[index].damage_type"
+				label="Damage type"
+				class="ml-1"
+			/>
 
-				<a v-if="index > 0" class="remove" @click="removeRoll(index)">
-					<i aria-hidden="true" class="fas fa-trash-alt" />
-				</a>
-			</div>
+			<a v-if="index > 0" class="remove" @click="removeRoll(index)">
+				<i aria-hidden="true" class="fas fa-trash-alt" />
+			</a>
+		</div>
 
-			<hk-roll
-				v-if="targeted.length > 0"
-				tooltip="Roll"
-				tooltipPosition="right"
-				@roll="roll($event)"
-			>
-				<a class="btn btn-block">Roll</a>
-			</hk-roll>
-			<div v-else class="text-center text-bold red">Select one ore more targets</div>
-		</q-form>
+		<hk-roll
+			v-if="targeted.length > 0"
+			tooltip="Roll"
+			tooltipPosition="right"
+			class="full-width"
+			@roll="roll($event)"
+		>
+			<span class="btn btn-block">Roll</span>
+		</hk-roll>
+		<div v-else class="text-center text-bold red">Select one ore more targets</div>
 	</div>
 </template>
 

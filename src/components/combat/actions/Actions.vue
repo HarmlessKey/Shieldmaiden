@@ -285,19 +285,26 @@ export default {
 			}
 		}
 	}
+	&::v-deep {
+		.q-tab {
+			width: 100%;
+		}
+	}
 }
 
 .modes {
 	&::v-deep {
 		.q-tabs {
+			
 			&__content {
 				padding: 10px;
 				margin: -10px;
 				gap: 0.5rem;
-
+				
 				.q-tab {
 					border: solid 1px transparent;
 					border-radius: $border-radius;
+					width: 100%;
 
 					&:focus {
 						outline: $outline;
@@ -307,6 +314,7 @@ export default {
 		}
 	}
 }
+
 
 .q-tab-panel {
 	padding: 15px 0 0 0 !important;

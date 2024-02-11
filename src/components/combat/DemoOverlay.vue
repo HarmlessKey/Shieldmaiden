@@ -1,11 +1,8 @@
 <template>
 	<div class="demo">
-		<transition 
-			enter-active-class="animated animate__slideInBottom" 
-			leave-active-class="animated animate__slideOutBottom"
-		>
-			<div class="banner bg-neutral-8" :class="{ hide: !showInfo }">
-				<h3>
+		<div v-if="showInfo" class="banner bg-neutral-8">
+			<div class="d-flex items-center justify-content-between mb-3">
+				<h3 class="d-flex items-center mb-0 gap-2">
 					<a class="btn btn-sm bg-neutral-5" @click="reset_demo()">
 						<i aria-hidden="true" class="far fa-sync-alt"></i>
 						<q-tooltip anchor="top middle" self="center middle">
@@ -14,25 +11,32 @@
 					</a>
 					Demo Encounter 
 				</h3>
-				<div class="d-flex justify-content-between items-center">
-					<template v-if="!user">
-						This demo encounter has all the functionality our encounter tracker has. 
-						If you create an account you can make your own encounters and run them just like this, but with your custom content.<br/>
+				<button class="btn btn-clear" @click="showInfo = false">
+					<i aria-hidden="true" class="fas fa-times neutral-4" />
+				</button>
+			</div>
+			<div class="content d-flex justify-content-between items-center gap-2">
+				<div v-if="!user">
+					<p>
+						Thanks for trying out our demo encounter!<br/>
+						This demo has all the functionality our combat tracker has. 
+						If you <strong>create an account</strong> you can make your own encounters and run them just like this, but with your custom content.<br/>
+					</p>
+					<h3>
 						Create your personal account now and run your D&D encounters smoother than ever.
-					</template>
-					<span v-else class="orange">
-						Now that you've created an account you can start a campaign and run your custom encounters from there.
-					</span>
-					<div class="button">
-						<router-link v-if="!user" to="/sign-up" class="btn btn-lg bg-green">Create Account</router-link>
-						<router-link v-else to="/content" class="btn btn-lg bg-green">Create custom content</router-link>
-					</div>
+					</h3>
+				</div>
+				<span v-else>
+					Now that you've created an account you can start a campaign and run your custom encounters from there.
+				</span>
+				<div class="button">
+					<router-link v-if="!user" to="/sign-up" class="btn btn-lg">Create Account</router-link>
+					<router-link v-else to="/content" class="btn btn-lg">Create custom content</router-link>
 				</div>
 			</div>
-		</transition>
-		<div class="toggle bg-blue" @click="showInfo = !showInfo">
-			<i aria-hidden="true" class="fas fa-times" v-if="showInfo"></i>
-			<i aria-hidden="true" class="fas fa-chevron-up" v-else></i>
+		</div>
+		<div v-if="!showInfo" class="toggle bg-orange" @click="showInfo = true">
+			<i aria-hidden="true" class="fas fa-info" />
 		</div>
 	</div>
 </template>
@@ -63,28 +67,28 @@
 	bottom: 0;
 	width: calc(100% - 30px);
 	z-index: 999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	
-
 	.banner {
-		padding: 20px;
+		padding: 25px;
 		box-shadow: 0px 0px 15px $black;
-		transition: bottom .5s linear;
+		max-width: 800px;
 
-		&.hide {
-			display:none;
-		}
-		.d-flex {
-			gap: 15px;
+		.content {
+			padding: 0;
 
 			.button {
-				min-width: 250px;
+				flex-grow: 1;
+				min-width: fit-content;
 			}
 		}
 	}
 	.toggle {
-		position: absolute;
-		top: -50px;
-		right: 5px;
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
 		height: 50px;
 		width: 50px;
 		z-index: 97;
@@ -94,6 +98,7 @@
 		cursor: pointer;
 		line-height: 50px;
 		color:$neutral-1 !important;
+		border-radius: 50%;
 
 		i {
 				transition: transform .5s linear;
@@ -105,4 +110,17 @@
 		}
 	}
 }
+@media only screen and (max-width: 576px) {
+		.demo {
+			.banner {
+				.content {
+					flex-direction: column;
+				}
+			}
+			.toggle {
+				bottom: 70px;
+				right: 10px;
+			}
+		}
+	}
 </style>

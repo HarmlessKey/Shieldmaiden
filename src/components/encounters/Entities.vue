@@ -164,10 +164,15 @@
 				debounce="300"
 				clearable
 				placeholder="Search SRD monster"
-				@change="filter"
+				@change="filterMonsters"
+				@clear="filterMonsters"
 			>
 				<q-icon slot="prepend" name="search" />
-				<q-btn slot="after" no-caps color="primary" label="Search" @click="filter" />
+				<q-btn slot="after" no-caps color="primary" @click="filter_dialog = true">
+					Filter
+					<i class="fas fa-filter ml-2" aria-hidden="true" />
+					<q-badge v-if="Object.keys(filter).length" floating rounded color="red" :label="Object.keys(filter).length" />
+				</q-btn>
 			</q-input>
 			<q-table
 				:data="monsters"
@@ -265,6 +270,24 @@
 			</q-table>
 		</template>
 		<q-resize-observer @resize="setSize" />
+
+		<q-dialog v-model="filter_dialog">
+			<hk-card header="Filter monsters" :min-width="300">
+				<div class="card-body">
+					<hk-filter v-model="filter" type="monster" />
+				</div>
+				<div slot="footer" class="card-footer">
+					<button class="btn bg-neutral-5" @click="clearFilter">
+						<i class="fas fa-times" aria-hidden="true" />
+						Clear filter
+					</button>
+					<button class="btn ml-2" @click="setFilter">
+						<i class="fas fa-filter" aria-hidden="true" />
+						Set filter
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
 
 		<q-dialog v-model="player_dialog">
 			<div>
@@ -400,6 +423,8 @@ export default {
 			player: {},
 			drawer: this.$store.getters.getDrawer,
 			to_add: {},
+			filter_dialog: false,
+			filter: {},
 			typeFilter: [],
 			monsterFields: {
 				name: {
@@ -543,15 +568,25 @@ export default {
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;
 		},
-		filter() {
+		filterMonsters() {
 			this.loading_monsters = true;
 			this.monsters = [];
 			this.pagination.page = 1;
 			this.query = {
 				search: this.searchMonster,
+				...this.filter
 			};
 			this.fetchMonsters();
 		},
+		setFilter() {
+			this.filter_dialog = false;
+			this.filterMonsters();
+		},
+		clearFilter() {
+				this.filter_dialog = false;
+				this.$set(this, "filter", {});
+				this.filterMonsters();
+			},
 		request(req) {
 			this.pagination = req.pagination;
 			this.fetchMonsters();

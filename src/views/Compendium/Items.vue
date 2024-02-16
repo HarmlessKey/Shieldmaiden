@@ -14,9 +14,11 @@
 				filled square
 				debounce="300" 
 				clearable
-				placeholder="Search">
+				placeholder="Search"
+				@keyup.enter="filter()"
+				@clear="filter()">
 				<q-icon slot="append" name="search" />
-				<button slot="after" class="btn" @click="filter()">Filter</button>
+				<button slot="after" class="btn" @click="filter()">Search</button>
 			</q-input>
 
 			<q-table

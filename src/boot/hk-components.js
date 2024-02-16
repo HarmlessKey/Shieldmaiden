@@ -24,6 +24,7 @@ import HkActionRollForm from "../components/hk-components/hk-action-rolls/hk-act
 import HkActionRollsTable from "../components/hk-components/hk-action-rolls/hk-action-rolls-table";
 import HkActionRollScaling from "../components/hk-components/hk-action-rolls/hk-action-roll-scaling";
 import HkPane from "../components/hk-components/hk-pane";
+import HkFilter from "../components/hk-components/hk-filter";
 
 export default async ({ Vue }) => {
 	Vue.component("hk-input", HkInput);
@@ -52,4 +53,5 @@ export default async ({ Vue }) => {
 	Vue.component("hk-action-rolls-table", HkActionRollsTable);
 	Vue.component("hk-action-roll-scaling", HkActionRollScaling);
 	Vue.component("hk-pane", HkPane);
+	Vue.component("hk-filter", HkFilter);
 };

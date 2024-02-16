@@ -78,8 +78,6 @@
 						/>
 					</div>
 				</template>
-
-				<DemoOverlay v-if="demo" />
 			</template>
 
 			<!-- MOBILE -->
@@ -108,6 +106,7 @@
 				</div>
 			</template>
 		</div>
+		<DemoOverlay v-if="demo" />
 		<q-dialog v-model="demo_dialog" persistent>
 			<hk-card v-if="!user || continue_demo" header="Choose encounter">
 				<div class="card-body text-center">
@@ -115,7 +114,7 @@
 					<button class="btn btn-block mb-2" @click="demo_dialog = false">
 						Use demo encounter
 					</button>
-					<router-link to="/tools/encounter-builder/build-encounter" class="btn btn-block">
+					<router-link to="/tools/encounter-builder/build-encounter" class="btn btn-sm btn-clear btn-block">
 						Build custom encounter
 					</router-link>
 				</div>
@@ -551,7 +550,7 @@ export default {
 				"turns turns turns"
 				"current targets targeted";
 		}
-		#side_container {
+		.side {
 			display: none;
 		}
 	}
@@ -559,7 +558,7 @@ export default {
 		.desktop {
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
-				"turns turns turns"
+				"turns turns"
 				"current targets";
 		}
 	}

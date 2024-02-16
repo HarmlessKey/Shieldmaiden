@@ -62,13 +62,35 @@
 
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">
-			<hk-card :minWidth="320">
+			<hk-card class="create-dialog">
 				<div slot="header" class="card-header">
 					<span>Copy existing Spell</span>
 					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
 				</div>
 				<div class="card-body">
 					<CopyContent @copy="copy" type="spell" />
+				</div>
+			</hk-card>
+		</q-dialog>
+
+		<q-dialog v-model="create_dialog" persistent position="top">
+			<hk-card class="create-dialog" header="How do you want to do this?">
+				<div class="card-body">
+					<template v-if="!copy_spell">
+						<button class="btn btn-lg btn-block" @click="copy_spell = true">Copy existing spell</button>
+						<h2 class="text-center my-2">OR</h2>
+						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">Create from scratch</button>
+					</template>
+					<template v-if="copy_spell">
+						<h2>Copy an existing spell</h2>
+						<CopyContent @copy="copy" type="spell" />
+					</template>
+				</div>
+				<div v-if="copy_spell" class="card-footer" slot="footer">
+					<button class="btn btn-sm bg-neutral-5" @click="create_dialog = false">
+						<i class="fas fa-times mr-1" aria-hidden="true" />
+						Create from scratch
+					</button>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -102,6 +124,8 @@ export default {
 			loading: false,
 			spell_copy: {},
 			copy_dialog: false,
+			create_dialog: false,
+			copy_spell: false,
 			unsaved_changes: false,
 		};
 	},
@@ -115,6 +139,8 @@ export default {
 				this.unsaved_changes = false;
 				this.loading = false;
 			});
+		} else {
+			this.create_dialog = true;
 		}
 	},
 	computed: {
@@ -144,6 +170,7 @@ export default {
 		copy({ result }) {
 			this.copy_dialog = false;
 			this.spell = { ...result };
+			this.create_dialog = false;
 		},
 		reset() {
 			this.spell = {};
@@ -262,6 +289,16 @@ export default {
 				border-radius: 50%;
 			}
 		}
+	}
+}
+.hk-card.create-dialog {
+	max-width: 95vw;
+	width: 576px;
+	margin-top: 100px;
+	max-height: 86vh;
+
+	.card-body {
+		overflow: auto;
 	}
 }
 </style>

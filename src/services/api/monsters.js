@@ -1,4 +1,5 @@
 import axios from "axios";
+import { range } from "lodash";
 
 const MONSTERS_REF = "/monsters";
 
@@ -29,8 +30,17 @@ export class monsterServices {
           queryParams.push(`type[]=${type}`);
         }
       }
-      if(query.challenge_ratings && query.challenge_ratings.length) {
-        for(const cr of query.challenge_ratings) {
+      if(query.sizes && query.sizes.length) {
+        for(const size of query.sizes) {
+          queryParams.push(`size[]=${size}`);
+        }
+      }
+      if(query.challenge_ratings) {
+        let challenge_ratings = range(query.challenge_ratings.min, query.challenge_ratings.max+1);
+        if(query.challenge_ratings.min === 0) {
+          challenge_ratings = challenge_ratings.concat([0.125, 0.25, 0.5]);
+        }
+        for(const cr of challenge_ratings) {
           queryParams.push(`challenge_rating[]=${cr}`);
         }
       }

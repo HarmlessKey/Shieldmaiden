@@ -295,7 +295,6 @@ export default {
 	max-width: 95vw;
 	width: 576px;
 	margin-top: 100px;
-	max-height: 86vh;
 
 	.card-body {
 		overflow: auto;

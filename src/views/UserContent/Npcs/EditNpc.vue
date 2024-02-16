@@ -89,8 +89,13 @@
 					<template v-if="copy_monster">
 						<h2>Copy an existing monster</h2>
 						<CopyContent @copy="copy" type="monster" />
-						<button class="btn btn-sm btn-block bg-neutral-5 mt-3" @click="create_dialog = false">Create from scratch</button>
 					</template>
+				</div>
+				<div v-if="copy_monster" class="card-footer" slot="footer">
+					<button class="btn btn-sm bg-neutral-5" @click="create_dialog = false">
+						<i class="fas fa-times mr-1" aria-hidden="true" />
+						Create from scratch
+					</button>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -345,5 +350,9 @@ export default {
 	max-width: 95vw;
 	width: 576px;
 	margin-top: 100px;
+	
+	.card-body {
+		overflow: auto;
+	}
 }
 </style>

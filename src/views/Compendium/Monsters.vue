@@ -30,13 +30,16 @@
 			<p v-if="!loading && pagination.rowsNumber === 0" class="red">
 				Nothing found 
 				<template v-if="query.search">
-					for "{{query.search}}"
+					for "{{ query.search }}"
 				</template>
-				<template v-if="types">
-					with a type of {{ types.join(" or ")}}
+				<template v-if="filter.types?.length">
+					with a type of {{ filter.types.join(" or ")}}
 				</template>
-				<template v-if="cr.min > 0 || cr.max < 30">
-					{{ types ? "and a" : "with a" }} CR between {{ cr.min }} and {{  cr.max }}
+				<template v-if="filter.sizes?.length">
+					{{ filter.types?.length ? "and" : "with" }} a size {{ filter.sizes.join(" or ")}}
+				</template>
+				<template v-if="filter.challenge_ratings?.min > 0 || filter.challenge_ratings?.max < 30">
+					{{ filter.types?.length || filter.sizes?.length ? "and" : "with" }} a CR between {{ filter.challenge_ratings.min }} and {{  filter.challenge_ratings.max }}
 				</template>
 			</p>
 
@@ -104,24 +107,7 @@
 		<q-dialog v-model="filter_dialog">
 			<hk-card header="Filter monsters" :min-width="300">
 				<div class="card-body">
-					<q-select
-						:dark="$store.getters.theme !== 'light'" filled square
-						class="mb-3"
-						label="Type"
-						v-model="types"
-						use-chips
-						multiple
-						clearable
-						:options="monster_types"
-					/>
-
-					<strong class="block mb-5">Challenge rating</strong>
-					<q-range
-						v-model="cr"
-						label-always
-						:min="0"
-						:max="30"
-					/>
+					<hk-filter v-model="filter" type="monster" />
 				</div>
 				<div slot="footer" class="card-footer">
 					<button class="btn bg-neutral-5" @click="clearFilter">
@@ -157,8 +143,6 @@
 				filter: {},
 				search: "",
 				query: null,
-				cr: { min: 0, max: 30 },
-				types: [],
 				pagination: {
 					sortBy: "name",
 					descending: false,
@@ -179,6 +163,13 @@
 						name: "type",
 						label: "Type",
 						field: "type",
+						align: "left",
+						sortable: true
+					},
+					{
+						name: "size",
+						label: "Size",
+						field: "size",
 						align: "left",
 						sortable: true
 					},
@@ -216,23 +207,6 @@
 			},
 			setFilter() {
 				this.filter_dialog = false;
-				// Set CR filter
-				if(this.cr.min > 0 || this.cr.max < 30) {
-					const cr = _.range(this.cr.min, this.cr.max+1);
-					if(this.cr.min === 0) {
-						cr.unshift([0.125, 0.25, 0.5]);
-					}
-					this.$set(this.filter, "cr", cr);
-				} else {
-					this.$delete(this.filter, "cr");
-				}
-				
-				// Set type filter
-				if(!this.types || !this.types.length || this.types.length === this.monster_types.length) {
-					this.$delete(this.filter, "types");
-				} else {
-					this.$set(this.filter, "types", this.types);
-				}
 				this.filterMonsters();
 			},
 			clearFilter() {
@@ -246,8 +220,7 @@
 				this.pagination.page = 1;
 				this.query = {
 					search: this.search,
-					types: this.filter.types,
-					challenge_ratings: this.filter.cr
+					...this.filter
 				}
 				this.fetchMonsters();
 			},
@@ -260,7 +233,7 @@
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,
-					fields: ["name", "type", "challenge_rating", "url"],
+					fields: ["name", "type", "challenge_rating", "size", "url"],
 					sortBy: this.pagination.sortBy,
 					descending: this.pagination.descending
 				}).then(result => {

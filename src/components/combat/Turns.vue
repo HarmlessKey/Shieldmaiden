@@ -103,7 +103,15 @@
 				</q-popup-proxy>
 			</a>
 
-			<span class="ml-2 d-none d-md-inline truncate">{{ encounter.name }}</span>
+			<span class="ml-2 d-none d-md-inline truncate">
+				<template v-if="!demo">
+					{{ encounter.name }}
+				</template>
+				<template v-else>
+					<router-link v-if="!userId" to="/sign-up" class="btn">Create Account</router-link>
+					<router-link v-else to="/content" class="btn">Create custom content</router-link>
+				</template>
+			</span>
 		</div>
 
 		<!-- TURNS & ROUNDS -->

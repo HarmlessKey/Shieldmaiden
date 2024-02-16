@@ -107,8 +107,10 @@
 				<template v-if="!demo">
 					{{ encounter.name }}
 				</template>
-				<router-link v-if="!userId" to="/sign-up" class="btn">Create Account</router-link>
-				<router-link v-else to="/content" class="btn">Create custom content</router-link>
+				<template v-else>
+					<router-link v-if="!userId" to="/sign-up" class="btn">Create Account</router-link>
+					<router-link v-else to="/content" class="btn">Create custom content</router-link>
+				</template>
 			</span>
 		</div>
 

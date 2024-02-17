@@ -42,7 +42,6 @@
 					{{ filter.types?.length || filter.sizes?.length ? "and" : "with" }} a CR between {{ filter.challenge_ratings.min }} and {{  filter.challenge_ratings.max }}
 				</template>
 			</p>
-
 			<q-table
 				:data="monsters"
 				:columns="columns"
@@ -50,6 +49,7 @@
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
+				:visible-columns="visibleColumns"
 				:pagination.sync="pagination"
 				:loading="loading"
 				separator="none"
@@ -65,8 +65,8 @@
 							v-for="col in props.cols"
 							:key="col.name"
 							:props="props"
-							:auto-width="col.name === 'challenge_rating'"
-							>
+							:auto-width="col.name !== 'name'"
+						>
 							{{ col.label }}
 						</q-th>
 						<q-th auto-width />
@@ -80,7 +80,7 @@
 							v-for="col in props.cols"
 							:key="col.name"
 							:props="props"
-							:auto-width="col.name === 'challenge_rating'"
+							:auto-width="col.name !== 'name'"
 						>
 							<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
 								{{ col.value }}
@@ -109,6 +109,7 @@
 					</q-tr>
 				</template>
 			</q-table>
+			<q-resize-observer @resize="setSize" />
 		</div>
 
 		<q-dialog v-model="filter_dialog">
@@ -162,7 +163,7 @@
 						name: "challenge_rating",
 						label: "CR",
 						field: "challenge_rating",
-						align: "center",
+						align: "left",
 						headerStyle: "min-width: 70px;",
 						style: "font-weight: bold;",
 						sortable: true,
@@ -178,30 +179,39 @@
 						format: val => val.capitalizeEach()
 					},
 					{
-						name: "size",
-						label: "Size",
-						field: "size",
-						align: "left",
-						classes: "truncate-cell",
-						sortable: true
-					},
-					{
 						name: "type",
 						label: "Type",
 						field: "type",
 						align: "left",
-						classes: "truncate-cell",
+						sortable: true
+					},
+					{
+						name: "size",
+						label: "Size",
+						field: "size",
+						align: "left",
+						headerStyle: "min-width: 80px;",
+						sortable: true
+					},
+					{
+						name: "alignment",
+						label: "Alignment",
+						field: "alignment",
+						style: "white-space: nowrap;",
+						headerStyle: "min-width: 115;",
+						align: "left",
 						sortable: true
 					},
 					{
 						name: "environment",
 						label: "Environment",
 						field: "environment",
+						style: "white-space: nowrap;",
 						align: "left",
-						classes: "truncate-cell"
 					}
 				],
 				loading: true,
+				width: 0,
 			}
 		},
 		computed: {
@@ -214,7 +224,21 @@
 			},
 			type_options() {
 				return this.monster_types.map(type => { return { label: type, value: type } });
-			}
+			},
+			visibleColumns() {
+				switch (true) {
+					case this.width > 700:
+						return  ["challenge_rating", "name", "type", "size", "alignment", "environment"];
+					case this.width > 620:
+						return  ["challenge_rating", "name", "type", "size", "alignment"];
+					case this.width > 500:
+						return  ["challenge_rating", "name", "type", "size"];
+					case this.width > 450:
+						return  ["challenge_rating", "name", "type",];
+					default:
+						return ["challenge_rating", "name"];
+				}
+			},
 		},
 		methods: {
 			...mapActions("api_monsters", ["fetch_monsters"]),
@@ -252,7 +276,7 @@
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,
-					fields: ["name", "type", "challenge_rating", "size", "environment", "url"],
+					fields: ["name", "type", "challenge_rating", "size", "environment", "alignment", "url"],
 					sortBy: this.pagination.sortBy,
 					descending: this.pagination.descending
 				}).then(result => {
@@ -260,7 +284,10 @@
 					this.monsters = result.results;
 					this.loading = false;
 				});
-			}
+			},
+			setSize(e) {
+				this.width = e.width;
+			},
 		},
 		async mounted() {
 			await this.fetchMonsters();

@@ -21,6 +21,15 @@
 			/>
 			<hk-select
 				class="mb-3"
+				label="Alignment"
+				v-model="filter.alignments"
+				use-chips
+				multiple
+				clearable
+				:options="monster_alignment"
+			/>
+			<hk-select
+				class="mb-3"
 				label="Environment"
 				v-model="filter.environments"
 				use-chips

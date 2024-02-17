@@ -102,50 +102,55 @@
 					:filter="search"
 					wrap-cells
 				>
-					<template v-slot:body-cell="props">
-						<q-td v-if="props.col.name !== 'actions'">
-							<div class="truncate-cell">
-								<div class="truncate">
+					<template v-slot:body="props">
+						<q-tr :props="props">
+							<q-td
+								v-for="col in props.cols"
+								:key="col.name"
+								:props="props"
+								:auto-width="col.name !== 'name'"
+							>
+								<template v-if="col.name !== 'actions'">
 									<router-link
-										v-if="!overencumbered && props.col.name === 'name' && props.row.entity_count"
+										v-if="!overencumbered && col.name === 'name' && props.row.entity_count"
 										:to="`/run-encounter/${campaignId}/${props.key}`"
 									>
-										{{ props.value }}
+										{{ col.value }}
 									</router-link>
 									<template v-else>
-										{{ props.value }}
+										{{ col.value }}
 									</template>
+								</template>
+								<div v-else class="text-right d-flex justify-content-end">
+									<router-link
+										v-if="props.row.entity_count && !overencumbered"
+										class="btn btn-sm bg-neutral-5 mr-1"
+										:to="'/run-encounter/' + campaignId + '/' + props.key"
+									>
+										<i aria-hidden="true" class="fas fa-play"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Run encounter </q-tooltip>
+									</router-link>
+									<a v-else class="disabled btn btn-sm mr-1 bg-neutral-5">
+										<i aria-hidden="true" class="fas fa-play"></i>
+									</a>
+									<router-link
+										v-if="!overencumbered"
+										class="mr-1 btn btn-sm bg-neutral-5"
+										:to="'/content/campaigns/' + campaignId + '/' + props.key"
+									>
+										<i aria-hidden="true" class="fas fa-pencil-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+									</router-link>
+									<a
+										class="btn btn-sm bg-neutral-5"
+										@click="deleteEncounter($event, props.key, props.row.name)"
+									>
+										<i aria-hidden="true" class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
+									</a>
 								</div>
-							</div>
-						</q-td>
-						<q-td v-else class="text-right d-flex justify-content-between">
-							<router-link
-								v-if="props.row.entity_count && !overencumbered"
-								class="btn btn-sm bg-neutral-5 mr-1"
-								:to="'/run-encounter/' + campaignId + '/' + props.key"
-							>
-								<i aria-hidden="true" class="fas fa-play"></i>
-								<q-tooltip anchor="top middle" self="center middle"> Run encounter </q-tooltip>
-							</router-link>
-							<a v-else class="disabled btn btn-sm mr-1 bg-neutral-5">
-								<i aria-hidden="true" class="fas fa-play"></i>
-							</a>
-							<router-link
-								v-if="!overencumbered"
-								class="mr-1 btn btn-sm bg-neutral-5"
-								:to="'/content/campaigns/' + campaignId + '/' + props.key"
-							>
-								<i aria-hidden="true" class="fas fa-pencil-alt"></i>
-								<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-							</router-link>
-							<a
-								class="btn btn-sm bg-neutral-5"
-								@click="deleteEncounter($event, props.key, props.row.name)"
-							>
-								<i aria-hidden="true" class="fas fa-trash-alt"></i>
-								<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
-							</a>
-						</q-td>
+							</q-td>
+							</q-tr>
 					</template>
 					<div slot="no-data" />
 				</q-table>
@@ -153,8 +158,8 @@
 
 			<!-- FINISHED ENCOUNTERS -->
 			<template v-if="finished_encounters.length">
-				<div>
-					<span>Finished encounters</span>
+				<div class="d-flex justify-content-between">
+					<strong>Finished encounters</strong>
 					<a class="btn btn-sm bg-neutral-5" @click="deleteFinishedEncounters">
 						<i aria-hidden="true" class="fas fa-trash-alt mr-1 red" />
 						Delete all
@@ -173,51 +178,56 @@
 						:pagination="{ rowsPerPage: 5 }"
 						wrap-cells
 					>
-						<template v-slot:body-cell="props">
-							<q-td v-if="props.col.name !== 'actions'">
-								<div class="truncate-cell">
-									<div class="truncate">
+						<template v-slot:body="props">
+							<q-tr :props="props">
+								<q-td
+									v-for="col in props.cols"
+									:key="col.name"
+									:props="props"
+									:auto-width="col.name !== 'name'"
+								>
+									<template v-if="col.name !== 'actions'">
 										<router-link
-											v-if="props.col.name === 'name' && props.row.entity_count && !overencumbered"
+											v-if="col.name === 'name' && props.row.entity_count && !overencumbered"
 											:to="`/run-encounter/${campaignId}/${props.key}`"
 										>
-											{{ props.value }}
+											{{ col.value }}
 										</router-link>
 										<template v-else>
-											{{ props.value }}
+											{{ col.value }}
 										</template>
+									</template>
+									<div v-else class="text-right d-flex justify-content-end">
+										<router-link
+											v-if="!overencumbered"
+											class="btn btn-sm bg-neutral-5"
+											:to="`/run-encounter/${campaignId}/${props.key}`"
+										>
+											<i aria-hidden="true" class="fas fa-eye"></i>
+											<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
+										</router-link>
+										<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(props.key, (hard = false))">
+											<i aria-hidden="true" class="fas fa-trash-restore-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Unfinish </q-tooltip>
+										</a>
+										<a
+											v-if="!overencumbered"
+											class="btn btn-sm bg-neutral-5 mx-1"
+											@click="reset(props.key)"
+										>
+											<i aria-hidden="true" class="fas fa-undo"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Reset </q-tooltip>
+										</a>
+										<a
+											class="btn btn-sm bg-neutral-5"
+											@click="deleteEncounter($event, props.key, props.row.name)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
+										</a>
 									</div>
-								</div>
-							</q-td>
-							<q-td v-else class="text-right d-flex justify-content-between">
-								<router-link
-									v-if="!overencumbered"
-									class="btn btn-sm bg-neutral-5"
-									:to="`/run-encounter/${campaignId}/${props.key}`"
-								>
-									<i aria-hidden="true" class="fas fa-eye"></i>
-									<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
-								</router-link>
-								<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(props.key, (hard = false))">
-									<i aria-hidden="true" class="fas fa-trash-restore-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Unfinish </q-tooltip>
-								</a>
-								<a
-									v-if="!overencumbered"
-									class="btn btn-sm bg-neutral-5 mx-1"
-									@click="reset(props.key)"
-								>
-									<i aria-hidden="true" class="fas fa-undo"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Reset </q-tooltip>
-								</a>
-								<a
-									class="btn btn-sm bg-neutral-5"
-									@click="deleteEncounter($event, props.key, props.row.name)"
-								>
-									<i aria-hidden="true" class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
-								</a>
-							</q-td>
+								</q-td>
+							</q-tr>
 						</template>
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="Encounters" />
@@ -325,6 +335,7 @@ export default {
 					field: "name",
 					sortable: true,
 					align: "left",
+					classes: "truncate-cell",
 				},
 				{
 					name: "entities",

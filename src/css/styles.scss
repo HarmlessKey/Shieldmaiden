@@ -983,9 +983,10 @@ html body {
 	}
 
 	.truncate-cell {
-		display: table;
-		table-layout: fixed;
-		width: 100%;
+		white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 1px;
 	}
 	.truncate {
 		white-space: nowrap;

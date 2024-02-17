@@ -61,38 +61,45 @@
 				
 				<template v-slot:header="props">
 					<q-tr :props="props">
-						<q-th auto-width />
 						<q-th
 							v-for="col in props.cols"
 							:key="col.name"
 							:props="props"
-						>
+							:auto-width="col.name === 'challenge_rating'"
+							>
 							{{ col.label }}
 						</q-th>
+						<q-th auto-width />
 					</q-tr>
 				</template>
 
 				<!-- Body -->
 				<template v-slot:body="props">
 					<q-tr :props="props">
-						<q-td auto-width>
-							<a  @click="props.expand = !props.expand">
-								<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
-							</a>
-						</q-td>
 						<q-td
 							v-for="col in props.cols"
 							:key="col.name"
 							:props="props"
+							:auto-width="col.name === 'challenge_rating'"
 						>
-							<div class="truncate-cell">
-								<div class="truncate">
-									<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
-										{{ col.value }}
-									</router-link>
-									<template v-else>{{ col.value }}</template>
-								</div>
-							</div>
+							<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
+								{{ col.value }}
+							</router-link>
+							<span v-else-if="col.name === 'environment'">
+								{{ col.value?.[0]?.capitalize() }}
+								<template v-if="col.value?.length > 1">
+									<span class="neutral-2">+{{ col.value.length - 1 }}</span>
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ col.value?.join(", ").capitalizeEach() }}
+									</q-tooltip>
+								</template>
+							</span>
+							<template v-else>{{ col.value }}</template>
+						</q-td>
+						<q-td auto-width>
+							<a  @click="props.expand = !props.expand" class="neutral-2">
+								<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+							</a>
 						</q-td>
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
@@ -152,34 +159,46 @@
 				},
 				columns: [
 					{
+						name: "challenge_rating",
+						label: "CR",
+						field: "challenge_rating",
+						align: "center",
+						headerStyle: "min-width: 70px;",
+						style: "font-weight: bold;",
+						sortable: true,
+						format: val => this.cr_label(val)
+					},
+					{
 						name: "name",
 						label: "Name",
 						field: "name",
 						sortable: true,
 						align: "left",
+						classes: "truncate-cell",
 						format: val => val.capitalizeEach()
-					},
-					{
-						name: "type",
-						label: "Type",
-						field: "type",
-						align: "left",
-						sortable: true
 					},
 					{
 						name: "size",
 						label: "Size",
 						field: "size",
 						align: "left",
+						classes: "truncate-cell",
 						sortable: true
 					},
 					{
-						name: "challenge_rating",
-						label: "CR",
-						field: "challenge_rating",
+						name: "type",
+						label: "Type",
+						field: "type",
 						align: "left",
-						sortable: true,
-						format: val => this.cr_label(val)
+						classes: "truncate-cell",
+						sortable: true
+					},
+					{
+						name: "environment",
+						label: "Environment",
+						field: "environment",
+						align: "left",
+						classes: "truncate-cell"
 					}
 				],
 				loading: true,
@@ -233,7 +252,7 @@
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,
-					fields: ["name", "type", "challenge_rating", "size", "url"],
+					fields: ["name", "type", "challenge_rating", "size", "environment", "url"],
 					sortBy: this.pagination.sortBy,
 					descending: this.pagination.descending
 				}).then(result => {

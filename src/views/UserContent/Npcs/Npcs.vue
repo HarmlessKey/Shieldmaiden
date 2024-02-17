@@ -49,47 +49,49 @@
 						:filter="search"
 						wrap-cells
 					>
-						<template v-slot:body-cell="props">
-							<q-td
-								v-if="props.col.name === 'avatar'"
-								class="avatar"
-								:style="avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
-							>
-								<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-monster" />
-							</q-td>
-							<q-td v-else-if="props.col.name !== 'actions'">
-								<div class="truncate-cell">
-									<div class="truncate">
+						<template v-slot:body="props">
+							<q-tr :props="props">
+								<q-td
+									v-for="col in props.cols"
+									:key="col.name"
+									:props="props"
+									:auto-width="col.name !== 'name'"
+									:style="col.name === 'avatar' && avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
+								>
+									<template v-if="col.name === 'avatar'">
+										<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-monster" />
+									</template>
+									<template v-else-if="col.name !== 'actions'">
 										<router-link
-											v-if="props.col.name === 'name'"
+											v-if="col.name === 'name'"
 											:to="`${$route.path}/${props.key}`"
 										>
-											{{ props.value }}
+											{{ col.value }}
 										</router-link>
 										<template v-else>
-											{{ props.value }}
+											{{ col.value }}
 										</template>
+									</template>
+									<div v-else class="text-right d-flex justify-content-between">
+										<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+											<i aria-hidden="true" class="fas fa-pencil" />
+											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+										</router-link>
+										<ExportUserContent
+											class="btn-sm bg-neutral-5 mx-2"
+											content-type="npc"
+											:content-id="props.key"
+										/>
+										<a
+											class="btn btn-sm bg-neutral-5"
+											@click="confirmDelete($event, props.key, props.row)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt" />
+											<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
+										</a>
 									</div>
-								</div>
-							</q-td>
-							<q-td v-else class="text-right d-flex justify-content-between">
-								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i aria-hidden="true" class="fas fa-pencil" />
-									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-								</router-link>
-								<ExportUserContent
-									class="btn-sm bg-neutral-5 mx-2"
-									content-type="npc"
-									:content-id="props.key"
-								/>
-								<a
-									class="btn btn-sm bg-neutral-5"
-									@click="confirmDelete($event, props.key, props.row)"
-								>
-									<i aria-hidden="true" class="fas fa-trash-alt" />
-									<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
-								</a>
-							</q-td>
+								</q-td>
+							</q-tr>
 						</template>
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="NPCs" />
@@ -159,6 +161,7 @@ export default {
 					label: "",
 					field: "avatar",
 					align: "left",
+					classes: "avatar",
 				},
 				{
 					name: "name",
@@ -166,6 +169,7 @@ export default {
 					field: "name",
 					sortable: true,
 					align: "left",
+					classes: "truncate-cell",
 					format: (val) => val.capitalizeEach(),
 				},
 				{
@@ -179,6 +183,7 @@ export default {
 					name: "challenge_rating",
 					label: "CR",
 					field: "challenge_rating",
+					headerStyle: "min-width: 70px;",
 					align: "left",
 					sortable: true,
 					format: (val) => this.cr(val),

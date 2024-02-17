@@ -35,6 +35,16 @@ export class monsterServices {
           queryParams.push(`size[]=${size}`);
         }
       }
+      if(query.environments && query.environments.length) {
+        for(const environment of query.environments) {
+          queryParams.push(`environment[]=${environment}`);
+        }
+      }
+      if(query.alignments && query.alignments.length) {
+        for(const alignment of query.alignments) {
+          queryParams.push(`alignment[]=${alignment}`);
+        }
+      }
       if(query.challenge_ratings) {
         let challenge_ratings = range(query.challenge_ratings.min, query.challenge_ratings.max+1);
         if(query.challenge_ratings.min === 0) {

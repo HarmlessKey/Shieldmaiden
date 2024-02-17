@@ -28,40 +28,42 @@
 					:pagination="{ rowsPerPage: 15 }"
 					wrap-cells
 				>	
-					<template v-slot:body-cell="props">
-						<q-td 
-							v-if="props.col.name === 'avatar'" 
-							class="avatar"
-							:style="props.value ? `background-image: url('${props.value}')` : ''"
-						>
-							<i aria-hidden="true" v-if="!props.value" class="hki-player" />
-						</q-td>
-						<q-td v-else-if="props.col.name !== 'actions'">
-							<div  class="truncate-cell">
-								<div class="truncate">
-									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
-										{{ props.value }}
+					<template v-slot:body="props">
+						<q-tr :props="props">
+							<q-td
+								v-for="col in props.cols"
+								:key="col.name"
+								:props="props"
+								:auto-width="col.name !== 'name'"
+								:style="col.name === 'avatar' && col.value ? `background-image: url('${col.value}')` : ''"
+							>
+								<template v-if="col.name === 'avatar'">
+									<i aria-hidden="true" v-if="!col.value" class="hki-player" />
+								</template>
+								<template v-else-if="col.name !== 'actions'">
+									<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
+										{{ col.value }}
 									</router-link>
 									<template v-else>
-										{{ props.value }}
+										{{ col.value }}
 									</template>
+								</template>
+								<div v-else class="text-right d-flex justify-content-end">
+									<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+										<i aria-hidden="true" class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Edit
+										</q-tooltip>
+									</router-link>
+									<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
+										<i aria-hidden="true" class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Delete
+										</q-tooltip>
+									</a>
 								</div>
-							</div>
-						</q-td>
-						<q-td v-else class="text-right d-flex justify-content-between">
-							<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-								<i aria-hidden="true" class="fas fa-pencil"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Edit
-								</q-tooltip>
-							</router-link>
-							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
-								<i aria-hidden="true" class="fas fa-trash-alt"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Delete
-								</q-tooltip>
-							</a>
-						</q-td>
+							</q-td>
+						</q-tr>
 					</template>
 					<div slot="no-data" />
 					<hk-loader slot="loading" name="characters" />
@@ -99,12 +101,14 @@
 						name: "avatar",
 						label: "",
 						field: "avatar",
-						align: "left"
+						align: "left",
+						classes: "avatar"
 					},
 					{
 						name: "name",
 						label: "Name",
 						field: "character_name",
+						classes: "truncate-cell",
 						sortable: true,
 						align: "left"
 					},

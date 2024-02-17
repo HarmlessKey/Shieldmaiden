@@ -11,13 +11,22 @@
 				:options="monster_types"
 			/>
 			<hk-select
+			class="mb-3"
+			label="Size"
+			v-model="filter.sizes"
+			use-chips
+			multiple
+			clearable
+			:options="monster_sizes"
+			/>
+			<hk-select
 				class="mb-3"
-				label="Size"
-				v-model="filter.sizes"
+				label="Environment"
+				v-model="filter.environments"
 				use-chips
 				multiple
 				clearable
-				:options="monster_sizes"
+				:options="monster_environments"
 			/>
 
 			<strong class="block mb-5">Challenge rating</strong>

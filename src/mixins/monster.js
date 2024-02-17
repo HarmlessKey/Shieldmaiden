@@ -43,6 +43,7 @@ export const monsterMixin = {
 				30: { proficiency: 9, xp: 155000 },
 			},
 			monster_sizes: ["Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"],
+			monster_environments: ["arctic", "coastal", "desert", "forest", "grassland", "hill", "mountain", "swamp", "underdark", "underwater", "urban"],
 			monster_subtypes: {
 				Fiend: ["Demon", "Devil", "Shapechanger"],
 				Humanoid: [

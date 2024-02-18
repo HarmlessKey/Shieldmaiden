@@ -440,12 +440,14 @@ export default {
 		async setDifficulty() {
 			this.encDifficulty = await this.difficulty(this.encounter.entities);
 			//Store the new xp value for the encounter
-			this.set_xp({
-				campaignId: this.campaignId,
-				encounterId: this.encounterId,
-				type: "calculated",
-				value: this.encDifficulty["totalXp"],
-			});
+			if (!this.demo) {
+				this.set_xp({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					type: "calculated",
+					value: this.encDifficulty["totalXp"],
+				});
+			}
 		},
 		async get_entity_data() {
 			const entities = {};

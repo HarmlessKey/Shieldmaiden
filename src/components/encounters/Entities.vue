@@ -92,53 +92,65 @@
 				:filter="searchNpc"
 				wrap-cells
 			>
-				<template v-slot:body-cell="props">
-					<q-td v-if="props.col.name !== 'actions'">
-						<div class="truncate-cell">
-							<div class="truncate">
-								<router-link v-if="props.col.name === 'name'" :to="`/content/npcs/${props.key}`">
-									{{ props.value }}
-								</router-link>
-								<template v-else>
-									{{ props.value }}
+				<template v-slot:body="props">
+					<q-tr :props="props">
+						<q-td
+							v-for="col in props.cols"
+							:key="col.name"
+							:props="props"
+							:auto-width="col.name !== 'name'"
+						>
+							<router-link v-if="col.name === 'name'" :to="`/content/npcs/${col.key}`">
+								{{ col.value }}
+							</router-link>
+							<span v-else-if="col.name === 'environment'">
+								{{ col.value?.[0]?.capitalize() }}
+								<template v-if="col.value?.length > 1">
+									<span class="neutral-2">+{{ col.value.length - 1 }}</span>
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ col.value?.join(", ").capitalizeEach() }}
+									</q-tooltip>
 								</template>
+							</span>
+							<div v-else-if="col.name === 'actions'" class="text-right d-flex justify-content-between">
+								<div class="monster-actions">
+									<q-input
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									dense
+									class="multi_nr ml-2"
+									autocomplete="off"
+									type="number"
+									min="1"
+									max="99"
+									name="name"
+									placeholder="1"
+									v-model="to_add[props.key]"
+									/>
+									<a
+									class="btn btn-sm bg-neutral-5 mx-1"
+									@click="multi_add($event, props.key, 'npc', props.row.name, true)"
+									>
+										<i aria-hidden="true" class="fas fa-plus"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add with average HP
+										</q-tooltip>
+									</a>
+									<a
+										class="btn btn-sm bg-neutral-5"
+										@click="multi_add($event, props.key, 'npc', props.row.name, true, true)"
+									>
+										<i aria-hidden="true" class="fas fa-dice-d20"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Add with rolled HP </q-tooltip>
+									</a>
+								</div>
 							</div>
-						</div>
-					</q-td>
-					<q-td v-else class="text-right d-flex justify-content-between">
-						<div class="monster-actions">
-							<q-input
-								:dark="$store.getters.theme === 'dark'"
-								filled
-								square
-								dense
-								class="multi_nr ml-2"
-								autocomplete="off"
-								type="number"
-								min="1"
-								max="99"
-								name="name"
-								placeholder="1"
-								v-model="to_add[props.key]"
-							/>
-							<a
-								class="btn btn-sm bg-neutral-5 mx-1"
-								@click="multi_add($event, props.key, 'npc', props.row.name, true)"
-							>
-								<i aria-hidden="true" class="fas fa-plus"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Add with average HP
-								</q-tooltip>
-							</a>
-							<a
-								class="btn btn-sm bg-neutral-5"
-								@click="multi_add($event, props.key, 'npc', props.row.name, true, true)"
-							>
-								<i aria-hidden="true" class="fas fa-dice-d20"></i>
-								<q-tooltip anchor="top middle" self="center middle"> Add with rolled HP </q-tooltip>
-							</a>
-						</div>
-					</q-td>
+							<template v-else>
+								{{ col.value }}
+							</template>
+						</q-td>
+					</q-tr>
 				</template>
 				<div slot="no-data" />
 				<hk-loader slot="loading" name="monsters" />
@@ -164,10 +176,15 @@
 				debounce="300"
 				clearable
 				placeholder="Search SRD monster"
-				@change="filter"
+				@change="filterMonsters"
+				@clear="filterMonsters"
 			>
 				<q-icon slot="prepend" name="search" />
-				<q-btn slot="after" no-caps color="primary" label="Search" @click="filter" />
+				<q-btn slot="after" no-caps color="primary" @click="filter_dialog = true">
+					Filter
+					<i class="fas fa-filter ml-2" aria-hidden="true" />
+					<q-badge v-if="Object.keys(filter).length" floating rounded color="red" :label="Object.keys(filter).length" />
+				</q-btn>
 			</q-input>
 			<q-table
 				:data="monsters"
@@ -190,7 +207,12 @@
 				<template v-slot:header="props">
 					<q-tr :props="props">
 						<q-th auto-width />
-						<q-th v-for="col in props.cols" :key="col.name" :props="props">
+						<q-th
+							v-for="col in props.cols"
+							:key="col.name"
+							:props="props"
+							:auto-width="col.name !== 'name'"
+						>
 							{{ col.label }}
 						</q-th>
 					</q-tr>
@@ -200,7 +222,7 @@
 				<template v-slot:body="props">
 					<q-tr :props="props">
 						<q-td auto-width>
-							<a @click="props.expand = !props.expand">
+							<a @click="props.expand = !props.expand" class="neutral-2">
 								<i
 									aria-hidden="true"
 									class="fas"
@@ -208,52 +230,55 @@
 								/>
 							</a>
 						</q-td>
-						<q-td v-for="col in props.cols" :key="col.name" :props="props">
-							<div class="truncate-cell">
-								<div class="truncate">
-									<router-link
-										v-if="col.name === 'name'"
-										:to="'/compendium/monsters/' + col.value.replace(/ /g, '-').toLowerCase()"
-									>
-										{{ col.value }}
-									</router-link>
-									<div v-else-if="col.name === 'actions'" class="monster-actions">
-										<q-input
-											:dark="$store.getters.theme === 'dark'"
-											filled
-											square
-											dense
-											class="multi_nr ml-2"
-											autocomplete="off"
-											type="number"
-											min="1"
-											max="99"
-											name="name"
-											placeholder="1"
-											v-model="to_add[props.key]"
-										/>
-										<a
-											class="btn btn-sm bg-neutral-5 mx-1"
-											@click="multi_add($event, props.key, 'npc', props.row.name, false)"
-										>
-											<i aria-hidden="true" class="fas fa-plus"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Add with average HP
-											</q-tooltip>
-										</a>
-										<a
-											class="btn btn-sm bg-neutral-5"
-											@click="multi_add($event, props.key, 'npc', props.row.name, false, true)"
-										>
-											<i aria-hidden="true" class="fas fa-dice-d20"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Add with rolled HP
-											</q-tooltip>
-										</a>
-									</div>
-									<template v-else>{{ col.value }}</template>
-								</div>
+						<q-td
+							v-for="col in props.cols" :key="col.name"
+							:props="props"
+							:auto-width="col.name !== 'name'"
+						>
+							<div v-if="col.name === 'actions'" class="monster-actions">
+								<q-input
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									dense
+									class="multi_nr ml-2"
+									autocomplete="off"
+									type="number"
+									min="1"
+									max="99"
+									name="name"
+									placeholder="1"
+									v-model="to_add[props.key]"
+								/>
+								<a
+									class="btn btn-sm bg-neutral-5 mx-1"
+									@click="multi_add($event, props.key, 'npc', props.row.name, false)"
+								>
+									<i aria-hidden="true" class="fas fa-plus"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Add with average HP
+									</q-tooltip>
+								</a>
+								<a
+									class="btn btn-sm bg-neutral-5"
+									@click="multi_add($event, props.key, 'npc', props.row.name, false, true)"
+								>
+									<i aria-hidden="true" class="fas fa-dice-d20"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Add with rolled HP
+									</q-tooltip>
+								</a>
 							</div>
+							<span v-else-if="col.name === 'environment'">
+								{{ col.value?.[0]?.capitalize() }}
+								<template v-if="col.value?.length > 1">
+									<span class="neutral-2">+{{ col.value.length - 1 }}</span>
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ col.value?.join(", ").capitalizeEach() }}
+									</q-tooltip>
+								</template>
+							</span>
+							<template v-else>{{ col.value }}</template>
 						</q-td>
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
@@ -265,6 +290,24 @@
 			</q-table>
 		</template>
 		<q-resize-observer @resize="setSize" />
+
+		<q-dialog v-model="filter_dialog">
+			<hk-card header="Filter monsters" :min-width="300">
+				<div class="card-body">
+					<hk-filter v-model="filter" type="monster" />
+				</div>
+				<div slot="footer" class="card-footer">
+					<button class="btn bg-neutral-5" @click="clearFilter">
+						<i class="fas fa-times" aria-hidden="true" />
+						Clear filter
+					</button>
+					<button class="btn ml-2" @click="setFilter">
+						<i class="fas fa-filter" aria-hidden="true" />
+						Set filter
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
 
 		<q-dialog v-model="player_dialog">
 			<div>
@@ -400,6 +443,8 @@ export default {
 			player: {},
 			drawer: this.$store.getters.getDrawer,
 			to_add: {},
+			filter_dialog: false,
+			filter: {},
 			typeFilter: [],
 			monsterFields: {
 				name: {
@@ -442,11 +487,23 @@ export default {
 			npcPaginationSetter: undefined,
 			columns: [
 				{
+					name: "challenge_rating",
+					label: "CR",
+					field: "challenge_rating",
+					align: "left",
+					headerStyle: "min-width: 70px;",
+					style: "font-weight: bold;",
+					sortable: true,
+					format: (val) => this.cr(val),
+				},
+				{
 					name: "name",
 					label: "Name",
 					field: "name",
 					sortable: true,
 					align: "left",
+					classes: "truncate-cell",
+					style: "font-weight: bold;",
 					format: (val) => val.capitalizeEach(),
 				},
 				{
@@ -457,12 +514,11 @@ export default {
 					sortable: true,
 				},
 				{
-					name: "challenge_rating",
-					label: "CR",
-					field: "challenge_rating",
+					name: "environment",
+					label: "Environment",
+					field: "environment",
+					style: "white-space: nowrap;",
 					align: "left",
-					sortable: true,
-					format: (val) => this.cr(val),
 				},
 				{
 					name: "actions",
@@ -512,11 +568,16 @@ export default {
 			},
 		},
 		visibleColumns() {
-			return this.width > 600
-				? ["name", "type", "challenge_rating", "actions"]
-				: this.width > 450
-				? ["name", "type", "actions"]
-				: ["name", "actions"];
+			switch (true) {
+				case this.width > 600:
+					return  ["challenge_rating", "name", "type", "environment", "actions"];
+				case this.width > 450:
+					return  ["challenge_rating", "name", "type", "actions"];
+				case this.width > 400:
+					return   ["challenge_rating", "name", "actions"];
+				default:
+					return ["name", "actions"];
+			}
 		},
 		addable() {
 			let count = 0;
@@ -543,15 +604,25 @@ export default {
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;
 		},
-		filter() {
+		filterMonsters() {
 			this.loading_monsters = true;
 			this.monsters = [];
 			this.pagination.page = 1;
 			this.query = {
 				search: this.searchMonster,
+				...this.filter
 			};
 			this.fetchMonsters();
 		},
+		setFilter() {
+			this.filter_dialog = false;
+			this.filterMonsters();
+		},
+		clearFilter() {
+				this.filter_dialog = false;
+				this.$set(this, "filter", {});
+				this.filterMonsters();
+			},
 		request(req) {
 			this.pagination = req.pagination;
 			this.fetchMonsters();
@@ -561,7 +632,7 @@ export default {
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,
-				fields: ["name", "type", "challenge_rating"],
+				fields: ["name", "type", "challenge_rating", "environment"],
 				sortBy: this.pagination.sortBy,
 				descending: this.pagination.descending,
 			}).then((result) => {

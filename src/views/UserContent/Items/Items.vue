@@ -43,32 +43,30 @@
 								<i aria-hidden="true" v-if="!props.value" class="hki-axe" />
 							</q-td>
 
-							<q-td v-else-if="props.col.name !== 'actions'">
-								<div class="truncate-cell">
-									<div class="truncate">
-										<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
-											{{ props.value }}
-										</router-link>
-										<template v-else>
-											{{ props.value }}
-										</template>
-									</div>
-								</div>
+							<q-td v-else-if="props.col.name !== 'actions'" class="truncate-cell">
+								<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+									{{ props.value }}
+								</router-link>
+								<template v-else>
+									{{ props.value }}
+								</template>
 							</q-td>
 
-							<q-td v-else class="text-right d-flex justify-content-between">
-								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i aria-hidden="true" class="fas fa-pencil" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Edit
-									</q-tooltip>
-								</router-link>
-								<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
-									<i aria-hidden="true" class="fas fa-trash-alt" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Delete
-									</q-tooltip>
-								</a>
+							<q-td v-else>
+								<div class="text-right d-flex justify-content-end">
+									<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+										<i aria-hidden="true" class="fas fa-pencil" />
+										<q-tooltip anchor="top middle" self="center middle">
+											Edit
+										</q-tooltip>
+									</router-link>
+									<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
+										<i aria-hidden="true" class="fas fa-trash-alt" />
+										<q-tooltip anchor="top middle" self="center middle">
+											Delete
+										</q-tooltip>
+									</a>
+								</div>
 							</q-td>
 						</template>
 						<div slot="no-data" />	
@@ -116,6 +114,7 @@
 						field: "name",
 						sortable: true,
 						align: "left",
+						classes: "truncate-cell",
 						format: val => val.capitalizeEach()
 					},
 					{

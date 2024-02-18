@@ -48,40 +48,45 @@
 						:filter="search"
 						wrap-cells
 					>
-						<template v-slot:body-cell="props">
-							<q-td v-if="props.col.name !== 'actions'">
-								<div class="truncate-cell">
-									<div class="truncate">
+						<template v-slot:body="props">
+							<q-tr :props="props">
+								<q-td
+									v-for="col in props.cols"
+									:key="col.name"
+									:props="props"
+									:auto-width="col.name !== 'name'"
+								>
+									<template v-if="col.name !== 'actions'">
 										<router-link
-											v-if="props.col.name === 'name'"
+											v-if="col.name === 'name'"
 											:to="`${$route.path}/${props.key}`"
 										>
-											{{ props.value }}
+											{{ col.value }}
 										</router-link>
 										<template v-else>
-											{{ props.value }}
+											{{ col.value }}
 										</template>
+									</template>
+									<div v-else class="d-flex justify-content-end">
+										<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+											<i aria-hidden="true" class="fas fa-pencil" />
+											<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
+										</router-link>
+										<ExportUserContent
+											class="btn-sm bg-neutral-5 mx-2"
+											content-type="spell"
+											:content-id="props.key"
+										/>
+										<button
+											class="btn btn-sm bg-neutral-5"
+											@click="confirmDelete($event, props.key, props.row)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt" />
+											<q-tooltip anchor="top middle" self="center middle">Delete</q-tooltip>
+										</button>
 									</div>
-								</div>
-							</q-td>
-							<q-td v-else class="text-right d-flex justify-content-between">
-								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i aria-hidden="true" class="fas fa-pencil" />
-									<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
-								</router-link>
-								<ExportUserContent
-									class="btn-sm bg-neutral-5 mx-2"
-									content-type="spell"
-									:content-id="props.key"
-								/>
-								<button
-									class="btn btn-sm bg-neutral-5"
-									@click="confirmDelete($event, props.key, props.row)"
-								>
-									<i aria-hidden="true" class="fas fa-trash-alt" />
-									<q-tooltip anchor="top middle" self="center middle">Delete</q-tooltip>
-								</button>
-							</q-td>
+								</q-td>
+							</q-tr>
 						</template>
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="spells" />
@@ -149,6 +154,7 @@ export default {
 					field: "name",
 					sortable: true,
 					align: "left",
+					classes: "truncate-cell",
 					format: (val) => val.capitalizeEach(),
 				},
 				{
@@ -165,6 +171,7 @@ export default {
 					field: "level",
 					sortable: true,
 					align: "left",
+					headerStyle: "min-width: 80px;",
 					format: (val) => this.spellLevel(val),
 				},
 				{
@@ -179,7 +186,6 @@ export default {
 		...mapGetters(["tier", "overencumbered"]),
 		...mapGetters("spells", ["spells"]),
 		spellIds() {
-			console.log(this.spells.map((spell) => spell.key));
 			return this.spells.map((spell) => spell.key);
 		},
 	},

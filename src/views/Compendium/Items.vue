@@ -39,51 +39,49 @@
 				
 				<template v-slot:header="props">
 					<q-tr :props="props">
-						<q-th auto-width />
 						<q-th
 							v-for="col in props.cols"
 							:key="col.name"
 							:props="props"
-						>
+							:auto-width="col.name !== 'name'"
+							>
 							{{ col.label }}
 						</q-th>
+						<q-th auto-width />
 					</q-tr>
 				</template>
 
 				<!-- Body -->
 				<template v-slot:body="props">
 					<q-tr :props="props">
-						<q-td auto-width>
-							<a  @click="props.expand = !props.expand">
-								<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
-							</a>
-						</q-td>
 						<q-td
 							v-for="col in props.cols"
 							:key="col.name"
 							:props="props"
+							:auto-width="col.name !== 'name'"
 						>
-							<div class="truncate-cell">
-								<div class="truncate">
-									<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
-										{{ col.value }}
-									</router-link>
-									<span 
-										v-else-if="col.name === 'rarity'"
-										:class="{ 
-										'white': col.value == 'common',
-										'green': col.value == 'uncommon',
-										'blue': col.value == 'rare',
-										'purple': col.value == 'very rare',
-										'orange': col.value == 'legendary',
-										'red-light': col.value == 'artifact',
-										}" 
-									>
-										{{ col.value }}
-									</span>
-									<template v-else>{{ col.value }}</template>
-								</div>
-							</div>
+							<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
+								{{ col.value }}
+							</router-link>
+							<span 
+								v-else-if="col.name === 'rarity'"
+								:class="{ 
+								'white': col.value == 'common',
+								'green': col.value == 'uncommon',
+								'blue': col.value == 'rare',
+								'purple': col.value == 'very rare',
+								'orange': col.value == 'legendary',
+								'red-light': col.value == 'artifact',
+								}" 
+							>
+								{{ col.value }}
+							</span>
+							<template v-else>{{ col.value }}</template>
+						</q-td>
+						<q-td auto-width>
+							<a  @click="props.expand = !props.expand" class="neutral-2">
+								<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+							</a>
 						</q-td>
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
@@ -125,6 +123,7 @@
 						field: "name",
 						sortable: true,
 						align: "left",
+						classes: "truncate-cell",
 						format: val => val.capitalizeEach()
 					},
 					{
@@ -132,6 +131,8 @@
 						label: "Attunement",
 						field: "requires_attunement",
 						align: "left",
+						headerStyle: "min-width: 125px;",
+						classes: "truncate-cell",
 						sortable: true
 					},
 					{

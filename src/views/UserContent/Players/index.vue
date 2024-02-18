@@ -31,90 +31,90 @@
 					:filter="search"
 					wrap-cells
 				>
-					<template v-slot:body-cell="props">
-						<q-td
-							v-if="props.col.name === 'avatar'"
-							class="avatar"
-							:style="avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
-						>
-							<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-player" />
-						</q-td>
-						<q-td v-else-if="props.col.name !== 'actions'">
-							<div class="truncate-cell">
-								<div class="truncate">
-									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
-										{{ props.value }}
+					<template v-slot:body="props">
+						<q-tr :props="props">
+							<q-td
+								v-for="col in props.cols"
+								:key="col.name"
+								:props="props"
+								:auto-width="col.name !== 'name'"
+								:style="col.name === 'avatar' && avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
+							>
+								<template v-if="col.name === 'avatar'">
+									<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-player" />
+								</template>
+								<template v-else-if="col.name !== 'actions'">
+									<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
+										{{ col.value }}
 									</router-link>
 									<template v-else>
-										{{ props.value }}
+										{{ col.value }}
 									</template>
-								</div>
-							</div>
-						</q-td>
-						<q-td v-else>
-							<div class="text-right d-flex justify-content-end">
-								<template v-if="tier.name !== 'Free' && Object.keys(sync_characters).length">
-									<button
-										v-if="
-											!props.row.sync_character || !(props.row.sync_character in sync_characters)
-										"
-										class="btn btn-sm bg-neutral-5"
-										@click="linkDialog(props.key)"
-									>
-										<i class="fas fa-link" aria-hidden="true" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Link Character to Sync with
-										</q-tooltip>
-									</button>
-									<template v-else>
-										<a
-											class="btn btn-sm bg-neutral-5"
-											:href="props.row.sync_character"
-											target="_blank"
-											rel="noopener"
-										>
-											<i class="fas fa-external-link" aria-hidden="true" />
-											<q-tooltip anchor="top middle" self="center middle">
-												Open linked character sheet
-											</q-tooltip>
-										</a>
+								</template>
+								<div v-else class="text-right d-flex justify-content-end">
+									<template v-if="tier.name !== 'Free' && Object.keys(sync_characters).length">
 										<button
-											class="btn btn-sm bg-neutral-5 ml-2"
-											@click="syncCharacter(props.key, props.row.sync_character)"
+											v-if="
+												!props.row.sync_character || !(props.row.sync_character in sync_characters)
+											"
+											class="btn btn-sm bg-neutral-5"
+											@click="linkDialog(props.key)"
 										>
-											<i
-												class="fas fa-sync-alt fade-color"
-												:class="{
-													rotate: props.key in syncing,
-													green: syncing[props.key] === 'success',
-													red: syncing[props.key] === 'error',
-												}"
-												aria-hidden="true"
-											/>
+											<i class="fas fa-link" aria-hidden="true" />
 											<q-tooltip anchor="top middle" self="center middle">
-												Update with Character Sync
+												Link Character to Sync with
 											</q-tooltip>
 										</button>
+										<template v-else>
+											<a
+												class="btn btn-sm bg-neutral-5"
+												:href="props.row.sync_character"
+												target="_blank"
+												rel="noopener"
+											>
+												<i class="fas fa-external-link" aria-hidden="true" />
+												<q-tooltip anchor="top middle" self="center middle">
+													Open linked character sheet
+												</q-tooltip>
+											</a>
+											<button
+												class="btn btn-sm bg-neutral-5 ml-2"
+												@click="syncCharacter(props.key, props.row.sync_character)"
+											>
+												<i
+													class="fas fa-sync-alt fade-color"
+													:class="{
+														rotate: props.key in syncing,
+														green: syncing[props.key] === 'success',
+														red: syncing[props.key] === 'error',
+													}"
+													aria-hidden="true"
+												/>
+												<q-tooltip anchor="top middle" self="center middle">
+													Update with Character Sync
+												</q-tooltip>
+											</button>
+										</template>
+										<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-2" />
 									</template>
-									<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-2" />
-								</template>
 
-								<router-link
-									class="btn btn-sm bg-neutral-5 mx-2"
-									:to="`${$route.path}/${props.key}`"
-								>
-									<i aria-hidden="true" class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-								</router-link>
-								<a
-									class="btn btn-sm bg-neutral-5"
-									@click="confirmDelete($event, props.key, props.row)"
-								>
-									<i aria-hidden="true" class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
-								</a>
-							</div>
-						</q-td>
+									<router-link
+										class="btn btn-sm bg-neutral-5 mx-2"
+										:to="`${$route.path}/${props.key}`"
+									>
+										<i aria-hidden="true" class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+									</router-link>
+									<a
+										class="btn btn-sm bg-neutral-5"
+										@click="confirmDelete($event, props.key, props.row)"
+									>
+										<i aria-hidden="true" class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
+									</a>
+								</div>
+							</q-td>
+						</q-tr>
 					</template>
 					<div slot="no-data" />
 					<hk-loader slot="loading" name="players" />
@@ -171,11 +171,13 @@ export default {
 					label: "",
 					field: "avatar",
 					align: "left",
+					classes: "avatar",
 				},
 				{
 					name: "name",
 					label: "Name",
 					field: "character_name",
+					classes: "truncate-cell",
 					sortable: true,
 					align: "left",
 				},

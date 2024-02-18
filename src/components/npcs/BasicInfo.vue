@@ -94,6 +94,17 @@
 					v-model="npc.alignment"
 					:options="monster_alignment"
 				/>
+				
+				<!-- ENVIRONMENT -->
+				<hk-select
+					class="mb-4"
+					label="Environment"
+					v-model="npc.environment"
+					use-chips
+					multiple
+					clearable
+					:options="monster_environments"
+				/>
 
 				<!-- SPEED -->
 				<div class="row q-col-gutter-sm">

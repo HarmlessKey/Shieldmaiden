@@ -357,6 +357,10 @@
 				</template>
 			</div>
 		</div>
+
+		<div v-if="monster.environment?.length" class="mt-3">
+			<strong>Environment:</strong> {{ monster.environment.join(", ").capitalizeEach() }}
+		</div>
 		<q-resize-observer @resize="setSize" />
 	</div>
 	<hk-loader v-else name="monster" />

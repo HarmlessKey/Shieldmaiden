@@ -568,11 +568,16 @@ export default {
 			},
 		},
 		visibleColumns() {
-			return this.width > 600
-				? ["challenge_rating", "name", "type", "environment", "actions"]
-				: this.width > 450
-				? ["challenge_rating", "name", "type", "actions"]
-				: ["challenge_rating", "name", "actions"];
+			switch (true) {
+				case this.width > 600:
+					return  ["challenge_rating", "name", "type", "environment", "actions"];
+				case this.width > 450:
+					return  ["challenge_rating", "name", "type", "actions"];
+				case this.width > 400:
+					return   ["challenge_rating", "name", "actions"];
+				default:
+					return ["name", "actions"];
+			}
 		},
 		addable() {
 			let count = 0;

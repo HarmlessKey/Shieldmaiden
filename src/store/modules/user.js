@@ -164,7 +164,7 @@ const user_actions = {
 											let tier_id = patron_tierlist[i];
 											// SMART AWAIT ASYNC CONSTRUCTION #bless Key
 											await tiers_ref.child(tier_id).once("value", (tier_snapshot) => {
-												let tier_order = tier_snapshot.val().order;
+												let tier_order = tier_snapshot.val()?.order || 0;
 												if (tier_order > highest_order) {
 													highest_order = tier_order;
 													highest_tier = tier_id;
@@ -179,15 +179,18 @@ const user_actions = {
 								//Get tier info
 								let patron_tier = db.ref(`tiers/${highest_tier}`);
 								patron_tier.on("value", (tier_snapshot) => {
+									const tier = tier_snapshot.val();
+									const tier_order = tier?.order || 0;
+									const tier_name = tier?.name || "basic";
 									//Save Patron info under UserInfo
 									user_info.patron = {
 										last_charge_status: patron_data.last_charge_status,
 										pledge_end,
-										tier: tier_snapshot.val().name,
+										tier: tier_name,
 									};
 
-									if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_time) {
-										commit("SET_TIER", tier_snapshot.val());
+									if (tier_order >= voucher_order && pledge_end >= server_time) {
+										commit("SET_TIER", tier);
 									} else {
 										commit("SET_TIER", voucher_snap.val());
 									}

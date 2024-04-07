@@ -57,7 +57,7 @@
 					{
 						source: '<i aria-hidden="true" class="fab fa-discord discord-purple"></i> On Discord',
 						text: "I'm blown away by the quality and the attention to detail that you guys had while creating it. Honestly, "+
-						"I don't think that any of the more popular options [&#8230;] ever come close to the level of quality that Harmless Key has!",
+						"I don't think that any of the more popular options [&#8230;] ever come close to the level of quality that Shieldmaiden has!",
 						link: "https://discord.com/channels/654675574488563714/654695745156284472/857324784127180810",
 						date: "23 June 2021"
 					},
@@ -101,7 +101,7 @@
 					},
 					{
 						source: '<i aria-hidden="true" class="fas fa-envelope blue"></i> In a private message',
-						text: "I cannot tell you how much Harmless Key has helped me focus on "+
+						text: "I cannot tell you how much Shieldmaiden has helped me focus on "+
 							"story and content and less on encounter logistics planning. "+
 							"My players LOVE when I share the damage leaderboards after combat.",
 						date: "7 January 2020"

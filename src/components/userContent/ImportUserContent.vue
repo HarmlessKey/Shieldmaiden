@@ -2,7 +2,7 @@
 	<div>
 		<template v-if="import_state === 'start'">
 			<p>
-				Import Harmless Key Content.<br />
+				Import Shieldmaiden Content.<br />
 				<small><em>Content from other sources can't be imported</em></small>
 			</p>
 			<q-file

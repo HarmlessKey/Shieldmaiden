@@ -3,7 +3,7 @@
 		<div class="top">
 			<div class="content">
 				<div class="logo-container">
-					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
+					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden logo" />
 				</div>
 
 				<div class="links">
@@ -100,7 +100,7 @@
 					<router-link to="/privacy-policy">Privacy Policy</router-link>
 				</small>
 				<small>
-					©{{ year }} Harmless Key | All Rights Reserved<br />
+					©{{ year }} Shieldmaiden | All Rights Reserved<br />
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are
 					property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{
 						year

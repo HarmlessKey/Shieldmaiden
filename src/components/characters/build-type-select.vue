@@ -12,7 +12,7 @@
       </hk-card>
       <hk-card class="disabled" header="Simple" :class="{ active: build === 'simple' }">
         <div class="card-body">
-          Create a character with only basic stats needed for use in Harmless Key. 
+          Create a character with only basic stats needed for use in Shieldmaiden. 
           This can't be used as a full character reference in your games, 
           but just works for our combat tracker.
         </div>

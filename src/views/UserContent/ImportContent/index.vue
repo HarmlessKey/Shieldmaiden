@@ -1,8 +1,8 @@
 <template>
 	<div class="d-flex justify-center">
-		<hk-card header="Harmless Key">
+		<hk-card header="Shieldmaiden">
 			<div class="card-body">
-				<p>Import a Harmless Key export</p>
+				<p>Import a Shieldmaiden export</p>
 			</div>
 			<div slot="footer">
 				<router-link to="/content/import/hk_import" class="btn btn-block">Select</router-link>

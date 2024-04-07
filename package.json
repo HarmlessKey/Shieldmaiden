@@ -1,8 +1,8 @@
 {
 	"version": "2.22.2",
-	"name": "harmless_key",
+	"name": "shieldmaiden",
 	"description": "A Dungeons and Dragons Combat Tracker",
-	"productName": "Harmless Key",
+	"productName": "Shieldmaiden",
 	"private": true,
 	"scripts": {
 		"serve": "quasar dev",

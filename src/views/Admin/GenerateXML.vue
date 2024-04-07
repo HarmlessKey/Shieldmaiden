@@ -19,32 +19,32 @@ export default {
 	data() {
 		return {
 			routes: [
-				"https://harmlesskey.com",
-				"https://harmlesskey.com/demo",
-				"https://harmlesskey.com/documentation",
-				"https://harmlesskey.com/about-us",
-				"https://harmlesskey.com/sign-up",
-				"https://harmlesskey.com/sign-in",
-				"https://harmlesskey.com/privacy-policy",
-				"https://harmlesskey.com/changelog",
-				"https://harmlesskey.com/feedback",
-				"https://harmlesskey.com/patreon",
-				"https://harmlesskey.com/compendium",
-				"https://harmlesskey.com/compendium/conditions",
-				"https://harmlesskey.com/compendium/monsters",
-				"https://harmlesskey.com/compendium/spells",
-				"https://harmlesskey.com/compendium/items",
-				"https://harmlesskey.com/compendium/rules",
-				"https://harmlesskey.com/tools",
-				"https://harmlesskey.com/tools/combat-tracker",
-				"https://harmlesskey.com/tools/encounter-builder",
-				"https://harmlesskey.com/tools/encounter-builder/build-encounter",
-				"https://harmlesskey.com/tools/monster-creator",
-				"https://harmlesskey.com/tools/monster-creator/create-monster",
-				"https://harmlesskey.com/tools/spell-creator",
-				"https://harmlesskey.com/tools/spell-creator/create-spell",
-				"https://harmlesskey.com/tools/character-builder",
-				"https://harmlesskey.com/tools/dm-screen",
+				"https://shieldmaiden.app",
+				"https://shieldmaiden.app/demo",
+				"https://shieldmaiden.app/documentation",
+				"https://shieldmaiden.app/about-us",
+				"https://shieldmaiden.app/sign-up",
+				"https://shieldmaiden.app/sign-in",
+				"https://shieldmaiden.app/privacy-policy",
+				"https://shieldmaiden.app/changelog",
+				"https://shieldmaiden.app/feedback",
+				"https://shieldmaiden.app/patreon",
+				"https://shieldmaiden.app/compendium",
+				"https://shieldmaiden.app/compendium/conditions",
+				"https://shieldmaiden.app/compendium/monsters",
+				"https://shieldmaiden.app/compendium/spells",
+				"https://shieldmaiden.app/compendium/items",
+				"https://shieldmaiden.app/compendium/rules",
+				"https://shieldmaiden.app/tools",
+				"https://shieldmaiden.app/tools/combat-tracker",
+				"https://shieldmaiden.app/tools/encounter-builder",
+				"https://shieldmaiden.app/tools/encounter-builder/build-encounter",
+				"https://shieldmaiden.app/tools/monster-creator",
+				"https://shieldmaiden.app/tools/monster-creator/create-monster",
+				"https://shieldmaiden.app/tools/spell-creator",
+				"https://shieldmaiden.app/tools/spell-creator/create-spell",
+				"https://shieldmaiden.app/tools/character-builder",
+				"https://shieldmaiden.app/tools/dm-screen",
 			],
 		};
 	},
@@ -93,7 +93,7 @@ export default {
 
 				//Add loc element
 				let loc = xmlDoc.createElement("loc");
-				let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/rules/${rule.url}`);
+				let url = xmlDoc.createTextNode(`https://shieldmaiden.app/compendium/rules/${rule.url}`);
 				loc.appendChild(url);
 				urlElement.appendChild(loc);
 
@@ -120,7 +120,7 @@ export default {
 				//Add loc element
 				let loc = xmlDoc.createElement("loc");
 				let url = xmlDoc.createTextNode(
-					`https://harmlesskey.com/compendium/conditions/${condition.url}`
+					`https://shieldmaiden.app/compendium/conditions/${condition.url}`
 				);
 				loc.appendChild(url);
 				urlElement.appendChild(loc);
@@ -147,7 +147,7 @@ export default {
 
 				//Add loc element
 				let loc = xmlDoc.createElement("loc");
-				let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/items/${item.url}`);
+				let url = xmlDoc.createTextNode(`https://shieldmaiden.app/compendium/items/${item.url}`);
 				loc.appendChild(url);
 				urlElement.appendChild(loc);
 
@@ -174,7 +174,7 @@ export default {
 				//Add loc element
 				let loc = xmlDoc.createElement("loc");
 				let url = xmlDoc.createTextNode(
-					`https://harmlesskey.com/compendium/monsters/${monster.url}`
+					`https://shieldmaiden.app/compendium/monsters/${monster.url}`
 				);
 				loc.appendChild(url);
 				urlElement.appendChild(loc);
@@ -201,7 +201,7 @@ export default {
 
 				//Add loc element
 				let loc = xmlDoc.createElement("loc");
-				let url = xmlDoc.createTextNode(`https://harmlesskey.com/compendium/spells/${spell.url}`);
+				let url = xmlDoc.createTextNode(`https://shieldmaiden.app/compendium/spells/${spell.url}`);
 				loc.appendChild(url);
 				urlElement.appendChild(loc);
 

@@ -68,7 +68,7 @@ export default {
 	data() {
 		return {
 			tools: [{
-				title: "D&D Tools by Harmless Key",
+				title: "D&D Tools by Shieldmaiden",
 				tools: {
 					"combat-tracker": {
 						title: "Combat Tracker",
@@ -111,7 +111,7 @@ export default {
 					},
 					"character-sync": {
 						title: "Character Sync",
-						description: "Access your characters from external resources and sync them with Harmless Key.",
+						description: "Access your characters from external resources and sync them with Shieldmaiden.",
 						image: "character-sync.png",
 						url: "/tools/character-sync",
 						icon: "fas fa-sync-alt",

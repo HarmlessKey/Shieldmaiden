@@ -92,7 +92,7 @@ export default {
 				name: "description",
 				content:
 					this.$route.meta.description ||
-					"Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"Shieldmaiden, a combat tracker for D&D 5e. The online tool, for offline play.",
 			},
 
 			// TWITTER
@@ -102,17 +102,17 @@ export default {
 			},
 			twitterTitle: {
 				name: "twitter:title",
-				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key",
+				content: this.$route.meta.title || "D&D Combat Tracker | Shieldmaiden",
 			},
 			twitterDescription: {
 				name: "twitter:description",
 				content:
 					this.$route.meta.description ||
-					"Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"Shieldmaiden, a combat tracker for D&D 5e. The online tool, for offline play.",
 			},
 			twitterImage: {
 				name: "twitter:image",
-				content: "https://harmlesskey.com/harmless_key_logo_full.png",
+				content: "https://shieldmaiden.app/harmless_key_logo_full.png",
 			},
 			twitterSite: {
 				name: "twitter:site",
@@ -122,17 +122,17 @@ export default {
 			// OG
 			ogTitle: {
 				property: "og:title",
-				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key",
+				content: this.$route.meta.title || "D&D Combat Tracker | Shieldmaiden",
 			},
 			ogDescription: {
 				property: "og:description",
 				content:
 					this.$route.meta.description ||
-					"Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"Shieldmaiden, a combat tracker for D&D 5e. The online tool, for offline play.",
 			},
 			ogSiteName: {
 				property: "og:site_name",
-				content: "Harmless Key",
+				content: "Shieldmaiden",
 			},
 			ogType: {
 				property: "og:type",
@@ -140,11 +140,11 @@ export default {
 			},
 			ogUrl: {
 				property: "og:url",
-				content: `https://harmlesskey.com${this.$route.path}`,
+				content: `https://shieldmaiden.app${this.$route.path}`,
 			},
 			ogImage: {
 				property: "og:image",
-				content: `https://harmlesskey.com/linkedin.png`,
+				content: `https://shieldmaiden.app/linkedin.png`,
 			},
 			ogImageType: {
 				property: "og:image:type",
@@ -152,7 +152,7 @@ export default {
 			},
 			ogImageAlt: {
 				property: "og:image:alt",
-				content: "Harmless Key Logo",
+				content: "Shieldmaiden Logo",
 			},
 		};
 
@@ -166,11 +166,11 @@ export default {
 
 		return {
 			title: this.$route.meta.title || "D&D Combat Tracker",
-			titleTemplate: (title) => `${title} | Harmless Key`,
+			titleTemplate: (title) => `${title} | Shieldmaiden`,
 			link: {
 				canonical: {
 					rel: "canonical",
-					href: `https://harmlesskey.com${this.$route.path}`,
+					href: `https://shieldmaiden.app${this.$route.path}`,
 				},
 			},
 			meta: meta,

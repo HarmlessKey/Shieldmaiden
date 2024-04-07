@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"title": "Harmless Key NPC",
-	"description": "JSON Schema for importing Harmless Key NPCs",
+	"title": "Shieldmaiden NPC",
+	"description": "JSON Schema for importing Shieldmaiden NPCs",
 	"additionalProperties": false,
 	"type": "object",
 	"properties": {
@@ -145,7 +145,7 @@
 		},
 		"player_id": {
 			"title": "Player id",
-			"description": "When you give a player a character a companion and that player is controlled by another Harmless Key user, the player_id is saved on the NPC, so the user can edit this NPC.",
+			"description": "When you give a player a character a companion and that player is controlled by another Shieldmaiden user, the player_id is saved on the NPC, so the user can edit this NPC.",
 			"type": "string",
 			"maxLength": 50
 		},

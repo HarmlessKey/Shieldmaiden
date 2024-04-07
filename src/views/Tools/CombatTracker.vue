@@ -5,22 +5,22 @@
 		</template>
 
 		<p>
-			Harmless Key is probably the most advanced combat tracker for Dungeons & Dragons. Designed
+			Shieldmaiden is probably the most advanced combat tracker for Dungeons & Dragons. Designed
 			specifically for in-person play, our tools can be of some use to almost any dungeon master.
 		</p>
 		<p>
 			Of course basic stats basic stats, like initiative and hit points are tracked, but one of the
-			key features that sets Harmless Key apart, is the tracking of important details like bonuses
+			key features that sets Shieldmaiden apart, is the tracking of important details like bonuses
 			and setting reminders. With just a few clicks, you can add or remove combatants, track damage,
 			and manage other aspects of the battle. This saves time and ensures that combat encounters run
 			smoothly and efficiently and you have time to focus more on what's really important in your
 			games.
 		</p>
 		<p>
-			Overall, Harmless Key is a versatile tool that can enhance your Dungeons & Dragons gameplay
+			Overall, Shieldmaiden is a versatile tool that can enhance your Dungeons & Dragons gameplay
 			experience in numerous ways. Whether you're a dungeon master looking to streamline combat
 			encounters and focus on the action and adventure of your game, or a player who wants to stay
-			on top of the battle and make informed decisions, Harmless Key has the features you need to
+			on top of the battle and make informed decisions, Shieldmaiden has the features you need to
 			take your game to the next level.
 		</p>
 
@@ -28,7 +28,7 @@
 		<q-img
 			class="mb-3"
 			src="~assets/_img/tools/combat-tracker/combat-tracker.png"
-			alt="Harmless Key Combat Tracker"
+			alt="Shieldmaiden Combat Tracker"
 			fit="contain"
 		/>
 
@@ -60,7 +60,7 @@
 		<q-img
 			class="mb-3"
 			src="~assets/_img/tools/combat-tracker/live-initiative.png"
-			alt="Harmless Key Live Initiative Tracker"
+			alt="Shieldmaiden Live Initiative Tracker"
 			fit="contain"
 		/>
 

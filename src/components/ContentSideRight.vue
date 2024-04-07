@@ -12,7 +12,7 @@
 			<div class="card-body text-center">
 				<p>
 					Sync your player's character sheets from other resources in
-					<span class="whitespace-nowrap">Harmless Key</span
+					<span class="whitespace-nowrap">Shieldmaiden</span
 					><span v-if="tier.name === 'Free'" class="neutral-3"> *</span>.
 				</p>
 
@@ -32,7 +32,7 @@
 				v-if="tier.name === 'Free'"
 				slot="footer"
 				class="card-footer justify-content-start neutral-3"
-				>* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key
+				>* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Shieldmaiden
 				required.</small
 			>
 		</hk-card>
@@ -58,7 +58,7 @@
 		<!-- CAMPAIGNS -->
 		<hk-card v-if="$route.path === '/content/campaigns'">
 			<div slot="header" class="card-header">
-				<a :href="`https://harmlesskey.com/user/${userId}`" target="_blank" class="neutral-1">
+				<a :href="`https://shieldmaiden.app/user/${userId}`" target="_blank" class="neutral-1">
 					Share initiative
 					<i class="fas fa-external-link blue-light" aria-hidden="true" />
 				</a>

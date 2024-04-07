@@ -80,7 +80,7 @@ export default {
 
 						const roll = Math.floor(Math.random() * 6 + 15);
 						console.log(
-							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
+							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Shieldmaiden successful.`,
 							"color: #83b547;"
 						);
 
@@ -89,7 +89,7 @@ export default {
 					.catch((error) => {
 						const roll = Math.floor(Math.random() * 15);
 						console.log(
-							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key failed.`,
+							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Shieldmaiden failed.`,
 							"color: #cc3e4a;"
 						);
 						console.error(error);

@@ -112,7 +112,7 @@ export default {
 			},
 			twitterImage: {
 				name: "twitter:image",
-				content: "https://shieldmaiden.app/harmless_key_logo_full.png",
+				content: "https://shieldmaiden.app/shieldmaiden_logo_full.png",
 			},
 			twitterSite: {
 				name: "twitter:site",

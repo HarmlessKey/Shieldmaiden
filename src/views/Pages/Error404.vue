@@ -4,7 +4,7 @@
 			<div class="die">
 				<img
 					src="../../assets/_img/logo/logo-icon-no-shield-red.svg"
-					alt="Harmless Key logo icon"
+					alt="Shieldmaiden logo icon"
 				/>
 				<span>404</span>
 			</div>

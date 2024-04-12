@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3>Harmless Key Backgrounds</h3>
+		<h3>Shieldmaiden Backgrounds</h3>
 		<q-img 
 			v-for="{ name, value } in background_list" 
 			:key="value" 

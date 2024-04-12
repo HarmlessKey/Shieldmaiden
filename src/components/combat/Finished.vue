@@ -5,21 +5,21 @@
 			<q-slide-transition v-if="!tier || tier.name === 'Free'">
 				<a
 					v-show="patreon"
-					href="https://www.patreon.com/join/harmlesskey"
+					href="https://www.patreon.com/join/shieldmaidenapp"
 					target="_blank"
 					rel="noopener"
 					class="neutral-1"
 				>
 					<q-banner rounded inline-actions class="bg-neutral-8 mb-3">
 						<q-icon slot="avatar" name="fab fa-patreon patreon-red" />
-						Enjoying Harmless Key? <b>Please support us on Patreon.</b>
+						Enjoying Shieldmaiden? <b>Please support us on Patreon.</b>
 						<template slot="action">
 							<q-btn
 								color="patreon-red"
 								no-caps
 								label="Support"
 								target="_blank"
-								href="https://www.patreon.com/join/harmlesskey"
+								href="https://www.patreon.com/join/shieldmaidenapp"
 							/>
 							<q-btn
 								flat

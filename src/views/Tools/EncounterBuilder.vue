@@ -52,7 +52,7 @@
 				muted
 				autoplay
 				playsinline
-				alt="Harmless Key logo animation"
+				alt="Shieldmaiden logo animation"
 				loop
 			/>
 		</section>

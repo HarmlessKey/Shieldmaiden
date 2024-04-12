@@ -2,11 +2,11 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<hk-video />
+				<img class="logo mb-2" src="../../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden logo" />
 				<div class="content-box">
 					<div class="text" v-if="!maintenance">
 						<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
-						<h3>The online tool for offline play.</h3>
+						<h3>The perfect companion in your D&D campaign</h3>
 
 						<div class="button-container">
 							<div v-if="!$store.getters.user">
@@ -20,7 +20,7 @@
 						
 						<!-- PATREON -->
 						<div>
-							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red btn btn-lg btn-clear">
+							<a href="https://www.patreon.com/join/shieldmaidenapp" target="_blank" rel="noopener" class="patreon-red btn btn-lg btn-clear">
 								<i aria-hidden="true" class="fab fa-patreon"></i> Support us on Patreon
 							</a>
 						</div>
@@ -37,7 +37,6 @@
 </template>
 
 <script>
-	import HkVideo from "src/components/hk-components/hk-video";
 	import FlipCountdown from 'vue2-flip-countdown';
 
 	export default {
@@ -46,7 +45,6 @@
 			maintenance: [Boolean, String]
 		},
 		components: {
-			HkVideo,
 			FlipCountdown
 		}
 	}
@@ -57,7 +55,6 @@
 		background-image: url('../../assets/_img/styles/paper-bg.png');
 		background-position: top center;
 		padding: 0 0 75px 0;
-		min-height: calc(100vh - 50px - 55px);
 		background-color: $neutral-11;
 		overflow: hidden;
 		

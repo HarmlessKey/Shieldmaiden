@@ -162,7 +162,7 @@
 										</button>
 										<small class="neutral-3">
 											<router-link to="/patreon" class="mx-1">Subscription</router-link> for
-											Harmless Key required.
+											Shieldmaiden required.
 										</small>
 									</template>
 								</template>

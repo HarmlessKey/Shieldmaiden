@@ -6,13 +6,13 @@
 			</div>
 			<div class="card-body">
 				<p>
-					Harmless Key is created by two experienced Dungeons & Dragons players from Amsterdam. 
+					Shieldmaiden is created by two experienced Dungeons & Dragons players from Amsterdam. 
 					We were missing an encounter tracker that tended to all our needs, so we decided to build one ourselves.<br/> 
 					After some positive feedback from our fellow D&D players, we decided to share it with the public in Februari 2019.<br/>
 					Since then we've been improving and expending a lot and this is still going on.
 				</p>
 				<h3 class="mb-5">
-					We hope you get as much use out of Harmless Key as we do.
+					We hope you get as much use out of Shieldmaiden as we do.
 				</h3>
 				<h2 class="written">Meet the team</h2>
 				<hk-card-deck class="mb-3">

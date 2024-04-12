@@ -3,7 +3,7 @@
 		<div class="top">
 			<div class="content">
 				<div class="logo-container">
-					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
+					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden logo" />
 				</div>
 
 				<div class="links">
@@ -22,7 +22,7 @@
 						<h2 class="neutral-2">Follow us</h2>
 						<ul>
 							<li>
-								<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.patreon.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Patreon</a
 								>
 							</li>
@@ -30,21 +30,16 @@
 								<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a>
 							</li>
 							<li>
-								<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.instagram.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Instagram</a
 								>
 							</li>
 							<li>
-								<a href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">Twitter</a>
+								<a href="https://twitter.com/shieldmaidenapp" target="_blank" rel="noopener">Twitter</a>
 							</li>
 							<li>
-								<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.facebook.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Facebook</a
-								>
-							</li>
-							<li>
-								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener"
-									>Reddit</a
 								>
 							</li>
 						</ul>
@@ -100,7 +95,7 @@
 					<router-link to="/privacy-policy">Privacy Policy</router-link>
 				</small>
 				<small>
-					©{{ year }} Harmless Key | All Rights Reserved<br />
+					©{{ year }} Shieldmaiden | All Rights Reserved<br />
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are
 					property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{
 						year

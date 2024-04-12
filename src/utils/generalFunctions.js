@@ -58,7 +58,7 @@ export function calc_skill_mod(
 export function downloadJSON(data) {
 	let filename;
 	if (data instanceof Array) {
-		filename = "harmlesskey_npcs.json";
+		filename = "shieldmaiden_npcs.json";
 	} else {
 		filename = data.name.trim() + ".json";
 	}

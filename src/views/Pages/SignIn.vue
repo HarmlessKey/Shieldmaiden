@@ -1,8 +1,8 @@
 <template>
 	<div class="login-container">
 		<div id="login">
-			<img class="logo" src="../../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key" />
-			<h2>Sign in</h2>
+			<img class="logo" src="../../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden" />
+			<h2 class="mt-3">Sign in</h2>
 			<p v-if="error" class="red">
 				<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}
 			</p>

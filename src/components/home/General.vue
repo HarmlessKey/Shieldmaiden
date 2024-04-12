@@ -14,7 +14,7 @@
 				<div class="col-12 col-md-8">
 					<video 
 						class="video" src="~assets/_img/home/multitargeting.mp4" 
-						muted autoplay playsinline alt="Initiative tracker Harmless Key multitargeting demo" loop
+						muted autoplay playsinline alt="Initiative tracker Shieldmaiden multitargeting demo" loop
 					/>
 				</div>
 				<div class="col-12 col-md-4">			

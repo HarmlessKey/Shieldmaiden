@@ -2,6 +2,7 @@
 	<div class="content-side">
 		<Tutorial v-if="show_tutorial" vertical />
 
+
 		<hk-card v-if="$route.path.startsWith('/content/players')">
 			<div class="card-header" slot="header">
 				<span>
@@ -12,7 +13,7 @@
 			<div class="card-body text-center">
 				<p>
 					Sync your player's character sheets from other resources in
-					<span class="whitespace-nowrap">Harmless Key</span
+					<span class="whitespace-nowrap">Shieldmaiden</span
 					><span v-if="tier.name === 'Free'" class="neutral-3"> *</span>.
 				</p>
 
@@ -32,13 +33,9 @@
 				v-if="tier.name === 'Free'"
 				slot="footer"
 				class="card-footer justify-content-start neutral-3"
-				>* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Harmless Key
+				>* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Shieldmaiden
 				required.</small
 			>
-		</hk-card>
-
-		<hk-card v-if="$route.path === '/content'" class="bg-neutral-9 overflow-hidden">
-			<hk-video />
 		</hk-card>
 
 		<!-- COMPENDIUM -->
@@ -47,7 +44,7 @@
 				<h2><i aria-hidden="true" class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
 			</div>
 			<div class="card-body overflow-x-hidden">
-				<hk-video />
+				<img class="logo full-width" src="../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden" />
 				<p class="neutral-2 mt-3 text-center">
 					Try the most advanced initiative tracker on the internet.
 				</p>
@@ -58,7 +55,7 @@
 		<!-- CAMPAIGNS -->
 		<hk-card v-if="$route.path === '/content/campaigns'">
 			<div slot="header" class="card-header">
-				<a :href="`https://harmlesskey.com/user/${userId}`" target="_blank" class="neutral-1">
+				<a :href="`https://shieldmaiden.app/user/${userId}`" target="_blank" class="neutral-1">
 					Share initiative
 					<i class="fas fa-external-link blue-light" aria-hidden="true" />
 				</a>
@@ -68,6 +65,35 @@
 			</div>
 			<div class="card-body">
 				<PlayerLink :qr="false" :title="false" :info="false" />
+			</div>
+		</hk-card>
+
+		<!-- SUBSCRIPTION -->
+		<hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
+			<div slot="header" class="card-header">
+				Subscription
+				<hk-popover
+					v-if="pending_payment"
+					header="Pending"
+					content="Your Patreon payment is pending, this might take a few minutes."
+				>
+					Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
+				</hk-popover>
+				<strong v-else>{{ tier.name }}</strong>
+			</div>
+			<q-linear-progress
+				v-if="tier.name !== 'Deity'"
+				:value="slots_used.used_slots / slots_used.available_slots"
+				color="neutral-4"
+				track-color="neutral-11"
+			/>
+			<div>
+				<Tier />
+			</div>
+			<div slot="footer" v-if="tier.name !== 'Deity'">
+				<router-link to="/patreon" class="btn btn-block btn-square bg-patreon-red">
+					Upgrade
+				</router-link>
 			</div>
 		</hk-card>
 
@@ -125,35 +151,6 @@
 				</div>
 			</div>
 		</hk-card>
-
-		<!-- SUBSCRIPTION -->
-		<hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
-			<div slot="header" class="card-header">
-				Subscription
-				<hk-popover
-					v-if="pending_payment"
-					header="Pending"
-					content="Your Patreon payment is pending, this might take a few minutes."
-				>
-					Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
-				</hk-popover>
-				<strong v-else>{{ tier.name }}</strong>
-			</div>
-			<q-linear-progress
-				v-if="tier.name !== 'Deity'"
-				:value="slots_used.used_slots / slots_used.available_slots"
-				color="neutral-4"
-				track-color="neutral-11"
-			/>
-			<div>
-				<Tier />
-			</div>
-			<div slot="footer" v-if="tier.name !== 'Deity'">
-				<router-link to="/patreon" class="btn btn-block btn-square bg-patreon-red">
-					Upgrade
-				</router-link>
-			</div>
-		</hk-card>
 		<q-resize-observer @resize="setWidth" />
 	</div>
 </template>
@@ -169,7 +166,6 @@ export default {
 	},
 	components: {
 		PlayerLink: () => import("src/components/PlayerLink"),
-		HkVideo: () => import("src/components/hk-components/hk-video"),
 		Tier: () => import("src/components/userContent/Tier"),
 		Tutorial: () => import("src/components/userContent/Tutorial.vue"),
 	},
@@ -182,28 +178,23 @@ export default {
 				{
 					name: "Patreon",
 					icon: "fab fa-patreon patreon-red",
-					url: "https://www.patreon.com/harmlesskey",
+					url: "https://www.patreon.com/shieldmaidenapp",
 				},
 				{
 					name: "Instagram",
 					icon: "fab fa-instagram",
-					url: "https://www.instagram.com/harmlesskey",
+					url: "https://www.instagram.com/shieldmaidenapp",
 				},
 				{
 					name: "Twitter",
 					icon: "fab fa-twitter",
-					url: "https://twitter.com/KeyHarmless",
+					url: "https://twitter.com/shieldmaidenapp",
 				},
 				{
 					name: "Facebook",
 					icon: "fab fa-facebook-f",
-					url: "https://www.facebook.com/harmlesskey",
-				},
-				{
-					name: "Reddit",
-					icon: "fab fa-reddit-alien",
-					url: "https://www.reddit.com/r/HarmlessKey",
-				},
+					url: "https://www.facebook.com/shieldmaidenapp",
+				}
 			],
 		};
 	},

@@ -102,7 +102,7 @@
 					</div>
 					<div slot="footer" v-if="t.price != 'Free'">
 						<a
-							:href="'https://www.patreon.com/join/harmlesskey/checkout?rid=' + t['.key']"
+							:href="'https://www.patreon.com/join/shieldmaidenapp/checkout?rid=' + t['.key']"
 							target="_blank"
 							rel="noopener"
 							class="btn btn-block btn-square bg-patreon-red"

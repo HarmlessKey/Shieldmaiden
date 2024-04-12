@@ -20,7 +20,7 @@
 						
 						<!-- PATREON -->
 						<div>
-							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red btn btn-lg btn-clear">
+							<a href="https://www.patreon.com/join/shieldmaidenapp" target="_blank" rel="noopener" class="patreon-red btn btn-lg btn-clear">
 								<i aria-hidden="true" class="fab fa-patreon"></i> Support us on Patreon
 							</a>
 						</div>

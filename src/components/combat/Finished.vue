@@ -5,7 +5,7 @@
 			<q-slide-transition v-if="!tier || tier.name === 'Free'">
 				<a
 					v-show="patreon"
-					href="https://www.patreon.com/join/harmlesskey"
+					href="https://www.patreon.com/join/shieldmaidenapp"
 					target="_blank"
 					rel="noopener"
 					class="neutral-1"
@@ -19,7 +19,7 @@
 								no-caps
 								label="Support"
 								target="_blank"
-								href="https://www.patreon.com/join/harmlesskey"
+								href="https://www.patreon.com/join/shieldmaidenapp"
 							/>
 							<q-btn
 								flat

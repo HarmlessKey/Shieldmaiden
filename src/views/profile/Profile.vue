@@ -38,7 +38,7 @@
 								<div v-if="!valid(userInfo.patron.pledge_end)">
 									<p>Your subscription <strong class="red">expired</strong></p>
 									<a
-										href="https://www.patreon.com/join/harmlesskey"
+										href="https://www.patreon.com/join/shieldmaidenapp"
 										target="_blank"
 										class="btn bg-neutral-5"
 										rel="noopener"
@@ -48,7 +48,7 @@
 								</div>
 								<small v-else
 									><a
-										href="https://www.patreon.com/join/harmlesskey/checkout?edit=1"
+										href="https://www.patreon.com/join/shieldmaidenapp/checkout?edit=1"
 										target="_blank"
 										rel="noopener"
 										>Cancel subscription</a

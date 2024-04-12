@@ -61,7 +61,7 @@ export default {
 			const response = await octokit
 				.request("GET /repos/{owner}/{repo}/releases", {
 					owner: "HarmlessKey",
-					repo: "HarmlessKey",
+					repo: "Shieldmaiden",
 				})
 				.catch((e) => {
 					console.log(e);

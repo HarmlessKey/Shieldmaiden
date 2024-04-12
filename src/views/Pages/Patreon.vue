@@ -5,7 +5,7 @@
 				<h1 class="text-center">Get a Shieldmaiden subscription</h1>
 				<p class="text-center">
 					We use Patreon for our subscriptions. Once you make a choice, 
-					you will be redirected to <a class="patreon-red" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">Patreon</a> to finish payment.<br/>
+					you will be redirected to <a class="patreon-red" href="https://www.patreon.com/shieldmaidenapp" target="_blank" rel="noopener">Patreon</a> to finish payment.<br/>
 				</p>
 				<Tiers class="mb-4" />
 				<hk-card header="Why do you have to pay?">
@@ -27,7 +27,7 @@
 							This way you can help us in achieving this goal and benefit from the extra's that come with it.
 						</p>
 
-						<a class="btn bg-patreon-red btn-block" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">
+						<a class="btn bg-patreon-red btn-block" href="https://www.patreon.com/shieldmaidenapp" target="_blank" rel="noopener">
 							<i aria-hidden="true" class="fab fa-patreon black"></i> Support us
 						</a>
 					</div>

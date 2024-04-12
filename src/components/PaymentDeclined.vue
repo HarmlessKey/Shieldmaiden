@@ -7,7 +7,7 @@
 			on <strong>{{ makeDate(userInfo.patron.pledge_end) }}</strong
 			>.<br />
 			Go to
-			<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener"
+			<a href="https://www.patreon.com/join/shieldmaidenapp" target="_blank" rel="noopener"
 				>patreon.com</a
 			>
 			to check your payment details.

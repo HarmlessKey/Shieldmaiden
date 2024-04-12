@@ -22,7 +22,7 @@
 						<h2 class="neutral-2">Follow us</h2>
 						<ul>
 							<li>
-								<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.patreon.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Patreon</a
 								>
 							</li>
@@ -30,21 +30,16 @@
 								<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a>
 							</li>
 							<li>
-								<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.instagram.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Instagram</a
 								>
 							</li>
 							<li>
-								<a href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">Twitter</a>
+								<a href="https://twitter.com/shieldmaidenapp" target="_blank" rel="noopener">Twitter</a>
 							</li>
 							<li>
-								<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.facebook.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Facebook</a
-								>
-							</li>
-							<li>
-								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener"
-									>Reddit</a
 								>
 							</li>
 						</ul>

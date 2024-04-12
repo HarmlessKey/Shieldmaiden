@@ -337,7 +337,7 @@ export default {
 				{
 					name: "Patreon",
 					icon: "fab fa-patreon patreon-red",
-					url: "https://www.patreon.com/harmlesskey",
+					url: "https://www.patreon.com/shieldmaidenapp",
 				},
 				{
 					name: "Discord",
@@ -347,23 +347,18 @@ export default {
 				{
 					name: "Instagram",
 					icon: "fab fa-instagram",
-					url: "https://www.instagram.com/harmlesskey",
+					url: "https://www.instagram.com/shieldmaidenapp",
 				},
 				{
 					name: "Twitter",
 					icon: "fab fa-twitter-square",
-					url: "https://twitter.com/KeyHarmless",
+					url: "https://twitter.com/shieldmaidenapp",
 				},
 				{
 					name: "Facebook",
 					icon: "fab fa-facebook",
-					url: "https://www.facebook.com/harmlesskey",
-				},
-				{
-					name: "Reddit",
-					icon: "fab fa-reddit-alien",
-					url: "https://www.reddit.com/r/HarmlessKey",
-				},
+					url: "https://www.facebook.com/shieldmaidenapp",
+				}
 			],
 		};
 	},

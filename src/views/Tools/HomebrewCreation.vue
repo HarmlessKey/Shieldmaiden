@@ -26,7 +26,7 @@
 
 			<q-img
 				src="~assets/_img/tools/homebrew-creation/hbc-logo.webp"
-				alt="Harmless Key DM Screen"
+				alt="Shieldmaiden DM Screen"
 				fit="contain"
 			/>
 

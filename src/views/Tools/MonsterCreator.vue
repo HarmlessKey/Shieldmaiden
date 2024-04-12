@@ -81,7 +81,7 @@
 				<strong>spellcasters</strong> that are easy to use in our combat tracker. Unleashing magic
 				users on your party can be a pain for you as a DM, but with our combined tools that is no
 				longer the case. Spell slots are tracked for you and casting a spell is as simple as using
-				any other monster action in Harmless Key.
+				any other monster action in Shieldmaiden.
 			</p>
 		</section>
 
@@ -90,9 +90,9 @@
 			<p>
 				Our monster creator also makes it easy to share your custom monsters with other dungeon
 				masters. You can save your monsters to your library if you have an account, export them to
-				share with others, or import monsters created by other Harmless Key users.<br />
+				share with others, or import monsters created by other Shieldmaiden users.<br />
 				If you're a content creator you can provide your followers with monsters that they can
-				directly use in Harmless Key.
+				directly use in Shieldmaiden.
 			</p>
 		</section>
 

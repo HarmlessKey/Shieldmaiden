@@ -15,7 +15,7 @@
 				</div>
 				<router-link
 					to="/"
-					class="logo d-flex justify-content-start"
+					class="logo d-flex justify-content-start gap-1 items-center"
 					:class="{ home: $route.meta.sidebar === false }"
 					:tabindex="tabindex"
 				>
@@ -28,7 +28,7 @@
 					<img
 						class="wordmark d-none d-md-block"
 						src="../assets/_img/logo/logo-wordmark.svg"
-						alt="Harmless Key"
+						alt="Shieldmaiden"
 					/>
 				</router-link>
 			</div>
@@ -234,7 +234,6 @@ export default {
 		height: 40px;
 	}
 	.wordmark {
-		margin: 13px 0 0 7px;
 		height: 13px;
 	}
 }

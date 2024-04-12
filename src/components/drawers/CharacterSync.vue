@@ -98,17 +98,17 @@
 					},
 					{
 						title: "Link a Character",
-						description: "<p>Link a Character from the extension to a Player in Harmless Key.<br/>"+
+						description: "<p>Link a Character from the extension to a Player in Shieldmaiden.<br/>"+
 							'If you now revisit your player overview, there are <button class="btn btn-sm bg-neutral-5"><i class="fas fa-link" aria-hidden="true"></i></button> '+
 							'buttons next to each player to link a character with <span class="neutral-3">*</span>.</p>'+
-							'<small class="neutral-3">* Only if you have a Harmless Key subscription</small>',
+							'<small class="neutral-3">* Only if you have a Shieldmaiden subscription</small>',
 						icon: "fas fa-link"
 					},
 					{
 						title: "Sync Character",
 						description: "<p>Now that you linked a character to your player, you can sync the stats from the extension "+
-						'to Harmless Key with one click on the <button class="btn btn-sm bg-neutral-5"><i class="fas fa-sync-alt" aria-hidden="true"></i></button> button.</p>'+
-						"Every time changes are made to the original character sheet, it has to be revisited to update it in the extension, then the Sync button in Harmless Key must be used to update the player again.",
+						'to Shieldmaiden with one click on the <button class="btn btn-sm bg-neutral-5"><i class="fas fa-sync-alt" aria-hidden="true"></i></button> button.</p>'+
+						"Every time changes are made to the original character sheet, it has to be revisited to update it in the extension, then the Sync button in Shieldmaiden must be used to update the player again.",
 						icon: "fas fa-sync-alt"
 					}
 				]

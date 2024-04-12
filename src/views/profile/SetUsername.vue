@@ -4,7 +4,7 @@
 			<hk-card header="Username">
 				<div class="card-body">
 					<h3>
-						Thank you for creating a <strong>Harmless Key</strong> account!</h3>
+						Thank you for creating a <strong>Shieldmaiden</strong> account!</h3>
 					<p>To continue, please first enter a username.</p>
 					<ValidationProvider rules="required|alpha_num|min:3|max:20|username" name="Username" v-slot="{ errors, invalid, validated }">
 						<q-input 

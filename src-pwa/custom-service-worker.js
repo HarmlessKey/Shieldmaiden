@@ -4,7 +4,7 @@
  * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
  */
 self.addEventListener('message', (event) => {
-  if(event.origin !== "https://harmlesskey.com" && event.origin !== "https://staging.harmlesskey.com") 
+  if(event.origin !== "https://shieldmaiden.app" && event.origin !== "https://staging.shieldmaiden.app") 
     return;
     
   if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -12,7 +12,7 @@ self.addEventListener('message', (event) => {
   }
 });
 
-workbox.core.setCacheNameDetails({prefix: "harmlesskey"});
+workbox.core.setCacheNameDetails({prefix: "shieldmaiden"});
 
 // Precache array of routes (precacheManifest = this array)
 // https://developers.google.com/web/tools/workbox/modules/workbox-precaching

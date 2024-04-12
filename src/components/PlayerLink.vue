@@ -29,8 +29,8 @@
 					type="text"
 				>
 					<hk-share
-						title="Harmless Key"
-						text="Follow my campaigns on Harmless Key!"
+						title="Shieldmaiden"
+						text="Follow my campaigns on Shieldmaiden!"
 						:url="url"
 						slot="after"
 					/>

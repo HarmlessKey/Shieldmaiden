@@ -14,7 +14,7 @@
 						<div class="video">
 							<video 
 								src="~assets/_img/home/track-encounter.mp4" 
-								muted autoplay playsinline alt="Share initative screen Harmless Key D&amp;D Combat Tracker" loop
+								muted autoplay playsinline alt="Share initative screen Shieldmaiden D&amp;D Combat Tracker" loop
 							/>
 							<div class="info">An example of how your players can follow your encounters.</div>
 						</div>
@@ -45,7 +45,7 @@
 				</div>
 			</div>
 			<div class="d-flex justify-center">
-				<router-link to="sign-up" class="btn btn-lg">Try Harmless Key now!</router-link>
+				<router-link to="sign-up" class="btn btn-lg">Try Shieldmaiden now!</router-link>
 			</div>
 		</div>
 		

@@ -1,7 +1,7 @@
 <template>
 	<div class="login-container">
 		<div id="login">
-			<img class="logo" src="../../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key"/>
+			<img class="logo" src="../../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden"/>
 			<h2>Reset password</h2>
 			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 			<p v-if="success" class="green"><i aria-hidden="true" class="fas fa-check"></i> {{ success }}</p>

@@ -12,7 +12,7 @@
 
 		<q-img
 			src="~assets/_img/tools/dm-screen/dm-screen.png"
-			alt="Harmless Key DM Screen"
+			alt="Shieldmaiden DM Screen"
 			fit="contain"
 		/>
 

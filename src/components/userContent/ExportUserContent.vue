@@ -52,7 +52,7 @@ export default {
 		...mapActions("campaigns", ["get_campaign"]),
 		...mapActions("encounters", ["get_encounter", "get_campaign_encounters"]),
 		async downloadContent() {
-			let filename = "harmlesskey";
+			let filename = "shieldmaiden";
 			if (this.contentType === "campaign") {
 				await Promise.all([
 					this.exportCampaign(this.contentId),
@@ -66,13 +66,13 @@ export default {
 				await this.exportNpcArray(npc_ids);
 				await this.exportSpellArray([...this.exportQueue.spells]);
 				filename = this.inputIsArray()
-					? "harmless_key_npcs"
+					? "shieldmaiden_npcs"
 					: this.exportData.npcs[this.contentId].name;
 			} else if (this.contentType === "spell") {
 				const spell_ids = this.inputIsArray() ? this.contentId : [this.contentId];
 				await this.exportSpellArray(spell_ids);
 				filename = this.inputIsArray()
-					? "harmless_key_spells"
+					? "shieldmaiden_spells"
 					: this.exportData.spells[this.contentId].name;
 			}
 

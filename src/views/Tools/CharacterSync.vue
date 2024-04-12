@@ -18,7 +18,7 @@
 		<h2>D&D Character Sync - Google Chrome Extension</h2>
 		<p>
 			With this extension you can store character sheets from different D&D apps. 
-			Characters stored in your extension can be synced with your players in Harmless Key.
+			Characters stored in your extension can be synced with your players in Shieldmaiden.
 		</p>
 
 		<q-img
@@ -32,20 +32,20 @@
 			<h2>Various resources</h2>
 			<p>
 				Sync your Dungeons & Dragons character's data from various platforms like 
-				<strong>D&D Beyond</strong>, <strong>Dice Cloud</strong> and <strong>Harmless Key</strong>.
+				<strong>D&D Beyond</strong>, <strong>Dice Cloud</strong> and <strong>Shieldmaiden</strong>.
 			</p>
 		</section>
 
 		<q-img
 			src="~assets/_img/tools/character-sync/sync.gif"
-			alt="Harmless Key DM Screen"
+			alt="Shieldmaiden DM Screen"
 			fit="contain"
 		/>
 		
 		<section class="mb-3" id="players">
-			<h2>Sync with Harmless Key</h2>
+			<h2>Sync with Shieldmaiden</h2>
 			<p>
-				You can link a character saved in the extension to one of your players in Harmless Key. 
+				You can link a character saved in the extension to one of your players in Shieldmaiden. 
 				Once linked, the players kan be updated with one click.
 			</p>
 			<p>

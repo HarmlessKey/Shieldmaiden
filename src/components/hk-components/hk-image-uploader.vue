@@ -73,7 +73,7 @@
 								Do you want to <strong>crop</strong> and <strong>upload</strong> avatars?
 							</p>
 
-							<a class="btn btn-block bg-patreon-red" href="https://www.patreon.com/join/harmlesskey" rel="noopener" target="_blank">
+							<a class="btn btn-block bg-patreon-red" href="https://www.patreon.com/join/shieldmaidenapp" rel="noopener" target="_blank">
 							<i class="fab fa-patreon black" aria-hidden="true" />
 								Support us on Patreon
 							</a>

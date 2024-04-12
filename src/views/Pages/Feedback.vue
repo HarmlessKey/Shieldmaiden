@@ -12,7 +12,7 @@
 				Our discord is the best place to leave feedback, follow the link below.
 			</p>
 			<a href="https://discord.gg/UY63AY8Ae6" target="_blank" rel="noopener" class="btn btn-block btn-lg bg-discord-purple">
-				<i aria-hidden="true" class="fab fa-discord mr-2"></i> Join Harmless Key Discord
+				<i aria-hidden="true" class="fab fa-discord mr-2"></i> Join Shieldmaiden Discord
 			</a>
 		</div>
 	</hk-card>

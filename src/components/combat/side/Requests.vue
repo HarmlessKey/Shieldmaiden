@@ -16,7 +16,7 @@
 			<p>In order to do this, the following requirements must be met.</p>
 
 			<ol>
-				<li>The player must have a Harmless Key account.</li>
+				<li>The player must have a Shieldmaiden account.</li>
 				<li>The player must have control over a character in the encounter.</li>
 				<li>You must be <span class="live">Live</span> with your encounter.</li>
 			</ol>

@@ -2,6 +2,7 @@
 	<div class="content-side">
 		<Tutorial v-if="show_tutorial" vertical />
 
+
 		<hk-card v-if="$route.path.startsWith('/content/players')">
 			<div class="card-header" slot="header">
 				<span>
@@ -37,17 +38,13 @@
 			>
 		</hk-card>
 
-		<hk-card v-if="$route.path === '/content'" class="bg-neutral-9 overflow-hidden">
-			<hk-video />
-		</hk-card>
-
 		<!-- COMPENDIUM -->
 		<hk-card v-if="$route.path.split('/')[1] !== 'content'">
 			<div slot="header" class="card-header">
 				<h2><i aria-hidden="true" class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
 			</div>
 			<div class="card-body overflow-x-hidden">
-				<hk-video />
+				<img class="logo full-width" src="../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden" />
 				<p class="neutral-2 mt-3 text-center">
 					Try the most advanced initiative tracker on the internet.
 				</p>
@@ -68,6 +65,35 @@
 			</div>
 			<div class="card-body">
 				<PlayerLink :qr="false" :title="false" :info="false" />
+			</div>
+		</hk-card>
+
+		<!-- SUBSCRIPTION -->
+		<hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
+			<div slot="header" class="card-header">
+				Subscription
+				<hk-popover
+					v-if="pending_payment"
+					header="Pending"
+					content="Your Patreon payment is pending, this might take a few minutes."
+				>
+					Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
+				</hk-popover>
+				<strong v-else>{{ tier.name }}</strong>
+			</div>
+			<q-linear-progress
+				v-if="tier.name !== 'Deity'"
+				:value="slots_used.used_slots / slots_used.available_slots"
+				color="neutral-4"
+				track-color="neutral-11"
+			/>
+			<div>
+				<Tier />
+			</div>
+			<div slot="footer" v-if="tier.name !== 'Deity'">
+				<router-link to="/patreon" class="btn btn-block btn-square bg-patreon-red">
+					Upgrade
+				</router-link>
 			</div>
 		</hk-card>
 
@@ -125,35 +151,6 @@
 				</div>
 			</div>
 		</hk-card>
-
-		<!-- SUBSCRIPTION -->
-		<hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
-			<div slot="header" class="card-header">
-				Subscription
-				<hk-popover
-					v-if="pending_payment"
-					header="Pending"
-					content="Your Patreon payment is pending, this might take a few minutes."
-				>
-					Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
-				</hk-popover>
-				<strong v-else>{{ tier.name }}</strong>
-			</div>
-			<q-linear-progress
-				v-if="tier.name !== 'Deity'"
-				:value="slots_used.used_slots / slots_used.available_slots"
-				color="neutral-4"
-				track-color="neutral-11"
-			/>
-			<div>
-				<Tier />
-			</div>
-			<div slot="footer" v-if="tier.name !== 'Deity'">
-				<router-link to="/patreon" class="btn btn-block btn-square bg-patreon-red">
-					Upgrade
-				</router-link>
-			</div>
-		</hk-card>
 		<q-resize-observer @resize="setWidth" />
 	</div>
 </template>
@@ -169,7 +166,6 @@ export default {
 	},
 	components: {
 		PlayerLink: () => import("src/components/PlayerLink"),
-		HkVideo: () => import("src/components/hk-components/hk-video"),
 		Tier: () => import("src/components/userContent/Tier"),
 		Tutorial: () => import("src/components/userContent/Tutorial.vue"),
 	},

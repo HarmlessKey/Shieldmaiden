@@ -2,7 +2,7 @@
 	<div class="login-container">
 		<div id="login">
 			<img class="logo" src="../../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden"/>
-			<h2>Create an account</h2>
+			<h2 class="mt-3">Create an account</h2>
 			<p v-if="error" class="red"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 					
 			<button class="google mt-2" @click="googleSignIn()">

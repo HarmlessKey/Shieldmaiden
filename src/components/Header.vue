@@ -234,7 +234,7 @@ export default {
 		height: 40px;
 	}
 	.wordmark {
-		height: 28px;
+		height: 13px;
 	}
 }
 a.icon,

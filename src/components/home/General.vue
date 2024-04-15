@@ -76,10 +76,6 @@
 
 <style lang="scss" scoped>
 	.general {
-		padding-bottom: 100px;
-		min-height: calc(100vh - 50px - 55px);
-		background-color: $neutral-9;
-
 		ul {
 			margin-bottom: 30px;
 		}

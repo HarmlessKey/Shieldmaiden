@@ -28,13 +28,6 @@
 
 <style lang="scss" scoped>
 	.builder {
-		padding-bottom: 100px;
-		// min-height: calc(100vh - 50px - 55px);
-		background-color: $neutral-8;
-
-		.head {
-			padding-bottom: 30px;
-		}
 		.video {
 			width: 100%;
 			margin-bottom: 30px;

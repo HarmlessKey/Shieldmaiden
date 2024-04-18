@@ -17,7 +17,7 @@
 	},
 	"dependencies": {
 		"@octokit/rest": "^19.0.5",
-		"@quasar/extras": "^1.16.9",
+		"@quasar/extras": "^1.16.10",
 		"ajv": "^8.10.0",
 		"ajv-formats": "^2.1.1",
 		"animate.css": "^4.1.1",

@@ -437,18 +437,20 @@ const campaign_actions = {
 					active: true,
 				};
 
-				encounters.forEach((encounter) => {
-					dispatch(
-						"encounters/add_player_encounter",
-						{
-							campaignId: campaign.key,
-							encounterId: encounter.key,
-							playerId,
-							player: encounter_player,
-						},
-						{ root: true }
-					);
-				});
+				await Promise.all(
+					encounters.map((encounter) => {
+						return dispatch(
+							"encounters/add_player_encounter",
+							{
+								campaignId: campaign.key,
+								encounterId: encounter.key,
+								playerId,
+								player: encounter_player,
+							},
+							{ root: true }
+						);
+					})
+				);
 
 				// Add companions
 				if (player.companions) {
@@ -467,17 +469,46 @@ const campaign_actions = {
 								{ root: true }
 							);
 						} else {
-							companion = { curHp: companion.hit_points }; // Only need the hit_points
 							// Add the companion to the campaign
 							await dispatch("update_companion", {
 								uid,
 								id: campaign.key,
 								companionId,
 								property: "curHp",
-								value: companion.curHp,
+								value: companion.hit_points,
 							});
-							commit("SET_COMPANION", { uid, id: campaign.key, companionId, companion });
+							commit("SET_COMPANION", {
+								uid,
+								id: campaign.key,
+								companionId,
+								companion: { curHp: companion.hit_points }, //only need curhp
+							});
 						}
+
+						const encounter_companion = {
+							id: companionId,
+							name: companion.name,
+							entityType: "companion",
+							initiative: 0,
+							active: true,
+							npc: "custom",
+							player: playerId,
+						};
+
+						await Promise.all(
+							encounters.map((encounter) => {
+								return dispatch(
+									"encounters/add_player_encounter",
+									{
+										campaignId: campaign.key,
+										encounterId: encounter.key,
+										playerId: companionId,
+										player: encounter_companion,
+									},
+									{ root: true }
+								);
+							})
+						);
 					}
 				}
 

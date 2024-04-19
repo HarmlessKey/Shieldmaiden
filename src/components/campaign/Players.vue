@@ -39,8 +39,15 @@
 							})
 						"
 					>
-						<i aria-hidden="true" class="fas fa-swords"></i>
+						<i aria-hidden="true" class="fas fa-swords" />
 						<q-tooltip anchor="top middle" self="center middle">Damage Meters</q-tooltip>
+					</button>
+					<button
+						class="btn btn-sm mr-1 bg-neutral-5"
+						@click="rest_dialog = true"
+					>
+						<i aria-hidden="true" class="fas fa-campfire" />
+						<q-tooltip anchor="top middle" self="center middle">Party rest</q-tooltip>
 					</button>
 					<button
 						class="btn btn-sm mr-1 bg-neutral-5"
@@ -51,7 +58,7 @@
 							})
 						"
 					>
-						<i aria-hidden="true" class="fas fa-heart"></i>
+						<i aria-hidden="true" class="fas fa-heart" />
 						<q-tooltip anchor="top middle" self="center middle">Edit Group Health</q-tooltip>
 					</button>
 					<button
@@ -92,7 +99,7 @@
 						})
 					"
 				>
-					<i aria-hidden="true" class="fas fa-treasure-chest mr-1"></i>
+					<i aria-hidden="true" class="fas fa-treasure-chest mr-1" />
 					{{ Object.keys(campaign.inventory.items).length }}
 					<q-tooltip anchor="top middle" self="center middle">Party Inventory</q-tooltip>
 				</button>
@@ -117,7 +124,7 @@
 						!is_medium
 					"
 				>
-					<i aria-hidden="true" class="fas fa-eye"></i>
+					<i aria-hidden="true" class="fas fa-eye" />
 					<q-tooltip anchor="top middle" self="center middle"> Passive perception </q-tooltip>
 				</div>
 				<div
@@ -128,7 +135,7 @@
 						!is_medium
 					"
 				>
-					<i aria-hidden="true" class="fas fa-search"></i>
+					<i aria-hidden="true" class="fas fa-search" />
 					<q-tooltip anchor="top middle" self="center middle"> Passive investigation </q-tooltip>
 				</div>
 				<div
@@ -137,22 +144,22 @@
 						userSettings.general && userSettings.general.passive_insight === undefined && !is_medium
 					"
 				>
-					<i aria-hidden="true" class="fas fa-lightbulb-on"></i>
+					<i aria-hidden="true" class="fas fa-lightbulb-on" />
 					<q-tooltip anchor="top middle" self="center middle"> Passive insight </q-tooltip>
 				</div>
 				<div
 					class="col header text-center save"
 					v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
 				>
-					<i aria-hidden="true" class="fas fa-hand-holding-magic"></i>
+					<i aria-hidden="true" class="fas fa-hand-holding-magic" />
 					<q-tooltip anchor="top middle" self="center middle"> Save DC </q-tooltip>
 				</div>
 				<div class="col header text-center">
-					<i aria-hidden="true" class="fas fa-heart"></i>
+					<i aria-hidden="true" class="fas fa-heart" />
 					<q-tooltip anchor="top middle" self="center middle"> Health </q-tooltip>
 				</div>
 				<div class="col header text-right" v-if="viewerIsUser">
-					<i aria-hidden="true" class="far fa-ellipsis-h"></i>
+					<i aria-hidden="true" class="far fa-ellipsis-h" />
 				</div>
 
 				<template v-for="(player, key) in campaign.players">
@@ -168,13 +175,13 @@
 							}"
 						>
 							<div class="transformed" v-if="player.transformed">
-								<i aria-hidden="true" class="fas fa-paw-claws green"></i>
+								<i aria-hidden="true" class="fas fa-paw-claws green" />
 								<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
 							</div>
 							<i aria-hidden="true" v-if="!avatar(players[key])" class="hki-player" />
 						</div>
 						<div class="col ac" :key="'ac-' + key">
-							<i aria-hidden="true" class="fas fa-shield"></i>
+							<i aria-hidden="true" class="fas fa-shield" />
 							<span
 								v-if="player.ac_bonus"
 								class="value"
@@ -244,10 +251,10 @@
 						<div class="col health" :key="'health-' + key">
 							<template v-if="player.curHp <= 0">
 								<div v-if="player.stable" class="green">
-									<span><i aria-hidden="true" class="fas fa-fist-raised"></i> Stable</span>
+									<span><i aria-hidden="true" class="fas fa-fist-raised" /> Stable</span>
 								</div>
 								<div v-else-if="player.dead" class="red">
-									<span><i aria-hidden="true" class="fas fa-skull-crossbones"></i> Dead</span>
+									<span><i aria-hidden="true" class="fas fa-skull-crossbones" /> Dead</span>
 								</div>
 								<div v-else class="saves d-flex justify-content-end">
 									<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
@@ -329,7 +336,7 @@
 									})
 								"
 							>
-								<i aria-hidden="true" class="fas fa-pencil"></i>
+								<i aria-hidden="true" class="fas fa-pencil" />
 								<q-tooltip anchor="top middle" self="center middle"> Edit player </q-tooltip>
 							</a>
 						</div>
@@ -359,11 +366,48 @@
 			</div>
 			<hk-loader v-else name="players" />
 			<div slot="footer" v-if="viewerIsUser && page !== 'user'">
-				<button class="btn btn-block mt-2" @click="reset()">
-					<i aria-hidden="true" class="fas fa-undo-alt"></i> Reset player health
+				<button class="btn btn-lg btn-block bg-neutral-5 mt-4" @click="rest_dialog = true">
+					<i aria-hidden="true" class="fas fa-campfire" /> Rest party
 				</button>
 			</div>
 		</div>
+
+		<q-dialog v-if="viewerIsUser && page !== 'user'" v-model="rest_dialog">
+			<hk-card :min-width="300">
+				<div slot="header" class="card-header">
+					Party rest
+					<q-btn icon="close" no-caps flat dense v-close-popup />
+				</div>
+				<div class="card-body">
+					<p>Reset health and modifiers for every party member.</p>
+					<p>
+						<strong>
+							What should be reset during this rest?
+						</strong>
+					</p>
+						<q-checkbox
+							:dark="$store.getters.theme === 'dark'"
+							:value="all"
+							:indeterminate-value="false"
+							:false-value="null"
+							label="Select all"
+							@input="checkAll"
+						/>
+					<div v-for="({ label, value }) in resets" :key="value">
+						<q-checkbox
+							:dark="$store.getters.theme === 'dark'"
+							v-model="selected_resets"
+							:val="value"
+							:label="label"
+						/>
+					</div>
+				</div>
+				<div slot="footer" class="card-footer">
+					<q-btn color="primary" label="Rest" @click="reset()" />
+				</div>
+			</hk-card>
+		</q-dialog>
+
 		<q-resize-observer @resize="onResize" />
 	</tag>
 </template>
@@ -404,6 +448,30 @@ export default {
 			viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			loading: false,
 			isXpAdvancement: false,
+			rest_dialog: false,
+			resets: [
+				{
+					label: "Current Hit Points",
+					value: "curHp",
+				},
+				{
+					label: "Maximum Hit Point modifiers",
+					value: "maxHpMod",
+				},
+				{
+					label: "Temporary Hit Points",
+					value: "tempHp",
+				},
+				{
+					label: "Armor Class Bonus",
+					value: "ac_bonus",
+				},
+				{
+					label: "Transforms",
+					value: "transformed",
+				},
+			],
+			selected_resets: []
 		};
 	},
 	computed: {
@@ -415,6 +483,14 @@ export default {
 		},
 		page() {
 			return this.$route.path.split("/")[1];
+		},
+		all() {
+			if(this.selected_resets.length === this.resets.length) {
+				return true;
+			} else if (this.selected_resets.length) {
+				return false;
+			} 
+			return null;
 		},
 		templateColumns() {
 			let templateColumns = "max-content max-content auto ";
@@ -511,46 +587,68 @@ export default {
 		maxHp(maxHp, maxHpMod) {
 			return parseInt(maxHpMod ? maxHp + maxHpMod : maxHp);
 		},
+		checkAll(value) {
+			this.selected_resets = (value) ? this.resets.map((item) => item.value) : [];
+		},
 		reset() {
 			for (const [id, player] of Object.entries(this.players)) {
 				if (!player.dead) {
-					this.update_campaign_entity({
-						uid: this.userId,
-						campaignId: this.campaignId,
-						type: "players",
-						id,
-						property: "curHp",
-						value: player.maxHp,
-					});
-					this.update_campaign_entity({
-						uid: this.userId,
-						campaignId: this.campaignId,
-						type: "players",
-						id,
-						property: "tempHp",
-						value: 0,
-					});
-					this.update_campaign_entity({
-						uid: this.userId,
-						campaignId: this.campaignId,
-						type: "players",
-						id,
-						property: "maxHpMod",
-						value: 0,
-					});
-
-					for (const property of ["transformed", "stable", "saves"]) {
+					if (this.selected_resets.includes("curHp")) {
 						this.update_campaign_entity({
 							uid: this.userId,
 							campaignId: this.campaignId,
 							type: "players",
 							id,
-							property,
-							value: null,
+							property: "curHp",
+							value: player.maxHp,
 						});
+					}
+					if (this.selected_resets.includes("tempHp")) {
+						this.update_campaign_entity({
+							uid: this.userId,
+							campaignId: this.campaignId,
+							type: "players",
+							id,
+							property: "tempHp",
+							value: 0,
+						});
+					}
+					if (this.selected_resets.includes("maxHpMod")) {
+						this.update_campaign_entity({
+							uid: this.userId,
+							campaignId: this.campaignId,
+							type: "players",
+							id,
+							property: "maxHpMod",
+							value: 0,
+						});
+					}
+					if (this.selected_resets.includes("ac_bonus")) {
+						this.update_campaign_entity({
+							uid: this.userId,
+							campaignId: this.campaignId,
+							type: "players",
+							id,
+							property: "ac_bonus",
+							value: 0,
+						});
+					}
+					for (const property of ["transformed", "stable", "saves"]) {
+						if (property !== "transformed" || this.selected_resets.includes("transformed")) {
+							this.update_campaign_entity({
+								uid: this.userId,
+								campaignId: this.campaignId,
+								type: "players",
+								id,
+								property,
+								value: null,
+							});
+						}
 					}
 				}
 			}
+			this.rest_dialog = false;
+			this.selected_resets = [];
 		},
 	},
 };

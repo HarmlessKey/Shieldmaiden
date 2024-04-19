@@ -1,7 +1,7 @@
 <template>
 	<div class="top">
 		<div class="container">
-			<img class="shieldmaiden" src="../../assets/_img/shieldmaiden.png" alt="Shieldmaiden" />
+			<img class="shieldmaiden" src="../../assets/_img/shieldmaiden.webp" alt="Shieldmaiden" />
 			<div class="content">
 				<img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden logo" />
 				<div>

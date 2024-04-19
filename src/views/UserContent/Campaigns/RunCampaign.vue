@@ -173,6 +173,7 @@
 							:campaignId="campaignId"
 							:campaign="campaign"
 							:players="players"
+							@add-player="add_players_dialog"
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="resources" class="p-0">
@@ -189,6 +190,10 @@
 		</template>
 		<hk-loader v-else name="campaign" />
 		<q-resize-observer @resize="setSize" />
+		<!-- Edit campaign dialog -->
+		<q-dialog v-if="!overencumbered" v-model="add_players_dialog">
+			<AddPlayers :campaign="search_campaign" @players="update_players" />
+		</q-dialog>
 	</div>
 </template>
 
@@ -221,6 +226,8 @@ export default {
 			loading_campaign: true,
 			campaign: {},
 			players: {},
+			search_campaign: {},
+			add_players_dialog: false,
 			mobile_tab: "encounters",
 			mobile_tabs: [
 				{
@@ -272,6 +279,23 @@ export default {
 			}
 			this.players = campaignPlayers;
 			this.loading_campaign = false;
+
+			const properties = [
+				"name",
+				"background",
+				"hk_background",
+				"player_count",
+				"advancement",
+				"timestamp",
+				"private",
+			];
+
+			this.search_campaign = { key: this.campaignId };
+			for (const prop of properties) {
+				if (this.campaign.hasOwnProperty(prop)) {
+					this.search_campaign[prop] = this.campaign[prop];
+				}
+			}
 		});
 		this.set_active_campaign(this.campaignId);
 	},
@@ -287,7 +311,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["broadcast", "userSettings"]),
+		...mapGetters(["broadcast", "userSettings", "overencumbered"]),
 		background_image() {
 			return this.campaign.hk_background
 				? require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`)
@@ -321,6 +345,7 @@ export default {
 					return 50;
 			}
 		},
+		update_players(players) {},
 	},
 };
 </script>

@@ -132,7 +132,7 @@
 															@animationend="syncing = false"
 														/>
 														<q-tooltip anchor="top middle" self="center middle">
-															{{ playerEqualsLinkedCharacter() ? "Update" : "No update" }}
+															{{ playerEqualsLinkedCharacter() ? "No update" : "Update" }}
 														</q-tooltip>
 													</button>
 												</template>
@@ -881,7 +881,6 @@ export default {
 			}
 		},
 		savePlayer() {
-			console.log(this.player);
 			if (this.$route.name === "Add player") {
 				this.addPlayer();
 			} else {

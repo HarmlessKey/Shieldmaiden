@@ -3,15 +3,7 @@ import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
 // Parse entity number values to ints
-const numberValues = [
-	"ac",
-	"ac_bonus",
-	"curHp",
-	"initiative",
-	"maxHp",
-	"maxHpMod",
-	"tempHp",
-];
+const numberValues = ["ac", "ac_bonus", "curHp", "initiative", "maxHp", "maxHpMod", "tempHp"];
 
 function parseInts(entity) {
 	Object.entries(entity).forEach(([key, value]) => {
@@ -370,6 +362,8 @@ const encounter_actions = {
 	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
+			await dispatch("get_encounter", { uid, campaignId, id: encounterId });
+
 			const services = await dispatch("get_encounter_services");
 			try {
 				await services.addPlayer(uid, campaignId, encounterId, playerId, player);

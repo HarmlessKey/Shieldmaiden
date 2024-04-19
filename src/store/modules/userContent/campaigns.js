@@ -453,6 +453,34 @@ const campaign_actions = {
 					}
 				}
 
+				// Get all unfinished encounters
+				const encounters = await dispatch(
+					"encounters/get_campaign_encounters",
+					{ campaignId: campaign.key },
+					{ root: true }
+				);
+
+				const encounter_player = {
+					id: playerId,
+					name: player.character_name,
+					entityType: "player",
+					initiative: 0,
+					active: true,
+				};
+
+				encounters.forEach((encounter) => {
+					dispatch(
+						"encounters/add_player_encounter",
+						{
+							campaignId: campaign.key,
+							encounterId: encounter.key,
+							playerId,
+							player: encounter_player,
+						},
+						{ root: true }
+					);
+				});
+
 				await services.setPlayer(uid, campaign.key, playerId, campaign_player);
 				commit("SET_PLAYER", { uid, id: campaign.key, playerId, player });
 

@@ -154,6 +154,7 @@ export default {
 			});
 		},
 		async removePlayer(player) {
+			console.log("remove plyaer", player, this.campaign);
 			await this.delete_player({
 				id: this.campaign.key,
 				player,

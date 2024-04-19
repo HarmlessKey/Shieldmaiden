@@ -519,6 +519,7 @@ export default {
 			return parseInt(maxHpMod ? maxHp + maxHpMod : maxHp);
 		},
 		open_player_dialog() {
+			console.log("add player", true);
 			this.$emit("add-player", true);
 		},
 		reset() {

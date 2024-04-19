@@ -89,6 +89,7 @@
 							:campaignId="campaignId"
 							:campaign="campaign"
 							:players="players"
+							@add-player="open_player_dialog"
 						/>
 					</hk-pane>
 				</Splitpanes>
@@ -114,6 +115,7 @@
 									:campaignId="campaignId"
 									:campaign="campaign"
 									:players="players"
+									@add-player="open_player_dialog"
 								/>
 							</hk-pane>
 						</Splitpanes>
@@ -134,6 +136,7 @@
 									:campaignId="campaignId"
 									:campaign="campaign"
 									:players="players"
+									@add-player="open_player_dialog"
 								/>
 							</hk-pane>
 						</Splitpanes>
@@ -145,6 +148,7 @@
 							:campaignId="campaignId"
 							:campaign="campaign"
 							:players="players"
+							@add-player="open_player_dialog"
 						/>
 						<Share v-else-if="!campaign.private" :campaign="campaign" />
 					</hk-pane>
@@ -173,7 +177,7 @@
 							:campaignId="campaignId"
 							:campaign="campaign"
 							:players="players"
-							@add-player="add_players_dialog"
+							@add-player="open_player_dialog"
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="resources" class="p-0">
@@ -192,7 +196,7 @@
 		<q-resize-observer @resize="setSize" />
 		<!-- Edit campaign dialog -->
 		<q-dialog v-if="!overencumbered" v-model="add_players_dialog">
-			<AddPlayers :campaign="search_campaign" @players="update_players" />
+			<AddPlayers :campaign="search_campaign" @campaign-players="updatePlayers" />
 		</q-dialog>
 	</div>
 </template>
@@ -203,6 +207,7 @@ import Players from "src/components/campaign/Players.vue";
 import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
+import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
 
@@ -214,6 +219,7 @@ export default {
 		SoundBoard,
 		Share,
 		Resources,
+		AddPlayers,
 	},
 	data() {
 		return {
@@ -345,7 +351,20 @@ export default {
 					return 50;
 			}
 		},
-		update_players(players) {},
+		open_player_dialog() {
+			console.log("got emit");
+			this.add_players_dialog = true;
+		},
+		async updatePlayers(players) {
+			const campaignPlayers = {};
+			for (const playerId in players) {
+				const player = await this.get_player({ uid: this.user.uid, id: playerId });
+				if (player) {
+					campaignPlayers[playerId] = player;
+				}
+			}
+			this.players = campaignPlayers;
+		},
 	},
 };
 </script>

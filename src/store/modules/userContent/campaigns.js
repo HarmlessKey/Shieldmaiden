@@ -517,7 +517,7 @@ const campaign_actions = {
 
 				const new_count = await services.updatePlayerCount(uid, campaign.key, 1);
 				commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
-				return;
+				return (await dispatch("get_campaign", { uid, id: campaign.key })).players;
 			} catch (error) {
 				throw error;
 			}
@@ -697,17 +697,19 @@ const campaign_actions = {
 				{ root: true }
 			);
 
-			encounters.forEach((encounter) => {
-				dispatch(
-					"encounters/delete_entity",
-					{
-						campaignId: id,
-						encounterId: encounter.key,
-						entityId: companionId,
-					},
-					{ root: true }
-				);
-			});
+			await Promise.all(
+				encounters.map((encounter) => {
+					return dispatch(
+						"encounters/delete_entity",
+						{
+							campaignId: id,
+							encounterId: encounter.key,
+							entityId: companionId,
+						},
+						{ root: true }
+					);
+				})
+			);
 
 			try {
 				await services.deleteCompanion(uid, id, companionId);
@@ -760,23 +762,25 @@ const campaign_actions = {
 					{ root: true }
 				);
 
-				encounters.forEach((encounter) => {
-					dispatch(
-						"encounters/delete_entity",
-						{
-							campaignId: id,
-							encounterId: encounter.key,
-							entityId: player.key,
-						},
-						{ root: true }
-					);
-				});
+				await Promise.all(
+					encounters.map((encounter) => {
+						return dispatch(
+							"encounters/delete_entity",
+							{
+								campaignId: id,
+								encounterId: encounter.key,
+								entityId: player.key,
+							},
+							{ root: true }
+						);
+					})
+				);
 
 				await services.deletePlayer(uid, id, player.key);
 				commit("DELETE_PLAYER", { uid, id, playerId: player.key });
 
-				const new_count = await services.updatePlayerCount(uid, campaign.key, -1);
-				commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
+				const new_count = await services.updatePlayerCount(uid, id, -1);
+				commit("SET_PLAYER_COUNT", { uid, id: id, new_count });
 				return;
 			} catch (error) {
 				throw error;

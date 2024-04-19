@@ -202,7 +202,7 @@ export class campaignServices {
 	 * Adds an item to the inventory of a campaign
 	 *
 	 * @param {String} uid User ID
-	 * @param {String} campaignId Campaing ID
+	 * @param {String} campaignId Campaign ID
 	 * @param {String} encounterId Encounter ID
 	 * @param {object} item
 	 */

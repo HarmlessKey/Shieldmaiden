@@ -763,7 +763,10 @@ const encounter_actions = {
 	 * @param {string} encounterId
 	 * @param {object} playerId
 	 */
-	async delete_entity({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId }) {
+	async delete_entity(
+		{ rootGetters, commit, dispatch, state },
+		{ campaignId, encounterId, entityId }
+	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_encounter_services");

@@ -455,9 +455,9 @@ export default {
 			isXpAdvancement: false,
 			syncing: {},
 			sync_characters: this.syncCharacters,
-			extensionInstalled,
 			link_character: undefined,
 			link_dialog: false,
+			extensionInstalled: undefined
 		};
 	},
 	computed: {
@@ -539,7 +539,9 @@ export default {
 			return this.copperToPretty(currency);
 		},
 	},
-
+	async mounted() {
+		this.extensionInstalled = await extensionInstalled();
+	},
 	methods: {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),

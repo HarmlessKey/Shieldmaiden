@@ -203,7 +203,7 @@ import Players from "src/components/campaign/Players.vue";
 import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
-import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { getCharacterSyncStorage, extensionInstalled } from "src/utils/generalFunctions";
 
 import { mapGetters, mapActions } from "vuex";
 

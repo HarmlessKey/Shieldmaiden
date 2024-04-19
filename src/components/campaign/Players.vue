@@ -30,6 +30,10 @@
 			</div>
 			<div class="d-flex justify-content-end">
 				<template v-if="viewerIsUser && page !== 'user'">
+					<button class="btn btn-sm bg-neutral-5 mr-1" @click="add_players_dialog = true">
+						<i aria-hidden="true" class="fas fa-user"></i>
+						<q-tooltip anchor="top middle" self="center middle">Manage Players</q-tooltip>
+					</button>
 					<button
 						class="btn btn-sm bg-neutral-5 mr-1"
 						@click="
@@ -364,7 +368,13 @@
 				</button>
 			</div>
 		</div>
+
 		<q-resize-observer @resize="onResize" />
+
+		<!-- Edit campaign dialog -->
+		<q-dialog v-if="!overencumbered" v-model="add_players_dialog">
+			<AddPlayers :campaign="search_campaign" />
+		</q-dialog>
 	</tag>
 </template>
 
@@ -372,6 +382,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
+import AddPlayers from "src/components/campaign/AddPlayers";
 
 export default {
 	name: "Players",
@@ -394,6 +405,7 @@ export default {
 			default: false,
 		},
 	},
+	components: { AddPlayers },
 	mixins: [experience, currencyMixin],
 	data() {
 		return {
@@ -404,9 +416,12 @@ export default {
 			viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			loading: false,
 			isXpAdvancement: false,
+			add_players_dialog: false,
+			search_campaign: {},
 		};
 	},
 	computed: {
+		...mapGetters(["overencumbered"]),
 		...mapGetters(["userSettings"]),
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
@@ -552,6 +567,25 @@ export default {
 				}
 			}
 		},
+	},
+	async mounted() {
+		const properties = [
+			"name",
+			"background",
+			"hk_background",
+			"player_count",
+			"advancement",
+			"timestamp",
+			"private",
+		];
+
+		this.search_campaign = { key: this.campaignId };
+		for (const prop of properties) {
+			if (this.campaign.hasOwnProperty(prop)) {
+				this.search_campaign[prop] = this.campaign[prop];
+			}
+		}
+		console.log(this.search_campaign, this.campaign);
 	},
 };
 </script>

@@ -250,7 +250,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
 import EditCampaign from "./EditCampaign";
-import AddPlayers from "./AddPlayers";
+import AddPlayers from "src/components/campaign/AddPlayers";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import Tutorial from "src/components/userContent/Tutorial";
 import ExportUserContent from "src/components/userContent/ExportUserContent";

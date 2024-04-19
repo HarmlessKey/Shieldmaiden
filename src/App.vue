@@ -92,7 +92,7 @@ export default {
 				name: "description",
 				content:
 					this.$route.meta.description ||
-					"Shieldmaiden, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
 			},
 
 			// TWITTER
@@ -108,7 +108,7 @@ export default {
 				name: "twitter:description",
 				content:
 					this.$route.meta.description ||
-					"Shieldmaiden, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
 			},
 			twitterImage: {
 				name: "twitter:image",
@@ -128,7 +128,7 @@ export default {
 				property: "og:description",
 				content:
 					this.$route.meta.description ||
-					"Shieldmaiden, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
 			},
 			ogSiteName: {
 				property: "og:site_name",

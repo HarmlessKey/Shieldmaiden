@@ -254,6 +254,7 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-heart" />
+												<q-tooltip anchor="top middle" self="center middle">Maximum Hit Points</q-tooltip>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -278,6 +279,7 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-shield" />
+												<q-tooltip anchor="top middle" self="center middle">Armor class</q-tooltip>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -302,6 +304,7 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+												<q-tooltip anchor="top middle" self="center middle">Spell save DC</q-tooltip>
 											</q-input>
 										</ValidationProvider>
 									</div>

@@ -136,13 +136,6 @@
 
 <style lang="scss" scoped>
 	.feedback {
-		padding: 100px 0;
-		background-color: $neutral-10;
-
-		.head {
-			padding: 0 0 50px 0;
-		}
-		
 		.q-carousel {
 			max-width: 750px;
 			height: 250px;

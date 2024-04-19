@@ -15,7 +15,7 @@
 					}">
 				</span>
 			</section>
-			<section id="overview">
+			<section id="overview" class="bg-neutral-10">
 				<Feedback />
 				<span 
 					class="die" 
@@ -25,7 +25,7 @@
 					}">
 				</span>
 			</section>
-			<section id="general">
+			<section id="general" class="bg-neutral-9">
 				<General />
 				<span 
 					class="die" 
@@ -35,7 +35,7 @@
 					}">
 				</span>
 			</section>
-			<section id="builder">
+			<section id="builder" class="bg-neutral-10">
 				<Builder />
 				<span 
 					class="die" 
@@ -45,7 +45,7 @@
 					}">
 				</span>
 			</section>
-			<section id="share">
+			<section id="share" class="bg-neutral-9">
 				<Share />
 				<span 
 					class="die" 
@@ -55,7 +55,7 @@
 					}">
 				</span>
 			</section>
-			<section id="campaign">
+			<section id="campaign" class="bg-neutral-10">
 				<Campaign />
 			</section>
 			<Footer />
@@ -130,6 +130,11 @@
 	}
 	section {
 		position: relative;
+		padding: 100px 0;
+
+		&#top {
+			padding: 0;
+		}
 	}
 	.die {
 		left: 50%;
@@ -143,6 +148,22 @@
 		background-position: center;
 		background-repeat: no-repeat;
 		z-index: 97;
+	}
+}
+
+@media only screen and (max-width: 640px) {
+	.home {
+		.die {
+			width: 60px;
+			height: 60px;
+			background-size: 60px;
+			margin-left: -30px;
+			bottom: -30px;
+		}
+
+		section {
+			padding: 50px 0;
+		}
 	}
 }
 </style>

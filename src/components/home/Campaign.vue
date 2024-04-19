@@ -107,9 +107,6 @@
 
 <style lang="scss" scoped>
 	.campaign {
-		padding-bottom: 75px;
-		background-color: $neutral-8;
-
 		ul {
 			margin-bottom: 30px;
 		}

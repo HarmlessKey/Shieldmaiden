@@ -82,9 +82,6 @@
 
 <style lang="scss" scoped>
 	.share {
-		padding-bottom: 100px;
-		background-color: $neutral-9;
-
 		.video-wrapper {
 			padding: 0 80px;
 

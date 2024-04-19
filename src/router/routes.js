@@ -1,3 +1,4 @@
+import CharacterSyncPrivacyPolicy from "src/views/Pages/CharacterSyncPrivacyPolicy.vue";
 
 const Sitemap = () => import("src/views/Pages/Sitemap.vue");
 const Privacy = () => import("src/views/Pages/Privacy.vue");
@@ -1278,6 +1279,15 @@ const routes = [
 		meta: {
 			title: "Privacy policy",
 			description: "Privacy policy for Shieldmaiden, a Combat Tracker for D&D.",
+		},
+	},
+	{
+		path: "/character-sync-privacy-policy",
+		name: "Character Sync Privacy Policy",
+		component: CharacterSyncPrivacyPolicy,
+		meta: {
+			title: "D&D Character Sync Privacy policy",
+			description: "Privacy policy for the D&D Character Sync Google Chrome Extension.",
 		},
 	},
 	{

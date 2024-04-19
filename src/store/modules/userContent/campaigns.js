@@ -422,6 +422,34 @@ const campaign_actions = {
 					{ root: true }
 				);
 
+				// Add player to all unfinished encounters
+				const encounters = await dispatch(
+					"encounters/get_campaign_encounters",
+					{ campaignId: campaign.key },
+					{ root: true }
+				);
+
+				const encounter_player = {
+					id: playerId,
+					name: player.character_name,
+					entityType: "player",
+					initiative: 0,
+					active: true,
+				};
+
+				encounters.forEach((encounter) => {
+					dispatch(
+						"encounters/add_player_encounter",
+						{
+							campaignId: campaign.key,
+							encounterId: encounter.key,
+							playerId,
+							player: encounter_player,
+						},
+						{ root: true }
+					);
+				});
+
 				// Add companions
 				if (player.companions) {
 					for (const companionId in player.companions) {
@@ -452,34 +480,6 @@ const campaign_actions = {
 						}
 					}
 				}
-
-				// Get all unfinished encounters
-				const encounters = await dispatch(
-					"encounters/get_campaign_encounters",
-					{ campaignId: campaign.key },
-					{ root: true }
-				);
-
-				const encounter_player = {
-					id: playerId,
-					name: player.character_name,
-					entityType: "player",
-					initiative: 0,
-					active: true,
-				};
-
-				encounters.forEach((encounter) => {
-					dispatch(
-						"encounters/add_player_encounter",
-						{
-							campaignId: campaign.key,
-							encounterId: encounter.key,
-							playerId,
-							player: encounter_player,
-						},
-						{ root: true }
-					);
-				});
 
 				await services.setPlayer(uid, campaign.key, playerId, campaign_player);
 				commit("SET_PLAYER", { uid, id: campaign.key, playerId, player });
@@ -658,6 +658,26 @@ const campaign_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_campaign_services");
+
+			// Get all unfinished encounters
+			const encounters = await dispatch(
+				"encounters/get_campaign_encounters",
+				{ campaignId: id },
+				{ root: true }
+			);
+
+			encounters.forEach((encounter) => {
+				dispatch(
+					"encounters/delete_entity",
+					{
+						campaignId: id,
+						encounterId: encounter.key,
+						entityId: companionId,
+					},
+					{ root: true }
+				);
+			});
+
 			try {
 				await services.deleteCompanion(uid, id, companionId);
 				commit("DELETE_COMPANION", { uid, id, companionId });
@@ -678,8 +698,8 @@ const campaign_actions = {
 	 * it is possible the search_campaigns aren't fetched
 	 * in this case the player_count can't be found in the store, but it's sent from the get_campaign function.
 	 *
-	 * @param {object} campaign
-	 * @param {number} player_count
+	 * @param {object} id campaignId
+	 * @param {number} player
 	 * @returns {string} the id of the newly added campaign
 	 */
 	async delete_player({ state, rootGetters, commit, dispatch }, { id, player }) {
@@ -701,6 +721,26 @@ const campaign_actions = {
 						await dispatch("delete_companion", { id, companionId });
 					}
 				}
+
+				// Get all unfinished encounters
+				const encounters = await dispatch(
+					"encounters/get_campaign_encounters",
+					{ campaignId: id },
+					{ root: true }
+				);
+
+				encounters.forEach((encounter) => {
+					dispatch(
+						"encounters/delete_entity",
+						{
+							campaignId: id,
+							encounterId: encounter.key,
+							entityId: player.key,
+						},
+						{ root: true }
+					);
+				});
+
 				await services.deletePlayer(uid, id, player.key);
 				commit("DELETE_PLAYER", { uid, id, playerId: player.key });
 

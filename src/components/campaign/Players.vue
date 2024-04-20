@@ -30,6 +30,18 @@
 			</div>
 			<div class="d-flex justify-content-end">
 				<template v-if="viewerIsUser && page !== 'user'">
+					<button class="btn btn-sm bg-neutral-5 mr-1" @click="$emit('add-player', true)">
+						<i aria-hidden="true" class="fas fa-user-plus"></i>
+						<q-tooltip anchor="top middle" self="center middle">Manage Players</q-tooltip>
+					</button>
+					<button
+						v-if="tier.name !== 'Free' && Object.keys(sync_characters).length && Object.values(players).some(item => item.sync_character)"
+						class="btn btn-sm bg-neutral-5 mr-1"
+						@click="syncAll"
+					>
+						<i aria-hidden="true" class="fas fa-sync-alt" />
+						<q-tooltip anchor="top middle" self="center middle">Sync all players</q-tooltip>
+					</button>
 					<button
 						class="btn btn-sm bg-neutral-5 mr-1"
 						@click="
@@ -39,8 +51,12 @@
 							})
 						"
 					>
-						<i aria-hidden="true" class="fas fa-swords"></i>
+						<i aria-hidden="true" class="fas fa-swords" />
 						<q-tooltip anchor="top middle" self="center middle">Damage Meters</q-tooltip>
+					</button>
+					<button class="btn btn-sm mr-1 bg-neutral-5" @click="rest_dialog = true">
+						<i aria-hidden="true" class="fas fa-campfire" />
+						<q-tooltip anchor="top middle" self="center middle">Party rest</q-tooltip>
 					</button>
 					<button
 						class="btn btn-sm mr-1 bg-neutral-5"
@@ -51,7 +67,7 @@
 							})
 						"
 					>
-						<i aria-hidden="true" class="fas fa-heart"></i>
+						<i aria-hidden="true" class="fas fa-heart" />
 						<q-tooltip anchor="top middle" self="center middle">Edit Group Health</q-tooltip>
 					</button>
 					<button
@@ -92,7 +108,7 @@
 						})
 					"
 				>
-					<i aria-hidden="true" class="fas fa-treasure-chest mr-1"></i>
+					<i aria-hidden="true" class="fas fa-treasure-chest mr-1" />
 					{{ Object.keys(campaign.inventory.items).length }}
 					<q-tooltip anchor="top middle" self="center middle">Party Inventory</q-tooltip>
 				</button>
@@ -117,7 +133,7 @@
 						!is_medium
 					"
 				>
-					<i aria-hidden="true" class="fas fa-eye"></i>
+					<i aria-hidden="true" class="fas fa-eye" />
 					<q-tooltip anchor="top middle" self="center middle"> Passive perception </q-tooltip>
 				</div>
 				<div
@@ -128,7 +144,7 @@
 						!is_medium
 					"
 				>
-					<i aria-hidden="true" class="fas fa-search"></i>
+					<i aria-hidden="true" class="fas fa-search" />
 					<q-tooltip anchor="top middle" self="center middle"> Passive investigation </q-tooltip>
 				</div>
 				<div
@@ -137,22 +153,22 @@
 						userSettings.general && userSettings.general.passive_insight === undefined && !is_medium
 					"
 				>
-					<i aria-hidden="true" class="fas fa-lightbulb-on"></i>
+					<i aria-hidden="true" class="fas fa-lightbulb-on" />
 					<q-tooltip anchor="top middle" self="center middle"> Passive insight </q-tooltip>
 				</div>
 				<div
 					class="col header text-center save"
 					v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
 				>
-					<i aria-hidden="true" class="fas fa-hand-holding-magic"></i>
+					<i aria-hidden="true" class="fas fa-hand-holding-magic" />
 					<q-tooltip anchor="top middle" self="center middle"> Save DC </q-tooltip>
 				</div>
 				<div class="col header text-center">
-					<i aria-hidden="true" class="fas fa-heart"></i>
+					<i aria-hidden="true" class="fas fa-heart" />
 					<q-tooltip anchor="top middle" self="center middle"> Health </q-tooltip>
 				</div>
 				<div class="col header text-right" v-if="viewerIsUser">
-					<i aria-hidden="true" class="far fa-ellipsis-h"></i>
+					<i aria-hidden="true" class="far fa-ellipsis-h" />
 				</div>
 
 				<template v-for="(player, key) in campaign.players">
@@ -168,13 +184,13 @@
 							}"
 						>
 							<div class="transformed" v-if="player.transformed">
-								<i aria-hidden="true" class="fas fa-paw-claws green"></i>
+								<i aria-hidden="true" class="fas fa-paw-claws green" />
 								<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
 							</div>
 							<i aria-hidden="true" v-if="!avatar(players[key])" class="hki-player" />
 						</div>
 						<div class="col ac" :key="'ac-' + key">
-							<i aria-hidden="true" class="fas fa-shield"></i>
+							<i aria-hidden="true" class="fas fa-shield" />
 							<span
 								v-if="player.ac_bonus"
 								class="value"
@@ -244,10 +260,10 @@
 						<div class="col health" :key="'health-' + key">
 							<template v-if="player.curHp <= 0">
 								<div v-if="player.stable" class="green">
-									<span><i aria-hidden="true" class="fas fa-fist-raised"></i> Stable</span>
+									<span><i aria-hidden="true" class="fas fa-fist-raised" /> Stable</span>
 								</div>
 								<div v-else-if="player.dead" class="red">
-									<span><i aria-hidden="true" class="fas fa-skull-crossbones"></i> Dead</span>
+									<span><i aria-hidden="true" class="fas fa-skull-crossbones" /> Dead</span>
 								</div>
 								<div v-else class="saves d-flex justify-content-end">
 									<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
@@ -314,12 +330,43 @@
 								</span>
 								<span v-if="player.tempHp > 0" class="hit-points ml-1">
 									+{{ player.tempHp }}
-									<q-tooltip anchor="top middle" self="center middle"> Temporary HP </q-tooltip>
+									<q-tooltip anchor="top middle" self="center middle">Temporary HP</q-tooltip>
 								</span>
 							</template>
 						</div>
 						<div class="col actions" :key="'actions-' + key" v-if="viewerIsUser">
-							<a
+							<template v-if="tier.name !== 'Free' && extensionInstalled">
+								<button
+									v-if="players[key].sync_character && (players[key].sync_character in sync_characters)"
+									class="btn btn-sm bg-neutral-5 mr-1"
+									@click="syncCharacter(key, players[key].sync_character)"
+								>
+									<i
+										class="fas fa-sync-alt fade-color"
+										:class="{
+											rotate: key in syncing,
+											green: syncing[key] === 'success',
+											red: syncing[key] === 'error',
+											orange: !playerEqualsLinkedCharacter(players[key])
+										}"
+										aria-hidden="true"
+									/>
+									<q-tooltip anchor="top middle" self="center middle">
+										Update with Character Sync
+									</q-tooltip>
+								</button>
+								<button
+									v-else
+									class="btn btn-sm bg-neutral-5 mr-1"
+									@click="linkDialog(key)"
+								>
+									<i class="fas fa-link" aria-hidden="true" />
+									<q-tooltip anchor="top middle" self="center middle">
+										Link Character to Sync with
+									</q-tooltip>
+								</button>
+							</template>
+							<button
 								class="btn btn-sm bg-neutral-5"
 								@click="
 									setDrawer({
@@ -329,9 +376,9 @@
 									})
 								"
 							>
-								<i aria-hidden="true" class="fas fa-pencil"></i>
+								<i aria-hidden="true" class="fas fa-pencil" />
 								<q-tooltip anchor="top middle" self="center middle"> Edit player </q-tooltip>
-							</a>
+							</button>
 						</div>
 						<div
 							class="xp-bar"
@@ -359,11 +406,52 @@
 			</div>
 			<hk-loader v-else name="players" />
 			<div slot="footer" v-if="viewerIsUser && page !== 'user'">
-				<button class="btn btn-block mt-2" @click="reset()">
-					<i aria-hidden="true" class="fas fa-undo-alt"></i> Reset player health
+				<button class="btn btn-lg btn-block bg-neutral-5 mt-4" @click="rest_dialog = true">
+					<i aria-hidden="true" class="fas fa-campfire" /> Rest party
 				</button>
 			</div>
 		</div>
+
+		<q-dialog v-model="link_dialog" @before-hide="link_character = undefined">
+			<hk-link-character @link="linkCharacter" />
+		</q-dialog>
+
+
+		<q-dialog v-if="viewerIsUser && page !== 'user'" v-model="rest_dialog">
+			<hk-card :min-width="300">
+				<div slot="header" class="card-header">
+					Party rest
+					<q-btn icon="close" no-caps flat dense v-close-popup />
+				</div>
+				<div class="card-body">
+					<p>Reset health and modifiers for every party member.</p>
+					<p>
+						<strong> What should be reset during this rest? </strong>
+					</p>
+					<q-checkbox
+						:dark="$store.getters.theme === 'dark'"
+						:value="all"
+						:indeterminate-value="false"
+						:false-value="null"
+						label="Select all"
+						@input="checkAll"
+					/>
+					<hr class="my-1" />
+					<div v-for="{ label, property } in resets" :key="property">
+						<q-checkbox
+							:dark="$store.getters.theme === 'dark'"
+							v-model="selected_resets"
+							:val="property"
+							:label="label"
+						/>
+					</div>
+				</div>
+				<div slot="footer" class="card-footer">
+					<q-btn color="primary" label="Rest" @click="reset()" />
+				</div>
+			</hk-card>
+		</q-dialog>
+
 		<q-resize-observer @resize="onResize" />
 	</tag>
 </template>
@@ -372,6 +460,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
+import { extensionInstalled, comparePlayerToCharacter, getCharacterSyncCharacter } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",
@@ -393,6 +482,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		syncCharacters: {
+			type: Object,
+			default: () => {}
+		}
 	},
 	mixins: [experience, currencyMixin],
 	data() {
@@ -404,10 +497,49 @@ export default {
 			viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			loading: false,
 			isXpAdvancement: false,
+			rest_dialog: false,
+			resets: [
+				{
+					label: "Current Hit Points",
+					property: "curHp",
+				},
+				{
+					label: "Maximum Hit Point modifiers",
+					property: "maxHpMod",
+					value: 0,
+				},
+				{
+					label: "Temporary Hit Points",
+					property: "tempHp",
+					value: 0,
+				},
+				{
+					label: "Armor Class Bonus",
+					property: "ac_bonus",
+					value: 0,
+				},
+				{
+					label: "Transforms",
+					property: "transformed",
+					value: null,
+				},
+				{
+					label: "Death Saving Throws",
+					property: "saves",
+					value: null,
+				},
+			],
+			selected_setter: undefined,
+			syncing: {},
+			sync_characters: this.syncCharacters,
+			link_character: undefined,
+			link_dialog: false,
+			extensionInstalled: undefined
 		};
 	},
 	computed: {
-		...mapGetters(["userSettings"]),
+		...mapGetters(["overencumbered"]),
+		...mapGetters(["userSettings", "tier"]),
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
@@ -415,6 +547,24 @@ export default {
 		},
 		page() {
 			return this.$route.path.split("/")[1];
+		},
+		selected_resets: {
+			get() {
+				return this.selected_setter
+					? this.selected_setter
+					: this.resets.map((item) => item.property);
+			},
+			set(newVal) {
+				this.selected_setter = newVal;
+			},
+		},
+		all() {
+			if (this.selected_resets.length === this.resets.length) {
+				return true;
+			} else if (this.selected_resets.length) {
+				return false;
+			}
+			return null;
 		},
 		templateColumns() {
 			let templateColumns = "max-content max-content auto ";
@@ -485,10 +635,13 @@ export default {
 			return this.copperToPretty(currency);
 		},
 	},
-
+	async mounted() {
+		this.extensionInstalled = await extensionInstalled();
+	},
 	methods: {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
+		...mapActions("players", ["set_player_prop", "sync_player"]),
 		onResize(size) {
 			let width = size.width;
 			let small = 400;
@@ -511,45 +664,83 @@ export default {
 		maxHp(maxHp, maxHpMod) {
 			return parseInt(maxHpMod ? maxHp + maxHpMod : maxHp);
 		},
+		checkAll(value) {
+			this.selected_resets = value ? this.resets.map((item) => item.property) : [];
+		},
 		reset() {
 			for (const [id, player] of Object.entries(this.players)) {
 				if (!player.dead) {
-					this.update_campaign_entity({
-						uid: this.userId,
-						campaignId: this.campaignId,
-						type: "players",
-						id,
-						property: "curHp",
-						value: player.maxHp,
-					});
-					this.update_campaign_entity({
-						uid: this.userId,
-						campaignId: this.campaignId,
-						type: "players",
-						id,
-						property: "tempHp",
-						value: 0,
-					});
-					this.update_campaign_entity({
-						uid: this.userId,
-						campaignId: this.campaignId,
-						type: "players",
-						id,
-						property: "maxHpMod",
-						value: 0,
-					});
-
-					for (const property of ["transformed", "stable", "saves"]) {
-						this.update_campaign_entity({
-							uid: this.userId,
-							campaignId: this.campaignId,
-							type: "players",
-							id,
-							property,
-							value: null,
-						});
+					for (const { property, value } of [...this.resets, { property: "stable" }]) {
+						if (this.selected_resets?.includes(property)) {
+							this.resetValue(property, value, id, player);
+						}
 					}
 				}
+			}
+			this.rest_dialog = false;
+			this.selected_setter = undefined;
+		},
+		playerEqualsLinkedCharacter(player) {
+			const linked_character = this.sync_characters[player.sync_character];
+			return comparePlayerToCharacter(linked_character, player);
+		},
+		linkDialog(key) {
+			this.link_character = key;
+			this.link_dialog = true;
+		},
+		async linkCharacter(url) {
+			await this.set_player_prop({
+				uid: this.userId,
+				id: this.link_character,
+				property: "sync_character",
+				value: url,
+			});
+			await this.syncCharacter(this.link_character, url);
+			this.link_dialog = false;
+		},
+		async syncAll() {
+			for (const [key, player] of Object.entries(this.players)) {
+				if (player.sync_character && Object.keys(this.sync_characters).includes(player.sync_character)) {
+					await this.syncCharacter(key, player.sync_character);
+				}
+			}
+		},
+		async syncCharacter(id, sync_character) {
+			this.$set(this.syncing, id, "syncing");
+			try {
+				const linked_character = await this.sync_player({ uid: this.userId, id, sync_character });
+				if (linked_character) {
+					this.$set(this.players, id, { ...this.players[id], ...linked_character });
+				}
+				this.$set(this.syncing, id, "success");
+			} catch (e) {
+				this.syncing[id] = "error";
+				this.$snotify.error(e, "Sync failed", {});
+			} finally {
+				setTimeout(() => {
+					this.$delete(this.syncing, id);
+				}, 2000);
+			}
+		},
+		resetValue(property, value, id, player) {
+			const campaign_player = this.campaign?.players?.[id];
+			const maxHp = !this.selected_resets.includes("maxHpMod")
+				? this.maxHp(player.maxHp, campaign_player?.maxHpMod)
+				: player.maxHp;
+			const reset_value = property === "curHp" ? maxHp : value;
+
+			this.update_campaign_entity({
+				uid: this.userId,
+				campaignId: this.campaignId,
+				type: "players",
+				id,
+				property,
+				value: reset_value,
+			});
+
+			// if curHp > maxHp the curHp must be reset as well
+			if (campaign_player.curHp > maxHp && property !== "curHp") {
+				this.resetValue("curHp", value, id, player);
 			}
 		},
 	},

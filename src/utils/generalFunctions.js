@@ -189,8 +189,9 @@ export function comparePlayerToCharacter(sync_character, player) {
  * @param {string} url
  */
 export async function extensionInstalled() {
-	return new Promise((resolve) => {
-		chrome.runtime.sendMessage(character_sync_id, { request_content: ["version"] }, (response) => {
+
+	const sendMessage = new Promise((resolve) => {
+		chrome?.runtime?.sendMessage(character_sync_id, { request_content: ["version"] }, (response) => {
 			if (response) {
 				resolve(response.version);
 			} else {
@@ -198,14 +199,18 @@ export async function extensionInstalled() {
 			}
 		});
 	});
+	const timeout = new Promise((resolve) => {
+		setTimeout(resolve, 100, undefined);
+	});
+	return Promise.race([sendMessage, timeout]);
 }
 
 /**
  * Gets all characters from "D&D Character Sync" Chrome Extension
  */
 export async function getCharacterSyncStorage() {
-	return new Promise((resolve, reject) => {
-		chrome.runtime.sendMessage(
+	const sendMessage = new Promise((resolve, reject) => {
+		chrome?.runtime?.sendMessage(
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
@@ -217,6 +222,10 @@ export async function getCharacterSyncStorage() {
 			}
 		);
 	});
+	const timeout = new Promise((resolve) => {
+		setTimeout(resolve, 100, {});
+	});
+	return Promise.race([sendMessage, timeout]);
 }
 
 /**
@@ -226,8 +235,8 @@ export async function getCharacterSyncStorage() {
  * @returns
  */
 export async function getCharacterSyncCharacter(url) {
-	return new Promise((resolve, reject) => {
-		chrome.runtime.sendMessage(
+	const sendMessage = new Promise((resolve, reject) => {
+		chrome?.runtime?.sendMessage(
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
@@ -239,6 +248,10 @@ export async function getCharacterSyncCharacter(url) {
 			}
 		);
 	});
+	const timeout = new Promise((resolve) => {
+		setTimeout(resolve, 100, `Character not found in D&D Character Sync Extension`);
+	});
+	return Promise.race([sendMessage, timeout]);
 }
 
 /**

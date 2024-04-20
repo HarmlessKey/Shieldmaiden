@@ -116,7 +116,7 @@ export default {
 			},
 			twitterSite: {
 				name: "twitter:site",
-				content: "@KeyHarmless",
+				content: "@ShieldmaidenApp",
 			},
 
 			// OG

@@ -148,7 +148,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import ContentHeader from "src/components/userContent/ContentHeader";
-import { getCharacterSyncStorage, extensionInstalled } from "src/utils/generalFunctions";
+import { getCharacterSyncStorage } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",

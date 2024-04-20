@@ -269,7 +269,6 @@ export default {
 		};
 	},
 	async mounted() {
-		console.log("settings", this.userSettings);
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,
@@ -318,6 +317,12 @@ export default {
 	},
 	computed: {
 		...mapGetters(["broadcast", "userSettings", "overencumbered"]),
+		...mapGetters("players", { search_players: "players" }),
+		filtered_search_players() {
+			return this.search_players.filter((player) => {
+				return player.campaign_id === this.campaignId;
+			});
+		},
 		background_image() {
 			return this.campaign.hk_background
 				? require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`)
@@ -352,18 +357,23 @@ export default {
 			}
 		},
 		open_player_dialog() {
-			console.log("got emit");
 			this.add_players_dialog = true;
 		},
-		async updatePlayers(players) {
-			const campaignPlayers = {};
-			for (const playerId in players) {
-				const player = await this.get_player({ uid: this.user.uid, id: playerId });
-				if (player) {
-					campaignPlayers[playerId] = player;
-				}
-			}
+		async updatePlayers(search_players) {
+			const players = await Promise.all(
+				search_players.map(async (p) => ({
+					...(await this.get_player({ uid: this.user.uid, id: p.key })),
+					key: p.key,
+				}))
+			);
+			const campaignPlayers = players.reduce((a, p) => ({ ...a, [p.key]: p }), {});
+
 			this.players = campaignPlayers;
+		},
+	},
+	watch: {
+		filtered_search_players(players) {
+			this.updatePlayers(players);
 		},
 	},
 };

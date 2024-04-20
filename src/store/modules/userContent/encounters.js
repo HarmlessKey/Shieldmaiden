@@ -768,11 +768,21 @@ const encounter_actions = {
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
 			try {
-				await services.deleteEntity(uid, campaignId, encounterId, entityId);
-				const n = commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
+				const encounter_entities = (
+					await dispatch("get_encounter", {
+						uid,
+						campaignId,
+						id: encounterId,
+					})
+				)?.entities;
+				if (encounter_entities && Object.keys(encounter_entities).includes(entityId)) {
+					await services.deleteEntity(uid, campaignId, encounterId, entityId);
+					commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
 
-				const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -n);
-				commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
+					const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
+					commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
+				}
+
 				return;
 			} catch (error) {
 				throw error;
@@ -1178,9 +1188,7 @@ const encounter_mutations = {
 			state.cached_encounters[uid][campaignId][encounterId]
 		) {
 			Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
-			return 1;
 		}
-		return 0;
 	},
 	UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {
 		if (campaignId in state.encounters && encounterId in state.encounters[campaignId]) {

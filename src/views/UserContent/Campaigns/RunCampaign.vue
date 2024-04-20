@@ -90,6 +90,7 @@
 							:campaign="campaign"
 							:players="players"
 							:sync-characters="sync_characters"
+							@add-player="open_player_dialog"
 						/>
 					</hk-pane>
 				</Splitpanes>
@@ -116,6 +117,7 @@
 									:campaign="campaign"
 									:players="players"
 									:sync-characters="sync_characters"
+									@add-player="open_player_dialog"
 								/>
 							</hk-pane>
 						</Splitpanes>
@@ -137,6 +139,7 @@
 									:campaign="campaign"
 									:players="players"
 									:sync-characters="sync_characters"
+									@add-player="open_player_dialog"
 								/>
 							</hk-pane>
 						</Splitpanes>
@@ -149,6 +152,7 @@
 							:campaign="campaign"
 							:players="players"
 							:sync-characters="sync_characters"
+							@add-player="open_player_dialog"
 						/>
 						<Share v-else-if="!campaign.private" :campaign="campaign" />
 					</hk-pane>
@@ -178,6 +182,7 @@
 							:campaign="campaign"
 							:players="players"
 							:sync-characters="sync_characters"
+							@add-player="open_player_dialog"
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="resources" class="p-0">
@@ -194,6 +199,10 @@
 		</template>
 		<hk-loader v-else name="campaign" />
 		<q-resize-observer @resize="setSize" />
+		<!-- Edit campaign dialog -->
+		<q-dialog v-if="!overencumbered" v-model="add_players_dialog">
+			<AddPlayers :campaign="search_campaign" @campaign-players="updatePlayers" />
+		</q-dialog>
 	</div>
 </template>
 
@@ -204,6 +213,7 @@ import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
 import { getCharacterSyncStorage, extensionInstalled } from "src/utils/generalFunctions";
+import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
 
@@ -215,6 +225,7 @@ export default {
 		SoundBoard,
 		Share,
 		Resources,
+		AddPlayers,
 	},
 	data() {
 		return {
@@ -228,6 +239,8 @@ export default {
 			loading_campaign: true,
 			campaign: {},
 			players: {},
+			search_campaign: {},
+			add_players_dialog: false,
 			mobile_tab: "encounters",
 			mobile_tabs: [
 				{
@@ -279,6 +292,23 @@ export default {
 			}
 			this.players = campaignPlayers;
 			this.loading_campaign = false;
+
+			const properties = [
+				"name",
+				"background",
+				"hk_background",
+				"player_count",
+				"advancement",
+				"timestamp",
+				"private",
+			];
+
+			this.search_campaign = { key: this.campaignId };
+			for (const prop of properties) {
+				if (this.campaign.hasOwnProperty(prop)) {
+					this.search_campaign[prop] = this.campaign[prop];
+				}
+			}
 		});
 		this.set_active_campaign(this.campaignId);
 	},
@@ -294,7 +324,13 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["broadcast", "userSettings"]),
+		...mapGetters(["broadcast", "userSettings", "overencumbered"]),
+		...mapGetters("players", { search_players: "players" }),
+		filtered_search_players() {
+			return this.search_players.filter((player) => {
+				return player.campaign_id === this.campaignId;
+			});
+		},
 		background_image() {
 			return this.campaign.hk_background
 				? require(`src/assets/_img/atmosphere/${this.campaign.hk_background}.jpg`)
@@ -327,6 +363,25 @@ export default {
 				case "mid-top":
 					return 50;
 			}
+		},
+		open_player_dialog() {
+			this.add_players_dialog = true;
+		},
+		async updatePlayers(search_players) {
+			const players = await Promise.all(
+				search_players.map(async (p) => ({
+					...(await this.get_player({ uid: this.user.uid, id: p.key })),
+					key: p.key,
+				}))
+			);
+			const campaignPlayers = players.reduce((a, p) => ({ ...a, [p.key]: p }), {});
+
+			this.players = campaignPlayers;
+		},
+	},
+	watch: {
+		filtered_search_players(players) {
+			this.updatePlayers(players);
 		},
 	},
 };

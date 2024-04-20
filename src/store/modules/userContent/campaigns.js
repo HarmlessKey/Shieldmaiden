@@ -422,6 +422,36 @@ const campaign_actions = {
 					{ root: true }
 				);
 
+				// Add player to all unfinished encounters
+				const encounters = await dispatch(
+					"encounters/get_campaign_encounters",
+					{ campaignId: campaign.key },
+					{ root: true }
+				);
+
+				const encounter_player = {
+					id: playerId,
+					name: player.character_name,
+					entityType: "player",
+					initiative: 0,
+					active: true,
+				};
+
+				await Promise.all(
+					encounters.map((encounter) => {
+						return dispatch(
+							"encounters/add_player_encounter",
+							{
+								campaignId: campaign.key,
+								encounterId: encounter.key,
+								playerId,
+								player: encounter_player,
+							},
+							{ root: true }
+						);
+					})
+				);
+
 				// Add companions
 				if (player.companions) {
 					for (const companionId in player.companions) {
@@ -439,17 +469,46 @@ const campaign_actions = {
 								{ root: true }
 							);
 						} else {
-							companion = { curHp: companion.hit_points }; // Only need the hit_points
 							// Add the companion to the campaign
 							await dispatch("update_companion", {
 								uid,
 								id: campaign.key,
 								companionId,
 								property: "curHp",
-								value: companion.curHp,
+								value: companion.hit_points,
 							});
-							commit("SET_COMPANION", { uid, id: campaign.key, companionId, companion });
+							commit("SET_COMPANION", {
+								uid,
+								id: campaign.key,
+								companionId,
+								companion: { curHp: companion.hit_points }, //only need curhp
+							});
 						}
+
+						const encounter_companion = {
+							id: companionId,
+							name: companion.name,
+							entityType: "companion",
+							initiative: 0,
+							active: true,
+							npc: "custom",
+							player: playerId,
+						};
+
+						await Promise.all(
+							encounters.map((encounter) => {
+								return dispatch(
+									"encounters/add_player_encounter",
+									{
+										campaignId: campaign.key,
+										encounterId: encounter.key,
+										playerId: companionId,
+										player: encounter_companion,
+									},
+									{ root: true }
+								);
+							})
+						);
 					}
 				}
 
@@ -458,7 +517,7 @@ const campaign_actions = {
 
 				const new_count = await services.updatePlayerCount(uid, campaign.key, 1);
 				commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
-				return;
+				return (await dispatch("get_campaign", { uid, id: campaign.key })).players;
 			} catch (error) {
 				throw error;
 			}
@@ -630,6 +689,28 @@ const campaign_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_campaign_services");
+
+			// Get all unfinished encounters
+			const encounters = await dispatch(
+				"encounters/get_campaign_encounters",
+				{ campaignId: id },
+				{ root: true }
+			);
+
+			await Promise.all(
+				encounters.map((encounter) => {
+					return dispatch(
+						"encounters/delete_entity",
+						{
+							campaignId: id,
+							encounterId: encounter.key,
+							entityId: companionId,
+						},
+						{ root: true }
+					);
+				})
+			);
+
 			try {
 				await services.deleteCompanion(uid, id, companionId);
 				commit("DELETE_COMPANION", { uid, id, companionId });
@@ -650,8 +731,8 @@ const campaign_actions = {
 	 * it is possible the search_campaigns aren't fetched
 	 * in this case the player_count can't be found in the store, but it's sent from the get_campaign function.
 	 *
-	 * @param {object} campaign
-	 * @param {number} player_count
+	 * @param {object} id campaignId
+	 * @param {number} player
 	 * @returns {string} the id of the newly added campaign
 	 */
 	async delete_player({ state, rootGetters, commit, dispatch }, { id, player }) {
@@ -673,11 +754,33 @@ const campaign_actions = {
 						await dispatch("delete_companion", { id, companionId });
 					}
 				}
+
+				// Get all unfinished encounters
+				const encounters = await dispatch(
+					"encounters/get_campaign_encounters",
+					{ campaignId: id },
+					{ root: true }
+				);
+
+				await Promise.all(
+					encounters.map((encounter) => {
+						return dispatch(
+							"encounters/delete_entity",
+							{
+								campaignId: id,
+								encounterId: encounter.key,
+								entityId: player.key,
+							},
+							{ root: true }
+						);
+					})
+				);
+
 				await services.deletePlayer(uid, id, player.key);
 				commit("DELETE_PLAYER", { uid, id, playerId: player.key });
 
-				const new_count = await services.updatePlayerCount(uid, campaign.key, -1);
-				commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
+				const new_count = await services.updatePlayerCount(uid, id, -1);
+				commit("SET_PLAYER_COUNT", { uid, id: id, new_count });
 				return;
 			} catch (error) {
 				throw error;

@@ -74,9 +74,11 @@
 									{{ campaign.advancement !== "milestone" ? "Experience" : "Milestone" }}
 									advancement
 								</div>
-								<h3 class="truncate">
-									{{ campaign.name }}
-								</h3>
+								<router-link class="campaign-name" :to="`${$route.path}/${campaign.key}`">
+									<h3 class="truncate">
+										{{ campaign.name }}
+									</h3>
+								</router-link>
 
 								<div class="mb-1">
 									<a
@@ -109,13 +111,11 @@
 									<router-link to="/content/players" v-if="!content_count.players" class="btn">
 										<i aria-hidden="true" class="fas fa-user"></i> Create players
 									</router-link>
-									<a
-										v-else-if="!campaign.player_count"
-										class="btn"
-										@click="edit_players = { show: true, campaign: campaign }"
-									>
-										<i aria-hidden="true" class="fas fa-plus"></i> Add players
-									</a>
+									<template v-else-if="!campaign.player_count">
+										<a class="btn" @click="edit_players = { show: true, campaign: campaign }">
+											<i aria-hidden="true" class="fas fa-plus"></i> Add players
+										</a>
+									</template>
 									<router-link
 										v-else-if="!get_encounter_count(campaign.key)"
 										class="btn"
@@ -250,7 +250,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
 import EditCampaign from "./EditCampaign";
-import AddPlayers from "./AddPlayers";
+import AddPlayers from "src/components/campaign/AddPlayers";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import Tutorial from "src/components/userContent/Tutorial";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
@@ -406,7 +406,12 @@ export default {
 				font-size: 16px;
 				margin-bottom: 20px;
 			}
-
+			a.campaign-name {
+				color: $neutral-1;
+				&:hover {
+					color: $blue;
+				}
+			}
 			.col {
 				text-align: center;
 				font-size: 25px;

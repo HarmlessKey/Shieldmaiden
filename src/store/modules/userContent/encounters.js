@@ -3,15 +3,7 @@ import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
 // Parse entity number values to ints
-const numberValues = [
-	"ac",
-	"ac_bonus",
-	"curHp",
-	"initiative",
-	"maxHp",
-	"maxHpMod",
-	"tempHp",
-];
+const numberValues = ["ac", "ac_bonus", "curHp", "initiative", "maxHp", "maxHpMod", "tempHp"];
 
 function parseInts(entity) {
 	Object.entries(entity).forEach(([key, value]) => {
@@ -370,6 +362,8 @@ const encounter_actions = {
 	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
+			await dispatch("get_encounter", { uid, campaignId, id: encounterId });
+
 			const services = await dispatch("get_encounter_services");
 			try {
 				await services.addPlayer(uid, campaignId, encounterId, playerId, player);
@@ -769,16 +763,29 @@ const encounter_actions = {
 	 * @param {string} encounterId
 	 * @param {object} playerId
 	 */
-	async delete_entity({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId }) {
+	async delete_entity(
+		{ rootGetters, commit, dispatch, state },
+		{ campaignId, encounterId, entityId }
+	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
 			try {
-				await services.deleteEntity(uid, campaignId, encounterId, entityId);
-				commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
+				const encounter_entities = (
+					await dispatch("get_encounter", {
+						uid,
+						campaignId,
+						id: encounterId,
+					})
+				)?.entities;
+				if (encounter_entities && Object.keys(encounter_entities).includes(entityId)) {
+					await services.deleteEntity(uid, campaignId, encounterId, entityId);
+					commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
 
-				const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
-				commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
+					const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
+					commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
+				}
+
 				return;
 			} catch (error) {
 				throw error;

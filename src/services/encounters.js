@@ -109,7 +109,7 @@ export class encounterServices {
 	 * @param {String} campaignId ID of campaign
 	 * @param {String} encounterId ID of encounter to edit
 	 * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
-	 * @param {object} value Object with { proptery: value }
+	 * @param {object} value Object with { property: value }
 	 * @param {boolean} update_search Wether or not search_campaigns must be updated
 	 */
 	async updateEncounter(uid, campaignId, encounterId, path, value, update_search = false) {

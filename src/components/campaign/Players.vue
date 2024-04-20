@@ -30,8 +30,8 @@
 			</div>
 			<div class="d-flex justify-content-end">
 				<template v-if="viewerIsUser && page !== 'user'">
-					<button class="btn btn-sm bg-neutral-5 mr-1" @click="open_player_dialog">
-						<i aria-hidden="true" class="fas fa-user"></i>
+					<button class="btn btn-sm bg-neutral-5 mr-1" @click="$emit('add-player', true)">
+						<i aria-hidden="true" class="fas fa-user-plus"></i>
 						<q-tooltip anchor="top middle" self="center middle">Manage Players</q-tooltip>
 					</button>
 					<button
@@ -46,10 +46,7 @@
 						<i aria-hidden="true" class="fas fa-swords" />
 						<q-tooltip anchor="top middle" self="center middle">Damage Meters</q-tooltip>
 					</button>
-					<button
-						class="btn btn-sm mr-1 bg-neutral-5"
-						@click="rest_dialog = true"
-					>
+					<button class="btn btn-sm mr-1 bg-neutral-5" @click="rest_dialog = true">
 						<i aria-hidden="true" class="fas fa-campfire" />
 						<q-tooltip anchor="top middle" self="center middle">Party rest</q-tooltip>
 					</button>
@@ -385,9 +382,7 @@
 				<div class="card-body">
 					<p>Reset health and modifiers for every party member.</p>
 					<p>
-						<strong>
-							What should be reset during this rest?
-						</strong>
+						<strong> What should be reset during this rest? </strong>
 					</p>
 					<q-checkbox
 						:dark="$store.getters.theme === 'dark'"
@@ -397,8 +392,8 @@
 						label="Select all"
 						@input="checkAll"
 					/>
-					<hr class="my-1">
-					<div v-for="({ label, property }) in resets" :key="property">
+					<hr class="my-1" />
+					<div v-for="{ label, property } in resets" :key="property">
 						<q-checkbox
 							:dark="$store.getters.theme === 'dark'"
 							v-model="selected_resets"
@@ -453,7 +448,6 @@ export default {
 			viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			loading: false,
 			isXpAdvancement: false,
-			add_players_dialog: false,
 			rest_dialog: false,
 			resets: [
 				{
@@ -502,18 +496,20 @@ export default {
 		},
 		selected_resets: {
 			get() {
-				return this.selected_setter ? this.selected_setter : this.resets.map((item) => item.property);
+				return this.selected_setter
+					? this.selected_setter
+					: this.resets.map((item) => item.property);
 			},
 			set(newVal) {
 				this.selected_setter = newVal;
-			}
+			},
 		},
 		all() {
-			if(this.selected_resets.length === this.resets.length) {
+			if (this.selected_resets.length === this.resets.length) {
 				return true;
 			} else if (this.selected_resets.length) {
 				return false;
-			} 
+			}
 			return null;
 		},
 		templateColumns() {
@@ -611,18 +607,15 @@ export default {
 		maxHp(maxHp, maxHpMod) {
 			return parseInt(maxHpMod ? maxHp + maxHpMod : maxHp);
 		},
-		open_player_dialog() {
-			this.$emit("add-player", true);
-		},
 		checkAll(value) {
-			this.selected_resets = (value) ? this.resets.map((item) => item.property) : [];
+			this.selected_resets = value ? this.resets.map((item) => item.property) : [];
 		},
 		reset() {
 			for (const [id, player] of Object.entries(this.players)) {
 				if (!player.dead) {
-					for (const { property, value } of [...this.resets, { property: "stable" } ]) {
+					for (const { property, value } of [...this.resets, { property: "stable" }]) {
 						if (this.selected_resets?.includes(property)) {
-							this.resetValue(property, value, id, player)
+							this.resetValue(property, value, id, player);
 						}
 					}
 				}
@@ -632,9 +625,11 @@ export default {
 		},
 		resetValue(property, value, id, player) {
 			const campaign_player = this.campaign?.players?.[id];
-			const maxHp = (!this.selected_resets.includes("maxHpMod")) ? this.maxHp(player.maxHp, campaign_player?.maxHpMod) : player.maxHp;
+			const maxHp = !this.selected_resets.includes("maxHpMod")
+				? this.maxHp(player.maxHp, campaign_player?.maxHpMod)
+				: player.maxHp;
 			const reset_value = property === "curHp" ? maxHp : value;
-			
+
 			this.update_campaign_entity({
 				uid: this.userId,
 				campaignId: this.campaignId,
@@ -648,7 +643,7 @@ export default {
 			if (campaign_player.curHp > maxHp && property !== "curHp") {
 				this.resetValue("curHp", value, id, player);
 			}
-		}
+		},
 	},
 };
 </script>

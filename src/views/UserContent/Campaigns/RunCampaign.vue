@@ -89,6 +89,7 @@
 							:campaignId="campaignId"
 							:campaign="campaign"
 							:players="players"
+							:sync-characters="sync_characters"
 							@add-player="open_player_dialog"
 						/>
 					</hk-pane>
@@ -115,6 +116,7 @@
 									:campaignId="campaignId"
 									:campaign="campaign"
 									:players="players"
+									:sync-characters="sync_characters"
 									@add-player="open_player_dialog"
 								/>
 							</hk-pane>
@@ -136,6 +138,7 @@
 									:campaignId="campaignId"
 									:campaign="campaign"
 									:players="players"
+									:sync-characters="sync_characters"
 									@add-player="open_player_dialog"
 								/>
 							</hk-pane>
@@ -148,6 +151,7 @@
 							:campaignId="campaignId"
 							:campaign="campaign"
 							:players="players"
+							:sync-characters="sync_characters"
 							@add-player="open_player_dialog"
 						/>
 						<Share v-else-if="!campaign.private" :campaign="campaign" />
@@ -177,6 +181,7 @@
 							:campaignId="campaignId"
 							:campaign="campaign"
 							:players="players"
+							:sync-characters="sync_characters"
 							@add-player="open_player_dialog"
 						/>
 					</q-tab-panel>
@@ -207,6 +212,7 @@ import Players from "src/components/campaign/Players.vue";
 import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
+import { getCharacterSyncStorage, extensionInstalled } from "src/utils/generalFunctions";
 import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
@@ -229,6 +235,7 @@ export default {
 				width: 0,
 				height: 0,
 			},
+			sync_characters: {},
 			loading_campaign: true,
 			campaign: {},
 			players: {},
@@ -269,6 +276,7 @@ export default {
 		};
 	},
 	async mounted() {
+		this.sync_characters = await getCharacterSyncStorage();
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,

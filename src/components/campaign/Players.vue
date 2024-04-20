@@ -385,14 +385,15 @@
 							What should be reset during this rest?
 						</strong>
 					</p>
-						<q-checkbox
-							:dark="$store.getters.theme === 'dark'"
-							:value="all"
-							:indeterminate-value="false"
-							:false-value="null"
-							label="Select all"
-							@input="checkAll"
-						/>
+					<q-checkbox
+						:dark="$store.getters.theme === 'dark'"
+						:value="all"
+						:indeterminate-value="false"
+						:false-value="null"
+						label="Select all"
+						@input="checkAll"
+					/>
+					<hr class="my-1">
 					<div v-for="({ label, property }) in resets" :key="property">
 						<q-checkbox
 							:dark="$store.getters.theme === 'dark'"
@@ -480,7 +481,7 @@ export default {
 					value: null,
 				},
 			],
-			selected_resets: []
+			selected_setter: undefined,
 		};
 	},
 	computed: {
@@ -492,6 +493,14 @@ export default {
 		},
 		page() {
 			return this.$route.path.split("/")[1];
+		},
+		selected_resets: {
+			get() {
+				return this.selected_setter ? this.selected_setter : this.resets.map((item) => item.property);
+			},
+			set(newVal) {
+				this.selected_setter = newVal;
+			}
 		},
 		all() {
 			if(this.selected_resets.length === this.resets.length) {
@@ -604,23 +613,33 @@ export default {
 				if (!player.dead) {
 					for (const { property, value } of [...this.resets, { property: "stable" } ]) {
 						if (this.selected_resets?.includes(property)) {
-							const reset_value = property === "curHp" ? player.maxHp : value;
-
-							this.update_campaign_entity({
-								uid: this.userId,
-								campaignId: this.campaignId,
-								type: "players",
-								id,
-								property,
-								value: reset_value,
-							});
+							this.resetValue(property, value, id, player)
 						}
 					}
 				}
 			}
 			this.rest_dialog = false;
-			this.selected_resets = [];
+			this.selected_setter = undefined;
 		},
+		resetValue(property, value, id, player) {
+			const campaign_player = this.campaign?.players?.[id];
+			const maxHp = (!this.selected_resets.includes("maxHpMod")) ? this.maxHp(player.maxHp, campaign_player?.maxHpMod) : player.maxHp;
+			const reset_value = property === "curHp" ? maxHp : value;
+			
+			this.update_campaign_entity({
+				uid: this.userId,
+				campaignId: this.campaignId,
+				type: "players",
+				id,
+				property,
+				value: reset_value,
+			});
+
+			// if curHp > maxHp the curHp must be reset as well
+			if (campaign_player.curHp > maxHp && property !== "curHp") {
+				this.resetValue("curHp", value, id, player);
+			}
+		}
 	},
 };
 </script>

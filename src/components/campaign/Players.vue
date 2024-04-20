@@ -31,6 +31,14 @@
 			<div class="d-flex justify-content-end">
 				<template v-if="viewerIsUser && page !== 'user'">
 					<button
+						v-if="tier.name !== 'Free' && Object.keys(sync_characters).length && Object.values(players).some(item => item.sync_character)"
+						class="btn btn-sm bg-neutral-5 mr-1"
+						@click="syncAll"
+					>
+						<i aria-hidden="true" class="fas fa-sync-alt" />
+						<q-tooltip anchor="top middle" self="center middle">Sync all players</q-tooltip>
+					</button>
+					<button
 						class="btn btn-sm bg-neutral-5 mr-1"
 						@click="
 							setDrawer({
@@ -321,12 +329,43 @@
 								</span>
 								<span v-if="player.tempHp > 0" class="hit-points ml-1">
 									+{{ player.tempHp }}
-									<q-tooltip anchor="top middle" self="center middle"> Temporary HP </q-tooltip>
+									<q-tooltip anchor="top middle" self="center middle">Temporary HP</q-tooltip>
 								</span>
 							</template>
 						</div>
 						<div class="col actions" :key="'actions-' + key" v-if="viewerIsUser">
-							<a
+							<template v-if="tier.name !== 'Free' && extensionInstalled">
+								<button
+									v-if="players[key].sync_character && (players[key].sync_character in sync_characters)"
+									class="btn btn-sm bg-neutral-5 mr-1"
+									@click="syncCharacter(key, players[key].sync_character)"
+								>
+									<i
+										class="fas fa-sync-alt fade-color"
+										:class="{
+											rotate: key in syncing,
+											green: syncing[key] === 'success',
+											red: syncing[key] === 'error',
+											orange: !playerEqualsLinkedCharacter(players[key])
+										}"
+										aria-hidden="true"
+									/>
+									<q-tooltip anchor="top middle" self="center middle">
+										Update with Character Sync
+									</q-tooltip>
+								</button>
+								<button
+									v-else
+									class="btn btn-sm bg-neutral-5 mr-1"
+									@click="linkDialog(key)"
+								>
+									<i class="fas fa-link" aria-hidden="true" />
+									<q-tooltip anchor="top middle" self="center middle">
+										Link Character to Sync with
+									</q-tooltip>
+								</button>
+							</template>
+							<button
 								class="btn btn-sm bg-neutral-5"
 								@click="
 									setDrawer({
@@ -338,7 +377,7 @@
 							>
 								<i aria-hidden="true" class="fas fa-pencil" />
 								<q-tooltip anchor="top middle" self="center middle"> Edit player </q-tooltip>
-							</a>
+							</button>
 						</div>
 						<div
 							class="xp-bar"
@@ -371,6 +410,11 @@
 				</button>
 			</div>
 		</div>
+
+		<q-dialog v-model="link_dialog" @before-hide="link_character = undefined">
+			<hk-link-character @link="linkCharacter" />
+		</q-dialog>
+
 
 		<q-dialog v-if="viewerIsUser && page !== 'user'" v-model="rest_dialog">
 			<hk-card :min-width="300">
@@ -417,6 +461,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
+import { extensionInstalled, comparePlayerToCharacter, getCharacterSyncCharacter } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",
@@ -438,6 +483,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		syncCharacters: {
+			type: Object,
+			default: () => {}
+		}
 	},
 	mixins: [experience, currencyMixin],
 	data() {
@@ -482,10 +531,15 @@ export default {
 				},
 			],
 			selected_setter: undefined,
+			syncing: {},
+			sync_characters: this.syncCharacters,
+			link_character: undefined,
+			link_dialog: false,
+			extensionInstalled: undefined
 		};
 	},
 	computed: {
-		...mapGetters(["userSettings"]),
+		...mapGetters(["userSettings", "tier"]),
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
@@ -579,10 +633,13 @@ export default {
 			return this.copperToPretty(currency);
 		},
 	},
-
+	async mounted() {
+		this.extensionInstalled = await extensionInstalled();
+	},
 	methods: {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
+		...mapActions("players", ["set_player_prop", "sync_player"]),
 		onResize(size) {
 			let width = size.width;
 			let small = 400;
@@ -620,6 +677,48 @@ export default {
 			}
 			this.rest_dialog = false;
 			this.selected_setter = undefined;
+		},
+		playerEqualsLinkedCharacter(player) {
+			const linked_character = this.sync_characters[player.sync_character];
+			return comparePlayerToCharacter(linked_character, player);
+		},
+		linkDialog(key) {
+			this.link_character = key;
+			this.link_dialog = true;
+		},
+		async linkCharacter(url) {
+			await this.set_player_prop({
+				uid: this.userId,
+				id: this.link_character,
+				property: "sync_character",
+				value: url,
+			});
+			await this.syncCharacter(this.link_character, url);
+			this.link_dialog = false;
+		},
+		async syncAll() {
+			for (const [key, player] of Object.entries(this.players)) {
+				if (player.sync_character && Object.keys(this.sync_characters).includes(player.sync_character)) {
+					await this.syncCharacter(key, player.sync_character);
+				}
+			}
+		},
+		async syncCharacter(id, sync_character) {
+			this.$set(this.syncing, id, "syncing");
+			try {
+				const linked_character = await this.sync_player({ uid: this.userId, id, sync_character });
+				if (linked_character) {
+					this.$set(this.players, id, { ...this.players[id], ...linked_character });
+				}
+				this.$set(this.syncing, id, "success");
+			} catch (e) {
+				this.syncing[id] = "error";
+				this.$snotify.error(e, "Sync failed", {});
+			} finally {
+				setTimeout(() => {
+					this.$delete(this.syncing, id);
+				}, 2000);
+			}
 		},
 		resetValue(property, value, id, player) {
 			const campaign_player = this.campaign?.players?.[id];

@@ -393,11 +393,11 @@
 							label="Select all"
 							@input="checkAll"
 						/>
-					<div v-for="({ label, value }) in resets" :key="value">
+					<div v-for="({ label, property }) in resets" :key="property">
 						<q-checkbox
 							:dark="$store.getters.theme === 'dark'"
 							v-model="selected_resets"
-							:val="value"
+							:val="property"
 							:label="label"
 						/>
 					</div>
@@ -452,23 +452,32 @@ export default {
 			resets: [
 				{
 					label: "Current Hit Points",
-					value: "curHp",
+					property: "curHp",
 				},
 				{
 					label: "Maximum Hit Point modifiers",
-					value: "maxHpMod",
+					property: "maxHpMod",
+					value: 0,
 				},
 				{
 					label: "Temporary Hit Points",
-					value: "tempHp",
+					property: "tempHp",
+					value: 0,
 				},
 				{
 					label: "Armor Class Bonus",
-					value: "ac_bonus",
+					property: "ac_bonus",
+					value: 0,
 				},
 				{
 					label: "Transforms",
-					value: "transformed",
+					property: "transformed",
+					value: null,
+				},
+				{
+					label: "Death Saving Throws",
+					property: "saves",
+					value: null,
 				},
 			],
 			selected_resets: []
@@ -588,60 +597,22 @@ export default {
 			return parseInt(maxHpMod ? maxHp + maxHpMod : maxHp);
 		},
 		checkAll(value) {
-			this.selected_resets = (value) ? this.resets.map((item) => item.value) : [];
+			this.selected_resets = (value) ? this.resets.map((item) => item.property) : [];
 		},
 		reset() {
 			for (const [id, player] of Object.entries(this.players)) {
 				if (!player.dead) {
-					if (this.selected_resets.includes("curHp")) {
-						this.update_campaign_entity({
-							uid: this.userId,
-							campaignId: this.campaignId,
-							type: "players",
-							id,
-							property: "curHp",
-							value: player.maxHp,
-						});
-					}
-					if (this.selected_resets.includes("tempHp")) {
-						this.update_campaign_entity({
-							uid: this.userId,
-							campaignId: this.campaignId,
-							type: "players",
-							id,
-							property: "tempHp",
-							value: 0,
-						});
-					}
-					if (this.selected_resets.includes("maxHpMod")) {
-						this.update_campaign_entity({
-							uid: this.userId,
-							campaignId: this.campaignId,
-							type: "players",
-							id,
-							property: "maxHpMod",
-							value: 0,
-						});
-					}
-					if (this.selected_resets.includes("ac_bonus")) {
-						this.update_campaign_entity({
-							uid: this.userId,
-							campaignId: this.campaignId,
-							type: "players",
-							id,
-							property: "ac_bonus",
-							value: 0,
-						});
-					}
-					for (const property of ["transformed", "stable", "saves"]) {
-						if (property !== "transformed" || this.selected_resets.includes("transformed")) {
+					for (const { property, value } of [...this.resets, { property: "stable" } ]) {
+						if (this.selected_resets?.includes(property)) {
+							const reset_value = property === "curHp" ? player.maxHp : value;
+
 							this.update_campaign_entity({
 								uid: this.userId,
 								campaignId: this.campaignId,
 								type: "players",
 								id,
 								property,
-								value: null,
+								value: reset_value,
 							});
 						}
 					}

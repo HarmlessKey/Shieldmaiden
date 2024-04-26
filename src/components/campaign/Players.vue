@@ -35,7 +35,13 @@
 						<q-tooltip anchor="top middle" self="center middle">Manage Players</q-tooltip>
 					</button>
 					<button
-						v-if="tier.name !== 'Free' && Object.keys(sync_characters).length && Object.values(players).some(item => item.sync_character)"
+						v-if="
+							tier.name !== 'Free' &&
+							sync_characters &&
+							players &&
+							Object.keys(sync_characters).length &&
+							Object.values(players).some((item) => item.sync_character)
+						"
 						class="btn btn-sm bg-neutral-5 mr-1"
 						@click="syncAll"
 					>
@@ -337,7 +343,9 @@
 						<div class="col actions" :key="'actions-' + key" v-if="viewerIsUser">
 							<template v-if="tier.name !== 'Free' && extensionInstalled">
 								<button
-									v-if="players[key].sync_character && (players[key].sync_character in sync_characters)"
+									v-if="
+										players[key].sync_character && players[key].sync_character in sync_characters
+									"
 									class="btn btn-sm bg-neutral-5 mr-1"
 									@click="syncCharacter(key, players[key].sync_character)"
 								>
@@ -347,7 +355,7 @@
 											rotate: key in syncing,
 											green: syncing[key] === 'success',
 											red: syncing[key] === 'error',
-											orange: !playerEqualsLinkedCharacter(players[key])
+											orange: !playerEqualsLinkedCharacter(players[key]),
 										}"
 										aria-hidden="true"
 									/>
@@ -355,11 +363,7 @@
 										Update with Character Sync
 									</q-tooltip>
 								</button>
-								<button
-									v-else
-									class="btn btn-sm bg-neutral-5 mr-1"
-									@click="linkDialog(key)"
-								>
+								<button v-else class="btn btn-sm bg-neutral-5 mr-1" @click="linkDialog(key)">
 									<i class="fas fa-link" aria-hidden="true" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Link Character to Sync with
@@ -416,7 +420,6 @@
 			<hk-link-character @link="linkCharacter" />
 		</q-dialog>
 
-
 		<q-dialog v-if="viewerIsUser && page !== 'user'" v-model="rest_dialog">
 			<hk-card :min-width="300">
 				<div slot="header" class="card-header">
@@ -460,7 +463,11 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
-import { extensionInstalled, comparePlayerToCharacter, getCharacterSyncCharacter } from "src/utils/generalFunctions";
+import {
+	extensionInstalled,
+	comparePlayerToCharacter,
+	getCharacterSyncCharacter,
+} from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",
@@ -484,8 +491,8 @@ export default {
 		},
 		syncCharacters: {
 			type: Object,
-			default: () => {}
-		}
+			default: () => {},
+		},
 	},
 	mixins: [experience, currencyMixin],
 	data() {
@@ -534,7 +541,7 @@ export default {
 			sync_characters: this.syncCharacters,
 			link_character: undefined,
 			link_dialog: false,
-			extensionInstalled: undefined
+			extensionInstalled: undefined,
 		};
 	},
 	computed: {
@@ -700,7 +707,10 @@ export default {
 		},
 		async syncAll() {
 			for (const [key, player] of Object.entries(this.players)) {
-				if (player.sync_character && Object.keys(this.sync_characters).includes(player.sync_character)) {
+				if (
+					player.sync_character &&
+					Object.keys(this.sync_characters).includes(player.sync_character)
+				) {
 					await this.syncCharacter(key, player.sync_character);
 				}
 			}

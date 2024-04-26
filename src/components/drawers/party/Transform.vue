@@ -99,7 +99,7 @@ export default {
 				property: "transformed",
 				value: transform,
 			});
-			this.$emit("close");
+			this.$emit("close", beast);
 		},
 	},
 };

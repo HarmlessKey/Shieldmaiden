@@ -514,15 +514,17 @@ export default {
 		async dialogCloneEncounter(key) {
 			this.clone = true;
 			this.cloneEncounterData.key = key;
-			this.cloneEncounterData.ogEncounter = await this.get_encounter({
-				uid: this.user.uid,
-				campaignId: this.campaignId,
-				id: key,
-			});
-			this.cloneEncounterData.name = this.cloneEncounterData.ogEncounter.name;
+			this.cloneEncounterData.ogEncounter = structuredClone(
+				await this.get_encounter({
+					uid: this.user.uid,
+					campaignId: this.campaignId,
+					id: key,
+				})
+			);
+			this.cloneEncounterData.name = structuredClone(this.cloneEncounterData.ogEncounter.name);
 		},
 		async cloneEncounter() {
-			const encounter = this.cloneEncounterData.ogEncounter;
+			const encounter = structuredClone(this.cloneEncounterData.ogEncounter);
 			encounter.name = this.cloneEncounterData.name;
 			const new_id = await this.add_encounter({
 				campaignId: this.campaignId,
@@ -530,6 +532,11 @@ export default {
 			});
 			await this.reset_encounter({ campaignId: this.campaignId, id: new_id });
 			this.clone = false;
+			this.cloneEncounterData = {
+				name: undefined,
+				key: undefined,
+				ogEncounter: undefined,
+			};
 		},
 		async deleteFinishedEncounters() {
 			this.$snotify.error(

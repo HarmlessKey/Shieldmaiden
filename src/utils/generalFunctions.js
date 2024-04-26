@@ -50,6 +50,10 @@ export function calc_skill_mod(
 	return parseInt(mod) + parseInt(bonus);
 }
 
+export function displayCR(cr) {
+	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
+}
+
 /**
  * Downloads a JSON file
  *
@@ -189,15 +193,18 @@ export function comparePlayerToCharacter(sync_character, player) {
  * @param {string} url
  */
 export async function extensionInstalled() {
-
 	const sendMessage = new Promise((resolve) => {
-		chrome?.runtime?.sendMessage(character_sync_id, { request_content: ["version"] }, (response) => {
-			if (response) {
-				resolve(response.version);
-			} else {
-				return undefined;
+		chrome?.runtime?.sendMessage(
+			character_sync_id,
+			{ request_content: ["version"] },
+			(response) => {
+				if (response) {
+					resolve(response.version);
+				} else {
+					return undefined;
+				}
 			}
-		});
+		);
 	});
 	const timeout = new Promise((resolve) => {
 		setTimeout(resolve, 100, undefined);
@@ -269,7 +276,7 @@ export function urlType(url) {
 }
 
 export function generateYoutubeEmbedUrl(url) {
-	const regex = /(v=|embed\/|\.be\/|v\/)(?<id>[^&|/?]{11})/i
+	const regex = /(v=|embed\/|\.be\/|v\/)(?<id>[^&|/?]{11})/i;
 	const { id } = regex.exec(url).groups;
 
 	return `https://www.youtube-nocookie.com/embed/${id}`;

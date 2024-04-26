@@ -26,7 +26,7 @@ export default {
 	name: "hk-select",
 	props: {
 		value: {
-			type: [String, Array],
+			type: [String, Array, Number],
 		},
 		filled: {
 			type: Boolean,

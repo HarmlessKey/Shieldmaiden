@@ -143,14 +143,18 @@
 									</router-link>
 									<a
 										class="mr-1 btn btn-sm bg-neutral-5"
+										v-if="!overencumbered"
+										@click="dialogCloneEncounter(props.key)"
+									>
+										<i aria-hidden="true" class="fas fa-copy"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Clone </q-tooltip>
+									</a>
+									<a
+										class="btn btn-sm bg-neutral-5"
 										@click="deleteEncounter($event, props.key, props.row.name)"
 									>
 										<i aria-hidden="true" class="fas fa-trash-alt"></i>
 										<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
-									</a>
-									<a class="btn btn-sm bg-neutral-5" @click="dialogCloneEncounter(props.key)">
-										<i aria-hidden="true" class="fas fa-copy"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Clone </q-tooltip>
 									</a>
 								</div>
 							</q-td>
@@ -224,6 +228,14 @@
 										>
 											<i aria-hidden="true" class="fas fa-undo"></i>
 											<q-tooltip anchor="top middle" self="center middle"> Reset </q-tooltip>
+										</a>
+										<a
+											class="mr-1 btn btn-sm bg-neutral-5"
+											v-if="!overencumbered"
+											@click="dialogCloneEncounter(props.key)"
+										>
+											<i aria-hidden="true" class="fas fa-copy"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Clone </q-tooltip>
 										</a>
 										<a
 											class="btn btn-sm bg-neutral-5"

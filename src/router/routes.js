@@ -29,7 +29,8 @@ const routes = [
 		meta: {
 			sidebar: false,
 			offline: true,
-			description: "Shieldmaiden, a combat tracker for D&D 5e. The online tool, for offline play.",
+			description:
+				"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
 			title: "D&D Combat Tracker",
 		},
 	},
@@ -677,9 +678,9 @@ const routes = [
 						meta: {
 							title: "D&D 5e DM Screen",
 							description:
-							"A Dungeon Master Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+								"A Dungeon Master Screen for D&D 5e. Quickly reference rules and directly run encounters.",
 						},
-					}
+					},
 				],
 			},
 			{

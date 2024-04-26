@@ -276,7 +276,10 @@ export default {
 		};
 	},
 	async mounted() {
-		this.sync_characters = await getCharacterSyncStorage();
+		const installed = await extensionInstalled();
+		if (installed) {
+			this.sync_characters = await getCharacterSyncStorage();
+		}
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,

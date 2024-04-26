@@ -14,7 +14,7 @@
 			</small>
 			<ValidationObserver v-slot="{ handleSubmit }">
 				<div class="mb-2">Manual transform</div>
-				<q-form @submit="handleSubmit(edit)">
+				<q-form @submit="handleSubmit(edit())">
 					<div class="row q-col-gutter-md">
 						<div class="col">
 							<ValidationProvider
@@ -66,69 +66,13 @@
 				</q-form>
 			</ValidationObserver>
 
-			<div class="my-2">Select to transform</div>
-			<div class="d-flex justify-content-betweeen items-center gap-2 mb-2">
-				<hk-input
-					v-model="search"
-					:label="`Search ${types?.includes('Beast') ? 'beasts' : 'monsters'}`"
-					class="full-width"
-					clearable
-					@blur="updateFilter"
-					@keydown.enter="updateFilter"
-					@clear="updateFilter"
-				/>
-				<hk-select
-					v-model="cr_filter"
-					:options="crs"
-					class="full-width"
-					label="Challenge rating"
-					clearable
-					@input="updateFilter"
-				/>
-			</div>
-			<div class="mb-2 d-flex justify-content-between">
-				Select {{ types?.includes("Beast") ? "beast" : "monster" }}
-				<a v-if="types?.includes('Beast')" @click="clearTypes">Show all monsters</a>
-			</div>
-			<hk-loader v-if="loading" />
-			<q-list v-else :dark="$store.getters.theme === 'dark'">
-				<q-item v-for="(result, index) in beasts" :key="index" class="bg-neutral-8">
-					<q-item-section class="truncate">
-						{{ result.name.capitalizeEach() }}
-					</q-item-section>
-					<q-item-section class="text-right" avatar>
-						{{ displayCR(result.challenge_rating) }}
-					</q-item-section>
-					<q-item-section avatar>
-						<a class="btn btn-sm bg-neutral-5 ml-2" @click="transform(result.url)">
-							<i aria-hidden="true" class="fas fa-paw" />
-						</a>
-					</q-item-section>
-				</q-item>
-			</q-list>
-			<div v-if="!pagination.rowsNumber" class="red">
-				No {{ types?.includes("Beast") ? "beasts" : "monsters" }} found
-			</div>
-
-			<q-pagination
-				v-if="!loading && pagination.rowsNumber > pagination.rowsPerPage"
-				class="mt-3"
-				v-model="pagination.page"
-				:max="Math.ceil(pagination.rowsNumber / pagination.rowsPerPage)"
-				:max-pages="5"
-				color="dark"
-				:direction-links="true"
-				:boundary-links="true"
-				@input="fetchMonsters"
-			/>
+			<hk-transform-select @select="edit" />
 		</template>
 	</div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
-import { displayCR } from "src/utils/generalFunctions";
-import { range } from "lodash";
 
 export default {
 	name: "Transform",
@@ -141,72 +85,22 @@ export default {
 			encounterId: this.$route.params.encid,
 			transAc: null,
 			transHp: null,
-			beasts: [],
-			pagination: {
-				sortBy: "challenge_rating",
-				descending: false,
-				page: 1,
-				rowsPerPage: 15,
-				rowsNumber: 0,
-			},
-			cr_filter: null,
-			search: null,
-			types: ["Beast"],
-			displayCR,
-			loading: true,
 		};
-	},
-	computed: {
-		crs() {
-			const cr = [0, 0.125, 0.25, 0.5];
-			const max = this.types?.includes("Beast") ? 9 : 31;
-			return [...cr, ...range(1, max)];
-		},
-		query() {
-			return {
-				search: this.search,
-				types: this.types,
-				challenge_ratings:
-					this.cr_filter !== null ? { min: this.cr_filter, max: this.cr_filter } : null,
-			};
-		},
 	},
 	methods: {
 		...mapActions(["setDrawer", "transform_entity"]),
-		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
-		async fetchMonsters() {
-			await this.fetch_monsters({
-				pageNumber: this.pagination.page,
-				pageSize: this.pagination.rowsPerPage,
-				query: this.query,
-				fields: ["name", "challenge_rating", "url"],
-				sortBy: this.pagination.sortBy,
-				descending: this.pagination.descending,
-			}).then((result) => {
-				this.$set(this.pagination, "rowsNumber", result.meta.count);
-				this.beasts = result.results;
-				this.loading = false;
-			});
-		},
-		async transform(url) {
-			const beast = await this.fetch_monster(url);
-			this.transform_entity({
-				key: this.entity.key,
-				entity: {
-					ac: beast.armor_class,
-					maxHp: beast.hit_points,
-					curHp: beast.hit_points,
-				},
-			});
-			this.setDrawer(false);
-		},
-		edit() {
-			let transform = {
-				ac: parseInt(this.transAc),
-				maxHp: parseInt(this.transHp),
-				curHp: parseInt(this.transHp),
-			};
-
+		edit(beast) {
+			const transform = beast
+				? {
+						ac: beast.armor_class,
+						maxHp: beast.hit_points,
+						curHp: beast.hit_points,
+				  }
+				: {
+						ac: parseInt(this.transAc),
+						maxHp: parseInt(this.transHp),
+						curHp: parseInt(this.transHp),
+				  };
 			this.transform_entity({
 				key: this.entity.key,
 				entity: transform,
@@ -220,17 +114,6 @@ export default {
 			});
 			this.entity.transformed = false;
 		},
-		clearTypes() {
-			this.types = [];
-			this.updateFilter();
-		},
-		updateFilter() {
-			this.pagination.page = 1;
-			this.fetchMonsters();
-		},
-	},
-	async mounted() {
-		await this.fetchMonsters();
 	},
 };
 </script>

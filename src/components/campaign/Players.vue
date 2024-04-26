@@ -463,11 +463,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
-import {
-	extensionInstalled,
-	comparePlayerToCharacter,
-	getCharacterSyncCharacter,
-} from "src/utils/generalFunctions";
+import { extensionInstalled, comparePlayerToCharacter } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",

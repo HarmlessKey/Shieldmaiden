@@ -276,9 +276,13 @@ export default {
 		};
 	},
 	async mounted() {
-		const installed = await extensionInstalled();
-		if (installed) {
-			this.sync_characters = await getCharacterSyncStorage();
+		try {
+			const installed = await extensionInstalled();
+			if (installed) {
+				this.sync_characters = await getCharacterSyncStorage();
+			}
+		} catch (e) {
+			// Do nothing
 		}
 		await this.get_campaign({
 			uid: this.user.uid,

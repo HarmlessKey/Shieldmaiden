@@ -277,7 +277,10 @@ export default {
 	},
 	async mounted() {
 		try {
-			this.sync_characters = await getCharacterSyncStorage();
+			const installed = await extensionInstalled();
+			if (installed) {
+				this.sync_characters = await getCharacterSyncStorage();
+			}
 		} catch (e) {
 			// Do nothing
 		}

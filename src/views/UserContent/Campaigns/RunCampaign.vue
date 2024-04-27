@@ -276,7 +276,11 @@ export default {
 		};
 	},
 	async mounted() {
-		this.sync_characters = await getCharacterSyncStorage();
+		try {
+			this.sync_characters = await getCharacterSyncStorage();
+		} catch (e) {
+			// Do nothing
+		}
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,

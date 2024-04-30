@@ -137,61 +137,61 @@ module.exports = function (/* ctx */) {
 				categories: ["games", "entertainment"],
 				icons: [
 					{
-						src: "img/icons/transparent-512x512.png",
+						src: "icons/transparent-512x512.png",
 						sizes: "512x512",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "img/icons/maskable-512x512.png",
+						src: "icons/maskable-512x512.png",
 						sizes: "512x512",
 						type: "image/png",
 						purpose: "maskable",
 					},
 					{
-						src: "img/icons/transparent-192x192.png",
+						src: "icons/transparent-192x192.png",
 						sizes: "192x192",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "img/icons/maskable-192x192.png",
+						src: "icons/maskable-192x192.png",
 						sizes: "192x192",
 						type: "image/png",
 						purpose: "maskable",
 					},
 					{
-						src: "img/icons/ms/app-icon-44x44.png",
+						src: "icons/ms/app-icon-44x44.png",
 						sizes: "44x44",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "img/icons/ms/small-tile-71x71.png",
+						src: "icons/ms/small-tile-71x71.png",
 						sizes: "71x71",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "img/icons/ms/wide-tile-350x150.png",
+						src: "icons/ms/wide-tile-350x150.png",
 						sizes: "350x150",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "img/icons/ms/large-tile-310x310.png",
+						src: "icons/ms/large-tile-310x310.png",
 						sizes: "310x310",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "img/icons/ms/store-logo-50x50.png",
+						src: "icons/ms/store-logo-50x50.png",
 						sizes: "50x50",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "img/icons/ms/splash-screen-620x300.png",
+						src: "icons/ms/splash-screen-620x300.png",
 						sizes: "620x300",
 						type: "image/png",
 						purpose: "any",
@@ -204,7 +204,7 @@ module.exports = function (/* ctx */) {
 						url: "/content/campaigns",
 						icons: [
 							{
-								src: "/img/icons/shortcuts/campaigns-512x512.png",
+								src: "/icons/shortcuts/campaigns-512x512.png",
 								sizes: "512x512",
 								type: "image/png",
 								purpose: "any",
@@ -217,7 +217,7 @@ module.exports = function (/* ctx */) {
 						url: "/content/characters",
 						icons: [
 							{
-								src: "/img/icons/shortcuts/characters-512x512.png",
+								src: "/icons/shortcuts/characters-512x512.png",
 								sizes: "512x512",
 								type: "image/png",
 								purpose: "any",

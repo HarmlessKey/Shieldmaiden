@@ -28,7 +28,12 @@
 			:error="!!noResult"
 			:error-message="noResult"
 		>
-			<button v-if="copy_resource === 'srd'" slot="before" class="btn btn" @click="show_filter = !show_filter">
+			<button
+				v-if="copy_resource === 'srd'"
+				slot="before"
+				class="btn btn"
+				@click="show_filter = !show_filter"
+			>
 				<q-icon name="fas fa-filter" size="xs" />
 			</button>
 			<button slot="append" class="btn btn-sm btn-clear" @click="search()">
@@ -38,10 +43,7 @@
 		<q-slide-transition v-if="copy_resource === 'srd'">
 			<div v-show="show_filter" class="filter">
 				<h3>Filter {{ type }}s</h3>
-				<hk-filter 
-					v-model="filter" 
-					:type="type"
-					@change="search()" />
+				<hk-filter v-model="filter" :type="type" @change="search()" />
 			</div>
 		</q-slide-transition>
 		<q-list :dark="$store.getters.theme === 'dark'">
@@ -71,14 +73,14 @@
 		</q-list>
 		<q-pagination
 			v-if="copy_resource === 'srd' && totalPages > 1"
-      v-model="page"
-      :max="totalPages"
+			v-model="page"
+			:max="totalPages"
 			:max-pages="5"
 			flat
 			direction-links
 			class="mt-3"
 			@input="fetchApiContent()"
-    />
+		/>
 	</div>
 </template>
 
@@ -233,26 +235,24 @@ export default {
 				data = this.fetch_api_spells;
 			}
 
-			await data(
-				{ 
-					pageNumber: this.page,
-					pageSize: this.pageSize,
-					query: { 
-						search: this.query, 
-						...this.filter 
-					} 
-				}).then((result) => {
-					if (result.meta.count === 0) {
-						this.noResult = 'Nothing found for "' + this.query + '"';
-						this.totalPages = 0;
-					} else {
-						this.noResult = "";
-						this.searchResults = result.results;
-						this.totalPages = Math.ceil(result.meta.count / this.pageSize);
-					}
+			await data({
+				pageNumber: this.page,
+				pageSize: this.pageSize,
+				query: {
+					search: this.query,
+					...this.filter,
+				},
+			}).then((result) => {
+				if (result.meta.count === 0) {
+					this.noResult = 'Nothing found for "' + this.query + '"';
+					this.totalPages = 0;
+				} else {
+					this.noResult = "";
+					this.searchResults = result.results;
+					this.totalPages = Math.ceil(result.meta.count / this.pageSize);
 				}
-			);
-	},
+			});
+		},
 
 		/**
 		 * Emit the selected result

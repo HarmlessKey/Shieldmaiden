@@ -4,7 +4,7 @@
 	<div class="pb-5" v-if="entity && !demo">
 		<h2 class="d-flex justify-content-between">
 			<span>Edit {{ playerBase.character_name }}</span>
-			<a @click="setTransform = !setTransform">
+			<a v-if="!entity.transformed" @click="setTransform = !setTransform">
 				<i aria-hidden="true" v-if="setTransform" class="fas fa-times red"></i>
 				<i aria-hidden="true" v-else class="fas fa-paw-claws green"></i>
 				<q-tooltip anchor="top middle" self="center middle"> Transform </q-tooltip>
@@ -15,7 +15,7 @@
 			>Remove transformation</a
 		>
 
-		<Transform :data="entityKey" @close="closeTransform" v-if="setTransform" />
+		<Transform v-if="setTransform" :data="entityKey" @close="closeTransform" />
 
 		<template v-else>
 			<!-- DEATH SAVING THROWS -->
@@ -512,7 +512,8 @@ export default {
 				value,
 			});
 		},
-		closeTransform() {
+		closeTransform(beast) {
+			this.entity.transformed = beast;
 			this.setTransform = false;
 		},
 		removeTransform() {
@@ -524,6 +525,7 @@ export default {
 				property: "transformed",
 				value: null,
 			});
+			this.entity.transformed = null;
 		},
 		stabilize() {
 			this.stabilize_entity({

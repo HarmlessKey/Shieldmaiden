@@ -516,7 +516,7 @@ export default {
 			"display_maxHp",
 		]),
 		showCondition(key) {
-			this.setSlide({
+			this.setDrawer({
 				show: true,
 				type: "drawers/encounter/Condition",
 				data: {

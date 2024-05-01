@@ -24,7 +24,7 @@
 			take your game to the next level.
 		</p>
 
-		<h2 class="written">Features</h2>
+		<h2 class="written">Features of our Initiative Tracker</h2>
 		<q-img
 			class="mb-3"
 			src="~assets/_img/tools/combat-tracker/combat-tracker.png"

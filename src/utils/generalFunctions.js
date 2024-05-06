@@ -50,6 +50,10 @@ export function calc_skill_mod(
 	return parseInt(mod) + parseInt(bonus);
 }
 
+export function displayCR(cr) {
+	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
+}
+
 /**
  * Downloads a JSON file
  *

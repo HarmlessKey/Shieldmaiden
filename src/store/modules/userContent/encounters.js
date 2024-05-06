@@ -869,6 +869,7 @@ const encounter_actions = {
 						delete entity.meters;
 						delete entity.hidden;
 						delete entity.reminders;
+						delete entity.conditions;
 
 						if (entity.entityType === "npc") {
 							entity.curHp = entity.maxHp;

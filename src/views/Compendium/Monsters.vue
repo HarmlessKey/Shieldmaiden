@@ -155,6 +155,7 @@ import ViewMonster from "src/components/compendium/Monster.vue";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions } from "vuex";
 import _ from "lodash";
+import { displayCR } from "src/utils/generalFunctions";
 
 export default {
 	name: "Monsters",

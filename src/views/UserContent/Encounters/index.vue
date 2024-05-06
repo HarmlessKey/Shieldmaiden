@@ -142,6 +142,14 @@
 										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 									</router-link>
 									<a
+										class="mr-1 btn btn-sm bg-neutral-5"
+										v-if="!overencumbered"
+										@click="dialogCloneEncounter(props.key)"
+									>
+										<i aria-hidden="true" class="fas fa-copy"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Clone </q-tooltip>
+									</a>
+									<a
 										class="btn btn-sm bg-neutral-5"
 										@click="deleteEncounter($event, props.key, props.row.name)"
 									>
@@ -150,7 +158,7 @@
 									</a>
 								</div>
 							</q-td>
-							</q-tr>
+						</q-tr>
 					</template>
 					<div slot="no-data" />
 				</q-table>
@@ -206,7 +214,10 @@
 											<i aria-hidden="true" class="fas fa-eye"></i>
 											<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
 										</router-link>
-										<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(props.key, (hard = false))">
+										<a
+											class="btn btn-sm bg-neutral-5 ml-1"
+											@click="reset(props.key, (hard = false))"
+										>
 											<i aria-hidden="true" class="fas fa-trash-restore-alt"></i>
 											<q-tooltip anchor="top middle" self="center middle"> Unfinish </q-tooltip>
 										</a>
@@ -217,6 +228,14 @@
 										>
 											<i aria-hidden="true" class="fas fa-undo"></i>
 											<q-tooltip anchor="top middle" self="center middle"> Reset </q-tooltip>
+										</a>
+										<a
+											class="mr-1 btn btn-sm bg-neutral-5"
+											v-if="!overencumbered"
+											@click="dialogCloneEncounter(props.key)"
+										>
+											<i aria-hidden="true" class="fas fa-copy"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Clone </q-tooltip>
 										</a>
 										<a
 											class="btn btn-sm bg-neutral-5"
@@ -307,6 +326,39 @@
 				</q-form>
 			</div>
 		</q-dialog>
+
+		<!-- Clone encounter dialog -->
+		<q-dialog
+			v-if="
+				clone &&
+				(encounter_count < tier.benefits.encounters || tier.benefits.encounters == 'infinite')
+			"
+			v-model="clone"
+			square
+		>
+			<div>
+				<q-form @submit="cloneEncounter">
+					<hk-card header="Clone encounter" class="mb-0">
+						<div class="card-body">
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								label="Encounter title"
+								type="text"
+								autocomplete="off"
+								v-model="cloneEncounterData.name"
+								:rules="[(val) => (val && val.length > 0) || 'Enter a title']"
+							/>
+						</div>
+						<div slot="footer" class="card-footer d-flex justify-content-end">
+							<q-btn v-close-popup class="mr-1" no-caps type="cancel">Cancel</q-btn>
+							<q-btn color="primary" type="submit" no-caps label="Add encounter" />
+						</div>
+					</hk-card>
+				</q-form>
+			</div>
+		</q-dialog>
 	</div>
 	<hk-loader v-else name="encounters" />
 </template>
@@ -326,6 +378,12 @@ export default {
 			finished_fetched: false,
 			newEncounter: "",
 			add: false,
+			clone: false,
+			cloneEncounterData: {
+				name: undefined,
+				key: undefined,
+				ogEncounter: undefined,
+			},
 			currentPage: 1,
 			search: undefined,
 			columns: [
@@ -395,6 +453,7 @@ export default {
 	methods: {
 		...mapActions("encounters", [
 			"get_campaign_encounters",
+			"get_encounter",
 			"add_encounter",
 			"delete_encounter",
 			"delete_finished_encounters",
@@ -463,6 +522,33 @@ export default {
 					}
 				);
 			}
+		},
+		async dialogCloneEncounter(key) {
+			this.clone = true;
+			this.cloneEncounterData.key = key;
+			this.cloneEncounterData.ogEncounter = structuredClone(
+				await this.get_encounter({
+					uid: this.user.uid,
+					campaignId: this.campaignId,
+					id: key,
+				})
+			);
+			this.cloneEncounterData.name = structuredClone(this.cloneEncounterData.ogEncounter.name);
+		},
+		async cloneEncounter() {
+			const encounter = structuredClone(this.cloneEncounterData.ogEncounter);
+			encounter.name = this.cloneEncounterData.name;
+			const new_id = await this.add_encounter({
+				campaignId: this.campaignId,
+				encounter,
+			});
+			await this.reset_encounter({ campaignId: this.campaignId, id: new_id });
+			this.clone = false;
+			this.cloneEncounterData = {
+				name: undefined,
+				key: undefined,
+				ogEncounter: undefined,
+			};
 		},
 		async deleteFinishedEncounters() {
 			this.$snotify.error(

@@ -30,8 +30,8 @@ const routes = [
 			sidebar: false,
 			offline: true,
 			description:
-				"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
-			title: "D&D Combat Tracker",
+				"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+			title: "Manage combat encounters as a D&D 5e Dungeon Master",
 		},
 	},
 	{ path: "/home", redirect: "/" },
@@ -81,7 +81,7 @@ const routes = [
 						component: () => import("src/views/UserContent/ImportContent"),
 						meta: {
 							description: "Import content to Shieldmaiden",
-							title: "Import Shieldmaiden  Content",
+							title: "Import Shieldmaiden Content",
 						},
 					},
 					{
@@ -608,9 +608,9 @@ const routes = [
 				name: "Tools",
 				component: () => import("src/views/Tools"),
 				meta: {
-					title: "D&D 5e Tools",
+					title: "D&D Tools - Online tools for D&D 5e",
 					description:
-						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nDM Screen \nMonster builder \nSpell creator \nCharacter Builder \nCharacter Sync \nCompendium",
+						"Try our range of D&D 5e DM companion tools: track combat, build encounters, make custom monsters and spells, or check out one of our other useful tools for free now!",
 				},
 			},
 			{
@@ -618,8 +618,9 @@ const routes = [
 				name: "ToolsCombatTracker",
 				component: () => import("src/views/Tools/CombatTracker"),
 				meta: {
-					title: "D&D 5e Combat Tracker",
-					description: "An advanced initiative tracker for Dungeons and Dragons 5th edition.",
+					title: "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					description:
+						"Get a grip on tracking combat as a D&D DM with Shieldmaiden Combat Tracker. You can keep track of initiative, health, status effects, concentration spells, and much more. Use for free now! ",
 				},
 			},
 			{
@@ -630,9 +631,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5e Encounter Builder",
+					title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 					description:
-						"An encounter builder for D&D 5e. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
+						"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
 				},
 				children: [
 					{
@@ -640,9 +641,9 @@ const routes = [
 						name: "ToolsEncounterBuilder",
 						component: () => import("src/views/Tools/EncounterBuilder"),
 						meta: {
-							title: "D&D 5e Encounter Builder",
+							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 							description:
-								"An encounter builder for D&D 5e. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
+								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
 						},
 					},
 					{
@@ -650,9 +651,9 @@ const routes = [
 						name: "ToolsBuildEncounter",
 						component: () => import("src/components/encounters"),
 						meta: {
-							title: "Build encounter for D&D 5e",
+							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 							description:
-								"Create an encounter for D&D 5e and find out its difficulty. Once you're finished you can run it in our Combat Tracker.",
+								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now! ",
 							side: false,
 						},
 					},
@@ -691,9 +692,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5e Monster creator",
+					title: "D&D Monster Creator - Create custom monsters for D&D 5e",
 					description:
-						"An advanced monster creator for D&D 5e. Create a stat block with easy to roll actions.",
+						"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
 				},
 				children: [
 					{
@@ -703,7 +704,7 @@ const routes = [
 						meta: {
 							title: "Dungeons & Dragons Monster Creator",
 							description:
-								"An advanced monster creator for D&D 5e. Create a stat block with easy to roll actions.",
+								"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
 						},
 					},
 					{
@@ -725,7 +726,7 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5e Spell creator",
+					title: "D&D Spell Creator - Create custom spells for D&D 5e",
 					description:
 						"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
 				},
@@ -735,9 +736,9 @@ const routes = [
 						name: "ToolsSpellCreator",
 						component: () => import("src/views/Tools/SpellCreator"),
 						meta: {
-							title: "Dungeons & Dragons Spell Creator",
+							title: "D&D Spell Creator - Create custom spells for D&D 5e ",
 							description:
-								"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+								"Create custom spells for your D&D campaign with ease. Roll your customized spell directly or use them in your custom spellcaster monsters.",
 						},
 					},
 					{
@@ -798,8 +799,9 @@ const routes = [
 				name: "Compendium",
 				component: () => import("src/views/Compendium"),
 				meta: {
-					title: "Compendium D&D 5e",
-					description: "Conditions, items, monsters and spells for Dungeons & Dragons 5th edition.",
+					title: "Dungeons & Dragons Compendium - D&D 5e knowledge database",
+					description:
+						"Find descriptions and explanations for D&D 5e items, monsters, spells, conditions, rules and much more. What does this item do again? How does this spell work? Find the answer in our easy to understand compendium.",
 				},
 			},
 			{
@@ -1187,9 +1189,9 @@ const routes = [
 		meta: {
 			sidebar: false,
 			offline: true,
-			title: "Encounter demo",
+			title: "D&D Initative Tracker - Demo",
 			description:
-				"Try running an encounter with Shieldmaiden, a Combat Tracker for Dungeons & Dragons 5th Edition.",
+				"Try running an encounter with Shieldmaiden, an advanced Initiative Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
 		},
 	},
 	{

@@ -86,13 +86,14 @@ export default {
 		const meta = {
 			title: {
 				name: "title",
-				content: this.$route.meta.title || "D&D Combat Tracker",
+				content:
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			description: {
 				name: "description",
 				content:
 					this.$route.meta.description ||
-					"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
+					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 
 			// TWITTER
@@ -102,13 +103,14 @@ export default {
 			},
 			twitterTitle: {
 				name: "twitter:title",
-				content: this.$route.meta.title || "D&D Combat Tracker | Shieldmaiden",
+				content:
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			twitterDescription: {
 				name: "twitter:description",
 				content:
 					this.$route.meta.description ||
-					"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
+					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 			twitterImage: {
 				name: "twitter:image",
@@ -122,13 +124,14 @@ export default {
 			// OG
 			ogTitle: {
 				property: "og:title",
-				content: this.$route.meta.title || "D&D Combat Tracker | Shieldmaiden",
+				content:
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			ogDescription: {
 				property: "og:description",
 				content:
 					this.$route.meta.description ||
-					"Shieldmaiden, a Combat Tracker and other Campaign Tools for D&D 5e. The perfect companion for your D&D Campaign.",
+					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 			ogSiteName: {
 				property: "og:site_name",
@@ -165,7 +168,8 @@ export default {
 		}
 
 		return {
-			title: this.$route.meta.title || "D&D Combat Tracker",
+			title:
+				this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			titleTemplate: (title) => `${title} | Shieldmaiden`,
 			link: {
 				canonical: {

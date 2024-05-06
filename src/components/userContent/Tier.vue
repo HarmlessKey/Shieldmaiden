@@ -86,6 +86,9 @@ export default {
 				background: {
 					title: "Background effects",
 				},
+				import: {
+					title: "Import content",
+				},
 				storage: {
 					title: "Storage",
 				},

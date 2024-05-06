@@ -358,7 +358,7 @@ export default {
 					name: "Facebook",
 					icon: "fab fa-facebook",
 					url: "https://www.facebook.com/shieldmaidenapp",
-				}
+				},
 			],
 		};
 	},

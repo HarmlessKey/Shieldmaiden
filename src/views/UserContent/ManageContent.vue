@@ -8,7 +8,7 @@
 				</p>
 				<router-link to="/patreon" class="btn btn-block btn-lg bg-neutral-9 mt-2">
 					<i aria-hidden="true" class="fab fa-patreon patreon-red mr-2" />
-					{{ tier.name === "Free" ? "Get" : "Upgrade" }} subscription
+					{{ tier.price === "Free" ? "Get" : "Upgrade" }} subscription
 				</router-link>
 			</template>
 

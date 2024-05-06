@@ -2,7 +2,6 @@
 	<div class="content-side">
 		<Tutorial v-if="show_tutorial" vertical />
 
-
 		<hk-card v-if="$route.path.startsWith('/content/players')">
 			<div class="card-header" slot="header">
 				<span>
@@ -14,7 +13,7 @@
 				<p>
 					Sync your player's character sheets from other resources in
 					<span class="whitespace-nowrap">Shieldmaiden</span
-					><span v-if="tier.name === 'Free'" class="neutral-3"> *</span>.
+					><span v-if="tier.price === 'Free'" class="neutral-3"> *</span>.
 				</p>
 
 				<button
@@ -30,7 +29,7 @@
 				</button>
 			</div>
 			<small
-				v-if="tier.name === 'Free'"
+				v-if="tier.price === 'Free'"
 				slot="footer"
 				class="card-footer justify-content-start neutral-3"
 				>* <router-link to="/patreon" class="mx-1">Subscription</router-link> for Shieldmaiden
@@ -92,7 +91,7 @@
 			</div>
 			<div slot="footer" v-if="tier.name !== 'Deity'">
 				<router-link to="/patreon" class="btn btn-block btn-square bg-patreon-red">
-					Upgrade
+					{{ tier.price === "Free" ? "Subscribe" : "Upgrade" }}
 				</router-link>
 			</div>
 		</hk-card>
@@ -117,7 +116,7 @@
 					target="_blank"
 				>
 					Checkout HBC <hk-icon icon="fas fa-external-link" class="ml-2" />
-					</a>
+				</a>
 			</div>
 		</hk-card>
 
@@ -194,7 +193,7 @@ export default {
 					name: "Facebook",
 					icon: "fab fa-facebook-f",
 					url: "https://www.facebook.com/shieldmaidenapp",
-				}
+				},
 			],
 		};
 	},

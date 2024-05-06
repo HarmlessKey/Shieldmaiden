@@ -260,7 +260,7 @@
 				</template>
 				<hk-loader v-else />
 			</hk-card>
-			<hk-card v-if="demo || (tier && tier.name === 'Free')" class="background-effects">
+			<hk-card v-if="demo || (tier && tier.price === 'Free')" class="background-effects">
 				<video
 					slot="image"
 					class="video"

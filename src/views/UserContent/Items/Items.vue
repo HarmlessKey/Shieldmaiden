@@ -4,16 +4,15 @@
 			<ContentHeader type="items" />
 
 			<div class="card-body" v-if="!loading_items">
-				<p class="neutral-2">
-					These are your custom Items that you can use in your campaigns.
-				</p>
+				<p class="neutral-2">These are your custom Items that you can use in your campaigns.</p>
 				<template v-if="items.length">
 					<q-input
-						:dark="$store.getters.theme !== 'light'" 
+						:dark="$store.getters.theme !== 'light'"
 						v-model="search"
-						borderless 
-						filled square
-						debounce="300" 
+						borderless
+						filled
+						square
+						debounce="300"
 						clearable
 						placeholder="Search"
 					>
@@ -34,7 +33,6 @@
 						wrap-cells
 					>
 						<template v-slot:body-cell="props">
-
 							<q-td
 								v-if="props.col.name === 'image'"
 								class="avatar"
@@ -56,28 +54,34 @@
 								<div class="text-right d-flex justify-content-end">
 									<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
 										<i aria-hidden="true" class="fas fa-pencil" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Edit
-										</q-tooltip>
+										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 									</router-link>
-									<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
+									<a
+										class="btn btn-sm bg-neutral-5 ml-2"
+										@click="confirmDelete($event, props.key, props.row)"
+									>
 										<i aria-hidden="true" class="fas fa-trash-alt" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Delete
-										</q-tooltip>
+										<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
 									</a>
 								</div>
 							</q-td>
 						</template>
-						<div slot="no-data" />	
+						<div slot="no-data" />
 					</q-table>
 				</template>
-				<template >
-				</template>
-				<router-link v-if="!overencumbered && !items.length" to="/content/items/add-item" class="btn btn-lg bg-neutral-5">
+				<template> </template>
+				<router-link
+					v-if="!overencumbered && !items.length"
+					to="/content/items/add-item"
+					class="btn btn-lg bg-neutral-5"
+				>
 					<i aria-hidden="true" class="fas fa-plus green mr-1" /> Create your first item
 				</router-link>
-				<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+				<router-link
+					v-else-if="tier.price === 'Free'"
+					class="btn bg-neutral-8 btn-block"
+					to="/patreon"
+				>
 					Get more item slots
 				</router-link>
 			</div>
@@ -87,85 +91,90 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex';
-	import ContentHeader from "src/components/userContent/ContentHeader";
+import { mapGetters, mapActions } from "vuex";
+import ContentHeader from "src/components/userContent/ContentHeader";
 
-	export default {
-		name: 'Items',
-		components: {
-			ContentHeader
-		},
-		data() {
-			return {
-				userId: this.$store.getters.user.uid,
-				loading_items: true,
-				search: "",
-				
-				columns: [
+export default {
+	name: "Items",
+	components: {
+		ContentHeader,
+	},
+	data() {
+		return {
+			userId: this.$store.getters.user.uid,
+			loading_items: true,
+			search: "",
+
+			columns: [
+				{
+					name: "image",
+					label: "",
+					field: "image",
+					align: "left",
+				},
+				{
+					name: "name",
+					label: "Name",
+					field: "name",
+					sortable: true,
+					align: "left",
+					classes: "truncate-cell",
+					format: (val) => val.capitalizeEach(),
+				},
+				{
+					name: "actions",
+					label: "",
+					align: "right",
+				},
+			],
+		};
+	},
+	computed: {
+		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters("items", ["items"]),
+	},
+	async mounted() {
+		await this.get_items();
+		this.loading_items = false;
+	},
+	methods: {
+		...mapActions("items", ["get_items", "delete_item"]),
+		confirmDelete(e, key, item) {
+			//Instantly delete when shift is held
+			if (e.shiftKey) {
+				this.deleteItem(key);
+			} else {
+				this.$snotify.error(
+					"Are you sure you want to delete " +
+						item.name +
+						"? It will also remove it from the campaign inventories it is linked to.",
+					"Delete item",
 					{
-						name: "image",
-						label: "",
-						field: "image",
-						align: "left",
-					},
-					{
-						name: "name",
-						label: "Name",
-						field: "name",
-						sortable: true,
-						align: "left",
-						classes: "truncate-cell",
-						format: val => val.capitalizeEach()
-					},
-					{
-						name: "actions",
-						label: "",
-						align: "right"
-					}
-				],
-			}
-		},
-		computed: {
-			...mapGetters([
-				'tier',
-				'overencumbered',
-			]),
-			...mapGetters("items", ["items"]),
-		},
-		async mounted() {
-			await this.get_items();
-			this.loading_items = false;
-		},
-		methods: {
-			...mapActions("items", ["get_items", "delete_item"]),
-			confirmDelete(e, key, item) {
-				//Instantly delete when shift is held
-				if(e.shiftKey) {
-					this.deleteItem(key);
-				} else {
-					this.$snotify.error('Are you sure you want to delete ' + item.name + '? It will also remove it from the campaign inventories it is linked to.', 'Delete item', {
 						timeout: false,
 						buttons: [
 							{
-								text: 'Yes', action: (toast) => { 
-								this.deleteItem(key)
-								this.$snotify.remove(toast.id); 
-								}, 
-								bold: false
+								text: "Yes",
+								action: (toast) => {
+									this.deleteItem(key);
+									this.$snotify.remove(toast.id);
+								},
+								bold: false,
 							},
 							{
-								text: 'No', action: (toast) => { 
-									this.$snotify.remove(toast.id); 
-								}, 
-								bold: true
+								text: "No",
+								action: (toast) => {
+									this.$snotify.remove(toast.id);
+								},
+								bold: true,
 							},
-						]
-					});
-				}
-			},
-			deleteItem(key) {
-				this.delete_item(key);
+						],
+					}
+				);
 			}
-		}
-	}
+		},
+		deleteItem(key) {
+			this.delete_item(key);
+		},
+	},
+};
 </script>

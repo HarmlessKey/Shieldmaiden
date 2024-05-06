@@ -4,7 +4,7 @@
 			<hk-card-deck>
 				<hk-card
 					:header="t.name"
-					v-for="(t, key) in tiers"
+					v-for="(t, key) in tiers.filter((item) => item.name !== 'Legacy')"
 					:key="key"
 					:class="{ current: t.name == tier.name }"
 				>

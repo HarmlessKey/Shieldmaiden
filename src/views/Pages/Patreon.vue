@@ -13,11 +13,48 @@
 						>Patreon</a
 					>
 					to finish payment.<br />
-					Make sure that you use the <strong>same emailadres</strong> for both your Patreon and
+					Make sure that you use the <strong>same email-address</strong> for both your Patreon and
 					Shieldmaiden account.
 				</p>
 
 				<Tiers class="mb-4" />
+
+				<hk-card header="About the benefits">
+					<div class="card-body">
+						<h2>Character Sync</h2>
+						<p>
+							You will be able to sync your players characters with external online character sheets
+							from D&D Beyond and Dice Cloud using the
+							<a
+								:href="`https://chrome.google.com/webstore/detail/dd-character-sync/${extension_id}`"
+								target="_blank"
+								rel="noopener"
+								>Character Sync Chrome Extension</a
+							>. This way you won't have manually update your players, but you can simply click a
+							button.<br />
+							<router-link to="/tools/character-sync">More about Character Sync</router-link>
+						</p>
+						<h2>Avatar crop & upload</h2>
+						<p>
+							For both players and NPCs you can upload an image and crop it to your liking. Without
+							a subscription you have to reference an online image to use as an avatar.
+						</p>
+						<h2>Background effects</h2>
+						<p>
+							With our background effect you can create more atmosphere on the public initiative
+							list that you share with your players. With effects like rain and fog your players
+							will be immersed in your games even more than before.<br />
+							<router-link to="/weather-demo">Check out all background effects</router-link>
+						</p>
+						<h2>Import content</h2>
+						<p>
+							You can import any Shieldmaiden content directly into your account. If a friend or a
+							content creator you follow has offered an export of an export of a Campaign from
+							Shieldmaiden, you can import it including all the monsters, spells and encounters and
+							you will be able to directly run it yourself.
+						</p>
+					</div>
+				</hk-card>
 				<hk-card header="Why do you have to pay?">
 					<div class="card-body">
 						<p>
@@ -58,12 +95,18 @@
 <script>
 import Tiers from "src/components/Tiers.vue";
 import Footer from "src/components/Footer.vue";
+import { character_sync_id } from "src/utils/generalConstants";
 
 export default {
 	name: "Patreon",
 	components: {
 		Tiers,
 		Footer,
+	},
+	data() {
+		return {
+			extension_id: character_sync_id,
+		};
 	},
 };
 </script>

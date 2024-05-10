@@ -159,7 +159,7 @@ export default {
 					title: "Storage",
 				},
 			},
-			legacy_tiers: ["legacy", "3403110", "3403128"],
+			legacy_tiers: ["legacy", "3403110", "3403128", "3403171"],
 			storage: ["campaigns", "encounters", "players", "npcs", "spells", "reminders", "items"],
 		};
 	},

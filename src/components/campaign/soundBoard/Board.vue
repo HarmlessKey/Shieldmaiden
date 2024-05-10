@@ -1,22 +1,17 @@
 <template>
 	<div class="soundboard">
-		<hk-input 
-			v-model="search" 
-			dense 
-			label="Search"
-			class="mb-2"
-			clearable>
+		<hk-input v-model="search" dense label="Search" class="mb-2" clearable>
 			<q-icon slot="prepend" name="search" />
 		</hk-input>
 		<p class="red" v-if="!filtered.length">Nothing found</p>
-		<transition-group 
+		<transition-group
 			tag="div"
 			name="board"
 			class="board"
 			enter-active-class="animated animate__flipInX"
 			leave-active-class="animated animate__flipOutX"
 		>
-			<template v-for="(sound) in filtered">
+			<template v-for="sound in filtered">
 				<a
 					v-if="sound.url"
 					:key="`${sound.type}-${sound.key}`"
@@ -31,10 +26,11 @@
 						alt="sound board button background"
 						class="board__button-logo"
 					/>
-					<button 
-						v-if="edit && !sound.hk" 
+					<button
+						v-if="edit && !sound.hk"
 						class="btn btn-sm bg-neutral-5 board__button-delete"
-						@click.stop="delete_soundboard_link(sound.key)">
+						@click.stop="delete_soundboard_link(sound.key)"
+					>
 						<hk-icon icon="fas fa-trash-alt red" />
 					</button>
 					<hk-icon v-else-if="!sound.image" :icon="sound.icon" class="board__button-icon" />
@@ -50,11 +46,7 @@
 		</transition-group>
 
 		<div class="soundboard__actions">
-			<router-link
-				v-if="tier.name === 'Free'"
-				class="btn btn-block bg-patreon-red"
-				to="/patreon"
-			>
+			<router-link v-if="tier.name === 'Free'" class="btn btn-block bg-patreon-red" to="/patreon">
 				Add custom links
 			</router-link>
 			<template v-else>
@@ -102,7 +94,7 @@
 								</div>
 							</div>
 							<div slot="footer" class="card-footer">
-								<q-btn v-close-popup class="mr-1" no-caps type="cancel">Cancel</q-btn>
+								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
 								<q-btn no-caps label="Add" color="primary" type="submit" />
 							</div>
 						</hk-card>
@@ -318,19 +310,28 @@ export default {
 			const links = this.soundboard || [];
 			const board = links.concat(this.hk_links);
 
-			return board.filter((link) => link.type === this.type)
+			return board
+				.filter((link) => link.type === this.type)
 				.map((item) => ({ ...item, icon: this.getIcon(item.url) }));
 		},
 		filtered() {
-			return this.search ? this.board.filter((link) => link.name?.toLowerCase().includes(this.search.toLowerCase())) : this.board;
-		}
+			return this.search
+				? this.board.filter((link) => link.name?.toLowerCase().includes(this.search.toLowerCase()))
+				: this.board;
+		},
 	},
 	async mounted() {
 		await this.get_soundboard();
 		this.loading = false;
 	},
 	methods: {
-		...mapActions(["play_music", "play_ambience", "get_soundboard", "add_soundboard_link", "delete_soundboard_link"]),
+		...mapActions([
+			"play_music",
+			"play_ambience",
+			"get_soundboard",
+			"add_soundboard_link",
+			"delete_soundboard_link",
+		]),
 		getIcon(url, type) {
 			switch (true) {
 				case urlType(url) === "youtube":
@@ -392,13 +393,17 @@ export default {
 			transition: all 0.3s ease-in-out;
 			gap: 0;
 			padding-top: 10px;
-	
+
 			&-title {
 				position: absolute;
 				bottom: 0;
 				padding: 8px 4px 3px 4px;
 				width: 100%;
-				background: linear-gradient(180deg, rgba(215,215,215,0) 0%, rgba(0,0,0,0.7511379551820728) 100%);
+				background: linear-gradient(
+					180deg,
+					rgba(215, 215, 215, 0) 0%,
+					rgba(0, 0, 0, 0.7511379551820728) 100%
+				);
 				border-bottom-left-radius: 8px;
 				border-bottom-right-radius: 8px;
 				z-index: 10;
@@ -422,7 +427,7 @@ export default {
 				border-radius: inherit;
 				top: 0;
 				bottom: 0;
-	
+
 				img {
 					transition: all 0.1s ease-in-out;
 					width: 100%;
@@ -436,7 +441,7 @@ export default {
 			}
 			&:hover {
 				box-shadow: 0px 0px 8px 4px #0000006c;
-	
+
 				.board__button-bg {
 					img {
 						transform: scale(1.1);

@@ -50,7 +50,7 @@
 											v-if="t.benefits[storage_type] == 'infinite'"
 											class="green far fa-infinity"
 										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Campaign slots
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Campaigns
 									</template>
 									<template v-if="storage_type == 'encounters'">
 										<i
@@ -59,7 +59,7 @@
 											class="green far fa-infinity"
 										/>
 										<span v-else class="green">{{ t.benefits[storage_type] }}</span>
-										<span>Encounter slots <span class="neutral-3">(per campaign)</span></span>
+										<span>Encounters <span class="neutral-3">(per campaign)</span></span>
 									</template>
 									<template v-if="storage_type == 'players'">
 										<i
@@ -67,7 +67,7 @@
 											v-if="t.benefits[storage_type] == 'infinite'"
 											class="green far fa-infinity"
 										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Player slots
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Players
 									</template>
 									<template v-if="storage_type == 'npcs'">
 										<i
@@ -75,7 +75,7 @@
 											v-if="t.benefits[storage_type] == 'infinite'"
 											class="green far fa-infinity"
 										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> NPC slots
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span> NPCs
 									</template>
 									<template v-if="storage_type == 'spells'">
 										<i
@@ -83,7 +83,7 @@
 											v-if="t.benefits[storage_type] == 'infinite'"
 											class="green far fa-infinity"
 										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Spell slots
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Spells
 									</template>
 									<template v-if="storage_type == 'items'">
 										<i
@@ -91,7 +91,7 @@
 											v-if="t.benefits[storage_type] == 'infinite'"
 											class="green far fa-infinity"
 										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Item slots
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Items
 									</template>
 									<template v-if="storage_type == 'reminders'">
 										<i
@@ -99,7 +99,7 @@
 											v-if="t.benefits[storage_type] == 'infinite'"
 											class="green far fa-infinity"
 										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Reminder slots
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Reminders
 									</template>
 								</li>
 							</ul>
@@ -159,7 +159,7 @@ export default {
 					title: "Storage",
 				},
 			},
-			legacy_tiers: ["legacy", "3403110"],
+			legacy_tiers: ["legacy", "3403110", "3403128"],
 			storage: ["campaigns", "encounters", "players", "npcs", "spells", "reminders", "items"],
 		};
 	},

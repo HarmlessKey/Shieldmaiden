@@ -62,6 +62,9 @@
 							Subscription tier: <span class="patreon-red">{{ tier.name }}</span>
 						</h3>
 						<p v-if="tier.name === 'Deity'" class="neutral-2">You have unlimited power.</p>
+						<p v-if="tier.name === 'Legacy'" class="neutral-2">
+							The legacy tier is for anyone who created an account before the 15th of May 2024
+						</p>
 
 						<Tier />
 						<router-link

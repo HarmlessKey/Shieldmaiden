@@ -109,7 +109,7 @@ const user_actions = {
 						);
 
 					const server_time = new Date(time_ms).toISOString();
-					const legacy_date = new Date(2024, 4, 7).getTime();
+					const legacy_date = new Date(2024, 4, 15).getTime();
 
 					// User always basic reward tier
 					let path =

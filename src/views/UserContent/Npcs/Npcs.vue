@@ -4,15 +4,16 @@
 			<ContentHeader type="npcs">
 				<ExportUserContent
 					slot="actions-left"
-					class="btn-sm bg-neutral-5"
+					class="btn-sm bg-neutral-5 mr-2"
 					content-type="npc"
 					:content-id="npcIds"
 				>
 					<span>Export</span>
 				</ExportUserContent>
 				<button
+					v-if="tier.price !== 'Free'"
 					slot="actions-right"
-					class="btn btn-sm bg-neutral-5 mx-2"
+					class="btn btn-sm bg-neutral-5 mr-2"
 					@click="import_dialog = true"
 				>
 					Import

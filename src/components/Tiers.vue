@@ -44,63 +44,18 @@
 							</ul>
 							<ul class="storage">
 								<li v-for="storage_type in storage" :key="storage_type">
-									<template v-if="storage_type == 'campaigns'">
-										<i
-											aria-hidden="true"
-											v-if="t.benefits[storage_type] == 'infinite'"
-											class="green far fa-infinity"
-										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Campaigns
-									</template>
-									<template v-if="storage_type == 'encounters'">
-										<i
-											aria-hidden="true"
-											v-if="t.benefits[storage_type] == 'infinite'"
-											class="green far fa-infinity"
-										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span>
-										<span>Encounters <span class="neutral-3">(per campaign)</span></span>
-									</template>
-									<template v-if="storage_type == 'players'">
-										<i
-											aria-hidden="true"
-											v-if="t.benefits[storage_type] == 'infinite'"
-											class="green far fa-infinity"
-										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Players
-									</template>
-									<template v-if="storage_type == 'npcs'">
-										<i
-											aria-hidden="true"
-											v-if="t.benefits[storage_type] == 'infinite'"
-											class="green far fa-infinity"
-										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> NPCs
-									</template>
-									<template v-if="storage_type == 'spells'">
-										<i
-											aria-hidden="true"
-											v-if="t.benefits[storage_type] == 'infinite'"
-											class="green far fa-infinity"
-										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Spells
-									</template>
-									<template v-if="storage_type == 'items'">
-										<i
-											aria-hidden="true"
-											v-if="t.benefits[storage_type] == 'infinite'"
-											class="green far fa-infinity"
-										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Items
-									</template>
-									<template v-if="storage_type == 'reminders'">
-										<i
-											aria-hidden="true"
-											v-if="t.benefits[storage_type] == 'infinite'"
-											class="green far fa-infinity"
-										/>
-										<span v-else class="green">{{ t.benefits[storage_type] }}</span> Reminders
-									</template>
+									<i
+										aria-hidden="true"
+										v-if="t.benefits[storage_type] == 'infinite'"
+										class="green far fa-infinity"
+									/>
+									<span v-else class="green">{{ t.benefits[storage_type] }}</span>
+									<span>
+										{{ storageType(storage_type, t.benefits[storage_type]) }}
+										<span v-if="storage_type === 'encounters'" class="neutral-3">
+											(per campaign)
+										</span>
+									</span>
 								</li>
 							</ul>
 						</div>
@@ -173,6 +128,12 @@ export default {
 	},
 	computed: {
 		...mapGetters(["tier"]),
+	},
+	methods: {
+		storageType(type, count) {
+			type === "npcs" ? type.slice(0, -1).toUpperCase() : type.slice(0, -1).capitalize();
+			return count === "infinite" || count > 1 ? `${type}s` : type;
+		},
 	},
 };
 </script>

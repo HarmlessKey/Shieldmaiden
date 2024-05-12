@@ -526,17 +526,20 @@ export default {
 		async dialogCloneEncounter(key) {
 			this.clone = true;
 			this.cloneEncounterData.key = key;
-			this.cloneEncounterData.ogEncounter = structuredClone(
-				await this.get_encounter({
-					uid: this.user.uid,
-					campaignId: this.campaignId,
-					id: key,
-				})
+			const ogEncounter = JSON.parse(
+				JSON.stringify(
+					await this.get_encounter({
+						uid: this.user.uid,
+						campaignId: this.campaignId,
+						id: key,
+					})
+				)
 			);
-			this.cloneEncounterData.name = structuredClone(this.cloneEncounterData.ogEncounter.name);
+			this.cloneEncounterData.ogEncounter = ogEncounter;
+			this.cloneEncounterData.name = ogEncounter.name;
 		},
 		async cloneEncounter() {
-			const encounter = structuredClone(this.cloneEncounterData.ogEncounter);
+			const encounter = this.cloneEncounterData.ogEncounter;
 			encounter.name = this.cloneEncounterData.name;
 			const new_id = await this.add_encounter({
 				campaignId: this.campaignId,

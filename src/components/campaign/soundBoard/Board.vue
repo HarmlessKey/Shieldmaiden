@@ -94,7 +94,7 @@
 								</div>
 							</div>
 							<div slot="footer" class="card-footer">
-								<q-btn v-close-popup class="mr-1" no-caps type="cancel">Cancel</q-btn>
+								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
 								<q-btn no-caps label="Add" color="primary" type="submit" />
 							</div>
 						</hk-card>

@@ -195,11 +195,13 @@
 					<hr />
 				</template>
 				<q-list @click="setSideSmallScreen(false)">
-					<q-item clickable v-ripple to="/patreon">
+					<q-item clickable to="/patreon">
 						<q-item-section avatar>
 							<i aria-hidden="true" class="fas fa-coins" />
 						</q-item-section>
-						<q-item-section class="title">Subscription</q-item-section>
+						<q-item-section>
+							<q-btn no-caps color="primary" to="/patreon" class="full-width"> Subscription </q-btn>
+						</q-item-section>
 						<q-tooltip
 							v-if="$store.getters.side_collapsed"
 							anchor="center right"

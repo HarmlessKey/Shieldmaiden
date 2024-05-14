@@ -1,12 +1,12 @@
 <template>
 	<div>
-		<div v-if="tier && !loading">
+		<div v-if="!loading">
 			<hk-card-deck>
 				<template v-for="(t, key) in tiers">
 					<hk-card
 						v-if="!legacy_tiers.includes(t['.key'])"
 						:key="key"
-						:class="{ current: t.name == tier.name }"
+						:class="{ current: t.name === tier?.name }"
 					>
 						<div slot="header" class="card-header flex-col items-start">
 							<strong>{{ t.name }}</strong>
@@ -90,6 +90,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { db } from "src/firebase";
+import { legacy_tiers } from "src/utils/generalConstants";
 
 export default {
 	name: "Tiers",
@@ -114,7 +115,7 @@ export default {
 					title: "Storage",
 				},
 			},
-			legacy_tiers: ["legacy", "3403110", "3403128", "3403171"],
+			legacy_tiers,
 			storage: ["campaigns", "encounters", "players", "npcs", "spells", "reminders", "items"],
 		};
 	},

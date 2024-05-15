@@ -7,7 +7,7 @@
 				<hk-card header="Your subscription">
 					<div class="card-body">
 						<!-- HAS A SUBSCRIPTION -->
-						<template v-if="tier && tier.name !== 'Free'">
+						<template v-if="tier && tier.price !== 'Free'">
 							<!-- PATRON -->
 							<div v-if="userInfo.patron">
 								<h3>
@@ -61,11 +61,14 @@
 						<h3 class="mb-1">
 							Subscription tier: <span class="patreon-red">{{ tier.name }}</span>
 						</h3>
-						<p v-if="tier.name == 'Deity'" class="neutral-2">You have unlimited power.</p>
+						<p v-if="tier.name === 'Deity'" class="neutral-2">You have unlimited power.</p>
+						<p v-if="tier.name === 'Legacy'" class="neutral-2">
+							The legacy tier is for anyone who created an account before the 15th of May 2024
+						</p>
 
 						<Tier />
 						<router-link
-							v-if="tier.name === 'Free'"
+							v-if="tier.price === 'Free'"
 							class="btn btn-block bg-patreon-red mt-4"
 							to="/patreon"
 						>
@@ -110,7 +113,7 @@
 					<div class="card-body">
 						<Content />
 						<router-link
-							v-if="tier.name != 'Deity'"
+							v-if="tier.name !== 'Deity'"
 							class="btn btn-block bg-neutral-5 mt-3"
 							to="/patreon"
 						>

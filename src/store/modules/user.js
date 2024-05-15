@@ -93,9 +93,6 @@ const user_actions = {
 						? user_info.patreon_email.toLowerCase()
 						: user_info.email.toLowerCase();
 
-					// User always basic reward tier
-					let path = `tiers/basic`;
-
 					// Use firebase serverTimeOffset to get the date from the server and not the client.
 					// https://firebase.google.com/docs/database/web/offline-capabilities#clock-skew
 					let time_ms = 0;
@@ -112,6 +109,11 @@ const user_actions = {
 						);
 
 					const server_time = new Date(time_ms).toISOString();
+					const legacy_date = new Date(2024, 4, 15).getTime();
+
+					// User always basic reward tier
+					let path =
+						!user_info.created || user_info.created < legacy_date ? `tiers/legacy` : `tiers/basic`;
 
 					// If user has voucher use this
 					if (user_info.voucher) {
@@ -504,14 +506,13 @@ const user_actions = {
 			const services = await dispatch("get_user_services");
 			try {
 				await services.deleteSoundboardLink(uid, key);
-				commit("DELETE_SOUNDBOARD_LINK",  key);
+				commit("DELETE_SOUNDBOARD_LINK", key);
 				return;
 			} catch (error) {
 				throw error;
 			}
 		}
 	},
-
 };
 
 const user_mutations = {

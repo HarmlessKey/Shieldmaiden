@@ -194,7 +194,24 @@
 					</q-list>
 					<hr />
 				</template>
-
+				<q-list @click="setSideSmallScreen(false)">
+					<q-item clickable to="/patreon">
+						<q-item-section avatar>
+							<i aria-hidden="true" class="fas fa-coins" />
+						</q-item-section>
+						<q-item-section>
+							<q-btn no-caps color="primary" to="/patreon" class="full-width"> Subscription </q-btn>
+						</q-item-section>
+						<q-tooltip
+							v-if="$store.getters.side_collapsed"
+							anchor="center right"
+							self="center left"
+						>
+							Subscription
+						</q-tooltip>
+					</q-item>
+				</q-list>
+				<hr />
 				<q-list @click="setSideSmallScreen(false)">
 					<q-item clickable v-ripple to="/tools">
 						<q-item-section avatar>
@@ -358,7 +375,7 @@ export default {
 					name: "Facebook",
 					icon: "fab fa-facebook",
 					url: "https://www.facebook.com/shieldmaidenapp",
-				}
+				},
 			],
 		};
 	},

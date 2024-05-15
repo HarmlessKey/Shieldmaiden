@@ -36,7 +36,7 @@
 					</button>
 					<button
 						v-if="
-							tier.name !== 'Free' &&
+							tier.price !== 'Free' &&
 							sync_characters &&
 							players &&
 							Object.keys(sync_characters).length &&
@@ -341,7 +341,7 @@
 							</template>
 						</div>
 						<div class="col actions" :key="'actions-' + key" v-if="viewerIsUser">
-							<template v-if="tier.name !== 'Free' && extensionInstalled">
+							<template v-if="tier.price !== 'Free' && extensionInstalled">
 								<button
 									v-if="
 										players[key].sync_character && players[key].sync_character in sync_characters

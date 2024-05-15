@@ -4,15 +4,16 @@
 			<ContentHeader type="spells">
 				<ExportUserContent
 					slot="actions-left"
-					class="btn-sm bg-neutral-5"
+					class="btn-sm bg-neutral-5 mr-2"
 					content-type="spell"
 					:content-id="spellIds"
 				>
 					<span>Export</span>
 				</ExportUserContent>
 				<button
+					v-if="tier.price !== 'Free'"
 					slot="actions-right"
-					class="btn btn-sm bg-neutral-5 mx-2"
+					class="btn btn-sm bg-neutral-5 mr-2"
 					@click="import_dialog = true"
 				>
 					Import
@@ -57,10 +58,7 @@
 									:auto-width="col.name !== 'name'"
 								>
 									<template v-if="col.name !== 'actions'">
-										<router-link
-											v-if="col.name === 'name'"
-											:to="`${$route.path}/${props.key}`"
-										>
+										<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
 											{{ col.value }}
 										</router-link>
 										<template v-else>
@@ -68,7 +66,10 @@
 										</template>
 									</template>
 									<div v-else class="d-flex justify-content-end">
-										<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+										<router-link
+											class="btn btn-sm bg-neutral-5"
+											:to="`${$route.path}/${props.key}`"
+										>
 											<i aria-hidden="true" class="fas fa-pencil" />
 											<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
 										</router-link>
@@ -101,7 +102,7 @@
 					<i aria-hidden="true" class="fas fa-plus green mr-1" /> Create your first Spell
 				</router-link>
 				<router-link
-					v-else-if="tier.name === 'Free'"
+					v-else-if="tier.price === 'Free'"
 					class="btn bg-neutral-8 btn-block"
 					to="/patreon"
 				>

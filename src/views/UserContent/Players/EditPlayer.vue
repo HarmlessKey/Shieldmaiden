@@ -82,7 +82,7 @@
 									/>
 
 									<!-- Character Sync -->
-									<template v-if="tier.name !== 'Free'">
+									<template v-if="tier.price !== 'Free'">
 										<div v-if="player.sync_character">
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -254,7 +254,9 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-heart" />
-												<q-tooltip anchor="top middle" self="center middle">Maximum Hit Points</q-tooltip>
+												<q-tooltip anchor="top middle" self="center middle"
+													>Maximum Hit Points</q-tooltip
+												>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -304,7 +306,9 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
-												<q-tooltip anchor="top middle" self="center middle">Spell save DC</q-tooltip>
+												<q-tooltip anchor="top middle" self="center middle"
+													>Spell save DC</q-tooltip
+												>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -696,7 +700,7 @@
 		</q-dialog>
 
 		<!-- LINK CHARACTER -->
-		<q-dialog v-if="tier.name !== 'Free'" v-model="link_dialog">
+		<q-dialog v-if="tier.price !== 'Free'" v-model="link_dialog">
 			<hk-link-character @link="linkCharacter" />
 		</q-dialog>
 	</div>

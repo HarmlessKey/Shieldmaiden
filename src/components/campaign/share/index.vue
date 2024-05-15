@@ -2,7 +2,7 @@
 	<div v-if="!campaign.sharing" class="full-height">
 		<div v-if="!broadcast.live" class="not-live">
 			<p>Go live to share with your players</p>
-			<div 
+			<div
 				class="live pointer"
 				@click="
 					setDrawer({
@@ -10,7 +10,8 @@
 						type: 'drawers/Broadcast',
 						data: { campaign_id: campaignId, private: campaign.private },
 					})
-				">
+				"
+			>
 				Go live
 			</div>
 		</div>
@@ -172,15 +173,19 @@
 			</q-tab-panel>
 
 			<q-tab-panel name="weather">
-				<Weather v-model="weather" class="pb-4" :disabled="tier.name === 'Free'" />
+				<Weather v-model="weather" class="pb-4" :disabled="tier.price === 'Free'" />
 				<div class="actions">
-					<template v-if="tier.name !== 'Free'">
+					<template v-if="tier.price !== 'Free'">
 						<button class="btn bg-neutral-5" @click="clearWeather">Clear</button>
 						<button class="btn" :disabled="isEmpty(weather)" @click="setWeather">Set</button>
 					</template>
 					<template v-else>
-						<button v-if="!isEmpty(weather)" class="btn bg-neutral-5" @click="clearWeather">Clear</button>
-						<router-link v-else to="/patreon" class="btn bg-patreon-red">Get a subscription</router-link>
+						<button v-if="!isEmpty(weather)" class="btn bg-neutral-5" @click="clearWeather">
+							Clear
+						</button>
+						<router-link v-else to="/patreon" class="btn bg-patreon-red"
+							>Get a subscription</router-link
+						>
 					</template>
 				</div>
 			</q-tab-panel>

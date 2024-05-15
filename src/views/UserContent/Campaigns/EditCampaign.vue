@@ -36,7 +36,7 @@
 						/>
 
 						<hk-background-select
-							v-if="tier && tier.name !== 'Free'"
+							v-if="tier && tier.price !== 'Free'"
 							v-model="editCampaign.hk_background"
 							label="Background"
 							:disable="!!editCampaign.background"
@@ -86,7 +86,7 @@
 										<hk-popover
 											slot="append"
 											header="Custom background"
-											v-if="tier && tier.name !== 'Free'"
+											v-if="tier && tier.price !== 'Free'"
 										>
 											<i class="fas fa-info-circle" aria-hidden="true" />
 											<template #content>

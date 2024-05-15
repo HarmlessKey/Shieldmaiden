@@ -76,7 +76,7 @@
 								</ValidationProvider>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn v-close-popup class="mr-1" no-caps type="cancel">Cancel</q-btn>
+								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
 								<q-btn color="primary" type="submit" no-caps label="Add note" :disabled="!valid" />
 							</div>
 						</hk-card>
@@ -128,4 +128,3 @@ export default {
 	},
 };
 </script>
-

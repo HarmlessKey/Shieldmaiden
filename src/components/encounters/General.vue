@@ -65,7 +65,7 @@
 				</ValidationProvider>
 
 				<hk-background-select
-					v-if="demo || (tier && tier.name !== 'Free')"
+					v-if="demo || (tier && tier.price !== 'Free')"
 					v-model="editableEncounter.hk_background"
 					label="Background"
 					:disable="!!editableEncounter.background"
@@ -101,7 +101,7 @@
 								<hk-popover
 									slot="append"
 									header="Custom background"
-									v-if="demo || (tier && tier.name !== 'Free')"
+									v-if="demo || (tier && tier.price !== 'Free')"
 								>
 									<i class="fas fa-info-circle" aria-hidden="true" />
 									<template #content>
@@ -113,7 +113,7 @@
 					</div>
 				</ValidationProvider>
 
-				<template v-if="demo || (tier && tier.name !== 'Free')">
+				<template v-if="demo || (tier && tier.price !== 'Free')">
 					<h3>
 						Background effects
 						<q-icon name="fas fa-eye" class="blue ml-1 pointer" @click="image = true">
@@ -132,7 +132,7 @@
 					</q-icon>
 				</div>
 
-				<hk-card v-if="!demo && (!tier || tier.name === 'Free')">
+				<hk-card v-if="!demo && (!tier || tier.price === 'Free')">
 					<div slot="header" class="card-header">
 						<span>
 							<i class="fas fa-cloud-showers" aria-hidden="true" />
@@ -167,7 +167,7 @@
 			</q-form>
 		</ValidationObserver>
 
-		<q-dialog v-if="demo || (tier && tier.name !== 'Free')" v-model="image" full-height full-width>
+		<q-dialog v-if="demo || (tier && tier.price !== 'Free')" v-model="image" full-height full-width>
 			<q-card :dark="$store.getters.theme === 'dark'">
 				<q-toolbar class="bg-neutral-9">
 					<div>Background preview</div>

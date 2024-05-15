@@ -132,7 +132,7 @@ export default {
 	},
 	methods: {
 		storageType(type, count) {
-			type === "npcs" ? type.slice(0, -1).toUpperCase() : type.slice(0, -1).capitalize();
+			type = type === "npcs" ? type.slice(0, -1).toUpperCase() : type.slice(0, -1).capitalize();
 			return count === "infinite" || count > 1 ? `${type}s` : type;
 		},
 	},

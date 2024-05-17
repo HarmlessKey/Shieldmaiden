@@ -1437,6 +1437,25 @@ const routes = [
 		},
 	},
 	{
+		path: "/link-patreon-account",
+		component: () => import("src/layouts/default"),
+		meta: {
+			title: "Patreon support",
+			description: "Link your Patreon account to your Shieldmaiden account.",
+		},
+		children: [
+			{
+				path: "",
+				name: "LinkPatreonAccount",
+				component: () => import("src/views/Pages/LinkPatreonAccount"),
+				meta: {
+					title: "Patreon support",
+					description: "Link your Patreon account to your Shieldmaiden account.",
+				},
+			},
+		],
+	},
+	{
 		path: "/poster",
 		name: "poster",
 		component: () => import("src/views/Home.vue"),

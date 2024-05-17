@@ -74,6 +74,7 @@
 						>
 							Support us for more slots
 						</router-link>
+						<PatreonLinkButton v-else />
 						<div class="mt-3">
 							<h3><i aria-hidden="true" class="fas fa-ticket-alt"></i> Voucher subscription</h3>
 							<template v-if="voucher">
@@ -155,6 +156,7 @@ import Content from "src/components/userContent/Content";
 import Tier from "src/components/userContent/Tier";
 import UserBanner from "src/components/userContent/UserBanner";
 import Tutorial from "src/components/userContent/Tutorial";
+import PatreonLinkButton from "src/components/PatreonLinkButton";
 
 export default {
 	name: "Profile",
@@ -163,6 +165,7 @@ export default {
 		Content,
 		Tier,
 		Tutorial,
+		PatreonLinkButton,
 	},
 	preFetch({ store, redirect }) {
 		if (!store.getters.user) {

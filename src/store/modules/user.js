@@ -2,6 +2,7 @@ import { Cookies } from "quasar";
 import { db, auth } from "src/firebase";
 import { userServices } from "src/services/user";
 import { voucherService } from "src/services/vouchers";
+import { patreonServices } from "src/services/patreon";
 
 import Vue from "vue";
 
@@ -10,6 +11,7 @@ const tiers_ref = db.ref("tiers");
 
 const user_state = () => ({
 	user_services: null,
+	patreon_services: null,
 	user: undefined,
 	userInfo: undefined,
 	tier: undefined,
@@ -22,11 +24,16 @@ const user_state = () => ({
 	broadcast: {},
 	followed: {},
 	soundboard: undefined,
+	patreon_auth: undefined,
+	patreon_user: undefined,
 });
 
 const user_getters = {
 	user_services: (state) => {
 		return state.user_services;
+	},
+	patreon_services: (state) => {
+		return state.patreon_services;
 	},
 	user: function (state) {
 		return state.user;
@@ -68,6 +75,12 @@ const user_getters = {
 			.orderBy("name", "asc")
 			.value();
 	},
+	patreon_auth(state) {
+		return state.patreon_auth;
+	},
+	patreon_user(state) {
+		return state.patreon_user;
+	},
 };
 
 const user_actions = {
@@ -76,6 +89,12 @@ const user_actions = {
 			commit("SET_USER_SERVICES", new userServices());
 		}
 		return getters.user_services;
+	},
+	async get_patreon_services({ getters, commit }) {
+		if (getters.patreon_services === null || !Object.keys(getters.patreon_services).length) {
+			commit("SET_PATREON_SERVICES", new patreonServices());
+		}
+		return getters.patreon_services;
 	},
 
 	setUser({ commit }, user) {
@@ -513,11 +532,36 @@ const user_actions = {
 			}
 		}
 	},
+
+	/**
+	 * Authenticate Patreon User
+	 * @param {string} code
+	 */
+	async authenticate_patreon_user({ dispatch, commit }, code) {
+		const services = await dispatch("get_patreon_services");
+		const auth = await services.authenticatePatreonUser(code);
+		commit("SET_PATREON_AUTH", auth);
+		return auth;
+	},
+
+	/**
+	 * Get Patreon User
+	 * @param {string} code
+	 */
+	async get_patreon_user({ dispatch, commit, state }) {
+		const services = await dispatch("get_patreon_services");
+		const patron = await services.getPatreonUser(state.patreon_auth);
+		commit("SET_PATREON_USER", patron);
+		return patron;
+	},
 };
 
 const user_mutations = {
 	SET_USER_SERVICES(state, payload) {
 		Vue.set(state, "user_services", payload);
+	},
+	SET_PATREON_SERVICES(state, payload) {
+		Vue.set(state, "patreon_services", payload);
 	},
 	SET_USER(state, payload) {
 		Vue.set(state, "user", payload);
@@ -587,6 +631,12 @@ const user_mutations = {
 	},
 	DELETE_SOUNDBOARD_LINK(state, key) {
 		Vue.delete(state.soundboard, key);
+	},
+	SET_PATREON_AUTH(state, auth) {
+		Vue.set(state, "patreon_auth", auth);
+	},
+	SET_PATREON_USER(state, patron) {
+		Vue.set(state, "patreon_user", patron);
 	},
 	CLEAR_USER(state) {
 		Vue.set(state, "user", undefined);

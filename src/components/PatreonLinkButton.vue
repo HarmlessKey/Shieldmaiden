@@ -11,11 +11,12 @@ export default {
 		return {
 			client_id: process.env.VUE_APP_PATREON_CLIENT_ID,
 			redirect_uri: "http://localhost:8080/link-patreon-account",
+			scope: encodeURIComponent("identity identity[email]"),
 		};
 	},
 	computed: {
 		patreonOauthUrl() {
-			return `https://www.patreon.com/oauth2/authorize?response_type=code&client_id=${this.client_id}&redirect_uri=${this.redirect_uri}`;
+			return `https://www.patreon.com/oauth2/authorize?response_type=code&client_id=${this.client_id}&redirect_uri=${this.redirect_uri}&scope=${this.scope}`;
 		},
 	},
 };

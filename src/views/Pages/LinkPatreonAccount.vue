@@ -31,7 +31,7 @@ export default {
 	async preFetch({ store, redirect, currentRoute }) {
 		if (currentRoute.query?.code) {
 			await store.dispatch("authenticate_patreon_user", currentRoute.query.code, { root: true });
-			await store.dispatch("get_patreon_user", null, { root: true });
+			await store.dispatch("get_patreon_identity", null, { root: true });
 		}
 	},
 	computed: {

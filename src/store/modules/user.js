@@ -546,11 +546,20 @@ const user_actions = {
 
 	/**
 	 * Get Patreon User
-	 * @param {string} code
 	 */
 	async get_patreon_user({ dispatch, commit, state }) {
 		const services = await dispatch("get_patreon_services");
 		const patron = await services.getPatreonUser(state.patreon_auth);
+		commit("SET_PATREON_USER", patron);
+		return patron;
+	},
+
+	/**
+	 * Get Patreon Identity
+	 */
+	async get_patreon_identity({ dispatch, commit, state }) {
+		const services = await dispatch("get_patreon_services");
+		const patron = await services.getPatreonIdentity(state.patreon_auth);
 		commit("SET_PATREON_USER", patron);
 		return patron;
 	},

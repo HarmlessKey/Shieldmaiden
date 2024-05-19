@@ -1449,6 +1449,8 @@ const routes = [
 				name: "LinkPatreonAccount",
 				component: () => import("src/views/Pages/LinkPatreonAccount"),
 				meta: {
+					sidebar: false,
+					side: false,
 					title: "Patreon support",
 					description: "Link your Patreon account to your Shieldmaiden account.",
 				},

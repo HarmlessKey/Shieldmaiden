@@ -2,8 +2,8 @@ import axios from "axios";
 
 const REDIRECT_URI = "http://localhost:8080/link-patreon-account";
 const AUTH_REF = "/api/oauth2/token";
-const USER_REF = "/api/oauth2/api/current_user";
 const IDENTITY_REF = "/api/oauth2/v2/identity";
+const CAMPAIGNS_REF = "/api/oauth2/v2/campaigns";
 
 export class patreonServices {
 	constructor() {
@@ -37,32 +37,20 @@ export class patreonServices {
 			});
 	}
 
-	async getPatreonUser(auth) {
-		const config = {
-			headers: {
-				Authorization: `Bearer ${auth?.access_token}`,
-			},
-		};
-
-		return this.PATREON.get(USER_REF, config)
-			.then((response) => {
-				return response.data;
-			})
-			.catch((error) => {
-				console.error(
-					"Something went wrong fetching Patreon user data",
-					error.code,
-					error.response?.status,
-					error.response?.statusText
-				);
-			});
-	}
-
 	async getPatreonIdentity(auth) {
+		const fields = [
+			"about",
+			"created",
+			"email",
+			"first_name",
+			"full_name",
+			"image_url",
+			"last_name",
+			"thumb_url",
+			"url",
+		];
 		const params = [
-			`${encodeURIComponent(
-				"fields[user]"
-			)}=about,created,email,first_name,full_name,image_url,last_name,thumb_url,url`,
+			`${encodeURIComponent("fields[user]")}=${fields.join(",")}`,
 			"include=memberships",
 		];
 
@@ -74,11 +62,38 @@ export class patreonServices {
 
 		return this.PATREON.get(`${IDENTITY_REF}?${params.join("&")}`, config)
 			.then((response) => {
-				return response.data;
+				return response.data?.data;
 			})
 			.catch((error) => {
 				console.error(
 					"Something went wrong fetching Patreon identity data",
+					error.code,
+					error.response?.status,
+					error.response?.statusText
+				);
+			});
+	}
+
+	async getPatreonCampaigns() {
+		const params = [
+			`${encodeURIComponent(
+				"fields[campaign]"
+			)}=created_at,creation_name,discord_server_id,image_small_url,image_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,one_liner,patron_count,pay_per_name,pledge_url,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,has_rss,has_sent_rss_notify,rss_feed_title,rss_artwork_url,patron_count,discord_server_id,google_analytics_id`,
+		];
+
+		const config = {
+			headers: {
+				Authorization: `Bearer larWO47sp3gWO67ZRMzxM8RpIz4zo1qsQ9c8aYeUXS0`,
+			},
+		};
+
+		return this.PATREON.get(`${CAMPAIGNS_REF}?${params.join("&")}`, config)
+			.then((response) => {
+				return response.data?.data;
+			})
+			.catch((error) => {
+				console.error(
+					"Something went wrong fetching Patreon campaigns",
 					error.code,
 					error.response?.status,
 					error.response?.statusText

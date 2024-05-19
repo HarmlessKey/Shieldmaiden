@@ -29,8 +29,16 @@ export class userServices {
 		}
 	}
 
+	async updateUser(uid, value) {
+		try {
+			const user = await USERS_REF.child(uid).update(value);
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	/**
-	 * Get the seasch_user object from firebase
+	 * Get the search_user object from firebase
 	 *
 	 * @param {String} uid ID of active user
 	 * @returns Full user object from /search_user/uid
@@ -146,10 +154,9 @@ export class userServices {
 
 	async getSoundboard(uid) {
 		try {
-			const soundboard = await SOUNDBOARD_REF.child(uid)
-				.once("value", (snapshot) => {
-					return snapshot;
-				});
+			const soundboard = await SOUNDBOARD_REF.child(uid).once("value", (snapshot) => {
+				return snapshot;
+			});
 			return soundboard.val();
 		} catch (error) {
 			throw error;

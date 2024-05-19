@@ -1,5 +1,5 @@
 <template>
-	<a :href="patreonOauthUrl" rel="noopener" class="btn bg-patreon-red">
+	<a :href="patreonOauthUrl" rel="noopener" class="btn">
 		<hk-icon icon="fa fa-link" />
 		Link Patreon account
 	</a>

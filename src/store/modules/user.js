@@ -246,13 +246,19 @@ const user_actions = {
 				throw error;
 			}
 		}
+	},
 
-		// Return a promise, so you can wait for it in the initialize function from store/general.js
-		// return new Promise((resolve) => {
-		// 	setTimeout(() => {
-		// 		resolve()
-		// 	}, 1000)
-		// });
+	async update_userInfo({ commit, dispatch, rootGetters }, value) {
+		const uid = rootGetters.user.uid;
+		if (uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				await services.updateUser(uid, value);
+				commit("SET_USERINFO", value);
+			} catch (error) {
+				throw error;
+			}
+		}
 	},
 
 	setPoster({ state }) {
@@ -545,16 +551,6 @@ const user_actions = {
 	},
 
 	/**
-	 * Get Patreon User
-	 */
-	async get_patreon_user({ dispatch, commit, state }) {
-		const services = await dispatch("get_patreon_services");
-		const patron = await services.getPatreonUser(state.patreon_auth);
-		commit("SET_PATREON_USER", patron);
-		return patron;
-	},
-
-	/**
 	 * Get Patreon Identity
 	 */
 	async get_patreon_identity({ dispatch, commit, state }) {
@@ -576,7 +572,8 @@ const user_mutations = {
 		Vue.set(state, "user", payload);
 	},
 	SET_USERINFO(state, payload) {
-		Vue.set(state, "userInfo", payload);
+		const newVal = state.userInfo ? { ...state.userInfo, ...payload } : payload;
+		Vue.set(state, "userInfo", newVal);
 	},
 	SET_USER_SETTINGS(state, payload) {
 		Vue.set(state, "userSettings", payload);

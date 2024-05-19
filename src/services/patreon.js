@@ -49,10 +49,7 @@ export class patreonServices {
 			"thumb_url",
 			"url",
 		];
-		const params = [
-			`${encodeURIComponent("fields[user]")}=${fields.join(",")}`,
-			"include=memberships",
-		];
+		const params = [`${encodeURIComponent("fields[user]")}=${fields.join(",")}`];
 
 		const config = {
 			headers: {

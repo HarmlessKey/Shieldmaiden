@@ -1438,24 +1438,14 @@ const routes = [
 	},
 	{
 		path: "/link-patreon-account",
-		component: () => import("src/layouts/default"),
+		name: "LinkPatreonAccount",
+		component: () => import("src/views/Pages/LinkPatreonAccount"),
 		meta: {
-			title: "Patreon support",
+			requiresAuth: true,
+			sidebar: false,
+			title: "Link Patreon account",
 			description: "Link your Patreon account to your Shieldmaiden account.",
 		},
-		children: [
-			{
-				path: "",
-				name: "LinkPatreonAccount",
-				component: () => import("src/views/Pages/LinkPatreonAccount"),
-				meta: {
-					sidebar: false,
-					side: false,
-					title: "Patreon support",
-					description: "Link your Patreon account to your Shieldmaiden account.",
-				},
-			},
-		],
 	},
 	{
 		path: "/poster",

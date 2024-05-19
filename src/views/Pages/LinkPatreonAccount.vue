@@ -1,65 +1,92 @@
 <template>
-	<div header="Link your Patreon account">
-		{{ patreon_auth?.access_token }}
-		<hk-loader v-if="loading" />
-		<div v-else class="card-body d-flex flex-col items-center">
-			<template v-if="!patreon_auth">
-				<p v-if="$route.query?.code">
+	<div class="p-4">
+		<hk-loader v-if="loading" no-background />
+		<div v-else class="d-flex flex-col items-center">
+			<hk-card v-if="!patreon_auth" class="patron-card">
+				<div v-if="$route.query?.code" class="card-body">
 					Something went wrong while fetching your Patreon account, please try again.
-				</p>
-				<PatreonLinkButton />
-			</template>
+				</div>
+				<div slot="footer" class="card-footer">
+					<PatreonLinkButton class="btn-block" />
+				</div>
+			</hk-card>
 			<template v-else-if="patreon_user">
 				<hk-card class="patron-card">
 					<template v-if="!userInfo.patreon_id">
-						<div class="card-body">
-							<img :src="patreon_user.attributes?.thumb_url" />
-							<div class="name">{{ patreon_user.attributes?.full_name }}</div>
-							<div class="email">{{ patreon_user.attributes?.email }}</div>
-							<a
-								:href="patreon_user.attributes?.url"
-								target="_blank"
-								rel="noopener"
-								class="btn btn-sm bg-neutral-5 mt-3"
-								>View profile</a
-							>
-						</div>
-						<div slot="footer" class="card-footer">
-							<span v-if="success" class="full-width text-center green"
-								>Account successfully linked</span
-							>
-							<button v-else-if="!id_taken" class="btn btn-block" @click="link">
-								<hk-icon icon="fas fa-link" class="mr-2" /> Link account
-							</button>
-							<span v-else class="full-width text-center">This account is already linked</span>
-						</div>
+						<hk-loader v-if="linking" />
+						<template v-else>
+							<div class="card-body">
+								<img :src="patreon_user.attributes?.thumb_url" />
+								<div v-if="id_taken" class="red mb-2">
+									This profile is already linked to different Shieldmaiden account
+								</div>
+								<div class="name">{{ patreon_user.attributes?.full_name }}</div>
+								<div class="email">{{ patreon_user.attributes?.email }}</div>
+								<a
+									:href="patreon_user.attributes?.url"
+									target="_blank"
+									rel="noopener"
+									class="btn btn-sm bg-neutral-5 mt-3"
+									>View profile</a
+								>
+							</div>
+							<div slot="footer" class="card-footer">
+								<router-link
+									class="btn bg-neutral-5 mr-2"
+									:class="{ 'full-width': id_taken }"
+									to="/profile"
+								>
+									{{ id_taken ? "Back to profile" : "Cancel" }}
+								</router-link>
+								<button v-if="!success && !id_taken" class="btn" @click="link">
+									<hk-icon icon="fas fa-link" class="mr-2" /> Link account
+								</button>
+							</div>
+						</template>
 					</template>
 					<template v-else>
-						<div class="card-body">
-							<p>Your account is already linked with Patreon</p>
-							<a
-								:href="`https://www.patreon.com/user?u=${userInfo.patreon_id}`"
-								target="_blank"
-								rel="noopener"
-								class="btn btn-sm bg-neutral-5 mt-3"
-								>View linked profile</a
-							>
-						</div>
-						<div slot="footer" class="card-footer">
-							<button class="btn btn-block bg-red" @click="unLink">
-								<hk-icon icon="fas fa-unlink" class="mr-2" /> Unlink account
-							</button>
-						</div>
+						<hk-loader v-if="linking" />
+						<template v-else>
+							<div class="card-body">
+								<strong v-if="success" class="green mb-2">Account successfully linked</strong>
+								<p v-else>Your account is already linked with the following Patreon profile</p>
+								<strong>{{ userInfo.patreon_email }}</strong>
+								<a
+									:href="`https://www.patreon.com/user?u=${userInfo.patreon_id}`"
+									target="_blank"
+									rel="noopener"
+									class="btn btn-sm bg-neutral-5 mt-3"
+									>View linked profile</a
+								>
+								<a
+									v-if="!userInfo.patron"
+									href="https://www.patreon.com/join/shieldmaidenapp"
+									class="btn btn-block mt-3"
+								>
+									Subscribe
+								</a>
+								<h2 v-else class="mt-3 mb-0">{{ userInfo.patron?.tier }}</h2>
+							</div>
+							<div slot="footer" class="card-footer">
+								<router-link
+									class="btn bg-neutral-5 mr-2"
+									:class="{ 'full-width': success }"
+									to="/profile"
+								>
+									{{ success ? "Back to profile" : "Cancel" }}
+								</router-link>
+								<button v-if="!success" class="btn bg-red" @click="unLink">
+									<hk-icon icon="fas fa-unlink" class="mr-2" /> Unlink account
+								</button>
+							</div>
+						</template>
 					</template>
 				</hk-card>
-				<small
-					>In order to link your accounts, all we do is save your Patreon user identification ({{
+				<small v-if="!userInfo.patreon_id && !id_taken"
+					>In order to link your accounts, we will save your Patreon user identification ({{
 						patreon_user.id
-					}}) in your Shieldmaiden user info</small
-				>
-				<hk-card>
-					<pre>{{ patreon_user }}</pre>
-				</hk-card>
+					}}) and email ({{ patreon_user.attributes?.email }}) in your Shieldmaiden user info
+				</small>
 			</template>
 		</div>
 	</div>
@@ -68,7 +95,7 @@
 <script>
 import PatreonLinkButton from "src/components/PatreonLinkButton.vue";
 import { db } from "src/firebase";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
 	name: "LinkPatreonAccount",
@@ -77,12 +104,16 @@ export default {
 	},
 	data() {
 		return {
-			loading: false,
+			loading: true,
+			linking: false,
 			id_taken: false,
 			success: false,
 		};
 	},
-	async preFetch({ store, currentRoute }) {
+	async preFetch({ store, currentRoute, redirect }) {
+		if (!store.getters.user) {
+			redirect("/sign-in");
+		}
 		if (currentRoute.query?.code) {
 			await store.dispatch("authenticate_patreon_user", currentRoute.query.code, { root: true });
 			await store.dispatch("get_patreon_identity", null, { root: true });
@@ -95,17 +126,32 @@ export default {
 		if (this.patreon_user) {
 			await this.checkAvailability();
 		}
+		this.loading = false;
 	},
 	methods: {
+		...mapActions(["update_userInfo", "setUserInfo"]),
 		async link() {
+			this.inking = true;
 			await this.checkAvailability();
 			if (!this.id_taken && this.patreon_user.id) {
-				await db.ref(`users/${this.user.uid}`).child("patreon_id").set(this.patreon_user.id);
+				await this.update_userInfo({
+					patreon_id: this.patreon_user.id,
+					patreon_email: this.patreon_user.attributes?.email,
+				});
 				this.success = true;
+				await this.setUserInfo(); // directly access benefits
 			}
+			this.linking = false;
 		},
 		async unLink() {
-			db.ref(`users/${this.user.uid}`).child("patreon_id").set(null);
+			this.linking = true;
+			await this.update_userInfo({
+				patreon_id: null,
+				patreon_email: null,
+			});
+			await this.setUserInfo(); // directly remove benefits access
+			this.id_taken = false;
+			this.linking = false;
 		},
 		async checkAvailability() {
 			const patreon_id_ref = db

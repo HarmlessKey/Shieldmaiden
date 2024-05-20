@@ -58,14 +58,19 @@
 									class="btn btn-sm bg-neutral-5 mt-3"
 									>View linked profile</a
 								>
+								<h2 v-if="userInfo.patron" class="mt-3 mb-0 text-bold">
+									{{ userInfo.patron?.tier }}
+								</h2>
+								<strong v-if="userInfo.patron?.expired" class="red">Expired</strong>
 								<a
-									v-if="!userInfo.patron"
+									v-if="!userInfo.patron || userInfo.patron.expired"
 									href="https://www.patreon.com/join/shieldmaidenapp"
+									target="_blank"
+									rel="noopener"
 									class="btn btn-block mt-3"
 								>
-									Subscribe
+									{{ userInfo.patron?.expired ? "Renew" : "Subscribe" }}
 								</a>
-								<h2 v-else class="mt-3 mb-0">{{ userInfo.patron?.tier }}</h2>
 							</div>
 							<div slot="footer" class="card-footer">
 								<router-link
@@ -129,7 +134,7 @@ export default {
 		this.loading = false;
 	},
 	methods: {
-		...mapActions(["update_userInfo", "setUserInfo"]),
+		...mapActions(["update_userInfo", "setUserInfo", "checkEncumbrance"]),
 		async link() {
 			this.inking = true;
 			await this.checkAvailability();
@@ -140,6 +145,7 @@ export default {
 				});
 				this.success = true;
 				await this.setUserInfo(); // directly access benefits
+				await this.checkEncumbrance();
 			}
 			this.linking = false;
 		},
@@ -150,6 +156,7 @@ export default {
 				patreon_email: null,
 			});
 			await this.setUserInfo(); // directly remove benefits access
+			await this.checkEncumbrance();
 			this.id_taken = false;
 			this.linking = false;
 		},

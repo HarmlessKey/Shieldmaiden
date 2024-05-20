@@ -25,12 +25,12 @@
 							<template v-if="userInfo.patron">
 								<h3 class="mb-1">
 									Patreon:
-									<strong v-if="!valid(userInfo.patron?.pledge_end)" class="red"> Expired </strong>
+									<strong v-if="userInfo.patron?.expired" class="red"> Expired </strong>
 									<strong v-else>
 										{{ userInfo.patron.tier }}
 									</strong>
 								</h3>
-								<p v-if="valid(userInfo.patron?.pledge_end)">
+								<p v-if="!userInfo.patron?.expired">
 									Thank you so much for your support.
 									<i aria-hidden="true" class="patreon-red fas fa-heart"></i>
 								</p>
@@ -51,7 +51,7 @@
 								v-if="
 									userInfo.patron &&
 									userInfo.patron?.last_charge_status === 'Declined' &&
-									valid(userInfo.patron.pledge_end)
+									!userInfo.patron.expired
 								"
 							>
 								<h3 class="red">Payment Declined</h3>
@@ -69,7 +69,7 @@
 									<hk-icon icon="fas fa-unlink" class="mr-1" /> Unlink account
 								</button>
 								<a
-									v-if="userInfo.patron && !valid(userInfo.patron?.pledge_end)"
+									v-if="userInfo.patron && userInfo.patron.expired"
 									href="https://www.patreon.com/join/shieldmaidenapp"
 									target="_blank"
 									class="btn btn-sm"
@@ -254,7 +254,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["set_active_voucher", "setUserInfo", "update_userInfo"]),
+		...mapActions(["set_active_voucher", "setUserInfo", "update_userInfo", "checkEncumbrance"]),
 		resetPassword() {
 			var vm = this;
 			var emailAddress = this.user.email;
@@ -271,9 +271,6 @@ export default {
 					// An error happened.
 					vm.error = error.message;
 				});
-		},
-		valid(end) {
-			return new Date(end).toISOString() > new Date().toISOString();
 		},
 		async addVoucher() {
 			this.set_active_voucher(this.voucher_input_text)
@@ -293,6 +290,7 @@ export default {
 				patreon_email: null,
 			});
 			await this.setUserInfo();
+			await this.checkEncumbrance();
 		},
 	},
 };

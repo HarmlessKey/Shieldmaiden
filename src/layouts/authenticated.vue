@@ -25,6 +25,7 @@ import Crumble from "src/components/crumble";
 import ContentSideRight from "src/components/ContentSideRight";
 import OverEncumbered from "src/components/userContent/OverEncumbered";
 import PaymentDeclined from "src/components/PaymentDeclined.vue";
+import PatreonLinkDialog from "src/components/dialogs/PatreonLinkDialog.vue";
 
 export default {
 	name: "AuthenticatedLayout",
@@ -48,7 +49,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["overencumbered"]),
+		...mapGetters(["overencumbered", "userInfo"]),
 		show_overencumbered() {
 			const pathArray = this.$route.path.split("/");
 			return pathArray[1] === "content" && this.overencumbered;
@@ -62,6 +63,16 @@ export default {
 		setSize(size) {
 			this.width = size.width;
 		},
+		linkPatreon() {
+			this.$q.dialog({
+				component: PatreonLinkDialog,
+			});
+		},
+	},
+	mounted() {
+		if (this.userInfo.patron && !this.userInfo.patreon_id) {
+			this.linkPatreon();
+		}
 	},
 };
 </script>

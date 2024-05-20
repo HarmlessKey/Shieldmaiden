@@ -23,7 +23,6 @@ export class patreonServices {
 		];
 		const config = {
 			headers: {
-				"Access-Control-Allow-Origin": "http://localhost:8080",
 				"Content-Type": "application/x-www-form-urlencoded",
 			},
 		};
@@ -80,7 +79,7 @@ export class patreonServices {
 
 		const config = {
 			headers: {
-				Authorization: `Bearer larWO47sp3gWO67ZRMzxM8RpIz4zo1qsQ9c8aYeUXS0`,
+				Authorization: `Bearer `,
 			},
 		};
 

@@ -3,7 +3,6 @@ import { db, auth } from "src/firebase";
 import { userServices } from "src/services/user";
 import { voucherService } from "src/services/vouchers";
 import { patreonServices } from "src/services/patreon";
-
 import Vue from "vue";
 
 const users_ref = db.ref("users");
@@ -183,7 +182,6 @@ const user_actions = {
 									if (patron_tierlist.length > 1) {
 										for (let i in patron_tierlist) {
 											let tier_id = patron_tierlist[i];
-											// SMART AWAIT ASYNC CONSTRUCTION #bless Key
 											await tiers_ref.child(tier_id).once("value", (tier_snapshot) => {
 												let tier_order = tier_snapshot.val()?.order || 0;
 												if (tier_order > highest_order) {
@@ -202,15 +200,25 @@ const user_actions = {
 								patron_tier.on("value", (tier_snapshot) => {
 									const tier = tier_snapshot.val();
 									const tier_order = tier?.order || 0;
-									const tier_name = tier?.name || "basic";
+									const tier_name = tier?.name || "Free";
+
 									//Save Patron info under UserInfo
 									user_info.patron = {
 										last_charge_status: patron_data.last_charge_status,
 										pledge_end,
+										expired: server_time > pledge_end,
 										tier: tier_name,
 									};
 
-									if (tier_order >= voucher_order && pledge_end >= server_time) {
+									// Only hand out Patreon benefits if
+									// - a Patreon account is linked
+									// - the tier is better than the voucher tier
+									// - the pledge is not expired
+									if (
+										user_info.patreon_id &&
+										tier_order >= voucher_order &&
+										pledge_end >= server_time
+									) {
 										commit("SET_TIER", tier);
 									} else {
 										commit("SET_TIER", voucher_snap.val());

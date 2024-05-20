@@ -1,5 +1,4 @@
-import CharacterSyncPrivacyPolicy from "src/views/Pages/CharacterSyncPrivacyPolicy.vue";
-
+const CharacterSyncPrivacyPolicy = () => import("src/views/Pages/CharacterSyncPrivacyPolicy.vue");
 const Sitemap = () => import("src/views/Pages/Sitemap.vue");
 const Privacy = () => import("src/views/Pages/Privacy.vue");
 const Documentation = () => import("src/views/Pages/Documentation.vue");
@@ -66,7 +65,6 @@ const routes = [
 
 			{
 				path: "import",
-				name: "Import content",
 				component: {
 					render(c) {
 						return c("router-view");
@@ -78,6 +76,7 @@ const routes = [
 				children: [
 					{
 						path: "",
+						name: "Import content",
 						component: () => import("src/views/UserContent/ImportContent"),
 						meta: {
 							description: "Import content to Shieldmaiden",
@@ -86,10 +85,10 @@ const routes = [
 					},
 					{
 						path: "hk_import",
-						name: "Import HK Content",
+						name: "Import Shieldmaiden Content",
 						component: () => import("src/views/UserContent/ImportContent/ImportHKContent"),
 						meta: {
-							description: "Import User Content from an HK export",
+							description: "Import User Content from an Shieldmaiden export",
 							title: "Import Shieldmaiden Content",
 						},
 					},

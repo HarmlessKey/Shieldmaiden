@@ -116,21 +116,23 @@ export default {
 		};
 	},
 	async preFetch({ store, currentRoute, redirect, ssrContext }) {
-		console.log("preFetch: I should not be logged on the client side, only server");
-		const subdomains = ssrContext?.req?.subdomains?.length
-			? `${ssrContext?.req?.subdomains.join(".")}.`
-			: "";
-		const origin = `${ssrContext?.req?.protocol}://${subdomains}${ssrContext?.req?.headers?.host}`;
-		if (!store.getters.user) {
-			redirect("/sign-in");
-		}
-		if (currentRoute.query?.code) {
-			await store.dispatch(
-				"authenticate_patreon_user",
-				{ code: currentRoute.query.code, origin },
-				{ root: true }
-			);
-			await store.dispatch("get_patreon_identity", null, { root: true });
+		if (ssrContext) {
+			console.log("preFetch: I should not be logged on the client side, only server");
+			const subdomains = ssrContext.req?.subdomains?.length
+				? `${ssrContext.req?.subdomains.join(".")}.`
+				: "";
+			const origin = `${ssrContext.req?.protocol}://${subdomains}${ssrContext.req?.headers?.host}`;
+			if (!store.getters.user) {
+				redirect("/sign-in");
+			}
+			if (currentRoute.query?.code) {
+				await store.dispatch(
+					"authenticate_patreon_user",
+					{ code: currentRoute.query.code, origin },
+					{ root: true }
+				);
+				await store.dispatch("get_patreon_identity", null, { root: true });
+			}
 		}
 	},
 	computed: {

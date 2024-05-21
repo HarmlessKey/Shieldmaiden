@@ -70,7 +70,7 @@ export default {
 		},
 	},
 	mounted() {
-		if (this.userInfo.patron && !this.userInfo.patreon_id) {
+		if (this.userInfo.patron && !this.userInfo.patron.expired && !this.userInfo.patreon_id) {
 			this.linkPatreon();
 		}
 	},

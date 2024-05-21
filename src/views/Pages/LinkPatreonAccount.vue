@@ -116,8 +116,10 @@ export default {
 		};
 	},
 	async preFetch({ store, currentRoute, redirect, ssrContext }) {
-		const subdomains = ssrContext.subdomains?.length ? `${ssrContext.subdomains.join(".")}.` : "";
-		const origin = `${ssrContext.req.protocol}://${subdomains}${ssrContext.req?.headers?.host}`;
+		const subdomains = ssrContext?.req?.subdomains?.length
+			? `${ssrContext?.req?.subdomains.join(".")}.`
+			: "";
+		const origin = `${ssrContext?.req?.protocol}://${subdomains}${ssrContext?.req?.headers?.host}`;
 		console.log(origin);
 		if (!store.getters.user) {
 			redirect("/sign-in");

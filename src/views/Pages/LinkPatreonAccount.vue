@@ -116,11 +116,11 @@ export default {
 		};
 	},
 	async preFetch({ store, currentRoute, redirect, ssrContext }) {
+		console.log("preFetch: I should not be logged on the client side, only server");
 		const subdomains = ssrContext?.req?.subdomains?.length
 			? `${ssrContext?.req?.subdomains.join(".")}.`
 			: "";
 		const origin = `${ssrContext?.req?.protocol}://${subdomains}${ssrContext?.req?.headers?.host}`;
-		console.log(origin);
 		if (!store.getters.user) {
 			redirect("/sign-in");
 		}

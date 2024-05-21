@@ -249,7 +249,7 @@ export default {
 			},
 		},
 	},
-	async preFetch({ store, ssrContext }) {
+	async preFetch({ store, ssrContext, currentRoute }) {
 		const cookies = Cookies.parseSSR(ssrContext);
 		const access_token = cookies.get("access_token");
 		if (!access_token) return;
@@ -273,6 +273,25 @@ export default {
 		await store.dispatch("setUser", transformed_user);
 		await store.dispatch("setUserInfo");
 		await store.dispatch("initialize");
+
+		// On the patreon link page authenticate in the preFetch
+		if (currentRoute.path === "/link-patreon-account") {
+			const subdomains = ssrContext.req?.subdomains?.length
+				? `${ssrContext.req?.subdomains.join(".")}.`
+				: "";
+			const origin = `${ssrContext.req?.protocol}://${subdomains}${ssrContext.req?.headers?.host}`;
+			if (!store.getters.user) {
+				redirect("/sign-in");
+			}
+			if (currentRoute.query?.code) {
+				await store.dispatch(
+					"authenticate_patreon_user",
+					{ code: currentRoute.query.code, origin },
+					{ root: true }
+				);
+				await store.dispatch("get_patreon_identity", null, { root: true });
+			}
+		}
 	},
 	async mounted() {
 		this.setTips();

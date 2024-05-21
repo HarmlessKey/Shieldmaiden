@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const REDIRECT_URI = "http://localhost:8080/link-patreon-account";
+const REDIRECT_URI = "/link-patreon-account";
 const AUTH_REF = "/api/oauth2/token";
 const IDENTITY_REF = "/api/oauth2/v2/identity";
 const CAMPAIGNS_REF = "/api/oauth2/v2/campaigns";
@@ -12,13 +12,13 @@ export class patreonServices {
 		});
 	}
 
-	async authenticatePatreonUser(code) {
+	async authenticatePatreonUser(code, origin) {
 		const params = [
 			`code=${code}`,
 			"grant_type=authorization_code",
 			`client_id=${process.env.VUE_APP_PATREON_CLIENT_ID}`,
 			`client_secret=${process.env.VUE_APP_PATREON_CLIENT_SECRET}`,
-			`redirect_uri=${REDIRECT_URI}`,
+			`redirect_uri=${origin}${REDIRECT_URI}`,
 			`scope=${encodeURIComponent("identity[email]")}`,
 		];
 		const config = {

@@ -115,12 +115,19 @@ export default {
 			success: false,
 		};
 	},
-	async preFetch({ store, currentRoute, redirect }) {
+	async preFetch({ store, currentRoute, redirect, ssrContext }) {
+		const subdomains = ssrContext.subdomains?.length ? `${ssrContext.subdomains.join(".")}.` : "";
+		const origin = `${ssrContext.req.protocol}://${subdomains}${ssrContext.req?.headers?.host}`;
+		console.log(origin);
 		if (!store.getters.user) {
 			redirect("/sign-in");
 		}
 		if (currentRoute.query?.code) {
-			await store.dispatch("authenticate_patreon_user", currentRoute.query.code, { root: true });
+			await store.dispatch(
+				"authenticate_patreon_user",
+				{ code: currentRoute.query.code, origin },
+				{ root: true }
+			);
 			await store.dispatch("get_patreon_identity", null, { root: true });
 		}
 	},

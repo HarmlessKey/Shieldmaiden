@@ -10,7 +10,7 @@ export default {
 	data() {
 		return {
 			client_id: process.env.VUE_APP_PATREON_CLIENT_ID,
-			redirect_uri: "http://localhost:8080/link-patreon-account",
+			redirect_uri: `${window.origin}/link-patreon-account`,
 			scope: encodeURIComponent("identity identity[email]"),
 		};
 	},

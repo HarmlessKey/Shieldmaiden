@@ -550,10 +550,11 @@ const user_actions = {
 	/**
 	 * Authenticate Patreon User
 	 * @param {string} code
+	 * @param {string} origin https://current_domain.com
 	 */
-	async authenticate_patreon_user({ dispatch, commit }, code) {
+	async authenticate_patreon_user({ dispatch, commit }, { code, origin }) {
 		const services = await dispatch("get_patreon_services");
-		const auth = await services.authenticatePatreonUser(code);
+		const auth = await services.authenticatePatreonUser(code, origin);
 		commit("SET_PATREON_AUTH", auth);
 		return auth;
 	},

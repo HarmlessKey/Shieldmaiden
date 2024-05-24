@@ -1,11 +1,11 @@
-import axios from "axios";
+const axios = require("axios");
 
 const REDIRECT_URI = "/link-patreon-account";
 const AUTH_REF = "/api/oauth2/token";
 const IDENTITY_REF = "/api/oauth2/v2/identity";
 const CAMPAIGNS_REF = "/api/oauth2/v2/campaigns";
 
-export class patreonServices {
+module.exports.patreonServices = class patreonServices {
 	constructor() {
 		this.PATREON = axios.create({
 			baseURL: "https://www.patreon.com",
@@ -49,7 +49,6 @@ export class patreonServices {
 			"url",
 		];
 		const params = [`${encodeURIComponent("fields[user]")}=${fields.join(",")}`];
-
 		const config = {
 			headers: {
 				Authorization: `Bearer ${auth?.access_token}`,
@@ -96,4 +95,4 @@ export class patreonServices {
 				);
 			});
 	}
-}
+};

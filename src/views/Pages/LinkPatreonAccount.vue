@@ -121,11 +121,22 @@ export default {
 	async mounted() {
 		if (this.patreon_user) {
 			await this.checkAvailability();
+		} else if (this.$route.query?.code) {
+			// Authenticate the Patreon user
+			const auth = await this.authenticate_patreon_user(this.$route.query.code);
+			// Get the Patreon identity with the authenticated Patreon user
+			await this.get_patreon_identity(auth);
 		}
 		this.loading = false;
 	},
 	methods: {
-		...mapActions(["update_userInfo", "setUserInfo", "checkEncumbrance"]),
+		...mapActions([
+			"update_userInfo",
+			"setUserInfo",
+			"checkEncumbrance",
+			"authenticate_patreon_user",
+			"get_patreon_identity",
+		]),
 		async link() {
 			this.inking = true;
 			await this.checkAvailability();

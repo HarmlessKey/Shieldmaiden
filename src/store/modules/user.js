@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Cookies } from "quasar";
 import { db, auth } from "src/firebase";
 import { userServices } from "src/services/user";
@@ -552,21 +553,26 @@ const user_actions = {
 	 * @param {string} code
 	 * @param {string} origin https://current_domain.com
 	 */
-	async authenticate_patreon_user({ dispatch, commit }, { code, origin }) {
-		const services = await dispatch("get_patreon_services");
-		const auth = await services.authenticatePatreonUser(code, origin);
-		commit("SET_PATREON_AUTH", auth);
-		return auth;
+	async authenticate_patreon_user({ commit }, code) {
+		const result = await axios.post(
+			"http://localhost:8080/api/patreon/auth",
+			{ code },
+			{ headers: { contentType: "application/json" } }
+		);
+		commit("SET_PATREON_AUTH", result.data);
+		return result.data;
 	},
 
 	/**
 	 * Get Patreon Identity
 	 */
-	async get_patreon_identity({ dispatch, commit, state }) {
-		const services = await dispatch("get_patreon_services");
-		const patron = await services.getPatreonIdentity(state.patreon_auth);
-		commit("SET_PATREON_USER", patron);
-		return patron;
+	async get_patreon_identity({ commit, state }, auth) {
+		console.log(state.patreon_auth);
+		const result = await axios.post("api/patreon/identity", auth, {
+			headers: { contentType: "application/json" },
+		});
+		commit("SET_PATREON_USER", result.data);
+		return result.data;
 	},
 };
 

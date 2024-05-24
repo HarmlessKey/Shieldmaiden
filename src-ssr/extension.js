@@ -10,12 +10,16 @@
  * Note: Changes to this file (but not any file it imports!) are picked up by the
  * development server, but such updates are costly since the dev-server needs a reboot.
  */
+const api = require("./api");
+const express = require("express");
 
 module.exports.extendApp = function ({ app, ssr }) {
-  /*
+	/*
      Extend the parts of the express app that you
      want to use with development server too.
 
      Example: app.use(), app.get() etc
   */
-}
+	app.use(express.json());
+	app.use("/api", api);
+};

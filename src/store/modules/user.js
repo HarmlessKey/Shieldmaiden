@@ -554,11 +554,7 @@ const user_actions = {
 	 * @param {string} origin https://current_domain.com
 	 */
 	async authenticate_patreon_user({ commit }, code) {
-		const result = await axios.post(
-			"http://localhost:8080/api/patreon/auth",
-			{ code },
-			{ headers: { contentType: "application/json" } }
-		);
+		const result = await axios.post("api/patreon/auth", { code });
 		commit("SET_PATREON_AUTH", result.data);
 		return result.data;
 	},
@@ -567,9 +563,7 @@ const user_actions = {
 	 * Get Patreon Identity
 	 */
 	async get_patreon_identity({ commit }, patreonAuth) {
-		const result = await axios.post("api/patreon/identity", patreonAuth, {
-			headers: { contentType: "application/json" },
-		});
+		const result = await axios.post("api/patreon/identity", patreonAuth);
 		commit("SET_PATREON_USER", result.data);
 		return result.data;
 	},

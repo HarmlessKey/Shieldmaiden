@@ -31,7 +31,7 @@ export class userServices {
 
 	async updateUser(uid, value) {
 		try {
-			const user = await USERS_REF.child(uid).update(value);
+			await USERS_REF.child(uid).update(value);
 		} catch (error) {
 			throw error;
 		}

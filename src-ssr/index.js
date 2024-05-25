@@ -42,11 +42,6 @@ app.use(ssr.resolveUrl("/"), serve(".", true));
 // we extend the custom common dev & prod parts here
 extension.extendApp({ app, ssr });
 
-// app.get(ssr.resolveUrl("/api/patreon"), (req, res) => {
-// 	console.log("API PATREON");
-// 	return { message: "API HIT!" };
-// });
-
 // this should be last get(), rendering with SSR
 app.get(ssr.resolveUrl("*"), (req, res) => {
 	res.setHeader("Content-Type", "text/html");

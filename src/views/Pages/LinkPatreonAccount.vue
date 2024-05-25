@@ -16,7 +16,7 @@
 						<hk-loader v-if="linking" />
 						<template v-else>
 							<div class="card-body">
-								<img :src="patreon_user.attributes?.thumb_url" />
+								<img :src="patreon_user.attributes?.thumb_url" alt="Patreon profile picture" />
 								<div v-if="id_taken" class="red mb-2">
 									This profile is already linked to different Shieldmaiden account
 								</div>

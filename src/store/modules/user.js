@@ -566,9 +566,8 @@ const user_actions = {
 	/**
 	 * Get Patreon Identity
 	 */
-	async get_patreon_identity({ commit, state }, auth) {
-		console.log(state.patreon_auth);
-		const result = await axios.post("api/patreon/identity", auth, {
+	async get_patreon_identity({ commit }, patreonAuth) {
+		const result = await axios.post("api/patreon/identity", patreonAuth, {
 			headers: { contentType: "application/json" },
 		});
 		commit("SET_PATREON_USER", result.data);
@@ -653,8 +652,8 @@ const user_mutations = {
 	DELETE_SOUNDBOARD_LINK(state, key) {
 		Vue.delete(state.soundboard, key);
 	},
-	SET_PATREON_AUTH(state, auth) {
-		Vue.set(state, "patreon_auth", auth);
+	SET_PATREON_AUTH(state, payload) {
+		Vue.set(state, "patreon_auth", payload);
 	},
 	SET_PATREON_USER(state, patron) {
 		Vue.set(state, "patreon_user", patron);

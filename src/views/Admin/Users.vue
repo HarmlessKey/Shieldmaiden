@@ -37,13 +37,13 @@
 
 					<span slot="voucher" slot-scope="data" v-if="data.item">
 						<i
-							aria-hidden="true"
 							v-if="tiers[data.item.id]"
 							class="fas fa-ticket-alt"
+							aria-hidden="true"
 							:class="{
-								blue: tiers[data.item.id].name == 'Folk Hero',
-								purple: tiers[data.item.id].name == 'Noble',
-								orange: tiers[data.item.id].name == 'Deity',
+								blue: tiers[data.item.id]?.name == 'Folk Hero',
+								purple: tiers[data.item.id]?.name == 'Noble',
+								orange: tiers[data.item.id]?.name == 'Deity',
 							}"
 						></i>
 					</span>
@@ -51,18 +51,18 @@
 					<span slot="patreon" slot-scope="data" v-if="data.item">
 						<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
 						<i
-							aria-hidden="true"
 							v-else-if="data.item"
 							v-for="tier in data.item"
 							:key="tier"
 							class="fab fa-patreon"
+							aria-hidden="true"
 							:class="{
-								blue: tiers[tier].name == 'Folk Hero',
-								purple: tiers[tier].name == 'Noble',
-								orange: tiers[tier].name == 'Deity',
-								red: tiers[tier].name == 'Former',
+								blue: tiers[tier]?.name == 'Folk Hero',
+								purple: tiers[tier]?.name == 'Noble',
+								orange: tiers[tier]?.name == 'Deity',
+								red: tiers[tier]?.name == 'Former',
 							}"
-						></i>
+						/>
 					</span>
 
 					<span slot="live" slot-scope="data" v-if="data.item" class="red">

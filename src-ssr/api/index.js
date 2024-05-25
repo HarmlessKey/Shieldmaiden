@@ -5,7 +5,7 @@ const router = new Router();
 
 router.post("/patreon/auth", async (req, res) => {
 	const service = new patreonServices();
-	const result = await service.authenticatePatreonUser(req.body?.code, req.headers?.origin);
+	const result = await service.authenticatePatreonUser(req.body.code, req.headers.origin);
 	res.json(result);
 });
 

@@ -5,7 +5,7 @@ const AUTH_REF = "/api/oauth2/token";
 const IDENTITY_REF = "/api/oauth2/v2/identity";
 const CAMPAIGNS_REF = "/api/oauth2/v2/campaigns";
 
-module.exports.patreonServices = class patreonServices {
+module.exports = class patreonServices {
 	constructor() {
 		this.PATREON = axios.create({
 			baseURL: "https://www.patreon.com",
@@ -51,20 +51,20 @@ module.exports.patreonServices = class patreonServices {
 		const params = [`${encodeURIComponent("fields[user]")}=${fields.join(",")}`];
 		const config = {
 			headers: {
-				Authorization: `Bearer ${auth?.access_token}`,
+				Authorization: `Bearer ${auth.access_token}`,
 			},
 		};
 
 		return this.PATREON.get(`${IDENTITY_REF}?${params.join("&")}`, config)
 			.then((response) => {
-				return response.data?.data;
+				return response.data.data;
 			})
 			.catch((error) => {
 				console.error(
 					"Something went wrong fetching Patreon identity data",
 					error.code,
-					error.response?.status,
-					error.response?.statusText
+					error.response.status,
+					error.response.statusText
 				);
 			});
 	}
@@ -84,14 +84,14 @@ module.exports.patreonServices = class patreonServices {
 
 		return this.PATREON.get(`${CAMPAIGNS_REF}?${params.join("&")}`, config)
 			.then((response) => {
-				return response.data?.data;
+				return response.data.data;
 			})
 			.catch((error) => {
 				console.error(
 					"Something went wrong fetching Patreon campaigns",
 					error.code,
-					error.response?.status,
-					error.response?.statusText
+					error.response.status,
+					error.response.statusText
 				);
 			});
 	}

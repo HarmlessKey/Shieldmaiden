@@ -5,7 +5,7 @@ const AUTH_REF = "/api/oauth2/token";
 const IDENTITY_REF = "/api/oauth2/v2/identity";
 const CAMPAIGNS_REF = "/api/oauth2/v2/campaigns";
 
-module.exports = class patreonServices {
+module.exports.patreonServices = class patreonServices {
 	constructor() {
 		this.PATREON = axios.create({
 			baseURL: "https://www.patreon.com",

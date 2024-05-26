@@ -66,7 +66,7 @@
 				<i aria-hidden="true" class="fas fa-plus green"></i> Create your first reminder
 			</router-link>
 			<router-link
-				v-else-if="tier.name === 'Free'"
+				v-else-if="tier.price === 'Free'"
 				class="btn bg-neutral-8 btn-block"
 				to="/patreon"
 			>

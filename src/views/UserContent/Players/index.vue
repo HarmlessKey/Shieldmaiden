@@ -38,7 +38,11 @@
 								:key="col.name"
 								:props="props"
 								:auto-width="col.name !== 'name'"
-								:style="col.name === 'avatar' && avatar(props.row) ? `background-image: url('${avatar(props.row)}')` : ''"
+								:style="
+									col.name === 'avatar' && avatar(props.row)
+										? `background-image: url('${avatar(props.row)}')`
+										: ''
+								"
 							>
 								<template v-if="col.name === 'avatar'">
 									<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-player" />
@@ -52,7 +56,7 @@
 									</template>
 								</template>
 								<div v-else class="text-right d-flex justify-content-end">
-									<template v-if="tier.name !== 'Free' && Object.keys(sync_characters).length">
+									<template v-if="tier.price !== 'Free' && Object.keys(sync_characters).length">
 										<button
 											v-if="
 												!props.row.sync_character || !(props.row.sync_character in sync_characters)
@@ -129,7 +133,7 @@
 				<i aria-hidden="true" class="fas fa-plus green mr-1" /> Create your first player
 			</router-link>
 			<router-link
-				v-else-if="tier.name === 'Free'"
+				v-else-if="tier.price === 'Free'"
 				class="btn bg-neutral-8 btn-block"
 				to="/patreon"
 			>

@@ -2,7 +2,7 @@
 	<div class="content">
 		<h2 class="head">Encounter finished</h2>
 		<div class="container">
-			<q-slide-transition v-if="!tier || tier.name === 'Free'">
+			<q-slide-transition v-if="!tier || tier.price === 'Free'">
 				<a
 					v-show="patreon"
 					href="https://www.patreon.com/join/shieldmaidenapp"

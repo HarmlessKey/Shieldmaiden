@@ -2051,22 +2051,23 @@ html body {
 	}
 	.target-item {
 		display: grid;
-		grid-template-columns: 35px 35px 1fr;
+		grid-template-columns: 40px 40px 1fr;
 		grid-template-rows: auto;
 		grid-gap: 0;
-		line-height: 35px;
+		line-height: 40px;
 		user-select: none;
 		border-radius: $border-radius-small;
 		width: 100%;
 
 		&.hasInitiative {
-			grid-template-columns: 35px 35px 35px 1fr;
+			grid-template-columns: 40px 40px 40px 1fr;
 		}
 		.initiative,
 		.ac,
-		.img {
+		.target-avatar {
 			text-align: center;
-			height: 35px;
+			height: 40px;
+			width: 40px;
 		}
 		.ac_wrapper {
 			position: relative;
@@ -2075,7 +2076,7 @@ html body {
 			i,
 			.ac {
 				position: absolute;
-				line-height: 35px;
+				line-height: 40px;
 				width: 100%;
 				text-align: center;
 			}
@@ -2089,16 +2090,12 @@ html body {
 				margin-top: -1px;
 			}
 		}
-		.img {
-			display: block;
-			width: 35px;
-			height: 35px;
+		.target-avatar {
+			width: 40px;
+			height: 40px;
 			background-color: $neutral-9;
-			background-position: center top;
-			background-repeat: no-repeat;
-			background-size: cover;
 			font-size: 20px;
-			line-height: 35px;
+			line-height: 40px;
 			overflow: hidden;
 			border: solid 1px transparent;
 
@@ -2120,7 +2117,7 @@ html body {
 				display: grid;
 				grid-template-columns: 1fr max-content;
 				grid-column-gap: 5px;
-				line-height: 35px;
+				line-height: 40px;
 				margin-right: 5px;
 				color: $neutral-1;
 

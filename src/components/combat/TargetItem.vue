@@ -6,7 +6,7 @@
 				class="initiative"
 				v-if="initiative"
 				@click.stop
-				:class="targeted.includes(entity.key) ? 'blue' : ''"
+				:style="{ color: entity.color_label ? entity.color_label : `` }"
 			>
 				{{ entity.initiative }}
 				<q-popup-proxy
@@ -24,7 +24,7 @@
 							filled
 							square
 							dense
-							utofocus
+							autofocus
 							label="Initiative"
 							type="number"
 							color="white"
@@ -47,39 +47,8 @@
 				</q-popup-proxy>
 			</span>
 
-			<!-- HIDDEN -->
-			<div
-				class="img-wrapper"
-				:style="
-					entity.color_label
-						? `border-color: ${entity.color_label}; color: color: ${entity.color_label}`
-						: ``
-				"
-			>
-				<span class="img" v-if="entity.hidden">
-					<i aria-hidden="true" class="fas fa-eye-slash red" />
-					<q-tooltip anchor="top middle" self="center middle"> Hidden </q-tooltip>
-				</span>
-				<span class="img" v-else-if="entity.transformed">
-					<i aria-hidden="true" class="fas fa-paw-claws" />
-					<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
-				</span>
-				<span
-					v-else
-					class="img"
-					:style="{
-						'background-image': entity.img ? 'url(' + entity.img + ')' : '',
-						'border-color': entity.color_label ? entity.color_label : ``,
-						color: entity.color_label ? entity.color_label : ``,
-					}"
-				>
-					<i
-						aria-hidden="true"
-						v-if="!entity.img"
-						:class="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`"
-					/>
-				</span>
-
+			<!-- AVATAR -->
+			<TargetAvatar :entity="entity">
 				<q-popup-proxy
 					v-if="entity.entityType === 'npc'"
 					:dark="$store.getters.theme === 'dark'"
@@ -119,7 +88,7 @@
 						</div>
 					</div>
 				</q-popup-proxy>
-			</div>
+			</TargetAvatar>
 
 			<!-- ARMOR CLASS -->
 			<div class="ac_wrapper" @click.stop>
@@ -216,7 +185,7 @@
 
 			<!-- HEALTH BAR -->
 			<q-linear-progress
-				size="35px"
+				size="40px"
 				:value="percentage(displayStats().curHp, displayStats().maxHp)"
 				:color="hpBarColor((displayStats().curHp / displayStats().maxHp) * 100)"
 			>
@@ -448,9 +417,13 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import TargetAvatar from "./TargetAvatar.vue";
 
 export default {
 	name: "TargetItem",
+	components: {
+		TargetAvatar,
+	},
 	props: {
 		item: {
 			type: String,

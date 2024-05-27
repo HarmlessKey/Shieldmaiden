@@ -184,7 +184,8 @@ export default {
 				},
 				{
 					option: "transform",
-					method: () => this.setDrawer({ show: true, type: "drawers/Transform", data: this.target }),
+					method: () =>
+						this.setDrawer({ show: true, type: "drawers/Transform", data: this.target }),
 					key: ["t"],
 					icon: "fa-paw-claws",
 					tooltip: "[t] Transform",
@@ -347,16 +348,16 @@ export default {
 	}
 	.health {
 		display: grid;
-		grid-template-columns: 1fr 35px;
-		grid-template-rows: 35px;
+		grid-template-columns: 1fr 40px;
+		grid-template-rows: 40px;
 		grid-gap: 0;
 		background: $neutral-8;
 
 		.clear {
 			display: block;
-			width: 35px;
-			height: 35px;
-			line-height: 35px;
+			width: 40px;
+			height: 40px;
+			line-height: 40px;
 			font-size: 15px;
 			text-align: center;
 		}

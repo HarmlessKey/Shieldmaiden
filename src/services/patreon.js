@@ -29,10 +29,11 @@ module.exports.patreonServices = class patreonServices {
 
 		return this.PATREON.post(`${AUTH_REF}?${params.join("&")}`, config)
 			.then((response) => {
+				console.log("Auth successful", response.data);
 				return response.data;
 			})
 			.catch((error) => {
-				console.error("Something went wrong authentication Patreon user", error.code);
+				console.error("Patreon Auth error", error.code, error);
 			});
 	}
 
@@ -57,15 +58,11 @@ module.exports.patreonServices = class patreonServices {
 
 		return this.PATREON.get(`${IDENTITY_REF}?${params.join("&")}`, config)
 			.then((response) => {
+				console.log("Get identity successful", response.data);
 				return response.data.data;
 			})
 			.catch((error) => {
-				console.error(
-					"Something went wrong fetching Patreon identity data",
-					error.code,
-					error.response.status,
-					error.response.statusText
-				);
+				console.error("Patreon Identity error", error.code, error);
 			});
 	}
 

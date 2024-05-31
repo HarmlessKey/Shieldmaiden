@@ -252,8 +252,8 @@
 						<template v-else>
 							<h3>Add entities</h3>
 							<p>Add players and monsters to create your encounter.</p>
-							<button v-if="!demo" class="btn btn-block" @click="$emit('add-players')">
-								Add all players
+							<button class="btn btn-block" @click="$emit('add-players')">
+								Add{{ !demo ? " all " : " " }}players
 							</button>
 						</template>
 					</div>
@@ -321,7 +321,7 @@ export default {
 	mixins: [difficulty],
 	data() {
 		return {
-			demo: this.$route.name === "ToolsBuildEncounter",
+			demo: this.$route.name === "ToolsBuildEncounter" || this.$route.name === "DemoBuildEncounter",
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
 			user: this.$store.getters ? this.$store.getters.user : undefined,
@@ -457,9 +457,9 @@ export default {
 						continue;
 					}
 					if (entity.entityType == "player" && !this.demo) {
-						entities[entity.id] = await this.get_player({ uid: this.user.uid, id: key });
+						entities[entity.id] = await this.get_player({ uid: this.user?.uid, id: key });
 					} else if (entity.npc === "custom" && !this.demo) {
-						entities[entity.id] = await this.get_npc({ uid: this.user.uid, id: entity.id });
+						entities[entity.id] = await this.get_npc({ uid: this.user?.uid, id: entity.id });
 					} else if (entity.npc === "api" || entity.npc === "srd") {
 						entities[entity.id] = await this.fetch_monster(entity.id);
 					}

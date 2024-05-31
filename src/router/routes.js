@@ -14,7 +14,7 @@ const Username = () => import("src/views/profile/SetUsername.vue");
 const DeleteAccount = () => import("src/views/profile/DeleteAccount.vue");
 const Offline = () => import("src/views/Pages/Offline.vue");
 const RunEncounter = () => import("src/views/RunEncounter.vue");
-const EncounterBuilder = () => import("src/views/userContent/Encounters/EditEncounter");
+const EncounterBuilder = () => import("src/views/UserContent/Encounters/EditEncounter.vue");
 const User = () => import("src/views/User.vue");
 
 // This is where you add all your site routes

@@ -225,7 +225,8 @@
 					</router-link>
 				</span>
 				<button
-					class="btn ml-2" @click="startEncounter()"
+					class="btn ml-2"
+					@click="startEncounter()"
 					v-shortkey="['shift', 'arrowright']"
 					@shortkey="startEncounter()"
 				>
@@ -261,7 +262,7 @@ export default {
 		},
 		leaveRoute() {
 			if (this.demo) {
-				return "/";
+				return "/demo";
 			}
 			if (this.test) {
 				return `/content/campaigns/${this.$route.params.campid}/${this.$route.params.encid}`;

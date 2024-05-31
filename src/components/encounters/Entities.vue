@@ -112,25 +112,28 @@
 									</q-tooltip>
 								</template>
 							</span>
-							<div v-else-if="col.name === 'actions'" class="text-right d-flex justify-content-between">
+							<div
+								v-else-if="col.name === 'actions'"
+								class="text-right d-flex justify-content-between"
+							>
 								<div class="monster-actions">
 									<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									dense
-									class="multi_nr ml-2"
-									autocomplete="off"
-									type="number"
-									min="1"
-									max="99"
-									name="name"
-									placeholder="1"
-									v-model="to_add[props.key]"
+										:dark="$store.getters.theme === 'dark'"
+										filled
+										square
+										dense
+										class="multi_nr ml-2"
+										autocomplete="off"
+										type="number"
+										min="1"
+										max="99"
+										name="name"
+										placeholder="1"
+										v-model="to_add[props.key]"
 									/>
 									<a
-									class="btn btn-sm bg-neutral-5 mx-1"
-									@click="multi_add($event, props.key, 'npc', props.row.name, true)"
+										class="btn btn-sm bg-neutral-5 mx-1"
+										@click="multi_add($event, props.key, 'npc', props.row.name, true)"
 									>
 										<i aria-hidden="true" class="fas fa-plus"></i>
 										<q-tooltip anchor="top middle" self="center middle">
@@ -142,7 +145,9 @@
 										@click="multi_add($event, props.key, 'npc', props.row.name, true, true)"
 									>
 										<i aria-hidden="true" class="fas fa-dice-d20"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Add with rolled HP </q-tooltip>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add with rolled HP
+										</q-tooltip>
 									</a>
 								</div>
 							</div>
@@ -183,7 +188,13 @@
 				<q-btn slot="after" no-caps color="primary" @click="filter_dialog = true">
 					Filter
 					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge v-if="Object.keys(filter).length" floating rounded color="red" :label="Object.keys(filter).length" />
+					<q-badge
+						v-if="Object.keys(filter).length"
+						floating
+						rounded
+						color="red"
+						:label="Object.keys(filter).length"
+					/>
 				</q-btn>
 			</q-input>
 			<q-table
@@ -231,7 +242,8 @@
 							</a>
 						</q-td>
 						<q-td
-							v-for="col in props.cols" :key="col.name"
+							v-for="col in props.cols"
+							:key="col.name"
 							:props="props"
 							:auto-width="col.name !== 'name'"
 						>
@@ -432,7 +444,7 @@ export default {
 	},
 	data() {
 		return {
-			demo: this.$route.name === "ToolsBuildEncounter",
+			demo: this.$route.name === "ToolsBuildEncounter" || this.$route.name === "DemoBuildEncounter",
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
 			user: this.$store.getters ? this.$store.getters.user : undefined,
@@ -538,7 +550,7 @@ export default {
 	watch: {
 		// Prop is changed in parent to trigger addAllPlayers function from Overview.vue
 		addPlayers() {
-			this.addAllPlayers();
+			this.demo ? (this.player_dialog = true) : this.addAllPlayers();
 		},
 	},
 	computed: {
@@ -570,11 +582,11 @@ export default {
 		visibleColumns() {
 			switch (true) {
 				case this.width > 600:
-					return  ["challenge_rating", "name", "type", "environment", "actions"];
+					return ["challenge_rating", "name", "type", "environment", "actions"];
 				case this.width > 450:
-					return  ["challenge_rating", "name", "type", "actions"];
+					return ["challenge_rating", "name", "type", "actions"];
 				case this.width > 400:
-					return   ["challenge_rating", "name", "actions"];
+					return ["challenge_rating", "name", "actions"];
 				default:
 					return ["name", "actions"];
 			}
@@ -610,7 +622,7 @@ export default {
 			this.pagination.page = 1;
 			this.query = {
 				search: this.searchMonster,
-				...this.filter
+				...this.filter,
 			};
 			this.fetchMonsters();
 		},
@@ -619,10 +631,10 @@ export default {
 			this.filterMonsters();
 		},
 		clearFilter() {
-				this.filter_dialog = false;
-				this.$set(this, "filter", {});
-				this.filterMonsters();
-			},
+			this.filter_dialog = false;
+			this.$set(this, "filter", {});
+			this.filterMonsters();
+		},
 		request(req) {
 			this.pagination = req.pagination;
 			this.fetchMonsters();

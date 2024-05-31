@@ -3,7 +3,7 @@
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)" greedy>
 				<h3 class="d-flex justify-between">
-					General settings
+					Atmosphere
 					<div v-if="!demo">
 						<q-btn color="primary" type="submit" no-caps>Save</q-btn>
 						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
@@ -14,156 +14,178 @@
 					</div>
 				</h3>
 
-				<p v-if="demo">
-					These setting are mostly to add some atmosphere to the live initiative list that you can
-					share with your players. When you have an account you can share a live initiative list of
-					your active encounter with your players and while building the encounter, you can add a
-					<strong>background</strong> and <strong>weather effects</strong> that will show on this
-					shared list.
-				</p>
-				<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
-					<q-input
-						:dark="$store.getters.theme === 'dark'"
-						filled
-						square
-						label="Name"
-						autocomplete="off"
-						class="mb-3"
-						v-model="editableEncounter.name"
-						:error="invalid && validated"
-						:error-message="errors[0]"
-					/>
-				</ValidationProvider>
-
-				<ValidationProvider rules="audio" name="Audio" v-slot="{ errors, invalid, validated }">
-					<div class="audio">
-						<div v-if="encounter.audio && !invalid" class="img pointer">
-							<a :href="encounter.audio" target="_blank" rel="noopener">
-								<q-icon
-									:class="audio_icons[audio_link_type].icon"
-									:style="`color:${audio_icons[audio_link_type].color};`"
-								></q-icon>
-							</a>
-						</div>
-						<div class="img" v-else>
-							<q-icon name="fas fa-music-alt" />
-						</div>
-						<div>
-							<q-input
-								:dark="$store.getters.theme === 'dark'"
-								filled
-								square
-								label="Audio"
-								autocomplete="off"
-								v-model="editableEncounter.audio"
-								placeholder="Audio URL"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-							/>
-						</div>
-					</div>
-				</ValidationProvider>
-
-				<hk-background-select
-					v-if="demo || (tier && tier.price !== 'Free')"
-					v-model="editableEncounter.hk_background"
-					label="Background"
-					:disable="!!editableEncounter.background"
-					@input="setBackground($event)"
-					class="mb-3"
-				/>
-
-				<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
-					<div class="background mb-3">
-						<div
-							v-if="encounter.background && !invalid"
-							class="img pointer"
-							:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
-							@click="image = true"
-						></div>
-						<div class="img" v-else>
-							<q-icon name="fas fa-image" />
-						</div>
-						<div>
-							<q-input
-								:dark="$store.getters.theme === 'dark'"
-								filled
-								square
-								label="Background"
-								autocomplete="off"
-								v-model="editableEncounter.background"
-								class="mb-2"
-								placeholder="Background URL"
-								:error="invalid && validated"
-								:error-message="errors[0]"
-								@input="editableEncounter.hk_background = null"
-							>
-								<hk-popover
-									slot="append"
-									header="Custom background"
-									v-if="demo || (tier && tier.price !== 'Free')"
-								>
-									<i class="fas fa-info-circle" aria-hidden="true" />
-									<template #content>
-										Setting a custom background will overwrite your selected background.
-									</template>
-								</hk-popover>
-							</q-input>
-						</div>
-					</div>
-				</ValidationProvider>
-
-				<template v-if="demo || (tier && tier.price !== 'Free')">
-					<h3>
-						Background effects
-						<q-icon name="fas fa-eye" class="blue ml-1 pointer" @click="image = true">
-							<q-tooltip anchor="top middle" self="center middle"> Background preview </q-tooltip>
-						</q-icon>
-					</h3>
-					<EditWeather v-model="weather" />
+				<template v-if="demo">
+					<p>
+						If you create an account, you can add atmosphere to your encounters, to let players
+						immerse even.
+					</p>
+					<q-list class="mb-3">
+						<q-item class="bg-neutral-8">
+							<q-item-section avatar>
+								<hk-icon icon="fas fa-image" />
+							</q-item-section>
+							<q-item-section>Background</q-item-section>
+						</q-item>
+						<q-item class="bg-neutral-8">
+							<q-item-section avatar>
+								<hk-icon icon="fas fa-music" />
+							</q-item-section>
+							<q-item-section>Audio</q-item-section>
+						</q-item>
+						<q-item class="bg-neutral-8">
+							<q-item-section avatar>
+								<hk-icon icon="fas fa-cloud-showers" />
+							</q-item-section>
+							<q-item-section>Weather effects</q-item-section>
+						</q-item>
+					</q-list>
+					<router-link to="/sign-up" class="btn">Create an account</router-link>
 				</template>
 
-				<div v-if="!demo" class="d-flex justify-start items-center mb-3">
-					<q-btn color="primary" type="submit" no-caps>Save</q-btn>
-					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
-						<q-tooltip anchor="top middle" self="center middle">
-							There are validation errors
-						</q-tooltip>
-					</q-icon>
-				</div>
+				<template v-else>
+					<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
+						<q-input
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							label="Name of your encounter"
+							autocomplete="off"
+							class="mb-3"
+							v-model="editableEncounter.name"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+					</ValidationProvider>
 
-				<hk-card v-if="!demo && (!tier || tier.price === 'Free')">
-					<div slot="header" class="card-header">
-						<span>
-							<i class="fas fa-cloud-showers" aria-hidden="true" />
-							<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
-							<i class="fas fa-fog" aria-hidden="true" />
-						</span>
-						<strong>Backgrounds & Effects</strong>
-						<span>
-							<i class="fas fa-bolt" aria-hidden="true" />
-							<i class="fas fa-tornado mx-2" aria-hidden="true" />
-							<i class="fas fa-waveform-path" aria-hidden="true" />
-						</span>
-					</div>
-					<div class="p-3 text-center">
-						<p>With a subscription you have access to our backgrounds and background effects.</p>
-						<p>
-							<template v-for="(effect, i) in effects">
-								<strong :key="`effect-${effect}`">{{ effect.toUpperCase() }}</strong>
-								<span class="neutral-2 mx-1" :key="`pipe-${effect}`" v-if="i < effects.length - 1"
-									>|</span
+					<ValidationProvider rules="audio" name="Audio" v-slot="{ errors, invalid, validated }">
+						<div class="audio">
+							<div v-if="encounter.audio && !invalid" class="img pointer">
+								<a :href="encounter.audio" target="_blank" rel="noopener">
+									<q-icon
+										:class="audio_icons[audio_link_type].icon"
+										:style="`color:${audio_icons[audio_link_type].color};`"
+									></q-icon>
+								</a>
+							</div>
+							<div class="img" v-else>
+								<q-icon name="fas fa-music-alt" />
+							</div>
+							<div>
+								<q-input
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									label="Audio"
+									autocomplete="off"
+									v-model="editableEncounter.audio"
+									placeholder="Audio URL"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+							</div>
+						</div>
+					</ValidationProvider>
+
+					<hk-background-select
+						v-if="demo || (tier && tier.price !== 'Free')"
+						v-model="editableEncounter.hk_background"
+						label="Background"
+						:disable="!!editableEncounter.background"
+						@input="setBackground($event)"
+						class="mb-3"
+					/>
+					<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
+						<div class="background mb-3">
+							<div
+								v-if="encounter.background && !invalid"
+								class="img pointer"
+								:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
+								@click="image = true"
+							></div>
+							<div class="img" v-else>
+								<q-icon name="fas fa-image" />
+							</div>
+							<div>
+								<q-input
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									label="Background"
+									autocomplete="off"
+									v-model="editableEncounter.background"
+									class="mb-2"
+									placeholder="Background URL"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+									@input="editableEncounter.hk_background = null"
 								>
-							</template>
-						</p>
-						<router-link class="btn btn-sm bg-neutral-5 full-width" to="/weather-demo">
-							Checkout all effects
-						</router-link>
-						<router-link class="btn btn-sm full-width mt-2 bg-patreon-red" to="/patreon">
-							Get a subscription
-						</router-link>
+									<hk-popover
+										slot="append"
+										header="Custom background"
+										v-if="demo || (tier && tier.price !== 'Free')"
+									>
+										<i class="fas fa-info-circle" aria-hidden="true" />
+										<template #content>
+											Setting a custom background will overwrite your selected background.
+										</template>
+									</hk-popover>
+								</q-input>
+							</div>
+						</div>
+					</ValidationProvider>
+
+					<template v-if="tier && tier.price !== 'Free'">
+						<h3>
+							Background effects
+							<q-icon name="fas fa-eye" class="blue ml-1 pointer" @click="image = true">
+								<q-tooltip anchor="top middle" self="center middle"> Background preview </q-tooltip>
+							</q-icon>
+						</h3>
+						<EditWeather v-model="weather" />
+					</template>
+
+					<div v-if="!demo" class="d-flex justify-start items-center mb-3">
+						<q-btn color="primary" type="submit" no-caps>Save</q-btn>
+						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
 					</div>
-				</hk-card>
+
+					<hk-card v-if="!demo && (!tier || tier.price === 'Free')">
+						<div slot="header" class="card-header">
+							<span>
+								<i class="fas fa-cloud-showers" aria-hidden="true" />
+								<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
+								<i class="fas fa-fog" aria-hidden="true" />
+							</span>
+							<strong>Backgrounds & Effects</strong>
+							<span>
+								<i class="fas fa-bolt" aria-hidden="true" />
+								<i class="fas fa-tornado mx-2" aria-hidden="true" />
+								<i class="fas fa-waveform-path" aria-hidden="true" />
+							</span>
+						</div>
+						<div class="p-3 text-center">
+							<p>With a subscription you have access to our backgrounds and background effects.</p>
+							<p>
+								<template v-for="(effect, i) in effects">
+									<strong :key="`effect-${effect}`">{{ effect.toUpperCase() }}</strong>
+									<span class="neutral-2 mx-1" :key="`pipe-${effect}`" v-if="i < effects.length - 1"
+										>|</span
+									>
+								</template>
+							</p>
+							<router-link class="btn btn-sm bg-neutral-5 full-width" to="/weather-demo">
+								Checkout all effects
+							</router-link>
+							<router-link class="btn btn-sm full-width mt-2 bg-patreon-red" to="/patreon">
+								Get a subscription
+							</router-link>
+						</div>
+					</hk-card>
+				</template>
 			</q-form>
 		</ValidationObserver>
 
@@ -219,7 +241,7 @@ export default {
 	mixins: [audio],
 	data() {
 		return {
-			demo: this.$route.name === "ToolsBuildEncounter",
+			demo: this.$route.name === "ToolsBuildEncounter" || this.$route.name === "DemoBuildEncounter",
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
 			user: this.$store.getters.user,
@@ -329,5 +351,8 @@ export default {
 }
 .edit-weather {
 	min-width: 240px;
+}
+.q-item {
+	margin-bottom: 1px;
 }
 </style>

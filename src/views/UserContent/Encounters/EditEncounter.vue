@@ -1,7 +1,10 @@
 <template>
 	<div class="content">
 		<EditEncounter>
-			<router-link :to="`/content/campaigns/${campaignId}`" class="btn btn-sm btn-clear">
+			<router-link
+				:to="campaignId ? `/content/campaigns/${campaignId}` : `/`"
+				class="btn btn-sm btn-clear"
+			>
 				<hk-icon icon="fa fa-arrow-left" class="mr-1" />
 				Back
 			</router-link>

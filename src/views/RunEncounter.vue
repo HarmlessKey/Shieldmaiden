@@ -108,25 +108,14 @@
 		</div>
 		<DemoOverlay v-if="demo" />
 		<q-dialog v-model="demo_dialog" persistent>
-			<hk-card v-if="!user || continue_demo" header="Choose encounter">
-				<div class="card-body text-center">
-					<p>Would you like to use our demo encounter or build your own custom encounter?</p>
-					<button class="btn btn-block mb-2" @click="demo_dialog = false">
-						Use demo encounter
-					</button>
-					<router-link to="/tools/encounter-builder/build-encounter" class="btn btn-sm btn-clear btn-block">
-						Build custom encounter
-					</router-link>
-				</div>
-			</hk-card>
-			<hk-card v-else header="Create custom content">
+			<hk-card header="Create custom content">
 				<div class="card-body text-center">
 					<h2>This is our demo encounter.</h2>
 					<p>When signed in you can create Campaigns and run your custom Encounters from there.</p>
 					<router-link to="/content/campaigns" class="btn bg-green btn-block mb-2">
 						Go to campaigns
 					</router-link>
-					<button class="btn btn-sm btn-block btn-clear" @click="continue_demo = true">
+					<button class="btn btn-sm btn-block btn-clear" @click="demo_dialog = false">
 						Continue demo
 					</button>
 				</div>
@@ -186,7 +175,6 @@ export default {
 			audio_notification: false,
 			loading: true,
 			demo_dialog: false,
-			continue_demo: false,
 			panes: ["current", "targets", "targeted", "side"],
 			focused_pane: null,
 		};
@@ -205,7 +193,7 @@ export default {
 				id: this.encounterId,
 			});
 		} else {
-			this.demo_dialog = !this.demo_encounter;
+			this.demo_dialog = !!this.userId;
 		}
 		await this.init_Encounter({
 			cid: this.campaignId,

@@ -14,6 +14,7 @@ const Username = () => import("src/views/profile/SetUsername.vue");
 const DeleteAccount = () => import("src/views/profile/DeleteAccount.vue");
 const Offline = () => import("src/views/Pages/Offline.vue");
 const RunEncounter = () => import("src/views/RunEncounter.vue");
+const EncounterBuilder = () => import("src/views/userContent/Encounters/EditEncounter");
 const User = () => import("src/views/User.vue");
 
 // This is where you add all your site routes
@@ -585,7 +586,7 @@ const routes = [
 			{
 				path: ":encid",
 				name: "EditEncounter",
-				component: () => import("src/views/UserContent/Encounters/EditEncounter"),
+				component: EncounterBuilder,
 				meta: {
 					title: "Edit encounter",
 					description: "Edit your Shieldmaiden encounter.",
@@ -1184,16 +1185,33 @@ const routes = [
 	// DEMO ENCOUNTER
 	{
 		path: "/demo",
-		name: "Demo",
-		component: RunEncounter,
-		meta: {
-			sidebar: false,
-			offline: true,
-			title: "D&D Initative Tracker - Demo",
-			description:
-				"Try running an encounter with Shieldmaiden, an advanced Initiative Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
-		},
+		component: () => import("src/layouts/demo"),
+		children: [
+			{
+				path: "",
+				name: "DemoBuildEncounter",
+				component: EncounterBuilder,
+				meta: {
+					sidebar: false,
+					title: "Encounter Builder D&D Demo",
+					description:
+						"Build an encounter with Shieldmaiden, an advanced Combat Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
+				},
+			},
+			{
+				path: "run-encounter",
+				name: "Demo",
+				component: RunEncounter,
+				meta: {
+					sidebar: false,
+					title: "D&D Initiative Tracker Demo",
+					description:
+						"Run encounter with Shieldmaiden, an advanced Initiative Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
+				},
+			},
+		],
 	},
+
 	{
 		path: "/weather-demo",
 		name: "Weather demo",

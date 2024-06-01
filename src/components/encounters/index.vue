@@ -15,9 +15,15 @@
 			<h1 class="written mb-0 flex-grow truncate">
 				{{ demo ? "Encounter builder for D&D" : encounter.name }}
 			</h1>
-			<button class="btn" :disabled="!validEncounter" @click="runEncounter">
+			<button
+				class="btn"
+				:disabled="!validEncounter"
+				:class="{ 'step-highlight': get_progress('build') === 'start' }"
+				@click="runEncounter"
+			>
 				{{ demo ? "Run" : "Test" }} encounter
 				<i class="fas ml-2" :class="demo ? 'fa-sword rotate' : 'fa-flask'" aria-hidden="true" />
+				<TutorialPopover tutorial="build" step="start" />
 			</button>
 		</div>
 		<div class="wrapper">
@@ -80,6 +86,7 @@ import Overview from "./Overview.vue";
 import General from "./General.vue";
 import { mapGetters, mapActions } from "vuex";
 import SignedIn from "src/components/userContent/SignedIn.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "EditEncounter",
@@ -90,6 +97,7 @@ export default {
 		Overview,
 		General,
 		SignedIn,
+		TutorialPopover,
 	},
 	data() {
 		return {
@@ -108,6 +116,7 @@ export default {
 	computed: {
 		...mapGetters(["overencumbered"]),
 		...mapGetters("encounters", ["demo_encounter"]),
+		...mapGetters("tutorial", ["get_progress"]),
 		tabs() {
 			let tabs = {
 				entities: { name: "entities", label: "Entities", icon: "fas fa-helmet-battle" },

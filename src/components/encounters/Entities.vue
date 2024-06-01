@@ -45,9 +45,15 @@
 			</p>
 			<hr />
 		</template>
-		<button v-else class="btn btn-block mb-3" @click="player_dialog = true">
+		<button
+			v-else
+			class="btn btn-block mb-3"
+			:class="{ 'step-highlight': get_progress('build') === 'add-players' }"
+			@click="player_dialog = true"
+		>
 			<i class="fas fa-user-plus" aria-hidden="true" />
 			Add players
+			<TutorialPopover tutorial="build" step="add-players" />
 		</button>
 
 		<!-- MONSTERS -->
@@ -149,6 +155,12 @@
 											Add with rolled HP
 										</q-tooltip>
 									</a>
+									<TutorialPopover
+										v-if="props.rowIndex === 0"
+										tutorial="build"
+										position="right"
+										step="add-monsters"
+									/>
 								</div>
 							</div>
 							<template v-else>
@@ -247,7 +259,11 @@
 							:props="props"
 							:auto-width="col.name !== 'name'"
 						>
-							<div v-if="col.name === 'actions'" class="monster-actions">
+							<div
+								v-if="col.name === 'actions'"
+								class="monster-actions"
+								:class="{ 'step-highlight': get_progress('build') === 'add-monsters' }"
+							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
 									filled
@@ -280,6 +296,12 @@
 										Add with rolled HP
 									</q-tooltip>
 								</a>
+								<TutorialPopover
+									v-if="props.rowIndex === 0"
+									tutorial="build"
+									position="right"
+									step="add-monsters"
+								/>
 							</div>
 							<span v-else-if="col.name === 'environment'">
 								{{ col.value?.[0]?.capitalize() }}
@@ -415,8 +437,9 @@ import { mapActions, mapGetters } from "vuex";
 
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
-import ViewMonster from "src/components/compendium/Monster.vue";
 import { uuid } from "src/utils/generalFunctions";
+import ViewMonster from "src/components/compendium/Monster.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Entities",
@@ -441,6 +464,7 @@ export default {
 	mixins: [general, dice],
 	components: {
 		ViewMonster,
+		TutorialPopover,
 	},
 	data() {
 		return {
@@ -556,6 +580,7 @@ export default {
 	computed: {
 		...mapGetters(["content_count"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_progress"]),
 		monster_resource: {
 			get() {
 				const resource = this.npc_count ? "custom" : "srd";
@@ -607,6 +632,7 @@ export default {
 		...mapActions("npcs", ["get_npcs", "get_npc"]),
 		...mapActions("players", ["get_players", "get_player"]),
 		...mapActions("encounters", ["add_player_encounter", "add_npc_encounter"]),
+		...mapActions("tutorial", ["nextStep"]),
 		player_avatar(player) {
 			return player.storage_avatar || player.avatar;
 		},
@@ -771,6 +797,11 @@ export default {
 					});
 				} else {
 					this.add_demo_entity(entity);
+
+					// Next step of tutorial
+					if (this.follow_tutorial && this.get_progress("build") === "add-monsters") {
+						this.nextStep("build");
+					}
 				}
 			}
 
@@ -800,6 +831,11 @@ export default {
 					};
 					this.add_demo_entity(entity);
 					this.player = {};
+
+					// Next step of tutorial
+					if (this.follow_tutorial && this.get_progress("build") === "add-players") {
+						this.nextStep("build");
+					}
 				}
 			}
 
@@ -870,6 +906,7 @@ input[type="number"]::-webkit-inner-spin-button {
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
+	border-radius: $border-radius;
 
 	.multi_nr {
 		width: 45px;

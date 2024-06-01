@@ -865,6 +865,11 @@ html body {
 		}
 	}
 
+	.step-highlight {
+		outline: $yellow-light solid 2px;
+		outline-offset: 2px;
+	}
+
 	.hk-layout {
 		min-height: calc(100vh - #{$header-height});
 		display: grid;
@@ -984,9 +989,9 @@ html body {
 
 	.truncate-cell {
 		white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    max-width: 1px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		max-width: 1px;
 	}
 	.truncate {
 		white-space: nowrap;

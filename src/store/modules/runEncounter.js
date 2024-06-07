@@ -469,6 +469,7 @@ const run_encounter_actions = {
 					} else {
 						entity.img = entity.avatar;
 					}
+					entity.url = data_npc.url; // used for compendium images
 				}
 
 				//if an entity is quickly added during an encounter

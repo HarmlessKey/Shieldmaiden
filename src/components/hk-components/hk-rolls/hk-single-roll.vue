@@ -17,22 +17,7 @@
 			<div class="card-body">
 				<!-- TARGET -->
 				<div class="target-item" v-if="roll.target">
-					<span
-						class="img bg-neutral-8"
-						:style="{
-							'background-image': 'url(' + roll.target.img + ')',
-							'border-color': roll.target.color_label ? roll.target.color_label : ``,
-							color: roll.target.color_label ? roll.target.color_label : ``,
-						}"
-					>
-						<i
-							v-if="!roll.target.img"
-							:class="`hki-${
-								roll.target.entityType === 'npc' ? 'monster' : roll.target.entityType
-							}`"
-							aria-hidden="true"
-						/>
-					</span>
+					<TargetAvatar :entity="roll.target" class="img" :icons="false" />
 					<div class="ac_wrapper">
 						<i aria-hidden="true" class="fas fa-shield"></i>
 						<span
@@ -50,7 +35,7 @@
 						</span>
 					</div>
 					<div class="pl-2 truncate">
-						{{ roll.target.name }}
+						{{ roll.target.name?.capitalizeEach() }}
 					</div>
 				</div>
 
@@ -448,9 +433,13 @@ import { mapActions } from "vuex";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 import { dice } from "src/mixins/dice";
 import { setHP } from "src/mixins/HpManipulations";
+import TargetAvatar from "src/components/combat/TargetAvatar.vue";
 
 export default {
 	name: "hk-single-roll",
+	components: {
+		TargetAvatar,
+	},
 	props: {
 		value: {
 			type: Object,

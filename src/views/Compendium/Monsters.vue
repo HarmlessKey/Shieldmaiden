@@ -95,7 +95,8 @@
 							:props="props"
 							:auto-width="col.name !== 'name'"
 						>
-							<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
+							<hk-compendium-image v-if="col.name === 'avatar'" :value="col.value" />
+							<router-link v-else-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
 								{{ col.value }}
 							</router-link>
 							<span v-else-if="col.name === 'environment'">
@@ -121,7 +122,7 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" class="p-0" auto-width>
-							<ViewMonster :id="props.key" />
+							<ViewMonster :id="props.key" class="p-0" />
 						</q-td>
 					</q-tr>
 				</template>
@@ -153,8 +154,8 @@
 import ViewMonster from "src/components/compendium/Monster.vue";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions } from "vuex";
-import { displayCR } from "src/utils/generalFunctions";
 import _ from "lodash";
+import { displayCR } from "src/utils/generalFunctions";
 
 export default {
 	name: "Monsters",
@@ -177,6 +178,13 @@ export default {
 				rowsNumber: 0,
 			},
 			columns: [
+				{
+					name: "avatar",
+					label: "",
+					field: "url",
+					align: "left",
+					classes: "avatar",
+				},
 				{
 					name: "challenge_rating",
 					label: "CR",
@@ -230,7 +238,6 @@ export default {
 			],
 			loading: true,
 			width: 0,
-			cr_label: displayCR,
 		};
 	},
 	computed: {
@@ -251,20 +258,23 @@ export default {
 		visibleColumns() {
 			switch (true) {
 				case this.width > 700:
-					return ["challenge_rating", "name", "type", "size", "alignment", "environment"];
+					return ["challenge_rating", "avatar", "name", "type", "size", "alignment", "environment"];
 				case this.width > 620:
-					return ["challenge_rating", "name", "type", "size", "alignment"];
+					return ["challenge_rating", "avatar", "name", "type", "size", "alignment"];
 				case this.width > 500:
-					return ["challenge_rating", "name", "type", "size"];
+					return ["challenge_rating", "avatar", "name", "type", "size"];
 				case this.width > 450:
-					return ["challenge_rating", "name", "type"];
+					return ["challenge_rating", "avatar", "name", "type"];
 				default:
-					return ["challenge_rating", "name"];
+					return ["challenge_rating", "avatar", "name"];
 			}
 		},
 	},
 	methods: {
 		...mapActions("api_monsters", ["fetch_monsters"]),
+		cr_label(val) {
+			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;
+		},
 		setFilter() {
 			this.filter_dialog = false;
 			this.filterMonsters();

@@ -28,28 +28,7 @@
 				@keydown.h="set_hidden({ key: entity.key, hidden: !entity.hidden })"
 				@keydown.a="set_active({ key: entity.key, active: false })"
 			>
-				<span v-if="entity.hidden" class="img"
-					><i aria-hidden="true" class="fas fa-eye-slash red"></i
-				></span>
-				<span v-else-if="entity.reminders.surprised" class="img orange"
-					><i aria-hidden="true" class="hki hki-surprised"></i
-				></span>
-				<template v-else>
-					<span
-						class="img"
-						:style="{
-							'background-image': entity.img ? 'url(' + entity.img + ')' : '',
-							'border-color': entity.color_label ? entity.color_label : ``,
-							color: entity.color_label ? entity.color_label : ``,
-						}"
-					>
-						<i
-							aria-hidden="true"
-							v-if="!entity.img"
-							:class="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`"
-						/>
-					</span>
-				</template>
+				<TargetAvatar :entity="entity" class="img" />
 				<div class="overview-item">
 					<div class="name truncate">{{ entity.name.capitalizeEach() }}</div>
 					<strong class="blue initiative">{{ entity.initiative }}</strong>
@@ -138,10 +117,14 @@
 import { mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
 import { remindersMixin } from "src/mixins/reminders";
+import TargetAvatar from "../TargetAvatar.vue";
 
 export default {
 	name: "SetInitiativeNPC",
 	mixins: [general, remindersMixin],
+	components: {
+		TargetAvatar,
+	},
 	props: ["active", "idle"],
 	methods: {
 		...mapActions([

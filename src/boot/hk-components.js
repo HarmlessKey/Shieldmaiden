@@ -30,6 +30,7 @@ const HkActionRollScaling = () =>
 const HkPane = () => import("../components/hk-components/hk-pane");
 const HkFilter = () => import("../components/hk-components/hk-filter");
 const HkTransformSelect = () => import("../components/hk-components/hk-transform-select");
+import HkCompendiumImage from "../components/hk-components/hk-compendium-image";
 
 export default async ({ Vue }) => {
 	Vue.component("hk-input", HkInput);
@@ -61,4 +62,5 @@ export default async ({ Vue }) => {
 	Vue.component("hk-pane", HkPane);
 	Vue.component("hk-filter", HkFilter);
 	Vue.component("hk-transform-select", HkTransformSelect);
+	Vue.component("hk-compendium-image", HkCompendiumImage);
 };

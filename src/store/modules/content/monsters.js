@@ -71,13 +71,14 @@ const monster_actions = {
 				monster.meta = {
 					title: `${monster.name.capitalizeEach()} D&D 5e`,
 					description: "D&D 5th Edition monster: ",
+					image: `https://firebasestorage.googleapis.com/v0/b/dndcombat-71e41.appspot.com/o/compendium%2Fmonsters%2Fmeta%2F${monster.url}.png?alt=media`,
+					image_alt: monster.name.capitalizeEach(),
 				};
 				monster.meta.description += monster.type;
 				monster.meta.description += monster.subtype ? ` ${monster.subtype}, ` : ", ";
 				monster.meta.description += `${monster.alignment}. `;
 				monster.meta.description += `Challenge rating: ${monster.challenge_rating}. `;
 				monster.meta.description += `Armor class: ${monster.armor_class}. Hit points: ${monster.hit_points}. `;
-
 				monster.meta.description += monster.walk_speed
 					? `Speed: ${monster.walk_speed}ft.`
 					: "Speed: 0ft.";

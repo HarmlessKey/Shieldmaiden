@@ -8,16 +8,7 @@
 
 		<ul class="entities hasImg">
 			<li v-for="(entity, i) in npcs" :key="entity.key">
-				<span
-					class="img pointer"
-					:style="{
-						'background-image': entity.img ? 'url(' + entity.img + ')' : '',
-						'border-color': entity.color_label ? entity.color_label : ``,
-						color: entity.color_label ? entity.color_label : ``,
-					}"
-				>
-					<i aria-hidden="true" v-if="!entity.img" :class="`hki-monster`" />
-				</span>
+				<TargetAvatar :entity="entity" class="img pointer" :icons="false" />
 				<div class="truncate">
 					<q-checkbox
 						:dark="$store.getters.theme === 'dark'"
@@ -79,9 +70,13 @@
 import { mapGetters, mapActions } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
+import TargetAvatar from "../TargetAvatar.vue";
 
 export default {
 	name: "SetInitiativeNPC",
+	components: {
+		TargetAvatar,
+	},
 	mixins: [general, dice],
 	props: ["npcs"],
 	data() {

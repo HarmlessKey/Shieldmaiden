@@ -12,91 +12,93 @@
 					<div class="card-body">
 						<div v-if="!userInfo.patreon_id">
 							<div class="text-center mb-3">
-								<p>
+								<PatreonLinkButton class="btn-block btn-lg" />
+								<div class="mt-3">
 									To access your subscription benefits, you have to link your Patreon account to
 									your Shieldmaiden account.
-								</p>
-								<PatreonLinkButton class="btn-block btn-lg" />
+								</div>
 							</div>
 						</div>
 						<!-- HAS A SUBSCRIPTION -->
-						<q-banner v-if="userInfo.patreon_id" class="mb-3 bg-neutral-8" rounded>
-							<q-icon slot="avatar" name="fab fa-patreon" class="patreon-red" />
-							<template v-if="userInfo.patron">
-								<h3 class="mb-1">
-									Patreon:
-									<strong v-if="userInfo.patron?.expired" class="red"> Expired </strong>
-									<strong v-else>
-										{{ userInfo.patron.tier }}
-									</strong>
-								</h3>
-								<p v-if="!userInfo.patron?.expired">
-									Thank you so much for your support.
-									<i aria-hidden="true" class="patreon-red fas fa-heart"></i>
-								</p>
-							</template>
-							<template v-else>
-								<h3>No active Patreon subscription</h3>
+						<template v-if="userInfo.patreon_id">
+							<PaymentDeclined />
+							<q-banner class="mb-3 bg-neutral-8" rounded>
+								<q-icon slot="avatar" name="fab fa-patreon" class="patreon-red" />
+								<template v-if="userInfo.patron">
+									<h3 class="mb-1">
+										Patreon:
+										<strong v-if="userInfo.patron?.expired" class="red"> Expired </strong>
+										<strong v-else>
+											{{ userInfo.patron.tier }}
+										</strong>
+									</h3>
+									<p v-if="!userInfo.patron?.expired">
+										Thank you so much for your support.
+										<i aria-hidden="true" class="patreon-red fas fa-heart"></i>
+									</p>
+								</template>
+								<template v-else>
+									<h3>No active Patreon subscription</h3>
+									<p>
+										Our subscriptions are handled by Patreon, to make use of our benefits, please
+										get a subscription on our Patreon with your linked Patreon account.
+									</p>
+								</template>
 								<p>
-									Our subscriptions are handled by Patreon, to make use of our benefits, please get
-									a subscription on our Patreon with your linked Patreon account.
+									Linked Patreon account: <strong>{{ userInfo.patreon_email }}</strong>
 								</p>
-							</template>
 
-							<p>
-								Linked Patreon account: <strong>{{ userInfo.patreon_email }}</strong>
-							</p>
-
-							<div
-								v-if="
-									userInfo.patron &&
-									userInfo.patron?.last_charge_status === 'Declined' &&
-									!userInfo.patron.expired
-								"
-							>
-								<h3 class="red">Payment Declined</h3>
-								<p>
-									Your last payment on Patreon was declined, your subscription will automatically be
-									cancelled on <b>{{ makeDate(userInfo.patron?.pledge_end) }}</b
-									>.<br />
-									Go to
-									<a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a>
-									to check your payment details.
-								</p>
-							</div>
-							<template slot="action">
-								<button class="btn btn-sm bg-neutral-5 mr-2" @click="unlinkPatreon">
-									<hk-icon icon="fas fa-unlink" class="mr-1" /> Unlink account
-								</button>
-								<a
-									v-if="userInfo.patron && userInfo.patron.expired"
-									href="https://www.patreon.com/join/shieldmaidenapp"
-									target="_blank"
-									class="btn btn-sm"
-									rel="noopener"
+								<div
+									v-if="
+										userInfo.patron &&
+										userInfo.patron?.last_charge_status === 'Declined' &&
+										!userInfo.patron.expired
+									"
 								>
-									<hk-icon icon="fas fa-redo-alt" class="mr-1" /> Renew
-								</a>
-								<a
-									v-else-if="userInfo.patron"
-									href="https://www.patreon.com/join/shieldmaidenapp/checkout?edit=1"
-									class="btn btn-sm"
-									target="_blank"
-									rel="noopener"
-								>
-									Cancel subscription
-								</a>
-								<a
-									v-else
-									href="https://www.patreon.com/join/shieldmaidenapp"
-									class="btn btn-sm"
-									target="_blank"
-									rel="noopener"
-								>
-									Subscribe
-								</a>
-							</template>
-						</q-banner>
+									<h3 class="red">Payment Declined</h3>
+									<p>
+										Your last payment on Patreon was declined, your subscription will automatically
+										be cancelled on <b>{{ makeDate(userInfo.patron?.pledge_end) }}</b
+										>.<br />
+										Go to
+										<a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a>
+										to check your payment details.
+									</p>
+								</div>
+								<template slot="action">
+									<button class="btn btn-sm bg-neutral-5 mr-2" @click="unlinkPatreon">
+										<hk-icon icon="fas fa-unlink" class="mr-1" /> Unlink account
+									</button>
+									<a
+										v-if="userInfo.patron && userInfo.patron.expired"
+										href="https://www.patreon.com/join/shieldmaidenapp"
+										target="_blank"
+										class="btn btn-sm"
+										rel="noopener"
+									>
+										<hk-icon icon="fas fa-redo-alt" class="mr-1" /> Renew
+									</a>
+									<a
+										v-else-if="userInfo.patron"
+										href="https://www.patreon.com/join/shieldmaidenapp/checkout?edit=1"
+										class="btn btn-sm"
+										target="_blank"
+										rel="noopener"
+									>
+										Cancel subscription
+									</a>
+									<a
+										v-else
+										href="https://www.patreon.com/join/shieldmaidenapp"
+										class="btn btn-sm"
+										target="_blank"
+										rel="noopener"
+									>
+										Subscribe
+									</a>
+								</template>
+							</q-banner>
+						</template>
 
 						<q-banner class="mb-3 bg-neutral-8" rounded>
 							<q-icon slot="avatar" name="fas fa-ticket-alt" />
@@ -191,6 +193,7 @@ import Tier from "src/components/userContent/Tier";
 import UserBanner from "src/components/userContent/UserBanner";
 import Tutorial from "src/components/userContent/Tutorial";
 import PatreonLinkButton from "src/components/PatreonLinkButton";
+import PaymentDeclined from "src/components/PaymentDeclined.vue";
 
 export default {
 	name: "Profile",
@@ -200,6 +203,7 @@ export default {
 		Tier,
 		Tutorial,
 		PatreonLinkButton,
+		PaymentDeclined,
 	},
 	preFetch({ store, redirect }) {
 		if (!store.getters.user) {

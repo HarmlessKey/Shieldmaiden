@@ -95,7 +95,11 @@
 							:props="props"
 							:auto-width="col.name !== 'name'"
 						>
-							<hk-compendium-image v-if="col.name === 'avatar'" :value="col.value" />
+							<hk-compendium-image
+								v-if="col.name === 'avatar'"
+								:value="col.value"
+								:key="col.value"
+							/>
 							<router-link v-else-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
 								{{ col.value }}
 							</router-link>

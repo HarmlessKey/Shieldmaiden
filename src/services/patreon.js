@@ -13,6 +13,9 @@ module.exports.patreonServices = class patreonServices {
 	}
 
 	async authenticatePatreonUser(code, origin) {
+		console.log("ENV", process.env);
+		console.log("Patreon CLIENT ID", process.env.VUE_APP_PATREON_CLIENT_ID);
+		console.log("Patreon CLIENT SECRET", process.env.VUE_APP_PATREON_CLIENT_SECRET);
 		const params = [
 			`code=${code}`,
 			"grant_type=authorization_code",

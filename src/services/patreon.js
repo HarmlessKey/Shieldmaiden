@@ -1,4 +1,6 @@
 const axios = require("axios");
+const dotenv = require("dotenv");
+dotenv.config({ path: ".env.production.local" });
 
 const REDIRECT_URI = "/link-patreon-account";
 const AUTH_REF = "/api/oauth2/token";
@@ -36,7 +38,7 @@ module.exports.patreonServices = class patreonServices {
 				return response.data;
 			})
 			.catch((error) => {
-				console.error("Patreon Auth error", error.code, error);
+				console.error("Patreon Auth error", error.code, error.request);
 			});
 	}
 

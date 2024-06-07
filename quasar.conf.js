@@ -158,11 +158,11 @@ module.exports = function (/* ctx */) {
 						type: "image/png",
 						purpose: "maskable",
 					},
-          {
-            src: "favicon.png",
-            sizes: "48x48",
-            purpose: "any"
-          }
+					{
+						src: "favicon.png",
+						sizes: "48x48",
+						purpose: "any",
+					},
 				],
 				shortcuts: [
 					{

@@ -1,8 +1,9 @@
+import axios from "axios";
 import { Cookies } from "quasar";
 import { db, auth } from "src/firebase";
 import { userServices } from "src/services/user";
 import { voucherService } from "src/services/vouchers";
-
+import { patreonServices } from "src/services/patreon";
 import Vue from "vue";
 
 const users_ref = db.ref("users");
@@ -10,6 +11,7 @@ const tiers_ref = db.ref("tiers");
 
 const user_state = () => ({
 	user_services: null,
+	patreon_services: null,
 	user: undefined,
 	userInfo: undefined,
 	tier: undefined,
@@ -22,11 +24,16 @@ const user_state = () => ({
 	broadcast: {},
 	followed: {},
 	soundboard: undefined,
+	patreon_auth: undefined,
+	patreon_user: undefined,
 });
 
 const user_getters = {
 	user_services: (state) => {
 		return state.user_services;
+	},
+	patreon_services: (state) => {
+		return state.patreon_services;
 	},
 	user: function (state) {
 		return state.user;
@@ -68,6 +75,12 @@ const user_getters = {
 			.orderBy("name", "asc")
 			.value();
 	},
+	patreon_auth(state) {
+		return state.patreon_auth;
+	},
+	patreon_user(state) {
+		return state.patreon_user;
+	},
 };
 
 const user_actions = {
@@ -76,6 +89,12 @@ const user_actions = {
 			commit("SET_USER_SERVICES", new userServices());
 		}
 		return getters.user_services;
+	},
+	async get_patreon_services({ getters, commit }) {
+		if (getters.patreon_services === null || !Object.keys(getters.patreon_services).length) {
+			commit("SET_PATREON_SERVICES", new patreonServices());
+		}
+		return getters.patreon_services;
 	},
 
 	setUser({ commit }, user) {
@@ -164,7 +183,6 @@ const user_actions = {
 									if (patron_tierlist.length > 1) {
 										for (let i in patron_tierlist) {
 											let tier_id = patron_tierlist[i];
-											// SMART AWAIT ASYNC CONSTRUCTION #bless Key
 											await tiers_ref.child(tier_id).once("value", (tier_snapshot) => {
 												let tier_order = tier_snapshot.val()?.order || 0;
 												if (tier_order > highest_order) {
@@ -183,15 +201,25 @@ const user_actions = {
 								patron_tier.on("value", (tier_snapshot) => {
 									const tier = tier_snapshot.val();
 									const tier_order = tier?.order || 0;
-									const tier_name = tier?.name || "basic";
+									const tier_name = tier?.name || "Free";
+
 									//Save Patron info under UserInfo
 									user_info.patron = {
 										last_charge_status: patron_data.last_charge_status,
 										pledge_end,
+										expired: server_time > pledge_end,
 										tier: tier_name,
 									};
 
-									if (tier_order >= voucher_order && pledge_end >= server_time) {
+									// Only hand out Patreon benefits if
+									// - a Patreon account is linked
+									// - the tier is better than the voucher tier
+									// - the pledge is not expired
+									if (
+										user_info.patreon_id &&
+										tier_order >= voucher_order &&
+										pledge_end >= server_time
+									) {
 										commit("SET_TIER", tier);
 									} else {
 										commit("SET_TIER", voucher_snap.val());
@@ -227,13 +255,19 @@ const user_actions = {
 				throw error;
 			}
 		}
+	},
 
-		// Return a promise, so you can wait for it in the initialize function from store/general.js
-		// return new Promise((resolve) => {
-		// 	setTimeout(() => {
-		// 		resolve()
-		// 	}, 1000)
-		// });
+	async update_userInfo({ commit, dispatch, rootGetters }, value) {
+		const uid = rootGetters.user.uid;
+		if (uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				await services.updateUser(uid, value);
+				commit("SET_USERINFO", value);
+			} catch (error) {
+				throw error;
+			}
+		}
 	},
 
 	setPoster({ state }) {
@@ -513,17 +547,41 @@ const user_actions = {
 			}
 		}
 	},
+
+	/**
+	 * Authenticate Patreon User
+	 * @param {string} code
+	 * @param {string} origin https://current_domain.com
+	 */
+	async authenticate_patreon_user({ commit }, code) {
+		const result = await axios.post("api/patreon/auth", { code });
+		commit("SET_PATREON_AUTH", result.data);
+		return result.data;
+	},
+
+	/**
+	 * Get Patreon Identity
+	 */
+	async get_patreon_identity({ commit }, patreonAuth) {
+		const result = await axios.post("api/patreon/identity", patreonAuth);
+		commit("SET_PATREON_USER", result.data);
+		return result.data;
+	},
 };
 
 const user_mutations = {
 	SET_USER_SERVICES(state, payload) {
 		Vue.set(state, "user_services", payload);
 	},
+	SET_PATREON_SERVICES(state, payload) {
+		Vue.set(state, "patreon_services", payload);
+	},
 	SET_USER(state, payload) {
 		Vue.set(state, "user", payload);
 	},
 	SET_USERINFO(state, payload) {
-		Vue.set(state, "userInfo", payload);
+		const newVal = state.userInfo ? { ...state.userInfo, ...payload } : payload;
+		Vue.set(state, "userInfo", newVal);
 	},
 	SET_USER_SETTINGS(state, payload) {
 		Vue.set(state, "userSettings", payload);
@@ -587,6 +645,12 @@ const user_mutations = {
 	},
 	DELETE_SOUNDBOARD_LINK(state, key) {
 		Vue.delete(state.soundboard, key);
+	},
+	SET_PATREON_AUTH(state, payload) {
+		Vue.set(state, "patreon_auth", payload);
+	},
+	SET_PATREON_USER(state, patron) {
+		Vue.set(state, "patreon_user", patron);
 	},
 	CLEAR_USER(state) {
 		Vue.set(state, "user", undefined);

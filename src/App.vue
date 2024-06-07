@@ -82,6 +82,31 @@ export default {
 		HkRolls,
 		Home,
 	},
+	async preFetch({ store, ssrContext }) {
+		const cookies = Cookies.parseSSR(ssrContext);
+		const access_token = cookies.get("access_token");
+		if (!access_token) return;
+
+		const user = jwt_decode(access_token);
+		if (!user && !user.user_id) return;
+
+		const transform = {
+			uid: "user_id",
+			displayName: "name",
+			photoURL: "picture",
+			email: "email",
+			emailVerified: "email_verified",
+		};
+
+		const transformed_user = {};
+		for (const [k, v] of Object.entries(transform)) {
+			transformed_user[k] = user[v];
+		}
+
+		await store.dispatch("setUser", transformed_user);
+		await store.dispatch("setUserInfo");
+		await store.dispatch("initialize");
+	},
 	meta() {
 		const meta = {
 			title: {
@@ -248,31 +273,6 @@ export default {
 				this.announcementSetter = newVal;
 			},
 		},
-	},
-	async preFetch({ store, ssrContext }) {
-		const cookies = Cookies.parseSSR(ssrContext);
-		const access_token = cookies.get("access_token");
-		if (!access_token) return;
-
-		const user = jwt_decode(access_token);
-		if (!user && !user.user_id) return;
-
-		const transform = {
-			uid: "user_id",
-			displayName: "name",
-			photoURL: "picture",
-			email: "email",
-			emailVerified: "email_verified",
-		};
-
-		const transformed_user = {};
-		for (const [k, v] of Object.entries(transform)) {
-			transformed_user[k] = user[v];
-		}
-
-		await store.dispatch("setUser", transformed_user);
-		await store.dispatch("setUserInfo");
-		await store.dispatch("initialize");
 	},
 	async mounted() {
 		this.setTips();

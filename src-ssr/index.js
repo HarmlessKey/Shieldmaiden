@@ -10,7 +10,6 @@
  *   If you are looking to add common DEV & PROD logic to the express app, then use
  *   "src-ssr/extension.js"
  */
-
 const express = require("express");
 const morgan = require("morgan");
 const compression = require("compression");

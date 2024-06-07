@@ -93,7 +93,7 @@ export default {
 	},
 	data() {
 		return {
-			demo: this.$route.name === "ToolsBuildEncounter",
+			demo: this.$route.name === "ToolsBuildEncounter" || this.$route.name === "DemoBuildEncounter",
 			user: this.$store.getters ? this.$store.getters.user : undefined,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
@@ -111,7 +111,7 @@ export default {
 		tabs() {
 			let tabs = {
 				entities: { name: "entities", label: "Entities", icon: "fas fa-helmet-battle" },
-				general: { name: "general", label: "General", icon: "fas fa-sliders-h" },
+				general: { name: "general", label: "Atmosphere", icon: "fas fa-image" },
 			};
 			if (!this.demo) {
 				tabs.loot = { name: "loot", label: "Loot", icon: "fas fa-treasure-chest" };
@@ -137,19 +137,19 @@ export default {
 	async mounted() {
 		if (!this.demo) {
 			this.campaign = await this.get_campaign({
-				uid: this.user.uid,
+				uid: this.user?.uid,
 				id: this.campaignId,
 			});
 
 			this.encounter = await this.get_encounter({
-				uid: this.user.uid,
+				uid: this.user?.uid,
 				campaignId: this.campaignId,
 				id: this.encounterId,
 			});
 
 			for (const playerId in this.campaign.players) {
 				this.campaign_players[playerId] = await this.get_player({
-					uid: this.user.uid,
+					uid: this.user?.uid,
 					id: playerId,
 				});
 			}
@@ -173,7 +173,9 @@ export default {
 					await this.set_demo_encounter(this.encounter);
 				}
 				this.$router.replace(
-					this.demo ? "/demo" : `/test-encounter/${this.campaignId}/${this.encounterId}`
+					this.demo
+						? "/demo/run-encounter"
+						: `/test-encounter/${this.campaignId}/${this.encounterId}`
 				);
 			}
 		},

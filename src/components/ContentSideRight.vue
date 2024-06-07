@@ -89,11 +89,15 @@
 			<div>
 				<Tier />
 			</div>
-			<div slot="footer" v-if="tier.name !== 'Deity'">
-				<router-link to="/patreon" class="btn btn-block btn-square bg-patreon-red">
-					{{ tier.price === "Free" ? "Subscribe" : "Upgrade" }}
-				</router-link>
-			</div>
+			<PatreonLinkButton v-if="userInfo.patron && !userInfo.patreon_id" />
+			<router-link
+				v-else-if="tier.name !== 'Deity'"
+				slot="footer"
+				to="/patreon"
+				class="btn btn-block btn-square bg-patreon-red"
+			>
+				{{ tier.price === "Free" ? "Subscribe" : "Upgrade" }}
+			</router-link>
 		</hk-card>
 
 		<!-- HOMEBREW CREATION -->
@@ -167,6 +171,7 @@ export default {
 		PlayerLink: () => import("src/components/PlayerLink"),
 		Tier: () => import("src/components/userContent/Tier"),
 		Tutorial: () => import("src/components/userContent/Tutorial.vue"),
+		PatreonLinkButton: () => import("src/components/PatreonLinkButton.vue"),
 	},
 	data() {
 		return {

@@ -444,7 +444,7 @@ export default {
 	},
 	data() {
 		return {
-			demo: this.$route.name === "ToolsBuildEncounter",
+			demo: this.$route.name === "ToolsBuildEncounter" || this.$route.name === "DemoBuildEncounter",
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
 			user: this.$store.getters ? this.$store.getters.user : undefined,
@@ -550,7 +550,7 @@ export default {
 	watch: {
 		// Prop is changed in parent to trigger addAllPlayers function from Overview.vue
 		addPlayers() {
-			this.addAllPlayers();
+			this.demo ? (this.player_dialog = true) : this.addAllPlayers();
 		},
 	},
 	computed: {

@@ -12,10 +12,19 @@
 						rel="noopener"
 						>Patreon</a
 					>
-					to finish payment.<br />
-					Make sure that you use the <strong>same email-address</strong> for both your Patreon and
-					Shieldmaiden account.
+					to finish payment.
+					<template v-if="!userInfo?.patreon_id">
+						<br />To receive the benefits of your subscription you have to create a Patreon account
+						and link it to your Shieldmaiden account.
+					</template>
 				</p>
+
+				<div v-if="!user" class="d-flex justify-content-center mb-4">
+					<router-link class="btn" to="/sign-up"> Create a Shieldmaiden account </router-link>
+				</div>
+				<div v-else-if="!userInfo.patreon_id" class="d-flex justify-content-center mb-5">
+					<PatreonLinkButton />
+				</div>
 
 				<Tiers class="mb-4" />
 
@@ -95,18 +104,24 @@
 <script>
 import Tiers from "src/components/Tiers.vue";
 import Footer from "src/components/Footer.vue";
+import PatreonLinkButton from "src/components/PatreonLinkButton.vue";
 import { character_sync_id } from "src/utils/generalConstants";
+import { mapGetters } from "vuex";
 
 export default {
 	name: "Patreon",
 	components: {
 		Tiers,
 		Footer,
+		PatreonLinkButton,
 	},
 	data() {
 		return {
 			extension_id: character_sync_id,
 		};
+	},
+	computed: {
+		...mapGetters(["user", "userInfo"]),
 	},
 };
 </script>
@@ -125,7 +140,7 @@ export default {
 		"footer";
 
 	h1 {
-		margin-bottom: 40px;
+		margin-bottom: 30px;
 	}
 	h2 {
 		margin-bottom: 10px !important;
@@ -133,7 +148,7 @@ export default {
 	p {
 		font-size: 17px;
 		line-height: 30px;
-		margin-bottom: 40px;
+		margin-bottom: 30px;
 	}
 }
 </style>

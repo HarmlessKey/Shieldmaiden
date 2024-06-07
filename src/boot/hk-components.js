@@ -1,36 +1,41 @@
-import HkInput from "../components/hk-components/hk-input";
-import HkSelect from "../components/hk-components/hk-select";
-import HkIcon from "../components/hk-components/hk-icon";
-import HkTable from "../components/hk-components/hk-table";
-import HkCard from "../components/hk-components/hk-card";
-import HkCardDeck from "../components/hk-components/hk-card-deck";
-import HkShowKeybind from "../components/hk-components/hk-show-keybind";
-import HkRoll from "../components/hk-components/hk-roll";
-import HkRollAction from "../components/hk-components/hk-action-rolls/hk-roll-action";
-import HkAnimatedInteger from "../components/hk-components/hk-animated-integer";
-import HkDiceText from "../components/hk-components/hk-dice-text";
-import HkPopover from "../components/hk-components/hk-popover";
-import HkLoader from "../components/hk-components/hk-loader";
-import HkDmgTypeSelect from "../components/hk-components/hk-dmg-type-select";
-import HkTip from "../components/hk-components/hk-tip";
-import HkTimer from "../components/hk-components/hk-timer";
-import HkShare from "../components/hk-components/hk-share-button";
-import HkImageUploader from "../components/hk-components/hk-image-uploader";
-import HkBackgroundSelect from "../components/hk-components/hk-background-select";
-import HkMarkdownEditor from "../components/hk-components/hk-markdown-editor";
-import HkXpBar from "../components/hk-components/hk-xp-bar";
-import HkLinkCharacter from "../components/hk-components/hk-link-character";
-import HkActionRollForm from "../components/hk-components/hk-action-rolls/hk-action-roll-form";
-import HkActionRollsTable from "../components/hk-components/hk-action-rolls/hk-action-rolls-table";
-import HkActionRollScaling from "../components/hk-components/hk-action-rolls/hk-action-roll-scaling";
-import HkPane from "../components/hk-components/hk-pane";
-import HkFilter from "../components/hk-components/hk-filter";
-import HkTransformSelect from "../components/hk-components/hk-transform-select";
+const HkInput = () => import("../components/hk-components/hk-input");
+const HkSelect = () => import("../components/hk-components/hk-select");
+import HkDialog from "../components/hk-components/hk-dialog"; // can't load async because it's used in mounted
+const HkIcon = () => import("../components/hk-components/hk-icon");
+const HkTable = () => import("../components/hk-components/hk-table");
+const HkCard = () => import("../components/hk-components/hk-card");
+const HkCardDeck = () => import("../components/hk-components/hk-card-deck");
+const HkShowKeybind = () => import("../components/hk-components/hk-show-keybind");
+const HkRoll = () => import("../components/hk-components/hk-roll");
+const HkRollAction = () => import("../components/hk-components/hk-action-rolls/hk-roll-action");
+const HkAnimatedInteger = () => import("../components/hk-components/hk-animated-integer");
+const HkDiceText = () => import("../components/hk-components/hk-dice-text");
+const HkPopover = () => import("../components/hk-components/hk-popover");
+const HkLoader = () => import("../components/hk-components/hk-loader");
+const HkDmgTypeSelect = () => import("../components/hk-components/hk-dmg-type-select");
+const HkTip = () => import("../components/hk-components/hk-tip");
+const HkTimer = () => import("../components/hk-components/hk-timer");
+const HkShare = () => import("../components/hk-components/hk-share-button");
+const HkImageUploader = () => import("../components/hk-components/hk-image-uploader");
+const HkBackgroundSelect = () => import("../components/hk-components/hk-background-select");
+const HkMarkdownEditor = () => import("../components/hk-components/hk-markdown-editor");
+const HkXpBar = () => import("../components/hk-components/hk-xp-bar");
+const HkLinkCharacter = () => import("../components/hk-components/hk-link-character");
+const HkActionRollForm = () =>
+	import("../components/hk-components/hk-action-rolls/hk-action-roll-form");
+const HkActionRollsTable = () =>
+	import("../components/hk-components/hk-action-rolls/hk-action-rolls-table");
+const HkActionRollScaling = () =>
+	import("../components/hk-components/hk-action-rolls/hk-action-roll-scaling");
+const HkPane = () => import("../components/hk-components/hk-pane");
+const HkFilter = () => import("../components/hk-components/hk-filter");
+const HkTransformSelect = () => import("../components/hk-components/hk-transform-select");
 import HkCompendiumImage from "../components/hk-components/hk-compendium-image";
 
 export default async ({ Vue }) => {
 	Vue.component("hk-input", HkInput);
 	Vue.component("hk-select", HkSelect);
+	Vue.component("hk-dialog", HkDialog);
 	Vue.component("hk-icon", HkIcon);
 	Vue.component("hk-table", HkTable);
 	Vue.component("hk-card", HkCard);

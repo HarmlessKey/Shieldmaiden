@@ -4,63 +4,131 @@
 		<Tutorial v-if="show_tutorial" />
 		<div class="row q-col-gutter-md">
 			<div class="col-12">
-				<hk-card header="Your subscription">
+				<hk-card>
+					<div slot="header" class="card-header">
+						<span>Your Subscription</span>
+						<strong>{{ tier.name }}</strong>
+					</div>
 					<div class="card-body">
+						<div v-if="!userInfo.patreon_id">
+							<div class="text-center mb-3">
+								<PatreonLinkButton class="btn-block btn-lg" />
+								<div class="mt-3">
+									To access your subscription benefits, you have to link your Patreon account to
+									your Shieldmaiden account.
+								</div>
+							</div>
+						</div>
 						<!-- HAS A SUBSCRIPTION -->
-						<template v-if="tier && tier.price !== 'Free'">
-							<!-- PATRON -->
-							<div v-if="userInfo.patron">
-								<h3>
-									<i aria-hidden="true" class="fab fa-patreon patreon-red"></i> Patreon:
-									<b>{{ userInfo.patron.tier }}</b>
-								</h3>
+						<template v-if="userInfo.patreon_id">
+							<PaymentDeclined />
+							<q-banner class="mb-3 bg-neutral-8" rounded>
+								<q-icon slot="avatar" name="fab fa-patreon" class="patreon-red" />
+								<template v-if="userInfo.patron">
+									<h3 class="mb-1">
+										Patreon:
+										<strong v-if="userInfo.patron?.expired" class="red"> Expired </strong>
+										<strong v-else>
+											{{ userInfo.patron.tier }}
+										</strong>
+									</h3>
+									<p v-if="!userInfo.patron?.expired">
+										Thank you so much for your support.
+										<i aria-hidden="true" class="patreon-red fas fa-heart"></i>
+									</p>
+								</template>
+								<template v-else>
+									<h3>No active Patreon subscription</h3>
+									<p>
+										Our subscriptions are handled by Patreon, to make use of our benefits, please
+										get a subscription on our Patreon with your linked Patreon account.
+									</p>
+								</template>
 								<p>
-									Thank you so much for your support.
-									<i aria-hidden="true" class="patreon-red fas fa-heart"></i>
+									Linked Patreon account: <strong>{{ userInfo.patreon_email }}</strong>
 								</p>
 
 								<div
 									v-if="
-										userInfo.patron.last_charge_status === 'Declined' &&
-										valid(userInfo.patron.pledge_end)
+										userInfo.patron &&
+										userInfo.patron?.last_charge_status === 'Declined' &&
+										!userInfo.patron.expired
 									"
 								>
 									<h3 class="red">Payment Declined</h3>
 									<p>
 										Your last payment on Patreon was declined, your subscription will automatically
-										be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b
+										be cancelled on <b>{{ makeDate(userInfo.patron?.pledge_end) }}</b
 										>.<br />
 										Go to
 										<a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a>
 										to check your payment details.
 									</p>
 								</div>
-								<div v-if="!valid(userInfo.patron.pledge_end)">
-									<p>Your subscription <strong class="red">expired</strong></p>
+								<template slot="action">
+									<button class="btn btn-sm bg-neutral-5 mr-2" @click="unlinkPatreon">
+										<hk-icon icon="fas fa-unlink" class="mr-1" /> Unlink account
+									</button>
 									<a
+										v-if="userInfo.patron && userInfo.patron.expired"
 										href="https://www.patreon.com/join/shieldmaidenapp"
 										target="_blank"
-										class="btn bg-neutral-5"
+										class="btn btn-sm"
 										rel="noopener"
 									>
-										<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Renew
+										<hk-icon icon="fas fa-redo-alt" class="mr-1" /> Renew
 									</a>
-								</div>
-								<small v-else
-									><a
+									<a
+										v-else-if="userInfo.patron"
 										href="https://www.patreon.com/join/shieldmaidenapp/checkout?edit=1"
+										class="btn btn-sm"
 										target="_blank"
 										rel="noopener"
-										>Cancel subscription</a
-									></small
-								>
-								<hr />
-							</div>
+									>
+										Cancel subscription
+									</a>
+									<a
+										v-else
+										href="https://www.patreon.com/join/shieldmaidenapp"
+										class="btn btn-sm"
+										target="_blank"
+										rel="noopener"
+									>
+										Subscribe
+									</a>
+								</template>
+							</q-banner>
 						</template>
+
+						<q-banner class="mb-3 bg-neutral-8" rounded>
+							<q-icon slot="avatar" name="fas fa-ticket-alt" />
+							<h3 class="mb-1">Voucher subscription</h3>
+							<template v-if="voucher">
+								<p v-if="voucher.message" class="green">{{ voucher.message }}</p>
+								<p>
+									Your voucher ends on:
+									<span class="red" v-if="voucher.date">{{ makeDate(voucher.date, false) }}</span>
+									<i aria-hidden="true" v-else>never</i>.
+								</p>
+							</template>
+							<p v-else>You currently don't have an active voucher</p>
+							<q-input
+								class="text-uppercase full-width mb-2"
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								v-model="voucher_input_text"
+								label="Voucher code"
+								v-on:keyup.enter="addVoucher"
+							/>
+							<button slot="action" class="btn btn-sm" @click="addVoucher">Activate</button>
+						</q-banner>
+
 						<!-- TIER -->
-						<h3 class="mb-1">
-							Subscription tier: <span class="patreon-red">{{ tier.name }}</span>
-						</h3>
+						<h2 class="mb-1">Your active Subscription</h2>
+						<p>
+							Tier: <span class="patreon-red">{{ tier.name }}</span>
+						</p>
 						<p v-if="tier.name === 'Deity'" class="neutral-2">You have unlimited power.</p>
 						<p v-if="tier.name === 'Legacy'" class="neutral-2">
 							The legacy tier is for anyone who created an account before the 15th of May 2024
@@ -72,39 +140,8 @@
 							class="btn btn-block bg-patreon-red mt-4"
 							to="/patreon"
 						>
-							Support us for more slots
+							Subscribe for more storage
 						</router-link>
-						<div class="mt-3">
-							<h3><i aria-hidden="true" class="fas fa-ticket-alt"></i> Voucher subscription</h3>
-							<template v-if="voucher">
-								<p v-if="voucher.message" class="green">{{ voucher.message }}</p>
-								<p>
-									Your voucher ends on:
-									<span class="red" v-if="voucher.date">{{ makeDate(voucher.date, false) }}</span>
-									<i aria-hidden="true" v-else>never</i>.
-								</p>
-							</template>
-							<template>
-								<div class="d-flex justify-between">
-									<q-input
-										class="text-uppercase"
-										:dark="$store.getters.theme === 'dark'"
-										filled
-										square
-										v-model="voucher_input_text"
-										label="Voucher code"
-										v-on:keyup.enter="addVoucher"
-									>
-										<template v-slot:after>
-											<button class="btn" @click="addVoucher">
-												<i aria-hidden="true" class="fas fa-plus" />
-											</button>
-										</template>
-									</q-input>
-								</div>
-							</template>
-							<hr />
-						</div>
 					</div>
 					<!-- VOUCHER -->
 				</hk-card>
@@ -155,6 +192,8 @@ import Content from "src/components/userContent/Content";
 import Tier from "src/components/userContent/Tier";
 import UserBanner from "src/components/userContent/UserBanner";
 import Tutorial from "src/components/userContent/Tutorial";
+import PatreonLinkButton from "src/components/PatreonLinkButton";
+import PaymentDeclined from "src/components/PaymentDeclined.vue";
 
 export default {
 	name: "Profile",
@@ -163,6 +202,8 @@ export default {
 		Content,
 		Tier,
 		Tutorial,
+		PatreonLinkButton,
+		PaymentDeclined,
 	},
 	preFetch({ store, redirect }) {
 		if (!store.getters.user) {
@@ -217,7 +258,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["set_active_voucher"]),
+		...mapActions(["set_active_voucher", "setUserInfo", "update_userInfo", "checkEncumbrance"]),
 		resetPassword() {
 			var vm = this;
 			var emailAddress = this.user.email;
@@ -235,9 +276,6 @@ export default {
 					vm.error = error.message;
 				});
 		},
-		valid(end) {
-			return new Date(end).toISOString() > new Date().toISOString();
-		},
 		async addVoucher() {
 			this.set_active_voucher(this.voucher_input_text)
 				.then(() => {
@@ -249,6 +287,14 @@ export default {
 				.catch((error) => {
 					this.$snotify.error(error);
 				});
+		},
+		async unlinkPatreon() {
+			await this.update_userInfo({
+				patreon_id: null,
+				patreon_email: null,
+			});
+			await this.setUserInfo();
+			await this.checkEncumbrance();
 		},
 	},
 };

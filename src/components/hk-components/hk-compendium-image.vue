@@ -1,6 +1,6 @@
 <template>
-	<div v-if="image || icon" class="hk-compendium-image">
-		<img v-if="image" :src="src" :alt="alt" />
+	<div v-if="image || icon" class="hk-compendium-image" :class="`hk-compendium-image__${size}`">
+		<img v-if="image" :src="src" :alt="alt" :class="`hk-compendium-image__${size}`" />
 		<hk-icon v-else icon="hki-monster" />
 	</div>
 </template>
@@ -59,6 +59,15 @@ export default {
 .hk-compendium-image {
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
+
+	&__thumbnail {
+		aspect-ratio: 1 / 1;
+
+		img {
+			aspect-ratio: 1 / 1;
+		}
+	}
 
 	img {
 		width: 100%;

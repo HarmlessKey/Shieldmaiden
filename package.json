@@ -1,5 +1,5 @@
 {
-	"version": "2.25.2",
+	"version": "2.26.0",
 	"name": "shieldmaiden",
 	"description": "A Dungeons and Dragons Combat Tracker",
 	"productName": "Shieldmaiden",
@@ -23,6 +23,7 @@
 		"animate.css": "^4.1.1",
 		"core-js": "^3.37.0",
 		"axios": "^0.28.1",
+		"core-js": "^3.36.1",
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
 		"firebase": "^8.0.0",

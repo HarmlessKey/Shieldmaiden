@@ -11,14 +11,22 @@
 			<q-linear-progress size="5" color="info" :value="progress(tutorial, step)" />
 			<div class="p-2">
 				<div class="tutorial__header">
-					{{ steps.indexOf(step) + 1 }}/{{ steps.length }} {{ name }}
+					<span> {{ steps.indexOf(step) + 1 }}/{{ steps.length }} {{ name }} </span>
+					<span class="p-1 pointer" @click="stop">
+						<hk-icon icon="fas fa-times-circle" />
+						<q-tooltip anchor="top middle" self="bottom middle">Stop tutorial</q-tooltip>
+					</span>
 				</div>
 				<div class="tutorial__title">
 					{{ current_step.title }}
 				</div>
 				<p v-html="current_step.description" />
 				<div class="d-flex justify-content-end items-center gap-1">
-					<button class="btn btn-sm bg-yellow black" @click="nextStep(tutorial)">
+					<button
+						v-if="steps.indexOf(step) + 1 !== steps.length"
+						class="btn btn-sm bg-yellow black"
+						@click="nextStep(tutorial)"
+					>
 						Next <hk-icon icon="fas fa-chevron-right" />
 					</button>
 				</div>
@@ -52,6 +60,7 @@ export default {
 	},
 	computed: {
 		...mapGetters("tutorial", [
+			"follow_tutorial",
 			"get_step",
 			"get_progress",
 			"progress",
@@ -93,7 +102,7 @@ export default {
 			get() {
 				return this.stepSetter !== undefined
 					? this.stepSetter
-					: this.get_progress(this.tutorial) === this.step;
+					: this.follow_tutorial && this.get_progress(this.tutorial) === this.step;
 			},
 			set(newVal) {
 				this.stepSetter = newVal;
@@ -107,7 +116,11 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions("tutorial", ["nextStep"]),
+		...mapActions("tutorial", ["nextStep", "stopTutorial"]),
+		stop() {
+			this.stopTutorial();
+			this.show = false;
+		},
 	},
 };
 </script>
@@ -123,6 +136,9 @@ export default {
 
 	&__header {
 		margin-bottom: 10px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 	&__title {
 		font-weight: bold;

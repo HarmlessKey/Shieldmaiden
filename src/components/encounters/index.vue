@@ -15,16 +15,38 @@
 			<h1 class="written mb-0 flex-grow truncate">
 				{{ demo ? "Encounter builder for D&D" : encounter.name }}
 			</h1>
-			<button
-				class="btn"
-				:disabled="!validEncounter"
-				:class="{ 'step-highlight': get_progress('build') === 'start' }"
-				@click="runEncounter"
-			>
-				{{ demo ? "Run" : "Test" }} encounter
-				<i class="fas ml-2" :class="demo ? 'fa-sword rotate' : 'fa-flask'" aria-hidden="true" />
-				<TutorialPopover tutorial="build" step="start" />
-			</button>
+			<div>
+				<transition
+					v-if="demo"
+					name="slide"
+					enter-active-class="animated animate__slideInRight"
+					leave-active-class="animated animate__slideOutRight"
+				>
+					<button
+						v-show="!follow_tutorial"
+						class="btn bg-yellow-light black mr-2"
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/Tutorial',
+								data: 'build',
+							})
+						"
+					>
+						<hk-icon icon="fas fa-exclamation" />
+					</button>
+				</transition>
+				<button
+					class="btn"
+					:disabled="!validEncounter"
+					:class="{ 'step-highlight': follow_tutorial && get_progress('build') === 'start' }"
+					@click="runEncounter"
+				>
+					{{ demo ? "Run" : "Test" }} encounter
+					<i class="fas ml-2" :class="demo ? 'fa-sword rotate' : 'fa-flask'" aria-hidden="true" />
+					<TutorialPopover tutorial="build" step="start" />
+				</button>
+			</div>
 		</div>
 		<div class="wrapper">
 			<hk-card>
@@ -116,7 +138,7 @@ export default {
 	computed: {
 		...mapGetters(["overencumbered"]),
 		...mapGetters("encounters", ["demo_encounter"]),
-		...mapGetters("tutorial", ["get_progress"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_progress"]),
 		tabs() {
 			let tabs = {
 				entities: { name: "entities", label: "Entities", icon: "fas fa-helmet-battle" },
@@ -169,6 +191,7 @@ export default {
 		this.loading = false;
 	},
 	methods: {
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign"]),
 		...mapActions("encounters", ["get_encounter", "set_demo_encounter"]),
 		...mapActions("players", ["get_player"]),

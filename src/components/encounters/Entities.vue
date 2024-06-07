@@ -48,7 +48,7 @@
 		<button
 			v-else
 			class="btn btn-block mb-3"
-			:class="{ 'step-highlight': get_progress('build') === 'add-players' }"
+			:class="{ 'step-highlight': follow_tutorial && get_progress('build') === 'add-players' }"
 			@click="player_dialog = true"
 		>
 			<i class="fas fa-user-plus" aria-hidden="true" />
@@ -122,7 +122,12 @@
 								v-else-if="col.name === 'actions'"
 								class="text-right d-flex justify-content-between"
 							>
-								<div class="monster-actions">
+								<div
+									class="monster-actions"
+									:class="{
+										'step-highlight': follow_tutorial && get_progress('build') === 'add-monsters',
+									}"
+								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
 										filled
@@ -262,7 +267,9 @@
 							<div
 								v-if="col.name === 'actions'"
 								class="monster-actions"
-								:class="{ 'step-highlight': get_progress('build') === 'add-monsters' }"
+								:class="{
+									'step-highlight': follow_tutorial && get_progress('build') === 'add-monsters',
+								}"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"

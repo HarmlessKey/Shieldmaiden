@@ -13,73 +13,45 @@
 				<q-form v-if="!loading" @submit="handleSubmit(signUp)">
 					<h4 class="text-center neutral-2">With email and password</h4>
 
-					<ValidationProvider
-						rules="required|email"
+					<hk-input
+						v-model="email"
+						autocomplete="username"
+						class="email mb-2"
+						type="email"
+						label="Email"
 						name="Email"
-						v-slot="{ errors, invalid, validated }"
-					>
-						<hk-input
-							autocomplete="username"
-							class="email mb-2"
-							type="email"
-							label="Email"
-							v-model="email"
-							:error="invalid && validated"
-							:error-message="errors[0]"
-						/>
-					</ValidationProvider>
-
-					<ValidationProvider
-						rules="required|alpha_num|max:20|min:3|username"
+						rules="required|email"
+					/>
+					<hk-input
+						v-model="username"
+						type="text"
+						class="mb-2"
+						label="Username"
 						name="Username"
-						v-slot="{ errors, invalid, validated }"
-					>
-						<hk-input
-							type="text"
-							class="mb-2"
-							label="Username"
-							maxlength="20"
-							minlength="3"
-							v-model="username"
-							:error="invalid && validated"
-							:error-message="errors[0]"
-						/>
-					</ValidationProvider>
+						maxlength="20"
+						minlength="3"
+						rules="required|alpha_num|max:20|min:3|username"
+					/>
 
-					<ValidationProvider
+					<hk-input
+						autocomplete="new-password"
+						class="mb-2"
+						type="password"
+						placeholder="Password"
+						v-model="password"
+						name="password"
 						rules="required"
-						vid="password"
-						name="Password"
-						v-slot="{ errors, invalid, validated }"
-					>
-						<hk-input
-							autocomplete="new-password"
-							class="mb-2"
-							type="password"
-							placeholder="Password"
-							v-model="password"
-							name="password"
-							:error="invalid && validated"
-							:error-message="errors[0]"
-						/>
-					</ValidationProvider>
+					/>
 
-					<ValidationProvider
+					<hk-input
+						autocomplete="new-password"
+						class="mb-2"
+						type="password"
+						placeholder="Confirm Password"
+						v-model="confirm_password"
 						rules="required|confirmed:password"
 						name="Confirm Password"
-						v-slot="{ errors, invalid, validated }"
-					>
-						<hk-input
-							autocomplete="new-password"
-							class="mb-2"
-							type="password"
-							placeholder="Confirm Password"
-							v-model="confirm_password"
-							name="confirm-password"
-							:error="invalid && validated"
-							:error-message="errors[0]"
-						/>
-					</ValidationProvider>
+					/>
 
 					<q-btn
 						no-caps

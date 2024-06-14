@@ -226,7 +226,7 @@
 				</span>
 				<button
 					class="btn ml-2"
-					:class="{ 'step-highlight': follow_tutorial && get_step('initiative', 'start') }"
+					:class="{ 'step-highlight': demo && follow_tutorial && get_step('initiative', 'start') }"
 					v-shortkey="['shift', 'arrowright']"
 					@click="startEncounter()"
 					@shortkey="startEncounter()"
@@ -236,7 +236,7 @@
 						encounter <i aria-hidden="true" class="fas fa-arrow-right" />
 					</span>
 					<q-tooltip anchor="top middle" self="center middle">Start [shift] + [>]</q-tooltip>
-					<TutorialPopover tutorial="initiative" step="start" :offset="[0, 10]" />
+					<TutorialPopover v-if="demo" tutorial="initiative" step="start" :offset="[0, 10]" />
 				</button>
 			</template>
 		</div>

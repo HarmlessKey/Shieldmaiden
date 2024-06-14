@@ -39,12 +39,12 @@
 				<button
 					class="btn"
 					:disabled="!validEncounter"
-					:class="{ 'step-highlight': follow_tutorial && get_step('build', 'start') }"
+					:class="{ 'step-highlight': demo && follow_tutorial && get_step('build', 'start') }"
 					@click="runEncounter"
 				>
 					{{ demo ? "Run" : "Test" }} encounter
 					<i class="fas ml-2" :class="demo ? 'fa-sword rotate' : 'fa-flask'" aria-hidden="true" />
-					<TutorialPopover tutorial="build" step="start" :offset="[0, 10]" />
+					<TutorialPopover v-if="demo" tutorial="build" step="start" :offset="[0, 10]" />
 				</button>
 			</div>
 		</div>

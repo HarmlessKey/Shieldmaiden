@@ -72,7 +72,7 @@
 			<button
 				class="btn btn-block full-width roll-all"
 				:class="{
-					'step-highlight': follow_tutorial && get_step('initiative', 'monsters'),
+					'step-highlight': demo && follow_tutorial && get_step('initiative', 'monsters'),
 				}"
 			>
 				<i aria-hidden="true" class="fas fa-dice-d20" /> Roll
@@ -102,7 +102,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["encounterId", "broadcast"]),
+		...mapGetters(["encounterId", "broadcast", "demo"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;

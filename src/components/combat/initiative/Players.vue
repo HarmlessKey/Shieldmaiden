@@ -37,13 +37,21 @@
 						name="playerInit"
 						placeholder="0"
 						:autofocus="index === 0"
-						:class="{ 'step-highlight': follow_tutorial && get_step('initiative', 'players') }"
+						:class="{
+							'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
+						}"
 						@input="setInitiative(entity.key, entity.initiative)"
 						@focus="$event.target.select()"
 					/>
 				</div>
 			</li>
-			<TutorialPopover tutorial="initiative" step="players" position="right" :offset="[10, 0]" />
+			<TutorialPopover
+				v-if="demo"
+				tutorial="initiative"
+				step="players"
+				position="right"
+				:offset="[10, 0]"
+			/>
 		</ul>
 	</div>
 </template>
@@ -59,7 +67,7 @@ export default {
 	},
 	props: ["players"],
 	computed: {
-		...mapGetters(["campaignId", "encounterId", "entities", "path"]),
+		...mapGetters(["campaignId", "encounterId", "entities", "path", "demo"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 	},
 	methods: {

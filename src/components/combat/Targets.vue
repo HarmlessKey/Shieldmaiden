@@ -37,105 +37,112 @@
 				}"
 				@shortkey="cycle_target"
 			>
-				<template v-for="{ group, targets } in groups">
-					<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
-						<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" />
-						{{ group.capitalize() }} ({{ targets.length }})
-					</h2>
-					<transition-group
-						:key="group"
-						tag="ul"
-						class="targets"
-						:class="`${group}_targets`"
-						name="group"
-						enter-active-class="animated animate__fadeInUp"
-						leave-active-class="animated animate__fadeOutDown"
-					>
-						<li
-							v-for="(entity, i) in targets"
-							class="d-flex justify-content-between target-li"
-							:key="entity.key"
-							:class="{
-								targeted: targeted.includes(entity.key),
-								top: _active[0].key === entity.key && encounter.turn !== 0,
-							}"
-							tabindex="0"
-							@keydown.space="selectTarget($event, 'single', entity.key)"
+				<div>
+					<TutorialPopover tutorial="run" step="target" />
+
+					<template v-for="{ group, targets } in groups">
+						<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
+							<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" />
+							{{ group.capitalize() }} ({{ targets.length }})
+						</h2>
+
+						<transition-group
+							:key="group"
+							tag="ul"
+							class="targets"
+							:class="`${group}_targets`"
+							name="group"
+							enter-active-class="animated animate__fadeInUp"
+							leave-active-class="animated animate__fadeOutDown"
 						>
-							<span
-								class="topinfo d-flex justify-content-between"
-								v-if="group === 'active' && _active[0].key == entity.key && encounter.turn != 0"
+							<li
+								v-for="(entity, i) in targets"
+								class="d-flex justify-content-between target-li"
+								:key="entity.key"
+								:class="{
+									targeted: targeted.includes(entity.key),
+									top: _active[0].key === entity.key && encounter.turn !== 0,
+								}"
+								tabindex="0"
+								@keydown.space="selectTarget($event, 'single', entity.key)"
 							>
-								Top of the round
-								<div>
-									<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
-										+ {{ Object.keys(_addedNextRound).length }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Added next round
-										</q-tooltip>
-									</span>
-									<span class="red" v-if="Object.keys(_activeDown).length > 0">
-										<span class="neutral-3 mx-1">|</span>- {{ Object.keys(_activeDown).length }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Removed next round
-										</q-tooltip>
-									</span>
+								<span
+									class="topinfo d-flex justify-content-between"
+									v-if="group === 'active' && _active[0].key == entity.key && encounter.turn != 0"
+								>
+									Top of the round
+									<div>
+										<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
+											+ {{ Object.keys(_addedNextRound).length }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Added next round
+											</q-tooltip>
+										</span>
+										<span class="red" v-if="Object.keys(_activeDown).length > 0">
+											<span class="neutral-3 mx-1">|</span>- {{ Object.keys(_activeDown).length }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Removed next round
+											</q-tooltip>
+										</span>
+									</div>
+								</span>
+								<div
+									class="target"
+									v-touch-hold.mouse="(event) => selectTarget(event, 'multi', entity.key)"
+									@click="selectTarget($event, 'single', entity.key)"
+									v-shortkey="[i]"
+									@shortkey="set_targeted({ type: 'single', key: entity.key })"
+								>
+									<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
 								</div>
-							</span>
-
-							<div
-								class="target"
-								v-touch-hold.mouse="(event) => selectTarget(event, 'multi', entity.key)"
-								@click="selectTarget($event, 'single', entity.key)"
-								v-shortkey="[i]"
-								@shortkey="set_targeted({ type: 'single', key: entity.key })"
-							>
-								<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
-							</div>
-
-							<div v-if="!entity.active" class="d-flex">
-								<a
-									class="btn btn-sm btn-clear mx-1"
-									v-if="entity.addNextRound"
-									v-on:click.stop="add_next_round({ key: entity.key, action: 'tag', value: false })"
-								>
-									<i aria-hidden="true" class="fas fa-check green" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Will be added next round
-									</q-tooltip>
+								<div v-if="!entity.active" class="d-flex">
+									<a
+										class="btn btn-sm btn-clear mx-1"
+										v-if="entity.addNextRound"
+										v-on:click.stop="
+											add_next_round({ key: entity.key, action: 'tag', value: false })
+										"
+									>
+										<i aria-hidden="true" class="fas fa-check green" />
+										<q-tooltip anchor="top middle" self="center middle">
+											Will be added next round
+										</q-tooltip>
+									</a>
+									<a
+										class="btn btn-sm btn-clear mx-1"
+										v-if="!entity.addNextRound"
+										v-on:click.stop="
+											add_next_round({ key: entity.key, action: 'tag', value: true })
+										"
+									>
+										<i aria-hidden="true" class="fas fa-check neutral-2" />
+										<q-tooltip anchor="top middle" self="center middle">
+											Click to add next round
+										</q-tooltip>
+									</a>
+									<a
+										class="btn btn-sm bg-neutral-5"
+										@click="add_next_round({ key: entity.key, action: 'set' })"
+									>
+										<i aria-hidden="true" class="fas fa-arrow-up" />
+										<q-tooltip anchor="top middle" self="center middle"> Add now </q-tooltip>
+									</a>
+								</div>
+								<a class="options">
+									<i aria-hidden="true" class="fal fa-ellipsis-v" />
+									<q-popup-proxy
+										:dark="$store.getters.theme === 'dark'"
+										anchor="bottom right"
+										self="top right"
+										:breakpoint="576"
+									>
+										<target-menu :entity="entity" />
+									</q-popup-proxy>
 								</a>
-								<a
-									class="btn btn-sm btn-clear mx-1"
-									v-if="!entity.addNextRound"
-									v-on:click.stop="add_next_round({ key: entity.key, action: 'tag', value: true })"
-								>
-									<i aria-hidden="true" class="fas fa-check neutral-2" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Click to add next round
-									</q-tooltip>
-								</a>
-								<a
-									class="btn btn-sm bg-neutral-5"
-									@click="add_next_round({ key: entity.key, action: 'set' })"
-								>
-									<i aria-hidden="true" class="fas fa-arrow-up" />
-									<q-tooltip anchor="top middle" self="center middle"> Add now </q-tooltip>
-								</a>
-							</div>
-							<a class="options">
-								<i aria-hidden="true" class="fal fa-ellipsis-v" />
-								<q-popup-proxy
-									:dark="$store.getters.theme === 'dark'"
-									anchor="bottom right"
-									self="top right"
-									:breakpoint="576"
-								>
-									<target-menu :entity="entity" />
-								</q-popup-proxy>
-							</a>
-						</li>
-					</transition-group>
-				</template>
+							</li>
+						</transition-group>
+					</template>
+				</div>
 			</div>
 		</q-scroll-area>
 	</div>
@@ -146,10 +153,11 @@ import _ from "lodash";
 import { mapGetters, mapActions } from "vuex";
 import TargetItem from "src/components/combat/TargetItem.vue";
 import TargetMenu from "src/components/combat/TargetMenu.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Targets",
-	components: { TargetItem, TargetMenu },
+	components: { TargetItem, TargetMenu, TutorialPopover },
 	props: ["_active", "_idle"],
 	data() {
 		return {

@@ -33,25 +33,26 @@ const tutorial_state = () => ({
 	run: {
 		name: "Run encounter",
 		steps: [
-			{ id: "target", name: "Target", desc: "Select Target", completed: false },
+			{ key: "target", name: "Target", desc: "Select Target", completed: false },
 			{
-				id: "action",
+				key: "action",
+				completed: false,
 				branch: {
 					player: {
 						steps: [
-							{ id: "damage-type", name: "Type", desc: "Select Damage Type", completed: false },
-							{ id: "apply", name: "Apply", desc: "Select Apply", completed: false },
+							{ key: "damage-type", name: "Type", desc: "Select Damage Type", completed: false },
+							{ key: "apply", name: "Apply", desc: "Select Apply", completed: false },
 						],
 					},
 					monster: {
 						steps: [
-							{ id: "roll", name: "Roll", desc: "Roll", completed: false },
-							{ id: "apply", name: "Apply", desc: "Apply", completed: false },
+							{ key: "roll", name: "Roll", desc: "Roll", completed: false },
+							{ key: "apply", name: "Apply", desc: "Apply", completed: false },
 						],
 					},
 				},
 			},
-			{ id: "next", name: "Next", desc: "Next Turn", completed: false },
+			{ key: "next", name: "Next", desc: "Next Turn", completed: false },
 		],
 	},
 });
@@ -63,15 +64,41 @@ const tutorial_getters = {
 	get_tutorial: (state) => (tutorial) => {
 		return state[tutorial];
 	},
-	get_current_step: (state) => (tutorial) => {
-		return state[tutorial]?.steps.find((step) => !step.completed);
-	},
+	get_current_step:
+		(state) =>
+		(tutorial, active_branch = undefined) => {
+			const steps = state[tutorial].steps;
+			return get_active_step(steps, active_branch);
+		},
 	get_current_step_index: (state) => (tutorial) => {
 		return state[tutorial]?.steps.findIndex((step) => !step.completed);
 	},
 	get_step: (_state, getters) => (tutorial, step) => {
 		return getters.get_current_step(tutorial)?.key === step;
 	},
+};
+
+const get_active_step = (steps, active_branch = undefined) => {
+	const active_steps = steps.filter((step) => !step.completed);
+	if (active_steps.length === 0) {
+		return undefined;
+	}
+	// Pop first active step from active steps list;
+	const current_step = active_steps.shift();
+	// Not branching step so return step.
+	if (!current_step.branch) {
+		return current_step;
+	}
+	// Branch
+	if (!current.branch.hasOwnProperty(active_branch)) {
+		return undefined;
+	}
+	const sub_step = get_active_step(current_step.branch[active_branch].steps);
+	if (sub_step) {
+		return sub_step;
+	}
+	// All sub steps are completed so pop next active step.
+	return active_steps.shift();
 };
 
 const tutorial_actions = {

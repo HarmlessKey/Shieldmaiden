@@ -36,16 +36,13 @@
 						<i aria-hidden="true" class="fas fa-info"></i>
 						<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
 					</a>
-					<q-input
-						:dark="$store.getters.theme === 'dark'"
-						filled
-						square
+					<hk-input
+						v-model="entity.initiative"
 						dense
 						type="number"
 						class="ml-3"
 						min="0"
 						max="99"
-						v-model="entity.initiative"
 						name="npcInit"
 						@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
 						placeholder="0"
@@ -57,18 +54,28 @@
 								:tooltip="`1d20 + ${calcMod(entity.dexterity)}`"
 								@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
 							>
-								<a>
+								<a
+									:class="{
+										'step-highlight': follow_tutorial && get_step('initiative', 'monsters'),
+									}"
+								>
 									<q-icon size="small" name="fas fa-dice-d20" />
 								</a>
 							</hk-roll>
 						</template>
-					</q-input>
+					</hk-input>
 				</div>
 			</li>
+			<TutorialPopover tutorial="initiative" step="monsters" position="right" :offset="[10, 0]" />
 		</ul>
 		<hk-roll class="full-width" @roll="selected.length === 0 ? rollAll($event) : rollGroup($event)">
-			<button class="btn btn-block full-width roll-all">
-				<i aria-hidden="true" class="fas fa-dice-d20"></i> Roll
+			<button
+				class="btn btn-block full-width roll-all"
+				:class="{
+					'step-highlight': follow_tutorial && get_step('initiative', 'monsters'),
+				}"
+			>
+				<i aria-hidden="true" class="fas fa-dice-d20" /> Roll
 				{{ selected.length === 0 ? "all" : "selected" }}
 			</button>
 		</hk-roll>
@@ -79,9 +86,13 @@
 import { mapGetters, mapActions } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "SetInitiativeNPC",
+	components: {
+		TutorialPopover,
+	},
 	mixins: [general, dice],
 	props: ["npcs"],
 	data() {
@@ -92,12 +103,14 @@ export default {
 	},
 	computed: {
 		...mapGetters(["encounterId", "broadcast"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
 		},
 	},
 	methods: {
 		...mapActions(["setDrawer", "set_initiative"]),
+		...mapActions("tutorial", ["completeStep"]),
 		rollMonster(e, key, entity, advantage_disadvantage) {
 			const advantage_object = advantage_disadvantage ? advantage_disadvantage : {};
 			let roll = this.rollD(
@@ -112,10 +125,7 @@ export default {
 				this.share ? { encounter_id: this.encounterId, entity_key: key } : null
 			);
 			entity.initiative = roll.total;
-			this.set_initiative({
-				key: key,
-				initiative: entity.initiative,
-			});
+			this.setInitiative(key, entity.initiative);
 		},
 		rollAll(e) {
 			for (let i in this.npcs) {
@@ -151,12 +161,17 @@ export default {
 				entity = this.npcs[npc_indx];
 				entity.initiative = roll;
 
-				this.set_initiative({
-					key: entity.key,
-					initiative: entity.initiative,
-				});
+				this.setInitiative(entity.key, entity.initiative);
 			}
 			this.selected = [];
+		},
+		setInitiative(key, initiative) {
+			this.set_initiative({ key, initiative });
+
+			// If initiative has been set for all monsters, complete the tutorial step
+			if (!this.npcs.find((npc) => !npc.initiative) && this.get_step("initiative", "monsters")) {
+				this.completeStep("initiative");
+			}
 		},
 	},
 };
@@ -173,6 +188,16 @@ ul.entities {
 		.actions {
 			align-items: center;
 			padding: 0;
+
+			a {
+				margin: 0;
+				border-radius: $border-radius;
+				padding: 0 5px;
+
+				i {
+					margin-top: -5px;
+				}
+			}
 		}
 	}
 }

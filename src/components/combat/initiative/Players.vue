@@ -69,7 +69,10 @@ export default {
 			this.set_initiative({ key, initiative });
 
 			// If initiative has been set for all players, complete the tutorial step
-			if (!this.players.find((player) => !player.initiative)) {
+			if (
+				!this.players.find((player) => !player.initiative) &&
+				this.get_step("initiative", "players")
+			) {
 				this.completeStep("initiative");
 			}
 		},

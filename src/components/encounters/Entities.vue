@@ -53,7 +53,7 @@
 		>
 			<i class="fas fa-user-plus" aria-hidden="true" />
 			Add players
-			<TutorialPopover tutorial="build" step="add-players" />
+			<TutorialPopover tutorial="build" step="add-players" :offset="[0, 10]" />
 		</button>
 
 		<!-- MONSTERS -->
@@ -165,6 +165,7 @@
 										tutorial="build"
 										position="right"
 										step="add-monsters"
+										:offset="[10, 0]"
 									/>
 								</div>
 							</div>
@@ -308,6 +309,7 @@
 									tutorial="build"
 									position="right"
 									step="add-monsters"
+									:offset="[10, 0]"
 								/>
 							</div>
 							<span v-else-if="col.name === 'environment'">

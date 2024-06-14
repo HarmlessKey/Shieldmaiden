@@ -44,7 +44,7 @@
 				>
 					{{ demo ? "Run" : "Test" }} encounter
 					<i class="fas ml-2" :class="demo ? 'fa-sword rotate' : 'fa-flask'" aria-hidden="true" />
-					<TutorialPopover tutorial="build" step="start" />
+					<TutorialPopover tutorial="build" step="start" :offset="[0, 10]" />
 				</button>
 			</div>
 		</div>

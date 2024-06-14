@@ -226,8 +226,9 @@
 				</span>
 				<button
 					class="btn ml-2"
-					@click="startEncounter()"
+					:class="{ 'step-highlight': follow_tutorial && get_step('initiative', 'start') }"
 					v-shortkey="['shift', 'arrowright']"
+					@click="startEncounter()"
 					@shortkey="startEncounter()"
 				>
 					Start
@@ -235,6 +236,7 @@
 						encounter <i aria-hidden="true" class="fas fa-arrow-right" />
 					</span>
 					<q-tooltip anchor="top middle" self="center middle">Start [shift] + [>]</q-tooltip>
+					<TutorialPopover tutorial="initiative" step="start" :offset="[0, 10]" />
 				</button>
 			</template>
 		</div>
@@ -245,9 +247,13 @@
 import { mapActions, mapGetters } from "vuex";
 import { remindersMixin } from "src/mixins/reminders";
 import { audio } from "src/mixins/audio";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Turns",
+	components: {
+		TutorialPopover,
+	},
 	mixins: [remindersMixin, audio],
 	props: ["active_len", "current", "next", "settings"],
 	data() {
@@ -257,6 +263,7 @@ export default {
 	},
 	computed: {
 		...mapGetters(["encounter", "broadcast", "requests", "test", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		timer() {
 			return this.settings ? this.settings.timer : 0;
 		},

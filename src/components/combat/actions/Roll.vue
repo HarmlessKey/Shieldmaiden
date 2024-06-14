@@ -210,7 +210,7 @@
 											<TutorialPopover
 												v-if="action_index == 0"
 												tutorial="run"
-												step="action:roll"
+												step="action:monster:roll"
 												branch="monster"
 												position="right"
 											/>

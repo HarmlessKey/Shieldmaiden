@@ -77,8 +77,25 @@ const tutorial_state = () => ({
 					},
 					monster: {
 						steps: [
-							{ key: "action:roll", title: "Roll", description: "Roll", completed: false },
-							{ key: "action:apply", title: "Apply", description: "Apply", completed: false },
+							{
+								key: "action:monster:roll",
+								title: "Roll action",
+								description:
+									"<p>Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.</p>",
+								completed: false,
+							},
+							{
+								key: "action:player:to-hit",
+								title: "Hit or Miss",
+								description: "<p></p>",
+								completed: false,
+							},
+							{
+								key: "action:player:apply",
+								title: "Apply the value",
+								description: "<p>Apply the rolled damage</p>",
+								completed: false,
+							},
 						],
 					},
 				},
@@ -119,6 +136,7 @@ const tutorial_getters = {
 
 const get_active_step = (steps, active_branch = undefined) => {
 	const active_steps = steps.filter((step) => !step.completed);
+	console.log("Active steps:", active_steps);
 	if (active_steps.length === 0) {
 		return undefined;
 	}
@@ -126,10 +144,15 @@ const get_active_step = (steps, active_branch = undefined) => {
 	const current_step = active_steps.shift();
 	// Not branching step so return step.
 	if (!current_step.branch) {
+		console.log("No branch:", current_step);
+
 		return current_step;
 	}
 	// Branch
 	if (!current_step.branch.hasOwnProperty(active_branch)) {
+		if (current_step.started) {
+			return active_steps.shift();
+		}
 		return undefined;
 	}
 	const sub_step = get_active_step(current_step.branch[active_branch].steps);
@@ -176,6 +199,7 @@ const tutorial_mutations = {
 		let step_reference = state[tutorial];
 		while (path.length) {
 			if (step_reference.branch) {
+				Vue.set(step_reference, "started", true);
 				step_reference = step_reference.branch[branch];
 			}
 			const next_idx = path.shift();

@@ -19,12 +19,12 @@
 					</span>
 				</div> -->
 				<div class="tutorial__title">
-					{{ current_step.title }}
+					{{ current_step?.title }}
 				</div>
-				<p v-html="current_step.description" />
+				<p v-html="current_step?.description" />
 				<div class="d-flex justify-content-end items-center gap-1">
-					<button class="btn btn-sm bg-yellow black" @click="completeStep(tutorial)">
-						Next <hk-icon icon="fas fa-chevron-right" />
+					<button class="btn btn-sm bg-yellow black" @click="completeStep({ tutorial, branch })">
+						{{ branch }} Next <hk-icon icon="fas fa-chevron-right" />
 					</button>
 				</div>
 			</div>
@@ -45,6 +45,9 @@ export default {
 		step: {
 			type: String,
 		},
+		branch: {
+			type: String,
+		},
 		position: {
 			type: String,
 			default: "bottom",
@@ -59,7 +62,7 @@ export default {
 		...mapGetters("tutorial", ["follow_tutorial", "get_current_step", "get_step", "get_tutorial"]),
 		...mapActions(["current"]),
 		current_step() {
-			return this.get_current_step(this.tutorial);
+			return this.get_current_step(this.tutorial, this.branch);
 		},
 		anchor() {
 			switch (this.position) {
@@ -91,9 +94,10 @@ export default {
 		},
 		show: {
 			get() {
+				console.log("In computed tutorial show", this.step, this.branch);
 				return this.stepSetter !== undefined
 					? this.stepSetter
-					: this.follow_tutorial && this.get_step(this.tutorial, this.step);
+					: this.follow_tutorial && this.get_step(this.tutorial, this.step, this.branch);
 			},
 			set(newVal) {
 				this.stepSetter = newVal;

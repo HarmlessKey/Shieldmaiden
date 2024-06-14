@@ -37,14 +37,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters("tutorial", [
-			"follow_tutorial",
-			"get_step",
-			"get_progress",
-			"progress",
-			"get_order",
-			"get_tutorial",
-		]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step", "get_tutorial"]),
 		current_step() {
 			return this.get_step(this.tutorial, this.step);
 		},
@@ -53,7 +46,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions("tutorial", ["nextStep", "stopTutorial"]),
+		...mapActions("tutorial", ["completeStep", "stopTutorial"]),
 		stop() {
 			this.stopTutorial();
 			this.show = false;

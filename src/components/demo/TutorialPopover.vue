@@ -8,25 +8,21 @@
 		no-parent-event
 	>
 		<hk-card class="tutorial" no-margin>
-			<q-linear-progress size="5" color="info" :value="progress(tutorial, step)" />
+			<!-- <q-linear-progress size="5" color="info" :value="progress(tutorial, step)" /> -->
 			<div class="p-2">
-				<div class="tutorial__header">
+				<!-- <div class="tutorial__header">
 					<span> {{ steps.indexOf(step) + 1 }}/{{ steps.length }} {{ name }} </span>
 					<span class="p-1 pointer" @click="stop">
 						<hk-icon icon="fas fa-times-circle" />
 						<q-tooltip anchor="top middle" self="bottom middle">Stop tutorial</q-tooltip>
 					</span>
-				</div>
+				</div> -->
 				<div class="tutorial__title">
 					{{ current_step.title }}
 				</div>
 				<p v-html="current_step.description" />
 				<div class="d-flex justify-content-end items-center gap-1">
-					<button
-						v-if="steps.indexOf(step) + 1 !== steps.length"
-						class="btn btn-sm bg-yellow black"
-						@click="nextStep(tutorial)"
-					>
+					<button class="btn btn-sm bg-yellow black" @click="completeStep(tutorial)">
 						Next <hk-icon icon="fas fa-chevron-right" />
 					</button>
 				</div>
@@ -59,16 +55,10 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters("tutorial", [
-			"follow_tutorial",
-			"get_step",
-			"get_progress",
-			"progress",
-			"get_order",
-			"get_tutorial",
-		]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_current_step", "get_step", "get_tutorial"]),
+		...mapActions(["current"]),
 		current_step() {
-			return this.get_step(this.tutorial, this.step);
+			return this.get_current_step(this.tutorial);
 		},
 		anchor() {
 			switch (this.position) {
@@ -102,7 +92,7 @@ export default {
 			get() {
 				return this.stepSetter !== undefined
 					? this.stepSetter
-					: this.follow_tutorial && this.get_progress(this.tutorial) === this.step;
+					: this.follow_tutorial && this.get_step(this.tutorial, this.step);
 			},
 			set(newVal) {
 				this.stepSetter = newVal;
@@ -111,12 +101,12 @@ export default {
 		name() {
 			return this.get_tutorial(this.tutorial)?.name;
 		},
-		steps() {
-			return this.get_order(this.tutorial) || [];
+		entity_type() {
+			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},
 	methods: {
-		...mapActions("tutorial", ["nextStep", "stopTutorial"]),
+		...mapActions("tutorial", ["completeStep", "stopTutorial"]),
 		stop() {
 			this.stopTutorial();
 			this.show = false;

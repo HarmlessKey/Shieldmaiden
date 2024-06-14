@@ -39,7 +39,7 @@
 				<button
 					class="btn"
 					:disabled="!validEncounter"
-					:class="{ 'step-highlight': follow_tutorial && get_progress('build') === 'start' }"
+					:class="{ 'step-highlight': follow_tutorial && get_step('build', 'start') }"
 					@click="runEncounter"
 				>
 					{{ demo ? "Run" : "Test" }} encounter
@@ -138,7 +138,7 @@ export default {
 	computed: {
 		...mapGetters(["overencumbered"]),
 		...mapGetters("encounters", ["demo_encounter"]),
-		...mapGetters("tutorial", ["follow_tutorial", "get_progress"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		tabs() {
 			let tabs = {
 				entities: { name: "entities", label: "Entities", icon: "fas fa-helmet-battle" },

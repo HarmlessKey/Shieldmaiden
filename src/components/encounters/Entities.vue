@@ -48,7 +48,7 @@
 		<button
 			v-else
 			class="btn btn-block mb-3"
-			:class="{ 'step-highlight': follow_tutorial && get_progress('build') === 'add-players' }"
+			:class="{ 'step-highlight': follow_tutorial && get_step('build', 'add-players') }"
 			@click="player_dialog = true"
 		>
 			<i class="fas fa-user-plus" aria-hidden="true" />
@@ -125,7 +125,7 @@
 								<div
 									class="monster-actions"
 									:class="{
-										'step-highlight': follow_tutorial && get_progress('build') === 'add-monsters',
+										'step-highlight': follow_tutorial && get_step('build', 'add-monsters'),
 									}"
 								>
 									<q-input
@@ -268,7 +268,7 @@
 								v-if="col.name === 'actions'"
 								class="monster-actions"
 								:class="{
-									'step-highlight': follow_tutorial && get_progress('build') === 'add-monsters',
+									'step-highlight': follow_tutorial && get_step('build', 'add-monsters'),
 								}"
 							>
 								<q-input
@@ -587,7 +587,7 @@ export default {
 	computed: {
 		...mapGetters(["content_count"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
-		...mapGetters("tutorial", ["follow_tutorial", "get_progress"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		monster_resource: {
 			get() {
 				const resource = this.npc_count ? "custom" : "srd";
@@ -639,7 +639,7 @@ export default {
 		...mapActions("npcs", ["get_npcs", "get_npc"]),
 		...mapActions("players", ["get_players", "get_player"]),
 		...mapActions("encounters", ["add_player_encounter", "add_npc_encounter"]),
-		...mapActions("tutorial", ["nextStep"]),
+		...mapActions("tutorial", ["completeStep"]),
 		player_avatar(player) {
 			return player.storage_avatar || player.avatar;
 		},
@@ -806,8 +806,8 @@ export default {
 					this.add_demo_entity(entity);
 
 					// Next step of tutorial
-					if (this.follow_tutorial && this.get_progress("build") === "add-monsters") {
-						this.nextStep("build");
+					if (this.follow_tutorial && this.get_step("build", "add-monsters")) {
+						this.completeStep("build");
 					}
 				}
 			}
@@ -840,8 +840,8 @@ export default {
 					this.player = {};
 
 					// Next step of tutorial
-					if (this.follow_tutorial && this.get_progress("build") === "add-players") {
-						this.nextStep("build");
+					if (this.follow_tutorial && this.get_step("build", "add-players")) {
+						this.completeStep("build");
 					}
 				}
 			}

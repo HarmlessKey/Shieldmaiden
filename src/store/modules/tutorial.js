@@ -136,7 +136,6 @@ const tutorial_getters = {
 
 const get_active_step = (steps, active_branch = undefined) => {
 	const active_steps = steps.filter((step) => !step.completed);
-	console.log("Active steps:", active_steps);
 	if (active_steps.length === 0) {
 		return undefined;
 	}
@@ -144,8 +143,6 @@ const get_active_step = (steps, active_branch = undefined) => {
 	const current_step = active_steps.shift();
 	// Not branching step so return step.
 	if (!current_step.branch) {
-		console.log("No branch:", current_step);
-
 		return current_step;
 	}
 	// Branch
@@ -176,6 +173,9 @@ const get_active_step_path = (steps, path, active_branch = undefined) => {
 	}
 	// Branch > Recursion
 	if (!current_step.branch.hasOwnProperty(active_branch)) {
+		if (current_step.started) {
+			return (path[path.length - 1] += 1);
+		}
 		return undefined;
 	}
 	return get_active_step_path(current_step.branch[active_branch].steps, path);

@@ -148,6 +148,7 @@
 				v-shortkey="['shift', 'arrowright']"
 				@shortkey="nextTurn()"
 			>
+				<TutorialPopover tutorial="run" step="next" position="right" />
 				<i aria-hidden="true" class="fas fa-step-forward" />
 				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [>]</q-tooltip>
 			</a>

@@ -29,7 +29,7 @@
 							setDrawer({
 								show: true,
 								type: 'drawers/Tutorial',
-								data: 'build',
+								data: { tutorial: 'build' },
 							})
 						"
 					>

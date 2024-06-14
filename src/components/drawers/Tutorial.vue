@@ -32,13 +32,15 @@ export default {
 	name: "TutorialPopover",
 	props: {
 		data: {
-			type: String,
-			default: "run",
+			type: Object,
+			default: () => {
+				return { tutorial: "run" };
+			},
 		},
 	},
 	data() {
 		return {
-			tutorial: this.data,
+			tutorial: this.data.tutorial,
 			stepSetter: undefined,
 		};
 	},

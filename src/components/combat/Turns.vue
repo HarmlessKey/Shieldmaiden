@@ -205,7 +205,7 @@
 						setDrawer({
 							show: true,
 							type: 'drawers/Tutorial',
-							data: encounter.round > 0 ? 'run' : 'initiative',
+							data: { tutorial: encounter.round > 0 ? 'run' : 'initiative' },
 						})
 					"
 				>

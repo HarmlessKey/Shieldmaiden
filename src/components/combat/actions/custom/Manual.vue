@@ -28,17 +28,23 @@
 						name="Manual Input"
 						min="0"
 						class="manual-input"
-						@keypress="submitManual($event, !invalid)"
+						:class="{
+							'step-highlight':
+								demo && follow_tutorial && get_step('run', 'action:player:manual', 'player'),
+						}"
 						autocomplete="off"
 						:autofocus="autofocus"
 						:error="invalid && validated"
 						:error-message="errors[0]"
+						@keypress="submitManual($event, !invalid)"
 					/>
 					<button
 						class="btn dmg bg-red white"
-						:class="{ disabled: invalid || manualAmount === '' }"
-						@click="setManual('damage', !invalid)"
+						:class="{
+							disabled: invalid || manualAmount === '',
+						}"
 						tabindex="-1"
+						@click="setManual('damage', !invalid)"
 					>
 						Attack
 						<i aria-hidden="true" class="hki-sword-break ml-3" />
@@ -46,7 +52,9 @@
 					</button>
 					<button
 						class="btn heal bg-green white"
-						:class="{ disabled: invalid || manualAmount === '' }"
+						:class="{
+							disabled: invalid || manualAmount === '',
+						}"
 						@click="setManual('healing', !invalid)"
 						tabindex="-1"
 					>
@@ -54,6 +62,12 @@
 						<i aria-hidden="true" class="hki-heal" />
 						<q-tooltip anchor="center right" self="center left">[shift] + [enter]</q-tooltip>
 					</button>
+					<TutorialPopover
+						step="action:player:manual"
+						branch="player"
+						position="right"
+						:offset="[10, 0]"
+					/>
 				</div>
 			</ValidationProvider>
 
@@ -108,12 +122,16 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Manual",
+	components: {
+		TutorialPopover,
+	},
 	mixins: [setHP],
 	props: ["current", "autofocus"],
 	data() {
@@ -143,7 +161,8 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["entities", "targeted"]),
+		...mapGetters(["entities", "targeted", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		multiplier: {
 			get() {
 				let returnValue = {};
@@ -197,6 +216,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions("tutorial", ["completeStep"]),
 		checkDefenses(target) {
 			const entity = JSON.parse(JSON.stringify(this.entities[target]));
 			for (const [key, defense] of Object.entries(this.defenses)) {
@@ -282,6 +302,12 @@ export default {
 				this.damage_type = "";
 				this.crit = false;
 				this.$refs.input.blur();
+			}
+
+			console.log("complete step");
+			// If a value is applied, complete the tutorial step
+			if (this.get_step("run", "action:player:manual", "player")) {
+				this.completeStep({ tutorial: "run", branch: "player" });
 			}
 		},
 	},

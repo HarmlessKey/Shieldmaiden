@@ -53,7 +53,13 @@ const tutorial_state = () => ({
 	run: {
 		name: "Run encounter",
 		steps: [
-			{ key: "target", title: "Target", description: "Select Target", completed: false },
+			{
+				key: "target",
+				title: "Target entities",
+				description:
+					"<p>Click on an entity to target it.</p> <strong>TIP!</strong> You can select multiple targets at once by holding shift and clicking.",
+				completed: false,
+			},
 			{
 				key: "action",
 				completed: false,
@@ -61,12 +67,12 @@ const tutorial_state = () => ({
 					player: {
 						steps: [
 							{
-								key: "damage-type",
-								title: "Type",
-								description: "Select Damage Type",
+								key: "action:player:manual",
+								title: "Input value",
+								description:
+									"<p>Input the amount of damage or healing you want to apply to the target(s).</p> Use the <strong>Attack</strong> [Enter] button to damage your targets or the <strong>Heal</strong> [Shift + Enter] button to heal them.",
 								completed: false,
 							},
-							{ key: "apply", title: "Apply", description: "Select Apply", completed: false },
 						],
 					},
 					monster: {

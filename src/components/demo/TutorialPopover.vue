@@ -24,7 +24,7 @@
 				<p v-html="current_step?.description" />
 				<div class="d-flex justify-content-end items-center gap-1">
 					<button class="btn btn-sm bg-yellow black" @click="completeStep({ tutorial, branch })">
-						{{ branch }} Next <hk-icon icon="fas fa-chevron-right" />
+						Next <hk-icon icon="fas fa-chevron-right" />
 					</button>
 				</div>
 			</div>

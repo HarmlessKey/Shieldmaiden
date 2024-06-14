@@ -27,7 +27,7 @@ const tutorial_state = () => ({
 		],
 	},
 	initiative: {
-		name: "Initiative",
+		name: "Setting initiative",
 		steps: [
 			{
 				key: "players",
@@ -153,8 +153,8 @@ const get_active_step_path = (steps, path, active_branch = undefined) => {
 };
 
 const tutorial_actions = {
-	stopTutorial({ commit }) {
-		commit("STOP_TUTORIAL");
+	toggleTutorial({ state, commit }) {
+		commit("SET_TUTORIAL", !state.follow_tutorial);
 	},
 	completeStep({ commit, getters }, { tutorial, branch }) {
 		const path = getters.get_current_step_path(tutorial, branch);
@@ -163,8 +163,8 @@ const tutorial_actions = {
 };
 
 const tutorial_mutations = {
-	STOP_TUTORIAL(state) {
-		Vue.set(state, "follow_tutorial", false);
+	SET_TUTORIAL(state, payload) {
+		Vue.set(state, "follow_tutorial", payload);
 	},
 	SET_COMPLETE(state, { tutorial, path, branch }) {
 		let step_reference = state[tutorial];

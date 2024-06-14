@@ -192,6 +192,26 @@
 				<i class="fas fa-flask mr-1" aria-hidden="true" />
 				Test mode
 			</button>
+			<transition
+				v-if="demo"
+				name="slide"
+				enter-active-class="animated animate__slideInRight"
+				leave-active-class="animated animate__slideOutRight"
+			>
+				<button
+					v-show="!follow_tutorial"
+					class="btn bg-yellow-light black"
+					@click="
+						setDrawer({
+							show: true,
+							type: 'drawers/Tutorial',
+							data: encounter.round > 0 ? 'run' : 'initiative',
+						})
+					"
+				>
+					<hk-icon icon="fas fa-exclamation" />
+				</button>
+			</transition>
 
 			<template v-if="encounter.round > 0">
 				<div

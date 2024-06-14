@@ -809,7 +809,7 @@ export default {
 
 					// Next step of tutorial
 					if (this.follow_tutorial && this.get_step("build", "add-monsters")) {
-						this.completeStep("build");
+						this.completeStep({ tutorial: "build" });
 					}
 				}
 			}
@@ -843,7 +843,7 @@ export default {
 
 					// Next step of tutorial
 					if (this.follow_tutorial && this.get_step("build", "add-players")) {
-						this.completeStep("build");
+						this.completeStep({ tutorial: "build" });
 					}
 				}
 			}

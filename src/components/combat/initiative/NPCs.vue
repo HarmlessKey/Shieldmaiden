@@ -170,7 +170,7 @@ export default {
 
 			// If initiative has been set for all monsters, complete the tutorial step
 			if (!this.npcs.find((npc) => !npc.initiative) && this.get_step("initiative", "monsters")) {
-				this.completeStep("initiative");
+				this.completeStep({ tutorial: "initiative" });
 			}
 		},
 	},

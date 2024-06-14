@@ -11,13 +11,13 @@
 		<hk-card class="tutorial" no-margin>
 			<!-- <q-linear-progress size="5" color="info" :value="progress(tutorial, step)" /> -->
 			<div class="p-2">
-				<!-- <div class="tutorial__header">
-					<span> {{ steps.indexOf(step) + 1 }}/{{ steps.length }} {{ name }} </span>
+				<div class="tutorial__header">
+					<span>{{ name }}</span>
 					<span class="p-1 pointer" @click="stop">
 						<hk-icon icon="fas fa-times-circle" />
 						<q-tooltip anchor="top middle" self="bottom middle">Stop tutorial</q-tooltip>
 					</span>
-				</div> -->
+				</div>
 				<div class="tutorial__title">
 					{{ current_step?.title }}
 				</div>
@@ -92,16 +92,8 @@ export default {
 					return "top middle";
 			}
 		},
-		show: {
-			get() {
-				console.log("In computed tutorial show", this.step, this.branch);
-				return this.stepSetter !== undefined
-					? this.stepSetter
-					: this.follow_tutorial && this.get_step(this.tutorial, this.step, this.branch);
-			},
-			set(newVal) {
-				this.stepSetter = newVal;
-			},
+		show() {
+			return this.follow_tutorial && this.get_step(this.tutorial, this.step, this.branch);
 		},
 		name() {
 			return this.get_tutorial(this.tutorial)?.name;
@@ -111,10 +103,9 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions("tutorial", ["completeStep", "stopTutorial"]),
+		...mapActions("tutorial", ["completeStep", "toggleTutorial"]),
 		stop() {
-			this.stopTutorial();
-			this.show = false;
+			this.toggleTutorial();
 		},
 	},
 };

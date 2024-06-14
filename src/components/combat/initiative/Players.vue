@@ -81,7 +81,7 @@ export default {
 				!this.players.find((player) => !player.initiative) &&
 				this.get_step("initiative", "players")
 			) {
-				this.completeStep("initiative");
+				this.completeStep({ tutorial: "initiative" });
 			}
 		},
 	},

@@ -1,6 +1,7 @@
 <template>
 	<q-menu
 		v-model="show"
+		v-bind="$attrs"
 		:dark="$store.getters.theme === 'dark'"
 		:anchor="anchor"
 		:self="self"

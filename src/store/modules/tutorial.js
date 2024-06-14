@@ -28,30 +28,50 @@ const tutorial_state = () => ({
 	},
 	initiative: {
 		name: "Initiative",
-		steps: [],
+		steps: [
+			{
+				key: "players",
+				title: "Player initiative",
+				description:
+					"<p>Your players will want to roll their own initiative, therefore we input it manually here.</p> Use tab to skip to the next player.",
+				completed: false,
+			},
+			{
+				key: "monsters",
+				title: "Monster initiative",
+				description: "Monster initiative can be rolled individually or all at once with one click.",
+				completed: false,
+			},
+			{
+				key: "start",
+				title: "Start combat!",
+				description: "With the turn order decided, you can start the encounter!",
+				completed: false,
+			},
+		],
 	},
 	run: {
 		name: "Run encounter",
 		steps: [
-			{ id: "target", name: "Target", desc: "Select Target", completed: false },
+			{ key: "target", name: "Target", desc: "Select Target", completed: false },
 			{
-				id: "action",
+				key: "action",
 				branch: {
 					player: {
 						steps: [
-							{ id: "damage-type", name: "Type", desc: "Select Damage Type", completed: false },
-							{ id: "apply", name: "Apply", desc: "Select Apply", completed: false },
+							{ key: "damage-type", name: "Type", desc: "Select Damage Type", completed: false },
+							{ key: "apply", name: "Apply", desc: "Select Apply", completed: false },
 						],
 					},
 					monster: {
 						steps: [
-							{ id: "roll", name: "Roll", desc: "Roll", completed: false },
-							{ id: "apply", name: "Apply", desc: "Apply", completed: false },
+							{ key: "roll", name: "Roll", desc: "Roll", completed: false },
+							{ key: "apply", name: "Apply", desc: "Apply", completed: false },
 						],
 					},
 				},
 			},
-			{ id: "next", name: "Next", desc: "Next Turn", completed: false },
+			{ key: "next", name: "Next", desc: "Next Turn", completed: false },
 		],
 	},
 });

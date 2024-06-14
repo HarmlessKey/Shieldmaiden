@@ -206,15 +206,24 @@
 											action.action_list[0].rolls.length
 										"
 									>
-										<hk-roll-action
-											:ref="action_index"
-											:action="action"
-											:tooltip="`Roll ${action.name}`"
-											@roll="startRoll(...arguments, action_index, action, type)"
-											:disabled="!checkAvailable(type, action_index, action)"
-										>
-											<span class="roll-button" />
-										</hk-roll-action>
+										<div>
+											<TutorialPopover
+												v-if="action_index == 0"
+												tutorial="run"
+												step="action:roll"
+												branch="monster"
+												position="right"
+											/>
+											<hk-roll-action
+												:ref="action_index"
+												:action="action"
+												:tooltip="`Roll ${action.name}`"
+												@roll="startRoll(...arguments, action_index, action, type)"
+												:disabled="!checkAvailable(type, action_index, action)"
+											>
+												<span class="roll-button" />
+											</hk-roll-action>
+										</div>
 									</q-item-section>
 									<!-- Spend limited actions that can't be rolled -->
 									<q-item-section
@@ -308,12 +317,14 @@ import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Projectiles from "./Projectiles";
 import { isNil } from "lodash";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Roll",
 	mixins: [setHP, runEncounter],
 	components: {
 		Projectiles,
+		TutorialPopover,
 	},
 	props: ["current"],
 	data() {

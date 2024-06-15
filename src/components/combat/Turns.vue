@@ -117,15 +117,13 @@
 		<!-- TURNS & ROUNDS -->
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">
 			<a
-				class="handler neutral-2"
+				class="handler neutral-2 mr-2 px-2"
 				@click="prevTurn()"
 				v-shortkey="['shift', 'arrowleft']"
 				@shortkey="prevTurn()"
 			>
 				<i aria-hidden="true" class="fas fa-step-backward" />
-				<q-tooltip anchor="top middle" self="center middle"
-					>Previous turn [shift] + [&lt;]</q-tooltip
-				>
+				<q-tooltip anchor="top middle" self="center middle">Previous turn [shift] + [←]</q-tooltip>
 			</a>
 
 			<template v-if="encounter.round">
@@ -143,14 +141,17 @@
 			</template>
 
 			<a
-				class="handler neutral-2"
-				@click="nextTurn()"
+				class="handler neutral-2 ml-2 px-2"
+				:class="{
+					'step-highlight': demo && follow_tutorial && get_step('run', 'next'),
+				}"
 				v-shortkey="['shift', 'arrowright']"
+				@click="nextTurn()"
 				@shortkey="nextTurn()"
 			>
-				<TutorialPopover tutorial="run" step="next" position="right" />
 				<i aria-hidden="true" class="fas fa-step-forward" />
-				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [>]</q-tooltip>
+				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [→]</q-tooltip>
+				<TutorialPopover step="next" :offset="[0, 10]" />
 			</a>
 		</div>
 		<div v-else>Set Initiative</div>
@@ -256,7 +257,7 @@
 					<span class="ml-1 d-none d-md-inline">
 						encounter <i aria-hidden="true" class="fas fa-arrow-right" />
 					</span>
-					<q-tooltip anchor="top middle" self="center middle">Start [shift] + [>]</q-tooltip>
+					<q-tooltip anchor="top middle" self="center middle">Start [shift] + [->]</q-tooltip>
 					<TutorialPopover v-if="demo" tutorial="initiative" step="start" :offset="[0, 10]" />
 				</button>
 			</template>
@@ -307,6 +308,7 @@ export default {
 			"set_finished",
 			"reset_demo",
 		]),
+		...mapActions("tutorial", ["completeStep"]),
 		startEncounter() {
 			this.set_turn({ turn: 0, round: 1 });
 			this.checkReminders(this.next, "startTurn");
@@ -405,8 +407,8 @@ export default {
 
 	.handler {
 		font-size: 25px;
-		padding: 0 20px;
 		line-height: 40px;
+		border-radius: $border-radius;
 
 		&:hover {
 			color: $blue !important;

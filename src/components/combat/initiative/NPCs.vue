@@ -56,7 +56,7 @@
 							>
 								<a
 									:class="{
-										'step-highlight': follow_tutorial && get_step('initiative', 'monsters'),
+										'step-highlight': demo && follow_tutorial && get_step('initiative', 'monsters'),
 									}"
 								>
 									<q-icon size="small" name="fas fa-dice-d20" />

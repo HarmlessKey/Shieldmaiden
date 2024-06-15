@@ -304,7 +304,6 @@ export default {
 				this.$refs.input.blur();
 			}
 
-			console.log("complete step");
 			// If a value is applied, complete the tutorial step
 			if (this.get_step("run", "action:player:manual", "player")) {
 				this.completeStep({ tutorial: "run", branch: "player" });

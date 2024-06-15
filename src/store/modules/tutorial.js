@@ -100,7 +100,18 @@ const tutorial_state = () => ({
 					},
 				},
 			},
-			{ key: "next", title: "Next", description: "Next Turn", completed: false },
+			{
+				key: "next",
+				title: "Next turn",
+				description: "When the current entity is finished, go to the next turn.",
+				completed: false,
+			},
+			{
+				key: "opportunity",
+				title: "Opportunity attack",
+				description: "When the current entity is finished, go to the next turn.",
+				completed: false,
+			},
 		],
 	},
 });
@@ -174,7 +185,8 @@ const get_active_step_path = (steps, path, active_branch = undefined) => {
 	// Branch > Recursion
 	if (!current_step.branch.hasOwnProperty(active_branch)) {
 		if (current_step.started) {
-			return (path[path.length - 1] += 1);
+			path[path.length - 1] += 1;
+			return path;
 		}
 		return undefined;
 	}

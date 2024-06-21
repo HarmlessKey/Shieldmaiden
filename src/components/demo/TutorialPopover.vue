@@ -48,6 +48,10 @@ export default {
 		branch: {
 			type: String,
 		},
+		transition: {
+			type: Boolean,
+			default: false,
+		},
 		position: {
 			type: String,
 			default: "bottom",
@@ -62,7 +66,8 @@ export default {
 		...mapGetters("tutorial", ["follow_tutorial", "get_current_step", "get_step", "get_tutorial"]),
 		...mapActions(["current"]),
 		current_step() {
-			return this.get_current_step(this.tutorial, this.branch);
+			const step = this.get_current_step(this.tutorial, this.branch, this.transition);
+			return step;
 		},
 		anchor() {
 			switch (this.position) {
@@ -93,7 +98,11 @@ export default {
 			}
 		},
 		show() {
-			return this.follow_tutorial && this.get_step(this.tutorial, this.step, this.branch);
+			console.log("TUTORIAL CURRENT STEP", this.step, this.current_step);
+			return (
+				this.follow_tutorial &&
+				this.get_step(this.tutorial, this.step, this.branch, this.transition)
+			);
 		},
 		name() {
 			return this.get_tutorial(this.tutorial)?.name;

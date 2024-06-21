@@ -218,7 +218,7 @@
 											<TutorialPopover
 												v-if="action_index == 0"
 												tutorial="run"
-												step="action:monster:roll"
+												step="roll"
 												branch="monster"
 												position="right"
 												:offset="[20, 0]"

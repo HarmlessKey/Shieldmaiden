@@ -149,6 +149,13 @@
 				@click="nextTurn()"
 				@shortkey="nextTurn()"
 			>
+				<TutorialPopover
+					tutorial="run"
+					step="action:next"
+					:branch="current.entityType === 'player' ? 'player' : 'monster'"
+					:transition="true"
+					position="right"
+				/>
 				<i aria-hidden="true" class="fas fa-step-forward" />
 				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [→]</q-tooltip>
 				<TutorialPopover step="next" :offset="[0, 10]" />

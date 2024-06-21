@@ -51,7 +51,8 @@ const tutorial_state = () => ({
 		],
 	},
 	run: {
-		name: "Run encounter",
+		title: "Run encounter",
+		completed: false,
 		steps: [
 			{
 				key: "target",
@@ -65,9 +66,10 @@ const tutorial_state = () => ({
 				completed: false,
 				branch: {
 					player: {
+						completed: false,
 						steps: [
 							{
-								key: "action:player:manual",
+								key: "manual",
 								title: "Input value",
 								description:
 									"<p>Input the amount of damage or healing you want to apply to the target(s).</p> Use the <strong>Attack</strong> [Enter] button to damage your targets or the <strong>Heal</strong> [Shift + Enter] button to heal them.",
@@ -76,9 +78,10 @@ const tutorial_state = () => ({
 						],
 					},
 					monster: {
+						completed: false,
 						steps: [
 							{
-								key: "action:monster:roll",
+								key: "roll",
 								title: "Roll action",
 								description:
 									"Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.",
@@ -123,13 +126,14 @@ const tutorial_state = () => ({
 							},
 						],
 					},
+					transition: {
+						completed: false,
+						depends_on: ["monster", "player"],
+						steps: [
+							{ key: "action:next", title: "Next", description: "Next Turn", completed: false },
+						],
+					},
 				},
-			},
-			{
-				key: "next",
-				title: "Next turn",
-				description: "When the current entity is finished, go to the next turn.",
-				completed: false,
 			},
 			{
 				key: "opportunity",
@@ -150,72 +154,66 @@ const tutorial_getters = {
 	},
 	get_current_step:
 		(state) =>
-		(tutorial, active_branch = undefined) => {
+		(tutorial, active_branch = undefined, transition = false) => {
 			const steps = state[tutorial].steps;
-			return get_active_step(steps, active_branch);
+			// const path = `#${tutorial}`;
+			const path = "";
+			return get_active_step(steps, path, active_branch, transition).step;
 		},
 	get_current_step_path: (state) => (tutorial, active_branch) => {
 		const steps = state[tutorial].steps;
-		return get_active_step_path(steps, [], active_branch);
+		// const path = `#${tutorial}`;
+		const path = "";
+		return get_active_step(steps, path, active_branch).path;
 	},
 	get_current_step_index: (state) => (tutorial) => {
 		return state[tutorial]?.steps.findIndex((step) => !step.completed);
 	},
 	get_step:
 		(_state, getters) =>
-		(tutorial, step, branch = undefined) => {
-			const current_step = getters.get_current_step(tutorial, branch);
+		(tutorial, step, branch = undefined, transition = false) => {
+			const current_step = getters.get_current_step(tutorial, branch, transition);
 			const at_step = current_step?.key === step;
 			return at_step;
 		},
 };
-
-const get_active_step = (steps, active_branch = undefined) => {
+const get_active_step = (steps, path, active_branch, transition) => {
 	const active_steps = steps.filter((step) => !step.completed);
 	if (active_steps.length === 0) {
-		return undefined;
+		return { step: undefined, path };
 	}
 	// Pop first active step from active steps list;
 	const current_step = active_steps.shift();
+	path += `.${current_step.key}`;
+
 	// Not branching step so return step.
 	if (!current_step.branch) {
-		return current_step;
+		return { step: current_step, path };
 	}
-	// Branch
-	if (!current_step.branch.hasOwnProperty(active_branch)) {
-		if (current_step.started) {
-			return active_steps.shift();
-		}
-		return undefined;
-	}
-	const sub_step = get_active_step(current_step.branch[active_branch].steps);
-	if (sub_step) {
-		return sub_step;
-	}
-	// All sub steps are completed so pop next active step.
-	return active_steps.shift();
+	// Branching
+	const { branch_steps, branch_key } = get_branch_steps(
+		current_step.branch,
+		active_branch,
+		transition
+	);
+	path += `<${branch_key}`;
+	return get_active_step(branch_steps, path, active_branch, transition);
 };
 
-const get_active_step_path = (steps, path, active_branch = undefined) => {
-	const active_step_index = steps.findIndex((step) => !step.completed);
-	if (active_step_index === undefined) {
-		return undefined;
+const get_branch_steps = (branches, active_branch, transition) => {
+	let branch_steps = [];
+	if (!branches.hasOwnProperty(active_branch)) {
+		return { branch_steps, branch_key: undefined };
 	}
-	path = path.concat(active_step_index);
-	const current_step = steps[active_step_index];
-	// Base case
-	if (!current_step.branch) {
-		return path;
-	}
-	// Branch > Recursion
-	if (!current_step.branch.hasOwnProperty(active_branch)) {
-		if (current_step.started) {
-			path[path.length - 1] += 1;
-			return path;
+	if (branches[active_branch].completed) {
+		if (transition) {
+			branch_steps = branches.transition.completed ? [] : branches.transition.steps;
+			return { branch_steps, branch_key: "transition" };
 		}
-		return undefined;
+		return { branch_steps, branch_key: active_branch };
 	}
-	return get_active_step_path(current_step.branch[active_branch].steps, path);
+	branch_steps = branches[active_branch].steps;
+	return { branch_steps, branch_key: active_branch };
 };
 
 const tutorial_actions = {
@@ -223,8 +221,9 @@ const tutorial_actions = {
 		commit("SET_TUTORIAL", !state.follow_tutorial);
 	},
 	completeStep({ commit, getters }, { tutorial, branch }) {
+		// path = run.action<player.
 		const path = getters.get_current_step_path(tutorial, branch);
-		commit("SET_COMPLETE", { tutorial, path, branch });
+		commit("SET_COMPLETE", { tutorial, path });
 	},
 };
 
@@ -232,18 +231,54 @@ const tutorial_mutations = {
 	SET_TUTORIAL(state, payload) {
 		Vue.set(state, "follow_tutorial", payload);
 	},
-	SET_COMPLETE(state, { tutorial, path, branch }) {
+	SET_COMPLETE(state, { tutorial, path }) {
 		let step_reference = state[tutorial];
-		while (path.length) {
-			if (step_reference.branch) {
-				Vue.set(step_reference, "started", true);
-				step_reference = step_reference.branch[branch];
+		let branch_reference = {};
+		let failsafe = 0;
+		while (path.length && failsafe < 10) {
+			failsafe += 1;
+			const { key, type, path: next_path } = next_path_step(path);
+			path = next_path;
+			switch (type) {
+				case "root":
+					break;
+				case "branch":
+					branch_reference = step_reference.branch[key];
+					step_reference = step_reference.branch[key];
+					break;
+				case "step":
+					const indx = step_reference.steps.findIndex((step) => step.key === key);
+					step_reference = step_reference.steps[indx];
+					break;
 			}
-			const next_idx = path.shift();
-			step_reference = step_reference.steps[next_idx];
 		}
 		Vue.set(step_reference, "completed", true);
+		if (branch_reference.completed === false && branch_completed(branch_reference)) {
+			branch_reference.completed = true;
+		}
 	},
+};
+
+const branch_completed = (branch_reference) => {
+	// if all steps are completed filter length == false
+	return branch_reference.steps.filter((step) => step.completed === false).length === 0;
+};
+
+const next_path_step = (path) => {
+	const reg = /^(?<type_sym>[#<.])(?<key>\w+)/;
+	const match = reg.exec(path);
+	if (match === null) {
+		return false;
+	}
+	const { key, type_sym } = match.groups;
+	const repl_reg = new RegExp(`${type_sym}${key}`, "g");
+	const sym2type = {
+		"#": "root",
+		"<": "branch",
+		".": "step",
+	};
+	path = path.replace(repl_reg, "");
+	return { key, type: sym2type[type_sym], path };
 };
 
 export default {

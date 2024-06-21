@@ -29,8 +29,7 @@
 						min="0"
 						class="manual-input"
 						:class="{
-							'step-highlight':
-								demo && follow_tutorial && get_step('run', 'action:player:manual', 'player'),
+							'step-highlight': demo && follow_tutorial && get_step('run', 'manual', 'player'),
 						}"
 						autocomplete="off"
 						:autofocus="autofocus"
@@ -62,12 +61,7 @@
 						<i aria-hidden="true" class="hki-heal" />
 						<q-tooltip anchor="center right" self="center left">[shift] + [enter]</q-tooltip>
 					</button>
-					<TutorialPopover
-						step="action:player:manual"
-						branch="player"
-						position="right"
-						:offset="[10, 0]"
-					/>
+					<TutorialPopover step="manual" branch="player" position="right" :offset="[10, 0]" />
 				</div>
 			</ValidationProvider>
 
@@ -305,7 +299,7 @@ export default {
 			}
 
 			// If a value is applied, complete the tutorial step
-			if (this.get_step("run", "action:player:manual", "player")) {
+			if (this.get_step("run", "manual", "player")) {
 				this.completeStep({ tutorial: "run", branch: "player" });
 			}
 		},

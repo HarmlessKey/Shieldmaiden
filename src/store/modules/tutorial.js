@@ -81,19 +81,44 @@ const tutorial_state = () => ({
 								key: "action:monster:roll",
 								title: "Roll action",
 								description:
-									"<p>Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.</p>",
+									"Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.",
 								completed: false,
 							},
 							{
-								key: "action:player:to-hit",
+								key: "action:monster:to-hit",
 								title: "Hit or Miss",
-								description: "<p></p>",
+								description:
+									"<p>We automatically determine if your roll was a hit or miss, based on the target's AC. You can always turn a hit into miss manually.</p>" +
+									"<p>For Saving Throw actions you have to manually set it as a success or fail.</p>" +
+									"This does not apply for <strong>healing</strong> actions.",
 								completed: false,
 							},
 							{
-								key: "action:player:apply",
+								key: "action:monster:defenses",
+								title: "Defenses",
+								description:
+									"<p>With the <strong>V</strong>ulnerable, <strong>R</strong>esistent and <strong>I</strong>mmune buttons you can update a target's defenses for the damage type of the current attack.</p>" +
+									"<p>Monsters and Players can have their defenses set before hand, but it can always be overruled for any roll you make.<p>" +
+									"This does not apply for <strong>healing</strong> actions.",
+								completed: false,
+							},
+							{
+								key: "action:monster:details",
+								title: "Roll details",
+								description:
+									"<p>Click on the row to show details about the roll.</p>" +
+									"<strong>TIP</strong> From the details you can  reroll any die you want.",
+								completed: false,
+							},
+							{
+								key: "action:monster:apply",
 								title: "Apply the value",
-								description: "<p>Apply the rolled damage</p>",
+								description:
+									"<p>Apply the total value of the roll to the target.</p>" +
+									"<strong>Full</strong> Apply to total value.<br/>" +
+									"<strong>Half</strong> Apply half of the total value (rounded down).<br/>" +
+									"<strong>Double</strong> Apply the total value multiplied by 2.<br/>" +
+									'<strong><i class="fas fa-times"></i></strong> Do not apply the value.',
 								completed: false,
 							},
 						],

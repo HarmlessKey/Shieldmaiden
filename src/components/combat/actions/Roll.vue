@@ -197,7 +197,6 @@
 										</q-item-label>
 									</q-item-section>
 									<q-item-section
-										avatar
 										v-if="
 											action.action_list &&
 											action.action_list[0] &&
@@ -205,14 +204,24 @@
 											action.action_list[0].rolls &&
 											action.action_list[0].rolls.length
 										"
+										avatar
 									>
-										<div>
+										<div
+											class="roll-wrapper"
+											:class="{
+												'step-highlight':
+													demo &&
+													follow_tutorial &&
+													get_step('run', 'action:monster:roll', 'monster'),
+											}"
+										>
 											<TutorialPopover
 												v-if="action_index == 0"
 												tutorial="run"
 												step="action:monster:roll"
 												branch="monster"
 												position="right"
+												:offset="[20, 0]"
 											/>
 											<hk-roll-action
 												:ref="action_index"
@@ -346,7 +355,8 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["encounter", "targeted"]),
+		...mapGetters(["encounter", "targeted", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		tab: {
 			get() {
 				let tab = "actions";
@@ -369,6 +379,7 @@ export default {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
+		...mapActions("tutorial", ["completeStep"]),
 		focusButton(i) {
 			const button = this.$refs[i]?.[0]?.$el;
 			button?.focus();
@@ -401,6 +412,10 @@ export default {
 				option: this.rollObject.option,
 			});
 			this.cancelRoll();
+
+			if (this.get_step("run", "action:monster:roll", "monster")) {
+				this.completeStep({ tutorial: "run", branch: "monster" });
+			}
 		},
 		cancelRoll() {
 			this.projectile_dialog = false;
@@ -466,6 +481,11 @@ h3 {
 }
 .is-disabled {
 	opacity: 0.3;
+}
+.roll-wrapper {
+	border-radius: 50%;
+	padding: 5px;
+	margin: -10px;
 }
 .roll-button {
 	display: inline-block;

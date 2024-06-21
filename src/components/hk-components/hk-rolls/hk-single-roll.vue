@@ -59,104 +59,133 @@
 					v-for="(action, action_index) in roll.actions"
 					:key="`action-${index}-${action_index}`"
 				>
-					<!-- TO HIT ROLL -->
-					<template v-if="action.toHit">
-						<div class="toHit">
-							<div>
-								To hit:
-								<span class="advantage" v-if="action.toHit.ignored">
-									<span v-html="advantage(action.toHit.advantage_disadvantage)" />
-									<span class="ignored neutral-4">
-										{{ action.toHit.ignored }}
-									</span> </span
-								>{{ action.toHit.throwsTotal }}
-								<template v-if="parseInt(action.toHit.mod) !== 0">
-									{{
-										parseInt(action.toHit.mod) > 0
-											? `+ ${parseInt(action.toHit.mod)}`
-											: `- ${Math.abs(action.toHit.mod)}`
-									}}
-								</template>
-							</div>
-							<transition
-								v-if="action.toHit.throwsTotal == 1"
-								:name="`${roll.key}`"
-								enter-active-class="animated animate__hinge"
-								appear
-							>
-								<div class="total crit red">
-									Crit
-									<b><hk-animated-integer :value="1" onMount /></b>
+					<div>
+						<!-- TO HIT ROLL -->
+						<template v-if="action.toHit">
+							<div class="toHit">
+								<div>
+									To hit:
+									<span class="advantage" v-if="action.toHit.ignored">
+										<span v-html="advantage(action.toHit.advantage_disadvantage)" />
+										<span class="ignored neutral-4">
+											{{ action.toHit.ignored }}
+										</span> </span
+									>{{ action.toHit.throwsTotal }}
+									<template v-if="parseInt(action.toHit.mod) !== 0">
+										{{
+											parseInt(action.toHit.mod) > 0
+												? `+ ${parseInt(action.toHit.mod)}`
+												: `- ${Math.abs(action.toHit.mod)}`
+										}}
+									</template>
 								</div>
-							</transition>
-							<transition
-								v-else-if="action.toHit.throwsTotal == 20"
-								name="heartBeat"
-								enter-active-class="animated animate__heartBeat"
-								appear
-							>
-								<div class="total crit green">
-									Crit
-									<b><hk-animated-integer :value="20" onMount /></b>
-								</div>
-							</transition>
-							<div v-else class="total">
-								<hk-animated-integer :value="action.toHit.total" onMount />
-							</div>
-						</div>
-						<q-btn-toggle
-							v-model="hitOrMiss[action_index]"
-							class="mb-3 neutral-1"
-							spread
-							no-caps
-							:dark="$store.getters.theme === 'dark'"
-							dense
-							toggle-color="primary"
-							color="neutral-9"
-							:options="[
-								{ label: 'Hit', value: 'hit' },
-								{ label: 'Miss', value: 'miss' },
-							]"
-							@keydown.enter="shortkeyApply"
-							@keydown.backspace="removeRoll(index)"
-						/>
-					</template>
-
-					<!-- SAVING THROW -->
-					<template v-if="action.type === 'save'">
-						<div class="toHit" v-if="action.save_ability || action.save_dc">
-							<div v-if="action.save_ability">{{ action.save_ability.capitalize() }} save</div>
-							<div v-if="action.save_dc">
-								<span class="neutral-2">DC</span>
-								<span
-									class="total"
-									:class="{
-										green: savingThrowResult[action_index] === 'fail',
-										red: savingThrowResult[action_index] === 'save',
-									}"
+								<transition
+									v-if="action.toHit.throwsTotal == 1"
+									:name="`${roll.key}`"
+									enter-active-class="animated animate__hinge"
+									appear
 								>
-									{{ action.save_dc }}
-								</span>
+									<div class="total crit red">
+										Crit
+										<b><hk-animated-integer :value="1" onMount /></b>
+									</div>
+								</transition>
+								<transition
+									v-else-if="action.toHit.throwsTotal == 20"
+									name="heartBeat"
+									enter-active-class="animated animate__heartBeat"
+									appear
+								>
+									<div class="total crit green">
+										Crit
+										<b><hk-animated-integer :value="20" onMount /></b>
+									</div>
+								</transition>
+								<div v-else class="total">
+									<hk-animated-integer :value="action.toHit.total" onMount />
+								</div>
 							</div>
-						</div>
-						<q-btn-toggle
-							v-model="savingThrowResult[action_index]"
-							class="mb-3 neutral-1"
-							spread
-							no-caps
-							:dark="$store.getters.theme === 'dark'"
-							dense
-							square
-							toggle-color="primary"
-							color="neutral-9"
-							:options="[
-								{ label: 'Fail', value: 'fail' },
-								{ label: 'Save', value: 'save' },
-							]"
-							@keydown.enter="shortkeyApply"
-							@keydown.backspace="removeRoll(index)"
+							<q-btn-toggle
+								v-model="hitOrMiss[action_index]"
+								class="mb-3 neutral-1"
+								spread
+								no-caps
+								:dark="$store.getters.theme === 'dark'"
+								dense
+								toggle-color="primary"
+								color="neutral-9"
+								:options="[
+									{ label: 'Hit', value: 'hit' },
+									{ label: 'Miss', value: 'miss' },
+								]"
+								:class="{
+									'step-highlight':
+										demo && follow_tutorial && get_step('run', 'action:monster:to-hit', 'monster'),
+								}"
+								@keydown.enter="shortkeyApply"
+								@keydown.backspace="removeRoll(index)"
+								@click="
+									get_step('run', 'action:monster:to-hit', 'monster')
+										? completeStep({ tutorial: 'run', branch: 'monster' })
+										: null
+								"
+							/>
+						</template>
+
+						<!-- SAVING THROW -->
+						<template v-if="action.type === 'save'">
+							<div class="toHit" v-if="action.save_ability || action.save_dc">
+								<div v-if="action.save_ability">{{ action.save_ability.capitalize() }} save</div>
+								<div v-if="action.save_dc">
+									<span class="neutral-2">DC</span>
+									<span
+										class="total"
+										:class="{
+											green: savingThrowResult[action_index] === 'fail',
+											red: savingThrowResult[action_index] === 'save',
+										}"
+									>
+										{{ action.save_dc }}
+									</span>
+								</div>
+							</div>
+							<q-btn-toggle
+								v-model="savingThrowResult[action_index]"
+								class="mb-3 neutral-1"
+								spread
+								no-caps
+								:dark="$store.getters.theme === 'dark'"
+								dense
+								square
+								toggle-color="primary"
+								color="neutral-9"
+								:options="[
+									{ label: 'Fail', value: 'fail' },
+									{ label: 'Save', value: 'save' },
+								]"
+								:class="{
+									'step-highlight':
+										demo && follow_tutorial && get_step('run', 'action:monster:to-hit', 'monster'),
+								}"
+								@keydown.enter="shortkeyApply"
+								@keydown.backspace="removeRoll(index)"
+								@click="
+									get_step('run', 'action:monster:to-hit', 'monster')
+										? completeStep({ tutorial: 'run', branch: 'monster' })
+										: null
+								"
+							/>
+						</template>
+
+						<TutorialPopover
+							v-if="index === 0"
+							tutorial="run"
+							step="action:monster:to-hit"
+							branch="monster"
+							position="right"
+							:offset="[15, 0]"
 						/>
-					</template>
+					</div>
 
 					<!-- DAMAGE / HEALING ROLLS -->
 					<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
@@ -166,6 +195,15 @@
 							:dark="$store.getters.theme === 'dark'"
 							switch-toggle-side
 							:group="`rolled-${index}`"
+							:class="{
+								'step-highlight':
+									demo && follow_tutorial && get_step('run', 'action:monster:details', 'monster'),
+							}"
+							@click="
+								get_step('run', 'action:monster:details', 'monster')
+									? completeStep({ tutorial: 'run', branch: 'monster' })
+									: null
+							"
 						>
 							<template #header>
 								<q-item-section v-if="action.type === 'healing'">
@@ -175,7 +213,15 @@
 									</span>
 								</q-item-section>
 								<q-item-section v-else>
-									<div class="defenses">
+									<div
+										class="defenses"
+										:class="{
+											'step-highlight':
+												demo &&
+												follow_tutorial &&
+												get_step('run', 'action:monster:defenses', 'monster'),
+										}"
+									>
 										<div
 											v-for="({ name }, key) in defenses"
 											:key="key"
@@ -201,18 +247,34 @@
 											</span>
 											{{ rolled.damage_type }}
 										</span>
+										<TutorialPopover
+											v-if="index === 0"
+											tutorial="run"
+											step="action:monster:defenses"
+											branch="monster"
+											position="left"
+											:offset="[15, 0]"
+										/>
 									</div>
 								</q-item-section>
 								<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
 									<q-item-label>
-										<b
+										<strong
 											><hk-animated-integer :value="totalRollValue(action, action_index, rolled)"
-										/></b>
+										/></strong>
 									</q-item-label>
 									<q-tooltip anchor="top middle" self="center middle">
 										{{ rolled.rollResult.roll }}
 									</q-tooltip>
 								</q-item-section>
+								<TutorialPopover
+									v-if="index === 0"
+									tutorial="run"
+									step="action:monster:details"
+									branch="monster"
+									position="right"
+									:offset="[10, 0]"
+								/>
 							</template>
 							<div class="accordion-body">
 								<div>
@@ -310,7 +372,7 @@
 								<!-- Special events -->
 								<div
 									v-if="
-										rolled.special &&
+										rolled.special?.length &&
 										(savingThrowResult[action_index] === 'fail' ||
 											hitOrMiss[action_index] === 'hit')
 									"
@@ -333,7 +395,7 @@
 					</q-list>
 
 					<!-- TOTAL OF THE ACTION -->
-					<div class="total-action-damage" v-if="roll.actions.length > 1">
+					<div v-if="roll.actions.length > 1" class="total-action-damage">
 						<div>Total {{ action.type === "healing" ? "healing" : "damage" }}</div>
 						<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
 							<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
@@ -413,7 +475,15 @@
 				</div>
 			</div>
 
-			<div slot="footer" class="card-footer" v-if="roll.target">
+			<div
+				v-if="roll.target"
+				slot="footer"
+				class="card-footer"
+				:class="{
+					'step-highlight':
+						demo && follow_tutorial && get_step('run', 'action:monster:apply', 'monster'),
+				}"
+			>
 				<q-btn
 					color="neutral-9"
 					class="full-width neutral-1"
@@ -438,19 +508,32 @@
 				<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
 					<i aria-hidden="true" class="fas fa-times" />
 				</q-btn>
+
+				<TutorialPopover
+					v-if="index === 0"
+					tutorial="run"
+					step="action:monster:apply"
+					branch="monster"
+					position="right"
+					:offset="[10, 0]"
+				/>
 			</div>
 		</hk-card>
 	</div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 import { dice } from "src/mixins/dice";
 import { setHP } from "src/mixins/HpManipulations";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "hk-single-roll",
+	components: {
+		TutorialPopover,
+	},
 	props: {
 		value: {
 			type: Object,
@@ -500,6 +583,7 @@ export default {
 		};
 	},
 	computed: {
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		roll() {
 			return this.value;
 		},
@@ -553,6 +637,7 @@ export default {
 	},
 	methods: {
 		...mapActions(["removeActionRoll", "edit_entity_prop"]),
+		...mapActions("tutorial", ["completeStep"]),
 		checkHitOrMiss() {
 			this.roll.actions.forEach((action, index) => {
 				if (action.toHit) {
@@ -698,6 +783,9 @@ export default {
 					});
 				}
 			}
+			if (this.get_step("run", "action:monster:apply", "monster")) {
+				this.completeStep({ tutorial: "run", branch: "monster" });
+			}
 			// Remove the roll
 			this.removeRoll(this.index);
 		},
@@ -759,6 +847,9 @@ export default {
 				this.$delete(this.resistances, type);
 			} else {
 				this.$set(this.resistances, type, resistance);
+			}
+			if (this.get_step("run", "action:monster:defenses", "monster")) {
+				this.completeStep({ tutorial: "run", branch: "monster" });
 			}
 			this.$forceUpdate();
 		},
@@ -913,6 +1004,7 @@ export default {
 			grid-column-gap: 5px;
 			user-select: none;
 			line-height: 28px;
+			border-radius: $border-radius;
 
 			.type {
 				padding-left: 10px;
@@ -1005,6 +1097,11 @@ export default {
 	}
 	.card-footer {
 		padding: 0;
+
+		&.step-highlight {
+			margin: 4px;
+			border-radius: 2px;
+		}
 
 		.q-btn {
 			border-radius: 0;

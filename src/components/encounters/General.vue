@@ -16,8 +16,8 @@
 
 				<template v-if="demo">
 					<p>
-						If you create an account, you can add atmosphere to your encounters, to let players
-						immerse even.
+						If you create an account, you can add atmosphere to your encounters, to let your players
+						immerse even more.
 					</p>
 					<q-list class="mb-3">
 						<q-item class="bg-neutral-8">

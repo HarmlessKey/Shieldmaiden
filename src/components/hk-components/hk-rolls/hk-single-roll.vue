@@ -119,13 +119,12 @@
 									{ label: 'Miss', value: 'miss' },
 								]"
 								:class="{
-									'step-highlight':
-										demo && follow_tutorial && get_step('run', 'action:monster:to-hit', 'monster'),
+									'step-highlight': demo && follow_tutorial && get_step('run', 'to-hit', 'monster'),
 								}"
 								@keydown.enter="shortkeyApply"
 								@keydown.backspace="removeRoll(index)"
 								@click="
-									get_step('run', 'action:monster:to-hit', 'monster')
+									get_step('run', 'to-hit', 'monster')
 										? completeStep({ tutorial: 'run', branch: 'monster' })
 										: null
 								"
@@ -164,13 +163,12 @@
 									{ label: 'Save', value: 'save' },
 								]"
 								:class="{
-									'step-highlight':
-										demo && follow_tutorial && get_step('run', 'action:monster:to-hit', 'monster'),
+									'step-highlight': demo && follow_tutorial && get_step('run', 'to-hit', 'monster'),
 								}"
 								@keydown.enter="shortkeyApply"
 								@keydown.backspace="removeRoll(index)"
 								@click="
-									get_step('run', 'action:monster:to-hit', 'monster')
+									get_step('run', 'to-hit', 'monster')
 										? completeStep({ tutorial: 'run', branch: 'monster' })
 										: null
 								"
@@ -180,7 +178,7 @@
 						<TutorialPopover
 							v-if="index === 0"
 							tutorial="run"
-							step="action:monster:to-hit"
+							step="to-hit"
 							branch="monster"
 							position="right"
 							:offset="[15, 0]"
@@ -196,11 +194,10 @@
 							switch-toggle-side
 							:group="`rolled-${index}`"
 							:class="{
-								'step-highlight':
-									demo && follow_tutorial && get_step('run', 'action:monster:details', 'monster'),
+								'step-highlight': demo && follow_tutorial && get_step('run', 'details', 'monster'),
 							}"
 							@click="
-								get_step('run', 'action:monster:details', 'monster')
+								get_step('run', 'details', 'monster')
 									? completeStep({ tutorial: 'run', branch: 'monster' })
 									: null
 							"
@@ -217,9 +214,7 @@
 										class="defenses"
 										:class="{
 											'step-highlight':
-												demo &&
-												follow_tutorial &&
-												get_step('run', 'action:monster:defenses', 'monster'),
+												demo && follow_tutorial && get_step('run', 'defenses', 'monster'),
 										}"
 									>
 										<div
@@ -250,7 +245,7 @@
 										<TutorialPopover
 											v-if="index === 0"
 											tutorial="run"
-											step="action:monster:defenses"
+											step="defenses"
 											branch="monster"
 											position="left"
 											:offset="[15, 0]"
@@ -270,7 +265,7 @@
 								<TutorialPopover
 									v-if="index === 0"
 									tutorial="run"
-									step="action:monster:details"
+									step="details"
 									branch="monster"
 									position="right"
 									:offset="[10, 0]"
@@ -480,8 +475,7 @@
 				slot="footer"
 				class="card-footer"
 				:class="{
-					'step-highlight':
-						demo && follow_tutorial && get_step('run', 'action:monster:apply', 'monster'),
+					'step-highlight': demo && follow_tutorial && get_step('run', 'apply', 'monster'),
 				}"
 			>
 				<q-btn
@@ -512,7 +506,7 @@
 				<TutorialPopover
 					v-if="index === 0"
 					tutorial="run"
-					step="action:monster:apply"
+					step="apply"
 					branch="monster"
 					position="right"
 					:offset="[10, 0]"
@@ -783,7 +777,7 @@ export default {
 					});
 				}
 			}
-			if (this.get_step("run", "action:monster:apply", "monster")) {
+			if (this.get_step("run", "apply", "monster")) {
 				this.completeStep({ tutorial: "run", branch: "monster" });
 			}
 			// Remove the roll
@@ -848,7 +842,7 @@ export default {
 			} else {
 				this.$set(this.resistances, type, resistance);
 			}
-			if (this.get_step("run", "action:monster:defenses", "monster")) {
+			if (this.get_step("run", "defenses", "monster")) {
 				this.completeStep({ tutorial: "run", branch: "monster" });
 			}
 			this.$forceUpdate();

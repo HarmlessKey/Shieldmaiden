@@ -210,9 +210,7 @@
 											class="roll-wrapper"
 											:class="{
 												'step-highlight':
-													demo &&
-													follow_tutorial &&
-													get_step('run', 'action:monster:roll', 'monster'),
+													demo && follow_tutorial && get_step('run', 'roll', 'monster'),
 											}"
 										>
 											<TutorialPopover
@@ -413,7 +411,7 @@ export default {
 			});
 			this.cancelRoll();
 
-			if (this.get_step("run", "action:monster:roll", "monster")) {
+			if (this.get_step("run", "roll", "monster")) {
 				this.completeStep({ tutorial: "run", branch: "monster" });
 			}
 		},

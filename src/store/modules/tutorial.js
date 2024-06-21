@@ -64,6 +64,7 @@ const tutorial_state = () => ({
 			{
 				key: "action",
 				completed: false,
+				depends_on: ["monster", "player"],
 				branch: {
 					player: {
 						completed: false,
@@ -88,7 +89,7 @@ const tutorial_state = () => ({
 								completed: false,
 							},
 							{
-								key: "action:monster:to-hit",
+								key: "to-hit",
 								title: "Hit or Miss",
 								description:
 									"<p>We automatically determine if your roll was a hit or miss, based on the target's AC. You can always turn a hit into miss manually.</p>" +
@@ -97,7 +98,7 @@ const tutorial_state = () => ({
 								completed: false,
 							},
 							{
-								key: "action:monster:defenses",
+								key: "defenses",
 								title: "Defenses",
 								description:
 									"<p>With the <strong>V</strong>ulnerable, <strong>R</strong>esistent and <strong>I</strong>mmune buttons you can update a target's defenses for the damage type of the current attack.</p>" +
@@ -106,7 +107,7 @@ const tutorial_state = () => ({
 								completed: false,
 							},
 							{
-								key: "action:monster:details",
+								key: "details",
 								title: "Roll details",
 								description:
 									"<p>Click on the row to show details about the roll.</p>" +
@@ -114,7 +115,7 @@ const tutorial_state = () => ({
 								completed: false,
 							},
 							{
-								key: "action:monster:apply",
+								key: "apply",
 								title: "Apply the value",
 								description:
 									"<p>Apply the total value of the roll to the target.</p>" +
@@ -128,7 +129,6 @@ const tutorial_state = () => ({
 					},
 					transition: {
 						completed: false,
-						depends_on: ["monster", "player"],
 						steps: [
 							{ key: "action:next", title: "Next", description: "Next Turn", completed: false },
 						],
@@ -223,6 +223,7 @@ const tutorial_actions = {
 	completeStep({ commit, getters }, { tutorial, branch }) {
 		// path = run.action<player.
 		const path = getters.get_current_step_path(tutorial, branch);
+		// console.log("Complete step:", tutorial, branch, path);
 		commit("SET_COMPLETE", { tutorial, path });
 	},
 };
@@ -232,8 +233,10 @@ const tutorial_mutations = {
 		Vue.set(state, "follow_tutorial", payload);
 	},
 	SET_COMPLETE(state, { tutorial, path }) {
+		// console.log("SET COMPLETE", tutorial, path);
 		let step_reference = state[tutorial];
 		let branch_reference = {};
+		let branch_root = {};
 		let failsafe = 0;
 		while (path.length && failsafe < 10) {
 			failsafe += 1;
@@ -243,6 +246,7 @@ const tutorial_mutations = {
 				case "root":
 					break;
 				case "branch":
+					branch_root = step_reference;
 					branch_reference = step_reference.branch[key];
 					step_reference = step_reference.branch[key];
 					break;
@@ -256,6 +260,9 @@ const tutorial_mutations = {
 		if (branch_reference.completed === false && branch_completed(branch_reference)) {
 			branch_reference.completed = true;
 		}
+		if (branch_root.completed === false && all_branches_completed(branch_root)) {
+			branch_root.completed = true;
+		}
 	},
 };
 
@@ -264,8 +271,14 @@ const branch_completed = (branch_reference) => {
 	return branch_reference.steps.filter((step) => step.completed === false).length === 0;
 };
 
+const all_branches_completed = (branch_root) => {
+	return branch_root.depends_on.every((branch) => {
+		return branch_root.branch[branch].completed;
+	});
+};
+
 const next_path_step = (path) => {
-	const reg = /^(?<type_sym>[#<.])(?<key>\w+)/;
+	const reg = /^(?<type_sym>[#<.])(?<key>[\w-_]+)/;
 	const match = reg.exec(path);
 	if (match === null) {
 		return false;

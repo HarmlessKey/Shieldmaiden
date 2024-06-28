@@ -137,6 +137,7 @@
 								v-if="group === 'active' && i === 1"
 								tutorial="run"
 								requirement="target"
+                :branch="tutorial_branch"
 								position="right"
 								:offset="[10, 0]"
 							/>
@@ -158,7 +159,7 @@ import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 export default {
 	name: "Targets",
 	components: { TargetItem, TargetMenu, TutorialPopover },
-	props: ["_active", "_idle"],
+	props: ["current", "_active", "_idle"],
 	data() {
 		return {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
@@ -227,6 +228,9 @@ export default {
 				})
 				.sortBy("name", "desc")
 				.value();
+		},
+    tutorial_branch() {
+			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},
 	methods: {

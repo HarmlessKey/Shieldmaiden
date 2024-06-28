@@ -82,7 +82,7 @@ export default {
 			"get_tutorial",
 			"get_requirement",
 		]),
-		...mapGetters(["current", "targeted"]),
+		...mapGetters(["targeted"]),
 		current_step() {
 			const step = this.requirement
 				? this.get_requirement(this.tutorial, this.requirement)
@@ -126,16 +126,15 @@ export default {
 			}
 		},
 		show() {
-			let show_step = this.requirement
-				? false
-				: this.get_step(this.tutorial, this.step, this.branch, this.transition);
+      let show_step = this.requirement
+      ? false
+      : this.get_step(this.tutorial, this.step, this.branch, this.transition);
 
 			// If we are in a requirement popover we need to check if this requirement is needed for the current step
 			if (this.requirement && !this.requirement_met) {
 				const requirement = this.get_requirement(this.tutorial, this.requirement);
-				for (const path of requirement.required_for) {
-					const [step, branch] = path.split(".");
-					if (this.get_step(this.tutorial, step, branch)) {
+				for (const {step, branch, transition} of requirement.required_for) {
+					if (this.get_step(this.tutorial, step,this.branch, transition)) {
 						show_step = true;
 						break;
 					}
@@ -145,9 +144,6 @@ export default {
 		},
 		name() {
 			return this.get_tutorial(this.tutorial)?.title;
-		},
-		entity_type() {
-			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},
 	methods: {

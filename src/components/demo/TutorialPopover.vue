@@ -98,7 +98,6 @@ export default {
 			}
 		},
 		show() {
-			console.log("TUTORIAL CURRENT STEP", this.step, this.current_step);
 			return (
 				this.follow_tutorial &&
 				this.get_step(this.tutorial, this.step, this.branch, this.transition)

@@ -39,6 +39,7 @@ export default {
 				bootstrap().then((gtag) => {
 					console.log("bootstrapped", gtag);
 				});
+				this.$gtm.enable(true);
 			}
 			this.show_banner = false;
 		},

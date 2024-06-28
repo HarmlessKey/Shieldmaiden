@@ -23,7 +23,11 @@
 				</div>
 				<p v-html="current_step?.description" />
 				<div class="d-flex justify-content-end items-center gap-1">
-					<button class="btn btn-sm bg-yellow black" @click="completeStep({ tutorial, branch })">
+					<button
+						v-if="!no_button"
+						class="btn btn-sm bg-yellow black"
+						@click="completeStep({ tutorial, branch })"
+					>
 						Next <hk-icon icon="fas fa-chevron-right" />
 					</button>
 				</div>
@@ -55,6 +59,10 @@ export default {
 		position: {
 			type: String,
 			default: "bottom",
+		},
+		no_button: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {

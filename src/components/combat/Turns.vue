@@ -143,7 +143,8 @@
 			<a
 				class="handler neutral-2 ml-2 px-2"
 				:class="{
-					'step-highlight': demo && follow_tutorial && get_step('run', 'next'),
+					'step-highlight':
+						demo && follow_tutorial && get_step('run', 'next', tutorial_branch, true),
 				}"
 				v-shortkey="['shift', 'arrowright']"
 				@click="nextTurn()"
@@ -151,10 +152,12 @@
 			>
 				<TutorialPopover
 					tutorial="run"
-					step="action:next"
-					:branch="current.entityType === 'player' ? 'player' : 'monster'"
+					step="next"
+					:branch="tutorial_branch"
 					:transition="true"
 					position="right"
+					:no_button="true"
+					:offset="[10, 0]"
 				/>
 				<i aria-hidden="true" class="fas fa-step-forward" />
 				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [→]</q-tooltip>
@@ -265,6 +268,7 @@
 						encounter <i aria-hidden="true" class="fas fa-arrow-right" />
 					</span>
 					<q-tooltip anchor="top middle" self="center middle">Start [shift] + [->]</q-tooltip>
+
 					<TutorialPopover v-if="demo" tutorial="initiative" step="start" :offset="[0, 10]" />
 				</button>
 			</template>
@@ -304,6 +308,9 @@ export default {
 				return `/content/campaigns/${this.$route.params.campid}/${this.$route.params.encid}`;
 			}
 			return `/content/campaigns/${this.$route.params.campid}`;
+		},
+		tutorial_branch() {
+			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},
 	methods: {

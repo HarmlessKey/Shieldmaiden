@@ -422,12 +422,22 @@
 									/>
 								</ValidationProvider>
 							</div>
-							<div slot="footer" class="card-footer">
+							<div slot="footer" class="card-footer d-flex justify-content-between">
 								<q-btn flat no-caps v-close-popup label="Cancel" />
+								<q-btn
+									type="submit"
+									label="Add more"
+									class="ml-1"
+									no-caps
+									flat
+									color="primary"
+									:disable="!valid"
+								/>
 								<q-btn
 									type="submit"
 									label="Add"
 									class="ml-1"
+									v-close-popup
 									no-caps
 									color="primary"
 									:disable="!valid"

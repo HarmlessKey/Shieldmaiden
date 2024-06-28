@@ -130,7 +130,14 @@ const tutorial_state = () => ({
 					transition: {
 						completed: false,
 						steps: [
-							{ key: "action:next", title: "Next", description: "Next Turn", completed: false },
+							{
+								key: "next",
+								title: "Next Turn",
+								description:
+									"<p>Go to the next turn using the <strong><i class='fas fa-step-forward'></i></strong> button or using the shortcut: [shift]+[→]</p>" +
+									"",
+								completed: false,
+							},
 						],
 					},
 				},

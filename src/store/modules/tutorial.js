@@ -308,7 +308,6 @@ const tutorial_mutations = {
 		Vue.set(state.game_state, game_state_key, value);
 	},
 	SET_COMPLETE(state, { tutorial, path }) {
-		// console.log("SET COMPLETE", tutorial, path);
 		let step_reference = state[tutorial];
 		let branch_reference = {};
 		let branch_root = {};

@@ -123,8 +123,13 @@
 					</q-tooltip>
 				</q-tab>
 			</q-tabs>
-			<q-tab-panels v-model="tab" class="bg-transparent">
-				<q-tab-panel :name="name" v-for="{ name } in tabs" :key="`panel-${name}`">
+			<q-tab-panels v-model="tab" class="bg-transparent overflow-visible">
+				<q-tab-panel
+					:name="name"
+					class="overflow-visible"
+					v-for="{ name } in tabs"
+					:key="`panel-${name}`"
+				>
 					<Custom
 						v-if="name === 'manual'"
 						:current="entitiesList[doneBy]"
@@ -295,12 +300,11 @@ export default {
 .modes {
 	&::v-deep {
 		.q-tabs {
-			
 			&__content {
 				padding: 10px;
 				margin: -10px;
 				gap: 0.5rem;
-				
+
 				.q-tab {
 					border: solid 1px transparent;
 					border-radius: $border-radius;
@@ -315,10 +319,18 @@ export default {
 	}
 }
 
-
 .q-tab-panel {
 	padding: 15px 0 0 0 !important;
 }
+.overflow-visible {
+	overflow: visible;
+	&::v-deep {
+		.q-panel {
+			overflow: visible;
+		}
+	}
+}
+
 .img {
 	display: block;
 	width: 35px;

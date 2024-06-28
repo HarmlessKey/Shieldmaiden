@@ -9,7 +9,7 @@
 							Reset
 						</q-tooltip>
 					</a>
-					Demo Encounter 
+					Demo Encounter
 				</h3>
 				<button class="btn btn-clear" @click="showInfo = false">
 					<i aria-hidden="true" class="fas fa-times neutral-4" />
@@ -19,7 +19,7 @@
 				<div v-if="!user">
 					<p>
 						Thanks for trying out our demo encounter!<br/>
-						This demo has all the functionality our combat tracker has. 
+						This demo has all the functionality our combat tracker has.
 						If you <strong>create an account</strong> you can make your own encounters and run them just like this, but with your custom content.<br/>
 					</p>
 					<h3>
@@ -56,12 +56,13 @@
 		},
 		methods: {
 			...mapActions(["reset_demo"])
-		}		
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
 .demo {
+  pointer-events: none;
 	position: fixed;
 	margin: 0 15px;
 	bottom: 0;
@@ -70,8 +71,9 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	
+
 	.banner {
+    pointer-events: all;
 		padding: 25px;
 		box-shadow: 0px 0px 15px $black;
 		max-width: 800px;
@@ -102,7 +104,7 @@
 
 		i {
 				transition: transform .5s linear;
-		}    
+		}
 		&.show {
 			i {
 					transform: rotate(180deg);

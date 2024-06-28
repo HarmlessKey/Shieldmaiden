@@ -57,7 +57,7 @@
 							ref="targets"
 							tabindex="0"
 							class="pane"
-              :current="_active[encounter.turn]"
+							:current="_active[encounter.turn]"
 							:_active="_active"
 							:_idle="_idle"
 							:class="{ focused: focused_pane === 'targets' }"

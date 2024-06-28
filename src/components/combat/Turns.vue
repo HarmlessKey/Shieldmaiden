@@ -322,7 +322,8 @@ export default {
 			"set_finished",
 			"reset_demo",
 		]),
-		...mapActions("tutorial", ["completeStep"]),
+		...mapActions("tutorial", ["completeStep", "setGameState"]),
+
 		startEncounter() {
 			this.set_turn({ turn: 0, round: 1 });
 			this.checkReminders(this.next, "startTurn");
@@ -378,6 +379,15 @@ export default {
 		},
 		finish() {
 			this.set_finished();
+		},
+	},
+	watch: {
+		current: {
+			handler(newVal, _) {
+				const entity_type = newVal.entityType === "player" ? "player" : "monster";
+				console.log("Current changed", entity_type);
+				this.setGameState({ game_state_key: "current_entity_type", value: entity_type });
+			},
 		},
 	},
 };

@@ -2,6 +2,9 @@ import Vue from "vue";
 
 const tutorial_state = () => ({
 	follow_tutorial: true,
+	game_state: {
+		current_entity_type: undefined,
+	},
 	build: {
 		name: "Build encounter",
 		steps: [
@@ -206,9 +209,14 @@ const tutorial_getters = {
 	get_tutorial: (state) => (tutorial) => {
 		return state[tutorial];
 	},
+	get_game_state: (state) => (game_state_key) => {
+		return state.game_state[game_state_key];
+	},
 	get_current_step:
-		(state) =>
+		(state, getters) =>
 		(tutorial, active_branch = undefined, transition = false) => {
+			// console.log("get current step ", active_branch);
+			// console.log("gamestate branch", getters.get_game_state("current_entity_type"));
 			const steps = state[tutorial].steps;
 			// const path = `#${tutorial}`;
 			const path = "";
@@ -283,11 +291,17 @@ const tutorial_actions = {
 		// console.log("Complete step:", tutorial, branch, path);
 		commit("SET_COMPLETE", { tutorial, path });
 	},
+	setGameState({ commit }, { game_state_key, value }) {
+		commit("SET_GAME_STATE", { game_state_key, value });
+	},
 };
 
 const tutorial_mutations = {
 	SET_TUTORIAL(state, payload) {
 		Vue.set(state, "follow_tutorial", payload);
+	},
+	SET_GAME_STATE(state, { game_state_key, value }) {
+		Vue.set(state.game_state, game_state_key, value);
 	},
 	SET_COMPLETE(state, { tutorial, path }) {
 		// console.log("SET COMPLETE", tutorial, path);

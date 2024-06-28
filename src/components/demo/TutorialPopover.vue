@@ -126,21 +126,22 @@ export default {
 			}
 		},
 		show() {
-      let show_step = this.requirement
-      ? false
-      : this.get_step(this.tutorial, this.step, this.branch, this.transition);
+			if (!this.follow_tutorial) {
+				return false;
+			}
+
+			if (!this.requirement) {
+				return this.get_step(this.tutorial, this.step, this.branch, this.transition);
+			}
 
 			// If we are in a requirement popover we need to check if this requirement is needed for the current step
-			if (this.requirement && !this.requirement_met) {
-				const requirement = this.get_requirement(this.tutorial, this.requirement);
-				for (const {step, branch, transition} of requirement.required_for) {
-					if (this.get_step(this.tutorial, step,this.branch, transition)) {
-						show_step = true;
-						break;
-					}
-				}
+			if (this.requirement_met) {
+				return false;
 			}
-			return this.follow_tutorial && show_step;
+			const requirement = this.get_requirement(this.tutorial, this.requirement);
+			return requirement.required_for.some(({ step, branch, transition }) =>
+				this.get_step(this.tutorial, step, this.branch, transition)
+			);
 		},
 		name() {
 			return this.get_tutorial(this.tutorial)?.title;

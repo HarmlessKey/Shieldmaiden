@@ -135,7 +135,7 @@ const tutorial_state = () => ({
 								title: "Next Turn",
 								description:
 									"<p>Go to the next turn using the <strong><i class='fas fa-step-forward'></i></strong> button or using the shortcut: [shift]+[→]</p>" +
-									"",
+									"<em><small>(This tutorial step stays active until next step is reached)</small></em>",
 								completed: false,
 							},
 						],

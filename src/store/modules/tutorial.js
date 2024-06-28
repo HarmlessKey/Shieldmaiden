@@ -212,15 +212,13 @@ const tutorial_getters = {
 	get_game_state: (state) => (game_state_key) => {
 		return state.game_state[game_state_key];
 	},
-	get_current_step:
-		(state, getters) =>
-		(tutorial, transition = false) => {
-			const steps = state[tutorial].steps;
-			// const path = `#${tutorial}`;
-			const path = "";
-			const active_branch = getters.get_game_state("current_entity_type");
-			return get_active_step(steps, path, active_branch, transition).step;
-		},
+	get_current_step: (state, getters) => (tutorial) => {
+		const steps = state[tutorial].steps;
+		// const path = `#${tutorial}`;
+		const path = "";
+		const active_branch = getters.get_game_state("current_entity_type");
+		return get_active_step(steps, path, active_branch).step;
+	},
 	get_current_step_path: (state, getters) => (tutorial) => {
 		const steps = state[tutorial].steps;
 		// const path = `#${tutorial}`;
@@ -231,14 +229,11 @@ const tutorial_getters = {
 	get_current_step_index: (state) => (tutorial) => {
 		return state[tutorial]?.steps.findIndex((step) => !step.completed);
 	},
-	get_step:
-		(_state, getters) =>
-		(tutorial, step, transition = false) => {
-			const current_step = getters.get_current_step(tutorial, transition);
-			console.log("GET STEP:", current_step?.key, transition);
-			const at_step = current_step?.key === step;
-			return at_step;
-		},
+	get_step: (_state, getters) => (tutorial, step) => {
+		const current_step = getters.get_current_step(tutorial);
+		const at_step = current_step?.key === step;
+		return at_step;
+	},
 	get_requirement: (state) => (tutorial, requirement) => {
 		return state[tutorial].requirements[requirement];
 	},
@@ -260,7 +255,7 @@ const tutorial_getters = {
 		}
 	},
 };
-const get_active_step = (steps, path, active_branch, transition) => {
+const get_active_step = (steps, path, active_branch) => {
 	const active_steps = steps.filter((step) => !step.completed);
 	if (active_steps.length === 0) {
 		return { step: undefined, path };
@@ -274,26 +269,19 @@ const get_active_step = (steps, path, active_branch, transition) => {
 		return { step: current_step, path };
 	}
 	// Branching
-	const { branch_steps, branch_key } = get_branch_steps(
-		current_step.branch,
-		active_branch,
-		transition
-	);
+	const { branch_steps, branch_key } = get_branch_steps(current_step.branch, active_branch);
 	path += `<${branch_key}`;
-	return get_active_step(branch_steps, path, active_branch, transition);
+	return get_active_step(branch_steps, path, active_branch);
 };
 
-const get_branch_steps = (branches, active_branch, transition) => {
+const get_branch_steps = (branches, active_branch) => {
 	let branch_steps = [];
 	if (!branches.hasOwnProperty(active_branch)) {
 		return { branch_steps, branch_key: undefined };
 	}
 	if (branches[active_branch].completed) {
-		// if (transition) {
 		branch_steps = branches.transition.completed ? [] : branches.transition.steps;
 		return { branch_steps, branch_key: "transition" };
-		// }
-		// return { branch_steps, branch_key: active_branch };
 	}
 	branch_steps = branches[active_branch].steps;
 	return { branch_steps, branch_key: active_branch };
@@ -303,7 +291,7 @@ const tutorial_actions = {
 	toggleTutorial({ state, commit }) {
 		commit("SET_TUTORIAL", !state.follow_tutorial);
 	},
-	completeStep({ commit, getters }, { tutorial, branch }) {
+	completeStep({ commit, getters }, { tutorial }) {
 		const path = getters.get_current_step_path(tutorial);
 		commit("SET_COMPLETE", { tutorial, path });
 	},

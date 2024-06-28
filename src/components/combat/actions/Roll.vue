@@ -410,7 +410,7 @@ export default {
 			this.cancelRoll();
 
 			if (this.get_step("run", "roll", "monster")) {
-				this.completeStep({ tutorial: "run", branch: "monster" });
+				this.completeStep({ tutorial: "run" });
 			}
 		},
 		cancelRoll() {

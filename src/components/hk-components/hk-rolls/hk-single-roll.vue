@@ -124,9 +124,7 @@
 								@keydown.enter="shortkeyApply"
 								@keydown.backspace="removeRoll(index)"
 								@click="
-									get_step('run', 'to-hit', 'monster')
-										? completeStep({ tutorial: 'run', branch: 'monster' })
-										: null
+									get_step('run', 'to-hit', 'monster') ? completeStep({ tutorial: 'run' }) : null
 								"
 							/>
 						</template>
@@ -168,9 +166,7 @@
 								@keydown.enter="shortkeyApply"
 								@keydown.backspace="removeRoll(index)"
 								@click="
-									get_step('run', 'to-hit', 'monster')
-										? completeStep({ tutorial: 'run', branch: 'monster' })
-										: null
+									get_step('run', 'to-hit', 'monster') ? completeStep({ tutorial: 'run' }) : null
 								"
 							/>
 						</template>
@@ -195,11 +191,7 @@
 							:class="{
 								'step-highlight': demo && follow_tutorial && get_step('run', 'details'),
 							}"
-							@click="
-								get_step('run', 'details')
-									? completeStep({ tutorial: 'run', branch: 'monster' })
-									: null
-							"
+							@click="get_step('run', 'details') ? completeStep({ tutorial: 'run' }) : null"
 						>
 							<template #header>
 								<q-item-section v-if="action.type === 'healing'">
@@ -773,7 +765,7 @@ export default {
 				}
 			}
 			if (this.get_step("run", "apply", "monster")) {
-				this.completeStep({ tutorial: "run", branch: "monster" });
+				this.completeStep({ tutorial: "run" });
 			}
 			// Remove the roll
 			this.removeRoll(this.index);
@@ -838,7 +830,7 @@ export default {
 				this.$set(this.resistances, type, resistance);
 			}
 			if (this.get_step("run", "defenses", "monster")) {
-				this.completeStep({ tutorial: "run", branch: "monster" });
+				this.completeStep({ tutorial: "run" });
 			}
 			this.$forceUpdate();
 		},

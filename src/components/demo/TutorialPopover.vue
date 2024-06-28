@@ -26,7 +26,7 @@
 					<button
 						v-if="!no_button"
 						class="btn btn-sm bg-yellow black"
-						@click="completeStep({ tutorial, branch })"
+						@click="completeStep({ tutorial })"
 					>
 						Next <hk-icon icon="fas fa-chevron-right" />
 					</button>
@@ -87,7 +87,7 @@ export default {
 		current_step() {
 			const step = this.requirement
 				? this.get_requirement(this.tutorial, this.requirement)
-				: this.get_current_step(this.tutorial, this.transition);
+				: this.get_current_step(this.tutorial);
 			return step;
 		},
 		anchor() {

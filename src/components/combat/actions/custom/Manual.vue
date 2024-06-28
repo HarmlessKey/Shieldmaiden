@@ -300,7 +300,7 @@ export default {
 
 			// If a value is applied, complete the tutorial step
 			if (this.get_step("run", "manual", "player")) {
-				this.completeStep({ tutorial: "run", branch: "player" });
+				this.completeStep({ tutorial: "run" });
 			}
 		},
 	},

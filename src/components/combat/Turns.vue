@@ -143,7 +143,7 @@
 			<a
 				class="handler neutral-2 ml-2 px-2"
 				:class="{
-					'step-highlight': demo && follow_tutorial && get_step('run', 'next', true),
+					'step-highlight': demo && follow_tutorial && get_step('run', 'next'),
 				}"
 				v-shortkey="['shift', 'arrowright']"
 				@click="nextTurn()"
@@ -382,7 +382,7 @@ export default {
 	watch: {
 		current: {
 			handler(newVal) {
-				const entity_type = newVal.entityType === "player" ? "player" : "monster";
+				const entity_type = newVal?.entityType === "player" ? "player" : "monster";
 				this.setGameState({ game_state_key: "current_entity_type", value: entity_type });
 			},
 			immediate: true,

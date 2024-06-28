@@ -136,7 +136,7 @@
 							<TutorialPopover
 								v-if="group === 'active' && i === 1"
 								tutorial="run"
-								step="target"
+								requirement="target"
 								position="right"
 								:offset="[10, 0]"
 							/>

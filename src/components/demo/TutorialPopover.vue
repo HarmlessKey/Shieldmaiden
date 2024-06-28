@@ -64,6 +64,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		requirement: {
+			type: String,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -71,10 +75,18 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters("tutorial", ["follow_tutorial", "get_current_step", "get_step", "get_tutorial"]),
-		...mapActions(["current"]),
+		...mapGetters("tutorial", [
+			"follow_tutorial",
+			"get_current_step",
+			"get_step",
+			"get_tutorial",
+			"get_requirement",
+		]),
+		...mapGetters(["current", "targeted"]),
 		current_step() {
-			const step = this.get_current_step(this.tutorial, this.branch, this.transition);
+			const step = this.requirement
+				? this.get_requirement(this.tutorial, this.requirement)
+				: this.get_current_step(this.tutorial, this.branch, this.transition);
 			return step;
 		},
 		anchor() {
@@ -105,14 +117,34 @@ export default {
 					return "top middle";
 			}
 		},
+		requirement_met() {
+			switch (this.requirement) {
+				case "target":
+					return !!this.targeted?.length;
+				default:
+					return false;
+			}
+		},
 		show() {
-			return (
-				this.follow_tutorial &&
-				this.get_step(this.tutorial, this.step, this.branch, this.transition)
-			);
+			let show_step = this.requirement
+				? false
+				: this.get_step(this.tutorial, this.step, this.branch, this.transition);
+
+			// If we are in a requirement popover we need to check if this requirement is needed for the current step
+			if (this.requirement && !this.requirement_met) {
+				const requirement = this.get_requirement(this.tutorial, this.requirement);
+				for (const path of requirement.required_for) {
+					const [step, branch] = path.split(".");
+					if (this.get_step(this.tutorial, step, branch)) {
+						show_step = true;
+						break;
+					}
+				}
+			}
+			return this.follow_tutorial && show_step;
 		},
 		name() {
-			return this.get_tutorial(this.tutorial)?.name;
+			return this.get_tutorial(this.tutorial)?.title;
 		},
 		entity_type() {
 			return this.current.entityType === "player" ? "player" : "monster";

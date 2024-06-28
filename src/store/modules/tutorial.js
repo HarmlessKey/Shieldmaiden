@@ -55,13 +55,6 @@ const tutorial_state = () => ({
 		completed: false,
 		steps: [
 			{
-				key: "target",
-				title: "Target entities",
-				description:
-					"<p>Click on an entity to target it.</p> <strong>TIP!</strong> You can select multiple targets at once by holding shift and clicking.",
-				completed: false,
-			},
-			{
 				key: "action",
 				completed: false,
 				completed_after: ["monster", "player"],
@@ -145,10 +138,64 @@ const tutorial_state = () => ({
 			{
 				key: "opportunity",
 				title: "Opportunity attack",
-				description: "When the current entity is finished, go to the next turn.",
+				description:
+					"<p>You can perform an out of turn action at any time during a round.</p>" +
+					"<p>This can be useful for opportunity attacks and legendary actions.</p>" +
+					'For these out of turn actions you first select the target(s) and then click the <strong><i class="fas fa-swords"></i></strong> button. You then select who performs the action.',
+				completed: false,
+			},
+			{
+				key: "conditions",
+				title: "Conditions",
+				description:
+					'You can apply conditions to your target(s) using the <strong><i class="fas fa-flame"></i></strong> button.',
+				completed: false,
+			},
+			{
+				key: "reminders",
+				title: "Reminders",
+				description:
+					"<p>Reminders will notify you when an event is triggered on a target.<p>" +
+					"<p>You can be notified when a <strong>concentrating</strong> target takes damage for instance.<p>" +
+					'You can apply reminders to your target(s) using the <strong><i class="fas fa-stopwatch"></i></strong> button.',
+				completed: false,
+			},
+			{
+				key: "transform",
+				title: "Transform",
+				description:
+					'<p>You can transform a target into another entity using the <strong><i class="fas fa-paw"></i></strong> button.</p>' +
+					"This can used for a druid's <strong>Wildshape</strong> or on the target of a <strong>Polymorph</strong> spell.",
+				completed: false,
+			},
+			{
+				key: "edit",
+				title: "Edit entity",
+				description:
+					"You can manually edit an entity to update their base values, or give them <strong>Armor class bonus</strong>, <strong>Maximum hit points modifier</strong> and <strong>Temporary hit points</strong>",
 				completed: false,
 			},
 		],
+		requirements: {
+			target: {
+				key: "target",
+				title: "Target entities",
+				description:
+					"<p>Click on an entity to target it.</p>" +
+					"<p>Most of the actions you can perform require at least one target.</p>" +
+					"<strong>TIP!</strong> You can select multiple targets at once by holding shift and clicking.",
+				completed: false,
+				required_for: [
+					"roll.monster",
+					"manual.player",
+					"opportunity",
+					"conditions",
+					"reminders",
+					"transform",
+					"edit",
+				],
+			},
+		},
 	},
 });
 
@@ -183,6 +230,9 @@ const tutorial_getters = {
 			const at_step = current_step?.key === step;
 			return at_step;
 		},
+	get_requirement: (state) => (tutorial, requirement) => {
+		return state[tutorial].requirements[requirement];
+	},
 };
 const get_active_step = (steps, path, active_branch, transition) => {
 	const active_steps = steps.filter((step) => !step.completed);

@@ -209,15 +209,13 @@
 										<div
 											class="roll-wrapper"
 											:class="{
-												'step-highlight':
-													demo && follow_tutorial && get_step('run', 'roll', 'monster'),
+												'step-highlight': demo && follow_tutorial && get_step('run', 'roll'),
 											}"
 										>
 											<TutorialPopover
 												v-if="action_index == 0"
 												tutorial="run"
 												step="roll"
-												branch="monster"
 												position="right"
 												:offset="[20, 0]"
 											/>

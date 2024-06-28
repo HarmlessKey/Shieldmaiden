@@ -137,7 +137,6 @@
 								v-if="group === 'active' && i === 1"
 								tutorial="run"
 								requirement="target"
-								:branch="tutorial_branch"
 								position="right"
 								:offset="[10, 0]"
 							/>

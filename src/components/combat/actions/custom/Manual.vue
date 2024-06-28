@@ -29,7 +29,7 @@
 						min="0"
 						class="manual-input"
 						:class="{
-							'step-highlight': demo && follow_tutorial && get_step('run', 'manual', 'player'),
+							'step-highlight': demo && follow_tutorial && get_step('run', 'manual'),
 						}"
 						autocomplete="off"
 						:autofocus="autofocus"
@@ -61,7 +61,7 @@
 						<i aria-hidden="true" class="hki-heal" />
 						<q-tooltip anchor="center right" self="center left">[shift] + [enter]</q-tooltip>
 					</button>
-					<TutorialPopover step="manual" branch="player" position="right" :offset="[10, 0]" />
+					<TutorialPopover step="manual" position="right" :offset="[10, 0]" />
 				</div>
 			</ValidationProvider>
 

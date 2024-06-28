@@ -214,18 +214,18 @@ const tutorial_getters = {
 	},
 	get_current_step:
 		(state, getters) =>
-		(tutorial, active_branch = undefined, transition = false) => {
-			// console.log("get current step ", active_branch);
-			// console.log("gamestate branch", getters.get_game_state("current_entity_type"));
+		(tutorial, transition = false) => {
 			const steps = state[tutorial].steps;
 			// const path = `#${tutorial}`;
 			const path = "";
+			const active_branch = getters.get_game_state("current_entity_type");
 			return get_active_step(steps, path, active_branch, transition).step;
 		},
-	get_current_step_path: (state) => (tutorial, active_branch) => {
+	get_current_step_path: (state, getters) => (tutorial) => {
 		const steps = state[tutorial].steps;
 		// const path = `#${tutorial}`;
 		const path = "";
+		const active_branch = getters.get_game_state("current_entity_type");
 		return get_active_step(steps, path, active_branch).path;
 	},
 	get_current_step_index: (state) => (tutorial) => {
@@ -233,8 +233,9 @@ const tutorial_getters = {
 	},
 	get_step:
 		(_state, getters) =>
-		(tutorial, step, branch = undefined, transition = false) => {
-			const current_step = getters.get_current_step(tutorial, branch, transition);
+		(tutorial, step, transition = false) => {
+			const current_step = getters.get_current_step(tutorial, transition);
+			console.log("GET STEP:", current_step?.key, transition);
 			const at_step = current_step?.key === step;
 			return at_step;
 		},
@@ -288,11 +289,11 @@ const get_branch_steps = (branches, active_branch, transition) => {
 		return { branch_steps, branch_key: undefined };
 	}
 	if (branches[active_branch].completed) {
-		if (transition) {
-			branch_steps = branches.transition.completed ? [] : branches.transition.steps;
-			return { branch_steps, branch_key: "transition" };
-		}
-		return { branch_steps, branch_key: active_branch };
+		// if (transition) {
+		branch_steps = branches.transition.completed ? [] : branches.transition.steps;
+		return { branch_steps, branch_key: "transition" };
+		// }
+		// return { branch_steps, branch_key: active_branch };
 	}
 	branch_steps = branches[active_branch].steps;
 	return { branch_steps, branch_key: active_branch };
@@ -303,9 +304,7 @@ const tutorial_actions = {
 		commit("SET_TUTORIAL", !state.follow_tutorial);
 	},
 	completeStep({ commit, getters }, { tutorial, branch }) {
-		// path = run.action<player.
-		const path = getters.get_current_step_path(tutorial, branch);
-		// console.log("Complete step:", tutorial, branch, path);
+		const path = getters.get_current_step_path(tutorial);
 		commit("SET_COMPLETE", { tutorial, path });
 	},
 	setGameState({ commit }, { game_state_key, value }) {

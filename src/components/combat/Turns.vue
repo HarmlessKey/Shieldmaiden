@@ -143,8 +143,7 @@
 			<a
 				class="handler neutral-2 ml-2 px-2"
 				:class="{
-					'step-highlight':
-						demo && follow_tutorial && get_step('run', 'next', tutorial_branch, true),
+					'step-highlight': demo && follow_tutorial && get_step('run', 'next', true),
 				}"
 				v-shortkey="['shift', 'arrowright']"
 				@click="nextTurn()"
@@ -153,15 +152,13 @@
 				<TutorialPopover
 					tutorial="run"
 					step="next"
-					:branch="tutorial_branch"
-					:transition="true"
 					position="right"
 					:no_button="true"
 					:offset="[10, 0]"
 				/>
 				<i aria-hidden="true" class="fas fa-step-forward" />
 				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [→]</q-tooltip>
-				<TutorialPopover step="next" :offset="[0, 10]" />
+				<TutorialPopover tutorial="initiative" step="next" :offset="[0, 10]" />
 			</a>
 		</div>
 		<div v-else>Set Initiative</div>
@@ -310,6 +307,7 @@ export default {
 			return `/content/campaigns/${this.$route.params.campid}`;
 		},
 		tutorial_branch() {
+			console.log("Tutorial branch", this.current.entityType);
 			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},
@@ -383,11 +381,11 @@ export default {
 	},
 	watch: {
 		current: {
-			handler(newVal, _) {
+			handler(newVal) {
 				const entity_type = newVal.entityType === "player" ? "player" : "monster";
-				console.log("Current changed", entity_type);
 				this.setGameState({ game_state_key: "current_entity_type", value: entity_type });
 			},
+			immediate: true,
 		},
 	},
 };

@@ -87,7 +87,7 @@ export default {
 		current_step() {
 			const step = this.requirement
 				? this.get_requirement(this.tutorial, this.requirement)
-				: this.get_current_step(this.tutorial, this.branch, this.transition);
+				: this.get_current_step(this.tutorial, this.transition);
 			return step;
 		},
 		anchor() {
@@ -124,7 +124,7 @@ export default {
 			}
 
 			if (!this.requirement) {
-				return this.get_step(this.tutorial, this.step, this.branch, this.transition);
+				return this.get_step(this.tutorial, this.step, this.transition);
 			}
 
 			// If we are in a requirement popover we need to check if this requirement is needed for the current step

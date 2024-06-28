@@ -179,7 +179,6 @@
 							v-if="index === 0"
 							tutorial="run"
 							step="to-hit"
-							branch="monster"
 							position="right"
 							:offset="[15, 0]"
 						/>
@@ -194,10 +193,10 @@
 							switch-toggle-side
 							:group="`rolled-${index}`"
 							:class="{
-								'step-highlight': demo && follow_tutorial && get_step('run', 'details', 'monster'),
+								'step-highlight': demo && follow_tutorial && get_step('run', 'details'),
 							}"
 							@click="
-								get_step('run', 'details', 'monster')
+								get_step('run', 'details')
 									? completeStep({ tutorial: 'run', branch: 'monster' })
 									: null
 							"
@@ -213,8 +212,7 @@
 									<div
 										class="defenses"
 										:class="{
-											'step-highlight':
-												demo && follow_tutorial && get_step('run', 'defenses', 'monster'),
+											'step-highlight': demo && follow_tutorial && get_step('run', 'defenses'),
 										}"
 									>
 										<div
@@ -246,7 +244,6 @@
 											v-if="index === 0"
 											tutorial="run"
 											step="defenses"
-											branch="monster"
 											position="left"
 											:offset="[15, 0]"
 										/>
@@ -266,7 +263,6 @@
 									v-if="index === 0"
 									tutorial="run"
 									step="details"
-									branch="monster"
 									position="right"
 									:offset="[10, 0]"
 								/>
@@ -475,7 +471,7 @@
 				slot="footer"
 				class="card-footer"
 				:class="{
-					'step-highlight': demo && follow_tutorial && get_step('run', 'apply', 'monster'),
+					'step-highlight': demo && follow_tutorial && get_step('run', 'apply'),
 				}"
 			>
 				<q-btn
@@ -507,7 +503,6 @@
 					v-if="index === 0"
 					tutorial="run"
 					step="apply"
-					branch="monster"
 					position="right"
 					:offset="[10, 0]"
 				/>

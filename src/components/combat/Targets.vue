@@ -59,7 +59,7 @@
 							:class="{
 								targeted: targeted.includes(entity.key),
 								top: _active[0].key === entity.key && encounter.turn !== 0,
-								'step-highlight': i > 0 && demo && follow_tutorial && get_step('run', 'target'),
+								'step-highlight': i > 0 && demo && follow_tutorial && get_required('run', 'target'),
 							}"
 							tabindex="0"
 							@keydown.space="selectTarget($event, 'single', entity.key)"
@@ -137,7 +137,7 @@
 								v-if="group === 'active' && i === 1"
 								tutorial="run"
 								requirement="target"
-                :branch="tutorial_branch"
+								:branch="tutorial_branch"
 								position="right"
 								:offset="[10, 0]"
 							/>
@@ -178,7 +178,7 @@ export default {
 			"test",
 			"demo",
 		]),
-		...mapGetters("tutorial", ["get_step", "follow_tutorial"]),
+		...mapGetters("tutorial", ["get_required", "follow_tutorial"]),
 		groups() {
 			return [
 				{
@@ -229,7 +229,7 @@ export default {
 				.sortBy("name", "desc")
 				.value();
 		},
-    tutorial_branch() {
+		tutorial_branch() {
 			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},
@@ -288,16 +288,11 @@ export default {
 				type,
 				key,
 			});
-
-			// When an entity is targeted, complete the tutorial step
-			if (this.get_step("run", "target")) {
-				this.completeStep({ tutorial: "run" });
-			}
 		},
 		cycle_target(event) {
 			const lastSelected = this.targeted[this.targeted.length - 1];
 			const type =
-				event.srcKey === "upSingle" || event.srcKey === "downSingle" ? "single" : "multi"; //Multitarget or not
+				event.srcKey === "upSingle" || event.srcKey === "downSingle" ? "single" : "multi"; // Multitarget or not
 			//Create array with keys of all targets
 			const targetsArray = this._targets.map((item) => {
 				return item.key;

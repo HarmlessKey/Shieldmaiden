@@ -241,6 +241,23 @@ const tutorial_getters = {
 	get_requirement: (state) => (tutorial, requirement) => {
 		return state[tutorial].requirements[requirement];
 	},
+	get_required: (_state, getters) => (tutorial, requirement) => {
+		if (getters.requirement_met(requirement)) {
+			return false;
+		}
+		const requirement_step = getters.get_requirement(tutorial, requirement);
+		return requirement_step.required_for.some(({ step, branch, transition }) =>
+			getters.get_step(tutorial, step, branch, transition)
+		);
+	},
+	requirement_met: (state) => (requirement) => {
+		switch (requirement) {
+			case "target":
+				return state.game_state.targeted;
+			default:
+				return false;
+		}
+	},
 };
 const get_active_step = (steps, path, active_branch, transition) => {
 	const active_steps = steps.filter((step) => !step.completed);

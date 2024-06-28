@@ -81,6 +81,7 @@ export default {
 			"get_step",
 			"get_tutorial",
 			"get_requirement",
+			"get_required",
 		]),
 		...mapGetters(["targeted"]),
 		current_step() {
@@ -117,14 +118,6 @@ export default {
 					return "top middle";
 			}
 		},
-		requirement_met() {
-			switch (this.requirement) {
-				case "target":
-					return !!this.targeted?.length;
-				default:
-					return false;
-			}
-		},
 		show() {
 			if (!this.follow_tutorial) {
 				return false;
@@ -135,13 +128,7 @@ export default {
 			}
 
 			// If we are in a requirement popover we need to check if this requirement is needed for the current step
-			if (this.requirement_met) {
-				return false;
-			}
-			const requirement = this.get_requirement(this.tutorial, this.requirement);
-			return requirement.required_for.some(({ step, branch, transition }) =>
-				this.get_step(this.tutorial, step, this.branch, transition)
-			);
+			return this.get_required(this.tutorial, this.requirement);
 		},
 		name() {
 			return this.get_tutorial(this.tutorial)?.title;

@@ -1098,7 +1098,7 @@ const run_encounter_actions = {
 	 * @param {string} type single, multi, untarget
 	 * @param {string} key Entity key, all
 	 */
-	set_targeted({ state, commit }, { type, key }) {
+	set_targeted({ state, commit, dispatch }, { type, key }) {
 		let targeted = state.targeted;
 
 		//Untarget
@@ -1131,6 +1131,10 @@ const run_encounter_actions = {
 				targeted = [];
 			}
 		}
+
+		// set targeted in tutorial game state
+		dispatch("tutorial/setGameState", { game_state_key: "targeted", value: !!targeted?.length });
+
 		commit("SET_TARGETED", targeted);
 	},
 

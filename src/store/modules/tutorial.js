@@ -64,7 +64,7 @@ const tutorial_state = () => ({
 			{
 				key: "action",
 				completed: false,
-				depends_on: ["monster", "player"],
+				completed_after: ["monster", "player"],
 				branch: {
 					player: {
 						completed: false,
@@ -272,7 +272,7 @@ const branch_completed = (branch_reference) => {
 };
 
 const all_branches_completed = (branch_root) => {
-	return branch_root.depends_on.every((branch) => {
+	return branch_root.completed_after.every((branch) => {
 		return branch_root.branch[branch].completed;
 	});
 };

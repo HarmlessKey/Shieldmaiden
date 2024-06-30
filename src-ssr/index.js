@@ -10,7 +10,6 @@
  *   If you are looking to add common DEV & PROD logic to the express app, then use
  *   "src-ssr/extension.js"
  */
-
 const express = require("express");
 const morgan = require("morgan");
 const compression = require("compression");
@@ -64,7 +63,7 @@ app.get(ssr.resolveUrl("*"), (req, res) => {
 	// res.setHeader('X-Content-Type-Options', 'nosniff')
 
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
-	// res.setHeader('Access-Control-Allow-Origin', '*') // one of '*', '<origin>' where origin is one SINGLE origin
+	res.setHeader('Access-Control-Allow-Origin', 'https://harmlesskey.com') // one of '*', '<origin>' where origin is one SINGLE origin
 
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
 	// res.setHeader('X-DNS-Prefetch-Control', 'off') // may be slower, but stops some leaks

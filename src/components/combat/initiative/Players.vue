@@ -2,15 +2,7 @@
 	<div>
 		<ul v-if="entities" class="entities hasImg">
 			<li v-for="(entity, index) in players" :key="entity.key">
-				<span
-					class="img"
-					:style="{
-						'background-image': entity.img ? 'url(' + entity.img + ')' : '',
-						'border-color': entity.color_label ? entity.color_label : ``,
-					}"
-				>
-					<i aria-hidden="true" v-if="!entity.img" :class="`hki-player`" />
-				</span>
+				<TargetAvatar :entity="entity" class="img" :icons="false" />
 				<div class="truncate">
 					{{ entity.name }}
 				</div>
@@ -58,11 +50,13 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import TargetAvatar from "../TargetAvatar.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "SetInitiativePlayer",
 	components: {
+        TargetAvatar,
 		TutorialPopover,
 	},
 	props: ["players"],

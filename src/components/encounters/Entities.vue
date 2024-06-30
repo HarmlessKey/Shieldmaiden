@@ -326,7 +326,7 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" class="p-0" auto-width>
-							<ViewMonster :id="props.key" />
+							<ViewMonster :id="props.key" class="p-0" />
 						</q-td>
 					</q-tr>
 				</template>

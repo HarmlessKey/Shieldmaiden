@@ -6,20 +6,7 @@
 				<h3>{{ type.name.capitalize() }}</h3>
 				<ul>
 					<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
-						<div
-							class="img"
-							:style="{
-								'background-image': 'url(' + entity.img + ')',
-								'border-color': entity.color_label ? entity.color_label : ``,
-								color: entity.color_label ? entity.color_label : ``,
-							}"
-						>
-							<i
-								aria-hidden="true"
-								v-if="!entity.img"
-								:class="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`"
-							/>
-						</div>
+						<TargetAvatar :entity="entity" class="img" :icons="false" />
 						<q-linear-progress
 							size="30px"
 							:color="type.name === 'damage' ? 'negative' : 'positive'"
@@ -53,10 +40,13 @@
 <script>
 import _ from "lodash";
 import { mapGetters } from "vuex";
+import TargetAvatar from "../TargetAvatar.vue";
 
 export default {
 	name: "Dmg",
-
+	components: {
+		TargetAvatar,
+	},
 	data() {
 		return {
 			types: {

@@ -482,6 +482,18 @@ h3 {
 	border-radius: 50%;
 	padding: 5px;
 	margin: -10px;
+
+	&::v-deep {
+		.hk-roll {
+			padding: 10px;
+			margin: -10px;
+			border-radius: 50%;
+
+			&:focus {
+				background: $neutral-5;
+			}
+		}
+	}
 }
 .roll-button {
 	display: inline-block;
@@ -493,15 +505,6 @@ h3 {
 	background-size: cover;
 	vertical-align: -5px;
 	user-select: none;
-}
-.hk-roll {
-	padding: 10px;
-	margin: -10px;
-	border-radius: 50%;
-
-	&:focus {
-		background: $neutral-5;
-	}
 }
 .advantage .roll-button:hover,
 .advantage.hk-roll:focus .roll-button {

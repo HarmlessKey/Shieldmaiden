@@ -6,7 +6,7 @@ const tutorial_state = () => ({
 		current_entity_type: undefined,
 	},
 	build: {
-		name: "Build encounter",
+		title: "Build encounter",
 		steps: [
 			{
 				key: "add-players",
@@ -30,7 +30,7 @@ const tutorial_state = () => ({
 		],
 	},
 	initiative: {
-		name: "Setting initiative",
+		title: "Setting initiative",
 		steps: [
 			{
 				key: "players",
@@ -178,6 +178,11 @@ const tutorial_state = () => ({
 					"You can manually edit an entity to update their base values, or give them <strong>Armor class bonus</strong>, <strong>Maximum hit points modifier</strong> and <strong>Temporary hit points</strong>",
 				completed: false,
 			},
+			{
+				key: "finished",
+				title: "Tutorial finished",
+				completed: false,
+			},
 		],
 		requirements: {
 			target: {
@@ -298,6 +303,7 @@ const tutorial_actions = {
 	setGameState({ commit }, { game_state_key, value }) {
 		commit("SET_GAME_STATE", { game_state_key, value });
 	},
+	resetTutorial({ state, commit }) {},
 };
 
 const tutorial_mutations = {

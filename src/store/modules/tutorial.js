@@ -95,6 +95,9 @@ const TUTORIALS = {
 				completed_after: ["monster", "player"],
 				branch: {
 					player: {
+						title: "Player actions",
+						description:
+							"<p>Input the amount of damage or healing you want to apply to the target(s).</p> Use the <strong>Attack</strong> [Enter] button to damage your targets or the <strong>Heal</strong> [Shift + Enter] button to heal them.",
 						completed: false,
 						steps: [
 							{
@@ -108,6 +111,9 @@ const TUTORIALS = {
 						],
 					},
 					monster: {
+						title: "Monster actions",
+						description:
+							"Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.",
 						completed: false,
 						steps: [
 							{
@@ -315,9 +321,13 @@ const tutorial_getters = {
 				return false;
 		}
 	},
-	get_tutorial_progress: (state, getters) => (tutorial) => {
+	get_tutorial_progress: (state) => (tutorial) => {
 		const steps = state[tutorial].steps;
 		return count_steps(steps);
+	},
+	get_progress_steps: (state) => (tutorial) => {
+		const steps = state[tutorial].steps;
+		return steps_progress(steps);
 	},
 };
 const get_active_step = (steps, path, active_branch) => {
@@ -353,7 +363,7 @@ const get_branch_steps = (branches, active_branch) => {
 };
 
 const count_steps = (steps) => {
-	const step_counts = steps.reduce(
+	return steps.reduce(
 		(counts, step) => {
 			if (!step.branch) {
 				counts.completed += step.completed;
@@ -372,7 +382,22 @@ const count_steps = (steps) => {
 		},
 		{ completed: 0, total: 0 }
 	);
-	return step_counts;
+};
+
+const steps_progress = (steps) => {
+	return steps.reduce((progress, step) => {
+		if (!step.branch) {
+			const { title, completed, description } = step;
+			return progress.concat({ title, completed, description });
+		} else {
+			const branch_step_progress = step.completed_after.map((branch_name) => ({
+				title: step.branch[branch_name].title,
+				completed: step.branch[branch_name].completed,
+				description: step.branch[branch_name].description,
+			}));
+			return progress.concat(branch_step_progress);
+		}
+	}, []);
 };
 
 const tutorial_actions = {

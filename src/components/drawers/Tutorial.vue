@@ -1,20 +1,20 @@
 <template>
 	<div>
-		<button v-if="!follow_tutorial" class="btn bg-neutral-5 mb-3 mr-1" @click="reset">
+		<button v-if="!follow_tutorial" class="btn bg-neutral-5 mb-3 mr-1" @click="resetTutorial()">
 			Reset tutorial
 		</button>
 		<button v-if="!follow_tutorial" class="btn mb-3" @click="toggle">Continue tutorial</button>
-		<h3>{{ full_tutorial.name }}</h3>
+		<h3>{{ tutorial_title }}</h3>
 		<q-stepper v-model="current_step" :dark="$store.getters.theme === 'dark'" vertical animated>
 			<q-step
-				v-for="({ title, description }, i) in full_tutorial.steps"
+				v-for="({ title, completed, description }, i) in tutorial_progress"
 				:name="i"
 				:title="title"
 				done-icon="fas fa-check white"
 				icon="fas fa-exclamation white"
 				active-icon="fas fa-exclamation white"
 				done-color="positive"
-				:done="current_step > i"
+				:done="completed"
 				:key="`step-${i}`"
 			>
 				<div v-html="description" />
@@ -30,7 +30,7 @@
 import { mapActions, mapGetters } from "vuex";
 
 export default {
-	name: "TutorialPopover",
+	name: "TutorialDrawer",
 	props: {
 		data: {
 			type: Object,
@@ -46,22 +46,29 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters("tutorial", ["follow_tutorial", "get_current_step_index", "get_tutorial"]),
+		...mapGetters("tutorial", [
+			"follow_tutorial",
+			"get_current_step_index",
+			"get_tutorial",
+			"get_progress_steps",
+		]),
 		current_step() {
-			return this.get_current_step_index(this.tutorial);
+			return this.tutorial_progress.findIndex((step) => !step.completed);
 		},
-		full_tutorial() {
-			return this.get_tutorial(this.tutorial);
+		tutorial_title() {
+			return this.get_tutorial(this.tutorial)?.title;
+		},
+		tutorial_progress() {
+			return this.get_progress_steps(this.tutorial);
 		},
 	},
 	methods: {
 		...mapActions(["setDrawer"]),
-		...mapActions("tutorial", ["completeStep", "toggleTutorial"]),
+		...mapActions("tutorial", ["completeStep", "toggleTutorial", "resetTutorial"]),
 		toggle() {
 			this.setDrawer({ show: false });
 			this.toggleTutorial();
 		},
-		reset() {},
 	},
 };
 </script>

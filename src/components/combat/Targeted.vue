@@ -175,7 +175,7 @@ export default {
 			options: [
 				{
 					option: "damage",
-					method: () => this.setDrawer({ show: true, type: "drawers/encounter/DamageHealing" }),
+					method: () => this.opportunityAttack(),
 					key: ["shift", "d"],
 					icon: "fa-swords",
 					tooltip: "[shift]+[d] Out of turn damage/healing",
@@ -183,7 +183,7 @@ export default {
 				},
 				{
 					option: "conditions",
-					method: () => this.setDrawer({ show: true, type: "drawers/encounter/Conditions" }),
+					method: () => this.setConditions(),
 					key: ["c"],
 					icon: "fa-flame",
 					tooltip: "[c] Conditions",
@@ -191,8 +191,7 @@ export default {
 				},
 				{
 					option: "reminders",
-					method: () =>
-						this.setDrawer({ show: true, type: "drawers/encounter/reminders/TargetReminders" }),
+					method: () => this.setReminders(),
 					key: ["m"],
 					icon: "fa-stopwatch",
 					tooltip: "[m] Reminders",
@@ -200,8 +199,7 @@ export default {
 				},
 				{
 					option: "transform",
-					method: () =>
-						this.setDrawer({ show: true, type: "drawers/Transform", data: this.target }),
+					method: () => this.transform(),
 					key: ["t"],
 					icon: "fa-paw-claws",
 					tooltip: "[t] Transform",
@@ -216,7 +214,7 @@ export default {
 				},
 				{
 					option: "edit",
-					method: () => this.setDrawer({ show: true, type: "drawers/encounter/EditEntity" }),
+					method: () => this.edit(),
 					key: ["e"],
 					icon: "fa-pencil",
 					tooltip: "[e] Edit",
@@ -331,6 +329,31 @@ export default {
 					? parseInt(this.modifier(entity[ability])) + proficiency
 					: parseInt(this.modifier(entity[ability]));
 			return save > 0 ? `+${save}` : save;
+		},
+		completeTutorialStep(step) {
+			if (this.get_step("run", step)) {
+				this.completeStep({ tutorial: "run" });
+			}
+		},
+		opportunityAttack() {
+			this.setDrawer({ show: true, type: "drawers/encounter/DamageHealing" });
+			this.completeTutorialStep("opportunity");
+		},
+		setConditions() {
+			this.setDrawer({ show: true, type: "drawers/encounter/Conditions" });
+			this.completeTutorialStep("conditions");
+		},
+		setReminders() {
+			this.setDrawer({ show: true, type: "drawers/encounter/reminders/TargetReminders" });
+			this.completeTutorialStep("reminders");
+		},
+		transform() {
+			this.setDrawer({ show: true, type: "drawers/Transform", data: this.target });
+			this.completeTutorialStep("transform");
+		},
+		edit() {
+			this.setDrawer({ show: true, type: "drawers/encounter/EditEntity" });
+			this.completeTutorialStep("edit");
 		},
 	},
 };

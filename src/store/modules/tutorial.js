@@ -114,7 +114,8 @@ const TUTORIALS = {
 								key: "roll",
 								title: "Roll action",
 								description:
-									"Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.",
+									"<p>Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.<p>" +
+									"<strong>TIP!</strong> Targeted actions can be rolled with <strong>advantage</strong> by holding [shift] or with <strong>disadvantage</strong> by holding [ctrl].",
 								action: "Click the button",
 								completed: false,
 							},

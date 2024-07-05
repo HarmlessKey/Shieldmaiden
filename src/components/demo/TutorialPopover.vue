@@ -13,6 +13,7 @@
 			<div class="p-2">
 				<div class="tutorial__header">
 					<span>{{ name }}</span>
+					<div>{{ progress.completed++ }} / {{ progress.total }}</div>
 					<span class="p-1 pointer" @click="stop">
 						<hk-icon icon="fas fa-times-circle" />
 						<q-tooltip anchor="top middle" self="bottom middle">Stop tutorial</q-tooltip>
@@ -88,6 +89,7 @@ export default {
 			"get_tutorial",
 			"get_requirement",
 			"get_required",
+			"get_tutorial_progress",
 		]),
 		...mapGetters(["targeted"]),
 		current_step() {
@@ -95,6 +97,9 @@ export default {
 				? this.get_requirement(this.tutorial, this.requirement)
 				: this.get_current_step(this.tutorial);
 			return step;
+		},
+		progress() {
+			return this.get_tutorial_progress(this.tutorial);
 		},
 		anchor() {
 			switch (this.position) {

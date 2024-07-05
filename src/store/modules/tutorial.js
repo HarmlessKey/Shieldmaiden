@@ -279,6 +279,10 @@ const tutorial_getters = {
 				return false;
 		}
 	},
+	get_tutorial_progress: (state, getters) => (tutorial) => {
+		const steps = state[tutorial].steps;
+		return count_steps(steps);
+	},
 };
 const get_active_step = (steps, path, active_branch) => {
 	const active_steps = steps.filter((step) => !step.completed);
@@ -310,6 +314,29 @@ const get_branch_steps = (branches, active_branch) => {
 	}
 	branch_steps = branches[active_branch].steps;
 	return { branch_steps, branch_key: active_branch };
+};
+
+const count_steps = (steps) => {
+	const step_counts = steps.reduce(
+		(counts, step) => {
+			if (!step.branch) {
+				counts.completed += step.completed;
+				counts.total += 1;
+			} else {
+				const branch_steps = step.completed_after.reduce(
+					(all_steps, branch_name) => all_steps.concat(step.branch[branch_name].steps),
+					[]
+				);
+				const { completed, total } = get_completed_steps(branch_steps);
+				counts.completed += completed;
+				counts.total += total;
+			}
+
+			return counts;
+		},
+		{ completed: 0, total: 0 }
+	);
+	return step_counts;
 };
 
 const tutorial_actions = {

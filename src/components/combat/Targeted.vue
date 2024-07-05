@@ -1,5 +1,12 @@
 <template>
-	<div id="targeted" class="bg-neutral-6-transparent" @focus="$emit('focus')">
+	<div
+		id="targeted"
+		class="bg-neutral-6-transparent"
+		:class="{
+			'step-highlight': demo && follow_tutorial && get_step('run', 'targeted'),
+		}"
+		@focus="$emit('focus')"
+	>
 		<h2 class="componentHeader" :class="{ shadow: setShadow > 0 }">
 			<div class="d-flex justify-content-between">
 				<span><i aria-hidden="true" class="fas fa-crosshairs"></i> Targeted</span>
@@ -148,6 +155,8 @@
 				</div>
 			</div>
 		</q-scroll-area>
+
+		<TutorialPopover tutorial="run" position="right" step="targeted" :offset="[10, 0]" />
 	</div>
 </template>
 

@@ -1,5 +1,12 @@
 <template>
-	<div id="targets" class="bg-neutral-6-transparent" @focus="$emit('focus')">
+	<div
+		id="targets"
+		class="bg-neutral-6-transparent"
+		:class="{
+			'step-highlight': demo && follow_tutorial && get_step('run', 'targets'),
+		}"
+		@focus="$emit('focus')"
+	>
 		<h2 class="componentHeader d-flex justify-content-between" :class="{ shadow: setShadow > 0 }">
 			<span>
 				<i aria-hidden="true" class="fas fa-helmet-battle" /> Targets ({{ _targets.length }})
@@ -145,6 +152,8 @@
 				</template>
 			</div>
 		</q-scroll-area>
+
+		<TutorialPopover tutorial="run" position="right" step="targets" :offset="[10, 0]" />
 	</div>
 </template>
 
@@ -177,7 +186,7 @@ export default {
 			"test",
 			"demo",
 		]),
-		...mapGetters("tutorial", ["get_required", "follow_tutorial"]),
+		...mapGetters("tutorial", ["get_required", "follow_tutorial", "get_step"]),
 		groups() {
 			return [
 				{

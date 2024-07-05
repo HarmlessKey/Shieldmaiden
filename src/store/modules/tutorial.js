@@ -61,6 +61,35 @@ const TUTORIALS = {
 		completed: false,
 		steps: [
 			{
+				key: "current",
+				title: "Current entity",
+				description:
+					"<p>This panel shows the entity who's turn it currently is.</p>" +
+					"<p>From this panel you can perform actions with the current entity, like performing an attack or cast a spell.</p>" +
+					"We'll guide you through the action process in later steps.",
+				next: true,
+				completed: false,
+			},
+			{
+				key: "targets",
+				title: "Targeting",
+				description:
+					"<p>This panel shows the initiative list of the encounter. You can click on entities in the list to target them.</p>" +
+					"Actions of the current entity are performed on the targets you select here.",
+				next: true,
+				completed: false,
+			},
+			{
+				key: "targeted",
+				title: "Targeted entities",
+				description:
+					"<p>In this panel you see all entities you have currently targeted.</p>" +
+					"<p>From this panel you can perform some actions on the targets that are not initiated by the current entity.</p>" +
+					"You can roll ability checks, or saving throws, but also apply conditions or reminders to the targets.",
+				next: true,
+				completed: false,
+			},
+			{
 				key: "action",
 				completed: false,
 				completed_after: ["monster", "player"],
@@ -181,7 +210,7 @@ const TUTORIALS = {
 				title: "Transform",
 				description:
 					'<p>You can transform a target into another entity using the <strong><i class="fas fa-paw"></i></strong> button.</p>' +
-					"This can used for a druid's <strong>Wildshape</strong> or on the target of a <strong>Polymorph</strong> spell.",
+					"This can be used for a druid's <strong>Wildshape</strong> or on the target of a <strong>Polymorph</strong> spell.",
 				next: true,
 				completed: false,
 			},

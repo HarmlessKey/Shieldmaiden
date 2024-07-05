@@ -102,7 +102,7 @@ export default {
 			return this.get_tutorial_progress(this.tutorial);
 		},
 		progress_frac() {
-			return this.progress.completed / this.progress.total;
+			return this.progress.completed / (this.progress.total - 1);
 		},
 		anchor() {
 			switch (this.position) {

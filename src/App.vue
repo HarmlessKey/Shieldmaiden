@@ -34,7 +34,6 @@
 		<q-no-ssr>
 			<vue-snotify />
 			<HkRolls />
-			<CookieConsent />
 		</q-no-ssr>
 
 		<!-- Announcements -->
@@ -62,7 +61,6 @@ import { db } from "./firebase";
 import Header from "./components/Header.vue";
 import Sidebar from "./components/Sidebar.vue";
 import Drawer from "./components/Drawer.vue";
-import CookieConsent from "./components/CookieConsent.vue";
 import { mapActions, mapGetters } from "vuex";
 import HkRolls from "./components/hk-components/hk-rolls";
 import { general } from "./mixins/general";
@@ -78,7 +76,6 @@ export default {
 		navMain: Header,
 		Sidebar,
 		Drawer,
-		CookieConsent,
 		HkRolls,
 		Home,
 	},

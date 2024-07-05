@@ -114,6 +114,16 @@ export default {
 					await this.setUser(result.user);
 					await this.setUserInfo();
 					await this.reinitialize();
+
+					this.$gtm.trackEvent({
+						event: "sign-up",
+						category: "Account",
+						action: "click",
+						label: "Created account",
+						value: "Email and Password",
+						noninteraction: false,
+					});
+
 					this.$router.replace("/content");
 				},
 				(err) => {
@@ -128,6 +138,14 @@ export default {
 			auth
 				.signInWithPopup(provider)
 				.then(() => {
+					this.$gtm.trackEvent({
+						event: "sign-up",
+						category: "Account",
+						action: "click",
+						label: "Created account",
+						value: "Google",
+						noninteraction: false,
+					});
 					this.$router.replace("/set-username");
 				})
 				.catch((err) => {

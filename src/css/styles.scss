@@ -307,6 +307,13 @@ html body {
 			fill: $yellow-light !important;
 		}
 	}
+	.yellow-dark,
+	.text-yellow-dark {
+		color: $yellow-dark !important;
+		path {
+			fill: $yellow-dark !important;
+		}
+	}
 
 	.copper {
 		color: $copper !important;

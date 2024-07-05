@@ -327,7 +327,7 @@ const count_steps = (steps) => {
 					(all_steps, branch_name) => all_steps.concat(step.branch[branch_name].steps),
 					[]
 				);
-				const { completed, total } = get_completed_steps(branch_steps);
+				const { completed, total } = count_steps(branch_steps);
 				counts.completed += completed;
 				counts.total += total;
 			}

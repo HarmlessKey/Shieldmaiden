@@ -9,11 +9,11 @@
 		no-parent-event
 	>
 		<hk-card class="tutorial" no-margin>
-			<!-- <q-linear-progress size="5" color="info" :value="progress(tutorial, step)" /> -->
+			<q-linear-progress size="7px" color="yellow-dark" :value="progress_frac" />
 			<div class="p-2">
 				<div class="tutorial__header">
+					<div>{{ progress.completed + 1 }} / {{ progress.total }}</div>
 					<span>{{ name }}</span>
-					<div>{{ progress.completed++ }} / {{ progress.total }}</div>
 					<span class="p-1 pointer" @click="stop">
 						<hk-icon icon="fas fa-times-circle" />
 						<q-tooltip anchor="top middle" self="bottom middle">Stop tutorial</q-tooltip>
@@ -100,6 +100,9 @@ export default {
 		},
 		progress() {
 			return this.get_tutorial_progress(this.tutorial);
+		},
+		progress_frac() {
+			return this.progress.completed / this.progress.total;
 		},
 		anchor() {
 			switch (this.position) {

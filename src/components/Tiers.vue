@@ -65,6 +65,7 @@
 								target="_blank"
 								rel="noopener"
 								class="btn btn-block btn-square bg-patreon-red"
+								@click="selectTier(t)"
 								>Join {{ t.price }} tier</a
 							>
 						</div>
@@ -134,6 +135,17 @@ export default {
 		storageType(type, count) {
 			type = type === "npcs" ? type.slice(0, -1).toUpperCase() : type.slice(0, -1).capitalize();
 			return count === "infinite" || count > 1 ? `${type}s` : type;
+		},
+		selectTier(t) {
+			console.log(t.name);
+			this.$gtm.trackEvent({
+				event: "subscribe",
+				category: "Subscription",
+				action: "click",
+				label: "Started subscription process",
+				value: t.name,
+				noninteraction: false, // Optional
+			});
 		},
 	},
 };

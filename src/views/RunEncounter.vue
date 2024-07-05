@@ -57,6 +57,7 @@
 							ref="targets"
 							tabindex="0"
 							class="pane"
+							:current="_active[encounter.turn]"
 							:_active="_active"
 							:_idle="_idle"
 							:class="{ focused: focused_pane === 'targets' }"
@@ -107,6 +108,7 @@
 			</template>
 		</div>
 		<DemoOverlay v-if="demo" />
+		<TutorialFinishedDialog v-if="demo" />
 		<q-dialog v-model="demo_dialog" persistent>
 			<hk-card header="Create custom content">
 				<div class="card-body text-center">
@@ -145,6 +147,7 @@ import Side from "src/components/combat/side/Side.vue";
 import SetInitiative from "src/components/combat/initiative";
 import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
 import DemoOverlay from "src/components/combat/DemoOverlay.vue";
+import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
 
 export default {
 	name: "RunEncounter",
@@ -161,6 +164,7 @@ export default {
 		SetInitiative,
 		OverEncumbered,
 		DemoOverlay,
+		TutorialFinishedDialog,
 	},
 	mixins: [audio],
 	data() {

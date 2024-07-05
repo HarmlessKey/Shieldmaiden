@@ -1,5 +1,12 @@
 <template>
-	<div id="targeted" class="bg-neutral-6-transparent" @focus="$emit('focus')">
+	<div
+		id="targeted"
+		class="bg-neutral-6-transparent"
+		:class="{
+			'step-highlight': demo && follow_tutorial && get_step('run', 'targeted'),
+		}"
+		@focus="$emit('focus')"
+	>
 		<h2 class="componentHeader" :class="{ shadow: setShadow > 0 }">
 			<div class="d-flex justify-content-between">
 				<span><i aria-hidden="true" class="fas fa-crosshairs"></i> Targeted</span>
@@ -21,12 +28,15 @@
 				@focus="focusOptions"
 			>
 				<button
-					v-for="({ key, method, icon, tooltip }, i) in display_options"
+					v-for="({ key, method, icon, tooltip, step }, i) in display_options"
 					ref="options"
 					tabindex="-1"
 					class="option"
 					:key="`option-${i}`"
 					v-shortkey="key"
+					:class="{
+						'step-highlight': step && demo && follow_tutorial && get_step('run', step),
+					}"
 					@click="method"
 					@shortkey="method"
 					@keydown.left="cycleOptions(i, 'left')"
@@ -34,6 +44,14 @@
 				>
 					<i aria-hidden="true" class="fas" :class="icon" />
 					<q-tooltip anchor="top middle" self="center middle">{{ tooltip }}</q-tooltip>
+
+					<TutorialPopover
+						v-if="step"
+						tutorial="run"
+						:step="step"
+						position="bottom"
+						:offset="[0, 10]"
+					/>
 				</button>
 			</div>
 		</h2>
@@ -55,7 +73,7 @@
 						<div class="health">
 							<TargetItem :item="key" />
 							<a class="clear" @click="set_targeted({ type: 'untarget', key })">
-								<i aria-hidden="true" class="fas fa-times red"></i>
+								<hk-icon icon="fas fa-times red" />
 								<q-tooltip anchor="top middle" self="center middle"> Untarget </q-tooltip>
 							</a>
 						</div>
@@ -137,6 +155,8 @@
 				</div>
 			</div>
 		</q-scroll-area>
+
+		<TutorialPopover tutorial="run" position="right" step="targeted" :offset="[10, 0]" />
 	</div>
 </template>
 
@@ -147,6 +167,7 @@ import { abilities } from "src/utils/generalConstants";
 import TargetItem from "src/components/combat/TargetItem.vue";
 import TargetInfo from "src/components/combat/TargetInfo.vue";
 import { experience } from "src/mixins/experience.js";
+import TutorialPopover from "../demo/TutorialPopover.vue";
 
 export default {
 	name: "Targeted",
@@ -154,6 +175,7 @@ export default {
 	components: {
 		TargetItem,
 		TargetInfo,
+		TutorialPopover,
 	},
 	data() {
 		return {
@@ -162,33 +184,35 @@ export default {
 			options: [
 				{
 					option: "damage",
-					method: () => this.setDrawer({ show: true, type: "drawers/encounter/DamageHealing" }),
+					method: () => this.opportunityAttack(),
 					key: ["shift", "d"],
 					icon: "fa-swords",
 					tooltip: "[shift]+[d] Out of turn damage/healing",
+					step: "opportunity",
 				},
 				{
 					option: "conditions",
-					method: () => this.setDrawer({ show: true, type: "drawers/encounter/Conditions" }),
+					method: () => this.setConditions(),
 					key: ["c"],
 					icon: "fa-flame",
 					tooltip: "[c] Conditions",
+					step: "conditions",
 				},
 				{
 					option: "reminders",
-					method: () =>
-						this.setDrawer({ show: true, type: "drawers/encounter/reminders/TargetReminders" }),
+					method: () => this.setReminders(),
 					key: ["m"],
 					icon: "fa-stopwatch",
 					tooltip: "[m] Reminders",
+					step: "reminders",
 				},
 				{
 					option: "transform",
-					method: () =>
-						this.setDrawer({ show: true, type: "drawers/Transform", data: this.target }),
+					method: () => this.transform(),
 					key: ["t"],
 					icon: "fa-paw-claws",
 					tooltip: "[t] Transform",
+					step: "transform",
 				},
 				{
 					option: "hide",
@@ -199,16 +223,18 @@ export default {
 				},
 				{
 					option: "edit",
-					method: () => this.setDrawer({ show: true, type: "drawers/encounter/EditEntity" }),
+					method: () => this.edit(),
 					key: ["e"],
 					icon: "fa-pencil",
 					tooltip: "[e] Edit",
+					step: "edit",
 				},
 			],
 		};
 	},
 	computed: {
-		...mapGetters(["encounterId", "entities", "turn", "targeted", "broadcast"]),
+		...mapGetters(["encounterId", "entities", "turn", "targeted", "broadcast", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		shares() {
 			return this.broadcast.shares || [];
 		},
@@ -241,6 +267,7 @@ export default {
 			"set_targetReminder",
 			"set_hidden",
 		]),
+		...mapActions("tutorial", ["completeStep"]),
 		focusOptions() {
 			this.$refs.options[0].focus();
 		},
@@ -311,6 +338,31 @@ export default {
 					? parseInt(this.modifier(entity[ability])) + proficiency
 					: parseInt(this.modifier(entity[ability]));
 			return save > 0 ? `+${save}` : save;
+		},
+		completeTutorialStep(step) {
+			if (this.get_step("run", step)) {
+				this.completeStep({ tutorial: "run" });
+			}
+		},
+		opportunityAttack() {
+			this.setDrawer({ show: true, type: "drawers/encounter/DamageHealing" });
+			this.completeTutorialStep("opportunity");
+		},
+		setConditions() {
+			this.setDrawer({ show: true, type: "drawers/encounter/Conditions" });
+			this.completeTutorialStep("conditions");
+		},
+		setReminders() {
+			this.setDrawer({ show: true, type: "drawers/encounter/reminders/TargetReminders" });
+			this.completeTutorialStep("reminders");
+		},
+		transform() {
+			this.setDrawer({ show: true, type: "drawers/Transform", data: this.target });
+			this.completeTutorialStep("transform");
+		},
+		edit() {
+			this.setDrawer({ show: true, type: "drawers/encounter/EditEntity" });
+			this.completeTutorialStep("edit");
 		},
 	},
 };

@@ -12,13 +12,41 @@
 		<SignedIn v-if="user && demo" />
 		<div class="d-flex justify-between items-center gap-1 mb-3">
 			<slot />
-			<h1 class="written mb-0 flex-grow truncate">
+			<h1 class="written mb-0 flex-grow truncate d-none d-md-flex">
 				{{ demo ? "Encounter builder for D&D" : encounter.name }}
 			</h1>
-			<button class="btn" :disabled="!validEncounter" @click="runEncounter">
-				{{ demo ? "Run" : "Test" }} encounter
-				<i class="fas ml-2" :class="demo ? 'fa-sword rotate' : 'fa-flask'" aria-hidden="true" />
-			</button>
+			<div>
+				<transition
+					v-if="demo"
+					name="slide"
+					enter-active-class="animated animate__slideInRight"
+					leave-active-class="animated animate__slideOutRight"
+				>
+					<button
+						v-show="!follow_tutorial"
+						class="btn bg-yellow-light black mr-2"
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/Tutorial',
+								data: { tutorial: 'build' },
+							})
+						"
+					>
+						<hk-icon icon="fas fa-exclamation" />
+					</button>
+				</transition>
+				<button
+					class="btn"
+					:disabled="!validEncounter"
+					:class="{ 'step-highlight': demo && follow_tutorial && get_step('build', 'start') }"
+					@click="runEncounter"
+				>
+					{{ demo ? "Run" : "Test" }} encounter
+					<i class="fas ml-2" :class="demo ? 'fa-sword rotate' : 'fa-flask'" aria-hidden="true" />
+					<TutorialPopover v-if="demo" tutorial="build" step="start" :offset="[0, 10]" />
+				</button>
+			</div>
 		</div>
 		<div class="wrapper">
 			<hk-card>
@@ -80,6 +108,7 @@ import Overview from "./Overview.vue";
 import General from "./General.vue";
 import { mapGetters, mapActions } from "vuex";
 import SignedIn from "src/components/userContent/SignedIn.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "EditEncounter",
@@ -90,6 +119,7 @@ export default {
 		Overview,
 		General,
 		SignedIn,
+		TutorialPopover,
 	},
 	data() {
 		return {
@@ -108,6 +138,7 @@ export default {
 	computed: {
 		...mapGetters(["overencumbered"]),
 		...mapGetters("encounters", ["demo_encounter"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		tabs() {
 			let tabs = {
 				entities: { name: "entities", label: "Entities", icon: "fas fa-helmet-battle" },
@@ -160,6 +191,7 @@ export default {
 		this.loading = false;
 	},
 	methods: {
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign"]),
 		...mapActions("encounters", ["get_encounter", "set_demo_encounter"]),
 		...mapActions("players", ["get_player"]),

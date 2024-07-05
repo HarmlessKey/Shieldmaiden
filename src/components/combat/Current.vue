@@ -1,5 +1,13 @@
 <template>
-	<div v-if="current" id="current" class="bg-neutral-6-transparent" @focus="$emit('focus')">
+	<div
+		v-if="current"
+		id="current"
+		class="bg-neutral-6-transparent"
+		:class="{
+			'step-highlight': demo && follow_tutorial && get_step('run', 'current'),
+		}"
+		@focus="$emit('focus')"
+	>
 		<h2 class="componentHeader" :class="{ shadow: setShadow > 0 }">
 			<span>
 				<i aria-hidden="true" v-if="current.hidden" class="fas fa-eye-slash red"></i>
@@ -41,6 +49,8 @@
 				<Actions :current="current" />
 			</div>
 		</q-scroll-area>
+
+		<TutorialPopover tutorial="run" step="current" position="right" :offset="[10, 0]" />
 	</div>
 </template>
 
@@ -54,6 +64,7 @@ import { dice } from "src/mixins/dice";
 import TargetItem from "src/components/combat/TargetItem.vue";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
 import ViewEntity from "./ViewEntity.vue";
+import TutorialPopover from "../demo/TutorialPopover.vue";
 
 export default {
 	name: "Current",
@@ -65,6 +76,7 @@ export default {
 		TargetItem,
 		DeathSaves,
 		ViewEntity,
+		TutorialPopover,
 	},
 	props: ["current", "next", "settings"],
 	data() {
@@ -142,7 +154,8 @@ export default {
 		},
 	},
 	computed: {
-		...mapGetters(["entities", "round", "turn", "targeted", "show_monster_card"]),
+		...mapGetters(["entities", "round", "turn", "targeted", "show_monster_card", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		showCard: {
 			get() {
 				const show = this.current.entityType === "npc" && this.show_monster_card ? true : false;

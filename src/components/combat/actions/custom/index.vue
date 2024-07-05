@@ -10,7 +10,7 @@
 			/>
 		</q-tabs>
 
-		<q-tab-panels v-model="tab" class="bg-transparent">
+		<q-tab-panels v-model="tab" class="bg-transparent overflow-visible">
 			<q-tab-panel :name="name" v-for="{ name } in tabs" :key="`panel-${name}`">
 				<Manual v-if="name === 'manual'" :current="current" :autofocus="autofocus" />
 				<CustomRoll v-if="name === 'roll'" :current="current" />
@@ -45,5 +45,13 @@ export default {
 <style lang="scss" scoped>
 .q-tab-panel {
 	padding: 15px 0;
+}
+.overflow-visible {
+	overflow: visible;
+	&::v-deep {
+		.q-panel {
+			overflow: visible;
+		}
+	}
 }
 </style>

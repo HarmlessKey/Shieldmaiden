@@ -131,7 +131,10 @@
 				<NPCs :npcs="_npcs" />
 			</q-tab-panel>
 			<q-tab-panel name="overview">
-				<a class="btn btn-block mb-3" @click="set_turn({ turn: 0, round: 1 })"> Start encounter </a>
+				<a class="btn btn-block mb-3" @click="set_turn({ turn: 0, round: 1 })">
+					Start encounter
+					<TutorialPopover tutorial="initiative" step="start" :offset="[0, 10]" />
+				</a>
 				<Overview :active="_active" :idle="_idle" />
 			</q-tab-panel>
 		</q-tab-panels>
@@ -146,6 +149,7 @@ import Turns from "src/components/combat/Turns.vue";
 import Players from "./Players.vue";
 import NPCs from "./NPCs.vue";
 import Overview from "./Overview.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "SetInitiative",
@@ -155,6 +159,7 @@ export default {
 		Players,
 		NPCs,
 		Overview,
+		TutorialPopover,
 	},
 	data() {
 		return {
@@ -187,6 +192,7 @@ export default {
 	},
 	computed: {
 		...mapGetters(["campaignId", "encounterId", "encounter", "entities", "path"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		_players: function () {
 			return _.chain(this.entities)
 				.filter(function (entity, key) {

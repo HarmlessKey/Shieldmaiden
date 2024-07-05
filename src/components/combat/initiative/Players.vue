@@ -56,10 +56,15 @@ import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 export default {
 	name: "SetInitiativePlayer",
 	components: {
-        TargetAvatar,
+		TargetAvatar,
 		TutorialPopover,
 	},
 	props: ["players"],
+	data() {
+		return {
+			completed: false,
+		};
+	},
 	computed: {
 		...mapGetters(["campaignId", "encounterId", "entities", "path", "demo"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
@@ -72,10 +77,14 @@ export default {
 
 			// If initiative has been set for all players, complete the tutorial step
 			if (
+				!this.completed &&
 				!this.players.find((player) => !player.initiative) &&
 				this.get_step("initiative", "players")
 			) {
-				this.completeStep({ tutorial: "initiative" });
+				this.completed = true;
+				setTimeout(() => {
+					this.completeStep({ tutorial: "initiative" });
+				}, 500);
 			}
 		},
 	},

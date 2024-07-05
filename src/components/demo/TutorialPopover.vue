@@ -13,8 +13,12 @@
 			<q-linear-progress size="7px" color="yellow-dark" :value="progress_frac" />
 			<div class="p-2">
 				<div class="tutorial__header">
-					<div>{{ progress.completed + 1 }} / {{ progress.total }}</div>
-					<span class="flex-grow">{{ name }}</span>
+					<small
+						><strong>
+							<span class="mr-2">{{ progress.completed + 1 }} / {{ progress.total }}</span>
+							<span class="flex-grow">{{ name }}</span>
+						</strong></small
+					>
 					<span class="p-1 pointer" @click="stop">
 						<hk-icon icon="fas fa-times-circle" />
 						<q-tooltip anchor="top middle" self="bottom middle">Stop tutorial</q-tooltip>

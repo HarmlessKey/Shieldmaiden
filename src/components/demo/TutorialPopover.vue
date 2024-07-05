@@ -1,5 +1,5 @@
 <template>
-	<q-menu
+	<q-popup-proxy
 		v-model="show"
 		v-bind="$attrs"
 		:dark="$store.getters.theme === 'dark'"
@@ -22,18 +22,24 @@
 					{{ current_step?.title }}
 				</div>
 				<p v-html="current_step?.description" />
-				<div class="d-flex justify-content-end items-center gap-1">
-					<button
-						v-if="!no_button"
-						class="btn btn-sm bg-yellow black"
-						@click="completeStep({ tutorial })"
-					>
-						Next <hk-icon icon="fas fa-chevron-right" />
-					</button>
+				<div class="d-flex justify-content-between items-center gap-1">
+					<div class="tutorial__action" v-html="current_step.action" />
+					<div>
+						<button
+							v-if="current_step.next"
+							class="btn btn-sm bg-yellow black d-none d-md-block"
+							@click="completeStep({ tutorial })"
+						>
+							Next <hk-icon icon="fas fa-chevron-right" />
+						</button>
+						<button class="btn btn-sm bg-yellow black d-block d-md-none" @click="hideOrNext">
+							{{ current_step.next ? "Next" : "Hide" }}
+						</button>
+					</div>
 				</div>
 			</div>
 		</hk-card>
-	</q-menu>
+	</q-popup-proxy>
 </template>
 
 <script>
@@ -118,17 +124,26 @@ export default {
 					return "top middle";
 			}
 		},
-		show() {
-			if (!this.follow_tutorial) {
-				return false;
-			}
+		show: {
+			get() {
+				if (this.stepSetter !== undefined) {
+					return this.stepSetter;
+				}
 
-			if (!this.requirement) {
-				return this.get_step(this.tutorial, this.step, this.transition);
-			}
+				if (!this.follow_tutorial) {
+					return false;
+				}
 
-			// If we are in a requirement popover we need to check if this requirement is needed for the current step
-			return this.get_required(this.tutorial, this.requirement);
+				if (!this.requirement) {
+					return this.get_step(this.tutorial, this.step, this.transition);
+				}
+
+				// If we are in a requirement popover we need to check if this requirement is needed for the current step
+				return this.get_required(this.tutorial, this.requirement);
+			},
+			set(newVal) {
+				this.stepSetter = newVal;
+			},
 		},
 		name() {
 			return this.get_tutorial(this.tutorial)?.title;
@@ -138,6 +153,9 @@ export default {
 		...mapActions("tutorial", ["completeStep", "toggleTutorial"]),
 		stop() {
 			this.toggleTutorial();
+		},
+		hideOrNext() {
+			this.current_step.next ? this.completeStep() : (this.show = false);
 		},
 	},
 };
@@ -159,6 +177,9 @@ export default {
 		align-items: center;
 	}
 	&__title {
+		font-weight: bold;
+	}
+	&__action {
 		font-weight: bold;
 	}
 }

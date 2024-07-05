@@ -12,7 +12,7 @@
 		<SignedIn v-if="user && demo" />
 		<div class="d-flex justify-between items-center gap-1 mb-3">
 			<slot />
-			<h1 class="written mb-0 flex-grow truncate">
+			<h1 class="written mb-0 flex-grow truncate d-none d-md-flex">
 				{{ demo ? "Encounter builder for D&D" : encounter.name }}
 			</h1>
 			<div>

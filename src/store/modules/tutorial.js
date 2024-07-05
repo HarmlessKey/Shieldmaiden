@@ -12,6 +12,7 @@ const tutorial_state = () => ({
 				key: "add-players",
 				title: "Add players",
 				description: "Let's start with adding some players to your encounter.",
+				action: "Click Add players",
 				completed: false,
 			},
 			{
@@ -19,12 +20,15 @@ const tutorial_state = () => ({
 				title: "Add monsters",
 				description:
 					"<p>Now let's give those players a challenge by adding some monsters.</p> The plus buttons adds them with average hit point, the D20 button rolls the hit points.",
+				action: 'Click <i class="fas fa-plus"></i> or <i class="fas fa-dice-d20"></i>',
 				completed: false,
 			},
 			{
 				key: "start",
 				title: "Ready to go!",
-				description: "If you added at least 1 player and 1 monster, you can start your encounter.",
+				description:
+					"You can add as many monsters and players as you like. When you're ready, you can start the encounter.",
+				action: "Click Run encounter",
 				completed: false,
 			},
 		],
@@ -37,18 +41,21 @@ const tutorial_state = () => ({
 				title: "Player initiative",
 				description:
 					"<p>Your players will want to roll their own initiative, therefore we input it manually here.</p> Use tab to skip to the next player.",
+				action: "Enter initiative",
 				completed: false,
 			},
 			{
 				key: "monsters",
 				title: "Monster initiative",
 				description: "Monster initiative can be rolled individually or all at once with one click.",
+				action: "Click Roll all",
 				completed: false,
 			},
 			{
 				key: "start",
 				title: "Start combat!",
 				description: "With the turn order decided, you can start the encounter!",
+				action: "Click Start encounter",
 				completed: false,
 			},
 		],
@@ -70,6 +77,7 @@ const tutorial_state = () => ({
 								title: "Input value",
 								description:
 									"<p>Input the amount of damage or healing you want to apply to the target(s).</p> Use the <strong>Attack</strong> [Enter] button to damage your targets or the <strong>Heal</strong> [Shift + Enter] button to heal them.",
+								action: "Enter value and click Attack or Heal",
 								completed: false,
 							},
 						],
@@ -82,6 +90,7 @@ const tutorial_state = () => ({
 								title: "Roll action",
 								description:
 									"Select an action you want to roll and click the <strong>D20</strong> to automatically roll the action.",
+								action: "Click the button",
 								completed: false,
 							},
 							{
@@ -91,6 +100,7 @@ const tutorial_state = () => ({
 									"<p>We automatically determine if your roll was a hit or miss, based on the target's AC. You can always turn a hit into miss manually.</p>" +
 									"<p>For Saving Throw actions you have to manually set it as a success or fail.</p>" +
 									"This does not apply for <strong>healing</strong> actions.",
+								next: true,
 								completed: false,
 							},
 							{
@@ -100,6 +110,7 @@ const tutorial_state = () => ({
 									"<p>With the <strong>V</strong>ulnerable, <strong>R</strong>esistent and <strong>I</strong>mmune buttons you can update a target's defenses for the damage type of the current attack.</p>" +
 									"<p>Monsters and Players can have their defenses set before hand, but it can always be overruled for any roll you make.<p>" +
 									"This does not apply for <strong>healing</strong> actions.",
+								next: true,
 								completed: false,
 							},
 							{
@@ -108,6 +119,7 @@ const tutorial_state = () => ({
 								description:
 									"<p>Click on the row to show details about the roll.</p>" +
 									"<strong>TIP</strong> From the details you can  reroll any die you want.",
+								next: true,
 								completed: false,
 							},
 							{
@@ -119,6 +131,7 @@ const tutorial_state = () => ({
 									"<strong>Half</strong> Apply half of the total value (rounded down).<br/>" +
 									"<strong>Double</strong> Apply the total value multiplied by 2.<br/>" +
 									'<strong><i class="fas fa-times"></i></strong> Do not apply the value.',
+								action: "Click Full, Half or Double",
 								completed: false,
 							},
 						],
@@ -132,6 +145,7 @@ const tutorial_state = () => ({
 								description:
 									"<p>Go to the next turn using the <strong><i class='fas fa-step-forward'></i></strong> button or using the shortcut: [shift]+[→]</p>" +
 									"<em><small>(This tutorial step stays active until next step is reached)</small></em>",
+								action: 'Click <i class="fas fa-step-forward"></i>',
 								completed: false,
 							},
 						],
@@ -145,6 +159,7 @@ const tutorial_state = () => ({
 					"<p>You can perform an out of turn action at any time during a round.</p>" +
 					"<p>This can be useful for opportunity attacks and legendary actions.</p>" +
 					'For these out of turn actions you first select the target(s) and then click the <strong><i class="fas fa-swords"></i></strong> button. You then select who performs the action.',
+				next: true,
 				completed: false,
 			},
 			{
@@ -152,6 +167,7 @@ const tutorial_state = () => ({
 				title: "Conditions",
 				description:
 					'You can apply conditions to your target(s) using the <strong><i class="fas fa-flame"></i></strong> button.',
+				next: true,
 				completed: false,
 			},
 			{
@@ -161,6 +177,7 @@ const tutorial_state = () => ({
 					"<p>Reminders will notify you when an event is triggered on a target.<p>" +
 					"<p>You can be notified when a <strong>concentrating</strong> target takes damage for instance.<p>" +
 					'You can apply reminders to your target(s) using the <strong><i class="fas fa-stopwatch"></i></strong> button.',
+				next: true,
 				completed: false,
 			},
 			{
@@ -169,6 +186,7 @@ const tutorial_state = () => ({
 				description:
 					'<p>You can transform a target into another entity using the <strong><i class="fas fa-paw"></i></strong> button.</p>' +
 					"This can used for a druid's <strong>Wildshape</strong> or on the target of a <strong>Polymorph</strong> spell.",
+				next: true,
 				completed: false,
 			},
 			{
@@ -176,6 +194,7 @@ const tutorial_state = () => ({
 				title: "Edit entity",
 				description:
 					"You can manually edit an entity to update their base values, or give them <strong>Armor class bonus</strong>, <strong>Maximum hit points modifier</strong> and <strong>Temporary hit points</strong>",
+				next: true,
 				completed: false,
 			},
 			{
@@ -193,6 +212,7 @@ const tutorial_state = () => ({
 					"<p>Most of the actions you can perform require at least one target.</p>" +
 					"<strong>TIP!</strong> You can select multiple targets at once by holding shift and clicking.",
 				completed: false,
+				action: "Click a target",
 				required_for: [
 					{ step: "roll", branch: "monster", transition: true },
 					{ step: "manual", branch: "player", transition: true },

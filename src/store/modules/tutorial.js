@@ -1,10 +1,6 @@
 import Vue from "vue";
 
-const tutorial_state = () => ({
-	follow_tutorial: true,
-	game_state: {
-		current_entity_type: undefined,
-	},
+const TUTORIALS = {
 	build: {
 		title: "Build encounter",
 		steps: [
@@ -225,6 +221,16 @@ const tutorial_state = () => ({
 			},
 		},
 	},
+};
+
+const tutorial_state = () => ({
+	follow_tutorial: true,
+	game_state: {
+		current_entity_type: undefined,
+	},
+	build: TUTORIALS.build,
+	initiative: TUTORIALS.initiative,
+	run: TUTORIALS.run,
 });
 
 const tutorial_getters = {
@@ -350,12 +356,19 @@ const tutorial_actions = {
 	setGameState({ commit }, { game_state_key, value }) {
 		commit("SET_GAME_STATE", { game_state_key, value });
 	},
-	resetTutorial({ state, commit }) {},
+	resetTutorial({ commit }) {
+		Object.keys(TUTORIALS).forEach((tutorial_name) => {
+			commit("RESET_TUTORIAL", tutorial_name);
+		});
+	},
 };
 
 const tutorial_mutations = {
 	SET_TUTORIAL(state, payload) {
 		Vue.set(state, "follow_tutorial", payload);
+	},
+	RESET_TUTORIAL(state, tutorial_name) {
+		Vue.set(state, tutorial_name, TUTORIALS[tutorial_name]);
 	},
 	SET_GAME_STATE(state, { game_state_key, value }) {
 		Vue.set(state.game_state, game_state_key, value);

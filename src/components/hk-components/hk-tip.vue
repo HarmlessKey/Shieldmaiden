@@ -65,7 +65,8 @@ export default {
 	.tip {
 		display: flex;
 		justify-content: space-between;
-		border-left: solid 8px $yellow;
+    border:solid 1px $yellow;
+		border-left-width: 8px;
 		padding: 5px;
 		background-color: rgba(0, 0, 0, .2);
 		margin-bottom: 20px;

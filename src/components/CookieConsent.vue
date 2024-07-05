@@ -16,7 +16,6 @@
 
 <script>
 import { Cookies } from "quasar";
-import { bootstrap } from "vue-gtag";
 
 export default {
 	name: "CookieConsent",
@@ -36,9 +35,6 @@ export default {
 					Cookies.remove(cookie, { domain: ".shieldmaiden.app", path: "/" });
 				}
 			} else {
-				bootstrap().then((gtag) => {
-					console.log("bootstrapped", gtag);
-				});
 				this.$gtm.enable(true);
 			}
 			this.show_banner = false;

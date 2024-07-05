@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import general from "./modules/general";
+import tutorial from "./modules/tutorial";
 import tips from "./modules/tips";
 import { run_encounter } from "./modules/runEncounter";
 import user from "./modules/user";
@@ -33,6 +34,7 @@ export default function () {
 	return new Vuex.Store({
 		modules: {
 			general: general,
+			tutorial: tutorial,
 			tips: tips,
 			user: user,
 			encounter: run_encounter,

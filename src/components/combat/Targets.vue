@@ -1,5 +1,12 @@
 <template>
-	<div id="targets" class="bg-neutral-6-transparent" @focus="$emit('focus')">
+	<div
+		id="targets"
+		class="bg-neutral-6-transparent"
+		:class="{
+			'step-highlight': demo && follow_tutorial && get_step('run', 'targets'),
+		}"
+		@focus="$emit('focus')"
+	>
 		<h2 class="componentHeader d-flex justify-content-between" :class="{ shadow: setShadow > 0 }">
 			<span>
 				<i aria-hidden="true" class="fas fa-helmet-battle" /> Targets ({{ _targets.length }})
@@ -42,6 +49,7 @@
 						<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" />
 						{{ group.capitalize() }} ({{ targets.length }})
 					</h2>
+
 					<transition-group
 						:key="group"
 						tag="ul"
@@ -58,6 +66,7 @@
 							:class="{
 								targeted: targeted.includes(entity.key),
 								top: _active[0].key === entity.key && encounter.turn !== 0,
+								'step-highlight': i > 0 && demo && follow_tutorial && get_required('run', 'target'),
 							}"
 							tabindex="0"
 							@keydown.space="selectTarget($event, 'single', entity.key)"
@@ -82,7 +91,6 @@
 									</span>
 								</div>
 							</span>
-
 							<div
 								class="target"
 								v-touch-hold.mouse="(event) => selectTarget(event, 'multi', entity.key)"
@@ -92,7 +100,6 @@
 							>
 								<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
 							</div>
-
 							<div v-if="!entity.active" class="d-flex">
 								<a
 									class="btn btn-sm btn-clear mx-1"
@@ -133,11 +140,20 @@
 									<target-menu :entity="entity" />
 								</q-popup-proxy>
 							</a>
+							<TutorialPopover
+								v-if="group === 'active' && i === 1"
+								tutorial="run"
+								requirement="target"
+								position="right"
+								:offset="[10, 0]"
+							/>
 						</li>
 					</transition-group>
 				</template>
 			</div>
 		</q-scroll-area>
+
+		<TutorialPopover tutorial="run" position="right" step="targets" :offset="[10, 0]" />
 	</div>
 </template>
 
@@ -146,11 +162,12 @@ import _ from "lodash";
 import { mapGetters, mapActions } from "vuex";
 import TargetItem from "src/components/combat/TargetItem.vue";
 import TargetMenu from "src/components/combat/TargetMenu.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Targets",
-	components: { TargetItem, TargetMenu },
-	props: ["_active", "_idle"],
+	components: { TargetItem, TargetMenu, TutorialPopover },
+	props: ["current", "_active", "_idle"],
 	data() {
 		return {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
@@ -167,7 +184,9 @@ export default {
 			"targeted",
 			"userSettings",
 			"test",
+			"demo",
 		]),
+		...mapGetters("tutorial", ["get_required", "follow_tutorial", "get_step"]),
 		groups() {
 			return [
 				{
@@ -218,6 +237,9 @@ export default {
 				.sortBy("name", "desc")
 				.value();
 		},
+		tutorial_branch() {
+			return this.current.entityType === "player" ? "player" : "monster";
+		},
 	},
 	methods: {
 		...mapActions([
@@ -228,6 +250,7 @@ export default {
 			"remove_entity",
 			"add_next_round",
 		]),
+		...mapActions("tutorial", ["completeStep"]),
 		setHidden(key, hidden) {
 			if (key) {
 				this.set_hidden({
@@ -277,7 +300,7 @@ export default {
 		cycle_target(event) {
 			const lastSelected = this.targeted[this.targeted.length - 1];
 			const type =
-				event.srcKey === "upSingle" || event.srcKey === "downSingle" ? "single" : "multi"; //Multitarget or not
+				event.srcKey === "upSingle" || event.srcKey === "downSingle" ? "single" : "multi"; // Multitarget or not
 			//Create array with keys of all targets
 			const targetsArray = this._targets.map((item) => {
 				return item.key;

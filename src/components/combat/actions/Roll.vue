@@ -197,7 +197,6 @@
 										</q-item-label>
 									</q-item-section>
 									<q-item-section
-										avatar
 										v-if="
 											action.action_list &&
 											action.action_list[0] &&
@@ -205,16 +204,31 @@
 											action.action_list[0].rolls &&
 											action.action_list[0].rolls.length
 										"
+										avatar
 									>
-										<hk-roll-action
-											:ref="action_index"
-											:action="action"
-											:tooltip="`Roll ${action.name}`"
-											@roll="startRoll(...arguments, action_index, action, type)"
-											:disabled="!checkAvailable(type, action_index, action)"
+										<div
+											class="roll-wrapper"
+											:class="{
+												'step-highlight': demo && follow_tutorial && get_step('run', 'roll'),
+											}"
 										>
-											<span class="roll-button" />
-										</hk-roll-action>
+											<TutorialPopover
+												v-if="action_index == 0"
+												tutorial="run"
+												step="roll"
+												position="right"
+												:offset="[20, 0]"
+											/>
+											<hk-roll-action
+												:ref="action_index"
+												:action="action"
+												:tooltip="`Roll ${action.name}`"
+												@roll="startRoll(...arguments, action_index, action, type)"
+												:disabled="!checkAvailable(type, action_index, action)"
+											>
+												<span class="roll-button" />
+											</hk-roll-action>
+										</div>
 									</q-item-section>
 									<!-- Spend limited actions that can't be rolled -->
 									<q-item-section
@@ -308,12 +322,14 @@ import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Projectiles from "./Projectiles";
 import { isNil } from "lodash";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Roll",
 	mixins: [setHP, runEncounter],
 	components: {
 		Projectiles,
+		TutorialPopover,
 	},
 	props: ["current"],
 	data() {
@@ -335,7 +351,8 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["encounter", "targeted"]),
+		...mapGetters(["encounter", "targeted", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		tab: {
 			get() {
 				let tab = "actions";
@@ -358,6 +375,7 @@ export default {
 	methods: {
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		...mapActions("campaigns", ["set_share"]),
+		...mapActions("tutorial", ["completeStep"]),
 		focusButton(i) {
 			const button = this.$refs[i]?.[0]?.$el;
 			button?.focus();
@@ -390,6 +408,10 @@ export default {
 				option: this.rollObject.option,
 			});
 			this.cancelRoll();
+
+			if (this.get_step("run", "roll", "monster")) {
+				this.completeStep({ tutorial: "run" });
+			}
 		},
 		cancelRoll() {
 			this.projectile_dialog = false;
@@ -456,6 +478,23 @@ h3 {
 .is-disabled {
 	opacity: 0.3;
 }
+.roll-wrapper {
+	border-radius: 50%;
+	padding: 5px;
+	margin: -10px;
+
+	&::v-deep {
+		.hk-roll {
+			padding: 10px;
+			margin: -10px;
+			border-radius: 50%;
+
+			&:focus {
+				background: $neutral-5;
+			}
+		}
+	}
+}
 .roll-button {
 	display: inline-block;
 	cursor: pointer;
@@ -466,15 +505,6 @@ h3 {
 	background-size: cover;
 	vertical-align: -5px;
 	user-select: none;
-}
-.hk-roll {
-	padding: 10px;
-	margin: -10px;
-	border-radius: 50%;
-
-	&:focus {
-		background: $neutral-5;
-	}
 }
 .advantage .roll-button:hover,
 .advantage.hk-roll:focus .roll-button {

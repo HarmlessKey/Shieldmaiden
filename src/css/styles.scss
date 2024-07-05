@@ -307,6 +307,13 @@ html body {
 			fill: $yellow-light !important;
 		}
 	}
+	.yellow-dark,
+	.text-yellow-dark {
+		color: $yellow-dark !important;
+		path {
+			fill: $yellow-dark !important;
+		}
+	}
 
 	.copper {
 		color: $copper !important;
@@ -864,6 +871,11 @@ html body {
 		}
 	}
 
+	.step-highlight {
+		outline: $yellow-light solid 2px;
+		outline-offset: 2px;
+	}
+
 	.hk-layout {
 		min-height: calc(100vh - #{$header-height});
 		display: grid;
@@ -1364,7 +1376,6 @@ html body {
 		border-radius: $border-radius-small;
 		background: $blue;
 		color: $neutral-1;
-		display: inline-block;
 		font-weight: 400;
 		text-align: center;
 		vertical-align: middle;
@@ -2275,7 +2286,7 @@ html body {
 
 	// Q-INPUT FIELDS
 	.manual-input {
-		height: 110px;
+		height: 90px;
 		font-size: 50px;
 
 		.q-field {

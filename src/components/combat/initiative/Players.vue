@@ -19,10 +19,7 @@
 					>
 						<i aria-hidden="true" class="fas fa-pencil"></i>
 					</a>
-					<q-input
-						:dark="$store.getters.theme === 'dark'"
-						filled
-						square
+					<hk-input
 						dense
 						type="number"
 						class="ml-2 player-initiative"
@@ -32,11 +29,21 @@
 						name="playerInit"
 						placeholder="0"
 						:autofocus="index === 0"
+						:class="{
+							'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
+						}"
+						@input="setInitiative(entity.key, entity.initiative)"
 						@focus="$event.target.select()"
-						@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
 					/>
 				</div>
 			</li>
+			<TutorialPopover
+				v-if="demo"
+				tutorial="initiative"
+				step="players"
+				position="right"
+				:offset="[10, 0]"
+			/>
 		</ul>
 	</div>
 </template>
@@ -44,18 +51,42 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import TargetAvatar from "../TargetAvatar.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "SetInitiativePlayer",
-	props: ["players"],
 	components: {
 		TargetAvatar,
+		TutorialPopover,
+	},
+	props: ["players"],
+	data() {
+		return {
+			completed: false,
+		};
 	},
 	computed: {
-		...mapGetters(["campaignId", "encounterId", "entities", "path"]),
+		...mapGetters(["campaignId", "encounterId", "entities", "path", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 	},
 	methods: {
 		...mapActions(["setDrawer", "set_initiative"]),
+		...mapActions("tutorial", ["completeStep"]),
+		setInitiative(key, initiative) {
+			this.set_initiative({ key, initiative });
+
+			// If initiative has been set for all players, complete the tutorial step
+			if (
+				!this.completed &&
+				!this.players.find((player) => !player.initiative) &&
+				this.get_step("initiative", "players")
+			) {
+				this.completed = true;
+				setTimeout(() => {
+					this.completeStep({ tutorial: "initiative" });
+				}, 500);
+			}
+		},
 	},
 };
 </script>

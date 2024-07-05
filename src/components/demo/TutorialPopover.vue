@@ -1,5 +1,6 @@
 <template>
 	<q-popup-proxy
+		v-if="!isMobile"
 		v-model="show"
 		v-bind="$attrs"
 		:dark="$store.getters.theme === 'dark'"
@@ -37,6 +38,37 @@
 							{{ current_step.next ? "Next" : "Hide" }}
 						</button>
 					</div>
+				</div>
+			</div>
+		</hk-card>
+	</q-popup-proxy>
+	<q-popup-proxy
+		v-else
+		v-model="show"
+		v-bind="$attrs"
+		:dark="$store.getters.theme === 'dark'"
+		:anchor="anchor"
+		:self="self"
+		persistent
+		no-parent-event
+	>
+		<hk-card class="tutorial" no-margin>
+			<div class="p-2">
+				<div class="tutorial__header">
+					<span class="flex-grow"></span>
+					<span class="p-1 pointer" @click="stop">
+						<hk-icon icon="fas fa-times-circle" />
+						<q-tooltip anchor="top middle" self="bottom middle">Stop tutorial</q-tooltip>
+					</span>
+				</div>
+				<div class="tutorial__title">Shieldmaiden.app works best on a larger screen</div>
+				<p>On larger screens a step by step tutorial is available</p>
+				<p>
+					Although the entire app is usable on a smaller screen, we recommend using a large screen
+					for your first time use.
+				</p>
+				<div class="d-flex justify-content-end items-center gap-1">
+					<button class="btn btn-sm bg-yellow black d-block d-md-none" @click="stop">Close</button>
 				</div>
 			</div>
 		</hk-card>
@@ -92,6 +124,10 @@ export default {
 			"get_tutorial_progress",
 		]),
 		...mapGetters(["targeted"]),
+		isMobile() {
+			// This only works for real mobiles, not for small desktop screens
+			return this.$q.platform.is.mobile;
+		},
 		current_step() {
 			const step = this.requirement
 				? this.get_requirement(this.tutorial, this.requirement)
@@ -162,8 +198,11 @@ export default {
 		stop() {
 			this.toggleTutorial();
 		},
+		hide() {
+			this.show = false;
+		},
 		hideOrNext() {
-			this.current_step.next ? this.completeStep() : (this.show = false);
+			this.current_step.next ? this.completeStep() : this.hide();
 		},
 	},
 };

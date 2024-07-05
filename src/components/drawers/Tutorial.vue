@@ -3,7 +3,9 @@
 		<button v-if="!follow_tutorial" class="btn bg-neutral-5 mb-3 mr-1" @click="resetTutorial()">
 			Reset tutorial
 		</button>
-		<button v-if="!follow_tutorial" class="btn mb-3" @click="toggle">Continue tutorial</button>
+		<button v-if="!follow_tutorial && !isMobile" class="btn mb-3" @click="toggle">
+			Continue tutorial
+		</button>
 		<h3>{{ tutorial_title }}</h3>
 		<q-stepper v-model="current_step" :dark="$store.getters.theme === 'dark'" vertical animated>
 			<q-step
@@ -19,7 +21,8 @@
 			>
 				<div v-html="description" />
 				<q-stepper-navigation>
-					<q-btn color="primary" label="Show me" no-caps @click="toggle" />
+					<q-btn v-if="!isMobile" color="primary" label="Show me" no-caps @click="toggle" />
+					<q-btn v-else color="primary" label="Next step" no-caps @click="next_step" />
 				</q-stepper-navigation>
 			</q-step>
 		</q-stepper>
@@ -52,6 +55,10 @@ export default {
 			"get_tutorial",
 			"get_progress_steps",
 		]),
+		isMobile() {
+			// This only works for real mobiles, not for small desktop screens
+			return this.$q.platform.is.mobile;
+		},
 		current_step() {
 			return this.tutorial_progress.findIndex((step) => !step.completed);
 		},
@@ -68,6 +75,9 @@ export default {
 		toggle() {
 			this.setDrawer({ show: false });
 			this.toggleTutorial();
+		},
+		next_step() {
+			this.completeStep({ tutorial: this.tutorial });
 		},
 	},
 };

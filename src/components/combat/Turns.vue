@@ -234,7 +234,7 @@
 				</div>
 
 				<div
-					class="info"
+					class="info ml-2"
 					@click="
 						setDrawer({
 							show: true,

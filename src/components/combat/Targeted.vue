@@ -46,7 +46,7 @@
 					<q-tooltip anchor="top middle" self="center middle">{{ tooltip }}</q-tooltip>
 
 					<TutorialPopover
-						v-if="step"
+						v-if="demo && step"
 						tutorial="run"
 						:step="step"
 						position="bottom"
@@ -156,7 +156,13 @@
 			</div>
 		</q-scroll-area>
 
-		<TutorialPopover tutorial="run" position="right" step="targeted" :offset="[10, 0]" />
+		<TutorialPopover
+			v-if="demo"
+			tutorial="run"
+			position="right"
+			step="targeted"
+			:offset="[10, 0]"
+		/>
 	</div>
 </template>
 

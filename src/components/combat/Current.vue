@@ -50,7 +50,7 @@
 			</div>
 		</q-scroll-area>
 
-		<TutorialPopover tutorial="run" step="current" position="right" :offset="[10, 0]" />
+		<TutorialPopover v-if="demo" tutorial="run" step="current" position="right" :offset="[10, 0]" />
 	</div>
 </template>
 

@@ -133,7 +133,7 @@
 			<q-tab-panel name="overview">
 				<a class="btn btn-block mb-3" @click="set_turn({ turn: 0, round: 1 })">
 					Start encounter
-					<TutorialPopover tutorial="initiative" step="start" :offset="[0, 10]" />
+					<TutorialPopover v-if="demo" tutorial="initiative" step="start" :offset="[0, 10]" />
 				</a>
 				<Overview :active="_active" :idle="_idle" />
 			</q-tab-panel>

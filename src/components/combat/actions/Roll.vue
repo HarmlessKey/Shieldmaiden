@@ -213,7 +213,7 @@
 											}"
 										>
 											<TutorialPopover
-												v-if="action_index == 0"
+												v-if="demo && action_index == 0"
 												tutorial="run"
 												step="roll"
 												position="right"

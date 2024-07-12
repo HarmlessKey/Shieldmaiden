@@ -57,7 +57,13 @@
 					</hk-input>
 				</div>
 			</li>
-			<TutorialPopover tutorial="initiative" step="monsters" position="right" :offset="[10, 0]" />
+			<TutorialPopover
+				v-if="demo"
+				tutorial="initiative"
+				step="monsters"
+				position="right"
+				:offset="[10, 0]"
+			/>
 		</ul>
 		<hk-roll class="full-width" @roll="selected.length === 0 ? rollAll($event) : rollGroup($event)">
 			<button

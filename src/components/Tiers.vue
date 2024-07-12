@@ -137,14 +137,9 @@ export default {
 			return count === "infinite" || count > 1 ? `${type}s` : type;
 		},
 		selectTier(t) {
-			console.log(t.name);
 			this.$gtm.trackEvent({
 				event: "subscribe",
-				category: "Subscription",
-				action: "click",
-				label: "Started subscription process",
-				value: t.name,
-				noninteraction: false, // Optional
+				tier: t.name,
 			});
 		},
 	},

@@ -141,7 +141,7 @@
 								</q-popup-proxy>
 							</a>
 							<TutorialPopover
-								v-if="group === 'active' && i === 1"
+								v-if="demo && group === 'active' && i === 1"
 								tutorial="run"
 								requirement="target"
 								position="right"
@@ -153,7 +153,7 @@
 			</div>
 		</q-scroll-area>
 
-		<TutorialPopover tutorial="run" position="right" step="targets" :offset="[10, 0]" />
+		<TutorialPopover v-if="demo" tutorial="run" position="right" step="targets" :offset="[10, 0]" />
 	</div>
 </template>
 

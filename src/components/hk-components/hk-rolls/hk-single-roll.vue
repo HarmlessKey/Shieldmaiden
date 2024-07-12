@@ -157,7 +157,7 @@
 						</template>
 
 						<TutorialPopover
-							v-if="index === 0"
+							v-if="demo && index === 0"
 							tutorial="run"
 							step="to-hit"
 							position="right"
@@ -218,7 +218,7 @@
 											{{ rolled.damage_type }}
 										</span>
 										<TutorialPopover
-											v-if="index === 0"
+											v-if="demo && index === 0"
 											tutorial="run"
 											step="defenses"
 											position="left"
@@ -237,7 +237,7 @@
 									</q-tooltip>
 								</q-item-section>
 								<TutorialPopover
-									v-if="index === 0"
+									v-if="demo && index === 0"
 									tutorial="run"
 									step="details"
 									position="right"
@@ -477,7 +477,7 @@
 				</q-btn>
 
 				<TutorialPopover
-					v-if="index === 0"
+					v-if="demo && index === 0"
 					tutorial="run"
 					step="apply"
 					position="right"

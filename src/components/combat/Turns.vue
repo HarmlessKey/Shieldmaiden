@@ -150,6 +150,7 @@
 				@shortkey="nextTurn()"
 			>
 				<TutorialPopover
+					v-if="demo"
 					tutorial="run"
 					step="next"
 					position="right"
@@ -158,7 +159,7 @@
 				/>
 				<i aria-hidden="true" class="fas fa-step-forward" />
 				<q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [→]</q-tooltip>
-				<TutorialPopover tutorial="initiative" step="next" :offset="[0, 10]" />
+				<TutorialPopover v-if="demo" tutorial="initiative" step="next" :offset="[0, 10]" />
 			</a>
 		</div>
 		<div v-else>Set Initiative</div>

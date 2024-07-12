@@ -81,8 +81,8 @@ export class npcServices {
 			if (predefined_key) {
 				await NPCS_REF.child(uid).child(predefined_key).set(npc);
 			} else {
-				const newNpc = await NPCS_REF.child(uid).push(npc);
-				npc_key = newNpc.key;
+        const newNpc = await NPCS_REF.child(uid).push(npc);
+        npc_key = newNpc.key;
 			}
 
 			// Upload image
@@ -106,7 +106,8 @@ export class npcServices {
 			const newNpc = await NPCS_REF.child(`${uid}/${npc_key}`).once("value");
 			return [newNpc.val(), npc_key];
 		} catch (error) {
-			throw error;
+      console.error(`Error while adding NPC ${npc.name}`, npc)
+      console.error("With error:", error)
 		}
 	}
 
@@ -154,7 +155,8 @@ export class npcServices {
 				await NPCS_REF.child(uid).child(id).set(npc);
 			}
 		} catch (error) {
-			throw error;
+      console.error(`Error while saving NPC ${npc.name}`, npc)
+      console.error("With error:", error)
 		}
 	}
 

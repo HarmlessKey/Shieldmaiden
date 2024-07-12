@@ -104,7 +104,8 @@ export class SpellServices {
 
 			return spell_key;
 		} catch (error) {
-			throw error;
+			console.error(`Error while adding Spell ${spell.name}`, spell)
+      console.error("With error:", error)
 		}
 	}
 
@@ -127,7 +128,8 @@ export class SpellServices {
 				SEARCH_SPELLS_REF.child(`${uid}/results/${id}`).set(search_spell);
 			})
 			.catch((error) => {
-				throw error;
+				console.error(`Error while editing Spell ${spell.name}`, spell)
+        console.error("With error:", error)
 			});
 	}
 

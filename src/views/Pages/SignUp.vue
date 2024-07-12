@@ -117,11 +117,7 @@ export default {
 
 					this.$gtm.trackEvent({
 						event: "sign-up",
-						category: "Account",
-						action: "click",
-						label: "Created account",
-						value: "Email and Password",
-						noninteraction: false,
+						method: "Email and Password",
 					});
 
 					this.$router.replace("/content");
@@ -140,11 +136,7 @@ export default {
 				.then(() => {
 					this.$gtm.trackEvent({
 						event: "sign-up",
-						category: "Account",
-						action: "click",
-						label: "Created account",
-						value: "Google",
-						noninteraction: false,
+						method: "Google",
 					});
 					this.$router.replace("/set-username");
 				})

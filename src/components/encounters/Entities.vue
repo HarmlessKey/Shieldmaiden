@@ -53,7 +53,7 @@
 		>
 			<i class="fas fa-user-plus" aria-hidden="true" />
 			Add players
-			<TutorialPopover tutorial="build" step="add-players" :offset="[0, 10]" />
+			<TutorialPopover v-if="demo" tutorial="build" step="add-players" :offset="[0, 10]" />
 		</button>
 
 		<!-- MONSTERS -->
@@ -161,7 +161,7 @@
 										</q-tooltip>
 									</a>
 									<TutorialPopover
-										v-if="props.rowIndex === 0"
+										v-if="demo && props.rowIndex === 0"
 										tutorial="build"
 										position="right"
 										step="add-monsters"
@@ -305,7 +305,7 @@
 									</q-tooltip>
 								</a>
 								<TutorialPopover
-									v-if="props.rowIndex === 0"
+									v-if="demo && props.rowIndex === 0"
 									tutorial="build"
 									position="right"
 									step="add-monsters"

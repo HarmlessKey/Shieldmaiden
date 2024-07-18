@@ -188,14 +188,12 @@ const encounter_actions = {
 		}
 		// Check for non-existing NPCs, Companions and Players
 		// Remove them from the encounter if they don't exist
-		console.log("get encoutner", encounter);
 		if (encounter.entities) {
 			for (const [entityId, entity] of Object.entries(encounter.entities)) {
 				// REMOVE NON EXISTING NPCs
 				if (entity.entityType === "npc" && entity.npc === "custom" && entity.id) {
 					const npc = await dispatch("npcs/get_npc", { uid, id: entity.id }, { root: true });
 					if (!no_ghosts && !npc) {
-						console.log("NPC:", entity, npc, entityId);
 						const npc_id = entity.id;
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
 						delete encounter.entities[entityId];
@@ -769,12 +767,9 @@ const encounter_actions = {
 		{ rootGetters, commit, dispatch, state },
 		{ campaignId, encounterId, entityId }
 	) {
-		console.log("Store", campaignId, encounterId, entityId);
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
-		console.log(uid);
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
-			console.log(services);
 			try {
 				const encounter = await dispatch("get_encounter", {
 					uid,
@@ -783,8 +778,6 @@ const encounter_actions = {
 					no_ghosts: true,
 				});
 				const encounter_entities = encounter?.entities;
-				console.log("enc:", encounter);
-				console.log("entities", encounter_entities);
 				if (encounter_entities && Object.keys(encounter_entities).includes(entityId)) {
 					await services.deleteEntity(uid, campaignId, encounterId, entityId);
 					commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
@@ -795,7 +788,6 @@ const encounter_actions = {
 
 				return;
 			} catch (error) {
-				console.log("ERROR!!!");
 				throw error;
 			}
 		}

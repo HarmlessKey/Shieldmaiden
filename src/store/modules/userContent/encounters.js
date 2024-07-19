@@ -171,7 +171,7 @@ const encounter_actions = {
 	 *
 	 * @return {Encounter}
 	 */
-	async get_encounter({ state, commit, dispatch }, { uid, campaignId, id }) {
+	async get_encounter({ state, commit, dispatch }, { uid, campaignId, id, no_ghosts }) {
 		let encounter =
 			state.cached_encounters[uid] && state.cached_encounters[uid][campaignId]
 				? state.cached_encounters[uid][campaignId][id]
@@ -193,7 +193,7 @@ const encounter_actions = {
 				// REMOVE NON EXISTING NPCs
 				if (entity.entityType === "npc" && entity.npc === "custom" && entity.id) {
 					const npc = await dispatch("npcs/get_npc", { uid, id: entity.id }, { root: true });
-					if (!npc) {
+					if (!no_ghosts && !npc) {
 						const npc_id = entity.id;
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
 						delete encounter.entities[entityId];
@@ -203,7 +203,7 @@ const encounter_actions = {
 				// REMOVE NON EXISTING COMPANIONS
 				if (entity.entityType === "companion") {
 					const companion = await dispatch("npcs/get_npc", { uid, id: entityId }, { root: true });
-					if (!companion) {
+					if (!no_ghosts && !companion) {
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
 						delete encounter.entities[entityId];
 						console.warn(`Ghost companion ${entityId} deleted.`);
@@ -216,7 +216,7 @@ const encounter_actions = {
 						{ uid, id: entityId },
 						{ root: true }
 					);
-					if (!player) {
+					if (!no_ghosts && !player) {
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
 						delete encounter.entities[entityId];
 						console.warn(`Ghost player ${entityId} deleted.`);
@@ -771,13 +771,13 @@ const encounter_actions = {
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
 			try {
-				const encounter_entities = (
-					await dispatch("get_encounter", {
-						uid,
-						campaignId,
-						id: encounterId,
-					})
-				)?.entities;
+				const encounter = await dispatch("get_encounter", {
+					uid,
+					campaignId,
+					id: encounterId,
+					no_ghosts: true,
+				});
+				const encounter_entities = encounter?.entities;
 				if (encounter_entities && Object.keys(encounter_entities).includes(entityId)) {
 					await services.deleteEntity(uid, campaignId, encounterId, entityId);
 					commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });

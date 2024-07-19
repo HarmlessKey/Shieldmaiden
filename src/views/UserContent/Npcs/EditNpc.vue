@@ -194,7 +194,7 @@ export default {
 		copy({ result }) {
 			this.copy_dialog = false;
 			this.create_dialog = false;
-			this.npc = { ...result };
+			this.npc = JSON.parse(JSON.stringify({ ...result }));
 			this.npc = this.convertVersatileToOptions(this.npc);
 		},
 		reset() {
@@ -350,7 +350,7 @@ export default {
 	max-width: 95vw;
 	width: 576px;
 	margin-top: 100px;
-	
+
 	.card-body {
 		overflow: auto;
 	}

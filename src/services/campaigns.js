@@ -84,7 +84,8 @@ export class campaignServices {
 
 			return campaign_key;
 		} catch (error) {
-			throw error;
+			console.error(`Error while adding Campaign ${campaign.name}`, campaign)
+      console.error("With error:", error)
 		}
 	}
 
@@ -96,7 +97,8 @@ export class campaignServices {
 				return;
 			})
 			.catch((error) => {
-				throw error;
+				console.error(`Error while adding Campaign ${campaign.name}`, campaign)
+        console.error("With error:", error)
 			});
 	}
 

@@ -5,7 +5,7 @@ export const remindersMixin = {
 		return {
 			premade: {
 				concentration: {
-					".key": "concentratrion",
+					".key": "concentration",
 					action: "notify",
 					color: "blue-light",
 					title: "Concentrating",

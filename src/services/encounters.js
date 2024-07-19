@@ -79,7 +79,8 @@ export class encounterServices {
 
 			return encounter_key;
 		} catch (error) {
-			throw error;
+			console.error(`Error while adding Encounter ${encounter.name}`, encounter)
+      console.error("With error:", error)
 		}
 	}
 
@@ -89,7 +90,8 @@ export class encounterServices {
 		ENCOUNTERS_REF.child(path)
 			.set(value)
 			.catch((error) => {
-				throw error;
+				console.error(`Error while editing Encounter ${encounter.name}`, encounter)
+        console.error("With error:", error)
 			});
 
 		// Update search_encounter

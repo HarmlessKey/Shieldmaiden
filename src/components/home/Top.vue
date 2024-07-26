@@ -78,30 +78,6 @@
 		</a>
 		<q-resize-observer @resize="setSize" />
 	</div>
-	<!-- <div class="top">
-		<div class="container">
-			<img class="shieldmaiden" src="../../assets/_img/shieldmaiden.webp" alt="Shieldmaiden" />
-			<div class="content">
-				<div>
-					<h1>Combat Tracker for D&amp;D 5<span>e</span></h1>
-					<h2>The perfect companion in your D&D campaign</h2>
-
-					<div class="button-container">
-						<template v-if="!$store.getters.user">
-							<q-btn to="/demo" color="primary" size="lg" no-caps push>Try demo encounter</q-btn>
-							<div>
-								<small>
-									<em class="neutral-4">No download required</em>
-								</small>
-							</div>
-						</template>
-						<router-link v-else to="/content" class="btn btn-lg bg-green">My content</router-link>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="bar"></div>
-	</div> -->
 </template>
 
 <script>

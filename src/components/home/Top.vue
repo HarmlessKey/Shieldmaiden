@@ -57,7 +57,12 @@
 					:to="to"
 					class="tool"
 				>
-					<img class="tool__image" :src="require(`src/assets/_img/atmosphere/medium/${image}`)" />
+					<div
+						class="tool__image"
+						:style="{
+							backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${image}`)})`,
+						}"
+					/>
 					<div class="tool__content">
 						<div class="tool__content-title">
 							{{ title }}
@@ -262,10 +267,14 @@ export default {
 				cursor: pointer;
 				box-shadow: 0 10px 15px $black;
 
+				&:hover {
+					background-color: $neutral-7;
+				}
 				&__image {
-					width: 110px;
-					height: 120px;
-					object-fit: cover;
+					min-width: 110px;
+					height: 100px;
+					background-size: cover;
+					background-position: center top;
 					border-top-left-radius: $border-radius;
 					border-bottom-left-radius: $border-radius;
 				}
@@ -294,6 +303,11 @@ export default {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+
+		&:hover {
+			font-size: 20px;
+			margin-bottom: -2px;
+		}
 	}
 }
 

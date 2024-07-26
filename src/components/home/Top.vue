@@ -2,36 +2,41 @@
 	<div class="top">
 		<div class="container">
 			<img class="shieldmaiden" src="../../assets/_img/shieldmaiden.webp" alt="Shieldmaiden" />
-			<div class="logo__wrapper">
-				<img
-					class="logo"
-					src="../../assets/_img/logo/logo-main-icon-left.svg"
-					alt="Shieldmaiden logo"
-				/>
+			<div class="content">
+				<div>
+					<h1>D&D Combat Tracker</h1>
+					<h2>The ultimate companion app for your D&D campaign</h2>
+
+					<q-btn
+						v-if="!$store.getters.user"
+						:class="{ 'full-width': isMobile }"
+						class="px-2 py-1"
+						to="/demo"
+						color="primary"
+						size="lg"
+						no-caps
+						push
+					>
+						Try demo encounter
+					</q-btn>
+					<router-link
+						v-else
+						to="/content"
+						class="btn btn-lg bg-green"
+						:class="{ 'btn-block': isMobile }"
+						>My content</router-link
+					>
+				</div>
+				<div class="logo__wrapper">
+					<img
+						class="logo"
+						src="https://cf-images.dustin.eu/cdn-cgi/image/format=auto,quality=75,width=828,,fit=contain/image/d2000010011230484/microsoft-surface-laptop-6-for-business-black-core-ultra-7-32gb-1000gb-15.png"
+						alt="Shieldmaiden logo"
+					/>
+				</div>
 			</div>
-			<h1>Combat Tracker for D&D 5e</h1>
-			<h2>The ultimate companion app for your D&D campaign</h2>
 
-			<q-btn
-				v-if="!$store.getters.user"
-				:class="{ 'full-width': isMobile }"
-				to="/demo"
-				color="primary"
-				size="lg"
-				no-caps
-				push
-			>
-				Try demo encounter
-			</q-btn>
-			<router-link
-				v-else
-				to="/content"
-				class="btn btn-lg bg-green"
-				:class="{ 'btn-block': isMobile }"
-				>My content</router-link
-			>
-
-			<h2>More D&D tools</h2>
+			<div class="tools-title">More RPG tools from Shieldmaiden</div>
 			<div class="tools">
 				<router-link
 					v-for="{ title, to, description, image } in tools"
@@ -165,6 +170,9 @@ export default {
 		padding: 30px 20px 0 20px;
 		max-width: 1280px;
 		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 
 		.q-stepper {
 			border: none;
@@ -194,22 +202,24 @@ export default {
 			width: 350px;
 
 			&__wrapper {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
+				// display: flex;
+				// flex-direction: column;
+				// align-items: center;
 			}
 		}
 		h1 {
-			// font-size: 15px;
-			font-weight: light;
 			line-height: normal;
-			// padding-left: 80px;
-			// margin: -20px 0 0 0;
-			// font-family: "Open Sans", sans-serif;
+			font-size: 30px;
+			margin: 0 0 10px 0;
+			text-transform: uppercase;
 		}
 		h2 {
-			text-align: center;
-			margin-top: 25px;
+			margin: 0 0 30px 0;
+			font-size: 18px;
+		}
+		.tools-title {
+			font-size: 18px;
+			margin: 25px 0 25px 0;
 		}
 		.tools {
 			display: flex;
@@ -243,6 +253,7 @@ export default {
 					flex-direction: column;
 
 					&-title {
+						font-size: 18px;
 						font-weight: bold;
 					}
 					&-description {
@@ -281,10 +292,6 @@ export default {
 		padding: 25px 0 75px 0;
 
 		.container {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-
 			.tools {
 				flex-direction: row;
 				flex-wrap: wrap;
@@ -298,9 +305,20 @@ export default {
 @media only screen and (min-width: $lg-breakpoint) {
 	.top {
 		.container {
-			padding-left: 250px;
+			padding-left: 330px;
+			align-items: start;
+			.content {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0;
+			}
 			.shieldmaiden {
 				display: block;
+			}
+			.logo {
+				width: 600px;
+				margin: -80px -120px;
 			}
 			.tools {
 				.tool {
@@ -310,85 +328,4 @@ export default {
 		}
 	}
 }
-
-// @media only screen and (max-width: 768px) {
-// 	.top {
-// 		.container {
-// 			padding-top: 25px;
-// 			gap: 30px;
-
-// 			.shieldmaiden {
-// 				width: 350px;
-// 				margin-left: -75px;
-// 			}
-// 			.content {
-// 				.logo {
-// 					width: 300px;
-// 				}
-// 				h1 {
-// 					font-size: 28px;
-// 				}
-// 				h2 {
-// 					font-size: 16px;
-// 				}
-// 			}
-// 		}
-// 	}
-// }
-
-// @media only screen and (max-width: 640px) {
-// 	.top {
-// 		.bar {
-// 			top: 180px;
-// 			height: 100%;
-// 		}
-// 		.container {
-// 			padding-top: 30px;
-// 			gap: 20px;
-// 			padding-bottom: 80px;
-
-// 			.shieldmaiden {
-// 				width: 250px;
-// 				height: 180px;
-// 				position: absolute;
-// 				top: 0;
-// 				left: 0;
-// 				object-fit: cover;
-// 				object-position: top -5px left -30px;
-// 			}
-// 			.content {
-// 				padding-left: 120px;
-// 				position: relative;
-// 				z-index: 50;
-
-// 				.logo {
-// 					width: 200px;
-// 					margin-left: -18px;
-// 					margin-bottom: 10px;
-// 				}
-// 				h1 {
-// 					font-size: 20px;
-// 				}
-// 				h2 {
-// 					display: none;
-// 				}
-// 				.button-container {
-// 					position: absolute;
-// 					left: 0;
-// 					top: 180px;
-// 					width: 100%;
-// 					text-align: center;
-
-// 					.q-btn {
-// 						width: 100%;
-
-// 						&__content {
-// 							font-size: 12px;
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// }
 </style>

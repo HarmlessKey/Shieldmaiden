@@ -8,28 +8,10 @@
 					src="../../assets/_img/logo/logo-main-icon-left.svg"
 					alt="Shieldmaiden logo"
 				/>
-				<!-- <h1>The ultimate companion app for your D&D campaign</h1> -->
 			</div>
-			<h1>D&D Combat Tracker</h1>
+			<h1>Combat Tracker for D&D 5e</h1>
+			<h2>The ultimate companion app for your D&D campaign</h2>
 
-			<q-stepper
-				v-model="step"
-				:dark="$store.getters.theme === 'dark'"
-				class="my-4"
-				alternative-labels
-				color="primary"
-				animated
-				:vertical="isMobile"
-			>
-				<q-step
-					v-for="({ title, caption, icon }, index) of steps"
-					:key="title"
-					:name="index + 1"
-					:title="title"
-					:caption="caption"
-					:icon="icon"
-				/>
-			</q-stepper>
 			<q-btn
 				v-if="!$store.getters.user"
 				:class="{ 'full-width': isMobile }"

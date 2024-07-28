@@ -5,7 +5,7 @@
 			<div class="content">
 				<div>
 					<h1>D&D Combat Tracker</h1>
-					<h2>The ultimate companion app for your D&D campaign</h2>
+					<h2>And the ultimate companion app for your D&D campaign</h2>
 
 					<q-btn
 						v-if="!$store.getters.user"
@@ -27,13 +27,11 @@
 						>My content</router-link
 					>
 				</div>
-				<div class="logo__wrapper">
-					<img
-						class="logo"
-						src="https://cf-images.dustin.eu/cdn-cgi/image/format=auto,quality=75,width=828,,fit=contain/image/d2000010011230484/microsoft-surface-laptop-6-for-business-black-core-ultra-7-32gb-1000gb-15.png"
-						alt="Shieldmaiden logo"
-					/>
-				</div>
+				<img
+					class="laptop"
+					:src="require('src/assets/_img/shieldmaiden-combat-tracker-laptop.webp')"
+					alt="Shieldmaiden Combat Tracker on Laptop"
+				/>
 			</div>
 
 			<div class="tools-title">More RPG tools from Shieldmaiden</div>
@@ -140,7 +138,7 @@ export default {
 	},
 	computed: {
 		isMobile() {
-			return this.width < 790;
+			return this.width < 768;
 		},
 	},
 	methods: {
@@ -197,14 +195,14 @@ export default {
 			top: 20px;
 			z-index: 0;
 		}
+		.content {
+			display: flex;
+			flex-direction: column;
+			gap: 25px;
+			padding: 0;
 
-		.logo {
-			width: 350px;
-
-			&__wrapper {
-				// display: flex;
-				// flex-direction: column;
-				// align-items: center;
+			.laptop {
+				width: 100%;
 			}
 		}
 		h1 {
@@ -292,6 +290,14 @@ export default {
 		padding: 25px 0 75px 0;
 
 		.container {
+			.content {
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				.laptop {
+					width: 400px;
+				}
+			}
 			.tools {
 				flex-direction: row;
 				flex-wrap: wrap;
@@ -308,17 +314,14 @@ export default {
 			padding-left: 330px;
 			align-items: start;
 			.content {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				padding: 0;
+				margin-bottom: 25px;
+
+				.laptop {
+					width: 457px;
+				}
 			}
 			.shieldmaiden {
 				display: block;
-			}
-			.logo {
-				width: 600px;
-				margin: -80px -120px;
 			}
 			.tools {
 				.tool {

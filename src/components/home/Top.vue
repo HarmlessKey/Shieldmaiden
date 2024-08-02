@@ -34,7 +34,7 @@
 				/>
 			</div>
 
-			<div class="tools-title">More RPG tools from Shieldmaiden</div>
+			<div class="tools-title">More Shieldmaiden features</div>
 			<div class="tools">
 				<router-link
 					v-for="{ title, to, description, icon } in tools"
@@ -215,7 +215,8 @@ export default {
 		}
 		.tools-title {
 			font-size: 18px;
-			margin: 25px 0 25px 0;
+			margin: 25px 0 15px 0;
+			font-weight: bold;
 		}
 		.tools {
 			display: flex;

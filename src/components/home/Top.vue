@@ -1,7 +1,7 @@
 <template>
 	<div class="top">
 		<div class="container">
-			<img class="shieldmaiden" src="../../assets/_img/shieldmaiden.webp" alt="Shieldmaiden" />
+			<img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden" />
 			<div class="content">
 				<div>
 					<h1>D&D Combat Tracker</h1>
@@ -37,17 +37,14 @@
 			<div class="tools-title">More RPG tools from Shieldmaiden</div>
 			<div class="tools">
 				<router-link
-					v-for="{ title, to, description, image } in tools"
+					v-for="{ title, to, description, icon } in tools"
 					:key="to"
 					:to="to"
 					class="tool"
 				>
-					<div
-						class="tool__image"
-						:style="{
-							backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${image}`)})`,
-						}"
-					/>
+					<div class="tool__image">
+						<hk-icon :icon="icon" />
+					</div>
 					<div class="tool__content">
 						<div class="tool__content-title">
 							{{ title }}
@@ -56,6 +53,11 @@
 					</div>
 				</router-link>
 			</div>
+			<img
+				class="shieldmaiden"
+				src="../../assets/_img/shieldmaiden.webp"
+				alt="Shieldmaiden holding a sword and shield"
+			/>
 		</div>
 		<a href="#general" class="read-more">
 			<div>Read more</div>
@@ -99,6 +101,7 @@ export default {
 					description:
 						"Quick access to rules, a soundboard, your players, your custom encounters and more.",
 					image: "dm-screen-medium.png",
+					icon: "fas fa-map",
 				},
 				{
 					title: "Character Sync",
@@ -106,6 +109,7 @@ export default {
 					description:
 						"Access your characters from external resources and sync them with Shieldmaiden.",
 					image: "character-sync.png",
+					icon: "fas fa-sync-alt",
 				},
 				{
 					title: "Monster Creator",
@@ -113,6 +117,7 @@ export default {
 					description:
 						"Build custom monster stat blocks with easy to roll actions. You can use your monsters in our combat tracker.",
 					image: "monster-medium.jpg",
+					icon: "fas fa-dragon",
 				},
 				{
 					title: "Spell Creator",
@@ -120,18 +125,21 @@ export default {
 					description:
 						"Create custom spells to roll directly, or use on your spellcaster monsters.",
 					image: "fire-dragon-medium.jpg",
+					icon: "fas fa-wand-magic",
 				},
 				{
 					title: "Compendium",
 					to: "/compendium",
 					description: "Quickly reference Monsters, Spells, Conditions and Items.",
 					image: "compendium-medium.jpg",
+					icon: "fas fa-book-spells",
 				},
 				{
 					title: "Character Builder",
 					to: "/tools/character-builder",
 					description: "Build your character and get an online character sheet.",
 					image: "characters-medium.jpg",
+					icon: "fas fa-helmet-battle",
 				},
 			],
 		};
@@ -157,13 +165,6 @@ export default {
 	background-color: $neutral-11;
 	overflow: hidden;
 
-	.bar {
-		width: 100%;
-		height: 150px;
-		position: absolute;
-		bottom: 0;
-		background-color: $neutral-9;
-	}
 	.container {
 		padding: 30px 20px 0 20px;
 		max-width: 1280px;
@@ -172,26 +173,16 @@ export default {
 		flex-direction: column;
 		align-items: center;
 
-		.q-stepper {
-			border: none;
-			padding: 0;
-			background: none;
-
-			&::v-deep {
-				.q-stepper__header {
-					border: none;
-				}
-				.q-stepper__step-inner {
-					display: none;
-				}
-			}
+		.logo {
+			width: 100%;
+			max-width: 350px;
+			margin-bottom: 30px;
 		}
-
 		.shieldmaiden {
 			height: 860px;
 			display: none;
 			position: absolute;
-			left: -150px;
+			left: -170px;
 			top: 20px;
 			z-index: 0;
 		}
@@ -200,9 +191,16 @@ export default {
 			flex-direction: column;
 			gap: 25px;
 			padding: 0;
+			text-align: center;
 
 			.laptop {
-				width: 100%;
+				width: 80%;
+				margin: 20px auto;
+			}
+			::v-deep {
+				.q-btn {
+					background-color: #3fa3ad !important;
+				}
 			}
 		}
 		h1 {
@@ -237,21 +235,25 @@ export default {
 					background-color: $neutral-7;
 				}
 				&__image {
-					min-width: 110px;
-					height: 100px;
+					min-width: 80px;
+					height: 85px;
 					background-size: cover;
 					background-position: center top;
 					border-top-left-radius: $border-radius;
 					border-bottom-left-radius: $border-radius;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					font-size: 25px;
 				}
 
 				&__content {
-					padding: 10px 15px;
+					padding: 10px 10px 10px 0;
 					display: flex;
 					flex-direction: column;
 
 					&-title {
-						font-size: 18px;
+						font-size: 15px;
 						font-weight: bold;
 					}
 					&-description {
@@ -294,8 +296,11 @@ export default {
 				flex-direction: row;
 				justify-content: space-between;
 				align-items: center;
+				text-align: left;
+
 				.laptop {
 					width: 400px;
+					margin: 0;
 				}
 			}
 			.tools {
@@ -318,7 +323,11 @@ export default {
 
 				.laptop {
 					width: 457px;
+					display: none;
 				}
+			}
+			.logo {
+				margin-left: -35px;
 			}
 			.shieldmaiden {
 				display: block;
@@ -326,6 +335,18 @@ export default {
 			.tools {
 				.tool {
 					// flex-basis: calc(33% - 7.5px);
+				}
+			}
+		}
+	}
+}
+@media only screen and (min-width: $xl-breakpoint) {
+	.top {
+		.container {
+			.content {
+				.laptop {
+					width: 457px;
+					display: block;
 				}
 			}
 		}

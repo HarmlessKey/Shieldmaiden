@@ -61,7 +61,7 @@
 		</div>
 		<a href="#general" class="read-more">
 			<div>Read more</div>
-			<hk-icon icon="fas fa-chevron-down" />
+			<i aria-hidden="true" icon="fas fa-chevron-down" />
 		</a>
 		<q-resize-observer @resize="setSize" />
 	</div>

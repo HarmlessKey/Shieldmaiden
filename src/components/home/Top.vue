@@ -43,7 +43,7 @@
 					class="tool"
 				>
 					<div class="tool__image">
-						<hk-icon :icon="icon" />
+						<i :class="icon" aria-hidden="true" />
 					</div>
 					<div class="tool__content">
 						<div class="tool__content-title">

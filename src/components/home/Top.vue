@@ -1,32 +1,69 @@
 <template>
 	<div class="top">
 		<div class="container">
-			<img class="shieldmaiden" src="../../assets/_img/shieldmaiden.webp" alt="Shieldmaiden" />
+			<img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden" />
 			<div class="content">
-				<img
-					class="logo"
-					src="../../assets/_img/logo/logo-main-icon-left.svg"
-					alt="Shieldmaiden logo"
-				/>
 				<div>
-					<h1>Combat Tracker for D&amp;D 5<span>e</span></h1>
-					<h2>The perfect companion in your D&D campaign</h2>
+					<h1>D&D Combat Tracker</h1>
+					<h2>And the ultimate companion app for your D&D campaign</h2>
 
-					<div class="button-container">
-						<template v-if="!$store.getters.user">
-							<q-btn to="/demo" color="primary" size="lg" no-caps push>Try demo encounter</q-btn>
-							<div>
-								<small>
-									<em class="neutral-4">No download required</em>
-								</small>
-							</div>
-						</template>
-						<router-link v-else to="/content" class="btn btn-lg bg-green">My content</router-link>
-					</div>
+					<q-btn
+						v-if="!$store.getters.user"
+						:class="{ 'full-width': isMobile }"
+						class="px-2 py-1"
+						to="/demo"
+						color="primary"
+						size="lg"
+						no-caps
+						push
+					>
+						Try demo encounter
+					</q-btn>
+					<router-link
+						v-else
+						to="/content"
+						class="btn btn-lg bg-green"
+						:class="{ 'btn-block': isMobile }"
+						>My content</router-link
+					>
 				</div>
+				<img
+					class="laptop"
+					:src="require('src/assets/_img/shieldmaiden-combat-tracker-laptop.webp')"
+					alt="Shieldmaiden Combat Tracker on Laptop"
+				/>
 			</div>
+
+			<div class="tools-title">More Shieldmaiden features</div>
+			<div class="tools">
+				<router-link
+					v-for="{ title, to, description, icon } in tools"
+					:key="to"
+					:to="to"
+					class="tool"
+				>
+					<div class="tool__image">
+						<i :class="icon" aria-hidden="true" />
+					</div>
+					<div class="tool__content">
+						<div class="tool__content-title">
+							{{ title }}
+						</div>
+						<div class="tool__content-description" v-html="description" />
+					</div>
+				</router-link>
+			</div>
+			<img
+				class="shieldmaiden"
+				src="../../assets/_img/shieldmaiden.webp"
+				alt="Shieldmaiden holding a sword and shield"
+			/>
 		</div>
-		<div class="bar"></div>
+		<a href="#general" class="read-more">
+			<div>Read more</div>
+			<hk-icon icon="fas fa-chevron-down" />
+		</a>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -36,6 +73,87 @@ export default {
 	props: {
 		maintenance: [Boolean, String],
 	},
+	data() {
+		return {
+			step: 0,
+			width: 0,
+			steps: [
+				{
+					title: "Build Encounter",
+					caption: "Add players & monsters",
+					icon: "",
+				},
+				{
+					title: "Run Encounter",
+					caption: "Perform actions Track health & initiative",
+					icon: "",
+				},
+				{
+					title: "Distribute Loot",
+					caption: "Award experience, items and items",
+					icon: "",
+				},
+			],
+			tools: [
+				{
+					title: "DM Screen",
+					to: "/tools/dm-screen",
+					description:
+						"Quick access to rules, a soundboard, your players, your custom encounters and more.",
+					image: "dm-screen-medium.png",
+					icon: "fas fa-map",
+				},
+				{
+					title: "Character Sync",
+					to: "/tools/character-sync",
+					description:
+						"Access your characters from external resources and sync them with Shieldmaiden.",
+					image: "character-sync.png",
+					icon: "fas fa-sync-alt",
+				},
+				{
+					title: "Monster Creator",
+					to: "/tools/monster-creator",
+					description:
+						"Build custom monster stat blocks with easy to roll actions. You can use your monsters in our combat tracker.",
+					image: "monster-medium.jpg",
+					icon: "fas fa-dragon",
+				},
+				{
+					title: "Spell Creator",
+					to: "/tools/spell-creator",
+					description:
+						"Create custom spells to roll directly, or use on your spellcaster monsters.",
+					image: "fire-dragon-medium.jpg",
+					icon: "fas fa-wand-magic",
+				},
+				{
+					title: "Compendium",
+					to: "/compendium",
+					description: "Quickly reference Monsters, Spells, Conditions and Items.",
+					image: "compendium-medium.jpg",
+					icon: "fas fa-book-spells",
+				},
+				{
+					title: "Character Builder",
+					to: "/tools/character-builder",
+					description: "Build your character and get an online character sheet.",
+					image: "characters-medium.jpg",
+					icon: "fas fa-helmet-battle",
+				},
+			],
+		};
+	},
+	computed: {
+		isMobile() {
+			return this.width < 768;
+		},
+	},
+	methods: {
+		setSize(size) {
+			this.width = size.width;
+		},
+	},
 };
 </script>
 
@@ -43,64 +161,122 @@ export default {
 .top {
 	background-image: url("../../assets/_img/styles/paper-bg.png");
 	background-position: top center;
-	padding-bottom: 25px;
+	padding-bottom: 50px;
 	background-color: $neutral-11;
 	overflow: hidden;
-	position: relative;
 
-	.bar {
-		width: 100%;
-		height: 150px;
-		position: absolute;
-		bottom: 0;
-		background-color: $neutral-9;
-	}
 	.container {
-		padding: 50px 20px 0 20px;
+		padding: 30px 20px 0 20px;
 		max-width: 1280px;
-		display: flex;
-		justify-content: start;
-		gap: 50px;
 		position: relative;
-		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 
-		.shieldmaiden {
-			width: 450px;
+		.logo {
+			width: 100%;
+			max-width: 320px;
+			margin-bottom: 30px;
 		}
-
+		.shieldmaiden {
+			height: 860px;
+			display: none;
+			position: absolute;
+			left: -170px;
+			top: 20px;
+			z-index: 0;
+		}
 		.content {
-			padding: 0 0 100px 0;
+			display: flex;
+			flex-direction: column;
+			gap: 25px;
+			padding: 0;
+			text-align: center;
 
-			.logo {
-				margin: 0 0 25px -35px;
-				width: 400px;
+			.laptop {
+				width: 80%;
+				margin: 20px auto;
 			}
-			h1 {
-				font-family: $text-written;
-				font-size: 40px;
-				text-transform: none;
-				line-height: normal;
-				text-transform: uppercase;
-
-				span {
-					text-transform: none;
+			::v-deep {
+				.q-btn {
+					background-color: #3fa3ad !important;
 				}
 			}
-			h2 {
-				font-size: 20px;
-				font-style: italic;
-				font-weight: light;
-				text-transform: none;
-				line-height: normal;
-				margin-bottom: 50px;
-			}
-			.button-container {
-				margin-bottom: 30px;
+		}
+		h1 {
+			line-height: normal;
+			font-size: 30px;
+			margin: 0 0 10px 0;
+			text-transform: uppercase;
+		}
+		h2 {
+			margin: 0 0 30px 0;
+			font-size: 18px;
+		}
+		.tools-title {
+			font-size: 18px;
+			margin: 25px 0 15px 0;
+			font-weight: bold;
+		}
+		.tools {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+			z-index: 1;
 
-				.btn {
-					text-shadow: none;
+			.tool {
+				background-color: $neutral-6;
+				border-radius: $border-radius;
+				color: $neutral-1;
+				display: flex;
+				cursor: pointer;
+				box-shadow: 0 10px 15px $black;
+
+				&:hover {
+					background-color: $neutral-7;
+				}
+				&__image {
+					min-width: 80px;
+					height: 85px;
+					background-size: cover;
+					background-position: center top;
+					border-top-left-radius: $border-radius;
+					border-bottom-left-radius: $border-radius;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					font-size: 25px;
+				}
+
+				&__content {
+					padding: 10px 10px 10px 0;
+					display: flex;
+					flex-direction: column;
+
+					&-title {
+						font-size: 15px;
+						font-weight: bold;
+					}
+					&-description {
+						font-size: 12px;
+						line-height: normal;
+					}
 				}
 			}
+		}
+	}
+	.read-more {
+		color: $neutral-1;
+		text-align: center;
+		width: 100%;
+		margin-top: 25px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		&:hover {
+			font-size: 20px;
+			margin-bottom: -2px;
 		}
 	}
 }
@@ -112,104 +288,66 @@ export default {
 	}
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (min-width: $md-breakpoint) {
 	.top {
+		padding: 25px 0 75px 0;
+
 		.container {
-			.shieldmaiden {
-				width: 400px;
-				margin-left: -35px;
-			}
 			.content {
-				.logo {
-					margin-left: -25px;
-					width: 300px;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				text-align: left;
+
+				.laptop {
+					width: 400px;
+					margin: 0;
 				}
-				h1 {
-					font-size: 30px;
-				}
-				h2 {
-					font-size: 18px;
+			}
+			.tools {
+				flex-direction: row;
+				flex-wrap: wrap;
+				.tool {
+					flex-basis: calc(50% - 7.5px);
 				}
 			}
 		}
 	}
 }
-
-@media only screen and (max-width: 768px) {
+@media only screen and (min-width: $lg-breakpoint) {
 	.top {
 		.container {
-			padding-top: 25px;
-			gap: 30px;
-
-			.shieldmaiden {
-				width: 350px;
-				margin-left: -75px;
-			}
+			padding-left: 330px;
+			align-items: start;
 			.content {
-				.logo {
-					width: 300px;
-				}
-				h1 {
-					font-size: 28px;
-				}
-				h2 {
-					font-size: 16px;
-				}
-			}
-		}
-	}
-}
+				margin-bottom: 25px;
 
-@media only screen and (max-width: 640px) {
-	.top {
-		.bar {
-			top: 180px;
-			height: 100%;
-		}
-		.container {
-			padding-top: 30px;
-			gap: 20px;
-			padding-bottom: 80px;
-
-			.shieldmaiden {
-				width: 250px;
-				height: 180px;
-				position: absolute;
-				top: 0;
-				left: 0;
-				object-fit: cover;
-				object-position: top -5px left -30px;
-			}
-			.content {
-				padding-left: 120px;
-				position: relative;
-				z-index: 50;
-
-				.logo {
-					width: 200px;
-					margin-left: -18px;
-					margin-bottom: 10px;
-				}
-				h1 {
-					font-size: 20px;
-				}
-				h2 {
+				.laptop {
+					width: 457px;
 					display: none;
 				}
-				.button-container {
-					position: absolute;
-					left: 0;
-					top: 180px;
-					width: 100%;
-					text-align: center;
-
-					.q-btn {
-						width: 100%;
-
-						&__content {
-							font-size: 12px;
-						}
-					}
+			}
+			.logo {
+				margin-left: -35px;
+			}
+			.shieldmaiden {
+				display: block;
+			}
+			.tools {
+				.tool {
+					// flex-basis: calc(33% - 7.5px);
+				}
+			}
+		}
+	}
+}
+@media only screen and (min-width: $xl-breakpoint) {
+	.top {
+		.container {
+			.content {
+				.laptop {
+					width: 457px;
+					display: block;
 				}
 			}
 		}

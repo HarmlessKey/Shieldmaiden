@@ -33,8 +33,6 @@
 				</router-link>
 			</div>
 
-			<MusicPlayer />
-
 			<!-- ENVIRONMENT LABEL -->
 			<q-chip v-if="environment !== 'live'" color="red" icon="far fa-rocket" class="white">
 				<span class="ml-1">{{ environment.capitalize() }}</span>
@@ -184,14 +182,10 @@
 </template>
 
 <script>
-import MusicPlayer from "./MusicPlayer";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
 	name: "Header",
-	components: {
-		MusicPlayer,
-	},
 	props: {
 		maintenance: {
 			type: [Boolean, String],

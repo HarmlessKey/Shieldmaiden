@@ -28,10 +28,10 @@
 				</a>
 			</div>
 
-			<div class="card-body">
+			<div class="card-body -mt-3">
 				<template v-for="{ name, category, name_single } in actions">
 					<div v-if="npc[category] && npc[category].length > 0" :key="category">
-						<h3 class="d-flex justify-content-between">
+						<h3 class="d-flex justify-content-between mt-3">
 							{{ name }}
 							<a class="btn btn-sm btn-clear" @click="add(category)">
 								<i aria-hidden="true" class="fas fa-plus green"></i>
@@ -60,445 +60,481 @@
 						</ValidationProvider>
 
 						<!-- ABILITIES -->
-						<q-list :dark="$store.getters.theme === 'dark'" class="accordion">
-							<ValidationObserver
-								v-for="(ability, ability_index) in npc[category]"
-								v-slot="{ valid }"
-								:key="`ability-${ability_index}`"
+						<draggable
+							tag="div"
+							v-model="npc[category]"
+							:animation="200"
+							class="accordion"
+							handle=".drag-handle"
+							ghost-class="drag-ghost"
+							drag-class="drag-dragging"
+							:force-fallback="true"
+						>
+							<transition-group
+								type="transition"
+								name="action-list"
+								enter-active-class="animated animate__fadeIn"
+								leave-active-class="animated animate__fadeOut"
 							>
-								<q-expansion-item
-									:dark="$store.getters.theme === 'dark'"
-									switch-toggle-side
-									:group="name"
-									:name="name"
-									enter-active-class="animated animate__fadeIn"
-									leave-active-class="animated animate__fadeOut"
+								<div
+									v-for="(ability, ability_index) in npc[category]"
+									:key="`ability-${ability_index}`"
 								>
-									<template v-slot:header>
-										<q-item-section avatar v-if="!valid">
-											<q-icon name="error" color="red" />
-											<q-tooltip anchor="top middle" self="center middle">
-												Validation errors
-											</q-tooltip>
-										</q-item-section>
-										<q-item-section
-											avatar
-											v-if="
-												ability.action_list &&
-												ability.action_list[0] &&
-												ability.action_list[0].type !== 'other' &&
-												ability.action_list[0].rolls
-											"
+									<ValidationObserver v-slot="{ valid }">
+										<q-expansion-item
+											:dark="$store.getters.theme === 'dark'"
+											switch-toggle-side
+											:group="name"
+											:name="name"
+											enter-active-class="animated animate__fadeIn"
+											leave-active-class="animated animate__fadeOut"
 										>
-											<hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability">
-												<span class="roll-button" />
-											</hk-roll-action>
-										</q-item-section>
-										<q-item-section>
-											{{ ability.name }}
-											{{
-												ability.recharge
-													? `(Recharge ${
-															ability.recharge === "rest"
-																? "after a Short or Long Rest"
-																: ability.recharge
-													  })`
-													: ``
-											}}
-											{{
-												ability.limit
-													? `(${ability.limit}/${
-															ability.limit_type ? ability.limit_type.capitalize() : `Day`
-													  })`
-													: ``
-											}}
-											{{
-												ability.legendary_cost > 1
-													? `(Costs ${ability.legendary_cost} Actions)`
-													: ``
-											}}
-										</q-item-section>
-										<q-item-section avatar>
-											<a @click.stop="remove(ability_index, category)" class="remove">
-												<i aria-hidden="true" class="fas fa-trash-alt red" />
-												<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
-											</a>
-										</q-item-section>
-									</template>
+											<template v-slot:header>
+												<q-item-section avatar class="drag-handle">
+													<hk-icon icon="fas fa-grip-vertical" />
+												</q-item-section>
+												<q-item-section avatar v-if="!valid">
+													<q-icon name="error" color="red" />
+													<q-tooltip anchor="top middle" self="center middle">
+														Validation errors
+													</q-tooltip>
+												</q-item-section>
+												<q-item-section>
+													{{ ability.name }}
+													{{
+														ability.recharge
+															? `(Recharge ${
+																	ability.recharge === "rest"
+																		? "after a Short or Long Rest"
+																		: ability.recharge
+															  })`
+															: ``
+													}}
+													{{
+														ability.limit
+															? `(${ability.limit}/${
+																	ability.limit_type ? ability.limit_type.capitalize() : `Day`
+															  })`
+															: ``
+													}}
+													{{
+														ability.legendary_cost > 1
+															? `(Costs ${ability.legendary_cost} Actions)`
+															: ``
+													}}
+												</q-item-section>
+												<q-item-section
+													avatar
+													v-if="
+														ability.action_list &&
+														ability.action_list[0] &&
+														ability.action_list[0].type !== 'other' &&
+														ability.action_list[0].rolls
+													"
+												>
+													<hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability">
+														<span class="roll-button" />
+													</hk-roll-action>
+												</q-item-section>
+												<q-item-section avatar>
+													<a @click.stop="remove(ability_index, category)" class="remove">
+														<i aria-hidden="true" class="fas fa-trash-alt red" />
+														<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
+													</a>
+												</q-item-section>
+											</template>
 
-									<div class="accordion-body">
-										<ValidationProvider
-											v-if="category === 'legendary_actions'"
-											rules="between:1,9|required"
-											name="Legendary actions"
-											v-slot="{ errors, invalid, validated }"
-										>
-											<q-input
-												:dark="$store.getters.theme === 'dark'"
-												filled
-												square
-												label="Legendary actions"
-												autocomplete="off"
-												type="number"
-												class="mb-3"
-												v-model.number="ability.legendary_cost"
-												hint="How many legendary actions does this cost?"
-												@input="parseToInt($event, ability, 'legendary_cost')"
-												@keyup="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
-											/>
-										</ValidationProvider>
-
-										<ValidationProvider
-											rules="max:50|required"
-											name="Name"
-											v-slot="{ errors, invalid, validated }"
-										>
-											<q-input
-												:dark="$store.getters.theme === 'dark'"
-												filled
-												square
-												label="Name"
-												autocomplete="off"
-												class="mb-3"
-												maxlength="51"
-												v-model="ability.name"
-												@keyup="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
-											/>
-										</ValidationProvider>
-
-										<div class="row q-col-gutter-md mb-2" v-if="category !== 'legendary_actions'">
-											<div class="col">
+											<div class="accordion-body">
 												<ValidationProvider
-													rules="recharge"
-													name="Recharge"
+													v-if="category === 'legendary_actions'"
+													rules="between:1,9|required"
+													name="Legendary actions"
 													v-slot="{ errors, invalid, validated }"
 												>
 													<q-input
 														:dark="$store.getters.theme === 'dark'"
 														filled
 														square
-														label="Recharge"
+														label="Legendary actions"
 														autocomplete="off"
-														v-model="ability.recharge"
+														type="number"
+														class="mb-3"
+														v-model.number="ability.legendary_cost"
+														hint="How many legendary actions does this cost?"
+														@input="parseToInt($event, ability, 'legendary_cost')"
 														@keyup="$forceUpdate()"
 														:error="invalid && validated"
 														:error-message="errors[0]"
 													/>
 												</ValidationProvider>
-											</div>
-											<div class="col">
-												<div class="d-flex justify-content-start limit">
-													<ValidationProvider
-														rules="between:1,9"
-														name="Limited"
-														v-slot="{ errors, invalid, validated }"
-													>
-														<q-input
-															:dark="$store.getters.theme === 'dark'"
-															filled
-															square
-															label="Limited uses"
-															autocomplete="off"
-															type="number"
-															v-model.number="ability.limit"
-															@input="parseToInt($event, ability, 'limit')"
-															@keyup="$forceUpdate()"
-															:error="invalid && validated"
-															:error-message="errors[0]"
-														/>
-													</ValidationProvider>
-													<q-select
+
+												<ValidationProvider
+													rules="max:50|required"
+													name="Name"
+													v-slot="{ errors, invalid, validated }"
+												>
+													<q-input
 														:dark="$store.getters.theme === 'dark'"
 														filled
 														square
-														bottom-slots
-														label="Limit type"
-														class="limit-type"
-														v-model="ability.limit_type"
-														:options="limit_types"
-														@input="$forceUpdate()"
-														prefix="/"
+														label="Name"
+														autocomplete="off"
+														class="mb-3"
+														maxlength="51"
+														v-model="ability.name"
+														@keyup="$forceUpdate()"
+														:error="invalid && validated"
+														:error-message="errors[0]"
 													/>
-												</div>
-											</div>
-										</div>
-										<ValidationProvider
-											rules="max:2000"
-											name="Description"
-											v-slot="{ errors, invalid, validated }"
-										>
-											<q-input
-												:dark="$store.getters.theme === 'dark'"
-												filled
-												square
-												counter
-												label="Description"
-												autocomplete="off"
-												v-model="ability.desc"
-												name="desc"
-												maxlength="2000"
-												autogrow
-												@keyup="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
-											/>
-										</ValidationProvider>
+												</ValidationProvider>
 
-										<template>
-											<label class="group mt-3">Range & area of effect</label>
-											<div class="row q-col-gutter-sm">
-												<div class="col">
-													<ValidationProvider
-														rules="between:0,999"
-														name="Reach"
-														v-slot="{ errors, invalid, validated }"
-													>
-														<q-input
-															:dark="$store.getters.theme === 'dark'"
-															filled
-															square
-															class="reach"
-															label="Reach"
-															v-model.number="ability.reach"
-															type="number"
-															suffix="ft."
-															@keyup="$forceUpdate()"
-															@input="parseToInt($event, ability, 'reach')"
-															:error="invalid && validated"
-															:error-message="errors[0]"
-														/>
-													</ValidationProvider>
-												</div>
-												<div class="col">
-													<ValidationProvider
-														rules="range"
-														name="Range"
-														v-slot="{ errors, invalid, validated }"
-													>
-														<q-input
-															:dark="$store.getters.theme === 'dark'"
-															filled
-															square
-															label="Range"
-															v-model="ability.range"
-															suffix="ft."
-															@keyup="$forceUpdate()"
-															:error="invalid && validated"
-															:error-message="errors[0]"
-														/>
-													</ValidationProvider>
-												</div>
-												<div class="col">
-													<q-select
-														:dark="$store.getters.theme === 'dark'"
-														filled
-														square
-														clearable
-														emit-value
-														map-options
-														label="AOE type"
-														:options="aoe_types"
-														v-model="ability.aoe_type"
-														@input="$forceUpdate()"
-													/>
-												</div>
-												<div class="col">
-													<ValidationProvider
-														rules="between:0,999"
-														name="AOE size"
-														v-slot="{ errors, invalid, validated }"
-													>
-														<q-input
-															:dark="$store.getters.theme === 'dark'"
-															filled
-															square
-															label="AOE size"
-															type="number"
-															v-model.number="ability.aoe_size"
-															suffix="ft."
-															:disable="!ability.aoe_type"
-															@keyup="$forceUpdate()"
-															@input="parseToInt($event, ability, 'aoe_size')"
-															:error="invalid && validated"
-															:error-message="errors[0]"
-														/>
-													</ValidationProvider>
-												</div>
-											</div>
-
-											<!-- OPTIONS -->
-											<q-select
-												:dark="$store.getters.theme === 'dark'"
-												filled
-												square
-												multiple
-												use-input
-												use-chips
-												label="Options"
-												v-model="ability.options"
-												:option-disable="
-													(opt) =>
-														ability.options &&
-														ability.options.length > 1 &&
-														opt === ability.options[0]
-												"
-												class="mb-4"
-												@new-value="addOption"
-												@remove="removeOption($event, category, ability_index)"
-												@input="$forceUpdate()"
-											>
-												<hk-popover slot="append" header="Action options">
-													<i class="fas fa-info-circle" aria-hidden="true" />
-													<template #content>
-														Options allow you to create slightly different rolls for the actions and
-														choose to use this action with one of the options. Think of versatile
-														weapon attacks where you roll a different damage die for 1- or 2-handed
-														attacks.
-													</template>
-												</hk-popover>
-											</q-select>
-
-											<!-- ACTIONS -->
-											<div
-												v-for="(action, action_index) in ability.action_list"
-												:key="`action-${action_index}`"
-											>
-												<label class="group mt-3">Type of action</label>
-												<div class="row q-col-gutter-md">
-													<!-- ACTION TYPE -->
+												<div
+													class="row q-col-gutter-md mb-2"
+													v-if="category !== 'legendary_actions'"
+												>
 													<div class="col">
-														<q-select
-															:dark="$store.getters.theme === 'dark'"
-															filled
-															square
-															map-options
-															emit-value
-															label="Action type"
-															:options="Object.values(attack_types)"
-															v-model="action.type"
-															class="mb-2"
-															@input="$forceUpdate()"
-														/>
+														<ValidationProvider
+															rules="recharge"
+															name="Recharge"
+															v-slot="{ errors, invalid, validated }"
+														>
+															<q-input
+																:dark="$store.getters.theme === 'dark'"
+																filled
+																square
+																label="Recharge"
+																autocomplete="off"
+																v-model="ability.recharge"
+																@keyup="$forceUpdate()"
+																:error="invalid && validated"
+																:error-message="errors[0]"
+															/>
+														</ValidationProvider>
 													</div>
-
-													<!-- SAVE -->
-													<template v-if="action.type === 'save'">
-														<div class="col">
+													<div class="col">
+														<div class="d-flex justify-content-start limit">
 															<ValidationProvider
-																rules="required"
-																name="Save DC"
+																rules="between:1,9"
+																name="Limited"
 																v-slot="{ errors, invalid, validated }"
 															>
+																<q-input
+																	:dark="$store.getters.theme === 'dark'"
+																	filled
+																	square
+																	label="Limited uses"
+																	autocomplete="off"
+																	type="number"
+																	v-model.number="ability.limit"
+																	@input="parseToInt($event, ability, 'limit')"
+																	@keyup="$forceUpdate()"
+																	:error="invalid && validated"
+																	:error-message="errors[0]"
+																/>
+															</ValidationProvider>
+															<q-select
+																:dark="$store.getters.theme === 'dark'"
+																filled
+																square
+																bottom-slots
+																label="Limit type"
+																class="limit-type"
+																v-model="ability.limit_type"
+																:options="limit_types"
+																@input="$forceUpdate()"
+																prefix="/"
+															/>
+														</div>
+													</div>
+												</div>
+												<ValidationProvider
+													rules="max:2000"
+													name="Description"
+													v-slot="{ errors, invalid, validated }"
+												>
+													<q-input
+														:dark="$store.getters.theme === 'dark'"
+														filled
+														square
+														counter
+														label="Description"
+														autocomplete="off"
+														v-model="ability.desc"
+														name="desc"
+														maxlength="2000"
+														autogrow
+														@keyup="$forceUpdate()"
+														:error="invalid && validated"
+														:error-message="errors[0]"
+													/>
+												</ValidationProvider>
+
+												<template>
+													<label class="group mt-3">Range & area of effect</label>
+													<div class="row q-col-gutter-sm">
+														<div class="col">
+															<ValidationProvider
+																rules="between:0,999"
+																name="Reach"
+																v-slot="{ errors, invalid, validated }"
+															>
+																<q-input
+																	:dark="$store.getters.theme === 'dark'"
+																	filled
+																	square
+																	class="reach"
+																	label="Reach"
+																	v-model.number="ability.reach"
+																	type="number"
+																	suffix="ft."
+																	@keyup="$forceUpdate()"
+																	@input="parseToInt($event, ability, 'reach')"
+																	:error="invalid && validated"
+																	:error-message="errors[0]"
+																/>
+															</ValidationProvider>
+														</div>
+														<div class="col">
+															<ValidationProvider
+																rules="range"
+																name="Range"
+																v-slot="{ errors, invalid, validated }"
+															>
+																<q-input
+																	:dark="$store.getters.theme === 'dark'"
+																	filled
+																	square
+																	label="Range"
+																	v-model="ability.range"
+																	suffix="ft."
+																	@keyup="$forceUpdate()"
+																	:error="invalid && validated"
+																	:error-message="errors[0]"
+																/>
+															</ValidationProvider>
+														</div>
+														<div class="col">
+															<q-select
+																:dark="$store.getters.theme === 'dark'"
+																filled
+																square
+																clearable
+																emit-value
+																map-options
+																label="AOE type"
+																:options="aoe_types"
+																v-model="ability.aoe_type"
+																@input="$forceUpdate()"
+															/>
+														</div>
+														<div class="col">
+															<ValidationProvider
+																rules="between:0,999"
+																name="AOE size"
+																v-slot="{ errors, invalid, validated }"
+															>
+																<q-input
+																	:dark="$store.getters.theme === 'dark'"
+																	filled
+																	square
+																	label="AOE size"
+																	type="number"
+																	v-model.number="ability.aoe_size"
+																	suffix="ft."
+																	:disable="!ability.aoe_type"
+																	@keyup="$forceUpdate()"
+																	@input="parseToInt($event, ability, 'aoe_size')"
+																	:error="invalid && validated"
+																	:error-message="errors[0]"
+																/>
+															</ValidationProvider>
+														</div>
+													</div>
+
+													<!-- OPTIONS -->
+													<q-select
+														:dark="$store.getters.theme === 'dark'"
+														filled
+														square
+														multiple
+														use-input
+														use-chips
+														label="Options"
+														v-model="ability.options"
+														:option-disable="
+															(opt) =>
+																ability.options &&
+																ability.options.length > 1 &&
+																opt === ability.options[0]
+														"
+														class="mb-4"
+														@new-value="addOption"
+														@remove="removeOption($event, category, ability_index)"
+														@input="$forceUpdate()"
+													>
+														<hk-popover slot="append" header="Action options">
+															<i class="fas fa-info-circle" aria-hidden="true" />
+															<template #content>
+																Options allow you to create slightly different rolls for the actions
+																and choose to use this action with one of the options. Think of
+																versatile weapon attacks where you roll a different damage die for
+																1- or 2-handed attacks.
+															</template>
+														</hk-popover>
+													</q-select>
+
+													<!-- ACTIONS -->
+													<div
+														v-for="(action, action_index) in ability.action_list"
+														:key="`action-${action_index}`"
+													>
+														<label class="group mt-3">Type of action</label>
+														<div class="row q-col-gutter-md">
+															<!-- ACTION TYPE -->
+															<div class="col">
 																<q-select
 																	:dark="$store.getters.theme === 'dark'"
 																	filled
 																	square
 																	map-options
 																	emit-value
-																	label="Save ability"
-																	:options="abilities"
-																	v-model="action.save_ability"
+																	label="Action type"
+																	:options="Object.values(attack_types)"
+																	v-model="action.type"
+																	class="mb-2"
 																	@input="$forceUpdate()"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
 																/>
-															</ValidationProvider>
-														</div>
-														<div class="col">
-															<ValidationProvider
-																rules="required|between:1,99"
-																name="Save DC"
-																v-slot="{ errors, invalid, validated }"
+															</div>
+
+															<!-- SAVE -->
+															<template v-if="action.type === 'save'">
+																<div class="col">
+																	<ValidationProvider
+																		rules="required"
+																		name="Save DC"
+																		v-slot="{ errors, invalid, validated }"
+																	>
+																		<q-select
+																			:dark="$store.getters.theme === 'dark'"
+																			filled
+																			square
+																			map-options
+																			emit-value
+																			label="Save ability"
+																			:options="abilities"
+																			v-model="action.save_ability"
+																			@input="$forceUpdate()"
+																			:error="invalid && validated"
+																			:error-message="errors[0]"
+																		/>
+																	</ValidationProvider>
+																</div>
+																<div class="col">
+																	<ValidationProvider
+																		rules="required|between:1,99"
+																		name="Save DC"
+																		v-slot="{ errors, invalid, validated }"
+																	>
+																		<q-input
+																			:dark="$store.getters.theme === 'dark'"
+																			filled
+																			square
+																			type="number"
+																			label="Save DC"
+																			v-model.number="action.save_dc"
+																			@keyup="$forceUpdate()"
+																			@input="parseToInt($event, action, 'save_dc')"
+																			:error="invalid && validated"
+																			:error-message="errors[0]"
+																		/>
+																	</ValidationProvider>
+																</div>
+															</template>
+
+															<template
+																v-else-if="!['healing', 'damage', 'other'].includes(action.type)"
 															>
-																<q-input
-																	:dark="$store.getters.theme === 'dark'"
-																	filled
-																	square
-																	type="number"
-																	label="Save DC"
-																	v-model.number="action.save_dc"
-																	@keyup="$forceUpdate()"
-																	@input="parseToInt($event, action, 'save_dc')"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
+																<div class="col">
+																	<ValidationProvider
+																		rules="between:-10,99"
+																		name="Attack modifier"
+																		v-slot="{ errors, invalid, validated }"
+																	>
+																		<q-input
+																			:dark="$store.getters.theme === 'dark'"
+																			filled
+																			square
+																			type="number"
+																			label="Attack modifier"
+																			v-model.number="action.attack_bonus"
+																			@keyup="$forceUpdate()"
+																			@input="parseToInt($event, action, 'attack_bonus')"
+																			:error="invalid && validated"
+																			:error-message="errors[0]"
+																		/>
+																	</ValidationProvider>
+																</div>
+															</template>
+														</div>
+
+														<template v-if="action.type !== 'other'">
+															<!-- ACTION ROLLS -->
+															<div class="hk-card mt-3 rolls">
+																<div class="card-header d-flex justify-content-between">
+																	<span
+																		><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span
+																	>
+																	<a
+																		class="btn btn-sm bg-neutral-5"
+																		@click="
+																			newRoll(
+																				ability_index,
+																				ability,
+																				category,
+																				action_index,
+																				action
+																			)
+																		"
+																	>
+																		<i aria-hidden="true" class="fas fa-plus green"></i>
+																		<span class="d-none d-md-inline ml-1">Add roll</span>
+																	</a>
+																</div>
+
+																<!-- ROLLS TABLE -->
+																<hk-action-rolls-table
+																	v-if="action.rolls"
+																	:rolls="action.rolls"
+																	:type="action.type"
+																	:versatile="ability.versatile"
+																	:versatile-options="[
+																		ability.versatile_one,
+																		ability.versatile_two,
+																	]"
+																	@edit="
+																		editRoll(
+																			$event,
+																			ability_index,
+																			ability,
+																			category,
+																			action_index,
+																			action
+																		)
+																	"
+																	@delete="
+																		deleteRoll($event, ability_index, category, action_index)
+																	"
 																/>
-															</ValidationProvider>
-														</div>
-													</template>
-
-													<template
-														v-else-if="!['healing', 'damage', 'other'].includes(action.type)"
-													>
-														<div class="col">
-															<ValidationProvider
-																rules="between:-10,99"
-																name="Attack modifier"
-																v-slot="{ errors, invalid, validated }"
-															>
-																<q-input
-																	:dark="$store.getters.theme === 'dark'"
-																	filled
-																	square
-																	type="number"
-																	label="Attack modifier"
-																	v-model.number="action.attack_bonus"
-																	@keyup="$forceUpdate()"
-																	@input="parseToInt($event, action, 'attack_bonus')"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
-																/>
-															</ValidationProvider>
-														</div>
-													</template>
-												</div>
-
-												<template v-if="action.type !== 'other'">
-													<!-- ACTION ROLLS -->
-													<div class="hk-card mt-3 rolls">
-														<div class="card-header d-flex justify-content-between">
-															<span><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span>
-															<a
-																class="btn btn-sm bg-neutral-5"
-																@click="
-																	newRoll(ability_index, ability, category, action_index, action)
-																"
-															>
-																<i aria-hidden="true" class="fas fa-plus green"></i>
-																<span class="d-none d-md-inline ml-1">Add roll</span>
-															</a>
-														</div>
-
-														<!-- ROLLS TABLE -->
-														<hk-action-rolls-table
-															v-if="action.rolls"
-															:rolls="action.rolls"
-															:type="action.type"
-															:versatile="ability.versatile"
-															:versatile-options="[ability.versatile_one, ability.versatile_two]"
-															@edit="
-																editRoll(
-																	$event,
-																	ability_index,
-																	ability,
-																	category,
-																	action_index,
-																	action
-																)
-															"
-															@delete="deleteRoll($event, ability_index, category, action_index)"
-														/>
+															</div>
+														</template>
 													</div>
 												</template>
 											</div>
-										</template>
-									</div>
-								</q-expansion-item>
-							</ValidationObserver>
-						</q-list>
+										</q-expansion-item>
+									</ValidationObserver>
+								</div>
+							</transition-group>
+						</draggable>
 					</div>
 				</template>
 			</div>
@@ -547,11 +583,15 @@ import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { attack_types } from "src/utils/actionConstants";
+import draggable from "vuedraggable";
 
 export default {
 	name: "npc-Actions",
 	props: ["value"],
 	mixins: [general, monsterMixin, dice],
+	components: {
+		draggable,
+	},
 	data() {
 		return {
 			damage_types: damage_types,
@@ -812,5 +852,29 @@ h3 {
 }
 .disadvantage .roll-button:hover {
 	background-image: url("../../assets/_img/logo/logo-icon-no-shield-red.svg");
+}
+.drag {
+	&-ghost {
+		opacity: 0.6;
+	}
+	&-handle {
+		color: $neutral-2;
+		cursor: grab;
+	}
+	&-dragging {
+		opacity: 1 !important;
+		margin-top: -42px !important;
+		margin-left: -40px !important;
+		box-shadow: 0 5px 10px $black;
+		background-color: $neutral-9;
+	}
+}
+.action-list {
+	transition: transform 0.5s;
+}
+::v-deep {
+	.q-item {
+		user-select: none;
+	}
 }
 </style>

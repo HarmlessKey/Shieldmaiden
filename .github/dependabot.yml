@@ -3,7 +3,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     target-branch: "develop"
     ignore:
       - dependency-name: "@quasar/app"
+        versions: [">=2.4.3"]

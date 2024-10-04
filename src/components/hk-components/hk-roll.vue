@@ -8,7 +8,7 @@
 		@mousemove="checkAdvantage($event)"
 		@mouseout="clearAdvantage()"
 		v-touch-hold.mouse="!disabled ? showDialog : null"
-		@click.stop="disabled ? null : roll ? rollDice($event) : emit($event)"
+		@click.stop.prevent="disabled ? null : roll ? rollDice($event) : emit($event)"
 	>
 		<slot name="default" />
 		<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">

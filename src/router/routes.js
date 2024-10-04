@@ -77,7 +77,7 @@ const routes = [
 				children: [
 					{
 						path: "",
-						name: "Import content",
+						name: "ImportContent",
 						component: () => import("src/views/UserContent/ImportContent"),
 						meta: {
 							description: "Import content to Shieldmaiden",
@@ -85,12 +85,21 @@ const routes = [
 						},
 					},
 					{
-						path: "hk_import",
-						name: "Import Shieldmaiden Content",
+						path: "shieldmaiden-import",
+						name: "ImportShieldmaidenContent",
 						component: () => import("src/views/UserContent/ImportContent/ImportHKContent"),
 						meta: {
-							description: "Import User Content from an Shieldmaiden export",
-							title: "Import Shieldmaiden Content",
+							description: "Import User Content from a Shieldmaiden export",
+							title: "Shieldmaiden",
+						},
+					},
+					{
+						path: "generate-npcs",
+						name: "GenerateNPCs",
+						component: () => import("src/views/UserContent/ImportContent/GenerateNPCs"),
+						meta: {
+							description: "Generate NPCs from a picture or text prompt.",
+							title: "Generate NPCs",
 						},
 					},
 				],

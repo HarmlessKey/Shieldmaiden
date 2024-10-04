@@ -1,5 +1,5 @@
 <template>
-	<hk-card header="Manage your content">
+	<hk-card header="Import Shieldmaiden content">
 		<ImportUserContent class="card-body" />
 	</hk-card>
 </template>
@@ -8,13 +8,9 @@
 import ImportUserContent from "src/components/userContent/ImportUserContent";
 
 export default {
-	name: "manage-content",
+	name: "import-shieldmaiden-content",
 	components: {
 		ImportUserContent,
 	},
-	data() {
-		return {};
-	},
-	computed: {},
 };
 </script>

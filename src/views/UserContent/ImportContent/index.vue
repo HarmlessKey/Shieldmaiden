@@ -1,44 +1,50 @@
 <template>
-	<div v-if="tier.price !== 'Free'" class="d-flex justify-center">
-		<hk-card header="Shieldmaiden" class="select">
+	<div v-if="tier.price !== 'Free'">
+		<hk-card header="Import content">
+			<div slot="header" class="card-header">
+				<div><hk-icon icon="fas fa-file-upload" class="mr-1" /> Import content</div>
+			</div>
 			<div class="card-body">
-				<p>Import a Shieldmaiden export</p>
-			</div>
-			<div slot="footer">
-				<router-link to="/content/import/hk_import" class="btn btn-block">Select</router-link>
-			</div>
-		</hk-card>
-		<hk-card header="Convert Old" class="disabled select">
-			<div class="card-body">
-				<p>Convert your old exports to new format</p>
-			</div>
-			<div slot="footer">
-				<button class="btn btn-block">Select</button>
-			</div>
-		</hk-card>
-		<hk-card header="External Source" class="disabled select">
-			<div class="card-body">
-				<p>Import from an external source</p>
-			</div>
-			<div slot="footer">
-				<button class="btn btn-block">Select</button>
-			</div>
-		</hk-card>
-		<hk-card header="Sync Extension" class="disabled select">
-			<div class="card-body">
-				<p>Import from the HK Content Sync Extension</p>
-			</div>
-			<div slot="footer">
-				<button class="btn btn-block">Select</button>
+				<div class="row q-col-gutter-md">
+					<div class="col-12 col-sm-6 col-md-4">
+						<hk-card header="Shieldmaiden">
+							<div class="card-body">
+								<p>Import a Shieldmaiden export</p>
+							</div>
+							<div slot="footer">
+								<router-link to="/content/import/shieldmaiden-import" class="btn btn-block"
+									>Start import</router-link
+								>
+							</div>
+						</hk-card>
+					</div>
+					<div class="col-12 col-sm-6 col-md-4">
+						<hk-card header="Generate NPCs">
+							<div class="card-body">
+								<p>Generate Shieldmaiden NPCs from an image or text prompt.</p>
+							</div>
+							<div slot="footer">
+								<router-link to="/content/import/generate-npcs" class="btn btn-block"
+									>Start generate</router-link
+								>
+							</div>
+						</hk-card>
+					</div>
+				</div>
 			</div>
 		</hk-card>
 	</div>
 	<hk-card v-else header="Import content">
-		<div class="card-body d-flex flex-col justify-center text-center">
+		<div class="card-body d-flex flex-col justify-center">
 			<h2>With a subscription you can import Shieldmaiden content created by others.</h2>
 			<p>
 				Content creators can export their entire one shots or campaigns from Shieldmaiden and you
 				will be able to import them including all encounters and monsters.
+			</p>
+			<h2>Generate NPCs</h2>
+			<p>
+				You can't spell Shieldmaiden without AI, therefore, you can generate NPCs with an image or
+				text prompt, that you can use directly in Shieldmaiden.
 			</p>
 			<router-link to="/patreon" class="btn btn-lg mt-2">Get a subscription</router-link>
 		</div>
@@ -57,9 +63,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.hk-card.select {
-	max-width: 200px;
-	margin: 10px;
-	user-select: none;
+h2 {
+	margin-bottom: 10px;
+}
+.hk-card {
+	height: 100%;
 }
 </style>

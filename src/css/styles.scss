@@ -1570,32 +1570,33 @@ html body {
 	.login-container {
 		background-position: center;
 		padding: 100px 30px 0 30px;
+	}
+	#login {
+		background-color: $neutral-7;
+		max-width: 360px;
+		margin: auto;
+		padding: 120px 30px 30px;
+		position: relative;
+		box-shadow: 5px 5px 10px #000;
+		border-radius: $border-radius;
+		overflow: visible;
+		width: 100%;
 
-		#login {
-			background-color: $neutral-7;
-			max-width: 360px;
-			margin: auto;
-			padding: 120px 30px 30px;
-			position: relative;
-			box-shadow: 5px 5px 10px #000;
-			border-radius: $border-radius;
-
-			h1,
-			h2 {
-				text-transform: none !important;
-				text-align: center;
-				margin-bottom: 20px;
-			}
-			img.logo {
-				width: calc(100% - 50px);
-				margin: 0 25px;
-				position: absolute;
-				top: -35px;
-				left: 0;
-			}
-			.q-field {
-				margin-bottom: 1px;
-			}
+		h1,
+		h2 {
+			text-transform: none !important;
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		img.logo {
+			width: calc(100% - 50px);
+			margin: 0 25px;
+			position: absolute;
+			top: -35px;
+			left: 0;
+		}
+		.q-field {
+			margin-bottom: 1px;
 		}
 	}
 	.google {

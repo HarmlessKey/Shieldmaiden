@@ -162,30 +162,96 @@
 		</div>
 
 		<!-- ACTIONS -->
-		<hk-card class="mb-0">
-			<div class="card-body actions">
+		<hk-card header="Account" class="mb-0">
+			<div class="card-body">
+				<h2>Sign in methods</h2>
+				<q-list class="mb-4">
+					<q-item
+						v-for="{ key, name, icon } of providers"
+						:key="key"
+						class="bg-neutral-9 mb-1"
+						:class="{ 'neutral-3': !sign_in_methods.includes(key) }"
+					>
+						<q-item-section avatar><hk-icon :icon="icon" /></q-item-section>
+						<q-item-section>
+							{{ name }}
+							<template v-if="!sign_in_methods.includes(key)">(Not linked)</template>
+						</q-item-section>
+						<q-item-section
+							v-if="!sign_in_methods.includes(key) || sign_in_methods.length > 1"
+							avatar
+						>
+							<button
+								class="btn btn-sm bg-neutral-5"
+								@click="sign_in_methods.includes(key) ? unlinkMethod(key) : linkMethod(key)"
+							>
+								<hk-icon :icon="sign_in_methods.includes(key) ? 'fas fa-unlink' : 'fas fa-link'" />
+							</button>
+						</q-item-section>
+					</q-item>
+				</q-list>
+				<h2>Actions</h2>
+				<a @click="resetPassword()" class="btn btn-sm btn-clear mb-3">
+					<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Reset Password </a
+				><br />
 				<p v-if="resetError" class="red text-center">
 					<i aria-hidden="true" class="fas fa-exclamation-triangle" /> {{ resetError }}
 				</p>
 				<p v-if="resetSuccess" class="green text-center">
 					<i aria-hidden="true" class="fas fa-check" /> {{ resetSuccess }}
 				</p>
-
-				<div class="d-flex justify-content-between">
-					<a @click="resetPassword()" class="btn btn-sm btn-clear">
-						<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Reset Password
-					</a>
-					<router-link to="/profile/delete-account" class="btn btn-sm btn-clear">
-						<i aria-hidden="true" class="fas fa-trash-alt red mr-1" /> Delete account
-					</router-link>
-				</div>
+				<router-link to="/profile/delete-account" class="btn btn-sm btn-clear">
+					<i aria-hidden="true" class="fas fa-trash-alt red mr-1" /> Delete account
+				</router-link>
 			</div>
 		</hk-card>
+		<q-dialog v-model="password_dialog">
+			<div>
+				<ValidationObserver v-slot="{ handleSubmit, valid }">
+					<q-form @submit="handleSubmit(linkMethod('password'))">
+						<hk-card header="Set a password">
+							<div class="card-body pb-0">
+								<hk-input :value="user.email" readonly class="mb-4" />
+								<hk-input
+									v-model="password"
+									autocomplete="new-password"
+									class="mb-2"
+									type="password"
+									placeholder="Password"
+									name="password"
+									rules="required"
+								/>
+
+								<hk-input
+									v-model="confirm_password"
+									autocomplete="new-password"
+									class="mb-2"
+									type="password"
+									placeholder="Confirm Password"
+									rules="required|confirmed:password"
+									name="Confirm Password"
+								/>
+							</div>
+							<div slot="footer" class="card-footer">
+								<q-btn no-caps label="Cancel" type="submit" :disabled="!valid" />
+								<q-btn no-caps label="Confirm" color="primary" type="submit" :disabled="!valid" />
+							</div>
+						</hk-card>
+					</q-form>
+				</ValidationObserver>
+			</div>
+		</q-dialog>
+		<q-dialog v-model="sign_in_dialog">
+			<SignIn
+				@sign-in="handleSignIn"
+				message="This is a sensitive action, please login again first"
+			/>
+		</q-dialog>
 	</q-no-ssr>
 </template>
 
 <script>
-import { auth } from "src/firebase";
+import { firebase, auth } from "src/firebase";
 import { general } from "src/mixins/general.js";
 import { mapActions, mapGetters } from "vuex";
 import Content from "src/components/userContent/Content";
@@ -194,6 +260,7 @@ import UserBanner from "src/components/userContent/UserBanner";
 import Tutorial from "src/components/userContent/Tutorial";
 import PatreonLinkButton from "src/components/PatreonLinkButton";
 import PaymentDeclined from "src/components/PaymentDeclined.vue";
+import SignIn from "src/components/SignIn.vue";
 
 export default {
 	name: "Profile",
@@ -204,6 +271,7 @@ export default {
 		Tutorial,
 		PatreonLinkButton,
 		PaymentDeclined,
+		SignIn,
 	},
 	preFetch({ store, redirect }) {
 		if (!store.getters.user) {
@@ -219,6 +287,23 @@ export default {
 			resetError: undefined,
 			resetSuccess: undefined,
 			voucher_input_text: undefined,
+			sign_in_dialog: false,
+			password_dialog: false,
+			password: null,
+			confirm_password: null,
+			providers: [
+				{
+					key: "password",
+					name: "Email and Password",
+					icon: "fas fa-lock",
+				},
+				{
+					key: "google.com",
+					name: "Google",
+					icon: "fab fa-google",
+				},
+			],
+			sign_in_methods: [],
 			content_types: [
 				{
 					type: "campaigns",
@@ -257,8 +342,16 @@ export default {
 			);
 		},
 	},
+	async mounted() {
+		await this.fetchMethods();
+	},
 	methods: {
 		...mapActions(["set_active_voucher", "setUserInfo", "update_userInfo", "checkEncumbrance"]),
+		async fetchMethods() {
+			auth.fetchSignInMethodsForEmail(this.user.email).then((providers) => {
+				this.sign_in_methods = providers;
+			});
+		},
 		resetPassword() {
 			var vm = this;
 			var emailAddress = this.user.email;
@@ -295,6 +388,66 @@ export default {
 			});
 			await this.setUserInfo();
 			await this.checkEncumbrance();
+		},
+		showPasswordDialog() {
+			this.password_dialog = true;
+		},
+		async linkMethod(method) {
+			const user = firebase.auth().currentUser;
+			if (user) {
+				if (method === "google.com") {
+					const provider = new firebase.auth.GoogleAuthProvider();
+					await user
+						.linkWithPopup(provider)
+						.then(async () => {
+							await this.fetchMethods();
+						})
+						.catch((e) => {
+							console.error(e);
+							this.sign_in_dialog = true;
+						});
+				} else if (method === "password") {
+					if (!this.password_dialog) {
+						this.password_dialog = true;
+					} else {
+						const credential = firebase.auth.EmailAuthProvider.credential(
+							this.user.email,
+							this.password
+						);
+						await user
+							.linkWithCredential(credential)
+							.then(async () => {
+								this.password = null;
+								this.confirm_password = null;
+								this.password_dialog = false;
+								await this.fetchMethods();
+							})
+							.catch((e) => {
+								console.error(e);
+								this.sign_in_dialog = true;
+							});
+					}
+				}
+			}
+		},
+		async unlinkMethod(method) {
+			const user = firebase.auth().currentUser;
+			if (user) {
+				await user
+					.unlink(method)
+					.then(async () => {
+						await this.fetchMethods();
+					})
+					.catch((e) => {
+						console.error(e);
+						this.sign_in_dialog = true;
+					});
+			}
+		},
+		handleSignIn(e) {
+			if (e === "success") {
+				this.sign_in_dialog = false;
+			}
 		},
 	},
 };

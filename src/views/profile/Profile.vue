@@ -191,16 +191,18 @@
 					</q-item>
 				</q-list>
 				<h2>Actions</h2>
-				<a @click="resetPassword()" class="btn btn-sm btn-clear mb-3">
-					<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Reset Password </a
-				><br />
-				<p v-if="resetError" class="red text-center">
-					<i aria-hidden="true" class="fas fa-exclamation-triangle" /> {{ resetError }}
-				</p>
-				<p v-if="resetSuccess" class="green text-center">
-					<i aria-hidden="true" class="fas fa-check" /> {{ resetSuccess }}
-				</p>
-				<router-link to="/profile/delete-account" class="btn btn-sm btn-clear">
+				<div v-if="sign_in_methods.includes('password')" class="mb-3">
+					<a @click="resetPassword()" class="neutral-2">
+						<i aria-hidden="true" class="fas fa-redo-alt blue mr-1" /> Reset Password
+					</a>
+					<p v-if="resetError" class="red text-center">
+						<i aria-hidden="true" class="fas fa-exclamation-triangle" /> {{ resetError }}
+					</p>
+					<p v-if="resetSuccess" class="green text-center">
+						<i aria-hidden="true" class="fas fa-check" /> {{ resetSuccess }}
+					</p>
+				</div>
+				<router-link to="/profile/delete-account" class="neutral-2">
 					<i aria-hidden="true" class="fas fa-trash-alt red mr-1" /> Delete account
 				</router-link>
 			</div>

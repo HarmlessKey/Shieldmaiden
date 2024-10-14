@@ -159,8 +159,6 @@ export default {
 
 <style lang="scss" scoped>
 .top {
-	background-image: url("../../assets/_img/styles/paper-bg.png");
-	background-position: top center;
 	padding-bottom: 50px;
 	background-color: $neutral-11;
 	overflow: hidden;
@@ -230,7 +228,6 @@ export default {
 				color: $neutral-1;
 				display: flex;
 				cursor: pointer;
-				box-shadow: 0 10px 15px $black;
 
 				&:hover {
 					background-color: $neutral-7;

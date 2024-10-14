@@ -1,23 +1,23 @@
 :root {
 	color-scheme: dark;
-	--neutral-11: #080808; // custom
-	--neutral-10: #191a1c; //custom
-	--neutral-9: #202225; // Server sidebar
-	--neutral-8: #292b2f; // Sidebar Bottom
-	--neutral-7: #2f3136; // Sidebar
-	--neutral-6: #36393f; // Main background
-	--neutral-5: #3e4249;
-	--neutral-4: #72767d; // Sidebar icon
-	--neutral-3: #8e9297; // Sidebar text
-	--neutral-2: #b9bbbe; // Icons header
+	--neutral-11: #15171e; // custom
+	--neutral-10: #0c0e13; //custom
+	--neutral-9: #111219; // Server sidebar
+	--neutral-8: #1c1e22; // Sidebar Bottom
+	--neutral-7: #1e1f25; // Sidebar
+	--neutral-6: #23252b; // Main background
+	--neutral-5: #2c2e34;
+	--neutral-4: #737478; // Sidebar icon
+	--neutral-3: #7e7f83; // Sidebar text
+	--neutral-2: #8a8b8f; // Icons header
 	--neutral-1: #ffffff; // Text
 
-	--neutral-6-transparent: rgba(54, 57, 63, 0.9);
-	--neutral-6-transparent-8: rgba(54, 57, 63, 0.8);
-	--neutral-6-transparent-7: rgba(54, 57, 63, 0.7);
+	--neutral-6-transparent: rgba(35, 37, 43, 0.9);
+	--neutral-6-transparent-8: rgba(35, 37, 43, 0.8);
+	--neutral-6-transparent-7: rgba(35, 37, 43, 0.7);
 
-	--neutral-8-transparent: rgba(41, 43, 47, 0.9);
-	--neutral-8-transparent-8: rgba(41, 43, 47, 0.8);
+	--neutral-8-transparent: rgba(28, 30, 34, 0.9);
+	--neutral-8-transparent-8: rgba(28, 30, 34, 0.8);
 
 	--black: #000;
 	--white: #fff;
@@ -74,23 +74,23 @@
 [data-theme="light"] {
 	color-scheme: light;
 	--neutral-11: #ffffff;
-	--neutral-10: #eeeeee;
-	--neutral-9: #e3e5e8;
-	--neutral-8: #dcdee0;
-	--neutral-7: #f2f3f5;
+	--neutral-10: #eaf1fb;
+	--neutral-9: #f2f6fc;
+	--neutral-8: #f6f8fc;
+	--neutral-7: #eaf1fb;
 	--neutral-6: #ffffff;
-	--neutral-5: #9ea5b1;
-	--neutral-4: #747f8d;
-	--neutral-3: #6a7480;
-	--neutral-2: #4f5660;
+	--neutral-5: #c2e7ff;
+	--neutral-4: #8cb7d4;
+	--neutral-3: #638ba6;
+	--neutral-2: #0d2d43;
 	--neutral-1: #060607;
 
 	--neutral-6-transparent: rgba(255, 255, 255, 0.9);
 	--neutral-6-transparent-8: rgba(255, 255, 255, 0.8);
 	--neutral-6-transparent-7: rgba(255, 255, 255, 0.7);
 
-	--neutral-8-transparent: rgba(220, 222, 224, 0.9);
-	--neutral-8-transparent-8: rgba(220, 222, 224, 0.8);
+	--neutral-8-transparent: rgba(246, 248, 252, 0.9);
+	--neutral-8-transparent-8: rgba(246, 248, 252, 0.8);
 
 	--radiant: #e2da5f;
 }

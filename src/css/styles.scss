@@ -34,7 +34,7 @@ html body {
 	font-size: $font-size;
 	font-family: "Open Sans", sans-serif;
 	position: relative;
-	background-image: url("../assets/_img/styles/paper-bg.png");
+	// background-image: url("../assets/_img/styles/paper-bg.png");
 
 	*:focus-visible {
 		outline-offset: 3px;
@@ -58,7 +58,7 @@ html body {
 		height: $header-height;
 		line-height: 50px;
 		width: 100%;
-		background: $neutral-7;
+		background: $neutral-6;
 		border-bottom: solid 1px transparent;
 		position: fixed;
 		top: 0;
@@ -1002,9 +1002,8 @@ html body {
 
 	.breadcrumb {
 		margin-bottom: 20px;
-		background: $neutral-9;
+		background: $neutral-6;
 		border-radius: $border-radius;
-		border: solid 1px $neutral-8;
 		padding: 10px 15px;
 	}
 
@@ -1664,8 +1663,8 @@ html body {
 		margin-bottom: 20px;
 		border-radius: $border-radius;
 		overflow: auto;
-		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.125), 0 6px 2px 0 rgba(0, 0, 0, 0.1);
-		border: solid 1px $neutral-5;
+		// box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.125), 0 6px 2px 0 rgba(0, 0, 0, 0.1);
+		// border: solid 1px $neutral-5;
 
 		&::-webkit-scrollbar {
 			display: none !important;
@@ -1708,8 +1707,7 @@ html body {
 		}
 		.card-footer {
 			padding: 12px 15px;
-			background-color: rgba(0, 0, 0, 0.03);
-			border-top: 1px solid rgba(0, 0, 0, 0.125);
+			background-color: $neutral-8;
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
@@ -2852,7 +2850,7 @@ html body {
 
 			.breadcrumb {
 				margin-bottom: 0;
-				background: $neutral-9;
+				background: $neutral-6;
 				border-radius: 0;
 				border: none;
 				padding: 10px 15px;

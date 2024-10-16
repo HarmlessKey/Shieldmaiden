@@ -1,7 +1,70 @@
 <template>
 	<div class="top">
 		<div class="container">
-			<img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden" />
+			<div class="header">
+				<!-- <img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden" /> -->
+				<div class="header__bar">
+					<span>Shieldmaiden<em class="neutral-2">.app</em></span>
+				</div>
+				<a
+					class="btn bg-neutral-6"
+					href="https://discord.gg/dU59jgvcuq"
+					target="_blank"
+					rel="noopener"
+					><i class="fab fa-discord mr-3" />Join our Discord</a
+				>
+				<router-link
+					v-if="!$store.getters.user"
+					class="btn bg-neutral-6 create-account"
+					to="/sign-up"
+					>Create account</router-link
+				>
+			</div>
+			<q-parallax src="../../assets/_img/home/shieldmaiden-banner.webp" class="mb-4" :height="360">
+				<div class="banner">
+					<div class="banner__content">
+						<h1>D&D Combat Tracker</h1>
+						<h2>And the ultimate companion app for your campaign</h2>
+						<q-btn
+							v-if="!$store.getters.user"
+							class="px-2 py-1"
+							to="/demo"
+							color="primary"
+							size="lg"
+							no-caps
+						>
+							Try Demo Encounter
+						</q-btn>
+					</div>
+				</div>
+			</q-parallax>
+
+			<div class="tools-title">More Shieldmaiden features</div>
+			<div class="tools">
+				<router-link
+					v-for="{ title, to, description, icon } in tools"
+					:key="to"
+					:to="to"
+					class="tool"
+				>
+					<div class="tool__image">
+						<i :class="icon" aria-hidden="true" />
+					</div>
+					<div class="tool__content">
+						<div class="tool__content-title">
+							{{ title }}
+						</div>
+						<div class="tool__content-description" v-html="description" />
+					</div>
+				</router-link>
+			</div>
+
+			<a href="#general" class="read-more">
+				<div>Read more</div>
+				<i aria-hidden="true" class="fas fa-chevron-down" />
+			</a>
+
+			<!-- <img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden" />
 			<div class="content">
 				<div>
 					<h1>D&D Combat Tracker</h1>
@@ -63,7 +126,8 @@
 			<div>Read more</div>
 			<i aria-hidden="true" icon="fas fa-chevron-down" />
 		</a>
-		<q-resize-observer @resize="setSize" />
+		<q-resize-observer @resize="setSize" /> -->
+		</div>
 	</div>
 </template>
 
@@ -164,17 +228,87 @@ export default {
 	overflow: hidden;
 
 	.container {
-		padding: 30px 20px 0 20px;
+		padding: 0 20px;
 		max-width: 1280px;
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 
-		.logo {
+		.header {
 			width: 100%;
-			max-width: 320px;
-			margin-bottom: 30px;
+			display: flex;
+			align-items: center;
+			margin-bottom: 10px;
+			border-radius: $border-radius;
+			gap: 10px;
+
+			.logo {
+				max-width: 260px;
+				margin: -10px;
+			}
+			&__bar {
+				width: 100%;
+				height: 54px;
+				background-color: $neutral-6;
+				border-radius: $border-radius-small;
+				display: flex;
+				justify-content: flex-start;
+				gap: 10px;
+				align-items: center;
+				padding: 0 15px;
+				font-weight: bold;
+			}
+			.btn {
+				white-space: nowrap;
+				height: 54px;
+				line-height: 54px;
+				padding: 0 12px;
+
+				&.create-account {
+					border-color: $neutral-2;
+					border-width: 2px;
+					line-height: 52px;
+				}
+			}
+		}
+		.q-parallax {
+			border-radius: $border-radius;
+		}
+		.banner {
+			// background-image: url("../../assets/_img/home/shieldmaiden-banner.webp");
+			// background-size: cover;
+			border-radius: $border-radius;
+			height: 360px;
+			width: 100%;
+			display: flex;
+			justify-content: flex-start;
+			overflow: hidden;
+			&__content {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				padding: 0 45px;
+				width: 100%;
+				max-width: 550px;
+
+				h1,
+				h2 {
+					text-shadow: 2px 2px 5px $black;
+				}
+
+				::v-deep {
+					.q-btn {
+						font-weight: bold;
+						font-size: 22px !important;
+						// background-color: $green !important;
+						border: solid 3px $neutral-1;
+						max-width: 300px;
+						// color: $neutral-11 !important;
+						box-shadow: $shadow-8;
+					}
+				}
+			}
 		}
 		.shieldmaiden {
 			height: 860px;
@@ -195,25 +329,25 @@ export default {
 				width: 80%;
 				margin: 20px auto;
 			}
-			::v-deep {
-				.q-btn {
-					background-color: #3fa3ad !important;
-				}
-			}
 		}
 		h1 {
 			line-height: normal;
-			font-size: 30px;
+			font-size: 35px;
 			margin: 0 0 10px 0;
-			text-transform: uppercase;
+			font-family: inherit;
+			max-width: 400px;
+			font-weight: bold;
+			line-height: 35px;
 		}
 		h2 {
 			margin: 0 0 30px 0;
 			font-size: 18px;
+			line-height: 25px;
+			opacity: 0.8;
 		}
 		.tools-title {
-			font-size: 18px;
-			margin: 25px 0 15px 0;
+			font-size: 22px;
+			margin: 25px 0 20px 0;
 			font-weight: bold;
 		}
 		.tools {
@@ -228,13 +362,14 @@ export default {
 				color: $neutral-1;
 				display: flex;
 				cursor: pointer;
+				min-height: 101px;
 
 				&:hover {
-					background-color: $neutral-7;
+					background-color: $neutral-5;
 				}
 				&__image {
 					min-width: 80px;
-					height: 85px;
+					height: 70px;
 					background-size: cover;
 					background-position: center top;
 					border-top-left-radius: $border-radius;
@@ -246,7 +381,7 @@ export default {
 				}
 
 				&__content {
-					padding: 10px 10px 10px 0;
+					padding: 10px 25px 10px 0;
 					display: flex;
 					flex-direction: column;
 
@@ -270,6 +405,7 @@ export default {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		font-weight: bold;
 
 		&:hover {
 			font-size: 20px;
@@ -314,7 +450,7 @@ export default {
 @media only screen and (min-width: $lg-breakpoint) {
 	.top {
 		.container {
-			padding-left: 330px;
+			// padding-left: 330px;
 			align-items: start;
 			.content {
 				margin-bottom: 25px;
@@ -325,14 +461,14 @@ export default {
 				}
 			}
 			.logo {
-				margin-left: -35px;
+				// margin-left: -35px;
 			}
 			.shieldmaiden {
 				display: block;
 			}
 			.tools {
 				.tool {
-					// flex-basis: calc(33% - 7.5px);
+					flex-basis: calc(33% - 7.5px);
 				}
 			}
 		}

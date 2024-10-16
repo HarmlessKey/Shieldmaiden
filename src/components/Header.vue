@@ -40,29 +40,6 @@
 
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end" :class="{ 'mr-2': maintenance }">
-					<button class="icon" aria-label="Select theme" :tabindex="tabindex">
-						<i aria-hidden="true" class="fas fa-moon" />
-						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
-							<div class="theme">
-								<button
-									@click="setTheme('dark')"
-									:class="{ active: $store.getters.theme === 'dark' }"
-									aria-label="Dark theme"
-								>
-									<img src="~assets/_img/dark.webp" alt="Dark theme" />
-									Dark
-								</button>
-								<button
-									@click="setTheme('light')"
-									:class="{ active: $store.getters.theme === 'light' }"
-									aria-label="Light theme"
-								>
-									<img src="~assets/_img/light.webp" alt="Light theme" />
-									Light
-								</button>
-							</div>
-						</q-popup-proxy>
-					</button>
 					<button
 						class="icon d-none d-md-block"
 						aria-label="Keybindings"
@@ -162,6 +139,23 @@
 											><i aria-hidden="true" class="fas fa-cogs"></i
 										></q-item-section>
 										<q-item-section>Settings</q-item-section>
+									</q-item>
+
+									<q-item
+										clickable
+										v-close-popup
+										@click="setTheme($store.getters.theme === 'dark' ? 'light' : 'dark')"
+									>
+										<q-item-section avatar
+											><i
+												aria-hidden="true"
+												class="fas"
+												:class="$store.getters.theme === 'dark' ? 'fa-sun' : 'fa-moon'"
+											></i
+										></q-item-section>
+										<q-item-section
+											>{{ $store.getters.theme === "dark" ? "Light" : "Dark" }} mode</q-item-section
+										>
 									</q-item>
 									<q-separator />
 									<q-item clickable v-close-popup @click="signOut()">

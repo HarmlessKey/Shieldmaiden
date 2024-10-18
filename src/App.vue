@@ -1,5 +1,5 @@
 <template>
-	<div id="q-app" @click="setSideSmallScreen(false)">
+	<div id="q-app" :class="{ home: $route.name === 'home' }" @click="setSideSmallScreen(false)">
 		<div>
 			<nav-main :maintenance="maintenance" />
 			<div class="offline" v-if="connection === 'offline'">
@@ -327,3 +327,13 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+#q-app {
+	padding-top: $header-height;
+
+	&.home {
+		padding-top: 70px;
+	}
+}
+</style>

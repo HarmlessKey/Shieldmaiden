@@ -136,7 +136,7 @@ export default {
 
 <style lang="scss" scoped>
 .home {
-	height: calc(100vh - #{$header-height});
+	height: calc(100vh - 70px);
 
 	&::-webkit-scrollbar {
 		display: none;

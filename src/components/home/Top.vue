@@ -223,7 +223,7 @@ export default {
 
 <style lang="scss" scoped>
 .top {
-	padding-bottom: 50px;
+	padding: 1px 0 50px 0;
 	background-color: $neutral-11;
 	overflow: hidden;
 
@@ -423,7 +423,7 @@ export default {
 
 @media only screen and (min-width: $md-breakpoint) {
 	.top {
-		padding: 25px 0 75px 0;
+		padding-bottom: 75px;
 
 		.container {
 			.content {
@@ -450,7 +450,6 @@ export default {
 @media only screen and (min-width: $lg-breakpoint) {
 	.top {
 		.container {
-			// padding-left: 330px;
 			align-items: start;
 			.content {
 				margin-bottom: 25px;

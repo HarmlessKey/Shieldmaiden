@@ -1,11 +1,13 @@
 <template>
-	<header>
+	<header :class="{ home: $route.name === 'home' }">
 		<div
 			id="header"
 			class="d-flex justify-content-between items-center"
-			:class="{ 'hidden-sidebar': $route.meta.sidebar === false }"
+			:class="{
+				'hidden-sidebar': $route.meta.sidebar === false,
+			}"
 		>
-			<div>
+			<div class="d-flex items-center gap-1">
 				<div class="menu" @click.stop="setSideSmallScreen(!$store.getters.side_small_screen)">
 					<i
 						aria-hidden="true"
@@ -218,9 +220,6 @@ export default {
 	padding: 0 15px;
 }
 .logo {
-	position: absolute;
-	left: 5px;
-	top: 5px;
 	height: 40px;
 	transition: position 0.4s linear;
 
@@ -256,36 +255,6 @@ button.icon {
 		background-repeat: no-repeat;
 	}
 }
-.theme {
-	padding: 15px;
-	text-align: center;
-	background-color: $neutral-8;
-
-	button {
-		display: block;
-		margin-bottom: 10px;
-		background: none;
-		cursor: pointer;
-
-		&:last-child {
-			margin: 0;
-		}
-		border: solid 1px transparent;
-		border-radius: $border-radius;
-		padding: 3px;
-		color: $neutral-3;
-
-		&:hover,
-		&.active {
-			border-color: $blue;
-			color: $neutral-1;
-		}
-		img {
-			max-width: 150px;
-			display: block;
-		}
-	}
-}
 .user {
 	cursor: pointer;
 	font-size: 15px;
@@ -308,15 +277,22 @@ button.icon {
 }
 
 #header.hidden-sidebar {
-	.logo {
-		left: 45px;
+	position: relative;
+}
+header.home {
+	background-color: $neutral-11;
+	display: flex;
+	justify-content: center;
+	padding: 10px 0;
+	box-sizing: content-box;
+
+	#header {
+		width: 100%;
+		max-width: 1240px;
 	}
 }
 
 @media only screen and (max-width: 575px) {
-	.logo {
-		left: 50px !important;
-	}
 	.menu {
 		font-size: 25px;
 		width: 41px;

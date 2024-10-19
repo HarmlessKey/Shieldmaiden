@@ -40,7 +40,7 @@
 				<span class="ml-1">{{ environment.capitalize() }}</span>
 			</q-chip>
 
-			<div class="d-flex justify-content-end">
+			<div class="d-flex justify-content-end items-center">
 				<div class="area d-flex justify-content-end" :class="{ 'mr-2': maintenance }">
 					<button
 						class="icon d-none d-md-block"
@@ -170,18 +170,34 @@
 							</div>
 						</q-popup-proxy>
 					</div>
-					<router-link v-else to="/sign-in" class="px-2">Sign in</router-link>
+					<button
+						v-else
+						class="btn btn-sm btn-clear bg-neutral-5 mr-1"
+						@click="sign_in_dialog = true"
+					>
+						Sign in
+					</button>
 				</template>
 			</div>
 		</div>
+		<q-dialog v-model="sign_in_dialog">
+			<SignIn
+				@sign-in="handleSignIn"
+				message="This is a sensitive action, please login again first"
+			/>
+		</q-dialog>
 	</header>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import SignIn from "./SignIn.vue";
 
 export default {
 	name: "Header",
+	components: {
+		SignIn,
+	},
 	props: {
 		maintenance: {
 			type: [Boolean, String],
@@ -191,6 +207,7 @@ export default {
 	data() {
 		return {
 			environment: process.env.VUE_APP_ENV_NAME,
+			sign_in_dialog: false,
 		};
 	},
 	computed: {
@@ -204,6 +221,11 @@ export default {
 		signOut() {
 			if (this.$route.path !== "/") this.$router.replace("/");
 			this.sign_out();
+		},
+		handleSignIn(e) {
+			if (e === "success") {
+				this.sign_in_dialog = false;
+			}
 		},
 	},
 };

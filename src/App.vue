@@ -1,11 +1,11 @@
 <template>
 	<div id="q-app" :class="{ home: $route.name === 'home' }" @click="setSideSmallScreen(false)">
 		<div>
-			<nav-main :maintenance="maintenance" />
+			<Header v-if="$route.name !== 'home'" />
 			<div class="offline" v-if="connection === 'offline'">
 				<i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection
 			</div>
-			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
+			<div :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar
 					v-if="
 						(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen
@@ -20,7 +20,6 @@
 					<router-view />
 				</q-scroll-area>
 			</div>
-			<Home v-else :maintenance="maintenance" />
 		</div>
 		<transition
 			enter-active-class="animated animate__slideInRight"
@@ -58,13 +57,12 @@
 
 <script>
 import { db } from "./firebase";
-import Header from "./components/Header.vue";
+import Header from "./components/header";
 import Sidebar from "./components/Sidebar.vue";
 import Drawer from "./components/Drawer.vue";
 import { mapActions, mapGetters } from "vuex";
 import HkRolls from "./components/hk-components/hk-rolls";
 import { general } from "./mixins/general";
-import Home from "./views/Home";
 
 import { Cookies } from "quasar";
 import jwt_decode from "jwt-decode";
@@ -73,11 +71,10 @@ export default {
 	name: "App",
 	mixins: [general],
 	components: {
-		navMain: Header,
+		Header,
 		Sidebar,
 		Drawer,
 		HkRolls,
-		Home,
 	},
 	async preFetch({ store, ssrContext }) {
 		const cookies = Cookies.parseSSR(ssrContext);
@@ -333,7 +330,11 @@ export default {
 	padding-top: $header-height;
 
 	&.home {
-		padding-top: 70px;
+		padding-top: 0;
+
+		.scrollable-content {
+			height: 100vh;
+		}
 	}
 }
 </style>

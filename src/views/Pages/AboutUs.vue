@@ -25,7 +25,7 @@
 			</div>
 		</hk-card>
 
-		<h2 class="written">Meet the team</h2>
+		<h2>Meet the team</h2>
 		<hk-card-deck>
 			<hk-card header="The Harmless">
 				<div class="card-body sheet">
@@ -167,7 +167,7 @@
 
 		<hk-card header="Special thanks">
 			<div class="card-body text-center">
-				<h2 class="written">Patrick Teunissen</h2>
+				<h2>Patrick Teunissen</h2>
 				<h3>For designing our logo!</h3>
 				<p class="mb-4">
 					Patrick was nice enough to lend us his time and design the awesome logo for us.<br />We
@@ -267,7 +267,6 @@ p {
 	width: 100px;
 }
 .written {
-	font-family: $text-written;
 	font-size: 30px;
 }
 
@@ -354,7 +353,6 @@ p {
 						display: inline-block;
 						background-color: $neutral-9;
 						font-family: $text-written;
-						// border: solid 1px $neutral-4;
 					}
 				}
 			}

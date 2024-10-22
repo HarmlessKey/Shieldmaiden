@@ -5,6 +5,7 @@
 		:thumb-style="{ width: '10px' }"
 		v-on:scroll="handleScroll"
 	>
+		<Header :scrolled="!!scrolled" />
 		<template v-if="diceColors.length > 0">
 			<section id="top">
 				<Top :maintenance="maintenance" />
@@ -85,6 +86,7 @@
 </template>
 
 <script>
+import Header from "src/components/home/Header.vue";
 import Top from "src/components/home/Top.vue";
 import Feedback from "src/components/home/Feedback.vue";
 import General from "src/components/home/General.vue";
@@ -99,6 +101,7 @@ export default {
 		maintenance: [Boolean, String],
 	},
 	components: {
+		Header,
 		Top,
 		Feedback,
 		General,
@@ -136,7 +139,7 @@ export default {
 
 <style lang="scss" scoped>
 .home {
-	height: calc(100vh - 70px);
+	height: 100vh;
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -146,7 +149,7 @@ export default {
 		padding: 50px 0;
 
 		&#top {
-			padding: 0;
+			padding: $header-height 0 0 0;
 		}
 	}
 	.die {
@@ -167,15 +170,15 @@ export default {
 @media only screen and (min-width: $md-breakpoint) {
 	.home {
 		.die {
-			width: 100px;
-			height: 100px;
-			background-size: 100px;
+			width: 80px;
+			height: 80px;
+			background-size: 80px;
 			margin-left: -50px;
-			bottom: -50px;
+			bottom: -40px;
 		}
 
 		section {
-			padding: 100px 0;
+			padding: 60px 0;
 		}
 	}
 }

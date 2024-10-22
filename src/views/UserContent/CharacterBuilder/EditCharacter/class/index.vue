@@ -1041,13 +1041,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.accordion {
-	.q-item {
-		font-family: $text-written !important;
-	}
-}
 h3 {
-	font-family: $text-written !important;
 	font-size: 25px !important;
 	margin: 0 0 20px 0 !important;
 
@@ -1142,7 +1136,6 @@ h3 {
 .rolled {
 	cursor: pointer;
 	line-height: 38px;
-	font-family: $text-written !important;
 
 	.val {
 		font-size: 30px;

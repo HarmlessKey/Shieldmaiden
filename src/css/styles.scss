@@ -51,7 +51,7 @@ html body {
 		grid-template-columns: max-content auto;
 	}
 
-	header {
+	#header {
 		display: block;
 		height: $header-height;
 		line-height: 50px;
@@ -61,6 +61,7 @@ html body {
 		position: fixed;
 		top: 0;
 		z-index: 999;
+		padding-right: 10px;
 	}
 	pre {
 		color: $neutral-2;
@@ -106,11 +107,10 @@ html body {
 	h4,
 	h5,
 	h6 {
-		font-weight: normal;
+		font-weight: bold;
 		margin: 0;
 	}
 	h1 {
-		font-family: $text-written;
 		font-size: 25px;
 		line-height: 40px;
 		margin-bottom: 15px;
@@ -1231,7 +1231,6 @@ html body {
 				text-align: center;
 
 				h2 {
-					font-family: $text-written;
 					font-size: 30px !important;
 					line-height: 50px;
 					text-align: center;
@@ -2713,6 +2712,7 @@ html body {
 	}
 	.q-btn {
 		border-radius: $border-radius;
+		font-weight: bold;
 
 		&:focus-visible {
 			outline: $outline !important;
@@ -2738,10 +2738,10 @@ html body {
 				}
 			}
 			a.q-item {
-				color: $neutral-2 !important;
+				// color: $neutral-2 !important;
 
 				&:hover {
-					color: $blue !important;
+					// color: $blue !important;
 				}
 			}
 		}

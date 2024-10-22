@@ -14,7 +14,7 @@
 					<hk-icon icon="fas fa-arrow-left" class="mr-1" />
 					Leave
 				</router-link>
-				<div class="dm-screen__header-title written flex-grow truncate">
+				<div class="dm-screen__header-title flex-grow truncate">
 					{{ campaign.name }}
 				</div>
 				<div class="d-flex justify-content-end items-center gap-1">

@@ -43,11 +43,10 @@ header {
 	z-index: 999;
 	transition: all 0.3s ease-in-out;
 	height: 80px;
-	padding: 0 20px;
 
 	.container {
-		max-width: 1250px;
-		padding: 0;
+		padding: 0 20px;
+		max-width: 1280px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -55,7 +54,6 @@ header {
 
 		.logo {
 			height: 36px;
-			margin-left: -10px;
 		}
 		.dot-app {
 			margin-left: 3px;
@@ -78,7 +76,7 @@ header {
 
 @media only screen and (min-width: $md-breakpoint) {
 	header {
-		height: 200px;
+		height: 145px;
 
 		.container {
 			.logo {
@@ -92,6 +90,18 @@ header {
 				.user-btn {
 					font-size: 25px;
 				}
+			}
+		}
+	}
+}
+
+@media only screen and (min-width: $lg-breakpoint) {
+	header {
+		height: 200px;
+
+		.container {
+			.logo {
+				height: 56px;
 			}
 		}
 	}

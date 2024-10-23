@@ -1,18 +1,14 @@
 <template>
 	<div class="top">
 		<div class="container">
-			<h1>D&D Combat Tracker</h1>
-			<h2>And the ultimate companion app for your campaign</h2>
+			<h1>Run D&D Combat with ease</h1>
+			<h2>
+				Build encounters for your campaign and keep track of everything you need during combat,
+				using our advanced initiative tracker.
+			</h2>
 
 			<div class="buttons">
-				<q-btn
-					v-if="!$store.getters.user"
-					class="mr-2"
-					to="/demo"
-					color="primary"
-					size="lg"
-					no-caps
-				>
+				<q-btn v-if="!$store.getters.user" to="/demo" color="primary" size="lg" no-caps>
 					Try Demo Encounter
 				</q-btn>
 				<q-btn v-if="!$store.getters.user" to="/sign-up" class="" size="lg" no-caps>
@@ -110,18 +106,19 @@ export default {
 			}
 		}
 		h1 {
-			line-height: normal;
 			font-size: 35px;
 			margin: 0 0 10px 0;
-			max-width: 400px;
+			max-width: 550px;
 			font-weight: bold;
-			line-height: 35px;
+			line-height: 45px;
 		}
 		h2 {
-			margin: 0 0 30px 0;
+			margin: 0 0 40px 0;
 			font-size: 18px;
-			line-height: 25px;
+			line-height: 30px;
+			max-width: 500px;
 			opacity: 0.8;
+			font-weight: normal;
 		}
 		.buttons {
 			display: flex;
@@ -162,6 +159,7 @@ export default {
 
 				&__content {
 					font-size: 16px;
+					transition: all 0.2s ease-in-out;
 				}
 			}
 		}
@@ -171,10 +169,10 @@ export default {
 @media only screen and (min-width: $md-breakpoint) {
 	.top {
 		.container {
-			padding: 150px 20px 77px 20px;
+			padding: 95px 20px 77px 20px;
 			background-image: url("../../assets/_img/shieldmaiden.webp");
 			background-repeat: no-repeat;
-			background-position: top 0 right -110px;
+			background-position: top 50px right -120px;
 
 			.laptop {
 				display: none;
@@ -188,9 +186,16 @@ export default {
 				}
 			}
 			.tools {
+				gap: 4px;
 				.tool {
 					background: none;
-					padding: 0;
+					padding: 3px 0;
+
+					&:hover {
+						.tool__content {
+							font-size: 20px;
+						}
+					}
 				}
 			}
 		}
@@ -199,14 +204,26 @@ export default {
 @media only screen and (min-width: $lg-breakpoint) {
 	.top {
 		.container {
-			background-position: top 0 right 60px;
+			padding: 145px 20px 77px 20px;
+			background-position: top 30px right 30px;
+
+			h2 {
+				max-width: 500px;
+			}
+			.tools {
+				align-items: flex-start;
+			}
 		}
 	}
 }
 @media only screen and (min-width: $xl-breakpoint) {
 	.top {
 		.container {
-			background-position: top 10px right 150px;
+			background-position: top 10px right 120px;
+
+			h2 {
+				max-width: 600px;
+			}
 		}
 	}
 }

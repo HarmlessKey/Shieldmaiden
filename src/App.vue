@@ -34,23 +34,6 @@
 			<vue-snotify />
 			<HkRolls />
 		</q-no-ssr>
-
-		<!-- Announcements -->
-		<q-dialog v-model="announcement" position="top" persistent>
-			<q-banner class="bg-blue white">
-				<template v-slot:avatar>
-					<q-icon name="info" />
-				</template>
-				<h3 class="mb-1">Nothing to see here</h3>
-				<p>
-					<strong>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</strong>
-				</p>
-				<p>No announcement</p>
-				<template v-slot:action>
-					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
-				</template>
-			</q-banner>
-		</q-dialog>
 		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
@@ -203,10 +186,7 @@ export default {
 		return {
 			width: 0,
 			small_screen: true,
-			announcementSetter: false,
-			announcement_cookie: false,
 			broadcast: undefined,
-			maintenance: false,
 			connection: process.browser && !navigator.onLine ? "offline" : "online",
 		};
 	},
@@ -258,27 +238,9 @@ export default {
 			storeBroadcast: "broadcast",
 		}),
 		...mapGetters(["initialized", "theme", "user", "action_rolls"]),
-		announcement: {
-			get() {
-				const announcement = this.user && !this.announcement_cookie ? true : false;
-				return this.announcementSetter !== undefined ? this.announcementSetter : announcement;
-			},
-			set(newVal) {
-				this.announcementSetter = newVal;
-			},
-		},
 	},
 	async mounted() {
 		this.setTips();
-		const cookies = document.cookie.split(";");
-
-		for (let cookie of cookies) {
-			const [key, val] = cookie.split("=");
-			if (key.trim() === "announcement" && val === "true") {
-				this.announcement_cookie = true;
-			}
-		}
-
 		if (this.user) {
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
@@ -314,12 +276,6 @@ export default {
 		setSize(size) {
 			this.small_screen = size.width < 576;
 			this.width = size.width;
-		},
-		closeAnnouncement() {
-			const max_age = 24 * 60 * 60; // 24 hours in seconds
-
-			document.cookie = `announcement=true; max-age=${max_age}; path=/`;
-			this.announcement = false;
 		},
 	},
 };

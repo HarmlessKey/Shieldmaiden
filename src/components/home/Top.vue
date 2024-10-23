@@ -34,7 +34,6 @@
 					</div>
 				</router-link>
 			</div>
-
 			<q-resize-observer @resize="setSize" />
 		</div>
 	</div>
@@ -116,7 +115,7 @@ export default {
 			margin: 0 0 40px 0;
 			font-size: 18px;
 			line-height: 30px;
-			max-width: 500px;
+			max-width: 400px;
 			opacity: 0.8;
 			font-weight: normal;
 		}
@@ -219,7 +218,7 @@ export default {
 @media only screen and (min-width: $xl-breakpoint) {
 	.top {
 		.container {
-			background-position: top 10px right 120px;
+			background-position: top 10px right 85px;
 
 			h2 {
 				max-width: 600px;

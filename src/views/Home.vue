@@ -1,11 +1,12 @@
 <template>
 	<q-scroll-area
+		v-if="!user"
 		class="home"
 		:dark="$store.getters.theme === 'dark'"
 		:thumb-style="{ width: '10px' }"
 		v-on:scroll="handleScroll"
 	>
-		<Header :scrolled="!!scrolled" />
+		<HomeHeader :scrolled="!!scrolled" />
 		<template v-if="diceColors.length > 0">
 			<section id="top">
 				<Top :maintenance="maintenance" />
@@ -83,10 +84,18 @@
 			<Footer />
 		</template>
 	</q-scroll-area>
+	<div v-else class="user-content">
+		<Header />
+		<Authenticated>
+			<UserContent />
+		</Authenticated>
+	</div>
 </template>
 
 <script>
-import Header from "src/components/home/Header.vue";
+import { mapGetters } from "vuex";
+import HomeHeader from "src/components/home/Header.vue";
+import Header from "src/components/header";
 import Top from "src/components/home/Top.vue";
 import Feedback from "src/components/home/Feedback.vue";
 import General from "src/components/home/General.vue";
@@ -94,6 +103,8 @@ import Share from "src/components/home/Share.vue";
 import Builder from "src/components/home/Builder.vue";
 import Campaign from "src/components/home/Campaign.vue";
 import Footer from "src/components/Footer.vue";
+import UserContent from "./UserContent";
+import Authenticated from "src/layouts/authenticated.vue";
 
 export default {
 	name: "home",
@@ -101,6 +112,7 @@ export default {
 		maintenance: [Boolean, String],
 	},
 	components: {
+		HomeHeader,
 		Header,
 		Top,
 		Feedback,
@@ -109,6 +121,8 @@ export default {
 		Builder,
 		Campaign,
 		Footer,
+		UserContent,
+		Authenticated,
 	},
 	data() {
 		return {
@@ -116,6 +130,7 @@ export default {
 		};
 	},
 	computed: {
+		...mapGetters(["user"]),
 		diceColors() {
 			let array = ["blue", "cyan", "green", "orange", "red", "yellow"];
 
@@ -165,6 +180,10 @@ export default {
 		background-repeat: no-repeat;
 		z-index: 97;
 	}
+}
+.hk-layout {
+	height: 100vh;
+	padding-top: $header-height;
 }
 
 @media only screen and (min-width: $md-breakpoint) {

@@ -104,7 +104,7 @@ export default {
 		.shieldmaiden {
 			transform: scaleX(-1);
 			object-fit: cover;
-			object-position: top 0 left -20px;
+			object-position: top 0 left -30px;
 			height: 250px;
 			width: 100%;
 			margin-bottom: 22px;

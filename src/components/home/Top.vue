@@ -144,6 +144,7 @@ export default {
 
 				&.create-account {
 					border: solid 1px $accent;
+					background-color: $neutral-11;
 				}
 			}
 		}
@@ -265,8 +266,7 @@ export default {
 
 [data-theme="light"] {
 	.top {
-		background-image: none;
-		background-color: $neutral-9;
+		background-color: $neutral-6;
 	}
 }
 </style>

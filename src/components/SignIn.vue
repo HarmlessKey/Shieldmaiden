@@ -151,5 +151,6 @@ export default {
 	max-width: 360px;
 	padding-top: 40px;
 	overflow-y: auto;
+	margin: auto;
 }
 </style>

@@ -135,11 +135,14 @@ export default {
 
 			auth
 				.signInWithPopup(provider)
-				.then(() => {
+				.then(async (result) => {
 					this.$gtm.trackEvent({
 						event: "sign-up",
 						method: "Google",
 					});
+					await this.setUser(result.user);
+					await this.setUserInfo();
+					await this.reinitialize();
 
 					this.$emit("sign-up", "success");
 

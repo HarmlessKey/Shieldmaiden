@@ -67,7 +67,7 @@
 					</q-tooltip>
 				</button>
 				<button
-					v-if="user && !maintenance"
+					v-if="user"
 					aria-label="Live initiative link"
 					class="icon"
 					:tabindex="tabindex"

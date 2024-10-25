@@ -8,7 +8,7 @@
 			<div :class="{ hasSide: $route.meta.sidebar !== false || ($route.name === 'home' && user) }">
 				<Sidebar
 					v-if="
-						($route.name === 'home' && user) ||
+						(!small_screen && $route.name === 'home' && user) ||
 						(!small_screen && $route.meta.sidebar !== false) ||
 						$store.getters.side_small_screen
 					"

@@ -31,7 +31,9 @@ export default {
 	},
 	computed: {
 		logo() {
-			return this.environment !== "live" ? "logo-main-icon-left.svg" : "logo-main-icon-left.svg";
+			return this.environment !== "live"
+				? "logo-main-icon-left-red.svg"
+				: "logo-main-icon-left.svg";
 		},
 	},
 	methods: {},

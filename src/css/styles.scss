@@ -1583,7 +1583,7 @@ html body {
 
 	.login-container {
 		background-position: center;
-		padding: 100px 30px 0 30px;
+		padding: 50px 30px 0 30px;
 	}
 	#login {
 		background-color: $neutral-7;
@@ -1611,6 +1611,9 @@ html body {
 		}
 		.q-field {
 			margin-bottom: 1px;
+		}
+		.q-form {
+			overflow: auto;
 		}
 	}
 	.google {

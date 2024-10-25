@@ -8,7 +8,7 @@
 						<router-link class="btn btn-sm btn-clear" :to="`/user/${userId}`">
 							<i aria-hidden="true" class="fas fa-chevron-left"></i> Back
 						</router-link>
-						<span class="title written truncate">{{ campaign.name }}</span>
+						<span class="title truncate">{{ campaign.name }}</span>
 						<div class="d-flex justify-content-end items-center gap-2">
 							<span class="live" :class="{ active: broadcasting['.value'] == campaignId }"
 								>live</span

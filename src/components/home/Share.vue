@@ -4,7 +4,8 @@
 			<div class="head">
 				<h2>Share a live initiative list with your players</h2>
 				<span>
-					Show your players a live initiative list of the encounter that updates as you play. Perfect for at the table or if you are hosting a podcast or stream.
+					Show your players a live initiative list of the encounter that updates as you play.
+					Perfect for at the table or if you are hosting a podcast or stream.
 				</span>
 			</div>
 
@@ -12,9 +13,13 @@
 				<div class="col-12 col-md-6">
 					<div class="video-wrapper">
 						<div class="video">
-							<video 
-								src="~assets/_img/home/track-encounter.mp4" 
-								muted autoplay playsinline alt="Share initative screen Shieldmaiden D&amp;D Combat Tracker" loop
+							<video
+								src="~assets/_img/home/track-encounter.mp4"
+								muted
+								autoplay
+								playsinline
+								alt="Share initiative screen Shieldmaiden D&amp;D Combat Tracker"
+								loop
 							/>
 							<div class="info">An example of how your players can follow your encounters.</div>
 						</div>
@@ -22,12 +27,12 @@
 				</div>
 				<div class="col-12 col-md-6">
 					<h3>Shows everything you need</h3>
-					
+
 					<q-list>
-						<q-item 
-							v-for="({name, icon, title}, index) in items"
+						<q-item
+							v-for="({ name, icon, title }, index) in items"
 							:key="`item-${index}`"
-							clickable 
+							clickable
 							@click="setDialog(name)"
 						>
 							<q-item-section avatar>
@@ -41,14 +46,13 @@
 							</q-item-section>
 						</q-item>
 					</q-list>
-
 				</div>
 			</div>
 			<div class="d-flex justify-center">
-				<router-link to="sign-up" class="btn btn-lg">Try Shieldmaiden now!</router-link>
+				<router-link to="sign-up" class="btn btn-lg bg-accent">Try Shieldmaiden now!</router-link>
 			</div>
 		</div>
-		
+
 		<q-dialog v-model="dialog" square>
 			<Carousel :slides="items" :slide="slide" />
 		</q-dialog>
@@ -56,69 +60,68 @@
 </template>
 
 <script>
-	import Carousel from "./Carousel";
-	import { live_initiative_texts } from "src/utils/generalConstants";
+import Carousel from "./Carousel";
+import { live_initiative_texts } from "src/utils/generalConstants";
 
-	export default {
-		name: 'Share',
-		components: {
-			Carousel
+export default {
+	name: "Share",
+	components: {
+		Carousel,
+	},
+	data() {
+		return {
+			dialog: false,
+			slide: "hp",
+			items: live_initiative_texts,
+		};
+	},
+	methods: {
+		setDialog(slide) {
+			this.slide = slide;
+			this.dialog = true;
 		},
-		data() {
-			return {
-				dialog: false,
-				slide: "hp",
-				items: live_initiative_texts
-			}
-		},
-		methods: {
-			setDialog(slide) {
-				this.slide = slide;
-				this.dialog = true;
-			}
-		}
-	}
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.share {
-		.video-wrapper {
-			padding: 0 80px;
+.share {
+	.video-wrapper {
+		padding: 0 80px;
 
-			.video {
-				width: 100%;
-				height: calc(100% - 10px);
-				overflow: hidden;
-				border: solid 8px $black;
-				background-color: $black;
+		.video {
+			width: 100%;
+			height: calc(100% - 10px);
+			overflow: hidden;
+			border: solid 8px $black;
+			background-color: $black;
+			border-radius: 10px;
+			position: relative;
+
+			video {
+				width: calc(100% + 2px);
 				border-radius: 10px;
-				position: relative;
-
-				video {
-					width: calc(100% + 2px);
-					border-radius: 10px;
-				}
-				.info {
-					text-align: center;
-					font-style: italic;
-					padding: 10px 50px 20px 50px;
-					position: absolute;
-					bottom: 0;
-					opacity: .5;
-					font-size: 12px;
-					line-height: 20px;
-				}
 			}
-
-		}
-		@media only screen and (max-width: 567px) { 
-			.video-wrapper {
-				padding: 0 50px !important;
-
-				.info {
-					padding: 10px 20px 20px 20px !important;
-				}
+			.info {
+				text-align: center;
+				font-style: italic;
+				padding: 10px 50px 20px 50px;
+				position: absolute;
+				bottom: 0;
+				opacity: 0.5;
+				font-size: 12px;
+				line-height: 20px;
 			}
 		}
 	}
+	@media only screen and (max-width: 567px) {
+		.video-wrapper {
+			padding: 0 50px !important;
+
+			.info {
+				padding: 10px 20px 20px 20px !important;
+			}
+		}
+	}
+}
 </style>

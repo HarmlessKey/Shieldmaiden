@@ -347,7 +347,6 @@ export default {
 		padding: 15px;
 
 		h4 {
-			font-family: $text-written !important;
 			font-size: 22px;
 			margin: 0px;
 		}
@@ -376,7 +375,6 @@ export default {
 					line-height: 60px;
 					font-size: 30px;
 					font-weight: bold;
-					font-family: $text-written !important;
 				}
 			}
 		}
@@ -405,7 +403,6 @@ export default {
 					line-height: 40px;
 					font-size: 35px;
 					font-weight: bold;
-					font-family: $text-written !important;
 				}
 				.ft {
 					font-size: 15px;
@@ -424,7 +421,6 @@ export default {
 				border-bottom: solid 1px $neutral-3;
 
 				.value {
-					font-family: $text-written !important;
 					font-size: 20px;
 				}
 			}

@@ -4,15 +4,28 @@
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
-						<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
-							<q-tooltip anchor="top middle" self="center middle">
-								There are validation errors
-							</q-tooltip>
-						</q-icon>
-						<q-btn v-if="!npcId" class="mx-1" color="neutral-5" no-caps @click="copy_dialog = true">
-							<i aria-hidden="true" class="fas fa-copy mr-2"></i>
-							Copy
+						<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
+							<i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
+							Create Account
 						</q-btn>
+						<div v-else />
+						<div>
+							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+								<q-tooltip anchor="top middle" self="center middle">
+									There are validation errors
+								</q-tooltip>
+							</q-icon>
+							<q-btn
+								v-if="!npcId"
+								class="mx-1"
+								color="neutral-5"
+								no-caps
+								@click="copy_dialog = true"
+							>
+								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
+								Copy
+							</q-btn>
+						</div>
 					</div>
 
 					<div class="form">
@@ -40,13 +53,19 @@
 								</q-tooltip>
 							</q-icon>
 							<router-link
-								:to="userId ? `/content/npcs` : `/tools/monster-creator`"
+								:to="user ? `/content/npcs` : `/tools/monster-creator`"
 								class="btn bg-neutral-5 mr-2"
 								>{{ unsaved_changes ? "Cancel" : "Back" }}</router-link
 							>
-							<q-btn v-if="userId" label="Save" type="submit" color="primary" no-caps />
-							<q-btn v-else :disabled="!valid" color="primary" no-caps @click="download">
-								Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+							<q-btn v-if="user" label="Save" type="submit" color="primary" no-caps />
+							<q-btn
+								v-else
+								:disabled="!valid"
+								color="primary"
+								no-caps
+								@click="account_dialog = true"
+							>
+								Save
 							</q-btn>
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">
@@ -54,9 +73,9 @@
 								<div v-if="userId" class="orange truncate mr-2 d-none d-md-block">
 									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>
-								<a class="btn btn-sm bg-neutral-5" @click="userId ? revertChanges() : reset()">
+								<a class="btn btn-sm bg-neutral-5" @click="user ? revertChanges() : reset()">
 									<i aria-hidden="true" class="fas fa-undo" />
-									{{ userId ? "Revert" : "Reset" }}
+									{{ user ? "Revert" : "Reset" }}
 								</a>
 							</template>
 						</div>
@@ -78,13 +97,37 @@
 			</hk-card>
 		</q-dialog>
 
+		<q-dialog v-model="account_dialog">
+			<hk-card class="account-dialog">
+				<div slot="header" class="card-header">
+					<span>Save your monster</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
+				<div class="card-body">
+					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
+					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
+						Create Free Account
+					</button>
+				</div>
+				<div slot="footer" class="card-footer">
+					<q-btn no-caps @click="download">
+						Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+					</q-btn>
+				</div>
+			</hk-card>
+		</q-dialog>
+
 		<q-dialog v-model="create_dialog" persistent position="top">
 			<hk-card class="create-dialog" header="How do you want to do this?">
 				<div class="card-body">
 					<template v-if="!copy_monster">
-						<button class="btn btn-lg btn-block" @click="copy_monster = true">Copy existing monster</button>
+						<button class="btn btn-lg btn-block" @click="copy_monster = true">
+							Copy existing monster
+						</button>
 						<h2 class="text-center my-2">OR</h2>
-						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">Create from scratch</button>
+						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">
+							Create from scratch
+						</button>
 					</template>
 					<template v-if="copy_monster">
 						<h2>Copy an existing monster</h2>
@@ -98,6 +141,10 @@
 					</button>
 				</div>
 			</hk-card>
+		</q-dialog>
+
+		<q-dialog v-model="sign_up_dialog">
+			<SignUp @sign-up="handleSignUp" />
 		</q-dialog>
 	</div>
 	<hk-card v-else header="Basic info">
@@ -118,6 +165,7 @@ import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import SignUp from "src/components/SignUp.vue";
 
 export default {
 	name: "EditNpc",
@@ -131,6 +179,7 @@ export default {
 		SpellCasting,
 		Actions,
 		CopyContent,
+		SignUp,
 	},
 	data() {
 		return {
@@ -145,6 +194,8 @@ export default {
 			copy_dialog: false,
 			unsaved_changes: false,
 			create_dialog: false,
+			account_dialog: false,
+			sign_up_dialog: false,
 			copy_monster: false,
 		};
 	},
@@ -163,7 +214,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters(["user", "tier", "overencumbered"]),
 		...mapGetters("npcs", ["npc_count"]),
 	},
 	watch: {
@@ -287,6 +338,12 @@ export default {
 				this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			});
 		},
+		handleSignUp(e) {
+			if (e === "success") {
+				this.account_dialog = false;
+				this.sign_up_dialog = false;
+			}
+		},
 	},
 	beforeRouteLeave(to, from, next) {
 		if (this.unsaved_changes) {
@@ -325,7 +382,7 @@ export default {
 .content__edit {
 	.top {
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 10px;
 
@@ -354,5 +411,9 @@ export default {
 	.card-body {
 		overflow: auto;
 	}
+}
+.hk-card.account-dialog {
+	width: 100%;
+	max-width: 360px;
 }
 </style>

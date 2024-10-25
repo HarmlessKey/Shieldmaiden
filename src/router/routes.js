@@ -2,7 +2,7 @@ const CharacterSyncPrivacyPolicy = () => import("src/views/Pages/CharacterSyncPr
 const Sitemap = () => import("src/views/Pages/Sitemap.vue");
 const Privacy = () => import("src/views/Pages/Privacy.vue");
 const Documentation = () => import("src/views/Pages/Documentation.vue");
-const SignIn = () => import("src/views/Pages/SignIn.vue");
+const SignInPage = () => import("src/views/Pages/SignIn.vue");
 const SignUp = () => import("src/views/Pages/SignUp.vue");
 const ResetPassword = () => import("src/views/Pages/ResetPassword.vue");
 const Patreon = () => import("src/views/Pages/Patreon.vue");
@@ -31,7 +31,7 @@ const routes = [
 			offline: true,
 			description:
 				"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
-			title: "Combat Tracker for D&D 5e",
+			title: "Combat Tracker for D&D",
 		},
 	},
 	{ path: "/home", redirect: "/" },
@@ -1435,7 +1435,7 @@ const routes = [
 	{
 		path: "/sign-in",
 		name: "signIn",
-		component: SignIn,
+		component: SignInPage,
 		meta: {
 			sidebar: false,
 			description: "Sign in to your account on Shieldmaiden, a Combat Tracker for D&D.",

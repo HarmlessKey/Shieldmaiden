@@ -16,7 +16,7 @@
 				<q-btn v-if="!$store.getters.user" to="/demo" color="accent" size="lg" no-caps>
 					Try Demo Encounter
 				</q-btn>
-				<q-btn v-if="!$store.getters.user" to="/sign-up" class="" size="lg" no-caps>
+				<q-btn v-if="!$store.getters.user" to="/sign-up" class="create-account" size="lg" no-caps>
 					Create Free Account
 				</q-btn>
 			</div>
@@ -141,6 +141,10 @@ export default {
 
 			.q-btn {
 				width: 100%;
+
+				&.create-account {
+					border: solid 1px $accent;
+				}
 			}
 		}
 		.tools-title {

@@ -3,15 +3,11 @@
 		<div
 			class="header d-flex justify-content-between items-center"
 			:class="{
-				'hidden-sidebar': $route.meta.sidebar === false,
+				'hidden-sidebar': $route.meta.sidebar === false && !$route.name !== 'home',
 			}"
 		>
 			<div class="d-flex items-center gap-1">
-				<div
-					v-if="$route.meta.sidebar === false && $route.name !== 'home'"
-					class="menu"
-					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
-				>
+				<div class="menu" @click.stop="setSideSmallScreen(!$store.getters.side_small_screen)">
 					<i
 						aria-hidden="true"
 						class="fas"
@@ -140,6 +136,9 @@ export default {
 	padding: 0 15px;
 }
 .logo {
+	position: absolute;
+	left: 5px;
+	top: 5px;
 	height: 40px;
 	transition: position 0.4s linear;
 
@@ -179,6 +178,10 @@ button.icon {
 
 .header.hidden-sidebar {
 	position: relative;
+
+	.logo {
+		left: 45px;
+	}
 }
 
 @media only screen and (max-width: 575px) {

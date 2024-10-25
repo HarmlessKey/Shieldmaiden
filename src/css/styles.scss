@@ -61,7 +61,7 @@ html body {
 		position: fixed;
 		top: 0;
 		z-index: 999;
-		padding-right: 10px;
+		padding: 0 10px 0 5px;
 	}
 	pre {
 		color: $neutral-2;
@@ -1058,10 +1058,9 @@ html body {
 	}
 
 	.content-count {
-		border: solid 1px $neutral-5;
 		background-color: $neutral-9;
 		padding: 5px 10px;
-		border-radius: 12px;
+		border-radius: $border-radius;
 		user-select: none;
 		margin-right: 4px;
 

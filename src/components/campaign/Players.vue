@@ -871,8 +871,7 @@ export default {
 				font-weight: bold;
 			}
 			.hit-points {
-				background-color: $neutral-5;
-				border: solid 1px $neutral-4;
+				background-color: $neutral-9;
 				border-radius: $border-radius-small;
 				padding: 0 5px;
 				line-height: 33px;

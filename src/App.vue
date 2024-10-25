@@ -291,6 +291,10 @@ export default {
 		.scrollable-content {
 			height: 100vh;
 		}
+
+		#sidebar {
+			top: $header-height;
+		}
 	}
 }
 </style>

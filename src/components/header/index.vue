@@ -7,7 +7,11 @@
 			}"
 		>
 			<div class="d-flex items-center gap-1">
-				<div class="menu" @click.stop="setSideSmallScreen(!$store.getters.side_small_screen)">
+				<div
+					v-if="$route.name === 'home'"
+					class="menu"
+					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
+				>
 					<i
 						aria-hidden="true"
 						class="fas"

@@ -1,16 +1,16 @@
 :root {
 	color-scheme: dark;
-	--neutral-11: #15171e; // custom
-	--neutral-10: #0c0e13; //custom
-	--neutral-9: #111219; // Server sidebar
-	--neutral-8: #1c1e22; // Sidebar Bottom
-	--neutral-7: #1e1f25; // Sidebar
-	--neutral-6: #23252b; // Main background
+	--neutral-11: #15171e;
+	--neutral-10: #0c0e13;
+	--neutral-9: #111219;
+	--neutral-8: #1c1e22;
+	--neutral-7: #1e1f25;
+	--neutral-6: #23252b;
 	--neutral-5: #2c2e34;
-	--neutral-4: #737478; // Sidebar icon
-	--neutral-3: #7e7f83; // Sidebar text
-	--neutral-2: #8a8b8f; // Icons header
-	--neutral-1: #ffffff; // Text
+	--neutral-4: #737478;
+	--neutral-3: #7e7f83;
+	--neutral-2: #8a8b8f;
+	--neutral-1: #ffffff;
 
 	--neutral-6-transparent: rgba(35, 37, 43, 0.9);
 	--neutral-6-transparent-8: rgba(35, 37, 43, 0.8);
@@ -21,6 +21,9 @@
 
 	--black: #000;
 	--white: #fff;
+
+	--accent: #d74691;
+	--accent-light: #d65a9a;
 
 	--green: #83b547;
 	--green-hover: #9ddb51;
@@ -127,6 +130,9 @@ $neutral-8-transparent-8: var(--neutral-8-transparent-8);
 $black: var(--black); // Keep
 $white: var(--white); // Keep
 
+$accent: var(--accent);
+$accent-light: var(--accent-light);
+
 $green: var(--green);
 $green-hover: var(--green-hover);
 $blue: var(--blue);
@@ -188,7 +194,7 @@ $xl-breakpoint: 1200px;
 */
 $primary: var(--blue);
 $secondary: #26a69a;
-$accent: #9c27b0;
+$accent: var(--accent);
 
 $dark: #15171e;
 

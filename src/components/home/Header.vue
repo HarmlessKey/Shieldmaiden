@@ -2,7 +2,7 @@
 	<header :class="{ scrolled: scrolled }">
 		<div class="container">
 			<div class="d-flex items-center">
-				<img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden" />
+				<img class="logo" :src="require(`../../assets/_img/logo/${logo}`)" alt="Shieldmaiden" />
 				<!-- <span class="dot-app">.app</span> -->
 			</div>
 			<UserMenu> Account </UserMenu>
@@ -11,7 +11,6 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
 import UserMenu from "../header/UserMenu.vue";
 
 export default {
@@ -30,7 +29,11 @@ export default {
 			environment: process.env.VUE_APP_ENV_NAME,
 		};
 	},
-	computed: {},
+	computed: {
+		logo() {
+			return this.environment !== "live" ? "logo-main-icon-left.svg" : "logo-main-icon-left.svg";
+		},
+	},
 	methods: {},
 };
 </script>

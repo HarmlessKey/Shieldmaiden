@@ -137,6 +137,11 @@ html body {
 	.white {
 		color: $white !important;
 	}
+	.text {
+		&-left {
+			text-align: left !important;
+		}
+	}
 
 	.neutral-1,
 	.text-neutral-1 {
@@ -420,6 +425,12 @@ html body {
 	}
 	.bg-yellow-light {
 		background-color: $yellow-light !important;
+	}
+	.bg-accent {
+		background-color: $accent !important;
+	}
+	.bg-accent-light {
+		background-color: $accent-light !important;
 	}
 
 	.healing {
@@ -1533,6 +1544,9 @@ html body {
 		}
 		&.bg-neutral-9:hover {
 			background-color: $neutral-8 !important;
+		}
+		&.bg-accent:hover {
+			background-color: $accent-light !important;
 		}
 
 		&.btn-square {

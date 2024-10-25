@@ -91,23 +91,23 @@
 			>
 				<div class="bg-neutral-8">
 					<q-list>
-						<q-item clickable v-close-popup @click="sign_in_dialog = true">
-							<q-item-section avatar
-								><i aria-hidden="true" class="fas fa-sign-in"></i
-							></q-item-section>
-							<q-item-section>Sign in</q-item-section>
-						</q-item>
 						<q-item clickable v-close-popup href="https://discord.gg/dU59jgvcuq">
 							<q-item-section avatar
 								><i aria-hidden="true" class="fab fa-discord"></i
 							></q-item-section>
 							<q-item-section>Join our Discord</q-item-section>
 						</q-item>
+						<q-item clickable v-close-popup @click="sign_in_dialog = true">
+							<q-item-section avatar
+								><i aria-hidden="true" class="fas fa-sign-in"></i
+							></q-item-section>
+							<q-item-section>Sign in</q-item-section>
+						</q-item>
 					</q-list>
-					<div class="px-2 py-3 bg-neutral-6">
-						<router-link class="btn p-2 px-2" to="sign-up">
+					<div class="p-2 bg-neutral-6">
+						<router-link class="btn bg-accent p-2 px-2 btn-block text-left" to="sign-up">
 							<i class="fas fa-user-plus mr-1" aria-hidden="true" />
-							Create free account
+							Sign up
 						</router-link>
 					</div>
 				</div>
@@ -165,7 +165,6 @@ export default {
 	justify-content: flex-end;
 	align-items: center;
 	gap: 5px;
-	width: 100%;
 
 	a {
 		color: $neutral-1;

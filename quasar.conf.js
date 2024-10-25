@@ -50,7 +50,7 @@ module.exports = function (/* ctx */) {
 			vueRouterMode: "history", // available values: 'hash', 'history'
 			env: require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` }).parsed,
 			scssLoaderOptions: {
-				additionalData: '@import "src/css/variables.scss";',
+				additionalData: "",
 			},
 			vueCompiler: true,
 			transpile: true,

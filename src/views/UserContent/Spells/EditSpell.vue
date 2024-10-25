@@ -4,21 +4,28 @@
 			<q-form @submit="handleSubmit(saveSpell)" greedy>
 				<div>
 					<div class="top">
-						<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
-							<q-tooltip anchor="top middle" self="center middle">
-								There are validation errors
-							</q-tooltip>
-						</q-icon>
-						<button v-if="!spellId" class="btn bg-neutral-5" @click.prevent="copy_dialog = true">
-							<i aria-hidden="true" class="fas fa-copy mr-2"></i>
-							Copy
-						</button>
-						<button
-							class="btn bg-neutral-5 ml-2"
-							@click.prevent="setDrawer({ show: true, type: 'compendium/Spell', data: spell })"
-						>
-							<i aria-hidden="true" class="fas fa-eye" />
-						</button>
+						<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
+							<i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
+							Create Account
+						</q-btn>
+						<div v-else />
+						<div>
+							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+								<q-tooltip anchor="top middle" self="center middle">
+									There are validation errors
+								</q-tooltip>
+							</q-icon>
+							<button v-if="!spellId" class="btn bg-neutral-5" @click.prevent="copy_dialog = true">
+								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
+								Copy
+							</button>
+							<button
+								class="btn bg-neutral-5 ml-2"
+								@click.prevent="setDrawer({ show: true, type: 'compendium/Spell', data: spell })"
+							>
+								<i aria-hidden="true" class="fas fa-eye" />
+							</button>
+						</div>
 					</div>
 
 					<div class="form">
@@ -35,23 +42,29 @@
 								</q-tooltip>
 							</q-icon>
 							<router-link
-								:to="userId ? `/content/spells` : `/tools/spell-creator`"
+								:to="user ? `/content/spells` : `/tools/spell-creator`"
 								class="btn bg-neutral-5 mr-2"
 								>{{ unsaved_changes ? "Cancel" : "Back" }}</router-link
 							>
-							<q-btn v-if="userId" label="Save" type="submit" color="primary" no-caps />
-							<q-btn v-else :disabled="!valid" color="primary" no-caps @click="download">
-								Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+							<q-btn v-if="user" label="Save" type="submit" color="primary" no-caps />
+							<q-btn
+								v-else
+								:disabled="!valid"
+								color="primary"
+								no-caps
+								@click="account_dialog = true"
+							>
+								Save
 							</q-btn>
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">
 							<template v-if="unsaved_changes">
-								<div v-if="userId" class="orange truncate mr-2 d-none d-md-block">
+								<div v-if="user" class="orange truncate mr-2 d-none d-md-block">
 									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>
-								<a class="btn btn-sm bg-neutral-5" @click="userId ? revertChanges() : reset()">
+								<a class="btn btn-sm bg-neutral-5" @click="user ? revertChanges() : reset()">
 									<i aria-hidden="true" class="fas fa-undo" />
-									{{ userId ? "Revert" : "Reset" }}
+									{{ user ? "Revert" : "Reset" }}
 								</a>
 							</template>
 						</div>
@@ -73,13 +86,37 @@
 			</hk-card>
 		</q-dialog>
 
+		<q-dialog v-model="account_dialog">
+			<hk-card class="account-dialog">
+				<div slot="header" class="card-header">
+					<span>Save your spell</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
+				<div class="card-body">
+					<p>Create an account to save your spell and use it on your spellcaster monsters.</p>
+					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
+						Create Free Account
+					</button>
+				</div>
+				<div slot="footer" class="card-footer">
+					<q-btn no-caps @click="download">
+						Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+					</q-btn>
+				</div>
+			</hk-card>
+		</q-dialog>
+
 		<q-dialog v-model="create_dialog" persistent position="top">
 			<hk-card class="create-dialog" header="How do you want to do this?">
 				<div class="card-body">
 					<template v-if="!copy_spell">
-						<button class="btn btn-lg btn-block" @click="copy_spell = true">Copy existing spell</button>
+						<button class="btn btn-lg btn-block" @click="copy_spell = true">
+							Copy existing spell
+						</button>
 						<h2 class="text-center my-2">OR</h2>
-						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">Create from scratch</button>
+						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">
+							Create from scratch
+						</button>
 					</template>
 					<template v-if="copy_spell">
 						<h2>Copy an existing spell</h2>
@@ -94,6 +131,10 @@
 				</div>
 			</hk-card>
 		</q-dialog>
+
+		<q-dialog v-model="sign_up_dialog">
+			<SignUp @sign-up="handleSignUp" />
+		</q-dialog>
 	</div>
 	<hk-card v-else>
 		<hk-loader />
@@ -107,6 +148,7 @@ import BasicInfo from "src/components/spells/BasicInfo";
 import SpellActions from "src/components/spells/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import SignUp from "src/components/SignUp.vue";
 
 export default {
 	name: "EditSpell",
@@ -114,6 +156,7 @@ export default {
 		BasicInfo,
 		SpellActions,
 		CopyContent,
+		SignUp,
 	},
 	data() {
 		return {
@@ -126,6 +169,8 @@ export default {
 			copy_dialog: false,
 			create_dialog: false,
 			copy_spell: false,
+			account_dialog: false,
+			sign_up_dialog: false,
 			unsaved_changes: false,
 		};
 	},
@@ -144,7 +189,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters(["user", "tier", "overencumbered"]),
 		...mapGetters("spells", ["spell_count"]),
 	},
 	watch: {
@@ -229,6 +274,12 @@ export default {
 				this.spell_copy = JSON.parse(JSON.stringify(this.spell));
 			});
 		},
+		handleSignUp(e) {
+			if (e === "success") {
+				this.account_dialog = false;
+				this.sign_up_dialog = false;
+			}
+		},
 	},
 
 	// This is now handled in contribute/spells/edit
@@ -270,7 +321,7 @@ export default {
 .content__edit {
 	.top {
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 10px;
 
@@ -299,5 +350,9 @@ export default {
 	.card-body {
 		overflow: auto;
 	}
+}
+.hk-card.account-dialog {
+	width: 100%;
+	max-width: 360px;
 }
 </style>

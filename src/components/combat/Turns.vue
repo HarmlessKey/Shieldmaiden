@@ -108,7 +108,9 @@
 					{{ encounter.name }}
 				</template>
 				<template v-else>
-					<router-link v-if="!userId" to="/sign-up" class="btn">Create Account</router-link>
+					<router-link v-if="!userId" to="/sign-up" class="btn bg-accent"
+						>Create Account</router-link
+					>
 					<router-link v-else to="/content" class="btn">Create custom content</router-link>
 				</template>
 			</span>

@@ -1,12 +1,13 @@
 <template>
 	<q-no-ssr class="hk-layout">
 		<div class="content">
-			<Crumble />
+			<Crumble v-if="$route.name !== 'home'" />
 			<PaymentDeclined />
 			<OverEncumbered v-if="show_overencumbered" />
 			<div class="row q-col-gutter-md">
 				<div class="col-12" :class="{ 'col-md-9': width > 978 && $route.meta.side !== false }">
 					<router-view :key="$route.fullPath" />
+					<slot />
 				</div>
 				<div class="col-12 col-md-3" v-if="width > 978 && $route.meta.side !== false">
 					<ContentSideRight />

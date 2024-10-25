@@ -31,7 +31,7 @@ const routes = [
 			offline: true,
 			description:
 				"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
-			title: "Combat Tracker for D&D 5e",
+			title: "Combat Tracker for D&D",
 		},
 	},
 	{ path: "/home", redirect: "/" },

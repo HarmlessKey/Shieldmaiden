@@ -4,7 +4,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 @import "hk-icons.scss";
-@import "./variables.scss";
 @import "./splitpanes.scss";
 
 /* 2. Themes */
@@ -28,13 +27,16 @@
 /* 2. Defaults */
 /*********************************************/
 html body {
-	padding-top: $header-height;
 	background: $neutral-11;
 	color: $neutral-1;
 	font-size: $font-size;
 	font-family: "Open Sans", sans-serif;
 	position: relative;
-	background-image: url("../assets/_img/styles/paper-bg.png");
+	// background-image: url("../assets/_img/styles/paper-bg.png");
+
+	button {
+		all: unset;
+	}
 
 	*:focus-visible {
 		outline-offset: 3px;
@@ -53,16 +55,17 @@ html body {
 		grid-template-columns: max-content auto;
 	}
 
-	header {
+	#header {
 		display: block;
 		height: $header-height;
 		line-height: 50px;
 		width: 100%;
-		background: $neutral-7;
+		background: $neutral-6;
 		border-bottom: solid 1px transparent;
 		position: fixed;
 		top: 0;
 		z-index: 999;
+		padding: 0 10px 0 5px;
 	}
 	pre {
 		color: $neutral-2;
@@ -108,11 +111,10 @@ html body {
 	h4,
 	h5,
 	h6 {
-		font-weight: normal;
+		font-weight: bold;
 		margin: 0;
 	}
 	h1 {
-		font-family: $text-written;
 		font-size: 25px;
 		line-height: 40px;
 		margin-bottom: 15px;
@@ -138,6 +140,11 @@ html body {
 	/*********************************************/
 	.white {
 		color: $white !important;
+	}
+	.text {
+		&-left {
+			text-align: left !important;
+		}
 	}
 
 	.neutral-1,
@@ -422,6 +429,12 @@ html body {
 	}
 	.bg-yellow-light {
 		background-color: $yellow-light !important;
+	}
+	.bg-accent {
+		background-color: $accent !important;
+	}
+	.bg-accent-light {
+		background-color: $accent-light !important;
 	}
 
 	.healing {
@@ -1002,9 +1015,8 @@ html body {
 
 	.breadcrumb {
 		margin-bottom: 20px;
-		background: $neutral-9;
+		background: $neutral-6;
 		border-radius: $border-radius;
-		border: solid 1px $neutral-8;
 		padding: 10px 15px;
 	}
 
@@ -1050,10 +1062,9 @@ html body {
 	}
 
 	.content-count {
-		border: solid 1px $neutral-5;
 		background-color: $neutral-9;
 		padding: 5px 10px;
-		border-radius: 12px;
+		border-radius: $border-radius;
 		user-select: none;
 		margin-right: 4px;
 
@@ -1234,7 +1245,6 @@ html body {
 				text-align: center;
 
 				h2 {
-					font-family: $text-written;
 					font-size: 30px !important;
 					line-height: 50px;
 					text-align: center;
@@ -1465,7 +1475,7 @@ html body {
 		border-radius: $border-radius-small;
 		background: $blue;
 		color: $neutral-1;
-		font-weight: 400;
+		font-weight: 700;
 		text-align: center;
 		vertical-align: middle;
 		user-select: none;
@@ -1474,6 +1484,10 @@ html body {
 		font-size: 1rem;
 		line-height: 1.5;
 		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+
+		i {
+			// font-weight: normal;
+		}
 
 		&:focus-visible {
 			outline: $outline;
@@ -1534,6 +1548,9 @@ html body {
 		&.bg-neutral-9:hover {
 			background-color: $neutral-8 !important;
 		}
+		&.bg-accent:hover {
+			background-color: $accent-light !important;
+		}
 
 		&.btn-square {
 			border-radius: 0;
@@ -1569,7 +1586,7 @@ html body {
 
 	.login-container {
 		background-position: center;
-		padding: 100px 30px 0 30px;
+		padding: 50px 30px 0 30px;
 	}
 	#login {
 		background-color: $neutral-7;
@@ -1597,6 +1614,9 @@ html body {
 		}
 		.q-field {
 			margin-bottom: 1px;
+		}
+		.q-form {
+			overflow: auto;
 		}
 	}
 	.google {
@@ -1665,8 +1685,8 @@ html body {
 		margin-bottom: 20px;
 		border-radius: $border-radius;
 		overflow: auto;
-		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.125), 0 6px 2px 0 rgba(0, 0, 0, 0.1);
-		border: solid 1px $neutral-5;
+		// box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.125), 0 6px 2px 0 rgba(0, 0, 0, 0.1);
+		// border: solid 1px $neutral-5;
 
 		&::-webkit-scrollbar {
 			display: none !important;
@@ -1709,8 +1729,7 @@ html body {
 		}
 		.card-footer {
 			padding: 12px 15px;
-			background-color: rgba(0, 0, 0, 0.03);
-			border-top: 1px solid rgba(0, 0, 0, 0.125);
+			background-color: $neutral-8;
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
@@ -2713,6 +2732,7 @@ html body {
 	}
 	.q-btn {
 		border-radius: $border-radius;
+		font-weight: bold;
 
 		&:focus-visible {
 			outline: $outline !important;
@@ -2738,10 +2758,10 @@ html body {
 				}
 			}
 			a.q-item {
-				color: $neutral-2 !important;
+				// color: $neutral-2 !important;
 
 				&:hover {
-					color: $blue !important;
+					// color: $blue !important;
 				}
 			}
 		}
@@ -2853,7 +2873,7 @@ html body {
 
 			.breadcrumb {
 				margin-bottom: 0;
-				background: $neutral-9;
+				background: $neutral-6;
 				border-radius: 0;
 				border: none;
 				padding: 10px 15px;

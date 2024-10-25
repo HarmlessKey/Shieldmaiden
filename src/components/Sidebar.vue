@@ -8,8 +8,9 @@
 			id="sidebar"
 			:class="{
 				'side-collapsed':
-					$store.getters.side_collapsed && !smallScreen && $route.meta.sidebar !== false,
-				slideIn: $route.meta.sidebar === false,
+					($store.getters.side_collapsed && !smallScreen && $route.meta.sidebar !== false) ||
+					($route.name === 'home' && $store.getters.side_collapsed && !smallScreen),
+				slideIn: $route.meta.sidebar === false && $route.name !== 'home',
 			}"
 		>
 			<div>

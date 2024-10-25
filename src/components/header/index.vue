@@ -8,7 +8,7 @@
 		>
 			<div class="d-flex items-center gap-1">
 				<div
-					v-if="$route.name === 'home'"
+					v-if="$route.meta.sidebar === false && $route.name !== 'home'"
 					class="menu"
 					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
 				>

@@ -1,14 +1,16 @@
 <template>
 	<div id="q-app" :class="{ home: $route.name === 'home' }" @click="setSideSmallScreen(false)">
 		<div>
-			<Header v-if="$route.name !== 'home'" />
+			<Header v-if="$route.name !== 'home' || ($route.name === 'home' && user)" />
 			<div class="offline" v-if="connection === 'offline'">
 				<i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection
 			</div>
-			<div :class="{ hasSide: $route.meta.sidebar !== false }">
+			<div :class="{ hasSide: $route.meta.sidebar !== false || ($route.name === 'home' && user) }">
 				<Sidebar
 					v-if="
-						(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen
+						($route.name === 'home' && user) ||
+						(!small_screen && $route.meta.sidebar !== false) ||
+						$store.getters.side_small_screen
 					"
 					:small-screen="small_screen"
 				/>

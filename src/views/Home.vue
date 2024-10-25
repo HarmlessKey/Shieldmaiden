@@ -6,7 +6,7 @@
 		:thumb-style="{ width: '10px' }"
 		v-on:scroll="handleScroll"
 	>
-		<HomeHeader :scrolled="!!scrolled" />
+		<Header :scrolled="!!scrolled" />
 		<template v-if="diceColors.length > 0">
 			<section id="top">
 				<Top :maintenance="maintenance" />
@@ -85,7 +85,6 @@
 		</template>
 	</q-scroll-area>
 	<div v-else class="user-content">
-		<Header />
 		<Authenticated>
 			<UserContent />
 		</Authenticated>
@@ -94,8 +93,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import HomeHeader from "src/components/home/Header.vue";
-import Header from "src/components/header";
+import Header from "src/components/home/Header.vue";
 import Top from "src/components/home/Top.vue";
 import Feedback from "src/components/home/Feedback.vue";
 import General from "src/components/home/General.vue";
@@ -112,7 +110,6 @@ export default {
 		maintenance: [Boolean, String],
 	},
 	components: {
-		HomeHeader,
 		Header,
 		Top,
 		Feedback,

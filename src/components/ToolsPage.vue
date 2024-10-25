@@ -53,8 +53,8 @@ export default {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		text-transform: uppercase;
 		background-size: auto;
+		font-weight: bold;
 	}
 	&::v-deep h2 {
 		font-size: 25px;

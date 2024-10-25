@@ -69,12 +69,12 @@ export default {
 				},
 				{
 					title: "Live Initiative List",
-					to: "/tools/spell-creator/create-spell",
+					to: "/tools/combat-tracker",
 					icon: "fas fa-list-alt",
 				},
 				{
 					title: "Character Sync",
-					to: "/tools/spell-creator/create-spell",
+					to: "/tools/character-sync",
 					icon: "fas fa-sync-alt",
 				},
 			],

@@ -13,12 +13,8 @@
 			</h2>
 
 			<div class="buttons">
-				<q-btn v-if="!$store.getters.user" to="/demo" color="accent" size="lg" no-caps>
-					Try Demo Encounter
-				</q-btn>
-				<q-btn v-if="!$store.getters.user" to="/sign-up" class="create-account" size="lg" no-caps>
-					Create Free Account
-				</q-btn>
+				<q-btn to="/sign-up" color="accent" size="lg" no-caps> Create Free Account </q-btn>
+				<q-btn to="/demo" class="try-demo" size="lg" no-caps> Try Demo Encounter </q-btn>
 			</div>
 
 			<div class="tools-title">Shieldmaiden features</div>
@@ -142,7 +138,7 @@ export default {
 			.q-btn {
 				width: 100%;
 
-				&.create-account {
+				&.try-demo {
 					border: solid 1px $accent;
 					background-color: $neutral-11;
 				}

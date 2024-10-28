@@ -1,10 +1,12 @@
 <template>
 	<q-scroll-area
+		v-if="!user"
 		class="home"
 		:dark="$store.getters.theme === 'dark'"
 		:thumb-style="{ width: '10px' }"
 		v-on:scroll="handleScroll"
 	>
+		<Header :scrolled="!!scrolled" />
 		<template v-if="diceColors.length > 0">
 			<section id="top">
 				<Top :maintenance="maintenance" />
@@ -82,9 +84,16 @@
 			<Footer />
 		</template>
 	</q-scroll-area>
+	<div v-else class="user-content">
+		<Authenticated>
+			<UserContent />
+		</Authenticated>
+	</div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import Header from "src/components/home/Header.vue";
 import Top from "src/components/home/Top.vue";
 import Feedback from "src/components/home/Feedback.vue";
 import General from "src/components/home/General.vue";
@@ -92,6 +101,8 @@ import Share from "src/components/home/Share.vue";
 import Builder from "src/components/home/Builder.vue";
 import Campaign from "src/components/home/Campaign.vue";
 import Footer from "src/components/Footer.vue";
+import UserContent from "./UserContent";
+import Authenticated from "src/layouts/authenticated.vue";
 
 export default {
 	name: "home",
@@ -99,6 +110,7 @@ export default {
 		maintenance: [Boolean, String],
 	},
 	components: {
+		Header,
 		Top,
 		Feedback,
 		General,
@@ -106,6 +118,8 @@ export default {
 		Builder,
 		Campaign,
 		Footer,
+		UserContent,
+		Authenticated,
 	},
 	data() {
 		return {
@@ -113,17 +127,9 @@ export default {
 		};
 	},
 	computed: {
+		...mapGetters(["user"]),
 		diceColors() {
-			let array = ["blue", "cyan", "green", "orange", "red", "yellow"];
-
-			//Shuffle the array
-			for (let i = array.length - 1; i > 0; i--) {
-				const j = Math.floor(Math.random() * i);
-				const temp = array[i];
-				array[i] = array[j];
-				array[j] = temp;
-			}
-			return array;
+			return ["cyan", "orange", "green", "blue", "red", "yellow"];
 		},
 	},
 	methods: {
@@ -136,7 +142,7 @@ export default {
 
 <style lang="scss" scoped>
 .home {
-	height: calc(100vh - #{$header-height});
+	height: 100vh;
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -146,7 +152,7 @@ export default {
 		padding: 50px 0;
 
 		&#top {
-			padding: 0;
+			padding: $header-height 0 0 0;
 		}
 	}
 	.die {
@@ -163,19 +169,23 @@ export default {
 		z-index: 97;
 	}
 }
+.hk-layout {
+	height: 100vh;
+	padding-top: $header-height;
+}
 
 @media only screen and (min-width: $md-breakpoint) {
 	.home {
 		.die {
-			width: 100px;
-			height: 100px;
-			background-size: 100px;
+			width: 80px;
+			height: 80px;
+			background-size: 80px;
 			margin-left: -50px;
-			bottom: -50px;
+			bottom: -40px;
 		}
 
 		section {
-			padding: 100px 0;
+			padding: 60px 0;
 		}
 	}
 }

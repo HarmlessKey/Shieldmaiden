@@ -8,29 +8,36 @@
 				</span>
 			</div>
 
-			<video 
-				class="video" src="~assets/_img/home/encounter-builder.mp4" 
-				muted autoplay playsinline alt="Shieldmaiden logo animation" loop
+			<video
+				class="video"
+				src="~assets/_img/home/encounter-builder.mp4"
+				muted
+				autoplay
+				playsinline
+				alt="Shieldmaiden logo animation"
+				loop
 			/>
 
 			<div class="text-center">
-				<router-link to="/encounter-builder" class="btn btn-lg">Try our encounter builder</router-link>
+				<router-link to="/encounter-builder" class="btn btn-lg bg-accent"
+					>Try our encounter builder</router-link
+				>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-	export default {
-		name: 'Content'
-	}
+export default {
+	name: "Content",
+};
 </script>
 
 <style lang="scss" scoped>
-	.builder {
-		.video {
-			width: 100%;
-			margin-bottom: 30px;
-		}
+.builder {
+	.video {
+		width: 100%;
+		margin-bottom: 30px;
 	}
+}
 </style>

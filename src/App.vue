@@ -1,14 +1,16 @@
 <template>
-	<div id="q-app" @click="setSideSmallScreen(false)">
+	<div id="q-app" :class="{ home: $route.name === 'home' }" @click="setSideSmallScreen(false)">
 		<div>
-			<nav-main :maintenance="maintenance" />
+			<Header v-if="$route.name !== 'home' || ($route.name === 'home' && user)" />
 			<div class="offline" v-if="connection === 'offline'">
 				<i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection
 			</div>
-			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
+			<div :class="{ hasSide: $route.meta.sidebar !== false || ($route.name === 'home' && user) }">
 				<Sidebar
 					v-if="
-						(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen
+						(!small_screen && $route.name === 'home' && user) ||
+						(!small_screen && $route.meta.sidebar !== false) ||
+						$store.getters.side_small_screen
 					"
 					:small-screen="small_screen"
 				/>
@@ -20,7 +22,6 @@
 					<router-view />
 				</q-scroll-area>
 			</div>
-			<Home v-else :maintenance="maintenance" />
 		</div>
 		<transition
 			enter-active-class="animated animate__slideInRight"
@@ -35,36 +36,18 @@
 			<vue-snotify />
 			<HkRolls />
 		</q-no-ssr>
-
-		<!-- Announcements -->
-		<q-dialog v-model="announcement" position="top" persistent>
-			<q-banner class="bg-blue white">
-				<template v-slot:avatar>
-					<q-icon name="info" />
-				</template>
-				<h3 class="mb-1">Nothing to see here</h3>
-				<p>
-					<strong>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</strong>
-				</p>
-				<p>No announcement</p>
-				<template v-slot:action>
-					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
-				</template>
-			</q-banner>
-		</q-dialog>
 		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
 <script>
 import { db } from "./firebase";
-import Header from "./components/Header.vue";
+import Header from "./components/header";
 import Sidebar from "./components/Sidebar.vue";
 import Drawer from "./components/Drawer.vue";
 import { mapActions, mapGetters } from "vuex";
 import HkRolls from "./components/hk-components/hk-rolls";
 import { general } from "./mixins/general";
-import Home from "./views/Home";
 
 import { Cookies } from "quasar";
 import jwt_decode from "jwt-decode";
@@ -73,11 +56,10 @@ export default {
 	name: "App",
 	mixins: [general],
 	components: {
-		navMain: Header,
+		Header,
 		Sidebar,
 		Drawer,
 		HkRolls,
-		Home,
 	},
 	async preFetch({ store, ssrContext }) {
 		const cookies = Cookies.parseSSR(ssrContext);
@@ -206,10 +188,7 @@ export default {
 		return {
 			width: 0,
 			small_screen: true,
-			announcementSetter: false,
-			announcement_cookie: false,
 			broadcast: undefined,
-			maintenance: false,
 			connection: process.browser && !navigator.onLine ? "offline" : "online",
 		};
 	},
@@ -261,27 +240,9 @@ export default {
 			storeBroadcast: "broadcast",
 		}),
 		...mapGetters(["initialized", "theme", "user", "action_rolls"]),
-		announcement: {
-			get() {
-				const announcement = this.user && !this.announcement_cookie ? true : false;
-				return this.announcementSetter !== undefined ? this.announcementSetter : announcement;
-			},
-			set(newVal) {
-				this.announcementSetter = newVal;
-			},
-		},
 	},
 	async mounted() {
 		this.setTips();
-		const cookies = document.cookie.split(";");
-
-		for (let cookie of cookies) {
-			const [key, val] = cookie.split("=");
-			if (key.trim() === "announcement" && val === "true") {
-				this.announcement_cookie = true;
-			}
-		}
-
 		if (this.user) {
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
@@ -318,12 +279,24 @@ export default {
 			this.small_screen = size.width < 576;
 			this.width = size.width;
 		},
-		closeAnnouncement() {
-			const max_age = 24 * 60 * 60; // 24 hours in seconds
-
-			document.cookie = `announcement=true; max-age=${max_age}; path=/`;
-			this.announcement = false;
-		},
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+#q-app {
+	padding-top: $header-height;
+
+	&.home {
+		padding-top: 0;
+
+		.scrollable-content {
+			height: 100vh;
+		}
+
+		#sidebar {
+			top: $header-height;
+		}
+	}
+}
+</style>

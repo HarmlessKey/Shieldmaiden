@@ -357,7 +357,6 @@ h2.head {
 	text-shadow: 0 0 8px $black;
 	font-size: 30px !important;
 	text-align: center;
-	font-family: "Fredericka the Great", cursive;
 }
 
 .xp {

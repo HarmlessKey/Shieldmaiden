@@ -37,60 +37,56 @@
 			</div>
 		</hk-card>
 
-		<hk-card-deck>
-			<hk-card header="Dungeon Master">
-				<div class="card-body">
-					<q-list :dark="$store.getters.theme === 'dark'" class="mb-4">
-						<q-item
-							v-for="({ path, icon, label, caption }, index) in dm_tabs"
-							clickable
-							v-ripple
-							:to="path"
-							:key="`dm-${index}`"
-						>
-							<q-item-section avatar>
-								<q-icon :name="icon" class="neutral-2" />
-							</q-item-section>
-							<q-item-section>
-								<q-item-label>{{ label }}</q-item-label>
-								<q-item-label caption>{{ caption }}</q-item-label>
-							</q-item-section>
-							<q-item-section side>
-								<q-icon name="fas fa-chevron-right" />
-							</q-item-section>
-						</q-item>
-					</q-list>
-				</div>
-			</hk-card>
+		<div>
+			<h2>Dungeon Master</h2>
+			<q-list :dark="$store.getters.theme === 'dark'" class="mb-4">
+				<q-item
+					v-for="({ path, icon, label, caption }, index) in dm_tabs"
+					clickable
+					v-ripple
+					:to="path"
+					:key="`dm-${index}`"
+				>
+					<q-item-section avatar>
+						<q-icon :name="icon" class="neutral-2" />
+					</q-item-section>
+					<q-item-section>
+						<q-item-label>{{ label }}</q-item-label>
+						<q-item-label caption>{{ caption }}</q-item-label>
+					</q-item-section>
+					<q-item-section side>
+						<q-icon name="fas fa-chevron-right" />
+					</q-item-section>
+				</q-item>
+			</q-list>
+		</div>
 
-			<hk-card header="Player">
-				<div class="card-body">
-					<q-list :dark="$store.getters.theme === 'dark'">
-						<q-item
-							v-for="({ path, icon, label, caption, badge }, index) in player_tabs"
-							clickable
-							v-ripple
-							:to="path"
-							:key="`player-${index}`"
-						>
-							<q-item-section avatar>
-								<q-icon :name="icon" class="neutral-2" />
-							</q-item-section>
-							<q-item-section>
-								<q-item-label>{{ label }}</q-item-label>
-								<q-item-label caption>{{ caption }}</q-item-label>
-							</q-item-section>
-							<q-item-section avatar v-if="badge"
-								><q-badge>{{ badge }}</q-badge></q-item-section
-							>
-							<q-item-section side>
-								<q-icon name="fas fa-chevron-right" />
-							</q-item-section>
-						</q-item>
-					</q-list>
-				</div>
-			</hk-card>
-		</hk-card-deck>
+		<div>
+			<h2>Player</h2>
+			<q-list :dark="$store.getters.theme === 'dark'">
+				<q-item
+					v-for="({ path, icon, label, caption, badge }, index) in player_tabs"
+					clickable
+					v-ripple
+					:to="path"
+					:key="`player-${index}`"
+				>
+					<q-item-section avatar>
+						<q-icon :name="icon" class="neutral-2" />
+					</q-item-section>
+					<q-item-section>
+						<q-item-label>{{ label }}</q-item-label>
+						<q-item-label caption>{{ caption }}</q-item-label>
+					</q-item-section>
+					<q-item-section avatar v-if="badge"
+						><q-badge>{{ badge }}</q-badge></q-item-section
+					>
+					<q-item-section side>
+						<q-icon name="fas fa-chevron-right" />
+					</q-item-section>
+				</q-item>
+			</q-list>
+		</div>
 	</div>
 </template>
 
@@ -254,7 +250,6 @@ export default {
 }
 
 h2 {
-	font-family: "Fredericka the Great", cursive;
 	margin-bottom: 10px;
 }
 h4 {

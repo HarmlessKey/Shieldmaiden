@@ -194,22 +194,22 @@ export default {
 			};
 
 			for (const roll of this.custom_rolls) {
-				const rolls = roll.roll.split("+");
-				const dice_values = rolls[0].split("d");
-				const fixed_val = rolls[1] ? roll[1] : undefined;
+				const [dice, fixed_val] = roll.roll.split("+");
+				const dice_values = dice.split("d");
 				const damage_type = type !== "healing" ? roll.damage_type : undefined;
 				const miss_mod = this.roll_type === "attack" ? 0 : undefined;
 				const save_fail_mod = this.roll_type === "save" ? 0.5 : undefined;
 
 				custom_roll.action_list[0].rolls.push({
 					damage_type,
-					dice_count: dice_values[0],
-					dice_type: dice_values[1],
-					fixed_val,
+					dice_count: parseInt(dice_values[0]),
+					dice_type: parseInt(dice_values[1]),
+					fixed_val: fixed_val ? parseInt(fixed_val) : null,
 					miss_mod,
 					save_fail_mod,
 				});
 			}
+			console.log(custom_roll);
 			return custom_roll;
 		},
 		addRoll() {

@@ -28,7 +28,9 @@
 					from there.
 				</span>
 				<div class="button">
-					<router-link v-if="!user" to="/sign-up" class="btn btn-lg">Create Account</router-link>
+					<router-link v-if="!user" to="/sign-up" class="btn btn-lg bg-accent"
+						>Create Account</router-link
+					>
 					<router-link v-else to="/content" class="btn btn-lg">Create custom content</router-link>
 				</div>
 			</div>

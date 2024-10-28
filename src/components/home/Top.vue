@@ -1,69 +1,39 @@
 <template>
 	<div class="top">
 		<div class="container">
-			<img class="logo" src="../../assets/_img/logo/logo-main-icon-left.svg" alt="Shieldmaiden" />
-			<div class="content">
-				<div>
-					<h1>D&D Combat Tracker</h1>
-					<h2>And the ultimate companion app for your D&D campaign</h2>
+			<img
+				class="shieldmaiden"
+				src="../../assets/_img/shieldmaiden-cropped.webp"
+				alt="Shieldmaiden"
+			/>
+			<h1>Run D&D Combat with ease.</h1>
+			<h2>
+				Build encounters for your campaign, and keep track of everything you need during combat
+				using our advanced initiative tracker.
+			</h2>
 
-					<q-btn
-						v-if="!$store.getters.user"
-						:class="{ 'full-width': isMobile }"
-						class="px-2 py-1"
-						to="/demo"
-						color="primary"
-						size="lg"
-						no-caps
-						push
-					>
-						Try demo encounter
-					</q-btn>
-					<router-link
-						v-else
-						to="/content"
-						class="btn btn-lg bg-green"
-						:class="{ 'btn-block': isMobile }"
-						>My content</router-link
-					>
-				</div>
-				<img
-					class="laptop"
-					:src="require('src/assets/_img/shieldmaiden-combat-tracker-laptop.webp')"
-					alt="Shieldmaiden Combat Tracker on Laptop"
-				/>
+			<div class="buttons">
+				<q-btn v-if="!$store.getters.user" to="/demo" color="accent" size="lg" no-caps>
+					Try Demo Encounter
+				</q-btn>
+				<q-btn v-if="!$store.getters.user" to="/sign-up" class="create-account" size="lg" no-caps>
+					Create Free Account
+				</q-btn>
 			</div>
 
-			<div class="tools-title">More Shieldmaiden features</div>
+			<div class="tools-title">Shieldmaiden features</div>
 			<div class="tools">
-				<router-link
-					v-for="{ title, to, description, icon } in tools"
-					:key="to"
-					:to="to"
-					class="tool"
-				>
+				<router-link v-for="{ title, to, icon } in tools" :key="to" :to="to" class="tool">
 					<div class="tool__image">
 						<i :class="icon" aria-hidden="true" />
 					</div>
 					<div class="tool__content">
-						<div class="tool__content-title">
-							{{ title }}
-						</div>
-						<div class="tool__content-description" v-html="description" />
+						{{ title }}
 					</div>
 				</router-link>
 			</div>
-			<img
-				class="shieldmaiden"
-				src="../../assets/_img/shieldmaiden.webp"
-				alt="Shieldmaiden holding a sword and shield"
-			/>
+			<q-resize-observer @resize="setSize" />
 		</div>
-		<a href="#general" class="read-more">
-			<div>Read more</div>
-			<i aria-hidden="true" icon="fas fa-chevron-down" />
-		</a>
-		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -75,71 +45,37 @@ export default {
 	},
 	data() {
 		return {
-			step: 0,
 			width: 0,
-			steps: [
-				{
-					title: "Build Encounter",
-					caption: "Add players & monsters",
-					icon: "",
-				},
-				{
-					title: "Run Encounter",
-					caption: "Perform actions Track health & initiative",
-					icon: "",
-				},
-				{
-					title: "Distribute Loot",
-					caption: "Award experience, items and items",
-					icon: "",
-				},
-			],
 			tools: [
 				{
-					title: "DM Screen",
-					to: "/tools/dm-screen",
-					description:
-						"Quick access to rules, a soundboard, your players, your custom encounters and more.",
-					image: "dm-screen-medium.png",
-					icon: "fas fa-map",
+					title: "Combat Tracker",
+					to: "/demo/run-encounter",
+					icon: "fas fa-swords",
+				},
+				{
+					title: "Encounter Builder",
+					to: "/tools/encounter-builder/build-encounter",
+					icon: "fas fa-hammer-war",
+				},
+				{
+					title: "Spell Creator",
+					to: "/tools/spell-creator/create-spell",
+					icon: "fas fa-wand-magic",
+				},
+				{
+					title: "Monster Creator",
+					to: "/tools/monster-creator/create-monster",
+					icon: "fas fa-dragon",
+				},
+				{
+					title: "Live Initiative List",
+					to: "/tools/combat-tracker",
+					icon: "fas fa-list-alt",
 				},
 				{
 					title: "Character Sync",
 					to: "/tools/character-sync",
-					description:
-						"Access your characters from external resources and sync them with Shieldmaiden.",
-					image: "character-sync.png",
 					icon: "fas fa-sync-alt",
-				},
-				{
-					title: "Monster Creator",
-					to: "/tools/monster-creator",
-					description:
-						"Build custom monster stat blocks with easy to roll actions. You can use your monsters in our combat tracker.",
-					image: "monster-medium.jpg",
-					icon: "fas fa-dragon",
-				},
-				{
-					title: "Spell Creator",
-					to: "/tools/spell-creator",
-					description:
-						"Create custom spells to roll directly, or use on your spellcaster monsters.",
-					image: "fire-dragon-medium.jpg",
-					icon: "fas fa-wand-magic",
-				},
-				{
-					title: "Compendium",
-					to: "/compendium",
-					description: "Quickly reference Monsters, Spells, Conditions and Items.",
-					image: "compendium-medium.jpg",
-					icon: "fas fa-book-spells",
-				},
-				{
-					title: "Character Builder",
-					to: "/tools/character-builder",
-					description: "Build your character and get an online character sheet.",
-					image: "characters-medium.jpg",
-					icon: "fas fa-helmet-battle",
 				},
 			],
 		};
@@ -159,156 +95,125 @@ export default {
 
 <style lang="scss" scoped>
 .top {
-	background-image: url("../../assets/_img/styles/paper-bg.png");
-	background-position: top center;
-	padding-bottom: 50px;
 	background-color: $neutral-11;
-	overflow: hidden;
 
 	.container {
-		padding: 30px 20px 0 20px;
 		max-width: 1280px;
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+		padding: 22px 20px 50px 20px;
 
-		.logo {
-			width: 100%;
-			max-width: 320px;
-			margin-bottom: 30px;
-		}
 		.shieldmaiden {
-			height: 860px;
-			display: none;
-			position: absolute;
-			left: -170px;
-			top: 20px;
-			z-index: 0;
+			transform: scaleX(-1);
+			object-fit: cover;
+			object-position: top 0 left -30px;
+			height: 250px;
+			width: 100%;
+			margin-bottom: 22px;
 		}
-		.content {
+		.laptop {
 			display: flex;
-			flex-direction: column;
-			gap: 25px;
-			padding: 0;
-			text-align: center;
+			justify-content: center;
 
-			.laptop {
-				width: 80%;
-				margin: 20px auto;
-			}
-			::v-deep {
-				.q-btn {
-					background-color: #3fa3ad !important;
-				}
+			img {
+				width: 90%;
+				margin-bottom: 50px;
 			}
 		}
 		h1 {
-			line-height: normal;
-			font-size: 30px;
+			font-size: 35px;
 			margin: 0 0 10px 0;
-			text-transform: uppercase;
+			max-width: 550px;
+			font-weight: bold;
+			line-height: 45px;
 		}
 		h2 {
-			margin: 0 0 30px 0;
+			margin: 0 0 22px 0;
 			font-size: 18px;
+			line-height: 30px;
+			max-width: 400px;
+			opacity: 0.8;
+			font-weight: normal;
+		}
+		.buttons {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+			margin-bottom: 35px;
+
+			.q-btn {
+				width: 100%;
+
+				&.create-account {
+					border: solid 1px $accent;
+					background-color: $neutral-11;
+				}
+			}
 		}
 		.tools-title {
 			font-size: 18px;
-			margin: 25px 0 15px 0;
+			margin-bottom: 20px;
 			font-weight: bold;
 		}
 		.tools {
 			display: flex;
 			flex-direction: column;
-			gap: 15px;
+			gap: 10px;
 			z-index: 1;
 
 			.tool {
-				background-color: $neutral-6;
 				border-radius: $border-radius;
+				background-color: $neutral-6;
 				color: $neutral-1;
 				display: flex;
 				cursor: pointer;
-				box-shadow: 0 10px 15px $black;
+				align-items: center;
+				gap: 10px;
+				padding: 15px 10px;
 
-				&:hover {
-					background-color: $neutral-7;
-				}
 				&__image {
-					min-width: 80px;
-					height: 85px;
-					background-size: cover;
-					background-position: center top;
-					border-top-left-radius: $border-radius;
-					border-bottom-left-radius: $border-radius;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					font-size: 25px;
+					min-width: 40px;
+					font-size: 20px;
+					text-align: center;
 				}
 
 				&__content {
-					padding: 10px 10px 10px 0;
-					display: flex;
-					flex-direction: column;
-
-					&-title {
-						font-size: 15px;
-						font-weight: bold;
-					}
-					&-description {
-						font-size: 12px;
-						line-height: normal;
-					}
+					font-size: 16px;
+					transition: all 0.2s ease-in-out;
 				}
 			}
 		}
-	}
-	.read-more {
-		color: $neutral-1;
-		text-align: center;
-		width: 100%;
-		margin-top: 25px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-
-		&:hover {
-			font-size: 20px;
-			margin-bottom: -2px;
-		}
-	}
-}
-
-[data-theme="light"] {
-	.top {
-		background-image: none;
-		background-color: $neutral-9;
 	}
 }
 
 @media only screen and (min-width: $md-breakpoint) {
 	.top {
-		padding: 25px 0 75px 0;
-
 		.container {
-			.content {
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-				text-align: left;
+			padding: 95px 20px 77px 20px;
+			background-image: url("../../assets/_img/shieldmaiden.webp");
+			background-repeat: no-repeat;
+			background-position: top 50px right -120px;
 
-				.laptop {
-					width: 400px;
-					margin: 0;
+			.shieldmaiden {
+				display: none;
+			}
+			.buttons {
+				flex-direction: row;
+				margin-bottom: 77px;
+
+				.q-btn {
+					width: unset;
 				}
 			}
 			.tools {
-				flex-direction: row;
-				flex-wrap: wrap;
+				gap: 4px;
 				.tool {
-					flex-basis: calc(50% - 7.5px);
+					background: none;
+					padding: 3px 0;
+
+					&:hover {
+						.tool__content {
+							font-size: 20px;
+						}
+					}
 				}
 			}
 		}
@@ -317,25 +222,23 @@ export default {
 @media only screen and (min-width: $lg-breakpoint) {
 	.top {
 		.container {
-			padding-left: 330px;
-			align-items: start;
-			.content {
-				margin-bottom: 25px;
+			padding: 145px 30px 77px 30px;
+			background-position: top 55px right -20px;
 
-				.laptop {
-					width: 457px;
-					display: none;
-				}
-			}
-			.logo {
-				margin-left: -35px;
-			}
-			.shieldmaiden {
-				display: block;
+			h2 {
+				max-width: 500px;
 			}
 			.tools {
+				align-items: flex-start;
+				flex-direction: row;
+				flex-wrap: wrap;
+				column-gap: 25px;
+				row-gap: 2px;
+				max-width: 600px;
+
 				.tool {
-					// flex-basis: calc(33% - 7.5px);
+					flex-basis: 250px;
+					padding: 8px 0;
 				}
 			}
 		}
@@ -344,13 +247,26 @@ export default {
 @media only screen and (min-width: $xl-breakpoint) {
 	.top {
 		.container {
-			.content {
-				.laptop {
-					width: 457px;
-					display: block;
+			background-position: top 10px right 85px;
+
+			h2 {
+				max-width: 600px;
+			}
+			.tools {
+				column-gap: 60px;
+				max-width: 600px;
+
+				.tool {
+					flex-basis: 250px;
 				}
 			}
 		}
+	}
+}
+
+[data-theme="light"] {
+	.top {
+		background-color: $neutral-6;
 	}
 }
 </style>

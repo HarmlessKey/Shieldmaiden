@@ -32,10 +32,10 @@ html body {
 	font-size: $font-size;
 	font-family: "Open Sans", sans-serif;
 	position: relative;
-	// background-image: url("../assets/_img/styles/paper-bg.png");
 
 	button {
 		all: unset;
+		box-sizing: border-box;
 	}
 
 	*:focus-visible {
@@ -1483,11 +1483,9 @@ html body {
 		padding: 0.375rem 0.75rem;
 		font-size: 1rem;
 		line-height: 1.5;
-		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
-
-		i {
-			// font-weight: normal;
-		}
+		transition:
+			color 0.15s ease-in-out,
+			background-color 0.15s ease-in-out;
 
 		&:focus-visible {
 			outline: $outline;
@@ -1685,8 +1683,6 @@ html body {
 		margin-bottom: 20px;
 		border-radius: $border-radius;
 		overflow: auto;
-		// box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.125), 0 6px 2px 0 rgba(0, 0, 0, 0.1);
-		// border: solid 1px $neutral-5;
 
 		&::-webkit-scrollbar {
 			display: none !important;
@@ -2755,13 +2751,6 @@ html body {
 			.q-item {
 				&__section--avatar {
 					min-width: 35px;
-				}
-			}
-			a.q-item {
-				// color: $neutral-2 !important;
-
-				&:hover {
-					// color: $blue !important;
 				}
 			}
 		}

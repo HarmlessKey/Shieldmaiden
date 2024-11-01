@@ -25,9 +25,6 @@ export default class UserDataExport extends BaseDataExport {
 
 	async getPatrons() {
 		try {
-			// const getUserInfo = functions.httpsCallable("updateUsersEndpoint");
-			// console.log(await getUserInfo());
-			// return;
 			const patreon_ref = db.ref("new_patrons");
 			const payload = await patreon_ref.once("value");
 			if (!payload.exists()) {

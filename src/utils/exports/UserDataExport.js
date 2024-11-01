@@ -1,3 +1,5 @@
+import { db, functions } from "src/firebase";
+
 import BaseDataExport from "./BaseDataExport";
 
 export default class UserDataExport extends BaseDataExport {
@@ -21,18 +23,15 @@ export default class UserDataExport extends BaseDataExport {
 		}
 	}
 
-	// Method to simulate data fetching
 	async fetchUserData() {
-		// Simulate network request delay
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve([
-					["Username", "Email", "Sign-up Date"],
-					["Alice", "alice@example.com", "2021-01-15"],
-					["Bob", "bob@example.com", "2021-03-22"],
-					["Charlie", "charlie@example.com", "2021-05-18"],
-				]);
-			}, 1000);
-		});
+		try {
+			const getUserInfo = functions.httpsCallable("updateUsersEndpoint");
+			console.log("Functions", getUserInfo);
+			const user_info = await getUserInfo();
+			console.log("User info", user_info);
+			return [[JSON.stringify(user_info)]];
+		} catch (e) {
+			console.error(e);
+		}
 	}
 }

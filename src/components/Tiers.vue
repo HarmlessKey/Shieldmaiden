@@ -131,7 +131,13 @@ export default {
 		return {
 			loading: true,
 			show_storage: false,
-			default_benefits: ["Combat tracker", "Encounter builder", "Monster creator", "Spell creator"],
+			default_benefits: [
+				"Combat tracker",
+				"Digital DM Screen",
+				"Encounter builder",
+				"Monster creator",
+				"Spell creator",
+			],
 			benefits: {
 				character_sync: {
 					title: "Character sync",

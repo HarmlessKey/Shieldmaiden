@@ -1242,12 +1242,13 @@ html body {
 
 			.head {
 				margin-bottom: 50px;
-				text-align: center;
 
 				h2 {
-					font-size: 30px !important;
+					font-size: 30px;
 					line-height: 50px;
-					text-align: center;
+				}
+				.text {
+					max-width: 600px;
 				}
 			}
 			h3 {
@@ -2998,7 +2999,7 @@ html body {
 	//XL
 	@media only screen and (min-width: $xl-breakpoint) {
 		.container {
-			max-width: 1140px;
+			max-width: 1280px;
 		}
 		.drawer {
 			width: 420px;

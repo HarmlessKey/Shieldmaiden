@@ -78,6 +78,11 @@ export default {
 					email: this.user.email.toLowerCase(),
 				});
 
+				this.$gtm.trackEvent({
+					event: "sign-up",
+					method: "Set Username",
+				});
+
 				this.$snotify.success("Username saved.", "Critical hit!", {
 					position: "centerTop",
 				});

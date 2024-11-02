@@ -3,10 +3,10 @@
 		<div class="container">
 			<div class="head">
 				<h2>Share a live initiative list with your players</h2>
-				<span>
+				<div class="text">
 					Show your players a live initiative list of the encounter that updates as you play.
 					Perfect for at the table or if you are hosting a podcast or stream.
-				</span>
+				</div>
 			</div>
 
 			<div class="row q-col-gutter-xl mb-5">

@@ -23,7 +23,9 @@
 					<router-link class="btn" to="/sign-up"> Create a Shieldmaiden account </router-link>
 				</div>
 				<div v-else-if="!userInfo.patreon_id" class="d-flex justify-content-center mb-5">
-					<PatreonLinkButton />
+					<q-no-ssr>
+						<PatreonLinkButton />
+					</q-no-ssr>
 				</div>
 
 				<Tiers class="mb-4" />

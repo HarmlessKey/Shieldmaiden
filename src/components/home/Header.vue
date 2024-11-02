@@ -3,9 +3,25 @@
 		<div class="container">
 			<div class="d-flex items-center">
 				<img class="logo" :src="require(`../../assets/_img/logo/${logo}`)" alt="Shieldmaiden" />
-				<!-- <span class="dot-app">.app</span> -->
 			</div>
-			<UserMenu> Account </UserMenu>
+			<div class="d-flex justify-content-end items-center">
+				<router-link class="btn btn-sm btn-clear" to="/patreon">
+					Pricing
+					<i class="fas fa-coins ml-1" aria-hidden="true" />
+				</router-link>
+				<a
+					class="btn btn-sm btn-clear"
+					href="https://discord.gg/dU59jgvcuq"
+					target="_blank"
+					rel="noopener"
+				>
+					<i class="fab fa-discord" aria-hidden="true" />
+					<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
+						Join our Discord
+					</q-tooltip>
+				</a>
+				<UserMenu />
+			</div>
 		</div>
 	</header>
 </template>
@@ -64,6 +80,9 @@ header {
 			margin-left: 3px;
 			opacity: 0.3;
 			font-size: 12px;
+		}
+		.btn {
+			box-sizing: border-box;
 		}
 	}
 

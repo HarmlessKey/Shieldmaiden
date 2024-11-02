@@ -81,7 +81,7 @@
 				</div>
 			</q-popup-proxy>
 		</div>
-		<button v-else class="btn btn-clear bg-neutral-6 user-btn">
+		<button v-else class="btn btn-clear btn-sm bg-neutral-6 user-btn">
 			<i class="fas fa-user-circle" />
 			<q-popup-proxy
 				:dark="$store.getters.theme === 'dark'"
@@ -91,12 +91,6 @@
 			>
 				<div class="bg-neutral-8">
 					<q-list>
-						<q-item clickable v-close-popup href="https://discord.gg/dU59jgvcuq">
-							<q-item-section avatar
-								><i aria-hidden="true" class="fab fa-discord"></i
-							></q-item-section>
-							<q-item-section>Join our Discord</q-item-section>
-						</q-item>
 						<q-item clickable v-close-popup @click="sign_in_dialog = true">
 							<q-item-section avatar
 								><i aria-hidden="true" class="fas fa-sign-in"></i
@@ -188,12 +182,9 @@ export default {
 		}
 	}
 	.user-btn {
-		font-size: 22px;
-		border-radius: 999px;
-		height: 38px;
-		width: 38px;
 		box-sizing: border-box;
-		padding: 0;
+		font-size: 22px;
+		padding: 0 8px;
 	}
 }
 </style>

@@ -3,10 +3,10 @@
 		<div class="container">
 			<div class="head">
 				<h2>We keep track, you focus on the game</h2>
-				<span>
+				<div class="text">
 					We focus on keeping the game on the table by managing everything you need to keep track of
 					during encounters. On top of that we enhance the player experience.
-				</span>
+				</div>
 			</div>
 
 			<div class="row q-col-gutter-xl mb-5">

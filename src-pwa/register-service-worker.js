@@ -23,9 +23,14 @@ register(process.env.SERVICE_WORKER_FILE, {
     // console.log('Content has been cached for offline use.')
   },
 
-  updatefound (/* registration */) {
-    // console.log('New content is downloading.')
-  },
+  updatefound (registration) {
+    try {
+      registration.update()
+    } catch (err) {
+      console.err('SW update failed:', err)
+    }
+  }
+
 
   updated (registration) {
     // Cleares old cash so new content is downloaded

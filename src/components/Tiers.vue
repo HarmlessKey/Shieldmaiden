@@ -85,9 +85,9 @@
 						</div>
 						<div slot="footer">
 							<router-link
-								v-if="t.price === 'Free' && !user"
+								v-if="t.price === 'Free'"
 								class="btn btn-block btn-square bg-patreon-red"
-								to="/sign-up"
+								:to="!user ? '/sign-up' : '/content'"
 							>
 								Use for Free
 							</router-link>

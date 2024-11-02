@@ -74,6 +74,12 @@
 										/>
 										<span v-else class="green">{{ t.benefits[storage_type] }}</span>
 										<span>
+											<span
+												v-if="['npcs', 'spells', 'reminders', 'items'].includes(storage_type)"
+												class="neutral-3"
+											>
+												Custom
+											</span>
 											{{ storageType(storage_type, t.benefits[storage_type]) }}
 											<span v-if="storage_type === 'encounters'" class="neutral-3">
 												(per campaign)
@@ -133,8 +139,9 @@ export default {
 			show_storage: false,
 			default_benefits: [
 				"Combat tracker",
-				"Digital DM Screen",
 				"Encounter builder",
+				"Digital DM Screen",
+				"Public Initiative List",
 				"Monster creator",
 				"Spell creator",
 			],

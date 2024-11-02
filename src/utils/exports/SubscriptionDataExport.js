@@ -42,7 +42,7 @@ export default class UserDataExport extends BaseDataExport {
 				"Time till subscription in hours",
 				"Time till subscription in ms",
 			];
-			const csvRows = [csvHeader];
+			let csvRows = [csvHeader];
 
 			console.log("PATRONS", patrons);
 			csvRows += Promise.all(

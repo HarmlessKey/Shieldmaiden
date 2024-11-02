@@ -36,6 +36,20 @@
 				>
 				</span>
 			</section>
+			<section id="pricing" class="bg-neutral-11">
+				<Pricing />
+				<span
+					class="die"
+					:style="{
+						backgroundImage:
+							'url(' +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') +
+							')',
+						transform: `rotate(${scrolled}deg)`,
+					}"
+				>
+				</span>
+			</section>
 			<section id="general" class="bg-neutral-9">
 				<General />
 				<span
@@ -43,7 +57,7 @@
 					:style="{
 						backgroundImage:
 							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') +
 							')',
 						transform: `rotate(${scrolled}deg)`,
 					}"
@@ -57,7 +71,7 @@
 					:style="{
 						backgroundImage:
 							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') +
 							')',
 						transform: `rotate(${scrolled}deg)`,
 					}"
@@ -71,7 +85,7 @@
 					:style="{
 						backgroundImage:
 							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[5] + '.svg') +
 							')',
 						transform: `rotate(${scrolled}deg)`,
 					}"
@@ -95,6 +109,7 @@
 import { mapGetters } from "vuex";
 import Header from "src/components/home/Header.vue";
 import Top from "src/components/home/Top.vue";
+import Pricing from "src/components/home/Pricing.vue";
 import Feedback from "src/components/home/Feedback.vue";
 import General from "src/components/home/General.vue";
 import Share from "src/components/home/Share.vue";
@@ -113,6 +128,7 @@ export default {
 		Header,
 		Top,
 		Feedback,
+		Pricing,
 		General,
 		Share,
 		Builder,

@@ -3,11 +3,11 @@
 		<div class="container">
 			<div class="head">
 				<h2>Campaign Manager</h2>
-				<span>
+				<div class="text">
 					Our tool started out as a combat tracker for Dungeons & Dragons, but it has grown a lot.
 					Over time it has become so much more than that, but if you simply want to run your
 					encounters it is still perfect for just that.
-				</span>
+				</div>
 			</div>
 
 			<div class="row q-col-gutter-xl mb-5">

@@ -14,11 +14,17 @@
 						</div>
 						<div class="card-body">
 							<div class="top">
-								<h2>{{ t.price }}</h2>
+								<span class="price" :class="{ 'patreon-red': t.name === 'Free' }">{{
+									t.price
+								}}</span>
 								<em v-if="t.price === 'Free'" class="neutral-2 sub">forever</em>
 								<em v-else class="neutral-2 sub">per month</em>
 							</div>
 							<ul>
+								<li v-for="(benefit, key) in default_benefits" :key="key">
+									<i class="fas fa-check green" aria-hidden="true" />
+									{{ benefit }}
+								</li>
 								<li v-for="(benefit, key) in benefits" :key="key">
 									<i
 										v-if="typeof t.benefits[key] === 'boolean'"
@@ -41,26 +47,52 @@
 										<span v-if="key === 'character_sync'" class="neutral-3">*</span>
 									</span>
 								</li>
-							</ul>
-							<ul class="storage">
-								<li v-for="storage_type in storage" :key="storage_type">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span>
-									<span>
-										{{ storageType(storage_type, t.benefits[storage_type]) }}
-										<span v-if="storage_type === 'encounters'" class="neutral-3">
-											(per campaign)
-										</span>
+								<li>
+									<i class="fas fa-check green" aria-hidden="true" />
+									<span
+										class="d-flex justify-content-between items-center pointer"
+										@click="show_storage = !show_storage"
+									>
+										<span
+											><strong>{{ storage_size[t.name] }}</strong> storage</span
+										>
+										<i
+											class="fas fa-chevron-down"
+											aria-hidden="true"
+											:class="{ open: show_storage }"
+										/>
 									</span>
 								</li>
 							</ul>
+							<q-slide-transition v-show="show_storage">
+								<ul class="storage">
+									<li v-for="storage_type in storage" :key="storage_type">
+										<i
+											aria-hidden="true"
+											v-if="t.benefits[storage_type] == 'infinite'"
+											class="green far fa-infinity"
+										/>
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span>
+										<span>
+											{{ storageType(storage_type, t.benefits[storage_type]) }}
+											<span v-if="storage_type === 'encounters'" class="neutral-3">
+												(per campaign)
+											</span>
+										</span>
+									</li>
+								</ul>
+							</q-slide-transition>
 						</div>
-						<div slot="footer" v-if="t.price != 'Free'">
+						<div slot="footer">
+							<router-link
+								v-if="t.price === 'Free' && !user"
+								class="btn btn-block btn-square bg-patreon-red"
+								to="/sign-up"
+							>
+								Use for Free
+							</router-link>
 							<a
+								v-else
 								:href="'https://www.patreon.com/join/shieldmaidenapp/checkout?rid=' + t['.key']"
 								target="_blank"
 								rel="noopener"
@@ -99,6 +131,7 @@ export default {
 		return {
 			loading: true,
 			show_storage: false,
+			default_benefits: ["Combat tracker", "Encounter builder", "NPC creator", "Spell creator"],
 			benefits: {
 				character_sync: {
 					title: "Character sync",
@@ -112,9 +145,12 @@ export default {
 				import: {
 					title: "Import content",
 				},
-				storage: {
-					title: "Storage",
-				},
+			},
+			storage_size: {
+				Free: "Small",
+				"Folk Hero": "Medium",
+				Noble: "Large",
+				Deity: "Infinite",
 			},
 			legacy_tiers,
 			storage: ["campaigns", "encounters", "players", "npcs", "spells", "reminders", "items"],
@@ -129,7 +165,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier"]),
+		...mapGetters(["user", "tier"]),
 	},
 	methods: {
 		storageType(type, count) {
@@ -157,12 +193,14 @@ export default {
 		}
 	}
 	.card-body {
-		padding: 0;
+		padding: 0 0 15px 0;
 
 		.top {
 			padding: 15px;
-			h2 {
-				margin-bottom: 0 !important;
+			.price {
+				font-size: 25px;
+				font-weight: bold;
+				margin-right: 5px;
 			}
 			i.sub {
 				display: block;
@@ -180,13 +218,20 @@ export default {
 				line-height: 35px;
 				align-items: center;
 				font-size: 15px;
-				padding: 0 5px 0 15px;
+				padding: 0 15px;
 				color: $neutral-1;
 				margin-bottom: 1px;
+
+				.fa-chevron-down {
+					transition: all 0.2s linear;
+
+					&.open {
+						transform: rotate(-180deg);
+					}
+				}
 			}
 			&.storage {
 				padding-left: 20px;
-				margin-bottom: 15px;
 
 				li {
 					font-size: 13px;

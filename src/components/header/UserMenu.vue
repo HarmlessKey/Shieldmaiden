@@ -91,7 +91,13 @@
 			>
 				<div class="bg-neutral-8">
 					<q-list>
-						<q-item clickable v-close-popup href="https://discord.gg/dU59jgvcuq">
+						<q-item
+							clickable
+							v-close-popup
+							href="https://discord.gg/dU59jgvcuq"
+							target="_blank"
+							rel="noopener"
+						>
 							<q-item-section avatar
 								><i aria-hidden="true" class="fab fa-discord"></i
 							></q-item-section>

@@ -3,9 +3,9 @@
 		<div class="container">
 			<div class="head">
 				<h2>Build great encounters</h2>
-				<span>
+				<div class="text">
 					Our encounter builder is easy to use and lets you use your own custom monsters.
-				</span>
+				</div>
 			</div>
 
 			<video

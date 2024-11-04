@@ -91,7 +91,7 @@
 			</TargetAvatar>
 
 			<!-- ARMOR CLASS -->
-			<div class="ac_wrapper" @click.stop>
+			<div class="ac_wrapper" :style="{ backgroundColor: entity.color_label || null }" @click.stop>
 				<i aria-hidden="true" class="fas fa-shield"></i>
 				<span
 					v-if="entity.ac_bonus"

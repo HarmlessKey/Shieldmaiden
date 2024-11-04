@@ -2169,7 +2169,7 @@ html body {
 		display: grid;
 		grid-template-columns: 40px 40px 1fr;
 		grid-template-rows: auto;
-		grid-gap: 0;
+		grid-gap: 1px;
 		line-height: 40px;
 		user-select: none;
 		border-radius: $border-radius-small;
@@ -2197,13 +2197,13 @@ html body {
 				text-align: center;
 			}
 			i {
-				font-size: 28px;
+				font-size: 33px;
 				color: $neutral-4;
+				margin-top: 1px;
 			}
 			.ac {
 				font-weight: bold;
 				color: $neutral-1;
-				margin-top: -1px;
 			}
 		}
 		.target-avatar {
@@ -2213,7 +2213,7 @@ html body {
 			font-size: 20px;
 			line-height: 40px;
 			overflow: hidden;
-			border: solid 1px transparent;
+			border: solid 2px transparent;
 
 			[class^="hki-"],
 			[class*=" hki-"] {
@@ -2228,13 +2228,12 @@ html body {
 
 		.q-linear-progress {
 			.health-bar {
-				padding-left: 5px;
+				padding: 0 10px;
 				font-size: 13px;
 				display: grid;
 				grid-template-columns: 1fr max-content;
 				grid-column-gap: 5px;
 				line-height: 40px;
-				margin-right: 5px;
 				color: $neutral-1;
 
 				.conditions {

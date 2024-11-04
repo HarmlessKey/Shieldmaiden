@@ -146,6 +146,7 @@
 												? 'url(\'' + npcAvatar(data.row, entity_data) + '\')'
 												: '',
 											'border-color': data.row.color_label ? data.row.color_label : ``,
+											'background-color': data.row.color_label ? data.row.color_label : ``,
 											color: data.row.color_label ? data.row.color_label : ``,
 										}"
 									>
@@ -153,6 +154,7 @@
 											aria-hidden="true"
 											v-if="!npcAvatar(data.row, entity_data)"
 											class="hki-monster"
+											:class="{ 'neutral-1': data.row.color_label }"
 										/>
 									</span>
 								</div>
@@ -211,6 +213,7 @@
 											? 'url(\'' + npcAvatar(data.row, entity_data) + '\')'
 											: '',
 										'border-color': data.row.color_label ? data.row.color_label : ``,
+										'background-color': data.row.color_label ? data.row.color_label : ``,
 										color: data.row.color_label ? data.row.color_label : ``,
 									}"
 								>
@@ -218,6 +221,7 @@
 										aria-hidden="true"
 										v-if="!npcAvatar(data.row, entity_data)"
 										class="hki-monster"
+										:class="{ 'neutral-1': data.row.color_label }"
 									/>
 								</span>
 
@@ -522,7 +526,9 @@ export default {
 		z-index: 96;
 		background: $neutral-6;
 		width: 300px;
-		transition: right 0.5s linear, box-shadow 0.5s linear;
+		transition:
+			right 0.5s linear,
+			box-shadow 0.5s linear;
 
 		.hk-card.overview-main {
 			border: none;

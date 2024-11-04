@@ -32,10 +32,16 @@
 						:style="{
 							backgroundImage: 'url(\'' + npc.avatar + '\')',
 							'border-color': npc.color_label ? npc.color_label : ``,
+							'background-color': npc.color_label ? npc.color_label : ``,
 							color: npc.color_label ? npc.color_label : ``,
 						}"
 					>
-						<i aria-hidden="true" v-if="!npc.avatar" class="hki-monster" />
+						<i
+							aria-hidden="true"
+							v-if="!npc.avatar"
+							class="hki-monster"
+							:class="{ 'neutral-1': npc.color_label }"
+						/>
 					</div>
 					<ValidationProvider
 						rules="url|max:2000"

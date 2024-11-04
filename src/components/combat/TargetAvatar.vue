@@ -12,25 +12,35 @@
 					? 'url(' + entity.img + ')'
 					: '',
 			'border-color': entity.color_label ? entity.color_label : ``,
+			'background-color': entity.color_label ? entity.color_label : ``,
 			color: entity.color_label ? entity.color_label : ``,
 		}"
 	>
 		<template v-if="icons && entity.hidden">
-			<hk-icon icon="fas fa-eye-slash" class="red" />
+			<hk-icon icon="fas fa-eye-slash" class="red" :class="{ 'neutral-1': entity.color_label }" />
 			<q-tooltip anchor="top middle" self="center middle">Hidden</q-tooltip>
 		</template>
 		<template v-else-if="icons && entity.transformed">
-			<hk-icon icon="fas fa-paw-claws" />
+			<hk-icon icon="fas fa-paw-claws" :class="{ 'neutral-1': entity.color_label }" />
 			<q-tooltip anchor="top middle" self="center middle">Transformed</q-tooltip>
 		</template>
 		<template v-else-if="icons && entity.reminders?.surprised">
-			<hk-icon icon="hki hki-surprised" class="orange" />
+			<hk-icon
+				icon="hki hki-surprised"
+				class="orange"
+				:class="{ 'neutral-1': entity.color_label }"
+			/>
 			<q-tooltip anchor="top middle" self="center middle">Surprised</q-tooltip>
 		</template>
-		<hk-compendium-image v-else-if="!entity.img && entity.url" :value="entity.url" />
+		<hk-compendium-image
+			v-else-if="!entity.img && entity.url"
+			:value="entity.url"
+			:class="{ 'neutral-1': entity.color_label }"
+		/>
 		<hk-icon
 			v-else-if="!entity.img"
 			:icon="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`"
+			:class="{ 'neutral-1': entity.color_label }"
 		/>
 		<slot />
 	</div>
@@ -49,11 +59,6 @@ export default {
 			default: true,
 		},
 	},
-	data() {
-		return {};
-	},
-	methods: {},
-	mounted() {},
 };
 </script>
 
@@ -62,5 +67,6 @@ export default {
 	background-position: center top;
 	background-repeat: no-repeat;
 	background-size: cover;
+	border-width: 5px;
 }
 </style>

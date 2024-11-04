@@ -76,7 +76,7 @@
 									<template v-else>{{ entity.initiative }}</template>
 								</td>
 
-								<td class="image">
+								<td class="image" :style="{ 'background-color': entity.color_label || null }">
 									<Avatar class="img" :entity="entity" :players="players" :npcs="npcs" />
 								</td>
 								<td class="ac">
@@ -642,12 +642,14 @@ export default {
 							padding: 5px;
 
 							&.image {
+								padding: 0;
 								width: 43px;
 								vertical-align: top;
 
 								.img {
 									width: 44px;
 									height: 44px;
+									box-sizing: border-box;
 								}
 							}
 							&.init {
@@ -688,7 +690,7 @@ export default {
 
 					th {
 						&.image {
-							width: 57px;
+							width: 67px;
 						}
 						&.init {
 							width: 55px;
@@ -702,11 +704,11 @@ export default {
 						tr {
 							td {
 								&.image {
-									max-width: 59px;
+									// max-width: 57px;
 
 									.img {
-										width: 57px;
-										height: 57px;
+										width: 67px;
+										height: 67px;
 										font-size: 42px;
 									}
 									svg.img {

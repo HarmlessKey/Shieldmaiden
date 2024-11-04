@@ -95,7 +95,7 @@
 												? {
 														encounter_id: encounterId,
 														entity_key: key,
-												  }
+													}
 												: null
 										"
 									>
@@ -123,7 +123,7 @@
 												? {
 														encounter_id: encounterId,
 														entity_key: key,
-												  }
+													}
 												: null
 										"
 									>
@@ -260,7 +260,7 @@ export default {
 			return this.targeted.length > 1
 				? this.options.filter((opt) => {
 						return !["transform"].includes(opt.option);
-				  })
+					})
 				: this.options;
 		},
 	},
@@ -471,6 +471,7 @@ export default {
 			border-radius: $border-radius-small;
 			border: none;
 			cursor: pointer;
+			text-align: center;
 
 			&:hover {
 				background: $neutral-4;

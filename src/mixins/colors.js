@@ -18,6 +18,7 @@ export const colors = {
 				getCssVariable("purple"),
 				getCssVariable("black"),
 				getCssVariable("neutral-2"),
+				getCssVariable("white"),
 			],
 		};
 	},

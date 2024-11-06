@@ -65,7 +65,7 @@
 							:dark="$store.getters.theme === 'dark'"
 							flat
 							v-model="editable_entity.color_label"
-							:palette="hkColors"
+							:palette="shieldmaiden_colors"
 							default-view="palette"
 						/>
 						<div class="d-flex justify-content-end mt-2">
@@ -418,9 +418,11 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import TargetAvatar from "./TargetAvatar.vue";
+import { colors } from "src/mixins/colors";
 
 export default {
 	name: "TargetItem",
+	mixins: [colors],
 	components: {
 		TargetAvatar,
 	},
@@ -446,7 +448,6 @@ export default {
 			user: this.$store.getters.user || {},
 			target: "",
 			entitySetter: undefined,
-			hkColors: ["#88b3ce", "#9ac16a", "#c45e66", "#db815e", "#e2da5f", "#9b7aba"],
 		};
 	},
 	computed: {

@@ -73,7 +73,11 @@
 					<template v-slot:append>
 						<q-icon name="colorize" class="cursor-pointer">
 							<q-popup-proxy transition-show="scale" transition-hide="scale">
-								<q-color v-model="npc.color_label" :palette="hkColors" default-view="palette" />
+								<q-color
+									v-model="npc.color_label"
+									:palette="shieldmaiden_colors"
+									default-view="palette"
+								/>
 							</q-popup-proxy>
 						</q-icon>
 					</template>
@@ -162,10 +166,12 @@
 
 <script>
 import { mapActions } from "vuex";
+import { colors } from "src/mixins/colors";
 
 export default {
 	name: "EditNpc",
 	props: ["data"],
+	mixins: [colors],
 	data() {
 		return {
 			demo: this.$route.name === "ToolsBuildEncounter",
@@ -173,7 +179,6 @@ export default {
 			encounterId: this.$route.params.encid,
 			npc: { ...this.data.npc },
 			encounter: this.data.encounter,
-			hkColors: ["#88b3ce", "#9ac16a", "#c45e66", "#db815e", "#e2da5f", "#9b7aba"],
 		};
 	},
 	methods: {

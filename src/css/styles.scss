@@ -2188,6 +2188,7 @@ html body {
 		.ac_wrapper {
 			position: relative;
 			cursor: pointer;
+			color: $neutral-4;
 
 			i,
 			.ac {
@@ -2198,12 +2199,13 @@ html body {
 			}
 			i {
 				font-size: 33px;
-				color: $neutral-4;
 				margin-top: 1px;
 			}
 			.ac {
 				font-weight: bold;
-				color: $neutral-1;
+				filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
+				mix-blend-mode: luminosity;
+				opacity: 0.95;
 			}
 		}
 		.target-avatar {
@@ -2213,7 +2215,6 @@ html body {
 			font-size: 20px;
 			line-height: 40px;
 			overflow: hidden;
-			border: solid 2px transparent;
 
 			[class^="hki-"],
 			[class*=" hki-"] {

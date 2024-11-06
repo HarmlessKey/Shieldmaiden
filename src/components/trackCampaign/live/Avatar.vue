@@ -3,15 +3,13 @@
 		class="avatar"
 		:style="{
 			backgroundImage: 'url(\'' + displayImg(entity) + '\')',
-			'border-color': entity.color_label ? entity.color_label : '',
-			'background-color': entity.color_label ? entity.color_label : '',
 			color: entity.color_label ? entity.color_label : '',
 		}"
 	>
 		<i
 			aria-hidden="true"
 			v-if="['monster', 'player', 'companion'].includes(displayImg(entity))"
-			:class="[{ 'neutral-1': entity.color_label }, `hki-${displayImg(entity)}`]"
+			:class="`hki-${displayImg(entity)}`"
 		/>
 	</div>
 </template>

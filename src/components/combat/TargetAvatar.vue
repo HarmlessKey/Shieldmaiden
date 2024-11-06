@@ -12,7 +12,6 @@
 					? 'url(' + entity.img + ')'
 					: '',
 			'border-color': entity.color_label ? entity.color_label : ``,
-			'background-color': entity.color_label ? entity.color_label : ``,
 			color: entity.color_label ? entity.color_label : ``,
 		}"
 	>
@@ -25,22 +24,13 @@
 			<q-tooltip anchor="top middle" self="center middle">Transformed</q-tooltip>
 		</template>
 		<template v-else-if="icons && entity.reminders?.surprised">
-			<hk-icon
-				icon="hki hki-surprised"
-				class="orange"
-				:class="{ 'neutral-1': entity.color_label }"
-			/>
+			<hk-icon icon="hki hki-surprised" class="orange" />
 			<q-tooltip anchor="top middle" self="center middle">Surprised</q-tooltip>
 		</template>
-		<hk-compendium-image
-			v-else-if="!entity.img && entity.url"
-			:value="entity.url"
-			:class="{ 'neutral-1': entity.color_label }"
-		/>
+		<hk-compendium-image v-else-if="!entity.img && entity.url" :value="entity.url" />
 		<hk-icon
 			v-else-if="!entity.img"
 			:icon="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`"
-			:class="{ 'neutral-1': entity.color_label }"
 		/>
 		<slot />
 	</div>
@@ -67,6 +57,5 @@ export default {
 	background-position: center top;
 	background-repeat: no-repeat;
 	background-size: cover;
-	border-width: 5px;
 }
 </style>

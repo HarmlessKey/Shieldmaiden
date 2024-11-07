@@ -7,6 +7,12 @@ export default class UserDataExport extends BaseDataExport {
 		super();
 	}
 
+	static config = () => ({
+		label: "User Data",
+		value: "user_data",
+		exporter: this,
+	});
+
 	// Implementing the abstract getCSVRows method
 	async getCSVRows() {
 		this.startLoading();

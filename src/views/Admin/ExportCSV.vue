@@ -26,6 +26,7 @@
 <script>
 import UserDataExport from "src/utils/exports/UserDataExport";
 import SubscriptionDataExport from "src/utils/exports/SubscriptionDataExport";
+import SignupsPerDay from "src/utils/exports/SignupsPerDay";
 
 export default {
 	name: "Export CSV",
@@ -34,16 +35,24 @@ export default {
 			loading: false,
 			data_export: undefined,
 			available_exports: [
-				{
-					label: "User Data",
-					value: "user_data",
-					exporter: UserDataExport,
-				},
-				{
-					label: "Subscription Data",
-					value: "sub_data",
-					exporter: SubscriptionDataExport,
-				},
+				UserDataExport.config,
+				SubscriptionDataExport.config,
+				SignupsPerDay.config,
+				// {
+				// 	label: "User Data",
+				// 	value: "user_data",
+				// 	exporter: UserDataExport,
+				// },
+				// {
+				// 	label: "Subscription Data",
+				// 	value: "sub_data",
+				// 	exporter: SubscriptionDataExport,
+				// },
+				// {
+				// 	label: "Signups per day",
+				// 	value: "signups",
+				// 	exporter: SignupsPerDay,
+				// },
 			],
 		};
 	},

@@ -21,9 +21,9 @@
 
 		<q-tab-panels v-model="tab" class="bg-transparent mt-3">
 			<q-tab-panel name="npc">
-				<a class="btn bg-neutral-5 full-width mb-3" @click="copy_dialog = true">
+				<button class="btn bg-neutral-5 full-width mb-3" @click="copy_dialog = true">
 					<i aria-hidden="true" class="fas fa-copy" /> Copy NPC
-				</a>
+				</button>
 
 				<ValidationObserver v-slot="{ handleSubmit, validate, valid }">
 					<q-form @submit="valid ? handleSubmit(addNPC) : validate()" greedy>

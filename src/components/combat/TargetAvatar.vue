@@ -11,7 +11,7 @@
 					!entity.reminder?.surprised)
 					? 'url(' + entity.img + ')'
 					: '',
-			'border-color': entity.color_label ? entity.color_label : ``,
+			border: entity.color_label ? `2px solid ${entity.color_label}` : ``,
 			color: entity.color_label ? entity.color_label : ``,
 		}"
 	>

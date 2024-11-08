@@ -90,6 +90,13 @@ export function uuid(mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx") {
 }
 
 /**
+ * Get the value of a CSS variable
+ */
+export function getCssVariable(name) {
+	return getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
+}
+
+/**
  * Make readable Date
  */
 

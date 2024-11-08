@@ -11,16 +11,16 @@
 					!entity.reminder?.surprised)
 					? 'url(' + entity.img + ')'
 					: '',
-			'border-color': entity.color_label ? entity.color_label : ``,
+			border: entity.color_label ? `2px solid ${entity.color_label}` : ``,
 			color: entity.color_label ? entity.color_label : ``,
 		}"
 	>
 		<template v-if="icons && entity.hidden">
-			<hk-icon icon="fas fa-eye-slash" class="red" />
+			<hk-icon icon="fas fa-eye-slash" class="red" :class="{ 'neutral-1': entity.color_label }" />
 			<q-tooltip anchor="top middle" self="center middle">Hidden</q-tooltip>
 		</template>
 		<template v-else-if="icons && entity.transformed">
-			<hk-icon icon="fas fa-paw-claws" />
+			<hk-icon icon="fas fa-paw-claws" :class="{ 'neutral-1': entity.color_label }" />
 			<q-tooltip anchor="top middle" self="center middle">Transformed</q-tooltip>
 		</template>
 		<template v-else-if="icons && entity.reminders?.surprised">
@@ -49,11 +49,6 @@ export default {
 			default: true,
 		},
 	},
-	data() {
-		return {};
-	},
-	methods: {},
-	mounted() {},
 };
 </script>
 

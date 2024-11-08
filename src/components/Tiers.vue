@@ -187,8 +187,13 @@ export default {
 		},
 		selectTier(t) {
 			this.$gtm.trackEvent({
-				event: "subscribe",
-				tier: t.name,
+				event: "purchase",
+				value: t.price,
+				items: [
+					{
+						item_name: t.name,
+					},
+				],
 			});
 		},
 	},

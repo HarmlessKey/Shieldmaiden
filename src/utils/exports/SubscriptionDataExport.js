@@ -15,6 +15,10 @@ export default class UserDataExport extends BaseDataExport {
 		};
 	}
 
+	getFileName() {
+		return "subscriptionData.csv";
+	}
+
 	// Implementing the abstract getCSVRows method
 	async getCSVRows() {
 		this.startLoading();

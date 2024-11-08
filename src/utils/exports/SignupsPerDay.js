@@ -37,8 +37,8 @@ export default class UserDataExport extends BaseDataExport {
 		const from = this.date2timestamp(this.config.fields[0].value.from);
 		const to = this.date2timestamp(this.config.fields[0].value.to);
 
+		this.header = ["date", "count"];
 		try {
-			this.header = ["date", "count"];
 			const users = await this.fetchUsersInRange(from, to);
 			this.rows = await this.aggregateSignups(users);
 			return this.rows;
@@ -54,11 +54,9 @@ export default class UserDataExport extends BaseDataExport {
 		const user_ref = db.ref("users").orderByChild("created").startAt(from).endAt(to);
 		const payload = await user_ref.once("value");
 		if (!payload.exists()) {
-			throw "No users found";
+			throw new Error("No users found");
 		}
-		const users = Object.values(payload.val());
-
-		return users;
+		return Object.values(payload.val());
 	}
 
 	async aggregateSignups(users) {

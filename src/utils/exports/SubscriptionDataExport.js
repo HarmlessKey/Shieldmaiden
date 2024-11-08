@@ -1,4 +1,4 @@
-import { db, functions } from "src/firebase";
+import { db } from "src/firebase";
 import { makeDate } from "../generalFunctions";
 import BaseDataExport from "./BaseDataExport";
 

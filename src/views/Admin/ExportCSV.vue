@@ -71,7 +71,6 @@ export default {
 	methods: {
 		async downloadCSV() {
 			const exporter = this.data_export.exporter;
-			this.data_export;
 			const rows = await exporter.getCSVRows();
 			exporter.exportToCSV();
 		},

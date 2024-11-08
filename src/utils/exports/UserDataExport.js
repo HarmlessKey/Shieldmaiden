@@ -5,13 +5,11 @@ import BaseDataExport from "./BaseDataExport";
 export default class UserDataExport extends BaseDataExport {
 	constructor() {
 		super();
+		this.config = {
+			label: "User Data",
+			value: "user_data",
+		};
 	}
-
-	static config = () => ({
-		label: "User Data",
-		value: "user_data",
-		exporter: this,
-	});
 
 	// Implementing the abstract getCSVRows method
 	async getCSVRows() {

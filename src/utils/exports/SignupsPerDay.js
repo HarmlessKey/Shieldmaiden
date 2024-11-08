@@ -5,17 +5,14 @@ import BaseDataExport from "./BaseDataExport";
 export default class UserDataExport extends BaseDataExport {
 	constructor() {
 		super();
+		this.config = {
+			label: "Signups Per Day",
+			value: "signups",
+			fields: [
+				{ name: "Date Range", type: "daterange", value: { from: undefined, to: undefined } },
+			],
+		};
 	}
-
-	static config = () => ({
-		label: "Signups Per Day",
-		value: "signups",
-		exporter: this,
-		fields: {
-			from: "date",
-			to: "date",
-		},
-	});
 
 	// Implementing the abstract getCSVRows method
 	async getCSVRows() {

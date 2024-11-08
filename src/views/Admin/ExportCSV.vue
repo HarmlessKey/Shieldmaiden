@@ -1,8 +1,7 @@
 <template>
-	<hk-card header="Export a database">
+	<hk-card header="Export data from database">
 		<div class="card-body">
 			<p>Creates a CSV file with data from selected export.</p>
-
 			<q-select
 				dark
 				filled
@@ -12,6 +11,22 @@
 				v-model="data_export"
 				:options="available_exports"
 			/>
+			<template v-if="data_export?.fields">
+				<hr />
+				<div v-for="(field, index) in data_export.fields" :key="`${index}_${field.name}`">
+					<h4>{{ field.name }}</h4>
+					<q-date minimal class="text-black" v-if="field.type === 'date'" v-model="field.value" />
+					<q-date
+						minimal
+						range
+						class="text-black"
+						v-else-if="field.type === 'daterange'"
+						v-model="field.value"
+					/>
+				</div>
+				<hr />
+			</template>
+
 			<a class="btn bnt-large" @click="downloadCSV()" :disabled="!data_export || loading">
 				<i aria-hidden="true" class="fas fa-file-download" />
 				{{ data_export ? `Download ${data_export.label}` : "Select a data to export" }}
@@ -28,6 +43,10 @@ import UserDataExport from "src/utils/exports/UserDataExport";
 import SubscriptionDataExport from "src/utils/exports/SubscriptionDataExport";
 import SignupsPerDay from "src/utils/exports/SignupsPerDay";
 
+const userDataExport = new UserDataExport();
+const subscriptionDataExport = new SubscriptionDataExport();
+const signupsPerDay = new SignupsPerDay();
+
 export default {
 	name: "Export CSV",
 	data() {
@@ -35,35 +54,20 @@ export default {
 			loading: false,
 			data_export: undefined,
 			available_exports: [
-				UserDataExport.config,
-				SubscriptionDataExport.config,
-				SignupsPerDay.config,
-				// {
-				// 	label: "User Data",
-				// 	value: "user_data",
-				// 	exporter: UserDataExport,
-				// },
-				// {
-				// 	label: "Subscription Data",
-				// 	value: "sub_data",
-				// 	exporter: SubscriptionDataExport,
-				// },
-				// {
-				// 	label: "Signups per day",
-				// 	value: "signups",
-				// 	exporter: SignupsPerDay,
-				// },
+				// userDataExport.config,
+				// subscriptionDataExport.config,
+				signupsPerDay.config,
 			],
 		};
 	},
 	methods: {
 		async downloadCSV() {
-			const exporter = new this.data_export.exporter();
+			this.data_export;
 			this.loading = true;
-			const rows = await exporter.getCSVRows();
+			const rows = await this.data_export.getCSVRows();
 			console.log(rows);
 			this.loading = false;
-			exporter.exportToCSV(rows);
+			this.data_export.exportToCSV(rows);
 		},
 	},
 };

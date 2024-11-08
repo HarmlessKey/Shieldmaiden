@@ -4,6 +4,8 @@ export default class BaseDataExport {
 			throw new Error("Cannot instantiate an abstract class.");
 		}
 		this.loading = false;
+		this.header = [];
+		this.rows = [];
 	}
 
 	startLoading() {
@@ -24,14 +26,16 @@ export default class BaseDataExport {
 	}
 
 	// Method to export rows to a CSV file
-	exportToCSV(rows, filename = "dataExport.csv") {
-		if (!rows || rows.length === 0) {
+	exportToCSV(filename = "dataExport.csv") {
+		if (!this.rows || this.rows.length === 0) {
 			console.error("No data available for CSV export.");
 			return;
 		}
 
+		const csvRows = this.header.concat(this.rows);
+
 		// Convert rows array to CSV format
-		const csvContent = rows.map((row) => row.join(",")).join("\n");
+		const csvContent = csvRows.map((row) => row.join(",")).join("\n");
 
 		// Create a Blob with CSV content and make it downloadable
 		const blob = new Blob([csvContent], { type: "text/csv" });

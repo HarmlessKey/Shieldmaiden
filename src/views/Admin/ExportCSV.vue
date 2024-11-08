@@ -15,14 +15,15 @@
 				<hr />
 				<div v-for="(field, index) in data_export.fields" :key="`${index}_${field.name}`">
 					<h4>{{ field.name }}</h4>
-					<q-date minimal class="text-black" v-if="field.type === 'date'" v-model="field.value" />
+					<q-date v-if="field.type === 'date'" minimal class="text-black" v-model="field.value" />
 					<q-date
+						v-else-if="field.type === 'daterange'"
 						minimal
 						range
 						class="text-black"
-						v-else-if="field.type === 'daterange'"
 						v-model="field.value"
 					/>
+					<q-checkbox v-if="field.type === 'checkbox'" dark size="lg" v-model="field.value" />
 				</div>
 				<hr />
 			</template>
@@ -54,7 +55,7 @@ export default {
 			data_export: undefined,
 			available_exports: [
 				// userDataExport.config,
-				// subscriptionDataExport.config,
+				subscriptionDataExport,
 				signupsPerDay,
 			],
 		};

@@ -1053,6 +1053,24 @@ const routes = [
 				],
 			},
 			{
+				path: "promotions",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Promotions",
+				},
+				children: [
+					{
+						path: "",
+						name: "Promotions",
+						component: () => import("src/views/Admin/Promotions.vue"),
+					},
+				],
+			},
+			{
 				path: "subscriptions",
 				component: {
 					render(c) {

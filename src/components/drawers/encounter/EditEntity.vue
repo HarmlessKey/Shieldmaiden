@@ -66,7 +66,7 @@
 									square
 									:dark="$store.getters.theme === 'dark'"
 									v-model="entity.color_label"
-									:palette="hkColors"
+									:palette="shieldmaiden_colors"
 									default-view="palette"
 									@input="editValue('color_label', entity.color_label)"
 								/>
@@ -313,6 +313,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import TargetItem from "src/components/combat/TargetItem.vue";
+import { colors } from "src/mixins/colors";
 
 export default {
 	name: "EditEntity",
@@ -320,6 +321,7 @@ export default {
 		TargetItem,
 	},
 	props: ["data"],
+	mixins: [colors],
 	data() {
 		return {
 			demo: this.$route.name === "Demo",
@@ -329,7 +331,6 @@ export default {
 			maxHpMod: undefined,
 			tempHp: undefined,
 			ac_bonus: undefined,
-			hkColors: ["#88b3ce", "#9ac16a", "#c45e66", "#db815e", "#e2da5f", "#9b7aba"],
 			npcsOptions: [
 				{
 					key: "name",

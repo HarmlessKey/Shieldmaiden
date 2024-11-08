@@ -90,6 +90,13 @@ export function uuid(mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx") {
 }
 
 /**
+ * Get the value of a CSS variable
+ */
+export function getCssVariable(name) {
+	return getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
+}
+
+/**
  * Make readable Date
  */
 
@@ -280,4 +287,15 @@ export function generateYoutubeEmbedUrl(url) {
 	const { id } = regex.exec(url).groups;
 
 	return `https://www.youtube-nocookie.com/embed/${id}`;
+}
+
+export class DefaultDict {
+	constructor(defaultVal) {
+		return new Proxy(
+			{},
+			{
+				get: (target, name) => (name in target ? target[name] : defaultVal),
+			}
+		);
+	}
 }

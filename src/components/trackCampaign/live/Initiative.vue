@@ -80,8 +80,8 @@
 									<Avatar class="img" :entity="entity" :players="players" :npcs="npcs" />
 								</td>
 								<td class="ac">
-									<div class="ac_wrapper">
-										<i aria-hidden="true" class="fas fa-shield"></i>
+									<div class="ac_wrapper" :style="{ color: entity.color_label || null }">
+										<i aria-hidden="true" class="fas fa-shield" />
 										<template
 											v-if="
 												(playerSettings.ac === undefined &&
@@ -463,10 +463,10 @@ export default {
 				}
 				th.ac {
 					text-align: center;
-					width: 44px;
+					width: 46px;
 				}
 				th.image {
-					width: 44px;
+					width: 46px;
 				}
 				th.conditions {
 					max-width: 200px;
@@ -510,28 +510,28 @@ export default {
 							text-align: center;
 						}
 						td.ac {
-							padding: 0 5px;
+							padding: 0;
 							width: 45px;
 
 							.ac_wrapper {
 								height: 44px;
 								position: relative;
+								color: $neutral-4;
+								text-align: center;
 
-								i,
-								.value {
+								i {
 									width: 100%;
 									position: absolute;
-									line-height: 44px;
-									text-align: center;
-								}
-								i {
+									left: 0;
+									top: 5px;
 									font-size: 35px;
-									color: $neutral-4;
 								}
 								.value {
 									font-weight: bold;
-									color: $white;
-									margin-top: -1px;
+									filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
+									mix-blend-mode: luminosity;
+									opacity: 0.95;
+									line-height: 40px;
 								}
 							}
 						}
@@ -546,7 +546,6 @@ export default {
 						}
 						td.image {
 							padding: 0;
-							max-width: 43px;
 
 							.img {
 								width: 44px;
@@ -642,12 +641,14 @@ export default {
 							padding: 5px;
 
 							&.image {
+								padding: 0;
 								width: 43px;
 								vertical-align: top;
 
 								.img {
 									width: 44px;
 									height: 44px;
+									box-sizing: border-box;
 								}
 							}
 							&.init {
@@ -655,12 +656,6 @@ export default {
 							}
 							&.ac {
 								.ac_wrapper {
-									height: 31px;
-
-									i,
-									.value {
-										line-height: 31px;
-									}
 									i {
 										font-size: 22px;
 									}
@@ -688,7 +683,7 @@ export default {
 
 					th {
 						&.image {
-							width: 57px;
+							width: 67px;
 						}
 						&.init {
 							width: 55px;
@@ -702,29 +697,22 @@ export default {
 						tr {
 							td {
 								&.image {
-									max-width: 59px;
+									// max-width: 57px;
 
 									.img {
-										width: 57px;
-										height: 57px;
-										font-size: 42px;
-									}
-									svg.img {
-										margin-bottom: -9px;
+										width: 67px;
+										height: 67px;
+										font-size: 48px;
 									}
 								}
 								&.ac {
 									.ac_wrapper {
-										height: 44px;
-
-										i,
-										.value {
-											line-height: 44px;
-										}
 										i {
+											top: 2px;
 											font-size: 48px;
 										}
 										.value {
+											line-height: 45px;
 											font-size: 23px;
 										}
 									}

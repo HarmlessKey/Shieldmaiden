@@ -72,7 +72,6 @@ export default {
 			const exporter = this.data_export.exporter;
 			this.data_export;
 			const rows = await exporter.getCSVRows();
-			console.log(rows);
 			exporter.exportToCSV();
 		},
 	},

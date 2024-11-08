@@ -62,11 +62,10 @@ export default class UserDataExport extends BaseDataExport {
 	}
 
 	async aggregateSignups(users) {
-		const agg = await users.reduce((counts, user) => {
+		const aggregate = await users.reduce((counts, user) => {
 			counts[this.timestamp2date(user.created)] += 1;
 			return counts;
 		}, new DefaultDict(0));
-		console.log("Counts", Object.entries(agg));
-		return Object.entries(agg);
+		return Object.entries(aggregate);
 	}
 }

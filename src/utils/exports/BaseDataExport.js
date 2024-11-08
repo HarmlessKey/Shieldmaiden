@@ -20,19 +20,25 @@ export default class BaseDataExport {
 		return this.loading;
 	}
 
+	getFileName() {
+		return "dataExport.csv";
+	}
+
 	// Abstract method to retrieve CSV rows
 	async getCSVRows() {
 		throw new Error("getCSVRows() must be implemented by subclasses.");
 	}
 
 	// Method to export rows to a CSV file
-	exportToCSV(filename = "dataExport.csv") {
+	exportToCSV() {
+		const filename = this.getFileName();
 		if (!this.rows || this.rows.length === 0) {
 			console.error("No data available for CSV export.");
 			return;
 		}
 
-		const csvRows = this.header.concat(this.rows);
+		const csvRows = [this.header].concat(this.rows);
+		console.log(this.header, this.rows, csvRows);
 
 		// Convert rows array to CSV format
 		const csvContent = csvRows.map((row) => row.join(",")).join("\n");

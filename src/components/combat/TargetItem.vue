@@ -2,12 +2,7 @@
 	<div class="target-item-wrapper">
 		<div class="target-item bg-neutral-8" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
-			<span
-				class="initiative"
-				v-if="initiative"
-				@click.stop
-				:style="{ color: entity.color_label ? entity.color_label : `` }"
-			>
+			<span class="initiative truncate" v-if="initiative" @click.stop>
 				{{ entity.initiative }}
 				<q-popup-proxy
 					:dark="$store.getters.theme === 'dark'"

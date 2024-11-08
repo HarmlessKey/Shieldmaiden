@@ -51,6 +51,11 @@ export default {
 					url: "subscriptions",
 					icon: "fab fa-patreon",
 				},
+				data_exports: {
+					name: "Data Exports",
+					url: "export_csv",
+					icon: "fas fa-file-spreadsheet",
+				},
 				// prerender: {
 				// 	name: "Generate prerender paths JSON",
 				// 	url: "prerender",

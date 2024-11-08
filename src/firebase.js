@@ -1,7 +1,8 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-import 'firebase/storage';
+import firebase from "firebase/app";
+import "firebase/functions";
+import "firebase/auth";
+import "firebase/database";
+import "firebase/storage";
 
 const config = {
 	apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
@@ -20,4 +21,6 @@ const auth = firebase.auth();
 const db = firebase.database();
 const storage = firebase.storage();
 
-export { firebase, auth, db, storage };
+const functions = firebase.functions();
+
+export { firebase, auth, db, storage, functions };

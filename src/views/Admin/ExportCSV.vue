@@ -9,7 +9,7 @@
 				class="select"
 				label="Export Data"
 				v-model="data_export"
-				:options="available_exports"
+				:options="dropdown_exports"
 			/>
 			<template v-if="data_export?.fields">
 				<hr />
@@ -51,23 +51,29 @@ export default {
 	name: "Export CSV",
 	data() {
 		return {
-			loading: false,
 			data_export: undefined,
 			available_exports: [
 				// userDataExport.config,
 				// subscriptionDataExport.config,
-				signupsPerDay.config,
+				signupsPerDay,
 			],
 		};
 	},
+	computed: {
+		dropdown_exports() {
+			return this.available_exports.map((e) => ({ ...e.config, exporter: e }));
+		},
+		loading() {
+			return this.data_export?.exporter.isLoading() ?? false;
+		},
+	},
 	methods: {
 		async downloadCSV() {
+			const exporter = this.data_export.exporter;
 			this.data_export;
-			this.loading = true;
-			const rows = await this.data_export.getCSVRows();
+			const rows = await exporter.getCSVRows();
 			console.log(rows);
-			this.loading = false;
-			this.data_export.exportToCSV(rows);
+			exporter.exportToCSV();
 		},
 	},
 };

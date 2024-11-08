@@ -19,7 +19,6 @@ export default class UserDataExport extends BaseDataExport {
 		this.startLoading();
 
 		try {
-			// Simulate data fetching
 			const rows = await this.fetchUserData();
 			return rows;
 		} catch (error) {

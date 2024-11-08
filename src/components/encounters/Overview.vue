@@ -212,16 +212,17 @@
 										backgroundImage: npcAvatar(data.row, entity_data)
 											? 'url(\'' + npcAvatar(data.row, entity_data) + '\')'
 											: '',
-										'border-color': data.row.color_label ? data.row.color_label : ``,
-										'background-color': data.row.color_label ? data.row.color_label : ``,
+										border: data.row.color_label ? `2px solid ${data.row.color_label}` : 'none',
 										color: data.row.color_label ? data.row.color_label : ``,
 									}"
 								>
-									<i
-										aria-hidden="true"
-										v-if="!npcAvatar(data.row, entity_data)"
-										class="hki-monster"
-										:class="{ 'neutral-1': data.row.color_label }"
+									<hk-compendium-image
+										v-if="
+											!npcAvatar(data.row, entity_data) &&
+											data.row.id &&
+											entity_data[data.row.id].url
+										"
+										:value="entity_data[data.row.id].url"
 									/>
 								</span>
 

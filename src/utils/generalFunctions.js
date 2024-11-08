@@ -281,3 +281,14 @@ export function generateYoutubeEmbedUrl(url) {
 
 	return `https://www.youtube-nocookie.com/embed/${id}`;
 }
+
+export class DefaultDict {
+	constructor(defaultVal) {
+		return new Proxy(
+			{},
+			{
+				get: (target, name) => (name in target ? target[name] : defaultVal),
+			}
+		);
+	}
+}

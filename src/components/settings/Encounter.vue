@@ -87,9 +87,9 @@
 				</q-input>
 			</div>
 		</div>
-		<a class="btn mt-3 bg-neutral-5" @click="set_default_settings('encounter')">
+		<button class="btn mt-3 bg-neutral-5" @click="set_default_settings('encounter')">
 			Reset to default
-		</a>
+		</button>
 	</div>
 </template>
 
@@ -104,6 +104,25 @@ export default {
 			types: {
 				general: {
 					type_settings: [
+						{
+							key: "layout",
+							name: "Layout",
+							icon: "fas fa-th-large",
+							options: [
+								{
+									value: undefined,
+									name: "Standard",
+									icon: "fas fa-table",
+									color: "neutral-2",
+								},
+								{
+									value: "legacy",
+									name: "Legacy",
+									icon: "fas fa-columns",
+									color: "red",
+								},
+							],
+						},
 						{
 							key: "automate",
 							name: "Automate",

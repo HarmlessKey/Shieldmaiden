@@ -4,8 +4,8 @@
 			<OverEncumbered />
 		</div>
 		<div
-			class="combat-wrapper"
 			v-else-if="encounter && (players || demo)"
+			class="combat-wrapper"
 			:style="[
 				settings.background && getBackground(encounter)
 					? { background: 'url(\'' + getBackground(encounter) + '\')' }
@@ -36,7 +36,8 @@
 						:_idle="_idle"
 						:width="width"
 					/>
-					<div v-else class="desktop">
+					<div v-else-if="!settings.layout" class="desktop"></div>
+					<div v-else class="legacy">
 						<Turns
 							:active_len="Object.keys(_active).length"
 							:current="_active[encounter.turn]"
@@ -475,7 +476,7 @@ export default {
 		margin-top: 30px;
 		background: rgba(38, 38, 38, 0.9) !important;
 	}
-	.desktop {
+	.legacy {
 		padding: 5px;
 		width: 100%;
 		height: 100%;

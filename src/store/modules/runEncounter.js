@@ -117,6 +117,7 @@ const getDefaultState = () => ({
 	test: false,
 	uid: undefined,
 	entities: {},
+	actor: undefined,
 	targeted: [],
 	encounter: undefined,
 	requests: undefined,
@@ -152,6 +153,9 @@ const run_encounter_getters = {
 	},
 	down(state) {
 		return state.down;
+	},
+	actor(state) {
+		return state.actor;
 	},
 	targeted(state) {
 		return state.targeted;
@@ -1094,6 +1098,14 @@ const run_encounter_actions = {
 	},
 
 	/**
+	 * Set entity as the current actor
+	 */
+	set_actor({ state, commit }, entity) {
+		state.actor = entity;
+		commit("SET_ACTOR", entity);
+	},
+
+	/**
 	 * Target entities
 	 *
 	 * @param {string} type single, multi, untarget
@@ -2010,6 +2022,9 @@ const run_encounter_mutations = {
 	},
 	SET_ENCOUNTER(state, payload) {
 		Vue.set(state, "encounter", payload);
+	},
+	SET_ACTOR(state, payload) {
+		Vue.set(state, "actor", payload);
 	},
 	SET_TARGETED(state, payload) {
 		Vue.set(state, "targeted", payload);

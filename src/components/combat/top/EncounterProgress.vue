@@ -12,13 +12,14 @@
 		<div class="progress">
 			<div class="round">
 				{{ encounter.round }}
+				<q-tooltip anchor="bottom middle" self="center middle">Round</q-tooltip>
 			</div>
 			<q-circular-progress
 				show-value
 				:value="((encounter.turn + 1) / activeEntities) * 100"
 				size="100px"
-				color="neutral-5"
-				track-color="dark"
+				color="neutral-4"
+				track-color="neutral-8"
 			>
 				<div class="turn truncate">
 					<hk-animated-integer :value="encounter.turn + 1" />
@@ -56,7 +57,7 @@ import { remindersMixin } from "src/mixins/reminders";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
-	name: "CombatTopRound",
+	name: "EncounterProgress",
 	components: {
 		TutorialPopover,
 	},
@@ -134,7 +135,13 @@ export default {
 
 	.progress {
 		position: relative;
+		background-color: $neutral-6;
+		border-radius: 50%;
+		border: solid 5px $neutral-9;
 
+		.q-circular-progress {
+			margin: -1px;
+		}
 		.round,
 		.timer {
 			position: absolute;
@@ -143,6 +150,7 @@ export default {
 			left: 50%;
 			z-index: 10;
 			box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+			cursor: default;
 		}
 		.round {
 			top: -8px;

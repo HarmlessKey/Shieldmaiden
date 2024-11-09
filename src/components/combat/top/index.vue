@@ -4,9 +4,14 @@
 			<Menu />
 			live
 		</div>
-		Actor
+		<Actor :actor="active_actor" />
 		<div class="encounter-status">
-			<Round :active-entities="activeEntities" :current="current" :next="next" :timer="timer" />
+			<EncounterProgress
+				:active-entities="activeEntities"
+				:current="current"
+				:next="next"
+				:timer="timer"
+			/>
 		</div>
 	</div>
 </template>
@@ -14,13 +19,15 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import Menu from "./Menu.vue";
-import Round from "./Round.vue";
+import Actor from "../actor";
+import EncounterProgress from "./EncounterProgress.vue";
 
 export default {
 	name: "CombatTop",
 	components: {
 		Menu,
-		Round,
+		Actor,
+		EncounterProgress,
 	},
 	props: {
 		activeEntities: {
@@ -42,7 +49,10 @@ export default {
 		return {};
 	},
 	computed: {
-		...mapGetters(["encounter"]),
+		...mapGetters(["encounter", "actor"]),
+		active_actor() {
+			return this.actor || this.current;
+		},
 		timer() {
 			return this.settings ? this.settings.timer : 0;
 		},
@@ -58,9 +68,17 @@ export default {
 .top {
 	grid-area: top;
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: center;
+	background-color: $neutral-6-transparent;
+	border-radius: $border-radius;
+	margin: 30px 0;
+	padding: 0 10px;
+	gap: 20px;
 
+	.actor {
+		flex-grow: 1;
+	}
 	.encounter-status {
 	}
 }

@@ -17,7 +17,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import Actions from "src/components/combat/actions/Actions.vue";
+import Actions from "src/components/combat/legacy/actions/Actions.vue";
 import TargetItem from "src/components/combat/TargetItem.vue";
 
 export default {

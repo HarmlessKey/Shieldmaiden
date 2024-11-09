@@ -95,14 +95,14 @@
 																action.recharge === "rest"
 																	? "after a Short or Long Rest"
 																	: action.recharge
-														  })`
+															})`
 														: ``
 												}}
 												{{
 													action.limit
 														? `(${action.limit}/${
 																action.limit_type ? action.limit_type.capitalize() : `Day`
-														  })`
+															})`
 														: ``
 												}}
 												{{
@@ -320,7 +320,7 @@ import { mapGetters, mapActions } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
-import Projectiles from "./Projectiles";
+import Projectiles from "../../actions/Projectiles";
 import { isNil } from "lodash";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
@@ -495,23 +495,23 @@ h3 {
 		}
 	}
 }
-.roll-button {
-	display: inline-block;
-	cursor: pointer;
-	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
-	height: 20px;
-	width: 20px;
-	background-position: center;
-	background-size: cover;
-	vertical-align: -5px;
-	user-select: none;
-}
-.advantage .roll-button:hover,
-.advantage.hk-roll:focus .roll-button {
-	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-green.svg");
-}
-.disadvantage .roll-button:hover,
-.disadvantage.hk-roll:focus .roll-button {
-	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-red.svg");
-}
+// .roll-button {
+// 	display: inline-block;
+// 	cursor: pointer;
+// 	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+// 	height: 20px;
+// 	width: 20px;
+// 	background-position: center;
+// 	background-size: cover;
+// 	vertical-align: -5px;
+// 	user-select: none;
+// }
+// .advantage .roll-button:hover,
+// .advantage.hk-roll:focus .roll-button {
+// 	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-green.svg");
+// }
+// .disadvantage .roll-button:hover,
+// .disadvantage.hk-roll:focus .roll-button {
+// 	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-red.svg");
+// }
 </style>

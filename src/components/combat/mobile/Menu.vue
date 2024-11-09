@@ -25,7 +25,7 @@
 								show: true,
 								type: drawer.type,
 								data: drawer.data,
-						  })
+							})
 						: (dialog[name] = !dialog[name])
 				"
 			/>
@@ -147,7 +147,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Actions from "src/components/combat/actions/Actions.vue";
+import Actions from "src/components/combat/legacy/actions/Actions.vue";
 
 export default {
 	name: "Menu",

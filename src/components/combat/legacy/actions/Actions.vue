@@ -118,11 +118,11 @@ import _ from "lodash";
 import { mapGetters } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
 
-import Custom from "src/components/combat/actions/custom";
-import Roll from "src/components/combat/actions/Roll.vue";
-import Spellcasting from "src/components/combat/actions/Spellcasting.vue";
+import Custom from "./custom";
+import Roll from "./Roll.vue";
+import Spellcasting from "./Spellcasting.vue";
 import { damage_types } from "src/utils/generalConstants";
-import TargetAvatar from "../TargetAvatar.vue";
+import TargetAvatar from "../../TargetAvatar.vue";
 
 export default {
 	name: "Actions",

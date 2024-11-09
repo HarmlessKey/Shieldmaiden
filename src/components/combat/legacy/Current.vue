@@ -63,8 +63,8 @@ import { remindersMixin } from "src/mixins/reminders";
 import { dice } from "src/mixins/dice";
 import TargetItem from "src/components/combat/TargetItem.vue";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
-import ViewEntity from "./ViewEntity.vue";
-import TutorialPopover from "../demo/TutorialPopover.vue";
+import ViewEntity from "../ViewEntity.vue";
+import TutorialPopover from "../../demo/TutorialPopover.vue";
 
 export default {
 	name: "Current",

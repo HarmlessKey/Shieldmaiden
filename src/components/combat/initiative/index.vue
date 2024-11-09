@@ -145,7 +145,7 @@
 import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
 
-import Turns from "src/components/combat/Turns.vue";
+import Turns from "src/components/combat/legacy/Turns.vue";
 import Players from "./Players.vue";
 import NPCs from "./NPCs.vue";
 import Overview from "./Overview.vue";

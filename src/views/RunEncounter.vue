@@ -36,7 +36,38 @@
 						:_idle="_idle"
 						:width="width"
 					/>
-					<div v-else-if="!settings.layout" class="desktop"></div>
+					<div v-else-if="!settings.layout" class="desktop">
+						<Top
+							:active-entities="Object.keys(_active).length"
+							:current="_active[encounter.turn]"
+							:next="_active[encounter.turn + 1]"
+							:settings="settings"
+						/>
+						<Targets
+							ref="targets"
+							tabindex="0"
+							class="pane"
+							:current="_active[encounter.turn]"
+							:_active="_active"
+							:_idle="_idle"
+							:class="{ focused: focused_pane === 'targets' }"
+							@focus="focusPane('targets')"
+						/>
+						<Targeted
+							ref="targeted"
+							tabindex="0"
+							class="pane"
+							:class="{ focused: focused_pane === 'targeted' }"
+							@focus="focusPane('targeted')"
+						/>
+						<Side
+							ref="side"
+							tabindex="0"
+							class="pane"
+							:class="{ focused: focused_pane === 'side' }"
+							@focus="focusPane('side')"
+						/>
+					</div>
 					<div v-else class="legacy">
 						<Turns
 							:active_len="Object.keys(_active).length"
@@ -74,7 +105,7 @@
 						<Side
 							ref="side"
 							tabindex="0"
-							class="pane"
+							class="pane legacy-side"
 							:class="{ focused: focused_pane === 'side' }"
 							@focus="focusPane('side')"
 						/>
@@ -138,9 +169,10 @@ import { mapActions, mapGetters } from "vuex";
 import { audio } from "src/mixins/audio";
 import Finished from "src/components/combat/Finished.vue";
 import DemoFinished from "src/components/combat/DemoFinished.vue";
-import Turns from "src/components/combat/Turns.vue";
+import Top from "src/components/combat/top";
+import Turns from "src/components/combat/legacy/Turns.vue";
 import Menu from "src/components/combat/mobile/Menu.vue";
-import Current from "src/components/combat/Current.vue";
+import Current from "src/components/combat/legacy/Current.vue";
 import CurrentMobile from "src/components/combat/mobile/Current.vue";
 import Targets from "src/components/combat/Targets.vue";
 import Targeted from "src/components/combat/Targeted.vue";
@@ -155,6 +187,7 @@ export default {
 	components: {
 		Finished,
 		DemoFinished,
+		Top,
 		Turns,
 		Menu,
 		Current,
@@ -476,6 +509,23 @@ export default {
 		margin-top: 30px;
 		background: rgba(38, 38, 38, 0.9) !important;
 	}
+	.desktop {
+		width: 100%;
+		height: 100%;
+		padding: 5px;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-template-rows: 120px 1fr;
+		grid-gap: 5px;
+		grid-template-areas:
+			"top top top"
+			"targets targeted side";
+		position: absolute;
+
+		.pane {
+			border-radius: $border-radius-small;
+		}
+	}
 	.legacy {
 		padding: 5px;
 		width: 100%;
@@ -502,19 +552,19 @@ export default {
 			font-size: 15px !important;
 			margin-bottom: 15px !important;
 		}
+	}
 
-		.pane {
-			&.focused,
-			&:focus {
-				outline: $neutral-3 solid 1px;
-				outline-offset: 1px;
-			}
+	.pane {
+		&.focused,
+		&:focus {
+			outline: $neutral-3 solid 1px;
+			outline-offset: 1px;
 		}
+	}
 
-		.side {
-			grid-area: side;
-			overflow: hidden;
-		}
+	.side {
+		grid-area: side;
+		overflow: hidden;
 	}
 
 	.mobile {
@@ -537,18 +587,19 @@ export default {
 	}
 
 	@media only screen and (max-width: 1000px) {
-		.desktop {
+		.legacy {
 			grid-template-columns: 2fr 3fr 2fr;
 			grid-template-areas:
 				"turns turns turns"
 				"current targets targeted";
-		}
-		.side {
-			display: none;
+
+			.legacy-side {
+				display: none;
+			}
 		}
 	}
 	@media only screen and (max-width: 900px) {
-		.desktop {
+		.legacy {
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
 				"turns turns"

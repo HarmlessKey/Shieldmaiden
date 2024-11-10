@@ -1100,8 +1100,7 @@ const run_encounter_actions = {
 	/**
 	 * Set entity as the current actor
 	 */
-	set_actor({ state, commit }, entity) {
-		state.actor = entity;
+	set_actor({ commit }, entity) {
 		commit("SET_ACTOR", entity);
 	},
 

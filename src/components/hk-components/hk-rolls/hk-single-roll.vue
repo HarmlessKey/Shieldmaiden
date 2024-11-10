@@ -17,7 +17,7 @@
 			<div class="card-body">
 				<!-- TARGET -->
 				<div class="target-item" v-if="roll.target">
-					<TargetAvatar :entity="roll.target" class="img" :icons="false" />
+					<Avatar :entity="roll.target" class="img" :icons="false" />
 					<div class="ac_wrapper">
 						<i aria-hidden="true" class="fas fa-shield"></i>
 						<span
@@ -493,13 +493,13 @@ import { mapActions, mapGetters } from "vuex";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 import { dice } from "src/mixins/dice";
 import { setHP } from "src/mixins/HpManipulations";
-import TargetAvatar from "src/components/combat/TargetAvatar.vue";
+import Avatar from "src/components/combat/entities/Avatar.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "hk-single-roll",
 	components: {
-		TargetAvatar,
+		Avatar,
 		TutorialPopover,
 	},
 	props: {

@@ -1,6 +1,6 @@
 <template>
 	<div class="actor">
-		<SelectActor :actor="actor" />
+		<SelectActor :actor="actor" :_active="_active" />
 		<Manual :actor="actor" />
 		Actions
 	</div>
@@ -21,6 +21,10 @@ export default {
 	props: {
 		actor: {
 			type: Object,
+		},
+		_active: {
+			type: Array,
+			required: true,
 		},
 	},
 	data() {
@@ -43,7 +47,6 @@ export default {
 	align-items: center;
 	gap: 15px;
 	padding: 15px;
-	background-color: $neutral-6;
 	border-radius: $border-radius;
 }
 </style>

@@ -6,7 +6,7 @@
 				<h3>{{ type.name.capitalize() }}</h3>
 				<ul>
 					<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
-						<TargetAvatar :entity="entity" class="img" :icons="false" />
+						<Avatar :entity="entity" class="img" :icons="false" />
 						<q-linear-progress
 							size="30px"
 							:color="type.name === 'damage' ? 'negative' : 'positive'"
@@ -40,12 +40,12 @@
 <script>
 import _ from "lodash";
 import { mapGetters } from "vuex";
-import TargetAvatar from "../TargetAvatar.vue";
+import Avatar from "../entities/Avatar.vue";
 
 export default {
 	name: "Dmg",
 	components: {
-		TargetAvatar,
+		Avatar,
 	},
 	data() {
 		return {

@@ -28,7 +28,7 @@
 				@keydown.h="set_hidden({ key: entity.key, hidden: !entity.hidden })"
 				@keydown.a="set_active({ key: entity.key, active: false })"
 			>
-				<TargetAvatar :entity="entity" class="img" />
+				<Avatar :entity="entity" class="img" />
 				<div class="overview-item">
 					<div class="name truncate">{{ entity.name.capitalizeEach() }}</div>
 					<strong class="blue initiative">{{ entity.initiative }}</strong>
@@ -117,13 +117,13 @@
 import { mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
 import { remindersMixin } from "src/mixins/reminders";
-import TargetAvatar from "../TargetAvatar.vue";
+import Avatar from "../entities/Avatar.vue";
 
 export default {
 	name: "SetInitiativeNPC",
 	mixins: [general, remindersMixin],
 	components: {
-		TargetAvatar,
+		Avatar,
 	},
 	props: ["active", "idle"],
 	methods: {

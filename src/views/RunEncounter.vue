@@ -38,7 +38,7 @@
 					/>
 					<div v-else-if="!settings.layout" class="desktop">
 						<Top
-							:active-entities="Object.keys(_active).length"
+							:_active="_active"
 							:current="_active[encounter.turn]"
 							:next="_active[encounter.turn + 1]"
 							:settings="settings"
@@ -512,10 +512,10 @@ export default {
 	.desktop {
 		width: 100%;
 		height: 100%;
-		padding: 5px;
+		padding: 10px 5px 5px 5px;
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		grid-template-rows: 120px 1fr;
+		grid-template-rows: 95px 1fr;
 		grid-gap: 5px;
 		grid-template-areas:
 			"top top top"

@@ -4,10 +4,10 @@
 			<Menu />
 			live
 		</div>
-		<Actor :actor="active_actor" />
+		<Actor :actor="active_actor" :_active="_active" />
 		<div class="encounter-status">
 			<EncounterProgress
-				:active-entities="activeEntities"
+				:active-entities="_active.length"
 				:current="current"
 				:next="next"
 				:timer="timer"
@@ -30,8 +30,8 @@ export default {
 		EncounterProgress,
 	},
 	props: {
-		activeEntities: {
-			type: Number,
+		_active: {
+			type: Array,
 			required: true,
 		},
 		current: {
@@ -72,7 +72,7 @@ export default {
 	align-items: center;
 	background-color: $neutral-6-transparent;
 	border-radius: $border-radius;
-	margin: 30px 0;
+	margin: 10px 0;
 	padding: 0 10px;
 	gap: 20px;
 

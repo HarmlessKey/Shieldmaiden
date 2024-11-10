@@ -8,7 +8,7 @@
 				center-color="neutral-6"
 				track-color="neutral-8"
 				color="primary"
-				:disabled="!targeted?.length"
+				:disable="!targeted?.length"
 				@input="value = $event"
 			/>
 			<input
@@ -132,6 +132,13 @@ export default {
 
 			&:focus {
 				outline: none;
+			}
+		}
+		::v-deep {
+			.disabled,
+			.disabled *,
+			[disabled] {
+				cursor: default !important;
 			}
 		}
 	}

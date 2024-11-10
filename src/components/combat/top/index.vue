@@ -4,7 +4,7 @@
 			<Menu />
 			live
 		</div>
-		<Actor :actor="active_actor" :_active="_active" />
+		<Actor :actor="active_actor" :_active="_active" :out-of-turn="out_of_turn" />
 		<div class="encounter-status">
 			<EncounterProgress
 				:active-entities="_active.length"
@@ -52,6 +52,9 @@ export default {
 		...mapGetters(["encounter", "actor"]),
 		active_actor() {
 			return this.actor || this.current;
+		},
+		out_of_turn() {
+			return this.actor && this.actor.key !== this.current.key;
 		},
 		timer() {
 			return this.settings ? this.settings.timer : 0;

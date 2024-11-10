@@ -8,9 +8,24 @@
 				center-color="neutral-6"
 				track-color="neutral-8"
 				color="primary"
+				:disabled="!targeted?.length"
 				@input="value = $event"
 			/>
-			<input ref="input" v-model.number="value" type="number" @keypress="submitManual" />
+			<input
+				ref="input"
+				v-model.number="value"
+				type="number"
+				:disabled="!targeted?.length"
+				@keypress="submitManual"
+			/>
+			<q-tooltip
+				v-if="!targeted?.length"
+				anchor="center middle"
+				self="center middle"
+				:offset="[0, -5]"
+			>
+				Select a target
+			</q-tooltip>
 		</div>
 	</div>
 </template>

@@ -1,6 +1,6 @@
 <template>
 	<div class="actor">
-		<SelectActor :actor="actor" :_active="_active" />
+		<SelectActor :actor="actor" :_active="_active" :out-of-turn="outOfTurn" />
 		<Manual :actor="actor" />
 		Actions
 	</div>
@@ -25,6 +25,10 @@ export default {
 		_active: {
 			type: Array,
 			required: true,
+		},
+		outOfTurn: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {

@@ -1,9 +1,24 @@
 <template>
 	<div class="select-actor">
+		<button v-if="outOfTurn" class="return" @click.stop="set_actor(undefined)">
+			<hk-icon icon="fas fa-undo-alt" />
+			<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, -5]">
+				Return to current actor
+			</q-tooltip>
+		</button>
 		<Avatar :entity="actor" />
-		<hk-icon icon="fas fa-chevron-down" />
+		<div class="d-flex flex-col justify-content-center">
+			<div v-if="outOfTurn" class="orange">
+				<hk-icon icon="fas fa-exclamation-circle" />
+				<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, -5]">
+					Out of Turn
+				</q-tooltip>
+			</div>
+			<hk-icon icon="fas fa-chevron-down" />
+		</div>
 		<q-popup-proxy
 			:dark="$store.getters.theme === 'dark'"
+			v-model="show_menu"
 			content-class="select-actor__select"
 			anchor="bottom left"
 			self="top left"
@@ -55,9 +70,15 @@ export default {
 			type: Array,
 			required: true,
 		},
+		outOfTurn: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
-		return {};
+		return {
+			show_menu: false,
+		};
 	},
 	computed: {
 		...mapGetters([]),
@@ -70,9 +91,10 @@ export default {
 
 <style lang="scss" scoped>
 .select-actor {
+	position: relative;
 	display: flex;
 	align-items: center;
-	font-size: 25px;
+	font-size: 22px;
 	gap: 10px;
 	color: $neutral-2;
 	cursor: pointer;
@@ -83,6 +105,24 @@ export default {
 		font-size: 44px;
 		border-radius: $border-radius;
 		background-color: $neutral-8;
+	}
+	.return {
+		position: absolute;
+		left: -10px;
+		top: -12px;
+		font-size: 12px;
+		background-color: $neutral-5;
+		color: $neutral-1;
+		border-radius: 9999px;
+		text-align: center;
+		line-height: 23px;
+		width: 25px;
+		height: 25px;
+		padding-right: 2px;
+
+		&:hover {
+			background-color: $neutral-4;
+		}
 	}
 }
 </style>

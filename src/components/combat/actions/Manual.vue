@@ -115,7 +115,7 @@ export default {
 		border-radius: 50%;
 		margin: -50px 0;
 		position: relative;
-		border: solid 8px $neutral-9;
+		border: solid 8px $neutral-10;
 
 		input {
 			position: absolute;

@@ -4,6 +4,11 @@
 		<div class="basic-entity__name truncate">
 			{{ entity.name?.capitalizeEach() }}
 		</div>
+		<div
+			v-if="entity.color_label"
+			class="color-label"
+			:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
+		/>
 	</div>
 </template>
 
@@ -27,6 +32,7 @@ export default {
 .basic-entity {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 10px;
 
 	.target-avatar {
@@ -36,8 +42,14 @@ export default {
 		background-color: $neutral-9;
 		border-radius: $border-radius-small;
 	}
+	.color-label {
+		border-radius: 9999px;
+		height: 15px;
+		width: 15px;
+	}
 	&__name {
 		font-weight: bold;
+		flex-grow: 1;
 	}
 }
 </style>

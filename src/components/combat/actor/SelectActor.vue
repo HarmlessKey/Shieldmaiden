@@ -4,11 +4,13 @@
 			<div class="select-actor__menu">
 				<button v-if="outOfTurn" @click.stop="set_actor(undefined)">
 					<hk-icon icon="fas fa-undo-alt" />
-					<q-tooltip anchor="center left" self="center right">Return to current actor</q-tooltip>
+					<q-tooltip anchor="center left" self="center right">Return</q-tooltip>
 				</button>
 				<button @click.stop>
 					<hk-icon icon="fas fa-list-alt" />
-					<q-tooltip anchor="center left" self="center right">Show monster card</q-tooltip>
+					<q-tooltip anchor="center left" self="center right"
+						>Show {{ actor.entityType === "player" ? "sheet" : "card" }}</q-tooltip
+					>
 				</button>
 			</div>
 			<Avatar :entity="actor" />
@@ -20,7 +22,7 @@
 					Out of Turn
 				</q-tooltip>
 			</div>
-			<hk-icon icon="fas fa-chevron-down" />
+			<hk-icon icon="fas fa-chevron-down" :class="{ open: show_menu }" />
 		</div>
 		<q-popup-proxy
 			:dark="$store.getters.theme === 'dark'"
@@ -89,7 +91,13 @@ export default {
 	computed: {
 		...mapGetters([]),
 		active() {
-			return this._active.filter((entity) => entity.key !== this.actor.key);
+			const entities = this._active.filter((entity) => entity.key !== this.actor.key);
+			const environment = {
+				key: "environment",
+				name: "Environment",
+				entityType: "environment",
+			};
+			return [environment, ...entities];
 		},
 	},
 	methods: {
@@ -111,6 +119,13 @@ export default {
 	gap: 10px;
 	color: $neutral-2;
 	cursor: pointer;
+
+	i {
+		transition: all 0.3s linear;
+	}
+	.open {
+		transform: rotate(-180deg);
+	}
 
 	&__menu {
 		display: flex;

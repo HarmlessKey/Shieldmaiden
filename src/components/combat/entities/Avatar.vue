@@ -37,7 +37,7 @@
 
 <script>
 export default {
-	name: "target-avatar",
+	name: "Avatar",
 	props: {
 		entity: {
 			type: Object,

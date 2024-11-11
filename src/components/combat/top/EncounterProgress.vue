@@ -137,7 +137,7 @@ export default {
 		position: relative;
 		background-color: $neutral-6;
 		border-radius: 50%;
-		border: solid 5px $neutral-9;
+		border: solid 8px $neutral-10;
 
 		.q-circular-progress {
 			margin: -1px;

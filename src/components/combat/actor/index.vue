@@ -50,7 +50,10 @@ export default {
 	display: flex;
 	align-items: center;
 	gap: 15px;
-	padding: 15px;
 	border-radius: $border-radius;
+
+	.manual {
+		margin: -100px 0;
+	}
 }
 </style>

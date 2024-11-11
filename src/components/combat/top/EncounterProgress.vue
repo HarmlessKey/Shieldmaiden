@@ -1,7 +1,24 @@
 <template>
 	<div class="encounter-progress">
+		<div class="encounter-progress__round">
+			<div>Round</div>
+			<div class="round">{{ encounter.round }}</div>
+		</div>
+		<q-linear-progress
+			:value="(encounter.turn + 1) / activeEntities"
+			size="32px"
+			color="neutral-6"
+			track-color="neutral-5"
+			rounded
+		>
+			<div class="turn">
+				<template v-if="encounter.round > 1 && encounter.turn === 0"> Top of the Round </template>
+				<hk-animated-integer v-else :value="encounter.turn + 1" />
+			</div>
+			<hk-timer class="timer" :value="timer || 0" :key="encounter.turn" />
+		</q-linear-progress>
 		<button
-			class="btn btn-sm btn-clear"
+			class="btn btn-sm bg-neutral-6"
 			v-shortkey="['shift', 'arrowleft']"
 			@click="prevTurn()"
 			@shortkey="prevTurn()"
@@ -9,26 +26,8 @@
 			<i aria-hidden="true" class="fas fa-step-backward" />
 			<!-- <q-tooltip anchor="top middle" self="center middle">Previous turn [shift] + [←]</q-tooltip> -->
 		</button>
-		<div class="progress">
-			<div class="round">
-				{{ encounter.round }}
-				<q-tooltip anchor="bottom middle" self="center middle">Round</q-tooltip>
-			</div>
-			<q-circular-progress
-				show-value
-				:value="((encounter.turn + 1) / activeEntities) * 100"
-				size="100px"
-				color="neutral-4"
-				track-color="neutral-8"
-			>
-				<div class="turn truncate">
-					<hk-animated-integer :value="encounter.turn + 1" />
-				</div>
-			</q-circular-progress>
-			<hk-timer class="timer" :value="timer || 0" :key="encounter.turn" />
-		</div>
 		<button
-			class="btn btn-sm btn-clear"
+			class="btn btn-sm bg-neutral-6"
 			:class="{
 				'step-highlight': demo && follow_tutorial && get_step('run', 'next'),
 			}"
@@ -133,43 +132,54 @@ export default {
 	align-items: center;
 	gap: 5px;
 
-	.progress {
-		position: relative;
-		background-color: $neutral-6;
-		border-radius: 50%;
-		border: solid 8px $neutral-10;
+	&__round {
+		display: flex;
+		align-items: center;
+		z-index: 10;
 
-		.q-circular-progress {
-			margin: -1px;
+		div {
+			background-color: $neutral-6;
+			border-radius: $border-radius;
+			line-height: 32px;
+			height: 32px;
+			padding: 0 20px 0 10px;
+
+			&.round {
+				border-radius: 50%;
+				height: 46px;
+				line-height: 36px;
+				min-width: 46px;
+				text-align: center;
+				padding: 0;
+				margin: -2px -20px -2px -10px;
+				font-size: 18px;
+				border: solid 5px $neutral-10;
+				font-weight: bold;
+			}
 		}
-		.round,
+	}
+
+	.q-linear-progress {
+		width: 400px;
+
 		.timer {
 			position: absolute;
-			background-color: $neutral-7;
-			transform: translateX(-50%);
-			left: 50%;
-			z-index: 10;
-			box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-			cursor: default;
-		}
-		.round {
-			top: -8px;
-			border-radius: 9999px;
-			height: 25px;
-			min-width: 25px;
-			line-height: 25px;
-			text-align: center;
-		}
-		.timer {
-			bottom: -2px;
-			font-size: 12px;
-			border-radius: $border-radius-small;
-			padding: 1px 5px;
+			color: $neutral-1;
+			right: 10px;
+			display: flex;
+			align-items: center;
+			font-size: 15px;
+			height: 100%;
 		}
 		.turn {
+			position: absolute;
+			color: $neutral-1;
+			left: 25px;
+			display: flex;
+			align-items: center;
 			font-weight: bold;
-			font-size: 30px;
-			padding: 0 8px;
+			font-size: 15px;
+			height: 100%;
 		}
 	}
 }

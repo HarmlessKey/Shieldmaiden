@@ -1,17 +1,43 @@
 <template>
 	<div class="top">
-		<div>
-			<Menu />
-			live
+		<div class="top__encounter">
+			<div class="top__encounter-title">
+				<Menu />
+				<span class="truncate"> {{ encounter.name }}</span>
+			</div>
+			<div class="top__encounter-status">
+				<EncounterProgress
+					:active-entities="_active.length"
+					:current="current"
+					:next="next"
+					:timer="timer"
+				/>
+			</div>
+			<div class="top__encounter-end">
+				<span
+					v-if="!demo && !test"
+					@click="
+						setDrawer({
+							show: true,
+							type: 'drawers/Broadcast',
+							data: {
+								campaign_id: campid,
+								encounter_id: encid,
+							},
+						})
+					"
+					class="live"
+					:class="{ active: broadcast.live === campid }"
+				>
+					{{ broadcast.live === campid ? "" : "go" }} live
+				</span>
+			</div>
 		</div>
-		<Actor :actor="active_actor" :_active="_active" :out-of-turn="out_of_turn" />
-		<div class="encounter-status">
-			<EncounterProgress
-				:active-entities="_active.length"
-				:current="current"
-				:next="next"
-				:timer="timer"
-			/>
+		<div class="top__actor">
+			<Actor :actor="active_actor" :_active="_active" :out-of-turn="out_of_turn" />
+		</div>
+		<div class="top__bottom">
+			<strong>{{ active_actor.name?.capitalizeEach() }}</strong>
 		</div>
 	</div>
 </template>
@@ -46,10 +72,13 @@ export default {
 	},
 	mixins: [],
 	data() {
-		return {};
+		return {
+			campid: this.$route.params.campid,
+			encid: this.$route.params.encid,
+		};
 	},
 	computed: {
-		...mapGetters(["encounter", "actor"]),
+		...mapGetters(["encounter", "actor", "broadcast", "test", "demo"]),
 		active_actor() {
 			return this.actor || this.current;
 		},
@@ -61,7 +90,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions([]),
+		...mapActions(["setDrawer"]),
 	},
 	watch: {},
 };
@@ -71,18 +100,49 @@ export default {
 .top {
 	grid-area: top;
 	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	background-color: $neutral-6-transparent;
-	border-radius: $border-radius;
-	margin: 10px 0;
-	padding: 0 10px;
-	gap: 20px;
+	flex-direction: column;
+	gap: 5px;
 
-	.actor {
-		flex-grow: 1;
+	&__encounter {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin: -5px 0;
+		gap: 5px;
+
+		&-title {
+			font-size: 18px;
+			width: 165px;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+
+			span {
+				min-width: 0;
+			}
+		}
+		&-end {
+			width: 165px;
+			display: flex;
+			justify-content: flex-end;
+		}
 	}
-	.encounter-status {
+	&__actor,
+	&__bottom {
+		background-color: $neutral-6-transparent;
+		border-radius: $border-radius-small;
+		padding: 10px;
+	}
+	&__actor {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		gap: 20px;
+
+		.actor {
+			flex-grow: 1;
+		}
 	}
 }
 </style>

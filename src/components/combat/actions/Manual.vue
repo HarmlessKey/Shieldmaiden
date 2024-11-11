@@ -4,7 +4,7 @@
 			<q-knob
 				v-model="knob_value"
 				:angle="180"
-				size="110px"
+				size="130px"
 				center-color="neutral-6"
 				track-color="neutral-8"
 				color="primary"
@@ -113,9 +113,8 @@ export default {
 	&__input {
 		background-color: $neutral-6;
 		border-radius: 50%;
-		margin: -50px 0;
 		position: relative;
-		border: solid 8px $neutral-10;
+		border: solid 5px $neutral-10;
 
 		input {
 			position: absolute;

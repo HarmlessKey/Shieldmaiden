@@ -512,10 +512,10 @@ export default {
 	.desktop {
 		width: 100%;
 		height: 100%;
-		padding: 10px 5px 5px 5px;
+		padding: 5px;
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		grid-template-rows: 95px 1fr;
+		grid-template-columns: repeat(2, 3fr) 2fr;
+		grid-template-rows: min-content 1fr;
 		grid-gap: 5px;
 		grid-template-areas:
 			"top top top"

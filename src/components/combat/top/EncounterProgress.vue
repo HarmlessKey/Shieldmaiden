@@ -2,7 +2,9 @@
 	<div class="encounter-progress">
 		<div class="encounter-progress__round">
 			<div>Round</div>
-			<div class="round">{{ encounter.round }}</div>
+			<div class="round">
+				<hk-animated-integer :value="encounter.round" />
+			</div>
 		</div>
 		<q-linear-progress
 			:value="(encounter.turn + 1) / activeEntities"

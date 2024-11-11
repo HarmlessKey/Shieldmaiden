@@ -30,8 +30,8 @@
 			content-class="select-actor__select"
 			anchor="bottom left"
 			self="top left"
-			transition-show="scale"
-			transition-hide="scale"
+			transition-show="jump-down"
+			transition-hide="jump-up"
 			:breakpoint="576"
 			:offset="[0, 10]"
 		>

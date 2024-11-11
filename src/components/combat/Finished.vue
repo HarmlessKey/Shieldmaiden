@@ -213,7 +213,7 @@
 
 <script>
 import Dmg from "src/components/combat/side/Dmg.vue";
-import Log from "src/components/combat/side/Log.vue";
+import Log from "src/components/combat/legacy/side/Log.vue";
 import { currencyMixin } from "src/mixins/currency.js";
 import { mapActions, mapGetters } from "vuex";
 

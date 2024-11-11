@@ -33,8 +33,9 @@
 				</span>
 			</div>
 		</div>
-		<div class="top__actor">
+		<div class="top__main">
 			<Actor :actor="active_actor" :_active="_active" :out-of-turn="out_of_turn" />
+			<Log />
 		</div>
 		<div class="top__bottom">
 			<strong>{{ active_actor.name?.capitalizeEach() }}</strong>
@@ -46,6 +47,7 @@
 import { mapActions, mapGetters } from "vuex";
 import Menu from "./Menu.vue";
 import Actor from "../actor";
+import Log from "./log";
 import EncounterProgress from "./EncounterProgress.vue";
 
 export default {
@@ -53,6 +55,7 @@ export default {
 	components: {
 		Menu,
 		Actor,
+		Log,
 		EncounterProgress,
 	},
 	props: {
@@ -117,6 +120,7 @@ export default {
 			display: flex;
 			align-items: center;
 			gap: 5px;
+			color: $neutral-2;
 
 			span {
 				min-width: 0;
@@ -134,14 +138,23 @@ export default {
 		border-radius: $border-radius-small;
 		padding: 10px;
 	}
-	&__actor {
+	&__main {
 		display: flex;
 		justify-content: flex-start;
-		align-items: center;
-		gap: 20px;
+		align-items: stretch;
+		gap: 5px;
 
+		.combat-log,
+		.actor {
+			background-color: $neutral-6-transparent;
+			border-radius: $border-radius-small;
+			padding: 10px;
+		}
 		.actor {
 			flex-grow: 1;
+		}
+		.combat-log {
+			max-width: 300px;
 		}
 	}
 }

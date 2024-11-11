@@ -42,7 +42,7 @@
 
 <script>
 import Dmg from "src/components/combat/side/Dmg.vue";
-import Log from "src/components/combat/side/Log.vue";
+import Log from "src/components/combat/legacy/side/Log.vue";
 import Requests from "src/components/combat/side/Requests.vue";
 import Inventory from "src/components/drawers/party/Inventory.vue";
 import { mapGetters } from "vuex";

@@ -21,7 +21,7 @@
 				<div class="manual__modifiers-damage-type__icon">
 					<hk-icon
 						:icon="damage_type ? damage_type_icons[damage_type] : 'fas fa-chevron-down'"
-						:class="damage_type"
+						:class="[damage_type, { indicator: !damage_type }]"
 					/>
 				</div>
 				<q-popup-proxy
@@ -228,6 +228,11 @@ export default {
 				font-size: 28px;
 				padding-left: 5px;
 				text-align: center;
+
+				.indicator {
+					color: $neutral-2;
+					font-size: 24px;
+				}
 			}
 		}
 		.q-checkbox {

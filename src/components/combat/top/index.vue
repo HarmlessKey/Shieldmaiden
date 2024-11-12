@@ -37,9 +37,6 @@
 			<Actor :actor="active_actor" :_active="_active" :out-of-turn="out_of_turn" />
 			<Log />
 		</div>
-		<div class="top__bottom">
-			<strong>{{ active_actor.name?.capitalizeEach() }}</strong>
-		</div>
 	</div>
 </template>
 
@@ -132,20 +129,13 @@ export default {
 			justify-content: flex-end;
 		}
 	}
-	&__actor,
-	&__bottom {
-		background-color: $neutral-6-transparent;
-		border-radius: $border-radius-small;
-		padding: 10px;
-	}
 	&__main {
 		display: flex;
 		justify-content: flex-start;
 		align-items: stretch;
 		gap: 5px;
 
-		.combat-log,
-		.actor {
+		.combat-log {
 			background-color: $neutral-6-transparent;
 			border-radius: $border-radius-small;
 			padding: 10px;

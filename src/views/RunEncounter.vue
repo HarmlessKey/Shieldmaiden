@@ -99,6 +99,7 @@
 							ref="targeted"
 							tabindex="0"
 							class="pane"
+							out-of-turn-actions
 							:class="{ focused: focused_pane === 'targeted' }"
 							@focus="focusPane('targeted')"
 						/>
@@ -107,6 +108,7 @@
 							tabindex="0"
 							class="pane legacy-side"
 							:class="{ focused: focused_pane === 'side' }"
+							log
 							@focus="focusPane('side')"
 						/>
 					</div>
@@ -514,7 +516,7 @@ export default {
 		height: 100%;
 		padding: 5px;
 		display: grid;
-		grid-template-columns: repeat(2, 3fr) 2fr;
+		grid-template-columns: repeat(2, 1fr) 300px;
 		grid-template-rows: min-content 1fr;
 		grid-gap: 5px;
 		grid-template-areas:

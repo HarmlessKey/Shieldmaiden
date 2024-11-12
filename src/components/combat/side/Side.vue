@@ -9,7 +9,7 @@
 			dense
 			align="left"
 		>
-			<q-tab name="log" icon="fas fa fa-scroll-old" />
+			<q-tab name="log" v-if="log" icon="fas fa fa-scroll-old" />
 			<q-tab name="damage" icon="fas fa-swords" />
 			<q-tab v-if="!demo && !test" name="inventory" icon="fas fa-treasure-chest" />
 			<q-tab v-if="!demo && !test" name="requests" icon="fas fa-bell">
@@ -23,7 +23,7 @@
 		</q-tabs>
 		<q-scroll-area dark :thumb-style="{ width: '5px' }">
 			<q-tab-panels v-model="tab" class="bg-transparent">
-				<q-tab-panel name="log">
+				<q-tab-panel v-if="log" name="log">
 					<Log />
 				</q-tab-panel>
 				<q-tab-panel name="damage">
@@ -55,9 +55,15 @@ export default {
 		Requests,
 		Inventory,
 	},
+	props: {
+		log: {
+			type: Boolean,
+			default: false,
+		},
+	},
 	data() {
 		return {
-			tab: "log",
+			tab: this.log ? "log" : "damage",
 		};
 	},
 	computed: {

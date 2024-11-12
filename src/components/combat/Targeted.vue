@@ -183,19 +183,23 @@ export default {
 		TargetInfo,
 		TutorialPopover,
 	},
+	props: {
+		outOfTurnActions: {
+			type: Boolean,
+			default: false,
+		},
+	},
 	data() {
 		return {
 			setShadow: 0,
 			abilities: abilities,
-			options: [
-				{
-					option: "damage",
-					method: () => this.opportunityAttack(),
-					key: ["shift", "d"],
-					icon: "fa-swords",
-					tooltip: "[shift]+[d] Out of turn damage/healing",
-					step: "opportunity",
-				},
+		};
+	},
+	computed: {
+		...mapGetters(["encounterId", "entities", "turn", "targeted", "broadcast", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
+		options() {
+			const options = [
 				{
 					option: "conditions",
 					method: () => this.setConditions(),
@@ -235,12 +239,19 @@ export default {
 					tooltip: "[e] Edit",
 					step: "edit",
 				},
-			],
-		};
-	},
-	computed: {
-		...mapGetters(["encounterId", "entities", "turn", "targeted", "broadcast", "demo"]),
-		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
+			];
+			if (this.outOfTurnActions) {
+				options.unshift({
+					option: "damage",
+					method: () => this.opportunityAttack(),
+					key: ["shift", "d"],
+					icon: "fa-swords",
+					tooltip: "[shift]+[d] Out of turn damage/healing",
+					step: "opportunity",
+				});
+			}
+			return options;
+		},
 		shares() {
 			return this.broadcast.shares || [];
 		},
@@ -463,19 +474,18 @@ export default {
 		margin: 20px -3px 0 -3px;
 
 		button {
-			background-color: $neutral-3;
+			background-color: $neutral-2;
 			width: 100%;
-			color: $neutral-10 !important;
 			line-height: 35px;
-			font-size: 15px;
+			font-size: 18px;
 			border-radius: $border-radius-small;
 			border: none;
 			cursor: pointer;
 			text-align: center;
+			color: $neutral-11;
 
 			&:hover {
-				background: $neutral-4;
-				color: $neutral-1 !important;
+				background: $neutral-3;
 			}
 		}
 	}

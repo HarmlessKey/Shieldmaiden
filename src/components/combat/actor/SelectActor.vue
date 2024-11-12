@@ -1,21 +1,11 @@
 <template>
 	<div class="select-actor">
-		<div class="d-flex">
-			<div class="select-actor__menu">
-				<button v-if="outOfTurn" @click.stop="set_actor(undefined)">
-					<hk-icon icon="fas fa-undo-alt" />
-					<q-tooltip anchor="center left" self="center right">Return</q-tooltip>
-				</button>
-				<button @click.stop>
-					<hk-icon icon="fas fa-list-alt" />
-					<q-tooltip anchor="center left" self="center right"
-						>Show {{ actor.entityType === "player" ? "sheet" : "card" }}</q-tooltip
-					>
-				</button>
-			</div>
-			<Avatar :entity="actor" />
-		</div>
-		<div class="d-flex flex-col justify-content-center">
+		<button v-if="outOfTurn" @click.stop="set_actor(undefined)">
+			<hk-icon icon="fas fa-undo-alt" />
+			<q-tooltip anchor="center left" self="center right">Return</q-tooltip>
+		</button>
+		<Avatar :entity="actor" :key="actor.key" />
+		<div class="d-flex flex-col justify-content-center items-center">
 			<div v-if="outOfTurn" class="orange">
 				<hk-icon icon="fas fa-exclamation-circle" />
 				<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, -5]">

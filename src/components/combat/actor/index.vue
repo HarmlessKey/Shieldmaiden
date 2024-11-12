@@ -1,8 +1,11 @@
 <template>
 	<div class="actor">
-		<SelectActor :actor="actor" :_active="_active" :out-of-turn="outOfTurn" />
-		<Manual :actor="actor" />
-		Actions
+		<div class="actor__actions">
+			<SelectActor :actor="actor" :_active="_active" :out-of-turn="outOfTurn" />
+			<Manual :actor="actor" />
+			Actions
+		</div>
+		<Details :actor="actor" />
 	</div>
 </template>
 
@@ -10,12 +13,14 @@
 import { mapActions, mapGetters } from "vuex";
 import SelectActor from "./SelectActor.vue";
 import Manual from "../actions/Manual";
+import Details from "./Details.vue";
 
 export default {
 	name: "Actor",
 	components: {
 		SelectActor,
 		Manual,
+		Details,
 	},
 	mixins: [],
 	props: {
@@ -48,12 +53,20 @@ export default {
 <style lang="scss" scoped>
 .actor {
 	display: flex;
-	align-items: center;
-	gap: 15px;
-	border-radius: $border-radius;
+	flex-direction: column;
+	gap: 5px;
 
-	.manual {
-		margin: -100px 0;
+	&__actions {
+		background-color: $neutral-6-transparent;
+		border-radius: $border-radius-small;
+		padding: 10px;
+		display: flex;
+		align-items: center;
+		gap: 15px;
+
+		.manual {
+			margin: -100px 0;
+		}
 	}
 }
 </style>

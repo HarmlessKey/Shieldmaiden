@@ -66,240 +66,7 @@
 							</div>
 						</div>
 
-						<q-list
-							v-if="current[type]"
-							:dark="$store.getters.theme === 'dark'"
-							square
-							:class="`accordion`"
-						>
-							<q-expansion-item
-								v-for="(action, action_index) in current[type]"
-								:key="`action-${action_index}`"
-								:dark="$store.getters.theme === 'dark'"
-								switch-toggle-side
-								expand-icon-class="hidden-toggle"
-								:group="type"
-								:name="name"
-								@focus="focusButton(action_index)"
-							>
-								<template v-slot:header>
-									<q-item-section
-										:class="checkAvailable(type, action_index, action) ? '' : 'is-disabled'"
-									>
-										<q-item-label>
-											<strong>{{ action.name }}</strong>
-											<span class="neutral-3">
-												{{
-													action.recharge
-														? `(Recharge ${
-																action.recharge === "rest"
-																	? "after a Short or Long Rest"
-																	: action.recharge
-															})`
-														: ``
-												}}
-												{{
-													action.limit
-														? `(${action.limit}/${
-																action.limit_type ? action.limit_type.capitalize() : `Day`
-															})`
-														: ``
-												}}
-												{{
-													action.legendary_cost > 1
-														? `(Costs ${action.legendary_cost} Actions)`
-														: ``
-												}}
-											</span>
-										</q-item-label>
-										<q-item-label
-											caption
-											v-if="
-												action.action_list &&
-												action.action_list[0] &&
-												action.action_list[0].type !== 'other'
-											"
-										>
-											<!-- Rolls -->
-											<span v-if="!isNil(action.action_list[0].attack_bonus)">
-												{{
-													action.action_list[0].attack_bonus < 0
-														? `-${Math.abs(action.action_list[0].attack_bonus)}`
-														: `+${action.action_list[0].attack_bonus}`
-												}}
-												to hit
-											</span>
-											<span v-if="action.action_list[0].rolls">
-												<span
-													v-for="(roll, roll_index) in action.action_list[0].rolls"
-													:key="`roll-${action_index}-${roll_index}`"
-												>
-													(<i
-														aria-hidden="true"
-														:class="[
-															action.action_list[0].type === 'healing'
-																? 'fas fa-heart green'
-																: damage_type_icons[roll.damage_type],
-															roll.damage_type,
-														]"
-													/>
-													{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
-													}}<template v-if="roll.fixed_val && roll.dice_count">
-														{{
-															roll.fixed_val < 0
-																? `- ${Math.abs(roll.fixed_val)}`
-																: `+ ${roll.fixed_val}`
-														}}) </template
-													><template v-else>{{ roll.fixed_val }})</template>
-													{{ roll_index + 1 < action.action_list[0].rolls.length ? "+" : "" }}
-													<q-tooltip anchor="top middle" self="center middle">
-														{{
-															action.action_list[0].type === "healing"
-																? "Healing"
-																: `${roll.damage_type.capitalize()} damage`
-														}}
-													</q-tooltip>
-												</span>
-											</span>
-											<!-- Reach -->
-											<span v-if="action.reach">
-												<span class="blue">|</span> {{ action.reach
-												}}<small class="neutral-2">ft.</small>
-												<q-tooltip anchor="top middle" self="center middle"> Reach </q-tooltip>
-											</span>
-											<!-- Range -->
-											<span v-if="action.range">
-												<span class="blue">|</span> {{ action.range
-												}}<small class="neutral-2">ft.</small>
-												<q-tooltip anchor="top middle" self="center middle"> Range </q-tooltip>
-											</span>
-											<!-- Saving trow -->
-											<span
-												v-if="
-													action.action_list[0].type === 'save' && action.action_list[0].save_dc
-												"
-											>
-												<span class="blue">|</span>
-												<span v-if="action.action_list[0].save_ability">
-													{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
-												</span>
-												{{ action.action_list[0].save_dc }}
-											</span>
-											<!-- AOE -->
-											<span v-if="action.aoe_type">
-												<span class="blue">|</span>
-												{{ action.aoe_size }}<small class="neutral-2">ft.</small>
-												{{ action.aoe_type.capitalize() }}
-												<q-tooltip anchor="top middle" self="center middle">
-													Area of effect
-												</q-tooltip>
-											</span>
-										</q-item-label>
-									</q-item-section>
-									<q-item-section
-										v-if="
-											action.action_list &&
-											action.action_list[0] &&
-											action.action_list[0].type !== 'other' &&
-											action.action_list[0].rolls &&
-											action.action_list[0].rolls.length
-										"
-										avatar
-									>
-										<div
-											class="roll-wrapper"
-											:class="{
-												'step-highlight': demo && follow_tutorial && get_step('run', 'roll'),
-											}"
-										>
-											<TutorialPopover
-												v-if="demo && action_index == 0"
-												tutorial="run"
-												step="roll"
-												position="right"
-												:offset="[20, 0]"
-											/>
-											<hk-roll-action
-												:ref="action_index"
-												:action="action"
-												:tooltip="`Roll ${action.name}`"
-												@roll="startRoll(...arguments, action_index, action, type)"
-												:disabled="!checkAvailable(type, action_index, action)"
-											>
-												<span class="roll-button" />
-											</hk-roll-action>
-										</div>
-									</q-item-section>
-									<!-- Spend limited actions that can't be rolled -->
-									<q-item-section
-										v-else-if="action.limit || action.recharge || action.legendary_cost"
-										avatar
-									>
-										<template v-if="action.legendary_cost || action.recharge">
-											<div
-												v-if="checkAvailable(type, action_index, action)"
-												class="blue"
-												@click.stop="
-													spendLimited(
-														type,
-														action.legendary_cost ? 'legendaries_used' : action_index,
-														false,
-														action.legendary_cost ? action.legendary_cost : 1
-													)
-												"
-											>
-												Use
-											</div>
-											<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
-										</template>
-										<div v-else class="slots">
-											<span
-												v-for="i in parseInt(action.limit)"
-												:key="`legendary-${i}`"
-												class="mr-1"
-												@click.stop="
-													current.limited_uses[type] &&
-													current.limited_uses[type][action_index] >= i
-														? spendLimited(type, action_index, true)
-														: spendLimited(type, action_index)
-												"
-											>
-												<i
-													aria-hidden="true"
-													class="far"
-													:class="
-														current.limited_uses[type] &&
-														current.limited_uses[type][action_index] >= i
-															? 'fa-dot-circle'
-															: 'fa-circle'
-													"
-												/>
-												<q-tooltip anchor="top middle" self="center middle">
-													{{
-														current.limited_uses[type] &&
-														current.limited_uses[type][action_index] >= i
-															? "Regain"
-															: "Spend"
-													}}
-												</q-tooltip>
-											</span>
-										</div>
-									</q-item-section>
-								</template>
-
-								<div class="accordion-body description" v-if="action.desc">
-									<hk-dice-text :input_text="action.desc" />
-									<div
-										class="blue pointer mt-2"
-										v-if="!checkAvailable(type, action_index, action) && action.recharge"
-										@click="spendLimited(type, action_index, true)"
-									>
-										Regain use
-									</div>
-								</div>
-							</q-expansion-item>
-						</q-list>
-						<p v-else>Nothing found.</p>
+						<RollActions :actor="current" :type="type" />
 					</q-tab-panel>
 				</q-tab-panels>
 			</template>
@@ -322,14 +89,14 @@ import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Projectiles from "../../actions/Projectiles";
 import { isNil } from "lodash";
-import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import RollActions from "../../actions/RollActions.vue";
 
 export default {
 	name: "Roll",
 	mixins: [setHP, runEncounter],
 	components: {
 		Projectiles,
-		TutorialPopover,
+		RollActions,
 	},
 	props: ["current"],
 	data() {
@@ -495,23 +262,23 @@ h3 {
 		}
 	}
 }
-// .roll-button {
-// 	display: inline-block;
-// 	cursor: pointer;
-// 	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
-// 	height: 20px;
-// 	width: 20px;
-// 	background-position: center;
-// 	background-size: cover;
-// 	vertical-align: -5px;
-// 	user-select: none;
-// }
-// .advantage .roll-button:hover,
-// .advantage.hk-roll:focus .roll-button {
-// 	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-green.svg");
-// }
-// .disadvantage .roll-button:hover,
-// .disadvantage.hk-roll:focus .roll-button {
-// 	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-red.svg");
-// }
+.roll-button {
+	display: inline-block;
+	cursor: pointer;
+	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+	height: 20px;
+	width: 20px;
+	background-position: center;
+	background-size: cover;
+	vertical-align: -5px;
+	user-select: none;
+}
+.advantage .roll-button:hover,
+.advantage.hk-roll:focus .roll-button {
+	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-green.svg");
+}
+.disadvantage .roll-button:hover,
+.disadvantage.hk-roll:focus .roll-button {
+	background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-red.svg");
+}
 </style>

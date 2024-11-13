@@ -3,7 +3,10 @@
 		<div class="actor__actions">
 			<SelectActor :actor="actor" :_active="_active" :out-of-turn="outOfTurn" />
 			<Manual :actor="actor" />
-			Actions
+			<template v-if="actor.entityType !== 'player'">
+				<Actions :actor="actor" />
+				Spells
+			</template>
 		</div>
 		<Details :actor="actor" />
 	</div>
@@ -14,6 +17,7 @@ import { mapActions, mapGetters } from "vuex";
 import SelectActor from "./SelectActor.vue";
 import Manual from "../actions/Manual";
 import Details from "./Details.vue";
+import Actions from "./Actions.vue";
 
 export default {
 	name: "Actor",
@@ -21,8 +25,8 @@ export default {
 		SelectActor,
 		Manual,
 		Details,
+		Actions,
 	},
-	mixins: [],
 	props: {
 		actor: {
 			type: Object,
@@ -46,7 +50,6 @@ export default {
 	methods: {
 		...mapActions(["set_turn", "set_targeted", "update_round", "demo"]),
 	},
-	watch: {},
 };
 </script>
 

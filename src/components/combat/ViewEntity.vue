@@ -1,5 +1,10 @@
 <template>
-	<div class="py-1" ref="entity" :class="{ smallWidth: is_small }" v-if="!entity.no_linked_npc">
+	<div
+		class="py-1 actor"
+		ref="entity"
+		:class="{ smallWidth: is_small }"
+		v-if="!entity.no_linked_npc"
+	>
 		<template v-if="!is_current">
 			<h2>
 				{{ entity.name.capitalizeEach() }}
@@ -71,7 +76,7 @@
 							? {
 									encounter_id: encounterId,
 									entity_key: entity.key,
-							  }
+								}
 							: null
 					"
 				>
@@ -107,7 +112,7 @@
 									? {
 											encounter_id: encounterId,
 											entity_key: entity.key,
-									  }
+										}
 									: null
 							"
 						>
@@ -143,7 +148,7 @@
 									? {
 											encounter_id: encounterId,
 											entity_key: entity.key,
-									  }
+										}
 									: null
 							"
 						>
@@ -215,7 +220,7 @@
 								? {
 										encounter_id: encounterId,
 										entity_key: entity.key,
-								  }
+									}
 								: null
 						"
 					>
@@ -441,14 +446,14 @@
 														action.recharge === "rest"
 															? "after a Short or Long Rest"
 															: action.recharge
-												  })`
+													})`
 												: ``
 										}}
 										{{
 											action.limit
 												? `(${action.limit}/${
 														action.limit_type ? action.limit_type.capitalize() : `Day`
-												  })`
+													})`
 												: ``
 										}}
 										{{

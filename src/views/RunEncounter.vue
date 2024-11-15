@@ -43,6 +43,7 @@
 							:next="_active[encounter.turn + 1]"
 							:settings="settings"
 						/>
+						<ViewEntity class="pane" :data="_active[encounter.turn]" current />
 						<Targets
 							ref="targets"
 							tabindex="0"
@@ -183,6 +184,7 @@ import SetInitiative from "src/components/combat/initiative";
 import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
 import DemoOverlay from "src/components/combat/DemoOverlay.vue";
 import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
+import ViewEntity from "src/components/combat/ViewEntity.vue";
 
 export default {
 	name: "RunEncounter",
@@ -201,6 +203,7 @@ export default {
 		OverEncumbered,
 		DemoOverlay,
 		TutorialFinishedDialog,
+		ViewEntity,
 	},
 	mixins: [audio],
 	data() {
@@ -516,16 +519,19 @@ export default {
 		height: 100%;
 		padding: 5px;
 		display: grid;
-		grid-template-columns: repeat(2, 1fr) 300px;
+		grid-template-columns: repeat(3, 1fr) 300px;
 		grid-template-rows: min-content 1fr;
 		grid-gap: 5px;
 		grid-template-areas:
-			"top top top"
-			"targets targeted side";
+			"top top top top"
+			"actor targets targeted side";
 		position: absolute;
 
 		.pane {
 			border-radius: $border-radius-small;
+		}
+		.actor {
+			grid-area: actor;
 		}
 	}
 	.legacy {

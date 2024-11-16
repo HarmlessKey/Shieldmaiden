@@ -23,7 +23,7 @@
 		</div>
 		<div class="promo-banner__footer">
 			<div class="remaining">
-				Get your first month with a <strong>60%</strong> discount.
+				Get your first month with a <strong>{{ discount }}%</strong> discount.
 				<span class="remaining__count">{{
 					days_remaining ? days_remaining : hours_remaining
 				}}</span>
@@ -47,8 +47,8 @@ export default {
 	},
 	data() {
 		return {
-			code: "SHIELDMAIDEN60",
-			discount: 60,
+			code: "SHIELDMAIDEN80",
+			discount: 80,
 			now: new Date(),
 			start: new Date("2024-11-15T00:00:00Z"),
 			end: new Date("2024-12-03T07:59:59Z"),

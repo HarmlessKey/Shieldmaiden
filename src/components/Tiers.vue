@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<q-no-ssr>
+			<PromoBanner class="mb-5" :closable="false" @discount="setDiscount" />
+		</q-no-ssr>
 		<div v-if="!loading">
 			<hk-card-deck>
 				<template v-for="(t, key) in tiers">
@@ -14,11 +17,21 @@
 						</div>
 						<div class="card-body">
 							<div class="top">
-								<span class="price" :class="{ 'patreon-red': t.name === 'Free' }">{{
-									t.price
-								}}</span>
+								<span
+									class="price"
+									:class="{
+										'patreon-red': t.name === 'Free',
+										strike: discount && t.name !== 'Free',
+									}"
+									>{{ t.price }}</span
+								>
+								<span v-if="discount && t.name !== 'Free'" class="price"
+									>${{ discountPrice(t.price) }}</span
+								>
 								<em v-if="t.price === 'Free'" class="neutral-2 sub">forever</em>
-								<em v-else class="neutral-2 sub">per month</em>
+								<em v-else class="neutral-2 sub">{{
+									discount ? "the first month" : "per month"
+								}}</em>
 							</div>
 							<ul>
 								<li v-for="(benefit, key) in default_benefits" :key="key">
@@ -123,6 +136,7 @@
 			</small>
 		</div>
 		<hk-loader v-else name="tiers" />
+		{{ discount }}
 	</div>
 </template>
 
@@ -130,13 +144,18 @@
 import { mapGetters } from "vuex";
 import { db } from "src/firebase";
 import { legacy_tiers } from "src/utils/generalConstants";
+import PromoBanner from "./PromoBanner.vue";
 
 export default {
 	name: "Tiers",
+	components: {
+		PromoBanner,
+	},
 	data() {
 		return {
 			loading: true,
 			show_storage: false,
+			discount: undefined,
 			default_benefits: [
 				"Combat tracker",
 				"Encounter builder",
@@ -191,6 +210,13 @@ export default {
 				tier: t.name,
 			});
 		},
+		setDiscount(discount) {
+			this.discount = discount;
+		},
+		discountPrice(price) {
+			price = Number(price.slice(1));
+			return (price * (1 - this.discount / 100)).toFixed(2);
+		},
 	},
 };
 </script>
@@ -210,10 +236,18 @@ export default {
 
 		.top {
 			padding: 15px;
+
 			.price {
 				font-size: 25px;
 				font-weight: bold;
 				margin-right: 5px;
+
+				&.strike {
+					text-decoration: line-through;
+					font-weight: normal;
+					color: $neutral-2;
+					font-size: 20px;
+				}
 			}
 			i.sub {
 				display: block;

@@ -24,6 +24,7 @@
 		<div class="promo-banner__footer">
 			<div class="remaining">
 				Get your first month with a <strong>{{ discount }}%</strong> discount.
+				<template v-if="hours_remaining <= 1">Less than </template>
 				<span class="remaining__count">{{
 					days_remaining ? days_remaining : hours_remaining
 				}}</span>
@@ -53,6 +54,7 @@ export default {
 			start: new Date("2024-11-15T00:00:00Z"),
 			end: new Date("2024-12-03T07:59:59Z"),
 			showSetter: undefined,
+			timer: null,
 		};
 	},
 	computed: {
@@ -76,15 +78,20 @@ export default {
 		},
 		hours_remaining() {
 			const diff = this.end - this.now;
-			const hours = Math.floor(diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
-			return this.days_remaining >= 1 ? days : hours;
+			const hours = Math.floor(diff / (1000 * 60 * 60));
+			return hours;
 		},
 	},
-	methods: {},
 	mounted() {
 		if (this.show_banner) {
 			this.$emit("discount", this.discount);
 		}
+		this.timer = setInterval(() => {
+			this.now = new Date();
+		}, 60000);
+	},
+	beforeDestroy() {
+		clearInterval(this.timer);
 	},
 };
 </script>

@@ -136,7 +136,6 @@
 			</small>
 		</div>
 		<hk-loader v-else name="tiers" />
-		{{ discount }}
 	</div>
 </template>
 

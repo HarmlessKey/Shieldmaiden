@@ -6,6 +6,7 @@
 			<OverEncumbered v-if="show_overencumbered" />
 			<div class="row q-col-gutter-md">
 				<div class="col-12" :class="{ 'col-md-9': width > 978 && $route.meta.side !== false }">
+					<PromoBanner class="mb-3" />
 					<router-view :key="$route.fullPath" />
 					<slot />
 				</div>
@@ -27,6 +28,7 @@ import ContentSideRight from "src/components/ContentSideRight";
 import OverEncumbered from "src/components/userContent/OverEncumbered";
 import PaymentDeclined from "src/components/PaymentDeclined.vue";
 import PatreonLinkDialog from "src/components/dialogs/PatreonLinkDialog.vue";
+import PromoBanner from "src/components/PromoBanner.vue";
 
 export default {
 	name: "AuthenticatedLayout",
@@ -36,6 +38,7 @@ export default {
 		ContentSideRight,
 		OverEncumbered,
 		PaymentDeclined,
+		PromoBanner,
 	},
 	preFetch({ store, redirect }) {
 		if (!store.getters.user) {

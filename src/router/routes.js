@@ -1071,6 +1071,24 @@ const routes = [
 				],
 			},
 			{
+				path: "export_csv",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Analytics",
+				},
+				children: [
+					{
+						path: "",
+						name: "Export CSV ",
+						component: () => import("src/views/Admin/ExportCSV.vue"),
+					},
+				],
+			},
+			{
 				path: "export",
 				component: {
 					render(c) {

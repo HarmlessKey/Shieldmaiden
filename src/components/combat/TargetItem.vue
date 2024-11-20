@@ -2,12 +2,7 @@
 	<div class="target-item-wrapper">
 		<div class="target-item bg-neutral-8" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
-			<span
-				class="initiative"
-				v-if="initiative"
-				@click.stop
-				:style="{ color: entity.color_label ? entity.color_label : `` }"
-			>
+			<span class="initiative truncate" v-if="initiative" @click.stop>
 				{{ entity.initiative }}
 				<q-popup-proxy
 					:dark="$store.getters.theme === 'dark'"
@@ -65,7 +60,7 @@
 							:dark="$store.getters.theme === 'dark'"
 							flat
 							v-model="editable_entity.color_label"
-							:palette="hkColors"
+							:palette="shieldmaiden_colors"
 							default-view="palette"
 						/>
 						<div class="d-flex justify-content-end mt-2">
@@ -91,8 +86,8 @@
 			</TargetAvatar>
 
 			<!-- ARMOR CLASS -->
-			<div class="ac_wrapper" @click.stop>
-				<i aria-hidden="true" class="fas fa-shield"></i>
+			<div class="ac_wrapper" :style="{ color: entity.color_label || null }" @click.stop>
+				<i aria-hidden="true" class="fas fa-shield" />
 				<span
 					v-if="entity.ac_bonus"
 					class="ac"
@@ -418,9 +413,11 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import TargetAvatar from "./TargetAvatar.vue";
+import { colors } from "src/mixins/colors";
 
 export default {
 	name: "TargetItem",
+	mixins: [colors],
 	components: {
 		TargetAvatar,
 	},
@@ -446,7 +443,6 @@ export default {
 			user: this.$store.getters.user || {},
 			target: "",
 			entitySetter: undefined,
-			hkColors: ["#88b3ce", "#9ac16a", "#c45e66", "#db815e", "#e2da5f", "#9b7aba"],
 		};
 	},
 	computed: {

@@ -12,6 +12,7 @@
 				</button>
 			</LogItem>
 			<q-popup-proxy
+				v-if="combat_log?.length"
 				:dark="$store.getters.theme === 'dark'"
 				anchor="bottom end"
 				self="top right"

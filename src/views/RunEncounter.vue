@@ -43,7 +43,9 @@
 							:next="_active[encounter.turn + 1]"
 							:settings="settings"
 						/>
-						<ViewEntity class="pane" :data="_active[encounter.turn]" current />
+						<Pane title="Actor">
+							<ViewEntity :data="_active[encounter.turn]" current />
+						</Pane>
 						<Targets
 							ref="targets"
 							tabindex="0"
@@ -185,6 +187,7 @@ import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
 import DemoOverlay from "src/components/combat/DemoOverlay.vue";
 import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
 import ViewEntity from "src/components/combat/ViewEntity.vue";
+import Pane from "src/components/combat/Pane.vue";
 
 export default {
 	name: "RunEncounter",
@@ -204,6 +207,7 @@ export default {
 		DemoOverlay,
 		TutorialFinishedDialog,
 		ViewEntity,
+		Pane,
 	},
 	mixins: [audio],
 	data() {
@@ -527,9 +531,6 @@ export default {
 			"actor targets targeted side";
 		position: absolute;
 
-		.pane {
-			border-radius: $border-radius-small;
-		}
 		.actor {
 			grid-area: actor;
 		}

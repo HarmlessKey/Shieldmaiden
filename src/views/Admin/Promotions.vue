@@ -21,7 +21,7 @@
 				wrap-cells
 			>
 				<div slot="no-data" />
-				<hk-loader slot="loading" name="players" />
+				<hk-loader slot="loading" name="Promotions" />
 				<template v-slot:body="props">
 					<q-tr :props="props" :class="props.row.disabled ? 'text-neutral-3' : ''">
 						<q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -234,7 +234,7 @@ export default {
 	},
 	computed: {
 		loading() {
-			return this.loading_promotions || this.loading_tiers;
+			return this.loading_promotions;
 		},
 	},
 	methods: {

@@ -88,7 +88,6 @@
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
-									:disable="update_promotion"
 									type="number"
 									autocomplete="off"
 									v-model="newPromotion.discount"
@@ -166,7 +165,13 @@
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-end">
 								<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
-								<q-btn type="submit" no-caps label="Add Promotion" class="mr-1" color="primary" />
+								<q-btn
+									type="submit"
+									no-caps
+									:label="`${update_promotion ? 'Edit' : 'Add'} Promotion`"
+									class="mr-1"
+									color="primary"
+								/>
 							</div>
 						</hk-card>
 					</q-form>
@@ -255,7 +260,7 @@ export default {
 			this.add = true;
 			this.update_promotion = true;
 			this.newPromotion = promotion;
-			console.log(newPromotion, promotion);
+			console.log(this.newPromotion, promotion);
 		},
 		async enablePromotion(promotion_name) {
 			await promotionService.enablePromotion(promotion_name);

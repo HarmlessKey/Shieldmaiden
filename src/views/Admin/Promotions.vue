@@ -23,7 +23,13 @@
 				<div slot="no-data" />
 				<hk-loader slot="loading" name="Promotions" />
 				<template v-slot:body="props">
-					<q-tr :props="props" :class="props.row.disabled ? 'text-neutral-3' : ''">
+					<q-tr
+						:props="props"
+						:class="[
+							props.row.disabled ? 'text-neutral-3' : '',
+							promotionIsActive(props.row) ? 'green' : '',
+						]"
+					>
 						<q-td v-for="col in props.cols" :key="col.name" :props="props">
 							{{ col.value }}
 						</q-td>
@@ -64,7 +70,7 @@
 					</q-tr>
 				</template>
 			</q-table>
-
+			{{ active_promotion }}
 			<q-dialog square v-model="add">
 				<div>
 					<q-form @submit="addPromotion">
@@ -197,6 +203,7 @@ export default {
 			loading_tiers: true,
 			newPromotion: {},
 			update_promotion: false,
+			active_promotion: undefined,
 			tierMap: {},
 			columns: [
 				{
@@ -262,26 +269,33 @@ export default {
 			this.newPromotion = promotion;
 			console.log(this.newPromotion, promotion);
 		},
-		async enablePromotion(promotion_name) {
-			await promotionService.enablePromotion(promotion_name);
+		async enablePromotion(promotion_code) {
+			await promotionService.enablePromotion(promotion_code);
 		},
-		async disablePromotion(promotion_name) {
-			await promotionService.disablePromotion(promotion_name);
+		async disablePromotion(promotion_code) {
+			await promotionService.disablePromotion(promotion_code);
 		},
 		setPromotions(snapshot) {
 			this.promotions = snapshot.val() ? Object.values(snapshot.val()) : [];
 			this.loading_promotions = false;
 		},
+		promotionIsActive(promotion) {
+			console.log(this.active_promotion, promotion);
+			if (!this.active_promotion) {
+				return false;
+			}
+			return promotion?.code === this.active_promotion?.code;
+		},
+		async getActivePromotions() {
+			return await promotionService.getAllActivePromotions();
+		},
+		async getActivePromotion() {
+			return await promotionService.getFirstActivePromotion();
+		},
 	},
 	async mounted() {
 		promotionService.getPromotionsWithCallback(this.setPromotions);
-		const tiers_promise = await promotionService.getPromotionTiers();
-		this.tiers = Object.entries(tiers_promise).map(([id, vals]) => ({ ...vals, id }));
-		this.tierMap = Object.entries(tiers_promise).reduce(
-			(acc, [id, tier]) => ({ ...acc, [id]: tier.name }),
-			{}
-		);
-		this.loading_tiers = false;
+		this.active_promotion = await this.getActivePromotion();
 	},
 };
 </script>

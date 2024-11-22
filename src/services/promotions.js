@@ -14,14 +14,22 @@ export class promotionService {
 		return PROMOTION_REF.on("value", callback);
 	}
 
-	static async getValidPromotions() {
+	static async getAllActivePromotions() {
 		const promotions = (await PROMOTION_REF.once("value")).val();
 		const server_time = await serverUtils.getServerTime();
 		return Object.values(promotions).filter((promotion) => {
-			const valid_until = new Date(promotion.valid_until);
-			valid_until.setDate(valid_until.getDate() + 1);
-			return promotion.disabled === undefined && server_time < valid_until;
+			const active_from = new Date(promotion.active_from);
+			const active_until = new Date(promotion.active_until);
+			active_until.setDate(active_until.getDate() + 1);
+			return (
+				promotion.disabled === undefined && server_time < active_until && server_time > active_from
+			);
 		});
+	}
+
+	static async getFirstActivePromotion() {
+		const promotions = await this.getAllActivePromotions();
+		return promotions.length > 0 ? promotions[0] : undefined;
 	}
 
 	static async addNewPromotion(promotion_object) {

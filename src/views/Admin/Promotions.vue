@@ -88,6 +88,19 @@
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
+									:disable="update_promotion"
+									type="number"
+									autocomplete="off"
+									v-model="newPromotion.discount"
+									name="discount"
+									label="Discount"
+									:rules="[(val) => !!val || 'Field is required']"
+								/>
+								<q-input
+									class="mb-2"
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
 									type="text"
 									autocomplete="off"
 									v-model="newPromotion.title"
@@ -95,20 +108,6 @@
 									label="Title"
 									:rules="[(val) => !!val || 'Field is required']"
 								/>
-
-								<q-input
-									class="mb-2"
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									type="textarea"
-									autocomplete="off"
-									v-model="newPromotion.text"
-									name="text"
-									label="Text"
-									:rules="[(val) => !!val || 'Field is required']"
-								/>
-
 								<q-input
 									class="mb-2"
 									:dark="$store.getters.theme === 'dark'"
@@ -210,9 +209,10 @@ export default {
 					align: "left",
 				},
 				{
-					name: "text",
-					label: "Text",
-					field: "text",
+					name: "discount",
+					label: "Discount",
+					field: "discount",
+					sortable: true,
 					align: "left",
 				},
 				{

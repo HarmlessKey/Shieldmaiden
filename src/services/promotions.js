@@ -29,25 +29,15 @@ export class promotionService {
 		return PROMOTION_REF.child(promotion_object.code).set(promotion_object);
 	}
 
-	static async deletePromotion(promotion_name) {
-		return PROMOTION_REF.child(promotion_name).remove();
+	static async deletePromotion(promotion_code) {
+		return PROMOTION_REF.child(promotion_code).remove();
 	}
 
-	static async disablePromotion(promotion_name) {
-		return PROMOTION_REF.child(promotion_name).child("disabled").set(true);
+	static async disablePromotion(promotion_code) {
+		return PROMOTION_REF.child(promotion_code).child("disabled").set(true);
 	}
 
-	static async enablePromotion(promotion_name) {
-		return PROMOTION_REF.child(promotion_name).child("disabled").remove();
-	}
-
-	static async incrementPromotionUsage(promotion_name) {
-		return PROMOTION_REF.child(promotion_name)
-			.child("times_used")
-			.set(firebase.database.ServerValue.increment(1));
-	}
-
-	static async getPromotionTiers() {
-		return (await TIERS_REF.once("value")).val();
+	static async enablePromotion(promotion_code) {
+		return PROMOTION_REF.child(promotion_code).child("disabled").remove();
 	}
 }

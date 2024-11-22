@@ -37,7 +37,7 @@
 									<a
 										v-if="!props.row.disabled"
 										class="btn btn-sm bg-neutral-5 mr-2"
-										@click="disablePromotion(props.row.promotion)"
+										@click="disablePromotion(props.row.code)"
 									>
 										<i class="fas fa-times-square" aria-hidden="true" />
 										<q-tooltip anchor="top middle" self="center middle">
@@ -47,7 +47,7 @@
 									<a
 										v-else
 										class="btn btn-sm bg-neutral-5 mr-2"
-										@click="enablePromotion(props.row.promotion)"
+										@click="enablePromotion(props.row.code)"
 									>
 										<i class="fas fa-check-square" aria-hidden="true" />
 										<q-tooltip anchor="top middle" self="center middle">
@@ -55,7 +55,7 @@
 										</q-tooltip>
 									</a>
 								</template>
-								<a class="btn btn-sm bg-neutral-5" @click="deletePromotion(props.row.promotion)">
+								<a class="btn btn-sm bg-neutral-5" @click="deletePromotion(props.row.code)">
 									<i class="fas fa-trash-alt" aria-hidden="true" />
 									<q-tooltip anchor="top middle" self="center middle"> Delete promotion </q-tooltip>
 								</a>

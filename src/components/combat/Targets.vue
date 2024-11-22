@@ -351,10 +351,10 @@ ul.targets {
 
 	li {
 		margin-bottom: 8px;
-		border: solid 1px transparent;
+		// border: solid 1px transparent;
 		cursor: pointer;
-		background: $neutral-8;
-		border-radius: $border-radius-small;
+		// background: $neutral-8;
+		// border-radius: $border-radius-small;
 
 		&.targeted {
 			outline: $blue solid 3px;

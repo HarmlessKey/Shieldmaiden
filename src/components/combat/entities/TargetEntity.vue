@@ -38,6 +38,11 @@ export default {
 	align-items: center;
 	gap: 10px;
 
+	&__container {
+		.health-bar {
+			// margin-top: 10px;
+		}
+	}
 	.target-avatar {
 		width: 50px;
 		height: 50px;

@@ -25,9 +25,8 @@ export class promotionService {
 	}
 
 	static async addNewPromotion(promotion_object) {
-		promotion_object.promotion = promotion_object.promotion.toUpperCase();
-		promotion_object.times_used = 0;
-		return PROMOTION_REF.child(promotion_object.promotion).set(promotion_object);
+		promotion_object.code = promotion_object.code.toUpperCase();
+		return PROMOTION_REF.child(promotion_object.code).set(promotion_object);
 	}
 
 	static async deletePromotion(promotion_name) {

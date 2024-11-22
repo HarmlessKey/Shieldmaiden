@@ -78,36 +78,22 @@
 									:disable="update_promotion"
 									type="text"
 									autocomplete="off"
-									v-model="newPromotion.promotion"
-									name="promotion"
-									label="Promotion"
+									v-model="newPromotion.code"
+									name="code"
+									label="Code"
 									:rules="[(val) => !!val || 'Field is required']"
-								/>
-								<q-select
-									class="mb-2"
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									:options="tier_select"
-									map-options
-									emit-value
-									type="text"
-									autocomplete="off"
-									v-model="newPromotion.tier"
-									:rules="[(val) => !!val || 'Field is required']"
-									label="Tier"
 								/>
 								<q-input
 									class="mb-2"
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
-									type="number"
+									type="text"
 									autocomplete="off"
-									v-model.number="newPromotion.duration"
+									v-model="newPromotion.title"
+									name="title"
+									label="Title"
 									:rules="[(val) => !!val || 'Field is required']"
-									label="Duration"
-									suffix="Months"
 								/>
 
 								<q-input
@@ -115,15 +101,56 @@
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
-									v-model="newPromotion.valid_until"
-									label="Valid Until (MM/DD/YYYY)"
+									type="textarea"
+									autocomplete="off"
+									v-model="newPromotion.text"
+									name="text"
+									label="Text"
+									:rules="[(val) => !!val || 'Field is required']"
+								/>
+
+								<q-input
+									class="mb-2"
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									v-model="newPromotion.active_from"
+									label="Active From (MM/DD/YYYY)"
 									:rules="[(val) => !!val || 'Field is required']"
 								>
 									<template v-slot:append>
 										<q-icon name="event" class="cursor-pointer">
 											<q-popup-proxy cover transition-show="scale" transition-hide="scale">
 												<q-date
-													v-model="newPromotion.valid_until"
+													v-model="newPromotion.active_from"
+													mask="MM/DD/YYYY"
+													:dark="$store.getters.theme === 'dark'"
+													filled
+													square
+												>
+													<div class="row items-center justify-end">
+														<q-btn v-close-popup label="Close" color="primary" flat />
+													</div>
+												</q-date>
+											</q-popup-proxy>
+										</q-icon>
+									</template>
+								</q-input>
+
+								<q-input
+									class="mb-2"
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									v-model="newPromotion.active_until"
+									label="Active Until (MM/DD/YYYY)"
+									:rules="[(val) => !!val || 'Field is required']"
+								>
+									<template v-slot:append>
+										<q-icon name="event" class="cursor-pointer">
+											<q-popup-proxy cover transition-show="scale" transition-hide="scale">
+												<q-date
+													v-model="newPromotion.active_until"
 													mask="MM/DD/YYYY"
 													:dark="$store.getters.theme === 'dark'"
 													filled
@@ -153,10 +180,9 @@
 <script>
 import { promotionService } from "src/services/promotions";
 import { monsterMixin } from "src/mixins/monster";
-import { legacy_tiers } from "src/utils/generalConstants";
 
 export default {
-	name: "GenerateSearchTable",
+	name: "Promotions",
 	mixins: [monsterMixin],
 	data() {
 		return {
@@ -170,38 +196,36 @@ export default {
 			tierMap: {},
 			columns: [
 				{
-					name: "promotion",
-					label: "Promotion",
-					field: "promotion",
+					name: "code",
+					label: "Code",
+					field: "code",
 					sortable: true,
 					align: "left",
 				},
 				{
-					name: "tier",
-					label: "Tier",
-					field: "tier",
-					align: "left",
+					name: "title",
+					label: "Title",
+					field: "title",
 					sortable: true,
-					format: (val) => this.tierMap[val],
+					align: "left",
 				},
 				{
-					name: "duration",
-					label: "Duration",
-					field: "duration",
+					name: "text",
+					label: "Text",
+					field: "text",
+					align: "left",
+				},
+				{
+					name: "active_from",
+					label: "Active From",
+					field: "active_from",
 					align: "left",
 					sortable: true,
 				},
 				{
-					name: "valid_until",
-					label: "Valid Until",
-					field: "valid_until",
-					align: "left",
-					sortable: true,
-				},
-				{
-					name: "times_used",
-					label: "Times Used",
-					field: "times_used",
+					name: "active_until",
+					label: "Active Until",
+					field: "active_until",
 					align: "left",
 					sortable: true,
 				},
@@ -209,13 +233,6 @@ export default {
 		};
 	},
 	computed: {
-		tier_select() {
-			let tier_list = this.tiers;
-			tier_list.sort((a, b) => a.order - b.order);
-			return tier_list
-				.filter((tier) => tier.order > 0 && !legacy_tiers.includes(tier.id))
-				.map((tier) => ({ label: tier.name, value: tier.id }));
-		},
 		loading() {
 			return this.loading_promotions || this.loading_tiers;
 		},
@@ -230,9 +247,6 @@ export default {
 			} catch (error) {
 				this.$snotify.error(error);
 			}
-		},
-		async getTierName(id) {
-			return await promotionService.getTierName(id);
 		},
 		async deletePromotion(promotion_name) {
 			await promotionService.deletePromotion(promotion_name);

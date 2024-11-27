@@ -118,7 +118,7 @@ export default {
 			},
 			twitterImage: {
 				name: "twitter:image",
-				content: "https://shieldmaiden.app/shieldmaiden_logo_full.png",
+				content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
 			},
 			twitterSite: {
 				name: "twitter:site",
@@ -151,7 +151,7 @@ export default {
 			},
 			ogImage: {
 				property: "og:image",
-				content: `https://shieldmaiden.app/linkedin.png`,
+				content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
 			},
 			ogImageType: {
 				property: "og:image:type",

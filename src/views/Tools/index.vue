@@ -30,23 +30,22 @@
 										tool.image
 											? {
 													backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${tool.image}`)})`,
-											  }
+												}
 											: '',
 									]"
-								>
-									<i :class="tool.icon" aria-hidden="true" />
-								</div>
-								<div slot="header" class="card-header">
-									{{ tool.title }}
-								</div>
+								></div>
 								<div class="card-body">
+									<div class="header">
+										<i :class="tool.icon" aria-hidden="true" class="mr-1" />
+										{{ tool.title }}
+									</div>
 									{{ tool.description }}
 								</div>
-								<div slot="footer" class="card-footer">
+								<div slot="footer" class="footer">
 									<div v-if="tool.under_development" class="red full-width text-center">
 										Under development
 									</div>
-									<button v-else class="btn btn-block">Use {{ tool.title }}</button>
+									<button v-else class="btn btn-sm">Use {{ tool.title }}</button>
 								</div>
 							</hk-card>
 						</router-link>
@@ -79,7 +78,7 @@ export default {
 							title: "Combat Tracker",
 							description:
 								"Track everything in your encounters and share initiative with your players.",
-							image: "dragon-encounter-medium.jpg",
+							image: "combat-tracker-medium.webp",
 							url: "/tools/combat-tracker",
 							icon: "fas fa-swords",
 						},
@@ -165,14 +164,17 @@ a {
 }
 .hk-card.tool {
 	transition: all 0.5s ease-in;
+	background-color: $neutral-7;
 
-	.card-header {
-		transition: all 0.5s ease-in;
-		min-height: 32px;
-		font-size: 21px;
+	.header {
+		font-size: 18px;
+		font-weight: bold;
+		margin-bottom: 10px;
+	}
+	.footer {
+		padding: 0 20px 20px 20px;
 	}
 	.card-image {
-		filter: grayscale(50%);
 		transition: all 0.5s ease-in-out;
 		font-size: 95px;
 		width: inherit;
@@ -182,14 +184,6 @@ a {
 	}
 	&:hover {
 		background-color: $neutral-5;
-		border-color: $neutral-4;
-
-		.card-header {
-			background-color: $neutral-7;
-		}
-		.card-image {
-			filter: grayscale(0%);
-		}
 	}
 }
 </style>

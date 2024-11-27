@@ -1,5 +1,5 @@
 <template>
-	<ToolsPage title="Combat Tracker" bg_img="dragon-encounter-tool-header.jpg">
+	<ToolsPage title="Combat Tracker" bg_img="combat-tracker-header.webp">
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn color="primary" :class="btn_classes" no-caps push to="/demo">Try Demo Encounter</q-btn>
 		</template>
@@ -102,6 +102,20 @@ export default {
 		return {
 			tracker: combat_tracker_texts.filter((item) => item.name !== "more"),
 			share: live_initiative_texts,
+		};
+	},
+	meta() {
+		return {
+			meta: {
+				twitterImage: {
+					name: "twitter:image",
+					content: require(`assets/_img/meta/shieldmaiden-combat-tracker.png`),
+				},
+				ogImage: {
+					property: "og:image",
+					content: require(`assets/_img/meta/shieldmaiden-combat-tracker.png`),
+				},
+			},
 		};
 	},
 };

@@ -86,7 +86,19 @@
 							v-shortkey="[i]"
 							@shortkey="set_targeted({ type: 'single', key: entity.key })"
 						>
-							<TargetEntity :entity="entity" />
+							<TargetEntity :entity="entity">
+								<a slot="actions" class="options">
+									<i aria-hidden="true" class="fal fa-ellipsis-v" />
+									<q-popup-proxy
+										:dark="$store.getters.theme === 'dark'"
+										anchor="bottom right"
+										self="top right"
+										:breakpoint="576"
+									>
+										<target-menu :entity="entity" />
+									</q-popup-proxy>
+								</a>
+							</TargetEntity>
 						</div>
 						<div v-if="!entity.active" class="d-flex">
 							<a
@@ -117,17 +129,6 @@
 								<q-tooltip anchor="top middle" self="center middle"> Add now </q-tooltip>
 							</a>
 						</div>
-						<a class="options">
-							<i aria-hidden="true" class="fal fa-ellipsis-v" />
-							<q-popup-proxy
-								:dark="$store.getters.theme === 'dark'"
-								anchor="bottom right"
-								self="top right"
-								:breakpoint="576"
-							>
-								<target-menu :entity="entity" />
-							</q-popup-proxy>
-						</a>
 						<TutorialPopover
 							v-if="demo && group === 'active' && i === 1"
 							tutorial="run"

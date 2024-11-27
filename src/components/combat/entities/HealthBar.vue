@@ -51,18 +51,25 @@ export default {
 <style lang="scss" scoped>
 .health-bar {
 	width: 100%;
-	background-color: $neutral-9;
-	height: 15px;
-	// border-radius: 999px;
-	overflow: hidden;
+	// overflow: hidden;
 	display: flex;
-	gap: 1px;
+	gap: 2px;
 	text-align: center;
 	font-size: 12px;
+	background-color: $neutral-9;
+	border-radius: 999px;
+	align-items: center;
 
 	&__main {
 		width: 100%;
 		position: relative;
+		background-color: $neutral-9;
+		border-radius: 999px;
+		overflow: hidden;
+		border: solid 3px $neutral-9;
+		height: 8px;
+		box-sizing: content-box;
+		align-items: center;
 
 		> div {
 			height: 100%;
@@ -71,19 +78,24 @@ export default {
 			background-color: $neutral-4;
 		}
 		&-modifier {
-			// background-color: #ffffff30;
-			border-left: solid 1px $neutral-5;
 			position: absolute;
-			right: -1px;
+			right: 0;
 			top: 0;
+			border-left: solid 2px $neutral-2;
 
 			&.negative {
-				background-color: $neutral-11;
+				background-color: $neutral-5;
+				outline: none;
+				border-color: $neutral-9;
 			}
 		}
 	}
 	&__temporary {
-		background-color: $neutral-4;
+		height: 10px;
+		box-sizing: content-box;
+		border: solid 3px $neutral-9;
+		background-color: $neutral-2;
+		border-radius: 999px;
 	}
 }
 </style>

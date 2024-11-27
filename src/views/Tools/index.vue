@@ -4,21 +4,8 @@
 			<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D 5e Tools</h1>
 		</div>
 		<div class="card-body">
-			<SignedIn v-if="user" />
-			<h2>
-				Online tools to enhance and simplify every aspect of your tabletop role-playing experience.
-			</h2>
-			<p>
-				Designed with the Dungeon Master in mind, our suite of tools is a comprehensive resource to
-				streamline and enrich every facet of your storytelling journey. From managing combat
-				encounters with our initiative tracker and creating unique monsters to seamlessly guiding
-				the narrative with a digital DM screen, our tools provide the essential support needed for
-				Dungeon Masters to create immersive and dynamic adventures. Dive into a realm where our
-				tools serve as your digital assistant, helping you master the art of storytelling and
-				deliver unparalleled experiences to your players.
-			</p>
 			<template v-for="(group, i) in tools">
-				<h2 :key="`title-${i}`" :class="{ 'mt-5': i > 0 }">{{ group.title }}</h2>
+				<h2 :key="`title-${i}`" :class="{ 'mt-3': i > 0 }">{{ group.title }}</h2>
 				<div class="row q-col-gutter-md" :key="i" :class="{ 'pb-2': i === 0 }">
 					<div v-for="(tool, key) in group.tools" class="col-12 col-sm-6 col-md-4" :key="key">
 						<router-link :to="tool.url">
@@ -52,19 +39,27 @@
 					</div>
 				</div>
 			</template>
+			<h2 class="mt-3">
+				Online tools to enhance and simplify every aspect of your tabletop role-playing experience.
+			</h2>
+			<p>
+				Designed with the Dungeon Master in mind, our suite of tools is a comprehensive resource to
+				streamline and enrich every facet of your storytelling journey. From managing combat
+				encounters with our initiative tracker and creating unique monsters to seamlessly guiding
+				the narrative with a digital DM screen, our tools provide the essential support needed for
+				Dungeon Masters to create immersive and dynamic adventures. Dive into a realm where our
+				tools serve as your digital assistant, helping you master the art of storytelling and
+				deliver unparalleled experiences to your players.
+			</p>
 		</div>
 	</hk-card>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import SignedIn from "src/components/userContent/SignedIn.vue";
 
 export default {
 	name: "ToolsOverview",
-	components: {
-		SignedIn,
-	},
 	computed: {
 		...mapGetters(["user"]),
 	},
@@ -158,6 +153,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h2 {
+	line-height: 25px;
+}
 a {
 	all: unset;
 	cursor: pointer;

@@ -115,6 +115,10 @@ export default {
 					property: "og:image",
 					content: require(`assets/_img/meta/shieldmaiden-combat-tracker.png`),
 				},
+				ogImageAlt: {
+					property: "og:image:alt",
+					content: "Shieldmaiden Combat Tracker",
+				},
 			},
 		};
 	},

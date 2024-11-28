@@ -275,9 +275,11 @@ export default {
 		async disablePromotion(promotion_code) {
 			await promotionService.disablePromotion(promotion_code);
 		},
-		setPromotions(snapshot) {
+		async setPromotions(snapshot) {
+			console.log("SET PROMO", snapshot);
 			this.promotions = snapshot.val() ? Object.values(snapshot.val()) : [];
 			this.loading_promotions = false;
+			this.active_promotion = await this.getActivePromotion();
 		},
 		promotionIsActive(promotion) {
 			console.log(this.active_promotion, promotion);
@@ -285,9 +287,6 @@ export default {
 				return false;
 			}
 			return promotion?.code === this.active_promotion?.code;
-		},
-		async getActivePromotions() {
-			return await promotionService.getAllActivePromotions();
 		},
 		async getActivePromotion() {
 			return await promotionService.getFirstActivePromotion();

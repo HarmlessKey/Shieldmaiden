@@ -265,7 +265,6 @@ export default {
 			this.add = true;
 			this.update_promotion = true;
 			this.newPromotion = promotion;
-			console.log(this.newPromotion, promotion);
 		},
 		async enablePromotion(promotion_code) {
 			await promotionService.enablePromotion(promotion_code);
@@ -274,13 +273,11 @@ export default {
 			await promotionService.disablePromotion(promotion_code);
 		},
 		async setPromotions(snapshot) {
-			console.log("SET PROMO", snapshot);
 			this.promotions = snapshot.val() ? Object.values(snapshot.val()) : [];
 			this.loading_promotions = false;
 			this.active_promotion = await this.getActivePromotion();
 		},
 		promotionIsActive(promotion) {
-			console.log(this.active_promotion, promotion);
 			if (!this.active_promotion) {
 				return false;
 			}

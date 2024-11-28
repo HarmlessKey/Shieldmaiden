@@ -65,7 +65,6 @@ export default {
 		days_remaining() {
 			const diff = new Date(this.active_promotion.active_until) - this.now;
 			const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-			console.log(this.active_promotion, diff, days);
 			return days >= 1 ? days : undefined;
 		},
 		hours_remaining() {

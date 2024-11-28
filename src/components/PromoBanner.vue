@@ -12,19 +12,19 @@
 		</button>
 		<div class="promo-banner__body">
 			<div class="discount">
-				<div class="discount__percentage">{{ discount }}</div>
+				<div class="discount__percentage">{{ active_promotion.discount }}</div>
 				<div class="discount__off">OFF</div>
 			</div>
 			<div>
 				<div class="code">
 					Use promo code
-					<div>{{ code }}</div>
+					<div>{{ active_promotion.code }}</div>
 				</div>
 			</div>
 		</div>
 		<div class="promo-banner__footer">
 			<div class="remaining">
-				Get your first month with a <strong>{{ discount }}%</strong> discount.
+				Get your first month with a <strong>{{ active_promotion.discount }}%</strong> discount.
 				<template v-if="hours_remaining <= 1">Less than </template>
 				<span class="remaining__count">{{
 					days_remaining ? days_remaining : hours_remaining
@@ -38,6 +38,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { promotionService } from "src/services/promotions";
 
 export default {
 	name: "PromoBanner",
@@ -49,38 +50,40 @@ export default {
 	},
 	data() {
 		return {
+			active_promotion: undefined,
 			code: "SHIELDMAIDEN80",
-			discount: 80,
 			now: new Date(),
-			start: new Date("2024-11-15T00:00:00Z"),
-			end: new Date("2024-12-03T07:59:59Z"),
 			showSetter: undefined,
 			timer: null,
 		};
 	},
 	computed: {
 		...mapGetters(["tier"]),
-		show_banner: {
-			get() {
-				const show =
-					(this.tier?.price === "Free" || !this.tier) &&
-					this.now >= this.start &&
-					this.now <= this.end;
-				return this.showSetter !== undefined ? this.showSetter : show;
-			},
-			set(newVal) {
-				this.showSetter = newVal;
-			},
+		show_banner() {
+			return this.active_promotion && (this.tier?.price === "Free" || !this.tier);
 		},
 		days_remaining() {
-			const diff = this.end - this.now;
+			const diff = new Date(this.active_promotion.active_until) - this.now;
 			const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+			console.log(this.active_promotion, diff, days);
 			return days >= 1 ? days : undefined;
 		},
 		hours_remaining() {
-			const diff = this.end - this.now;
+			const diff = new Date(this.active_promotion.active_until) - this.now;
 			const hours = Math.floor(diff / (1000 * 60 * 60));
 			return hours;
+		},
+	},
+	methods: {
+		copyCode(event) {
+			event.preventDefault();
+			navigator.clipboard.writeText(this.active_promotion.code);
+			this.$snotify.success("To clipboard", "Code Copied!", {
+				position: "rightTop",
+			});
+		},
+		async getActivePromotion() {
+			return await promotionService.getFirstActivePromotion();
 		},
 	},
 	methods: {
@@ -90,9 +93,10 @@ export default {
 			});
 		},
 	},
-	mounted() {
-		if (this.show_banner) {
-			this.$emit("discount", this.discount);
+	async mounted() {
+		this.active_promotion = await this.getActivePromotion();
+		if (this.show_banner && this.active_promotion) {
+			this.$emit("discount", this.active_promotion.discount);
 		}
 		this.timer = setInterval(() => {
 			this.now = new Date();

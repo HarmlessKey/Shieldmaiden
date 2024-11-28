@@ -189,11 +189,9 @@
 
 <script>
 import { promotionService } from "src/services/promotions";
-import { monsterMixin } from "src/mixins/monster";
 
 export default {
 	name: "Promotions",
-	mixins: [monsterMixin],
 	data() {
 		return {
 			add: false,

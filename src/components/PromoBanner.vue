@@ -16,7 +16,7 @@
 				<div class="discount__off">OFF</div>
 			</div>
 			<div>
-				<div class="code">
+				<div class="code" @click="copyCode">
 					Use promo code
 					<div>{{ active_promotion.code }}</div>
 				</div>
@@ -141,6 +141,9 @@ export default {
 
 		.code {
 			color: $neutral-2;
+			:hover {
+				color: $primary;
+			}
 
 			> div {
 				color: $white;

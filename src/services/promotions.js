@@ -5,6 +5,9 @@ import { serverUtils } from "src/services/serverUtils";
 const PROMOTION_REF = db.ref("promotions");
 const TIERS_REF = db.ref("tiers");
 
+const START_TZ = "Z"; // UTC
+const END_TZ = "-07:00"; // PACIFIC TIME
+
 export class promotionService {
 	static async getAllPromotions() {
 		return (await PROMOTION_REF.once("value")).val();
@@ -18,11 +21,12 @@ export class promotionService {
 		const promotions = (await PROMOTION_REF.once("value")).val();
 		const server_time = await serverUtils.getServerTime();
 		return Object.values(promotions).filter((promotion) => {
-			const active_from = new Date(promotion.active_from);
-			const active_until = new Date(promotion.active_until);
-			active_until.setDate(active_until.getDate() + 1);
+			promotion.active_from = new Date(`${promotion.active_from}T00:00:00${START_TZ}`);
+			promotion.active_until = new Date(`${promotion.active_until}T00:00:00${END_TZ}`);
 			return (
-				promotion.disabled === undefined && server_time < active_until && server_time > active_from
+				promotion.disabled === undefined &&
+				server_time < promotion.active_until &&
+				server_time > promotion.active_from
 			);
 		});
 	}

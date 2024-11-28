@@ -63,12 +63,13 @@ export default {
 			return this.active_promotion && (this.tier?.price === "Free" || !this.tier);
 		},
 		days_remaining() {
-			const diff = new Date(this.active_promotion.active_until) - this.now;
+			const diff = this.active_promotion.active_until - this.now;
+			console.log(diff, this.active_promotion.active_until);
 			const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 			return days >= 1 ? days : undefined;
 		},
 		hours_remaining() {
-			const diff = new Date(this.active_promotion.active_until) - this.now;
+			const diff = this.active_promotion.active_until - this.now;
 			const hours = Math.floor(diff / (1000 * 60 * 60));
 			return hours;
 		},

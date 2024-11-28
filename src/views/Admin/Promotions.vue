@@ -119,7 +119,7 @@
 									filled
 									square
 									v-model="newPromotion.active_from"
-									label="Active From (MM/DD/YYYY)"
+									label="Active From (YYYY-MM-DD)"
 									:rules="[(val) => !!val || 'Field is required']"
 								>
 									<template v-slot:append>
@@ -127,7 +127,7 @@
 											<q-popup-proxy cover transition-show="scale" transition-hide="scale">
 												<q-date
 													v-model="newPromotion.active_from"
-													mask="MM/DD/YYYY"
+													mask="YYYY-MM-DD"
 													:dark="$store.getters.theme === 'dark'"
 													filled
 													square
@@ -147,7 +147,7 @@
 									filled
 									square
 									v-model="newPromotion.active_until"
-									label="Active Until (MM/DD/YYYY)"
+									label="Active Until (YYYY-MM-DD)"
 									:rules="[(val) => !!val || 'Field is required']"
 								>
 									<template v-slot:append>
@@ -155,7 +155,7 @@
 											<q-popup-proxy cover transition-show="scale" transition-hide="scale">
 												<q-date
 													v-model="newPromotion.active_until"
-													mask="MM/DD/YYYY"
+													mask="YYYY-MM-DD"
 													:dark="$store.getters.theme === 'dark'"
 													filled
 													square

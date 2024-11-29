@@ -5,6 +5,7 @@
 		href="https://www.patreon.com/shieldmaidenapp/membership"
 		target="_blank"
 		rel="noopener"
+		@click="purchaseEvent"
 	>
 		<button v-if="closable" class="no-thanks" @click.stop.prevent="show_banner = false">
 			no thanks
@@ -80,6 +81,13 @@ export default {
 			const diff = this.end - this.now;
 			const hours = Math.floor(diff / (1000 * 60 * 60));
 			return hours;
+		},
+	},
+	methods: {
+		purchaseEvent() {
+			this.$gtm.trackEvent({
+				event: "purchase",
+			});
 		},
 	},
 	mounted() {

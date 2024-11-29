@@ -4,6 +4,9 @@
 			<PromoBanner class="mb-5" :closable="false" @discount="setDiscount" />
 		</q-no-ssr>
 		<div v-if="!loading">
+			<div class="d-flex justify-content-center mb-4">
+				<q-toggle v-model="annually" size="lg"> <strong>Pay annually</strong> (save 10%) </q-toggle>
+			</div>
 			<hk-card-deck>
 				<template v-for="(t, key) in tiers">
 					<hk-card
@@ -21,11 +24,11 @@
 									class="price"
 									:class="{
 										'patreon-red': t.name === 'Free',
-										strike: discount && t.name !== 'Free',
+										strike: discount && !annually && t.name !== 'Free',
 									}"
-									>{{ t.price }}</span
+									>{{ t.name === "Free" ? t.price : `$${price(t.price)}` }}</span
 								>
-								<span v-if="discount && t.name !== 'Free'" class="price"
+								<span v-if="discount && !annually && t.name !== 'Free'" class="price"
 									>${{ discountPrice(t.price) }}</span
 								>
 								<em v-if="t.price === 'Free'" class="neutral-2 sub">forever</em>
@@ -112,12 +115,12 @@
 							</router-link>
 							<a
 								v-else
-								:href="'https://www.patreon.com/join/shieldmaidenapp/checkout?rid=' + t['.key']"
+								:href="`https://www.patreon.com/join/shieldmaidenapp/checkout?rid=${t['.key']}&cadence=${annually ? 12 : 1}`"
 								target="_blank"
 								rel="noopener"
 								class="btn btn-block btn-square bg-patreon-red"
 								@click="selectTier(t)"
-								>Join {{ t.price }} tier</a
+								>Join {{ `$${price(t.price)}` }} tier</a
 							>
 						</div>
 					</hk-card>
@@ -155,6 +158,7 @@ export default {
 			loading: true,
 			show_storage: false,
 			discount: undefined,
+			annually: false,
 			default_benefits: [
 				"Combat tracker",
 				"Encounter builder",
@@ -205,12 +209,17 @@ export default {
 		},
 		selectTier(t) {
 			this.$gtm.trackEvent({
-				event: "subscribe",
+				event: "purchase",
 				tier: t.name,
+				cadence: this.annually ? 12 : 1,
 			});
 		},
 		setDiscount(discount) {
 			this.discount = discount;
+		},
+		price(price) {
+			price = Number(price.slice(1));
+			return this.annually ? (price * 0.9).toFixed(2) : price;
 		},
 		discountPrice(price) {
 			price = Number(price.slice(1));

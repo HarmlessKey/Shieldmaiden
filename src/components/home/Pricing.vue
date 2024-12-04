@@ -4,8 +4,12 @@
 			<div class="head">
 				<h2>Pricing</h2>
 				<div class="text">
-					Shieldmaiden has a free tier that gives access to al our core features, including our
-					Combat Tracker and Encounter Builder.
+					<p class="mb-4">
+						All of our core features are available for free, forever. For DMs running larger
+						campaigns and/or wanting some extra functionality, there's paid tiers offering extra
+						storage & features.
+					</p>
+					Your support helps us keep the app afloat & spend more time improving it. Thank you!
 				</div>
 			</div>
 			<Tiers class="mb-4" />

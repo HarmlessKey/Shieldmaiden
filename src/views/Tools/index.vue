@@ -4,21 +4,8 @@
 			<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D 5e Tools</h1>
 		</div>
 		<div class="card-body">
-			<SignedIn v-if="user" />
-			<h2>
-				Online tools to enhance and simplify every aspect of your tabletop role-playing experience.
-			</h2>
-			<p>
-				Designed with the Dungeon Master in mind, our suite of tools is a comprehensive resource to
-				streamline and enrich every facet of your storytelling journey. From managing combat
-				encounters with our initiative tracker and creating unique monsters to seamlessly guiding
-				the narrative with a digital DM screen, our tools provide the essential support needed for
-				Dungeon Masters to create immersive and dynamic adventures. Dive into a realm where our
-				tools serve as your digital assistant, helping you master the art of storytelling and
-				deliver unparalleled experiences to your players.
-			</p>
 			<template v-for="(group, i) in tools">
-				<h2 :key="`title-${i}`" :class="{ 'mt-5': i > 0 }">{{ group.title }}</h2>
+				<h2 :key="`title-${i}`" :class="{ 'mt-3': i > 0 }">{{ group.title }}</h2>
 				<div class="row q-col-gutter-md" :key="i" :class="{ 'pb-2': i === 0 }">
 					<div v-for="(tool, key) in group.tools" class="col-12 col-sm-6 col-md-4" :key="key">
 						<router-link :to="tool.url">
@@ -30,42 +17,49 @@
 										tool.image
 											? {
 													backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${tool.image}`)})`,
-											  }
+												}
 											: '',
 									]"
-								>
-									<i :class="tool.icon" aria-hidden="true" />
-								</div>
-								<div slot="header" class="card-header">
-									{{ tool.title }}
-								</div>
+								></div>
 								<div class="card-body">
+									<div class="header">
+										<i :class="tool.icon" aria-hidden="true" class="mr-1" />
+										{{ tool.title }}
+									</div>
 									{{ tool.description }}
 								</div>
-								<div slot="footer" class="card-footer">
+								<div slot="footer" class="footer">
 									<div v-if="tool.under_development" class="red full-width text-center">
 										Under development
 									</div>
-									<button v-else class="btn btn-block">Use {{ tool.title }}</button>
+									<button v-else class="btn btn-sm">Use {{ tool.title }}</button>
 								</div>
 							</hk-card>
 						</router-link>
 					</div>
 				</div>
 			</template>
+			<h2 class="mt-3">
+				Online tools to enhance and simplify every aspect of your tabletop role-playing experience.
+			</h2>
+			<p>
+				Designed with the Dungeon Master in mind, our suite of tools is a comprehensive resource to
+				streamline and enrich every facet of your storytelling journey. From managing combat
+				encounters with our initiative tracker and creating unique monsters to seamlessly guiding
+				the narrative with a digital DM screen, our tools provide the essential support needed for
+				Dungeon Masters to create immersive and dynamic adventures. Dive into a realm where our
+				tools serve as your digital assistant, helping you master the art of storytelling and
+				deliver unparalleled experiences to your players.
+			</p>
 		</div>
 	</hk-card>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import SignedIn from "src/components/userContent/SignedIn.vue";
 
 export default {
 	name: "ToolsOverview",
-	components: {
-		SignedIn,
-	},
 	computed: {
 		...mapGetters(["user"]),
 	},
@@ -79,7 +73,7 @@ export default {
 							title: "Combat Tracker",
 							description:
 								"Track everything in your encounters and share initiative with your players.",
-							image: "dragon-encounter-medium.jpg",
+							image: "combat-tracker-medium.webp",
 							url: "/tools/combat-tracker",
 							icon: "fas fa-swords",
 						},
@@ -159,20 +153,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h2 {
+	line-height: 25px;
+}
 a {
 	all: unset;
 	cursor: pointer;
 }
 .hk-card.tool {
 	transition: all 0.5s ease-in;
+	background-color: $neutral-7;
 
-	.card-header {
-		transition: all 0.5s ease-in;
-		min-height: 32px;
-		font-size: 21px;
+	.header {
+		font-size: 18px;
+		font-weight: bold;
+		margin-bottom: 10px;
+	}
+	.footer {
+		padding: 0 20px 20px 20px;
 	}
 	.card-image {
-		filter: grayscale(50%);
 		transition: all 0.5s ease-in-out;
 		font-size: 95px;
 		width: inherit;
@@ -182,14 +182,6 @@ a {
 	}
 	&:hover {
 		background-color: $neutral-5;
-		border-color: $neutral-4;
-
-		.card-header {
-			background-color: $neutral-7;
-		}
-		.card-image {
-			filter: grayscale(0%);
-		}
 	}
 }
 </style>

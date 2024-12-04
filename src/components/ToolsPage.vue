@@ -4,9 +4,7 @@
 			<h1>{{ title }} for D&D 5e</h1>
 			<slot name="action_btn" />
 		</div>
-		<div slot="image" class="card-image" :style="{ backgroundImage: `url(${img})` }">
-			D&D {{ title }}
-		</div>
+		<div slot="image" class="card-image" :style="{ backgroundImage: `url(${img})` }"></div>
 		<div class="card-body">
 			<SignedIn v-if="user && showSignedIn" />
 			<slot />

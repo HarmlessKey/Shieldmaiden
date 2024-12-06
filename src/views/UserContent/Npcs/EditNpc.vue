@@ -270,10 +270,10 @@ export default {
 							for (const roll of sub_action.rolls) {
 								roll.options = {
 									[versTwoName]: {
-										damage_type: roll.versatile_damage_type,
-										dice_count: roll.versatile_dice_count,
-										dice_type: roll.versatile_dice_type,
-										fixed_val: roll.versatile_fixed_val,
+										damage_type: roll.versatile_damage_type || null,
+										dice_count: roll.versatile_dice_count || null,
+										dice_type: roll.versatile_dice_type || null,
+										fixed_val: roll.versatile_fixed_val || null,
 									},
 								};
 								delete roll.versatile_damage_type;

@@ -1,7 +1,7 @@
 <template>
 	<div class="general">
-		<div class="container">
-			<div class="row q-col-gutter-xl mb-5 items-center">
+		<div class="home__container">
+			<div class="row q-col-gutter-xl items-center">
 				<div class="col-12 col-md-7">
 					<img
 						src="~assets/_img/combat-tracker-shieldmaiden.webp"

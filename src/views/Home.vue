@@ -8,7 +8,7 @@
 	>
 		<Header :scrolled="!!scrolled" />
 		<template v-if="diceColors.length > 0">
-			<section id="top">
+			<section class="home-section" id="top">
 				<Top :maintenance="maintenance" />
 				<span
 					class="die"
@@ -22,7 +22,7 @@
 				>
 				</span>
 			</section>
-			<section id="overview" class="bg-neutral-10">
+			<section id="overview" class="home-section bg-neutral-10">
 				<Feedback />
 				<span
 					class="die"
@@ -36,21 +36,7 @@
 				>
 				</span>
 			</section>
-			<section id="pricing" class="bg-neutral-11">
-				<Pricing />
-				<span
-					class="die"
-					:style="{
-						backgroundImage:
-							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') +
-							')',
-						transform: `rotate(${scrolled}deg)`,
-					}"
-				>
-				</span>
-			</section>
-			<section id="general" class="bg-neutral-9">
+			<section id="general" class="home-section bg-neutral-9">
 				<General />
 				<span
 					class="die"
@@ -64,7 +50,7 @@
 				>
 				</span>
 			</section>
-			<section id="builder" class="bg-neutral-10">
+			<section id="builder" class="home-section bg-neutral-10">
 				<Builder />
 				<span
 					class="die"
@@ -78,7 +64,7 @@
 				>
 				</span>
 			</section>
-			<section id="share" class="bg-neutral-9">
+			<section id="share" class="home-section bg-neutral-9">
 				<Share />
 				<span
 					class="die"
@@ -92,7 +78,21 @@
 				>
 				</span>
 			</section>
-			<section id="campaign" class="bg-neutral-10">
+			<section id="pricing" class="home-section bg-neutral-11">
+				<Pricing />
+				<span
+					class="die"
+					:style="{
+						backgroundImage:
+							'url(' +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') +
+							')',
+						transform: `rotate(${scrolled}deg)`,
+					}"
+				>
+				</span>
+			</section>
+			<section id="campaign" class="home-section bg-neutral-10">
 				<Campaign />
 			</section>
 			<Footer />
@@ -163,7 +163,7 @@ export default {
 	&::-webkit-scrollbar {
 		display: none;
 	}
-	section {
+	.home-section {
 		position: relative;
 		padding: 50px 0;
 
@@ -200,7 +200,7 @@ export default {
 			bottom: -40px;
 		}
 
-		section {
+		.home-section {
 			padding: 60px 0;
 		}
 	}

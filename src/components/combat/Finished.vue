@@ -116,7 +116,7 @@
 									</div>
 
 									<!-- CURRENCY -->
-									<div class="currency mb-3" v-if="encounter.currency">
+									<div class="currency mb-3">
 										<div class="currency-form">
 											<div v-for="(coin, key) in currencies" :key="key">
 												<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" />
@@ -235,7 +235,7 @@ export default {
 			campaign: {},
 			patreon: true,
 			tab: "loot",
-			editableEncounter: this.encounter,
+			editableEncounter: { ...this.encounter, currency: {} },
 		};
 	},
 	computed: {

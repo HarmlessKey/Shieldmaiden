@@ -18,7 +18,10 @@
 			<div>
 				<div class="code" @click="copyCode">
 					Use promo code
-					<div>{{ active_promotion.code }}</div>
+					<div>
+				   	{{ active_promotion.code }}
+				   	<hk-icon icon="fas fa-copy" class="ml-1" />
+				  </div>
 				</div>
 			</div>
 		</div>

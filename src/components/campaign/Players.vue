@@ -1,6 +1,6 @@
 <template>
 	<tag :is="cardView ? 'hk-card' : 'div'" :class="!cardView ? 'normal-view' : ''">
-		<div slot="header" class="pane__header top-menu">
+		<div slot="header" class="pane__header top-menu" :class="cardView && 'card-header'">
 			<div
 				class="money"
 				:class="{ red: currency >= maxCurrencyAmount }"
@@ -10,7 +10,7 @@
 								show: true,
 								type: 'drawers/party/Currency',
 								data: { current: currency },
-						  })
+							})
 						: null
 				"
 			>

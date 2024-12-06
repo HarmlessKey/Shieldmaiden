@@ -1,28 +1,24 @@
 <template>
 	<div class="general">
 		<div class="container">
-			<div class="head">
-				<h2>We keep track, you focus on the game</h2>
-				<div class="text">
-					We focus on keeping the game on the table by managing everything you need to keep track of
-					during encounters. On top of that we enhance the player experience.
-				</div>
-			</div>
-
-			<div class="row q-col-gutter-xl mb-5">
-				<div class="col-12 col-md-8">
-					<video
-						class="video"
-						src="~assets/_img/home/multitargeting.mp4"
-						muted
-						autoplay
-						playsinline
-						alt="Initiative tracker Shieldmaiden multitargeting demo"
-						loop
+			<div class="row q-col-gutter-xl mb-5 items-center">
+				<div class="col-12 col-md-7">
+					<img
+						src="~assets/_img/combat-tracker-shieldmaiden.webp"
+						alt="Combat Tracker Shieldmaiden"
 					/>
 				</div>
-				<div class="col-12 col-md-4">
-					<q-list>
+				<div class="col-12 col-md-5">
+					<div class="head">
+						<h2>Combat Tracker for D&D</h2>
+						<h3>We keep track, you focus on the game</h3>
+						<p class="text">
+							We focus on keeping the game on the table by managing everything you need to keep
+							track of during encounters. On top of that we enhance the player experience.
+						</p>
+						<router-link to="/demo" class="btn btn-lg bg-accent">Try Demo Encounter</router-link>
+					</div>
+					<!-- <q-list>
 						<q-item
 							v-for="({ name, icon, title }, index) in items"
 							:key="`item-${index}`"
@@ -39,11 +35,8 @@
 								<i aria-hidden="true" class="fas fa-eye neutral-3" />
 							</q-item-section>
 						</q-item>
-					</q-list>
+					</q-list> -->
 				</div>
-			</div>
-			<div class="d-flex justify-center">
-				<router-link to="/demo" class="btn btn-lg bg-accent">Try Demo Encounter</router-link>
 			</div>
 		</div>
 
@@ -84,8 +77,11 @@ export default {
 		margin-bottom: 30px;
 	}
 
-	video {
+	img {
 		width: 100%;
+		object-fit: cover;
+		max-height: 500px;
+		border-radius: $border-radius;
 	}
 }
 </style>

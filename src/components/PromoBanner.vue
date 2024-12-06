@@ -19,9 +19,9 @@
 				<div class="code" @click="copyCode">
 					Use promo code
 					<div>
-				   	{{ active_promotion.code }}
-				   	<hk-icon icon="fas fa-copy" class="ml-1" />
-				  </div>
+						{{ active_promotion.code }}
+						<hk-icon icon="fas fa-copy" class="ml-1" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -87,8 +87,6 @@ export default {
 		async getActivePromotion() {
 			return await promotionService.getFirstActivePromotion();
 		},
-	},
-	methods: {
 		purchaseEvent() {
 			this.$gtm.trackEvent({
 				event: "purchase",

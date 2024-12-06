@@ -70,7 +70,6 @@
 					</q-tr>
 				</template>
 			</q-table>
-			{{ active_promotion }}
 			<q-dialog square v-model="add">
 				<div>
 					<q-form @submit="addPromotion">

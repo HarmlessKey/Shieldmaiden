@@ -3,7 +3,7 @@
 	<div v-if="current" tabindex="-1">
 		<h3 v-if="targeted.length === 0" class="red text-center">Select one or more targets</h3>
 		<template v-else-if="current.entityType !== 'player'">
-			<template v-if="['npc', 'environment'].includes(current.entityType)">
+			<template v-if="['npc', 'environment', 'companion'].includes(current.entityType)">
 				<!-- ACTIONS -->
 				<q-tabs
 					v-model="tab"
@@ -95,14 +95,14 @@
 																action.recharge === "rest"
 																	? "after a Short or Long Rest"
 																	: action.recharge
-														  })`
+															})`
 														: ``
 												}}
 												{{
 													action.limit
 														? `(${action.limit}/${
 																action.limit_type ? action.limit_type.capitalize() : `Day`
-														  })`
+															})`
 														: ``
 												}}
 												{{

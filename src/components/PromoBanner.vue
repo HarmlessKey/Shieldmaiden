@@ -64,7 +64,6 @@ export default {
 		},
 		days_remaining() {
 			const diff = this.active_promotion.active_until - this.now;
-			console.log(diff, this.active_promotion.active_until);
 			const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 			return days >= 1 ? days : undefined;
 		},

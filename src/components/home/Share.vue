@@ -1,6 +1,6 @@
 <template>
 	<div class="share">
-		<div class="container">
+		<div class="home__container">
 			<div class="head">
 				<h2>Share a live initiative list with your players</h2>
 				<div class="text">

@@ -1,6 +1,6 @@
 <template>
 	<div class="pricing">
-		<div class="container">
+		<div class="home__container">
 			<div class="head">
 				<h2>Pricing</h2>
 				<div class="text">
@@ -35,5 +35,3 @@ export default {
 	},
 };
 </script>
-
-<style lang="scss" scoped></style>

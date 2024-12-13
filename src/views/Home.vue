@@ -1,11 +1,5 @@
 <template>
-	<q-scroll-area
-		v-if="!user"
-		class="home"
-		:dark="$store.getters.theme === 'dark'"
-		:thumb-style="{ width: '10px' }"
-		v-on:scroll="handleScroll"
-	>
+	<div v-if="!user" class="home" ref="scrollArea">
 		<Header :scrolled="!!scrolled" />
 		<template v-if="diceColors.length > 0">
 			<section class="home-section" id="top">
@@ -78,6 +72,9 @@
 				>
 				</span>
 			</section>
+			<section id="campaign" class="home-section bg-neutral-10">
+				<Campaign />
+			</section>
 			<section id="pricing" class="home-section bg-neutral-11">
 				<Pricing />
 				<span
@@ -92,12 +89,9 @@
 				>
 				</span>
 			</section>
-			<section id="campaign" class="home-section bg-neutral-10">
-				<Campaign />
-			</section>
 			<Footer />
 		</template>
-	</q-scroll-area>
+	</div>
 	<div v-else class="user-content">
 		<Authenticated>
 			<UserContent />
@@ -148,10 +142,21 @@ export default {
 			return ["cyan", "orange", "green", "blue", "red", "yellow"];
 		},
 	},
+	mounted() {
+		const scrollArea = this.$refs.scrollArea;
+		this._scrollListener = () => {
+			this.scrolled = scrollArea.scrollTop;
+		};
+		this._scrollListener();
+		scrollArea.addEventListener("scroll", this._scrollListener);
+	},
 	methods: {
 		handleScroll(e) {
 			this.scrolled = e.verticalPosition;
 		},
+	},
+	beforeDestroy() {
+		this.$refs.scrollArea.removeEventListener("scroll", this._scrollListener);
 	},
 };
 </script>
@@ -159,6 +164,7 @@ export default {
 <style lang="scss" scoped>
 .home {
 	height: 100vh;
+	overflow: auto;
 
 	&::-webkit-scrollbar {
 		display: none;

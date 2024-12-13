@@ -21,7 +21,6 @@
 					</div>
 				</div>
 			</Flicking>
-			<q-resize-observer @resize="setSize" />
 		</div>
 	</div>
 </template>
@@ -37,7 +36,6 @@ export default {
 	},
 	data() {
 		return {
-			width: 0,
 			feedback: [
 				{
 					source: '<i aria-hidden="true" class="fab fa-discord discord-purple"></i> On Discord',
@@ -141,21 +139,6 @@ export default {
 			],
 		};
 	},
-	computed: {
-		slides() {
-			switch (true) {
-				case this.width <= 576:
-					return 1;
-				default:
-					return 3;
-			}
-		},
-	},
-	methods: {
-		setSize(dimensions) {
-			this.width = dimensions.width;
-		},
-	},
 };
 </script>
 
@@ -185,10 +168,6 @@ export default {
 		a {
 			color: $neutral-2;
 		}
-	}
-}
-@media only screen and (min-width: 900px) {
-	.feedback {
 	}
 }
 </style>

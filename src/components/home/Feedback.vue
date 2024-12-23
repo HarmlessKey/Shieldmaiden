@@ -1,11 +1,12 @@
 <template>
 	<div class="feedback">
 		<div class="home__container">
-			<div class="head">
-				<h2 class="text-center mb-4">User feedback</h2>
-				<div class="d-flex justify-content-center items-center gap-1">
+			<div class="head text-center">
+				<h2 class="mb-4">User feedback</h2>
+				<div class="d-flex justify-content-center items-center gap-1 mb-4">
 					<i v-for="i in 5" class="fas fa-star" aria-hidden="true" :key="i" />
 				</div>
+				Over <strong>10,000</strong> D&D players use Shieldmaiden, these are the reactions of a few
 			</div>
 			<Flicking :options="{ align: 'prev', circular: true }">
 				<div

@@ -14,7 +14,8 @@
 						<h3>We keep track, you focus on the game</h3>
 						<p class="text">
 							We focus on keeping the game on the table by managing everything you need to keep
-							track of during encounters. On top of that we enhance the player experience.
+							track of during encounters. On top of that we enhance the player experience.<br />
+							<router-link to="/tools/combat-tracker" class="learn-more">Learn more</router-link>
 						</p>
 						<router-link to="/demo" class="btn btn-lg bg-accent">Try Demo Encounter</router-link>
 					</div>
@@ -73,15 +74,11 @@ export default {
 
 <style lang="scss" scoped>
 .general {
-	ul {
-		margin-bottom: 30px;
-	}
-
 	img {
 		width: 100%;
 		object-fit: cover;
-		max-height: 500px;
 		border-radius: $border-radius;
+		aspect-ratio: 16/9;
 	}
 }
 </style>

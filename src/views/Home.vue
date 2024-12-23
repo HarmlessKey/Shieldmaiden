@@ -37,7 +37,7 @@
 					:style="{
 						backgroundImage:
 							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') +
 							')',
 						transform: `rotate(${scrolled}deg)`,
 					}"
@@ -51,7 +51,7 @@
 					:style="{
 						backgroundImage:
 							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') +
 							')',
 						transform: `rotate(${scrolled}deg)`,
 					}"
@@ -65,29 +65,15 @@
 					:style="{
 						backgroundImage:
 							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[5] + '.svg') +
+							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') +
 							')',
 						transform: `rotate(${scrolled}deg)`,
 					}"
 				>
 				</span>
 			</section>
-			<section id="campaign" class="home-section bg-neutral-10">
-				<Campaign />
-			</section>
-			<section id="pricing" class="home-section bg-neutral-11">
+			<section id="pricing" class="home-section bg-neutral-10">
 				<Pricing />
-				<span
-					class="die"
-					:style="{
-						backgroundImage:
-							'url(' +
-							require('src/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') +
-							')',
-						transform: `rotate(${scrolled}deg)`,
-					}"
-				>
-				</span>
 			</section>
 			<Footer />
 		</template>
@@ -108,7 +94,6 @@ import Feedback from "src/components/home/Feedback.vue";
 import General from "src/components/home/General.vue";
 import Share from "src/components/home/Share.vue";
 import Builder from "src/components/home/Builder.vue";
-import Campaign from "src/components/home/Campaign.vue";
 import Footer from "src/components/Footer.vue";
 import UserContent from "./UserContent";
 import Authenticated from "src/layouts/authenticated.vue";
@@ -126,7 +111,6 @@ export default {
 		General,
 		Share,
 		Builder,
-		Campaign,
 		Footer,
 		UserContent,
 		Authenticated,
@@ -139,7 +123,7 @@ export default {
 	computed: {
 		...mapGetters(["user"]),
 		diceColors() {
-			return ["cyan", "orange", "green", "blue", "red", "yellow"];
+			return ["cyan", "yellow", "orange", "green", "blue", "red"];
 		},
 	},
 	mounted() {
@@ -166,9 +150,6 @@ export default {
 	height: 100vh;
 	overflow: auto;
 
-	&::-webkit-scrollbar {
-		display: none;
-	}
 	.home-section {
 		position: relative;
 		padding: 50px 0;
@@ -190,6 +171,19 @@ export default {
 		background-repeat: no-repeat;
 		z-index: 97;
 	}
+	::v-deep {
+		a.learn-more {
+			font-weight: bold;
+			color: $neutral-1;
+
+			&:hover {
+				text-decoration: underline;
+			}
+			&::after {
+				content: "...";
+			}
+		}
+	}
 }
 .hk-layout {
 	height: 100vh;
@@ -207,7 +201,7 @@ export default {
 		}
 
 		.home-section {
-			padding: 60px 0;
+			padding: 80px 0;
 		}
 	}
 }

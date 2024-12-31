@@ -41,16 +41,8 @@
 </template>
 
 <script>
-// import Tiers from "src/components/Tiers.vue";
-
 export default {
 	name: "Pricing",
-	components: {
-		// Tiers,
-	},
-	data() {
-		return {};
-	},
 };
 </script>
 
@@ -68,6 +60,12 @@ export default {
 		.row {
 			flex-direction: column-reverse;
 		}
+	}
+}
+@media only screen and (max-width: $sm-breakpoint) {
+	.btn {
+		width: 100%;
+		display: block;
 	}
 }
 </style>

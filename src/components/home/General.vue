@@ -81,4 +81,10 @@ export default {
 		aspect-ratio: 16/9;
 	}
 }
+@media only screen and (max-width: $sm-breakpoint) {
+	.btn {
+		width: 100%;
+		display: block;
+	}
+}
 </style>

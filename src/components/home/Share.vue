@@ -68,6 +68,10 @@ export default {
 		img {
 			padding: 0;
 		}
+		.btn {
+			width: 100%;
+			display: block;
+		}
 	}
 }
 </style>

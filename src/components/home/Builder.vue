@@ -46,4 +46,10 @@ export default {
 		}
 	}
 }
+@media only screen and (max-width: $sm-breakpoint) {
+	.btn {
+		width: 100%;
+		display: block;
+	}
+}
 </style>

@@ -3,7 +3,7 @@
 	<div v-if="current" tabindex="-1">
 		<h3 v-if="targeted.length === 0" class="red text-center">Select one or more targets</h3>
 		<template v-else-if="current.entityType !== 'player'">
-			<template v-if="['npc', 'environment'].includes(current.entityType)">
+			<template v-if="['npc', 'environment', 'companion'].includes(current.entityType)">
 				<!-- ACTIONS -->
 				<q-tabs
 					v-model="tab"

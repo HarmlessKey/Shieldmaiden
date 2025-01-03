@@ -33,7 +33,7 @@
 								>
 								<em v-if="t.price === 'Free'" class="neutral-2 sub">forever</em>
 								<em v-else class="neutral-2 sub">{{
-									discount ? "the first month" : "per month"
+									discount && !annually ? "the first month" : "per month"
 								}}</em>
 							</div>
 							<ul>

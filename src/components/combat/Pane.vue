@@ -72,6 +72,14 @@ export default {
 	.q-scrollarea {
 		position: relative;
 		height: calc(100% - 52px);
+		max-width: 100%;
+
+		&::v-deep {
+			.q-scrollarea__content {
+				position: unset;
+				overflow: hidden;
+			}
+		}
 
 		&:before {
 			content: "";

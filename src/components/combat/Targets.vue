@@ -87,17 +87,20 @@
 							@shortkey="set_targeted({ type: 'single', key: entity.key })"
 						>
 							<TargetEntity :entity="entity">
-								<button slot="actions" class="btn btn-clear" @click.stop>
-									<i aria-hidden="true" class="fal fa-ellipsis-v" />
-									<q-popup-proxy
-										:dark="$store.getters.theme === 'dark'"
-										anchor="bottom right"
-										self="top right"
-										:breakpoint="576"
-									>
-										<target-menu :entity="entity" />
-									</q-popup-proxy>
-								</button>
+								<template #actions>
+									<Effects :entity="entity" />
+									<button class="btn btn-clear" @click.stop>
+										<i aria-hidden="true" class="fal fa-ellipsis-v" />
+										<q-popup-proxy
+											:dark="$store.getters.theme === 'dark'"
+											anchor="bottom right"
+											self="top right"
+											:breakpoint="576"
+										>
+											<target-menu :entity="entity" />
+										</q-popup-proxy>
+									</button>
+								</template>
 							</TargetEntity>
 						</div>
 						<div v-if="!entity.active" class="d-flex">
@@ -152,10 +155,11 @@ import Pane from "./Pane.vue";
 import TargetEntity from "./entities/TargetEntity.vue";
 import TargetMenu from "src/components/combat/TargetMenu.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import Effects from "./entities/Effects.vue";
 
 export default {
 	name: "Targets",
-	components: { Pane, TargetEntity, TargetMenu, TutorialPopover },
+	components: { Pane, TargetEntity, TargetMenu, TutorialPopover, Effects },
 	props: ["current", "_active", "_idle"],
 	data() {
 		return {

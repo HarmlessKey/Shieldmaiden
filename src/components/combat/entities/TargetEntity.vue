@@ -25,7 +25,9 @@
 					<div class="target-entity__content-info__name truncate">
 						{{ entity.name?.capitalizeEach() }}
 					</div>
-					<slot name="actions" />
+					<div class="target-entity__content-info__actions">
+						<slot name="actions" />
+					</div>
 				</div>
 				<div class="target-entity__health">
 					<HealthBar :entity="entity" />
@@ -110,6 +112,7 @@ export default {
 	}
 	.target-avatar {
 		width: 56px;
+		min-width: 56px;
 		font-size: 42px;
 		background-color: $neutral-7;
 		border-radius: $border-radius;
@@ -121,18 +124,21 @@ export default {
 		justify-content: space-between;
 		height: 56px;
 		flex-grow: 1;
+		min-width: 0;
 
 		&-info {
 			display: flex;
 			align-items: center;
 			flex-grow: 1;
-			gap: 10px;
+			gap: 8px;
+			min-width: 0;
 
 			&__ac {
 				position: relative;
 				cursor: pointer;
 				color: $neutral-4;
 				width: 33px;
+				min-width: 33px;
 				height: 100%;
 
 				i,
@@ -156,6 +162,12 @@ export default {
 			&__name {
 				font-weight: bold;
 				min-width: 0;
+			}
+			&__actions {
+				display: flex;
+				justify-content: flex-end;
+				gap: 5px;
+				align-items: center;
 				flex-grow: 1;
 			}
 		}

@@ -18,7 +18,7 @@
 <script>
 import { mapGetters } from "vuex";
 import Actions from "src/components/combat/legacy/actions/Actions.vue";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import TargetItem from "src/components/combat/legacy/TargetItem.vue";
 
 export default {
 	name: "damageHealing",

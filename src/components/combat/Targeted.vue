@@ -63,7 +63,7 @@
 			<template v-else-if="targeted.length > 1">
 				<div v-for="key in targeted" :key="`target-${key}`" class="target">
 					<div class="health">
-						<TargetItem :item="key" />
+						<BasicEntity :entity="entities[key]" />
 						<a class="clear" @click="set_targeted({ type: 'untarget', key })">
 							<hk-icon icon="fas fa-times red" />
 							<q-tooltip anchor="top middle" self="center middle"> Untarget </q-tooltip>
@@ -162,7 +162,7 @@ import { mapActions, mapGetters } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { abilities } from "src/utils/generalConstants";
 import Pane from "./Pane.vue";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import BasicEntity from "./entities/BasicEntity.vue";
 import TargetInfo from "src/components/combat/TargetInfo.vue";
 import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "../demo/TutorialPopover.vue";
@@ -172,7 +172,7 @@ export default {
 	mixins: [dice, experience],
 	components: {
 		Pane,
-		TargetItem,
+		BasicEntity,
 		TargetInfo,
 		TutorialPopover,
 	},
@@ -392,16 +392,17 @@ export default {
 	}
 	.health {
 		display: grid;
-		grid-template-columns: 1fr 40px;
-		grid-template-rows: 40px;
+		grid-template-columns: 1fr 34px;
+		grid-template-rows: 34px;
 		grid-gap: 0;
 		background: $neutral-8;
+		padding: 3px;
 
 		.clear {
 			display: block;
-			width: 40px;
-			height: 40px;
-			line-height: 40px;
+			width: 34px;
+			height: 34px;
+			line-height: 34px;
 			font-size: 15px;
 			text-align: center;
 		}

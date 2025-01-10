@@ -87,7 +87,7 @@
 							@shortkey="set_targeted({ type: 'single', key: entity.key })"
 						>
 							<TargetEntity :entity="entity">
-								<a slot="actions" class="options">
+								<button slot="actions" class="btn btn-clear" @click.stop>
 									<i aria-hidden="true" class="fal fa-ellipsis-v" />
 									<q-popup-proxy
 										:dark="$store.getters.theme === 'dark'"
@@ -97,7 +97,7 @@
 									>
 										<target-menu :entity="entity" />
 									</q-popup-proxy>
-								</a>
+								</button>
 							</TargetEntity>
 						</div>
 						<div v-if="!entity.active" class="d-flex">
@@ -349,13 +349,16 @@ ul.targets {
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 
 	li {
-		margin-bottom: 8px;
-		// border: solid 1px transparent;
+		padding: 5px 5px 5px 0;
 		cursor: pointer;
-		// background: $neutral-8;
-		// border-radius: $border-radius-small;
+		background: $neutral-5;
+		border-radius: $border-radius-small;
+		margin-left: 18px;
 
 		&.targeted {
 			outline: $blue solid 3px;
@@ -368,10 +371,6 @@ ul.targets {
 		&:focus &:not(&.targeted) {
 			outline: $outline;
 		}
-	}
-	&.active_targets li:first-child {
-		margin-bottom: 20px;
-		border-color: $green;
 	}
 	li.top {
 		position: relative;

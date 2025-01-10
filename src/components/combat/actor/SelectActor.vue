@@ -1,17 +1,24 @@
 <template>
 	<div class="select-actor">
-		<button v-if="outOfTurn" @click.stop="set_actor(undefined)">
-			<hk-icon icon="fas fa-undo-alt" />
-			<q-tooltip anchor="center left" self="center right">Return</q-tooltip>
-		</button>
+		<div
+			class="select-actor__initiative"
+			:style="{
+				color: actor.color_label ? actor.color_label : ``,
+				backgroundColor: actor.color_label ? actor.color_label : ``,
+			}"
+		>
+			<div class="select-actor__initiative-value truncate">
+				{{ actor.initiative }}
+			</div>
+		</div>
 		<Avatar :entity="actor" :key="actor.key" />
 		<div class="d-flex flex-col justify-content-center items-center">
-			<div v-if="outOfTurn" class="orange">
-				<hk-icon icon="fas fa-exclamation-circle" />
+			<button v-if="outOfTurn" @click.stop="set_actor(undefined)">
+				<hk-icon icon="fas fa-undo-alt" class="orange" />
 				<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, -5]">
 					Out of Turn
 				</q-tooltip>
-			</div>
+			</button>
 			<hk-icon icon="fas fa-chevron-down" :class="{ open: show_menu }" />
 		</div>
 		<q-popup-proxy
@@ -106,7 +113,6 @@ export default {
 	display: flex;
 	align-items: center;
 	font-size: 22px;
-	gap: 10px;
 	color: $neutral-2;
 	cursor: pointer;
 
@@ -137,13 +143,33 @@ export default {
 			}
 		}
 	}
+	&__initiative {
+		border-top-left-radius: 9999px;
+		border-bottom-left-radius: 9999px;
+		color: $neutral-9;
+		background-color: $neutral-9;
+		padding: 0 7px 0 9px;
+		line-height: 30px;
+		min-width: 0;
+		width: 18px;
+		box-sizing: content-box;
+		text-align: center;
+
+		&-value {
+			font-size: 15px;
+			font-weight: bold;
+			filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
+			mix-blend-mode: luminosity;
+			opacity: 0.95;
+			margin-top: -1px;
+		}
+	}
 	.target-avatar {
 		width: 60px;
 		height: 60px;
 		font-size: 44px;
-		border-top-right-radius: $border-radius;
-		border-bottom-right-radius: $border-radius;
-		background-color: $neutral-8;
+		border-radius: $border-radius;
+		margin-right: 10px;
 	}
 	.return {
 		position: absolute;

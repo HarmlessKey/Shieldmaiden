@@ -312,7 +312,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import TargetItem from "src/components/combat/legacy/TargetItem.vue";
 import { colors } from "src/mixins/colors";
 
 export default {

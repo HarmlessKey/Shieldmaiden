@@ -106,7 +106,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { conditions } from "src/mixins/conditions.js";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import TargetItem from "src/components/combat/legacy/TargetItem.vue";
 
 export default {
 	name: "Conditions",

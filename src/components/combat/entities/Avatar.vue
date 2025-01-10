@@ -12,6 +12,7 @@
 					? 'url(' + entity.img + ')'
 					: '',
 			color: entity.color_label ? entity.color_label : ``,
+			borderColor: entity.color_label ? entity.color_label : ``,
 		}"
 	>
 		<template v-if="icons && entity.hidden">
@@ -56,5 +57,9 @@ export default {
 	background-position: center top;
 	background-repeat: no-repeat;
 	background-size: cover;
+	aspect-ratio: 1/1;
+	border-radius: $border-radius-small;
+	border-left: solid 2px $neutral-7;
+	background-color: $neutral-8;
 }
 </style>

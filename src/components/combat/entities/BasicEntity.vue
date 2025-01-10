@@ -1,14 +1,13 @@
 <template>
 	<div class="basic-entity">
+		<div
+			class="color-label"
+			:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
+		/>
 		<Avatar :entity="entity" />
 		<div class="basic-entity__name truncate">
 			{{ entity.name?.capitalizeEach() }}
 		</div>
-		<div
-			v-if="entity.color_label"
-			class="color-label"
-			:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
-		/>
 	</div>
 </template>
 
@@ -34,6 +33,7 @@ export default {
 	align-items: center;
 	justify-content: space-between;
 	gap: 10px;
+	margin-left: -8px;
 
 	.target-avatar {
 		width: 32px;
@@ -43,9 +43,14 @@ export default {
 		border-radius: $border-radius-small;
 	}
 	.color-label {
-		border-radius: 9999px;
-		height: 15px;
-		width: 15px;
+		border-top-left-radius: 999px;
+		border-bottom-left-radius: 999px;
+		background-color: $neutral-8;
+		height: 12px;
+		width: 8px;
+		z-index: 10;
+		box-sizing: content-box;
+		margin-right: -10px;
 	}
 	&__name {
 		font-weight: bold;

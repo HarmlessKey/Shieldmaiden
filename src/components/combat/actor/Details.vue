@@ -9,9 +9,9 @@
 			</div>
 		</div>
 		<template v-for="(stat, key) of stats">
-			<div v-if="actor[key]" :key="key">
+			<div :key="key">
 				<hk-icon :icon="stat.icon" />
-				{{ actor[key] }}
+				{{ displayStats(actor)[key] }}
 				<q-tooltip anchor="bottom middle" self="center middle">{{ stat.label }}</q-tooltip>
 			</div>
 		</template>
@@ -39,6 +39,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { abilities } from "src/utils/generalConstants";
+import { displayStats } from "src/utils/entityFunctions";
 import { general } from "src/mixins/general";
 
 export default {
@@ -61,16 +62,13 @@ export default {
 					icon: "fas fa-shield",
 					label: "Armor Class",
 				},
-				walk_speed: {
-					icon: "fas fa-running",
-					label: "Walk Speed",
-				},
 				speed: {
 					icon: "fas fa-running",
 					label: "Walk Speed",
 				},
 			},
 			abilities: abilities,
+			displayStats,
 		};
 	},
 	computed: {

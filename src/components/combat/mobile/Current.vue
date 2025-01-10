@@ -31,7 +31,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import TargetItem from "src/components/combat/legacy/TargetItem.vue";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
 
 export default {

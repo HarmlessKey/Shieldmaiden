@@ -1,7 +1,7 @@
 <template>
 	<div class="health-bar">
 		<div class="health-bar__main" :style="{ width: `${main}%` }">
-			<div class="health-bar__main-current" :style="{ width: `${current}%` }"></div>
+			<div class="health-bar__main-current" :style="{ width: `${current}%` }" :class="mainColor" />
 			<div
 				v-if="entity.maxHpMod"
 				class="health-bar__main-modifier"
@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { displayStats } from "src/utils/entityFunctions";
+
 export default {
 	name: "HealthBar",
 	props: {
@@ -27,6 +29,11 @@ export default {
 			type: Object,
 			required: true,
 		},
+	},
+	data() {
+		return {
+			displayStats,
+		};
 	},
 	computed: {
 		max() {
@@ -44,6 +51,16 @@ export default {
 		main() {
 			return 100 - (this.temporary || 0);
 		},
+		mainColor() {
+			switch (true) {
+				case this.current < 33:
+					return "bg-red";
+				case this.current < 76:
+					return "bg-orange";
+				default:
+					return "bg-green";
+			}
+		},
 	},
 };
 </script>
@@ -51,9 +68,7 @@ export default {
 <style lang="scss" scoped>
 .health-bar {
 	width: 100%;
-	// overflow: hidden;
 	display: flex;
-	gap: 2px;
 	text-align: center;
 	font-size: 12px;
 	background-color: $neutral-9;
@@ -66,8 +81,8 @@ export default {
 		background-color: $neutral-9;
 		border-radius: 999px;
 		overflow: hidden;
-		border: solid 3px $neutral-9;
-		height: 8px;
+		border: solid 4px $neutral-9;
+		height: 6px;
 		box-sizing: content-box;
 		align-items: center;
 
@@ -75,27 +90,30 @@ export default {
 			height: 100%;
 		}
 		&-current {
-			background-color: $neutral-4;
+			transition: all 0.5s linear;
 		}
 		&-modifier {
 			position: absolute;
 			right: 0;
 			top: 0;
-			border-left: solid 2px $neutral-2;
+			background-color: $neutral-1;
+			opacity: 0.4;
 
 			&.negative {
-				background-color: $neutral-5;
-				outline: none;
-				border-color: $neutral-9;
+				background-color: $neutral-6;
+				opacity: 1;
 			}
 		}
 	}
 	&__temporary {
-		height: 10px;
+		height: 6px;
 		box-sizing: content-box;
 		border: solid 3px $neutral-9;
 		background-color: $neutral-2;
 		border-radius: 999px;
+		transition: transform 0.5s linear;
+		margin-left: -4px;
+		z-index: 10;
 	}
 }
 </style>

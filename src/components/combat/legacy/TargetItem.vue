@@ -412,7 +412,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import Avatar from "./entities/Avatar.vue";
+import Avatar from "../entities/Avatar.vue";
 import { colors } from "src/mixins/colors";
 
 export default {

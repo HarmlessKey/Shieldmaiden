@@ -133,7 +133,7 @@
 import { mapActions, mapGetters } from "vuex";
 import ReminderForm from "src/components/ReminderForm";
 import { remindersMixin } from "src/mixins/reminders";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import TargetItem from "src/components/combat/legacy/TargetItem.vue";
 import Reminders from "src/components/combat/Reminders.vue";
 
 export default {

@@ -1,58 +1,36 @@
 <template>
-	<div class="target-effects" @click.stop>
-		<template v-for="(reminder, key) in entity.reminders">
-			<q-chip
-				v-if="reminder"
-				:key="key"
-				clickable
-				square
-				:class="[`bg-${reminder.color}`, reminder.color]"
-				@click="
-					setDrawer({
-						show: true,
-						type: 'drawers/encounter/reminders/Reminder',
-						data: {
-							key,
-							entity,
-						},
-					})
-				"
-			>
-				<q-item-label>
-					<template v-if="reminder.rounds">
-						<b>{{ reminder.rounds }}</b>
-					</template>
-				</q-item-label>
-				<q-tooltip anchor="top middle" self="center middle">
-					{{ title(reminder) }}
-				</q-tooltip>
-			</q-chip>
-		</template>
-		<template v-for="(_, key) in entity.conditions">
-			<div
-				v-if="entity.conditions[key]"
-				:key="key"
-				class="target-effects__condition"
-				@click="
-					setDrawer({
-						show: true,
-						type: 'drawers/encounter/Condition',
-						data: {
-							condition: key,
-							entity: entity,
-						},
-					})
-				"
-			>
-				<span class="n" v-if="key == 'exhaustion'">
-					{{ entity.conditions[key] }}
-				</span>
-				<i aria-hidden="true" :class="`hki-${key}`" class="icon" />
-				<q-tooltip anchor="top middle" self="center middle">
-					{{ key.capitalize() }}
-				</q-tooltip>
+	<div class="entity-effects" @click.stop>
+		<div
+			v-for="effect in effects"
+			:key="effect.key"
+			class="entity-effects__effect"
+			:class="[effect.type, effect.color]"
+			@click="
+				setDrawer({
+					show: true,
+					type:
+						effect.type === 'condition'
+							? 'drawers/encounter/Condition'
+							: 'drawers/encounter/reminders/Reminder',
+					data: {
+						key: effect.key,
+						condition: effect.key,
+						entity: entity,
+					},
+				})
+			"
+		>
+			<div class="value" :class="effect.type === 'reminder' ? `bg-${effect.color}` : ''">
+				<strong v-if="effect.value">
+					{{ effect.value }}
+				</strong>
 			</div>
-		</template>
+			<hk-icon v-if="effect.icon" :icon="`hki-${effect.icon}`" />
+			<q-tooltip anchor="top middle" self="center middle">
+				{{ effect.title }}
+			</q-tooltip>
+		</div>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -63,11 +41,17 @@ import { db } from "src/firebase";
 
 export default {
 	name: "Effects",
+	mixins: [remindersMixin],
 	props: {
 		entity: {
 			type: Object,
 			required: true,
 		},
+	},
+	data() {
+		return {
+			width: 0,
+		};
 	},
 	firebase() {
 		return {
@@ -77,59 +61,97 @@ export default {
 			},
 		};
 	},
-	mixins: [remindersMixin],
+	computed: {
+		effects() {
+			const conditions = this.entity.conditions
+				? Object.entries(this.entity.conditions).map(([key, value]) => {
+						return {
+							type: "condition",
+							key: key,
+							icon: key,
+							title: key.capitalize(),
+							value: key === "exhaustion" ? value : null,
+						};
+					})
+				: [];
+			const reminders = this.entity.reminders
+				? Object.entries(this.entity.reminders).map(([key, reminder]) => {
+						return {
+							type: "reminder",
+							key: key,
+							title: reminder.selectedVars
+								? this.replaceReminderVariables(title, reminder.selectedVars)
+								: reminder.title,
+							value: reminder.rounds,
+							color: reminder.color,
+						};
+					})
+				: [];
+			return [...reminders, ...conditions];
+		},
+		space() {
+			const content = this.effects?.length * 33 - 3;
+			const space = Math.floor((this.width + 3) / 33);
+			return space;
+		},
+	},
 	methods: {
 		...mapActions(["setDrawer"]),
-		title(reminder) {
-			let title = reminder.title;
-
-			if (reminder.selectedVars) {
-				title = this.replaceReminderVariables(title, reminder.selectedVars);
-			}
-			return title;
+		setSize(dimensions) {
+			this.width = dimensions.width;
 		},
 	},
 };
 </script>
 
 <style lang="scss" scoped>
-.target-effects {
+.entity-effects {
 	display: flex;
-	gap: 5px;
+	align-items: flex-start;
+	justify-content: flex-end;
+	gap: 3px;
+	height: 30px;
+	overflow: auto;
+	flex-grow: 1;
 
-	&__condition {
-		width: 25px;
-		height: 25px;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	&__effect {
+		height: 30px;
 		padding: 0 3px;
-		line-height: 28px;
 		position: relative;
-		background-color: $neutral-8;
+		background-color: $neutral-7;
 		border-radius: $border-radius;
 		box-sizing: border-box;
-
-		.n {
-			position: absolute;
-			font-size: 12px;
-			color: $neutral-1;
-			top: -6px;
-			left: 3px;
-		}
-	}
-	.q-chip {
-		color: $neutral-1 !important;
-		border-radius: $border-radius;
-		cursor: pointer;
-		padding: 0;
+		aspect-ratio: 1/1;
 		text-align: center;
-		margin: 0;
-		height: 25px;
 
-		&::v-deep {
-			.q-item__label {
-				width: 25px;
-				filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
-				mix-blend-mode: luminosity;
-				opacity: 0.95;
+		&.condition {
+			line-height: 30px;
+			.value {
+				position: absolute;
+				font-size: 12px;
+				color: $neutral-1;
+				top: -5px;
+				left: 4px;
+			}
+		}
+		&.reminder {
+			padding: 6px;
+			.value {
+				width: 100%;
+				aspect-ratio: 1/1;
+				border-radius: $border-radius;
+				line-height: 18px;
+
+				strong {
+					filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
+					mix-blend-mode: luminosity;
+					opacity: 0.95;
+					width: 100%;
+				}
 			}
 		}
 	}

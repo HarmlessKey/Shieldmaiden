@@ -36,7 +36,7 @@
 		>
 			<template v-for="{ group, targets } in groups">
 				<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
-					<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" />
+					<hk-icon v-if="group === 'down'" icon="fas fa-skull-crossbones" class="red mr-1" />
 					{{ group.capitalize() }} ({{ targets.length }})
 				</h2>
 
@@ -89,7 +89,7 @@
 							<TargetEntity :entity="entity">
 								<template #actions>
 									<Effects :entity="entity" />
-									<button class="btn btn-clear" @click.stop>
+									<button class="btn btn-sm bg-neutral-8 target-menu__button" @click.stop>
 										<i aria-hidden="true" class="fal fa-ellipsis-v" />
 										<q-popup-proxy
 											:dark="$store.getters.theme === 'dark'"
@@ -347,6 +347,11 @@ export default {
 			text-align: center;
 		}
 	}
+
+	h2 {
+		margin: 15px 0 10px 0;
+		font-size: 18px;
+	}
 }
 
 ul.targets {
@@ -370,6 +375,12 @@ ul.targets {
 		.target-item-wrapper {
 			border-top-right-radius: 0;
 			border-bottom-right-radius: 0;
+		}
+
+		.target-menu__button {
+			align-self: flex-start;
+			font-size: 18px;
+			padding: 1px 8px;
 		}
 
 		&:focus &:not(&.targeted) {

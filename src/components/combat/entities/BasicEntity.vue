@@ -1,22 +1,25 @@
 <template>
-	<div class="basic-entity">
-		<div
-			class="color-label"
-			:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
-		/>
-		<Avatar :entity="entity" />
-		<div class="basic-entity__name truncate">
-			{{ entity.name?.capitalizeEach() }}
+	<div class="basic-entity__wrapper">
+		<div class="basic-entity">
+			<div
+				class="color-label"
+				:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
+			/>
+			<Avatar :entity="entity" />
+			<Name class="basic-entity__name truncate" :entity="entity" />
 		</div>
 	</div>
 </template>
 
 <script>
 import Avatar from "./Avatar.vue";
+import Name from "./Name.vue";
+
 export default {
 	name: "BasicEntity",
 	components: {
 		Avatar,
+		Name,
 	},
 	props: {
 		entity: {
@@ -32,8 +35,13 @@ export default {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 10px;
-	margin-left: -8px;
+	gap: 8px;
+	min-width: 0;
+
+	&__wrapper {
+		margin-left: -6px;
+		overflow: hidden;
+	}
 
 	.target-avatar {
 		width: 32px;

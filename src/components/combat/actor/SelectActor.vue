@@ -46,7 +46,7 @@
 					v-close-popup
 					@click="setActor(entity)"
 				>
-					<q-item-section>
+					<q-item-section class="list-item">
 						<BasicEntity :entity="entity" />
 					</q-item-section>
 				</q-item>
@@ -189,6 +189,11 @@ export default {
 			background-color: $neutral-4;
 		}
 	}
+}
+.list-item {
+	overflow: hidden;
+	padding-left: 8px;
+	margin-left: -8px;
 }
 </style>
 

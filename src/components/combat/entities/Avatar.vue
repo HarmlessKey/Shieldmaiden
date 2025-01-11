@@ -61,5 +61,6 @@ export default {
 	border-radius: $border-radius-small;
 	border-left: solid 2px $neutral-7;
 	background-color: $neutral-8;
+	box-sizing: content-box;
 }
 </style>

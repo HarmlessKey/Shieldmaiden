@@ -22,9 +22,7 @@
 						<hk-animated-integer :value="displayStats(entity).ac" class="ac" />
 						<ArmorClassQuickEdit :entity="entity" />
 					</div>
-					<div class="target-entity__content-info__name truncate">
-						{{ entity.name?.capitalizeEach() }}
-					</div>
+					<Name class="target-entity__content-info__name" :entity="entity" />
 					<div class="target-entity__content-info__actions">
 						<slot name="actions" />
 					</div>
@@ -48,6 +46,7 @@ import InitiativeQuickEdit from "./quick-edit/InitiativeQuickEdit.vue";
 import ArmorClassQuickEdit from "./quick-edit/ArmorClassQuickEdit.vue";
 import HealthQuickEdit from "./quick-edit/HealthQuickEdit.vue";
 import Avatar from "./Avatar.vue";
+import Name from "./Name.vue";
 import HealthBar from "./HealthBar.vue";
 import { displayStats } from "src/utils/entityFunctions";
 
@@ -55,6 +54,7 @@ export default {
 	name: "TargetEntity",
 	components: {
 		Avatar,
+		Name,
 		HealthBar,
 		InitiativeQuickEdit,
 		ArmorClassQuickEdit,
@@ -80,6 +80,7 @@ export default {
 	gap: 5px;
 	user-select: none;
 	width: 100%;
+	overflow: hidden;
 
 	&__container {
 		display: flex;
@@ -92,7 +93,7 @@ export default {
 		color: $neutral-7;
 		padding: 0 5px 0 7px;
 		line-height: 28px;
-		min-width: 0;
+		min-width: 16px;
 		width: 16px;
 		box-sizing: content-box;
 		margin-left: -25px;
@@ -123,15 +124,16 @@ export default {
 		flex-direction: column;
 		justify-content: space-between;
 		height: 56px;
+		gap: 6px;
 		flex-grow: 1;
 		min-width: 0;
+		position: relative;
 
 		&-info {
 			display: flex;
 			align-items: center;
 			flex-grow: 1;
-			gap: 8px;
-			min-width: 0;
+			gap: 6px;
 
 			&__ac {
 				position: relative;

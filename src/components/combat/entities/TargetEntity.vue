@@ -22,9 +22,22 @@
 						<hk-animated-integer :value="displayStats(entity).ac" class="ac" />
 						<ArmorClassQuickEdit :entity="entity" />
 					</div>
-					<Name class="target-entity__content-info__name" :entity="entity" />
+					<Name class="target-entity__content-info__name" :entity="entity">
+						<q-resize-observer @resize="setSize" />
+					</Name>
 					<div class="target-entity__content-info__actions">
-						<slot name="actions" />
+						<Effects :entity="entity" :available-space="nameWidth - 30" collapse />
+						<button class="btn btn-sm bg-neutral-8 target-menu__button" @click.stop>
+							<i aria-hidden="true" class="fal fa-ellipsis-v" />
+							<q-popup-proxy
+								:dark="$store.getters.theme === 'dark'"
+								anchor="bottom right"
+								self="top right"
+								:breakpoint="576"
+							>
+								<target-menu :entity="entity" />
+							</q-popup-proxy>
+						</button>
 					</div>
 				</div>
 				<div class="target-entity__health">
@@ -45,6 +58,8 @@
 import InitiativeQuickEdit from "./quick-edit/InitiativeQuickEdit.vue";
 import ArmorClassQuickEdit from "./quick-edit/ArmorClassQuickEdit.vue";
 import HealthQuickEdit from "./quick-edit/HealthQuickEdit.vue";
+import TargetMenu from "../TargetMenu.vue";
+import Effects from "./effects";
 import Avatar from "./Avatar.vue";
 import Name from "./Name.vue";
 import HealthBar from "./HealthBar.vue";
@@ -55,6 +70,8 @@ export default {
 	components: {
 		Avatar,
 		Name,
+		TargetMenu,
+		Effects,
 		HealthBar,
 		InitiativeQuickEdit,
 		ArmorClassQuickEdit,
@@ -69,7 +86,13 @@ export default {
 	data() {
 		return {
 			displayStats: displayStats,
+			nameWidth: 0,
 		};
+	},
+	methods: {
+		setSize(dimensions) {
+			this.nameWidth = dimensions.width;
+		},
 	},
 };
 </script>

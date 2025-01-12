@@ -4,18 +4,15 @@
 			v-if="target.entityType === 'player' || target.entityType === 'companion'"
 			:target="target"
 		/>
-
-		<Conditions :entity="target" />
-		<Reminders :entity="target" />
-		<ViewEntity class="mt-3 hide" :data="target" />
+		<Effects :entity="target" />
+		<ViewEntity class="mt-1 hide" :data="target" />
 	</div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 import ViewEntity from "./ViewEntity.vue";
-import Conditions from "src/components/combat/Conditions.vue";
-import Reminders from "src/components/combat/Reminders.vue";
+import Effects from "./entities/effects";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
 
 export default {
@@ -23,8 +20,7 @@ export default {
 	props: ["data"],
 	components: {
 		ViewEntity,
-		Conditions,
-		Reminders,
+		Effects,
 		DeathSaves,
 	},
 	computed: {

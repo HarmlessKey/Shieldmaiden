@@ -1,51 +1,46 @@
 <template>
-	<div class="entity-effects" @click.stop>
-		<div
-			v-for="effect in effects"
-			:key="effect.key"
-			class="entity-effects__effect"
-			:class="[effect.type, effect.color]"
-			@click="
-				setDrawer({
-					show: true,
-					type:
-						effect.type === 'condition'
-							? 'drawers/encounter/Condition'
-							: 'drawers/encounter/reminders/Reminder',
-					data: {
-						key: effect.key,
-						condition: effect.key,
-						entity: entity,
-					},
-				})
-			"
-		>
-			<div class="value" :class="effect.type === 'reminder' ? `bg-${effect.color}` : ''">
-				<strong v-if="effect.value">
-					{{ effect.value }}
-				</strong>
-			</div>
-			<hk-icon v-if="effect.icon" :icon="`hki-${effect.icon}`" />
-			<q-tooltip anchor="top middle" self="center middle">
-				{{ effect.title }}
-			</q-tooltip>
+	<div class="entity-effects" :class="{ collapse: collapse }">
+		<Effect v-for="effect in visible" :key="effect.key" :effect="effect" :entity="entity" />
+		<div v-if="collapsed.length" class="entity-effects__collapsed" @click.stop>
+			+<hk-animated-integer :value="collapsed.length" />
+			<q-menu
+				:dark="$store.getters.theme === 'dark'"
+				anchor="bottom middle"
+				self="top middle"
+				transition-show="jump-down"
+				transition-hide="jump-up"
+			>
+				<div class="entity-effects__collapsed-menu">
+					<Effect v-for="effect in collapsed" :key="effect.key" :effect="effect" :entity="entity" />
+				</div>
+			</q-menu>
 		</div>
 		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
 <script>
+import Effect from "./Effect.vue";
 import { remindersMixin } from "src/mixins/reminders";
-import { mapActions } from "vuex";
 import { db } from "src/firebase";
 
 export default {
 	name: "Effects",
 	mixins: [remindersMixin],
+	components: {
+		Effect,
+	},
 	props: {
 		entity: {
 			type: Object,
 			required: true,
+		},
+		availableSpace: {
+			type: Number,
+		},
+		collapse: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {
@@ -90,13 +85,23 @@ export default {
 			return [...reminders, ...conditions];
 		},
 		space() {
-			const content = this.effects?.length * 33 - 3;
-			const space = Math.floor((this.width + 3) / 33);
-			return space;
+			const ITEM_SIZE = 33;
+			const GAP = 3;
+
+			return Math.floor((this.width + GAP + this.availableSpace) / ITEM_SIZE);
+		},
+		visible() {
+			return this.effects?.length > this.space && this.collapse
+				? this.effects?.slice(0, this.space - 1)
+				: this.effects;
+		},
+		collapsed() {
+			return this.effects?.length > this.space && this.collapse
+				? this.effects?.slice(this.space - 1, this.effects?.length + 1)
+				: [];
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
 		setSize(dimensions) {
 			this.width = dimensions.width;
 		},
@@ -108,51 +113,33 @@ export default {
 .entity-effects {
 	display: flex;
 	align-items: flex-start;
-	justify-content: flex-end;
+	flex-wrap: wrap;
 	gap: 3px;
-	height: 30px;
-	overflow: auto;
 	flex-grow: 1;
 
-	&::-webkit-scrollbar {
-		display: none;
+	&.collapse {
+		justify-content: flex-end;
+		flex-wrap: nowrap;
 	}
 
-	&__effect {
+	&__collapsed {
 		height: 30px;
 		padding: 0 3px;
 		position: relative;
 		background-color: $neutral-7;
 		border-radius: $border-radius;
+		line-height: 28px;
 		box-sizing: border-box;
 		aspect-ratio: 1/1;
 		text-align: center;
+		font-weight: bold;
 
-		&.condition {
-			line-height: 30px;
-			.value {
-				position: absolute;
-				font-size: 12px;
-				color: $neutral-1;
-				top: -5px;
-				left: 4px;
-			}
-		}
-		&.reminder {
-			padding: 6px;
-			.value {
-				width: 100%;
-				aspect-ratio: 1/1;
-				border-radius: $border-radius;
-				line-height: 18px;
-
-				strong {
-					filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
-					mix-blend-mode: luminosity;
-					opacity: 0.95;
-					width: 100%;
-				}
-			}
+		&-menu {
+			padding: 5px;
+			background-color: $neutral-11;
+			display: flex;
+			flex-direction: column;
+			gap: 3px;
 		}
 	}
 }

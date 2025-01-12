@@ -4,6 +4,7 @@
 			{{ name?.[1]?.capitalizeEach() }}
 		</span>
 		<span v-if="name[2]">{{ name[2] }}</span>
+		<slot />
 	</div>
 </template>
 

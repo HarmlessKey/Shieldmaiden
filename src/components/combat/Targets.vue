@@ -86,22 +86,7 @@
 							v-shortkey="[i]"
 							@shortkey="set_targeted({ type: 'single', key: entity.key })"
 						>
-							<TargetEntity :entity="entity">
-								<template #actions>
-									<Effects :entity="entity" />
-									<button class="btn btn-sm bg-neutral-8 target-menu__button" @click.stop>
-										<i aria-hidden="true" class="fal fa-ellipsis-v" />
-										<q-popup-proxy
-											:dark="$store.getters.theme === 'dark'"
-											anchor="bottom right"
-											self="top right"
-											:breakpoint="576"
-										>
-											<target-menu :entity="entity" />
-										</q-popup-proxy>
-									</button>
-								</template>
-							</TargetEntity>
+							<TargetEntity :entity="entity" />
 						</div>
 						<div v-if="!entity.active" class="d-flex">
 							<a
@@ -153,13 +138,11 @@ import _ from "lodash";
 import { mapGetters, mapActions } from "vuex";
 import Pane from "./Pane.vue";
 import TargetEntity from "./entities/TargetEntity.vue";
-import TargetMenu from "src/components/combat/TargetMenu.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
-import Effects from "./entities/Effects.vue";
 
 export default {
 	name: "Targets",
-	components: { Pane, TargetEntity, TargetMenu, TutorialPopover, Effects },
+	components: { Pane, TargetEntity, TutorialPopover },
 	props: ["current", "_active", "_idle"],
 	data() {
 		return {

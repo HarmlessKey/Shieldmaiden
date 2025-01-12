@@ -1,34 +1,29 @@
 <template>
 	<div v-if="entities">
-		<h2>Damage meters</h2>
+		<h2 class="mb-1">Damage meters</h2>
 		<template v-for="(type, index) in types">
 			<div v-if="_meters[type.name].length > 0" :key="`meters-${index}`">
 				<h3>{{ type.name.capitalize() }}</h3>
 				<ul>
-					<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
-						<Avatar :entity="entity" class="img" :icons="false" />
-						<q-linear-progress
-							size="30px"
-							:color="type.name === 'damage' ? 'negative' : 'positive'"
-							:value="percentage(entity[type.name], type.name) / 100"
-						>
-							<div class="info">
-								<span class="name">
-									{{ entity.name.capitalize() }}.
-									<q-tooltip anchor="center right" self="center left">
-										{{ entity.name.capitalize() }}
-									</q-tooltip>
+					<li v-for="(entity, index) in _meters[type.name]" :key="index">
+						<div class="info">
+							<BasicEntity :entity="entity" />
+							<div class="value" :class="type.name === 'damage' ? 'red' : 'green'">
+								<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
+								<template v-else>{{ entity[type.name] | numeral("0.0a") }}</template>
+								<span v-if="entity[type.over]" class="neutral-2">
+									(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
+									<template v-else>{{ entity[type.over] | numeral("0.0a") }} </template>
+									<small>over</small>)
 								</span>
-								<b class="numbers">
-									<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
-									<template v-else>{{ entity[type.name] | numeral("0.0a") }}</template>
-									<template v-if="entity[type.over]">
-										(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
-										<template v-else>{{ entity[type.over] | numeral("0.0a") }} </template>
-										<small>over</small>)
-									</template>
-								</b>
 							</div>
+						</div>
+						<q-linear-progress
+							size="33px"
+							color="neutral-9"
+							class="bg-neutral-5"
+							:value="percentage(entity[type.name], type.name)"
+						>
 						</q-linear-progress>
 					</li>
 				</ul>
@@ -40,12 +35,12 @@
 <script>
 import _ from "lodash";
 import { mapGetters } from "vuex";
-import Avatar from "../entities/Avatar.vue";
+import BasicEntity from "../entities/BasicEntity.vue";
 
 export default {
 	name: "Dmg",
 	components: {
-		Avatar,
+		BasicEntity,
 	},
 	data() {
 		return {
@@ -82,13 +77,7 @@ export default {
 	},
 	methods: {
 		percentage(input, type) {
-			var total = 0;
-
-			for (var key in this._meters[type]) {
-				var amount = this._meters[type][key][type];
-				total = total + amount;
-			}
-			return Math.floor((input / total) * 100);
+			return input / this._meters[type][0][type];
 		},
 	},
 };
@@ -96,81 +85,45 @@ export default {
 
 <style lang="scss" scoped>
 h3 {
-	font-size: 15px !important;
-	line-height: 25px;
+	font-size: 13px !important;
+	line-height: normal;
 	margin-bottom: 5px !important;
 }
 ul {
 	user-select: none;
 	padding: 0;
-	margin: 0;
+	margin: 0 0 15px 0;
 	list-style: none;
 
 	li {
-		display: grid;
-		grid-template-columns: 30px 1fr;
-		grid-template-rows: auto;
-		grid-gap: 0;
-		grid-template-areas: "img hp-bar";
-
+		position: relative;
 		margin-bottom: 1px;
 
-		.img {
-			background-color: $neutral-9;
-			color: $neutral-2;
-			background-position: center top;
-			background-repeat: no-repeat;
-			background-size: cover;
-			grid-area: img;
-			width: 30px;
-			height: 30px;
-			border: solid 1px transparent;
-			font-size: 22px;
+		.info {
+			position: relative;
+			display: flex;
+			align-items: center;
+			z-index: 10;
+			width: 100%;
+			padding-right: 8px;
+			font-size: 13px;
 
-			i::before {
-				vertical-align: 1px;
+			.value {
+				font-weight: bold;
+				flex-grow: 1;
+				text-align: right;
 			}
 		}
 		.q-linear-progress {
-			height: 30px;
-			line-height: 30px;
+			height: 32px;
+			line-height: 32px;
 			background-color: $neutral-7;
-			position: relative;
-
-			.info {
-				font-size: 13px;
-				width: 100%;
-				position: absolute;
-				left: 0;
-				display: grid;
-				grid-template-columns: auto max-content;
-				grid-template-rows: auto;
-				grid-gap: 0;
-				grid-template-areas: "name numbers";
-
-				span.name,
-				.numbers {
-					color: $neutral-1;
-				}
-				.numbers {
-					text-align: right;
-					padding: 0 5px;
-				}
-				span.name {
-					font-weight: bold !important;
-					padding-left: 5px;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-				}
-			}
+			position: absolute;
+			left: 35px;
+			top: 0;
+			width: calc(100% - 35px);
+			z-index: 0;
 		}
-	}
-}
-[data-theme="light"] {
-	ul li .img {
-		background-color: $neutral-2;
-		color: $neutral-8;
 	}
 }
 </style>

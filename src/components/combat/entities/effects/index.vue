@@ -135,7 +135,7 @@ export default {
 		font-weight: bold;
 
 		&-menu {
-			padding: 5px;
+			padding: 3px;
 			background-color: $neutral-11;
 			display: flex;
 			flex-direction: column;

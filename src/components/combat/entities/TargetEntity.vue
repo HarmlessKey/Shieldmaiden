@@ -27,7 +27,7 @@
 					</Name>
 					<div class="target-entity__content-info__actions">
 						<Effects :entity="entity" :available-space="nameWidth - 30" collapse />
-						<button class="btn btn-sm bg-neutral-8 target-menu__button" @click.stop>
+						<button class="btn btn-sm bg-neutral-8 target-menu__button" tabindex="-1" @click.stop>
 							<i aria-hidden="true" class="fal fa-ellipsis-v" />
 							<q-popup-proxy
 								:dark="$store.getters.theme === 'dark'"

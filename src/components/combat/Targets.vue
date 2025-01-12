@@ -61,24 +61,20 @@
 						tabindex="0"
 						@keydown.space="selectTarget($event, 'single', entity.key)"
 					>
-						<span
-							class="topinfo d-flex justify-content-between"
+						<div
+							class="top-of-round"
 							v-if="group === 'active' && _active[0].key == entity.key && encounter.turn != 0"
 						>
-							Top of the round
-							<div>
-								<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
-									+ {{ Object.keys(_addedNextRound).length }}
-									<q-tooltip anchor="top middle" self="center middle"> Added next round </q-tooltip>
-								</span>
-								<span class="red" v-if="Object.keys(_activeDown).length > 0">
-									<span class="neutral-3 mx-1">|</span>- {{ Object.keys(_activeDown).length }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Removed next round
-									</q-tooltip>
-								</span>
+							<div class="top-of-round__title">Top of the Round</div>
+							<div class="top-of-round__added" v-if="Object.keys(_addedNextRound).length > 0">
+								+ {{ Object.keys(_addedNextRound).length }}
+								<q-tooltip anchor="top middle" self="center middle"> Added next round </q-tooltip>
 							</div>
-						</span>
+							<div class="top-of-round__removed" v-if="Object.keys(_activeDown).length > 0">
+								- {{ Object.keys(_activeDown).length }}
+								<q-tooltip anchor="top middle" self="center middle"> Removed next round </q-tooltip>
+							</div>
+						</div>
 						<div
 							class="target"
 							v-touch-hold.mouse="(event) => selectTarget(event, 'multi', entity.key)"
@@ -372,16 +368,34 @@ ul.targets {
 	}
 	li.top {
 		position: relative;
-		margin-top: 35px;
+		margin-top: 40px;
 
-		.topinfo {
-			cursor: default;
-			text-transform: uppercase;
-			font-size: 11px;
-			width: 100%;
+		.top-of-round {
 			position: absolute;
-			top: -25px;
-			border-bottom: solid 1px $neutral-1;
+			display: flex;
+			justify-content: space-between;
+			gap: 3px;
+			font-weight: bold;
+			cursor: default;
+			width: 100%;
+			top: -40px;
+			margin-left: -25px;
+			width: calc(100% + 25px);
+
+			> div {
+				background-color: $neutral-9;
+				border-radius: $border-radius;
+				padding: 3px 8px;
+			}
+			&__title {
+				flex-grow: 1;
+			}
+			&__added {
+				color: $green;
+			}
+			&__removed {
+				color: $red;
+			}
 		}
 	}
 }

@@ -36,6 +36,11 @@ export default {
 					url: "vouchers",
 					icon: "fas fa-ticket",
 				},
+				promotions: {
+					name: "Promotions",
+					url: "promotions",
+					icon: "fas fa-megaphone",
+				},
 				// export: {
 				// 	name: "Export databases",
 				// 	url: "export",

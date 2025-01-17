@@ -1,6 +1,9 @@
 <template>
 	<div class="pricing">
 		<div class="home__container">
+			<q-no-ssr>
+				<PromoBanner class="mb-5" :closable="false" />
+			</q-no-ssr>
 			<div class="row q-col-gutter-xl items-center">
 				<div class="col-12 col-md-6">
 					<div class="head">
@@ -34,15 +37,17 @@
 					></iframe>
 				</div>
 			</div>
-
-			<!-- <Tiers class="mb-4" /> -->
 		</div>
 	</div>
 </template>
 
 <script>
+import PromoBanner from "../PromoBanner.vue";
 export default {
 	name: "Pricing",
+	components: {
+		PromoBanner,
+	},
 };
 </script>
 

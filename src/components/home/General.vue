@@ -17,26 +17,10 @@
 							track of during encounters. On top of that we enhance the player experience.<br />
 							<router-link to="/tools/combat-tracker" class="learn-more">Learn more</router-link>
 						</p>
-						<router-link to="/demo" class="btn btn-lg bg-accent">Try Demo Encounter</router-link>
-					</div>
-					<!-- <q-list>
-						<q-item
-							v-for="({ name, icon, title }, index) in items"
-							:key="`item-${index}`"
-							clickable
-							@click="setDialog(name)"
+						<router-link to="/demo/run-encounter" class="btn btn-lg bg-accent"
+							>Try Demo Encounter</router-link
 						>
-							<q-item-section avatar>
-								<i aria-hidden="true" :class="icon" class="neutral-2" />
-							</q-item-section>
-							<q-item-section>
-								{{ title }}
-							</q-item-section>
-							<q-item-section avatar>
-								<i aria-hidden="true" class="fas fa-eye neutral-3" />
-							</q-item-section>
-						</q-item>
-					</q-list> -->
+					</div>
 				</div>
 			</div>
 		</div>

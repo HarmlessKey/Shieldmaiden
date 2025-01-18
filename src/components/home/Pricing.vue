@@ -27,7 +27,7 @@
 				</div>
 				<div class="col-12 col-md-6">
 					<iframe
-						src="https://www.youtube.com/embed/-Z9i4WR5vtA?si=xYYrDRykRgjMUy8T"
+						src="https://www.youtube.com/embed/QW8wwuWvhac?si=qdwMuqAsDd0fnPVW"
 						title="Shieldmaiden Subscriptions"
 						frameborder="0"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

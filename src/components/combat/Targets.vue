@@ -43,6 +43,7 @@
 					tag="div"
 					:value="targets"
 					:animation="200"
+					handle=".drag-handle"
 					ghost-class="drag-ghost"
 					drag-class="drag-dragging"
 					:force-fallback="true"

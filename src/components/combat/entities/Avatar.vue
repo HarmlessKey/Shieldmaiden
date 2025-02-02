@@ -13,6 +13,8 @@
 					: '',
 			color: entity.color_label ? entity.color_label : ``,
 			borderColor: entity.color_label ? entity.color_label : ``,
+			width: `${size}px`,
+			minWidth: `${size}px`,
 		}"
 	>
 		<template v-if="icons && entity.hidden">
@@ -47,6 +49,10 @@ export default {
 		icons: {
 			type: Boolean,
 			default: true,
+		},
+		size: {
+			type: Number,
+			default: 32,
 		},
 	},
 };

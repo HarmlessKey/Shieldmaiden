@@ -19,7 +19,7 @@
 				<span class="btn btn-sm bg-neutral-8 mr-1">
 					{{ assigned_projectiles[key] || 0 }}
 				</span>
-				<TargetItem :item="key" />
+				<BasicEntity :entity="entities[key]" />
 				<button
 					class="btn btn-sm bg-red mx-1"
 					@click="setProjectile(false, key)"
@@ -51,7 +51,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import TargetItem from "src/components/combat/legacy/TargetItem.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 
 export default {
 	name: "Projectiles",
@@ -62,7 +62,7 @@ export default {
 		},
 	},
 	components: {
-		TargetItem,
+		BasicEntity,
 	},
 	data() {
 		return {
@@ -70,7 +70,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["encounter", "targeted"]),
+		...mapGetters(["encounter", "targeted", "entities"]),
 		available_projectiles() {
 			return (
 				this.projectileCount - Object.values(this.assigned_projectiles).reduce((a, b) => a + b, 0)
@@ -113,6 +113,12 @@ export default {
 .target {
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: 1px;
+	margin-bottom: 2px;
+
+	&::v-deep {
+		.basic-entity__wrapper {
+			flex-grow: 1;
+		}
+	}
 }
 </style>

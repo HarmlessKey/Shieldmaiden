@@ -14,7 +14,7 @@
 			<InitiativeQuickEdit :entity="entity" />
 		</div>
 		<div class="target-entity">
-			<Avatar :entity="entity" />
+			<Avatar :entity="entity" :size="56" />
 			<div class="target-entity__content">
 				<div class="target-entity__content-info">
 					<div class="target-entity__content-info__ac" @click.stop>
@@ -135,8 +135,6 @@ export default {
 		}
 	}
 	.target-avatar {
-		width: 56px;
-		min-width: 56px;
 		font-size: 42px;
 		background-color: $neutral-7;
 		border-radius: $border-radius;

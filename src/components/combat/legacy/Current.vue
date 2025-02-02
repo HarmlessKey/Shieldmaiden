@@ -34,7 +34,7 @@
 				/>
 
 				<div class="d-flex justify-content-start">
-					<TargetItem :item="current.key" />
+					<BasicEntity :entity="current" />
 				</div>
 
 				<Conditions :entity="current" />
@@ -61,7 +61,7 @@ import Reminders from "src/components/combat/Reminders.vue";
 import Actions from "src/components/combat/legacy/actions/Actions.vue";
 import { remindersMixin } from "src/mixins/reminders";
 import { dice } from "src/mixins/dice";
-import TargetItem from "src/components/combat/legacy/TargetItem.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
 import ViewEntity from "../ViewEntity.vue";
 import TutorialPopover from "../../demo/TutorialPopover.vue";
@@ -73,7 +73,7 @@ export default {
 		Actions,
 		Conditions,
 		Reminders,
-		TargetItem,
+		BasicEntity,
 		DeathSaves,
 		ViewEntity,
 		TutorialPopover,

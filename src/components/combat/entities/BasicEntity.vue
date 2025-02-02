@@ -5,8 +5,9 @@
 				class="color-label"
 				:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
 			/>
-			<Avatar :entity="entity" />
+			<Avatar :entity="entity" :size="size" />
 			<Name class="basic-entity__name truncate" :entity="entity" />
+			<slot />
 		</div>
 	</div>
 </template>
@@ -26,6 +27,10 @@ export default {
 			type: Object,
 			required: true,
 		},
+		size: {
+			type: Number,
+			default: 32,
+		},
 	},
 };
 </script>
@@ -37,10 +42,11 @@ export default {
 	justify-content: space-between;
 	gap: 8px;
 	min-width: 0;
+	margin-left: -6px;
 
 	&__wrapper {
-		margin-left: -6px;
-		overflow: hidden;
+		border-radius: $border-radius-small;
+		width: 100%;
 	}
 
 	.target-avatar {

@@ -1,21 +1,18 @@
 <template>
 	<div class="pb-5">
-		<h2 :id="`${cond.value}Table`">
+		<BasicEntity :entity="entity" />
+		<h2 :id="`${cond.value}Table`" class="mt-3">
 			<i aria-hidden="true" :class="`hki-${cond.value}`" />
 			{{ cond.name }}
 		</h2>
 
-		<TargetItem :item="entity.key" />
-
-		<hr />
-
-		<a
+		<button
 			v-if="entity.conditions[cond.value]"
 			class="btn btn-block bg-red mb-3"
 			@click="remove(cond.value)"
 		>
-			Remove condition</a
-		>
+			Remove condition
+		</button>
 
 		<table
 			v-if="cond.value === 'exhaustion'"
@@ -56,13 +53,13 @@
 <script>
 import { mapActions } from "vuex";
 import { conditions } from "src/mixins/conditions.js";
-import TargetItem from "src/components/combat/legacy/TargetItem.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 
 export default {
 	name: "Condition",
 	mixins: [conditions],
 	components: {
-		TargetItem,
+		BasicEntity,
 	},
 	props: ["data"],
 	data() {

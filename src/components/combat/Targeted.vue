@@ -166,6 +166,7 @@ import BasicEntity from "./entities/BasicEntity.vue";
 import TargetInfo from "src/components/combat/TargetInfo.vue";
 import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "../demo/TutorialPopover.vue";
+import { calc_mod } from "src/utils/generalFunctions";
 
 export default {
 	name: "Targeted",
@@ -186,6 +187,7 @@ export default {
 		return {
 			setShadow: 0,
 			abilities: abilities,
+			modifier: calc_mod,
 		};
 	},
 	computed: {
@@ -330,9 +332,6 @@ export default {
 				};
 			}
 			return stats;
-		},
-		modifier(score) {
-			return Math.floor((score - 10) / 2);
 		},
 		savingThrow(entity, ability) {
 			let proficiency;

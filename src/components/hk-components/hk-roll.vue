@@ -10,7 +10,9 @@
 		v-touch-hold.mouse="!disabled ? showDialog : null"
 		@click.stop.prevent="disabled ? null : roll ? rollDice($event) : emit($event)"
 	>
-		<slot name="default" />
+		<slot name="default">
+			<span class="roll-button" />
+		</slot>
 		<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">
 			{{ tooltip }}
 			{{ Object.keys(advantage).length === 1 ? `with ${Object.keys(advantage)[0]}` : `` }}
@@ -182,6 +184,26 @@ export default {
 
 	&:focus {
 		outline: none;
+	}
+
+	.roll-button {
+		display: inline-block;
+		cursor: pointer;
+		background-image: url("../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+		height: 20px;
+		width: 20px;
+		background-position: center;
+		background-size: cover;
+		vertical-align: -5px;
+		user-select: none;
+	}
+	.advantage .roll-button:hover,
+	.advantage.hk-roll:focus .roll-button {
+		background-image: url("../../assets/_img/logo/logo-icon-no-shield-green.svg");
+	}
+	.disadvantage .roll-button:hover,
+	.disadvantage.hk-roll:focus .roll-button {
+		background-image: url("../../assets/_img/logo/logo-icon-no-shield-red.svg");
 	}
 }
 </style>

@@ -3,7 +3,9 @@
 		<h2>Set Conditions</h2>
 		<ul class="targets">
 			<li v-for="(target, i) in condition_targets" :key="`target=${i}`">
-				<TargetItem :item="target" :i="i" />
+				<BasicEntity :entity="entities[target]">
+					<Effects :entity="entities[target]" :available-space="30" conditions collapse />
+				</BasicEntity>
 			</li>
 		</ul>
 		<hr />
@@ -106,13 +108,15 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { conditions } from "src/mixins/conditions.js";
-import TargetItem from "src/components/combat/legacy/TargetItem.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
+import Effects from "src/components/combat/entities/effects";
 
 export default {
 	name: "Conditions",
 	mixins: [conditions],
 	components: {
-		TargetItem,
+		BasicEntity,
+		Effects,
 	},
 	props: ["data"],
 	data() {
@@ -123,7 +127,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["entities", "targeted"]),
+		...mapGetters(["entities", "targeted", "entities"]),
 		condition_targets: function () {
 			if (this.data !== undefined && this.data.length > 0) return this.data;
 
@@ -235,6 +239,7 @@ ul.targets {
 	li {
 		margin-bottom: 2px !important;
 		border: solid 1px transparent;
+		width: 100%;
 	}
 }
 </style>

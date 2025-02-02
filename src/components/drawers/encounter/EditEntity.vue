@@ -3,7 +3,7 @@
 		<h2>Edit {{ entity ? "entity" : "entities" }}</h2>
 		<ul class="targets">
 			<li v-for="(target, i) in edit_targets" :key="`target=${i}`">
-				<TargetItem :item="target" :i="i" />
+				<BasicEntity :entity="entities[target]" />
 			</li>
 		</ul>
 		<hr />
@@ -312,13 +312,13 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import TargetItem from "src/components/combat/legacy/TargetItem.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import { colors } from "src/mixins/colors";
 
 export default {
 	name: "EditEntity",
 	components: {
-		TargetItem,
+		BasicEntity,
 	},
 	props: ["data"],
 	mixins: [colors],

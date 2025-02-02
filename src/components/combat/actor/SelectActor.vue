@@ -11,9 +11,9 @@
 				{{ actor.initiative }}
 			</div>
 		</div>
-		<Avatar :entity="actor" :key="actor.key" />
+		<Avatar :entity="actor" :size="60" :key="actor.key" />
 		<div class="d-flex flex-col justify-content-center items-center">
-			<button v-if="outOfTurn" @click.stop="set_actor(undefined)">
+			<button v-if="outOfTurn" @click.stop="set_actor(undefined)" class="return">
 				<hk-icon icon="fas fa-undo-alt" class="orange" />
 				<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, -5]">
 					Out of Turn
@@ -165,28 +165,16 @@ export default {
 		}
 	}
 	.target-avatar {
-		width: 60px;
-		height: 60px;
 		font-size: 44px;
 		border-radius: $border-radius;
 		margin-right: 10px;
 	}
 	.return {
-		position: absolute;
-		left: -10px;
-		top: -12px;
-		font-size: 12px;
-		background-color: $neutral-5;
-		color: $neutral-1;
-		border-radius: 9999px;
-		text-align: center;
-		line-height: 23px;
-		width: 25px;
-		height: 25px;
-		padding-right: 2px;
+		font-size: 15px;
+		margin-bottom: 5px;
 
 		&:hover {
-			background-color: $neutral-4;
+			color: $orange-light;
 		}
 	}
 }

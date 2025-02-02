@@ -44,7 +44,7 @@
 							:settings="settings"
 						/>
 						<Pane title="Actor">
-							<ViewEntity :data="_active[encounter.turn]" current />
+							<ViewEntity :data="actor || _active[encounter.turn]" current />
 						</Pane>
 						<Targets
 							ref="targets"
@@ -261,6 +261,7 @@ export default {
 			"broadcast",
 			"requests",
 			"userSettings",
+			"actor",
 		]),
 		...mapGetters("players", ["players"]),
 		...mapGetters("encounters", ["demo_encounter"]),
@@ -564,6 +565,7 @@ export default {
 	}
 
 	.pane {
+		border-radius: $border-radius;
 		&.focused,
 		&:focus {
 			outline: $neutral-3 solid 1px;

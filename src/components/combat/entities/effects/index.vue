@@ -22,7 +22,6 @@
 <script>
 import Effect from "./Effect.vue";
 import { remindersMixin } from "src/mixins/reminders";
-import { db } from "src/firebase";
 
 export default {
 	name: "Effects",
@@ -42,18 +41,18 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		conditions: {
+			type: Boolean,
+			default: false,
+		},
+		reminders: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
 			width: 0,
-		};
-	},
-	firebase() {
-		return {
-			conditions: {
-				source: db.ref("conditions"),
-				asObject: true,
-			},
 		};
 	},
 	computed: {
@@ -74,14 +73,20 @@ export default {
 						return {
 							type: "reminder",
 							key: key,
-							title: reminder.selectedVars
-								? this.replaceReminderVariables(title, reminder.selectedVars)
+							title: reminder?.selectedVars
+								? this.replaceReminderVariables(title, reminder?.selectedVars)
 								: reminder.title,
-							value: reminder.rounds,
-							color: reminder.color,
+							value: reminder?.rounds,
+							color: reminder?.color,
 						};
 					})
 				: [];
+			if (this.reminders && !this.conditions) {
+				return reminders;
+			}
+			if (this.conditions && !this.reminders) {
+				return conditions;
+			}
 			return [...reminders, ...conditions];
 		},
 		space() {

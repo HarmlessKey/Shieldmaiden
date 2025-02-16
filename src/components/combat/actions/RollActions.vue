@@ -280,7 +280,7 @@ export default {
 			}
 		},
 		roll(assigned_projectiles) {
-			this.roll_action({
+			const action = {
 				e: this.rollObject.e,
 				action_index: this.rollObject.action_index,
 				action: this.rollObject.action,
@@ -288,7 +288,9 @@ export default {
 				entity: this.actor,
 				targets: assigned_projectiles || this.targeted,
 				option: this.rollObject.option,
-			});
+			};
+			this.roll_action(action);
+			this.$emit("roll", action);
 			this.cancelRoll();
 
 			if (this.get_step("run", "roll", "monster")) {

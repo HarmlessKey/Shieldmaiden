@@ -929,12 +929,20 @@ a {
 	column-gap: 20px;
 	column-rule: 1px solid $neutral-5;
 
+	.hk-roll {
+		width: 100%;
+	}
 	.playerSkill {
-		display: grid;
-		grid-template-columns: 1fr max-content;
-		column-gap: 5px;
+		display: flex;
+		gap: 5px;
 		cursor: pointer;
+		width: 100%;
+		text-align: left;
 
+		.truncate {
+			min-width: 0;
+			flex-grow: 1;
+		}
 		&:hover {
 			color: $neutral-1;
 		}

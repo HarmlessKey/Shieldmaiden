@@ -4,9 +4,10 @@
 			<SelectActor :actor="actor" :_active="_active" :out-of-turn="outOfTurn" />
 			<Manual :actor="actor" />
 			<template v-if="actor.entityType !== 'player'">
-				<Actions :actor="actor" />
-				Spells
+				<Actions :actor="actor" :key="`actions-${actor.key}`" />
+				<Spells :actor="actor" :key="`spells-${actor.key}`" />
 			</template>
+			<div v-if="targeted.includes(actor.key)" class="actor__targeted-self">Targeted self</div>
 		</div>
 		<Details :actor="actor" />
 	</div>
@@ -18,6 +19,7 @@ import SelectActor from "./SelectActor.vue";
 import Manual from "../actions/Manual";
 import Details from "./Details.vue";
 import Actions from "./Actions.vue";
+import Spells from "./Spells.vue";
 
 export default {
 	name: "Actor",
@@ -26,6 +28,7 @@ export default {
 		Manual,
 		Details,
 		Actions,
+		Spells,
 	},
 	props: {
 		actor: {
@@ -44,7 +47,7 @@ export default {
 		return {};
 	},
 	computed: {
-		...mapGetters(["encounter"]),
+		...mapGetters(["encounter", "targeted"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 	},
 	methods: {
@@ -70,6 +73,12 @@ export default {
 		.manual {
 			margin: -100px 0;
 		}
+	}
+	&__targeted-self {
+		background-color: $orange;
+		border-radius: $border-radius;
+		padding: 3px 5px;
+		font-weight: bold;
 	}
 }
 </style>

@@ -49,7 +49,7 @@ import ActionsDropdown from "./ActionsDropdown.vue";
 import RollActions from "../actions/RollActions.vue";
 
 export default {
-	name: "ActorActions",
+	name: "ActorSpells",
 	components: {
 		ActionsDropdown,
 		RollActions,

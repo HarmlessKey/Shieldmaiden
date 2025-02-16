@@ -90,21 +90,24 @@
 			]
 		},
 		"environment": {
+			"type": "array",
 			"title": "Environment",
-			"type": "string",
-			"enum": [
-				"arctic",
-				"coastal",
-				"desert",
-				"forest",
-				"grassland",
-				"hill",
-				"mountain",
-				"swamp",
-				"underdark",
-				"underwater",
-				"urban"
-			]
+			"items": {
+				"type": "string",
+				"enum": [
+					"arctic",
+					"coastal",
+					"desert",
+					"forest",
+					"grassland",
+					"hill",
+					"mountain",
+					"swamp",
+					"underdark",
+					"underwater",
+					"urban"
+				]
+			}
 		},
 		"walk_speed": {
 			"title": "Walk speed",

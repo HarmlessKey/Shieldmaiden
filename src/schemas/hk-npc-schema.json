@@ -89,6 +89,23 @@
 				"Chaotic evil"
 			]
 		},
+		"environment": {
+			"title": "Environment",
+			"type": "string",
+			"enum": [
+				"arctic",
+				"coastal",
+				"desert",
+				"forest",
+				"grassland",
+				"hill",
+				"mountain",
+				"swamp",
+				"underdark",
+				"underwater",
+				"urban"
+			]
+		},
 		"walk_speed": {
 			"title": "Walk speed",
 			"type": "integer",

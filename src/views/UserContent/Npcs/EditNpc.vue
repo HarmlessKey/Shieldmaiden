@@ -25,7 +25,7 @@
 								<i aria-hidden="true" class="fas fa-sparkles"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Generate NPC with AI!
-								</q-tooltip> 
+								</q-tooltip>
 							</q-btn>
 							<q-btn
 								v-if="!npcId"
@@ -123,10 +123,8 @@
 						label="Description"
 						placeholder="Describe your NPC"
 						class="mb-2"
-						/>
-					<button class="btn btn-block bg-accent" @click="generate">
-						Generate
-					</button>
+					/>
+					<button class="btn btn-block bg-accent" @click="generate">Generate</button>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -139,7 +137,11 @@
 				</div>
 				<div class="card-body">
 					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
-					<button :disabled="monster_description.length == 0" class="btn btn-block bg-accent" @click="sign_up_dialog = true">
+					<button
+						:disabled="monster_description.length == 0"
+						class="btn btn-block bg-accent"
+						@click="sign_up_dialog = true"
+					>
 						Create Free Account
 					</button>
 				</div>
@@ -200,10 +202,9 @@ import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
-import { QInput } from "quasar";
+import axios from "axios";
 
 import { MonsterGenerator } from "src/services/monster_generator";
-
 
 export default {
 	name: "EditNpc",
@@ -290,9 +291,14 @@ export default {
 		},
 		async generate() {
 			this.loading = true;
-			const response = await MonsterGenerator.generateMonster(this.monster_description)
-			console.log(response);
-			this.npc = response.output
+			const response = await axios.post(
+				"api/ai/generate-monster",
+				{
+					description: this.monster_description,
+				},
+				{ timeout: 0 }
+			);
+			this.npc = response.data.output;
 			this.loading = false;
 			this.generate_dialog = false;
 		},

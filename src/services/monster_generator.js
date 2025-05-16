@@ -17,7 +17,6 @@ class MonsterGenerator {
 				headers: headers,
 				body: body,
 			});
-			console.log("Monster generated:", monster);
 			return monster.json();
 		} catch (e) {
 			console.error("Error generating monster", e);

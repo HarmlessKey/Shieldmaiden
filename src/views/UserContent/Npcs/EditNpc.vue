@@ -20,7 +20,7 @@
 								class="mx-1"
 								color="neutral-5"
 								no-caps
-								@click="generate_dialog = true"
+								@click="(create_dialog = true), (generate_monster = true)"
 							>
 								<i aria-hidden="true" class="fas fa-sparkles"></i>
 								<q-tooltip anchor="top middle" self="center middle">
@@ -109,26 +109,6 @@
 			</hk-card>
 		</q-dialog>
 
-		<!-- GENERATE DIALOG -->
-		<q-dialog v-model="generate_dialog">
-			<hk-card class="create-dialog">
-				<div slot="header" class="card-header">
-					<span>Generate an NPC with AI</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
-				<div class="card-body">
-					<p>Describe your monster</p>
-					<hk-input
-						v-model="monster_description"
-						label="Description"
-						placeholder="Describe your NPC"
-						class="mb-2"
-					/>
-					<button class="btn btn-block bg-accent" @click="generate">Generate</button>
-				</div>
-			</hk-card>
-		</q-dialog>
-
 		<q-dialog v-model="account_dialog">
 			<hk-card class="account-dialog">
 				<div slot="header" class="card-header">
@@ -154,15 +134,27 @@
 		</q-dialog>
 
 		<q-dialog v-model="create_dialog" persistent position="top">
-			<hk-card class="create-dialog" header="How do you want to do this?">
-				<div class="card-body">
-					<template v-if="!copy_monster">
+			<hk-card class="create-dialog">
+				<div slot="header" class="card-header">
+					<div v-if="generating"><span class="loader">Generating your monster</span></div>
+					<template v-else> How do you want to do this? </template>
+				</div>
+				<div
+					v-if="!generate_monster"
+					class="card-body"
+					:class="{ generate: generate_monster, generating: generating }"
+				>
+					<template v-if="!copy_monster && !generate_monster">
 						<button class="btn btn-lg btn-block" @click="copy_monster = true">
 							Copy existing monster
 						</button>
 						<h2 class="text-center my-2">OR</h2>
-						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">
+						<button class="btn btn-lg btn-block" @click="create_dialog = false">
 							Create from scratch
+						</button>
+						<h2 class="text-center my-2">OR</h2>
+						<button class="btn btn-lg btn-block bg-accent mb-2" @click="generate_monster = true">
+							AI generate (beta)
 						</button>
 					</template>
 					<template v-if="copy_monster">
@@ -170,10 +162,17 @@
 						<CopyContent @copy="copy" type="monster" />
 					</template>
 				</div>
-				<div v-if="copy_monster" class="card-footer" slot="footer">
-					<button class="btn btn-sm bg-neutral-5" @click="create_dialog = false">
+				<template v-if="generate_monster">
+					<GenerateMonster @generating="setGenerating" @finished="finishedGenerate" />
+				</template>
+				<div v-if="copy_monster || generate_monster" class="card-footer" slot="footer">
+					<button
+						v-if="!generating"
+						class="btn btn-sm bg-neutral-5"
+						@click="(copy_monster = false), (generate_monster = false)"
+					>
 						<i class="fas fa-times mr-1" aria-hidden="true" />
-						Create from scratch
+						Cancel
 					</button>
 				</div>
 			</hk-card>
@@ -202,9 +201,7 @@ import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
-import axios from "axios";
-
-import { MonsterGenerator } from "src/services/monster_generator";
+import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
 export default {
 	name: "EditNpc",
@@ -219,6 +216,7 @@ export default {
 		Actions,
 		CopyContent,
 		SignUp,
+		GenerateMonster,
 	},
 	data() {
 		return {
@@ -230,7 +228,7 @@ export default {
 			npc: {},
 			loading: false,
 			npc_copy: {},
-			generate_dialog: false,
+			generate_monster: false,
 			copy_dialog: false,
 			unsaved_changes: false,
 			create_dialog: false,
@@ -238,6 +236,8 @@ export default {
 			sign_up_dialog: false,
 			copy_monster: false,
 			monster_description: "",
+			generating: false,
+			generate_error: null,
 		};
 	},
 	async mounted() {
@@ -289,18 +289,14 @@ export default {
 			this.npc = JSON.parse(JSON.stringify({ ...result }));
 			this.npc = this.convertVersatileToOptions(this.npc);
 		},
-		async generate() {
-			this.loading = true;
-			const response = await axios.post(
-				"api/ai/generate-monster",
-				{
-					description: this.monster_description,
-				},
-				{ timeout: 0 }
-			);
-			this.npc = response.data.output;
-			this.loading = false;
-			this.generate_dialog = false;
+		setGenerating(value) {
+			this.generating = value;
+		},
+		finishedGenerate(npc) {
+			console.log(npc);
+			this.npc = npc;
+			this.generating = false;
+			this.create_dialog = false;
 		},
 		reset() {
 			this.npc = {};
@@ -462,8 +458,14 @@ export default {
 	width: 576px;
 	margin-top: 100px;
 
+	.loader {
+		color: $neutral-1;
+		font-weight: bold;
+	}
+
 	.card-body {
-		overflow: auto;
+		overflow: hidden;
+		z-index: 0;
 	}
 }
 .hk-card.account-dialog {

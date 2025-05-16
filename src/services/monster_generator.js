@@ -1,11 +1,11 @@
 
 
 
-class MonsterGenerator {
+export class MonsterGenerator {
 
 
     static async generateMonster(description) {
-        const url = "localhost:8000/generate_monster"
+        const url = "http://localhost:8000/api/generate_monster"
         const method = "POST"
         const headers = {
             "Content-Type": "application/json",
@@ -15,10 +15,13 @@ class MonsterGenerator {
             monster_description: description,
         })
 
-        return await fetch(url, {
+        const monster = await fetch(url, {
             method: method,
             headers: headers,
             body: body,
         })
+        console.log("Monster generated:", monster)
+
+        return monster.json()
     }
 }

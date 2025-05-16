@@ -20,6 +20,18 @@
 								class="mx-1"
 								color="neutral-5"
 								no-caps
+								@click="generate_dialog = true"
+							>
+								<i aria-hidden="true" class="fas fa-sparkles"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Generate NPC with AI!
+								</q-tooltip> 
+							</q-btn>
+							<q-btn
+								v-if="!npcId"
+								class="mx-1"
+								color="neutral-5"
+								no-caps
 								@click="copy_dialog = true"
 							>
 								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
@@ -97,6 +109,28 @@
 			</hk-card>
 		</q-dialog>
 
+		<!-- GENERATE DIALOG -->
+		<q-dialog v-model="generate_dialog">
+			<hk-card class="create-dialog">
+				<div slot="header" class="card-header">
+					<span>Generate an NPC with AI</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
+				<div class="card-body">
+					<p>Describe your monster</p>
+					<hk-input
+						v-model="monster_description"
+						label="Description"
+						placeholder="Describe your NPC"
+						class="mb-2"
+						/>
+					<button class="btn btn-block bg-accent" @click="generate">
+						Generate
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
+
 		<q-dialog v-model="account_dialog">
 			<hk-card class="account-dialog">
 				<div slot="header" class="card-header">
@@ -105,7 +139,7 @@
 				</div>
 				<div class="card-body">
 					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
-					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
+					<button :disabled="monster_description.length == 0" class="btn btn-block bg-accent" @click="sign_up_dialog = true">
 						Create Free Account
 					</button>
 				</div>
@@ -166,6 +200,10 @@ import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
+import { QInput } from "quasar";
+
+import { MonsterGenerator } from "src/services/monster_generator";
+
 
 export default {
 	name: "EditNpc",
@@ -191,12 +229,14 @@ export default {
 			npc: {},
 			loading: false,
 			npc_copy: {},
+			generate_dialog: false,
 			copy_dialog: false,
 			unsaved_changes: false,
 			create_dialog: false,
 			account_dialog: false,
 			sign_up_dialog: false,
 			copy_monster: false,
+			monster_description: "",
 		};
 	},
 	async mounted() {
@@ -247,6 +287,14 @@ export default {
 			this.create_dialog = false;
 			this.npc = JSON.parse(JSON.stringify({ ...result }));
 			this.npc = this.convertVersatileToOptions(this.npc);
+		},
+		async generate() {
+			this.loading = true;
+			const response = await MonsterGenerator.generateMonster(this.monster_description)
+			console.log(response);
+			this.npc = response.output
+			this.loading = false;
+			this.generate_dialog = false;
 		},
 		reset() {
 			this.npc = {};

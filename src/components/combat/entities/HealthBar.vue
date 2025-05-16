@@ -53,9 +53,9 @@ export default {
 		},
 		mainColor() {
 			switch (true) {
-				case this.current < 33:
+				case this.current <= 25:
 					return "bg-red";
-				case this.current < 76:
+				case this.current <= 50:
 					return "bg-orange";
 				default:
 					return "bg-green";

@@ -44,11 +44,11 @@
 					<span
 						class="current"
 						:class="{
-							red: percentage(health.curHp, health.maxHp) <= 33,
+							red: percentage(health.curHp, health.maxHp) <= 25,
 							orange:
-								percentage(health.curHp, health.maxHp) > 33 &&
-								percentage(health.curHp, health.maxHp) <= 76,
-							green: percentage(health.curHp, health.maxHp) > 76,
+								percentage(health.curHp, health.maxHp) > 25 &&
+								percentage(health.curHp, health.maxHp) <= 50,
+							green: percentage(health.curHp, health.maxHp) > 50,
 						}"
 					>
 						<hk-animated-integer :value="health.curHp" />
@@ -85,10 +85,13 @@
 				class="fas"
 				:class="{
 					'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
+					'green fa-heart-broken':
+						percentage(entity.curHp, entity.maxHp) > 50 &&
+						percentage(entity.curHp, entity.maxHp) < 100,
 					'orange fa-heart-broken':
-						percentage(entity.curHp, entity.maxHp) < 100 &&
-						percentage(entity.curHp, entity.maxHp) > 33,
-					'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
+						percentage(entity.curHp, entity.maxHp) <= 50 &&
+						percentage(entity.curHp, entity.maxHp) > 25,
+					'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 25,
 				}"
 			/>
 		</div>

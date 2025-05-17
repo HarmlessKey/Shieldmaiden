@@ -73,6 +73,7 @@ export default {
 							dispatch("encounters/fetch_encounter_count"),
 							dispatch("reminders/fetch_reminder_count"),
 							dispatch("spells/fetch_spell_count"),
+							dispatch("set_user_ai"),
 						]);
 					})
 					.then(async () => {

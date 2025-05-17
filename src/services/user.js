@@ -68,6 +68,26 @@ export class userServices {
 	}
 
 	/**
+	 * Get spent ai credits
+	 *
+	 * @param {String} uid ID of active user
+	 * @returns Spent AI credits /subscription_ai_credits_spent
+	 */
+	static getSpentCreditsWithCallback(uid, callback) {
+		return USERS_REF.child(uid).child("subscription_ai_credits_spent").on("value", callback);
+	}
+
+	/**
+	 * Get ai credits
+	 *
+	 * @param {String} uid ID of active user
+	 * @returns All user settings from /subscription_ai_credits_spent
+	 */
+	static getCreditsWithCallback(uid, callback) {
+		return USERS_REF.child(uid).child("ai_credits").on("value", callback);
+	}
+
+	/**
 	 * Update a setting for a user
 	 *
 	 * @param {String} uid ID of active user

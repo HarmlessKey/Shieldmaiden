@@ -3,8 +3,8 @@
 		<div class="generate-monster__content">
 			<h2 class="text-shadow">Generate your monster with AI</h2>
 			<template v-if="error">
-				<p>Something went wrong generating your monster.</p>
-				<p>{{ error }}</p>
+				<p class="red">Something went wrong generating your monster.</p>
+				<p class="red">{{ error }}</p>
 			</template>
 			<p class="text-shadow">Describe your monster</p>
 			<hk-input
@@ -17,18 +17,25 @@
 				name="Prompt"
 				class="mb-2"
 			/>
-			<button
-				class="btn btn-block bg-accent"
-				:disabled="!monster_description || monster_description.length > max_length"
-				@click="generate"
-			>
-				Generate
-			</button>
+			<div class="d-flex justify-content-between">
+				<div>
+					<div class="credits" :class="ai.total <= 0 ? 'red' : 'green'">{{ ai.total.min(0) }}</div>
+					Credits
+				</div>
+				<button
+					class="btn bg-accent"
+					:disabled="!monster_description || monster_description.length > max_length"
+					@click="generate"
+				>
+					Generate
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import axios from "axios";
 
 export default {
@@ -43,7 +50,9 @@ export default {
 			error: null,
 		};
 	},
-	computed: {},
+	computed: {
+		...mapGetters(["ai"]),
+	},
 	methods: {
 		async generate() {
 			this.$emit("generating", true);
@@ -97,7 +106,7 @@ export default {
 	&.generating {
 		&:before {
 			opacity: 1;
-			animation: zoomRotate 20s ease-in-out infinite;
+			animation: zoomRotate 30s ease-in-out infinite;
 		}
 		&:after {
 			content: "Assembling your monster";
@@ -114,6 +123,15 @@ export default {
 		.generate-monster__content {
 			opacity: 0;
 		}
+	}
+	.credits {
+		font-weight: bold;
+		padding: 3px 5px;
+		background-color: $neutral-5;
+		display: inline-block;
+		border-radius: $border-radius;
+		box-shadow: 0px 0px 5px $black;
+		margin-right: 2px;
 	}
 }
 

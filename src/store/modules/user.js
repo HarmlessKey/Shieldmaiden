@@ -16,6 +16,7 @@ const user_state = () => ({
 	userInfo: undefined,
 	tier: undefined,
 	voucher: undefined,
+	ai: {},
 	overencumbered: undefined,
 	content_count: {},
 	slots_used: {},
@@ -49,6 +50,18 @@ const user_getters = {
 	},
 	voucher(state) {
 		return state.voucher;
+	},
+	ai(state) {
+		const spent = state.ai.spent || 0;
+		const subscription = state.tier?.benefits?.ai_credits || 0;
+		const credits = state.ai.credits || 0;
+
+		return {
+			credits,
+			subscription,
+			spent,
+			total: subscription - spent + credits,
+		};
 	},
 	overencumbered(state) {
 		return state.overencumbered;
@@ -255,6 +268,31 @@ const user_actions = {
 				throw error;
 			}
 		}
+	},
+
+	async set_user_ai({ dispatch, rootGetters }) {
+		const uid = rootGetters.user.uid;
+		if (uid) {
+			try {
+				userServices.getSpentCreditsWithCallback(uid, (snapshot) => {
+					dispatch("set_ai_spent", snapshot);
+				});
+				userServices.getCreditsWithCallback(uid, (snapshot) => {
+					dispatch("set_ai_credits", snapshot);
+				});
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	set_ai_spent({ commit }, snapshot) {
+		const spent = snapshot.val();
+		commit("SET_AI_SPENT", spent);
+	},
+	set_ai_credits({ commit }, snapshot) {
+		const credits = snapshot.val();
+		commit("SET_AI_CREDITS", credits);
 	},
 
 	async update_userInfo({ commit, dispatch, rootGetters }, value) {
@@ -608,9 +646,19 @@ const user_mutations = {
 	},
 	SET_TIER(state, payload) {
 		Vue.set(state, "tier", payload);
+		Vue.set(state.tier, "benefits", payload.benefits || {});
+		Vue.set(state.tier.benefits, "ai_credits", payload.benefits?.ai_credits || 0);
 	},
 	SET_VOUCHER(state, payload) {
 		Vue.set(state, "voucher", payload);
+	},
+	SET_AI_SPENT(state, payload) {
+		Vue.set(state.ai, "spent", payload);
+		console.log("commit state.ai.spent", state.ai.spent);
+	},
+	SET_AI_CREDITS(state, payload) {
+		Vue.set(state.ai, "credits", payload);
+		console.log("commit state.ai.credits", state.ai.credits);
 	},
 	SET_ENCUMBRANCE(state, value) {
 		Vue.set(state, "overencumbered", value);

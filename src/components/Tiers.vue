@@ -61,6 +61,7 @@
 									<span>
 										{{ benefit.title }}
 										<span v-if="key === 'character_sync'" class="neutral-3">*</span>
+										<span v-if="key === 'ai_credits'" class="neutral-3">(per month)</span>
 									</span>
 								</li>
 								<li>
@@ -179,6 +180,9 @@ export default {
 				},
 				import: {
 					title: "Import content",
+				},
+				ai_credits: {
+					title: "AI credits",
 				},
 			},
 			storage_size: {

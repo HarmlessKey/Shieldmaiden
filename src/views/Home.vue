@@ -183,6 +183,11 @@ export default {
 				content: "...";
 			}
 		}
+		.footer {
+			.content {
+				max-width: 1280px;
+			}
+		}
 	}
 }
 .hk-layout {

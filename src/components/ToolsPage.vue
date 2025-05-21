@@ -51,7 +51,7 @@ export default {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-size: auto;
+		background-size: cover;
 		font-weight: bold;
 		min-height: unset;
 		aspect-ratio: 5/2;

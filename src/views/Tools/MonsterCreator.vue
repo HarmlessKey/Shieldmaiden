@@ -1,5 +1,5 @@
 <template>
-	<ToolsPage title="Monster Creator" bg_img="monster-tool-header.jpg">
+	<ToolsPage title="Monster Creator" bg_img="monster-creator-header.webp">
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn
 				color="primary"
@@ -104,12 +104,30 @@
 import { mapActions } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import ToolsPage from "src/components/ToolsPage.vue";
+
 export default {
 	name: "ToolsMonsterCreator",
 	components: {
 		ToolsPage,
 	},
-
+	meta() {
+		return {
+			meta: {
+				twitterImage: {
+					name: "twitter:image",
+					content: require(`assets/_img/meta/shieldmaiden-monster-creator.png`),
+				},
+				ogImage: {
+					property: "og:image",
+					content: require(`assets/_img/meta/shieldmaiden-monster-creator.png`),
+				},
+				ogImageAlt: {
+					property: "og:image:alt",
+					content: "Shieldmaiden Monster Creator",
+				},
+			},
+		};
+	},
 	mixins: [dice],
 	data() {
 		return {

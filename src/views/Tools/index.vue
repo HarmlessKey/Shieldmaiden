@@ -97,7 +97,7 @@ export default {
 							title: "Monster Creator",
 							description:
 								"Build custom monster stat blocks with easy to roll actions. You can use your monsters in our combat tracker.",
-							image: "monster-medium.jpg",
+							image: "monster-creator-medium.webp",
 							url: "/tools/monster-creator",
 							icon: "fas fa-dragon",
 						},

@@ -659,6 +659,7 @@ const user_mutations = {
 	SET_AI_CREDITS(state, payload) {
 		Vue.set(state.ai, "credits", payload);
 		console.log("commit state.ai.credits", state.ai.credits);
+		console.log("credits", state.ai.credits);
 	},
 	SET_ENCUMBRANCE(state, value) {
 		Vue.set(state, "overencumbered", value);

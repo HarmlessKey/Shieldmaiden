@@ -1,6 +1,6 @@
 <template>
 	<div class="card-body generate-monster" :class="{ generating: generating }">
-		<div v-if="tier.name !== 'Free'" class="generate-monster__content">
+		<div v-if="tier.price !== 'Free'" class="generate-monster__content">
 			<h2 class="text-shadow d-flex justify-content-between">
 				<span>Generate your monster with AI</span>
 				<em>BETA</em>
@@ -173,7 +173,6 @@ export default {
 		startMessageRotation() {
 			if (this.messageInterval) return;
 			this.messageInterval = setInterval(() => {
-				console.log("rotate");
 				this.message_index = (this.message_index + 1) % this.messages.length;
 			}, 3000);
 		},

@@ -11,7 +11,7 @@
 						<span>Export</span>
 					</ExportUserContent>
 					<button
-						v-if="ai.total > 0"
+						v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
 						class="btn btn-sm bg-neutral-5 mr-2"
 						@click="generate_dialog = true"
 					>

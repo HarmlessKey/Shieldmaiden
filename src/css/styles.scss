@@ -1558,6 +1558,9 @@ html body {
 		&.btn-square {
 			border-radius: 0;
 		}
+		&.btn-round {
+			border-radius: 9999px;
+		}
 	}
 
 	a.logout {

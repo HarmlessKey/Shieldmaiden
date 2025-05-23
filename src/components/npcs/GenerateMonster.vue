@@ -1,6 +1,6 @@
 <template>
 	<div class="card-body generate-monster" :class="{ generating: generating }">
-		<div class="generate-monster__content">
+		<div v-if="tier.name !== 'Free'" class="generate-monster__content">
 			<h2 class="text-shadow d-flex justify-content-between">
 				<span>Generate your monster with AI</span>
 				<em>BETA</em>
@@ -9,7 +9,20 @@
 				<p class="red">Something went wrong generating your monster.</p>
 				<p class="red">{{ error }}</p>
 			</template>
-			<p class="text-shadow">Describe your monster</p>
+			<p class="text-shadow mb-1">
+				Describe your monster
+				<button
+					class="btn btn-clear btn-sm btn-round"
+					@click="
+						setDrawer({
+							show: true,
+							type: 'drawers/AIPromptInfo',
+						})
+					"
+				>
+					<hk-icon icon="fas fa-info-circle" />
+				</button>
+			</p>
 			<hk-input
 				v-model="monster_description"
 				label="Description"
@@ -19,25 +32,24 @@
 				:rules="`max:${max_length}`"
 				name="Prompt"
 				class="mb-2"
-				:disabled="ai.total <= 0"
+				:disable="ai.total <= 0"
 			/>
 			<div class="d-flex justify-content-between items-center">
 				<div>
 					<div class="credits" :class="ai.total <= 0 ? 'red' : 'green'">{{ ai.total.min(0) }}</div>
 					Credits
 				</div>
-				<div>
+				<div v-if="ai.total > 0">
 					<q-toggle v-model="auto_download" label="Auto-Download" left-label size="xs" />
 					<button
-						v-if="ai.total > 0"
 						class="btn bg-accent"
 						:disabled="!monster_description || monster_description.length > max_length"
 						@click="generate"
 					>
 						Generate
 					</button>
-					<button v-else class="btn bg-neutral-5" disabled>Not enough credits</button>
 				</div>
+				<button v-else class="btn bg-neutral-5" disabled>Not enough credits</button>
 			</div>
 			<div v-if="generated_npcs.length" class="generate-monster__history">
 				<strong>History</strong>
@@ -54,6 +66,20 @@
 					<hk-icon icon="fas fa-download" />
 				</div>
 			</div>
+		</div>
+		<div v-else class="text-center">
+			<h2 class="text-shadow">Subscribe and generate monster with AI</h2>
+			<p class="mb-4 text-shadow">
+				A subscription is required to use our AI generation functionality.
+			</p>
+			<router-link to="/patreon" class="btn btn-block bg-patreon-red">Subscribe now</router-link>
+		</div>
+		<div v-if="generating" class="messages">
+			<hk-loader>
+				<transition name="slide" mode="out-in">
+					<div :key="currentMessage" v-text="currentMessage" class="message" />
+				</transition>
+			</hk-loader>
 		</div>
 	</div>
 </template>
@@ -73,17 +99,40 @@ export default {
 			max_length: 500,
 			error: null,
 			auto_download: true,
+			message_index: null,
+			messages: [
+				"Gathering parts",
+				"Assembling monster",
+				"Teaching languages",
+				"Training combat skills",
+				"Enhancing senses",
+				"Forging weapons",
+				"Infusing arcane energy",
+				"Adding a dash of evil",
+				"Oops... a lot of evil it is",
+				"Caging the monster",
+				"It might've broken free",
+				"Running away",
+				"Good luck, it's your problem now",
+			],
+			messageInterval: null,
 		};
 	},
 	computed: {
-		...mapGetters(["ai"]),
+		...mapGetters(["ai", "tier"]),
 		...mapGetters("npcs", ["generated_npcs"]),
+		currentMessage() {
+			return this.messages[this.message_index];
+		},
 	},
 	methods: {
+		...mapActions(["setDrawer"]),
 		...mapActions("npcs", ["cache_generated_npc"]),
 		async generate() {
 			this.$emit("generating", true);
 			this.generating = true;
+			this.message_index = 0;
+			this.startMessageRotation();
 			try {
 				const response = await axios.post(
 					"api/ai/generate-monster",
@@ -108,6 +157,8 @@ export default {
 			} finally {
 				this.$emit("generating", false);
 				this.generating = false;
+				this.stopMessageRotation();
+				this.monster_description = null;
 			}
 		},
 		download(monster) {
@@ -118,6 +169,17 @@ export default {
 			a.download = monster.name;
 			a.click();
 			URL.revokeObjectURL(url);
+		},
+		startMessageRotation() {
+			if (this.messageInterval) return;
+			this.messageInterval = setInterval(() => {
+				console.log("rotate");
+				this.message_index = (this.message_index + 1) % this.messages.length;
+			}, 3000);
+		},
+		stopMessageRotation() {
+			clearInterval(this.messageInterval);
+			this.messageInterval = null;
 		},
 	},
 };
@@ -150,25 +212,23 @@ export default {
 			opacity: 1;
 			animation: zoomRotate 30s ease-in-out infinite;
 		}
-		&:after {
-			content: "Assembling your monster";
-			position: absolute;
-			width: 100%;
-			left: 0;
-			top: 50%;
-			transform: translateY(-50%);
-			font-size: 30px;
-			font-weight: bold;
-			text-shadow: 0 0 5px $black;
-			text-align: center;
-		}
 		.generate-monster__content {
 			opacity: 0;
 		}
 	}
+	.messages {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		font-size: 30px;
+		font-weight: bold;
+		text-shadow: 0 0 5px $black;
+	}
 	.credits {
 		font-weight: bold;
-		padding: 3px 5px;
+		padding: 3px 8px;
 		background-color: $neutral-5;
 		display: inline-block;
 		border-radius: $border-radius;
@@ -183,7 +243,7 @@ export default {
 			justify-content: space-between;
 			border-radius: $border-radius;
 			background-color: $neutral-6;
-			padding: 5px 8px;
+			padding: 5px 10px;
 			margin-top: 2px;
 			cursor: pointer;
 
@@ -192,6 +252,27 @@ export default {
 			}
 		}
 	}
+}
+
+.slide-enter-active,
+.slide-leave-active {
+	transition: all 0.5s ease;
+}
+.slide-enter {
+	transform: translateX(100%);
+	opacity: 0;
+}
+.slide-enter-to {
+	transform: translateX(0);
+	opacity: 1;
+}
+.slide-leave {
+	transform: translateX(0);
+	opacity: 1;
+}
+.slide-leave-to {
+	transform: translateX(-100%);
+	opacity: 0;
 }
 
 @keyframes zoomRotate {

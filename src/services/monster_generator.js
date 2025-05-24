@@ -1,10 +1,10 @@
 class MonsterGenerator {
 	static async generateMonster(description) {
-		console.log("description", description);
-		const url = "http://localhost:8000/api/generate_monster";
+		const url = process.env.MONSTER_GENERATOR_URL;
 		const method = "POST";
 		const headers = {
 			"Content-Type": "application/json",
+			"x-api-key": process.env.MONSTER_GENERATOR_API_KEY,
 		};
 
 		const body = JSON.stringify({

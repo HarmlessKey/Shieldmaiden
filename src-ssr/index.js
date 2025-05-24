@@ -14,6 +14,14 @@ const express = require("express");
 const morgan = require("morgan");
 const compression = require("compression");
 
+const path = require("path");
+require("dotenv").config({
+	path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}.local`),
+});
+
+const extension = require("./extension");
+const express = require("express");
+
 const ssr = require("quasar-ssr");
 const extension = require("./extension");
 const app = express();
@@ -63,7 +71,7 @@ app.get(ssr.resolveUrl("*"), (req, res) => {
 	// res.setHeader('X-Content-Type-Options', 'nosniff')
 
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
-	res.setHeader('Access-Control-Allow-Origin', 'https://harmlesskey.com') // one of '*', '<origin>' where origin is one SINGLE origin
+	res.setHeader("Access-Control-Allow-Origin", "https://harmlesskey.com"); // one of '*', '<origin>' where origin is one SINGLE origin
 
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
 	// res.setHeader('X-DNS-Prefetch-Control', 'off') // may be slower, but stops some leaks

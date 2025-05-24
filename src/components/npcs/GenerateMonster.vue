@@ -87,6 +87,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import axios from "axios";
+import { Cookies } from "quasar";
 
 export default {
 	name: "GenerateMonster",
@@ -138,10 +139,16 @@ export default {
 					"api/ai/generate-monster",
 					{
 						description: this.monster_description,
+						subscription: this.tier?.benefits?.ai_credits || 0,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${Cookies.get("access_token")}`,
+						},
 					},
 					{ timeout: 0 }
 				);
-				const monster = response?.data?.output;
+				const monster = response?.data?.output || {};
 				monster.source = "Shieldm.ai.den";
 				monster.hit_dice = monster?.hit_dice?.split("+")[0];
 				this.cache_generated_npc(monster);

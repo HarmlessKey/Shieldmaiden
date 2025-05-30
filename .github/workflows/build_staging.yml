@@ -57,4 +57,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: harmlesskey/harmlesskey_staging
+          tags: ghcr.io/harmlesskey/harmlesskey_staging

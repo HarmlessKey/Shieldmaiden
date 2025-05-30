@@ -139,7 +139,6 @@ export default {
 					"api/ai/generate-monster",
 					{
 						description: this.monster_description,
-						subscription: this.tier?.benefits?.ai_credits || 0,
 					},
 					{
 						headers: {

@@ -21,6 +21,7 @@ class MonsterGenerator {
 			return monster.json();
 		} catch (e) {
 			console.error("Error generating monster", e);
+			throw e;
 		}
 	}
 }

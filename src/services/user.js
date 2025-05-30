@@ -7,6 +7,7 @@ const SETTINGS_REF = db.ref("settings");
 const SEARCH_USERS_REF = db.ref("search_users");
 const VOUCHER_HISTORY_REF = db.ref("voucher_history");
 const SOUNDBOARD_REF = db.ref("soundboard");
+const TIERS_REF = db.ref("tiers");
 
 /**
  * User Firebase Service
@@ -131,7 +132,6 @@ export class userServices {
 	/*
 	 *
 	 */
-
 	static async setActiveVoucher(uid, voucher_object) {
 		let date = await serverUtils.getServerTime();
 		date.setMonth(date.getMonth() + voucher_object.duration);

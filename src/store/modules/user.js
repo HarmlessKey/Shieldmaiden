@@ -3,7 +3,9 @@ import { Cookies } from "quasar";
 import { db, auth } from "src/firebase";
 import { userServices } from "src/services/user";
 import { voucherService } from "src/services/vouchers";
+import { serverUtils } from "src/services/serverUtils";
 import { patreonServices } from "src/services/patreon";
+import { SubscriptionServices } from "src/services/subscription";
 import Vue from "vue";
 
 const users_ref = db.ref("users");
@@ -120,131 +122,57 @@ const user_actions = {
 				const user_info = user_snapshot.val();
 
 				if (user_info) {
-					//Fetch patron info with email
-					const email = user_info.patreon_email
-						? user_info.patreon_email.toLowerCase()
-						: user_info.email.toLowerCase();
-
-					// Use firebase serverTimeOffset to get the date from the server and not the client.
-					// https://firebase.google.com/docs/database/web/offline-capabilities#clock-skew
-					let time_ms = 0;
-					await db
-						.ref("/.info/serverTimeOffset")
-						.once("value")
-						.then(
-							function stv(data) {
-								time_ms = data.val() + Date.now();
-							},
-							(err) => {
-								return err;
-							}
-						);
-
-					const server_time = new Date(time_ms).toISOString();
+					const server_time = await serverUtils.getServerTime();
 					const legacy_date = new Date(2024, 4, 15).getTime();
+					const tiersSnap = await tiers_ref.once("value");
+					const tiers = tiersSnap.val();
 
 					// User always basic reward tier
-					let path =
-						!user_info.created || user_info.created < legacy_date ? `tiers/legacy` : `tiers/basic`;
+					let tier_id = !user_info.created || user_info.created < legacy_date ? `legacy` : `basic`;
 
 					// If user has voucher use this
 					if (user_info.voucher) {
 						let voucher = user_info.voucher;
 
 						if (user_info.voucher.date === undefined) {
-							path = `tiers/${user_info.voucher.id}`;
+							tier_id = user_info.voucher.id;
 						} else {
 							const end_date = new Date(user_info.voucher.date).toISOString();
 
-							if (server_time > end_date) {
+							if (server_time.toISOString() > end_date) {
 								dispatch("remove_voucher", rootGetters.user.uid);
 								voucher = undefined;
 							} else {
-								path = `tiers/${user_info.voucher.id}`;
+								tier_id = user_info.voucher.id;
 							}
 						}
 						commit("SET_VOUCHER", voucher);
 					}
-					let vouch_tiers = db.ref(path);
-					vouch_tiers.once("value", (voucher_snap) => {
-						// Get the order of voucher/basic
-						let voucher_order = voucher_snap.val().order;
+					const tier = tiers[tier_id];
 
-						// Search email in patrons
-						let patrons = db.ref("new_patrons").orderByChild("email").equalTo(email);
-						patrons.on("value", async (patron_snapshot) => {
-							// If user patron check if patron tier is higher than voucher/basic tier
-							if (patron_snapshot.val()) {
-								const patron_data = Object.values(patron_snapshot.val())[0];
+					// For vouchers we don't hand out AI credits
+					tier.benefits.ai_credits = 0;
 
-								// Set pledge to expired if there is no pledge_end present
-								const expired = new Date(time_ms);
-								expired.setDate(expired.getDate() - 1);
-								const pledge_end = patron_data.pledge_end
-									? new Date(patron_data.pledge_end).toISOString()
-									: expired.toISOString();
+					//Fetch patron info with email
+					const email = user_info.patreon_email
+						? user_info.patreon_email.toLowerCase()
+						: user_info.email.toLowerCase();
 
-								// Compare patron tiers to find highest tier checking order in FB
-								let highest_order = 0;
-								let highest_tier = "basic";
+					// Search email in patrons
+					const patronsRef = db.ref("new_patrons").orderByChild("email").equalTo(email);
+					const patronSnap = await patronsRef.once("value");
+					const patron = patronSnap.val();
 
-								// When the last_charge_status = Pending a user won't have a Patreon tier yet
-								// Just hand out free tier for pending status
-								if (patron_data.tiers) {
-									const patron_tierlist = Object.keys(patron_data.tiers);
+					const patreon_tier = await SubscriptionServices.getActivePatreonTier(
+						tiers,
+						user_info,
+						patron,
+						tier.order,
+						server_time
+					);
 
-									if (patron_tierlist.length > 1) {
-										for (let i in patron_tierlist) {
-											let tier_id = patron_tierlist[i];
-											await tiers_ref.child(tier_id).once("value", (tier_snapshot) => {
-												let tier_order = tier_snapshot.val()?.order || 0;
-												if (tier_order > highest_order) {
-													highest_order = tier_order;
-													highest_tier = tier_id;
-												}
-											});
-										}
-									} else {
-										highest_tier = patron_tierlist[0];
-									}
-								}
-
-								//Get tier info
-								let patron_tier = db.ref(`tiers/${highest_tier}`);
-								patron_tier.on("value", (tier_snapshot) => {
-									const tier = tier_snapshot.val();
-									const tier_order = tier?.order || 0;
-									const tier_name = tier?.name || "Free";
-
-									//Save Patron info under UserInfo
-									user_info.patron = {
-										last_charge_status: patron_data.last_charge_status,
-										pledge_end,
-										expired: server_time > pledge_end,
-										tier: tier_name,
-									};
-
-									// Only hand out Patreon benefits if
-									// - a Patreon account is linked
-									// - the tier is better than the voucher tier
-									// - the pledge is not expired
-									if (
-										user_info.patreon_id &&
-										tier_order >= voucher_order &&
-										pledge_end >= server_time
-									) {
-										commit("SET_TIER", tier);
-									} else {
-										commit("SET_TIER", voucher_snap.val());
-									}
-								});
-							}
-							// If not patron use voucher/basic tier
-							else {
-								commit("SET_TIER", voucher_snap.val());
-							}
-						});
-					});
+					// If not patron use voucher/basic tier
+					commit("SET_TIER", patreon_tier || tier);
 					commit("SET_USERINFO", user_info);
 				}
 			});
@@ -654,12 +582,9 @@ const user_mutations = {
 	},
 	SET_AI_SPENT(state, payload) {
 		Vue.set(state.ai, "spent", payload);
-		console.log("commit state.ai.spent", state.ai.spent);
 	},
 	SET_AI_CREDITS(state, payload) {
 		Vue.set(state.ai, "credits", payload);
-		console.log("commit state.ai.credits", state.ai.credits);
-		console.log("credits", state.ai.credits);
 	},
 	SET_ENCUMBRANCE(state, value) {
 		Vue.set(state, "overencumbered", value);

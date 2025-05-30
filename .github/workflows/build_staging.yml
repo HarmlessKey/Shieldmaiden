@@ -24,6 +24,10 @@ jobs:
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
 
+      - name: Create temporary firebaseServiceAccountKey.json
+        run: |
+          echo "{}" > firebaseServiceAccountKey.json
+
       # - name: Create env file
       #   run: |
       #     cat << EOF >> .env.production.local

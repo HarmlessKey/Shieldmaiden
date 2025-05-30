@@ -30,7 +30,10 @@ router.post("/patreon/identity", async (req, res) => {
 });
 
 router.post("/ai/generate-monster", async (req, res) => {
-	const idToken = req.headers.authorization?.split("Bearer ")[1];
+	if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {
+		return res.status(401).json({ error: "Unauthorized" });
+	}
+	const idToken = req.headers.authorization.split("Bearer ")[1];
 	console.log(process.env.VUE_APP_FIREBASE_DATABASE_URL);
 
 	if (!idToken) {

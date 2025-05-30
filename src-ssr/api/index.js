@@ -2,8 +2,16 @@ const { Router } = require("express");
 const { patreonServices } = require("../../src/services/patreon");
 const { MonsterGenerator } = require("../../src/services/monster_generator");
 const { SubscriptionServices } = require("../../src/services/subscription");
+
+const fs = require("fs");
+const path = require("path");
+
 const admin = require("firebase-admin");
-const serviceAccount = require("../../firebaseServiceAccountKey.json");
+
+const serviceAccountFilePath = path.resolve(process.cwd(), "firebaseServiceAccountKey.json");
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountFilePath, "utf8"));
+
+
 process.env.GOOGLE_CLOUD_PROJECT = serviceAccount.project_id;
 if (!admin.apps.length) {
 	try {

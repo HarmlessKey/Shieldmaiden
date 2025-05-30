@@ -24,6 +24,12 @@ jobs:
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
 
+      - name: Create env file
+        run: |
+          cat << EOF >> .env.production.local
+          ${{ secrets.ENV_FILE }}
+          EOF
+
       - # Fill firebaseServiceAccountKey.json with an empty object
         name: Create firebaseServiceAccountKey.json
         run: |

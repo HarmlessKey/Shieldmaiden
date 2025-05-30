@@ -37,8 +37,13 @@ class SubscriptionServices {
 
 			//Get tier info
 			const patreon_tier = tiers[highest_tier];
-			const patreon_tier_order = patreon_tier?.order || 0;
-			const tier_name = patreon_tier?.name || "Free";
+			let patreon_tier_order = 0;
+			let tier_name = "Free";
+
+			if (patreon_tier) {
+				patreon_tier_order = patreon_tier.order;
+				tier_name = patreon_tier.name;
+			}
 
 			//Save Patron info under UserInfo
 			user_info.patron = {

@@ -1,6 +1,7 @@
 class MonsterGenerator {
 	static async generateMonster(description) {
-		const url = process.env.MONSTER_GENERATOR_URL;
+		const baseUrl = process.env.MONSTER_GENERATOR_API_URL;
+		const url = `${baseUrl}/generate_monster`;
 		const method = "POST";
 		const headers = {
 			"Content-Type": "application/json",

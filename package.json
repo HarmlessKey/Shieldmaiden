@@ -34,6 +34,7 @@
 		"lodash": "^4.17.21",
 		"marked": "^4.0.16",
 		"morgan": "^1.10.0",
+		"node-fetch": "^3.3.2",
 		"quasar": "^1.0.0",
 		"sanitize-html": "^2.13.0",
 		"splitpanes": "^2.4.1",

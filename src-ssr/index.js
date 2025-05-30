@@ -19,9 +19,6 @@ require("dotenv").config({
 	path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}.local`),
 });
 
-const extension = require("./extension");
-const express = require("express");
-
 const ssr = require("quasar-ssr");
 const extension = require("./extension");
 const app = express();

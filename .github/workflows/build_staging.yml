@@ -24,16 +24,16 @@ jobs:
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
 
-      # - name: Create env file
-      #   run: |
-      #     cat << EOF >> .env.production.local
-      #     ${{ secrets.ENV_FILE_STAGING }}
-      #     EOF
-
-      - # Fill firebaseServiceAccountKey.json with an empty object
-        name: Create firebaseServiceAccountKey.json
+      - name: Create public env file
         run: |
-          echo "{}" > firebaseServiceAccountKey.json
+          cat << EOF >> .env.production.local
+          ${{ secrets.ENV_FILE_STAGING }}
+          EOF
+
+      # - # Fill firebaseServiceAccountKey.json with an empty object
+      #   name: Create firebaseServiceAccountKey.json
+      #   run: |
+      #     echo "{}" > firebaseServiceAccountKey.json
 
       - run: quasar build -m ssr -d --if-present
 

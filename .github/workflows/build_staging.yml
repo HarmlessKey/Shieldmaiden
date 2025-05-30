@@ -24,11 +24,11 @@ jobs:
       - run: npm i -g @quasar/cli@latest
       - run: npm ci
 
-      - name: Create env file
-        run: |
-          cat << EOF >> .env.production.local
-          ${{ secrets.STAGING_ENV_FILE }}
-          EOF
+      # - name: Create env file
+      #   run: |
+      #     cat << EOF >> .env.production.local
+      #     ${{ secrets.STAGING_ENV_FILE }}
+      #     EOF
 
       # - run: npm run build in debug mode --if-present
       - run: quasar build -m ssr -d --if-present

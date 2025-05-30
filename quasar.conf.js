@@ -77,12 +77,6 @@ module.exports = function (/* ctx */) {
 			chainWebpack(chain) {
 				chain.plugin("eslint-webpack-plugin").use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
 			},
-			extendWebpack(cfg) {
-				cfg.externals = {
-					...(cfg.externals || {}),
-					"./firebaseServiceAccountKey.json": "commonjs ./firebaseServiceAccountKey.json",
-				};
-			},
 		},
 
 		// Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer

@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 class MonsterGenerator {
 	static async generateMonster(description) {
 		const baseUrl = process.env.MONSTER_GENERATOR_API_URL;

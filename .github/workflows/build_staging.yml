@@ -27,7 +27,7 @@ jobs:
       - name: Create public env file
         run: |
           cat << EOF >> .env.production.local
-          ${{ secrets.ENV_FILE_STAGING }}
+          ${{ secrets.STAGING_ENV_FILE }}
           EOF
 
       # - # Fill firebaseServiceAccountKey.json with an empty object

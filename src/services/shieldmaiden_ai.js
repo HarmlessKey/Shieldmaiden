@@ -1,3 +1,5 @@
+const fetch = require("node-fetch");
+
 export class ShieldmaidenAiAPI {
 	constructor() {
 		this.baseUrl = process.env.MONSTER_GENERATOR_API_URL;

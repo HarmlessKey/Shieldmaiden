@@ -150,6 +150,17 @@ export default {
 				const monster = response?.data?.output || {};
 				monster.source = "Shieldm.ai.den";
 				monster.hit_dice = monster?.hit_dice?.split("+")[0];
+				["actions", "reactions", "legendary_actions"].forEach((action_type) => {
+					monster[action_type]?.forEach((action) => {
+						action.action_list?.forEach((sub_action) => {
+							if (["melee_weapon", "ranged_weapon", "spell_attack"].includes(sub_action.type)) {
+								sub_action.rolls?.forEach((roll) => {
+									roll.miss_mod = roll.miss_mod || 0;
+								});
+							}
+						});
+					});
+				});
 				this.cache_generated_npc(monster);
 
 				if (this.auto_download) {

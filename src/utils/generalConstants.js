@@ -598,7 +598,7 @@ export const rules = Object.freeze([
 		url: "truesight",
 		caption: "See in darkness",
 		description:
-			"A creature with truesight can see everything in its true form, independent of the environment" +
+			"A creature with truesight can see everything in its true form, independent of the environment.\n\n" +
 			"A creature with truesight can, out to a specific range, see in normal and magical darkness, see invisible creatures and objects, automatically detect visual illusions and succeed on saving throws against them, and perceives the original form of a shapechanger or a creature that is transformed by magic.",
 		src: "phb 184",
 	},

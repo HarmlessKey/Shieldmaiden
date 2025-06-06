@@ -20,6 +20,7 @@ const npc_state = () => ({
 	cached_npcs: {},
 	npc_count: 0,
 	npcs: undefined,
+	generated_npcs: [],
 });
 
 const npc_getters = {
@@ -38,6 +39,9 @@ const npc_getters = {
 	},
 	npc_services: (state) => {
 		return state.npc_services;
+	},
+	generated_npcs: (state) => {
+		return state.generated_npcs;
 	},
 };
 
@@ -355,6 +359,10 @@ const npc_actions = {
 		}
 	},
 
+	cache_generated_npc({ commit }, npc) {
+		commit("CACHE_GENERATED_NPC", npc);
+	},
+
 	clear_npc_store({ commit, rootGetters }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
@@ -413,6 +421,9 @@ const npc_mutations = {
 		if (state.cached_npcs[uid]) {
 			Vue.delete(state.cached_npcs[uid], id);
 		}
+	},
+	CACHE_GENERATED_NPC(state, npc) {
+		state.generated_npcs.push(npc);
 	},
 	CLEAR_STORE(state) {
 		Vue.set(state, "npcs", undefined);

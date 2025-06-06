@@ -2,14 +2,22 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="npcs">
-				<ExportUserContent
-					slot="actions-left"
-					class="btn-sm bg-neutral-5 mr-2"
-					content-type="npc"
-					:content-id="npcIds"
-				>
-					<span>Export</span>
-				</ExportUserContent>
+				<template #actions-left>
+					<ExportUserContent
+						class="btn-sm bg-neutral-5 mr-2"
+						content-type="npc"
+						:content-id="npcIds"
+					>
+						<span>Export</span>
+					</ExportUserContent>
+					<button
+						v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						@click="generate_dialog = true"
+					>
+						AI Generate
+					</button>
+				</template>
 				<button
 					v-if="tier.price !== 'Free'"
 					slot="actions-right"
@@ -124,7 +132,7 @@
 
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
-			<hk-card :minWidth="400">
+			<hk-card class="npc-dialog">
 				<div slot="header" class="card-header">
 					<span>Import NPC from JSON</span>
 					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
@@ -134,6 +142,34 @@
 				</div>
 			</hk-card>
 		</q-dialog>
+
+		<!-- AI generate dialog-->
+		<q-dialog v-model="generate_dialog">
+			<hk-card class="npc-dialog" :persistent="generating">
+				<div slot="header" class="card-header">
+					<span>AI Monster Generation</span>
+					<q-btn
+						v-if="!generating"
+						padding="sm"
+						size="sm"
+						no-caps
+						icon="fas fa-times"
+						flat
+						v-close-popup
+					/>
+				</div>
+				<div v-if="content_count.npcs >= tier.benefits.npcs && show_warning" class="card-body">
+					<h2 class="orange">Insufficient NPC slots</h2>
+					<p>You don't have enough NPC slots to save your generated monster.</p>
+					<p class="mb-4">
+						You will be able to <strong>download</strong> your generated monster.<br />Downloaded
+						monsters can be imported whenever you have sufficient slots again.
+					</p>
+					<button class="btn btn-block" @click="show_warning = false">Continue</button>
+				</div>
+				<GenerateMonster v-else @generating="setGenerating" />
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -141,8 +177,9 @@
 import { mapActions, mapGetters } from "vuex";
 import { monsterMixin } from "src/mixins/monster";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
-import ContentHeader from "src/components/userContent/ContentHeader";
-import ExportUserContent from "src/components/userContent/ExportUserContent";
+import ContentHeader from "src/components/userContent/ContentHeader.vue";
+import ExportUserContent from "src/components/userContent/ExportUserContent.vue";
+import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
 export default {
 	name: "Npcs",
@@ -151,15 +188,19 @@ export default {
 		ImportUserContent,
 		ContentHeader,
 		ExportUserContent,
+		GenerateMonster,
 	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
 			import_dialog: false,
+			generate_dialog: false,
 			loading_npcs: true,
+			show_warning: true,
 			search: "",
 			card_width: 0,
 			overwrite: undefined,
+			generating: false,
 			columns: [
 				{
 					name: "avatar",
@@ -202,7 +243,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters(["tier", "content_count", "overencumbered", "ai"]),
 		...mapGetters("npcs", ["npcs"]),
 		...mapGetters("players", ["players"]),
 		...mapGetters("campaigns", ["campaigns"]),
@@ -270,10 +311,20 @@ export default {
 		deleteNpc(key) {
 			this.delete_npc(key);
 		},
-
+		setGenerating(value) {
+			this.generating = value;
+		},
 		setSize(e) {
 			this.card_width = e.width;
 		},
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.hk-card.npc-dialog {
+	max-width: 95vw;
+	width: 576px;
+	margin-top: 100px;
+}
+</style>

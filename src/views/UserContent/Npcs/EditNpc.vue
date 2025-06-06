@@ -20,6 +20,18 @@
 								class="mx-1"
 								color="neutral-5"
 								no-caps
+								@click="(create_dialog = true), (generate_monster = true)"
+							>
+								<i aria-hidden="true" class="fas fa-sparkles"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Generate NPC with AI!
+								</q-tooltip>
+							</q-btn>
+							<q-btn
+								v-if="!npcId"
+								class="mx-1"
+								color="neutral-5"
+								no-caps
 								@click="copy_dialog = true"
 							>
 								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
@@ -105,7 +117,11 @@
 				</div>
 				<div class="card-body">
 					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
-					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
+					<button
+						:disabled="monster_description.length == 0"
+						class="btn btn-block bg-accent"
+						@click="sign_up_dialog = true"
+					>
 						Create Free Account
 					</button>
 				</div>
@@ -118,15 +134,31 @@
 		</q-dialog>
 
 		<q-dialog v-model="create_dialog" persistent position="top">
-			<hk-card class="create-dialog" header="How do you want to do this?">
-				<div class="card-body">
-					<template v-if="!copy_monster">
+			<hk-card class="create-dialog">
+				<div slot="header" class="card-header">
+					<div v-if="generating"><span class="loader">Generating your monster</span></div>
+					<template v-else> How do you want to do this? </template>
+				</div>
+				<div
+					v-if="!generate_monster"
+					class="card-body"
+					:class="{ generate: generate_monster, generating: generating }"
+				>
+					<template v-if="!copy_monster && !generate_monster">
 						<button class="btn btn-lg btn-block" @click="copy_monster = true">
 							Copy existing monster
 						</button>
 						<h2 class="text-center my-2">OR</h2>
-						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">
+						<button class="btn btn-lg btn-block" @click="create_dialog = false">
 							Create from scratch
+						</button>
+						<h2 class="text-center my-2">OR</h2>
+						<button
+							class="btn btn-lg btn-block bg-accent mb-2"
+							@click="generate_monster = true"
+							:disabled="!userId"
+						>
+							AI generate (beta)
 						</button>
 					</template>
 					<template v-if="copy_monster">
@@ -134,10 +166,17 @@
 						<CopyContent @copy="copy" type="monster" />
 					</template>
 				</div>
-				<div v-if="copy_monster" class="card-footer" slot="footer">
-					<button class="btn btn-sm bg-neutral-5" @click="create_dialog = false">
+				<template v-if="generate_monster">
+					<GenerateMonster @generating="setGenerating" @finished="finishedGenerate" />
+				</template>
+				<div v-if="copy_monster || generate_monster" class="card-footer" slot="footer">
+					<button
+						v-if="!generating"
+						class="btn btn-sm bg-neutral-5"
+						@click="(copy_monster = false), (generate_monster = false)"
+					>
 						<i class="fas fa-times mr-1" aria-hidden="true" />
-						Create from scratch
+						Cancel
 					</button>
 				</div>
 			</hk-card>
@@ -166,6 +205,7 @@ import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
+import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
 export default {
 	name: "EditNpc",
@@ -180,6 +220,7 @@ export default {
 		Actions,
 		CopyContent,
 		SignUp,
+		GenerateMonster,
 	},
 	data() {
 		return {
@@ -191,12 +232,16 @@ export default {
 			npc: {},
 			loading: false,
 			npc_copy: {},
+			generate_monster: false,
 			copy_dialog: false,
 			unsaved_changes: false,
 			create_dialog: false,
 			account_dialog: false,
 			sign_up_dialog: false,
 			copy_monster: false,
+			monster_description: "",
+			generating: false,
+			generate_error: null,
 		};
 	},
 	async mounted() {
@@ -247,6 +292,15 @@ export default {
 			this.create_dialog = false;
 			this.npc = JSON.parse(JSON.stringify({ ...result }));
 			this.npc = this.convertVersatileToOptions(this.npc);
+		},
+		setGenerating(value) {
+			this.generating = value;
+		},
+		finishedGenerate(npc) {
+			console.log(npc);
+			this.npc = npc;
+			this.generating = false;
+			this.create_dialog = false;
 		},
 		reset() {
 			this.npc = {};
@@ -408,8 +462,14 @@ export default {
 	width: 576px;
 	margin-top: 100px;
 
+	.loader {
+		color: $neutral-1;
+		font-weight: bold;
+	}
+
 	.card-body {
-		overflow: auto;
+		overflow: hidden;
+		z-index: 0;
 	}
 }
 .hk-card.account-dialog {

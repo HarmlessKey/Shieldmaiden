@@ -6,5 +6,8 @@ updates:
       interval: "monthly"
     target-branch: "develop"
     ignore:
+      - dependency-name: "vue"
+        versions: [">=3.0.0"]
       - dependency-name: "@quasar/app"
-        versions: [">=2.4.3"]
+        versions: [">=3.0.0"]
+

@@ -873,6 +873,7 @@ html body {
 		}
 	}
 	.flex {
+		display: flex;
 		&-col {
 			flex-direction: column;
 		}
@@ -881,6 +882,12 @@ html body {
 		}
 		&-grow {
 			flex-grow: 1;
+		}
+		&-wrap {
+			flex-wrap: wrap;
+			&-nowrap {
+				flex-wrap: nowrap;
+			}
 		}
 	}
 	.gap {
@@ -1557,6 +1564,9 @@ html body {
 
 		&.btn-square {
 			border-radius: 0;
+		}
+		&.btn-round {
+			border-radius: 9999px;
 		}
 	}
 

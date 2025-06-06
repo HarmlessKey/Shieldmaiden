@@ -1,8 +1,8 @@
 <template>
 	<div class="card-body generate-monster" :class="{ generating: generating }">
 		<div v-if="tier.price !== 'Free'" class="generate-monster__content">
-			<h2 class="text-shadow d-flex justify-content-between">
-				<span>Generate your monster with AI</span>
+			<h2 class="text-shadow d-flex justify-content-between gap-2">
+				<span>Generate your monster <span class="whitespace-nowrap">with AI</span></span>
 				<em>BETA</em>
 			</h2>
 			<template v-if="error">
@@ -34,12 +34,12 @@
 				class="mb-2"
 				:disable="ai.total <= 0"
 			/>
-			<div class="d-flex justify-content-between items-center">
-				<div>
+			<div class="d-flex justify-content-between items-center gap-2">
+				<div class="d-flex gap-1 items-center">
 					<div class="credits" :class="ai.total <= 0 ? 'red' : 'green'">{{ ai.total.min(0) }}</div>
 					Credits
 				</div>
-				<div v-if="ai.total > 0">
+				<div v-if="ai.total > 0" class="d-flex justify-content-end flex-wrap gap-y-1">
 					<q-toggle v-model="auto_download" label="Auto-Download" left-label size="xs" />
 					<button
 						class="btn bg-accent"
@@ -238,7 +238,6 @@ export default {
 		display: inline-block;
 		border-radius: $border-radius;
 		box-shadow: 0px 0px 5px #00000042;
-		margin-right: 2px;
 	}
 	&__history {
 		margin-top: 15px;

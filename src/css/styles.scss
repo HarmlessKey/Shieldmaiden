@@ -873,6 +873,7 @@ html body {
 		}
 	}
 	.flex {
+		display: flex;
 		&-col {
 			flex-direction: column;
 		}
@@ -881,6 +882,12 @@ html body {
 		}
 		&-grow {
 			flex-grow: 1;
+		}
+		&-wrap {
+			flex-wrap: wrap;
+			&-nowrap {
+				flex-wrap: nowrap;
+			}
 		}
 	}
 	.gap {

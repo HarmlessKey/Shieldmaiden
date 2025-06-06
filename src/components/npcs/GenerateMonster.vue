@@ -13,12 +13,7 @@
 				Describe your monster
 				<button
 					class="btn btn-clear btn-sm btn-round"
-					@click="
-						setDrawer({
-							show: true,
-							type: 'drawers/AIPromptInfo',
-						})
-					"
+					@click="ai_info = !ai_info"
 				>
 					<hk-icon icon="fas fa-info-circle" />
 				</button>
@@ -81,6 +76,9 @@
 				</transition>
 			</hk-loader>
 		</div>
+		<hk-dialog v-model="ai_info" header="Generate monsters" position="top">
+			<AIPromptInfo />
+		</hk-dialog>
 	</div>
 </template>
 
@@ -88,11 +86,14 @@
 import { mapGetters, mapActions } from "vuex";
 import axios from "axios";
 import { Cookies } from "quasar";
+import AIPromptInfo from "../drawers/AIPromptInfo.vue";
 
 export default {
 	name: "GenerateMonster",
 	props: {},
-	components: {},
+	components: {
+		AIPromptInfo
+	},
 	data() {
 		return {
 			generating: false,
@@ -101,6 +102,7 @@ export default {
 			error: null,
 			auto_download: true,
 			message_index: null,
+			ai_info: false,
 			messages: [
 				"Gathering parts",
 				"Assembling monster",

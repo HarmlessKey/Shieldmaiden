@@ -30,11 +30,6 @@ jobs:
           ${{ secrets.STAGING_ENV_FILE }}
           EOF
 
-      # - # Fill firebaseServiceAccountKey.json with an empty object
-      #   name: Create firebaseServiceAccountKey.json
-      #   run: |
-      #     echo "{}" > firebaseServiceAccountKey.json
-
       - run: quasar build -m ssr -d --if-present
 
       - # Login against GitHub Container Registry

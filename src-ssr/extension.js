@@ -10,6 +10,11 @@
  * Note: Changes to this file (but not any file it imports!) are picked up by the
  * development server, but such updates are costly since the dev-server needs a reboot.
  */
+const path = require("path");
+require("dotenv").config({
+	path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}.local`),
+});
+
 const express = require("express");
 const api = require("./api");
 

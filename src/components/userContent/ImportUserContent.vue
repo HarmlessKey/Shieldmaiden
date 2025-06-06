@@ -1,10 +1,13 @@
 <template>
 	<div>
 		<template v-if="import_state === 'start'">
-			<p>
-				Import Shieldmaiden Content.<br />
-				<small><em>Content from other sources can't be imported</em></small>
-			</p>
+			<div class="d-flex justify-content-between gap-2 items-center mb-4">
+				<div>
+					Import Shieldmaiden Content.<br />
+					<small><em>Content from other sources can't be imported</em></small>
+				</div>
+				<slot />
+			</div>
 			<q-file
 				:dark="$store.getters.theme === 'dark'"
 				filled
@@ -259,7 +262,7 @@
 					@click="closeAction()"
 					color="neutral-5"
 					class="full-width"
-					v-close-popup="!isFullPage"
+					v-close-popup
 				/>
 			</div>
 		</div>
@@ -273,9 +276,9 @@
 				<div class="card-body">
 					<p>
 						You can use
-						<a href="https://www.jsonschemavalidator.net/" target="_blank" rel="noopener"
-							>these schemas validator</a
-						>
+						<a href="https://www.jsonschemavalidator.net/" target="_blank" rel="noopener">
+							this schemas validator
+						</a>
 						to find errors in your imported JSON.<br />
 						Paste our schema in the left field and the JSON of your imported JSON in the right.
 					</p>
@@ -309,11 +312,17 @@ addFormats(ajv, ["uri"]);
 export default {
 	name: "ImportUserContent",
 	components: { DuplicateOptions },
+	props: {
+		jsonInput: {
+			type: Object,
+			default: null,
+		},
+	},
 	data() {
 		return {
 			uid: this.$store.getters.user.uid,
 			json_file: undefined,
-			json_input: undefined,
+			json_input: this.jsonInput ? JSON.stringify(this.jsonInput, null, 2) : undefined,
 			showSchema: false,
 			schema: undefined,
 			import_state: "start",
@@ -459,9 +468,7 @@ export default {
 			}
 		},
 		closeAction() {
-			if (this.isFullPage) {
-				this.import_state = "start";
-			}
+			this.import_state = "start";
 		},
 		loadJSON() {
 			const fr = new FileReader();
@@ -473,9 +480,9 @@ export default {
 
 			fr.readAsText(this.json_file);
 		},
-		parseJSON() {
+		parseJSON(monster) {
 			try {
-				const result = JSON.parse(this.json_input);
+				const result = monster ? JSON.parse(monster) : JSON.parse(this.json_input);
 				this.parse(result);
 			} catch {
 				this.$snotify.error("Invalid JSON");

@@ -716,6 +716,7 @@
 		},
 		"action-options": {
 			"title": "Options",
+			"description": "Options allow you to create slightly different rolls for the actions and choose to use this action with one of the options. Think of versatile weapon attacks where you roll a different damage die for 1- or 2-handed attacks.",
 			"type": "array",
 			"items": {
 				"type": "string"
@@ -724,6 +725,7 @@
 		"action-list": {
 			"title": "Action list",
 			"type": "array",
+			"maxItems": 1,
 			"items": {
 				"type": "object",
 				"additionalProperties": false,
@@ -834,14 +836,18 @@
 								"miss_mod": {
 									"title": "Miss modifier",
 									"type": "number",
+									"description": "Multiplier for the rolled damage when the attack misses",
 									"minimum": 0,
-									"maximum": 2
+									"maximum": 2,
+									"default": 0
 								},
 								"save_fail_mod": {
 									"title": "Save fail modifier",
+									"description": "Multiplier for the rolled damage when the target's saving throw is successful",
 									"type": "number",
 									"minimum": 0,
-									"maximum": 2
+									"maximum": 2,
+									"default": 0.5
 								},
 								"special": {
 									"title": "special",

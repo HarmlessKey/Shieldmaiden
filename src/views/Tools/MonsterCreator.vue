@@ -96,6 +96,20 @@
 			</p>
 		</section>
 
+		<section class="mt-5">
+			<h2>AI monster generation</h2>
+			<em class="d-block mb-3">You can't spell Shieldmaiden without AI</em>
+			<p>
+				Our AI monster generator will generate monsters from any description you provide.<br />
+				You can either provide a short descriptive prompt and let the AI go wild, or you can give
+				extensive details and be in more control on what kind of monster you get back.
+			</p>
+			<p>
+				The generated monster is fully operational in our application, with rollable actions and
+				accurate Challenge Rating for your party.
+			</p>
+		</section>
+
 		<em>To save a monster, you need an account, but you can always download your creations.</em>
 	</ToolsPage>
 </template>

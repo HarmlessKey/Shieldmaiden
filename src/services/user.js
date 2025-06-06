@@ -7,6 +7,7 @@ const SETTINGS_REF = db.ref("settings");
 const SEARCH_USERS_REF = db.ref("search_users");
 const VOUCHER_HISTORY_REF = db.ref("voucher_history");
 const SOUNDBOARD_REF = db.ref("soundboard");
+const TIERS_REF = db.ref("tiers");
 
 /**
  * User Firebase Service
@@ -68,6 +69,26 @@ export class userServices {
 	}
 
 	/**
+	 * Get spent ai credits
+	 *
+	 * @param {String} uid ID of active user
+	 * @returns Spent AI credits /subscription_ai_credits_spent
+	 */
+	static getSpentCreditsWithCallback(uid, callback) {
+		return USERS_REF.child(uid).child("subscription_ai_credits_spent").on("value", callback);
+	}
+
+	/**
+	 * Get ai credits
+	 *
+	 * @param {String} uid ID of active user
+	 * @returns All user settings from /subscription_ai_credits_spent
+	 */
+	static getCreditsWithCallback(uid, callback) {
+		return USERS_REF.child(uid).child("ai_credits").on("value", callback);
+	}
+
+	/**
 	 * Update a setting for a user
 	 *
 	 * @param {String} uid ID of active user
@@ -111,7 +132,6 @@ export class userServices {
 	/*
 	 *
 	 */
-
 	static async setActiveVoucher(uid, voucher_object) {
 		let date = await serverUtils.getServerTime();
 		date.setMonth(date.getMonth() + voucher_object.duration);

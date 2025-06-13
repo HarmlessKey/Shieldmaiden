@@ -76,7 +76,7 @@
 				(entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
 			"
 		>
-			<template v-if="entity.curHp == 0">
+			<template v-if="health.curHp == 0">
 				<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 			</template>
 			<i
@@ -84,20 +84,20 @@
 				v-else
 				class="fas"
 				:class="{
-					'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
+					'green fa-heart': percentage(health.curHp, health.maxHp) == 100,
 					'green fa-heart-broken':
-						percentage(entity.curHp, entity.maxHp) > 50 &&
-						percentage(entity.curHp, entity.maxHp) < 100,
+						percentage(health.curHp, health.maxHp) > 50 &&
+						percentage(health.curHp, health.maxHp) < 100,
 					'orange fa-heart-broken':
-						percentage(entity.curHp, entity.maxHp) <= 50 &&
-						percentage(entity.curHp, entity.maxHp) > 25,
-					'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 25,
+						percentage(health.curHp, health.maxHp) <= 50 &&
+						percentage(health.curHp, health.maxHp) > 25,
+					'red fa-heartbeat': percentage(health.curHp, health.maxHp) <= 25,
 				}"
 			/>
 		</div>
 		<div v-else>
 			<span class="neutral-2">
-				<template v-if="entity.curHp == 0">
+				<template v-if="health.curHp == 0">
 					<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 				</template>
 				<template v-else>? ? ?</template>

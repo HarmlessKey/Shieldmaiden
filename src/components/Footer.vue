@@ -10,9 +10,9 @@
 					<div>
 						<h2 class="neutral-2">Quick Links</h2>
 						<ul>
+							<li><router-link to="/tools">Tools</router-link></li>
 							<li><router-link to="/compendium">Compendium</router-link></li>
 							<li><router-link to="/support">Support</router-link></li>
-							<li><router-link to="/feedback">Feedback</router-link></li>
 							<li><router-link to="/changelog">Changelog</router-link></li>
 							<li><router-link to="/documentation">Documentation</router-link></li>
 							<li><router-link to="/about-us">About us</router-link></li>
@@ -35,7 +35,9 @@
 								>
 							</li>
 							<li>
-								<a href="https://twitter.com/shieldmaidenapp" target="_blank" rel="noopener">Twitter</a>
+								<a href="https://twitter.com/shieldmaidenapp" target="_blank" rel="noopener"
+									>Twitter</a
+								>
 							</li>
 							<li>
 								<a href="https://www.facebook.com/shieldmaidenapp" target="_blank" rel="noopener"
@@ -196,14 +198,21 @@ export default {
 }
 @media (max-width: 772px) {
 	.footer .top .content {
-		justify-content: center;
+		flex-direction: column;
 
-		.links {
+		.logo-container {
 			justify-content: center;
-			text-align: center;
+			width: 100%;
+		}
+		.links {
+			justify-content: space-between;
+			column-gap: 10px;
+			flex-grow: 1;
+			width: 100%;
+			max-width: unset;
 
 			> div {
-				padding: 0 10px;
+				max-width: fit-content;
 			}
 		}
 	}

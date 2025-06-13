@@ -15,14 +15,21 @@
 					:class="tier.benefits[key] ? 'fa-check green' : 'fa-times neutral-3'"
 				/>
 				<template v-else>
+					<span v-if="key === 'ai_credits' && tier.price !== 'Free'">
+						<strong
+							><hk-animated-integer
+								:value="credits"
+								:class="{ green: credits >= 1, red: credits === 0 }" /></strong
+						><span class="neutral-2">/</span>{{ tier.benefits[key] }}
+					</span>
 					<i
+						v-else-if="tier.benefits[key] === 'infinite'"
 						aria-hidden="true"
-						v-if="tier.benefits[key] === 'infinite'"
 						class="green far fa-infinity"
 					/>
-					<strong v-else :class="tier.benefits[key] === '-' ? 'neutral-3' : 'green'">{{
-						tier.benefits[key]
-					}}</strong>
+					<strong v-else :class="tier.benefits[key] === true ? 'green' : 'neutral-3'">
+						{{ tier.benefits[key] }}
+					</strong>
 				</template>
 				<span class="flex justify-between items-center">
 					{{ benefit.title }}
@@ -45,8 +52,8 @@
 							content_count[storage_type] > tier.benefits[storage_type]
 								? 'red'
 								: content_count[storage_type] === tier.benefits[storage_type]
-								? 'neutral-2'
-								: 'green'
+									? 'neutral-2'
+									: 'green'
 						"
 					>
 						{{ tier.benefits[storage_type] }}
@@ -89,6 +96,9 @@ export default {
 				import: {
 					title: "Import content",
 				},
+				ai_credits: {
+					title: "AI Credits",
+				},
 				storage: {
 					title: "Storage",
 				},
@@ -97,7 +107,10 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier", "content_count"]),
+		...mapGetters(["ai", "tier", "content_count"]),
+		credits() {
+			return this.tier.benefits.ai_credits - this.ai.spent;
+		},
 	},
 };
 </script>
@@ -110,11 +123,11 @@ ul {
 
 	li {
 		display: grid;
-		grid-template-columns: 30px 1fr;
+		grid-template-columns: 35px 1fr;
 		line-height: 35px;
 		align-items: center;
 		font-size: 15px;
-		padding: 0 5px 0 15px;
+		padding: 0 5px 0 10px;
 		color: $neutral-1;
 		background-color: $neutral-9;
 		margin-bottom: 1px;

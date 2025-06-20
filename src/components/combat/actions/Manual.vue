@@ -70,8 +70,11 @@
 				ref="input"
 				v-model.number="value"
 				type="number"
+				min="0"
+				placeholder="0"
 				:disabled="!targeted?.length"
 				@keypress="submitManual"
+				@input="setValue"
 			/>
 			<q-tooltip
 				v-if="!targeted?.length"
@@ -130,7 +133,7 @@ export default {
 	data() {
 		return {
 			knob_value: 0,
-			value: 0,
+			value: null,
 			crit: false,
 			magical: false,
 			damage_type: undefined,
@@ -157,6 +160,9 @@ export default {
 			} else if (e.key === "Enter") {
 				this.setManual("damage", valid);
 			}
+		},
+		setValue(e) {
+			this.value = e.target.value >= 0 ? parseInt(e.target.value) : 0;
 		},
 		async setManual(type) {
 			if (this.value) {

@@ -199,7 +199,17 @@ export default {
 			}
 		},
 	},
-	watch: {},
+	watch: {
+		value(newValue) {
+			let knob_value = newValue;
+			if (newValue > 50) {
+				knob_value = 50;
+			} else if (newValue <= 0) {
+				knob_value = 0;
+			}
+			this.knob_value = knob_value;
+		},
+	},
 };
 </script>
 

@@ -235,7 +235,7 @@ export default {
 			campaign: {},
 			patreon: true,
 			tab: "loot",
-			editableEncounter: { ...this.encounter, currency: {} },
+			editableEncounter: { currency: {}, ...this.encounter },
 		};
 	},
 	computed: {

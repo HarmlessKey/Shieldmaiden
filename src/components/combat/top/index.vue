@@ -46,6 +46,7 @@ import Menu from "./Menu.vue";
 import Actor from "../actor";
 import Log from "./log";
 import EncounterProgress from "./EncounterProgress.vue";
+import { remindersMixin } from "src/mixins/reminders";
 
 export default {
 	name: "CombatTop",
@@ -70,7 +71,7 @@ export default {
 			type: Object,
 		},
 	},
-	mixins: [],
+	mixins: [remindersMixin],
 	data() {
 		return {
 			campid: this.$route.params.campid,
@@ -78,7 +79,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["encounter", "actor", "broadcast", "test", "demo"]),
+		...mapGetters(["encounter", "actor", "broadcast", "turn", "test", "demo"]),
 		active_actor() {
 			return this.actor || this.current;
 		},
@@ -92,7 +93,14 @@ export default {
 	methods: {
 		...mapActions(["setDrawer"]),
 	},
-	watch: {},
+	watch: {
+		//Watch turn to trigger reminders when an entity starts their turn
+		turn(newVal, oldVal) {
+			console.log('New turn');
+			this.checkReminders(this.current, "startTurn");
+
+		},
+	},
 };
 </script>
 

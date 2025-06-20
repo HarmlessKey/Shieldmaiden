@@ -441,27 +441,38 @@
 					'step-highlight': demo && follow_tutorial && get_step('run', 'apply'),
 				}"
 			>
-				<q-btn
-					color="neutral-9"
-					class="full-width neutral-1"
-					label="Full"
-					no-caps
-					@click="apply(1)"
-				/>
-				<q-btn
-					color="neutral-9"
-					class="full-width neutral-1"
-					label="Half"
-					no-caps
-					@click="apply(0.5)"
-				/>
-				<q-btn
-					color="neutral-9"
-					class="full-width neutral-1"
-					label="Double"
-					no-caps
-					@click="apply(2)"
-				/>
+				<template v-if="allMiss">
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Missed"
+						no-caps
+						@click="apply(1)"
+					/>
+				</template>
+				<template v-else>
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Full"
+						no-caps
+						@click="apply(1)"
+					/>
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Half"
+						no-caps
+						@click="apply(0.5)"
+					/>
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Double"
+						no-caps
+						@click="apply(2)"
+					/>
+				</template>
 				<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
 					<i aria-hidden="true" class="fas fa-times" />
 				</q-btn>
@@ -592,6 +603,10 @@ export default {
 			}
 			return undefined; // Default = undefined = roll twice
 		},
+		allMiss() {
+			if (Object.values(this.hitOrMiss).length === 0) return false;
+			return Object.values(this.hitOrMiss).every((value) => value === "miss");
+		}
 	},
 	mounted() {
 		this.checkHitOrMiss();

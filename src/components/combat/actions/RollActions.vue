@@ -2,17 +2,17 @@
 	<div v-if="actions">
 		<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 			<q-expansion-item
-				v-for="(action, action_index) in actions"
-				:key="`action-${action_index}`"
+				v-for="action in actions"
+				:key="`action-${action.action_index}`"
 				:dark="$store.getters.theme === 'dark'"
 				switch-toggle-side
 				expand-icon-class="hidden-toggle"
 				:group="type"
 				:name="type"
-				@focus="focusButton(action_index)"
+				@focus="focusButton(action.action_index)"
 			>
 				<template v-slot:header>
-					<q-item-section :class="checkAvailable(type, action_index, action) ? '' : 'is-disabled'">
+					<q-item-section :class="checkAvailable(type, action.action_index, action) ? '' : 'is-disabled'">
 						<q-item-label>
 							<strong>{{ action.name }}</strong>
 							<span class="neutral-3">
@@ -41,7 +41,7 @@
 							<span v-if="action.action_list?.[0]?.rolls">
 								<span
 									v-for="(roll, roll_index) in action.action_list?.[0]?.rolls"
-									:key="`roll-${action_index}-${roll_index}`"
+									:key="`roll-${action.action_index}-${roll_index}`"
 								>
 									(<i
 										aria-hidden="true"
@@ -104,19 +104,21 @@
 							}"
 						>
 							<TutorialPopover
-								v-if="demo && action_index == 0"
+								v-if="demo && action.action_index == 0"
 								tutorial="run"
 								step="roll"
 								position="right"
 								:offset="[20, 0]"
 							/>
 							<hk-roll-action
-								:ref="action_index"
+								:ref="action.action_index"
 								:action="action"
 								:tooltip="`Roll ${action.name}`"
-								:disabled="!checkAvailable(type, action_index, action)"
-								@roll="startRoll(...arguments, action_index, action, type)"
-							/>
+								:disabled="!checkAvailable(type, action.action_index, action)"
+								@roll="startRoll(...arguments, action.action_index, action, type)"
+							>
+								<span class="roll-button" />
+							</hk-roll-action>
 						</div>
 					</q-item-section>
 					<!-- Spend limited actions that can't be rolled -->
@@ -126,12 +128,12 @@
 					>
 						<template v-if="action.legendary_cost || action.recharge">
 							<div
-								v-if="checkAvailable(type, action_index, action)"
+								v-if="checkAvailable(type, action.action_index, action)"
 								class="blue"
 								@click.stop="
 									spendLimited(
 										type,
-										action.legendary_cost ? 'legendaries_used' : action_index,
+										action.legendary_cost ? 'legendaries_used' : action.action_index,
 										false,
 										action.legendary_cost ? action.legendary_cost : 1
 									)
@@ -147,23 +149,23 @@
 								:key="`legendary-${i}`"
 								class="mr-1"
 								@click.stop="
-									actor.limited_uses[type] && actor.limited_uses[type][action_index] >= i
-										? spendLimited(type, action_index, true)
-										: spendLimited(type, action_index)
+									actor.limited_uses[type] && actor.limited_uses[type][action.action_index] >= i
+										? spendLimited(type, action.action_index, true)
+										: spendLimited(type, action.action_index)
 								"
 							>
 								<i
 									aria-hidden="true"
 									class="far"
 									:class="
-										actor.limited_uses[type] && actor.limited_uses[type][action_index] >= i
+										actor.limited_uses[type] && actor.limited_uses[type][action.action_index] >= i
 											? 'fa-dot-circle'
 											: 'fa-circle'
 									"
 								/>
 								<q-tooltip anchor="top middle" self="center middle">
 									{{
-										actor.limited_uses[type] && actor.limited_uses[type][action_index] >= i
+										actor.limited_uses[type] && actor.limited_uses[type][action.action_index] >= i
 											? "Regain"
 											: "Spend"
 									}}
@@ -177,8 +179,8 @@
 					<hk-dice-text :input_text="action.desc" />
 					<div
 						class="blue pointer mt-2"
-						v-if="!checkAvailable(type, action_index, action) && action.recharge"
-						@click="spendLimited(type, action_index, true)"
+						v-if="!checkAvailable(type, action.action_index, action) && action.recharge"
+						@click="spendLimited(type, action.action_index, true)"
 					>
 						Regain use
 					</div>
@@ -234,12 +236,11 @@ export default {
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		actions() {
 			const actions = this.actor[this.type];
-			return this.rollsOnly
-				? actions.filter(
+			if (!this.rollsOnly) return actions;
+			return actions.map((action, action_index) => ({...action, action_index })).filter(
 						(action) =>
 							action.action_list?.[0]?.type !== "other" && action.action_list?.[0]?.rolls?.length
 					)
-				: actions;
 		},
 	},
 	methods: {

@@ -47,6 +47,8 @@ import Actor from "../actor";
 import Log from "./log";
 import EncounterProgress from "./EncounterProgress.vue";
 import { remindersMixin } from "src/mixins/reminders";
+import { dice } from "src/mixins/dice";
+
 
 export default {
 	name: "CombatTop",
@@ -71,7 +73,7 @@ export default {
 			type: Object,
 		},
 	},
-	mixins: [remindersMixin],
+	mixins: [remindersMixin, dice],
 	data() {
 		return {
 			campid: this.$route.params.campid,
@@ -91,7 +93,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
+		...mapActions(["setDrawer", "remove_limitedUses"]),
 	},
 	watch: {
 		//Watch turn to trigger reminders when an entity starts their turn
@@ -99,6 +101,69 @@ export default {
 			console.log('New turn');
 			this.checkReminders(this.current, "startTurn");
 
+			//Check if the turn went up or down	considering round changes
+			//Fails with only 2 entities !!
+			if (
+				(newVal > oldVal && oldVal != 0) ||
+				(newVal > oldVal && oldVal === 0 && newVal === 1) ||
+				(newVal === 0 && oldVal > newVal && oldVal !== 1)
+			) {
+				this.timedReminders(this.current, "up");
+			} else {
+				//Update next in initiative order
+				this.timedReminders(this.next, "down");
+			}
+
+			// Check limited uses
+			if (this.current.limited_uses && Object.keys(this.current.limited_uses).length > 0) {
+				// Check all actions for limited uses that can be regained at the start of the turn
+				const categories = ["special_abilities", "actions", "legendary_actions", "reactions"];
+
+				for (const category of categories) {
+					if (this.current[category] && this.current.limited_uses[category]) {
+						this.current[category].forEach((ability, index) => {
+							// Remove abilities from limited uses
+							if ((ability.limit && ability.limit_type === "turn") || ability.recharge) {
+								let remove = true;
+								// For recharge, roll to see if the ability is regained
+								console.log("ability", ability, ability.recharge, this.current, this.current.limited_uses, category, index);
+								if (
+									ability.recharge &&
+									ability.recharge !== "rest" &&
+									this.current.limited_uses[category][index]
+								) {
+									let values = ability.recharge.split("-");
+									const dice_type = values.length > 1 ? values[1] : values[0];
+
+									const roll = this.rollD({}, dice_type, 1, 0, `Recharge ${ability.name}`).total;
+									if (roll < values[0]) {
+										remove = false;
+									} // Don't remove if the roll was too low
+
+									const title = remove
+										? `Recharged ${ability.name}`
+										: `Recharge failed ${ability.name}`;
+									const message = `${roll} Was rolled for a recharge of ${ability.recharge}.`;
+
+									//Notify about the recharge
+									this.$snotify.warning(message, title, {
+										timeout: 0,
+									});
+								}
+								if (remove) this.remove_limitedUses({ key: this.current.key, category, index });
+							}
+						});
+						// Remove legendaries_used
+						if (category === "legendary_actions") {
+							this.remove_limitedUses({
+								key: this.current.key,
+								category,
+								index: "legendaries_used",
+							});
+						}
+					}
+				}
+			}
 		},
 	},
 };

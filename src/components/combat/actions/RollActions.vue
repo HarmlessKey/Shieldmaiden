@@ -114,11 +114,9 @@
 								:ref="action_index"
 								:action="action"
 								:tooltip="`Roll ${action.name}`"
-								@roll="startRoll(...arguments, action_index, action, type)"
 								:disabled="!checkAvailable(type, action_index, action)"
-							>
-								<span class="roll-button" />
-							</hk-roll-action>
+								@roll="startRoll(...arguments, action_index, action, type)"
+							/>
 						</div>
 					</q-item-section>
 					<!-- Spend limited actions that can't be rolled -->
@@ -331,25 +329,3 @@ export default {
 	},
 };
 </script>
-
-<style lang="scss" scoped>
-.roll-button {
-	display: inline-block;
-	cursor: pointer;
-	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
-	height: 20px;
-	width: 20px;
-	background-position: center;
-	background-size: cover;
-	vertical-align: -5px;
-	user-select: none;
-}
-.advantage .roll-button:hover,
-.advantage.hk-roll:focus .roll-button {
-	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-green.svg");
-}
-.disadvantage .roll-button:hover,
-.disadvantage.hk-roll:focus .roll-button {
-	background-image: url("../../../assets/_img/logo/logo-icon-no-shield-red.svg");
-}
-</style>

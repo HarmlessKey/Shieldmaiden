@@ -5,13 +5,17 @@
 		:class="
 			disabled ? 'disabled' : Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : ''
 		"
-		@mousemove="checkAdvantage($event)"
+		@mousemove="checkAdvantage"
 		@mouseout="clearAdvantage()"
 		v-touch-hold.mouse="!disabled ? showDialog : null"
 		@click.stop.prevent="disabled ? null : roll ? rollDice($event) : emit($event)"
+		@keydown="checkAdvantage"
+    	@keyup="checkAdvantage"
+		@mouseenter="checkAdvantage"
+    	@mouseleave="checkAdvantage"
 	>
 		<slot name="default">
-			<span class="roll-button" />
+			<span class="roll-button" :class="`roll-button__${color}`" />
 		</slot>
 		<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">
 			{{ tooltip }}
@@ -71,6 +75,10 @@ export default {
 			required: false,
 			default: null,
 		},
+		color: {
+			type: String,
+			default: "cyan"
+		}
 	},
 	data() {
 		return {
@@ -196,14 +204,21 @@ export default {
 		background-size: cover;
 		vertical-align: -5px;
 		user-select: none;
+
+		&__yellow {
+			background-image: url("../../assets/_img/logo/logo-icon-no-shield-yellow.svg");
+		}
+		&__blue {
+			background-image: url("../../assets/_img/logo/logo-icon-no-shield-blue.svg");
+		}
 	}
-	.advantage .roll-button:hover,
+	&.advantage .roll-button:hover,
 	.advantage.hk-roll:focus .roll-button {
-		background-image: url("../../assets/_img/logo/logo-icon-no-shield-green.svg");
+		background-image: url("../../assets/_img/logo/logo-icon-no-shield-green.svg") !important;
 	}
-	.disadvantage .roll-button:hover,
+	&.disadvantage .roll-button:hover,
 	.disadvantage.hk-roll:focus .roll-button {
-		background-image: url("../../assets/_img/logo/logo-icon-no-shield-red.svg");
+		background-image: url("../../assets/_img/logo/logo-icon-no-shield-red.svg") !important;
 	}
 }
 </style>

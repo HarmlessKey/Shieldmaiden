@@ -1,6 +1,6 @@
 <template>
 	<div class="actor-actions">
-		<div class="actor-actions__type">
+		<div v-if="types.length > 1" class="actor-actions__type">
 			<hk-icon icon="fas fa-chevron-down" :class="{ open: open }" />
 			<q-popup-proxy
 				v-model="open"
@@ -17,7 +17,8 @@
 			</q-popup-proxy>
 		</div>
 		<button :disabled="!targeted.length" :class="{ show: showActions }">
-			<img src="../../../assets/_img/logo/logo-icon-no-shield-cyan.svg" />
+			<img :src="require(`../../../assets/_img/logo/logo-icon-no-shield-${type === 'actions' ? 'cyan' : 'yellow'}.svg`)" />
+			<div class="label">{{ type.capitalize() }}</div>
 			<q-popup-proxy
 				v-model="showActions"
 				:dark="$store.getters.theme === 'dark'"
@@ -48,6 +49,14 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		type: {
+			type: String,
+			default: "actions"
+		},
+		types: {
+			type: Array,
+			default: () => []
+		}
 	},
 	data() {
 		return {
@@ -102,6 +111,16 @@ export default {
 		img {
 			height: 52px;
 			transition: all 0.3s linear;
+			z-index: 10;
+		}
+		.label {
+			font-weight: bold;
+			background-color: $neutral-9;
+			padding: 0 12px 0 20px;
+			line-height: 32px;
+			margin-left: -15px;
+			border-top-right-radius: 9999px;
+			border-bottom-right-radius: 9999px;
 		}
 
 		&.show {

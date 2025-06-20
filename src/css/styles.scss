@@ -892,6 +892,9 @@ html body {
 		}
 	}
 	.gap {
+		&-05 {
+			gap: 0.25rem;
+		}
 		&-1 {
 			gap: 0.5rem;
 		}
@@ -905,6 +908,9 @@ html body {
 			gap: 2rem;
 		}
 		&-x {
+			&-05 {
+				column-gap: 0.25rem;
+			}
 			&-1 {
 				column-gap: 0.5rem;
 			}
@@ -919,6 +925,9 @@ html body {
 			}
 		}
 		&-y {
+			&-05 {
+				row-gap: 0.25rem;
+			}
 			&-1 {
 				row-gap: 0.5rem;
 			}

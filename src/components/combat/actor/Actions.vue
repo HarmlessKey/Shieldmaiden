@@ -1,5 +1,9 @@
 <template>
-	<ActionsDropdown v-if="available_types?.length" v-model="show">
+	<ActionsDropdown
+		v-if="available_types?.length"
+		v-model="show"
+		:types="available_types"
+	>
 		<template #select-type>
 			<q-item
 				clickable

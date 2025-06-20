@@ -134,7 +134,7 @@
 
 				<p>
 					<strong>Selecting a target</strong><br />Click on an entity in the target list, or use
-					[0-9] on your keyboard to target it.
+					<span style="white-space: nowrap;">[0-9]</span> on your keyboard to target it.
 				</p>
 				<p>
 					<strong>Multi-targeting</strong><br />Hold down shift and click on multiple entities to

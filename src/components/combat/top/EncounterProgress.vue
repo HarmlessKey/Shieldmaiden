@@ -86,7 +86,7 @@ export default {
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 	},
 	methods: {
-		...mapActions(["set_turn", "set_targeted", "update_round", "demo"]),
+		...mapActions(["set_turn", "set_targeted", "update_round", "set_actor", "demo"]),
 		...mapActions("tutorial", ["setGameState"]),
 		nextTurn() {
 			let turn = this.encounter.turn + 1;
@@ -99,6 +99,7 @@ export default {
 			}
 			this.set_turn({ turn, round });
 			this.set_targeted({ type: "untarget", key: "all" });
+			this.set_actor(null);
 			this.checkReminders(this.current, "endTurn");
 		},
 		prevTurn() {
@@ -114,6 +115,7 @@ export default {
 			}
 			this.set_turn({ turn, round });
 			this.set_targeted({ type: "untarget", key: "all" });
+			this.set_actor(null);
 		},
 	},
 	watch: {

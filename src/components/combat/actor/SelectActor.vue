@@ -1,5 +1,8 @@
 <template>
-	<div class="select-actor">
+	<div class="select-actor" v-shortkey="['shift', 'd']" @shortkey="show_menu = !show_menu">
+		<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 5]">
+			Select Actor [shift + d]
+		</q-tooltip>
 		<div
 			class="select-actor__initiative"
 			:style="{

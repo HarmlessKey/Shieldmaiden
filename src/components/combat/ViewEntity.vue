@@ -97,7 +97,7 @@
 					<span class="saves">
 						<hk-roll
 							tooltip="Roll save"
-							v-for="(ability, index) in entity.saving_throws"
+							v-for="ability in entity.saving_throws"
 							:key="ability"
 							:roll="{
 								d: 20,
@@ -116,23 +116,20 @@
 									: null
 							"
 						>
-							<span class="save">
-								{{ ability.substring(0, 3).capitalize() }}
-								+{{ calcMod(data[ability]) + entity.proficiency }}
-								{{
-									// eslint-disable-next-line vue/no-parsing-error
-									index + 1 < entity.saving_throws.length ? "," : ""
-								}}
-							</span>
+							<span class="save"
+								>{{ ability.substring(0, 3).capitalize() }} +{{
+									calcMod(data[ability]) + entity.proficiency
+								}}</span
+							>
 						</hk-roll>
 					</span>
 					<br />
 				</template>
 				<template v-if="entity.skills">
-					<strong>Skills</strong>
+					<strong>Skills </strong>
 					<span class="saves">
 						<hk-roll
-							v-for="(skill, index) in entity.skills"
+							v-for="skill in entity.skills"
 							:key="skill"
 							:tooltip="`Roll ${skill}`"
 							:roll="{
@@ -152,15 +149,12 @@
 									: null
 							"
 						>
-							<span class="save">
-								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}
-
-								<!-- eslint-disable-next-line vue/no-parsing-error -->
-								{{ index + 1 < entity.skills.length ? "," : "" }}
-							</span>
+							<span class="save"
+								>{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}</span
+							>
 						</hk-roll>
-						<br />
 					</span>
+					<br />
 				</template>
 				<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
 					<strong>Damage vulnerabilities</strong>
@@ -964,10 +958,12 @@ a {
 .skills .skill,
 .saves .hk-roll {
 	&::after {
-		content: ", ";
+		content: ",";
+		padding-right: 5px;
 	}
 	&:last-child::after {
 		content: "";
+		padding: 0;
 	}
 }
 .saves {

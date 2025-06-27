@@ -16,8 +16,20 @@
 				<slot name="select-type" />
 			</q-popup-proxy>
 		</div>
-		<button :disabled="!targeted.length" :class="{ show: showActions }">
-			<img :src="require(`../../../assets/_img/logo/logo-icon-no-shield-${type === 'actions' ? 'cyan' : 'yellow'}.svg`)" />
+		<button
+			:disabled="!targeted.length"
+			:class="{ show: showActions }"
+			v-shortkey="{ actions: ['a'], spells: ['s'] }[type]"
+			@shortkey="toggleShowActions()"
+			v-close-popup="-1"
+		>
+			<img
+				:src="
+					require(
+						`../../../assets/_img/logo/logo-icon-no-shield-${type === 'actions' ? 'cyan' : 'yellow'}.svg`
+					)
+				"
+			/>
 			<div class="label">{{ type.capitalize() }}</div>
 			<q-popup-proxy
 				v-model="showActions"
@@ -52,12 +64,12 @@ export default {
 		},
 		type: {
 			type: String,
-			default: "actions"
+			default: "actions",
 		},
 		types: {
 			type: Array,
-			default: () => []
-		}
+			default: () => [],
+		},
 	},
 	data() {
 		return {

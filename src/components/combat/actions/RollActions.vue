@@ -12,7 +12,9 @@
 				@focus="focusButton(action.action_index)"
 			>
 				<template v-slot:header>
-					<q-item-section :class="checkAvailable(type, action.action_index, action) ? '' : 'is-disabled'">
+					<q-item-section
+						:class="checkAvailable(type, action.action_index, action) ? '' : 'is-disabled'"
+					>
 						<q-item-label>
 							<strong>{{ action.name }}</strong>
 							<span class="neutral-3">
@@ -237,10 +239,12 @@ export default {
 		actions() {
 			const actions = this.actor[this.type];
 			if (!this.rollsOnly) return actions;
-			return actions.map((action, action_index) => ({...action, action_index })).filter(
-						(action) =>
-							action.action_list?.[0]?.type !== "other" && action.action_list?.[0]?.rolls?.length
-					)
+			return actions
+				.map((action, action_index) => ({ ...action, action_index }))
+				.filter(
+					(action) =>
+						action.action_list?.[0]?.type !== "other" && action.action_list?.[0]?.rolls?.length
+				);
 		},
 	},
 	methods: {

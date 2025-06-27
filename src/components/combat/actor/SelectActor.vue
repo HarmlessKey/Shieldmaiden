@@ -1,5 +1,5 @@
 <template>
-	<div class="select-actor" v-shortkey="['shift', 'd']" @shortkey="show_menu = !show_menu">
+	<div class="select-actor" v-shortkey="['shift', 'd']" @shortkey="toggleShowMenu()">
 		<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 5]">
 			Select Actor [shift + d]
 		</q-tooltip>
@@ -62,6 +62,7 @@
 import { mapActions, mapGetters } from "vuex";
 import Avatar from "../entities/Avatar.vue";
 import BasicEntity from "../entities/BasicEntity.vue";
+import { EventBus } from "src/event-bus";
 
 export default {
 	name: "SelectActor",
@@ -106,6 +107,17 @@ export default {
 			this.set_actor(entity);
 			this.show_menu = false;
 		},
+		toggleShowMenu() {
+			if (!this.show_menu) EventBus.$emit("close-popups", { actor: "select-actor" });
+			this.show_menu = !this.show_menu;
+		},
+	},
+	mounted() {
+		EventBus.$on("close-popups", ({ actor }) => {
+			if (actor !== "select-actor") {
+				this.show_menu = false;
+			}
+		});
 	},
 };
 </script>

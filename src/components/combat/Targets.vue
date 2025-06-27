@@ -12,14 +12,14 @@
 			class="btn btn-sm bg-neutral-5"
 			tabindex="-1"
 			:class="{ disabled: test }"
-			v-shortkey="['a']"
+			v-shortkey="{ main: ['='], alt: ['shift', '+'] }"
 			@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
 			@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
 		>
 			<i aria-hidden="true" class="fas fa-plus green" />
 			<span class="ml-1">
 				Add
-				<hk-show-keybind class="d-none d-sm-inline" :binds="['a']" />
+				<hk-show-keybind class="d-none d-sm-inline" :binds="['+']" />
 			</span>
 			<q-tooltip v-if="test" anchor="top middle" self="center middle"
 				>Unavailable in test mode</q-tooltip

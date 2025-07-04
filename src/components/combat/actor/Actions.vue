@@ -30,7 +30,15 @@
 		<template v-for="type in selected_type">
 			<q-item :key="`header-${type}`">
 				<q-item-section>
-					{{ action_types[type].label }}
+					<span class="d-flex justify-content-between">
+						{{ action_types[type].label }}
+						<LimitedUseCounter
+							v-if="type === 'legendary_actions' && actor.legendary_count"
+							:entity="actor"
+							:limited_type="type"
+							:limited_max="actor.legendary_count"
+						/>
+					</span>
 				</q-item-section>
 			</q-item>
 			<RollActions
@@ -47,12 +55,14 @@
 <script>
 import ActionsDropdown from "./ActionsDropdown.vue";
 import RollActions from "../actions/RollActions.vue";
+import LimitedUseCounter from "../actions/LimitedUseCounter.vue";
 
 export default {
 	name: "ActorActions",
 	components: {
 		ActionsDropdown,
 		RollActions,
+		LimitedUseCounter,
 	},
 	props: {
 		actor: {

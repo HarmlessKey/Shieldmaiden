@@ -361,41 +361,12 @@
 				<template v-if="entity[category] && entity[category].length > 0">
 					<h3 v-if="category !== 'special_abilities'" class="d-flex justify-content-between">
 						{{ name }}
-						<div
+						<LimitedUseCounter
 							v-if="category === 'legendary_actions' && entity.legendary_count"
-							class="slots pointer"
-						>
-							<span
-								v-for="i in entity.legendary_count"
-								:key="`legendary-${i}`"
-								class="mr-1"
-								@click="
-									entity.limited_uses['legendary_actions'] &&
-									entity.limited_uses['legendary_actions'].legendaries_used >= i
-										? spendLimited('legendary_actions', 'legendaries_used', true)
-										: spendLimited('legendary_actions', 'legendaries_used')
-								"
-							>
-								<i
-									aria-hidden="true"
-									class="far"
-									:class="
-										entity.limited_uses['legendary_actions'] &&
-										entity.limited_uses['legendary_actions'].legendaries_used >= i
-											? 'fa-dot-circle'
-											: 'fa-circle'
-									"
-								/>
-								<q-tooltip anchor="top middle" self="center middle">
-									{{
-										entity.limited_uses["legendary_actions"] &&
-										entity.limited_uses["legendary_actions"].legendaries_used >= i
-											? "Regain action"
-											: "Spend action"
-									}}
-								</q-tooltip>
-							</span>
-						</div>
+							:entity="entity"
+							:limited_type="category"
+							:limited_max="entity.legendary_count"
+						/>
 					</h3>
 					<p v-if="entity.legendary_count && category === 'legendary_actions'">
 						{{ entity.name.capitalizeEach() }} can take {{ entity.legendary_count }} legendary
@@ -474,38 +445,13 @@
 										</div>
 										<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
 									</template>
-									<div v-else class="slots">
-										<span
-											v-for="i in parseInt(action.limit)"
-											:key="`legendary-${i}`"
-											class="mr-1"
-											@click.stop="
-												entity.limited_uses[category] &&
-												entity.limited_uses[category][action_index] >= i
-													? spendLimited(category, action_index, true)
-													: spendLimited(category, action_index)
-											"
-										>
-											<i
-												aria-hidden="true"
-												class="far"
-												:class="
-													entity.limited_uses[category] &&
-													entity.limited_uses[category][action_index] >= i
-														? 'fa-dot-circle'
-														: 'fa-circle'
-												"
-											/>
-											<q-tooltip anchor="top middle" self="center middle">
-												{{
-													entity.limited_uses[category] &&
-													entity.limited_uses[category][action_index] >= i
-														? "Regain"
-														: "Spend"
-												}}
-											</q-tooltip>
-										</span>
-									</div>
+									<LimitedUseCounter
+										v-else
+										:entity="entity"
+										:limited_type="category"
+										:limited_index="action_index"
+										:limited_max="action.limit"
+									/>
 								</template>
 							</div>
 						</div>
@@ -605,6 +551,7 @@ import { runEncounter } from "src/mixins/runEncounter.js";
 import Spell from "src/components/compendium/Spell";
 import { calc_skill_mod } from "src/utils/generalFunctions";
 import Projectiles from "./actions/Projectiles";
+import LimitedUseCounter from "./actions/LimitedUseCounter";
 
 export default {
 	name: "ViewEntity",
@@ -612,6 +559,7 @@ export default {
 	components: {
 		Spell,
 		Projectiles,
+		LimitedUseCounter,
 	},
 	props: {
 		data: {
@@ -659,6 +607,7 @@ export default {
 			if (entity.entityType === "npc" && !entity.no_linked_npc && !entity.proficiency) {
 				entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 			}
+			console.log(entity);
 			return entity;
 		},
 		spellCasting() {

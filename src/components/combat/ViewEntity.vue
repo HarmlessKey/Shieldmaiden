@@ -1,5 +1,10 @@
 <template>
-	<div class="py-1" ref="entity" :class="{ smallWidth: is_small }" v-if="!entity.no_linked_npc">
+	<div
+		class="py-1 actor"
+		ref="entity"
+		:class="{ smallWidth: is_small }"
+		v-if="!entity.no_linked_npc"
+	>
 		<template v-if="!is_current">
 			<h2>
 				{{ entity.name.capitalizeEach() }}
@@ -71,7 +76,7 @@
 							? {
 									encounter_id: encounterId,
 									entity_key: entity.key,
-							  }
+								}
 							: null
 					"
 				>
@@ -92,7 +97,7 @@
 					<span class="saves">
 						<hk-roll
 							tooltip="Roll save"
-							v-for="(ability, index) in entity.saving_throws"
+							v-for="ability in entity.saving_throws"
 							:key="ability"
 							:roll="{
 								d: 20,
@@ -107,27 +112,24 @@
 									? {
 											encounter_id: encounterId,
 											entity_key: entity.key,
-									  }
+										}
 									: null
 							"
 						>
-							<span class="save">
-								{{ ability.substring(0, 3).capitalize() }}
-								+{{ calcMod(data[ability]) + entity.proficiency }}
-								{{
-									// eslint-disable-next-line vue/no-parsing-error
-									index + 1 < entity.saving_throws.length ? "," : ""
-								}}
-							</span>
+							<span class="save"
+								>{{ ability.substring(0, 3).capitalize() }} +{{
+									calcMod(data[ability]) + entity.proficiency
+								}}</span
+							>
 						</hk-roll>
 					</span>
 					<br />
 				</template>
 				<template v-if="entity.skills">
-					<strong>Skills</strong>
+					<strong>Skills </strong>
 					<span class="saves">
 						<hk-roll
-							v-for="(skill, index) in entity.skills"
+							v-for="skill in entity.skills"
 							:key="skill"
 							:tooltip="`Roll ${skill}`"
 							:roll="{
@@ -143,19 +145,16 @@
 									? {
 											encounter_id: encounterId,
 											entity_key: entity.key,
-									  }
+										}
 									: null
 							"
 						>
-							<span class="save">
-								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}
-
-								<!-- eslint-disable-next-line vue/no-parsing-error -->
-								{{ index + 1 < entity.skills.length ? "," : "" }}
-							</span>
+							<span class="save"
+								>{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}</span
+							>
 						</hk-roll>
-						<br />
 					</span>
+					<br />
 				</template>
 				<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
 					<strong>Damage vulnerabilities</strong>
@@ -215,7 +214,7 @@
 								? {
 										encounter_id: encounterId,
 										entity_key: entity.key,
-								  }
+									}
 								: null
 						"
 					>
@@ -362,41 +361,12 @@
 				<template v-if="entity[category] && entity[category].length > 0">
 					<h3 v-if="category !== 'special_abilities'" class="d-flex justify-content-between">
 						{{ name }}
-						<div
+						<LimitedUseCounter
 							v-if="category === 'legendary_actions' && entity.legendary_count"
-							class="slots pointer"
-						>
-							<span
-								v-for="i in entity.legendary_count"
-								:key="`legendary-${i}`"
-								class="mr-1"
-								@click="
-									entity.limited_uses['legendary_actions'] &&
-									entity.limited_uses['legendary_actions'].legendaries_used >= i
-										? spendLimited('legendary_actions', 'legendaries_used', true)
-										: spendLimited('legendary_actions', 'legendaries_used')
-								"
-							>
-								<i
-									aria-hidden="true"
-									class="far"
-									:class="
-										entity.limited_uses['legendary_actions'] &&
-										entity.limited_uses['legendary_actions'].legendaries_used >= i
-											? 'fa-dot-circle'
-											: 'fa-circle'
-									"
-								/>
-								<q-tooltip anchor="top middle" self="center middle">
-									{{
-										entity.limited_uses["legendary_actions"] &&
-										entity.limited_uses["legendary_actions"].legendaries_used >= i
-											? "Regain action"
-											: "Spend action"
-									}}
-								</q-tooltip>
-							</span>
-						</div>
+							:entity="entity"
+							:limited_type="category"
+							:limited_max="entity.legendary_count"
+						/>
 					</h3>
 					<p v-if="entity.legendary_count && category === 'legendary_actions'">
 						{{ entity.name.capitalizeEach() }} can take {{ entity.legendary_count }} legendary
@@ -441,14 +411,14 @@
 														action.recharge === "rest"
 															? "after a Short or Long Rest"
 															: action.recharge
-												  })`
+													})`
 												: ``
 										}}
 										{{
 											action.limit
 												? `(${action.limit}/${
 														action.limit_type ? action.limit_type.capitalize() : `Day`
-												  })`
+													})`
 												: ``
 										}}
 										{{
@@ -475,38 +445,13 @@
 										</div>
 										<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
 									</template>
-									<div v-else class="slots">
-										<span
-											v-for="i in parseInt(action.limit)"
-											:key="`legendary-${i}`"
-											class="mr-1"
-											@click.stop="
-												entity.limited_uses[category] &&
-												entity.limited_uses[category][action_index] >= i
-													? spendLimited(category, action_index, true)
-													: spendLimited(category, action_index)
-											"
-										>
-											<i
-												aria-hidden="true"
-												class="far"
-												:class="
-													entity.limited_uses[category] &&
-													entity.limited_uses[category][action_index] >= i
-														? 'fa-dot-circle'
-														: 'fa-circle'
-												"
-											/>
-											<q-tooltip anchor="top middle" self="center middle">
-												{{
-													entity.limited_uses[category] &&
-													entity.limited_uses[category][action_index] >= i
-														? "Regain"
-														: "Spend"
-												}}
-											</q-tooltip>
-										</span>
-									</div>
+									<LimitedUseCounter
+										v-else
+										:entity="entity"
+										:limited_type="category"
+										:limited_index="action_index"
+										:limited_max="action.limit"
+									/>
 								</template>
 							</div>
 						</div>
@@ -606,6 +551,7 @@ import { runEncounter } from "src/mixins/runEncounter.js";
 import Spell from "src/components/compendium/Spell";
 import { calc_skill_mod } from "src/utils/generalFunctions";
 import Projectiles from "./actions/Projectiles";
+import LimitedUseCounter from "./actions/LimitedUseCounter";
 
 export default {
 	name: "ViewEntity",
@@ -613,6 +559,7 @@ export default {
 	components: {
 		Spell,
 		Projectiles,
+		LimitedUseCounter,
 	},
 	props: {
 		data: {
@@ -660,6 +607,7 @@ export default {
 			if (entity.entityType === "npc" && !entity.no_linked_npc && !entity.proficiency) {
 				entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 			}
+			console.log(entity);
 			return entity;
 		},
 		spellCasting() {
@@ -924,12 +872,20 @@ a {
 	column-gap: 20px;
 	column-rule: 1px solid $neutral-5;
 
+	.hk-roll {
+		width: 100%;
+	}
 	.playerSkill {
-		display: grid;
-		grid-template-columns: 1fr max-content;
-		column-gap: 5px;
+		display: flex;
+		gap: 5px;
 		cursor: pointer;
+		width: 100%;
+		text-align: left;
 
+		.truncate {
+			min-width: 0;
+			flex-grow: 1;
+		}
 		&:hover {
 			color: $neutral-1;
 		}
@@ -951,10 +907,12 @@ a {
 .skills .skill,
 .saves .hk-roll {
 	&::after {
-		content: ", ";
+		content: ",";
+		padding-right: 5px;
 	}
 	&:last-child::after {
 		content: "";
+		padding: 0;
 	}
 }
 .saves {

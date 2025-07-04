@@ -128,6 +128,16 @@ const getDefaultState = () => ({
 	track: undefined,
 	encounter_initialized: false,
 	show_monster_card: false,
+	manual: {
+		value: null,
+		type: null,
+		magical: false,
+		critical: false,
+	},
+	target_multipliers: {
+		multipliers: {},
+		defenses: {},
+	},
 });
 
 const run_encounter_state = getDefaultState();
@@ -196,6 +206,12 @@ const run_encounter_getters = {
 	},
 	round(state) {
 		return state.encounter ? state.encounter.round : undefined;
+	},
+	manual(state) {
+		return state.manual;
+	},
+	target_multipliers(state) {
+		return state.target_multipliers;
 	},
 };
 
@@ -1967,7 +1983,7 @@ const run_encounter_actions = {
 		commit("SET_LIMITED_USES", { key, category, index, value: used });
 	},
 	/**
-	 * Remove limeted uses of an ability
+	 * Remove limited uses of an ability
 	 *
 	 * @param {string} key Entity Key
 	 * @param {integer} index index of the action or level of the spell slot used
@@ -1987,6 +2003,20 @@ const run_encounter_actions = {
 			{ root: true }
 		);
 		commit("REMOVE_LIMITED_USES", { key, category, index });
+	},
+	setManual({ commit }, { key, value }) {
+		if (key === "clear") {
+			commit("CLEAR_MANUAL");
+		} else {
+			commit("SET_MANUAL", { key, value });
+		}
+	},
+	setMultipliers({ commit }, { key, type, value }) {
+		if (type === "clear") {
+			commit("CLEAR_MULTIPLIERS");
+		} else {
+			commit("SET_MULTIPLIERS", { key, type, value });
+		}
 	},
 	reset_store({ commit }) {
 		commit("RESET_STORE");
@@ -2130,6 +2160,18 @@ const run_encounter_mutations = {
 			const parsed = JSON.stringify(state.log);
 			if (!state.demo && !state.test) localStorage.setItem(state.encounterId, parsed);
 		}
+	},
+	SET_MANUAL(state, { key, value }) {
+		Vue.set(state.manual, key, value);
+	},
+	CLEAR_MANUAL(state) {
+		Vue.set(state, "manual", { value: null, type: null, magical: false, critical: false });
+	},
+	SET_MULTIPLIERS(state, { key, type, value }) {
+		Vue.set(state.target_multipliers[type], key, value);
+	},
+	CLEAR_MULTIPLIERS(state) {
+		Vue.set(state, "target_multipliers", { multipliers: {}, defenses: {} });
 	},
 };
 

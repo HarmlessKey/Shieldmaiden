@@ -185,7 +185,7 @@
 								<q-tab-panel name="dmg">
 									<div class="row q-col-gutter-md">
 										<div class="col-12 col-md-6">
-											<Dmg />
+											<DamageMeters />
 										</div>
 										<div class="col-12 col-md-6">
 											<h2>Log</h2>
@@ -212,7 +212,7 @@
 </template>
 
 <script>
-import Dmg from "src/components/combat/side/Dmg.vue";
+import DamageMeters from "src/components/combat/side/DamageMeters.vue";
 import Log from "src/components/combat/legacy/side/Log.vue";
 import { currencyMixin } from "src/mixins/currency.js";
 import { mapActions, mapGetters } from "vuex";
@@ -222,7 +222,7 @@ export default {
 	props: ["encounter"],
 	mixins: [currencyMixin],
 	components: {
-		Dmg,
+		DamageMeters,
 		Log,
 		Players: () => import("src/components/campaign/Players.vue"),
 	},

@@ -6,18 +6,17 @@
 				<h3>{{ type.name.capitalize() }}</h3>
 				<ul>
 					<li v-for="(entity, index) in _meters[type.name]" :key="index">
-						<div class="info">
-							<BasicEntity :entity="entity" />
+						<BasicEntity :entity="entity">
 							<div class="value" :class="type.name === 'damage' ? 'red' : 'green'">
-								<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
-								<template v-else>{{ entity[type.name] | numeral("0.0a") }}</template>
-								<span v-if="entity[type.over]" class="neutral-2">
+								<small v-if="entity[type.over]" class="neutral-2 whitespace-nowrap mr-1">
 									(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
 									<template v-else>{{ entity[type.over] | numeral("0.0a") }} </template>
-									<small>over</small>)
-								</span>
+									over)
+								</small>
+								<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
+								<template v-else>{{ entity[type.name] | numeral("0.0a") }}</template>
 							</div>
-						</div>
+						</BasicEntity>
 						<q-linear-progress
 							size="33px"
 							color="neutral-9"
@@ -38,7 +37,7 @@ import { mapGetters } from "vuex";
 import BasicEntity from "../entities/BasicEntity.vue";
 
 export default {
-	name: "Dmg",
+	name: "DamageMeters",
 	components: {
 		BasicEntity,
 	},
@@ -98,25 +97,23 @@ ul {
 	li {
 		position: relative;
 		margin-bottom: 1px;
+		height: 32px;
 
-		.info {
-			position: relative;
-			display: flex;
-			align-items: center;
-			z-index: 10;
-			width: 100%;
-			padding-right: 8px;
-			font-size: 13px;
-
-			.value {
-				font-weight: bold;
-				flex-grow: 1;
-				text-align: right;
+		::v-deep {
+			.basic-entity__wrapper {
+				position: relative;
+				z-index: 10;
+				font-size: 13px;
+				padding-right: 8px;
 			}
 		}
+		.value {
+			font-weight: bold;
+			text-align: right;
+			display: flex;
+			align-items: center;
+		}
 		.q-linear-progress {
-			height: 32px;
-			line-height: 32px;
 			background-color: $neutral-7;
 			position: absolute;
 			left: 35px;

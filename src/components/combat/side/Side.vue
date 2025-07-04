@@ -27,7 +27,7 @@
 					<Log />
 				</q-tab-panel>
 				<q-tab-panel name="damage">
-					<Dmg />
+					<DamageMeters />
 				</q-tab-panel>
 				<q-tab-panel v-if="!demo && !test" name="inventory">
 					<Inventory />
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import Dmg from "src/components/combat/side/Dmg.vue";
+import DamageMeters from "src/components/combat/side/DamageMeters.vue";
 import Log from "src/components/combat/legacy/side/Log.vue";
 import Requests from "src/components/combat/side/Requests.vue";
 import Inventory from "src/components/drawers/party/Inventory.vue";
@@ -50,7 +50,7 @@ import { mapGetters } from "vuex";
 export default {
 	name: "Side",
 	components: {
-		Dmg,
+		DamageMeters,
 		Log,
 		Requests,
 		Inventory,
@@ -108,8 +108,17 @@ export default {
 	}
 }
 .q-scrollarea {
+	position: relative;
 	height: calc(100% - 30px);
+	max-width: 100%;
 	background: $neutral-6-transparent;
+
+	// Position relative on scrollarea__content causes target items to overflow horizontally
+	&::v-deep {
+		.q-scrollarea__content {
+			position: unset;
+		}
+	}
 }
 
 .tab-content {

@@ -62,69 +62,82 @@
 			<!-- MULTIPLE TARGETS -->
 			<template v-else-if="targeted.length > 1">
 				<div v-for="key in targeted" :key="`target-${key}`" class="target">
-					<div class="health">
-						<BasicEntity :entity="entities[key]" />
-						<a class="clear" @click="set_targeted({ type: 'untarget', key })">
-							<hk-icon icon="fas fa-times red" />
-							<q-tooltip anchor="top middle" self="center middle"> Untarget </q-tooltip>
-						</a>
+					<div class="header">
+						<BasicEntity :entity="entities[key]">
+							<div class="header__actions">
+								<template v-if="manual.value">
+									<Defenses v-if="manual.type" :entity-key="key" />
+									<Multipliers :entity-key="key" />
+									<div class="value">
+										{{ calculateAmount(key) }}
+										<i
+											v-if="manual.type"
+											:class="[damage_type_icons[manual.type], manual.type]"
+											aria-hidden="true"
+										/>
+									</div>
+								</template>
+								<a class="clear" @click="set_targeted({ type: 'untarget', key })">
+									<hk-icon icon="fas fa-times red" />
+									<q-tooltip anchor="top middle" self="center middle">Untarget</q-tooltip>
+								</a>
+							</div>
+						</BasicEntity>
 					</div>
 					<div class="scores">
-						<template v-for="(ability, index) in abilities">
-							<div :key="`score-${index}`" v-if="entities[key][ability]" class="ability">
-								<hk-roll
-									tooltip="Roll check"
-									:roll="{
-										d: 20,
-										n: 1,
-										m: modifier(entities[key][ability]),
-										title: `${ability.capitalize()} check`,
-										entity_name: entities[key].name.capitalizeEach(),
-										notify: true,
-									}"
-									:share="
-										shares.includes('ability_rolls')
-											? {
-													encounter_id: encounterId,
-													entity_key: key,
-												}
-											: null
-									"
-								>
-									<div class="abilityName">{{ ability.substring(0, 3).toUpperCase() }}</div>
-									<div class="mod bg-neutral-8">
-										{{
-											modifier(entities[key][ability]) > 0
-												? `+${modifier(entities[key][ability])}`
-												: modifier(entities[key][ability])
-										}}
-									</div>
-								</hk-roll>
-								<hk-roll
-									tooltip="Roll save"
-									:roll="{
-										d: 20,
-										n: 1,
-										m: savingThrow(entities[key], ability),
-										title: `${ability.capitalize()} save`,
-										entity_name: entities[key].name.capitalizeEach(),
-										notify: true,
-									}"
-									:share="
-										shares.includes('save_rolls')
-											? {
-													encounter_id: encounterId,
-													entity_key: key,
-												}
-											: null
-									"
-								>
-									<div class="mod bg-neutral-8">
-										{{ savingThrow(entities[key], ability) }}
-									</div>
-								</hk-roll>
-							</div>
-						</template>
+						<div v-for="(ability, index) in abilities" :key="`score-${index}`" class="ability">
+							<hk-roll
+								tooltip="Roll check"
+								:roll="{
+									d: 20,
+									n: 1,
+									m: modifier(entities[key][ability] || 10),
+									title: `${ability.capitalize()} check`,
+									entity_name: entities[key].name.capitalizeEach(),
+									notify: true,
+								}"
+								:share="
+									shares.includes('ability_rolls')
+										? {
+												encounter_id: encounterId,
+												entity_key: key,
+											}
+										: null
+								"
+							>
+								<div class="abilityName">{{ ability.substring(0, 3).toUpperCase() }}</div>
+								<div class="mod bg-neutral-8">
+									{{
+										modifier(entities[key][ability] || 10) > 0
+											? `+${modifier(entities[key][ability] || 10)}`
+											: modifier(entities[key][ability] || 10)
+									}}
+								</div>
+							</hk-roll>
+							<hk-roll
+								tooltip="Roll save"
+								:roll="{
+									d: 20,
+									n: 1,
+									m: savingThrow(entities[key], ability),
+									title: `${ability.capitalize()} save`,
+									entity_name: entities[key].name.capitalizeEach(),
+									notify: true,
+								}"
+								:share="
+									shares.includes('save_rolls')
+										? {
+												encounter_id: encounterId,
+												entity_key: key,
+											}
+										: null
+								"
+							>
+								<div class="mod bg-neutral-8">
+									{{ savingThrow(entities[key], ability) }}
+								</div>
+							</hk-roll>
+						</div>
 					</div>
 				</div>
 			</template>
@@ -134,7 +147,7 @@
 
 				<p>
 					<strong>Selecting a target</strong><br />Click on an entity in the target list, or use
-					<span style="white-space: nowrap;">[0-9]</span> on your keyboard to target it.
+					<span style="white-space: nowrap">[0-9]</span> on your keyboard to target it.
 				</p>
 				<p>
 					<strong>Multi-targeting</strong><br />Hold down shift and click on multiple entities to
@@ -167,6 +180,10 @@ import TargetInfo from "src/components/combat/TargetInfo.vue";
 import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "../demo/TutorialPopover.vue";
 import { calc_mod } from "src/utils/generalFunctions";
+import Multipliers from "./entities/multipliers/Multipliers.vue";
+import Defenses from "./entities/multipliers/Defenses.vue";
+import { calculateManualDamage } from "src/utils/combatFunctions";
+import { damage_type_icons } from "src/utils/generalConstants";
 
 export default {
 	name: "Targeted",
@@ -176,6 +193,8 @@ export default {
 		BasicEntity,
 		TargetInfo,
 		TutorialPopover,
+		Multipliers,
+		Defenses,
 	},
 	props: {
 		outOfTurnActions: {
@@ -188,10 +207,20 @@ export default {
 			setShadow: 0,
 			abilities: abilities,
 			modifier: calc_mod,
+			damage_type_icons: damage_type_icons,
 		};
 	},
 	computed: {
-		...mapGetters(["encounterId", "entities", "turn", "targeted", "broadcast", "demo"]),
+		...mapGetters([
+			"encounterId",
+			"entities",
+			"turn",
+			"targeted",
+			"broadcast",
+			"demo",
+			"manual",
+			"target_multipliers",
+		]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		options() {
 			const options = [
@@ -344,9 +373,15 @@ export default {
 			}
 			const save =
 				entity.saving_throws && entity.saving_throws.includes(ability)
-					? parseInt(this.modifier(entity[ability])) + proficiency
-					: parseInt(this.modifier(entity[ability]));
+					? parseInt(this.modifier(entity[ability] || 10)) + proficiency
+					: parseInt(this.modifier(entity[ability] || 10));
 			return save > 0 ? `+${save}` : save;
+		},
+		calculateAmount(key) {
+			const target = this.entities[key];
+			const multiplier = this.target_multipliers.multipliers?.[key];
+			const defense = this.target_multipliers.defenses?.[key];
+			return calculateManualDamage(this.manual, target, multiplier, defense);
 		},
 		completeTutorialStep(step) {
 			if (this.get_step("run", step)) {
@@ -389,39 +424,52 @@ export default {
 	.btn.save {
 		width: 49.5%;
 	}
-	.health {
-		display: grid;
-		grid-template-columns: 1fr 34px;
-		grid-template-rows: 34px;
-		grid-gap: 0;
-		background: $neutral-8;
-		padding: 3px;
-
-		.clear {
-			display: block;
-			width: 34px;
-			height: 34px;
-			line-height: 34px;
-			font-size: 15px;
-			text-align: center;
-		}
-	}
 	.target {
 		margin-bottom: 10px;
 		border: solid 1px $neutral-5;
 		border-radius: $border-radius-small;
 		background-color: $neutral-6;
 
+		.header {
+			display: flex;
+			justify-content: space-between;
+			gap: 5px;
+			background: $neutral-8;
+			padding: 3px;
+
+			&__actions {
+				display: flex;
+				justify-content: flex-end;
+				gap: 5px;
+				align-items: center;
+				flex-grow: 1;
+			}
+			.value {
+				font-weight: bold;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+
+			.clear {
+				display: block;
+				width: 34px;
+				height: 34px;
+				line-height: 34px;
+				font-size: 15px;
+				text-align: center;
+			}
+		}
 		.scores {
 			width: 100%;
-			display: grid;
-			grid-template-columns: repeat(6, 1fr);
+			display: flex;
 			user-select: none;
-			grid-column-gap: 1px;
+			gap: 1px;
 
 			.ability {
 				margin-top: 5px;
 				text-align: center;
+				flex-grow: 1;
 
 				.abilityName {
 					margin-bottom: 3px;

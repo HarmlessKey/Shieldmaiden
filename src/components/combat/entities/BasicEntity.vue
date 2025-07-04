@@ -6,7 +6,7 @@
 				:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
 			/>
 			<Avatar :entity="entity" :size="size" />
-			<Name class="basic-entity__name truncate" :entity="entity" />
+			<Name class="basic-entity__name" :entity="entity" />
 			<slot />
 		</div>
 	</div>
@@ -41,7 +41,6 @@ export default {
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
-	min-width: 0;
 	margin-left: -6px;
 
 	&__wrapper {

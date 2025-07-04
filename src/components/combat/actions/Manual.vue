@@ -73,8 +73,9 @@
 				min="0"
 				placeholder="0"
 				:disabled="!targeted?.length"
+				v-shortkey="['d']"
+				@shortkey="focus()"
 				@keypress="submitManual"
-				@input="setValue"
 			/>
 			<q-tooltip
 				v-if="!targeted?.length"
@@ -93,7 +94,7 @@
 				}"
 				:disabled="!targeted.length || !value"
 				tabindex="-1"
-				@click="setManual('damage')"
+				@click="applyManual('damage')"
 			>
 				Attack
 				<i aria-hidden="true" class="hki-sword-break ml-2" />
@@ -106,7 +107,7 @@
 				}"
 				:disabled="!targeted.length || !value"
 				tabindex="-1"
-				@click="setManual('healing')"
+				@click="applyManual('healing')"
 			>
 				Heal
 				<i aria-hidden="true" class="hki-heal" />
@@ -133,38 +134,53 @@ export default {
 	data() {
 		return {
 			knob_value: 0,
-			value: null,
 			crit: false,
 			magical: false,
-			damage_type: undefined,
 			damage_type_icons: damage_type_icons,
 		};
 	},
 	computed: {
-		...mapGetters(["entities", "targeted", "demo"]),
+		...mapGetters(["entities", "targeted", "demo", "manual"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		damage_types() {
 			return damage_types.filter((type) => !type.startsWith("non_magical"));
 		},
+		damage_type: {
+			get() {
+				return this.manual.type;
+			},
+			set(newVal) {
+				this.setManual({ key: "type", value: newVal });
+			},
+		},
+		value: {
+			get() {
+				return this.manual.value;
+			},
+			set(newVal) {
+				newVal = newVal >= 0 ? parseInt(newVal) : 0;
+				this.setManual({ key: "value", value: newVal });
+			},
+		},
 	},
 	methods: {
-		...mapActions([]),
+		...mapActions(["setManual", "setMultipliers"]),
 		...mapActions("tutorial", ["completeStep"]),
+		focus() {
+			this.$refs.input.focus();
+		},
 		typeLabel(type) {
 			type = type.split("_");
 			return type.join(" ").capitalizeEach();
 		},
 		submitManual(e, valid) {
 			if (e.key === "Enter" && e.shiftKey) {
-				this.setManual("healing", valid);
+				this.applyManual("healing", valid);
 			} else if (e.key === "Enter") {
-				this.setManual("damage", valid);
+				this.applyManual("damage", valid);
 			}
 		},
-		setValue(e) {
-			this.value = e.target.value >= 0 ? parseInt(e.target.value) : 0;
-		},
-		async setManual(type) {
+		async applyManual(type) {
 			if (this.value) {
 				//Update HP
 				for (const key of this.targeted) {
@@ -189,14 +205,15 @@ export default {
 							},
 						],
 					};
-
 					await this.setHP(amount, this.entities[key], this.actor, config);
 				}
 
 				//Reset input fields
-				this.value = 0;
+				this.damage_type = null;
+				this.value = null;
 				this.knob_value = 0;
 				this.$refs.input.blur();
+				this.setMultipliers({ type: "clear" });
 			}
 
 			// If a value is applied, complete the tutorial step

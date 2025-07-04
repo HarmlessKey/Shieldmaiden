@@ -1,5 +1,5 @@
 <template>
-	<div class="entity-name">
+	<div class="entity-name truncate">
 		<span class="truncate">
 			{{ name?.[1]?.capitalizeEach() }}
 		</span>

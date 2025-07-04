@@ -78,15 +78,20 @@ export default {
 			type: Number,
 		},
 	},
-	data() {
-		return {};
-	},
 	computed: {
 		...mapGetters(["encounter"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 	},
 	methods: {
-		...mapActions(["set_turn", "set_targeted", "update_round", "set_actor", "demo"]),
+		...mapActions([
+			"set_turn",
+			"set_targeted",
+			"update_round",
+			"set_actor",
+			"demo",
+			"setManual",
+			"setMultipliers",
+		]),
 		...mapActions("tutorial", ["setGameState"]),
 		nextTurn() {
 			let turn = this.encounter.turn + 1;
@@ -101,6 +106,8 @@ export default {
 			this.set_targeted({ type: "untarget", key: "all" });
 			this.set_actor(null);
 			this.checkReminders(this.current, "endTurn");
+			this.setManual({ key: "clear" });
+			this.setMultipliers({ type: "clear" });
 		},
 		prevTurn() {
 			let turn = this.encounter.turn - 1;
@@ -116,6 +123,8 @@ export default {
 			this.set_turn({ turn, round });
 			this.set_targeted({ type: "untarget", key: "all" });
 			this.set_actor(null);
+			this.setManual({ key: "clear" });
+			this.setMultipliers({ type: "clear" });
 		},
 	},
 	watch: {

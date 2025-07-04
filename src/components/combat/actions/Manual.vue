@@ -121,6 +121,7 @@
 import { mapActions, mapGetters } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
+import { calculateManualDamage } from "src/utils/combatFunctions";
 
 export default {
 	name: "ActionsManual",
@@ -140,7 +141,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["entities", "targeted", "demo", "manual"]),
+		...mapGetters(["entities", "targeted", "demo", "manual", "target_multipliers"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		damage_types() {
 			return damage_types.filter((type) => !type.startsWith("non_magical"));
@@ -184,8 +185,17 @@ export default {
 			if (this.value) {
 				//Update HP
 				for (const key of this.targeted) {
+					const entity = this.entities[key];
 					let amount = {};
-					amount[type] = this.value;
+					amount[type] =
+						type === "damage"
+							? calculateManualDamage(
+									this.manual,
+									entity,
+									this.target_multipliers.multipliers[key],
+									this.target_multipliers.defenses[key]
+								)
+							: this.value;
 
 					// Set config for HpManipulation and log
 					const config = {

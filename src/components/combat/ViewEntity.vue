@@ -5,7 +5,7 @@
 		:class="{ smallWidth: is_small }"
 		v-if="!entity.no_linked_npc"
 	>
-		<template v-if="!is_current">
+		<template v-if="!current">
 			<h2>
 				{{ entity.name.capitalizeEach() }}
 				<small v-if="entity.source">{{ entity.source }}</small>
@@ -241,7 +241,7 @@
 
 		<!-- SPELLCASTING -->
 		<template v-if="entity.caster_ability">
-			<p v-if="!is_current">
+			<p v-if="!current">
 				<strong><em> Spellcasting </em></strong>
 				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral("Oo") }}-level
 				spellcaster. its spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
@@ -300,7 +300,7 @@
 
 		<!-- INNATE SPELLCASTING -->
 		<template v-if="entity.innate_ability">
-			<p v-if="!is_current">
+			<p v-if="!current">
 				<strong><em> Innate spellcasting </em></strong>
 				The {{ entity.name.capitalizeEach() }}'s innate spellcasting ability is
 				{{ entity.innate_ability.capitalize() }} (spell save DC {{ entity.innate_save_dc }},
@@ -384,7 +384,7 @@
 						<div class="monster-action-title">
 							<template
 								v-if="
-									is_current &&
+									current &&
 									action.action_list &&
 									action.action_list[0] &&
 									action.action_list[0].type !== 'other' &&
@@ -458,7 +458,7 @@
 						<!-- Roll Summary -->
 						<div
 							v-if="
-								is_current &&
+								current &&
 								action.action_list &&
 								action.action_list[0] &&
 								action.action_list[0].type !== 'other'
@@ -578,7 +578,6 @@ export default {
 			damage_type_icons: damage_type_icons,
 			skillList: skills,
 			width: 0,
-			is_current: this.current,
 			actions: [
 				{
 					category: "special_abilities",
@@ -598,7 +597,10 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["encounterId", "broadcast", "targeted"]),
+		...mapGetters(["encounterId", "broadcast", "targeted", "actor"]),
+		current_actor() {
+			return this.actor || this.data;
+		},
 		shares() {
 			return this.broadcast.shares || [];
 		},
@@ -732,10 +734,11 @@ export default {
 				action_index: this.rollObject.action_index,
 				action: this.rollObject.action,
 				category: this.rollObject.category,
-				entity: this.current,
+				entity: this.current_actor,
 				targets: assigned_projectiles || this.targeted,
 				option: this.rollObject.option,
 			});
+			console.log(this.current_actor);
 			this.cancelRoll();
 		},
 		cancelRoll() {

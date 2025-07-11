@@ -30,15 +30,13 @@
 			<span v-for="(action, index) in item.actions" :key="`action-${index}`">
 				<!-- Manual -->
 				<span v-if="(action.manual || action.request) && action.type === 'damage'">
-					<strong>{{ item.by_name.capitalizeEach() }}s</strong> {{ item.ability }} did
+					<strong>{{ item.by_name?.capitalizeEach() }}s</strong> {{ item.ability }} did
 				</span>
 
 				<!-- To hit -->
 				<span v-else-if="action.hitOrMiss">
-					<strong no-whitespace>
-						<span>{{ item.by_name.capitalizeEach() }}</span>
-						<span>{{ item.ability ? `s ${item.ability}` : `` }}</span>
-					</strong>
+					<strong>{{ item.by_name?.capitalizeEach() }}</strong
+					>{{ item.ability ? `s ${item.ability}` : `` }}
 					<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
 						{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
 					</span>
@@ -56,13 +54,13 @@
 
 				<!-- Healing -->
 				<span v-else-if="action.type === 'healing'">
-					<strong>{{ item.by_name.capitalizeEach() }}s</strong> {{ item.ability }} healed
+					<strong>{{ item.by_name?.capitalizeEach() }}s</strong> {{ item.ability }} healed
 					<strong>{{ item.target_name.capitalizeEach() }}</strong> for
 				</span>
 
 				<!-- Damage rolls with no to hit or save -->
 				<span v-else>
-					<strong>{{ item.by_name.capitalizeEach() }}</strong
+					<strong>{{ item.by_name?.capitalizeEach() }}</strong
 					>{{ item.ability ? `s ${item.ability}` : `` }} damaged
 					<strong>{{ item.target_name.capitalizeEach() }}</strong> for
 				</span>

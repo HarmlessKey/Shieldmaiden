@@ -35,8 +35,10 @@
 
 				<!-- To hit -->
 				<span v-else-if="action.hitOrMiss">
-					<strong>{{ item.by_name.capitalizeEach() }}</strong
-					>{{ item.ability ? `s ${item.ability}` : `` }}
+					<strong no-whitespace>
+						<span>{{ item.by_name.capitalizeEach() }}</span>
+						<span>{{ item.ability ? `s ${item.ability}` : `` }}</span>
+					</strong>
 					<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
 						{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
 					</span>
@@ -75,7 +77,14 @@
 						<strong>{{ roll.value }}</strong>
 						{{ action.type !== "healing" ? roll.damage_type : "" }}
 					</span>
-					{{ roll_index+1 &lt; action.rolls.length ? "and" : action.type !== "healing" ? "damage" : "healing" }}
+					{{
+						// eslint-disable-next-line vue/no-parsing-error
+						roll_index + 1 < action.rolls.length
+							? "and"
+							: action.type !== "healing"
+								? "damage"
+								: "healing"
+					}}
 				</span>
 
 				<!-- MANUAL END -->

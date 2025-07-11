@@ -145,35 +145,13 @@
 							</div>
 							<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
 						</template>
-						<div v-else class="slots">
-							<span
-								v-for="i in parseInt(action.limit)"
-								:key="`legendary-${i}`"
-								class="mr-1"
-								@click.stop="
-									actor.limited_uses[type] && actor.limited_uses[type][action.action_index] >= i
-										? spendLimited(type, action.action_index, true)
-										: spendLimited(type, action.action_index)
-								"
-							>
-								<i
-									aria-hidden="true"
-									class="far"
-									:class="
-										actor.limited_uses[type] && actor.limited_uses[type][action.action_index] >= i
-											? 'fa-dot-circle'
-											: 'fa-circle'
-									"
-								/>
-								<q-tooltip anchor="top middle" self="center middle">
-									{{
-										actor.limited_uses[type] && actor.limited_uses[type][action.action_index] >= i
-											? "Regain"
-											: "Spend"
-									}}
-								</q-tooltip>
-							</span>
-						</div>
+						<LimitedUseCounter
+							v-else
+							:entity="actor"
+							:limited_type="type"
+							:limited_index="action.action_index"
+							:limited_max="action.limit"
+						/>
 					</q-item-section>
 				</template>
 
@@ -203,12 +181,13 @@ import { runEncounter } from "src/mixins/runEncounter.js";
 import { isNil } from "lodash";
 import Projectiles from "./Projectiles";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
-
+import LimitedUseCounter from "./LimitedUseCounter.vue";
 export default {
 	name: "RollAction",
 	mixins: [setHP, runEncounter],
 	components: {
 		Projectiles,
+		LimitedUseCounter,
 		TutorialPopover,
 	},
 	props: {
@@ -240,7 +219,15 @@ export default {
 			const actions = this.actor[this.type];
 			if (!this.rollsOnly) return actions;
 			return actions
-				.map((action, action_index) => ({ ...action, action_index }))
+				.map((action, action_index) => {
+					if (this.type === "legendary_actions") {
+						const name = action.name;
+						if (this.actor["actions"].find((a) => a.name === name)) {
+							action.action_list = a.action_list;
+						}
+					}
+					return { ...action, action_index };
+				})
 				.filter(
 					(action) =>
 						action.action_list?.[0]?.type !== "other" && action.action_list?.[0]?.rolls?.length

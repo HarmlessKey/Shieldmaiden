@@ -180,7 +180,6 @@ export default {
 		}
 	}
 	.target-avatar {
-		font-size: 44px;
 		border-radius: $border-radius;
 		margin-right: 10px;
 	}

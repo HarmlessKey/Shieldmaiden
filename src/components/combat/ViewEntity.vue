@@ -607,7 +607,6 @@ export default {
 			if (entity.entityType === "npc" && !entity.no_linked_npc && !entity.proficiency) {
 				entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 			}
-			console.log(entity);
 			return entity;
 		},
 		spellCasting() {

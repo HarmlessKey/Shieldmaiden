@@ -135,7 +135,6 @@ export default {
 		}
 	}
 	.target-avatar {
-		font-size: 42px;
 		background-color: $neutral-7;
 		border-radius: $border-radius;
 		text-align: center;

@@ -122,6 +122,7 @@ import { mapActions, mapGetters } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 import { calculateManualDamage } from "src/utils/combatFunctions";
+import { EventBus } from "src/event-bus";
 
 export default {
 	name: "ActionsManual",
@@ -182,7 +183,7 @@ export default {
 			}
 		},
 		async applyManual(type) {
-			if (this.value) {
+			if (this.manual.value) {
 				//Update HP
 				for (const key of this.targeted) {
 					const entity = this.entities[key];
@@ -195,11 +196,11 @@ export default {
 									this.target_multipliers.multipliers[key],
 									this.target_multipliers.defenses[key]
 								)
-							: this.value;
+							: this.manual.value;
 
 					// Set config for HpManipulation and log
 					const config = {
-						crit: this.crit,
+						crit: this.manual.crit,
 						ability: "manual input",
 						log: true,
 						actions: [
@@ -208,7 +209,7 @@ export default {
 								manual: true,
 								rolls: [
 									{
-										damage_type: this.damage_type,
+										damage_type: this.manual.type,
 										value: amount[type],
 									},
 								],
@@ -218,11 +219,10 @@ export default {
 					await this.setHP(amount, this.entities[key], this.actor, config);
 				}
 
-				//Reset input fields
-				this.damage_type = null;
-				this.value = null;
+				//Reset values
 				this.knob_value = 0;
 				this.$refs.input.blur();
+				this.setManual({ key: "clear" });
 				this.setMultipliers({ type: "clear" });
 			}
 
@@ -242,6 +242,11 @@ export default {
 			}
 			this.knob_value = knob_value;
 		},
+	},
+	mounted() {
+		EventBus.$on("applyManualValue", (type) => {
+			this.applyManual(type);
+		});
 	},
 };
 </script>

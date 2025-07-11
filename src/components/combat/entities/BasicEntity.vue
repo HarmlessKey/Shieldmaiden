@@ -49,9 +49,6 @@ export default {
 	}
 
 	.target-avatar {
-		width: 32px;
-		height: 32px;
-		font-size: 24px;
 		background-color: $neutral-9;
 		border-radius: $border-radius-small;
 	}

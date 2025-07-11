@@ -15,6 +15,7 @@
 			borderColor: entity.color_label ? entity.color_label : ``,
 			width: `${size}px`,
 			minWidth: `${size}px`,
+			fontSize: `${font_size}px`,
 		}"
 	>
 		<template v-if="icons && entity.hidden">
@@ -53,6 +54,11 @@ export default {
 		size: {
 			type: Number,
 			default: 32,
+		},
+	},
+	computed: {
+		font_size() {
+			return Math.ceil(this.size * 0.75);
 		},
 	},
 };

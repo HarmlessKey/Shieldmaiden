@@ -7,7 +7,7 @@
 				<Actions :actor="actor" :key="`actions-${actor.key}`" />
 				<Spells :actor="actor" :key="`spells-${actor.key}`" />
 			</template>
-			<div v-if="targeted.includes(actor.key)" class="actor__targeted-self">Targeted self</div>
+			<Target v-if="targeted?.length" :actor="actor" />
 		</div>
 		<Details :actor="actor" />
 	</div>
@@ -20,6 +20,7 @@ import Manual from "../actions/Manual";
 import Details from "./Details.vue";
 import Actions from "./Actions.vue";
 import Spells from "./Spells.vue";
+import Target from "../top/Target.vue";
 
 export default {
 	name: "Actor",
@@ -29,6 +30,7 @@ export default {
 		Details,
 		Actions,
 		Spells,
+		Target,
 	},
 	props: {
 		actor: {

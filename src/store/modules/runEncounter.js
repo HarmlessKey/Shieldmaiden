@@ -132,7 +132,7 @@ const getDefaultState = () => ({
 		value: null,
 		type: null,
 		magical: false,
-		critical: false,
+		crit: false,
 	},
 	target_multipliers: {
 		multipliers: {},
@@ -2165,7 +2165,7 @@ const run_encounter_mutations = {
 		Vue.set(state.manual, key, value);
 	},
 	CLEAR_MANUAL(state) {
-		Vue.set(state, "manual", { value: null, type: null, magical: false, critical: false });
+		Vue.set(state, "manual", { value: null, type: null, magical: false, crit: false });
 	},
 	SET_MULTIPLIERS(state, { key, type, value }) {
 		Vue.set(state.target_multipliers[type], key, value);

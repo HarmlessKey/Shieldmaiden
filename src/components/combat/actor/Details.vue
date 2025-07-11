@@ -4,35 +4,30 @@
 			<hk-icon icon="fas fa-list-alt" />
 		</button>
 		<div class="actor-details__name">
-			<div class="truncate">
-				{{ actor.name?.capitalizeEach() }}
-			</div>
+			<Name :entity="actor" />
 		</div>
-		<template v-for="(stat, key) of stats">
-			<div :key="key">
-				<hk-icon :icon="stat.icon" />
-				{{ displayStats(actor)[key] }}
-				<q-tooltip anchor="bottom middle" self="center middle">{{ stat.label }}</q-tooltip>
-			</div>
-		</template>
-		<template v-for="ability of abilities">
-			<div v-if="actor[ability]" :key="ability">
+		<div class="actor-details__filler" />
+		<template v-if="target">
+			<div v-for="ability of abilities" :key="ability">
 				<hk-roll
 					:roll="{
 						d: 20,
 						n: 1,
-						m: calcMod(actor[ability]),
+						m: calcMod(target[ability] || 10),
 						title: 'Initiative roll',
 						notify: true,
 					}"
 				>
 					<span class="label">{{ ability?.substring(0, 3) }}</span>
-					{{ actor[ability] }}
+					{{ target?.[ability] || 10 }}
 				</hk-roll>
 			</div>
+			<div v-for="(stat, key) of stats" :key="key">
+				<hk-icon :icon="stat.icon" />
+				{{ displayStats(target)[key] }}
+				<q-tooltip anchor="bottom middle" self="center middle">{{ stat.label }}</q-tooltip>
+			</div>
 		</template>
-		<!-- <div class="actor-details__filler" /> -->
-		<!-- <pre>{{ actor }}</pre> -->
 	</div>
 </template>
 
@@ -41,14 +36,18 @@ import { mapGetters } from "vuex";
 import { abilities } from "src/utils/generalConstants";
 import { displayStats } from "src/utils/entityFunctions";
 import { general } from "src/mixins/general";
+import Name from "../entities/Name.vue";
 
 export default {
 	name: "SelectActor",
-	components: {},
+	components: {
+		Name,
+	},
 	mixins: [general],
 	props: {
 		actor: {
 			type: Object,
+			default: null,
 		},
 		outOfTurn: {
 			type: Boolean,
@@ -58,13 +57,13 @@ export default {
 	data() {
 		return {
 			stats: {
-				ac: {
-					icon: "fas fa-shield",
-					label: "Armor Class",
-				},
 				speed: {
 					icon: "fas fa-running",
 					label: "Walk Speed",
+				},
+				ac: {
+					icon: "fas fa-shield",
+					label: "Armor Class",
 				},
 			},
 			abilities: abilities,
@@ -72,7 +71,10 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters([]),
+		...mapGetters(["entities", "targeted"]),
+		target() {
+			return this.targeted.length === 1 ? this.entities?.[this.targeted?.[0]] : undefined;
+		},
 	},
 	methods: {},
 };
@@ -116,6 +118,8 @@ export default {
 	}
 	&__name {
 		font-weight: bold;
+		max-width: 235px;
+		padding-right: 45px !important;
 		flex-grow: 1;
 
 		.truncate {

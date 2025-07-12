@@ -216,7 +216,7 @@ import { dice } from "src/mixins/dice.js";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_types } from "src/utils/generalConstants";
 import Spell from "src/components/compendium/Spell";
-import Projectiles from "./Projectiles";
+import Projectiles from "../../actions/Projectiles";
 import { runEncounter } from "src/mixins/runEncounter.js";
 
 export default {
@@ -313,7 +313,7 @@ export default {
 						Object.entries(this.entity[`${type.name}_spells`]).map(async ([key, value]) => {
 							const spell = value.custom
 								? // userId comes from setHP mixin
-								  await this.get_spell({ uid: this.userId, id: key })
+									await this.get_spell({ uid: this.userId, id: key })
 								: await this.fetch_api_spell(key);
 							spell.key = key;
 
@@ -491,7 +491,7 @@ export default {
 	.roll-button {
 		display: inline-block;
 		cursor: pointer;
-		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+		background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
 		height: 20px;
 		width: 20px;
 		background-position: center;
@@ -510,11 +510,11 @@ export default {
 	}
 	.advantage .roll-button:hover,
 	.advantage.hk-roll:focus .roll-button {
-		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-green.svg");
+		background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-green.svg");
 	}
 	.disadvantage .roll-button:hover,
 	.disadvantage.hk-roll:focus .roll-button {
-		background-image: url("../../../assets/_img/logo/logo-icon-no-shield-red.svg");
+		background-image: url("../../../../assets/_img/logo/logo-icon-no-shield-red.svg");
 	}
 }
 </style>

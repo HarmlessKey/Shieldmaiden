@@ -44,7 +44,7 @@
 							:settings="settings"
 						/>
 						<Pane title="Actor">
-							<ViewEntity :data="actor || _active[encounter.turn]" current />
+							<Card :entity="actor || _active[encounter.turn]" />
 						</Pane>
 						<Targets
 							ref="targets"
@@ -186,8 +186,8 @@ import SetInitiative from "src/components/combat/initiative";
 import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
 import DemoOverlay from "src/components/combat/DemoOverlay.vue";
 import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
-import ViewEntity from "src/components/combat/ViewEntity.vue";
 import Pane from "src/components/combat/Pane.vue";
+import Card from "src/components/combat/entities/card";
 
 export default {
 	name: "RunEncounter",
@@ -206,8 +206,8 @@ export default {
 		OverEncumbered,
 		DemoOverlay,
 		TutorialFinishedDialog,
-		ViewEntity,
 		Pane,
+		Card,
 	},
 	mixins: [audio],
 	data() {

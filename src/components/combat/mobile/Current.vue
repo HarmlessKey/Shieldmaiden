@@ -2,7 +2,7 @@
 	<div id="current" v-if="current">
 		<div class="bg-neutral-6 current">
 			<div>Up now:</div>
-			<TargetItem :item="current.key" />
+			<BasicEntity :entity="current" />
 			<a
 				@click="
 					setDrawer({
@@ -31,13 +31,13 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
 
 export default {
 	name: "Current",
 	components: {
-		TargetItem,
+		BasicEntity,
 		DeathSaves,
 	},
 	props: ["current", "next", "settings"],

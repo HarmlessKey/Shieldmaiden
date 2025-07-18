@@ -1,9 +1,7 @@
 <template>
 	<div class="pb-5">
-		<h2>{{ title }}</h2>
-
-		<TargetItem :item="entity.key" />
-
+		<BasicEntity :entity="entity" />
+		<h2 class="mt-3">{{ title }}</h2>
 		<button class="btn btn-block bg-red my-3" @click="remove()">Remove reminder</button>
 
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
@@ -19,7 +17,7 @@
 import { remindersMixin } from "src/mixins/reminders";
 import { mapActions } from "vuex";
 import ReminderForm from "src/components/ReminderForm";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 
 export default {
 	name: "Reminder",
@@ -27,7 +25,7 @@ export default {
 	mixins: [remindersMixin],
 	components: {
 		ReminderForm,
-		TargetItem,
+		BasicEntity,
 	},
 	data() {
 		return {

@@ -8,7 +8,7 @@
 
 		<ul class="entities hasImg">
 			<li v-for="(entity, i) in npcs" :key="entity.key">
-				<TargetAvatar :entity="entity" class="img pointer" :icons="false" />
+				<Avatar :entity="entity" class="img pointer" :icons="false" />
 				<div class="truncate">
 					<q-checkbox
 						:dark="$store.getters.theme === 'dark'"
@@ -83,13 +83,13 @@
 import { mapGetters, mapActions } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
-import TargetAvatar from "../TargetAvatar.vue";
+import Avatar from "../entities/Avatar.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "SetInitiativeNPC",
 	components: {
-		TargetAvatar,
+		Avatar,
 		TutorialPopover,
 	},
 	mixins: [general, dice],

@@ -13,6 +13,12 @@ export const character_sync_id =
 		? process.env.LOCAL_CHARACTER_SYNC_ID
 		: "jgcbbmbchbkdjbgiiheminkkkecjohpg";
 
+export const defenses = Object.freeze({
+	v: { name: "Vulnerable", value: "damage_vulnerabilities" },
+	r: { name: "Resistant", value: "damage_resistances" },
+	i: { name: "Immune", value: "damage_immunities" },
+});
+
 export const backgrounds = Object.freeze([
 	{
 		name: "Forest",

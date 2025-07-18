@@ -1,5 +1,5 @@
 <template>
-	<div class="entity-effects" :class="{ collapse: collapse }">
+	<div v-if="effects?.length" class="entity-effects" :class="{ collapse: collapse }">
 		<Effect v-for="effect in visible" :key="effect.key" :effect="effect" :entity="entity" />
 		<div v-if="collapsed.length" class="entity-effects__collapsed" @click.stop>
 			+<hk-animated-integer :value="collapsed.length" />

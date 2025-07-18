@@ -16,30 +16,35 @@
 				<small v-if="entity.source" class="neutral-2"> | {{ entity.source }}</small>
 			</div>
 		</div>
-		<div v-if="entity.conditions || entity.reminders" class="card-details__effects">
-			<Effects :entity="full_entity" />
-		</div>
+		<Effects :entity="full_entity" />
 		<div class="card-details__stats">
 			<template v-for="(stat, key) of stats">
 				<div v-if="displayStats(full_entity)[key] !== undefined" :key="key">
-					<hk-icon :icon="stat.icon" class="mr-1" />
-					<template v-if="key === 'maxHp'">
-						<hk-animated-integer :value="displayStats(full_entity).curHp" class="ml-1" /> /
-					</template>
-					{{ displayStats(full_entity)[key] }}
-					<q-tooltip anchor="bottom middle" self="center middle">{{ stat.label }}</q-tooltip>
+					<div class="truncate label stat__label">{{ stat.label }}</div>
+					<div class="stat">
+						<hk-icon :icon="stat.icon" class="mr-1" />
+						<template v-if="key === 'maxHp'">
+							<hk-animated-integer :value="displayStats(full_entity).curHp" class="ml-1" /> /
+						</template>
+						{{ displayStats(full_entity)[key] }}
+						<q-tooltip anchor="bottom middle" self="center middle">{{ stat.label }}</q-tooltip>
+					</div>
 				</div>
 			</template>
 		</div>
 		<div class="card-details__abilities">
 			<template v-for="(ability, index) in abilities">
-				<div v-if="index === 0 || index === 3" :key="index" class="card-details__abilities-header">
+				<div
+					v-if="index === 0 || index === 3"
+					:key="index"
+					class="card-details__abilities-header label"
+				>
 					<div class="placeholder" />
 					<div>mod</div>
 					<div>save</div>
 				</div>
 				<div :key="ability" class="ability">
-					<div class="ability__label">{{ ability.substring(0, 3) }}</div>
+					<div class="label">{{ ability.substring(0, 3) }}</div>
 					<div class="ability__score">{{ full_entity[ability] }}</div>
 					<hk-roll
 						v-for="type in ['mod', 'save']"
@@ -72,7 +77,7 @@
 		</div>
 		<p v-if="!entity.old && entity.entityType !== 'player'" class="card-details__summary">
 			<template v-if="entity.skills">
-				<strong>Skills </strong>
+				<strong class="neutral-2">Skills </strong>
 				<span class="saves">
 					<hk-roll
 						v-for="skill in entity.skills"
@@ -101,23 +106,23 @@
 				<br />
 			</template>
 			<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
-				<strong>Damage vulnerabilities</strong>
+				<strong class="neutral-2">Damage vulnerabilities</strong>
 				{{ defensesDisplay(entity.damage_vulnerabilities).join(", ") }}<br />
 			</template>
 			<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
-				<strong>Damage resistances</strong>
+				<strong class="neutral-2">Damage resistances</strong>
 				{{ defensesDisplay(entity.damage_resistances).join(", ") }}<br />
 			</template>
 			<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
-				<strong>Damage immunities</strong>
+				<strong class="neutral-2">Damage immunities</strong>
 				{{ defensesDisplay(entity.damage_immunities).join(", ") }}<br />
 			</template>
 			<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
-				<strong>Condition immunities</strong>
+				<strong class="neutral-2">Condition immunities</strong>
 				{{ entity.condition_immunities.join(", ") }}<br />
 			</template>
 
-			<strong>Senses</strong>
+			<strong class="neutral-2">Senses</strong>
 			<template v-if="entity.senses">
 				<span v-for="(sense, key) in entity.senses" :key="key">
 					{{ key }} {{ sense.range ? `${sense.range} ft.` : ``
@@ -127,17 +132,17 @@
 			passive perception {{ passivePerception() }}<br />
 
 			<template v-if="entity.languages && entity.languages.length > 0"
-				><strong>Languages</strong> {{ entity.languages.join(", ") }}<br
+				><strong class="neutral-2">Languages</strong> {{ entity.languages.join(", ") }}<br
 			/></template>
 			<template v-if="entity.challenge_rating">
-				<strong>Challenge Rating</strong> {{ entity.challenge_rating }} ({{
+				<strong class="neutral-2">Challenge Rating</strong> {{ entity.challenge_rating }} ({{
 					monster_challenge_rating[entity.challenge_rating].xp | numeral("0,0")
 				}}
 				XP)<br />
 			</template>
 		</p>
 
-		<h3>Skills</h3>
+		<h3 class="label">Skills</h3>
 		<CardSkills :entity="full_entity" :skill-modifier="skillModifier" />
 	</div>
 </template>
@@ -263,9 +268,12 @@ export default {
 	}
 	h3 {
 		margin-bottom: 5px;
+		line-height: normal;
 	}
-	p {
-		opacity: 0.7;
+	.label {
+		font-weight: bold;
+		text-transform: uppercase;
+		color: $neutral-2;
 	}
 	&__top {
 		display: flex;
@@ -285,36 +293,49 @@ export default {
 			}
 		}
 	}
-	&__effects {
-		// background-color: $neutral-5;
-		// border-radius: $border-radius;
-		// padding: 5px;
-		margin-bottom: 10px;
+	.entity-effects {
+		border-bottom: solid 1px $neutral-5;
+		padding-bottom: 5px;
 	}
 	&__stats {
 		display: flex;
 		justify-content: space-evenly;
 		gap: 1px;
-		margin-bottom: 15px;
+		margin: 15px 0;
 
 		> div {
-			width: 100%;
+			flex-grow: 1;
+
+			&:first-child {
+				.stat {
+					border-bottom-left-radius: $border-radius;
+					border-top-left-radius: $border-radius;
+				}
+			}
+			&:last-child {
+				.stat {
+					border-bottom-right-radius: $border-radius;
+					border-top-right-radius: $border-radius;
+				}
+			}
+		}
+		.stat {
+			flex-grow: 1;
 			background-color: $neutral-5;
 			line-height: 30px;
 			font-weight: bold;
 			text-align: center;
+			min-width: 0;
+
+			&__label {
+				min-width: 0;
+				text-align: center;
+				flex-grow: 1;
+				font-size: 13px;
+			}
 
 			i {
 				color: $neutral-2;
-			}
-
-			&:first-child {
-				border-bottom-left-radius: $border-radius;
-				border-top-left-radius: $border-radius;
-			}
-			&:last-child {
-				border-bottom-right-radius: $border-radius;
-				border-top-right-radius: $border-radius;
 			}
 		}
 	}
@@ -335,9 +356,6 @@ export default {
 				width: 100%;
 				text-align: center;
 				font-size: 13px;
-				text-transform: uppercase;
-				font-weight: bold;
-				color: $neutral-2;
 
 				&.placeholder {
 					column-span: 2;
@@ -369,11 +387,6 @@ export default {
 						color: $red;
 					}
 				}
-			}
-			&__label {
-				text-transform: uppercase;
-				font-weight: bold;
-				color: $neutral-2;
 			}
 			&__score {
 				background-color: $neutral-9;

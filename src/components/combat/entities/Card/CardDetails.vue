@@ -1,7 +1,7 @@
 <template>
 	<div class="card-details">
 		<div class="card-details__top">
-			<Avatar :entity="full_entity" class="mb-1" :size="56" />
+			<Avatar v-if="avatar" :entity="full_entity" :size="56" />
 			<div class="card-details__top-title">
 				<Name :entity="entity" />
 				<em v-if="full_entity.entityType !== 'player'" class="subtitle">
@@ -167,6 +167,10 @@ export default {
 		entity: {
 			type: Object,
 			required: true,
+		},
+		avatar: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	data() {

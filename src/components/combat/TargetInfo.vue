@@ -4,23 +4,21 @@
 			v-if="target.entityType === 'player' || target.entityType === 'companion'"
 			:target="target"
 		/>
-		<Effects :entity="target" />
-		<ViewEntity class="mt-1 hide" :data="target" />
+		<Card class="mt-1 hide" :entity="target" :avatar="false" />
 	</div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import ViewEntity from "./ViewEntity.vue";
-import Effects from "./entities/effects";
+
+import Card from "./entities/Card";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
 
 export default {
 	name: "TargetInfo",
 	props: ["data"],
 	components: {
-		ViewEntity,
-		Effects,
+		Card,
 		DeathSaves,
 	},
 	computed: {

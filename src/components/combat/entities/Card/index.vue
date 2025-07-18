@@ -1,6 +1,6 @@
 <template>
 	<div class="entity-card">
-		<CardDetails :entity="entity" />
+		<CardDetails v-bind="$attrs" :entity="entity" />
 		<CardActions v-if="entity.entityType !== 'player'" :entity="entity" />
 	</div>
 </template>

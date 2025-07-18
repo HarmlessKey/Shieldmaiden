@@ -187,7 +187,7 @@ import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
 import DemoOverlay from "src/components/combat/DemoOverlay.vue";
 import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
 import Pane from "src/components/combat/Pane.vue";
-import Card from "src/components/combat/entities/card";
+import Card from "src/components/combat/entities/Card";
 
 export default {
 	name: "RunEncounter",

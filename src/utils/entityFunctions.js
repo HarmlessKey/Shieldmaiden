@@ -9,6 +9,8 @@ export function displayStats(entity) {
 	const stats = {
 		ac_bonus: entity.ac_bonus || 0,
 		speed: entity.speed || entity.walk_speed,
+		initiative_bonus:
+			entity.initiative_bonus > 0 ? `+${entity.initiative_bonus}` : entity.initiative_bonus,
 	};
 	if (entity.transformed) {
 		stats.ac = entity.transformedAc + stats.ac_bonus;
@@ -16,9 +18,9 @@ export function displayStats(entity) {
 		stats.maxHp = entity.transformedMaxHp;
 		stats.curHp = entity.transformedCurHp;
 	} else {
-		stats.ac = entity.ac + stats.ac_bonus;
+		stats.ac = (entity.ac || entity.armor_class || 0) + stats.ac_bonus;
 		stats.maxHpMod = entity.maxHpMod;
-		stats.maxHp = entity.maxHp;
+		stats.maxHp = entity.maxHp || entity.hit_points;
 		stats.curHp = entity.curHp;
 	}
 	return stats;

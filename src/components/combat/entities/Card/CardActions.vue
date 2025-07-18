@@ -174,10 +174,14 @@
 import { mapGetters } from "vuex";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
+import LimitedUseCounter from "../../actions/LimitedUseCounter.vue";
 
 export default {
 	name: "CardActions",
 	mixins: [runEncounter],
+	components: {
+		LimitedUseCounter,
+	},
 	props: {
 		entity: {
 			type: Object,

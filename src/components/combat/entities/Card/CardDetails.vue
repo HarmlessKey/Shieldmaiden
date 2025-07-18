@@ -17,11 +17,11 @@
 			</div>
 		</div>
 		<Effects :entity="full_entity" />
-		<div class="card-details__stats">
+		<div class="stats">
 			<template v-for="(stat, key) of stats">
 				<div v-if="displayStats(full_entity)[key] !== undefined" :key="key">
-					<div class="truncate label stat__label">{{ stat.label }}</div>
-					<div class="stat">
+					<div class="truncate label value__label">{{ stat.label }}</div>
+					<div class="value">
 						<hk-icon :icon="stat.icon" class="mr-1" />
 						<template v-if="key === 'maxHp'">
 							<hk-animated-integer :value="displayStats(full_entity).curHp" class="ml-1" /> /
@@ -263,18 +263,6 @@ export default {
 
 <style lang="scss" scoped>
 .card-details {
-	hr {
-		background-color: $neutral-5;
-	}
-	h3 {
-		margin-bottom: 5px;
-		line-height: normal;
-	}
-	.label {
-		font-weight: bold;
-		text-transform: uppercase;
-		color: $neutral-2;
-	}
 	&__top {
 		display: flex;
 		gap: 10px;
@@ -296,48 +284,6 @@ export default {
 	.entity-effects {
 		border-bottom: solid 1px $neutral-5;
 		padding-bottom: 5px;
-	}
-	&__stats {
-		display: flex;
-		justify-content: space-evenly;
-		gap: 1px;
-		margin: 15px 0;
-
-		> div {
-			flex-grow: 1;
-
-			&:first-child {
-				.stat {
-					border-bottom-left-radius: $border-radius;
-					border-top-left-radius: $border-radius;
-				}
-			}
-			&:last-child {
-				.stat {
-					border-bottom-right-radius: $border-radius;
-					border-top-right-radius: $border-radius;
-				}
-			}
-		}
-		.stat {
-			flex-grow: 1;
-			background-color: $neutral-5;
-			line-height: 30px;
-			font-weight: bold;
-			text-align: center;
-			min-width: 0;
-
-			&__label {
-				min-width: 0;
-				text-align: center;
-				flex-grow: 1;
-				font-size: 13px;
-			}
-
-			i {
-				color: $neutral-2;
-			}
-		}
 	}
 	&__abilities {
 		columns: 2;

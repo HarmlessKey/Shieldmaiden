@@ -81,7 +81,7 @@
 						:roll="{
 							d: 20,
 							n: 1,
-							m: skillModifier(skillList[skill].ability, skill),
+							m: skillModifier(skills[skill].ability, skill),
 							title: `${skill} check`,
 							entity_name: entity.name.capitalizeEach(),
 							notify: true,
@@ -95,9 +95,7 @@
 								: null
 						"
 					>
-						<span class="save"
-							>{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}</span
-						>
+						<span class="save">{{ skill }} {{ skillModifier(skills[skill].ability, skill) }}</span>
 					</hk-roll>
 				</span>
 				<br />
@@ -138,6 +136,9 @@
 				XP)<br />
 			</template>
 		</p>
+
+		<h3>Skills</h3>
+		<CardSkills :entity="full_entity" :skill-modifier="skillModifier" />
 	</div>
 </template>
 
@@ -148,17 +149,19 @@ import { calc_mod, calc_skill_mod } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster.js";
 import { experience } from "src/mixins/experience";
 import { displayStats } from "src/utils/entityFunctions";
+import Effects from "../effects";
 import Avatar from "../Avatar.vue";
 import Name from "../Name.vue";
-import Effects from "../effects";
+import CardSkills from "./CardSkills.vue";
 
 export default {
 	name: "CardDetails",
 	mixins: [monsterMixin, experience],
 	components: {
-		Avatar,
 		Effects,
+		Avatar,
 		Name,
+		CardSkills,
 	},
 	props: {
 		entity: {
@@ -168,8 +171,8 @@ export default {
 	},
 	data() {
 		return {
-			abilities: abilities,
-			skillList: skills,
+			abilities,
+			skills,
 			stats: {
 				ac: {
 					icon: "fas fa-shield",
@@ -253,6 +256,9 @@ export default {
 .card-details {
 	hr {
 		background-color: $neutral-5;
+	}
+	h3 {
+		margin-bottom: 5px;
 	}
 	p {
 		opacity: 0.7;

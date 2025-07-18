@@ -1,15 +1,18 @@
 <template>
 	<div class="entity-card">
+		<CardDetails :entity="entity" />
 		<CardActions v-if="entity.entityType !== 'player'" :entity="entity" />
 	</div>
 </template>
 
 <script>
+import CardDetails from "./CardDetails.vue";
 import CardActions from "./CardActions.vue";
 
 export default {
 	name: "Card",
 	components: {
+		CardDetails,
 		CardActions,
 	},
 	props: {

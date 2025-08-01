@@ -7,30 +7,11 @@
 		}"
 		@focus="$emit('focus')"
 	>
-		<button
-			v-if="targeted.length > 0"
-			slot="header-action"
-			class="btn btn-sm bg-neutral-5"
-			@click="set_targeted({ type: 'untarget', key: 'all' })"
-		>
-			<i aria-hidden="true" class="fas fa-times red"></i>
-			<q-tooltip anchor="top middle" self="center middle"
-				>Untarget {{ targeted.length > 1 ? "all" : "" }}</q-tooltip
-			>
-		</button>
-
-		<!-- SINGLE TARGET OPTIONS -->
-		<div
-			v-if="targeted.length"
-			class="options d-flex justify-content-between gap-1"
-			tabindex="0"
-			@focus="focusOptions"
-		>
+		<div v-if="targeted.length" slot="header-action" class="d-flex justify-content-between gap-1">
 			<button
 				v-for="({ key, method, icon, tooltip, step }, i) in display_options"
 				ref="options"
-				tabindex="-1"
-				class="option"
+				class="btn btn-sm bg-neutral-5"
 				:key="`option-${i}`"
 				v-shortkey="key"
 				:class="{
@@ -42,7 +23,10 @@
 				@keydown.right="cycleOptions(i, 'right')"
 			>
 				<i aria-hidden="true" class="fas" :class="icon" />
-				<q-tooltip anchor="top middle" self="center middle">{{ tooltip }}</q-tooltip>
+				<q-tooltip anchor="top middle" self="center middle">
+					{{ tooltip }}
+					<hk-show-keybind :binds="key" show />
+				</q-tooltip>
 
 				<TutorialPopover
 					v-if="demo && step"
@@ -52,7 +36,17 @@
 					:offset="[0, 10]"
 				/>
 			</button>
+			<button
+				class="btn btn-sm bg-neutral-5"
+				@click="set_targeted({ type: 'untarget', key: 'all' })"
+			>
+				<i aria-hidden="true" class="fas fa-times red"></i>
+				<q-tooltip anchor="top middle" self="center middle"
+					>Untarget {{ targeted.length > 1 ? "all" : "" }}</q-tooltip
+				>
+			</button>
 		</div>
+
 		<div>
 			<!-- SINGLE TARGET -->
 			<template v-if="targeted.length === 1">
@@ -142,20 +136,32 @@
 				</div>
 			</template>
 			<div v-else class="noTargetInfo">
-				<h3 class="red">No target selected</h3>
+				<h3><hk-icon icon="fas fa-arrow-left" /> Select a target</h3>
 				<p>Select at least 1 target from the target list to perform targeted actions.</p>
 
 				<p>
-					<strong>Selecting a target</strong><br />Click on an entity in the target list, or use
-					<span style="white-space: nowrap">[0-9]</span> on your keyboard to target it.
+					<strong>Selecting a target</strong><br />
+					<span class="neutral-2">
+						<hk-icon icon="fas fa-hand-pointer" /> Click on an entity in the target list, or use
+						<hk-show-keybind show :binds="['0-9']" /> on your keyboard to target it.
+					</span>
 				</p>
 				<p>
-					<strong>Multi-targeting</strong><br />Hold down shift and click on multiple entities to
-					target them all at once.
+					<strong>Multi-targeting</strong><br />
+					<span class="neutral-2">
+						Hold down <hk-show-keybind show :binds="['shift']" /> shift and click on multiple
+						entities to target them all at once.
+					</span>
 				</p>
 				<p>
-					<strong>Cycle through targets</strong><br />Use the up and down arrow keys on your
-					keyboard to cycle through the targets. Hold shift to select multiple targets in a row.
+					<strong>Cycle through targets</strong><br />
+					<span class="neutral-2">
+						Use the
+						<hk-show-keybind show :binds="['up']" /> and
+						<hk-show-keybind show :binds="['down']" /> arrow keys on your keyboard to cycle through
+						the targets. Hold <hk-show-keybind show :binds="['shift']" /> to select multiple targets
+						in a row.
+					</span>
 				</p>
 			</div>
 		</div>
@@ -229,7 +235,7 @@ export default {
 					method: () => this.setConditions(),
 					key: ["c"],
 					icon: "fa-flame",
-					tooltip: "[c] Conditions",
+					tooltip: "Conditions",
 					step: "conditions",
 				},
 				{
@@ -237,7 +243,7 @@ export default {
 					method: () => this.setReminders(),
 					key: ["m"],
 					icon: "fa-stopwatch",
-					tooltip: "[m] Reminders",
+					tooltip: "Reminders",
 					step: "reminders",
 				},
 				{
@@ -245,7 +251,7 @@ export default {
 					method: () => this.transform(),
 					key: ["t"],
 					icon: "fa-paw-claws",
-					tooltip: "[t] Transform",
+					tooltip: "Transform",
 					step: "transform",
 				},
 				{
@@ -253,14 +259,14 @@ export default {
 					method: () => this.setHidden(),
 					key: ["h"],
 					icon: "fa-eye",
-					tooltip: "[h] Hide / Show",
+					tooltip: "Hide / Show",
 				},
 				{
 					option: "edit",
 					method: () => this.edit(),
 					key: ["e"],
 					icon: "fa-pencil",
-					tooltip: "[e] Edit",
+					tooltip: "Edit",
 					step: "edit",
 				},
 			];
@@ -270,7 +276,7 @@ export default {
 					method: () => this.opportunityAttack(),
 					key: ["shift", "d"],
 					icon: "fa-swords",
-					tooltip: "[shift]+[d] Out of turn damage/healing",
+					tooltip: "Out of turn damage/healing",
 					step: "opportunity",
 				});
 			}
@@ -473,6 +479,9 @@ export default {
 
 				.abilityName {
 					margin-bottom: 3px;
+					font-weight: bold;
+					color: $neutral-2;
+					font-size: 13px;
 				}
 				.hk-roll {
 					width: 100%;
@@ -483,12 +492,10 @@ export default {
 					}
 				}
 				.advantage .mod:hover {
-					color: $neutral-1;
-					background-color: $green !important;
+					color: $green;
 				}
 				.disadvantage .mod:hover {
-					color: $neutral-1;
-					background-color: $red !important;
+					color: $red;
 				}
 			}
 		}

@@ -27,7 +27,6 @@
 							<hk-animated-integer :value="displayStats(full_entity).curHp" class="ml-1" /> /
 						</template>
 						{{ displayStats(full_entity)[key] }}
-						<q-tooltip anchor="bottom middle" self="center middle">{{ stat.label }}</q-tooltip>
 					</div>
 				</div>
 			</template>

@@ -41,7 +41,11 @@
 					</div>
 				</div>
 				<div class="target-entity__health">
-					<HealthBar :entity="entity" />
+					<DeathSaves
+						v-if="entity.entityType && entity.curHp === 0 && !entity.stable && !entity.dead"
+						:target="entity"
+					/>
+					<HealthBar v-else :entity="entity" />
 					<div class="target-entity__health-values" @click.stop>
 						<hk-animated-integer :value="displayStats(entity).curHp" />
 						/
@@ -63,6 +67,7 @@ import Effects from "./effects";
 import Avatar from "./Avatar.vue";
 import Name from "./Name.vue";
 import HealthBar from "./HealthBar.vue";
+import DeathSaves from "../DeathSaves.vue";
 import { displayStats } from "src/utils/entityFunctions";
 
 export default {
@@ -76,6 +81,7 @@ export default {
 		InitiativeQuickEdit,
 		ArmorClassQuickEdit,
 		HealthQuickEdit,
+		DeathSaves,
 	},
 	props: {
 		entity: {
@@ -196,13 +202,22 @@ export default {
 	}
 	&__health {
 		display: flex;
-		align-items: flex-end;
+		align-items: center;
 		gap: 5px;
 
 		&-values {
 			font-weight: bold;
 			white-space: nowrap;
 			line-height: 16px;
+		}
+		::v-deep {
+			.saves {
+				font-size: 13px;
+
+				&__wrapper {
+					width: 100%;
+				}
+			}
 		}
 	}
 }

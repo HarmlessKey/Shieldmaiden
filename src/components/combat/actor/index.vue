@@ -2,7 +2,12 @@
 	<div class="actor">
 		<div class="actor__actions">
 			<SelectActor :actor="actor" :_active="_active" :out-of-turn="outOfTurn" />
-			<Manual :actor="actor" />
+			<DeathSaves
+				v-if="actor.entityType === 'player' && actor.curHp === 0"
+				:target="actor"
+				show-actions
+			/>
+			<Manual v-else :actor="actor" />
 			<template v-if="actor.entityType !== 'player'">
 				<Actions :actor="actor" :key="`actions-${actor.key}`" />
 				<Spells :actor="actor" :key="`spells-${actor.key}`" />
@@ -16,7 +21,8 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import SelectActor from "./SelectActor.vue";
-import Manual from "../actions/Manual";
+import DeathSaves from "../DeathSaves.vue";
+import Manual from "../actions/Manual.vue";
 import Details from "./Details.vue";
 import Actions from "./Actions.vue";
 import Spells from "./Spells.vue";
@@ -26,6 +32,7 @@ export default {
 	name: "Actor",
 	components: {
 		SelectActor,
+		DeathSaves,
 		Manual,
 		Details,
 		Actions,

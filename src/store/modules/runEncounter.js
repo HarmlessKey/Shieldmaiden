@@ -765,6 +765,11 @@ const run_encounter_actions = {
 		if (prop === "curHp" || prop === "transformedCurHp") {
 			if (!value || value < 0) value = 0;
 			if (value > maxHpIncMod) value = maxHpIncMod;
+			if (value > 0) {
+				commit("SET_ENTITY_PROPERTY", { key, prop: "saves", value: {} });
+				commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: false });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
+			}
 		}
 
 		// Maximum hit points
@@ -1805,6 +1810,7 @@ const run_encounter_actions = {
 			}
 			commit("SET_ENTITY_PROPERTY", { key, prop: "dead", value: true });
 		}
+		commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: false });
 	},
 	async set_finished({ state, dispatch, commit }) {
 		if (!state.demo && !state.test) {

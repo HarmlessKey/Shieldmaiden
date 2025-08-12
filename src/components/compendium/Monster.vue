@@ -1,20 +1,23 @@
 <template>
-	<div v-if="!loading" class="monster-card__wrapper" :class="{ smallWidth: width < 576 }">
+	<div v-if="!loading" class="monster-card__wrapper">
 		<hk-compendium-image :value="monster.url" size="large" :icon="false" />
 		<div class="monster-card">
 			<h1 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
-				<span v-if="monster.source" class="source">{{ monster.source }}</span>
 			</h1>
 			<div class="monster-card__subtitle">
 				<template v-if="monster.size">{{ monster.size }}</template>
 				<template v-if="monster.type"> {{ monster.type }}</template>
-				<span v-if="monster.subtype">({{ monster.subtype }})</span>
-				<template v-if="monster.alignment">, {{ monster.alignment }}</template>
+				<span v-if="monster.subtype"> ({{ monster.subtype }})</span>
+				<template v-if="monster.alignment">, {{ monster.alignment?.capitalizeEach() }}</template>
 			</div>
-			<span class="monster-card__attributes">
+			<div class="monster-card__attributes">
 				<div>
 					<strong>AC </strong> {{ monster.armor_class || monster.ac }}
+					<span class="ml-2">
+						<strong>Initiative </strong> {{ monster.dexterity > 10 ? `+${calcMod(monster.dexterity)}` : calcMod(monster.dexterity) }}
+						({{ 10 + calcMod(monster.dexterity) }})
+					</span>
 				</div>
 				<div>
 					<strong>HP</strong> {{ monster.hit_points || monster.maxHp }}
@@ -29,12 +32,8 @@
 					}}{{ monster.burrow_speed ? `, burrow ${monster.burrow_speed} ft.` : ``
 					}}{{ monster.climb_speed ? `, climb ${monster.climb_speed} ft.` : `` }}
 				</div>
-				<div>
-					<strong>Initiative </strong> {{ monster.dexterity > 10 ? `+${calcMod(monster.dexterity)}` : calcMod(monster.dexterity) }}
-					({{ 10 + calcMod(monster.dexterity) }})
-				</div>
-			</span>
-			<div class="d-flex gap-1">	
+			</div>
+			<div class="d-flex gap-1 mb-4">	
 				<table
 					v-for="table in [0, 1]"
 					:key="`table-${table}`" 
@@ -99,35 +98,34 @@
 			<div class="monster-card__stats">
 				<template v-if="monster.skills?.length > 0"
 					><strong>Skills </strong>
-					<span class="saves">
-						<hk-roll
-							v-for="skill in monster.skills"
-							:key="skill"
-							:tooltip="`Roll ${skill}`"
-							:roll="{
-								d: 20,
-								n: 1,
-								m: skillModifier(skillList[skill].ability, skill),
-								title: `${skill} check`,
-								entity_name: monster.name.capitalizeEach(),
-								notify: true,
-							}"
-							:share="
-								shares.includes('skill_rolls')
-									? {
-											encounter_id: encounterId,
-											entity_key: monster.key,
-										}
-									: null
-							"
-						>
-							<span class="save">
-								<span>{{ skill.capitalize() }}</span>
-								<span> {{ mod2str(skillModifier(skillList[skill].ability, skill)) }}</span>
-							</span>
-						</hk-roll>
-					</span>
-					<br />
+					<hk-roll
+						v-for="skill, index in monster.skills"
+						:key="skill"
+						:tooltip="`Roll ${skill}`"
+						:roll="{
+							d: 20,
+							n: 1,
+							m: skillModifier(skillList[skill].ability, skill),
+							title: `${skill} check`,
+							entity_name: monster.name.capitalizeEach(),
+							notify: true,
+						}"
+						:share="
+							shares.includes('skill_rolls')
+								? {
+										encounter_id: encounterId,
+										entity_key: monster.key,
+									}
+								: null
+						"
+					>
+						<span>{{ skill.capitalize() }}</span>
+						<span>
+							{{ mod2str(skillModifier(skillList[skill].ability, skill)) }}{{ 
+								index + 1 &lt; monster.skills.length ? "," : ""
+							}}
+						</span>
+					</hk-roll>
 				</template>
 				<div
 					v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0"
@@ -231,9 +229,9 @@
 				<p>
 					<template v-for="level in caster_spell_levels">
 						<div :key="`spell-${level}`">
-							<template v-if="level === 0"> Cantrips (at will): </template>
+							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
-								{{ level | numeral("Oo") }} level ({{ monster.caster_spell_slots[level] }} slots):
+								<strong>{{ level | numeral("Oo") }} level</strong> ({{ monster.caster_spell_slots[level] }} slots):
 							</template>
 							<i
 								aria-hidden="true"
@@ -241,10 +239,8 @@
 								:key="spell.name"
 							>
 								<hk-popover>
-									{{ spell.name }}
-									<template #content>
-										<Spell :id="spell.key" />
-									</template> </hk-popover
+									{{ spell.name }}<Spell slot="content" :id="spell.key" />
+								</hk-popover
 								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
@@ -335,11 +331,15 @@
 					</template>
 				</div>
 			</div>
-	
-			<div v-if="monster.environment?.length" class="mt-3">
-				<strong>Environment:</strong> {{ monster.environment.join(", ").capitalizeEach() }}
+			
+			<div v-if="monster.source || monster.environment" class="mt-4">
+				<span v-if="monster.source">
+					<strong>Source:</strong> {{ monster.source }}
+				</span>		
+				<template v-if="monster.environment?.length" class="mt-3">
+					<strong>Environment:</strong> {{ monster.environment.join(", ").capitalizeEach() }}
+				</template>
 			</div>
-			<q-resize-observer @resize="setSize" />
 		</div>
 	</div>
 	<hk-loader v-else name="monster" />
@@ -372,7 +372,6 @@ export default {
 	},
 	data() {
 		return {
-			width: 0,
 			monster: {},
 			loading: true,
 			abilities: abilities,
@@ -441,9 +440,6 @@ export default {
 	},
 	methods: {
 		...mapActions("api_monsters", ["fetch_monster"]),
-		setSize(size) {
-			this.width = size.width;
-		},
 		passivePerception() {
 			return 10 + parseInt(this.skillModifier("wisdom", "perception"));
 		},
@@ -499,7 +495,7 @@ export default {
 .monster-card {
 	background-color: #f5f3ee;
 	color: $black;
-	padding: 15px;
+	padding: 1rem;
 	font-size: 15px;
 
 	h1, h2 {
@@ -512,6 +508,10 @@ export default {
 		font-size: 1.75rem;
 		column-span: all;
 	}
+	p {
+		margin-bottom: 1rem;
+		break-inside: avoid;
+	}
 	&__subtitle {
 		color: #68747b;
 		font-style: italic;
@@ -519,9 +519,13 @@ export default {
 	}
 	&__attributes, &__stats {
 		color: #5b160c;
+		margin-bottom: 1rem;
+		line-height: 1.5rem;
+		break-inside: avoid;
 	}
 	&__abilities {
 		color: #5b160c;
+		margin-bottom: 0;
 		
 		tr {			
 			th {
@@ -531,13 +535,13 @@ export default {
 				font-size: 0.8rem;
 				font-weight: normal;
 				height: unset;
-				padding: 3px 5px;
+				padding: 0 0.3rem;
 			}
 			td {
 				text-align: center;
 				height: unset;
 				background-color: #ede6d9;
-				padding: 3px 5px;
+				padding: 0.2rem 0.3rem;
 
 				&:first-child {
 					font-weight: bold;
@@ -563,10 +567,13 @@ export default {
 	&__traits {
 		&-description {
 			margin-bottom: 1rem;
+			break-inside: avoid;
 		}
 		&-legendary {
 			color: #68747b;
 			font-style: italic;
+			margin-bottom: 1rem;
+			break-inside: avoid;
 		}
 	}
 	&__wrapper {
@@ -577,11 +584,11 @@ export default {
 			display: inline-block;
 			cursor: pointer;
 			background-image: url("../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
-			height: 20px;
-			width: 20px;
+			height: 1.5rem;
+			width: 1.5rem;
 			background-position: center;
 			background-size: cover;
-			vertical-align: -5px;
+			vertical-align: -0.35rem;
 			user-select: none;
 			margin-right: .25rem;
 		}
@@ -599,147 +606,4 @@ export default {
 		}
 	}
 }
-// .monster {
-// 	color: $black;
-// 	font-family: Helvetica, sans-serif, serif;
-// 	&::v-deep {
-// 		.hk-roll {
-// 			color: $black;
-// 			&:hover {
-// 				color: rgb(165, 42, 42);
-// 			}
-// 		}
-// 	}
-
-// 	.hk-compendium-image {
-// 		column-span: all;
-// 	}
-
-// 	h2 {
-// 		color: #6e1d10;
-// 		text-transform: none;
-// 		font-size: 32px;
-// 		margin-bottom: 0;
-// 		font-family: "Playfair Display SC", serif;
-// 		font-weight: normal;
-
-// 		.source {
-// 			font-size: 15px;
-// 			font-family: Helvetica, sans-serif, serif;
-// 			color: $black;
-// 		}
-// 	}
-// 	h3 {
-// 		font-family: sans-serif;
-// 		color: #6e1d10;
-// 		border-bottom: solid 1px rgb(165, 42, 42);
-// 		font-size: 20px;
-// 		padding-bottom: 2px;
-// 		margin-bottom: 5px;
-// 	}
-// 	p {
-// 		margin-bottom: 10px;
-// 	}
-// 	.size {
-// 		font-size: 18px;
-// 		font-style: italic;
-// 	}
-// 	.attributes,
-// 	.stats {
-// 		color: #6e1d10;
-
-// 		.saves {
-// 			user-select: none;
-
-// 			.save {
-// 				cursor: pointer;
-// 			}
-// 			.advantage .save:hover {
-// 				color: $green;
-// 			}
-// 			.disadvantage .save:hover {
-// 				color: $red;
-// 			}
-// 		}
-// 	}
-// 	.skills {
-// 		user-select: none;
-// 		column-count: 3;
-// 		column-gap: 20px;
-// 		column-rule: 1px solid rgb(165, 42, 42);
-
-// 		.skill {
-// 			display: grid;
-// 			grid-template-columns: 1fr max-content;
-// 			column-gap: 5px;
-// 			cursor: pointer;
-
-// 			&:hover {
-// 				color: rgb(165, 42, 42);
-// 			}
-// 			i {
-// 				&.fa-circle {
-// 					margin: 0 3px;
-// 					font-size: 6px;
-// 					vertical-align: 2px;
-// 				}
-// 			}
-// 		}
-// 		.advantage .skill:hover {
-// 			color: $green;
-// 		}
-// 		.disadvantage .skill:hover {
-// 			color: $red;
-// 		}
-// 	}
-// 	.saves .hk-roll {
-// 		&::after {
-// 			content: ",";
-// 			margin-right: 3px;
-// 		}
-// 		&:last-child::after {
-// 			content: "";
-// 		}
-// 	}
-
-// 	ul {
-// 		padding-left: 20px;
-// 	}
-// 	.abilities {
-// 		user-select: none;
-// 		color: #6e1d10;
-// 		display: flex;
-// 		flex-wrap: wrap;
-// 		text-align: center;
-// 		font-size: 12px;
-// 		margin: -10px;
-
-// 		.abilityName {
-// 			font-size: 15px;
-// 			font-weight: bold;
-// 		}
-// 		.ability {
-// 			margin: 10px;
-// 			cursor: pointer;
-// 		}
-// 		.advantage .ability:hover {
-// 			color: $green;
-// 		}
-// 		.disadvantage .ability:hover {
-// 			color: $red;
-// 		}
-// 	}
-
-// 	&.smallWidth {
-// 		.abilities {
-// 			grid-template-columns: repeat(3, auto);
-// 			grid-template-rows: auto auto;
-// 			grid-row-gap: 15px;
-// 		}
-
-// 		.skills {
-// 			column-count: 2;
-// 		}
-// 	}
-// }
 </style>

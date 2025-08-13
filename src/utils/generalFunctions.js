@@ -328,7 +328,7 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 		const footer = document.createElement("div");
 		footer.textContent = footerText;
 		footer.style.width = "100%";
-		footer.style.marginTop = "1em";
+		footer.style.marginTop = "1.5em";
 		footer.style.color = "#68747b";
 
 		wrapper.appendChild(clone);

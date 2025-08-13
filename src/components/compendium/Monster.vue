@@ -339,7 +339,6 @@
 				</template>
 			</div>
 		</div>
-		<button class="btn" @click="generatePDF">Download PDF</button>
 	</div>
 	<hk-loader v-else name="monster" />
 </template>

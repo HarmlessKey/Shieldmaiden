@@ -1,7 +1,7 @@
 <template>
 	<div v-if="!loading" class="monster-card__wrapper">
 		<hk-compendium-image :value="monster.url" size="large" :icon="false" />
-		<div class="monster-card">
+		<div ref="card" class="monster-card">
 			<h1 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
 			</h1>
@@ -308,8 +308,7 @@
 										ability.action_list[0].rolls.length
 									"
 								><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"><span class="roll-button" 
-									/></hk-roll-action></template><strong
-									><em>{{ ability.name }}{{
+									/></hk-roll-action></template><span class="monster-card__traits-description__title">{{ ability.name }}{{
 											ability.recharge
 												? ` (Recharge ${
 														ability.recharge === "rest"
@@ -325,8 +324,7 @@
 												: ``
 										}}{{
 											ability.legendary_cost > 1 ? ` (Costs ${ability.legendary_cost} Actions)` : ``
-										}}. </em></strong
-								></hk-dice-text>
+										}}. </span></hk-dice-text>
 						</template>
 					</template>
 				</div>
@@ -341,6 +339,7 @@
 				</template>
 			</div>
 		</div>
+		<button class="btn" @click="generatePDF">Download PDF</button>
 	</div>
 	<hk-loader v-else name="monster" />
 </template>
@@ -487,61 +486,67 @@ export default {
 		ability2str(ability) {
 			return ability.substring(0, 3);
 		},
-	},
+	}
 };
 </script>
 
 <style lang="scss" scoped>
 .monster-card {
-	background-color: #f5f3ee;
 	color: $black;
-	padding: 1rem;
+	padding: 1em;
 	font-size: 15px;
 
 	h1, h2 {
 		color: #5b160c;
 		border-bottom: solid 1px #5b160c;
-		margin: 0.45rem 0;
+		margin: 0.45em 0;
 	}
 	h1 {
 		margin-top: 0;
-		font-size: 1.75rem;
+		font-size: 1.75em;
+		line-height: 1.5em;
 		column-span: all;
 	}
+	h2 {
+		font-size: 1.3em;
+		line-height: 1.5em;
+		font-weight: normal;
+	}
 	p {
-		margin-bottom: 1rem;
+		margin-bottom: 1em;
 		break-inside: avoid;
 	}
 	&__subtitle {
 		color: #68747b;
 		font-style: italic;
-		margin-bottom: 1rem;
+		margin-bottom: 1em;
 	}
 	&__attributes, &__stats {
 		color: #5b160c;
-		margin-bottom: 1rem;
-		line-height: 1.5rem;
+		margin-bottom: 1em;
+		line-height: 1.5em;
 		break-inside: avoid;
 	}
 	&__abilities {
 		color: #5b160c;
 		margin-bottom: 0;
+		font-size: inherit;
 		
 		tr {			
 			th {
 				color: #68747b;
 				text-transform: uppercase;
 				text-align: center;
-				font-size: 0.8rem;
+				font-size: 0.8em;
 				font-weight: normal;
 				height: unset;
-				padding: 0 0.3rem;
+				padding: 0 0.3em;
 			}
 			td {
 				text-align: center;
 				height: unset;
 				background-color: #ede6d9;
-				padding: 0.2rem 0.3rem;
+				padding: 0.2em 0.3em;
 
 				&:first-child {
 					font-weight: bold;
@@ -566,43 +571,71 @@ export default {
 	}
 	&__traits {
 		&-description {
-			margin-bottom: 1rem;
+			margin-bottom: 1em;
 			break-inside: avoid;
+
+			&__title {
+				font-weight: bold;
+				font-style: italic;
+			}
 		}
 		&-legendary {
 			color: #68747b;
 			font-style: italic;
-			margin-bottom: 1rem;
+			margin-bottom: 1em;
 			break-inside: avoid;
 		}
 	}
 	&__wrapper {
 		container-type: inline-size;
 		container-name: monster-card;
+		background-color: #f5f3ee;
+		background-color: #f5f3ee;
 
 		.roll-button {
 			display: inline-block;
 			cursor: pointer;
 			background-image: url("../../assets/_img/logo/logo-icon-no-shield-cyan.svg");
-			height: 1.5rem;
-			width: 1.5rem;
+			height: 1.5em;
+			width: 1.5em;
 			background-position: center;
 			background-size: cover;
-			vertical-align: -0.35rem;
+			vertical-align: -0.35em;
 			user-select: none;
-			margin-right: .25rem;
+			margin-right: .25em;
 		}
 		.advantage .roll-button:hover {
 			background-image: url("../../assets/_img/logo/logo-icon-no-shield-green.svg");
 		}
 		.disadvantage .roll-button:hover {
 			background-image: url("../../assets/_img/logo/logo-icon-no-shield-red.svg");
-}
+		}
 
 		@container (min-width: 600px) {
 			.monster-card {
 				column-count: 2;
+				gap: 1.5em;
 			}
+		}
+	}
+	&.download-mode {
+		font-size: 15px;
+		border: solid 1px #5b160c;
+		border-radius: 0.5em;
+
+		.roll-button {
+			display: none;
+		}
+
+		&.columned {
+			column-count: 2;
+			gap: 1.5em;
+		}
+		&.single-column {
+			font-size: 30px;
+		}
+		&.single-column, &.full {
+			column-count: 1 !important;
 		}
 	}
 }

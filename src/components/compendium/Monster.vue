@@ -4,6 +4,13 @@
 		<div ref="card" class="monster-card">
 			<h1 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
+				<button
+					v-if="allowDownload"
+					class="btn btn-sm bg-neutral-5"
+					@click="download_dialog = true"
+				>
+					Download <hk-icon icon="fas fa-download" class="ml-1" />
+				</button>
 			</h1>
 			<div class="monster-card__subtitle">
 				<template v-if="monster.size">{{ monster.size }}</template>
@@ -15,7 +22,10 @@
 				<div>
 					<strong>AC </strong> {{ monster.armor_class || monster.ac }}
 					<span class="ml-2">
-						<strong>Initiative </strong> {{ monster.dexterity > 10 ? `+${calcMod(monster.dexterity)}` : calcMod(monster.dexterity) }}
+						<strong>Initiative </strong>
+						{{
+							monster.dexterity > 10 ? `+${calcMod(monster.dexterity)}` : calcMod(monster.dexterity)
+						}}
 						({{ 10 + calcMod(monster.dexterity) }})
 					</span>
 				</div>
@@ -33,21 +43,26 @@
 					}}{{ monster.climb_speed ? `, climb ${monster.climb_speed} ft.` : `` }}
 				</div>
 			</div>
-			<div class="d-flex gap-1 mb-4">	
+			<div class="d-flex gap-1 mb-4">
 				<table
 					v-for="table in [0, 1]"
-					:key="`table-${table}`" 
-					class="monster-card__abilities" 
-					:class="table === 0 ? 'left' : 'right'">
+					:key="`table-${table}`"
+					class="monster-card__abilities"
+					:class="table === 0 ? 'left' : 'right'"
+				>
 					<tr>
 						<th colspan="2"></th>
 						<th>mod</th>
 						<th>save</th>
 					</tr>
-					<tr v-for="(ability, index) in abilities.slice(table*3, table*3+3)" :class="`ability ability__${ability}`" :key="index">
+					<tr
+						v-for="(ability, index) in abilities.slice(table * 3, table * 3 + 3)"
+						:class="`ability ability__${ability}`"
+						:key="index"
+					>
 						<td class="ability__label">{{ ability2str(ability.toUpperCase()) }}</td>
-						<td  class="ability__score">{{ monster[ability] }}</td>
-						<td class="mod">			
+						<td class="ability__score">{{ monster[ability] }}</td>
+						<td class="mod">
 							<hk-roll
 								:roll="{
 									d: 20,
@@ -74,7 +89,9 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: monster.saving_throws.includes(ability) ? calcMod(monster[ability]) + monster.proficiency : calcMod(monster[ability]),
+									m: monster.saving_throws.includes(ability)
+										? calcMod(monster[ability]) + monster.proficiency
+										: calcMod(monster[ability]),
 									title: `${ability.capitalize()} save`,
 									entity_name: monster.name.capitalizeEach(),
 									notify: true,
@@ -88,18 +105,24 @@
 										: null
 								"
 							>
-								{{ mod2str(monster.saving_throws.includes(ability) ? calcMod(monster[ability]) + monster.proficiency : calcMod(monster[ability])) }}
+								{{
+									mod2str(
+										monster.saving_throws.includes(ability)
+											? calcMod(monster[ability]) + monster.proficiency
+											: calcMod(monster[ability])
+									)
+								}}
 							</hk-roll>
 						</td>
 					</tr>
 				</table>
 			</div>
-	
+
 			<div class="monster-card__stats">
 				<template v-if="monster.skills?.length > 0"
 					><strong>Skills </strong>
 					<hk-roll
-						v-for="skill, index in monster.skills"
+						v-for="(skill, index) in monster.skills"
 						:key="skill"
 						:tooltip="`Roll ${skill}`"
 						:roll="{
@@ -121,15 +144,14 @@
 					>
 						<span>{{ skill.capitalize() }}</span>
 						<span>
-							{{ mod2str(skillModifier(skillList[skill].ability, skill)) }}{{ 
+							{{ mod2str(skillModifier(skillList[skill].ability, skill))
+							}}{{ 
 								index + 1 &lt; monster.skills.length ? "," : ""
 							}}
 						</span>
 					</hk-roll>
 				</template>
-				<div
-					v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0"
-				>
+				<div v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0">
 					<strong>Damage vulnerabilities</strong>
 					{{ defensesDisplay(monster.damage_vulnerabilities).join(", ") }}
 				</div>
@@ -144,7 +166,7 @@
 				<div v-if="monster.condition_immunities && monster.condition_immunities.length > 0">
 					<strong>Condition immunities</strong> {{ monster.condition_immunities.join(", ") }}
 				</div>
-				
+
 				<div>
 					<strong>Senses</strong>
 					<template v-if="monster.senses">
@@ -155,7 +177,7 @@
 					</template>
 					Passive Perception {{ passivePerception() }}
 				</div>
-	
+
 				<div v-if="monster.languages && monster.languages.length > 0">
 					<strong>Languages</strong> {{ monster.languages.join(", ") }}
 				</div>
@@ -163,10 +185,11 @@
 					<strong>Challenge Rating</strong> {{ monster.challenge_rating }} ({{
 						monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0")
 					}}
-					XP; <template v-if="monster.challenge_rating">PB +{{ monster.proficiency }}</template>)
-				</div>	
+					XP; <template v-if="monster.challenge_rating">PB +{{ monster.proficiency }}</template
+					>)
+				</div>
 			</div>
-	
+
 			<!-- <h3>Skills</h3>
 			<div class="skills">
 				<hk-roll
@@ -208,16 +231,14 @@
 					</span>
 				</hk-roll>
 			</div> -->
-	
-	
+
 			<!-- SPELLCASTING -->
 			<template v-if="monster.caster_ability">
 				<p>
 					<strong><em> Spellcasting </em></strong>
 					The {{ monster.name.capitalizeEach() }} is a
-					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. its spellcasting ability
-					is {{ monster.caster_ability.capitalize() }} (spell save DC
-					{{ monster.caster_save_dc }},
+					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. its spellcasting ability is
+					{{ monster.caster_ability.capitalize() }} (spell save DC {{ monster.caster_save_dc }},
 					{{
 						monster.caster_spell_attack > 0
 							? `+${monster.caster_spell_attack}`
@@ -231,23 +252,24 @@
 						<div :key="`spell-${level}`">
 							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
-								<strong>{{ level | numeral("Oo") }} level</strong> ({{ monster.caster_spell_slots[level] }} slots):
+								<strong>{{ level | numeral("Oo") }} level</strong> ({{
+									monster.caster_spell_slots[level]
+								}}
+								slots):
 							</template>
 							<i
 								aria-hidden="true"
 								v-for="(spell, index) in spellsForLevel(level)"
 								:key="spell.name"
 							>
-								<hk-popover>
-									{{ spell.name }}<Spell slot="content" :id="spell.key" />
-								</hk-popover
+								<hk-popover> {{ spell.name }}<Spell slot="content" :id="spell.key" /> </hk-popover
 								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
 					</template>
 				</p>
 			</template>
-	
+
 			<!-- INNATE SPELLCASTING -->
 			<template v-if="monster.innate_ability">
 				<p>
@@ -259,8 +281,8 @@
 							? `+${monster.innate_spell_attack}`
 							: monster.innate_spell_attack
 					}}
-					to hit with spell attacks). The {{ monster.name.capitalizeEach() }} can cast the
-					following spells, requiring no material components:
+					to hit with spell attacks). The {{ monster.name.capitalizeEach() }} can cast the following
+					spells, requiring no material components:
 				</p>
 				<p>
 					<template v-for="limit in innate_spell_levels">
@@ -283,23 +305,27 @@
 					</template>
 				</p>
 			</template>
-	
-			
+
 			<div class="monster-card__traits">
 				<div v-for="{ category, name } in actions" :key="category">
 					<template v-if="monster[category] && monster[category].length > 0">
 						<h2>{{ name }}</h2>
-						<p v-if="monster.legendary_count && category === 'legendary_actions'" class="monster-card__traits-legendary">
-							Legendary Action Uses: {{ monster.legendary_count }}. 
-							Immediately after another creature's turn, the {{ monster.name.capitalizeEach() }} can expend a use to take one of the following actions. 
-							The {{ monster.name.capitalizeEach() }} regains all expended uses at the start of each of its turns.
+						<p
+							v-if="monster.legendary_count && category === 'legendary_actions'"
+							class="monster-card__traits-legendary"
+						>
+							Legendary Action Uses: {{ monster.legendary_count }}. Immediately after another
+							creature's turn, the {{ monster.name.capitalizeEach() }} can expend a use to take one
+							of the following actions. The {{ monster.name.capitalizeEach() }} regains all expended
+							uses at the start of each of its turns.
 						</p>
 						<template v-for="(ability, index) in monster[category]">
 							<hk-dice-text
 								v-if="ability.desc"
 								:key="`${category}-${index}`"
 								class="monster-card__traits-description"
-								:input_text="ability.desc"><template
+								:input_text="ability.desc"
+								><template
 									v-if="
 										ability.action_list &&
 										ability.action_list[0] &&
@@ -307,38 +333,62 @@
 										ability.action_list[0].rolls &&
 										ability.action_list[0].rolls.length
 									"
-								><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"><span class="roll-button" 
-									/></hk-roll-action></template><span class="monster-card__traits-description__title">{{ ability.name }}{{
-											ability.recharge
-												? ` (Recharge ${
-														ability.recharge === "rest"
-															? "after a Short or Long Rest"
-															: ability.recharge
-													})`
-												: ``
-										}}{{
-											ability.limit
-												? ` (${ability.limit}/${
-														ability.limit_type ? ability.limit_type.capitalize() : `Day`
-													})`
-												: ``
-										}}{{
-											ability.legendary_cost > 1 ? ` (Costs ${ability.legendary_cost} Actions)` : ``
-										}}. </span></hk-dice-text>
+									><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"
+										><span class="roll-button" /></hk-roll-action></template
+								><span class="monster-card__traits-description__title"
+									>{{ ability.name
+									}}{{
+										ability.recharge
+											? ` (Recharge ${
+													ability.recharge === "rest"
+														? "after a Short or Long Rest"
+														: ability.recharge
+												})`
+											: ``
+									}}{{
+										ability.limit
+											? ` (${ability.limit}/${
+													ability.limit_type ? ability.limit_type.capitalize() : `Day`
+												})`
+											: ``
+									}}{{
+										ability.legendary_cost > 1 ? ` (Costs ${ability.legendary_cost} Actions)` : ``
+									}}.
+								</span></hk-dice-text
+							>
 						</template>
 					</template>
 				</div>
 			</div>
-			
+
 			<div v-if="monster.source || monster.environment" class="mt-4">
-				<span v-if="monster.source">
-					<strong>Source:</strong> {{ monster.source }}
-				</span>		
+				<span v-if="monster.source"> <strong>Source:</strong> {{ monster.source }} </span>
 				<template v-if="monster.environment?.length" class="mt-3">
 					<strong>Environment:</strong> {{ monster.environment.join(", ").capitalizeEach() }}
 				</template>
 			</div>
 		</div>
+		<hk-dialog v-model="download_dialog" :header="`Download ${monster.name?.capitalizeEach()}`">
+			<div class="layouts">
+				<button
+					v-for="({ label, value, icon, pdf_only }, index) in layouts"
+					:key="index"
+					:class="{ active: layout === value }"
+					@click="layout = value"
+				>
+					<hk-icon :icon="icon" />
+					<div>{{ label }} <small v-if="pdf_only">(PFD only)</small></div>
+				</button>
+			</div>
+			<div slot="footer" class="d-flex full-width items-center gap-1">
+				<button class="btn btn-block" @click="download('pdf')">
+					Download PDF <hk-icon icon="fas fa-file-pdf" class="ml-1" />
+				</button>
+				<button class="btn btn-block" :disabled="layout === 'full'" @click="download('png')">
+					Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
+				</button>
+			</div>
+		</hk-dialog>
 	</div>
 	<hk-loader v-else name="monster" />
 </template>
@@ -351,6 +401,7 @@ import { mapActions, mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell";
 import { skills, abilities } from "src/utils/generalConstants";
 import { calc_skill_mod } from "src/utils/generalFunctions";
+import { downloadMonsterFile } from "src/utils/generalFunctions";
 
 export default {
 	name: "ViewMonster",
@@ -366,6 +417,10 @@ export default {
 		// If the id prop is passed, the monster is fetched in the Monster component
 		id: {
 			type: String,
+		},
+		allowDownload: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {
@@ -387,6 +442,26 @@ export default {
 					name_single: "Legendary action",
 				},
 				{ category: "reactions", name: "Reactions", name_single: "Reaction" },
+			],
+			download_dialog: false,
+			layout: "columned",
+			layouts: [
+				{
+					label: "Columns",
+					value: "columned",
+					icon: "fas fa-line-columns",
+				},
+				{
+					label: "Single column",
+					value: "single-column",
+					icon: "fad fa-line-columns",
+				},
+				{
+					label: "Full",
+					value: "full",
+					pdf_only: true,
+					icon: "fas fa-align-justify",
+				},
 			],
 		};
 	},
@@ -485,7 +560,14 @@ export default {
 		ability2str(ability) {
 			return ability.substring(0, 3);
 		},
-	}
+		download(type) {
+			downloadMonsterFile(this.$refs.card, type, {
+				layout: this.layout,
+				filename: `${this.monster.url} (Shieldmaiden)`,
+				footerText: `https://shieldmaiden.app/homebrew/${this.monster.url}`,
+			});
+		},
+	},
 };
 </script>
 
@@ -495,7 +577,8 @@ export default {
 	padding: 1em;
 	font-size: 15px;
 
-	h1, h2 {
+	h1,
+	h2 {
 		color: #5b160c;
 		border-bottom: solid 1px #5b160c;
 		margin: 0.45em 0;
@@ -505,6 +588,14 @@ export default {
 		font-size: 1.75em;
 		line-height: 1.5em;
 		column-span: all;
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		gap: 1em;
+
+		button {
+			white-space: nowrap;
+		}
 	}
 	h2 {
 		font-size: 1.3em;
@@ -520,7 +611,8 @@ export default {
 		font-style: italic;
 		margin-bottom: 1em;
 	}
-	&__attributes, &__stats {
+	&__attributes,
+	&__stats {
 		color: #5b160c;
 		margin-bottom: 1em;
 		line-height: 1.5em;
@@ -530,8 +622,8 @@ export default {
 		color: #5b160c;
 		margin-bottom: 0;
 		font-size: inherit;
-		
-		tr {			
+
+		tr {
 			th {
 				color: #68747b;
 				text-transform: uppercase;
@@ -553,7 +645,8 @@ export default {
 				button {
 					width: 100%;
 				}
-				&.mod, &.save {
+				&.mod,
+				&.save {
 					background-color: #ded4cc;
 					cursor: pointer;
 				}
@@ -562,7 +655,8 @@ export default {
 		&.right {
 			tr td {
 				background-color: #d8dad1;
-				&.mod, &.save {
+				&.mod,
+				&.save {
 					background-color: #d0caca;
 				}
 			}
@@ -601,7 +695,7 @@ export default {
 			background-size: cover;
 			vertical-align: -0.35em;
 			user-select: none;
-			margin-right: .25em;
+			margin-right: 0.25em;
 		}
 		.advantage .roll-button:hover {
 			background-image: url("../../assets/_img/logo/logo-icon-no-shield-green.svg");
@@ -633,8 +727,37 @@ export default {
 		&.single-column {
 			font-size: 30px;
 		}
-		&.single-column, &.full {
+		&.single-column,
+		&.full {
 			column-count: 1 !important;
+		}
+	}
+}
+.layouts {
+	display: flex;
+	gap: 10px;
+
+	button {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		flex-grow: 1;
+		background-color: $neutral-5;
+		padding: 15px 10px 12px 10px;
+		border-radius: $border-radius;
+		cursor: pointer;
+
+		&:hover {
+			background-color: $neutral-4;
+		}
+		&.active {
+			border: solid 1px $blue;
+		}
+		i {
+			font-size: 30px;
+		}
+		small {
+			color: $neutral-2;
 		}
 	}
 }

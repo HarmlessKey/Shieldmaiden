@@ -32,6 +32,9 @@ export class monsterServices {
 			if (query.search) {
 				queryParams.push(`name=${query.search}`);
 			}
+			if (query.source) {
+				queryParams.push(`source=${query.source}`);
+			}
 			if (query.types && query.types.length) {
 				for (const type of query.types) {
 					queryParams.push(`type[]=${type}`);

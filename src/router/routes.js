@@ -957,6 +957,34 @@ const routes = [
 			},
 		],
 	},
+	{
+		path: "/homebrew",
+		component: () => import("src/layouts/default"),
+		meta: {
+			offline: true,
+			title: "Homebrew",
+		},
+		children: [
+			{
+				path: "",
+				name: "Homebrew",
+				component: () => import("src/views/Compendium/Homebrew"),
+				meta: {
+					title: "Homebrew",
+					description: "Monsters created by Shieldmaiden.",
+				},
+			},
+			{
+				path: ":id",
+				name: "HomebrewMonster",
+				component: () => import("src/views/Compendium/view/HomebrewMonster"),
+				meta: {
+					title: "Monster D&D 5e",
+					description: "D&D 5th Edition monster.",
+				},
+			},
+		],
+	},
 
 	// ADMIN
 	{

@@ -91,6 +91,9 @@ export default {
 	gap: 10px;
 	flex-grow: 1;
 
+	.entity-name {
+		font-weight: bold;
+	}
 	.multi {
 		color: $neutral-2;
 		font-size: 35px;

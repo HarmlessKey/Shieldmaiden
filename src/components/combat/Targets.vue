@@ -404,7 +404,12 @@ ul.targets {
 		background: $neutral-5;
 		border-radius: $border-radius-small;
 		margin-left: 18px;
+		border: solid 1px transparent;
+		transition: all 0.1s linear;
 
+		&:hover {
+			border-color: $neutral-4;
+		}
 		&.targeted {
 			outline: $blue solid 3px;
 		}

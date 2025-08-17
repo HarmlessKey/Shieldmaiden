@@ -1,14 +1,16 @@
 <template>
 	<div>
 		<template v-if="target.entityType === 'player' || target.entityType === 'companion'">
-			<span>Death Saving Throws</span>
-			<button
-				class="btn btn-sm btn-clear"
-				@click="setDrawer({ show: true, type: 'drawers/DeathSaves' })"
-			>
-				<i aria-hidden="true" class="fas fa-question" />
-				<q-tooltip anchor="top middle" self="center middle">Learn more</q-tooltip>
-			</button>
+			<template v-if="!target.curHp">
+				<span>Death Saving Throws</span>
+				<button
+					class="btn btn-sm btn-clear"
+					@click="setDrawer({ show: true, type: 'drawers/DeathSaves' })"
+				>
+					<i aria-hidden="true" class="fas fa-question" />
+					<q-tooltip anchor="top middle" self="center middle">Learn more</q-tooltip>
+				</button>
+			</template>
 			<DeathSaves :target="target" />
 		</template>
 		<Card class="mt-1 hide" :entity="target" :avatar="false" />

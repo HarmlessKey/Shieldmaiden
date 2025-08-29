@@ -380,11 +380,11 @@
 					<div>{{ label }} <small v-if="pdf_only">(PFD only)</small></div>
 				</button>
 			</div>
-			<div slot="footer" class="d-flex full-width items-center gap-1">
-				<button class="btn btn-block" @click="download('pdf')">
+			<div slot="footer" class="d-flex justify-content-end full-width items-center gap-1">
+				<!-- <button class="btn btn-block" @click="download('pdf')">
 					Download PDF <hk-icon icon="fas fa-file-pdf" class="ml-1" />
-				</button>
-				<button class="btn btn-block" :disabled="layout === 'full'" @click="download('png')">
+				</button> -->
+				<button class="btn" :disabled="layout === 'full'" @click="download('png')">
 					Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
 				</button>
 			</div>
@@ -456,12 +456,12 @@ export default {
 					value: "single-column",
 					icon: "fad fa-line-columns",
 				},
-				{
-					label: "Full",
-					value: "full",
-					pdf_only: true,
-					icon: "fas fa-align-justify",
-				},
+				// {
+				// 	label: "Full",
+				// 	value: "full",
+				// 	pdf_only: true,
+				// 	icon: "fas fa-align-justify",
+				// },
 			],
 		};
 	},

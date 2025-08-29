@@ -65,8 +65,9 @@
 			no-caps
 			toggle-color="primary"
 			:options="[
-				{ label: 'Custom NPCs', value: 'custom' },
-				{ label: 'SRD monsters', value: 'srd' },
+				{ label: 'Custom', value: 'custom' },
+				{ label: 'SRD', value: 'srd' },
+				{ label: 'Homebrew', value: 'homebrew' },
 			]"
 		/>
 
@@ -198,7 +199,7 @@
 				square
 				debounce="300"
 				clearable
-				placeholder="Search SRD monster"
+				placeholder="Search monster"
 				@change="filterMonsters"
 				@clear="filterMonsters"
 			>
@@ -585,7 +586,6 @@ export default {
 		};
 	},
 	async mounted() {
-		await this.fetchMonsters();
 		this.loading_monsters = false;
 		await this.get_npcs();
 		this.loading_npcs = false;
@@ -605,8 +605,11 @@ export default {
 				const resource = this.npc_count ? "custom" : "srd";
 				return this.monster_resource_setter ? this.monster_resource_setter : resource;
 			},
-			set(newVal) {
+			async set(newVal) {
 				this.monster_resource_setter = newVal;
+				if (newVal !== "custom") {
+					await this.filterMonsters();
+				}
 			},
 		},
 		npc_pagination: {
@@ -617,7 +620,7 @@ export default {
 							sortBy: "name",
 							rowsPerPage: 15,
 							rowsNumber: this.npc_count,
-					  };
+						};
 			},
 			set(newVal) {
 				this.npcPaginationSetter = newVal;
@@ -667,6 +670,7 @@ export default {
 			this.pagination.page = 1;
 			this.query = {
 				search: this.searchMonster,
+				source: this.monster_resource === "homebrew" ? "homebrew" : null,
 				...this.filter,
 			};
 			this.fetchMonsters();

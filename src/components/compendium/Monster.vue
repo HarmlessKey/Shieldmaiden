@@ -582,6 +582,7 @@ export default {
 		color: #5b160c;
 		border-bottom: solid 1px #5b160c;
 		margin: 0.45em 0;
+		font-family: "ScalySans", sans-serif;
 	}
 	h1 {
 		margin-top: 0;
@@ -592,9 +593,11 @@ export default {
 		justify-content: space-between;
 		align-items: start;
 		gap: 1em;
+		font-weight: 700;
 
 		button {
 			white-space: nowrap;
+			font-family: "Open Sans", sans-serif;
 		}
 	}
 	h2 {

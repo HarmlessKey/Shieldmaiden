@@ -24,6 +24,21 @@
 	10. Croppa
 */
 
+@font-face {
+	font-family: "ScalySans";
+	src: url("../assets/fonts/scaly/ScalaSansCaps-Regular.otf") format("opentype");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "ScalySans";
+	src: url("../assets/fonts/scaly/ScalaSansCaps-Bold.otf") format("opentype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 /* 2. Defaults */
 /*********************************************/
 html body {

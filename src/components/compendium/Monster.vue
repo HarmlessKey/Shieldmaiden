@@ -6,7 +6,7 @@
 				{{ monster.name.capitalizeEach() }}
 				<button
 					v-if="allowDownload"
-					class="btn btn-sm bg-neutral-5"
+					class="btn btn-sm bg-neutral-5 download-btn"
 					@click="download_dialog = true"
 				>
 					Download <hk-icon icon="fas fa-download" class="ml-1" />
@@ -716,7 +716,8 @@ export default {
 		border: solid 1px #5b160c;
 		border-radius: 0.5em;
 
-		.roll-button {
+		.roll-button,
+		.download-btn {
 			display: none;
 		}
 

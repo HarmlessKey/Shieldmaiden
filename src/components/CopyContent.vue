@@ -8,10 +8,7 @@
 			no-caps
 			toggle-color="primary"
 			@input="changeCopyResource($event)"
-			:options="[
-				{ label: `Custom ${type === 'monster' ? 'NPC' : type}s`, value: 'custom' },
-				{ label: `SRD ${type}s`, value: 'srd' },
-			]"
+			:options="options"
 		/>
 		<hk-input
 			:label="
@@ -135,7 +132,7 @@ export default {
 			copy_resource_setter: undefined,
 			show_filter: false,
 			filter: {},
-			pageSize: 10,
+			pageSize: 5,
 			page: 1,
 			totalPages: 0,
 		};
@@ -144,6 +141,15 @@ export default {
 		...mapGetters("npcs", ["npcs"]),
 		...mapGetters("items", ["items"]),
 		...mapGetters("spells", ["spells"]),
+		options() {
+			const values = [
+				{ label: `Custom`, value: "custom" },
+				{ label: `SRD`, value: "srd" },
+			];
+			return this.type === "monster"
+				? values.concat({ label: `Homebrew`, value: "homebrew" })
+				: values;
+		},
 		custom_content() {
 			let content = [];
 			if (this.type === "monster") {
@@ -163,8 +169,11 @@ export default {
 						: "srd";
 				return this.copy_resource_setter ? this.copy_resource_setter : resource;
 			},
-			set(newVal) {
+			async set(newVal) {
 				this.copy_resource_setter = newVal;
+				if (newVal !== "custom") {
+					await this.fetchApiContent();
+				}
 			},
 		},
 	},
@@ -190,12 +199,12 @@ export default {
 		...mapActions("api_spells", ["fetch_api_spells", "fetch_api_spell"]),
 		...mapActions("spells", ["get_spells", "get_spell"]),
 		changeCopyResource(value) {
-			this.copy_resource = value;
 			this.query = "";
 			this.searchResults = [];
 			this.noResult = "";
 			this.page = 1;
 			this.totalPages = 0;
+			this.copy_resource = value;
 		},
 		async search() {
 			// CUSTOM
@@ -240,6 +249,7 @@ export default {
 				pageSize: this.pageSize,
 				query: {
 					search: this.query,
+					source: this.copy_resource === "homebrew" ? "homebrew" : null,
 					...this.filter,
 				},
 			}).then((result) => {

@@ -1,8 +1,23 @@
 <template>
 	<hk-card>
 		<div slot="header" class="card-header">
-			<h1><i aria-hidden="true" class="fas fa-dragon"></i> Monsters</h1>
-			<span class="neutral-3">
+			<h1>
+				<i class="fas fa-dragon mr-1" aria-hidden="true" />
+				{{ source?.capitalize() }}
+				Monsters
+			</h1>
+			<span v-if="source === 'homebrew'" class="neutral-3">
+				Instagram
+				<a
+					class="btn btn-sm btn-clear"
+					href="https://www.instagram.com/shieldmaidenapp"
+					target="_blank"
+					rel="noopener"
+				>
+					#shieldmaidenapp
+				</a>
+			</span>
+			<span v-else class="neutral-3">
 				Resource
 				<a
 					class="btn btn-sm btn-clear"
@@ -41,7 +56,7 @@
 					/>
 				</q-btn>
 			</q-input>
-			<p v-if="!loading && pagination.rowsNumber === 0" class="red">
+			<p v-if="!loading && pagination.rowsNumber === 0" class="red mt-1">
 				Nothing found
 				<template v-if="query.search"> for "{{ query.search }}" </template>
 				<template v-if="filter.types?.length">
@@ -159,7 +174,6 @@ import ViewMonster from "src/components/compendium/Monster.vue";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions } from "vuex";
 import _ from "lodash";
-import { displayCR } from "src/utils/generalFunctions";
 
 export default {
 	name: "Monsters",
@@ -169,11 +183,14 @@ export default {
 	},
 	data() {
 		return {
+			source: this.$route.name === "Homebrew" ? "homebrew" : null,
 			monsters: [],
 			filter_dialog: false,
 			filter: {},
 			search: "",
-			query: null,
+			query: {
+				source: this.$route.name === "Homebrew" ? "homebrew" : null,
+			},
 			pagination: {
 				sortBy: "name",
 				descending: false,
@@ -294,6 +311,7 @@ export default {
 			this.pagination.page = 1;
 			this.query = {
 				search: this.search,
+				source: this.source,
 				...this.filter,
 			};
 			this.fetchMonsters();

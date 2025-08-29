@@ -968,10 +968,10 @@ const routes = [
 			{
 				path: "",
 				name: "Homebrew",
-				component: () => import("src/views/Compendium/Homebrew"),
+				component: () => import("src/views/Compendium/Monsters"),
 				meta: {
 					title: "Homebrew",
-					description: "Monsters created by Shieldmaiden.",
+					description: "D&D 5e Monsters created by Shieldmaiden.",
 				},
 			},
 			{
@@ -979,8 +979,8 @@ const routes = [
 				name: "HomebrewMonster",
 				component: () => import("src/views/Compendium/view/HomebrewMonster"),
 				meta: {
-					title: "Monster D&D 5e",
-					description: "D&D 5th Edition monster.",
+					title: "Homebrew Monster D&D 5e",
+					description: "D&D 5th Edition monster created by Shieldmaiden.",
 				},
 			},
 		],

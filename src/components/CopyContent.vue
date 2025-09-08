@@ -300,6 +300,7 @@ export default {
 				delete result.key;
 				delete result.url;
 				delete result.meta;
+				delete result.release_date;
 
 				this.$emit("copy", { result, id, resource: this.copy_resource });
 			}

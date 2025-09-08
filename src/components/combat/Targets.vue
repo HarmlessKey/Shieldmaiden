@@ -439,7 +439,6 @@ ul.targets {
 			gap: 3px;
 			font-weight: bold;
 			cursor: default;
-			width: 100%;
 			top: -40px;
 			margin-left: -25px;
 			width: calc(100% + 25px);

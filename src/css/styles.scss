@@ -24,6 +24,21 @@
 	10. Croppa
 */
 
+@font-face {
+	font-family: "ScalySans";
+	src: url("../assets/fonts/scaly/ScalaSansCaps-Regular.otf") format("opentype");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "ScalySans";
+	src: url("../assets/fonts/scaly/ScalaSansCaps-Bold.otf") format("opentype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 /* 2. Defaults */
 /*********************************************/
 html body {
@@ -1990,10 +2005,6 @@ html body {
 			padding: 15px;
 			overflow: auto;
 
-			&.monster-card {
-				background-color: #f7e4ba !important;
-				background-image: url("../assets/_img/styles/monster-card-bg.png") !important;
-			}
 			&::-webkit-scrollbar {
 				display: none !important;
 			}
@@ -2474,21 +2485,6 @@ html body {
 				box-sizing: border-box;
 			}
 		}
-
-		.monster {
-			column-count: 2;
-
-			.skills {
-				column-count: 2;
-			}
-		}
-		.monster-card {
-			padding: 10px;
-		}
-	}
-	.monster-card {
-		background-color: #f7e4ba !important;
-		background-image: url("../assets/_img/styles/monster-card-bg.png") !important;
 	}
 	@media only screen and (max-width: 1530px) {
 		.monster-table {

@@ -16,7 +16,7 @@
 								</q-tooltip>
 							</q-icon>
 							<q-btn
-								v-if="!npcId"
+								v-if="!npcId && userId"
 								class="mx-1"
 								color="neutral-5"
 								no-caps
@@ -118,7 +118,6 @@
 				<div class="card-body">
 					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
 					<button
-						:disabled="monster_description.length == 0"
 						class="btn btn-block bg-accent"
 						@click="sign_up_dialog = true"
 					>

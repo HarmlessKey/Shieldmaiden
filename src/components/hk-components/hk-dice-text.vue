@@ -1,10 +1,9 @@
 <template>
 	<div class="hk-dice-text">
-		<template v-for="(line, index) in splitOnRollable(input_text)">
-			<template v-if="line.dice === undefined">
-				{{ line.value }}
-			</template>
-			<hk-roll 
+		<slot 
+		/><template v-for="(line, index) in splitOnRollable(input_text)"
+		><template v-if="line.dice === undefined">{{ line.value }}</template
+			><hk-roll 
 				v-else
 				:tooltip="`Roll ${dice2str(line.dice)}`"
 				:key="index"
@@ -16,11 +15,8 @@
 					entity_name,
 					notify: true
 				}"
-			>
-				<strong class="rollable">
-					{{ line.value }}
-				</strong>
-			</hk-roll>
+			><strong class="rollable">{{ line.value }}</strong
+			></hk-roll>
 		</template>
 
 	</div>
@@ -91,6 +87,8 @@
 
 <style lang="scss" scoped>
 .hk-dice-text {
+	white-space: pre-line;
+
 	.rollable {
 		cursor: pointer;
 		user-select: none;

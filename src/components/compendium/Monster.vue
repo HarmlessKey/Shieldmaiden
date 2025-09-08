@@ -399,9 +399,7 @@ import { dice } from "src/mixins/dice.js";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions, mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell";
-import { skills, abilities } from "src/utils/generalConstants";
-import { calc_skill_mod } from "src/utils/generalFunctions";
-import { downloadMonsterFile } from "src/utils/generalFunctions";
+import { skills, abilities, calc_skill_mod, downloadMonsterFile } from "src/utils/generalConstants";
 
 export default {
 	name: "ViewMonster",

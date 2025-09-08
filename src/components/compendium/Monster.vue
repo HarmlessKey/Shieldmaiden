@@ -686,7 +686,6 @@ export default {
 		container-type: inline-size;
 		container-name: monster-card;
 		background-color: #f5f3ee;
-		background-color: #f5f3ee;
 
 		.roll-button {
 			display: inline-block;

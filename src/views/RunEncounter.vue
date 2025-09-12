@@ -43,7 +43,8 @@
 							:next="_active[encounter.turn + 1]"
 							:settings="settings"
 						/>
-						<Pane title="Actor">
+						<Actor :current="_active[encounter.turn]" :_active="_active" />
+						<Pane title="Actor" style="grid-area: current">
 							<Card :entity="actor || _active[encounter.turn]" />
 						</Pane>
 						<Targets
@@ -63,6 +64,7 @@
 							:class="{ focused: focused_pane === 'targeted' }"
 							@focus="focusPane('targeted')"
 						/>
+						<Log />
 						<Side
 							ref="side"
 							tabindex="0"
@@ -188,6 +190,8 @@ import DemoOverlay from "src/components/combat/DemoOverlay.vue";
 import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
 import Pane from "src/components/combat/Pane.vue";
 import Card from "src/components/combat/entities/Card";
+import Actor from "src/components/combat/actor";
+import Log from "src/components/combat/top/log";
 
 export default {
 	name: "RunEncounter",
@@ -208,6 +212,8 @@ export default {
 		TutorialFinishedDialog,
 		Pane,
 		Card,
+		Actor,
+		Log,
 	},
 	mixins: [audio],
 	data() {
@@ -525,16 +531,12 @@ export default {
 		padding: 5px;
 		display: grid;
 		grid-template-columns: repeat(3, 1fr) 300px;
-		grid-template-rows: min-content 1fr;
+		grid-template-rows: 32px 125px 1fr;
 		grid-gap: 5px;
 		grid-template-areas:
 			"top top top top"
-			"actor targets targeted side";
-		position: absolute;
-
-		.actor {
-			grid-area: actor;
-		}
+			"actor actor actor log"
+			"current targets targeted side";
 	}
 	.legacy {
 		padding: 5px;

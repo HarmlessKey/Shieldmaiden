@@ -33,29 +33,20 @@
 				</span>
 			</div>
 		</div>
-		<div class="top__main">
-			<Actor :actor="active_actor" :_active="_active" :out-of-turn="out_of_turn" />
-			<Log />
-		</div>
 	</div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
 import Menu from "./Menu.vue";
-import Actor from "../actor";
-import Log from "./log";
 import EncounterProgress from "./EncounterProgress.vue";
 import { remindersMixin } from "src/mixins/reminders";
 import { dice } from "src/mixins/dice";
-
 
 export default {
 	name: "CombatTop",
 	components: {
 		Menu,
-		Actor,
-		Log,
 		EncounterProgress,
 	},
 	props: {
@@ -82,12 +73,6 @@ export default {
 	},
 	computed: {
 		...mapGetters(["encounter", "actor", "broadcast", "turn", "test", "demo"]),
-		active_actor() {
-			return this.actor || this.current;
-		},
-		out_of_turn() {
-			return this.actor && this.actor.key !== this.current.key;
-		},
 		timer() {
 			return this.settings ? this.settings.timer : 0;
 		},
@@ -98,7 +83,6 @@ export default {
 	watch: {
 		//Watch turn to trigger reminders when an entity starts their turn
 		turn(newVal, oldVal) {
-			console.log('New turn');
 			this.checkReminders(this.current, "startTurn");
 
 			//Check if the turn went up or down	considering round changes
@@ -126,7 +110,15 @@ export default {
 							if ((ability.limit && ability.limit_type === "turn") || ability.recharge) {
 								let remove = true;
 								// For recharge, roll to see if the ability is regained
-								console.log("ability", ability, ability.recharge, this.current, this.current.limited_uses, category, index);
+								console.log(
+									"ability",
+									ability,
+									ability.recharge,
+									this.current,
+									this.current.limited_uses,
+									category,
+									index
+								);
 								if (
 									ability.recharge &&
 									ability.recharge !== "rest" &&
@@ -200,24 +192,6 @@ export default {
 			width: 165px;
 			display: flex;
 			justify-content: flex-end;
-		}
-	}
-	&__main {
-		display: flex;
-		justify-content: flex-start;
-		align-items: stretch;
-		gap: 5px;
-
-		.combat-log {
-			background-color: $neutral-6-transparent;
-			border-radius: $border-radius-small;
-			padding: 10px;
-		}
-		.actor {
-			flex-grow: 1;
-		}
-		.combat-log {
-			max-width: 300px;
 		}
 	}
 }

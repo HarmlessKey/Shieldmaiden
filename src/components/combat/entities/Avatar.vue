@@ -15,6 +15,7 @@
 			borderColor: entity.color_label ? entity.color_label : ``,
 			width: `${size}px`,
 			minWidth: `${size}px`,
+			lineHeight: `${size}px`,
 			fontSize: `${font_size}px`,
 		}"
 	>

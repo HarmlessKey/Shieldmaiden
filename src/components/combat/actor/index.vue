@@ -1,20 +1,20 @@
 <template>
 	<div class="actor">
 		<div class="actor__actions">
-			<SelectActor :actor="actor" :_active="_active" :out-of-turn="outOfTurn" />
+			<SelectActor :actor="active_actor" :_active="_active" :out-of-turn="outOfTurn" />
 			<DeathSaves
-				v-if="actor.entityType === 'player' && actor.curHp === 0"
+				v-if="active_actor.entityType === 'player' && active_actor.curHp === 0"
 				:target="actor"
 				show-actions
 			/>
-			<Manual v-else :actor="actor" />
-			<template v-if="actor.entityType !== 'player'">
-				<Actions :actor="actor" :key="`actions-${actor.key}`" />
-				<Spells :actor="actor" :key="`spells-${actor.key}`" />
+			<Manual v-else :actor="active_actor" />
+			<template v-if="active_actor.entityType !== 'player'">
+				<Actions :actor="active_actor" :key="`actions-${active_actor.key}`" />
+				<Spells :actor="active_actor" :key="`spells-${active_actor.key}`" />
 			</template>
-			<Target v-if="targeted?.length" :actor="actor" />
+			<Target v-if="targeted?.length" :actor="active_actor" />
 		</div>
-		<Details :actor="actor" />
+		<Details :actor="active_actor" />
 	</div>
 </template>
 
@@ -40,7 +40,7 @@ export default {
 		Target,
 	},
 	props: {
-		actor: {
+		current: {
 			type: Object,
 		},
 		_active: {
@@ -56,8 +56,14 @@ export default {
 		return {};
 	},
 	computed: {
-		...mapGetters(["encounter", "targeted"]),
+		...mapGetters(["encounter", "actor", "targeted"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
+		active_actor() {
+			return this.actor || this.current;
+		},
+		out_of_turn() {
+			return this.actor && this.actor.key !== this.current.key;
+		},
 	},
 	methods: {
 		...mapActions(["set_turn", "set_targeted", "update_round", "demo"]),
@@ -67,6 +73,7 @@ export default {
 
 <style lang="scss" scoped>
 .actor {
+	grid-area: actor;
 	display: flex;
 	flex-direction: column;
 	gap: 5px;

@@ -21,7 +21,7 @@
 				<div v-else-if="targeted.includes(actor.key)" class="target__targeted-self">
 					Targeted self
 				</div>
-				<Name v-else :entity="target" />
+				<Name v-else :entity="target" class="truncate" />
 			</div>
 			<Avatar :size="60" :key="key" :entity="target" />
 		</template>
@@ -90,9 +90,12 @@ export default {
 	align-items: center;
 	gap: 10px;
 	flex-grow: 1;
+	min-width: 0;
+	overflow: hidden;
 
 	.entity-name {
 		font-weight: bold;
+		min-width: 0;
 	}
 	.multi {
 		color: $neutral-2;
@@ -109,6 +112,7 @@ export default {
 		gap: 3px;
 		justify-content: center;
 		align-items: flex-end;
+		min-width: 0;
 	}
 	&__targeted-self {
 		background-color: $orange;

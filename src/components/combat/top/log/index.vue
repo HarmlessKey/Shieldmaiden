@@ -28,6 +28,9 @@
 				</div>
 			</q-popup-proxy>
 		</template>
+		<div v-else class="combat-log__empty">
+			<div>Combat Log</div>
+		</div>
 	</div>
 </template>
 
@@ -77,5 +80,20 @@ export default {
 
 <style lang="scss" scoped>
 .combat-log {
+	grid-area: log;
+	background-color: $neutral-6;
+	border-radius: $border-radius;
+	padding: 10px;
+
+	&__empty {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $neutral-2;
+		text-align: center;
+		font-weight: bold;
+		text-transform: uppercase;
+		height: 100%;
+	}
 }
 </style>

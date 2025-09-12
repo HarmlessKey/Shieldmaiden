@@ -4,7 +4,7 @@
 			<SelectActor :actor="active_actor" :_active="_active" :out-of-turn="outOfTurn" />
 			<DeathSaves
 				v-if="active_actor.entityType === 'player' && active_actor.curHp === 0"
-				:target="actor"
+				:target="active_actor"
 				show-actions
 			/>
 			<Manual v-else :actor="active_actor" />

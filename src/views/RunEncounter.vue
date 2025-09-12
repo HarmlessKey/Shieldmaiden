@@ -531,7 +531,7 @@ export default {
 		padding: 5px;
 		display: grid;
 		grid-template-columns: repeat(3, 1fr) 300px;
-		grid-template-rows: 32px 125px 1fr;
+		grid-template-rows: 32px 118px 1fr;
 		grid-gap: 5px;
 		grid-template-areas:
 			"top top top top"

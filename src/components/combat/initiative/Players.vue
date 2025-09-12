@@ -2,7 +2,7 @@
 	<div>
 		<ul v-if="entities" class="entities hasImg">
 			<li v-for="(entity, index) in players" :key="entity.key">
-				<TargetAvatar :entity="entity" class="img" :icons="false" />
+				<Avatar :entity="entity" class="img" :icons="false" />
 				<div class="truncate">
 					{{ entity.name }}
 				</div>
@@ -50,13 +50,13 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import TargetAvatar from "../TargetAvatar.vue";
+import Avatar from "../entities/Avatar.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "SetInitiativePlayer",
 	components: {
-		TargetAvatar,
+		Avatar,
 		TutorialPopover,
 	},
 	props: ["players"],

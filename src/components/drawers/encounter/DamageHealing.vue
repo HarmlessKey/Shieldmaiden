@@ -4,7 +4,7 @@
 
 		<ul class="targets">
 			<li v-for="(target, i) in targeted" :key="`target=${i}`">
-				<TargetItem :item="target" :i="i" />
+				<BasicEntity :entity="entities[target]" />
 			</li>
 		</ul>
 		<hr />
@@ -17,14 +17,14 @@
 
 <script>
 import { mapGetters } from "vuex";
-import Actions from "src/components/combat/actions/Actions.vue";
-import TargetItem from "src/components/combat/TargetItem.vue";
+import Actions from "src/components/combat/legacy/actions/Actions.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 
 export default {
 	name: "damageHealing",
 	components: {
 		Actions: Actions,
-		TargetItem,
+		BasicEntity,
 	},
 	props: ["data"],
 	data() {
@@ -33,7 +33,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["targeted"]),
+		...mapGetters(["targeted", "entities"]),
 	},
 };
 </script>

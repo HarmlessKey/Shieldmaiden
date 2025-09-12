@@ -6,9 +6,9 @@
 			encounter, see who's turn it is and what the status of the entities within the encounter is.
 			Below you can determine what should be visible on the public initiative list.
 		</p>
-		<a @click="setDrawer({ show: true, type: 'PlayerLink' })" class="btn bg-neutral-4 mb-3">
+		<button @click="setDrawer({ show: true, type: 'PlayerLink' })" class="btn bg-neutral-5 mb-3">
 			Share your adventures
-		</a>
+		</button>
 
 		<div v-for="({ name, type_settings }, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
@@ -86,7 +86,9 @@
 			</q-select>
 		</div>
 
-		<a class="btn mt-3 bg-neutral-5" @click="set_default_settings('track')"> Reset to default </a>
+		<button class="btn mt-3 bg-neutral-5" @click="set_default_settings('track')">
+			Reset to default
+		</button>
 	</div>
 </template>
 

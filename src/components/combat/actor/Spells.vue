@@ -24,12 +24,18 @@
 			<button
 				v-for="level of spell_levels"
 				class="btn btn-sm"
-				:class="{ 
+				:class="{
 					'bg-neutral-5': !selected_levels?.includes(level),
-					'bg-neutral-7 neutral-2': !selected_levels?.includes(level) && actor.limited_uses?.[selected_type]?.[level] >= actor[`${selected_type}_spell_slots`]?.[level]
+					'bg-neutral-7 neutral-2':
+						!selected_levels?.includes(level) &&
+						actor.limited_uses?.[selected_type]?.[level] >=
+							actor[`${selected_type}_spell_slots`]?.[level],
 				}"
 				:key="level"
-				@click="selectLevel(level)">{{ level === 0 ? "C" : level }}</button>
+				@click="selectLevel(level)"
+			>
+				{{ level === 0 ? "C" : level }}
+			</button>
 		</q-item>
 		<RollSpells
 			:actor="actor"
@@ -121,11 +127,11 @@ export default {
 			if (this.selected_levels.includes(level)) {
 				this.selected_levels = this.selected_levels.filter((item) => item !== level);
 			} else {
-				this.selected_levels.push(level)
+				this.selected_levels = [...this.selected_levels, level];
 			}
 			this.selected_levels = this.selected_levels.sort();
-		}
-	}
+		},
+	},
 };
 </script>
 

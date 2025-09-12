@@ -1,14 +1,23 @@
 <template>
 	<div v-if="!loading">
 		<template v-for="level in levels">
-			<q-list v-if="spellsForLevel(level)?.length" :key="level" :dark="$store.getters.theme === 'dark'" square class="accordion">
+			<q-list
+				v-if="spellsForLevel(level)?.length"
+				:key="level"
+				:dark="$store.getters.theme === 'dark'"
+				square
+				class="accordion"
+			>
 				<q-item class="p-2 bg-neutral-6">
 					<q-item-section v-if="level === 0 || level === Infinity">
 						<strong>
 							{{ type === "caster" ? "Cantrips" : "At will" }}
 						</strong>
 					</q-item-section>
-					<div v-else-if="type === 'caster'" class="d-flex justify-content-between items-center full-width">
+					<div
+						v-else-if="type === 'caster'"
+						class="d-flex justify-content-between items-center full-width"
+					>
 						<strong>{{ level | numeral("Oo") }} level</strong>
 						<div class="slots">
 							<span
@@ -56,9 +65,7 @@
 					@focus="focusButton(level, spell.key)"
 				>
 					<template v-slot:header>
-						<q-item-section
-							:class="checkAvailable(level, spell.key) ? '' : 'is-disabled'"
-						>
+						<q-item-section :class="checkAvailable(level, spell.key) ? '' : 'is-disabled'">
 							<q-item-label>
 								{{ spell.name.capitalizeEach() }}
 							</q-item-label>
@@ -131,11 +138,7 @@
 						</q-item-section>
 					</template>
 					<div class="accordion-body description p-2">
-						<Spell
-							:data="spell"
-							:title="false"
-							v-if="showSpell === `${level}-${spell.key}`"
-						/>
+						<Spell :data="spell" :title="false" v-if="showSpell === `${level}-${spell.key}`" />
 					</div>
 				</q-expansion-item>
 			</q-list>
@@ -158,7 +161,7 @@ export default {
 	mixins: [setHP, runEncounter],
 	components: {
 		Spell,
-		Projectiles
+		Projectiles,
 	},
 	props: {
 		actor: {
@@ -222,7 +225,7 @@ export default {
 				);
 			}
 			return spells?.filter((spell) => {
-				return !this.rollsOnly || spell.actions?.some(action => action.rolls?.length);
+				return !this.rollsOnly || spell.actions?.some((action) => action.rolls?.length);
 			});
 		},
 		spellsForLevel(level) {

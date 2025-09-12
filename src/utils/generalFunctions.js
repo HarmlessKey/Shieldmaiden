@@ -1,6 +1,8 @@
 import numeral from "numeral";
 import { character_sync_id } from "./generalConstants";
 import _ from "lodash";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 /**
  * Calculate the average value of given dice
@@ -297,5 +299,84 @@ export class DefaultDict {
 				get: (target, name) => (name in target ? target[name] : defaultVal),
 			}
 		);
+	}
+}
+
+export async function downloadMonsterFile(element, filetype = "png", options = {}) {
+	const {
+		filename = "shieldmaiden-monster",
+		margin = 5,
+		footerText = "https://shieldmaiden.app",
+		layout = "columned",
+		width = 1080,
+	} = options;
+
+	const clone = element.cloneNode(true);
+
+	clone.style.pointerEvents = "none";
+	clone.style.width = `${width}px`;
+	clone.classList.add("download-mode", layout);
+
+	// Download the PNG
+	if (filetype === "png") {
+		const wrapper = document.createElement("div");
+		wrapper.style.display = "inline-block";
+		wrapper.style.padding = "1em";
+		wrapper.style.background = "#f5f3ee";
+		document.body.appendChild(wrapper);
+
+		const footer = document.createElement("div");
+		footer.textContent = footerText;
+		footer.style.width = "100%";
+		footer.style.marginTop = "1.5em";
+		footer.style.color = "#68747b";
+
+		wrapper.appendChild(clone);
+		wrapper.appendChild(footer);
+		
+		const canvas = await html2canvas(wrapper, {
+			scale: 2,
+			useCORS: true
+		});
+		canvas.toBlob(blob => {
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = filename;
+			link.click();
+			URL.revokeObjectURL(link.href);
+		});
+		document.body.removeChild(wrapper);
+	}
+	// Download a PDF
+	else {
+		document.body.appendChild(clone);
+		const canvas = await html2canvas(clone, {
+			scale: 2,
+			useCORS: true
+		});
+		const imgData = canvas.toDataURL("image/png");
+		const pdf = new jsPDF("p", "mm", "a4");
+		let pageWidth = pdf.internal.pageSize.getWidth();
+		const pageHeight = pdf.internal.pageSize.getHeight();
+	
+		if (layout === "single-column") {
+			pageWidth = pageWidth / 2;
+		}
+	
+		const contentWidth = pageWidth - margin * 2;
+		const contentHeight = (canvas.height * contentWidth) / canvas.width;
+	
+		pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight);
+	
+		const pageCount = pdf.internal.getNumberOfPages();
+		for (let i = 1; i <= pageCount; i++) {
+			pdf.setPage(i);
+			pdf.setFontSize(10);
+			pdf.setTextColor(100);
+			pdf.text(footerText, margin, pageHeight - margin, { align: 'left' });
+		}
+	
+		pdf.save(`${filename}.pdf`);
+		document.body.removeChild(clone);
 	}
 }

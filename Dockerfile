@@ -26,7 +26,7 @@ COPY --from=build /app/dist/ssr ./
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --ignore-scripts
 
 # Install PM2 globally
 RUN npm install -g pm2

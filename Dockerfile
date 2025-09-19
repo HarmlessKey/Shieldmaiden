@@ -1,5 +1,5 @@
 # --------- Build Stage ---------
-FROM node:20-slim-bullseye AS build
+FROM node:20-slim AS build
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ COPY . .
 RUN npx quasar build -m ssr
 
 # --------- Runtime Stage ---------
-FROM node:20-slim-bullseye AS runtime
+FROM node:20-slim AS runtime
 
 WORKDIR /app
 

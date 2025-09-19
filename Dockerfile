@@ -10,9 +10,6 @@ RUN npm ci
 # Copy source and env
 COPY . .
 
-# Set environment variables for production build
-ARG STAGING_ENV_FILE
-RUN printf "%s\n" "$STAGING_ENV_FILE" > .env.production.local
 
 # Build Quasar SSR
 RUN npx quasar build -m ssr

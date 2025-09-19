@@ -5,14 +5,15 @@ WORKDIR /app
 
 # Install deps first (for better caching)
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copy source and env
 COPY . .
-# (You can pass envs at build-time instead of copying .env if secrets shouldn’t be baked in)
 
+# Set environment variables for production build
 ARG STAGING_ENV_FILE
-RUN echo "$STAGING_ENV_FILE" > .env.production.local
+RUN printf "%s\n" "$STAGING_ENV_FILE" > .env.production.local
+
 # Build Quasar SSR
 RUN npx quasar build -m ssr
 
@@ -23,7 +24,6 @@ WORKDIR /app
 
 # Copy SSR dist from build stage
 COPY --from=build /app/dist/ssr ./
-COPY --from=build /app/.env.production.local .
 
 # Install only production dependencies
 RUN npm install

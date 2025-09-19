@@ -34,4 +34,7 @@ jobs:
           tags: ghcr.io/harmlesskey/harmlesskey_staging
           build-args: |
             STAGING_ENV_FILE=${{ secrets.STAGING_ENV_FILE }}
+          cache-from: type=gha,scope=staging
+          cache-to: type=gha,scope=staging,mode=max
+
 

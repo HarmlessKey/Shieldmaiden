@@ -74,6 +74,7 @@
 				placeholder="0"
 				:disabled="!targeted?.length"
 				v-shortkey="['d']"
+				v-scroll-wheel
 				@shortkey="focus()"
 				@keypress="submitManual"
 			/>
@@ -248,6 +249,32 @@ export default {
 			this.applyManual(type);
 		});
 	},
+	directives: {
+		scrollWheel: {
+			bind(el) {
+				el.addEventListener("wheel", (event) => {
+				// Only trigger on hover, not when focused
+				if (document.activeElement !== el) {
+					event.preventDefault();
+
+					const step = Number(el.step) || 1;
+					const currentValue = Number(el.value) || 0;
+
+					if (event.deltaY < 0) {
+						el.value = currentValue + step;
+					} else {
+						const val = currentValue - step;
+						el.value = val > 0 ? val : 0;
+					}
+
+					// Trigger Vue reactivity
+					el.dispatchEvent(new Event("input", { bubbles: true }));
+					el.dispatchEvent(new Event("change", { bubbles: true }));
+				}
+				});
+			}
+		}
+	}
 };
 </script>
 

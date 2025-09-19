@@ -1,5 +1,5 @@
 # --------- Build Stage ---------
-FROM node:20-slim AS build
+FROM node:24-slim AS build
 
 WORKDIR /app
 
@@ -10,12 +10,11 @@ RUN npm ci
 # Copy source and env
 COPY . .
 
-
 # Build Quasar SSR
 RUN npx quasar build -m ssr
 
 # --------- Runtime Stage ---------
-FROM node:20-slim AS runtime
+FROM node:24-slim AS runtime
 
 WORKDIR /app
 

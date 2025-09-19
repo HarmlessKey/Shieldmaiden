@@ -1,5 +1,5 @@
 # --------- Build Stage ---------
-FROM node:20-slim AS build
+FROM node:20-slim-bullseye AS build
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ COPY . .
 RUN npx quasar build -m ssr
 
 # --------- Runtime Stage ---------
-FROM node:20-slim AS runtime
+FROM node:20-slim-bullseye AS runtime
 
 WORKDIR /app
 
@@ -32,5 +32,7 @@ RUN npm ci --omit=dev --ignore-scripts
 RUN npm install -g pm2
 
 EXPOSE 3000
+
+ENV UV_THREADPOOL_SIZE=2
 
 ENTRYPOINT ["pm2-runtime", "index.js"]

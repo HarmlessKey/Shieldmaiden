@@ -1,11 +1,11 @@
 # --------- Build Stage ---------
-FROM node:20-slim AS build
+FROM node:18-slim AS build
 
 WORKDIR /app
 
 # Install deps first (for better caching)
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Copy source and env
 COPY . .
@@ -15,7 +15,7 @@ COPY . .
 RUN npx quasar build -m ssr
 
 # --------- Runtime Stage ---------
-FROM node:20-slim AS runtime
+FROM node:18-slim AS runtime
 
 WORKDIR /app
 

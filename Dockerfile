@@ -11,6 +11,8 @@ RUN npm install
 COPY . .
 # (You can pass envs at build-time instead of copying .env if secrets shouldn’t be baked in)
 
+ARG STAGING_ENV_FILE
+RUN echo "$STAGING_ENV_FILE" > .env.production.local
 # Build Quasar SSR
 RUN npx quasar build -m ssr
 

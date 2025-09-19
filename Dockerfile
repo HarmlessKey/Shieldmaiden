@@ -23,6 +23,7 @@ WORKDIR /app
 
 # Copy SSR dist from build stage
 COPY --from=build /app/dist/ssr ./
+COPY --from=build /app/.env.production.local .
 
 # Install only production dependencies
 RUN npm install

@@ -3,7 +3,7 @@
 		<div class="target-item bg-neutral-8" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative truncate" v-if="initiative" @click.stop>
-				{{ entity.initiative }}
+				{{ parseInt(entity.initiative) }}
 				<q-popup-proxy
 					:dark="$store.getters.theme === 'dark'"
 					anchor="bottom middle"

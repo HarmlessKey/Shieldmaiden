@@ -44,8 +44,13 @@
 							:settings="settings"
 						/>
 						<Actor :current="_active[encounter.turn]" :_active="_active" />
-						<Pane title="Actor" style="grid-area: current">
+						<Pane
+							title="Actor"
+							:class="{
+								'step-highlight': demo && follow_tutorial && get_step('run', 'current'),
+							}">
 							<Card :entity="actor || _active[encounter.turn]" />
+							<TutorialPopover v-if="demo" tutorial="run" step="current" position="right" :offset="[10, 0]" />
 						</Pane>
 						<Targets
 							ref="targets"
@@ -187,11 +192,13 @@ import Side from "src/components/combat/side/Side.vue";
 import SetInitiative from "src/components/combat/initiative";
 import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
 import DemoOverlay from "src/components/combat/DemoOverlay.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
 import Pane from "src/components/combat/Pane.vue";
 import Card from "src/components/combat/entities/Card";
 import Actor from "src/components/combat/actor";
 import Log from "src/components/combat/top/log";
+
 
 export default {
 	name: "RunEncounter",
@@ -209,6 +216,7 @@ export default {
 		SetInitiative,
 		OverEncumbered,
 		DemoOverlay,
+		TutorialPopover,
 		TutorialFinishedDialog,
 		Pane,
 		Card,
@@ -271,6 +279,7 @@ export default {
 		]),
 		...mapGetters("players", ["players"]),
 		...mapGetters("encounters", ["demo_encounter"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		settings() {
 			return this.userSettings && this.userSettings.encounter ? this.userSettings.encounter : {};
 		},

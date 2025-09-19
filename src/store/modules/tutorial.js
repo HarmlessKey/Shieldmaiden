@@ -62,11 +62,10 @@ const TUTORIALS = {
 		steps: [
 			{
 				key: "current",
-				title: "Current entity",
+				title: "Actor",
 				description:
-					"<p>This panel shows the entity who's turn it currently is.</p>" +
-					"<p>From this panel you can perform actions with the current entity, like performing an attack or cast a spell.</p>" +
-					"We'll guide you through the action process in later steps.",
+					"<p>This panel shows an overview of the current actor. The entity that is performing actions.</p>" +
+					"<p>Initiative usually determines who is the current actor, but you can change the actor, we'll show you how in a later step.</p>",
 				next: true,
 				completed: false,
 			},
@@ -75,7 +74,7 @@ const TUTORIALS = {
 				title: "Targeting",
 				description:
 					"<p>This panel shows the initiative list of the encounter. You can click on entities in the list to target them.</p>" +
-					"Actions of the current entity are performed on the targets you select here.",
+					"Actions of the actor are performed on the targets you select here.",
 				next: true,
 				completed: false,
 			},
@@ -84,7 +83,7 @@ const TUTORIALS = {
 				title: "Targeted entities",
 				description:
 					"<p>In this panel you see all entities you have currently targeted.</p>" +
-					"<p>From this panel you can perform some actions on the targets that are not initiated by the current entity.</p>" +
+					"<p>From this panel you can perform some actions on the targets that are not initiated by the actor.</p>" +
 					"You can roll ability checks, or saving throws, but also apply conditions or reminders to the targets.",
 				next: true,
 				completed: false,

@@ -54,7 +54,11 @@
 				</q-popup-proxy>
 			</div>
 		</div>
-		<div class="manual__input">
+		<div
+			class="manual__input"
+			:class="{
+				'step-highlight': targeted.length && demo && follow_tutorial && get_step('run', 'manual'),
+			}">
 			<q-knob
 				v-model="knob_value"
 				:angle="180"
@@ -86,6 +90,7 @@
 			>
 				Select a target
 			</q-tooltip>
+			<TutorialPopover v-if="demo && targeted.length" step="manual" position="bottom" :offset="[0, 10]" />
 		</div>
 		<div class="manual__buttons">
 			<button
@@ -124,10 +129,13 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 import { calculateManualDamage } from "src/utils/combatFunctions";
 import { EventBus } from "src/event-bus";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "ActionsManual",
-	components: {},
+	components: {
+		TutorialPopover,
+	},
 	mixins: [setHP],
 	props: {
 		actor: {

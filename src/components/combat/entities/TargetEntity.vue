@@ -9,7 +9,7 @@
 			@click.stop
 		>
 			<div class="target-entity__initiative-value truncate">
-				{{ entity.initiative }}
+				{{ parseInt(entity.initiative) }}
 			</div>
 			<InitiativeQuickEdit :entity="entity" />
 		</div>

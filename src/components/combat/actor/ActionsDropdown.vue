@@ -18,11 +18,20 @@
 		</div>
 		<button
 			:disabled="!targeted.length"
-			:class="{ show: showActions }"
+			:class="{ 
+				show: showActions,
+				'step-highlight': demo && follow_tutorial && get_step('run', 'roll')
+			}"
 			v-shortkey="{ actions: ['a'], spells: ['s'] }[type]"
 			@shortkey="toggleShowActions()"
 			v-close-popup="-1"
 		>
+			<TutorialPopover
+				v-if="demo && !showActions && targeted.length"
+				tutorial="run"
+				step="roll"
+				:offset="[0, 10]"
+			/>
 			<img
 				:src="
 					require(
@@ -54,9 +63,13 @@
 <script>
 import { mapGetters } from "vuex";
 import { EventBus } from "src/event-bus.js";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "ActionsDropdown",
+	components: {
+		TutorialPopover,
+	},
 	props: {
 		value: {
 			type: Boolean,
@@ -77,7 +90,8 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["targeted"]),
+		...mapGetters(["targeted", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		showActions: {
 			get() {
 				return this.value;
@@ -134,6 +148,7 @@ export default {
 		display: flex;
 		align-items: center;
 		cursor: pointer;
+		border-radius: 999999px;
 
 		img {
 			height: 52px;

@@ -182,6 +182,7 @@ import { isNil } from "lodash";
 import Projectiles from "./Projectiles";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import LimitedUseCounter from "./LimitedUseCounter.vue";
+
 export default {
 	name: "RollAction",
 	mixins: [setHP, runEncounter],
@@ -321,3 +322,9 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.roll-wrapper {
+	border-radius: 999px;
+}
+</style>

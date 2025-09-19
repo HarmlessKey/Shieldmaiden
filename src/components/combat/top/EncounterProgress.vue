@@ -47,9 +47,8 @@
 					v-if="demo"
 					tutorial="run"
 					step="next"
-					position="right"
 					:no_button="true"
-					:offset="[10, 0]"
+					:offset="[0, 10]"
 				/>
 				<i aria-hidden="true" class="fas fa-step-forward" />
 				<!-- <q-tooltip anchor="top middle" self="center middle">Next turn <hk-show-keybind :binds="['shift', '→']" /></q-tooltip> -->

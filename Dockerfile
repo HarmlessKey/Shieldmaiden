@@ -22,11 +22,8 @@ WORKDIR /app
 # Copy SSR dist from build stage
 COPY --from=build /app/dist/ssr ./
 
-# Copy package.json & lock for production deps
-COPY package*.json ./
-
 # Install only production dependencies
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm install
 
 # Install PM2 globally
 RUN npm install -g pm2

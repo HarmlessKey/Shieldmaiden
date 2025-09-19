@@ -1,11 +1,33 @@
-FROM node:24
+# --------- Build Stage ---------
+FROM node:20-slim AS build
 
 WORKDIR /app
 
-COPY ./dist/ssr .
-COPY .env.production.local .
+# Install deps first (for better caching)
+COPY package*.json ./
+RUN npm ci
 
-RUN npm i
-RUN npm install pm2 -g
+# Copy source and env
+COPY . .
+# (You can pass envs at build-time instead of copying .env if secrets shouldn’t be baked in)
+
+# Build Quasar SSR
+RUN npx quasar build -m ssr
+
+# --------- Runtime Stage ---------
+FROM node:20-slim AS runtime
+
+WORKDIR /app
+
+# Copy SSR dist from build stage
+COPY --from=build /app/dist/ssr ./
+
+# Install only production dependencies
+RUN npm ci --omit=dev
+
+# Install PM2 globally
+RUN npm install -g pm2
+
+EXPOSE 3000
 
 ENTRYPOINT ["pm2-runtime", "index.js"]

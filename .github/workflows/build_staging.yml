@@ -16,23 +16,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-      - run: npm i -g @quasar/cli@latest
-      - run: npm ci
-
-      - run: node -v
-
-      - name: Create public env file
-        run: |
-          cat << EOF >> .env.production.local
-          ${{ secrets.STAGING_ENV_FILE }}
-          EOF
-
-      - run: quasar build -m ssr -d --if-present
 
       - # Login against GitHub Container Registry
         name: Log in to GitHub Container Registry
@@ -49,3 +32,6 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/harmlesskey/harmlesskey_staging
+          build-args: |
+            STAGING_ENV_FILE=${{ secrets.STAGING_ENV_FILE }}
+

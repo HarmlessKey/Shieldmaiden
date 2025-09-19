@@ -61,7 +61,7 @@ module.exports = function (/* ctx */) {
 			// Add dependencies for transpiling with Babel (Array of string/regex)
 			// (from node_modules, which are by default not transpiled).
 			// Applies only if "transpile" is set to true.
-			transpileDependencies: ["vee-validate/dist/rules", "vue-numeral-filter", "htmlparser2"],
+			transpileDependencies: ["vee-validate/dist/rules", "vue-numeral-filter", "htmlparser2", "fast-png"],
 
 			// rtl: false, // https://v1.quasar.dev/options/rtl-support
 			// preloadChunks: true,

@@ -34,5 +34,6 @@ RUN npm install -g pm2
 EXPOSE 3000
 
 ENV UV_THREADPOOL_SIZE=2
+ENV NODE_OPTIONS="--no-experimental-worker-threads"
 
 ENTRYPOINT ["pm2-runtime", "index.js"]

@@ -3,10 +3,15 @@
 		<div class="basic-entity">
 			<div
 				class="color-label"
-				:style="{ backgroundColor: entity.color_label ? entity.color_label : `` }"
-			/>
+				:style="{
+					backgroundColor: entity.color_label ? entity.color_label : ``,
+					minWidth: label_width,
+					minHeight: label_height,
+				}" />
 			<Avatar :entity="entity" :size="size" />
-			<Name class="basic-entity__name" :entity="entity" />
+			<slot name="name">		
+				<Name class="basic-entity__name" :entity="entity" />
+			</slot>
 			<slot />
 		</div>
 	</div>
@@ -31,7 +36,19 @@ export default {
 			type: Number,
 			default: 32,
 		},
+		padding: {
+			type: Number,
+			default: 0,
+		}
 	},
+	computed: {
+		label_width() {
+			return `${this.padding + 8}px`;
+		},
+		label_height() {
+			return `${this.padding + 12}px`;
+		}
+	}
 };
 </script>
 
@@ -51,16 +68,16 @@ export default {
 	.target-avatar {
 		background-color: $neutral-9;
 		border-radius: $border-radius-small;
+		z-index: 10;
 	}
 	.color-label {
 		border-top-left-radius: 999px;
 		border-bottom-left-radius: 999px;
 		background-color: $neutral-8;
 		height: 12px;
-		width: 8px;
 		z-index: 10;
 		box-sizing: content-box;
-		margin-right: -10px;
+		margin-right: -12px;
 	}
 	&__name {
 		font-weight: bold;

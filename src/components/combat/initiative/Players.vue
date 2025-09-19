@@ -1,41 +1,40 @@
 <template>
 	<div>
-		<ul v-if="entities" class="entities hasImg">
+		<ul v-if="entities" class="entities">
 			<li v-for="(entity, index) in players" :key="entity.key">
-				<Avatar :entity="entity" class="img" :icons="false" />
-				<div class="truncate">
-					{{ entity.name }}
-				</div>
-				<div class="actions">
+				<BasicEntity :entity="entity" :size="48" :padding="8">
 					<div>
 						{{ entity.curHp }} / {{ entity.maxHp }}
 						<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
 					</div>
-					<a
-						class="btn btn-sm bg-neutral-5"
+				</BasicEntity>
+				<div class="actions">		
+					<button
+						class="btn btn-sm bg-neutral-9"
+						tabindex="-1"
 						@click="
 							setDrawer({ show: true, type: 'drawers/encounter/EditEntity', data: [entity.key] })
 						"
 					>
-						<i aria-hidden="true" class="fas fa-pencil"></i>
-					</a>
-					<hk-input
-						dense
-						type="number"
-						class="ml-2 player-initiative"
-						v-model="entity.initiative"
-						min="0"
-						max="99"
-						name="playerInit"
-						placeholder="0"
-						:autofocus="index === 0"
-						:class="{
-							'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
-						}"
-						@input="setInitiative(entity.key, entity.initiative)"
-						@focus="$event.target.select()"
-					/>
+						<i aria-hidden="true" class="fas fa-pencil" />
+					</button>
 				</div>
+				<hk-input
+					dense
+					type="number"
+					class="player-initiative"
+					v-model="entity.initiative"
+					min="0"
+					max="99"
+					name="playerInit"
+					placeholder="0"
+					:autofocus="index === 0"
+					:class="{
+						'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
+					}"
+					@input="setInitiative(entity.key, entity.initiative)"
+					@focus="$event.target.select()"
+				/>
 			</li>
 			<TutorialPopover
 				v-if="demo"
@@ -50,13 +49,13 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import Avatar from "../entities/Avatar.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import BasicEntity from "../entities/BasicEntity.vue";
 
 export default {
 	name: "SetInitiativePlayer",
 	components: {
-		Avatar,
+		BasicEntity,
 		TutorialPopover,
 	},
 	props: ["players"],
@@ -92,16 +91,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-ul.entities {
-	margin: 0;
-	li {
-		padding-right: 3px;
-		background: $neutral-8;
-
-		.actions {
-			align-items: center;
-			padding: 0;
-		}
-	}
+.initiative-input {
+	width: 90px;
 }
 </style>

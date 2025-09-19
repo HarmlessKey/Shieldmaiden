@@ -29,6 +29,7 @@ export default {
 <style lang="scss" scoped>
 .entity-name {
 	display: flex;
+	font-weight: bold;
 	gap: 2px;
 
 	.truncate {

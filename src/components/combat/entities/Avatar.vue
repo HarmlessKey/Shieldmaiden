@@ -75,5 +75,6 @@ export default {
 	border-left: solid 2px $neutral-7;
 	background-color: $neutral-8;
 	box-sizing: content-box;
+	text-align: center;
 }
 </style>

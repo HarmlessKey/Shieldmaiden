@@ -14,6 +14,26 @@
 				/>
 			</div>
 			<div class="top__encounter-end">
+				<transition
+					v-if="demo"
+					name="slide"
+					enter-active-class="animated animate__slideInRight"
+					leave-active-class="animated animate__slideOutRight"
+				>
+					<button
+						v-show="!follow_tutorial"
+						class="btn btn-sm bg-yellow-light black"
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/Tutorial',
+								data: { tutorial: encounter.round > 0 ? 'run' : 'initiative' },
+							})
+						"
+					>
+						<hk-icon icon="fas fa-exclamation" />
+					</button>
+				</transition>
 				<span
 					v-if="!demo && !test"
 					@click="
@@ -73,6 +93,7 @@ export default {
 	},
 	computed: {
 		...mapGetters(["encounter", "actor", "broadcast", "turn", "test", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial"]),
 		timer() {
 			return this.settings ? this.settings.timer : 0;
 		},
@@ -164,15 +185,11 @@ export default {
 <style lang="scss" scoped>
 .top {
 	grid-area: top;
-	display: flex;
-	flex-direction: column;
-	gap: 5px;
 
 	&__encounter {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin: -5px 0;
 		gap: 5px;
 
 		&-title {
@@ -186,6 +203,12 @@ export default {
 
 			span {
 				min-width: 0;
+			}
+		}
+		&-status {
+			.set-initiative {
+				font-weight: bold;
+				font-size: 18px;
 			}
 		}
 		&-end {

@@ -8,7 +8,10 @@
 		}"
 		@shortkey="cyclePanes"
 	>
-		<Turns :next="_active[0]" />
+		<Top 
+			:_active="_active"
+			:next="_active[0]"
+		/>
 		<div
 			ref="players"
 			tabindex="0"
@@ -35,8 +38,19 @@
 			:class="{ focused: focused_pane === 'npcs' }"
 			@focus="focusPane('npcs')"
 		>
-			<h2 class="componentHeader" :class="{ shadow: setShadowNPC > 0 }">
-				<span><i aria-hidden="true" class="fas fa-dragon"></i> NPC's</span>
+			<h2 class="componentHeader d-flex" :class="{ shadow: setShadowNPC > 0 }">
+				<span class="flex-grow"><i aria-hidden="true" class="fas fa-dragon"></i> NPC's</span>
+				<hk-roll @roll="rollNPCs($event)">
+					<button
+						class="btn btn-sm bg-neutral-5"
+						:class="{
+							'step-highlight': demo && follow_tutorial && get_step('initiative', 'monsters'),
+						}"
+					>
+						<i class="fas fa-dice-d20 mr-1" aria-hidden="true" /> Roll
+						{{ !npcs_selected ? "all" : "selected" }}
+					</button>
+				</hk-roll>
 			</h2>
 			<q-scroll-area
 				:dark="$store.getters.theme === 'dark'"
@@ -44,7 +58,11 @@
 				v-on:scroll="shadow()"
 				ref="scrollNPC"
 			>
-				<NPCs :npcs="_npcs" class="p-3" />
+				<NPCs
+					ref="NPCList"
+					:npcs="_npcs" 
+					class="p-3"
+					@select="npcs_selected = $event" />
 			</q-scroll-area>
 		</div>
 		<div
@@ -146,6 +164,7 @@ import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
 
 import Turns from "src/components/combat/legacy/Turns.vue";
+import Top from "src/components/combat/top";
 import Players from "./Players.vue";
 import NPCs from "./NPCs.vue";
 import Overview from "./Overview.vue";
@@ -155,6 +174,7 @@ export default {
 	name: "SetInitiative",
 	props: ["_active", "_idle", "width"],
 	components: {
+		Top,
 		Turns,
 		Players,
 		NPCs,
@@ -171,6 +191,7 @@ export default {
 			panes: ["players", "npcs", "overview"],
 			focused_pane: "players",
 			panel: "players",
+			npcs_selected: 0,
 			panels: [
 				{
 					label: "Players initiative",
@@ -255,6 +276,13 @@ export default {
 				this.panel = direction === "previous" ? "npcs" : "overview";
 			}
 		},
+		rollNPCs(e) {
+			if (this.npcs_selected) {
+				this.$refs.NPCList.rollGroup(e);
+			} else {
+				this.$refs.NPCList.rollAll(e);
+			}
+		}
 	},
 };
 </script>
@@ -266,19 +294,18 @@ export default {
 	height: 100%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-rows: 60px auto;
+	grid-template-rows: 42px auto;
 	grid-gap: 5px;
 	grid-template-areas:
-		"turns turns turns"
+		"top top top"
 		"players npcs set";
-	position: absolute;
 
 	.q-scrollarea {
 		height: calc(100% - 45px);
 	}
 
 	h2 {
-		padding-left: 10px;
+		padding: 0 10px;
 
 		&.componentHeader {
 			padding: 10px 15px !important;
@@ -292,6 +319,7 @@ export default {
 	}
 	.pane {
 		background: $neutral-6-transparent;
+		border-radius: $border-radius;
 		overflow: hidden;
 
 		&.players {
@@ -309,9 +337,43 @@ export default {
 			outline-offset: 1px;
 		}
 	}
+	::v-deep {
+		ul.entities {
+			margin-top: 0;
+
+			li {
+				display: flex;
+				align-items: center;
+				padding: 8px 8px 8px 0;
+				background: $neutral-5;
+				border-radius: $border-radius-small;
+				margin-bottom: 5px;
+				gap: 8px;
+				
+				.entity-name {
+					flex-grow: 1;
+				}
+				.actions {
+					align-items: center;
+					padding: 0;
+					gap: 3px;
+				}
+
+				&:hover {
+					background-color: $neutral-5;
+				}
+			}
+		}
+	}
 }
 .initiative-move {
 	transition: transform 0.5s;
+}
+.advantage .btn:hover {
+	background-color: $green;
+}
+.disadvantage .btn:hover {
+	background-color: $red;
 }
 @media only screen and (max-width: 900px) {
 	#container {

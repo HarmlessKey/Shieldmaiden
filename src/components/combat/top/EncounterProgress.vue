@@ -12,42 +12,65 @@
 			color="neutral-6"
 			track-color="neutral-5"
 			rounded
-		>
-			<div class="turn">
-				<template v-if="encounter.round > 1 && encounter.turn === 0"> Top of the Round </template>
-				<hk-animated-integer v-else :value="encounter.turn + 1" />
+		>	
+			<template v-if="encounter.round > 0">
+				<div class="turn">
+					<template v-if="encounter.round > 1 && encounter.turn === 0"> Top of the Round </template>
+					<hk-animated-integer v-else :value="encounter.turn + 1" />
+				</div>
+				<hk-timer class="timer" :value="timer || 0" :key="encounter.turn" />
+			</template>
+			<div v-else class="turn set-initiative">
+				Set initiative
 			</div>
-			<hk-timer class="timer" :value="timer || 0" :key="encounter.turn" />
 		</q-linear-progress>
+		<template v-if="encounter.round > 0">
+			<button
+				class="btn btn-sm bg-neutral-6"
+				v-shortkey="['shift', 'arrowleft']"
+				@click="prevTurn()"
+				@shortkey="prevTurn()"
+			>
+				<i aria-hidden="true" class="fas fa-step-backward" />
+				<!-- <q-tooltip anchor="top middle" self="center middle">Previous turn <hk-show-keybind :binds="['shift', '←']" /></q-tooltip> -->
+			</button>
+			<button
+				class="btn btn-sm bg-neutral-6"
+				:class="{
+					'step-highlight': demo && follow_tutorial && get_step('run', 'next'),
+				}"
+				v-shortkey="['shift', 'arrowright']"
+				@click="nextTurn()"
+				@shortkey="nextTurn()"
+			>
+				<TutorialPopover
+					v-if="demo"
+					tutorial="run"
+					step="next"
+					position="right"
+					:no_button="true"
+					:offset="[10, 0]"
+				/>
+				<i aria-hidden="true" class="fas fa-step-forward" />
+				<!-- <q-tooltip anchor="top middle" self="center middle">Next turn <hk-show-keybind :binds="['shift', '→']" /></q-tooltip> -->
+				<TutorialPopover v-if="demo" tutorial="initiative" step="next" :offset="[0, 10]" />
+			</button>
+		</template>
 		<button
-			class="btn btn-sm bg-neutral-6"
-			v-shortkey="['shift', 'arrowleft']"
-			@click="prevTurn()"
-			@shortkey="prevTurn()"
-		>
-			<i aria-hidden="true" class="fas fa-step-backward" />
-			<!-- <q-tooltip anchor="top middle" self="center middle">Previous turn [shift] + [←]</q-tooltip> -->
-		</button>
-		<button
-			class="btn btn-sm bg-neutral-6"
-			:class="{
-				'step-highlight': demo && follow_tutorial && get_step('run', 'next'),
-			}"
+			v-else
+			class="btn btn-sm"
+			:class="{ 'step-highlight': demo && follow_tutorial && get_step('initiative', 'start') }"
 			v-shortkey="['shift', 'arrowright']"
-			@click="nextTurn()"
-			@shortkey="nextTurn()"
+			@click="startEncounter()"
+			@shortkey="startEncounter()"
 		>
-			<TutorialPopover
-				v-if="demo"
-				tutorial="run"
-				step="next"
-				position="right"
-				:no_button="true"
-				:offset="[10, 0]"
-			/>
-			<i aria-hidden="true" class="fas fa-step-forward" />
-			<!-- <q-tooltip anchor="top middle" self="center middle">Next turn [shift] + [→]</q-tooltip> -->
-			<TutorialPopover v-if="demo" tutorial="initiative" step="next" :offset="[0, 10]" />
+			Start
+			<span class="ml-1 d-none d-md-inline">
+				encounter <i aria-hidden="true" class="fas fa-arrow-right ml-1" />
+			</span>
+			<q-tooltip anchor="top middle" self="center middle">Start <hk-show-keybind :binds="['shift', '→']" /></q-tooltip>
+
+			<TutorialPopover v-if="demo" tutorial="initiative" step="start" :offset="[0, 10]" />
 		</button>
 	</div>
 </template>
@@ -93,6 +116,10 @@ export default {
 			"setMultipliers",
 		]),
 		...mapActions("tutorial", ["setGameState"]),
+		startEncounter() {
+			this.set_turn({ turn: 0, round: 1 });
+			this.checkReminders(this.next, "startTurn");
+		},
 		nextTurn() {
 			let turn = this.encounter.turn + 1;
 			let round = this.encounter.round;

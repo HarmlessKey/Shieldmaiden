@@ -1,7 +1,7 @@
 <template>
 	<div class="actor">
 		<div class="actor__actions">
-			<SelectActor :actor="active_actor" :_active="_active" :out-of-turn="outOfTurn" />
+			<SelectActor :actor="active_actor" :_active="_active" :out-of-turn="out_of_turn" />
 			<DeathSaves
 				v-if="active_actor.entityType === 'player' && active_actor.curHp === 0"
 				:target="active_actor"
@@ -46,10 +46,6 @@ export default {
 		_active: {
 			type: Array,
 			required: true,
-		},
-		outOfTurn: {
-			type: Boolean,
-			default: false,
 		},
 	},
 	data() {

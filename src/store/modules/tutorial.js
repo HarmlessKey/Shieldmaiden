@@ -187,9 +187,9 @@ const TUTORIALS = {
 				key: "opportunity",
 				title: "Opportunity attack",
 				description:
-					"<p>You can perform an out of turn action at any time during a round.</p>" +
+					"<p>You can change the current actor at any time.</p>" +
 					"<p>This can be useful for opportunity attacks and legendary actions.</p>" +
-					'For these out of turn actions you first select the target(s) and then click the <strong><i class="fas fa-swords"></i></strong> button. You then select who performs the action.',
+					"Simply select the entity you need to perform an action with from this dropdown.",
 				next: true,
 				completed: false,
 			},

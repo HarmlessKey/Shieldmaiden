@@ -1,12 +1,12 @@
 <template>
-	<div class="actor-details">
+	<div class="target-details">
 		<button class="btn btn-sm bg-neutral-5">
 			<hk-icon icon="fas fa-list-alt" />
 		</button>
-		<div class="actor-details__name">
+		<div class="target-details__name">
 			<Name :entity="actor" />
 		</div>
-		<div class="actor-details__filler" />
+		<div class="target-details__filler" />
 		<template v-if="target">
 			<div v-for="ability of abilities" :key="ability">
 				<hk-roll
@@ -39,7 +39,7 @@ import { general } from "src/mixins/general";
 import Name from "../entities/Name.vue";
 
 export default {
-	name: "SelectActor",
+	name: "TargetDetails",
 	components: {
 		Name,
 	},
@@ -48,10 +48,6 @@ export default {
 		actor: {
 			type: Object,
 			default: null,
-		},
-		outOfTurn: {
-			type: Boolean,
-			default: false,
 		},
 	},
 	data() {
@@ -81,7 +77,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.actor-details {
+.target-details {
 	display: flex;
 	gap: 1px;
 	height: 32px;

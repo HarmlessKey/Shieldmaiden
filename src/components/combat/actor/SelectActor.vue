@@ -16,13 +16,27 @@
 		</div>
 		<Avatar :entity="actor" :size="60" :key="actor.key" />
 		<div class="d-flex flex-col justify-content-center items-center">
-			<button v-if="outOfTurn" @click.stop="set_actor(undefined)" class="return">
+			<button
+				v-if="outOfTurn"
+				@click.stop="set_actor(undefined)"
+				class="return"
+				aria-labelledby="Back to current actor"
+			>
 				<hk-icon icon="fas fa-undo-alt" class="orange" />
 				<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, -5]">
 					Out of Turn
 				</q-tooltip>
 			</button>
-			<hk-icon icon="fas fa-chevron-down" :class="{ open: show_menu }" />
+			<button aria-labelledby="Select actor">
+				<hk-icon icon="fas fa-chevron-down" :class="{ open: show_menu }" />
+				<TutorialPopover
+					v-if="demo"
+					tutorial="run"
+					step="opportunity"
+					position="bottom"
+					:offset="[0, 10]"
+				/>
+			</button>
 		</div>
 		<q-popup-proxy
 			:dark="$store.getters.theme === 'dark'"
@@ -60,15 +74,17 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { EventBus } from "src/event-bus";
 import Avatar from "../entities/Avatar.vue";
 import BasicEntity from "../entities/BasicEntity.vue";
-import { EventBus } from "src/event-bus";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "SelectActor",
 	components: {
 		Avatar,
 		BasicEntity,
+		TutorialPopover,
 	},
 	mixins: [],
 	props: {
@@ -90,7 +106,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters([]),
+		...mapGetters(["demo"]),
 		active() {
 			const entities = this._active.filter((entity) => entity.key !== this.actor.key);
 			const environment = {

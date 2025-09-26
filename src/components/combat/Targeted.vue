@@ -165,7 +165,6 @@
 				</p>
 			</div>
 		</div>
-
 		<TutorialPopover
 			v-if="demo"
 			tutorial="run"

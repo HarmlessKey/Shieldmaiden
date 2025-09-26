@@ -48,9 +48,16 @@
 							title="Actor"
 							:class="{
 								'step-highlight': demo && follow_tutorial && get_step('run', 'current'),
-							}">
+							}"
+						>
 							<Card :entity="actor || _active[encounter.turn]" />
-							<TutorialPopover v-if="demo" tutorial="run" step="current" position="right" :offset="[10, 0]" />
+							<TutorialPopover
+								v-if="demo"
+								tutorial="run"
+								step="current"
+								position="right"
+								:offset="[10, 0]"
+							/>
 						</Pane>
 						<Targets
 							ref="targets"
@@ -197,8 +204,7 @@ import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog
 import Pane from "src/components/combat/Pane.vue";
 import Card from "src/components/combat/entities/Card";
 import Actor from "src/components/combat/actor";
-import Log from "src/components/combat/top/log";
-
+import Log from "src/components/combat/side/log";
 
 export default {
 	name: "RunEncounter",

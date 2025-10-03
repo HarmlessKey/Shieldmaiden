@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=build /app/dist/ssr ./
 
 # Install only production dependencies
-RUN npm install
+RUN npm install --ignore-scripts
 
 # Install PM2 globally
 RUN npm install -g pm2

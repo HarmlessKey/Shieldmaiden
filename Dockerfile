@@ -27,13 +27,14 @@ RUN npm install --ignore-scripts
 # Install PM2 globally
 RUN npm install -g pm2
 
+# Set PM2 home to app directory
+ENV PM2_HOME=/app/.pm2
+
 # Create non-root user and set ownership
-RUN groupadd -r nodeuser && useradd -r -g nodeuser -m nodeuser \
-    && mkdir -p /home/nodeuser/.pm2 \
-    && chown -R nodeuser:nodeuser /app /home/nodeuser
+RUN groupadd -r nodeuser && useradd -r -g nodeuser nodeuser \
+    && mkdir -p /app/.pm2 \
+    && chown -R nodeuser:nodeuser /app
 
-
-# Switch to non-root user
 USER nodeuser
 
 EXPOSE 3000

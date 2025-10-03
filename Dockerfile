@@ -28,8 +28,10 @@ RUN npm install --ignore-scripts
 RUN npm install -g pm2
 
 # Create non-root user and set ownership
-RUN groupadd -r nodeuser && useradd -r -g nodeuser nodeuser \
-    && chown -R nodeuser:nodeuser /app
+RUN groupadd -r nodeuser && useradd -r -g nodeuser -m nodeuser \
+    && mkdir -p /home/nodeuser/.pm2 \
+    && chown -R nodeuser:nodeuser /app /home/nodeuser
+
 
 # Switch to non-root user
 USER nodeuser

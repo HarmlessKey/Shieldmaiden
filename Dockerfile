@@ -27,6 +27,13 @@ RUN npm install
 # Install PM2 globally
 RUN npm install -g pm2
 
+# Create non-root user and set ownership
+RUN groupadd -r nodeuser && useradd -r -g nodeuser nodeuser \
+    && chown -R nodeuser:nodeuser /app
+
+# Switch to non-root user
+USER nodeuser
+
 EXPOSE 3000
 
 ENV UV_THREADPOOL_SIZE=1

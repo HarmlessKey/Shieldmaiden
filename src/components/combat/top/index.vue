@@ -51,6 +51,21 @@
 				>
 					{{ broadcast.live === campid ? "" : "go" }} live
 				</span>
+				<button
+					class="btn btn-sm bg-neutral-5 ml-2 toggle-side"
+					@click="
+						setDrawer({
+							show: true,
+							type: 'combat/side/Side',
+							data: {
+								log: true,
+								drawer: true,
+							},
+						})
+					"
+				>
+					<hk-icon icon="fas fa-bars" />
+				</button>
 			</div>
 		</div>
 	</div>
@@ -215,7 +230,26 @@ export default {
 			width: 165px;
 			display: flex;
 			justify-content: flex-end;
+			align-items: center;
 		}
+	}
+	.toggle-side {
+		display: none;
+	}
+}
+@media only screen and (max-width: $xl-breakpoint) {
+	.top {
+		&__encounter-status {
+			max-width: 400px;
+		}
+		.toggle-side {
+			display: inline-block;
+		}
+	}
+}
+@media only screen and (max-width: $lg-breakpoint) {
+	.top__encounter-status {
+		max-width: 300px;
 	}
 }
 </style>

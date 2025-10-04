@@ -41,9 +41,9 @@
 				@click="set_targeted({ type: 'untarget', key: 'all' })"
 			>
 				<i aria-hidden="true" class="fas fa-times red"></i>
-				<q-tooltip anchor="top middle" self="center middle"
-					>Untarget {{ targeted.length > 1 ? "all" : "" }}</q-tooltip
-				>
+				<q-tooltip anchor="top middle" self="center middle">
+					Untarget {{ targeted.length > 1 ? "all" : "" }}
+				</q-tooltip>
 			</button>
 		</div>
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="side" @focus="$emit('focus')">
+	<div class="side" :class="{ 'is-drawer': drawer }" @focus="$emit('focus')">
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'"
@@ -60,6 +60,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		drawer: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -75,53 +79,62 @@ export default {
 <style lang="scss" scoped>
 .side {
 	height: 100%;
-}
-.q-tabs {
-	background: $neutral-8-transparent;
-	.q-tab {
-		padding-top: 10px;
-		padding-bottom: 9px;
-		position: relative;
 
-		&.q-tab--active {
-			background: $neutral-6-transparent;
-			color: $blue;
+	&.is-drawer {
+		height: calc(100vh - 120px);
+
+		.q-scrollarea {
+			background: none;
+			height: calc(100% - 50px);
 		}
-		.notifications {
-			user-select: none;
-			position: absolute;
-			top: -5px;
-			right: -25px;
-			height: 20px;
-			width: 20px;
-			border-radius: 50%;
+	}
+	.q-tabs {
+		background: $neutral-8-transparent;
+		.q-tab {
+			padding-top: 10px;
+			padding-bottom: 9px;
+			position: relative;
 
-			div {
+			&.q-tab--active {
+				background: $neutral-6-transparent;
+				color: $blue;
+			}
+			.notifications {
+				user-select: none;
 				position: absolute;
-				width: inherit;
-				height: inherit;
-				line-height: 20px;
-				text-align: center;
-				font-size: 13px;
+				top: -5px;
+				right: -25px;
+				height: 20px;
+				width: 20px;
+				border-radius: 50%;
+
+				div {
+					position: absolute;
+					width: inherit;
+					height: inherit;
+					line-height: 20px;
+					text-align: center;
+					font-size: 13px;
+				}
 			}
 		}
 	}
-}
-.q-scrollarea {
-	position: relative;
-	height: calc(100% - 30px);
-	max-width: 100%;
-	background: $neutral-6-transparent;
+	.q-scrollarea {
+		position: relative;
+		height: calc(100% - 30px);
+		max-width: 100%;
+		background: $neutral-6-transparent;
 
-	// Position relative on scrollarea__content causes target items to overflow horizontally
-	&::v-deep {
-		.q-scrollarea__content {
-			position: unset;
+		// Position relative on scrollarea__content causes target items to overflow horizontally
+		&::v-deep {
+			.q-scrollarea__content {
+				position: unset;
+			}
 		}
 	}
-}
 
-.tab-content {
-	padding: 0 10px 15px 10px;
+	.tab-content {
+		padding: 0 10px 15px 10px;
+	}
 }
 </style>

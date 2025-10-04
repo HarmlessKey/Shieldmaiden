@@ -58,39 +58,47 @@
 			class="manual__input"
 			:class="{
 				'step-highlight': targeted.length && demo && follow_tutorial && get_step('run', 'manual'),
-			}">
+			}"
+		>
 			<q-knob
 				v-model="knob_value"
 				:angle="180"
 				:max="50"
-				size="130px"
 				color="primary"
 				center-color="neutral-6"
 				track-color="neutral-8"
 				:disable="!targeted?.length"
 				@input="value = $event"
+				class="knob"
 			/>
-			<input
-				ref="input"
-				v-model.number="value"
-				type="number"
-				min="0"
-				placeholder="0"
-				:disabled="!targeted?.length"
-				v-shortkey="['d']"
-				v-scroll-wheel
-				@shortkey="focus()"
-				@keypress="submitManual"
+			<div class="input__wrapper">
+				<input
+					ref="input"
+					v-model.number="value"
+					type="number"
+					min="0"
+					placeholder="0"
+					:disabled="!targeted?.length"
+					v-shortkey="['d']"
+					v-scroll-wheel
+					@shortkey="focus()"
+					@keypress="submitManual"
+				/>
+				<q-tooltip
+					v-if="!targeted?.length"
+					anchor="center middle"
+					self="center middle"
+					:offset="[0, -5]"
+				>
+					Select a target
+				</q-tooltip>
+			</div>
+			<TutorialPopover
+				v-if="demo && targeted.length"
+				step="manual"
+				position="bottom"
+				:offset="[0, 10]"
 			/>
-			<q-tooltip
-				v-if="!targeted?.length"
-				anchor="center middle"
-				self="center middle"
-				:offset="[0, -5]"
-			>
-				Select a target
-			</q-tooltip>
-			<TutorialPopover v-if="demo && targeted.length" step="manual" position="bottom" :offset="[0, 10]" />
 		</div>
 		<div class="manual__buttons">
 			<button
@@ -261,28 +269,28 @@ export default {
 		scrollWheel: {
 			bind(el) {
 				el.addEventListener("wheel", (event) => {
-				// Only trigger on hover, not when focused
-				if (document.activeElement !== el) {
-					event.preventDefault();
+					// Only trigger on hover, not when focused
+					if (document.activeElement !== el) {
+						event.preventDefault();
 
-					const step = Number(el.step) || 1;
-					const currentValue = Number(el.value) || 0;
+						const step = Number(el.step) || 1;
+						const currentValue = Number(el.value) || 0;
 
-					if (event.deltaY < 0) {
-						el.value = currentValue + step;
-					} else {
-						const val = currentValue - step;
-						el.value = val > 0 ? val : 0;
+						if (event.deltaY < 0) {
+							el.value = currentValue + step;
+						} else {
+							const val = currentValue - step;
+							el.value = val > 0 ? val : 0;
+						}
+
+						// Trigger Vue reactivity
+						el.dispatchEvent(new Event("input", { bubbles: true }));
+						el.dispatchEvent(new Event("change", { bubbles: true }));
 					}
-
-					// Trigger Vue reactivity
-					el.dispatchEvent(new Event("input", { bubbles: true }));
-					el.dispatchEvent(new Event("change", { bubbles: true }));
-				}
 				});
-			}
-		}
-	}
+			},
+		},
+	},
 };
 </script>
 
@@ -331,17 +339,19 @@ export default {
 		margin: 0 -20px;
 		z-index: 10;
 
-		input {
+		.input__wrapper {
 			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		input {
 			border: none;
 			background: none;
 			height: 80px;
 			width: 80px;
 			text-align: center;
 			border-radius: 50%;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
 			font-size: 30px;
 
 			&:focus {
@@ -355,6 +365,10 @@ export default {
 				cursor: default !important;
 			}
 		}
+		.knob {
+			width: 120px;
+			height: 120px;
+		}
 	}
 	&__buttons {
 		display: flex;
@@ -367,6 +381,13 @@ export default {
 			justify-content: space-between;
 			padding-left: 25px;
 		}
+	}
+}
+
+@media only screen and (max-width: $lg-breakpoint) {
+	.manual__input .knob {
+		width: 110px;
+		height: 110px;
 	}
 }
 </style>

@@ -46,6 +46,7 @@
 						<Actor :current="_active[encounter.turn]" :_active="_active" />
 						<Pane
 							title="Actor"
+							class="current"
 							:class="{
 								'step-highlight': demo && follow_tutorial && get_step('run', 'current'),
 							}"
@@ -614,14 +615,49 @@ export default {
 		}
 	}
 
-	@media only screen and (max-width: 1000px) {
+	@media only screen and (max-width: 1300px) {
+		.desktop {
+			grid-template-columns: repeat(3, 1fr) 200px;
+		}
+	}
+
+	@media only screen and (max-width: $xl-breakpoint) {
+		.desktop {
+			grid-template-columns: repeat(3, 1fr);
+			grid-template-areas:
+				"top top top"
+				"actor actor actor"
+				"current targets targeted";
+
+			.combat-log,
+			.side {
+				display: none;
+			}
+		}
+	}
+
+	@media only screen and (max-width: $lg-breakpoint) {
 		.legacy {
 			grid-template-columns: 2fr 3fr 2fr;
 			grid-template-areas:
 				"turns turns turns"
 				"current targets targeted";
 
-			.legacy-side {
+			&-side {
+				display: none;
+			}
+		}
+		.desktop {
+			grid-template-columns: repeat(2, 1fr);
+			grid-template-rows: 42px 118px 1fr;
+			grid-template-areas:
+				"top top"
+				"actor actor"
+				"targets targeted";
+
+			.current,
+			.combat-log,
+			.side {
 				display: none;
 			}
 		}
@@ -632,6 +668,14 @@ export default {
 			grid-template-areas:
 				"turns turns"
 				"current targets";
+		}
+		.desktop {
+			grid-template-columns: repeat(2, 1fr);
+			grid-template-rows: 42px 118px 1fr;
+			grid-template-areas:
+				"top top"
+				"actor actor"
+				"targets targeted";
 		}
 	}
 }

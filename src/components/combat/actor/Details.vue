@@ -7,27 +7,6 @@
 			<Name :entity="actor" />
 		</div>
 		<div class="target-details__filler" />
-		<template v-if="target">
-			<div v-for="ability of abilities" :key="ability">
-				<hk-roll
-					:roll="{
-						d: 20,
-						n: 1,
-						m: calcMod(target[ability] || 10),
-						title: 'Initiative roll',
-						notify: true,
-					}"
-				>
-					<span class="label">{{ ability?.substring(0, 3) }}</span>
-					{{ target?.[ability] || 10 }}
-				</hk-roll>
-			</div>
-			<div v-for="(stat, key) of stats" :key="key">
-				<hk-icon :icon="stat.icon" />
-				{{ displayStats(target)[key] }}
-				<q-tooltip anchor="bottom middle" self="center middle">{{ stat.label }}</q-tooltip>
-			</div>
-		</template>
 	</div>
 </template>
 

@@ -3,7 +3,7 @@
 		<div class="target-item bg-neutral-8" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative truncate" v-if="initiative" @click.stop>
-				{{ entity.initiative }}
+				{{ parseInt(entity.initiative) }}
 				<q-popup-proxy
 					:dark="$store.getters.theme === 'dark'"
 					anchor="bottom middle"
@@ -43,7 +43,7 @@
 			</span>
 
 			<!-- AVATAR -->
-			<TargetAvatar :entity="entity">
+			<Avatar :entity="entity">
 				<q-popup-proxy
 					v-if="entity.entityType === 'npc'"
 					:dark="$store.getters.theme === 'dark'"
@@ -83,7 +83,7 @@
 						</div>
 					</div>
 				</q-popup-proxy>
-			</TargetAvatar>
+			</Avatar>
 
 			<!-- ARMOR CLASS -->
 			<div class="ac_wrapper" :style="{ color: entity.color_label || null }" @click.stop>
@@ -412,14 +412,14 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import TargetAvatar from "./TargetAvatar.vue";
+import Avatar from "../entities/Avatar.vue";
 import { colors } from "src/mixins/colors";
 
 export default {
 	name: "TargetItem",
 	mixins: [colors],
 	components: {
-		TargetAvatar,
+		Avatar,
 	},
 	props: {
 		item: {

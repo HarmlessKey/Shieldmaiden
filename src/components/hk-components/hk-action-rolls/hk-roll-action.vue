@@ -12,8 +12,9 @@
 					<hk-roll
 						v-for="(option, i) in action.options"
 						:key="`${option}-roll`"
-						@roll="roll($event, action, option)"
 						:disabled="disabled"
+						:color="color"
+						@roll="roll($event, action, option)"
 					>
 						<q-item clickable v-close-popup>
 							<q-item-section avatar>{{ i + 1 }}</q-item-section>
@@ -36,7 +37,10 @@
 					</q-item-section>
 				</q-item>
 				<q-list :dark="$store.getters.theme === 'dark'">
-					<hk-roll v-for="i in [0, 1]" :key="`${i}-versatile-roll`" @roll="roll($event, action, i)">
+					<hk-roll
+						v-for="i in [0, 1]" :key="`${i}-versatile-roll`"
+						:color="color"
+						@roll="roll($event, action, i)">
 						<q-item clickable v-close-popup>
 							<q-item-section avatar>{{ i + 1 }}</q-item-section>
 							<q-item-section>
@@ -48,7 +52,12 @@
 			</div>
 		</q-popup-proxy>
 	</span>
-	<hk-roll v-else :tooltip="tooltip" @roll="roll($event, action)" :disabled="disabled">
+	<hk-roll
+		v-else :tooltip="tooltip"
+		:disabled="disabled"
+		:color="color"
+		@roll="roll($event, action)"
+	>
 		<slot />
 	</hk-roll>
 </template>
@@ -84,6 +93,10 @@ export default {
 		disabled: {
 			type: Boolean,
 			default: false,
+		},
+		color: {
+			type: String,
+			default: null,
 		},
 	},
 	methods: {

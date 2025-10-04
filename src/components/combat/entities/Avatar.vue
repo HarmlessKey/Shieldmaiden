@@ -12,6 +12,11 @@
 					? 'url(' + entity.img + ')'
 					: '',
 			color: entity.color_label ? entity.color_label : ``,
+			borderColor: entity.color_label ? entity.color_label : ``,
+			width: `${size}px`,
+			minWidth: `${size}px`,
+			lineHeight: `${size}px`,
+			fontSize: `${font_size}px`,
 		}"
 	>
 		<template v-if="icons && entity.hidden">
@@ -37,7 +42,7 @@
 
 <script>
 export default {
-	name: "target-avatar",
+	name: "Avatar",
 	props: {
 		entity: {
 			type: Object,
@@ -46,6 +51,15 @@ export default {
 		icons: {
 			type: Boolean,
 			default: true,
+		},
+		size: {
+			type: Number,
+			default: 32,
+		},
+	},
+	computed: {
+		font_size() {
+			return Math.ceil(this.size * 0.75);
 		},
 	},
 };
@@ -56,5 +70,11 @@ export default {
 	background-position: center top;
 	background-repeat: no-repeat;
 	background-size: cover;
+	aspect-ratio: 1/1;
+	border-radius: $border-radius-small;
+	border-left: solid 2px $neutral-7;
+	background-color: $neutral-8;
+	box-sizing: content-box;
+	text-align: center;
 }
 </style>

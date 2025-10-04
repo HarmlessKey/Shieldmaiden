@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { campaignServices } from "src/services/campaigns";
+import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
 // Converts a full campaign to a search_campaign
@@ -1015,6 +1016,33 @@ const campaign_actions = {
 				throw error;
 			}
 		}
+	},
+
+	async rebuild_campaign_search_tables({ commit, rootGetters }, { campaignId }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid) {
+			return;
+		}
+		const campaignService = new campaignServices();
+		const encounterService = new encounterServices();
+		// Get Campaign
+		const campaign = await campaignService.getCampaign(uid, campaignId);
+		if (!campaign) {
+			return;
+		}
+		const search_campaign = convert_campaign(campaign);
+		campaignService.updateSearchCampaign(uid, id, "", search_campaign);
+		commit("SET_CAMPAIGN", { uid, id: campaignId, search_campaign });
+
+		// Get all encounters of campaign getCampaignEncounters returns an object, so they need to be destructured
+		const [encounters, finished_encounters] = await Promise.all([
+			encounterService.getCampaignEncounters(uid, campaignId, false),
+			encounterService.getCampaignEncounters(uid, campaignId, true),
+		]);
+
+		const meta = {
+			count: Object.keys(encounters).length + Object.keys(finished_encounters).length,
+		};
 	},
 
 	clear_campaign_store({ commit, rootGetters }) {

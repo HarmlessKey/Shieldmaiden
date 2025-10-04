@@ -1,43 +1,43 @@
 <template>
 	<div>
-		<DeathSaves 
-			v-if="(target.entityType === 'player' || target.entityType === 'companion')" 
-			:target="target"
-		/>
-		
-		<TargetItem :item="target.key" />
-		<Conditions :entity="target" />
-		<Reminders :entity="target" />
-		<ViewEntity class="mt-3 hide" :data="target" />
-
+		<template v-if="target.entityType === 'player' || target.entityType === 'companion'">
+			<template v-if="!target.curHp">
+				<span>Death Saving Throws</span>
+				<button
+					class="btn btn-sm btn-clear"
+					@click="setDrawer({ show: true, type: 'drawers/DeathSaves' })"
+				>
+					<i aria-hidden="true" class="fas fa-question" />
+					<q-tooltip anchor="top middle" self="center middle">Learn more</q-tooltip>
+				</button>
+			</template>
+			<DeathSaves :target="target" />
+		</template>
+		<Card class="mt-1 hide" :entity="target" :avatar="false" />
 	</div>
 </template>
 
 <script>
-	import { mapGetters } from 'vuex'
-	import ViewEntity from './ViewEntity.vue';
-	import Conditions from 'src/components/combat/Conditions.vue';
-	import Reminders from 'src/components/combat/Reminders.vue';
-	import TargetItem from 'src/components/combat/TargetItem.vue';
-	import DeathSaves from 'src/components/combat/DeathSaves.vue';
+import { mapGetters, mapActions } from "vuex";
 
-	export default {
-		name: 'TargetInfo',
-		props: ["data"],
-		components: {
-			ViewEntity,
-			Conditions,
-			Reminders,
-			TargetItem,
-			DeathSaves
+import Card from "./entities/Card";
+import DeathSaves from "src/components/combat/DeathSaves.vue";
+
+export default {
+	name: "TargetInfo",
+	props: ["data"],
+	components: {
+		Card,
+		DeathSaves,
+	},
+	computed: {
+		...mapGetters(["entities"]),
+		target: function () {
+			return this.entities[this.data.key];
 		},
-		computed: {
-			...mapGetters([
-				'entities',
-			]),
-			target: function() {
-				return this.entities[this.data.key];
-			},
-		}
-	}
+	},
+	methods: {
+		...mapActions(["setDrawer"]),
+	},
+};
 </script>

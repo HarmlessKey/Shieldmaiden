@@ -71,7 +71,9 @@
 			</q-select>
 		</div>
 
-		<a class="btn bg-neutral-5 mt-3" @click="set_default_settings('general')"> Reset to default </a>
+		<button class="btn bg-neutral-5 mt-3" @click="set_default_settings('general')">
+			Reset to default
+		</button>
 	</div>
 </template>
 

@@ -79,8 +79,8 @@ export class encounterServices {
 
 			return encounter_key;
 		} catch (error) {
-			console.error(`Error while adding Encounter ${encounter.name}`, encounter)
-      console.error("With error:", error)
+			console.error(`Error while adding Encounter ${encounter.name}`, encounter);
+			console.error("With error:", error);
 		}
 	}
 
@@ -90,8 +90,8 @@ export class encounterServices {
 		ENCOUNTERS_REF.child(path)
 			.set(value)
 			.catch((error) => {
-				console.error(`Error while editing Encounter ${encounter.name}`, encounter)
-        console.error("With error:", error)
+				console.error(`Error while editing Encounter ${value.name}`, value);
+				console.error("With error:", error);
 			});
 
 		// Update search_encounter
@@ -242,7 +242,7 @@ export class encounterServices {
 	 * Adds an item to the loot of the encounter
 	 *
 	 * @param {String} uid User ID
-	 * @param {String} campaignId Campaing ID
+	 * @param {String} campaignId Campaign ID
 	 * @param {String} encounterId Encounter ID
 	 * @param {object} item
 	 */
@@ -260,7 +260,7 @@ export class encounterServices {
 	 * Edits an existing item to the loot of the encounter
 	 *
 	 * @param {String} uid User ID
-	 * @param {String} campaignId Campaing ID
+	 * @param {String} campaignId Campaign ID
 	 * @param {String} encounterId Encounter ID
 	 * @param {string} id Item ID
 	 * @param {object} item
@@ -279,7 +279,7 @@ export class encounterServices {
 	 * Edits an existing item to the loot of the encounter
 	 *
 	 * @param {String} uid User ID
-	 * @param {String} campaignId Campaing ID
+	 * @param {String} campaignId Campaign ID
 	 * @param {String} encounterId Encounter ID
 	 * @param {string} id Item ID
 	 */
@@ -296,7 +296,7 @@ export class encounterServices {
 	 * Update entity count in the search table of search_encounters
 	 *
 	 * @param {String} uid User ID
-	 * @param {String} campaignId Campaing ID
+	 * @param {String} campaignId Campaign ID
 	 * @param {Int} diff Difference to add or subtract from entity count
 	 */
 	async updateEncounterCount(uid, campaignId, diff) {
@@ -310,7 +310,7 @@ export class encounterServices {
 	 * Update entity count in the search table of search_encounters
 	 *
 	 * @param {String} uid User ID
-	 * @param {String} campaignId Campaing ID
+	 * @param {String} campaignId Campaign ID
 	 * @param {String} encounterId Encounter ID
 	 * @param {Int} diff Difference to add or subtract from entity count
 	 */

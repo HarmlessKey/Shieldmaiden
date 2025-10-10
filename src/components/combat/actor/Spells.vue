@@ -41,7 +41,6 @@
 			:actor="actor"
 			:levels="selected_levels"
 			:type="selected_type"
-			rolls-only
 			@roll="show = false"
 		/>
 	</ActionsDropdown>
@@ -81,6 +80,7 @@ export default {
 			if (this.actor.innate_ability) {
 				types.push("innate");
 			}
+			console.log("TYPES", types)
 			return types;
 		},
 		selected_type: {

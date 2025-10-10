@@ -15,7 +15,6 @@
 				</div>
 			</q-menu>
 		</div>
-		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
@@ -52,7 +51,6 @@ export default {
 	},
 	data() {
 		return {
-			width: 0,
 		};
 	},
 	computed: {
@@ -89,26 +87,20 @@ export default {
 			}
 			return [...reminders, ...conditions];
 		},
-		space() {
+		numberOfEffectsVisible() {
 			const ITEM_SIZE = 33;
-			const GAP = 3;
 
-			return Math.floor((this.width + GAP + this.availableSpace) / ITEM_SIZE);
+			return Math.floor((this.availableSpace) / ITEM_SIZE);
 		},
 		visible() {
-			return this.effects?.length > this.space && this.collapse
-				? this.effects?.slice(0, this.space - 1)
+			return this.effects?.length > this.numberOfEffectsVisible && this.collapse
+				? this.effects?.slice(0, this.numberOfEffectsVisible - 1)
 				: this.effects;
 		},
 		collapsed() {
-			return this.effects?.length > this.space && this.collapse
-				? this.effects?.slice(this.space - 1, this.effects?.length + 1)
+			return this.effects?.length > this.numberOfEffectsVisible && this.collapse
+				? this.effects?.slice(this.numberOfEffectsVisible - 1, this.effects?.length + 1)
 				: [];
-		},
-	},
-	methods: {
-		setSize(dimensions) {
-			this.width = dimensions.width;
 		},
 	},
 };

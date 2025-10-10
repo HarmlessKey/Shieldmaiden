@@ -22,11 +22,9 @@
 						<hk-animated-integer :value="displayStats(entity).ac" class="ac" />
 						<ArmorClassQuickEdit :entity="entity" />
 					</div>
-					<Name class="target-entity__content-info__name" :entity="entity">
-						<q-resize-observer @resize="setSize" />
-					</Name>
+					<Name class="target-entity__content-info__name" :entity="entity" />
 					<div class="target-entity__content-info__actions">
-						<Effects :entity="entity" :available-space="nameWidth - 30" collapse />
+						<Effects :entity="entity" :available-space="effectSpace" collapse />
 						<button class="btn btn-sm bg-neutral-8 target-menu__button" tabindex="-1" @click.stop>
 							<i aria-hidden="true" class="fal fa-ellipsis-v" />
 							<q-popup-proxy
@@ -39,6 +37,7 @@
 							</q-popup-proxy>
 						</button>
 					</div>
+					<q-resize-observer @resize="setSize" />
 				</div>
 				<div class="target-entity__health">
 					<DeathSaves
@@ -93,11 +92,15 @@ export default {
 		return {
 			displayStats: displayStats,
 			nameWidth: 0,
+			effectSpace: 0,
 		};
 	},
 	methods: {
 		setSize(dimensions) {
-			this.nameWidth = dimensions.width;
+			const AC_SIZE = 33 + 6; // width + gap
+			const MIN_NAME_SIZE = 50 + 6; // width + gap
+			const MENU_SIZE = 20 + 5; // width + gap
+			this.effectSpace = dimensions.width - AC_SIZE - MIN_NAME_SIZE - MENU_SIZE;
 		},
 	},
 };
@@ -189,7 +192,7 @@ export default {
 			}
 			&__name {
 				font-weight: bold;
-				min-width: 0;
+				min-width: 50px;
 			}
 			&__actions {
 				display: flex;

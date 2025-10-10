@@ -1,30 +1,15 @@
 <template>
 	<div class="manual">
 		<div class="manual__modifiers">
-			<!-- <q-checkbox
-				:dark="$store.getters.theme === 'dark'"
-				v-model="crit"
-				label="CRITICAL"
-				left-label
-				size="xs"
-				indeterminate-value="something-else"
-			/>
-			<q-checkbox
-				:dark="$store.getters.theme === 'dark'"
-				v-model="magical"
-				label="MAGICAL"
-				left-label
-				size="xs"
-				indeterminate-value="something-else"
-			/> -->
 			<div class="manual__modifiers-damage-type">
 				<div class="manual__modifiers-damage-type__icon">
 					<hk-icon
 						:icon="damage_type ? damage_type_icons[damage_type] : 'fas fa-chevron-down'"
-						:class="[damage_type, { indicator: !damage_type }]"
+						:class="[damage_type, { indicator: !damage_type, open: show_menu }]"
 					/>
 				</div>
 				<q-popup-proxy
+					v-model="show_menu"
 					:dark="$store.getters.theme === 'dark'"
 					content-class="manual__select-damage-type"
 					anchor="bottom middle"
@@ -35,6 +20,19 @@
 					:offset="[0, 1]"
 				>
 					<q-list>
+						<q-item class="pl-2 bg-neutral-8">
+							<q-checkbox
+								:dark="$store.getters.theme === 'dark'"
+								v-model="magical"
+								indeterminate-value="something-else"
+							>
+								<span class="pl-2">
+									Magical
+									<hk-icon icon="fas fa-sparkles" class="ml-1" />
+								</span>
+							</q-checkbox>
+						</q-item>
+						<q-separator />
 						<q-item
 							v-for="type of damage_types"
 							:key="type"
@@ -112,7 +110,9 @@
 			>
 				Attack
 				<i aria-hidden="true" class="hki-sword-break ml-2" />
-				<q-tooltip anchor="center right" self="center left">[enter]</q-tooltip>
+				<q-tooltip anchor="center right" self="center left">
+					<hk-show-keybind :binds="['enter']" />
+				</q-tooltip>
 			</button>
 			<button
 				class="btn btn-sm bg-green white"
@@ -125,7 +125,9 @@
 			>
 				Heal
 				<i aria-hidden="true" class="hki-heal" />
-				<q-tooltip anchor="center right" self="center left">[shift] + [enter]</q-tooltip>
+				<q-tooltip anchor="center right" self="center left">
+					<hk-show-keybind :binds="['shift', 'enter']" />
+				</q-tooltip>
 			</button>
 		</div>
 	</div>
@@ -154,7 +156,7 @@ export default {
 		return {
 			knob_value: 0,
 			crit: false,
-			magical: false,
+			show_menu: false,
 			damage_type_icons: damage_type_icons,
 		};
 	},
@@ -170,6 +172,14 @@ export default {
 			},
 			set(newVal) {
 				this.setManual({ key: "type", value: newVal });
+			},
+		},
+		magical: {
+			get() {
+				return this.manual.magical;
+			},
+			set(newVal) {
+				this.setManual({ key: "magical", value: newVal });
 			},
 		},
 		value: {
@@ -307,29 +317,50 @@ export default {
 		&-damage-type {
 			display: flex;
 			align-items: center;
-			height: 50px;
-			width: 70px;
+			height: 40px;
+			width: 60px;
 			border-top-left-radius: 9999px;
 			border-bottom-left-radius: 9999px;
-			background-color: $neutral-9;
+			background-color: $neutral-10;
 			cursor: pointer;
 
 			&__icon {
-				width: 50px;
-				font-size: 28px;
+				width: 40px;
+				font-size: 22px;
 				padding-left: 5px;
 				text-align: center;
-
+				
+				i {
+					transition: all 0.3s linear;
+				}
 				.indicator {
 					color: $neutral-2;
 					font-size: 24px;
 				}
+				.open {
+					vertical-align: 2px;
+					transform: rotate(180deg);
+				}
 			}
 		}
-		.q-checkbox {
-			margin-right: 20px;
-			font-size: 12px;
+		&-checks {
+			display: flex;
+			justify-content: space-between;
+			height: 100%;
+	
+			> button {
+				border-radius: 999px;
+				background-color: $neutral-9;
+				aspect-ratio: 1/1;
+				height: 30px;
+				line-height: 30px;
+				text-align: center;
+			}
 		}
+		// .q-checkbox {
+		// 	margin-right: 20px;
+		// 	font-size: 12px;
+		// }
 	}
 	&__input {
 		background-color: $neutral-6;

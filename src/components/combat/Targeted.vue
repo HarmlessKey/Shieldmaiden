@@ -80,6 +80,7 @@
 					</div>
 					<div class="scores">
 						<div v-for="(ability, index) in abilities" :key="`score-${index}`" class="ability">
+							<div class="abilityName">{{ ability.substring(0, 3).toUpperCase() }}</div>
 							<hk-roll
 								tooltip="Roll check"
 								:roll="{
@@ -99,7 +100,6 @@
 										: null
 								"
 							>
-								<div class="abilityName">{{ ability.substring(0, 3).toUpperCase() }}</div>
 								<div class="mod bg-neutral-8">
 									{{
 										modifier(entities[key][ability] || 10) > 0

@@ -3,7 +3,7 @@
 		<div class="card-details__top">
 			<Avatar v-if="avatar" :entity="full_entity" :size="56" />
 			<div class="card-details__top-title">
-				<Name :entity="entity" />
+				<Name :entity="full_entity" />
 				<em v-if="full_entity.entityType !== 'player'" class="subtitle">
 					<template v-if="full_entity.size">{{ full_entity.size }}</template>
 					<template v-if="full_entity.type"> {{ full_entity.type }}</template>
@@ -11,9 +11,9 @@
 					<template v-if="full_entity.alignment">, {{ full_entity.alignment }}</template>
 				</em>
 				<em v-else class="subtitle">
-					Level {{ entity.level || calculatedLevel(full_entity.experience) }}
+					Level {{ full_entity.level || calculatedLevel(full_entity.experience) }}
 				</em>
-				<small v-if="entity.source" class="neutral-2"> | {{ entity.source }}</small>
+				<small v-if="full_entity.source" class="neutral-2"> | {{ full_entity.source }}</small>
 			</div>
 		</div>
 		<Effects :entity="full_entity" />
@@ -74,12 +74,12 @@
 				</div>
 			</template>
 		</div>
-		<p v-if="!entity.old && entity.entityType !== 'player'" class="card-details__summary">
-			<template v-if="entity.skills">
+		<p v-if="!full_entity.old && full_entity.entityType !== 'player'" class="card-details__summary">
+			<template v-if="full_entity.skills">
 				<strong class="neutral-2">Skills </strong>
 				<span class="saves">
 					<hk-roll
-						v-for="skill in entity.skills"
+						v-for="skill in full_entity.skills"
 						:key="skill"
 						:tooltip="`Roll ${skill}`"
 						:roll="{
@@ -87,7 +87,7 @@
 							n: 1,
 							m: skillModifier(skills[skill].ability, skill),
 							title: `${skill} check`,
-							entity_name: entity.name.capitalizeEach(),
+							entity_name: full_entity.name.capitalizeEach(),
 							notify: true,
 						}"
 						:share="
@@ -104,38 +104,38 @@
 				</span>
 				<br />
 			</template>
-			<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
+			<template v-if="full_entity.damage_vulnerabilities && full_entity.damage_vulnerabilities.length > 0">
 				<strong class="neutral-2">Damage vulnerabilities</strong>
-				{{ defensesDisplay(entity.damage_vulnerabilities).join(", ") }}<br />
+				{{ defensesDisplay(full_entity.damage_vulnerabilities).join(", ") }}<br />
 			</template>
-			<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
+			<template v-if="full_entity.damage_resistances && full_entity.damage_resistances.length > 0">
 				<strong class="neutral-2">Damage resistances</strong>
-				{{ defensesDisplay(entity.damage_resistances).join(", ") }}<br />
+				{{ defensesDisplay(full_entity.damage_resistances).join(", ") }}<br />
 			</template>
-			<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
+			<template v-if="full_entity.damage_immunities && full_entity.damage_immunities.length > 0">
 				<strong class="neutral-2">Damage immunities</strong>
-				{{ defensesDisplay(entity.damage_immunities).join(", ") }}<br />
+				{{ defensesDisplay(full_entity.damage_immunities).join(", ") }}<br />
 			</template>
-			<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
+			<template v-if="full_entity.condition_immunities && full_entity.condition_immunities.length > 0">
 				<strong class="neutral-2">Condition immunities</strong>
-				{{ entity.condition_immunities.join(", ") }}<br />
+				{{ full_entity.condition_immunities.join(", ") }}<br />
 			</template>
 
 			<strong class="neutral-2">Senses</strong>
-			<template v-if="entity.senses">
-				<span v-for="(sense, key) in entity.senses" :key="key">
+			<template v-if="full_entity.senses">
+				<span v-for="(sense, key) in full_entity.senses" :key="key">
 					{{ key }} {{ sense.range ? `${sense.range} ft.` : ``
 					}}{{ sense.comments ? `${sense.comments}` : `` }},
 				</span>
 			</template>
 			passive perception {{ passivePerception() }}<br />
 
-			<template v-if="entity.languages && entity.languages.length > 0"
-				><strong class="neutral-2">Languages</strong> {{ entity.languages.join(", ") }}<br
+			<template v-if="full_entity.languages && full_entity.languages.length > 0"
+				><strong class="neutral-2">Languages</strong> {{ full_entity.languages.join(", ") }}<br
 			/></template>
-			<template v-if="entity.challenge_rating">
-				<strong class="neutral-2">Challenge Rating</strong> {{ entity.challenge_rating }} ({{
-					monster_challenge_rating[entity.challenge_rating].xp | numeral("0,0")
+			<template v-if="full_entity.challenge_rating">
+				<strong class="neutral-2">Challenge Rating</strong> {{ full_entity.challenge_rating }} ({{
+					monster_challenge_rating[full_entity.challenge_rating].xp | numeral("0,0")
 				}}
 				XP)<br />
 			</template>

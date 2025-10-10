@@ -1,7 +1,8 @@
 <template>
 	<div class="select-actor" v-shortkey="['shift', 'd']" @shortkey="toggleShowMenu()">
 		<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 5]">
-			Select Actor [shift + d]
+			Select Actor
+			<hk-show-keybind :binds="['shift', 'd']" />
 		</q-tooltip>
 		<div
 			class="select-actor__initiative"

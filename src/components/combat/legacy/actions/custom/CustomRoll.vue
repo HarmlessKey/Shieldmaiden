@@ -209,7 +209,6 @@ export default {
 					save_fail_mod,
 				});
 			}
-			console.log(custom_roll);
 			return custom_roll;
 		},
 		addRoll() {

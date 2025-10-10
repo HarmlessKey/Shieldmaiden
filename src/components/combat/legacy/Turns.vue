@@ -211,7 +211,6 @@ export default {
 			return `/content/campaigns/${this.$route.params.campid}`;
 		},
 		tutorial_branch() {
-			console.log("Tutorial branch", this.current.entityType);
 			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},

@@ -86,9 +86,6 @@ export default {
 			cheatSheet: rules,
 		};
 	},
-	mounted() {
-		console.log("Mount Cheat Sheet");
-	},
 	computed: {
 		isMobile() {
 			// This only works for real mobiles, not for small desktop screens

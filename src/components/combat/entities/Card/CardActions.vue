@@ -247,7 +247,6 @@ export default {
 				targets: assigned_projectiles || this.targeted,
 				option: this.rollObject.option,
 			});
-			console.log(this.current_actor);
 			this.cancelRoll();
 		},
 		cancelRoll() {

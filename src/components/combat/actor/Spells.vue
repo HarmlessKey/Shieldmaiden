@@ -66,7 +66,7 @@ export default {
 	data() {
 		return {
 			typeSetter: undefined,
-			levelSetter: undefined,
+			casterLevelSetter: undefined,
 			show: false,
 			spell_types: {
 				caster: { label: "Spellcasting", name: "caster" },
@@ -93,11 +93,11 @@ export default {
 		},
 		selected_levels: {
 			get() {
-				const levels = this.selected_type === "caster" ? [0] : this.spell_levels;
-				return this.levelSetter ? this.levelSetter : levels;
+				if (this.selected_type === "innate") return this.spell_levels;;
+				return this.casterLevelSetter ? this.casterLevelSetter : [0];
 			},
 			set(newVal) {
-				this.levelSetter = newVal;
+				this.casterLevelSetter = newVal;
 			},
 		},
 		spell_levels() {

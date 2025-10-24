@@ -79,7 +79,7 @@
 					},
 					"npc": {
 						"type": "string",
-						"enum": ["custom", "srd"]
+						"enum": ["custom", "srd", "api"]
 					},
 					"ac": {
 						"type": "integer",

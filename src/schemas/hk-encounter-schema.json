@@ -105,6 +105,15 @@
 					"color_label": {
 						"type": "string",
 						"maxLength": 7
+					},
+					"hidden": {
+						"type": "boolean"
+					},
+					"friendly": {
+						"type": "boolean"
+					},
+					"down": {
+						"type": "boolean"
 					}
 				}
 			}

@@ -1,5 +1,10 @@
 <template>
-	<div class="select-actor" v-shortkey="['shift', 'd']" @shortkey="toggleShowMenu()">
+	<div
+		class="select-actor"
+		:class="{ 'is-small': small }"
+		v-shortkey="['shift', 'd']"
+		@shortkey="toggleShowMenu()"
+	>
 		<q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 5]">
 			Select Actor
 			<hk-show-keybind :binds="['shift', 'd']" />
@@ -15,8 +20,8 @@
 				{{ actor.initiative }}
 			</div>
 		</div>
-		<Avatar :entity="actor" :size="60" :key="actor.key" />
-		<div class="d-flex flex-col justify-content-center items-center">
+		<Avatar :entity="actor" :size="small ? 50 : 60" :key="actor.key" />
+		<div class="select-actor__actions">
 			<button
 				v-if="outOfTurn"
 				@click.stop="set_actor(undefined)"
@@ -100,6 +105,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		small: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -145,7 +154,6 @@ export default {
 	display: flex;
 	align-items: center;
 	font-size: 22px;
-	color: $neutral-2;
 	cursor: pointer;
 
 	i {
@@ -153,27 +161,6 @@ export default {
 	}
 	.open {
 		transform: rotate(-180deg);
-	}
-
-	&__menu {
-		display: flex;
-		flex-direction: column;
-		border-top-left-radius: $border-radius;
-		border-bottom-left-radius: $border-radius;
-		background-color: $neutral-11;
-		overflow: hidden;
-		justify-content: center;
-
-		button {
-			padding: 4px 8px 4px 5px;
-			text-align: center;
-			font-size: 15px;
-			flex-grow: 1;
-
-			&:hover {
-				background-color: $neutral-7;
-			}
-		}
 	}
 	&__initiative {
 		border-top-left-radius: 9999px;
@@ -196,6 +183,13 @@ export default {
 			margin-top: -1px;
 		}
 	}
+	&__actions {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: center;
+		color: $neutral-2;
+	}
 	.target-avatar {
 		border-radius: $border-radius;
 		margin-right: 10px;
@@ -206,6 +200,24 @@ export default {
 
 		&:hover {
 			color: $orange-light;
+		}
+	}
+
+	&.is-small {
+		font-size: 18px;
+		flex-direction: column;
+		justify-content: center;
+
+		.select-actor {
+			&__actions {
+				display: none;
+			}
+			&__initiative {
+				display: none;
+			}
+		}
+		.target-avatar {
+			margin: 0;
 		}
 	}
 }

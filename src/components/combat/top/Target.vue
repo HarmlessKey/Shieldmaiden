@@ -1,7 +1,7 @@
 <template>
 	<div class="target">
 		<template v-if="targeted?.length === 1">
-			<div class="target__manual">
+			<div v-if="!small" class="target__manual">
 				<template v-if="manual.value && !targeted.includes(actor.key)">
 					<div class="d-flex gap-1">
 						<Defenses v-if="manual.type" :entity-key="key" />
@@ -25,8 +25,11 @@
 			</div>
 			<Avatar :size="60" :key="key" :entity="target" />
 		</template>
-		<div v-else class="mt-1">
-			<strong>Multitargeting</strong>
+		<div v-else class="mt-1 d-flex items-center">
+			<template v-if="!small">
+				<div v-if="targeted.includes(actor.key)" class="target__targeted-self">Targeted self</div>
+				<strong v-else>Multitargeting</strong>
+			</template>
 			<hk-icon icon="fas fa-clone" class="multi" />
 		</div>
 	</div>
@@ -48,6 +51,9 @@ export default {
 		actor: {
 			type: Object,
 			required: true,
+		},
+		small: {
+			type: Boolean,
 		},
 	},
 	components: {

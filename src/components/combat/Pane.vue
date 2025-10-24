@@ -1,7 +1,7 @@
 <template>
 	<div class="combat-pane" @focus="$emit('focus')">
 		<div class="combat-pane__header">
-			<div class="combat-pane__header-title">
+			<div class="combat-pane__header-title truncate">
 				<slot name="header-title">
 					{{ title }}
 				</slot>
@@ -51,6 +51,7 @@ export default {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		gap: 5px;
 		background-color: $neutral-8;
 		padding: 0 10px;
 		min-height: 51px;
@@ -64,6 +65,7 @@ export default {
 		&-title {
 			font-size: 18px;
 			font-weight: bold;
+			min-width: 0;
 		}
 	}
 	&__content {

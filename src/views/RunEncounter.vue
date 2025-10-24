@@ -51,7 +51,7 @@
 								'step-highlight': demo && follow_tutorial && get_step('run', 'current'),
 							}"
 						>
-							<Card :entity="actor || _active[encounter.turn]" />
+							<Card :entity="actor || _active[encounter.turn]" :avatar="false" />
 							<TutorialPopover
 								v-if="demo"
 								tutorial="run"

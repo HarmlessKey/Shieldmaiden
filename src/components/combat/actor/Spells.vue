@@ -13,7 +13,7 @@
 				v-ripple
 				v-close-popup
 				:class="{ active: selected_type?.length === 1 && selected_type.includes(key) }"
-				@click="(selected_type = key), (show = true)"
+				@click="((selected_type = key), (show = true))"
 			>
 				<q-item-section>
 					{{ spell_types[key].label }}
@@ -80,7 +80,6 @@ export default {
 			if (this.actor.innate_ability) {
 				types.push("innate");
 			}
-			console.log("TYPES", types)
 			return types;
 		},
 		selected_type: {

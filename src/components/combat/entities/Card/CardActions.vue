@@ -2,7 +2,7 @@
 	<div class="card-actions">
 		<div v-for="{ category, name } in actions" :key="category">
 			<template v-if="entity[category] && entity[category].length > 0">
-				<h3 v-if="category !== 'special_abilities'" class="d-flex justify-content-between">
+				<h3 v-if="category !== 'special_abilities'" class="label d-flex justify-content-between">
 					{{ name }}
 					<LimitedUseCounter
 						v-if="category === 'legendary_actions' && entity.legendary_count"

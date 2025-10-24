@@ -1,17 +1,29 @@
 <template>
 	<div class="target-details">
-		<button class="btn btn-sm bg-neutral-5">
+		<button
+			class="target-details__show-card btn btn-sm bg-neutral-5"
+			@click="
+				setDrawer({
+					show: true,
+					type: 'combat/entities/Card/index',
+					data: {
+						entity: actor,
+					},
+				})
+			"
+		>
 			<hk-icon icon="fas fa-list-alt" />
 		</button>
 		<div class="target-details__name">
 			<Name :entity="actor" />
 		</div>
 		<div class="target-details__filler" />
+		<slot />
 	</div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { abilities } from "src/utils/generalConstants";
 import { displayStats } from "src/utils/entityFunctions";
 import { general } from "src/mixins/general";
@@ -51,7 +63,9 @@ export default {
 			return this.targeted.length === 1 ? this.entities?.[this.targeted?.[0]] : undefined;
 		},
 	},
-	methods: {},
+	methods: {
+		...mapActions(["setDrawer"]),
+	},
 };
 </script>
 
@@ -62,9 +76,10 @@ export default {
 	height: 32px;
 	line-height: 32px;
 
-	.btn {
+	&__show-card {
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
+		display: none;
 	}
 	> div {
 		background-color: $neutral-6;
@@ -103,6 +118,14 @@ export default {
 	}
 	&__filler {
 		flex-grow: 1;
+	}
+}
+
+@media only screen and (max-width: $lg-breakpoint) {
+	.target-details {
+		&__show-card {
+			display: inline-block;
+		}
 	}
 }
 </style>

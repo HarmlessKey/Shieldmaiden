@@ -53,7 +53,7 @@ export default {
 <style lang="scss" scoped>
 .multipliers {
 	display: flex;
-	justify-content: end;
+	justify-content: flex-end;
 	align-items: center;
 	gap: 2px;
 

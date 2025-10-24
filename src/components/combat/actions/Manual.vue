@@ -329,7 +329,7 @@ export default {
 				font-size: 22px;
 				padding-left: 5px;
 				text-align: center;
-				
+
 				i {
 					transition: all 0.3s linear;
 				}
@@ -347,7 +347,7 @@ export default {
 			display: flex;
 			justify-content: space-between;
 			height: 100%;
-	
+
 			> button {
 				border-radius: 999px;
 				background-color: $neutral-9;
@@ -357,10 +357,6 @@ export default {
 				text-align: center;
 			}
 		}
-		// .q-checkbox {
-		// 	margin-right: 20px;
-		// 	font-size: 12px;
-		// }
 	}
 	&__input {
 		background-color: $neutral-6;
@@ -419,6 +415,35 @@ export default {
 	.manual__input .knob {
 		width: 110px;
 		height: 110px;
+	}
+}
+@media only screen and (max-width: 850px) {
+	.manual {
+		&__input {
+			.knob {
+				width: 85px;
+				height: 85px;
+			}
+			input {
+				font-size: 23px;
+			}
+		}
+		&__buttons .btn {
+			font-size: 13px;
+		}
+		&__modifiers-damage-type {
+			height: 35px;
+			width: 50px;
+
+			&__icon {
+				width: 30px;
+				padding-left: 5px;
+
+				.indicator {
+					font-size: 20px;
+				}
+			}
+		}
 	}
 }
 </style>

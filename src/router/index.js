@@ -1,8 +1,5 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from "vue-router";
 import routes from "./routes";
-
-Vue.use(VueRouter);
 
 /*
  * If not building with SSR mode, you can
@@ -14,19 +11,25 @@ Vue.use(VueRouter);
  */
 
 export default function ({ store, ssrContext }) {
-	const router = new VueRouter({
+	const createHistory = ssrContext
+		? createMemoryHistory
+		: (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
+
+	const router = createRouter({
 		scrollBehavior() {
 			const el = document.querySelector(".scroll");
-			el.scrollLeft = 0;
-			el.scrollTop = 0;
+			if (el) {
+				el.scrollLeft = 0;
+				el.scrollTop = 0;
+			}
+			return { left: 0, top: 0 };
 		},
 		routes,
 
-		// Leave these as they are and change in quasar.conf.js instead!
-		// quasar.conf.js -> build -> vueRouterMode
-		// quasar.conf.js -> build -> publicPath
-		mode: process.env.VUE_ROUTER_MODE,
-		base: process.env.VUE_ROUTER_BASE,
+		// Leave this as it is and change in quasar.config.js instead!
+		// quasar.config.js -> build -> vueRouterMode
+		// quasar.config.js -> build -> publicPath
+		history: createHistory(process.env.VUE_ROUTER_BASE),
 	});
 
 	// Check before each page load whether the page requires authentication/
@@ -40,16 +43,22 @@ export default function ({ store, ssrContext }) {
 		const offline_available = to.matched.some((record) => record.meta.offline); //Check if route is offline available
 
 		// Check if a user is offline, if the page is not available offline, send to home
-		if (process.browser && !navigator.onLine && !offline_available) {
-			Notify.create({
-				message: "Page not available offline, redirected to home.",
-				icon: "fas fa-wifi-slash",
-				color: "negative",
-				position: "top",
+		// Note: process.browser is replaced with typeof window check for SSR compatibility
+		const isBrowser = typeof window !== 'undefined';
+		if (isBrowser && !navigator.onLine && !offline_available) {
+			// Import Notify dynamically to avoid SSR issues
+			import('quasar').then(({ Notify }) => {
+				Notify.create({
+					message: "Page not available offline, redirected to home.",
+					icon: "fas fa-wifi-slash",
+					color: "negative",
+					position: "top",
+				});
 			});
 			next("/");
+		} else {
+			next();
 		}
-		next();
 	});
 
 	return router;

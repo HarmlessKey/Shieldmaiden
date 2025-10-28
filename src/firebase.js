@@ -1,8 +1,9 @@
-import firebase from "firebase/app";
-import "firebase/functions";
-import "firebase/auth";
-import "firebase/database";
-import "firebase/storage";
+// Firebase 10+ Modular SDK
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage";
+import { getFunctions } from "firebase/functions";
 
 const config = {
 	apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
@@ -13,14 +14,17 @@ const config = {
 	messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID,
 };
 
-if (!firebase.apps.length) {
-	firebase.initializeApp(config);
-}
+// Initialize Firebase
+const app = getApps().length === 0 ? initializeApp(config) : getApps()[0];
 
-const auth = firebase.auth();
-const db = firebase.database();
-const storage = firebase.storage();
+// Get Firebase services
+const auth = getAuth(app);
+const db = getDatabase(app);
+const storage = getStorage(app);
+const functions = getFunctions(app);
 
-const functions = firebase.functions();
+// Note: Firebase 10+ uses modular SDK
+// Old: firebase.database().ref('path')
+// New: import { ref } from 'firebase/database'; ref(db, 'path')
 
-export { firebase, auth, db, storage, functions };
+export { app, auth, db, storage, functions };

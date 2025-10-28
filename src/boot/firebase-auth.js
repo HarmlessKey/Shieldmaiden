@@ -1,13 +1,18 @@
-import { auth, db, firebase } from "../firebase";
+// NOTE: This file uses Firebase 10 modular SDK imports
+// The ../firebase.js file needs to be migrated to modular SDK first
+import { auth, db } from "../firebase";
+import { ref as dbRef, onValue, onDisconnect, set, remove, serverTimestamp } from "firebase/database";
 import { Cookies } from "quasar";
 
-export default async ({ app, router, store, Vue }) => {
+export default async ({ app, router, store }) => {
+	// Note: Vue parameter removed in Quasar 2/Vue 3
+
 	// Check if user is connected
 	auth.onAuthStateChanged((user) => {
 		if (user) {
 			const uid = user.uid;
-			const userStatusDatabaseRef = db.ref(`/status/${uid}`);
-			const userLiveDatabaseRef = db.ref(`/broadcast/${uid}`);
+			const userStatusDatabaseRef = dbRef(db, `/status/${uid}`);
+			const userLiveDatabaseRef = dbRef(db, `/broadcast/${uid}`);
 
 			// Set Cookie
 			user.getIdToken(true).then(async (token) => {
@@ -16,26 +21,26 @@ export default async ({ app, router, store, Vue }) => {
 
 			const isOfflineForDatabase = {
 				state: "offline",
-				last_change: firebase.database.ServerValue.TIMESTAMP,
+				last_change: serverTimestamp(),
 			};
 
 			const isOnlineForDatabase = {
 				state: "online",
-				last_changed: firebase.database.ServerValue.TIMESTAMP,
+				last_changed: serverTimestamp(),
 			};
 
-			db.ref(".info/connected").on("value", function (snapshot) {
+			const connectedRef = dbRef(db, ".info/connected");
+			onValue(connectedRef, (snapshot) => {
 				if (!snapshot.val()) return;
 
-				userStatusDatabaseRef
-					.onDisconnect()
+				onDisconnect(userStatusDatabaseRef)
 					.set(isOfflineForDatabase)
 					.then(function () {
-						userStatusDatabaseRef.set(isOnlineForDatabase);
+						set(userStatusDatabaseRef, isOnlineForDatabase);
 					});
 
 				// Stop broadcast when connection is lost
-				userLiveDatabaseRef.onDisconnect().remove();
+				onDisconnect(userLiveDatabaseRef).then(() => remove(userLiveDatabaseRef));
 			});
 		} else {
 			// Delete the cookie

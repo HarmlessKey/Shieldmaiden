@@ -1,162 +1,130 @@
 import { db } from 'src/firebase';
-import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
-import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num, email, confirmed} from "vee-validate/dist/rules";
+import { defineRule, configure, Field, Form, ErrorMessage } from 'vee-validate';
+import * as AllRules from '@vee-validate/rules';
 
-export default async ({ router, Vue }) => {
-  Vue.component('ValidationProvider', ValidationProvider);
-  Vue.component('ValidationObserver', ValidationObserver);
+export default async ({ router, app }) => {
+  // Register VeeValidate components globally
+  app.component('Field', Field);
+  app.component('Form', Form);
+  app.component('ErrorMessage', ErrorMessage);
 
-  extend("required", {
-    ...required,
-    message: "{_field_} is required"
-  });
-  extend("max", {
-    ...max,
-    message: "{_field_} must be {length} or less"
-  });
-  extend("max_value", {
-    ...max_value,
-    message: "{_field_} must be {max} or less"
-  });
-  extend("min", {
-    ...min,
-    message: "{_field_} can't be under {length} "
-  });
-  extend("min_value", {
-    ...min_value,
-    message: "{_field_} can't be under {min} "
-  });
-  extend('length', length);
-  extend('alpha_dash', {
-    ...alpha_dash,
-    message: "{_field_} may only contain alpha-numeric characters, dashes and underscores"
-  });
-  extend("numeric", numeric);
-  extend('alpha_num', {
-    ...alpha_num,
-    message: "{_field_} may only contain alpha-numeric characters."
+  // NOTE: VeeValidate 4 changes:
+  // - ValidationProvider → Field
+  // - ValidationObserver → Form
+  // - extend() → defineRule()
+  // Components using VeeValidate will need updates
+
+  // Register all default rules from @vee-validate/rules
+  Object.keys(AllRules).forEach(rule => {
+    defineRule(rule, AllRules[rule]);
   });
 
-  extend("email", {
-    ...email,
-    message: "{_field_} must be a valid email address."
+  // Configure VeeValidate with custom messages
+  configure({
+    generateMessage: (ctx) => {
+      const messages = {
+        required: `${ctx.field} is required`,
+        max: `${ctx.field} must be ${ctx.rule.params[0]} or less`,
+        max_value: `${ctx.field} must be ${ctx.rule.params[0]} or less`,
+        min: `${ctx.field} can't be under ${ctx.rule.params[0]}`,
+        min_value: `${ctx.field} can't be under ${ctx.rule.params[0]}`,
+        alpha_dash: `${ctx.field} may only contain alpha-numeric characters, dashes and underscores`,
+        alpha_num: `${ctx.field} may only contain alpha-numeric characters.`,
+        email: `${ctx.field} must be a valid email address.`,
+        confirmed: `${ctx.field} confirmation does not match`,
+      };
+
+      return messages[ctx.rule.name] || `${ctx.field} is invalid`;
+    },
   });
 
-  // Value is same as other field
-  extend("confirmed", confirmed);
+  // Custom validation rules
 
   // Value must be between 2 numbers
-  extend("between", {
-    validate(value, { minimum, maximum } = {}) {
-      return Number(minimum) <= value && Number(maximum) >= value;
-    },
-    params: ["minimum", "maximum"],
-    message: "Must be between {minimum} and {maximum}"
+  defineRule('between', (value, [minimum, maximum]) => {
+    if (!value) return true;
+    return Number(minimum) <= value && Number(maximum) >= value || `Must be between ${minimum} and ${maximum}`;
   });
 
   // Recharge 1, 5-6 or rest
-  extend('recharge', {
-    validate(value) {
-      if (value) {
-        const regex = /^[\d]+(-[\d]+)*$/;
-        return regex.test(value) || value === "rest";
-      } return false;
-    },
-    message: 'Allowed format: 6, 5-6 or rest',
+  defineRule('recharge', (value) => {
+    if (!value) return true;
+    const regex = /^[\d]+(-[\d]+)*$/;
+    return regex.test(value) || value === "rest" || 'Allowed format: 6, 5-6 or rest';
   });
 
   // Range
-  extend('range', {
-    validate(value) {
-      if (value) {
-        const regex = /^[\d]+(\/[\d]+)*$/g;
-        return regex.test(value);
-      } return false;
-    },
-    message: 'Allowed format: 20 or 20/60',
+  defineRule('range', (value) => {
+    if (!value) return true;
+    const regex = /^[\d]+(\/[\d]+)*$/g;
+    return regex.test(value) || 'Allowed format: 20 or 20/60';
   });
 
   // Hit dice
-  extend('hit_dice', {
-    validate(value) {
-      if (value) {
-        const regex = /^[\d]+d[\d]+$/;
-        return regex.test(value);
-      } return false;
-    },
-    message: 'Allowed format: 2d6',
+  defineRule('hit_dice', (value) => {
+    if (!value) return true;
+    const regex = /^[\d]+d[\d]+$/;
+    return regex.test(value) || 'Allowed format: 2d6';
   });
 
   // Validate url input
-  extend('url', {
-    validate(value) {
-      if (value) {
-        const regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z\d]+([-.]{1}[a-z\d]+)*\.[a-z]{2,5}(:[\d]{1,5})?(\/.*)?$/;
-        return regex.test(value);
-      } return false;
-    },
-    message: '{_field_} must be a valid URL',
+  defineRule('url', (value) => {
+    if (!value) return true;
+    const regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z\d]+([-.]{1}[a-z\d]+)*\.[a-z]{2,5}(:[\d]{1,5})?(\/.*)?$/;
+    return regex.test(value) || 'Must be a valid URL';
   });
 
-  extend('audio', {
-    validate(value) {
-      if (value) {
-        // Check if value is url
-        const url_expr = /[A-z\d@:%._+~#=-]{1,256}\.[A-z\d()]{1,6}\b([A-z\d()@:%_+.~#?&/=-]+)?/gi;
-        if (value.match(url_expr)) {
-          return true;
-        }
-        // Check if value is spotify URI
-        const spotify_expr  = /^spotify:.+/gi;
-        
-        return value.match(spotify_expr);
-      } return false;
-    },
-    message: '{_field_} must be a valid URL or URI',
-  });
-
-  // Check if variable used in a description, exists
-  extend('variable_check', {
-    message: field => `The ${field.toLowerCase()} contains undefined variables.`,
-    validate: (value, variables) => {
-      let regexpr = /\[(\w+)\]/g;
-      let text_vars = value.match(regexpr, "$1");
-      if (!text_vars)
-        return true;
-      for (let v of text_vars) {
-        let stripped = v.slice(1,-1);
-        if (!variables[0] || !Object.keys(variables[0]).includes(stripped))
-          return false
-      }
+  // Validate audio URL or URI
+  defineRule('audio', (value) => {
+    if (!value) return true;
+    // Check if value is url
+    const url_expr = /[A-z\d@:%._+~#=-]{1,256}\.[A-z\d()]{1,6}\b([A-z\d()@:%_+.~#?&/=-]+)?/gi;
+    if (value.match(url_expr)) {
       return true;
     }
+    // Check if value is spotify URI
+    const spotify_expr = /^spotify:.+/gi;
+    return value.match(spotify_expr) || 'Must be a valid URL or URI';
   });
 
-  extend('json', {
-    message: "This field contains invalid JSON",
-    validate: (value) => {
-      try {
-        JSON.parse(value);
-        return true;
+  // Check if variable used in a description exists
+  defineRule('variable_check', (value, [variables]) => {
+    if (!value) return true;
+    let regexpr = /\[(\w+)\]/g;
+    let text_vars = value.match(regexpr, "$1");
+    if (!text_vars) return true;
 
-      } catch {
-        return false;
+    for (let v of text_vars) {
+      let stripped = v.slice(1, -1);
+      if (!variables || !Object.keys(variables).includes(stripped)) {
+        return 'Contains undefined variables';
       }
     }
+    return true;
   });
 
-  extend('username', {
-    message: "This usename has already been taken",
-    validate: async (value) => {
-      let username_ref = db.ref(`search_users`).orderByChild('username').equalTo(value.toLowerCase());
-  
-      // Check username
-      let exists = false
-      await username_ref.once('value' , (snapshot) => {
-        exists = snapshot.exists();
-      });
-
-      return !exists;
+  // Validate JSON
+  defineRule('json', (value) => {
+    if (!value) return true;
+    try {
+      JSON.parse(value);
+      return true;
+    } catch {
+      return 'This field contains invalid JSON';
     }
-  })
+  });
+
+  // Check if username is available
+  defineRule('username', async (value) => {
+    if (!value) return true;
+    let username_ref = db.ref(`search_users`).orderByChild('username').equalTo(value.toLowerCase());
+
+    // Check username
+    let exists = false;
+    await username_ref.once('value', (snapshot) => {
+      exists = snapshot.exists();
+    });
+
+    return !exists || 'This username has already been taken';
+  });
 };

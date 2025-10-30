@@ -1,12 +1,13 @@
-const { Router } = require("express");
-const { patreonServices } = require("../../src/services/patreon");
-const { MonsterGenerator } = require("../../src/services/monster_generator");
-const { SubscriptionServices } = require("../../src/services/subscription");
+import { Router } from "express";
+import { patreonServices } from "../../src/services/patreon.js";
+import { MonsterGenerator } from "../../src/services/monster_generator.js";
+import { SubscriptionServices } from "../../src/services/subscription.js";
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const admin = require("firebase-admin");
+import admin from "firebase-admin";
 
 const serviceAccountFilePath = path.resolve(process.cwd(), "firebaseServiceAccountKey.json");
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountFilePath, "utf8"));
@@ -110,4 +111,4 @@ router.post("/ai/generate-monster", async (req, res) => {
 	}
 });
 
-module.exports = router;
+export default router;

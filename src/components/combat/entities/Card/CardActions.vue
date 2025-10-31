@@ -27,6 +27,7 @@
 					<div class="card-action-title">
 						<template
 							v-if="
+								rollable &&
 								action.action_list &&
 								action.action_list[0] &&
 								action.action_list[0].type !== 'other' &&
@@ -186,6 +187,10 @@ export default {
 		entity: {
 			type: Object,
 			required: true,
+		},
+		rollable: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {

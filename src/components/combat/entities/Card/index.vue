@@ -2,7 +2,7 @@
 	<div class="entity-card">
 		<CardDetails v-bind="$attrs" :entity="entity" />
 		<CardSpellCasting v-if="entity.caster_ability || entity.innate_ability" :entity="entity" />
-		<CardActions v-if="entity.entityType !== 'player'" :entity="entity" />
+		<CardActions v-if="entity.entityType !== 'player'" :entity="entity" :rollable="rollable" />
 	</div>
 </template>
 
@@ -22,6 +22,10 @@ export default {
 		entity: {
 			type: Object,
 			required: true,
+		},
+		rollable: {
+			type: Boolean,
+			default: false,
 		},
 	},
 };

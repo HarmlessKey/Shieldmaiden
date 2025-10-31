@@ -94,36 +94,41 @@
 								v-shortkey="[i]"
 								@shortkey="set_targeted({ type: 'single', key: entity.key })"
 							>
-								<TargetEntity :entity="entity" />
-							</div>
-							<div v-if="!entity.active" class="d-flex">
-								<a
-									class="btn btn-sm btn-clear mx-1"
-									v-if="entity.addNextRound"
-									v-on:click.stop="add_next_round({ key: entity.key, action: 'tag', value: false })"
-								>
-									<i aria-hidden="true" class="fas fa-check green" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Will be added next round
-									</q-tooltip>
-								</a>
-								<a
-									class="btn btn-sm btn-clear mx-1"
-									v-if="!entity.addNextRound"
-									v-on:click.stop="add_next_round({ key: entity.key, action: 'tag', value: true })"
-								>
-									<i aria-hidden="true" class="fas fa-check neutral-2" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Click to add next round
-									</q-tooltip>
-								</a>
-								<a
-									class="btn btn-sm bg-neutral-5"
-									@click="add_next_round({ key: entity.key, action: 'set' })"
-								>
-									<i aria-hidden="true" class="fas fa-arrow-up" />
-									<q-tooltip anchor="top middle" self="center middle"> Add now </q-tooltip>
-								</a>
+								<TargetEntity :entity="entity">
+									<template v-if="!entity.active" slot="effects">
+										<button
+											class="btn btn-sm bg-neutral-8"
+											v-if="entity.addNextRound"
+											v-on:click.stop="
+												add_next_round({ key: entity.key, action: 'tag', value: false })
+											"
+										>
+											<i aria-hidden="true" class="fas fa-check green" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Will be added next round
+											</q-tooltip>
+										</button>
+										<button
+											class="btn btn-sm bg-neutral-8"
+											v-if="!entity.addNextRound"
+											v-on:click.stop="
+												add_next_round({ key: entity.key, action: 'tag', value: true })
+											"
+										>
+											<i aria-hidden="true" class="fas fa-check neutral-2" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Click to add next round
+											</q-tooltip>
+										</button>
+										<button
+											class="btn btn-sm bg-neutral-8"
+											@click="add_next_round({ key: entity.key, action: 'set' })"
+										>
+											<i aria-hidden="true" class="fas fa-arrow-up" />
+											<q-tooltip anchor="top middle" self="center middle">Add now</q-tooltip>
+										</button>
+									</template>
+								</TargetEntity>
 							</div>
 							<TutorialPopover
 								v-if="demo && group === 'active' && i === 1"

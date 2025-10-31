@@ -24,7 +24,9 @@
 					</div>
 					<Name class="target-entity__content-info__name" :entity="entity" />
 					<div class="target-entity__content-info__actions">
-						<Effects :entity="entity" :available-space="effectSpace" collapse />
+						<slot name="effects">
+							<Effects :entity="entity" :available-space="effectSpace" collapse />
+						</slot>
 						<button class="btn btn-sm bg-neutral-8 target-menu__button" tabindex="-1" @click.stop>
 							<i aria-hidden="true" class="fal fa-ellipsis-v" />
 							<q-popup-proxy

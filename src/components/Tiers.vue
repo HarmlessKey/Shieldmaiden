@@ -182,7 +182,7 @@ export default {
 					title: "Import content",
 				},
 				ai_credits: {
-					title: "AI credits",
+					title: "Monster credits",
 				},
 			},
 			storage_size: {

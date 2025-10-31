@@ -1,18 +1,17 @@
 <template>
 	<div>
-		<h2 class="mb-1">Using our AI Monster Generator</h2>
-		<em>You can't spell Shieldmaiden without AI</em>
+		<h2 class="mb-1">Using our Monster Generator</h2>
 		<p class="mt-3">
-			Our AI monster generator will generate monsters from any description you provide.<br />
-			You can either provide a short descriptive prompt and let the AI go wild, or you can give
-			extensive details and be in more control on what kind of monster you get back.
+			Our monster generator will create monsters from any description you provide.<br />
+			You can either provide a short description, or you can give extensive details and be in more
+			control of what kind of monster you get back.
 		</p>
 		<p>
 			The generated monster is injected in to our NPC creation form, allowing you to make changes if
 			you wish.
 		</p>
 
-		<h3>Example prompts</h3>
+		<h3>Example descriptions</h3>
 		<div class="d-flex flex-col gap-2">
 			<em>A Knight</em>
 			<em>The rabbit from Monty Python and the Holy Grail</em>

@@ -2,7 +2,7 @@
 	<div class="card-body generate-monster" :class="{ generating: generating }">
 		<div v-if="tier.price !== 'Free'" class="generate-monster__content">
 			<h2 class="text-shadow d-flex justify-content-between gap-2">
-				<span>Generate your monster <span class="whitespace-nowrap">with AI</span></span>
+				<span>Generate your monster <span class="whitespace-nowrap">with Shieldmaiden</span></span>
 				<em>BETA</em>
 			</h2>
 			<template v-if="error">
@@ -11,10 +11,7 @@
 			</template>
 			<p class="text-shadow mb-1">
 				Describe your monster
-				<button
-					class="btn btn-clear btn-sm btn-round"
-					@click="ai_info = !ai_info"
-				>
+				<button class="btn btn-clear btn-sm btn-round" @click="ai_info = !ai_info">
 					<hk-icon icon="fas fa-info-circle" />
 				</button>
 			</p>
@@ -25,7 +22,7 @@
 				type="textarea"
 				:maxLength="max_length"
 				:rules="`max:${max_length}`"
-				name="Prompt"
+				name="Description"
 				class="mb-2"
 				:disable="ai.total <= 0"
 			/>
@@ -63,9 +60,9 @@
 			</div>
 		</div>
 		<div v-else class="text-center">
-			<h2 class="text-shadow">Subscribe and generate monster with AI</h2>
+			<h2 class="text-shadow">Subscribe and generate monster with Shieldmaiden</h2>
 			<p class="mb-4 text-shadow">
-				A subscription is required to use our AI generation functionality.
+				A subscription is required to use our smart generation functionality.
 			</p>
 			<router-link to="/patreon" class="btn btn-block bg-patreon-red">Subscribe now</router-link>
 		</div>
@@ -92,7 +89,7 @@ export default {
 	name: "GenerateMonster",
 	props: {},
 	components: {
-		AIPromptInfo
+		AIPromptInfo,
 	},
 	data() {
 		return {
@@ -150,7 +147,7 @@ export default {
 					{ timeout: 0 }
 				);
 				const monster = response?.data?.output || {};
-				monster.source = "Shieldm.ai.den";
+				monster.source = "Shieldmaiden";
 				monster.hit_dice = monster?.hit_dice?.split("+")[0];
 				["actions", "reactions", "legendary_actions"].forEach((action_type) => {
 					monster[action_type]?.forEach((action) => {

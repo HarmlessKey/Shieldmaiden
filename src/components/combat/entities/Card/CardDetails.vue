@@ -44,7 +44,7 @@
 				</div>
 				<div :key="ability" class="ability">
 					<div class="label">{{ ability.substring(0, 3) }}</div>
-					<div class="ability__score">{{ full_entity[ability] }}</div>
+					<div class="ability__score">{{ full_entity[ability] ?? 10 }}</div>
 					<hk-roll
 						v-for="type in ['mod', 'save']"
 						:key="type"

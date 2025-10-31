@@ -20,12 +20,10 @@
 								class="mx-1"
 								color="neutral-5"
 								no-caps
-								@click="(create_dialog = true), (generate_monster = true)"
+								@click="((create_dialog = true), (generate_monster = true))"
 							>
 								<i aria-hidden="true" class="fas fa-sparkles"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Generate NPC with AI!
-								</q-tooltip>
+								<q-tooltip anchor="top middle" self="center middle"> Generate NPC! </q-tooltip>
 							</q-btn>
 							<q-btn
 								v-if="!npcId"
@@ -117,10 +115,7 @@
 				</div>
 				<div class="card-body">
 					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
-					<button
-						class="btn btn-block bg-accent"
-						@click="sign_up_dialog = true"
-					>
+					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
 						Create Free Account
 					</button>
 				</div>
@@ -157,7 +152,7 @@
 							@click="generate_monster = true"
 							:disabled="!userId"
 						>
-							AI generate (beta)
+							Generate from description
 						</button>
 					</template>
 					<template v-if="copy_monster">
@@ -172,7 +167,7 @@
 					<button
 						v-if="!generating"
 						class="btn btn-sm bg-neutral-5"
-						@click="(copy_monster = false), (generate_monster = false)"
+						@click="((copy_monster = false), (generate_monster = false))"
 					>
 						<i class="fas fa-times mr-1" aria-hidden="true" />
 						Cancel

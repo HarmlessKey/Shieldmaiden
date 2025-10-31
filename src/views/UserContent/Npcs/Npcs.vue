@@ -15,7 +15,7 @@
 						class="btn btn-sm bg-neutral-5 mr-2"
 						@click="generate_dialog = true"
 					>
-						AI Generate
+						Generate
 					</button>
 				</template>
 				<button
@@ -143,11 +143,11 @@
 			</hk-card>
 		</q-dialog>
 
-		<!-- AI generate dialog-->
+		<!-- generate dialog-->
 		<q-dialog v-model="generate_dialog">
 			<hk-card class="npc-dialog" :persistent="generating">
 				<div slot="header" class="card-header">
-					<span>AI Monster Generation</span>
+					<span>Monster Generation</span>
 					<q-btn
 						v-if="!generating"
 						padding="sm"

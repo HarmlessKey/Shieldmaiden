@@ -97,7 +97,7 @@ export default {
 					title: "Import content",
 				},
 				ai_credits: {
-					title: "AI Credits",
+					title: "Monster Credits",
 				},
 				storage: {
 					title: "Storage",

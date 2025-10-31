@@ -77,9 +77,9 @@
 		<p v-if="!full_entity.old && full_entity.entityType !== 'player'" class="card-details__summary">
 			<template v-if="full_entity.skills">
 				<strong class="neutral-2">Skills </strong>
-				<span class="saves">
+				<span class="skills">
 					<hk-roll
-						v-for="skill in full_entity.skills"
+						v-for="(skill, idx) in full_entity.skills"
 						:key="skill"
 						:tooltip="`Roll ${skill}`"
 						:roll="{
@@ -99,12 +99,17 @@
 								: null
 						"
 					>
-						<span class="save">{{ skill }} {{ skillModifier(skills[skill].ability, skill) }}</span>
+						<span class="skill">
+							{{ skill }} {{ skillModifier(skills[skill].ability, skill)
+							}}<span class="mr-2" v-if="idx < full_entity.skills.length - 1">,</span>
+						</span>
 					</hk-roll>
 				</span>
 				<br />
 			</template>
-			<template v-if="full_entity.damage_vulnerabilities && full_entity.damage_vulnerabilities.length > 0">
+			<template
+				v-if="full_entity.damage_vulnerabilities && full_entity.damage_vulnerabilities.length > 0"
+			>
 				<strong class="neutral-2">Damage vulnerabilities</strong>
 				{{ defensesDisplay(full_entity.damage_vulnerabilities).join(", ") }}<br />
 			</template>
@@ -116,7 +121,9 @@
 				<strong class="neutral-2">Damage immunities</strong>
 				{{ defensesDisplay(full_entity.damage_immunities).join(", ") }}<br />
 			</template>
-			<template v-if="full_entity.condition_immunities && full_entity.condition_immunities.length > 0">
+			<template
+				v-if="full_entity.condition_immunities && full_entity.condition_immunities.length > 0"
+			>
 				<strong class="neutral-2">Condition immunities</strong>
 				{{ full_entity.condition_immunities.join(", ") }}<br />
 			</template>

@@ -3,7 +3,6 @@
 		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
 			<q-select
 				v-bind="$attrs"
-				v-on="$listeners"
 				v-model="modelValue"
 				:dark="$store.getters.theme === 'dark'"
 				:filled="filled"

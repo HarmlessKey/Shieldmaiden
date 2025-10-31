@@ -106,7 +106,8 @@ export default {
 			}
 			const projectiles = this.projectileScaling(config);
 
-			if (this.$listeners && this.$listeners["roll"]) {
+			// In Vue 3, event listeners are in $attrs with "on" prefix (e.g., onRoll)
+			if (this.$attrs.onRoll) {
 				this.$emit("roll", e, projectiles, option);
 			} else {
 				[...Array(projectiles).keys()].forEach(() => {

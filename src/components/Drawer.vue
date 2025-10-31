@@ -35,7 +35,8 @@ export default {
 			if (!this.drawer.type) {
 				return null;
 			}
-			return () => import(`./${this.drawer.type}.vue`);
+			// @vite-ignore - Dynamic drawer component loading based on type
+			return () => import(/* @vite-ignore */ `./${this.drawer.type}.vue`);
 		},
 	},
 	mounted() {

@@ -38,7 +38,7 @@ const routes = [
 	// CONTENT
 	{
 		path: "/content",
-		component: () => import("src/layouts/authenticated"),
+		component: () => import("src/layouts/authenticated.vue"),
 		meta: {
 			requiresAuth: true,
 			title: "Content",
@@ -47,7 +47,7 @@ const routes = [
 			{
 				path: "",
 				name: "Content",
-				component: () => import("src/views/UserContent"),
+				component: () => import("src/views/UserContent/index.vue"),
 				meta: {
 					description: "Your custom content on Shieldmaiden.",
 					title: "Content",
@@ -56,7 +56,7 @@ const routes = [
 			{
 				path: "manage",
 				name: "Manage content",
-				component: () => import("src/views/UserContent/ManageContent"),
+				component: () => import("src/views/UserContent/ManageContent.vue"),
 				meta: {
 					description: "Manage your content on Shieldmaiden.",
 					title: "Manage content",
@@ -77,7 +77,7 @@ const routes = [
 					{
 						path: "",
 						name: "Import content",
-						component: () => import("src/views/UserContent/ImportContent"),
+						component: () => import("src/views/UserContent/ImportContent.vue"),
 						meta: {
 							description: "Import content to Shieldmaiden",
 							title: "Import Shieldmaiden Content",
@@ -86,7 +86,7 @@ const routes = [
 					{
 						path: "hk_import",
 						name: "Import Shieldmaiden Content",
-						component: () => import("src/views/UserContent/ImportContent/ImportHKContent"),
+						component: () => import("src/views/UserContent/ImportContent/ImportHKContent.vue"),
 						meta: {
 							description: "Import User Content from an Shieldmaiden export",
 							title: "Import Shieldmaiden Content",
@@ -134,7 +134,7 @@ const routes = [
 					{
 						path: "",
 						name: "Players",
-						component: () => import("src/views/UserContent/Players"),
+						component: () => import("src/views/UserContent/Players.vue"),
 						meta: {
 							description: "Your players Shieldmaiden.",
 							title: "Players",
@@ -176,7 +176,7 @@ const routes = [
 					{
 						path: "",
 						name: "CharacterBuilder",
-						component: () => import("src/views/UserContent/CharacterBuilder"),
+						component: () => import("src/views/UserContent/CharacterBuilder.vue"),
 						meta: {
 							description: "Your Characters on Shieldmaiden.",
 							title: "Character builder",
@@ -184,7 +184,7 @@ const routes = [
 					},
 					{
 						path: ":id",
-						component: () => import("src/layouts/character-builder"),
+						component: () => import("src/layouts/character-builder.vue"),
 						meta: {
 							title: "Edit character",
 							description: "Edit an existing character on Shieldmaiden.",
@@ -195,7 +195,7 @@ const routes = [
 								path: "",
 								name: "EditCharacterGeneral",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/general"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/general.vue"),
 								meta: {
 									description: "Edit your character's general information",
 									title: "General",
@@ -206,7 +206,7 @@ const routes = [
 								path: "info",
 								name: "EditCharacterInfoTab",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/info"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/info.vue"),
 								meta: {
 									description: "Character builder information",
 									title: "Info",
@@ -217,7 +217,7 @@ const routes = [
 								path: "general",
 								name: "EditCharacterGeneralTab",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/general"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/general.vue"),
 								meta: {
 									description: "Edit your character's general information",
 									title: "General",
@@ -228,7 +228,7 @@ const routes = [
 								path: "race",
 								name: "EditRace",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/race"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/race.vue"),
 								meta: {
 									title: "Race",
 									description: "Edit your character's race",
@@ -239,7 +239,7 @@ const routes = [
 								path: "class",
 								name: "EditClass",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/class"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/class.vue"),
 								meta: {
 									title: "Class",
 									description: "Edit your character's classes",
@@ -250,7 +250,7 @@ const routes = [
 								path: "abilities",
 								name: "EditAbilities",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/abilities"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/abilities.vue"),
 								meta: {
 									title: "Abilities",
 									description: "Edit your character's abilities",
@@ -261,7 +261,7 @@ const routes = [
 								path: "equipment",
 								name: "EditEquipment",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/equipment"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/equipment.vue"),
 								meta: {
 									title: "Equipment",
 									description: "Edit your character's equipment",
@@ -411,7 +411,7 @@ const routes = [
 					{
 						path: "",
 						name: "Reminders",
-						component: () => import("src/views/UserContent/Reminders"),
+						component: () => import("src/views/UserContent/Reminders.vue"),
 						meta: {
 							title: "Reminders",
 							description: "Your custom reminders Shieldmaiden.",
@@ -495,7 +495,7 @@ const routes = [
 					{
 						path: "",
 						name: "Characters",
-						component: () => import("src/views/UserContent/Characters"),
+						component: () => import("src/views/UserContent/Characters.vue"),
 						meta: {
 							title: "Characters",
 							description: "Your player characters on Shieldmaiden.",
@@ -566,7 +566,7 @@ const routes = [
 	// DM SCREEN
 	{
 		path: "/content/campaigns/:campid",
-		component: () => import("src/layouts/run-campaign"),
+		component: () => import("src/layouts/run-campaign.vue"),
 		meta: {
 			requiresAuth: true,
 			title: "Run campaign",
@@ -575,7 +575,7 @@ const routes = [
 			{
 				path: "",
 				name: "Run campaign",
-				component: () => import("src/views/UserContent/Campaigns/RunCampaign"),
+				component: () => import("src/views/UserContent/Campaigns/RunCampaign.vue"),
 				meta: {
 					description: "Run your campaign on Shieldmaiden.",
 					title: "Run campaign",
@@ -597,7 +597,7 @@ const routes = [
 	// TOOLS
 	{
 		path: "/tools",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			title: "Tools",
 		},
@@ -605,7 +605,7 @@ const routes = [
 			{
 				path: "",
 				name: "Tools",
-				component: () => import("src/views/Tools"),
+				component: () => import("src/views/Tools.vue"),
 				meta: {
 					title: "D&D Tools - Online tools for D&D 5e",
 					description:
@@ -615,7 +615,7 @@ const routes = [
 			{
 				path: "combat-tracker",
 				name: "ToolsCombatTracker",
-				component: () => import("src/views/Tools/CombatTracker"),
+				component: () => import("src/views/Tools/CombatTracker.vue"),
 				meta: {
 					title: "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 					description:
@@ -638,7 +638,7 @@ const routes = [
 					{
 						path: "",
 						name: "ToolsEncounterBuilder",
-						component: () => import("src/views/Tools/EncounterBuilder"),
+						component: () => import("src/views/Tools/EncounterBuilder.vue"),
 						meta: {
 							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 							description:
@@ -648,7 +648,7 @@ const routes = [
 					{
 						path: "build-encounter",
 						name: "ToolsBuildEncounter",
-						component: () => import("src/components/encounters"),
+						component: () => import("src/components/encounters.vue"),
 						meta: {
 							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 							description:
@@ -674,7 +674,7 @@ const routes = [
 					{
 						path: "",
 						name: "ToolsDmScreen",
-						component: () => import("src/views/Tools/DmScreen"),
+						component: () => import("src/views/Tools/DmScreen.vue"),
 						meta: {
 							title: "D&D 5e DM Screen",
 							description:
@@ -699,7 +699,7 @@ const routes = [
 					{
 						path: "",
 						name: "ToolsMonsterCreator",
-						component: () => import("src/views/Tools/MonsterCreator"),
+						component: () => import("src/views/Tools/MonsterCreator.vue"),
 						meta: {
 							title: "Dungeons & Dragons Monster Creator",
 							description:
@@ -709,7 +709,7 @@ const routes = [
 					{
 						path: "create-monster",
 						name: "ToolsCreateMonster",
-						component: () => import("src/views/UserContent/Npcs/EditNpc"),
+						component: () => import("src/views/UserContent/Npcs/EditNpc.vue"),
 						meta: {
 							title: "Create monster",
 							description: "Create your custom D&D 5e monster.",
@@ -733,7 +733,7 @@ const routes = [
 					{
 						path: "",
 						name: "ToolsSpellCreator",
-						component: () => import("src/views/Tools/SpellCreator"),
+						component: () => import("src/views/Tools/SpellCreator.vue"),
 						meta: {
 							title: "D&D Spell Creator - Create custom spells for D&D 5e ",
 							description:
@@ -743,7 +743,7 @@ const routes = [
 					{
 						path: "create-spell",
 						name: "ToolsCreateSpell",
-						component: () => import("src/views/UserContent/Spells/EditSpell"),
+						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
 						meta: {
 							title: "Create spell",
 							description:
@@ -755,7 +755,7 @@ const routes = [
 			{
 				path: "character-sync",
 				name: "ToolsCharacterSync",
-				component: () => import("src/views/Tools/CharacterSync"),
+				component: () => import("src/views/Tools/CharacterSync.vue"),
 				meta: {
 					title: "Character Sync",
 					description:
@@ -765,7 +765,7 @@ const routes = [
 			{
 				path: "character-builder",
 				name: "ToolsCharacterBuilder",
-				component: () => import("src/views/Tools/CharacterBuilder"),
+				component: () => import("src/views/Tools/CharacterBuilder.vue"),
 				meta: {
 					title: "Character Builder",
 					description:
@@ -775,7 +775,7 @@ const routes = [
 			{
 				path: "homebrew-creation",
 				name: "ToolsHomebrewCreation",
-				component: () => import("src/views/Tools/HomebrewCreation"),
+				component: () => import("src/views/Tools/HomebrewCreation.vue"),
 				meta: {
 					title: "Homebrew Creation",
 					description:
@@ -788,7 +788,7 @@ const routes = [
 	//COMPENDIUM
 	{
 		path: "/compendium",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			title: "Compendium",
 		},
@@ -796,7 +796,7 @@ const routes = [
 			{
 				path: "",
 				name: "Compendium",
-				component: () => import("src/views/Compendium"),
+				component: () => import("src/views/Compendium.vue"),
 				meta: {
 					title: "Dungeons & Dragons Compendium - D&D 5e knowledge database",
 					description:
@@ -818,7 +818,7 @@ const routes = [
 					{
 						path: "",
 						name: "Monsters",
-						component: () => import("src/views/Compendium/Monsters"),
+						component: () => import("src/views/Compendium/Monsters.vue"),
 						meta: {
 							title: "Monsters D&D 5e",
 							description: "Dungeons & Dragons 5th edition monsters. All monsters from the SRD 5.1",
@@ -827,7 +827,7 @@ const routes = [
 					{
 						path: ":id",
 						name: "Monster",
-						component: () => import("src/views/Compendium/view/Monster"),
+						component: () => import("src/views/Compendium/view/Monster.vue"),
 						meta: {
 							title: "Monster D&D 5e",
 							description: "D&D 5th Edition monster.",
@@ -849,7 +849,7 @@ const routes = [
 					{
 						path: "",
 						name: "Spells D&D 5e",
-						component: () => import("src/views/Compendium/Spells"),
+						component: () => import("src/views/Compendium/Spells.vue"),
 						meta: {
 							title: "Spells D&D 5e",
 							description: "Dungeons & Dragons 5th edition spells. All spells from the SRD 5.1",
@@ -858,7 +858,7 @@ const routes = [
 					{
 						path: ":id",
 						name: "Spell",
-						component: () => import("src/views/Compendium/view/Spell"),
+						component: () => import("src/views/Compendium/view/Spell.vue"),
 						meta: {
 							title: "Spell",
 						},
@@ -879,7 +879,7 @@ const routes = [
 					{
 						path: "",
 						name: "Conditions",
-						component: () => import("src/views/Compendium/Conditions"),
+						component: () => import("src/views/Compendium/Conditions.vue"),
 						meta: {
 							title: "Conditions D&D 5e",
 							description: "Dungeons & Dragons 5th edition spells. All conditions from the SRD 5.1",
@@ -888,7 +888,7 @@ const routes = [
 					{
 						path: ":id",
 						name: "Condition",
-						component: () => import("src/views/Compendium/view/Condition"),
+						component: () => import("src/views/Compendium/view/Condition.vue"),
 						meta: {
 							title: "Condition",
 						},
@@ -909,7 +909,7 @@ const routes = [
 					{
 						path: "",
 						name: "CompendiumItems",
-						component: () => import("src/views/Compendium/Items"),
+						component: () => import("src/views/Compendium/Items.vue"),
 						meta: {
 							title: "Items D&D 5e",
 							description: "Dungeons & Dragons 5th edition items. All items from the SRD 5.1",
@@ -918,7 +918,7 @@ const routes = [
 					{
 						path: ":id",
 						name: "Item",
-						component: () => import("src/views/Compendium/view/Item"),
+						component: () => import("src/views/Compendium/view/Item.vue"),
 						meta: {
 							title: "Item",
 						},
@@ -939,7 +939,7 @@ const routes = [
 					{
 						path: "",
 						name: "CompendiumRules",
-						component: () => import("src/views/Compendium/Rules"),
+						component: () => import("src/views/Compendium/Rules.vue"),
 						meta: {
 							title: "Rules D&D 5e",
 							description: "Dungeons & Dragons 5th edition rules. Rules for playing D&D 5e.",
@@ -948,7 +948,7 @@ const routes = [
 					{
 						path: ":id",
 						name: "Rule",
-						component: () => import("src/views/Compendium/view/Rule"),
+						component: () => import("src/views/Compendium/view/Rule.vue"),
 						meta: {
 							title: "Rule",
 						},
@@ -959,7 +959,7 @@ const routes = [
 	},
 	{
 		path: "/homebrew",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			offline: true,
 			title: "Homebrew",
@@ -968,7 +968,7 @@ const routes = [
 			{
 				path: "",
 				name: "Homebrew",
-				component: () => import("src/views/Compendium/Monsters"),
+				component: () => import("src/views/Compendium/Monsters.vue"),
 				meta: {
 					title: "Homebrew",
 					description: "D&D 5e Monsters created by Shieldmaiden.",
@@ -977,7 +977,7 @@ const routes = [
 			{
 				path: ":id",
 				name: "HomebrewMonster",
-				component: () => import("src/views/Compendium/view/HomebrewMonster"),
+				component: () => import("src/views/Compendium/view/HomebrewMonster.vue"),
 				meta: {
 					title: "Homebrew Monster D&D 5e",
 					description: "D&D 5th Edition monster created by Shieldmaiden.",
@@ -989,7 +989,7 @@ const routes = [
 	// ADMIN
 	{
 		path: "/admin",
-		component: () => import("src/layouts/admin"),
+		component: () => import("src/layouts/admin.vue"),
 		meta: {
 			requiresAuth: true,
 			requiresAdmin: true,
@@ -999,7 +999,7 @@ const routes = [
 			{
 				path: "",
 				name: "Admin",
-				component: () => import("src/views/Admin"),
+				component: () => import("src/views/Admin.vue"),
 			},
 			{
 				path: "users",
@@ -1041,12 +1041,12 @@ const routes = [
 					{
 						path: "",
 						name: "Patrons",
-						component: () => import("src/views/Admin/Patrons"),
+						component: () => import("src/views/Admin/Patrons.vue"),
 					},
 					{
 						path: "new",
 						name: "New patron",
-						component: () => import("src/views/Admin/Patrons/New"),
+						component: () => import("src/views/Admin/Patrons/New.vue"),
 						meta: {
 							title: "New patron",
 						},
@@ -1054,7 +1054,7 @@ const routes = [
 					{
 						path: ":id",
 						name: "Patron",
-						component: () => import("src/views/Admin/Patrons"),
+						component: () => import("src/views/Admin/Patrons.vue"),
 						meta: {
 							title: "Patron",
 						},
@@ -1265,7 +1265,7 @@ const routes = [
 	// DEMO ENCOUNTER
 	{
 		path: "/demo",
-		component: () => import("src/layouts/demo"),
+		component: () => import("src/layouts/demo.vue"),
 		children: [
 			{
 				path: "",
@@ -1308,7 +1308,7 @@ const routes = [
 	// CONTRIBUTE
 	{
 		path: "/contribute",
-		component: () => import("src/layouts/contribute"),
+		component: () => import("src/layouts/contribute.vue"),
 		meta: {
 			requiresAuth: true,
 			title: "Contribute",
@@ -1317,7 +1317,7 @@ const routes = [
 			{
 				path: "",
 				name: "Contribute",
-				component: () => import("src/views/Contribute"),
+				component: () => import("src/views/Contribute.vue"),
 			},
 			{
 				path: "spells",
@@ -1349,7 +1349,7 @@ const routes = [
 							{
 								path: "",
 								name: "Spell contribute",
-								component: () => import("src/components/contribute/spell"),
+								component: () => import("src/components/contribute/spell.vue"),
 							},
 							{
 								path: "edit",
@@ -1393,7 +1393,7 @@ const routes = [
 	},
 	{
 		path: "/about-us",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			offline: true,
 			title: "About us",
@@ -1402,7 +1402,7 @@ const routes = [
 			{
 				path: "",
 				name: "About us",
-				component: () => import("src/views/Pages/AboutUs"),
+				component: () => import("src/views/Pages/AboutUs.vue"),
 				meta: {
 					title: "About us",
 					description:
@@ -1423,7 +1423,7 @@ const routes = [
 	},
 	{
 		path: "/support",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			offline: true,
 			title: "Support",
@@ -1432,7 +1432,7 @@ const routes = [
 			{
 				path: "",
 				name: "Support",
-				component: () => import("src/views/Pages/Support"),
+				component: () => import("src/views/Pages/Support.vue"),
 				meta: {
 					title: "Support",
 					description: "Get support with Shieldmaiden issues.",
@@ -1442,7 +1442,7 @@ const routes = [
 	},
 	{
 		path: "/feedback",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			offline: true,
 			title: "Feedback",
@@ -1451,7 +1451,7 @@ const routes = [
 			{
 				path: "",
 				name: "Feedback",
-				component: () => import("src/views/Pages/Feedback"),
+				component: () => import("src/views/Pages/Feedback.vue"),
 				meta: {
 					title: "Feedback",
 					description: "Leave feedback for Shieldmaiden, a Combat Tracker for D&D.",
@@ -1461,7 +1461,7 @@ const routes = [
 	},
 	{
 		path: "/changelog",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			title: "Changelog",
 		},
@@ -1469,7 +1469,7 @@ const routes = [
 			{
 				path: "",
 				name: "Changelog",
-				component: () => import("src/views/Pages/Changelog"),
+				component: () => import("src/views/Pages/Changelog.vue"),
 				meta: {
 					title: "Changelog",
 					description: "Changelog of D&D 5e Combat Tracker Shieldmaiden.",
@@ -1479,7 +1479,7 @@ const routes = [
 	},
 	{
 		path: "/cookies",
-		component: () => import("src/layouts/default"),
+		component: () => import("src/layouts/default.vue"),
 		meta: {
 			title: "Cookies",
 		},
@@ -1487,7 +1487,7 @@ const routes = [
 			{
 				path: "",
 				name: "Cookies",
-				component: () => import("src/views/Pages/Cookies"),
+				component: () => import("src/views/Pages/Cookies.vue"),
 				meta: {
 					title: "Cookies",
 					description: "Cookie information for Shieldmaiden.",
@@ -1537,7 +1537,7 @@ const routes = [
 	{
 		path: "/link-patreon-account",
 		name: "LinkPatreonAccount",
-		component: () => import("src/views/Pages/LinkPatreonAccount"),
+		component: () => import("src/views/Pages/LinkPatreonAccount.vue"),
 		meta: {
 			requiresAuth: true,
 			sidebar: false,
@@ -1616,7 +1616,7 @@ const routes = [
 	{
 		path: "/user/:userid/:campid",
 		name: "Follow campaign",
-		component: () => import("src/components/trackCampaign"),
+		component: () => import("src/components/trackCampaign.vue"),
 		meta: {
 			basePath: "/user",
 			title: "Campaign",
@@ -1649,8 +1649,10 @@ const routes = [
 	{ path: "/monster-creator", redirect: "/tools/monster-creator/create-monster" },
 	{ path: "/encounter-builder", redirect: "/tools/encounter-builder/build-encounter" },
 
+	// Catch-all 404 route - Vue Router 4 syntax
 	{
-		path: "*",
+		path: "/:pathMatch(.*)*",
+		name: "NotFound",
 		component: () => import("src/views/Pages/Error404.vue"),
 	},
 ];

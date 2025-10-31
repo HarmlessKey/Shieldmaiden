@@ -43,11 +43,11 @@
 
 <script>
 import { db } from "./firebase";
-import Header from "./components/header";
+import Header from "./components/header/index.vue";
 import Sidebar from "./components/Sidebar.vue";
 import Drawer from "./components/Drawer.vue";
 import { mapActions, mapGetters } from "vuex";
-import HkRolls from "./components/hk-components/hk-rolls";
+import HkRolls from "./components/hk-components/hk-rolls/index.vue";
 import { general } from "./mixins/general";
 
 import { Cookies } from "quasar";

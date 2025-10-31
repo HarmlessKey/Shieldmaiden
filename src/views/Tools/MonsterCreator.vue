@@ -97,12 +97,11 @@
 		</section>
 
 		<section class="mt-5">
-			<h2>AI monster generation</h2>
-			<em class="d-block mb-3">You can't spell Shieldmaiden without AI</em>
+			<h2>Monster generation</h2>
 			<p>
-				Our AI monster generator will generate monsters from any description you provide.<br />
-				You can either provide a short descriptive prompt and let the AI go wild, or you can give
-				extensive details and be in more control on what kind of monster you get back.
+				Our monster generator will generate monsters from any description you provide.<br />
+				You can either provide a short description, or you can give extensive details and be in more
+				control of what kind of monster you get back.
 			</p>
 			<p>
 				The generated monster is fully operational in our application, with rollable actions and

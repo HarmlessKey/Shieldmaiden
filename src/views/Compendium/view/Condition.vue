@@ -31,6 +31,7 @@
 	import Condition from "src/components/compendium/Condition";
 	import { mapGetters } from 'vuex';
 	import { metaCompendium } from 'src/mixins/metaCompendium';
+	import { eventBus } from 'src/utils/eventBus';
 
 	export default {
 		name: 'ViewCondition',
@@ -66,8 +67,8 @@
 		mounted() {
 			if(this.condition) {
 				this.loading = false;
-				// Root emit with the condition name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.condition.name);
+				// Emit with the condition name, so it can be used in Crumble component
+				eventBus.emit('route-name', this.condition.name);
 			} else {
 				this.not_found = true;
 				this.loading = false;

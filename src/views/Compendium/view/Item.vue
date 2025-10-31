@@ -28,6 +28,7 @@
 	import { mapGetters } from 'vuex';
 	import Item from "src/components/compendium/Item";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
+	import { eventBus } from 'src/utils/eventBus';
 
 	export default {
 		name: "ViewItem",
@@ -62,7 +63,7 @@
 		mounted() {
 			if(this.item) {
 				this.loading = false;
-				this.$root.$emit('route-name', this.item?.name.capitalizeEach())
+				eventBus.emit('route-name', this.item?.name.capitalizeEach())
 			} else {
 				this.not_found = true;
 				this.loading = false;

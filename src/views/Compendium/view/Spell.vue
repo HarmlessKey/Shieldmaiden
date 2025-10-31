@@ -36,6 +36,7 @@
 	import { mapGetters } from "vuex";
 	import Spell from "src/components/compendium/Spell";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
+	import { eventBus } from 'src/utils/eventBus';
 
 	export default {
 		name: "ViewSpell",
@@ -71,8 +72,8 @@
 		mounted() {
 			if(this.spell) {
 				this.loading = false;
-				// Root emit with the spell name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.spell.name);
+				// Emit with the spell name, so it can be used in Crumble component
+				eventBus.emit('route-name', this.spell.name);
 			} else {
 				this.not_found = true;
 				this.loading = false;

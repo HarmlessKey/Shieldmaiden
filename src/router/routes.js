@@ -1041,7 +1041,7 @@ const routes = [
 					{
 						path: "",
 						name: "Patrons",
-						component: () => import("src/views/Admin/Patrons.vue"),
+						component: () => import("src/views/Admin/Patrons/index.vue"),
 					},
 					{
 						path: "new",
@@ -1054,7 +1054,7 @@ const routes = [
 					{
 						path: ":id",
 						name: "Patron",
-						component: () => import("src/views/Admin/Patrons.vue"),
+						component: () => import("src/views/Admin/Patrons/index.vue"),
 						meta: {
 							title: "Patron",
 						},

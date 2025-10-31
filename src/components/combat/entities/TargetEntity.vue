@@ -41,7 +41,9 @@
 				</div>
 				<div class="target-entity__health">
 					<DeathSaves
-						v-if="entity.entityType && entity.curHp === 0 && !entity.stable && !entity.dead"
+						v-if="
+							entity.entityType === 'player' && entity.curHp === 0 && !entity.stable && !entity.dead
+						"
 						:target="entity"
 					/>
 					<HealthBar v-else :entity="entity" />

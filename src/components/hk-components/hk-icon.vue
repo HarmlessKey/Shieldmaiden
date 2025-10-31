@@ -1,5 +1,5 @@
 <template>
-	<i :class="icon" aria-hidden="true" />
+	<i :class="icon" class="hk-icon" aria-hidden="true" />
 </template>
 
 <script>

@@ -7,13 +7,19 @@
 				:out-of-turn="out_of_turn"
 				:small="small"
 			/>
-			<DeathSaves
-				v-if="active_actor.entityType === 'player' && active_actor.curHp === 0"
-				:target="active_actor"
-				show-actions
-			/>
+			<template v-if="active_actor.curHp === 0">
+				<DeathSaves
+					v-if="active_actor.entityType === 'player'"
+					:target="active_actor"
+					show-actions
+				/>
+				<div v-else class="actor__dead">
+					<hk-icon icon="fas fa-skull" />
+					Entity is dead
+				</div>
+			</template>
 			<Manual v-else :actor="active_actor" />
-			<template v-if="active_actor.entityType !== 'player'">
+			<template v-if="active_actor.entityType !== 'player' && active_actor.curHp > 0">
 				<Actions :actor="active_actor" :key="`actions-${active_actor.key}`" />
 				<Spells :actor="active_actor" :key="`spells-${active_actor.key}`" />
 			</template>
@@ -103,7 +109,7 @@ export default {
 		padding: 10px;
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 15px;
 		height: 80px;
 
 		.manual {
@@ -116,6 +122,23 @@ export default {
 		border-bottom-right-radius: $border-radius;
 		padding: 3px 5px;
 		font-weight: bold;
+	}
+	&__dead {
+		font-size: 20px;
+		margin-left: 15px;
+
+		.hk-icon {
+			margin-right: 5px;
+			color: $red;
+		}
+	}
+}
+
+@media only screen and (max-width: $lg-breakpoint) {
+	.actor {
+		&__actions {
+			gap: 10px;
+		}
 	}
 }
 </style>

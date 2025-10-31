@@ -111,7 +111,7 @@ export default {
 		}
 		.modifier {
 			text-align: center;
-			width: 28px;
+			min-width: 28px;
 			background-color: $neutral-5;
 			border-bottom-right-radius: $border-radius;
 			border-top-right-radius: $border-radius;

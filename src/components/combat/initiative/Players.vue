@@ -3,12 +3,10 @@
 		<ul v-if="entities" class="entities">
 			<li v-for="(entity, index) in players" :key="entity.key">
 				<BasicEntity :entity="entity" :size="48" :padding="8">
-					<div>
+					<div class="hit-points">
 						{{ entity.curHp }} / {{ entity.maxHp }}
 						<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
 					</div>
-				</BasicEntity>
-				<div class="actions">		
 					<button
 						class="btn btn-sm bg-neutral-9"
 						tabindex="-1"
@@ -18,23 +16,23 @@
 					>
 						<i aria-hidden="true" class="fas fa-pencil" />
 					</button>
-				</div>
-				<hk-input
-					dense
-					type="number"
-					class="player-initiative"
-					v-model="entity.initiative"
-					min="0"
-					max="99"
-					name="playerInit"
-					placeholder="0"
-					:autofocus="index === 0"
-					:class="{
-						'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
-					}"
-					@input="setInitiative(entity.key, entity.initiative)"
-					@focus="$event.target.select()"
-				/>
+					<hk-input
+						dense
+						type="number"
+						class="player-initiative"
+						v-model="entity.initiative"
+						min="0"
+						max="99"
+						name="playerInit"
+						placeholder="0"
+						:autofocus="index === 0"
+						:class="{
+							'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
+						}"
+						@input="setInitiative(entity.key, entity.initiative)"
+						@focus="$event.target.select()"
+					/>
+				</BasicEntity>
 			</li>
 			<TutorialPopover
 				v-if="demo"
@@ -91,7 +89,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.initiative-input {
-	width: 90px;
+.hit-points {
+	white-space: nowrap;
+	margin: 0 5px;
+}
+.player-initiative {
+	min-width: 60px;
+
+	::v-deep {
+		.q-field__control input {
+			padding: 0;
+			text-align: center;
+		}
+	}
 }
 </style>

@@ -22,8 +22,7 @@
 							color="neutral-9"
 							class="bg-neutral-5"
 							:value="percentage(entity[type.name], type.name)"
-						>
-						</q-linear-progress>
+						/>
 					</li>
 				</ul>
 			</div>

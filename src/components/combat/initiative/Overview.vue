@@ -28,47 +28,58 @@
 				@keydown.h="set_hidden({ key: entity.key, hidden: !entity.hidden })"
 				@keydown.a="set_active({ key: entity.key, active: false })"
 			>
-				<BasicEntity :entity="entity" :size="48" :padding="8" />
-				<strong class="set-initiative">{{ entity.initiative }}</strong>
-				<div class="actions">
-					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
-					<button
-						v-if="!entity.reminders.surprised"
-						class="btn btn-sm bg-neutral-8"
-						@click="setSurprised(entity.key, true)"
-					>
-						<i aria-hidden="true" class="hki-surprised"></i>
-						<q-tooltip anchor="top middle" self="center middle">Set surprised <hk-show-keybind :binds="['s']" /></q-tooltip>
-					</button>
-					<button v-else class="btn btn-sm bg-neutral-8" @click="setSurprised(entity.key, false)">
-						<i aria-hidden="true" class="hki-surprised"></i>
-						<q-tooltip anchor="top middle" self="center middle">Remove surprised <hk-show-keybind :binds="['s']" /></q-tooltip>
-					</button>
-					<!-- Hide / Unhide Entity -->
-					<button
-						v-if="!entity.hidden"
-						class="btn btn-sm bg-neutral-8"
-						@click="set_hidden({ key: entity.key, hidden: true })"
-					>
-						<i aria-hidden="true" class="fas fa-eye-slash"></i>
-						<q-tooltip anchor="top middle" self="center middle">Hide <hk-show-keybind :binds="['h']" /></q-tooltip>
-					</button>
-					<button
-						v-else
-						class="btn btn-sm bg-neutral-8"
-						@click="set_hidden({ key: entity.key, hidden: false })"
-					>
-						<i aria-hidden="true" class="fas fa-eye"></i>
-						<q-tooltip anchor="top middle" self="center middle">Unhide <hk-show-keybind :binds="['h']" /></q-tooltip>
-					</button>
-					<button
-						class="btn btn-sm bg-neutral-8"
-						@click="set_active({ key: entity.key, active: false })"
-					>
-						<i aria-hidden="true" class="fas fa-minus"></i>
-						<q-tooltip anchor="top middle" self="center middle">Set inactive <hk-show-keybind :binds="['a']" /></q-tooltip>
-					</button>
-				</div>
+				<BasicEntity :entity="entity" :size="48" :padding="8">
+					<strong class="set-initiative">{{ entity.initiative }}</strong>
+					<div class="actions">
+						<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
+						<button
+							v-if="!entity.reminders.surprised"
+							class="btn btn-sm bg-neutral-8"
+							@click="setSurprised(entity.key, true)"
+						>
+							<i aria-hidden="true" class="hki-surprised"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Set surprised <hk-show-keybind :binds="['s']"
+							/></q-tooltip>
+						</button>
+						<button v-else class="btn btn-sm bg-neutral-8" @click="setSurprised(entity.key, false)">
+							<i aria-hidden="true" class="hki-surprised"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Remove surprised <hk-show-keybind :binds="['s']"
+							/></q-tooltip>
+						</button>
+						<!-- Hide / Unhide Entity -->
+						<button
+							v-if="!entity.hidden"
+							class="btn btn-sm bg-neutral-8"
+							@click="set_hidden({ key: entity.key, hidden: true })"
+						>
+							<i aria-hidden="true" class="fas fa-eye-slash"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Hide <hk-show-keybind :binds="['h']"
+							/></q-tooltip>
+						</button>
+						<button
+							v-else
+							class="btn btn-sm bg-neutral-8"
+							@click="set_hidden({ key: entity.key, hidden: false })"
+						>
+							<i aria-hidden="true" class="fas fa-eye"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Unhide <hk-show-keybind :binds="['h']"
+							/></q-tooltip>
+						</button>
+						<button
+							class="btn btn-sm bg-neutral-8"
+							@click="set_active({ key: entity.key, active: false })"
+						>
+							<i aria-hidden="true" class="fas fa-minus"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Set inactive <hk-show-keybind :binds="['a']"
+							/></q-tooltip>
+						</button>
+					</div>
+				</BasicEntity>
 			</li>
 		</ul>
 
@@ -84,7 +95,10 @@
 				<BasicEntity :entity="entity" :size="48" :padding="8" />
 				<strong class="set-initiative">{{ entity.initiative }}</strong>
 				<div class="actions">
-					<button class="btn btn-sm bg-neutral-8" @click="set_active({ key: entity.key, active: true })">
+					<button
+						class="btn btn-sm bg-neutral-8"
+						@click="set_active({ key: entity.key, active: true })"
+					>
 						<i aria-hidden="true" class="fas fa-plus"></i>
 						<q-tooltip anchor="top middle" self="center middle"> Set active [a] </q-tooltip>
 					</button>
@@ -134,10 +148,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	.set-initiative {
-		font-weight: bold;
-		font-size: 20px;
-		color: $neutral-1;
-		margin-right: 8px;
-	}
+.set-initiative {
+	font-weight: bold;
+	font-size: 20px;
+	color: $neutral-1;
+	margin-right: 8px;
+}
 </style>

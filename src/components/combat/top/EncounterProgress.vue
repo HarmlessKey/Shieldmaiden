@@ -12,7 +12,7 @@
 			color="neutral-6"
 			track-color="neutral-5"
 			rounded
-		>	
+		>
 			<template v-if="encounter.round > 0">
 				<div class="turn">
 					<template v-if="encounter.round > 1 && encounter.turn === 0"> Top of the Round </template>
@@ -20,9 +20,7 @@
 				</div>
 				<hk-timer class="timer" :value="timer || 0" :key="encounter.turn" />
 			</template>
-			<div v-else class="turn set-initiative">
-				Set initiative
-			</div>
+			<div v-else class="turn set-initiative">Set initiative</div>
 		</q-linear-progress>
 		<template v-if="encounter.round > 0">
 			<button
@@ -64,10 +62,12 @@
 			@shortkey="startEncounter()"
 		>
 			Start
-			<span class="ml-1 d-none d-md-inline">
+			<span class="ml-1 d-none d-xl-inline">
 				encounter <i aria-hidden="true" class="fas fa-arrow-right ml-1" />
 			</span>
-			<q-tooltip anchor="top middle" self="center middle">Start <hk-show-keybind :binds="['shift', '→']" /></q-tooltip>
+			<q-tooltip anchor="top middle" self="center middle"
+				>Start <hk-show-keybind :binds="['shift', '→']"
+			/></q-tooltip>
 
 			<TutorialPopover v-if="demo" tutorial="initiative" step="start" :offset="[0, 10]" />
 		</button>

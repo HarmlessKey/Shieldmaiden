@@ -8,10 +8,7 @@
 		}"
 		@shortkey="cyclePanes"
 	>
-		<Top 
-			:_active="_active"
-			:next="_active[0]"
-		/>
+		<Top :_active="_active" :next="_active[0]" />
 		<div
 			ref="players"
 			tabindex="0"
@@ -58,11 +55,7 @@
 				v-on:scroll="shadow()"
 				ref="scrollNPC"
 			>
-				<NPCs
-					ref="NPCList"
-					:npcs="_npcs" 
-					class="p-3"
-					@select="npcs_selected = $event" />
+				<NPCs ref="NPCList" :npcs="_npcs" class="p-3" @select="npcs_selected = $event" />
 			</q-scroll-area>
 		</div>
 		<div
@@ -282,7 +275,7 @@ export default {
 			} else {
 				this.$refs.NPCList.rollAll(e);
 			}
-		}
+		},
 	},
 };
 </script>
@@ -302,6 +295,12 @@ export default {
 
 	.q-scrollarea {
 		height: calc(100% - 45px);
+
+		&::v-deep {
+			.q-scrollarea__content {
+				position: unset;
+			}
+		}
 	}
 
 	h2 {
@@ -342,17 +341,11 @@ export default {
 			margin-top: 0;
 
 			li {
-				display: flex;
-				align-items: center;
 				padding: 8px 8px 8px 0;
 				background: $neutral-5;
 				border-radius: $border-radius-small;
 				margin-bottom: 5px;
-				gap: 8px;
-				
-				.entity-name {
-					flex-grow: 1;
-				}
+
 				.actions {
 					align-items: center;
 					padding: 0;
@@ -378,10 +371,10 @@ export default {
 @media only screen and (max-width: 900px) {
 	#container {
 		grid-template-columns: auto;
-		grid-template-rows: 60px 1fr 1fr 1fr;
+		grid-template-rows: 38px 1fr 1fr 1fr;
 		grid-gap: 10px;
 		grid-template-areas:
-			"turns"
+			"top"
 			"players"
 			"npcs"
 			"set";

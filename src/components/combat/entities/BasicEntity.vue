@@ -7,9 +7,10 @@
 					backgroundColor: entity.color_label ? entity.color_label : ``,
 					minWidth: label_width,
 					minHeight: label_height,
-				}" />
+				}"
+			/>
 			<Avatar :entity="entity" :size="size" />
-			<slot name="name">		
+			<slot name="name">
 				<Name class="basic-entity__name" :entity="entity" />
 			</slot>
 			<slot />
@@ -39,7 +40,7 @@ export default {
 		padding: {
 			type: Number,
 			default: 0,
-		}
+		},
 	},
 	computed: {
 		label_width() {
@@ -47,8 +48,8 @@ export default {
 		},
 		label_height() {
 			return `${this.padding + 12}px`;
-		}
-	}
+		},
+	},
 };
 </script>
 
@@ -63,6 +64,7 @@ export default {
 	&__wrapper {
 		border-radius: $border-radius-small;
 		width: 100%;
+		min-width: 0;
 	}
 
 	.target-avatar {

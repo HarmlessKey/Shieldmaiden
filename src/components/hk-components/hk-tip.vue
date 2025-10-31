@@ -23,25 +23,23 @@
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-	name: 'hk-tip',
+	name: "hk-tip",
 	props: {
 		value: {
 			type: String,
-			required: true
+			required: true,
 		},
 		title: {
 			type: String,
-			default: undefined
+			default: undefined,
 		},
 		content: {
 			type: String,
-			default: undefined
-		}
+			default: undefined,
+		},
 	},
 	computed: {
-		...mapGetters([
-			"get_tip"
-		]),
+		...mapGetters(["get_tip"]),
 		hasContent() {
 			return !!this.$slots.content || !!this.$scopedSlots.content || !!this.content;
 		},
@@ -50,58 +48,56 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions([
-			"set_tip"
-		]),
+		...mapActions(["set_tip"]),
 		closeTip() {
 			this.set_tip(this.value);
 			this.$forceUpdate();
-		}
-	}
-}
+		},
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.tip {
+.tip {
+	display: flex;
+	justify-content: space-between;
+	border: solid 1px $yellow;
+	border-left-width: 8px;
+	padding: 5px;
+	background-color: rgba(0, 0, 0, 0.2);
+	margin-bottom: 20px;
+
+	&__icon {
+		padding-right: 8px;
+		color: $yellow;
+	}
+	&__middle {
 		display: flex;
-		justify-content: space-between;
-    border:solid 1px $yellow;
-		border-left-width: 8px;
-		padding: 5px;
-		background-color: rgba(0, 0, 0, .2);
-		margin-bottom: 20px;
+		flex-wrap: wrap;
+		flex: 1;
+	}
+	&__title {
+		font-weight: bold;
+	}
+	&__close {
+		padding-left: 8px;
+		color: $neutral-3;
+		line-height: 10px;
 
-		&__icon {
-			padding-right: 8px;
-			color: $yellow;
-		}
-		&__middle {
-			display: flex;
-			flex-wrap: wrap;
-			flex: 1;
-		}
-		&__title {
-			font-weight: bold;
-		}
-		&__close {
-			padding-left: 8px;
-			color: $neutral-3;
-			line-height: 10px;
-
-			&:hover {
-				color: $neutral-1;
-			}
+		&:hover {
+			color: $neutral-1;
 		}
 	}
+}
 
-	[data-theme="light"] .tip {
-		border-color: $yellow-light;
+[data-theme="light"] .tip {
+	border-color: $yellow-light;
 
-		&__icon {
-			color: $neutral-2;
-		}
-		.green {
-			color: $green-light !important;
-		}
+	&__icon {
+		color: $neutral-2;
 	}
+	.green {
+		color: $green-light !important;
+	}
+}
 </style>

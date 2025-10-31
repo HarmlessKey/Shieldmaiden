@@ -19,48 +19,49 @@
 					>
 						<Name :entity="entity" />
 					</q-checkbox>
-				</BasicEntity>
-
-				<div class="actions">
-					<button
-						class="btn btn-sm bg-neutral-9"
-						tabindex="-1"
-						@click="setDrawer({ show: true, type: 'combat/entities/Card/index', data: { entity } })"
-					>
-						<i aria-hidden="true" class="fas fa-info"></i>
-						<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
-					</button>
-				</div>
-				<hk-input
-					v-model="entity.initiative"
-					dense
-					type="number"
-					min="0"
-					max="99"
-					name="npcInit"
-					class="initiative-input"
-					@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
-					placeholder="0"
-					@keydown.enter="$refs?.[i]?.[0]?.$el?.click()"
-				>
-					<template v-slot:append>
-						<hk-roll
-							:ref="i"
-							:tooltip="`1d20 + ${calcMod(entity.dexterity)}`"
-							@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
+					<div class="actions">
+						<button
+							class="btn btn-sm bg-neutral-9"
+							tabindex="-1"
+							@click="
+								setDrawer({ show: true, type: 'combat/entities/Card/index', data: { entity } })
+							"
 						>
-							<button
-								class="pointer"
-								tabindex="-1"
-								:class="{
-									'step-highlight': demo && follow_tutorial && get_step('initiative', 'monsters'),
-								}"
+							<i aria-hidden="true" class="fas fa-info"></i>
+							<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
+						</button>
+					</div>
+					<hk-input
+						v-model="entity.initiative"
+						dense
+						type="number"
+						min="0"
+						max="99"
+						name="npcInit"
+						class="initiative-input"
+						@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
+						placeholder="0"
+						@keydown.enter="$refs?.[i]?.[0]?.$el?.click()"
+					>
+						<template v-slot:append>
+							<hk-roll
+								:ref="i"
+								:tooltip="`1d20 + ${calcMod(entity.dexterity)}`"
+								@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
 							>
-								<q-icon size="small" name="fas fa-dice-d20" />
-							</button>
-						</hk-roll>
-					</template>
-				</hk-input>
+								<button
+									class="pointer"
+									tabindex="-1"
+									:class="{
+										'step-highlight': demo && follow_tutorial && get_step('initiative', 'monsters'),
+									}"
+								>
+									<q-icon size="small" name="fas fa-dice-d20" />
+								</button>
+							</hk-roll>
+						</template>
+					</hk-input>
+				</BasicEntity>
 			</li>
 			<TutorialPopover
 				v-if="demo"
@@ -109,8 +110,8 @@ export default {
 			set(newVal) {
 				this.$emit("select", newVal.length);
 				this.selectedSetter = newVal;
-			}
-		}
+			},
+		},
 	},
 	methods: {
 		...mapActions(["setDrawer", "set_initiative"]),
@@ -182,8 +183,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep {
+	.q-checkbox {
+		min-width: 0;
+		margin-right: 5px;
+
+		&__label {
+			min-width: 0;
+		}
+	}
+}
 .initiative-input {
-	width: 90px;
+	min-width: 90px;
 }
 .advantage .btn:hover {
 	background-color: $green;

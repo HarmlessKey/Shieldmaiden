@@ -19,11 +19,12 @@ export default configure(function (/* ctx */) {
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
       'global-mixins', // Global helper methods (numeral, etc.)
+      'notify-wrapper', // Quasar Notify wrapper for $snotify compatibility
       { path: 'plugins', server: false },
       { path: 'hk-components', server: false },
       { path: 'vee-validate', server: false },
       { path: 'firebase-auth', server: false },
-      // Note: vue-shortkey and vue-snotify removed - need alternatives
+      // Note: vue-shortkey removed - need alternative
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css

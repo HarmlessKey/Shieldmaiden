@@ -77,7 +77,7 @@ const routes = [
 					{
 						path: "",
 						name: "Import content",
-						component: () => import("src/views/UserContent/ImportContent.vue"),
+						component: () => import("src/views/UserContent/ImportContent/index.vue"),
 						meta: {
 							description: "Import content to Shieldmaiden",
 							title: "Import Shieldmaiden Content",
@@ -134,7 +134,7 @@ const routes = [
 					{
 						path: "",
 						name: "Players",
-						component: () => import("src/views/UserContent/Players.vue"),
+						component: () => import("src/views/UserContent/Players/index.vue"),
 						meta: {
 							description: "Your players Shieldmaiden.",
 							title: "Players",
@@ -176,7 +176,7 @@ const routes = [
 					{
 						path: "",
 						name: "CharacterBuilder",
-						component: () => import("src/views/UserContent/CharacterBuilder.vue"),
+						component: () => import("src/views/UserContent/CharacterBuilder/index.vue"),
 						meta: {
 							description: "Your Characters on Shieldmaiden.",
 							title: "Character builder",
@@ -239,7 +239,7 @@ const routes = [
 								path: "class",
 								name: "EditClass",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/class.vue"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/class/index.vue"),
 								meta: {
 									title: "Class",
 									description: "Edit your character's classes",
@@ -261,7 +261,7 @@ const routes = [
 								path: "equipment",
 								name: "EditEquipment",
 								component: () =>
-									import("src/views/UserContent/CharacterBuilder/EditCharacter/equipment.vue"),
+									import("src/views/UserContent/CharacterBuilder/EditCharacter/equipment/index.vue"),
 								meta: {
 									title: "Equipment",
 									description: "Edit your character's equipment",
@@ -411,7 +411,7 @@ const routes = [
 					{
 						path: "",
 						name: "Reminders",
-						component: () => import("src/views/UserContent/Reminders.vue"),
+						component: () => import("src/views/UserContent/Reminders/index.vue"),
 						meta: {
 							title: "Reminders",
 							description: "Your custom reminders Shieldmaiden.",
@@ -495,7 +495,7 @@ const routes = [
 					{
 						path: "",
 						name: "Characters",
-						component: () => import("src/views/UserContent/Characters.vue"),
+						component: () => import("src/views/UserContent/Characters/index.vue"),
 						meta: {
 							title: "Characters",
 							description: "Your player characters on Shieldmaiden.",
@@ -605,7 +605,7 @@ const routes = [
 			{
 				path: "",
 				name: "Tools",
-				component: () => import("src/views/Tools.vue"),
+				component: () => import("src/views/Tools/index.vue"),
 				meta: {
 					title: "D&D Tools - Online tools for D&D 5e",
 					description:
@@ -648,7 +648,7 @@ const routes = [
 					{
 						path: "build-encounter",
 						name: "ToolsBuildEncounter",
-						component: () => import("src/components/encounters.vue"),
+						component: () => import("src/components/encounters/index.vue"),
 						meta: {
 							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 							description:
@@ -796,7 +796,7 @@ const routes = [
 			{
 				path: "",
 				name: "Compendium",
-				component: () => import("src/views/Compendium.vue"),
+				component: () => import("src/views/Compendium/index.vue"),
 				meta: {
 					title: "Dungeons & Dragons Compendium - D&D 5e knowledge database",
 					description:
@@ -999,7 +999,7 @@ const routes = [
 			{
 				path: "",
 				name: "Admin",
-				component: () => import("src/views/Admin.vue"),
+				component: () => import("src/views/Admin/index.vue"),
 			},
 			{
 				path: "users",
@@ -1317,7 +1317,7 @@ const routes = [
 			{
 				path: "",
 				name: "Contribute",
-				component: () => import("src/views/Contribute.vue"),
+				component: () => import("src/views/Contribute/index.vue"),
 			},
 			{
 				path: "spells",
@@ -1349,7 +1349,7 @@ const routes = [
 							{
 								path: "",
 								name: "Spell contribute",
-								component: () => import("src/components/contribute/spell.vue"),
+								component: () => import("src/components/contribute/spell/index.vue"),
 							},
 							{
 								path: "edit",
@@ -1616,7 +1616,7 @@ const routes = [
 	{
 		path: "/user/:userid/:campid",
 		name: "Follow campaign",
-		component: () => import("src/components/trackCampaign.vue"),
+		component: () => import("src/components/trackCampaign/index.vue"),
 		meta: {
 			basePath: "/user",
 			title: "Campaign",

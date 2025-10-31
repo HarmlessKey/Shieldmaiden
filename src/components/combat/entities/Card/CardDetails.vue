@@ -85,7 +85,7 @@
 						:roll="{
 							d: 20,
 							n: 1,
-							m: skillModifier(skills[skill].ability, skill),
+							m: skillModifier(skills[skill]),
 							title: `${skill} check`,
 							entity_name: full_entity.name.capitalizeEach(),
 							notify: true,
@@ -100,7 +100,7 @@
 						"
 					>
 						<span class="skill">
-							{{ skill }} {{ skillModifier(skills[skill].ability, skill)
+							{{ skill }} {{ skillModifier(skills[skill])
 							}}<span class="mr-2" v-if="idx < full_entity.skills.length - 1">,</span>
 						</span>
 					</hk-roll>
@@ -243,20 +243,22 @@ export default {
 			return type === "mod" ? calc_mod(this.full_entity[ability] || 10) : this.savingThrow(ability);
 		},
 		passivePerception() {
-			return 10 + parseInt(this.skillModifier("wisdom", "perception"));
+			return 10 + parseInt(this.skillModifier({ ability: "wisdom", value: "perception" }));
 		},
-		skillModifier(skill, key) {
+		skillModifier(skill) {
 			const ability_mod = this.calcMod(this.full_entity[skill.ability]);
-			const proficiency = this.returnProficiency(
-				this.entity.level ? this.entity.level : this.calculatedLevel(this.entity.experience)
-			);
+			const proficiency = this.entity.npc
+				? this.entity.proficiency
+				: this.returnProficiency(
+						this.entity.level ? this.entity.level : this.calculatedLevel(this.entity.experience)
+					);
 			const bonus =
-				this.entity.skill_modifiers && this.entity.skill_modifiers[skill]
-					? this.entity.skill_modifiers[skill]
+				this.entity.skill_modifiers && this.entity.skill_modifiers[skill.value]
+					? this.entity.skill_modifiers[skill.value]
 					: 0;
-			const proficient = this.entity.skills ? this.entity.skills.includes(key) : false;
+			const proficient = this.entity.skills ? this.entity.skills.includes(skill.value) : false;
 			const expertise = this.entity.skills_expertise
-				? this.entity.skills_expertise.includes(key)
+				? this.entity.skills_expertise.includes(skill.value)
 				: false;
 
 			const jack_oa_trades = this.entity.skills_jack_of_all_trades;

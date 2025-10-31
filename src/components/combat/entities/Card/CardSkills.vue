@@ -6,7 +6,7 @@
 			:roll="{
 				d: 20,
 				n: 1,
-				m: skillModifier(skill, key),
+				m: skillModifier(skill),
 				title: `${skill.skill} check`,
 				entity_name: entity.name.capitalizeEach(),
 				notify: true,
@@ -35,7 +35,7 @@
 				<span class="truncate">
 					{{ skill.skill }}
 				</span>
-				<span class="modifier">{{ skillModifier(skill, key) }}</span>
+				<span class="modifier">{{ skillModifier(skill) }}</span>
 			</span>
 		</hk-roll>
 	</div>

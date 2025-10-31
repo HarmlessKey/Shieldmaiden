@@ -56,7 +56,7 @@
 
 							<!-- LIFETIME SUPPORT -->
 							<span slot="lifetime_support" slot-scope="data">
-									{{ data.item / 100 | numeral('$0,0') }}
+									{{ $numeral(data.item / 100, '$0,0') }}
 							</span>
 
 							<!-- LOADER -->

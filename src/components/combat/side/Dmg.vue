@@ -21,10 +21,10 @@
 								</span>
 								<b class="numbers">
 									<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
-									<template v-else>{{ entity[type.name] | numeral("0.0a") }}</template>
+									<template v-else>{{ $numeral(entity[type.name], "0.0a") }}</template>
 									<template v-if="entity[type.over]">
 										(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
-										<template v-else>{{ entity[type.over] | numeral("0.0a") }} </template>
+										<template v-else>{{ $numeral(entity[type.over], "0.0a") }} </template>
 										<small>over</small>)
 									</template>
 								</b>

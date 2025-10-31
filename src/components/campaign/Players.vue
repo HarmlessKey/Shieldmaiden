@@ -17,7 +17,7 @@
 				<template v-if="currency">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
-							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral("0.0a") }} </template>
+							<template v-if="key === 'pp' && coin >= 1000">{{ $numeral(coin, "0.0a") }} </template>
 							<template v-else>{{ coin }} </template>
 							<img
 								:src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)"

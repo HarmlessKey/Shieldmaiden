@@ -96,7 +96,7 @@
 							<label class="d-block mb-3">Spell slots</label>
 							<div class="slots">
 								<div v-for="level in 9" :key="`level-${level}`" class="slot">
-									<div class="level">{{ level | numeral("Oo") }}</div>
+									<div class="level">{{ $numeral(level, "Oo") }}</div>
 									<div class="handling">
 										<div
 											class="up"
@@ -164,7 +164,7 @@
 									</q-item-section>
 									<q-item-section v-else avatar class="neutral-2">
 										<template v-if="spell.level > 0">
-											{{ spell.level | numeral("Oo") }}
+											{{ $numeral(spell.level, "Oo") }}
 										</template>
 										<template v-else> Cant </template>
 									</q-item-section>

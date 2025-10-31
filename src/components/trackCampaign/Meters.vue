@@ -43,11 +43,11 @@
 												'green' : type == 'healing'
 											}">
 												<template v-if="entity.meters[subtype] < 10000">{{ entity.meters[subtype] }}</template>
-												<template v-else>{{ entity.meters[subtype] | numeral('0.0a') }}</template>
+												<template v-else>{{ $numeral(entity.meters[subtype], '0.0a') }}</template>
 											</span>
-											<template v-if="entity.meters[over]"> 
+											<template v-if="entity.meters[over]">
 												(<template v-if="entity.meters[over] < 10000">{{ entity.meters[over] }} </template>
-												<template v-else>{{ entity.meters[over] | numeral('0.0a') }} </template> 
+												<template v-else>{{ $numeral(entity.meters[over], '0.0a') }} </template>
 												<small>over</small>)</template>
 										</span>
 									</div>

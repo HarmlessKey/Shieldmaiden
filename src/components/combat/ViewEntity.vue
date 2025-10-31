@@ -188,7 +188,7 @@
 				/></template>
 				<template v-if="entity.challenge_rating">
 					<strong>Challenge Rating</strong> {{ entity.challenge_rating }} ({{
-						monster_challenge_rating[entity.challenge_rating].xp | numeral("0,0")
+						$numeral(monster_challenge_rating[entity.challenge_rating].xp, "0,0")
 					}}
 					XP)<br />
 				</template>
@@ -244,7 +244,7 @@
 		<template v-if="entity.caster_ability">
 			<p v-if="!is_current">
 				<strong><em> Spellcasting </em></strong>
-				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral("Oo") }}-level
+				The {{ entity.name.capitalizeEach() }} is a {{ $numeral(entity.caster_level, "Oo") }}-level
 				spellcaster. its spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
 				save DC {{ entity.caster_save_dc }},
 				{{
@@ -284,7 +284,7 @@
 					<div :key="`spell-${level}`">
 						<template v-if="level === 0"> Cantrips (at will): </template>
 						<template v-else>
-							{{ level | numeral("Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
+							{{ $numeral(level, "Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
 						</template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>

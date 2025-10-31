@@ -18,6 +18,7 @@ export default configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
+      'global-mixins', // Global helper methods (numeral, etc.)
       { path: 'plugins', server: false },
       { path: 'hk-components', server: false },
       { path: 'vee-validate', server: false },

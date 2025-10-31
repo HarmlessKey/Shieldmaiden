@@ -69,7 +69,7 @@
 							{{ tab === "caster" ? "Cantrips" : "At will" }}
 						</div>
 						<div v-else-if="tab === 'caster'" class="spell-level">
-							{{ level | numeral("Oo") }} level
+							{{ $numeral(level, "Oo") }} level
 							<div class="slots">
 								<span
 									v-for="i in entity[`${tab}_spell_slots`][level]"

@@ -16,8 +16,7 @@
 								<li>
 									<span>Entitled Amount:</span>
 									<span>{{
-										(notification.attributes.currently_entitled_amount_cents / 100)
-											| numeral("$0,0")
+										$numeral(notification.attributes.currently_entitled_amount_cents / 100, "$0,0")
 									}}</span>
 								</li>
 								<li>
@@ -40,7 +39,7 @@
 								<li>
 									<span>Lifetime support:</span>
 									<span>{{
-										(notification.attributes.lifetime_support_cents / 100) | numeral("$0,0")
+										$numeral(notification.attributes.lifetime_support_cents / 100, "$0,0")
 									}}</span>
 								</li>
 								<li>
@@ -59,7 +58,7 @@
 								<li>
 									<span>Will pay:</span>
 									<span>{{
-										(notification.attributes.will_pay_amount_cents / 100) | numeral("$0,0")
+										$numeral(notification.attributes.will_pay_amount_cents / 100, "$0,0")
 									}}</span>
 								</li>
 								<li>
@@ -112,10 +111,10 @@
 						>
 							Upgrade:
 							<b>{{
-								(notification.attributes.currently_entitled_amount_cents / 100) | numeral("$0,0")
+								$numeral(notification.attributes.currently_entitled_amount_cents / 100, "$0,0")
 							}}</b>
 							->
-							<b>{{ (notification.attributes.will_pay_amount_cents / 100) | numeral("$0,0") }}</b>
+							<b>{{ $numeral(notification.attributes.will_pay_amount_cents / 100, "$0,0") }}</b>
 						</div>
 						<div
 							v-if="
@@ -128,10 +127,10 @@
 						>
 							Downgrade:
 							<b>{{
-								(notification.attributes.currently_entitled_amount_cents / 100) | numeral("$0,0")
+								$numeral(notification.attributes.currently_entitled_amount_cents / 100, "$0,0")
 							}}</b>
 							->
-							<b>{{ (notification.attributes.will_pay_amount_cents / 100) | numeral("$0,0") }}</b>
+							<b>{{ $numeral(notification.attributes.will_pay_amount_cents / 100, "$0,0") }}</b>
 						</div>
 					</div>
 				</li>

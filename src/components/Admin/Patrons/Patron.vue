@@ -63,7 +63,7 @@
 					Lifetime support
 				</div>
 				<div class="col">
-					{{ patron.lifetime_support  / 100 | numeral('$0,0') }}
+					{{ $numeral(patron.lifetime_support  / 100, '$0,0') }}
 				</div>
 			</div>
 

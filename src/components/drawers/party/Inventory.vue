@@ -8,7 +8,7 @@
 			<div class="money" v-if="currency" @click="addCurrency = !addCurrency">
 				<template v-for="(coin, key) in copperToPretty(currency)">
 					<div v-if="coin" :key="key">
-						<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral("0.0a") }} </template>
+						<template v-if="key === 'pp' && coin >= 1000">{{ $numeral(coin, "0.0a") }} </template>
 						<template v-else>{{ coin }} </template>
 						<img :src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
 					</div>

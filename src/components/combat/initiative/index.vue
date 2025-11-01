@@ -2,11 +2,6 @@
 	<div
 		v-if="width > 576"
 		id="container"
-		v-shortkey="{
-			left: [','],
-			right: ['.'],
-		}"
-		@shortkey="cyclePanes"
 	>
 		<Turns :next="_active[0]" />
 		<div
@@ -144,6 +139,7 @@
 <script>
 import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 
 import Turns from "src/components/combat/Turns.vue";
 import Players from "./Players.vue";
@@ -188,6 +184,7 @@ export default {
 					icon: "fas fa-list-ul",
 				},
 			],
+			keyCleanups: [],
 		};
 	},
 	computed: {
@@ -212,13 +209,35 @@ export default {
 				.value();
 		},
 	},
+	mounted() {
+		// Comma (,) to cycle left through panes
+		this.keyCleanups.push(
+			onKeyStroke(",", (e) => {
+				if (this.width <= 576) return;
+				e.preventDefault();
+				this.cyclePanes("left");
+			})
+		);
+
+		// Period (.) to cycle right through panes
+		this.keyCleanups.push(
+			onKeyStroke(".", (e) => {
+				if (this.width <= 576) return;
+				e.preventDefault();
+				this.cyclePanes("right");
+			})
+		);
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		this.keyCleanups.forEach((cleanup) => cleanup());
+	},
 	methods: {
 		...mapActions(["set_turn"]),
-		cyclePanes(e) {
-			const key = e.srcKey;
+		cyclePanes(direction) {
 			const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;
 			let index;
-			if (key === "right") {
+			if (direction === "right") {
 				index = current < this.panes.length - 1 ? current + 1 : 0;
 			} else {
 				index = current > 0 ? current - 1 : this.panes.length - 1;

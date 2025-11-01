@@ -77,9 +77,7 @@
 				<button
 					class="icon roll"
 					aria-label="Dice roller"
-					v-shortkey="['r']"
 					:tabindex="tabindex"
-					@shortkey="setDrawer({ show: true, type: 'drawers/roll/index' })"
 					@click="setDrawer({ show: true, type: 'drawers/roll/index' })"
 				>
 					<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
@@ -94,6 +92,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 import UserMenu from "./UserMenu.vue";
 
 export default {
@@ -111,6 +110,7 @@ export default {
 		return {
 			environment: process.env.VUE_APP_ENV_NAME,
 			sign_in_dialog: false,
+			keyCleanup: null,
 		};
 	},
 	computed: {
@@ -118,6 +118,23 @@ export default {
 		tabindex() {
 			return this.$route.name === "RunEncounter" ? -1 : 0;
 		},
+	},
+	mounted() {
+		// 'r' to open dice roller
+		this.keyCleanup = onKeyStroke("r", (e) => {
+			// Don't trigger if user is typing in an input
+			if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+				return;
+			}
+			e.preventDefault();
+			this.setDrawer({ show: true, type: "drawers/roll/index" });
+		});
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		if (this.keyCleanup) {
+			this.keyCleanup();
+		}
 	},
 	methods: {
 		...mapActions(["setDrawer", "setSideSmallScreen"]),

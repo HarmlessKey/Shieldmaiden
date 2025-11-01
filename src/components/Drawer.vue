@@ -1,6 +1,6 @@
 <template>
 	<div class="drawer">
-		<a @click="hideDrawer()" v-shortkey="['esc']" @shortkey="hideDrawer()" class="hide">
+		<a @click="hideDrawer()" class="hide">
 			<i aria-hidden="true" class="far fa-chevron-double-right" />
 			<span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
 			<q-tooltip anchor="bottom middle" self="center middle"> Hide [esc] </q-tooltip>
@@ -21,6 +21,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 
 export default {
 	name: "Drawer",
@@ -28,6 +29,7 @@ export default {
 		return {
 			drawer: this.$store.getters.getDrawer,
 			component: null,
+			keyCleanup: null,
 		};
 	},
 	computed: {
@@ -47,6 +49,18 @@ export default {
 			.catch(() => {
 				this.component = () => import("./drawers/Error.vue");
 			});
+
+		// ESC to hide drawer
+		this.keyCleanup = onKeyStroke("Escape", (e) => {
+			e.preventDefault();
+			this.hideDrawer();
+		});
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		if (this.keyCleanup) {
+			this.keyCleanup();
+		}
 	},
 	methods: {
 		...mapActions(["setDrawer"]),

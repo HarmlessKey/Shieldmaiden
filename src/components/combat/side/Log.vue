@@ -85,11 +85,9 @@
 
 					<!-- UNDO -->
 					<div class="undo" v-if="key == 0 && !encounter.finished">
-						<a 
+						<a
 							class="btn btn-sm bg-red"
 							@click="undo(key, item.amount, item.over, item.target, item.by, item.type)"
-							v-shortkey="['ctrl', 'z']" 
-							@shortkey="undo(key, item.amount, item.over, item.target, item.by, item.type)"
 						>
 							Undo
 							<hk-show-keybind :binds="['ctrl', 'z']" />
@@ -106,6 +104,7 @@
 
 <script>
 	import { mapGetters } from 'vuex';
+	import { onKeyStroke } from '@vueuse/core';
 	import { setHP } from 'src/mixins/HpManipulations.js';
 
 	export default {
@@ -118,6 +117,7 @@
 				environment: {
 					key: 'environment',
 				},
+				keyCleanup: null,
 			}
 		},
 		computed: {
@@ -126,6 +126,28 @@
 				'log',
 				'entities',
 			]),
+			latestLogItem() {
+				if (!this.log || Object.keys(this.log).length === 0) {
+					return null;
+				}
+				return this.log[0];
+			}
+		},
+		mounted() {
+			// Ctrl+Z to undo last action
+			this.keyCleanup = onKeyStroke('z', (e) => {
+				if (e.ctrlKey && this.latestLogItem && !this.encounter.finished) {
+					e.preventDefault();
+					const item = this.latestLogItem;
+					this.undo(0, item.amount, item.over, item.target, item.by, item.type);
+				}
+			});
+		},
+		beforeUnmount() {
+			// Cleanup keyboard listeners
+			if (this.keyCleanup) {
+				this.keyCleanup();
+			}
 		},
 		methods: {
 			setLog() {
@@ -139,7 +161,7 @@
 				let doneBy = (by === 'environment') ? this.environment : this.entities[by];
 				let amount = {};
 				amount[type] = value;
-				
+
 				await this.setHP(amount, this.entities[target], doneBy, { undo });
 				this.set_log({
 					action: 'unset',

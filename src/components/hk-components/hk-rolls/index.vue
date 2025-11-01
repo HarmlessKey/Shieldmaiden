@@ -14,9 +14,7 @@
 				class="full-width mb-2 neutral-1"
 				icon="fas fa-times"
 				no-caps
-				v-shortkey="['esc']"
 				tabindex="-1"
-				@shortkey="clearRolls"
 				@click="clearRolls"
 			>
 				Clear all <span class="ml-1 neutral-2">[esc]</span>
@@ -35,12 +33,18 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 import hkSingleRoll from "./hk-single-roll.vue";
 
 export default {
 	name: "hk-rolls",
 	components: {
 		hkSingleRoll,
+	},
+	data() {
+		return {
+			keyCleanup: null,
+		};
 	},
 	computed: {
 		...mapGetters(["action_rolls"]),
@@ -55,6 +59,21 @@ export default {
 			},
 			deep: true,
 		},
+	},
+	mounted() {
+		// ESC to clear all rolls
+		this.keyCleanup = onKeyStroke("Escape", (e) => {
+			if (this.show && this.action_rolls?.length > 1) {
+				e.preventDefault();
+				this.clearRolls();
+			}
+		});
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		if (this.keyCleanup) {
+			this.keyCleanup();
+		}
 	},
 	methods: {
 		clearRolls() {

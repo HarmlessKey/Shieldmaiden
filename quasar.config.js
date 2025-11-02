@@ -24,7 +24,7 @@ export default configure(function (/* ctx */) {
       { path: 'hk-components', server: false },
       { path: 'vee-validate', server: false },
       { path: 'firebase-auth', server: false },
-      // Note: vue-shortkey removed - need alternative
+      // Note: vue-shortkey removed - replaced with @vueuse/core keyboard shortcuts
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css

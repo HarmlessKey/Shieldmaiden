@@ -1,5 +1,5 @@
 <template>
-	<q-no-ssr v-if="!loading && encounter_initialized" v-shortkey="['d']" @shortkey="focusDamage">
+	<q-no-ssr v-if="!loading && encounter_initialized">
 		<div v-if="overencumbered && !demo">
 			<OverEncumbered />
 		</div>
@@ -11,12 +11,6 @@
 					? { background: 'url(\'' + getBackground(encounter) + '\')' }
 					: { background: '' },
 			]"
-			v-shortkey="{
-				left: [','],
-				right: ['.'],
-				clearSnotify: ['esc'],
-			}"
-			@shortkey="cyclePanes"
 		>
 			<template v-if="encounter.finished">
 				<Finished v-if="!demo" :encounter="encounter" />
@@ -134,6 +128,7 @@
 <script>
 import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 import { audio } from "src/mixins/audio";
 import Finished from "src/components/combat/Finished.vue";
 import DemoFinished from "src/components/combat/DemoFinished.vue";
@@ -181,6 +176,7 @@ export default {
 			demo_dialog: false,
 			panes: ["current", "targets", "targeted", "side"],
 			focused_pane: null,
+			keyCleanups: [],
 		};
 	},
 	beforeMount() {
@@ -206,6 +202,51 @@ export default {
 			test: this.test,
 		});
 		this.loading = false;
+
+		// Setup keyboard shortcuts
+		// 'd' to focus damage input
+		this.keyCleanups.push(
+			onKeyStroke("d", (e) => {
+				if (!e.shiftKey && !e.ctrlKey && this.encounter_initialized && !this.loading) {
+					e.preventDefault();
+					this.focusDamage();
+				}
+			})
+		);
+
+		// Comma (,) to cycle left through panes
+		this.keyCleanups.push(
+			onKeyStroke(",", (e) => {
+				if (this.encounter && !this.encounter.finished) {
+					e.preventDefault();
+					this.cyclePanes({ srcKey: "left" });
+				}
+			})
+		);
+
+		// Period (.) to cycle right through panes
+		this.keyCleanups.push(
+			onKeyStroke(".", (e) => {
+				if (this.encounter && !this.encounter.finished) {
+					e.preventDefault();
+					this.cyclePanes({ srcKey: "right" });
+				}
+			})
+		);
+
+		// ESC to clear notifications
+		this.keyCleanups.push(
+			onKeyStroke("Escape", (e) => {
+				if (this.encounter && !this.encounter.finished) {
+					e.preventDefault();
+					this.$snotify.clear();
+				}
+			})
+		);
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		this.keyCleanups.forEach((cleanup) => cleanup());
 	},
 	computed: {
 		...mapGetters([

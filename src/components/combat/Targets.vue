@@ -15,9 +15,7 @@
 				class="btn btn-sm bg-neutral-5"
 				tabindex="-1"
 				:class="{ disabled: test }"
-				v-shortkey="['a']"
 				@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
-				@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
 			>
 				<i aria-hidden="true" class="fas fa-plus green" />
 				<span class="ml-1">
@@ -35,15 +33,7 @@
 			v-on:scroll="shadow()"
 			ref="scroll"
 		>
-			<div
-				v-shortkey="{
-					downSingle: ['arrowdown'],
-					downMultiple: ['shift', 'arrowdown'],
-					upSingle: ['arrowup'],
-					upMultiple: ['shift', 'arrowup'],
-				}"
-				@shortkey="cycle_target"
-			>
+			<div>
 				<template v-for="{ group, targets } in groups">
 					<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
 						<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" />
@@ -95,8 +85,6 @@
 								class="target"
 								v-touch-hold.mouse="(event) => selectTarget(event, 'multi', entity.key)"
 								@click="selectTarget($event, 'single', entity.key)"
-								v-shortkey="[i]"
-								@shortkey="set_targeted({ type: 'single', key: entity.key })"
 							>
 								<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
 							</div>
@@ -160,6 +148,7 @@
 <script>
 import _ from "lodash";
 import { mapGetters, mapActions } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 import TargetItem from "src/components/combat/TargetItem.vue";
 import TargetMenu from "src/components/combat/TargetMenu.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
@@ -173,6 +162,7 @@ export default {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			currentTarget: {},
 			setShadow: 0,
+			keyCleanups: [],
 		};
 	},
 	computed: {
@@ -240,6 +230,48 @@ export default {
 		tutorial_branch() {
 			return this.current.entityType === "player" ? "player" : "monster";
 		},
+	},
+	mounted() {
+		// 'a' to add NPC
+		this.keyCleanups.push(
+			onKeyStroke("a", (e) => {
+				if (!this.test && !e.shiftKey && !e.ctrlKey) {
+					e.preventDefault();
+					this.setDrawer({ show: true, type: "drawers/encounter/AddNpc" });
+				}
+			})
+		);
+
+		// Numeric keys 0-9 to target entities
+		for (let i = 0; i <= 9; i++) {
+			this.keyCleanups.push(
+				onKeyStroke(i.toString(), (e) => {
+					if (!e.shiftKey && !e.ctrlKey && this._targets && this._targets[i]) {
+						e.preventDefault();
+						this.set_targeted({ type: "single", key: this._targets[i].key });
+					}
+				})
+			);
+		}
+
+		// Arrow keys to cycle through targets
+		this.keyCleanups.push(
+			onKeyStroke("ArrowDown", (e) => {
+				e.preventDefault();
+				this.cycle_target({ srcKey: e.shiftKey ? "downMultiple" : "downSingle" });
+			})
+		);
+
+		this.keyCleanups.push(
+			onKeyStroke("ArrowUp", (e) => {
+				e.preventDefault();
+				this.cycle_target({ srcKey: e.shiftKey ? "upMultiple" : "upSingle" });
+			})
+		);
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		this.keyCleanups.forEach((cleanup) => cleanup());
 	},
 	methods: {
 		...mapActions([

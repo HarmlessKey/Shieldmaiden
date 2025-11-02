@@ -33,12 +33,10 @@
 					tabindex="-1"
 					class="option"
 					:key="`option-${i}`"
-					v-shortkey="key"
 					:class="{
 						'step-highlight': step && demo && follow_tutorial && get_step('run', step),
 					}"
 					@click="method"
-					@shortkey="method"
 					@keydown.left="cycleOptions(i, 'left')"
 					@keydown.right="cycleOptions(i, 'right')"
 				>
@@ -168,6 +166,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 import { dice } from "src/mixins/dice.js";
 import { abilities } from "src/utils/generalConstants";
 import TargetItem from "src/components/combat/TargetItem.vue";
@@ -187,6 +186,7 @@ export default {
 		return {
 			setShadow: 0,
 			abilities: abilities,
+			keyCleanups: [],
 			options: [
 				{
 					option: "damage",
@@ -263,6 +263,74 @@ export default {
 					})
 				: this.options;
 		},
+	},
+	mounted() {
+		// Setup keyboard shortcuts for targeted actions
+		// Only trigger when targets are selected
+
+		// Shift+D for opportunity attack
+		this.keyCleanups.push(
+			onKeyStroke("d", (e) => {
+				if (e.shiftKey && this.targeted.length > 0) {
+					e.preventDefault();
+					this.opportunityAttack();
+				}
+			})
+		);
+
+		// C for conditions
+		this.keyCleanups.push(
+			onKeyStroke("c", (e) => {
+				if (!e.shiftKey && !e.ctrlKey && this.targeted.length > 0) {
+					e.preventDefault();
+					this.setConditions();
+				}
+			})
+		);
+
+		// M for reminders
+		this.keyCleanups.push(
+			onKeyStroke("m", (e) => {
+				if (!e.shiftKey && !e.ctrlKey && this.targeted.length > 0) {
+					e.preventDefault();
+					this.setReminders();
+				}
+			})
+		);
+
+		// T for transform
+		this.keyCleanups.push(
+			onKeyStroke("t", (e) => {
+				if (!e.shiftKey && !e.ctrlKey && this.targeted.length === 1) {
+					e.preventDefault();
+					this.transform();
+				}
+			})
+		);
+
+		// H for hide/show
+		this.keyCleanups.push(
+			onKeyStroke("h", (e) => {
+				if (!e.shiftKey && !e.ctrlKey && this.targeted.length > 0) {
+					e.preventDefault();
+					this.setHidden();
+				}
+			})
+		);
+
+		// E for edit
+		this.keyCleanups.push(
+			onKeyStroke("e", (e) => {
+				if (!e.shiftKey && !e.ctrlKey && this.targeted.length > 0) {
+					e.preventDefault();
+					this.edit();
+				}
+			})
+		);
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		this.keyCleanups.forEach((cleanup) => cleanup());
 	},
 	methods: {
 		...mapActions([

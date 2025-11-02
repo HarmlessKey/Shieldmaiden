@@ -121,8 +121,6 @@
 			<a
 				class="handler neutral-2 mr-2 px-2"
 				@click="prevTurn()"
-				v-shortkey="['shift', 'arrowleft']"
-				@shortkey="prevTurn()"
 			>
 				<i aria-hidden="true" class="fas fa-step-backward" />
 				<q-tooltip anchor="top middle" self="center middle">Previous turn [shift] + [←]</q-tooltip>
@@ -147,9 +145,7 @@
 				:class="{
 					'step-highlight': demo && follow_tutorial && get_step('run', 'next'),
 				}"
-				v-shortkey="['shift', 'arrowright']"
 				@click="nextTurn()"
-				@shortkey="nextTurn()"
 			>
 				<TutorialPopover
 					v-if="demo"
@@ -259,9 +255,7 @@
 				<button
 					class="btn ml-2"
 					:class="{ 'step-highlight': demo && follow_tutorial && get_step('initiative', 'start') }"
-					v-shortkey="['shift', 'arrowright']"
 					@click="startEncounter()"
-					@shortkey="startEncounter()"
 				>
 					Start
 					<span class="ml-1 d-none d-md-inline">
@@ -278,6 +272,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { onKeyStroke } from "@vueuse/core";
 import { remindersMixin } from "src/mixins/reminders";
 import { audio } from "src/mixins/audio";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
@@ -292,6 +287,7 @@ export default {
 	data() {
 		return {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+			keyCleanups: [],
 		};
 	},
 	computed: {
@@ -313,6 +309,35 @@ export default {
 			console.log("Tutorial branch", this.current.entityType);
 			return this.current.entityType === "player" ? "player" : "monster";
 		},
+	},
+	mounted() {
+		// Shift+ArrowLeft to go to previous turn
+		this.keyCleanups.push(
+			onKeyStroke("ArrowLeft", (e) => {
+				if (e.shiftKey && this.encounter.round > 0) {
+					e.preventDefault();
+					this.prevTurn();
+				}
+			})
+		);
+
+		// Shift+ArrowRight to go to next turn or start encounter
+		this.keyCleanups.push(
+			onKeyStroke("ArrowRight", (e) => {
+				if (e.shiftKey) {
+					e.preventDefault();
+					if (this.encounter.round === 0) {
+						this.startEncounter();
+					} else {
+						this.nextTurn();
+					}
+				}
+			})
+		);
+	},
+	beforeUnmount() {
+		// Cleanup keyboard listeners
+		this.keyCleanups.forEach((cleanup) => cleanup());
 	},
 	methods: {
 		...mapActions([

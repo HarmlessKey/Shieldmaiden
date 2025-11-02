@@ -9,7 +9,7 @@
 			</p>
 			<button class="google mb-2" @click="googleSignIn()">Sign in with Google</button>
 			<hr />
-			<ValidationObserver v-if="!loading" v-slot="{ handleSubmit }">
+			<Form v-if="!loading" v-slot="{ handleSubmit }">
 				<q-form @submit="handleSubmit(signIn)" greedy>
 					<h4 class="text-center neutral-2">With email and password</h4>
 					<hk-input
@@ -44,7 +44,7 @@
 						<small>No account yet? <router-link to="/sign-up">Create one here.</router-link></small>
 					</div>
 				</q-form>
-			</ValidationObserver>
+			</Form>
 			<hk-loader v-else prefix="Signing you in" noBackground />
 		</div>
 	</div>

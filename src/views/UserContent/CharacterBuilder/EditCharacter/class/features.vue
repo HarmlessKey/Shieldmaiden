@@ -112,10 +112,10 @@
 									indeterminate-value="something-else"
 									@input="save(valid)"
 								/>
-								<ValidationProvider
+								<Field
 									rules="required|max:30"
 									name="Feature name"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -126,23 +126,23 @@
 										type="text"
 										v-model="character.class.classes[classIndex].features[feature.index].name"
 										:placeholder="index === 'asi' ? 'Feat name' : 'Feature name'"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 
-								<ValidationProvider
+								<Field
 									rules="max:2000"
 									name="Description"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<hk-markdown-editor
 										v-model="
 											character.class.classes[classIndex].features[feature.index].description
 										"
 										@change="save(valid)"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 										label="Description"
 									>
 										<character-descriptions
@@ -150,7 +150,7 @@
 											v-model="feature.description"
 										/>
 									</hk-markdown-editor>
-								</ValidationProvider>
+								</Field>
 							</template>
 							<character-descriptions v-else v-model="feature.description" />
 

@@ -19,7 +19,7 @@
 				<!-- NAME -->
 				<div class="row q-col-gutter-md mb-2">
 					<div class="col-9">
-						<ValidationProvider rules="max:100|required" name="Name" v-slot="{ errors, invalid, validated }">
+						<Field rules="max:100|required" name="Name" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Name *"
@@ -27,53 +27,53 @@
 								autocomplete="off"  
 								v-model="npc.name"
 								@input="capitalizeName"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col-3">
-						<ValidationProvider rules="max:20" name="Source" v-slot="{ errors, invalid, validated }">
+						<Field rules="max:20" name="Source" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Source"
 								maxlength="20"
 								autocomplete="off"  
 								v-model="npc.source"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 				</div>
 
 				<!-- SIZE -->
-				<ValidationProvider rules="required" name="Size" v-slot="{ errors, invalid, validated }">
+				<Field rules="required" name="Size" v-slot="{ errorMessage, meta }">
 					<q-select
 						:dark="$store.getters.theme === 'dark'" filled square
 						label="Size *"
 						class="mb-2" 
 						v-model="npc.size"
 						:options="monster_sizes"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 					/>
-				</ValidationProvider>
+				</Field>
 				
 				<!-- TYPE -->
 				<div class="row q-col-gutter-md">
 					<div class="col-12" :class="{'col-md-6': npc.type && monster_subtypes[npc.type] }">
-						<ValidationProvider rules="required" name="Type" v-slot="{ errors, invalid, validated }">
+						<Field rules="required" name="Type" v-slot="{ errorMessage, meta }">
 							<q-select
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Type *"
 								class="mb-2" 
 								v-model="npc.type"
 								:options="monster_types"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col-12 col-md-6" v-if="npc.type && monster_subtypes[npc.type]">
 						<q-select
@@ -109,7 +109,7 @@
 				<!-- SPEED -->
 				<div class="row q-col-gutter-sm">
 					<div class="col">
-						<ValidationProvider rules="between:0,999" name="Walk speed" v-slot="{ errors, invalid, validated }">
+						<Field rules="between:0,999" name="Walk speed" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Walk speed"
@@ -119,13 +119,13 @@
 								v-model.number="npc.walk_speed" 
 								@input="parseToInt($event, npc, 'walk_speed')"
 								suffix="ft."
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="between:0,999" name="Swim speed" v-slot="{ errors, invalid, validated }">
+						<Field rules="between:0,999" name="Swim speed" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Swim speed"
@@ -135,13 +135,13 @@
 								v-model.number="npc.swim_speed"
 								@input="parseToInt($event, npc, 'swim_speed')"
 								suffix="ft."
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="between:0,999" name="Fly speed" v-slot="{ errors, invalid, validated }">
+						<Field rules="between:0,999" name="Fly speed" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Fly speed"
@@ -151,13 +151,13 @@
 								v-model.number="npc.fly_speed" 
 								@input="parseToInt($event, npc, 'fly_speed')"
 								suffix="ft."
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="between:0,999" name="Burrow speed" v-slot="{ errors, invalid, validated }">
+						<Field rules="between:0,999" name="Burrow speed" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Burrow speed"
@@ -167,13 +167,13 @@
 								v-model.number="npc.burrow_speed"
 								@input="parseToInt($event, npc, 'burrow_speed')"
 								suffix="ft."
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="between:0,999" name="Climb speed" v-slot="{ errors, invalid, validated }">
+						<Field rules="between:0,999" name="Climb speed" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Climb speed"
@@ -183,11 +183,11 @@
 								v-model.number="npc.climb_speed"
 								@input="parseToInt($event, npc, 'climb_speed')"
 								suffix="ft."
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							>
 							</q-input>
-						</ValidationProvider>
+						</Field>
 					</div>
 				</div>
 
@@ -205,15 +205,15 @@
 				/>
 
 				<!-- CR -->
-				<ValidationProvider rules="required" name="CR" v-slot="{ errors, invalid, validated }">
+				<Field rules="required" name="CR" v-slot="{ errorMessage, meta }">
 					<q-select 
 						:dark="$store.getters.theme === 'dark'" filled square
 						label="Challenge rating *"
 						v-model="npc.challenge_rating" 
 						:options="challenge_ratings"
 						:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 					>
 						<template v-slot:option="scope">
 							<q-list :dark="$store.getters.theme === 'dark'">
@@ -235,7 +235,7 @@
 							</q-tooltip>
 						</div>
 					</q-select>
-				</ValidationProvider>
+				</Field>
 
 				<q-checkbox 
 					size="lg" :dark="$store.getters.theme === 'dark'" 
@@ -253,7 +253,7 @@
 			<div class="card-body">
 				<div class="row q-col-gutter-md">
 					<div class="col-12 col-md-4">
-						<ValidationProvider rules="required|between:1,99" name="AC" v-slot="{ errors, invalid, validated }">
+						<Field rules="required|between:1,99" name="AC" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Armor class *"
@@ -263,17 +263,17 @@
 								v-model.number="npc.armor_class"
 								@input="parseToInt($event, npc, 'armor_class')"
 								name="ac" 
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							>
 								<template v-slot:prepend>
 									<q-icon name="fas fa-shield" size="xs" />
 								</template>
 							</q-input>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col-12 col-md-4">
-						<ValidationProvider rules="required|between:1,9999" name="HP" v-slot="{ errors, invalid, validated }">
+						<Field rules="required|between:1,9999" name="HP" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Hit points *"
@@ -283,17 +283,17 @@
 								v-model.number="npc.hit_points" 
 								@input="parseToInt($event, npc, 'hit_points')"
 								name="hp" 
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							>
 								<template v-slot:prepend>
 									<q-icon name="fas fa-heart" size="xs" />
 								</template>
 							</q-input>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col-12 col-md-4">
-						<ValidationProvider rules="hit_dice|max:10" name="Hit dice" v-slot="{ errors, invalid, validated }">
+						<Field rules="hit_dice|max:10" name="Hit dice" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Hit dice"
@@ -302,8 +302,8 @@
 								class="mb-2" 
 								v-model="npc.hit_dice"  
 								name="hit_dice" 
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							>
 								<template v-slot:append>
 									<small>{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}</small>
@@ -315,7 +315,7 @@
 									</hk-popover>
 								</template>
 							</q-input>
-						</ValidationProvider>
+						</Field>
 					</div>
 				</div>
 			</div>

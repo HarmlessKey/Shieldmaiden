@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ valid }">
+		<Form v-slot="{ valid }">
 			<q-form greedy>
 				<hk-card>
 					<div class="card-header" slot="header">
@@ -25,10 +25,10 @@
 							@input="selectRace($event, valid)"
 						/>
 						<template v-if="race.race === 'custom'">
-							<ValidationProvider
+							<Field
 								rules="required|max:30"
 								name="Race name"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									dark
@@ -41,14 +41,14 @@
 									v-model="race.race_name"
 									placeholder="Race"
 									class="mb-2"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
-							<ValidationProvider
+							</Field>
+							<Field
 								rules="required|between:1,99"
 								name="Speed"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									dark
@@ -61,14 +61,14 @@
 									v-model="race.walking_speed"
 									placeholder="Speed"
 									class="mb-2"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
-							<ValidationProvider
+							</Field>
+							<Field
 								rules="max:2000"
 								name="Description"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									dark
@@ -79,10 +79,10 @@
 									@change="save(valid)"
 									v-model="race.race_description"
 									autogrow
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</template>
 					</div>
 				</hk-card>
@@ -123,10 +123,10 @@
 
 								<div class="accordion-body">
 									<div class="form-item mb-3">
-										<ValidationProvider
+										<Field
 											rules="required|max:30"
 											name="Trait name"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage, meta }"
 										>
 											<q-input
 												dark
@@ -137,10 +137,10 @@
 												type="text"
 												v-model="race.traits[index].name"
 												label="Trait name"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!meta.valid && meta.validated"
+												:error-message="errorMessage"
 											/>
-										</ValidationProvider>
+										</Field>
 									</div>
 
 									<!-- Modifiers -->
@@ -166,7 +166,7 @@
 					/>
 				</q-dialog>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

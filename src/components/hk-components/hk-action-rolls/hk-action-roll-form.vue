@@ -50,7 +50,7 @@
 						v-if="!index || !roll.options || !roll.options[key] || !roll.options[key].ignore"
 					>
 						<template v-if="action_type !== 'healing'">
-							<ValidationProvider
+							<Field
 								:rules="{
 									required: index === 0,
 								}"
@@ -62,7 +62,7 @@
 									:value="getValue('damage_type', { key, index })"
 									@input="setValue($event, 'damage_type', { key, index })"
 								/>
-							</ValidationProvider>
+							</Field>
 							<div class="d-flex items-center mb-2">
 								<q-checkbox
 									:dark="$store.getters.theme === 'dark'"
@@ -91,13 +91,13 @@
 						<div class="row q-col-gutter-md mb-3">
 							<!-- DICE COUNT -->
 							<div class="col">
-								<ValidationProvider
+								<Field
 									:rules="{
 										between: [1, 99],
 										required: !!getValue('dice_type', { key, index }),
 									}"
 									:name="`Dice count ${key}`"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -112,10 +112,10 @@
 										name="dice_count"
 										class="mb-2"
 										type="number"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 							<div class="col">
 								<!-- DICE TYPE -->
@@ -135,10 +135,10 @@
 							</div>
 							<div class="col">
 								<!-- MODIFIER FIXED VALUE -->
-								<ValidationProvider
+								<Field
 									rules="between:-99,99"
 									name="Fixed value"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -150,8 +150,8 @@
 										autocomplete="off"
 										class="mb-2"
 										type="number"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									>
 										<template v-slot:append>
 											<hk-popover
@@ -162,7 +162,7 @@
 											</hk-popover>
 										</template>
 									</q-input>
-								</ValidationProvider>
+								</Field>
 							</div>
 
 							<!-- PRIMARY STAT -->
@@ -219,7 +219,7 @@
 			</template>
 
 			<!-- FAIL MODIFIER -->
-			<ValidationProvider
+			<Field
 				v-if="action_type === 'save'"
 				rules="required"
 				name="Fixed value"
@@ -236,11 +236,11 @@
 					v-model="roll.save_fail_mod"
 					class="mb-3"
 					hint="The effect if the target makes a successful saving throw."
-					:error="invalid && validated"
+					:error="!meta.valid && meta.validated"
 					error-message="What happens on a succesful save?"
 				/>
-			</ValidationProvider>
-			<ValidationProvider
+			</Field>
+			<Field
 				v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
 				rules="required"
 				name="Fixed value"
@@ -257,10 +257,10 @@
 					v-model="roll.miss_mod"
 					class="mb-3"
 					hint="The effect if the attack is a miss."
-					:error="invalid && validated"
+					:error="!meta.valid && meta.validated"
 					error-message="What happens on a miss?"
 				/>
-			</ValidationProvider>
+			</Field>
 
 			<!-- SPECIAL ACTIONS -->
 			<template v-if="action_type !== 'healing'">
@@ -284,7 +284,7 @@
 				</div>
 			</template>
 		</div>
-		<ValidationObserver v-if="set_scaling" v-slot="{ valid }">
+		<Form v-if="set_scaling" v-slot="{ valid }">
 			<hk-action-roll-scaling
 				v-model="roll.scaling"
 				:roll="roll"
@@ -292,14 +292,14 @@
 				@input="$forceUpdate()"
 			/>
 			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!valid" />
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 
 <script>
 import { damage_types, dice_types } from "src/utils/generalConstants";
 import { spellScalingDescription } from "src/utils/spellFunctions";
-import { ValidationProvider } from "vee-validate";
+import { Field } from "vee-validate";
 
 export default {
 	name: "HkActionRollForm",
@@ -433,7 +433,7 @@ export default {
 			}
 		},
 	},
-	components: { ValidationProvider },
+	components: { Field },
 };
 </script>
 

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ valid }">
+		<Form v-slot="{ meta }">
 			<hk-card :min-width="300">
 				<div slot="header" class="card-header">
 					Add avatar
@@ -76,10 +76,10 @@
 						<template v-if="!using_crop">
 							<hr />
 							Enter an image url
-							<ValidationProvider
+							<Field
 								rules="url|max:2000"
 								name="Avatar"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta: fieldMeta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -90,10 +90,10 @@
 									type="text"
 									v-model="url"
 									maxLength="2000"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!fieldMeta.valid && fieldMeta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</template>
 					</q-form>
 				</div>
@@ -109,7 +109,7 @@
 					</q-btn>
 				</div>
 			</hk-card>
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

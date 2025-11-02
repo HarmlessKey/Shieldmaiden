@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
+		<Field :rules="rules" :name="name" v-slot="{ errorMessage, meta }">
 			<q-input
 				v-bind="$attrs"
 				v-model="modelValue"
@@ -9,12 +9,12 @@
 				:filled="filled"
 				:square="square"
 				:autocomplete="autocomplete"
-				:error="rules ? invalid && validated : null"
-				:error-message="errors[0]"
+				:error="rules ? !meta.valid && meta.validated : null"
+				:error-message="errorMessage"
 			>
 				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
 			</q-input>
-		</ValidationProvider>
+		</Field>
 	</div>
 </template>
 

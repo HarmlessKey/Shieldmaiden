@@ -36,7 +36,7 @@
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
 			<q-tab-panel name="background">
-				<ValidationObserver v-slot="{ valid }">
+				<Form v-slot="{ valid }">
 					<hk-input
 						v-model="background.image"
 						label="Background image"
@@ -101,11 +101,11 @@
 							Set
 						</button>
 					</div>
-				</ValidationObserver>
+				</Form>
 			</q-tab-panel>
 
 			<q-tab-panel name="share">
-				<ValidationObserver v-slot="{ valid }">
+				<Form v-slot="{ valid }">
 					<hk-input
 						v-model="share.image"
 						label="Share image"
@@ -169,7 +169,7 @@
 							Share
 						</button>
 					</div>
-				</ValidationObserver>
+				</Form>
 			</q-tab-panel>
 
 			<q-tab-panel name="weather">

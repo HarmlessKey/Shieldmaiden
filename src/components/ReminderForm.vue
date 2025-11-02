@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<ValidationProvider
+		<Field
 			name="Title"
 			:rules="{
 				required: true,
 				max: 30,
 				variable_check: [reminder.variables],
 			}"
-			v-slot="{ errors, invalid, validated }"
+			v-slot="{ errorMessage, meta }"
 		>
 			<q-input
 				:dark="$store.getters.theme === 'dark'"
@@ -18,10 +18,10 @@
 				autocomplete="off"
 				v-model="reminder.title"
 				maxLength="30"
-				:error="invalid && validated"
-				:error-message="errors[0]"
+				:error="!meta.valid && meta.validated"
+				:error-message="errorMessage"
 			/>
-		</ValidationProvider>
+		</Field>
 
 		<div class="colors d-flex justify-content-between my-3">
 			<a
@@ -37,7 +37,7 @@
 			</a>
 		</div>
 
-		<ValidationProvider name="Trigger" rules="required" v-slot="{ errors, invalid, validated }">
+		<Field name="Trigger" rules="required" v-slot="{ errorMessage, meta }">
 			<q-select
 				:dark="$store.getters.theme === 'dark'"
 				filled
@@ -48,16 +48,16 @@
 				:options="triggers"
 				type="text"
 				v-model="reminder.trigger"
-				:error="invalid && validated"
-				:error-message="errors[0]"
+				:error="!meta.valid && meta.validated"
+				:error-message="errorMessage"
 			/>
-		</ValidationProvider>
+		</Field>
 
 		<div v-if="reminder.trigger === 'timed'" class="my-2">
-			<ValidationProvider
+			<Field
 				name="Rounds"
 				rules="required|max_value:99"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage, meta }"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -69,10 +69,10 @@
 					min="1"
 					max="99"
 					hint="One round is 6 seconds"
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!meta.valid && meta.validated"
+					:error-message="errorMessage"
 				/>
-			</ValidationProvider>
+			</Field>
 		</div>
 
 		<div class="mb-3">
@@ -93,13 +93,13 @@
 				/>
 			</q-field>
 
-			<ValidationProvider
+			<Field
 				name="Notification"
 				:rules="{
 					max: 999,
 					variable_check: [reminder.variables],
 				}"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage, meta }"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -111,10 +111,10 @@
 					maxLength="999"
 					v-model="reminder.notify"
 					autogrow
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!meta.valid && meta.validated"
+					:error-message="errorMessage"
 				/>
-			</ValidationProvider>
+			</Field>
 		</div>
 
 		<!-- VARIABLES -->
@@ -126,10 +126,10 @@
 				</hk-popover>
 			</label>
 			<div class="mb-3">
-				<ValidationProvider
+				<Field
 					name="Variable"
 					rules="alpha_dash"
-					v-slot="{ errors, invalid, validated }"
+					v-slot="{ errorMessage, meta }"
 				>
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -141,8 +141,8 @@
 						autocomplete="off"
 						v-model="newVar"
 						placeholder="New Variable name"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 					>
 						<a
 							slot="after"
@@ -158,7 +158,7 @@
 							<q-icon name="fas fa-plus" />
 						</a>
 					</q-input>
-				</ValidationProvider>
+				</Field>
 			</div>
 
 			<div v-for="(variable, key) in reminder.variables" :key="`var-${key}`" class="var">
@@ -178,10 +178,10 @@
 
 				<!-- Options -->
 				<div v-for="(option, i) in variable" :key="`${key}-option-${i}`" class="option">
-					<ValidationProvider
+					<Field
 						name="Option"
 						rules="required|max:30"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -197,8 +197,8 @@
 							autocomplete="off"
 							v-model="reminder.variables[key][i]"
 							maxLength="30"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						>
 							<div slot="before" v-if="selectOptions">
 								<button
@@ -233,7 +233,7 @@
 								</q-icon>
 							</template>
 						</q-input>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</div>
 		</div>

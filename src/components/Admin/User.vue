@@ -102,7 +102,7 @@
 		<hk-card header="Voucher">
 			<div class="card-body">
 				<h3>Gift user a subscription</h3>
-				<ValidationObserver v-slot="{ valid }">
+				<Form v-slot="{ valid }">
 					<q-form>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -124,11 +124,11 @@
 							:options="duration_options"
 						/>
 
-						<ValidationProvider
+						<Field
 							v-if="duration === 'date'"
 							rules="required"
 							name="Date"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -139,10 +139,10 @@
 								placeholder="mm/dd/yyyy"
 								class="mb-2"
 								v-model="voucher.date"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -156,7 +156,7 @@
 						/>
 						<a class="btn" @click="setVoucher(valid)">Save</a>
 					</q-form>
-				</ValidationObserver>
+				</Form>
 			</div>
 		</hk-card>
 	</div>

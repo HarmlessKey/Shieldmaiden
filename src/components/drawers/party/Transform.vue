@@ -7,14 +7,14 @@
 			should work for Wild Shape (phb 67).
 		</small>
 
-		<ValidationObserver v-slot="{ handleSubmit }">
+		<Form v-slot="{ handleSubmit }">
 			<q-form @submit="handleSubmit(edit())">
 				<div class="row q-col-gutter-md mb-2">
 					<div class="col">
-						<ValidationProvider
+						<Field
 							rules="between:1,99|required"
 							name="AC"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -26,17 +26,17 @@
 								min="1"
 								max="99"
 								v-model="transAc"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 
 					<div class="col">
-						<ValidationProvider
+						<Field
 							rules="between:1,9999|required"
 							name="HP"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -48,17 +48,17 @@
 								min="1"
 								max="9999"
 								v-model="transHp"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 				</div>
 				<q-btn no-caps label="Save" class="full-width" color="primary" type="submit" />
 			</q-form>
 
 			<hk-transform-select @select="edit" />
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

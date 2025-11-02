@@ -1,14 +1,14 @@
 <template>
 	<div>
 		<h2>Health Modifiers</h2>
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(setHpModifiers)">
 				<div class="row q-col-gutter-md">
 					<div class="col">
-						<ValidationProvider
+						<Field
 							rules="between:0,999"
 							name="Temp HP"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -18,16 +18,16 @@
 								type="number"
 								name="tempHp"
 								v-model="tempHp"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col">
-						<ValidationProvider
+						<Field
 							rules="between:-999,999"
 							name="Max HP mod"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -37,10 +37,10 @@
 								type="number"
 								name="maxHpMod"
 								v-model="maxHpMod"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 				</div>
 
@@ -63,7 +63,7 @@
 					</q-icon>
 				</div>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

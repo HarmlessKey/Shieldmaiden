@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)" greedy>
 				<hk-card header="Edit campaign" :min-width="300">
 					<div class="card-body">
-						<ValidationProvider
+						<Field
 							rules="required"
 							name="Title"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -18,10 +18,10 @@
 								type="text"
 								class="mb-2"
 								v-model="editCampaign.name"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -66,10 +66,10 @@
 								<q-icon name="fas fa-image" />
 							</div>
 							<div>
-								<ValidationProvider
+								<Field
 									rules="url"
 									name="Background"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -79,8 +79,8 @@
 										type="text"
 										v-model="editCampaign.background"
 										placeholder="Custom background URL"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 										@input="editCampaign.hk_background = null"
 									>
 										<hk-popover
@@ -94,7 +94,7 @@
 											</template>
 										</hk-popover>
 									</q-input>
-								</ValidationProvider>
+								</Field>
 							</div>
 						</div>
 
@@ -135,7 +135,7 @@
 					</div>
 				</hk-card>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

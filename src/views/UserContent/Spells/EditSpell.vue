@@ -1,6 +1,6 @@
 <template>
 	<div class="content__edit" v-if="!loading">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveSpell)" greedy>
 				<div>
 					<div class="top">
@@ -71,7 +71,7 @@
 					</div>
 				</div>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">

@@ -25,12 +25,12 @@
 					<i aria-hidden="true" class="fas fa-copy" /> Copy NPC
 				</button>
 
-				<ValidationObserver v-slot="{ handleSubmit, validate, valid }">
+				<Form v-slot="{ handleSubmit, validate, valid }">
 					<q-form @submit="valid ? handleSubmit(addNPC) : validate()" greedy>
-						<ValidationProvider
+						<Field
 							rules="required|max:100"
 							name="Name"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -42,17 +42,17 @@
 								name="name"
 								v-model="entity.name"
 								no-error-icon
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 						<hr />
 						<div class="row q-col-gutter-md mb-2">
 							<div class="col">
-								<ValidationProvider
+								<Field
 									rules="required|between:0,99"
 									name="Initiative"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -65,8 +65,8 @@
 										max="99"
 										v-model.number="entity.initiative"
 										no-error-icon
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									>
 										<template v-slot:append>
 											<a @click="rollInitiative">
@@ -77,13 +77,13 @@
 											</a>
 										</template>
 									</q-input>
-								</ValidationProvider>
+								</Field>
 							</div>
 							<div class="col">
-								<ValidationProvider
+								<Field
 									rules="required|between:1,99"
 									name="AC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -96,16 +96,16 @@
 										max="99"
 										v-model.number="entity.ac"
 										no-error-icon
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 							<div class="col">
-								<ValidationProvider
+								<Field
 									rules="required|between:1,9999"
 									name="HP"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -118,10 +118,10 @@
 										max="9999"
 										v-model.number="entity.maxHp"
 										no-error-icon
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 						</div>
 						<label class="my-2">When to add</label>
@@ -138,7 +138,7 @@
 						<hr />
 						<q-btn class="full-width mb-3" color="primary" no-caps type="submit" label="Add" />
 					</q-form>
-				</ValidationObserver>
+				</Form>
 			</q-tab-panel>
 			<q-tab-panel name="player">
 				<q-form @submit="addPlayer()" v-if="Object.keys(players).length > 0">

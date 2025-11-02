@@ -74,13 +74,13 @@
 			>
 
 			<!-- EDIT PLAYER -->
-			<ValidationObserver v-slot="{ handleSubmit }">
+			<Form v-slot="{ handleSubmit }">
 				<q-form @submit="handleSubmit(edit)">
-					<ValidationProvider
+					<Field
 						v-if="location == 'encounter'"
 						rules="between:0,99|required"
 						name="Initiative"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -92,18 +92,18 @@
 							max="99"
 							v-model="initiative"
 							v-validate="'required'"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 
 					<h2>Temporary</h2>
 					<div class="row q-col-gutter-md mb-2">
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:-99,99"
 								name="AC"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -115,17 +115,17 @@
 									v-model="entity.ac_bonus"
 									clearable
 									no-error-icon
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:0,999"
 								name="Temp HP"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -137,17 +137,17 @@
 									v-model="entity.tempHp"
 									clearable
 									no-error-icon
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 
 						<div class="col" v-if="!entity.transformed">
-							<ValidationProvider
+							<Field
 								rules="between:-999,999"
 								name="Max Hp mod"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -159,10 +159,10 @@
 									v-model="maxHpMod"
 									clearable
 									no-error-icon
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 					</div>
 
@@ -170,10 +170,10 @@
 					<h2 class="mb-0">Override</h2>
 					<div class="row q-col-gutter-md my-2">
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="min_value:0|required"
 								name="Current HP"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									v-if="entity.transformed"
@@ -186,8 +186,8 @@
 									min="0"
 									v-model="entity.transformed.curHp"
 									placeholder="Current Hit Points"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								>
 									<q-icon slot="prepend" name="fas fa-paw-claws green">
 										<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
@@ -203,17 +203,17 @@
 									type="number"
 									min="0"
 									v-model="entity.curHp"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:1,9999|required"
 								name="Max HP"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									v-if="entity.transformed"
@@ -226,8 +226,8 @@
 									min="1"
 									max="9999"
 									v-model="entity.transformed.maxHp"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								>
 									<q-icon slot="prepend" name="fas fa-paw-claws green">
 										<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
@@ -244,18 +244,18 @@
 									min="1"
 									max="9999"
 									v-model="playerBase.maxHp"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 					</div>
 					<div class="row q-col-gutter-md">
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:1,99|required"
 								name="Armor class"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									v-if="entity.transformed"
@@ -268,8 +268,8 @@
 									min="1"
 									max="99"
 									v-model="entity.transformed.ac"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								>
 									<q-icon slot="prepend" name="fas fa-paw-claws green">
 										<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
@@ -288,18 +288,18 @@
 									max="99"
 									v-model="playerBase.ac"
 									placeholder="Armor Class"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 						<div class="col">
-							<ValidationProvider
+							<Field
 								:rules="
 									isXpAdvancement() ? 'numeric|between:1,20' : 'required|numeric|between:1,20'
 								"
 								name="Level"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -312,21 +312,21 @@
 									max="20"
 									v-model="playerBase.level"
 									:clearable="isXpAdvancement()"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								>
 									<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level }">
 										{{ calculatedLevel(playerBase.experience) }}
 										<q-tooltip anchor="top left" self="center left"> Level based on XP </q-tooltip>
 									</span>
 								</q-input>
-							</ValidationProvider>
+							</Field>
 						</div>
 					</div>
 
 					<q-btn no-caps label="Save" class="full-width" color="primary" type="submit" />
 				</q-form>
-			</ValidationObserver>
+			</Form>
 			<div v-if="isXpAdvancement() && playerBase.experience !== undefined" class="pt-2">
 				<hr />
 				<h2>Experience Points</h2>

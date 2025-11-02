@@ -1,6 +1,6 @@
 <template>
-	<ValidationProvider :rules="validationRules" :name="label" v-slot="{ errors, invalid, validated }">
-		<q-select 
+	<Field :rules="validationRules" :name="label" v-slot="{ errorMessage, meta }">
+		<q-select
 			:dark="$store.getters.theme === 'dark'" filled square
 			:dense="dense"
 			:clearable="clearable"
@@ -12,8 +12,8 @@
 			@filter="filterTypes"
 			@focus="hide_selected = true"
 			@blur="hide_selected = false"
-			:error="invalid && validated"
-			:error-message="errors[0]"
+			:error="!meta.valid && meta.validated"
+			:error-message="errorMessage"
 		>
 			<template v-slot:selected>
 				<span v-if="damage_type && !hide_selected" class="truncate">
@@ -41,7 +41,7 @@
 				</q-item>
 			</template>
 		</q-select>
-	</ValidationProvider>
+	</Field>
 </template>
 
 <script>

@@ -1,6 +1,6 @@
 <template>
 <div>
-	<ValidationObserver v-slot="{ handleSubmit }">
+	<Form v-slot="{ handleSubmit }">
 		<q-form @submit="handleSubmit(saveModifier)" greedy>
 			<hk-card :min-width="300" no-margin>
 				<div slot="header" class="card-header d-flex justify-content-between">
@@ -15,7 +15,7 @@
 					<div v-if="!scaling">
 						<div class="form-item mb-3">
 							<div class="mb-3">Origin: {{ modifier_origin }}</div>
-							<ValidationProvider rules="max:30|required" name="Name" v-slot="{ errors, invalid, validated }">
+							<Field rules="max:30|required" name="Name" v-slot="{ errorMessage, meta }">
 								<q-input
 									autocomplete="off"
 									dark filled square
@@ -25,10 +25,10 @@
 									maxlength="30"
 									name="name"
 									placeholder="Modifier name"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 
 						<!-- TYPE -->
@@ -113,7 +113,7 @@
 							
 							<!-- VALUE -->
 							<div class="form-item mb-3" v-if="['bonus', 'set'].includes(modifier.type)">
-								<ValidationProvider rules="required" name="Value" v-slot="{ errors, invalid, validated }">
+								<Field rules="required" name="Value" v-slot="{ errorMessage, meta }">
 									<q-input 
 										dark filled square
 										label="Value"
@@ -121,8 +121,8 @@
 										type="number" 
 										v-model.number="modifier.value"
 										@input="parseInt($event)" 
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									>
 										<a slot="after" @click="addScaling" class="btn btn-block">
 											<i class="far fa-chart-line" aria-hidden="true"/>
@@ -131,7 +131,7 @@
 											</q-tooltip>
 										</a>
 									</q-input>
-								</ValidationProvider>
+								</Field>
 								
 								<p class="mt-1" v-if="modifier.scaling && modifier.scaling.scale && modifier.scaling.scale.size && modifier.scaling.scale.value">
 									<span v-html="scalingText()"/>
@@ -197,7 +197,7 @@
 
 						<!-- VALUE -->
 						<div class="form-item mb-3">
-							<ValidationProvider rules="required" name="Initial value" v-slot="{ errors, invalid, validated }">
+							<Field rules="required" name="Initial value" v-slot="{ errorMessage, meta }">
 								<q-input 
 									dark filled square
 									label="Initial value"
@@ -205,15 +205,15 @@
 									type="number"
 									v-model.number="modifier.value"
 									@input="parseInt($event)"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 						
 						<!-- STARTING LEVELS -->
 						<div class="form-item mb-3" v-if="modifier.origin.split('.')[0] !== 'class'">
-							<ValidationProvider rules="required" name="Start" v-slot="{ errors, invalid, validated }">
+							<Field rules="required" name="Start" v-slot="{ errorMessage, meta }">
 								<q-input 
 									dark filled square
 									label="Starting level"
@@ -221,10 +221,10 @@
 									type="number"
 									v-model.number="modifier.scaling.start"
 									@input="parseInt($event)"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 
 						<!-- SCALING TYPE -->
@@ -243,7 +243,7 @@
 						<div v-if="modifier.scaling.type === 'scale'" class="form-item mb-3">
 							<div class="row q-col-gutter-md mb-2">
 								<div class="col-6">
-									<ValidationProvider rules="required" name="Size" v-slot="{ errors, invalid, validated }">
+									<Field rules="required" name="Size" v-slot="{ errorMessage, meta }">
 										<q-input 
 											dark filled square
 											label="Scale size"
@@ -251,13 +251,13 @@
 											type="number" 
 											v-model.number="modifier.scaling.scale.size"
 											@input="parseInt($event)"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!meta.valid && meta.validated"
+											:error-message="errorMessage"
 										/>
-									</ValidationProvider>
+									</Field>
 								</div>
 								<div class="col-6">
-									<ValidationProvider rules="required" name="Scale value" v-slot="{ errors, invalid, validated }">
+									<Field rules="required" name="Scale value" v-slot="{ errorMessage, meta }">
 										<q-input 
 											dark filled square
 											label="Scale value"
@@ -265,10 +265,10 @@
 											type="number" 
 											v-model.number="modifier.scaling.scale.value" 
 											@input="parseInt($event)"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!meta.valid && meta.validated"
+											:error-message="errorMessage"
 										/>
-									</ValidationProvider>
+									</Field>
 								</div>
 							</div>
 							
@@ -286,7 +286,7 @@
 				</div>
 			</hk-card>
 		</q-form>
-	</ValidationObserver>
+	</Form>
 </div>
 </template>
 

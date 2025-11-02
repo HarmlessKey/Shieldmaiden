@@ -30,10 +30,10 @@
 					<template v-if="npc[`${casting.category}_ability`]">
 						<div class="row q-col-gutter-sm">
 							<div class="col" v-if="casting.category === 'caster'">
-								<ValidationProvider
+								<Field
 									rules="between:1,20|required"
 									name="Caster level"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -44,16 +44,16 @@
 										@input="parseToInt(npc, `${casting.category}_level`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 							<div class="col">
-								<ValidationProvider
+								<Field
 									rules="between:1,99|required"
 									name="Save DC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -64,16 +64,16 @@
 										@input="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 							<div class="col">
-								<ValidationProvider
+								<Field
 									rules="between:-10,99|required"
 									name="Save DC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -84,10 +84,10 @@
 										@input="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 						</div>
 

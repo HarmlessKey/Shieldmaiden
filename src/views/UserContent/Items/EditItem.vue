@@ -1,6 +1,6 @@
 <template>
 	<div class="content__edit">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveItem(valid))">
 				<hk-card header="Your Item">
 					<div slot="header" class="card-header">
@@ -17,10 +17,10 @@
 					</div>
 					<div class="card-body">
 						<!-- NAME -->
-						<ValidationProvider
+						<Field
 							rules="max:100|required"
 							name="Name"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -32,10 +32,10 @@
 								class="mb-2"
 								v-model="item.name"
 								maxlength="100"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 
 						<!-- IMAGE -->
 						<div class="avatar">
@@ -48,10 +48,10 @@
 								<i v-if="!item.image" aria-hidden="true" class="hki-axe" />
 							</div>
 							<div>
-								<ValidationProvider
+								<Field
 									rules="url"
 									name="Image"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -62,17 +62,17 @@
 										type="text"
 										v-model="item.image"
 										placeholder="Image URL"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 						</div>
 
-						<ValidationProvider
+						<Field
 							rules="max:5000"
 							name="Description"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -84,10 +84,10 @@
 								type="text"
 								v-model="item.desc"
 								maxlength="5000"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 				</hk-card>
 
@@ -99,10 +99,10 @@
 							<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
 								<div class="bg-neutral-8 px-2 py-2">
 									<p>Add a table</p>
-									<ValidationProvider
+									<Field
 										rules="required|numeric|between:1,10"
 										name="Columns"
-										v-slot="{ errors, invalid, validated }"
+										v-slot="{ errorMessage, meta }"
 									>
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
@@ -114,8 +114,8 @@
 											min="1"
 											class="mb-4"
 											v-model="columns"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!meta.valid && meta.validated"
+											:error-message="errorMessage"
 											hint="How many columns?"
 										/>
 										<div class="d-flex justify-content-end mt-2">
@@ -130,14 +130,14 @@
 												Add table
 											</q-btn>
 										</div>
-									</ValidationProvider>
+									</Field>
 								</div>
 							</q-popup-proxy>
 						</a>
 					</div>
 					<div class="card-body">
 						<q-list v-if="item.tables" :dark="$store.getters.theme === 'dark'" :class="`accordion`">
-							<ValidationObserver
+							<Form
 								v-for="(table, tableIndex) in item.tables"
 								v-slot="{ valid }"
 								:key="tableIndex"
@@ -168,10 +168,10 @@
 									</template>
 
 									<div class="accordion-body">
-										<ValidationProvider
+										<Field
 											rules="max:100"
 											name="Table name"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage, meta }"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -181,20 +181,20 @@
 												v-model="table.name"
 												class="mb-3"
 												name="table name"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!meta.valid && meta.validated"
+												:error-message="errorMessage"
 											/>
-										</ValidationProvider>
+										</Field>
 
 										<div
 											class="item-table"
 											:style="{ 'grid-template-columns': `repeat(${table.columns}, auto) 30px` }"
 										>
 											<div v-for="(col, i) in table.columns" :key="i" class="header">
-												<ValidationProvider
+												<Field
 													rules="required|max:100"
 													:name="`Column header ${i + 1}`"
-													v-slot="{ errors, invalid, validated }"
+													v-slot="{ errorMessage, meta }"
 												>
 													<q-input
 														:dark="$store.getters.theme === 'dark'"
@@ -203,10 +203,10 @@
 														v-model="table.header[i]"
 														:placeholder="`Column header ${i + 1}`"
 														maxlength="100"
-														:error="invalid && validated"
-														:error-message="errors[0]"
+														:error="!meta.valid && meta.validated"
+														:error-message="errorMessage"
 													/>
-												</ValidationProvider>
+												</Field>
 											</div>
 											<a @click="addRow(tableIndex)" class="remove green"
 												><i aria-hidden="true" class="fas fa-plus"
@@ -216,10 +216,10 @@
 													v-for="(col, colIndex) in table.rows[rowIndex].columns"
 													:key="`column-${rowIndex}-${colIndex}`"
 												>
-													<ValidationProvider
+													<Field
 														rules="required|max:5000"
 														:name="`Column ${colIndex + 1}`"
-														v-slot="{ errors, invalid, validated }"
+														v-slot="{ errorMessage, meta }"
 													>
 														<q-input
 															:dark="$store.getters.theme === 'dark'"
@@ -229,10 +229,10 @@
 															v-model="table.rows[rowIndex].columns[colIndex]"
 															:placeholder="`Column ${colIndex + 1}`"
 															maxlength="5000"
-															:error="invalid && validated"
-															:error-message="errors[0]"
+															:error="!meta.valid && meta.validated"
+															:error-message="errorMessage"
 														/>
-													</ValidationProvider>
+													</Field>
 												</div>
 												<a
 													class="red remove"
@@ -245,7 +245,7 @@
 										<a @click="addRow(tableIndex)" class="btn btn-block mt-4">Add Row</a>
 									</div>
 								</q-expansion-item>
-							</ValidationObserver>
+							</Form>
 						</q-list>
 					</div>
 				</hk-card>
@@ -259,7 +259,7 @@
 					</div>
 				</div>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 
 		<q-dialog v-model="copy_dialog">
 			<hk-card header="Copy Existing Item" :min-width="300">

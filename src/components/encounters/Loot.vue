@@ -38,7 +38,7 @@
 		</h3>
 		<hr />
 		<q-list v-if="encounter.loot" :dark="$store.getters.theme === 'dark'" class="accordion">
-			<ValidationObserver
+			<Form
 				v-for="(item, key) in encounter.loot"
 				:key="key"
 				v-slot="{ handleSubmit, validate, valid }"
@@ -69,10 +69,10 @@
 						</template>
 
 						<div class="accordion-body">
-							<ValidationProvider
+							<Field
 								rules="required|max:100"
 								name="Name"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -83,8 +83,8 @@
 									id="name"
 									type="text"
 									v-model="item.public_name"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								>
 									<hk-popover
 										slot="append"
@@ -94,12 +94,12 @@
 										<q-icon name="info" @click.stop class="pointer" />
 									</hk-popover>
 								</q-input>
-							</ValidationProvider>
+							</Field>
 
-							<ValidationProvider
+							<Field
 								rules="max:2000"
 								name="Dscription"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -113,10 +113,10 @@
 									rows="4"
 									name="desc"
 									maxlength="2000"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 							<div>
 								<a
 									v-if="!item.linked_item"
@@ -156,7 +156,7 @@
 						</div>
 					</q-expansion-item>
 				</q-form>
-			</ValidationObserver>
+			</Form>
 		</q-list>
 	</div>
 </template>

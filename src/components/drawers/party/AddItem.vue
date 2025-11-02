@@ -8,17 +8,17 @@
 		</div>
 
 		<h2>New Item</h2>
-		<ValidationObserver v-slot="{ handleSubmit, validate, valid }">
+		<Form v-slot="{ handleSubmit, validate, valid }">
 			<q-form @submit="valid ? handleSubmit(addItem) : validate()" greedy>
-				<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
+				<Field rules="required" name="Name" v-slot="{ errorMessage, meta }">
 					<q-input
 						:dark="$store.getters.theme === 'dark'" filled square
 						label="Public name *"
 						class="mb-3"
 						type="text" 
 						v-model="item.public_name"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 					>
 						<hk-popover 
 							slot="append" 
@@ -28,9 +28,9 @@
 							<q-icon name="info" @click.stop class="pointer" />
 						</hk-popover>
 					</q-input>
-				</ValidationProvider>
+				</Field>
 
-				<ValidationProvider rules="max:2000" name="Name" v-slot="{ errors, invalid, validated }">
+				<Field rules="max:2000" name="Name" v-slot="{ errorMessage, meta }">
 					<q-input
 						:dark="$store.getters.theme === 'dark'" filled square
 						autogrow
@@ -40,10 +40,10 @@
 						rows="4"
 						name="desc"
 						maxlength="2000"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 					/>
-				</ValidationProvider>
+				</Field>
 
 				<div class="linked mb-3">
 					<LinkedItem v-if="item.linked_item" :linked-item="item.linked_item">
@@ -61,7 +61,7 @@
 
 				<q-btn class="full-width" color="primary" type="submit" no-caps label="Add item" />
 			</q-form>
-		</ValidationObserver>
+		</Form>
 
 		<q-dialog v-model="link_dialog">
 			<hk-card header="Link item" :min-width="320">

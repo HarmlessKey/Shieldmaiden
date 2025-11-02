@@ -62,7 +62,7 @@
 
 		<q-dialog v-model="add_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit }">
+				<Form v-slot="{ handleSubmit }">
 					<q-form @submit="handleSubmit(addLink)" greedy>
 						<hk-card :min-width="320" no-margin>
 							<div slot="header" class="card-header">
@@ -99,7 +99,7 @@
 							</div>
 						</hk-card>
 					</q-form>
-				</ValidationObserver>
+				</Form>
 			</div>
 		</q-dialog>
 	</div>

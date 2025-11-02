@@ -4,7 +4,7 @@
 			<div class="card-body">
 				<div class="row q-col-gutter-md mb-3" v-for="(ability, index) in abilities" :key="index">
 					<div class="col-4 col-md-3">
-						<ValidationProvider rules="required|between:0,99" :name="ability.capitalize()" v-slot="{ errors, invalid, validated }">
+						<Field rules="required|between:0,99" :name="ability.capitalize()" v-slot="{ errorMessage, meta }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								:label="`${ability.capitalize()} *`"
@@ -12,8 +12,8 @@
 								type="number" 
 								v-model.number="npc[ability]" 
 								@input="parseToInt($event, npc, ability)"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							>
 								<template #append>
 									{{ npc[ability] !== undefined 
@@ -21,7 +21,7 @@
 									: '' }}
 								</template>
 							</q-input>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<div class="col pt-4">
 						<q-checkbox 

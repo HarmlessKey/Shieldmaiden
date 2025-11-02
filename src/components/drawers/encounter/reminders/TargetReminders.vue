@@ -76,11 +76,11 @@
 								<q-slide-transition>
 									<div v-if="varOptions === key" class="variables">
 										<div class="mb-1">Select variable values</div>
-										<ValidationObserver v-slot="{ valid }">
-											<ValidationProvider
+										<Form v-slot="{ valid }">
+											<Field
 												rules="required"
 												:name="var_key"
-												v-slot="{ errors, invalid, validated }"
+												v-slot="{ errorMessage, meta }"
 												v-for="(variable, var_key) in reminder.variables"
 												:key="var_key"
 											>
@@ -94,11 +94,11 @@
 														:options="variable"
 														type="text"
 														v-model="selectedVars[var_key]"
-														:error="invalid && validated"
-														:error-message="errors[0]"
+														:error="!meta.valid && meta.validated"
+														:error-message="errorMessage"
 													/>
 												</div>
-											</ValidationProvider>
+											</Field>
 											<button
 												@click="valid ? addReminder('premade', reminder, selectedVars) : null"
 												:disabled="!valid"
@@ -106,7 +106,7 @@
 											>
 												<i aria-hidden="true" class="fas fa-plus green"></i> Add reminder
 											</button>
-										</ValidationObserver>
+										</Form>
 									</div>
 								</q-slide-transition>
 							</li>
@@ -114,14 +114,14 @@
 					</template>
 				</q-tab-panel>
 				<q-tab-panel name="custom">
-					<ValidationObserver v-slot="{ handleSubmit, valid }">
+					<Form v-slot="{ handleSubmit, valid }">
 						<q-form @submit="handleSubmit(valid ? addReminder('custom') : invalidReminder)">
 							<reminder-form v-model="customReminder" :variables="false" />
 							<q-btn color="blue" class="full-width" no-caps type="submit" :disabled="!valid"
 								>Set reminder</q-btn
 							>
 						</q-form>
-					</ValidationObserver>
+					</Form>
 				</q-tab-panel>
 			</q-tab-panels>
 		</template>

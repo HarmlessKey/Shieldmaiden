@@ -37,14 +37,14 @@
 
 		<q-dialog v-model="note_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
+				<Form v-slot="{ handleSubmit, valid }">
 					<q-form @submit="handleSubmit(addNote)" greedy>
 						<hk-card header="New note" class="mb-0" :min-width="300">
 							<div class="card-body">
-								<ValidationProvider
+								<Field
 									rules="max:100|required"
 									name="Title"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -53,14 +53,14 @@
 										label="Title"
 										autocomplete="off"
 										v-model="new_note.title"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
-								<ValidationProvider
+								</Field>
+								<Field
 									rules="max:1000|required"
 									name="Note"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage, meta }"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -70,10 +70,10 @@
 										autocomplete="off"
 										type="textarea"
 										v-model="new_note.description"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!meta.valid && meta.validated"
+										:error-message="errorMessage"
 									/>
-								</ValidationProvider>
+								</Field>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
 								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
@@ -81,7 +81,7 @@
 							</div>
 						</hk-card>
 					</q-form>
-				</ValidationObserver>
+				</Form>
 			</div>
 		</q-dialog>
 	</div>

@@ -14,10 +14,10 @@
 					Spell actions are the parts of a spell that can be rolled. By adding spell actions to your
 					spell, it can be used during encounters to quickly apply damage or healing.
 				</p>
-				<ValidationProvider
+				<Field
 					rules="between:1,25"
 					name="Projectiles"
-					v-slot="{ errors, invalid, validated }"
+					v-slot="{ errorMessage, meta }"
 				>
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -28,8 +28,8 @@
 						autocomplete="off"
 						type="number"
 						class="mb-2"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 						@keyup="$forceUpdate()"
 						@input="(value) => parseToInt(value, spell, 'projectiles')"
 					>
@@ -49,7 +49,7 @@
 							<i class="fas fa-chart-line" aria-hidden="true" />
 						</button>
 					</q-input>
-				</ValidationProvider>
+				</Field>
 				<q-select
 					:dark="$store.getters.theme === 'dark'"
 					filled
@@ -78,7 +78,7 @@
 
 				<!-- ACTION LIST -->
 				<q-list :dark="$store.getters.theme === 'dark'" class="accordion">
-					<ValidationObserver
+					<Form
 						v-for="(action, action_index) in spell.actions"
 						v-slot="{ valid }"
 						:key="`action-${action_index}`"
@@ -110,10 +110,10 @@
 								<div class="row q-col-gutter-md">
 									<!-- ACTION TYPE -->
 									<div class="col-12 col-md-12">
-										<ValidationProvider
+										<Field
 											rules="required|max:100"
 											name="Attack type"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage, meta }"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -124,19 +124,19 @@
 												autocomplete="off"
 												class="mb-2"
 												@keyup="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!meta.valid && meta.validated"
+												:error-message="errorMessage"
 											/>
-										</ValidationProvider>
+										</Field>
 									</div>
 								</div>
 								<div class="row q-col-gutter-md">
 									<!-- ACTION TYPE -->
 									<div class="col-12 col-md-6">
-										<ValidationProvider
+										<Field
 											rules="required"
 											name="Attack type"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage, meta }"
 										>
 											<q-select
 												:dark="$store.getters.theme === 'dark'"
@@ -149,10 +149,10 @@
 												v-model="action.type"
 												class="mb-2"
 												@input="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!meta.valid && meta.validated"
+												:error-message="errorMessage"
 											/>
-										</ValidationProvider>
+										</Field>
 									</div>
 
 									<!-- SAVE -->
@@ -193,14 +193,14 @@
 								/>
 							</div>
 						</q-expansion-item>
-					</ValidationObserver>
+					</Form>
 				</q-list>
 			</div>
 		</hk-card>
 
 		<q-dialog v-model="roll_dialog">
 			<div v-if="roll">
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
+				<Form v-slot="{ handleSubmit, valid }">
 					<q-form @submit="handleSubmit(saveRoll)">
 						<hk-card :header="edit_index !== undefined ? 'Edit roll' : 'New roll'" class="mb-0">
 							<div class="card-body">
@@ -223,13 +223,13 @@
 							</div>
 						</hk-card>
 					</q-form>
-				</ValidationObserver>
+				</Form>
 			</div>
 		</q-dialog>
 
 		<q-dialog v-model="scaling_dialog">
 			<div>
-				<ValidationObserver>
+				<Form>
 					<q-form>
 						<hk-card header="Projectile scaling" class="mb-0">
 							<div class="card-body">
@@ -245,7 +245,7 @@
 							</div>
 						</hk-card>
 					</q-form>
-				</ValidationObserver>
+				</Form>
 			</div>
 		</q-dialog>
 	</div>

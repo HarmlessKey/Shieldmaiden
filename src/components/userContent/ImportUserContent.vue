@@ -23,9 +23,9 @@
 			</q-file>
 
 			<h4 class="my-3 text-center">OR</h4>
-			<ValidationObserver v-slot="{ handleSubmit }">
+			<Form v-slot="{ handleSubmit }">
 				<q-form @submit="handleSubmit(parseJSON)">
-					<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated }">
+					<Field rules="json" name="JSON" v-slot="{ errorMessage, meta }">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -33,15 +33,15 @@
 							label-slot
 							type="textarea"
 							v-model="json_input"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						>
 							<template #label>
 								<i class="fas fa-brackets-curly mr-1" aria-hidden="true" />
 								JSON Input
 							</template>
 						</q-input>
-					</ValidationProvider>
+					</Field>
 					<q-btn
 						class="full-width my-2"
 						color="primary"
@@ -52,7 +52,7 @@
 						Parse Input
 					</q-btn>
 				</q-form>
-			</ValidationObserver>
+			</Form>
 		</template>
 		<hk-loader v-else-if="import_state === 'parsing'" title="Validating JSON" />
 		<div v-else-if="import_state === 'selecting'">

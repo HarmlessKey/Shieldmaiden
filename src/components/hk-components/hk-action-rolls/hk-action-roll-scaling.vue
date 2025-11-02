@@ -19,10 +19,10 @@
 			>
 				<div class="row q-col-gutter-sm mb-0 full-width">
 					<div class="col">
-						<ValidationProvider
+						<Field
 							rules="required|between:1,20"
 							:name="`${scaling_name} ${tier_index}`"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -35,21 +35,21 @@
 								type="number"
 								min="1"
 								max="20"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 								@keyup="$forceUpdate()"
 								@input="
 									(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
 								"
 							/>
-						</ValidationProvider>
+						</Field>
 					</div>
 					<template v-if="type === 'roll'">
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:1,99"
 								:name="`Dice count ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -62,8 +62,8 @@
 									type="number"
 									min="1"
 									max="99"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
@@ -72,13 +72,13 @@
 								>
 									<small slot="append">d{{ roll.dice_type }}</small>
 								</q-input>
-							</ValidationProvider>
+							</Field>
 						</div>
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:-99,99"
 								:name="`Fixed value ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -91,22 +91,22 @@
 									type="number"
 									min="-99"
 									max="99"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
 											$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
 									"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 					</template>
 					<template v-if="type === 'projectile'">
-						<ValidationProvider
+						<Field
 								rules="between:1,10"
 								:name="`Projectile count ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -116,15 +116,15 @@
 									v-model="level_tier.projectile_count"
 									autocomplete="off"
 									type="number"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
 											$set(level_tier, 'projectile_count', value != undefined ? parseInt(value) : value)
 									"
 								/>
-							</ValidationProvider>
+							</Field>
 					</template>
 				</div>
 				<div>

@@ -6,12 +6,12 @@
 			Edit <strong>{{ npc.name.capitalize() }}</strong>
 		</h2>
 
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)" greedy>
-				<ValidationProvider
+				<Field
 					rules="max:100|required"
 					name="Name"
-					v-slot="{ errors, invalid, validated }"
+					v-slot="{ errorMessage, meta }"
 				>
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -22,10 +22,10 @@
 						class="mb-2"
 						placeholder="Name"
 						maxlength="100"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 					/>
-				</ValidationProvider>
+				</Field>
 				<div class="avatar">
 					<div
 						class="img"
@@ -43,10 +43,10 @@
 							:class="{ 'neutral-1': npc.color_label }"
 						/>
 					</div>
-					<ValidationProvider
+					<Field
 						rules="url|max:2000"
 						name="Avatar"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -57,10 +57,10 @@
 							class="mb-2"
 							placeholder="Input URL"
 							maxlength="2000"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -94,10 +94,10 @@
 				/>
 
 				<div class="d-flex justify-content-between">
-					<ValidationProvider
+					<Field
 						rules="required|between:1,99"
 						name="Armor class"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 						class="full-width"
 					>
 						<q-input
@@ -110,19 +110,19 @@
 							min="1"
 							max="99"
 							v-model.number="npc.ac"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						>
 							<template v-slot:append>
 								<i aria-hidden="true" class="fas fa-shield" />
 							</template>
 						</q-input>
-					</ValidationProvider>
+					</Field>
 
-					<ValidationProvider
+					<Field
 						rules="required|between:1,999"
 						name="Hit points"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 						class="full-width"
 					>
 						<q-input
@@ -135,14 +135,14 @@
 							max="999"
 							v-model.number="npc.maxHp"
 							placeholder="Hit Points"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						>
 							<template v-slot:append>
 								<q-icon name="favorite" />
 							</template>
 						</q-input>
-					</ValidationProvider>
+					</Field>
 				</div>
 				<div class="d-flex items-center my-3">
 					<q-btn color="primary" type="submit" class="full-width">Save</q-btn>
@@ -153,7 +153,7 @@
 					</q-icon>
 				</div>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 		<small>
 			Slightly tweak your NPC for the current encounter.
 			<span v-if="!demo"

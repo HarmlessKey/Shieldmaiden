@@ -1,6 +1,6 @@
 <template>
 	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveReminder(valid))">
 				<div class="card-body">
 					<div class="reminder" v-if="reminder">
@@ -26,7 +26,7 @@
 					</div>
 				</div>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 	</hk-card>
 </template>
 

@@ -27,7 +27,7 @@
 				@input="confirmMethodChange($event)"
 			/>
 
-			<ValidationObserver v-if="method" v-slot="{ valid }">
+			<Form v-if="method" v-slot="{ valid }">
 				<q-form greedy>
 					<h3 class="text-center">Base ability scores</h3>
 					<div class="d-flex justify-content-center mb-4" v-if="method === 'manual'">
@@ -87,10 +87,10 @@
 					<div v-if="method === 'manual'" class="base_abilities input">
 						<div class="ability" v-for="ability in abilities" :key="`base-${ability}`">
 							<div>{{ ability.capitalize() }}</div>
-							<ValidationProvider
+							<Field
 								rules="between:1,20"
 								:name="ability"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -101,10 +101,10 @@
 									autocomplete="off"
 									type="number"
 									v-model="ability_scores[ability]"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 
 						<q-dialog v-model="roll_dialog">
@@ -204,7 +204,7 @@
 						</div>
 					</div>
 				</q-form>
-			</ValidationObserver>
+			</Form>
 
 			<template v-else>
 				<div class="text-center">

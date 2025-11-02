@@ -6,12 +6,12 @@
 
 		<button class="btn btn-block bg-red my-3" @click="remove()">Remove reminder</button>
 
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(editReminder)">
 				<reminder-form v-model="reminder" :select-options="true" />
 				<button class="btn btn-block" :disabled="!valid">Save</button>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

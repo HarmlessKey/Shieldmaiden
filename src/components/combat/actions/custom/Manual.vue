@@ -16,7 +16,7 @@
 				indeterminate-value="something-else"
 			/>
 
-			<ValidationProvider rules="min_value:0" name="Input" v-slot="{ errors, invalid, validated }">
+			<Field rules="min_value:0" name="Input" v-slot="{ errorMessage, meta }">
 				<div class="manual">
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -33,8 +33,8 @@
 						}"
 						autocomplete="off"
 						:autofocus="autofocus"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!meta.valid && meta.validated"
+						:error-message="errorMessage"
 						@keypress="submitManual($event, !invalid)"
 					/>
 					<button
@@ -63,7 +63,7 @@
 					</button>
 					<TutorialPopover v-if="demo" step="manual" position="right" :offset="[10, 0]" />
 				</div>
-			</ValidationProvider>
+			</Field>
 
 			<div class="select-amount" :class="{ 'has-defenses': damage_type }">
 				<div>Target</div>

@@ -5,10 +5,10 @@
 				<div class="card-body">
 					<h3>Thank you for creating a <strong>Shieldmaiden</strong> account!</h3>
 					<p>To continue, please first enter a username.</p>
-					<ValidationProvider
+					<Field
 						rules="required|alpha_num|min:3|max:20|username"
 						name="Username"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -21,8 +21,8 @@
 							maxlength="20"
 							minlength="3"
 							v-model="username"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
 						<button
 							class="btn btn-block"
@@ -31,7 +31,7 @@
 						>
 							Save
 						</button>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</hk-card>
 		</template>

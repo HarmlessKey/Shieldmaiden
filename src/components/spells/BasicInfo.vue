@@ -8,10 +8,10 @@
 			<div class="row q-col-gutter-md">
 				<!-- NAME -->
 				<div class="col-12 col-md-6">
-					<ValidationProvider
+					<Field
 						rules="max:100|required"
 						name="Name"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -22,15 +22,15 @@
 							class="mb-2"
 							maxlength="101"
 							autocomplete="off"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 
 				<!-- LEVEL -->
 				<div class="col-12 col-md-3">
-					<ValidationProvider rules="required" name="Level" v-slot="{ errors, invalid, validated }">
+					<Field rules="required" name="Level" v-slot="{ errorMessage, meta }">
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -41,18 +41,18 @@
 							:options="spell_levels"
 							v-model="spell.level"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 
 				<!-- SCHOOL -->
 				<div class="col-12 col-md-3">
-					<ValidationProvider
+					<Field
 						rules="required"
 						name="School"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -64,20 +64,20 @@
 							label="School *"
 							v-model="spell.school"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</div>
 
 			<div class="row q-col-gutter-md">
 				<!-- CAST TIME -->
 				<div class="col-12 col-md-2">
-					<ValidationProvider
+					<Field
 						rules="required|between:1,999"
 						name="Cast time"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -88,19 +88,19 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 							@input="(value) => parseToInt(value, spell, 'cast_time')"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 
 				<!-- CAST TIME TYPE -->
 				<div class="col-12 col-md-3">
-					<ValidationProvider
+					<Field
 						rules="required"
 						name="Cast type"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -117,17 +117,17 @@
 									if (value !== 'reaction') $delete(spell, 'cast_time_react_desc');
 								}
 							"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 				<!-- REACTION TIME DESCRIPTION -->
 				<div class="col-12 col-md-7" v-if="spell.cast_time_type === 'reaction'">
-					<ValidationProvider
+					<Field
 						rules="max:200"
 						name="Reaction time description"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -138,10 +138,10 @@
 							:disable="spell.cast_time_type !== 'reaction'"
 							autocomplete="off"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</div>
 			<div class="row q-col-gutter-md">
@@ -164,10 +164,10 @@
 					class="col-12 col-md-8"
 					v-if="spell.components && spell.components.includes('material')"
 				>
-					<ValidationProvider
+					<Field
 						rules="required|max:500"
 						name="Material components description"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -180,19 +180,19 @@
 							maxlength="501"
 							class="mb-2"
 							type="text"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</div>
 			<div class="row q-col-gutter-md">
 				<!-- RANGE TYPE -->
 				<div class="col-12 col-md-4">
-					<ValidationProvider
+					<Field
 						rules="required"
 						name="Range type"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -209,21 +209,21 @@
 									if (value !== 'ranged') $delete(spell, 'range');
 								}
 							"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 
 				<!-- RANGE -->
 				<div class="col-12 col-md-4">
-					<ValidationProvider
+					<Field
 						:rules="{
 							required: spell.range_type === 'ranged',
 							between: [0, 9999999],
 						}"
 						name="Range"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -235,13 +235,13 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 							@input="(value) => parseToInt(value, spell, 'range')"
 						>
 							<span slot="append" class="neutral-2">ft.</span>
 						</q-input>
-					</ValidationProvider>
+					</Field>
 				</div>
 
 				<!-- CLASSES -->
@@ -262,10 +262,10 @@
 			<div class="row q-col-gutter-md">
 				<!-- DURATION TYPE -->
 				<div class="col-12 col-md-4">
-					<ValidationProvider
+					<Field
 						rules="required"
 						name="Duration type"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -285,21 +285,21 @@
 									}
 								}
 							"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 
 				<!-- DURATION -->
 				<div class="col-12 col-md-4">
-					<ValidationProvider
+					<Field
 						:rules="{
 							required: spell_duration_types_time.includes(spell.duration_type),
 							between: [1, 999],
 						}"
 						name="Duration"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -313,21 +313,21 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 							@input="(value) => parseToInt(value, spell, 'duration')"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 
 				<!-- DURATION SCALE -->
 				<div class="col-12 col-md-4">
-					<ValidationProvider
+					<Field
 						:rules="{
 							required: spell_duration_types_time.includes(spell.duration_type),
 						}"
 						name="Time scale"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -342,19 +342,19 @@
 							v-model="spell.duration_scale"
 							:disable="!spell_duration_types_time.includes(spell.duration_type)"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</div>
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-6">
 					<!-- AOE TYPE -->
-					<ValidationProvider
+					<Field
 						rules="required"
 						name="AOE type"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -371,19 +371,19 @@
 									if (value === 'none') $delete(spell, 'aoe_size');
 								}
 							"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 				<div class="col-12 col-md-6">
-					<ValidationProvider
+					<Field
 						:rules="{
 							required: spell.aoe_type !== 'none',
 							between: [1, 99999],
 						}"
 						name="AOE size"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -396,12 +396,12 @@
 							class="mb-2"
 							type="number"
 							@input="(value) => parseToInt(value, spell, 'aoe_size')"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						>
 							<span slot="append" class="neutral-2">ft.</span>
 						</q-input>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</div>
 			<div class="row q-col-gutter-md spell_row">
@@ -418,10 +418,10 @@
 				</div>
 				<!-- LEVEL SCALING -->
 				<div class="col-12 col-md-5">
-					<ValidationProvider
+					<Field
 						rules="required"
 						name="Spell scaling"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage, meta }"
 					>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -433,8 +433,8 @@
 							label="Spell scaling *"
 							v-model="spell.scaling"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 							@change="$forceUpdate()"
 						>
 							<hk-popover
@@ -445,11 +445,11 @@
 								<q-icon name="info" />
 							</hk-popover>
 						</q-select>
-					</ValidationProvider>
+					</Field>
 				</div>
 				<!-- SOURCE BOOK -->
 				<div class="col-12 col-md-5">
-					<ValidationProvider rules="max:30" name="Source" v-slot="{ errors, invalid, validated }">
+					<Field rules="max:30" name="Source" v-slot="{ errorMessage, meta }">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -459,34 +459,34 @@
 							autocomplete="off"
 							maxlength="31"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 				</div>
 			</div>
 
 			<!-- DESCRIPTION -->
-			<ValidationProvider
+			<Field
 				rules="max:5000"
 				name="Description"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage, meta }"
 			>
 				<hk-markdown-editor
 					v-model="spell.description"
 					label="Description"
 					class="mb-2"
 					maxlength="5001"
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!meta.valid && meta.validated"
+					:error-message="errorMessage"
 				>
 				</hk-markdown-editor>
-			</ValidationProvider>
+			</Field>
 
-			<ValidationProvider
+			<Field
 				rules="max:1000"
 				name="At higher levels"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage, meta }"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -496,11 +496,11 @@
 					v-model="spell.higher_level"
 					class="mb-2"
 					maxlength="1001"
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!meta.valid && meta.validated"
+					:error-message="errorMessage"
 					autogrow
 				/>
-			</ValidationProvider>
+			</Field>
 		</div>
 	</hk-card>
 </template>

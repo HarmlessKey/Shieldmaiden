@@ -18,7 +18,7 @@
 		</div>
 
 		<template v-if="type === 'damage'">
-			<ValidationObserver v-slot="{ valid }">
+			<Form v-slot="{ valid }">
 				<div class="damage_inputs">
 					<div>Amount</div>
 					<div>Type</div>
@@ -26,10 +26,10 @@
 						><i aria-hidden="true" class="fas fa-plus green"></i
 					></a>
 					<template v-for="(input, i) in damage">
-						<ValidationProvider
+						<Field
 							rules="required|numeric|min_value:0"
 							:name="`amount-${i}`"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage, meta }"
 							:key="`damage-${i}`"
 						>
 							<q-input
@@ -43,10 +43,10 @@
 								type="number"
 								v-model="damage[i].amount"
 								min="0"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!meta.valid && meta.validated"
+								:error-message="errorMessage"
 							/>
-						</ValidationProvider>
+						</Field>
 
 						<hk-dmg-type-select
 							v-model="damage[i].damage_type"
@@ -69,14 +69,14 @@
 				>
 					Send Request
 				</button>
-			</ValidationObserver>
+			</Form>
 		</template>
 
-		<ValidationObserver v-if="type === 'healing'" v-slot="{ valid }">
-			<ValidationProvider
+		<Form v-if="type === 'healing'" v-slot="{ valid }">
+			<Field
 				rules="required|numeric|min_value:0"
 				name="Manual input`"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage, meta }"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -87,10 +87,10 @@
 					v-model="healingAmount"
 					min="0"
 					class="healing-input"
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!meta.valid && meta.validated"
+					:error-message="errorMessage"
 				/>
-			</ValidationProvider>
+			</Field>
 			<button
 				class="btn btn-block"
 				@click="valid ? sendRequest() : null"
@@ -98,7 +98,7 @@
 			>
 				Send Request
 			</button>
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

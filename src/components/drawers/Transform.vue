@@ -12,15 +12,15 @@
 				for the Polymorph spell. Damage and healing is handled as the Player's Handbook describes it
 				should work for Wild Shape (phb 67).
 			</small>
-			<ValidationObserver v-slot="{ handleSubmit }">
+			<Form v-slot="{ handleSubmit }">
 				<div class="mb-2">Manual transform</div>
 				<q-form @submit="handleSubmit(edit())">
 					<div class="row q-col-gutter-md">
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:1,99|required"
 								name="AC"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -34,17 +34,17 @@
 									v-model="transAc"
 									min="1"
 									max="99"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 
 						<div class="col">
-							<ValidationProvider
+							<Field
 								rules="between:1,9999|required"
 								name="HP"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage, meta }"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -56,15 +56,15 @@
 									min="1"
 									max="9999"
 									v-model="transHp"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
-							</ValidationProvider>
+							</Field>
 						</div>
 					</div>
 					<q-btn no-caps label="Transform" class="full-width mb-3" color="primary" type="submit" />
 				</q-form>
-			</ValidationObserver>
+			</Form>
 
 			<hk-transform-select @select="edit" />
 		</template>

@@ -209,7 +209,7 @@
 		</hk-card>
 		<q-dialog v-model="password_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
+				<Form v-slot="{ handleSubmit, valid }">
 					<q-form @submit="handleSubmit(linkMethod('password'))">
 						<hk-card header="Set a password">
 							<div class="card-body pb-0">
@@ -240,7 +240,7 @@
 							</div>
 						</hk-card>
 					</q-form>
-				</ValidationObserver>
+				</Form>
 			</div>
 		</q-dialog>
 		<q-dialog v-model="sign_in_dialog">

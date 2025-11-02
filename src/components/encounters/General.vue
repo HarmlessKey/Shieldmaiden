@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
+		<Form v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)" greedy>
 				<h3 class="d-flex justify-between">
 					Atmosphere
@@ -43,7 +43,7 @@
 				</template>
 
 				<template v-else>
-					<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
+					<Field rules="required" name="Name" v-slot="{ errorMessage, meta }">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -52,12 +52,12 @@
 							autocomplete="off"
 							class="mb-3"
 							v-model="editableEncounter.name"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!meta.valid && meta.validated"
+							:error-message="errorMessage"
 						/>
-					</ValidationProvider>
+					</Field>
 
-					<ValidationProvider rules="audio" name="Audio" v-slot="{ errors, invalid, validated }">
+					<Field rules="audio" name="Audio" v-slot="{ errorMessage, meta }">
 						<div class="audio">
 							<div v-if="encounter.audio && !invalid" class="img pointer">
 								<a :href="encounter.audio" target="_blank" rel="noopener">
@@ -79,12 +79,12 @@
 									autocomplete="off"
 									v-model="editableEncounter.audio"
 									placeholder="Audio URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 								/>
 							</div>
 						</div>
-					</ValidationProvider>
+					</Field>
 
 					<hk-background-select
 						v-if="demo || (tier && tier.price !== 'Free')"
@@ -94,7 +94,7 @@
 						@input="setBackground($event)"
 						class="mb-3"
 					/>
-					<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
+					<Field rules="url" name="Audio" v-slot="{ errorMessage, meta }">
 						<div class="background mb-3">
 							<div
 								v-if="encounter.background && !invalid"
@@ -115,8 +115,8 @@
 									v-model="editableEncounter.background"
 									class="mb-2"
 									placeholder="Background URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!meta.valid && meta.validated"
+									:error-message="errorMessage"
 									@input="editableEncounter.hk_background = null"
 								>
 									<hk-popover
@@ -132,7 +132,7 @@
 								</q-input>
 							</div>
 						</div>
-					</ValidationProvider>
+					</Field>
 
 					<template v-if="tier && tier.price !== 'Free'">
 						<h3>
@@ -187,7 +187,7 @@
 					</hk-card>
 				</template>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 
 		<q-dialog v-if="demo || (tier && tier.price !== 'Free')" v-model="image" full-height full-width>
 			<q-card :dark="$store.getters.theme === 'dark'">

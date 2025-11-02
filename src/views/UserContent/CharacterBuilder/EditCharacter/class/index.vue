@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ valid }">
+		<Form v-slot="{ valid }">
 			<q-form greedy>
 				<hk-card>
 					<div class="card-header" slot="header">
@@ -111,10 +111,10 @@
 
 										<!-- Custom class name -->
 										<div v-if="subclass.class === 'custom'">
-											<ValidationProvider
+											<Field
 												rules="required|max:30"
 												name="Class name"
-												v-slot="{ errors, invalid, validated }"
+												v-slot="{ errorMessage, meta }"
 											>
 												<q-input
 													:dark="$store.getters.theme === 'dark'"
@@ -125,14 +125,14 @@
 													autocomplete="off"
 													type="text"
 													v-model="subclass.name"
-													:error="invalid && validated"
-													:error-message="errors[0]"
+													:error="!meta.valid && meta.validated"
+													:error-message="errorMessage"
 												/>
-											</ValidationProvider>
-											<ValidationProvider
+											</Field>
+											<Field
 												rules="required|max:50"
 												name="Subclass"
-												v-slot="{ errors, invalid, validated }"
+												v-slot="{ errorMessage, meta }"
 											>
 												<q-input
 													:dark="$store.getters.theme === 'dark'"
@@ -144,10 +144,10 @@
 													:id="`${classIndex}-subclass`"
 													type="text"
 													v-model="subclass.subclass"
-													:error="invalid && validated"
-													:error-message="errors[0]"
+													:error="!meta.valid && meta.validated"
+													:error-message="errorMessage"
 												/>
-											</ValidationProvider>
+											</Field>
 										</div>
 
 										<template v-if="subclass.class">
@@ -602,10 +602,10 @@
 										class="roll_hp"
 										:class="{ hidden: editClass === 0 && level === 1 }"
 									>
-										<ValidationProvider
+										<Field
 											:rules="{ between: [1, character_classes[editClass].hit_dice] }"
 											:name="`Level ${level}`"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage, meta }"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -617,8 +617,8 @@
 												type="number"
 												v-model="character_classes[editClass].rolled_hit_points[level]"
 												:label="`Level ${level}`"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!meta.valid && meta.validated"
+												:error-message="errorMessage"
 											>
 												<button
 													slot="after"
@@ -632,7 +632,7 @@
 													Roll
 												</button>
 											</q-input>
-										</ValidationProvider>
+										</Field>
 									</div>
 								</template>
 								<div v-else class="red">First set the class' hit dice.</div>
@@ -712,7 +712,7 @@
 					</q-dialog>
 				</hk-card>
 			</q-form>
-		</ValidationObserver>
+		</Form>
 	</div>
 </template>
 

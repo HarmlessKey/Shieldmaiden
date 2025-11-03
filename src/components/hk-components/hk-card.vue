@@ -81,7 +81,7 @@
 		},
 		computed: {
 			hasBody() {
-				return !!this.$slots.default || !!this.$scopedSlots.default;
+				return !!this.$slots.default;
 			}
 		},
 		methods: {

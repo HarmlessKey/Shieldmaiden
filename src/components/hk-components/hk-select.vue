@@ -11,8 +11,7 @@
 				:error="rules ? !meta.valid && meta.validated : null"
 				:error-message="errorMessage"
 			>
-				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
-				<template v-for="slot in Object.keys($scopedSlots)" :slot="slot" slot-scope="scope">
+				<template v-for="(_, slot) in $slots" #[slot]="scope">
 					<slot :name="slot" v-bind="scope" />
 				</template>
 			</q-select>

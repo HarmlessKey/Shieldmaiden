@@ -81,10 +81,10 @@ const item_actions = {
   },
 };
 const item_mutations = {
-  SET_ITEM_SERVICES(state, payload) { Vue.set(state, "item_services", payload); },
-  SET_ITEMS(state, payload) { Vue.set(state, "items", payload); },
-  SET_CACHED_ITEM(state, payload) { Vue.set(state.cached_items, payload["_id"], payload) },
-  SET_CACHED_URL(state, { url, id }) { Vue.set(state.cached_urls, url, id) },
+  SET_ITEM_SERVICES(state, payload) { state.item_services = payload; },
+  SET_ITEMS(state, payload) { state.items = payload; },
+  SET_CACHED_ITEM(state, payload) { state.cached_items[payload["_id"]] = payload },
+  SET_CACHED_URL(state, { url, id }) { state.cached_urls[url] = id },
 };
 
 export default {

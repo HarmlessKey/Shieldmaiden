@@ -218,42 +218,42 @@ const reminder_actions = {
 
 const reminder_mutations = {
 	SET_REMINDER_SERVICES(state, payload) {
-		Vue.set(state, "reminder_services", payload);
+		state.reminder_services = payload;
 	},
 	SET_REMINDER_COUNT(state, value) {
-		Vue.set(state, "reminder_count", value);
+		state.reminder_count = value;
 	},
 	SET_REMINDERS(state, value) {
-		Vue.set(state, "reminders", value);
+		state.reminders = value;
 	},
 	SET_CACHED_REMINDERS(state, { uid, reminders }) {
-		Vue.set(state.cached_reminders, uid, reminders);
+		state.cached_reminders[uid] = reminders;
 	},
 	SET_CACHED_REMINDER(state, { uid, id, reminder }) {
 		if (state.cached_reminders[uid]) {
-			Vue.set(state.cached_reminders[uid], id, reminder);
+			state.cached_reminders[uid][id] = reminder;
 		} else {
-			Vue.set(state.cached_reminders, uid, { [id]: reminder });
+			state.cached_reminders[uid] = { [id]: reminder };
 		}
 	},
 	SET_REMINDER(state, { id, search_reminder }) {
 		if (state.reminders) {
-			Vue.set(state.reminders, id, search_reminder);
+			state.reminders[id] = search_reminder;
 		} else {
-			Vue.set(state, "reminders", { [id]: search_reminder });
+			state.reminders = { [id]: search_reminder };
 		}
 	},
 	REMOVE_REMINDER(state, id) {
-		Vue.delete(state.reminders, id);
+		delete state.reminders[id];
 	},
 	REMOVE_CACHED_REMINDER(state, { uid, id }) {
 		if (state.cached_reminders[uid]) {
-			Vue.delete(state.cached_reminders[uid], id);
+			delete state.cached_reminders[uid][id];
 		}
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "reminders", undefined);
-		Vue.set(state, "reminder_count", 0);
+		state.reminders = undefined;
+		state.reminder_count = 0;
 	},
 };
 

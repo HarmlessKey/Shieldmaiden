@@ -248,39 +248,39 @@ const spell_actions = {
 
 const spell_mutations = {
 	SET_SPELL_SERVICES(state, payload) {
-		Vue.set(state, "spell_services", payload);
+		state.spell_services = payload;
 	},
 	SET_SPELL_COUNT(state, value) {
-		Vue.set(state, "spell_count", value);
+		state.spell_count = value;
 	},
 	SET_SPELLS(state, value) {
-		Vue.set(state, "spells", value);
+		state.spells = value;
 	},
 	SET_CACHED_SPELL(state, { uid, id, spell }) {
 		if (state.cached_spells[uid]) {
-			Vue.set(state.cached_spells[uid], id, spell);
+			state.cached_spells[uid][id] = spell;
 		} else {
-			Vue.set(state.cached_spells, uid, { [id]: spell });
+			state.cached_spells[uid] = { [id]: spell };
 		}
 	},
 	SET_SPELL(state, { id, search_spell }) {
 		if (state.spells) {
-			Vue.set(state.spells, id, search_spell);
+			state.spells[id] = search_spell;
 		} else {
-			Vue.set(state, "spells", { [id]: search_spell });
+			state.spells = { [id]: search_spell };
 		}
 	},
 	REMOVE_SPELL(state, id) {
-		Vue.delete(state.spells, id);
+		delete state.spells[id];
 	},
 	REMOVE_CACHED_SPELL(state, { uid, id }) {
 		if (state.cached_spells[uid]) {
-			Vue.delete(state.cached_spells[uid], id);
+			delete state.cached_spells[uid][id];
 		}
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "spells", undefined);
-		Vue.set(state, "spell_count", 0);
+		state.spells = undefined;
+		state.spell_count = 0;
 	},
 };
 

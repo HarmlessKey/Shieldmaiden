@@ -537,106 +537,106 @@ const user_actions = {
 
 const user_mutations = {
 	SET_USER_SERVICES(state, payload) {
-		Vue.set(state, "user_services", payload);
+		state.user_services = payload;
 	},
 	SET_PATREON_SERVICES(state, payload) {
-		Vue.set(state, "patreon_services", payload);
+		state.patreon_services = payload;
 	},
 	SET_USER(state, payload) {
-		Vue.set(state, "user", payload);
+		state.user = payload;
 	},
 	SET_USERINFO(state, payload) {
 		const newVal = state.userInfo ? { ...state.userInfo, ...payload } : payload;
-		Vue.set(state, "userInfo", newVal);
+		state.userInfo = newVal;
 	},
 	SET_USER_SETTINGS(state, payload) {
-		Vue.set(state, "userSettings", payload);
+		state.userSettings = payload;
 	},
 	UPDATE_USER_SETTINGS(state, { category, sub_category, type, value }) {
 		if (!sub_category) {
 			if (state.userSettings && state.userSettings[category]) {
-				Vue.set(state.userSettings[category], type, value);
+				state.userSettings[category][type] = value;
 			} else {
-				Vue.set(state.userSettings, category, { [type]: value });
+				state.userSettings[category] = { [type]: value };
 			}
 		} else if (state.userSettings && state.userSettings[category]) {
 			if (state.userSettings[category][sub_category]) {
-				Vue.set(state.userSettings[category][sub_category], type, value);
+				state.userSettings[category][sub_category][type] = value;
 			} else {
-				Vue.set(state.userSettings[category], sub_category, { [type]: value });
+				state.userSettings[category][sub_category] = { [type]: value };
 			}
 		} else {
-			Vue.set(state.userSettings, category, { [sub_category]: { [type]: value } });
+			state.userSettings[category] = { [sub_category]: { [type]: value } };
 		}
 	},
 	SET_DEFAULT_SETTINGS(state, category) {
-		Vue.delete(state.userSettings, category);
+		delete state.userSettings[category];
 	},
 	SET_TIER(state, payload) {
-		Vue.set(state, "tier", payload);
-		Vue.set(state.tier, "benefits", payload.benefits || {});
-		Vue.set(state.tier.benefits, "ai_credits", payload.benefits?.ai_credits || 0);
+		state.tier = payload;
+		state.tier.benefits = payload.benefits || {};
+		state.tier.benefits.ai_credits = payload.benefits?.ai_credits || 0;
 	},
 	SET_VOUCHER(state, payload) {
-		Vue.set(state, "voucher", payload);
+		state.voucher = payload;
 	},
 	SET_AI_SPENT(state, payload) {
-		Vue.set(state.ai, "spent", payload);
+		state.ai.spent = payload;
 	},
 	SET_AI_CREDITS(state, payload) {
-		Vue.set(state.ai, "credits", payload);
+		state.ai.credits = payload;
 	},
 	SET_ENCUMBRANCE(state, value) {
-		Vue.set(state, "overencumbered", value);
+		state.overencumbered = value;
 	},
 	SET_CONTENT_COUNT(state, value) {
-		Vue.set(state, "content_count", value);
+		state.content_count = value;
 	},
 	SET_SLOTS_USED(state, { available_slots, used_slots }) {
-		Vue.set(state, "slots_used", { available_slots, used_slots });
+		state.slots_used = { available_slots, used_slots };
 	},
 	SET_FOLLOWED(state, payload) {
-		Vue.set(state, "followed", payload);
+		state.followed = payload;
 	},
 	SET_BROADCAST(state, payload) {
-		Vue.set(state, "broadcast", payload);
+		state.broadcast = payload;
 	},
 	SET_BROADCAST_ENCOUNTER(state, payload) {
-		Vue.set(state.broadcast, "encounter", payload);
+		state.broadcast.encounter = payload;
 	},
 	SET_BROADCAST_SHARES(state, payload) {
-		Vue.set(state.broadcast, "shares", payload);
+		state.broadcast.shares = payload;
 	},
 	SET_SOUNDBOARD(state, soundboard) {
-		Vue.set(state, "soundboard", soundboard);
+		state.soundboard = soundboard;
 	},
 	SET_SOUNDBOARD_LINK(state, { id, link }) {
 		if (state.soundboard) {
-			Vue.set(state.soundboard, id, link);
+			state.soundboard[id] = link;
 		} else {
-			Vue.set(state, "soundboard", { [id]: link });
+			state.soundboard = { [id]: link };
 		}
 	},
 	DELETE_SOUNDBOARD_LINK(state, key) {
-		Vue.delete(state.soundboard, key);
+		delete state.soundboard[key];
 	},
 	SET_PATREON_AUTH(state, payload) {
-		Vue.set(state, "patreon_auth", payload);
+		state.patreon_auth = payload;
 	},
 	SET_PATREON_USER(state, patron) {
-		Vue.set(state, "patreon_user", patron);
+		state.patreon_user = patron;
 	},
 	CLEAR_USER(state) {
-		Vue.set(state, "user", undefined);
-		Vue.set(state, "userInfo", undefined);
-		Vue.set(state, "tier", undefined);
-		Vue.set(state, "voucher", undefined);
-		Vue.set(state, "overencumbered", undefined);
-		Vue.set(state, "content_count", {});
-		Vue.set(state, "slots_used", {});
-		Vue.set(state, "userSettings", {});
-		Vue.set(state, "poster", undefined);
-		Vue.set(state, "broadcast", {});
+		state.user = undefined;
+		state.userInfo = undefined;
+		state.tier = undefined;
+		state.voucher = undefined;
+		state.overencumbered = undefined;
+		state.content_count = {};
+		state.slots_used = {};
+		state.userSettings = {};
+		state.poster = undefined;
+		state.broadcast = {};
 	},
 };
 

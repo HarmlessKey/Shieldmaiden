@@ -1143,46 +1143,46 @@ const encounter_actions = {
 };
 const encounter_mutations = {
 	SET_ENCOUNTER_SERVICES(state, payload) {
-		Vue.set(state, "encounter_services", payload);
+		state.encounter_services = payload;
 	},
 	SET_CACHED_ENCOUNTERS(state, { uid, encounters }) {
-		Vue.set(state.cached_encounters, uid, encounters);
+		state.cached_encounters[uid] = encounters;
 	},
 	SET_ENCOUNTER_COUNT(state, { campaignId, count }) {
-		Vue.set(state.encounter_count, campaignId, count);
+		state.encounter_count[campaignId] = count;
 	},
 	SET_ENCOUNTER(state, { campaignId, id, encounter }) {
 		if (state.encounters[campaignId]) {
-			Vue.set(state.encounters[campaignId], id, encounter);
+			state.encounters[campaignId][id] = encounter;
 		} else {
-			Vue.set(state.encounters, campaignId, { [id]: encounter });
+			state.encounters[campaignId] = { [id]: encounter };
 		}
 	},
 	UPDATE_SEARCH_ENCOUNTER(state, { campaignId, id, encounter }) {
 		if (state.encounters[campaignId] && state.encounters[campaignId][id]) {
-			Vue.set(state.encounters[campaignId], id, encounter);
+			state.encounters[campaignId][id] = encounter;
 		}
 	},
 	REMOVE_ENCOUNTER(state, { campaignId, id }) {
 		if (state.encounters[campaignId]) {
-			Vue.delete(state.encounters[campaignId], id);
+			delete state.encounters[campaignId][id];
 		}
 	},
 	REMOVE_CAMPAIGN_ENCOUNTERS(state, campaignId) {
 		if (state.encounters && state.encounters[campaignId]) {
-			Vue.delete(state.encounters, campaignId);
+			delete state.encounters[campaignId];
 		}
 	},
 	SET_ENCOUNTERS(state, { campaignId, encounters }) {
-		Vue.set(state.encounters, campaignId, encounters);
+		state.encounters[campaignId] = encounters;
 	},
 	ADD_ENTITY(state, { uid, campaignId, encounterId, entityId, entity }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].entities) {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
+			state.cached_encounters[uid][campaignId][encounterId].entities[entityId] = entity;
 		} else {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId], "entities", {
+			state.cached_encounters[uid][campaignId][encounterId].entities = {
 				[entityId]: entity,
-			});
+			};
 		}
 	},
 	DELETE_ENTITY(state, { uid, campaignId, encounterId, entityId }) {
@@ -1191,99 +1191,87 @@ const encounter_mutations = {
 			state.cached_encounters[uid][campaignId] &&
 			state.cached_encounters[uid][campaignId][encounterId]
 		) {
-			Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
+			delete state.cached_encounters[uid][campaignId][encounterId].entities[entityId];
 		}
 	},
 	UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {
 		if (campaignId in state.encounters && encounterId in state.encounters[campaignId]) {
-			Vue.set(state.encounters[campaignId][encounterId], "entity_count", count);
+			state.encounters[campaignId][encounterId].entity_count = count;
 		}
 	},
 	SET_CACHED_ENCOUNTER(state, { uid, campaignId, encounterId, encounter }) {
 		if (state.cached_encounters[uid]) {
 			if (state.cached_encounters[uid][campaignId]) {
-				Vue.set(state.cached_encounters[uid][campaignId], encounterId, encounter);
+				state.cached_encounters[uid][campaignId][encounterId] = encounter;
 			} else {
-				Vue.set(state.cached_encounters[uid], campaignId, { [encounterId]: encounter });
+				state.cached_encounters[uid][campaignId] = { [encounterId]: encounter };
 			}
 		} else {
-			Vue.set(state.cached_encounters, uid, { [campaignId]: { [encounterId]: encounter } });
+			state.cached_encounters[uid] = { [campaignId]: { [encounterId]: encounter } };
 		}
 	},
 	REMOVE_CACHED_ENCOUNTER(state, { uid, campaignId, id }) {
 		if (state.cached_encounters[uid] && state.cached_encounters[uid][campaignId]) {
-			Vue.delete(state.cached_encounters[uid][campaignId], id);
+			delete state.cached_encounters[uid][campaignId][id];
 		}
 	},
 	REMOVE_CACHED_ENCOUNTERS(state, { uid, campaignId }) {
 		if (state.cached_encounters[uid]) {
-			Vue.delete(state.cached_encounters[uid], campaignId);
+			delete state.cached_encounters[uid][campaignId];
 		}
 	},
 	EDIT_ENTITY(state, { uid, campaignId, encounterId, entityId, entity }) {
-		Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
+		state.cached_encounters[uid][campaignId][encounterId].entities[entityId] = entity;
 	},
 	SET_ENTITY_PROP(state, { uid, campaignId, encounterId, entityId, property, value }) {
 		if (value === null) {
-			Vue.delete(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId],
-				property
-			);
+			delete 
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId][property
+			];
 		} else {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId],
-				property,
-				value
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId][property] = value
+			;
 		}
 	},
 	SET_TRANSFORMED_PROP(state, { uid, campaignId, encounterId, entityId, property, value }) {
 		if (value === null) {
-			Vue.delete(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed,
-				property
-			);
+			delete 
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed[property
+			];
 		} else {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed,
-				property,
-				value
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed[property] = value
+			;
 		}
 	},
 	SET_ENTITY_METERS(state, { uid, campaignId, encounterId, entityId, type, value }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters) {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters,
-				type,
-				value
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters[type] = value
+			;
 		} else {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], "meters", {
+			state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters = {
 				[type]: value,
-			});
+			};
 		}
 	},
 	SET_ENTITY_CONDITION(state, { uid, campaignId, encounterId, entityId, condition, value }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions) {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions,
-				condition,
-				value
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions[condition] = value
+			;
 		} else {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId],
-				"conditions",
-				{ [condition]: value }
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions = { [condition]: value }
+			;
 		}
 	},
 	SET_XP_VALUE(state, { uid, campaignId, encounterId, type, value }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].xp) {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId].xp, type, value);
+			state.cached_encounters[uid][campaignId][encounterId].xp[type] = value;
 		} else {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId], "xp", { [type]: value });
+			state.cached_encounters[uid][campaignId][encounterId].xp = { [type]: value };
 		}
 	},
 	UPDATE_LIMITED_USES(state, { uid, campaignId, encounterId, key, category, index, value }) {
@@ -1291,37 +1279,31 @@ const encounter_mutations = {
 			if (
 				state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses[category]
 			) {
-				Vue.set(
+				
 					state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses[
 						category
-					],
-					index,
-					value
-				);
+					][index] = value
+				;
 			} else {
-				Vue.set(
-					state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses,
-					category,
-					{ [index]: value }
-				);
+				
+					state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses[category] = { [index]: value }
+				;
 			}
 		} else {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId], "limited_uses", {
+			state.cached_encounters[uid][campaignId][encounterId].limited_uses = {
 				[category]: { [index]: value },
-			});
+			};
 		}
 	},
 	SET_REMINDER(state, { uid, campaignId, encounterId, entity, key, reminder }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders) {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders,
-				key,
-				reminder
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders[key] = reminder
+			;
 		} else {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity], "reminders", {
+			state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders = {
 				[key]: reminder,
-			});
+			};
 		}
 	},
 	SET_LOOT(state, { uid, campaignId, encounterId, id, item }) {
@@ -1331,18 +1313,16 @@ const encounter_mutations = {
 			state.cached_encounters[uid][campaignId][encounterId]
 		) {
 			if (state.cached_encounters[uid][campaignId][encounterId].loot) {
-				Vue.set(state.cached_encounters[uid][campaignId][encounterId].loot, id, item);
+				state.cached_encounters[uid][campaignId][encounterId].loot[id] = item;
 			} else {
-				Vue.set(state.cached_encounters[uid][campaignId][encounterId], "loot", { [id]: item });
+				state.cached_encounters[uid][campaignId][encounterId].loot = { [id]: item };
 			}
 		}
 	},
 	ADD_ITEM_LINK(state, { uid, campaignId, encounterId, parent_item, item }) {
-		Vue.set(
-			state.cached_encounters[uid][campaignId][encounterId].loot[parent_item],
-			"linked_item",
-			item
-		);
+		
+			state.cached_encounters[uid][campaignId][encounterId].loot[parent_item].linked_item = item
+		;
 	},
 	REMOVE_ITEM_LINK(state, { uid, campaignId, encounterId, parent_item }) {
 		if (
@@ -1352,10 +1332,9 @@ const encounter_mutations = {
 			state.cached_encounters[uid][campaignId][encounterId].loot &&
 			state.cached_encounters[uid][campaignId][encounterId].loot[parent_item]
 		) {
-			Vue.delete(
-				state.cached_encounters[uid][campaignId][encounterId].loot[parent_item],
-				"linked_item"
-			);
+			delete 
+				state.cached_encounters[uid][campaignId][encounterId].loot[parent_item][	"linked_item"
+			];
 		}
 	},
 	DELETE_LOOT(state, { uid, campaignId, encounterId, id }) {
@@ -1365,43 +1344,35 @@ const encounter_mutations = {
 			state.cached_encounters[uid][campaignId][encounterId] &&
 			state.cached_encounters[uid][campaignId][encounterId].loot
 		) {
-			Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot, id);
+			delete state.cached_encounters[uid][campaignId][encounterId].loot[id];
 		}
 	},
 	UPDATE_REMINDER(state, { uid, campaignId, encounterId, entity, key, property, value }) {
-		Vue.set(
-			state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders[key],
-			property,
-			value
-		);
+		
+			state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders[key][property] = value
+		;
 	},
 	SET_ENTITY_SETTING(state, { uid, campaignId, encounterId, entityId, key, value }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings) {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings,
-				key,
-				value
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings[key] = value
+			;
 		} else {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId],
-				"settings",
-				{ [key]: value }
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings = { [key]: value }
+			;
 		}
 	},
 	CLEAR_ENTITY_SETTINGS(state, { uid, campaignId, encounterId, entityId }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].entities[entityId]) {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId],
-				"settings",
-				{}
-			);
+			
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings = {}
+			;
 		}
 	},
 	DELETE_REQUEST(state, { uid, campaignId, encounterId, id }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].requests) {
-			Vue.delete(state.cached_encounters[uid][campaignId][encounterId].requests, id);
+			delete state.cached_encounters[uid][campaignId][encounterId].requests[id];
 		}
 	},
 	SET_ENCOUNTER_PROP(state, { uid, campaignId, encounterId, property, value, update_search }) {
@@ -1410,37 +1381,37 @@ const encounter_mutations = {
 			state.encounters[campaignId] &&
 			state.encounters[campaignId][encounterId]
 		) {
-			Vue.set(state.encounters[campaignId][encounterId], property, value);
+			state.encounters[campaignId][encounterId][property] = value;
 		}
 		if (
 			state.cached_encounters[uid] &&
 			state.cached_encounters[uid][campaignId] &&
 			state.cached_encounters[uid][campaignId][encounterId]
 		) {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId], property, value);
+			state.cached_encounters[uid][campaignId][encounterId][property] = value;
 		}
 	},
 	FINISH_ENCOUNTER(state, { uid, campaignId, id, finished }) {
 		if (state.encounters[campaignId] && state.encounters[campaignId][id]) {
-			Vue.set(state.encounters[campaignId][id], "finished", finished);
+			state.encounters[campaignId][id].finished = finished;
 		}
 		if (
 			state.cached_encounters[uid] &&
 			state.cached_encounters[uid][campaignId] &&
 			state.cached_encounters[uid][campaignId][id]
 		) {
-			Vue.set(state.cached_encounters[uid][campaignId][id], "finished", finished);
+			state.cached_encounters[uid][campaignId][id].finished = finished;
 		}
 	},
 	SAVE_DEMO(state, encounter) {
-		Vue.set(state, "demo_encounter", encounter);
+		state.demo_encounter = encounter;
 	},
 	ADD_DEMO_ENTITY(state, { key, entity }) {
-		Vue.set(state.demo_encounter.entities, key, entity);
+		state.demo_encounter.entities[key] = entity;
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "encounters", {});
-		Vue.set(state, "encounter_count", {});
+		state.encounters = {};
+		state.encounter_count = {};
 	},
 };
 

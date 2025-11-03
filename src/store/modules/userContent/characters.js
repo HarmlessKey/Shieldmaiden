@@ -189,29 +189,29 @@ const character_actions = {
 };
   
 const character_mutations = {
-  SET_CHARACTER_SERVICES(state, payload) { Vue.set(state, "character_services", payload); },
-  SET_CHARACTERS(state, payload) { Vue.set(state, "characters", payload); },
-  SET_CHARACTER_COUNT(state, value) { Vue.set(state, "character_count", value); },
+  SET_CHARACTER_SERVICES(state, payload) { state.character_services = payload; },
+  SET_CHARACTERS(state, payload) { state.characters = payload; },
+  SET_CHARACTER_COUNT(state, value) { state.character_count = value; },
   SET_CHARACTER(state, { id, search_character }) {
     if(state.characters) {
-      Vue.set(state.characters, id, search_character);
+      state.characters[id] = search_character;
     } else {
-      Vue.set(state, "characters", { [id]: search_character });
+      state.characters = { [id]: search_character };
     }
   },
   SET_CACHED_CHARACTER(state, {uid, id, character}) {
     if(state.cached_characters[uid]) {
-      Vue.set(state.cached_characters[uid], id, character);
+      state.cached_characters[uid][id] = character;
     } else {
-      Vue.set(state.cached_characters, uid, { [id]: character });
+      state.cached_characters[uid] = { [id]: character };
     }
   },
   REMOVE_CHARACTER(state, id) { 
-    Vue.delete(state.characters, id);
+    delete state.characters[id];
   },
   REMOVE_CACHED_CHARACTER(state, { uid, id }) { 
     if(state.cached_characters[uid]) {
-      Vue.delete(state.cached_characters[uid], id);
+      delete state.cached_characters[uid][id];
     }
   },
 };

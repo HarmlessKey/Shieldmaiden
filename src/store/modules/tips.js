@@ -51,7 +51,7 @@ const tip_actions = {
 
 const tip_mutations = {
 	SET_TIPS(state, payload) {
-		Vue.set(state, "tips", payload);
+		state.tips = payload;
 	},
 };
 

@@ -567,64 +567,64 @@ const player_actions = {
 };
 const player_mutations = {
 	SET_PLAYER_SERVICES(state, payload) {
-		Vue.set(state, "player_services", payload);
+		state.player_services = payload;
 	},
 	SET_PLAYERS(state, payload) {
-		Vue.set(state, "players", payload);
+		state.players = payload;
 	},
 	SET_CHARACTERS(state, payload) {
-		Vue.set(state, "characters", payload);
+		state.characters = payload;
 	},
 	SET_PLAYER_COUNT(state, value) {
-		Vue.set(state, "player_count", value);
+		state.player_count = value;
 	},
 	SET_PLAYER(state, { id, search_player }) {
 		if (state.players) {
-			Vue.set(state.players, id, search_player);
+			state.players[id] = search_player;
 		} else {
-			Vue.set(state, "players", { [id]: search_player });
+			state.players = { [id]: search_player };
 		}
 	},
 	UPDATE_SEARCH_PLAYER(state, { id, search_player }) {
 		if (state.players && state.players[id]) {
-			Vue.set(state.players, id, { ...state.players[id], ...search_player });
+			state.players[id] = { ...state.players[id], ...search_player };
 		}
 	},
 	REMOVE_PLAYER(state, id) {
-		Vue.delete(state.players, id);
+		delete state.players[id];
 	},
 	REMOVE_CHARACTER(state, id) {
 		if (state.characters) {
-			Vue.delete(state.characters, id);
+			delete state.characters[id];
 		}
 	},
 	SET_CACHED_PLAYER(state, { uid, id, player }) {
 		if (state.cached_players[uid]) {
-			Vue.set(state.cached_players[uid], id, player);
+			state.cached_players[uid][id] = player;
 		} else {
-			Vue.set(state.cached_players, uid, { [id]: player });
+			state.cached_players[uid] = { [id]: player };
 		}
 	},
 	PATCH_CACHED_PLAYER(state, { uid, id, player }) {
 		if (state.cached_players[uid]) {
-			Vue.set(state.cached_players[uid], id, { ...state.cached_players[uid][id], ...player });
+			state.cached_players[uid][id] = { ...state.cached_players[uid][id], ...player };
 		}
 	},
 	REMOVE_CACHED_PLAYER(state, { uid, id }) {
 		if (state.cached_players[uid]) {
-			Vue.delete(state.cached_players[uid], id);
+			delete state.cached_players[uid][id];
 		}
 	},
 	SET_PLAYER_PROP(state, { uid, id, property, value, update_search }) {
 		if (state.cached_players[uid] && state.cached_players[uid][id]) {
-			Vue.set(state.cached_players[uid][id], property, value);
+			state.cached_players[uid][id][property] = value;
 		}
 		if (update_search && state.players && state.players[id]) {
-			Vue.set(state.players[id], property, value);
+			state.players[id][property] = value;
 		}
 	},
 	SET_CONTROL(state, { uid, id, user_id }) {
-		Vue.set(state.cached_players[uid][id], "control", user_id);
+		state.cached_players[uid][id].control = user_id;
 	},
 	REMOVE_COMPANION(state, { uid, playerId, id }) {
 		if (
@@ -632,16 +632,16 @@ const player_mutations = {
 			state.cached_players[uid][playerId] &&
 			state.cached_players[uid][playerId].campanions
 		) {
-			Vue.delete(state.cached_players[uid][playerId].campanions, id);
+			delete state.cached_players[uid][playerId].campanions[id];
 		}
 		if (state.players && state.players[playerId] && state.players[playerId].companions) {
-			Vue.delete(state.players[playerId].companions, id);
+			delete state.players[playerId].companions[id];
 		}
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "players", undefined);
-		Vue.set(state, "player_count", 0);
-		Vue.set(state, "characters", undefined);
+		state.players = undefined;
+		state.player_count = 0;
+		state.characters = undefined;
 	},
 };
 

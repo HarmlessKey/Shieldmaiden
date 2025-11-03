@@ -198,39 +198,39 @@ const item_actions = {
 
 const item_mutations = {
 	SET_ITEM_SERVICES(state, payload) {
-		Vue.set(state, "item_services", payload);
+		state.item_services = payload;
 	},
 	SET_ITEM_COUNT(state, value) {
-		Vue.set(state, "item_count", value);
+		state.item_count = value;
 	},
 	SET_ITEMS(state, value) {
-		Vue.set(state, "items", value);
+		state.items = value;
 	},
 	SET_CACHED_ITEM(state, { uid, id, item }) {
 		if (state.cached_items[uid]) {
-			Vue.set(state.cached_items[uid], id, item);
+			state.cached_items[uid][id] = item;
 		} else {
-			Vue.set(state.cached_items, uid, { [id]: item });
+			state.cached_items[uid] = { [id]: item };
 		}
 	},
 	SET_ITEM(state, { id, search_item }) {
 		if (state.items) {
-			Vue.set(state.items, id, search_item);
+			state.items[id] = search_item;
 		} else {
-			Vue.set(state, "items", { [id]: search_item });
+			state.items = { [id]: search_item };
 		}
 	},
 	REMOVE_ITEM(state, id) {
-		Vue.delete(state.items, id);
+		delete state.items[id];
 	},
 	REMOVE_CACHED_ITEM(state, { uid, id }) {
 		if (state.cached_items[uid]) {
-			Vue.delete(state.cached_items[uid], id);
+			delete state.cached_items[uid][id];
 		}
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "items", undefined);
-		Vue.set(state, "item_count", 0);
+		state.items = undefined;
+		state.item_count = 0;
 	},
 };
 

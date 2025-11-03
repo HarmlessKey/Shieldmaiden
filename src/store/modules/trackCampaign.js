@@ -123,20 +123,20 @@ const track_campaign_actions = {
   }
 };
 const track_campaign_mutations = {
-  SET_CAMPAIGN_SERVICES(state, payload) { Vue.set(state, "campaign_services", payload); },
-  SET_USER(state, { uid, user }) { Vue.set(state.users, uid, user); },
-  SET_USER_SETTINGS(state, { uid, settings }) { Vue.set(state.users[uid], "settings", settings); },
-  SET_USER_LIVE(state, { uid, live }) { Vue.set(state.users[uid], "live", live); },
-  SET_CAMPAIGNS(state, { uid, campaigns}) { Vue.set(state.track_search_campaigns, uid, campaigns); },
+  SET_CAMPAIGN_SERVICES(state, payload) { state.campaign_services = payload; },
+  SET_USER(state, { uid, user }) { state.users[uid] = user; },
+  SET_USER_SETTINGS(state, { uid, settings }) { state.users[uid].settings = settings; },
+  SET_USER_LIVE(state, { uid, live }) { state.users[uid].live = live; },
+  SET_CAMPAIGNS(state, { uid, campaigns}) { state.track_search_campaigns[uid] = campaigns; },
   SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) { 
     if(state.cached_campaigns[uid]) {
-      Vue.set(state.cached_campaigns[uid], id, campaign);
+      state.cached_campaigns[uid][id] = campaign;
     } else {
-      Vue.set(state.cached_campaigns, uid, { [id]: campaign });
+      state.cached_campaigns[uid] = { [id]: campaign };
     }
   },
   CLEAR_STORE(state) {
-    Vue.set(state, "track_campaigns", {});
+    state.track_campaigns = {};
   }
 };
 

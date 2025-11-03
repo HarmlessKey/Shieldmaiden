@@ -372,30 +372,30 @@ const npc_actions = {
 };
 const npc_mutations = {
 	SET_NPC_SERVICES(state, payload) {
-		Vue.set(state, "npc_services", payload);
+		state.npc_services = payload;
 	},
 	SET_NPC_COUNT(state, value) {
-		Vue.set(state, "npc_count", value);
+		state.npc_count = value;
 	},
 	SET_NPCS(state, value) {
-		Vue.set(state, "npcs", value);
+		state.npcs = value;
 	},
 	SET_CACHED_NPCS(state, { uid, npcs }) {
-		Vue.set(state.cached_npcs, uid, npcs);
+		state.cached_npcs[uid] = npcs;
 	},
 	SET_CACHED_NPC(state, { uid, id, npc }) {
 		if (state.cached_npcs[uid]) {
-			Vue.set(state.cached_npcs[uid], id, npc);
+			state.cached_npcs[uid][id] = npc;
 		} else {
-			Vue.set(state.cached_npcs, uid, { [id]: npc });
+			state.cached_npcs[uid] = { [id]: npc };
 		}
 	},
 	SET_NPC_PROP(state, { uid, id, property, value, update_search }) {
 		if (state.cached_npcs[uid] && state.cached_npcs[uid][id]) {
-			Vue.set(state.cached_npcs[uid][id], property, value);
+			state.cached_npcs[uid][id][property] = value;
 		}
 		if (update_search && state.npcs && state.npcs[id]) {
-			Vue.set(state.npcs[id], property, value);
+			state.npcs[id][property] = value;
 		}
 	},
 	REMOVE_NPC_SPELL(state, { uid, id, spell_list, spell_id }) {
@@ -409,25 +409,25 @@ const npc_mutations = {
 	},
 	SET_NPC(state, { id, search_npc }) {
 		if (state.npcs) {
-			Vue.set(state.npcs, id, search_npc);
+			state.npcs[id] = search_npc;
 		} else {
-			Vue.set(state, "npcs", { [id]: search_npc });
+			state.npcs = { [id]: search_npc };
 		}
 	},
 	REMOVE_NPC(state, id) {
-		Vue.delete(state.npcs, id);
+		delete state.npcs[id];
 	},
 	REMOVE_CACHED_NPC(state, { uid, id }) {
 		if (state.cached_npcs[uid]) {
-			Vue.delete(state.cached_npcs[uid], id);
+			delete state.cached_npcs[uid][id];
 		}
 	},
 	CACHE_GENERATED_NPC(state, npc) {
 		state.generated_npcs.push(npc);
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "npcs", undefined);
-		Vue.set(state, "npc_count", 0);
+		state.npcs = undefined;
+		state.npc_count = 0;
 	},
 };
 

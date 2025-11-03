@@ -78,9 +78,9 @@ const conditions_actions = {
   },
 };
 const conditions_mutations = {
-  SET_CONDITION_SERVICES(state, payload) { Vue.set(state, "condition_services", payload); },
-  SET_CACHED_CONDITION(state, payload) { Vue.set(state.cached_conditions, payload["_id"], payload) },
-  SET_CACHED_URL(state, { url, id }) { Vue.set(state.cached_urls, url, id) },
+  SET_CONDITION_SERVICES(state, payload) { state.condition_services = payload; },
+  SET_CACHED_CONDITION(state, payload) { state.cached_conditions[payload["_id"]] = payload },
+  SET_CACHED_URL(state, { url, id }) { state.cached_urls[url] = id },
 };
 
 export default {

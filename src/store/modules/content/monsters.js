@@ -120,16 +120,16 @@ const monster_actions = {
 };
 const monster_mutations = {
 	SET_MONSTER_SERVICES(state, payload) {
-		Vue.set(state, "monster_services", payload);
+		state.monster_services = payload;
 	},
 	SET_MONSTERS(state, payload) {
-		Vue.set(state, "monsters", payload);
+		state.monsters = payload;
 	},
 	SET_CACHED_MONSTER(state, payload) {
-		Vue.set(state.cached_monsters, payload["_id"], payload);
+		state.cached_monsters[payload["_id"]] = payload;
 	},
 	SET_CACHED_URL(state, { url, id }) {
-		Vue.set(state.cached_urls, url, id);
+		state.cached_urls[url] = id;
 	},
 };
 

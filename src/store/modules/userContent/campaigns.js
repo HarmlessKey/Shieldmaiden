@@ -613,7 +613,7 @@ const campaign_actions = {
 			const meters = entities[id].meters || {};
 			const current_value = meters[property] || 0;
 			const new_value = parseInt(current_value) + parseInt(value);
-			Vue.set(meters, property, new_value.min());
+			meters[property] = new_value.min();
 
 			try {
 				await dispatch("update_campaign_entity", {
@@ -1026,120 +1026,120 @@ const campaign_actions = {
 };
 const campaign_mutations = {
 	SET_CAMPAIGN_SERVICES(state, payload) {
-		Vue.set(state, "campaign_services", payload);
+		state.campaign_services = payload;
 	},
 	SET_CAMPAIGNS(state, payload) {
-		Vue.set(state, "campaigns", payload);
+		state.campaigns = payload;
 	},
 	SET_CAMPAIGN_COUNT(state, value) {
-		Vue.set(state, "campaign_count", value);
+		state.campaign_count = value;
 	},
 	SET_CAMPAIGN(state, { id, search_campaign }) {
 		if (state.campaigns) {
-			Vue.set(state.campaigns, id, search_campaign);
+			state.campaigns[id] = search_campaign;
 		} else {
-			Vue.set(state, "campaigns", { [id]: search_campaign });
+			state.campaigns = { [id]: search_campaign };
 		}
 	},
 	SET_NOTES(state, { campaignId, notes }) {
-		Vue.set(state.notes, campaignId, notes);
+		state.notes[campaignId] = notes;
 	},
 	REMOVE_CAMPAIGN(state, id) {
-		Vue.delete(state.campaigns, id);
+		delete state.campaigns[id];
 	},
 	SET_ACTIVE_CAMPAIGN(state, id) {
-		Vue.set(state, "active_campaign", id);
+		state.active_campaign = id;
 	},
 	SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) {
 		if (state.cached_campaigns[uid]) {
-			Vue.set(state.cached_campaigns[uid], id, campaign);
+			state.cached_campaigns[uid][id] = campaign;
 		} else {
-			Vue.set(state.cached_campaigns, uid, { [id]: campaign });
+			state.cached_campaigns[uid] = { [id]: campaign };
 		}
 	},
 	SET_CACHED_PROP(state, { uid, id, property, value }) {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
-			Vue.set(state.cached_campaigns[uid][id], property, value);
+			state.cached_campaigns[uid][id][property] = value;
 		}
 	},
 	REMOVE_CACHED_CAMPAIGN(state, { uid, id }) {
 		if (state.cached_campaigns[uid]) {
-			Vue.delete(state.cached_campaigns[uid], id);
+			delete state.cached_campaigns[uid][id];
 		}
 	},
 
 	// CAMPAIGN PLAYERS
 	ADD_PLAYER(state, { uid, id, playerId, player }) {
 		if (state.cached_campaigns[uid][id].players) {
-			Vue.set(state.cached_campaigns[uid][id].players, playerId, player);
+			state.cached_campaigns[uid][id].players[playerId] = player;
 		} else {
-			Vue.set(state.cached_campaigns[uid][id], "players", { [playerId]: player });
+			state.cached_campaigns[uid][id].players = { [playerId]: player };
 		}
 	},
 	SET_PLAYER_COUNT(state, { id, new_count }) {
 		if (state.campaigns && state.campaigns[id]) {
-			Vue.set(state.campaigns[id], "player_count", new_count);
+			state.campaigns[id].player_count = new_count;
 		}
 	},
 	SET_PLAYER(state, { uid, id, playerId, player }) {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
 			if (state.cached_campaigns[uid][id].players) {
-				Vue.set(state.cached_campaigns[uid][id].players, playerId, player);
+				state.cached_campaigns[uid][id].players[playerId] = player;
 			} else {
-				Vue.set(state.cached_campaigns[uid][id], "players", { [playerId]: player });
+				state.cached_campaigns[uid][id].players = { [playerId]: player };
 			}
 		}
 	},
 	DELETE_PLAYER(state, { uid, id, playerId }) {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
-			Vue.delete(state.cached_campaigns[uid][id].players, playerId);
+			delete state.cached_campaigns[uid][id].players[playerId];
 		}
 	},
 	UPDATE_CAMPAIGN_ENTITY(state, { uid, campaignId, type, id, property, value }) {
 		if (value === null) {
-			Vue.delete(state.cached_campaigns[uid][campaignId][type][id], property);
+			delete state.cached_campaigns[uid][campaignId][type][id][property];
 		} else {
-			Vue.set(state.cached_campaigns[uid][campaignId][type][id], property, value);
+			state.cached_campaigns[uid][campaignId][type][id][property] = value;
 		}
 	},
 	UPDATE_TRANSFORMED_ENTITY(state, { uid, campaignId, type, id, property, value }) {
 		if (value === null) {
-			Vue.delete(state.cached_campaigns[uid][campaignId][type][id].transformed, property);
+			delete state.cached_campaigns[uid][campaignId][type][id].transformed[property];
 		} else {
-			Vue.set(state.cached_campaigns[uid][campaignId][type][id].transformed, property, value);
+			state.cached_campaigns[uid][campaignId][type][id].transformed[property] = value;
 		}
 	},
 	SET_DEATH_SAVE(state, { uid, campaignId, type, id, index, value }) {
 		if (value === null) {
-			Vue.delete(state.cached_campaigns[uid][campaignId][type][id].saves, index);
+			delete state.cached_campaigns[uid][campaignId][type][id].saves[index];
 		} else {
 			if (state.cached_campaigns[uid][campaignId][type][id].saves) {
-				Vue.set(state.cached_campaigns[uid][campaignId][type][id].saves, index, value);
+				state.cached_campaigns[uid][campaignId][type][id].saves[index] = value;
 			} else {
-				Vue.set(state.cached_campaigns[uid][campaignId][type][id], "saves", { [index]: value });
+				state.cached_campaigns[uid][campaignId][type][id].saves = { [index]: value };
 			}
 		}
 	},
 	SET_COMPANION(state, { uid, id, companionId, companion }) {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
 			if (state.cached_campaigns[uid][id].companions) {
-				Vue.set(state.cached_campaigns[uid][id].companions, companionId, companion);
+				state.cached_campaigns[uid][id].companions[companionId] = companion;
 			} else {
-				Vue.set(state.cached_campaigns[uid][id], "companions", { [companionId]: companion });
+				state.cached_campaigns[uid][id].companions = { [companionId]: companion };
 			}
 		}
 	},
 	DELETE_COMPANION(state, { uid, id, companionId }) {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
-			Vue.delete(state.cached_campaigns[uid][id].companions, companionId);
+			delete state.cached_campaigns[uid][id].companions[companionId];
 		}
 	},
 	SET_CURRENCY(state, { uid, campaignId, value }) {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][campaignId]) {
 			if (state.cached_campaigns[uid][campaignId].inventory) {
-				Vue.set(state.cached_campaigns[uid][campaignId].inventory, "currency", value);
+				state.cached_campaigns[uid][campaignId].inventory.currency = value;
 			} else {
-				Vue.set(state.cached_campaigns[uid][campaignId], "inventory", { currency: value });
+				state.cached_campaigns[uid][campaignId].inventory = { currency: value };
 			}
 		}
 	},
@@ -1147,40 +1147,40 @@ const campaign_mutations = {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][campaignId]) {
 			if (state.cached_campaigns[uid][campaignId].inventory) {
 				if (state.cached_campaigns[uid][campaignId].inventory.items) {
-					Vue.set(state.cached_campaigns[uid][campaignId].inventory.items, id, item);
+					state.cached_campaigns[uid][campaignId].inventory.items[id] = item;
 				} else {
-					Vue.set(state.cached_campaigns[uid][campaignId].inventory, "items", { [id]: item });
+					state.cached_campaigns[uid][campaignId].inventory.items = { [id]: item };
 				}
 			} else {
-				Vue.set(state.cached_campaigns[uid][campaignId], "inventory", { items: { [id]: item } });
+				state.cached_campaigns[uid][campaignId].inventory = { items: { [id]: item } };
 			}
 		}
 	},
 	IDENTIFY_ITEM(state, { uid, campaignId, id, value }) {
-		Vue.set(state.cached_campaigns[uid][campaignId].inventory.items[id], "identified", value);
+		state.cached_campaigns[uid][campaignId].inventory.items[id].identified = value;
 	},
 	DELETE_ITEM(state, { uid, campaignId, id }) {
-		Vue.delete(state.cached_campaigns[uid][campaignId].inventory.items, id);
+		delete state.cached_campaigns[uid][campaignId].inventory.items[id];
 	},
 	SET_NOTE(state, { campaignId, id, note }) {
 		if (state.notes[campaignId]) {
-			Vue.set(state.notes[campaignId], id, note);
+			state.notes[campaignId][id] = note;
 		} else {
-			Vue.set(state.notes, campaignId, { [id]: note });
+			state.notes[campaignId] = { [id]: note };
 		}
 	},
 	UPDATE_NOTE(state, { campaignId, id, note }) {
 		const current = state.notes[campaignId][id];
-		Vue.set(state.notes[campaignId], id, { ...current, ...note });
+		state.notes[campaignId][id] = { ...current, ...note };
 	},
 	DELETE_NOTE(state, { campaignId, key }) {
-		Vue.delete(state.notes[campaignId], key);
+		delete state.notes[campaignId][key];
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "active_campaign", undefined);
-		Vue.set(state, "campaigns", undefined);
-		Vue.set(state, "campaign_count", 0);
-		Vue.set(state, "notes", {});
+		state.active_campaign = undefined;
+		state.campaigns = undefined;
+		state.campaign_count = 0;
+		state.notes = {};
 	},
 };
 

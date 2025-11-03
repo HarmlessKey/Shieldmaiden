@@ -627,7 +627,7 @@ const run_encounter_actions = {
 		if (rootGetters["encounters/demo_encounter"]) {
 			dispatch("encounters/add_demo_entity", { key, entity });
 		} else {
-			Vue.set(demoEncounter.entities, key, entity);
+			demoEncounter.entities[key] = entity;
 		}
 
 		dispatch("add_entity", key);
@@ -1991,40 +1991,40 @@ const run_encounter_actions = {
 const run_encounter_mutations = {
 	//INITIALIZE ENCOUNTER
 	TRACK(state, value) {
-		Vue.set(state, "track", value);
+		state.track = value;
 	},
 	SET_TEST(state, value) {
-		Vue.set(state, "test", value);
+		state.test = value;
 	},
 	SET_DEMO(state, value) {
-		Vue.set(state, "demo", value);
+		state.demo = value;
 	},
 	SET_UID(state, value) {
-		Vue.set(state, "uid", value);
+		state.uid = value;
 	},
 	SET_CAMPAIGN_ID(state, value) {
-		Vue.set(state, "campaignId", value);
+		state.campaignId = value;
 	},
 	SET_ENCOUNTER_ID(state, value) {
-		Vue.set(state, "encounterId", value);
+		state.encounterId = value;
 	},
 	SET_ENCOUNTER(state, payload) {
-		Vue.set(state, "encounter", payload);
+		state.encounter = payload;
 	},
 	SET_TARGETED(state, payload) {
-		Vue.set(state, "targeted", payload);
+		state.targeted = payload;
 	},
 	SET_PATH(state, path) {
-		Vue.set(state, "path", path);
+		state.path = path;
 	},
 	SET_REQUESTS(state, requests) {
-		Vue.set(state, "requests", requests);
+		state.requests = requests;
 	},
 	INITIALIZED(state) {
-		Vue.set(state, "encounter_initialized", true);
+		state.encounter_initialized = true;
 	},
 	UNINITIALIZED(state) {
-		Vue.set(state, "encounter_initialized", false);
+		state.encounter_initialized = false;
 	},
 	RESET_STORE(state) {
 		Object.assign(state, getDefaultState());
@@ -2032,73 +2032,73 @@ const run_encounter_mutations = {
 
 	//ENCOUNTER MUTATIONS
 	SET_TURN(state, payload) {
-		Vue.set(state.encounter, "turn", payload);
+		state.encounter.turn = payload;
 	},
 	SET_ROUND(state, payload) {
-		Vue.set(state.encounter, "round", payload);
+		state.encounter.round = payload;
 	},
 	FINISH(state) {
-		Vue.set(state.encounter, "finished", true);
+		state.encounter.finished = true;
 	},
 	DELETE_REQUEST(state, id) {
-		Vue.delete(state.encounter.requests, id);
+		delete state.encounter.requests[id];
 	},
 
 	//ENTITY MUTATIONS
 	SET_ENTITY_PROPERTY(state, { key, prop, value }) {
-		Vue.set(state.entities[key], prop, value);
+		state.entities[key][prop] = value;
 	},
 	DELETE_ENTITY_PROPERTY(state, { key, prop }) {
-		Vue.delete(state.entities[key], prop);
+		delete state.entities[key][prop];
 	},
 	SET_SAVE(state, { key, i, check }) {
-		Vue.set(state.entities[key].saves, i, check);
+		state.entities[key].saves[ i] = check;
 	},
 	DELETE_SAVE(state, { key, index }) {
-		Vue.delete(state.entities[key].saves, index);
+		delete state.entities[key].saves[index];
 	},
 	SET_CONDITION(state, { key, condition, value }) {
-		Vue.set(state.entities[key].conditions, condition, value);
+		state.entities[key].conditions[condition] = value;
 	},
 	DELETE_CONDITION(state, { key, condition }) {
-		Vue.delete(state.entities[key].conditions, condition);
+		delete state.entities[key].conditions[condition];
 	},
 	SET_REMINDER(state, { entityKey, key, reminder }) {
-		Vue.set(state.entities[entityKey].reminders, key, reminder);
+		state.entities[entityKey].reminders[key] = reminder;
 	},
 	UPDATE_REMINDER_ROUNDS(state, { entityKey, key, rounds }) {
-		Vue.set(state.entities[entityKey].reminders[key], "rounds", rounds);
+		state.entities[entityKey].reminders[key].rounds = rounds;
 	},
 	DELETE_REMINDER(state, { entityKey, key }) {
-		Vue.delete(state.entities[entityKey].reminders, key);
+		delete state.entities[entityKey].reminders[key];
 	},
 	REMOVE_ENTITY(state, key) {
-		Vue.delete(state.entities, key);
+		delete state.entities[key];
 	},
 	CLEAR_ENTITIES(state) {
-		Vue.set(state, "entities", {});
+		state.entities = {};
 	},
 	SET_LIMITED_USES(state, { key, category, index, value }) {
 		if (!state.entities[key].limited_uses[category])
-			Vue.set(state.entities[key].limited_uses, category, {});
-		Vue.set(state.entities[key].limited_uses[category], index, value);
+			state.entities[key].limited_uses[category] = {};
+		state.entities[key].limited_uses[category][index] = value;
 	},
 	SET_ENTITY_SETTING(state, { entityId, key, value }) {
-		if (!state.entities[entityId].settings) Vue.set(state.entities[entityId], "settings", {});
-		Vue.set(state.entities[entityId].settings, key, value);
+		if (!state.entities[entityId].settings) state.entities[entityId].settings = {};
+		state.entities[entityId].settings[key] = value;
 	},
 	CLEAR_ENTITY_SETTINGS(state, entityId) {
-		Vue.set(state.entities[entityId], "settings", {});
+		state.entities[entityId].settings = {};
 	},
 	REMOVE_LIMITED_USES(state, { key, category, index }) {
-		Vue.delete(state.entities[key].limited_uses[category], index);
+		delete state.entities[key].limited_uses[category][index];
 	},
 
 	ADD_ENTITY(state, { key, entity }) {
-		Vue.set(state.entities, key, entity);
+		state.entities[key] = entity;
 	},
 	SET_SHOW_MONSTER_CARD(state, value) {
-		Vue.set(state, "show_monster_card", value);
+		state.show_monster_card = value;
 	},
 	SET_LOG(state, { action, value }) {
 		if (!state.test && localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
@@ -2111,7 +2111,7 @@ const run_encounter_mutations = {
 			if (!state.demo && !state.test) localStorage.setItem(state.encounterId, parsed);
 		}
 		if (action == "unset") {
-			Vue.delete(state.log, value);
+			delete state.log[value];
 
 			const parsed = JSON.stringify(state.log);
 			if (!state.demo && !state.test) localStorage.setItem(state.encounterId, parsed);

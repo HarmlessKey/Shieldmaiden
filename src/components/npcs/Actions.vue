@@ -872,9 +872,7 @@ h3 {
 .action-list {
 	transition: transform 0.5s;
 }
-::v-deep {
-	.q-item {
+:deep(.q-item) {
 		user-select: none;
-	}
 }
 </style>

@@ -97,7 +97,7 @@ export default {
 			display: flex;
 			justify-content: flex-start;
 
-			&::v-deep .q-field {
+			:deep(.q-field) {
 				.row,
 				.q-field__control,
 				.q-field__inner {

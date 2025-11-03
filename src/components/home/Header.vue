@@ -110,10 +110,8 @@ header {
 		.user-menu {
 			font-size: 18px;
 
-			&::v-deep {
-				.user-btn {
+			:deep(.user-btn) {
 					font-size: 25px;
-				}
 			}
 		}
 	}

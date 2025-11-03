@@ -40,10 +40,8 @@ export default {
 	}
 }
 @media only screen and (max-width: 1023px) {
-	::v-deep {
-		.row {
+	:deep(.row) {
 			flex-direction: column-reverse;
-		}
 	}
 }
 @media only screen and (max-width: $sm-breakpoint) {

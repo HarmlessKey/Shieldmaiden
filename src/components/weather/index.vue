@@ -171,10 +171,8 @@ export default {
 		background-position: center bottom;
 		z-index: 1;
 
-		&::v-deep {
-			.wrapper {
+		:deep(.wrapper) {
 				pointer-events: none;
-			}
 		}
 
 		&::before,

@@ -17,14 +17,13 @@ export default {
 	height: 100%;
 	position: static;
 
-	&::v-deep {
-		.q-scrollarea__content {
-			width: 100%;
-			position: static;
-		}
-		.q-scrollarea__container {
-			position: static;
-		}
+	:deep(.q-scrollarea__content) {
+		width: 100%;
+		position: static;
+	}
+
+	:deep(.q-scrollarea__container) {
+		position: static;
 	}
 }
 </style>

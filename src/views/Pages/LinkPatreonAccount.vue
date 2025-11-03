@@ -178,25 +178,23 @@ export default {
 <style lang="scss" scoped>
 .hk-card.patron-card {
 	width: 300px;
-	&::v-deep {
-		.card-body {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			text-align: center;
+	:deep(.card-body) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
 
-			img {
-				width: 100px;
-				aspect-ratio: 1/1;
-				object-fit: cover;
-				object-position: center;
-				border-radius: 100%;
-				margin-bottom: 15px;
-			}
-			.name {
-				font-size: 18px;
-				font-weight: bold;
-			}
+		img {
+			width: 100px;
+			aspect-ratio: 1/1;
+			object-fit: cover;
+			object-position: center;
+			border-radius: 100%;
+			margin-bottom: 15px;
+		}
+		.name {
+			font-size: 18px;
+			font-weight: bold;
 		}
 	}
 }

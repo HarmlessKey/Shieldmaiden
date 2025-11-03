@@ -937,7 +937,7 @@ input[type="number"]::-webkit-inner-spin-button {
 		text-align: center;
 		margin-left: 4px;
 
-		&::v-deep .q-field__inner {
+		:deep(.q-field__inner) {
 			.row {
 				height: 31px;
 			}

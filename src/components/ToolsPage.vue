@@ -57,7 +57,7 @@ export default {
 		aspect-ratio: 5/2;
 		background-repeat: no-repeat;
 	}
-	&::v-deep h2 {
+	:deep(h2) {
 		font-size: 25px;
 		border-bottom: solid 1px $neutral-3;
 	}

@@ -197,7 +197,7 @@ export default {
 	margin: 30px auto;
 	width: 100%;
 
-	&::v-deep .q-img__content {
+	:deep(.q-img__content) {
 		> div {
 			background: none;
 		}

@@ -442,22 +442,20 @@ export default {
 	.splitpanes__pane,
 	.q-tab-panel {
 		padding: 0;
-		&::v-deep {
-			.pane {
-				&__header {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					background-color: $neutral-8;
-					min-height: 51px;
-					padding: 10px;
-					position: sticky;
-					top: 0;
-					z-index: 10;
-				}
-				&__content {
-					padding: 10px;
-				}
+		:deep(.pane) {
+			&__header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				background-color: $neutral-8;
+				min-height: 51px;
+				padding: 10px;
+				position: sticky;
+				top: 0;
+				z-index: 10;
+			}
+			&__content {
+				padding: 10px;
 			}
 		}
 	}

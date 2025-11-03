@@ -48,10 +48,8 @@ export default {
 }
 .overflow-visible {
 	overflow: visible;
-	&::v-deep {
-		.q-panel {
+	:deep(.q-panel) {
 			overflow: visible;
-		}
 	}
 }
 </style>

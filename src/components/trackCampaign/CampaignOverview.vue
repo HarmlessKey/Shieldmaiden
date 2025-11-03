@@ -208,10 +208,8 @@ h3 {
 				> div {
 					padding-right: 6px;
 				}
-				&::v-deep {
-					.top-menu {
+				:deep(.top-menu) {
 						border-bottom: solid 2px $white;
-						padding-bottom: 2px;
 						margin-bottom: 23px;
 
 						.money {

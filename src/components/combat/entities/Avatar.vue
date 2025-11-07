@@ -2,15 +2,7 @@
 	<div
 		class="target-avatar"
 		:style="{
-			'background-image':
-				(entity.img && !icons) ||
-				(entity.img &&
-					icons &&
-					!entity.hidden &&
-					!entity.transformed &&
-					!entity.reminder?.surprised)
-					? 'url(' + entity.img + ')'
-					: '',
+			'background-image': backgroundImage,
 			color: entity.color_label ? entity.color_label : ``,
 			borderColor: entity.color_label ? entity.color_label : ``,
 			width: `${size}px`,
@@ -61,6 +53,13 @@ export default {
 		font_size() {
 			return Math.ceil(this.size * 0.75);
 		},
+		backgroundImage() {
+			const { img, hidden, transformed, reminders } = this.entity;
+			if (!img) return "";
+			if (!this.icons) return `url(${img})`;
+			if (!hidden && !transformed && !reminders?.surprised) return `url(${img})`;
+			return "";
+		}
 	},
 };
 </script>

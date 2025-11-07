@@ -51,7 +51,7 @@ import HkRolls from "./components/hk-components/hk-rolls";
 import { general } from "./mixins/general";
 
 import { Cookies } from "quasar";
-import jwt_decode from "jwt-decode";
+import { jwtDecode as jwt_decode } from "jwt-decode";
 
 export default {
 	name: "App",

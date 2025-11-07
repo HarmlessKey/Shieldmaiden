@@ -3,8 +3,8 @@
 		<h2>Set Reminders</h2>
 		<ul class="targets">
 			<li v-for="(target, i) in reminder_targets" :key="`target=${i}`">
-				<BasicEntity :entity="entities[target]">
-					<Effects :entity="entities[target]" :available-space="30" reminders collapse />
+				<BasicEntity ref="basicEntity" :entity="entities[target]">
+					<Effects :entity="entities[target]" :available-space="effectSpace" reminders collapse />
 				</BasicEntity>
 			</li>
 		</ul>
@@ -156,6 +156,7 @@ export default {
 			customReminder: {},
 			varOptions: undefined,
 			selectedVars: {},
+			effectSpace: 0,
 		};
 	},
 	computed: {
@@ -166,6 +167,7 @@ export default {
 		},
 	},
 	async mounted() {
+		this.setEffectSize();
 		this.$refs.tab[0]?.$el.focus();
 		this.personalReminders = await this.get_full_reminders();
 	},
@@ -204,6 +206,12 @@ export default {
 				this.tab = "premade";
 				this.customReminder = {};
 			}
+		},
+		setEffectSize() {
+			const basicEntityWidth = this.$refs.basicEntity[0].$el.clientWidth;
+			const AVATAR_SIZE = 34 + 8; // size + gap
+			const MIN_NAME_SIZE = 50 + 8; // width + gap
+			this.effectSpace = basicEntityWidth - AVATAR_SIZE - MIN_NAME_SIZE;
 		},
 		showVariableOptions(key) {
 			this.varOptions = this.varOptions !== key ? key : undefined;

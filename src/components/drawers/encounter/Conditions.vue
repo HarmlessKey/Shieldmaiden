@@ -3,8 +3,8 @@
 		<h2>Set Conditions</h2>
 		<ul class="targets">
 			<li v-for="(target, i) in condition_targets" :key="`target=${i}`">
-				<BasicEntity :entity="entities[target]">
-					<Effects :entity="entities[target]" :available-space="30" conditions collapse />
+				<BasicEntity ref="basicEntity" :entity="entities[target]">
+					<Effects :entity="entities[target]" :available-space="effectSpace" conditions collapse />
 				</BasicEntity>
 			</li>
 		</ul>
@@ -124,6 +124,7 @@ export default {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
+			effectSpace: 0,
 		};
 	},
 	computed: {
@@ -135,6 +136,7 @@ export default {
 		},
 	},
 	mounted() {
+		this.setEffectSize();
 		this.$refs[0]?.[0]?.focus();
 	},
 	methods: {
@@ -145,6 +147,12 @@ export default {
 			}
 			const button = this.$refs[i.min(0)]?.[0];
 			button?.focus();
+		},
+		setEffectSize() {
+			const basicEntityWidth = this.$refs.basicEntity[0].$el.clientWidth;
+			const AVATAR_SIZE = 34 + 8; // size + gap
+			const MIN_NAME_SIZE = 50 + 8; // width + gap
+			this.effectSpace = basicEntityWidth - AVATAR_SIZE - MIN_NAME_SIZE;
 		},
 		set(condition) {
 			const action = this.checkAll(condition) ? "remove" : "add";

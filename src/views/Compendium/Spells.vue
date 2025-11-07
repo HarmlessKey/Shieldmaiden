@@ -188,7 +188,7 @@ export default {
 		
 		clearFilter() {
 			this.filter_dialog = false;
-			this.$set(this, "filter", {});
+			this["filter"] = {};
 			this.filterSpells();
 		},
 		request(req) {

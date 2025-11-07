@@ -37,7 +37,6 @@
 								max="20"
 								:error="!meta.valid && meta.validated"
 								:error-message="errorMessage"
-								@keyup="$forceUpdate()"
 								@input="
 									(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
 								"
@@ -64,7 +63,6 @@
 									max="99"
 									:error="!meta.valid && meta.validated"
 									:error-message="errorMessage"
-									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
 											$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
@@ -93,7 +91,6 @@
 									max="99"
 									:error="!meta.valid && meta.validated"
 									:error-message="errorMessage"
-									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
 											$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
@@ -118,7 +115,6 @@
 									type="number"
 									:error="!meta.valid && meta.validated"
 									:error-message="errorMessage"
-									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
 											$set(level_tier, 'projectile_count', value != undefined ? parseInt(value) : value)
@@ -203,11 +199,11 @@ export default {
 			} else {
 				this.scaling.push({});
 			}
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		removeLevelTier(tier_index) {
-			this.$delete(this.scaling, tier_index);
-			this.$forceUpdate();
+			delete this.scaling[tier_index];
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		scalingDesc(tiers, scaling, level) {
 			return spellScalingDescription(tiers, scaling, level);

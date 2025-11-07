@@ -53,7 +53,6 @@
 							label="Damage type"
 							dense
 							:key="`type-${i}`"
-							@input="$forceUpdate()"
 							:class="{ 'no-delete': i === 0 }"
 						/>
 						<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"
@@ -151,8 +150,8 @@ export default {
 			this.damage.push({ amount: "", damage_type: "acid" });
 		},
 		removeInput(i) {
-			this.$delete(this.damage, i);
-			this.$forceUpdate();
+			delete this.damage[ i];
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		sendRequest() {
 			let results = {};

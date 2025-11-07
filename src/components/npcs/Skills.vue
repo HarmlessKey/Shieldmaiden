@@ -30,7 +30,6 @@
 							v-model="npc.skills_expertise" 
 							:false-value="null" indeterminate-value="something-else"
 							:disable="npc.skills ? !npc.skills.includes(key) : true"
-							@input="$forceUpdate()"
 						>
 							<template slot:label>
 								+{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}
@@ -131,14 +130,14 @@
 					return this.npc.skills ? this.npc.skills : [];
 				},
 				set(newValue) {
-					this.$set(this.npc, 'skills', newValue);
+					this.npc['skills'] = newValue;
 				}
 			},
 		},
 		methods: {
 			setDialog() {
 				if(!this.npc.skill_modifiers) {
-					this.$set(this.npc, "skill_modifiers", {});
+					this.npc["skill_modifiers"] = {};
 				}
 				this.modifier_dialog = true;
 			},
@@ -150,14 +149,14 @@
 
 				if(value) {
 					if(this.npc.skill_modifiers) {
-						this.$set(this.npc.skill_modifiers, skill, parseInt(value));
+						this.npc.skill_modifiers[skill] = parseInt(value);
 					} else {
 						let val = {};
 						val[skill] = parseInt(value);
-						this.$set(this.npc, "skill_modifiers", val);
+						this.npc["skill_modifiers"] = val;
 					}
 				} else {
-					this.$delete(this.npc.skill_modifiers, skill);
+					delete this.npc.skill_modifiers[skill];
 				}
 			},
 			skillModifier(skill, key) {

@@ -256,16 +256,16 @@ export default {
 			this.link_dialog = false;
 		},
 		async syncCharacter(id, sync_character) {
-			this.$set(this.syncing, id, "syncing");
+			this.syncing[id] = "syncing";
 			try {
 				await this.sync_player({ uid: this.userId, id, sync_character });
-				this.$set(this.syncing, id, "success");
+				this.syncing[id] = "success";
 			} catch (e) {
 				this.syncing[id] = "error";
 				this.$snotify.error(e, "Sync failed", {});
 			} finally {
 				setTimeout(() => {
-					this.$delete(this.syncing, id);
+					delete this.syncing[id];
 				}, 2000);
 			}
 		},

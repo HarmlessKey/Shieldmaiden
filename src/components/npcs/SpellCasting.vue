@@ -149,7 +149,6 @@
 												:indeterminate-value="undefined"
 												:toggle-indeterminate="false"
 												class="mb-2"
-												@input="$forceUpdate()"
 											/>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -158,7 +157,6 @@
 												type="number"
 												:disable="spell.limit === 0"
 												suffix="/day"
-												@keyup="$forceUpdate()"
 											/>
 										</q-popup-edit>
 									</q-item-section>
@@ -253,9 +251,9 @@ export default {
 	methods: {
 		parseToInt(value, object, property, valid) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else if (valid) {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		setCaster(value, category) {
@@ -263,10 +261,10 @@ export default {
 				this.npc[`${category}_spell_slots`] = {};
 			}
 			if (!value) {
-				this.$delete(this.npc, `${category}_save_dc`);
-				this.$delete(this.npc, `${category}_spell_attack`);
-				this.$delete(this.npc, `${category}_spell_slots`);
-				this.$delete(this.npc, `${category}_spells`);
+				delete this.npc[`${category}_save_dc`];
+				delete this.npc[`${category}_spell_attack`];
+				delete this.npc[`${category}_spell_slots`];
+				delete this.npc[`${category}_spells`];
 			}
 		},
 		setSpellSlot(direction, level) {
@@ -277,20 +275,20 @@ export default {
 
 			if (newVal > 9) newVal = 9;
 			if (newVal <= 0) {
-				this.$delete(this.npc.caster_spell_slots, level);
+				delete this.npc.caster_spell_slots[level];
 			} else {
-				this.$set(this.npc.caster_spell_slots, level, newVal);
+				this.npc.caster_spell_slots[level] = newVal;
 			}
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		checkSpellSlot(level) {
 			const value = this.npc.caster_spell_slots[level];
 
-			if (value > 9) this.$set(this.npc.caster_spell_slots, level, 9);
+			if (value > 9) this.npc.caster_spell_slots[level] = 9;
 			if (value <= 0) {
-				this.$delete(this.npc.caster_spell_slots, level);
+				delete this.npc.caster_spell_slots[level];
 			}
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		openDialog(category) {
 			this.category = category;
@@ -298,7 +296,7 @@ export default {
 		},
 		addSpell({ result, id, resource }) {
 			if (!this.npc[`${this.category}_spells`]) {
-				this.$set(this.npc, `${this.category}_spells`, {});
+				this.npc[`${this.category}_spells`] = {};
 			}
 
 			let spell = { name: result.name };
@@ -309,10 +307,10 @@ export default {
 			if (this.category === "caster") spell.level = result.level;
 
 			this.npc[`${this.category}_spells`][id] = spell;
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		removeSpell(key, category) {
-			this.$delete(this.npc[`${category}_spells`], key);
+			delete this.npc[`${category}_spells`][key];
 		},
 		orderedSpells(spell_list, category) {
 			const category_key = category === "caster" ? "level" : "limit";

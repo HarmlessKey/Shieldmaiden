@@ -355,7 +355,7 @@ export default {
 				.then((key) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
-					this.$set(this, "npcId", key);
+					this["npcId"] = key;
 
 					this.$snotify.success("Monster Saved.", "Critical hit!", {
 						position: "rightTop",

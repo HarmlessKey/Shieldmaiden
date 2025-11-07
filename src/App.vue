@@ -248,7 +248,7 @@ export default {
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
 				this.broadcast = snapshot.val();
-				this.$forceUpdate();
+				// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			});
 		}
 

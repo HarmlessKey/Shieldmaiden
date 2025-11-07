@@ -89,7 +89,6 @@
 						title="Dice Count"
 						type="number"
 						data-vv-as="Dice Count"
-						@keyup="$forceUpdate()"
 					/>
 				</div>
 				<div class="col-12 col-md-3">
@@ -101,7 +100,6 @@
 						label="Dice type"
 						v-model="effect.dice_type"
 						:options="dice_type"
-						@change="$forceUpdate()"
 					/>
 				</div>
 				<div class="col-12 col-md-3">
@@ -116,7 +114,6 @@
 						class="mb-2"
 						type="number"
 						data-vv-as="Fixed Value"
-						@keyup="$forceUpdate()"
 					>
 						<template v-slot:append>
 							<q-icon name="info" @click.stop>
@@ -164,7 +161,6 @@
 					data-vv-as="Description"
 					v-validate="'required|max:100'"
 					maxlength="101"
-					@change="$forceUpdate()"
 				/>
 				<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
 			</div>
@@ -179,7 +175,6 @@
 					v-validate="'required'"
 					data-vv-as="Ability"
 					class="mb-2"
-					@change="$forceUpdate()"
 				/>
 				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
 			</div>
@@ -197,7 +192,6 @@
 					v-validate="'required'"
 					data-vv-as="Skill"
 					class="mb-2"
-					@change="$forceUpdate()"
 				/>
 				<p class="validate red" v-if="errors.has(`skills`)">{{ errors.first(`skills`) }}</p>
 			</div>
@@ -215,7 +209,6 @@
 					v-validate="'required'"
 					data-vv-as="Made by/against"
 					class="mb-2"
-					@change="$forceUpdate()"
 				/>
 				<p class="validate red" v-if="errors.has(`attack`)">{{ errors.first(`attack`) }}</p>
 			</div>
@@ -298,14 +291,14 @@ export default {
 				effect.primary = false
 			}
 			effect.primary = !effect.primary
-			this.$forceUpdate(); //IMPORTANT
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity //IMPORTANT
 		},
 		setMinimum(effect) {
 			if (effect.minimum == undefined) {
 				effect.minimum = false
 			}
 			effect.minimum = !effect.minimum
-			this.$forceUpdate(); //IMPORTANT
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity //IMPORTANT
 		},
 		hasField(field_name) {
 			let type = this.effect.type;

@@ -162,7 +162,6 @@
 														v-model.number="ability.legendary_cost"
 														hint="How many legendary actions does this cost?"
 														@input="parseToInt($event, ability, 'legendary_cost')"
-														@keyup="$forceUpdate()"
 														:error="!meta.valid && meta.validated"
 														:error-message="errorMessage"
 													/>
@@ -182,7 +181,6 @@
 														class="mb-3"
 														maxlength="51"
 														v-model="ability.name"
-														@keyup="$forceUpdate()"
 														:error="!meta.valid && meta.validated"
 														:error-message="errorMessage"
 													/>
@@ -205,7 +203,6 @@
 																label="Recharge"
 																autocomplete="off"
 																v-model="ability.recharge"
-																@keyup="$forceUpdate()"
 																:error="!meta.valid && meta.validated"
 																:error-message="errorMessage"
 															/>
@@ -227,7 +224,6 @@
 																	type="number"
 																	v-model.number="ability.limit"
 																	@input="parseToInt($event, ability, 'limit')"
-																	@keyup="$forceUpdate()"
 																	:error="!meta.valid && meta.validated"
 																	:error-message="errorMessage"
 																/>
@@ -241,7 +237,6 @@
 																class="limit-type"
 																v-model="ability.limit_type"
 																:options="limit_types"
-																@input="$forceUpdate()"
 																prefix="/"
 															/>
 														</div>
@@ -263,7 +258,6 @@
 														name="desc"
 														maxlength="2000"
 														autogrow
-														@keyup="$forceUpdate()"
 														:error="!meta.valid && meta.validated"
 														:error-message="errorMessage"
 													/>
@@ -287,7 +281,6 @@
 																	v-model.number="ability.reach"
 																	type="number"
 																	suffix="ft."
-																	@keyup="$forceUpdate()"
 																	@input="parseToInt($event, ability, 'reach')"
 																	:error="!meta.valid && meta.validated"
 																	:error-message="errorMessage"
@@ -307,7 +300,6 @@
 																	label="Range"
 																	v-model="ability.range"
 																	suffix="ft."
-																	@keyup="$forceUpdate()"
 																	:error="!meta.valid && meta.validated"
 																	:error-message="errorMessage"
 																/>
@@ -324,7 +316,6 @@
 																label="AOE type"
 																:options="aoe_types"
 																v-model="ability.aoe_type"
-																@input="$forceUpdate()"
 															/>
 														</div>
 														<div class="col">
@@ -342,7 +333,6 @@
 																	v-model.number="ability.aoe_size"
 																	suffix="ft."
 																	:disable="!ability.aoe_type"
-																	@keyup="$forceUpdate()"
 																	@input="parseToInt($event, ability, 'aoe_size')"
 																	:error="!meta.valid && meta.validated"
 																	:error-message="errorMessage"
@@ -370,7 +360,6 @@
 														class="mb-4"
 														@new-value="addOption"
 														@remove="removeOption($event, category, ability_index)"
-														@input="$forceUpdate()"
 													>
 														<hk-popover slot="append" header="Action options">
 															<i class="fas fa-info-circle" aria-hidden="true" />
@@ -402,7 +391,6 @@
 																	:options="Object.values(attack_types)"
 																	v-model="action.type"
 																	class="mb-2"
-																	@input="$forceUpdate()"
 																/>
 															</div>
 
@@ -423,7 +411,6 @@
 																			label="Save ability"
 																			:options="abilities"
 																			v-model="action.save_ability"
-																			@input="$forceUpdate()"
 																			:error="!meta.valid && meta.validated"
 																			:error-message="errorMessage"
 																		/>
@@ -442,7 +429,6 @@
 																			type="number"
 																			label="Save DC"
 																			v-model.number="action.save_dc"
-																			@keyup="$forceUpdate()"
 																			@input="parseToInt($event, action, 'save_dc')"
 																			:error="!meta.valid && meta.validated"
 																			:error-message="errorMessage"
@@ -467,7 +453,6 @@
 																			type="number"
 																			label="Attack modifier"
 																			v-model.number="action.attack_bonus"
-																			@keyup="$forceUpdate()"
 																			@input="parseToInt($event, action, 'attack_bonus')"
 																			:error="!meta.valid && meta.validated"
 																			:error-message="errorMessage"
@@ -641,9 +626,9 @@ export default {
 		...mapActions(["setActionRoll"]),
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		/**
@@ -674,7 +659,7 @@ export default {
 				this.npc[category] = [];
 			}
 			this.npc[category].push(action);
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 
 		/**
@@ -684,8 +669,8 @@ export default {
 		 * @param {string} category actions / legendary_actions / special_abilities
 		 */
 		remove(index, category) {
-			this.$delete(this.npc[category], index);
-			this.$forceUpdate();
+			delete this.npc[category][index];
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 
 		/**
@@ -741,13 +726,13 @@ export default {
 				action.rolls = !action.rolls ? [] : action.rolls;
 				action.rolls.push(this.roll);
 			} else {
-				this.$set(action.rolls, this.edit_roll_index, this.roll);
+				action.rolls[this.edit_roll_index] = this.roll;
 			}
 			this.action_dialog = false;
 		},
 		deleteRoll(roll_index, ability_index, category, action_index) {
-			this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
-			this.$forceUpdate();
+			delete this.npc[category][ability_index].action_list[action_index].rolls[roll_index];
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 
 		/**
@@ -773,7 +758,7 @@ export default {
 					if (action.rolls) {
 						for (const roll of action.rolls) {
 							if (roll.options) {
-								this.$delete(roll.options, details.value);
+								delete roll.options[details.value];
 							}
 						}
 					}

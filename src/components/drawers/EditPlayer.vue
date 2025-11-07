@@ -616,7 +616,7 @@ export default {
 					this.entity.transformed.curHp = this.entity.transformed.maxHp;
 				}
 				if (this.entity.transformed.curHp <= 0) {
-					this.$delete(this.entity, "transformed");
+					delete this.entity["transformed"];
 				}
 			}
 

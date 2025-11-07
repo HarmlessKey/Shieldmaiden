@@ -58,7 +58,7 @@
         },
         set(newVal) {
           this.$emit("input", newVal);
-          this.$forceUpdate();
+          // this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
         }
       }
     },

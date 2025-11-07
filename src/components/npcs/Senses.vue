@@ -71,17 +71,17 @@ import { monsterMixin } from 'src/mixins/monster.js';
 				if(value) {
 					let val = {};
 					val[sense] = true;
-					if(!this.npc.senses) this.$set(this.npc, "senses", {});
-					this.$set(this.npc.senses, sense, val);
+					if(!this.npc.senses) this.npc["senses"] = {};
+					this.npc.senses[sense] = val;
 				} else {
-					this.$delete(this.npc.senses, sense);
+					delete this.npc.senses[sense];
 				}
 			},
 			parseToInt(value, object, property) {
 				if(value === undefined || value === "") {
-					this.$delete(object, property);
+					delete object[property];
 				} else {
-					this.$set(object, property, parseInt(value));
+					object[property] = parseInt(value);
 				}
 			}
 		}

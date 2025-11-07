@@ -439,7 +439,7 @@ export default {
 					entityId: id,
 				});
 			} else {
-				this.$delete(this.encounter.entities, id);
+				delete this.encounter.entities[id];
 			}
 		},
 		async setDifficulty() {

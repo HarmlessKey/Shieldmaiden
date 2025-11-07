@@ -287,9 +287,9 @@ export default {
 					this.deleteTrait(i, valid);
 				}
 
-				this.$set(this.character, "race", {
+				this.character["race"] = {
 					...value,
-				});
+				};
 			}
 			this.save(valid);
 		},
@@ -302,7 +302,7 @@ export default {
 		},
 		addTrait(valid) {
 			this.character.add_trait();
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			this.save(valid);
 		},
 		editTrait(key, property) {
@@ -317,7 +317,7 @@ export default {
 		},
 		deleteTrait(index, valid) {
 			this.character.delete_trait(index);
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			this.save(valid);
 		},
 		confirmDelete(index, name, valid) {

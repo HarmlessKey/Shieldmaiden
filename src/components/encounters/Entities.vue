@@ -681,7 +681,7 @@ export default {
 		},
 		clearFilter() {
 			this.filter_dialog = false;
-			this.$set(this, "filter", {});
+			this["filter"] = {};
 			this.filterMonsters();
 		},
 		request(req) {
@@ -908,8 +908,8 @@ export default {
 		},
 		add_demo_entity(entity) {
 			this.encounter.entities
-				? this.$set(this.encounter.entities, uuid(), entity)
-				: this.$set(this.encounter, "entities", { [uuid()]: entity });
+				? this.encounter.entities[uuid()] = entity
+				: this.encounter["entities"] = { [uuid(]: entity });
 		},
 		setSize(e) {
 			this.width = e.width;

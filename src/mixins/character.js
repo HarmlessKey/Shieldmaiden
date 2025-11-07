@@ -470,14 +470,14 @@ export const characterMixin = {
 			for (const [skill, value] of Object.entries(senses)) {
 				//Ad ability modifier
 				if (skill === "investigation") {
-					this.$set(senses, skill, value + this.calcMod(ability_scores["intelligence"]));
+					senses[skill] = value + this.calcMod(ability_scores["intelligence"]);
 				} else {
-					this.$set(senses, skill, value + this.calcMod(ability_scores["wisdom"]));
+					senses[skill] = value + this.calcMod(ability_scores["wisdom"]);
 				}
 
 				//Add proficiency
 				if (skills.proficiencies[skill]) {
-					this.$set(senses, skill, senses[skill] + proficiency);
+					senses[skill] = senses[skill] + proficiency;
 				}
 			}
 			computed_character.sheet.senses = senses;
@@ -546,26 +546,24 @@ export const characterMixin = {
 				if (modifier.subtarget) {
 					if (this.advantage_disadvantage[modifier.target]) {
 						if (this.advantage_disadvantage[modifier.target][modifier.subtarget]) {
-							this.$set(
-								this.advantage_disadvantage[modifier.target][modifier.subtarget],
-								modifier.type,
-								true
-							);
+							
+								this.advantage_disadvantage[modifier.target][modifier.subtarget][modifier.type] = true
+							;
 						} else {
-							this.$set(this.advantage_disadvantage[modifier.target], modifier.subtarget, {
+							this.advantage_disadvantage[modifier.target][modifier.subtarget] = {
 								[modifier.type]: true,
-							});
+							};
 						}
 					} else {
-						this.$set(this.advantage_disadvantage, modifier.target, {
+						this.advantage_disadvantage[modifier.target] = {
 							[modifier.subtarget]: { [modifier.type]: true },
-						});
+						};
 					}
 				} else {
 					if (this.advantage_disadvantage[modifier.target]) {
-						this.$set(this.advantage_disadvantage[modifier.target], modifier.type, true);
+						this.advantage_disadvantage[modifier.target][modifier.type] = true;
 					} else {
-						this.$set(this.advantage_disadvantage, modifier.target, { [modifier.type]: true });
+						this.advantage_disadvantage[modifier.target] = { [modifier.type]: true };
 					}
 				}
 			}

@@ -290,48 +290,48 @@ export default {
 	mounted() {
 		if (Object.keys(this.value).length === 0) {
 			//Set default values
-			this.$set(this.reminder, "color", "green-light");
-			this.$set(this.reminder, "action", "remove");
+			this.reminder["color"] = "green-light";
+			this.reminder["action"] = "remove";
 		}
 	},
 	methods: {
 		setColor(color) {
-			this.$set(this.reminder, "color", color);
+			this.reminder["color"] = color;
 		},
 		addVariable() {
 			if (this.newVar) {
 				if (!this.reminder.variables) {
-					this.$set(this.reminder, "variables", {});
+					this.reminder["variables"] = {};
 				}
-				this.$set(this.reminder.variables, this.newVar, [""]);
+				this.reminder.variables[this.newVar] = [""];
 				this.newVar = undefined;
 			}
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		addOption(key) {
 			this.reminder.variables[key].push("");
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		removeOption(key, i) {
-			this.$delete(this.reminder.variables[key], i);
-			this.$forceUpdate();
+			delete this.reminder.variables[key][ i];
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		removeVar(key) {
-			this.$delete(this.reminder.variables, key);
+			delete this.reminder.variables[key];
 
 			// if the reminder is in use, the selection must be deleted too
 			if (this.reminder.selectedVars) {
-				this.$delete(this.reminder.selectedVars, key);
+				delete this.reminder.selectedVars[key];
 			}
 
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		setOption(key, i) {
 			if (!this.reminder.selectedVars) {
-				this.$set(this.reminder, "selectedVars", {});
+				this.reminder["selectedVars"] = {};
 			}
 			this.reminder.selectedVars[key] = i;
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 	},
 };

@@ -225,15 +225,15 @@
 				} else {
 					amount = this.updateAmount(defense, amount);
 				}
-				this.$set(this.results[index].targets[target], 'defense', defense);
-				this.$set(this.results[index].targets[target], 'amount', amount);
-				this.$forceUpdate();
+				this.results[index].targets[target]['defense'] = defense;
+				this.results[index].targets[target]['amount'] = amount;
+				// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 
 				this.final_results = this.setFinal(this.results);
 			},
 			setIntensity(target, value) {
-				this.$set(this.intensity, target, value);
-				this.$forceUpdate();
+				this.intensity[target] = value;
+				// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			},
 			async apply(type) {
 				for(let key in this.final_results) {

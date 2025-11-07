@@ -219,7 +219,7 @@ export default {
 			});
 		},
 		removeRoll(index) {
-			if (index != 0) this.$delete(this.custom_rolls, index);
+			if (index != 0) delete this.custom_rolls[index];
 		},
 	},
 };

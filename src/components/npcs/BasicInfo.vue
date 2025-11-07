@@ -378,9 +378,9 @@
 		methods: {
 			parseToInt(value, object, property) {
 				if(value === undefined || value === "") {
-					this.$delete(object, property);
+					delete object[property];
 				} else {
-					this.$set(object, property, parseInt(value));
+					object[property] = parseInt(value);
 				}
 			},
 			// Capitalizes every word in the name of the NPC
@@ -389,21 +389,21 @@
 			},
 			saveBlob(value) {
 				// Clear the image url
-				this.$delete(this.npc, "avatar");
-				this.$set(this.npc, "blob", value.blob);
+				delete this.npc["avatar"];
+				this.npc["blob"] = value.blob;
 				this.preview_new_upload = value.dataUrl;
 				this.avatar_dialog = false;
 			},
 			saveUrl(value) {
-				this.$delete(this.npc, "storage_avatar");
-				this.$set(this.npc, "avatar", value);
+				delete this.npc["storage_avatar"];
+				this.npc["avatar"] = value;
 				this.preview_new_upload = undefined;
 				this.avatar_dialog = false;
 			},
 			clearAvatar() {
-				this.$delete(this.npc, "avatar");
-				this.$delete(this.npc, "storage_avatar");
-				this.$delete(this.npc, "blob");
+				delete this.npc["avatar"];
+				delete this.npc["storage_avatar"];
+				delete this.npc["blob"];
 				this.preview_new_upload = undefined;
 				this.avatar_dialog = false;
 			}

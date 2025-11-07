@@ -609,12 +609,12 @@ export default {
 		checkHitOrMiss() {
 			this.roll.actions.forEach((action, index) => {
 				if (action.toHit) {
-					if (action.toHit.throwsTotal === 20) this.$set(this.hitOrMiss, index, "hit");
-					else if (action.toHit.throwsTotal === 1) this.$set(this.hitOrMiss, index, "miss");
+					if (action.toHit.throwsTotal === 20) this.hitOrMiss[index] = "hit";
+					else if (action.toHit.throwsTotal === 1) this.hitOrMiss[index] = "miss";
 					else if (this.roll.target) {
 						if (this.displayStats(this.roll.target).ac <= action.toHit.total)
-							this.$set(this.hitOrMiss, index, "hit");
-						else this.$set(this.hitOrMiss, index, "miss");
+							this.hitOrMiss[index] = "hit";
+						else this.hitOrMiss[index] = "miss";
 					}
 				}
 			});
@@ -810,23 +810,23 @@ export default {
 			return total;
 		},
 		setDefense(type, resistance, key) {
-			if (!this.resistances) this.$set(this.resistances, key, {});
+			if (!this.resistances) this.resistances[key] = {};
 			if (this.resistances[type] === resistance) {
-				this.$delete(this.resistances, type);
+				delete this.resistances[type];
 			} else {
-				this.$set(this.resistances, type, resistance);
+				this.resistances[type] = resistance;
 			}
 			if (this.get_step("run", "defenses", "monster")) {
 				this.completeStep({ tutorial: "run" });
 			}
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		reroll(e, roll, throw_index, crit) {
 			const add = (a, b) => a + b;
 			const newRoll = this.rollD(e, roll.d, 1, 0, `Reroll 1d${roll.d}`);
 
-			this.$set(roll.throws, throw_index, newRoll.total);
-			this.$set(roll, "throwsTotal", roll.throws.reduce(add));
+			roll.throws[throw_index] = newRoll.total;
+			roll["throwsTotal"] = roll.throws.reduce(add);
 			let new_total = roll.throwsTotal + roll.m;
 			// Add total thrown to total when crit
 			if (crit && this.critSettings === "double") {
@@ -837,7 +837,7 @@ export default {
 				new_total = new_total + roll.n * roll.d;
 			}
 
-			this.$set(roll, "total", new_total);
+			roll["total"] = new_total;
 		},
 		missSaveEffect(effect, type) {
 			if (type === "text") {

@@ -417,48 +417,48 @@ export default {
 			this.$emit("change", "modifier.saved");
 		},
 		setWeapon(weapon) {
-			this.$set(this.new_item, "value", weapon.value);
-			this.$set(this.new_item, "name", weapon.label);
-			this.$set(this.new_item, "damage", weapon.damage);
-			this.$set(this.new_item, "damage_type", weapon.damage_type);
-			this.$set(this.new_item, "weapon_type", weapon.type);
+			this.new_item["value"] = weapon.value;
+			this.new_item["name"] = weapon.label;
+			this.new_item["damage"] = weapon.damage;
+			this.new_item["damage_type"] = weapon.damage_type;
+			this.new_item["weapon_type"] = weapon.type;
 
 			//Ability
 			if (weapon.type === "ranged" || weapon.finesse) {
-				this.$set(this.new_item, "ability", "dexterity");
+				this.new_item["ability"] = "dexterity";
 			} else {
-				this.$set(this.new_item, "ability", "strength");
+				this.new_item["ability"] = "strength";
 			}
 
-			if (weapon.light) this.$set(this.new_item, "light", weapon.light);
-			if (weapon.finesse) this.$set(this.new_item, "finesse", weapon.finesse);
-			if (weapon.thrown) this.$set(this.new_item, "thrown", weapon.thrown);
-			if (weapon.two_handed) this.$set(this.new_item, "two_handed", weapon.two_handed);
-			if (weapon.versatile) this.$set(this.new_item, "versatile", weapon.versatile);
-			if (weapon.range) this.$set(this.new_item, "range", weapon.range);
-			if (weapon.heavy) this.$set(this.new_item, "heavy", weapon.heavy);
-			if (weapon.reach) this.$set(this.new_item, "reach", weapon.reach);
-			if (weapon.special) this.$set(this.new_item, "special", weapon.special);
+			if (weapon.light) this.new_item["light"] = weapon.light;
+			if (weapon.finesse) this.new_item["finesse"] = weapon.finesse;
+			if (weapon.thrown) this.new_item["thrown"] = weapon.thrown;
+			if (weapon.two_handed) this.new_item["two_handed"] = weapon.two_handed;
+			if (weapon.versatile) this.new_item["versatile"] = weapon.versatile;
+			if (weapon.range) this.new_item["range"] = weapon.range;
+			if (weapon.heavy) this.new_item["heavy"] = weapon.heavy;
+			if (weapon.reach) this.new_item["reach"] = weapon.reach;
+			if (weapon.special) this.new_item["special"] = weapon.special;
 		},
 		setArmor(armor) {
-			this.$set(this.new_item, "value", armor.value);
-			this.$set(this.new_item, "name", armor.label);
-			this.$set(this.new_item, "armor_type", armor.type);
+			this.new_item["value"] = armor.value;
+			this.new_item["name"] = armor.label;
+			this.new_item["armor_type"] = armor.type;
 
 			//Shield
 			if (armor.type === "shield") {
-				this.$set(this.new_item, "type", "shield");
-				this.$set(this.new_item, "armor_class_mod", armor.armor_class_mod);
+				this.new_item["type"] = "shield";
+				this.new_item["armor_class_mod"] = armor.armor_class_mod;
 			} else {
-				this.$set(this.new_item, "armor_class", armor.armor_class);
+				this.new_item["armor_class"] = armor.armor_class;
 			}
 
-			if (armor.dex_mod) this.$set(this.new_item, "dex_mod", armor.dex_mod);
-			if (armor.dex_max) this.$set(this.new_item, "dex_max", armor.dex_max);
+			if (armor.dex_mod) this.new_item["dex_mod"] = armor.dex_mod;
+			if (armor.dex_max) this.new_item["dex_max"] = armor.dex_max;
 			if (armor.stealth_disadvantage)
-				this.$set(this.new_item, "stealth_disadvantage", armor.stealth_disadvantage);
+				this.new_item["stealth_disadvantage"] = armor.stealth_disadvantage;
 			if (armor.strength_required)
-				this.$set(this.new_item, "strength_required", armor.strength_required);
+				this.new_item["strength_required"] = armor.strength_required;
 		},
 		equipItem(e, type, key) {
 			if (!e || type === "item" || !this.checkEquipped(type)) {

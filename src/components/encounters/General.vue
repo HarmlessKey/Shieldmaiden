@@ -271,7 +271,7 @@ export default {
 			this.weather = this.encounter.weather;
 		}
 		if (this.editableEncounter && !this.editableEncounter.hk_background) {
-			this.$set(this.editableEncounter, "hk_background", null);
+			this.editableEncounter["hk_background"] = null;
 		}
 	},
 	methods: {
@@ -311,7 +311,7 @@ export default {
 			}
 		},
 		setBackground(value) {
-			this.$set(this.editableEncounter, "hk_background", value);
+			this.editableEncounter["hk_background"] = value;
 		},
 		getBackground(encounter) {
 			if (encounter.background) return encounter.background;

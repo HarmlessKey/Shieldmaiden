@@ -103,7 +103,7 @@ export default {
 		async addReminder() {
 			this.add_reminder(this.reminder).then(
 				(key) => {
-					this.$set(this, "reminderId", key);
+					this["reminderId"] = key;
 					this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" });
 					this.reminder_copy = JSON.stringify(this.reminder);
 					this.unsaved_changes = false;

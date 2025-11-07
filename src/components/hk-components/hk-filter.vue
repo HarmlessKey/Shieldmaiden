@@ -134,19 +134,19 @@ export default {
 	methods: {
 		setLevels(value) {
 			if(!this.filter.levels) {
-				this.$set(this.filter, "levels", {});
+				this.filter["levels"] = {};
 			}
-			this.$set(this.filter.levels, "min", value.min);
-			this.$set(this.filter.levels, "max", value.max);
-			this.$forceUpdate();
+			this.filter.levels["min"] = value.min;
+			this.filter.levels["max"] = value.max;
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		setCR(value) {
 			if(!this.filter.challenge_ratings) {
-				this.$set(this.filter, "challenge_ratings", {});
+				this.filter["challenge_ratings"] = {};
 			}
-			this.$set(this.filter.challenge_ratings, "min", value.min);
-			this.$set(this.filter.challenge_ratings, "max", value.max);
-			this.$forceUpdate();
+			this.filter.challenge_ratings["min"] = value.min;
+			this.filter.challenge_ratings["max"] = value.max;
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		}
 	}
 };

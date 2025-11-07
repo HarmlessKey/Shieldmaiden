@@ -280,7 +280,7 @@ export default {
 		},
 		addFeature(level, valid) {
 			this.character.add_feature(this.classIndex, level);
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			this.save(valid);
 		},
 
@@ -311,7 +311,7 @@ export default {
 		},
 		deleteFeature(level, index, valid) {
 			this.character.delete_feature(this.classIndex, level, index);
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			this.save(valid, "class.delete_feature");
 		},
 
@@ -345,7 +345,7 @@ export default {
 
 		saveASI(value, level, index, valid) {
 			this.character.save_asi(value, this.classIndex, level, index);
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			this.save(valid, `class.set_asi`);
 		},
 

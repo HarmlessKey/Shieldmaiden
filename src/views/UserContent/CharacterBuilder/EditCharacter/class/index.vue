@@ -846,7 +846,7 @@ export default {
 			}
 		},
 		setClass(Class, classIndex, valid) {
-			this.$set(this.Class.classes[classIndex], "class", Class);
+			this.Class.classes[classIndex]["class"] = Class;
 			this.save(valid, `classes.class`);
 		},
 		filtered_skills(Class, _skills) {
@@ -858,7 +858,7 @@ export default {
 			}
 		},
 		saveProp(value, classIndex, property, valid) {
-			this.$set(this.Class.classes[classIndex], property, value);
+			this.Class.classes[classIndex][property] = value;
 			this.save(valid, `classes.${classIndex}.${property}`);
 		},
 		setShowClass(classIndex) {
@@ -944,7 +944,7 @@ export default {
 			//Set rolled HP manually
 			value = parseInt(value) || 0;
 
-			this.$set(this.Class.classes[classIndex].rolled_hit_points, level, value);
+			this.Class.classes[classIndex].rolled_hit_points[level] = value;
 
 			this.save(valid, "class.rolled_hp");
 		},
@@ -965,7 +965,7 @@ export default {
 		},
 		clear_invalid_rolls(valid) {
 			if (!valid) {
-				this.$set(this.Class.classes[this.editClass], "rolled_hit_points", this.rolled_hp_copy);
+				this.Class.classes[this.editClass]["rolled_hit_points"] = this.rolled_hp_copy;
 			}
 			this.rolled_hp_copy = undefined;
 		},

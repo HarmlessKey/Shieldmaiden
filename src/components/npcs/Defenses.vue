@@ -136,18 +136,18 @@
 			},
 			setResistance(type, value) {
 				if(!this.entity[type]) {
-					this.$set(this.entity, type, [value]);
+					this.entity[type] = [value];
 				} else if(this.entity[type].includes(value)) {
-					this.$delete(this.entity[type], this.entity[type].indexOf(value));
+					delete this.entity[type][this.entity[type].indexOf(value]);
 				} else {
 					this.entity[type].push(value);
 				}
 			},
 			setCondition(value) {
 				if(!this.entity.condition_immunities) {
-					this.$set(this.entity, "condition_immunities", [value]);
+					this.entity["condition_immunities"] = [value];
 				} else if(this.entity.condition_immunities.includes(value)) {
-					this.$delete(this.entity.condition_immunities, this.entity.condition_immunities.indexOf(value));
+					delete this.entity.condition_immunities[this.entity.condition_immunities.indexOf(value]);
 				} else {
 					this.entity.condition_immunities.push(value);
 				}

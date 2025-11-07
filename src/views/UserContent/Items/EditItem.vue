@@ -345,7 +345,7 @@ export default {
 		addItem() {
 			this.add_item(this.item).then(
 				(key) => {
-					this.$set(this, "itemId", key);
+					this["itemId"] = key;
 
 					this.$snotify.success("Item Saved.", "Critical hit!", {
 						position: "rightTop",
@@ -393,7 +393,7 @@ export default {
 			if (this.columns !== undefined) {
 				this.columns = parseInt(this.columns);
 				if (this.item.tables === undefined) {
-					this.$set(this.item, "tables", []);
+					this.item["tables"] = [];
 				}
 				this.item.tables.push({
 					columns: this.columns,
@@ -413,10 +413,10 @@ export default {
 			});
 		},
 		removeRow(tableIndex, rowIndex) {
-			this.$delete(this.item.tables[tableIndex].rows, rowIndex);
+			delete this.item.tables[tableIndex].rows[rowIndex];
 		},
 		removeTable(key) {
-			this.$delete(this.item.tables, key);
+			delete this.item.tables[key];
 		},
 	},
 };

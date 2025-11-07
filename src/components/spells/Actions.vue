@@ -30,7 +30,6 @@
 						class="mb-2"
 						:error="!meta.valid && meta.validated"
 						:error-message="errorMessage"
-						@keyup="$forceUpdate()"
 						@input="(value) => parseToInt(value, spell, 'projectiles')"
 					>
 						<hk-popover slot="append" header="Projectiles">
@@ -123,7 +122,6 @@
 												v-model="action.name"
 												autocomplete="off"
 												class="mb-2"
-												@keyup="$forceUpdate()"
 												:error="!meta.valid && meta.validated"
 												:error-message="errorMessage"
 											/>
@@ -148,7 +146,6 @@
 												:options="Object.values(attack_types)"
 												v-model="action.type"
 												class="mb-2"
-												@input="$forceUpdate()"
 												:error="!meta.valid && meta.validated"
 												:error-message="errorMessage"
 											/>
@@ -168,7 +165,6 @@
 											v-model="action.save_ability"
 											:disable="action.type !== 'save'"
 											class="mb-2"
-											@input="$forceUpdate()"
 										/>
 									</div>
 								</div>
@@ -237,7 +233,6 @@
 									v-model="spell.projectile_scaling"
 									type="projectile"
 									:spell="spell"
-									@input="$forceUpdate()"
 								/>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
@@ -287,9 +282,9 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		add_action() {
@@ -300,10 +295,10 @@ export default {
 				type: "spell_attack",
 				name: "New action",
 			});
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		remove_action(index) {
-			this.$delete(this.spell.actions, index);
+			delete this.spell.actions[index];
 		},
 		newRoll(action, action_index) {
 			this.edit_index = undefined; // It's new, so no edit index
@@ -325,9 +320,9 @@ export default {
 					? []
 					: this.spell.actions[this.action_index].rolls;
 				rolls.push(this.roll);
-				this.$set(this.spell.actions[this.action_index], "rolls", rolls);
+				this.spell.actions[this.action_index]["rolls"] = rolls;
 			} else {
-				this.$set(this.spell.actions[this.action_index].rolls, this.edit_index, this.roll);
+				this.spell.actions[this.action_index].rolls[this.edit_index] = this.roll;
 			}
 			this.roll = {};
 			this.edit_index = undefined;
@@ -341,7 +336,7 @@ export default {
 			this.roll = undefined;
 		},
 		removeRoll(index) {
-			this.$delete(this.rolls, index);
+			delete this.rolls[index];
 		},
 
 		/**
@@ -363,7 +358,7 @@ export default {
 					if (action.rolls) {
 						for (const roll of action.rolls) {
 							if (roll.options) {
-								this.$delete(roll.options, details.value);
+								delete roll.options[details.value];
 							}
 						}
 					}

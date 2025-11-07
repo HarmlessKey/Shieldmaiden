@@ -55,7 +55,7 @@ export default {
 		]),
 		closeTip() {
 			this.set_tip(this.value);
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		}
 	}
 }

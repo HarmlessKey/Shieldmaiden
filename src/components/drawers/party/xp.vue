@@ -93,7 +93,7 @@ export default {
 
 			for (const id in campaign.players) {
 				this.allPlayers.push(id);
-				this.$set(this.players, id, await this.get_player({ uid: this.user.uid, id }));
+				this.players[id] = await this.get_player({ uid: this.user.uid, id });
 			}
 		});
 	},

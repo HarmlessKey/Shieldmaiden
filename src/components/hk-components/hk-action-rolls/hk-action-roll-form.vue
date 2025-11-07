@@ -289,7 +289,6 @@
 				v-model="roll.scaling"
 				:roll="roll"
 				:spell="spell"
-				@input="$forceUpdate()"
 			/>
 			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!valid" />
 		</Form>
@@ -383,7 +382,7 @@ export default {
 				return this.roll.special;
 			},
 			set(newVal) {
-				this.$set(this.roll, "special", newVal);
+				this.roll["special"] = newVal;
 			},
 		},
 		action_options() {
@@ -393,15 +392,15 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		reset_magical(value, versatile) {
 			const prop = versatile === 1 ? "versatile_magical" : "magical";
 			if (!["bludgeoning", "piercing", "slashing"].includes(value)) {
-				this.$set(this.roll, prop, null);
+				this.roll[prop] = null;
 			}
 		},
 		scalingDesc(tiers, scaling, level) {
@@ -418,15 +417,15 @@ export default {
 			value =
 				["dice_count", "fixed_val"].includes(prop) && value != undefined ? parseInt(value) : value;
 			if (option.index === 0) {
-				this.$set(this.roll, prop, value);
+				this.roll[prop] = value;
 			} else if (this.roll.options) {
 				if (this.roll.options[option.key]) {
-					this.$set(this.roll.options[option.key], prop, value);
+					this.roll.options[option.key][prop] = value;
 				} else {
-					this.$set(this.roll.options, option.key, { [prop]: value });
+					this.roll.options[option.key] = { [prop]: value };
 				}
 			} else {
-				this.$set(this.roll, "options", { [option.key]: { [prop]: value } });
+				this.roll["options"] = { [option.key]: { [prop]: value } };
 			}
 			if (prop === "damage_type") {
 				this.reset_magical(value, option.key);

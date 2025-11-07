@@ -239,7 +239,7 @@ export default {
 				.then((key) => {
 					// Set the spellId, so we know there is an existing spell
 					// even though we are on the AddSpell route, this we won't create multiple when hitting save again
-					this.$set(this, "spellId", key);
+					this["spellId"] = key;
 
 					this.$snotify.success("Spell Saved.", "Critical hit!", {
 						position: "rightTop",

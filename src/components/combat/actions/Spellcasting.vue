@@ -350,10 +350,10 @@ export default {
 				this.displayLevels = [level];
 			} else {
 				if (this.displayLevels.includes(level))
-					this.$delete(this.displayLevels, this.displayLevels.indexOf(level));
+					delete this.displayLevels[this.displayLevels.indexOf(level]);
 				else this.displayLevels.push(level);
 			}
-			this.$forceUpdate();
+			// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 		},
 		useSpellSlot(index, category, regain = false) {
 			this.set_limitedUses({

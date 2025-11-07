@@ -446,18 +446,18 @@ export default {
 
 			// Reset ability scores
 			for (const ability of this.abilities) {
-				this.$set(this.character.abilities, ability, value);
+				this.character.abilities[ability] = value;
 			}
 
 			// Set the method
-			this.$set(this.character, "ability_score_method", method);
+			this.character["ability_score_method"] = method;
 			this.method = method;
 			this.save("abilities.method", true);
 		},
 		saveAbility(score, ability, valid) {
 			score = score !== null ? parseInt(score) : score;
 
-			this.$set(this.character.abilities, ability, score);
+			this.character.abilities[ability] = score;
 
 			this.save(`abilities.${ability}`, valid);
 		},
@@ -496,8 +496,8 @@ export default {
 		},
 		clearAllRolls() {
 			for (const index in this.rolls) {
-				this.$set(this.rolls[index], "ability", "");
-				this.$set(this.rolls[index], "results", []);
+				this.rolls[index]["ability"] = "";
+				this.rolls[index]["results"] = [];
 			}
 		},
 	},

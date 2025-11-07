@@ -89,7 +89,7 @@ export default {
 		 * When a roll is deleted it is not automatically removed from the $refs
 		 */
 		removeEl(index) {
-			this.$delete(this.$refs?.rolls, index);
+			delete this.$refs?.rolls[index];
 		},
 	},
 };

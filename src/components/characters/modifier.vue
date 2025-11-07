@@ -523,21 +523,21 @@
 			},
 			addScaling() {
 				if(!this.modifier.scaling) {
-					this.$set(this.modifier, "scaling", {});
+					this.modifier["scaling"] = {};
 				}
 				this.scaling = true;
 			},
 			setScalingType(type) {
-				this.$set(this.modifier.scaling, "type", type);
+				this.modifier.scaling["type"] = type;
 				if(type === "scale") {
-					this.$set(this.modifier.scaling, "scale", {});
+					this.modifier.scaling["scale"] = {};
 				} else {
-					this.$set(this.modifier.scaling, "steps", []);
+					this.modifier.scaling["steps"] = [];
 				}
-				this.$forceUpdate();
+				// this.$forceUpdate(); // Removed for Vue 3 - no longer needed with Proxy reactivity
 			},
 			deleteScaling() {
-				this.$set(this.modifier, "scaling", null);
+				this.modifier["scaling"] = null;
 			},
 		}
 	}

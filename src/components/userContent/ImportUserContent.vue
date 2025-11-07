@@ -807,15 +807,15 @@ export default {
 						if (ability.versatile && !ability.options) {
 							// Turn versatile into options
 							is_versatile = true;
-							this.$set(ability, "options", [
+							ability["options"] = [
 								ability.versatile_one || "Option 1",
 								ability.versatile_two || "Option 2",
-							]);
+							];
 						}
 						// Remove versatile
-						this.$delete(ability, "versatile");
-						this.$delete(ability, "versatile_one");
-						this.$delete(ability, "versatile_two");
+						delete ability["versatile"];
+						delete ability["versatile_one"];
+						delete ability["versatile_two"];
 
 						// In the actions find rolls with versatile options set
 						if (ability.action_list && ability.action_list.length) {
@@ -832,11 +832,11 @@ export default {
 												options = !options ? { [ability.options[1]]: {} } : options;
 												options[ability.options[1]][option] = roll[`versatile_${option}`];
 											}
-											this.$delete(roll, `versatile_${option}`);
+											delete roll[`versatile_${option}`];
 										}
 
 										if (is_versatile && options) {
-											this.$set(roll, "options", options);
+											roll["options"] = options;
 										}
 									}
 								}

@@ -129,7 +129,7 @@ export default {
 			const prop = tab === "Taken" ? `${type}${tab}` : type;
 
 			const meters = this.campaign.players[key].meters || {};
-			this.$set(meters, prop, value ? value.min() : value);
+			meters[prop] = value ? value.min( : value);
 
 			await this.update_campaign_entity({
 				uid: this.user.uid,

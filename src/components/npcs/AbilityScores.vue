@@ -31,7 +31,6 @@
 							:false-value="null" 
 							indeterminate-value="something-else" 
 							label="Saving throw proficiency"
-							@input="$forceUpdate()"
 						>
 							<q-tooltip anchor="top middle" self="center middle">
 								Saving throw proficiency
@@ -72,9 +71,9 @@
 		methods: {
 			parseToInt(value, object, property) {
 				if(value === undefined || value === "") {
-					this.$delete(object, property);
+					delete object[property];
 				} else {
-					this.$set(object, property, parseInt(value));
+					object[property] = parseInt(value);
 				}
 			}
 		}

@@ -16,7 +16,7 @@
 		"prepare": "husky install"
 	},
 	"dependencies": {
-		"@egjs/vue-flicking": "^4.12.0",
+		"@egjs/vue-flicking": "4.12.0",
 		"@gtm-support/vue2-gtm": "^2.0.0",
 		"@octokit/rest": "^19.0.5",
 		"@quasar/extras": "^1.16.12",
@@ -31,7 +31,7 @@
 		"firebase-admin": "^13.4.0",
 		"helmet": "^7.2.0",
 		"html2canvas": "^1.4.1",
-		"jspdf": "^3.0.1",
+		"jspdf": "^3.0.2",
 		"jwt-decode": "^4.0.0",
 		"lodash": "^4.17.21",
 		"marked": "^4.0.16",
@@ -74,7 +74,10 @@
 		"rtlcss": "^4.0.0",
 		"got": "^11.8.5",
 		"json5": "^2.2.2",
-		"semver": "^7.5.1"
+		"semver": "^7.5.1",
+		"@octokit/plugin-paginate-rest": "^9.2.2",
+		"@octokit/request": "^8.4.1",
+		"@octokit/request-error": "^5.1.1"
 	},
 	"browserslist": [
 		"defaults and supports es6-module",

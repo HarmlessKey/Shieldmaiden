@@ -69,6 +69,7 @@ module.exports = function (/* ctx */) {
 				"iobuffer",
 				"@gtm-support/vue2-gtm",
 				"@gtm-support/core",
+				"@octokit",
 			],
 
 			// rtl: false, // https://v1.quasar.dev/options/rtl-support

@@ -206,8 +206,6 @@ export default {
 					label: "Initiative",
 				},
 			},
-			calc_mod,
-			displayStats,
 		};
 	},
 	computed: {
@@ -224,6 +222,8 @@ export default {
 		},
 	},
 	methods: {
+		calc_mod,
+		displayStats,
 		savingThrow(ability) {
 			let proficiency;
 			if (this.full_entity.entityType === "player") {

@@ -211,7 +211,6 @@ export default {
 		return {
 			setShadow: 0,
 			abilities: abilities,
-			modifier: calc_mod,
 			damage_type_icons: damage_type_icons,
 		};
 	},
@@ -314,6 +313,7 @@ export default {
 			"set_hidden",
 		]),
 		...mapActions("tutorial", ["completeStep"]),
+		modifier: calc_mod,
 		focusOptions() {
 			this.$refs.options[0].focus();
 		},

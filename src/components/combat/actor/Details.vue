@@ -54,7 +54,6 @@ export default {
 				},
 			},
 			abilities: abilities,
-			displayStats,
 		};
 	},
 	computed: {
@@ -65,6 +64,8 @@ export default {
 	},
 	methods: {
 		...mapActions(["setDrawer"]),
+		displayStats,
+
 	},
 };
 </script>

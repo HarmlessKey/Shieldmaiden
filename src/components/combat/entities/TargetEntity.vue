@@ -94,12 +94,11 @@ export default {
 	},
 	data() {
 		return {
-			displayStats: displayStats,
-			nameWidth: 0,
 			effectSpace: 0,
 		};
 	},
 	methods: {
+		displayStats, // imported utility function
 		setSize(dimensions) {
 			const AC_SIZE = 33 + 6; // width + gap
 			const MIN_NAME_SIZE = 50 + 6; // width + gap

@@ -30,10 +30,8 @@ export default {
 			required: true,
 		},
 	},
-	data() {
-		return {
-			displayStats,
-		};
+	methods: {
+		displayStats,
 	},
 	computed: {
 		max() {

@@ -217,6 +217,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { mapActions, mapGetters } from "vuex";
 
 import EditWeather from "./Weather";
@@ -236,7 +237,7 @@ export default {
 	},
 	components: {
 		EditWeather,
-		Weather: () => import("src/components/weather"),
+		Weather: defineAsyncComponent(() => import("src/components/weather")),
 	},
 	mixins: [audio],
 	data() {

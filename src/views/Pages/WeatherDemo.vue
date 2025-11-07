@@ -37,13 +37,14 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import EditWeather from "src/components/encounters/Weather";
 
 export default {
 	name: "WeatherDemo",
 	components: {
 		EditWeather,
-		Weather: () => import("src/components/weather"),
+		Weather: defineAsyncComponent(() => import("src/components/weather")),
 	},
 	data() {
 		return {

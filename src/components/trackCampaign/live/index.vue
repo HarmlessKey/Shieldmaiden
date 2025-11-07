@@ -172,6 +172,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import _ from "lodash";
 import { db } from "src/firebase";
 
@@ -187,9 +188,9 @@ export default {
 		Initiative,
 		Meters,
 		RollForInitiative,
-		Shares: () => import("../Shares"),
-		Rewards: () => import("./Rewards"),
-		Weather: () => import("src/components/weather"),
+		Shares: defineAsyncComponent(() => import("../Shares")),
+		Rewards: defineAsyncComponent(() => import("./Rewards")),
+		Weather: defineAsyncComponent(() => import("src/components/weather")),
 	},
 	props: ["encounter", "campaign", "players", "width", "shares"],
 	data() {

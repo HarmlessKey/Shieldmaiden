@@ -103,6 +103,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import Meters from "src/components/trackCampaign/Meters.vue";
 import ViewPlayers from "src/components/campaign/Players.vue";
 import Sharing from "./Sharing.vue";
@@ -114,7 +115,7 @@ export default {
 	components: {
 		Meters,
 		ViewPlayers,
-		Shares: () => import("./Shares"),
+		Shares: defineAsyncComponent(() => import("./Shares")),
 		Sharing,
 		Weather,
 	},

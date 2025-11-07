@@ -212,6 +212,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import Dmg from "src/components/combat/side/Dmg.vue";
 import Log from "src/components/combat/side/Log.vue";
 import { currencyMixin } from "src/mixins/currency.js";
@@ -224,7 +225,7 @@ export default {
 	components: {
 		Dmg,
 		Log,
-		Players: () => import("src/components/campaign/Players.vue"),
+		Players: defineAsyncComponent(() => import("src/components/campaign/Players.vue")),
 	},
 	data() {
 		return {

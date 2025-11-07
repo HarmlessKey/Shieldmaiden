@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { mapActions } from "vuex";
 import { onKeyStroke } from "@vueuse/core";
 
@@ -44,10 +45,10 @@ export default {
 	mounted() {
 		this.loader()
 			.then(() => {
-				this.component = () => this.loader();
+				this.component = defineAsyncComponent(() => this.loader());
 			})
 			.catch(() => {
-				this.component = () => import("./drawers/Error.vue");
+				this.component = defineAsyncComponent(() => import("./drawers/Error.vue"));
 			});
 
 		// ESC to hide drawer

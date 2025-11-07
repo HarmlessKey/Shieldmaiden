@@ -45,11 +45,15 @@
 						/>
 						<Actor :current="_active[encounter.turn]" :_active="_active" />
 						<Pane
+							ref="actor"
+							tabindex="0"
 							title="Actor"
 							class="current"
 							:class="{
 								'step-highlight': demo && follow_tutorial && get_step('run', 'current'),
+								focused: focused_pane === 'actor',
 							}"
+							@focus="focusPane('actor')"
 						>
 							<Card :entity="actor || _active[encounter.turn]" :avatar="false" rollable />
 							<TutorialPopover
@@ -243,7 +247,7 @@ export default {
 			audio_notification: false,
 			loading: true,
 			demo_dialog: false,
-			panes: ["current", "targets", "targeted", "side"],
+			panes: ["actor", "targets", "targeted", "side"],
 			focused_pane: null,
 		};
 	},
@@ -582,11 +586,11 @@ export default {
 		}
 	}
 
-	.pane {
+	.combat-pane {
 		border-radius: $border-radius;
 		&.focused,
 		&:focus {
-			outline: $neutral-3 solid 1px;
+			outline: $neutral-2 solid 1px;
 			outline-offset: 1px;
 		}
 	}

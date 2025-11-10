@@ -254,13 +254,13 @@
 													rotate: animateRoll === roll.key + rolled_index + throw_index,
 												}"
 												@click="
-													(animateRoll = roll.key + rolled_index + throw_index),
-														reroll(
-															$event,
-															rolled.rollResult,
-															throw_index,
-															action.toHit && action.toHit.throwsTotal === 20
-														)
+													((animateRoll = roll.key + rolled_index + throw_index),
+													reroll(
+														$event,
+														rolled.rollResult,
+														throw_index,
+														action.toHit && action.toHit.throwsTotal === 20
+													))
 												"
 												@animationend="animateRoll = undefined"
 											>
@@ -498,6 +498,7 @@ import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import { calc_mod } from "src/utils/generalFunctions";
+import { displayStats } from "src/utils/entityFunctions";
 
 export default {
 	name: "hk-single-roll",
@@ -606,7 +607,7 @@ export default {
 		allMiss() {
 			if (Object.values(this.hitOrMiss).length === 0) return false;
 			return Object.values(this.hitOrMiss).every((value) => value === "miss");
-		}
+		},
 	},
 	mounted() {
 		this.checkHitOrMiss();
@@ -620,7 +621,7 @@ export default {
 					if (action.toHit.throwsTotal === 20) this.$set(this.hitOrMiss, index, "hit");
 					else if (action.toHit.throwsTotal === 1) this.$set(this.hitOrMiss, index, "miss");
 					else if (this.roll.target) {
-						if (this.displayStats(this.roll.target).ac <= action.toHit.total)
+						if (displayStats(this.roll.target).ac <= action.toHit.total)
 							this.$set(this.hitOrMiss, index, "hit");
 						else this.$set(this.hitOrMiss, index, "miss");
 					}
@@ -887,25 +888,6 @@ export default {
 				if (effect === 0.5) return "/ 2";
 				if (effect === 0) return "no effect";
 			}
-		},
-		displayStats(target) {
-			let stats = "";
-			if (target.transformed) {
-				stats = {
-					ac: target.transformedAc,
-					maxHp: target.transformedMaxHp,
-					maxHpMod: target.transformedMaxHpMod,
-					curHp: target.transformedCurHp,
-				};
-			} else {
-				stats = {
-					ac: target.ac,
-					maxHp: target.maxHp,
-					maxHpMod: target.maxHpMod,
-					curHp: target.curHp,
-				};
-			}
-			return stats;
 		},
 		eventValues(event, value) {
 			let returnObj = {

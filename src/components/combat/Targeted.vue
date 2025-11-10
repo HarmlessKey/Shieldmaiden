@@ -79,8 +79,13 @@
 						</BasicEntity>
 					</div>
 					<div class="scores">
+						<div class="ability">
+							<div class="ability-name" />
+							<div class="ability-type">MOD</div>
+							<div class="ability-type">SAVE</div>
+						</div>
 						<div v-for="(ability, index) in abilities" :key="`score-${index}`" class="ability">
-							<div class="abilityName">{{ ability.substring(0, 3).toUpperCase() }}</div>
+							<div class="ability-name">{{ ability.substring(0, 3).toUpperCase() }}</div>
 							<hk-roll
 								tooltip="Roll check"
 								:roll="{
@@ -472,12 +477,13 @@ export default {
 			gap: 1px;
 
 			.ability {
-				margin-top: 5px;
 				text-align: center;
 				flex-grow: 1;
 
-				.abilityName {
-					margin-bottom: 3px;
+				&-name,
+				&-type {
+					line-height: 25px;
+					height: 25px;
 					font-weight: bold;
 					color: $neutral-2;
 					font-size: 13px;

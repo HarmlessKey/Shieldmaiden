@@ -34,6 +34,19 @@
 						<hk-icon icon="fas fa-exclamation" />
 					</button>
 				</transition>
+				<button
+					v-if="test"
+					class="btn btn-sm bg-orange"
+					@click="
+						setDrawer({
+							show: true,
+							type: 'drawers/encounter/TestMode',
+						})
+					"
+				>
+					<i class="fas fa-flask mr-1" aria-hidden="true" />
+					Test mode
+				</button>
 				<span
 					v-if="!demo && !test"
 					@click="

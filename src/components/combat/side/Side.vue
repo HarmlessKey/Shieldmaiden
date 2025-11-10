@@ -119,6 +119,9 @@ export default {
 			}
 		}
 	}
+	.q-tab-panel {
+		padding: 10px;
+	}
 	.q-scrollarea {
 		position: relative;
 		height: calc(100% - 30px);
@@ -131,10 +134,6 @@ export default {
 				position: unset;
 			}
 		}
-	}
-
-	.tab-content {
-		padding: 0 10px 15px 10px;
 	}
 }
 </style>

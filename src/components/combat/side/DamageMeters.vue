@@ -1,9 +1,9 @@
 <template>
 	<div v-if="entities">
-		<h2 class="mb-1">Damage meters</h2>
+		<h3>Damage meters</h3>
 		<template v-for="(type, index) in types">
 			<div v-if="_meters[type.name].length > 0" :key="`meters-${index}`">
-				<h3>{{ type.name.capitalize() }}</h3>
+				<h4>{{ type.name.capitalize() }}</h4>
 				<ul>
 					<li v-for="(entity, index) in _meters[type.name]" :key="index">
 						<BasicEntity :entity="entity">
@@ -82,7 +82,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-h3 {
+h4 {
 	font-size: 13px !important;
 	line-height: normal;
 	margin-bottom: 5px !important;

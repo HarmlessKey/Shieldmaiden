@@ -16,28 +16,7 @@
 
 			<div class="card-body">
 				<!-- TARGET -->
-				<div class="target-item" v-if="roll.target">
-					<TargetAvatar :entity="roll.target" class="img" :icons="false" />
-					<div class="ac_wrapper">
-						<i aria-hidden="true" class="fas fa-shield"></i>
-						<span
-							v-if="roll.target.ac_bonus"
-							class="ac"
-							:class="{
-								green: roll.target.ac_bonus > 0,
-								red: roll.target.ac_bonus < 0,
-							}"
-						>
-							{{ displayStats(roll.target).ac + roll.target.ac_bonus }}
-						</span>
-						<span class="ac" v-else>
-							{{ displayStats(roll.target).ac }}
-						</span>
-					</div>
-					<div class="pl-2 truncate">
-						{{ roll.target.name?.capitalizeEach() }}
-					</div>
-				</div>
+				<BasicEntity :entity="roll.target" class="mb-2" />
 
 				<!-- ALL ROLLED ACTIONS -->
 				<div
@@ -131,29 +110,40 @@
 									</span>
 								</div>
 							</div>
-							<q-btn-toggle
-								v-model="savingThrowResult[action_index]"
-								class="mb-3 neutral-1"
-								spread
-								no-caps
-								:dark="$store.getters.theme === 'dark'"
-								dense
-								square
-								toggle-color="primary"
-								color="neutral-9"
-								:options="[
-									{ label: 'Fail', value: 'fail' },
-									{ label: 'Save', value: 'save' },
-								]"
-								:class="{
-									'step-highlight': demo && follow_tutorial && get_step('run', 'to-hit', 'monster'),
-								}"
-								@keydown.enter="shortkeyApply"
-								@keydown.backspace="removeRoll(index)"
-								@click="
-									get_step('run', 'to-hit', 'monster') ? completeStep({ tutorial: 'run' }) : null
-								"
-							/>
+							<div class="d-flex gap-1 items-center mb-3">
+								<q-btn-toggle
+									v-model="savingThrowResult[action_index]"
+									class="neutral-1 full-width"
+									spread
+									no-caps
+									:dark="$store.getters.theme === 'dark'"
+									dense
+									square
+									toggle-color="primary"
+									color="neutral-9"
+									:options="[
+										{ label: 'Fail', value: 'fail' },
+										{ label: 'Save', value: 'save' },
+									]"
+									:class="{
+										'step-highlight':
+											demo && follow_tutorial && get_step('run', 'to-hit', 'monster'),
+									}"
+									@keydown.enter="shortkeyApply"
+									@keydown.backspace="removeRoll(index)"
+									@click="
+										get_step('run', 'to-hit', 'monster') ? completeStep({ tutorial: 'run' }) : null
+									"
+								/>
+								<hk-roll
+									:tooltip="`Roll ${action.save_ability} save`"
+									@roll="rollSave($event, action_index, action)"
+								>
+									<template v-if="rolledSaves[action_index] !== undefined">{{
+										rolledSaves[action_index]
+									}}</template>
+								</hk-roll>
+							</div>
 						</template>
 
 						<TutorialPopover
@@ -264,13 +254,13 @@
 													rotate: animateRoll === roll.key + rolled_index + throw_index,
 												}"
 												@click="
-													(animateRoll = roll.key + rolled_index + throw_index),
-														reroll(
-															$event,
-															rolled.rollResult,
-															throw_index,
-															action.toHit && action.toHit.throwsTotal === 20
-														)
+													((animateRoll = roll.key + rolled_index + throw_index),
+													reroll(
+														$event,
+														rolled.rollResult,
+														throw_index,
+														action.toHit && action.toHit.throwsTotal === 20
+													))
 												"
 												@animationend="animateRoll = undefined"
 											>
@@ -451,27 +441,38 @@
 					'step-highlight': demo && follow_tutorial && get_step('run', 'apply'),
 				}"
 			>
-				<q-btn
-					color="neutral-9"
-					class="full-width neutral-1"
-					label="Full"
-					no-caps
-					@click="apply(1)"
-				/>
-				<q-btn
-					color="neutral-9"
-					class="full-width neutral-1"
-					label="Half"
-					no-caps
-					@click="apply(0.5)"
-				/>
-				<q-btn
-					color="neutral-9"
-					class="full-width neutral-1"
-					label="Double"
-					no-caps
-					@click="apply(2)"
-				/>
+				<template v-if="allMiss">
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Missed"
+						no-caps
+						@click="apply(1)"
+					/>
+				</template>
+				<template v-else>
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Full"
+						no-caps
+						@click="apply(1)"
+					/>
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Half"
+						no-caps
+						@click="apply(0.5)"
+					/>
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Double"
+						no-caps
+						@click="apply(2)"
+					/>
+				</template>
 				<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
 					<i aria-hidden="true" class="fas fa-times" />
 				</q-btn>
@@ -493,14 +494,17 @@ import { mapActions, mapGetters } from "vuex";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 import { dice } from "src/mixins/dice";
 import { setHP } from "src/mixins/HpManipulations";
-import TargetAvatar from "src/components/combat/TargetAvatar.vue";
+import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
+import { calc_mod } from "src/utils/generalFunctions";
+import { displayStats } from "src/utils/entityFunctions";
 
 export default {
 	name: "hk-single-roll",
 	components: {
-		TargetAvatar,
 		TutorialPopover,
+		BasicEntity,
 	},
 	props: {
 		value: {
@@ -512,7 +516,7 @@ export default {
 			required: true,
 		},
 	},
-	mixins: [dice, setHP],
+	mixins: [dice, setHP, experience],
 	data() {
 		return {
 			edit_total: {
@@ -538,6 +542,7 @@ export default {
 				disabled: "Auto crits are disabled",
 			},
 			savingThrowResult: {},
+			rolledSaves: {},
 			hitOrMiss: {},
 			animateRoll: undefined,
 			resultColumns: {
@@ -599,6 +604,10 @@ export default {
 			}
 			return undefined; // Default = undefined = roll twice
 		},
+		allMiss() {
+			if (Object.values(this.hitOrMiss).length === 0) return false;
+			return Object.values(this.hitOrMiss).every((value) => value === "miss");
+		},
 	},
 	mounted() {
 		this.checkHitOrMiss();
@@ -612,12 +621,42 @@ export default {
 					if (action.toHit.throwsTotal === 20) this.$set(this.hitOrMiss, index, "hit");
 					else if (action.toHit.throwsTotal === 1) this.$set(this.hitOrMiss, index, "miss");
 					else if (this.roll.target) {
-						if (this.displayStats(this.roll.target).ac <= action.toHit.total)
+						if (displayStats(this.roll.target).ac <= action.toHit.total)
 							this.$set(this.hitOrMiss, index, "hit");
 						else this.$set(this.hitOrMiss, index, "miss");
 					}
 				}
 			});
+		},
+		rollSave(e, action_index, action) {
+			const entity = this.roll.target;
+			const ability = action.save_ability;
+
+			let proficiency;
+			if (entity.entityType === "player") {
+				proficiency = this.returnProficiency(
+					entity.level ? entity.level : this.calculatedLevel(entity.experience)
+				);
+			} else {
+				proficiency = entity.proficiency;
+			}
+			const modifier = entity.saving_throws?.includes(ability)
+				? parseInt(calc_mod(entity[ability])) + proficiency
+				: parseInt(calc_mod(entity[ability]));
+
+			const roll = this.rollD(
+				e,
+				20,
+				1,
+				modifier,
+				`${entity.name?.capitalizeEach()}: ${ability} saving throw`
+			);
+			this.$set(this.rolledSaves, action_index, roll.throwsTotal);
+			this.$set(
+				this.savingThrowResult,
+				action_index,
+				roll.throwsTotal >= action.save_dc ? "save" : "fail"
+			);
 		},
 		removeRoll(index) {
 			this.removeActionRoll(index);
@@ -850,25 +889,6 @@ export default {
 				if (effect === 0) return "no effect";
 			}
 		},
-		displayStats(target) {
-			let stats = "";
-			if (target.transformed) {
-				stats = {
-					ac: target.transformedAc,
-					maxHp: target.transformedMaxHp,
-					maxHpMod: target.transformedMaxHpMod,
-					curHp: target.transformedCurHp,
-				};
-			} else {
-				stats = {
-					ac: target.ac,
-					maxHp: target.maxHp,
-					maxHpMod: target.maxHpMod,
-					curHp: target.curHp,
-				};
-			}
-			return stats;
-		},
 		eventValues(event, value) {
 			let returnObj = {
 				name: "",
@@ -918,12 +938,10 @@ export default {
 			font-size: 15px;
 		}
 
-		.target-item {
-			margin-bottom: 15px;
-			background-color: $neutral-8;
-
-			.ac_wrapper {
-				background-color: $neutral-9;
+		&::v-deep {
+			.basic-entity__wrapper {
+				margin-bottom: 15px;
+				background-color: $neutral-8;
 			}
 		}
 

@@ -117,6 +117,7 @@ const getDefaultState = () => ({
 	test: false,
 	uid: undefined,
 	entities: {},
+	actor: undefined,
 	targeted: [],
 	encounter: undefined,
 	requests: undefined,
@@ -127,6 +128,16 @@ const getDefaultState = () => ({
 	track: undefined,
 	encounter_initialized: false,
 	show_monster_card: false,
+	manual: {
+		value: null,
+		type: null,
+		magical: false,
+		crit: false,
+	},
+	target_multipliers: {
+		multipliers: {},
+		defenses: {},
+	},
 });
 
 const run_encounter_state = getDefaultState();
@@ -152,6 +163,9 @@ const run_encounter_getters = {
 	},
 	down(state) {
 		return state.down;
+	},
+	actor(state) {
+		return state.actor;
 	},
 	targeted(state) {
 		return state.targeted;
@@ -192,6 +206,12 @@ const run_encounter_getters = {
 	},
 	round(state) {
 		return state.encounter ? state.encounter.round : undefined;
+	},
+	manual(state) {
+		return state.manual;
+	},
+	target_multipliers(state) {
+		return state.target_multipliers;
 	},
 };
 
@@ -745,6 +765,11 @@ const run_encounter_actions = {
 		if (prop === "curHp" || prop === "transformedCurHp") {
 			if (!value || value < 0) value = 0;
 			if (value > maxHpIncMod) value = maxHpIncMod;
+			if (value > 0) {
+				commit("SET_ENTITY_PROPERTY", { key, prop: "saves", value: {} });
+				commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: false });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
+			}
 		}
 
 		// Maximum hit points
@@ -1091,6 +1116,13 @@ const run_encounter_actions = {
 			);
 		}
 		commit("SET_ENTITY_PROPERTY", { key, prop: "hidden", value: hidden });
+	},
+
+	/**
+	 * Set entity as the current actor
+	 */
+	set_actor({ commit }, entity) {
+		commit("SET_ACTOR", entity);
 	},
 
 	/**
@@ -1778,6 +1810,7 @@ const run_encounter_actions = {
 			}
 			commit("SET_ENTITY_PROPERTY", { key, prop: "dead", value: true });
 		}
+		commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: false });
 	},
 	async set_finished({ state, dispatch, commit }) {
 		if (!state.demo && !state.test) {
@@ -1956,7 +1989,7 @@ const run_encounter_actions = {
 		commit("SET_LIMITED_USES", { key, category, index, value: used });
 	},
 	/**
-	 * Remove limeted uses of an ability
+	 * Remove limited uses of an ability
 	 *
 	 * @param {string} key Entity Key
 	 * @param {integer} index index of the action or level of the spell slot used
@@ -1976,6 +2009,20 @@ const run_encounter_actions = {
 			{ root: true }
 		);
 		commit("REMOVE_LIMITED_USES", { key, category, index });
+	},
+	setManual({ commit }, { key, value }) {
+		if (key === "clear") {
+			commit("CLEAR_MANUAL");
+		} else {
+			commit("SET_MANUAL", { key, value });
+		}
+	},
+	setMultipliers({ commit }, { key, type, value }) {
+		if (type === "clear") {
+			commit("CLEAR_MULTIPLIERS");
+		} else {
+			commit("SET_MULTIPLIERS", { key, type, value });
+		}
 	},
 	reset_store({ commit }) {
 		commit("RESET_STORE");
@@ -2010,6 +2057,9 @@ const run_encounter_mutations = {
 	},
 	SET_ENCOUNTER(state, payload) {
 		Vue.set(state, "encounter", payload);
+	},
+	SET_ACTOR(state, payload) {
+		Vue.set(state, "actor", payload);
 	},
 	SET_TARGETED(state, payload) {
 		Vue.set(state, "targeted", payload);
@@ -2116,6 +2166,18 @@ const run_encounter_mutations = {
 			const parsed = JSON.stringify(state.log);
 			if (!state.demo && !state.test) localStorage.setItem(state.encounterId, parsed);
 		}
+	},
+	SET_MANUAL(state, { key, value }) {
+		Vue.set(state.manual, key, value);
+	},
+	CLEAR_MANUAL(state) {
+		Vue.set(state, "manual", { value: null, type: null, magical: false, crit: false });
+	},
+	SET_MULTIPLIERS(state, { key, type, value }) {
+		Vue.set(state.target_multipliers[type], key, value);
+	},
+	CLEAR_MULTIPLIERS(state) {
+		Vue.set(state, "target_multipliers", { multipliers: {}, defenses: {} });
 	},
 };
 

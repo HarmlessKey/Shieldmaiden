@@ -1,9 +1,11 @@
 <template>
 	<div class="drawer">
 		<a @click="hideDrawer()" v-shortkey="['esc']" @shortkey="hideDrawer()" class="hide">
-			<i aria-hidden="true" class="far fa-chevron-double-right" />
-			<span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
-			<q-tooltip anchor="bottom middle" self="center middle"> Hide [esc] </q-tooltip>
+			<i aria-hidden="true" class="far fa-chevron-double-right mr-2" />
+			<hk-show-keybind :binds="['esc']" />
+			<q-tooltip anchor="bottom middle" self="center middle">
+				Hide <hk-show-keybind :binds="['esc']" show />
+			</q-tooltip>
 		</a>
 		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px' }">
 			<div class="drawer__content" :class="drawer.classes">

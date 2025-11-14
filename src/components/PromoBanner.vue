@@ -27,7 +27,7 @@
 		</div>
 		<div class="promo-banner__footer">
 			<div class="remaining">
-				Get your first month with a <strong>{{ active_promotion.discount }}%</strong> discount.
+				Get your first month<template v-if="eligible_tier_names"> of <strong>{{ eligible_tier_names }}</strong></template> with a <strong>{{ active_promotion.discount }}%</strong> discount.
 				<template v-if="hours_remaining <= 1">Less than </template>
 				<span class="remaining__count">{{
 					days_remaining ? days_remaining : hours_remaining
@@ -58,6 +58,7 @@ export default {
 			now: new Date(),
 			showSetter: undefined,
 			timer: null,
+			tiers: null,
 		};
 	},
 	computed: {
@@ -74,6 +75,29 @@ export default {
 			const diff = this.active_promotion.active_until - this.now;
 			const hours = Math.floor(diff / (1000 * 60 * 60));
 			return hours;
+		},
+		eligible_tier_names() {
+			if (!this.active_promotion?.eligible_tiers || !this.tiers) {
+				return null;
+			}
+
+			const tierNames = this.active_promotion.eligible_tiers
+				.map((tierId) => this.tiers[tierId]?.name)
+				.filter(Boolean);
+
+			if (tierNames.length === 0) {
+				return null;
+			}
+
+			// Format the list: "A", "A and B", or "A, B, and C"
+			if (tierNames.length === 1) {
+				return tierNames[0];
+			} else if (tierNames.length === 2) {
+				return `${tierNames[0]} and ${tierNames[1]}`;
+			} else {
+				const lastTier = tierNames.pop();
+				return `${tierNames.join(", ")}, and ${lastTier}`;
+			}
 		},
 	},
 	methods: {
@@ -94,10 +118,8 @@ export default {
 		},
 	},
 	async mounted() {
+		this.tiers = await promotionService.getTiers();
 		this.active_promotion = await this.getActivePromotion();
-		if (this.show_banner && this.active_promotion) {
-			this.$emit("discount", this.active_promotion.discount);
-		}
 		this.timer = setInterval(() => {
 			this.now = new Date();
 		}, 60000);

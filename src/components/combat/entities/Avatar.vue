@@ -2,16 +2,13 @@
 	<div
 		class="target-avatar"
 		:style="{
-			'background-image':
-				(entity.img && !icons) ||
-				(entity.img &&
-					icons &&
-					!entity.hidden &&
-					!entity.transformed &&
-					!entity.reminder?.surprised)
-					? 'url(' + entity.img + ')'
-					: '',
+			'background-image': backgroundImage,
 			color: entity.color_label ? entity.color_label : ``,
+			borderColor: entity.color_label ? entity.color_label : ``,
+			width: `${size}px`,
+			minWidth: `${size}px`,
+			lineHeight: `${size}px`,
+			fontSize: `${font_size}px`,
 		}"
 	>
 		<template v-if="icons && entity.hidden">
@@ -37,7 +34,7 @@
 
 <script>
 export default {
-	name: "target-avatar",
+	name: "Avatar",
 	props: {
 		entity: {
 			type: Object,
@@ -47,6 +44,22 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		size: {
+			type: Number,
+			default: 32,
+		},
+	},
+	computed: {
+		font_size() {
+			return Math.ceil(this.size * 0.75);
+		},
+		backgroundImage() {
+			const { img, hidden, transformed, reminders } = this.entity;
+			if (!img) return "";
+			if (!this.icons) return `url(${img})`;
+			if (!hidden && !transformed && !reminders?.surprised) return `url(${img})`;
+			return "";
+		}
 	},
 };
 </script>
@@ -56,5 +69,11 @@ export default {
 	background-position: center top;
 	background-repeat: no-repeat;
 	background-size: cover;
+	aspect-ratio: 1/1;
+	border-radius: $border-radius-small;
+	border-left: solid 2px $neutral-7;
+	background-color: $neutral-8;
+	box-sizing: content-box;
+	text-align: center;
 }
 </style>

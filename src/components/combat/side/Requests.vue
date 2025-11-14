@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Player requests</h2>
+		<h3>Player requests</h3>
 		<q-list v-if="_requests.length">
 			<template v-for="(request, i) in _requests">
 				<Request :request="request" :i="i" :key="`request-${request.key}`" />

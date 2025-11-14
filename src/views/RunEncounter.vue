@@ -4,8 +4,8 @@
 			<OverEncumbered />
 		</div>
 		<div
-			class="combat-wrapper"
 			v-else-if="encounter && (players || demo)"
+			class="combat-wrapper"
 			:style="[
 				settings.background && getBackground(encounter)
 					? { background: 'url(\'' + getBackground(encounter) + '\')' }
@@ -36,7 +36,61 @@
 						:_idle="_idle"
 						:width="width"
 					/>
-					<div v-else class="desktop">
+					<div v-else-if="!settings.layout" class="desktop">
+						<Top
+							:_active="_active"
+							:current="_active[encounter.turn]"
+							:next="_active[encounter.turn + 1]"
+							:settings="settings"
+						/>
+						<Actor :current="_active[encounter.turn]" :_active="_active" />
+						<Pane
+							ref="actor"
+							tabindex="0"
+							title="Actor"
+							class="current"
+							:class="{
+								'step-highlight': demo && follow_tutorial && get_step('run', 'current'),
+								focused: focused_pane === 'actor',
+							}"
+							@focus="focusPane('actor')"
+						>
+							<Card :entity="actor || _active[encounter.turn]" :avatar="false" rollable />
+							<TutorialPopover
+								v-if="demo"
+								tutorial="run"
+								step="current"
+								position="right"
+								:offset="[10, 0]"
+							/>
+						</Pane>
+						<Targets
+							ref="targets"
+							tabindex="0"
+							class="pane"
+							:current="_active[encounter.turn]"
+							:_active="_active"
+							:_idle="_idle"
+							:class="{ focused: focused_pane === 'targets' }"
+							@focus="focusPane('targets')"
+						/>
+						<Targeted
+							ref="targeted"
+							tabindex="0"
+							class="pane"
+							:class="{ focused: focused_pane === 'targeted' }"
+							@focus="focusPane('targeted')"
+						/>
+						<Log />
+						<Side
+							ref="side"
+							tabindex="0"
+							class="pane"
+							:class="{ focused: focused_pane === 'side' }"
+							@focus="focusPane('side')"
+						/>
+					</div>
+					<div v-else class="legacy">
 						<Turns
 							:active_len="Object.keys(_active).length"
 							:current="_active[encounter.turn]"
@@ -67,14 +121,16 @@
 							ref="targeted"
 							tabindex="0"
 							class="pane"
+							out-of-turn-actions
 							:class="{ focused: focused_pane === 'targeted' }"
 							@focus="focusPane('targeted')"
 						/>
 						<Side
 							ref="side"
 							tabindex="0"
-							class="pane"
+							class="pane legacy-side"
 							:class="{ focused: focused_pane === 'side' }"
+							log
 							@focus="focusPane('side')"
 						/>
 					</div>
@@ -137,9 +193,10 @@ import { mapActions, mapGetters } from "vuex";
 import { audio } from "src/mixins/audio";
 import Finished from "src/components/combat/Finished.vue";
 import DemoFinished from "src/components/combat/DemoFinished.vue";
-import Turns from "src/components/combat/Turns.vue";
+import Top from "src/components/combat/top";
+import Turns from "src/components/combat/legacy/Turns.vue";
 import Menu from "src/components/combat/mobile/Menu.vue";
-import Current from "src/components/combat/Current.vue";
+import Current from "src/components/combat/legacy/Current.vue";
 import CurrentMobile from "src/components/combat/mobile/Current.vue";
 import Targets from "src/components/combat/Targets.vue";
 import Targeted from "src/components/combat/Targeted.vue";
@@ -147,13 +204,19 @@ import Side from "src/components/combat/side/Side.vue";
 import SetInitiative from "src/components/combat/initiative";
 import OverEncumbered from "src/components/userContent/OverEncumbered.vue";
 import DemoOverlay from "src/components/combat/DemoOverlay.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import TutorialFinishedDialog from "src/components/combat/TutorialFinishedDialog.vue";
+import Pane from "src/components/combat/Pane.vue";
+import Card from "src/components/combat/entities/Card";
+import Actor from "src/components/combat/actor";
+import Log from "src/components/combat/side/log";
 
 export default {
 	name: "RunEncounter",
 	components: {
 		Finished,
 		DemoFinished,
+		Top,
 		Turns,
 		Menu,
 		Current,
@@ -164,7 +227,12 @@ export default {
 		SetInitiative,
 		OverEncumbered,
 		DemoOverlay,
+		TutorialPopover,
 		TutorialFinishedDialog,
+		Pane,
+		Card,
+		Actor,
+		Log,
 	},
 	mixins: [audio],
 	data() {
@@ -179,7 +247,7 @@ export default {
 			audio_notification: false,
 			loading: true,
 			demo_dialog: false,
-			panes: ["current", "targets", "targeted", "side"],
+			panes: ["actor", "targets", "targeted", "side"],
 			focused_pane: null,
 		};
 	},
@@ -218,9 +286,11 @@ export default {
 			"broadcast",
 			"requests",
 			"userSettings",
+			"actor",
 		]),
 		...mapGetters("players", ["players"]),
 		...mapGetters("encounters", ["demo_encounter"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		settings() {
 			return this.userSettings && this.userSettings.encounter ? this.userSettings.encounter : {};
 		},
@@ -476,6 +546,19 @@ export default {
 		background: rgba(38, 38, 38, 0.9) !important;
 	}
 	.desktop {
+		width: 100%;
+		height: 100%;
+		padding: 5px;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr) 300px;
+		grid-template-rows: 42px 118px 1fr;
+		grid-gap: 5px;
+		grid-template-areas:
+			"top top top top"
+			"actor actor actor log"
+			"current targets targeted side";
+	}
+	.legacy {
 		padding: 5px;
 		width: 100%;
 		height: 100%;
@@ -501,19 +584,20 @@ export default {
 			font-size: 15px !important;
 			margin-bottom: 15px !important;
 		}
+	}
 
-		.pane {
-			&.focused,
-			&:focus {
-				outline: $neutral-3 solid 1px;
-				outline-offset: 1px;
-			}
+	.combat-pane {
+		border-radius: $border-radius;
+		&.focused,
+		&:focus {
+			outline: $neutral-2 solid 1px;
+			outline-offset: 1px;
 		}
+	}
 
-		.side {
-			grid-area: side;
-			overflow: hidden;
-		}
+	.side {
+		grid-area: side;
+		overflow: hidden;
 	}
 
 	.mobile {
@@ -535,23 +619,67 @@ export default {
 		}
 	}
 
-	@media only screen and (max-width: 1000px) {
+	@media only screen and (max-width: 1300px) {
 		.desktop {
+			grid-template-columns: repeat(3, 1fr) 200px;
+		}
+	}
+
+	@media only screen and (max-width: $xl-breakpoint) {
+		.desktop {
+			grid-template-columns: repeat(3, 1fr);
+			grid-template-areas:
+				"top top top"
+				"actor actor actor"
+				"current targets targeted";
+
+			.combat-log,
+			.side {
+				display: none;
+			}
+		}
+	}
+
+	@media only screen and (max-width: $lg-breakpoint) {
+		.legacy {
 			grid-template-columns: 2fr 3fr 2fr;
 			grid-template-areas:
 				"turns turns turns"
 				"current targets targeted";
+
+			&-side {
+				display: none;
+			}
 		}
-		.side {
-			display: none;
+		.desktop {
+			grid-template-columns: repeat(2, 1fr);
+			grid-template-rows: 42px 118px 1fr;
+			grid-template-areas:
+				"top top"
+				"actor actor"
+				"targets targeted";
+
+			.current,
+			.combat-log,
+			.side {
+				display: none;
+			}
 		}
 	}
 	@media only screen and (max-width: 900px) {
-		.desktop {
+		.legacy {
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
 				"turns turns"
 				"current targets";
+		}
+		.desktop {
+			grid-template-columns: repeat(2, 1fr);
+			grid-template-rows: 42px 118px 1fr;
+			grid-template-areas:
+				"top top"
+				"actor actor"
+				"targets targeted";
 		}
 	}
 }

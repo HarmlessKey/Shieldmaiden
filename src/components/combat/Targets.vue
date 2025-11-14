@@ -1,55 +1,55 @@
 <template>
-	<div
+	<Pane
 		id="targets"
-		class="bg-neutral-6-transparent"
+		title="Targets"
 		:class="{
 			'step-highlight': demo && follow_tutorial && get_step('run', 'targets'),
 		}"
 		@focus="$emit('focus')"
 	>
-		<h2 class="componentHeader d-flex justify-content-between" :class="{ shadow: setShadow > 0 }">
-			<span>
-				<i aria-hidden="true" class="fas fa-helmet-battle" /> Targets ({{ _targets.length }})
-			</span>
-			<button
-				class="btn btn-sm bg-neutral-5"
-				tabindex="-1"
-				:class="{ disabled: test }"
-				v-shortkey="['a']"
-				@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
-				@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
-			>
-				<i aria-hidden="true" class="fas fa-plus green" />
-				<span class="ml-1">
-					Add
-					<hk-show-keybind class="d-none d-sm-inline" :binds="['a']" />
-				</span>
-				<q-tooltip v-if="test" anchor="top middle" self="center middle"
-					>Unavailable in test mode</q-tooltip
-				>
-			</button>
-		</h2>
-		<q-scroll-area
-			:dark="$store.getters.theme === 'dark'"
-			:thumb-style="{ width: '5px' }"
-			v-on:scroll="shadow()"
-			ref="scroll"
+		<button
+			slot="header-action"
+			class="btn btn-sm bg-neutral-5"
+			tabindex="-1"
+			:class="{ disabled: test }"
+			v-shortkey="{ main: ['='], alt: ['shift', '+'] }"
+			@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
+			@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
 		>
-			<div
-				v-shortkey="{
-					downSingle: ['arrowdown'],
-					downMultiple: ['shift', 'arrowdown'],
-					upSingle: ['arrowup'],
-					upMultiple: ['shift', 'arrowup'],
-				}"
-				@shortkey="cycle_target"
+			<i aria-hidden="true" class="fas fa-plus green" />
+			<span class="ml-1">
+				Add
+				<hk-show-keybind class="d-none d-sm-inline" :binds="['+']" />
+			</span>
+			<q-tooltip v-if="test" anchor="top middle" self="center middle"
+				>Unavailable in test mode</q-tooltip
 			>
-				<template v-for="{ group, targets } in groups">
-					<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
-						<i aria-hidden="true" v-if="group === 'down'" class="fas fa-skull-crossbones red" />
-						{{ group.capitalize() }} ({{ targets.length }})
-					</h2>
-
+		</button>
+		<div
+			v-shortkey="{
+				downSingle: ['arrowdown'],
+				downMultiple: ['shift', 'arrowdown'],
+				upSingle: ['arrowup'],
+				upMultiple: ['shift', 'arrowup'],
+			}"
+			@shortkey="cycle_target"
+		>
+			<template v-for="{ group, targets } in groups">
+				<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
+					<hk-icon v-if="group === 'down'" icon="fas fa-skull-crossbones" class="red mr-1" />
+					{{ group.capitalize() }} ({{ targets.length }})
+				</h2>
+				<draggable
+					tag="div"
+					:value="targets"
+					:animation="200"
+					handle=".drag-handle"
+					ghost-class="drag-ghost"
+					drag-class="drag-dragging"
+					:force-fallback="true"
+					:key="`sortable-${group}`"
+					@end="onDrag"
+				>
 					<transition-group
 						:key="group"
 						tag="ul"
@@ -71,26 +71,22 @@
 							tabindex="0"
 							@keydown.space="selectTarget($event, 'single', entity.key)"
 						>
-							<span
-								class="topinfo d-flex justify-content-between"
+							<div
+								class="top-of-round"
 								v-if="group === 'active' && _active[0].key == entity.key && encounter.turn != 0"
 							>
-								Top of the round
-								<div>
-									<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
-										+ {{ Object.keys(_addedNextRound).length }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Added next round
-										</q-tooltip>
-									</span>
-									<span class="red" v-if="Object.keys(_activeDown).length > 0">
-										<span class="neutral-3 mx-1">|</span>- {{ Object.keys(_activeDown).length }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Removed next round
-										</q-tooltip>
-									</span>
+								<div class="top-of-round__title">Top of the Round</div>
+								<div class="top-of-round__added" v-if="Object.keys(_addedNextRound).length > 0">
+									+ {{ Object.keys(_addedNextRound).length }}
+									<q-tooltip anchor="top middle" self="center middle"> Added next round </q-tooltip>
 								</div>
-							</span>
+								<div class="top-of-round__removed" v-if="Object.keys(_activeDown).length > 0">
+									- {{ Object.keys(_activeDown).length }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Removed next round
+									</q-tooltip>
+								</div>
+							</div>
 							<div
 								class="target"
 								v-touch-hold.mouse="(event) => selectTarget(event, 'multi', entity.key)"
@@ -98,48 +94,42 @@
 								v-shortkey="[i]"
 								@shortkey="set_targeted({ type: 'single', key: entity.key })"
 							>
-								<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
+								<TargetEntity :entity="entity">
+									<template v-if="!entity.active" slot="effects">
+										<button
+											class="btn btn-sm bg-neutral-8"
+											v-if="entity.addNextRound"
+											v-on:click.stop="
+												add_next_round({ key: entity.key, action: 'tag', value: false })
+											"
+										>
+											<i aria-hidden="true" class="fas fa-check green" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Will be added next round
+											</q-tooltip>
+										</button>
+										<button
+											class="btn btn-sm bg-neutral-8"
+											v-if="!entity.addNextRound"
+											v-on:click.stop="
+												add_next_round({ key: entity.key, action: 'tag', value: true })
+											"
+										>
+											<i aria-hidden="true" class="fas fa-check neutral-2" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Click to add next round
+											</q-tooltip>
+										</button>
+										<button
+											class="btn btn-sm bg-neutral-8"
+											@click="add_next_round({ key: entity.key, action: 'set' })"
+										>
+											<i aria-hidden="true" class="fas fa-arrow-up" />
+											<q-tooltip anchor="top middle" self="center middle">Add now</q-tooltip>
+										</button>
+									</template>
+								</TargetEntity>
 							</div>
-							<div v-if="!entity.active" class="d-flex">
-								<a
-									class="btn btn-sm btn-clear mx-1"
-									v-if="entity.addNextRound"
-									v-on:click.stop="add_next_round({ key: entity.key, action: 'tag', value: false })"
-								>
-									<i aria-hidden="true" class="fas fa-check green" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Will be added next round
-									</q-tooltip>
-								</a>
-								<a
-									class="btn btn-sm btn-clear mx-1"
-									v-if="!entity.addNextRound"
-									v-on:click.stop="add_next_round({ key: entity.key, action: 'tag', value: true })"
-								>
-									<i aria-hidden="true" class="fas fa-check neutral-2" />
-									<q-tooltip anchor="top middle" self="center middle">
-										Click to add next round
-									</q-tooltip>
-								</a>
-								<a
-									class="btn btn-sm bg-neutral-5"
-									@click="add_next_round({ key: entity.key, action: 'set' })"
-								>
-									<i aria-hidden="true" class="fas fa-arrow-up" />
-									<q-tooltip anchor="top middle" self="center middle"> Add now </q-tooltip>
-								</a>
-							</div>
-							<a class="options">
-								<i aria-hidden="true" class="fal fa-ellipsis-v" />
-								<q-popup-proxy
-									:dark="$store.getters.theme === 'dark'"
-									anchor="bottom right"
-									self="top right"
-									:breakpoint="576"
-								>
-									<target-menu :entity="entity" />
-								</q-popup-proxy>
-							</a>
 							<TutorialPopover
 								v-if="demo && group === 'active' && i === 1"
 								tutorial="run"
@@ -149,30 +139,30 @@
 							/>
 						</li>
 					</transition-group>
-				</template>
-			</div>
-		</q-scroll-area>
+				</draggable>
+			</template>
+		</div>
 
 		<TutorialPopover v-if="demo" tutorial="run" position="right" step="targets" :offset="[10, 0]" />
-	</div>
+	</Pane>
 </template>
 
 <script>
 import _ from "lodash";
 import { mapGetters, mapActions } from "vuex";
-import TargetItem from "src/components/combat/TargetItem.vue";
-import TargetMenu from "src/components/combat/TargetMenu.vue";
+import Pane from "./Pane.vue";
+import TargetEntity from "./entities/TargetEntity.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import draggable from "vuedraggable";
 
 export default {
 	name: "Targets",
-	components: { TargetItem, TargetMenu, TutorialPopover },
+	components: { Pane, TargetEntity, TutorialPopover, draggable },
 	props: ["current", "_active", "_idle"],
 	data() {
 		return {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			currentTarget: {},
-			setShadow: 0,
 		};
 	},
 	computed: {
@@ -185,6 +175,7 @@ export default {
 			"userSettings",
 			"test",
 			"demo",
+			"turn",
 		]),
 		...mapGetters("tutorial", ["get_required", "follow_tutorial", "get_step"]),
 		groups() {
@@ -249,8 +240,50 @@ export default {
 			"set_stable",
 			"remove_entity",
 			"add_next_round",
+			"set_initiative",
 		]),
 		...mapActions("tutorial", ["completeStep"]),
+		onDrag(event) {
+			const oldIndex = event.oldIndex;
+			const newIndex = event.newIndex;
+			const entity = this._targets[oldIndex];
+			let initiative = entity.initiative;
+
+			// Moving down
+			if (oldIndex < newIndex) {
+				const previousIndex = newIndex;
+				let nextIndex = newIndex === this._targets?.length - 1 ? 0 : newIndex + 1;
+
+				// When the top entity is dragged to bottom, show a warning
+				// This action should cause the turn go up
+				if (nextIndex === 0 && oldIndex === 0) {
+					this.$q.notify({
+						message: "Can't drag top to bottom",
+						color: "warning",
+						position: "top",
+						timeout: 1000,
+					});
+					return;
+				}
+
+				const above = this._targets[previousIndex]?.initiative;
+				const below = this._targets[nextIndex]?.initiative;
+
+				// When below > above we're dragging to the bottom of the initiative list
+				// In that case we can simply make the initiative lower than above
+				initiative = below > above ? above / 2 : (above + below) / 2;
+			}
+			// Moving up
+			if (oldIndex > newIndex) {
+				const previousIndex = !newIndex ? this._targets?.length - 1 : newIndex - 1;
+				const nextIndex = newIndex === this._targets?.length - 1 ? 0 : newIndex;
+				const above = this._targets[previousIndex]?.initiative;
+				const below = this._targets[nextIndex]?.initiative;
+
+				initiative = (above + below) / 2;
+			}
+			this.set_initiative({ key: entity.key, initiative: initiative });
+		},
 		setHidden(key, hidden) {
 			if (key) {
 				this.set_hidden({
@@ -260,9 +293,6 @@ export default {
 			} else {
 				this.$snotify.error("Select a target", "Hide entity", {});
 			}
-		},
-		shadow() {
-			this.setShadow = this.$refs.scroll.scrollPosition;
 		},
 		remove(key, name) {
 			this.$snotify.error(
@@ -335,22 +365,6 @@ export default {
 		width: 100%;
 	}
 
-	h2 {
-		padding-left: 15px;
-		margin-bottom: 5px;
-		font-size: 18px;
-
-		&.componentHeader {
-			background-color: $neutral-8-transparent;
-			padding: 10px 15px;
-			margin-bottom: 0 !important;
-			line-height: 31px;
-
-			&.shadow {
-				box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-			}
-		}
-	}
 	a.options {
 		display: inline-block;
 		height: 35px;
@@ -374,23 +388,33 @@ export default {
 			text-align: center;
 		}
 	}
+
+	h2 {
+		margin: 15px 0 10px 0;
+		font-size: 18px;
+	}
 }
-.q-scrollarea {
-	padding: 0 0 30px 0;
-	height: calc(100% - 55px);
-}
+
 ul.targets {
-	margin: 0;
 	list-style: none;
-	padding: 10px 15px 10px 10px !important;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 
 	li {
-		margin-bottom: 8px;
-		border: solid 1px transparent;
+		padding: 5px 5px 5px 0;
 		cursor: pointer;
-		background: $neutral-8;
+		background: $neutral-5;
 		border-radius: $border-radius-small;
+		margin-left: 18px;
+		border: solid 1px transparent;
+		transition: all 0.1s linear;
 
+		&:hover {
+			border-color: $neutral-4;
+		}
 		&.targeted {
 			outline: $blue solid 3px;
 		}
@@ -399,47 +423,70 @@ ul.targets {
 			border-bottom-right-radius: 0;
 		}
 
+		.target-menu__button {
+			align-self: flex-start;
+			font-size: 18px;
+			padding: 1px 8px;
+		}
+
 		&:focus &:not(&.targeted) {
 			outline: $outline;
 		}
 	}
-	&.active_targets li:first-child {
-		margin-bottom: 20px;
-		border-color: $green;
-	}
 	li.top {
 		position: relative;
-		margin-top: 35px;
+		margin-top: 40px;
 
-		.topinfo {
-			cursor: default;
-			text-transform: uppercase;
-			font-size: 11px;
-			width: 100%;
+		.top-of-round {
 			position: absolute;
-			top: -25px;
-			border-bottom: solid 1px $neutral-1;
+			display: flex;
+			justify-content: space-between;
+			gap: 3px;
+			font-weight: bold;
+			cursor: default;
+			top: -40px;
+			margin-left: -25px;
+			width: calc(100% + 25px);
+
+			> div {
+				background-color: $neutral-9;
+				border-radius: $border-radius;
+				padding: 3px 8px;
+			}
+			&__title {
+				flex-grow: 1;
+			}
+			&__added {
+				color: $green;
+			}
+			&__removed {
+				color: $red;
+			}
 		}
 	}
 }
 .targets-move {
 	transition: transform 0.6s;
 }
+.drag {
+	&-ghost {
+		opacity: 0.6;
+	}
+	&-handle {
+		color: $neutral-2;
+		cursor: grab;
+	}
+	&-dragging {
+		opacity: 1 !important;
+		margin-top: -75% !important;
+		margin-left: -100% !important;
+		box-shadow: 0 5px 10px $black;
+		background-color: $neutral-9;
+		cursor: grabbing;
+	}
+}
 .fadeInUp,
 .fadeInDown {
 	animation-delay: 0.6s;
-}
-@media only screen and (max-width: 576px) {
-	#targets,
-	.q-scrollarea {
-		overflow: visible !important;
-		padding-bottom: 0;
-
-		.componentHeader {
-			font-size: 15px;
-			padding: 5px 10px;
-			line-height: normal;
-		}
-	}
 }
 </style>

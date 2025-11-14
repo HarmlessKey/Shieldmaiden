@@ -79,7 +79,7 @@
 					},
 					"npc": {
 						"type": "string",
-						"enum": ["custom", "srd"]
+						"enum": ["custom", "srd", "api"]
 					},
 					"ac": {
 						"type": "integer",
@@ -105,6 +105,15 @@
 					"color_label": {
 						"type": "string",
 						"maxLength": 7
+					},
+					"hidden": {
+						"type": "boolean"
+					},
+					"friendly": {
+						"type": "boolean"
+					},
+					"down": {
+						"type": "boolean"
 					}
 				}
 			}

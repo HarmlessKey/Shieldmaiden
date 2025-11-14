@@ -46,7 +46,6 @@
 								:error-message="errors[0]"
 							/>
 						</ValidationProvider>
-						<hr />
 						<div class="row q-col-gutter-md mb-2">
 							<div class="col">
 								<ValidationProvider
@@ -124,19 +123,21 @@
 								</ValidationProvider>
 							</div>
 						</div>
-						<label class="my-2">When to add</label>
-						<q-btn-toggle
-							class="mt-2"
-							v-model="addMoment"
-							spread
-							no-caps
-							flat
-							:dark="$store.getters.theme === 'dark'"
-							:options="options"
-							toggle-color="primary"
-						/>
-						<hr />
-						<q-btn class="full-width mb-3" color="primary" no-caps type="submit" label="Add" />
+						<div class="d-flex gap-1">
+							<q-btn
+								class="full-width mb-3 bg-neutral-5"
+								no-caps
+								label="Add next round"
+								@click="valid ? addNPC('next') : validate()"
+							/>
+							<q-btn
+								class="full-width mb-3"
+								color="primary"
+								no-caps
+								type="submit"
+								label="Add directly"
+							/>
+						</div>
 					</q-form>
 				</ValidationObserver>
 			</q-tab-panel>
@@ -171,24 +172,15 @@
 						</template>
 					</ul>
 
-					<label class="my-2">When to add</label>
-					<q-btn-toggle
-						class="mt-2"
-						v-model="addMoment"
-						spread
-						no-caps
-						:dark="$store.getters.theme === 'dark'"
-						:options="options"
-						toggle-color="primary"
-					/>
-					<hr />
-					<q-btn
-						v-if="selectedPlayers.length > 0"
-						color="primary"
-						type="submit"
-						no-caps
-						:label="`Add player${selectedPlayers.length > 1 ? 's' : ''}`"
-					/>
+					<div v-if="selectedPlayers.length > 0" class="d-flex gap-1">
+						<q-btn
+							class="full-width bg-neutral-5"
+							no-caps
+							label="Add next round"
+							@click="addPlayer('next')"
+						/>
+						<q-btn class="full-width" color="primary" type="submit" no-caps label="Add directly" />
+					</div>
 				</q-form>
 				<p v-else>
 					<b class="red">No players available</b><br />
@@ -235,7 +227,6 @@ export default {
 				{ label: "Add next round", value: "next" },
 				{ label: "Add directly", value: "directly" },
 			],
-			addMoment: "next",
 			tabs: [
 				{ name: "npc", label: "NPC", icon: "fas fa-dragon" },
 				{ name: "player", label: "Player", icon: "fas fa-user" },
@@ -298,11 +289,11 @@ export default {
 			this.copy_dialog = false;
 			this.$forceUpdate();
 		},
-		async addNPC() {
+		async addNPC(addMoment) {
 			this.entity.entityType = "npc";
 			this.entity.curHp = this.entity.maxHp;
 
-			if (this.addMoment === "next") {
+			if (addMoment === "next") {
 				this.entity.addNextRound = true;
 				this.entity.active = false;
 			} else {
@@ -316,7 +307,7 @@ export default {
 				!this.selectedPlayers.includes(key)
 			);
 		},
-		async addPlayer() {
+		async addPlayer(addMoment) {
 			for (const key of this.selectedPlayers) {
 				if (this.playerInitiative[key] > 0) {
 					const player = this.players[key];
@@ -329,7 +320,7 @@ export default {
 						id: key,
 					};
 
-					if (this.addMoment === "next") {
+					if (addMoment === "next") {
 						entity.addNextRound = true;
 						entity.active = false;
 					} else {
@@ -368,6 +359,7 @@ export default {
 					}
 				}
 			}
+			this.selectedPlayers = [];
 		},
 	},
 };

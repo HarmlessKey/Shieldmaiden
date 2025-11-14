@@ -18,7 +18,7 @@
 				</span>
 			</template>
 		</hk-tip>
-		<ul class="entities hasImg">
+		<ul class="entities">
 			<li
 				v-for="entity in active"
 				v-bind:key="entity.key"
@@ -28,50 +28,58 @@
 				@keydown.h="set_hidden({ key: entity.key, hidden: !entity.hidden })"
 				@keydown.a="set_active({ key: entity.key, active: false })"
 			>
-				<TargetAvatar :entity="entity" class="img" />
-				<div class="overview-item">
-					<div class="name truncate">{{ entity.name.capitalizeEach() }}</div>
-					<strong class="blue initiative">{{ entity.initiative }}</strong>
-				</div>
-				<div class="actions">
-					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
-					<a
-						v-if="!entity.reminders.surprised"
-						class="btn btn-sm bg-neutral-5"
-						@click="setSurprised(entity.key, true)"
-					>
-						<i aria-hidden="true" class="hki-surprised"></i>
-						<q-tooltip anchor="top middle" self="center middle"> Set surprised [s] </q-tooltip>
-					</a>
-					<a v-else class="btn btn-sm bg-neutral-5" @click="setSurprised(entity.key, false)">
-						<i aria-hidden="true" class="hki-surprised"></i>
-						<q-tooltip anchor="top middle" self="center middle"> Remove surprised [s] </q-tooltip>
-					</a>
-					<!-- Hide / Unhide Entity -->
-					<a
-						v-if="!entity.hidden"
-						class="btn btn-sm bg-neutral-5"
-						@click="set_hidden({ key: entity.key, hidden: true })"
-					>
-						<i aria-hidden="true" class="fas fa-eye-slash"></i>
-						<q-tooltip anchor="top middle" self="center middle"> Set hidden [h] </q-tooltip>
-					</a>
-					<a
-						v-else
-						class="btn btn-sm bg-neutral-5"
-						@click="set_hidden({ key: entity.key, hidden: false })"
-					>
-						<i aria-hidden="true" class="fas fa-eye"></i>
-						<q-tooltip anchor="top middle" self="center middle"> Unhide [h] </q-tooltip>
-					</a>
-					<a
-						class="btn btn-sm bg-neutral-5"
-						@click="set_active({ key: entity.key, active: false })"
-					>
-						<i aria-hidden="true" class="fas fa-minus"></i>
-						<q-tooltip anchor="top middle" self="center middle"> Set inactive [a] </q-tooltip>
-					</a>
-				</div>
+				<BasicEntity :entity="entity" :size="48" :padding="8">
+					<strong class="set-initiative">{{ entity.initiative }}</strong>
+					<div class="actions">
+						<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
+						<button
+							v-if="!entity.reminders.surprised"
+							class="btn btn-sm bg-neutral-8"
+							@click="setSurprised(entity.key, true)"
+						>
+							<i aria-hidden="true" class="hki-surprised"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Set surprised <hk-show-keybind :binds="['s']"
+							/></q-tooltip>
+						</button>
+						<button v-else class="btn btn-sm bg-neutral-8" @click="setSurprised(entity.key, false)">
+							<i aria-hidden="true" class="hki-surprised"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Remove surprised <hk-show-keybind :binds="['s']"
+							/></q-tooltip>
+						</button>
+						<!-- Hide / Unhide Entity -->
+						<button
+							v-if="!entity.hidden"
+							class="btn btn-sm bg-neutral-8"
+							@click="set_hidden({ key: entity.key, hidden: true })"
+						>
+							<i aria-hidden="true" class="fas fa-eye-slash"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Hide <hk-show-keybind :binds="['h']"
+							/></q-tooltip>
+						</button>
+						<button
+							v-else
+							class="btn btn-sm bg-neutral-8"
+							@click="set_hidden({ key: entity.key, hidden: false })"
+						>
+							<i aria-hidden="true" class="fas fa-eye"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Unhide <hk-show-keybind :binds="['h']"
+							/></q-tooltip>
+						</button>
+						<button
+							class="btn btn-sm bg-neutral-8"
+							@click="set_active({ key: entity.key, active: false })"
+						>
+							<i aria-hidden="true" class="fas fa-minus"></i>
+							<q-tooltip anchor="top middle" self="center middle"
+								>Set inactive <hk-show-keybind :binds="['a']"
+							/></q-tooltip>
+						</button>
+					</div>
+				</BasicEntity>
 			</li>
 		</ul>
 
@@ -84,29 +92,16 @@
 				tabindex="0"
 				@keydown.a="set_active({ key: entity.key, active: true })"
 			>
-				<span
-					class="img"
-					:style="{
-						'background-image': entity.img ? 'url(' + entity.img + ')' : '',
-						'border-color': entity.color_label ? entity.color_label : ``,
-						color: entity.color_label ? entity.color_label : ``,
-					}"
-				>
-					<i
-						aria-hidden="true"
-						v-if="!entity.img"
-						:class="`hki-${entity.entityType === 'npc' ? 'monster' : entity.entityType}`"
-					/>
-				</span>
-				<span class="d-flex justify-content-between">
-					{{ entity.name }}
-					<strong class="blue initiative">{{ entity.initiative }}</strong>
-				</span>
+				<BasicEntity :entity="entity" :size="48" :padding="8" />
+				<strong class="set-initiative">{{ entity.initiative }}</strong>
 				<div class="actions">
-					<a class="btn btn-sm bg-neutral-5" @click="set_active({ key: entity.key, active: true })">
+					<button
+						class="btn btn-sm bg-neutral-8"
+						@click="set_active({ key: entity.key, active: true })"
+					>
 						<i aria-hidden="true" class="fas fa-plus"></i>
 						<q-tooltip anchor="top middle" self="center middle"> Set active [a] </q-tooltip>
-					</a>
+					</button>
 				</div>
 			</li>
 		</ul>
@@ -117,13 +112,13 @@
 import { mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
 import { remindersMixin } from "src/mixins/reminders";
-import TargetAvatar from "../TargetAvatar.vue";
+import BasicEntity from "../entities/BasicEntity.vue";
 
 export default {
 	name: "SetInitiativeNPC",
 	mixins: [general, remindersMixin],
 	components: {
-		TargetAvatar,
+		BasicEntity,
 	},
 	props: ["active", "idle"],
 	methods: {
@@ -153,24 +148,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-ul.entities {
-	margin-top: 0;
-
-	li {
-		padding-right: 3px;
-		background: $neutral-8;
-
-		&:focus {
-			outline: none;
-			background: $neutral-9;
-		}
-		.actions {
-			align-items: center;
-
-			a {
-				margin-left: 5px;
-			}
-		}
-	}
+.set-initiative {
+	font-weight: bold;
+	font-size: 20px;
+	color: $neutral-1;
+	margin-right: 8px;
 }
 </style>

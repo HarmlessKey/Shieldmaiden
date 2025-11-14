@@ -39,9 +39,6 @@ export default {
 			},
 		};
 	},
-	mounted() {
-		console.log("export mounted");
-	},
 	computed: {
 		...mapGetters(["userInfo"]),
 	},

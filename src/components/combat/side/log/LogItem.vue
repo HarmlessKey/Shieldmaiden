@@ -91,19 +91,6 @@
 				</span>
 			</span>
 		</div>
-
-		<!-- UNDO -->
-		<!-- <div class="undo" v-if="key == 0 && !encounter.finished">
-			<a
-				class="btn btn-sm bg-red"
-				@click="undo(key, item.amount, item.over, item.target, item.by, item.type)"
-				v-shortkey="['ctrl', 'z']"
-				@shortkey="undo(key, item.amount, item.over, item.target, item.by, item.type)"
-			>
-				Undo
-				<hk-show-keybind :binds="['ctrl', 'z']" />
-			</a>
-		</div> -->
 	</div>
 </template>
 

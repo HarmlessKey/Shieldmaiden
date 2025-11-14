@@ -53,7 +53,7 @@
 		<!-- CUSTOM ROLL -->
 		<h3>
 			Rolls
-			<a @click="addRoll">
+			<a @click="addRoll" aria-label="Add">
 				<i aria-hidden="true" class="fas fa-plus green" />
 			</a>
 		</h3>
@@ -84,7 +84,7 @@
 				class="ml-1"
 			/>
 
-			<a v-if="index > 0" class="remove" @click="removeRoll(index)">
+			<a v-if="index > 0" class="remove" aria-label="Remove" @click="removeRoll(index)">
 				<i aria-hidden="true" class="fas fa-trash-alt" />
 			</a>
 		</div>
@@ -194,8 +194,8 @@ export default {
 			};
 
 			for (const roll of this.custom_rolls) {
-				const [dice, fixed_val] = roll.roll.split("+");
-				const dice_values = dice.split("d");
+				const [dice_type, fixed_val] = roll.roll.split("+");
+				const dice_values = dice_type.split("d");
 				const damage_type = type !== "healing" ? roll.damage_type : undefined;
 				const miss_mod = this.roll_type === "attack" ? 0 : undefined;
 				const save_fail_mod = this.roll_type === "save" ? 0.5 : undefined;

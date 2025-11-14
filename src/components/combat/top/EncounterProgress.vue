@@ -30,7 +30,9 @@
 				@shortkey="prevTurn()"
 			>
 				<i aria-hidden="true" class="fas fa-step-backward" />
-				<!-- <q-tooltip anchor="top middle" self="center middle">Previous turn <hk-show-keybind :binds="['shift', '←']" /></q-tooltip> -->
+				<q-tooltip anchor="top middle" self="center middle"
+					>Previous turn <hk-show-keybind :binds="['shift', '←']"
+				/></q-tooltip>
 			</button>
 			<button
 				class="btn btn-sm bg-neutral-6"
@@ -49,7 +51,9 @@
 					:offset="[0, 10]"
 				/>
 				<i aria-hidden="true" class="fas fa-step-forward" />
-				<!-- <q-tooltip anchor="top middle" self="center middle">Next turn <hk-show-keybind :binds="['shift', '→']" /></q-tooltip> -->
+				<q-tooltip anchor="top middle" self="center middle"
+					>Next turn <hk-show-keybind :binds="['shift', '→']"
+				/></q-tooltip>
 				<TutorialPopover v-if="demo" tutorial="initiative" step="next" :offset="[0, 10]" />
 			</button>
 		</template>

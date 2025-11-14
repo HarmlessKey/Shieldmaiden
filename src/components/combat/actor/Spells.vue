@@ -49,7 +49,6 @@
 <script>
 import ActionsDropdown from "./ActionsDropdown.vue";
 import RollSpells from "../actions/RollSpells.vue";
-import _ from "lodash";
 
 export default {
 	name: "ActorSpells",
@@ -92,7 +91,7 @@ export default {
 		},
 		selected_levels: {
 			get() {
-				if (this.selected_type === "innate") return this.spell_levels;;
+				if (this.selected_type === "innate") return this.spell_levels;
 				return this.casterLevelSetter ? this.casterLevelSetter : [0];
 			},
 			set(newVal) {

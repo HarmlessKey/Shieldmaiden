@@ -10,8 +10,8 @@ export function calculateManualDamage(manual, entity, multiplier, defense) {
 	let value = manual.value * multiplier;
 
 	let resistance;
-	for (const [key, defense] of Object.entries(defenses)) {
-		let resistances = entity[defense.value];
+	for (const [key, defense_type] of Object.entries(defenses)) {
+		let resistances = entity[defense_type.value];
 		resistances = resistances?.map((res) => {
 			return manual.magical ? res : res.replace(/non_magical_/, "");
 		});

@@ -154,8 +154,3 @@ export default {
 	watch: {},
 };
 </script>
-
-<style lang="scss" scoped>
-.top {
-}
-</style>

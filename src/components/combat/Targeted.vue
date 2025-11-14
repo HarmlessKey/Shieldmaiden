@@ -183,7 +183,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { dice } from "src/mixins/dice.js";
-import { abilities } from "src/utils/generalConstants";
+import { abilities, damage_type_icons } from "src/utils/generalConstants";
 import Pane from "./Pane.vue";
 import BasicEntity from "./entities/BasicEntity.vue";
 import TargetInfo from "src/components/combat/TargetInfo.vue";
@@ -193,7 +193,6 @@ import { calc_mod } from "src/utils/generalFunctions";
 import Multipliers from "./entities/multipliers/Multipliers.vue";
 import Defenses from "./entities/multipliers/Defenses.vue";
 import { calculateManualDamage } from "src/utils/combatFunctions";
-import { damage_type_icons } from "src/utils/generalConstants";
 
 export default {
 	name: "Targeted",
@@ -524,11 +523,6 @@ export default {
 			}
 		}
 	}
-}
-@media only screen and (max-width: 900px) {
-	// #targeted {
-	// 	display: none;
-	// }
 }
 @media only screen and (max-width: 600px) {
 	.hide {

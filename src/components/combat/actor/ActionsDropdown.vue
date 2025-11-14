@@ -18,9 +18,9 @@
 		</div>
 		<button
 			:disabled="!targeted.length"
-			:class="{ 
+			:class="{
 				show: showActions,
-				'step-highlight': demo && follow_tutorial && get_step('run', 'roll')
+				'step-highlight': demo && follow_tutorial && get_step('run', 'roll'),
 			}"
 			v-shortkey="{ actions: ['a'], spells: ['s'] }[type]"
 			@shortkey="toggleShowActions()"
@@ -38,6 +38,7 @@
 						`../../../assets/_img/logo/logo-icon-no-shield-${type === 'actions' ? 'cyan' : 'yellow'}.svg`
 					)
 				"
+				alt="Logo"
 			/>
 			<div class="label">{{ type.capitalize() }}</div>
 			<q-popup-proxy

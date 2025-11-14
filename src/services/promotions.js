@@ -52,4 +52,8 @@ export class promotionService {
 	static async enablePromotion(promotion_code) {
 		return PROMOTION_REF.child(promotion_code).child("disabled").remove();
 	}
+
+	static async getTiers() {
+		return (await TIERS_REF.once("value")).val();
+	}
 }

@@ -167,6 +167,31 @@
 										</q-icon>
 									</template>
 								</q-input>
+
+								<q-select
+									class="mb-2"
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									multiple
+									v-model="newPromotion.eligible_tiers"
+									:options="tier_select"
+									map-options
+									emit-value
+									label="Eligible Tiers"
+									hint="Leave empty for all tiers"
+								>
+									<template v-slot:selected-item="scope">
+										<q-chip
+											removable
+											dense
+											@remove="scope.removeAtIndex(scope.index)"
+											:tabindex="scope.tabindex"
+										>
+											{{ scope.opt.label }}
+										</q-chip>
+									</template>
+								</q-select>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-end">
 								<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
@@ -188,6 +213,7 @@
 
 <script>
 import { promotionService } from "src/services/promotions";
+import { legacy_tiers } from "src/utils/generalConstants";
 
 export default {
 	name: "Promotions",
@@ -238,12 +264,27 @@ export default {
 					align: "left",
 					sortable: true,
 				},
+				{
+					name: "eligible_tiers",
+					label: "Eligible Tiers",
+					field: "eligible_tiers",
+					align: "left",
+					sortable: false,
+					format: (val) => this.formatTiers(val),
+				},
 			],
 		};
 	},
 	computed: {
 		loading() {
-			return this.loading_promotions;
+			return this.loading_promotions || this.loading_tiers;
+		},
+		tier_select() {
+			let tier_list = this.tiers;
+			tier_list.sort((a, b) => a.order - b.order);
+			return tier_list
+				.filter((tier) => tier.order > 0 && !legacy_tiers.includes(tier.id))
+				.map((tier) => ({ label: tier.name, value: tier.id }));
 		},
 	},
 	methods: {
@@ -285,9 +326,22 @@ export default {
 		async getActivePromotion() {
 			return await promotionService.getFirstActivePromotion();
 		},
+		formatTiers(tierIds) {
+			if (!tierIds || tierIds.length === 0) {
+				return "All tiers";
+			}
+			return tierIds.map((id) => this.tierMap[id] || id).join(", ");
+		},
 	},
 	async mounted() {
 		promotionService.getPromotionsWithCallback(this.setPromotions);
+		const tiers_promise = await promotionService.getTiers();
+		this.tiers = Object.entries(tiers_promise).map(([id, vals]) => ({ ...vals, id }));
+		this.tierMap = Object.entries(tiers_promise).reduce(
+			(acc, [id, tier]) => ({ ...acc, [id]: tier.name }),
+			{}
+		);
+		this.loading_tiers = false;
 		this.active_promotion = await this.getActivePromotion();
 	},
 };

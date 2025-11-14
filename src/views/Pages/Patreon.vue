@@ -22,7 +22,7 @@
 				<div v-if="!user" class="d-flex justify-content-center mb-4">
 					<router-link class="btn" to="/sign-up"> Create a Shieldmaiden account </router-link>
 				</div>
-				<div v-else-if="!userInfo.patreon_id" class="d-flex justify-content-center mb-5">
+				<div v-else-if="!userInfo?.patreon_id" class="d-flex justify-content-center mb-5">
 					<q-no-ssr>
 						<PatreonLinkButton />
 					</q-no-ssr>

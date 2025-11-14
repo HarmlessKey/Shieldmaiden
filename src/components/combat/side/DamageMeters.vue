@@ -95,7 +95,7 @@ ul {
 
 	li {
 		position: relative;
-		margin-bottom: 1px;
+		margin-bottom: 2px;
 		height: 32px;
 
 		::v-deep {

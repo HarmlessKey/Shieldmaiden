@@ -18,7 +18,7 @@
 				<template v-slot:selected>
 					<q-item v-if="doneBy" class="selected">
 						<q-item-section avatar>
-							<TargetAvatar :entity="entitiesList[doneBy]" class="img" :icons="false" />
+							<Avatar :entity="entitiesList[doneBy]" class="img" :icons="false" />
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-text="entitiesList[doneBy].name.capitalizeEach()" />
@@ -29,7 +29,7 @@
 				<template v-slot:option="scope">
 					<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
 						<q-item-section avatar>
-							<TargetAvatar :entity="scope.opt" class="img" :icons="false" />
+							<Avatar :entity="scope.opt" class="img" :icons="false" />
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-text="scope.opt.name?.capitalizeEach()" />
@@ -118,11 +118,11 @@ import _ from "lodash";
 import { mapGetters } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
 
-import Custom from "src/components/combat/actions/custom";
-import Roll from "src/components/combat/actions/Roll.vue";
-import Spellcasting from "src/components/combat/actions/Spellcasting.vue";
+import Custom from "./custom";
+import Roll from "./Roll.vue";
+import Spellcasting from "./Spellcasting.vue";
 import { damage_types } from "src/utils/generalConstants";
-import TargetAvatar from "../TargetAvatar.vue";
+import Avatar from "../../entities/Avatar.vue";
 
 export default {
 	name: "Actions",
@@ -130,7 +130,7 @@ export default {
 		Custom,
 		Roll,
 		Spellcasting,
-		TargetAvatar,
+		Avatar,
 	},
 	mixins: [setHP],
 	props: {

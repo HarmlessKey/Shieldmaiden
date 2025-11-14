@@ -107,14 +107,14 @@
 																	ability.recharge === "rest"
 																		? "after a Short or Long Rest"
 																		: ability.recharge
-															  })`
+																})`
 															: ``
 													}}
 													{{
 														ability.limit
 															? `(${ability.limit}/${
 																	ability.limit_type ? ability.limit_type.capitalize() : `Day`
-															  })`
+																})`
 															: ``
 													}}
 													{{

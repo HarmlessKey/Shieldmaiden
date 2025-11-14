@@ -3,17 +3,13 @@
 		<h2>Set Reminders</h2>
 		<ul class="targets">
 			<li v-for="(target, i) in reminder_targets" :key="`target=${i}`">
-				<TargetItem :item="target" :i="i" />
+				<BasicEntity ref="basicEntity" :entity="entities[target]">
+					<Effects :entity="entities[target]" :available-space="effectSpace" reminders collapse />
+				</BasicEntity>
 			</li>
 		</ul>
 		<hr />
 		<template v-if="reminder_targets.length > 0">
-			<Reminders
-				v-if="reminder_targets.length === 1 && entities[reminder_targets[0]].reminders"
-				:entity="entities[reminder_targets[0]]"
-				class="mb-2"
-			/>
-
 			<q-tabs
 				v-model="tab"
 				ref="tabs"
@@ -133,16 +129,16 @@
 import { mapActions, mapGetters } from "vuex";
 import ReminderForm from "src/components/ReminderForm";
 import { remindersMixin } from "src/mixins/reminders";
-import TargetItem from "src/components/combat/TargetItem.vue";
-import Reminders from "src/components/combat/Reminders.vue";
+import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
+import Effects from "src/components/combat/entities/effects";
 
 export default {
 	name: "TargetReminders",
 	mixins: [remindersMixin],
 	components: {
 		ReminderForm,
-		TargetItem,
-		Reminders,
+		BasicEntity,
+		Effects,
 	},
 	props: ["data"],
 	data() {
@@ -160,6 +156,7 @@ export default {
 			customReminder: {},
 			varOptions: undefined,
 			selectedVars: {},
+			effectSpace: 0,
 		};
 	},
 	computed: {
@@ -170,6 +167,7 @@ export default {
 		},
 	},
 	async mounted() {
+		this.setEffectSize();
 		this.$refs.tab[0]?.$el.focus();
 		this.personalReminders = await this.get_full_reminders();
 	},
@@ -208,6 +206,12 @@ export default {
 				this.tab = "premade";
 				this.customReminder = {};
 			}
+		},
+		setEffectSize() {
+			const basicEntityWidth = this.$refs.basicEntity[0].$el.clientWidth;
+			const AVATAR_SIZE = 34 + 8; // size + gap
+			const MIN_NAME_SIZE = 50 + 8; // width + gap
+			this.effectSpace = basicEntityWidth - AVATAR_SIZE - MIN_NAME_SIZE;
 		},
 		showVariableOptions(key) {
 			this.varOptions = this.varOptions !== key ? key : undefined;

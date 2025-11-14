@@ -124,11 +124,11 @@ export const setHP = {
 					newhp = 0;
 
 					if (tempHp) {
-						over = parseInt(rest_amount + tempHp - curHp); //overkill
-						amount = parseInt(curHp + tempHp);
+						over = parseInt(rest_amount) + parseInt(tempHp) - parseInt(curHp); //overkill
+						amount = parseInt(curHp) + parseInt(tempHp);
 					} else {
-						over = parseInt(rest_amount - curHp); //overkill
-						amount = curHp;
+						over = parseInt(rest_amount) - parseInt(curHp); //overkill
+						amount = parseInt(curHp);
 					}
 					//Character dies if the overkill is >= maxHp
 					if (
@@ -144,7 +144,9 @@ export const setHP = {
 				});
 			}
 			//Check if a reminder is triggered on damage taken
-			this.checkReminders(target, "damage");
+			if (amount > 0) {
+				this.checkReminders(target, "damage");
+			}
 
 			//Notification
 			if (config.notify) {

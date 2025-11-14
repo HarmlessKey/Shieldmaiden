@@ -290,6 +290,7 @@ html body {
 		}
 	}
 	.purple {
+		color: $purple !important;
 		path {
 			fill: $purple !important;
 		}
@@ -906,6 +907,9 @@ html body {
 		}
 	}
 	.gap {
+		&-05 {
+			gap: 0.25rem;
+		}
 		&-1 {
 			gap: 0.5rem;
 		}
@@ -919,6 +923,9 @@ html body {
 			gap: 2rem;
 		}
 		&-x {
+			&-05 {
+				column-gap: 0.25rem;
+			}
 			&-1 {
 				column-gap: 0.5rem;
 			}
@@ -933,6 +940,9 @@ html body {
 			}
 		}
 		&-y {
+			&-05 {
+				row-gap: 0.25rem;
+			}
 			&-1 {
 				row-gap: 0.5rem;
 			}
@@ -2660,6 +2670,7 @@ html body {
 						font-size: 80px;
 						font-weight: bold;
 						background-color: $neutral-7;
+						color: $neutral-1;
 					}
 					.roll_footer {
 						text-align: center;

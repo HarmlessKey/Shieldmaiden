@@ -41,11 +41,6 @@ export default {
 	name: "HitPoints",
 	mixins: [dice],
 	props: ["data"],
-	data() {
-		return {
-			calcMod: calc_mod,
-		};
-	},
 	computed: {
 		character() {
 			return this.data.character;

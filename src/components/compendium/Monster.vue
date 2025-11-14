@@ -590,7 +590,7 @@ export default {
 		column-span: all;
 		display: flex;
 		justify-content: space-between;
-		align-items: start;
+		align-items: flex-start;
 		gap: 1em;
 		font-weight: 700;
 

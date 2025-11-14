@@ -17,8 +17,10 @@ export default function ({ store, ssrContext }) {
 	const router = new VueRouter({
 		scrollBehavior() {
 			const el = document.querySelector(".scroll");
-			el.scrollLeft = 0;
-			el.scrollTop = 0;
+			if (el) {
+				el.scrollLeft = 0;
+				el.scrollTop = 0;
+			}
 		},
 		routes,
 

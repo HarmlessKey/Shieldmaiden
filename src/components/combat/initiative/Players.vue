@@ -1,28 +1,25 @@
 <template>
 	<div>
-		<ul v-if="entities" class="entities hasImg">
+		<ul v-if="entities" class="entities">
 			<li v-for="(entity, index) in players" :key="entity.key">
-				<TargetAvatar :entity="entity" class="img" :icons="false" />
-				<div class="truncate">
-					{{ entity.name }}
-				</div>
-				<div class="actions">
-					<div>
+				<BasicEntity :entity="entity" :size="48" :padding="8">
+					<div class="hit-points">
 						{{ entity.curHp }} / {{ entity.maxHp }}
 						<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
 					</div>
-					<a
-						class="btn btn-sm bg-neutral-5"
+					<button
+						class="btn btn-sm bg-neutral-9"
+						tabindex="-1"
 						@click="
 							setDrawer({ show: true, type: 'drawers/encounter/EditEntity', data: [entity.key] })
 						"
 					>
-						<i aria-hidden="true" class="fas fa-pencil"></i>
-					</a>
+						<i aria-hidden="true" class="fas fa-pencil" />
+					</button>
 					<hk-input
 						dense
 						type="number"
-						class="ml-2 player-initiative"
+						class="player-initiative"
 						v-model="entity.initiative"
 						min="0"
 						max="99"
@@ -35,7 +32,7 @@
 						@input="setInitiative(entity.key, entity.initiative)"
 						@focus="$event.target.select()"
 					/>
-				</div>
+				</BasicEntity>
 			</li>
 			<TutorialPopover
 				v-if="demo"
@@ -50,13 +47,13 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import TargetAvatar from "../TargetAvatar.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import BasicEntity from "../entities/BasicEntity.vue";
 
 export default {
 	name: "SetInitiativePlayer",
 	components: {
-		TargetAvatar,
+		BasicEntity,
 		TutorialPopover,
 	},
 	props: ["players"],
@@ -92,15 +89,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-ul.entities {
-	margin: 0;
-	li {
-		padding-right: 3px;
-		background: $neutral-8;
+.hit-points {
+	white-space: nowrap;
+	margin: 0 5px;
+}
+.player-initiative {
+	min-width: 60px;
 
-		.actions {
-			align-items: center;
+	::v-deep {
+		.q-field__control input {
 			padding: 0;
+			text-align: center;
 		}
 	}
 }

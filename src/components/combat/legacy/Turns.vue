@@ -1,107 +1,7 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
 		<div>
-			<a class="btn btn-clear">
-				<i aria-hidden="true" class="fas fa-cog" />
-				<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
-					<q-list class="bg-neutral-8">
-						<q-item>
-							<q-item-section>
-								<strong>{{ encounter.name }}</strong>
-							</q-item-section>
-						</q-item>
-						<q-separator />
-						<q-item
-							v-if="!demo && !test"
-							clickable
-							v-close-popup
-							@click="
-								setDrawer({
-									show: true,
-									type: 'drawers/Broadcast',
-									data: {
-										campaign_id: $route.params.campid,
-										encounter_id: $route.params.encid,
-									},
-								})
-							"
-						>
-							<q-item-section avatar>
-								<i
-									aria-hidden="true"
-									class="far fa-dot-circle"
-									:class="{ red: broadcast.live === $route.params.campid }"
-								/>
-							</q-item-section>
-							<q-item-section>
-								{{ broadcast.live !== $route.params.campid ? "Go live" : "Stop broadcast" }}
-							</q-item-section>
-						</q-item>
-						<q-item
-							v-if="encounter.audio"
-							clickable
-							v-close-popup
-							@click="open_audio_link(encounter.audio)"
-						>
-							<q-item-section avatar
-								><q-icon
-									:class="audio_icons[audio_link_type].icon"
-									:style="`color:${audio_icons[audio_link_type].color};`"
-								></q-icon
-							></q-item-section>
-							<q-item-section>Audio Link</q-item-section>
-						</q-item>
-						<q-item
-							v-if="!demo"
-							clickable
-							v-close-popup
-							@click="setDrawer({ show: true, type: 'settings/Encounter' })"
-						>
-							<q-item-section avatar><i aria-hidden="true" class="fas fa-cogs" /></q-item-section>
-							<q-item-section>Settings</q-item-section>
-						</q-item>
-						<q-item
-							v-if="!demo && !test"
-							clickable
-							v-close-popup
-							@click="setDrawer({ show: true, type: 'settings/TrackEncounter' })"
-						>
-							<q-item-section avatar
-								><i aria-hidden="true" class="fas fa-desktop"
-							/></q-item-section>
-							<q-item-section>Public initiative settings</q-item-section>
-						</q-item>
-						<q-item
-							clickable
-							v-close-popup
-							v-if="demo"
-							@click="$router.replace('/tools/encounter-builder/build-encounter')"
-						>
-							<q-item-section avatar
-								><i aria-hidden="true" class="fas fa-hammer-war"
-							/></q-item-section>
-							<q-item-section>Build encounter</q-item-section>
-						</q-item>
-						<q-item clickable v-close-popup v-if="demo" @click="reset_demo()">
-							<q-item-section avatar
-								><i aria-hidden="true" class="far fa-sync-alt"
-							/></q-item-section>
-							<q-item-section>Reset encounter</q-item-section>
-						</q-item>
-						<q-item v-if="!test" clickable v-close-popup @click="confirmFinish()">
-							<q-item-section avatar><i aria-hidden="true" class="fas fa-check" /></q-item-section>
-							<q-item-section>Finish encounter</q-item-section>
-						</q-item>
-						<q-separator />
-						<q-item clickable v-close-popup @click="$router.replace(leaveRoute)">
-							<q-item-section avatar
-								><i aria-hidden="true" class="fas fa-chevron-left"
-							/></q-item-section>
-							<q-item-section>Leave encounter</q-item-section>
-						</q-item>
-					</q-list>
-				</q-popup-proxy>
-			</a>
+			<Menu />
 
 			<span class="ml-2 d-none d-md-inline truncate">
 				<template v-if="!demo">
@@ -120,8 +20,8 @@
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">
 			<a
 				class="handler neutral-2 mr-2 px-2"
-				@click="prevTurn()"
 				v-shortkey="['shift', 'arrowleft']"
+				@click="prevTurn()"
 				@shortkey="prevTurn()"
 			>
 				<i aria-hidden="true" class="fas fa-step-backward" />
@@ -279,15 +179,16 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { remindersMixin } from "src/mixins/reminders";
-import { audio } from "src/mixins/audio";
+import Menu from "../top/Menu.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
 	name: "Turns",
 	components: {
+		Menu,
 		TutorialPopover,
 	},
-	mixins: [remindersMixin, audio],
+	mixins: [remindersMixin],
 	props: ["active_len", "current", "next", "settings"],
 	data() {
 		return {
@@ -310,20 +211,12 @@ export default {
 			return `/content/campaigns/${this.$route.params.campid}`;
 		},
 		tutorial_branch() {
-			console.log("Tutorial branch", this.current.entityType);
 			return this.current.entityType === "player" ? "player" : "monster";
 		},
 	},
 	methods: {
-		...mapActions([
-			"set_turn",
-			"update_round",
-			"set_targeted",
-			"setDrawer",
-			"set_finished",
-			"reset_demo",
-		]),
-		...mapActions("tutorial", ["completeStep", "setGameState"]),
+		...mapActions(["set_turn", "update_round", "set_targeted", "setDrawer"]),
+		...mapActions("tutorial", ["setGameState"]),
 
 		startEncounter() {
 			this.set_turn({ turn: 0, round: 1 });
@@ -354,32 +247,6 @@ export default {
 			}
 			this.set_turn({ turn, round });
 			this.set_targeted({ type: "untarget", key: "all" });
-		},
-		confirmFinish() {
-			this.$snotify.error("Are you sure you want to finish the encounter?", "Finish Encounter", {
-				position: "centerCenter",
-				timeout: 0,
-				buttons: [
-					{
-						text: "Finish",
-						action: (toast) => {
-							this.finish();
-							this.$snotify.remove(toast.id);
-						},
-						bold: false,
-					},
-					{
-						text: "Cancel",
-						action: (toast) => {
-							this.$snotify.remove(toast.id);
-						},
-						bold: true,
-					},
-				],
-			});
-		},
-		finish() {
-			this.set_finished();
 		},
 	},
 	watch: {

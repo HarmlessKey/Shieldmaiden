@@ -128,11 +128,13 @@ export default {
 	},
 	mounted() {
 		const scrollArea = this.$refs.scrollArea;
-		this._scrollListener = () => {
-			this.scrolled = scrollArea.scrollTop;
-		};
-		this._scrollListener();
-		scrollArea.addEventListener("scroll", this._scrollListener);
+		if (scrollArea) {
+			this._scrollListener = () => {
+				this.scrolled = scrollArea.scrollTop;
+			};
+			this._scrollListener();
+			scrollArea.addEventListener("scroll", this._scrollListener);
+		}
 	},
 	methods: {
 		handleScroll(e) {
@@ -140,7 +142,7 @@ export default {
 		},
 	},
 	beforeDestroy() {
-		this.$refs.scrollArea.removeEventListener("scroll", this._scrollListener);
+		this.$refs.scrollArea?.removeEventListener("scroll", this._scrollListener);
 	},
 };
 </script>

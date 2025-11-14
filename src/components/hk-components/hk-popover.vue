@@ -32,6 +32,7 @@
 
 <script>
 import _ from "lodash";
+import { EventBus } from "src/event-bus";
 
 export default {
 	name: "hk-popover",
@@ -57,15 +58,32 @@ export default {
 			menu: false,
 			cardHover: false,
 			itemHover: false,
+			componentId: Math.random().toString(36).substr(2, 9), // Unique ID
 		};
 	},
+	mounted() {
+		// Listen for other popovers opening
+		EventBus.$on("popover-opened", this.handleOtherPopoverOpened);
+	},
+	beforeDestroy() {
+		EventBus.$off("popover-opened", this.handleOtherPopoverOpened);
+	},
 	methods: {
+		handleOtherPopoverOpened(id) {
+			// If another popover opened, close this one
+			if (id !== this.componentId) {
+				this.menu = false;
+				this.cardHover = false;
+			}
+		},
 		debounceCheck: _.debounce(function () {
 			this.checkMenu();
 		}, 300),
 		checkMenu() {
 			if (this.itemHover || this.cardHover) {
 				this.menu = true;
+				// Notify other popovers
+				EventBus.$emit("popover-opened", this.componentId);
 			} else {
 				this.menu = false;
 			}
@@ -81,3 +99,9 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.hk-card {
+	border: $neutral-3 1px solid;
+}
+</style>

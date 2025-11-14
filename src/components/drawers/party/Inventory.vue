@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<template v-if="!addNew">
-			<h2>Party Inventory</h2>
+			<h3>Party Inventory</h3>
 			<div v-if="currency >= maxCurrencyAmount" class="red text-center mb-2">
 				Max amount reached
 			</div>
@@ -10,7 +10,10 @@
 					<div v-if="coin" :key="key">
 						<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral("0.0a") }} </template>
 						<template v-else>{{ coin }} </template>
-						<img :src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)" :alt="currencies[key].name" />
+						<img
+							:src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)"
+							:alt="currencies[key].name"
+						/>
 					</div>
 				</template>
 			</div>
@@ -44,7 +47,7 @@
 				</div>
 			</div>
 
-			<h2 class="my-4 d-flex justify-content-between items-center">
+			<h2 class="d-flex justify-content-between items-center">
 				<span>Items</span>
 				<a @click="addNew = true" class="btn btn-sm bg-neutral-5">
 					<i aria-hidden="true" class="fas fa-plus green" />
@@ -214,6 +217,7 @@ export default {
 	cursor: pointer;
 	grid-area: money;
 	line-height: 15px;
+	margin-bottom: 10px;
 
 	div {
 		margin-right: 10px;

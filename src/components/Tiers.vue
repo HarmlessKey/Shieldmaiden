@@ -24,16 +24,23 @@
 									class="price"
 									:class="{
 										'patreon-red': t.name === 'Free',
-										strike: discount && !annually && t.name !== 'Free' && isTierEligible(t['.key']),
+										strike:
+											show_discount && !annually && t.name !== 'Free' && isTierEligible(t['.key']),
 									}"
 									>{{ t.name === "Free" ? t.price : `$${price(t.price)}` }}</span
 								>
-								<span v-if="discount && !annually && t.name !== 'Free' && isTierEligible(t['.key'])" class="price"
+								<span
+									v-if="
+										show_discount && !annually && t.name !== 'Free' && isTierEligible(t['.key'])
+									"
+									class="price"
 									>${{ discountPrice(t.price) }}</span
 								>
 								<em v-if="t.price === 'Free'" class="neutral-2 sub">forever</em>
 								<em v-else class="neutral-2 sub">{{
-									discount && !annually && isTierEligible(t['.key']) ? "the first month" : "per month"
+									show_discount && !annually && isTierEligible(t[".key"])
+										? "the first month"
+										: "per month"
 								}}</em>
 							</div>
 							<ul>
@@ -207,6 +214,10 @@ export default {
 	},
 	computed: {
 		...mapGetters(["user", "tier"]),
+		show_discount() {
+			console.log(this.discount, this.tier);
+			return this.discount && (this.tier?.price === "Free" || !this.tier);
+		},
 	},
 	methods: {
 		storageType(type, count) {
@@ -233,7 +244,10 @@ export default {
 				return false;
 			}
 			// If no eligible_tiers specified, all paid tiers are eligible
-			if (!this.active_promotion.eligible_tiers || this.active_promotion.eligible_tiers.length === 0) {
+			if (
+				!this.active_promotion.eligible_tiers ||
+				this.active_promotion.eligible_tiers.length === 0
+			) {
 				return true;
 			}
 			// Check if this tier is in the eligible list

@@ -151,9 +151,6 @@ export default {
 	async mounted() {
 		this.tiers = await promotionService.getTiers();
 		this.active_promotion = await this.getActivePromotion();
-		if (this.show_banner && this.active_promotion) {
-			this.$emit("discount", this.active_promotion.discount);
-		}
 		this.timer = setInterval(() => {
 			this.now = new Date();
 		}, 60000);

@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<q-no-ssr>
-			<PromoBanner class="mb-5" :closable="false" @discount="setDiscount" />
+			<PromoBanner class="mb-5" :closable="false" />
 		</q-no-ssr>
 		<div v-if="!loading">
 			<div class="d-flex justify-content-center mb-4">
@@ -24,16 +24,16 @@
 									class="price"
 									:class="{
 										'patreon-red': t.name === 'Free',
-										strike: discount && !annually && t.name !== 'Free',
+										strike: discount && !annually && t.name !== 'Free' && isTierEligible(t['.key']),
 									}"
 									>{{ t.name === "Free" ? t.price : `$${price(t.price)}` }}</span
 								>
-								<span v-if="discount && !annually && t.name !== 'Free'" class="price"
+								<span v-if="discount && !annually && t.name !== 'Free' && isTierEligible(t['.key'])" class="price"
 									>${{ discountPrice(t.price) }}</span
 								>
 								<em v-if="t.price === 'Free'" class="neutral-2 sub">forever</em>
 								<em v-else class="neutral-2 sub">{{
-									discount && !annually ? "the first month" : "per month"
+									discount && !annually && isTierEligible(t['.key']) ? "the first month" : "per month"
 								}}</em>
 							</div>
 							<ul>
@@ -147,6 +147,7 @@
 import { mapGetters } from "vuex";
 import { db } from "src/firebase";
 import { legacy_tiers } from "src/utils/generalConstants";
+import { promotionService } from "src/services/promotions";
 import PromoBanner from "./PromoBanner.vue";
 
 export default {
@@ -160,6 +161,7 @@ export default {
 			show_storage: false,
 			discount: undefined,
 			annually: false,
+			active_promotion: undefined,
 			default_benefits: [
 				"Combat tracker",
 				"Encounter builder",
@@ -218,9 +220,6 @@ export default {
 				cadence: this.annually ? 12 : 1,
 			});
 		},
-		setDiscount(discount) {
-			this.discount = discount;
-		},
 		price(price) {
 			price = Number(price.slice(1));
 			return this.annually ? (price * 0.9).toFixed(2) : price;
@@ -229,6 +228,23 @@ export default {
 			price = Number(price.slice(1));
 			return (price * (1 - this.discount / 100)).toFixed(2);
 		},
+		isTierEligible(tierId) {
+			if (!this.active_promotion) {
+				return false;
+			}
+			// If no eligible_tiers specified, all paid tiers are eligible
+			if (!this.active_promotion.eligible_tiers || this.active_promotion.eligible_tiers.length === 0) {
+				return true;
+			}
+			// Check if this tier is in the eligible list
+			return this.active_promotion.eligible_tiers.includes(tierId);
+		},
+	},
+	async mounted() {
+		this.active_promotion = await promotionService.getFirstActivePromotion();
+		if (this.active_promotion) {
+			this.discount = this.active_promotion.discount;
+		}
 	},
 };
 </script>

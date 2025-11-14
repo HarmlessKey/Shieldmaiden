@@ -62,25 +62,9 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier", "userInfo"]),
+		...mapGetters(["tier"]),
 		show_banner() {
-			if (!this.active_promotion) {
-				return false;
-			}
-
-			// Check if promotion has eligible tiers restriction
-			if (this.active_promotion.eligible_tiers && this.active_promotion.eligible_tiers.length > 0) {
-				// User must have a tier order lower than the minimum eligible tier order
-				// to be shown the promotion (encouraging upgrades)
-				const userTierOrder = this.tier?.order ?? 0;
-				const minEligibleTierOrder = this.getMinEligibleTierOrder();
-
-				// Show promotion if user's tier is lower than the minimum eligible tier
-				return userTierOrder < minEligibleTierOrder;
-			}
-
-			// No tier restriction, show to free users only
-			return this.tier?.price === "Free" || !this.tier;
+			return this.active_promotion && (this.tier?.price === "Free" || !this.tier);
 		},
 		days_remaining() {
 			const diff = this.active_promotion.active_until - this.now;
@@ -131,21 +115,6 @@ export default {
 			this.$gtm.trackEvent({
 				event: "purchase",
 			});
-		},
-		getMinEligibleTierOrder() {
-			if (!this.active_promotion.eligible_tiers || !this.tiers) {
-				return Infinity;
-			}
-
-			// Find the minimum order among eligible tiers
-			let minOrder = Infinity;
-			for (const tierId of this.active_promotion.eligible_tiers) {
-				const tier = this.tiers[tierId];
-				if (tier && tier.order < minOrder) {
-					minOrder = tier.order;
-				}
-			}
-			return minOrder;
 		},
 	},
 	async mounted() {

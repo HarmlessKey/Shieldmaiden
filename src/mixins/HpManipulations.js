@@ -320,8 +320,8 @@ export const setHP = {
 			}
 		},
 		addLog(type, crit, target, current, amount, over, config) {
-			var d = new Date();
-			var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+			const d = new Date();
+			const time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
 			if (localStorage.getItem(this.encounterId)) {
 				this.log = JSON.parse(localStorage.getItem(this.encounterId));

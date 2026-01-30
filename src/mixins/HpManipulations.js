@@ -329,7 +329,7 @@ export const setHP = {
 				this.log = [];
 			}
 
-			var newLog = {
+			const newLog = {
 				round: this.encounter.round,
 				turn: this.encounter.turn + 1,
 				by: current.key,

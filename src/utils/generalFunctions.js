@@ -197,28 +197,50 @@ export function comparePlayerToCharacter(sync_character, player) {
 }
 
 /**
- * Check if the "D&D Character Sync" extension is installed
+ * Send a message to the "D&D Character Sync" browser extension.
+ * Uses window.postMessage bridge on Firefox, chrome.runtime.sendMessage on Chrome.
  *
- * @param {string} url
+ * @param {string[]} request_content - The content keys to request (e.g. ["version"], ["characters"])
+ * @returns {Promise<object|undefined>} The extension's response, or undefined on error/timeout
  */
-export async function extensionInstalled() {
-	const sendMessage = new Promise((resolve) => {
+function sendExtensionMessage(request_content) {
+	const isFirefox = navigator.userAgent.includes("Firefox");
+
+	if (isFirefox) {
+		return new Promise((resolve) => {
+			const requestId = Math.random().toString(36).slice(2);
+			function handler(event) {
+				if (!event.data?.CS_BRIDGE_RESPONSE || event.data.requestId !== requestId) return;
+				window.removeEventListener("message", handler);
+				resolve(event.data);
+			}
+			window.addEventListener("message", handler);
+			window.postMessage({ CS_BRIDGE: true, requestId, request_content }, "*");
+		});
+	}
+
+	return new Promise((resolve) => {
 		chrome?.runtime?.sendMessage(
 			character_sync_id,
-			{ request_content: ["version"] },
+			{ request_content },
 			(response) => {
 				if (chrome.runtime.lastError) {
 					resolve(undefined);
 					return;
 				}
-				if (response) {
-					resolve(response.version);
-				} else {
-					resolve(undefined);
-				}
+				resolve(response);
 			}
 		);
 	});
+}
+
+/**
+ * Check if the "D&D Character Sync" extension is installed
+ */
+export async function extensionInstalled() {
+	const sendMessage = sendExtensionMessage(["version"]).then(
+		(response) => response?.version
+	);
 	const timeout = new Promise((resolve) => {
 		setTimeout(resolve, 2000, undefined);
 	});
@@ -226,26 +248,12 @@ export async function extensionInstalled() {
 }
 
 /**
- * Gets all characters from "D&D Character Sync" Chrome Extension
+ * Gets all characters from "D&D Character Sync" browser extension
  */
 export async function getCharacterSyncStorage() {
-	const sendMessage = new Promise((resolve) => {
-		chrome?.runtime?.sendMessage(
-			character_sync_id,
-			{ request_content: ["characters"] },
-			(response) => {
-				if (chrome.runtime.lastError) {
-					resolve({});
-					return;
-				}
-				if (response && response.characters) {
-					resolve(response.characters);
-				} else {
-					resolve({});
-				}
-			}
-		);
-	});
+	const sendMessage = sendExtensionMessage(["characters"]).then(
+		(response) => response?.characters || {}
+	);
 	const timeout = new Promise((resolve) => {
 		setTimeout(resolve, 2000, {});
 	});
@@ -253,28 +261,17 @@ export async function getCharacterSyncStorage() {
 }
 
 /**
- * Get a single character from the "D&D Character Sync" Chrome Extension
+ * Get a single character from the "D&D Character Sync" browser extension
  *
  * @param {string} url
  * @returns
  */
 export async function getCharacterSyncCharacter(url) {
-	const sendMessage = new Promise((resolve, reject) => {
-		chrome?.runtime?.sendMessage(
-			character_sync_id,
-			{ request_content: ["characters"] },
-			(response) => {
-				if (chrome.runtime.lastError) {
-					reject(`Character not found in D&D Character Sync Extension`);
-					return;
-				}
-				if (response.characters && url in response.characters) {
-					resolve(response.characters[url]);
-				} else {
-					reject(`Character not found in D&D Character Sync Extension`);
-				}
-			}
-		);
+	const sendMessage = sendExtensionMessage(["characters"]).then((response) => {
+		if (response?.characters && url in response.characters) {
+			return response.characters[url];
+		}
+		throw `Character not found in D&D Character Sync Extension`;
 	});
 	const timeout = new Promise((resolve) => {
 		setTimeout(resolve, 2000, `Character not found in D&D Character Sync Extension`);
@@ -345,7 +342,7 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 
 		wrapper.appendChild(clone);
 		wrapper.appendChild(footer);
-		
+
 		const canvas = await html2canvas(wrapper, {
 			scale: 2,
 			useCORS: true
@@ -370,16 +367,16 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 		const pdf = new jsPDF("p", "mm", "a4");
 		let pageWidth = pdf.internal.pageSize.getWidth();
 		const pageHeight = pdf.internal.pageSize.getHeight();
-	
+
 		if (layout === "single-column") {
 			pageWidth = pageWidth / 2;
 		}
-	
+
 		const contentWidth = pageWidth - margin * 2;
 		const contentHeight = (canvas.height * contentWidth) / canvas.width;
-	
+
 		pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight);
-	
+
 		const pageCount = pdf.internal.getNumberOfPages();
 		for (let i = 1; i <= pageCount; i++) {
 			pdf.setPage(i);
@@ -387,7 +384,7 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 			pdf.setTextColor(100);
 			pdf.text(footerText, margin, pageHeight - margin, { align: 'left' });
 		}
-	
+
 		pdf.save(`${filename}.pdf`);
 		document.body.removeChild(clone);
 	}

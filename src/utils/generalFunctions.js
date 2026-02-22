@@ -207,16 +207,20 @@ export async function extensionInstalled() {
 			character_sync_id,
 			{ request_content: ["version"] },
 			(response) => {
+				if (chrome.runtime.lastError) {
+					resolve(undefined);
+					return;
+				}
 				if (response) {
 					resolve(response.version);
 				} else {
-					return undefined;
+					resolve(undefined);
 				}
 			}
 		);
 	});
 	const timeout = new Promise((resolve) => {
-		setTimeout(resolve, 100, undefined);
+		setTimeout(resolve, 2000, undefined);
 	});
 	return Promise.race([sendMessage, timeout]);
 }
@@ -230,6 +234,10 @@ export async function getCharacterSyncStorage() {
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
+				if (chrome.runtime.lastError) {
+					resolve({});
+					return;
+				}
 				if (response && response.characters) {
 					resolve(response.characters);
 				} else {
@@ -239,7 +247,7 @@ export async function getCharacterSyncStorage() {
 		);
 	});
 	const timeout = new Promise((resolve) => {
-		setTimeout(resolve, 100, {});
+		setTimeout(resolve, 2000, {});
 	});
 	return Promise.race([sendMessage, timeout]);
 }
@@ -256,6 +264,10 @@ export async function getCharacterSyncCharacter(url) {
 			character_sync_id,
 			{ request_content: ["characters"] },
 			(response) => {
+				if (chrome.runtime.lastError) {
+					reject(`Character not found in D&D Character Sync Extension`);
+					return;
+				}
 				if (response.characters && url in response.characters) {
 					resolve(response.characters[url]);
 				} else {
@@ -265,7 +277,7 @@ export async function getCharacterSyncCharacter(url) {
 		);
 	});
 	const timeout = new Promise((resolve) => {
-		setTimeout(resolve, 100, `Character not found in D&D Character Sync Extension`);
+		setTimeout(resolve, 2000, `Character not found in D&D Character Sync Extension`);
 	});
 	return Promise.race([sendMessage, timeout]);
 }

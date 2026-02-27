@@ -280,11 +280,11 @@ export function getStoreUrl() {
  */
 export async function extensionInstalled() {
 	const sendMessage = new Promise((resolve) => {
-		browser?.runtime?.sendMessage(
+		chrome?.runtime?.sendMessage(
 			getExtensionId(),
 			{ request_content: ["version"] },
 			(response) => {
-				if (browser.runtime.lastError) {
+				if (chrome.runtime.lastError) {
 					resolve(undefined);
 					return;
 				}
@@ -307,11 +307,11 @@ export async function extensionInstalled() {
  */
 export async function getCharacterSyncStorage() {
 	const sendMessage = new Promise((resolve) => {
-		browser?.runtime?.sendMessage(
+		chrome?.runtime?.sendMessage(
 			getExtensionId(),
 			{ request_content: ["characters"] },
 			(response) => {
-				if (browser.runtime.lastError) {
+				if (chrome.runtime.lastError) {
 					resolve({});
 					return;
 				}
@@ -337,11 +337,11 @@ export async function getCharacterSyncStorage() {
  */
 export async function getCharacterSyncCharacter(url) {
 	const sendMessage = new Promise((resolve, reject) => {
-		browser?.runtime?.sendMessage(
+		chrome?.runtime?.sendMessage(
 			getExtensionId(),
 			{ request_content: ["characters"] },
 			(response) => {
-				if (browser.runtime.lastError) {
+				if (chrome.runtime.lastError) {
 					reject(`Character not found in D&D Character Sync Extension`);
 					return;
 				}

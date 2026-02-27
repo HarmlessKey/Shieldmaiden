@@ -1388,7 +1388,7 @@ const routes = [
 		component: CharacterSyncPrivacyPolicy,
 		meta: {
 			title: "D&D Character Sync Privacy policy",
-			description: "Privacy policy for the D&D Character Sync Google Chrome Extension.",
+			description: "Privacy policy for the D&D Character Sync browser extension.",
 		},
 	},
 	{

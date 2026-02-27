@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { browserDetect } from "../../functions";
+import { browserDetect } from "src/utils/generalFunctions";
 
 export default {
 	state: () => ({

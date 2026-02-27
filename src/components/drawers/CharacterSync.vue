@@ -1,18 +1,18 @@
 <template>
 	<q-no-ssr>
 		<h3>Character Sync</h3>
-		<div v-if="browser !== 'Chrome'" class="red mb-2">
-			Google
-			<a href="https://chrome.google.com" target="_blank" rel="noopener">Chrome</a>
+		<div v-if="!supportedBrowser" class="red mb-2">
+			A supported browser
+			(<strong>Chrome</strong>, <strong>Firefox</strong> or <strong>Edge</strong>)
 			is needed for this feature to work.
 		</div>
 
 		<!-- No extension -->
 		<template v-if="!extensionVersion">
-			<p>A Google Chrome Extension is needed to Sync your characters from other resources.</p>
+			<p>The D&D Character Sync browser extension is needed to Sync your characters from other resources.</p>
 			<a
 				class="btn btn-block"
-				:href="`https://chrome.google.com/webstore/detail/dd-character-sync/${extension_id}`"
+				:href="storeUrl"
 				target="_blank"
 				rel="noopener"
 			>
@@ -71,18 +71,16 @@
 </template>
 
 <script>
-import { extensionInstalled } from "src/utils/generalFunctions";
-import { browserDetect } from "src/functions";
+import { extensionInstalled, getStoreUrl, browserDetect } from "src/utils/generalFunctions";
 import { mapGetters } from "vuex";
-import { character_sync_id } from "src/utils/generalConstants";
 
 export default {
 	name: "CharacterSync",
 	data() {
 		return {
 			extensionVersion: false,
-			extension_id: character_sync_id,
 			browser: browserDetect(),
+			supportedBrowsers: ["Chrome", "Firefox", "Edge"],
 			step: 0,
 			steps: [
 				{
@@ -114,6 +112,12 @@ export default {
 	},
 	computed: {
 		...mapGetters(["tier"]),
+		supportedBrowser() {
+			return this.supportedBrowsers.includes(this.browser);
+		},
+		storeUrl() {
+			return getStoreUrl();
+		},
 	},
 	methods: {
 		previous() {

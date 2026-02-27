@@ -1,5 +1,5 @@
 import numeral from "numeral";
-import { character_sync_id } from "./generalConstants";
+import { character_sync_chrome_id, character_sync_firefox_id, character_sync_edge_id, character_sync_stores } from "./generalConstants";
 import _ from "lodash";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -197,17 +197,94 @@ export function comparePlayerToCharacter(sync_character, player) {
 }
 
 /**
+ * Returns the browser type
+ * @return {string} browser: Opera, Firefox, Safari, IE, Edge, Chrome
+ */
+/* eslint-disable */
+export function browserDetect() {
+	if (process.browser) {
+		// Opera 8.0+
+		const isOpera =
+			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(" OPR/") >= 0;
+
+		// Firefox 1.0+
+		const isFirefox = typeof InstallTrigger !== "undefined";
+
+		// Safari 3.0+ "[object HTMLElementConstructor]"
+		const isSafari =
+			/constructor/i.test(window.HTMLElement) ||
+			(function (p) {
+				return p.toString() === "[object SafariRemoteNotification]";
+			})(!window["safari"] || (typeof safari !== "undefined" && window["safari"].pushNotification));
+
+		// Internet Explorer 6-11
+		const isIE = /*@cc_on!@*/ false || !!document.documentMode;
+
+		// Edge 20+
+		const isEdge = !isIE && !!window.StyleMedia;
+
+		// Chrome 1 - 79
+		const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+
+		// Edge (based on chromium) detection
+		const isEdgeChromium = isChrome && navigator.userAgent.indexOf("Edg") != -1;
+
+		return isOpera
+			? "Opera"
+			: isFirefox
+			? "Firefox"
+			: isSafari
+			? "Safari"
+			: isEdgeChromium
+			? "Edge"
+			: isChrome
+			? "Chrome"
+			: isIE
+			? "IE"
+			: isEdge
+			? "Edge"
+			: "Don't know";
+	}
+	return "Not a browser";
+}
+
+/**
+ * Get the extension ID for the current browser
+ * @returns {string} extension ID
+ */
+function getExtensionId() {
+	const browser = browserDetect();
+	switch (browser) {
+		case "Firefox":
+			return character_sync_firefox_id;
+		case "Edge":
+			return character_sync_edge_id;
+		default:
+			return character_sync_chrome_id;
+	}
+}
+
+/**
+ * Get the extension store URL for the current browser
+ * @returns {string} store URL
+ */
+export function getStoreUrl() {
+	const browser = browserDetect();
+	return character_sync_stores[browser]?.url || character_sync_stores.Chrome.url;
+}
+
+/**
  * Check if the "D&D Character Sync" extension is installed
  *
  * @param {string} url
  */
 export async function extensionInstalled() {
 	const sendMessage = new Promise((resolve) => {
-		chrome?.runtime?.sendMessage(
-			character_sync_id,
+		browser?.runtime?.sendMessage(
+			getExtensionId(),
 			{ request_content: ["version"] },
 			(response) => {
-				if (chrome.runtime.lastError) {
+				if (browser.runtime.lastError) {
 					resolve(undefined);
 					return;
 				}
@@ -226,15 +303,15 @@ export async function extensionInstalled() {
 }
 
 /**
- * Gets all characters from "D&D Character Sync" Chrome Extension
+ * Gets all characters from the "D&D Character Sync" extension
  */
 export async function getCharacterSyncStorage() {
 	const sendMessage = new Promise((resolve) => {
-		chrome?.runtime?.sendMessage(
-			character_sync_id,
+		browser?.runtime?.sendMessage(
+			getExtensionId(),
 			{ request_content: ["characters"] },
 			(response) => {
-				if (chrome.runtime.lastError) {
+				if (browser.runtime.lastError) {
 					resolve({});
 					return;
 				}
@@ -253,18 +330,18 @@ export async function getCharacterSyncStorage() {
 }
 
 /**
- * Get a single character from the "D&D Character Sync" Chrome Extension
+ * Get a single character from the "D&D Character Sync" extension
  *
  * @param {string} url
  * @returns
  */
 export async function getCharacterSyncCharacter(url) {
 	const sendMessage = new Promise((resolve, reject) => {
-		chrome?.runtime?.sendMessage(
-			character_sync_id,
+		browser?.runtime?.sendMessage(
+			getExtensionId(),
 			{ request_content: ["characters"] },
 			(response) => {
-				if (chrome.runtime.lastError) {
+				if (browser.runtime.lastError) {
 					reject(`Character not found in D&D Character Sync Extension`);
 					return;
 				}

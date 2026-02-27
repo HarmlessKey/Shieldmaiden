@@ -4,7 +4,7 @@
 
 		<p>
 			Thank you for using D&D Character Sync! Your privacy is important to us. This Privacy Policy
-			outlines how we collect, use, and safeguard your information when you use our Google Chrome
+			outlines how we collect, use, and safeguard your information when you use our browser
 			extension.
 		</p>
 

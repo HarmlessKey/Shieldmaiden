@@ -5,17 +5,17 @@
 		:showSignedIn="false"
 	>
 		<template v-slot:action_btn="{ btn_classes }">
-			<q-btn 
-				color="primary" 
-				:class="btn_classes" 
-				no-caps push target="_blank" 
-				rel="noopener" 
-				href="https://chromewebstore.google.com/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg">
+			<q-btn
+				color="primary"
+				:class="btn_classes"
+				no-caps push target="_blank"
+				rel="noopener"
+				:href="storeUrl">
 				Get Extension
 			</q-btn>
 		</template>
 
-		<h2>D&D Character Sync - Google Chrome Extension</h2>
+		<h2>D&D Character Sync - Browser Extension</h2>
 		<p>
 			With this extension you can store character sheets from different D&D apps. 
 			Characters stored in your extension can be synced with your players in Shieldmaiden.
@@ -58,6 +58,7 @@
 <script>
 import { mapGetters } from "vuex";
 import ToolsPage from "src/components/ToolsPage.vue";
+import { getStoreUrl } from "src/utils/generalFunctions";
 
 export default {
 	name: "ToolsMonsterCreator",
@@ -66,6 +67,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(["user"]),
+		storeUrl() {
+			return getStoreUrl();
+		},
 	},
 };
 </script>

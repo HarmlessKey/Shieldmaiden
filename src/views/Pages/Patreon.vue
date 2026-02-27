@@ -73,10 +73,10 @@
 							You will be able to sync your players characters with external online character sheets
 							from D&D Beyond and Dice Cloud using the
 							<a
-								:href="`https://chrome.google.com/webstore/detail/dd-character-sync/${extension_id}`"
+								:href="storeUrl"
 								target="_blank"
 								rel="noopener"
-								>Character Sync Chrome Extension</a
+								>Character Sync Extension</a
 							>. This way you won't have manually update your players, but you can simply click a
 							button.<br />
 							<router-link to="/tools/character-sync">More about Character Sync</router-link>
@@ -112,7 +112,7 @@
 import Tiers from "src/components/Tiers.vue";
 import Footer from "src/components/Footer.vue";
 import PatreonLinkButton from "src/components/PatreonLinkButton.vue";
-import { character_sync_id } from "src/utils/generalConstants";
+import { getStoreUrl } from "src/utils/generalFunctions";
 import { mapGetters } from "vuex";
 
 export default {
@@ -122,13 +122,11 @@ export default {
 		Footer,
 		PatreonLinkButton,
 	},
-	data() {
-		return {
-			extension_id: character_sync_id,
-		};
-	},
 	computed: {
 		...mapGetters(["user", "userInfo"]),
+		storeUrl() {
+			return getStoreUrl();
+		},
 	},
 };
 </script>

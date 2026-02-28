@@ -14,7 +14,7 @@
 				class="btn btn-block"
 				:href="storeUrl"
 				target="_blank"
-				rel="noopener"
+				rel="noopener noreferrer"
 			>
 				Install D&D Character Sync
 			</a>

@@ -9,7 +9,7 @@
 				color="primary"
 				:class="btn_classes"
 				no-caps push target="_blank"
-				rel="noopener"
+				rel="noopener noreferrer"
 				:href="storeUrl">
 				Get Extension
 			</q-btn>

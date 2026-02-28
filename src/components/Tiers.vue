@@ -140,7 +140,7 @@
 				<a
 					:href="storeUrl"
 					target="_blank"
-					rel="noopener"
+					rel="noopener noreferrer"
 				>
 					D&D Character Sync Extension</a
 				>.

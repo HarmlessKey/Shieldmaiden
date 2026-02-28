@@ -78,6 +78,7 @@ export default {
 							dispatch("reminders/fetch_reminder_count"),
 							dispatch("spells/fetch_spell_count"),
 							dispatch("set_user_ai"),
+							dispatch("checkExtensionInstalled"),
 						]);
 					})
 					.then(async () => {

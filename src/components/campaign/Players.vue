@@ -537,12 +537,11 @@ export default {
 			sync_characters: this.syncCharacters,
 			link_character: undefined,
 			link_dialog: false,
-			extensionInstalled: undefined,
 		};
 	},
 	computed: {
 		...mapGetters(["overencumbered"]),
-		...mapGetters(["userSettings", "tier"]),
+		...mapGetters(["userSettings", "tier", "extensionInstalled"]),
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
@@ -638,11 +637,8 @@ export default {
 			return this.copperToPretty(currency);
 		},
 	},
-	async mounted() {
-		this.extensionInstalled = await this.checkExtensionInstalled();
-	},
 	methods: {
-		...mapActions(["setDrawer", "checkExtensionInstalled"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
 		...mapActions("players", ["set_player_prop", "sync_player"]),
 		onResize(size) {

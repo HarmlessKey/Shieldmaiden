@@ -176,7 +176,6 @@ export default {
 		return {
 			width: 0,
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
-			hasExtension: false,
 			social_media: [
 				{
 					name: "Patreon",
@@ -202,7 +201,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["user", "tier", "slots_used", "userInfo", "content_count"]),
+		...mapGetters(["user", "tier", "slots_used", "userInfo", "content_count", "extensionInstalled"]),
 		filtered_content() {
 			return this.content.filter((item) => item.value !== this.page);
 		},
@@ -223,15 +222,10 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer", "checkExtensionInstalled"]),
+		...mapActions(["setDrawer"]),
 		setWidth(size) {
 			this.width = size.width;
 		},
-	},
-	async mounted() {
-		if (this.$route.path.startsWith("/content/players")) {
-			this.hasExtension = await this.checkExtensionInstalled();
-		}
 	},
 };
 </script>

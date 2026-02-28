@@ -8,7 +8,7 @@
 		</div>
 
 		<!-- No extension -->
-		<template v-if="!extensionVersion">
+		<template v-if="!extensionInstalled">
 			<p>The D&D Character Sync browser extension is needed to Sync your characters from other resources.</p>
 			<a
 				class="btn btn-block"
@@ -72,13 +72,12 @@
 
 <script>
 import { getStoreUrl, browserDetect, compareVersions } from "src/utils/generalFunctions";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
 	name: "CharacterSync",
 	data() {
 		return {
-			extensionVersion: false,
 			browser: browserDetect(),
 			supportedBrowsers: ["Chrome", "Firefox", "Edge"],
 			step: 0,
@@ -111,7 +110,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier"]),
+		...mapGetters(["tier", "extensionInstalled"]),
 		supportedBrowser() {
 			return this.supportedBrowsers.includes(this.browser);
 		},
@@ -119,20 +118,16 @@ export default {
 			return getStoreUrl();
 		},
 		isVersionTooLow() {
-			return this.extensionVersion && compareVersions(this.extensionVersion, "0.2.1") < 0;
+			return this.extensionInstalled && compareVersions(this.extensionInstalled, "0.2.1") < 0;
 		},
 	},
 	methods: {
-		...mapActions(["checkExtensionInstalled"]),
 		previous() {
 			this.step--;
 		},
 		next() {
 			this.step++;
 		},
-	},
-	async mounted() {
-		this.extensionVersion = await this.checkExtensionInstalled();
 	},
 };
 </script>

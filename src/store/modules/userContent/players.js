@@ -503,7 +503,7 @@ const player_actions = {
 	async sync_player({ commit, dispatch, rootState }, { uid, id, sync_character }) {
 		if (uid) {
 			if (!rootState.general.extensionInstalled)
-				throw "Character not found in D&D Character Sync Extension";
+				throw "D&D Character Sync Extension not installed or not detected. Please install the extension to use this feature.";
 			const services = await dispatch("get_player_services");
 			const character = await getCharacterSyncCharacter(sync_character);
 

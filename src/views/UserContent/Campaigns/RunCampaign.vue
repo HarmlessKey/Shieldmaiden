@@ -276,13 +276,8 @@ export default {
 		};
 	},
 	async mounted() {
-		try {
-			const installed = await this.checkExtensionInstalled();
-			if (installed) {
-				this.sync_characters = await getCharacterSyncStorage();
-			}
-		} catch (e) {
-			// Do nothing
+		if (this.extensionInstalled) {
+			this.sync_characters = await getCharacterSyncStorage();
 		}
 		await this.get_campaign({
 			uid: this.user.uid,
@@ -331,7 +326,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["broadcast", "userSettings", "overencumbered"]),
+		...mapGetters(["broadcast", "userSettings", "overencumbered", "extensionInstalled"]),
 		...mapGetters("players", { search_players: "players" }),
 		filtered_search_players() {
 			return this.search_players.filter((player) => {
@@ -351,7 +346,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer", "checkExtensionInstalled"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
 		...mapActions("players", ["get_player"]),
 		setSize(size) {

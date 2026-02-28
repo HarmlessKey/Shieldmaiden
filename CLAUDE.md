@@ -1,0 +1,51 @@
+# Shieldmaiden
+
+D&D combat tracker web app built with Vue 2 + Quasar 1 + Firebase.
+
+## Tech Stack
+
+- **Framework**: Vue 2.7 + Quasar 1 (SSR mode)
+- **Build**: Webpack 4 via `@quasar/app ~2.4.3`
+- **Backend**: Firebase v8 (namespaced API — do NOT migrate to modular v10+ API)
+- **State**: Vuex with modules in `src/store/modules/`
+- **Node**: >= 24, npm >= 10.2.4
+
+## Dev Commands
+
+```bash
+npm run ssr       # Start dev server (SSR mode)
+npm run build     # quasar build -m ssr
+npm run lint      # ESLint
+```
+
+## Key Constraints
+
+- **Firebase v8 namespaced API** is used across 63+ files — do not switch to modular API
+- Vue 2 / Quasar 1 ecosystem locks transitive deps (postcss 7, webpack 4, etc.)
+- Many audit vulnerabilities are unfixable without framework migration — do not attempt to fix them
+- `package.json` uses `overrides` to force-update transitive deps
+
+## Project Structure
+
+```
+src/
+  boot/           # Quasar boot files (plugins, firebase-auth, etc.)
+  components/     # Vue components
+  layouts/        # App layouts
+  views/          # Page-level views
+  store/          # Vuex store
+    modules/
+      userContent/  # User data (campaigns, encounters, players, etc.)
+      content/      # API content (spells, monsters, items, conditions)
+  services/       # Firebase service layer (one file per resource)
+  utils/
+    generalFunctions.js  # Shared utility functions
+    generalConstants.js  # Shared constants
+```
+
+## Patterns
+
+- Services in `src/services/` handle Firebase reads/writes
+- Vuex modules dispatch to services and cache results in state
+- Extension communication uses `window.postMessage` bridge (not `chrome.runtime` directly)
+- Utility functions go in `src/utils/generalFunctions.js`

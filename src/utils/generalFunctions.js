@@ -1,5 +1,5 @@
 import numeral from "numeral";
-import { character_sync_chrome_id, character_sync_firefox_id, character_sync_edge_id, character_sync_stores } from "./generalConstants";
+import { character_sync_stores } from "./generalConstants";
 import _ from "lodash";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -249,22 +249,6 @@ export function browserDetect() {
 }
 
 /**
- * Get the extension ID for the current browser
- * @returns {string} extension ID
- */
-function getExtensionId() {
-	const browser = browserDetect();
-	switch (browser) {
-		case "Firefox":
-			return character_sync_firefox_id;
-		case "Edge":
-			return character_sync_edge_id;
-		default:
-			return character_sync_chrome_id;
-	}
-}
-
-/**
  * Get the extension store URL for the current browser
  * @returns {string} store URL
  */
@@ -274,89 +258,68 @@ export function getStoreUrl() {
 }
 
 /**
- * Check if the "D&D Character Sync" extension is installed
+ * Send a message to the D&D Character Sync extension via the injected bridge content script.
+ * The bridge relays window.postMessage to the extension background and posts back a response.
  *
- * @param {string} url
+ * @param {object} payload
+ * @param {number} timeoutMs
+ * @returns {Promise<object|null>} response data, or null on timeout
+ */
+function sendBridgeMessage(payload, timeoutMs = 2000) {
+	return new Promise((resolve) => {
+		const requestId = crypto.randomUUID();
+		let settled = false;
+		const handler = (event) => {
+			if (event.source !== window) return;
+			if (!event.data?.CS_BRIDGE_RESPONSE) return;
+			if (event.data.requestId !== requestId) return;
+			if (settled) return;
+			settled = true;
+			window.removeEventListener("message", handler);
+			resolve(event.data);
+		};
+		window.addEventListener("message", handler);
+		window.postMessage({ CS_BRIDGE: true, requestId, ...payload }, "*");
+		setTimeout(() => {
+			if (!settled) {
+				settled = true;
+				window.removeEventListener("message", handler);
+				resolve(null);
+			}
+		}, timeoutMs);
+	});
+}
+
+/**
+ * Check if the "D&D Character Sync" extension is installed
+ * @returns {Promise<string|undefined>} extension version, or undefined if not installed
  */
 export async function extensionInstalled() {
-	const sendMessage = new Promise((resolve) => {
-		chrome?.runtime?.sendMessage(
-			getExtensionId(),
-			{ request_content: ["version"] },
-			(response) => {
-				if (chrome.runtime.lastError) {
-					resolve(undefined);
-					return;
-				}
-				if (response) {
-					resolve(response.version);
-				} else {
-					resolve(undefined);
-				}
-			}
-		);
-	});
-	const timeout = new Promise((resolve) => {
-		setTimeout(resolve, 2000, undefined);
-	});
-	return Promise.race([sendMessage, timeout]);
+	const response = await sendBridgeMessage({ request_content: ["version"] });
+	return response?.version;
 }
 
 /**
  * Gets all characters from the "D&D Character Sync" extension
+ * @returns {Promise<object>}
  */
 export async function getCharacterSyncStorage() {
-	const sendMessage = new Promise((resolve) => {
-		chrome?.runtime?.sendMessage(
-			getExtensionId(),
-			{ request_content: ["characters"] },
-			(response) => {
-				if (chrome.runtime.lastError) {
-					resolve({});
-					return;
-				}
-				if (response && response.characters) {
-					resolve(response.characters);
-				} else {
-					resolve({});
-				}
-			}
-		);
-	});
-	const timeout = new Promise((resolve) => {
-		setTimeout(resolve, 2000, {});
-	});
-	return Promise.race([sendMessage, timeout]);
+	const response = await sendBridgeMessage({ request_content: ["characters"] });
+	return response?.characters ?? {};
 }
 
 /**
  * Get a single character from the "D&D Character Sync" extension
  *
  * @param {string} url
- * @returns
+ * @returns {Promise<object>}
  */
 export async function getCharacterSyncCharacter(url) {
-	const sendMessage = new Promise((resolve, reject) => {
-		chrome?.runtime?.sendMessage(
-			getExtensionId(),
-			{ request_content: ["characters"] },
-			(response) => {
-				if (chrome.runtime.lastError) {
-					reject(`Character not found in D&D Character Sync Extension`);
-					return;
-				}
-				if (response.characters && url in response.characters) {
-					resolve(response.characters[url]);
-				} else {
-					reject(`Character not found in D&D Character Sync Extension`);
-				}
-			}
-		);
-	});
-	const timeout = new Promise((resolve) => {
-		setTimeout(resolve, 2000, `Character not found in D&D Character Sync Extension`);
-	});
-	return Promise.race([sendMessage, timeout]);
+	const response = await sendBridgeMessage({ request_content: ["characters"] });
+	if (response?.characters && url in response.characters) {
+		return response.characters[url];
+	}
+	throw "Character not found in D&D Character Sync Extension";
 }
 
 /**

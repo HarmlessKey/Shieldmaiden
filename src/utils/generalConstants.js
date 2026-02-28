@@ -7,26 +7,15 @@ export const dice_types = Object.freeze([
 	{ value: 20, label: "d20" },
 ]);
 
-/** Extension IDs and store URLs per browser */
-export const character_sync_chrome_id =
-	process.env.VUE_APP_ENV_NAME === "develop"
-		? process.env.LOCAL_CHARACTER_SYNC_ID
-		: "jgcbbmbchbkdjbgiiheminkkkecjohpg";
-
-export const character_sync_firefox_id = "9e75e317-8e27-4670-8093-675b9f1a9109";
-export const character_sync_edge_id = "oflbeapjjjffofhihbphnpakejkamoph";
-
+/** Extension store URLs per browser */
 export const character_sync_stores = Object.freeze({
 	Chrome: {
-		id: character_sync_chrome_id,
 		url: "https://chromewebstore.google.com/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg",
 	},
 	Firefox: {
-		id: character_sync_firefox_id,
 		url: "https://addons.mozilla.org/en-US/addon/d-d-character-sync/",
 	},
 	Edge: {
-		id: character_sync_edge_id,
 		url: "https://microsoftedge.microsoft.com/addons/detail/dd-character-sync/oflbeapjjjffofhihbphnpakejkamoph",
 	},
 });

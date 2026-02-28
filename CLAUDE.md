@@ -49,3 +49,26 @@ src/
 - Vuex modules dispatch to services and cache results in state
 - Extension communication uses `window.postMessage` bridge (not `chrome.runtime` directly)
 - Utility functions go in `src/utils/generalFunctions.js`
+
+## Git Workflow
+
+We use **Git Flow**. Follow these rules strictly:
+
+### Branch Structure
+- `main` — production releases only
+- `develop` — integration branch
+- `feature/*` — new features, branched from `develop`
+- `release/*` — release preparation, branched from `develop`
+- `hotfix/*` — urgent production fixes, branched from `main`
+
+### Merging Rules
+- **Features**: open a PR from `feature/*` → `develop`
+- **Releases**: merge `release/*` → `main` AND `develop` (no PR required)
+- **Hotfixes**: merge `hotfix/*` → `main` AND `develop` (no PR required)
+- Never merge features directly to `main`
+
+### Tags
+- Tag every merge to `main` with the version number (e.g. `2.39.2`)
+
+### Commits & PRs
+- Do NOT add Claude as a co-author in commits or PR descriptions

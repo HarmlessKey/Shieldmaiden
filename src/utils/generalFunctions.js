@@ -249,6 +249,26 @@ export function browserDetect() {
 }
 
 /**
+ * Compares two semantic version strings (e.g., "1.2.3")
+ * @param {string} v1 - First version string
+ * @param {string} v2 - Second version string
+ * @returns {number} -1 if v1 < v2, 0 if v1 === v2, 1 if v1 > v2
+ */
+export function compareVersions(v1, v2) {
+	const parts1 = (v1 || "").split(".").map(Number);
+	const parts2 = (v2 || "").split(".").map(Number);
+
+	const maxLength = Math.max(parts1.length, parts2.length);
+	for (let i = 0; i < maxLength; i++) {
+		const num1 = parts1[i] || 0;
+		const num2 = parts2[i] || 0;
+		if (num1 < num2) return -1;
+		if (num1 > num2) return 1;
+	}
+	return 0;
+}
+
+/**
  * Get the extension store URL for the current browser
  * @returns {string} store URL
  */

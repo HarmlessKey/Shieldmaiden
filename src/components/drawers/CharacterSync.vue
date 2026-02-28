@@ -21,7 +21,7 @@
 		</template>
 
 		<!-- Version too low -->
-		<template v-if="extensionVersion < '0.2.1'">
+		<template v-if="isVersionTooLow">
 			<strong class="orange">Version too low</strong>
 			<span class="neutral-3"> (0.2.1 or higher required)</span>
 			<p>A newer version of the <strong>D&D Character Sync</strong> extension is required</p>
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { getStoreUrl, browserDetect } from "src/utils/generalFunctions";
+import { getStoreUrl, browserDetect, compareVersions } from "src/utils/generalFunctions";
 import { mapGetters } from "vuex";
 
 export default {
@@ -117,6 +117,9 @@ export default {
 		},
 		storeUrl() {
 			return getStoreUrl();
+		},
+		isVersionTooLow() {
+			return this.extensionVersion && compareVersions(this.extensionVersion, "0.2.1") < 0;
 		},
 	},
 	methods: {

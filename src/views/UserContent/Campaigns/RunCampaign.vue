@@ -277,7 +277,7 @@ export default {
 	},
 	async mounted() {
 		try {
-			const installed = await this.$store.dispatch("checkExtensionInstalled");
+			const installed = await this.checkExtensionInstalled();
 			if (installed) {
 				this.sync_characters = await getCharacterSyncStorage();
 			}
@@ -351,7 +351,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
+		...mapActions(["setDrawer", "checkExtensionInstalled"]),
 		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
 		...mapActions("players", ["get_player"]),
 		setSize(size) {

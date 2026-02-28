@@ -72,7 +72,7 @@
 
 <script>
 import { getStoreUrl, browserDetect, compareVersions } from "src/utils/generalFunctions";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
 	name: "CharacterSync",
@@ -123,6 +123,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(["checkExtensionInstalled"]),
 		previous() {
 			this.step--;
 		},
@@ -131,7 +132,7 @@ export default {
 		},
 	},
 	async mounted() {
-		this.extensionVersion = await this.$store.dispatch("checkExtensionInstalled");
+		this.extensionVersion = await this.checkExtensionInstalled();
 	},
 };
 </script>

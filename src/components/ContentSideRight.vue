@@ -223,14 +223,14 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
+		...mapActions(["setDrawer", "checkExtensionInstalled"]),
 		setWidth(size) {
 			this.width = size.width;
 		},
 	},
 	async mounted() {
 		if (this.$route.path.startsWith("/content/players")) {
-			this.hasExtension = await this.$store.dispatch("checkExtensionInstalled");
+			this.hasExtension = await this.checkExtensionInstalled();
 		}
 	},
 };

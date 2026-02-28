@@ -639,10 +639,10 @@ export default {
 		},
 	},
 	async mounted() {
-		this.extensionInstalled = await this.$store.dispatch("checkExtensionInstalled");
+		this.extensionInstalled = await this.checkExtensionInstalled();
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
+		...mapActions(["setDrawer", "checkExtensionInstalled"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
 		...mapActions("players", ["set_player_prop", "sync_player"]),
 		onResize(size) {

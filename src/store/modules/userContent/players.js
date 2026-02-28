@@ -500,8 +500,10 @@ const player_actions = {
 	 * @param {string} user_id
 	 * @param {string} id
 	 */
-	async sync_player({ commit, dispatch }, { uid, id, sync_character }) {
+	async sync_player({ commit, dispatch, rootState }, { uid, id, sync_character }) {
 		if (uid) {
+			if (!rootState.general.extensionInstalled)
+				throw "Character not found in D&D Character Sync Extension";
 			const services = await dispatch("get_player_services");
 			const character = await getCharacterSyncCharacter(sync_character);
 

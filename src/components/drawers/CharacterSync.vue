@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { extensionInstalled, getStoreUrl, browserDetect } from "src/utils/generalFunctions";
+import { getStoreUrl, browserDetect } from "src/utils/generalFunctions";
 import { mapGetters } from "vuex";
 
 export default {
@@ -128,7 +128,7 @@ export default {
 		},
 	},
 	async mounted() {
-		this.extensionVersion = await extensionInstalled();
+		this.extensionVersion = await this.$store.dispatch("checkExtensionInstalled");
 	},
 };
 </script>

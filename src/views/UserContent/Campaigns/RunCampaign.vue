@@ -212,7 +212,7 @@ import Players from "src/components/campaign/Players.vue";
 import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
-import { getCharacterSyncStorage, extensionInstalled } from "src/utils/generalFunctions";
+import { getCharacterSyncStorage } from "src/utils/generalFunctions";
 import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
@@ -277,7 +277,7 @@ export default {
 	},
 	async mounted() {
 		try {
-			const installed = await extensionInstalled();
+			const installed = await this.$store.dispatch("checkExtensionInstalled");
 			if (installed) {
 				this.sync_characters = await getCharacterSyncStorage();
 			}

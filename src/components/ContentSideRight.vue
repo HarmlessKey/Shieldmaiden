@@ -160,7 +160,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { extensionInstalled } from "src/utils/generalFunctions";
 
 export default {
 	name: "ContentSideRight",
@@ -231,7 +230,7 @@ export default {
 	},
 	async mounted() {
 		if (this.$route.path.startsWith("/content/players")) {
-			this.hasExtension = await extensionInstalled();
+			this.hasExtension = await this.$store.dispatch("checkExtensionInstalled");
 		}
 	},
 };

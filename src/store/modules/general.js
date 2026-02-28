@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { browserDetect } from "src/utils/generalFunctions";
+import { browserDetect, extensionInstalled } from "src/utils/generalFunctions";
 
 export default {
 	state: () => ({
@@ -11,6 +11,7 @@ export default {
 		side_collapsed: true,
 		side_small_screen: false,
 		browser: browserDetect(),
+		extensionInstalled: null,
 		music: null,
 		ambience: [],
 	}),
@@ -39,6 +40,9 @@ export default {
 		},
 		browser(state) {
 			return state.browser;
+		},
+		extensionInstalled(state) {
+			return state.extensionInstalled;
 		},
 		music(state) {
 			return state.music;
@@ -210,6 +214,12 @@ export default {
 			commit("SET_SIDE_SMALL_SCREEN", payload);
 		},
 
+		async checkExtensionInstalled({ state, commit }) {
+			if (state.extensionInstalled !== null) return state.extensionInstalled;
+			const version = await extensionInstalled();
+			commit("SET_EXTENSION_INSTALLED", version);
+			return version ?? false;
+		},
 		play_music({ commit }, payload) {
 			commit("SET_MUSIC", payload);
 		},
@@ -249,6 +259,9 @@ export default {
 		},
 		SET_SIDE_SMALL_SCREEN(state, payload) {
 			Vue.set(state, "side_small_screen", payload);
+		},
+		SET_EXTENSION_INSTALLED(state, version) {
+			Vue.set(state, "extensionInstalled", version ?? false);
 		},
 		SET_MUSIC(state, payload) {
 			Vue.set(state, "music", payload);

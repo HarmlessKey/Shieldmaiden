@@ -463,7 +463,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
-import { extensionInstalled, comparePlayerToCharacter } from "src/utils/generalFunctions";
+import { comparePlayerToCharacter } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",
@@ -639,7 +639,7 @@ export default {
 		},
 	},
 	async mounted() {
-		this.extensionInstalled = await extensionInstalled();
+		this.extensionInstalled = await this.$store.dispatch("checkExtensionInstalled");
 	},
 	methods: {
 		...mapActions(["setDrawer"]),

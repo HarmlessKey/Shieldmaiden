@@ -7,11 +7,18 @@ export const dice_types = Object.freeze([
 	{ value: 20, label: "d20" },
 ]);
 
-/** Id of extension @see https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg */
-export const character_sync_id =
-	process.env.VUE_APP_ENV_NAME === "develop"
-		? process.env.LOCAL_CHARACTER_SYNC_ID
-		: "jgcbbmbchbkdjbgiiheminkkkecjohpg";
+/** Extension store URLs per browser */
+export const character_sync_stores = Object.freeze({
+	Chrome: {
+		url: "https://chromewebstore.google.com/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg",
+	},
+	Firefox: {
+		url: "https://addons.mozilla.org/en-US/addon/d-d-character-sync/",
+	},
+	Edge: {
+		url: "https://microsoftedge.microsoft.com/addons/detail/dd-character-sync/oflbeapjjjffofhihbphnpakejkamoph",
+	},
+});
 
 export const defenses = Object.freeze({
 	v: { name: "Vulnerable", value: "damage_vulnerabilities" },

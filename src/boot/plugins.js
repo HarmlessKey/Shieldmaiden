@@ -6,7 +6,6 @@ import Croppa from "vue-croppa";
 import { Cookies } from "quasar";
 import { Splitpanes, Pane } from "splitpanes";
 import VueGtm from "@gtm-support/vue2-gtm";
-
 export default async ({ router, Vue }) => {
 	Vue.config.productionTip = false;
 
@@ -17,8 +16,6 @@ export default async ({ router, Vue }) => {
 
 	Vue.component("Splitpanes", Splitpanes);
 	Vue.component("Pane", Pane);
-
-	require("../functions.js");
 
 	Vue.use(VueGtm, {
 		id: "GTM-5XJCCDMS",

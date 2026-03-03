@@ -1,27 +1,27 @@
 <template>
 	<q-no-ssr>
 		<h3>Character Sync</h3>
-		<div v-if="browser !== 'Chrome'" class="red mb-2">
-			Google
-			<a href="https://chrome.google.com" target="_blank" rel="noopener">Chrome</a>
+		<div v-if="!supportedBrowser" class="red mb-2">
+			A supported browser
+			(<strong>Chrome</strong>, <strong>Firefox</strong> or <strong>Edge</strong>)
 			is needed for this feature to work.
 		</div>
 
 		<!-- No extension -->
-		<template v-if="!extensionVersion">
-			<p>A Google Chrome Extension is needed to Sync your characters from other resources.</p>
+		<template v-if="!extensionInstalled">
+			<p>The D&D Character Sync browser extension is needed to Sync your characters from other resources.</p>
 			<a
 				class="btn btn-block"
-				:href="`https://chrome.google.com/webstore/detail/dd-character-sync/${extension_id}`"
+				:href="storeUrl"
 				target="_blank"
-				rel="noopener"
+				rel="noopener noreferrer"
 			>
 				Install D&D Character Sync
 			</a>
 		</template>
 
 		<!-- Version too low -->
-		<template v-if="extensionVersion < '0.2.1'">
+		<template v-if="isVersionTooLow">
 			<strong class="orange">Version too low</strong>
 			<span class="neutral-3"> (0.2.1 or higher required)</span>
 			<p>A newer version of the <strong>D&D Character Sync</strong> extension is required</p>
@@ -71,18 +71,15 @@
 </template>
 
 <script>
-import { extensionInstalled } from "src/utils/generalFunctions";
-import { browserDetect } from "src/functions";
+import { getStoreUrl, browserDetect, compareVersions } from "src/utils/generalFunctions";
 import { mapGetters } from "vuex";
-import { character_sync_id } from "src/utils/generalConstants";
 
 export default {
 	name: "CharacterSync",
 	data() {
 		return {
-			extensionVersion: false,
-			extension_id: character_sync_id,
 			browser: browserDetect(),
+			supportedBrowsers: ["Chrome", "Firefox", "Edge"],
 			step: 0,
 			steps: [
 				{
@@ -113,7 +110,16 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier"]),
+		...mapGetters(["tier", "extensionInstalled"]),
+		supportedBrowser() {
+			return this.supportedBrowsers.includes(this.browser);
+		},
+		storeUrl() {
+			return getStoreUrl();
+		},
+		isVersionTooLow() {
+			return this.extensionInstalled && compareVersions(this.extensionInstalled, "0.2.1") < 0;
+		},
 	},
 	methods: {
 		previous() {
@@ -122,9 +128,6 @@ export default {
 		next() {
 			this.step++;
 		},
-	},
-	async mounted() {
-		this.extensionVersion = await extensionInstalled();
 	},
 };
 </script>

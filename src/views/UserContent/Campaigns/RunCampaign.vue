@@ -212,7 +212,7 @@ import Players from "src/components/campaign/Players.vue";
 import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
-import { getCharacterSyncStorage, extensionInstalled } from "src/utils/generalFunctions";
+import { getCharacterSyncStorage } from "src/utils/generalFunctions";
 import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
@@ -276,13 +276,8 @@ export default {
 		};
 	},
 	async mounted() {
-		try {
-			const installed = await extensionInstalled();
-			if (installed) {
-				this.sync_characters = await getCharacterSyncStorage();
-			}
-		} catch (e) {
-			// Do nothing
+		if (this.extensionInstalled) {
+			this.sync_characters = await getCharacterSyncStorage();
 		}
 		await this.get_campaign({
 			uid: this.user.uid,
@@ -331,7 +326,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["broadcast", "userSettings", "overencumbered"]),
+		...mapGetters(["broadcast", "userSettings", "overencumbered", "extensionInstalled"]),
 		...mapGetters("players", { search_players: "players" }),
 		filtered_search_players() {
 			return this.search_players.filter((player) => {

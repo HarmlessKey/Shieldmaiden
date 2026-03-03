@@ -135,14 +135,14 @@
 				</template>
 			</hk-card-deck>
 			<small class="d-block text-center">
-				<span class="neutral-3">*</span> Character Sync requires <strong>Chrome</strong> as your
-				browser and the
+				<span class="neutral-3">*</span> Character Sync requires
+				<strong>Chrome</strong>, <strong>Firefox</strong> or <strong>Edge</strong> and the
 				<a
-					href="https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg"
+					:href="storeUrl"
 					target="_blank"
-					rel="noopener"
+					rel="noopener noreferrer"
 				>
-					D&D Character Sync Chrome Extension</a
+					D&D Character Sync Extension</a
 				>.
 			</small>
 		</div>
@@ -154,6 +154,7 @@
 import { mapGetters } from "vuex";
 import { db } from "src/firebase";
 import { legacy_tiers } from "src/utils/generalConstants";
+import { getStoreUrl } from "src/utils/generalFunctions";
 import { promotionService } from "src/services/promotions";
 import PromoBanner from "./PromoBanner.vue";
 
@@ -214,6 +215,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(["user", "tier"]),
+		storeUrl() {
+			return getStoreUrl();
+		},
 		show_discount() {
 			console.log(this.discount, this.tier);
 			return this.discount && (this.tier?.price === "Free" || !this.tier);

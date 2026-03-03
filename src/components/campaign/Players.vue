@@ -463,7 +463,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
-import { extensionInstalled, comparePlayerToCharacter } from "src/utils/generalFunctions";
+import { comparePlayerToCharacter } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",
@@ -537,12 +537,11 @@ export default {
 			sync_characters: this.syncCharacters,
 			link_character: undefined,
 			link_dialog: false,
-			extensionInstalled: undefined,
 		};
 	},
 	computed: {
 		...mapGetters(["overencumbered"]),
-		...mapGetters(["userSettings", "tier"]),
+		...mapGetters(["userSettings", "tier", "extensionInstalled"]),
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
@@ -637,9 +636,6 @@ export default {
 					: 0;
 			return this.copperToPretty(currency);
 		},
-	},
-	async mounted() {
-		this.extensionInstalled = await extensionInstalled();
 	},
 	methods: {
 		...mapActions(["setDrawer"]),

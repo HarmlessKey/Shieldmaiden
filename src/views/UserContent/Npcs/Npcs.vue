@@ -3,6 +3,9 @@
 		<hk-card>
 			<ContentHeader type="npcs">
 				<template #actions-left>
+					<button class="btn btn-sm bg-neutral-5 mr-2" @click="group_dialog = true">
+						Groups
+					</button>
 					<ExportUserContent
 						class="btn-sm bg-neutral-5 mr-2"
 						content-type="npc"
@@ -10,9 +13,6 @@
 					>
 						<span>Export</span>
 					</ExportUserContent>
-					<button class="btn btn-sm bg-neutral-5 mr-2" @click="group_dialog = true">
-						Groups
-					</button>
 					<button
 						v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
 						class="btn btn-sm bg-neutral-5 mr-2"
@@ -60,6 +60,7 @@
 								square
 								dense
 								clearable
+								label="Filter by group"
 								placeholder="Filter by group"
 								option-value="value"
 								option-label="label"

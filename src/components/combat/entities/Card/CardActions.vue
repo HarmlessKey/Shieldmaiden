@@ -1,7 +1,307 @@
 <template>
 	<div class="card-actions">
 		<div v-for="{ category, name } in actions" :key="category">
-			<template v-if="entity[category] && entity[category].length > 0">
+			<template v-if="category === 'actions'">
+				<!-- Regular actions -->
+				<template v-if="regularActions.length > 0">
+					<h3 class="label d-flex justify-content-between">Actions</h3>
+					<div
+						v-for="(action, action_index) in regularActions"
+						:key="`action-${action_index}`"
+						class="card-action"
+					>
+						<div class="card-action-title">
+							<template
+								v-if="
+									rollable &&
+									action.action_list &&
+									action.action_list[0] &&
+									action.action_list[0].type !== 'other' &&
+									action.action_list[0].rolls &&
+									action.action_list[0].rolls.length
+								"
+							>
+								<hk-roll-action
+									:action="action"
+									:tooltip="`Roll ${action.name}`"
+									@roll="startRoll(...arguments, action_index, action, category)"
+									:disabled="!checkAvailable(category, action_index, action)"
+								>
+									<span class="roll-button" />
+								</hk-roll-action>
+							</template>
+							<div class="card-action-title__name">
+								<strong
+									><em>
+										{{ action.name }}
+										{{
+											action.recharge
+												? `(Recharge ${
+														action.recharge === "rest"
+															? "after a Short or Long Rest"
+															: action.recharge
+													})`
+												: ``
+										}}
+										{{
+											action.limit
+												? `(${action.limit}/${
+														action.limit_type ? action.limit_type.capitalize() : `Day`
+													})`
+												: ``
+										}}
+										{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : `` }}
+									</em></strong
+								>
+
+								<template v-if="action.limit || action.recharge || action.legendary_cost">
+									<template v-if="action.legendary_cost || action.recharge">
+										<div
+											v-if="checkAvailable(category, action_index, action)"
+											class="btn btn-xs btn-clear"
+											@click.stop="
+												spendLimited(
+													category,
+													action.legendary_cost ? 'legendaries_used' : action_index,
+													false,
+													action.legendary_cost ? action.legendary_cost : 1
+												)
+											"
+										>
+											Spend
+										</div>
+										<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
+									</template>
+									<LimitedUseCounter
+										v-else
+										:entity="entity"
+										:limited_type="category"
+										:limited_index="action_index"
+										:limited_max="action.limit"
+									/>
+								</template>
+							</div>
+						</div>
+						<!-- Roll Summary -->
+						<div
+							v-if="
+								action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'
+							"
+						>
+							<span v-if="action.action_list[0].rolls">
+								<span
+									v-for="(roll, roll_index) in action.action_list[0].rolls"
+									:key="`roll-${action_index}-${roll_index}`"
+								>
+									(<i
+										aria-hidden="true"
+										:class="[
+											action.action_list[0].type === 'healing'
+												? 'fas fa-heart green'
+												: damage_type_icons[roll.damage_type],
+											roll.damage_type,
+										]"
+									/>
+									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : `` }}
+									<template v-if="roll.fixed_val && roll.dice_count">
+										{{
+											// eslint-disable-next-line vue/no-parsing-error
+											roll.fixed_val < 0 ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+										}})
+									</template>
+									<template v-else>{{ roll.fixed_val }})</template>
+									<!-- eslint-disable-next-line vue/no-parsing-error -->
+									{{ roll_index + 1 < action.action_list[0].rolls.length ? "+" : "" }}
+									<q-tooltip anchor="top middle" self="center middle">
+										{{
+											action.action_list[0].type === "healing"
+												? "Healing"
+												: `${roll.damage_type.capitalize()} damage`
+										}}
+									</q-tooltip>
+								</span>
+							</span>
+							<!-- Reach -->
+							<span v-if="action.reach">
+								<span class="blue">|</span> {{ action.reach }}<small class="neutral-2">ft.</small>
+								<q-tooltip anchor="top middle" self="center middle"> Reach </q-tooltip>
+							</span>
+							<!-- Range -->
+							<span v-if="action.range">
+								<span class="blue">|</span> {{ action.range }}<small class="neutral-2">ft.</small>
+								<q-tooltip anchor="top middle" self="center middle"> Range </q-tooltip>
+							</span>
+							<!-- Saving throw -->
+							<span v-if="action.action_list[0].type === 'save' && action.action_list[0].save_dc">
+								<span class="blue">|</span>
+								<span v-if="action.action_list[0].save_ability">
+									{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
+								</span>
+								{{ action.action_list[0].save_dc }}
+							</span>
+							<!-- AOE -->
+							<span v-if="action.aoe_type">
+								<span class="blue">|</span>
+								{{ action.aoe_size }}<small class="neutral-2">ft.</small>
+								{{ action.aoe_type.capitalize() }}
+								<q-tooltip anchor="top middle" self="center middle"> Area of effect </q-tooltip>
+							</span>
+						</div>
+						<hk-dice-text v-if="action.desc" :input_text="action.desc" />
+					</div>
+				</template>
+
+				<!-- Bonus actions -->
+				<template v-if="bonusActions.length > 0">
+					<h3 class="label d-flex justify-content-between">Bonus Actions</h3>
+					<div
+						v-for="(action, action_index) in bonusActions"
+						:key="`bonus-${action_index}`"
+						class="card-action"
+					>
+						<div class="card-action-title">
+							<template
+								v-if="
+									rollable &&
+									action.action_list &&
+									action.action_list[0] &&
+									action.action_list[0].type !== 'other' &&
+									action.action_list[0].rolls &&
+									action.action_list[0].rolls.length
+								"
+							>
+								<hk-roll-action
+									:action="action"
+									:tooltip="`Roll ${action.name}`"
+									@roll="startRoll(...arguments, action_index, action, category)"
+									:disabled="!checkAvailable(category, action_index, action)"
+								>
+									<span class="roll-button" />
+								</hk-roll-action>
+							</template>
+							<div class="card-action-title__name">
+								<strong
+									><em>
+										{{ action.name }}
+										{{
+											action.recharge
+												? `(Recharge ${
+														action.recharge === "rest"
+															? "after a Short or Long Rest"
+															: action.recharge
+													})`
+												: ``
+										}}
+										{{
+											action.limit
+												? `(${action.limit}/${
+														action.limit_type ? action.limit_type.capitalize() : `Day`
+													})`
+												: ``
+										}}
+										{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : `` }}
+									</em></strong
+								>
+
+								<template v-if="action.limit || action.recharge || action.legendary_cost">
+									<template v-if="action.legendary_cost || action.recharge">
+										<div
+											v-if="checkAvailable(category, action_index, action)"
+											class="btn btn-xs btn-clear"
+											@click.stop="
+												spendLimited(
+													category,
+													action.legendary_cost ? 'legendaries_used' : action_index,
+													false,
+													action.legendary_cost ? action.legendary_cost : 1
+												)
+											"
+										>
+											Spend
+										</div>
+										<i aria-hidden="true" v-else class="fas fa-ban neutral-2" />
+									</template>
+									<LimitedUseCounter
+										v-else
+										:entity="entity"
+										:limited_type="category"
+										:limited_index="action_index"
+										:limited_max="action.limit"
+									/>
+								</template>
+							</div>
+						</div>
+						<!-- Roll Summary -->
+						<div
+							v-if="
+								action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'
+							"
+						>
+							<span v-if="action.action_list[0].rolls">
+								<span
+									v-for="(roll, roll_index) in action.action_list[0].rolls"
+									:key="`roll-${action_index}-${roll_index}`"
+								>
+									(<i
+										aria-hidden="true"
+										:class="[
+											action.action_list[0].type === 'healing'
+												? 'fas fa-heart green'
+												: damage_type_icons[roll.damage_type],
+											roll.damage_type,
+										]"
+									/>
+									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : `` }}
+									<template v-if="roll.fixed_val && roll.dice_count">
+										{{
+											// eslint-disable-next-line vue/no-parsing-error
+											roll.fixed_val < 0 ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`
+										}})
+									</template>
+									<template v-else>{{ roll.fixed_val }})</template>
+									<!-- eslint-disable-next-line vue/no-parsing-error -->
+									{{ roll_index + 1 < action.action_list[0].rolls.length ? "+" : "" }}
+									<q-tooltip anchor="top middle" self="center middle">
+										{{
+											action.action_list[0].type === "healing"
+												? "Healing"
+												: `${roll.damage_type.capitalize()} damage`
+										}}
+									</q-tooltip>
+								</span>
+							</span>
+							<!-- Reach -->
+							<span v-if="action.reach">
+								<span class="blue">|</span> {{ action.reach }}<small class="neutral-2">ft.</small>
+								<q-tooltip anchor="top middle" self="center middle"> Reach </q-tooltip>
+							</span>
+							<!-- Range -->
+							<span v-if="action.range">
+								<span class="blue">|</span> {{ action.range }}<small class="neutral-2">ft.</small>
+								<q-tooltip anchor="top middle" self="center middle"> Range </q-tooltip>
+							</span>
+							<!-- Saving throw -->
+							<span v-if="action.action_list[0].type === 'save' && action.action_list[0].save_dc">
+								<span class="blue">|</span>
+								<span v-if="action.action_list[0].save_ability">
+									{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
+								</span>
+								{{ action.action_list[0].save_dc }}
+							</span>
+							<!-- AOE -->
+							<span v-if="action.aoe_type">
+								<span class="blue">|</span>
+								{{ action.aoe_size }}<small class="neutral-2">ft.</small>
+								{{ action.aoe_type.capitalize() }}
+								<q-tooltip anchor="top middle" self="center middle"> Area of effect </q-tooltip>
+							</span>
+						</div>
+						<hk-dice-text v-if="action.desc" :input_text="action.desc" />
+					</div>
+				</template>
+			</template>
+
+			<template v-else-if="entity[category] && entity[category].length > 0">
 				<h3 v-if="category !== 'special_abilities'" class="label d-flex justify-content-between">
 					{{ name }}
 					<LimitedUseCounter
@@ -216,6 +516,14 @@ export default {
 	},
 	computed: {
 		...mapGetters(["targeted"]),
+		regularActions() {
+			return (this.entity.actions || []).filter(
+				(a) => !a.timing || a.timing === "action"
+			);
+		},
+		bonusActions() {
+			return (this.entity.actions || []).filter((a) => a.timing === "bonus_action");
+		},
 	},
 	methods: {
 		startRoll(e, projectiles, option, action_index, action, category) {

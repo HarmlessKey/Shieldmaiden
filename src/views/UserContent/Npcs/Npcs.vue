@@ -222,6 +222,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { campaignGroupKey } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader.vue";
@@ -331,7 +332,7 @@ export default {
 				for (const campaign of this.campaigns) {
 					options.push({
 						label: `[Campaign] ${campaign.name ? campaign.name.capitalizeEach() : campaign.key}`,
-						value: `campaign__${campaign.key}`,
+						value: campaignGroupKey(campaign.key),
 					});
 				}
 			}
@@ -346,7 +347,7 @@ export default {
 			}
 			if (this.campaigns) {
 				for (const campaign of this.campaigns) {
-					map[`campaign__${campaign.key}`] = campaign.name
+					map[campaignGroupKey(campaign.key)] = campaign.name
 						? campaign.name.capitalizeEach()
 						: campaign.key;
 				}

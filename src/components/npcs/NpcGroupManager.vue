@@ -141,6 +141,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { campaignGroupKey } from "src/utils/generalFunctions";
 
 export default {
 	name: "NpcGroupManager",
@@ -158,7 +159,7 @@ export default {
 		campaignGroups() {
 			if (!this.campaigns) return [];
 			return this.campaigns.map((campaign) => ({
-				key: `campaign__${campaign.key}`,
+				key: campaignGroupKey(campaign.key),
 				name: campaign.name || campaign.key,
 				isCampaign: true,
 			}));

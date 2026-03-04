@@ -217,7 +217,7 @@ import Defenses from "src/components/npcs/Defenses";
 import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
-import { downloadJSON } from "src/utils/generalFunctions";
+import { downloadJSON, campaignGroupKey } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
@@ -307,7 +307,7 @@ export default {
 				for (const campaign of this.all_campaigns) {
 					options.push({
 						label: `[Campaign] ${campaign.name ? campaign.name.capitalizeEach() : campaign.key}`,
-						value: `campaign__${campaign.key}`,
+						value: campaignGroupKey(campaign.key),
 					});
 				}
 			}

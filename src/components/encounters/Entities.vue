@@ -73,20 +73,30 @@
 
 		<!-- CUSTOM NPCs -->
 		<template v-if="monster_resource === 'custom'">
-			<q-input
-				:dark="$store.getters.theme !== 'light'"
-				v-model="searchNpc"
-				borderless
-				filled
-				square
-				debounce="300"
-				clearable
-				placeholder="Search custom NPCs"
-			>
-				<q-icon slot="prepend" name="search" />
-			</q-input>
+			<div class="d-flex items-center mb-1">
+				<q-input
+					:dark="$store.getters.theme !== 'light'"
+					v-model="searchNpc"
+					borderless
+					filled
+					square
+					debounce="300"
+					clearable
+					placeholder="Search custom NPCs"
+					class="col"
+				>
+					<q-icon slot="prepend" name="search" />
+				</q-input>
+				<q-toggle
+					v-if="campaignId"
+					:dark="$store.getters.theme !== 'light'"
+					v-model="campaignOnly"
+					label="Campaign only"
+					class="ml-2"
+				/>
+			</div>
 			<q-table
-				:data="npcs"
+				:data="filteredCustomNpcs"
 				:visible-columns="visibleColumns"
 				:columns="columns"
 				row-key="key"
@@ -107,7 +117,7 @@
 							:props="props"
 							:auto-width="col.name !== 'name'"
 						>
-							<router-link v-if="col.name === 'name'" :to="`/content/npcs/${col.key}`">
+							<router-link v-if="col.name === 'name'" :to="`/content/npcs/${props.key}`">
 								{{ col.value }}
 							</router-link>
 							<span v-else-if="col.name === 'environment'">
@@ -457,7 +467,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
-import { uuid } from "src/utils/generalFunctions";
+import { uuid, campaignGroupKey } from "src/utils/generalFunctions";
 import ViewMonster from "src/components/compendium/Monster.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
@@ -499,6 +509,7 @@ export default {
 			player: {},
 			drawer: this.$store.getters.getDrawer,
 			to_add: {},
+			campaignOnly: false,
 			filter_dialog: false,
 			filter: {},
 			typeFilter: [],
@@ -599,6 +610,12 @@ export default {
 	computed: {
 		...mapGetters(["content_count"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
+		filteredCustomNpcs() {
+			const npcs = this.npcs;
+			if (!this.campaignOnly || !this.campaignId) return npcs;
+			const groupKey = campaignGroupKey(this.campaignId);
+			return npcs.filter((npc) => npc.groups && npc.groups[groupKey]);
+		},
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		monster_resource: {
 			get() {

@@ -286,6 +286,7 @@ export function getStoreUrl() {
  * @returns {Promise<object|null>} response data, or null on timeout
  */
 function sendBridgeMessage(payload, timeoutMs = 2000) {
+	if (typeof window === "undefined") return Promise.resolve(null);
 	return new Promise((resolve) => {
 		const requestId = crypto.randomUUID();
 		let settled = false;

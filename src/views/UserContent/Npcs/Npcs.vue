@@ -10,6 +10,9 @@
 					>
 						<span>Export</span>
 					</ExportUserContent>
+					<button class="btn btn-sm bg-neutral-5 mr-2" @click="group_dialog = true">
+						Groups
+					</button>
 					<button
 						v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
 						class="btn btn-sm bg-neutral-5 mr-2"
@@ -31,21 +34,44 @@
 			<div class="card-body" v-if="!loading_npcs">
 				<p class="neutral-2">These are your custom Non-Player Characters and monsters.</p>
 				<template v-if="npcs.length">
-					<q-input
-						:dark="$store.getters.theme !== 'light'"
-						v-model="search"
-						borderless
-						filled
-						square
-						debounce="300"
-						clearable
-						placeholder="Search NPCs"
-					>
-						<q-icon slot="prepend" name="search" />
-					</q-input>
+					<div class="row q-col-gutter-sm mb-1">
+						<div class="col">
+							<q-input
+								:dark="$store.getters.theme !== 'light'"
+								v-model="search"
+								borderless
+								filled
+								square
+								dense
+								debounce="300"
+								clearable
+								placeholder="Search NPCs"
+							>
+								<q-icon slot="prepend" name="search" />
+							</q-input>
+						</div>
+						<div class="col" v-if="groupFilterOptions.length">
+							<q-select
+								:dark="$store.getters.theme !== 'light'"
+								v-model="groupFilter"
+								:options="groupFilterOptions"
+								multiple
+								filled
+								square
+								dense
+								clearable
+								placeholder="Filter by group"
+								option-value="value"
+								option-label="label"
+								emit-value
+								map-options
+								use-chips
+							/>
+						</div>
+					</div>
 
 					<q-table
-						:data="npcs"
+						:data="filteredNpcs"
 						:visible-columns="visibleColumns"
 						:columns="columns"
 						row-key="key"
@@ -73,6 +99,21 @@
 								>
 									<template v-if="col.name === 'avatar'">
 										<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-monster" />
+									</template>
+									<template v-else-if="col.name === 'groups'">
+										<template v-if="props.row.groups">
+											<q-chip
+												v-for="(_, groupId) in props.row.groups"
+												:key="groupId"
+												dense
+												size="sm"
+												color="neutral-4"
+												text-color="white"
+												class="mr-1"
+											>
+												{{ groupNameMap[groupId] || groupId }}
+											</q-chip>
+										</template>
 									</template>
 									<template v-else-if="col.name !== 'actions'">
 										<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
@@ -143,6 +184,11 @@
 			</hk-card>
 		</q-dialog>
 
+		<!-- Groups dialog -->
+		<q-dialog v-model="group_dialog">
+			<NpcGroupManager />
+		</q-dialog>
+
 		<!-- generate dialog-->
 		<q-dialog v-model="generate_dialog">
 			<hk-card class="npc-dialog" :persistent="generating">
@@ -180,6 +226,7 @@ import ImportUserContent from "src/components/userContent/ImportUserContent.vue"
 import ContentHeader from "src/components/userContent/ContentHeader.vue";
 import ExportUserContent from "src/components/userContent/ExportUserContent.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
+import NpcGroupManager from "src/components/npcs/NpcGroupManager.vue";
 
 export default {
 	name: "Npcs",
@@ -189,15 +236,18 @@ export default {
 		ContentHeader,
 		ExportUserContent,
 		GenerateMonster,
+		NpcGroupManager,
 	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
 			import_dialog: false,
 			generate_dialog: false,
+			group_dialog: false,
 			loading_npcs: true,
 			show_warning: true,
 			search: "",
+			groupFilter: [],
 			card_width: 0,
 			overwrite: undefined,
 			generating: false,
@@ -226,6 +276,12 @@ export default {
 					sortable: true,
 				},
 				{
+					name: "groups",
+					label: "Groups",
+					field: "groups",
+					align: "left",
+				},
+				{
 					name: "challenge_rating",
 					label: "CR",
 					field: "challenge_rating",
@@ -247,19 +303,68 @@ export default {
 		...mapGetters("npcs", ["npcs"]),
 		...mapGetters("players", ["players"]),
 		...mapGetters("campaigns", ["campaigns"]),
+		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
 		visibleColumns() {
-			return this.card_width > 600
-				? ["avatar", "name", "type", "challenge_rating", "actions"]
-				: this.card_width > 450
-					? ["avatar", "name", "type", "actions"]
-					: ["avatar", "name", "actions"];
+			return this.card_width > 800
+				? ["avatar", "name", "groups", "type", "challenge_rating", "actions"]
+				: this.card_width > 600
+					? ["avatar", "name", "type", "challenge_rating", "actions"]
+					: this.card_width > 450
+						? ["avatar", "name", "type", "actions"]
+						: ["avatar", "name", "actions"];
 		},
 		npcIds() {
 			return this.npcs.map((npc) => npc.key);
 		},
+		groupFilterOptions() {
+			const options = [];
+			if (this.npc_groups) {
+				for (const group of this.npc_groups) {
+					options.push({
+						label: group.name ? group.name.capitalizeEach() : group.key,
+						value: group.key,
+					});
+				}
+			}
+			if (this.campaigns) {
+				for (const campaign of this.campaigns) {
+					options.push({
+						label: `[Campaign] ${campaign.name ? campaign.name.capitalizeEach() : campaign.key}`,
+						value: `campaign__${campaign.key}`,
+					});
+				}
+			}
+			return options;
+		},
+		groupNameMap() {
+			const map = {};
+			if (this.npc_groups) {
+				for (const group of this.npc_groups) {
+					map[group.key] = group.name ? group.name.capitalizeEach() : group.key;
+				}
+			}
+			if (this.campaigns) {
+				for (const campaign of this.campaigns) {
+					map[`campaign__${campaign.key}`] = campaign.name
+						? campaign.name.capitalizeEach()
+						: campaign.key;
+				}
+			}
+			return map;
+		},
+		filteredNpcs() {
+			if (!this.groupFilter || !this.groupFilter.length) {
+				return this.npcs;
+			}
+			return this.npcs.filter((npc) => {
+				if (!npc.groups) return false;
+				return this.groupFilter.some((groupId) => npc.groups[groupId]);
+			});
+		},
 	},
 	async mounted() {
 		await this.get_npcs();
+		this.get_npc_groups();
 		this.update_npc_count();
 
 		this.loading_npcs = false;
@@ -274,6 +379,7 @@ export default {
 			"add_npc",
 			"update_npc_count",
 		]),
+		...mapActions("npcGroups", ["get_npc_groups"]),
 		...mapActions("spells", ["get_spell"]),
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;

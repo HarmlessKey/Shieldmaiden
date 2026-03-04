@@ -366,6 +366,7 @@ export default {
 	async mounted() {
 		await this.get_npcs();
 		this.get_npc_groups();
+		this.get_campaigns();
 		this.update_npc_count();
 
 		this.loading_npcs = false;
@@ -381,6 +382,7 @@ export default {
 			"update_npc_count",
 		]),
 		...mapActions("npcGroups", ["get_npc_groups"]),
+		...mapActions("campaigns", ["get_campaigns"]),
 		...mapActions("spells", ["get_spell"]),
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;

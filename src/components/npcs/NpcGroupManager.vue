@@ -13,8 +13,8 @@
 		<div class="card-body">
 			<!-- GROUP DETAIL VIEW -->
 			<template v-if="selectedGroup">
-				<!-- Rename -->
-				<div class="row q-col-gutter-sm mb-3">
+				<!-- Rename (only for custom groups, not campaigns) -->
+				<div v-if="!selectedGroup.isCampaign" class="row q-col-gutter-sm mb-3">
 					<div class="col">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -115,6 +115,25 @@
 					</div>
 				</div>
 				<p v-else class="neutral-3">No groups created yet.</p>
+
+				<!-- Campaign groups -->
+				<template v-if="campaignGroups.length">
+					<h3 class="mt-3 mb-2">Campaigns</h3>
+					<div class="group-list">
+						<div
+							v-for="group in campaignGroups"
+							:key="group.key"
+							class="group-item d-flex justify-content-between items-center"
+						>
+							<a @click="selectGroup(group)" class="group-name truncate">
+								{{ group.name ? group.name.capitalizeEach() : group.key }}
+							</a>
+							<a class="btn btn-sm bg-neutral-5" @click="selectGroup(group)">
+								<i aria-hidden="true" class="fas fa-pencil" />
+							</a>
+						</div>
+					</div>
+				</template>
 			</template>
 		</div>
 	</hk-card>
@@ -135,6 +154,15 @@ export default {
 	computed: {
 		...mapGetters("npcGroups", ["npc_groups"]),
 		...mapGetters("npcs", ["npcs"]),
+		...mapGetters("campaigns", ["campaigns"]),
+		campaignGroups() {
+			if (!this.campaigns) return [];
+			return this.campaigns.map((campaign) => ({
+				key: `campaign__${campaign.key}`,
+				name: campaign.name || campaign.key,
+				isCampaign: true,
+			}));
+		},
 		npcOptions() {
 			return this.npcs.map((npc) => ({
 				label: npc.name ? npc.name.capitalizeEach() : npc.key,

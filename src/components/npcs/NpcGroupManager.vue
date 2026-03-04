@@ -2,7 +2,7 @@
 	<hk-card class="npc-group-manager">
 		<div slot="header" class="card-header">
 			<template v-if="selectedGroup">
-				<a @click="selectedGroup = null" class="btn btn-sm bg-neutral-5 mr-2">
+				<a @click="selectedGroup = null" class="btn btn-sm bg-neutral-5 mr-2" aria-label="Back to groups">
 					<i aria-hidden="true" class="fas fa-arrow-left" />
 				</a>
 				<span>{{ selectedGroup.name ? selectedGroup.name.capitalizeEach() : "" }}</span>
@@ -64,7 +64,7 @@
 						class="member d-flex justify-content-between items-center"
 					>
 						<span>{{ npc.name ? npc.name.capitalizeEach() : npc.key }}</span>
-						<a class="btn btn-sm bg-neutral-5" @click="removeNpcFromGroup(npc.key)">
+						<a class="btn btn-sm bg-neutral-5" @click="removeNpcFromGroup(npc.key)" aria-label="Remove NPC from group">
 							<i aria-hidden="true" class="fas fa-times red" />
 						</a>
 					</div>
@@ -105,10 +105,10 @@
 							{{ group.name ? group.name.capitalizeEach() : group.key }}
 						</a>
 						<div class="d-flex">
-							<a class="btn btn-sm bg-neutral-5 mr-1" @click="selectGroup(group)">
+							<a class="btn btn-sm bg-neutral-5 mr-1" @click="selectGroup(group)" aria-label="Edit group">
 								<i aria-hidden="true" class="fas fa-pencil" />
 							</a>
-							<a class="btn btn-sm bg-neutral-5" @click="confirmDeleteGroup(group)">
+							<a class="btn btn-sm bg-neutral-5" @click="confirmDeleteGroup(group)" aria-label="Delete group">
 								<i aria-hidden="true" class="fas fa-trash-alt" />
 							</a>
 						</div>
@@ -128,7 +128,7 @@
 							<a @click="selectGroup(group)" class="group-name truncate">
 								{{ group.name ? group.name.capitalizeEach() : group.key }}
 							</a>
-							<a class="btn btn-sm bg-neutral-5" @click="selectGroup(group)">
+							<a class="btn btn-sm bg-neutral-5" @click="selectGroup(group)" aria-label="Edit campaign group">
 								<i aria-hidden="true" class="fas fa-pencil" />
 							</a>
 						</div>

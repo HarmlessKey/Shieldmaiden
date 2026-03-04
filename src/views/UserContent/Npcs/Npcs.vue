@@ -307,13 +307,16 @@ export default {
 		...mapGetters("campaigns", ["campaigns"]),
 		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
 		visibleColumns() {
-			return this.card_width > 800
-				? ["avatar", "name", "groups", "type", "challenge_rating", "actions"]
-				: this.card_width > 600
-					? ["avatar", "name", "type", "challenge_rating", "actions"]
-					: this.card_width > 450
-						? ["avatar", "name", "type", "actions"]
-						: ["avatar", "name", "actions"];
+			if (this.card_width > 800) {
+				return ["avatar", "name", "groups", "type", "challenge_rating", "actions"];
+			}
+			if (this.card_width > 600) {
+				return ["avatar", "name", "type", "challenge_rating", "actions"];
+			}
+			if (this.card_width > 450) {
+				return ["avatar", "name", "type", "actions"];
+			}
+			return ["avatar", "name", "actions"];
 		},
 		npcIds() {
 			return this.npcs.map((npc) => npc.key);

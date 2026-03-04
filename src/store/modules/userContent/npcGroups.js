@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { npcGroupServices } from "src/services/npc_groups";
+import { NpcGroupServices } from "src/services/npc_groups";
 import _ from "lodash";
 
 const npc_group_state = () => ({
@@ -26,7 +26,7 @@ const npc_group_getters = {
 const npc_group_actions = {
 	async get_npc_group_services({ getters, commit }) {
 		if (getters.npc_group_services === null || !Object.keys(getters.npc_group_services).length) {
-			commit("SET_NPC_GROUP_SERVICES", new npcGroupServices());
+			commit("SET_NPC_GROUP_SERVICES", new NpcGroupServices());
 		}
 		return getters.npc_group_services;
 	},
@@ -40,12 +40,8 @@ const npc_group_actions = {
 
 		if (!groups && uid) {
 			const services = await dispatch("get_npc_group_services");
-			try {
-				groups = await services.getGroups(uid);
-				commit("SET_NPC_GROUPS", groups || {});
-			} catch (error) {
-				throw error;
-			}
+			groups = await services.getGroups(uid);
+			commit("SET_NPC_GROUPS", groups || {});
 		}
 		return groups;
 	},
@@ -61,13 +57,9 @@ const npc_group_actions = {
 
 		if (uid) {
 			const services = await dispatch("get_npc_group_services");
-			try {
-				const id = await services.addGroup(uid, group);
-				commit("SET_NPC_GROUP", { id, group });
-				return id;
-			} catch (error) {
-				throw error;
-			}
+			const id = await services.addGroup(uid, group);
+			commit("SET_NPC_GROUP", { id, group });
+			return id;
 		}
 	},
 
@@ -82,13 +74,8 @@ const npc_group_actions = {
 
 		if (uid) {
 			const services = await dispatch("get_npc_group_services");
-			try {
-				await services.updateGroup(uid, id, group);
-				commit("SET_NPC_GROUP", { id, group });
-				return;
-			} catch (error) {
-				throw error;
-			}
+			await services.updateGroup(uid, id, group);
+			commit("SET_NPC_GROUP", { id, group });
 		}
 	},
 
@@ -102,16 +89,11 @@ const npc_group_actions = {
 
 		if (uid) {
 			const services = await dispatch("get_npc_group_services");
-			try {
-				await services.deleteGroup(uid, id);
-				commit("REMOVE_NPC_GROUP", id);
+			await services.deleteGroup(uid, id);
+			commit("REMOVE_NPC_GROUP", id);
 
-				// Remove group from all NPCs that reference it
-				await dispatch("npcs/remove_group_from_all_npcs", id, { root: true });
-				return;
-			} catch (error) {
-				throw error;
-			}
+			// Remove group from all NPCs that reference it
+			await dispatch("npcs/remove_group_from_all_npcs", id, { root: true });
 		}
 	},
 

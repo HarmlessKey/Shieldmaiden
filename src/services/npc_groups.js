@@ -6,7 +6,7 @@ const NPC_GROUPS_REF = db.ref("npc_groups");
  * NPC Groups Firebase Service
  * CRUD interface for NPC group management
  */
-export class npcGroupServices {
+export class NpcGroupServices {
 	/**
 	 * Get all NPC groups for a user
 	 *
@@ -14,12 +14,8 @@ export class npcGroupServices {
 	 * @returns All NPC groups for the user
 	 */
 	async getGroups(uid) {
-		try {
-			const groups = await NPC_GROUPS_REF.child(uid).once("value");
-			return groups.val();
-		} catch (error) {
-			throw error;
-		}
+		const groups = await NPC_GROUPS_REF.child(uid).once("value");
+		return groups.val();
 	}
 
 	/**
@@ -30,15 +26,11 @@ export class npcGroupServices {
 	 * @returns Key of the newly added group
 	 */
 	async addGroup(uid, group) {
-		try {
-			group.name = group.name.toLowerCase();
-			group.created = firebase.database.ServerValue.TIMESTAMP;
+		group.name = group.name.toLowerCase();
+		group.created = firebase.database.ServerValue.TIMESTAMP;
 
-			const newGroup = await NPC_GROUPS_REF.child(uid).push(group);
-			return newGroup.key;
-		} catch (error) {
-			throw error;
-		}
+		const newGroup = await NPC_GROUPS_REF.child(uid).push(group);
+		return newGroup.key;
 	}
 
 	/**
@@ -49,12 +41,8 @@ export class npcGroupServices {
 	 * @param {Object} group Updated group object
 	 */
 	async updateGroup(uid, id, group) {
-		try {
-			group.name = group.name.toLowerCase();
-			await NPC_GROUPS_REF.child(`${uid}/${id}`).update(group);
-		} catch (error) {
-			throw error;
-		}
+		group.name = group.name.toLowerCase();
+		await NPC_GROUPS_REF.child(`${uid}/${id}`).update(group);
 	}
 
 	/**
@@ -64,10 +52,6 @@ export class npcGroupServices {
 	 * @param {String} id Group ID
 	 */
 	async deleteGroup(uid, id) {
-		try {
-			await NPC_GROUPS_REF.child(`${uid}/${id}`).remove();
-		} catch (error) {
-			throw error;
-		}
+		await NPC_GROUPS_REF.child(`${uid}/${id}`).remove();
 	}
 }

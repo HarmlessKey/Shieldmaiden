@@ -369,13 +369,8 @@ const npc_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_npc_services");
-			try {
-				await services.updateNpc(uid, id, "", { groups }, true);
-				commit("SET_NPC_PROP", { uid, id, property: "groups", value: groups, update_search: true });
-				return;
-			} catch (error) {
-				throw error;
-			}
+			await services.updateNpc(uid, id, "", { groups }, true);
+			commit("SET_NPC_PROP", { uid, id, property: "groups", value: groups, update_search: true });
 		}
 	},
 

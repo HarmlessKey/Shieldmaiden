@@ -3,7 +3,7 @@
 		<div class="container">
 			<img
 				class="hero-image"
-				src="../../assets/_img/shieldmaiden-cropped.webp"
+				src="../../assets/_img/shieldmaiden.webp"
 				alt="Shieldmaiden Hero Image"
 				fetchpriority="high"
 			/>
@@ -29,7 +29,6 @@
 					</div>
 				</router-link>
 			</div>
-			<q-resize-observer @resize="setSize" />
 		</div>
 	</div>
 </template>
@@ -42,7 +41,6 @@ export default {
 	},
 	data() {
 		return {
-			width: 0,
 			tools: [
 				{
 					title: "Combat Tracker",
@@ -77,16 +75,6 @@ export default {
 			],
 		};
 	},
-	computed: {
-		isMobile() {
-			return this.width < 768;
-		},
-	},
-	methods: {
-		setSize(size) {
-			this.width = size.width;
-		},
-	},
 };
 </script>
 
@@ -97,12 +85,12 @@ export default {
 	.container {
 		max-width: 1280px;
 		padding: 22px 20px 50px 20px;
+		position: relative;
 
 		.hero-image {
-			transform: scaleX(-1);
 			object-fit: cover;
-			object-position: top 0 left -30px;
-			height: 250px;
+			object-position: top -30px right -30px;
+			aspect-ratio: 16 / 9;
 			width: 100%;
 			margin-bottom: 22px;
 		}
@@ -185,12 +173,15 @@ export default {
 	.top {
 		.container {
 			padding: 95px 20px 77px 20px;
-			background-image: url("../../assets/_img/shieldmaiden.webp");
-			background-repeat: no-repeat;
-			background-position: top 50px right -120px;
 
 			.hero-image {
-				display: none;
+				position: absolute;
+				top: 50px;
+				right: -120px;
+				object-position: top right;
+				width: 512px;
+				aspect-ratio: 512 / 705;
+				margin: 0;
 			}
 			.buttons {
 				flex-direction: row;
@@ -220,7 +211,12 @@ export default {
 	.top {
 		.container {
 			padding: 145px 30px 77px 30px;
-			background-position: top 55px right -20px;
+
+			.hero-image {
+				top: 55px;
+				right: 0;
+				aspect-ratio: 512 / 655;
+			}
 
 			h2 {
 				max-width: 500px;
@@ -244,7 +240,11 @@ export default {
 @media only screen and (min-width: $xl-breakpoint) {
 	.top {
 		.container {
-			background-position: top 10px right 85px;
+			.hero-image {
+				top: 10px;
+				right: 85px;
+				aspect-ratio: 512 / 670;
+			}
 
 			h2 {
 				max-width: 600px;

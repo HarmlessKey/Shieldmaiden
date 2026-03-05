@@ -17,7 +17,7 @@
 							<p>
 								Your support helps us keep the app afloat and spend more time improving it. Thank
 								you!<br />
-								<router-link to="/pricing" class="learn-more">Learn more</router-link>
+								<router-link to="/pricing" class="learn-more">Checkout pricing</router-link>
 							</p>
 						</div>
 						<router-link to="/sign-up" class="btn btn-lg bg-accent">

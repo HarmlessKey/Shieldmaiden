@@ -2,9 +2,10 @@
 	<div class="top">
 		<div class="container">
 			<img
-				class="shieldmaiden"
+				class="hero-image"
 				src="../../assets/_img/shieldmaiden-cropped.webp"
-				alt="Shieldmaiden"
+				alt="Shieldmaiden Hero Image"
+				fetchpriority="high"
 			/>
 			<h1>Run D&D Combat with ease.</h1>
 			<h2>
@@ -97,7 +98,7 @@ export default {
 		max-width: 1280px;
 		padding: 22px 20px 50px 20px;
 
-		.shieldmaiden {
+		.hero-image {
 			transform: scaleX(-1);
 			object-fit: cover;
 			object-position: top 0 left -30px;
@@ -188,7 +189,7 @@ export default {
 			background-repeat: no-repeat;
 			background-position: top 50px right -120px;
 
-			.shieldmaiden {
+			.hero-image {
 				display: none;
 			}
 			.buttons {

@@ -1,7 +1,7 @@
 <template>
 	<div v-if="!user" class="home" ref="scrollArea">
 		<Header :scrolled="!!scrolled" />
-		<template v-if="diceColors.length > 0">
+		<div v-if="diceColors.length > 0" role="main">
 			<section class="home-section" id="top">
 				<Top :maintenance="maintenance" />
 				<span
@@ -76,7 +76,7 @@
 				<Pricing />
 			</section>
 			<Footer />
-		</template>
+		</div>
 	</div>
 	<div v-else class="user-content">
 		<Authenticated>

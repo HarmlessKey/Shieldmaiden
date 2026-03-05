@@ -14,6 +14,7 @@
 					href="https://discord.gg/dU59jgvcuq"
 					target="_blank"
 					rel="noopener"
+					aria-label="Join our Discord"
 				>
 					<i class="fab fa-discord" aria-hidden="true" />
 					<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
@@ -75,6 +76,7 @@ header {
 
 		.logo {
 			height: 36px;
+			aspect-ratio: 156 / 36;
 		}
 		.dot-app {
 			margin-left: 3px;

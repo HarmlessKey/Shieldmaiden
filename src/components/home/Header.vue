@@ -1,8 +1,14 @@
 <template>
-	<header :class="{ scrolled: scrolled }">
+	<header class="home-header" :class="{ scrolled: scrolled }">
 		<div class="container">
 			<div class="d-flex items-center">
-				<img class="logo" :src="require(`../../assets/_img/logo/${logo}`)" alt="Shieldmaiden" />
+				<img
+					class="logo"
+					height="56"
+					:src="require(`../../assets/_img/logo/${logo}`)"
+					alt="Shieldmaiden"
+					fetchpriority="high"
+				/>
 			</div>
 			<div class="d-flex justify-content-end items-center">
 				<router-link class="btn btn-sm btn-clear" to="/pricing">
@@ -57,8 +63,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-header {
+<style lang="scss">
+header.home-header {
 	width: 100%;
 	position: fixed;
 	top: 0;
@@ -101,7 +107,7 @@ header {
 }
 
 @media only screen and (min-width: $md-breakpoint) {
-	header {
+	header.home-header {
 		height: 145px;
 
 		.container {
@@ -122,7 +128,7 @@ header {
 }
 
 @media only screen and (min-width: $lg-breakpoint) {
-	header {
+	header.home-header {
 		height: 200px;
 
 		.container {

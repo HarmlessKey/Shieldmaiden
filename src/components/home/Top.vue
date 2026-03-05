@@ -1,12 +1,6 @@
 <template>
-	<div class="top">
+	<div class="home-top">
 		<div class="container">
-			<img
-				class="hero-image"
-				src="../../assets/_img/shieldmaiden.webp"
-				alt="Shieldmaiden Hero Image"
-				fetchpriority="high"
-			/>
 			<h1>Run D&D Combat with ease.</h1>
 			<h2>
 				Build encounters for your campaign, and keep track of everything you need during combat
@@ -29,6 +23,12 @@
 					</div>
 				</router-link>
 			</div>
+			<img
+				class="hero-image"
+				src="../../assets/_img/shieldmaiden.webp"
+				alt="Shieldmaiden Hero Image"
+				fetchpriority="high"
+			/>
 		</div>
 	</div>
 </template>
@@ -78,14 +78,16 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.top {
+<style lang="scss">
+.home-top {
 	background-color: $neutral-11;
 
 	.container {
 		max-width: 1280px;
 		padding: 22px 20px 50px 20px;
 		position: relative;
+		display: flex;
+		flex-direction: column;
 
 		.hero-image {
 			object-fit: cover;
@@ -93,6 +95,7 @@ export default {
 			aspect-ratio: 16 / 9;
 			width: 100%;
 			margin-bottom: 22px;
+			order: -1;
 		}
 		.laptop {
 			display: flex;
@@ -170,11 +173,12 @@ export default {
 }
 
 @media only screen and (min-width: $md-breakpoint) {
-	.top {
+	.home-top {
 		.container {
 			padding: 95px 20px 77px 20px;
 
 			.hero-image {
+				order: 1;
 				position: absolute;
 				top: 50px;
 				right: -120px;
@@ -208,7 +212,7 @@ export default {
 	}
 }
 @media only screen and (min-width: $lg-breakpoint) {
-	.top {
+	.home-top {
 		.container {
 			padding: 145px 30px 77px 30px;
 
@@ -238,7 +242,7 @@ export default {
 	}
 }
 @media only screen and (min-width: $xl-breakpoint) {
-	.top {
+	.home-top {
 		.container {
 			.hero-image {
 				top: 10px;
@@ -262,7 +266,7 @@ export default {
 }
 
 [data-theme="light"] {
-	.top {
+	.home-top {
 		background-color: $neutral-6;
 	}
 }

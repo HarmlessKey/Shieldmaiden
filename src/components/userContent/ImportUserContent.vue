@@ -596,6 +596,7 @@ export default {
 			 */
 
 			this.removeTimestamps(npc);
+			delete npc.groups;
 
 			this.versatileToOptions(npc);
 			this.renameNpcProps(npc);

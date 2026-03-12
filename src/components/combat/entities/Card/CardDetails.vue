@@ -142,7 +142,7 @@
 			/></template>
 			<template v-if="full_entity.challenge_rating">
 				<strong class="neutral-2">Challenge Rating</strong> {{ full_entity.challenge_rating }} ({{
-					monster_challenge_rating[full_entity.challenge_rating].xp | numeral("0,0")
+					formatNumber(monster_challenge_rating[full_entity.challenge_rating].xp, "0,0")
 				}}
 				XP)<br />
 			</template>
@@ -155,6 +155,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import { abilities, skills } from "src/utils/generalConstants";
 import { calc_mod, calc_skill_mod } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster.js";
@@ -222,6 +223,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		calc_mod,
 		displayStats,
 		savingThrow(ability) {

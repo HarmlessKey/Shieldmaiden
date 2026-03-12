@@ -24,7 +24,7 @@
 			</div>
 			<p>
 				<strong><em>Spellcasting</em></strong>
-				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral("Oo") }}-level
+				The {{ entity.name.capitalizeEach() }} is a {{ formatNumber(entity.caster_level, "Oo") }}-level
 				spellcaster. Its spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
 				save DC {{ entity.caster_save_dc }},
 				{{
@@ -42,7 +42,7 @@
 					<div :key="`spell-${level}`">
 						<template v-if="level === 0"> Cantrips (at will): </template>
 						<template v-else>
-							{{ level | numeral("Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
+							{{ formatNumber(level, "Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
 						</template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
@@ -117,6 +117,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import Spell from "src/components/compendium/Spell.vue";
 
 export default {
@@ -174,6 +175,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)
 				.filter(([key, item]) => {

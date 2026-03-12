@@ -271,10 +271,10 @@ export default {
 		},
 	},
 	mounted() {
-		EventBus.$on("applyManualValue", this.applyManual);
+		EventBus.on("applyManualValue", this.applyManual);
 	},
 	beforeDestroy() {
-		EventBus.$off("applyManualValue", this.applyManual);
+		EventBus.off("applyManualValue", this.applyManual);
 	},
 	directives: {
 		scrollWheel: {

@@ -105,12 +105,12 @@ export default {
 	methods: {
 		toggleShowActions() {
 			if (!this.targeted.length) return;
-			if (!this.showActions) EventBus.$emit("close-popups", { actor: this.type }); // Close other popups
+			if (!this.showActions) EventBus.emit("close-popups", { actor: this.type }); // Close other popups
 			this.showActions = !this.showActions;
 		},
 	},
 	mounted() {
-		EventBus.$on("close-popups", ({ actor }) => {
+		EventBus.on("close-popups", ({ actor }) => {
 			if (actor !== this.type) {
 				this.showActions = false;
 			}

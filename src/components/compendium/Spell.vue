@@ -67,7 +67,7 @@
 			</h3>
 			<i>
 				<template v-if="spell.level === 0">Cantrip </template>
-				<template v-else>{{ spell.level | numeral("0o") }}-level </template>
+				<template v-else>{{ formatNumber(spell.level, "0o") }}-level </template>
 				{{ spell.school.capitalize() }}
 			</i>
 		</div>
@@ -104,6 +104,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 
 export default {
 	name: "Spell",
@@ -188,6 +189,7 @@ export default {
 		}
 	},
 	methods: {
+		formatNumber,
 		...mapActions("api_spells", ["fetch_api_spell"]),
 		selectLevel(i) {
 			this.cast_level = i;

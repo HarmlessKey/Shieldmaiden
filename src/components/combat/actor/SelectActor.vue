@@ -134,12 +134,12 @@ export default {
 			this.show_menu = false;
 		},
 		toggleShowMenu() {
-			if (!this.show_menu) EventBus.$emit("close-popups", { actor: "select-actor" });
+			if (!this.show_menu) EventBus.emit("close-popups", { actor: "select-actor" });
 			this.show_menu = !this.show_menu;
 		},
 	},
 	mounted() {
-		EventBus.$on("close-popups", ({ actor }) => {
+		EventBus.on("close-popups", ({ actor }) => {
 			if (actor !== "select-actor") {
 				this.show_menu = false;
 			}

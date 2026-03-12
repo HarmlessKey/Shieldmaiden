@@ -43,11 +43,11 @@
 												'green' : type == 'healing'
 											}">
 												<template v-if="entity.meters[subtype] < 10000">{{ entity.meters[subtype] }}</template>
-												<template v-else>{{ entity.meters[subtype] | numeral('0.0a') }}</template>
+												<template v-else>{{ formatNumber(entity.meters[subtype], '0.0a') }}</template>
 											</span>
 											<template v-if="entity.meters[over]"> 
 												(<template v-if="entity.meters[over] < 10000">{{ entity.meters[over] }} </template>
-												<template v-else>{{ entity.meters[over] | numeral('0.0a') }} </template> 
+												<template v-else>{{ formatNumber(entity.meters[over], '0.0a') }} </template> 
 												<small>over</small>)</template>
 										</span>
 									</div>
@@ -62,6 +62,7 @@
 </template>
 
 <script>
+	import { formatNumber } from "src/utils/formatNumber";
 	import _ from 'lodash';
 	import { trackEncounter } from 'src/mixins/trackEncounter.js';
 	import Name from './live/Name';
@@ -158,6 +159,7 @@
 			},
 		},
 		methods: {
+		formatNumber,
 			percentageMeters(input, type, subtype) {
 				//Highest = 100%
 				//lower is percentage of highest

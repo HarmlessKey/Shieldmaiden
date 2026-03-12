@@ -69,7 +69,7 @@
 							{{ tab === "caster" ? "Cantrips" : "At will" }}
 						</div>
 						<div v-else-if="tab === 'caster'" class="spell-level">
-							{{ level | numeral("Oo") }} level
+							{{ formatNumber(level, "Oo") }} level
 							<div class="slots">
 								<span
 									v-for="i in entity[`${tab}_spell_slots`][level]"
@@ -212,6 +212,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import { dice } from "src/mixins/dice.js";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_types } from "src/utils/generalConstants";
@@ -297,6 +298,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		...mapActions(["set_limitedUses"]),
 		...mapActions("api_spells", ["fetch_api_spell"]),
 		...mapActions("spells", ["get_spell"]),

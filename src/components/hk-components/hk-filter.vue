@@ -83,7 +83,7 @@
 <script>
 import { monsterMixin } from "src/mixins/monster.js";
 import { spell_schools } from "src/utils/spellConstants";
-import numeral from "numeral";
+import { formatNumber } from "src/utils/formatNumber";
 
 export default {
 	name: "hk-filter",
@@ -117,10 +117,10 @@ export default {
 			}
 		},
 		minLevelMarker() {
-			return this.levels?.min ? numeral(this.levels.min).format("0o") : "Cantrip";
+			return this.levels?.min ? formatNumber(this.levels.min, "0o") : "Cantrip";
 		},
 		maxLevelMarker() {
-			return this.levels?.max ? numeral(this.levels.max).format("0o") : "Cantrip";
+			return this.levels?.max ? formatNumber(this.levels.max, "0o") : "Cantrip";
 		},
 	},
 	watch: {

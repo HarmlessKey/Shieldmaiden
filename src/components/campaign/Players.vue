@@ -17,7 +17,7 @@
 				<template v-if="currency">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
-							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral("0.0a") }} </template>
+							<template v-if="key === 'pp' && coin >= 1000">{{ formatNumber(coin, "0.0a") }} </template>
 							<template v-else>{{ coin }} </template>
 							<img
 								:src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)"
@@ -461,6 +461,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
 import { extensionInstalled, comparePlayerToCharacter } from "src/utils/generalFunctions";
@@ -642,6 +643,7 @@ export default {
 		this.extensionInstalled = await extensionInstalled();
 	},
 	methods: {
+		formatNumber,
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
 		...mapActions("players", ["set_player_prop", "sync_player"]),

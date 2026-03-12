@@ -183,7 +183,7 @@
 				</div>
 				<div v-if="monster.challenge_rating">
 					<strong>Challenge Rating</strong> {{ monster.challenge_rating }} ({{
-						monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0")
+						formatNumber(monster_challenge_rating[monster.challenge_rating].xp, "0,0")
 					}}
 					XP; <template v-if="monster.challenge_rating">PB +{{ monster.proficiency }}</template
 					>)
@@ -237,7 +237,7 @@
 				<p>
 					<strong><em> Spellcasting </em></strong>
 					The {{ monster.name.capitalizeEach() }} is a
-					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. its spellcasting ability is
+					{{ formatNumber(monster.caster_level, "Oo") }}-level spellcaster. its spellcasting ability is
 					{{ monster.caster_ability.capitalize() }} (spell save DC {{ monster.caster_save_dc }},
 					{{
 						monster.caster_spell_attack > 0
@@ -252,7 +252,7 @@
 						<div :key="`spell-${level}`">
 							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
-								<strong>{{ level | numeral("Oo") }} level</strong> ({{
+								<strong>{{ formatNumber(level, "Oo") }} level</strong> ({{
 									monster.caster_spell_slots[level]
 								}}
 								slots):
@@ -395,6 +395,7 @@
 
 <script>
 import { general } from "src/mixins/general.js";
+import { formatNumber } from "src/utils/formatNumber";
 import { dice } from "src/mixins/dice.js";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions, mapGetters } from "vuex";
@@ -511,6 +512,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		...mapActions("api_monsters", ["fetch_monster"]),
 		passivePerception() {
 			return 10 + parseInt(this.skillModifier("wisdom", "perception"));

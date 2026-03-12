@@ -63,10 +63,10 @@ export default {
 	},
 	mounted() {
 		// Listen for other popovers opening
-		EventBus.$on("popover-opened", this.handleOtherPopoverOpened);
+		EventBus.on("popover-opened", this.handleOtherPopoverOpened);
 	},
 	beforeDestroy() {
-		EventBus.$off("popover-opened", this.handleOtherPopoverOpened);
+		EventBus.off("popover-opened", this.handleOtherPopoverOpened);
 	},
 	methods: {
 		handleOtherPopoverOpened(id) {
@@ -83,7 +83,7 @@ export default {
 			if (this.itemHover || this.cardHover) {
 				this.menu = true;
 				// Notify other popovers
-				EventBus.$emit("popover-opened", this.componentId);
+				EventBus.emit("popover-opened", this.componentId);
 			} else {
 				this.menu = false;
 			}

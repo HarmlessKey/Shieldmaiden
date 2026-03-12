@@ -56,7 +56,7 @@
 
 							<!-- LIFETIME SUPPORT -->
 							<span slot="lifetime_support" slot-scope="data">
-									{{ data.item / 100 | numeral('$0,0') }}
+									{{ formatNumber(data.item / 100, '$0,0') }}
 							</span>
 
 							<!-- LOADER -->
@@ -81,6 +81,7 @@
 </template>
 
 <script>
+	import { formatNumber } from "src/utils/formatNumber";
 	import { db } from 'src/firebase';
 	import Patron from 'src/components/Admin/Patrons/Patron.vue';
 	import Notifications from 'src/components/Admin/Patrons/Notifications.vue';
@@ -127,6 +128,9 @@
 				},
 				isBusy: true,
 			}
+		},
+		methods: {
+			formatNumber,
 		},
 		firebase() {
 			return {

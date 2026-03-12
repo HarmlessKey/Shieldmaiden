@@ -16,8 +16,7 @@
 								<li>
 									<span>Entitled Amount:</span>
 									<span>{{
-										(notification.attributes.currently_entitled_amount_cents / 100)
-											| numeral("$0,0")
+										formatNumber(notification.attributes.currently_entitled_amount_cents / 100, "$0,0")
 									}}</span>
 								</li>
 								<li>
@@ -40,7 +39,7 @@
 								<li>
 									<span>Lifetime support:</span>
 									<span>{{
-										(notification.attributes.lifetime_support_cents / 100) | numeral("$0,0")
+										formatNumber(notification.attributes.lifetime_support_cents / 100, "$0,0")
 									}}</span>
 								</li>
 								<li>
@@ -59,7 +58,7 @@
 								<li>
 									<span>Will pay:</span>
 									<span>{{
-										(notification.attributes.will_pay_amount_cents / 100) | numeral("$0,0")
+										formatNumber(notification.attributes.will_pay_amount_cents / 100, "$0,0")
 									}}</span>
 								</li>
 								<li>
@@ -112,10 +111,10 @@
 						>
 							Upgrade:
 							<b>{{
-								(notification.attributes.currently_entitled_amount_cents / 100) | numeral("$0,0")
+								formatNumber(notification.attributes.currently_entitled_amount_cents / 100, "$0,0")
 							}}</b>
 							->
-							<b>{{ (notification.attributes.will_pay_amount_cents / 100) | numeral("$0,0") }}</b>
+							<b>{{ formatNumber(notification.attributes.will_pay_amount_cents / 100, "$0,0") }}</b>
 						</div>
 						<div
 							v-if="
@@ -128,10 +127,10 @@
 						>
 							Downgrade:
 							<b>{{
-								(notification.attributes.currently_entitled_amount_cents / 100) | numeral("$0,0")
+								formatNumber(notification.attributes.currently_entitled_amount_cents / 100, "$0,0")
 							}}</b>
 							->
-							<b>{{ (notification.attributes.will_pay_amount_cents / 100) | numeral("$0,0") }}</b>
+							<b>{{ formatNumber(notification.attributes.will_pay_amount_cents / 100, "$0,0") }}</b>
 						</div>
 					</div>
 				</li>
@@ -142,6 +141,7 @@
 
 <script>
 import { db } from "src/firebase";
+import { formatNumber } from "src/utils/formatNumber";
 import _ from "lodash";
 import { general } from "src/mixins/general.js";
 
@@ -182,6 +182,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		setShow(key) {
 			this.show = this.show === key ? undefined : key;
 		},

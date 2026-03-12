@@ -18,7 +18,7 @@
 						v-else-if="type === 'caster'"
 						class="d-flex justify-content-between items-center full-width"
 					>
-						<strong>{{ level | numeral("Oo") }} level</strong>
+						<strong>{{ formatNumber(level, "Oo") }} level</strong>
 						<div class="slots">
 							<span
 								v-for="i in actor[`${type}_spell_slots`][level]"
@@ -151,6 +151,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import { setHP } from "src/mixins/HpManipulations.js";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Spell from "src/components/compendium/Spell";
@@ -195,6 +196,7 @@ export default {
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 	},
 	methods: {
+		formatNumber,
 		...mapActions(["set_limitedUses"]),
 		...mapActions("tutorial", ["completeStep"]),
 		...mapActions("api_spells", ["fetch_api_spell"]),

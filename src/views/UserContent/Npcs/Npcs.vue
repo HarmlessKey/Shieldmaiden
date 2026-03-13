@@ -2,7 +2,7 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="npcs">
-				<template #actions-left>
+				<template v-if="card_width >= 600" #actions-left>
 					<button class="btn btn-sm bg-neutral-5 mr-2" @click="group_dialog = true">
 						Groups
 					</button>
@@ -20,16 +20,71 @@
 					>
 						Generate
 					</button>
+					<button
+						v-if="tier.price !== 'Free'"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						@click="import_dialog = true"
+					>
+						Import
+					</button>
 				</template>
-				<button
-					v-if="tier.price !== 'Free'"
-					slot="actions-right"
-					class="btn btn-sm bg-neutral-5 mr-2"
-					@click="import_dialog = true"
-				>
-					Import
-				</button>
+				<template v-else #actions-after>
+					<button class="btn btn-sm bg-neutral-5 ml-2">
+						<i aria-hidden="true" class="fas fa-ellipsis-v" />
+						<q-popup-proxy
+							:dark="$store.getters.theme !== 'light'"
+							anchor="bottom right"
+							self="top right"
+						>
+							<div class="bg-neutral-8">
+								<q-list>
+									<q-item clickable v-close-popup @click="group_dialog = true">
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-layer-group" />
+										</q-item-section>
+										<q-item-section>Groups</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup @click="$refs.exporter.downloadContent()">
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-file-export" />
+										</q-item-section>
+										<q-item-section>Export</q-item-section>
+									</q-item>
+									<q-item
+										v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
+										clickable
+										v-close-popup
+										@click="generate_dialog = true"
+									>
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-magic" />
+										</q-item-section>
+										<q-item-section>Generate</q-item-section>
+									</q-item>
+									<q-item
+										v-if="tier.price !== 'Free'"
+										clickable
+										v-close-popup
+										@click="import_dialog = true"
+									>
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-file-import" />
+										</q-item-section>
+										<q-item-section>Import</q-item-section>
+									</q-item>
+								</q-list>
+							</div>
+						</q-popup-proxy>
+					</button>
+				</template>
 			</ContentHeader>
+
+			<ExportUserContent
+				ref="exporter"
+				style="display:none"
+				content-type="npc"
+				:content-id="npcIds"
+			/>
 
 			<div class="card-body" v-if="!loading_npcs">
 				<p class="neutral-2">These are your custom Non-Player Characters and monsters.</p>

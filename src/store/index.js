@@ -11,6 +11,7 @@ import api_items from "./modules/content/items.js";
 import api_conditions from "./modules/content/conditions.js";
 import campaigns from "./modules/userContent/campaigns.js";
 import npcs from "./modules/userContent/npcs.js";
+import npcGroups from "./modules/userContent/npcGroups.js";
 import items from "./modules/userContent/items.js";
 import spells from "./modules/userContent/spells.js";
 import reminders from "./modules/userContent/reminders.js";
@@ -44,6 +45,7 @@ export default function () {
 			api_items: api_items,
 			api_conditions: api_conditions,
 			npcs: npcs,
+			npcGroups: npcGroups,
 			items: items,
 			spells: spells,
 			reminders: reminders,

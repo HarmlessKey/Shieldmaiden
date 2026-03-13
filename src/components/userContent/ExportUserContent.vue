@@ -241,6 +241,7 @@ export default {
 
 		addNpcToExport(npc_id, npc) {
 			delete npc.player_id;
+			delete npc.groups;
 			npc.harmless_key = npc_id;
 
 			this.exportData.npcs[npc_id] = npc;

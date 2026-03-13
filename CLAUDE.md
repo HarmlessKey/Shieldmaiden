@@ -50,6 +50,13 @@ src/
 - Extension communication uses `window.postMessage` bridge (not `chrome.runtime` directly)
 - Utility functions go in `src/utils/generalFunctions.js`
 
+## Planning Artifacts
+Feature specs live in `.planning/`. 
+- Always check `.planning/` for an existing spec before investigating or implementing anything
+- When writing a spec, always write it to `.planning/<feature-name>.md`
+- Never begin implementation without a spec file present in `.planning/`
+
+
 ## Git Workflow
 
 We use **Git Flow**. Follow these rules strictly:

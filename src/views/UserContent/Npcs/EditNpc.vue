@@ -74,6 +74,15 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
+							<q-btn
+								v-if="npcId"
+								class="mr-2"
+								color="neutral-5"
+								no-caps
+								@click="viewNpc"
+							>
+								View
+							</q-btn>
 							<router-link
 								:to="user ? `/content/npcs` : `/tools/monster-creator`"
 								class="btn bg-neutral-5 mr-2"
@@ -88,16 +97,6 @@
 								@click="account_dialog = true"
 							>
 								Save
-							</q-btn>
-							<q-btn
-								v-if="npcId"
-								class="ml-2"
-								color="neutral-5"
-								no-caps
-								@click="viewNpc"
-							>
-								<i aria-hidden="true" class="fas fa-eye mr-2"></i>
-								View
 							</q-btn>
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">

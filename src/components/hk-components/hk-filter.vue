@@ -1,5 +1,37 @@
 <template>
 	<div class="hk-filter">
+		<template v-if="type === 'npc'">
+			<hk-select
+				v-if="groupOptions.length"
+				class="mb-3"
+				label="Group"
+				v-model="filter.groups"
+				use-chips
+				multiple
+				clearable
+				emit-value
+				map-options
+				:options="groupOptions"
+			/>
+			<hk-select
+				class="mb-3"
+				label="Type"
+				v-model="filter.types"
+				use-chips
+				multiple
+				clearable
+				:options="monster_types"
+			/>
+			<strong class="block mb-5">Challenge rating</strong>
+			<q-range
+				v-model="cr"
+				label-always
+				:min="0"
+				:max="30"
+				class="px-2"
+				@input="setCR"
+			/>
+		</template>
 		<template v-if="type === 'monster'">
 			<hk-select
 				class="mb-3"
@@ -95,7 +127,11 @@ export default {
 		},
 		type: {
 			type: String,
-			default: "monster"
+			default: "monster",
+		},
+		groupOptions: {
+			type: Array,
+			default: () => [],
 		},
 	},
 	data() {

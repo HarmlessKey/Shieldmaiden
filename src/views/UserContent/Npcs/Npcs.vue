@@ -34,7 +34,7 @@
 			<div class="card-body" v-if="!loading_npcs">
 				<p class="neutral-2">These are your custom Non-Player Characters and monsters.</p>
 				<template v-if="npcs.length">
-					<div class="row q-col-gutter-sm mb-1">
+					<div class="row q-col-gutter-sm mb-1" :class="{ 'column': card_width < 600 }">
 						<div class="col">
 							<q-input
 								:dark="$store.getters.theme !== 'light'"
@@ -308,7 +308,7 @@ export default {
 		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
 		visibleColumns() {
 			if (this.card_width > 800) {
-				return ["avatar", "name", "groups", "type", "challenge_rating", "actions"];
+				return ["avatar", "name", "type", "challenge_rating", "actions"];
 			}
 			if (this.card_width > 600) {
 				return ["avatar", "name", "type", "challenge_rating", "actions"];

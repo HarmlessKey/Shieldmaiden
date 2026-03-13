@@ -499,7 +499,6 @@ export default {
 			is_large: false,
 			viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			loading: false,
-			isXpAdvancement: false,
 			rest_dialog: false,
 			resets: [
 				{
@@ -542,6 +541,9 @@ export default {
 	computed: {
 		...mapGetters(["overencumbered"]),
 		...mapGetters(["userSettings", "tier", "extensionInstalled"]),
+		isXpAdvancement() {
+			return this.campaign && this.campaign.advancement !== "milestone";
+		},
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
@@ -571,32 +573,16 @@ export default {
 		templateColumns() {
 			let templateColumns = "max-content max-content auto ";
 
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_perception === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_perception === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_investigation === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_investigation === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_insight === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_insight === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.save_dc === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.save_dc === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
 			if (this.viewerIsUser) {
@@ -609,16 +595,16 @@ export default {
 		calcColspan() {
 			let colspan = this.viewerIsUser ? 4 : 3;
 
-			if (this.settings.passive_perception === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_perception === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.passive_investigation === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_investigation === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.passive_insight === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_insight === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.save_dc === undefined && !this.is_medium) {
+			if (this.userSettings.general?.save_dc === undefined && !this.is_medium) {
 				colspan++;
 			}
 

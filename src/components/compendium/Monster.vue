@@ -306,9 +306,97 @@
 				</p>
 			</template>
 
-			<div class="monster-card__traits">
+						<div class="monster-card__traits">
 				<div v-for="{ category, name } in actions" :key="category">
-					<template v-if="monster[category] && monster[category].length > 0">
+					<template v-if="category === 'actions'">
+						<!-- Regular actions -->
+						<template v-if="regularActions.length > 0">
+							<h2>Actions</h2>
+							<template v-for="(ability, index) in regularActions">
+								<hk-dice-text
+									v-if="ability.desc"
+									:key="`action-${index}`"
+									class="monster-card__traits-description"
+									:input_text="ability.desc"
+									><template
+										v-if="
+											ability.action_list &&
+											ability.action_list[0] &&
+											ability.action_list[0].type !== 'other' &&
+											ability.action_list[0].rolls &&
+											ability.action_list[0].rolls.length
+										"
+										><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"
+											><span class="roll-button" /></hk-roll-action></template
+									><span class="monster-card__traits-description__title"
+										>{{ ability.name
+										}}{{
+											ability.recharge
+												? ` (Recharge ${
+														ability.recharge === "rest"
+															? "after a Short or Long Rest"
+															: ability.recharge
+													})`
+												: ``
+										}}{{
+											ability.limit
+												? ` (${ability.limit}/${
+														ability.limit_type ? ability.limit_type.capitalize() : `Day`
+													})`
+												: ``
+										}}{{
+											ability.legendary_cost > 1 ? ` (Costs ${ability.legendary_cost} Actions)` : ``
+										}}.
+									</span></hk-dice-text
+								>
+							</template>
+						</template>
+
+						<!-- Bonus actions -->
+						<template v-if="bonusActions.length > 0">
+							<h2>Bonus Actions</h2>
+							<template v-for="(ability, index) in bonusActions">
+								<hk-dice-text
+									v-if="ability.desc"
+									:key="`bonus-${index}`"
+									class="monster-card__traits-description"
+									:input_text="ability.desc"
+									><template
+										v-if="
+											ability.action_list &&
+											ability.action_list[0] &&
+											ability.action_list[0].type !== 'other' &&
+											ability.action_list[0].rolls &&
+											ability.action_list[0].rolls.length
+										"
+										><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"
+											><span class="roll-button" /></hk-roll-action></template
+									><span class="monster-card__traits-description__title"
+										>{{ ability.name
+										}}{{
+											ability.recharge
+												? ` (Recharge ${
+														ability.recharge === "rest"
+															? "after a Short or Long Rest"
+															: ability.recharge
+													})`
+												: ``
+										}}{{
+											ability.limit
+												? ` (${ability.limit}/${
+														ability.limit_type ? ability.limit_type.capitalize() : `Day`
+													})`
+												: ``
+										}}{{
+											ability.legendary_cost > 1 ? ` (Costs ${ability.legendary_cost} Actions)` : ``
+										}}.
+									</span></hk-dice-text
+								>
+							</template>
+						</template>
+					</template>
+
+					<template v-else-if="monster[category] && monster[category].length > 0">
 						<h2>{{ name }}</h2>
 						<p
 							v-if="monster.legendary_count && category === 'legendary_actions'"
@@ -486,6 +574,14 @@ export default {
 		...mapGetters(["encounterId", "broadcast"]),
 		shares() {
 			return this.broadcast.shares || [];
+		},
+		regularActions() {
+			return (this.monster.actions || []).filter(
+				(a) => !a.timing || a.timing === "action"
+			);
+		},
+		bonusActions() {
+			return (this.monster.actions || []).filter((a) => a.timing === "bonus_action");
 		},
 		caster_spell_levels() {
 			if (this.monster.caster_spells) {

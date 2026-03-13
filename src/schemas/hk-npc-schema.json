@@ -534,7 +534,12 @@
 					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
 					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
 					"options": { "$ref": "#/$defs/action-options" },
-					"action_list": { "$ref": "#/$defs/action-list" }
+					"action_list": { "$ref": "#/$defs/action-list" },
+					"timing": {
+						"title": "Action timing",
+						"type": "string",
+						"enum": ["action", "bonus_action"]
+					}
 				},
 				"required": ["name"]
 			}

@@ -11,11 +11,11 @@
 						<div class="bg-neutral-9">
 							<q-list>
 								<q-item
-									v-for="{ category, name_single } in actions"
-									:key="`add-${category}`"
+									v-for="{ category, name_single, timing } in actions"
+									:key="`add-${category}-${timing || 'default'}`"
 									clickable
 									v-close-popup
-									@click="add(category)"
+									@click="add(category, timing)"
 								>
 									<q-item-section avatar>
 										<i aria-hidden="true" class="fas fa-plus"></i>
@@ -29,11 +29,11 @@
 			</div>
 
 			<div class="card-body -mt-3">
-				<template v-for="{ name, category, name_single } in actions">
-					<div v-if="npc[category] && npc[category].length > 0" :key="category">
+				<template v-for="{ name, category, name_single, timing } in actions">
+					<div v-if="sectionItems(category, timing).length > 0" :key="`${category}-${timing || 'default'}`">
 						<h3 class="d-flex justify-content-between mt-3">
 							{{ name }}
-							<a class="btn btn-sm btn-clear" @click="add(category)">
+							<a class="btn btn-sm btn-clear" @click="add(category, timing)">
 								<i aria-hidden="true" class="fas fa-plus green"></i>
 								<span class="d-none d-md-inline ml-1">Add {{ name_single }}</span>
 							</a>
@@ -62,13 +62,15 @@
 						<!-- ABILITIES -->
 						<draggable
 							tag="div"
-							v-model="npc[category]"
+							:list="sectionItems(category, timing)"
 							:animation="200"
 							class="accordion"
 							handle=".drag-handle"
 							ghost-class="drag-ghost"
 							drag-class="drag-dragging"
 							:force-fallback="true"
+							:group="{ name: `${category}-${timing || 'default'}`, pull: false, put: false }"
+							@change="category === 'actions' ? onDraggableChange($event, category, timing) : null"
 						>
 							<transition-group
 								type="transition"
@@ -77,8 +79,8 @@
 								leave-active-class="animated animate__fadeOut"
 							>
 								<div
-									v-for="(ability, ability_index) in npc[category]"
-									:key="`ability-${ability_index}`"
+									v-for="(ability, filtered_index) in sectionItems(category, timing)"
+									:key="`${category}-${timing || 'default'}-${getActionIndex(ability, category) >= 0 ? getActionIndex(ability, category) : filtered_index}`"
 								>
 									<ValidationObserver v-slot="{ valid }">
 										<q-expansion-item
@@ -137,7 +139,7 @@
 													</hk-roll-action>
 												</q-item-section>
 												<q-item-section avatar>
-													<a @click.stop="remove(ability_index, category)" class="remove">
+													<a @click.stop="remove(getActionIndex(ability, category), category)" class="remove">
 														<i aria-hidden="true" class="fas fa-trash-alt red" />
 														<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
 													</a>
@@ -187,6 +189,23 @@
 														:error-message="errors[0]"
 													/>
 												</ValidationProvider>
+
+												<q-select
+													v-if="category === 'actions'"
+													:dark="$store.getters.theme === 'dark'"
+													filled
+													square
+													class="mb-3"
+													:value="ability.timing || 'action'"
+													:options="[
+														{ label: 'Action', value: 'action' },
+														{ label: 'Bonus Action', value: 'bonus_action' },
+													]"
+													label="Timing"
+													emit-value
+													map-options
+													@input="val => { $set(ability, 'timing', val); $forceUpdate(); }"
+												/>
 
 												<div
 													class="row q-col-gutter-md mb-2"
@@ -369,7 +388,7 @@
 														"
 														class="mb-4"
 														@new-value="addOption"
-														@remove="removeOption($event, category, ability_index)"
+														@remove="removeOption($event, category, getActionIndex(ability, category))"
 														@input="$forceUpdate()"
 													>
 														<hk-popover slot="append" header="Action options">
@@ -488,7 +507,7 @@
 																		class="btn btn-sm bg-neutral-5"
 																		@click="
 																			newRoll(
-																				ability_index,
+																				getActionIndex(ability, category),
 																				ability,
 																				category,
 																				action_index,
@@ -514,7 +533,7 @@
 																	@edit="
 																		editRoll(
 																			$event,
-																			ability_index,
+																			getActionIndex(ability, category),
 																			ability,
 																			category,
 																			action_index,
@@ -522,7 +541,7 @@
 																		)
 																	"
 																	@delete="
-																		deleteRoll($event, ability_index, category, action_index)
+																		deleteRoll($event, getActionIndex(ability, category), category, action_index)
 																	"
 																/>
 															</div>
@@ -609,6 +628,12 @@ export default {
 				},
 				{ category: "actions", name: "Actions", name_single: "Action" },
 				{
+					category: "actions",
+					name: "Bonus Actions",
+					name_single: "Bonus action",
+					timing: "bonus_action",
+				},
+				{
 					category: "legendary_actions",
 					name: "Legendary Actions",
 					name_single: "Legendary action",
@@ -636,6 +661,14 @@ export default {
 				this.$emit("input", newValue);
 			},
 		},
+		regularActions() {
+			return (this.npc.actions || []).filter(
+				(a) => !a.timing || a.timing === "action"
+			);
+		},
+		bonusActions() {
+			return (this.npc.actions || []).filter((a) => a.timing === "bonus_action");
+		},
 	},
 	methods: {
 		...mapActions(["setActionRoll"]),
@@ -647,13 +680,45 @@ export default {
 			}
 		},
 		/**
+		 * Returns the items for a given section, filtered by timing for the actions category.
+		 */
+		sectionItems(category, timing) {
+			if (category !== "actions") return this.npc[category] || [];
+			return timing ? this.bonusActions : this.regularActions;
+		},
+		/**
+		 * Maps a filtered-loop item back to its real index in npc[category].
+		 */
+		getActionIndex(action, category) {
+			return (this.npc[category] || []).indexOf(action);
+		},
+		/**
+		 * Handles drag reorder for filtered action sections (regular or bonus).
+		 */
+		onDraggableChange(event, category, timing) {
+			if (!event.moved) return;
+			const { oldIndex, newIndex } = event.moved;
+			const slots = (this.npc[category] || [])
+				.map((a, i) => i)
+				.filter((i) =>
+					timing
+						? this.npc[category][i].timing === timing
+						: !this.npc[category][i].timing || this.npc[category][i].timing === "action"
+				);
+			const arr = [...this.npc[category]];
+			const [item] = arr.splice(slots[oldIndex], 1);
+			arr.splice(slots[newIndex], 0, item);
+			this.npc[category] = arr;
+		},
+		/**
 		 * Add a new action
 		 *
-		 * @param {string} category actions / lengedary_actions / special_abilities
+		 * @param {string} category actions / legendary_actions / special_abilities
+		 * @param {string} timing optional timing value for bonus actions
 		 */
-		add(category) {
+		add(category, timing = null) {
 			let type;
-			if (category === "actions") {
+			if (category === "actions" && !timing) {
 				type = "melee_weapon";
 			} else if (category === "legendary_actions") {
 				type = "save";
@@ -669,6 +734,10 @@ export default {
 					},
 				],
 			};
+
+			if (timing) {
+				action.timing = timing;
+			}
 
 			if (this.npc[category] === undefined) {
 				this.npc[category] = [];

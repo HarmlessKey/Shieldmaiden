@@ -4,11 +4,12 @@
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
-						<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
-							<i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
-							Create Account
-						</q-btn>
-						<div v-else />
+						<div>
+							<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
+								<i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
+								Create Account
+							</q-btn>
+						</div>
 						<div>
 							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
@@ -35,21 +36,22 @@
 								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
 								Copy
 							</q-btn>
-							<q-btn
-								v-if="npcId"
-								class="mx-1"
-								color="neutral-5"
-								no-caps
-								@click="viewNpc"
-							>
-								<i aria-hidden="true" class="fas fa-eye mr-2"></i>
-								View
-							</q-btn>
 						</div>
 					</div>
 
 					<div class="form">
-						<BasicInfo v-model="npc" />
+						<BasicInfo v-model="npc">
+							<template v-if="npcId" #header-right>
+								<q-btn
+									color="neutral-5"
+									no-caps
+									@click="viewNpc"
+								>
+									<i aria-hidden="true" class="fas fa-eye mr-2"></i>
+									View
+								</q-btn>
+							</template>
+						</BasicInfo>
 
 						<Senses v-model="npc" />
 
@@ -86,6 +88,16 @@
 								@click="account_dialog = true"
 							>
 								Save
+							</q-btn>
+							<q-btn
+								v-if="npcId"
+								class="ml-2"
+								color="neutral-5"
+								no-caps
+								@click="viewNpc"
+							>
+								<i aria-hidden="true" class="fas fa-eye mr-2"></i>
+								View
 							</q-btn>
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">

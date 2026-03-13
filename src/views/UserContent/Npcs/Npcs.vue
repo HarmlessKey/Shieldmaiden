@@ -82,26 +82,53 @@
 											{{ col.value }}
 										</template>
 									</template>
-									<div v-else class="text-right d-flex justify-content-between">
-										<router-link
-											class="btn btn-sm bg-neutral-5"
-											:to="`${$route.path}/${props.key}`"
-										>
-											<i aria-hidden="true" class="fas fa-pencil" />
-											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-										</router-link>
-										<ExportUserContent
-											class="btn-sm bg-neutral-5 mx-2"
-											content-type="npc"
-											:content-id="props.key"
-										/>
-										<a
-											class="btn btn-sm bg-neutral-5"
-											@click="confirmDelete($event, props.key, props.row)"
-										>
-											<i aria-hidden="true" class="fas fa-trash-alt" />
-											<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
-										</a>
+									<div v-else class="text-right">
+										<button class="btn btn-sm bg-neutral-5">
+											<i aria-hidden="true" class="fas fa-ellipsis-h" />
+											<q-popup-proxy
+												:dark="$store.getters.theme === 'dark'"
+												:breakpoint="576"
+											>
+												<q-list
+													:dark="$store.getters.theme === 'dark'"
+													class="bg-neutral-8"
+												>
+													<q-item clickable v-close-popup @click="viewNpc(props.key)">
+														<q-item-section avatar>
+															<i aria-hidden="true" class="fas fa-eye" />
+														</q-item-section>
+														<q-item-section>View</q-item-section>
+													</q-item>
+													<q-item
+														clickable
+														v-close-popup
+														:to="`${$route.path}/${props.key}`"
+													>
+														<q-item-section avatar>
+															<i aria-hidden="true" class="fas fa-pencil" />
+														</q-item-section>
+														<q-item-section>Edit</q-item-section>
+													</q-item>
+													<q-item clickable v-close-popup>
+														<ExportUserContent
+															content-type="npc"
+															:content-id="props.key"
+															class="export-menu-item"
+														/>
+													</q-item>
+													<q-item
+														clickable
+														v-close-popup
+														@click="confirmDelete($event, props.key, props.row)"
+													>
+														<q-item-section avatar>
+															<i aria-hidden="true" class="fas fa-trash-alt red" />
+														</q-item-section>
+														<q-item-section>Delete</q-item-section>
+													</q-item>
+												</q-list>
+											</q-popup-proxy>
+										</button>
 									</div>
 								</q-td>
 							</q-tr>
@@ -308,6 +335,16 @@ export default {
 				});
 			}
 		},
+		async viewNpc(key) {
+			try {
+				const npc = await this.get_npc({ uid: this.userId, id: key });
+				if (npc) {
+					this.setDrawer({ show: true, type: "drawers/ViewNpc", data: npc });
+				}
+			} catch (e) {
+				console.error("Failed to load NPC", e);
+			}
+		},
 		deleteNpc(key) {
 			this.delete_npc(key);
 		},
@@ -326,5 +363,12 @@ export default {
 	max-width: 95vw;
 	width: 576px;
 	margin-top: 100px;
+}
+.export-menu-item {
+	width: 100%;
+	text-align: left;
+	background: none;
+	border: none;
+	padding: 0;
 }
 </style>

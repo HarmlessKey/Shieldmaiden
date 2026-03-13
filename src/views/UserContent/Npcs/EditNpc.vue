@@ -35,6 +35,16 @@
 								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
 								Copy
 							</q-btn>
+							<q-btn
+								v-if="npcId"
+								class="mx-1"
+								color="neutral-5"
+								no-caps
+								@click="viewNpc"
+							>
+								<i aria-hidden="true" class="fas fa-eye mr-2"></i>
+								View
+							</q-btn>
 						</div>
 					</div>
 
@@ -277,6 +287,9 @@ export default {
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 		isOwner() {
 			return this.$route.name !== "Edit Companion";
+		},
+		viewNpc() {
+			this.setDrawer({ show: true, type: "drawers/ViewNpc", data: this.npc });
 		},
 		download() {
 			downloadJSON(this.npc);

@@ -658,8 +658,10 @@ export default {
 		download(type) {
 			downloadMonsterFile(this.$refs.card, type, {
 				layout: this.layout,
-				filename: `${this.monster.url} (Shieldmaiden)`,
-				footerText: `https://shieldmaiden.app/homebrew/${this.monster.url}`,
+				filename: `${this.monster.url || this.monster.name} (Shieldmaiden)`,
+				footerText: this.monster.url
+					? `https://shieldmaiden.app/homebrew/${this.monster.url}`
+					: `https://shieldmaiden.app`,
 			});
 		},
 	},

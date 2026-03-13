@@ -83,6 +83,10 @@
 										</template>
 									</template>
 									<div v-else class="text-right d-flex justify-content-between">
+										<button class="btn btn-sm bg-neutral-5" @click="viewNpc(props.key)">
+											<i aria-hidden="true" class="fas fa-eye" />
+											<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
+										</button>
 										<router-link
 											class="btn btn-sm bg-neutral-5"
 											:to="`${$route.path}/${props.key}`"
@@ -306,6 +310,16 @@ export default {
 						},
 					],
 				});
+			}
+		},
+		async viewNpc(key) {
+			try {
+				const npc = await this.get_npc({ uid: this.userId, id: key });
+				if (npc) {
+					this.setDrawer({ show: true, type: "drawers/ViewNpc", data: npc });
+				}
+			} catch (e) {
+				console.error("Failed to load NPC", e);
 			}
 		},
 		deleteNpc(key) {

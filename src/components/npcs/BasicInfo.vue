@@ -1,25 +1,23 @@
 <template>
-  <div>
-    <hk-card>
-      <div class="card-header p-0" slot="header">
-        <div class="d-flex justify-content-start items-center">
-          <div
-            class="img"
-            @click="avatar_dialog = true"
-            :style="{
-              backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
-            }"
-          >
-            <i
-              aria-hidden="true"
-              v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload"
-              class="hki-monster"
-            />
-          </div>
-          Basic info
-        </div>
-      </div>
-      <div class="card-body">
+	<div>
+		<hk-card>
+			<div class="card-header p-0" slot="header">
+				<div class="d-flex justify-content-between items-center">
+					<div class="d-flex justify-content-start items-center">
+						<div
+							class="img"
+							@click="avatar_dialog = true"
+							:style="{
+								backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
+							}">
+							<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
+						</div>
+						Basic info
+					</div>
+					<slot name="header-right" />
+				</div>
+			</div>
+			<div class="card-body">
         <!-- NAME -->
         <div class="row q-col-gutter-md mb-2">
           <div class="col-9">

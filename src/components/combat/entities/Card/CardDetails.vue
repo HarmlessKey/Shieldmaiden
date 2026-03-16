@@ -18,8 +18,8 @@
 		</div>
 		<Effects :entity="full_entity" />
 		<div class="stats">
-			<template v-for="(stat, key) of stats">
-				<div v-if="displayStats(full_entity)[key] !== undefined" :key="key">
+			<template v-for="(stat, key) of stats" :key="key">
+				<div v-if="displayStats(full_entity)[key] !== undefined">
 					<div class="truncate label value__label">{{ stat.label }}</div>
 					<div class="value">
 						<hk-icon :icon="stat.icon" class="mr-1" />
@@ -32,17 +32,16 @@
 			</template>
 		</div>
 		<div class="card-details__abilities">
-			<template v-for="(ability, index) in abilities">
+			<template v-for="(ability, index) in abilities" :key="ability">
 				<div
 					v-if="index === 0 || index === 3"
-					:key="index"
 					class="card-details__abilities-header label"
 				>
 					<div class="placeholder" />
 					<div>mod</div>
 					<div>save</div>
 				</div>
-				<div :key="ability" class="ability">
+				<div class="ability">
 					<div class="label">{{ ability.substring(0, 3) }}</div>
 					<div class="ability__score">{{ full_entity[ability] ?? 10 }}</div>
 					<hk-roll

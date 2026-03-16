@@ -46,7 +46,7 @@ export default {
 	},
 	computed: {
 		share_available() {
-			return process.browser && navigator.share !== undefined;
+			return typeof window !== "undefined" && navigator.share !== undefined;
 		},
 	},
 	methods: {

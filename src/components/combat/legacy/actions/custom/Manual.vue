@@ -73,11 +73,11 @@
 				</div>
 				<div>Multipliers</div>
 				<div></div>
-				<template v-for="key in targeted">
-					<div class="name truncate" :key="`name-${key}`">
+				<template v-for="key in targeted" :key="key">
+					<div class="name truncate" >
 						{{ entities[key].name.capitalizeEach() }}
 					</div>
-					<div v-if="damage_type" class="defenses" :key="`defenses-${key}`">
+					<div v-if="damage_type" class="defenses" >
 						<div
 							v-for="({ name }, defense_key) in defenses"
 							:key="defense_key"
@@ -92,7 +92,7 @@
 							</q-tooltip>
 						</div>
 					</div>
-					<div class="multipliers" :key="`multipliers-${key}`">
+					<div class="multipliers" >
 						<div
 							v-for="{ value, name, label } in multipliers"
 							@click="setMultiplier(key, value)"
@@ -106,7 +106,7 @@
 							</q-tooltip>
 						</div>
 					</div>
-					<div class="value" :key="`value-${key}`">
+					<div class="value" >
 						{{ calculateAmount(key) }}
 					</div>
 				</template>

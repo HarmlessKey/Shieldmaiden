@@ -33,10 +33,8 @@
 			</div>
 		</transition>
 
-		<q-no-ssr>
-			<vue-snotify />
-			<HkRolls />
-		</q-no-ssr>
+		<!-- vue-snotify DISABLED for Vue 3 migration -->
+		<HkRolls v-if="isClient" />
 		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
@@ -190,7 +188,9 @@ export default {
 			width: 0,
 			small_screen: true,
 			broadcast: undefined,
-			connection: process.browser && !navigator.onLine ? "offline" : "online",
+			isClient: typeof window !== "undefined",
+			connection:
+				typeof window !== "undefined" && !navigator.onLine ? "offline" : "online",
 		};
 	},
 	watch: {
@@ -248,7 +248,6 @@ export default {
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
 				this.broadcast = snapshot.val();
-				this.$forceUpdate();
 			});
 		}
 
@@ -259,7 +258,7 @@ export default {
 			this.connection = "online";
 		});
 	},
-	destroyed() {
+	unmounted() {
 		window.removeEventListener("offline", () => {
 			this.connection = "offline";
 		});

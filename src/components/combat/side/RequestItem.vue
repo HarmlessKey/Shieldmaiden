@@ -26,16 +26,16 @@
 				<div v-for="(result, index) in results" :key="`result-${index}`">
 					<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
 					<div class="targets">
-						<template v-for="(target, key) in result.targets">
-							<div class="name truncate bg-neutral-8" :key="`name-${key}-${i}`" v-if="entities[key]">
+						<template v-for="(target, key) in result.targets" :key="key">
+							<div class="name truncate bg-neutral-8"  v-if="entities[key]">
 								{{ entities[key].name.capitalizeEach() }}
 							</div>
 
-							<div class="amount bg-neutral-8" :key="`amount-${key}-${i}`">
+							<div class="amount bg-neutral-8" >
 								{{ target.amount }}
 							</div>
 
-							<div class="defenses bg-neutral-8" :key="`defenses-${key}-${i}`">
+							<div class="defenses bg-neutral-8" >
 								<div 
 									v-for="({name}, defense_key) in defenses"
 									:key="defense_key"
@@ -58,14 +58,14 @@
 				<!-- FINAL RESULTS -->
 				<div class="damage">Final values</div>
 				<div class="targets">
-					<template v-for="(final, key) in final_results">
-						<div class="name truncate bg-neutral-8" v-if="entities[key]" :key="`final-name-${key}`">
+					<template v-for="(final, key) in final_results" :key="key">
+						<div class="name truncate bg-neutral-8" v-if="entities[key]" >
 							{{ entities[key].name }}
 						</div>
-						<div class="amount bg-neutral-8 red" :key="`final-amount-${key}`">
+						<div class="amount bg-neutral-8 red" >
 							{{ Math.floor(final * intensity[key]) }}
 						</div>
-						<div class="defenses bg-neutral-8" :key="`final-options-${key}`">
+						<div class="defenses bg-neutral-8" >
 							<div
 								v-for="{multiplier, name, label} in multipliers"
 								@click="setIntensity(key, multiplier)"

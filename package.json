@@ -17,9 +17,9 @@
 	},
 	"dependencies": {
 		"@egjs/vue-flicking": "4.12.0",
-		"@gtm-support/vue2-gtm": "^2.0.0",
 		"@octokit/rest": "^19.0.5",
 		"@quasar/extras": "^1.16.12",
+		"@vue/compat": "^3.3",
 		"ajv": "^8.13.0",
 		"ajv-formats": "^2.1.1",
 		"animate.css": "^4.1.1",
@@ -39,31 +39,33 @@
 		"morgan": "^1.10.0",
 		"node-fetch": "^2.7.0",
 		"numeral": "^2.0.6",
-		"quasar": "^1.0.0",
+		"quasar": "^2.14",
 		"sanitize-html": "^2.13.0",
 		"splitpanes": "^2.4.1",
 		"vee-validate": "^3.4.14",
-		"vue": "~2.7.16",
+		"vue": "^3.3",
 		"vue-croppa": "^1.3.8",
 		"vue-qr": "^4.0.9",
+		"vue-router": "^4.2",
 		"vue-shortkey": "^3.1.7",
 		"vue-snotify": "^3.2.1",
 		"vue2-flip-countdown": "^0.12.1",
 		"vuedraggable": "^2.24.3",
-		"vuefire": "^1.4.5",
-		"vuejs-logger": "^1.10.2",
-		"vuex": "^3.0.1"
+		"vuex": "^4.1"
 	},
 	"devDependencies": {
-		"@quasar/app": "~2.4.3",
+		"@babel/eslint-parser": "^7.23.0",
+		"@quasar/app-webpack": "^3",
+		"@quasar/babel-preset-app": "^2.0.3",
 		"@types/sanitize-html": "^2.11.0",
-		"babel-eslint": "^10.0.1",
+		"autoprefixer": "^10.4.27",
 		"eslint": "^7.21.0",
 		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-vue": "^7.7.0",
-		"eslint-webpack-plugin": "^2.4.0",
+		"eslint-plugin-vue": "^9",
 		"husky": "^8.0.2",
+		"postcss": "^8.5.8",
 		"prettier": "^3.3.3",
+		"webpack": "^5.105.4",
 		"workbox-webpack-plugin": "^7.3.0"
 	},
 	"overrides": {
@@ -94,8 +96,7 @@
 		"serve-static": "^2.0.0"
 	},
 	"browserslist": [
-		"defaults and supports es6-module",
-		"maintained node versions"
+		"defaults and supports es6-module"
 	],
 	"engines": {
 		"node": ">= 24.0.0",

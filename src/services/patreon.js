@@ -1,6 +1,6 @@
 const axios = require("axios");
-const dotenv = require("dotenv");
-dotenv.config({ path: ".env.production.local" });
+// dotenv removed — env vars are injected by webpack at build time (client)
+// and by src-ssr/extension.js (server)
 
 const REDIRECT_URI = "/link-patreon-account";
 const AUTH_REF = "/api/oauth2/token";

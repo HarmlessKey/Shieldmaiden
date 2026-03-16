@@ -54,12 +54,11 @@
 						enter-active-class="animated animate__fadeIn"
 						leave-active-class="animated animate__fadeOut"
 					>
-						<template v-for="(entity, index) in targets">
-							<tr v-if="allEntities[0].key == entity.key && turn > 0" :key="index" class="top">
+						<template v-for="(entity, index) in targets" :key="entity.key">
+							<tr v-if="allEntities[0].key == entity.key && turn > 0" class="top">
 								<td colspan="6">Top of the round</td>
 							</tr>
 							<tr
-								:key="entity.key"
 								:class="{
 									pointer: characters.length !== 0,
 									targeted: targeted.includes(entity.key),
@@ -192,11 +191,10 @@
 								>
 									<div class="d-flex justify-content-end" v-if="entity.conditions">
 										<template
-											v-for="({ value, name }, index) in returnConditions(entity.conditions)"
+											v-for="({ value, name }, index) in returnConditions(entity.conditions)" :key="`condition-${entity.key}-${value}`"
 										>
 											<div
 												class="condition"
-												:key="`condition-${entity.key}-${value}`"
 												v-if="index + 1 <= conditionCount"
 											>
 												<span class="n" v-if="value === 'exhaustion'">

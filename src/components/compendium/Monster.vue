@@ -248,8 +248,8 @@
 					spells prepared:
 				</p>
 				<p>
-					<template v-for="level in caster_spell_levels">
-						<div :key="`spell-${level}`">
+					<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+						<div>
 							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
 								<strong>{{ formatNumber(level, "Oo") }} level</strong> ({{
@@ -285,8 +285,8 @@
 					spells, requiring no material components:
 				</p>
 				<p>
-					<template v-for="limit in innate_spell_levels">
-						<div :key="`spell-${limit}`">
+					<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+						<div>
 							<template v-if="limit === Infinity"> At will: </template>
 							<template v-else> {{ limit }}/day each: </template>
 							<i
@@ -319,10 +319,10 @@
 							of the following actions. The {{ monster.name.capitalizeEach() }} regains all expended
 							uses at the start of each of its turns.
 						</p>
-						<template v-for="(ability, index) in monster[category]">
+						<template v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
 							<hk-dice-text
 								v-if="ability.desc"
-								:key="`${category}-${index}`"
+								
 								class="monster-card__traits-description"
 								:input_text="ability.desc"
 								><template

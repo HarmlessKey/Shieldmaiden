@@ -197,9 +197,8 @@
 										</q-item-section>
 									</q-item>
 
-									<template v-for="armor in scope.opt.armor">
+									<template v-for="armor in scope.opt.armor" :key="armor.value">
 										<q-item
-											:key="armor.value"
 											clickable
 											v-ripple
 											v-close-popup

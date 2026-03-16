@@ -279,8 +279,8 @@
 				><br />
 			</template>
 			<p>
-				<template v-for="level in caster_spell_levels">
-					<div :key="`spell-${level}`">
+				<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+					<div>
 						<template v-if="level === 0"> Cantrips (at will): </template>
 						<template v-else>
 							{{ formatNumber(level, "Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
@@ -337,8 +337,8 @@
 				><br />
 			</template>
 			<p>
-				<template v-for="limit in innate_spell_levels">
-					<div :key="`spell-${limit}`">
+				<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+					<div>
 						<template v-if="limit === Infinity"> At will: </template>
 						<template v-else> {{ limit }}/day each: </template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">

@@ -34,8 +34,8 @@
 			}"
 			@shortkey="cycle_target"
 		>
-			<template v-for="{ group, targets } in groups">
-				<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
+			<template v-for="{ group, targets } in groups" :key="group">
+				<h2 v-if="group !== 'active' && targets.length > 0">
 					<hk-icon v-if="group === 'down'" icon="fas fa-skull-crossbones" class="red mr-1" />
 					{{ group.capitalize() }} ({{ targets.length }})
 				</h2>
@@ -47,11 +47,11 @@
 					ghost-class="drag-ghost"
 					drag-class="drag-dragging"
 					:force-fallback="true"
-					:key="`sortable-${group}`"
+					
 					@end="onDrag"
 				>
 					<transition-group
-						:key="group"
+						
 						tag="ul"
 						class="targets"
 						:class="`${group}_targets`"

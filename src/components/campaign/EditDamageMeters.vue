@@ -15,12 +15,12 @@
 		</q-tabs>
 		<q-tab-panels v-model="current_tab" class="bg-transparent" :key="over">
 			<q-tab-panel v-for="tab in tabs" :key="`panel-${tab}`" :name="tab">
-				<template v-for="type in over ? over_types : types">
-					<h3 :key="`header-${type}`">
+				<template v-for="type in over ? over_types : types" :key="type">
+					<h3>
 						<i class="mr-1 fas" :class="icon(type)" aria-hidden="true" />
 						{{ type.capitalize() }} {{ tab.toLowerCase() }}
 					</h3>
-					<ul class="meters" :key="`list-${type}`">
+					<ul class="meters">
 						<li
 							v-for="(player, i) in meters(`${type}${tab === 'Taken' ? tab : ''}`)"
 							class="meters__player"

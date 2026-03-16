@@ -211,7 +211,7 @@
 											<a @click="addRow(tableIndex)" class="remove green"
 												><i aria-hidden="true" class="fas fa-plus"
 											/></a>
-											<template v-for="(row, rowIndex) in table.rows">
+											<template v-for="(row, rowIndex) in table.rows" :key="rowIndex">
 												<div
 													v-for="(col, colIndex) in table.rows[rowIndex].columns"
 													:key="`column-${rowIndex}-${colIndex}`"
@@ -237,7 +237,6 @@
 												<a
 													class="red remove"
 													@click="removeRow(tableIndex, rowIndex)"
-													:key="`remove-${rowIndex}`"
 													><i aria-hidden="true" class="fas fa-trash-alt"></i
 												></a>
 											</template>

@@ -47,7 +47,7 @@ Array.min = function (array) {
  * @return {string} browser: Opera, Firefox, Safari, IE, edge, chrome
  */
 /* eslint-disable */ export function browserDetect() {
-	if (process.browser) {
+	if (typeof window !== "undefined") {
 		// Opera 8.0+
 		const isOpera =
 			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(" OPR/") >= 0;

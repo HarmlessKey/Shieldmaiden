@@ -80,9 +80,8 @@
 											</q-item-section>
 										</q-item>
 
-										<template v-for="weapon in scope.opt.weapons">
+										<template v-for="weapon in scope.opt.weapons" :key="weapon.value">
 											<q-item
-												:key="weapon.value"
 												clickable
 												v-ripple
 												v-close-popup

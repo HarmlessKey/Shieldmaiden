@@ -1,5 +1,5 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { store } from "quasar/wrappers";
+import { createStore } from "vuex";
 import general from "./modules/general";
 import tutorial from "./modules/tutorial";
 import tips from "./modules/tips";
@@ -19,19 +19,8 @@ import encounters from "./modules/userContent/encounters.js";
 import characters from "./modules/userContent/characters.js";
 import trackCampaign from "./modules/trackCampaign.js";
 
-Vue.use(Vuex);
-
-/*
- * If not building with SSR mode, you can
- * directly export the Store instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Store instance.
- */
-
-export default function () {
-	return new Vuex.Store({
+export default store(function () {
+	return createStore({
 		modules: {
 			general: general,
 			tutorial: tutorial,
@@ -52,9 +41,6 @@ export default function () {
 			characters: characters,
 			trackCampaign: trackCampaign,
 		},
-		// enable strict mode (adds overhead!)
-		// for dev mode only
-		// strict: process.env.DEBUGGING
 		strict: false,
 	});
-}
+});

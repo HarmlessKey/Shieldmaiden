@@ -2,6 +2,10 @@
 
 const { configure } = require("quasar/wrappers");
 
+// Load .env file — try environment-specific first, then fall back to .env.dist
+const dotenvResult = require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` });
+const envParsed = dotenvResult.parsed || require("dotenv").config({ path: ".env.dist" }).parsed || {};
+
 module.exports = configure(function (/* ctx */) {
 	return {
 		preFetch: true,
@@ -23,7 +27,7 @@ module.exports = configure(function (/* ctx */) {
 
 		build: {
 			vueRouterMode: "history",
-			env: require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` }).parsed,
+			env: envParsed,
 			devtool: "source-map",
 			transpileDependencies: ["htmlparser2", "fast-png", "iobuffer", "@gtm-support/core", "@octokit"],
 

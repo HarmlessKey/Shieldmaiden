@@ -54,7 +54,7 @@
 				this.countTimer()
 			}, 1000);
 		},
-    async destroyed() {
+    async unmounted() {
       window.clearInterval(this.interval);
     },
 	}

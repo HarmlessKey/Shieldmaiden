@@ -124,7 +124,7 @@ export default {
 			this.now = new Date();
 		}, 60000);
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		clearInterval(this.timer);
 	},
 };

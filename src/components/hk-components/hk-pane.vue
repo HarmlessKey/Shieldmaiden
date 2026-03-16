@@ -17,7 +17,7 @@ export default {
 	height: 100%;
 	position: static;
 
-	&::v-deep {
+	&:deep() {
 		.q-scrollarea__content {
 			width: 100%;
 			position: static;

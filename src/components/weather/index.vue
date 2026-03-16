@@ -171,7 +171,7 @@ export default {
 		background-position: center bottom;
 		z-index: 1;
 
-		&::v-deep {
+		&:deep() {
 			.wrapper {
 				pointer-events: none;
 			}

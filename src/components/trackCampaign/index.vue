@@ -257,7 +257,7 @@ export default {
 			return undefined;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener("resize", this.setSize);
 	},
 };

@@ -89,10 +89,10 @@
 						:columns="columns"
 						:row-key="(row) => `${row.meta.key}-${row.meta.overwrite}`"
 						virtual-scroll
-						:pagination.sync="pagination"
+						v-model:pagination="pagination"
 						:rows-per-page-options="[0]"
 						selection="multiple"
-						:selected.sync="selected[import_type]"
+						v-model:selected="selected[import_type]"
 						hide-bottom
 						hide-top
 					>
@@ -979,7 +979,7 @@ export default {
 .q-expansion-item {
 	background-color: $neutral-9;
 }
-.no-table-margin::v-deep table {
+.no-table-margin:deep(table) {
 	margin-bottom: 0;
 }
 

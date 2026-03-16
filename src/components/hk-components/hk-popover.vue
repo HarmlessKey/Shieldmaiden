@@ -10,8 +10,8 @@
 			:breakpoint="576"
 		>
 			<hk-card
-				@mouseover.native="cardHover = true"
-				@mouseout.native="cardHover = false"
+				@mouseover="cardHover = true"
+				@mouseout="cardHover = false"
 				:max-width="300"
 				:no-margin="true"
 				:small="true"
@@ -65,7 +65,7 @@ export default {
 		// Listen for other popovers opening
 		EventBus.on("popover-opened", this.handleOtherPopoverOpened);
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		EventBus.off("popover-opened", this.handleOtherPopoverOpened);
 	},
 	methods: {

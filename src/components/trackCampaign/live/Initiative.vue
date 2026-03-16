@@ -415,7 +415,7 @@ export default {
 			return returnConditions;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener("resize", this.setSize);
 	},
 };

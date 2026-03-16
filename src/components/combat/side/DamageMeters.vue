@@ -100,7 +100,7 @@ ul {
 		margin-bottom: 2px;
 		height: 32px;
 
-		::v-deep {
+		:deep() {
 			.basic-entity__wrapper {
 				position: relative;
 				z-index: 10;

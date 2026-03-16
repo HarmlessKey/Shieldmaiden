@@ -121,7 +121,7 @@ export default {
 			window.addEventListener("keydown", this.checkKeyPress);
 		});
 	},
-	destroyed() {
+	unmounted() {
 		window.removeEventListener("keyup", this.checkKeypress);
 		window.removeEventListener("keydown", this.checkKeypress);
 	},

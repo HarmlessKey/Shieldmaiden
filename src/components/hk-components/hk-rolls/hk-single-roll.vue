@@ -938,7 +938,7 @@ export default {
 			font-size: 15px;
 		}
 
-		&::v-deep {
+		&:deep() {
 			.basic-entity__wrapper {
 				margin-bottom: 15px;
 				background-color: $neutral-8;

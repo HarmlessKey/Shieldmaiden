@@ -41,10 +41,10 @@ export default {
 	computed: {
 		...mapGetters(["get_tip"]),
 		hasContent() {
-			return !!this.$slots.content || !!this.$scopedSlots.content || !!this.content;
+			return !!this.$slots.content || !!this.$slots.content || !!this.content;
 		},
 		hasTitle() {
-			return !!this.$slots.title || !!this.$scopedSlots.title || !!this.title;
+			return !!this.$slots.title || !!this.$slots.title || !!this.title;
 		},
 	},
 	methods: {

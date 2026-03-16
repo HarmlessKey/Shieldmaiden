@@ -78,7 +78,7 @@
 				flat
 				:dark="$store.getters.theme !== 'light'"
 				:visible-columns="visibleColumns"
-				:pagination.sync="pagination"
+				v-model:pagination="pagination"
 				:loading="loading"
 				separator="none"
 				wrap-cells

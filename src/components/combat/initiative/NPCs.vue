@@ -183,7 +183,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
+:deep() {
 	.q-checkbox {
 		min-width: 0;
 		margin-right: 5px;

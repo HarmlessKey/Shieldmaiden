@@ -28,7 +28,7 @@
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
-				:pagination.sync="pagination"
+				v-model:pagination="pagination"
 				:loading="loading"
 				separator="none"
 				wrap-cells

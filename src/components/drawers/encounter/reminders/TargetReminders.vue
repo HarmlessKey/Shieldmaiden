@@ -111,7 +111,7 @@
 				</q-tab-panel>
 				<q-tab-panel name="custom">
 					<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
-						<q-form @submit="handleSubmit(meta.valid ? addReminder('custom') : invalidReminder)">
+						<q-form @submit="handleSubmit($event, () => addReminder('custom'))">
 							<reminder-form v-model="customReminder" :variables="false" />
 							<q-btn color="blue" class="full-width" no-caps type="submit" :disabled="!meta.valid"
 								>Set reminder</q-btn

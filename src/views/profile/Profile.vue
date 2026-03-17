@@ -210,7 +210,7 @@
 		<q-dialog v-model="password_dialog">
 			<div>
 				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
-					<q-form @submit="handleSubmit(linkMethod('password'))">
+					<q-form @submit="handleSubmit($event, () => linkMethod('password'))">
 						<hk-card header="Set a password">
 							<div class="card-body pb-0">
 								<hk-input :value="user.email" readonly class="mb-4" />

@@ -41,9 +41,9 @@
 			<ValidationObserver
 				v-for="(item, key) in encounter.loot"
 				:key="key"
-				v-slot="{ handleSubmit, validate, valid }"
+				v-slot="{ handleSubmit, meta }"
 			>
-				<q-form @submit="valid ? handleSubmit(saveItem(item, key)) : validate()" greedy>
+				<q-form @submit="handleSubmit($event, () => saveItem(item, key))" greedy>
 					<q-expansion-item
 						:dark="$store.getters.theme === 'dark'"
 						switch-toggle-side
@@ -147,7 +147,7 @@
 							</div>
 							<div class="d-flex items-center mt-4">
 								<q-btn no-caps color="primary" type="submit">Save</q-btn>
-								<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+								<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 									<q-tooltip anchor="top middle" self="center middle">
 										There are validation errors
 									</q-tooltip>

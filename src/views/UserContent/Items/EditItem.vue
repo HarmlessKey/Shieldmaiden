@@ -1,7 +1,7 @@
 <template>
 	<div class="content__edit">
 		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
-			<q-form @submit="handleSubmit(saveItem(meta.valid))">
+			<q-form @submit="handleSubmit($event, () => saveItem(meta.valid))">
 				<hk-card header="Your Item">
 					<div slot="header" class="card-header">
 						{{ item.name ? item.name : "New item" }}
@@ -343,7 +343,7 @@ export default {
 		addItem() {
 			this.add_item(this.item).then(
 				(key) => {
-					this.$set(this, "itemId", key);
+					this["itemId"] = key;
 
 					notifySuccess("Item Saved.", "Critical hit!");
 
@@ -383,7 +383,7 @@ export default {
 			if (this.columns !== undefined) {
 				this.columns = parseInt(this.columns);
 				if (this.item.tables === undefined) {
-					this.$set(this.item, "tables", []);
+					this.item["tables"] = [];
 				}
 				this.item.tables.push({
 					columns: this.columns,
@@ -403,10 +403,10 @@ export default {
 			});
 		},
 		removeRow(tableIndex, rowIndex) {
-			this.$delete(this.item.tables[tableIndex].rows, rowIndex);
+			this.item.tables[tableIndex].rows.splice(rowIndex, 1);
 		},
 		removeTable(key) {
-			this.$delete(this.item.tables, key);
+			this.item.tables.splice(key, 1);
 		},
 	},
 };

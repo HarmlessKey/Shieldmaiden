@@ -114,7 +114,7 @@
 							class="mb-2"
 							@input="
 								(value) => {
-									if (value !== 'reaction') $delete(spell, 'cast_time_react_desc');
+									if (value !== 'reaction') delete spell['cast_time_react_desc'];
 								}
 							"
 							:error="!!errorMessage"
@@ -206,7 +206,7 @@
 							class="mb-2"
 							@input="
 								(value) => {
-									if (value !== 'ranged') $delete(spell, 'range');
+									if (value !== 'ranged') delete spell['range'];
 								}
 							"
 							:error="!!errorMessage"
@@ -280,8 +280,8 @@
 							@input="
 								(value) => {
 									if (!spell_duration_types_time.includes(value)) {
-										$delete(spell, 'duration');
-										$delete(spell, 'duration_scale');
+										delete spell['duration'];
+										delete spell['duration_scale'];
 									}
 								}
 							"
@@ -368,7 +368,7 @@
 							class="mb-2"
 							@input="
 								(value) => {
-									if (value === 'none') $delete(spell, 'aoe_size');
+									if (value === 'none') delete spell['aoe_size'];
 								}
 							"
 							:error="!!errorMessage"
@@ -546,9 +546,9 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		setRitual() {

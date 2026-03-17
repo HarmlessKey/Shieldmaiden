@@ -72,9 +72,9 @@
 		methods: {
 			parseToInt(value, object, property) {
 				if(value === undefined || value === "") {
-					this.$delete(object, property);
+					delete object[property];
 				} else {
-					this.$set(object, property, parseInt(value));
+					object[property] = parseInt(value);
 				}
 			}
 		}

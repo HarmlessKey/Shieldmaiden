@@ -25,8 +25,8 @@
 					<i aria-hidden="true" class="fas fa-copy" /> Copy NPC
 				</button>
 
-				<ValidationObserver v-slot="{ handleSubmit, validate, valid }">
-					<q-form @submit="valid ? handleSubmit(addNPC) : validate()" greedy>
+				<ValidationObserver v-slot="{ handleSubmit, meta, validate }">
+					<q-form @submit="handleSubmit($event, addNPC)" greedy>
 						<ValidationProvider
 							rules="required|max:100"
 							name="Name"
@@ -128,7 +128,7 @@
 								class="full-width mb-3 bg-neutral-5"
 								no-caps
 								label="Add next round"
-								@click="valid ? addNPC('next') : validate()"
+								@click="meta.valid ? addNPC('next') : validate()"
 							/>
 							<q-btn
 								class="full-width mb-3"

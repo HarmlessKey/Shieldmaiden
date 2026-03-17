@@ -8,8 +8,8 @@
 		</div>
 
 		<h2>New Item</h2>
-		<ValidationObserver v-slot="{ handleSubmit, validate, valid }">
-			<q-form @submit="valid ? handleSubmit(addItem) : validate()" greedy>
+		<ValidationObserver v-slot="{ handleSubmit }">
+			<q-form @submit="handleSubmit($event, addItem)" greedy>
 				<ValidationProvider rules="required" name="Name" v-slot="{ errorMessage }" :modelValue="item.public_name" as="div">
 					<q-input
 						:dark="$store.getters.theme === 'dark'" filled square

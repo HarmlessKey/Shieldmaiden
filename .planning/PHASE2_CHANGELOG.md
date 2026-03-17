@@ -107,9 +107,9 @@ All changes made during Phase 2 implementation, with deviations from the plan no
 
 ---
 
-## Step 6: Migrate vee-validate v3 → v4 (In Progress)
+## Step 6: Migrate vee-validate v3 → v4 ✓
 
-**Status:** In Progress
+**Status:** Complete
 
 ### 6.1 Rewrote boot file (`src/boot/vee-validate.js`)
 - `extend()` → `defineRule()`
@@ -121,10 +121,12 @@ All changes made during Phase 2 implementation, with deviations from the plan no
 - `hk-input.vue` — updated ValidationProvider slot from `{ errors, invalid, validated }` to `{ errorMessage }`, added `as="div"`, `modelValue` binding
 - `hk-select.vue` — same pattern
 
-### 6.3 Template migration (39 files) — In Progress
-- Migrating `invalid && validated` → `!!errorMessage`
-- Migrating `errors[0]` → `errorMessage`
-- Adding `as="div"` and `:modelValue` bindings
+### 6.3 Template migration (48 files) ✓
+- Migrated `invalid && validated` → `!!errorMessage`
+- Migrated `errors[0]` → `errorMessage`
+- Added `as="div"` and `:modelValue` bindings
+- Fixed `handleSubmit(callback)` → `handleSubmit($event, callback)` (v4 pattern) in 13 files
+- Fixed `{ validate, valid }` slot → `{ meta, validate }` + `meta.valid` in 3 files
 
 ---
 
@@ -147,10 +149,11 @@ All changes made during Phase 2 implementation, with deviations from the plan no
 - `hk-dialog.vue` — removed `v-on="$listeners"`
 - `hk-roll-action.vue` — replaced `this.$listeners["roll"]` with `this.$attrs["onRoll"]`
 
-### Fix `$set` / `$delete` / `Vue.set` / `Vue.delete` (In Progress)
-- ~59 files with 437 occurrences
-- Replacing with direct property assignment (`obj[key] = value`) and `delete` operator
-- Removing `import Vue from 'vue'` where no longer needed
+### Fix `$set` / `$delete` / `Vue.set` / `Vue.delete` ✓
+- All occurrences across all files replaced
+- `this.$set(obj, key, value)` → `obj[key] = value`
+- `this.$delete(obj, key)` → `delete obj[key]` (or `splice()` for arrays)
+- Removed `import Vue from 'vue'` where no longer needed
 
 ---
 

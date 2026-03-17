@@ -24,7 +24,7 @@
 
 			<h4 class="my-3 text-center">OR</h4>
 			<ValidationObserver v-slot="{ handleSubmit }">
-				<q-form @submit="handleSubmit(parseJSON)">
+				<q-form @submit="handleSubmit($event, parseJSON)">
 					<ValidationProvider rules="json" name="JSON" v-slot="{ errorMessage }" :modelValue="json_input" as="div">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"

@@ -356,7 +356,7 @@
 		<q-dialog v-model="player_dialog">
 			<div>
 				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
-					<q-form @submit="handleSubmit(add($event, generateUUID(), 'player', player.name))" greedy>
+					<q-form @submit="handleSubmit($event, () => add(null, generateUUID(), 'player', player.name))" greedy>
 						<hk-card header="Add players" :min-width="300">
 							<div class="card-body">
 								<ValidationProvider
@@ -907,9 +907,11 @@ export default {
 			}
 		},
 		add_demo_entity(entity) {
-			this.encounter.entities
-				? this.$set(this.encounter.entities, uuid(), entity)
-				: this.$set(this.encounter, "entities", { [uuid()]: entity });
+			if (this.encounter.entities) {
+				this.encounter.entities[uuid()] = entity;
+			} else {
+				this.encounter["entities"] = { [uuid()]: entity };
+			}
 		},
 		setSize(e) {
 			this.width = e.width;

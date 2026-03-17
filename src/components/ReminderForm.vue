@@ -151,7 +151,7 @@
 							:class="{
 								disabled:
 									!newVar ||
-									errors[0] ||
+									errorMessage ||
 									(reminder.variables && Object.keys(reminder.variables).includes(newVar)),
 							}"
 						>

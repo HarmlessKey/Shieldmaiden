@@ -75,7 +75,7 @@
 
 			<!-- EDIT PLAYER -->
 			<ValidationObserver v-slot="{ handleSubmit }">
-				<q-form @submit="handleSubmit(edit)">
+				<q-form @submit="handleSubmit($event, edit)">
 					<ValidationProvider
 						v-if="location == 'encounter'"
 						rules="between:0,99|required"

@@ -287,9 +287,9 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		add_action() {
@@ -303,7 +303,7 @@ export default {
 			this.$forceUpdate();
 		},
 		remove_action(index) {
-			this.$delete(this.spell.actions, index);
+			this.spell.actions.splice(index, 1);
 		},
 		newRoll(action, action_index) {
 			this.edit_index = undefined; // It's new, so no edit index
@@ -325,9 +325,9 @@ export default {
 					? []
 					: this.spell.actions[this.action_index].rolls;
 				rolls.push(this.roll);
-				this.$set(this.spell.actions[this.action_index], "rolls", rolls);
+				this.spell.actions[this.action_index]["rolls"] = rolls;
 			} else {
-				this.$set(this.spell.actions[this.action_index].rolls, this.edit_index, this.roll);
+				this.spell.actions[this.action_index].rolls[this.edit_index] = this.roll;
 			}
 			this.roll = {};
 			this.edit_index = undefined;
@@ -341,7 +341,7 @@ export default {
 			this.roll = undefined;
 		},
 		removeRoll(index) {
-			this.$delete(this.rolls, index);
+			this.rolls.splice(index, 1);
 		},
 
 		/**
@@ -363,7 +363,7 @@ export default {
 					if (action.rolls) {
 						for (const roll of action.rolls) {
 							if (roll.options) {
-								this.$delete(roll.options, details.value);
+								delete roll.options[details.value];
 							}
 						}
 					}

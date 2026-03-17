@@ -1,7 +1,7 @@
 <template>
 	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
 		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
-			<q-form @submit="handleSubmit(saveReminder(meta.valid))">
+			<q-form @submit="handleSubmit($event, () => saveReminder(meta.valid))">
 				<div class="card-body">
 					<div class="reminder" v-if="reminder">
 						<reminder-form v-model="reminder" />
@@ -102,7 +102,7 @@ export default {
 		async addReminder() {
 			this.add_reminder(this.reminder).then(
 				(key) => {
-					this.$set(this, "reminderId", key);
+					this["reminderId"] = key;
 					notifySuccess("Reminder Saved.", "Critical hit!");
 					this.reminder_copy = JSON.stringify(this.reminder);
 					this.unsaved_changes = false;

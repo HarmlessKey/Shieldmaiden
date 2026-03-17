@@ -77,8 +77,8 @@
 										v-if="$route.name !== 'Add player'"
 										:playerId="playerId"
 										:control="player.control"
-										@set="$set(player, 'control', $event)"
-										@remove="$set(player, 'control', null)"
+										@set="player['control'] = $event"
+										@remove="player['control'] = null"
 									/>
 
 									<!-- Character Sync -->
@@ -782,7 +782,7 @@ export default {
 				return this.player.skills ? this.player.skills : [];
 			},
 			set(newValue) {
-				this.$set(this.player, "skills", newValue);
+				this.player["skills"] = newValue;
 			},
 		},
 		skills_expertise: {
@@ -790,7 +790,7 @@ export default {
 				return this.player.skills_expertise ? this.player.skills_expertise : [];
 			},
 			set(newValue) {
-				this.$set(this.player, "skills_expertise", newValue);
+				this.player["skills_expertise"] = newValue;
 			},
 		},
 		npcsAsCompanion() {
@@ -809,7 +809,7 @@ export default {
 		await this.get_players();
 		if (this.$route.name === "Add player") {
 			for (const ability of this.abilities) {
-				this.$set(this.player, ability, 10);
+				this.player[ability] = 10;
 			}
 		}
 
@@ -871,7 +871,7 @@ export default {
 			return comparePlayerToCharacter(this.linked_character, this.player);
 		},
 		async linkCharacter(url) {
-			this.$set(this.player, "sync_character", url);
+			this.player["sync_character"] = url;
 			this.linked_character = await getCharacterSyncCharacter(this.player.sync_character);
 			await this.sync();
 			this.link_dialog = false;
@@ -918,10 +918,10 @@ export default {
 		add({ result, id }) {
 			this.companion_dialog = false;
 			if (this.player.companions === undefined) {
-				this.$set(this.player, "companions", {});
+				this.player["companions"] = {};
 			}
 
-			this.$set(this.player.companions, id, true);
+			this.player.companions[id] = true;
 			result.key = id;
 			this.companions.push(result);
 			this.npcsAsCompanion.push(id);
@@ -934,8 +934,8 @@ export default {
 			this.$forceUpdate();
 		},
 		removeCompanion(index, id) {
-			this.$delete(this.companions, index);
-			this.$delete(this.player.companions, id);
+			this.companions.splice(index, 1);
+			delete this.player.companions[id];
 			this.companions_to_delete.push(id);
 
 			const npcsAsCompanionIndex = this.npcsAsCompanion.indexOf(id);
@@ -945,13 +945,13 @@ export default {
 		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === null || value === "") {
-				this.$set(object, property, null);
+				object[property] = null;
 			} else {
 				value = parseInt(value);
 				if (property === "level") {
 					value = value.between(1, 20);
 				}
-				this.$set(object, property, value);
+				object[property] = value;
 			}
 		},
 		skillMod(skill, key) {
@@ -977,21 +977,21 @@ export default {
 			return parseInt(mod);
 		},
 		saveBlob(value) {
-			this.$delete(this.player, "avatar");
-			this.$set(this.player, "blob", value.blob);
+			delete this.player["avatar"];
+			this.player["blob"] = value.blob;
 			this.preview_new_upload = value.dataUrl;
 			this.avatar_dialog = false;
 		},
 		saveUrl(value) {
-			this.$delete(this.player, "storage_avatar");
-			this.$set(this.player, "avatar", value);
+			delete this.player["storage_avatar"];
+			this.player["avatar"] = value;
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},
 		clearAvatar() {
-			this.$delete(this.player, "avatar");
-			this.$delete(this.player, "storage_avatar");
-			this.$delete(this.player, "blob");
+			delete this.player["avatar"];
+			delete this.player["storage_avatar"];
+			delete this.player["blob"];
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},

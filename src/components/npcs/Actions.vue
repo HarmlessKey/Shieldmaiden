@@ -639,9 +639,9 @@ export default {
 		...mapActions(["setActionRoll"]),
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		/**
@@ -682,7 +682,7 @@ export default {
 		 * @param {string} category actions / legendary_actions / special_abilities
 		 */
 		remove(index, category) {
-			this.$delete(this.npc[category], index);
+			this.npc[category].splice(index, 1);
 			this.$forceUpdate();
 		},
 
@@ -739,12 +739,12 @@ export default {
 				action.rolls = !action.rolls ? [] : action.rolls;
 				action.rolls.push(this.roll);
 			} else {
-				this.$set(action.rolls, this.edit_roll_index, this.roll);
+				action.rolls[this.edit_roll_index] = this.roll;
 			}
 			this.action_dialog = false;
 		},
 		deleteRoll(roll_index, ability_index, category, action_index) {
-			this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
+			this.npc[category][ability_index].action_list[action_index].rolls.splice(roll_index, 1);
 			this.$forceUpdate();
 		},
 
@@ -771,7 +771,7 @@ export default {
 					if (action.rolls) {
 						for (const roll of action.rolls) {
 							if (roll.options) {
-								this.$delete(roll.options, details.value);
+								delete roll.options[details.value];
 							}
 						}
 					}

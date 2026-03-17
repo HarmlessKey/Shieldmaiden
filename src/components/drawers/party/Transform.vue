@@ -8,7 +8,7 @@
 		</small>
 
 		<ValidationObserver v-slot="{ handleSubmit }">
-			<q-form @submit="handleSubmit(edit())">
+			<q-form @submit="handleSubmit($event, edit)">
 				<div class="row q-col-gutter-md mb-2">
 					<div class="col">
 						<ValidationProvider

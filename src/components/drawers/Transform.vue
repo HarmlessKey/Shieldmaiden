@@ -14,7 +14,7 @@
 			</small>
 			<ValidationObserver v-slot="{ handleSubmit }">
 				<div class="mb-2">Manual transform</div>
-				<q-form @submit="handleSubmit(edit())">
+				<q-form @submit="handleSubmit($event, edit)">
 					<div class="row q-col-gutter-md">
 						<div class="col">
 							<ValidationProvider

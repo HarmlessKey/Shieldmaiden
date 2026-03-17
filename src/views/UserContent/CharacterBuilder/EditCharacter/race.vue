@@ -270,9 +270,9 @@ export default {
 					this.deleteTrait(i, valid);
 				}
 
-				this.$set(this.character, "race", {
+				this.character["race"] = {
 					...value,
-				});
+				};
 			}
 			this.save(valid);
 		},

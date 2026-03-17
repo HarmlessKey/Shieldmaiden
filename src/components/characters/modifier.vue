@@ -1,7 +1,7 @@
 <template>
 <div>
 	<ValidationObserver v-slot="{ handleSubmit }">
-		<q-form @submit="handleSubmit(saveModifier)" greedy>
+		<q-form @submit="handleSubmit($event, saveModifier)" greedy>
 			<hk-card :min-width="300" no-margin>
 				<div slot="header" class="card-header d-flex justify-content-between">
 					<span>
@@ -522,21 +522,21 @@
 			},
 			addScaling() {
 				if(!this.modifier.scaling) {
-					this.$set(this.modifier, "scaling", {});
+					this.modifier["scaling"] = {};
 				}
 				this.scaling = true;
 			},
 			setScalingType(type) {
-				this.$set(this.modifier.scaling, "type", type);
+				this.modifier.scaling["type"] = type;
 				if(type === "scale") {
-					this.$set(this.modifier.scaling, "scale", {});
+					this.modifier.scaling["scale"] = {};
 				} else {
-					this.$set(this.modifier.scaling, "steps", []);
+					this.modifier.scaling["steps"] = [];
 				}
 				this.$forceUpdate();
 			},
 			deleteScaling() {
-				this.$set(this.modifier, "scaling", null);
+				this.modifier["scaling"] = null;
 			},
 		}
 	}

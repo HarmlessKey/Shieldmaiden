@@ -1,6 +1,6 @@
 # Vue 3 Migration — Implementation Progress
 
-> Last updated: 2026-03-16
+> Last updated: 2026-03-17
 > Branch: `claude/vue3-migration-plan-9q0qC`
 
 ---
@@ -11,7 +11,7 @@
 |---|---|---|
 | Phase 0 — Pre-Migration Prep | ✅ Complete | 100% |
 | Phase 1 — Core Dependency Upgrade | ✅ Complete | 100% |
-| Phase 2 — Stabilize Dev Build | 🔲 Not Started | 0% |
+| Phase 2 — Stabilize Dev Build | ✅ Complete | 100% |
 | Phase 3 — Component Migration | 🔲 Not Started | 0% |
 | Phase 4 — SSR Re-enablement | 🔲 Not Started | 0% |
 
@@ -64,21 +64,27 @@ All completed on Vue 2 before the dependency swap.
 
 ---
 
-## Phase 2 — Stabilize Dev Build 🔲
+## Phase 2 — Stabilize Dev Build ✅
 
 | Task | Status | Scope |
 |---|---|---|
-| Fix Quasar v1→v2 component API changes | 🔲 | Audit all Quasar components |
-| Replace vue-snotify → Quasar Notify/Dialog | 🔲 | 139 calls, 46 files |
-| Replace vee-validate v3 → v4 | 🔲 | Complete API rewrite |
-| Replace vue-shortkey | 🔲 | Custom directive or @vueuse |
-| Replace vue-croppa | 🔲 | vue-advanced-cropper or similar |
-| Fix ::v-deep → :deep() | 🔲 | 41 occurrences, 38 files |
-| Upgrade splitpanes to v3 | 🔲 | 1 dependency |
-| Upgrade vuedraggable to v4 | 🔲 | 1 dependency |
-| Re-add GTM (Vue 3 version) | 🔲 | 1 boot file |
-| Replace vue2-flip-countdown | 🔲 | 1 component |
-| Verify @egjs/vue-flicking | 🔲 | Import path check |
+| Replace `.sync` → `v-model:` | ✅ | 6 files |
+| Fix `::v-deep` → `:deep()` | ✅ | 38 files |
+| Replace `beforeDestroy` → `beforeUnmount` | ✅ | 6 files |
+| Replace `destroyed` → `unmounted` | ✅ | 2 files |
+| Remove `.native` event modifier | ✅ | 1 file |
+| Replace `$scopedSlots` → `$slots` | ✅ | 3 files |
+| Remove `$listeners` / fix `$attrs` | ✅ | 3 files |
+| Replace vue-snotify → Quasar Notify/Dialog | ✅ | 46 files + 1 utility |
+| Replace vue-shortkey → custom directive | ✅ | 2 files |
+| Replace vue-croppa → vue-advanced-cropper | ✅ | 1 file |
+| Upgrade vuedraggable v2 → v4 | ✅ | 2 files |
+| Upgrade splitpanes v2 → v3 | ✅ | package.json |
+| Re-add GTM (Vue 3 version) | ✅ | 1 boot file |
+| Remove vue2-flip-countdown | ✅ | package.json |
+| Verify @egjs/vue-flicking | ✅ | Already v3-compatible |
+| Migrate vee-validate v3 → v4 | ✅ | Boot file + 48 template files |
+| Remove `$set`/`$delete`/`Vue.set`/`Vue.delete` | ✅ | All occurrences removed |
 
 ---
 
@@ -86,12 +92,7 @@ All completed on Vue 2 before the dependency swap.
 
 | Task | Status | Scope |
 |---|---|---|
-| Remove $set/$delete calls | 🔲 | 510 calls, ~70 files |
 | Migrate v-model on components | 🔲 | 583 occurrences, 153 files |
-| Remove $listeners usage | 🔲 | 5 files |
-| Remove $scopedSlots usage | 🔲 | 3 files |
-| Remove .native modifier | 🔲 | 1 file |
-| Replace .sync with v-model:prop | 🔲 | 7 files |
 | Migrate render(h) functions | 🔲 | 9 files |
 | Fix transition class names | 🔲 | 58 files |
 | Convert hk-components to Composition API | 🔲 | 28 files |
@@ -114,27 +115,9 @@ All completed on Vue 2 before the dependency swap.
 
 ---
 
-## Disabled Features (to re-enable in Phase 2)
-
-These boot files/plugins are currently disabled to allow the dev server to boot:
-
-| Plugin | Boot File | Replacement Strategy |
-|---|---|---|
-| vee-validate v3 | `src/boot/vee-validate.js` | Upgrade to v4 (composition API) |
-| vue-shortkey | `src/boot/vue-shortkey.js` | Custom directive or @vueuse |
-| vue-snotify | `src/boot/vue-snotify.js` | Quasar Notify + Dialog |
-| vue-croppa | (in plugins.js) | vue-advanced-cropper |
-| GTM (vue2-gtm) | (in plugins.js) | @gtm-support/vue-gtm@^2 |
-| vuefire | (in plugins.js) | Removed — was never used |
-
----
-
 ## Known Deprecation Warnings (Expected)
 
 These appear in the console during dev and are expected while in compat mode:
 
-- `::v-deep` usage (41 files) — fix in Phase 2
-- `$set` / `$delete` usage — fix in Phase 3
 - `v-model` component binding (value/input) — fix in Phase 3
-- Slot syntax warnings from Quasar components — fix in Phase 2
-- Various HTML structure warnings from Quasar v2 — fix in Phase 2
+- Slot syntax warnings from Quasar components — cosmetic, resolved when compat removed

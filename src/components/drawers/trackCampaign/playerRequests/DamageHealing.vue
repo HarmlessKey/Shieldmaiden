@@ -18,7 +18,7 @@
 		</div>
 
 		<template v-if="type === 'damage'">
-			<ValidationObserver v-slot="{ valid }">
+			<ValidationObserver v-slot="{ meta }" as="div">
 				<div class="damage_inputs">
 					<div>Amount</div>
 					<div>Type</div>
@@ -29,7 +29,7 @@
 						<ValidationProvider
 							rules="required|numeric|min_value:0"
 							:name="`amount-${i}`"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="damage[i].amount" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -42,8 +42,8 @@
 								type="number"
 								v-model="damage[i].amount"
 								min="0"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 
@@ -61,20 +61,20 @@
 				</div>
 				<button
 					class="btn btn-block"
-					@click="valid ? sendRequest() : null"
-					:disabled="!valid"
-					:class="{ disabled: !valid }"
+					@click="meta.valid ? sendRequest() : null"
+					:disabled="!meta.valid"
+					:class="{ disabled: !meta.valid }"
 				>
 					Send Request
 				</button>
 			</ValidationObserver>
 		</template>
 
-		<ValidationObserver v-if="type === 'healing'" v-slot="{ valid }">
+		<ValidationObserver v-if="type === 'healing'" v-slot="{ meta }" as="div">
 			<ValidationProvider
 				rules="required|numeric|min_value:0"
 				name="Manual input`"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="healingAmount" as="div"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -85,14 +85,14 @@
 					v-model="healingAmount"
 					min="0"
 					class="healing-input"
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!!errorMessage"
+					:error-message="errorMessage"
 				/>
 			</ValidationProvider>
 			<button
 				class="btn btn-block"
-				@click="valid ? sendRequest() : null"
-				:class="{ disabled: !valid }"
+				@click="meta.valid ? sendRequest() : null"
+				:class="{ disabled: !meta.valid }"
 			>
 				Send Request
 			</button>
@@ -150,7 +150,7 @@ export default {
 			this.damage.push({ amount: "", damage_type: "acid" });
 		},
 		removeInput(i) {
-			this.$delete(this.damage, i);
+			this.damage.splice(i, 1);
 			this.$forceUpdate();
 		},
 		sendRequest() {

@@ -72,7 +72,7 @@
 							<ValidationProvider
 								rules="required|max:100"
 								name="Name"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="item.public_name" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -83,8 +83,8 @@
 									id="name"
 									type="text"
 									v-model="item.public_name"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								>
 									<hk-popover
 										slot="append"
@@ -99,7 +99,7 @@
 							<ValidationProvider
 								rules="max:2000"
 								name="Dscription"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="item.public_description" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -113,8 +113,8 @@
 									rows="4"
 									name="desc"
 									maxlength="2000"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 							<div>

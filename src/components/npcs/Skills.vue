@@ -71,7 +71,7 @@
 			<hk-card header="Skill modifiers">
 				<div class="card-body">
 					<div class="modifiers">
-						<ValidationProvider v-for="(skill, key) in skillList" rules="between:-99,99" :name="skill.skill" v-slot="{ errors, invalid, validated }" :key="`mod-${key}`">
+						<ValidationProvider v-for="(skill, key) in skillList" rules="between:-99,99" :name="skill.skill" v-slot="{ errorMessage }" :modelValue="npc.skill_modifiers[key]" as="div" :key="`mod-${key}`">
 							<q-input
 								:dark="$store.getters.theme === 'dark'" filled square
 								class="mb-2"
@@ -79,8 +79,8 @@
 								:label="skill.skill"
 								v-model="npc.skill_modifiers[key]"
 								@change="setModifier(key)"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							>
 								<i aria-hidden="true" class="fas fa-check green saved" slot="append" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
 							</q-input>

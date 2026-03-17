@@ -62,8 +62,8 @@
 
 		<q-dialog v-model="add_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit }">
-					<q-form @submit="handleSubmit(addLink)" greedy>
+				<ValidationObserver v-slot="{ handleSubmit }" as="div">
+					<q-form @submit="handleSubmit($event, addLink)" greedy>
 						<hk-card :min-width="320" no-margin>
 							<div slot="header" class="card-header">
 								<span>Add to your Soundboard</span>

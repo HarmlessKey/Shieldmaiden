@@ -1,19 +1,18 @@
 <template>
 	<div>
-		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
+		<ValidationProvider :rules="rules" :name="name" v-slot="{ errorMessage }" :modelValue="modelValue" as="div">
 			<q-input
 				v-bind="$attrs"
-				v-on="$listeners"
 				v-model="modelValue"
 				:dark="$store.getters.theme === 'dark'"
 				:type="type"
 				:filled="filled"
 				:square="square"
 				:autocomplete="autocomplete"
-				:error="rules ? invalid && validated : null"
-				:error-message="errors[0]"
+				:error="rules ? !!errorMessage : null"
+				:error-message="errorMessage"
 			>
-				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
+				<slot v-for="(_, slot) in $slots" :name="slot" />
 			</q-input>
 		</ValidationProvider>
 	</div>
@@ -24,8 +23,12 @@ import { isNil } from "lodash";
 
 export default {
 	name: "hk-input",
+	inheritAttrs: false,
 	props: {
 		value: {
+			type: [String, Number],
+		},
+		modelValue: {
 			type: [String, Number],
 		},
 		filled: {
@@ -55,16 +58,18 @@ export default {
 			default: false,
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	computed: {
 		modelValue: {
 			get() {
-				return this.value;
+				return this.$props.modelValue !== undefined ? this.$props.modelValue : this.value;
 			},
 			set(newVal) {
 				if (this.type === "number" && !isNil(newVal)) {
 					newVal = this.integer ? parseInt(newVal) : Number(newVal);
 				}
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},

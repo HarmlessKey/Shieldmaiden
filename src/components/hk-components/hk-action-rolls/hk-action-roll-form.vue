@@ -51,6 +51,7 @@
 					>
 						<template v-if="action_type !== 'healing'">
 							<ValidationProvider
+								as="div"
 								:rules="{
 									required: index === 0,
 								}"
@@ -97,7 +98,7 @@
 										required: !!getValue('dice_type', { key, index }),
 									}"
 									:name="`Dice count ${key}`"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="getValue('dice_count', { key, index })" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -112,8 +113,8 @@
 										name="dice_count"
 										class="mb-2"
 										type="number"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -138,7 +139,7 @@
 								<ValidationProvider
 									rules="between:-99,99"
 									name="Fixed value"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="getValue('fixed_val', { key, index })" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -150,8 +151,8 @@
 										autocomplete="off"
 										class="mb-2"
 										type="number"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									>
 										<template v-slot:append>
 											<hk-popover
@@ -223,7 +224,7 @@
 				v-if="action_type === 'save'"
 				rules="required"
 				name="Fixed value"
-				v-slot="{ invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="roll.save_fail_mod" as="div"
 			>
 				<q-select
 					:dark="$store.getters.theme === 'dark'"
@@ -236,7 +237,7 @@
 					v-model="roll.save_fail_mod"
 					class="mb-3"
 					hint="The effect if the target makes a successful saving throw."
-					:error="invalid && validated"
+					:error="!!errorMessage"
 					error-message="What happens on a succesful save?"
 				/>
 			</ValidationProvider>
@@ -244,7 +245,7 @@
 				v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
 				rules="required"
 				name="Fixed value"
-				v-slot="{ invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="roll.miss_mod" as="div"
 			>
 				<q-select
 					:dark="$store.getters.theme === 'dark'"
@@ -257,7 +258,7 @@
 					v-model="roll.miss_mod"
 					class="mb-3"
 					hint="The effect if the attack is a miss."
-					:error="invalid && validated"
+					:error="!!errorMessage"
 					error-message="What happens on a miss?"
 				/>
 			</ValidationProvider>
@@ -284,14 +285,14 @@
 				</div>
 			</template>
 		</div>
-		<ValidationObserver v-if="set_scaling" v-slot="{ valid }">
+		<ValidationObserver v-if="set_scaling" v-slot="{ meta }" as="div">
 			<hk-action-roll-scaling
 				v-model="roll.scaling"
 				:roll="roll"
 				:spell="spell"
 				@input="$forceUpdate()"
 			/>
-			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!valid" />
+			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!meta.valid" />
 		</ValidationObserver>
 	</div>
 </template>
@@ -383,7 +384,7 @@ export default {
 				return this.roll.special;
 			},
 			set(newVal) {
-				this.$set(this.roll, "special", newVal);
+				this.roll["special"] = newVal;
 			},
 		},
 		action_options() {
@@ -393,15 +394,15 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		reset_magical(value, versatile) {
 			const prop = versatile === 1 ? "versatile_magical" : "magical";
 			if (!["bludgeoning", "piercing", "slashing"].includes(value)) {
-				this.$set(this.roll, prop, null);
+				this.roll[prop] = null;
 			}
 		},
 		scalingDesc(tiers, scaling, level) {
@@ -418,15 +419,15 @@ export default {
 			value =
 				["dice_count", "fixed_val"].includes(prop) && value != undefined ? parseInt(value) : value;
 			if (option.index === 0) {
-				this.$set(this.roll, prop, value);
+				this.roll[prop] = value;
 			} else if (this.roll.options) {
 				if (this.roll.options[option.key]) {
-					this.$set(this.roll.options[option.key], prop, value);
+					this.roll.options[option.key][prop] = value;
 				} else {
-					this.$set(this.roll.options, option.key, { [prop]: value });
+					this.roll.options[option.key] = { [prop]: value };
 				}
 			} else {
-				this.$set(this.roll, "options", { [option.key]: { [prop]: value } });
+				this.roll["options"] = { [option.key]: { [prop]: value } };
 			}
 			if (prop === "damage_type") {
 				this.reset_magical(value, option.key);

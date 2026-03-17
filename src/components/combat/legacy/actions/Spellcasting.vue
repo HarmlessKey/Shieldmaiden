@@ -352,7 +352,7 @@ export default {
 				this.displayLevels = [level];
 			} else {
 				if (this.displayLevels.includes(level))
-					this.$delete(this.displayLevels, this.displayLevels.indexOf(level));
+					this.displayLevels.splice(this.displayLevels.indexOf(level), 1);
 				else this.displayLevels.push(level);
 			}
 			this.$forceUpdate();

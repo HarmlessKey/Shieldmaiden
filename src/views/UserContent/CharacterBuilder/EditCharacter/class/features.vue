@@ -115,7 +115,7 @@
 								<ValidationProvider
 									rules="required|max:30"
 									name="Feature name"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="character.class.classes[classIndex].features[feature.index].name" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -126,23 +126,23 @@
 										type="text"
 										v-model="character.class.classes[classIndex].features[feature.index].name"
 										:placeholder="index === 'asi' ? 'Feat name' : 'Feature name'"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 
 								<ValidationProvider
 									rules="max:2000"
 									name="Description"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="feature.description" as="div"
 								>
 									<hk-markdown-editor
 										v-model="
 											character.class.classes[classIndex].features[feature.index].description
 										"
 										@change="save(valid)"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 										label="Description"
 									>
 										<character-descriptions

@@ -14,7 +14,7 @@
 						<ValidationProvider
 							rules="between:1,99|required"
 							name="AC"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="transAc" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -26,8 +26,8 @@
 								min="1"
 								max="99"
 								v-model="transAc"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>
@@ -36,7 +36,7 @@
 						<ValidationProvider
 							rules="between:1,9999|required"
 							name="HP"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="transHp" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -48,8 +48,8 @@
 								min="1"
 								max="9999"
 								v-model="transHp"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>

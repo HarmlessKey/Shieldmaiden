@@ -12,57 +12,57 @@
 			</small>
 		</div>
 		<div class="card-body">
-			<ValidationObserver v-slot="{ valid }">
+			<ValidationObserver v-slot="{ meta }" as="div">
 				<q-form greedy>	
-					<ValidationProvider rules="required|max:30" name="Player name" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="required|max:30" name="Player name" v-slot="{ errorMessage }" :modelValue="character.player_name" as="div">
 						<q-input 
 							dark filled square
 							label="Player name"
 							autocomplete="off"  
 							type="text" 
-							@change="save(valid)"
+							@change="save(meta.valid)"
 							v-model="character.player_name" 
 							maxlength="30"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						/>
 					</ValidationProvider>
-					<ValidationProvider rules="required|max:35" name="Character name" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="required|max:35" name="Character name" v-slot="{ errorMessage }" :modelValue="character.character_name" as="div">
 						<q-input 
 							dark filled square
 							label="Character name"
 							autocomplete="off"  
 							type="text" 
-							@change="save(valid)"
+							@change="save(meta.valid)"
 							v-model="character.character_name" 
 							maxlength="35"
 							class="mb-2"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						/>
 					</ValidationProvider>
 					<div class="avatar mb-2">
 						<div class="image" :style="character.avatar ? `background-image: url('${character.avatar}')` : ''">
 							<i v-if="!character.avatar" class="hki-player" aria-hidden="true" />
 						</div>
-						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="url|max:2000" name="Avatar" v-slot="{ errorMessage }" :modelValue="character.avatar" as="div">
 							<q-input
 								dark filled square
 								label="Avatar"
 								autocomplete="off"
 								type="text"
-								@change="save(valid)"
+								@change="save(meta.valid)"
 								v-model="character.avatar"
 								maxlength="2000"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>
 					<q-select 
 						dark filled square map-options emit-value
-						@input="save(valid)"
+						@input="save(meta.valid)"
 						v-model="character.advancement" 
 						:options="advancement_options" 
 						label="Advancement" 
@@ -70,7 +70,7 @@
 					/>
 					<q-select 
 						dark filled square map-options emit-value
-						@input="save(valid)"
+						@input="save(meta.valid)"
 						v-model="character.hit_point_type" 
 						:options="hit_point_options" 
 						label="Hit point type"

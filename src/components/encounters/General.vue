@@ -1,12 +1,12 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(edit)" greedy>
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, edit)" greedy>
 				<h3 class="d-flex justify-between">
 					Atmosphere
 					<div v-if="!demo">
 						<q-btn color="primary" type="submit" no-caps>Save</q-btn>
-						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 							<q-tooltip anchor="top middle" self="center middle">
 								There are validation errors
 							</q-tooltip>
@@ -43,7 +43,7 @@
 				</template>
 
 				<template v-else>
-					<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="required" name="Name" v-slot="{ errorMessage }" :modelValue="editableEncounter.name" as="div">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -52,12 +52,12 @@
 							autocomplete="off"
 							class="mb-3"
 							v-model="editableEncounter.name"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						/>
 					</ValidationProvider>
 
-					<ValidationProvider rules="audio" name="Audio" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="audio" name="Audio" v-slot="{ errorMessage }" :modelValue="editableEncounter.audio" as="div">
 						<div class="audio">
 							<div v-if="encounter.audio && !invalid" class="img pointer">
 								<a :href="encounter.audio" target="_blank" rel="noopener">
@@ -79,8 +79,8 @@
 									autocomplete="off"
 									v-model="editableEncounter.audio"
 									placeholder="Audio URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</div>
 						</div>
@@ -94,7 +94,7 @@
 						@input="setBackground($event)"
 						class="mb-3"
 					/>
-					<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="url" name="Audio" v-slot="{ errorMessage }" :modelValue="editableEncounter.background" as="div">
 						<div class="background mb-3">
 							<div
 								v-if="encounter.background && !invalid"
@@ -115,8 +115,8 @@
 									v-model="editableEncounter.background"
 									class="mb-2"
 									placeholder="Background URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 									@input="editableEncounter.hk_background = null"
 								>
 									<hk-popover
@@ -146,7 +146,7 @@
 
 					<div v-if="!demo" class="d-flex justify-start items-center mb-3">
 						<q-btn color="primary" type="submit" no-caps>Save</q-btn>
-						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 							<q-tooltip anchor="top middle" self="center middle">
 								There are validation errors
 							</q-tooltip>
@@ -271,7 +271,7 @@ export default {
 			this.weather = this.encounter.weather;
 		}
 		if (this.editableEncounter && !this.editableEncounter.hk_background) {
-			this.$set(this.editableEncounter, "hk_background", null);
+			this.editableEncounter["hk_background"] = null;
 		}
 	},
 	methods: {
@@ -307,7 +307,7 @@ export default {
 			}
 		},
 		setBackground(value) {
-			this.$set(this.editableEncounter, "hk_background", value);
+			this.editableEncounter["hk_background"] = value;
 		},
 		getBackground(encounter) {
 			if (encounter.background) return encounter.background;

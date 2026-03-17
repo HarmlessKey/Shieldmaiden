@@ -355,14 +355,14 @@
 
 		<q-dialog v-model="player_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
+				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
 					<q-form @submit="handleSubmit(add($event, generateUUID(), 'player', player.name))" greedy>
 						<hk-card header="Add players" :min-width="300">
 							<div class="card-body">
 								<ValidationProvider
 									rules="required"
 									name="Name"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.name" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -370,14 +370,14 @@
 										square
 										label="Name"
 										v-model="player.name"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 								<ValidationProvider
 									rules="required|between:1,20"
 									name="Level"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.level" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -386,14 +386,14 @@
 										label="Level"
 										type="number"
 										v-model="player.level"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 								<ValidationProvider
 									rules="required|between:1,9999"
 									name="Max HP"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.maxHp" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -402,14 +402,14 @@
 										label="Hit Point Maximum"
 										type="number"
 										v-model="player.maxHp"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 								<ValidationProvider
 									rules="required|between:1,99"
 									name="AC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.ac" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -418,8 +418,8 @@
 										label="Armor Class"
 										type="number"
 										v-model="player.ac"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -432,7 +432,7 @@
 									no-caps
 									flat
 									color="primary"
-									:disable="!valid"
+									:disable="!meta.valid"
 								/>
 								<q-btn
 									type="submit"
@@ -441,7 +441,7 @@
 									v-close-popup
 									no-caps
 									color="primary"
-									:disable="!valid"
+									:disable="!meta.valid"
 								/>
 							</div>
 						</hk-card>
@@ -682,7 +682,7 @@ export default {
 		},
 		clearFilter() {
 			this.filter_dialog = false;
-			this.$set(this, "filter", {});
+			this.filter = {};
 			this.filterMonsters();
 		},
 		request(req) {

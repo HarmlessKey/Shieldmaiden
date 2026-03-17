@@ -1,5 +1,5 @@
 <template>
-	<q-dialog ref="dialog" v-bind="$attrs" v-on="$listeners">
+	<q-dialog ref="dialog" v-bind="$attrs">
 		<hk-card v-bind="$attrs" :class="cardClass">
 			<div slot="header" class="card-header">
 				<slot name="header">

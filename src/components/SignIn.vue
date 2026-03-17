@@ -9,8 +9,8 @@
 			</p>
 			<button class="google mb-2" @click="googleSignIn()">Sign in with Google</button>
 			<hr />
-			<ValidationObserver v-if="!loading" v-slot="{ handleSubmit }">
-				<q-form @submit="handleSubmit(signIn)" greedy>
+			<ValidationObserver v-if="!loading" v-slot="{ handleSubmit }" as="div">
+				<q-form @submit="handleSubmit($event, signIn)" greedy>
 					<h4 class="text-center neutral-2">With email and password</h4>
 					<hk-input
 						v-model="email"

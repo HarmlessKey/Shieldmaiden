@@ -1,7 +1,7 @@
 <template>
 	<div class="content__edit" v-if="!loading">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(savePlayer)">
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, savePlayer)">
 				<div
 					id="players"
 					v-if="
@@ -34,7 +34,7 @@
 									v-if="$route.name !== 'Edit character'"
 									rules="max:15|required"
 									name="Name"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.player_name" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -46,15 +46,15 @@
 										class="mb-2"
 										v-model="player.player_name"
 										maxlength="15"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 
 								<ValidationProvider
 									rules="max:35|required"
 									name="Character name"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.character_name" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -66,8 +66,8 @@
 										class="mb-2"
 										v-model="player.character_name"
 										maxlength="35"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 
@@ -175,7 +175,7 @@
 										<ValidationProvider
 											rules="numeric|between:0,355000"
 											name="XP"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="player.experience" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -188,8 +188,8 @@
 												max="355000"
 												v-model="player.experience"
 												:disable="player.level > 0"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											>
 												<template v-slot:append>
 													<small
@@ -212,7 +212,7 @@
 										<ValidationProvider
 											rules="numeric|between:1,20"
 											name="Level"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="player.level" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -226,8 +226,8 @@
 												max="20"
 												:value="player.level"
 												@input="parseToInt($event, player, 'level')"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -235,7 +235,7 @@
 										<ValidationProvider
 											rules="required|numeric|between:1,999"
 											name="Max HP"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="player.maxHp" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -250,8 +250,8 @@
 												name="maxHp"
 												placeholder="Maximum Hit Points*"
 												@input="parseToInt($event, player, 'maxHp')"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											>
 												<q-icon slot="prepend" name="fas fa-heart" />
 												<q-tooltip anchor="top middle" self="center middle"
@@ -264,7 +264,7 @@
 										<ValidationProvider
 											rules="required|numeric|between:1,99"
 											name="AC"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="player.ac" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -277,8 +277,8 @@
 												type="number"
 												:value="player.ac"
 												@input="parseToInt($event, player, 'ac')"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											>
 												<q-icon slot="prepend" name="fas fa-shield" />
 												<q-tooltip anchor="top middle" self="center middle">Armor class</q-tooltip>
@@ -289,7 +289,7 @@
 										<ValidationProvider
 											rules="numeric|between:1,99"
 											name="Save DC"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="player.spell_save_dc" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -302,8 +302,8 @@
 												type="number"
 												:value="player.spell_save_dc"
 												@input="parseToInt($event, player, 'spell_save_dc')"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											>
 												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
 												<q-tooltip anchor="top middle" self="center middle"
@@ -318,7 +318,7 @@
 										<ValidationProvider
 											rules="numeric|between:0,999"
 											name="Speed"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="player.speed" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -332,8 +332,8 @@
 												:value="player.speed"
 												placeholder="Speed"
 												@input="parseToInt($event, player, 'speed')"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -341,7 +341,7 @@
 										<ValidationProvider
 											rules="between:-10,99"
 											name="Initiative"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="player.initiative" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -354,8 +354,8 @@
 												type="number"
 												:value="player.initiative"
 												@input="parseToInt($event, player, 'initiative')"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -373,7 +373,7 @@
 									<ValidationProvider
 										rules="numeric|between:1,99"
 										:name="ability"
-										v-slot="{ errors, invalid, validated }"
+										v-slot="{ errorMessage }" :modelValue="player[ability]" as="div"
 									>
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
@@ -386,8 +386,8 @@
 											max="99"
 											v-model="player[ability]"
 											@input="parseToInt($event, player, ability)"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!!errorMessage"
+											:error-message="errorMessage"
 										>
 											<!-- eslint-disable -->
 											<q-checkbox
@@ -414,7 +414,7 @@
 									<ValidationProvider
 										rules="numeric|between:1,99"
 										name="Passive perception"
-										v-slot="{ errors, invalid, validated }"
+										v-slot="{ errorMessage }" :modelValue="player.passive_perception" as="div"
 									>
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
@@ -428,8 +428,8 @@
 											v-model="player.passive_perception"
 											@input="parseToInt($event, player, 'passive_perception')"
 											placeholder="Perception"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!!errorMessage"
+											:error-message="errorMessage"
 										>
 											<q-icon slot="prepend" name="fas fa-eye" />
 										</q-input>
@@ -439,7 +439,7 @@
 									<ValidationProvider
 										rules="numeric|between:1,99"
 										name="Passive investigation"
-										v-slot="{ errors, invalid, validated }"
+										v-slot="{ errorMessage }" :modelValue="player.passive_investigation" as="div"
 									>
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
@@ -453,8 +453,8 @@
 											v-model="player.passive_investigation"
 											@input="parseToInt($event, player, 'passive_investigation')"
 											placeholder="Investigation"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!!errorMessage"
+											:error-message="errorMessage"
 										>
 											<q-icon slot="prepend" name="fas fa-search" />
 										</q-input>
@@ -464,7 +464,7 @@
 									<ValidationProvider
 										rules="numeric|between:1,99"
 										name="Passive insight"
-										v-slot="{ errors, invalid, validated }"
+										v-slot="{ errorMessage }" :modelValue="player.passive_insight" as="div"
 									>
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
@@ -478,8 +478,8 @@
 											v-model="player.passive_insight"
 											@input="parseToInt($event, player, 'passive_insight')"
 											placeholder="Insight"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!!errorMessage"
+											:error-message="errorMessage"
 										>
 											<q-icon slot="prepend" name="fas fa-lightbulb-on" />
 										</q-input>
@@ -655,7 +655,7 @@
 
 					<div class="save">
 						<div class="buttons">
-							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+							<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
 								</q-tooltip>

@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { campaignServices } from "src/services/campaigns";
 import { db } from "src/firebase";
 import _ from 'lodash';
@@ -21,7 +20,7 @@ const track_campaign_getters = {
   track_user: (state) => (uid) => {
     return state.users[uid];
   },
-  track_search_campaigns: (state) => (uid) => { 
+  track_search_campaigns: (state) => (uid) => {
     // Convert object to sorted array
     return _.chain(state.track_search_campaigns[uid])
     .filter((campaign, key) => {
@@ -48,7 +47,7 @@ const track_campaign_actions = {
    */
    async get_user({ state, commit }, uid) {
     let user = (state.users) ? state.users[uid] : undefined;
-    
+
     if(!user) {
       try {
         USERS_REF.child(uid).on("value", (snapshot) => {
@@ -73,7 +72,7 @@ const track_campaign_actions = {
    */
    async get_campaigns({ state, dispatch, commit }, uid) {
     let campaigns = (state.track_search_campaigns) ? state.track_search_campaigns[uid] : undefined;
-    
+
     if(!campaigns) {
       try {
         SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).orderByChild("private").equalTo(null).on("value", (snapshot) => {
@@ -86,7 +85,7 @@ const track_campaign_actions = {
     return state.track_search_campaigns[uid];
   },
 
- 
+
   /**
    * Get a single campaign
    * - first try to find it in the store, then fetch if wasn't present
@@ -94,7 +93,7 @@ const track_campaign_actions = {
    * - Set current hit points
    * - Remove ghost players
    * - Remove ghost companions
-   * 
+   *
    * @param {string} uid userId
    * @param {string} id campaignId
    */
@@ -123,20 +122,20 @@ const track_campaign_actions = {
   }
 };
 const track_campaign_mutations = {
-  SET_CAMPAIGN_SERVICES(state, payload) { Vue.set(state, "campaign_services", payload); },
-  SET_USER(state, { uid, user }) { Vue.set(state.users, uid, user); },
-  SET_USER_SETTINGS(state, { uid, settings }) { Vue.set(state.users[uid], "settings", settings); },
-  SET_USER_LIVE(state, { uid, live }) { Vue.set(state.users[uid], "live", live); },
-  SET_CAMPAIGNS(state, { uid, campaigns}) { Vue.set(state.track_search_campaigns, uid, campaigns); },
-  SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) { 
+  SET_CAMPAIGN_SERVICES(state, payload) { state.campaign_services = payload; },
+  SET_USER(state, { uid, user }) { state.users[uid] = user; },
+  SET_USER_SETTINGS(state, { uid, settings }) { state.users[uid].settings = settings; },
+  SET_USER_LIVE(state, { uid, live }) { state.users[uid].live = live; },
+  SET_CAMPAIGNS(state, { uid, campaigns}) { state.track_search_campaigns[uid] = campaigns; },
+  SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) {
     if(state.cached_campaigns[uid]) {
-      Vue.set(state.cached_campaigns[uid], id, campaign);
+      state.cached_campaigns[uid][id] = campaign;
     } else {
-      Vue.set(state.cached_campaigns, uid, { [id]: campaign });
+      state.cached_campaigns[uid] = { [id]: campaign };
     }
   },
   CLEAR_STORE(state) {
-    Vue.set(state, "track_campaigns", {});
+    state.track_campaigns = {};
   }
 };
 

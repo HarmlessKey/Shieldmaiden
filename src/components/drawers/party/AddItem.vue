@@ -10,15 +10,15 @@
 		<h2>New Item</h2>
 		<ValidationObserver v-slot="{ handleSubmit, validate, valid }">
 			<q-form @submit="valid ? handleSubmit(addItem) : validate()" greedy>
-				<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
+				<ValidationProvider rules="required" name="Name" v-slot="{ errorMessage }" :modelValue="item.public_name" as="div">
 					<q-input
 						:dark="$store.getters.theme === 'dark'" filled square
 						label="Public name *"
 						class="mb-3"
 						type="text" 
 						v-model="item.public_name"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!!errorMessage"
+						:error-message="errorMessage"
 					>
 						<hk-popover 
 							slot="append" 
@@ -30,7 +30,7 @@
 					</q-input>
 				</ValidationProvider>
 
-				<ValidationProvider rules="max:2000" name="Name" v-slot="{ errors, invalid, validated }">
+				<ValidationProvider rules="max:2000" name="Name" v-slot="{ errorMessage }" :modelValue="item.public_description" as="div">
 					<q-input
 						:dark="$store.getters.theme === 'dark'" filled square
 						autogrow
@@ -40,8 +40,8 @@
 						rows="4"
 						name="desc"
 						maxlength="2000"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!!errorMessage"
+						:error-message="errorMessage"
 					/>
 				</ValidationProvider>
 
@@ -101,7 +101,7 @@
 					key: id,
 					custom: resource === "custom" ? true : null
 				};
-				this.$set(this.item, "linked_item", item);
+				this.item["linked_item"] = item;
 				this.link_dialog = false;
 			},
 			async addItem() {	

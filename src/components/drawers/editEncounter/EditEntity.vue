@@ -6,12 +6,12 @@
 			Edit <strong>{{ npc.name.capitalize() }}</strong>
 		</h2>
 
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(edit)" greedy>
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, edit)" greedy>
 				<ValidationProvider
 					rules="max:100|required"
 					name="Name"
-					v-slot="{ errors, invalid, validated }"
+					v-slot="{ errorMessage }" :modelValue="npc.name" as="div"
 				>
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -22,8 +22,8 @@
 						class="mb-2"
 						placeholder="Name"
 						maxlength="100"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!!errorMessage"
+						:error-message="errorMessage"
 					/>
 				</ValidationProvider>
 				<div class="avatar">
@@ -46,7 +46,7 @@
 					<ValidationProvider
 						rules="url|max:2000"
 						name="Avatar"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage }" :modelValue="npc.avatar" as="div"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -57,8 +57,8 @@
 							class="mb-2"
 							placeholder="Input URL"
 							maxlength="2000"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						/>
 					</ValidationProvider>
 				</div>
@@ -97,7 +97,7 @@
 					<ValidationProvider
 						rules="required|between:1,99"
 						name="Armor class"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage }" :modelValue="npc.ac" as="div"
 						class="full-width"
 					>
 						<q-input
@@ -110,8 +110,8 @@
 							min="1"
 							max="99"
 							v-model.number="npc.ac"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						>
 							<template v-slot:append>
 								<i aria-hidden="true" class="fas fa-shield" />
@@ -122,7 +122,7 @@
 					<ValidationProvider
 						rules="required|between:1,999"
 						name="Hit points"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage }" :modelValue="npc.maxHp" as="div"
 						class="full-width"
 					>
 						<q-input
@@ -135,8 +135,8 @@
 							max="999"
 							v-model.number="npc.maxHp"
 							placeholder="Hit Points"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						>
 							<template v-slot:append>
 								<q-icon name="favorite" />
@@ -146,7 +146,7 @@
 				</div>
 				<div class="d-flex items-center my-3">
 					<q-btn color="primary" type="submit" class="full-width">Save</q-btn>
-					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+					<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 						<q-tooltip anchor="top middle" self="bottom right">
 							There are validation errors
 						</q-tooltip>

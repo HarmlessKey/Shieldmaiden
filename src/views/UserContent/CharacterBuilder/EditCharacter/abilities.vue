@@ -27,7 +27,7 @@
 				@input="confirmMethodChange($event)"
 			/>
 
-			<ValidationObserver v-if="method" v-slot="{ valid }">
+			<ValidationObserver v-if="method" v-slot="{ meta }" as="div">
 				<q-form greedy>
 					<h3 class="text-center">Base ability scores</h3>
 					<div class="d-flex justify-content-center mb-4" v-if="method === 'manual'">
@@ -50,7 +50,7 @@
 								emit-value
 								map-options
 								:option-disable="standardArrayDisable"
-								@input="saveAbility($event, ability, valid)"
+								@input="saveAbility($event, ability, meta.valid)"
 								clearable
 							/>
 						</div>
@@ -72,7 +72,7 @@
 									emit-value
 									map-options
 									:option-disable="(opt) => pointBuyDisable(opt, ability_scores[ability])"
-									@input="saveAbility($event, ability, valid)"
+									@input="saveAbility($event, ability, meta.valid)"
 								/>
 							</div>
 						</div>
@@ -90,19 +90,19 @@
 							<ValidationProvider
 								rules="between:1,20"
 								:name="ability"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="ability_scores[ability]" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
 									placeholder="-"
-									@change="saveAbility($event.target.value, ability, valid)"
+									@change="saveAbility($event.target.value, ability, meta.valid)"
 									autocomplete="off"
 									type="number"
 									v-model="ability_scores[ability]"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 						</div>

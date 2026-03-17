@@ -8,7 +8,7 @@
 					<ValidationProvider
 						rules="required|alpha_num|min:3|max:20|username"
 						name="Username"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage }" :modelValue="username" as="div"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -21,8 +21,8 @@
 							maxlength="20"
 							minlength="3"
 							v-model="username"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						/>
 						<button
 							class="btn btn-block"

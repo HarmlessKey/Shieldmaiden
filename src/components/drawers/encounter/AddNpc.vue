@@ -30,7 +30,7 @@
 						<ValidationProvider
 							rules="required|max:100"
 							name="Name"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="entity.name" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -42,8 +42,8 @@
 								name="name"
 								v-model="entity.name"
 								no-error-icon
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 						<div class="row q-col-gutter-md mb-2">
@@ -51,7 +51,7 @@
 								<ValidationProvider
 									rules="required|between:0,99"
 									name="Initiative"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="entity.initiative" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -64,8 +64,8 @@
 										max="99"
 										v-model.number="entity.initiative"
 										no-error-icon
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									>
 										<template v-slot:append>
 											<a @click="rollInitiative">
@@ -82,7 +82,7 @@
 								<ValidationProvider
 									rules="required|between:1,99"
 									name="AC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="entity.ac" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -95,8 +95,8 @@
 										max="99"
 										v-model.number="entity.ac"
 										no-error-icon
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -104,7 +104,7 @@
 								<ValidationProvider
 									rules="required|between:1,9999"
 									name="HP"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="entity.maxHp" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -117,8 +117,8 @@
 										max="9999"
 										v-model.number="entity.maxHp"
 										no-error-icon
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -275,14 +275,14 @@ export default {
 				{},
 				this.share ? { encounter_id: this.encounterId } : null
 			);
-			this.$set(this.entity, "initiative", Number(roll.total));
+			this.entity["initiative"] = Number(roll.total);
 		},
 		set({ result, id, resource }) {
-			this.$set(this.entity, "id", id);
-			this.$set(this.entity, "npc", resource === "custom" ? "custom" : "api");
-			this.$set(this.entity, "maxHp", parseInt(result.hit_points));
-			this.$set(this.entity, "ac", parseInt(result.armor_class));
-			this.$set(this.entity, "name", result.name);
+			this.entity["id"] = id;
+			this.entity["npc"] = resource === "custom" ? "custom" : "api";
+			this.entity["maxHp"] = parseInt(result.hit_points);
+			this.entity["ac"] = parseInt(result.armor_class);
+			this.entity["name"] = result.name;
 
 			this.dexterity = result.dexterity; // needed to roll initiative
 

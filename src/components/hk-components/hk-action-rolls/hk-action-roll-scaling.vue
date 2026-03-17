@@ -22,7 +22,7 @@
 						<ValidationProvider
 							rules="required|between:1,20"
 							:name="`${scaling_name} ${tier_index}`"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="level_tier.level" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -35,11 +35,11 @@
 								type="number"
 								min="1"
 								max="20"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 								@keyup="$forceUpdate()"
 								@input="
-									(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
+									(value) => level_tier['level'] = (value != undefined ? parseInt(value) : value)
 								"
 							/>
 						</ValidationProvider>
@@ -49,7 +49,7 @@
 							<ValidationProvider
 								rules="between:1,99"
 								:name="`Dice count ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="level_tier.dice_count" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -62,12 +62,12 @@
 									type="number"
 									min="1"
 									max="99"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
-											$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
+											level_tier['dice_count'] = (value != undefined ? parseInt(value) : value)
 									"
 								>
 									<small slot="append">d{{ roll.dice_type }}</small>
@@ -78,7 +78,7 @@
 							<ValidationProvider
 								rules="between:-99,99"
 								:name="`Fixed value ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="level_tier.fixed_val" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -91,12 +91,12 @@
 									type="number"
 									min="-99"
 									max="99"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
-											$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
+											level_tier['fixed_val'] = (value != undefined ? parseInt(value) : value)
 									"
 								/>
 							</ValidationProvider>
@@ -106,7 +106,7 @@
 						<ValidationProvider
 								rules="between:1,10"
 								:name="`Projectile count ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="level_tier.projectile_count" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -116,12 +116,12 @@
 									v-model="level_tier.projectile_count"
 									autocomplete="off"
 									type="number"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
 									@input="
 										(value) =>
-											$set(level_tier, 'projectile_count', value != undefined ? parseInt(value) : value)
+											level_tier['projectile_count'] = (value != undefined ? parseInt(value) : value)
 									"
 								/>
 							</ValidationProvider>
@@ -206,7 +206,7 @@ export default {
 			this.$forceUpdate();
 		},
 		removeLevelTier(tier_index) {
-			this.$delete(this.scaling, tier_index);
+			this.scaling.splice(tier_index, 1);
 			this.$forceUpdate();
 		},
 		scalingDesc(tiers, scaling, level) {

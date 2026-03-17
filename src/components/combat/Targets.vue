@@ -40,29 +40,26 @@
 					{{ group.capitalize() }} ({{ targets.length }})
 				</h2>
 				<draggable
-					tag="div"
-					:value="targets"
+					:list="targets"
+					item-key="key"
 					:animation="200"
 					handle=".drag-handle"
 					ghost-class="drag-ghost"
 					drag-class="drag-dragging"
 					:force-fallback="true"
-					
+					tag="transition-group"
+					:component-data="{
+						tag: 'ul',
+						class: ['targets', `${group}_targets`],
+						name: 'group',
+						'enter-active-class': 'animated animate__fadeInUp',
+						'leave-active-class': 'animated animate__fadeOutDown',
+					}"
 					@end="onDrag"
 				>
-					<transition-group
-						
-						tag="ul"
-						class="targets"
-						:class="`${group}_targets`"
-						name="group"
-						enter-active-class="animated animate__fadeInUp"
-						leave-active-class="animated animate__fadeOutDown"
-					>
+					<template #item="{ element: entity, index: i }">
 						<li
-							v-for="(entity, i) in targets"
 							class="d-flex justify-content-between target-li"
-							:key="entity.key"
 							:class="{
 								targeted: targeted.includes(entity.key),
 								top: _active[0].key === entity.key && encounter.turn !== 0,
@@ -138,7 +135,7 @@
 								:offset="[10, 0]"
 							/>
 						</li>
-					</transition-group>
+					</template>
 				</draggable>
 			</template>
 		</div>

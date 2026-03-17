@@ -225,14 +225,14 @@
 				} else {
 					amount = this.updateAmount(defense, amount);
 				}
-				this.$set(this.results[index].targets[target], 'defense', defense);
-				this.$set(this.results[index].targets[target], 'amount', amount);
+				this.results[index].targets[target]['defense'] = defense;
+				this.results[index].targets[target]['amount'] = amount;
 				this.$forceUpdate();
 
 				this.final_results = this.setFinal(this.results);
 			},
 			setIntensity(target, value) {
-				this.$set(this.intensity, target, value);
+				this.intensity[target] = value;
 				this.$forceUpdate();
 			},
 			async apply(type) {

@@ -42,7 +42,7 @@
 							v-if="category === 'legendary_actions'"
 							rules="between:1,9|required"
 							name="Count"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="npc.legendary_count" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -54,33 +54,31 @@
 								class="my-3"
 								hint="Amount of legendary actions per turn."
 								@input="parseToInt($event, npc, 'legendary_count')"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 
 						<!-- ABILITIES -->
 						<draggable
-							tag="div"
 							v-model="npc[category]"
+							item-key="name"
 							:animation="200"
 							class="accordion"
 							handle=".drag-handle"
 							ghost-class="drag-ghost"
 							drag-class="drag-dragging"
 							:force-fallback="true"
+							tag="transition-group"
+							:component-data="{
+								name: 'action-list',
+								'enter-active-class': 'animated animate__fadeIn',
+								'leave-active-class': 'animated animate__fadeOut',
+							}"
 						>
-							<transition-group
-								type="transition"
-								name="action-list"
-								enter-active-class="animated animate__fadeIn"
-								leave-active-class="animated animate__fadeOut"
-							>
-								<div
-									v-for="(ability, ability_index) in npc[category]"
-									:key="`ability-${ability_index}`"
-								>
-									<ValidationObserver v-slot="{ valid }">
+							<template #item="{ element: ability, index: ability_index }">
+								<div>
+									<ValidationObserver v-slot="{ meta }" as="div">
 										<q-expansion-item
 											:dark="$store.getters.theme === 'dark'"
 											switch-toggle-side
@@ -93,7 +91,7 @@
 												<q-item-section avatar class="drag-handle">
 													<hk-icon icon="fas fa-grip-vertical" />
 												</q-item-section>
-												<q-item-section avatar v-if="!valid">
+												<q-item-section avatar v-if="!meta.valid">
 													<q-icon name="error" color="red" />
 													<q-tooltip anchor="top middle" self="center middle">
 														Validation errors
@@ -149,7 +147,7 @@
 													v-if="category === 'legendary_actions'"
 													rules="between:1,9|required"
 													name="Legendary actions"
-													v-slot="{ errors, invalid, validated }"
+													v-slot="{ errorMessage }" :modelValue="ability.legendary_cost" as="div"
 												>
 													<q-input
 														:dark="$store.getters.theme === 'dark'"
@@ -163,15 +161,15 @@
 														hint="How many legendary actions does this cost?"
 														@input="parseToInt($event, ability, 'legendary_cost')"
 														@keyup="$forceUpdate()"
-														:error="invalid && validated"
-														:error-message="errors[0]"
+														:error="!!errorMessage"
+														:error-message="errorMessage"
 													/>
 												</ValidationProvider>
 
 												<ValidationProvider
 													rules="max:50|required"
 													name="Name"
-													v-slot="{ errors, invalid, validated }"
+													v-slot="{ errorMessage }" :modelValue="ability.name" as="div"
 												>
 													<q-input
 														:dark="$store.getters.theme === 'dark'"
@@ -183,8 +181,8 @@
 														maxlength="51"
 														v-model="ability.name"
 														@keyup="$forceUpdate()"
-														:error="invalid && validated"
-														:error-message="errors[0]"
+														:error="!!errorMessage"
+														:error-message="errorMessage"
 													/>
 												</ValidationProvider>
 
@@ -196,7 +194,7 @@
 														<ValidationProvider
 															rules="recharge"
 															name="Recharge"
-															v-slot="{ errors, invalid, validated }"
+															v-slot="{ errorMessage }" :modelValue="ability.recharge" as="div"
 														>
 															<q-input
 																:dark="$store.getters.theme === 'dark'"
@@ -206,8 +204,8 @@
 																autocomplete="off"
 																v-model="ability.recharge"
 																@keyup="$forceUpdate()"
-																:error="invalid && validated"
-																:error-message="errors[0]"
+																:error="!!errorMessage"
+																:error-message="errorMessage"
 															/>
 														</ValidationProvider>
 													</div>
@@ -216,7 +214,7 @@
 															<ValidationProvider
 																rules="between:1,9"
 																name="Limited"
-																v-slot="{ errors, invalid, validated }"
+																v-slot="{ errorMessage }" :modelValue="ability.limit" as="div"
 															>
 																<q-input
 																	:dark="$store.getters.theme === 'dark'"
@@ -228,8 +226,8 @@
 																	v-model.number="ability.limit"
 																	@input="parseToInt($event, ability, 'limit')"
 																	@keyup="$forceUpdate()"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
+																	:error="!!errorMessage"
+																	:error-message="errorMessage"
 																/>
 															</ValidationProvider>
 															<q-select
@@ -250,7 +248,7 @@
 												<ValidationProvider
 													rules="max:2000"
 													name="Description"
-													v-slot="{ errors, invalid, validated }"
+													v-slot="{ errorMessage }" :modelValue="ability.desc" as="div"
 												>
 													<q-input
 														:dark="$store.getters.theme === 'dark'"
@@ -264,8 +262,8 @@
 														maxlength="2000"
 														autogrow
 														@keyup="$forceUpdate()"
-														:error="invalid && validated"
-														:error-message="errors[0]"
+														:error="!!errorMessage"
+														:error-message="errorMessage"
 													/>
 												</ValidationProvider>
 
@@ -276,7 +274,7 @@
 															<ValidationProvider
 																rules="between:0,999"
 																name="Reach"
-																v-slot="{ errors, invalid, validated }"
+																v-slot="{ errorMessage }" :modelValue="ability.reach" as="div"
 															>
 																<q-input
 																	:dark="$store.getters.theme === 'dark'"
@@ -289,8 +287,8 @@
 																	suffix="ft."
 																	@keyup="$forceUpdate()"
 																	@input="parseToInt($event, ability, 'reach')"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
+																	:error="!!errorMessage"
+																	:error-message="errorMessage"
 																/>
 															</ValidationProvider>
 														</div>
@@ -298,7 +296,7 @@
 															<ValidationProvider
 																rules="range"
 																name="Range"
-																v-slot="{ errors, invalid, validated }"
+																v-slot="{ errorMessage }" :modelValue="ability.range" as="div"
 															>
 																<q-input
 																	:dark="$store.getters.theme === 'dark'"
@@ -308,8 +306,8 @@
 																	v-model="ability.range"
 																	suffix="ft."
 																	@keyup="$forceUpdate()"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
+																	:error="!!errorMessage"
+																	:error-message="errorMessage"
 																/>
 															</ValidationProvider>
 														</div>
@@ -331,7 +329,7 @@
 															<ValidationProvider
 																rules="between:0,999"
 																name="AOE size"
-																v-slot="{ errors, invalid, validated }"
+																v-slot="{ errorMessage }" :modelValue="ability.aoe_size" as="div"
 															>
 																<q-input
 																	:dark="$store.getters.theme === 'dark'"
@@ -344,8 +342,8 @@
 																	:disable="!ability.aoe_type"
 																	@keyup="$forceUpdate()"
 																	@input="parseToInt($event, ability, 'aoe_size')"
-																	:error="invalid && validated"
-																	:error-message="errors[0]"
+																	:error="!!errorMessage"
+																	:error-message="errorMessage"
 																/>
 															</ValidationProvider>
 														</div>
@@ -412,7 +410,7 @@
 																	<ValidationProvider
 																		rules="required"
 																		name="Save DC"
-																		v-slot="{ errors, invalid, validated }"
+																		v-slot="{ errorMessage }" :modelValue="action.save_ability" as="div"
 																	>
 																		<q-select
 																			:dark="$store.getters.theme === 'dark'"
@@ -424,8 +422,8 @@
 																			:options="abilities"
 																			v-model="action.save_ability"
 																			@input="$forceUpdate()"
-																			:error="invalid && validated"
-																			:error-message="errors[0]"
+																			:error="!!errorMessage"
+																			:error-message="errorMessage"
 																		/>
 																	</ValidationProvider>
 																</div>
@@ -433,7 +431,7 @@
 																	<ValidationProvider
 																		rules="required|between:1,99"
 																		name="Save DC"
-																		v-slot="{ errors, invalid, validated }"
+																		v-slot="{ errorMessage }" :modelValue="action.save_dc" as="div"
 																	>
 																		<q-input
 																			:dark="$store.getters.theme === 'dark'"
@@ -444,8 +442,8 @@
 																			v-model.number="action.save_dc"
 																			@keyup="$forceUpdate()"
 																			@input="parseToInt($event, action, 'save_dc')"
-																			:error="invalid && validated"
-																			:error-message="errors[0]"
+																			:error="!!errorMessage"
+																			:error-message="errorMessage"
 																		/>
 																	</ValidationProvider>
 																</div>
@@ -458,7 +456,7 @@
 																	<ValidationProvider
 																		rules="between:-10,99"
 																		name="Attack modifier"
-																		v-slot="{ errors, invalid, validated }"
+																		v-slot="{ errorMessage }" :modelValue="action.attack_bonus" as="div"
 																	>
 																		<q-input
 																			:dark="$store.getters.theme === 'dark'"
@@ -469,8 +467,8 @@
 																			v-model.number="action.attack_bonus"
 																			@keyup="$forceUpdate()"
 																			@input="parseToInt($event, action, 'attack_bonus')"
-																			:error="invalid && validated"
-																			:error-message="errors[0]"
+																			:error="!!errorMessage"
+																			:error-message="errorMessage"
 																		/>
 																	</ValidationProvider>
 																</div>
@@ -533,7 +531,7 @@
 										</q-expansion-item>
 									</ValidationObserver>
 								</div>
-							</transition-group>
+							</template>
 						</draggable>
 					</div>
 				</template>
@@ -542,8 +540,8 @@
 
 		<q-dialog v-model="action_dialog">
 			<div v-if="Object.keys(edit_action).length > 0">
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
-					<q-form @submit="handleSubmit(saveRoll)">
+				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+					<q-form @submit="handleSubmit($event, saveRoll)">
 						<hk-card
 							:header="edit_roll_index !== undefined ? 'Edit roll' : 'New roll'"
 							class="mb-0"
@@ -564,7 +562,7 @@
 									color="primary"
 									type="submit"
 									no-caps
-									:disabled="!valid"
+									:disabled="!meta.valid"
 									:label="edit_roll_index !== undefined ? 'Save' : 'Add'"
 								/>
 							</div>

@@ -209,7 +209,7 @@
 		</hk-card>
 		<q-dialog v-model="password_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
+				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
 					<q-form @submit="handleSubmit(linkMethod('password'))">
 						<hk-card header="Set a password">
 							<div class="card-body pb-0">
@@ -235,8 +235,8 @@
 								/>
 							</div>
 							<div slot="footer" class="card-footer">
-								<q-btn no-caps label="Cancel" type="submit" :disabled="!valid" />
-								<q-btn no-caps label="Confirm" color="primary" type="submit" :disabled="!valid" />
+								<q-btn no-caps label="Cancel" type="submit" :disabled="!meta.valid" />
+								<q-btn no-caps label="Confirm" color="primary" type="submit" :disabled="!meta.valid" />
 							</div>
 						</hk-card>
 					</q-form>

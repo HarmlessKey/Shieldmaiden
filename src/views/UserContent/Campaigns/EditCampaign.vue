@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(edit)" greedy>
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, edit)" greedy>
 				<hk-card header="Edit campaign" :min-width="300">
 					<div class="card-body">
 						<ValidationProvider
 							rules="required"
 							name="Title"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="editCampaign.name" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -18,8 +18,8 @@
 								type="text"
 								class="mb-2"
 								v-model="editCampaign.name"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 
@@ -69,7 +69,7 @@
 								<ValidationProvider
 									rules="url"
 									name="Background"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="editCampaign.background" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -79,8 +79,8 @@
 										type="text"
 										v-model="editCampaign.background"
 										placeholder="Custom background URL"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 										@input="editCampaign.hk_background = null"
 									>
 										<hk-popover
@@ -125,7 +125,7 @@
 						</div>
 					</div>
 					<div slot="footer" class="card-footer">
-						<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+						<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="mr-2">
 							<q-tooltip anchor="top middle" self="center middle">
 								There are validation errors
 							</q-tooltip>

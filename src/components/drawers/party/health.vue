@@ -1,14 +1,14 @@
 <template>
 	<div>
 		<h2>Health Modifiers</h2>
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(setHpModifiers)">
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, setHpModifiers)">
 				<div class="row q-col-gutter-md">
 					<div class="col">
 						<ValidationProvider
 							rules="between:0,999"
 							name="Temp HP"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="tempHp" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -18,8 +18,8 @@
 								type="number"
 								name="tempHp"
 								v-model="tempHp"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>
@@ -27,7 +27,7 @@
 						<ValidationProvider
 							rules="between:-999,999"
 							name="Max HP mod"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="maxHpMod" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -37,8 +37,8 @@
 								type="number"
 								name="maxHpMod"
 								v-model="maxHpMod"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>
@@ -56,7 +56,7 @@
 
 				<div class="d-flex items-center mt-3">
 					<q-btn class="full-width" type="submit" color="primary" no-caps> Update health </q-btn>
-					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+					<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 						<q-tooltip anchor="top middle" self="bottom right">
 							There are validation errors
 						</q-tooltip>

@@ -97,7 +97,7 @@ export default {
 
 			new_value = add ? new_value + 1 : new_value - 1;
 
-			this.$set(this.assigned_projectiles, key, new_value.between(0, this.projectileCount));
+			this.assigned_projectiles[key] = new_value.between(0, this.projectileCount);
 		},
 		cancel() {
 			this.$emit("cancel");

@@ -1,12 +1,18 @@
 import "animate.css";
 import { Splitpanes, Pane } from "splitpanes";
-// VueFire — REMOVED, never used its binding features (all Firebase access is direct SDK calls)
-// Croppa — DISABLED until Vue 3 replacement found
-// GTM — DISABLED until @gtm-support/vue-gtm (Vue 3 version) is installed
+import { createGtm } from "@gtm-support/vue-gtm";
 
 export default async ({ app, router }) => {
 	app.component("Splitpanes", Splitpanes);
 	app.component("Pane", Pane);
+
+	app.use(
+		createGtm({
+			id: "GTM-5XJCCDMS",
+			vueRouter: router,
+			enabled: process.env.NODE_ENV === "production",
+		})
+	);
 
 	require("../functions.js");
 };

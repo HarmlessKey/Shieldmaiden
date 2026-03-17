@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import { conditionServices } from "src/services/api/conditions"; 
+import { conditionServices } from "src/services/api/conditions";
 
 
 const conditions_state = () => ({
@@ -10,7 +9,7 @@ const conditions_state = () => ({
 
 const conditions_getters = {
   condition_services: (state) => { return state.condition_services; },
-  get_condition: (state) => (key) => { 
+  get_condition: (state) => (key) => {
     const id = state.cached_urls[key] || key;
     return state.cached_conditions[id];
   },
@@ -36,7 +35,7 @@ const conditions_actions = {
   /**
    * Gets a single condition from the database using and id (or kebab name)
    * and saves the condition in de store
-   * 
+   *
    * @param {number | string} id | kebab name
    * @returns {object} condition
    */
@@ -58,12 +57,12 @@ const conditions_actions = {
       const services = await dispatch("get_condition_services");
       try {
         condition = await services.getCondition(id);
-        
+
         // Create meta tags
         const maxLength = 160 - 29;
 				const description =  (condition.effects) ? `${condition.effects.join(" ").substring(0, maxLength).trim()}...` : "";
-        
-        condition.meta = { 
+
+        condition.meta = {
           title: `${condition.name} D&D 5e`,
           description: `D&D 5th Edition condition: ${description}`
         };
@@ -78,9 +77,9 @@ const conditions_actions = {
   },
 };
 const conditions_mutations = {
-  SET_CONDITION_SERVICES(state, payload) { Vue.set(state, "condition_services", payload); },
-  SET_CACHED_CONDITION(state, payload) { Vue.set(state.cached_conditions, payload["_id"], payload) },
-  SET_CACHED_URL(state, { url, id }) { Vue.set(state.cached_urls, url, id) },
+  SET_CONDITION_SERVICES(state, payload) { state.condition_services = payload; },
+  SET_CACHED_CONDITION(state, payload) { state.cached_conditions[payload["_id"]] = payload; },
+  SET_CACHED_URL(state, { url, id }) { state.cached_urls[url] = id; },
 };
 
 export default {

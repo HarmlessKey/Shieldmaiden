@@ -33,7 +33,7 @@
 			</div>
 		</transition>
 
-		<!-- vue-snotify DISABLED for Vue 3 migration -->
+		<!-- Notifications now use Quasar Notify via src/utils/notify.js -->
 		<HkRolls v-if="isClient" />
 		<q-resize-observer @resize="setSize" />
 	</div>

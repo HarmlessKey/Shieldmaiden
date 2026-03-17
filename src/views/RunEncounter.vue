@@ -486,9 +486,9 @@ export default {
 			const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;
 			let index;
 
-			// Clear notifications
+			// Clear notifications (snotify removed; Quasar Notify has no global clear)
 			if (key === "clearSnotify") {
-				this.$snotify.clear();
+				// no-op: Quasar notifications auto-dismiss
 			} else {
 				if (key === "right") {
 					index = current < this.panes.length - 1 ? current + 1 : 0;

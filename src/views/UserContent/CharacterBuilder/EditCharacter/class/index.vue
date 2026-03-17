@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ valid }">
+		<ValidationObserver v-slot="{ meta }" as="div">
 			<q-form greedy>
 				<hk-card>
 					<div class="card-header" slot="header">
@@ -58,7 +58,7 @@
 											calculatedLevel(Class.experience_points) > computed.level
 										"
 										class="btn bg-green"
-										@click.prevent.stop="levelUp(classIndex, valid)"
+										@click.prevent.stop="levelUp(classIndex, meta.valid)"
 									>
 										Level up <i class="fas fa-arrow-circle-up" aria-hidden="true" />
 									</button>
@@ -81,7 +81,7 @@
 												label="Class"
 												v-model="subclass.class"
 												:options="class_list"
-												@input="selectClass($event, classIndex, valid)"
+												@input="selectClass($event, classIndex, meta.valid)"
 											>
 											</q-select>
 
@@ -100,7 +100,7 @@
 														v-ripple
 														v-close-popup
 														:active="subclass.level === scope.opt"
-														@click="saveClassLevel(classIndex, scope.opt, valid)"
+														@click="saveClassLevel(classIndex, scope.opt, meta.valid)"
 														:disable="levelAvailable(subclass, scope.opt)"
 													>
 														{{ scope.opt }}
@@ -114,38 +114,38 @@
 											<ValidationProvider
 												rules="required|max:30"
 												name="Class name"
-												v-slot="{ errors, invalid, validated }"
+												v-slot="{ errorMessage }" :modelValue="subclass.name" as="div"
 											>
 												<q-input
 													:dark="$store.getters.theme === 'dark'"
 													filled
 													square
 													label="Class"
-													@change="saveProp(subclass.name, classIndex, 'name', valid)"
+													@change="saveProp(subclass.name, classIndex, 'name', meta.valid)"
 													autocomplete="off"
 													type="text"
 													v-model="subclass.name"
-													:error="invalid && validated"
-													:error-message="errors[0]"
+													:error="!!errorMessage"
+													:error-message="errorMessage"
 												/>
 											</ValidationProvider>
 											<ValidationProvider
 												rules="required|max:50"
 												name="Subclass"
-												v-slot="{ errors, invalid, validated }"
+												v-slot="{ errorMessage }" :modelValue="subclass.subclass" as="div"
 											>
 												<q-input
 													:dark="$store.getters.theme === 'dark'"
 													filled
 													square
 													label="Subclass"
-													@change="saveProp(subclass.subclass, classIndex, 'subclass', valid)"
+													@change="saveProp(subclass.subclass, classIndex, 'subclass', meta.valid)"
 													autocomplete="off"
 													:id="`${classIndex}-subclass`"
 													type="text"
 													v-model="subclass.subclass"
-													:error="invalid && validated"
-													:error-message="errors[0]"
+													:error="!!errorMessage"
+													:error-message="errorMessage"
 												/>
 											</ValidationProvider>
 										</div>
@@ -244,7 +244,7 @@
 															<template v-if="subclass.class === 'custom'">
 																<a
 																	v-for="{ value, text } in dice_types"
-																	@click="setHitDice(classIndex, value, valid)"
+																	@click="setHitDice(classIndex, value, meta.valid)"
 																	:key="`d${value}-${classIndex}`"
 																	class="hit_die"
 																	:class="{ active: subclass.hit_dice === value }"
@@ -359,7 +359,7 @@
 																emit-value
 																map-options
 																class="mb-3"
-																@input="saveCasterType(classIndex, valid)"
+																@input="saveCasterType(classIndex, meta.valid)"
 															/>
 															<q-select
 																:dark="$store.getters.theme === 'dark'"
@@ -449,7 +449,7 @@
 																:options="armor_types"
 																v-model="proficiencies[classIndex].armor"
 																class="mb-3"
-																@input="setProficiencies($event, classIndex, 'armor', valid)"
+																@input="setProficiencies($event, classIndex, 'armor', meta.valid)"
 															/>
 
 															<!-- WEAPONS -->
@@ -487,7 +487,7 @@
 																			clickable
 																			v-ripple
 																			@click="
-																				setWeaponProficiencies(weapon.value, classIndex, valid)
+																				setWeaponProficiencies(weapon.value, classIndex, meta.valid)
 																			"
 																			:active="
 																				proficiencies[classIndex].weapon.includes(weapon.value)
@@ -510,7 +510,7 @@
 																multiple
 																:options="abilities"
 																v-model="proficiencies[classIndex].saving_throw"
-																@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
+																@input="setProficiencies($event, classIndex, 'saving_throw', meta.valid)"
 															/>
 														</template>
 														<div v-else class="mb-3">
@@ -554,7 +554,7 @@
 															:max-values="subclass.skill_count || null"
 															:options="filtered_skills(subclass.class, subclass.skills)"
 															v-model="proficiencies[classIndex].skill.subtarget"
-															@input="setProficiencies($event, classIndex, 'skill', valid)"
+															@input="setProficiencies($event, classIndex, 'skill', meta.valid)"
 														/>
 													</div>
 												</q-expansion-item>
@@ -585,7 +585,7 @@
 					<q-dialog
 						v-if="character.hit_point_type === 'rolled'"
 						v-model="roll_hp_modal"
-						@before-hide="clear_invalid_rolls(valid)"
+						@before-hide="clear_invalid_rolls(meta.valid)"
 					>
 						<hk-card>
 							<div slot="header" class="card-header d-flex justify-content-between">
@@ -604,20 +604,20 @@
 										<ValidationProvider
 											:rules="{ between: [1, character_classes[editClass].hit_dice] }"
 											:name="`Level ${level}`"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="character_classes[editClass].rolled_hit_points[level]" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
 												filled
 												square
 												dense
-												@change="setRolledHP($event.target.value, editClass, level, valid)"
+												@change="setRolledHP($event.target.value, editClass, level, meta.valid)"
 												autocomplete="off"
 												type="number"
 												v-model="character_classes[editClass].rolled_hit_points[level]"
 												:label="`Level ${level}`"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											>
 												<button
 													slot="after"
@@ -626,7 +626,7 @@
 														character_classes[editClass].rolled_hit_points &&
 														character_classes[editClass].rolled_hit_points[level]
 													"
-													@click.stop="rollHitDice(editClass, level, valid)"
+													@click.stop="rollHitDice(editClass, level, meta.valid)"
 												>
 													Roll
 												</button>
@@ -661,8 +661,8 @@
 										placeholder="Amount"
 									/>
 									<div>
-										<a @click="handleXP('add', valid)" class="btn bg-green">Add</a>
-										<a @click="handleXP('remove', valid)" class="btn bg-red">Remove</a>
+										<a @click="handleXP('add', meta.valid)" class="btn bg-green">Add</a>
+										<a @click="handleXP('remove', meta.valid)" class="btn bg-red">Remove</a>
 									</div>
 								</div>
 							</div>

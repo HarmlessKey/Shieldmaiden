@@ -14,7 +14,7 @@
 						/>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="between:0,999" name="Range" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:0,999" name="Range" v-slot="{ errorMessage }" :modelValue="npc.senses && npc.senses[sense] ? npc.senses[sense].range : undefined" as="div">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Range"
@@ -24,13 +24,13 @@
 								suffix="ft."
 								:disable="!npc.senses || !npc.senses[sense]"
 								@input="parseToInt($event, npc.senses[sense], 'range')"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="max:999" name="Comments" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="max:999" name="Comments" v-slot="{ errorMessage }" :modelValue="npc.senses && npc.senses[sense] ? npc.senses[sense].comments : undefined" as="div">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Comments"
@@ -38,8 +38,8 @@
 								:value="npc.senses && npc.senses[sense] ? npc.senses[sense].comments : undefined"
 								:disable="!npc.senses || !npc.senses[sense]"
 								@input="$event => !$event || $set(npc.senses[sense], 'comments', $event)"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>

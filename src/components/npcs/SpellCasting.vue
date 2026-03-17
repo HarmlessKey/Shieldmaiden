@@ -33,7 +33,7 @@
 								<ValidationProvider
 									rules="between:1,20|required"
 									name="Caster level"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="npc[`${casting.category}_level`]" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -44,8 +44,8 @@
 										@input="parseToInt(npc, `${casting.category}_level`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -53,7 +53,7 @@
 								<ValidationProvider
 									rules="between:1,99|required"
 									name="Save DC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="npc[`${casting.category}_save_dc`]" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -64,8 +64,8 @@
 										@input="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -73,7 +73,7 @@
 								<ValidationProvider
 									rules="between:-10,99|required"
 									name="Save DC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="npc[`${casting.category}_spell_attack`]" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -84,8 +84,8 @@
 										@input="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>

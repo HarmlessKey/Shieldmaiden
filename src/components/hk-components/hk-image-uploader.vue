@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ valid }">
+		<ValidationObserver v-slot="{ meta }" as="div">
 			<hk-card :min-width="300">
 				<div slot="header" class="card-header">
 					Add avatar
@@ -36,26 +36,26 @@
 									<q-btn no-caps flat dense icon="close" size="sm" @click="stopCrop" class="red" />
 								</div>
 							</div>
-							<croppa
-								v-model="crop"
-								:width="250"
-								:height="250"
-								placeholder="Choose an image"
-								:placeholder-font-size="0"
-								:disabled="false"
-								:prevent-white-space="true"
-								:show-remove-button="false"
-								@file-choose="startCrop"
-								@image-remove="stopCrop"
+							<div v-if="!imageSrc" class="crop-placeholder" @click="openFileInput">
+								<span>Choose an image</span>
+								<input ref="fileInput" type="file" accept="image/*" style="display:none" @change="onFileSelect" />
+							</div>
+							<Cropper
+								v-if="imageSrc"
+								ref="cropper"
+								:src="imageSrc"
+								:stencil-props="{ aspectRatio: 1 }"
+								:canvas="{ width: 250, height: 250 }"
+								class="cropper"
 							/>
 							<div v-if="using_crop" class="d-flex justify-content-center">
-								<q-btn no-caps flat icon="fas fa-undo" @click="crop.rotate(-1)" size="sm">
+								<q-btn no-caps flat icon="fas fa-undo" @click="rotate()" size="sm">
 									<q-tooltip anchor="top middle" self="center middle"> Rotate </q-tooltip>
 								</q-btn>
-								<q-btn no-caps flat icon="fas fa-arrow-up" @click="crop.flipY()" size="sm">
+								<q-btn no-caps flat icon="fas fa-arrow-up" @click="flipY()" size="sm">
 									<q-tooltip anchor="top middle" self="center middle"> Flip Y </q-tooltip>
 								</q-btn>
-								<q-btn no-caps flat icon="fas fa-arrow-right" @click="crop.flipX()" size="sm">
+								<q-btn no-caps flat icon="fas fa-arrow-right" @click="flipX()" size="sm">
 									<q-tooltip anchor="top middle" self="center middle"> Flip X </q-tooltip>
 								</q-btn>
 							</div>
@@ -79,7 +79,7 @@
 							<ValidationProvider
 								rules="url|max:2000"
 								name="Avatar"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="url" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -90,8 +90,8 @@
 									type="text"
 									v-model="url"
 									maxLength="2000"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 						</template>
@@ -102,8 +102,8 @@
 					<q-btn
 						color="green"
 						no-caps
-						@click="acceptAvatar(valid)"
-						:disable="!valid || (!url && !using_crop)"
+						@click="acceptAvatar(meta.valid)"
+						:disable="!meta.valid || (!url && !using_crop)"
 					>
 						Accept
 					</q-btn>
@@ -115,10 +115,12 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { Cropper } from "vue-advanced-cropper";
+import "vue-advanced-cropper/dist/style.css";
 import hkPopover from "./hk-popover.vue";
 
 export default {
-	components: { hkPopover },
+	components: { hkPopover, Cropper },
 	name: "hk-image-uploader",
 	props: {
 		avatar: {
@@ -143,7 +145,7 @@ export default {
 		return {
 			using_crop: false,
 			url: this.avatar || undefined,
-			crop: {},
+			imageSrc: null,
 		};
 	},
 	computed: {
@@ -153,12 +155,32 @@ export default {
 		},
 	},
 	methods: {
-		startCrop() {
-			this.using_crop = true;
+		openFileInput() {
+			this.$refs.fileInput.click();
+		},
+		onFileSelect(event) {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					this.imageSrc = e.target.result;
+					this.using_crop = true;
+				};
+				reader.readAsDataURL(file);
+			}
 		},
 		stopCrop() {
-			this.crop.remove();
+			this.imageSrc = null;
 			this.using_crop = false;
+		},
+		rotate() {
+			this.$refs.cropper.rotate(-90);
+		},
+		flipY() {
+			this.$refs.cropper.flip(false, true);
+		},
+		flipX() {
+			this.$refs.cropper.flip(true, false);
 		},
 		acceptAvatar(valid) {
 			if (this.using_crop) {
@@ -168,25 +190,19 @@ export default {
 			}
 		},
 		async acceptCrop() {
-			const img = new Image(); // Create a new blank image
+			const { canvas } = this.$refs.cropper.getResult();
+			if (!canvas) return;
 
-			// Set the cropped image as the src for the blank image
-			img.src = this.crop.generateDataUrl("image/webp");
+			// Resize to target dimensions
+			const resized = document.createElement("canvas");
+			resized.width = this.width;
+			resized.height = this.height;
+			const ctx = resized.getContext("2d");
+			ctx.drawImage(canvas, 0, 0, this.width, this.height);
 
-			// Resize the image to given dimensions and emit the blob + dataUrl
-			// The blob can be uploaded to firebase
-			// The dataUrl can be used to show a preview
-			img.onload = () => {
-				const canvas = document.createElement("canvas");
-				canvas.width = this.width;
-				canvas.height = this.height;
-				const ctx = canvas.getContext("2d");
-				ctx.drawImage(img, 0, 0, this.width, this.height);
-
-				canvas.toBlob((blob) => {
-					this.$emit("crop", { blob: blob, dataUrl: canvas.toDataURL() });
-				}, "image/webp");
-			};
+			resized.toBlob((blob) => {
+				this.$emit("crop", { blob: blob, dataUrl: resized.toDataURL() });
+			}, "image/webp");
 		},
 		acceptUrl(valid) {
 			if (valid) {
@@ -215,6 +231,26 @@ export default {
 	.hk-popover i {
 		vertical-align: -1px;
 	}
+}
+.crop-placeholder {
+	width: 250px;
+	height: 250px;
+	border: 2px dashed $neutral-4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	color: $neutral-3;
+	margin: 0 auto;
+	&:hover {
+		border-color: $neutral-2;
+		color: $neutral-2;
+	}
+}
+.cropper {
+	width: 250px;
+	height: 250px;
+	margin: 0 auto;
 }
 .current-avatar {
 	background-color: $neutral-7;

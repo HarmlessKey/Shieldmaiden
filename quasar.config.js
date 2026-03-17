@@ -14,11 +14,9 @@ module.exports = configure(function (/* ctx */) {
 			{ path: "compat", server: false },
 			{ path: "plugins", server: false },
 			{ path: "hk-components", server: false },
-			// DISABLED for Vue 3 migration — need Vue 3-compatible versions:
-			// { path: "vee-validate", server: false },
+			{ path: "vee-validate", server: false },
 			{ path: "firebase-auth", server: false },
-			// { path: "vue-shortkey", server: false },
-			// { path: "vue-snotify", server: false },
+			{ path: "vue-shortkey", server: false },
 		],
 
 		css: ["styles.scss"],

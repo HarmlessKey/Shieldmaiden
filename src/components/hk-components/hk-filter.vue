@@ -134,18 +134,18 @@ export default {
 	methods: {
 		setLevels(value) {
 			if(!this.filter.levels) {
-				this.$set(this.filter, "levels", {});
+				this.filter["levels"] = {};
 			}
-			this.$set(this.filter.levels, "min", value.min);
-			this.$set(this.filter.levels, "max", value.max);
+			this.filter.levels["min"] = value.min;
+			this.filter.levels["max"] = value.max;
 			this.$forceUpdate();
 		},
 		setCR(value) {
 			if(!this.filter.challenge_ratings) {
-				this.$set(this.filter, "challenge_ratings", {});
+				this.filter["challenge_ratings"] = {};
 			}
-			this.$set(this.filter.challenge_ratings, "min", value.min);
-			this.$set(this.filter.challenge_ratings, "max", value.max);
+			this.filter.challenge_ratings["min"] = value.min;
+			this.filter.challenge_ratings["max"] = value.max;
 			this.$forceUpdate();
 		}
 	}

@@ -17,7 +17,7 @@
 				<ValidationProvider
 					rules="between:1,25"
 					name="Projectiles"
-					v-slot="{ errors, invalid, validated }"
+					v-slot="{ errorMessage }" :modelValue="spell.projectiles" as="div"
 				>
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -28,8 +28,8 @@
 						autocomplete="off"
 						type="number"
 						class="mb-2"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!!errorMessage"
+						:error-message="errorMessage"
 						@keyup="$forceUpdate()"
 						@input="(value) => parseToInt(value, spell, 'projectiles')"
 					>
@@ -80,7 +80,7 @@
 				<q-list :dark="$store.getters.theme === 'dark'" class="accordion">
 					<ValidationObserver
 						v-for="(action, action_index) in spell.actions"
-						v-slot="{ valid }"
+						v-slot="{ meta }" as="div"
 						:key="`action-${action_index}`"
 					>
 						<q-expansion-item
@@ -113,7 +113,7 @@
 										<ValidationProvider
 											rules="required|max:100"
 											name="Attack type"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="action.name" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -124,8 +124,8 @@
 												autocomplete="off"
 												class="mb-2"
 												@keyup="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -136,7 +136,7 @@
 										<ValidationProvider
 											rules="required"
 											name="Attack type"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="action.type" as="div"
 										>
 											<q-select
 												:dark="$store.getters.theme === 'dark'"
@@ -149,8 +149,8 @@
 												v-model="action.type"
 												class="mb-2"
 												@input="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -200,8 +200,8 @@
 
 		<q-dialog v-model="roll_dialog">
 			<div v-if="roll">
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
-					<q-form @submit="handleSubmit(saveRoll)">
+				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+					<q-form @submit="handleSubmit($event, saveRoll)">
 						<hk-card :header="edit_index !== undefined ? 'Edit roll' : 'New roll'" class="mb-0">
 							<div class="card-body">
 								<hk-action-roll-form
@@ -217,7 +217,7 @@
 									color="primary"
 									type="submit"
 									no-caps
-									:disabled="!valid"
+									:disabled="!meta.valid"
 									:label="edit_index !== undefined ? 'Save' : 'Add'"
 								/>
 							</div>

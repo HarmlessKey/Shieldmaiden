@@ -1,20 +1,18 @@
 <template>
 	<div>
-		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
+		<ValidationProvider :rules="rules" :name="name" v-slot="{ errorMessage }" :modelValue="modelValue" as="div">
 			<q-select
 				v-bind="$attrs"
-				v-on="$listeners"
 				v-model="modelValue"
 				:dark="$store.getters.theme === 'dark'"
 				:filled="filled"
 				:square="square"
 				:autocomplete="autocomplete"
-				:error="rules ? invalid && validated : null"
-				:error-message="errors[0]"
+				:error="rules ? !!errorMessage : null"
+				:error-message="errorMessage"
 			>
-				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
-				<template v-for="slot in Object.keys($slots)" :slot="slot" slot-scope="scope">
-					<slot :name="slot" v-bind="scope" />
+				<template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
+					<slot :name="slot" v-bind="scope || {}" />
 				</template>
 			</q-select>
 		</ValidationProvider>
@@ -24,8 +22,12 @@
 <script>
 export default {
 	name: "hk-select",
+	inheritAttrs: false,
 	props: {
 		value: {
+			type: [String, Array, Number],
+		},
+		modelValue: {
 			type: [String, Array, Number],
 		},
 		filled: {
@@ -47,13 +49,15 @@ export default {
 			type: [Object, String],
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	computed: {
 		modelValue: {
 			get() {
-				return this.value;
+				return this.$props.modelValue !== undefined ? this.$props.modelValue : this.value;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},

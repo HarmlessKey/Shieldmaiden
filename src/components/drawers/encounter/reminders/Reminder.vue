@@ -4,10 +4,10 @@
 		<h2 class="mt-3">{{ title }}</h2>
 		<button class="btn btn-block bg-red my-3" @click="remove()">Remove reminder</button>
 
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(editReminder)">
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, editReminder)">
 				<reminder-form v-model="reminder" :select-options="true" />
-				<button class="btn btn-block" :disabled="!valid">Save</button>
+				<button class="btn btn-block" :disabled="!meta.valid">Save</button>
 			</q-form>
 		</ValidationObserver>
 	</div>

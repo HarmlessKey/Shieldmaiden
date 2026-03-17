@@ -25,7 +25,7 @@
 			<h4 class="my-3 text-center">OR</h4>
 			<ValidationObserver v-slot="{ handleSubmit }">
 				<q-form @submit="handleSubmit(parseJSON)">
-					<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="json" name="JSON" v-slot="{ errorMessage }" :modelValue="json_input" as="div">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -33,8 +33,8 @@
 							label-slot
 							type="textarea"
 							v-model="json_input"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						>
 							<template #label>
 								<i class="fas fa-brackets-curly mr-1" aria-hidden="true" />
@@ -804,15 +804,15 @@ export default {
 						if (ability.versatile && !ability.options) {
 							// Turn versatile into options
 							is_versatile = true;
-							this.$set(ability, "options", [
-								ability.versatile_one || "Option 1",
-								ability.versatile_two || "Option 2",
-							]);
+							ability["options"] = [
+							ability.versatile_one || "Option 1",
+							ability.versatile_two || "Option 2",
+						];
 						}
 						// Remove versatile
-						this.$delete(ability, "versatile");
-						this.$delete(ability, "versatile_one");
-						this.$delete(ability, "versatile_two");
+						delete ability["versatile"];
+						delete ability["versatile_one"];
+						delete ability["versatile_two"];
 
 						// In the actions find rolls with versatile options set
 						if (ability.action_list && ability.action_list.length) {
@@ -829,11 +829,11 @@ export default {
 												options = !options ? { [ability.options[1]]: {} } : options;
 												options[ability.options[1]][option] = roll[`versatile_${option}`];
 											}
-											this.$delete(roll, `versatile_${option}`);
+											delete roll[`versatile_${option}`];
 										}
 
 										if (is_versatile && options) {
-											this.$set(roll, "options", options);
+											roll["options"] = options;
 										}
 									}
 								}

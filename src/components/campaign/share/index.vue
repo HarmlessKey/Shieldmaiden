@@ -36,7 +36,7 @@
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
 			<q-tab-panel name="background">
-				<ValidationObserver v-slot="{ valid }">
+				<ValidationObserver v-slot="{ meta }" as="div">
 					<hk-input
 						v-model="background.image"
 						label="Background image"
@@ -95,8 +95,8 @@
 						<button class="btn bg-neutral-5" @click="clearBackground">Clear</button>
 						<button
 							class="btn"
-							@click="valid ? setBackground() : null"
-							:disabled="isEmpty(background) || !valid"
+							@click="meta.valid ? setBackground() : null"
+							:disabled="isEmpty(background) || !meta.valid"
 						>
 							Set
 						</button>
@@ -105,7 +105,7 @@
 			</q-tab-panel>
 
 			<q-tab-panel name="share">
-				<ValidationObserver v-slot="{ valid }">
+				<ValidationObserver v-slot="{ meta }" as="div">
 					<hk-input
 						v-model="share.image"
 						label="Share image"
@@ -163,8 +163,8 @@
 					<div class="actions">
 						<button
 							class="btn btn-block"
-							:disabled="isEmpty(share) || !valid"
-							@click="valid ? startShare() : null"
+							:disabled="isEmpty(share) || !meta.valid"
+							@click="meta.valid ? startShare() : null"
 						>
 							Share
 						</button>

@@ -1,7 +1,7 @@
 <template>
 	<div class="content__edit">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveItem(valid))">
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit(saveItem(meta.valid))">
 				<hk-card header="Your Item">
 					<div slot="header" class="card-header">
 						{{ item.name ? item.name : "New item" }}
@@ -20,7 +20,7 @@
 						<ValidationProvider
 							rules="max:100|required"
 							name="Name"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="item.name" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -32,8 +32,8 @@
 								class="mb-2"
 								v-model="item.name"
 								maxlength="100"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 
@@ -51,7 +51,7 @@
 								<ValidationProvider
 									rules="url"
 									name="Image"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="item.image" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -62,8 +62,8 @@
 										type="text"
 										v-model="item.image"
 										placeholder="Image URL"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -72,7 +72,7 @@
 						<ValidationProvider
 							rules="max:5000"
 							name="Description"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="item.desc" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -84,8 +84,8 @@
 								type="text"
 								v-model="item.desc"
 								maxlength="5000"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>
@@ -102,7 +102,7 @@
 									<ValidationProvider
 										rules="required|numeric|between:1,10"
 										name="Columns"
-										v-slot="{ errors, invalid, validated }"
+										v-slot="{ errorMessage }" :modelValue="columns" as="div"
 									>
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
@@ -114,8 +114,8 @@
 											min="1"
 											class="mb-4"
 											v-model="columns"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											:error="!!errorMessage"
+											:error-message="errorMessage"
 											hint="How many columns?"
 										/>
 										<div class="d-flex justify-content-end mt-2">
@@ -139,7 +139,7 @@
 						<q-list v-if="item.tables" :dark="$store.getters.theme === 'dark'" :class="`accordion`">
 							<ValidationObserver
 								v-for="(table, tableIndex) in item.tables"
-								v-slot="{ valid }"
+								v-slot="{ meta }" as="div"
 								:key="tableIndex"
 							>
 								<q-expansion-item
@@ -151,7 +151,7 @@
 									leave-active-class="animated animate__fadeOut"
 								>
 									<template v-slot:header>
-										<q-item-section avatar v-if="!valid">
+										<q-item-section avatar v-if="!meta.valid">
 											<q-icon name="error" color="red" />
 											<q-tooltip anchor="top middle" self="center middle">
 												Validation errors in table
@@ -171,7 +171,7 @@
 										<ValidationProvider
 											rules="max:100"
 											name="Table name"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="table.name" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -181,8 +181,8 @@
 												v-model="table.name"
 												class="mb-3"
 												name="table name"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 
@@ -194,7 +194,7 @@
 												<ValidationProvider
 													rules="required|max:100"
 													:name="`Column header ${i + 1}`"
-													v-slot="{ errors, invalid, validated }"
+													v-slot="{ errorMessage }" :modelValue="table.header[i]" as="div"
 												>
 													<q-input
 														:dark="$store.getters.theme === 'dark'"
@@ -203,8 +203,8 @@
 														v-model="table.header[i]"
 														:placeholder="`Column header ${i + 1}`"
 														maxlength="100"
-														:error="invalid && validated"
-														:error-message="errors[0]"
+														:error="!!errorMessage"
+														:error-message="errorMessage"
 													/>
 												</ValidationProvider>
 											</div>
@@ -219,7 +219,7 @@
 													<ValidationProvider
 														rules="required|max:5000"
 														:name="`Column ${colIndex + 1}`"
-														v-slot="{ errors, invalid, validated }"
+														v-slot="{ errorMessage }" :modelValue="table.rows[rowIndex].columns[colIndex]" as="div"
 													>
 														<q-input
 															:dark="$store.getters.theme === 'dark'"
@@ -229,8 +229,8 @@
 															v-model="table.rows[rowIndex].columns[colIndex]"
 															:placeholder="`Column ${colIndex + 1}`"
 															maxlength="5000"
-															:error="invalid && validated"
-															:error-message="errors[0]"
+															:error="!!errorMessage"
+															:error-message="errorMessage"
 														/>
 													</ValidationProvider>
 												</div>

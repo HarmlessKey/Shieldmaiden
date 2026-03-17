@@ -1,7 +1,7 @@
 <template>
 	<div class="content__edit" v-if="!loading">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveNpc)" greedy>
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, saveNpc)" greedy>
 				<div>
 					<div class="top">
 						<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
@@ -10,7 +10,7 @@
 						</q-btn>
 						<div v-else />
 						<div>
-							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+							<q-icon v-if="!meta.valid" name="error" color="red" size="sm" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
 								</q-tooltip>
@@ -57,7 +57,7 @@
 					<!-- HANDLING -->
 					<div class="save">
 						<div class="buttons">
-							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+							<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
 								</q-tooltip>
@@ -70,7 +70,7 @@
 							<q-btn v-if="user" label="Save" type="submit" color="primary" no-caps />
 							<q-btn
 								v-else
-								:disabled="!valid"
+								:disabled="!meta.valid"
 								color="primary"
 								no-caps
 								@click="account_dialog = true"

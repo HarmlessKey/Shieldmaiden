@@ -374,9 +374,9 @@ export default {
 		},
 		async addVoucher() {
 			this.set_active_voucher(this.voucher_input_text)
+				.then(() => {
 					notifySuccess(
 						`Successfully added ${this.voucher_input_text.toUpperCase()} voucher.`
-					);
 					);
 					this.voucher_input_text = null;
 				})

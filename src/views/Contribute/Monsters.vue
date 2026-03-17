@@ -393,7 +393,7 @@ export default {
 		confirmFinish(key, name) {
 			confirmAction({
 				title: "Finish Item",
-				message: "Are you sure you've finished the monster "" + name + ""? Make sure not to set incomplete monsters to finised.",
+				message: "Are you sure you've finished the monster \"" + name + "\"? Make sure not to set incomplete monsters to finised.",
 				onOk: () => {
 					this.finish(key);
 				},

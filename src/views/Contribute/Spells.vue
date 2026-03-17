@@ -408,7 +408,7 @@ export default {
 		confirmFinish(key, name) {
 			confirmAction({
 				title: "Finish Item",
-				message: "Are you sure you've finished the spell "" + name + ""? Make sure not to set incomplete spells to finished.",
+				message: "Are you sure you've finished the spell \"" + name + "\"? Make sure not to set incomplete spells to finished.",
 				onOk: () => {
 					this.finish(key);
 				},

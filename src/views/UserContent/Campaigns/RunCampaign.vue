@@ -442,8 +442,7 @@ export default {
 	.splitpanes__pane,
 	.q-tab-panel {
 		padding: 0;
-		&:deep(.pane) {
-			&__header {
+		:deep(.pane__header) {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
@@ -454,10 +453,9 @@ export default {
 				top: 0;
 				z-index: 10;
 			}
-			&__content {
+		:deep(.pane__content) {
 				padding: 10px;
 			}
-		}
 	}
 }
 </style>

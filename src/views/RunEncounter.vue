@@ -395,6 +395,7 @@ export default {
 		requests: {
 			deep: true,
 			handler(newValue, oldValue) {
+				if (newValue && oldValue && Object.keys(newValue).length > Object.keys(oldValue).length) {
 					confirmAction({
 						title: "New request",
 						message: "A new player request was made.",

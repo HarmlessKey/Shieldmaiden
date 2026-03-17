@@ -460,6 +460,7 @@ import { general } from "src/mixins/general.js";
 import { uuid } from "src/utils/generalFunctions";
 import ViewMonster from "src/components/compendium/Monster.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import { notifySuccess } from "src/utils/notify";
 
 export default {
 	name: "Entities",
@@ -712,10 +713,9 @@ export default {
 
 			// Notification for NPCs
 			if (type === "npc") {
-				this.$snotify.success(
+				notifySuccess(
 					`${this.to_add[id]} NPC${this.to_add > 1 ? "s" : ""} added successfully`,
-					"NPC added",
-					{ position: "centerTop" }
+					"NPC added"
 				);
 			}
 

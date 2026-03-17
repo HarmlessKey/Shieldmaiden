@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { notifySuccess, notifyError } from "src/utils/notify";
 export default {
 	name: "hk-share-button",
 	props: {
@@ -59,13 +60,9 @@ export default {
 				const successful = document.execCommand("copy");
 				const msg = successful ? "Successful" : "Unsuccessful";
 
-				this.$snotify.success(msg, "Link copied", {
-					position: "rightTop",
-				});
+				notifySuccess(msg, "Link copied");
 			} catch (err) {
-				this.$snotify.error("Unsuccessful", "Link not copied", {
-					position: "rightTop",
-				});
+				notifyError("Unsuccessful", "Link not copied");
 			}
 
 			/* unselect the range */

@@ -278,6 +278,7 @@
 import { mapActions, mapGetters } from "vuex";
 import { general } from "src/mixins/general.js";
 import CopyContent from "src/components/CopyContent";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "EditItem",
@@ -330,9 +331,7 @@ export default {
 		},
 		saveItem(valid) {
 			if (!valid) {
-				this.$snotify.error("There are validation errors.", "Critical miss!", {
-					position: "rightTop",
-				});
+				notifyError("There are validation errors.", "Critical miss!");
 				return;
 			}
 			if (this.$route.name === "Add item" && !this.itemId) {
@@ -346,9 +345,7 @@ export default {
 				(key) => {
 					this.$set(this, "itemId", key);
 
-					this.$snotify.success("Item Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Item Saved.", "Critical hit!");
 
 					this.item_copy = JSON.stringify(this.item);
 					this.unsaved_changes = false;
@@ -356,9 +353,7 @@ export default {
 					this.$router.replace(`/content/items`);
 				},
 				(error) => {
-					this.$snotify.error("Couldn't save item.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Couldn't save item.", "Save failed");
 					console.error(error);
 					console.log(this.item);
 				}
@@ -371,18 +366,14 @@ export default {
 				item: this.item,
 			}).then(
 				() => {
-					this.$snotify.success("Item Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Item Saved.", "Critical hit!");
 
 					this.item_copy = JSON.stringify(this.item);
 					this.unsaved_changes = false;
 					this.$router.replace(`/content/items`);
 				},
 				(error) => {
-					this.$snotify.error("Couldn't save monster.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Couldn't save monster.", "Save failed");
 					console.error(error);
 					console.log(this.item);
 				}

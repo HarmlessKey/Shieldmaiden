@@ -152,6 +152,7 @@
 import { voucherService } from "src/services/vouchers";
 import { monsterMixin } from "src/mixins/monster";
 import { legacy_tiers } from "src/utils/generalConstants";
+import { notifyError } from "src/utils/notify";
 
 export default {
 	name: "GenerateSearchTable",
@@ -226,7 +227,7 @@ export default {
 				this.update_voucher = false;
 				this.newVoucher = {};
 			} catch (error) {
-				this.$snotify.error(error);
+				notifyError(error);
 			}
 		},
 		async getTierName(id) {

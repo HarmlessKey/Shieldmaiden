@@ -80,6 +80,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Reminders",
@@ -123,30 +124,11 @@ export default {
 			if (e.shiftKey) {
 				this.deleteReminder(key);
 			} else {
-				this.$snotify.error(
-					"Are you sure you want to delete " + reminder + "?",
-					"Delete reminder",
-					{
-						timeout: false,
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.deleteReminder(key);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: "Delete reminder",
+					message: "Are you sure you want to delete " + reminder + "?",
+					onOk: () => this.deleteReminder(key),
+				});
 			}
 		},
 		deleteReminder(key) {

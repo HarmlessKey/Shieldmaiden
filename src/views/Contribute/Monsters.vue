@@ -249,6 +249,7 @@
 import _ from "lodash";
 import { db } from "src/firebase";
 import { mapGetters, mapActions } from "vuex";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Monsters",
@@ -390,31 +391,13 @@ export default {
 			}
 		},
 		confirmFinish(key, name) {
-			this.$snotify.error(
-				"Are you sure you've finished the monster \"" +
-					name +
-					'"? Make sure not to set incomplete monsters to finised.',
-				"Finish Item",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.finish(key);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Finish Item",
+				message: "Are you sure you've finished the monster "" + name + ""? Make sure not to set incomplete monsters to finised.",
+				onOk: () => {
+					this.finish(key);
+				},
+			});
 		},
 		finish(key) {
 			db.ref(`new_monsters/${key}/metadata/finished`).set(true);

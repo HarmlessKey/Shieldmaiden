@@ -305,6 +305,7 @@ import spellSchema from "src/schemas/hk-spell-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import DuplicateOptions from "./importer/DuplicateOptions";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
@@ -485,7 +486,7 @@ export default {
 				const result = monster ? JSON.parse(monster) : JSON.parse(this.json_input);
 				this.parse(result);
 			} catch {
-				this.$snotify.error("Invalid JSON");
+				notifyError("Invalid JSON");
 			}
 		},
 
@@ -781,13 +782,9 @@ export default {
 		copySchema() {
 			try {
 				navigator.clipboard.writeText(JSON.stringify(this.schema));
-				this.$snotify.success("Successful", "Schema copied", {
-					position: "rightTop",
-				});
+				notifySuccess("Successful", "Schema copied");
 			} catch {
-				this.$snotify.error("Unsuccessful", "Schema not copied", {
-					position: "rightTop",
-				});
+				notifyError("Unsuccessful", "Schema not copied");
 			}
 		},
 

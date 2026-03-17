@@ -148,6 +148,7 @@ import BasicInfo from "src/components/spells/BasicInfo";
 import SpellActions from "src/components/spells/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import { notifySuccess, notifyError, confirmAction } from "src/utils/notify";
 import SignUp from "src/components/SignUp.vue";
 
 export default {
@@ -241,18 +242,14 @@ export default {
 					// even though we are on the AddSpell route, this we won't create multiple when hitting save again
 					this.$set(this, "spellId", key);
 
-					this.$snotify.success("Spell Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Spell Saved.", "Critical hit!");
 
 					this.spell.name = this.spell.name ? this.spell.name.capitalizeEach() : undefined;
 					this.spell_copy = JSON.parse(JSON.stringify(this.spell));
 					this.unsaved_changes = false;
 				})
 				.catch((error) => {
-					this.$snotify.error("Couldn't save spell.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Couldn't save spell.", "Save failed");
 					console.error(error);
 					console.log(this.spell);
 				});
@@ -263,9 +260,7 @@ export default {
 				id: this.spellId,
 				spell: this.spell,
 			}).then(() => {
-				this.$snotify.success("Spell Saved.", "Critical hit!", {
-					position: "rightTop",
-				});
+				notifySuccess("Spell Saved.", "Critical hit!");
 
 				this.unsaved_changes = false;
 
@@ -286,30 +281,11 @@ export default {
 	// Eventually this will be needed here too
 	beforeRouteLeave(to, from, next) {
 		if (this.unsaved_changes) {
-			this.$snotify.error(
-				"There are unsaved changes in the form.\n Would you like to continue?",
-				"Unsaved Changes",
-				{
-					buttons: [
-						{
-							text: "Leave",
-							action: (toast) => {
-								next();
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "Stay",
-							action: (toast) => {
-								next(false);
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Unsaved Changes",
+				message: "There are unsaved changes in the form.\n Would you like to continue?",
+				onOk: () => next(),
+			});
 		} else {
 			next();
 		}

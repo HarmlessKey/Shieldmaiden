@@ -180,6 +180,7 @@ import ImportUserContent from "src/components/userContent/ImportUserContent.vue"
 import ContentHeader from "src/components/userContent/ContentHeader.vue";
 import ExportUserContent from "src/components/userContent/ExportUserContent.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Npcs",
@@ -286,25 +287,10 @@ export default {
 			if (e.shiftKey) {
 				this.deleteNpc(key);
 			} else {
-				this.$snotify.error("Are you sure you want to delete " + npc.name + "?", "Delete NPC", {
-					timeout: false,
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteNpc(key);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
+				confirmAction({
+					title: "Delete NPC",
+					message: "Are you sure you want to delete " + npc.name + "?",
+					onOk: () => this.deleteNpc(key),
 				});
 			}
 		},

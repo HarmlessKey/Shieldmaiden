@@ -254,6 +254,7 @@ import AddPlayers from "src/components/campaign/AddPlayers";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import Tutorial from "src/components/userContent/Tutorial";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
+import { notifySuccess, confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Campaigns",
@@ -323,9 +324,7 @@ export default {
 				await this.add_campaign({ campaign });
 
 				this.newCampaign = "";
-				this.$snotify.success("Campaign added.", "Critical hit!", {
-					position: "rightTop",
-				});
+				notifySuccess("Campaign added.", "Critical hit!");
 				this.add = false;
 			}
 		},
@@ -334,29 +333,11 @@ export default {
 			if (e.shiftKey) {
 				this.delete_campaign(key);
 			} else {
-				this.$snotify.error(
-					'Are you sure you want to delete the campaign "' + name + '"?',
-					"Delete campaign",
-					{
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.delete_campaign(key);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: "Delete campaign",
+					message: 'Are you sure you want to delete the campaign "' + name + '"?',
+					onOk: () => this.delete_campaign(key),
+				});
 			}
 		},
 		getBackground(campaign) {

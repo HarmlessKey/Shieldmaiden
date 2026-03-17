@@ -163,6 +163,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { notifySuccess } from "src/utils/notify";
 import { currencyMixin } from "src/mixins/currency.js";
 import LinkedItem from "./LinkedItem";
 
@@ -210,9 +211,7 @@ export default {
 				property: "currency",
 				value: this.currency,
 			});
-			this.$snotify.success("Currency was successfully saved.", "Currency saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Currency was successfully saved.", "Currency saved!");
 		},
 		async getItem(id, custom) {
 			let item;
@@ -235,9 +234,7 @@ export default {
 				id: key,
 				item,
 			});
-			this.$snotify.success("Your item was successfully saved.", "Item saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Your item was successfully saved.", "Item saved!");
 		},
 		addItem() {
 			this.add_encounter_loot({

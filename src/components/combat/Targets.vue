@@ -150,6 +150,7 @@
 <script>
 import _ from "lodash";
 import { mapGetters, mapActions } from "vuex";
+import { notifyError, confirmAction } from "src/utils/notify";
 import Pane from "./Pane.vue";
 import TargetEntity from "./entities/TargetEntity.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
@@ -291,33 +292,17 @@ export default {
 					hidden: hidden,
 				});
 			} else {
-				this.$snotify.error("Select a target", "Hide entity", {});
+				notifyError("Select a target", "Hide entity");
 			}
 		},
 		remove(key, name) {
-			this.$snotify.error(
-				'Are you sure you want to remove "' + name + '" from this encounter?',
-				"Delete character",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.remove_entity(key);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete character",
+				message: 'Are you sure you want to remove "' + name + '" from this encounter?',
+				onOk: () => {
+					this.remove_entity(key);
+				},
+			});
 		},
 		selectTarget(e, type, key) {
 			type = e.shiftKey ? "multi" : type;

@@ -165,6 +165,7 @@
 <script>
 import { db } from "src/firebase";
 import { legacy_tiers } from "src/utils/generalConstants";
+import { notifySuccess } from "src/utils/notify";
 
 export default {
 	name: "AdminUser",
@@ -289,9 +290,7 @@ export default {
 					}
 					db.ref(`users/${this.id}/voucher`).set(this.voucher);
 				}
-				this.$snotify.success("Voucher given.", "Voucher set!", {
-					position: "rightTop",
-				});
+				notifySuccess("Voucher given.", "Voucher set!");
 			}
 		},
 		setPatronEmail() {
@@ -300,17 +299,13 @@ export default {
 			} else {
 				db.ref(`users/${this.id}/patreon_email`).set(this.user.patreon_email);
 			}
-			this.$snotify.success("Patreon email linked.", "Saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Patreon email linked.", "Saved!");
 		},
 		setContribute(value) {
 			value = !value ? null : value;
 			db.ref(`users/${this.id}/contribute`).set(value);
 
-			this.$snotify.success("Contribute set.", "Saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Contribute set.", "Saved!");
 		},
 		makeDate(input) {
 			let monthNames = [

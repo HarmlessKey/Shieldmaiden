@@ -461,6 +461,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { notifyError } from "src/utils/notify";
 import { formatNumber } from "src/utils/formatNumber";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
@@ -723,7 +724,7 @@ export default {
 				this.$set(this.syncing, id, "success");
 			} catch (e) {
 				this.syncing[id] = "error";
-				this.$snotify.error(e, "Sync failed", {});
+				notifyError(e, "Sync failed");
 			} finally {
 				setTimeout(() => {
 					this.$delete(this.syncing, id);

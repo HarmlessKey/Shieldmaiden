@@ -153,6 +153,7 @@ import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { notifyError, confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Players",
@@ -212,30 +213,11 @@ export default {
 			if (e.shiftKey) {
 				this.deletePlayer(key);
 			} else {
-				this.$snotify.error(
-					"Are you sure you want to delete " + player.character_name + "?",
-					"Delete player",
-					{
-						timeout: false,
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.deletePlayer(key);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: "Delete player",
+					message: "Are you sure you want to delete " + player.character_name + "?",
+					onOk: () => this.deletePlayer(key),
+				});
 			}
 		},
 		deletePlayer(key) {
@@ -262,7 +244,7 @@ export default {
 				this.$set(this.syncing, id, "success");
 			} catch (e) {
 				this.syncing[id] = "error";
-				this.$snotify.error(e, "Sync failed", {});
+				notifyError(e, "Sync failed");
 			} finally {
 				setTimeout(() => {
 					this.$delete(this.syncing, id);

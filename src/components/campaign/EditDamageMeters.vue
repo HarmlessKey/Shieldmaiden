@@ -70,6 +70,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { confirmAction } from "src/utils/notify";
 import _ from "lodash";
 
 export default {
@@ -141,31 +142,13 @@ export default {
 			});
 		},
 		reset() {
-			this.$snotify.error(
-				"Are you sure? For every player, all values will be set to 0.",
-				"Reset meters",
-				{
-					timeout: false,
-					position: "rightTop",
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.resetAll();
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Reset meters",
+				message: "Are you sure? For every player, all values will be set to 0.",
+				onOk: () => {
+					this.resetAll();
+				},
+			});
 		},
 		async resetAll() {
 			for (const key in this.campaign.players) {

@@ -214,6 +214,7 @@
 <script>
 import { promotionService } from "src/services/promotions";
 import { legacy_tiers } from "src/utils/generalConstants";
+import { notifyError } from "src/utils/notify";
 
 export default {
 	name: "Promotions",
@@ -295,7 +296,7 @@ export default {
 				this.update_promotion = false;
 				this.newPromotion = {};
 			} catch (error) {
-				this.$snotify.error(error);
+				notifyError(error);
 			}
 		},
 		async deletePromotion(promotion_name) {

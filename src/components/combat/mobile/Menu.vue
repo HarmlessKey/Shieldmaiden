@@ -147,6 +147,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { notifyError, confirmAction } from "src/utils/notify";
 import Actions from "src/components/combat/legacy/actions/Actions.vue";
 
 export default {
@@ -208,30 +209,14 @@ export default {
 	methods: {
 		...mapActions(["setDrawer", "set_hidden", "remove_entity"]),
 		remove(key, name) {
-			this.$snotify.error(
-				'Are you sure you want to remove "' + name + '" from this encounter?',
-				"Delete character",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.remove_entity(key);
-								this.dialog.options = false;
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete character",
+				message: 'Are you sure you want to remove "' + name + '" from this encounter?',
+				onOk: () => {
+					this.remove_entity(key);
+					this.dialog.options = false;
+				},
+			});
 		},
 		setHidden(key, hidden) {
 			if (key) {
@@ -240,7 +225,7 @@ export default {
 					hidden: hidden,
 				});
 			} else {
-				this.$snotify.error("Select a target", "Hide entity", {});
+				notifyError("Select a target", "Hide entity");
 			}
 		},
 	},

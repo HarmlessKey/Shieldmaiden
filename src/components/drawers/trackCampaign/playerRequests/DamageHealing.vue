@@ -103,6 +103,7 @@
 <script>
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
+import { notifySuccess } from "src/utils/notify";
 
 export default {
 	name: "damageHealing",
@@ -183,10 +184,9 @@ export default {
 				request
 			);
 
-			this.$snotify.success(
+			notifySuccess(
 				`Your ${this.type} request was successfuly sent.`,
-				`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`,
-				{ position: "centerTop" }
+				`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`
 			);
 			this.setDrawer({ show: false });
 		},

@@ -210,6 +210,7 @@ import Pane from "src/components/combat/Pane.vue";
 import Card from "src/components/combat/entities/Card";
 import Actor from "src/components/combat/actor";
 import Log from "src/components/combat/side/log";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "RunEncounter",
@@ -394,26 +395,12 @@ export default {
 		requests: {
 			deep: true,
 			handler(newValue, oldValue) {
-				if (newValue && oldValue && Object.keys(newValue).length > Object.keys(oldValue).length) {
-					this.$snotify.warning("A new player request was made.", "New request", {
-						timeout: 5000,
-						buttons: [
-							{
-								text: "Show requests",
-								action: (toast) => {
-									this.setDrawer({ show: true, type: "combat/side/Requests" });
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "Close",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-						],
+					confirmAction({
+						title: "New request",
+						message: "A new player request was made.",
+						onOk: () => {
+							this.setDrawer({ show: true, type: "combat/side/Requests" });
+						},
 					});
 				}
 			},
@@ -443,31 +430,13 @@ export default {
 			this.width = size.width;
 		},
 		confirmFinish() {
-			this.$snotify.error(
-				"All NPCs seem to be dead. Do you want to finish the encounter?",
-				"Finish Encounter",
-				{
-					position: "centerCenter",
-					timeout: 0,
-					buttons: [
-						{
-							text: "Finish",
-							action: (toast) => {
-								this.finish();
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "Cancel",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Finish Encounter",
+				message: "All NPCs seem to be dead. Do you want to finish the encounter?",
+				onOk: () => {
+					this.finish();
+				},
+			});
 		},
 		finish() {
 			this.set_finished();

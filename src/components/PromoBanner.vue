@@ -41,6 +41,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { notifySuccess } from "src/utils/notify";
 import { promotionService } from "src/services/promotions";
 
 export default {
@@ -104,9 +105,7 @@ export default {
 		copyCode(event) {
 			event.preventDefault();
 			navigator.clipboard.writeText(this.active_promotion.code);
-			this.$snotify.success("To clipboard", "Code Copied!", {
-				position: "rightTop",
-			});
+			notifySuccess("To clipboard", "Code Copied!");
 		},
 		async getActivePromotion() {
 			return await promotionService.getFirstActivePromotion();

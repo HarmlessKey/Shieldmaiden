@@ -198,6 +198,7 @@ import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import { notifySuccess, notifyError, confirmAction } from "src/utils/notify";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
@@ -352,9 +353,7 @@ export default {
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
 					this.$set(this, "npcId", key);
 
-					this.$snotify.success("Monster Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Monster Saved.", "Critical hit!");
 
 					// Capitalize before stringify so changes found isn't triggered
 					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
@@ -362,9 +361,7 @@ export default {
 					this.unsaved_changes = false;
 				})
 				.catch((error) => {
-					this.$snotify.error("Couldn't save monster.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Couldn't save monster.", "Save failed");
 					console.error(error);
 					console.log(this.npc);
 				});
@@ -375,9 +372,7 @@ export default {
 				id: this.npcId,
 				npc: this.npc,
 			}).then(() => {
-				this.$snotify.success("Monster Saved.", "Critical hit!", {
-					position: "rightTop",
-				});
+				notifySuccess("Monster Saved.", "Critical hit!");
 
 				this.unsaved_changes = false;
 
@@ -395,30 +390,11 @@ export default {
 	},
 	beforeRouteLeave(to, from, next) {
 		if (this.unsaved_changes) {
-			this.$snotify.error(
-				"There are unsaved changes in the form.\n Would you like to continue?",
-				"Unsaved Changes",
-				{
-					buttons: [
-						{
-							text: "Leave",
-							action: (toast) => {
-								next();
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "Stay",
-							action: (toast) => {
-								next(false);
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Unsaved Changes",
+				message: "There are unsaved changes in the form.\n Would you like to continue?",
+				onOk: () => next(),
+			});
 		} else {
 			next();
 		}

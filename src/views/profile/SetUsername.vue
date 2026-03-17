@@ -41,6 +41,7 @@
 <script>
 import { db, firebase } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
+import { notifySuccess } from "src/utils/notify";
 
 export default {
 	name: "Username",
@@ -83,9 +84,7 @@ export default {
 					method: "Set Username",
 				});
 
-				this.$snotify.success("Username saved.", "Critical hit!", {
-					position: "centerTop",
-				});
+				notifySuccess("Username saved.", "Critical hit!");
 				await this.reinitialize();
 				this.$router.replace("/profile");
 			}

@@ -175,6 +175,7 @@ import { mapActions } from "vuex";
 import { races, subraces } from "src/utils/characterConstants";
 import ModifierTable from "src/components/characters/modifier-table.vue";
 import Modifier from "src/components/characters/modifier.vue";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterRace",
@@ -251,29 +252,11 @@ export default {
 		},
 		selectRace(value, valid) {
 			if (this.race.race) {
-				this.$snotify.error(
-					`Are you sure you want to change the race? All traits will be reset.`,
-					`Change race`,
-					{
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.setRace(value, valid);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: `Change race`,
+					message: `Are you sure you want to change the race? All traits will be reset.`,
+					onOk: () => this.setRace(value, valid),
+				});
 			} else {
 				this.setRace(value, valid);
 			}
@@ -321,29 +304,11 @@ export default {
 			this.save(valid);
 		},
 		confirmDelete(index, name, valid) {
-			this.$snotify.error(
-				'Are you sure you want to delete the the trait "' + name + '"?',
-				"Delete trait",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteTrait(index, valid);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete trait",
+				message: 'Are you sure you want to delete the the trait "' + name + '"?',
+				onOk: () => this.deleteTrait(index, valid),
+			});
 		},
 		modifierSaved(valid) {
 			this.modal = false;

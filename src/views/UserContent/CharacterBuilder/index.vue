@@ -77,6 +77,7 @@
 	import { experience } from 'src/mixins/experience.js';
 	import { mapGetters, mapActions } from "vuex";
 	import ContentHeader from "src/components/userContent/ContentHeader";
+	import { notifyError, confirmAction } from "src/utils/notify";
 
 	export default {
 		name: 'CharacterBuilder',
@@ -145,9 +146,7 @@
 				await this.add_character().then(key => {
 					this.$router.replace(`${this.$route.path}/${key}`);
 				}).catch(error => {
-					this.$snotify.error('Couldn\'t create character.', 'Save failed', {
-						position: "rightTop"
-					});
+					notifyError('Couldn\'t create character.', 'Save failed');
 					console.error(error);
 				});
 			},
@@ -156,23 +155,10 @@
 				if(e.shiftKey) {
 					this.deletePlayer(key);
 				} else {
-					this.$snotify.error('Are you sure you want to delete ' + character.character_name + '?', 'Delete character', {
-						timeout: false,
-						buttons: [
-							{
-								text: 'Yes', action: (toast) => { 
-									this.deleteCharacter(key)
-									this.$snotify.remove(toast.id); 
-								}, 
-								bold: false
-							},
-							{
-								text: 'No', action: (toast) => { 
-									this.$snotify.remove(toast.id); 
-								}, 
-								bold: false
-							}
-							]
+					confirmAction({
+						title: 'Delete character',
+						message: 'Are you sure you want to delete ' + character.character_name + '?',
+						onOk: () => this.deleteCharacter(key),
 					});
 				}
 			},

@@ -724,6 +724,7 @@ import {
 	characterToPlayer,
 	comparePlayerToCharacter,
 } from "src/utils/generalFunctions";
+import { notifyError } from "src/utils/notify";
 
 export default {
 	name: "EditPlayer",
@@ -896,7 +897,7 @@ export default {
 		},
 		async addPlayer() {
 			if (this.player_count >= this.tier.benefits.players) {
-				this.$snotify.error("You have too many players.", "Error");
+				notifyError("You have too many players.", "Error");
 			} else {
 				await this.add_player(this.player).then(() => {
 					this.$router.replace("/content/players");

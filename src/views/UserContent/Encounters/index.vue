@@ -365,6 +365,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { notifySuccess, confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Encounters",
@@ -482,9 +483,7 @@ export default {
 				},
 			});
 			this.newEncounter = "";
-			this.$snotify.success("Encounter added.", "Critical hit!", {
-				position: "rightTop",
-			});
+			notifySuccess("Encounter added.", "Critical hit!");
 		},
 		deleteEncounter(e, key, encounter) {
 			//Instantly delete when shift is held
@@ -494,33 +493,16 @@ export default {
 					id: key,
 				});
 			} else {
-				this.$snotify.error(
-					'Are you sure you want to delete "' + encounter + '"?',
-					"Delete encounter",
-					{
-						timeout: 5000,
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.delete_encounter({
-										campaignId: this.campaignId,
-										id: key,
-									});
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: "Delete encounter",
+					message: 'Are you sure you want to delete "' + encounter + '"?',
+					onOk: () => {
+						this.delete_encounter({
+							campaignId: this.campaignId,
+							id: key,
+						});
+					},
+				});
 			}
 		},
 		async dialogCloneEncounter(key) {
@@ -554,30 +536,11 @@ export default {
 			};
 		},
 		async deleteFinishedEncounters() {
-			this.$snotify.error(
-				"Are you sure you want to delete all finished encounters?",
-				"Delete finished encounters",
-				{
-					timeout: 5000,
-					buttons: [
-						{
-							text: "Yes",
-							action: async (toast) => {
-								await this.delete_finished_encounters(this.campaignId);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete finished encounters",
+				message: "Are you sure you want to delete all finished encounters?",
+				onOk: async () => await this.delete_finished_encounters(this.campaignId),
+			});
 		},
 		reset(id, hard = true) {
 			if (hard) {

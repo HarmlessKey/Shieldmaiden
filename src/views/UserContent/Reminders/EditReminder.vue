@@ -33,6 +33,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import ReminderForm from "src/components/ReminderForm";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "EditReminder",
@@ -89,9 +90,7 @@ export default {
 
 		saveReminder(valid) {
 			if (!valid) {
-				this.$snotify.error("There are validation errors.", "Critical miss!", {
-					position: "rightTop",
-				});
+				notifyError("There are validation errors.", "Critical miss!");
 				return;
 			}
 			if (this.$route.name == "Add reminder" && !this.reminderId) {
@@ -104,13 +103,13 @@ export default {
 			this.add_reminder(this.reminder).then(
 				(key) => {
 					this.$set(this, "reminderId", key);
-					this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" });
+					notifySuccess("Reminder Saved.", "Critical hit!");
 					this.reminder_copy = JSON.stringify(this.reminder);
 					this.unsaved_changes = false;
 					this.$router.replace(`/content/reminders`);
 				},
 				(error) => {
-					this.$snotify.error("Couldn't save reminder.", "Save failed", { position: "rightTop" });
+					notifyError("Couldn't save reminder.", "Save failed");
 					console.error(error);
 				}
 			);
@@ -123,7 +122,7 @@ export default {
 				reminder: this.reminder,
 			});
 
-			this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" });
+			notifySuccess("Reminder Saved.", "Critical hit!");
 
 			this.reminder_copy = JSON.stringify(this.reminder);
 			this.unsaved_changes = false;

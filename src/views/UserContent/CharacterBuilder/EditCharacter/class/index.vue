@@ -723,6 +723,7 @@ import { dice } from "src/mixins/dice.js";
 import { db } from "src/firebase";
 import Features from "./features";
 import { classes } from "src/utils/characterConstants";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterClass",
@@ -815,29 +816,11 @@ export default {
 		},
 		selectClass(Class, classIndex, valid) {
 			if (this.Class.classes[classIndex].class) {
-				this.$snotify.error(
-					`Are you sure you want to change the class? Rolled Hit Points and custom Features & linked Modifiers will be lost.`,
-					`Change class`,
-					{
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.setClass(Class, classIndex, valid);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: `Change class`,
+					message: `Are you sure you want to change the class? Rolled Hit Points and custom Features & linked Modifiers will be lost.`,
+					onOk: () => this.setClass(Class, classIndex, valid),
+				});
 			} else {
 				this.setClass(Class, classIndex, valid);
 			}
@@ -975,31 +958,13 @@ export default {
 			this.$emit("change", "class.spells_known");
 		},
 		confirmDeleteClass(classIndex, name) {
-			this.$snotify.error(
-				`Are you sure you want to delete ${
+			confirmAction({
+				title: `Delete class`,
+				message: `Are you sure you want to delete ${
 					name ? `the class "${name}"` : `this class`
 				}? All linked features and modifiers will be removed.`,
-				`Delete class`,
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteClass(classIndex);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+				onOk: () => this.deleteClass(classIndex),
+			});
 		},
 		addClass() {
 			this.add_class({

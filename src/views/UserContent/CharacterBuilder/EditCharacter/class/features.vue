@@ -195,6 +195,7 @@ import { mapActions } from "vuex";
 import Modifier from "src/components/characters/modifier.vue";
 import ModifierTable from "src/components/characters/modifier-table.vue";
 import CharacterDescriptions from "src/components/characters/character-descriptions";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterClassFeatures",
@@ -285,29 +286,11 @@ export default {
 		},
 
 		confirmDeleteFeature(level, index, name, valid) {
-			this.$snotify.error(
-				'Are you sure you want to delete the the feature "' + name + '"?',
-				"Delete feature",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteFeature(level, index, valid);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete feature",
+				message: 'Are you sure you want to delete the the feature "' + name + '"?',
+				onOk: () => this.deleteFeature(level, index, valid),
+			});
 		},
 		deleteFeature(level, index, valid) {
 			this.character.delete_feature(this.classIndex, level, index);

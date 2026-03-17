@@ -134,6 +134,7 @@ import ContentHeader from "src/components/userContent/ContentHeader";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import { downloadJSON } from "src/utils/generalFunctions";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Spells",
@@ -206,25 +207,10 @@ export default {
 			if (e.shiftKey) {
 				this.deleteSpell(key);
 			} else {
-				this.$snotify.error("Are you sure you want to delete " + spell.name + "?", "Delete spell", {
-					timeout: false,
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteSpell(key);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
+				confirmAction({
+					title: "Delete spell",
+					message: "Are you sure you want to delete " + spell.name + "?",
+					onOk: () => this.deleteSpell(key),
 				});
 			}
 		},

@@ -221,6 +221,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import EditWeather from "./Weather";
 import { audio } from "src/mixins/audio";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "General",
@@ -285,14 +286,10 @@ export default {
 				value: this.editableEncounter,
 			})
 				.then(() => {
-					this.$snotify.success("Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Saved.", "Critical hit!");
 				})
 				.catch(() => {
-					this.$snotify.error("Something went wrong saving the encounter.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Something went wrong saving the encounter.", "Save failed");
 				});
 		},
 		intensity(type) {

@@ -1,4 +1,5 @@
 import { mapActions } from "vuex";
+import { notifyHtml, warningAction, notifyWarning } from "src/utils/notify";
 
 export const remindersMixin = {
 	data() {
@@ -105,50 +106,33 @@ export const remindersMixin = {
 			let notify = target?.reminders[key].notify;
 			let title = target?.reminders[key].title;
 
-			//Replace variables in title and message
 			if (target?.reminders[key].selectedVars) {
 				notify = this.replaceReminderVariables(notify, target?.reminders[key].selectedVars);
 				title = this.replaceReminderVariables(title, target?.reminders[key].selectedVars);
 			}
 
-			//Create buttons for notification
-			let buttons;
 			if (target?.reminders[key].action !== "remove") {
 				notify = notify !== undefined ? notify : "Keep reminder?";
-				buttons = [
-					{
-						text: "Keep Reminder",
-						action: (toast) => {
-							this.$snotify.remove(toast.id);
-						},
-						bold: false,
+				warningAction({
+					title: title,
+					message: target.name + ": " + notify,
+					okLabel: "Keep Reminder",
+					cancelLabel: "Remove",
+					onOk: () => {}, // keep reminder, do nothing
+					onCancel: () => {
+						this.set_targetReminder({
+							action: "remove",
+							entity: target.key,
+							key: key,
+						});
 					},
-					{
-						text: "Remove",
-						action: (toast) => {
-							this.set_targetReminder({
-								action: "remove",
-								entity: target.key,
-								key: key,
-							});
-							this.$snotify.remove(toast.id);
-						},
-						bold: false,
-					},
-				];
+				});
 			} else {
-				notify =
-					target?.reminders[key].notify !== undefined
-						? target?.reminders[key].notify
-						: "Reminder removed";
-				buttons = "";
+				notify = target?.reminders[key].notify !== undefined
+					? target?.reminders[key].notify
+					: "Reminder removed";
+				notifyWarning(target.name + ": " + notify, title, { timeout: 0 });
 			}
-
-			// NOTIFICATION
-			this.$snotify.warning(target.name + ": " + notify, title, {
-				timeout: 0,
-				buttons,
-			});
 		},
 	},
 };

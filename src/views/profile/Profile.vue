@@ -263,6 +263,7 @@ import Tutorial from "src/components/userContent/Tutorial";
 import PatreonLinkButton from "src/components/PatreonLinkButton";
 import PaymentDeclined from "src/components/PaymentDeclined.vue";
 import SignIn from "src/components/SignIn.vue";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "Profile",
@@ -373,14 +374,14 @@ export default {
 		},
 		async addVoucher() {
 			this.set_active_voucher(this.voucher_input_text)
-				.then(() => {
-					this.$snotify.success(
+					notifySuccess(
 						`Successfully added ${this.voucher_input_text.toUpperCase()} voucher.`
+					);
 					);
 					this.voucher_input_text = null;
 				})
 				.catch((error) => {
-					this.$snotify.error(error);
+					notifyError(error);
 				});
 		},
 		async unlinkPatreon() {

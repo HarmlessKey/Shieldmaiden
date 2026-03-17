@@ -268,6 +268,7 @@
 import { abilities } from "src/utils/generalConstants";
 import { dice } from "src/mixins/dice.js";
 import { mapActions } from "vuex";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterAbilities",
@@ -416,29 +417,11 @@ export default {
 			if (!this.method) {
 				this.saveAbilityScoreMethod(method);
 			} else {
-				this.$snotify.error(
-					`Are you sure you want to change the method? Current ability scores will be reset.`,
-					`Change method`,
-					{
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.saveAbilityScoreMethod(method);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: `Change method`,
+					message: `Are you sure you want to change the method? Current ability scores will be reset.`,
+					onOk: () => this.saveAbilityScoreMethod(method),
+				});
 			}
 		},
 		saveAbilityScoreMethod(method) {

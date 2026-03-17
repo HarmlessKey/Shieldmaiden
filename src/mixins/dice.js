@@ -1,4 +1,5 @@
 import { mapActions, mapGetters } from "vuex";
+import { notifyHtml, warningAction, notifyWarning } from "src/utils/notify";
 
 export const dice = {
 	data() {
@@ -122,16 +123,13 @@ export const dice = {
 				}
 
 				this.animateTrigger = !this.animateTrigger;
-				this.$snotify.html(
-					`<div class="snotifyToast__body roll">
+				notifyHtml(
+					`<div class="roll">
 						<div class="roll_title truncate">${entity_name ? `${entity_name}: ` : ``}${title}</div>
 						<div class="rolled" id="roll">${roll.total}</div>
 						<div class="roll_footer">${advantage ? advantage : ""}${sumThrows}${roll.mod}</div>
-					</div> `,
-					{
-						timeout: 3000,
-						closeOnClick: true,
-					}
+					</div>`,
+					{ timeout: 3000 }
 				);
 				this.rolled = roll.total;
 			}

@@ -41,6 +41,7 @@
 import { db } from "src/firebase";
 import { general } from "src/mixins/general";
 import { mapGetters } from "vuex";
+import { confirmAction } from "src/utils/notify";
 import ViewSpell from "src/components/compendium/Spell";
 
 export default {
@@ -256,30 +257,13 @@ export default {
 	},
 	beforeRouteLeave(to, from, next) {
 		if (this.unsaved_changes) {
-			this.$snotify.error(
-				"There are unsaved changes in the form.\n Would you like to continue?",
-				"Unsaved Changes",
-				{
-					buttons: [
-						{
-							text: "Leave",
-							action: (toast) => {
-								next();
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "Stay",
-							action: (toast) => {
-								next(false);
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Unsaved Changes",
+				message: "There are unsaved changes in the form.\n Would you like to continue?",
+				onOk: () => {
+					next();
+				},
+			});
 		} else {
 			next();
 		}

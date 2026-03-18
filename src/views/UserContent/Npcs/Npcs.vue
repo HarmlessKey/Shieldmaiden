@@ -197,6 +197,34 @@
 											{{ col.value }}
 										</template>
 									</template>
+									<div v-else-if="$q.screen.gt.xs" class="text-right d-flex justify-content-between">
+										<a
+											class="btn btn-sm bg-neutral-5"
+											@click="viewNpc(props.key)"
+										>
+											<i aria-hidden="true" class="fas fa-eye" />
+											<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
+										</a>
+										<router-link
+											class="btn btn-sm bg-neutral-5 mx-2"
+											:to="`${$route.path}/${props.key}`"
+										>
+											<i aria-hidden="true" class="fas fa-pencil" />
+											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+										</router-link>
+										<ExportUserContent
+											class="btn-sm bg-neutral-5 mr-2"
+											content-type="npc"
+											:content-id="props.key"
+										/>
+										<a
+											class="btn btn-sm bg-neutral-5"
+											@click="confirmDelete($event, props.key, props.row)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt" />
+											<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
+										</a>
+									</div>
 									<div v-else class="text-right">
 										<button class="btn btn-sm bg-neutral-5">
 											<i aria-hidden="true" class="fas fa-ellipsis-h" />

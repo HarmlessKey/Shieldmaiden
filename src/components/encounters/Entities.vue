@@ -649,7 +649,7 @@ export default {
 			}
 			if (this.npcFilter.groups?.length) {
 				npcs = npcs.filter((npc) =>
-					this.npcFilter.groups.every((groupId) => npc.groups && npc.groups[groupId])
+					this.npcFilter.groups.some((groupId) => npc.groups && npc.groups[groupId])
 				);
 			}
 			if (this.npcFilter.types?.length) {

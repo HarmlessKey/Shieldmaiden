@@ -456,6 +456,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
 import { languages } from "src/utils/generalConstants";
+import { campaignGroupKey } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster.js";
 
 export default {
@@ -506,7 +507,7 @@ export default {
         for (const campaign of this.all_campaigns) {
           options.push({
             label: `[Campaign] ${campaign.name ? campaign.name.capitalizeEach() : campaign.key}`,
-            value: `campaign__${campaign.key}`,
+            value: campaignGroupKey(campaign.key),
           });
         }
       }

@@ -19,7 +19,7 @@
 									<div class="header">
 										<!-- NAME -->
 										<div class="name truncate" v-if="entity_key && entities && Object.keys(entities).includes(entity_key)">
-											<Name :entity="entities[entity_key]" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
+											<Name :entity="entities[entity_key]" :players="players" :npcs="npcs" :npcSettings="npcSettings" :allySettings="allySettings" />
 										</div>
 										
 
@@ -47,7 +47,7 @@
 												<div v-if="entities && Object.keys(entities).includes(target)" :key="target" class="img">
 													<Avatar :entity="entities[target]" :players="players" :npcs="npcs" />
 													<q-tooltip anchor="top middle" self="center middle">
-														<Name :entity="entities[target]" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
+														<Name :entity="entities[target]" :players="players" :npcs="npcs" :npcSettings="npcSettings" :allySettings="allySettings" />
 													</q-tooltip>
 												</div>
 											</template>
@@ -139,6 +139,10 @@
 				default: undefined
 			},
 			npcSettings: {
+				type: Object,
+				default: undefined
+			},
+			allySettings: {
 				type: Object,
 				default: undefined
 			}

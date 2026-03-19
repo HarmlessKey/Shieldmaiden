@@ -129,7 +129,7 @@ export default {
 					],
 				},
 				npcs: {
-					name: "NPC's",
+					name: "Enemies",
 					type_settings: [
 						{
 							key: "name",
@@ -201,6 +201,98 @@ export default {
 							name: "Conditions",
 							icon: "fas fa-flame",
 							info: "Players can see the conditions on NPC's.",
+							options: [
+								{
+									value: false,
+									name: "Hidden",
+									action: "Hide",
+									icon: "fas fa-eye-slash",
+									color: "red",
+								},
+								{
+									value: undefined,
+									name: "Shown",
+									action: "Show",
+									icon: "fas fa-eye",
+									color: "green",
+								},
+							],
+						},
+					],
+				},
+				allies: {
+					name: "Allies",
+					type_settings: [
+						{
+							key: "name",
+							entity: "ally",
+							name: "Name",
+							icon: "fas fa-helmet-battle",
+							info: "Players can see the names of allied NPC's.",
+							options: [
+								{
+									value: false,
+									name: "Hidden",
+									action: "Hide",
+									icon: "fas fa-eye-slash",
+									color: "red",
+								},
+								{
+									value: undefined,
+									name: "Shown",
+									action: "Show",
+									icon: "fas fa-eye",
+									color: "green",
+								},
+							],
+						},
+						{
+							key: "health",
+							entity: "ally",
+							name: "Health",
+							icon: "fas fa-heart",
+							info: "Players can see the health of allied NPC's.",
+							options: [
+								{
+									value: undefined,
+									name: "Hidden",
+									action: "Hide",
+									icon: "fas fa-eye-slash",
+									color: "red",
+								},
+								{
+									value: "obscured",
+									name: "Obsc",
+									action: "Obsc",
+									icon: "fas fa-question-circle",
+									color: "orange",
+								},
+								{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
+							],
+						},
+						{
+							key: "ac",
+							entity: "ally",
+							name: "Armor Class",
+							icon: "fas fa-shield",
+							info: "Players can see the armor class of allied NPC's.",
+							options: [
+								{
+									value: undefined,
+									name: "Hidden",
+									action: "Hide",
+									icon: "fas fa-eye-slash",
+									color: "red",
+								},
+								{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
+							],
+						},
+						{
+							key: "conditions",
+							entity: "ally",
+							name: "Conditions",
+							icon: "fas fa-flame",
+							info: "Players can see the conditions on allied NPC's.",
 							options: [
 								{
 									value: false,

@@ -33,6 +33,9 @@ export default {
 		npcSettings: {
 			type: Object,
 		},
+		allySettings: {
+			type: Object,
+		},
 	},
 	methods: {
 		displayImg(entity) {

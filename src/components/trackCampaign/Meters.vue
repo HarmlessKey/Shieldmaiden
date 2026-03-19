@@ -35,7 +35,7 @@
 								>
 									<div class="info">
 										<span class="name">
-											<Name :entity="entity" :players="players" :npcs="npcs" :npcSettings="npcSettings || {}" />
+											<Name :entity="entity" :players="players" :npcs="npcs" :npcSettings="npcSettings || {}" :allySettings="allySettings" />
 										</span>
 										<span class="numbers">
 											<span :class="{
@@ -79,7 +79,8 @@
 			'campaign',
 			'players',
 			'npcs',
-			'npcSettings'
+			'npcSettings',
+			'allySettings'
 		],
 		data() {
 			return {

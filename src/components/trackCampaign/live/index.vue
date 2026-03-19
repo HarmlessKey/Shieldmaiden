@@ -22,6 +22,7 @@
 				:npcs="npcs"
 				:playerSettings="playerSettings"
 				:npcSettings="npcSettings"
+				:allySettings="allySettings"
 				@setWeather="setWeather"
 				:timer="timer['.value']"
 			/>
@@ -46,6 +47,7 @@
 						:playerSettings="playerSettings"
 						:screenWidth="width"
 						:npcSettings="npcSettings"
+						:allySettings="allySettings"
 					/>
 					<Rewards v-else :encounter="encounter" />
 				</div>
@@ -61,6 +63,7 @@
 								:npcs="npcs"
 								:players="players"
 								:npcSettings="npcSettings"
+								:allySettings="allySettings"
 							/>
 						</div>
 					</q-scroll-area>
@@ -76,6 +79,7 @@
 						:npcs="npcs"
 						:players="players"
 						:npcSettings="npcSettings"
+						:allySettings="allySettings"
 					/>
 				</div>
 			</div>
@@ -143,6 +147,7 @@
 							:npcs="npcs"
 							:playerSettings="playerSettings"
 							:npcSettings="npcSettings"
+							:allySettings="allySettings"
 							:screenWidth="width"
 						/>
 						<Rewards v-else :encounter="encounter" />
@@ -153,6 +158,7 @@
 							:npcs="npcs"
 							:players="players"
 							:npcSettings="npcSettings"
+							:allySettings="allySettings"
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="shares">
@@ -163,6 +169,7 @@
 							:npcs="npcs"
 							:players="players"
 							:npcSettings="npcSettings"
+							:allySettings="allySettings"
 						/>
 					</q-tab-panel>
 				</q-tab-panels>
@@ -227,6 +234,10 @@ export default {
 			},
 			npcSettings: {
 				source: db.ref(`settings/${this.userId}/track/npc`),
+				asObject: true,
+			},
+			allySettings: {
+				source: db.ref(`settings/${this.userId}/track/ally`),
 				asObject: true,
 			},
 			playerSettings: {

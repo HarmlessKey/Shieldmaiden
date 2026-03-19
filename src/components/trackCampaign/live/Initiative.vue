@@ -166,6 +166,7 @@
 										:players="players"
 										:npcs="npcs"
 										:npcSettings="npcSettings"
+										:allySettings="allySettings"
 									/>
 								</td>
 
@@ -177,6 +178,7 @@
 										:players="players"
 										:npcs="npcs"
 										:npcSettings="npcSettings"
+										:allySettings="allySettings"
 										:playerSettings="playerSettings"
 									/>
 								</td>
@@ -186,7 +188,7 @@
 									v-if="
 										(playerSettings.conditions === undefined &&
 											(entity.entityType === 'player' ||
-												(entity.entityType == 'npc' && npcSettings.conditions === undefined))) ||
+												(entity.entityType == 'npc' && (entity.friendly ? (allySettings || {}).conditions : npcSettings.conditions) === undefined))) ||
 										entity.entityType === 'companion'
 									"
 								>
@@ -232,6 +234,7 @@
 																:players="players"
 																:npcs="npcs"
 																:npcSettings="npcSettings"
+																:allySettings="allySettings"
 															/>
 														</q-item-section>
 														<q-item-section avatar>
@@ -301,6 +304,7 @@ export default {
 		"playerSettings",
 		"npcs",
 		"npcSettings",
+		"allySettings",
 		"screenWidth",
 	],
 	data() {
@@ -395,6 +399,7 @@ export default {
 					players: this.players,
 					campPlayers: this.campPlayers,
 					npcSettings: this.npcSettings,
+					allySettings: this.allySettings,
 					npcs: this.npcs,
 					encounter: {
 						key: this.encounter.key,

@@ -25,7 +25,7 @@
 
 			<h2 class="d-none d-md-flex justify-content-start">
 				<span class="mr-3">
-					<Name :entity="current" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
+					<Name :entity="current" :players="players" :npcs="npcs" :npcSettings="npcSettings" :allySettings="allySettings" />
 				</span>
 
 				<!-- Companion health is stored in campaign.companions -->
@@ -111,6 +111,7 @@ export default {
 		"playerSettings",
 		"npcs",
 		"npcSettings",
+		"allySettings",
 		"timer",
 	],
 	data() {

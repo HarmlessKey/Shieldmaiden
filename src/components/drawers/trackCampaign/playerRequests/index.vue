@@ -61,6 +61,7 @@
 						:players="players" 
 						:npcs="npcs" 
 						:npcSettings="npcSettings"
+						:allySettings="allySettings"
 					/>
 				</div>
 			</li>
@@ -95,6 +96,7 @@
 				players: this.data.players,
 				campPlayers: this.data.campPlayers,
 				npcSettings: this.data.npcSettings,
+				allySettings: this.data.allySettings,
 				npcs: this.data.npcs,
 				player: this.data.characters[0]
 			}

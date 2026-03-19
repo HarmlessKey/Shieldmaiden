@@ -121,6 +121,7 @@ export default {
 		"players",
 		"playerSettings",
 		"npcSettings",
+		"allySettings",
 	],
 	data() {
 		return {

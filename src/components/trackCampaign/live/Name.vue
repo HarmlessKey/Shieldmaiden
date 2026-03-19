@@ -31,6 +31,10 @@
 			npcSettings: {
 				type: Object,
 				required: true
+			},
+			allySettings: {
+				type: Object,
+				default: undefined
 			}
 		},
 		methods: {

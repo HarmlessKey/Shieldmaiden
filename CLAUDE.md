@@ -18,6 +18,11 @@ npm run build     # quasar build -m ssr
 npm run lint      # ESLint
 ```
 
+## File Editing Rules
+
+- **Always use the `Edit` or `Write` tools** to modify files — never use Bash, `sed`, `awk`, `python`, or `node` for file editing
+- If the `Edit` tool fails due to whitespace mismatches, investigate the exact characters with `cat -A` and adjust the match — do not fall back to shell scripts
+
 ## Key Constraints
 
 - **Firebase v8 namespaced API** is used across 63+ files — do not switch to modular API

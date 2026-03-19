@@ -89,7 +89,7 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: monster.saving_throws.includes(ability)
+									m: monster.saving_throws?.includes(ability)
 										? calcMod(monster[ability]) + monster.proficiency
 										: calcMod(monster[ability]),
 									title: `${ability.capitalize()} save`,
@@ -107,7 +107,7 @@
 							>
 								{{
 									mod2str(
-										monster.saving_throws.includes(ability)
+										monster.saving_throws?.includes(ability)
 											? calcMod(monster[ability]) + monster.proficiency
 											: calcMod(monster[ability])
 									)

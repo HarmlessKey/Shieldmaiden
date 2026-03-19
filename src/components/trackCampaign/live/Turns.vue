@@ -40,6 +40,8 @@
 					:campCompanions="campCompanions"
 					:players="players"
 					:npcs="npcs"
+					:npcSettings="npcSettings"
+					:allySettings="allySettings"
 				/>
 				<template
 					v-else-if="

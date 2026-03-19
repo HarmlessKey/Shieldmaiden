@@ -108,7 +108,7 @@ import { mapActions, mapGetters } from "vuex";
 
 export default {
 	name: "damageHealing",
-	props: ["targeted", "player", "encounter"],
+	props: ["targeted", "player", "encounter", "npcSettings", "allySettings"],
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,

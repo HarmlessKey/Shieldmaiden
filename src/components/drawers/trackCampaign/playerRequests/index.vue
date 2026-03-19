@@ -66,7 +66,7 @@
 				</div>
 			</li>
 		</ul>
-		<DamageHealing :targeted="targeted" :player="player" :encounter="encounter" />
+		<DamageHealing :targeted="targeted" :player="player" :encounter="encounter" :npcSettings="npcSettings" :allySettings="allySettings" />
 	</div>
 </template>
 

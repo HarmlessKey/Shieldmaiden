@@ -15,15 +15,8 @@
 					:class="tier.benefits[key] ? 'fa-check green' : 'fa-times neutral-3'"
 				/>
 				<template v-else>
-					<span v-if="key === 'ai_credits' && tier.price !== 'Free'">
-						<strong
-							><hk-animated-integer
-								:value="credits"
-								:class="{ green: credits >= 1, red: credits === 0 }" /></strong
-						><span class="neutral-2">/</span>{{ tier.benefits[key] }}
-					</span>
 					<i
-						v-else-if="tier.benefits[key] === 'infinite'"
+						v-if="tier.benefits[key] === 'infinite'"
 						aria-hidden="true"
 						class="green far fa-infinity"
 					/>
@@ -96,9 +89,6 @@ export default {
 				import: {
 					title: "Import content",
 				},
-				ai_credits: {
-					title: "Monster Credits",
-				},
 				storage: {
 					title: "Storage",
 				},
@@ -107,10 +97,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["ai", "tier", "content_count"]),
-		credits() {
-			return this.tier.benefits.ai_credits - this.ai.spent;
-		},
+		...mapGetters(["tier", "content_count"]),
 	},
 };
 </script>

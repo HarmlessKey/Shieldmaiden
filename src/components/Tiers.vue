@@ -68,7 +68,6 @@
 									<span>
 										{{ benefit.title }}
 										<span v-if="key === 'character_sync'" class="neutral-3">*</span>
-										<span v-if="key === 'ai_credits'" class="neutral-3">(per month)</span>
 									</span>
 								</li>
 								<li>
@@ -135,14 +134,14 @@
 				</template>
 			</hk-card-deck>
 			<small class="d-block text-center">
-				<span class="neutral-3">*</span> Character Sync requires
-				<strong>Chrome</strong>, <strong>Firefox</strong> or <strong>Edge</strong> and the
+				<span class="neutral-3">*</span> Character Sync requires <strong>Chrome</strong> as your
+				browser and the
 				<a
-					:href="storeUrl"
+					href="https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg"
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener"
 				>
-					D&D Character Sync Extension</a
+					D&D Character Sync Chrome Extension</a
 				>.
 			</small>
 		</div>
@@ -154,7 +153,6 @@
 import { mapGetters } from "vuex";
 import { db } from "src/firebase";
 import { legacy_tiers } from "src/utils/generalConstants";
-import { getStoreUrl } from "src/utils/generalFunctions";
 import { promotionService } from "src/services/promotions";
 import PromoBanner from "./PromoBanner.vue";
 
@@ -191,9 +189,6 @@ export default {
 				import: {
 					title: "Import content",
 				},
-				ai_credits: {
-					title: "Monster credits",
-				},
 			},
 			storage_size: {
 				Free: "Small",
@@ -215,9 +210,6 @@ export default {
 	},
 	computed: {
 		...mapGetters(["user", "tier"]),
-		storeUrl() {
-			return getStoreUrl();
-		},
 		show_discount() {
 			console.log(this.discount, this.tier);
 			return this.discount && (this.tier?.price === "Free" || !this.tier);

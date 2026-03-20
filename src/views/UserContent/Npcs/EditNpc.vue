@@ -127,7 +127,7 @@
 			</hk-card>
 		</q-dialog>
 
-		<q-dialog v-model="create_dialog" persistent position="top">
+		<q-dialog v-model="create_dialog" :persistent="generating" position="top">
 			<hk-card class="create-dialog">
 				<div slot="header" class="card-header">
 					<div v-if="generating"><span class="loader">Generating your monster</span></div>
@@ -146,14 +146,16 @@
 						<button class="btn btn-lg btn-block" @click="create_dialog = false">
 							Create from scratch
 						</button>
+						<template v-if="tier && tier.price !== 'Free'">
 						<h2 class="text-center my-2">OR</h2>
 						<button
-							class="btn btn-lg btn-block bg-accent mb-2"
+							class="btn btn-lg btn-block mb-2"
 							@click="generate_monster = true"
 							:disabled="!userId"
 						>
 							Generate from description
 						</button>
+					</template>
 					</template>
 					<template v-if="copy_monster">
 						<h2>Copy an existing monster</h2>

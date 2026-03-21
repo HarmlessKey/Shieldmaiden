@@ -1,5 +1,39 @@
 <template>
 	<div class="hk-filter">
+		<template v-if="type === 'npc'">
+			<hk-select
+				v-if="groupOptions.length"
+				class="mb-3"
+				label="Group"
+				v-model="filter.groups"
+				use-chips
+				multiple
+				clearable
+				emit-value
+				map-options
+				:options="groupOptions"
+			/>
+			<hk-select
+				class="mb-3"
+				label="Type"
+				v-model="filter.types"
+				use-chips
+				multiple
+				clearable
+				:options="monster_types"
+			/>
+			<strong class="block mb-5">Challenge rating</strong>
+			<q-range
+				v-model="cr"
+				label-always
+				:min="0"
+				:max="33"
+				:left-label-value="crLabel(cr.min)"
+				:right-label-value="crLabel(cr.max)"
+				class="px-2"
+				@input="setCR"
+			/>
+		</template>
 		<template v-if="type === 'monster'">
 			<hk-select
 				class="mb-3"
@@ -43,7 +77,9 @@
 				v-model="cr"
 				label-always
 				:min="0"
-				:max="30"
+				:max="33"
+				:left-label-value="crLabel(cr.min)"
+				:right-label-value="crLabel(cr.max)"
 				class="px-2"
 				@input="setCR"
 			/>
@@ -85,6 +121,14 @@ import { monsterMixin } from "src/mixins/monster.js";
 import { spell_schools } from "src/utils/spellConstants";
 import numeral from "numeral";
 
+const CR_VALUES = [0, 0.125, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+const CR_LABELS = ["0", "1/8", "1/4", "1/2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"];
+
+function crToPosition(cr) {
+	const idx = CR_VALUES.indexOf(cr);
+	return idx >= 0 ? idx : CR_VALUES.length - 1;
+}
+
 export default {
 	name: "hk-filter",
 	mixins: [monsterMixin],
@@ -95,13 +139,20 @@ export default {
 		},
 		type: {
 			type: String,
-			default: "monster"
+			default: "monster",
+		},
+		groupOptions: {
+			type: Array,
+			default: () => [],
 		},
 	},
 	data() {
+		const existingCR = this.value?.challenge_ratings;
 		return {
 			spell_schools: spell_schools,
-			cr: this.value?.challenge_ratings || { min: 0, max: 30 },
+			cr: existingCR
+				? { min: crToPosition(existingCR.min), max: crToPosition(existingCR.max) }
+				: { min: 0, max: 33 },
 			levels: this.value?.levels || { min: 0, max: 9 },
 		}
 	},
@@ -132,6 +183,9 @@ export default {
 		}
 	},
 	methods: {
+		crLabel(position) {
+			return CR_LABELS[position] ?? String(position);
+		},
 		setLevels(value) {
 			if(!this.filter.levels) {
 				this.$set(this.filter, "levels", {});
@@ -144,8 +198,8 @@ export default {
 			if(!this.filter.challenge_ratings) {
 				this.$set(this.filter, "challenge_ratings", {});
 			}
-			this.$set(this.filter.challenge_ratings, "min", value.min);
-			this.$set(this.filter.challenge_ratings, "max", value.max);
+			this.$set(this.filter.challenge_ratings, "min", CR_VALUES[value.min]);
+			this.$set(this.filter.challenge_ratings, "max", CR_VALUES[value.max]);
 			this.$forceUpdate();
 		}
 	}

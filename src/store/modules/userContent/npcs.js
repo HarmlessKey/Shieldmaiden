@@ -4,7 +4,7 @@ import _ from "lodash";
 
 // Converts a full npc to a search_npc
 const convert_npc = (npc) => {
-	const properties = ["name", "challenge_rating", "avatar", "storage_avatar", "type"];
+	const properties = ["name", "challenge_rating", "avatar", "storage_avatar", "type", "groups"];
 	const returnNpc = {};
 
 	for (const prop of properties) {
@@ -355,6 +355,40 @@ const npc_actions = {
 				return await services.reserveNpcId(uid);
 			} catch (error) {
 				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Updates the groups for an NPC
+	 *
+	 * @param {string} id NPC ID
+	 * @param {object} groups Groups object { groupId: true, ... }
+	 */
+	async update_npc_groups({ rootGetters, commit, dispatch }, { id, groups }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_npc_services");
+			await services.updateNpc(uid, id, "", { groups }, true);
+			commit("SET_NPC_PROP", { uid, id, property: "groups", value: groups, update_search: true });
+		}
+	},
+
+	/**
+	 * Removes a group from all NPCs that reference it
+	 * Called when a group is deleted
+	 *
+	 * @param {string} groupId
+	 */
+	async remove_group_from_all_npcs({ state, rootGetters, dispatch }, groupId) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid && state.npcs) {
+			const services = await dispatch("get_npc_services");
+			for (const [npcId, npc] of Object.entries(state.npcs)) {
+				if (npc.groups && npc.groups[groupId]) {
+					await services.updateNpc(uid, npcId, "/groups", { [groupId]: null }, true);
+					Vue.delete(state.npcs[npcId].groups, groupId);
+				}
 			}
 		}
 	},

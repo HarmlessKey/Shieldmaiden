@@ -82,11 +82,23 @@
 				debounce="300"
 				clearable
 				placeholder="Search custom NPCs"
+				class="mb-1"
 			>
 				<q-icon slot="prepend" name="search" />
+				<q-btn slot="after" no-caps color="primary" @click="npc_filter_dialog = true">
+					Filter
+					<i class="fas fa-filter ml-2" aria-hidden="true" />
+					<q-badge
+						v-if="npcActiveFilterCount"
+						floating
+						rounded
+						color="red"
+						:label="npcActiveFilterCount"
+					/>
+				</q-btn>
 			</q-input>
 			<q-table
-				:data="npcs"
+				:data="filteredCustomNpcs"
 				:visible-columns="visibleColumns"
 				:columns="columns"
 				row-key="key"
@@ -107,7 +119,7 @@
 							:props="props"
 							:auto-width="col.name !== 'name'"
 						>
-							<router-link v-if="col.name === 'name'" :to="`/content/npcs/${col.key}`">
+							<router-link v-if="col.name === 'name'" :to="`/content/npcs/${props.key}`">
 								{{ col.value }}
 							</router-link>
 							<span v-else-if="col.name === 'environment'">
@@ -353,6 +365,31 @@
 			</hk-card>
 		</q-dialog>
 
+		<q-dialog v-model="npc_filter_dialog">
+			<hk-card header="Filter NPCs" :min-width="300">
+				<div class="card-body">
+					<hk-filter v-model="npcFilter" type="npc" :group-options="npcGroupOptions" />
+					<q-toggle
+						v-if="campaignId"
+						:dark="$store.getters.theme !== 'light'"
+						v-model="campaignOnly"
+						label="Campaign only"
+						class="mt-2"
+					/>
+				</div>
+				<div slot="footer" class="card-footer">
+					<button class="btn bg-neutral-5" @click="clearNpcFilter">
+						<i class="fas fa-times" aria-hidden="true" />
+						Clear filter
+					</button>
+					<button class="btn ml-2" @click="npc_filter_dialog = false">
+						<i class="fas fa-filter" aria-hidden="true" />
+						Set filter
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
+
 		<q-dialog v-model="player_dialog">
 			<div>
 				<ValidationObserver v-slot="{ handleSubmit, valid }">
@@ -457,7 +494,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
-import { uuid } from "src/utils/generalFunctions";
+import { uuid, campaignGroupKey } from "src/utils/generalFunctions";
 import ViewMonster from "src/components/compendium/Monster.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
@@ -499,6 +536,9 @@ export default {
 			player: {},
 			drawer: this.$store.getters.getDrawer,
 			to_add: {},
+			campaignOnly: false,
+			npcFilter: {},
+			npc_filter_dialog: false,
 			filter_dialog: false,
 			filter: {},
 			typeFilter: [],
@@ -588,6 +628,7 @@ export default {
 	async mounted() {
 		this.loading_monsters = false;
 		await this.get_npcs();
+		this.get_npc_groups();
 		this.loading_npcs = false;
 	},
 	watch: {
@@ -599,6 +640,40 @@ export default {
 	computed: {
 		...mapGetters(["content_count"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
+		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
+		filteredCustomNpcs() {
+			let npcs = this.npcs;
+			if (this.campaignOnly && this.campaignId) {
+				const groupKey = campaignGroupKey(this.campaignId);
+				npcs = npcs.filter((npc) => npc.groups && npc.groups[groupKey]);
+			}
+			if (this.npcFilter.groups?.length) {
+				npcs = npcs.filter((npc) =>
+					this.npcFilter.groups.some((groupId) => npc.groups && npc.groups[groupId])
+				);
+			}
+			if (this.npcFilter.types?.length) {
+				npcs = npcs.filter((npc) => this.npcFilter.types.includes(npc.type));
+			}
+			if (this.npcFilter.challenge_ratings) {
+				const { min, max } = this.npcFilter.challenge_ratings;
+				npcs = npcs.filter((npc) => {
+					const cr = npc.challenge_rating ?? 0;
+					return cr >= min && cr <= max;
+				});
+			}
+			return npcs;
+		},
+		npcActiveFilterCount() {
+			return Object.keys(this.npcFilter).length + (this.campaignOnly ? 1 : 0);
+		},
+		npcGroupOptions() {
+			if (!this.npc_groups) return [];
+			return this.npc_groups.map((group) => ({
+				label: group.name ? group.name.capitalizeEach() : group.key,
+				value: group.key,
+			}));
+		},
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		monster_resource: {
 			get() {
@@ -652,6 +727,7 @@ export default {
 		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 		...mapActions("npcs", ["get_npcs", "get_npc"]),
+		...mapActions("npcGroups", ["get_npc_groups"]),
 		...mapActions("players", ["get_players", "get_player"]),
 		...mapActions("encounters", ["add_player_encounter", "add_npc_encounter"]),
 		...mapActions("tutorial", ["completeStep"]),
@@ -683,6 +759,11 @@ export default {
 			this.filter_dialog = false;
 			this.$set(this, "filter", {});
 			this.filterMonsters();
+		},
+		clearNpcFilter() {
+			this.npc_filter_dialog = false;
+			this.$set(this, "npcFilter", {});
+			this.campaignOnly = false;
 		},
 		request(req) {
 			this.pagination = req.pagination;

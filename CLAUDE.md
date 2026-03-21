@@ -18,6 +18,11 @@ npm run build     # quasar build -m ssr
 npm run lint      # ESLint
 ```
 
+## File Editing Rules
+
+- **Always use the `Edit` or `Write` tools** to modify files — never use Bash, `sed`, `awk`, `python`, or `node` for file editing
+- If the `Edit` tool fails due to whitespace mismatches, investigate the exact characters with `cat -A` and adjust the match — do not fall back to shell scripts
+
 ## Key Constraints
 
 - **Firebase v8 namespaced API** is used across 63+ files — do not switch to modular API
@@ -49,6 +54,13 @@ src/
 - Vuex modules dispatch to services and cache results in state
 - Extension communication uses `window.postMessage` bridge (not `chrome.runtime` directly)
 - Utility functions go in `src/utils/generalFunctions.js`
+
+## Planning Artifacts
+Feature specs live in `.planning/`. 
+- Always check `.planning/` for an existing spec before investigating or implementing anything
+- When writing a spec, always write it to `.planning/<feature-name>.md`
+- Never begin implementation without a spec file present in `.planning/`
+
 
 ## Git Workflow
 

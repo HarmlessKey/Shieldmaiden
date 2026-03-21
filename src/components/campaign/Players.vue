@@ -77,7 +77,7 @@
 						<q-tooltip anchor="top middle" self="center middle">Edit Group Health</q-tooltip>
 					</button>
 					<button
-						class="btn btn-sm mr-1"
+						class="btn btn-sm mr-1 bg-neutral-5"
 						v-if="isXpAdvancement"
 						@click="
 							setDrawer({

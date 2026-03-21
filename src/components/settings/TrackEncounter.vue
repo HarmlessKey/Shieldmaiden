@@ -95,6 +95,42 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 
+const SHOW_HIDE = [
+	{ value: false, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red" },
+	{ value: undefined, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
+];
+
+const NPC_HEALTH = [
+	{ value: undefined, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red" },
+	{ value: "obscured", name: "Obsc", action: "Obsc", icon: "fas fa-question-circle", color: "orange" },
+	{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
+];
+
+const NPC_AC = [
+	{ value: undefined, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red" },
+	{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
+];
+
+const PLAYER_HEALTH = [
+	{ value: false, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red" },
+	{ value: "obscured", name: "Obsc", action: "Obsc", icon: "fas fa-question-circle", color: "orange" },
+	{ value: undefined, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
+];
+
+const DEATH_SAVES = [
+	{ value: true, name: "Hidden", action: "Hide", icon: "fas fa-eye-slash", color: "red" },
+	{ value: undefined, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
+];
+
+function npcTypeSettings(entity, label) {
+	return [
+		{ key: "name", entity, name: "Name", icon: "fas fa-helmet-battle", info: `Players can see the names of ${label}.`, options: SHOW_HIDE },
+		{ key: "health", entity, name: "Health", icon: "fas fa-heart", info: `Players can see the health of ${label}.`, options: NPC_HEALTH },
+		{ key: "ac", entity, name: "Armor Class", icon: "fas fa-shield", info: `Players can see the armor class of ${label}.`, options: NPC_AC },
+		{ key: "conditions", entity, name: "Conditions", icon: "fas fa-flame", info: `Players can see the conditions on ${label}.`, options: SHOW_HIDE },
+	];
+}
+
 export default {
 	name: "TrackEncounterSettings",
 	data() {
@@ -103,317 +139,24 @@ export default {
 			types: {
 				general: {
 					type_settings: [
-						{
-							key: "meters",
-							entity: "player",
-							name: "Damage Meters",
-							icon: "fas fa-swords",
-							info: "Players can see the damage meters.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
+						{ key: "meters", entity: "player", name: "Damage Meters", icon: "fas fa-swords", info: "Players can see the damage meters.", options: SHOW_HIDE },
 					],
 				},
 				npcs: {
 					name: "Enemies",
-					type_settings: [
-						{
-							key: "name",
-							entity: "npc",
-							name: "Name",
-							icon: "fas fa-helmet-battle",
-							info: "Players can see the names of NPC's.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
-						{
-							key: "health",
-							entity: "npc",
-							name: "Health",
-							icon: "fas fa-heart",
-							info: "Players can see the health of NPC's.",
-							options: [
-								{
-									value: undefined,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: "obscured",
-									name: "Obsc",
-									action: "Obsc",
-									icon: "fas fa-question-circle",
-									color: "orange",
-								},
-								{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
-							],
-						},
-						{
-							key: "ac",
-							entity: "npc",
-							name: "Armor Class",
-							icon: "fas fa-shield",
-							info: "Players can see the armor class of NPC's.",
-							options: [
-								{
-									value: undefined,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
-							],
-						},
-						{
-							key: "conditions",
-							entity: "npc",
-							name: "Conditions",
-							icon: "fas fa-flame",
-							info: "Players can see the conditions on NPC's.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
-					],
+					type_settings: npcTypeSettings("npc", "NPC's"),
 				},
 				allies: {
 					name: "Allies",
-					type_settings: [
-						{
-							key: "name",
-							entity: "ally",
-							name: "Name",
-							icon: "fas fa-helmet-battle",
-							info: "Players can see the names of allied NPC's.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
-						{
-							key: "health",
-							entity: "ally",
-							name: "Health",
-							icon: "fas fa-heart",
-							info: "Players can see the health of allied NPC's.",
-							options: [
-								{
-									value: undefined,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: "obscured",
-									name: "Obsc",
-									action: "Obsc",
-									icon: "fas fa-question-circle",
-									color: "orange",
-								},
-								{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
-							],
-						},
-						{
-							key: "ac",
-							entity: "ally",
-							name: "Armor Class",
-							icon: "fas fa-shield",
-							info: "Players can see the armor class of allied NPC's.",
-							options: [
-								{
-									value: undefined,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{ value: true, name: "Shown", action: "Show", icon: "fas fa-eye", color: "green" },
-							],
-						},
-						{
-							key: "conditions",
-							entity: "ally",
-							name: "Conditions",
-							icon: "fas fa-flame",
-							info: "Players can see the conditions on allied NPC's.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
-					],
+					type_settings: npcTypeSettings("ally", "allied NPC's"),
 				},
 				players: {
 					name: "Players",
 					type_settings: [
-						{
-							key: "health",
-							entity: "player",
-							name: "Health",
-							icon: "fas fa-heart",
-							info: "Players can see the health of players.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: "obscured",
-									name: "Obsc",
-									action: "Obsc",
-									icon: "fas fa-question-circle",
-									color: "orange",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
-						{
-							key: "ac",
-							entity: "player",
-							name: "Armor Class",
-							icon: "fas fa-shield",
-							info: "Players can see the armor class of players.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
-						{
-							condition: "conditions",
-							entity: "player",
-							name: "Conditions",
-							icon: "fas fa-flame",
-							info: "Players can see the conditions of players.",
-							options: [
-								{
-									value: false,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
-						{
-							key: "hide_death_saves",
-							entity: "player",
-							name: "Death Saves",
-							icon: "fas fa-skull-crossbones",
-							info: "Players can see the death saves/fails of other players.",
-							options: [
-								{
-									value: true,
-									name: "Hidden",
-									action: "Hide",
-									icon: "fas fa-eye-slash",
-									color: "red",
-								},
-								{
-									value: undefined,
-									name: "Shown",
-									action: "Show",
-									icon: "fas fa-eye",
-									color: "green",
-								},
-							],
-						},
+						{ key: "health", entity: "player", name: "Health", icon: "fas fa-heart", info: "Players can see the health of players.", options: PLAYER_HEALTH },
+						{ key: "ac", entity: "player", name: "Armor Class", icon: "fas fa-shield", info: "Players can see the armor class of players.", options: SHOW_HIDE },
+						{ key: "conditions", entity: "player", name: "Conditions", icon: "fas fa-flame", info: "Players can see the conditions of players.", options: SHOW_HIDE },
+						{ key: "hide_death_saves", entity: "player", name: "Death Saves", icon: "fas fa-skull-crossbones", info: "Players can see the death saves/fails of other players.", options: DEATH_SAVES },
 					],
 				},
 			},

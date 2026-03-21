@@ -41,26 +41,6 @@
 					<div class="form">
 						<BasicInfo v-model="npc" />
 
-						<!-- NPC GROUPS -->
-						<hk-card v-if="userId" header="Groups">
-							<div class="card-body">
-								<q-select
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									multiple
-									use-chips
-									label="Assign to groups"
-									v-model="selectedGroups"
-									:options="groupOptions"
-									option-value="value"
-									option-label="label"
-									emit-value
-									map-options
-								/>
-							</div>
-						</hk-card>
-
 						<Senses v-model="npc" />
 
 						<AbilityScores v-model="npc" />
@@ -217,7 +197,7 @@ import Defenses from "src/components/npcs/Defenses";
 import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
-import { downloadJSON, campaignGroupKey } from "src/utils/generalFunctions";
+import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
@@ -259,10 +239,6 @@ export default {
 		};
 	},
 	async mounted() {
-		if (this.userId) {
-			this.get_npc_groups();
-			this.get_campaigns();
-		}
 		if (this.npcId) {
 			this.loading = true;
 			await this.get_npc({ uid: this.userId, id: this.npcId }).then((npc) => {
@@ -279,40 +255,6 @@ export default {
 	computed: {
 		...mapGetters(["user", "tier", "overencumbered"]),
 		...mapGetters("npcs", ["npc_count"]),
-		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
-		...mapGetters("campaigns", { all_campaigns: "campaigns" }),
-		selectedGroups: {
-			get() {
-				return this.npc.groups ? Object.keys(this.npc.groups) : [];
-			},
-			set(val) {
-				const groups = {};
-				for (const id of val) {
-					groups[id] = true;
-				}
-				this.$set(this.npc, "groups", Object.keys(groups).length ? groups : undefined);
-			},
-		},
-		groupOptions() {
-			const options = [];
-			if (this.npc_groups) {
-				for (const group of this.npc_groups) {
-					options.push({
-						label: group.name ? group.name.capitalizeEach() : group.key,
-						value: group.key,
-					});
-				}
-			}
-			if (this.all_campaigns) {
-				for (const campaign of this.all_campaigns) {
-					options.push({
-						label: `[Campaign] ${campaign.name ? campaign.name.capitalizeEach() : campaign.key}`,
-						value: campaignGroupKey(campaign.key),
-					});
-				}
-			}
-			return options;
-		},
 	},
 	watch: {
 		npc: {
@@ -333,8 +275,6 @@ export default {
 		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
-		...mapActions("npcGroups", ["get_npc_groups"]),
-		...mapActions("campaigns", ["get_campaigns"]),
 		isOwner() {
 			return this.$route.name !== "Edit Companion";
 		},

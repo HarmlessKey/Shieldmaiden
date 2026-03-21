@@ -121,8 +121,26 @@
 								option-label="label"
 								emit-value
 								map-options
-								use-chips
-							/>
+							>
+								<template v-slot:option="scope">
+									<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+										<q-item-section class="group-option">
+											<span>{{ scope.opt.label }}</span>
+											<span v-if="scope.opt.isCampaign" class="campaign-pill">Campaign</span>
+										</q-item-section>
+									</q-item>
+								</template>
+								<template v-slot:selected-item="scope">
+									<q-chip
+										removable
+										:dark="scope.opt.isCampaign"
+										@remove="scope.removeAtIndex(scope.index)"
+										class="q-ma-xs"
+									>
+										{{ scope.opt.label }}
+									</q-chip>
+								</template>
+							</q-select>
 						</div>
 					</div>
 
@@ -163,7 +181,7 @@
 												:key="groupId"
 												dense
 												size="sm"
-												color="neutral-4"
+												:color="isCampaignGroup(groupId) ? 'secondary' : 'neutral-4'"
 												text-color="white"
 												class="mr-1"
 											>
@@ -383,14 +401,16 @@ export default {
 					options.push({
 						label: group.name ? group.name.capitalizeEach() : group.key,
 						value: group.key,
+						isCampaign: false,
 					});
 				}
 			}
 			if (this.campaigns) {
 				for (const campaign of this.campaigns) {
 					options.push({
-						label: `[Campaign] ${campaign.name ? campaign.name.capitalizeEach() : campaign.key}`,
+						label: campaign.name ? campaign.name.capitalizeEach() : campaign.key,
 						value: campaignGroupKey(campaign.key),
+						isCampaign: true,
 					});
 				}
 			}
@@ -449,6 +469,9 @@ export default {
 		avatar(npc) {
 			return npc.storage_avatar || npc.avatar;
 		},
+		isCampaignGroup(key) {
+			return key.startsWith("campaign__");
+		},
 		confirmDelete(e, key, npc) {
 			//Instantly delete when shift is held
 			if (e.shiftKey) {
@@ -494,5 +517,21 @@ export default {
 	max-width: 95vw;
 	width: 576px;
 	margin-top: 100px;
+}
+.group-option {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-direction: row;
+}
+
+.campaign-pill {
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 10px;
+	background-color: $neutral-4;
+	color: #fff;
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 </style>

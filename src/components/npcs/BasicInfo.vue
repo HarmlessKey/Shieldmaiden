@@ -312,25 +312,52 @@
             <hk-select
               label="Environment"
               v-model="npc.environment"
-              use-chips
               multiple
               clearable
               bottom-slots
               :options="monster_environments"
-            />
+            >
+              <template v-slot:selected-item="scope">
+                <q-chip
+                  removable
+                  @remove="scope.removeAtIndex(scope.index)"
+                  class="q-ma-xs"
+                >
+                  {{ scope.opt }}
+                </q-chip>
+              </template>
+            </hk-select>
           </div>
           <div class="col-12 col-sm-6">
             <hk-select
               label="Groups"
               v-model="selectedGroups"
-              use-chips
               multiple
               clearable
               bottom-slots
               emit-value
               map-options
               :options="groupOptions"
-            />
+            >
+              <template v-slot:option="scope">
+                <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+                  <q-item-section class="group-option">
+                    <span>{{ scope.opt.label }}</span>
+                    <span v-if="scope.opt.isCampaign" class="campaign-pill">Campaign</span>
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-slot:selected-item="scope">
+                <q-chip
+                  removable
+                  :dark="scope.opt.isCampaign"
+                  @remove="scope.removeAtIndex(scope.index)"
+                  class="q-ma-xs"
+                >
+                  {{ scope.opt.label }}
+                </q-chip>
+              </template>
+            </hk-select>
           </div>
         </div>
 
@@ -500,14 +527,16 @@ export default {
           options.push({
             label: group.name ? group.name.capitalizeEach() : group.key,
             value: group.key,
+            isCampaign: false,
           });
         }
       }
       if (this.all_campaigns) {
         for (const campaign of this.all_campaigns) {
           options.push({
-            label: `[Campaign] ${campaign.name ? campaign.name.capitalizeEach() : campaign.key}`,
+            label: campaign.name ? campaign.name.capitalizeEach() : campaign.key,
             value: campaignGroupKey(campaign.key),
+            isCampaign: true,
           });
         }
       }
@@ -611,5 +640,21 @@ export default {
     background-color: $neutral-2;
     color: $neutral-8;
   }
+}
+.group-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.campaign-pill {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background-color: $neutral-4;
+  color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 </style>

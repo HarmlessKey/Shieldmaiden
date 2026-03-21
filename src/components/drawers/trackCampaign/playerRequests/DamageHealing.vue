@@ -105,9 +105,11 @@
 <script>
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
+import { trackEncounter } from "src/mixins/trackEncounter";
 
 export default {
 	name: "damageHealing",
+	mixins: [trackEncounter],
 	props: ["targeted", "player", "encounter", "npcSettings", "allySettings"],
 	data() {
 		return {
@@ -192,17 +194,7 @@ export default {
 			);
 			this.setDrawer({ show: false });
 		},
-		displayNPCField(field, entity) {
-			const defaults = { name: true, health: false, ac: false };
-			if (entity.settings && entity.settings[field] !== undefined) return entity.settings[field];
-
-			// Select global settings based on friendly flag
-			const globalSettings = entity.friendly ? this.allySettings : this.npcSettings;
-
-			if (!globalSettings || globalSettings[field] == undefined) return defaults[field]; // Default value
-			return globalSettings[field];
 		},
-	},
 };
 </script>
 

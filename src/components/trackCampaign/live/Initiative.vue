@@ -188,7 +188,7 @@
 									v-if="
 										(playerSettings.conditions === undefined &&
 											(entity.entityType === 'player' ||
-												(entity.entityType == 'npc' && (entity.friendly ? (allySettings || {}).conditions : npcSettings.conditions) === undefined))) ||
+												(entity.entityType == 'npc' && displayNPCField('conditions', entity) === undefined))) ||
 										entity.entityType === 'companion'
 									"
 								>

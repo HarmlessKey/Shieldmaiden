@@ -15,23 +15,24 @@
 		<div v-for="(player, key) in players" :key="key">
 			<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="awardTo" :val="key">
 				{{ player.character_name }}
-				<span v-if="amount && awardTo.includes(key)" class="ml-2 blue">
-					({{ ((awardPlayer() &lt; 0) ? "" : "+") + awardPlayer() }})
-				</span>
 			</q-checkbox>
 		</div>
 
-		<q-btn-toggle
-			v-model="awardType"
-			spread
-			no-caps
-			class="mt-4"
-			:dark="$store.getters.theme === 'dark'"
-			:options="options"
-			toggle-color="green"
-		/>
-
-		<button class="btn btn-block my-3" @click="awardXP()">Award XP</button>
+		<div class="d-flex gap-1 mt-4">
+			<q-btn
+				class="full-width bg-neutral-5"
+				no-caps
+				label="Divide over players"
+				@click="awardXP('divide')"
+			/>
+			<q-btn
+				class="full-width"
+				color="primary"
+				no-caps
+				label="Award to all"
+				@click="awardXP('toAll')"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -62,11 +63,6 @@ export default {
 			players: {},
 			allSelected: true,
 			indeterminate: false,
-			options: [
-				{ label: "Divide over", value: "divide" },
-				{ label: "Award to all", value: "toAll" },
-			],
-			awardType: "divide",
 		};
 	},
 	computed: {
@@ -117,18 +113,10 @@ export default {
 		...mapActions("campaigns", ["get_campaign", "set_share"]),
 		...mapActions("players", ["get_player", "set_player_prop"]),
 		...mapActions("encounters", ["set_xp", "update_encounter_prop"]),
-		awardPlayer() {
-			let amount = this.amount;
-
-			if (this.awardType === "divide") {
-				amount = Math.floor(this.amount / this.awardTo.length);
-			}
-			return parseInt(amount);
-		},
-		awardXP() {
+		awardXP(awardType) {
 			let amount = parseInt(this.amount);
 
-			if (this.awardType === "divide") {
+			if (awardType === "divide") {
 				amount = Math.floor(this.amount / this.awardTo.length);
 			}
 

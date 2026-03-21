@@ -227,7 +227,7 @@
 									</div>
 									<div v-else class="text-right">
 										<button class="btn btn-sm bg-neutral-5">
-											<i aria-hidden="true" class="fas fa-ellipsis-h" />
+											<i aria-hidden="true" class="fas fa-ellipsis-v" />
 											<q-popup-proxy
 												:dark="$store.getters.theme === 'dark'"
 												:breakpoint="576"
@@ -252,12 +252,17 @@
 														</q-item-section>
 														<q-item-section>Edit</q-item-section>
 													</q-item>
-													<q-item clickable v-close-popup>
+													<q-item v-close-popup>
 														<ExportUserContent
 															content-type="npc"
 															:content-id="props.key"
 															class="export-menu-item"
-														/>
+														>
+															<q-item-section avatar>
+																<i aria-hidden="true" class="fas fa-arrow-alt-down" />
+															</q-item-section>
+															<q-item-section>Export</q-item-section>
+														</ExportUserContent>
 													</q-item>
 													<q-item
 														clickable
@@ -601,10 +606,13 @@ export default {
 }
 
 .export-menu-item {
+	display: flex;
+	align-items: center;
 	width: 100%;
 	text-align: left;
 	background: none;
 	border: none;
 	padding: 0;
+	color: inherit;
 }
 </style>

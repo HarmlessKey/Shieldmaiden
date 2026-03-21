@@ -20,9 +20,7 @@
 				:campCompanions="campaign.companions"
 				:players="players"
 				:npcs="npcs"
-				:playerSettings="playerSettings"
-				:npcSettings="npcSettings"
-				:allySettings="allySettings"
+				:displaySettings="displaySettings"
 				@setWeather="setWeather"
 				:timer="timer['.value']"
 			/>
@@ -44,10 +42,8 @@
 						:campCompanions="campaign.companions"
 						:players="players"
 						:npcs="npcs"
-						:playerSettings="playerSettings"
+						:displaySettings="displaySettings"
 						:screenWidth="width"
-						:npcSettings="npcSettings"
-						:allySettings="allySettings"
 					/>
 					<Rewards v-else :encounter="encounter" />
 				</div>
@@ -62,8 +58,7 @@
 								:entities="encounter.entities"
 								:npcs="npcs"
 								:players="players"
-								:npcSettings="npcSettings"
-								:allySettings="allySettings"
+								:displaySettings="displaySettings"
 							/>
 						</div>
 					</q-scroll-area>
@@ -78,8 +73,7 @@
 						:entities="encounter.entities"
 						:npcs="npcs"
 						:players="players"
-						:npcSettings="npcSettings"
-						:allySettings="allySettings"
+						:displaySettings="displaySettings"
 					/>
 				</div>
 			</div>
@@ -145,9 +139,7 @@
 							:campCompanions="campaign.companions"
 							:players="players"
 							:npcs="npcs"
-							:playerSettings="playerSettings"
-							:npcSettings="npcSettings"
-							:allySettings="allySettings"
+							:displaySettings="displaySettings"
 							:screenWidth="width"
 						/>
 						<Rewards v-else :encounter="encounter" />
@@ -157,8 +149,7 @@
 							:entities="encounter.entities"
 							:npcs="npcs"
 							:players="players"
-							:npcSettings="npcSettings"
-							:allySettings="allySettings"
+							:displaySettings="displaySettings"
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="shares">
@@ -168,8 +159,7 @@
 							:entities="encounter.entities"
 							:npcs="npcs"
 							:players="players"
-							:npcSettings="npcSettings"
-							:allySettings="allySettings"
+							:displaySettings="displaySettings"
 						/>
 					</q-tab-panel>
 				</q-tab-panels>
@@ -251,6 +241,13 @@ export default {
 		};
 	},
 	computed: {
+		displaySettings() {
+			return {
+				npc: this.npcSettings,
+				ally: this.allySettings,
+				player: this.playerSettings,
+			};
+		},
 		_allEntities() {
 			return _.chain(this.encounter.entities)
 				.filter(function (entity, key) {

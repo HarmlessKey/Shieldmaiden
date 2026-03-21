@@ -28,14 +28,14 @@
 				type: Object,
 				required: true
 			},
-			npcSettings: {
-				type: Object,
-				required: true
-			},
-			allySettings: {
+			displaySettings: {
 				type: Object,
 				default: undefined
 			}
+		},
+		computed: {
+			npcSettings() { return this.displaySettings?.npc; },
+			allySettings() { return this.displaySettings?.ally; },
 		},
 		methods: {
 			name() {

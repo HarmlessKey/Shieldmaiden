@@ -119,10 +119,13 @@ export default {
 		"campCompanions",
 		"npcs",
 		"players",
-		"playerSettings",
-		"npcSettings",
-		"allySettings",
+		"displaySettings",
 	],
+	computed: {
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
+	},
 	data() {
 		return {
 			userId: this.$route.params.userid,

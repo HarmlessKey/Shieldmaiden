@@ -35,7 +35,7 @@
 								>
 									<div class="info">
 										<span class="name">
-											<Name :entity="entity" :players="players" :npcs="npcs" :npcSettings="npcSettings || {}" :allySettings="allySettings" />
+											<Name :entity="entity" :players="players" :npcs="npcs" :displaySettings="displaySettings" />
 										</span>
 										<span class="numbers">
 											<span :class="{
@@ -79,9 +79,12 @@
 			'campaign',
 			'players',
 			'npcs',
-			'npcSettings',
-			'allySettings'
+			'displaySettings'
 		],
+		computed: {
+			npcSettings() { return this.displaySettings?.npc; },
+			allySettings() { return this.displaySettings?.ally; },
+		},
 		data() {
 			return {
 				userId: this.$route.params.userid,

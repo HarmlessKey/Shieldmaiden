@@ -165,8 +165,7 @@
 										:entity="entity"
 										:players="players"
 										:npcs="npcs"
-										:npcSettings="npcSettings"
-										:allySettings="allySettings"
+										:displaySettings="displaySettings"
 									/>
 								</td>
 
@@ -177,9 +176,7 @@
 										:campCompanions="campCompanions"
 										:players="players"
 										:npcs="npcs"
-										:npcSettings="npcSettings"
-										:allySettings="allySettings"
-										:playerSettings="playerSettings"
+										:displaySettings="displaySettings"
 									/>
 								</td>
 
@@ -233,8 +230,7 @@
 																:entity="entity"
 																:players="players"
 																:npcs="npcs"
-																:npcSettings="npcSettings"
-																:allySettings="allySettings"
+																:displaySettings="displaySettings"
 															/>
 														</q-item-section>
 														<q-item-section avatar>
@@ -301,12 +297,15 @@ export default {
 		"campPlayers",
 		"campCompanions",
 		"players",
-		"playerSettings",
 		"npcs",
-		"npcSettings",
-		"allySettings",
+		"displaySettings",
 		"screenWidth",
 	],
+	computed: {
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
+	},
 	data() {
 		return {
 			dmId: this.$route.params.userid,

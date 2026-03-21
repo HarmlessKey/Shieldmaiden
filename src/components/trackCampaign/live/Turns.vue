@@ -25,7 +25,7 @@
 
 			<h2 class="d-none d-md-flex justify-content-start">
 				<span class="mr-3">
-					<Name :entity="current" :players="players" :npcs="npcs" :npcSettings="npcSettings" :allySettings="allySettings" />
+					<Name :entity="current" :players="players" :npcs="npcs" :displaySettings="displaySettings" />
 				</span>
 
 				<!-- Companion health is stored in campaign.companions -->
@@ -40,8 +40,7 @@
 					:campCompanions="campCompanions"
 					:players="players"
 					:npcs="npcs"
-					:npcSettings="npcSettings"
-					:allySettings="allySettings"
+					:displaySettings="displaySettings"
 				/>
 				<template
 					v-else-if="
@@ -110,12 +109,15 @@ export default {
 		"campPlayers",
 		"campCompanions",
 		"players",
-		"playerSettings",
 		"npcs",
-		"npcSettings",
-		"allySettings",
+		"displaySettings",
 		"timer",
 	],
+	computed: {
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
+	},
 	data() {
 		return {
 			userId: this.$route.params.userid,

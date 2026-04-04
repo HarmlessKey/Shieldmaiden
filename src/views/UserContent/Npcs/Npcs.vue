@@ -252,18 +252,19 @@
 														</q-item-section>
 														<q-item-section>Edit</q-item-section>
 													</q-item>
-													<ExportUserContent
-														tag="q-item"
-														clickable
-														v-close-popup
-														content-type="npc"
-														:content-id="props.key"
-													>
-														<q-item-section avatar>
-															<i aria-hidden="true" class="fas fa-arrow-alt-down" />
-														</q-item-section>
-														<q-item-section>Export</q-item-section>
-													</ExportUserContent>
+													<q-item clickable v-close-popup>
+														<ExportUserContent
+															tag="span"
+															style="display: contents"
+															content-type="npc"
+															:content-id="props.key"
+														>
+															<q-item-section avatar>
+																<i aria-hidden="true" class="fas fa-arrow-alt-down" />
+															</q-item-section>
+															<q-item-section>Export</q-item-section>
+														</ExportUserContent>
+													</q-item>
 													<q-item
 														clickable
 														v-close-popup
@@ -605,14 +606,4 @@ export default {
 	flex-shrink: 0;
 }
 
-.export-menu-item {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	text-align: left;
-	background: none;
-	border: none;
-	padding: 0;
-	color: inherit;
-}
 </style>

@@ -4,11 +4,12 @@
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
-						<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
-							<i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
-							Create Account
-						</q-btn>
-						<div v-else />
+						<div>
+							<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
+								<i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
+								Create Account
+							</q-btn>
+						</div>
 						<div>
 							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
@@ -39,7 +40,18 @@
 					</div>
 
 					<div class="form">
-						<BasicInfo v-model="npc" />
+						<BasicInfo v-model="npc">
+							<template v-if="npcId" #header-right>
+								<q-btn
+									color="neutral-5"
+									no-caps
+									@click="viewNpc"
+								>
+									<i aria-hidden="true" class="fas fa-eye mr-2"></i>
+									View
+								</q-btn>
+							</template>
+						</BasicInfo>
 
 						<Senses v-model="npc" />
 
@@ -62,6 +74,15 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
+							<q-btn
+								v-if="npcId"
+								class="mr-2"
+								color="neutral-5"
+								no-caps
+								@click="viewNpc"
+							>
+								View
+							</q-btn>
 							<router-link
 								:to="user ? `/content/npcs` : `/tools/monster-creator`"
 								class="btn bg-neutral-5 mr-2"
@@ -277,6 +298,9 @@ export default {
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 		isOwner() {
 			return this.$route.name !== "Edit Companion";
+		},
+		viewNpc() {
+			this.setDrawer({ show: true, type: "drawers/ViewNpc", data: this.npc });
 		},
 		download() {
 			downloadJSON(this.npc);

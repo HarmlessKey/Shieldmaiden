@@ -155,11 +155,11 @@
 					<template v-else> How do you want to do this? </template>
 				</div>
 				<div
-					v-if="!generate_monster"
+					v-if="!generate_monster && !parse_image"
 					class="card-body"
 					:class="{ generate: generate_monster, generating: generating }"
 				>
-					<template v-if="!copy_monster && !generate_monster">
+					<template v-if="!copy_monster && !generate_monster && !parse_image">
 						<button class="btn btn-lg btn-block" @click="copy_monster = true">
 							Copy existing monster
 						</button>
@@ -175,6 +175,15 @@
 						>
 							Generate from description
 						</button>
+						<h2 class="text-center my-2">OR</h2>
+						<button
+							class="btn btn-lg btn-block bg-accent mb-2"
+							@click="parse_image = true"
+							:disabled="!userId"
+						>
+							<i aria-hidden="true" class="fas fa-camera mr-2" />
+							Import from image
+						</button>
 					</template>
 					<template v-if="copy_monster">
 						<h2>Copy an existing monster</h2>
@@ -184,17 +193,24 @@
 				<template v-if="generate_monster">
 					<GenerateMonster @generating="setGenerating" @finished="finishedGenerate" />
 				</template>
-				<div v-if="copy_monster || generate_monster" class="card-footer" slot="footer">
+				<template v-if="parse_image">
+					<ParseStatblock @generating="setGenerating" @finished="finishedParseImage" />
+				</template>
+				<div v-if="copy_monster || generate_monster || parse_image" class="card-footer" slot="footer">
 					<button
 						v-if="!generating"
 						class="btn btn-sm bg-neutral-5"
-						@click="((copy_monster = false), (generate_monster = false))"
+						@click="((copy_monster = false), (generate_monster = false), (parse_image = false))"
 					>
 						<i class="fas fa-times mr-1" aria-hidden="true" />
 						Cancel
 					</button>
 				</div>
 			</hk-card>
+		</q-dialog>
+
+		<q-dialog v-model="parse_caveats">
+			<ParseCaveats @close="parse_caveats = false" />
 		</q-dialog>
 
 		<q-dialog v-model="sign_up_dialog">
@@ -221,6 +237,8 @@ import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
+import ParseStatblock from "src/components/npcs/ParseStatblock.vue";
+import ParseCaveats from "src/components/npcs/ParseCaveats.vue";
 
 export default {
 	name: "EditNpc",
@@ -236,6 +254,8 @@ export default {
 		CopyContent,
 		SignUp,
 		GenerateMonster,
+		ParseStatblock,
+		ParseCaveats,
 	},
 	data() {
 		return {
@@ -248,6 +268,8 @@ export default {
 			loading: false,
 			npc_copy: {},
 			generate_monster: false,
+			parse_image: false,
+			parse_caveats: false,
 			copy_dialog: false,
 			unsaved_changes: false,
 			create_dialog: false,
@@ -319,6 +341,13 @@ export default {
 			this.npc = npc;
 			this.generating = false;
 			this.create_dialog = false;
+		},
+		finishedParseImage(npc) {
+			this.npc = npc;
+			this.generating = false;
+			this.create_dialog = false;
+			this.parse_image = false;
+			this.parse_caveats = true;
 		},
 		reset() {
 			this.npc = {};

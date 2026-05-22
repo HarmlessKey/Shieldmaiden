@@ -120,12 +120,22 @@ router.post("/ai/generate-monster", async (req, res) => {
 	}
 });
 
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 router.post("/ai/parse-statblock", async (req, res) => {
 	try {
+		const { image_base64, mime_type } = req.body;
+		if (!image_base64 || typeof image_base64 !== "string") {
+			return res.status(400).json({ error: "Missing or invalid image_base64" });
+		}
+		if (!ALLOWED_MIME_TYPES.includes(mime_type)) {
+			return res.status(400).json({ error: "Invalid mime_type. Allowed: image/jpeg, image/png, image/webp" });
+		}
+
 		const creditData = await verifyUserAndCredits(req, res);
 		if (!creditData) return;
 
-		const result = await MonsterGenerator.parseStatblock(req.body.image_base64, req.body.mime_type);
+		const result = await MonsterGenerator.parseStatblock(image_base64, mime_type);
 		await deductCredit(creditData);
 
 		res.json(result);

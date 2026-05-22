@@ -162,7 +162,7 @@ export default {
 				this.$emit("finished", monster);
 			} catch (e) {
 				console.error("Something went wrong parsing the statblock", e);
-				this.error = e;
+				this.error = e?.response?.data?.error || e?.message || "Unknown error";
 			} finally {
 				this.$emit("generating", false);
 				this.generating = false;

@@ -169,7 +169,7 @@
 						</button>
 						<h2 class="text-center my-2">OR</h2>
 						<button
-							class="btn btn-lg btn-block bg-accent mb-2"
+							class="btn btn-lg btn-block"
 							@click="generate_monster = true"
 							:disabled="!userId"
 						>
@@ -177,7 +177,7 @@
 						</button>
 						<h2 class="text-center my-2">OR</h2>
 						<button
-							class="btn btn-lg btn-block bg-accent mb-2"
+							class="btn btn-lg btn-block"
 							@click="parse_image = true"
 							:disabled="!userId"
 						>

@@ -2,7 +2,6 @@ const { Router } = require("express");
 const { patreonServices } = require("../../src/services/patreon");
 const { MonsterGenerator } = require("../../src/services/monster_generator");
 const { SubscriptionServices } = require("../../src/services/subscription");
-const axios = require("axios");
 
 const fs = require("fs");
 const path = require("path");
@@ -126,18 +125,10 @@ router.post("/ai/parse-statblock", async (req, res) => {
 		const creditData = await verifyUserAndCredits(req, res);
 		if (!creditData) return;
 
-		const aiUrl = process.env.SHIELDMAIDEN_AI_URL;
-		const aiKey = process.env.SHIELDMAIDEN_AI_KEY;
-
-		const aiResponse = await axios.post(
-			`${aiUrl}/parse_statblock`,
-			{ image_base64: req.body.image_base64, mime_type: req.body.mime_type },
-			{ headers: { "x-api-key": aiKey } }
-		);
-
+		const result = await MonsterGenerator.parseStatblock(req.body.image_base64, req.body.mime_type);
 		await deductCredit(creditData);
 
-		res.json(aiResponse.data);
+		res.json(result);
 	} catch (error) {
 		console.error("Error parsing statblock:", error);
 		res.status(500).json({ error: "Internal Server Error" });

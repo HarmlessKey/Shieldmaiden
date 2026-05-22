@@ -25,6 +25,6 @@ module.exports.extendApp = function ({ app, ssr }) {
 
      Example: app.use(), app.get() etc
   */
-	app.use(express.json());
+	app.use(express.json({ limit: "8mb" }));
 	app.use("/api", api);
 };

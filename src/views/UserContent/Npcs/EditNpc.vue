@@ -40,18 +40,7 @@
 					</div>
 
 					<div class="form">
-						<BasicInfo v-model="npc">
-							<template v-if="npcId" #header-right>
-								<q-btn
-									color="neutral-5"
-									no-caps
-									@click="viewNpc"
-								>
-									<i aria-hidden="true" class="fas fa-eye mr-2"></i>
-									View
-								</q-btn>
-							</template>
-						</BasicInfo>
+						<BasicInfo v-model="npc" />
 
 						<Senses v-model="npc" />
 

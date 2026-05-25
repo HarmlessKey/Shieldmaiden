@@ -433,7 +433,10 @@ export default {
 			},
 		},
 		npcSettings() {
-			return this.userSettings && this.userSettings.track ? this.userSettings.track.npc : undefined;
+			if (!this.userSettings?.track) return undefined;
+			return this.entity?.friendly
+				? this.userSettings.track.ally
+				: this.userSettings.track.npc;
 		},
 	},
 	methods: {

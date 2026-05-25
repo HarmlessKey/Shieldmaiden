@@ -30,9 +30,6 @@ export default {
 			type: Object,
 			required: true,
 		},
-		npcSettings: {
-			type: Object,
-		},
 	},
 	methods: {
 		displayImg(entity) {

@@ -453,3 +453,7 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 		document.body.removeChild(clone);
 	}
 }
+
+export function campaignGroupKey(campaignId) {
+	return `campaign__${campaignId}`;
+}

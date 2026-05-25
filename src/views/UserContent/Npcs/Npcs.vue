@@ -2,7 +2,10 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="npcs">
-				<template #actions-left>
+				<template v-if="card_width >= 600" #actions-left>
+					<button class="btn btn-sm bg-neutral-5 mr-2" @click="group_dialog = true">
+						Groups
+					</button>
 					<ExportUserContent
 						class="btn-sm bg-neutral-5 mr-2"
 						content-type="npc"
@@ -17,35 +20,132 @@
 					>
 						Generate
 					</button>
+					<button
+						v-if="tier.price !== 'Free'"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						@click="import_dialog = true"
+					>
+						Import
+					</button>
 				</template>
-				<button
-					v-if="tier.price !== 'Free'"
-					slot="actions-right"
-					class="btn btn-sm bg-neutral-5 mr-2"
-					@click="import_dialog = true"
-				>
-					Import
-				</button>
+				<template v-else #actions-after>
+					<button class="btn btn-sm bg-neutral-5 ml-2">
+						<i aria-hidden="true" class="fas fa-ellipsis-v" />
+						<q-popup-proxy
+							:dark="$store.getters.theme !== 'light'"
+							anchor="bottom right"
+							self="top right"
+						>
+							<div class="bg-neutral-8">
+								<q-list>
+									<q-item clickable v-close-popup @click="group_dialog = true">
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-layer-group" />
+										</q-item-section>
+										<q-item-section>Groups</q-item-section>
+									</q-item>
+									<q-item clickable v-close-popup @click="$refs.exporter.downloadContent()">
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-file-export" />
+										</q-item-section>
+										<q-item-section>Export</q-item-section>
+									</q-item>
+									<q-item
+										v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
+										clickable
+										v-close-popup
+										@click="generate_dialog = true"
+									>
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-magic" />
+										</q-item-section>
+										<q-item-section>Generate</q-item-section>
+									</q-item>
+									<q-item
+										v-if="tier.price !== 'Free'"
+										clickable
+										v-close-popup
+										@click="import_dialog = true"
+									>
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-file-import" />
+										</q-item-section>
+										<q-item-section>Import</q-item-section>
+									</q-item>
+								</q-list>
+							</div>
+						</q-popup-proxy>
+					</button>
+				</template>
 			</ContentHeader>
+
+			<ExportUserContent
+				ref="exporter"
+				style="display:none"
+				content-type="npc"
+				:content-id="npcIds"
+			/>
 
 			<div class="card-body" v-if="!loading_npcs">
 				<p class="neutral-2">These are your custom Non-Player Characters and monsters.</p>
 				<template v-if="npcs.length">
-					<q-input
-						:dark="$store.getters.theme !== 'light'"
-						v-model="search"
-						borderless
-						filled
-						square
-						debounce="300"
-						clearable
-						placeholder="Search NPCs"
-					>
-						<q-icon slot="prepend" name="search" />
-					</q-input>
+					<div class="row q-col-gutter-sm mb-1" :class="{ 'column': card_width < 600 }">
+						<div class="col">
+							<q-input
+								:dark="$store.getters.theme !== 'light'"
+								v-model="search"
+								borderless
+								filled
+								square
+								dense
+								debounce="300"
+								clearable
+								placeholder="Search NPCs"
+							>
+								<q-icon slot="prepend" name="search" />
+							</q-input>
+						</div>
+						<div class="col" v-if="groupFilterOptions.length">
+							<q-select
+								:dark="$store.getters.theme !== 'light'"
+								v-model="groupFilter"
+								:options="groupFilterOptions"
+								multiple
+								filled
+								square
+								dense
+								clearable
+								label="Filter by group"
+								placeholder="Filter by group"
+								option-value="value"
+								option-label="label"
+								emit-value
+								map-options
+							>
+								<template v-slot:option="scope">
+									<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+										<q-item-section class="group-option">
+											<span>{{ scope.opt.label }}</span>
+											<span v-if="scope.opt.isCampaign" class="campaign-pill">Campaign</span>
+										</q-item-section>
+									</q-item>
+								</template>
+								<template v-slot:selected-item="scope">
+									<q-chip
+										removable
+										:dark="scope.opt.isCampaign"
+										@remove="scope.removeAtIndex(scope.index)"
+										class="q-ma-xs"
+									>
+										{{ scope.opt.label }}
+									</q-chip>
+								</template>
+							</q-select>
+						</div>
+					</div>
 
 					<q-table
-						:data="npcs"
+						:data="filteredNpcs"
 						:visible-columns="visibleColumns"
 						:columns="columns"
 						row-key="key"
@@ -74,6 +174,21 @@
 									<template v-if="col.name === 'avatar'">
 										<i aria-hidden="true" v-if="!avatar(props.row)" class="hki-monster" />
 									</template>
+									<template v-else-if="col.name === 'groups'">
+										<template v-if="props.row.groups">
+											<q-chip
+												v-for="(_, groupId) in props.row.groups"
+												:key="groupId"
+												dense
+												size="sm"
+												:color="isCampaignGroup(groupId) ? 'secondary' : 'neutral-4'"
+												text-color="white"
+												class="mr-1"
+											>
+												{{ groupNameMap[groupId] || groupId }}
+											</q-chip>
+										</template>
+									</template>
 									<template v-else-if="col.name !== 'actions'">
 										<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
 											{{ col.value }}
@@ -82,16 +197,23 @@
 											{{ col.value }}
 										</template>
 									</template>
-									<div v-else class="text-right d-flex justify-content-between">
-										<router-link
+									<div v-else-if="$q.screen.gt.xs" class="text-right d-flex justify-content-between">
+										<a
 											class="btn btn-sm bg-neutral-5"
+											@click="viewNpc(props.key)"
+										>
+											<i aria-hidden="true" class="fas fa-eye" />
+											<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
+										</a>
+										<router-link
+											class="btn btn-sm bg-neutral-5 mx-2"
 											:to="`${$route.path}/${props.key}`"
 										>
 											<i aria-hidden="true" class="fas fa-pencil" />
 											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 										</router-link>
 										<ExportUserContent
-											class="btn-sm bg-neutral-5 mx-2"
+											class="btn-sm bg-neutral-5 mr-2"
 											content-type="npc"
 											:content-id="props.key"
 										/>
@@ -102,6 +224,60 @@
 											<i aria-hidden="true" class="fas fa-trash-alt" />
 											<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
 										</a>
+									</div>
+									<div v-else class="text-right">
+										<button class="btn btn-sm bg-neutral-5">
+											<i aria-hidden="true" class="fas fa-ellipsis-v" />
+											<q-popup-proxy
+												:dark="$store.getters.theme === 'dark'"
+												:breakpoint="576"
+											>
+												<q-list
+													:dark="$store.getters.theme === 'dark'"
+													class="bg-neutral-8"
+												>
+													<q-item clickable v-close-popup @click="viewNpc(props.key)">
+														<q-item-section avatar>
+															<i aria-hidden="true" class="fas fa-eye" />
+														</q-item-section>
+														<q-item-section>View</q-item-section>
+													</q-item>
+													<q-item
+														clickable
+														v-close-popup
+														:to="`${$route.path}/${props.key}`"
+													>
+														<q-item-section avatar>
+															<i aria-hidden="true" class="fas fa-pencil" />
+														</q-item-section>
+														<q-item-section>Edit</q-item-section>
+													</q-item>
+													<q-item clickable v-close-popup>
+														<ExportUserContent
+															tag="span"
+															style="display: contents"
+															content-type="npc"
+															:content-id="props.key"
+														>
+															<q-item-section avatar>
+																<i aria-hidden="true" class="fas fa-arrow-alt-down" />
+															</q-item-section>
+															<q-item-section>Export</q-item-section>
+														</ExportUserContent>
+													</q-item>
+													<q-item
+														clickable
+														v-close-popup
+														@click="confirmDelete($event, props.key, props.row)"
+													>
+														<q-item-section avatar>
+															<i aria-hidden="true" class="fas fa-trash-alt red" />
+														</q-item-section>
+														<q-item-section>Delete</q-item-section>
+													</q-item>
+												</q-list>
+											</q-popup-proxy>
+										</button>
 									</div>
 								</q-td>
 							</q-tr>
@@ -143,6 +319,11 @@
 			</hk-card>
 		</q-dialog>
 
+		<!-- Groups dialog -->
+		<q-dialog v-model="group_dialog">
+			<NpcGroupManager />
+		</q-dialog>
+
 		<!-- generate dialog-->
 		<q-dialog v-model="generate_dialog">
 			<hk-card class="npc-dialog" :persistent="generating">
@@ -175,11 +356,13 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { campaignGroupKey } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader.vue";
 import ExportUserContent from "src/components/userContent/ExportUserContent.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
+import NpcGroupManager from "src/components/npcs/NpcGroupManager.vue";
 
 export default {
 	name: "Npcs",
@@ -189,15 +372,18 @@ export default {
 		ContentHeader,
 		ExportUserContent,
 		GenerateMonster,
+		NpcGroupManager,
 	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
 			import_dialog: false,
 			generate_dialog: false,
+			group_dialog: false,
 			loading_npcs: true,
 			show_warning: true,
 			search: "",
+			groupFilter: [],
 			card_width: 0,
 			overwrite: undefined,
 			generating: false,
@@ -226,6 +412,12 @@ export default {
 					sortable: true,
 				},
 				{
+					name: "groups",
+					label: "Groups",
+					field: "groups",
+					align: "left",
+				},
+				{
 					name: "challenge_rating",
 					label: "CR",
 					field: "challenge_rating",
@@ -247,19 +439,74 @@ export default {
 		...mapGetters("npcs", ["npcs"]),
 		...mapGetters("players", ["players"]),
 		...mapGetters("campaigns", ["campaigns"]),
+		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
 		visibleColumns() {
-			return this.card_width > 600
-				? ["avatar", "name", "type", "challenge_rating", "actions"]
-				: this.card_width > 450
-					? ["avatar", "name", "type", "actions"]
-					: ["avatar", "name", "actions"];
+			if (this.card_width > 800) {
+				return ["avatar", "name", "type", "challenge_rating", "actions"];
+			}
+			if (this.card_width > 600) {
+				return ["avatar", "name", "type", "challenge_rating", "actions"];
+			}
+			if (this.card_width > 450) {
+				return ["avatar", "name", "type", "actions"];
+			}
+			return ["avatar", "name", "actions"];
 		},
 		npcIds() {
 			return this.npcs.map((npc) => npc.key);
 		},
+		groupFilterOptions() {
+			const options = [];
+			if (this.npc_groups) {
+				for (const group of this.npc_groups) {
+					options.push({
+						label: group.name ? group.name.capitalizeEach() : group.key,
+						value: group.key,
+						isCampaign: false,
+					});
+				}
+			}
+			if (this.campaigns) {
+				for (const campaign of this.campaigns) {
+					options.push({
+						label: campaign.name ? campaign.name.capitalizeEach() : campaign.key,
+						value: campaignGroupKey(campaign.key),
+						isCampaign: true,
+					});
+				}
+			}
+			return options;
+		},
+		groupNameMap() {
+			const map = {};
+			if (this.npc_groups) {
+				for (const group of this.npc_groups) {
+					map[group.key] = group.name ? group.name.capitalizeEach() : group.key;
+				}
+			}
+			if (this.campaigns) {
+				for (const campaign of this.campaigns) {
+					map[campaignGroupKey(campaign.key)] = campaign.name
+						? campaign.name.capitalizeEach()
+						: campaign.key;
+				}
+			}
+			return map;
+		},
+		filteredNpcs() {
+			if (!this.groupFilter || !this.groupFilter.length) {
+				return this.npcs;
+			}
+			return this.npcs.filter((npc) => {
+				if (!npc.groups) return false;
+				return this.groupFilter.some((groupId) => npc.groups[groupId]);
+			});
+		},
 	},
 	async mounted() {
 		await this.get_npcs();
+		this.get_npc_groups();
+		this.get_campaigns();
 		this.update_npc_count();
 
 		this.loading_npcs = false;
@@ -274,12 +521,17 @@ export default {
 			"add_npc",
 			"update_npc_count",
 		]),
+		...mapActions("npcGroups", ["get_npc_groups"]),
+		...mapActions("campaigns", ["get_campaigns"]),
 		...mapActions("spells", ["get_spell"]),
 		cr(val) {
 			return val == 0.125 ? "1/8" : val == 0.25 ? "1/4" : val == 0.5 ? "1/2" : val;
 		},
 		avatar(npc) {
 			return npc.storage_avatar || npc.avatar;
+		},
+		isCampaignGroup(key) {
+			return key.startsWith("campaign__");
 		},
 		confirmDelete(e, key, npc) {
 			//Instantly delete when shift is held
@@ -308,6 +560,16 @@ export default {
 				});
 			}
 		},
+		async viewNpc(key) {
+			try {
+				const npc = await this.get_npc({ uid: this.userId, id: key });
+				if (npc) {
+					this.setDrawer({ show: true, type: "drawers/ViewNpc", data: npc });
+				}
+			} catch (e) {
+				console.error("Failed to load NPC", e);
+			}
+		},
 		deleteNpc(key) {
 			this.delete_npc(key);
 		},
@@ -327,4 +589,21 @@ export default {
 	width: 576px;
 	margin-top: 100px;
 }
+.group-option {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-direction: row;
+}
+
+.campaign-pill {
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 10px;
+	background-color: $neutral-4;
+	color: #fff;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
 </style>

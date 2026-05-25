@@ -89,7 +89,7 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: monster.saving_throws.includes(ability)
+									m: monster.saving_throws?.includes(ability)
 										? calcMod(monster[ability]) + monster.proficiency
 										: calcMod(monster[ability]),
 									title: `${ability.capitalize()} save`,
@@ -107,7 +107,7 @@
 							>
 								{{
 									mod2str(
-										monster.saving_throws.includes(ability)
+										monster.saving_throws?.includes(ability)
 											? calcMod(monster[ability]) + monster.proficiency
 											: calcMod(monster[ability])
 									)
@@ -562,8 +562,10 @@ export default {
 		download(type) {
 			downloadMonsterFile(this.$refs.card, type, {
 				layout: this.layout,
-				filename: `${this.monster.url} (Shieldmaiden)`,
-				footerText: `https://shieldmaiden.app/homebrew/${this.monster.url}`,
+				filename: `${this.monster.url || this.monster.name} (Shieldmaiden)`,
+				footerText: this.monster.url
+					? `https://shieldmaiden.app/homebrew/${this.monster.url}`
+					: `https://shieldmaiden.app`,
 			});
 		},
 	},

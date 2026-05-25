@@ -111,8 +111,31 @@
 				:filter="searchNpc"
 				wrap-cells
 			>
+				<template v-slot:header="props">
+					<q-tr :props="props">
+						<q-th auto-width />
+						<q-th
+							v-for="col in props.cols"
+							:key="col.name"
+							:props="props"
+							:auto-width="col.name !== 'name'"
+						>
+							{{ col.label }}
+						</q-th>
+					</q-tr>
+				</template>
+
 				<template v-slot:body="props">
 					<q-tr :props="props">
+						<q-td auto-width>
+							<a @click="toggleCustomNpc(props, props.key)" class="neutral-2">
+								<i
+									aria-hidden="true"
+									class="fas"
+									:class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'"
+								/>
+							</a>
+						</q-td>
 						<q-td
 							v-for="col in props.cols"
 							:key="col.name"
@@ -185,6 +208,12 @@
 							<template v-else>
 								{{ col.value }}
 							</template>
+						</q-td>
+					</q-tr>
+					<q-tr v-if="props.expand" :props="props">
+						<q-td colspan="100%" class="p-0" auto-width>
+							<hk-loader v-if="!npcExpandData[props.key]" name="monster" />
+							<ViewMonster v-else :data="npcExpandData[props.key]" class="p-0" />
 						</q-td>
 					</q-tr>
 				</template>
@@ -565,6 +594,7 @@ export default {
 					maxContent: true,
 				},
 			},
+			npcExpandData: {},
 			monster_resource_setter: undefined,
 			loading_monsters: true,
 			loading_npcs: true,
@@ -991,6 +1021,13 @@ export default {
 			this.encounter.entities
 				? this.$set(this.encounter.entities, uuid(), entity)
 				: this.$set(this.encounter, "entities", { [uuid()]: entity });
+		},
+		async toggleCustomNpc(props, id) {
+			props.expand = !props.expand;
+			if (props.expand && !this.npcExpandData[id]) {
+				const npc = await this.get_npc({ uid: this.user.uid, id });
+				this.$set(this.npcExpandData, id, npc);
+			}
 		},
 		setSize(e) {
 			this.width = e.width;

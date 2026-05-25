@@ -1025,8 +1025,22 @@ export default {
 		async toggleCustomNpc(props, id) {
 			props.expand = !props.expand;
 			if (props.expand && !this.npcExpandData[id]) {
-				const npc = await this.get_npc({ uid: this.user.uid, id });
-				this.$set(this.npcExpandData, id, npc);
+				try {
+					const npc = await this.get_npc({ uid: this.user.uid, id });
+					if (!npc) {
+						props.expand = false;
+						this.$snotify.error("This NPC could not be loaded.", "NPC unavailable", {
+							position: "centerTop",
+						});
+						return;
+					}
+					this.$set(this.npcExpandData, id, npc);
+				} catch (e) {
+					props.expand = false;
+					this.$snotify.error("Failed to load NPC statblock.", "Load error", {
+						position: "centerTop",
+					});
+				}
 			}
 		},
 		setSize(e) {

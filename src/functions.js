@@ -11,6 +11,28 @@ String.prototype.capitalizeEach = function (sep = " ") {
 String.prototype.formatUnicorn = function () {
 	var e = this.toString();
 	if (!arguments.length) return e;
+	/**
+	 * Determines the type of the first argument and assigns a value to `n` based on its type.
+	 * If the first argument is a string or number, `n` is set to an array of all arguments.
+	 * Otherwise, `n` is set to the first argument itself.
+	 *
+	 * @param {...*} arguments - The arguments passed to the function.
+	 * @returns {Array|*} Returns an array of arguments if the first argument is a string or number, otherwise returns the first argument.
+	 */
+	/**
+	 * Determines the type of the first argument and assigns it to variable `t`.
+	 *
+	 * @type {string}
+	 * @example
+	 * // If the first argument is a string:
+	 * var t = typeof "hello"; // t === "string"
+	 *
+	 * // If the first argument is a number:
+	 * var t = typeof 42; // t === "number"
+	 *
+	 * // If the first argument is an object:
+	 * var t = typeof { key: "value" }; // t === "object"
+	 */
 	var t = typeof arguments[0],
 		n = "string" === t || "number" === t ? Array.prototype.slice.call(arguments) : arguments[0];
 	for (var o in n) e = e.replace(new RegExp("\\{" + o + "\\}", "gi"), n[o]);
@@ -42,53 +64,3 @@ Array.min = function (array) {
 	return Math.min.apply(Math, array);
 };
 
-/**
- * Returns the browser type
- * @return {string} browser: Opera, Firefox, Safari, IE, edge, chrome
- */
-/* eslint-disable */ export function browserDetect() {
-	if (process.browser) {
-		// Opera 8.0+
-		const isOpera =
-			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(" OPR/") >= 0;
-
-		// Firefox 1.0+
-		const isFirefox = typeof InstallTrigger !== "undefined";
-
-		// Safari 3.0+ "[object HTMLElementConstructor]"
-		const isSafari =
-			/constructor/i.test(window.HTMLElement) ||
-			(function (p) {
-				return p.toString() === "[object SafariRemoteNotification]";
-			})(!window["safari"] || (typeof safari !== "undefined" && window["safari"].pushNotification));
-
-		// Internet Explorer 6-11
-		const isIE = /*@cc_on!@*/ false || !!document.documentMode;
-
-		// Edge 20+
-		const isEdge = !isIE && !!window.StyleMedia;
-
-		// Chrome 1 - 79
-		const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-
-		// Edge (based on chromium) detection
-		const isEdgeChromium = isChrome && navigator.userAgent.indexOf("Edg") != -1;
-
-		return isOpera
-			? "Opera"
-			: isFirefox
-			? "Firefox"
-			: isSafari
-			? "Safari"
-			: isEdgeChromium
-			? "Edge"
-			: isChrome
-			? "Chrome"
-			: isIE
-			? "IE"
-			: isEdge
-			? "Edge"
-			: "Don't know";
-	}
-	return "Not a browser";
-}

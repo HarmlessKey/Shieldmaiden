@@ -165,7 +165,7 @@
 										:entity="entity"
 										:players="players"
 										:npcs="npcs"
-										:npcSettings="npcSettings"
+										:displaySettings="displaySettings"
 									/>
 								</td>
 
@@ -176,8 +176,7 @@
 										:campCompanions="campCompanions"
 										:players="players"
 										:npcs="npcs"
-										:npcSettings="npcSettings"
-										:playerSettings="playerSettings"
+										:displaySettings="displaySettings"
 									/>
 								</td>
 
@@ -186,7 +185,7 @@
 									v-if="
 										(playerSettings.conditions === undefined &&
 											(entity.entityType === 'player' ||
-												(entity.entityType == 'npc' && npcSettings.conditions === undefined))) ||
+												(entity.entityType == 'npc' && displayNPCField('conditions', entity) === undefined))) ||
 										entity.entityType === 'companion'
 									"
 								>
@@ -231,7 +230,7 @@
 																:entity="entity"
 																:players="players"
 																:npcs="npcs"
-																:npcSettings="npcSettings"
+																:displaySettings="displaySettings"
 															/>
 														</q-item-section>
 														<q-item-section avatar>
@@ -298,9 +297,8 @@ export default {
 		"campPlayers",
 		"campCompanions",
 		"players",
-		"playerSettings",
 		"npcs",
-		"npcSettings",
+		"displaySettings",
 		"screenWidth",
 	],
 	data() {
@@ -313,9 +311,9 @@ export default {
 		};
 	},
 	computed: {
-		/**
-		 * Returns how many conditions can be shown
-		 */
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
 		conditionCount() {
 			if (this.width < 400) return 1;
 			if (this.width < 450) return 2;
@@ -395,6 +393,7 @@ export default {
 					players: this.players,
 					campPlayers: this.campPlayers,
 					npcSettings: this.npcSettings,
+					allySettings: this.allySettings,
 					npcs: this.npcs,
 					encounter: {
 						key: this.encounter.key,

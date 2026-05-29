@@ -254,7 +254,7 @@ export default {
 			return index + 1 < length ? "+" : "";
 		},
 		startRoll(e, projectiles, option, action_index, action, category) {
-			if (this.targeted && this.targeted.length) {
+			if (this.targeted?.length) {
 				this.rollObject = {
 					e,
 					projectiles,

@@ -219,7 +219,7 @@ export default {
 	},
 	methods: {
 		startRoll(e, projectiles, option, action_index, action, category) {
-			if (this.targeted && this.targeted.length) {
+			if (this.targeted?.length) {
 				this.rollObject = {
 					e,
 					projectiles,
@@ -248,7 +248,7 @@ export default {
 				action_index: this.rollObject.action_index,
 				action: this.rollObject.action,
 				category: this.rollObject.category,
-				entity: this.current_actor,
+				entity: this.entity,
 				targets: assigned_projectiles || this.targeted,
 				option: this.rollObject.option,
 			});

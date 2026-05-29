@@ -20,6 +20,7 @@ module.exports = function (/* ctx */) {
 		// --> boot files are part of "main.js"
 		// https://v1.quasar.dev/quasar-cli/boot-files
 		boot: [
+			"prototypes",
 			{ path: "plugins", server: false },
 			{ path: "hk-components", server: false },
 			{ path: "vee-validate", server: false },

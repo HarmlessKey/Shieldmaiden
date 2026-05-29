@@ -196,7 +196,7 @@ export default {
 		...mapActions(["setManual", "setMultipliers"]),
 		...mapActions("tutorial", ["completeStep"]),
 		focus() {
-			this.$refs.input.focus();
+			this.$refs.input?.focus();
 		},
 		typeLabel(type) {
 			type = type.split("_");
@@ -248,7 +248,7 @@ export default {
 
 				//Reset values
 				this.knob_value = 0;
-				this.$refs.input.blur();
+				this.$refs.input?.blur();
 				this.setManual({ key: "clear" });
 				this.setMultipliers({ type: "clear" });
 			}
@@ -271,9 +271,10 @@ export default {
 		},
 	},
 	mounted() {
-		EventBus.$on("applyManualValue", (type) => {
-			this.applyManual(type);
-		});
+		EventBus.$on("applyManualValue", this.applyManual);
+	},
+	beforeDestroy() {
+		EventBus.$off("applyManualValue", this.applyManual);
 	},
 	directives: {
 		scrollWheel: {

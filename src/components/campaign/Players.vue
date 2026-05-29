@@ -77,7 +77,7 @@
 						<q-tooltip anchor="top middle" self="center middle">Edit Group Health</q-tooltip>
 					</button>
 					<button
-						class="btn btn-sm mr-1"
+						class="btn btn-sm mr-1 bg-neutral-5"
 						v-if="isXpAdvancement"
 						@click="
 							setDrawer({
@@ -463,7 +463,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
-import { extensionInstalled, comparePlayerToCharacter } from "src/utils/generalFunctions";
+import { comparePlayerToCharacter } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",
@@ -499,7 +499,6 @@ export default {
 			is_large: false,
 			viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			loading: false,
-			isXpAdvancement: false,
 			rest_dialog: false,
 			resets: [
 				{
@@ -537,12 +536,14 @@ export default {
 			sync_characters: this.syncCharacters,
 			link_character: undefined,
 			link_dialog: false,
-			extensionInstalled: undefined,
 		};
 	},
 	computed: {
 		...mapGetters(["overencumbered"]),
-		...mapGetters(["userSettings", "tier"]),
+		...mapGetters(["userSettings", "tier", "extensionInstalled"]),
+		isXpAdvancement() {
+			return this.campaign && this.campaign.advancement !== "milestone";
+		},
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
@@ -572,32 +573,16 @@ export default {
 		templateColumns() {
 			let templateColumns = "max-content max-content auto ";
 
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_perception === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_perception === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_investigation === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_investigation === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_insight === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_insight === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.save_dc === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.save_dc === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
 			if (this.viewerIsUser) {
@@ -610,16 +595,16 @@ export default {
 		calcColspan() {
 			let colspan = this.viewerIsUser ? 4 : 3;
 
-			if (this.settings.passive_perception === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_perception === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.passive_investigation === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_investigation === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.passive_insight === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_insight === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.save_dc === undefined && !this.is_medium) {
+			if (this.userSettings.general?.save_dc === undefined && !this.is_medium) {
 				colspan++;
 			}
 
@@ -637,9 +622,6 @@ export default {
 					: 0;
 			return this.copperToPretty(currency);
 		},
-	},
-	async mounted() {
-		this.extensionInstalled = await extensionInstalled();
 	},
 	methods: {
 		...mapActions(["setDrawer"]),

@@ -6,6 +6,7 @@
 					<img
 						src="~assets/_img/combat-tracker-shieldmaiden.webp"
 						alt="Combat Tracker Shieldmaiden"
+						loading="lazy"
 					/>
 				</div>
 				<div class="col-12 col-md-5">
@@ -15,7 +16,9 @@
 						<p class="text">
 							We focus on keeping the game on the table by managing everything you need to keep
 							track of during encounters. On top of that we enhance the player experience.<br />
-							<router-link to="/tools/combat-tracker" class="learn-more">Learn more</router-link>
+							<router-link to="/tools/combat-tracker" class="learn-more"
+								>More about the Combat Tracker</router-link
+							>
 						</p>
 						<router-link to="/demo/run-encounter" class="btn btn-lg bg-accent"
 							>Try Demo Encounter</router-link

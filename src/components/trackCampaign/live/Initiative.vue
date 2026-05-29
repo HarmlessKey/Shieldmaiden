@@ -301,11 +301,6 @@ export default {
 		"displaySettings",
 		"screenWidth",
 	],
-	computed: {
-		playerSettings() { return this.displaySettings?.player || {}; },
-		npcSettings() { return this.displaySettings?.npc; },
-		allySettings() { return this.displaySettings?.ally; },
-	},
 	data() {
 		return {
 			dmId: this.$route.params.userid,
@@ -316,9 +311,9 @@ export default {
 		};
 	},
 	computed: {
-		/**
-		 * Returns how many conditions can be shown
-		 */
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
 		conditionCount() {
 			if (this.width < 400) return 1;
 			if (this.width < 450) return 2;

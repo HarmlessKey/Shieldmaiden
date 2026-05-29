@@ -23,6 +23,10 @@ npm run lint      # ESLint
 - **Always use the `Edit` or `Write` tools** to modify files — never use Bash, `sed`, `awk`, `python`, or `node` for file editing
 - If the `Edit` tool fails due to whitespace mismatches, investigate the exact characters with `cat -A` and adjust the match — do not fall back to shell scripts
 
+## Vue Component Rules
+
+- `computed`, `data`, `methods`, `watch`, `props` and all other component options can only appear **once** per Vue component — JavaScript silently discards the first when two keys share the same name. Always merge into a single block rather than adding a second one.
+
 ## Key Constraints
 
 - **Firebase v8 namespaced API** is used across 63+ files — do not switch to modular API

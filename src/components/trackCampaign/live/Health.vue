@@ -121,17 +121,15 @@ export default {
 		"players",
 		"displaySettings",
 	],
-	computed: {
-		playerSettings() { return this.displaySettings?.player || {}; },
-		npcSettings() { return this.displaySettings?.npc; },
-		allySettings() { return this.displaySettings?.ally; },
-	},
 	data() {
 		return {
 			userId: this.$route.params.userid,
 		};
 	},
 	computed: {
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
 		camp_data: function () {
 			const key = this.entity.key;
 

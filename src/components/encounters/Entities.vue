@@ -86,7 +86,7 @@
 				<q-icon slot="prepend" name="search" />
 			</q-input>
 			<q-table
-				:data="npcs"
+				:rows="npcs"
 				:visible-columns="visibleColumns"
 				:columns="columns"
 				row-key="key"
@@ -217,7 +217,7 @@
 				</q-btn>
 			</q-input>
 			<q-table
-				:data="monsters"
+				:rows="monsters"
 				:columns="columns"
 				row-key="_id"
 				card-class="bg-none"

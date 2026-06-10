@@ -29,6 +29,7 @@
 
 <script>
 	import Condition from "src/components/compendium/Condition";
+	import { EventBus } from "src/event-bus";
 	import { mapGetters } from 'vuex';
 	import { metaCompendium } from 'src/mixins/metaCompendium';
 
@@ -67,7 +68,7 @@
 			if(this.condition) {
 				this.loading = false;
 				// Root emit with the condition name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.condition.name);
+				EventBus.emit('route-name', this.condition.name);
 			} else {
 				this.not_found = true;
 				this.loading = false;

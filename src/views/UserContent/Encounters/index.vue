@@ -90,7 +90,7 @@
 					<q-icon slot="prepend" name="search" />
 				</q-input>
 				<q-table
-					:data="active_encounters"
+					:rows="active_encounters"
 					:columns="columns"
 					:visible-columns="visibleColumns"
 					row-key="key"
@@ -176,7 +176,7 @@
 
 				<div>
 					<q-table
-						:data="finished_encounters"
+						:rows="finished_encounters"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"

@@ -16,10 +16,11 @@
 		"prepare": "husky install"
 	},
 	"dependencies": {
-		"@egjs/vue-flicking": "^4.12.0",
+		"@egjs/vue3-flicking": "^4.15.0",
 		"@gtm-support/vue-gtm": "^2.2.0",
 		"@octokit/rest": "^19.0.5",
 		"@quasar/extras": "^1.16.12",
+		"@vee-validate/rules": "^4.13.2",
 		"@vue/compat": "^3.3",
 		"ajv": "^8.13.0",
 		"ajv-formats": "^2.1.1",
@@ -44,7 +45,6 @@
 		"sanitize-html": "^2.13.0",
 		"splitpanes": "^3.1.5",
 		"vee-validate": "^4.13.2",
-		"@vee-validate/rules": "^4.13.2",
 		"vue": "^3.3",
 		"vue-advanced-cropper": "^2.8.9",
 		"vue-qr": "^4.0.9",

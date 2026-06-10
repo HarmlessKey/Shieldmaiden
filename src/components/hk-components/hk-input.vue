@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<ValidationProvider :rules="rules" :name="name" v-slot="{ errorMessage }" :modelValue="modelValue" as="div">
+		<ValidationProvider :rules="rules" :name="fieldName" v-slot="{ errorMessage }" :modelValue="modelValue" as="div">
 			<q-input
 				v-bind="$attrs"
-				v-model="modelValue"
+				v-model="inputModel"
 				:dark="$store.getters.theme === 'dark'"
 				:type="type"
 				:filled="filled"
@@ -60,7 +60,12 @@ export default {
 	},
 	emits: ["input", "update:modelValue"],
 	computed: {
-		modelValue: {
+		// vee-validate v4 requires a string name on every Field; fall back to a unique
+		// id so unnamed inputs without rules don't crash form path resolution
+		fieldName() {
+			return this.name || `field-${this.$.uid}`;
+		},
+		inputModel: {
 			get() {
 				return this.$props.modelValue !== undefined ? this.$props.modelValue : this.value;
 			},

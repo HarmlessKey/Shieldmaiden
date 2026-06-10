@@ -32,6 +32,7 @@
 
 <script>
 import ViewMonster from "src/components/compendium/Monster";
+import { EventBus } from "src/event-bus";
 import { mapGetters } from "vuex";
 import { metaCompendium } from "src/mixins/metaCompendium";
 
@@ -67,7 +68,7 @@ export default {
 	mounted() {
 		if (this.monster) {
 			this.loading = false;
-			this.$root.$emit("route-name", this.monster.name.capitalizeEach());
+			EventBus.emit("route-name", this.monster.name.capitalizeEach());
 		} else {
 			this.not_found = true;
 			this.loading = false;

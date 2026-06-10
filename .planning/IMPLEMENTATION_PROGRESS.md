@@ -1,6 +1,6 @@
 # Vue 3 Migration — Implementation Progress
 
-> Last updated: 2026-03-17
+> Last updated: 2026-06-10
 > Branch: `claude/vue3-migration-plan-9q0qC`
 
 ---
@@ -12,8 +12,21 @@
 | Phase 0 — Pre-Migration Prep | ✅ Complete | 100% |
 | Phase 1 — Core Dependency Upgrade | ✅ Complete | 100% |
 | Phase 2 — Stabilize Dev Build | ✅ Complete | 100% |
+| Phase 2.5 — Runtime Verification | ✅ Complete | 100% |
 | Phase 3 — Component Migration | 🔲 Not Started | 0% |
 | Phase 4 — SSR Re-enablement | 🔲 Not Started | 0% |
+
+---
+
+## Phase 2.5 — Runtime Verification ✅
+
+Headless-browser audit of 10+ public routes (see `.planning/VERIFICATION_REPORT.md`).
+8 runtime bugs found and fixed: dotenv fallback never firing (app failed to boot),
+missing env-key defaults, `Cookies.parseSSR` in SPA mode, `modelValue` prop/computed
+collision in hk-input/hk-select, vee-validate Field crash on unnamed inputs, leftover
+`$root.$on`/`$emit` event-bus usage (6 files), Vue 2 build of vue-flicking replaced
+with `@egjs/vue3-flicking`, and QTable `data` → `rows` rename (18 occurrences).
+Result: all audited routes render with zero console errors; production build passes.
 
 ---
 

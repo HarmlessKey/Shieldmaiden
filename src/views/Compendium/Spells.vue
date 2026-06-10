@@ -45,7 +45,7 @@
 				<template v-if="schools"> with a type of {{ schools.join(" or ") }} </template>
 			</p>
 			<q-table
-				:data="spells"
+				:rows="spells"
 				:columns="columns"
 				row-key="_id"
 				card-class="bg-none"

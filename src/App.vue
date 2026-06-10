@@ -61,7 +61,7 @@ export default {
 		HkRolls,
 	},
 	async preFetch({ store, ssrContext }) {
-		const cookies = Cookies.parseSSR(ssrContext);
+		const cookies = process.env.SERVER ? Cookies.parseSSR(ssrContext) : Cookies;
 		const access_token = cookies.get("access_token");
 		if (!access_token) return;
 

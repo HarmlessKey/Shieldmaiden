@@ -20,7 +20,7 @@
 					</q-input>
 
 					<q-table
-						:data="items"
+						:rows="items"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"

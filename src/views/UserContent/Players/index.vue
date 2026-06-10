@@ -19,7 +19,7 @@
 				</q-input>
 
 				<q-table
-					:data="players"
+					:rows="players"
 					:columns="columns"
 					row-key="key"
 					card-class="bg-none"

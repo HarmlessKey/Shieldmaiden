@@ -9,7 +9,7 @@
 		</div>
 		<div class="card-body">
 			<q-table
-				:data="promotions"
+				:rows="promotions"
 				:columns="columns"
 				row-key="key"
 				card-class="bg-none"

@@ -85,7 +85,7 @@
 						flat
 						dense
 						square
-						:data="parsed_data[import_type]"
+						:rows="parsed_data[import_type]"
 						:columns="columns"
 						:row-key="(row) => `${row.meta.key}-${row.meta.overwrite}`"
 						virtual-scroll

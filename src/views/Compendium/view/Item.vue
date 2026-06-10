@@ -25,6 +25,7 @@
 </template>
 
 <script>
+	import { EventBus } from "src/event-bus";
 	import { mapGetters } from 'vuex';
 	import Item from "src/components/compendium/Item";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
@@ -62,7 +63,7 @@
 		mounted() {
 			if(this.item) {
 				this.loading = false;
-				this.$root.$emit('route-name', this.item?.name.capitalizeEach())
+				EventBus.emit('route-name', this.item?.name.capitalizeEach())
 			} else {
 				this.not_found = true;
 				this.loading = false;

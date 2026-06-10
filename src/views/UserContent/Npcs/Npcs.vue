@@ -45,7 +45,7 @@
 					</q-input>
 
 					<q-table
-						:data="npcs"
+						:rows="npcs"
 						:visible-columns="visibleColumns"
 						:columns="columns"
 						row-key="key"

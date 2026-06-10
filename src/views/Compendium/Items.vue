@@ -22,7 +22,7 @@
 			</q-input>
 
 			<q-table
-				:data="items"
+				:rows="items"
 				:columns="columns"
 				row-key="_id"
 				card-class="bg-none"

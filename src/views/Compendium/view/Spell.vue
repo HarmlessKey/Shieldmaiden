@@ -33,6 +33,7 @@
 </template>
 
 <script>
+	import { EventBus } from "src/event-bus";
 	import { mapGetters } from "vuex";
 	import Spell from "src/components/compendium/Spell";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
@@ -72,7 +73,7 @@
 			if(this.spell) {
 				this.loading = false;
 				// Root emit with the spell name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.spell.name);
+				EventBus.emit('route-name', this.spell.name);
 			} else {
 				this.not_found = true;
 				this.loading = false;

@@ -3,8 +3,19 @@
 const { configure } = require("quasar/wrappers");
 
 // Load .env file — try environment-specific first, then fall back to .env.dist
-const dotenvResult = require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` });
-const envParsed = dotenvResult.parsed || require("dotenv").config({ path: ".env.dist" }).parsed || {};
+// Note: dotenv returns { error, parsed: {} } for missing files, so check error, not parsed
+function loadEnv(path) {
+	const result = require("dotenv").config({ path });
+	return result.error ? null : result.parsed;
+}
+const envParsed = loadEnv(`.env.${process.env.NODE_ENV}.local`) || loadEnv(".env.dist") || {};
+
+// Optional keys referenced in src must always be defined, otherwise webpack leaves
+// a bare `process.env.X` in the bundle which throws at runtime (no process in browser)
+envParsed.LOCAL_CHARACTER_SYNC_ID = envParsed.LOCAL_CHARACTER_SYNC_ID ?? "";
+envParsed.MONSTER_GENERATOR_API_URL =
+	envParsed.MONSTER_GENERATOR_API_URL ?? envParsed.MONSTER_GENERATOR_URL ?? "";
+envParsed.MONSTER_GENERATOR_API_KEY = envParsed.MONSTER_GENERATOR_API_KEY ?? "";
 
 module.exports = configure(function (/* ctx */) {
 	return {

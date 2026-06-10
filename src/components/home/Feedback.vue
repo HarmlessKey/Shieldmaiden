@@ -27,8 +27,15 @@
 </template>
 
 <script>
-import { Flicking } from "@egjs/vue-flicking";
-import "@egjs/vue-flicking/dist/flicking.css";
+import Flicking from "@egjs/vue3-flicking";
+import "@egjs/vue3-flicking/dist/flicking.css";
+
+// Flicking is written for native Vue 3; opt it (and its internal Panel
+// component) out of @vue/compat's Vue 2 behavior
+Flicking.compatConfig = { MODE: 3 };
+for (const component of Object.values(Flicking.components || {})) {
+	component.compatConfig = { MODE: 3 };
+}
 
 export default {
 	name: "Feedback",

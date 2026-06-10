@@ -43,8 +43,7 @@ export function loadPaneSizes() {
 
 export function savePaneSizes(partial) {
 	if (typeof window === "undefined" || !window.localStorage) return;
-	const current = pickValid(readRaw());
-	const merged = pickValid({ ...current, ...partial });
+	const merged = pickValid({ ...readRaw(), ...partial });
 	try {
 		window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
 	} catch (e) {

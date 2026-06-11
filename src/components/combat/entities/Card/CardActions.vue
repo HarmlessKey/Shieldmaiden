@@ -203,6 +203,11 @@ export default {
 				},
 				{ category: "actions", name: "Actions", name_single: "Action" },
 				{
+					category: "bonus_actions",
+					name: "Bonus Actions",
+					name_single: "Bonus action",
+				},
+				{
 					category: "legendary_actions",
 					name: "Legendary Actions",
 					name_single: "Legendary action",

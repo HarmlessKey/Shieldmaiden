@@ -150,7 +150,13 @@ export default {
 			// Check limited uses
 			if (this.current.limited_uses && Object.keys(this.current.limited_uses).length > 0) {
 				// Check all actions for limited uses that can be regained at the start of the turn
-				const categories = ["special_abilities", "actions", "legendary_actions", "reactions"];
+				const categories = [
+					"special_abilities",
+					"actions",
+					"bonus_actions",
+					"legendary_actions",
+					"reactions",
+				];
 
 				for (const category of categories) {
 					if (this.current[category] && this.current.limited_uses[category]) {

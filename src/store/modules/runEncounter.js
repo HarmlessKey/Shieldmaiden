@@ -563,7 +563,13 @@ const run_encounter_actions = {
 					}
 
 					// Abilities
-					for (const type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
+					for (const type of [
+						"special_abilities",
+						"actions",
+						"bonus_actions",
+						"legendary_actions",
+						"reactions",
+					]) {
 						if (data_npc[type]) entity[type] = data_npc[type];
 					}
 

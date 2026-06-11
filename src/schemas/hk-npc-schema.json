@@ -539,6 +539,28 @@
 				"required": ["name"]
 			}
 		},
+		"bonus_actions": {
+			"title": "Bonus actions",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"name": { "$ref": "#/$defs/action-name" },
+					"recharge": { "$ref": "#/$defs/action-recharge" },
+					"limit": { "$ref": "#/$defs/action-limit" },
+					"limit_type": { "$ref": "#/$defs/action-limit-type" },
+					"desc": { "$ref": "#/$defs/action-desc" },
+					"reach": { "$ref": "#/$defs/action-reach" },
+					"range": { "$ref": "#/$defs/action-range" },
+					"aoe_type": { "$ref": "#/$defs/action-aoe-type" },
+					"aoe_size": { "$ref": "#/$defs/action-aoe-size" },
+					"options": { "$ref": "#/$defs/action-options" },
+					"action_list": { "$ref": "#/$defs/action-list" }
+				},
+				"required": ["name"]
+			}
+		},
 		"legendary_count": {
 			"title": "Legendary count",
 			"type": "integer",

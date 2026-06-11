@@ -86,6 +86,7 @@
 					"innate_spells",
 					"special_abilities",
 					"actions",
+					"bonus_actions",
 					"legendary_count",
 					"legendary_actions",
 					"reactions"
@@ -109,6 +110,7 @@
 				action_abilities: [
 					"special_abilities",
 					"actions",
+					"bonus_actions",
 					"legendary_actions",
 					"reactions"
 				],

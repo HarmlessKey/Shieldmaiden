@@ -797,7 +797,13 @@ export default {
 		 * @param {object} npc
 		 */
 		versatileToOptions(npc) {
-			const ability_types = ["special_abilities", "actions", "legendary_actions", "reactions"];
+			const ability_types = [
+				"special_abilities",
+				"actions",
+				"bonus_actions",
+				"legendary_actions",
+				"reactions",
+			];
 			const versatile_options = ["damage_type", "magical", "dice_count", "dice_type", "fixed_val"];
 
 			// Check all rolls in all actions in all ability types of an NPC

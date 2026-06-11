@@ -149,7 +149,7 @@ export default {
 				const monster = response?.data?.output || {};
 				monster.source = "Shieldmaiden";
 				monster.hit_dice = monster?.hit_dice?.split("+")[0];
-				["actions", "reactions", "legendary_actions"].forEach((action_type) => {
+				["actions", "bonus_actions", "reactions", "legendary_actions"].forEach((action_type) => {
 					monster[action_type]?.forEach((action) => {
 						action.action_list?.forEach((sub_action) => {
 							if (["melee_weapon", "ranged_weapon", "spell_attack"].includes(sub_action.type)) {

@@ -296,6 +296,7 @@ export const monsterMixin = {
 			for (const action_type of [
 				"special_abilities",
 				"actions",
+				"bonus_actions",
 				"legendary_actions",
 				"reactions",
 			]) {

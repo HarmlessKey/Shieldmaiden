@@ -71,7 +71,7 @@
 
 							<div class="card-body">
 								<div class="neutral-4 mb-2">
-									{{ campaign.edition === "2024" ? "5.5e" : "5e" }} &bull;
+									{{ campaign.edition === "5.5e" ? "5.5e" : "5e" }} &bull;
 									{{ campaign.advancement !== "milestone" ? "Experience" : "Milestone" }}
 									advancement
 								</div>
@@ -313,7 +313,7 @@ export default {
 					label: "Milestone",
 				},
 			],
-			edition: "2024",
+			edition: "5.5e",
 			edition_options: editions,
 		};
 	},

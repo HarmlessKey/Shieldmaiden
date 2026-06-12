@@ -7,13 +7,13 @@ export const dice_types = Object.freeze([
 	{ value: 20, label: "d20" },
 ]);
 
-/** D&D rule editions. "2014" = 5e, "2024" = 5.5e */
+/** D&D rule editions. "5e" = 5e, "5.5e" = 5.5e */
 export const editions = Object.freeze([
-	{ value: "2014", label: "D&D 5e (2014)" },
-	{ value: "2024", label: "D&D 5.5e (2024)" },
+	{ value: "5e", label: "D&D 5e (2014)" },
+	{ value: "5.5e", label: "D&D 5.5e (2024)" },
 ]);
 
-export const default_edition = "2014";
+export const default_edition = "5e";
 
 /** Extension store URLs per browser */
 export const character_sync_stores = Object.freeze({

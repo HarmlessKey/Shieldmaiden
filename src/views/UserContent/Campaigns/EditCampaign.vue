@@ -177,7 +177,7 @@ export default {
 				},
 			],
 			edition_options: editions,
-			editCampaign: { edition: default_edition, ...this.campaign },
+			editCampaign: { ...this.campaign },
 		};
 	},
 	computed: {

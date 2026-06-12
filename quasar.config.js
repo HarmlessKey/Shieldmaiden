@@ -17,7 +17,7 @@ envParsed.MONSTER_GENERATOR_API_URL =
 	envParsed.MONSTER_GENERATOR_API_URL ?? envParsed.MONSTER_GENERATOR_URL ?? "";
 envParsed.MONSTER_GENERATOR_API_KEY = envParsed.MONSTER_GENERATOR_API_KEY ?? "";
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
 	return {
 		preFetch: true,
 
@@ -42,6 +42,18 @@ module.exports = configure(function (/* ctx */) {
 
 			chainWebpack(chain) {
 				chain.resolve.alias.set("vue", "@vue/compat");
+
+				// Silence mini-css-extract-plugin "Conflicting order" warnings.
+				// All flagged modules are Vue scoped styles (data-v-xxxxx attribute
+				// selectors), so cross-component CSS specificity can't actually conflict.
+				["extract-css", "mini-css-extract"].forEach((name) => {
+					if (chain.plugins.has(name)) {
+						chain.plugin(name).tap((args) => {
+							args[0] = { ...(args[0] || {}), ignoreOrder: true };
+							return args;
+						});
+					}
+				});
 			},
 		},
 
@@ -61,7 +73,11 @@ module.exports = configure(function (/* ctx */) {
 		animations: [],
 
 		ssr: {
-			pwa: true,
+			// PWA in SSR dev causes an infinite reload loop:
+			// GenerateSW emits a new service-worker.js on every HMR poll,
+			// skipWaiting + clientsClaim then force every page to refresh,
+			// the refresh triggers another build, repeat.
+			pwa: ctx.prod,
 		},
 
 		pwa: {

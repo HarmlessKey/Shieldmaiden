@@ -64,8 +64,8 @@ const conditions_actions = {
 				const description =  (condition.effects) ? `${condition.effects.join(" ").substring(0, maxLength).trim()}...` : "";
         
         condition.meta = { 
-          title: `${condition.name} D&D 5e`,
-          description: `D&D 5th Edition condition: ${description}`
+          title: `${condition.name} D&D 5e and 5.5e`,
+          description: `D&D 5e and 5.5e condition: ${description}`
         };
 
         commit("SET_CACHED_CONDITION", condition);

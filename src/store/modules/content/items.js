@@ -61,8 +61,8 @@ const item_actions = {
               
         // Create meta tags
         item.meta = {
-          title: `${item.name.capitalizeEach()} D&D 5e`,
-          desciption: "D&D 5th Edition item: "
+          title: `${item.name.capitalizeEach()} D&D 5e and 5.5e`,
+          desciption: "D&D 5e and 5.5e item: "
         };
         item.meta.desciption += item.rarity + ' ';
         item.meta.desciption += item.type + ' \n';

@@ -68,8 +68,8 @@ const spell_actions = {
 					: "...";
 
 				spell.meta = {
-					title: `${spell.name} D&D 5e`,
-					description: `D&D 5th Edition Spell: ${description}`,
+					title: `${spell.name} D&D 5e and 5.5e`,
+					description: `D&D 5e and 5.5e spell: ${description}`,
 				};
 
 				commit("SET_CACHED_SPELL", spell);

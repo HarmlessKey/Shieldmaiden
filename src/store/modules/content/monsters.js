@@ -69,8 +69,8 @@ const monster_actions = {
 
 				// Create meta tags
 				monster.meta = {
-					title: `${monster.name.capitalizeEach()} D&D 5e`,
-					description: "D&D 5th Edition monster: ",
+					title: `${monster.name.capitalizeEach()} D&D 5e and 5.5e`,
+					description: "D&D 5e and 5.5e monster: ",
 					image: `https://firebasestorage.googleapis.com/v0/b/dndcombat-71e41.appspot.com/o/compendium%2Fmonsters%2Fmeta%2F${monster.url}.png?alt=media`,
 					image_alt: monster.name.capitalizeEach(),
 				};

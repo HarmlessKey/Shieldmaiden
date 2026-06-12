@@ -29,7 +29,7 @@ const routes = [
 			sidebar: false,
 			offline: true,
 			description:
-				"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+				"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			title: "Combat Tracker for D&D",
 		},
 	},
@@ -607,9 +607,9 @@ const routes = [
 				name: "Tools",
 				component: () => import("src/views/Tools"),
 				meta: {
-					title: "D&D Tools - Online tools for D&D 5e",
+					title: "D&D Tools - Online tools for D&D 5e and 5.5e",
 					description:
-						"Try our range of D&D 5e DM companion tools: track combat, build encounters, make custom monsters and spells, or check out one of our other useful tools for free now!",
+						"Try our range of D&D 5e and 5.5e DM companion tools: track combat, build encounters, make custom monsters and spells, or check out one of our other useful tools for free now!",
 				},
 			},
 			{
@@ -617,7 +617,7 @@ const routes = [
 				name: "ToolsCombatTracker",
 				component: () => import("src/views/Tools/CombatTracker"),
 				meta: {
-					title: "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					title: "D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
 					description:
 						"Get a grip on tracking combat as a D&D DM with Shieldmaiden Combat Tracker. You can keep track of initiative, health, status effects, concentration spells, and much more. Use for free now! ",
 				},
@@ -630,9 +630,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
+					title: "D&D Encounter Builder - Build and manage encounters for D&D 5e and 5.5e",
 					description:
-						"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
+						"Build and manage your D&D 5e and 5.5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
 				},
 				children: [
 					{
@@ -640,9 +640,10 @@ const routes = [
 						name: "ToolsEncounterBuilder",
 						component: () => import("src/views/Tools/EncounterBuilder"),
 						meta: {
-							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
+							title:
+								"D&D Encounter Builder - Build and manage encounters for D&D 5e and 5.5e",
 							description:
-								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
+								"Build and manage your D&D 5e and 5.5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
 						},
 					},
 					{
@@ -650,9 +651,10 @@ const routes = [
 						name: "ToolsBuildEncounter",
 						component: () => import("src/components/encounters"),
 						meta: {
-							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
+							title:
+								"D&D Encounter Builder - Build and manage encounters for D&D 5e and 5.5e",
 							description:
-								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now! ",
+								"Build and manage your D&D 5e and 5.5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now! ",
 							side: false,
 						},
 					},
@@ -666,9 +668,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5e DM Screen",
+					title: "D&D 5e and 5.5e DM Screen",
 					description:
-						"A DM Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+						"A DM Screen for D&D 5e and 5.5e. Quickly reference rules and directly run encounters.",
 				},
 				children: [
 					{
@@ -676,9 +678,9 @@ const routes = [
 						name: "ToolsDmScreen",
 						component: () => import("src/views/Tools/DmScreen"),
 						meta: {
-							title: "D&D 5e DM Screen",
+							title: "D&D 5e and 5.5e DM Screen",
 							description:
-								"A Dungeon Master Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+								"A Dungeon Master Screen for D&D 5e and 5.5e. Quickly reference rules and directly run encounters.",
 						},
 					},
 				],
@@ -691,7 +693,7 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D Monster Creator - Create custom monsters for D&D 5e",
+					title: "D&D Monster Creator - Create custom monsters for D&D 5e and 5.5e",
 					description:
 						"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
 				},
@@ -712,7 +714,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Npcs/EditNpc"),
 						meta: {
 							title: "Create monster",
-							description: "Create your custom D&D 5e monster.",
+							description: "Create your custom D&D 5e or 5.5e monster.",
 						},
 					},
 				],
@@ -725,9 +727,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D Spell Creator - Create custom spells for D&D 5e",
+					title: "D&D Spell Creator - Create custom spells for D&D 5e and 5.5e",
 					description:
-						"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+						"Create spells for D&D 5e and 5.5e to roll directly or use in your custom spellcaster monsters.",
 				},
 				children: [
 					{
@@ -735,7 +737,7 @@ const routes = [
 						name: "ToolsSpellCreator",
 						component: () => import("src/views/Tools/SpellCreator"),
 						meta: {
-							title: "D&D Spell Creator - Create custom spells for D&D 5e ",
+							title: "D&D Spell Creator - Create custom spells for D&D 5e and 5.5e ",
 							description:
 								"Create custom spells for your D&D campaign with ease. Roll your customized spell directly or use them in your custom spellcaster monsters.",
 						},
@@ -747,7 +749,7 @@ const routes = [
 						meta: {
 							title: "Create spell",
 							description:
-								"Create your custom D&D 5e spell to roll directly or use in your custom spellcaster monsters.",
+								"Create your custom D&D 5e or 5.5e spell to roll directly or use in your custom spellcaster monsters.",
 						},
 					},
 				],
@@ -759,7 +761,7 @@ const routes = [
 				meta: {
 					title: "Character Sync",
 					description:
-						"Sync the D&D 5e characters of your players in Shieldmaiden. Update the stats of your players characters with one click.",
+						"Sync the D&D 5e and 5.5e characters of your players in Shieldmaiden. Update the stats of your players characters with one click.",
 				},
 			},
 			{
@@ -769,7 +771,7 @@ const routes = [
 				meta: {
 					title: "Character Builder",
 					description:
-						"An advanced character builder for D&D 5e. Create a character sheet for you character.",
+						"An advanced character builder for D&D 5e and 5.5e. Create a character sheet for you character.",
 				},
 			},
 			{
@@ -798,9 +800,9 @@ const routes = [
 				name: "Compendium",
 				component: () => import("src/views/Compendium"),
 				meta: {
-					title: "Dungeons & Dragons Compendium - D&D 5e knowledge database",
+					title: "Dungeons & Dragons Compendium - D&D 5e and 5.5e knowledge database",
 					description:
-						"Find descriptions and explanations for D&D 5e items, monsters, spells, conditions, rules and much more. What does this item do again? How does this spell work? Find the answer in our easy to understand compendium.",
+						"Find descriptions and explanations for D&D 5e and 5.5e items, monsters, spells, conditions, rules and much more. What does this item do again? How does this spell work? Find the answer in our easy to understand compendium.",
 				},
 			},
 			{
@@ -811,8 +813,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "Monsters D&D 5e",
-					description: "Dungeons & Dragons 5th edition monsters. All monsters from the SRD 5.1",
+					title: "Monsters D&D 5e and 5.5e",
+					description:
+						"D&D 5e and 5.5e monsters for your encounters. Includes monsters from the SRD 5.1.",
 				},
 				children: [
 					{
@@ -820,8 +823,9 @@ const routes = [
 						name: "Monsters",
 						component: () => import("src/views/Compendium/Monsters"),
 						meta: {
-							title: "Monsters D&D 5e",
-							description: "Dungeons & Dragons 5th edition monsters. All monsters from the SRD 5.1",
+							title: "Monsters D&D 5e and 5.5e",
+							description:
+								"D&D 5e and 5.5e monsters for your encounters. Includes monsters from the SRD 5.1.",
 						},
 					},
 					{
@@ -829,8 +833,8 @@ const routes = [
 						name: "Monster",
 						component: () => import("src/views/Compendium/view/Monster"),
 						meta: {
-							title: "Monster D&D 5e",
-							description: "D&D 5th Edition monster.",
+							title: "Monster D&D 5e and 5.5e",
+							description: "D&D 5e and 5.5e monster.",
 						},
 					},
 				],
@@ -843,16 +847,17 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "Spells D&D 5e",
+					title: "Spells D&D 5e and 5.5e",
 				},
 				children: [
 					{
 						path: "",
-						name: "Spells D&D 5e",
+						name: "Spells D&D 5e and 5.5e",
 						component: () => import("src/views/Compendium/Spells"),
 						meta: {
-							title: "Spells D&D 5e",
-							description: "Dungeons & Dragons 5th edition spells. All spells from the SRD 5.1",
+							title: "Spells D&D 5e and 5.5e",
+							description:
+								"D&D 5e and 5.5e spells for your campaign. Includes spells from the SRD 5.1.",
 						},
 					},
 					{
@@ -881,8 +886,9 @@ const routes = [
 						name: "Conditions",
 						component: () => import("src/views/Compendium/Conditions"),
 						meta: {
-							title: "Conditions D&D 5e",
-							description: "Dungeons & Dragons 5th edition spells. All conditions from the SRD 5.1",
+							title: "Conditions D&D 5e and 5.5e",
+							description:
+								"D&D 5e and 5.5e conditions for quick rules reference. Includes conditions from the SRD 5.1.",
 						},
 					},
 					{
@@ -911,8 +917,9 @@ const routes = [
 						name: "CompendiumItems",
 						component: () => import("src/views/Compendium/Items"),
 						meta: {
-							title: "Items D&D 5e",
-							description: "Dungeons & Dragons 5th edition items. All items from the SRD 5.1",
+							title: "Items D&D 5e and 5.5e",
+							description:
+								"D&D 5e and 5.5e items for your campaign. Includes items from the SRD 5.1.",
 						},
 					},
 					{
@@ -941,8 +948,8 @@ const routes = [
 						name: "CompendiumRules",
 						component: () => import("src/views/Compendium/Rules"),
 						meta: {
-							title: "Rules D&D 5e",
-							description: "Dungeons & Dragons 5th edition rules. Rules for playing D&D 5e.",
+							title: "Rules D&D 5e and 5.5e",
+							description: "Rules reference for playing D&D 5e and 5.5e.",
 						},
 					},
 					{
@@ -971,7 +978,7 @@ const routes = [
 				component: () => import("src/views/Compendium/Monsters"),
 				meta: {
 					title: "Homebrew",
-					description: "D&D 5e Monsters created by Shieldmaiden.",
+					description: "D&D 5e and 5.5e monsters created by Shieldmaiden.",
 				},
 			},
 			{
@@ -979,8 +986,8 @@ const routes = [
 				name: "HomebrewMonster",
 				component: () => import("src/views/Compendium/view/HomebrewMonster"),
 				meta: {
-					title: "Homebrew Monster D&D 5e",
-					description: "D&D 5th Edition monster created by Shieldmaiden.",
+					title: "Homebrew Monster D&D 5e and 5.5e",
+					description: "D&D 5e and 5.5e monster created by Shieldmaiden.",
 				},
 			},
 		],
@@ -1275,7 +1282,7 @@ const routes = [
 					sidebar: false,
 					title: "Encounter Builder D&D Demo",
 					description:
-						"Build an encounter with Shieldmaiden, an advanced Combat Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
+						"Build an encounter with Shieldmaiden, an advanced Combat Tracker for Dungeons & Dragons (D&D) 5e and 5.5e.",
 				},
 			},
 			{
@@ -1286,7 +1293,7 @@ const routes = [
 					sidebar: false,
 					title: "D&D Initiative Tracker Demo",
 					description:
-						"Run encounter with Shieldmaiden, an advanced Initiative Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
+						"Run encounter with Shieldmaiden, an advanced Initiative Tracker for Dungeons & Dragons (D&D) 5e and 5.5e.",
 				},
 			},
 		],
@@ -1472,7 +1479,7 @@ const routes = [
 				component: () => import("src/views/Pages/Changelog"),
 				meta: {
 					title: "Changelog",
-					description: "Changelog of D&D 5e Combat Tracker Shieldmaiden.",
+					description: "Changelog of D&D 5e and 5.5e Combat Tracker Shieldmaiden.",
 				},
 			},
 		],
@@ -1588,7 +1595,7 @@ const routes = [
 			title: "Run encounter",
 			requiresAuth: true,
 			sidebar: false,
-			description: "Run your encounter in Shieldmaiden, a Combat Tracker for D&D 5e.",
+			description: "Run your encounter in Shieldmaiden, a Combat Tracker for D&D 5e and 5.5e.",
 		},
 	},
 	{
@@ -1599,7 +1606,7 @@ const routes = [
 			title: "Test encounter",
 			requiresAuth: true,
 			sidebar: false,
-			description: "Test your encounter in Shieldmaiden, a Combat Tracker for D&D 5e.",
+			description: "Test your encounter in Shieldmaiden, a Combat Tracker for D&D 5e and 5.5e.",
 		},
 	},
 	{

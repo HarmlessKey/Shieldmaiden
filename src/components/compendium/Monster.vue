@@ -23,10 +23,7 @@
 					<strong>AC </strong> {{ monster.armor_class || monster.ac }}
 					<span class="ml-2">
 						<strong>Initiative </strong>
-						{{
-							monster.dexterity > 10 ? `+${calcMod(monster.dexterity)}` : calcMod(monster.dexterity)
-						}}
-						({{ 10 + calcMod(monster.dexterity) }})
+						{{ mod2str(initiative_bonus) }} ({{ 10 + initiative_bonus }})
 					</span>
 				</div>
 				<div>
@@ -152,20 +149,18 @@
 					</hk-roll>
 				</template>
 				<div v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0">
-					<strong>Damage vulnerabilities</strong>
+					<strong>Vulnerabilities</strong>
 					{{ defensesDisplay(monster.damage_vulnerabilities).join(", ") }}
 				</div>
 				<div v-if="monster.damage_resistances && monster.damage_resistances.length > 0">
-					<strong>Damage resistances</strong>
+					<strong>Resistances</strong>
 					{{ defensesDisplay(monster.damage_resistances).join(", ") }}
 				</div>
-				<div v-if="monster.damage_immunities && monster.damage_immunities.length > 0">
-					<strong>Damage immunities</strong>
-					{{ defensesDisplay(monster.damage_immunities).join(", ") }}
+				<div v-if="immunities">
+					<strong>Immunities</strong> {{ immunities }}
 				</div>
-				<div v-if="monster.condition_immunities && monster.condition_immunities.length > 0">
-					<strong>Condition immunities</strong> {{ monster.condition_immunities.join(", ") }}
-				</div>
+
+				<div v-if="monster.gear"><strong>Gear</strong> {{ monster.gear }}</div>
 
 				<div>
 					<strong>Senses</strong>
@@ -182,11 +177,10 @@
 					<strong>Languages</strong> {{ monster.languages.join(", ") }}
 				</div>
 				<div v-if="monster.challenge_rating">
-					<strong>Challenge Rating</strong> {{ monster.challenge_rating }} ({{
-						monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0")
-					}}
-					XP; <template v-if="monster.challenge_rating">PB +{{ monster.proficiency }}</template
-					>)
+					<strong>CR</strong> {{ monster.challenge_rating }} (XP
+					{{ monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0") }}; PB +{{
+						monster.proficiency
+					}})
 				</div>
 			</div>
 
@@ -491,6 +485,24 @@ export default {
 		...mapGetters(["encounterId", "broadcast"]),
 		shares() {
 			return this.broadcast.shares || [];
+		},
+		initiative_bonus() {
+			// 5.5e stat blocks can have a flat initiative bonus, default is the dexterity modifier
+			return this.monster.initiative !== undefined
+				? this.monster.initiative
+				: this.calcMod(this.monster.dexterity);
+		},
+		immunities() {
+			// 2024 stat blocks merge damage and condition immunities into a single line
+			const damage =
+				this.monster.damage_immunities && this.monster.damage_immunities.length
+					? this.defensesDisplay(this.monster.damage_immunities).join(", ")
+					: null;
+			const condition =
+				this.monster.condition_immunities && this.monster.condition_immunities.length
+					? this.monster.condition_immunities.join(", ").capitalizeEach()
+					: null;
+			return damage && condition ? `${damage}; ${condition}` : damage || condition;
 		},
 		caster_spell_levels() {
 			if (this.monster.caster_spells) {

@@ -41,6 +41,7 @@
 				allowed_properties: [
 					"name",
 					"source",
+					"edition",
 					"avatar",
 					"size",
 					"type",
@@ -57,6 +58,8 @@
 					"friendly",
 					"player_id",
 					"armor_class",
+					"initiative",
+					"gear",
 					"hit_points",
 					"hit_dice",
 					"senses",

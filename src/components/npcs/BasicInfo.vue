@@ -20,7 +20,7 @@
 			<div class="card-body">
         <!-- NAME -->
         <div class="row q-col-gutter-md mb-2">
-          <div class="col-9">
+          <div class="col-6">
             <ValidationProvider
               rules="max:100|required"
               name="Name"
@@ -58,6 +58,19 @@
                 :error-message="errors[0]"
               />
             </ValidationProvider>
+          </div>
+          <div class="col-3">
+            <q-select
+              :dark="$store.getters.theme === 'dark'"
+              filled
+              square
+              clearable
+              emit-value
+              map-options
+              label="Edition"
+              v-model="npc.edition"
+              :options="edition_options"
+            />
           </div>
         </div>
 
@@ -304,6 +317,40 @@
           </div>
         </div>
 
+        <!-- GEAR -->
+        <div class="row q-col-gutter-md mb-2">
+          <div class="col-12">
+            <ValidationProvider
+              rules="max:2000"
+              name="Gear"
+              v-slot="{ errors, invalid, validated }"
+            >
+              <q-input
+                :dark="$store.getters.theme === 'dark'"
+                filled
+                square
+                autogrow
+                label="Gear"
+                maxlength="2000"
+                autocomplete="off"
+                v-model="npc.gear"
+                :error="invalid && validated"
+                :error-message="errors[0]"
+              >
+                <template v-slot:append>
+                  <hk-popover header="Gear">
+                    <q-icon name="info" size="xs" class="blue" />
+                    <template #content>
+                      Equipment the creature carries, shown on 5.5e (2024) stat blocks.<br />
+                      For example: <i>Leather Armor, Scimitar, Shortbow</i>.
+                    </template>
+                  </hk-popover>
+                </template>
+              </q-input>
+            </ValidationProvider>
+          </div>
+        </div>
+
         <!-- ENVIRONMENT & GROUPS -->
         <div class="row q-col-gutter-md mb-2">
           <div class="col-12 col-sm-6">
@@ -480,7 +527,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
-import { languages } from "src/utils/generalConstants";
+import { languages, editions } from "src/utils/generalConstants";
 import { campaignGroupKey } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster.js";
 
@@ -491,6 +538,7 @@ export default {
   data() {
     return {
       languages: languages,
+      edition_options: editions,
       avatar_dialog: false,
       preview_new_upload: undefined,
     };

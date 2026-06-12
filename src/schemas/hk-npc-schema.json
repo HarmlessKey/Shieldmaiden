@@ -28,6 +28,11 @@
 			"type": "string",
 			"maxLength": 200
 		},
+		"edition": {
+			"title": "Edition",
+			"type": "string",
+			"enum": ["2014", "2024"]
+		},
 		"avatar": {
 			"title": "Avatar",
 			"type": "string",
@@ -174,6 +179,19 @@
 			"type": "integer",
 			"minimum": 1,
 			"maximum": 99
+		},
+		"initiative": {
+			"title": "Initiative bonus",
+			"description": "Flat initiative bonus override (5.5e stat blocks), defaults to the dexterity modifier when absent.",
+			"type": "integer",
+			"minimum": -10,
+			"maximum": 30
+		},
+		"gear": {
+			"title": "Gear",
+			"description": "Free-text description of the creature's gear (5.5e stat blocks).",
+			"type": "string",
+			"maxLength": 2000
 		},
 		"hit_points": {
 			"title": "Hit points",

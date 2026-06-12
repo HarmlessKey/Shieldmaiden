@@ -2,6 +2,32 @@
 	<div>
 		<hk-card header="Ability Scores">
 			<div class="card-body">
+				<div class="row q-col-gutter-md mb-3">
+					<div class="col-4 col-md-3">
+						<ValidationProvider rules="between:-10,30" name="Initiative" v-slot="{ errors, invalid, validated }">
+							<q-input
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Initiative bonus"
+								autocomplete="off"
+								type="number"
+								v-model.number="npc.initiative"
+								@input="parseToInt($event, npc, 'initiative')"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							>
+								<template #append>
+									<hk-popover header="Initiative bonus">
+										<q-icon name="info" size="xs" class="blue" />
+										<template #content>
+											Overrides the initiative bonus, shown on 5.5e (2024) stat blocks.<br/>
+											When left empty the dexterity modifier is used.
+										</template>
+									</hk-popover>
+								</template>
+							</q-input>
+						</ValidationProvider>
+					</div>
+				</div>
 				<div class="row q-col-gutter-md mb-3" v-for="(ability, index) in abilities" :key="index">
 					<div class="col-4 col-md-3">
 						<ValidationProvider rules="required|between:0,99" :name="ability.capitalize()" v-slot="{ errors, invalid, validated }">

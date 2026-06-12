@@ -60,17 +60,7 @@
             </ValidationProvider>
           </div>
           <div class="col-3">
-            <q-select
-              :dark="$store.getters.theme === 'dark'"
-              filled
-              square
-              clearable
-              emit-value
-              map-options
-              label="Edition"
-              v-model="npc.edition"
-              :options="edition_options"
-            />
+            <hk-edition-select v-model="npc.edition" />
           </div>
         </div>
 
@@ -527,7 +517,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
-import { languages, editions } from "src/utils/generalConstants";
+import { languages } from "src/utils/generalConstants";
 import { campaignGroupKey } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster.js";
 
@@ -538,7 +528,6 @@ export default {
   data() {
     return {
       languages: languages,
-      edition_options: editions,
       avatar_dialog: false,
       preview_new_upload: undefined,
     };

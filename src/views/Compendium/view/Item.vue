@@ -73,7 +73,7 @@
 		},
 		meta() {
 			return {
-				title: this.item?.meta?.title,
+				title: this.compendium_edition_text(this.item?.meta?.title),
 				meta: this.generate_compendium_meta(this.item?.meta)
 			}
 		},

@@ -75,7 +75,7 @@
 		},
 		meta() {
 			return {
-				title: this.condition.meta.title,
+				title: this.compendium_edition_text(this.condition.meta.title),
 				meta: this.generate_compendium_meta(this.condition.meta)
 			}
 		},

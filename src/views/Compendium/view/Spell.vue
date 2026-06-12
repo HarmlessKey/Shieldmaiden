@@ -78,7 +78,7 @@
 		},
 		meta() {
 			return {
-				title: this.spell.meta.title,
+				title: this.compendium_edition_text(this.spell.meta.title),
 				meta: this.generate_compendium_meta(this.spell.meta)
 			}
 		},

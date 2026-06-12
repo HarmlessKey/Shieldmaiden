@@ -76,7 +76,7 @@ export default {
 	},
 	meta() {
 		return {
-			title: this.monster.meta.title,
+			title: this.compendium_edition_text(this.monster.meta.title),
 			meta: this.generate_compendium_meta(this.monster.meta),
 		};
 	},

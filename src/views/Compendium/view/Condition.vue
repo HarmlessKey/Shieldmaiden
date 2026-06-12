@@ -5,13 +5,19 @@
 				<h1>
 					<i aria-hidden="true" :class="`hki-${condition.name.toLowerCase()}`" />
 					{{ condition.name }}
+					<span v-if="!not_found" class="neutral-2">{{ editionLabel }}</span>
 				</h1>
-				<hk-share 
-					v-if="!not_found" 
-					:title="condition.meta.title" 
-					:text="condition.meta.description" 
-					size="sm"
-				/>
+				<div class="flex items-center gap-1">
+					<router-link v-if="!not_found" class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+						Show for {{ otherEdition.label }}
+					</router-link>
+					<hk-share
+						v-if="!not_found"
+						:title="condition.meta.title"
+						:text="condition.meta.description"
+						size="sm"
+					/>
+				</div>
 			</div>
 			<div class="card-body">
 				<template v-if="not_found">
@@ -31,6 +37,7 @@
 	import Condition from "src/components/compendium/Condition";
 	import { mapGetters } from 'vuex';
 	import { metaCompendium } from 'src/mixins/metaCompendium';
+	import { otherEdition } from 'src/utils/generalFunctions';
 
 	export default {
 		name: 'ViewCondition',
@@ -58,6 +65,12 @@
 			},
 			listPath() {
 				return this.$route.params.edition ? `/compendium/conditions/${this.$route.params.edition}` : "/compendium/conditions";
+			},
+			otherEdition() {
+				return otherEdition(this.$route);
+			},
+			editionLabel() {
+				return this.$route.params.edition || "5e";
 			}
 		},
 		meta() {

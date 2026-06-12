@@ -1,19 +1,23 @@
 <template>
 	<hk-card>
 		<div slot="header" class="card-header">
-			<h1><i aria-hidden="true" class="fas fa-wand-magic"></i> Spells</h1>
+			<h1>
+				<i aria-hidden="true" class="fas fa-wand-magic"></i> Spells
+				<span class="neutral-2">{{ editionLabel }}</span>
+			</h1>
 			<span class="neutral-3">
 				Resource
-				<a
-					class="btn btn-sm btn-clear"
-					href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
-					target="_blank"
-					rel="noopener"
-					>SRD 5.1</a
-				>
+				<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
+					resource.label
+				}}</a>
 			</span>
 		</div>
 		<div class="card-body">
+			<p>
+				<router-link class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+					Show Spells for {{ otherEdition.label }}
+				</router-link>
+			</p>
 			<q-input
 				:dark="$store.getters.theme !== 'light'"
 				v-model="search"
@@ -62,7 +66,12 @@
 
 				<template v-slot:header="props">
 					<q-tr :props="props">
-						<q-th v-for="col in props.cols" :key="col.name" :props="props" :auto-width="col.name !== 'name'">
+						<q-th
+							v-for="col in props.cols"
+							:key="col.name"
+							:props="props"
+							:auto-width="col.name !== 'name'"
+						>
 							{{ col.label }}
 						</q-th>
 						<q-th auto-width />
@@ -72,7 +81,12 @@
 				<!-- Body -->
 				<template v-slot:body="props">
 					<q-tr :props="props">
-						<q-td v-for="col in props.cols" :key="col.name" :props="props" :auto-width="col.name !== 'name'">
+						<q-td
+							v-for="col in props.cols"
+							:key="col.name"
+							:props="props"
+							:auto-width="col.name !== 'name'"
+						>
 							<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
 								{{ col.value }}
 							</router-link>
@@ -118,6 +132,7 @@
 
 <script>
 import ViewSpell from "src/components/compendium/Spell.vue";
+import { otherEdition } from "src/utils/generalFunctions";
 import { mapActions } from "vuex";
 
 export default {
@@ -169,6 +184,25 @@ export default {
 			loading: true,
 		};
 	},
+	computed: {
+		resource() {
+			return this.$route.params.edition === "5.5e"
+				? {
+						label: "SRD 5.2",
+						url: "https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.pdf",
+					}
+				: {
+						label: "SRD 5.1",
+						url: "https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf",
+					};
+		},
+		editionLabel() {
+			return this.$route.params.edition || "5e";
+		},
+		otherEdition() {
+			return otherEdition(this.$route);
+		},
+	},
 	methods: {
 		...mapActions("api_spells", ["fetch_api_spells"]),
 		filterSpells() {
@@ -177,7 +211,7 @@ export default {
 			this.pagination.page = 1;
 			this.query = {
 				search: this.search,
-				...this.filter
+				...this.filter,
 			};
 			this.fetchSpells();
 		},
@@ -185,7 +219,7 @@ export default {
 			this.filter_dialog = false;
 			this.filterSpells();
 		},
-		
+
 		clearFilter() {
 			this.filter_dialog = false;
 			this.$set(this, "filter", {});

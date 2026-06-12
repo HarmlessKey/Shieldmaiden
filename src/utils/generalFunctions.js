@@ -52,6 +52,32 @@ export function calc_skill_mod(
 	return parseInt(mod) + parseInt(bonus);
 }
 
+/**
+ * Returns the label and path to view the current compendium page in the other edition (5e <-> 5.5e)
+ *
+ * @param {import("vue-router").Route} route
+ * @returns {{ label: string, to: string }}
+ */
+export function otherEdition(route) {
+	const isCurrently55 = route.params.edition === "5.5e";
+	const base = route.path.replace(/\/5\.5e(?=\/|$)/, "");
+
+	let to;
+	if (isCurrently55) {
+		to = base;
+	} else if (route.params.id) {
+		const idIndex = base.lastIndexOf(`/${route.params.id}`);
+		to = `${base.slice(0, idIndex)}/5.5e${base.slice(idIndex)}`;
+	} else {
+		to = `${base}/5.5e`;
+	}
+
+	return {
+		label: isCurrently55 ? "5e" : "5.5e",
+		to,
+	};
+}
+
 export function displayCR(cr) {
 	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
 }

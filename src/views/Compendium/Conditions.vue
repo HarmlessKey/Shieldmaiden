@@ -1,22 +1,35 @@
 <template>
 	<hk-card>
 		<div slot="header" class="card-header">
-			<h1><i aria-hidden="true" class="fas fa-flame mr-1"></i> Conditions</h1>
+			<h1>
+				<i aria-hidden="true" class="fas fa-flame mr-1"></i> Conditions
+				<span class="neutral-2">{{ editionLabel }}</span>
+			</h1>
 			<span class="neutral-3">
-				Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+				Resource
+				<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
+					resource.label
+				}}</a>
 			</span>
 		</div>
 		<div class="card-body">
-			<q-input 
-				:dark="$store.getters.theme !== 'light'" 
+			<p>
+				<router-link class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+					Show Conditions for {{ otherEdition.label }}
+				</router-link>
+			</p>
+			<q-input
+				:dark="$store.getters.theme !== 'light'"
 				v-model="search"
-				borderless 
-				filled square
-				debounce="300" 
+				borderless
+				filled
+				square
+				debounce="300"
 				clearable
 				placeholder="Search"
 				@keyup.enter="filter()"
-				@clear="filter()">
+				@clear="filter()"
+			>
 				<q-icon slot="append" name="search" />
 				<button slot="after" class="btn" @click="filter()">Search</button>
 			</q-input>
@@ -36,14 +49,10 @@
 			>
 				<div slot="no-data" />
 				<hk-loader slot="loading" name="conditions" />
-				
+
 				<template v-slot:header="props">
 					<q-tr :props="props">
-						<q-th
-							v-for="col in props.cols"
-							:key="col.name"
-							:props="props"
-							>
+						<q-th v-for="col in props.cols" :key="col.name" :props="props">
 							{{ col.label }}
 						</q-th>
 						<q-th auto-width />
@@ -53,19 +62,19 @@
 				<!-- Body -->
 				<template v-slot:body="props">
 					<q-tr :props="props">
-						<q-td
-							v-for="col in props.cols"
-							:key="col.name"
-							:props="props"
-							>
+						<q-td v-for="col in props.cols" :key="col.name" :props="props">
 							<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
 								{{ col.value }}
 							</router-link>
 							<template v-else>{{ col.value }}</template>
 						</q-td>
 						<q-td auto-width>
-							<a  @click="props.expand = !props.expand" class="neutral-2">
-								<i aria-hidden="true" class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+							<a @click="props.expand = !props.expand" class="neutral-2">
+								<i
+									aria-hidden="true"
+									class="fas"
+									:class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'"
+								/>
 							</a>
 						</q-td>
 					</q-tr>
@@ -81,72 +90,92 @@
 </template>
 
 <script>
-	import ViewCondition from 'src/components/compendium/Condition.vue';
-	import { mapActions } from "vuex";
+import ViewCondition from "src/components/compendium/Condition.vue";
+import { otherEdition } from "src/utils/generalFunctions";
+import { mapActions } from "vuex";
 
-	export default {
-		name: 'Conditions',
-		components: {
-			ViewCondition
-		},
-		data() {
-			return {
-				conditions: [],
-				search: "",
-				query: null,
-				pagination: {
-					sortBy: "name",
-					descending: false,
-					page: 1,
-					rowsPerPage: 15,
-					rowsNumber: 0
+export default {
+	name: "Conditions",
+	components: {
+		ViewCondition,
+	},
+	data() {
+		return {
+			conditions: [],
+			search: "",
+			query: null,
+			pagination: {
+				sortBy: "name",
+				descending: false,
+				page: 1,
+				rowsPerPage: 15,
+				rowsNumber: 0,
+			},
+			columns: [
+				{
+					name: "name",
+					label: "Name",
+					field: "name",
+					sortable: true,
+					align: "left",
+					classes: "truncate-cell",
+					format: (val) => val.capitalizeEach(),
 				},
-				columns: [
-					{
-						name: "name",
-						label: "Name",
-						field: "name",
-						sortable: true,
-						align: "left",
-						classes: "truncate-cell",
-						format: val => val.capitalizeEach()
+			],
+			loading: true,
+		};
+	},
+	computed: {
+		resource() {
+			return this.$route.params.edition === "5.5e"
+				? {
+						label: "SRD 5.2",
+						url: "https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.pdf",
 					}
-				],
-				loading: true
-			}
+				: {
+						label: "SRD 5.1",
+						url: "https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf",
+					};
 		},
-		methods: {
-			...mapActions("api_conditions", ["fetch_conditions"]),
-			filter() {
-				this.loading = true;
-				this.conditions = [];
-				this.pagination.page = 1;
-				this.query = {
-					search: this.search
-				}
-				this.fetchConditions();
-			},
-			request(req) {
-				this.pagination = req.pagination;
-				this.fetchConditions();		
-			},
-			async fetchConditions() {
-				await this.fetch_conditions({
-					pageNumber: this.pagination.page,
-					pageSize: this.pagination.rowsPerPage,
-					query: this.query,
-					fields: ["name", "url"],
-					sortBy: this.pagination.sortBy,
-					descending: this.pagination.descending
-				}).then(result => {
-					this.pagination.rowsNumber = result.meta.count;
-					this.conditions = result.results;
-					this.loading = false;
-				});
-			}
+		editionLabel() {
+			return this.$route.params.edition || "5e";
 		},
-		async mounted() {
-			await this.fetchConditions();
-		}
-	}
+		otherEdition() {
+			return otherEdition(this.$route);
+		},
+	},
+	methods: {
+		...mapActions("api_conditions", ["fetch_conditions"]),
+		filter() {
+			this.loading = true;
+			this.conditions = [];
+			this.pagination.page = 1;
+			this.query = {
+				search: this.search,
+			};
+			this.fetchConditions();
+		},
+		request(req) {
+			this.pagination = req.pagination;
+			this.fetchConditions();
+		},
+		async fetchConditions() {
+			await this.fetch_conditions({
+				pageNumber: this.pagination.page,
+				pageSize: this.pagination.rowsPerPage,
+				query: this.query,
+				fields: ["name", "url"],
+				sortBy: this.pagination.sortBy,
+				descending: this.pagination.descending,
+			}).then((result) => {
+				this.pagination.rowsNumber = result.meta.count;
+				this.conditions = result.results;
+				this.loading = false;
+			});
+		},
+	},
+	async mounted() {
+		await this.fetchConditions();
+	},
+};
 </script>

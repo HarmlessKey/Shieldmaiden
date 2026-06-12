@@ -1,13 +1,21 @@
 <template>
 	<hk-card>
 		<div slot="header" class="card-header">
-			<h1>{{ !rule ? "Rule not found" : rule.name }}</h1>
-			<hk-share 
-				v-if="!!rule" 
-				:title="rule.name"
-				:text="rule.description"
-				size="sm"
-			/>
+			<h1>
+				{{ !rule ? "Rule not found" : rule.name }}
+				<span v-if="!!rule" class="neutral-2">{{ editionLabel }}</span>
+			</h1>
+			<div class="flex items-center gap-1">
+				<router-link v-if="!!rule" class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+					Show for {{ otherEdition.label }}
+				</router-link>
+				<hk-share
+					v-if="!!rule"
+					:title="rule.name"
+					:text="rule.description"
+					size="sm"
+				/>
+			</div>
 		</div>
 		<div class="card-body">
 			<div v-if="!rule">
@@ -28,6 +36,7 @@
 <script>
 	import { rules } from "src/utils/generalConstants";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
+	import { otherEdition } from 'src/utils/generalFunctions';
 
 	export default {
 		name: "ViewRule",
@@ -45,6 +54,12 @@
 			},
 			listPath() {
 				return this.$route.params.edition ? `/compendium/rules/${this.$route.params.edition}` : "/compendium/rules";
+			},
+			otherEdition() {
+				return otherEdition(this.$route);
+			},
+			editionLabel() {
+				return this.$route.params.edition || "5e";
 			}
 		},
 		meta() {

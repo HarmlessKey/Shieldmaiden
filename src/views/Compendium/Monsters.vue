@@ -4,7 +4,7 @@
 			<h1>
 				<i class="fas fa-dragon mr-1" aria-hidden="true" />
 				{{ source?.capitalize() }}
-				Monsters
+				Monsters <span class="neutral-2">{{ editionLabel }}</span>
 			</h1>
 			<span v-if="source === 'homebrew'" class="neutral-3">
 				Instagram
@@ -19,16 +19,17 @@
 			</span>
 			<span v-else class="neutral-3">
 				Resource
-				<a
-					class="btn btn-sm btn-clear"
-					href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
-					target="_blank"
-					rel="noopener"
-					>SRD 5.1</a
-				>
+				<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
+					resource.label
+				}}</a>
 			</span>
 		</div>
 		<div class="card-body">
+			<p v-if="source !== 'homebrew'">
+				<router-link class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+					Show Monsters for {{ otherEdition.label }}
+				</router-link>
+			</p>
 			<q-input
 				:dark="$store.getters.theme !== 'light'"
 				v-model="search"
@@ -172,6 +173,7 @@
 <script>
 import ViewMonster from "src/components/compendium/Monster.vue";
 import { monsterMixin } from "src/mixins/monster.js";
+import { otherEdition } from "src/utils/generalFunctions";
 import { mapActions } from "vuex";
 import _ from "lodash";
 
@@ -275,6 +277,23 @@ export default {
 			return this.monster_types.map((type) => {
 				return { label: type, value: type };
 			});
+		},
+		resource() {
+			return this.$route.params.edition === "5.5e"
+				? {
+						label: "SRD 5.2",
+						url: "https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.pdf",
+					}
+				: {
+						label: "SRD 5.1",
+						url: "https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf",
+					};
+		},
+		editionLabel() {
+			return this.$route.params.edition || "5e";
+		},
+		otherEdition() {
+			return otherEdition(this.$route);
 		},
 		visibleColumns() {
 			switch (true) {

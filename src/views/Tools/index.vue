@@ -1,7 +1,7 @@
 <template>
 	<hk-card>
 		<div class="card-header" slot="header">
-			<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D 5e Tools</h1>
+			<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D Tools</h1>
 		</div>
 		<div class="card-body">
 			<template v-for="(group, i) in tools">
@@ -67,7 +67,7 @@ export default {
 		return {
 			tools: [
 				{
-					title: "D&D Tools by Shieldmaiden",
+					title: "D&D Tools by Shieldmaiden for 5e and 5.5e",
 					tools: {
 						"combat-tracker": {
 							title: "Combat Tracker",

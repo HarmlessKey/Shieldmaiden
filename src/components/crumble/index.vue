@@ -30,7 +30,7 @@ export default {
 					breadcrumbArray.push({
 						path: path,
 						to: breadcrumbArray[i - 1] ? breadcrumbArray[i - 1].to + "/" + path : "/" + path,
-						name: this.$route.matched[i] ? this.$route.matched[i].meta.title || path : path,
+						name: this.$route.matched[i] ? this.$route.matched[i].meta.crumb || this.$route.matched[i].meta.title || path : path,
 					});
 				}
 				return breadcrumbArray;
@@ -57,7 +57,7 @@ export default {
 				{
 					path: "compendium",
 					to: "/compendium",
-					name: this.$route.matched[0]?.meta.title || "Compendium",
+					name: this.$route.matched[0]?.meta.crumb || this.$route.matched[0]?.meta.title || "Compendium",
 				},
 				{
 					path: section,
@@ -70,7 +70,7 @@ export default {
 				breadcrumbs.push({
 					path: id,
 					to: this.$route.path,
-					name: this.last_route || this.$route.meta.title || id,
+					name: this.last_route || this.$route.meta.crumb || this.$route.meta.title || id,
 				});
 			} else if (this.last_route) {
 				breadcrumbs.at(-1).name = this.last_route;

@@ -617,6 +617,7 @@ const routes = [
 				name: "ToolsCombatTracker",
 				component: () => import("src/views/Tools/CombatTracker"),
 				meta: {
+					crumb: "Combat Tracker",
 					title: "D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
 					description:
 						"Get a grip on tracking combat as a D&D DM with Shieldmaiden Combat Tracker. You can keep track of initiative, health, status effects, concentration spells, and much more. Use for free now! ",
@@ -630,6 +631,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Encounter Builder",
 					title: "D&D Encounter Builder - Build and manage encounters for D&D 5e and 5.5e",
 					description:
 						"Build and manage your D&D 5e and 5.5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
@@ -640,6 +642,7 @@ const routes = [
 						name: "ToolsEncounterBuilder",
 						component: () => import("src/views/Tools/EncounterBuilder"),
 						meta: {
+							crumb: "Encounter Builder",
 							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e and 5.5e",
 							description:
 								"Build and manage your D&D 5e and 5.5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
@@ -650,6 +653,7 @@ const routes = [
 						name: "ToolsBuildEncounter",
 						component: () => import("src/components/encounters"),
 						meta: {
+							crumb: "Build Encounter",
 							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e and 5.5e",
 							description:
 								"Build and manage your D&D 5e and 5.5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now! ",
@@ -666,6 +670,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "DM Screen",
 					title: "D&D 5e and 5.5e DM Screen",
 					description:
 						"A DM Screen for D&D 5e and 5.5e. Quickly reference rules and directly run encounters.",
@@ -691,6 +696,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Monster Creator",
 					title: "D&D Monster Creator - Create custom monsters for D&D 5e and 5.5e",
 					description:
 						"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
@@ -725,6 +731,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Spell Creator",
 					title: "D&D Spell Creator - Create custom spells for D&D 5e and 5.5e",
 					description:
 						"Create spells for D&D 5e and 5.5e to roll directly or use in your custom spellcaster monsters.",
@@ -811,6 +818,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Monsters",
 					title: "Monsters D&D 5e",
 					description: "D&D 5e monsters for your encounters. Includes monsters from SRD 5.1.",
 				},
@@ -847,6 +855,7 @@ const routes = [
 						name: "Monster",
 						component: () => import("src/views/Compendium/view/Monster"),
 						meta: {
+							crumb: "Monster",
 							title: "Monster D&D 5e",
 							description: "D&D 5e monster from SRD 5.1.",
 						},
@@ -861,6 +870,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Spells",
 					title: "Spells D&D 5e",
 					description: "D&D 5e spells for your campaign. Includes spells from SRD 5.1.",
 				},
@@ -897,6 +907,7 @@ const routes = [
 						name: "Spell",
 						component: () => import("src/views/Compendium/view/Spell"),
 						meta: {
+							crumb: "Spell",
 							title: "Spell D&D 5e",
 							description: "D&D 5e spell from SRD 5.1.",
 						},
@@ -911,6 +922,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Conditions",
 					title: "Conditions D&D 5e",
 					description:
 						"D&D 5e conditions for quick rules reference. Includes conditions from SRD 5.1.",
@@ -950,6 +962,7 @@ const routes = [
 						name: "Condition",
 						component: () => import("src/views/Compendium/view/Condition"),
 						meta: {
+							crumb: "Condition",
 							title: "Condition D&D 5e",
 							description: "D&D 5e condition from SRD 5.1.",
 						},
@@ -964,6 +977,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Items",
 					title: "Items D&D 5e",
 					description: "D&D 5e items for your campaign. Includes items from SRD 5.1.",
 				},
@@ -1000,6 +1014,7 @@ const routes = [
 						name: "Item",
 						component: () => import("src/views/Compendium/view/Item"),
 						meta: {
+							crumb: "Item",
 							title: "Item D&D 5e",
 							description: "D&D 5e item from SRD 5.1.",
 						},
@@ -1014,6 +1029,7 @@ const routes = [
 					},
 				},
 				meta: {
+					crumb: "Rules",
 					title: "Rules D&D 5e",
 					description: "Rules reference for playing D&D 5e. Includes rules from SRD 5.1.",
 				},
@@ -1050,6 +1066,7 @@ const routes = [
 						name: "Rule",
 						component: () => import("src/views/Compendium/view/Rule"),
 						meta: {
+							crumb: "Rule",
 							title: "Rule D&D 5e",
 							description: "D&D 5e rule from SRD 5.1.",
 						},
@@ -1080,6 +1097,7 @@ const routes = [
 				name: "HomebrewMonster",
 				component: () => import("src/views/Compendium/view/HomebrewMonster"),
 				meta: {
+					crumb: "Monster",
 					title: "Homebrew Monster D&D 5e and 5.5e",
 					description: "D&D 5e and 5.5e monster created by Shieldmaiden.",
 				},

@@ -71,6 +71,7 @@
 
 							<div class="card-body">
 								<div class="neutral-4 mb-2">
+									{{ campaign.edition === "2024" ? "5.5e" : "5e" }} &bull;
 									{{ campaign.advancement !== "milestone" ? "Experience" : "Milestone" }}
 									advancement
 								</div>
@@ -170,6 +171,17 @@
 							square
 							map-options
 							emit-value
+							label="Edition"
+							class="mt-2"
+							v-model="edition"
+							:options="edition_options"
+						/>
+						<q-select
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							map-options
+							emit-value
 							label="Advancement"
 							class="mt-2"
 							v-model="advancement"
@@ -218,6 +230,17 @@
 								square
 								emit-value
 								map-options
+								label="Edition"
+								class="mt-2"
+								v-model="edition"
+								:options="edition_options"
+							/>
+							<q-select
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								emit-value
+								map-options
 								label="Advancement"
 								class="mt-2"
 								v-model="advancement"
@@ -249,6 +272,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { general } from "src/mixins/general.js";
+import { editions } from "src/utils/generalConstants";
 import EditCampaign from "./EditCampaign";
 import AddPlayers from "src/components/campaign/AddPlayers";
 import ContentHeader from "src/components/userContent/ContentHeader";
@@ -289,6 +313,8 @@ export default {
 					label: "Milestone",
 				},
 			],
+			edition: "2024",
+			edition_options: editions,
 		};
 	},
 	async mounted() {
@@ -317,6 +343,7 @@ export default {
 				const campaign = {
 					name: this.newCampaign,
 					advancement: this.advancement,
+					edition: this.edition,
 					timestamp: Date.now(),
 				};
 

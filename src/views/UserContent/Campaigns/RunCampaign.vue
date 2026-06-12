@@ -203,6 +203,30 @@
 		<q-dialog v-if="!overencumbered" v-model="add_players_dialog">
 			<AddPlayers :campaign="search_campaign" @campaign-players="updatePlayers" />
 		</q-dialog>
+
+		<!-- Campaign edition dialog -->
+		<q-dialog v-model="edition_dialog" persistent>
+			<hk-card header="Which edition does this campaign use?" class="mb-0">
+				<div class="card-body">
+					<p>
+						This campaign was created before edition support was added. Select the edition this
+						campaign uses, it determines which rules and content are shown by default. You can
+						always change this later when editing the campaign.
+					</p>
+					<div class="d-flex justify-content-between gap-1">
+						<button
+							v-for="{ value, label } in edition_options"
+							:key="value"
+							class="btn btn-block"
+							:class="value === '2024' ? 'bg-green' : 'bg-neutral-5'"
+							@click="setEdition(value)"
+						>
+							{{ label }}
+						</button>
+					</div>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -213,6 +237,7 @@ import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
 import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { editions } from "src/utils/generalConstants";
 import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
@@ -241,6 +266,8 @@ export default {
 			players: {},
 			search_campaign: {},
 			add_players_dialog: false,
+			edition_dialog: false,
+			edition_options: editions,
 			mobile_tab: "encounters",
 			mobile_tabs: [
 				{
@@ -311,6 +338,11 @@ export default {
 					this.search_campaign[prop] = this.campaign[prop];
 				}
 			}
+
+			// Campaigns from before edition support: ask the user which edition is used
+			if (!this.campaign.edition) {
+				this.edition_dialog = true;
+			}
 		});
 		this.set_active_campaign(this.campaignId);
 	},
@@ -347,8 +379,13 @@ export default {
 	},
 	methods: {
 		...mapActions(["setDrawer"]),
-		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
+		...mapActions("campaigns", ["get_campaign", "set_active_campaign", "set_campaign_prop"]),
 		...mapActions("players", ["get_player"]),
+		async setEdition(edition) {
+			await this.set_campaign_prop({ id: this.campaignId, property: "edition", value: edition });
+			this.$set(this.campaign, "edition", edition);
+			this.edition_dialog = false;
+		},
 		setSize(size) {
 			this.container = size;
 		},

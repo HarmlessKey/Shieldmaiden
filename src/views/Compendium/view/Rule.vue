@@ -12,13 +12,15 @@
 		<div class="card-body">
 			<div v-if="!rule">
 				<p>Could not find rule <strong>{{ id }}</strong></p>
-				<router-link to="/compendium/rules" class="btn bg-neutral-5">
+				<router-link :to="listPath" class="btn bg-neutral-5">
 					Find rules
 				</router-link>
 			</div>
-			<div class="caption">{{ rule.caption }}</div>
-			<hk-markdown-editor :value="rule.description" read-only />
-			<span class="neutral-2">{{ rule.src }}</span>
+			<template v-else>
+				<div class="caption">{{ rule.caption }}</div>
+				<hk-markdown-editor :value="rule.description" read-only />
+				<span class="neutral-2">{{ rule.src }}</span>
+			</template>
 		</div>
 	</hk-card>
 </template>
@@ -40,6 +42,9 @@
 		computed: {
 			rule() {
 				return rules?.find(rule => rule.url === this.id);
+			},
+			listPath() {
+				return this.$route.params.edition ? `/compendium/rules/${this.$route.params.edition}` : "/compendium/rules";
 			}
 		},
 		meta() {

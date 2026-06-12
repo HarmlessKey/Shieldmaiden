@@ -21,7 +21,7 @@
 			<div class="card-body">
 				<template v-if="not_found">
 					<p>Could not find spell <strong>{{ id }}</strong></p>
-					<router-link to="/compendium/spells" class="btn bg-neutral-5">
+					<router-link :to="listPath" class="btn bg-neutral-5">
 						Find spells
 					</router-link>
 				</template>
@@ -60,6 +60,9 @@
 			...mapGetters("api_spells", ["get_api_spell"]),
 			spell() {
 				return this.get_api_spell(this.id);
+			},
+			listPath() {
+				return this.$route.params.edition ? `/compendium/spells/${this.$route.params.edition}` : "/compendium/spells";
 			}
 		},
 		meta() {

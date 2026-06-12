@@ -829,6 +829,25 @@ const routes = [
 						},
 					},
 					{
+						path: ":edition(5\\.5e)",
+						name: "Monsters5.5e",
+						component: () => import("src/views/Compendium/Monsters"),
+						meta: {
+							title: "Monsters D&D 5.5e",
+							description:
+								"D&D 5.5e monsters for your encounters. Includes monsters from the SRD 5.1.",
+						},
+					},
+					{
+						path: ":edition(5\\.5e)/:id",
+						name: "Monster5.5e",
+						component: () => import("src/views/Compendium/view/Monster"),
+						meta: {
+							title: "Monster D&D 5.5e",
+							description: "D&D 5.5e monster.",
+						},
+					},
+					{
 						path: ":id",
 						name: "Monster",
 						component: () => import("src/views/Compendium/view/Monster"),
@@ -858,6 +877,24 @@ const routes = [
 							title: "Spells D&D 5e and 5.5e",
 							description:
 								"D&D 5e and 5.5e spells for your campaign. Includes spells from the SRD 5.1.",
+						},
+					},
+					{
+						path: ":edition(5\\.5e)",
+						name: "Spells5.5e",
+						component: () => import("src/views/Compendium/Spells"),
+						meta: {
+							title: "Spells D&D 5.5e",
+							description:
+								"D&D 5.5e spells for your campaign. Includes spells from the SRD 5.1.",
+						},
+					},
+					{
+						path: ":edition(5\\.5e)/:id",
+						name: "Spell5.5e",
+						component: () => import("src/views/Compendium/view/Spell"),
+						meta: {
+							title: "Spell D&D 5.5e",
 						},
 					},
 					{
@@ -892,6 +929,24 @@ const routes = [
 						},
 					},
 					{
+						path: ":edition(5\\.5e)",
+						name: "Conditions5.5e",
+						component: () => import("src/views/Compendium/Conditions"),
+						meta: {
+							title: "Conditions D&D 5.5e",
+							description:
+								"D&D 5.5e conditions for quick rules reference. Includes conditions from the SRD 5.1.",
+						},
+					},
+					{
+						path: ":edition(5\\.5e)/:id",
+						name: "Condition5.5e",
+						component: () => import("src/views/Compendium/view/Condition"),
+						meta: {
+							title: "Condition D&D 5.5e",
+						},
+					},
+					{
 						path: ":id",
 						name: "Condition",
 						component: () => import("src/views/Compendium/view/Condition"),
@@ -923,6 +978,24 @@ const routes = [
 						},
 					},
 					{
+						path: ":edition(5\\.5e)",
+						name: "CompendiumItems5.5e",
+						component: () => import("src/views/Compendium/Items"),
+						meta: {
+							title: "Items D&D 5.5e",
+							description:
+								"D&D 5.5e items for your campaign. Includes items from the SRD 5.1.",
+						},
+					},
+					{
+						path: ":edition(5\\.5e)/:id",
+						name: "Item5.5e",
+						component: () => import("src/views/Compendium/view/Item"),
+						meta: {
+							title: "Item D&D 5.5e",
+						},
+					},
+					{
 						path: ":id",
 						name: "Item",
 						component: () => import("src/views/Compendium/view/Item"),
@@ -950,6 +1023,23 @@ const routes = [
 						meta: {
 							title: "Rules D&D 5e and 5.5e",
 							description: "Rules reference for playing D&D 5e and 5.5e.",
+						},
+					},
+					{
+						path: ":edition(5\\.5e)",
+						name: "CompendiumRules5.5e",
+						component: () => import("src/views/Compendium/Rules"),
+						meta: {
+							title: "Rules D&D 5.5e",
+							description: "Rules reference for playing D&D 5.5e.",
+						},
+					},
+					{
+						path: ":edition(5\\.5e)/:id",
+						name: "Rule5.5e",
+						component: () => import("src/views/Compendium/view/Rule"),
+						meta: {
+							title: "Rule D&D 5.5e",
 						},
 					},
 					{

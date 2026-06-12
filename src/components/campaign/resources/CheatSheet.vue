@@ -26,7 +26,7 @@
 			>
 				<template v-slot:header>
 					<q-item-section>
-						<router-link v-if="compendium" :to="`/compendium/rules/${url}`" stop.prevent>
+						<router-link v-if="compendium" :to="`${compendiumRulesPath}/${url}`" stop.prevent>
 							{{ name }}
 						</router-link>
 						<template v-else>{{ name }}</template>
@@ -103,6 +103,9 @@ export default {
 				return this.cheatSheet.filter((item) => item.type === this.tab_type);
 			}
 			return this.cheatSheet;
+		},
+		compendiumRulesPath() {
+			return this.$route.params.edition ? `/compendium/rules/${this.$route.params.edition}` : "/compendium/rules";
 		},
 	},
 };

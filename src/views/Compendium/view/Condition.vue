@@ -16,7 +16,7 @@
 			<div class="card-body">
 				<template v-if="not_found">
 					<p>Could not find condition <strong>{{ id }}</strong></p>
-					<router-link to="/compendium/conditions" class="btn bg-neutral-5">
+					<router-link :to="listPath" class="btn bg-neutral-5">
 						Find conditions
 					</router-link>
 				</template>
@@ -55,6 +55,9 @@
 			...mapGetters("api_conditions", ["get_condition"]),
 			condition() {
 				return this.get_condition(this.id);
+			},
+			listPath() {
+				return this.$route.params.edition ? `/compendium/conditions/${this.$route.params.edition}` : "/compendium/conditions";
 			}
 		},
 		meta() {

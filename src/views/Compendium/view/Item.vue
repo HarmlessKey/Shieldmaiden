@@ -13,7 +13,7 @@
 			<div class="card-body">
 				<div v-if="not_found">
 					<p>Could not find item <strong>{{ id }}</strong></p>
-					<router-link to="/compendium/items" class="btn bg-neutral-5">
+					<router-link :to="listPath" class="btn bg-neutral-5">
 						Find items
 					</router-link>
 				</div>
@@ -51,6 +51,9 @@
 			...mapGetters("api_items", ["get_api_item"]),
 			item() {
 				return this.get_api_item(this.id)
+			},
+			listPath() {
+				return this.$route.params.edition ? `/compendium/items/${this.$route.params.edition}` : "/compendium/items";
 			}
 		},
 		meta() {

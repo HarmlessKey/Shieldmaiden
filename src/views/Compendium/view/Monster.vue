@@ -23,7 +23,7 @@
 				<p>
 					Could not find monster <strong>{{ id }}</strong>
 				</p>
-				<router-link to="/compendium/monsters" class="btn bg-neutral-5">
+				<router-link :to="listPath" class="btn bg-neutral-5">
 					Find monsters
 				</router-link>
 			</div>
@@ -58,6 +58,9 @@ export default {
 		...mapGetters("api_monsters", ["get_monster"]),
 		monster() {
 			return this.get_monster(this.id);
+		},
+		listPath() {
+			return this.$route.params.edition ? `/compendium/monsters/${this.$route.params.edition}` : "/compendium/monsters";
 		},
 	},
 	meta() {

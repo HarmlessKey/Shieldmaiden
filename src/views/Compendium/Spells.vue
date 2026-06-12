@@ -62,34 +62,30 @@
 
 				<template v-slot:header="props">
 					<q-tr :props="props">
-						<q-th auto-width />
-						<q-th v-for="col in props.cols" :key="col.name" :props="props">
+						<q-th v-for="col in props.cols" :key="col.name" :props="props" :auto-width="col.name !== 'name'">
 							{{ col.label }}
 						</q-th>
+						<q-th auto-width />
 					</q-tr>
 				</template>
 
 				<!-- Body -->
 				<template v-slot:body="props">
 					<q-tr :props="props">
-						<q-td auto-width>
-							<a @click="props.expand = !props.expand">
+						<q-td v-for="col in props.cols" :key="col.name" :props="props" :auto-width="col.name !== 'name'">
+							<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
+								{{ col.value }}
+							</router-link>
+							<template v-else>{{ col.value }}</template>
+						</q-td>
+						<q-td auto-width class="text-center">
+							<a @click="props.expand = !props.expand" class="neutral-2">
 								<i
 									aria-hidden="true"
 									class="fas"
 									:class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'"
 								/>
 							</a>
-						</q-td>
-						<q-td v-for="col in props.cols" :key="col.name" :props="props">
-							<div class="truncate-cell">
-								<div class="truncate">
-									<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.row.url}`">
-										{{ col.value }}
-									</router-link>
-									<template v-else>{{ col.value }}</template>
-								</div>
-							</div>
 						</q-td>
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
@@ -103,30 +99,7 @@
 		<q-dialog v-model="filter_dialog">
 			<hk-card header="Filter spells" :min-width="300">
 				<div class="card-body">
-					<q-select
-						:dark="$store.getters.theme !== 'light'"
-						filled
-						square
-						class="mb-3"
-						label="Type"
-						v-model="schools"
-						use-chips
-						multiple
-						clearable
-						:options="spell_schools"
-					>
-					</q-select>
-
-					<!-- Level -->
-					<strong class="block mb-5">Level</strong>
-					<q-range
-						v-model="levels"
-						label-always
-						:min="0"
-						:max="9"
-						:left-label-value="minLevelMarker"
-						:right-label-value="maxLevelMarker"
-					/>
+					<hk-filter v-model="filter" type="spell" />
 				</div>
 				<div slot="footer" class="card-footer">
 					<button class="btn bg-neutral-5" @click="clearFilter">
@@ -146,9 +119,6 @@
 <script>
 import ViewSpell from "src/components/compendium/Spell.vue";
 import { mapActions } from "vuex";
-import { spell_schools } from "src/utils/spellConstants";
-import _ from "lodash";
-import numeral from "numeral";
 
 export default {
 	name: "Spells",
@@ -162,8 +132,6 @@ export default {
 			query: null,
 			filter_dialog: false,
 			filter: {},
-			schools: [],
-			levels: { min: 0, max: 9 },
 			pagination: {
 				sortBy: "name",
 				descending: false,
@@ -171,7 +139,6 @@ export default {
 				rowsPerPage: 15,
 				rowsNumber: 0,
 			},
-			spell_schools: spell_schools,
 			columns: [
 				{
 					name: "name",
@@ -179,6 +146,7 @@ export default {
 					field: "name",
 					sortable: true,
 					align: "left",
+					classes: "truncate-cell",
 					format: (val) => val.capitalizeEach(),
 				},
 				{
@@ -201,14 +169,6 @@ export default {
 			loading: true,
 		};
 	},
-	computed: {
-		minLevelMarker() {
-			return this.levels.min ? numeral(this.levels.min).format("0o") : "Cantrip";
-		},
-		maxLevelMarker() {
-			return this.levels.max ? numeral(this.levels.max).format("0o") : "Cantrip";
-		},
-	},
 	methods: {
 		...mapActions("api_spells", ["fetch_api_spells"]),
 		filterSpells() {
@@ -217,45 +177,15 @@ export default {
 			this.pagination.page = 1;
 			this.query = {
 				search: this.search,
-				schools: this.filter.schools,
-				levels: this.filter.levels,
+				...this.filter
 			};
 			this.fetchSpells();
 		},
 		setFilter() {
 			this.filter_dialog = false;
-
-			this.setSchoolFilter();
-			this.setLevelFilter();
-
 			this.filterSpells();
 		},
-		setSchoolFilter() {
-			console.log(this.schools);
-			if (
-				!this.schools ||
-				!this.schools.length ||
-				this.schools.length === this.spell_schools.length
-			) {
-				this.$delete(this.filter, "schools");
-				return;
-			}
-			this.$set(
-				this.filter,
-				"schools",
-				this.schools.map((x) => x.value)
-			);
-		},
-		setLevelFilter() {
-			if (this.levels.min === 0 && this.levels.max === 9) {
-				this.$delete(this.filter, "levels");
-				return;
-			}
-
-			const levels = _.range(this.levels.min, this.levels.max + 1);
-			console.log(levels);
-			this.$set(this.filter, "levels", levels);
-		},
+		
 		clearFilter() {
 			this.filter_dialog = false;
 			this.$set(this, "filter", {});

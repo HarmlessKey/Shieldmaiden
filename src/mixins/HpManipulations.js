@@ -124,11 +124,11 @@ export const setHP = {
 					newhp = 0;
 
 					if (tempHp) {
-						over = parseInt(rest_amount + tempHp - curHp); //overkill
-						amount = parseInt(curHp + tempHp);
+						over = parseInt(rest_amount) + parseInt(tempHp) - parseInt(curHp); //overkill
+						amount = parseInt(curHp) + parseInt(tempHp);
 					} else {
-						over = parseInt(rest_amount - curHp); //overkill
-						amount = curHp;
+						over = parseInt(rest_amount) - parseInt(curHp); //overkill
+						amount = parseInt(curHp);
 					}
 					//Character dies if the overkill is >= maxHp
 					if (
@@ -144,7 +144,9 @@ export const setHP = {
 				});
 			}
 			//Check if a reminder is triggered on damage taken
-			this.checkReminders(target, "damage");
+			if (amount > 0) {
+				this.checkReminders(target, "damage");
+			}
 
 			//Notification
 			if (config.notify) {
@@ -318,8 +320,8 @@ export const setHP = {
 			}
 		},
 		addLog(type, crit, target, current, amount, over, config) {
-			var d = new Date();
-			var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+			const d = new Date();
+			const time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
 			if (localStorage.getItem(this.encounterId)) {
 				this.log = JSON.parse(localStorage.getItem(this.encounterId));
@@ -327,7 +329,7 @@ export const setHP = {
 				this.log = [];
 			}
 
-			var newLog = {
+			const newLog = {
 				round: this.encounter.round,
 				turn: this.encounter.turn + 1,
 				by: current.key,

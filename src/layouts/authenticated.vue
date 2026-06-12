@@ -1,12 +1,14 @@
 <template>
 	<q-no-ssr class="hk-layout">
 		<div class="content">
-			<Crumble />
+			<Crumble v-if="$route.name !== 'home'" />
 			<PaymentDeclined />
 			<OverEncumbered v-if="show_overencumbered" />
 			<div class="row q-col-gutter-md">
 				<div class="col-12" :class="{ 'col-md-9': width > 978 && $route.meta.side !== false }">
+					<PromoBanner class="mb-3" />
 					<router-view :key="$route.fullPath" />
+					<slot />
 				</div>
 				<div class="col-12 col-md-3" v-if="width > 978 && $route.meta.side !== false">
 					<ContentSideRight />
@@ -25,6 +27,8 @@ import Crumble from "src/components/crumble";
 import ContentSideRight from "src/components/ContentSideRight";
 import OverEncumbered from "src/components/userContent/OverEncumbered";
 import PaymentDeclined from "src/components/PaymentDeclined.vue";
+import PatreonLinkDialog from "src/components/dialogs/PatreonLinkDialog.vue";
+import PromoBanner from "src/components/PromoBanner.vue";
 
 export default {
 	name: "AuthenticatedLayout",
@@ -34,6 +38,7 @@ export default {
 		ContentSideRight,
 		OverEncumbered,
 		PaymentDeclined,
+		PromoBanner,
 	},
 	preFetch({ store, redirect }) {
 		if (!store.getters.user) {
@@ -48,7 +53,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["overencumbered"]),
+		...mapGetters(["overencumbered", "userInfo"]),
 		show_overencumbered() {
 			const pathArray = this.$route.path.split("/");
 			return pathArray[1] === "content" && this.overencumbered;
@@ -62,6 +67,16 @@ export default {
 		setSize(size) {
 			this.width = size.width;
 		},
+		linkPatreon() {
+			this.$q.dialog({
+				component: PatreonLinkDialog,
+			});
+		},
+	},
+	mounted() {
+		if (this.userInfo.patron && !this.userInfo.patron.expired && !this.userInfo.patreon_id) {
+			this.linkPatreon();
+		}
 	},
 };
 </script>

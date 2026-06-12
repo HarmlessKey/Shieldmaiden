@@ -6,6 +6,8 @@ const USERS_REF = db.ref("users");
 const SETTINGS_REF = db.ref("settings");
 const SEARCH_USERS_REF = db.ref("search_users");
 const VOUCHER_HISTORY_REF = db.ref("voucher_history");
+const SOUNDBOARD_REF = db.ref("soundboard");
+const TIERS_REF = db.ref("tiers");
 
 /**
  * User Firebase Service
@@ -28,8 +30,16 @@ export class userServices {
 		}
 	}
 
+	async updateUser(uid, value) {
+		try {
+			await USERS_REF.child(uid).update(value);
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	/**
-	 * Get the seasch_user object from firebase
+	 * Get the search_user object from firebase
 	 *
 	 * @param {String} uid ID of active user
 	 * @returns Full user object from /search_user/uid
@@ -56,6 +66,26 @@ export class userServices {
 		} catch (error) {
 			throw error;
 		}
+	}
+
+	/**
+	 * Get spent ai credits
+	 *
+	 * @param {String} uid ID of active user
+	 * @returns Spent AI credits /subscription_ai_credits_spent
+	 */
+	static getSpentCreditsWithCallback(uid, callback) {
+		return USERS_REF.child(uid).child("subscription_ai_credits_spent").on("value", callback);
+	}
+
+	/**
+	 * Get ai credits
+	 *
+	 * @param {String} uid ID of active user
+	 * @returns All user settings from /subscription_ai_credits_spent
+	 */
+	static getCreditsWithCallback(uid, callback) {
+		return USERS_REF.child(uid).child("ai_credits").on("value", callback);
 	}
 
 	/**
@@ -102,7 +132,6 @@ export class userServices {
 	/*
 	 *
 	 */
-
 	static async setActiveVoucher(uid, voucher_object) {
 		let date = await serverUtils.getServerTime();
 		date.setMonth(date.getMonth() + voucher_object.duration);
@@ -141,5 +170,34 @@ export class userServices {
 			.catch((error) => {
 				throw error;
 			});
+	}
+
+	async getSoundboard(uid) {
+		try {
+			const soundboard = await SOUNDBOARD_REF.child(uid).once("value", (snapshot) => {
+				return snapshot;
+			});
+			return soundboard.val();
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async addSoundboardLink(uid, link) {
+		try {
+			const newLink = await SOUNDBOARD_REF.child(uid).push(link);
+			return newLink.key;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async deleteSoundboardLink(uid, key) {
+		try {
+			SOUNDBOARD_REF.child(uid).child(key).remove();
+			return;
+		} catch (error) {
+			throw error;
+		}
 	}
 }

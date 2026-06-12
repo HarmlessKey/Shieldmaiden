@@ -2,6 +2,31 @@ import Vue from "vue";
 import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
+// Parse entity number values to ints
+const numberValues = ["ac", "ac_bonus", "curHp", "initiative", "maxHp", "maxHpMod", "tempHp"];
+
+function parseInts(entity) {
+	Object.entries(entity).forEach(([key, value]) => {
+		if (numberValues.includes(key) && value !== undefined && value !== null && value !== "") {
+			entity[key] = parseInt(value);
+		}
+		if (numberValues.includes(key) && value === "") {
+			entity[key] = null;
+		}
+	});
+	return entity;
+}
+
+/**
+ * @typedef {Object} Encounter
+ * @property {Array} entities
+ * @property {boolean} finished
+ * @property {string} name
+ * @property {number} round
+ * @property {number} turn
+ *
+ */
+
 // Converts a full encounter to a search_encounter
 const convert_encounter = (encounter) => {
 	const properties = ["name", "round", "turn", "finished"];
@@ -28,12 +53,12 @@ const encounter_getters = {
 		const encounters = state.encounters[campaignId];
 		// Convert object to sorted array
 		return _.chain(encounters)
-			.filter((campaign, key) => {
-				campaign.key = key;
-				return campaign.finished === finished;
+			.filter((encounter, key) => {
+				encounter.key = key;
+				return encounter.finished === finished;
 			})
-			.orderBy((campaign) => {
-				return parseInt(campaign.timestamp);
+			.orderBy((encounter) => {
+				return parseInt(encounter.timestamp);
 			}, "asc")
 			.value();
 	},
@@ -61,7 +86,7 @@ const encounter_actions = {
 
 	/**
 	 * Gets all encounters for a single campaign
-	 * first try to find it in the store, then fetch if wasn't present
+	 * first try to find it in the store, then fetch if it wasn't present
 	 *
 	 * @param {string} uid userId
 	 * @param {string} id encounterId
@@ -81,13 +106,14 @@ const encounter_actions = {
 			const services = await dispatch("get_encounter_services");
 			try {
 				encounters = await services.getCampaignEncounters(uid, campaignId, finished);
-				encounters = { ...campaign_encounters, ...encounters }; // Merge with encounters allready in the store
+				encounters = { ...campaign_encounters, ...encounters }; // Merge with encounters already in the store
 				commit("SET_ENCOUNTERS", { campaignId, encounters });
 			} catch (error) {
 				throw error;
 			}
 		}
-		return encounters;
+
+		return getters.get_encounters(campaignId, finished);
 	},
 
 	/**
@@ -112,6 +138,24 @@ const encounter_actions = {
 		}
 	},
 
+	async update_encounter_count({ rootGetters, state, commit, dispatch }, { campaignId }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			try {
+				const current_count = state.encounter_count[campaignId] || 0;
+				const table_length = Object.keys(state.encounters[campaignId]).length;
+				const count_diff = table_length - current_count;
+
+				const new_count = await services.updateEncounterCount(uid, campaignId, count_diff);
+				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+				dispatch("checkEncumbrance", "", { root: true });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Get a single encounter
 	 * first try to find it in the store, then fetch if wasn't present
@@ -119,13 +163,15 @@ const encounter_actions = {
 	 * - Remove ghost NPCs
 	 * - Remove ghost Players
 	 * - Remove ghost Companions
-	 * - Remove gost item links
+	 * - Remove ghost item links
 	 *
 	 * @param {string} uid userId
 	 * @param {string} campaignId campaignId
 	 * @param {string} id encounterId
+	 *
+	 * @return {Encounter}
 	 */
-	async get_encounter({ state, commit, dispatch }, { uid, campaignId, id }) {
+	async get_encounter({ state, commit, dispatch }, { uid, campaignId, id, no_ghosts }) {
 		let encounter =
 			state.cached_encounters[uid] && state.cached_encounters[uid][campaignId]
 				? state.cached_encounters[uid][campaignId][id]
@@ -140,7 +186,6 @@ const encounter_actions = {
 				throw error;
 			}
 		}
-
 		// Check for non-existing NPCs, Companions and Players
 		// Remove them from the encounter if they don't exist
 		if (encounter.entities) {
@@ -148,7 +193,7 @@ const encounter_actions = {
 				// REMOVE NON EXISTING NPCs
 				if (entity.entityType === "npc" && entity.npc === "custom" && entity.id) {
 					const npc = await dispatch("npcs/get_npc", { uid, id: entity.id }, { root: true });
-					if (!npc) {
+					if (!no_ghosts && !npc) {
 						const npc_id = entity.id;
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
 						delete encounter.entities[entityId];
@@ -158,7 +203,7 @@ const encounter_actions = {
 				// REMOVE NON EXISTING COMPANIONS
 				if (entity.entityType === "companion") {
 					const companion = await dispatch("npcs/get_npc", { uid, id: entityId }, { root: true });
-					if (!companion) {
+					if (!no_ghosts && !companion) {
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
 						delete encounter.entities[entityId];
 						console.warn(`Ghost companion ${entityId} deleted.`);
@@ -171,7 +216,7 @@ const encounter_actions = {
 						{ uid, id: entityId },
 						{ root: true }
 					);
-					if (!player) {
+					if (!no_ghosts && !player) {
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
 						delete encounter.entities[entityId];
 						console.warn(`Ghost player ${entityId} deleted.`);
@@ -222,6 +267,18 @@ const encounter_actions = {
 		return encounter;
 	},
 
+	async reserve_encounter_id({ rootGetters, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			try {
+				return await services.reserveEncounterId(uid);
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
 	/**
 	 * Adds a newly created encounter for a user
 	 * A user can only add encounters for themselves so we use the uid from the store
@@ -230,7 +287,10 @@ const encounter_actions = {
 	 * @param {object} encounter
 	 * @returns {string} the id of the newly added encounter
 	 */
-	async add_encounter({ rootGetters, dispatch, commit }, { campaignId, encounter }) {
+	async add_encounter(
+		{ rootGetters, dispatch, commit },
+		{ campaignId, encounter, predefined_key }
+	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.encounters;
 
@@ -243,12 +303,16 @@ const encounter_actions = {
 			}
 			try {
 				const search_encounter = convert_encounter(encounter);
-				const id = await services.addEncounter(uid, campaignId, encounter, search_encounter);
+				const id = await services.addEncounter(
+					uid,
+					campaignId,
+					encounter,
+					search_encounter,
+					predefined_key
+				);
 				commit("SET_ENCOUNTER", { uid, campaignId, id, encounter: search_encounter });
-
-				const new_count = await services.updateEncounterCount(uid, campaignId, 1);
-				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
-				dispatch("checkEncumbrance", "", { root: true });
+				commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId: id, encounter });
+				await dispatch("update_encounter_count", { campaignId });
 				return id;
 			} catch (error) {
 				throw error;
@@ -298,6 +362,8 @@ const encounter_actions = {
 	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
+			await dispatch("get_encounter", { uid, campaignId, id: encounterId });
+
 			const services = await dispatch("get_encounter_services");
 			try {
 				await services.addPlayer(uid, campaignId, encounterId, playerId, player);
@@ -329,6 +395,8 @@ const encounter_actions = {
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
 			try {
+				entity = parseInts(entity);
+
 				await services.updateEncounter(uid, campaignId, encounterId, "/entities", {
 					[entityId]: entity,
 				});
@@ -695,16 +763,29 @@ const encounter_actions = {
 	 * @param {string} encounterId
 	 * @param {object} playerId
 	 */
-	async delete_entity({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId }) {
+	async delete_entity(
+		{ rootGetters, commit, dispatch, state },
+		{ campaignId, encounterId, entityId }
+	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
 			try {
-				await services.deleteEntity(uid, campaignId, encounterId, entityId);
-				commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
+				const encounter = await dispatch("get_encounter", {
+					uid,
+					campaignId,
+					id: encounterId,
+					no_ghosts: true,
+				});
+				const encounter_entities = encounter?.entities;
+				if (encounter_entities && Object.keys(encounter_entities).includes(entityId)) {
+					await services.deleteEntity(uid, campaignId, encounterId, entityId);
+					commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
 
-				const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
-				commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
+					const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
+					commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
+				}
+
 				return;
 			} catch (error) {
 				throw error;
@@ -788,6 +869,7 @@ const encounter_actions = {
 						delete entity.meters;
 						delete entity.hidden;
 						delete entity.reminders;
+						delete entity.conditions;
 
 						if (entity.entityType === "npc") {
 							entity.curHp = entity.maxHp;
@@ -976,9 +1058,7 @@ const encounter_actions = {
 				commit("REMOVE_ENCOUNTER", { campaignId, id });
 				commit("REMOVE_CACHED_ENCOUNTER", { uid, id });
 
-				const new_count = await services.updateEncounterCount(uid, campaignId, -1);
-				commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
-				dispatch("checkEncumbrance", "", { root: true });
+				await dispatch("update_encounter_count", { campaignId });
 			} catch (error) {
 				throw error;
 			}
@@ -1006,8 +1086,7 @@ const encounter_actions = {
 					}
 
 					const diff = Object.keys(encounters).length;
-					const new_count = await services.updateEncounterCount(uid, campaignId, -diff);
-					commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+					await dispatch("update_encounter_count", { campaignId });
 				}
 			} catch (error) {
 				throw error;
@@ -1161,7 +1240,7 @@ const encounter_mutations = {
 	SET_TRANSFORMED_PROP(state, { uid, campaignId, encounterId, entityId, property, value }) {
 		if (value === null) {
 			Vue.delete(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transoformed,
+				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed,
 				property
 			);
 		} else {

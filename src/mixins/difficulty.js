@@ -289,7 +289,7 @@ export const difficulty = {
 				multiplier = multiplier + 1 > 6 ? 6 : multiplier + 1;
 			}
 			//For groups larger than 6, you use 1 multiplier lower.
-			if(nPlayers > 6) {
+			if(nPlayers > 5) {
 				multiplier = multiplier - 1 < 0 ? 0 : multiplier - 1;
 			}
 

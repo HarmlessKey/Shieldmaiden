@@ -1,6 +1,8 @@
 import numeral from "numeral";
-import { character_sync_id } from "./generalConstants";
+import { character_sync_stores } from "./generalConstants";
 import _ from "lodash";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 /**
  * Calculate the average value of given dice
@@ -50,6 +52,10 @@ export function calc_skill_mod(
 	return parseInt(mod) + parseInt(bonus);
 }
 
+export function displayCR(cr) {
+	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
+}
+
 /**
  * Downloads a JSON file
  *
@@ -58,7 +64,7 @@ export function calc_skill_mod(
 export function downloadJSON(data) {
 	let filename;
 	if (data instanceof Array) {
-		filename = "harmlesskey_npcs.json";
+		filename = "shieldmaiden_npcs.json";
 	} else {
 		filename = data.name.trim() + ".json";
 	}
@@ -83,6 +89,13 @@ export function uuid(mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx") {
 			v = c == "x" ? r : (r & 0x3) | 0x8;
 		return v.toString(16);
 	});
+}
+
+/**
+ * Get the value of a CSS variable
+ */
+export function getCssVariable(name) {
+	return getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
 }
 
 /**
@@ -184,59 +197,263 @@ export function comparePlayerToCharacter(sync_character, player) {
 }
 
 /**
- * Check if the "D&D Character Sync" extension is installed
+ * Returns the browser type
+ * @return {string} browser: Opera, Firefox, Safari, IE, Edge, Chrome
+ */
+/* eslint-disable */
+export function browserDetect() {
+	if (process.browser) {
+		// Opera 8.0+
+		const isOpera =
+			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(" OPR/") >= 0;
+
+		// Firefox 1.0+
+		const isFirefox = typeof InstallTrigger !== "undefined";
+
+		// Safari 3.0+ "[object HTMLElementConstructor]"
+		const isSafari =
+			/constructor/i.test(window.HTMLElement) ||
+			(function (p) {
+				return p.toString() === "[object SafariRemoteNotification]";
+			})(!window["safari"] || (typeof safari !== "undefined" && window["safari"].pushNotification));
+
+		// Internet Explorer 6-11
+		const isIE = /*@cc_on!@*/ false || !!document.documentMode;
+
+		// Edge 20+
+		const isEdge = !isIE && !!window.StyleMedia;
+
+		// Chrome 1 - 79
+		const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+
+		// Edge (based on chromium) detection
+		const isEdgeChromium = isChrome && navigator.userAgent.indexOf("Edg") != -1;
+
+		return isOpera
+			? "Opera"
+			: isFirefox
+			? "Firefox"
+			: isSafari
+			? "Safari"
+			: isEdgeChromium
+			? "Edge"
+			: isChrome
+			? "Chrome"
+			: isIE
+			? "IE"
+			: isEdge
+			? "Edge"
+			: "Don't know";
+	}
+	return "Not a browser";
+}
+
+/**
+ * Compares two semantic version strings (e.g., "1.2.3")
+ * @param {string} v1 - First version string
+ * @param {string} v2 - Second version string
+ * @returns {number} -1 if v1 < v2, 0 if v1 === v2, 1 if v1 > v2
+ */
+export function compareVersions(v1, v2) {
+	const parts1 = (v1 || "").split(".").map(Number);
+	const parts2 = (v2 || "").split(".").map(Number);
+
+	const maxLength = Math.max(parts1.length, parts2.length);
+	for (let i = 0; i < maxLength; i++) {
+		const num1 = parts1[i] || 0;
+		const num2 = parts2[i] || 0;
+		if (num1 < num2) return -1;
+		if (num1 > num2) return 1;
+	}
+	return 0;
+}
+
+/**
+ * Get the extension store URL for the current browser
+ * @returns {string} store URL
+ */
+export function getStoreUrl() {
+	const browser = browserDetect();
+	return character_sync_stores[browser]?.url || character_sync_stores.Chrome.url;
+}
+
+/**
+ * Send a message to the D&D Character Sync extension via the injected bridge content script.
+ * The bridge relays window.postMessage to the extension background and posts back a response.
  *
- * @param {string} url
+ * @param {object} payload
+ * @param {number} timeoutMs
+ * @returns {Promise<object|null>} response data, or null on timeout
+ */
+function sendBridgeMessage(payload, timeoutMs = 2000) {
+	if (typeof window === "undefined") return Promise.resolve(null);
+	return new Promise((resolve) => {
+		const requestId = crypto.randomUUID();
+		let settled = false;
+		const handler = (event) => {
+			if (event.source !== window) return;
+			if (!event.data?.CS_BRIDGE_RESPONSE) return;
+			if (event.data.requestId !== requestId) return;
+			if (settled) return;
+			settled = true;
+			window.removeEventListener("message", handler);
+			resolve(event.data);
+		};
+		window.addEventListener("message", handler);
+		window.postMessage({ CS_BRIDGE: true, requestId, ...payload }, "*");
+		setTimeout(() => {
+			if (!settled) {
+				settled = true;
+				window.removeEventListener("message", handler);
+				resolve(null);
+			}
+		}, timeoutMs);
+	});
+}
+
+/**
+ * Check if the "D&D Character Sync" extension is installed
+ * @returns {Promise<string|undefined>} extension version, or undefined if not installed
  */
 export async function extensionInstalled() {
-	return new Promise((resolve) => {
-		chrome.runtime.sendMessage(character_sync_id, { request_content: ["version"] }, (response) => {
-			if (response) {
-				resolve(response.version);
-			} else {
-				return undefined;
-			}
-		});
-	});
+	const response = await sendBridgeMessage({ request_content: ["version"] });
+	return response?.version;
 }
 
 /**
- * Gets all characters from "D&D Character Sync" Chrome Extension
+ * Gets all characters from the "D&D Character Sync" extension
+ * @returns {Promise<object>}
  */
 export async function getCharacterSyncStorage() {
-	return new Promise((resolve, reject) => {
-		chrome.runtime.sendMessage(
-			character_sync_id,
-			{ request_content: ["characters"] },
-			(response) => {
-				if (response && response.characters) {
-					resolve(response.characters);
-				} else {
-					reject("Something went wrong getting data from Character Sync extension.");
-				}
-			}
-		);
-	});
+	const response = await sendBridgeMessage({ request_content: ["characters"] });
+	return response?.characters ?? {};
 }
 
 /**
- * Get a single character from the "D&D Character Sync" Chrome Extension
+ * Get a single character from the "D&D Character Sync" extension
  *
  * @param {string} url
- * @returns
+ * @returns {Promise<object>}
  */
 export async function getCharacterSyncCharacter(url) {
-	return new Promise((resolve, reject) => {
-		chrome.runtime.sendMessage(
-			character_sync_id,
-			{ request_content: ["characters"] },
-			(response) => {
-				if (response.characters && url in response.characters) {
-					resolve(response.characters[url]);
-				} else {
-					reject(`Character not found in D&D Character Sync Extension`);
-				}
+	const response = await sendBridgeMessage({ request_content: ["characters"] });
+	if (response?.characters && url in response.characters) {
+		return response.characters[url];
+	}
+	throw "Character not found in D&D Character Sync Extension";
+}
+
+/**
+ * Check if a url is spotify or youtube
+ */
+export function urlType(url) {
+	switch (true) {
+		case !!url?.match(/^https?:\/\/(www.)?((youtube.)|(youtu.be))/):
+			return "youtube";
+		case !!url?.match(/^(https?:\/\/(www.)?|(open.))spotify\./):
+			return "spotify";
+		default:
+			return "other";
+	}
+}
+
+export function generateYoutubeEmbedUrl(url) {
+	const regex = /(v=|embed\/|\.be\/|v\/)(?<id>[^&|/?]{11})/i;
+	const { id } = regex.exec(url).groups;
+
+	return `https://www.youtube-nocookie.com/embed/${id}`;
+}
+
+export class DefaultDict {
+	constructor(defaultVal) {
+		return new Proxy(
+			{},
+			{
+				get: (target, name) => (name in target ? target[name] : defaultVal),
 			}
 		);
-	});
+	}
+}
+
+export async function downloadMonsterFile(element, filetype = "png", options = {}) {
+	const {
+		filename = "shieldmaiden-monster",
+		margin = 5,
+		footerText = "https://shieldmaiden.app",
+		layout = "columned",
+		width = 1080,
+	} = options;
+
+	const clone = element.cloneNode(true);
+
+	clone.style.pointerEvents = "none";
+	clone.style.width = `${width}px`;
+	clone.classList.add("download-mode", layout);
+
+	// Download the PNG
+	if (filetype === "png") {
+		const wrapper = document.createElement("div");
+		wrapper.style.display = "inline-block";
+		wrapper.style.padding = "1em";
+		wrapper.style.background = "#f5f3ee";
+		document.body.appendChild(wrapper);
+
+		const footer = document.createElement("div");
+		footer.textContent = footerText;
+		footer.style.width = "100%";
+		footer.style.marginTop = "1.5em";
+		footer.style.color = "#68747b";
+
+		wrapper.appendChild(clone);
+		wrapper.appendChild(footer);
+		
+		const canvas = await html2canvas(wrapper, {
+			scale: 2,
+			useCORS: true
+		});
+		canvas.toBlob(blob => {
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = filename;
+			link.click();
+			URL.revokeObjectURL(link.href);
+		});
+		document.body.removeChild(wrapper);
+	}
+	// Download a PDF
+	else {
+		document.body.appendChild(clone);
+		const canvas = await html2canvas(clone, {
+			scale: 2,
+			useCORS: true
+		});
+		const imgData = canvas.toDataURL("image/png");
+		const pdf = new jsPDF("p", "mm", "a4");
+		let pageWidth = pdf.internal.pageSize.getWidth();
+		const pageHeight = pdf.internal.pageSize.getHeight();
+	
+		if (layout === "single-column") {
+			pageWidth = pageWidth / 2;
+		}
+	
+		const contentWidth = pageWidth - margin * 2;
+		const contentHeight = (canvas.height * contentWidth) / canvas.width;
+	
+		pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight);
+	
+		const pageCount = pdf.internal.getNumberOfPages();
+		for (let i = 1; i <= pageCount; i++) {
+			pdf.setPage(i);
+			pdf.setFontSize(10);
+			pdf.setTextColor(100);
+			pdf.text(footerText, margin, pageHeight - margin, { align: 'left' });
+		}
+	
+		pdf.save(`${filename}.pdf`);
+		document.body.removeChild(clone);
+	}
+}
+
+export function campaignGroupKey(campaignId) {
+	return `campaign__${campaignId}`;
 }

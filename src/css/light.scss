@@ -1,4 +1,4 @@
-[data-theme='light'] {
+[data-theme="light"] {
 	body {
 		background: $neutral-10;
 
@@ -12,26 +12,24 @@
 					color: $neutral-11;
 				}
 			}
+			&.bg-neutral-5,
+			&.bg-neutral-6,
 			&.bg-neutral-8,
 			&.bg-neutral-9 {
 				color: $neutral-2;
 			}
 		}
 
-		.green {
-			color: $green-hover !important;
-		}
-
 		.live {
-			color: $neutral-11;
+			color: $neutral-2;
 
 			&::before {
-				background-color: $neutral-11;
+				background-color: $neutral-3;
 			}
 
 			&.active {
 				&::before {
-					background-color: $neutral-11;
+					background-color: $neutral-3;
 				}
 			}
 		}

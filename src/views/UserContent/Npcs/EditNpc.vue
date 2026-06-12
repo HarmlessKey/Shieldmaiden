@@ -4,15 +4,39 @@
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
-						<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
-							<q-tooltip anchor="top middle" self="center middle">
-								There are validation errors
-							</q-tooltip>
-						</q-icon>
-						<q-btn v-if="!npcId" class="mx-1" color="neutral-5" no-caps @click="copy_dialog = true">
-							<i aria-hidden="true" class="fas fa-copy mr-2"></i>
-							Copy
-						</q-btn>
+						<div>
+							<q-btn v-if="!user" color="accent" no-caps @click="sign_up_dialog = true">
+								<i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
+								Create Account
+							</q-btn>
+						</div>
+						<div>
+							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+								<q-tooltip anchor="top middle" self="center middle">
+									There are validation errors
+								</q-tooltip>
+							</q-icon>
+							<q-btn
+								v-if="!npcId && userId"
+								class="mx-1"
+								color="neutral-5"
+								no-caps
+								@click="((create_dialog = true), (generate_monster = true))"
+							>
+								<i aria-hidden="true" class="fas fa-sparkles"></i>
+								<q-tooltip anchor="top middle" self="center middle"> Generate NPC! </q-tooltip>
+							</q-btn>
+							<q-btn
+								v-if="!npcId"
+								class="mx-1"
+								color="neutral-5"
+								no-caps
+								@click="copy_dialog = true"
+							>
+								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
+								Copy
+							</q-btn>
+						</div>
 					</div>
 
 					<div class="form">
@@ -39,14 +63,29 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
+							<q-btn
+								v-if="npcId"
+								class="mr-2"
+								color="neutral-5"
+								no-caps
+								@click="viewNpc"
+							>
+								View
+							</q-btn>
 							<router-link
-								:to="userId ? `/content/npcs` : `/tools/monster-creator`"
+								:to="user ? `/content/npcs` : `/tools/monster-creator`"
 								class="btn bg-neutral-5 mr-2"
 								>{{ unsaved_changes ? "Cancel" : "Back" }}</router-link
 							>
-							<q-btn v-if="userId" label="Save" type="submit" color="primary" no-caps />
-							<q-btn v-else :disabled="!valid" color="primary" no-caps @click="download">
-								Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+							<q-btn v-if="user" label="Save" type="submit" color="primary" no-caps />
+							<q-btn
+								v-else
+								:disabled="!valid"
+								color="primary"
+								no-caps
+								@click="account_dialog = true"
+							>
+								Save
 							</q-btn>
 						</div>
 						<div class="d-flex justify-content-start unsaved_changes">
@@ -54,9 +93,9 @@
 								<div v-if="userId" class="orange truncate mr-2 d-none d-md-block">
 									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>
-								<a class="btn btn-sm bg-neutral-5" @click="userId ? revertChanges() : reset()">
+								<a class="btn btn-sm bg-neutral-5" @click="user ? revertChanges() : reset()">
 									<i aria-hidden="true" class="fas fa-undo" />
-									{{ userId ? "Revert" : "Reset" }}
+									{{ user ? "Revert" : "Reset" }}
 								</a>
 							</template>
 						</div>
@@ -67,7 +106,7 @@
 
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">
-			<hk-card :minWidth="320">
+			<hk-card class="create-dialog">
 				<div slot="header" class="card-header">
 					<span>Copy existing NPC</span>
 					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
@@ -76,6 +115,79 @@
 					<CopyContent @copy="copy" type="monster" />
 				</div>
 			</hk-card>
+		</q-dialog>
+
+		<q-dialog v-model="account_dialog">
+			<hk-card class="account-dialog">
+				<div slot="header" class="card-header">
+					<span>Save your monster</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
+				<div class="card-body">
+					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
+					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
+						Create Free Account
+					</button>
+				</div>
+				<div slot="footer" class="card-footer">
+					<q-btn no-caps @click="download">
+						Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+					</q-btn>
+				</div>
+			</hk-card>
+		</q-dialog>
+
+		<q-dialog v-model="create_dialog" persistent position="top">
+			<hk-card class="create-dialog">
+				<div slot="header" class="card-header">
+					<div v-if="generating"><span class="loader">Generating your monster</span></div>
+					<template v-else> How do you want to do this? </template>
+				</div>
+				<div
+					v-if="!generate_monster"
+					class="card-body"
+					:class="{ generate: generate_monster, generating: generating }"
+				>
+					<template v-if="!copy_monster && !generate_monster">
+						<button class="btn btn-lg btn-block" @click="copy_monster = true">
+							Copy existing monster
+						</button>
+						<h2 class="text-center my-2">OR</h2>
+						<button class="btn btn-lg btn-block" @click="create_dialog = false">
+							Create from scratch
+						</button>
+						<h2 class="text-center my-2">OR</h2>
+						<button
+							class="btn btn-lg btn-block bg-accent mb-2"
+							@click="generate_monster = true"
+							:disabled="!userId"
+						>
+							Generate from description
+						</button>
+					</template>
+					<template v-if="copy_monster">
+						<h2>Copy an existing monster</h2>
+						<CopyContent @copy="copy" type="monster" />
+					</template>
+				</div>
+				<template v-if="generate_monster">
+					<GenerateMonster @generating="setGenerating" @finished="finishedGenerate" />
+				</template>
+				<div v-if="copy_monster || generate_monster" class="card-footer" slot="footer">
+					<button
+						v-if="!generating"
+						class="btn btn-sm bg-neutral-5"
+						@click="((copy_monster = false), (generate_monster = false))"
+					>
+						<i class="fas fa-times mr-1" aria-hidden="true" />
+						Cancel
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
+
+		<q-dialog v-model="sign_up_dialog">
+			<SignUp @sign-up="handleSignUp" />
 		</q-dialog>
 	</div>
 	<hk-card v-else header="Basic info">
@@ -96,6 +208,8 @@ import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import SignUp from "src/components/SignUp.vue";
+import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
 export default {
 	name: "EditNpc",
@@ -109,6 +223,8 @@ export default {
 		SpellCasting,
 		Actions,
 		CopyContent,
+		SignUp,
+		GenerateMonster,
 	},
 	data() {
 		return {
@@ -120,8 +236,16 @@ export default {
 			npc: {},
 			loading: false,
 			npc_copy: {},
+			generate_monster: false,
 			copy_dialog: false,
 			unsaved_changes: false,
+			create_dialog: false,
+			account_dialog: false,
+			sign_up_dialog: false,
+			copy_monster: false,
+			monster_description: "",
+			generating: false,
+			generate_error: null,
 		};
 	},
 	async mounted() {
@@ -134,10 +258,12 @@ export default {
 				this.unsaved_changes = false;
 				this.loading = false;
 			});
+		} else {
+			this.create_dialog = true;
 		}
 	},
 	computed: {
-		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters(["user", "tier", "overencumbered"]),
 		...mapGetters("npcs", ["npc_count"]),
 	},
 	watch: {
@@ -156,18 +282,32 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
 		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 		isOwner() {
 			return this.$route.name !== "Edit Companion";
+		},
+		viewNpc() {
+			this.setDrawer({ show: true, type: "drawers/ViewNpc", data: this.npc });
 		},
 		download() {
 			downloadJSON(this.npc);
 		},
 		copy({ result }) {
 			this.copy_dialog = false;
-			this.npc = { ...result };
+			this.create_dialog = false;
+			this.npc = JSON.parse(JSON.stringify({ ...result }));
+			this.npc = this.convertVersatileToOptions(this.npc);
+		},
+		setGenerating(value) {
+			this.generating = value;
+		},
+		finishedGenerate(npc) {
+			console.log(npc);
+			this.npc = npc;
+			this.generating = false;
+			this.create_dialog = false;
 		},
 		reset() {
 			this.npc = {};
@@ -176,6 +316,37 @@ export default {
 			this.npc = JSON.parse(this.npc_copy);
 			this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			this.unsaved_changes = false;
+		},
+		convertVersatileToOptions(npc) {
+			if (npc.actions.length > 0) {
+				for (const action of npc.actions) {
+					if (action.versatile === true) {
+						const versTwoName = action.versatile_two;
+						action.options = [action.versatile_one, action.versatile_two];
+						delete action.versatile;
+						delete action.versatile_one;
+						delete action.versatile_two;
+
+						for (const sub_action of action.action_list) {
+							for (const roll of sub_action.rolls) {
+								roll.options = {
+									[versTwoName]: {
+										damage_type: roll.versatile_damage_type || null,
+										dice_count: roll.versatile_dice_count || null,
+										dice_type: roll.versatile_dice_type || null,
+										fixed_val: roll.versatile_fixed_val || null,
+									},
+								};
+								delete roll.versatile_damage_type;
+								delete roll.versatile_dice_count;
+								delete roll.versatile_dice_type;
+								delete roll.versatile_fixed_val;
+							}
+						}
+					}
+				}
+			}
+			return npc;
 		},
 		/**
 		 * Checks if a new NPC must be added, or an existing NPC must be saved.
@@ -188,7 +359,7 @@ export default {
 			}
 		},
 		addNpc() {
-			this.add_npc(this.npc)
+			this.add_npc({ npc: this.npc })
 				.then((key) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
@@ -228,6 +399,12 @@ export default {
 				this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			});
 		},
+		handleSignUp(e) {
+			if (e === "success") {
+				this.account_dialog = false;
+				this.sign_up_dialog = false;
+			}
+		},
 	},
 	beforeRouteLeave(to, from, next) {
 		if (this.unsaved_changes) {
@@ -266,7 +443,7 @@ export default {
 .content__edit {
 	.top {
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 10px;
 
@@ -286,5 +463,24 @@ export default {
 			}
 		}
 	}
+}
+.hk-card.create-dialog {
+	max-width: 95vw;
+	width: 576px;
+	margin-top: 100px;
+
+	.loader {
+		color: $neutral-1;
+		font-weight: bold;
+	}
+
+	.card-body {
+		overflow: hidden;
+		z-index: 0;
+	}
+}
+.hk-card.account-dialog {
+	width: 100%;
+	max-width: 360px;
 }
 </style>

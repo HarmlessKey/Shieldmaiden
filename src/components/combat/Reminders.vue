@@ -1,25 +1,28 @@
 <template>
-	<div 
-		v-if="entity.reminders && Object.keys(entity.reminders).length > 0" 
-		class="reminders truncate-chip-labels" 
+	<div
+		v-if="entity.reminders && Object.keys(entity.reminders).length > 0"
+		class="reminders truncate-chip-labels"
 	>
 		<template v-for="(reminder, key) in entity.reminders">
-			<q-chip 
+			<q-chip
 				v-if="reminder"
 				clickable
-				:key="key" 
-				square 
+				:key="key"
+				square
 				size="12px"
 				:icon="reminder.icon"
 				class=""
-				:class="'bg-'+reminder.color"
-				@click="setSlide({
-					show: true, 
-					type: 'slides/encounter/reminders/Reminder',
-					data: {
-						key,
-						entity
-				}})" 
+				:class="'bg-' + reminder.color"
+				@click="
+					setDrawer({
+						show: true,
+						type: 'drawers/encounter/reminders/Reminder',
+						data: {
+							key,
+							entity,
+						},
+					})
+				"
 			>
 				<q-avatar v-if="reminder.rounds">
 					<b>{{ reminder.rounds }}</b>
@@ -34,43 +37,41 @@
 </template>
 
 <script>
-	import { remindersMixin } from 'src/mixins/reminders';
-	import { mapActions } from 'vuex';
+import { remindersMixin } from "src/mixins/reminders";
+import { mapActions } from "vuex";
 
-	export default {
-		name: 'Reminders',
-		props: ['entity'],
-		mixins: [remindersMixin],
-		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			title(reminder) {
-				let title = reminder.title;
+export default {
+	name: "Reminders",
+	props: ["entity"],
+	mixins: [remindersMixin],
+	methods: {
+		...mapActions(["setDrawer"]),
+		title(reminder) {
+			let title = reminder.title;
 
-				if(reminder.selectedVars) {
-					title = this.replaceReminderVariables(title, reminder.selectedVars);
-				}
-				return title;
+			if (reminder.selectedVars) {
+				title = this.replaceReminderVariables(title, reminder.selectedVars);
 			}
-		}
-	}
+			return title;
+		},
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	.reminders {
-		margin-top: 4px;
-		margin-left: -4px;
+.reminders {
+	margin-top: 4px;
+	margin-left: -4px;
 
-		.q-chip {
-			color:$neutral-1 !important;
+	.q-chip {
+		color: $neutral-1 !important;
+		border-radius: 0;
+		cursor: pointer;
+
+		.q-avatar {
 			border-radius: 0;
-			cursor: pointer;
-
-			.q-avatar {
-				border-radius: 0;
-				background: rgba(0, 0, 0, .4);
-			}
+			background: rgba(0, 0, 0, 0.4);
 		}
 	}
+}
 </style>

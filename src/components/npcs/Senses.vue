@@ -30,7 +30,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="max:100" name="Comments" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="max:999" name="Comments" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Comments"

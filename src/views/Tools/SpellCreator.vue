@@ -53,7 +53,7 @@
 		<section class="mt-4">
 			<h2>Spellcasting monsters</h2>
 			<p>
-				You can combine your custom spells with the monsters you've made in Harmless Key to create
+				You can combine your custom spells with the monsters you've made in Shieldmaiden to create
 				powerful spellcasters that are easy to use in our
 				<router-link to="/tools/combat-tracker">combat tracker</router-link>.
 			</p>
@@ -64,9 +64,9 @@
 			<p>
 				Our spell creator also makes it easy to share your custom spells with other dungeon masters
 				and players. You can save your spells to your library if you have an account, export them to
-				share with others, or import spells created by other Harmless Key users.<br />
+				share with others, or import spells created by other Shieldmaiden users.<br />
 				If you're a content creator you can provide your followers with spells that they can
-				directly use in Harmless Key.
+				directly use in Shieldmaiden.
 			</p>
 		</section>
 	</ToolsPage>

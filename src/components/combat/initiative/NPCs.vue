@@ -6,71 +6,71 @@
 			content="Use decimals when multiple entities have the same initiative to change the order."
 		/>
 
-		<ul class="entities hasImg">
+		<ul class="entities">
 			<li v-for="(entity, i) in npcs" :key="entity.key">
-				<span
-					class="img pointer"
-					:style="{
-						'background-image': entity.img ? 'url(' + entity.img + ')' : '',
-						'border-color': entity.color_label ? entity.color_label : ``,
-						color: entity.color_label ? entity.color_label : ``,
-					}"
-				>
-					<i aria-hidden="true" v-if="!entity.img" :class="`hki-monster`" />
-				</span>
-				<div class="truncate">
+				<BasicEntity :entity="entity" :size="48" :padding="8">
 					<q-checkbox
+						slot="name"
 						:dark="$store.getters.theme === 'dark'"
 						v-model="selected"
 						:val="i"
-						:label="entity.name.capitalizeEach()"
-					/>
-				</div>
-
-				<div class="actions">
-					<a
-						class="btn btn-sm bg-neutral-5"
-						@click="setSlide({ show: true, type: 'combat/ViewEntity', data: entity })"
+						tabindex="-1"
+						class="flex-grow"
 					>
-						<i aria-hidden="true" class="fas fa-info"></i>
-						<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
-					</a>
-					<q-input
-						:dark="$store.getters.theme === 'dark'"
-						filled
-						square
+						<Name :entity="entity" />
+					</q-checkbox>
+					<div class="actions">
+						<button
+							class="btn btn-sm bg-neutral-9"
+							tabindex="-1"
+							@click="
+								setDrawer({ show: true, type: 'combat/entities/Card/index', data: { entity } })
+							"
+						>
+							<i aria-hidden="true" class="fas fa-info"></i>
+							<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
+						</button>
+					</div>
+					<hk-input
+						v-model="entity.initiative"
 						dense
 						type="number"
-						class="ml-3"
 						min="0"
 						max="99"
-						v-model="entity.initiative"
 						name="npcInit"
+						class="initiative-input"
 						@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
 						placeholder="0"
+						@keydown.enter="$refs?.[i]?.[0]?.$el?.click()"
 					>
 						<template v-slot:append>
 							<hk-roll
+								:ref="i"
 								:tooltip="`1d20 + ${calcMod(entity.dexterity)}`"
 								@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
 							>
-								<a>
+								<button
+									class="pointer"
+									tabindex="-1"
+									:class="{
+										'step-highlight': demo && follow_tutorial && get_step('initiative', 'monsters'),
+									}"
+								>
 									<q-icon size="small" name="fas fa-dice-d20" />
-								</a>
+								</button>
 							</hk-roll>
 						</template>
-					</q-input>
-				</div>
+					</hk-input>
+				</BasicEntity>
 			</li>
+			<TutorialPopover
+				v-if="demo"
+				tutorial="initiative"
+				step="monsters"
+				position="right"
+				:offset="[10, 0]"
+			/>
 		</ul>
-		<div>
-			<hk-roll @roll="selected.length === 0 ? rollAll($event) : rollGroup($event)">
-				<a class="btn btn-block">
-					<i aria-hidden="true" class="fas fa-dice-d20"></i> Roll
-					{{ selected.length === 0 ? "all" : "selected" }}
-				</a>
-			</hk-roll>
-		</div>
 	</div>
 </template>
 
@@ -78,25 +78,44 @@
 import { mapGetters, mapActions } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
+import Name from "../entities/Name.vue";
+import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import BasicEntity from "../entities/BasicEntity.vue";
 
 export default {
 	name: "SetInitiativeNPC",
+	components: {
+		Name,
+		BasicEntity,
+		TutorialPopover,
+	},
 	mixins: [general, dice],
 	props: ["npcs"],
 	data() {
 		return {
-			selected: [],
+			selectedSetter: undefined,
 			selectAll: [],
 		};
 	},
 	computed: {
-		...mapGetters(["encounterId", "broadcast"]),
+		...mapGetters(["encounterId", "broadcast", "demo"]),
+		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
 		},
+		selected: {
+			get() {
+				return this.selectedSetter ? this.selectedSetter : [];
+			},
+			set(newVal) {
+				this.$emit("select", newVal.length);
+				this.selectedSetter = newVal;
+			},
+		},
 	},
 	methods: {
-		...mapActions(["setSlide", "set_initiative"]),
+		...mapActions(["setDrawer", "set_initiative"]),
+		...mapActions("tutorial", ["completeStep"]),
 		rollMonster(e, key, entity, advantage_disadvantage) {
 			const advantage_object = advantage_disadvantage ? advantage_disadvantage : {};
 			let roll = this.rollD(
@@ -111,10 +130,7 @@ export default {
 				this.share ? { encounter_id: this.encounterId, entity_key: key } : null
 			);
 			entity.initiative = roll.total;
-			this.set_initiative({
-				key: key,
-				initiative: entity.initiative,
-			});
+			this.setInitiative(key, entity.initiative);
 		},
 		rollAll(e) {
 			for (let i in this.npcs) {
@@ -150,29 +166,35 @@ export default {
 				entity = this.npcs[npc_indx];
 				entity.initiative = roll;
 
-				this.set_initiative({
-					key: entity.key,
-					initiative: entity.initiative,
-				});
+				this.setInitiative(entity.key, entity.initiative);
 			}
 			this.selected = [];
+		},
+		setInitiative(key, initiative) {
+			this.set_initiative({ key, initiative });
+
+			// If initiative has been set for all monsters, complete the tutorial step
+			if (!this.npcs.find((npc) => !npc.initiative) && this.get_step("initiative", "monsters")) {
+				this.completeStep({ tutorial: "initiative" });
+			}
 		},
 	},
 };
 </script>
 
 <style lang="scss" scoped>
-ul.entities {
-	margin-top: 0;
+::v-deep {
+	.q-checkbox {
+		min-width: 0;
+		margin-right: 5px;
 
-	li {
-		padding-right: 3px;
-
-		.actions {
-			align-items: center;
-			padding: 0;
+		&__label {
+			min-width: 0;
 		}
 	}
+}
+.initiative-input {
+	min-width: 90px;
 }
 .advantage .btn:hover {
 	background-color: $green;

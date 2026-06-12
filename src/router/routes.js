@@ -1,18 +1,18 @@
+const CharacterSyncPrivacyPolicy = () => import("src/views/Pages/CharacterSyncPrivacyPolicy.vue");
 const Sitemap = () => import("src/views/Pages/Sitemap.vue");
 const Privacy = () => import("src/views/Pages/Privacy.vue");
 const Documentation = () => import("src/views/Pages/Documentation.vue");
-const SignIn = () => import("src/views/Pages/SignIn.vue");
+const SignInPage = () => import("src/views/Pages/SignIn.vue");
 const SignUp = () => import("src/views/Pages/SignUp.vue");
 const ResetPassword = () => import("src/views/Pages/ResetPassword.vue");
-const Patreon = () => import("src/views/Pages/Patreon.vue");
 const WeatherDemo = () => import("src/views/Pages/WeatherDemo.vue");
 
 const Profile = () => import("src/views/profile/Profile.vue");
 const Username = () => import("src/views/profile/SetUsername.vue");
 const DeleteAccount = () => import("src/views/profile/DeleteAccount.vue");
 const Offline = () => import("src/views/Pages/Offline.vue");
-const EditEncounter = () => import("src/views/UserContent/Encounters/Edit");
 const RunEncounter = () => import("src/views/RunEncounter.vue");
+const EncounterBuilder = () => import("src/views/UserContent/Encounters/EditEncounter.vue");
 const User = () => import("src/views/User.vue");
 
 // This is where you add all your site routes
@@ -28,8 +28,9 @@ const routes = [
 		meta: {
 			sidebar: false,
 			offline: true,
-			description: "Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
-			title: "D&D Combat Tracker",
+			description:
+				"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+			title: "Combat Tracker for D&D",
 		},
 	},
 	{ path: "/home", redirect: "/" },
@@ -48,7 +49,7 @@ const routes = [
 				name: "Content",
 				component: () => import("src/views/UserContent"),
 				meta: {
-					description: "Your custom content on Harmless Key.",
+					description: "Your custom content on Shieldmaiden.",
 					title: "Content",
 				},
 			},
@@ -57,12 +58,44 @@ const routes = [
 				name: "Manage content",
 				component: () => import("src/views/UserContent/ManageContent"),
 				meta: {
-					description: "Manage your content on Harmless Key.",
+					description: "Manage your content on Shieldmaiden.",
 					title: "Manage content",
 				},
 			},
 
-			// Cammpaigns
+			{
+				path: "import",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Import content",
+				},
+				children: [
+					{
+						path: "",
+						name: "Import content",
+						component: () => import("src/views/UserContent/ImportContent"),
+						meta: {
+							description: "Import content to Shieldmaiden",
+							title: "Import Shieldmaiden Content",
+						},
+					},
+					{
+						path: "hk_import",
+						name: "Import Shieldmaiden Content",
+						component: () => import("src/views/UserContent/ImportContent/ImportHKContent"),
+						meta: {
+							description: "Import User Content from an Shieldmaiden export",
+							title: "Import Shieldmaiden Content",
+						},
+					},
+				],
+			},
+
+			// Campaigns
 			{
 				path: "campaigns",
 				component: {
@@ -79,42 +112,9 @@ const routes = [
 						name: "Campaigns",
 						component: () => import("src/views/UserContent/Campaigns/Campaigns.vue"),
 						meta: {
-							description: "Your campaigns on Harmless Key.",
+							description: "Your campaigns on Shieldmaiden.",
 							title: "Campaigns",
 						},
-					},
-					{
-						path: ":campid",
-						component: {
-							render(c) {
-								return c("router-view");
-							},
-						},
-						meta: {
-							title: "Run campaign",
-						},
-						children: [
-							{
-								path: "",
-								name: "Run campaign",
-								component: () => import("src/views/UserContent/Encounters"),
-								meta: {
-									description: "Run your campaign on Harmless Key.",
-									title: "Run campaign",
-									side: false,
-								},
-							},
-							{
-								path: ":encid",
-								name: "EditEncounter",
-								component: EditEncounter,
-								meta: {
-									title: "Edit encounter",
-									description: "Edit your Harmless Key encounter.",
-									side: false,
-								},
-							},
-						],
 					},
 				],
 			},
@@ -136,7 +136,7 @@ const routes = [
 						name: "Players",
 						component: () => import("src/views/UserContent/Players"),
 						meta: {
-							description: "Your players Harmless Key.",
+							description: "Your players Shieldmaiden.",
 							title: "Players",
 						},
 					},
@@ -146,7 +146,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Players/EditPlayer.vue"),
 						meta: {
 							title: "Add player",
-							description: "Create a new player on Harmless Key.",
+							description: "Create a new player on Shieldmaiden.",
 						},
 					},
 					{
@@ -155,7 +155,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Players/EditPlayer.vue"),
 						meta: {
 							title: "Edit player",
-							description: "Edit an existing player on Harmless Key.",
+							description: "Edit an existing player on Shieldmaiden.",
 						},
 					},
 				],
@@ -178,7 +178,7 @@ const routes = [
 						name: "CharacterBuilder",
 						component: () => import("src/views/UserContent/CharacterBuilder"),
 						meta: {
-							description: "Your Characters on Harmless Key.",
+							description: "Your Characters on Shieldmaiden.",
 							title: "Character builder",
 						},
 					},
@@ -187,7 +187,7 @@ const routes = [
 						component: () => import("src/layouts/character-builder"),
 						meta: {
 							title: "Edit character",
-							description: "Edit an existing character on Harmless Key.",
+							description: "Edit an existing character on Shieldmaiden.",
 							side: false,
 						},
 						children: [
@@ -290,7 +290,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Npcs/Npcs.vue"),
 						meta: {
 							title: "NPCs",
-							description: "Your custom non-player characters on Harmless Key.",
+							description: "Your custom non-player characters on Shieldmaiden.",
 						},
 					},
 					{
@@ -299,7 +299,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Npcs/EditNpc.vue"),
 						meta: {
 							title: "Add NPC",
-							description: "Create a new NPC on Harmless Key.",
+							description: "Create a new NPC on Shieldmaiden.",
 						},
 					},
 					{
@@ -308,7 +308,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Npcs/EditNpc.vue"),
 						meta: {
 							title: "Edit NPC",
-							description: "Edit an existing NPC on Harmless Key.",
+							description: "Edit an existing NPC on Shieldmaiden.",
 						},
 					},
 				],
@@ -330,7 +330,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Npcs/Npcs.vue"),
 						meta: {
 							title: "Companions",
-							description: "Your custom companions Harmless Key.",
+							description: "Your custom companions Shieldmaiden.",
 						},
 					},
 					{
@@ -339,7 +339,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Npcs/EditNpc.vue"),
 						meta: {
 							title: "Edit Companion",
-							description: "Edit an existing companion on Harmless Key.",
+							description: "Edit an existing companion on Shieldmaiden.",
 						},
 					},
 					{
@@ -348,7 +348,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Npcs/EditNpc.vue"),
 						meta: {
 							title: "Edit companion",
-							description: "Edit an existing companion on Harmless Key.",
+							description: "Edit an existing companion on Shieldmaiden.",
 						},
 					},
 				],
@@ -372,7 +372,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Spells/Spells.vue"),
 						meta: {
 							title: "Spells",
-							description: "Your custom spells on Harmless Key.",
+							description: "Your custom spells on Shieldmaiden.",
 						},
 					},
 					{
@@ -381,7 +381,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
 						meta: {
 							title: "Add spell",
-							description: "Create a new spell on Harmless Key.",
+							description: "Create a new spell on Shieldmaiden.",
 						},
 					},
 					{
@@ -390,7 +390,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Spells/EditSpell.vue"),
 						meta: {
 							title: "Edit spell",
-							description: "Edit an existing spell on Harmless Key.",
+							description: "Edit an existing spell on Shieldmaiden.",
 						},
 					},
 				],
@@ -456,7 +456,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Reminders"),
 						meta: {
 							title: "Reminders",
-							description: "Your custom reminders Harmless Key.",
+							description: "Your custom reminders Shieldmaiden.",
 						},
 					},
 					{
@@ -465,7 +465,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Reminders/EditReminder.vue"),
 						meta: {
 							title: "Add reminder",
-							description: "Add a new reminder on Harmless Key.",
+							description: "Add a new reminder on Shieldmaiden.",
 						},
 					},
 					{
@@ -474,7 +474,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Reminders/EditReminder.vue"),
 						meta: {
 							title: "Edit reminder",
-							description: "Edit an existing reminder Harmless Key.",
+							description: "Edit an existing reminder Shieldmaiden.",
 						},
 					},
 				],
@@ -498,7 +498,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Items/Items.vue"),
 						meta: {
 							title: "Items",
-							description: "Your custom items Harmless Key.",
+							description: "Your custom items Shieldmaiden.",
 						},
 					},
 					{
@@ -507,7 +507,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Items/EditItem.vue"),
 						meta: {
 							title: "Add item",
-							description: "Add an existing item on Harmless Key.",
+							description: "Add an existing item on Shieldmaiden.",
 						},
 					},
 					{
@@ -516,7 +516,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Items/EditItem.vue"),
 						meta: {
 							title: "Edit item",
-							description: "Edit an existing item on Harmless Key.",
+							description: "Edit an existing item on Shieldmaiden.",
 						},
 					},
 				],
@@ -540,7 +540,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Characters"),
 						meta: {
 							title: "Characters",
-							description: "Your player characters on Harmless Key.",
+							description: "Your player characters on Shieldmaiden.",
 						},
 					},
 					{
@@ -549,7 +549,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Players/EditPlayer.vue"),
 						meta: {
 							title: "Edit character",
-							description: "Edit an existing character on Harmless Key.",
+							description: "Edit an existing character on Shieldmaiden.",
 						},
 					},
 				],
@@ -573,7 +573,7 @@ const routes = [
 						component: () => import("src/views/UserContent/Followed.vue"),
 						meta: {
 							title: "Followed users",
-							description: "Other users you're following on Harmless Key.",
+							description: "Other users you're following on Shieldmaiden.",
 						},
 					},
 				],
@@ -597,10 +597,41 @@ const routes = [
 						component: () => import("src/views/UserContent/Settings.vue"),
 						meta: {
 							title: "Settings",
-							description: "Your custom settings for Harmless Key.",
+							description: "Your custom settings for Shieldmaiden.",
 						},
 					},
 				],
+			},
+		],
+	},
+
+	// DM SCREEN
+	{
+		path: "/content/campaigns/:campid",
+		component: () => import("src/layouts/run-campaign"),
+		meta: {
+			requiresAuth: true,
+			title: "Run campaign",
+		},
+		children: [
+			{
+				path: "",
+				name: "Run campaign",
+				component: () => import("src/views/UserContent/Campaigns/RunCampaign"),
+				meta: {
+					description: "Run your campaign on Shieldmaiden.",
+					title: "Run campaign",
+				},
+			},
+			{
+				path: ":encid",
+				name: "EditEncounter",
+				component: EncounterBuilder,
+				meta: {
+					title: "Edit encounter",
+					description: "Edit your Shieldmaiden encounter.",
+					side: false,
+				},
 			},
 		],
 	},
@@ -618,9 +649,9 @@ const routes = [
 				name: "Tools",
 				component: () => import("src/views/Tools"),
 				meta: {
-					title: "D&D 5e Tools",
+					title: "D&D Tools - Online tools for D&D 5e",
 					description:
-						"Online tools for D&D 5e. \nCombat Tracker \nEncounter Builder \nMonster builder \nSpell creator \nCharacter Builder \nCompendium",
+						"Try our range of D&D 5e DM companion tools: track combat, build encounters, make custom monsters and spells, or check out one of our other useful tools for free now!",
 				},
 			},
 			{
@@ -628,8 +659,9 @@ const routes = [
 				name: "ToolsCombatTracker",
 				component: () => import("src/views/Tools/CombatTracker"),
 				meta: {
-					title: "D&D 5e Combat Tracker",
-					description: "An advanced initiative tracker for Dungeons and Dragons 5th edition.",
+					title: "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					description:
+						"Get a grip on tracking combat as a D&D DM with Shieldmaiden Combat Tracker. You can keep track of initiative, health, status effects, concentration spells, and much more. Use for free now! ",
 				},
 			},
 			{
@@ -640,9 +672,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5e Encounter Builder",
+					title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 					description:
-						"An encounter builder for D&D 5e. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
+						"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
 				},
 				children: [
 					{
@@ -650,20 +682,45 @@ const routes = [
 						name: "ToolsEncounterBuilder",
 						component: () => import("src/views/Tools/EncounterBuilder"),
 						meta: {
-							title: "D&D 5e Encounter Builder",
+							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 							description:
-								"An encounter builder for D&D 5e. It calculates the difficulty of your encounter and you can directly run it in our Combat Tracker.",
+								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
 						},
 					},
 					{
 						path: "build-encounter",
 						name: "ToolsBuildEncounter",
-						component: () => import("src/views/UserContent/Encounters/Edit"),
+						component: () => import("src/components/encounters"),
 						meta: {
-							title: "Build encounter for D&D 5e",
+							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
 							description:
-								"Create an encounter for D&D 5e and find out it's difficulty. Once you're finished you can run it in our Combat Tracker.",
+								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now! ",
 							side: false,
+						},
+					},
+				],
+			},
+			{
+				path: "dm-screen",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "D&D 5e DM Screen",
+					description:
+						"A DM Screen for D&D 5e. Quickly reference rules and directly run encounters.",
+				},
+				children: [
+					{
+						path: "",
+						name: "ToolsDmScreen",
+						component: () => import("src/views/Tools/DmScreen"),
+						meta: {
+							title: "D&D 5e DM Screen",
+							description:
+								"A Dungeon Master Screen for D&D 5e. Quickly reference rules and directly run encounters.",
 						},
 					},
 				],
@@ -676,9 +733,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5e Monster creator",
+					title: "D&D Monster Creator - Create custom monsters for D&D 5e",
 					description:
-						"An advanced monster creator for D&D 5e. Create a stat block with easy to roll actions.",
+						"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
 				},
 				children: [
 					{
@@ -688,7 +745,7 @@ const routes = [
 						meta: {
 							title: "Dungeons & Dragons Monster Creator",
 							description:
-								"An advanced monster creator for D&D 5e. Create a stat block with easy to roll actions.",
+								"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
 						},
 					},
 					{
@@ -710,7 +767,7 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D 5e Spell creator",
+					title: "D&D Spell Creator - Create custom spells for D&D 5e",
 					description:
 						"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
 				},
@@ -720,9 +777,9 @@ const routes = [
 						name: "ToolsSpellCreator",
 						component: () => import("src/views/Tools/SpellCreator"),
 						meta: {
-							title: "Dungeons & Dragons Spell Creator",
+							title: "D&D Spell Creator - Create custom spells for D&D 5e ",
 							description:
-								"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+								"Create custom spells for your D&D campaign with ease. Roll your customized spell directly or use them in your custom spellcaster monsters.",
 						},
 					},
 					{
@@ -738,6 +795,16 @@ const routes = [
 				],
 			},
 			{
+				path: "character-sync",
+				name: "ToolsCharacterSync",
+				component: () => import("src/views/Tools/CharacterSync"),
+				meta: {
+					title: "Character Sync",
+					description:
+						"Sync the D&D 5e characters of your players in Shieldmaiden. Update the stats of your players characters with one click.",
+				},
+			},
+			{
 				path: "character-builder",
 				name: "ToolsCharacterBuilder",
 				component: () => import("src/views/Tools/CharacterBuilder"),
@@ -745,6 +812,16 @@ const routes = [
 					title: "Character Builder",
 					description:
 						"An advanced character builder for D&D 5e. Create a character sheet for you character.",
+				},
+			},
+			{
+				path: "homebrew-creation",
+				name: "ToolsHomebrewCreation",
+				component: () => import("src/views/Tools/HomebrewCreation"),
+				meta: {
+					title: "Homebrew Creation",
+					description:
+						"Homebrew Creation. Because the secret of D&D is: you can create everything yourself",
 				},
 			},
 		],
@@ -763,8 +840,9 @@ const routes = [
 				name: "Compendium",
 				component: () => import("src/views/Compendium"),
 				meta: {
-					title: "Compendium D&D 5e",
-					description: "Conditions, items, monsters and spells for Dungeons & Dragons 5th edition.",
+					title: "Dungeons & Dragons Compendium - D&D 5e knowledge database",
+					description:
+						"Find descriptions and explanations for D&D 5e items, monsters, spells, conditions, rules and much more. What does this item do again? How does this spell work? Find the answer in our easy to understand compendium.",
 				},
 			},
 			{
@@ -889,6 +967,64 @@ const routes = [
 					},
 				],
 			},
+			{
+				path: "rules",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Rules",
+				},
+				children: [
+					{
+						path: "",
+						name: "CompendiumRules",
+						component: () => import("src/views/Compendium/Rules"),
+						meta: {
+							title: "Rules D&D 5e",
+							description: "Dungeons & Dragons 5th edition rules. Rules for playing D&D 5e.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Rule",
+						component: () => import("src/views/Compendium/view/Rule"),
+						meta: {
+							title: "Rule",
+						},
+					},
+				],
+			},
+		],
+	},
+	{
+		path: "/homebrew",
+		component: () => import("src/layouts/default"),
+		meta: {
+			offline: true,
+			title: "Homebrew",
+		},
+		children: [
+			{
+				path: "",
+				name: "Homebrew",
+				component: () => import("src/views/Compendium/Monsters"),
+				meta: {
+					title: "Homebrew",
+					description: "D&D 5e Monsters created by Shieldmaiden.",
+				},
+			},
+			{
+				path: ":id",
+				name: "HomebrewMonster",
+				component: () => import("src/views/Compendium/view/HomebrewMonster"),
+				meta: {
+					title: "Homebrew Monster D&D 5e",
+					description: "D&D 5th Edition monster created by Shieldmaiden.",
+				},
+			},
 		],
 	},
 
@@ -982,6 +1118,60 @@ const routes = [
 						path: "",
 						name: "Vouchers",
 						component: () => import("src/views/Admin/Vouchers.vue"),
+					},
+				],
+			},
+			{
+				path: "promotions",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Promotions",
+				},
+				children: [
+					{
+						path: "",
+						name: "Promotions",
+						component: () => import("src/views/Admin/Promotions.vue"),
+					},
+				],
+			},
+			{
+				path: "subscriptions",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Subscriptions",
+				},
+				children: [
+					{
+						path: "",
+						name: "Subscriptions",
+						component: () => import("src/views/Admin/Subscriptions.vue"),
+					},
+				],
+			},
+			{
+				path: "export_csv",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Analytics",
+				},
+				children: [
+					{
+						path: "",
+						name: "Export CSV ",
+						component: () => import("src/views/Admin/ExportCSV.vue"),
 					},
 				],
 			},
@@ -1117,16 +1307,33 @@ const routes = [
 	// DEMO ENCOUNTER
 	{
 		path: "/demo",
-		name: "Demo",
-		component: RunEncounter,
-		meta: {
-			sidebar: false,
-			offline: true,
-			title: "Encounter demo",
-			description:
-				"Try running an encounter with Harmless Key, a Combat Tracker for Dungeons & Dragons 5th Edition.",
-		},
+		component: () => import("src/layouts/demo"),
+		children: [
+			{
+				path: "",
+				name: "DemoBuildEncounter",
+				component: EncounterBuilder,
+				meta: {
+					sidebar: false,
+					title: "Encounter Builder D&D Demo",
+					description:
+						"Build an encounter with Shieldmaiden, an advanced Combat Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
+				},
+			},
+			{
+				path: "run-encounter",
+				name: "Demo",
+				component: RunEncounter,
+				meta: {
+					sidebar: false,
+					title: "D&D Initiative Tracker Demo",
+					description:
+						"Run encounter with Shieldmaiden, an advanced Initiative Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
+				},
+			},
+		],
 	},
+
 	{
 		path: "/weather-demo",
 		name: "Weather demo",
@@ -1136,7 +1343,7 @@ const routes = [
 			offline: true,
 			title: "Weather effects.",
 			description:
-				"Add weather effects to your encounters with Harmless Key, a Dungeons & Dragons Combat Tracker.",
+				"Add weather effects to your encounters with Shieldmaiden, a Dungeons & Dragons Combat Tracker.",
 		},
 	},
 
@@ -1205,7 +1412,7 @@ const routes = [
 		component: Sitemap,
 		meta: {
 			title: "Sitemap",
-			description: "Sitemap of Harmless Key, a Combat Tracker for D&D.",
+			description: "Sitemap of Shieldmaiden, a Combat Tracker for D&D.",
 		},
 	},
 	{
@@ -1214,7 +1421,16 @@ const routes = [
 		component: Privacy,
 		meta: {
 			title: "Privacy policy",
-			description: "Privacy policy for Harmless Key, a Combat Tracker for D&D.",
+			description: "Privacy policy for Shieldmaiden, a Combat Tracker for D&D.",
+		},
+	},
+	{
+		path: "/character-sync-privacy-policy",
+		name: "Character Sync Privacy Policy",
+		component: CharacterSyncPrivacyPolicy,
+		meta: {
+			title: "D&D Character Sync Privacy policy",
+			description: "Privacy policy for the D&D Character Sync browser extension.",
 		},
 	},
 	{
@@ -1232,7 +1448,7 @@ const routes = [
 				meta: {
 					title: "About us",
 					description:
-						"Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 experienced D&D players who were missing an initiative tracker that met their needs.",
+						"Shieldmaiden is a Combat Tracker for Dungeon and Dragons, created by 2 experienced D&D players who were missing an initiative tracker that met their needs.",
 				},
 			},
 		],
@@ -1244,7 +1460,7 @@ const routes = [
 		meta: {
 			offline: true,
 			title: "Documentation",
-			description: "Documentation for Harmless Key, a Combat Tracker for D&D.",
+			description: "Documentation for Shieldmaiden, a Combat Tracker for D&D.",
 		},
 	},
 	{
@@ -1261,7 +1477,7 @@ const routes = [
 				component: () => import("src/views/Pages/Support"),
 				meta: {
 					title: "Support",
-					description: "Get support with Harmless Key issues.",
+					description: "Get support with Shieldmaiden issues.",
 				},
 			},
 		],
@@ -1280,7 +1496,7 @@ const routes = [
 				component: () => import("src/views/Pages/Feedback"),
 				meta: {
 					title: "Feedback",
-					description: "Leave feedback for Harmless Key, a Combat Tracker for D&D.",
+					description: "Leave feedback for Shieldmaiden, a Combat Tracker for D&D.",
 				},
 			},
 		],
@@ -1298,7 +1514,7 @@ const routes = [
 				component: () => import("src/views/Pages/Changelog"),
 				meta: {
 					title: "Changelog",
-					description: "Changelog of D&D 5e Combat Tracker Harmless Key.",
+					description: "Changelog of D&D 5e Combat Tracker Shieldmaiden.",
 				},
 			},
 		],
@@ -1316,7 +1532,7 @@ const routes = [
 				component: () => import("src/views/Pages/Cookies"),
 				meta: {
 					title: "Cookies",
-					description: "Cookie information for Harmless Key.",
+					description: "Cookie information for Shieldmaiden.",
 				},
 			},
 		],
@@ -1324,10 +1540,10 @@ const routes = [
 	{
 		path: "/sign-in",
 		name: "signIn",
-		component: SignIn,
+		component: SignInPage,
 		meta: {
 			sidebar: false,
-			description: "Sign in to your account on Harmless Key, a Combat Tracker for D&D.",
+			description: "Sign in to your account on Shieldmaiden, a Combat Tracker for D&D.",
 		},
 	},
 	{
@@ -1337,7 +1553,7 @@ const routes = [
 		meta: {
 			sidebar: false,
 			title: "Sign up",
-			description: "Create an account for Harmless Key, a Combat Tracker for D&D",
+			description: "Create an account for Shieldmaiden, a Combat Tracker for D&D",
 		},
 	},
 	{
@@ -1347,17 +1563,28 @@ const routes = [
 		meta: {
 			sidebar: false,
 			title: "Forgot password",
-			description: "Request to reset your Harmless Key password.",
+			description: "Request to reset your Shieldmaiden password.",
 		},
 	},
 	{
-		path: "/patreon",
-		name: "Patreon",
-		component: Patreon,
+		path: "/pricing",
+		name: "Pricing",
+		component: () => import("src/views/Pages/Patreon.vue"),
 		meta: {
-			title: "Patreon support",
+			title: "Pricing",
 			description:
-				"Support Harmless Key on Patreon for more content slots and help our D&D Combat Tracker improve.",
+				"Get a Shieldmaiden subscription for more content slots and help our D&D Combat Tracker improve.",
+		},
+	},
+	{
+		path: "/link-patreon-account",
+		name: "LinkPatreonAccount",
+		component: () => import("src/views/Pages/LinkPatreonAccount"),
+		meta: {
+			requiresAuth: true,
+			sidebar: false,
+			title: "Link Patreon account",
+			description: "Link your Patreon account to your Shieldmaiden account.",
 		},
 	},
 	{
@@ -1374,7 +1601,7 @@ const routes = [
 		meta: {
 			requiresAuth: true,
 			title: "Profile",
-			description: "Your Harmless Key profile page.",
+			description: "Your Shieldmaiden profile page.",
 		},
 	},
 	{
@@ -1392,7 +1619,7 @@ const routes = [
 		meta: {
 			sidebar: false,
 			title: "Set username",
-			description: "Set your username for Harmless Key.",
+			description: "Set your username for Shieldmaiden.",
 		},
 	},
 	{
@@ -1403,7 +1630,7 @@ const routes = [
 			title: "Run encounter",
 			requiresAuth: true,
 			sidebar: false,
-			description: "Run your encounter in Harmless Key, a Combat Tracker for D&D 5e.",
+			description: "Run your encounter in Shieldmaiden, a Combat Tracker for D&D 5e.",
 		},
 	},
 	{
@@ -1414,7 +1641,7 @@ const routes = [
 			title: "Test encounter",
 			requiresAuth: true,
 			sidebar: false,
-			description: "Test your encounter in Harmless Key, a Combat Tracker for D&D 5e.",
+			description: "Test your encounter in Shieldmaiden, a Combat Tracker for D&D 5e.",
 		},
 	},
 	{
@@ -1425,7 +1652,7 @@ const routes = [
 			basePath: "/user",
 			title: "User page",
 			description:
-				"Follow the live initiative lists of your DM with Harmless Key, a Dungeons & Dragons Initiative Tracker.",
+				"Follow the live initiative lists of your DM with Shieldmaiden, a Dungeons & Dragons Initiative Tracker.",
 		},
 	},
 	{
@@ -1437,7 +1664,7 @@ const routes = [
 			title: "Campaign",
 			sidebar: false,
 			description:
-				"Campaign with live initiative list of the encounters with Harmless Key, a Dungeons & Dragons Initiative Tracker.",
+				"Campaign with live initiative list of the encounters with Shieldmaiden, a Dungeons & Dragons Initiative Tracker.",
 		},
 	},
 	{ path: "/track-encounter/:userid", redirect: "/user/:userid" },
@@ -1458,6 +1685,7 @@ const routes = [
 	{ path: "/followed", redirect: "/content/followed" },
 	{ path: "/settings", redirect: "/content/settings" },
 
+	{ path: "/patreon", redirect: "/pricing" },
 	{ path: "/updates", redirect: "/changelog" },
 	{ path: "/combat-tracker", redirect: "/demo" },
 	{ path: "/monster-creator", redirect: "/tools/monster-creator/create-monster" },

@@ -4,7 +4,7 @@ import _ from "lodash";
 
 // Converts a full npc to a search_npc
 const convert_npc = (npc) => {
-	const properties = ["name", "challenge_rating", "avatar", "storage_avatar", "type"];
+	const properties = ["name", "challenge_rating", "avatar", "storage_avatar", "type", "groups"];
 	const returnNpc = {};
 
 	for (const prop of properties) {
@@ -20,6 +20,7 @@ const npc_state = () => ({
 	cached_npcs: {},
 	npc_count: 0,
 	npcs: undefined,
+	generated_npcs: [],
 });
 
 const npc_getters = {
@@ -38,6 +39,9 @@ const npc_getters = {
 	},
 	npc_services: (state) => {
 		return state.npc_services;
+	},
+	generated_npcs: (state) => {
+		return state.generated_npcs;
 	},
 };
 
@@ -87,6 +91,23 @@ const npc_actions = {
 		}
 	},
 
+	async update_npc_count({ rootGetters, state, commit, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_npc_services");
+			try {
+				const current_count = state.npc_count;
+				const table_length = Object.keys(state.npcs).length;
+				const count_diff = table_length - current_count;
+
+				const new_count = await services.updateNpcCount(uid, count_diff);
+				commit("SET_NPC_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
 	async get_npc({ state, commit, dispatch }, { uid, id }) {
 		let npc = state.cached_npcs[uid] ? state.cached_npcs[uid][id] : undefined;
 
@@ -154,7 +175,7 @@ const npc_actions = {
 	 * @param {object} npc
 	 * @returns {string} the id of the newly added npc
 	 */
-	async add_npc({ rootGetters, commit, dispatch }, npc) {
+	async add_npc({ rootGetters, commit, dispatch, state }, { npc, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.npcs;
 
@@ -167,13 +188,13 @@ const npc_actions = {
 			}
 			try {
 				const search_npc = convert_npc(npc);
-				const id = await services.addNpc(uid, npc, search_npc);
-				commit("SET_NPC", { id, search_npc });
-				commit("SET_CACHED_NPC", { uid, id, npc });
+				const [new_npc, id] = await services.addNpc(uid, npc, search_npc, predefined_key);
 
-				const new_count = await services.updateNpcCount(uid, 1);
-				commit("SET_NPC_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				commit("SET_NPC", { id, search_npc });
+				commit("SET_CACHED_NPC", { uid, id, new_npc });
+
+				await dispatch("update_npc_count");
+
 				return id;
 			} catch (error) {
 				throw error;
@@ -296,9 +317,7 @@ const npc_actions = {
 				commit("REMOVE_NPC", id);
 				commit("REMOVE_CACHED_NPC", { uid, id });
 
-				const new_count = await services.updateNpcCount(uid, -1);
-				commit("SET_NPC_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				await dispatch("update_npc_count");
 				return;
 			} catch (error) {
 				throw error;
@@ -322,6 +341,60 @@ const npc_actions = {
 				throw error;
 			}
 		}
+	},
+
+	/**
+	 * Reserve Npc id for future usage
+	 */
+	async reserve_npc_id({ rootGetters, dispatch }) {
+		console.log("store reserving npc id");
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_npc_services");
+			try {
+				return await services.reserveNpcId(uid);
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Updates the groups for an NPC
+	 *
+	 * @param {string} id NPC ID
+	 * @param {object} groups Groups object { groupId: true, ... }
+	 */
+	async update_npc_groups({ rootGetters, commit, dispatch }, { id, groups }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_npc_services");
+			await services.updateNpc(uid, id, "", { groups }, true);
+			commit("SET_NPC_PROP", { uid, id, property: "groups", value: groups, update_search: true });
+		}
+	},
+
+	/**
+	 * Removes a group from all NPCs that reference it
+	 * Called when a group is deleted
+	 *
+	 * @param {string} groupId
+	 */
+	async remove_group_from_all_npcs({ state, rootGetters, dispatch }, groupId) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid && state.npcs) {
+			const services = await dispatch("get_npc_services");
+			for (const [npcId, npc] of Object.entries(state.npcs)) {
+				if (npc.groups && npc.groups[groupId]) {
+					await services.updateNpc(uid, npcId, "/groups", { [groupId]: null }, true);
+					Vue.delete(state.npcs[npcId].groups, groupId);
+				}
+			}
+		}
+	},
+
+	cache_generated_npc({ commit }, npc) {
+		commit("CACHE_GENERATED_NPC", npc);
 	},
 
 	clear_npc_store({ commit, rootGetters }) {
@@ -382,6 +455,9 @@ const npc_mutations = {
 		if (state.cached_npcs[uid]) {
 			Vue.delete(state.cached_npcs[uid], id);
 		}
+	},
+	CACHE_GENERATED_NPC(state, npc) {
+		state.generated_npcs.push(npc);
 	},
 	CLEAR_STORE(state) {
 		Vue.set(state, "npcs", undefined);

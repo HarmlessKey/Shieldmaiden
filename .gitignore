@@ -6,6 +6,7 @@ node_modules
 .env*
 .env.local
 .env.*.local
+!.env.vault
 
 # Log files
 npm-debug.log*
@@ -65,3 +66,8 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+
+firebaseServiceAccountKey.json
+
+# Claude Code local settings (per-machine permissions allowlist)
+.claude/settings.local.json

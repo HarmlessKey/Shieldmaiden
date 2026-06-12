@@ -8,15 +8,9 @@
 			no-caps
 			toggle-color="primary"
 			@input="changeCopyResource($event)"
-			:options="[
-				{ label: `Custom ${type === 'monster' ? 'NPCs' : type}s`, value: 'custom' },
-				{ label: `SRD ${type}s`, value: 'srd' },
-			]"
+			:options="options"
 		/>
-		<q-input
-			:dark="$store.getters.theme === 'dark'"
-			filled
-			square
+		<hk-input
 			:label="
 				copy_resource === 'custom'
 					? `Search ${type === 'monster' ? 'NPCs' : type}`
@@ -31,10 +25,24 @@
 			:error="!!noResult"
 			:error-message="noResult"
 		>
-			<template v-slot:append>
-				<q-icon name="fas fa-search" size="xs" @click="search()" />
-			</template>
-		</q-input>
+			<button
+				v-if="copy_resource === 'srd'"
+				slot="before"
+				class="btn btn"
+				@click="show_filter = !show_filter"
+			>
+				<q-icon name="fas fa-filter" size="xs" />
+			</button>
+			<button slot="append" class="btn btn-sm btn-clear" @click="search()">
+				<q-icon name="fas fa-search" size="xs" />
+			</button>
+		</hk-input>
+		<q-slide-transition v-if="copy_resource === 'srd'">
+			<div v-show="show_filter" class="filter">
+				<h3>Filter {{ type }}s</h3>
+				<hk-filter v-model="filter" :type="type" @change="search()" />
+			</div>
+		</q-slide-transition>
 		<q-list :dark="$store.getters.theme === 'dark'">
 			<q-item
 				v-for="(result, index) in searchResults"
@@ -60,6 +68,16 @@
 				</q-item-section>
 			</q-item>
 		</q-list>
+		<q-pagination
+			v-if="copy_resource === 'srd' && totalPages > 1"
+			v-model="page"
+			:max="totalPages"
+			:max-pages="5"
+			flat
+			direction-links
+			class="mt-3"
+			@input="fetchApiContent()"
+		/>
 	</div>
 </template>
 
@@ -112,12 +130,26 @@ export default {
 			searchResults: [],
 			noResult: "",
 			copy_resource_setter: undefined,
+			show_filter: false,
+			filter: {},
+			pageSize: 5,
+			page: 1,
+			totalPages: 0,
 		};
 	},
 	computed: {
 		...mapGetters("npcs", ["npcs"]),
 		...mapGetters("items", ["items"]),
 		...mapGetters("spells", ["spells"]),
+		options() {
+			const values = [
+				{ label: `Custom`, value: "custom" },
+				{ label: `SRD`, value: "srd" },
+			];
+			return this.type === "monster"
+				? values.concat({ label: `Homebrew`, value: "homebrew" })
+				: values;
+		},
 		custom_content() {
 			let content = [];
 			if (this.type === "monster") {
@@ -137,8 +169,11 @@ export default {
 						: "srd";
 				return this.copy_resource_setter ? this.copy_resource_setter : resource;
 			},
-			set(newVal) {
+			async set(newVal) {
 				this.copy_resource_setter = newVal;
+				if (newVal !== "custom") {
+					await this.fetchApiContent();
+				}
 			},
 		},
 	},
@@ -164,15 +199,17 @@ export default {
 		...mapActions("api_spells", ["fetch_api_spells", "fetch_api_spell"]),
 		...mapActions("spells", ["get_spells", "get_spell"]),
 		changeCopyResource(value) {
-			this.copy_resource = value;
 			this.query = "";
 			this.searchResults = [];
 			this.noResult = "";
+			this.page = 1;
+			this.totalPages = 0;
+			this.copy_resource = value;
 		},
 		async search() {
-			if (this.query) {
-				// CUSTOM
-				if (this.copy_resource === "custom") {
+			// CUSTOM
+			if (this.copy_resource === "custom") {
+				if (this.query) {
 					const results = this.custom_content.filter((result) => {
 						return result.name.toLowerCase().includes(this.query.toLowerCase());
 					});
@@ -184,32 +221,47 @@ export default {
 						this.searchResults = [];
 						this.noResult = 'Nothing found for "' + this.query + '"';
 					}
+				} else {
+					this.noResult = "";
+					this.searchResults = [];
 				}
-				// API
-				else {
-					let data;
-
-					if (this.type === "monster") {
-						data = this.fetch_monsters;
-					} else if (this.type === "item") {
-						data = this.fetch_api_items;
-					} else if (this.type === "spell") {
-						data = this.fetch_api_spells;
-					}
-
-					await data({ query: { search: this.query } }).then((results) => {
-						if (results.meta.count === 0) {
-							this.noResult = 'Nothing found for "' + this.query + '"';
-						} else {
-							this.noResult = "";
-							this.searchResults = results.results;
-						}
-					});
-				}
-			} else {
-				this.noResult = "";
-				this.searchResults = [];
 			}
+			// API
+			else {
+				await this.fetchApiContent();
+				this.page = 1;
+			}
+		},
+
+		async fetchApiContent() {
+			let data;
+
+			if (this.type === "monster") {
+				data = this.fetch_monsters;
+			} else if (this.type === "item") {
+				data = this.fetch_api_items;
+			} else if (this.type === "spell") {
+				data = this.fetch_api_spells;
+			}
+
+			await data({
+				pageNumber: this.page,
+				pageSize: this.pageSize,
+				query: {
+					search: this.query,
+					source: this.copy_resource === "homebrew" ? "homebrew" : null,
+					...this.filter,
+				},
+			}).then((result) => {
+				if (result.meta.count === 0) {
+					this.noResult = 'Nothing found for "' + this.query + '"';
+					this.totalPages = 0;
+				} else {
+					this.noResult = "";
+					this.searchResults = result.results;
+					this.totalPages = Math.ceil(result.meta.count / this.pageSize);
+				}
+			});
 		},
 
 		/**
@@ -248,6 +300,7 @@ export default {
 				delete result.key;
 				delete result.url;
 				delete result.meta;
+				delete result.release_date;
 
 				this.$emit("copy", { result, id, resource: this.copy_resource });
 			}
@@ -263,5 +316,11 @@ export default {
 <style lang="scss" scoped>
 .q-item {
 	margin-bottom: 1px;
+}
+.filter {
+	padding: 20px;
+	margin-bottom: 15px;
+	background-color: $neutral-7;
+	border-radius: $border-radius;
 }
 </style>

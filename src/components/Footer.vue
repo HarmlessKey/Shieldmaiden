@@ -3,16 +3,21 @@
 		<div class="top">
 			<div class="content">
 				<div class="logo-container">
-					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
+					<img
+						class="logo"
+						src="../assets/_img/logo/logo-cyan.svg"
+						alt="Shieldmaiden logo"
+						loading="lazy"
+					/>
 				</div>
 
 				<div class="links">
 					<div>
 						<h2 class="neutral-2">Quick Links</h2>
 						<ul>
+							<li><router-link to="/tools">Tools</router-link></li>
 							<li><router-link to="/compendium">Compendium</router-link></li>
 							<li><router-link to="/support">Support</router-link></li>
-							<li><router-link to="/feedback">Feedback</router-link></li>
 							<li><router-link to="/changelog">Changelog</router-link></li>
 							<li><router-link to="/documentation">Documentation</router-link></li>
 							<li><router-link to="/about-us">About us</router-link></li>
@@ -22,7 +27,7 @@
 						<h2 class="neutral-2">Follow us</h2>
 						<ul>
 							<li>
-								<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.patreon.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Patreon</a
 								>
 							</li>
@@ -30,21 +35,18 @@
 								<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a>
 							</li>
 							<li>
-								<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener"
+								<a href="https://www.instagram.com/shieldmaidenapp" target="_blank" rel="noopener"
 									>Instagram</a
 								>
 							</li>
 							<li>
-								<a href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">Twitter</a>
-							</li>
-							<li>
-								<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener"
-									>Facebook</a
+								<a href="https://twitter.com/shieldmaidenapp" target="_blank" rel="noopener"
+									>Twitter</a
 								>
 							</li>
 							<li>
-								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener"
-									>Reddit</a
+								<a href="https://www.facebook.com/shieldmaidenapp" target="_blank" rel="noopener"
+									>Facebook</a
 								>
 							</li>
 						</ul>
@@ -81,6 +83,7 @@
 							<li><router-link to="/tools/encounter-builder">Encounter builder</router-link></li>
 							<li><router-link to="/tools/monster-creator">Monster creator</router-link></li>
 							<li><router-link to="/tools/spell-creator">Spell creator</router-link></li>
+							<li><router-link to="/tools/character-sync">Character sync</router-link></li>
 						</ul>
 					</div>
 				</div>
@@ -99,7 +102,7 @@
 					<router-link to="/privacy-policy">Privacy Policy</router-link>
 				</small>
 				<small>
-					©{{ year }} Harmless Key | All Rights Reserved<br />
+					©{{ year }} Shieldmaiden | All Rights Reserved<br />
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are
 					property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{
 						year
@@ -149,6 +152,7 @@ export default {
 				.logo {
 					margin-top: -40px;
 					width: 250px;
+					aspect-ratio: 25 / 24;
 				}
 			}
 		}
@@ -169,6 +173,9 @@ export default {
 				ul {
 					padding: 0;
 					list-style: none;
+					display: flex;
+					flex-direction: column;
+					gap: 3px;
 
 					a {
 						font-size: 12px;
@@ -200,14 +207,21 @@ export default {
 }
 @media (max-width: 772px) {
 	.footer .top .content {
-		justify-content: center;
+		flex-direction: column;
 
-		.links {
+		.logo-container {
 			justify-content: center;
-			text-align: center;
+			width: 100%;
+		}
+		.links {
+			justify-content: space-between;
+			column-gap: 10px;
+			flex-grow: 1;
+			width: 100%;
+			max-width: unset;
 
 			> div {
-				padding: 0 10px;
+				max-width: fit-content;
 			}
 		}
 	}

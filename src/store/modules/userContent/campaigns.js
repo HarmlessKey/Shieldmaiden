@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { campaignServices } from "src/services/campaigns";
+import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
 
 // Converts a full campaign to a search_campaign
@@ -29,6 +30,7 @@ const campaign_state = () => ({
 	cached_campaigns: {},
 	campaigns: undefined,
 	campaign_count: 0,
+	notes: {},
 });
 
 const campaign_getters = {
@@ -50,6 +52,9 @@ const campaign_getters = {
 	campaign_services: (state) => {
 		return state.campaign_services;
 	},
+	get_notes: (state) => (campaignId) => {
+		return state.notes[campaignId];
+	},
 };
 
 const campaign_actions = {
@@ -64,11 +69,11 @@ const campaign_actions = {
 	 * Fetches all the search_campaigns for a user
 	 * and stores them in campaigns
 	 */
-	async get_campaigns({ state, rootGetters, dispatch, commit }) {
+	async get_campaigns({ state, rootGetters, getters, dispatch, commit }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		let campaigns = state.campaigns ? state.campaigns : undefined;
 
-		if (!campaigns && uid) {
+		if ((!campaigns || getters.campaign_count > Object.keys(campaigns)) && uid) {
 			const services = await dispatch("get_campaign_services");
 			try {
 				campaigns = await services.getCampaigns(uid);
@@ -92,6 +97,24 @@ const campaign_actions = {
 				const count = (await services.getCampaignCount(uid)) || 0;
 				commit("SET_CAMPAIGN_COUNT", count);
 				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	async update_campaign_count({ rootGetters, state, commit, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				const current_count = state.campaign_count;
+				const table_length = Object.keys(state.campaigns).length;
+				const count_diff = table_length - current_count;
+
+				const new_count = await services.updateCampaignCount(uid, count_diff);
+				commit("SET_CAMPAIGN_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
 			} catch (error) {
 				throw error;
 			}
@@ -209,8 +232,30 @@ const campaign_actions = {
 				}
 			}
 		}
-
 		return campaign;
+	},
+
+	/**
+	 * Gets all notes for a single campaign
+	 * first try to find it in the store, then fetch if it wasn't present
+	 *
+	 * @param {string} campaignId campaignId
+	 */
+	async get_campaign_notes({ state, rootGetters, commit, dispatch }, campaignId) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		let notes = state.notes[campaignId];
+
+		// The notes are not in the store and need to be fetched from the database
+		if (!notes) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				notes = await services.getCampaignNotes(uid, campaignId);
+				commit("SET_NOTES", { campaignId: campaignId, notes });
+			} catch (error) {
+				throw error;
+			}
+		}
+		return notes;
 	},
 
 	/**
@@ -240,7 +285,7 @@ const campaign_actions = {
 	 * @param {object} campaign
 	 * @returns {string} the id of the newly added campaign
 	 */
-	async add_campaign({ rootGetters, commit, dispatch }, campaign) {
+	async add_campaign({ rootGetters, commit, dispatch, state }, { campaign, predefined_key }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const available_slots = rootGetters.tier.benefits.campaigns;
 		if (uid) {
@@ -252,14 +297,14 @@ const campaign_actions = {
 			}
 			try {
 				const search_campaign = convert_campaign(campaign);
-				const id = await services.addCampaign(uid, campaign, search_campaign);
+				const id = await services.addCampaign(uid, campaign, search_campaign, predefined_key);
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
+				commit("SET_CACHED_CAMPAIGN", { uid, id, campaign });
 
-				const new_count = await services.updateCampaignCount(uid, 1);
-				commit("SET_CAMPAIGN_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_campaign_count");
 				return id;
 			} catch (error) {
+				console.log("caught error", error);
 				throw error;
 			}
 		}
@@ -287,6 +332,21 @@ const campaign_actions = {
 
 				commit("SET_CAMPAIGN", { uid, id, search_campaign });
 				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Reserve campaign id for future usage
+	 */
+	async reserve_campaign_id({ rootGetters, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				return await services.reserveCampaignId(uid);
 			} catch (error) {
 				throw error;
 			}
@@ -323,10 +383,8 @@ const campaign_actions = {
 				commit("REMOVE_CAMPAIGN", id);
 				commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
 
-				// Update campaign count
-				const new_count = await services.updateCampaignCount(uid, -1);
-				commit("SET_CAMPAIGN_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
+				dispatch("update_campaign_count");
+
 				return;
 			} catch (error) {
 				throw error;
@@ -365,6 +423,36 @@ const campaign_actions = {
 					{ root: true }
 				);
 
+				// Add player to all unfinished encounters
+				const encounters = await dispatch(
+					"encounters/get_campaign_encounters",
+					{ campaignId: campaign.key },
+					{ root: true }
+				);
+
+				const encounter_player = {
+					id: playerId,
+					name: player.character_name,
+					entityType: "player",
+					initiative: 0,
+					active: true,
+				};
+
+				await Promise.all(
+					encounters.map((encounter) => {
+						return dispatch(
+							"encounters/add_player_encounter",
+							{
+								campaignId: campaign.key,
+								encounterId: encounter.key,
+								playerId,
+								player: encounter_player,
+							},
+							{ root: true }
+						);
+					})
+				);
+
 				// Add companions
 				if (player.companions) {
 					for (const companionId in player.companions) {
@@ -382,17 +470,46 @@ const campaign_actions = {
 								{ root: true }
 							);
 						} else {
-							companion = { curHp: companion.hit_points }; // Only need the hit_points
 							// Add the companion to the campaign
 							await dispatch("update_companion", {
 								uid,
 								id: campaign.key,
 								companionId,
 								property: "curHp",
-								value: companion.curHp,
+								value: companion.hit_points,
 							});
-							commit("SET_COMPANION", { uid, id: campaign.key, companionId, companion });
+							commit("SET_COMPANION", {
+								uid,
+								id: campaign.key,
+								companionId,
+								companion: { curHp: companion.hit_points }, //only need curhp
+							});
 						}
+
+						const encounter_companion = {
+							id: companionId,
+							name: companion.name,
+							entityType: "companion",
+							initiative: 0,
+							active: true,
+							npc: "custom",
+							player: playerId,
+						};
+
+						await Promise.all(
+							encounters.map((encounter) => {
+								return dispatch(
+									"encounters/add_player_encounter",
+									{
+										campaignId: campaign.key,
+										encounterId: encounter.key,
+										playerId: companionId,
+										player: encounter_companion,
+									},
+									{ root: true }
+								);
+							})
+						);
 					}
 				}
 
@@ -401,7 +518,7 @@ const campaign_actions = {
 
 				const new_count = await services.updatePlayerCount(uid, campaign.key, 1);
 				commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
-				return;
+				return (await dispatch("get_campaign", { uid, id: campaign.key })).players;
 			} catch (error) {
 				throw error;
 			}
@@ -573,6 +690,28 @@ const campaign_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_campaign_services");
+
+			// Get all unfinished encounters
+			const encounters = await dispatch(
+				"encounters/get_campaign_encounters",
+				{ campaignId: id },
+				{ root: true }
+			);
+
+			await Promise.all(
+				encounters.map((encounter) => {
+					return dispatch(
+						"encounters/delete_entity",
+						{
+							campaignId: id,
+							encounterId: encounter.key,
+							entityId: companionId,
+						},
+						{ root: true }
+					);
+				})
+			);
+
 			try {
 				await services.deleteCompanion(uid, id, companionId);
 				commit("DELETE_COMPANION", { uid, id, companionId });
@@ -593,8 +732,8 @@ const campaign_actions = {
 	 * it is possible the search_campaigns aren't fetched
 	 * in this case the player_count can't be found in the store, but it's sent from the get_campaign function.
 	 *
-	 * @param {object} campaign
-	 * @param {number} player_count
+	 * @param {object} id campaignId
+	 * @param {number} player
 	 * @returns {string} the id of the newly added campaign
 	 */
 	async delete_player({ state, rootGetters, commit, dispatch }, { id, player }) {
@@ -616,11 +755,33 @@ const campaign_actions = {
 						await dispatch("delete_companion", { id, companionId });
 					}
 				}
+
+				// Get all unfinished encounters
+				const encounters = await dispatch(
+					"encounters/get_campaign_encounters",
+					{ campaignId: id },
+					{ root: true }
+				);
+
+				await Promise.all(
+					encounters.map((encounter) => {
+						return dispatch(
+							"encounters/delete_entity",
+							{
+								campaignId: id,
+								encounterId: encounter.key,
+								entityId: player.key,
+							},
+							{ root: true }
+						);
+					})
+				);
+
 				await services.deletePlayer(uid, id, player.key);
 				commit("DELETE_PLAYER", { uid, id, playerId: player.key });
 
-				const new_count = await services.updatePlayerCount(uid, campaign.key, -1);
-				commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
+				const new_count = await services.updatePlayerCount(uid, id, -1);
+				commit("SET_PLAYER_COUNT", { uid, id: id, new_count });
 				return;
 			} catch (error) {
 				throw error;
@@ -700,7 +861,7 @@ const campaign_actions = {
 
 	/**
 	 * Update the "share" property with the latest value
-	 * Shares can be seen by players on the public intiative list
+	 * Shares can be seen by players on the public initiative list
 	 *
 	 * @param {string} id campaignId
 	 * @param {object} share Share object
@@ -783,8 +944,8 @@ const campaign_actions = {
 	/**
 	 * Deletes an item from a campaign inventory
 	 *
-	 * @param {string} id campaignId
-	 * @param {object} share Share object
+	 * @param {string} campaignId
+	 * @param {string} id itemId
 	 */
 	async delete_campaign_item({ rootGetters, commit, dispatch }, { campaignId, id }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
@@ -798,6 +959,90 @@ const campaign_actions = {
 				throw error;
 			}
 		}
+	},
+
+	/**
+	 * Adds a newly created note for a user
+	 * A user can only add notes for themselves so we use the uid from the store
+	 *
+	 * @param {string} campaignId
+	 * @param {object} note
+	 * @returns {string} the id of the newly added campaign
+	 */
+	async add_note({ rootGetters, commit, dispatch }, { campaignId, note }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+
+			try {
+				const id = await services.addNote(uid, campaignId, note);
+				commit("SET_NOTE", { campaignId, id, note });
+				return id;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	async update_note({ rootGetters, commit, dispatch }, { campaignId, id, note }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+
+			try {
+				await services.updateNote(uid, campaignId, id, note);
+				commit("UPDATE_NOTE", { campaignId, id, note });
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Deletes a note from a campaign
+	 *
+	 * @param {string} campaignId
+	 * @param {string} key note key
+	 */
+	async delete_note({ rootGetters, commit, dispatch }, { campaignId, key }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			try {
+				await services.deleteNote(uid, campaignId, key);
+				commit("DELETE_NOTE", { campaignId, key });
+				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	async rebuild_campaign_search_tables({ commit, rootGetters }, { campaignId }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid) {
+			return;
+		}
+		const campaignService = new campaignServices();
+		const encounterService = new encounterServices();
+		// Get Campaign
+		const campaign = await campaignService.getCampaign(uid, campaignId);
+		if (!campaign) {
+			return;
+		}
+		const search_campaign = convert_campaign(campaign);
+		campaignService.updateSearchCampaign(uid, id, "", search_campaign);
+		commit("SET_CAMPAIGN", { uid, id: campaignId, search_campaign });
+
+		// Get all encounters of campaign getCampaignEncounters returns an object, so they need to be destructured
+		const [encounters, finished_encounters] = await Promise.all([
+			encounterService.getCampaignEncounters(uid, campaignId, false),
+			encounterService.getCampaignEncounters(uid, campaignId, true),
+		]);
+
+		const meta = {
+			count: Object.keys(encounters).length + Object.keys(finished_encounters).length,
+		};
 	},
 
 	clear_campaign_store({ commit, rootGetters }) {
@@ -823,6 +1068,9 @@ const campaign_mutations = {
 		} else {
 			Vue.set(state, "campaigns", { [id]: search_campaign });
 		}
+	},
+	SET_NOTES(state, { campaignId, notes }) {
+		Vue.set(state.notes, campaignId, notes);
 	},
 	REMOVE_CAMPAIGN(state, id) {
 		Vue.delete(state.campaigns, id);
@@ -942,10 +1190,25 @@ const campaign_mutations = {
 	DELETE_ITEM(state, { uid, campaignId, id }) {
 		Vue.delete(state.cached_campaigns[uid][campaignId].inventory.items, id);
 	},
+	SET_NOTE(state, { campaignId, id, note }) {
+		if (state.notes[campaignId]) {
+			Vue.set(state.notes[campaignId], id, note);
+		} else {
+			Vue.set(state.notes, campaignId, { [id]: note });
+		}
+	},
+	UPDATE_NOTE(state, { campaignId, id, note }) {
+		const current = state.notes[campaignId][id];
+		Vue.set(state.notes[campaignId], id, { ...current, ...note });
+	},
+	DELETE_NOTE(state, { campaignId, key }) {
+		Vue.delete(state.notes[campaignId], key);
+	},
 	CLEAR_STORE(state) {
 		Vue.set(state, "active_campaign", undefined);
 		Vue.set(state, "campaigns", undefined);
 		Vue.set(state, "campaign_count", 0);
+		Vue.set(state, "notes", {});
 	},
 };
 

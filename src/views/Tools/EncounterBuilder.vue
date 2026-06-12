@@ -1,5 +1,5 @@
 <template>
-	<ToolsPage title="Encounter Builder" bg_img="encounter-builder-tool-header.jpg">
+	<ToolsPage title="Encounter Builder" bg_img="encounter-builder-header.webp">
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn
 				color="primary"
@@ -37,7 +37,7 @@
 
 		<section class="d-lg-flex justify-between mt-5">
 			<div>
-				<h2>Difficulty</h2>
+				<h2>Encounter Difficulty Calculator</h2>
 				<p>
 					One of the features of our encounter builder is the built-in difficulty calculator. This
 					tool uses the official rules to analyze your encounter and calculate its difficulty level
@@ -52,7 +52,7 @@
 				muted
 				autoplay
 				playsinline
-				alt="Harmless Key logo animation"
+				alt="Shieldmaiden logo animation"
 				loop
 			/>
 		</section>
@@ -69,8 +69,23 @@ export default {
 	components: {
 		ToolsPage,
 	},
-	data() {
-		return {};
+	meta() {
+		return {
+			meta: {
+				twitterImage: {
+					name: "twitter:image",
+					content: require(`assets/_img/meta/shieldmaiden-encounter-builder.png`),
+				},
+				ogImage: {
+					property: "og:image",
+					content: require(`assets/_img/meta/shieldmaiden-encounter-builder.png`),
+				},
+				ogImageAlt: {
+					property: "og:image:alt",
+					content: "Shieldmaiden Encounter Builder",
+				},
+			},
+		};
 	},
 };
 </script>

@@ -1,43 +1,61 @@
 <template>
 	<div class="builder">
-		<div class="container">
-			<div class="head">
-				<h2>Build great encounters</h2>
-				<span>
-					Our encounter builder is easy to use and lets you use your own custom monsters.
-				</span>
-			</div>
-
-			<video 
-				class="video" src="~assets/_img/home/encounter-builder.mp4" 
-				muted autoplay playsinline alt="Harmless Key logo animation" loop
-			/>
-
-			<div class="text-center">
-				<router-link to="/encounter-builder" class="btn btn-lg">Try our encounter builder</router-link>
+		<div class="home__container">
+			<div class="row q-col-gutter-xl items-center">
+				<div class="col-12 col-md-5">
+					<div class="head">
+						<h2>Encounter Builder</h2>
+						<h3>Quickly build exciting encounters</h3>
+						<p class="text">
+							Our encounter builder is easy to use and lets you use your own custom monsters. We
+							instantly calculate the difficulty for you.<br />
+							<router-link to="/tools/encounter-builder" class="learn-more"
+								>More on the Encounter Builder</router-link
+							>
+						</p>
+						<router-link to="/encounter-builder" class="btn btn-lg bg-accent">
+							Try Encounter Builder
+						</router-link>
+					</div>
+				</div>
+				<div class="col-12 col-md-7">
+					<img
+						src="~assets/_img/encounter-builder-shieldmaiden.webp"
+						alt="Encounter Builder"
+						loading="lazy"
+					/>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-	export default {
-		name: 'Content'
-	}
+export default {
+	name: "Content",
+};
 </script>
 
 <style lang="scss" scoped>
-	.builder {
-		padding-bottom: 100px;
-		// min-height: calc(100vh - 50px - 55px);
-		background-color: $neutral-8;
-
-		.head {
-			padding-bottom: 30px;
-		}
-		.video {
-			width: 100%;
-			margin-bottom: 30px;
+.builder {
+	img {
+		width: 100%;
+		object-fit: cover;
+		border-radius: $border-radius;
+		aspect-ratio: 16/9;
+	}
+}
+@media only screen and (max-width: 1023px) {
+	::v-deep {
+		.row {
+			flex-direction: column-reverse;
 		}
 	}
+}
+@media only screen and (max-width: $sm-breakpoint) {
+	.btn {
+		width: 100%;
+		display: block;
+	}
+}
 </style>

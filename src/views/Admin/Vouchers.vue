@@ -151,6 +151,7 @@
 <script>
 import { voucherService } from "src/services/vouchers";
 import { monsterMixin } from "src/mixins/monster";
+import { legacy_tiers } from "src/utils/generalConstants";
 
 export default {
 	name: "GenerateSearchTable",
@@ -210,7 +211,7 @@ export default {
 			let tier_list = this.tiers;
 			tier_list.sort((a, b) => a.order - b.order);
 			return tier_list
-				.filter((tier) => tier.order > 0)
+				.filter((tier) => tier.order > 0 && !legacy_tiers.includes(tier.id))
 				.map((tier) => ({ label: tier.name, value: tier.id }));
 		},
 		loading() {

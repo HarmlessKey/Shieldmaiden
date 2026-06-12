@@ -1,105 +1,104 @@
 <template>
-	<div id="q-app" @click="setSideSmallScreen(false)">
+	<div id="q-app" :class="{ home: $route.name === 'home' }" @click="setSideSmallScreen(false)">
 		<div>
-			<nav-main :maintenance="maintenance" />
+			<Header v-if="$route.name !== 'home' || ($route.name === 'home' && user)" />
 			<div class="offline" v-if="connection === 'offline'">
 				<i aria-hidden="true" class="fas fa-wifi-slash mr-1"></i> No internet connection
 			</div>
-			<div v-if="!maintenance" :class="{ hasSide: $route.meta.sidebar !== false }">
+			<div :class="{ hasSide: $route.meta.sidebar !== false || ($route.name === 'home' && user) }">
 				<Sidebar
 					v-if="
-						(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen
+						(!small_screen && $route.name === 'home' && user) ||
+						(!small_screen && $route.meta.sidebar !== false) ||
+						$store.getters.side_small_screen
 					"
 					:small-screen="small_screen"
 				/>
-				<q-scroll-area
+				<div
+					:is="$route.name === 'home' ? 'div' : 'q-scroll-area'"
 					class="scrollable-content"
 					:dark="$store.getters.theme === 'dark'"
 					:thumb-style="{ width: '5px' }"
 				>
 					<router-view />
-				</q-scroll-area>
+				</div>
 			</div>
-			<Home v-else :maintenance="maintenance" />
 		</div>
 		<transition
 			enter-active-class="animated animate__slideInRight"
 			leave-active-class="animated animate__slideOutRight"
 		>
-			<div v-if="slide.show == true" class="slide">
-				<a @click="hideSlide()" v-shortkey="['esc']" @shortkey="hideSlide()" class="hide">
-					<i aria-hidden="true" class="far fa-chevron-double-right" />
-					<span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
-					<q-tooltip anchor="bottom middle" self="center middle"> Hide [esc] </q-tooltip>
-				</a>
-				<div class="content" :class="slide.classes">
-					<Slide />
-				</div>
+			<div v-if="drawer.show == true" class="drawer-wrapper">
+				<Drawer />
 			</div>
 		</transition>
 
 		<q-no-ssr>
 			<vue-snotify />
 			<HkRolls />
-			<CookieConsent />
 		</q-no-ssr>
-
-		<!-- Announcements -->
-		<q-dialog v-model="announcement" position="top" persistent>
-			<q-banner class="bg-blue white">
-				<template v-slot:avatar>
-					<q-icon name="info" />
-				</template>
-				<h3 class="mb-1">Nothing to see here</h3>
-				<p>
-					<strong>{{ makeDate("2022-02-18T09:00:00.000Z", true) }}</strong>
-				</p>
-				<p>No announcement</p>
-				<template v-slot:action>
-					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
-				</template>
-			</q-banner>
-		</q-dialog>
 		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
 <script>
 import { db } from "./firebase";
-import Header from "./components/Header.vue";
+import Header from "./components/header";
 import Sidebar from "./components/Sidebar.vue";
-import Slide from "./components/Slide.vue";
-import CookieConsent from "./components/CookieConsent.vue";
+import Drawer from "./components/Drawer.vue";
 import { mapActions, mapGetters } from "vuex";
 import HkRolls from "./components/hk-components/hk-rolls";
 import { general } from "./mixins/general";
-import Home from "./views/Home";
 
 import { Cookies } from "quasar";
-import jwt_decode from "jwt-decode";
+import { jwtDecode as jwt_decode } from "jwt-decode";
 
 export default {
 	name: "App",
 	mixins: [general],
 	components: {
-		navMain: Header,
+		Header,
 		Sidebar,
-		Slide,
-		CookieConsent,
+		Drawer,
 		HkRolls,
-		Home,
+	},
+	async preFetch({ store, ssrContext }) {
+		const cookies = Cookies.parseSSR(ssrContext);
+		const access_token = cookies.get("access_token");
+		if (!access_token) return;
+
+		const user = jwt_decode(access_token);
+		if (!user && !user.user_id) return;
+
+		const transform = {
+			uid: "user_id",
+			displayName: "name",
+			photoURL: "picture",
+			email: "email",
+			emailVerified: "email_verified",
+		};
+
+		const transformed_user = {};
+		for (const [k, v] of Object.entries(transform)) {
+			transformed_user[k] = user[v];
+		}
+
+		await store.dispatch("setUser", transformed_user);
+		await store.dispatch("setUserInfo");
+		await store.dispatch("initialize");
 	},
 	meta() {
 		const meta = {
 			title: {
 				name: "title",
-				content: this.$route.meta.title || "D&D Combat Tracker",
+				content:
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			description: {
 				name: "description",
 				content:
 					this.$route.meta.description ||
-					"Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 
 			// TWITTER
@@ -109,37 +108,39 @@ export default {
 			},
 			twitterTitle: {
 				name: "twitter:title",
-				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key",
+				content:
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			twitterDescription: {
 				name: "twitter:description",
 				content:
 					this.$route.meta.description ||
-					"Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 			twitterImage: {
 				name: "twitter:image",
-				content: "https://harmlesskey.com/harmless_key_logo_full.png",
+				content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
 			},
 			twitterSite: {
 				name: "twitter:site",
-				content: "@KeyHarmless",
+				content: "@ShieldmaidenApp",
 			},
 
 			// OG
 			ogTitle: {
 				property: "og:title",
-				content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key",
+				content:
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			ogDescription: {
 				property: "og:description",
 				content:
 					this.$route.meta.description ||
-					"Harmless Key, a combat tracker for D&D 5e. The online tool, for offline play.",
+					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 			ogSiteName: {
 				property: "og:site_name",
-				content: "Harmless Key",
+				content: "Shieldmaiden",
 			},
 			ogType: {
 				property: "og:type",
@@ -147,11 +148,11 @@ export default {
 			},
 			ogUrl: {
 				property: "og:url",
-				content: `https://harmlesskey.com${this.$route.path}`,
+				content: `https://shieldmaiden.app${this.$route.path}`,
 			},
 			ogImage: {
 				property: "og:image",
-				content: `https://harmlesskey.com/linkedin.png`,
+				content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
 			},
 			ogImageType: {
 				property: "og:image:type",
@@ -159,7 +160,7 @@ export default {
 			},
 			ogImageAlt: {
 				property: "og:image:alt",
-				content: "Harmless Key Logo",
+				content: "Shieldmaiden Logo",
 			},
 		};
 
@@ -172,12 +173,13 @@ export default {
 		}
 
 		return {
-			title: this.$route.meta.title || "D&D Combat Tracker",
-			titleTemplate: (title) => `${title} | Harmless Key`,
+			title:
+				this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+			titleTemplate: (title) => `${title} | Shieldmaiden`,
 			link: {
 				canonical: {
 					rel: "canonical",
-					href: `https://harmlesskey.com${this.$route.path}`,
+					href: `https://shieldmaiden.app${this.$route.path}`,
 				},
 			},
 			meta: meta,
@@ -187,10 +189,7 @@ export default {
 		return {
 			width: 0,
 			small_screen: true,
-			announcementSetter: false,
-			announcement_cookie: false,
 			broadcast: undefined,
-			maintenance: false,
 			connection: process.browser && !navigator.onLine ? "offline" : "online",
 		};
 	},
@@ -238,56 +237,13 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			slide: "getSlide",
+			drawer: "getDrawer",
 			storeBroadcast: "broadcast",
 		}),
-		...mapGetters(["initialized", "theme", "user"]),
-		announcement: {
-			get() {
-				const announcement = this.user && !this.announcement_cookie ? true : false;
-				return this.announcementSetter !== undefined ? this.announcementSetter : announcement;
-			},
-			set(newVal) {
-				this.announcementSetter = newVal;
-			},
-		},
-	},
-	async preFetch({ store, ssrContext }) {
-		const cookies = Cookies.parseSSR(ssrContext);
-		const access_token = cookies.get("access_token");
-		if (!access_token) return;
-
-		const user = jwt_decode(access_token);
-		if (!user && !user.user_id) return;
-
-		const transform = {
-			uid: "user_id",
-			displayName: "name",
-			photoURL: "picture",
-			email: "email",
-			emailVerified: "email_verified",
-		};
-
-		const transformed_user = {};
-		for (const [k, v] of Object.entries(transform)) {
-			transformed_user[k] = user[v];
-		}
-
-		await store.dispatch("setUser", transformed_user);
-		await store.dispatch("setUserInfo");
-		await store.dispatch("initialize");
+		...mapGetters(["initialized", "theme", "user", "action_rolls"]),
 	},
 	async mounted() {
 		this.setTips();
-		const cookies = document.cookie.split(";");
-
-		for (let cookie of cookies) {
-			const [key, val] = cookie.split("=");
-			if (key.trim() === "announcement" && val === "true") {
-				this.announcement_cookie = true;
-			}
-		}
-
 		if (this.user) {
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
@@ -313,7 +269,6 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"setSlide",
 			"setSideSmallScreen",
 			"setLive",
 			"initialize",
@@ -325,15 +280,24 @@ export default {
 			this.small_screen = size.width < 576;
 			this.width = size.width;
 		},
-		hideSlide() {
-			this.setSlide(false);
-		},
-		closeAnnouncement() {
-			const max_age = 24 * 60 * 60; // 24 hours in seconds
-
-			document.cookie = `announcement=true; max-age=${max_age}; path=/`;
-			this.announcement = false;
-		},
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+#q-app {
+	padding-top: $header-height;
+
+	&.home {
+		padding-top: 0;
+
+		.scrollable-content {
+			height: 100vh;
+		}
+
+		#sidebar {
+			top: $header-height;
+		}
+	}
+}
+</style>

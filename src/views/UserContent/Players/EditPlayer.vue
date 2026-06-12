@@ -82,7 +82,7 @@
 									/>
 
 									<!-- Character Sync -->
-									<template v-if="tier.name !== 'Free'">
+									<template v-if="tier.price !== 'Free'">
 										<div v-if="player.sync_character">
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -132,7 +132,7 @@
 															@animationend="syncing = false"
 														/>
 														<q-tooltip anchor="top middle" self="center middle">
-															{{ playerEqualsLinkedCharacter() ? "Update" : "No update" }}
+															{{ playerEqualsLinkedCharacter() ? "No update" : "Update" }}
 														</q-tooltip>
 													</button>
 												</template>
@@ -151,9 +151,9 @@
 										<button
 											class="btn btn-block bg-neutral-5"
 											@click.prevent="
-												setSlide({
+												setDrawer({
 													show: true,
-													type: 'slides/CharacterSync',
+													type: 'drawers/CharacterSync',
 												})
 											"
 										>
@@ -161,8 +161,8 @@
 											Sync with external character
 										</button>
 										<small class="neutral-3">
-											<router-link to="/patreon" class="mx-1">Subscription</router-link> for
-											Harmless Key required.
+											<router-link to="/pricing" class="mx-1">Subscription</router-link> for
+											Shieldmaiden required.
 										</small>
 									</template>
 								</template>
@@ -202,7 +202,7 @@
 														name="info"
 														class="ml-1 pointer blue"
 														size="xs"
-														@click="setSlide({ show: true, type: 'slides/xpTable' })"
+														@click="setDrawer({ show: true, type: 'drawers/xpTable' })"
 													/>
 												</template>
 											</q-input>
@@ -254,6 +254,9 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-heart" />
+												<q-tooltip anchor="top middle" self="center middle"
+													>Maximum Hit Points</q-tooltip
+												>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -278,6 +281,7 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-shield" />
+												<q-tooltip anchor="top middle" self="center middle">Armor class</q-tooltip>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -302,6 +306,9 @@
 												:error-message="errors[0]"
 											>
 												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+												<q-tooltip anchor="top middle" self="center middle"
+													>Spell save DC</q-tooltip
+												>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -693,7 +700,7 @@
 		</q-dialog>
 
 		<!-- LINK CHARACTER -->
-		<q-dialog v-if="tier.name !== 'Free'" v-model="link_dialog">
+		<q-dialog v-if="tier.price !== 'Free'" v-model="link_dialog">
 			<hk-link-character @link="linkCharacter" />
 		</q-dialog>
 	</div>
@@ -845,7 +852,7 @@ export default {
 		this.sync_characters = await getCharacterSyncStorage();
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		...mapActions("players", [
 			"get_player",
 			"get_owner_id",
@@ -881,7 +888,6 @@ export default {
 			}
 		},
 		savePlayer() {
-			console.log(this.player);
 			if (this.$route.name === "Add player") {
 				this.addPlayer();
 			} else {

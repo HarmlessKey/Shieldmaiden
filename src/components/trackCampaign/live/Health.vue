@@ -44,11 +44,11 @@
 					<span
 						class="current"
 						:class="{
-							red: percentage(health.curHp, health.maxHp) <= 33,
+							red: percentage(health.curHp, health.maxHp) <= 25,
 							orange:
-								percentage(health.curHp, health.maxHp) > 33 &&
-								percentage(health.curHp, health.maxHp) <= 76,
-							green: percentage(health.curHp, health.maxHp) > 76,
+								percentage(health.curHp, health.maxHp) > 25 &&
+								percentage(health.curHp, health.maxHp) <= 50,
+							green: percentage(health.curHp, health.maxHp) > 50,
 						}"
 					>
 						<hk-animated-integer :value="health.curHp" />
@@ -76,7 +76,7 @@
 				(entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
 			"
 		>
-			<template v-if="entity.curHp == 0">
+			<template v-if="health.curHp == 0">
 				<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 			</template>
 			<i
@@ -84,17 +84,20 @@
 				v-else
 				class="fas"
 				:class="{
-					'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
+					'green fa-heart': percentage(health.curHp, health.maxHp) == 100,
+					'green fa-heart-broken':
+						percentage(health.curHp, health.maxHp) > 50 &&
+						percentage(health.curHp, health.maxHp) < 100,
 					'orange fa-heart-broken':
-						percentage(entity.curHp, entity.maxHp) < 100 &&
-						percentage(entity.curHp, entity.maxHp) > 33,
-					'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
+						percentage(health.curHp, health.maxHp) <= 50 &&
+						percentage(health.curHp, health.maxHp) > 25,
+					'red fa-heartbeat': percentage(health.curHp, health.maxHp) <= 25,
 				}"
 			/>
 		</div>
 		<div v-else>
 			<span class="neutral-2">
-				<template v-if="entity.curHp == 0">
+				<template v-if="health.curHp == 0">
 					<i aria-hidden="true" class="fas fa-skull-crossbones red"></i>
 				</template>
 				<template v-else>? ? ?</template>
@@ -116,8 +119,7 @@ export default {
 		"campCompanions",
 		"npcs",
 		"players",
-		"playerSettings",
-		"npcSettings",
+		"displaySettings",
 	],
 	data() {
 		return {
@@ -125,6 +127,9 @@ export default {
 		};
 	},
 	computed: {
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
 		camp_data: function () {
 			const key = this.entity.key;
 

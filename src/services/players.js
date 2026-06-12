@@ -104,7 +104,8 @@ export class playerServices {
 
 			return newPlayer.key;
 		} catch (error) {
-			throw error;
+			console.error(`Error while adding Player ${newPlayer.name}`, newPlayer)
+      console.error("With error:", error)
 		}
 	}
 
@@ -141,7 +142,8 @@ export class playerServices {
 				await SEARCH_PLAYERS_REF.child(`${uid}/results/${id}`).set(search_player);
 			}
 		} catch (error) {
-			throw error;
+			console.error(`Error while editing Player ${newPlayer.name}`, player)
+      console.error("With error:", error)
 		}
 	}
 

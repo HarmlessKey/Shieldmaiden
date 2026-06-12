@@ -1,46 +1,51 @@
 <template>
 	<div class="conditions" v-if="entity.conditions && Object.keys(entity.conditions).length > 0">
 		<template v-for="(condition, key) in entity.conditions">
-			<div :key="key" 
-				@click="setSlide({
-					show: true, 
-					type: 'slides/encounter/Condition',
-					data: {
-						condition: key,
-						entity: entity
-					}})" 
-					v-if="conditions[key]">
-					<span class="n" v-if="key == 'exhaustion'">
-						{{ entity.conditions[key] }}
-					</span>
-					<i aria-hidden="true" :class="`hki-${key}`" class="icon" />
-					<q-tooltip anchor="top middle" self="center middle">
-						{{ key.capitalize() }}
-					</q-tooltip>
+			<div
+				:key="key"
+				@click="
+					setDrawer({
+						show: true,
+						type: 'drawers/encounter/Condition',
+						data: {
+							condition: key,
+							entity: entity,
+						},
+					})
+				"
+				v-if="conditions[key]"
+			>
+				<span class="n" v-if="key == 'exhaustion'">
+					{{ entity.conditions[key] }}
+				</span>
+				<i aria-hidden="true" :class="`hki-${key}`" class="icon" />
+				<q-tooltip anchor="top middle" self="center middle">
+					{{ key.capitalize() }}
+				</q-tooltip>
 			</div>
 		</template>
 	</div>
 </template>
 
 <script>
-	import { mapActions } from "vuex";
-	import { db } from "src/firebase";
+import { mapActions } from "vuex";
+import { db } from "src/firebase";
 
-	export default {
-		name: "Conditions",
-		props: ["entity"],
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref("conditions"),
-					asObject: true,
-				}
-			}
-		},
-		methods: {
-			...mapActions(["setSlide"])
-		}
-	}
+export default {
+	name: "Conditions",
+	props: ["entity"],
+	firebase() {
+		return {
+			conditions: {
+				source: db.ref("conditions"),
+				asObject: true,
+			},
+		};
+	},
+	methods: {
+		...mapActions(["setDrawer"]),
+	},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -50,7 +55,7 @@
 	grid-template-columns: repeat(auto-fill, 30px);
 	grid-auto-rows: 30px;
 	grid-gap: 1px;
-	
+
 	div {
 		position: relative;
 	}

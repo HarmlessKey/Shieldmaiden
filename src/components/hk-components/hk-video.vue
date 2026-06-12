@@ -22,10 +22,10 @@
     </div>
     <video 
       ref="video" class="animated-video" src="~assets/_vid/harmless-key-animation-transparent-compressed.webm" 
-      :muted="muted" autoplay playsinline alt="Harmless Key logo animation"
+      :muted="muted" autoplay playsinline alt="Shieldmaiden logo animation"
     />
   </div>
-  <img v-else class="logo" src="~assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
+  <img v-else class="logo" src="~assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden logo" />
 </template>
 
 <script>

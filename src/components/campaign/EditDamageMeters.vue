@@ -62,7 +62,7 @@
 		</q-tab-panels>
 		<small v-if="over">
 			<strong>Overkill</strong> is damage done to target that was at 0 hit points.<br />
-			<strong>Overhealing</strong> is healing done to a target with current hit points equal to it's
+			<strong>Overhealing</strong> is healing done to a target with current hit points equal to its
 			maximum hit points.
 		</small>
 	</div>

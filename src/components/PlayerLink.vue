@@ -29,8 +29,8 @@
 					type="text"
 				>
 					<hk-share
-						title="Harmless Key"
-						text="Follow my campaigns on Harmless Key!"
+						title="Shieldmaiden"
+						text="Follow my campaigns on Shieldmaiden!"
 						:url="url"
 						slot="after"
 					/>
@@ -139,7 +139,6 @@ export default {
 		}
 		h2 {
 			font-size: 25px;
-			font-family: $text-written;
 		}
 		small {
 			line-height: initial;

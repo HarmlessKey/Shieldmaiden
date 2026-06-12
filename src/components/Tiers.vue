@@ -1,125 +1,148 @@
 <template>
 	<div>
-		<div v-if="tier && !loading">
+		<q-no-ssr>
+			<PromoBanner class="mb-5" :closable="false" />
+		</q-no-ssr>
+		<div v-if="!loading">
+			<div class="d-flex justify-content-center mb-4">
+				<q-toggle v-model="annually" size="lg"> <strong>Pay annually</strong> (save 10%) </q-toggle>
+			</div>
 			<hk-card-deck>
-				<hk-card
-					:header="t.name"
-					v-for="(t, key) in tiers"
-					:key="key"
-					:class="{ current: t.name == tier.name }"
-				>
-					<div class="card-body">
-						<div class="top">
-							<h2>{{ t.price }}</h2>
-							<em v-if="t.price == 'Free'" class="neutral-3 sub">forever</em>
-							<em v-else class="neutral-3 sub">per month</em>
+				<template v-for="(t, key) in tiers">
+					<hk-card
+						v-if="!legacy_tiers.includes(t['.key'])"
+						:key="key"
+						:class="{ current: t.name === tier?.name }"
+					>
+						<div slot="header" class="card-header flex-col items-start">
+							<strong>{{ t.name }}</strong>
+							<span class="neutral-2">{{ t.description }}</span>
 						</div>
-						<ul>
-							<li v-for="(benefit, key) in benefits" :key="key">
-								<i
-									v-if="typeof t.benefits[key] === 'boolean'"
-									aria-hidden="true"
-									class="fas"
-									:class="t.benefits[key] ? 'fa-check green' : 'fa-times neutral-3'"
-								/>
-								<template v-else>
+						<div class="card-body">
+							<div class="top">
+								<span
+									class="price"
+									:class="{
+										'patreon-red': t.name === 'Free',
+										strike:
+											show_discount && !annually && t.name !== 'Free' && isTierEligible(t['.key']),
+									}"
+									>{{ t.name === "Free" ? t.price : `$${price(t.price)}` }}</span
+								>
+								<span
+									v-if="
+										show_discount && !annually && t.name !== 'Free' && isTierEligible(t['.key'])
+									"
+									class="price"
+									>${{ discountPrice(t.price) }}</span
+								>
+								<em v-if="t.price === 'Free'" class="neutral-2 sub">forever</em>
+								<em v-else class="neutral-2 sub">{{
+									show_discount && !annually && isTierEligible(t[".key"])
+										? "the first month"
+										: "per month"
+								}}</em>
+							</div>
+							<ul>
+								<li v-for="(benefit, key) in default_benefits" :key="key">
+									<i class="fas fa-check green" aria-hidden="true" />
+									{{ benefit }}
+								</li>
+								<li v-for="(benefit, key) in benefits" :key="key">
 									<i
+										v-if="typeof t.benefits[key] === 'boolean'"
 										aria-hidden="true"
-										v-if="t.benefits[key] === 'infinite'"
-										class="green far fa-infinity"
+										class="fas"
+										:class="t.benefits[key] ? 'fa-check green' : 'fa-times neutral-3'"
 									/>
-									<strong v-else :class="t.benefits[key] === '-' ? 'neutral-3' : 'green'">{{
-										t.benefits[key]
-									}}</strong>
-								</template>
-								<span>
-									{{ benefit.title }}
-									<span v-if="key === 'character_sync'" class="neutral-3">*</span>
-								</span>
-							</li>
-						</ul>
-						<ul class="storage">
-							<li v-for="storage_type in storage" :key="storage_type">
-								<template v-if="storage_type == 'campaigns'">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Campaign slots
-								</template>
-								<template v-if="storage_type == 'encounters'">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span>
-									<span>Encounter slots <span class="neutral-3">(per campaign)</span></span>
-								</template>
-								<template v-if="storage_type == 'players'">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Player slots
-								</template>
-								<template v-if="storage_type == 'npcs'">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span> NPC slots
-								</template>
-								<template v-if="storage_type == 'spells'">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Spell slots
-								</template>
-								<template v-if="storage_type == 'items'">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Item slots
-								</template>
-								<template v-if="storage_type == 'reminders'">
-									<i
-										aria-hidden="true"
-										v-if="t.benefits[storage_type] == 'infinite'"
-										class="green far fa-infinity"
-									/>
-									<span v-else class="green">{{ t.benefits[storage_type] }}</span> Reminder slots
-								</template>
-							</li>
-						</ul>
-					</div>
-					<div slot="footer" v-if="t.price != 'Free'">
-						<a
-							:href="'https://www.patreon.com/join/harmlesskey/checkout?rid=' + t['.key']"
-							target="_blank"
-							rel="noopener"
-							class="btn btn-block btn-square bg-patreon-red"
-							>Join {{ t.price }} tier</a
-						>
-					</div>
-				</hk-card>
+									<template v-else>
+										<i
+											aria-hidden="true"
+											v-if="t.benefits[key] === 'infinite'"
+											class="green far fa-infinity"
+										/>
+										<strong v-else :class="t.benefits[key] === '-' ? 'neutral-3' : 'green'">{{
+											t.benefits[key]
+										}}</strong>
+									</template>
+									<span>
+										{{ benefit.title }}
+										<span v-if="key === 'character_sync'" class="neutral-3">*</span>
+										<span v-if="key === 'ai_credits'" class="neutral-3">(per month)</span>
+									</span>
+								</li>
+								<li>
+									<i class="fas fa-check green" aria-hidden="true" />
+									<span
+										class="d-flex justify-content-between items-center pointer"
+										@click="show_storage = !show_storage"
+									>
+										<span
+											><strong>{{ storage_size[t.name] }}</strong> storage</span
+										>
+										<i
+											class="fas fa-chevron-down"
+											aria-hidden="true"
+											:class="{ open: show_storage }"
+										/>
+									</span>
+								</li>
+							</ul>
+							<q-slide-transition v-show="show_storage">
+								<ul class="storage">
+									<li v-for="storage_type in storage" :key="storage_type">
+										<i
+											aria-hidden="true"
+											v-if="t.benefits[storage_type] == 'infinite'"
+											class="green far fa-infinity"
+										/>
+										<span v-else class="green">{{ t.benefits[storage_type] }}</span>
+										<span>
+											<span
+												v-if="['npcs', 'spells', 'reminders', 'items'].includes(storage_type)"
+												class="neutral-3"
+											>
+												Custom
+											</span>
+											{{ storageType(storage_type, t.benefits[storage_type]) }}
+											<span v-if="storage_type === 'encounters'" class="neutral-3">
+												(per campaign)
+											</span>
+										</span>
+									</li>
+								</ul>
+							</q-slide-transition>
+						</div>
+						<div slot="footer">
+							<router-link
+								v-if="t.price === 'Free'"
+								class="btn btn-block btn-square bg-patreon-red"
+								:to="!user ? '/sign-up' : '/content'"
+							>
+								Use for Free
+							</router-link>
+							<a
+								v-else
+								:href="`https://www.patreon.com/join/shieldmaidenapp/checkout?rid=${t['.key']}&cadence=${annually ? 12 : 1}`"
+								target="_blank"
+								rel="noopener"
+								class="btn btn-block btn-square bg-patreon-red"
+								@click="selectTier(t)"
+								>Join {{ `$${price(t.price)}` }} tier</a
+							>
+						</div>
+					</hk-card>
+				</template>
 			</hk-card-deck>
 			<small class="d-block text-center">
-				<span class="neutral-3">*</span> Character Sync requires <strong>Chrome</strong> as your
-				browser and the
+				<span class="neutral-3">*</span> Character Sync requires
+				<strong>Chrome</strong>, <strong>Firefox</strong> or <strong>Edge</strong> and the
 				<a
-					href="https://chrome.google.com/webstore/detail/dd-character-sync/jgcbbmbchbkdjbgiiheminkkkecjohpg"
+					:href="storeUrl"
 					target="_blank"
-					rel="noopener"
+					rel="noopener noreferrer"
 				>
-					D&D Character Sync Chrome Extension</a
+					D&D Character Sync Extension</a
 				>.
 			</small>
 		</div>
@@ -130,13 +153,31 @@
 <script>
 import { mapGetters } from "vuex";
 import { db } from "src/firebase";
+import { legacy_tiers } from "src/utils/generalConstants";
+import { getStoreUrl } from "src/utils/generalFunctions";
+import { promotionService } from "src/services/promotions";
+import PromoBanner from "./PromoBanner.vue";
 
 export default {
 	name: "Tiers",
+	components: {
+		PromoBanner,
+	},
 	data() {
 		return {
 			loading: true,
 			show_storage: false,
+			discount: undefined,
+			annually: false,
+			active_promotion: undefined,
+			default_benefits: [
+				"Combat tracker",
+				"Encounter builder",
+				"Digital DM Screen",
+				"Public Initiative List",
+				"Monster creator",
+				"Spell creator",
+			],
 			benefits: {
 				character_sync: {
 					title: "Character sync",
@@ -147,10 +188,20 @@ export default {
 				background: {
 					title: "Background effects",
 				},
-				storage: {
-					title: "Storage",
+				import: {
+					title: "Import content",
+				},
+				ai_credits: {
+					title: "Monster credits",
 				},
 			},
+			storage_size: {
+				Free: "Small",
+				"Folk Hero": "Medium",
+				Noble: "Large",
+				Deity: "Infinite",
+			},
+			legacy_tiers,
 			storage: ["campaigns", "encounters", "players", "npcs", "spells", "reminders", "items"],
 		};
 	},
@@ -163,7 +214,55 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier"]),
+		...mapGetters(["user", "tier"]),
+		storeUrl() {
+			return getStoreUrl();
+		},
+		show_discount() {
+			console.log(this.discount, this.tier);
+			return this.discount && (this.tier?.price === "Free" || !this.tier);
+		},
+	},
+	methods: {
+		storageType(type, count) {
+			type = type === "npcs" ? type.slice(0, -1).toUpperCase() : type.slice(0, -1).capitalize();
+			return count === "infinite" || count > 1 ? `${type}s` : type;
+		},
+		selectTier(t) {
+			this.$gtm.trackEvent({
+				event: "purchase",
+				tier: t.name,
+				cadence: this.annually ? 12 : 1,
+			});
+		},
+		price(price) {
+			price = Number(price.slice(1));
+			return this.annually ? (price * 0.9).toFixed(2) : price;
+		},
+		discountPrice(price) {
+			price = Number(price.slice(1));
+			return (price * (1 - this.discount / 100)).toFixed(2);
+		},
+		isTierEligible(tierId) {
+			if (!this.active_promotion) {
+				return false;
+			}
+			// If no eligible_tiers specified, all paid tiers are eligible
+			if (
+				!this.active_promotion.eligible_tiers ||
+				this.active_promotion.eligible_tiers.length === 0
+			) {
+				return true;
+			}
+			// Check if this tier is in the eligible list
+			return this.active_promotion.eligible_tiers.includes(tierId);
+		},
+	},
+	async mounted() {
+		this.active_promotion = await promotionService.getFirstActivePromotion();
+		if (this.active_promotion) {
+			this.discount = this.active_promotion.discount;
+		}
 	},
 };
 </script>
@@ -173,13 +272,28 @@ export default {
 	&.current {
 		border-color: $patreon-red !important;
 	}
+	.card-header {
+		strong {
+			font-size: 18px;
+		}
+	}
 	.card-body {
-		padding: 0;
+		padding: 0 0 15px 0;
 
 		.top {
 			padding: 15px;
-			h2 {
-				margin-bottom: 0 !important;
+
+			.price {
+				font-size: 25px;
+				font-weight: bold;
+				margin-right: 5px;
+
+				&.strike {
+					text-decoration: line-through;
+					font-weight: normal;
+					color: $neutral-2;
+					font-size: 20px;
+				}
 			}
 			i.sub {
 				display: block;
@@ -197,13 +311,20 @@ export default {
 				line-height: 35px;
 				align-items: center;
 				font-size: 15px;
-				padding: 0 5px 0 15px;
+				padding: 0 15px;
 				color: $neutral-1;
 				margin-bottom: 1px;
+
+				.fa-chevron-down {
+					transition: all 0.2s linear;
+
+					&.open {
+						transform: rotate(-180deg);
+					}
+				}
 			}
 			&.storage {
 				padding-left: 20px;
-				margin-bottom: 15px;
 
 				li {
 					font-size: 13px;

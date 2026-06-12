@@ -1,8 +1,11 @@
+import axios from "axios";
 import { Cookies } from "quasar";
 import { db, auth } from "src/firebase";
 import { userServices } from "src/services/user";
 import { voucherService } from "src/services/vouchers";
-
+import { serverUtils } from "src/services/serverUtils";
+import { patreonServices } from "src/services/patreon";
+import { SubscriptionServices } from "src/services/subscription";
 import Vue from "vue";
 
 const users_ref = db.ref("users");
@@ -10,10 +13,12 @@ const tiers_ref = db.ref("tiers");
 
 const user_state = () => ({
 	user_services: null,
+	patreon_services: null,
 	user: undefined,
 	userInfo: undefined,
 	tier: undefined,
 	voucher: undefined,
+	ai: {},
 	overencumbered: undefined,
 	content_count: {},
 	slots_used: {},
@@ -21,11 +26,17 @@ const user_state = () => ({
 	poster: undefined,
 	broadcast: {},
 	followed: {},
+	soundboard: undefined,
+	patreon_auth: undefined,
+	patreon_user: undefined,
 });
 
 const user_getters = {
 	user_services: (state) => {
 		return state.user_services;
+	},
+	patreon_services: (state) => {
+		return state.patreon_services;
 	},
 	user: function (state) {
 		return state.user;
@@ -41,6 +52,18 @@ const user_getters = {
 	},
 	voucher(state) {
 		return state.voucher;
+	},
+	ai(state) {
+		const spent = state.ai.spent || 0;
+		const subscription = state.tier?.benefits?.ai_credits || 0;
+		const credits = state.ai.credits || 0;
+
+		return {
+			credits,
+			subscription,
+			spent,
+			total: subscription - spent + credits,
+		};
 	},
 	overencumbered(state) {
 		return state.overencumbered;
@@ -60,6 +83,19 @@ const user_getters = {
 	followed(state) {
 		return state.followed;
 	},
+	soundboard: (state) => {
+		// Convert object to sorted array
+		return _.chain(state.soundboard)
+			.map((link, key) => ({ key, ...link }))
+			.orderBy("name", "asc")
+			.value();
+	},
+	patreon_auth(state) {
+		return state.patreon_auth;
+	},
+	patreon_user(state) {
+		return state.patreon_user;
+	},
 };
 
 const user_actions = {
@@ -68,6 +104,12 @@ const user_actions = {
 			commit("SET_USER_SERVICES", new userServices());
 		}
 		return getters.user_services;
+	},
+	async get_patreon_services({ getters, commit }) {
+		if (getters.patreon_services === null || !Object.keys(getters.patreon_services).length) {
+			commit("SET_PATREON_SERVICES", new patreonServices());
+		}
+		return getters.patreon_services;
 	},
 
 	setUser({ commit }, user) {
@@ -80,117 +122,57 @@ const user_actions = {
 				const user_info = user_snapshot.val();
 
 				if (user_info) {
-					//Fetch patron info with email
-					const email = user_info.patreon_email
-						? user_info.patreon_email.toLowerCase()
-						: user_info.email.toLowerCase();
+					const server_time = await serverUtils.getServerTime();
+					const legacy_date = new Date(2024, 4, 15).getTime();
+					const tiersSnap = await tiers_ref.once("value");
+					const tiers = tiersSnap.val();
 
 					// User always basic reward tier
-					let path = `tiers/basic`;
-
-					// Use firebase serverTimeOffset to get the date from the server and not the client.
-					// https://firebase.google.com/docs/database/web/offline-capabilities#clock-skew
-					let time_ms = 0;
-					await db
-						.ref("/.info/serverTimeOffset")
-						.once("value")
-						.then(
-							function stv(data) {
-								time_ms = data.val() + Date.now();
-							},
-							(err) => {
-								return err;
-							}
-						);
-
-					const server_time = new Date(time_ms).toISOString();
+					let tier_id = !user_info.created || user_info.created < legacy_date ? `legacy` : `basic`;
 
 					// If user has voucher use this
 					if (user_info.voucher) {
 						let voucher = user_info.voucher;
 
 						if (user_info.voucher.date === undefined) {
-							path = `tiers/${user_info.voucher.id}`;
+							tier_id = user_info.voucher.id;
 						} else {
 							const end_date = new Date(user_info.voucher.date).toISOString();
 
-							if (server_time > end_date) {
+							if (server_time.toISOString() > end_date) {
 								dispatch("remove_voucher", rootGetters.user.uid);
 								voucher = undefined;
 							} else {
-								path = `tiers/${user_info.voucher.id}`;
+								tier_id = user_info.voucher.id;
 							}
 						}
 						commit("SET_VOUCHER", voucher);
 					}
-					let vouch_tiers = db.ref(path);
-					vouch_tiers.once("value", (voucher_snap) => {
-						// Get the order of voucher/basic
-						let voucher_order = voucher_snap.val().order;
+					const tier = tiers[tier_id];
 
-						// Search email in patrons
-						let patrons = db.ref("new_patrons").orderByChild("email").equalTo(email);
-						patrons.on("value", async (patron_snapshot) => {
-							// If user patron check if patron tier is higher than voucher/basic tier
-							if (patron_snapshot.val()) {
-								const patron_data = Object.values(patron_snapshot.val())[0];
+					// For vouchers we don't hand out AI credits
+					tier.benefits.ai_credits = 0;
 
-								// Set pledge to expired if there is no pledge_end present
-								const expired = new Date(time_ms);
-								expired.setDate(expired.getDate() - 1);
-								const pledge_end = patron_data.pledge_end
-									? new Date(patron_data.pledge_end).toISOString()
-									: expired.toISOString();
+					//Fetch patron info with email
+					const email = user_info.patreon_email
+						? user_info.patreon_email.toLowerCase()
+						: user_info.email.toLowerCase();
 
-								// Compare patron tiers to find highest tier checking order in FB
-								let highest_order = 0;
-								let highest_tier = "basic";
+					// Search email in patrons
+					const patronsRef = db.ref("new_patrons").orderByChild("email").equalTo(email);
+					const patronSnap = await patronsRef.once("value");
+					const patron = patronSnap.val();
 
-								// When the last_charge_status = Pending a user won't have a Patreon tier yet
-								// Just hand out free tier for pending status
-								if (patron_data.tiers) {
-									const patron_tierlist = Object.keys(patron_data.tiers);
+					const patreon_tier = await SubscriptionServices.getActivePatreonTier(
+						tiers,
+						user_info,
+						patron,
+						tier.order,
+						server_time
+					);
 
-									if (patron_tierlist.length > 1) {
-										for (let i in patron_tierlist) {
-											let tier_id = patron_tierlist[i];
-											// SMART AWAIT ASYNC CONSTRUCTION #bless Key
-											await tiers_ref.child(tier_id).once("value", (tier_snapshot) => {
-												let tier_order = tier_snapshot.val().order;
-												if (tier_order > highest_order) {
-													highest_order = tier_order;
-													highest_tier = tier_id;
-												}
-											});
-										}
-									} else {
-										highest_tier = patron_tierlist[0];
-									}
-								}
-
-								//Get tier info
-								let patron_tier = db.ref(`tiers/${highest_tier}`);
-								patron_tier.on("value", (tier_snapshot) => {
-									//Save Patron info under UserInfo
-									user_info.patron = {
-										last_charge_status: patron_data.last_charge_status,
-										pledge_end,
-										tier: tier_snapshot.val().name,
-									};
-
-									if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_time) {
-										commit("SET_TIER", tier_snapshot.val());
-									} else {
-										commit("SET_TIER", voucher_snap.val());
-									}
-								});
-							}
-							// If not patron use voucher/basic tier
-							else {
-								commit("SET_TIER", voucher_snap.val());
-							}
-						});
-					});
+					// If not patron use voucher/basic tier
+					commit("SET_TIER", patreon_tier || tier);
 					commit("SET_USERINFO", user_info);
 				}
 			});
@@ -214,13 +196,44 @@ const user_actions = {
 				throw error;
 			}
 		}
+	},
 
-		// Return a promise, so you can wait for it in the initialize function from store/general.js
-		// return new Promise((resolve) => {
-		// 	setTimeout(() => {
-		// 		resolve()
-		// 	}, 1000)
-		// });
+	async set_user_ai({ dispatch, rootGetters }) {
+		const uid = rootGetters.user.uid;
+		if (uid) {
+			try {
+				userServices.getSpentCreditsWithCallback(uid, (snapshot) => {
+					dispatch("set_ai_spent", snapshot);
+				});
+				userServices.getCreditsWithCallback(uid, (snapshot) => {
+					dispatch("set_ai_credits", snapshot);
+				});
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	set_ai_spent({ commit }, snapshot) {
+		const spent = snapshot.val();
+		commit("SET_AI_SPENT", spent);
+	},
+	set_ai_credits({ commit }, snapshot) {
+		const credits = snapshot.val();
+		commit("SET_AI_CREDITS", credits);
+	},
+
+	async update_userInfo({ commit, dispatch, rootGetters }, value) {
+		const uid = rootGetters.user.uid;
+		if (uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				await services.updateUser(uid, value);
+				commit("SET_USERINFO", value);
+			} catch (error) {
+				throw error;
+			}
+		}
 	},
 
 	setPoster({ state }) {
@@ -438,17 +451,105 @@ const user_actions = {
 		const intersection = vouchers.filter((v) => v.voucher == voucher_string.toUpperCase());
 		return intersection.length ? intersection[0] : false;
 	},
+
+	// SOUNDBOARD
+
+	/**
+	 * Gets all notes for a single campaign
+	 * first try to find it in the store, then fetch if it wasn't present
+	 */
+	async get_soundboard({ state, rootGetters, commit, dispatch }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		let soundboard = state.notes;
+
+		// The notes are not in the store and need to be fetched from the database
+		if (!soundboard) {
+			const services = await dispatch("get_user_services");
+			try {
+				soundboard = await services.getSoundboard(uid);
+				commit("SET_SOUNDBOARD", soundboard);
+			} catch (error) {
+				throw error;
+			}
+		}
+		return soundboard;
+	},
+
+	/**
+	 * Adds a newly created soundboard link
+	 * A user can only add to the soundboard for themselves so we use the uid from the store
+	 *
+	 * @param {object} link
+	 * @returns {string} the id of the newly added campaign
+	 */
+	async add_soundboard_link({ rootGetters, commit, dispatch }, link) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_user_services");
+
+			try {
+				const id = await services.addSoundboardLink(uid, link);
+				commit("SET_SOUNDBOARD_LINK", { id, link });
+				return id;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Deletes a link from the soundboard
+	 *
+	 * @param {string} key link key
+	 */
+	async delete_soundboard_link({ rootGetters, commit, dispatch }, key) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				await services.deleteSoundboardLink(uid, key);
+				commit("DELETE_SOUNDBOARD_LINK", key);
+				return;
+			} catch (error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Authenticate Patreon User
+	 * @param {string} code
+	 * @param {string} origin https://current_domain.com
+	 */
+	async authenticate_patreon_user({ commit }, code) {
+		const result = await axios.post("api/patreon/auth", { code });
+		commit("SET_PATREON_AUTH", result.data);
+		return result.data;
+	},
+
+	/**
+	 * Get Patreon Identity
+	 */
+	async get_patreon_identity({ commit }, patreonAuth) {
+		const result = await axios.post("api/patreon/identity", patreonAuth);
+		commit("SET_PATREON_USER", result.data);
+		return result.data;
+	},
 };
 
 const user_mutations = {
 	SET_USER_SERVICES(state, payload) {
 		Vue.set(state, "user_services", payload);
 	},
+	SET_PATREON_SERVICES(state, payload) {
+		Vue.set(state, "patreon_services", payload);
+	},
 	SET_USER(state, payload) {
 		Vue.set(state, "user", payload);
 	},
 	SET_USERINFO(state, payload) {
-		Vue.set(state, "userInfo", payload);
+		const newVal = state.userInfo ? { ...state.userInfo, ...payload } : payload;
+		Vue.set(state, "userInfo", newVal);
 	},
 	SET_USER_SETTINGS(state, payload) {
 		Vue.set(state, "userSettings", payload);
@@ -475,9 +576,17 @@ const user_mutations = {
 	},
 	SET_TIER(state, payload) {
 		Vue.set(state, "tier", payload);
+		Vue.set(state.tier, "benefits", payload.benefits || {});
+		Vue.set(state.tier.benefits, "ai_credits", payload.benefits?.ai_credits || 0);
 	},
 	SET_VOUCHER(state, payload) {
 		Vue.set(state, "voucher", payload);
+	},
+	SET_AI_SPENT(state, payload) {
+		Vue.set(state.ai, "spent", payload);
+	},
+	SET_AI_CREDITS(state, payload) {
+		Vue.set(state.ai, "credits", payload);
 	},
 	SET_ENCUMBRANCE(state, value) {
 		Vue.set(state, "overencumbered", value);
@@ -499,6 +608,25 @@ const user_mutations = {
 	},
 	SET_BROADCAST_SHARES(state, payload) {
 		Vue.set(state.broadcast, "shares", payload);
+	},
+	SET_SOUNDBOARD(state, soundboard) {
+		Vue.set(state, "soundboard", soundboard);
+	},
+	SET_SOUNDBOARD_LINK(state, { id, link }) {
+		if (state.soundboard) {
+			Vue.set(state.soundboard, id, link);
+		} else {
+			Vue.set(state, "soundboard", { [id]: link });
+		}
+	},
+	DELETE_SOUNDBOARD_LINK(state, key) {
+		Vue.delete(state.soundboard, key);
+	},
+	SET_PATREON_AUTH(state, payload) {
+		Vue.set(state, "patreon_auth", payload);
+	},
+	SET_PATREON_USER(state, patron) {
+		Vue.set(state, "patreon_user", patron);
 	},
 	CLEAR_USER(state) {
 		Vue.set(state, "user", undefined);

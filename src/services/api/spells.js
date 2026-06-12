@@ -1,4 +1,5 @@
 import axios from "axios";
+import { range } from "lodash";
 
 const SPELLS_REF = "/spells";
 
@@ -41,9 +42,10 @@ export class spellServices {
 					queryParams.push(`classes[]=${cls}`);
 				}
 			}
-			if (query.levels && query.levels.length) {
-				for (const lvl of query.levels) {
-					queryParams.push(`level[]=${lvl}`);
+			if (query.levels) {
+				const levels = range(query.levels.min, query.levels.max + 1);
+				for (const level of levels) {
+					queryParams.push(`level[]=${level}`);
 				}
 			}
 			params += `&${queryParams.join("&")}`;

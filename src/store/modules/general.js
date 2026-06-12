@@ -1,16 +1,19 @@
 import Vue from "vue";
-import { browserDetect } from "../../functions";
+import { browserDetect, extensionInstalled } from "src/utils/generalFunctions";
 
 export default {
 	state: () => ({
 		initialized: false,
 		theme: "dark",
-		slide: {},
+		drawer: {},
 		rolls: [],
 		action_rolls: [],
 		side_collapsed: true,
 		side_small_screen: false,
 		browser: browserDetect(),
+		extensionInstalled: null,
+		music: null,
+		ambience: [],
 	}),
 
 	getters: {
@@ -20,8 +23,8 @@ export default {
 		theme: (state) => {
 			return state.theme;
 		},
-		getSlide(state) {
-			return state.slide;
+		getDrawer(state) {
+			return state.drawer;
 		},
 		rolls(state) {
 			return state.rolls;
@@ -37,6 +40,15 @@ export default {
 		},
 		browser(state) {
 			return state.browser;
+		},
+		extensionInstalled(state) {
+			return state.extensionInstalled;
+		},
+		music(state) {
+			return state.music;
+		},
+		ambience(state) {
+			return state.ambience;
 		},
 	},
 
@@ -66,6 +78,8 @@ export default {
 							dispatch("reminders/fetch_reminder_count"),
 							dispatch("effects/fetch_effect_count"),
 							dispatch("spells/fetch_spell_count"),
+							dispatch("set_user_ai"),
+							dispatch("checkExtensionInstalled"),
 						]);
 					})
 					.then(async () => {
@@ -73,7 +87,7 @@ export default {
 
 						const roll = Math.floor(Math.random() * 6 + 15);
 						console.log(
-							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
+							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Shieldmaiden successful.`,
 							"color: #83b547;"
 						);
 
@@ -82,7 +96,7 @@ export default {
 					.catch((error) => {
 						const roll = Math.floor(Math.random() * 15);
 						console.log(
-							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key failed.`,
+							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Shieldmaiden failed.`,
 							"color: #cc3e4a;"
 						);
 						console.error(error);
@@ -163,12 +177,12 @@ export default {
 		removeActionRoll({ commit }, index) {
 			commit("REMOVE_ACTION_ROLL", index);
 		},
-		setSlide({ commit, state }, payload) {
-			let slide = state.slide;
+		setDrawer({ commit, state }, payload) {
+			let drawer = state.drawer;
 
 			if (
-				slide.type !== payload.type ||
-				(JSON.stringify(slide.data) !== JSON.stringify(payload.data) && payload.data != undefined)
+				drawer.type !== payload.type ||
+				(JSON.stringify(drawer.data) !== JSON.stringify(payload.data) && payload.data != undefined)
 			) {
 				commit("SET_SLIDE", false);
 				setTimeout(() => commit("SET_SLIDE", payload), 100);
@@ -201,6 +215,20 @@ export default {
 		setSideSmallScreen({ commit }, payload) {
 			commit("SET_SIDE_SMALL_SCREEN", payload);
 		},
+
+		async checkExtensionInstalled({ state, commit }) {
+			if (state.extensionInstalled !== null) return state.extensionInstalled;
+			const version = await extensionInstalled();
+			commit("SET_EXTENSION_INSTALLED", version);
+			return version ?? false;
+		},
+		play_music({ commit }, payload) {
+			commit("SET_MUSIC", payload);
+		},
+
+		play_ambience({ commit }, payload) {
+			commit("SET_AMBIENCE", payload);
+		},
 	},
 
 	mutations: {
@@ -211,7 +239,7 @@ export default {
 			Vue.set(state, "theme", payload);
 		},
 		SET_SLIDE(state, payload) {
-			Vue.set(state, "slide", payload);
+			Vue.set(state, "drawer", payload);
 		},
 		SET_ROLLS(state, payload) {
 			Vue.set(state, "rolls", payload);
@@ -233,6 +261,21 @@ export default {
 		},
 		SET_SIDE_SMALL_SCREEN(state, payload) {
 			Vue.set(state, "side_small_screen", payload);
+		},
+		SET_EXTENSION_INSTALLED(state, version) {
+			Vue.set(state, "extensionInstalled", version ?? false);
+		},
+		SET_MUSIC(state, payload) {
+			Vue.set(state, "music", payload);
+		},
+		SET_AMBIENCE(state, payload) {
+			let ambience = state.ambience;
+			if (ambience?.includes(payload)) {
+				ambience = ambience.filter((item) => item.url !== payload.url);
+			} else {
+				ambience.push(payload);
+			}
+			Vue.set(state, "ambience", ambience);
 		},
 	},
 };

@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    target-branch: "develop"
+    ignore:
+      - dependency-name: "vue"
+        versions: [">=3.0.0"]
+      - dependency-name: "@quasar/app"
+        versions: [">=3.0.0"]
+

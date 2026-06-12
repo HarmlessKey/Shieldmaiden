@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import general from "./modules/general";
+import tutorial from "./modules/tutorial";
 import tips from "./modules/tips";
 import { run_encounter } from "./modules/runEncounter";
 import user from "./modules/user";
@@ -10,6 +11,7 @@ import api_items from "./modules/content/items.js";
 import api_conditions from "./modules/content/conditions.js";
 import campaigns from "./modules/userContent/campaigns.js";
 import npcs from "./modules/userContent/npcs.js";
+import npcGroups from "./modules/userContent/npcGroups.js";
 import items from "./modules/userContent/items.js";
 import spells from "./modules/userContent/spells.js";
 import effects from "./modules/userContent/effects.js";
@@ -34,6 +36,7 @@ export default function () {
 	return new Vuex.Store({
 		modules: {
 			general: general,
+			tutorial: tutorial,
 			tips: tips,
 			user: user,
 			encounter: run_encounter,
@@ -43,6 +46,7 @@ export default function () {
 			api_items: api_items,
 			api_conditions: api_conditions,
 			npcs: npcs,
+			npcGroups: npcGroups,
 			items: items,
 			spells: spells,
 			effects: effects,

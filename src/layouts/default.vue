@@ -7,12 +7,12 @@
 				<div class="card-body">
 					<img
 						src="../assets/_img/logo/logo-icon-cyan.svg"
-						alt="Harmless Key: D&D Combat Tracker"
+						alt="Shieldmaiden: D&D Combat Tracker"
 					/>
 					<div class="right">
 						<div class="mr-2">
 							<div class="title"><i aria-hidden="true" class="fas fa-swords" /> Combat Tracker</div>
-							<i aria-hidden="true" class="">Harmless Key</i>
+							<i aria-hidden="true" class="">Shieldmaiden</i>
 						</div>
 						<router-link to="/demo" class="btn btn-sm bg-green my-2">Try demo</router-link>
 					</div>

@@ -4,7 +4,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 @import "hk-icons.scss";
-@import "./variables.scss";
+@import "./splitpanes.scss";
+@import "./home.scss";
 
 /* 2. Themes */
 /*********************************************/
@@ -24,16 +25,39 @@
 	10. Croppa
 */
 
+@font-face {
+	font-family: "ScalySans";
+	src: url("../assets/fonts/scaly/ScalaSansCaps-Regular.otf") format("opentype");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "ScalySans";
+	src: url("../assets/fonts/scaly/ScalaSansCaps-Bold.otf") format("opentype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 /* 2. Defaults */
 /*********************************************/
 html body {
-	padding-top: $header-height;
 	background: $neutral-11;
 	color: $neutral-1;
 	font-size: $font-size;
 	font-family: "Open Sans", sans-serif;
 	position: relative;
-	background-image: url("../assets/_img/styles/paper-bg.png");
+
+	button {
+		all: unset;
+		text-align: center;
+		box-sizing: border-box;
+	}
+
+	*:focus-visible {
+		outline-offset: 3px;
+	}
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -48,16 +72,17 @@ html body {
 		grid-template-columns: max-content auto;
 	}
 
-	header {
+	#header {
 		display: block;
 		height: $header-height;
 		line-height: 50px;
 		width: 100%;
-		background: $neutral-7;
+		background: $neutral-6;
 		border-bottom: solid 1px transparent;
 		position: fixed;
 		top: 0;
 		z-index: 999;
+		padding: 0 10px 0 5px;
 	}
 	pre {
 		color: $neutral-2;
@@ -103,11 +128,10 @@ html body {
 	h4,
 	h5,
 	h6 {
-		font-weight: normal;
+		font-weight: bold;
 		margin: 0;
 	}
 	h1 {
-		font-family: $text-written;
 		font-size: 25px;
 		line-height: 40px;
 		margin-bottom: 15px;
@@ -133,6 +157,11 @@ html body {
 	/*********************************************/
 	.white {
 		color: $white !important;
+	}
+	.text {
+		&-left {
+			text-align: left !important;
+		}
 	}
 
 	.neutral-1,
@@ -303,6 +332,13 @@ html body {
 			fill: $yellow-light !important;
 		}
 	}
+	.yellow-dark,
+	.text-yellow-dark {
+		color: $yellow-dark !important;
+		path {
+			fill: $yellow-dark !important;
+		}
+	}
 
 	.copper {
 		color: $copper !important;
@@ -412,6 +448,12 @@ html body {
 	.bg-yellow-light {
 		background-color: $yellow-light !important;
 	}
+	.bg-accent {
+		background-color: $accent !important;
+	}
+	.bg-accent-light {
+		background-color: $accent-light !important;
+	}
 
 	.healing {
 		color: $green;
@@ -509,6 +551,19 @@ html body {
 				overflow-y: scroll;
 			}
 		}
+	}
+
+	.absolute {
+		position: absolute;
+	}
+	.static {
+		position: static;
+	}
+	.fixed {
+		position: fixed;
+	}
+	.sticky {
+		position: sticky;
 	}
 
 	//MARGINS
@@ -613,6 +668,95 @@ html body {
 			}
 			&-5 {
 				margin-right: 3rem !important;
+			}
+		}
+	}
+	.-m {
+		&-1 {
+			margin: -0.25rem !important;
+		}
+		&-2 {
+			margin: -0.5rem !important;
+		}
+		&-3 {
+			margin: -1rem !important;
+		}
+		&-4 {
+			margin: -1.5rem !important;
+		}
+		&-5 {
+			margin: -3rem !important;
+		}
+		&b,
+		&y {
+			&-1 {
+				margin-bottom: -0.25rem !important;
+			}
+			&-2 {
+				margin-bottom: -0.5rem !important;
+			}
+			&-3 {
+				margin-bottom: -1rem !important;
+			}
+			&-4 {
+				margin-bottom: -1.5rem !important;
+			}
+			&-5 {
+				margin-bottom: -3rem !important;
+			}
+		}
+		&t,
+		&y {
+			&-1 {
+				margin-top: -0.25rem !important;
+			}
+			&-2 {
+				margin-top: -0.5rem !important;
+			}
+			&-3 {
+				margin-top: -1rem !important;
+			}
+			&-4 {
+				margin-top: -1.5rem !important;
+			}
+			&-5 {
+				margin-top: -3rem !important;
+			}
+		}
+		&l,
+		&x {
+			&-1 {
+				margin-left: -0.25rem !important;
+			}
+			&-2 {
+				margin-left: -0.5rem !important;
+			}
+			&-3 {
+				margin-left: -1rem !important;
+			}
+			&-4 {
+				margin-left: -1.5rem !important;
+			}
+			&-5 {
+				margin-left: -3rem !important;
+			}
+		}
+		&r,
+		&x {
+			&-1 {
+				margin-right: -0.25rem !important;
+			}
+			&-2 {
+				margin-right: -0.5rem !important;
+			}
+			&-3 {
+				margin-right: -1rem !important;
+			}
+			&-4 {
+				margin-right: -1.5rem !important;
+			}
+			&-5 {
+				margin-right: -3rem !important;
 			}
 		}
 	}
@@ -848,14 +992,27 @@ html body {
 		}
 	}
 	.flex {
+		display: flex;
 		&-col {
 			flex-direction: column;
 		}
 		&-row {
 			flex-direction: row;
 		}
+		&-grow {
+			flex-grow: 1;
+		}
+		&-wrap {
+			flex-wrap: wrap;
+			&-nowrap {
+				flex-wrap: nowrap;
+			}
+		}
 	}
 	.gap {
+		&-05 {
+			gap: 0.25rem;
+		}
 		&-1 {
 			gap: 0.5rem;
 		}
@@ -869,6 +1026,9 @@ html body {
 			gap: 2rem;
 		}
 		&-x {
+			&-05 {
+				column-gap: 0.25rem;
+			}
 			&-1 {
 				column-gap: 0.5rem;
 			}
@@ -883,6 +1043,9 @@ html body {
 			}
 		}
 		&-y {
+			&-05 {
+				row-gap: 0.25rem;
+			}
 			&-1 {
 				row-gap: 0.5rem;
 			}
@@ -916,7 +1079,7 @@ html body {
 	}
 	.items {
 		&-start {
-			align-items: start !important;
+			align-items: flex-start !important;
 		}
 		&-baseline {
 			align-items: baseline !important;
@@ -944,6 +1107,11 @@ html body {
 		&-pre-wrap {
 			white-space: pre-wrap;
 		}
+	}
+
+	.step-highlight {
+		outline: $yellow-light solid 2px;
+		outline-offset: 2px;
 	}
 
 	.hk-layout {
@@ -982,10 +1150,9 @@ html body {
 	}
 
 	.breadcrumb {
-		margin-bottom: 20px;
-		background: $neutral-9;
+		margin-bottom: 1rem;
+		background: $neutral-6;
 		border-radius: $border-radius;
-		border: solid 1px $neutral-8;
 		padding: 10px 15px;
 	}
 
@@ -1031,10 +1198,9 @@ html body {
 	}
 
 	.content-count {
-		border: solid 1px $neutral-5;
 		background-color: $neutral-9;
 		padding: 5px 10px;
-		border-radius: 12px;
+		border-radius: $border-radius;
 		user-select: none;
 		margin-right: 4px;
 
@@ -1064,9 +1230,10 @@ html body {
 	}
 
 	.truncate-cell {
-		display: table;
-		table-layout: fixed;
-		width: 100%;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		max-width: 1px;
 	}
 	.truncate {
 		white-space: nowrap;
@@ -1196,34 +1363,37 @@ html body {
 	.home {
 		scroll-behavior: smooth;
 
-		.top {
-			.animated-video {
-				margin: -8% 0 -15%;
-			}
-		}
-
 		.content {
 			max-width: 1140px;
 			margin: auto;
+		}
+		&__container {
+			padding: 0 15px;
+			width: 100%;
+			max-width: 1280px;
+			margin-right: auto;
+			margin-left: auto;
 		}
 		section {
 			font-size: 18px;
 			line-height: 30px;
 
 			.head {
-				padding: 100px 0 75px 0;
-				text-align: center;
+				margin-bottom: 50px;
 
 				h2 {
-					font-family: $text-written;
-					font-size: 30px !important;
-					line-height: 50px;
-					text-align: center;
+					font-size: 35px;
+					line-height: 45px;
+					margin-bottom: 10px;
+				}
+				.text {
+					max-width: 600px;
 				}
 			}
 			h3 {
 				font-size: 25px !important;
 				margin-bottom: 30px !important;
+				font-weight: normal;
 			}
 			p {
 				margin-bottom: 50px;
@@ -1446,8 +1616,7 @@ html body {
 		border-radius: $border-radius-small;
 		background: $blue;
 		color: $neutral-1;
-		display: inline-block;
-		font-weight: 400;
+		font-weight: 700;
 		text-align: center;
 		vertical-align: middle;
 		user-select: none;
@@ -1455,11 +1624,12 @@ html body {
 		padding: 0.375rem 0.75rem;
 		font-size: 1rem;
 		line-height: 1.5;
-		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+		transition:
+			color 0.15s ease-in-out,
+			background-color 0.15s ease-in-out;
 
-		&:focus,
-		&.active {
-			outline: none;
+		&:focus-visible {
+			outline: $outline;
 			box-shadow: none;
 		}
 		&.disabled {
@@ -1517,9 +1687,15 @@ html body {
 		&.bg-neutral-9:hover {
 			background-color: $neutral-8 !important;
 		}
+		&.bg-accent:hover {
+			background-color: $accent-light !important;
+		}
 
 		&.btn-square {
 			border-radius: 0;
+		}
+		&.btn-round {
+			border-radius: 9999px;
 		}
 	}
 
@@ -1552,33 +1728,37 @@ html body {
 
 	.login-container {
 		background-position: center;
-		padding: 100px 30px 0 30px;
+		padding: 50px 30px 0 30px;
+	}
+	#login {
+		background-color: $neutral-7;
+		max-width: 360px;
+		margin: auto;
+		padding: 120px 30px 30px;
+		position: relative;
+		box-shadow: 5px 5px 10px #000;
+		border-radius: $border-radius;
+		overflow: visible;
+		width: 100%;
 
-		#login {
-			background-color: $neutral-7;
-			max-width: 360px;
-			margin: auto;
-			padding: 120px 30px 30px;
-			position: relative;
-			box-shadow: 5px 5px 10px #000;
-			border-radius: $border-radius;
-
-			h1,
-			h2 {
-				text-transform: none !important;
-				text-align: center;
-				margin-bottom: 20px;
-			}
-			img.logo {
-				width: calc(100% - 50px);
-				margin: 0 25px;
-				position: absolute;
-				top: -35px;
-				left: 0;
-			}
-			.q-field {
-				margin-bottom: 1px;
-			}
+		h1,
+		h2 {
+			text-transform: none !important;
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		img.logo {
+			width: calc(100% - 50px);
+			margin: 0 25px;
+			position: absolute;
+			top: -35px;
+			left: 0;
+		}
+		.q-field {
+			margin-bottom: 1px;
+		}
+		.q-form {
+			overflow: auto;
 		}
 	}
 	.google {
@@ -1647,8 +1827,6 @@ html body {
 		margin-bottom: 20px;
 		border-radius: $border-radius;
 		overflow: auto;
-		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.125), 0 6px 2px 0 rgba(0, 0, 0, 0.1);
-		border: solid 1px $neutral-5;
 
 		&::-webkit-scrollbar {
 			display: none !important;
@@ -1691,8 +1869,7 @@ html body {
 		}
 		.card-footer {
 			padding: 12px 15px;
-			background-color: rgba(0, 0, 0, 0.03);
-			border-top: 1px solid rgba(0, 0, 0, 0.125);
+			background-color: $neutral-8;
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
@@ -1810,9 +1987,11 @@ html body {
 		.rolls {
 			pointer-events: auto;
 			width: 300px;
-			padding-top: 10px;
+			padding: 10px;
 			max-height: calc(100vh - 50px);
 			overflow-y: auto;
+			display: flex;
+			flex-direction: column-reverse;
 
 			.q-btn {
 				pointer-events: auto;
@@ -1898,22 +2077,30 @@ html body {
 		}
 	}
 
-	.slide {
-		position: fixed;
-		right: 0;
-		top: 50px;
-		height: calc(100vh - 50px);
-		width: 380px;
-		max-width: 95%;
-		z-index: 99;
-		box-shadow: 0 10px 15px $black;
-		background: $neutral-8;
+	.drawer {
+		&-wrapper {
+			position: fixed;
+			right: 0;
+			top: 50px;
+			height: calc(100vh - 50px);
+			width: 420px;
+			max-width: 95%;
+			z-index: 99;
+			box-shadow: 0 10px 15px $black;
+			background: $neutral-8;
+		}
+		height: 100%;
 		display: grid;
 		grid-template-columns: auto;
 		grid-template-rows: 40px auto;
 		grid-template-areas:
 			"hide"
 			"content";
+
+		.q-scrollarea {
+			height: 100%;
+			grid-area: content;
+		}
 
 		a.hide {
 			grid-area: hide;
@@ -1928,15 +2115,10 @@ html body {
 			background: $neutral-9;
 			color: $neutral-1 !important;
 		}
-		.content {
+		&__content {
 			padding: 15px;
-			grid-area: content;
 			overflow: auto;
 
-			&.monster-card {
-				background-color: #f7e4ba !important;
-				background-image: url("../assets/_img/styles/monster-card-bg.png") !important;
-			}
 			&::-webkit-scrollbar {
 				display: none !important;
 			}
@@ -2124,56 +2306,58 @@ html body {
 	}
 	.target-item {
 		display: grid;
-		grid-template-columns: 35px 35px 1fr;
+		grid-template-columns: 40px 40px 1fr;
 		grid-template-rows: auto;
-		grid-gap: 0;
-		line-height: 35px;
+		grid-gap: 1px;
+		line-height: 40px;
 		user-select: none;
 		border-radius: $border-radius-small;
 		width: 100%;
 
 		&.hasInitiative {
-			grid-template-columns: 35px 35px 35px 1fr;
+			grid-template-columns: 40px 40px 40px 1fr;
 		}
 		.initiative,
 		.ac,
-		.img {
+		.target-avatar {
 			text-align: center;
-			height: 35px;
+			height: 40px;
+			width: 40px;
+		}
+		.initiative {
+			padding: 0 5px;
+			font-weight: bold;
 		}
 		.ac_wrapper {
 			position: relative;
 			cursor: pointer;
+			color: $neutral-4;
 
 			i,
 			.ac {
 				position: absolute;
-				line-height: 35px;
+				line-height: 40px;
 				width: 100%;
 				text-align: center;
 			}
 			i {
-				font-size: 28px;
-				color: $neutral-4;
+				font-size: 33px;
+				margin-top: 1px;
 			}
 			.ac {
 				font-weight: bold;
-				color: $neutral-1;
-				margin-top: -1px;
+				filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
+				mix-blend-mode: luminosity;
+				opacity: 0.95;
 			}
 		}
-		.img {
-			display: block;
-			width: 35px;
-			height: 35px;
+		.target-avatar {
+			width: 40px;
+			height: 40px;
 			background-color: $neutral-9;
-			background-position: center top;
-			background-repeat: no-repeat;
-			background-size: cover;
 			font-size: 20px;
-			line-height: 35px;
+			line-height: 40px;
 			overflow: hidden;
-			border: solid 1px transparent;
 
 			[class^="hki-"],
 			[class*=" hki-"] {
@@ -2188,13 +2372,12 @@ html body {
 
 		.q-linear-progress {
 			.health-bar {
-				padding-left: 5px;
+				padding: 0 10px;
 				font-size: 13px;
 				display: grid;
 				grid-template-columns: 1fr max-content;
 				grid-column-gap: 5px;
-				line-height: 35px;
-				margin-right: 5px;
+				line-height: 40px;
 				color: $neutral-1;
 
 				.conditions {
@@ -2352,7 +2535,7 @@ html body {
 
 	// Q-INPUT FIELDS
 	.manual-input {
-		height: 110px;
+		height: 90px;
 		font-size: 50px;
 
 		.q-field {
@@ -2403,34 +2586,19 @@ html body {
 
 			&.avatar {
 				padding: 0;
-				width: 46px;
-				height: 46px;
+				width: 55px;
+				height: 55px;
 				border: solid 1px $neutral-4;
 				background-size: cover;
 				background-position: center top;
 				background-color: $neutral-8;
 				color: $neutral-2;
 				text-align: center;
-				font-size: 36px;
-				line-height: 36px;
+				font-size: 45px;
+				line-height: 55px;
 				box-sizing: border-box;
 			}
 		}
-
-		.monster {
-			column-count: 2;
-
-			.skills {
-				column-count: 2;
-			}
-		}
-		.monster-card {
-			padding: 10px;
-		}
-	}
-	.monster-card {
-		background-color: #f7e4ba !important;
-		background-image: url("../assets/_img/styles/monster-card-bg.png") !important;
 	}
 	@media only screen and (max-width: 1530px) {
 		.monster-table {
@@ -2606,6 +2774,7 @@ html body {
 						font-size: 80px;
 						font-weight: bold;
 						background-color: $neutral-7;
+						color: $neutral-1;
 					}
 					.roll_footer {
 						text-align: center;
@@ -2689,19 +2858,29 @@ html body {
 	}
 	.q-btn {
 		border-radius: $border-radius;
+		font-weight: bold;
+
+		&:focus-visible {
+			outline: $outline !important;
+		}
 	}
+
+	.q-btn-group {
+		.q-btn {
+			border: solid 1px transparent;
+
+			&:focus-visible {
+				outline: none !important;
+				border-color: $neutral-2;
+			}
+		}
+	}
+
 	.q-menu {
 		.q-list {
 			.q-item {
 				&__section--avatar {
 					min-width: 35px;
-				}
-			}
-			a.q-item {
-				color: $neutral-2 !important;
-
-				&:hover {
-					color: $blue !important;
 				}
 			}
 		}
@@ -2813,7 +2992,7 @@ html body {
 
 			.breadcrumb {
 				margin-bottom: 0;
-				background: $neutral-9;
+				background: $neutral-6;
 				border-radius: 0;
 				border: none;
 				padding: 10px 15px;
@@ -2949,9 +3128,9 @@ html body {
 	//XL
 	@media only screen and (min-width: $xl-breakpoint) {
 		.container {
-			max-width: 1140px;
+			max-width: 1280px;
 		}
-		.slide {
+		.drawer {
 			width: 420px;
 		}
 		.d-xl {

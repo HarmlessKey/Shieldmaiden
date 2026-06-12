@@ -1,11 +1,11 @@
 <template>
 	<div class="container">
-		<h1>Privacy Policy for Harmless Key</h1>
+		<h1>Privacy Policy for Shieldmaiden</h1>
 
 		<p>
-			At Harmless Key, accessible from harmlesskey.com, one of our main priorities is the privacy of
+			At Shieldmaiden, accessible from shieldmaiden.app, one of our main priorities is the privacy of
 			our visitors. This Privacy Policy document contains types of information that is collected and
-			recorded by Harmless Key and how we use it.
+			recorded by Shieldmaiden and how we use it.
 		</p>
 
 		<p>
@@ -15,7 +15,7 @@
 
 		<p>
 			This Privacy Policy applies only to our online activities and is valid for visitors to our
-			website with regards to the information that they shared and/or collect in Harmless Key. This
+			website with regards to the information that they shared and/or collect in Shieldmaiden. This
 			policy is not applicable to any information collected offline or via channels other than this
 			website.
 		</p>
@@ -62,7 +62,7 @@
 		<h2>Log Files</h2>
 
 		<p>
-			Harmless Key follows a standard procedure of using log files. These files log visitors when
+			Shieldmaiden follows a standard procedure of using log files. These files log visitors when
 			they visit websites. All hosting companies do this and a part of hosting services' analytics.
 			The information collected by log files include internet protocol (IP) addresses, browser type,
 			Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the
@@ -85,7 +85,7 @@
 		<h2>Cookies and Web Beacons</h2>
 
 		<p>
-			Like any other website, Harmless Key uses 'cookies'. These cookies are used to store
+			Like any other website, Shieldmaiden uses 'cookies'. These cookies are used to store
 			information including visitors' preferences, and the pages on the website that the visitor
 			accessed or visited. The information is used to optimize the users' experience by customizing
 			our web page content based on visitors' browser type and/or other information.
@@ -102,7 +102,7 @@
 
 		<p>
 			Google is one of a third-party vendor on our site. It also uses cookies, known as DART
-			cookies, to serve ads to our site visitors based upon their visit to harmlesskey.com and other
+			cookies, to serve ads to our site visitors based upon their visit to shieldmaiden.app and other
 			sites on the internet. However, visitors may choose to decline the use of DART cookies by
 			visiting the Google ad and content network Privacy Policy at the following URL –
 			<a target="_blank" rel="noopener" href="https://policies.google.com/technologies/ads"
@@ -114,27 +114,27 @@
 
 		<P
 			>You may consult this list to find the Privacy Policy for each of the advertising partners of
-			Harmless Key.</P
+			Shieldmaiden.</P
 		>
 
 		<p>
 			Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web
-			Beacons that are used in their respective advertisements and links that appear on Harmless
-			Key, which are sent directly to users' browser. They automatically receive your IP address
+			Beacons that are used in their respective advertisements and links that appear on Shieldmaiden,
+			which are sent directly to users' browser. They automatically receive your IP address
 			when this occurs. These technologies are used to measure the effectiveness of their
 			advertising campaigns and/or to personalize the advertising content that you see on websites
 			that you visit.
 		</p>
 
 		<p>
-			Note that Harmless Key has no access to or control over these cookies that are used by
+			Note that Shieldmaiden has no access to or control over these cookies that are used by
 			third-party advertisers.
 		</p>
 
 		<h2>Third Party Privacy Policies</h2>
 
 		<p>
-			Harmless Key's Privacy Policy does not apply to other advertisers or websites. Thus, we are
+			Shieldmaiden's Privacy Policy does not apply to other advertisers or websites. Thus, we are
 			advising you to consult the respective Privacy Policies of these third-party ad servers for
 			more detailed information. It may include their practices and instructions about how to
 			opt-out of certain options.
@@ -211,7 +211,7 @@
 		</p>
 
 		<p>
-			Harmless Key does not knowingly collect any Personal Identifiable Information from children
+			Shieldmaiden does not knowingly collect any Personal Identifiable Information from children
 			under the age of 13. If you think that your child provided this kind of information on our
 			website, we strongly encourage you to contact us immediately and we will do our best efforts
 			to promptly remove such information from our records.
@@ -220,8 +220,8 @@
 		<h2>How can you contact us?</h2>
 		<p>
 			You can contact us by emailing
-			<a target="_blank" rel="noopener" href="mailto:contact@harmlesskey.com"
-				>contact@harmlesskey.com</a
+			<a target="_blank" rel="noopener" href="mailto:contact@shieldmaiden.app"
+				>contact@shieldmaiden.app</a
 			>
 		</p>
 	</div>

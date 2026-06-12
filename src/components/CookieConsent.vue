@@ -16,7 +16,6 @@
 
 <script>
 import { Cookies } from "quasar";
-import { bootstrap } from "vue-gtag";
 
 export default {
 	name: "CookieConsent",
@@ -33,12 +32,10 @@ export default {
 			// Delete existing analytics cookies
 			if (!value) {
 				for (const cookie of this.analytics_cookies) {
-					Cookies.remove(cookie, { domain: ".harmlesskey.com", path: "/" });
+					Cookies.remove(cookie, { domain: ".shieldmaiden.app", path: "/" });
 				}
 			} else {
-				bootstrap().then((gtag) => {
-					console.log("bootstrapped", gtag);
-				});
+				this.$gtm.enable(true);
 			}
 			this.show_banner = false;
 		},

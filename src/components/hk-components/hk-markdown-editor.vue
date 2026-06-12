@@ -11,9 +11,9 @@
 					class="fas fa-info-circle pointer"
 					aria-hidden="true"
 					@click="
-						setSlide({
+						setDrawer({
 							show: true,
-							type: 'slides/MarkdownInfo',
+							type: 'drawers/MarkdownInfo',
 						})
 					"
 				/>
@@ -92,7 +92,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setSlide"]),
+		...mapActions(["setDrawer"]),
 		change(value) {
 			this.$emit("change", value);
 		},

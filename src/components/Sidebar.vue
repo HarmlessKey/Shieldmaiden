@@ -8,8 +8,9 @@
 			id="sidebar"
 			:class="{
 				'side-collapsed':
-					$store.getters.side_collapsed && !smallScreen && $route.meta.sidebar !== false,
-				slideIn: $route.meta.sidebar === false,
+					($store.getters.side_collapsed && !smallScreen && $route.meta.sidebar !== false) ||
+					($store.getters.side_collapsed && !smallScreen && $route.name === 'home'),
+				slideIn: $route.meta.sidebar === false && $route.name !== 'home',
 			}"
 		>
 			<div>
@@ -107,6 +108,19 @@
 								Items
 							</q-tooltip>
 						</q-item>
+						<q-item clickable v-ripple to="/content/import">
+							<q-item-section avatar>
+								<i aria-hidden="true" class="fas fa-file-upload" />
+							</q-item-section>
+							<q-item-section class="title">Import</q-item-section>
+							<q-tooltip
+								v-if="$store.getters.side_collapsed"
+								anchor="center right"
+								self="center left"
+							>
+								Import
+							</q-tooltip>
+						</q-item>
 					</q-list>
 					<hr />
 					<h3>Player Content</h3>
@@ -194,7 +208,24 @@
 					</q-list>
 					<hr />
 				</template>
-
+				<q-list @click="setSideSmallScreen(false)">
+					<q-item clickable v-ripple to="/pricing">
+						<q-item-section avatar>
+							<i aria-hidden="true" class="fas fa-coins" />
+						</q-item-section>
+						<q-item-section>
+							{{ $store.getters.user ? "Get subscription" : "Pricing" }}
+						</q-item-section>
+						<q-tooltip
+							v-if="$store.getters.side_collapsed"
+							anchor="center right"
+							self="center left"
+						>
+							Subscribe
+						</q-tooltip>
+					</q-item>
+				</q-list>
+				<hr />
 				<q-list @click="setSideSmallScreen(false)">
 					<q-item clickable v-ripple to="/tools">
 						<q-item-section avatar>
@@ -337,7 +368,7 @@ export default {
 				{
 					name: "Patreon",
 					icon: "fab fa-patreon patreon-red",
-					url: "https://www.patreon.com/harmlesskey",
+					url: "https://www.patreon.com/shieldmaidenapp",
 				},
 				{
 					name: "Discord",
@@ -347,22 +378,17 @@ export default {
 				{
 					name: "Instagram",
 					icon: "fab fa-instagram",
-					url: "https://www.instagram.com/harmlesskey",
+					url: "https://www.instagram.com/shieldmaidenapp",
 				},
 				{
 					name: "Twitter",
 					icon: "fab fa-twitter-square",
-					url: "https://twitter.com/KeyHarmless",
+					url: "https://twitter.com/shieldmaidenapp",
 				},
 				{
 					name: "Facebook",
 					icon: "fab fa-facebook",
-					url: "https://www.facebook.com/harmlesskey",
-				},
-				{
-					name: "Reddit",
-					icon: "fab fa-reddit-alien",
-					url: "https://www.reddit.com/r/HarmlessKey",
+					url: "https://www.facebook.com/shieldmaidenapp",
 				},
 			],
 		};

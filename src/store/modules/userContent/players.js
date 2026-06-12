@@ -500,8 +500,10 @@ const player_actions = {
 	 * @param {string} user_id
 	 * @param {string} id
 	 */
-	async sync_player({ commit, dispatch }, { uid, id, sync_character }) {
+	async sync_player({ commit, dispatch, rootState }, { uid, id, sync_character }) {
 		if (uid) {
+			if (!rootState.general.extensionInstalled)
+				throw "D&D Character Sync Extension not installed or not detected. Please install the extension to use this feature.";
 			const services = await dispatch("get_player_services");
 			const character = await getCharacterSyncCharacter(sync_character);
 
@@ -511,6 +513,8 @@ const player_actions = {
 			await services.syncPlayer(uid, id, player, search_player);
 			commit("UPDATE_SEARCH_PLAYER", { id, search_player });
 			commit("PATCH_CACHED_PLAYER", { uid, id, player });
+
+			return player;
 		}
 	},
 

@@ -20,6 +20,7 @@ module.exports = function (/* ctx */) {
 		// --> boot files are part of "main.js"
 		// https://v1.quasar.dev/quasar-cli/boot-files
 		boot: [
+			"prototypes",
 			{ path: "plugins", server: false },
 			{ path: "hk-components", server: false },
 			{ path: "vee-validate", server: false },
@@ -50,7 +51,7 @@ module.exports = function (/* ctx */) {
 			vueRouterMode: "history", // available values: 'hash', 'history'
 			env: require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` }).parsed,
 			scssLoaderOptions: {
-				additionalData: '@import "src/css/variables.scss";',
+				additionalData: "",
 			},
 			vueCompiler: true,
 			transpile: true,
@@ -61,7 +62,16 @@ module.exports = function (/* ctx */) {
 			// Add dependencies for transpiling with Babel (Array of string/regex)
 			// (from node_modules, which are by default not transpiled).
 			// Applies only if "transpile" is set to true.
-			transpileDependencies: ["vee-validate/dist/rules", "vue-numeral-filter"],
+			transpileDependencies: [
+				"vee-validate/dist/rules",
+				"vue-numeral-filter",
+				"htmlparser2",
+				"fast-png",
+				"iobuffer",
+				"@gtm-support/vue2-gtm",
+				"@gtm-support/core",
+				"@octokit",
+			],
 
 			// rtl: false, // https://v1.quasar.dev/options/rtl-support
 			// preloadChunks: true,
@@ -105,7 +115,7 @@ module.exports = function (/* ctx */) {
 			// directives: [],
 
 			// Quasar plugins
-			plugins: ["AppFullscreen", "Notify", "Cookies", "Meta"],
+			plugins: ["AppFullscreen", "Notify", "Cookies", "Meta", "Dialog"],
 		},
 
 		// animations: 'all', // --- includes all animations
@@ -125,75 +135,42 @@ module.exports = function (/* ctx */) {
 				clientsClaim: true,
 			},
 			manifest: {
-				name: "Harmless Key",
-				short_name: "Harmless Key",
+				name: "Shieldmaiden",
+				short_name: "Shieldmaiden",
 				start_url: ".",
 				description:
-					"Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
-				orientation: "portrait",
+					"Shieldmaiden is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+				orientation: "any",
 				theme_color: "#191a1c",
 				background_color: "#191a1c",
 				display: "standalone",
 				categories: ["games", "entertainment"],
 				icons: [
 					{
-						src: "img/icons/transparent-512x512.png",
+						src: "icons/transparent-512x512.png",
 						sizes: "512x512",
 						type: "image/png",
-						purpose: "any",
 					},
 					{
-						src: "img/icons/maskable-512x512.png",
+						src: "icons/maskable-512x512.png",
 						sizes: "512x512",
 						type: "image/png",
 						purpose: "maskable",
 					},
 					{
-						src: "img/icons/transparent-192x192.png",
+						src: "icons/transparent-192x192.png",
 						sizes: "192x192",
 						type: "image/png",
-						purpose: "any",
 					},
 					{
-						src: "img/icons/maskable-192x192.png",
+						src: "icons/maskable-192x192.png",
 						sizes: "192x192",
 						type: "image/png",
 						purpose: "maskable",
 					},
 					{
-						src: "img/icons/ms/app-icon-44x44.png",
-						sizes: "44x44",
-						type: "image/png",
-						purpose: "any",
-					},
-					{
-						src: "img/icons/ms/small-tile-71x71.png",
-						sizes: "71x71",
-						type: "image/png",
-						purpose: "any",
-					},
-					{
-						src: "img/icons/ms/wide-tile-350x150.png",
-						sizes: "350x150",
-						type: "image/png",
-						purpose: "any",
-					},
-					{
-						src: "img/icons/ms/large-tile-310x310.png",
-						sizes: "310x310",
-						type: "image/png",
-						purpose: "any",
-					},
-					{
-						src: "img/icons/ms/store-logo-50x50.png",
-						sizes: "50x50",
-						type: "image/png",
-						purpose: "any",
-					},
-					{
-						src: "img/icons/ms/splash-screen-620x300.png",
-						sizes: "620x300",
-						type: "image/png",
+						src: "favicon.png",
+						sizes: "48x48",
 						purpose: "any",
 					},
 				],
@@ -204,7 +181,7 @@ module.exports = function (/* ctx */) {
 						url: "/content/campaigns",
 						icons: [
 							{
-								src: "/img/icons/shortcuts/campaigns-512x512.png",
+								src: "/icons/shortcuts/campaigns-512x512.png",
 								sizes: "512x512",
 								type: "image/png",
 								purpose: "any",
@@ -217,7 +194,7 @@ module.exports = function (/* ctx */) {
 						url: "/content/characters",
 						icons: [
 							{
-								src: "/img/icons/shortcuts/characters-512x512.png",
+								src: "/icons/shortcuts/characters-512x512.png",
 								sizes: "512x512",
 								type: "image/png",
 								purpose: "any",

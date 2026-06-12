@@ -24,7 +24,7 @@
 				<th>Effect</th>
 			</thead>
 			<tbody>
-				<tr v-for="(effect, index) in effects" :key="index">
+				<tr v-for="(effect, index) in exhaustionLevels" :key="index">
 					<td>
 						<a
 							:class="{ active: entity.conditions['exhaustion'] >= index + 1 }"
@@ -66,14 +66,6 @@ export default {
 		return {
 			entity: this.data.entity,
 			condition: this.data.condition,
-			effects: [
-				"Disadvantage on ability checks",
-				"Speed halved",
-				"Disadvantage on attack rolls and saving throws",
-				"Hit point maximum halved",
-				"Speed reduced to 0",
-				"Death",
-			],
 		};
 	},
 	computed: {

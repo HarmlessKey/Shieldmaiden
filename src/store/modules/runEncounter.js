@@ -122,6 +122,7 @@ const getDefaultState = () => ({
 	encounter: undefined,
 	requests: undefined,
 	campaignId: undefined,
+	edition: undefined,
 	encounterId: undefined,
 	log: [],
 	path: undefined,
@@ -182,6 +183,9 @@ const run_encounter_getters = {
 	campaignId(state) {
 		return state.campaignId;
 	},
+	edition(state) {
+		return state.edition;
+	},
 	encounterId(state) {
 		return state.encounterId;
 	},
@@ -239,6 +243,10 @@ const run_encounter_actions = {
 		try {
 			// Set the entities when it's not a demo encounter
 			if (!demo) {
+				// The campaign edition decides which rules text (conditions etc.) is shown
+				const campaign = await dispatch("campaigns/get_campaign", { uid, id: cid });
+				commit("SET_EDITION", campaign?.edition || "2014");
+
 				// Fetch the encounter
 				const encounter = await dispatch("encounters/get_encounter", {
 					uid,
@@ -265,6 +273,8 @@ const run_encounter_actions = {
 					await dispatch("add_entity", key);
 				}
 			} else {
+				// The demo runs on the latest edition
+				commit("SET_EDITION", "2024");
 				const demo_encounter = rootGetters["encounters/demo_encounter"] || demoEncounter;
 				commit("SET_ENCOUNTER", { ...demo_encounter });
 				for (let key in demo_encounter.entities) {
@@ -505,6 +515,8 @@ const run_encounter_actions = {
 					entity.senses = data_npc.senses;
 					entity.languages = data_npc.languages;
 					entity.legendary_count = data_npc.legendary_count;
+					if (data_npc.initiative !== undefined) entity.initiative_bonus = data_npc.initiative;
+					if (data_npc.gear) entity.gear = data_npc.gear;
 
 					if (entity.challenge_rating)
 						entity.proficiency =
@@ -518,7 +530,11 @@ const run_encounter_actions = {
 					}
 
 					if (state.test) {
-						entity.initiative = Math.ceil(Math.random() * 20) + calc_mod(entity.dexterity);
+						entity.initiative =
+							Math.ceil(Math.random() * 20) +
+							(entity.initiative_bonus !== undefined
+								? entity.initiative_bonus
+								: calc_mod(entity.dexterity));
 					}
 
 					// Old NPC format values
@@ -2057,6 +2073,9 @@ const run_encounter_mutations = {
 	},
 	SET_CAMPAIGN_ID(state, value) {
 		Vue.set(state, "campaignId", value);
+	},
+	SET_EDITION(state, value) {
+		Vue.set(state, "edition", value);
 	},
 	SET_ENCOUNTER_ID(state, value) {
 		Vue.set(state, "encounterId", value);

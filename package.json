@@ -13,7 +13,9 @@
 		"docker-build": "docker build -t harmlesskey/harmlesskey .",
 		"docker-push": "docker push harmlesskey/harmlesskey:latest",
 		"docker-run": "docker run -p 8081:80 -d --name Harmlesskey harmlesskey/harmlesskey",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"emulators": "firebase emulators:start --config firebase.emulator.json --project demo-shieldmaiden",
+		"ssr:emulator": "USE_FIREBASE_EMULATOR=true quasar dev -m ssr"
 	},
 	"dependencies": {
 		"@egjs/vue-flicking": "4.12.0",
@@ -64,6 +66,7 @@
 		"eslint-webpack-plugin": "^2.4.0",
 		"husky": "^8.0.2",
 		"prettier": "^3.3.3",
+		"firebase-tools": "^14.0.0",
 		"workbox-webpack-plugin": "^7.3.0"
 	},
 	"overrides": {

@@ -1,6 +1,7 @@
 # Firebase Local Emulator Suite for local/sandbox dev — findings & plan
 
-**Status: investigation / proposal — NOT implemented yet.**
+**Status: IMPLEMENTED.** Verified end-to-end against the emulator suite
+(Auth + RTDB + Storage) with no real credentials — see §9 checklist, all done.
 
 Goal: let the app run fully offline (sandboxes, git worktrees, CI) against the
 Firebase Local Emulator Suite with permissive local-only rules, no real

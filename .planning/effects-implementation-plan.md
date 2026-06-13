@@ -67,6 +67,10 @@ This is the largest step - breaks into sub-steps:
 ### 7b. Effect lifecycle & duration tracking
 - Track per active effect: source entity, applied round/turn, duration_type +
   duration_value, cancelable + cancel_trigger.
+- For `duration_type: "concentration"` effects applied to a target, store a
+  `source.effect_id` linking back to the caster's active Concentration effect instance.
+  When that Concentration instance is removed/cancelled, cascade-remove every active
+  effect (on any entity) whose `source.effect_id` matches it.
 - On each relevant trigger, tick down durations, expire effects, and surface
   "save ends" / "until cancelled" prompts.
 

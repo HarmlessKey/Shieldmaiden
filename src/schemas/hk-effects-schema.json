@@ -1,0 +1,285 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://harmlesskey.com/schemas/hk-effects-schema.json",
+	"title": "Effect",
+	"description": "A single effect (condition, spell effect, monster ability effect, etc.) made up of one or more sub-effects.",
+	"type": "object",
+	"required": ["name", "duration_type", "sub_effects"],
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "Display name of the effect, e.g. 'Blinded', 'Bless', 'Hunter's Mark'."
+		},
+		"description": {
+			"type": "string",
+			"description": "Freeform description / reminder text shown to the user."
+		},
+		"duration_type": {
+			"type": "string",
+			"enum": ["time", "cancelled", "trigger", "concentration", "next_turn", "instant", "action_removed", "long_rest"],
+			"description": "How long the effect lasts. See duration_types in effectsConstants.js."
+		},
+		"duration_value": {
+			"type": "integer",
+			"minimum": 1,
+			"description": "Number of rounds, only relevant when duration_type is 'time'."
+		},
+		"cancelable": {
+			"type": "boolean",
+			"default": true,
+			"description": "Whether the effect can be manually cancelled before its duration ends."
+		},
+		"cancel_trigger": {
+			"$ref": "#/$defs/trigger",
+			"description": "Trigger that ends the effect early, only relevant when duration_type is 'trigger'."
+		},
+		"area": {
+			"$ref": "#/$defs/area"
+		},
+		"sub_effects": {
+			"type": "array",
+			"minItems": 1,
+			"items": { "$ref": "#/$defs/sub_effect" }
+		}
+	},
+
+	"$defs": {
+		"trigger": {
+			"type": "string",
+			"enum": [
+				"start_turn_target",
+				"end_turn_target",
+				"start_turn_caster",
+				"end_turn_caster",
+				"damage_taken",
+				"on_hit",
+				"on_crit",
+				"on_hit_taken",
+				"failed_save",
+				"success_save",
+				"combat_start",
+				"zero_hp",
+				"long_rest",
+				"short_rest"
+			]
+		},
+
+		"ability-select": {
+			"type": "string",
+			"enum": ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+		},
+
+		"damage-type-select": {
+			"type": "string",
+			"enum": [
+				"non_magical_bludgeoning",
+				"non_magical_piercing",
+				"non_magical_slashing",
+				"bludgeoning",
+				"piercing",
+				"slashing",
+				"acid",
+				"cold",
+				"fire",
+				"force",
+				"lightning",
+				"necrotic",
+				"poison",
+				"psychic",
+				"radiant",
+				"thunder"
+			]
+		},
+
+		"condition_ref": {
+			"type": "string",
+			"description": "Reference (id or value) to another condition, used by defense/i (immunity) sub-effects."
+		},
+
+		"scaling": {
+			"type": "object",
+			"description": "Describes how a numeric value scales with an external factor (e.g. exhaustion stacks).",
+			"required": ["by", "per_unit_value"],
+			"properties": {
+				"by": {
+					"type": "string",
+					"enum": ["stacks", "caster_level", "spell_level", "char_level"]
+				},
+				"per_unit_value": {
+					"type": "number",
+					"description": "Value added/changed per unit of 'by' (e.g. -5 per exhaustion stack)."
+				}
+			}
+		},
+
+		"condition_check": {
+			"type": "object",
+			"description": "Optional condition that must be true for a sub-effect to apply, e.g. attacker position.",
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": ["attacker_distance", "attacker_has_condition", "target_has_condition", "line_of_sight"]
+				},
+				"value": {
+					"description": "Descriptor for the condition type, e.g. distance in feet, a condition value, or a boolean.",
+					"oneOf": [
+						{ "type": "number" },
+						{ "type": "string" },
+						{ "type": "boolean" }
+					]
+				},
+				"comparator": {
+					"type": "string",
+					"enum": ["lte", "gte", "eq", "neq"],
+					"description": "How 'value' should be compared, used for attacker_distance."
+				}
+			}
+		},
+
+		"area": {
+			"type": "object",
+			"description": "Area-of-effect metadata for spells/abilities that affect multiple targets.",
+			"required": ["shape", "size", "origin"],
+			"properties": {
+				"shape": {
+					"type": "string",
+					"enum": ["sphere", "cone", "cube", "line", "cylinder"]
+				},
+				"size": {
+					"type": "number",
+					"description": "Size of the area in feet."
+				},
+				"origin": {
+					"type": "string",
+					"enum": ["caster", "point", "target"]
+				}
+			}
+		},
+
+		"dice_roll": {
+			"title": "Roll",
+			"type": "object",
+			"properties": {
+				"damage_type": {
+					"$ref": "#/$defs/damage-type-select"
+				},
+				"magical": {
+					"type": "boolean"
+				},
+				"dice_count": {
+					"title": "Dice count",
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 99
+				},
+				"dice_type": {
+					"title": "Dice type",
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 20
+				},
+				"fixed_val": {
+					"title": "Fixed val",
+					"type": "integer",
+					"minimum": -99,
+					"maximum": 99
+				}
+			}
+		},
+
+		"sub_effect": {
+			"type": "object",
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"bonus", "base", "fixed",
+						"defense",
+						"advantage", "disadvantage", "grant_advantage", "grant_disadvantage",
+						"reroll",
+						"damage", "healing",
+						"auto_fail", "auto_success",
+						"restrict",
+						"grant_action",
+						"damage_modifier",
+						"score_swap",
+						"outcome",
+						"special"
+					]
+				},
+				"sub_types": {
+					"type": "array",
+					"minItems": 1,
+					"items": { "$ref": "#/$defs/sub_type" }
+				},
+				"value": {
+					"type": "number",
+					"description": "Numeric value for bonus/base/fixed effect types."
+				},
+				"scaling": { "$ref": "#/$defs/scaling" },
+				"roll": { "$ref": "#/$defs/dice_roll" },
+				"abilities": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/ability-select" },
+					"description": "Ability score(s) this sub-effect applies to, when sub_types includes 'ability' or 'save'."
+				},
+				"skills": {
+					"type": "array",
+					"items": { "type": "string" },
+					"description": "Skill(s) this sub-effect applies to, when sub_types includes 'skill'."
+				},
+				"damage_types": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/damage-type-select" },
+					"description": "Damage type(s) this sub-effect applies to, used by defense (v/r/i) and damage_modifier sub-effects."
+				},
+				"conditions": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/condition_ref" },
+					"description": "Condition(s) this sub-effect grants immunity to, used by defense/i."
+				},
+				"reroll_condition": {
+					"type": "string",
+					"description": "Description of when the reroll applies, e.g. 'result is 1 or 2'."
+				},
+				"keep": {
+					"type": "string",
+					"enum": ["new", "higher", "lower"],
+					"description": "Which result to keep after a reroll."
+				},
+				"stacking": {
+					"type": "string",
+					"enum": ["highest", "replace", "add"],
+					"description": "How a fixed temp_hp value interacts with existing temp HP."
+				},
+				"trigger": { "$ref": "#/$defs/trigger" },
+				"condition": { "$ref": "#/$defs/condition_check" },
+				"description": {
+					"type": "string",
+					"description": "Freeform text, required for special/descriptive sub-effects."
+				}
+			}
+		},
+
+		"sub_type": {
+			"type": "string",
+			"enum": [
+				"ac", "max_hp", "temp_hp",
+				"attack", "damage", "ability", "skill", "save",
+				"concentration_save", "d20_test", "death_save",
+				"speed", "fly_speed", "climb_speed", "swim_speed", "burrow_speed", "reach",
+				"v", "r", "i",
+				"max_damage", "max_healing", "descriptive",
+				"roll", "fixed_value",
+				"crit", "incoming_crit_range",
+				"action", "reaction", "bonus_action", "movement", "speech",
+				"difficult_terrain", "size",
+				"extra_attack", "extra_action", "extra_bonus_action", "extra_reaction",
+				"halve_damage", "negate_damage", "redirect_damage",
+				"death", "unconscious", "stable", "destroyed"
+			]
+		}
+	}
+}

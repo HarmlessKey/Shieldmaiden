@@ -29,10 +29,13 @@ const functions = firebase.functions();
 if (process.env.VUE_APP_USE_FIREBASE_EMULATOR === "true") {
 	// useEmulator throws if an instance already performed an operation (can happen
 	// on SSR dev-server rebuilds where firebase.apps survives module re-evaluation).
+	// Hosts are pinned to 127.0.0.1 (not "localhost"): on dual-stack machines
+	// "localhost" can resolve to IPv6 ::1, but the emulators bind IPv4 only, so
+	// a browser request to localhost:9099 would fail with auth/network-request-failed.
 	try {
-		auth.useEmulator("http://localhost:9099", { disableWarnings: true });
-		db.useEmulator("localhost", 9000);
-		storage.useEmulator("localhost", 9199);
+		auth.useEmulator("http://127.0.0.1:9099", { disableWarnings: true });
+		db.useEmulator("127.0.0.1", 9000);
+		storage.useEmulator("127.0.0.1", 9199);
 	} catch (e) {
 		// already wired from a previous evaluation — safe to ignore
 	}

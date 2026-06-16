@@ -7,6 +7,7 @@ node_modules
 .env.local
 .env.*.local
 !.env.vault
+!.env.emulator
 
 # Log files
 npm-debug.log*
@@ -68,3 +69,8 @@ yarn-error.log*
 *.sln
 
 firebaseServiceAccountKey.json
+
+# Firebase emulator runtime artifacts
+*-debug.log
+.firebase/
+firebase-export-*/

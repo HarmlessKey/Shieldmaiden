@@ -116,74 +116,91 @@ const user_actions = {
 		commit("SET_USER", user);
 	},
 	async setUserInfo({ commit, dispatch, rootGetters }) {
-		if (rootGetters.user) {
-			const user = users_ref.child(rootGetters.user.uid);
-			user.on("value", async (user_snapshot) => {
-				const user_info = user_snapshot.val();
+		if (!rootGetters.user) return;
 
-				if (user_info) {
-					const server_time = await serverUtils.getServerTime();
-					const legacy_date = new Date(2024, 4, 15).getTime();
-					const tiersSnap = await tiers_ref.once("value");
-					const tiers = tiersSnap.val();
+		const user = users_ref.child(rootGetters.user.uid);
 
-					// User always basic reward tier
-					let tier_id = !user_info.created || user_info.created < legacy_date ? `legacy` : `basic`;
-
-					// If user has voucher use this
-					if (user_info.voucher) {
-						let voucher = user_info.voucher;
-
-						if (user_info.voucher.date === undefined) {
-							tier_id = user_info.voucher.id;
-						} else {
-							const end_date = new Date(user_info.voucher.date).toISOString();
-
-							if (server_time.toISOString() > end_date) {
-								dispatch("remove_voucher", rootGetters.user.uid);
-								voucher = undefined;
-							} else {
-								tier_id = user_info.voucher.id;
-							}
-						}
-						commit("SET_VOUCHER", voucher);
-					}
-					const tier = tiers[tier_id];
-
-					// For vouchers we don't hand out AI credits
-					tier.benefits.ai_credits = 0;
-
-					//Fetch patron info with email
-					const email = user_info.patreon_email
-						? user_info.patreon_email.toLowerCase()
-						: user_info.email.toLowerCase();
-
-					// Search email in patrons
-					const patronsRef = db.ref("new_patrons").orderByChild("email").equalTo(email);
-					const patronSnap = await patronsRef.once("value");
-					const patron = patronSnap.val();
-
-					const patreon_tier = await SubscriptionServices.getActivePatreonTier(
-						tiers,
-						user_info,
-						patron,
-						tier.order,
-						server_time
-					);
-
-					// If not patron use voucher/basic tier
-					commit("SET_TIER", patreon_tier || tier);
-					commit("SET_USERINFO", user_info);
-				}
-			});
+		// Initial, awaited load. We commit userInfo *first* — before the (slower)
+		// tier/voucher/patron enrichment — so the redirect-critical `username` field is
+		// available as soon as this promise resolves. Callers (App.vue boot sequence,
+		// route guards) can now rely on `userInfo` being populated once this resolves,
+		// instead of racing a fixed timer.
+		const snapshot = await user.once("value");
+		const user_info = snapshot.val();
+		if (user_info) {
+			commit("SET_USERINFO", user_info);
+			await dispatch("enrichTier", user_info);
 		}
 
-		// Return a promise, so you can wait for it in the initialize function from store/general.js
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve();
-			}, 1000);
+		// Keep listening for live updates to the user record (e.g. external changes,
+		// voucher/patron updates). This must NOT be what the boot sequence awaits.
+		user.on("value", (live_snapshot) => {
+			const live_info = live_snapshot.val();
+			if (live_info) {
+				commit("SET_USERINFO", live_info);
+				dispatch("enrichTier", live_info).catch((error) => console.error(error));
+			}
 		});
+	},
+
+	// Resolve the user's reward tier (basic/legacy/voucher/patron) and commit it.
+	// Wrapped so a slow or failing patron lookup can never block or unset userInfo.
+	async enrichTier({ commit, dispatch, rootGetters }, user_info) {
+		try {
+			const server_time = await serverUtils.getServerTime();
+			const legacy_date = new Date(2024, 4, 15).getTime();
+			const tiersSnap = await tiers_ref.once("value");
+			const tiers = tiersSnap.val();
+
+			// User always basic reward tier
+			let tier_id = !user_info.created || user_info.created < legacy_date ? `legacy` : `basic`;
+
+			// If user has voucher use this
+			if (user_info.voucher) {
+				let voucher = user_info.voucher;
+
+				if (user_info.voucher.date === undefined) {
+					tier_id = user_info.voucher.id;
+				} else {
+					const end_date = new Date(user_info.voucher.date).toISOString();
+
+					if (server_time.toISOString() > end_date) {
+						dispatch("remove_voucher", rootGetters.user.uid);
+						voucher = undefined;
+					} else {
+						tier_id = user_info.voucher.id;
+					}
+				}
+				commit("SET_VOUCHER", voucher);
+			}
+			const tier = tiers[tier_id];
+
+			// For vouchers we don't hand out AI credits
+			tier.benefits.ai_credits = 0;
+
+			//Fetch patron info with email
+			const email = user_info.patreon_email
+				? user_info.patreon_email.toLowerCase()
+				: user_info.email.toLowerCase();
+
+			// Search email in patrons
+			const patronsRef = db.ref("new_patrons").orderByChild("email").equalTo(email);
+			const patronSnap = await patronsRef.once("value");
+			const patron = patronSnap.val();
+
+			const patreon_tier = await SubscriptionServices.getActivePatreonTier(
+				tiers,
+				user_info,
+				patron,
+				tier.order,
+				server_time
+			);
+
+			// If not patron use voucher/basic tier
+			commit("SET_TIER", patreon_tier || tier);
+		} catch (error) {
+			console.error("Failed to resolve user tier:", error);
+		}
 	},
 	async set_user_settings({ commit, dispatch, rootGetters }) {
 		const uid = rootGetters.user.uid;

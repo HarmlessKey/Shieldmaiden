@@ -11,9 +11,8 @@
  * development server, but such updates are costly since the dev-server needs a reboot.
  */
 const path = require("path");
-require("dotenv").config({
-	path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}.local`),
-});
+const resolveEnvFile = require("../env");
+require("dotenv").config({ path: resolveEnvFile(path.resolve(__dirname, "..")) });
 
 const express = require("express");
 const api = require("./api");

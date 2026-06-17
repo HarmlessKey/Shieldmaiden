@@ -4,7 +4,7 @@
  * before this module (and src/firebase) is loaded, every ref here points at the
  * local Realtime Database emulator.
  */
-import { db, auth } from "src/firebase";
+import { db, auth, storage } from "src/firebase";
 
 /** Wipe the entire emulator database. Permissive emulator rules allow a root write. */
 export async function clearDatabase() {
@@ -47,4 +47,4 @@ export async function waitFor(assertion, { timeout = 5000, interval = 25 } = {})
 	throw lastError;
 }
 
-export { db, auth };
+export { db, auth, storage };

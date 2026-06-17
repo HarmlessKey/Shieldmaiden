@@ -15,7 +15,7 @@ Vue.use(Vuex);
  * @param {String}  [options.namespace]   Namespace to register the module under (default "mod").
  * @param {Object}  [options.rootGetters] Map of root getter name -> value.
  * @param {Object}  [options.rootState]   Root state.
- * @param {Object}  [options.rootActions] Map of root action name -> jest.fn/impl.
+ * @param {Object}  [options.rootActions] Map of root action name -> vi.fn/impl.
  * @param {Object}  [options.modules]     Extra sibling modules to register.
  * @returns {{ store: import('vuex').Store, namespace: string }}
  */

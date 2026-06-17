@@ -1,7 +1,7 @@
 # Test suite
 
 Unit + integration tests for the **store** (`src/store`) and **service**
-(`src/services`) layers, run with [Jest](https://jestjs.io/) against the
+(`src/services`) layers, run with [Vitest](https://vitest.dev/) against the
 **Firebase Local Emulator Suite** (Auth + Realtime Database + Storage).
 
 No real Firebase credentials are involved — everything points at the local
@@ -11,11 +11,12 @@ emulator (`demo-shieldmaiden` project, permissive rules in `emulator/`).
 
 ```bash
 npm test          # starts the emulators, runs the whole suite, tears them down
-npm run test:run  # runs Jest only (assumes emulators are already up)
-npm run emulators # start the emulators manually (for watch mode / the IDE)
+npm run test:run  # runs Vitest only (assumes emulators are already up)
+npm run test:watch# emulators + Vitest in watch mode
+npm run emulators # start the emulators manually (for the IDE)
 ```
 
-`npm test` wraps Jest in `firebase emulators:exec`, so a single command spins
+`npm test` wraps Vitest in `firebase emulators:exec`, so a single command spins
 up the emulators, runs the suite, and shuts them down. Java is required (the
 emulators run on the JVM).
 
@@ -27,13 +28,13 @@ The suite also runs automatically on **`git commit`** via the Husky
 ```
 test/
   setup/
-    env.js        # loads .env.emulator + sets the emulator flag before src/firebase loads
-    jestSetup.js  # wipes the DB before each test, goes offline after each file
+    env.js            # loads .env.emulator + sets the emulator flag before src/firebase loads
+    emulatorSetup.js  # wipes the DB before each test, goes offline after each file
   helpers/
-    db.js         # seed / read / push / clearDatabase / waitFor against the emulator
-    store.js      # makeStore() — builds a real Vuex store around a module under test
-  services/       # one *.test.js per src/services file
-  store/          # one *.test.js per src/store module
+    db.js             # seed / read / push / clearDatabase / waitFor against the emulator
+    store.js          # makeStore() — builds a real Vuex store around a module under test
+  services/           # one *.test.js per src/services file
+  store/              # one *.test.js per src/store module
 ```
 
 ## How it works
@@ -51,11 +52,25 @@ emulator. Tests then:
   mutations, getters and action orchestration. Actions that hit a service run
   against the emulator end-to-end.
 
-Tests run serially (`maxWorkers: 1`) because they share one emulator DB and
-reset it between tests.
+Tests run serially (`fileParallelism: false`) because they share one emulator DB
+and reset it between tests.
 
-### Pure-logic / HTTP services
+### Mocking notes (Vitest + CommonJS)
 
-A few services don't touch Firebase: `subscription.js` is pure logic (tested
-directly), and `monster_generator.js`, `patreon.js`, `shieldmaiden_ai.js` and
-`services/api/*` call the HTTP API (tested with `axios` mocked).
+`vi.mock` only intercepts **ESM `import`**, not CommonJS `require()`. Several
+services `require()` their HTTP client, so the tests use targeted techniques:
+
+- **`subscription.js`** — pure logic, tested directly (no emulator, no mocks).
+- **`services/api/*`** — `import axios`, so `vi.mock("axios")` works.
+- **`patreon.js`** — `require("axios")`; the test `require`s axios too (same
+  singleton) and `vi.spyOn`s `create`.
+- **`monster_generator.js`** (CJS) / **`shieldmaiden_ai.js`** (ESM) — both
+  `require("node-fetch")` and call the bare function. The tests inject a callable
+  mock into the Node `require` cache before loading the service.
+
+### Fire-and-forget writes
+
+Some service methods don't `await`/return their full promise chain (e.g. a
+secondary `search_*` write, or a Storage image delete). Tests assert those with
+the `waitFor(...)` poll helper, and stub the Storage `Reference.delete` where an
+un-awaited delete would otherwise leave an unhandled rejection.

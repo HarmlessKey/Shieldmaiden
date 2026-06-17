@@ -1,11 +1,11 @@
 /*
- * setupFiles entry — runs before any test module (and therefore before
+ * First setupFile — runs before any test module (and therefore before
  * `src/firebase` is imported and wires up `useEmulator`).
  *
  * Loads the emulator env file so the Firebase client SDK initialises with the
  * demo project config and the VUE_APP_USE_FIREBASE_EMULATOR flag is set.
- * dotenv does not override variables already present in process.env, so Jest's
- * NODE_ENV=test is preserved (the .env.emulator NODE_ENV=development is ignored).
+ * dotenv does not override variables already present in process.env, so the
+ * test NODE_ENV is preserved (the .env.emulator NODE_ENV=development is ignored).
  */
 const path = require("path");
 

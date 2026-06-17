@@ -1,0 +1,22 @@
+{
+	// --- Jest (Orta.vscode-jest) ---------------------------------------------
+	// The test suite runs against the Firebase Local Emulator Suite. For inline
+	// test running / debugging inside VS Code, start the emulators once in a
+	// terminal with `npm run emulators` (or run the "Start Firebase Emulators"
+	// task), then the extension below drives plain Jest against them.
+	"jest.jestCommandLine": "npx jest",
+	"jest.runMode": "on-demand",
+	"jest.rootPath": ".",
+
+	// --- Formatting / linting ------------------------------------------------
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"eslint.validate": ["javascript", "vue"],
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"files.associations": {
+		".env.emulator": "dotenv"
+	}
+}

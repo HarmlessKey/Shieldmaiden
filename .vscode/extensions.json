@@ -1,0 +1,9 @@
+{
+	"recommendations": [
+		"Orta.vscode-jest",
+		"firsttris.vscode-jest-runner",
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode",
+		"toba.vsfire"
+	]
+}

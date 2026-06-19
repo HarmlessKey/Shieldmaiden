@@ -161,6 +161,7 @@ export default {
 		},
 		async fetchConditions() {
 			await this.fetch_conditions({
+				edition: this.$route.params.edition,
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,

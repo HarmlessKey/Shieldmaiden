@@ -56,12 +56,16 @@
 		},
 		// Fetch the condition Server side, on the Client side retrieve it from the store
 		async preFetch({ store, currentRoute }) {
-			await store.dispatch("api_conditions/fetch_condition", currentRoute.params.id, { root: true });
+			await store.dispatch(
+				"api_conditions/fetch_condition",
+				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+				{ root: true }
+			);
 		},
 		computed: {
 			...mapGetters("api_conditions", ["get_condition"]),
 			condition() {
-				return this.get_condition(this.id);
+				return this.get_condition(this.id, this.$route.params.edition);
 			},
 			listPath() {
 				return this.$route.params.edition ? `/compendium/conditions/${this.$route.params.edition}` : "/compendium/conditions";

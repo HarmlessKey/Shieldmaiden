@@ -15,6 +15,7 @@
 					Leave
 				</router-link>
 				<div class="dm-screen__header-title flex-grow truncate">
+					<span class="neutral-2">{{ campaign.edition === "5.5e" ? "5.5e" : "5e" }}</span>
 					{{ campaign.name }}
 				</div>
 				<div class="d-flex justify-content-end items-center gap-1">

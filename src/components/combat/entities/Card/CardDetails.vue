@@ -201,7 +201,7 @@ export default {
 					icon: "fas fa-running",
 					label: "Walk Speed",
 				},
-				initiative_bonus: {
+				initiative_modifier: {
 					icon: "fas fa-chevron-double-up",
 					label: "Initiative",
 				},

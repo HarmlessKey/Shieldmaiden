@@ -46,7 +46,7 @@
 						<template v-slot:append>
 							<hk-roll
 								:ref="i"
-								:tooltip="`1d20 + ${initiativeBonus(entity)}`"
+								:tooltip="`1d20 + ${initiativeModifier(entity)}`"
 								@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
 							>
 								<button
@@ -116,10 +116,10 @@ export default {
 	methods: {
 		...mapActions(["setDrawer", "set_initiative"]),
 		...mapActions("tutorial", ["completeStep"]),
-		initiativeBonus(entity) {
-			// NPCs can have a flat initiative bonus override (5.5e stat blocks)
-			return entity.initiative_bonus !== undefined
-				? entity.initiative_bonus
+		initiativeModifier(entity) {
+			// NPCs can have a flat initiative modifier override (5.5e stat blocks)
+			return entity.initiative_modifier !== undefined
+				? entity.initiative_modifier
 				: this.calcMod(entity.dexterity);
 		},
 		rollMonster(e, key, entity, advantage_disadvantage) {
@@ -128,7 +128,7 @@ export default {
 				e,
 				20,
 				1,
-				this.initiativeBonus(entity),
+				this.initiativeModifier(entity),
 				"Initiative",
 				entity.name,
 				false,

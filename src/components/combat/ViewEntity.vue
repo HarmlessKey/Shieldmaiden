@@ -38,13 +38,11 @@
 						<br /><strong>Speed</strong>:
 						<span> {{ entity.speed }}</span>
 					</template>
-					<template v-if="entity.initiative_bonus">
+					<template v-if="entity.initiative_modifier !== undefined || entity.initiative_bonus">
 						<br /><strong>Initiative</strong>:
 						<span>
 							{{
-								entity.initiative_bonus > 0
-									? `+${entity.initiative_bonus}`
-									: entity.initiative_bonus
+								initiative > 0 ? `+${initiative}` : initiative
 							}}</span
 						>
 					</template>
@@ -415,8 +413,13 @@ export default {
 			}
 			return entity;
 		},
-		spellCasting() {
-			let casting = [];
+		initiative() {
+				return this.entity.initiative_modifier !== undefined
+					? this.entity.initiative_modifier
+					: this.entity.initiative_bonus;
+			},
+			spellCasting() {
+				let casting = [];
 			if (this.entity.innate_ability)
 				casting.push({
 					name: "innate",

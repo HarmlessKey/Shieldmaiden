@@ -51,13 +51,22 @@ export function makeStore({
 	return { store, namespace };
 }
 
-/** Convenience wrappers scoped to a namespace. */
-export function scoped(store, namespace) {
+/**
+ * Convenience wrappers scoped to a namespace.
+ *
+ * Some store modules are registered WITHOUT `namespaced: true` (e.g. `tips`,
+ * `general`, `user`, `runEncounter`). Their getters/actions/mutations live in
+ * the GLOBAL namespace (and their getters receive the global getters as their
+ * 2nd argument). Pass `{ global: true }` to address them without a prefix while
+ * still reading their state from `store.state[namespace]`.
+ */
+export function scoped(store, namespace, { global = false } = {}) {
+	const prefix = global ? "" : `${namespace}/`;
 	return {
 		dispatch: (type, payload, options) =>
-			store.dispatch(`${namespace}/${type}`, payload, options),
-		commit: (type, payload, options) => store.commit(`${namespace}/${type}`, payload, options),
-		getter: (name) => store.getters[`${namespace}/${name}`],
+			store.dispatch(`${prefix}${type}`, payload, options),
+		commit: (type, payload, options) => store.commit(`${prefix}${type}`, payload, options),
+		getter: (name) => store.getters[`${prefix}${name}`],
 		state: () => store.state[namespace],
 	};
 }

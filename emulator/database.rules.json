@@ -3,6 +3,7 @@
 		".read": true,
 		".write": true,
 		"search_spells": { "$uid": { "results": { ".indexOn": ["name"] } } },
+		"search_campaigns": { "$uid": { "results": { ".indexOn": ["private"] } } },
 		"search_encounters": { "$uid": { "results": { "$campaignId": { ".indexOn": ["finished"] } } } },
 		"campaign_notes": { "$uid": { "$campaignId": { ".indexOn": ["created"] } } }
 	}

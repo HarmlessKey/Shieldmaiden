@@ -130,116 +130,6 @@
           </div>
         </div>
 
-        <!-- SPEED -->
-        <div class="row q-col-gutter-sm mb-2">
-          <div class="col">
-            <ValidationProvider
-              rules="between:0,999"
-              name="Walk speed"
-              v-slot="{ errors, invalid, validated }"
-            >
-              <q-input
-                :dark="$store.getters.theme === 'dark'"
-                filled
-                square
-                label="Walk speed"
-                autocomplete="off"
-                type="number"
-                v-model.number="npc.walk_speed"
-                @input="parseToInt($event, npc, 'walk_speed')"
-                suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
-              />
-            </ValidationProvider>
-          </div>
-          <div class="col">
-            <ValidationProvider
-              rules="between:0,999"
-              name="Swim speed"
-              v-slot="{ errors, invalid, validated }"
-            >
-              <q-input
-                :dark="$store.getters.theme === 'dark'"
-                filled
-                square
-                label="Swim speed"
-                autocomplete="off"
-                type="number"
-                v-model.number="npc.swim_speed"
-                @input="parseToInt($event, npc, 'swim_speed')"
-                suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
-              />
-            </ValidationProvider>
-          </div>
-          <div class="col">
-            <ValidationProvider
-              rules="between:0,999"
-              name="Fly speed"
-              v-slot="{ errors, invalid, validated }"
-            >
-              <q-input
-                :dark="$store.getters.theme === 'dark'"
-                filled
-                square
-                label="Fly speed"
-                autocomplete="off"
-                type="number"
-                v-model.number="npc.fly_speed"
-                @input="parseToInt($event, npc, 'fly_speed')"
-                suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
-              />
-            </ValidationProvider>
-          </div>
-          <div class="col">
-            <ValidationProvider
-              rules="between:0,999"
-              name="Burrow speed"
-              v-slot="{ errors, invalid, validated }"
-            >
-              <q-input
-                :dark="$store.getters.theme === 'dark'"
-                filled
-                square
-                label="Burrow speed"
-                autocomplete="off"
-                type="number"
-                v-model.number="npc.burrow_speed"
-                @input="parseToInt($event, npc, 'burrow_speed')"
-                suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
-              />
-            </ValidationProvider>
-          </div>
-          <div class="col">
-            <ValidationProvider
-              rules="between:0,999"
-              name="Climb speed"
-              v-slot="{ errors, invalid, validated }"
-            >
-              <q-input
-                :dark="$store.getters.theme === 'dark'"
-                filled
-                square
-                label="Climb speed"
-                autocomplete="off"
-                type="number"
-                v-model.number="npc.climb_speed"
-                @input="parseToInt($event, npc, 'climb_speed')"
-                suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
-              >
-              </q-input>
-            </ValidationProvider>
-          </div>
-        </div>
-
         <!-- CR -->
         <div class="row q-col-gutter-md mb-2">
           <div class="col-12">
@@ -408,10 +298,10 @@
     </hk-card>
 
     <!-- HP & AC -->
-    <hk-card header="Health & Armor Class">
+    <hk-card header="AC, Initiative, HP and Speed">
       <div class="card-body">
         <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-6">
             <ValidationProvider
               rules="required|between:1,99"
               name="AC"
@@ -437,7 +327,33 @@
               </q-input>
             </ValidationProvider>
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-6">
+            <ValidationProvider rules="between:-10,30" name="Initiative" v-slot="{ errors, invalid, validated }">
+							<q-input
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Initiative bonus"
+								autocomplete="off"
+								type="number"
+								v-model.number="npc.initiative"
+								@input="parseToInt($event, npc, 'initiative')"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							>
+								<template #append>
+									<hk-popover header="Initiative bonus">
+										<q-icon name="info" size="xs" class="blue" />
+										<template #content>
+											Overrides the initiative bonus, shown on 5.5e (2024) stat blocks.<br/>
+											When left empty the dexterity modifier is used.
+										</template>
+									</hk-popover>
+								</template>
+							</q-input>
+						</ValidationProvider>
+          </div>
+        </div>
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-md-6">
             <ValidationProvider
               rules="required|between:1,9999"
               name="HP"
@@ -463,7 +379,7 @@
               </q-input>
             </ValidationProvider>
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-6">
             <ValidationProvider
               rules="hit_dice|max:10"
               name="Hit dice"
@@ -492,6 +408,116 @@
                     </template>
                   </hk-popover>
                 </template>
+              </q-input>
+            </ValidationProvider>
+          </div>
+        </div>
+
+        <!-- SPEED -->
+        <div class="row q-col-gutter-sm mb-2">
+          <div class="col">
+            <ValidationProvider
+              rules="between:0,999"
+              name="Walk speed"
+              v-slot="{ errors, invalid, validated }"
+            >
+              <q-input
+                :dark="$store.getters.theme === 'dark'"
+                filled
+                square
+                label="Walk speed"
+                autocomplete="off"
+                type="number"
+                v-model.number="npc.walk_speed"
+                @input="parseToInt($event, npc, 'walk_speed')"
+                suffix="ft."
+                :error="invalid && validated"
+                :error-message="errors[0]"
+              />
+            </ValidationProvider>
+          </div>
+          <div class="col">
+            <ValidationProvider
+              rules="between:0,999"
+              name="Swim speed"
+              v-slot="{ errors, invalid, validated }"
+            >
+              <q-input
+                :dark="$store.getters.theme === 'dark'"
+                filled
+                square
+                label="Swim speed"
+                autocomplete="off"
+                type="number"
+                v-model.number="npc.swim_speed"
+                @input="parseToInt($event, npc, 'swim_speed')"
+                suffix="ft."
+                :error="invalid && validated"
+                :error-message="errors[0]"
+              />
+            </ValidationProvider>
+          </div>
+          <div class="col">
+            <ValidationProvider
+              rules="between:0,999"
+              name="Fly speed"
+              v-slot="{ errors, invalid, validated }"
+            >
+              <q-input
+                :dark="$store.getters.theme === 'dark'"
+                filled
+                square
+                label="Fly speed"
+                autocomplete="off"
+                type="number"
+                v-model.number="npc.fly_speed"
+                @input="parseToInt($event, npc, 'fly_speed')"
+                suffix="ft."
+                :error="invalid && validated"
+                :error-message="errors[0]"
+              />
+            </ValidationProvider>
+          </div>
+          <div class="col">
+            <ValidationProvider
+              rules="between:0,999"
+              name="Burrow speed"
+              v-slot="{ errors, invalid, validated }"
+            >
+              <q-input
+                :dark="$store.getters.theme === 'dark'"
+                filled
+                square
+                label="Burrow speed"
+                autocomplete="off"
+                type="number"
+                v-model.number="npc.burrow_speed"
+                @input="parseToInt($event, npc, 'burrow_speed')"
+                suffix="ft."
+                :error="invalid && validated"
+                :error-message="errors[0]"
+              />
+            </ValidationProvider>
+          </div>
+          <div class="col">
+            <ValidationProvider
+              rules="between:0,999"
+              name="Climb speed"
+              v-slot="{ errors, invalid, validated }"
+            >
+              <q-input
+                :dark="$store.getters.theme === 'dark'"
+                filled
+                square
+                label="Climb speed"
+                autocomplete="off"
+                type="number"
+                v-model.number="npc.climb_speed"
+                @input="parseToInt($event, npc, 'climb_speed')"
+                suffix="ft."
+                :error="invalid && validated"
+                :error-message="errors[0]"
+              >
               </q-input>
             </ValidationProvider>
           </div>

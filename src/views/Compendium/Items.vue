@@ -200,6 +200,7 @@ export default {
 		},
 		async fetchItems() {
 			await this.fetch_api_items({
+				edition: this.$route.params.edition,
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,

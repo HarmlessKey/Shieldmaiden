@@ -55,12 +55,16 @@ export default {
 	},
 	// Fetch the monster Server side, on the Client side retrieve it from the store
 	async preFetch({ store, currentRoute }) {
-		await store.dispatch("api_monsters/fetch_monster", currentRoute.params.id, { root: true });
+		await store.dispatch(
+			"api_monsters/fetch_monster",
+			{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+			{ root: true }
+		);
 	},
 	computed: {
 		...mapGetters("api_monsters", ["get_monster"]),
 		monster() {
-			return this.get_monster(this.id);
+			return this.get_monster(this.id, this.$route.params.edition);
 		},
 		listPath() {
 			return this.$route.params.edition

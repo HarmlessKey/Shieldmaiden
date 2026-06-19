@@ -231,6 +231,7 @@ export default {
 		},
 		async fetchSpells() {
 			await this.fetch_api_spells({
+				edition: this.$route.params.edition,
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,

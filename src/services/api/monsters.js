@@ -11,6 +11,7 @@ export class monsterServices {
 	}
 
 	async getMonsters(
+		edition,
 		query,
 		pageNumber = 1,
 		pageSize = 15,
@@ -68,7 +69,9 @@ export class monsterServices {
 			params += `&${queryParams.join("&")}`;
 		}
 
-		return this.HK.get(MONSTERS_REF + params)
+		const ref = edition === "5.5e" ? `${MONSTERS_REF}/5.5e` : MONSTERS_REF;
+
+		return this.HK.get(ref + params)
 			.then((response) => {
 				return response.data;
 			})
@@ -77,8 +80,10 @@ export class monsterServices {
 			});
 	}
 
-	async getMonster(id) {
-		return this.HK.get(`${MONSTERS_REF}/${id}`)
+	async getMonster(id, edition) {
+		const ref = edition === "5.5e" ? `${MONSTERS_REF}/5.5e/${id}` : `${MONSTERS_REF}/${id}`;
+
+		return this.HK.get(ref)
 			.then((response) => {
 				return response.data;
 			})

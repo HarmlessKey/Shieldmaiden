@@ -59,12 +59,16 @@
 		},
 		// Fetch the spell Server side, on the Client side retrieve it from the store
 		async preFetch({ store, currentRoute }) {
-			await store.dispatch("api_spells/fetch_api_spell", currentRoute.params.id, { root: true });
+			await store.dispatch(
+				"api_spells/fetch_api_spell",
+				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+				{ root: true }
+			);
 		},
 		computed: {
 			...mapGetters("api_spells", ["get_api_spell"]),
 			spell() {
-				return this.get_api_spell(this.id);
+				return this.get_api_spell(this.id, this.$route.params.edition);
 			},
 			listPath() {
 				return this.$route.params.edition ? `/compendium/spells/${this.$route.params.edition}` : "/compendium/spells";

@@ -341,6 +341,7 @@ export default {
 		},
 		async fetchMonsters() {
 			await this.fetch_monsters({
+				edition: this.$route.params.edition,
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,

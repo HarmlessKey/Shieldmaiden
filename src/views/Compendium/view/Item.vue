@@ -54,12 +54,16 @@
 			}
 		},
 		async preFetch({ store, currentRoute }) {
-			await store.dispatch('api_items/fetch_api_item', currentRoute.params.id, { root: true });
+			await store.dispatch(
+				'api_items/fetch_api_item',
+				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+				{ root: true }
+			);
 		},
 		computed: {
 			...mapGetters("api_items", ["get_api_item"]),
 			item() {
-				return this.get_api_item(this.id)
+				return this.get_api_item(this.id, this.$route.params.edition)
 			},
 			listPath() {
 				return this.$route.params.edition ? `/compendium/items/${this.$route.params.edition}` : "/compendium/items";

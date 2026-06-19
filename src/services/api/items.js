@@ -10,6 +10,7 @@ export class itemServices {
 	}
 
 	async getItems(
+		edition,
 		query,
 		pageNumber = 1,
 		pageSize = 15,
@@ -35,7 +36,9 @@ export class itemServices {
 			params += `&${queryParams.join("&")}`;
 		}
 
-		return this.HK.get(ITEMS_REF + params)
+		const ref = edition === "5.5e" ? `${ITEMS_REF}/5.5e` : ITEMS_REF;
+
+		return this.HK.get(ref + params)
 			.then((response) => {
 				return response.data;
 			})
@@ -44,8 +47,10 @@ export class itemServices {
 			});
 	}
 
-	async getItem(id) {
-		return this.HK.get(`${ITEMS_REF}/${id}`)
+	async getItem(id, edition) {
+		const ref = edition === "5.5e" ? `${ITEMS_REF}/5.5e/${id}` : `${ITEMS_REF}/${id}`;
+
+		return this.HK.get(ref)
 			.then((response) => {
 				return response.data;
 			})

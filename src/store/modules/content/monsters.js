@@ -11,8 +11,9 @@ const monster_getters = {
 	monster_services: (state) => {
 		return state.monster_services;
 	},
-	get_monster: (state) => (key) => {
-		const id = state.cached_urls[key] || key;
+	get_monster: (state) => (key, edition) => {
+		const cache_key = `${edition || "5e"}:${key}`;
+		const id = state.cached_urls[cache_key] || key;
 		return state.cached_monsters[id];
 	},
 };
@@ -25,40 +26,44 @@ const monster_actions = {
 		return getters.monster_services;
 	},
 
-	async fetch_monsters({ dispatch }, { pageNumber, pageSize, query, fields, sortBy, descending }) {
+	async fetch_monsters(
+		{ dispatch },
+		{ edition, pageNumber, pageSize, query, fields, sortBy, descending }
+	) {
 		const services = await dispatch("get_monster_services");
 		try {
-			return await services.getMonsters(query, pageNumber, pageSize, fields, sortBy, descending);
+			return await services.getMonsters(
+				edition,
+				query,
+				pageNumber,
+				pageSize,
+				fields,
+				sortBy,
+				descending
+			);
 		} catch (error) {
 			console.error(error);
 		}
 	},
 
 	/**
-	 * Gets a single monster from the database using and id (or kebab name)
-	 * and saves the monster in de store
+	 * Gets a single monster from the database using an id (or kebab name) and saves
+	 * the monster in de store. Accepts either a plain id, or `{ id, edition }` when
+	 * the monster needs to be looked up for a specific edition (5e or 5.5e).
 	 *
-	 * @param {number | string} id | kebab name
+	 * @param {number | string | { id: (number|string), edition?: string }} payload
 	 * @returns {object} monster
 	 */
-	async fetch_monster({ commit, state, dispatch }, id) {
-		const cached = state.cached_monsters;
-		let monster = undefined;
-
-		// SRD Monsters
-		if (isNaN(id)) {
-			monster = Object.values(cached).filter((item) => {
-				return item.url === id;
-			})[0];
-		} else {
-			monster = cached[id];
-		}
+	async fetch_monster({ commit, state, dispatch }, payload) {
+		const { id, edition } = typeof payload === "object" ? payload : { id: payload };
+		const cache_key = `${edition || "5e"}:${id}`;
+		let monster = state.cached_monsters[state.cached_urls[cache_key]] || state.cached_monsters[id];
 
 		// Fetch the monster from the database if it wasn't cached yet
 		if (!monster) {
 			const services = await dispatch("get_monster_services");
 			try {
-				monster = await services.getMonster(id);
+				monster = await services.getMonster(id, edition);
 
 				if (monster.caster_spells) {
 					dispatch("cacheMonsterSpells", monster.caster_spells);
@@ -105,7 +110,7 @@ const monster_actions = {
 				monster.meta.description = monster.meta.description.substring(0, maxLength).trim() + "...";
 
 				commit("SET_CACHED_MONSTER", monster);
-				commit("SET_CACHED_URL", { url: monster.url, id: monster._id });
+				commit("SET_CACHED_URL", { url: monster.url, id: monster._id, edition });
 			} catch (error) {
 				throw error;
 			}
@@ -128,8 +133,8 @@ const monster_mutations = {
 	SET_CACHED_MONSTER(state, payload) {
 		Vue.set(state.cached_monsters, payload["_id"], payload);
 	},
-	SET_CACHED_URL(state, { url, id }) {
-		Vue.set(state.cached_urls, url, id);
+	SET_CACHED_URL(state, { url, id, edition }) {
+		Vue.set(state.cached_urls, `${edition || "5e"}:${url}`, id);
 	},
 };
 

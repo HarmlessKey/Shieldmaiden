@@ -259,7 +259,7 @@
 			</q-input>
 			<q-table
 				:data="monsters"
-				:columns="columns"
+				:columns="srdColumns"
 				row-key="_id"
 				card-class="bg-none"
 				flat
@@ -268,7 +268,7 @@
 				:loading="loading_monsters"
 				separator="none"
 				wrap-cells
-				:visible-columns="visibleColumns"
+				:visible-columns="srdVisibleColumns"
 				@request="request"
 			>
 				<div slot="loading">
@@ -368,7 +368,7 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" class="p-0" auto-width>
-							<ViewMonster :id="props.key" class="p-0" />
+							<ViewMonster :id="props.key" :edition="apiEdition" class="p-0" />
 						</q-td>
 					</q-tr>
 				</template>
@@ -379,6 +379,14 @@
 		<q-dialog v-model="filter_dialog">
 			<hk-card header="Filter monsters" :min-width="300">
 				<div class="card-body">
+					<q-btn-toggle
+						class="mb-3"
+						v-model="edition"
+						spread
+						no-caps
+						toggle-color="primary"
+						:options="editionOptions"
+					/>
 					<hk-filter v-model="filter" type="monster" />
 				</div>
 				<div slot="footer" class="card-footer">
@@ -524,6 +532,7 @@ import { mapActions, mapGetters } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
 import { uuid, campaignGroupKey } from "src/utils/generalFunctions";
+import { editions, default_edition } from "src/utils/generalConstants";
 import ViewMonster from "src/components/compendium/Monster.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
@@ -565,6 +574,8 @@ export default {
 			player: {},
 			drawer: this.$store.getters.getDrawer,
 			to_add: {},
+			edition: this.campaign.edition || default_edition,
+			editionOptions: editions.map((e) => ({ label: e.label.replace("D&D ", ""), value: e.value })),
 			campaignOnly: false,
 			npcFilter: {},
 			npc_filter_dialog: false,
@@ -666,11 +677,20 @@ export default {
 		addPlayers() {
 			this.demo ? (this.player_dialog = true) : this.addAllPlayers();
 		},
+		edition() {
+			if (this.monster_resource !== "custom") {
+				this.filterMonsters();
+			}
+		},
 	},
 	computed: {
 		...mapGetters(["content_count"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
 		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
+		// The API expects no edition for 5e content; only pass it for 5.5e
+		apiEdition() {
+			return this.edition === "5.5e" ? "5.5e" : undefined;
+		},
 		filteredCustomNpcs() {
 			let npcs = this.npcs;
 			if (this.campaignOnly && this.campaignId) {
@@ -743,6 +763,29 @@ export default {
 					return ["name", "actions"];
 			}
 		},
+		srdColumns() {
+			const cols = [...this.columns];
+			cols.splice(cols.length - 1, 0, {
+				name: "edition",
+				label: "Edition",
+				field: "edition",
+				align: "left",
+				format: (val) => val || "5e",
+			});
+			return cols;
+		},
+		srdVisibleColumns() {
+			switch (true) {
+				case this.width > 600:
+					return ["challenge_rating", "name", "type", "environment", "edition", "actions"];
+				case this.width > 450:
+					return ["challenge_rating", "name", "type", "edition", "actions"];
+				case this.width > 400:
+					return ["challenge_rating", "name", "actions"];
+				default:
+					return ["name", "actions"];
+			}
+		},
 		addable() {
 			let count = 0;
 			for (const playerId in this.campaign_players) {
@@ -801,10 +844,11 @@ export default {
 		},
 		async fetchMonsters() {
 			await this.fetch_monsters({
+				edition: this.apiEdition,
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,
-				fields: ["name", "type", "challenge_rating", "environment"],
+				fields: ["name", "type", "challenge_rating", "environment", "edition"],
 				sortBy: this.pagination.sortBy,
 				descending: this.pagination.descending,
 			}).then((result) => {
@@ -867,7 +911,7 @@ export default {
 
 				// SRD NPC
 				if (!custom) {
-					let npc_data = await this.fetch_monster(id);
+					let npc_data = await this.fetch_monster({ id, edition: this.apiEdition });
 					entity.npc = "srd";
 					if (rollHp && npc_data.hit_dice) {
 						let dice_values = npc_data.hit_dice.split("d");

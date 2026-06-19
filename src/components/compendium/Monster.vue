@@ -411,6 +411,10 @@ export default {
 		id: {
 			type: String,
 		},
+		// Edition to fetch the monster for when looked up by id ("5e" or "5.5e"); defaults to "5e"
+		edition: {
+			type: String,
+		},
 		allowDownload: {
 			type: Boolean,
 			default: false,
@@ -472,7 +476,7 @@ export default {
 			this.monster = monster;
 			this.loading = false;
 		} else {
-			await this.fetch_monster(this.id).then((result) => {
+			await this.fetch_monster({ id: this.id, edition: this.edition }).then((result) => {
 				if (this.monster_challenge_rating[result.challenge_rating]) {
 					result.proficiency = this.monster_challenge_rating[result.challenge_rating].proficiency;
 				}

@@ -48,7 +48,7 @@
 		"vue-qr": "^4.0.9",
 		"vue-shortkey": "^3.1.7",
 		"vue-snotify": "^3.2.1",
-		"vue2-flip-countdown": "^0.12.1",
+		"vue2-flip-countdown": "^1.0.0",
 		"vuedraggable": "^2.24.3",
 		"vuefire": "^1.4.5",
 		"vuejs-logger": "^1.10.2",

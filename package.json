@@ -18,7 +18,7 @@
 	"dependencies": {
 		"@egjs/vue-flicking": "4.12.0",
 		"@gtm-support/vue2-gtm": "^2.0.0",
-		"@octokit/rest": "^19.0.5",
+		"@octokit/rest": "^22.0.0",
 		"@quasar/extras": "^1.16.12",
 		"ajv": "^8.13.0",
 		"ajv-formats": "^2.1.1",
@@ -35,7 +35,7 @@
 		"jwt-decode": "^4.0.0",
 		"lodash": "^4.17.21",
 		"marked": "^4.0.16",
-		"morgan": "^1.10.0",
+		"morgan": "^1.10.1",
 		"node-fetch": "^2.7.0",
 		"quasar": "^1.0.0",
 		"sanitize-html": "^2.13.0",

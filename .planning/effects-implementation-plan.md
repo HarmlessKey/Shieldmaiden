@@ -29,22 +29,20 @@ Create `src/components/drawers/encounter/Effects.vue` - the UI from which a DM a
 an effect to one or more targeted entities, modelled on the existing Reminders drawer:
 
 - Lists available effects grouped by source:
-  - **SRD conditions** from `src/data/5e/effects.js` or `src/data/5.5e/effects.js`,
-    selected by the campaign's `edition` prop (`"2014"` / `"2024"`) - the same
-    `edition` getter already available in the combat tracker via `feature/5.5-support`.
-    Only the effects for the active edition are shown; switching edition on the campaign
-    automatically surfaces the correct rule text on the next encounter init (see 2e).
-  - **Predefined custom effects** from the user's Firebase Realtime Database
+  - **SRD non-condition effects** from `src/data/5e/effects.js` or
+    `src/data/5.5e/effects.js` (e.g. Concentration). Selected by campaign `edition`
+    (`"2014"` / `"2024"`) via the same `edition` getter from `feature/5.5-support`.
+  - **Custom effects** from the user's Firebase Realtime Database
     (`src/store/modules/userContent/effects.js` / `src/services/effects.js` already
     exist for this). Custom effects are edition-agnostic and always shown.
+- Conditions are explicitly out of scope here. They will use this same drawer component
+  in a later step, passed a prop (e.g. `conditions` or `mode="conditions"`) that
+  switches what is listed. The existing `Conditions.vue` drawer remains untouched until
+  that later step.
 - Each effect is expandable to show its `sub_effects` description.
 - On apply: user picks `duration_type` (cancelled / time / concentration / trigger /
   next_turn / etc.) and `duration_value` if relevant, then confirms. Duration fields
   are captured here, never on the definition.
-- For conditions already in the existing `Conditions.vue` drawer, this new drawer
-  replaces it - `entity.effects` replaces `entity.conditions`. Exhaustion: each level
-  is a separate entry in the SRD data; applying Exhaustion 2 replaces Exhaustion 1
-  (swap the instance).
 - Wires into the existing drawer system (`setDrawer` action,
   `src/components/drawers/encounter/` directory).
 
@@ -184,8 +182,9 @@ In the existing entity-init loop in `src/store/modules/encounters/runEncounter.j
 add a second pass over each entity's `effects` map:
 
 - For each active effect instance, look up its definition by `source` + `source_key`:
-  - `"srd"`: find the matching entry in `src/data/5e/effects.js` or
-    `src/data/5.5e/effects.js` depending on `campaign.edition` (`"2014"` / `"2024"`).
+  - `"srd"`: find the matching entry in `src/data/{edition}/effects.js` or
+    `src/data/{edition}/conditions.js` depending on `campaign.edition` and the
+    effect's category. Both files are searched by `key`.
     Each entry needs a stable `key` field matching the `source_key` (e.g. `"blinded"`,
     `"burning"`) - add this to both data files if not already present.
   - `"custom"`: fetch from the user's Firebase Realtime Database via the effects
@@ -295,22 +294,21 @@ effects whose time has run out:
   effect on any entity whose `applied.effect_id` matches it.
 - `duration_type: "cancelled"`: no automatic expiry - only removed manually.
 
-### 2i. Replace Conditions and Reminders UI (deferred cleanup)
-Once 2a-2h are stable, remove the legacy parallel systems:
+### 2i. Conditions via the Effects drawer (deferred)
+Conditions are not part of step 2. Once the Effects drawer (2a) is stable, extend it
+with a prop (e.g. `conditions` boolean or `mode="conditions"`) that switches the listed
+effects to SRD conditions from `src/data/5e|5.5e/conditions.js`. At that point:
 
-- Delete `src/components/combat/Conditions.vue`,
-  `src/components/drawers/encounter/Conditions.vue`, `src/mixins/conditions.js`, and
-  the `set_condition` Vuex action. The Effects drawer (2a) replaces the Conditions
-  drawer entirely.
-- Remove the conditions/reminders sections from
-  `src/components/combat/entities/effects/index.vue`, leaving only the effects list
-  (2f).
-- `src/mixins/reminders.js`, `entity.reminders`, `Reminders.vue`,
-  `TargetReminders.vue`: remove once all mechanical triggers from reminders are covered
-  by effects. User-authored custom reminders (`src/views/UserContent/Reminders/`) stay
-  as a separate freeform-note feature (not mechanical, out of scope here).
-- Existing Firestore encounter documents with `entity.conditions` / `entity.reminders`
-  data: decide on a read-migration shim or one-time conversion script.
+- The existing `src/components/drawers/encounter/Conditions.vue` drawer is removed and
+  replaced by `<Effects conditions />` opened from the same trigger point.
+- `src/components/combat/Conditions.vue`, `src/mixins/conditions.js`, `entity.conditions`,
+  and the `set_condition` Vuex action are removed. Conditions become effect instances
+  written to `entity.effects`.
+- `src/mixins/reminders.js`, `entity.reminders`, `Reminders.vue`, `TargetReminders.vue`:
+  removed once mechanical triggers are covered by the effects engine. User-authored
+  custom reminders (`src/views/UserContent/Reminders/`) stay as a freeform-note feature.
+- Existing Firestore data with `entity.conditions` / `entity.reminders`: decide on a
+  read-migration shim or one-time conversion script at that point.
 
 ## 3. Apply mechanical bonuses and resolve trigger actions
 With the trigger system (2g) in place, implement actual mechanical resolution per
@@ -349,10 +347,12 @@ components, and AC/HP display computeds.
 - Support array-of-effects editing (an "action" or "condition" has multiple effects).
 - Add validation matching the schema (required fields per type/subtype).
 
-## 5. SRD conditions data (done)
-`src/data/5e/effects.js` and `src/data/5.5e/effects.js` contain all SRD conditions
-(Blinded ... Unconscious, Exhaustion 1-6, plus 2024 Dying/Surprised) modeled against
-`hk-effects-schema.json`. Used directly by steps 2 and 3.
+## 5. SRD data files (done)
+- `src/data/5e/conditions.js` and `src/data/5.5e/conditions.js` contain all SRD
+  conditions (Blinded ... Unconscious, Exhaustion 1-6, plus 2024 Dying/Surprised).
+- `src/data/5e/effects.js` and `src/data/5.5e/effects.js` contain non-condition SRD
+  effects (Concentration to start; more added as needed).
+All files are modeled against `hk-effects-schema.json` and used by steps 2 and 3.
 
 - Extend the `action_list` sub-action shape in monster actions
   (`src/components/combat/actions/RollActions.vue`, monster docs in

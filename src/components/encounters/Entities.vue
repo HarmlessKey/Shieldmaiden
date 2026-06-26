@@ -660,6 +660,10 @@ export default {
 		await this.get_npcs();
 		this.get_npc_groups();
 		this.loading_npcs = false;
+
+		if (this.monster_resource !== "custom") {
+			this.filterMonsters();
+		}
 	},
 	watch: {
 		// Prop is changed in parent to trigger addAllPlayers function from Overview.vue

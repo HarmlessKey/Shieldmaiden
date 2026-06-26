@@ -125,6 +125,7 @@
 						</div>
 						<div class="d-flex gap-1">
 							<q-btn
+								v-if="started"
 								class="full-width mb-3 bg-neutral-5"
 								no-caps
 								label="Add next round"
@@ -135,7 +136,7 @@
 								color="primary"
 								no-caps
 								type="submit"
-								label="Add directly"
+								:label="started ? 'Add directly' : 'Add'"
 							/>
 						</div>
 					</q-form>
@@ -174,12 +175,19 @@
 
 					<div v-if="selectedPlayers.length > 0" class="d-flex gap-1">
 						<q-btn
+							v-if="started"
 							class="full-width bg-neutral-5"
 							no-caps
 							label="Add next round"
 							@click="addPlayer('next')"
 						/>
-						<q-btn class="full-width" color="primary" type="submit" no-caps label="Add directly" />
+						<q-btn
+							class="full-width"
+							color="primary"
+							type="submit"
+							no-caps
+							:label="started ? 'Add directly' : 'Add'"
+						/>
 					</div>
 				</q-form>
 				<p v-else>
@@ -252,7 +260,10 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(["entities", "broadcast"]),
+		...mapGetters(["entities", "broadcast", "encounter"]),
+		started() {
+			return !!(this.encounter && this.encounter.round > 0);
+		},
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
 		},

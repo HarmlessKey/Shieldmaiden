@@ -343,10 +343,14 @@ if (!admin.apps.length) {
 
 ### 6d. Wiring point 3 — env-file selection (flag flow through Quasar)
 
-The flag must reach three dotenv call sites. Proposal: select `.env.emulator`
-when `USE_FIREBASE_EMULATOR=true` is set in the shell, **or** as automatic
-fallback when `.env.${NODE_ENV}.local` doesn't exist (the sandbox/worktree
-case — zero setup):
+The flag must reach three dotenv call sites. The helper selects `.env.emulator`
+only in a **development** context, so it can never leak into a production
+build/deploy: (1) explicit `USE_FIREBASE_EMULATOR=true`, or (2) automatic
+fallback when `NODE_ENV=development` **and** `.env.development.local` doesn't
+exist (the sandbox/worktree case — zero setup). Under `NODE_ENV=production`
+(what `quasar build` sets) it always returns the normal
+`.env.production.local` path — identical to the original behaviour — even if
+that file is missing:
 
 ```js
 // shared helper, e.g. env.js in repo root (used by quasar.conf.js,
@@ -356,12 +360,24 @@ const path = require("path");
 
 module.exports = function resolveEnvFile(baseDir) {
 	const local = path.resolve(baseDir, `.env.${process.env.NODE_ENV}.local`);
-	if (process.env.USE_FIREBASE_EMULATOR === "true" || !fs.existsSync(local)) {
+
+	const explicitOptIn = process.env.USE_FIREBASE_EMULATOR === "true";
+	const devFallback = process.env.NODE_ENV === "development" && !fs.existsSync(local);
+
+	if (explicitOptIn || devFallback) {
 		return path.resolve(baseDir, ".env.emulator");
 	}
 	return local;
 };
 ```
+
+**Deployment safety.** The CI pipelines (`.github/workflows/build_*.yml`)
+write `.env.production.local` from a secret, then `docker build` copies it in
+and runs `quasar build` with `NODE_ENV=production`. The `NODE_ENV=development`
+guard above means a production build can never fall back to the emulator/demo
+config, even if that file were missing. As defense-in-depth, `.dockerignore`
+also excludes `.env.emulator`, `firebase.emulator.json`, `emulator/`, and
+`.planning/` from the image entirely.
 
 - `quasar.conf.js` → `env: require("dotenv").config({ path: resolveEnvFile(__dirname) }).parsed`
   → DefinePlugin injects `VUE_APP_USE_FIREBASE_EMULATOR` into client **and**

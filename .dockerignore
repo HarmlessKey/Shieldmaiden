@@ -22,3 +22,10 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 README.md
+
+# Local Firebase emulator / dev-only tooling — must never enter a deployed image
+.env.emulator
+firebase.emulator.json
+emulator/
+.planning/
+

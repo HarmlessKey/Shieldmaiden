@@ -47,6 +47,64 @@ app.use(ssr.resolveUrl("/"), serve(".", true));
 // we extend the custom common dev & prod parts here
 extension.extendApp({ app, ssr });
 
+// Static assets that no longer exist (hashed chunks from a previous build)
+// must not fall through to the SSR catch-all: that would answer a <script>
+// request with an HTML document ("Uncaught SyntaxError: Unexpected token '<'").
+// Answer with a 4xx so the browser reports a clean load error, and show a
+// friendly page to anyone who lands on such a URL directly.
+const MISSING_ASSET_RE =
+	/\.(js|mjs|css|map|json|woff2?|ttf|eot|otf|ico|png|jpe?g|gif|svg|webp|webmanifest)$/i;
+
+const missingAssetPage = `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex">
+	<title>Something went wrong | Shieldmaiden</title>
+	<style>
+		body {
+			margin: 0;
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: #191a1c;
+			color: #b2b2b2;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			text-align: center;
+		}
+		h1 { color: #fff; font-size: 1.5rem; margin-bottom: 0.5rem; }
+		button {
+			margin-top: 1.5rem;
+			padding: 0.6rem 2rem;
+			font-size: 1rem;
+			color: #fff;
+			background: #2c97de;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+		}
+		a { color: #2c97de; }
+	</style>
+</head>
+<body>
+	<main>
+		<h1>Whoops, something went wrong</h1>
+		<p>Please try reloading the page.</p>
+		<button onclick="location.reload()">Reload</button>
+		<p><a href="/">Back to Shieldmaiden</a></p>
+	</main>
+</body>
+</html>`;
+
+app.use((req, res, next) => {
+	if (req.path.startsWith("/api/") || !MISSING_ASSET_RE.test(req.path)) {
+		return next();
+	}
+	res.status(400).type("html").send(missingAssetPage);
+});
+
 // this should be last get(), rendering with SSR
 app.get(ssr.resolveUrl("*"), (req, res) => {
 	res.setHeader("Content-Type", "text/html");

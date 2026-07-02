@@ -58,52 +58,96 @@ Two aggravating findings:
 
 ## Decisions (from maintainer)
 
-- **No "new content available" banner.** When a new version is available, the page
-  should just reload itself. Offline availability is not a concern; users must not
-  keep running old versions.
+- **No "new content available" banner.** No UI around updates at all.
+- **Never reload a tab that is actively in use.** Check for a new version when the
+  tab regains focus and install it in the background, but the running session keeps
+  the old version. The new version applies on the user's **next page load** (which
+  performs one quick self-reload to switch over).
 - **Safety net**: if a chunk fails to load anyway, auto-reload instead of showing a
   broken page.
 - **Friendly error response** for missing static assets: not a 404 page, but a
   "Whoops, something went wrong — please try reloading" page, served with a 4xx
   status (400) so the browser never executes HTML as a script.
+- Offline availability is not a concern.
 
 ## Implementation plan
 
-### 1. Auto-reload on service-worker update — `src-pwa/register-service-worker.js`
+### 1. Background install + switch on next page load
 
-Keep `skipWaiting: true` and `clientsClaim: true` in `quasar.conf.js` (this is what
-makes a new version take over immediately). Replace the registration hooks:
+**`quasar.conf.js`**: remove `skipWaiting: true` from `pwa.workboxOptions`
+(keep `clientsClaim: true`). This is the core change: a newly downloaded SW now
+installs into the **waiting** state instead of activating under a live page.
+While it waits, the old SW stays in control and the old precache stays intact,
+so an active tab can never lose the chunks it is running on — the race is gone
+by construction.
+
+Two behaviors then need to be added in **`src-pwa/register-service-worker.js`**
+(full rewrite of the hooks):
 
 - **Delete** the `updated()` delete-all-caches handler.
-- **Delete** the `updatefound()` → `registration.update()` call (it just re-triggers
-  the update check that is already running).
-- **Add** a `controllerchange` listener that reloads the page when a *new* SW takes
-  control. Two guards are required:
-  - don't reload on the very first SW installation (`clientsClaim` fires
-    `controllerchange` on first visit too) — only reload if the page already had a
-    controller when it loaded;
-  - a `refreshing` flag so multiple `controllerchange` events cause only one reload.
+- **Delete** the `updatefound()` → `registration.update()` call.
+- **Update check on tab focus.** A browser only looks for a new
+  `service-worker.js` on document navigations, so an always-open tab would never
+  even learn about a deploy. On `visibilitychange` → visible (throttled to at
+  most once a minute), call `registration.update()`. The new SW downloads and
+  installs in the background and *waits* — the active session is not touched.
+- **Activate the waiting SW on page load.** A waiting SW does NOT take over on a
+  normal reload by itself (browsers keep the old SW in control until every tab is
+  closed). So at registration time, if `registration.waiting` exists, send it
+  `{ type: "SKIP_WAITING" }` (the GenerateSW-generated worker ships a listener
+  for exactly this message). It activates, workbox purges the outdated precache,
+  `controllerchange` fires, and we do one immediate `location.reload()` — the
+  page is barely started, so this shows as a slightly longer load, not a visible
+  reload. The reloaded page is served the new `offline.html` + new chunks.
 
 ```js
-if (process.browser && "serviceWorker" in navigator) {
-	let hadController = !!navigator.serviceWorker.controller;
-	let refreshing = false;
-	navigator.serviceWorker.addEventListener("controllerchange", () => {
-		if (!hadController) {
-			hadController = true; // first install claiming the page — no reload needed
-			return;
+import { register } from "register-service-worker";
+
+let refreshing = false;
+let hadController = !!navigator.serviceWorker.controller;
+
+// Reloads the page when a waiting SW we told to SKIP_WAITING takes control.
+// Never fires mid-session: SKIP_WAITING is only ever sent at page-load time.
+navigator.serviceWorker.addEventListener("controllerchange", () => {
+	if (!hadController) {
+		hadController = true; // first-ever install claiming the page (clientsClaim)
+		return;
+	}
+	if (refreshing) return;
+	refreshing = true;
+	window.location.reload();
+});
+
+register(process.env.SERVICE_WORKER_FILE, {
+	registered(registration) {
+		// A new version was installed during a previous session and has been
+		// waiting since: switch over now, at load time.
+		if (registration.waiting) {
+			registration.waiting.postMessage({ type: "SKIP_WAITING" });
 		}
-		if (refreshing) return;
-		refreshing = true;
-		window.location.reload();
-	});
-}
+
+		// Look for new versions when the user returns to the tab (max 1/min).
+		let lastCheck = Date.now();
+		document.addEventListener("visibilitychange", () => {
+			if (document.visibilityState === "visible" && Date.now() - lastCheck > 60000) {
+				lastCheck = Date.now();
+				registration.update().catch(() => {});
+			}
+		});
+	},
+});
 ```
 
-Net effect on the race: the moment the new SW activates mid-load, the page reloads
-and is served the new `offline.html` + new chunks. The stale-chunk requests become
-irrelevant. Users with the app open in a tab during a deploy also get refreshed to
-the new version automatically.
+Resulting behavior:
+
+- Deploy while the user is mid-session → on next tab focus the new SW installs in
+  the background and waits. The session keeps running the old version off the old
+  precache. Nothing breaks, nothing reloads.
+- Next page load (reload or reopening the app) → waiting SW is told to activate →
+  one quick self-reload at load time → user is on the new version.
+- If a new SW finishes installing *during* a page load (the original race
+  scenario), it now just waits instead of purging the old precache — the load
+  completes on the old version and the switch happens on the following load.
 
 ### 2. Remove dead code — `src-pwa/custom-service-worker.js`
 
@@ -191,9 +235,13 @@ Steps are independent and individually shippable, but 3 and 4 belong together:
 - SW update flow (Chrome, `localhost` allows SW):
   1. Build, serve, open the app, let the SW install (Application → Service Workers).
   2. Change a component, rebuild, restart the server.
-  3. Focus the open tab / navigate: the page must reload itself once and show the
-     new version. No `Unexpected token '<'` in the console.
-  4. First-ever visit (cleared storage) must NOT trigger a reload loop.
+  3. Blur and refocus the open tab: DevTools must show the new SW in **waiting**
+     state; the page must NOT reload and must keep working (navigate to a
+     not-yet-visited lazy route to prove old chunks still resolve).
+  4. Reload the tab: the waiting SW activates and the page performs one extra
+     self-reload, landing on the new version. No `Unexpected token '<'` in the
+     console, no further reloads.
+  5. First-ever visit (cleared storage) must NOT trigger a reload.
 - Safety net: with the app loaded, delete a lazy chunk from `dist/ssr/www/js/`,
   navigate to the matching route → expect a single automatic reload.
 

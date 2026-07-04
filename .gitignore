@@ -7,6 +7,7 @@ node_modules
 .env.local
 .env.*.local
 !.env.vault
+!.env.emulator
 
 # Log files
 npm-debug.log*
@@ -71,3 +72,8 @@ firebaseServiceAccountKey.json
 
 # Claude Code local settings (per-machine permissions allowlist)
 .claude/settings.local.json
+
+# Firebase emulator runtime artifacts
+*-debug.log
+.firebase/
+firebase-export-*/

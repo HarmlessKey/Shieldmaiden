@@ -22,7 +22,6 @@ module.exports = configure(function (ctx) {
 		preFetch: true,
 
 		boot: [
-			{ path: "compat", server: false },
 			{ path: "plugins", server: false },
 			{ path: "hk-components", server: false },
 			{ path: "vee-validate", server: false },
@@ -41,8 +40,6 @@ module.exports = configure(function (ctx) {
 			transpileDependencies: ["htmlparser2", "fast-png", "iobuffer", "@gtm-support/core", "@octokit"],
 
 			chainWebpack(chain) {
-				chain.resolve.alias.set("vue", "@vue/compat");
-
 				// Silence mini-css-extract-plugin "Conflicting order" warnings.
 				// All flagged modules are Vue scoped styles (data-v-xxxxx attribute
 				// selectors), so cross-component CSS specificity can't actually conflict.

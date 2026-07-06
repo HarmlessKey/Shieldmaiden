@@ -1,7 +1,6 @@
 <template>
-	<tag :is="cardView ? 'hk-card' : 'div'" :class="!cardView ? 'normal-view' : ''">
-		<template v-slot:header>
-			<div class="pane__header top-menu" :class="cardView && 'card-header'">
+	<component :is="cardView ? 'hk-card' : 'div'" :class="!cardView ? 'normal-view' : ''">
+		<div class="pane__header top-menu" :class="cardView && 'card-header'">
 				<div
 					class="money"
 					:class="{ red: currency >= maxCurrencyAmount }"
@@ -119,9 +118,8 @@
 						{{ Object.keys(campaign.inventory.items).length }}
 						<q-tooltip anchor="top middle" self="center middle">Party Inventory</q-tooltip>
 					</button>
-				</div>
 			</div>
-		</template>
+		</div>
 
 		<div class="pane__content">
 			<div
@@ -462,7 +460,7 @@
 		</q-dialog>
 
 		<q-resize-observer @resize="onResize" />
-	</tag>
+	</component>
 </template>
 
 <script>

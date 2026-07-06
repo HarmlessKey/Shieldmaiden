@@ -11,8 +11,10 @@
 		<!-- EXHAUSTION -->
 		<table v-if="condition.name == 'Exhaustion'" class="table">
 			<thead>
+				<tr>
 				<th>Level</th>
 				<th>Effect</th>
+				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(effect, index) in effects" :key="index">

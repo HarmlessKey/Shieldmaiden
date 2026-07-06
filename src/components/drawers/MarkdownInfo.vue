@@ -21,8 +21,10 @@
 				</template>
 				<table class="table mb-0" aria-describedby="ASDesc">
 					<thead>
+						<tr>
 						<th>Ability</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in ability_scores" :key="`ability-${index}`">
@@ -39,8 +41,10 @@
 				</template>
 				<table class="table mb-0" aria-describedby="AMDesc">
 					<thead>
+						<tr>
 						<th>Ability</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in ability_mods" :key="`mod-${index}`">
@@ -57,8 +61,10 @@
 				</template>
 				<table class="table mb-0" aria-describedby="CVDesc">
 					<thead>
+						<tr>
 						<th>Value</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in character" :key="`character-${index}`">
@@ -75,8 +81,10 @@
 				</template>
 				<table class="table mb-0" aria-describedby="ClVDesc">
 					<thead>
+						<tr>
 						<th>Value</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in Class" :key="`class-${index}`">

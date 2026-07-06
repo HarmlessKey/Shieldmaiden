@@ -40,17 +40,19 @@
 			<div>
 				<table class="initiative-list targets">
 					<thead class="white text-shadow">
+						<tr>
 						<th class="init">In.</th>
 						<th class="image"></th>
 						<th class="ac"><i aria-hidden="true" class="fas fa-shield"></i></th>
 						<th>Name</th>
 						<th class="hp"><i aria-hidden="true" class="fas fa-heart"></i></th>
 						<th class="conditions"></th>
+						</tr>
 					</thead>
-					<tbody
+					<transition-group
+						tag="tbody"
 						class="entities"
 						name="entities"
-						is="transition-group"
 						enter-active-class="animated animate__fadeIn"
 						leave-active-class="animated animate__fadeOut"
 					>
@@ -262,7 +264,7 @@
 								</td>
 							</tr>
 						</template>
-					</tbody>
+					</transition-group>
 				</table>
 			</div>
 		</q-scroll-area>

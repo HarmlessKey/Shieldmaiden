@@ -50,11 +50,14 @@
 					class="monster-card__abilities"
 					:class="table === 0 ? 'left' : 'right'"
 				>
-					<tr>
-						<th colspan="2"></th>
-						<th>mod</th>
-						<th>save</th>
-					</tr>
+					<thead>
+						<tr>
+							<th colspan="2"></th>
+							<th>mod</th>
+							<th>save</th>
+						</tr>
+					</thead>
+					<tbody>
 					<tr
 						v-for="(ability, index) in abilities.slice(table * 3, table * 3 + 3)"
 						:class="`ability ability__${ability}`"
@@ -115,6 +118,7 @@
 							</hk-roll>
 						</td>
 					</tr>
+					</tbody>
 				</table>
 			</div>
 

@@ -20,8 +20,10 @@
 			:aria-describedby="`${cond.value}Table`"
 		>
 			<thead>
+				<tr>
 				<th>Current</th>
 				<th>Effect</th>
+				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(effect, index) in effects" :key="index">

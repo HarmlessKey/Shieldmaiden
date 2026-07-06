@@ -14,14 +14,14 @@
 					"
 					:small-screen="small_screen"
 				/>
-				<div
+				<component
 					:is="$route.name === 'home' ? 'div' : 'q-scroll-area'"
 					class="scrollable-content"
 					:dark="$store.getters.theme === 'dark'"
 					:thumb-style="{ width: '5px' }"
 				>
 					<router-view />
-				</div>
+				</component>
 			</div>
 		</div>
 		<transition
@@ -48,44 +48,14 @@ import { mapActions, mapGetters } from "vuex";
 import HkRolls from "./components/hk-components/hk-rolls";
 import { general } from "./mixins/general";
 
-import { Cookies } from "quasar";
+import { Cookies, createMetaMixin } from "quasar";
 import { jwtDecode as jwt_decode } from "jwt-decode";
 
 export default {
 	name: "App",
-	mixins: [general],
-	components: {
-		Header,
-		Sidebar,
-		Drawer,
-		HkRolls,
-	},
-	async preFetch({ store, ssrContext }) {
-		const cookies = process.env.SERVER ? Cookies.parseSSR(ssrContext) : Cookies;
-		const access_token = cookies.get("access_token");
-		if (!access_token) return;
-
-		const user = jwt_decode(access_token);
-		if (!user && !user.user_id) return;
-
-		const transform = {
-			uid: "user_id",
-			displayName: "name",
-			photoURL: "picture",
-			email: "email",
-			emailVerified: "email_verified",
-		};
-
-		const transformed_user = {};
-		for (const [k, v] of Object.entries(transform)) {
-			transformed_user[k] = user[v];
-		}
-
-		await store.dispatch("setUser", transformed_user);
-		await store.dispatch("setUserInfo");
-		await store.dispatch("initialize");
-	},
-	meta() {
+	mixins: [
+		general,
+		createMetaMixin(function () {
 		const meta = {
 			title: {
 				name: "title",
@@ -182,6 +152,38 @@ export default {
 			},
 			meta: meta,
 		};
+		}),
+	],
+	components: {
+		Header,
+		Sidebar,
+		Drawer,
+		HkRolls,
+	},
+	async preFetch({ store, ssrContext }) {
+		const cookies = process.env.SERVER ? Cookies.parseSSR(ssrContext) : Cookies;
+		const access_token = cookies.get("access_token");
+		if (!access_token) return;
+
+		const user = jwt_decode(access_token);
+		if (!user && !user.user_id) return;
+
+		const transform = {
+			uid: "user_id",
+			displayName: "name",
+			photoURL: "picture",
+			email: "email",
+			emailVerified: "email_verified",
+		};
+
+		const transformed_user = {};
+		for (const [k, v] of Object.entries(transform)) {
+			transformed_user[k] = user[v];
+		}
+
+		await store.dispatch("setUser", transformed_user);
+		await store.dispatch("setUserInfo");
+		await store.dispatch("initialize");
 	},
 	data() {
 		return {

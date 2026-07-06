@@ -1,6 +1,6 @@
 # Vue 3 Migration — Implementation Progress
 
-> Last updated: 2026-06-10
+> Last updated: 2026-07-06
 > Branch: `claude/vue3-migration-plan-9q0qC`
 
 ---
@@ -13,8 +13,58 @@
 | Phase 1 — Core Dependency Upgrade | ✅ Complete | 100% |
 | Phase 2 — Stabilize Dev Build | ✅ Complete | 100% |
 | Phase 2.5 — Runtime Verification | ✅ Complete | 100% |
-| Phase 3 — Component Migration | 🔲 Not Started | 0% |
-| Phase 4 — SSR Re-enablement | 🔲 Not Started | 0% |
+| Phase 3 — Component Migration (compat removal) | ✅ Complete | 100% |
+| Phase 4 — SSR Re-enablement | ✅ Complete | 100% |
+
+**THE MIGRATION IS COMPLETE.** The app runs on plain `vue@3` (no `@vue/compat`),
+builds in SPA and SSR modes, server-side renders with correct meta/title tags,
+and hydrates without functional mismatches.
+
+---
+
+## Phase 3 — Component Migration ✅
+
+Executed with parallel agents on disjoint file sets, verified per batch with
+production builds + headless-browser audits.
+
+| Task | Status | Scope |
+|---|---|---|
+| Migrate `slot="x"`/`slot-scope` → `v-slot` | ✅ | 429 occurrences, 120 files |
+| Remove Vue.set/Vue.delete from stores | ✅ | 149 calls, 8 modules (splice for the one array case) |
+| Remove template `$set`/`$delete` | ✅ | 3 files |
+| Dual-mode v-model (value/input + modelValue) | ✅ | 16 components; 8 display-only components identified and skipped |
+| `defineAsyncComponent` for async registrations | ✅ | boot file + 5 components + Drawer dynamic loader |
+| WATCH_ARRAY: `deep: true` where mutated in place | ✅ | 3 watchers (evidence-based); rest verified safe |
+| Transition classes → `-from` suffixes | ✅ | 1 file (old estimate of 58 was stale) |
+| `render(c)` router passthroughs → `h(RouterView)` | ✅ | 36 in routes.js |
+| Vue 2 `is=` attribute fixes | ✅ | App.vue, character-descriptions, Initiative (transition-group), Players (dynamic component + slot restructure) |
+| Replace Vue 2-only vue-qr with qrcode.vue | ✅ | PlayerLink.vue |
+| Remove @vue/compat + alias + boot file | ✅ | app runs on standard vue@3 |
+
+**Deliberate deviation:** the original plan's "convert ~300 files to Composition
+API" and "mixins → composables" items were dropped. Options API and mixins are
+fully supported in Vue 3; converting them is not required to complete the
+migration and would add regression risk with no functional gain. Convert
+incrementally later if desired.
+
+---
+
+## Phase 4 — SSR Re-enablement ✅
+
+| Task | Status | Details |
+|---|---|---|
+| Rewrite src-ssr for @quasar/app-webpack v3 | ✅ | middlewares/render, compression, api + production-export.js |
+| Port /api express routes | ✅ | fail-soft when firebaseServiceAccountKey.json missing |
+| Boot files server-enabled | ✅ | plugins/hk-components/vee-validate/vue-shortkey run on server; GTM client-guarded; firebase-auth client-only |
+| SSR dev mode works | ✅ | `quasar dev -m ssr` renders real content |
+| Hydration mismatches fixed | ✅ | Quasar dark config (body--dark), SSR-stable useId for vee-validate field names, invalid `<thead>`/`<tr>` HTML nesting in 7 files |
+| Quasar Meta plugin restored | ✅ | v1 `meta()` option → `createMetaMixin`; titles/OG/canonical render server-side again (was silently broken since Phase 1) |
+| Runtime template compiler enabled | ✅ | `build.vueCompiler: true` for character-descriptions.vue |
+| Production SSR build + server | ✅ | `quasar build -m ssr` succeeds; server boots, renders, serves PWA |
+
+**Known cosmetic issue:** Quasar QField auto-generated `id`/`for` attributes
+log check-only hydration notices in dev (ids are added client-side by design
+in Quasar's useId). No functional impact; silent in production.
 
 ---
 

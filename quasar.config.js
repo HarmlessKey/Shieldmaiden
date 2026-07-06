@@ -22,11 +22,14 @@ module.exports = configure(function (ctx) {
 		preFetch: true,
 
 		boot: [
-			{ path: "plugins", server: false },
-			{ path: "hk-components", server: false },
-			{ path: "vee-validate", server: false },
+			// These register global components/directives/prototype extensions and
+			// must also run server-side, or SSR fails to resolve them during render
+			"plugins",
+			"hk-components",
+			"vee-validate",
+			"vue-shortkey",
+			// Firebase auth listeners are client-only
 			{ path: "firebase-auth", server: false },
-			{ path: "vue-shortkey", server: false },
 		],
 
 		css: ["styles.scss"],
@@ -35,6 +38,9 @@ module.exports = configure(function (ctx) {
 
 		build: {
 			vueRouterMode: "history",
+			// character-descriptions.vue compiles templates at runtime (dynamic
+			// stat tooltips), which requires the full Vue build
+			vueCompiler: true,
 			env: envParsed,
 			devtool: "source-map",
 			transpileDependencies: ["htmlparser2", "fast-png", "iobuffer", "@gtm-support/core", "@octokit"],
@@ -62,7 +68,9 @@ module.exports = configure(function (ctx) {
 		framework: {
 			iconSet: "material-icons",
 			lang: "en-US",
-			config: {},
+			// index.template.html hard-codes body--dark; setting dark here keeps the
+			// SSR render consistent with the client (q-chip--dark etc.)
+			config: { dark: true },
 
 			plugins: ["AppFullscreen", "Notify", "Cookies", "Meta", "Dialog"],
 		},
@@ -75,6 +83,13 @@ module.exports = configure(function (ctx) {
 			// skipWaiting + clientsClaim then force every page to refresh,
 			// the refresh triggers another build, repeat.
 			pwa: ctx.prod,
+			prodPort: 3000,
+			maxAge: 1000 * 60 * 60 * 24 * 30,
+			middlewares: [
+				ctx.prod ? "compression" : "",
+				"api",
+				"render", // keep this as last one
+			].filter(Boolean),
 		},
 
 		pwa: {

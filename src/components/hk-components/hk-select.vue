@@ -20,9 +20,15 @@
 </template>
 
 <script>
+import { useId } from "vue";
+
 export default {
 	name: "hk-select",
 	inheritAttrs: false,
+	setup() {
+		// SSR-stable unique id (this.$.uid differs between server and client)
+		return { uid: useId() };
+	},
 	props: {
 		value: {
 			type: [String, Array, Number],
@@ -60,7 +66,7 @@ export default {
 		// vee-validate v4 requires a string name on every Field; fall back to a unique
 		// id so unnamed inputs without rules don't crash form path resolution
 		fieldName() {
-			return this.name || `field-${this.$.uid}`;
+			return this.name || `field-${this.uid}`;
 		},
 		inputModel: {
 			get() {

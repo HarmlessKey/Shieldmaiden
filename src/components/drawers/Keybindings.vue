@@ -4,8 +4,10 @@
 			<h3  id="KeybindTable">{{ name }}</h3>
 			<table class="table mb-3" :class="{ 'table-sm': data && data.sm }" aria-describedby="KeybindTable">
 				<thead>
+					<tr>
 					<th>Action</th>
 					<th><i aria-hidden="true" class="fas fa-keyboard"></i> Keybind</th>
+					</tr>
 				</thead>
 				<tbody>
 					<tr v-for="({ action, bind }, i) in keybindings" :key="`row-${index}-${i}`">

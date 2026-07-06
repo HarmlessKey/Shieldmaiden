@@ -1,71 +1,77 @@
 <template>
 	<hk-table :items="rolls" :columns="rollColumns" :showHeader="false">
-		<div slot="roll" slot-scope="data" class="roll">
-			<span>
-				{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
-				({{ data.row.dice_count || "" }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
-				<template v-if="data.row.fixed_val && data.row.dice_count">
-					{{
-						// eslint-disable-next-line vue/no-parsing-error
-						data.row.fixed_val < 0
-							? `- ${Math.abs(data.row.fixed_val)}`
-							: `+ ${data.row.fixed_val}`
-					}})
-				</template>
-				<template v-else>{{ data.row.fixed_val }})</template>
-			</span>
-			<span v-if="data.row.options && versatileRoll(data.row)">
-				| {{ versatileRoll(data.row) }}
-			</span>
-			<span v-if="data.row.options && Object.values(data.row.options).length > 1">
-				<span>| ...</span>
-				<q-tooltip anchor="top middle" self="bottom middle">More than two Options</q-tooltip>
-			</span>
-		</div>
+		<template v-slot:roll="data">
+			<div class="roll">
+				<span>
+					{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
+					({{ data.row.dice_count || "" }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
+					<template v-if="data.row.fixed_val && data.row.dice_count">
+						{{
+							// eslint-disable-next-line vue/no-parsing-error
+							data.row.fixed_val < 0
+								? `- ${Math.abs(data.row.fixed_val)}`
+								: `+ ${data.row.fixed_val}`
+						}})
+					</template>
+					<template v-else>{{ data.row.fixed_val }})</template>
+				</span>
+				<span v-if="data.row.options && versatileRoll(data.row)">
+					| {{ versatileRoll(data.row) }}
+				</span>
+				<span v-if="data.row.options && Object.values(data.row.options).length > 1">
+					<span>| ...</span>
+					<q-tooltip anchor="top middle" self="bottom middle">More than two Options</q-tooltip>
+				</span>
+			</div>
+		</template>
 
 		<!-- SCALING -->
-		<hk-popover
-			v-if="scaling && level !== undefined && data.row.scaling && data.row.scaling.length"
-			slot="scaling"
-			slot-scope="data"
-		>
-			<i class="fas fa-chart-line" aria-hidden="true" />
-			<span slot="content" v-html="scalingDesc(data.row.scaling, scaling, level)" />
-		</hk-popover>
+		<template v-slot:scaling="data">
+			<hk-popover
+				v-if="scaling && level !== undefined && data.row.scaling && data.row.scaling.length"
+			>
+				<i class="fas fa-chart-line" aria-hidden="true" />
+				<template v-slot:content>
+					<span v-html="scalingDesc(data.row.scaling, scaling, level)" />
+				</template>
+			</hk-popover>
+		</template>
 
-		<span slot="type" slot-scope="data">
-			<span v-if="type === 'healing'" class="healing">
-				<i aria-hidden="true" class="fas fa-heart" /> Healing
-			</span>
-			<template v-else-if="data.row.damage_type">
-				<span :class="data.row.damage_type">
-					<i aria-hidden="true" :class="damage_type_icons[data.row.damage_type]" />
-					{{ data.row.damage_type.capitalize() }}
-					<q-tooltip v-if="versatile" anchor="top middle" self="bottom middle">
-						{{ versatileOptions[1] || "Enter versatile option" }}
-					</q-tooltip>
+		<template v-slot:type="data">
+			<span>
+				<span v-if="type === 'healing'" class="healing">
+					<i aria-hidden="true" class="fas fa-heart" /> Healing
 				</span>
-				<template
-					v-if="
-						versatile &&
-						data.row.versatile_damage_type &&
-						data.row.versatile_damage_type !== data.row.damage_type
-					"
-				>
-					|
-					<span :class="data.row.versatile_damage_type">
-						<i aria-hidden="true" :class="damage_type_icons[data.row.versatile_damage_type]" />
-						{{ data.row.versatile_damage_type.capitalize() }}
-						<q-tooltip anchor="top middle" self="bottom middle">
+				<template v-else-if="data.row.damage_type">
+					<span :class="data.row.damage_type">
+						<i aria-hidden="true" :class="damage_type_icons[data.row.damage_type]" />
+						{{ data.row.damage_type.capitalize() }}
+						<q-tooltip v-if="versatile" anchor="top middle" self="bottom middle">
 							{{ versatileOptions[1] || "Enter versatile option" }}
 						</q-tooltip>
 					</span>
+					<template
+						v-if="
+							versatile &&
+							data.row.versatile_damage_type &&
+							data.row.versatile_damage_type !== data.row.damage_type
+						"
+					>
+						|
+						<span :class="data.row.versatile_damage_type">
+							<i aria-hidden="true" :class="damage_type_icons[data.row.versatile_damage_type]" />
+							{{ data.row.versatile_damage_type.capitalize() }}
+							<q-tooltip anchor="top middle" self="bottom middle">
+								{{ versatileOptions[1] || "Enter versatile option" }}
+							</q-tooltip>
+						</span>
+					</template>
+					damage
 				</template>
-				damage
-			</template>
-		</span>
+			</span>
+		</template>
 
-		<template slot="magical" slot-scope="data">
+		<template v-slot:magical="data">
 			<i
 				v-if="data.row.magical || data.row.versatile_magical"
 				class="fas fa-sparkles"
@@ -75,7 +81,7 @@
 			</i>
 		</template>
 
-		<template slot="fail" slot-scope="data" v-if="!['healing', 'damage'].includes(type)">
+		<template v-if="!['healing', 'damage'].includes(type)" v-slot:fail="data">
 			{{
 				type === "save"
 					? `Save: ${application[data.row.save_fail_mod]}`
@@ -84,19 +90,21 @@
 		</template>
 
 		<!-- ACTIONS -->
-		<div slot="actions" slot-scope="data" class="actions">
-			<a
-				class="ml-2 btn btn-sm bg-neutral-5"
-				@click="$emit('edit', { roll_index: data.index, roll: data.row })"
-			>
-				<i aria-hidden="true" class="fas fa-pencil-alt"></i>
-				<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
-			</a>
-			<a class="ml-2 btn btn-sm bg-neutral-5" @click="$emit('delete', data.index)">
-				<i aria-hidden="true" class="fas fa-trash-alt"></i>
-				<q-tooltip anchor="top middle" self="center middle">Delete</q-tooltip>
-			</a>
-		</div>
+		<template v-slot:actions="data">
+			<div class="actions">
+				<a
+					class="ml-2 btn btn-sm bg-neutral-5"
+					@click="$emit('edit', { roll_index: data.index, roll: data.row })"
+				>
+					<i aria-hidden="true" class="fas fa-pencil-alt"></i>
+					<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
+				</a>
+				<a class="ml-2 btn btn-sm bg-neutral-5" @click="$emit('delete', data.index)">
+					<i aria-hidden="true" class="fas fa-trash-alt"></i>
+					<q-tooltip anchor="top middle" self="center middle">Delete</q-tooltip>
+				</a>
+			</div>
+		</template>
 	</hk-table>
 </template>
 

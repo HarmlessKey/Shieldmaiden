@@ -1,16 +1,18 @@
 <template>
 	<hk-card header="Ability scores">
-		<div class="card-header" slot="header">
-			<span>Abilities</span>
-			<small class="saved green" v-if="saved" @animationend="saved = false">
-				<i aria-hidden="true" class="fas fa-check" />
-				Saved
-			</small>
-			<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-				<i aria-hidden="true" class="fas fa-times" />
-				Couldn't save
-			</small>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<span>Abilities</span>
+				<small class="saved green" v-if="saved" @animationend="saved = false">
+					<i aria-hidden="true" class="fas fa-check" />
+					Saved
+				</small>
+				<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+					<i aria-hidden="true" class="fas fa-times" />
+					Couldn't save
+				</small>
+			</div>
+		</template>
 
 		<div class="card-body">
 			<q-select
@@ -109,10 +111,12 @@
 
 						<q-dialog v-model="roll_dialog">
 							<hk-card>
-								<div slot="header" class="card-header d-flex justify-content-between">
-									<span> Roll ability scores </span>
-									<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
-								</div>
+								<template v-slot:header>
+									<div class="card-header d-flex justify-content-between">
+										<span> Roll ability scores </span>
+										<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
+									</div>
+								</template>
 
 								<div class="card-body">
 									<button
@@ -177,18 +181,20 @@
 									</div>
 								</div>
 
-								<div slot="footer" class="card-footer d-flex justify-content-end">
-									<button class="btn bg-gray mr-2" @click="roll_dialog = false">Cancel</button>
-									<button
-										class="btn bg-green"
-										@click="applyRolledScores()"
-										:disabled="
-											rolls.filter((score) => score.ability && score.results.length).length < 6
-										"
-									>
-										Apply
-									</button>
-								</div>
+								<template v-slot:footer>
+									<div class="card-footer d-flex justify-content-end">
+										<button class="btn bg-gray mr-2" @click="roll_dialog = false">Cancel</button>
+										<button
+											class="btn bg-green"
+											@click="applyRolledScores()"
+											:disabled="
+												rolls.filter((score) => score.ability && score.results.length).length < 6
+											"
+										>
+											Apply
+										</button>
+									</div>
+								</template>
 							</hk-card>
 						</q-dialog>
 					</div>
@@ -214,10 +220,12 @@
 
 				<hk-card-deck>
 					<hk-card @click="confirmMethodChange('standard_array')" class="pointer">
-						<div class="card-header" slot="header">
-							<span>1. Standard array</span>
-							<span class="neutral-2">phb 13</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>1. Standard array</span>
+								<span class="neutral-2">phb 13</span>
+							</div>
+						</template>
 						<div class="card-body">
 							You get a standard set of scores you can divide over the abilities.<br />
 							<strong>15</strong> | <strong>14</strong> | <strong>13</strong> |
@@ -226,10 +234,12 @@
 					</hk-card>
 
 					<hk-card @click="confirmMethodChange('point_buy')" class="pointer">
-						<div class="card-header" slot="header">
-							<span>2. Point buy</span>
-							<span class="neutral-2">phb 13</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>2. Point buy</span>
+								<span class="neutral-2">phb 13</span>
+							</div>
+						</template>
 						<div class="card-body">
 							<p id="tableDesc">
 								You get 27 points to spend on your ability scores. The cost of each score is shown
@@ -253,9 +263,11 @@
 					</hk-card>
 
 					<hk-card @click="confirmMethodChange('manual')" class="pointer">
-						<div class="card-header" slot="header">
-							<span>3. Manual</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>3. Manual</span>
+							</div>
+						</template>
 						<div class="card-body">Manually input the scores for each ability.</div>
 					</hk-card>
 				</hk-card-deck>

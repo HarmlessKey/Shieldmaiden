@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent, markRaw } from "vue";
 import { mapActions } from "vuex";
 
 export default {
@@ -43,10 +44,10 @@ export default {
 	mounted() {
 		this.loader()
 			.then(() => {
-				this.component = () => this.loader();
+				this.component = markRaw(defineAsyncComponent(this.loader));
 			})
 			.catch(() => {
-				this.component = () => import("./drawers/Error.vue");
+				this.component = markRaw(defineAsyncComponent(() => import("./drawers/Error.vue")));
 			});
 	},
 	methods: {

@@ -83,7 +83,9 @@
 				clearable
 				placeholder="Search custom NPCs"
 			>
-				<q-icon slot="prepend" name="search" />
+				<template v-slot:prepend>
+					<q-icon name="search" />
+				</template>
 			</q-input>
 			<q-table
 				:rows="npcs"
@@ -176,12 +178,15 @@
 						</q-td>
 					</q-tr>
 				</template>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="monsters" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="monsters" />
+				</template>
 			</q-table>
 			<q-btn
 				v-if="!searchNpc && npcs.length < npc_count"
-				slot="bottom-row"
 				no-caps
 				color="primary"
 				label="Load more"
@@ -203,18 +208,22 @@
 				@change="filterMonsters"
 				@clear="filterMonsters"
 			>
-				<q-icon slot="prepend" name="search" />
-				<q-btn slot="after" no-caps color="primary" @click="filter_dialog = true">
-					Filter
-					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge
-						v-if="Object.keys(filter).length"
-						floating
-						rounded
-						color="red"
-						:label="Object.keys(filter).length"
-					/>
-				</q-btn>
+				<template v-slot:prepend>
+					<q-icon name="search" />
+				</template>
+				<template v-slot:after>
+					<q-btn no-caps color="primary" @click="filter_dialog = true">
+						Filter
+						<i class="fas fa-filter ml-2" aria-hidden="true" />
+						<q-badge
+							v-if="Object.keys(filter).length"
+							floating
+							rounded
+							color="red"
+							:label="Object.keys(filter).length"
+						/>
+					</q-btn>
+				</template>
 			</q-input>
 			<q-table
 				:rows="monsters"
@@ -230,9 +239,11 @@
 				:visible-columns="visibleColumns"
 				@request="request"
 			>
-				<div slot="loading">
-					<hk-loader name="monsters" />
-				</div>
+				<template v-slot:loading>
+					<div>
+						<hk-loader name="monsters" />
+					</div>
+				</template>
 
 				<template v-slot:header="props">
 					<q-tr :props="props">
@@ -340,16 +351,18 @@
 				<div class="card-body">
 					<hk-filter v-model="filter" type="monster" />
 				</div>
-				<div slot="footer" class="card-footer">
-					<button class="btn bg-neutral-5" @click="clearFilter">
-						<i class="fas fa-times" aria-hidden="true" />
-						Clear filter
-					</button>
-					<button class="btn ml-2" @click="setFilter">
-						<i class="fas fa-filter" aria-hidden="true" />
-						Set filter
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<button class="btn bg-neutral-5" @click="clearFilter">
+							<i class="fas fa-times" aria-hidden="true" />
+							Clear filter
+						</button>
+						<button class="btn ml-2" @click="setFilter">
+							<i class="fas fa-filter" aria-hidden="true" />
+							Set filter
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
@@ -423,27 +436,29 @@
 									/>
 								</ValidationProvider>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-between">
-								<q-btn flat no-caps v-close-popup label="Cancel" />
-								<q-btn
-									type="submit"
-									label="Add more"
-									class="ml-1"
-									no-caps
-									flat
-									color="primary"
-									:disable="!meta.valid"
-								/>
-								<q-btn
-									type="submit"
-									label="Add"
-									class="ml-1"
-									v-close-popup
-									no-caps
-									color="primary"
-									:disable="!meta.valid"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-between">
+									<q-btn flat no-caps v-close-popup label="Cancel" />
+									<q-btn
+										type="submit"
+										label="Add more"
+										class="ml-1"
+										no-caps
+										flat
+										color="primary"
+										:disable="!meta.valid"
+									/>
+									<q-btn
+										type="submit"
+										label="Add"
+										class="ml-1"
+										v-close-popup
+										no-caps
+										color="primary"
+										:disable="!meta.valid"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>

@@ -8,18 +8,20 @@
 							<hk-loader name="old spell" />
 						</hk-card>
 						<hk-card v-else class="old_spell">
-							<div slot="header" class="card-header">
-								{{ old_spell.name }}
-								<a
-									v-if="old_spell.name"
-									class="btn btn-sm bg-neutral-5"
-									:href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`"
-									target="_blank"
-									rel="noopener"
-								>
-									<i class="fas fa-external-link" aria-hidden="true" />
-								</a>
-							</div>
+							<template v-slot:header>
+								<div class="card-header">
+									{{ old_spell.name }}
+									<a
+										v-if="old_spell.name"
+										class="btn btn-sm bg-neutral-5"
+										:href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`"
+										target="_blank"
+										rel="noopener"
+									>
+										<i class="fas fa-external-link" aria-hidden="true" />
+									</a>
+								</div>
+							</template>
 							<div class="card-body">
 								<a class="btn btn-block mb-3" @click="parse_old_spell()">
 									<i aria-hidden="true" class="fas fa-wand-magic"></i>

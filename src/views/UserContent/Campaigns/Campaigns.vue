@@ -16,58 +16,59 @@
 					<div class="col-12 col-sm-6 col-md-4" v-for="campaign in campaigns" :key="campaign.key">
 						<hk-card>
 							<!-- Image -->
-							<div
-								slot="image"
-								class="card-image"
-								:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
-							>
-								<div class="d-flex justify-content-between">
-									<i
-										aria-hidden="true"
-										class="px-1 py-2"
-										:class="{
-											'fas fa-eye text-shadow-6 white': !campaign.private,
-											'fas fa-eye-slash text-shadow-6 white': campaign.private,
-										}"
-									>
-										<q-tooltip anchor="top middle" self="bottom middle">
-											{{ campaign.private ? "Private campaign" : "Public campaign" }}
-										</q-tooltip>
-									</i>
-									<div class="campaign-actions">
-										<template v-if="!overencumbered">
-											<a
-												class="btn btn-sm btn-clear white"
-												@click="edit_players = { show: true, campaign: campaign }"
-											>
-												<i aria-hidden="true" class="fas fa-user-plus"></i>
-												<q-tooltip anchor="top middle" self="bottom middle">
-													Add players
-												</q-tooltip>
-											</a>
-											<a
-												class="btn btn-sm btn-clear white"
-												@click="edit_campaign = { show: true, campaign: campaign }"
-											>
-												<i aria-hidden="true" class="fas fa-pencil"></i>
-												<q-tooltip anchor="top middle" self="bottom middle"> Edit </q-tooltip>
-											</a>
-										</template>
-										<ExportUserContent
-											class="btn-sm btn-clear white"
-											content-type="campaign"
-											:content-id="campaign.key"
-										/>
-										<a
-											class="btn btn-sm btn-clear white"
-											@click="confirmDelete($event, campaign.key, campaign.name)"
+							<template v-slot:image>
+								<div
+									class="card-image"
+									:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
+								>
+									<div class="d-flex justify-content-between">
+										<i
+											aria-hidden="true"
+											class="px-1 py-2"
+											:class="{
+												'fas fa-eye text-shadow-6 white': !campaign.private,
+												'fas fa-eye-slash text-shadow-6 white': campaign.private,
+											}"
 										>
-											<i aria-hidden="true" class="fas fa-trash-alt"></i>
-											<q-tooltip anchor="top middle" self="bottom middle"> Delete </q-tooltip>
-										</a>
+											<q-tooltip anchor="top middle" self="bottom middle">
+												{{ campaign.private ? "Private campaign" : "Public campaign" }}
+											</q-tooltip>
+										</i>
+										<div class="campaign-actions">
+											<template v-if="!overencumbered">
+												<a
+													class="btn btn-sm btn-clear white"
+													@click="edit_players = { show: true, campaign: campaign }"
+												>
+													<i aria-hidden="true" class="fas fa-user-plus"></i>
+													<q-tooltip anchor="top middle" self="bottom middle">
+														Add players
+													</q-tooltip>
+												</a>
+												<a
+													class="btn btn-sm btn-clear white"
+													@click="edit_campaign = { show: true, campaign: campaign }"
+												>
+													<i aria-hidden="true" class="fas fa-pencil"></i>
+													<q-tooltip anchor="top middle" self="bottom middle"> Edit </q-tooltip>
+												</a>
+											</template>
+											<ExportUserContent
+												class="btn-sm btn-clear white"
+												content-type="campaign"
+												:content-id="campaign.key"
+											/>
+											<a
+												class="btn btn-sm btn-clear white"
+												@click="confirmDelete($event, campaign.key, campaign.name)"
+											>
+												<i aria-hidden="true" class="fas fa-trash-alt"></i>
+												<q-tooltip anchor="top middle" self="bottom middle"> Delete </q-tooltip>
+											</a>
+										</div>
 									</div>
 								</div>
-							</div>
+							</template>
 
 							<div class="card-body">
 								<div class="neutral-4 mb-2">
@@ -140,11 +141,13 @@
 									</router-link>
 								</div>
 							</div>
-							<div slot="footer" class="card-footer">
-								<small class="text-center neutral-3"
-									><span class="">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small
-								>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer">
+									<small class="text-center neutral-3"
+										><span class="">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small
+									>
+								</div>
+							</template>
 						</hk-card>
 					</div>
 				</transition-group>
@@ -225,10 +228,12 @@
 							/>
 						</div>
 
-						<div slot="footer" class="card-footer d-flex justify-end">
-							<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
-							<q-btn type="submit" no-caps color="primary" label="Add campaign" />
-						</div>
+						<template v-slot:footer>
+							<div class="card-footer d-flex justify-end">
+								<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
+								<q-btn type="submit" no-caps color="primary" label="Add campaign" />
+							</div>
+						</template>
 					</hk-card>
 				</q-form>
 			</div>

@@ -65,8 +65,12 @@
 							</q-td>
 						</q-tr>
 					</template>
-					<div slot="no-data" />
-					<hk-loader slot="loading" name="characters" />
+					<template v-slot:no-data>
+						<div />
+					</template>
+					<template v-slot:loading>
+						<hk-loader name="characters" />
+					</template>
 				</q-table>
 			</template>
 		</div>

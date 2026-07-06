@@ -7,24 +7,25 @@
 		}"
 		@focus="$emit('focus')"
 	>
-		<button
-			slot="header-action"
-			class="btn btn-sm bg-neutral-5"
-			tabindex="-1"
-			:class="{ disabled: test }"
-			v-shortkey="{ main: ['='], alt: ['shift', '+'] }"
-			@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
-			@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
-		>
-			<i aria-hidden="true" class="fas fa-plus green" />
-			<span class="ml-1">
-				Add
-				<hk-show-keybind class="d-none d-sm-inline" :binds="['+']" />
-			</span>
-			<q-tooltip v-if="test" anchor="top middle" self="center middle"
-				>Unavailable in test mode</q-tooltip
+		<template v-slot:header-action>
+			<button
+				class="btn btn-sm bg-neutral-5"
+				tabindex="-1"
+				:class="{ disabled: test }"
+				v-shortkey="{ main: ['='], alt: ['shift', '+'] }"
+				@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
+				@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
 			>
-		</button>
+				<i aria-hidden="true" class="fas fa-plus green" />
+				<span class="ml-1">
+					Add
+					<hk-show-keybind class="d-none d-sm-inline" :binds="['+']" />
+				</span>
+				<q-tooltip v-if="test" anchor="top middle" self="center middle"
+					>Unavailable in test mode</q-tooltip
+				>
+			</button>
+		</template>
 		<div
 			v-shortkey="{
 				downSingle: ['arrowdown'],
@@ -92,7 +93,7 @@
 								@shortkey="set_targeted({ type: 'single', key: entity.key })"
 							>
 								<TargetEntity :entity="entity">
-									<template v-if="!entity.active" slot="effects">
+									<template v-if="!entity.active" v-slot:effects>
 										<button
 											class="btn btn-sm bg-neutral-8"
 											v-if="entity.addNextRound"

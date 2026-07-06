@@ -5,10 +5,12 @@
 		<div class="row q-col-gutter-md">
 			<div class="col-12">
 				<hk-card>
-					<div slot="header" class="card-header">
-						<span>Your Subscription</span>
-						<strong>{{ tier.name }}</strong>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>Your Subscription</span>
+							<strong>{{ tier.name }}</strong>
+						</div>
+					</template>
 					<div class="card-body">
 						<div v-if="!userInfo.patreon_id">
 							<div class="text-center mb-3">
@@ -23,7 +25,9 @@
 						<template v-if="userInfo.patreon_id">
 							<PaymentDeclined />
 							<q-banner class="mb-3 bg-neutral-8" rounded>
-								<q-icon slot="avatar" name="fab fa-patreon" class="patreon-red" />
+								<template v-slot:avatar>
+									<q-icon name="fab fa-patreon" class="patreon-red" />
+								</template>
 								<template v-if="userInfo.patron">
 									<h3 class="mb-1">
 										Patreon:
@@ -65,7 +69,7 @@
 										to check your payment details.
 									</p>
 								</div>
-								<template slot="action">
+								<template v-slot:action>
 									<button class="btn btn-sm bg-neutral-5 mr-2" @click="unlinkPatreon">
 										<hk-icon icon="fas fa-unlink" class="mr-1" /> Unlink account
 									</button>
@@ -101,7 +105,9 @@
 						</template>
 
 						<q-banner class="mb-3 bg-neutral-8" rounded>
-							<q-icon slot="avatar" name="fas fa-ticket-alt" />
+							<template v-slot:avatar>
+								<q-icon name="fas fa-ticket-alt" />
+							</template>
 							<h3 class="mb-1">Voucher subscription</h3>
 							<template v-if="voucher">
 								<p v-if="voucher.message" class="green">{{ voucher.message }}</p>
@@ -121,7 +127,9 @@
 								label="Voucher code"
 								v-on:keyup.enter="addVoucher"
 							/>
-							<button slot="action" class="btn btn-sm" @click="addVoucher">Activate</button>
+							<template v-slot:action>
+								<button class="btn btn-sm" @click="addVoucher">Activate</button>
+							</template>
 						</q-banner>
 
 						<!-- TIER -->
@@ -234,10 +242,18 @@
 									name="Confirm Password"
 								/>
 							</div>
-							<div slot="footer" class="card-footer">
-								<q-btn no-caps label="Cancel" type="submit" :disabled="!meta.valid" />
-								<q-btn no-caps label="Confirm" color="primary" type="submit" :disabled="!meta.valid" />
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer">
+									<q-btn no-caps label="Cancel" type="submit" :disabled="!meta.valid" />
+									<q-btn
+										no-caps
+										label="Confirm"
+										color="primary"
+										type="submit"
+										:disabled="!meta.valid"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>

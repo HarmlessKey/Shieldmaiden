@@ -15,7 +15,9 @@
 					clearable
 					placeholder="Search players"
 				>
-					<q-icon slot="prepend" name="search" />
+					<template v-slot:prepend>
+						<q-icon name="search" />
+					</template>
 				</q-input>
 
 				<q-table
@@ -120,8 +122,12 @@
 							</q-td>
 						</q-tr>
 					</template>
-					<div slot="no-data" />
-					<hk-loader slot="loading" name="players" />
+					<template v-slot:no-data>
+						<div />
+					</template>
+					<template v-slot:loading>
+						<hk-loader name="players" />
+					</template>
 				</q-table>
 			</template>
 

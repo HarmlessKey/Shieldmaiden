@@ -38,10 +38,12 @@
 					:showHeader="false"
 					:collapse="true"
 				>
-					<div slot="collapse" slot-scope="data">
-						<h3>{{ data.row.public_name }}</h3>
-						{{ data.row.public_description }}
-					</div>
+					<template v-slot:collapse="data">
+						<div>
+							<h3>{{ data.row.public_name }}</h3>
+							{{ data.row.public_description }}
+						</div>
+					</template>
 				</hk-table>
 			</div>
 		</q-scroll-area>

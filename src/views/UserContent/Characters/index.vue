@@ -61,9 +61,15 @@
 						</q-td>
 					</q-tr>
 				</template>
-				<div slot="no-data" />
-				<div slot="bottom" />
-				<hk-loader slot="loading" name="characters" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:bottom>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="characters" />
+				</template>
 			</q-table>
 			<p v-else>You have no control over other characters.</p>
 		</div>

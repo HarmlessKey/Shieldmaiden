@@ -1,8 +1,10 @@
 <template>
 	<hk-card>
-		<div class="card-header" slot="header">
-			<h1>Changelog</h1>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>Changelog</h1>
+			</div>
+		</template>
 		<hk-loader name="releases" v-if="loading" />
 		<div v-else class="card-body">
 			<q-list :dark="$store.getters.theme === 'dark'" class="accordion">

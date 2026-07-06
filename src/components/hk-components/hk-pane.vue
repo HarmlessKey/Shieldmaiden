@@ -1,7 +1,9 @@
 <template>
 	<Pane v-bind="$attrs">
 		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px' }">
-			<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
+			<template v-for="slot in Object.keys($slots)" v-slot:[slot]="scope">
+				<slot :name="slot" v-bind="scope" />
+			</template>
 		</q-scroll-area>
 	</Pane>
 </template>

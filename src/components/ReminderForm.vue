@@ -144,19 +144,20 @@
 						:error="!!errorMessage"
 						:error-message="errorMessage"
 					>
-						<a
-							slot="after"
-							class="btn bg-neutral-5"
-							@click="addVariable()"
-							:class="{
-								disabled:
-									!newVar ||
-									errorMessage ||
-									(reminder.variables && Object.keys(reminder.variables).includes(newVar)),
-							}"
-						>
-							<q-icon name="fas fa-plus" />
-						</a>
+						<template v-slot:after>
+							<a
+								class="btn bg-neutral-5"
+								@click="addVariable()"
+								:class="{
+									disabled:
+										!newVar ||
+										errorMessage ||
+										(reminder.variables && Object.keys(reminder.variables).includes(newVar)),
+								}"
+							>
+								<q-icon name="fas fa-plus" />
+							</a>
+						</template>
 					</q-input>
 				</ValidationProvider>
 			</div>
@@ -200,23 +201,25 @@
 							:error="!!errorMessage"
 							:error-message="errorMessage"
 						>
-							<div slot="before" v-if="selectOptions">
-								<button
-									class="btn btn-sm bg-neutral-4"
-									@click="setOption(key, reminder.variables[key][i])"
-								>
-									<i
-										aria-hidden="true"
-										class="fas fa-check"
-										:class="{
-											green:
-												reminder.selectedVars &&
-												reminder.selectedVars[key] === reminder.variables[key][i],
-										}"
-									></i>
-								</button>
-							</div>
-							<template slot="append">
+							<template v-slot:before>
+								<div v-if="selectOptions">
+									<button
+										class="btn btn-sm bg-neutral-4"
+										@click="setOption(key, reminder.variables[key][i])"
+									>
+										<i
+											aria-hidden="true"
+											class="fas fa-check"
+											:class="{
+												green:
+													reminder.selectedVars &&
+													reminder.selectedVars[key] === reminder.variables[key][i],
+											}"
+										></i>
+									</button>
+								</div>
+							</template>
+							<template v-slot:append>
 								<q-icon
 									name="fas fa-trash-alt"
 									class="red pointer"

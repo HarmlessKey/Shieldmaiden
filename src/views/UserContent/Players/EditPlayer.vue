@@ -11,24 +11,26 @@
 				>
 					<hk-card-deck>
 						<hk-card>
-							<div class="card-header p-0 pr-4" slot="header">
-								<div class="d-flex justify-content-start items-center">
-									<div
-										class="img player-avatar"
-										@click="avatar_dialog = true"
-										:style="{
-											backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
-										}"
-									>
-										<i
-											aria-hidden="true"
-											v-if="!player.storage_avatar && !player.avatar && !preview_new_upload"
-											class="hki-player"
-										/>
+							<template v-slot:header>
+								<div class="card-header p-0 pr-4">
+									<div class="d-flex justify-content-start items-center">
+										<div
+											class="img player-avatar"
+											@click="avatar_dialog = true"
+											:style="{
+												backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
+											}"
+										>
+											<i
+												aria-hidden="true"
+												v-if="!player.storage_avatar && !player.avatar && !preview_new_upload"
+												class="hki-player"
+											/>
+										</div>
+										Basic info
 									</div>
-									Basic info
 								</div>
-							</div>
+							</template>
 							<div class="card-body">
 								<ValidationProvider
 									v-if="$route.name !== 'Edit character'"
@@ -253,7 +255,9 @@
 												:error="!!errorMessage"
 												:error-message="errorMessage"
 											>
-												<q-icon slot="prepend" name="fas fa-heart" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-heart" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle"
 													>Maximum Hit Points</q-tooltip
 												>
@@ -280,7 +284,9 @@
 												:error="!!errorMessage"
 												:error-message="errorMessage"
 											>
-												<q-icon slot="prepend" name="fas fa-shield" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-shield" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle">Armor class</q-tooltip>
 											</q-input>
 										</ValidationProvider>
@@ -305,7 +311,9 @@
 												:error="!!errorMessage"
 												:error-message="errorMessage"
 											>
-												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-hand-holding-magic" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle"
 													>Spell save DC</q-tooltip
 												>
@@ -390,18 +398,19 @@
 											:error-message="errorMessage"
 										>
 											<!-- eslint-disable -->
-											<q-checkbox
-												slot="append"
-												size="xs"
-												:dark="$store.getters.theme === 'dark'"
-												v-model="player[`${ability}-save-profficient`]"
-												:false-value="null"
-												indeterminate-value="something-else"
-											>
-												<q-tooltip anchor="top middle" self="center middle">
-													Saving throw proficiency
-												</q-tooltip>
-											</q-checkbox>
+											<template v-slot:append>
+												<q-checkbox
+													size="xs"
+													:dark="$store.getters.theme === 'dark'"
+													v-model="player[`${ability}-save-profficient`]"
+													:false-value="null"
+													indeterminate-value="something-else"
+												>
+													<q-tooltip anchor="top middle" self="center middle">
+														Saving throw proficiency
+													</q-tooltip>
+												</q-checkbox>
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -431,7 +440,9 @@
 											:error="!!errorMessage"
 											:error-message="errorMessage"
 										>
-											<q-icon slot="prepend" name="fas fa-eye" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-eye" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -456,7 +467,9 @@
 											:error="!!errorMessage"
 											:error-message="errorMessage"
 										>
-											<q-icon slot="prepend" name="fas fa-search" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-search" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -481,7 +494,9 @@
 											:error="!!errorMessage"
 											:error-message="errorMessage"
 										>
-											<q-icon slot="prepend" name="fas fa-lightbulb-on" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-lightbulb-on" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -576,17 +591,19 @@
 
 					<!-- COMPANIONS -->
 					<hk-card>
-						<div slot="header" class="card-header">
-							Companions
-							<a
-								v-if="isOwner() && npc_count"
-								class="btn btn-sm bg-neutral-5"
-								@click="companion_dialog = !companion_dialog"
-							>
-								<i aria-hidden="true" class="fas fa-plus green mr-1" />
-								Add companion
-							</a>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								Companions
+								<a
+									v-if="isOwner() && npc_count"
+									class="btn btn-sm bg-neutral-5"
+									@click="companion_dialog = !companion_dialog"
+								>
+									<i aria-hidden="true" class="fas fa-plus green mr-1" />
+									Add companion
+								</a>
+							</div>
+						</template>
 						<div class="card-body">
 							<template v-if="isOwner()">
 								<div v-if="!npc_count">
@@ -604,36 +621,38 @@
 								:columns="columns"
 								:items="companions"
 							>
-								<template slot="avatar" slot-scope="data">
+								<template v-slot:avatar="data">
 									<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
 										<i aria-hidden="true" v-if="!data.item" class="hki-monster" />
 									</div>
 								</template>
 
-								<template slot="name" slot-scope="data">
+								<template v-slot:name="data">
 									<router-link class="mx-2" :to="`/content/companions/${userId}/${data.row.key}`">
 										{{ data.item }}
 										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 									</router-link>
 								</template>
 
-								<div slot="actions" slot-scope="data" class="actions">
-									<router-link
-										class="btn btn-sm bg-neutral-5 mx-1"
-										:to="`/content/companions/${userId}/${data.row.key}`"
-									>
-										<i aria-hidden="true" class="fas fa-pencil"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-									</router-link>
-									<a
-										v-if="isOwner()"
-										class="btn btn-sm bg-neutral-5"
-										@click="removeCompanion(data.index, data.row.key)"
-									>
-										<i aria-hidden="true" class="fas fa-trash-alt"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
-									</a>
-								</div>
+								<template v-slot:actions="data">
+									<div class="actions">
+										<router-link
+											class="btn btn-sm bg-neutral-5 mx-1"
+											:to="`/content/companions/${userId}/${data.row.key}`"
+										>
+											<i aria-hidden="true" class="fas fa-pencil"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+										</router-link>
+										<a
+											v-if="isOwner()"
+											class="btn btn-sm bg-neutral-5"
+											@click="removeCompanion(data.index, data.row.key)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
+										</a>
+									</div>
+								</template>
 							</hk-table>
 							<div v-else-if="!isOwner()">
 								<p>You currently have no companions linked to your player character</p>

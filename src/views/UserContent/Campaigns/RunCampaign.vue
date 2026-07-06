@@ -169,7 +169,9 @@
 					emit-value
 					class="px-4 bg-neutral-9 tab-select"
 				>
-					<hk-icon slot="prepend" :icon="tab_icon" />
+					<template v-slot:prepend>
+						<hk-icon :icon="tab_icon" />
+					</template>
 				</hk-select>
 				<q-tab-panels v-model="mobile_tab" class="bg-transparent" animated swipeable infinite>
 					<q-tab-panel name="encounters">

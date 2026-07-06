@@ -20,13 +20,14 @@
 						:error="!!errorMessage"
 						:error-message="errorMessage"
 					>
-						<hk-popover 
-							slot="append" 
-							header="Public name" 
-							content="The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item."
-						>
-							<q-icon name="info" @click.stop class="pointer" />
-						</hk-popover>
+						<template v-slot:append>
+							<hk-popover
+								header="Public name"
+								content="The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item."
+							>
+								<q-icon name="info" @click.stop class="pointer" />
+							</hk-popover>
+						</template>
 					</q-input>
 				</ValidationProvider>
 

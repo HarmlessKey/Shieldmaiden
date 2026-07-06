@@ -104,10 +104,12 @@
 		<q-dialog v-model="addModal">
 			<div class="new-item">
 				<hk-card>
-					<div slot="header" class="card-header d-flex justify-content-between">
-						<span> Add item </span>
-						<q-btn flat @click="cancelAdd" round dense icon="close" />
-					</div>
+					<template v-slot:header>
+						<div class="card-header d-flex justify-content-between">
+							<span> Add item </span>
+							<q-btn flat @click="cancelAdd" round dense icon="close" />
+						</div>
+					</template>
 					<div v-if="new_item">
 						<q-select
 							dark
@@ -227,10 +229,12 @@
 							</q-select>
 						</div>
 					</div>
-					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<button class="btn bg-gray mr-2" @click="cancelAdd">Cancel</button>
-						<button class="btn" @click="addItem">Save</button>
-					</div>
+					<template v-slot:footer>
+						<div class="card-footer d-flex justify-content-end">
+							<button class="btn bg-gray mr-2" @click="cancelAdd">Cancel</button>
+							<button class="btn" @click="addItem">Save</button>
+						</div>
+					</template>
 				</hk-card>
 			</div>
 		</q-dialog>

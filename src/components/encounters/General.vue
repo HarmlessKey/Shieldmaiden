@@ -119,16 +119,17 @@
 									:error-message="errorMessage"
 									@input="editableEncounter.hk_background = null"
 								>
-									<hk-popover
-										slot="append"
-										header="Custom background"
-										v-if="demo || (tier && tier.price !== 'Free')"
-									>
-										<i class="fas fa-info-circle" aria-hidden="true" />
-										<template #content>
-											Setting a custom background will overwrite your selected background.
-										</template>
-									</hk-popover>
+									<template v-slot:append>
+										<hk-popover
+											header="Custom background"
+											v-if="demo || (tier && tier.price !== 'Free')"
+										>
+											<i class="fas fa-info-circle" aria-hidden="true" />
+											<template #content>
+												Setting a custom background will overwrite your selected background.
+											</template>
+										</hk-popover>
+									</template>
 								</q-input>
 							</div>
 						</div>
@@ -154,19 +155,21 @@
 					</div>
 
 					<hk-card v-if="!demo && (!tier || tier.price === 'Free')">
-						<div slot="header" class="card-header">
-							<span>
-								<i class="fas fa-cloud-showers" aria-hidden="true" />
-								<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
-								<i class="fas fa-fog" aria-hidden="true" />
-							</span>
-							<strong>Backgrounds & Effects</strong>
-							<span>
-								<i class="fas fa-bolt" aria-hidden="true" />
-								<i class="fas fa-tornado mx-2" aria-hidden="true" />
-								<i class="fas fa-waveform-path" aria-hidden="true" />
-							</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>
+									<i class="fas fa-cloud-showers" aria-hidden="true" />
+									<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
+									<i class="fas fa-fog" aria-hidden="true" />
+								</span>
+								<strong>Backgrounds & Effects</strong>
+								<span>
+									<i class="fas fa-bolt" aria-hidden="true" />
+									<i class="fas fa-tornado mx-2" aria-hidden="true" />
+									<i class="fas fa-waveform-path" aria-hidden="true" />
+								</span>
+							</div>
+						</template>
 						<div class="p-3 text-center">
 							<p>With a subscription you have access to our backgrounds and background effects.</p>
 							<p>

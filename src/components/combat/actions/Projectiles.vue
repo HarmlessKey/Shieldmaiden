@@ -1,9 +1,11 @@
 <template>
 	<hk-card :min-width="300">
-		<div slot="header" class="card-header">
-			Projectiles
-			<span class="btn btn-sm bg-neutral-5">{{ available_projectiles }}/{{ projectileCount }}</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				Projectiles
+				<span class="btn btn-sm bg-neutral-5">{{ available_projectiles }}/{{ projectileCount }}</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<button
 				class="btn btn-block mb-3"
@@ -36,16 +38,18 @@
 				</button>
 			</div>
 		</div>
-		<div slot="footer" class="card-footer">
-			<q-btn label="Cancel" tabindex="-1" no-caps @click="cancel()" />
-			<q-btn
-				label="Roll"
-				color="primary"
-				no-caps
-				@click="roll()"
-				:disable="available_projectiles > 0"
-			/>
-		</div>
+		<template v-slot:footer>
+			<div class="card-footer">
+				<q-btn label="Cancel" tabindex="-1" no-caps @click="cancel()" />
+				<q-btn
+					label="Roll"
+					color="primary"
+					no-caps
+					@click="roll()"
+					:disable="available_projectiles > 0"
+				/>
+			</div>
+		</template>
 	</hk-card>
 </template>
 

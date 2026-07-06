@@ -10,24 +10,27 @@
 		<div class="row q-col-gutter-md">		
 			<div class="col-12 col-md-9">		
 				<hk-card>
-					<div slot="header" class="card-header">
-						<span>
-							<i aria-hidden="true" class="fas fa-dungeon mr-1" />
-							Campaigns
-						</span>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>
+								<i aria-hidden="true" class="fas fa-dungeon mr-1" />
+								Campaigns
+							</span>
+						</div>
+					</template>
 					<div class="card-body" v-if="!loading">
 						<!-- CAMPAIGNS -->
 						<div v-if="campaigns.length" class="row q-col-gutter-md">
 							<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign.key">
 								<hk-card class="campaign">
-									<div 
-										slot="image" 
-										class="card-image" 
-										:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
-									>
-										<span class="live active" v-if="user.live == campaign.key">live</span>
-									</div>
+									<template v-slot:image>
+										<div  
+											class="card-image" 
+											:style="{ backgroundImage: 'url(\'' + getBackground(campaign) + '\'' }"
+										>
+											<span class="live active" v-if="user.live == campaign.key">live</span>
+										</div>
+									</template>
 
 									<div class="card-body">
 										
@@ -39,9 +42,11 @@
 										</div>						
 									</div>
 			
-									<div slot="footer" class="card-footer neutral-3">
-										Started: {{ makeDate(campaign.timestamp) }}
-									</div>
+									<template v-slot:footer>
+										<div class="card-footer neutral-3">
+											Started: {{ makeDate(campaign.timestamp) }}
+										</div>
+									</template>
 								</hk-card>
 							</div>
 						</div>

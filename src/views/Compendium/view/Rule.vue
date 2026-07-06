@@ -1,14 +1,16 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1>{{ !rule ? "Rule not found" : rule.name }}</h1>
-			<hk-share 
-				v-if="!!rule" 
-				:title="rule.name"
-				:text="rule.description"
-				size="sm"
-			/>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>{{ !rule ? "Rule not found" : rule.name }}</h1>
+				<hk-share
+					v-if="!!rule"
+					:title="rule.name"
+					:text="rule.description"
+					size="sm"
+				/>
+			</div>
+		</template>
 		<div class="card-body">
 			<div v-if="!rule">
 				<p>Could not find rule <strong>{{ id }}</strong></p>

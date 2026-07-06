@@ -20,29 +20,31 @@
 			:columns="columns"
 			:items="modifiers"
 		>
-			<template slot="target" slot-scope="data">
+			<template v-slot:target="data">
 				{{ data.row.subtarget || data.item.capitalize() }}
 			</template>
-			<template slot="value" slot-scope="data">
+			<template v-slot:value="data">
 				<template v-if="data.item">{{ data.item }}</template>
 				<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
 				<template v-else-if="data.row.type === 'expertise'">Expertise</template>
 			</template>
-			<div slot="actions" slot-scope="data" class="actions">
-				<a class="btn btn-sm bg-neutral-5 mx-1" 
-					@click="editModifier(data.row)">
-					<i class="fas fa-pencil" aria-hidden="true" />
-					<q-tooltip anchor="top middle" self="center middle">
-						Edit modifier
-					</q-tooltip>
-				</a>
-				<a class="btn btn-sm bg-neutral-5" @click="deleteModifier(data.row.index)">
-					<i class="fas fa-trash-alt" aria-hidden="true" />
-					<q-tooltip anchor="top middle" self="center middle">
-						Delete modifier
-					</q-tooltip>
-				</a>
-			</div>
+			<template v-slot:actions="data">
+				<div class="actions">
+					<a class="btn btn-sm bg-neutral-5 mx-1"
+						@click="editModifier(data.row)">
+						<i class="fas fa-pencil" aria-hidden="true" />
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit modifier
+						</q-tooltip>
+					</a>
+					<a class="btn btn-sm bg-neutral-5" @click="deleteModifier(data.row.index)">
+						<i class="fas fa-trash-alt" aria-hidden="true" />
+						<q-tooltip anchor="top middle" self="center middle">
+							Delete modifier
+						</q-tooltip>
+					</a>
+				</div>
+			</template>
 		</hk-table>
 	</div>
 </template>

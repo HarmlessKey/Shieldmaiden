@@ -1,17 +1,23 @@
 <template>
 	<hk-card>
-		<div class="card-header" slot="header">
-			<h1>{{ title }} for D&D 5e</h1>
-			<slot name="action_btn" />
-		</div>
-		<div slot="image" class="card-image" :style="{ backgroundImage: `url(${img})` }"></div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>{{ title }} for D&D 5e</h1>
+				<slot name="action_btn" />
+			</div>
+		</template>
+		<template v-slot:image>
+			<div class="card-image" :style="{ backgroundImage: `url(${img})` }"></div>
+		</template>
 		<div class="card-body">
 			<SignedIn v-if="user && showSignedIn" />
 			<slot />
 		</div>
-		<div slot="footer" class="card-footer">
-			<slot btn_classes="full-width" name="action_btn" />
-		</div>
+		<template v-slot:footer>
+			<div class="card-footer">
+				<slot btn_classes="full-width" name="action_btn" />
+			</div>
+		</template>
 	</hk-card>
 </template>
 

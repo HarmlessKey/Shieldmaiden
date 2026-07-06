@@ -1,11 +1,13 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1><i aria-hidden="true" class="fas fa-book mr-1"></i> Rules</h1>
-			<span class="neutral-3">
-				Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
-			</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1><i aria-hidden="true" class="fas fa-book mr-1"></i> Rules</h1>
+				<span class="neutral-3">
+					Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+				</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<CheatSheet compendium />
 		</div>

@@ -1,8 +1,7 @@
 <template>
 	<hk-card>
-		<hk-loader v-if="loading" name="monster" />
-		<template v-else>
-			<div slot="header" class="card-header">
+		<template v-slot:header>
+			<div v-if="!loading" class="card-header">
 				<h1>
 					{{ not_found ? "Monster not found" : monster.name.capitalizeEach() }}
 				</h1>
@@ -19,6 +18,9 @@
 					/>
 				</div>
 			</div>
+		</template>
+		<hk-loader v-if="loading" name="monster" />
+		<template v-else>
 			<div v-if="not_found" class="card-body">
 				<p>
 					Could not find homebrew monster <strong>{{ id }}</strong>

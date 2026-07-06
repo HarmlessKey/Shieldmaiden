@@ -147,7 +147,6 @@
 						<template v-for="(player, key) in players">
 							<li v-if="!Object.keys(entities).includes(key)" :key="key" class="players">
 								<q-checkbox
-									slot="append"
 									size="s"
 									:dark="$store.getters.theme === 'dark'"
 									:false-value="undefined"

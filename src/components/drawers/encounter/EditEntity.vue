@@ -214,29 +214,31 @@
 					class="mb-1"
 					:key="`setting-${index}`"
 				>
-					<q-item slot="selected" dense>
-						<q-item-section avatar>
-							<q-icon :name="setting.icon" size="small" />
-						</q-item-section>
-						<q-item-section>
-							<q-item-label v-text="setting.name" />
-						</q-item-section>
-						<q-item-section side>
-							<q-icon
-								:name="
-									entity.settings && entity.settings[setting.key] !== undefined
-										? displaySetting(index, setting.key, entity.settings[setting.key]).icon
-										: displaySetting(index, setting.key, undefined).icon
-								"
-								:class="
-									entity.settings && entity.settings[setting.key] !== undefined
-										? displaySetting(index, setting.key, entity.settings[setting.key]).color
-										: displaySetting(index, setting.key, undefined).color
-								"
-								size="small"
-							/>
-						</q-item-section>
-					</q-item>
+					<template v-slot:selected>
+						<q-item dense>
+							<q-item-section avatar>
+								<q-icon :name="setting.icon" size="small" />
+							</q-item-section>
+							<q-item-section>
+								<q-item-label v-text="setting.name" />
+							</q-item-section>
+							<q-item-section side>
+								<q-icon
+									:name="
+										entity.settings && entity.settings[setting.key] !== undefined
+											? displaySetting(index, setting.key, entity.settings[setting.key]).icon
+											: displaySetting(index, setting.key, undefined).icon
+									"
+									:class="
+										entity.settings && entity.settings[setting.key] !== undefined
+											? displaySetting(index, setting.key, entity.settings[setting.key]).color
+											: displaySetting(index, setting.key, undefined).color
+									"
+									size="small"
+								/>
+							</q-item-section>
+						</q-item>
+					</template>
 					<template v-slot:option="scope">
 						<q-item
 							clickable

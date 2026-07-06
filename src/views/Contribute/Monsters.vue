@@ -25,37 +25,41 @@
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-4">
 					<hk-card>
-						<div class="card-header" slot="header">
-							Untagged Monsters
-							<span v-if="untaggedMonsters">{{ Object.keys(untaggedMonsters).length }}</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								Untagged Monsters
+								<span v-if="untaggedMonsters">{{ Object.keys(untaggedMonsters).length }}</span>
+							</div>
+						</template>
 						<hk-table
 							:items="untaggedMonsters"
 							:columns="untaggedColumns"
 							:perPage="15"
 							:search="['name']"
 						>
-							<router-link
-								:to="'/contribute/monsters/' + data.row['.key']"
-								slot="name"
-								slot-scope="data"
-								:class="isDifficult(data.row) ? 'red' : ''"
-							>
-								<span>{{ data.item }}</span>
-								<a v-if="isDifficult(data.row)" class="ml-2">
-									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Dificult </q-tooltip>
-								</a>
-							</router-link>
-							<div slot="actions" slot-scope="data" class="actions">
-								<a
-									v-if="Object.keys(taggedMonster).length === 0"
-									@click="tag(data.row['.key'], data.row.name)"
+							<template v-slot:name="data">
+								<router-link
+									:to="'/contribute/monsters/' + data.row['.key']"
+									:class="isDifficult(data.row) ? 'red' : ''"
 								>
-									<i aria-hidden="true" class="fas fa-plus"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Tag </q-tooltip>
-								</a>
-							</div>
+									<span>{{ data.item }}</span>
+									<a v-if="isDifficult(data.row)" class="ml-2">
+										<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Dificult </q-tooltip>
+									</a>
+								</router-link>
+							</template>
+							<template v-slot:actions="data">
+								<div class="actions">
+									<a
+										v-if="Object.keys(taggedMonster).length === 0"
+										@click="tag(data.row['.key'], data.row.name)"
+									>
+										<i aria-hidden="true" class="fas fa-plus"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Tag </q-tooltip>
+									</a>
+								</div>
+							</template>
 						</hk-table>
 					</hk-card>
 				</div>
@@ -66,62 +70,64 @@
 						v-for="({ key, name, monsters }, index) in taggedMonsters"
 						:key="`tagged-${index}`"
 					>
-						<div class="card-header" slot="header">
-							{{ name }}
-							<span v-if="monsters">{{ Object.keys(monsters).length }}</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								{{ name }}
+								<span v-if="monsters">{{ Object.keys(monsters).length }}</span>
+							</div>
+						</template>
 
 						<hk-table :items="monsters" :columns="taggedColumns">
-							<router-link
-								:to="'/contribute/monsters/' + data.row['.key']"
-								slot="name"
-								slot-scope="data"
-							>
-								{{ data.item ? data.item.capitalizeEach() : data.item }}
-							</router-link>
-
-							<div slot="actions" slot-scope="data" class="actions">
-								<router-link :to="'/contribute/monsters/' + data.row['.key'] + '/edit'">
-									<i aria-hidden="true" class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+							<template v-slot:name="data">
+								<router-link :to="'/contribute/monsters/' + data.row['.key']">
+									{{ data.item ? data.item.capitalizeEach() : data.item }}
 								</router-link>
-								<a
-									@click="
-										setDrawer({
-											show: true,
-											type: 'contribute/monster/ViewMonster',
-											data: data.row,
-										})
-									"
-								>
-									<i aria-hidden="true" class="fas fa-eye"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Preview </q-tooltip>
-								</a>
-								<a @click="markDifficult(data.row)">
-									<i
-										aria-hidden="true"
-										class="fas fa-exclamation"
-										:class="isDifficult(data.row) ? 'red' : ''"
-									></i>
-									<q-tooltip anchor="top middle" self="center middle"> Mark difficult </q-tooltip>
-								</a>
-								<a @click="confirmFinish(data.row['.key'], data.row.name)">
-									<i aria-hidden="true" class="fas fa-check"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Finish </q-tooltip>
-								</a>
-								<a @click="unTag(data.row['.key'])">
-									<i aria-hidden="true" class="fas fa-times"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Untag </q-tooltip>
-								</a>
-								<a v-if="key === 'allTagged'">
-									<i aria-hidden="true" class="fas fa-info"></i>
-									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
-										<hk-card header="Info" class="mb-0">
-											Tagged by: {{ getPlayerName(data.row.metadata.tagged) }}<br />
-										</hk-card>
-									</q-popup-proxy>
-								</a>
-							</div>
+							</template>
+
+							<template v-slot:actions="data">
+								<div class="actions">
+									<router-link :to="'/contribute/monsters/' + data.row['.key'] + '/edit'">
+										<i aria-hidden="true" class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+									</router-link>
+									<a
+										@click="
+											setDrawer({
+												show: true,
+												type: 'contribute/monster/ViewMonster',
+												data: data.row,
+											})
+										"
+									>
+										<i aria-hidden="true" class="fas fa-eye"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Preview </q-tooltip>
+									</a>
+									<a @click="markDifficult(data.row)">
+										<i
+											aria-hidden="true"
+											class="fas fa-exclamation"
+											:class="isDifficult(data.row) ? 'red' : ''"
+										></i>
+										<q-tooltip anchor="top middle" self="center middle"> Mark difficult </q-tooltip>
+									</a>
+									<a @click="confirmFinish(data.row['.key'], data.row.name)">
+										<i aria-hidden="true" class="fas fa-check"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Finish </q-tooltip>
+									</a>
+									<a @click="unTag(data.row['.key'])">
+										<i aria-hidden="true" class="fas fa-times"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Untag </q-tooltip>
+									</a>
+									<a v-if="key === 'allTagged'">
+										<i aria-hidden="true" class="fas fa-info"></i>
+										<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
+											<hk-card header="Info" class="mb-0">
+												Tagged by: {{ getPlayerName(data.row.metadata.tagged) }}<br />
+											</hk-card>
+										</q-popup-proxy>
+									</a>
+								</div>
+							</template>
 						</hk-table>
 					</hk-card>
 				</div>
@@ -129,10 +135,12 @@
 				<!-- FINISHED -->
 				<div class="col-12 col-md-4">
 					<hk-card>
-						<div class="card-header" slot="header">
-							Finished Monsters
-							<span v-if="finishedMonsters">{{ Object.keys(finishedMonsters).length }}</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								Finished Monsters
+								<span v-if="finishedMonsters">{{ Object.keys(finishedMonsters).length }}</span>
+							</div>
+						</template>
 
 						<q-checkbox
 							v-if="userInfo.admin"
@@ -150,93 +158,101 @@
 							:search="['name']"
 							class="mb-4"
 						>
-							<div slot="name" slot-scope="data" :class="isDifficult(data.row) ? 'red' : ''">
-								<span>{{ data.item.capitalizeEach() }}</span>
-								<a v-if="isDifficult(data.row)" class="ml-2">
-									<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Difficult </q-tooltip>
-								</a>
-							</div>
-							<div slot="actions" slot-scope="data" class="actions">
-								<a v-if="isDifficult(data.row)" @click="markDifficult(data.row)">
-									<i
-										aria-hidden="true"
-										class="fas fa-exclamation"
-										:class="isDifficult(data.row) ? 'red' : ''"
-									></i>
-									<q-tooltip anchor="top middle" self="center middle"> Unmark difficult </q-tooltip>
-								</a>
-								<router-link v-if="userInfo.admin" :to="'/contribute/monsters/' + data.row['.key']">
-									<i aria-hidden="true" class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-								</router-link>
-								<a
-									@click="
-										setDrawer({
-											show: true,
-											type: 'contribute/monster/ViewMonster',
-											data: data.row,
-										})
-									"
-								>
-									<i aria-hidden="true" class="fas fa-eye"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Preview </q-tooltip>
-								</a>
-								<a v-if="userInfo.admin">
-									<i aria-hidden="true" class="fas fa-info"></i>
-									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
-										<hk-card header="Info" class="mb-0">
-											Finished by:
-											{{ getPlayerName(data.row.metadata.finished_by) }}
-										</hk-card>
-									</q-popup-proxy>
-								</a>
-								<a
-									v-if="userInfo.admin && userId !== data.row.metadata.finished_by"
-									@click="approve(data.row['.key'])"
-								>
-									<i aria-hidden="true" class="fas fa-check white"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Approve </q-tooltip>
-								</a>
-							</div>
+							<template v-slot:name="data">
+								<div :class="isDifficult(data.row) ? 'red' : ''">
+									<span>{{ data.item.capitalizeEach() }}</span>
+									<a v-if="isDifficult(data.row)" class="ml-2">
+										<i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Difficult </q-tooltip>
+									</a>
+								</div>
+							</template>
+							<template v-slot:actions="data">
+								<div class="actions">
+									<a v-if="isDifficult(data.row)" @click="markDifficult(data.row)">
+										<i
+											aria-hidden="true"
+											class="fas fa-exclamation"
+											:class="isDifficult(data.row) ? 'red' : ''"
+										></i>
+										<q-tooltip anchor="top middle" self="center middle"> Unmark difficult </q-tooltip>
+									</a>
+									<router-link v-if="userInfo.admin" :to="'/contribute/monsters/' + data.row['.key']">
+										<i aria-hidden="true" class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+									</router-link>
+									<a
+										@click="
+											setDrawer({
+												show: true,
+												type: 'contribute/monster/ViewMonster',
+												data: data.row,
+											})
+										"
+									>
+										<i aria-hidden="true" class="fas fa-eye"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Preview </q-tooltip>
+									</a>
+									<a v-if="userInfo.admin">
+										<i aria-hidden="true" class="fas fa-info"></i>
+										<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
+											<hk-card header="Info" class="mb-0">
+												Finished by:
+												{{ getPlayerName(data.row.metadata.finished_by) }}
+											</hk-card>
+										</q-popup-proxy>
+									</a>
+									<a
+										v-if="userInfo.admin && userId !== data.row.metadata.finished_by"
+										@click="approve(data.row['.key'])"
+									>
+										<i aria-hidden="true" class="fas fa-check white"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Approve </q-tooltip>
+									</a>
+								</div>
+							</template>
 						</hk-table>
 
 						<h3><i aria-hidden="true" class="fas fa-check green" /> Approved monsters</h3>
 						<hk-table :items="approvedMonsters" :columns="untaggedColumns" :perPage="15">
-							<div slot="name" slot-scope="data">
-								<span>{{ data.item.capitalizeEach() }}</span>
-							</div>
-							<div slot="actions" slot-scope="data" class="actions">
-								<a
-									@click="
-										setDrawer({
-											show: true,
-											type: 'contribute/monster/ViewMonster',
-											data: data.row,
-										})
-									"
-								>
-									<i aria-hidden="true" class="fas fa-eye"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Preview </q-tooltip>
-								</a>
-								<a v-if="userInfo.admin">
-									<i aria-hidden="true" class="fas fa-info"></i>
-									<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
-										<hk-card header="Info" class="mb-0">
-											Approved by: {{ getPlayerName(data.row.metadata.approved) }}<br />
-											Finished by:
-											{{ getPlayerName(data.row.metadata.finished_by) }}
-										</hk-card>
-									</q-popup-proxy>
-								</a>
-								<a
-									v-if="userInfo.admin && userId !== data.row.metadata.finished_by"
-									@click="disApprove(data.row['.key'])"
-								>
-									<i aria-hidden="true" class="fas fa-times white"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Disapprove </q-tooltip>
-								</a>
-							</div>
+							<template v-slot:name="data">
+								<div>
+									<span>{{ data.item.capitalizeEach() }}</span>
+								</div>
+							</template>
+							<template v-slot:actions="data">
+								<div class="actions">
+									<a
+										@click="
+											setDrawer({
+												show: true,
+												type: 'contribute/monster/ViewMonster',
+												data: data.row,
+											})
+										"
+									>
+										<i aria-hidden="true" class="fas fa-eye"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Preview </q-tooltip>
+									</a>
+									<a v-if="userInfo.admin">
+										<i aria-hidden="true" class="fas fa-info"></i>
+										<q-popup-proxy :dark="$store.getters.theme === 'dark'" square>
+											<hk-card header="Info" class="mb-0">
+												Approved by: {{ getPlayerName(data.row.metadata.approved) }}<br />
+												Finished by:
+												{{ getPlayerName(data.row.metadata.finished_by) }}
+											</hk-card>
+										</q-popup-proxy>
+									</a>
+									<a
+										v-if="userInfo.admin && userId !== data.row.metadata.finished_by"
+										@click="disApprove(data.row['.key'])"
+									>
+										<i aria-hidden="true" class="fas fa-times white"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Disapprove </q-tooltip>
+									</a>
+								</div>
+							</template>
 						</hk-table>
 					</hk-card>
 				</div>

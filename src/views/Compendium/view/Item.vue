@@ -1,15 +1,17 @@
 <template>
 	<hk-card>
-		<template v-if="!loading">
-			<div slot="header" class="card-header">
+		<template v-slot:header>
+			<div v-if="!loading" class="card-header">
 				<h1>{{ not_found ? "Item not found" : item.name }}</h1>
-				<hk-share 
-					v-if="!not_found" 
+				<hk-share
+					v-if="!not_found"
 					:title="item.meta.title.capitalizeEach()"
-					:text="item.meta.description" 
+					:text="item.meta.description"
 					size="sm"
 				/>
 			</div>
+		</template>
+		<template v-if="!loading">
 			<div class="card-body">
 				<div v-if="not_found">
 					<p>Could not find item <strong>{{ id }}</strong></p>

@@ -25,26 +25,28 @@
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
-					<q-item-section avatar>
-						<q-icon :name="setting.icon" class="neutral-2" size="large" />
-					</q-item-section>
-					<q-item-section class="neutral-2 truncate">
-						<q-item-label class="truncate">
-							{{ setting.name }}
-						</q-item-label>
-						<q-item-label caption class="truncate">
-							{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
-						</q-item-label>
-					</q-item-section>
-					<q-item-section side>
-						<q-icon
-							:name="displaySetting(type_key, setting.key, settings[setting.key]).icon"
-							:class="displaySetting(type_key, setting.key, settings[setting.key]).color"
-							size="medium"
-						/>
-					</q-item-section>
-				</q-item>
+				<template v-slot:selected>
+					<q-item :dark="$store.getters.theme === 'dark'">
+						<q-item-section avatar>
+							<q-icon :name="setting.icon" class="neutral-2" size="large" />
+						</q-item-section>
+						<q-item-section class="neutral-2 truncate">
+							<q-item-label class="truncate">
+								{{ setting.name }}
+							</q-item-label>
+							<q-item-label caption class="truncate">
+								{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
+							</q-item-label>
+						</q-item-section>
+						<q-item-section side>
+							<q-icon
+								:name="displaySetting(type_key, setting.key, settings[setting.key]).icon"
+								:class="displaySetting(type_key, setting.key, settings[setting.key]).color"
+								size="medium"
+							/>
+						</q-item-section>
+					</q-item>
+				</template>
 				<template v-slot:option="scope">
 					<q-item
 						clickable
@@ -61,13 +63,17 @@
 						</q-item-section>
 					</q-item>
 				</template>
-				<hk-popover v-if="setting.info" slot="after" :header="setting.name">
-					<q-icon name="info" size="sm" color="neutral-3" />
-					<div slot="content">
-						<div v-html="setting.info" />
-						<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
-					</div>
-				</hk-popover>
+				<template v-slot:after>
+					<hk-popover v-if="setting.info" :header="setting.name">
+						<q-icon name="info" size="sm" color="neutral-3" />
+						<template v-slot:content>
+							<div>
+								<div v-html="setting.info" />
+								<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
+							</div>
+						</template>
+					</hk-popover>
+				</template>
 			</q-select>
 		</div>
 

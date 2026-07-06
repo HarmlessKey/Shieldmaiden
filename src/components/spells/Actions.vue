@@ -1,14 +1,16 @@
 <template>
 	<div>
 		<hk-card>
-			<div slot="header" class="card-header d-flex justify-content-between">
-				Spell actions
-				<a class="btn btn-sm bg-neutral-5" @click="add_action()">
-					<i aria-hidden="true" class="fas fa-plus green"></i>
-					<span class="d-none d-md-inline ml-1">Add</span>
-					<q-tooltip anchor="top middle" self="center middle"> Add action </q-tooltip>
-				</a>
-			</div>
+			<template v-slot:header>
+				<div class="card-header d-flex justify-content-between">
+					Spell actions
+					<a class="btn btn-sm bg-neutral-5" @click="add_action()">
+						<i aria-hidden="true" class="fas fa-plus green"></i>
+						<span class="d-none d-md-inline ml-1">Add</span>
+						<q-tooltip anchor="top middle" self="center middle"> Add action </q-tooltip>
+					</a>
+				</div>
+			</template>
 			<div class="card-body">
 				<p>
 					Spell actions are the parts of a spell that can be rolled. By adding spell actions to your
@@ -33,21 +35,24 @@
 						@keyup="$forceUpdate()"
 						@input="(value) => parseToInt(value, spell, 'projectiles')"
 					>
-						<hk-popover slot="append" header="Projectiles">
-							<i class="fas fa-info-circle" aria-hidden="true" />
-							<template #content>
-								Some spells, like Magic Missiles (phb 257) have multiple projectiles that can be
-								fired to different targets. For each projectile, every spell action is rolled.
-							</template>
-						</hk-popover>
-						<button
-							v-if="spell.projectiles && spell.scaling && spell.scaling != 'none'"
-							slot="after"
-							@click.prevent="scaling_dialog = true"
-							class="btn bg-neutral-5"
-						>
-							<i class="fas fa-chart-line" aria-hidden="true" />
-						</button>
+						<template v-slot:append>
+							<hk-popover header="Projectiles">
+								<i class="fas fa-info-circle" aria-hidden="true" />
+								<template #content>
+									Some spells, like Magic Missiles (phb 257) have multiple projectiles that can be
+									fired to different targets. For each projectile, every spell action is rolled.
+								</template>
+							</hk-popover>
+						</template>
+						<template v-slot:after>
+							<button
+								v-if="spell.projectiles && spell.scaling && spell.scaling != 'none'"
+								@click.prevent="scaling_dialog = true"
+								class="btn bg-neutral-5"
+							>
+								<i class="fas fa-chart-line" aria-hidden="true" />
+							</button>
+						</template>
 					</q-input>
 				</ValidationProvider>
 				<q-select
@@ -66,14 +71,16 @@
 					@new-value="addOption"
 					@remove="removeOption"
 				>
-					<hk-popover slot="append" header="Action options">
-						<i class="fas fa-info-circle" aria-hidden="true" />
-						<template #content>
-							Options allow you to create slightly different rolls for the actions and choose to use
-							this spell with one of the options. Think of versatile weapon attacks where you roll a
-							different damage die for 1- or 2-handed attacks.
-						</template>
-					</hk-popover>
+					<template v-slot:append>
+						<hk-popover header="Action options">
+							<i class="fas fa-info-circle" aria-hidden="true" />
+							<template #content>
+								Options allow you to create slightly different rolls for the actions and choose to use
+								this spell with one of the options. Think of versatile weapon attacks where you roll a
+								different damage die for 1- or 2-handed attacks.
+							</template>
+						</hk-popover>
+					</template>
 				</q-select>
 
 				<!-- ACTION LIST -->
@@ -211,16 +218,18 @@
 									:spell="spell"
 								/>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
-								<q-btn
-									color="primary"
-									type="submit"
-									no-caps
-									:disabled="!meta.valid"
-									:label="edit_index !== undefined ? 'Save' : 'Add'"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-end">
+									<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
+									<q-btn
+										color="primary"
+										type="submit"
+										no-caps
+										:disabled="!meta.valid"
+										:label="edit_index !== undefined ? 'Save' : 'Add'"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>
@@ -240,9 +249,11 @@
 									@input="$forceUpdate()"
 								/>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" v-close-popup no-caps>Close</q-btn>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-end">
+									<q-btn class="mr-1" v-close-popup no-caps>Close</q-btn>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>

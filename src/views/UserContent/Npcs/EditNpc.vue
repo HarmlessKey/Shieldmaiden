@@ -97,10 +97,12 @@
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">
 			<hk-card class="create-dialog">
-				<div slot="header" class="card-header">
-					<span>Copy existing NPC</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Copy existing NPC</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<CopyContent @copy="copy" type="monster" />
 				</div>
@@ -109,30 +111,36 @@
 
 		<q-dialog v-model="account_dialog">
 			<hk-card class="account-dialog">
-				<div slot="header" class="card-header">
-					<span>Save your monster</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Save your monster</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
 					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
 						Create Free Account
 					</button>
 				</div>
-				<div slot="footer" class="card-footer">
-					<q-btn no-caps @click="download">
-						Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
-					</q-btn>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<q-btn no-caps @click="download">
+							Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+						</q-btn>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
 		<q-dialog v-model="create_dialog" persistent position="top">
 			<hk-card class="create-dialog">
-				<div slot="header" class="card-header">
-					<div v-if="generating"><span class="loader">Generating your monster</span></div>
-					<template v-else> How do you want to do this? </template>
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<div v-if="generating"><span class="loader">Generating your monster</span></div>
+						<template v-else> How do you want to do this? </template>
+					</div>
+				</template>
 				<div
 					v-if="!generate_monster"
 					class="card-body"
@@ -163,16 +171,18 @@
 				<template v-if="generate_monster">
 					<GenerateMonster @generating="setGenerating" @finished="finishedGenerate" />
 				</template>
-				<div v-if="copy_monster || generate_monster" class="card-footer" slot="footer">
-					<button
-						v-if="!generating"
-						class="btn btn-sm bg-neutral-5"
-						@click="((copy_monster = false), (generate_monster = false))"
-					>
-						<i class="fas fa-times mr-1" aria-hidden="true" />
-						Cancel
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div v-if="copy_monster || generate_monster" class="card-footer">
+						<button
+							v-if="!generating"
+							class="btn btn-sm bg-neutral-5"
+							@click="((copy_monster = false), (generate_monster = false))"
+						>
+							<i class="fas fa-times mr-1" aria-hidden="true" />
+							Cancel
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 

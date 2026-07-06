@@ -1,33 +1,35 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1>
-				<i class="fas fa-dragon mr-1" aria-hidden="true" />
-				{{ source?.capitalize() }}
-				Monsters
-			</h1>
-			<span v-if="source === 'homebrew'" class="neutral-3">
-				Instagram
-				<a
-					class="btn btn-sm btn-clear"
-					href="https://www.instagram.com/shieldmaidenapp"
-					target="_blank"
-					rel="noopener"
-				>
-					#shieldmaidenapp
-				</a>
-			</span>
-			<span v-else class="neutral-3">
-				Resource
-				<a
-					class="btn btn-sm btn-clear"
-					href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
-					target="_blank"
-					rel="noopener"
-					>SRD 5.1</a
-				>
-			</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>
+					<i class="fas fa-dragon mr-1" aria-hidden="true" />
+					{{ source?.capitalize() }}
+					Monsters
+				</h1>
+				<span v-if="source === 'homebrew'" class="neutral-3">
+					Instagram
+					<a
+						class="btn btn-sm btn-clear"
+						href="https://www.instagram.com/shieldmaidenapp"
+						target="_blank"
+						rel="noopener"
+					>
+						#shieldmaidenapp
+					</a>
+				</span>
+				<span v-else class="neutral-3">
+					Resource
+					<a
+						class="btn btn-sm btn-clear"
+						href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
+						target="_blank"
+						rel="noopener"
+						>SRD 5.1</a
+					>
+				</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<q-input
 				:dark="$store.getters.theme !== 'light'"
@@ -41,20 +43,24 @@
 				@keyup.enter="filterMonsters"
 				@clear="filterMonsters"
 			>
-				<button slot="append" class="btn bg-neutral-5" @click="filterMonsters">
-					<q-icon name="search" />
-				</button>
-				<q-btn slot="after" color="primary" no-caps @click="filter_dialog = true">
-					Filter
-					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge
-						v-if="Object.keys(filter).length"
-						floating
-						rounded
-						color="red"
-						:label="Object.keys(filter).length"
-					/>
-				</q-btn>
+				<template v-slot:append>
+					<button class="btn bg-neutral-5" @click="filterMonsters">
+						<q-icon name="search" />
+					</button>
+				</template>
+				<template v-slot:after>
+					<q-btn color="primary" no-caps @click="filter_dialog = true">
+						Filter
+						<i class="fas fa-filter ml-2" aria-hidden="true" />
+						<q-badge
+							v-if="Object.keys(filter).length"
+							floating
+							rounded
+							color="red"
+							:label="Object.keys(filter).length"
+						/>
+					</q-btn>
+				</template>
 			</q-input>
 			<p v-if="!loading && pagination.rowsNumber === 0" class="red mt-1">
 				Nothing found
@@ -84,8 +90,12 @@
 				wrap-cells
 				@request="request"
 			>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="monsters" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="monsters" />
+				</template>
 
 				<template v-slot:header="props">
 					<q-tr :props="props">
@@ -154,16 +164,18 @@
 				<div class="card-body">
 					<hk-filter v-model="filter" type="monster" />
 				</div>
-				<div slot="footer" class="card-footer">
-					<button class="btn bg-neutral-5" @click="clearFilter">
-						<i class="fas fa-times" aria-hidden="true" />
-						Clear filter
-					</button>
-					<button class="btn ml-2" @click="setFilter">
-						<i class="fas fa-filter" aria-hidden="true" />
-						Set filter
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<button class="btn bg-neutral-5" @click="clearFilter">
+							<i class="fas fa-times" aria-hidden="true" />
+							Clear filter
+						</button>
+						<button class="btn ml-2" @click="setFilter">
+							<i class="fas fa-filter" aria-hidden="true" />
+							Set filter
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 	</hk-card>

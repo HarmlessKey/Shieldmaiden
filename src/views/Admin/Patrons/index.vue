@@ -24,45 +24,57 @@
 							:search="['full_name', 'email']"
 						>
 							<!-- EMAIL -->
-							<router-link :to="'/admin/patrons/' + data.row['.key']" slot="email" slot-scope="data">{{ data.item }}</router-link>
+							<template v-slot:email="data">
+								<router-link :to="'/admin/patrons/' + data.row['.key']">{{ data.item }}</router-link>
+							</template>
 
 							<!-- TIER -->
-							<span slot="tiers" slot-scope="data">
-								<template	v-for="(tier, key) in data.item">
-									<i aria-hidden="true" 
-										v-if="tiers[key]"
-										:key="tier"
-										class="fab fa-patreon"
-										:class="{
-											'blue': tiers[key].name == 'Folk Hero',
-											'purple': tiers[key].name == 'Noble',
-											'orange': tiers[key].name == 'Deity'
-										}"/>
-								</template>
-							</span>
+							<template v-slot:tiers="data">
+								<span>
+									<template	v-for="(tier, key) in data.item">
+										<i aria-hidden="true"
+											v-if="tiers[key]"
+											:key="tier"
+											class="fab fa-patreon"
+											:class="{
+												'blue': tiers[key].name == 'Folk Hero',
+												'purple': tiers[key].name == 'Noble',
+												'orange': tiers[key].name == 'Deity'
+											}"/>
+									</template>
+								</span>
+							</template>
 
 							<!-- END DATE -->"
-							<span slot="pledge_end" slot-scope="data">
-								<span :class="{'red': new Date(data.item) < new Date() }">
-									{{ makeDate(data.item, false, true) }}
+							<template v-slot:pledge_end="data">
+								<span>
+									<span :class="{'red': new Date(data.item) < new Date() }">
+										{{ makeDate(data.item, false, true) }}
+									</span>
 								</span>
-							</span>
+							</template>
 
 							<!-- STATUS -->
-							<span slot="last_charge_status" slot-scope="data">
-								<i aria-hidden="true" :class="{'green fas fa-check': data.item == 'Paid', 'red fas fa-times': data.item == 'Declined' }">
-								</i>
-							</span>
+							<template v-slot:last_charge_status="data">
+								<span>
+									<i aria-hidden="true" :class="{'green fas fa-check': data.item == 'Paid', 'red fas fa-times': data.item == 'Declined' }">
+									</i>
+								</span>
+							</template>
 
 							<!-- LIFETIME SUPPORT -->
-							<span slot="lifetime_support" slot-scope="data">
-									{{ formatNumber(data.item / 100, '$0,0') }}
-							</span>
+							<template v-slot:lifetime_support="data">
+								<span>
+										{{ formatNumber(data.item / 100, '$0,0') }}
+								</span>
+							</template>
 
 							<!-- LOADER -->
-							<div slot="table-loading" class="loader">
-								<span>Loading patrons....</span>
-							</div>
+							<template v-slot:table-loading>
+								<div class="loader">
+									<span>Loading patrons....</span>
+								</div>
+							</template>
 						</hk-table>
 					</div>
 		

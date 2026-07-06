@@ -1,8 +1,8 @@
 <template>
-	<div>
+	<div :class="$attrs.class" :style="$attrs.style">
 		<ValidationProvider :rules="rules" :name="fieldName" v-slot="{ errorMessage }" :modelValue="modelValue" as="div">
 			<q-select
-				v-bind="$attrs"
+				v-bind="attrsWithoutClassStyle"
 				v-model="inputModel"
 				:dark="$store.getters.theme === 'dark'"
 				:filled="filled"
@@ -51,6 +51,12 @@ export default {
 	},
 	emits: ["input", "update:modelValue"],
 	computed: {
+		// In Vue 3 class/style are part of $attrs; keep them on the wrapper div
+		// (Vue 2 behavior) instead of passing them through to the q-select
+		attrsWithoutClassStyle() {
+			const { class: _class, style: _style, ...rest } = this.$attrs;
+			return rest;
+		},
 		// vee-validate v4 requires a string name on every Field; fall back to a unique
 		// id so unnamed inputs without rules don't crash form path resolution
 		fieldName() {

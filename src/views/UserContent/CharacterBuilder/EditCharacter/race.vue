@@ -3,17 +3,19 @@
 		<ValidationObserver v-slot="{ meta }" as="div">
 			<q-form greedy>
 				<hk-card>
-					<div class="card-header" slot="header">
-						<span>Race</span>
-						<small class="saved green" v-if="saved" @animationend="saved = false">
-							<i aria-hidden="true" class="fas fa-check" />
-							Saved
-						</small>
-						<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-							<i aria-hidden="true" class="fas fa-times" />
-							Couldn't save
-						</small>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>Race</span>
+							<small class="saved green" v-if="saved" @animationend="saved = false">
+								<i aria-hidden="true" class="fas fa-check" />
+								Saved
+							</small>
+							<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+								<i aria-hidden="true" class="fas fa-times" />
+								Couldn't save
+							</small>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -89,13 +91,15 @@
 
 				<!-- Traits -->
 				<hk-card>
-					<div class="card-header" slot="header">
-						Traits
-						<button class="btn btn-sm bg-neutral-5" @click.prevent="addTrait(meta.valid)">
-							<i class="fas fa-plus green" aria-hidden="true" />
-							Add trait
-						</button>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							Traits
+							<button class="btn btn-sm bg-neutral-5" @click.prevent="addTrait(meta.valid)">
+								<i class="fas fa-plus green" aria-hidden="true" />
+								Add trait
+							</button>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-list dark square class="accordion">
 							<q-expansion-item

@@ -75,10 +75,12 @@
 									/>
 								</ValidationProvider>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
-								<q-btn color="primary" type="submit" no-caps label="Add note" :disabled="!meta.valid" />
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-end">
+									<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
+									<q-btn color="primary" type="submit" no-caps label="Add note" :disabled="!meta.valid" />
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>

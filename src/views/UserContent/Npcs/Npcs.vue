@@ -18,14 +18,15 @@
 						Generate
 					</button>
 				</template>
-				<button
-					v-if="tier.price !== 'Free'"
-					slot="actions-right"
-					class="btn btn-sm bg-neutral-5 mr-2"
-					@click="import_dialog = true"
-				>
-					Import
-				</button>
+				<template v-slot:actions-right>
+					<button
+						v-if="tier.price !== 'Free'"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						@click="import_dialog = true"
+					>
+						Import
+					</button>
+				</template>
 			</ContentHeader>
 
 			<div class="card-body" v-if="!loading_npcs">
@@ -41,7 +42,9 @@
 						clearable
 						placeholder="Search NPCs"
 					>
-						<q-icon slot="prepend" name="search" />
+						<template v-slot:prepend>
+							<q-icon name="search" />
+						</template>
 					</q-input>
 
 					<q-table
@@ -106,8 +109,12 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
-						<hk-loader slot="loading" name="NPCs" />
+						<template v-slot:no-data>
+							<div />
+						</template>
+						<template v-slot:loading>
+							<hk-loader name="NPCs" />
+						</template>
 					</q-table>
 				</template>
 
@@ -133,10 +140,12 @@
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
 			<hk-card class="npc-dialog">
-				<div slot="header" class="card-header">
-					<span>Import NPC from JSON</span>
-					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Import NPC from JSON</span>
+						<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<ImportUserContent type="npcs" />
 				</div>
@@ -146,18 +155,20 @@
 		<!-- generate dialog-->
 		<q-dialog v-model="generate_dialog">
 			<hk-card class="npc-dialog" :persistent="generating">
-				<div slot="header" class="card-header">
-					<span>Monster Generation</span>
-					<q-btn
-						v-if="!generating"
-						padding="sm"
-						size="sm"
-						no-caps
-						icon="fas fa-times"
-						flat
-						v-close-popup
-					/>
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Monster Generation</span>
+						<q-btn
+							v-if="!generating"
+							padding="sm"
+							size="sm"
+							no-caps
+							icon="fas fa-times"
+							flat
+							v-close-popup
+						/>
+					</div>
+				</template>
 				<div v-if="content_count.npcs >= tier.benefits.npcs && show_warning" class="card-body">
 					<h2 class="orange">Insufficient NPC slots</h2>
 					<p>You don't have enough NPC slots to save your generated monster.</p>

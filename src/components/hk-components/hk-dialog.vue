@@ -1,18 +1,22 @@
 <template>
 	<q-dialog ref="dialog" v-bind="$attrs">
 		<hk-card v-bind="$attrs" :class="cardClass">
-			<div slot="header" class="card-header">
-				<slot name="header">
-					{{ header }}
-				</slot>
-				<q-btn v-if="closable" round flat v-close-popup icon="close" size="sm" />
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					<slot name="header">
+						{{ header }}
+					</slot>
+					<q-btn v-if="closable" round flat v-close-popup icon="close" size="sm" />
+				</div>
+			</template>
 			<div :class="{ 'card-body': !noPadding }">
 				<slot />
 			</div>
-			<div v-if="$slots['footer']" slot="footer" class="card-footer">
-				<slot name="footer" />
-			</div>
+			<template v-if="$slots['footer']" v-slot:footer>
+				<div class="card-footer">
+					<slot name="footer" />
+				</div>
+			</template>
 		</hk-card>
 	</q-dialog>
 </template>

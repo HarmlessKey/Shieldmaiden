@@ -2,10 +2,12 @@
 	<div>
 		<ValidationObserver v-slot="{ meta }" as="div">
 			<hk-card :min-width="300">
-				<div slot="header" class="card-header">
-					Add avatar
-					<q-btn icon="close" no-caps flat dense @click="cancel" />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						Add avatar
+						<q-btn icon="close" no-caps flat dense @click="cancel" />
+					</div>
+				</template>
 				<div v-if="current_avatar" class="current-avatar">
 					<div class="d-flex justify-content-start items-center">
 						<div
@@ -97,17 +99,19 @@
 						</template>
 					</q-form>
 				</div>
-				<div slot="footer" class="card-footer">
-					<q-btn flat class="bg-neutral-8 mr-1" no-caps @click="cancel">Cancel</q-btn>
-					<q-btn
-						color="green"
-						no-caps
-						@click="acceptAvatar(meta.valid)"
-						:disable="!meta.valid || (!url && !using_crop)"
-					>
-						Accept
-					</q-btn>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<q-btn flat class="bg-neutral-8 mr-1" no-caps @click="cancel">Cancel</q-btn>
+						<q-btn
+							color="green"
+							no-caps
+							@click="acceptAvatar(meta.valid)"
+							:disable="!meta.valid || (!url && !using_crop)"
+						>
+							Accept
+						</q-btn>
+					</div>
+				</template>
 			</hk-card>
 		</ValidationObserver>
 	</div>

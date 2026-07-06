@@ -26,12 +26,13 @@
 						autocomplete="password"
 						:type="showPw ? 'text' : 'password'"
 					>
-						<q-icon
-							slot="append"
-							:name="showPw ? 'fas fa-eye' : 'fas fa-eye-slash'"
-							class="cursor-pointer"
-							@click="showPw = !showPw"
-						/>
+						<template v-slot:append>
+							<q-icon
+								:name="showPw ? 'fas fa-eye' : 'fas fa-eye-slash'"
+								class="cursor-pointer"
+								@click="showPw = !showPw"
+							/>
+						</template>
 					</hk-input>
 					<button class="btn btn-block my-3" type="submit">
 						Sign In <i aria-hidden="true" class="fas fa-sign-in-alt" />

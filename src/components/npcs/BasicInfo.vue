@@ -1,19 +1,21 @@
 <template>
 	<div>
 		<hk-card>
-			<div class="card-header p-0" slot="header">
-				<div class="d-flex justify-content-start items-center">
-					<div 
-						class="img" 
-						@click="avatar_dialog = true" 
-						:style="{ 
-							backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
-						}">
-						<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
+			<template v-slot:header>
+				<div class="card-header p-0">
+					<div class="d-flex justify-content-start items-center">
+						<div 
+							class="img" 
+							@click="avatar_dialog = true" 
+							:style="{ 
+								backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
+							}">
+							<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
+						</div>
+						Basic info
 					</div>
-					Basic info
 				</div>
-			</div>
+			</template>
 			<div class="card-body">
 
 				<!-- NAME -->
@@ -228,12 +230,14 @@
 								</q-item>
 							</q-list>
 						</template>
-						<div slot="after" v-if="npc.challenge_rating" class="pr-3">
-							+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Proficiency bonus
-							</q-tooltip>
-						</div>
+						<template v-slot:after>
+							<div v-if="npc.challenge_rating" class="pr-3">
+								+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
+								<q-tooltip anchor="top middle" self="center middle">
+									Proficiency bonus
+								</q-tooltip>
+							</div>
+						</template>
 					</q-select>
 				</ValidationProvider>
 

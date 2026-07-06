@@ -70,7 +70,9 @@
 											level_tier['dice_count'] = (value != undefined ? parseInt(value) : value)
 									"
 								>
-									<small slot="append">d{{ roll.dice_type }}</small>
+									<template v-slot:append>
+										<small>d{{ roll.dice_type }}</small>
+									</template>
 								</q-input>
 							</ValidationProvider>
 						</div>

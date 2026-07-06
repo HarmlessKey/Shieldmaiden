@@ -1,8 +1,10 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header d-flex justify-content-between">
-			<span>Basic Info</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header d-flex justify-content-between">
+				<span>Basic Info</span>
+			</div>
+		</template>
 
 		<div class="card-body">
 			<div class="row q-col-gutter-md">
@@ -239,7 +241,9 @@
 							:error-message="errorMessage"
 							@input="(value) => parseToInt(value, spell, 'range')"
 						>
-							<span slot="append" class="neutral-2">ft.</span>
+							<template v-slot:append>
+							<span class="neutral-2">ft.</span>
+						</template>
 						</q-input>
 					</ValidationProvider>
 				</div>
@@ -399,7 +403,9 @@
 							:error="!!errorMessage"
 							:error-message="errorMessage"
 						>
-							<span slot="append" class="neutral-2">ft.</span>
+							<template v-slot:append>
+							<span class="neutral-2">ft.</span>
+						</template>
 						</q-input>
 					</ValidationProvider>
 				</div>
@@ -437,13 +443,14 @@
 							:error-message="errorMessage"
 							@change="$forceUpdate()"
 						>
-							<hk-popover
-								slot="append"
-								header="At higher levels"
-								content="In what way does the spell change at higher levels?"
-							>
-								<q-icon name="info" />
-							</hk-popover>
+							<template v-slot:append>
+								<hk-popover
+									header="At higher levels"
+									content="In what way does the spell change at higher levels?"
+								>
+									<q-icon name="info" />
+								</hk-popover>
+							</template>
 						</q-select>
 					</ValidationProvider>
 				</div>

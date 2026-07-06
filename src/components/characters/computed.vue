@@ -1,31 +1,33 @@
 <template>
 	<hk-card :header="computed.character_name">
-		<div class="card-header" slot="header">
-			<div
-				class="image"
-				:style="computed.avatar ? `background-image: url('${computed.avatar}')` : ''"
-			>
-				<i v-if="!computed.avatar" class="hki-player" aria-hidden="true" />
-			</div>
-			<div>
-				<div class="name truncate">
-					<strong>{{ computed.character_name || "Unnamed Character" }}</strong>
+		<template v-slot:header>
+			<div class="card-header">
+				<div
+					class="image"
+					:style="computed.avatar ? `background-image: url('${computed.avatar}')` : ''"
+				>
+					<i v-if="!computed.avatar" class="hki-player" aria-hidden="true" />
 				</div>
 				<div>
-					Level {{ computed.level }} &bull; {{ computed.race.race_name }}
-					<template v-if="computed.classes">
-						<div v-for="(subclass, index) in classes" :key="`class-${index}`">
-							{{ (subclass.level &lt; computed.level) ? `${subclass.level}` : `` }}
-							<strong>{{ subclass.name }}</strong>
-							<template v-if="subclass.subclass">
-								<span class="blue mx-1">&bull;</span>
-								<em>{{ subclass.subclass }}</em>
-							</template>
-						</div>
-					</template>
+					<div class="name truncate">
+						<strong>{{ computed.character_name || "Unnamed Character" }}</strong>
+					</div>
+					<div>
+						Level {{ computed.level }} &bull; {{ computed.race.race_name }}
+						<template v-if="computed.classes">
+							<div v-for="(subclass, index) in classes" :key="`class-${index}`">
+								{{ (subclass.level &lt; computed.level) ? `${subclass.level}` : `` }}
+								<strong>{{ subclass.name }}</strong>
+								<template v-if="subclass.subclass">
+									<span class="blue mx-1">&bull;</span>
+									<em>{{ subclass.subclass }}</em>
+								</template>
+							</div>
+						</template>
+					</div>
 				</div>
 			</div>
-		</div>
+		</template>
 		<hk-xp-bar :xp="character.class.experience_points" :height="5" />
 		<q-tabs v-model="tab" dense inline-label no-caps align="justify" class="bg-neutral-9">
 			<q-tab name="sheet" label="Sheet" />

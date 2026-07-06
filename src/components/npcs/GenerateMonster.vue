@@ -272,7 +272,7 @@ export default {
 .slide-leave-active {
 	transition: all 0.5s ease;
 }
-.slide-enter {
+.slide-enter-from {
 	transform: translateX(100%);
 	opacity: 0;
 }
@@ -280,7 +280,7 @@ export default {
 	transform: translateX(0);
 	opacity: 1;
 }
-.slide-leave {
+.slide-leave-from {
 	transform: translateX(0);
 	opacity: 1;
 }

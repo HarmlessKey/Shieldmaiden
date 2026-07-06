@@ -204,18 +204,21 @@
 							: 'No scaling set'
 					"
 				>
-					<i slot="prepend" class="fas fa-chart-line" aria-hidden="true" />
-					<button
-						slot="append"
-						class="btn btn-sm bg-neutral-5"
-						@click.prevent="set_scaling = !set_scaling"
-					>
-						<i
-							class="fas"
-							:class="roll.scaling && roll.scaling.length ? 'fa-pencil' : 'fa-plus'"
-							aria-hidden="true"
-						/>
-					</button>
+					<template v-slot:prepend>
+						<i class="fas fa-chart-line" aria-hidden="true" />
+					</template>
+					<template v-slot:append>
+						<button
+							class="btn btn-sm bg-neutral-5"
+							@click.prevent="set_scaling = !set_scaling"
+						>
+							<i
+								class="fas"
+								:class="roll.scaling && roll.scaling.length ? 'fa-pencil' : 'fa-plus'"
+								aria-hidden="true"
+							/>
+						</button>
+					</template>
 				</q-input>
 			</template>
 
@@ -300,7 +303,7 @@
 <script>
 import { damage_types, dice_types } from "src/utils/generalConstants";
 import { spellScalingDescription } from "src/utils/spellFunctions";
-import { ValidationProvider } from "vee-validate";
+import { Field as ValidationProvider } from "vee-validate";
 
 export default {
 	name: "HkActionRollForm",

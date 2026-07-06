@@ -28,12 +28,13 @@
 					autocomplete="off"
 					type="text"
 				>
-					<hk-share
-						title="Shieldmaiden"
-						text="Follow my campaigns on Shieldmaiden!"
-						:url="url"
-						slot="after"
-					/>
+					<template v-slot:after>
+						<hk-share
+							title="Shieldmaiden"
+							text="Follow my campaigns on Shieldmaiden!"
+							:url="url"
+						/>
+					</template>
 				</q-input>
 			</div>
 		</div>

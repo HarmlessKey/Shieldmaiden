@@ -24,7 +24,9 @@
 						</template>
 					</slot>
 				</div>
-				<slot slot="footer" name="footer" />
+				<template v-slot:footer>
+					<slot name="footer" />
+				</template>
 			</hk-card>
 		</q-popup-proxy>
 	</span>

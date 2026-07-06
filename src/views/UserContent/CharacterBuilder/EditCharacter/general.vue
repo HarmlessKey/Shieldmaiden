@@ -1,16 +1,18 @@
 <template>
 	<hk-card>
-		<div class="card-header" slot="header">
-			<span>General characer info</span>
-			<small class="saved green" v-if="saved" @animationend="saved = false">
-				<i aria-hidden="true" class="fas fa-check" />
-				Saved
-			</small>
-			<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-				<i aria-hidden="true" class="fas fa-times" />
-				Couldn't save
-			</small>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<span>General characer info</span>
+				<small class="saved green" v-if="saved" @animationend="saved = false">
+					<i aria-hidden="true" class="fas fa-check" />
+					Saved
+				</small>
+				<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+					<i aria-hidden="true" class="fas fa-times" />
+					Couldn't save
+				</small>
+			</div>
+		</template>
 		<div class="card-body">
 			<ValidationObserver v-slot="{ meta }" as="div">
 				<q-form greedy>	

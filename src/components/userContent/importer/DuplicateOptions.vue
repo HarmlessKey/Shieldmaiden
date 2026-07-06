@@ -12,7 +12,6 @@
 		</div>
 		<q-btn-toggle
 			v-if="imported.meta.duplicate"
-			slot="footer"
 			v-model="imported.meta.overwrite"
 			toggle-color="primary"
 			dense

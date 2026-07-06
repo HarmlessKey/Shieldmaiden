@@ -1,32 +1,34 @@
 <template>
 	<div>
 		<hk-card>
-			<div slot="header" class="card-header d-flex justify-content-between">
-				Abilities
-				<a class="btn btn-sm bg-neutral-5">
-					<i aria-hidden="true" class="fas fa-plus green"></i>
-					<span class="d-none d-md-inline ml-1">Add</span>
-					<q-tooltip anchor="top middle" self="center middle"> Add </q-tooltip>
-					<q-popup-proxy :dark="$store.getters.theme === 'dark'">
-						<div class="bg-neutral-9">
-							<q-list>
-								<q-item
-									v-for="{ category, name_single } in actions"
-									:key="`add-${category}`"
-									clickable
-									v-close-popup
-									@click="add(category)"
-								>
-									<q-item-section avatar>
-										<i aria-hidden="true" class="fas fa-plus"></i>
-									</q-item-section>
-									<q-item-section>{{ name_single }}</q-item-section>
-								</q-item>
-							</q-list>
-						</div>
-					</q-popup-proxy>
-				</a>
-			</div>
+			<template v-slot:header>
+				<div class="card-header d-flex justify-content-between">
+					Abilities
+					<a class="btn btn-sm bg-neutral-5">
+						<i aria-hidden="true" class="fas fa-plus green"></i>
+						<span class="d-none d-md-inline ml-1">Add</span>
+						<q-tooltip anchor="top middle" self="center middle"> Add </q-tooltip>
+						<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+							<div class="bg-neutral-9">
+								<q-list>
+									<q-item
+										v-for="{ category, name_single } in actions"
+										:key="`add-${category}`"
+										clickable
+										v-close-popup
+										@click="add(category)"
+									>
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-plus"></i>
+										</q-item-section>
+										<q-item-section>{{ name_single }}</q-item-section>
+									</q-item>
+								</q-list>
+							</div>
+						</q-popup-proxy>
+					</a>
+				</div>
+			</template>
 
 			<div class="card-body -mt-3">
 				<template v-for="{ name, category, name_single } in actions">
@@ -370,15 +372,17 @@
 														@remove="removeOption($event, category, ability_index)"
 														@input="$forceUpdate()"
 													>
-														<hk-popover slot="append" header="Action options">
-															<i class="fas fa-info-circle" aria-hidden="true" />
-															<template #content>
-																Options allow you to create slightly different rolls for the actions
-																and choose to use this action with one of the options. Think of
-																versatile weapon attacks where you roll a different damage die for
-																1- or 2-handed attacks.
-															</template>
-														</hk-popover>
+														<template v-slot:append>
+															<hk-popover header="Action options">
+																<i class="fas fa-info-circle" aria-hidden="true" />
+																<template #content>
+																	Options allow you to create slightly different rolls for the actions
+																	and choose to use this action with one of the options. Think of
+																	versatile weapon attacks where you roll a different damage die for
+																	1- or 2-handed attacks.
+																</template>
+															</hk-popover>
+														</template>
 													</q-select>
 
 													<!-- ACTIONS -->
@@ -556,16 +560,18 @@
 								/>
 								<div v-else>Select an action type first</div>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
-								<q-btn
-									color="primary"
-									type="submit"
-									no-caps
-									:disabled="!meta.valid"
-									:label="edit_roll_index !== undefined ? 'Save' : 'Add'"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-end">
+									<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
+									<q-btn
+										color="primary"
+										type="submit"
+										no-caps
+										:disabled="!meta.valid"
+										:label="edit_roll_index !== undefined ? 'Save' : 'Add'"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>

@@ -2,17 +2,19 @@
 	<div>
 		<hk-card-deck>
 			<hk-card v-for="casting in caster_types" :key="casting.category">
-				<div slot="header" class="card-header d-flex justify-content-between">
-					{{ casting.name }}
-					<a
-						v-if="npc[`${casting.category}_ability`]"
-						@click="openDialog(casting.category)"
-						class="btn btn-sm bg-neutral-5"
-					>
-						<i aria-hidden="true" class="fas fa-plus green"></i>
-						<span class="ml-1">Add spell</span>
-					</a>
-				</div>
+				<template v-slot:header>
+					<div class="card-header d-flex justify-content-between">
+						{{ casting.name }}
+						<a
+							v-if="npc[`${casting.category}_ability`]"
+							@click="openDialog(casting.category)"
+							class="btn btn-sm bg-neutral-5"
+						>
+							<i aria-hidden="true" class="fas fa-plus green"></i>
+							<span class="ml-1">Add spell</span>
+						</a>
+					</div>
+				</template>
 
 				<div class="card-body">
 					<q-select
@@ -208,9 +210,11 @@
 						/>
 					</div>
 
-					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<q-btn class="mr-1" type="cancel" no-caps v-close-popup>Close</q-btn>
-					</div>
+					<template v-slot:footer>
+						<div class="card-footer d-flex justify-content-end">
+							<q-btn class="mr-1" type="cancel" no-caps v-close-popup>Close</q-btn>
+						</div>
+					</template>
 				</hk-card>
 			</div>
 		</q-dialog>

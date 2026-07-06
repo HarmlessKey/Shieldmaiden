@@ -1,18 +1,20 @@
 <template>
 	<hk-card header="">
-		<div class="card-header" slot="header">
-			<h1>Compendium D&D 5e</h1>
-			<span class="neutral-3">
-				Resource
-				<a
-					class="btn btn-sm btn-clear"
-					href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
-					target="_blank"
-					rel="noopener"
-					>SRD 5.1</a
-				>
-			</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>Compendium D&D 5e</h1>
+				<span class="neutral-3">
+					Resource
+					<a
+						class="btn btn-sm btn-clear"
+						href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
+						target="_blank"
+						rel="noopener"
+						>SRD 5.1</a
+					>
+				</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<ul class="entities hasImg">
 				<li v-for="(item, index) in items" :key="index">

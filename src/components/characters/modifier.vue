@@ -3,12 +3,14 @@
 	<ValidationObserver v-slot="{ handleSubmit }">
 		<q-form @submit="handleSubmit($event, saveModifier)" greedy>
 			<hk-card :min-width="300" no-margin>
-				<div slot="header" class="card-header d-flex justify-content-between">
-					<span>
-						{{ modifier['.key'] ? 'Edit' : 'New' }} modifier
-					</span>
-					<q-btn flat v-close-popup round icon="close" size="sm" class="ml-2" />
-				</div>
+				<template v-slot:header>
+					<div class="card-header d-flex justify-content-between">
+						<span>
+							{{ modifier['.key'] ? 'Edit' : 'New' }} modifier
+						</span>
+						<q-btn flat v-close-popup round icon="close" size="sm" class="ml-2" />
+					</div>
+				</template>
 
 				<div class="card-body">				
 					<!-- MODIFIER -->
@@ -123,12 +125,14 @@
 										:error="!!errorMessage"
 										:error-message="errorMessage"
 									>
-										<a slot="after" @click="addScaling" class="btn btn-block">
-											<i class="far fa-chart-line" aria-hidden="true"/>
-											<q-tooltip anchor="top middle" self="center middle">
-												Level scaling
-											</q-tooltip>
-										</a>
+										<template v-slot:after>
+											<a @click="addScaling" class="btn btn-block">
+												<i class="far fa-chart-line" aria-hidden="true"/>
+												<q-tooltip anchor="top middle" self="center middle">
+													Level scaling
+												</q-tooltip>
+											</a>
+										</template>
 									</q-input>
 								</ValidationProvider>
 								
@@ -279,10 +283,12 @@
 						</div>
 					</div>
 				</div>
-				<div slot="footer" class="card-footer d-flex justify-content-end">
-					<q-btn class="mr-2" label="Cancel" v-close-popup />
-					<q-btn type="submit" label="Save" no-caps color="primary" />
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer d-flex justify-content-end">
+						<q-btn class="mr-2" label="Cancel" v-close-popup />
+						<q-btn type="submit" label="Save" no-caps color="primary" />
+					</div>
+				</template>
 			</hk-card>
 		</q-form>
 	</ValidationObserver>

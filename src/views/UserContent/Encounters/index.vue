@@ -87,7 +87,9 @@
 					clearable
 					placeholder="Search encounter"
 				>
-					<q-icon slot="prepend" name="search" />
+					<template v-slot:prepend>
+						<q-icon name="search" />
+					</template>
 				</q-input>
 				<q-table
 					:rows="active_encounters"
@@ -160,7 +162,9 @@
 							</q-td>
 						</q-tr>
 					</template>
-					<div slot="no-data" />
+					<template v-slot:no-data>
+						<div />
+					</template>
 				</q-table>
 			</template>
 
@@ -248,8 +252,12 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
-						<hk-loader slot="loading" name="Encounters" />
+						<template v-slot:no-data>
+							<div />
+						</template>
+						<template v-slot:loading>
+							<hk-loader name="Encounters" />
+						</template>
 					</q-table>
 					<button
 						v-if="encounter_count > active_encounters.length + finished_encounters.length"
@@ -270,15 +278,16 @@
 						class="mb-3"
 					>
 						No finished encounters found.
-						<q-btn
-							slot="action"
-							size="sm"
-							flat
-							padding="sm"
-							no-caps
-							icon="fas fa-times"
-							@click="finished_fetched = false"
-						/>
+						<template v-slot:action>
+							<q-btn
+								size="sm"
+								flat
+								padding="sm"
+								no-caps
+								icon="fas fa-times"
+								@click="finished_fetched = false"
+							/>
+						</template>
 					</q-banner>
 					<button class="btn btn-block mb-2 bg-neutral-5" @click="getFinishedEncounters">
 						Get finished encounters
@@ -318,10 +327,12 @@
 								:rules="[(val) => (val && val.length > 0) || 'Enter a title']"
 							/>
 						</div>
-						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
-							<q-btn color="primary" type="submit" no-caps label="Add encounter" />
-						</div>
+						<template v-slot:footer>
+							<div class="card-footer d-flex justify-content-end">
+								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
+								<q-btn color="primary" type="submit" no-caps label="Add encounter" />
+							</div>
+						</template>
 					</hk-card>
 				</q-form>
 			</div>
@@ -351,10 +362,12 @@
 								:rules="[(val) => (val && val.length > 0) || 'Enter a title']"
 							/>
 						</div>
-						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
-							<q-btn color="primary" type="submit" no-caps label="Add encounter" />
-						</div>
+						<template v-slot:footer>
+							<div class="card-footer d-flex justify-content-end">
+								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
+								<q-btn color="primary" type="submit" no-caps label="Add encounter" />
+							</div>
+						</template>
 					</hk-card>
 				</q-form>
 			</div>

@@ -83,30 +83,31 @@
 										:error-message="errorMessage"
 										@input="editCampaign.hk_background = null"
 									>
-										<hk-popover
-											slot="append"
-											header="Custom background"
-											v-if="tier && tier.price !== 'Free'"
-										>
-											<i class="fas fa-info-circle" aria-hidden="true" />
-											<template #content>
-												Setting a custom background will overwrite your selected background.
-											</template>
-										</hk-popover>
+										<template v-slot:append>
+											<hk-popover
+												header="Custom background"
+												v-if="tier && tier.price !== 'Free'"
+											>
+												<i class="fas fa-info-circle" aria-hidden="true" />
+												<template #content>
+													Setting a custom background will overwrite your selected background.
+												</template>
+											</hk-popover>
+										</template>
 									</q-input>
 								</ValidationProvider>
 							</div>
 						</div>
 
 						<div class="mt-3 neutral-2 pointer">
-							<span class="btn btn-clear" @click="$set(editCampaign, 'private', null)">
+							<span class="btn btn-clear" @click="editCampaign.private = null">
 								<span :class="!editCampaign.private ? 'green' : 'neutral-2'">
 									<i aria-hidden="true" class="fas fa-eye"></i>
 									Public
 								</span>
 							</span>
 							/
-							<span class="btn btn-clear mr-2" @click="$set(editCampaign, 'private', true)">
+							<span class="btn btn-clear mr-2" @click="editCampaign.private = true">
 								<span :class="editCampaign.private ? 'red' : 'neutral-2'">
 									<i aria-hidden="true" class="fas fa-eye-slash"></i>
 									Private
@@ -124,15 +125,17 @@
 							</hk-popover>
 						</div>
 					</div>
-					<div slot="footer" class="card-footer">
-						<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="mr-2">
-							<q-tooltip anchor="top middle" self="center middle">
-								There are validation errors
-							</q-tooltip>
-						</q-icon>
-						<q-btn class="bg-neutral-5 mr-2" label="Cancel" no-caps v-close-popup />
-						<q-btn color="blue" type="submit" no-caps>Save</q-btn>
-					</div>
+					<template v-slot:footer>
+						<div class="card-footer">
+							<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="mr-2">
+								<q-tooltip anchor="top middle" self="center middle">
+									There are validation errors
+								</q-tooltip>
+							</q-icon>
+							<q-btn class="bg-neutral-5 mr-2" label="Cancel" no-caps v-close-popup />
+							<q-btn color="blue" type="submit" no-caps>Save</q-btn>
+						</div>
+					</template>
 				</hk-card>
 			</q-form>
 		</ValidationObserver>

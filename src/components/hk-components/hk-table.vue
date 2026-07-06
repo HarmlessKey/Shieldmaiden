@@ -14,13 +14,14 @@
 				v-model="searched"
 				@keyup="searchData()"
 			>
-				<q-icon
-					slot="append"
-					name="fas fa-search"
-					size="xs"
-					class="pointer"
-					@click="searchData()"
-				/>
+				<template v-slot:append>
+					<q-icon
+						name="fas fa-search"
+						size="xs"
+						class="pointer"
+						@click="searchData()"
+					/>
+				</template>
 			</q-input>
 			<div
 				v-if="searched !== undefined && searched !== ''"

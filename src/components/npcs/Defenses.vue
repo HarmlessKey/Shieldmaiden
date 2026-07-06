@@ -17,7 +17,7 @@
 							v-model="entity[type]" 
 							:hint="resistanceInfo(type)"
 						>
-							<template slot="prepend">
+							<template v-slot:prepend>
 								<div class="defense" :class="type">
 									<i aria-hidden="true" class="fas fa-shield"></i>
 									<span>
@@ -60,7 +60,7 @@
 					v-model="entity.condition_immunities" 
 					name="condition_immunities" 
 				>
-					<template slot="prepend">
+					<template v-slot:prepend>
 						<i aria-hidden="true" class="fas fa-fist-raised" />
 					</template>
 					<template v-slot:selected v-if="entity.condition_immunities">

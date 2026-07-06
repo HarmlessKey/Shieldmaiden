@@ -1,24 +1,26 @@
 <template>
 	<div>
 		<hk-card>
-			<div class="card-header d-flex justify-content-between" slot="header">
-				<div>
-					Skills
-					<span>
-						+<strong class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</strong>
+			<template v-slot:header>
+				<div class="card-header d-flex justify-content-between">
+					<div>
+						Skills
+						<span>
+							+<strong class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</strong>
+							<q-tooltip anchor="top middle" self="center middle">
+								Proficiency bonus
+						</q-tooltip>
+						</span>
+					</div>
+					<a class="btn btn-sm bg-neutral-5" @click="setDialog()">
+						<i aria-hidden="true" class="fas fa-plus green"></i>
+						<span class="d-none d-md-inline ml-1">Modifiers</span>
 						<q-tooltip anchor="top middle" self="center middle">
-							Proficiency bonus
-					</q-tooltip>
-					</span>
+							Skill modifiers
+						</q-tooltip>
+					</a>
 				</div>
-				<a class="btn btn-sm bg-neutral-5" @click="setDialog()">
-					<i aria-hidden="true" class="fas fa-plus green"></i>
-					<span class="d-none d-md-inline ml-1">Modifiers</span>
-					<q-tooltip anchor="top middle" self="center middle">
-						Skill modifiers
-					</q-tooltip>
-				</a>
-			</div>
+			</template>
 
 			<div class="card-body">
 				<div class="skills">
@@ -82,14 +84,18 @@
 								:error="!!errorMessage"
 								:error-message="errorMessage"
 							>
-								<i aria-hidden="true" class="fas fa-check green saved" slot="append" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
+								<template v-slot:append>
+									<i aria-hidden="true" class="fas fa-check green saved" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
+								</template>
 							</q-input>
 						</ValidationProvider>
 					</div>
 				</div>
-				<div class="card-footer d-flex justify-content-end" slot="footer">
-					<q-btn class="bg-neutral-5" no-caps @click="modifier_dialog = false" label="Close" />
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer d-flex justify-content-end">
+						<q-btn class="bg-neutral-5" no-caps @click="modifier_dialog = false" label="Close" />
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 	</div>

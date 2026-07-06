@@ -3,27 +3,29 @@
 		<ValidationObserver v-slot="{ meta }" as="div">
 			<q-form greedy>
 				<hk-card>
-					<div class="card-header" slot="header">
-						<span>Class</span>
-						<div>
-							<small class="saved green" v-if="saved" @animationend="saved = false">
-								<i aria-hidden="true" class="fas fa-check" />
-								Saved
-							</small>
-							<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-								<i aria-hidden="true" class="fas fa-times" />
-								Couldn't save
-							</small>
-							<button
-								class="btn btn-sm bg-neutral-5 ml-1"
-								v-if="character.advancement === 'experience'"
-								@click.prevent="experience_modal = !experience_modal"
-							>
-								<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
-								Experience
-							</button>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>Class</span>
+							<div>
+								<small class="saved green" v-if="saved" @animationend="saved = false">
+									<i aria-hidden="true" class="fas fa-check" />
+									Saved
+								</small>
+								<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+									<i aria-hidden="true" class="fas fa-times" />
+									Couldn't save
+								</small>
+								<button
+									class="btn btn-sm bg-neutral-5 ml-1"
+									v-if="character.advancement === 'experience'"
+									@click.prevent="experience_modal = !experience_modal"
+								>
+									<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
+									Experience
+								</button>
+							</div>
 						</div>
-					</div>
+					</template>
 					<!-- EXPERIENCE -->
 					<div
 						v-if="
@@ -218,15 +220,16 @@
 																			computed.abilities.constitution
 																		).hp
 																	}}</strong>
-																	<div
-																		slot="content"
-																		v-html="
-																			character.total_class_hp(
-																				classIndex,
-																				computed.abilities.constitution
-																			).info
-																		"
-																	/>
+																	<template v-slot:content>
+																		<div
+																			v-html="
+																				character.total_class_hp(
+																					classIndex,
+																					computed.abilities.constitution
+																				).info
+																			"
+																		/>
+																	</template>
 																</hk-popover>
 															</div>
 														</q-item-section>
@@ -588,10 +591,12 @@
 						@before-hide="clear_invalid_rolls(meta.valid)"
 					>
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Rolled HP {{ character_classes[editClass].name }} </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Rolled HP {{ character_classes[editClass].name }} </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 
 							<div class="card-body">
 								<template v-if="character_classes[editClass].hit_dice">
@@ -619,17 +624,18 @@
 												:error="!!errorMessage"
 												:error-message="errorMessage"
 											>
-												<button
-													slot="after"
-													class="btn"
-													:disabled="
-														character_classes[editClass].rolled_hit_points &&
-														character_classes[editClass].rolled_hit_points[level]
-													"
-													@click.stop="rollHitDice(editClass, level, meta.valid)"
-												>
-													Roll
-												</button>
+												<template v-slot:after>
+													<button
+														class="btn"
+														:disabled="
+															character_classes[editClass].rolled_hit_points &&
+															character_classes[editClass].rolled_hit_points[level]
+														"
+														@click.stop="rollHitDice(editClass, level, meta.valid)"
+													>
+														Roll
+													</button>
+												</template>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -642,10 +648,12 @@
 					<!-- EXPERIENCE MODAL -->
 					<q-dialog v-model="experience_modal">
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Experience points </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Experience points </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 							<div class="card-body">
 								<h3 class="xp">
 									<hk-animated-integer :value="Class.experience_points" /><small>xp</small>
@@ -672,10 +680,12 @@
 					<!-- SPELLS KNOWN MODAL -->
 					<q-dialog v-model="spells_known_modal">
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Spells known </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Spells known </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 							<div class="spells-known card-body" v-if="character_classes[editClass].spells_known">
 								<h3>Cantrips & Spells known</h3>
 								<div class="columns">

@@ -3,12 +3,14 @@
 		<Tutorial v-if="show_tutorial" vertical />
 
 		<hk-card v-if="$route.path.startsWith('/content/players')">
-			<div class="card-header" slot="header">
-				<span>
-					<i class="fas fa-sync-alt" aria-hidden="true" />
-					Character Sync
-				</span>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					<span>
+						<i class="fas fa-sync-alt" aria-hidden="true" />
+						Character Sync
+					</span>
+				</div>
+			</template>
 			<div class="card-body text-center">
 				<p>
 					Sync your player's character sheets from other resources in
@@ -28,20 +30,23 @@
 					<i class="fas fa-sync-alt" aria-hidden="true" /> Start Syncing
 				</button>
 			</div>
-			<small
-				v-if="tier.price === 'Free'"
-				slot="footer"
-				class="card-footer justify-content-start neutral-3"
-				>* <router-link to="/pricing" class="mx-1">Subscription</router-link> for Shieldmaiden
-				required.</small
-			>
+			<template v-slot:footer>
+				<small
+					v-if="tier.price === 'Free'"
+					class="card-footer justify-content-start neutral-3"
+					>* <router-link to="/pricing" class="mx-1">Subscription</router-link> for Shieldmaiden
+					required.</small
+				>
+			</template>
 		</hk-card>
 
 		<!-- COMPENDIUM -->
 		<hk-card v-if="$route.path.split('/')[1] !== 'content'">
-			<div slot="header" class="card-header">
-				<h2><i aria-hidden="true" class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					<h2><i aria-hidden="true" class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
+				</div>
+			</template>
 			<div class="card-body overflow-x-hidden">
 				<img class="logo full-width" src="../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden" />
 				<p class="neutral-2 mt-3 text-center">
@@ -53,15 +58,17 @@
 
 		<!-- CAMPAIGNS -->
 		<hk-card v-if="$route.path === '/content/campaigns'">
-			<div slot="header" class="card-header">
-				<a :href="`https://shieldmaiden.app/user/${userId}`" target="_blank" class="neutral-1">
-					Share initiative
-					<i class="fas fa-external-link blue-light" aria-hidden="true" />
-				</a>
-				<a class="btn btn-sm bg-neutral-5" @click="setDrawer({ show: true, type: 'PlayerLink' })">
-					<i aria-hidden="true" class="fas fa-qrcode" />
-				</a>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					<a :href="`https://shieldmaiden.app/user/${userId}`" target="_blank" class="neutral-1">
+						Share initiative
+						<i class="fas fa-external-link blue-light" aria-hidden="true" />
+					</a>
+					<a class="btn btn-sm bg-neutral-5" @click="setDrawer({ show: true, type: 'PlayerLink' })">
+						<i aria-hidden="true" class="fas fa-qrcode" />
+					</a>
+				</div>
+			</template>
 			<div class="card-body">
 				<PlayerLink :qr="false" :title="false" :info="false" />
 			</div>
@@ -69,17 +76,19 @@
 
 		<!-- SUBSCRIPTION -->
 		<hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
-			<div slot="header" class="card-header">
-				Subscription
-				<hk-popover
-					v-if="pending_payment"
-					header="Pending"
-					content="Your Patreon payment is pending, this might take a few minutes."
-				>
-					Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
-				</hk-popover>
-				<strong v-else>{{ tier.name }}</strong>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					Subscription
+					<hk-popover
+						v-if="pending_payment"
+						header="Pending"
+						content="Your Patreon payment is pending, this might take a few minutes."
+					>
+						Pending <i class="fas fa-sync ml-1 blue spin" aria-hidden="true" />
+					</hk-popover>
+					<strong v-else>{{ tier.name }}</strong>
+				</div>
+			</template>
 			<q-linear-progress
 				v-if="tier.name !== 'Deity'"
 				:value="slots_used.used_slots / slots_used.available_slots"
@@ -90,25 +99,27 @@
 				<Tier />
 			</div>
 			<PatreonLinkButton v-if="userInfo.patron && !userInfo.patreon_id" />
-			<router-link
-				v-else-if="tier.name !== 'Deity'"
-				slot="footer"
-				to="/pricing"
-				class="btn btn-block btn-square bg-patreon-red"
-			>
-				{{ tier.price === "Free" ? "Subscribe" : "Upgrade" }}
-			</router-link>
+			<template v-slot:footer>
+				<router-link
+					v-if="!(userInfo.patron && !userInfo.patreon_id) && tier.name !== 'Deity'"
+					to="/pricing"
+					class="btn btn-block btn-square bg-patreon-red"
+				>
+					{{ tier.price === "Free" ? "Subscribe" : "Upgrade" }}
+				</router-link>
+			</template>
 		</hk-card>
 
 		<!-- HOMEBREW CREATION -->
 		<hk-card>
-			<div
-				slot="image"
-				class="card-image"
-				:style="{ backgroundImage: `url(${require('src/assets/_img/homebrew-creation.webp')})` }"
-			>
-				<div class="image-title">Homebrew creation</div>
-			</div>
+			<template v-slot:image>
+				<div
+					class="card-image"
+					:style="{ backgroundImage: `url(${require('src/assets/_img/homebrew-creation.webp')})` }"
+				>
+					<div class="image-title">Homebrew creation</div>
+				</div>
+			</template>
 			<div class="card-body">
 				<p class="text-center">
 					Need a free adventure template, homebrew content or DMing inspiration?

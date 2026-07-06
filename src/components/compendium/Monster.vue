@@ -262,7 +262,11 @@
 								v-for="(spell, index) in spellsForLevel(level)"
 								:key="spell.name"
 							>
-								<hk-popover> {{ spell.name }}<Spell slot="content" :id="spell.key" /> </hk-popover
+								<hk-popover>
+									{{ spell.name }}
+									<template v-slot:content>
+										<Spell :id="spell.key" />
+									</template> </hk-popover
 								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
@@ -380,14 +384,16 @@
 					<div>{{ label }} <small v-if="pdf_only">(PFD only)</small></div>
 				</button>
 			</div>
-			<div slot="footer" class="d-flex justify-content-end full-width items-center gap-1">
-				<!-- <button class="btn btn-block" @click="download('pdf')">
-					Download PDF <hk-icon icon="fas fa-file-pdf" class="ml-1" />
-				</button> -->
-				<button class="btn" :disabled="layout === 'full'" @click="download('png')">
-					Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
-				</button>
-			</div>
+			<template v-slot:footer>
+				<div class="d-flex justify-content-end full-width items-center gap-1">
+					<!-- <button class="btn btn-block" @click="download('pdf')">
+						Download PDF <hk-icon icon="fas fa-file-pdf" class="ml-1" />
+					</button> -->
+					<button class="btn" :disabled="layout === 'full'" @click="download('png')">
+						Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
+					</button>
+				</div>
+			</template>
 		</hk-dialog>
 	</div>
 	<hk-loader v-else name="monster" />

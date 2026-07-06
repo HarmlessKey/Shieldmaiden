@@ -270,7 +270,9 @@ export default {
 	name: "spells-Actions",
 	props: {
 		value: Object,
+		modelValue: Object,
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			editing: false,
@@ -287,10 +289,11 @@ export default {
 	computed: {
 		spell: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},

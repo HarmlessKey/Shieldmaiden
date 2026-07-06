@@ -45,14 +45,17 @@ export default {
 	},
 	props: {
 		value: Object,
+		modelValue: Object,
 	},
+	emits: ["input", "update:modelValue"],
 	computed: {
 		imported: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 		existing() {

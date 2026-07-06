@@ -171,30 +171,33 @@ export default {
 		},
 	},
 	watch: {
-		targeted(newTargets) {
-			// Add new targets to multiplier list
-			for (const key of newTargets) {
-				// By default set multiplier to 1
-				if (!Object.keys(this.multiplier).includes(key)) {
-					this.multiplier[key] = 1;
+		targeted: {
+			handler(newTargets) {
+				// Add new targets to multiplier list
+				for (const key of newTargets) {
+					// By default set multiplier to 1
+					if (!Object.keys(this.multiplier).includes(key)) {
+						this.multiplier[key] = 1;
+					}
+					// Check the reistances of a target
+					if (this.damage_type && !Object.keys(this.resistances).includes(key)) {
+						this.checkDefenses(key);
+					}
 				}
-				// Check the reistances of a target
-				if (this.damage_type && !Object.keys(this.resistances).includes(key)) {
-					this.checkDefenses(key);
+				// Remove untargeted from multiplier list
+				for (let key in this.multiplier) {
+					if (!newTargets.includes(key)) {
+						delete this.multiplier[key];
+					}
 				}
-			}
-			// Remove untargeted from multiplier list
-			for (let key in this.multiplier) {
-				if (!newTargets.includes(key)) {
-					delete this.multiplier[key];
+				// Remove untargeted from resistances list
+				for (let key in this.resistances) {
+					if (!newTargets.includes(key)) {
+						delete this.resistances[key];
+					}
 				}
-			}
-			// Remove untargeted from resistances list
-			for (let key in this.resistances) {
-				if (!newTargets.includes(key)) {
-					delete this.resistances[key];
-				}
-			}
+			},
+			deep: true,
 		},
 		damage_type() {
 			this.resistances = {};

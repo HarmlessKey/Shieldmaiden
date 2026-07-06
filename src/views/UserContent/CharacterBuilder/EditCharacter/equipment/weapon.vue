@@ -153,13 +153,18 @@
 		props: {
 			value: {
 				type: Object,
-				required: true
+				required: false
+			},
+			modelValue: {
+				type: Object,
+				required: false
 			},
 			proficient: {
 				type: Boolean,
 				default: false
 			}
 		},
+		emits: ["input", "update:modelValue"],
 		data() {
 			return {
 				abilities: abilities,
@@ -168,7 +173,7 @@
 		},
 		computed: {
 			weapon() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			title() {
 				const type = this.weapon.weapon_type.split("_");
@@ -185,6 +190,7 @@
 				deep: true,
 				handler(newVal) {
 					this.$emit('input', newVal);
+					this.$emit('update:modelValue', newVal);
 				}
 			}
 		},

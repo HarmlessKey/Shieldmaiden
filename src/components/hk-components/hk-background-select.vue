@@ -41,11 +41,16 @@
         type: String,
         default: undefined
       },
+      modelValue: {
+        type: String,
+        default: undefined
+      },
       clearable: {
         type: Boolean,
         default: true
       }
     },
+    emits: ["input", "update:modelValue"],
     data() {
       return {
         background_options: backgrounds
@@ -54,10 +59,11 @@
     computed: {
       background: {
         get() {
-          return this.value;
+          return this.modelValue !== undefined ? this.modelValue : this.value;
         },
         set(newVal) {
           this.$emit("input", newVal);
+          this.$emit("update:modelValue", newVal);
           this.$forceUpdate();
         }
       }

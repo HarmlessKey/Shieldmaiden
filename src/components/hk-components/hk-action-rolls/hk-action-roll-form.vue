@@ -309,6 +309,7 @@ export default {
 	name: "HkActionRollForm",
 	props: {
 		value: Object,
+		modelValue: Object,
 		action_type: String,
 		versatile_options: {
 			type: Object,
@@ -328,6 +329,7 @@ export default {
 			type: String,
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			show_description: false,
@@ -349,10 +351,11 @@ export default {
 	computed: {
 		roll: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		specials() {

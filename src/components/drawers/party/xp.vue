@@ -98,18 +98,21 @@ export default {
 		});
 	},
 	watch: {
-		awardTo(newVal) {
-			// Handle changes in individual player checkboxes
-			if (newVal.length === 0) {
-				this.indeterminate = false;
-				this.allSelected = false;
-			} else if (newVal.length === this.allPlayers.length) {
-				this.indeterminate = false;
-				this.allSelected = true;
-			} else {
-				this.indeterminate = true;
-				this.allSelected = false;
-			}
+		awardTo: {
+			handler(newVal) {
+				// Handle changes in individual player checkboxes
+				if (newVal.length === 0) {
+					this.indeterminate = false;
+					this.allSelected = false;
+				} else if (newVal.length === this.allPlayers.length) {
+					this.indeterminate = false;
+					this.allSelected = true;
+				} else {
+					this.indeterminate = true;
+					this.allSelected = false;
+				}
+			},
+			deep: true,
 		},
 	},
 	methods: {

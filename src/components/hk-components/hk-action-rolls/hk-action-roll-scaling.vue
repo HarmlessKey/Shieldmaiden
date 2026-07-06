@@ -154,6 +154,10 @@ export default {
 			type: Array,
 			default: undefined,
 		},
+		modelValue: {
+			type: Array,
+			default: undefined,
+		},
 		roll: {
 			type: Object,
 			default: () => { return {} }
@@ -167,6 +171,7 @@ export default {
 			required: true,
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			dice_type: dice_types,
@@ -175,10 +180,11 @@ export default {
 	computed: {
 		scaling: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		shown_level_tiers() {

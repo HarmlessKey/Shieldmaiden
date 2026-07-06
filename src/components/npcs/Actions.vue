@@ -591,7 +591,8 @@ import draggable from "vuedraggable";
 
 export default {
 	name: "npc-Actions",
-	props: ["value"],
+	props: ["value", "modelValue"],
+	emits: ["input", "update:modelValue"],
 	mixins: [general, monsterMixin, dice],
 	components: {
 		draggable,
@@ -634,10 +635,11 @@ export default {
 	computed: {
 		npc: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},

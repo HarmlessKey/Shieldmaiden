@@ -520,7 +520,9 @@ export default {
 	name: "spells-BasicInfo",
 	props: {
 		value: Object,
+		modelValue: Object,
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			spell_levels: spell_constants.spell_levels,
@@ -569,10 +571,11 @@ export default {
 	computed: {
 		spell: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 				return newValue;
 			},
 		},

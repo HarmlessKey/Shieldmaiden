@@ -249,7 +249,11 @@ export default {
 	props: {
 		value: {
 			type: Object,
-			required: true,
+			required: false,
+		},
+		modelValue: {
+			type: Object,
+			required: false,
 		},
 		variables: {
 			type: Boolean,
@@ -260,6 +264,7 @@ export default {
 			default: false,
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			triggers: [
@@ -283,15 +288,16 @@ export default {
 	computed: {
 		reminder: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},
 	mounted() {
-		if (Object.keys(this.value).length === 0) {
+		if (Object.keys(this.reminder).length === 0) {
 			//Set default values
 			this.reminder["color"] = "green-light";
 			this.reminder["action"] = "remove";

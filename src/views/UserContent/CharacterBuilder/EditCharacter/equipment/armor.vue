@@ -143,16 +143,21 @@
 		props: {
 			value: {
 				type: Object,
-				required: true
+				required: false
+			},
+			modelValue: {
+				type: Object,
+				required: false
 			},
 			proficient: {
 				type: Boolean,
 				default: false
 			}
 		},
+		emits: ["input", "update:modelValue"],
 		computed: {
 			armor() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			title() {
 				return (this.armor.type === "shield") ? "Shield" :
@@ -164,6 +169,7 @@
 				deep: true,
 				handler(newVal) {
 					this.$emit('input', newVal);
+					this.$emit('update:modelValue', newVal);
 				}
 			}
 		}

@@ -54,6 +54,10 @@
 				type: String,
 				default: undefined
 			},
+			modelValue: {
+				type: String,
+				default: undefined
+			},
 			label: {
 				type: String,
 				default: undefined
@@ -82,13 +86,15 @@
 				default: false
 			}
 		},
+		emits: ["input", "update:modelValue"],
 		computed: {
 			damage_type: {
 				get() {
-					return this.value;
+					return this.modelValue !== undefined ? this.modelValue : this.value;
 				},
 				set(newVal) {
 					this.$emit("input", newVal);
+					this.$emit("update:modelValue", newVal);
 				}
 			},
 			damage_types() {

@@ -91,28 +91,35 @@ export default {
 	props: {
 		value: {
 			type: Object,
-			required: true,
+			default: undefined,
+		},
+		modelValue: {
+			type: Object,
+			default: undefined,
 		},
 		type: {
 			type: String,
 			default: "monster"
 		},
 	},
+	emits: ["input", "update:modelValue", "change"],
 	data() {
+		const filter = this.modelValue !== undefined ? this.modelValue : this.value;
 		return {
 			spell_schools: spell_schools,
-			cr: this.value?.challenge_ratings || { min: 0, max: 30 },
-			levels: this.value?.levels || { min: 0, max: 9 },
+			cr: filter?.challenge_ratings || { min: 0, max: 30 },
+			levels: filter?.levels || { min: 0, max: 9 },
 		}
 	},
 	computed: {
 		filter: {
 			get() {
-				const filter = this.value;
+				const filter = this.modelValue !== undefined ? this.modelValue : this.value;
 				return filter;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 				this.$emit("change");
 			}
 		},
@@ -124,7 +131,7 @@ export default {
 		},
 	},
 	watch: {
-		value: {
+		filter: {
 			deep: true,
 			handler() {
 				this.$emit("change");

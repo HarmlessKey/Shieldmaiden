@@ -24,7 +24,7 @@
 									autocomplete="off" 
 									type="number" min="0" 
 									name="name" 
-									:value="encounter.currency[key]"
+									:model-value="encounter.currency[key]"
 								/>
 							</div>
 						</div>

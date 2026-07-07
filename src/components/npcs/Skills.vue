@@ -32,7 +32,7 @@
 							v-model="npc.skills_expertise" 
 							:false-value="null" indeterminate-value="something-else"
 							:disable="npc.skills ? !npc.skills.includes(key) : true"
-							@input="$forceUpdate()"
+							@update:model-value="$forceUpdate()"
 						>
 							<template slot:label>
 								+{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}

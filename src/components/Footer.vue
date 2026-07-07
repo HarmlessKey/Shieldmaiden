@@ -3,7 +3,12 @@
 		<div class="top">
 			<div class="content">
 				<div class="logo-container">
-					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Shieldmaiden logo" />
+					<img
+						class="logo"
+						src="../assets/_img/logo/logo-cyan.svg"
+						alt="Shieldmaiden logo"
+						loading="lazy"
+					/>
 				</div>
 
 				<div class="links">
@@ -147,6 +152,7 @@ export default {
 				.logo {
 					margin-top: -40px;
 					width: 250px;
+					aspect-ratio: 25 / 24;
 				}
 			}
 		}
@@ -167,6 +173,9 @@ export default {
 				ul {
 					padding: 0;
 					list-style: none;
+					display: flex;
+					flex-direction: column;
+					gap: 3px;
 
 					a {
 						font-size: 12px;

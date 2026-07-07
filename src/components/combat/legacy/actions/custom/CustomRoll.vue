@@ -1,7 +1,7 @@
 <template>
 	<div v-if="current">
 		<q-btn-toggle
-			:value="roll_type"
+			:model-value="roll_type"
 			class="mb-3"
 			spread
 			no-caps
@@ -14,7 +14,7 @@
 				{ label: 'Save', value: 'save' },
 				{ label: 'Heal', value: 'heal' },
 			]"
-			@input="setType"
+			@update:model-value="setType"
 		/>
 		<q-input
 			v-if="roll_type === 'attack'"

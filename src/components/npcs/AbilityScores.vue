@@ -11,7 +11,7 @@
 								autocomplete="off"  
 								type="number" 
 								v-model.number="npc[ability]" 
-								@input="parseToInt($event, npc, ability)"
+								@update:model-value="parseToInt($event, npc, ability)"
 								:error="!!errorMessage"
 								:error-message="errorMessage"
 							>
@@ -31,7 +31,7 @@
 							:false-value="null" 
 							indeterminate-value="something-else" 
 							label="Saving throw proficiency"
-							@input="$forceUpdate()"
+							@update:model-value="$forceUpdate()"
 						>
 							<q-tooltip anchor="top middle" self="center middle">
 								Saving throw proficiency

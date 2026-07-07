@@ -20,7 +20,7 @@
 				class="full-width"
 				label="Challenge rating"
 				clearable
-				@input="updateFilter"
+				@update:model-value="updateFilter"
 			/>
 		</div>
 		<div class="mb-2 d-flex justify-content-between">

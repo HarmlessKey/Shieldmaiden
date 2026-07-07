@@ -26,7 +26,7 @@
 						:options="abilities"
 						v-model="npc[`${casting.category}_ability`]"
 						class="mb-2"
-						@input="setCaster($event, casting.category)"
+						@update:model-value="setCaster($event, casting.category)"
 					/>
 
 					<template v-if="npc[`${casting.category}_ability`]">
@@ -43,7 +43,7 @@
 										square
 										label="Caster level"
 										v-model.number="npc[`${casting.category}_level`]"
-										@input="parseToInt(npc, `${casting.category}_level`, !invalid)"
+										@update:model-value="parseToInt(npc, `${casting.category}_level`, !invalid)"
 										type="number"
 										class="mb-3"
 										:error="!!errorMessage"
@@ -63,7 +63,7 @@
 										square
 										label="Save DC"
 										v-model.number="npc[`${casting.category}_save_dc`]"
-										@input="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
+										@update:model-value="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
 										type="number"
 										class="mb-3"
 										:error="!!errorMessage"
@@ -83,7 +83,7 @@
 										square
 										label="Spell attack"
 										v-model.number="npc[`${casting.category}_spell_attack`]"
-										@input="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
+										@update:model-value="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
 										type="number"
 										class="mb-3"
 										:error="!!errorMessage"
@@ -151,7 +151,7 @@
 												:indeterminate-value="undefined"
 												:toggle-indeterminate="false"
 												class="mb-2"
-												@input="$forceUpdate()"
+												@update:model-value="$forceUpdate()"
 											/>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"

@@ -22,9 +22,9 @@
 							filled
 							square
 							label="Race"
-							:value="race.race"
+							:model-value="race.race"
 							:options="race_list"
-							@input="selectRace($event, meta.valid)"
+							@update:model-value="selectRace($event, meta.valid)"
 						/>
 						<template v-if="race.race === 'custom'">
 							<ValidationProvider

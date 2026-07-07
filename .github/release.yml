@@ -3,6 +3,7 @@ changelog:
     - title: New Features 🚀
       labels:
         - "Feature"
+        - "feature"
     - title: Improvements 🦾
       labels:
         - "improvement"

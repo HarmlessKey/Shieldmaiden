@@ -38,6 +38,7 @@
 					</button>
 					<router-link
 						v-else
+						tag="button"
 						class="btn btn-sm bg-neutral-5"
 						:to="`${$route.path}/add-${type.slice(0, -1)}`"
 					>
@@ -54,6 +55,7 @@
 				<i aria-hidden="true" class="fab fa-patreon patreon-red" />
 				<span class="d-none d-md-inline-block ml-1">Get more slots</span>
 			</router-link>
+			<slot name="actions-after" />
 		</div>
 	</div>
 </template>

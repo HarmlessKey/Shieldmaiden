@@ -33,7 +33,7 @@
 						:error="!!errorMessage"
 						:error-message="errorMessage"
 						@keyup="$forceUpdate()"
-						@input="(value) => parseToInt(value, spell, 'projectiles')"
+						@update:model-value="(value) => parseToInt(value, spell, 'projectiles')"
 					>
 						<template v-slot:append>
 							<hk-popover header="Projectiles">
@@ -155,7 +155,7 @@
 												:options="Object.values(attack_types)"
 												v-model="action.type"
 												class="mb-2"
-												@input="$forceUpdate()"
+												@update:model-value="$forceUpdate()"
 												:error="!!errorMessage"
 												:error-message="errorMessage"
 											/>
@@ -175,7 +175,7 @@
 											v-model="action.save_ability"
 											:disable="action.type !== 'save'"
 											class="mb-2"
-											@input="$forceUpdate()"
+											@update:model-value="$forceUpdate()"
 										/>
 									</div>
 								</div>

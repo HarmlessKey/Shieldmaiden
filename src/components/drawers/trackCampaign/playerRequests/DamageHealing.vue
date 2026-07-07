@@ -104,10 +104,12 @@
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
 import { notifySuccess } from "src/utils/notify";
+import { trackEncounter } from "src/mixins/trackEncounter";
 
 export default {
 	name: "damageHealing",
-	props: ["targeted", "player", "encounter"],
+	mixins: [trackEncounter],
+	props: ["targeted", "player", "encounter", "npcSettings", "allySettings"],
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
@@ -189,12 +191,6 @@ export default {
 				`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`
 			);
 			this.setDrawer({ show: false });
-		},
-		displayNPCField(field, entity) {
-			const defaults = { name: true, health: false, ac: false };
-			if (entity.settings && entity.settings[field] !== undefined) return entity.settings[field];
-			else if (this.npcSettings[field] == undefined) return defaults[field]; // Default value
-			else return this.npcSettings[field];
 		},
 	},
 };

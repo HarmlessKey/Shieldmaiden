@@ -119,8 +119,7 @@ export default {
 		"campCompanions",
 		"npcs",
 		"players",
-		"playerSettings",
-		"npcSettings",
+		"displaySettings",
 	],
 	data() {
 		return {
@@ -128,6 +127,9 @@ export default {
 		};
 	},
 	computed: {
+		playerSettings() { return this.displaySettings?.player || {}; },
+		npcSettings() { return this.displaySettings?.npc; },
+		allySettings() { return this.displaySettings?.ally; },
 		camp_data: function () {
 			const key = this.entity.key;
 

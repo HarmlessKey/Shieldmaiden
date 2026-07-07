@@ -77,7 +77,7 @@
 							<q-tooltip anchor="top middle" self="center middle">Edit Group Health</q-tooltip>
 						</button>
 						<button
-							class="btn btn-sm mr-1"
+							class="btn btn-sm mr-1 bg-neutral-5"
 							v-if="isXpAdvancement"
 							@click="
 								setDrawer({
@@ -134,8 +134,8 @@
 				<div
 					class="col header text-center pp"
 					v-if="
-						userSettings.general &&
-						userSettings.general.passive_perception === undefined &&
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.passive_perception === undefined)) &&
 						!is_medium
 					"
 				>
@@ -145,8 +145,8 @@
 				<div
 					class="col header text-center pinv"
 					v-if="
-						userSettings.general &&
-						userSettings.general.passive_investigation === undefined &&
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.passive_investigation === undefined)) &&
 						!is_medium
 					"
 				>
@@ -156,7 +156,9 @@
 				<div
 					class="col header text-center pins"
 					v-if="
-						userSettings.general && userSettings.general.passive_insight === undefined && !is_medium
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.passive_insight === undefined)) &&
+						!is_medium
 					"
 				>
 					<i aria-hidden="true" class="fas fa-lightbulb-on" />
@@ -164,7 +166,11 @@
 				</div>
 				<div
 					class="col header text-center save"
-					v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
+					v-if="
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.save_dc === undefined)) &&
+						!is_medium
+					"
 				>
 					<i aria-hidden="true" class="fas fa-hand-holding-magic" />
 					<q-tooltip anchor="top middle" self="center middle"> Save DC </q-tooltip>
@@ -223,8 +229,9 @@
 						<div
 							class="col pp"
 							v-if="
-								userSettings.general &&
-								userSettings.general.passive_perception === undefined &&
+								(!userSettings.general ||
+									(userSettings.general &&
+										userSettings.general.passive_perception === undefined)) &&
 								!is_medium
 							"
 							:key="'pp-' + key"
@@ -234,8 +241,9 @@
 						<div
 							class="col pinv"
 							v-if="
-								userSettings.general &&
-								userSettings.general.passive_investigation === undefined &&
+								(!userSettings.general ||
+									(userSettings.general &&
+										userSettings.general.passive_investigation === undefined)) &&
 								!is_medium
 							"
 							:key="'pinv-' + key"
@@ -245,8 +253,8 @@
 						<div
 							class="col pins"
 							v-if="
-								userSettings.general &&
-								userSettings.general.passive_insight === undefined &&
+								(!userSettings.general ||
+									(userSettings.general && userSettings.general.passive_insight === undefined)) &&
 								!is_medium
 							"
 							:key="'pins-' + key"
@@ -256,7 +264,9 @@
 						<div
 							class="col save"
 							v-if="
-								userSettings.general && userSettings.general.save_dc === undefined && !is_medium
+								(!userSettings.general ||
+									(userSettings.general && userSettings.general.save_dc === undefined)) &&
+								!is_medium
 							"
 							:key="'save-' + key"
 						>
@@ -435,11 +445,11 @@
 					</p>
 					<q-checkbox
 						:dark="$store.getters.theme === 'dark'"
-						:value="all"
+						:model-value="all"
 						:indeterminate-value="false"
 						:false-value="null"
 						label="Select all"
-						@input="checkAll"
+						@update:model-value="checkAll"
 					/>
 					<hr class="my-1" />
 					<div v-for="{ label, property } in resets" :key="property">
@@ -469,7 +479,7 @@ import { notifyError } from "src/utils/notify";
 import { formatNumber } from "src/utils/formatNumber";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
-import { extensionInstalled, comparePlayerToCharacter } from "src/utils/generalFunctions";
+import { comparePlayerToCharacter } from "src/utils/generalFunctions";
 
 export default {
 	name: "Players",
@@ -505,7 +515,6 @@ export default {
 			is_large: false,
 			viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			loading: false,
-			isXpAdvancement: false,
 			rest_dialog: false,
 			resets: [
 				{
@@ -543,12 +552,14 @@ export default {
 			sync_characters: this.syncCharacters,
 			link_character: undefined,
 			link_dialog: false,
-			extensionInstalled: undefined,
 		};
 	},
 	computed: {
 		...mapGetters(["overencumbered"]),
-		...mapGetters(["userSettings", "tier"]),
+		...mapGetters(["userSettings", "tier", "extensionInstalled"]),
+		isXpAdvancement() {
+			return this.campaign && this.campaign.advancement !== "milestone";
+		},
 		viewerIsUser() {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
@@ -578,32 +589,16 @@ export default {
 		templateColumns() {
 			let templateColumns = "max-content max-content auto ";
 
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_perception === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_perception === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_investigation === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_investigation === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.passive_insight === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.passive_insight === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
-			if (
-				this.userSettings.general &&
-				this.userSettings.general.save_dc === undefined &&
-				!this.is_medium
-			) {
+			if (this.userSettings.general?.save_dc === undefined && !this.is_medium) {
 				templateColumns = templateColumns.concat(" max-content");
 			}
 			if (this.viewerIsUser) {
@@ -616,16 +611,16 @@ export default {
 		calcColspan() {
 			let colspan = this.viewerIsUser ? 4 : 3;
 
-			if (this.settings.passive_perception === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_perception === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.passive_investigation === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_investigation === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.passive_insight === undefined && !this.is_medium) {
+			if (this.userSettings.general?.passive_insight === undefined && !this.is_medium) {
 				colspan++;
 			}
-			if (this.settings.save_dc === undefined && !this.is_medium) {
+			if (this.userSettings.general?.save_dc === undefined && !this.is_medium) {
 				colspan++;
 			}
 
@@ -643,9 +638,6 @@ export default {
 					: 0;
 			return this.copperToPretty(currency);
 		},
-	},
-	async mounted() {
-		this.extensionInstalled = await extensionInstalled();
 	},
 	methods: {
 		formatNumber,

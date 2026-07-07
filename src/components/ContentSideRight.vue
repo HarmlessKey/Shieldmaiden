@@ -170,8 +170,8 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
-import { extensionInstalled } from "src/utils/generalFunctions";
 
 export default {
 	name: "ContentSideRight",
@@ -179,16 +179,15 @@ export default {
 		page: String,
 	},
 	components: {
-		PlayerLink: () => import("src/components/PlayerLink"),
-		Tier: () => import("src/components/userContent/Tier"),
-		Tutorial: () => import("src/components/userContent/Tutorial.vue"),
-		PatreonLinkButton: () => import("src/components/PatreonLinkButton.vue"),
+		PlayerLink: defineAsyncComponent(() => import("src/components/PlayerLink")),
+		Tier: defineAsyncComponent(() => import("src/components/userContent/Tier")),
+		Tutorial: defineAsyncComponent(() => import("src/components/userContent/Tutorial.vue")),
+		PatreonLinkButton: defineAsyncComponent(() => import("src/components/PatreonLinkButton.vue")),
 	},
 	data() {
 		return {
 			width: 0,
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
-			hasExtension: false,
 			social_media: [
 				{
 					name: "Patreon",
@@ -214,7 +213,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["user", "tier", "slots_used", "userInfo", "content_count"]),
+		...mapGetters(["user", "tier", "slots_used", "userInfo", "content_count", "extensionInstalled"]),
 		filtered_content() {
 			return this.content.filter((item) => item.value !== this.page);
 		},
@@ -239,11 +238,6 @@ export default {
 		setWidth(size) {
 			this.width = size.width;
 		},
-	},
-	async mounted() {
-		if (this.$route.path.startsWith("/content/players")) {
-			this.hasExtension = await extensionInstalled();
-		}
 	},
 };
 </script>

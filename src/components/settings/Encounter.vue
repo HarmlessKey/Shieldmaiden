@@ -8,7 +8,7 @@
 				square
 				v-for="(setting, index) in type_settings"
 				:options="setting.options"
-				:value="index"
+				:model-value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
@@ -65,8 +65,8 @@
 					filled
 					type="number"
 					label="Minutes"
-					:value="timer.minutes"
-					@input="setTimer($event, 'minutes')"
+					:model-value="timer.minutes"
+					@update:model-value="setTimer($event, 'minutes')"
 				>
 					<template v-slot:prepend>
 						<q-icon size="medium" name="fas fa-stopwatch" class="mx-3" />
@@ -80,8 +80,8 @@
 					type="number"
 					max="59"
 					label="Seconds"
-					:value="timer.seconds"
-					@input="setTimer($event, 'seconds')"
+					:model-value="timer.seconds"
+					@update:model-value="setTimer($event, 'seconds')"
 				>
 					<template v-slot:after>
 						<hk-popover header="Turn timer">

@@ -38,7 +38,7 @@
 								:error="!!errorMessage"
 								:error-message="errorMessage"
 								@keyup="$forceUpdate()"
-								@input="
+								@update:model-value="
 									(value) => level_tier['level'] = (value != undefined ? parseInt(value) : value)
 								"
 							/>
@@ -65,7 +65,7 @@
 									:error="!!errorMessage"
 									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
-									@input="
+									@update:model-value="
 										(value) =>
 											level_tier['dice_count'] = (value != undefined ? parseInt(value) : value)
 									"
@@ -96,7 +96,7 @@
 									:error="!!errorMessage"
 									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
-									@input="
+									@update:model-value="
 										(value) =>
 											level_tier['fixed_val'] = (value != undefined ? parseInt(value) : value)
 									"
@@ -121,7 +121,7 @@
 									:error="!!errorMessage"
 									:error-message="errorMessage"
 									@keyup="$forceUpdate()"
-									@input="
+									@update:model-value="
 										(value) =>
 											level_tier['projectile_count'] = (value != undefined ? parseInt(value) : value)
 									"

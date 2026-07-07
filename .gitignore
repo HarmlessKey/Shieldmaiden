@@ -68,3 +68,6 @@ yarn-error.log*
 *.sln
 
 firebaseServiceAccountKey.json
+
+# Claude Code local settings (per-machine permissions allowlist)
+.claude/settings.local.json

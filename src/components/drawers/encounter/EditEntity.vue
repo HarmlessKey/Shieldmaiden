@@ -68,7 +68,7 @@
 									v-model="entity.color_label"
 									:palette="shieldmaiden_colors"
 									default-view="palette"
-									@input="editValue('color_label', entity.color_label)"
+									@update:model-value="editValue('color_label', entity.color_label)"
 								/>
 							</q-popup-proxy>
 						</q-icon>
@@ -210,7 +210,7 @@
 					dense
 					v-for="(setting, index) in npcsOptions"
 					:options="setting.options"
-					:value="index"
+					:model-value="index"
 					class="mb-1"
 					:key="`setting-${index}`"
 				>
@@ -435,7 +435,10 @@ export default {
 			},
 		},
 		npcSettings() {
-			return this.userSettings && this.userSettings.track ? this.userSettings.track.npc : undefined;
+			if (!this.userSettings?.track) return undefined;
+			return this.entity?.friendly
+				? this.userSettings.track.ally
+				: this.userSettings.track.npc;
 		},
 	},
 	methods: {

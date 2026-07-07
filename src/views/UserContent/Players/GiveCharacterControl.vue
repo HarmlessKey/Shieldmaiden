@@ -6,7 +6,7 @@
 			filled
 			square
 			label="Controlled by"
-			:value="controlUser.username"
+			:model-value="controlUser.username"
 			readonly
 		>
 			<template v-slot:append>

@@ -9,7 +9,9 @@
 						<p class="text">
 							Our encounter builder is easy to use and lets you use your own custom monsters. We
 							instantly calculate the difficulty for you.<br />
-							<router-link to="/tools/encounter-builder" class="learn-more">Learn more</router-link>
+							<router-link to="/tools/encounter-builder" class="learn-more"
+								>More on the Encounter Builder</router-link
+							>
 						</p>
 						<router-link to="/encounter-builder" class="btn btn-lg bg-accent">
 							Try Encounter Builder
@@ -17,7 +19,11 @@
 					</div>
 				</div>
 				<div class="col-12 col-md-7">
-					<img src="~assets/_img/encounter-builder-shieldmaiden.webp" alt="Encounter Builder" />
+					<img
+						src="~assets/_img/encounter-builder-shieldmaiden.webp"
+						alt="Encounter Builder"
+						loading="lazy"
+					/>
 				</div>
 			</div>
 		</div>

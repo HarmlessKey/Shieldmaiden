@@ -81,7 +81,7 @@
 				</div>
 			</q-popup-proxy>
 		</div>
-		<button v-else class="btn btn-clear btn-sm bg-neutral-6 user-btn">
+		<button v-else class="btn btn-clear btn-sm bg-neutral-6 user-btn" aria-label="User menu">
 			<i class="fas fa-user-circle" />
 			<q-popup-proxy
 				:dark="$store.getters.theme === 'dark'"

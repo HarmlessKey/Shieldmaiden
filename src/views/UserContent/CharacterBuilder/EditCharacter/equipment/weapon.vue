@@ -86,7 +86,7 @@
 						dark filled square dense
 						type="number"
 						label="Normal range"
-						:value="weapon.range ? weapon.range.split('/')[0] : undefined"
+						:model-value="weapon.range ? weapon.range.split('/')[0] : undefined"
 					/>
 				</div>
 				<div class="col">
@@ -94,7 +94,7 @@
 						dark filled square dense
 						type="number"
 						label="Long range"
-						:value="weapon.range ? weapon.range.split('/')[1] : undefined"
+						:model-value="weapon.range ? weapon.range.split('/')[1] : undefined"
 					/>
 				</div>
 			</div>
@@ -108,7 +108,7 @@
 						dark filled square dense
 						type="number"
 						label="Normal range"
-						:value="weapon.thrown ? weapon.thrown.split('/')[0] : undefined"
+						:model-value="weapon.thrown ? weapon.thrown.split('/')[0] : undefined"
 					/>
 				</div>
 				<div class="col">
@@ -116,7 +116,7 @@
 						dark filled square dense
 						type="number"
 						label="Long range"
-						:value="weapon.thrown ? weapon.thrown.split('/')[1] : undefined"
+						:model-value="weapon.thrown ? weapon.thrown.split('/')[1] : undefined"
 					/>
 				</div>
 			</div>

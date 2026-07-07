@@ -64,7 +64,7 @@
 					</div>
 					<q-select 
 						dark filled square map-options emit-value
-						@input="save(meta.valid)"
+						@update:model-value="save(meta.valid)"
 						v-model="character.advancement" 
 						:options="advancement_options" 
 						label="Advancement" 
@@ -72,7 +72,7 @@
 					/>
 					<q-select 
 						dark filled square map-options emit-value
-						@input="save(meta.valid)"
+						@update:model-value="save(meta.valid)"
 						v-model="character.hit_point_type" 
 						:options="hit_point_options" 
 						label="Hit point type"

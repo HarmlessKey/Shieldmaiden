@@ -21,7 +21,7 @@
 						<q-item-section avatar>
 							<q-checkbox
 								dark
-								:value="item.equipped"
+								:model-value="item.equipped"
 								:false-value="null"
 								indeterminate-value="something-else"
 								:disable="checkEquipped(item.type) > 0 && !item.equipped"
@@ -63,7 +63,7 @@
 							dark
 							size="sm"
 							class="mb-2"
-							:value="item.equipped"
+							:model-value="item.equipped"
 							:false-value="null"
 							indeterminate-value="something-else"
 							:disable="checkEquipped(item.type) > 0 && !item.equipped"
@@ -122,7 +122,7 @@
 							emit-value
 							v-model="new_item.type"
 							:options="types"
-							@input="changeType($event)"
+							@update:model-value="changeType($event)"
 						/>
 
 						<div class="form-item mb-3" v-if="new_item.type === 'weapon'">

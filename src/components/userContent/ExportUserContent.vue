@@ -1,10 +1,10 @@
 <template>
-	<button class="btn" @click="downloadContent()">
+	<component :is="tag" :class="{ btn: tag === 'button' }" @click="downloadContent()">
 		<slot>
 			<i aria-hidden="true" class="fas fa-arrow-alt-down"></i>
 			<q-tooltip anchor="top middle" self="bottom middle"> Export {{ contentType }} </q-tooltip>
 		</slot>
-	</button>
+	</component>
 </template>
 
 <script>
@@ -13,6 +13,10 @@ export default {
 	name: "ExportUserContent",
 
 	props: {
+		tag: {
+			type: String,
+			default: "button",
+		},
 		contentType: {
 			type: String,
 			required: true,
@@ -241,6 +245,7 @@ export default {
 
 		addNpcToExport(npc_id, npc) {
 			delete npc.player_id;
+			delete npc.groups;
 			npc.harmless_key = npc_id;
 
 			this.exportData.npcs[npc_id] = npc;

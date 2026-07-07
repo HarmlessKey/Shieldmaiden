@@ -24,6 +24,7 @@ module.exports = configure(function (ctx) {
 		boot: [
 			// These register global components/directives/prototype extensions and
 			// must also run server-side, or SSR fails to resolve them during render
+			"prototypes",
 			"plugins",
 			"hk-components",
 			"vee-validate",

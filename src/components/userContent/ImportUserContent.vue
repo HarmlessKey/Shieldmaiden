@@ -14,7 +14,7 @@
 				square
 				accept=".json"
 				v-model="json_file"
-				@input="loadJSON()"
+				@update:model-value="loadJSON()"
 				label="Drag a file here or click to upload"
 			>
 				<template v-slot:prepend>
@@ -607,6 +607,7 @@ export default {
 			 */
 
 			this.removeTimestamps(npc);
+			delete npc.groups;
 
 			this.versatileToOptions(npc);
 			this.renameNpcProps(npc);

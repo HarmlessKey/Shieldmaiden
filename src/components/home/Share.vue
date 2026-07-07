@@ -3,7 +3,11 @@
 		<div class="home__container">
 			<div class="row q-col-gutter-xl">
 				<div class="col-12 col-md-7">
-					<img src="~assets/_img/home/live-initiative-list.webp" alt="Live Initiative Tracker" />
+					<img
+						src="~assets/_img/home/live-initiative-list.webp"
+						alt="Live Initiative Tracker"
+						loading="lazy"
+					/>
 				</div>
 				<div class="col-12 col-md-5">
 					<div class="head">
@@ -12,7 +16,9 @@
 						<p class="text">
 							Show your players a live initiative list of the encounter that updates as you play.
 							Perfect for at the table or if you are hosting a podcast or stream.<br />
-							<router-link to="/tools/combat-tracker" class="learn-more">Learn more</router-link>
+							<router-link to="/tools/combat-tracker" class="learn-more"
+								>More about sharing</router-link
+							>
 						</p>
 						<router-link to="/sign-up" class="btn btn-lg bg-accent"
 							>Create Free Account</router-link

@@ -22,11 +22,11 @@
 				square
 				label="Method"
 				placeholder="Select method"
-				:value="method"
+				:model-value="method"
 				:options="ability_score_methods"
 				emit-value
 				map-options
-				@input="confirmMethodChange($event)"
+				@update:model-value="confirmMethodChange($event)"
 			/>
 
 			<ValidationObserver v-if="method" v-slot="{ meta }" as="div">
@@ -47,12 +47,12 @@
 								filled
 								square
 								placeholder="-"
-								:value="ability_scores[ability]"
+								:model-value="ability_scores[ability]"
 								:options="standard_array"
 								emit-value
 								map-options
 								:option-disable="standardArrayDisable"
-								@input="saveAbility($event, ability, meta.valid)"
+								@update:model-value="saveAbility($event, ability, meta.valid)"
 								clearable
 							/>
 						</div>
@@ -68,7 +68,7 @@
 									filled
 									square
 									placeholder="-"
-									:value="ability_scores[ability]"
+									:model-value="ability_scores[ability]"
 									:options="point_buy.map((item) => item.score)"
 									:option-label="ability"
 									emit-value

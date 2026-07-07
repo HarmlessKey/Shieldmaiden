@@ -46,7 +46,7 @@
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
 											type="number"
-											:value="player.value"
+											:model-value="player.value"
 											dense
 											autofocus
 											@focus="$event.target.select()"

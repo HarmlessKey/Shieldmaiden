@@ -3,11 +3,11 @@
 		<q-btn-toggle
 			v-if="custom_content && custom_content.length && content.length === 2"
 			class="mb-3"
-			:value="copy_resource"
+			:model-value="copy_resource"
 			spread
 			no-caps
 			toggle-color="primary"
-			@input="changeCopyResource($event)"
+			@update:model-value="changeCopyResource($event)"
 			:options="options"
 		/>
 		<hk-input

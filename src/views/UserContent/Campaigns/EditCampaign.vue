@@ -81,7 +81,7 @@
 										placeholder="Custom background URL"
 										:error="!!errorMessage"
 										:error-message="errorMessage"
-										@input="editCampaign.hk_background = null"
+										@update:model-value="editCampaign.hk_background = null"
 									>
 										<template v-slot:append>
 											<hk-popover

@@ -16,6 +16,4 @@ export default async ({ app, router }) => {
 			})
 		);
 	}
-
-	require("../functions.js");
 };

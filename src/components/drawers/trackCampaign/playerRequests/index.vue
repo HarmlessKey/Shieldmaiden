@@ -5,7 +5,7 @@
 			<q-select 
 				:dark="$store.getters.theme === 'dark'" filled square dense
 				name="doneBy"
-				:value="player" 
+				:model-value="player" 
 				:options="characters"
 				v-validate="'required'"
 			>
@@ -61,11 +61,12 @@
 						:players="players" 
 						:npcs="npcs" 
 						:npcSettings="npcSettings"
+						:allySettings="allySettings"
 					/>
 				</div>
 			</li>
 		</ul>
-		<DamageHealing :targeted="targeted" :player="player" :encounter="encounter" />
+		<DamageHealing :targeted="targeted" :player="player" :encounter="encounter" :npcSettings="npcSettings" :allySettings="allySettings" />
 	</div>
 </template>
 
@@ -95,6 +96,7 @@
 				players: this.data.players,
 				campPlayers: this.data.campPlayers,
 				npcSettings: this.data.npcSettings,
+				allySettings: this.data.allySettings,
 				npcs: this.data.npcs,
 				player: this.data.characters[0]
 			}

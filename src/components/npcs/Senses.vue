@@ -9,8 +9,8 @@
 							:label="sense.capitalize()" 
 							:false-value="null" 
 							indeterminate-value="something else"
-							:value="npc.senses && npc.senses[sense] ? npc.senses[sense][sense] : null"
-							@input="setSense($event, sense)"
+							:model-value="npc.senses && npc.senses[sense] ? npc.senses[sense][sense] : null"
+							@update:model-value="setSense($event, sense)"
 						/>
 					</div>
 					<div class="col">
@@ -20,10 +20,10 @@
 								label="Range"
 								autocomplete="off"
 								type="number" 
-								:value="npc.senses && npc.senses[sense] ? npc.senses[sense].range : undefined" 
+								:model-value="npc.senses && npc.senses[sense] ? npc.senses[sense].range : undefined" 
 								suffix="ft."
 								:disable="!npc.senses || !npc.senses[sense]"
-								@input="parseToInt($event, npc.senses[sense], 'range')"
+								@update:model-value="parseToInt($event, npc.senses[sense], 'range')"
 								:error="!!errorMessage"
 								:error-message="errorMessage"
 							/>
@@ -35,9 +35,9 @@
 								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Comments"
 								autocomplete="off"
-								:value="npc.senses && npc.senses[sense] ? npc.senses[sense].comments : undefined"
+								:model-value="npc.senses && npc.senses[sense] ? npc.senses[sense].comments : undefined"
 								:disable="!npc.senses || !npc.senses[sense]"
-								@input="$event => { if($event) npc.senses[sense]['comments'] = $event }"
+								@update:model-value="$event => { if($event) npc.senses[sense]['comments'] = $event }"
 								:error="!!errorMessage"
 								:error-message="errorMessage"
 							/>

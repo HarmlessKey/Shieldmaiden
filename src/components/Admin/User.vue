@@ -79,7 +79,7 @@
 					class="mb-3"
 					:options="contributes"
 					v-model="user.contribute"
-					@input="setContribute($event)"
+					@update:model-value="setContribute($event)"
 				/>
 
 				<h3>Link a Patreon account</h3>

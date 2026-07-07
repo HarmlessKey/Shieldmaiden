@@ -117,7 +117,7 @@
 									placeholder="Background URL"
 									:error="!!errorMessage"
 									:error-message="errorMessage"
-									@input="editableEncounter.hk_background = null"
+									@update:model-value="editableEncounter.hk_background = null"
 								>
 									<template v-slot:append>
 										<hk-popover

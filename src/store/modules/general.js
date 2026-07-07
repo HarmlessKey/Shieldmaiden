@@ -1,4 +1,4 @@
-import { browserDetect } from "../../functions";
+import { browserDetect, extensionInstalled } from "src/utils/generalFunctions";
 
 export default {
 	state: () => ({
@@ -10,6 +10,7 @@ export default {
 		side_collapsed: true,
 		side_small_screen: false,
 		browser: browserDetect(),
+		extensionInstalled: null,
 		music: null,
 		ambience: [],
 	}),
@@ -38,6 +39,9 @@ export default {
 		},
 		browser(state) {
 			return state.browser;
+		},
+		extensionInstalled(state) {
+			return state.extensionInstalled;
 		},
 		music(state) {
 			return state.music;
@@ -73,6 +77,7 @@ export default {
 							dispatch("reminders/fetch_reminder_count"),
 							dispatch("spells/fetch_spell_count"),
 							dispatch("set_user_ai"),
+							dispatch("checkExtensionInstalled"),
 						]);
 					})
 					.then(async () => {
@@ -209,6 +214,12 @@ export default {
 			commit("SET_SIDE_SMALL_SCREEN", payload);
 		},
 
+		async checkExtensionInstalled({ state, commit }) {
+			if (state.extensionInstalled !== null) return state.extensionInstalled;
+			const version = await extensionInstalled();
+			commit("SET_EXTENSION_INSTALLED", version);
+			return version ?? false;
+		},
 		play_music({ commit }, payload) {
 			commit("SET_MUSIC", payload);
 		},
@@ -248,6 +259,9 @@ export default {
 		},
 		SET_SIDE_SMALL_SCREEN(state, payload) {
 			state.side_small_screen = payload;
+		},
+		SET_EXTENSION_INSTALLED(state, version) {
+			state.extensionInstalled = version ?? false;
 		},
 		SET_MUSIC(state, payload) {
 			state.music = payload;

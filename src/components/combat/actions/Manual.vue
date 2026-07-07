@@ -66,7 +66,7 @@
 				center-color="neutral-6"
 				track-color="neutral-8"
 				:disable="!targeted?.length"
-				@input="value = $event"
+				@update:model-value="value = $event"
 				class="knob"
 			/>
 			<div class="input__wrapper">

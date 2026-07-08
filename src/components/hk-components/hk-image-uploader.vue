@@ -39,8 +39,16 @@
 								</div>
 							</div>
 							<div v-if="!imageSrc" class="crop-placeholder" @click="openFileInput">
-								<span>Choose an image</span>
-								<input ref="fileInput" type="file" accept="image/*" style="display:none" @change="onFileSelect" />
+								<label for="avatar-file-input">Choose an image</label>
+								<input
+									id="avatar-file-input"
+									ref="fileInput"
+									type="file"
+									accept="image/*"
+									aria-label="Choose an image to upload"
+									style="display: none"
+									@change="onFileSelect"
+								/>
 							</div>
 							<Cropper
 								v-if="imageSrc"

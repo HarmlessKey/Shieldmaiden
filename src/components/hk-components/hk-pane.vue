@@ -2,7 +2,9 @@
 	<Pane v-bind="$attrs">
 		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px' }">
 			<template v-for="slot in Object.keys($slots)" v-slot:[slot]="scope">
-				<slot :name="slot" v-bind="scope" />
+				<!-- scope is undefined when the slot is invoked without props;
+					v-bind of a nullish value makes renderSlot throw (null.key) -->
+				<slot :name="slot" v-bind="scope || {}" />
 			</template>
 		</q-scroll-area>
 	</Pane>

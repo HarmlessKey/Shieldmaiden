@@ -82,10 +82,6 @@
 			'npcs',
 			'displaySettings'
 		],
-		computed: {
-			npcSettings() { return this.displaySettings?.npc; },
-			allySettings() { return this.displaySettings?.ally; },
-		},
 		data() {
 			return {
 				userId: this.$route.params.userid,
@@ -103,6 +99,8 @@
 			}
 		},
 		computed: {
+			npcSettings() { return this.displaySettings?.npc; },
+			allySettings() { return this.displaySettings?.ally; },
 			types() {
 				let dmg = {
 					type: 'damage',

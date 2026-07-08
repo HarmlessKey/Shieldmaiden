@@ -162,6 +162,7 @@ const npc_actions = {
 						}
 					);
 				}
+				return null;
 			})
 		);
 		return spells_to_delete;

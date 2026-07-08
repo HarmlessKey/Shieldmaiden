@@ -312,12 +312,13 @@ export default {
 					let key = vm.search[i];
 					// If field is undefined don't return row
 					if (row[key] == undefined) {
-						return;
+						return false;
 					}
 					if (row[key].toLowerCase().includes(searchTerm)) {
-						return row;
+						return true;
 					}
 				}
+				return false;
 			});
 			this.dataItems = results;
 		},

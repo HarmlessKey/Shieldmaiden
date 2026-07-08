@@ -688,7 +688,11 @@ export default {
 	watch: {
 		// Prop is changed in parent to trigger addAllPlayers function from Overview.vue
 		addPlayers() {
-			this.demo ? (this.player_dialog = true) : this.addAllPlayers();
+			if (this.demo) {
+				this.player_dialog = true;
+			} else {
+				this.addAllPlayers();
+			}
 		},
 	},
 	computed: {

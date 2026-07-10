@@ -477,6 +477,47 @@ needing hard mechanical modeling beyond the explicit numeric pieces, which use e
 - *Polymorph* — wholesale stat-block replacement (likely out of scope for per-effect modeling;
   flag as "special/descriptive" catch-all).
 
+### Gap 19: Directional damage/healing — self vs. the entity that caused the trigger
+**Problem:** Every `damage`/`healing` sub-effect with a `trigger` (Burning's DoT, Concentration's
+"take damage" check) implicitly applies to the entity holding the effect. But some triggered
+damage is retaliatory: it belongs to the entity holding the effect, but lands on **whoever caused
+the trigger to fire**, not on the holder itself. The current schema has no way to say "roll this
+damage, but apply it to the other party."
+
+**Proposal:** Add a `target` field to `sub_effect` (JSON schema `$defs.sub_effect.target`):
+```js
+target: "self" | "trigger_source" // default: "self"
+```
+- `self` (default) — current/implicit behavior for every existing effect (Burning, Concentration's
+  save check, etc.). No existing data needs to change.
+- `trigger_source` — the sub-effect's damage/healing is applied to the entity that caused the
+  trigger to fire, not to the entity holding the effect. Only meaningful when paired with a trigger
+  that has a natural counterpart entity: `damage_taken` / `on_hit_taken` (the attacker), or
+  `on_hit` / `on_crit` (the creature this entity just hit). Triggers without a counterpart
+  (`start_turn_target`, `long_rest`, etc.) simply have no effect from this field.
+
+**Implementation note:** the attacker entity is not missing data that needs to be newly captured —
+it's already in scope at the exact point `damage_taken` will fire. `isDamage(amount, target,
+current, config)` in `src/mixins/HpManipulations.js` has both the damaged entity (`target`) and the
+entity that dealt the damage (`current`) in scope at the `checkReminders(target, "damage")` call
+site (`HpManipulations.js:148`) that the future trigger dispatcher (implementation plan step 2g)
+replaces. `current.key` is already persisted per-hit on every combat log entry via `addLog()`
+(`by: current.key`). So wiring this up is a matter of threading `current` through to the trigger
+dispatcher and, at mechanical-resolution time (step 3), re-invoking the same damage/healing
+pipeline with `target`/`current` swapped when a sub-effect specifies `target: "trigger_source"` -
+no new data source required.
+
+**Examples:**
+- *Black Pudding* — "A creature that touches the pudding or hits it with a melee attack while
+  within 5 feet of it takes 4 (1d8) acid damage." Modeled as a `damage` sub-effect with
+  `trigger: "damage_taken"`, `target: "trigger_source"`, rolling `1d8` acid. (The "touches the
+  pudding" half of the trait, which doesn't require a damage roll to trigger, is intentionally not
+  modeled - left to the DM to track manually. Weapon corrosion / ammunition destruction from this
+  same trait is also intentionally out of scope - it targets an item, not a creature, and there is
+  no item-state model in this schema; it stays purely descriptive text on the effect.)
+- Any other "hit me and you get hurt" trait (spike-covered creatures, fire-aura monsters) follows
+  the same shape.
+
 ---
 
 ## 3. New triggers and duration_types needed
@@ -682,6 +723,7 @@ export const effect_types = Object.freeze({
 		subtypes: ["roll", "fixed_value"],
 		trigger: true,
 		scaling: true,
+		target: ["self", "trigger_source"],
 	},
 	healing: {
 		label: "Healing",
@@ -690,6 +732,7 @@ export const effect_types = Object.freeze({
 		subtypes: ["roll", "fixed_value"],
 		trigger: true,
 		scaling: true,
+		target: ["self", "trigger_source"],
 	},
 	auto_fail: {
 		label: "Auto fail",

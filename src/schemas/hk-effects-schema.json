@@ -255,6 +255,12 @@
 					"description": "How a fixed temp_hp value interacts with existing temp HP."
 				},
 				"trigger": { "$ref": "#/$defs/trigger" },
+				"target": {
+					"type": "string",
+					"enum": ["self", "trigger_source"],
+					"default": "self",
+					"description": "Who receives this sub-effect's damage/healing. 'self' (default) applies to the entity holding the effect, e.g. a Burning DoT. 'trigger_source' applies to whichever entity caused the trigger to fire, e.g. the attacker who hit a Black Pudding with a melee weapon. Only meaningful on damage/healing sub-effects paired with a trigger that has a counterpart entity (damage_taken, on_hit_taken, on_hit, on_crit)."
+				},
 				"condition": { "$ref": "#/$defs/condition_check" },
 				"description": {
 					"type": "string",

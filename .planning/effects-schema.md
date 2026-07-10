@@ -7,6 +7,11 @@ Reference: D&D 5e (2014 SRD 5.1) and D&D 5.5e (2024 SRD 5.2) Conditions appendic
 > content), not a verbatim PDF extraction (PDF text extraction tooling was unavailable in this
 > environment). Mechanical summaries below are paraphrased, not quoted.
 
+> Update (2026-07-10): Section 2a and Gaps 20–28 were added after cross-referencing this proposal
+> against the live monster corpus at `https://api.harmlesskey.com/monsters` (325 monsters, 1430
+> action/trait entries). See [monster-actions-effect-scan.md](monster-actions-effect-scan.md) for the
+> raw scan data this compatibility check is based on.
+
 ---
 
 ## 1. Conditions broken down into the existing effect_type/subtype model
@@ -520,6 +525,206 @@ no new data source required.
 
 ---
 
+## 2a. Compatibility check against the live monster corpus
+
+Cross-referenced against every action/trait description for all 325 monsters at
+`https://api.harmlesskey.com/monsters` (1430 action/trait entries scanned; full breakdown in
+[monster-actions-effect-scan.md](monster-actions-effect-scan.md)). Findings below.
+
+### Already compatible, no schema changes needed
+
+- **All 15 named SRD conditions** referenced in monster text (Blinded, Charmed, Deafened, Frightened,
+  Grappled, Incapacitated, Invisible, Paralyzed, Petrified, Poisoned, Prone, Restrained, Stunned,
+  Unconscious, Surprised) — fully covered by the sub-effect breakdowns in Section 1. `Exhaustion`
+  never appears in monster action text (0 occurrences) — it's a PC-facing mechanic only.
+- **Self advantage/disadvantage** (`advantage`/`disadvantage` + `attack`/`ability`/`skill`/`save`) —
+  standard usage, e.g. Magic Resistance, Sunlight Weakness/Sensitivity.
+- **Grant advantage/disadvantage to others** (Gap 1, already modeled as `grant_advantage`/
+  `grant_disadvantage`) — confirmed by *Reckless* (Berserker, Minotaur): "attack rolls against it
+  have advantage."
+- **Self-healing on trigger** (*Aboleth* Psychic Drain — "regains hit points equal to the damage the
+  creature takes") — `healing` + `trigger: "on_hit"` (or `on_crit`) + `target: "self"` already covers
+  this; the healed amount equaling a damage roll from the *same* sub-effect bundle is an authoring
+  convention (reference the sibling `damage` sub-effect's roll), not a schema gap.
+- **Temporary HP grants/prevention** — `fixed`/`temp_hp` and the new `restrict`/`healing` (Gap 21,
+  below) cover both directions.
+- **Max HP reduction** (*Night Hag* Nightmare Haunting, *Shadow* life-drain adjacent effects) —
+  already fully supported via `bonus`/`base`/`fixed` + subtype `max_hp` with a negative value.
+- **Frightful Presence** — is exactly the Frightened condition (Section 1); no separate modeling
+  needed.
+- **Legendary Resistance** — out of scope for the *Effect* schema. It's a monster-trait-level
+  "auto-succeed a failed save, N/day" ability, and per-day usage tracking already exists at the
+  action level (`limit`/`limit_type` fields — see monster-actions-effect-scan.md §3), not on the
+  Effect object itself.
+- **Teleport** (*Blink Dog*) — a self-mobility action ability, not a target-facing effect; out of
+  scope for this schema.
+- **Shapechanger / Polymorph** (*Change Shape*, *Wereboar* Shapechanger) — already explicitly flagged
+  as an intentional `special`/`descriptive` catch-all in Gap 18.
+- **Ongoing ignite damage** (*Fire Elemental* Touch/Fire Form, *Chain Devil* Chain — "takes damage at
+  the start of each of its turns" until doused) — `damage` + `trigger: "start_turn_target"` +
+  `duration_type: "action_removed"` (Gap already proposed in Section 3) covers this cleanly.
+- **Touch/hit retaliation damage** (*Azer* Heated Body, *Fire Elemental* Fire Form) — this is exactly
+  the Black Pudding pattern Gap 19 was already written for (`target: "trigger_source"`).
+- **Swallowed** (*Behir* Swallow) — not a schema gap; it's a composite of existing primitives
+  (Blinded + Restrained + `damage`/`trigger: "start_turn_caster"` + a `special`/`descriptive` note for
+  the regurgitation-on-damage-threshold clause). Worth adding as a named preset/example condition
+  alongside Prone/Grappled when the constants file is built, but requires no new structure.
+
+### New gaps found (continuing numbering from Gap 19)
+
+### Gap 20: Multiplicative modifiers (halved values) — highest-priority gap, 80+ occurrences
+**Problem:** The single most common pattern in the monster corpus (80 of 1430 scanned entries) is
+save-for-half AOE damage: full damage on a failed save, half on a success (every dragon breath
+weapon, and the general 5e AOE spell pattern). A rarer but related pattern (6 occurrences) is a flat
+halving of a stat, e.g. *Slowing Breath*'s "speed is halved." Neither is representable today —
+`damage`/`bonus`/`base`/`fixed` sub-effects only carry an absolute `value` or `roll`, with no way to
+derive "half of X" without hand-duplicating the dice expression (error-prone, drifts if the source
+roll is edited).
+
+**Proposal:** Add a `multiplier` field (number, default `1`) to the `sub_effect` schema, valid on
+`damage`, `healing`, `bonus`, `base`, and `fixed`. The `roll`/`value` result is multiplied by this
+factor before being applied. Save-for-half becomes two sibling sub-effects sharing one dice
+expression:
+```js
+[
+  { type: "damage", trigger: "failed_save", roll: { dice_count: 8, dice_type: 6, damage_type: "fire" } },
+  { type: "damage", trigger: "success_save", roll: { dice_count: 8, dice_type: 6, damage_type: "fire" }, multiplier: 0.5 }
+]
+```
+Speed-halving becomes `{ type: "base", sub_types: ["speed"], multiplier: 0.5 }`.
+
+**Examples:**
+- Every dragon breath weapon in the corpus ("...or half as much damage on a successful one") — 80
+  occurrences across all elemental damage types.
+- *Slowing Breath* (Copper Dragon line) — speed halved for 1 minute.
+- *Enlarge/Reduce* (Gap 18) — Reduce halves damage dice; Enlarge would use `multiplier: 2`.
+
+### Gap 21: Prevent healing / "can't regain hit points" — 17 occurrences
+**Problem:** `restrict`'s subtypes (`action`, `reaction`, `bonus_action`, `attack`, `movement`,
+`speech`) have no way to express "the target can't regain hit points" — a common disease/curse/swarm
+rider.
+
+**Proposal:** Add subtype `healing` to `restrict`.
+
+**Examples:**
+- *Aboleth* Tentacle disease — "can't regain hit points unless it is underwater."
+- Swarm trait (multiple swarm monsters) — "can't regain hit points or gain temporary hit points."
+
+### Gap 22: Ability score drain (clarify overloaded `ability` subtype; generalize rest-based duration)
+**Problem:** `bonus`/`base`/`fixed` already list `ability` as a subtype, but `advantage`/
+`disadvantage`/`auto_fail`/`auto_success` also use `ability` to mean "checks made with this ability
+score" — the same subtype string is silently overloaded for two different meanings (modify the score
+*value* vs. modify *rolls using* the score). *Shadow* Strength Drain ("Strength score is reduced by
+1d4... lasts until the target finishes a short or long rest") needs the former, and needs a duration
+that ends on *either* rest type — the already-proposed `long_rest` duration_type is long-rest-only.
+
+**Proposal:** No new effect_type needed — `fixed`/`ability` (or `bonus`/`ability`) already covers
+"modify the ability score value" mechanically. Two documentation/schema fixes: (1) explicitly
+document that `ability` under `bonus`/`base`/`fixed` targets the score value, while the same string
+under `advantage`/`disadvantage`/`auto_fail`/`auto_success` targets checks made with it — both valid,
+disambiguated by parent `type`, not by the subtype string. (2) generalize the proposed `long_rest`
+duration_type to `rest`, with an optional `rest_type: "short" | "long"` qualifier (default `"long"`),
+so "ends on next short or long rest" is representable alongside "ends only on a long rest"
+(Exhaustion).
+
+**Examples:**
+- *Shadow* Strength Drain — 1d4 Strength reduction, ends on next short or long rest, death at 0.
+- Intellect-devourer-style ability drain (not in this dataset, but same shape).
+
+### Gap 23: Forced movement (push/pull) — 14 occurrences
+**Problem:** The model has `restrict`/`movement` (target *can't* move) and speed modifiers, but
+nothing for a source *displacing* a target against its will — a common rider on breath weapons, tail
+attacks, and harpoon-style attacks.
+
+**Proposal:** New effect_type `forced_movement`:
+- subtypes: `push`, `pull`
+- reuses the existing `value` field for distance in feet; direction is implied by the subtype (push =
+  away from source, pull = toward source)
+
+**Examples:**
+- *Dragon Turtle* Tail — "pushed up to 10 feet away."
+- *Merrow* Harpoon — "pulled up to 20 feet toward the merrow."
+
+### Gap 24: Escape DC as a structured field — 31 occurrences
+**Problem:** Grappled/Restrained effects always name an explicit DC to escape ("escape DC 13"), but
+today that number only exists inside freeform `description` text — it can't be queried, validated, or
+used to auto-roll an escape attempt.
+
+**Proposal:** Add an optional `escape` object to the top-level Effect schema (sibling of
+`cancel_trigger`), used when `duration_type` is `trigger` or `action_removed` and the trigger is
+"target escapes":
+```js
+escape: {
+  dc: <number>,
+  ability: "strength" | "dexterity", // the check used to escape (Athletics/Acrobatics)
+}
+```
+
+**Examples:**
+- *Ankheg* Bite — "grappled (escape DC 13)."
+- *Behir* Swallow/Constrict, *Chuul* Pincer, *Constrictor Snake* Constrict — same shape, DC varies per
+  monster (13–16 observed in the corpus).
+
+### Gap 25: Creature-type exception clauses — 4 occurrences
+**Problem:** Some effects explicitly exempt a creature type or race from their trigger ("the target
+is a creature other than an elf or undead"). `condition_check` (Gap 7) already models conditional
+sub-effects (attacker distance, line of sight, etc.) but has no type for "target's creature type."
+
+**Proposal:** Add `target_creature_type` to `condition_check.type`'s enum, with `value` naming the
+type/race and `comparator: "eq" | "neq"`.
+
+**Examples:**
+- *Ghoul*/*Ghast* Claws — paralysis doesn't affect elves or undead (`neq`, value covering both).
+
+### Gap 26: Damage floor ("stabilize at 1 HP") traits — 5 occurrences, common across the full SRD
+**Problem:** *Relentless* (Boar, Wereboar, Giant Boar) and *Undead Fortitude* (Zombie, Ogre Zombie)
+prevent a hit from dropping the creature below 1 HP, once per turn/rest. `damage_modifier`'s existing
+subtypes (`halve_damage`, `negate_damage`, `redirect_damage`) don't cover "cap the damage so current
+HP can't go below 1."
+
+**Proposal:** Add subtype `floor_at_1` to `damage_modifier`, paired with `trigger: "damage_taken"`.
+Per-use limiting (once/turn, once/long rest) is tracked the same way action recharge/limit already
+is at the ability level (monster-actions-effect-scan.md §3) — out of scope for the Effect schema
+itself.
+
+**Examples:**
+- *Zombie*/*Ogre Zombie* Undead Fortitude — Constitution save vs. radiant/crit-or-die; otherwise
+  damage that would drop it to 0 is capped at 1.
+- *Boar*/*Wereboar*/*Giant Boar* Relentless — same shape, unconditional (no save).
+
+### Gap 27: Partial action-economy caps — 5-6 occurrences
+**Problem:** *Slowing Breath* ("can't make more than one attack on its turn... can use either an
+action or a bonus action, but not both") and *Stone Golem* Slow impose a partial cap on the action
+economy rather than a full block. Current `restrict` subtypes are binary (blocked entirely).
+
+**Proposal:** Add an optional `limit` field (integer) to `restrict` sub-effects meaning "capped to N
+uses of this subtype per turn" instead of fully blocked (omitted/`null` preserves existing
+fully-blocked behavior). The narrower "action OR bonus action, not both" phrasing is rare enough (2
+distinct sources in the corpus) to leave as `special`/`descriptive` text rather than modeling
+formally.
+
+**Examples:**
+- *Slowing Breath* (Copper Dragon line) — attacks capped to 1/turn; action/bonus-action mutually
+  exclusive.
+- *Stone Golem* Slow — same shape.
+
+### Gap 28: Duration unit granularity — affects `temp_immunity_granted` (2) and disease timers (1)
+**Problem:** `duration_value` is documented as "number of rounds," but some effects specify duration
+in minutes, hours, or a periodic interval that doesn't convert cleanly to whole rounds for authoring
+purposes (10 rounds/minute is fine, but "24 hours" = 240 rounds is unwieldy to author).
+
+**Proposal:** Add an optional `duration_unit` field (`"round" | "minute" | "hour" | "day"`, default
+`"round"`) alongside `duration_value`. The rarer "damage every 10 minutes, independent of turn order"
+timing (*Aboleth* disease — a single occurrence in the corpus) isn't worth new structure; leave as
+`special`/`descriptive` text.
+
+**Examples:**
+- *Ghast* Stench — immune to the stench for 24 hours (`duration_unit: "hour"`).
+- Most save-ends conditions specify "for 1 minute" — natural to author as `duration_unit: "minute"`,
+  `duration_value: 1` instead of pre-converting to 10 rounds.
+
+---
+
 ## 3. New triggers and duration_types needed
 
 ### New `triggers`:
@@ -639,6 +844,10 @@ export const duration_types = Object.freeze([
 	{
 		label: "Until long rest",
 		value: "long_rest",
+		// Gap 22: pair with an optional `rest_type: "short" | "long"` field
+		// (default "long", unchanged existing behavior) so effects that end on
+		// *either* rest (e.g. Shadow's Strength Drain) are representable
+		// alongside long-rest-only effects (e.g. Exhaustion).
 	},
 ]);
 
@@ -651,8 +860,13 @@ export const effect_types = Object.freeze({
 			"ac", "max_hp", "attack", "damage", "ability", "skill", "save", "speed",
 			"fly_speed", "climb_speed", "swim_speed", "burrow_speed", "reach", "d20_test",
 		],
+		// NOTE (subtype "ability"): here this means the ability SCORE value itself
+		// (e.g. Shadow's Strength Drain), not checks made with it — see Gap 22.
+		// Checks-made-with-the-score meaning lives under advantage/disadvantage/
+		// auto_fail/auto_success's own "ability" subtype instead.
 		number_value: true,
 		scaling: true,
+		multiplier: true, // Gap 20: optional numeric multiplier applied to value/roll, default 1
 	},
 	base: {
 		label: "Set base value",
@@ -664,6 +878,7 @@ export const effect_types = Object.freeze({
 		],
 		number_value: true,
 		scaling: true,
+		multiplier: true, // Gap 20, e.g. Slowing Breath's "speed is halved"
 	},
 	fixed: {
 		label: "Fixed value",
@@ -674,6 +889,7 @@ export const effect_types = Object.freeze({
 			"fly_speed", "climb_speed", "swim_speed", "burrow_speed", "reach",
 		],
 		number_value: true,
+		multiplier: true, // Gap 20
 	},
 	defense: {
 		label: "Defenses",
@@ -724,6 +940,7 @@ export const effect_types = Object.freeze({
 		trigger: true,
 		scaling: true,
 		target: ["self", "trigger_source"],
+		multiplier: true, // Gap 20: e.g. failed_save at 1x paired with success_save at 0.5x
 	},
 	healing: {
 		label: "Healing",
@@ -733,6 +950,7 @@ export const effect_types = Object.freeze({
 		trigger: true,
 		scaling: true,
 		target: ["self", "trigger_source"],
+		multiplier: true, // Gap 20
 	},
 	auto_fail: {
 		label: "Auto fail",
@@ -750,8 +968,9 @@ export const effect_types = Object.freeze({
 		label: "Restrict",
 		value: "restrict",
 		description: "The target is restricted in performing specific actions",
-		subtypes: ["action", "reaction", "bonus_action", "attack", "movement", "speech"],
+		subtypes: ["action", "reaction", "bonus_action", "attack", "movement", "speech", "healing"], // "healing" added, Gap 21
 		condition: true,
+		limit: true, // Gap 27: optional cap (e.g. "only one attack per turn") instead of a full block
 	},
 	grant_action: {
 		label: "Grant action",
@@ -759,11 +978,19 @@ export const effect_types = Object.freeze({
 		description: "Grants the target additional actions, attacks, or bonus actions",
 		subtypes: ["extra_attack", "extra_action", "extra_bonus_action", "extra_reaction"],
 	},
+	forced_movement: {
+		// Gap 23
+		label: "Forced movement",
+		value: "forced_movement",
+		description: "The target is pushed away from or pulled toward the source",
+		subtypes: ["push", "pull"],
+		number_value: true, // reuses `value` as distance in feet
+	},
 	damage_modifier: {
 		label: "Damage modifier",
 		value: "damage_modifier",
-		description: "Halve, negate, or redirect incoming damage from a triggering event",
-		subtypes: ["halve_damage", "negate_damage", "redirect_damage"],
+		description: "Halve, negate, redirect, or floor incoming damage from a triggering event",
+		subtypes: ["halve_damage", "negate_damage", "redirect_damage", "floor_at_1"], // "floor_at_1" added, Gap 26
 		trigger: true,
 	},
 	score_swap: {
@@ -963,6 +1190,26 @@ export const effect_subtypes = Object.freeze({
 		label: "Redirect incoming damage",
 		value: "redirect_damage",
 	},
+	floor_at_1: {
+		// Gap 26
+		label: "Floor at 1 HP (can't be dropped to 0 by this damage)",
+		value: "floor_at_1",
+	},
+	healing: {
+		// Gap 21: used under restrict — "target can't regain hit points"
+		label: "Healing",
+		value: "healing",
+	},
+	push: {
+		// Gap 23
+		label: "Push",
+		value: "push",
+	},
+	pull: {
+		// Gap 23
+		label: "Pull",
+		value: "pull",
+	},
 	death: {
 		label: "Death",
 		value: "death",
@@ -1009,3 +1256,17 @@ export default {
 5. **Grant_advantage / grant_disadvantage (Gap 1)** targeting "other creatures" implies the effects
    engine needs to evaluate effects on a target when *other* creatures act, not just when the
    target itself acts. This is an architectural consideration beyond just constants.
+6. **Staged / delayed-onset effects** — found while checking the monster corpus (see §2a): a handful
+   of effects change their sub-effects after elapsed time *within their own duration*, distinct from
+   simply ending. *Aboleth* disease has no effect for 1 minute, then a different, harsher set of
+   sub-effects kicks in; *Wereboar* lycanthropy manifests "at the next dusk" rather than immediately.
+   The Effect schema currently models one flat bundle of sub-effects active for the whole duration —
+   there's no "phase 2 begins after X" concept. Low frequency in the corpus (2 occurrences) — flagging
+   as a known gap rather than proposing structure now; a `special`/`descriptive` note is an adequate
+   stand-in until this comes up more.
+7. **`multiplier` (Gap 20) interaction with `scaling` (Gap 12)** — both are optional numeric
+   modifiers on the same sub-effect types (`bonus`/`base`/`fixed`/`damage`/`healing`). Need to decide
+   application order if both are ever present on the same sub-effect (e.g. a scaling effect that's
+   also halved on a successful save) — likely `scaling` resolves first to produce a value, then
+   `multiplier` applies to that result, but this should be confirmed before implementation rather than
+   assumed.

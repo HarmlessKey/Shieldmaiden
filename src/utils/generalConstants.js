@@ -15,6 +15,26 @@ export const editions = Object.freeze([
 
 export const default_edition = "5e";
 
+/** Per-level exhaustion effects. Not covered by the conditions API (flat effects list only). */
+export const EXHAUSTION_LEVELS = Object.freeze({
+	"5e": [
+		"Disadvantage on ability checks",
+		"Speed halved",
+		"Disadvantage on attack rolls and saving throws",
+		"Hit point maximum halved",
+		"Speed reduced to 0",
+		"Death",
+	],
+	"5.5e": [
+		"−2 to all d20 tests, speed −5 ft.",
+		"−4 to all d20 tests, speed −10 ft.",
+		"−6 to all d20 tests, speed −15 ft.",
+		"−8 to all d20 tests, speed −20 ft.",
+		"−10 to all d20 tests, speed −25 ft.",
+		"Death",
+	],
+});
+
 /** Extension store URLs per browser */
 export const character_sync_stores = Object.freeze({
 	Chrome: {

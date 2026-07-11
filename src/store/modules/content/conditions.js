@@ -5,7 +5,8 @@ import { conditionServices } from "src/services/api/conditions";
 const conditions_state = () => ({
   condition_services: null,
   cached_conditions: {},
-  cached_urls: {}
+  cached_urls: {},
+  cached_condition_lists: {}
 });
 
 const conditions_getters = {
@@ -14,6 +15,9 @@ const conditions_getters = {
     const cache_key = `${edition || "5e"}:${key}`;
     const id = state.cached_urls[cache_key] || key;
     return state.cached_conditions[id];
+  },
+  conditions_by_edition: (state) => (edition) => {
+    return state.cached_condition_lists[edition === "5.5e" ? "5.5e" : "5e"] || [];
   },
 };
 
@@ -32,6 +36,33 @@ const conditions_actions = {
     } catch(error) {
       console.error(error);
     }
+  },
+
+  /**
+   * Fetches all conditions for an edition in a single, non-paginated request
+   * and caches the list. Used by the encounter condition drawer, which needs
+   * the full set of conditions rather than a paginated page of results.
+   *
+   * @param {string} edition "5e" | "5.5e"
+   * @returns {array} conditions
+   */
+  async fetch_all_conditions({ state, commit, dispatch }, { edition } = {}) {
+    const cache_key = edition === "5.5e" ? "5.5e" : "5e";
+    if (state.cached_condition_lists[cache_key]) {
+      return state.cached_condition_lists[cache_key];
+    }
+
+    const result = await dispatch("fetch_conditions", {
+      edition,
+      pageNumber: 1,
+      pageSize: 100,
+      fields: ["ALL"],
+      sortBy: "name",
+      descending: false,
+    });
+    const conditions = result?.results || [];
+    commit("SET_CACHED_CONDITIONS_LIST", { edition: cache_key, conditions });
+    return conditions;
   },
 
   /**
@@ -75,6 +106,7 @@ const conditions_mutations = {
   SET_CONDITION_SERVICES(state, payload) { Vue.set(state, "condition_services", payload); },
   SET_CACHED_CONDITION(state, payload) { Vue.set(state.cached_conditions, payload["_id"], payload) },
   SET_CACHED_URL(state, { url, id, edition }) { Vue.set(state.cached_urls, `${edition || "5e"}:${url}`, id) },
+  SET_CACHED_CONDITIONS_LIST(state, { edition, conditions }) { Vue.set(state.cached_condition_lists, edition, conditions) },
 };
 
 export default {

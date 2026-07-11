@@ -245,7 +245,7 @@ const run_encounter_actions = {
 			if (!demo) {
 				// The campaign edition decides which rules text (conditions etc.) is shown
 				const campaign = await dispatch("campaigns/get_campaign", { uid, id: cid });
-				commit("SET_EDITION", campaign?.edition || "2014");
+				commit("SET_EDITION", campaign?.edition || "5e");
 
 				// Fetch the encounter
 				const encounter = await dispatch("encounters/get_encounter", {

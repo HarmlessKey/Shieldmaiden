@@ -100,28 +100,39 @@ All in `src/components/compendium/Monster.vue` (reused by `drawers/ViewNpc.vue`)
 
 ## Phase 3 — Conditions & exhaustion
 
-Condition *names* are identical across editions (the tracker stores flags by name, so
-combat data needs no change). Only the rules text and the exhaustion effect table differ.
+**Status: implemented, superseding the original plan below.** Condition *slugs* are
+identical across editions (`entity.conditions[slug]`, e.g. `"poisoned"`), and this slug
+is identical to the API condition's `url` field — so combat data needs no migration.
 
-- `src/mixins/conditions.js`: restructure each entry to hold both texts —
-  `effects` (2014, as-is) plus `effects_2024`. Export a helper
-  `conditionEffects(condition, edition)`.
-  2024 text changes (SRD 5.2): grappled (disadvantage vs. others, movable), incapacitated
-  (no actions/bonus actions/reactions, concentration broken, disadvantage on initiative),
-  invisible (concealed wording), exhaustion (below), plus minor rewording elsewhere.
-- **Exhaustion 2024**: still levels 1–6, so the existing level tracking
-  (`runEncounter.js` `set_condition` with `level`) is untouched. The per-level effects
-  table in `src/components/drawers/encounter/Condition.vue` becomes edition-aware:
-  - 2014: current 6-row table (disadvantage on checks, speed halved, …, death).
-  - 2024: per level — d20 Tests −2 × level, Speed −5 ft × level; death at level 6.
-- `drawers/encounter/Condition.vue` and `drawers/encounter/Conditions.vue` read the
-  campaign edition from the store; no edition on the campaign ⇒ 2014 text (legacy
-  default, until the user answers the RunCampaign prompt).
+Original plan was to keep rules text in `src/mixins/conditions.js` (a hardcoded local
+array keyed by `2014`/`2024`). That has been superseded: the encounter condition drawer
+(`src/components/drawers/encounter/Condition.vue` and `Conditions.vue`) now fetches
+condition definitions from the HK API instead, matching the pattern already used for
+monsters/spells/items/compendium-conditions:
+- `store/modules/content/conditions.js` gained `fetch_all_conditions({ edition })` /
+  getter `conditions_by_edition(edition)` — fetches the full (non-paginated) condition
+  list for an edition (`"5e"` / `"5.5e"`, matching `campaign.edition`) and caches it.
+- The drawers map API results (`url`, `name`, `condition`, `effects`) to the shape the
+  templates use, matching on `condition.url === entity.conditions` key.
+- **Known gap**: the HK API has no 5.5e condition content yet (`/conditions/5.5e`
+  returns 0 results as of 2026-07-10). Until the API is backfilled, 5.5e campaigns will
+  show an empty condition list in the drawer. No client-side fallback was added
+  (deliberate choice — proceed without fallback, revisit once the API has content).
+- **Exhaustion per-level table**: the API only returns a flat `effects` array, no
+  per-level breakdown. The 6-row table (2014/2024 text) was moved out of the mixin into
+  `EXHAUSTION_LEVELS` in `src/utils/generalConstants.js` (keyed `"5e"`/`"5.5e"`), used
+  only by `drawers/encounter/Condition.vue`.
+- `src/mixins/conditions.js` has been **deleted**. Its last two consumers were
+  migrated onto the `api_conditions` store: `src/components/npcs/Defenses.vue`
+  (condition-immunity picker options) and `trackCampaign/live/Initiative.vue`
+  (icon/name lookup by slug). Both only needed name/icon lookup, not edition-aware
+  rules text, so they fetch/read `conditions_by_edition("5e")` unconditionally
+  rather than tracking a live campaign edition.
 - `src/components/combat/Conditions.vue` reads `db.ref("conditions")` (Firebase RTDB) only
   for icon/name display — names match across editions, so **no RTDB change** (verify
   during implementation).
-- Compendium `views/Compendium/Conditions.vue` + `compendium/Condition.vue`: list both
-  editions from the API with an edition badge (Phase 4 filter applies).
+- Compendium `views/Compendium/Conditions.vue` + `compendium/Condition.vue`: already
+  list per-edition from the API with an edition badge (done, `ee832b8a`).
 - Surprise: already not a condition (commented out in the mixin); 2024's
   "surprise = disadvantage on initiative" needs no tracker support. Nothing to do.
 

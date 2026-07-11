@@ -31,7 +31,7 @@
 		"edition": {
 			"title": "Edition",
 			"type": "string",
-			"enum": ["2014", "2024"]
+			"enum": ["5e", "5.5e"]
 		},
 		"avatar": {
 			"title": "Avatar",

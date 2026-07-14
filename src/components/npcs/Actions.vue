@@ -137,36 +137,48 @@
 													</hk-roll-action>
 												</q-item-section>
 												<q-item-section avatar>
-													<a @click.stop class="move">
-														<i aria-hidden="true" class="fas fa-arrow-alt-right" />
-														<q-tooltip anchor="top middle" self="center middle"> Move to </q-tooltip>
-														<q-popup-proxy :dark="$store.getters.theme === 'dark'">
-															<div class="bg-neutral-9">
-																<q-list>
-																	<q-item disable>
-																		<q-item-section>Move to</q-item-section>
-																	</q-item>
-																	<q-item
-																		v-for="target in actions.filter(
-																			(action) => action.category !== category
-																		)"
-																		:key="`move-${target.category}`"
-																		clickable
-																		v-close-popup
-																		@click="move(ability_index, category, target.category)"
-																	>
-																		<q-item-section>{{ target.name }}</q-item-section>
-																	</q-item>
-																</q-list>
-															</div>
-														</q-popup-proxy>
-													</a>
-												</q-item-section>
-												<q-item-section avatar>
-													<a @click.stop="remove(ability_index, category)" class="remove">
-														<i aria-hidden="true" class="fas fa-trash-alt red" />
-														<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
-													</a>
+													<div class="d-flex gap-1">
+														<button
+															@click.stop.prevent
+															class="move btn btn-sm bg-neutral-5"
+															aria-label="Move to"
+														>
+															<i aria-hidden="true" class="fas fa-arrows-alt-v" />
+															<q-tooltip anchor="top middle" self="center middle">
+																Move to
+															</q-tooltip>
+															<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+																<div class="bg-neutral-9">
+																	<q-list>
+																		<q-item disable>
+																			<q-item-section>Move to</q-item-section>
+																		</q-item>
+																		<q-item
+																			v-for="target in actions.filter(
+																				(action) => action.category !== category
+																			)"
+																			:key="`move-${target.category}`"
+																			clickable
+																			v-close-popup
+																			@click="move(ability_index, category, target.category)"
+																		>
+																			<q-item-section>{{ target.name }}</q-item-section>
+																		</q-item>
+																	</q-list>
+																</div>
+															</q-popup-proxy>
+														</button>
+														<button
+															@click.stop="remove(ability_index, category)"
+															aria-label="Remove"
+															class="btn btn-sm bg-neutral-5"
+														>
+															<i aria-hidden="true" class="fas fa-trash-alt red" />
+															<q-tooltip anchor="top middle" self="center middle">
+																Remove
+															</q-tooltip>
+														</button>
+													</div>
 												</q-item-section>
 											</template>
 

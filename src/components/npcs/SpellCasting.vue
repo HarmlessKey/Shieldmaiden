@@ -131,36 +131,38 @@
 									)"
 									:key="key"
 								>
-									<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
-										{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
-										<q-popup-edit
-											:dark="$store.getters.theme === 'dark'"
-											square
-											v-model.number="spell.limit"
-											buttons
-										>
-											<q-checkbox
-												size="sm"
+									<q-item-section avatar v-if="casting.category === 'innate'">
+										<a class="btn btn-sm bg-neutral-5">
+											{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
+											<q-popup-edit
 												:dark="$store.getters.theme === 'dark'"
-												v-model="spell.limit"
-												label="At will"
-												:true-value="0"
-												:false-value="1"
-												:indeterminate-value="undefined"
-												:toggle-indeterminate="false"
-												class="mb-2"
-												@input="$forceUpdate()"
-											/>
-											<q-input
-												:dark="$store.getters.theme === 'dark'"
+												square
 												v-model.number="spell.limit"
-												label="Limit"
-												type="number"
-												:disable="spell.limit === 0"
-												suffix="/day"
-												@keyup="$forceUpdate()"
-											/>
-										</q-popup-edit>
+												buttons
+											>
+												<q-checkbox
+													size="sm"
+													:dark="$store.getters.theme === 'dark'"
+													v-model="spell.limit"
+													label="At will"
+													:true-value="0"
+													:false-value="1"
+													:indeterminate-value="undefined"
+													:toggle-indeterminate="false"
+													class="mb-2"
+													@input="$forceUpdate()"
+												/>
+												<q-input
+													:dark="$store.getters.theme === 'dark'"
+													v-model.number="spell.limit"
+													label="Limit"
+													type="number"
+													:disable="spell.limit === 0"
+													suffix="/day"
+													@keyup="$forceUpdate()"
+												/>
+											</q-popup-edit>
+										</a>
 									</q-item-section>
 									<q-item-section v-else avatar class="neutral-2">
 										<template v-if="spell.level > 0">
@@ -170,6 +172,13 @@
 									</q-item-section>
 									<q-item-section>
 										{{ spell.name.capitalizeEach() }}
+									</q-item-section>
+									<q-item-section
+										v-if="casting.category === 'innate' && npc.edition === '5.5e'"
+										avatar
+									>
+										<template v-if="spell.level > 0"> Level {{ spell.level }} </template>
+										<template v-else> Cant </template>
 									</q-item-section>
 									<q-item-section avatar>
 										<a class="btn btn-sm bg-neutral-5" @click="removeSpell(key, casting.category)">
@@ -202,10 +211,44 @@
 								category === 'caster' && npc.caster_spells
 									? Object.keys(npc.caster_spells)
 									: category === 'innate' && npc.innate_spells
-									? Object.keys(npc.innate_spells)
-									: []
+										? Object.keys(npc.innate_spells)
+										: []
 							"
-						/>
+						>
+							<template
+								v-if="npc.edition === '5.5e' && category === 'innate'"
+								#action="{ result, disabled, copy }"
+							>
+								<a
+									v-if="!disabled && result.level === 0"
+									class="btn btn-sm bg-neutral-5"
+									@click="copy({ level: 0 })"
+								>
+									<i aria-hidden="true" class="fas fa-plus" />
+								</a>
+								<a v-else-if="!disabled" class="btn btn-sm bg-neutral-5">
+									<i aria-hidden="true" class="fas fa-chevron-down" />
+									<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+										<div class="bg-neutral-9">
+											<q-list>
+												<q-item
+													v-for="level in levelOptions(result.level)"
+													:key="`add-level-${level}`"
+													clickable
+													v-close-popup
+													@click="copy({ level })"
+												>
+													<q-item-section>Level {{ level }}</q-item-section>
+													<q-item-section avatar>
+														<i aria-hidden="true" class="fas fa-plus"></i>
+													</q-item-section>
+												</q-item>
+											</q-list>
+										</div>
+									</q-popup-proxy>
+								</a>
+							</template>
+						</CopyContent>
 					</div>
 
 					<div slot="footer" class="card-footer d-flex justify-content-end">
@@ -234,10 +277,6 @@ export default {
 			category: undefined,
 			spell_name: undefined,
 			spells: undefined,
-			caster_types: [
-				{ category: "caster", name: "Spellcasting" },
-				{ category: "innate", name: "Innate spellcasting" },
-			],
 		};
 	},
 	computed: {
@@ -248,6 +287,17 @@ export default {
 			set(newValue) {
 				this.$emit("input", newValue);
 			},
+		},
+		caster_types() {
+			const is55e = this.npc.edition === "5.5e";
+			const types = [
+				{ category: "caster", name: "Spellcasting" },
+				{ category: "innate", name: is55e ? "Spellcasting" : "Innate spellcasting" },
+			];
+			if (is55e) {
+				return types.filter(({ category }) => category !== "caster");
+			}
+			return types;
 		},
 	},
 	methods: {
@@ -296,7 +346,7 @@ export default {
 			this.category = category;
 			this.spells_dialog = true;
 		},
-		addSpell({ result, id, resource }) {
+		addSpell({ result, id, resource, level }) {
 			if (!this.npc[`${this.category}_spells`]) {
 				this.$set(this.npc, `${this.category}_spells`, {});
 			}
@@ -307,6 +357,7 @@ export default {
 			}
 			if (this.category === "innate") spell.limit = 0;
 			if (this.category === "caster") spell.level = result.level;
+			if (level !== undefined) spell.level = level;
 
 			this.npc[`${this.category}_spells`][id] = spell;
 			this.$forceUpdate();
@@ -320,6 +371,13 @@ export default {
 				(a, b) => a[1][category_key] - b[1][category_key]
 			);
 			return sorted.reduce((acc, [key, spell]) => ({ ...acc, [key]: spell }), {});
+		},
+		levelOptions(spellLevel) {
+			const levels = [];
+			for (let level = spellLevel; level <= 9; level++) {
+				levels.push(level);
+			}
+			return levels;
 		},
 	},
 };

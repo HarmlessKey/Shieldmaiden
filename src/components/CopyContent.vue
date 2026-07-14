@@ -58,13 +58,20 @@
 					{{ result.name.capitalizeEach() }}
 				</q-item-section>
 				<q-item-section avatar>
-					<a
-						v-if="!disabledCustom.includes(result.key)"
-						class="btn btn-sm bg-neutral-5"
-						@click="copy(copy_resource === 'custom' ? result.key : result._id)"
+					<slot
+						name="action"
+						:result="result"
+						:disabled="disabledCustom.includes(result.key)"
+						:copy="(extra) => copy(copy_resource === 'custom' ? result.key : result._id, extra)"
 					>
-						<i aria-hidden="true" class="fas" :class="`fa-${button}`" />
-					</a>
+						<a
+							v-if="!disabledCustom.includes(result.key)"
+							class="btn btn-sm bg-neutral-5"
+							@click="copy(copy_resource === 'custom' ? result.key : result._id)"
+						>
+							<i aria-hidden="true" class="fas" :class="`fa-${button}`" />
+						</a>
+					</slot>
 				</q-item-section>
 			</q-item>
 		</q-list>
@@ -268,11 +275,12 @@ export default {
 		 * Emit the selected result
 		 *
 		 * @param {string} id
+		 * @param {object} extra additional properties merged into the emitted payload
 		 * @emits {object} result, id, recource (custom or SRD)
 		 */
-		async copy(id) {
+		async copy(id, extra = {}) {
 			if (this.returnId) {
-				this.$emit("copy", { id, resource: this.copy_resource });
+				this.$emit("copy", { id, resource: this.copy_resource, ...extra });
 			} else {
 				let result;
 
@@ -302,12 +310,9 @@ export default {
 				delete result.meta;
 				delete result.release_date;
 
-				this.$emit("copy", { result, id, resource: this.copy_resource });
+				this.$emit("copy", { result, id, resource: this.copy_resource, ...extra });
 			}
 
-			// Clear search
-			this.searchResults = [];
-			this.query = "";
 		},
 	},
 };

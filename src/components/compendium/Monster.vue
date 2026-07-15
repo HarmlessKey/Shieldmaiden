@@ -156,9 +156,7 @@
 					<strong>Resistances</strong>
 					{{ defensesDisplay(monster.damage_resistances).join(", ") }}
 				</div>
-				<div v-if="immunities">
-					<strong>Immunities</strong> {{ immunities }}
-				</div>
+				<div v-if="immunities"><strong>Immunities</strong> {{ immunities }}</div>
 
 				<div v-if="monster.gear"><strong>Gear</strong> {{ monster.gear }}</div>
 
@@ -329,26 +327,9 @@
 									"
 									><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"
 										><span class="roll-button" /></hk-roll-action></template
-								><span class="monster-card__traits-description__title"
-									>{{ ability.name
-									}}{{
-										ability.recharge
-											? ` (Recharge ${
-													ability.recharge === "rest"
-														? "after a Short or Long Rest"
-														: ability.recharge
-												})`
-											: ``
-									}}{{
-										ability.limit
-											? ` (${ability.limit}/${
-													ability.limit_type ? ability.limit_type.capitalize() : `Day`
-												})`
-											: ``
-									}}{{
-										ability.legendary_cost > 1 ? ` (Costs ${ability.legendary_cost} Actions)` : ``
-									}}.
-								</span></hk-dice-text
+								><span class="monster-card__traits-description__title">{{
+									abilityTitle(ability)
+								}}</span></hk-dice-text
 							>
 						</template>
 					</template>
@@ -579,6 +560,23 @@ export default {
 		},
 		ability2str(ability) {
 			return ability.substring(0, 3);
+		},
+		abilityTitle(ability) {
+			let title = ability.name;
+			if (ability.recharge) {
+				title += ` (Recharge ${
+					ability.recharge === "rest" ? "after a Short or Long Rest" : ability.recharge
+				})`;
+			}
+			if (ability.limit) {
+				title += ` (${ability.limit}/${
+					ability.limit_type ? ability.limit_type.capitalize() : "Day"
+				})`;
+			}
+			if (ability.legendary_cost > 1) {
+				title += ` (Costs ${ability.legendary_cost} Actions)`;
+			}
+			return `${title}. `;
 		},
 		download(type) {
 			downloadMonsterFile(this.$refs.card, type, {

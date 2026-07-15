@@ -639,25 +639,6 @@ export default {
 			edit_action: {},
 			edit_roll_index: undefined,
 			roll: undefined,
-			actions: [
-				{
-					category: "special_abilities",
-					name: "Special Abilities",
-					name_single: "Special ability",
-				},
-				{ category: "actions", name: "Actions", name_single: "Action" },
-				{
-					category: "bonus_actions",
-					name: "Bonus Actions",
-					name_single: "Bonus action",
-				},
-				{
-					category: "legendary_actions",
-					name: "Legendary Actions",
-					name_single: "Legendary action",
-				},
-				{ category: "reactions", name: "Reactions", name_single: "Reaction" },
-			],
 			aoe_types: [
 				{ label: "Cone", value: "cone" },
 				{ label: "Cube", value: "cube" },
@@ -678,6 +659,28 @@ export default {
 			set(newValue) {
 				this.$emit("input", newValue);
 			},
+		},
+		actions() {
+			const is55e = this.npc.edition === "5.5e";
+			return [
+				{
+					category: "special_abilities",
+					name: is55e ? "Traits" : "Special Abilities",
+					name_single: is55e ? "Trait" : "Special ability",
+				},
+				{ category: "actions", name: "Actions", name_single: "Action" },
+				{
+					category: "bonus_actions",
+					name: "Bonus Actions",
+					name_single: "Bonus action",
+				},
+				{
+					category: "legendary_actions",
+					name: "Legendary Actions",
+					name_single: "Legendary action",
+				},
+				{ category: "reactions", name: "Reactions", name_single: "Reaction" },
+			];
 		},
 	},
 	methods: {

@@ -1,5 +1,10 @@
 <template>
-	<ToolsPage title="Spell Creator" bg_img="spells-tool-header.png">
+	<ToolsPage
+		title="Spell Creator"
+		heading="D&D Spell Creator"
+		bg_img="spells-tool-header.png"
+		:app_schema="app_schema"
+	>
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn
 				color="primary"
@@ -82,6 +87,17 @@ export default {
 	},
 	data() {
 		return {
+			app_schema: {
+				name: "Shieldmaiden Spell Creator",
+				description:
+					"Free D&D 5e spell creator for custom spells with scaling and one-click rollable actions.",
+				featureList: [
+					"Custom spell creation",
+					"Automatic spell scaling by level and slot",
+					"One-click rollable spell actions",
+					"Use spells on custom spellcaster monsters",
+				],
+			},
 			blight: {
 				actions: [
 					{

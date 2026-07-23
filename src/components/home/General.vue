@@ -11,13 +11,13 @@
 				</div>
 				<div class="col-12 col-md-5">
 					<div class="head">
-						<h2>Combat Tracker for D&D</h2>
+						<h2>Our Combat Tracker</h2>
 						<h3>We keep track, you focus on the game</h3>
 						<p class="text">
 							We focus on keeping the game on the table by managing everything you need to keep
 							track of during encounters. On top of that we enhance the player experience.<br />
 							<router-link to="/tools/combat-tracker" class="learn-more"
-								>More about the Combat Tracker</router-link
+								>Learn more about our D&D combat tracker</router-link
 							>
 						</p>
 						<router-link to="/demo/run-encounter" class="btn btn-lg bg-accent"

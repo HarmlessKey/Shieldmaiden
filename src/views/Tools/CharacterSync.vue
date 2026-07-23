@@ -1,7 +1,9 @@
 <template>
 	<ToolsPage
 		title="Character Sync"
+		heading="D&D Character Sync"
 		bg_img="character-sync-tool-header.png"
+		:app_schema="app_schema"
 		:showSignedIn="false"
 	>
 		<template v-slot:action_btn="{ btn_classes }">
@@ -61,9 +63,23 @@ import ToolsPage from "src/components/ToolsPage.vue";
 import { getStoreUrl } from "src/utils/generalFunctions";
 
 export default {
-	name: "ToolsMonsterCreator",
+	name: "ToolsCharacterSync",
 	components: {
 		ToolsPage,
+	},
+	data() {
+		return {
+			app_schema: {
+				name: "Shieldmaiden Character Sync",
+				description:
+					"Free browser extension to import and sync D&D Beyond and Dice Cloud characters into Shieldmaiden.",
+				featureList: [
+					"Import D&D Beyond characters",
+					"Import Dice Cloud characters",
+					"Sync player stats into Shieldmaiden with one click",
+				],
+			},
+		};
 	},
 	computed: {
 		...mapGetters(["user"]),

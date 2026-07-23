@@ -92,7 +92,7 @@ export default {
 			title: {
 				name: "title",
 				content:
-					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
 			},
 			description: {
 				name: "description",
@@ -109,7 +109,7 @@ export default {
 			twitterTitle: {
 				name: "twitter:title",
 				content:
-					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
 			},
 			twitterDescription: {
 				name: "twitter:description",
@@ -130,7 +130,7 @@ export default {
 			ogTitle: {
 				property: "og:title",
 				content:
-					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
 			},
 			ogDescription: {
 				property: "og:description",
@@ -170,11 +170,16 @@ export default {
 				name: "robots",
 				content: "noindex, nofollow",
 			};
+		} else if (this.$route.matched.some((route) => route.meta.noindex || route.meta.requiresAuth)) {
+			// App routes (deep tool routes, auth pages, user content) are not landing pages
+			meta.noindex = {
+				name: "robots",
+				content: "noindex, follow",
+			};
 		}
 
 		return {
-			title:
-				this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+			title: this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
 			titleTemplate: (title) => `${title} | Shieldmaiden`,
 			link: {
 				canonical: {

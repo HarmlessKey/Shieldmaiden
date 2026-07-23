@@ -1,2 +1,23 @@
 User-agent: *
 Disallow:
+
+# AI crawlers are explicitly welcome (codifies the existing allow-all policy)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://shieldmaiden.app/sitemap.xml

@@ -10,10 +10,10 @@
 							Our encounter builder is easy to use and lets you use your own custom monsters. We
 							instantly calculate the difficulty for you.<br />
 							<router-link to="/tools/encounter-builder" class="learn-more"
-								>More on the Encounter Builder</router-link
+								>Learn more about our D&D encounter builder</router-link
 							>
 						</p>
-						<router-link to="/encounter-builder" class="btn btn-lg bg-accent">
+						<router-link to="/tools/encounter-builder/build-encounter" class="btn btn-lg bg-accent">
 							Try Encounter Builder
 						</router-link>
 					</div>

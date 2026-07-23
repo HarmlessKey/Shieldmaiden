@@ -17,7 +17,7 @@
 							Show your players a live initiative list of the encounter that updates as you play.
 							Perfect for at the table or if you are hosting a podcast or stream.<br />
 							<router-link to="/tools/combat-tracker" class="learn-more"
-								>More about sharing</router-link
+								>More about our live initiative list for players</router-link
 							>
 						</p>
 						<router-link to="/sign-up" class="btn btn-lg bg-accent"

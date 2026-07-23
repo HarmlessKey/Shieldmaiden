@@ -1,7 +1,7 @@
 <template>
 	<hk-card>
 		<div class="card-header" slot="header">
-			<h1>{{ title }} for D&D 5e</h1>
+			<h1>{{ page_heading }}</h1>
 			<slot name="action_btn" />
 		</div>
 		<div slot="image" class="card-image" :style="{ backgroundImage: `url(${img})` }"></div>
@@ -26,14 +26,72 @@ export default {
 	},
 	props: {
 		title: String,
+		// Overrides the default "{title} for D&D 5e" H1 with an exact target term
+		heading: String,
 		bg_img: String,
+		// SoftwareApplication JSON-LD properties for this tool (name, description, featureList)
+		app_schema: Object,
 		showSignedIn: {
 			type: Boolean,
 			default: true,
 		},
 	},
+	meta() {
+		const script = {
+			breadcrumbs: {
+				type: "application/ld+json",
+				innerHTML: JSON.stringify({
+					"@context": "https://schema.org",
+					"@type": "BreadcrumbList",
+					itemListElement: [
+						{
+							"@type": "ListItem",
+							position: 1,
+							name: "Home",
+							item: "https://shieldmaiden.app/",
+						},
+						{
+							"@type": "ListItem",
+							position: 2,
+							name: "Tools",
+							item: "https://shieldmaiden.app/tools",
+						},
+						{
+							"@type": "ListItem",
+							position: 3,
+							name: this.page_heading,
+						},
+					],
+				}),
+			},
+		};
+
+		if (this.app_schema) {
+			script.softwareApplication = {
+				type: "application/ld+json",
+				innerHTML: JSON.stringify({
+					"@context": "https://schema.org",
+					"@type": "SoftwareApplication",
+					applicationCategory: "GameApplication",
+					operatingSystem: "Web browser",
+					url: `https://shieldmaiden.app${this.$route.path}`,
+					offers: {
+						"@type": "Offer",
+						price: "0",
+						priceCurrency: "EUR",
+					},
+					...this.app_schema,
+				}),
+			};
+		}
+
+		return { script };
+	},
 	computed: {
 		...mapGetters(["user"]),
+		page_heading() {
+			return this.heading || `${this.title} for D&D 5e`;
+		},
 		img() {
 			return require(`assets/_img/atmosphere/tool-header/${this.bg_img}`);
 		},

@@ -1,5 +1,10 @@
 <template>
-	<ToolsPage title="Encounter Builder" bg_img="encounter-builder-header.webp">
+	<ToolsPage
+		title="Encounter Builder"
+		heading="D&D Encounter Builder"
+		bg_img="encounter-builder-header.webp"
+		:app_schema="app_schema"
+	>
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn
 				color="primary"
@@ -58,6 +63,105 @@
 		</section>
 
 		<em class="mb-0">To save encounters, you need an account.</em>
+
+		<h2>How the D&D 5e encounter builder works</h2>
+		<p>
+			The Shieldmaiden encounter builder helps you assemble a balanced Dungeons &amp; Dragons 5e
+			encounter and see its difficulty before your players ever roll initiative. You add your party,
+			drop in monsters from the SRD or your own custom creations, and choose rolled or average hit
+			points for each one. As you add creatures, the difficulty calculator updates live so you always
+			know whether a fight is easy, medium, hard, or deadly for your party.
+		</p>
+		<p>
+			When the encounter is ready, you can run it directly in our
+			<router-link to="/tools/combat-tracker">D&D combat tracker</router-link>, so there is no
+			retyping stat blocks between planning and play. With a free account you can save encounters per
+			campaign and load them whenever you need them.
+		</p>
+
+		<h2>How encounter difficulty and XP thresholds work in 5e</h2>
+		<p>
+			D&D 5e rates encounter difficulty using experience point (XP) thresholds per character, based
+			on level. You add up each player's threshold for a difficulty band to get the party's total
+			threshold, then compare it against the adjusted XP of the monsters (the encounter multiplier
+			increases the effective XP as you add more monsters). The table below lists the per-character
+			XP thresholds from the SRD.
+		</p>
+		<div class="table-wrapper">
+			<table class="xp-table">
+				<thead>
+					<tr>
+						<th>Character level</th>
+						<th>Easy</th>
+						<th>Medium</th>
+						<th>Hard</th>
+						<th>Deadly</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="row in xpThresholds" :key="row.level">
+						<td>{{ row.level }}</td>
+						<td>{{ row.easy }}</td>
+						<td>{{ row.medium }}</td>
+						<td>{{ row.hard }}</td>
+						<td>{{ row.deadly }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p>
+			Shieldmaiden does this maths for you: enter your party and monsters and the difficulty is
+			calculated automatically, including the multiplier for multi-monster encounters.
+		</p>
+
+		<h2>Encounter building tips</h2>
+		<ul>
+			<li>
+				Aim a little above medium for a memorable fight; deadly does not always mean lethal, but it
+				leaves less room for bad dice.
+			</li>
+			<li>
+				Watch the multiplier: six weak monsters can be far more dangerous than their raw XP suggests
+				because of how 5e scales groups.
+			</li>
+			<li>
+				Mix roles — a controller, a striker, and some minions play better than one big bag of hit
+				points.
+			</li>
+			<li>
+				Save a few variant encounters per session so you can adjust difficulty on the fly if the
+				party is stronger or weaker than expected.
+			</li>
+		</ul>
+
+		<h2>Frequently asked questions</h2>
+		<div v-for="item in faq" :key="item.question" class="faq-item">
+			<h3>{{ item.question }}</h3>
+			<p>{{ item.answer }}</p>
+		</div>
+
+		<h2>How Shieldmaiden compares to other D&D encounter builders</h2>
+		<p>
+			Shieldmaiden's encounter builder is designed to flow straight into running the fight, with your
+			own homebrew monsters treated as first-class content. Other tools are worth knowing about
+			depending on what you need.
+		</p>
+		<ul>
+			<li>
+				<strong>Kobold Fight Club (Koboldplus)</strong> is a fast, focused encounter and difficulty
+				calculator. If you only want a quick CR check it is excellent; Shieldmaiden adds saving,
+				custom monsters, and running the encounter afterwards.
+			</li>
+			<li>
+				<strong>D&D Beyond's Encounter Builder</strong> is the best fit if your group already uses
+				D&D Beyond content and characters. Shieldmaiden is a better fit for homebrew-heavy tables and
+				for running the encounter in the same app.
+			</li>
+			<li>
+				<strong>Donjon's tools</strong> are great for random generation and reference tables.
+				Shieldmaiden is more about deliberately building and then playing out a specific encounter.
+			</li>
+		</ul>
 	</ToolsPage>
 </template>
 
@@ -68,6 +172,70 @@ export default {
 	name: "ToolsEncounterBuilder",
 	components: {
 		ToolsPage,
+	},
+	data() {
+		return {
+			app_schema: {
+				name: "Shieldmaiden Encounter Builder",
+				description:
+					"Free D&D 5e encounter builder with instant difficulty and CR calculation for SRD and custom monsters.",
+				featureList: [
+					"Encounter building with SRD and custom monsters",
+					"Instant encounter difficulty calculation",
+					"Rolled or average monster hit points",
+					"Run built encounters in the combat tracker",
+				],
+			},
+			xpThresholds: [
+				{ level: 1, easy: "25", medium: "50", hard: "75", deadly: "100" },
+				{ level: 2, easy: "50", medium: "100", hard: "150", deadly: "200" },
+				{ level: 3, easy: "75", medium: "150", hard: "225", deadly: "400" },
+				{ level: 4, easy: "125", medium: "250", hard: "375", deadly: "500" },
+				{ level: 5, easy: "250", medium: "500", hard: "750", deadly: "1,100" },
+				{ level: 6, easy: "300", medium: "600", hard: "900", deadly: "1,400" },
+				{ level: 7, easy: "350", medium: "750", hard: "1,100", deadly: "1,700" },
+				{ level: 8, easy: "450", medium: "900", hard: "1,400", deadly: "2,100" },
+				{ level: 9, easy: "550", medium: "1,100", hard: "1,600", deadly: "2,400" },
+				{ level: 10, easy: "600", medium: "1,200", hard: "1,900", deadly: "2,800" },
+				{ level: 11, easy: "800", medium: "1,600", hard: "2,400", deadly: "3,600" },
+				{ level: 12, easy: "1,000", medium: "2,000", hard: "3,000", deadly: "4,500" },
+				{ level: 13, easy: "1,100", medium: "2,200", hard: "3,400", deadly: "5,100" },
+				{ level: 14, easy: "1,250", medium: "2,500", hard: "3,800", deadly: "5,700" },
+				{ level: 15, easy: "1,400", medium: "2,800", hard: "4,300", deadly: "6,400" },
+				{ level: 16, easy: "1,600", medium: "3,200", hard: "4,800", deadly: "7,200" },
+				{ level: 17, easy: "2,000", medium: "3,900", hard: "5,900", deadly: "8,800" },
+				{ level: 18, easy: "2,100", medium: "4,200", hard: "6,300", deadly: "9,500" },
+				{ level: 19, easy: "2,400", medium: "4,900", hard: "7,300", deadly: "10,900" },
+				{ level: 20, easy: "2,800", medium: "5,700", hard: "8,500", deadly: "12,700" },
+			],
+			faq: [
+				{
+					question: "Is the Shieldmaiden encounter builder free?",
+					answer:
+						"Yes. Building encounters and calculating their difficulty is free, with no credit card required. A free account lets you save your encounters per campaign, and optional paid tiers raise content limits for very active dungeon masters.",
+				},
+				{
+					question: "How is encounter difficulty calculated?",
+					answer:
+						"Shieldmaiden uses the official D&D 5e XP threshold method. It sums each character's threshold for a difficulty band, applies the encounter multiplier based on the number of monsters, and compares the two to rate the fight as easy, medium, hard, or deadly.",
+				},
+				{
+					question: "Can I use my own custom monsters?",
+					answer:
+						"Yes. You can add custom monsters built in our monster creator alongside SRD monsters, and their challenge rating counts toward the difficulty calculation just like official creatures. You can also import monsters shared by other Shieldmaiden users.",
+				},
+				{
+					question: "Can I run the encounter after building it?",
+					answer:
+						"Yes. Once an encounter is built you can run it directly in the Shieldmaiden combat tracker, with no need to retype stat blocks. Initiative, hit points, conditions, and concentration are all handled in the same app.",
+				},
+				{
+					question: "Do I need an account to build an encounter?",
+					answer:
+						"No account is required to try building an encounter and see its difficulty. You only need a free account when you want to save an encounter so you can load and run it in a later session.",
+				},
+			],
+		};
 	},
 	meta() {
 		return {
@@ -85,12 +253,48 @@ export default {
 					content: "Shieldmaiden Encounter Builder",
 				},
 			},
+			script: {
+				faqPage: {
+					type: "application/ld+json",
+					innerHTML: JSON.stringify({
+						"@context": "https://schema.org",
+						"@type": "FAQPage",
+						mainEntity: this.faq.map((item) => ({
+							"@type": "Question",
+							name: item.question,
+							acceptedAnswer: {
+								"@type": "Answer",
+								text: item.answer,
+							},
+						})),
+					}),
+				},
+			},
 		};
 	},
 };
 </script>
 
 <style lang="scss" scoped>
+.table-wrapper {
+	overflow-x: auto;
+	margin-bottom: 20px;
+}
+.xp-table {
+	width: 100%;
+	border-collapse: collapse;
+
+	th,
+	td {
+		text-align: left;
+		padding: 8px 12px;
+		border-bottom: solid 1px $neutral-6;
+		white-space: nowrap;
+	}
+}
+.faq-item {
+	margin-bottom: 15px;
+}
 .media {
 	display: block;
 	margin: 30px auto;

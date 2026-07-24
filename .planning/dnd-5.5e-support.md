@@ -193,3 +193,26 @@ param and content live.
 2. **Slug strategy**: 2024 content under the `5.5e/` path prefix (`/5.5e/goblin`,
    `/5.5e/fireball`); 2014 slugs unchanged.
 3. **New campaigns default to 5.5e (`"2024"`)** in the create form.
+
+## Addendum — innate spell cast level (roll-time)
+
+2024 stat blocks assign innate spells an explicit casting level (e.g. "3/Day each:
+*misty step*, cast at 3rd level"), stored per-spell as optional `level` on
+`npc.innate_spells[key]` (added by the NPC editor, `src/components/npcs/SpellCasting.vue`).
+Combat rolls did not yet honor it — innate spells always rolled at their own base spell
+level (`src/mixins/runEncounter.js`, comment "Innate spells are cast at the lowest
+possible level").
+
+- `src/schemas/hk-npc-schema.json`: `innate_spells` item gains an optional `level`
+  property (mirrors `caster_spells.level`, but not `required` — legacy/2014 entries
+  have no level).
+- `src/components/combat/actions/RollSpells.vue` (`fetchSpells`): for `type === "innate"`,
+  carry the stored override as `spell.cast_level` (distinct from `spell.level`, the
+  spell's own base level used for upcast-scaling math) when present.
+- `src/mixins/runEncounter.js` (`roll_action`): `config.cast_level` uses
+  `action.cast_level ?? action.level` for innate — falls back to the existing base-level
+  behavior when no override is set.
+- `RollSpells.vue` template (innate `hk-roll-action`): pass `:cast-level` (and
+  `:caster-level`, matching the caster branch) so projectile/damage scaling in
+  `hk-roll-action.vue` also reflects the override.
+- No change when `level` is absent — existing NPCs/spells behave exactly as before.

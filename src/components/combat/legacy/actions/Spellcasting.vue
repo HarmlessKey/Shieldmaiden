@@ -183,6 +183,8 @@
 											:action="spell"
 											:tooltip="`Roll ${spell.name}`"
 											type="spell"
+											:cast-level="spell.cast_level || spell.level"
+											:caster-level="entity[`${name}_level`]"
 											@roll="startRoll(...arguments, spell.key, spell, tab)"
 											:disabled="!checkAvailable(tab, level, spell.key)"
 										>
@@ -319,6 +321,7 @@ export default {
 
 							if (type.name === "innate") {
 								spell.limit = value.limit == 0 ? Infinity : value.limit;
+								if (value.level !== undefined) spell.cast_level = value.level;
 							} else {
 								spell.level = value.level;
 							}

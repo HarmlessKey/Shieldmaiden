@@ -68,6 +68,9 @@
 						<q-item-section :class="checkAvailable(level, spell.key) ? '' : 'is-disabled'">
 							<q-item-label>
 								{{ spell.name.capitalizeEach() }}
+								<span v-if="castLevel(level, spell)" class="neutral-2">
+									({{ castLevel(level, spell) | numeral("Oo") }})
+								</span>
 							</q-item-label>
 						</q-item-section>
 						<q-item-section avatar v-if="type === 'caster'">
@@ -132,6 +135,8 @@
 								:tooltip="`Roll ${spell.name}`"
 								type="spell"
 								color="yellow"
+								:cast-level="spell.cast_level || spell.level"
+								:caster-level="actor[`${type}_level`]"
 								:disabled="!checkAvailable(level, spell.key)"
 								@roll="startRoll(...arguments, spell.key, spell, type)"
 							/>
@@ -203,6 +208,13 @@ export default {
 			const button = this.$refs[`${level}-${key}`]?.[0]?.$el;
 			button?.focus();
 		},
+		castLevel(level, spell) {
+			if (this.type === "caster") {
+				return level > 0 && level < Infinity ? level : undefined;
+			}
+			const castLevel = spell.cast_level || spell.level;
+			return castLevel > 0 ? castLevel : undefined;
+		},
 		async fetchSpells() {
 			let spells = [];
 
@@ -217,6 +229,7 @@ export default {
 
 						if (this.type === "innate") {
 							spell.limit = value.limit == 0 ? Infinity : value.limit;
+							if (value.level !== undefined) spell.cast_level = value.level;
 						} else {
 							spell.level = value.level;
 						}

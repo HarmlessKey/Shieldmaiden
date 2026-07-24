@@ -502,6 +502,11 @@
 						"maximum": 9,
 						"minimum": -1
 					},
+					"level": {
+						"type": "integer",
+						"maximum": 9,
+						"minimum": -1
+					},
 					"name": {
 						"type": "string",
 						"maxLength": 50

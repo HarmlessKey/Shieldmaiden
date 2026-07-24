@@ -1,6 +1,13 @@
 User-agent: *
 Disallow:
 
+# Explicit AI usage preferences (Cloudflare Content Signals Policy)
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# Explicit AI usage preferences (IETF AI Preferences / aipref)
+Content-Usage: train-ai=y
+Content-Usage: search=y
+
 # AI crawlers are explicitly welcome (codifies the existing allow-all policy)
 User-agent: GPTBot
 Allow: /

@@ -506,6 +506,7 @@ const run_encounter_actions = {
 				//without copying an existing
 				//it won't have data_npc
 				if (data_npc) {
+					entity.edition = data_npc.edition;
 					entity.size = data_npc.size;
 					entity.type = data_npc.type;
 					entity.subtype = data_npc.subtype;

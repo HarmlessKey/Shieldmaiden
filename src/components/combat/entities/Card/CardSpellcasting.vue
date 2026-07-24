@@ -80,7 +80,7 @@
 				</div>
 			</div>
 			<p>
-				<strong><em>Innate spellcasting</em></strong>
+				<strong><em>{{ is_5_5e ? "Spellcasting" : "Innate spellcasting" }}</em></strong>
 				The {{ entity.name.capitalizeEach() }}'s innate spellcasting ability is
 				{{ entity.innate_ability.capitalize() }} (spell save DC {{ entity.innate_save_dc }},
 				{{
@@ -91,7 +91,7 @@
 				to hit with spell attacks). The {{ entity.name.capitalizeEach() }} can cast the following
 				spells, requiring no material components:
 			</p>
-			<strong><em>Innate spells</em></strong
+			<strong><em>{{ is_5_5e ? "Spells" : "Innate spells" }}</em></strong
 			><br />
 			<p>
 				<template v-for="limit in innate_spell_levels">
@@ -105,6 +105,9 @@
 									<Spell :id="spell.key" />
 								</template>
 							</hk-popover>
+							<template v-if="is_5_5e && spell.level !== undefined">
+								({{ spell.level | numeral("Oo") }})
+							</template>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLimit(limit).length ? "," : "" }}
 						</i>
@@ -136,6 +139,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(["broadcast", "targeted"]),
+		is_5_5e() {
+			return this.entity.edition === "5.5e";
+		},
 		spellCasting() {
 			let casting = [];
 			if (this.entity.innate_ability)

@@ -30,7 +30,7 @@ const routes = [
 			offline: true,
 			description:
 				"Shieldmaiden is a free D&D 5e DM companion app: run combat with our initiative tracker, build encounters, and create custom monsters and spells. Free forever.",
-			title: "D&D DM Tools - Combat Tracker, Encounter Builder & More",
+			title: "Combat Tracker for D&D 5e - Free DM Companion App",
 		},
 	},
 	{ path: "/home", redirect: "/" },

@@ -92,7 +92,7 @@ export default {
 			title: {
 				name: "title",
 				content:
-					this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			description: {
 				name: "description",
@@ -109,7 +109,7 @@ export default {
 			twitterTitle: {
 				name: "twitter:title",
 				content:
-					this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			twitterDescription: {
 				name: "twitter:description",
@@ -130,7 +130,7 @@ export default {
 			ogTitle: {
 				property: "og:title",
 				content:
-					this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
+					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			},
 			ogDescription: {
 				property: "og:description",
@@ -179,7 +179,7 @@ export default {
 		}
 
 		return {
-			title: this.$route.meta.title || "D&D DM Tools - Combat Tracker, Encounter Builder & More",
+			title: this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			titleTemplate: (title) => `${title} | Shieldmaiden`,
 			link: {
 				canonical: {

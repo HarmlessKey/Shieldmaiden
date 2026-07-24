@@ -142,7 +142,12 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" class="p-0" auto-width>
-							<ViewMonster :id="props.key" class="p-0" :allow-download="source === 'homebrew'" />
+							<ViewMonster
+								:id="props.key"
+								:edition="$route.params.edition"
+								class="p-0"
+								:allow-download="source === 'homebrew'"
+							/>
 						</q-td>
 					</q-tr>
 				</template>

@@ -62,14 +62,19 @@
 				loading: true
 			}
 		},
+		computed: {
+			edition() {
+				return this.$route.params.edition === "5.5e" ? "5.5e" : "5e";
+			}
+		},
 		async beforeMount() {
 			if(this.data) {
 				this.item = this.data;
 				this.loading = false;
 			} else {
-				this.item = await this.fetch_api_item(this.id);
+				this.item = await this.fetch_api_item({ id: this.id, edition: this.edition });
 				this.loading = false;
-			}			
+			}
 		},
 		methods: {
 			...mapActions("api_items", ["fetch_api_item"]),

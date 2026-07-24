@@ -182,7 +182,7 @@ export default {
 		} else {
 			this.spell = this.custom
 				? await this.get_spell({ uid: this.userId, id: this.id })
-				: await this.fetch_api_spell(this.id);
+				: await this.fetch_api_spell({ id: this.id, edition: this.$route.params.edition });
 			this.cast_level = this.spell.level;
 			this.loading = false;
 		}

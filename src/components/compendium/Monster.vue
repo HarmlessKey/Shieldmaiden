@@ -265,7 +265,7 @@
 			<!-- INNATE SPELLCASTING -->
 			<template v-if="monster.innate_ability">
 				<p>
-					<strong><em> Innate spellcasting </em></strong>
+					<strong><em>{{ is55e ? " Spellcasting " : " Innate spellcasting " }}</em></strong>
 					The {{ monster.name.capitalizeEach() }}'s innate spellcasting ability is
 					{{ monster.innate_ability.capitalize() }} (spell save DC {{ monster.innate_save_dc }},
 					{{
@@ -471,6 +471,9 @@ export default {
 		shares() {
 			return this.broadcast.shares || [];
 		},
+		is55e() {
+			return this.monster.edition === "5.5e" || this.edition === "5.5e";
+		},
 		initiative_bonus() {
 			// 5.5e stat blocks can have a flat initiative bonus, default is the dexterity modifier
 			return this.monster.initiative !== undefined
@@ -531,7 +534,7 @@ export default {
 			return Object.entries(this.monster.innate_spells)
 				.filter(([key, spell]) => {
 					spell.key = key;
-					if (spell.limit === 0) spell.imit = Infinity;
+					if (spell.limit === 0) spell.limit = Infinity;
 					return spell.limit == limit;
 				})
 				.map((item) => {

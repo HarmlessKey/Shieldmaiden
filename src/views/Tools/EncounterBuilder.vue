@@ -109,6 +109,21 @@
 				</tbody>
 			</table>
 		</div>
+		<p class="table-source">
+			Source: XP thresholds by character level, from the
+			<a
+				href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
+				target="_blank"
+				rel="noopener noreferrer nofollow"
+				>System Reference Document 5.1</a
+			>, © Wizards of the Coast, used under the
+			<a
+				href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
+				target="_blank"
+				rel="noopener noreferrer nofollow"
+				>Open Game License 1.0a</a
+			>.
+		</p>
 		<p>
 			Shieldmaiden does this maths for you: enter your party and monsters and the difficulty is
 			calculated automatically, including the multiplier for multi-monster encounters.
@@ -131,35 +146,6 @@
 			<li>
 				Save a few variant encounters per session so you can adjust difficulty on the fly if the
 				party is stronger or weaker than expected.
-			</li>
-		</ul>
-
-		<h2>Frequently asked questions</h2>
-		<div v-for="item in faq" :key="item.question" class="faq-item">
-			<h3>{{ item.question }}</h3>
-			<p>{{ item.answer }}</p>
-		</div>
-
-		<h2>How Shieldmaiden compares to other D&D encounter builders</h2>
-		<p>
-			Shieldmaiden's encounter builder is designed to flow straight into running the fight, with your
-			own homebrew monsters treated as first-class content. Other tools are worth knowing about
-			depending on what you need.
-		</p>
-		<ul>
-			<li>
-				<strong>Kobold Fight Club (Koboldplus)</strong> is a fast, focused encounter and difficulty
-				calculator. If you only want a quick CR check it is excellent; Shieldmaiden adds saving,
-				custom monsters, and running the encounter afterwards.
-			</li>
-			<li>
-				<strong>D&D Beyond's Encounter Builder</strong> is the best fit if your group already uses
-				D&D Beyond content and characters. Shieldmaiden is a better fit for homebrew-heavy tables and
-				for running the encounter in the same app.
-			</li>
-			<li>
-				<strong>Donjon's tools</strong> are great for random generation and reference tables.
-				Shieldmaiden is more about deliberately building and then playing out a specific encounter.
 			</li>
 		</ul>
 	</ToolsPage>
@@ -208,33 +194,6 @@ export default {
 				{ level: 19, easy: "2,400", medium: "4,900", hard: "7,300", deadly: "10,900" },
 				{ level: 20, easy: "2,800", medium: "5,700", hard: "8,500", deadly: "12,700" },
 			],
-			faq: [
-				{
-					question: "Is the Shieldmaiden encounter builder free?",
-					answer:
-						"Yes. Building encounters and calculating their difficulty is free, with no credit card required. A free account lets you save your encounters per campaign, and optional paid tiers raise content limits for very active dungeon masters.",
-				},
-				{
-					question: "How is encounter difficulty calculated?",
-					answer:
-						"Shieldmaiden uses the official D&D 5e XP threshold method. It sums each character's threshold for a difficulty band, applies the encounter multiplier based on the number of monsters, and compares the two to rate the fight as easy, medium, hard, or deadly.",
-				},
-				{
-					question: "Can I use my own custom monsters?",
-					answer:
-						"Yes. You can add custom monsters built in our monster creator alongside SRD monsters, and their challenge rating counts toward the difficulty calculation just like official creatures. You can also import monsters shared by other Shieldmaiden users.",
-				},
-				{
-					question: "Can I run the encounter after building it?",
-					answer:
-						"Yes. Once an encounter is built you can run it directly in the Shieldmaiden combat tracker, with no need to retype stat blocks. Initiative, hit points, conditions, and concentration are all handled in the same app.",
-				},
-				{
-					question: "Do I need an account to build an encounter?",
-					answer:
-						"No account is required to try building an encounter and see its difficulty. You only need a free account when you want to save an encounter so you can load and run it in a later session.",
-				},
-			],
 		};
 	},
 	meta() {
@@ -251,23 +210,6 @@ export default {
 				ogImageAlt: {
 					property: "og:image:alt",
 					content: "Shieldmaiden Encounter Builder",
-				},
-			},
-			script: {
-				faqPage: {
-					type: "application/ld+json",
-					innerHTML: JSON.stringify({
-						"@context": "https://schema.org",
-						"@type": "FAQPage",
-						mainEntity: this.faq.map((item) => ({
-							"@type": "Question",
-							name: item.question,
-							acceptedAnswer: {
-								"@type": "Answer",
-								text: item.answer,
-							},
-						})),
-					}),
 				},
 			},
 		};
@@ -292,8 +234,10 @@ export default {
 		white-space: nowrap;
 	}
 }
-.faq-item {
-	margin-bottom: 15px;
+.table-source {
+	font-size: 12px;
+	color: $neutral-3;
+	margin-top: -10px;
 }
 .media {
 	display: block;

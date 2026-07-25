@@ -86,7 +86,7 @@
 						dark filled square dense
 						type="number"
 						label="Normal range"
-						:value="weapon.range ? weapon.range.split('/')[0] : undefined"
+						:model-value="weapon.range ? weapon.range.split('/')[0] : undefined"
 					/>
 				</div>
 				<div class="col">
@@ -94,7 +94,7 @@
 						dark filled square dense
 						type="number"
 						label="Long range"
-						:value="weapon.range ? weapon.range.split('/')[1] : undefined"
+						:model-value="weapon.range ? weapon.range.split('/')[1] : undefined"
 					/>
 				</div>
 			</div>
@@ -108,7 +108,7 @@
 						dark filled square dense
 						type="number"
 						label="Normal range"
-						:value="weapon.thrown ? weapon.thrown.split('/')[0] : undefined"
+						:model-value="weapon.thrown ? weapon.thrown.split('/')[0] : undefined"
 					/>
 				</div>
 				<div class="col">
@@ -116,7 +116,7 @@
 						dark filled square dense
 						type="number"
 						label="Long range"
-						:value="weapon.thrown ? weapon.thrown.split('/')[1] : undefined"
+						:model-value="weapon.thrown ? weapon.thrown.split('/')[1] : undefined"
 					/>
 				</div>
 			</div>
@@ -153,13 +153,18 @@
 		props: {
 			value: {
 				type: Object,
-				required: true
+				required: false
+			},
+			modelValue: {
+				type: Object,
+				required: false
 			},
 			proficient: {
 				type: Boolean,
 				default: false
 			}
 		},
+		emits: ["input", "update:modelValue"],
 		data() {
 			return {
 				abilities: abilities,
@@ -168,7 +173,7 @@
 		},
 		computed: {
 			weapon() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			title() {
 				const type = this.weapon.weapon_type.split("_");
@@ -185,6 +190,7 @@
 				deep: true,
 				handler(newVal) {
 					this.$emit('input', newVal);
+					this.$emit('update:modelValue', newVal);
 				}
 			}
 		},

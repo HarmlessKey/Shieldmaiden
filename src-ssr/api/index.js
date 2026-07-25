@@ -8,9 +8,16 @@ const path = require("path");
 
 const admin = require("firebase-admin");
 
+// Load server-side env (API secrets); the client bundle gets its env
+// baked in via quasar.config.js > build.env instead
+require("dotenv").config({
+	path: path.resolve(process.cwd(), `.env.${process.env.NODE_ENV}.local`),
+});
+
+// Throws when firebaseServiceAccountKey.json is missing; the api
+// middleware catches it and disables the /api routes
 const serviceAccountFilePath = path.resolve(process.cwd(), "firebaseServiceAccountKey.json");
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountFilePath, "utf8"));
-
 
 process.env.GOOGLE_CLOUD_PROJECT = serviceAccount.project_id;
 if (!admin.apps.length) {

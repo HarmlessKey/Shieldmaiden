@@ -35,13 +35,14 @@
 				:error="!!noResult"
 				:error-message="noResult"
 			>
-				<q-icon
-					slot="prepend"
-					name="fas fa-search"
-					size="xs"
-					class="pointer"
-					@click="searchType()"
-				/>
+				<template v-slot:prepend>
+					<q-icon
+						name="fas fa-search"
+						size="xs"
+						class="pointer"
+						@click="searchType()"
+					/>
+				</template>
 			</q-input>
 
 			<!-- SHOW SEARCH RESULTS -->

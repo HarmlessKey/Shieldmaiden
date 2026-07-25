@@ -17,7 +17,7 @@
 							v-model="entity[type]" 
 							:hint="resistanceInfo(type)"
 						>
-							<template slot="prepend">
+							<template v-slot:prepend>
 								<div class="defense" :class="type">
 									<i aria-hidden="true" class="fas fa-shield"></i>
 									<span>
@@ -60,7 +60,7 @@
 					v-model="entity.condition_immunities" 
 					name="condition_immunities" 
 				>
-					<template slot="prepend">
+					<template v-slot:prepend>
 						<i aria-hidden="true" class="fas fa-fist-raised" />
 					</template>
 					<template v-slot:selected v-if="entity.condition_immunities">
@@ -136,18 +136,18 @@
 			},
 			setResistance(type, value) {
 				if(!this.entity[type]) {
-					this.$set(this.entity, type, [value]);
+					this.entity[type] = [value];
 				} else if(this.entity[type].includes(value)) {
-					this.$delete(this.entity[type], this.entity[type].indexOf(value));
+					this.entity[type].splice(this.entity[type].indexOf(value), 1);
 				} else {
 					this.entity[type].push(value);
 				}
 			},
 			setCondition(value) {
 				if(!this.entity.condition_immunities) {
-					this.$set(this.entity, "condition_immunities", [value]);
+					this.entity["condition_immunities"] = [value];
 				} else if(this.entity.condition_immunities.includes(value)) {
-					this.$delete(this.entity.condition_immunities, this.entity.condition_immunities.indexOf(value));
+					this.entity.condition_immunities.splice(this.entity.condition_immunities.indexOf(value), 1);
 				} else {
 					this.entity.condition_immunities.push(value);
 				}

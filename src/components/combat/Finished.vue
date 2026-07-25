@@ -11,9 +11,11 @@
 					class="neutral-1"
 				>
 					<q-banner rounded inline-actions class="bg-neutral-8 mb-3">
-						<q-icon slot="avatar" name="fab fa-patreon patreon-red" />
+						<template v-slot:avatar>
+							<q-icon name="fab fa-patreon patreon-red" />
+						</template>
 						Enjoying Shieldmaiden? <b>Please support us on Patreon.</b>
-						<template slot="action">
+						<template v-slot:action>
 							<q-btn
 								color="patreon-red"
 								no-caps
@@ -39,28 +41,30 @@
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-7">
 					<hk-card>
-						<div slot="header" class="card-header">
-							<router-link
-								v-if="$route.name == 'RunEncounter'"
-								class="btn btn-sm btn-clear"
-								:to="'/content/campaigns/' + $route.params.campid"
-							>
-								<i aria-hidden="true" class="fas fa-chevron-left"></i> Leave
-							</router-link>
+						<template v-slot:header>
+							<div class="card-header">
+								<router-link
+									v-if="$route.name == 'RunEncounter'"
+									class="btn btn-sm btn-clear"
+									:to="'/content/campaigns/' + $route.params.campid"
+								>
+									<i aria-hidden="true" class="fas fa-chevron-left"></i> Leave
+								</router-link>
 
-							<span class="right">
-								<a class="btn btn-sm bg-neutral-5" @click="reset((hard = false))">
-									<i aria-hidden="true" class="fas fa-trash-restore-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Unfinish encounter
-									</q-tooltip>
-								</a>
-								<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset()">
-									<i aria-hidden="true" class="fas fa-undo"></i>
-									<q-tooltip anchor="top middle" self="center middle"> Reset encounter </q-tooltip>
-								</a>
-							</span>
-						</div>
+								<span class="right">
+									<a class="btn btn-sm bg-neutral-5" @click="reset((hard = false))">
+										<i aria-hidden="true" class="fas fa-trash-restore-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Unfinish encounter
+										</q-tooltip>
+									</a>
+									<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset()">
+										<i aria-hidden="true" class="fas fa-undo"></i>
+										<q-tooltip anchor="top middle" self="center middle"> Reset encounter </q-tooltip>
+									</a>
+								</span>
+							</div>
+						</template>
 
 						<q-tabs
 							v-model="tab"

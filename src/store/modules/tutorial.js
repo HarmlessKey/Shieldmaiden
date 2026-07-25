@@ -1,5 +1,3 @@
-import Vue from "vue";
-
 const TUTORIALS = {
 	build: {
 		title: "Build encounter",
@@ -419,13 +417,13 @@ const tutorial_actions = {
 
 const tutorial_mutations = {
 	SET_TUTORIAL(state, payload) {
-		Vue.set(state, "follow_tutorial", payload);
+		state.follow_tutorial = payload;
 	},
 	RESET_TUTORIAL(state, tutorial_name) {
-		Vue.set(state, tutorial_name, TUTORIALS[tutorial_name]);
+		state[tutorial_name] = TUTORIALS[tutorial_name];
 	},
 	SET_GAME_STATE(state, { game_state_key, value }) {
-		Vue.set(state.game_state, game_state_key, value);
+		state.game_state[game_state_key] = value;
 	},
 	SET_COMPLETE(state, { tutorial, path }) {
 		let step_reference = state[tutorial];
@@ -450,7 +448,7 @@ const tutorial_mutations = {
 					break;
 			}
 		}
-		Vue.set(step_reference, "completed", true);
+		step_reference.completed = true;
 		if (branch_reference.completed === false && branch_completed(branch_reference)) {
 			branch_reference.completed = true;
 		}

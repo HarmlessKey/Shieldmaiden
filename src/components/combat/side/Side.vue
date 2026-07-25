@@ -129,7 +129,7 @@ export default {
 		background: $neutral-6-transparent;
 
 		// Position relative on scrollarea__content causes target items to overflow horizontally
-		&::v-deep {
+		&:deep() {
 			.q-scrollarea__content {
 				position: unset;
 			}

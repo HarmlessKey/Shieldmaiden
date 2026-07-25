@@ -24,7 +24,7 @@
 			</div>
 			<p>
 				<strong><em>Spellcasting</em></strong>
-				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral("Oo") }}-level
+				The {{ entity.name.capitalizeEach() }} is a {{ formatNumber(entity.caster_level, "Oo") }}-level
 				spellcaster. Its spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
 				save DC {{ entity.caster_save_dc }},
 				{{
@@ -38,11 +38,11 @@
 			<strong><em>Spells</em></strong
 			><br />
 			<p>
-				<template v-for="level in caster_spell_levels">
-					<div :key="`spell-${level}`">
+				<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+					<div>
 						<template v-if="level === 0"> Cantrips (at will): </template>
 						<template v-else>
-							{{ level | numeral("Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
+							{{ formatNumber(level, "Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
 						</template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
@@ -94,8 +94,8 @@
 			<strong><em>Innate spells</em></strong
 			><br />
 			<p>
-				<template v-for="limit in innate_spell_levels">
-					<div :key="`spell-${limit}`">
+				<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+					<div>
 						<template v-if="limit === Infinity"> At will: </template>
 						<template v-else> {{ limit }}/day each: </template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
@@ -117,6 +117,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import Spell from "src/components/compendium/Spell.vue";
 
 export default {
@@ -174,6 +175,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)
 				.filter(([key, item]) => {

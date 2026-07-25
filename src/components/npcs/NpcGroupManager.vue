@@ -1,6 +1,7 @@
 <template>
 	<hk-card class="npc-group-manager">
-		<div slot="header" class="card-header">
+		<template v-slot:header>
+			<div class="card-header">
 			<template v-if="selectedGroup">
 				<a @click="selectedGroup = null" class="btn btn-sm bg-neutral-5 mr-2" aria-label="Back to groups">
 					<i aria-hidden="true" class="fas fa-arrow-left" />
@@ -9,7 +10,8 @@
 			</template>
 			<span v-else>Manage NPC Groups</span>
 			<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-		</div>
+			</div>
+		</template>
 		<div class="card-body">
 			<!-- GROUP DETAIL VIEW -->
 			<template v-if="selectedGroup">
@@ -142,6 +144,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { campaignGroupKey } from "src/utils/generalFunctions";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "NpcGroupManager",
@@ -206,33 +209,16 @@ export default {
 			this.selectedGroup.name = this.editName.toLowerCase();
 		},
 		confirmDeleteGroup(group) {
-			this.$snotify.error(
-				`Are you sure you want to delete "${group.name ? group.name.capitalizeEach() : group.key}"?`,
-				"Delete Group",
-				{
-					timeout: false,
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.delete_npc_group(group.key);
-								if (this.selectedGroup && this.selectedGroup.key === group.key) {
-									this.selectedGroup = null;
-								}
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete Group",
+				message: `Are you sure you want to delete "${group.name ? group.name.capitalizeEach() : group.key}"?`,
+				onOk: () => {
+					this.delete_npc_group(group.key);
+					if (this.selectedGroup && this.selectedGroup.key === group.key) {
+						this.selectedGroup = null;
+					}
+				},
+			});
 		},
 		async syncGroupNpcs(newNpcIds) {
 			const groupId = this.selectedGroup.key;

@@ -5,7 +5,7 @@
 
 			<q-table
 				v-if="characters.length"
-				:data="characters"
+				:rows="characters"
 				:columns="columns"
 				row-key="key"
 				card-class="bg-none"
@@ -61,9 +61,15 @@
 						</q-td>
 					</q-tr>
 				</template>
-				<div slot="no-data" />
-				<div slot="bottom" />
-				<hk-loader slot="loading" name="characters" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:bottom>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="characters" />
+				</template>
 			</q-table>
 			<p v-else>You have no control over other characters.</p>
 		</div>
@@ -74,6 +80,7 @@
 <script>
 	import { experience } from 'src/mixins/experience.js';
 	import { mapGetters, mapActions } from 'vuex';
+	import { confirmAction } from "src/utils/notify";
 
 	export default {
 		name: 'Characters',
@@ -127,25 +134,10 @@
 				if(e.shiftKey) {
 					this.deleteCharacter(key, player.user_id);
 				} else {
-					this.$snotify.error(
-						`Are you sure you want give up control over ${player.character_name}?`, 
-						'Give up control', {
-						timeout: false,
-						buttons: [
-							{
-								text: 'Yes', action: (toast) => { 
-								this.deleteCharacter(key, player.user_id)
-								this.$snotify.remove(toast.id); 
-								}, 
-								bold: false
-							},
-							{
-								text: 'No', action: (toast) => { 
-									this.$snotify.remove(toast.id); 
-								}, 
-								bold: true
-							},
-						]
+					confirmAction({
+						title: 'Give up control',
+						message: `Are you sure you want give up control over ${player.character_name}?`,
+						onOk: () => this.deleteCharacter(key, player.user_id),
 					});
 				}
 			},

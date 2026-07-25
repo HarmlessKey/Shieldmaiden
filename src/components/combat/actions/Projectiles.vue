@@ -1,9 +1,11 @@
 <template>
 	<hk-card :min-width="300">
-		<div slot="header" class="card-header">
-			Projectiles
-			<span class="btn btn-sm bg-neutral-5">{{ available_projectiles }}/{{ projectileCount }}</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				Projectiles
+				<span class="btn btn-sm bg-neutral-5">{{ available_projectiles }}/{{ projectileCount }}</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<button
 				class="btn btn-block mb-3"
@@ -36,16 +38,18 @@
 				</button>
 			</div>
 		</div>
-		<div slot="footer" class="card-footer">
-			<q-btn label="Cancel" tabindex="-1" no-caps @click="cancel()" />
-			<q-btn
-				label="Roll"
-				color="primary"
-				no-caps
-				@click="roll()"
-				:disable="available_projectiles > 0"
-			/>
-		</div>
+		<template v-slot:footer>
+			<div class="card-footer">
+				<q-btn label="Cancel" tabindex="-1" no-caps @click="cancel()" />
+				<q-btn
+					label="Roll"
+					color="primary"
+					no-caps
+					@click="roll()"
+					:disable="available_projectiles > 0"
+				/>
+			</div>
+		</template>
 	</hk-card>
 </template>
 
@@ -97,7 +101,7 @@ export default {
 
 			new_value = add ? new_value + 1 : new_value - 1;
 
-			this.$set(this.assigned_projectiles, key, new_value.between(0, this.projectileCount));
+			this.assigned_projectiles[key] = new_value.between(0, this.projectileCount);
 		},
 		cancel() {
 			this.$emit("cancel");
@@ -115,7 +119,7 @@ export default {
 	justify-content: space-between;
 	margin-bottom: 2px;
 
-	&::v-deep {
+	&:deep() {
 		.basic-entity__wrapper {
 			flex-grow: 1;
 		}

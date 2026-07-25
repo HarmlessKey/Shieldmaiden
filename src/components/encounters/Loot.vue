@@ -41,9 +41,9 @@
 			<ValidationObserver
 				v-for="(item, key) in encounter.loot"
 				:key="key"
-				v-slot="{ handleSubmit, validate, valid }"
+				v-slot="{ handleSubmit, meta }"
 			>
-				<q-form @submit="valid ? handleSubmit(saveItem(item, key)) : validate()" greedy>
+				<q-form @submit="handleSubmit($event, () => saveItem(item, key))" greedy>
 					<q-expansion-item
 						:dark="$store.getters.theme === 'dark'"
 						switch-toggle-side
@@ -72,7 +72,7 @@
 							<ValidationProvider
 								rules="required|max:100"
 								name="Name"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="item.public_name" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -83,23 +83,24 @@
 									id="name"
 									type="text"
 									v-model="item.public_name"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								>
-									<hk-popover
-										slot="append"
-										header="Public name"
-										content="The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item."
-									>
-										<q-icon name="info" @click.stop class="pointer" />
-									</hk-popover>
+									<template v-slot:append>
+										<hk-popover
+											header="Public name"
+											content="The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item."
+										>
+											<q-icon name="info" @click.stop class="pointer" />
+										</hk-popover>
+									</template>
 								</q-input>
 							</ValidationProvider>
 
 							<ValidationProvider
 								rules="max:2000"
 								name="Dscription"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="item.public_description" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -113,8 +114,8 @@
 									rows="4"
 									name="desc"
 									maxlength="2000"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 							<div>
@@ -147,7 +148,7 @@
 							</div>
 							<div class="d-flex items-center mt-4">
 								<q-btn no-caps color="primary" type="submit">Save</q-btn>
-								<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+								<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 									<q-tooltip anchor="top middle" self="center middle">
 										There are validation errors
 									</q-tooltip>
@@ -163,6 +164,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { notifySuccess } from "src/utils/notify";
 import { currencyMixin } from "src/mixins/currency.js";
 import LinkedItem from "./LinkedItem";
 
@@ -210,9 +212,7 @@ export default {
 				property: "currency",
 				value: this.currency,
 			});
-			this.$snotify.success("Currency was successfully saved.", "Currency saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Currency was successfully saved.", "Currency saved!");
 		},
 		async getItem(id, custom) {
 			let item;
@@ -235,9 +235,7 @@ export default {
 				id: key,
 				item,
 			});
-			this.$snotify.success("Your item was successfully saved.", "Item saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Your item was successfully saved.", "Item saved!");
 		},
 		addItem() {
 			this.add_encounter_loot({

@@ -31,7 +31,7 @@
 				:left-label-value="crLabel(cr.min)"
 				:right-label-value="crLabel(cr.max)"
 				class="px-2"
-				@input="setCR"
+				@update:model-value="setCR"
 			/>
 		</template>
 		<template v-if="type === 'monster'">
@@ -81,7 +81,7 @@
 				:left-label-value="crLabel(cr.min)"
 				:right-label-value="crLabel(cr.max)"
 				class="px-2"
-				@input="setCR"
+				@update:model-value="setCR"
 			/>
 		</template>
 		<template v-if="type === 'spell'">
@@ -110,7 +110,7 @@
 				:max="9"
 				:left-label-value="minLevelMarker"
 				:right-label-value="maxLevelMarker"
-				@input="setLevels"
+				@update:model-value="setLevels"
 			/>
 		</template>
 	</div>
@@ -119,7 +119,7 @@
 <script>
 import { monsterMixin } from "src/mixins/monster.js";
 import { spell_schools } from "src/utils/spellConstants";
-import numeral from "numeral";
+import { formatNumber } from "src/utils/formatNumber";
 
 const CR_VALUES = [0, 0.125, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
 const CR_LABELS = ["0", "1/8", "1/4", "1/2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"];
@@ -135,7 +135,11 @@ export default {
 	props: {
 		value: {
 			type: Object,
-			required: true,
+			default: undefined,
+		},
+		modelValue: {
+			type: Object,
+			default: undefined,
 		},
 		type: {
 			type: String,
@@ -146,36 +150,39 @@ export default {
 			default: () => [],
 		},
 	},
+	emits: ["input", "update:modelValue", "change"],
 	data() {
-		const existingCR = this.value?.challenge_ratings;
+		const filter = this.modelValue !== undefined ? this.modelValue : this.value;
+		const existingCR = filter?.challenge_ratings;
 		return {
 			spell_schools: spell_schools,
 			cr: existingCR
 				? { min: crToPosition(existingCR.min), max: crToPosition(existingCR.max) }
 				: { min: 0, max: 33 },
-			levels: this.value?.levels || { min: 0, max: 9 },
+			levels: filter?.levels || { min: 0, max: 9 },
 		}
 	},
 	computed: {
 		filter: {
 			get() {
-				const filter = this.value;
+				const filter = this.modelValue !== undefined ? this.modelValue : this.value;
 				return filter;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 				this.$emit("change");
 			}
 		},
 		minLevelMarker() {
-			return this.levels?.min ? numeral(this.levels.min).format("0o") : "Cantrip";
+			return this.levels?.min ? formatNumber(this.levels.min, "0o") : "Cantrip";
 		},
 		maxLevelMarker() {
-			return this.levels?.max ? numeral(this.levels.max).format("0o") : "Cantrip";
+			return this.levels?.max ? formatNumber(this.levels.max, "0o") : "Cantrip";
 		},
 	},
 	watch: {
-		value: {
+		filter: {
 			deep: true,
 			handler() {
 				this.$emit("change");
@@ -188,18 +195,18 @@ export default {
 		},
 		setLevels(value) {
 			if(!this.filter.levels) {
-				this.$set(this.filter, "levels", {});
+				this.filter["levels"] = {};
 			}
-			this.$set(this.filter.levels, "min", value.min);
-			this.$set(this.filter.levels, "max", value.max);
+			this.filter.levels["min"] = value.min;
+			this.filter.levels["max"] = value.max;
 			this.$forceUpdate();
 		},
 		setCR(value) {
 			if(!this.filter.challenge_ratings) {
-				this.$set(this.filter, "challenge_ratings", {});
+				this.filter["challenge_ratings"] = {};
 			}
-			this.$set(this.filter.challenge_ratings, "min", CR_VALUES[value.min]);
-			this.$set(this.filter.challenge_ratings, "max", CR_VALUES[value.max]);
+			this.filter.challenge_ratings["min"] = CR_VALUES[value.min];
+			this.filter.challenge_ratings["max"] = CR_VALUES[value.max];
 			this.$forceUpdate();
 		}
 	}

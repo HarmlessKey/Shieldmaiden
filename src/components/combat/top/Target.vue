@@ -83,7 +83,7 @@ export default {
 			return calculateManualDamage(this.manual, this.target, multiplier, defense);
 		},
 		applyDamage() {
-			EventBus.$emit("applyManualValue", "damage");
+			EventBus.emit("applyManualValue", "damage");
 		},
 	},
 };

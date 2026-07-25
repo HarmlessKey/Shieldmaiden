@@ -33,9 +33,9 @@
 					<div v-if="index" class="d-flex items-center mb-2">
 						<q-checkbox
 							:dark="$store.getters.theme === 'dark'"
-							:value="getValue('ignore', { key, index })"
+							:model-value="getValue('ignore', { key, index })"
 							:label="`Ignore for ${key}`"
-							@input="setValue($event, 'ignore', { key, index })"
+							@update:model-value="setValue($event, 'ignore', { key, index })"
 							:false-value="null"
 							indeterminate-value="something-else"
 						/>
@@ -51,6 +51,7 @@
 					>
 						<template v-if="action_type !== 'healing'">
 							<ValidationProvider
+								as="div"
 								:rules="{
 									required: index === 0,
 								}"
@@ -66,14 +67,14 @@
 							<div class="d-flex items-center mb-2">
 								<q-checkbox
 									:dark="$store.getters.theme === 'dark'"
-									:value="getValue('magical', { key, index })"
+									:model-value="getValue('magical', { key, index })"
 									:label="`${index ? key : ''} Magical`"
 									:disable="
 										!['bludgeoning', 'piercing', 'slashing'].includes(
 											getValue('damage_type', { key, index })
 										)
 									"
-									@input="setValue($event, 'magical', { key, index })"
+									@update:model-value="setValue($event, 'magical', { key, index })"
 									:false-value="null"
 									indeterminate-value="something-else"
 								/>
@@ -97,23 +98,23 @@
 										required: !!getValue('dice_type', { key, index }),
 									}"
 									:name="`Dice count ${key}`"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="getValue('dice_count', { key, index })" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
 										filled
 										square
 										:label="`Dice count ${key} ${!index ? '*' : ''}`"
-										:value="getValue('dice_count', { key, index })"
-										@input="setValue($event, 'dice_count', { key, index })"
+										:model-value="getValue('dice_count', { key, index })"
+										@update:model-value="setValue($event, 'dice_count', { key, index })"
 										min="1"
 										max="99"
 										autocomplete="off"
 										name="dice_count"
 										class="mb-2"
 										type="number"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -128,8 +129,8 @@
 									clearable
 									:label="`Dice type ${key}`"
 									:options="dice_type"
-									:value="getValue('dice_type', { key, index })"
-									@input="setValue($event, 'dice_type', { key, index })"
+									:model-value="getValue('dice_type', { key, index })"
+									@update:model-value="setValue($event, 'dice_type', { key, index })"
 									class="mb-2"
 								/>
 							</div>
@@ -138,7 +139,7 @@
 								<ValidationProvider
 									rules="between:-99,99"
 									name="Fixed value"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="getValue('fixed_val', { key, index })" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -150,8 +151,8 @@
 										autocomplete="off"
 										class="mb-2"
 										type="number"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									>
 										<template v-slot:append>
 											<hk-popover
@@ -197,24 +198,27 @@
 					square
 					readonly
 					autogrow
-					:value="
+					:model-value="
 						roll.scaling && roll.scaling.length
 							? scalingDesc(roll.scaling, spell.scaling, spell.level)
 							: 'No scaling set'
 					"
 				>
-					<i slot="prepend" class="fas fa-chart-line" aria-hidden="true" />
-					<button
-						slot="append"
-						class="btn btn-sm bg-neutral-5"
-						@click.prevent="set_scaling = !set_scaling"
-					>
-						<i
-							class="fas"
-							:class="roll.scaling && roll.scaling.length ? 'fa-pencil' : 'fa-plus'"
-							aria-hidden="true"
-						/>
-					</button>
+					<template v-slot:prepend>
+						<i class="fas fa-chart-line" aria-hidden="true" />
+					</template>
+					<template v-slot:append>
+						<button
+							class="btn btn-sm bg-neutral-5"
+							@click.prevent="set_scaling = !set_scaling"
+						>
+							<i
+								class="fas"
+								:class="roll.scaling && roll.scaling.length ? 'fa-pencil' : 'fa-plus'"
+								aria-hidden="true"
+							/>
+						</button>
+					</template>
 				</q-input>
 			</template>
 
@@ -223,7 +227,7 @@
 				v-if="action_type === 'save'"
 				rules="required"
 				name="Fixed value"
-				v-slot="{ invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="roll.save_fail_mod" as="div"
 			>
 				<q-select
 					:dark="$store.getters.theme === 'dark'"
@@ -236,7 +240,7 @@
 					v-model="roll.save_fail_mod"
 					class="mb-3"
 					hint="The effect if the target makes a successful saving throw."
-					:error="invalid && validated"
+					:error="!!errorMessage"
 					error-message="What happens on a succesful save?"
 				/>
 			</ValidationProvider>
@@ -244,7 +248,7 @@
 				v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
 				rules="required"
 				name="Fixed value"
-				v-slot="{ invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="roll.miss_mod" as="div"
 			>
 				<q-select
 					:dark="$store.getters.theme === 'dark'"
@@ -257,7 +261,7 @@
 					v-model="roll.miss_mod"
 					class="mb-3"
 					hint="The effect if the attack is a miss."
-					:error="invalid && validated"
+					:error="!!errorMessage"
 					error-message="What happens on a miss?"
 				/>
 			</ValidationProvider>
@@ -284,14 +288,14 @@
 				</div>
 			</template>
 		</div>
-		<ValidationObserver v-if="set_scaling" v-slot="{ valid }">
+		<ValidationObserver v-if="set_scaling" v-slot="{ meta }" as="div">
 			<hk-action-roll-scaling
 				v-model="roll.scaling"
 				:roll="roll"
 				:spell="spell"
 				@input="$forceUpdate()"
 			/>
-			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!valid" />
+			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!meta.valid" />
 		</ValidationObserver>
 	</div>
 </template>
@@ -299,12 +303,13 @@
 <script>
 import { damage_types, dice_types } from "src/utils/generalConstants";
 import { spellScalingDescription } from "src/utils/spellFunctions";
-import { ValidationProvider } from "vee-validate";
+import { Field as ValidationProvider } from "vee-validate";
 
 export default {
 	name: "HkActionRollForm",
 	props: {
 		value: Object,
+		modelValue: Object,
 		action_type: String,
 		versatile_options: {
 			type: Object,
@@ -324,6 +329,7 @@ export default {
 			type: String,
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			show_description: false,
@@ -345,10 +351,11 @@ export default {
 	computed: {
 		roll: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		specials() {
@@ -383,7 +390,7 @@ export default {
 				return this.roll.special;
 			},
 			set(newVal) {
-				this.$set(this.roll, "special", newVal);
+				this.roll["special"] = newVal;
 			},
 		},
 		action_options() {
@@ -393,15 +400,15 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		reset_magical(value, versatile) {
 			const prop = versatile === 1 ? "versatile_magical" : "magical";
 			if (!["bludgeoning", "piercing", "slashing"].includes(value)) {
-				this.$set(this.roll, prop, null);
+				this.roll[prop] = null;
 			}
 		},
 		scalingDesc(tiers, scaling, level) {
@@ -418,15 +425,15 @@ export default {
 			value =
 				["dice_count", "fixed_val"].includes(prop) && value != undefined ? parseInt(value) : value;
 			if (option.index === 0) {
-				this.$set(this.roll, prop, value);
+				this.roll[prop] = value;
 			} else if (this.roll.options) {
 				if (this.roll.options[option.key]) {
-					this.$set(this.roll.options[option.key], prop, value);
+					this.roll.options[option.key][prop] = value;
 				} else {
-					this.$set(this.roll.options, option.key, { [prop]: value });
+					this.roll.options[option.key] = { [prop]: value };
 				}
 			} else {
-				this.$set(this.roll, "options", { [option.key]: { [prop]: value } });
+				this.roll["options"] = { [option.key]: { [prop]: value } };
 			}
 			if (prop === "damage_type") {
 				this.reset_magical(value, option.key);

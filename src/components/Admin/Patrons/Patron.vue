@@ -63,7 +63,7 @@
 					Lifetime support
 				</div>
 				<div class="col">
-					{{ patron.lifetime_support  / 100 | numeral('$0,0') }}
+					{{ formatNumber(patron.lifetime_support  / 100, '$0,0') }}
 				</div>
 			</div>
 
@@ -95,6 +95,7 @@
 	import { db } from 'src/firebase'
 	import { general } from 'src/mixins/general.js'
 	import EditPatron from 'src/views/Admin/Patrons/New.vue'
+	import { formatNumber } from "src/utils/formatNumber";
 
 	export default {
 		name: 'Patron',
@@ -123,6 +124,7 @@
 			}
 		},
 		methods: {
+			formatNumber,
 			setEdit(value) {
 				this.edit = value
 			}

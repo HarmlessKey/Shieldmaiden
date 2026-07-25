@@ -1,7 +1,7 @@
 <template>
 	<span v-if="show || userSettings?.general?.keyBinds === undefined">
-		<template v-for="(bind, i) in binds">
-			<code class="hk-keybind" :key="i">{{ bind }}</code>
+		<template v-for="(bind, i) in binds" :key="i">
+			<code class="hk-keybind">{{ bind }}</code>
 			{{ (i+1 &lt; binds.length) ? " + " : "" }}
 		</template>
 	</span>

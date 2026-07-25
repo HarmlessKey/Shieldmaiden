@@ -1,14 +1,26 @@
 # Shieldmaiden
 
-D&D combat tracker web app built with Vue 2 + Quasar 1 + Firebase.
+D&D combat tracker web app built with Vue 3 + Quasar 2 + Firebase.
 
 ## Tech Stack
 
-- **Framework**: Vue 2.7 + Quasar 1 (SSR mode)
-- **Build**: Webpack 4 via `@quasar/app ~2.4.3`
+- **Framework**: Vue 3 + Quasar 2 (SSR mode), Options API (no Composition API rewrite)
+- **Build**: Webpack 5 via `@quasar/app-webpack ^3`
 - **Backend**: Firebase v8 (namespaced API — do NOT migrate to modular v10+ API)
-- **State**: Vuex with modules in `src/store/modules/`
+- **State**: Vuex 4 with modules in `src/store/modules/`
+- **Validation**: vee-validate v4 (`ValidationObserver`/`ValidationProvider` are global aliases for `Form`/`Field`)
+- **Notifications**: Quasar Notify/Dialog via `src/utils/notify.js` (vue-snotify is gone)
 - **Node**: >= 24, npm >= 10.2.4
+
+## Migrating Vue 2 Code
+
+Branches created before the Vue 3 migration contain Vue 2 syntax. When merging
+such a branch (or writing code by example from an old branch), follow
+**[VUE3_MIGRATION_GUIDE.md](./VUE3_MIGRATION_GUIDE.md)** — it covers the merge
+procedure, per-pattern conversion cheat sheet (slots, $set/$delete, Quasar v2
+renames, vee-validate v4, snotify), git conflict-resolution strategies, the
+mandatory post-merge pattern sweep, and the runtime pitfalls that don't show
+up as build errors.
 
 ## Dev Commands
 
@@ -30,8 +42,9 @@ npm run lint      # ESLint
 ## Key Constraints
 
 - **Firebase v8 namespaced API** is used across 63+ files — do not switch to modular API
-- Vue 2 / Quasar 1 ecosystem locks transitive deps (postcss 7, webpack 4, etc.)
-- Many audit vulnerabilities are unfixable without framework migration — do not attempt to fix them
+- Custom v-model components use a **dual contract**: `value`+`input` AND `modelValue`+`update:modelValue` (see `hk-input.vue`) — preserve it when editing them
+- On Quasar form components use `@update:model-value`/`:model-value`, never `@input`/`:value` (dead handlers, no error)
+- Regenerate the lockfile with `npx -y npm@11 install --package-lock-only` after dependency changes — npm 10 on Linux drops `fsevents` and the Docker build's `npm ci` then fails
 - `package.json` uses `overrides` to force-update transitive deps
 
 ## Project Structure

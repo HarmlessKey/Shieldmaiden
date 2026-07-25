@@ -5,7 +5,7 @@
 			<q-select 
 				:dark="$store.getters.theme === 'dark'" filled square dense
 				name="doneBy"
-				:value="player" 
+				:model-value="player" 
 				:options="characters"
 				v-validate="'required'"
 			>

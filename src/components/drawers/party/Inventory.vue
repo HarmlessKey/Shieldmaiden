@@ -8,7 +8,7 @@
 			<div class="money" v-if="currency" @click="addCurrency = !addCurrency">
 				<template v-for="(coin, key) in copperToPretty(currency)">
 					<div v-if="coin" :key="key">
-						<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral("0.0a") }} </template>
+						<template v-if="key === 'pp' && coin >= 1000">{{ formatNumber(coin, "0.0a") }} </template>
 						<template v-else>{{ coin }} </template>
 						<img
 							:src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)"
@@ -121,6 +121,7 @@
 
 <script>
 import { currencyMixin } from "src/mixins/currency.js";
+import { formatNumber } from "src/utils/formatNumber";
 import AddItem from "src/components/drawers/party/AddItem.vue";
 import { mapActions } from "vuex";
 import LinkedItem from "./LinkedItem";
@@ -161,6 +162,7 @@ export default {
 		});
 	},
 	methods: {
+		formatNumber,
 		...mapActions("campaigns", [
 			"get_campaign",
 			"set_campaign_currency",

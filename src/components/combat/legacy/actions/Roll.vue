@@ -250,7 +250,7 @@ h3 {
 	padding: 5px;
 	margin: -10px;
 
-	&::v-deep {
+	&:deep() {
 		.hk-roll {
 			padding: 10px;
 			margin: -10px;

@@ -1,7 +1,9 @@
 <template>
 	<div class="soundboard">
 		<hk-input v-model="search" dense label="Search" class="mb-2" clearable>
-			<q-icon slot="prepend" name="search" />
+			<template v-slot:prepend>
+				<q-icon name="search" />
+			</template>
 		</hk-input>
 		<p class="red" v-if="!filtered.length">Nothing found</p>
 		<transition-group
@@ -62,13 +64,15 @@
 
 		<q-dialog v-model="add_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit }">
-					<q-form @submit="handleSubmit(addLink)" greedy>
+				<ValidationObserver v-slot="{ handleSubmit }" as="div">
+					<q-form @submit="handleSubmit($event, addLink)" greedy>
 						<hk-card :min-width="320" no-margin>
-							<div slot="header" class="card-header">
-								<span>Add to your Soundboard</span>
-								<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-							</div>
+							<template v-slot:header>
+								<div class="card-header">
+									<span>Add to your Soundboard</span>
+									<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+								</div>
+							</template>
 							<div class="card-body">
 								<q-btn-toggle v-model="add.type" :options="toggle" spread no-caps class="mb-3" />
 								<hk-input
@@ -85,18 +89,24 @@
 									label="URL"
 									name="URL"
 								>
-									<hk-icon slot="prepend" icon="fas fa-music" />
+									<template v-slot:prepend>
+										<hk-icon icon="fas fa-music" />
+									</template>
 								</hk-input>
 								<div class="">
 									<hk-input v-model="add.image" rules="url" maxLength="21" label="Icon" name="Icon">
-										<hk-icon slot="prepend" icon="fas fa-image" />
+										<template v-slot:prepend>
+											<hk-icon icon="fas fa-image" />
+										</template>
 									</hk-input>
 								</div>
 							</div>
-							<div slot="footer" class="card-footer">
-								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
-								<q-btn no-caps label="Add" color="primary" type="submit" />
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer">
+									<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
+									<q-btn no-caps label="Add" color="primary" type="submit" />
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>

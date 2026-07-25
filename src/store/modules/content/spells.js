@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { spellServices } from "src/services/api/spells";
 
 const spell_state = () => ({
@@ -83,13 +82,13 @@ const spell_actions = {
 };
 const spell_mutations = {
 	SET_SPELL_SERVICES(state, payload) {
-		Vue.set(state, "spell_services", payload);
+		state.spell_services = payload;
 	},
 	SET_CACHED_SPELL(state, payload) {
-		Vue.set(state.cached_spells, payload["_id"], payload);
+		state.cached_spells[payload["_id"]] = payload;
 	},
 	SET_CACHED_URL(state, { url, id }) {
-		Vue.set(state.cached_urls, url, id);
+		state.cached_urls[url] = id;
 	},
 };
 

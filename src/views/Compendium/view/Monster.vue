@@ -1,8 +1,7 @@
 <template>
 	<hk-card>
-		<hk-loader v-if="loading" name="monster" />
-		<template v-else>
-			<div slot="header" class="card-header">
+		<template v-slot:header>
+			<div v-if="!loading" class="card-header">
 				<h1>
 					{{ not_found ? "Monster not found" : monster.name.capitalizeEach() }}
 				</h1>
@@ -19,6 +18,9 @@
 					/>
 				</div>
 			</div>
+		</template>
+		<hk-loader v-if="loading" name="monster" />
+		<template v-else>
 			<div v-if="not_found" class="card-body">
 				<p>
 					Could not find monster <strong>{{ id }}</strong>
@@ -34,6 +36,7 @@
 
 <script>
 import ViewMonster from "src/components/compendium/Monster";
+import { EventBus } from "src/event-bus";
 import { mapGetters } from "vuex";
 import { metaCompendium } from "src/mixins/metaCompendium";
 
@@ -69,7 +72,7 @@ export default {
 	mounted() {
 		if (this.monster) {
 			this.loading = false;
-			this.$root.$emit("route-name", this.monster.name.capitalizeEach());
+			EventBus.emit("route-name", this.monster.name.capitalizeEach());
 		} else {
 			this.not_found = true;
 			this.loading = false;

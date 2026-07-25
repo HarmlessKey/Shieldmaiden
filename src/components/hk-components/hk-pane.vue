@@ -1,7 +1,11 @@
 <template>
-	<Pane v-bind="$attrs" v-on="$listeners">
+	<Pane v-bind="$attrs">
 		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px' }">
-			<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
+			<template v-for="slot in Object.keys($slots)" v-slot:[slot]="scope">
+				<!-- scope is undefined when the slot is invoked without props;
+					v-bind of a nullish value makes renderSlot throw (null.key) -->
+				<slot :name="slot" v-bind="scope || {}" />
+			</template>
 		</q-scroll-area>
 	</Pane>
 </template>
@@ -17,7 +21,7 @@ export default {
 	height: 100%;
 	position: static;
 
-	&::v-deep {
+	&:deep() {
 		.q-scrollarea__content {
 			width: 100%;
 			position: static;

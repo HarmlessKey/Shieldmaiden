@@ -104,6 +104,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
 import Meters from "src/components/trackCampaign/Meters.vue";
 import Players from "src/components/campaign/Players.vue";
 import Sharing from "./Sharing.vue";
@@ -118,7 +119,7 @@ export default {
 	components: {
 		Meters,
 		Players,
-		Shares: () => import("./Shares"),
+		Shares: defineAsyncComponent(() => import("./Shares")),
 		Sharing,
 		Weather,
 	},
@@ -218,7 +219,7 @@ h3 {
 				> div {
 					padding-right: 6px;
 				}
-				&::v-deep {
+				&:deep() {
 					.top-menu {
 						border-bottom: solid 2px $white;
 						padding-bottom: 2px;

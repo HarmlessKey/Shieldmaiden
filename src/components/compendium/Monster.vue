@@ -50,11 +50,14 @@
 					class="monster-card__abilities"
 					:class="table === 0 ? 'left' : 'right'"
 				>
-					<tr>
-						<th colspan="2"></th>
-						<th>mod</th>
-						<th>save</th>
-					</tr>
+					<thead>
+						<tr>
+							<th colspan="2"></th>
+							<th>mod</th>
+							<th>save</th>
+						</tr>
+					</thead>
+					<tbody>
 					<tr
 						v-for="(ability, index) in abilities.slice(table * 3, table * 3 + 3)"
 						:class="`ability ability__${ability}`"
@@ -115,6 +118,7 @@
 							</hk-roll>
 						</td>
 					</tr>
+					</tbody>
 				</table>
 			</div>
 
@@ -183,7 +187,7 @@
 				</div>
 				<div v-if="monster.challenge_rating">
 					<strong>Challenge Rating</strong> {{ monster.challenge_rating }} ({{
-						monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0")
+						formatNumber(monster_challenge_rating[monster.challenge_rating].xp, "0,0")
 					}}
 					XP; <template v-if="monster.challenge_rating">PB +{{ monster.proficiency }}</template
 					>)
@@ -237,7 +241,7 @@
 				<p>
 					<strong><em> Spellcasting </em></strong>
 					The {{ monster.name.capitalizeEach() }} is a
-					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. its spellcasting ability is
+					{{ formatNumber(monster.caster_level, "Oo") }}-level spellcaster. its spellcasting ability is
 					{{ monster.caster_ability.capitalize() }} (spell save DC {{ monster.caster_save_dc }},
 					{{
 						monster.caster_spell_attack > 0
@@ -248,11 +252,11 @@
 					spells prepared:
 				</p>
 				<p>
-					<template v-for="level in caster_spell_levels">
-						<div :key="`spell-${level}`">
+					<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+						<div>
 							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
-								<strong>{{ level | numeral("Oo") }} level</strong> ({{
+								<strong>{{ formatNumber(level, "Oo") }} level</strong> ({{
 									monster.caster_spell_slots[level]
 								}}
 								slots):
@@ -262,7 +266,11 @@
 								v-for="(spell, index) in spellsForLevel(level)"
 								:key="spell.name"
 							>
-								<hk-popover> {{ spell.name }}<Spell slot="content" :id="spell.key" /> </hk-popover
+								<hk-popover>
+									{{ spell.name }}
+									<template v-slot:content>
+										<Spell :id="spell.key" />
+									</template> </hk-popover
 								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
@@ -285,8 +293,8 @@
 					spells, requiring no material components:
 				</p>
 				<p>
-					<template v-for="limit in innate_spell_levels">
-						<div :key="`spell-${limit}`">
+					<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+						<div>
 							<template v-if="limit === Infinity"> At will: </template>
 							<template v-else> {{ limit }}/day each: </template>
 							<i
@@ -319,10 +327,10 @@
 							of the following actions. The {{ monster.name.capitalizeEach() }} regains all expended
 							uses at the start of each of its turns.
 						</p>
-						<template v-for="(ability, index) in monster[category]">
+						<template v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
 							<hk-dice-text
 								v-if="ability.desc"
-								:key="`${category}-${index}`"
+								
 								class="monster-card__traits-description"
 								:input_text="ability.desc"
 								><template
@@ -380,14 +388,16 @@
 					<div>{{ label }} <small v-if="pdf_only">(PFD only)</small></div>
 				</button>
 			</div>
-			<div slot="footer" class="d-flex justify-content-end full-width items-center gap-1">
-				<!-- <button class="btn btn-block" @click="download('pdf')">
-					Download PDF <hk-icon icon="fas fa-file-pdf" class="ml-1" />
-				</button> -->
-				<button class="btn" :disabled="layout === 'full'" @click="download('png')">
-					Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
-				</button>
-			</div>
+			<template v-slot:footer>
+				<div class="d-flex justify-content-end full-width items-center gap-1">
+					<!-- <button class="btn btn-block" @click="download('pdf')">
+						Download PDF <hk-icon icon="fas fa-file-pdf" class="ml-1" />
+					</button> -->
+					<button class="btn" :disabled="layout === 'full'" @click="download('png')">
+						Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
+					</button>
+				</div>
+			</template>
 		</hk-dialog>
 	</div>
 	<hk-loader v-else name="monster" />
@@ -395,6 +405,7 @@
 
 <script>
 import { general } from "src/mixins/general.js";
+import { formatNumber } from "src/utils/formatNumber";
 import { dice } from "src/mixins/dice.js";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions, mapGetters } from "vuex";
@@ -511,6 +522,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		...mapActions("api_monsters", ["fetch_monster"]),
 		passivePerception() {
 			return 10 + parseInt(this.skillModifier("wisdom", "perception"));

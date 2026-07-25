@@ -6,9 +6,11 @@
 			:columns="fields"
 			class="xpTable"
 		>
-			<span slot="proficiency" slot-scope="data">
-				+{{ data.item }}
-			</span>
+			<template v-slot:proficiency="data">
+				<span>
+					+{{ data.item }}
+				</span>
+			</template>
 		</hk-table>
 	</div>
 </template>

@@ -9,8 +9,8 @@
 			</p>
 			<button class="google mb-2" @click="googleSignIn()">Sign in with Google</button>
 			<hr />
-			<ValidationObserver v-if="!loading" v-slot="{ handleSubmit }">
-				<q-form @submit="handleSubmit(signIn)" greedy>
+			<ValidationObserver v-if="!loading" v-slot="{ handleSubmit }" as="div">
+				<q-form @submit="handleSubmit($event, signIn)" greedy>
 					<h4 class="text-center neutral-2">With email and password</h4>
 					<hk-input
 						v-model="email"
@@ -26,12 +26,13 @@
 						autocomplete="password"
 						:type="showPw ? 'text' : 'password'"
 					>
-						<q-icon
-							slot="append"
-							:name="showPw ? 'fas fa-eye' : 'fas fa-eye-slash'"
-							class="cursor-pointer"
-							@click="showPw = !showPw"
-						/>
+						<template v-slot:append>
+							<q-icon
+								:name="showPw ? 'fas fa-eye' : 'fas fa-eye-slash'"
+								class="cursor-pointer"
+								@click="showPw = !showPw"
+							/>
+						</template>
 					</hk-input>
 					<button class="btn btn-block my-3" type="submit">
 						Sign In <i aria-hidden="true" class="fas fa-sign-in-alt" />

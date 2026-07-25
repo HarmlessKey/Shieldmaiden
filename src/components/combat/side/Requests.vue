@@ -2,8 +2,8 @@
 	<div>
 		<h3>Player requests</h3>
 		<q-list v-if="_requests.length">
-			<template v-for="(request, i) in _requests">
-				<Request :request="request" :i="i" :key="`request-${request.key}`" />
+			<template v-for="(request, i) in _requests" :key="`request-${request.key}`">
+				<Request :request="request" :i="i" />
 			</template>
 		</q-list>
 		<template v-else>

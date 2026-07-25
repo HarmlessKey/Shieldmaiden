@@ -87,10 +87,12 @@
 					clearable
 					placeholder="Search encounter"
 				>
-					<q-icon slot="prepend" name="search" />
+					<template v-slot:prepend>
+						<q-icon name="search" />
+					</template>
 				</q-input>
 				<q-table
-					:data="active_encounters"
+					:rows="active_encounters"
 					:columns="columns"
 					:visible-columns="visibleColumns"
 					row-key="key"
@@ -160,7 +162,9 @@
 							</q-td>
 						</q-tr>
 					</template>
-					<div slot="no-data" />
+					<template v-slot:no-data>
+						<div />
+					</template>
 				</q-table>
 			</template>
 
@@ -176,7 +180,7 @@
 
 				<div>
 					<q-table
-						:data="finished_encounters"
+						:rows="finished_encounters"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"
@@ -248,8 +252,12 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
-						<hk-loader slot="loading" name="Encounters" />
+						<template v-slot:no-data>
+							<div />
+						</template>
+						<template v-slot:loading>
+							<hk-loader name="Encounters" />
+						</template>
 					</q-table>
 					<button
 						v-if="encounter_count > active_encounters.length + finished_encounters.length"
@@ -270,15 +278,16 @@
 						class="mb-3"
 					>
 						No finished encounters found.
-						<q-btn
-							slot="action"
-							size="sm"
-							flat
-							padding="sm"
-							no-caps
-							icon="fas fa-times"
-							@click="finished_fetched = false"
-						/>
+						<template v-slot:action>
+							<q-btn
+								size="sm"
+								flat
+								padding="sm"
+								no-caps
+								icon="fas fa-times"
+								@click="finished_fetched = false"
+							/>
+						</template>
 					</q-banner>
 					<button class="btn btn-block mb-2 bg-neutral-5" @click="getFinishedEncounters">
 						Get finished encounters
@@ -318,10 +327,12 @@
 								:rules="[(val) => (val && val.length > 0) || 'Enter a title']"
 							/>
 						</div>
-						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
-							<q-btn color="primary" type="submit" no-caps label="Add encounter" />
-						</div>
+						<template v-slot:footer>
+							<div class="card-footer d-flex justify-content-end">
+								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
+								<q-btn color="primary" type="submit" no-caps label="Add encounter" />
+							</div>
+						</template>
 					</hk-card>
 				</q-form>
 			</div>
@@ -351,10 +362,12 @@
 								:rules="[(val) => (val && val.length > 0) || 'Enter a title']"
 							/>
 						</div>
-						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
-							<q-btn color="primary" type="submit" no-caps label="Add encounter" />
-						</div>
+						<template v-slot:footer>
+							<div class="card-footer d-flex justify-content-end">
+								<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
+								<q-btn color="primary" type="submit" no-caps label="Add encounter" />
+							</div>
+						</template>
 					</hk-card>
 				</q-form>
 			</div>
@@ -365,6 +378,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { notifySuccess, confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Encounters",
@@ -482,9 +496,7 @@ export default {
 				},
 			});
 			this.newEncounter = "";
-			this.$snotify.success("Encounter added.", "Critical hit!", {
-				position: "rightTop",
-			});
+			notifySuccess("Encounter added.", "Critical hit!");
 		},
 		deleteEncounter(e, key, encounter) {
 			//Instantly delete when shift is held
@@ -494,33 +506,16 @@ export default {
 					id: key,
 				});
 			} else {
-				this.$snotify.error(
-					'Are you sure you want to delete "' + encounter + '"?',
-					"Delete encounter",
-					{
-						timeout: 5000,
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.delete_encounter({
-										campaignId: this.campaignId,
-										id: key,
-									});
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: "Delete encounter",
+					message: 'Are you sure you want to delete "' + encounter + '"?',
+					onOk: () => {
+						this.delete_encounter({
+							campaignId: this.campaignId,
+							id: key,
+						});
+					},
+				});
 			}
 		},
 		async dialogCloneEncounter(key) {
@@ -554,30 +549,11 @@ export default {
 			};
 		},
 		async deleteFinishedEncounters() {
-			this.$snotify.error(
-				"Are you sure you want to delete all finished encounters?",
-				"Delete finished encounters",
-				{
-					timeout: 5000,
-					buttons: [
-						{
-							text: "Yes",
-							action: async (toast) => {
-								await this.delete_finished_encounters(this.campaignId);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete finished encounters",
+				message: "Are you sure you want to delete all finished encounters?",
+				onOk: async () => await this.delete_finished_encounters(this.campaignId),
+			});
 		},
 		reset(id, hard = true) {
 			if (hard) {

@@ -76,6 +76,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		modelValue: {
+			type: Boolean,
+			default: undefined,
+		},
 		type: {
 			type: String,
 			default: "actions",
@@ -85,6 +89,7 @@ export default {
 			default: () => [],
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			open: false,
@@ -95,22 +100,23 @@ export default {
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		showActions: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},
 	methods: {
 		toggleShowActions() {
 			if (!this.targeted.length) return;
-			if (!this.showActions) EventBus.$emit("close-popups", { actor: this.type }); // Close other popups
+			if (!this.showActions) EventBus.emit("close-popups", { actor: this.type }); // Close other popups
 			this.showActions = !this.showActions;
 		},
 	},
 	mounted() {
-		EventBus.$on("close-popups", ({ actor }) => {
+		EventBus.on("close-popups", ({ actor }) => {
 			if (actor !== this.type) {
 				this.showActions = false;
 			}

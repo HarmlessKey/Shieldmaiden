@@ -40,26 +40,27 @@
 			<div>
 				<table class="initiative-list targets">
 					<thead class="white text-shadow">
+						<tr>
 						<th class="init">In.</th>
 						<th class="image"></th>
 						<th class="ac"><i aria-hidden="true" class="fas fa-shield"></i></th>
 						<th>Name</th>
 						<th class="hp"><i aria-hidden="true" class="fas fa-heart"></i></th>
 						<th class="conditions"></th>
+						</tr>
 					</thead>
-					<tbody
+					<transition-group
+						tag="tbody"
 						class="entities"
 						name="entities"
-						is="transition-group"
 						enter-active-class="animated animate__fadeIn"
 						leave-active-class="animated animate__fadeOut"
 					>
-						<template v-for="(entity, index) in targets">
-							<tr v-if="allEntities[0].key == entity.key && turn > 0" :key="index" class="top">
+						<template v-for="(entity, index) in targets" :key="entity.key">
+							<tr v-if="allEntities[0].key == entity.key && turn > 0" class="top">
 								<td colspan="6">Top of the round</td>
 							</tr>
 							<tr
-								:key="entity.key"
 								:class="{
 									pointer: characters.length !== 0,
 									targeted: targeted.includes(entity.key),
@@ -191,11 +192,10 @@
 								>
 									<div class="d-flex justify-content-end" v-if="entity.conditions">
 										<template
-											v-for="({ value, name }, index) in returnConditions(entity.conditions)"
+											v-for="({ value, name }, index) in returnConditions(entity.conditions)" :key="`condition-${entity.key}-${value}`"
 										>
 											<div
 												class="condition"
-												:key="`condition-${entity.key}-${value}`"
 												v-if="index + 1 <= conditionCount"
 											>
 												<span class="n" v-if="value === 'exhaustion'">
@@ -263,7 +263,7 @@
 								</td>
 							</tr>
 						</template>
-					</tbody>
+					</transition-group>
 				</table>
 			</div>
 		</q-scroll-area>
@@ -416,7 +416,7 @@ export default {
 			return returnConditions;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener("resize", this.setSize);
 	},
 };

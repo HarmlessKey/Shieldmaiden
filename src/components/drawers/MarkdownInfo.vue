@@ -16,11 +16,15 @@
 			</p>
 
 			<hk-card small>
-				<div class="card-header" slot="header" id="ASDesc">Ability scores</div>
+				<template v-slot:header>
+					<div class="card-header" id="ASDesc">Ability scores</div>
+				</template>
 				<table class="table mb-0" aria-describedby="ASDesc">
 					<thead>
+						<tr>
 						<th>Ability</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in ability_scores" :key="`ability-${index}`">
@@ -32,11 +36,15 @@
 			</hk-card>
 
 			<hk-card small>
-				<div class="card-header" slot="header" id="AMDesc">Ability modifiers</div>
+				<template v-slot:header>
+					<div class="card-header" id="AMDesc">Ability modifiers</div>
+				</template>
 				<table class="table mb-0" aria-describedby="AMDesc">
 					<thead>
+						<tr>
 						<th>Ability</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in ability_mods" :key="`mod-${index}`">
@@ -48,11 +56,15 @@
 			</hk-card>
 
 			<hk-card header="Character values" small>
-				<div class="card-header" slot="header" id="CVDesc">Character values</div>
+				<template v-slot:header>
+					<div class="card-header" id="CVDesc">Character values</div>
+				</template>
 				<table class="table mb-0" aria-describedby="CVDesc">
 					<thead>
+						<tr>
 						<th>Value</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in character" :key="`character-${index}`">
@@ -64,11 +76,15 @@
 			</hk-card>
 
 			<hk-card header="Class values" small>
-				<div class="card-header" slot="header" id="ClVDesc">Class values</div>
+				<template v-slot:header>
+					<div class="card-header" id="ClVDesc">Class values</div>
+				</template>
 				<table class="table mb-0" aria-describedby="ClVDesc">
 					<thead>
+						<tr>
 						<th>Value</th>
 						<th>Reference</th>
+						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="({ stat, ref }, index) in Class" :key="`class-${index}`">

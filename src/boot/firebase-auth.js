@@ -1,7 +1,7 @@
 import { auth, db, firebase } from "../firebase";
 import { Cookies } from "quasar";
 
-export default async ({ app, router, store, Vue }) => {
+export default async ({ app, router, store }) => {
 	// Check if user is connected
 	auth.onAuthStateChanged((user) => {
 		if (user) {

@@ -8,7 +8,9 @@
 		You can link your accounts at any time from your profile page, or use the button below to link
 		them directly.
 
-		<PatreonLinkButton slot="footer" />
+		<template v-slot:footer>
+			<PatreonLinkButton />
+		</template>
 	</hk-dialog>
 </template>
 
@@ -36,7 +38,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
+:deep() {
 	.hk-card {
 		border-radius: $border-radius !important;
 		margin-top: 75px;

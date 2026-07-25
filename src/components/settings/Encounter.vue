@@ -8,28 +8,30 @@
 				square
 				v-for="(setting, index) in type_settings"
 				:options="setting.options"
-				:value="index"
+				:model-value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
-					<q-item-section avatar>
-						<q-icon :name="setting.icon" class="neutral-2" size="large" />
-					</q-item-section>
-					<q-item-section class="neutral-2 truncate">
-						<q-item-label>{{ setting.name }}</q-item-label>
-						<q-item-label caption>
-							{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
-						</q-item-label>
-					</q-item-section>
-					<q-item-section side>
-						<q-icon
-							:name="displaySetting(type_key, setting.key, settings[setting.key]).icon"
-							:class="displaySetting(type_key, setting.key, settings[setting.key]).color"
-							size="medium"
-						/>
-					</q-item-section>
-				</q-item>
+				<template v-slot:selected>
+					<q-item :dark="$store.getters.theme === 'dark'">
+						<q-item-section avatar>
+							<q-icon :name="setting.icon" class="neutral-2" size="large" />
+						</q-item-section>
+						<q-item-section class="neutral-2 truncate">
+							<q-item-label>{{ setting.name }}</q-item-label>
+							<q-item-label caption>
+								{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
+							</q-item-label>
+						</q-item-section>
+						<q-item-section side>
+							<q-icon
+								:name="displaySetting(type_key, setting.key, settings[setting.key]).icon"
+								:class="displaySetting(type_key, setting.key, settings[setting.key]).color"
+								size="medium"
+							/>
+						</q-item-section>
+					</q-item>
+				</template>
 				<template v-slot:option="scope">
 					<q-item
 						clickable
@@ -46,10 +48,14 @@
 						</q-item-section>
 					</q-item>
 				</template>
-				<hk-popover v-if="setting.info" slot="after" :header="setting.name">
-					<q-icon name="info" size="sm" color="neutral-3" />
-					<div v-html="setting.info" slot="content" />
-				</hk-popover>
+				<template v-slot:after>
+					<hk-popover v-if="setting.info" :header="setting.name">
+						<q-icon name="info" size="sm" color="neutral-3" />
+						<template v-slot:content>
+							<div v-html="setting.info" />
+						</template>
+					</hk-popover>
+				</template>
 			</q-select>
 
 			<div class="timer">
@@ -59,10 +65,12 @@
 					filled
 					type="number"
 					label="Minutes"
-					:value="timer.minutes"
-					@input="setTimer($event, 'minutes')"
+					:model-value="timer.minutes"
+					@update:model-value="setTimer($event, 'minutes')"
 				>
-					<q-icon slot="prepend" size="medium" name="fas fa-stopwatch" class="mx-3" />
+					<template v-slot:prepend>
+						<q-icon size="medium" name="fas fa-stopwatch" class="mx-3" />
+					</template>
 					<template #append>:</template>
 				</q-input>
 				<q-input
@@ -72,18 +80,20 @@
 					type="number"
 					max="59"
 					label="Seconds"
-					:value="timer.seconds"
-					@input="setTimer($event, 'seconds')"
+					:model-value="timer.seconds"
+					@update:model-value="setTimer($event, 'seconds')"
 				>
-					<hk-popover slot="after" header="Turn timer">
-						<q-icon name="info" size="sm" color="neutral-3" />
-						<template #content>
-							<p>
-								When a time is entered, the turn timer will count down from the time you entered.
-							</p>
-							<p>Set to 0 or clear the value to have the timer count up again.</p>
-						</template>
-					</hk-popover>
+					<template v-slot:after>
+						<hk-popover header="Turn timer">
+							<q-icon name="info" size="sm" color="neutral-3" />
+							<template #content>
+								<p>
+									When a time is entered, the turn timer will count down from the time you entered.
+								</p>
+								<p>Set to 0 or clear the value to have the timer count up again.</p>
+							</template>
+						</hk-popover>
+					</template>
 				</q-input>
 			</div>
 		</div>

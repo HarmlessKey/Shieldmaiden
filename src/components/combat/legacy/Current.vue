@@ -56,6 +56,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { notifyWarning } from "src/utils/notify";
 import Conditions from "src/components/combat/Conditions.vue";
 import Reminders from "src/components/combat/Reminders.vue";
 import Actions from "src/components/combat/legacy/actions/Actions.vue";
@@ -133,7 +134,7 @@ export default {
 									const message = `${roll} Was rolled for a recharge of ${ability.recharge}.`;
 
 									//Notify about the recharge
-									this.$snotify.warning(message, title, {
+									notifyWarning(message, title, {
 										timeout: 0,
 									});
 								}

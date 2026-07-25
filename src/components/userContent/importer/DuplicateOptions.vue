@@ -12,7 +12,6 @@
 		</div>
 		<q-btn-toggle
 			v-if="imported.meta.duplicate"
-			slot="footer"
 			v-model="imported.meta.overwrite"
 			toggle-color="primary"
 			dense
@@ -46,14 +45,17 @@ export default {
 	},
 	props: {
 		value: Object,
+		modelValue: Object,
 	},
+	emits: ["input", "update:modelValue"],
 	computed: {
 		imported: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 		existing() {
@@ -79,7 +81,7 @@ export default {
 
 <style lang="scss" scoped>
 .q-btn-toggle {
-	&::v-deep .q-icon {
+	&:deep(.q-icon) {
 		font-size: 18px;
 	}
 }

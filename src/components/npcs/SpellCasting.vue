@@ -2,17 +2,19 @@
 	<div>
 		<hk-card-deck>
 			<hk-card v-for="casting in caster_types" :key="casting.category">
-				<div slot="header" class="card-header d-flex justify-content-between">
-					{{ casting.name }}
-					<a
-						v-if="npc[`${casting.category}_ability`]"
-						@click="openDialog(casting.category)"
-						class="btn btn-sm bg-neutral-5"
-					>
-						<i aria-hidden="true" class="fas fa-plus green"></i>
-						<span class="ml-1">Add spell</span>
-					</a>
-				</div>
+				<template v-slot:header>
+					<div class="card-header d-flex justify-content-between">
+						{{ casting.name }}
+						<a
+							v-if="npc[`${casting.category}_ability`]"
+							@click="openDialog(casting.category)"
+							class="btn btn-sm bg-neutral-5"
+						>
+							<i aria-hidden="true" class="fas fa-plus green"></i>
+							<span class="ml-1">Add spell</span>
+						</a>
+					</div>
+				</template>
 
 				<div class="card-body">
 					<q-select
@@ -24,7 +26,7 @@
 						:options="abilities"
 						v-model="npc[`${casting.category}_ability`]"
 						class="mb-2"
-						@input="setCaster($event, casting.category)"
+						@update:model-value="setCaster($event, casting.category)"
 					/>
 
 					<template v-if="npc[`${casting.category}_ability`]">
@@ -33,7 +35,7 @@
 								<ValidationProvider
 									rules="between:1,20|required"
 									name="Caster level"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="npc[`${casting.category}_level`]" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -41,11 +43,11 @@
 										square
 										label="Caster level"
 										v-model.number="npc[`${casting.category}_level`]"
-										@input="parseToInt(npc, `${casting.category}_level`, !invalid)"
+										@update:model-value="parseToInt(npc, `${casting.category}_level`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -53,7 +55,7 @@
 								<ValidationProvider
 									rules="between:1,99|required"
 									name="Save DC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="npc[`${casting.category}_save_dc`]" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -61,11 +63,11 @@
 										square
 										label="Save DC"
 										v-model.number="npc[`${casting.category}_save_dc`]"
-										@input="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
+										@update:model-value="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -73,7 +75,7 @@
 								<ValidationProvider
 									rules="between:-10,99|required"
 									name="Save DC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="npc[`${casting.category}_spell_attack`]" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -81,11 +83,11 @@
 										square
 										label="Spell attack"
 										v-model.number="npc[`${casting.category}_spell_attack`]"
-										@input="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
+										@update:model-value="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
 										type="number"
 										class="mb-3"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -96,7 +98,7 @@
 							<label class="d-block mb-3">Spell slots</label>
 							<div class="slots">
 								<div v-for="level in 9" :key="`level-${level}`" class="slot">
-									<div class="level">{{ level | numeral("Oo") }}</div>
+									<div class="level">{{ formatNumber(level, "Oo") }}</div>
 									<div class="handling">
 										<div
 											class="up"
@@ -149,7 +151,7 @@
 												:indeterminate-value="undefined"
 												:toggle-indeterminate="false"
 												class="mb-2"
-												@input="$forceUpdate()"
+												@update:model-value="$forceUpdate()"
 											/>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -164,7 +166,7 @@
 									</q-item-section>
 									<q-item-section v-else avatar class="neutral-2">
 										<template v-if="spell.level > 0">
-											{{ spell.level | numeral("Oo") }}
+											{{ formatNumber(spell.level, "Oo") }}
 										</template>
 										<template v-else> Cant </template>
 									</q-item-section>
@@ -208,9 +210,11 @@
 						/>
 					</div>
 
-					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<q-btn class="mr-1" type="cancel" no-caps v-close-popup>Close</q-btn>
-					</div>
+					<template v-slot:footer>
+						<div class="card-footer d-flex justify-content-end">
+							<q-btn class="mr-1" type="cancel" no-caps v-close-popup>Close</q-btn>
+						</div>
+					</template>
 				</hk-card>
 			</div>
 		</q-dialog>
@@ -219,11 +223,13 @@
 
 <script>
 import { abilities } from "src/utils/generalConstants";
+import { formatNumber } from "src/utils/formatNumber";
 import CopyContent from "src/components/CopyContent";
 
 export default {
 	name: "npc-SpellCasting",
-	props: ["value"],
+	props: ["value", "modelValue"],
+	emits: ["input", "update:modelValue"],
 	components: {
 		CopyContent,
 	},
@@ -243,19 +249,21 @@ export default {
 	computed: {
 		npc: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},
 	methods: {
+		formatNumber,
 		parseToInt(value, object, property, valid) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else if (valid) {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		setCaster(value, category) {
@@ -263,10 +271,10 @@ export default {
 				this.npc[`${category}_spell_slots`] = {};
 			}
 			if (!value) {
-				this.$delete(this.npc, `${category}_save_dc`);
-				this.$delete(this.npc, `${category}_spell_attack`);
-				this.$delete(this.npc, `${category}_spell_slots`);
-				this.$delete(this.npc, `${category}_spells`);
+				delete this.npc[`${category}_save_dc`];
+				delete this.npc[`${category}_spell_attack`];
+				delete this.npc[`${category}_spell_slots`];
+				delete this.npc[`${category}_spells`];
 			}
 		},
 		setSpellSlot(direction, level) {
@@ -277,18 +285,18 @@ export default {
 
 			if (newVal > 9) newVal = 9;
 			if (newVal <= 0) {
-				this.$delete(this.npc.caster_spell_slots, level);
+				delete this.npc.caster_spell_slots[level];
 			} else {
-				this.$set(this.npc.caster_spell_slots, level, newVal);
+				this.npc.caster_spell_slots[level] = newVal;
 			}
 			this.$forceUpdate();
 		},
 		checkSpellSlot(level) {
 			const value = this.npc.caster_spell_slots[level];
 
-			if (value > 9) this.$set(this.npc.caster_spell_slots, level, 9);
+			if (value > 9) this.npc.caster_spell_slots[level] = 9;
 			if (value <= 0) {
-				this.$delete(this.npc.caster_spell_slots, level);
+				delete this.npc.caster_spell_slots[level];
 			}
 			this.$forceUpdate();
 		},
@@ -298,7 +306,7 @@ export default {
 		},
 		addSpell({ result, id, resource }) {
 			if (!this.npc[`${this.category}_spells`]) {
-				this.$set(this.npc, `${this.category}_spells`, {});
+				this.npc[`${this.category}_spells`] = {};
 			}
 
 			let spell = { name: result.name };
@@ -312,7 +320,7 @@ export default {
 			this.$forceUpdate();
 		},
 		removeSpell(key, category) {
-			this.$delete(this.npc[`${category}_spells`], key);
+			delete this.npc[`${category}_spells`][key];
 		},
 		orderedSpells(spell_list, category) {
 			const category_key = category === "caster" ? "level" : "limit";

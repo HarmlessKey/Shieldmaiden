@@ -31,7 +31,7 @@
 			multiple
 			emit-value
 			map-options
-			@input="sharesSelected"
+			@update:model-value="sharesSelected"
 		>
 			<template #before-options>
 				<q-item>
@@ -42,7 +42,7 @@
 						<q-checkbox
 							:dark="$store.getters.theme === 'dark'"
 							v-model="all"
-							@input="checkAll"
+							@update:model-value="checkAll"
 							:indeterminate-value="false"
 							:false-value="null"
 						/>
@@ -58,7 +58,7 @@
 						<q-checkbox
 							:dark="$store.getters.theme === 'dark'"
 							v-model="shares"
-							@input="sharesSelected"
+							@update:model-value="sharesSelected"
 							:val="scope.opt.value"
 						/>
 					</q-item-section>

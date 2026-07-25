@@ -1,11 +1,13 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1><i aria-hidden="true" class="fas fa-flame mr-1"></i> Conditions</h1>
-			<span class="neutral-3">
-				Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
-			</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1><i aria-hidden="true" class="fas fa-flame mr-1"></i> Conditions</h1>
+				<span class="neutral-3">
+					Resource <a class="btn btn-sm btn-clear" href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+				</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<q-input 
 				:dark="$store.getters.theme !== 'light'" 
@@ -17,25 +19,33 @@
 				placeholder="Search"
 				@keyup.enter="filter()"
 				@clear="filter()">
-				<q-icon slot="append" name="search" />
-				<button slot="after" class="btn" @click="filter()">Search</button>
+				<template v-slot:append>
+					<q-icon name="search" />
+				</template>
+				<template v-slot:after>
+					<button class="btn" @click="filter()">Search</button>
+				</template>
 			</q-input>
 
 			<q-table
-				:data="conditions"
+				:rows="conditions"
 				:columns="columns"
 				row-key="_id"
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
-				:pagination.sync="pagination"
+				v-model:pagination="pagination"
 				:loading="loading"
 				separator="none"
 				wrap-cells
 				@request="request"
 			>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="conditions" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="conditions" />
+				</template>
 				
 				<template v-slot:header="props">
 					<q-tr :props="props">

@@ -7,7 +7,7 @@
 				max: 30,
 				variable_check: [reminder.variables],
 			}"
-			v-slot="{ errors, invalid, validated }"
+			v-slot="{ errorMessage }" :modelValue="reminder.title" as="div"
 		>
 			<q-input
 				:dark="$store.getters.theme === 'dark'"
@@ -18,8 +18,8 @@
 				autocomplete="off"
 				v-model="reminder.title"
 				maxLength="30"
-				:error="invalid && validated"
-				:error-message="errors[0]"
+				:error="!!errorMessage"
+				:error-message="errorMessage"
 			/>
 		</ValidationProvider>
 
@@ -37,7 +37,7 @@
 			</a>
 		</div>
 
-		<ValidationProvider name="Trigger" rules="required" v-slot="{ errors, invalid, validated }">
+		<ValidationProvider name="Trigger" rules="required" v-slot="{ errorMessage }" :modelValue="reminder.trigger" as="div">
 			<q-select
 				:dark="$store.getters.theme === 'dark'"
 				filled
@@ -48,8 +48,8 @@
 				:options="triggers"
 				type="text"
 				v-model="reminder.trigger"
-				:error="invalid && validated"
-				:error-message="errors[0]"
+				:error="!!errorMessage"
+				:error-message="errorMessage"
 			/>
 		</ValidationProvider>
 
@@ -57,7 +57,7 @@
 			<ValidationProvider
 				name="Rounds"
 				rules="required|max_value:99"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="reminder.rounds" as="div"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -69,8 +69,8 @@
 					min="1"
 					max="99"
 					hint="One round is 6 seconds"
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!!errorMessage"
+					:error-message="errorMessage"
 				/>
 			</ValidationProvider>
 		</div>
@@ -99,7 +99,7 @@
 					max: 999,
 					variable_check: [reminder.variables],
 				}"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="reminder.notify" as="div"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -111,8 +111,8 @@
 					maxLength="999"
 					v-model="reminder.notify"
 					autogrow
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!!errorMessage"
+					:error-message="errorMessage"
 				/>
 			</ValidationProvider>
 		</div>
@@ -129,7 +129,7 @@
 				<ValidationProvider
 					name="Variable"
 					rules="alpha_dash"
-					v-slot="{ errors, invalid, validated }"
+					v-slot="{ errorMessage }" :modelValue="newVar" as="div"
 				>
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -141,22 +141,23 @@
 						autocomplete="off"
 						v-model="newVar"
 						placeholder="New Variable name"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!!errorMessage"
+						:error-message="errorMessage"
 					>
-						<a
-							slot="after"
-							class="btn bg-neutral-5"
-							@click="addVariable()"
-							:class="{
-								disabled:
-									!newVar ||
-									errors[0] ||
-									(reminder.variables && Object.keys(reminder.variables).includes(newVar)),
-							}"
-						>
-							<q-icon name="fas fa-plus" />
-						</a>
+						<template v-slot:after>
+							<a
+								class="btn bg-neutral-5"
+								@click="addVariable()"
+								:class="{
+									disabled:
+										!newVar ||
+										errorMessage ||
+										(reminder.variables && Object.keys(reminder.variables).includes(newVar)),
+								}"
+							>
+								<q-icon name="fas fa-plus" />
+							</a>
+						</template>
 					</q-input>
 				</ValidationProvider>
 			</div>
@@ -181,7 +182,7 @@
 					<ValidationProvider
 						name="Option"
 						rules="required|max:30"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage }" :modelValue="reminder.variables[key][i]" as="div"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -197,26 +198,28 @@
 							autocomplete="off"
 							v-model="reminder.variables[key][i]"
 							maxLength="30"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						>
-							<div slot="before" v-if="selectOptions">
-								<button
-									class="btn btn-sm bg-neutral-4"
-									@click="setOption(key, reminder.variables[key][i])"
-								>
-									<i
-										aria-hidden="true"
-										class="fas fa-check"
-										:class="{
-											green:
-												reminder.selectedVars &&
-												reminder.selectedVars[key] === reminder.variables[key][i],
-										}"
-									></i>
-								</button>
-							</div>
-							<template slot="append">
+							<template v-slot:before>
+								<div v-if="selectOptions">
+									<button
+										class="btn btn-sm bg-neutral-4"
+										@click="setOption(key, reminder.variables[key][i])"
+									>
+										<i
+											aria-hidden="true"
+											class="fas fa-check"
+											:class="{
+												green:
+													reminder.selectedVars &&
+													reminder.selectedVars[key] === reminder.variables[key][i],
+											}"
+										></i>
+									</button>
+								</div>
+							</template>
+							<template v-slot:append>
 								<q-icon
 									name="fas fa-trash-alt"
 									class="red pointer"
@@ -246,7 +249,11 @@ export default {
 	props: {
 		value: {
 			type: Object,
-			required: true,
+			required: false,
+		},
+		modelValue: {
+			type: Object,
+			required: false,
 		},
 		variables: {
 			type: Boolean,
@@ -257,6 +264,7 @@ export default {
 			default: false,
 		},
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			triggers: [
@@ -280,30 +288,31 @@ export default {
 	computed: {
 		reminder: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},
 	mounted() {
-		if (Object.keys(this.value).length === 0) {
+		if (Object.keys(this.reminder).length === 0) {
 			//Set default values
-			this.$set(this.reminder, "color", "green-light");
-			this.$set(this.reminder, "action", "remove");
+			this.reminder["color"] = "green-light";
+			this.reminder["action"] = "remove";
 		}
 	},
 	methods: {
 		setColor(color) {
-			this.$set(this.reminder, "color", color);
+			this.reminder["color"] = color;
 		},
 		addVariable() {
 			if (this.newVar) {
 				if (!this.reminder.variables) {
-					this.$set(this.reminder, "variables", {});
+					this.reminder["variables"] = {};
 				}
-				this.$set(this.reminder.variables, this.newVar, [""]);
+				this.reminder.variables[this.newVar] = [""];
 				this.newVar = undefined;
 			}
 			this.$forceUpdate();
@@ -313,22 +322,22 @@ export default {
 			this.$forceUpdate();
 		},
 		removeOption(key, i) {
-			this.$delete(this.reminder.variables[key], i);
+			this.reminder.variables[key].splice(i, 1);
 			this.$forceUpdate();
 		},
 		removeVar(key) {
-			this.$delete(this.reminder.variables, key);
+			delete this.reminder.variables[key];
 
 			// if the reminder is in use, the selection must be deleted too
 			if (this.reminder.selectedVars) {
-				this.$delete(this.reminder.selectedVars, key);
+				delete this.reminder.selectedVars[key];
 			}
 
 			this.$forceUpdate();
 		},
 		setOption(key, i) {
 			if (!this.reminder.selectedVars) {
-				this.$set(this.reminder, "selectedVars", {});
+				this.reminder["selectedVars"] = {};
 			}
 			this.reminder.selectedVars[key] = i;
 			this.$forceUpdate();

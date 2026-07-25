@@ -1,7 +1,7 @@
 <template>
 	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveReminder(valid))">
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, () => saveReminder(meta.valid))">
 				<div class="card-body">
 					<div class="reminder" v-if="reminder">
 						<reminder-form v-model="reminder" />
@@ -18,7 +18,7 @@
 							>Add reminder</q-btn
 						>
 						<q-btn v-else color="blue" type="submit" no-caps>Save</q-btn>
-						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 							<q-tooltip anchor="top middle" self="center middle">
 								There are validation errors
 							</q-tooltip>
@@ -33,6 +33,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import ReminderForm from "src/components/ReminderForm";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "EditReminder",
@@ -89,9 +90,7 @@ export default {
 
 		saveReminder(valid) {
 			if (!valid) {
-				this.$snotify.error("There are validation errors.", "Critical miss!", {
-					position: "rightTop",
-				});
+				notifyError("There are validation errors.", "Critical miss!");
 				return;
 			}
 			if (this.$route.name == "Add reminder" && !this.reminderId) {
@@ -103,14 +102,14 @@ export default {
 		async addReminder() {
 			this.add_reminder(this.reminder).then(
 				(key) => {
-					this.$set(this, "reminderId", key);
-					this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" });
+					this["reminderId"] = key;
+					notifySuccess("Reminder Saved.", "Critical hit!");
 					this.reminder_copy = JSON.stringify(this.reminder);
 					this.unsaved_changes = false;
 					this.$router.replace(`/content/reminders`);
 				},
 				(error) => {
-					this.$snotify.error("Couldn't save reminder.", "Save failed", { position: "rightTop" });
+					notifyError("Couldn't save reminder.", "Save failed");
 					console.error(error);
 				}
 			);
@@ -123,7 +122,7 @@ export default {
 				reminder: this.reminder,
 			});
 
-			this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" });
+			notifySuccess("Reminder Saved.", "Critical hit!");
 
 			this.reminder_copy = JSON.stringify(this.reminder);
 			this.unsaved_changes = false;

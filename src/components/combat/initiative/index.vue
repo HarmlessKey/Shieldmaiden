@@ -316,7 +316,7 @@ export default {
 	.q-scrollarea {
 		height: calc(100% - 45px);
 
-		&::v-deep {
+		&:deep() {
 			.q-scrollarea__content {
 				position: unset;
 			}
@@ -356,7 +356,7 @@ export default {
 			outline-offset: 1px;
 		}
 	}
-	::v-deep {
+	:deep() {
 		ul.entities {
 			margin-top: 0;
 

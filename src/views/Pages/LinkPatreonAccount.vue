@@ -6,9 +6,11 @@
 				<div v-if="$route.query?.code" class="card-body">
 					Something went wrong while fetching your Patreon account, please try again.
 				</div>
-				<div slot="footer" class="card-footer">
-					<PatreonLinkButton class="btn-block" />
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<PatreonLinkButton class="btn-block" />
+					</div>
+				</template>
 			</hk-card>
 			<template v-else-if="patreon_user">
 				<hk-card class="patron-card">
@@ -29,18 +31,6 @@
 									class="btn btn-sm bg-neutral-5 mt-3"
 									>View profile</a
 								>
-							</div>
-							<div slot="footer" class="card-footer">
-								<router-link
-									class="btn bg-neutral-5 mr-2"
-									:class="{ 'full-width': id_taken }"
-									to="/profile"
-								>
-									{{ id_taken ? "Back to profile" : "Cancel" }}
-								</router-link>
-								<button v-if="!success && !id_taken" class="btn" @click="link">
-									<hk-icon icon="fas fa-link" class="mr-2" /> Link account
-								</button>
 							</div>
 						</template>
 					</template>
@@ -72,7 +62,23 @@
 									{{ userInfo.patron?.expired ? "Renew" : "Subscribe" }}
 								</a>
 							</div>
-							<div slot="footer" class="card-footer">
+						</template>
+					</template>
+					<template v-slot:footer>
+						<template v-if="!linking">
+							<div v-if="!userInfo.patreon_id" class="card-footer">
+								<router-link
+									class="btn bg-neutral-5 mr-2"
+									:class="{ 'full-width': id_taken }"
+									to="/profile"
+								>
+									{{ id_taken ? "Back to profile" : "Cancel" }}
+								</router-link>
+								<button v-if="!success && !id_taken" class="btn" @click="link">
+									<hk-icon icon="fas fa-link" class="mr-2" /> Link account
+								</button>
+							</div>
+							<div v-else class="card-footer">
 								<router-link
 									class="btn bg-neutral-5 mr-2"
 									:class="{ 'full-width': success }"
@@ -178,25 +184,23 @@ export default {
 <style lang="scss" scoped>
 .hk-card.patron-card {
 	width: 300px;
-	&::v-deep {
-		.card-body {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			text-align: center;
+	&:deep(.card-body) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
 
-			img {
-				width: 100px;
-				aspect-ratio: 1/1;
-				object-fit: cover;
-				object-position: center;
-				border-radius: 100%;
-				margin-bottom: 15px;
-			}
-			.name {
-				font-size: 18px;
-				font-weight: bold;
-			}
+		img {
+			width: 100px;
+			aspect-ratio: 1/1;
+			object-fit: cover;
+			object-position: center;
+			border-radius: 100%;
+			margin-bottom: 15px;
+		}
+		.name {
+			font-size: 18px;
+			font-weight: bold;
 		}
 	}
 }

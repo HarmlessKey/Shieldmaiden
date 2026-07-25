@@ -19,59 +19,71 @@
 					:loading="isBusy"
 					:search="['username', 'email']"
 				>
-					<span slot="status" slot-scope="data">
-						<template v-if="data.item === 'online'">
+					<template v-slot:status="data">
+						<span>
+							<template v-if="data.item === 'online'">
+								<i
+									aria-hidden="true"
+									:class="{ green: data.item === 'online', 'neutral-2': data.item === 'offline' }"
+									class="fas fa-circle"
+								></i>
+							</template>
+							<span v-else><i aria-hidden="true" class="fas fa-circle neutral-2"></i></span>
+						</span>
+					</template>
+
+					<template v-slot:username="data">
+						<router-link :to="'/admin/users/' + data.row['.key']">
+							<span v-if="data.item">{{ data.item }}</span>
+							<span v-else>UNDEFINED</span>
+						</router-link>
+					</template>
+
+					<template v-slot:voucher="data">
+						<span v-if="data.item">
 							<i
+								v-if="tiers[data.item.id]"
+								class="fas fa-ticket-alt"
 								aria-hidden="true"
-								:class="{ green: data.item === 'online', 'neutral-2': data.item === 'offline' }"
-								class="fas fa-circle"
+								:class="{
+									blue: tiers[data.item.id]?.name == 'Folk Hero',
+									purple: tiers[data.item.id]?.name == 'Noble',
+									orange: tiers[data.item.id]?.name == 'Deity',
+								}"
 							></i>
-						</template>
-						<span v-else><i aria-hidden="true" class="fas fa-circle neutral-2"></i></span>
-					</span>
+						</span>
+					</template>
 
-					<router-link :to="'/admin/users/' + data.row['.key']" slot="username" slot-scope="data">
-						<span v-if="data.item">{{ data.item }}</span>
-						<span v-else>UNDEFINED</span>
-					</router-link>
+					<template v-slot:patreon="data">
+						<span v-if="data.item">
+							<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
+							<i
+								v-else-if="data.item"
+								v-for="tier in data.item"
+								:key="tier"
+								class="fab fa-patreon"
+								aria-hidden="true"
+								:class="{
+									blue: tiers[tier]?.name == 'Folk Hero',
+									purple: tiers[tier]?.name == 'Noble',
+									orange: tiers[tier]?.name == 'Deity',
+									red: tiers[tier]?.name == 'Former',
+								}"
+							/>
+						</span>
+					</template>
 
-					<span slot="voucher" slot-scope="data" v-if="data.item">
-						<i
-							v-if="tiers[data.item.id]"
-							class="fas fa-ticket-alt"
-							aria-hidden="true"
-							:class="{
-								blue: tiers[data.item.id]?.name == 'Folk Hero',
-								purple: tiers[data.item.id]?.name == 'Noble',
-								orange: tiers[data.item.id]?.name == 'Deity',
-							}"
-						></i>
-					</span>
+					<template v-slot:live="data">
+						<span v-if="data.item" class="red">
+							<i aria-hidden="true" class="far fa-dot-circle"></i>
+						</span>
+					</template>
 
-					<span slot="patreon" slot-scope="data" v-if="data.item">
-						<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
-						<i
-							v-else-if="data.item"
-							v-for="tier in data.item"
-							:key="tier"
-							class="fab fa-patreon"
-							aria-hidden="true"
-							:class="{
-								blue: tiers[tier]?.name == 'Folk Hero',
-								purple: tiers[tier]?.name == 'Noble',
-								orange: tiers[tier]?.name == 'Deity',
-								red: tiers[tier]?.name == 'Former',
-							}"
-						/>
-					</span>
-
-					<span slot="live" slot-scope="data" v-if="data.item" class="red">
-						<i aria-hidden="true" class="far fa-dot-circle"></i>
-					</span>
-
-					<div slot="table-loading" class="loader">
-						<span>Loading users...</span>
-					</div>
+					<template v-slot:table-loading>
+						<div class="loader">
+							<span>Loading users...</span>
+						</div>
+					</template>
 				</hk-table>
 			</div>
 		</hk-card>

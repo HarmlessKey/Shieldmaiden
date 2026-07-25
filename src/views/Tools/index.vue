@@ -1,26 +1,29 @@
 <template>
 	<hk-card>
-		<div class="card-header" slot="header">
-			<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D 5e Tools</h1>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1><i aria-hidden="true" class="fas fa-tools mr-2" /> D&D 5e Tools</h1>
+			</div>
+		</template>
 		<div class="card-body">
-			<template v-for="(group, i) in tools">
-				<h2 :key="`title-${i}`" :class="{ 'mt-3': i > 0 }">{{ group.title }}</h2>
-				<div class="row q-col-gutter-md" :key="i" :class="{ 'pb-2': i === 0 }">
+			<template v-for="(group, i) in tools" :key="i">
+				<h2 :class="{ 'mt-3': i > 0 }">{{ group.title }}</h2>
+				<div class="row q-col-gutter-md" :class="{ 'pb-2': i === 0 }">
 					<div v-for="(tool, key) in group.tools" class="col-12 col-sm-6 col-md-4" :key="key">
 						<router-link :to="tool.url">
 							<hk-card class="full-height tool">
-								<div
-									slot="image"
-									class="card-image"
-									:style="[
-										tool.image
-											? {
-													backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${tool.image}`)})`,
-												}
-											: '',
-									]"
-								></div>
+								<template v-slot:image>
+									<div
+										class="card-image"
+										:style="[
+											tool.image
+												? {
+														backgroundImage: `url(${require(`src/assets/_img/atmosphere/medium/${tool.image}`)})`,
+													}
+												: '',
+										]"
+									></div>
+								</template>
 								<div class="card-body">
 									<div class="header">
 										<i :class="tool.icon" aria-hidden="true" class="mr-1" />
@@ -28,12 +31,14 @@
 									</div>
 									{{ tool.description }}
 								</div>
-								<div slot="footer" class="footer">
-									<div v-if="tool.under_development" class="red full-width text-center">
-										Under development
+								<template v-slot:footer>
+									<div class="footer">
+										<div v-if="tool.under_development" class="red full-width text-center">
+											Under development
+										</div>
+										<button v-else class="btn btn-sm">Use {{ tool.title }}</button>
 									</div>
-									<button v-else class="btn btn-sm">Use {{ tool.title }}</button>
-								</div>
+								</template>
 							</hk-card>
 						</router-link>
 					</div>

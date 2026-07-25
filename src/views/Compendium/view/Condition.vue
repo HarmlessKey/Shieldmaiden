@@ -1,18 +1,20 @@
 <template>
 	<hk-card>
-		<template v-if="!loading">
-			<div slot="header" class="card-header">
+		<template v-slot:header>
+			<div v-if="!loading" class="card-header">
 				<h1>
 					<i aria-hidden="true" :class="`hki-${condition.name.toLowerCase()}`" />
 					{{ condition.name }}
 				</h1>
-				<hk-share 
-					v-if="!not_found" 
-					:title="condition.meta.title" 
-					:text="condition.meta.description" 
+				<hk-share
+					v-if="!not_found"
+					:title="condition.meta.title"
+					:text="condition.meta.description"
 					size="sm"
 				/>
 			</div>
+		</template>
+		<template v-if="!loading">
 			<div class="card-body">
 				<template v-if="not_found">
 					<p>Could not find condition <strong>{{ id }}</strong></p>
@@ -29,6 +31,7 @@
 
 <script>
 	import Condition from "src/components/compendium/Condition";
+	import { EventBus } from "src/event-bus";
 	import { mapGetters } from 'vuex';
 	import { metaCompendium } from 'src/mixins/metaCompendium';
 
@@ -67,7 +70,7 @@
 			if(this.condition) {
 				this.loading = false;
 				// Root emit with the condition name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.condition.name);
+				EventBus.emit('route-name', this.condition.name);
 			} else {
 				this.not_found = true;
 				this.loading = false;

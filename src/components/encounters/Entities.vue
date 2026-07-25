@@ -84,21 +84,25 @@
 				placeholder="Search custom NPCs"
 				class="mb-1"
 			>
-				<q-icon slot="prepend" name="search" />
-				<q-btn slot="after" no-caps color="primary" @click="npc_filter_dialog = true">
-					Filter
-					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge
-						v-if="npcActiveFilterCount"
-						floating
-						rounded
-						color="red"
-						:label="npcActiveFilterCount"
-					/>
-				</q-btn>
+				<template v-slot:prepend>
+					<q-icon name="search" />
+				</template>
+				<template v-slot:after>
+					<q-btn no-caps color="primary" @click="npc_filter_dialog = true">
+						Filter
+						<i class="fas fa-filter ml-2" aria-hidden="true" />
+						<q-badge
+							v-if="npcActiveFilterCount"
+							floating
+							rounded
+							color="red"
+							:label="npcActiveFilterCount"
+						/>
+					</q-btn>
+				</template>
 			</q-input>
 			<q-table
-				:data="filteredCustomNpcs"
+				:rows="filteredCustomNpcs"
 				:visible-columns="visibleColumns"
 				:columns="columns"
 				row-key="key"
@@ -217,12 +221,15 @@
 						</q-td>
 					</q-tr>
 				</template>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="monsters" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="monsters" />
+				</template>
 			</q-table>
 			<q-btn
 				v-if="!searchNpc && npcs.length < npc_count"
-				slot="bottom-row"
 				no-caps
 				color="primary"
 				label="Load more"
@@ -244,36 +251,42 @@
 				@change="filterMonsters"
 				@clear="filterMonsters"
 			>
-				<q-icon slot="prepend" name="search" />
-				<q-btn slot="after" no-caps color="primary" @click="filter_dialog = true">
-					Filter
-					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge
-						v-if="Object.keys(filter).length"
-						floating
-						rounded
-						color="red"
-						:label="Object.keys(filter).length"
-					/>
-				</q-btn>
+				<template v-slot:prepend>
+					<q-icon name="search" />
+				</template>
+				<template v-slot:after>
+					<q-btn no-caps color="primary" @click="filter_dialog = true">
+						Filter
+						<i class="fas fa-filter ml-2" aria-hidden="true" />
+						<q-badge
+							v-if="Object.keys(filter).length"
+							floating
+							rounded
+							color="red"
+							:label="Object.keys(filter).length"
+						/>
+					</q-btn>
+				</template>
 			</q-input>
 			<q-table
-				:data="monsters"
+				:rows="monsters"
 				:columns="columns"
 				row-key="_id"
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
-				:pagination.sync="pagination"
+				v-model:pagination="pagination"
 				:loading="loading_monsters"
 				separator="none"
 				wrap-cells
 				:visible-columns="visibleColumns"
 				@request="request"
 			>
-				<div slot="loading">
-					<hk-loader name="monsters" />
-				</div>
+				<template v-slot:loading>
+					<div>
+						<hk-loader name="monsters" />
+					</div>
+				</template>
 
 				<template v-slot:header="props">
 					<q-tr :props="props">
@@ -381,16 +394,18 @@
 				<div class="card-body">
 					<hk-filter v-model="filter" type="monster" />
 				</div>
-				<div slot="footer" class="card-footer">
-					<button class="btn bg-neutral-5" @click="clearFilter">
-						<i class="fas fa-times" aria-hidden="true" />
-						Clear filter
-					</button>
-					<button class="btn ml-2" @click="setFilter">
-						<i class="fas fa-filter" aria-hidden="true" />
-						Set filter
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<button class="btn bg-neutral-5" @click="clearFilter">
+							<i class="fas fa-times" aria-hidden="true" />
+							Clear filter
+						</button>
+						<button class="btn ml-2" @click="setFilter">
+							<i class="fas fa-filter" aria-hidden="true" />
+							Set filter
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
@@ -406,29 +421,31 @@
 						class="mt-2"
 					/>
 				</div>
-				<div slot="footer" class="card-footer">
-					<button class="btn bg-neutral-5" @click="clearNpcFilter">
-						<i class="fas fa-times" aria-hidden="true" />
-						Clear filter
-					</button>
-					<button class="btn ml-2" @click="npc_filter_dialog = false">
-						<i class="fas fa-filter" aria-hidden="true" />
-						Set filter
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<button class="btn bg-neutral-5" @click="clearNpcFilter">
+							<i class="fas fa-times" aria-hidden="true" />
+							Clear filter
+						</button>
+						<button class="btn ml-2" @click="npc_filter_dialog = false">
+							<i class="fas fa-filter" aria-hidden="true" />
+							Set filter
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
 		<q-dialog v-model="player_dialog">
 			<div>
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
-					<q-form @submit="handleSubmit(add($event, generateUUID(), 'player', player.name))" greedy>
+				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+					<q-form @submit="handleSubmit($event, () => add(null, generateUUID(), 'player', player.name))" greedy>
 						<hk-card header="Add players" :min-width="300">
 							<div class="card-body">
 								<ValidationProvider
 									rules="required"
 									name="Name"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.name" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -436,14 +453,14 @@
 										square
 										label="Name"
 										v-model="player.name"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 								<ValidationProvider
 									rules="required|between:1,20"
 									name="Level"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.level" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -452,14 +469,14 @@
 										label="Level"
 										type="number"
 										v-model="player.level"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 								<ValidationProvider
 									rules="required|between:1,9999"
 									name="Max HP"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.maxHp" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -468,14 +485,14 @@
 										label="Hit Point Maximum"
 										type="number"
 										v-model="player.maxHp"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 								<ValidationProvider
 									rules="required|between:1,99"
 									name="AC"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="player.ac" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -484,32 +501,34 @@
 										label="Armor Class"
 										type="number"
 										v-model="player.ac"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-between">
-								<q-btn flat no-caps v-close-popup label="Cancel" />
-								<q-btn
-									type="submit"
-									label="Add more"
-									class="ml-1"
-									no-caps
-									flat
-									color="primary"
-									:disable="!valid"
-								/>
-								<q-btn
-									type="submit"
-									label="Add"
-									class="ml-1"
-									v-close-popup
-									no-caps
-									color="primary"
-									:disable="!valid"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-between">
+									<q-btn flat no-caps v-close-popup label="Cancel" />
+									<q-btn
+										type="submit"
+										label="Add more"
+										class="ml-1"
+										no-caps
+										flat
+										color="primary"
+										:disable="!meta.valid"
+									/>
+									<q-btn
+										type="submit"
+										label="Add"
+										class="ml-1"
+										v-close-popup
+										no-caps
+										color="primary"
+										:disable="!meta.valid"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>
@@ -526,6 +545,7 @@ import { general } from "src/mixins/general.js";
 import { uuid, campaignGroupKey } from "src/utils/generalFunctions";
 import ViewMonster from "src/components/compendium/Monster.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "Entities",
@@ -668,7 +688,11 @@ export default {
 	watch: {
 		// Prop is changed in parent to trigger addAllPlayers function from Overview.vue
 		addPlayers() {
-			this.demo ? (this.player_dialog = true) : this.addAllPlayers();
+			if (this.demo) {
+				this.player_dialog = true;
+			} else {
+				this.addAllPlayers();
+			}
 		},
 	},
 	computed: {
@@ -791,12 +815,12 @@ export default {
 		},
 		clearFilter() {
 			this.filter_dialog = false;
-			this.$set(this, "filter", {});
+			this.filter = {};
 			this.filterMonsters();
 		},
 		clearNpcFilter() {
 			this.npc_filter_dialog = false;
-			this.$set(this, "npcFilter", {});
+			this.npcFilter = {};
 			this.campaignOnly = false;
 		},
 		request(req) {
@@ -827,10 +851,9 @@ export default {
 
 			// Notification for NPCs
 			if (type === "npc") {
-				this.$snotify.success(
+				notifySuccess(
 					`${this.to_add[id]} NPC${this.to_add > 1 ? "s" : ""} added successfully`,
-					"NPC added",
-					{ position: "centerTop" }
+					"NPC added"
 				);
 			}
 
@@ -1022,9 +1045,11 @@ export default {
 			}
 		},
 		add_demo_entity(entity) {
-			this.encounter.entities
-				? this.$set(this.encounter.entities, uuid(), entity)
-				: this.$set(this.encounter, "entities", { [uuid()]: entity });
+			if (this.encounter.entities) {
+				this.encounter.entities[uuid()] = entity;
+			} else {
+				this.encounter["entities"] = { [uuid()]: entity };
+			}
 		},
 		async toggleCustomNpc(props, id) {
 			props.expand = !props.expand;
@@ -1033,17 +1058,13 @@ export default {
 					const npc = await this.get_npc({ uid: this.user.uid, id });
 					if (!npc) {
 						props.expand = false;
-						this.$snotify.error("This NPC could not be loaded.", "NPC unavailable", {
-							position: "centerTop",
-						});
+						notifyError("This NPC could not be loaded.", "NPC unavailable");
 						return;
 					}
-					this.$set(this.npcExpandData, id, npc);
+					this.npcExpandData[id] = npc;
 				} catch (e) {
 					props.expand = false;
-					this.$snotify.error("Failed to load NPC statblock.", "Load error", {
-						position: "centerTop",
-					});
+					notifyError("Failed to load NPC statblock.", "Load error");
 				}
 			}
 		},
@@ -1073,7 +1094,7 @@ input[type="number"]::-webkit-inner-spin-button {
 		text-align: center;
 		margin-left: 4px;
 
-		&::v-deep .q-field__inner {
+		&:deep(.q-field__inner) {
 			.row {
 				height: 31px;
 			}

@@ -187,7 +187,7 @@
 				/></template>
 				<template v-if="entity.challenge_rating">
 					<strong>Challenge Rating</strong> {{ entity.challenge_rating }} ({{
-						monster_challenge_rating[entity.challenge_rating].xp | numeral("0,0")
+						formatNumber(monster_challenge_rating[entity.challenge_rating].xp, "0,0")
 					}}
 					XP)<br />
 				</template>
@@ -243,7 +243,7 @@
 		<template v-if="entity.caster_ability">
 			<p v-if="!current">
 				<strong><em> Spellcasting </em></strong>
-				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral("Oo") }}-level
+				The {{ entity.name.capitalizeEach() }} is a {{ formatNumber(entity.caster_level, "Oo") }}-level
 				spellcaster. its spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
 				save DC {{ entity.caster_save_dc }},
 				{{
@@ -279,11 +279,11 @@
 				><br />
 			</template>
 			<p>
-				<template v-for="level in caster_spell_levels">
-					<div :key="`spell-${level}`">
+				<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+					<div>
 						<template v-if="level === 0"> Cantrips (at will): </template>
 						<template v-else>
-							{{ level | numeral("Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
+							{{ formatNumber(level, "Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
 						</template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
@@ -337,8 +337,8 @@
 				><br />
 			</template>
 			<p>
-				<template v-for="limit in innate_spell_levels">
-					<div :key="`spell-${limit}`">
+				<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+					<div>
 						<template v-if="limit === Infinity"> At will: </template>
 						<template v-else> {{ limit }}/day each: </template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
@@ -366,6 +366,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import { general } from "src/mixins/general.js";
 import { dice } from "src/mixins/dice.js";
 import { monsterMixin } from "src/mixins/monster.js";
@@ -453,6 +454,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		...mapActions(["setActionRoll", "set_limitedUses"]),
 		setSize(size) {
 			let width = size.width;

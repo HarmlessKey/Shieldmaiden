@@ -1,74 +1,76 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ valid }">
+		<ValidationObserver v-slot="{ meta }" as="div">
 			<q-form greedy>
 				<hk-card>
-					<div class="card-header" slot="header">
-						<span>Race</span>
-						<small class="saved green" v-if="saved" @animationend="saved = false">
-							<i aria-hidden="true" class="fas fa-check" />
-							Saved
-						</small>
-						<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-							<i aria-hidden="true" class="fas fa-times" />
-							Couldn't save
-						</small>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>Race</span>
+							<small class="saved green" v-if="saved" @animationend="saved = false">
+								<i aria-hidden="true" class="fas fa-check" />
+								Saved
+							</small>
+							<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+								<i aria-hidden="true" class="fas fa-times" />
+								Couldn't save
+							</small>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
 							label="Race"
-							:value="race.race"
+							:model-value="race.race"
 							:options="race_list"
-							@input="selectRace($event, valid)"
+							@update:model-value="selectRace($event, meta.valid)"
 						/>
 						<template v-if="race.race === 'custom'">
 							<ValidationProvider
 								rules="required|max:30"
 								name="Race name"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="race.race_name" as="div"
 							>
 								<q-input
 									dark
 									filled
 									square
 									label="Race name"
-									@change="save(valid)"
+									@change="save(meta.valid)"
 									autocomplete="off"
 									type="text"
 									v-model="race.race_name"
 									placeholder="Race"
 									class="mb-2"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 							<ValidationProvider
 								rules="required|between:1,99"
 								name="Speed"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="race.walking_speed" as="div"
 							>
 								<q-input
 									dark
 									filled
 									square
 									label="Base walking speed"
-									@change="save(valid)"
+									@change="save(meta.valid)"
 									autocomplete="off"
 									type="number"
 									v-model="race.walking_speed"
 									placeholder="Speed"
 									class="mb-2"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 							<ValidationProvider
 								rules="max:2000"
 								name="Description"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="race.race_description" as="div"
 							>
 								<q-input
 									dark
@@ -76,11 +78,11 @@
 									square
 									type="textarea"
 									label="Race description"
-									@change="save(valid)"
+									@change="save(meta.valid)"
 									v-model="race.race_description"
 									autogrow
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 						</template>
@@ -89,13 +91,15 @@
 
 				<!-- Traits -->
 				<hk-card>
-					<div class="card-header" slot="header">
-						Traits
-						<button class="btn btn-sm bg-neutral-5" @click.prevent="addTrait(valid)">
-							<i class="fas fa-plus green" aria-hidden="true" />
-							Add trait
-						</button>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							Traits
+							<button class="btn btn-sm bg-neutral-5" @click.prevent="addTrait(meta.valid)">
+								<i class="fas fa-plus green" aria-hidden="true" />
+								Add trait
+							</button>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-list dark square class="accordion">
 							<q-expansion-item
@@ -113,7 +117,7 @@
 										<div class="actions">
 											<a
 												class="btn btn-sm bg-neutral-5"
-												@click.stop="confirmDelete(index, trait.name, valid)"
+												@click.stop="confirmDelete(index, trait.name, meta.valid)"
 											>
 												<i class="fas fa-trash-alt" aria-hidden="true" />
 											</a>
@@ -126,19 +130,19 @@
 										<ValidationProvider
 											rules="required|max:30"
 											name="Trait name"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="race.traits[index].name" as="div"
 										>
 											<q-input
 												dark
 												filled
 												square
-												@change="save(valid)"
+												@change="save(meta.valid)"
 												autocomplete="off"
 												type="text"
 												v-model="race.traits[index].name"
 												label="Trait name"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -150,7 +154,7 @@
 										:userId="userId"
 										:characterId="characterId"
 										@edit="editModifier"
-										@delete="save(valid)"
+										@delete="save(meta.valid)"
 									/>
 								</div>
 							</q-expansion-item>
@@ -162,7 +166,7 @@
 						:value="modifier"
 						:userId="userId"
 						:characterId="characterId"
-						@save="modifierSaved($event, valid)"
+						@save="modifierSaved($event, meta.valid)"
 					/>
 				</q-dialog>
 			</q-form>
@@ -175,6 +179,7 @@ import { mapActions } from "vuex";
 import { races, subraces } from "src/utils/characterConstants";
 import ModifierTable from "src/components/characters/modifier-table.vue";
 import Modifier from "src/components/characters/modifier.vue";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterRace",
@@ -251,29 +256,11 @@ export default {
 		},
 		selectRace(value, valid) {
 			if (this.race.race) {
-				this.$snotify.error(
-					`Are you sure you want to change the race? All traits will be reset.`,
-					`Change race`,
-					{
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.setRace(value, valid);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: `Change race`,
+					message: `Are you sure you want to change the race? All traits will be reset.`,
+					onOk: () => this.setRace(value, valid),
+				});
 			} else {
 				this.setRace(value, valid);
 			}
@@ -287,9 +274,9 @@ export default {
 					this.deleteTrait(i, valid);
 				}
 
-				this.$set(this.character, "race", {
+				this.character["race"] = {
 					...value,
-				});
+				};
 			}
 			this.save(valid);
 		},
@@ -321,29 +308,11 @@ export default {
 			this.save(valid);
 		},
 		confirmDelete(index, name, valid) {
-			this.$snotify.error(
-				'Are you sure you want to delete the the trait "' + name + '"?',
-				"Delete trait",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteTrait(index, valid);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete trait",
+				message: 'Are you sure you want to delete the the trait "' + name + '"?',
+				onOk: () => this.deleteTrait(index, valid),
+			});
 		},
 		modifierSaved(valid) {
 			this.modal = false;

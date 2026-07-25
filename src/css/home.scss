@@ -184,10 +184,8 @@
 			.user-menu {
 				font-size: 18px;
 
-				&::v-deep {
-					.user-btn {
-						font-size: 25px;
-					}
+				.user-btn {
+					font-size: 25px;
 				}
 			}
 		}

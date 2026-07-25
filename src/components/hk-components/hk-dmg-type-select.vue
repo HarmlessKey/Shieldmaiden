@@ -1,5 +1,5 @@
 <template>
-	<ValidationProvider :rules="validationRules" :name="label" v-slot="{ errors, invalid, validated }">
+	<ValidationProvider :rules="validationRules" :name="label" v-slot="{ errorMessage }" :modelValue="damage_type" as="div">
 		<q-select 
 			:dark="$store.getters.theme === 'dark'" filled square
 			:dense="dense"
@@ -12,8 +12,8 @@
 			@filter="filterTypes"
 			@focus="hide_selected = true"
 			@blur="hide_selected = false"
-			:error="invalid && validated"
-			:error-message="errors[0]"
+			:error="!!errorMessage"
+			:error-message="errorMessage"
 		>
 			<template v-slot:selected>
 				<span v-if="damage_type && !hide_selected" class="truncate">
@@ -54,6 +54,10 @@
 				type: String,
 				default: undefined
 			},
+			modelValue: {
+				type: String,
+				default: undefined
+			},
 			label: {
 				type: String,
 				default: undefined
@@ -82,13 +86,15 @@
 				default: false
 			}
 		},
+		emits: ["input", "update:modelValue"],
 		computed: {
 			damage_type: {
 				get() {
-					return this.value;
+					return this.modelValue !== undefined ? this.modelValue : this.value;
 				},
 				set(newVal) {
 					this.$emit("input", newVal);
+					this.$emit("update:modelValue", newVal);
 				}
 			},
 			damage_types() {

@@ -116,7 +116,7 @@ export default {
 };
 </script>
 
-<styles lang="scss" scoped>
+<style lang="scss" scoped>
 .caster__levels {
 	display: flex;
 	justify-content: center;
@@ -142,4 +142,4 @@ export default {
 		}
 	}
 }
-</styles>
+</style>

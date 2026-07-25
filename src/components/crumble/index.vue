@@ -17,6 +17,8 @@
 </template>
 
 <script>
+	import { EventBus } from "src/event-bus";
+
 	export default {
 		name: 'Crumble',
 		data() {
@@ -46,9 +48,15 @@
 		},
 		mounted() {
 			// Replace the last name in breadcrumb with a value emitted from a component
-			this.$root.$on("route-name", (name) => {
+			EventBus.on("route-name", this.setLastRoute);
+		},
+		beforeUnmount() {
+			EventBus.off("route-name", this.setLastRoute);
+		},
+		methods: {
+			setLastRoute(name) {
 				this.last_route = name;
-			});
+			}
 		},
 		watch: {
 			'$route' () {

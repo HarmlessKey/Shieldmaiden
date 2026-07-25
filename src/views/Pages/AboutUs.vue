@@ -1,9 +1,11 @@
 <template>
 	<div>
 		<hk-card>
-			<div slot="header" class="card-header">
-				<h1>Creating a D&D Combat Tracker</h1>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					<h1>Creating a D&D Combat Tracker</h1>
+				</div>
+			</template>
 			<div class="card-body">
 				<p>
 					As a DM, preparing and running combat encounters can be time consuming, challenging and

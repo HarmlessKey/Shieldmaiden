@@ -61,7 +61,7 @@ export default {
 	}
 }
 @media only screen and (max-width: 1023px) {
-	::v-deep {
+	:deep() {
 		.row {
 			flex-direction: column-reverse;
 		}

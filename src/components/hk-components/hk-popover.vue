@@ -10,8 +10,8 @@
 			:breakpoint="576"
 		>
 			<hk-card
-				@mouseover.native="cardHover = true"
-				@mouseout.native="cardHover = false"
+				@mouseover="cardHover = true"
+				@mouseout="cardHover = false"
 				:max-width="300"
 				:no-margin="true"
 				:small="true"
@@ -24,7 +24,9 @@
 						</template>
 					</slot>
 				</div>
-				<slot slot="footer" name="footer" />
+				<template v-slot:footer>
+					<slot name="footer" />
+				</template>
 			</hk-card>
 		</q-popup-proxy>
 	</span>
@@ -63,10 +65,10 @@ export default {
 	},
 	mounted() {
 		// Listen for other popovers opening
-		EventBus.$on("popover-opened", this.handleOtherPopoverOpened);
+		EventBus.on("popover-opened", this.handleOtherPopoverOpened);
 	},
-	beforeDestroy() {
-		EventBus.$off("popover-opened", this.handleOtherPopoverOpened);
+	beforeUnmount() {
+		EventBus.off("popover-opened", this.handleOtherPopoverOpened);
 	},
 	methods: {
 		handleOtherPopoverOpened(id) {
@@ -83,7 +85,7 @@ export default {
 			if (this.itemHover || this.cardHover) {
 				this.menu = true;
 				// Notify other popovers
-				EventBus.$emit("popover-opened", this.componentId);
+				EventBus.emit("popover-opened", this.componentId);
 			} else {
 				this.menu = false;
 			}

@@ -86,6 +86,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { notifyWarning } from "src/utils/notify";
 import Menu from "./Menu.vue";
 import EncounterProgress from "./EncounterProgress.vue";
 import { remindersMixin } from "src/mixins/reminders";
@@ -187,7 +188,7 @@ export default {
 									const message = `${roll} Was rolled for a recharge of ${ability.recharge}.`;
 
 									//Notify about the recharge
-									this.$snotify.warning(message, title, {
+									notifyWarning(message, title, {
 										timeout: 0,
 									});
 								}

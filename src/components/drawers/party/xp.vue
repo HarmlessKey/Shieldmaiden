@@ -89,23 +89,26 @@ export default {
 
 			for (const id in campaign.players) {
 				this.allPlayers.push(id);
-				this.$set(this.players, id, await this.get_player({ uid: this.user.uid, id }));
+				this.players[id] = await this.get_player({ uid: this.user.uid, id });
 			}
 		});
 	},
 	watch: {
-		awardTo(newVal) {
-			// Handle changes in individual player checkboxes
-			if (newVal.length === 0) {
-				this.indeterminate = false;
-				this.allSelected = false;
-			} else if (newVal.length === this.allPlayers.length) {
-				this.indeterminate = false;
-				this.allSelected = true;
-			} else {
-				this.indeterminate = true;
-				this.allSelected = false;
-			}
+		awardTo: {
+			handler(newVal) {
+				// Handle changes in individual player checkboxes
+				if (newVal.length === 0) {
+					this.indeterminate = false;
+					this.allSelected = false;
+				} else if (newVal.length === this.allPlayers.length) {
+					this.indeterminate = false;
+					this.allSelected = true;
+				} else {
+					this.indeterminate = true;
+					this.allSelected = false;
+				}
+			},
+			deep: true,
 		},
 	},
 	methods: {

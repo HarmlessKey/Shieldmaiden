@@ -18,7 +18,7 @@
 					"
 				/>
 			</div>
-			<button v-if="value" class="btn btn-sm btn-clear" @click.prevent="preview = !preview">
+			<button v-if="input" class="btn btn-sm btn-clear" @click.prevent="preview = !preview">
 				<i class="fas" :class="preview ? 'fa-pencil-alt' : 'fa-eye'" aria-hidden="true" />
 				<q-tooltip anchor="top middle" self="center middle">
 					{{ preview ? "Edit" : "Preview" }}
@@ -59,6 +59,9 @@ export default {
 		value: {
 			type: String,
 		},
+		modelValue: {
+			type: String,
+		},
 		label: {
 			type: String,
 		},
@@ -73,6 +76,7 @@ export default {
 			default: false,
 		},
 	},
+	emits: ["input", "update:modelValue", "change"],
 	data() {
 		return {
 			preview: false,
@@ -81,14 +85,15 @@ export default {
 	computed: {
 		input: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 		marked() {
-			return sanitizeHtml(marked.parse(this.value || ""));
+			return sanitizeHtml(marked.parse(this.input || ""));
 		},
 	},
 	methods: {

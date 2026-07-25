@@ -1,12 +1,12 @@
 <template>
 	<div class="wrapper" :class="intensityClass">
-		<template v-for="i in 3">
-			<div :id="`sandlayer_0${i}`" class="sand" :key="i">
+		<template v-for="i in 3" :key="i">
+			<div :id="`sandlayer_0${i}`" class="sand">
 				<div class="image01" />
 				<div class="image02" />
 			</div>
-			<div class="particles a" :class="`layer${i}`" :key="`particles-${i}-a`" />
-			<div class="particles" :class="`layer${i}`" :key="`particles-${i}`" />
+			<div class="particles a" :class="`layer${i}`" />
+			<div class="particles" :class="`layer${i}`" />
 		</template>
 	</div>
 </template>

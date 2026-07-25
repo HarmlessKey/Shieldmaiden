@@ -15,7 +15,7 @@
 					</a>
 				</div>
 		
-				<template slot="footer">
+				<template v-slot:footer>
 					<router-link v-if="!user" class="btn btn-square btn-block btn-lg bg-green" to="/sign-up">Create Account Now</router-link>
 					<router-link v-else class="btn btn-square btn-block btn-lg bg-green" to="/content">Create custom content</router-link>
 				</template>

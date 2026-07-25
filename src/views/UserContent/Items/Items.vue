@@ -16,11 +16,13 @@
 						clearable
 						placeholder="Search"
 					>
-						<q-icon slot="prepend" name="search" />
+						<template v-slot:prepend>
+							<q-icon name="search" />
+						</template>
 					</q-input>
 
 					<q-table
-						:data="items"
+						:rows="items"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"
@@ -66,7 +68,9 @@
 								</div>
 							</q-td>
 						</template>
-						<div slot="no-data" />
+						<template v-slot:no-data>
+							<div />
+						</template>
 					</q-table>
 				</template>
 				<template> </template>
@@ -93,6 +97,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Items",
@@ -144,32 +149,13 @@ export default {
 			if (e.shiftKey) {
 				this.deleteItem(key);
 			} else {
-				this.$snotify.error(
-					"Are you sure you want to delete " +
+				confirmAction({
+					title: "Delete item",
+					message: "Are you sure you want to delete " +
 						item.name +
 						"? It will also remove it from the campaign inventories it is linked to.",
-					"Delete item",
-					{
-						timeout: false,
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.deleteItem(key);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+					onOk: () => this.deleteItem(key),
+				});
 			}
 		},
 		deleteItem(key) {

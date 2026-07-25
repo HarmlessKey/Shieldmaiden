@@ -1,16 +1,18 @@
 <template>
 	<hk-card header="Ability scores">
-		<div class="card-header" slot="header">
-			<span>Abilities</span>
-			<small class="saved green" v-if="saved" @animationend="saved = false">
-				<i aria-hidden="true" class="fas fa-check" />
-				Saved
-			</small>
-			<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-				<i aria-hidden="true" class="fas fa-times" />
-				Couldn't save
-			</small>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<span>Abilities</span>
+				<small class="saved green" v-if="saved" @animationend="saved = false">
+					<i aria-hidden="true" class="fas fa-check" />
+					Saved
+				</small>
+				<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+					<i aria-hidden="true" class="fas fa-times" />
+					Couldn't save
+				</small>
+			</div>
+		</template>
 
 		<div class="card-body">
 			<q-select
@@ -20,14 +22,14 @@
 				square
 				label="Method"
 				placeholder="Select method"
-				:value="method"
+				:model-value="method"
 				:options="ability_score_methods"
 				emit-value
 				map-options
-				@input="confirmMethodChange($event)"
+				@update:model-value="confirmMethodChange($event)"
 			/>
 
-			<ValidationObserver v-if="method" v-slot="{ valid }">
+			<ValidationObserver v-if="method" v-slot="{ meta }" as="div">
 				<q-form greedy>
 					<h3 class="text-center">Base ability scores</h3>
 					<div class="d-flex justify-content-center mb-4" v-if="method === 'manual'">
@@ -45,12 +47,12 @@
 								filled
 								square
 								placeholder="-"
-								:value="ability_scores[ability]"
+								:model-value="ability_scores[ability]"
 								:options="standard_array"
 								emit-value
 								map-options
 								:option-disable="standardArrayDisable"
-								@input="saveAbility($event, ability, valid)"
+								@update:model-value="saveAbility($event, ability, meta.valid)"
 								clearable
 							/>
 						</div>
@@ -66,13 +68,13 @@
 									filled
 									square
 									placeholder="-"
-									:value="ability_scores[ability]"
+									:model-value="ability_scores[ability]"
 									:options="point_buy.map((item) => item.score)"
 									:option-label="ability"
 									emit-value
 									map-options
 									:option-disable="(opt) => pointBuyDisable(opt, ability_scores[ability])"
-									@input="saveAbility($event, ability, valid)"
+									@input="saveAbility($event, ability, meta.valid)"
 								/>
 							</div>
 						</div>
@@ -90,29 +92,31 @@
 							<ValidationProvider
 								rules="between:1,20"
 								:name="ability"
-								v-slot="{ errors, invalid, validated }"
+								v-slot="{ errorMessage }" :modelValue="ability_scores[ability]" as="div"
 							>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
 									placeholder="-"
-									@change="saveAbility($event.target.value, ability, valid)"
+									@change="saveAbility($event.target.value, ability, meta.valid)"
 									autocomplete="off"
 									type="number"
 									v-model="ability_scores[ability]"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 						</div>
 
 						<q-dialog v-model="roll_dialog">
 							<hk-card>
-								<div slot="header" class="card-header d-flex justify-content-between">
-									<span> Roll ability scores </span>
-									<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
-								</div>
+								<template v-slot:header>
+									<div class="card-header d-flex justify-content-between">
+										<span> Roll ability scores </span>
+										<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
+									</div>
+								</template>
 
 								<div class="card-body">
 									<button
@@ -177,18 +181,20 @@
 									</div>
 								</div>
 
-								<div slot="footer" class="card-footer d-flex justify-content-end">
-									<button class="btn bg-gray mr-2" @click="roll_dialog = false">Cancel</button>
-									<button
-										class="btn bg-green"
-										@click="applyRolledScores()"
-										:disabled="
-											rolls.filter((score) => score.ability && score.results.length).length < 6
-										"
-									>
-										Apply
-									</button>
-								</div>
+								<template v-slot:footer>
+									<div class="card-footer d-flex justify-content-end">
+										<button class="btn bg-gray mr-2" @click="roll_dialog = false">Cancel</button>
+										<button
+											class="btn bg-green"
+											@click="applyRolledScores()"
+											:disabled="
+												rolls.filter((score) => score.ability && score.results.length).length < 6
+											"
+										>
+											Apply
+										</button>
+									</div>
+								</template>
 							</hk-card>
 						</q-dialog>
 					</div>
@@ -214,10 +220,12 @@
 
 				<hk-card-deck>
 					<hk-card @click="confirmMethodChange('standard_array')" class="pointer">
-						<div class="card-header" slot="header">
-							<span>1. Standard array</span>
-							<span class="neutral-2">phb 13</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>1. Standard array</span>
+								<span class="neutral-2">phb 13</span>
+							</div>
+						</template>
 						<div class="card-body">
 							You get a standard set of scores you can divide over the abilities.<br />
 							<strong>15</strong> | <strong>14</strong> | <strong>13</strong> |
@@ -226,10 +234,12 @@
 					</hk-card>
 
 					<hk-card @click="confirmMethodChange('point_buy')" class="pointer">
-						<div class="card-header" slot="header">
-							<span>2. Point buy</span>
-							<span class="neutral-2">phb 13</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>2. Point buy</span>
+								<span class="neutral-2">phb 13</span>
+							</div>
+						</template>
 						<div class="card-body">
 							<p id="tableDesc">
 								You get 27 points to spend on your ability scores. The cost of each score is shown
@@ -253,9 +263,11 @@
 					</hk-card>
 
 					<hk-card @click="confirmMethodChange('manual')" class="pointer">
-						<div class="card-header" slot="header">
-							<span>3. Manual</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>3. Manual</span>
+							</div>
+						</template>
 						<div class="card-body">Manually input the scores for each ability.</div>
 					</hk-card>
 				</hk-card-deck>
@@ -268,6 +280,7 @@
 import { abilities } from "src/utils/generalConstants";
 import { dice } from "src/mixins/dice.js";
 import { mapActions } from "vuex";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterAbilities",
@@ -416,29 +429,11 @@ export default {
 			if (!this.method) {
 				this.saveAbilityScoreMethod(method);
 			} else {
-				this.$snotify.error(
-					`Are you sure you want to change the method? Current ability scores will be reset.`,
-					`Change method`,
-					{
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.saveAbilityScoreMethod(method);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: `Change method`,
+					message: `Are you sure you want to change the method? Current ability scores will be reset.`,
+					onOk: () => this.saveAbilityScoreMethod(method),
+				});
 			}
 		},
 		saveAbilityScoreMethod(method) {
@@ -446,18 +441,18 @@ export default {
 
 			// Reset ability scores
 			for (const ability of this.abilities) {
-				this.$set(this.character.abilities, ability, value);
+				this.character.abilities[ability] = value;
 			}
 
 			// Set the method
-			this.$set(this.character, "ability_score_method", method);
+			this.character["ability_score_method"] = method;
 			this.method = method;
 			this.save("abilities.method", true);
 		},
 		saveAbility(score, ability, valid) {
 			score = score !== null ? parseInt(score) : score;
 
-			this.$set(this.character.abilities, ability, score);
+			this.character.abilities[ability] = score;
 
 			this.save(`abilities.${ability}`, valid);
 		},
@@ -496,8 +491,8 @@ export default {
 		},
 		clearAllRolls() {
 			for (const index in this.rolls) {
-				this.$set(this.rolls[index], "ability", "");
-				this.$set(this.rolls[index], "results", []);
+				this.rolls[index]["ability"] = "";
+				this.rolls[index]["results"] = [];
 			}
 		},
 	},

@@ -4,16 +4,16 @@
 			<div class="card-body">
 				<div class="row q-col-gutter-md mb-3" v-for="(ability, index) in abilities" :key="index">
 					<div class="col-4 col-md-3">
-						<ValidationProvider rules="required|between:0,99" :name="ability.capitalize()" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="required|between:0,99" :name="ability.capitalize()" v-slot="{ errorMessage }" :modelValue="npc[ability]" as="div">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								:label="`${ability.capitalize()} *`"
 								autocomplete="off"  
 								type="number" 
 								v-model.number="npc[ability]" 
-								@input="parseToInt($event, npc, ability)"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								@update:model-value="parseToInt($event, npc, ability)"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							>
 								<template #append>
 									{{ npc[ability] !== undefined 
@@ -31,7 +31,7 @@
 							:false-value="null" 
 							indeterminate-value="something-else" 
 							label="Saving throw proficiency"
-							@input="$forceUpdate()"
+							@update:model-value="$forceUpdate()"
 						>
 							<q-tooltip anchor="top middle" self="center middle">
 								Saving throw proficiency
@@ -72,9 +72,9 @@
 		methods: {
 			parseToInt(value, object, property) {
 				if(value === undefined || value === "") {
-					this.$delete(object, property);
+					delete object[property];
 				} else {
-					this.$set(object, property, parseInt(value));
+					object[property] = parseInt(value);
 				}
 			}
 		}

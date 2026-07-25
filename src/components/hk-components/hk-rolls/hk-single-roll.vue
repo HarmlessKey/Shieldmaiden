@@ -7,12 +7,14 @@
 		@keydown.backspace="removeRoll(index)"
 	>
 		<hk-card>
-			<div slot="header" class="card-header">
-				<div class="truncate">{{ roll.name }}</div>
-				<button class="btn btn-sm btn-clear" tabindex="-1" @click="removeRoll(index)">
-					<i aria-hidden="true" class="fas fa-times" />
-				</button>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					<div class="truncate">{{ roll.name }}</div>
+					<button class="btn btn-sm btn-clear" tabindex="-1" @click="removeRoll(index)">
+						<i aria-hidden="true" class="fas fa-times" />
+					</button>
+				</div>
+			</template>
 
 			<div class="card-body">
 				<!-- TARGET -->
@@ -406,7 +408,9 @@
 								min="0"
 								@keydown.backspace.stop
 							>
-								<strong slot="append" class="pl-3 red">{{ overrideDamage }}</strong>
+								<template v-slot:append>
+									<strong class="pl-3 red">{{ overrideDamage }}</strong>
+								</template>
 							</q-input>
 							<q-input
 								v-else
@@ -426,65 +430,68 @@
 								min="0"
 								@keydown.backspace.stop
 							>
-								<strong slot="append" class="pl-3 red">{{ overrideHealing }}</strong>
+								<template v-slot:append>
+									<strong class="pl-3 red">{{ overrideHealing }}</strong>
+								</template>
 							</q-input>
 						</template>
 					</template>
 				</div>
 			</div>
 
-			<div
-				v-if="roll.target"
-				slot="footer"
-				class="card-footer"
-				:class="{
-					'step-highlight': demo && follow_tutorial && get_step('run', 'apply'),
-				}"
-			>
-				<template v-if="allMiss">
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Missed"
-						no-caps
-						@click="apply(1)"
-					/>
-				</template>
-				<template v-else>
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Full"
-						no-caps
-						@click="apply(1)"
-					/>
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Half"
-						no-caps
-						@click="apply(0.5)"
-					/>
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Double"
-						no-caps
-						@click="apply(2)"
-					/>
-				</template>
-				<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
-					<i aria-hidden="true" class="fas fa-times" />
-				</q-btn>
+			<template v-slot:footer>
+				<div
+					v-if="roll.target"
+					class="card-footer"
+					:class="{
+						'step-highlight': demo && follow_tutorial && get_step('run', 'apply'),
+					}"
+				>
+					<template v-if="allMiss">
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Missed"
+							no-caps
+							@click="apply(1)"
+						/>
+					</template>
+					<template v-else>
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Full"
+							no-caps
+							@click="apply(1)"
+						/>
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Half"
+							no-caps
+							@click="apply(0.5)"
+						/>
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Double"
+							no-caps
+							@click="apply(2)"
+						/>
+					</template>
+					<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
+						<i aria-hidden="true" class="fas fa-times" />
+					</q-btn>
 
-				<TutorialPopover
-					v-if="demo && index === 0"
-					tutorial="run"
-					step="apply"
-					position="right"
-					:offset="[10, 0]"
-				/>
-			</div>
+					<TutorialPopover
+						v-if="demo && index === 0"
+						tutorial="run"
+						step="apply"
+						position="right"
+						:offset="[10, 0]"
+					/>
+				</div>
+			</template>
 		</hk-card>
 	</div>
 </template>
@@ -618,12 +625,12 @@ export default {
 		checkHitOrMiss() {
 			this.roll.actions.forEach((action, index) => {
 				if (action.toHit) {
-					if (action.toHit.throwsTotal === 20) this.$set(this.hitOrMiss, index, "hit");
-					else if (action.toHit.throwsTotal === 1) this.$set(this.hitOrMiss, index, "miss");
+					if (action.toHit.throwsTotal === 20) this.hitOrMiss[index] = "hit";
+					else if (action.toHit.throwsTotal === 1) this.hitOrMiss[index] = "miss";
 					else if (this.roll.target) {
 						if (displayStats(this.roll.target).ac <= action.toHit.total)
-							this.$set(this.hitOrMiss, index, "hit");
-						else this.$set(this.hitOrMiss, index, "miss");
+							this.hitOrMiss[index] = "hit";
+						else this.hitOrMiss[index] = "miss";
 					}
 				}
 			});
@@ -651,12 +658,8 @@ export default {
 				modifier,
 				`${entity.name?.capitalizeEach()}: ${ability} saving throw`
 			);
-			this.$set(this.rolledSaves, action_index, roll.throwsTotal);
-			this.$set(
-				this.savingThrowResult,
-				action_index,
-				roll.throwsTotal >= action.save_dc ? "save" : "fail"
-			);
+			this.rolledSaves[action_index] = roll.throwsTotal;
+			this.savingThrowResult[action_index] = roll.throwsTotal >= action.save_dc ? "save" : "fail";
 		},
 		removeRoll(index) {
 			this.removeActionRoll(index);
@@ -849,11 +852,11 @@ export default {
 			return total;
 		},
 		setDefense(type, resistance, key) {
-			if (!this.resistances) this.$set(this.resistances, key, {});
+			if (!this.resistances) this.resistances[key] = {};
 			if (this.resistances[type] === resistance) {
-				this.$delete(this.resistances, type);
+				delete this.resistances[type];
 			} else {
-				this.$set(this.resistances, type, resistance);
+				this.resistances[type] = resistance;
 			}
 			if (this.get_step("run", "defenses", "monster")) {
 				this.completeStep({ tutorial: "run" });
@@ -864,8 +867,8 @@ export default {
 			const add = (a, b) => a + b;
 			const newRoll = this.rollD(e, roll.d, 1, 0, `Reroll 1d${roll.d}`);
 
-			this.$set(roll.throws, throw_index, newRoll.total);
-			this.$set(roll, "throwsTotal", roll.throws.reduce(add));
+			roll.throws[throw_index] = newRoll.total;
+			roll["throwsTotal"] = roll.throws.reduce(add);
 			let new_total = roll.throwsTotal + roll.m;
 			// Add total thrown to total when crit
 			if (crit && this.critSettings === "double") {
@@ -876,7 +879,7 @@ export default {
 				new_total = new_total + roll.n * roll.d;
 			}
 
-			this.$set(roll, "total", new_total);
+			roll["total"] = new_total;
 		},
 		missSaveEffect(effect, type) {
 			if (type === "text") {
@@ -938,7 +941,7 @@ export default {
 			font-size: 15px;
 		}
 
-		&::v-deep {
+		&:deep() {
 			.basic-entity__wrapper {
 				margin-bottom: 15px;
 				background-color: $neutral-8;

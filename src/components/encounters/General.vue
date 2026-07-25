@@ -1,12 +1,12 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(edit)" greedy>
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, edit)" greedy>
 				<h3 class="d-flex justify-between">
 					Atmosphere
 					<div v-if="!demo">
 						<q-btn color="primary" type="submit" no-caps>Save</q-btn>
-						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 							<q-tooltip anchor="top middle" self="center middle">
 								There are validation errors
 							</q-tooltip>
@@ -43,7 +43,7 @@
 				</template>
 
 				<template v-else>
-					<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="required" name="Name" v-slot="{ errorMessage }" :modelValue="editableEncounter.name" as="div">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -52,12 +52,12 @@
 							autocomplete="off"
 							class="mb-3"
 							v-model="editableEncounter.name"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						/>
 					</ValidationProvider>
 
-					<ValidationProvider rules="audio" name="Audio" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="audio" name="Audio" v-slot="{ errorMessage }" :modelValue="editableEncounter.audio" as="div">
 						<div class="audio">
 							<div v-if="encounter.audio && !invalid" class="img pointer">
 								<a :href="encounter.audio" target="_blank" rel="noopener">
@@ -79,8 +79,8 @@
 									autocomplete="off"
 									v-model="editableEncounter.audio"
 									placeholder="Audio URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</div>
 						</div>
@@ -94,7 +94,7 @@
 						@input="setBackground($event)"
 						class="mb-3"
 					/>
-					<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
+					<ValidationProvider rules="url" name="Audio" v-slot="{ errorMessage }" :modelValue="editableEncounter.background" as="div">
 						<div class="background mb-3">
 							<div
 								v-if="encounter.background && !invalid"
@@ -115,20 +115,21 @@
 									v-model="editableEncounter.background"
 									class="mb-2"
 									placeholder="Background URL"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-									@input="editableEncounter.hk_background = null"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
+									@update:model-value="editableEncounter.hk_background = null"
 								>
-									<hk-popover
-										slot="append"
-										header="Custom background"
-										v-if="demo || (tier && tier.price !== 'Free')"
-									>
-										<i class="fas fa-info-circle" aria-hidden="true" />
-										<template #content>
-											Setting a custom background will overwrite your selected background.
-										</template>
-									</hk-popover>
+									<template v-slot:append>
+										<hk-popover
+											header="Custom background"
+											v-if="demo || (tier && tier.price !== 'Free')"
+										>
+											<i class="fas fa-info-circle" aria-hidden="true" />
+											<template #content>
+												Setting a custom background will overwrite your selected background.
+											</template>
+										</hk-popover>
+									</template>
 								</q-input>
 							</div>
 						</div>
@@ -146,7 +147,7 @@
 
 					<div v-if="!demo" class="d-flex justify-start items-center mb-3">
 						<q-btn color="primary" type="submit" no-caps>Save</q-btn>
-						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="ml-2">
 							<q-tooltip anchor="top middle" self="center middle">
 								There are validation errors
 							</q-tooltip>
@@ -154,25 +155,27 @@
 					</div>
 
 					<hk-card v-if="!demo && (!tier || tier.price === 'Free')">
-						<div slot="header" class="card-header">
-							<span>
-								<i class="fas fa-cloud-showers" aria-hidden="true" />
-								<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
-								<i class="fas fa-fog" aria-hidden="true" />
-							</span>
-							<strong>Backgrounds & Effects</strong>
-							<span>
-								<i class="fas fa-bolt" aria-hidden="true" />
-								<i class="fas fa-tornado mx-2" aria-hidden="true" />
-								<i class="fas fa-waveform-path" aria-hidden="true" />
-							</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>
+									<i class="fas fa-cloud-showers" aria-hidden="true" />
+									<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
+									<i class="fas fa-fog" aria-hidden="true" />
+								</span>
+								<strong>Backgrounds & Effects</strong>
+								<span>
+									<i class="fas fa-bolt" aria-hidden="true" />
+									<i class="fas fa-tornado mx-2" aria-hidden="true" />
+									<i class="fas fa-waveform-path" aria-hidden="true" />
+								</span>
+							</div>
+						</template>
 						<div class="p-3 text-center">
 							<p>With a subscription you have access to our backgrounds and background effects.</p>
 							<p>
-								<template v-for="(effect, i) in effects">
-									<strong :key="`effect-${effect}`">{{ effect.toUpperCase() }}</strong>
-									<span class="neutral-2 mx-1" :key="`pipe-${effect}`" v-if="i < effects.length - 1"
+								<template v-for="(effect, i) in effects" :key="`effect-${effect}`">
+									<strong>{{ effect.toUpperCase() }}</strong>
+									<span class="neutral-2 mx-1" v-if="i < effects.length - 1"
 										>|</span
 									>
 								</template>
@@ -221,6 +224,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import EditWeather from "./Weather";
 import { audio } from "src/mixins/audio";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "General",
@@ -270,7 +274,7 @@ export default {
 			this.weather = this.encounter.weather;
 		}
 		if (this.editableEncounter && !this.editableEncounter.hk_background) {
-			this.$set(this.editableEncounter, "hk_background", null);
+			this.editableEncounter["hk_background"] = null;
 		}
 	},
 	methods: {
@@ -285,14 +289,10 @@ export default {
 				value: this.editableEncounter,
 			})
 				.then(() => {
-					this.$snotify.success("Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Saved.", "Critical hit!");
 				})
 				.catch(() => {
-					this.$snotify.error("Something went wrong saving the encounter.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Something went wrong saving the encounter.", "Save failed");
 				});
 		},
 		intensity(type) {
@@ -310,7 +310,7 @@ export default {
 			}
 		},
 		setBackground(value) {
-			this.$set(this.editableEncounter, "hk_background", value);
+			this.editableEncounter["hk_background"] = value;
 		},
 		getBackground(encounter) {
 			if (encounter.background) return encounter.background;

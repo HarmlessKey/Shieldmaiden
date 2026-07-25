@@ -11,18 +11,22 @@
 				<div class="card-body">
 					Create a complete character sheet that you can use as a player in your games.
 				</div>
-				<div slot="footer">
-					<button class="btn btn-block">Select</button>
-				</div>
+				<template v-slot:footer>
+					<div>
+						<button class="btn btn-block">Select</button>
+					</div>
+				</template>
 			</hk-card>
 			<hk-card class="disabled" header="Simple" :class="{ active: build === 'simple' }">
 				<div class="card-body">
 					Create a character with only basic stats needed for use in Shieldmaiden. This can't be
 					used as a full character reference in your games, but just works for our combat tracker.
 				</div>
-				<div slot="footer">
-					<button class="btn btn-block disabled">Select</button>
-				</div>
+				<template v-slot:footer>
+					<div>
+						<button class="btn btn-block disabled">Select</button>
+					</div>
+				</template>
 			</hk-card>
 			<hk-card class="disabled" header="Import">
 				<div class="card-body">
@@ -30,9 +34,11 @@
 					Import a character from DnDBeyond. Copy your character sheet over, so it can be used in
 					our combat tracker.
 				</div>
-				<div slot="footer">
-					<button class="btn btn-block disabled">Select</button>
-				</div>
+				<template v-slot:footer>
+					<div>
+						<button class="btn btn-block disabled">Select</button>
+					</div>
+				</template>
 			</hk-card>
 		</div>
 		<div class="d-flex justify-content-center mt-5">

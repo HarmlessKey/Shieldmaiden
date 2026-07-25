@@ -1,22 +1,24 @@
 <template>
 	<div>
 		<hk-card>
-			<div class="card-header p-0" slot="header">
-				<div class="d-flex justify-content-between items-center">
-					<div class="d-flex justify-content-start items-center">
-						<div
-							class="img"
-							@click="avatar_dialog = true"
-							:style="{
-								backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
-							}">
-							<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
+			<template v-slot:header>
+				<div class="card-header p-0">
+					<div class="d-flex justify-content-between items-center">
+						<div class="d-flex justify-content-start items-center">
+							<div
+								class="img"
+								@click="avatar_dialog = true"
+								:style="{
+									backgroundImage: current_avatar ? `url('${current_avatar}')` : ''
+								}">
+								<i aria-hidden="true" v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload" class="hki-monster" />
+							</div>
+							Basic info
 						</div>
-						Basic info
+						<slot name="header-right" />
 					</div>
-					<slot name="header-right" />
 				</div>
-			</div>
+			</template>
 			<div class="card-body">
         <!-- NAME -->
         <div class="row q-col-gutter-md mb-2">
@@ -24,7 +26,9 @@
             <ValidationProvider
               rules="max:100|required"
               name="Name"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.name"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -34,9 +38,9 @@
                 maxlength="100"
                 autocomplete="off"
                 v-model="npc.name"
-                @input="capitalizeName"
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                @update:model-value="capitalizeName"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -44,7 +48,9 @@
             <ValidationProvider
               rules="max:20"
               name="Source"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.source"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -54,8 +60,8 @@
                 maxlength="20"
                 autocomplete="off"
                 v-model="npc.source"
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -67,7 +73,9 @@
             <ValidationProvider
               rules="required"
               name="Size"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.size"
+              as="div"
             >
               <q-select
                 :dark="$store.getters.theme === 'dark'"
@@ -76,8 +84,8 @@
                 label="Size *"
                 v-model="npc.size"
                 :options="monster_sizes"
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -100,7 +108,9 @@
             <ValidationProvider
               rules="required"
               name="Type"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.type"
+              as="div"
             >
               <q-select
                 :dark="$store.getters.theme === 'dark'"
@@ -109,8 +119,8 @@
                 label="Type *"
                 v-model="npc.type"
                 :options="monster_types"
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -133,7 +143,9 @@
             <ValidationProvider
               rules="between:0,999"
               name="Walk speed"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.walk_speed"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -143,10 +155,10 @@
                 autocomplete="off"
                 type="number"
                 v-model.number="npc.walk_speed"
-                @input="parseToInt($event, npc, 'walk_speed')"
+                @update:model-value="parseToInt($event, npc, 'walk_speed')"
                 suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -154,7 +166,9 @@
             <ValidationProvider
               rules="between:0,999"
               name="Swim speed"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.swim_speed"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -164,10 +178,10 @@
                 autocomplete="off"
                 type="number"
                 v-model.number="npc.swim_speed"
-                @input="parseToInt($event, npc, 'swim_speed')"
+                @update:model-value="parseToInt($event, npc, 'swim_speed')"
                 suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -175,7 +189,9 @@
             <ValidationProvider
               rules="between:0,999"
               name="Fly speed"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.fly_speed"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -185,10 +201,10 @@
                 autocomplete="off"
                 type="number"
                 v-model.number="npc.fly_speed"
-                @input="parseToInt($event, npc, 'fly_speed')"
+                @update:model-value="parseToInt($event, npc, 'fly_speed')"
                 suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -196,7 +212,9 @@
             <ValidationProvider
               rules="between:0,999"
               name="Burrow speed"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.burrow_speed"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -206,10 +224,10 @@
                 autocomplete="off"
                 type="number"
                 v-model.number="npc.burrow_speed"
-                @input="parseToInt($event, npc, 'burrow_speed')"
+                @update:model-value="parseToInt($event, npc, 'burrow_speed')"
                 suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               />
             </ValidationProvider>
           </div>
@@ -217,7 +235,9 @@
             <ValidationProvider
               rules="between:0,999"
               name="Climb speed"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.climb_speed"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -227,10 +247,10 @@
                 autocomplete="off"
                 type="number"
                 v-model.number="npc.climb_speed"
-                @input="parseToInt($event, npc, 'climb_speed')"
+                @update:model-value="parseToInt($event, npc, 'climb_speed')"
                 suffix="ft."
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               >
               </q-input>
             </ValidationProvider>
@@ -240,7 +260,13 @@
         <!-- CR -->
         <div class="row q-col-gutter-md mb-2">
           <div class="col-12">
-            <ValidationProvider rules="required" name="CR" v-slot="{ errors, invalid, validated }">
+            <ValidationProvider
+              rules="required"
+              name="CR"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.challenge_rating"
+              as="div"
+            >
               <q-select
                 :dark="$store.getters.theme === 'dark'"
                 filled
@@ -251,8 +277,8 @@
                 :suffix="
                   npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``
                 "
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               >
                 <template v-slot:option="scope">
                   <q-list :dark="$store.getters.theme === 'dark'">
@@ -260,7 +286,7 @@
                       clickable
                       v-ripple
                       v-close-popup
-                      @click="$set(npc, 'challenge_rating', scope.opt)"
+                      @click="npc['challenge_rating'] = scope.opt"
                     >
                       <q-item-section>{{
                         scope.opt == 0.125
@@ -277,10 +303,12 @@
                     </q-item>
                   </q-list>
                 </template>
-                <div slot="after" v-if="npc.challenge_rating" class="pr-3">
-                  +{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
-                  <q-tooltip anchor="top middle" self="center middle"> Proficiency bonus </q-tooltip>
-                </div>
+                <template v-slot:after>
+                  <div v-if="npc.challenge_rating" class="pr-3">
+                    +{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
+                    <q-tooltip anchor="top middle" self="center middle"> Proficiency bonus </q-tooltip>
+                  </div>
+                </template>
               </q-select>
             </ValidationProvider>
           </div>
@@ -378,7 +406,9 @@
             <ValidationProvider
               rules="required|between:1,99"
               name="AC"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.armor_class"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -389,10 +419,10 @@
                 type="number"
                 class="mb-2"
                 v-model.number="npc.armor_class"
-                @input="parseToInt($event, npc, 'armor_class')"
+                @update:model-value="parseToInt($event, npc, 'armor_class')"
                 name="ac"
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               >
                 <template v-slot:prepend>
                   <q-icon name="fas fa-shield" size="xs" />
@@ -404,7 +434,9 @@
             <ValidationProvider
               rules="required|between:1,9999"
               name="HP"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.hit_points"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -415,10 +447,10 @@
                 type="number"
                 class="mb-2"
                 v-model.number="npc.hit_points"
-                @input="parseToInt($event, npc, 'hit_points')"
+                @update:model-value="parseToInt($event, npc, 'hit_points')"
                 name="hp"
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               >
                 <template v-slot:prepend>
                   <q-icon name="fas fa-heart" size="xs" />
@@ -430,7 +462,9 @@
             <ValidationProvider
               rules="hit_dice|max:10"
               name="Hit dice"
-              v-slot="{ errors, invalid, validated }"
+              v-slot="{ errorMessage }"
+              :modelValue="npc.hit_dice"
+              as="div"
             >
               <q-input
                 :dark="$store.getters.theme === 'dark'"
@@ -442,8 +476,8 @@
                 class="mb-2"
                 v-model="npc.hit_dice"
                 name="hit_dice"
-                :error="invalid && validated"
-                :error-message="errors[0]"
+                :error="!!errorMessage"
+                :error-message="errorMessage"
               >
                 <template v-slot:append>
                   <small>{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : "" }}</small>
@@ -486,7 +520,8 @@ import { monsterMixin } from "src/mixins/monster.js";
 
 export default {
   name: "npc-BasicInfo",
-  props: ["value"],
+  props: ["value", "modelValue"],
+  emits: ["input", "update:modelValue"],
   mixins: [general, monsterMixin],
   data() {
     return {
@@ -500,10 +535,11 @@ export default {
     ...mapGetters("campaigns", { all_campaigns: "campaigns" }),
     npc: {
       get() {
-        return this.value;
+        return this.modelValue !== undefined ? this.modelValue : this.value;
       },
       set(newValue) {
         this.$emit("input", newValue);
+        this.$emit("update:modelValue", newValue);
       },
     },
     selectedGroups: {
@@ -515,7 +551,7 @@ export default {
         for (const id of val) {
           groups[id] = true;
         }
-        this.$set(this.npc, "groups", Object.keys(groups).length ? groups : undefined);
+        this.npc.groups = Object.keys(groups).length ? groups : undefined;
       },
     },
     groupOptions() {
@@ -564,9 +600,9 @@ export default {
     ...mapActions("campaigns", ["get_campaigns"]),
     parseToInt(value, object, property) {
       if (value === undefined || value === "") {
-        this.$delete(object, property);
+        delete object[property];
       } else {
-        this.$set(object, property, parseInt(value));
+        object[property] = parseInt(value);
       }
     },
     // Capitalizes every word in the name of the NPC
@@ -575,21 +611,21 @@ export default {
     },
     saveBlob(value) {
       // Clear the image url
-      this.$delete(this.npc, "avatar");
-      this.$set(this.npc, "blob", value.blob);
+      delete this.npc["avatar"];
+      this.npc["blob"] = value.blob;
       this.preview_new_upload = value.dataUrl;
       this.avatar_dialog = false;
     },
     saveUrl(value) {
-      this.$delete(this.npc, "storage_avatar");
-      this.$set(this.npc, "avatar", value);
+      delete this.npc["storage_avatar"];
+      this.npc["avatar"] = value;
       this.preview_new_upload = undefined;
       this.avatar_dialog = false;
     },
     clearAvatar() {
-      this.$delete(this.npc, "avatar");
-      this.$delete(this.npc, "storage_avatar");
-      this.$delete(this.npc, "blob");
+      delete this.npc["avatar"];
+      delete this.npc["storage_avatar"];
+      delete this.npc["blob"];
       this.preview_new_upload = undefined;
       this.avatar_dialog = false;
     },

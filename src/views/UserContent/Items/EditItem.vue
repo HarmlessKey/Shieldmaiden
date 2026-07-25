@@ -1,26 +1,28 @@
 <template>
 	<div class="content__edit">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveItem(valid))">
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, () => saveItem(meta.valid))">
 				<hk-card header="Your Item">
-					<div slot="header" class="card-header">
-						{{ item.name ? item.name : "New item" }}
+					<template v-slot:header>
+						<div class="card-header">
+							{{ item.name ? item.name : "New item" }}
 
-						<a
-							v-if="$route.name == 'Add item' && !itemId"
-							class="btn btn-sm bg-neutral-5"
-							@click="copy_dialog = true"
-						>
-							Copy item
-							<i aria-hidden="true" class="ml-1 fas fa-copy" />
-						</a>
-					</div>
+							<a
+								v-if="$route.name == 'Add item' && !itemId"
+								class="btn btn-sm bg-neutral-5"
+								@click="copy_dialog = true"
+							>
+								Copy item
+								<i aria-hidden="true" class="ml-1 fas fa-copy" />
+							</a>
+						</div>
+					</template>
 					<div class="card-body">
 						<!-- NAME -->
 						<ValidationProvider
 							rules="max:100|required"
 							name="Name"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="item.name" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -32,8 +34,8 @@
 								class="mb-2"
 								v-model="item.name"
 								maxlength="100"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 
@@ -51,7 +53,7 @@
 								<ValidationProvider
 									rules="url"
 									name="Image"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="item.image" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -62,8 +64,8 @@
 										type="text"
 										v-model="item.image"
 										placeholder="Image URL"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 							</div>
@@ -72,7 +74,7 @@
 						<ValidationProvider
 							rules="max:5000"
 							name="Description"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="item.desc" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -84,62 +86,64 @@
 								type="text"
 								v-model="item.desc"
 								maxlength="5000"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 					</div>
 				</hk-card>
 
 				<hk-card>
-					<div slot="header" class="card-header">
-						<span> <i aria-hidden="true" class="fal fa-table"></i> Info Tables </span>
-						<a slot="after" class="btn bg-neutral-5">
-							<i aria-hidden="true" class="fas fa-plus"></i> Add table
-							<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
-								<div class="bg-neutral-8 px-2 py-2">
-									<p>Add a table</p>
-									<ValidationProvider
-										rules="required|numeric|between:1,10"
-										name="Columns"
-										v-slot="{ errors, invalid, validated }"
-									>
-										<q-input
-											:dark="$store.getters.theme === 'dark'"
-											filled
-											square
-											label="Columns"
-											type="number"
-											max="10"
-											min="1"
-											class="mb-4"
-											v-model="columns"
-											:error="invalid && validated"
-											:error-message="errors[0]"
-											hint="How many columns?"
-										/>
-										<div class="d-flex justify-content-end mt-2">
-											<q-btn flat class="bg-neutral-8 mr-1" no-caps v-close-popup>Cancel</q-btn>
-											<q-btn
-												color="primary"
-												v-close-popup
-												no-caps
-												@click="!invalid ? addTable() : null"
-												:disabled="invalid"
-											>
-												Add table
-											</q-btn>
-										</div>
-									</ValidationProvider>
-								</div>
-							</q-popup-proxy>
-						</a>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							<span> <i aria-hidden="true" class="fal fa-table"></i> Info Tables </span>
+							<a class="btn bg-neutral-5">
+								<i aria-hidden="true" class="fas fa-plus"></i> Add table
+								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+									<div class="bg-neutral-8 px-2 py-2">
+										<p>Add a table</p>
+										<ValidationProvider
+											rules="required|numeric|between:1,10"
+											name="Columns"
+											v-slot="{ errorMessage }" :modelValue="columns" as="div"
+										>
+											<q-input
+												:dark="$store.getters.theme === 'dark'"
+												filled
+												square
+												label="Columns"
+												type="number"
+												max="10"
+												min="1"
+												class="mb-4"
+												v-model="columns"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
+												hint="How many columns?"
+											/>
+											<div class="d-flex justify-content-end mt-2">
+												<q-btn flat class="bg-neutral-8 mr-1" no-caps v-close-popup>Cancel</q-btn>
+												<q-btn
+													color="primary"
+													v-close-popup
+													no-caps
+													@click="!invalid ? addTable() : null"
+													:disabled="invalid"
+												>
+													Add table
+												</q-btn>
+											</div>
+										</ValidationProvider>
+									</div>
+								</q-popup-proxy>
+							</a>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-list v-if="item.tables" :dark="$store.getters.theme === 'dark'" :class="`accordion`">
 							<ValidationObserver
 								v-for="(table, tableIndex) in item.tables"
-								v-slot="{ valid }"
+								v-slot="{ meta }" as="div"
 								:key="tableIndex"
 							>
 								<q-expansion-item
@@ -151,7 +155,7 @@
 									leave-active-class="animated animate__fadeOut"
 								>
 									<template v-slot:header>
-										<q-item-section avatar v-if="!valid">
+										<q-item-section avatar v-if="!meta.valid">
 											<q-icon name="error" color="red" />
 											<q-tooltip anchor="top middle" self="center middle">
 												Validation errors in table
@@ -171,7 +175,7 @@
 										<ValidationProvider
 											rules="max:100"
 											name="Table name"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="table.name" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -181,8 +185,8 @@
 												v-model="table.name"
 												class="mb-3"
 												name="table name"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 
@@ -194,7 +198,7 @@
 												<ValidationProvider
 													rules="required|max:100"
 													:name="`Column header ${i + 1}`"
-													v-slot="{ errors, invalid, validated }"
+													v-slot="{ errorMessage }" :modelValue="table.header[i]" as="div"
 												>
 													<q-input
 														:dark="$store.getters.theme === 'dark'"
@@ -203,15 +207,15 @@
 														v-model="table.header[i]"
 														:placeholder="`Column header ${i + 1}`"
 														maxlength="100"
-														:error="invalid && validated"
-														:error-message="errors[0]"
+														:error="!!errorMessage"
+														:error-message="errorMessage"
 													/>
 												</ValidationProvider>
 											</div>
 											<a @click="addRow(tableIndex)" class="remove green"
 												><i aria-hidden="true" class="fas fa-plus"
 											/></a>
-											<template v-for="(row, rowIndex) in table.rows">
+											<template v-for="(row, rowIndex) in table.rows" :key="rowIndex">
 												<div
 													v-for="(col, colIndex) in table.rows[rowIndex].columns"
 													:key="`column-${rowIndex}-${colIndex}`"
@@ -219,7 +223,7 @@
 													<ValidationProvider
 														rules="required|max:5000"
 														:name="`Column ${colIndex + 1}`"
-														v-slot="{ errors, invalid, validated }"
+														v-slot="{ errorMessage }" :modelValue="table.rows[rowIndex].columns[colIndex]" as="div"
 													>
 														<q-input
 															:dark="$store.getters.theme === 'dark'"
@@ -229,15 +233,14 @@
 															v-model="table.rows[rowIndex].columns[colIndex]"
 															:placeholder="`Column ${colIndex + 1}`"
 															maxlength="5000"
-															:error="invalid && validated"
-															:error-message="errors[0]"
+															:error="!!errorMessage"
+															:error-message="errorMessage"
 														/>
 													</ValidationProvider>
 												</div>
 												<a
 													class="red remove"
 													@click="removeRow(tableIndex, rowIndex)"
-													:key="`remove-${rowIndex}`"
 													><i aria-hidden="true" class="fas fa-trash-alt"></i
 												></a>
 											</template>
@@ -263,10 +266,12 @@
 
 		<q-dialog v-model="copy_dialog">
 			<hk-card header="Copy Existing Item" :min-width="300">
-				<div slot="header" class="card-header">
-					<span>Copy existing item</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Copy existing item</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<CopyContent @copy="copy" type="item" />
 				</div>
@@ -279,6 +284,7 @@
 import { mapActions, mapGetters } from "vuex";
 import { general } from "src/mixins/general.js";
 import CopyContent from "src/components/CopyContent";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 export default {
 	name: "EditItem",
@@ -331,9 +337,7 @@ export default {
 		},
 		saveItem(valid) {
 			if (!valid) {
-				this.$snotify.error("There are validation errors.", "Critical miss!", {
-					position: "rightTop",
-				});
+				notifyError("There are validation errors.", "Critical miss!");
 				return;
 			}
 			if (this.$route.name === "Add item" && !this.itemId) {
@@ -345,11 +349,9 @@ export default {
 		addItem() {
 			this.add_item(this.item).then(
 				(key) => {
-					this.$set(this, "itemId", key);
+					this["itemId"] = key;
 
-					this.$snotify.success("Item Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Item Saved.", "Critical hit!");
 
 					this.item_copy = JSON.stringify(this.item);
 					this.unsaved_changes = false;
@@ -357,9 +359,7 @@ export default {
 					this.$router.replace(`/content/items`);
 				},
 				(error) => {
-					this.$snotify.error("Couldn't save item.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Couldn't save item.", "Save failed");
 					console.error(error);
 					console.log(this.item);
 				}
@@ -372,18 +372,14 @@ export default {
 				item: this.item,
 			}).then(
 				() => {
-					this.$snotify.success("Item Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Item Saved.", "Critical hit!");
 
 					this.item_copy = JSON.stringify(this.item);
 					this.unsaved_changes = false;
 					this.$router.replace(`/content/items`);
 				},
 				(error) => {
-					this.$snotify.error("Couldn't save monster.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Couldn't save monster.", "Save failed");
 					console.error(error);
 					console.log(this.item);
 				}
@@ -393,7 +389,7 @@ export default {
 			if (this.columns !== undefined) {
 				this.columns = parseInt(this.columns);
 				if (this.item.tables === undefined) {
-					this.$set(this.item, "tables", []);
+					this.item["tables"] = [];
 				}
 				this.item.tables.push({
 					columns: this.columns,
@@ -413,10 +409,10 @@ export default {
 			});
 		},
 		removeRow(tableIndex, rowIndex) {
-			this.$delete(this.item.tables[tableIndex].rows, rowIndex);
+			this.item.tables[tableIndex].rows.splice(rowIndex, 1);
 		},
 		removeTable(key) {
-			this.$delete(this.item.tables, key);
+			this.item.tables.splice(key, 1);
 		},
 	},
 };

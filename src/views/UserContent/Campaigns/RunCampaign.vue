@@ -185,7 +185,9 @@
 					emit-value
 					class="px-4 bg-neutral-9 tab-select"
 				>
-					<hk-icon slot="prepend" :icon="tab_icon" />
+					<template v-slot:prepend>
+						<hk-icon :icon="tab_icon" />
+					</template>
 				</hk-select>
 				<q-tab-panels v-model="mobile_tab" class="bg-transparent" animated swipeable infinite>
 					<q-tab-panel name="encounters">
@@ -470,24 +472,20 @@ export default {
 	.splitpanes__pane,
 	.q-tab-panel {
 		padding: 0;
-		&::v-deep {
-			.pane {
-				&__header {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					background-color: $neutral-8;
-					min-height: 51px;
-					padding: 10px;
-					position: sticky;
-					top: 0;
-					z-index: 10;
-				}
-				&__content {
-					padding: 10px;
-				}
+		:deep(.pane__header) {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				background-color: $neutral-8;
+				min-height: 51px;
+				padding: 10px;
+				position: sticky;
+				top: 0;
+				z-index: 10;
 			}
-		}
+		:deep(.pane__content) {
+				padding: 10px;
+			}
 	}
 }
 </style>

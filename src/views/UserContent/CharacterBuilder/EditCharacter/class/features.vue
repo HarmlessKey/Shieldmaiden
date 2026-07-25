@@ -9,7 +9,7 @@
 			v-model="subclass.asi"
 			:options="levels"
 			multiple
-			@input="save(valid)"
+			@update:model-value="save(valid)"
 		/>
 		<q-list
 			:dark="$store.getters.theme === 'dark'"
@@ -79,8 +79,8 @@
 									{ value: 'asi', label: 'Ability Score Improvement' },
 									{ value: 'feat', label: 'Feat' },
 								]"
-								@input="saveFeatureType(level, $event)"
-								:value="asiOrFeat(level)"
+								@update:model-value="saveFeatureType(level, $event)"
+								:model-value="asiOrFeat(level)"
 							/>
 						</template>
 
@@ -94,9 +94,9 @@
 									square
 									:label="`Ability ${i + 1}`"
 									:options="abilities"
-									:value="asi_modifiers(level)[i]"
+									:model-value="asi_modifiers(level)[i]"
 									name="asi"
-									@input="saveASI($event, level, i, valid)"
+									@update:model-value="saveASI($event, level, i, valid)"
 								/>
 							</div>
 						</div>
@@ -110,12 +110,12 @@
 									label="Display on character sheet"
 									:false-value="null"
 									indeterminate-value="something-else"
-									@input="save(valid)"
+									@update:model-value="save(valid)"
 								/>
 								<ValidationProvider
 									rules="required|max:30"
 									name="Feature name"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="character.class.classes[classIndex].features[feature.index].name" as="div"
 								>
 									<q-input
 										:dark="$store.getters.theme === 'dark'"
@@ -126,23 +126,23 @@
 										type="text"
 										v-model="character.class.classes[classIndex].features[feature.index].name"
 										:placeholder="index === 'asi' ? 'Feat name' : 'Feature name'"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									/>
 								</ValidationProvider>
 
 								<ValidationProvider
 									rules="max:2000"
 									name="Description"
-									v-slot="{ errors, invalid, validated }"
+									v-slot="{ errorMessage }" :modelValue="feature.description" as="div"
 								>
 									<hk-markdown-editor
 										v-model="
 											character.class.classes[classIndex].features[feature.index].description
 										"
 										@change="save(valid)"
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 										label="Description"
 									>
 										<character-descriptions
@@ -195,6 +195,7 @@ import { mapActions } from "vuex";
 import Modifier from "src/components/characters/modifier.vue";
 import ModifierTable from "src/components/characters/modifier-table.vue";
 import CharacterDescriptions from "src/components/characters/character-descriptions";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterClassFeatures",
@@ -285,29 +286,11 @@ export default {
 		},
 
 		confirmDeleteFeature(level, index, name, valid) {
-			this.$snotify.error(
-				'Are you sure you want to delete the the feature "' + name + '"?',
-				"Delete feature",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteFeature(level, index, valid);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Delete feature",
+				message: 'Are you sure you want to delete the the feature "' + name + '"?',
+				onOk: () => this.deleteFeature(level, index, valid),
+			});
 		},
 		deleteFeature(level, index, valid) {
 			this.character.delete_feature(this.classIndex, level, index);

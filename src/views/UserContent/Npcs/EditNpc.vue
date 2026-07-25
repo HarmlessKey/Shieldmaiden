@@ -1,7 +1,7 @@
 <template>
 	<div class="content__edit" v-if="!loading">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveNpc)" greedy>
+		<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+			<q-form @submit="handleSubmit($event, saveNpc)" greedy>
 				<div>
 					<div class="top">
 						<div>
@@ -11,7 +11,7 @@
 							</q-btn>
 						</div>
 						<div>
-							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+							<q-icon v-if="!meta.valid" name="error" color="red" size="sm" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
 								</q-tooltip>
@@ -58,7 +58,7 @@
 					<!-- HANDLING -->
 					<div class="save">
 						<div class="buttons">
-							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+							<q-icon v-if="!meta.valid" name="error" color="red" size="md" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
 								</q-tooltip>
@@ -80,7 +80,7 @@
 							<q-btn v-if="user" label="Save" type="submit" color="primary" no-caps />
 							<q-btn
 								v-else
-								:disabled="!valid"
+								:disabled="!meta.valid"
 								color="primary"
 								no-caps
 								@click="account_dialog = true"
@@ -107,10 +107,12 @@
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">
 			<hk-card class="create-dialog">
-				<div slot="header" class="card-header">
-					<span>Copy existing NPC</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Copy existing NPC</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<CopyContent @copy="copy" type="monster" />
 				</div>
@@ -119,30 +121,36 @@
 
 		<q-dialog v-model="account_dialog">
 			<hk-card class="account-dialog">
-				<div slot="header" class="card-header">
-					<span>Save your monster</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Save your monster</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<p>Create an account to save your monster and use it in our Combat Tracker.</p>
 					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
 						Create Free Account
 					</button>
 				</div>
-				<div slot="footer" class="card-footer">
-					<q-btn no-caps @click="download">
-						Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
-					</q-btn>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<q-btn no-caps @click="download">
+							Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+						</q-btn>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
 		<q-dialog v-model="create_dialog" persistent position="top">
 			<hk-card class="create-dialog">
-				<div slot="header" class="card-header">
-					<div v-if="generating"><span class="loader">Generating your monster</span></div>
-					<template v-else> How do you want to do this? </template>
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<div v-if="generating"><span class="loader">Generating your monster</span></div>
+						<template v-else> How do you want to do this? </template>
+					</div>
+				</template>
 				<div
 					v-if="!generate_monster"
 					class="card-body"
@@ -173,16 +181,18 @@
 				<template v-if="generate_monster">
 					<GenerateMonster @generating="setGenerating" @finished="finishedGenerate" />
 				</template>
-				<div v-if="copy_monster || generate_monster" class="card-footer" slot="footer">
-					<button
-						v-if="!generating"
-						class="btn btn-sm bg-neutral-5"
-						@click="((copy_monster = false), (generate_monster = false))"
-					>
-						<i class="fas fa-times mr-1" aria-hidden="true" />
-						Cancel
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div v-if="copy_monster || generate_monster" class="card-footer">
+						<button
+							v-if="!generating"
+							class="btn btn-sm bg-neutral-5"
+							@click="((copy_monster = false), (generate_monster = false))"
+						>
+							<i class="fas fa-times mr-1" aria-hidden="true" />
+							Cancel
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
@@ -208,6 +218,7 @@ import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import { notifySuccess, notifyError, confirmAction } from "src/utils/notify";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
@@ -363,11 +374,9 @@ export default {
 				.then((key) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
-					this.$set(this, "npcId", key);
+					this["npcId"] = key;
 
-					this.$snotify.success("Monster Saved.", "Critical hit!", {
-						position: "rightTop",
-					});
+					notifySuccess("Monster Saved.", "Critical hit!");
 
 					// Capitalize before stringify so changes found isn't triggered
 					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
@@ -375,9 +384,7 @@ export default {
 					this.unsaved_changes = false;
 				})
 				.catch((error) => {
-					this.$snotify.error("Couldn't save monster.", "Save failed", {
-						position: "rightTop",
-					});
+					notifyError("Couldn't save monster.", "Save failed");
 					console.error(error);
 					console.log(this.npc);
 				});
@@ -388,9 +395,7 @@ export default {
 				id: this.npcId,
 				npc: this.npc,
 			}).then(() => {
-				this.$snotify.success("Monster Saved.", "Critical hit!", {
-					position: "rightTop",
-				});
+				notifySuccess("Monster Saved.", "Critical hit!");
 
 				this.unsaved_changes = false;
 
@@ -408,30 +413,11 @@ export default {
 	},
 	beforeRouteLeave(to, from, next) {
 		if (this.unsaved_changes) {
-			this.$snotify.error(
-				"There are unsaved changes in the form.\n Would you like to continue?",
-				"Unsaved Changes",
-				{
-					buttons: [
-						{
-							text: "Leave",
-							action: (toast) => {
-								next();
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "Stay",
-							action: (toast) => {
-								next(false);
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+			confirmAction({
+				title: "Unsaved Changes",
+				message: "There are unsaved changes in the form.\n Would you like to continue?",
+				onOk: () => next(),
+			});
 		} else {
 			next();
 		}

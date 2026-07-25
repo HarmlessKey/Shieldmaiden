@@ -1,14 +1,16 @@
 <template>
 	<div>
 		<hk-card>
-			<div slot="header" class="card-header d-flex justify-content-between">
-				Spell actions
-				<a class="btn btn-sm bg-neutral-5" @click="add_action()">
-					<i aria-hidden="true" class="fas fa-plus green"></i>
-					<span class="d-none d-md-inline ml-1">Add</span>
-					<q-tooltip anchor="top middle" self="center middle"> Add action </q-tooltip>
-				</a>
-			</div>
+			<template v-slot:header>
+				<div class="card-header d-flex justify-content-between">
+					Spell actions
+					<a class="btn btn-sm bg-neutral-5" @click="add_action()">
+						<i aria-hidden="true" class="fas fa-plus green"></i>
+						<span class="d-none d-md-inline ml-1">Add</span>
+						<q-tooltip anchor="top middle" self="center middle"> Add action </q-tooltip>
+					</a>
+				</div>
+			</template>
 			<div class="card-body">
 				<p>
 					Spell actions are the parts of a spell that can be rolled. By adding spell actions to your
@@ -17,7 +19,7 @@
 				<ValidationProvider
 					rules="between:1,25"
 					name="Projectiles"
-					v-slot="{ errors, invalid, validated }"
+					v-slot="{ errorMessage }" :modelValue="spell.projectiles" as="div"
 				>
 					<q-input
 						:dark="$store.getters.theme === 'dark'"
@@ -28,26 +30,29 @@
 						autocomplete="off"
 						type="number"
 						class="mb-2"
-						:error="invalid && validated"
-						:error-message="errors[0]"
+						:error="!!errorMessage"
+						:error-message="errorMessage"
 						@keyup="$forceUpdate()"
-						@input="(value) => parseToInt(value, spell, 'projectiles')"
+						@update:model-value="(value) => parseToInt(value, spell, 'projectiles')"
 					>
-						<hk-popover slot="append" header="Projectiles">
-							<i class="fas fa-info-circle" aria-hidden="true" />
-							<template #content>
-								Some spells, like Magic Missiles (phb 257) have multiple projectiles that can be
-								fired to different targets. For each projectile, every spell action is rolled.
-							</template>
-						</hk-popover>
-						<button
-							v-if="spell.projectiles && spell.scaling && spell.scaling != 'none'"
-							slot="after"
-							@click.prevent="scaling_dialog = true"
-							class="btn bg-neutral-5"
-						>
-							<i class="fas fa-chart-line" aria-hidden="true" />
-						</button>
+						<template v-slot:append>
+							<hk-popover header="Projectiles">
+								<i class="fas fa-info-circle" aria-hidden="true" />
+								<template #content>
+									Some spells, like Magic Missiles (phb 257) have multiple projectiles that can be
+									fired to different targets. For each projectile, every spell action is rolled.
+								</template>
+							</hk-popover>
+						</template>
+						<template v-slot:after>
+							<button
+								v-if="spell.projectiles && spell.scaling && spell.scaling != 'none'"
+								@click.prevent="scaling_dialog = true"
+								class="btn bg-neutral-5"
+							>
+								<i class="fas fa-chart-line" aria-hidden="true" />
+							</button>
+						</template>
 					</q-input>
 				</ValidationProvider>
 				<q-select
@@ -66,21 +71,23 @@
 					@new-value="addOption"
 					@remove="removeOption"
 				>
-					<hk-popover slot="append" header="Action options">
-						<i class="fas fa-info-circle" aria-hidden="true" />
-						<template #content>
-							Options allow you to create slightly different rolls for the actions and choose to use
-							this spell with one of the options. Think of versatile weapon attacks where you roll a
-							different damage die for 1- or 2-handed attacks.
-						</template>
-					</hk-popover>
+					<template v-slot:append>
+						<hk-popover header="Action options">
+							<i class="fas fa-info-circle" aria-hidden="true" />
+							<template #content>
+								Options allow you to create slightly different rolls for the actions and choose to use
+								this spell with one of the options. Think of versatile weapon attacks where you roll a
+								different damage die for 1- or 2-handed attacks.
+							</template>
+						</hk-popover>
+					</template>
 				</q-select>
 
 				<!-- ACTION LIST -->
 				<q-list :dark="$store.getters.theme === 'dark'" class="accordion">
 					<ValidationObserver
 						v-for="(action, action_index) in spell.actions"
-						v-slot="{ valid }"
+						v-slot="{ meta }" as="div"
 						:key="`action-${action_index}`"
 					>
 						<q-expansion-item
@@ -113,7 +120,7 @@
 										<ValidationProvider
 											rules="required|max:100"
 											name="Attack type"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="action.name" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
@@ -124,8 +131,8 @@
 												autocomplete="off"
 												class="mb-2"
 												@keyup="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -136,7 +143,7 @@
 										<ValidationProvider
 											rules="required"
 											name="Attack type"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="action.type" as="div"
 										>
 											<q-select
 												:dark="$store.getters.theme === 'dark'"
@@ -148,9 +155,9 @@
 												:options="Object.values(attack_types)"
 												v-model="action.type"
 												class="mb-2"
-												@input="$forceUpdate()"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												@update:model-value="$forceUpdate()"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											/>
 										</ValidationProvider>
 									</div>
@@ -168,7 +175,7 @@
 											v-model="action.save_ability"
 											:disable="action.type !== 'save'"
 											class="mb-2"
-											@input="$forceUpdate()"
+											@update:model-value="$forceUpdate()"
 										/>
 									</div>
 								</div>
@@ -200,8 +207,8 @@
 
 		<q-dialog v-model="roll_dialog">
 			<div v-if="roll">
-				<ValidationObserver v-slot="{ handleSubmit, valid }">
-					<q-form @submit="handleSubmit(saveRoll)">
+				<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+					<q-form @submit="handleSubmit($event, saveRoll)">
 						<hk-card :header="edit_index !== undefined ? 'Edit roll' : 'New roll'" class="mb-0">
 							<div class="card-body">
 								<hk-action-roll-form
@@ -211,16 +218,18 @@
 									:spell="spell"
 								/>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
-								<q-btn
-									color="primary"
-									type="submit"
-									no-caps
-									:disabled="!valid"
-									:label="edit_index !== undefined ? 'Save' : 'Add'"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-end">
+									<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
+									<q-btn
+										color="primary"
+										type="submit"
+										no-caps
+										:disabled="!meta.valid"
+										:label="edit_index !== undefined ? 'Save' : 'Add'"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>
@@ -240,9 +249,11 @@
 									@input="$forceUpdate()"
 								/>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" v-close-popup no-caps>Close</q-btn>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-end">
+									<q-btn class="mr-1" v-close-popup no-caps>Close</q-btn>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>
@@ -259,7 +270,9 @@ export default {
 	name: "spells-Actions",
 	props: {
 		value: Object,
+		modelValue: Object,
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			editing: false,
@@ -276,10 +289,11 @@ export default {
 	computed: {
 		spell: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},
@@ -287,9 +301,9 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		add_action() {
@@ -303,7 +317,7 @@ export default {
 			this.$forceUpdate();
 		},
 		remove_action(index) {
-			this.$delete(this.spell.actions, index);
+			this.spell.actions.splice(index, 1);
 		},
 		newRoll(action, action_index) {
 			this.edit_index = undefined; // It's new, so no edit index
@@ -325,9 +339,9 @@ export default {
 					? []
 					: this.spell.actions[this.action_index].rolls;
 				rolls.push(this.roll);
-				this.$set(this.spell.actions[this.action_index], "rolls", rolls);
+				this.spell.actions[this.action_index]["rolls"] = rolls;
 			} else {
-				this.$set(this.spell.actions[this.action_index].rolls, this.edit_index, this.roll);
+				this.spell.actions[this.action_index].rolls[this.edit_index] = this.roll;
 			}
 			this.roll = {};
 			this.edit_index = undefined;
@@ -341,7 +355,7 @@ export default {
 			this.roll = undefined;
 		},
 		removeRoll(index) {
-			this.$delete(this.rolls, index);
+			this.rolls.splice(index, 1);
 		},
 
 		/**
@@ -363,7 +377,7 @@ export default {
 					if (action.rolls) {
 						for (const roll of action.rolls) {
 							if (roll.options) {
-								this.$delete(roll.options, details.value);
+								delete roll.options[details.value];
 							}
 						}
 					}

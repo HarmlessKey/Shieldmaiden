@@ -1,7 +1,7 @@
 <template>
 	<hk-card>
-		<template v-if="!loading">
-			<div slot="header" class="card-header">
+		<template v-slot:header>
+			<div v-if="!loading" class="card-header">
 				<h1>
 					{{ not_found ? "Spell not found" : spell.name.capitalizeEach() }}
 				</h1>
@@ -9,15 +9,17 @@
 					<span class="neutral-3">
 						{{ spell.page }}
 					</span>
-					<hk-share 
-						v-if="!not_found" 
-						:title="spell.meta.title" 
-						:text="spell.meta.description" 
+					<hk-share
+						v-if="!not_found"
+						:title="spell.meta.title"
+						:text="spell.meta.description"
 						size="sm"
 						class="ml-1"
 					/>
 				</div>
 			</div>
+		</template>
+		<template v-if="!loading">
 			<div class="card-body">
 				<template v-if="not_found">
 					<p>Could not find spell <strong>{{ id }}</strong></p>
@@ -33,6 +35,7 @@
 </template>
 
 <script>
+	import { EventBus } from "src/event-bus";
 	import { mapGetters } from "vuex";
 	import Spell from "src/components/compendium/Spell";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
@@ -72,7 +75,7 @@
 			if(this.spell) {
 				this.loading = false;
 				// Root emit with the spell name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.spell.name);
+				EventBus.emit('route-name', this.spell.name);
 			} else {
 				this.not_found = true;
 				this.loading = false;

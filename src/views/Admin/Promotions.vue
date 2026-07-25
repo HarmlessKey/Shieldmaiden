@@ -9,7 +9,7 @@
 		</div>
 		<div class="card-body">
 			<q-table
-				:data="promotions"
+				:rows="promotions"
 				:columns="columns"
 				row-key="key"
 				card-class="bg-none"
@@ -20,8 +20,12 @@
 				:pagination="{ rowsPerPage: 15 }"
 				wrap-cells
 			>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="Promotions" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="Promotions" />
+				</template>
 				<template v-slot:body="props">
 					<q-tr
 						:props="props"
@@ -193,16 +197,18 @@
 									</template>
 								</q-select>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-end">
-								<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
-								<q-btn
-									type="submit"
-									no-caps
-									:label="`${update_promotion ? 'Edit' : 'Add'} Promotion`"
-									class="mr-1"
-									color="primary"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-end">
+									<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
+									<q-btn
+										type="submit"
+										no-caps
+										:label="`${update_promotion ? 'Edit' : 'Add'} Promotion`"
+										class="mr-1"
+										color="primary"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</div>
@@ -214,6 +220,7 @@
 <script>
 import { promotionService } from "src/services/promotions";
 import { legacy_tiers } from "src/utils/generalConstants";
+import { notifyError } from "src/utils/notify";
 
 export default {
 	name: "Promotions",
@@ -295,7 +302,7 @@ export default {
 				this.update_promotion = false;
 				this.newPromotion = {};
 			} catch (error) {
-				this.$snotify.error(error);
+				notifyError(error);
 			}
 		},
 		async deletePromotion(promotion_name) {

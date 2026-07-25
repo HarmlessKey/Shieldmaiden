@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { notifySuccess, notifyError } from "src/utils/notify";
 export default {
 	name: "hk-share-button",
 	props: {
@@ -46,7 +47,7 @@ export default {
 	},
 	computed: {
 		share_available() {
-			return process.browser && navigator.share !== undefined;
+			return typeof window !== "undefined" && navigator.share !== undefined;
 		},
 	},
 	methods: {
@@ -59,13 +60,9 @@ export default {
 				const successful = document.execCommand("copy");
 				const msg = successful ? "Successful" : "Unsuccessful";
 
-				this.$snotify.success(msg, "Link copied", {
-					position: "rightTop",
-				});
+				notifySuccess(msg, "Link copied");
 			} catch (err) {
-				this.$snotify.error("Unsuccessful", "Link not copied", {
-					position: "rightTop",
-				});
+				notifyError("Unsuccessful", "Link not copied");
 			}
 
 			/* unselect the range */

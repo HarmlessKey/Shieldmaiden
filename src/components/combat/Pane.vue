@@ -77,7 +77,7 @@ export default {
 		max-width: 100%;
 
 		// Position relative on scrollarea__content causes target items to overflow horizontally
-		&::v-deep {
+		&:deep() {
 			.q-scrollarea__content {
 				position: unset;
 			}

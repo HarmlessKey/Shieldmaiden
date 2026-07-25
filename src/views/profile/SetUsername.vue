@@ -8,7 +8,7 @@
 					<ValidationProvider
 						rules="required|alpha_num|min:3|max:20|username"
 						name="Username"
-						v-slot="{ errors, invalid, validated }"
+						v-slot="{ errorMessage }" :modelValue="username" as="div"
 					>
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
@@ -21,8 +21,8 @@
 							maxlength="20"
 							minlength="3"
 							v-model="username"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						/>
 						<button
 							class="btn btn-block"
@@ -41,6 +41,7 @@
 <script>
 import { db, firebase } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
+import { notifySuccess } from "src/utils/notify";
 
 export default {
 	name: "Username",
@@ -83,9 +84,7 @@ export default {
 					method: "Set Username",
 				});
 
-				this.$snotify.success("Username saved.", "Critical hit!", {
-					position: "centerTop",
-				});
+				notifySuccess("Username saved.", "Critical hit!");
 				await this.reinitialize();
 				this.$router.replace("/profile");
 			}

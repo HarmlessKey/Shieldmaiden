@@ -8,15 +8,16 @@
 			v-model="editable_entity.initiative"
 			@keydown.enter="setInitiative(editable_entity.initiative)"
 		>
-			<q-btn
-				slot="after"
-				color="primary"
-				v-close-popup
-				no-caps
-				@click.stop="setInitiative(editable_entity.initiative)"
-			>
-				Save
-			</q-btn>
+			<template v-slot:after>
+				<q-btn
+					color="primary"
+					v-close-popup
+					no-caps
+					@click.stop="setInitiative(editable_entity.initiative)"
+				>
+					Save
+				</q-btn>
+			</template>
 		</hk-input>
 	</quick-edit>
 </template>
@@ -50,7 +51,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
+:deep() {
 	.q-input {
 		max-width: 180px;
 	}

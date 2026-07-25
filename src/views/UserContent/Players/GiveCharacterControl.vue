@@ -6,13 +6,15 @@
 			filled
 			square
 			label="Controlled by"
-			:value="controlUser.username"
+			:model-value="controlUser.username"
 			readonly
 		>
-			<button slot="append" class="btn btn-sm bg-neutral-5" @click="removeControl()">
-				<i aria-hidden="true" class="fas fa-times red" />
-				<q-tooltip anchor="top middle" self="center middle"> Remove control </q-tooltip>
-			</button>
+			<template v-slot:append>
+				<button class="btn btn-sm bg-neutral-5" @click="removeControl()">
+					<i aria-hidden="true" class="fas fa-times red" />
+					<q-tooltip anchor="top middle" self="center middle"> Remove control </q-tooltip>
+				</button>
+			</template>
 		</q-input>
 		<div v-else>
 			<q-input
@@ -27,20 +29,24 @@
 				:error="foundUser === false && findUser !== ''"
 				:error-message="`User not found`"
 			>
-				<button slot="append" class="btn btn-sm bg-neutral-5" @click="find_user()">
-					<i aria-hidden="true" class="fas fa-search" />
-				</button>
+				<template v-slot:append>
+					<button class="btn btn-sm bg-neutral-5" @click="find_user()">
+						<i aria-hidden="true" class="fas fa-search" />
+					</button>
+				</template>
 
-				<hk-popover slot="after" header="Give player control">
-					<q-icon name="info" />
-					<template #content>
-						Give control over this character to another user. Let your players change their base
-						stats themselves, so it is less work for you.<br />
-						You can always revert this and you also keep control yourself.<br />
-						Players need control over character to be able to send in damage or healing request
-						during an encounter.
-					</template>
-				</hk-popover>
+				<template v-slot:after>
+					<hk-popover header="Give player control">
+						<q-icon name="info" />
+						<template #content>
+							Give control over this character to another user. Let your players change their base
+							stats themselves, so it is less work for you.<br />
+							You can always revert this and you also keep control yourself.<br />
+							Players need control over character to be able to send in damage or healing request
+							during an encounter.
+						</template>
+					</hk-popover>
+				</template>
 			</q-input>
 			<div v-if="foundUser && findUser !== ''" class="bg-neutral-5 p-2">
 				<p>
@@ -58,6 +64,7 @@
 <script>
 import { db } from "src/firebase";
 import { mapActions } from "vuex";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "GiveCharacterControl",
@@ -126,31 +133,13 @@ export default {
 			}
 		},
 		confirmGiveControl() {
-			this.$snotify.success(
-				'Are you sure you want to give "' +
+			confirmAction({
+				title: "Give out control",
+				message: 'Are you sure you want to give "' +
 					Object.values(this.foundUser)[0].username +
 					'" control over this character?',
-				"Give out control",
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.giveControl();
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+				onOk: () => this.giveControl(),
+			});
 		},
 		async giveControl() {
 			let user_id = Object.keys(this.foundUser)[0];

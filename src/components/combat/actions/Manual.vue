@@ -66,7 +66,7 @@
 				center-color="neutral-6"
 				track-color="neutral-8"
 				:disable="!targeted?.length"
-				@input="value = $event"
+				@update:model-value="value = $event"
 				class="knob"
 			/>
 			<div class="input__wrapper">
@@ -271,10 +271,10 @@ export default {
 		},
 	},
 	mounted() {
-		EventBus.$on("applyManualValue", this.applyManual);
+		EventBus.on("applyManualValue", this.applyManual);
 	},
-	beforeDestroy() {
-		EventBus.$off("applyManualValue", this.applyManual);
+	beforeUnmount() {
+		EventBus.off("applyManualValue", this.applyManual);
 	},
 	directives: {
 		scrollWheel: {
@@ -386,7 +386,7 @@ export default {
 				outline: none;
 			}
 		}
-		::v-deep {
+		:deep() {
 			.disabled,
 			.disabled *,
 			[disabled] {

@@ -9,15 +9,18 @@
 			color="white"
 			@keydown.enter="setHP('tempHp', editable_entity.tempHp)"
 		>
-			<q-icon slot="prepend" size="xs" name="fas fa-stopwatch" />
-			<q-btn
-				slot="after"
-				no-caps
-				color="primary"
-				label="Save"
-				v-close-popup
-				@click.stop="setHP('tempHp', editable_entity.tempHp)"
-			/>
+			<template v-slot:prepend>
+				<q-icon size="xs" name="fas fa-stopwatch" />
+			</template>
+			<template v-slot:after>
+				<q-btn
+					no-caps
+					color="primary"
+					label="Save"
+					v-close-popup
+					@click.stop="setHP('tempHp', editable_entity.tempHp)"
+				/>
+			</template>
 		</hk-input>
 		<hk-input
 			v-model="editable_entity.maxHpMod"
@@ -27,16 +30,19 @@
 			color="white"
 			@keydown.enter="setHP('maxHpMod', editable_entity.maxHpMod)"
 		>
-			<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-			<q-icon slot="prepend" size="xs" name="fas fa-plus" />
-			<q-btn
-				slot="after"
-				no-caps
-				color="primary"
-				label="Save"
-				v-close-popup
-				@click.stop="setHP('maxHpMod', editable_entity.maxHpMod)"
-			/>
+			<template v-slot:prepend>
+				<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+				<q-icon size="xs" name="fas fa-plus" />
+			</template>
+			<template v-slot:after>
+				<q-btn
+					no-caps
+					color="primary"
+					label="Save"
+					v-close-popup
+					@click.stop="setHP('maxHpMod', editable_entity.maxHpMod)"
+				/>
+			</template>
 		</hk-input>
 		<hr />
 		<hk-input
@@ -48,16 +54,19 @@
 			class="mb-2"
 			@keydown.enter="setHP('curHp', editable_entity.curHp)"
 		>
-			<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-			<q-icon slot="prepend" size="xs" name="fas fa-heartbeat" />
-			<q-btn
-				slot="after"
-				no-caps
-				color="primary"
-				label="Save"
-				v-close-popup
-				@click.stop="setHP('curHp', editable_entity.curHp)"
-			/>
+			<template v-slot:prepend>
+				<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+				<q-icon size="xs" name="fas fa-heartbeat" />
+			</template>
+			<template v-slot:after>
+				<q-btn
+					no-caps
+					color="primary"
+					label="Save"
+					v-close-popup
+					@click.stop="setHP('curHp', editable_entity.curHp)"
+				/>
+			</template>
 		</hk-input>
 		<hk-input
 			v-model="editable_entity.maxHp"
@@ -67,15 +76,18 @@
 			color="white"
 			@keydown.enter="setHP('maxHp', editable_entity.maxHp)"
 		>
-			<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-			<q-icon v-else slot="prepend" size="xs" name="fas fa-heart" />
-			<q-btn
-				slot="after"
-				color="primary"
-				label="Save"
-				v-close-popup
-				@click.stop="setHP('maxHp', editable_entity.maxHp)"
-			/>
+			<template v-slot:prepend>
+				<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+				<q-icon v-else size="xs" name="fas fa-heart" />
+			</template>
+			<template v-slot:after>
+				<q-btn
+					color="primary"
+					label="Save"
+					v-close-popup
+					@click.stop="setHP('maxHp', editable_entity.maxHp)"
+				/>
+			</template>
 		</hk-input>
 	</quick-edit>
 </template>
@@ -114,7 +126,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
+:deep() {
 	.q-input {
 		max-width: 200px;
 	}

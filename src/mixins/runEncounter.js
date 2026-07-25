@@ -80,8 +80,8 @@ export const runEncounter = {
 					}
 
 					// Set the target and current
-					this.$set(newRoll, "target", this.entities[key]);
-					this.$set(newRoll, "current", entity);
+					newRoll["target"] = this.entities[key];
+					newRoll["current"] = entity;
 
 					this.setActionRoll(newRoll);
 				}

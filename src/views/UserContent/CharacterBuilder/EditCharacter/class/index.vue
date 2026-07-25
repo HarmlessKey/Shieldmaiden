@@ -1,29 +1,31 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ valid }">
+		<ValidationObserver v-slot="{ meta }" as="div">
 			<q-form greedy>
 				<hk-card>
-					<div class="card-header" slot="header">
-						<span>Class</span>
-						<div>
-							<small class="saved green" v-if="saved" @animationend="saved = false">
-								<i aria-hidden="true" class="fas fa-check" />
-								Saved
-							</small>
-							<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-								<i aria-hidden="true" class="fas fa-times" />
-								Couldn't save
-							</small>
-							<button
-								class="btn btn-sm bg-neutral-5 ml-1"
-								v-if="character.advancement === 'experience'"
-								@click.prevent="experience_modal = !experience_modal"
-							>
-								<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
-								Experience
-							</button>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>Class</span>
+							<div>
+								<small class="saved green" v-if="saved" @animationend="saved = false">
+									<i aria-hidden="true" class="fas fa-check" />
+									Saved
+								</small>
+								<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+									<i aria-hidden="true" class="fas fa-times" />
+									Couldn't save
+								</small>
+								<button
+									class="btn btn-sm bg-neutral-5 ml-1"
+									v-if="character.advancement === 'experience'"
+									@click.prevent="experience_modal = !experience_modal"
+								>
+									<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
+									Experience
+								</button>
+							</div>
 						</div>
-					</div>
+					</template>
 					<!-- EXPERIENCE -->
 					<div
 						v-if="
@@ -58,7 +60,7 @@
 											calculatedLevel(Class.experience_points) > computed.level
 										"
 										class="btn bg-green"
-										@click.prevent.stop="levelUp(classIndex, valid)"
+										@click.prevent.stop="levelUp(classIndex, meta.valid)"
 									>
 										Level up <i class="fas fa-arrow-circle-up" aria-hidden="true" />
 									</button>
@@ -81,7 +83,7 @@
 												label="Class"
 												v-model="subclass.class"
 												:options="class_list"
-												@input="selectClass($event, classIndex, valid)"
+												@update:model-value="selectClass($event, classIndex, meta.valid)"
 											>
 											</q-select>
 
@@ -100,7 +102,7 @@
 														v-ripple
 														v-close-popup
 														:active="subclass.level === scope.opt"
-														@click="saveClassLevel(classIndex, scope.opt, valid)"
+														@click="saveClassLevel(classIndex, scope.opt, meta.valid)"
 														:disable="levelAvailable(subclass, scope.opt)"
 													>
 														{{ scope.opt }}
@@ -114,38 +116,38 @@
 											<ValidationProvider
 												rules="required|max:30"
 												name="Class name"
-												v-slot="{ errors, invalid, validated }"
+												v-slot="{ errorMessage }" :modelValue="subclass.name" as="div"
 											>
 												<q-input
 													:dark="$store.getters.theme === 'dark'"
 													filled
 													square
 													label="Class"
-													@change="saveProp(subclass.name, classIndex, 'name', valid)"
+													@change="saveProp(subclass.name, classIndex, 'name', meta.valid)"
 													autocomplete="off"
 													type="text"
 													v-model="subclass.name"
-													:error="invalid && validated"
-													:error-message="errors[0]"
+													:error="!!errorMessage"
+													:error-message="errorMessage"
 												/>
 											</ValidationProvider>
 											<ValidationProvider
 												rules="required|max:50"
 												name="Subclass"
-												v-slot="{ errors, invalid, validated }"
+												v-slot="{ errorMessage }" :modelValue="subclass.subclass" as="div"
 											>
 												<q-input
 													:dark="$store.getters.theme === 'dark'"
 													filled
 													square
 													label="Subclass"
-													@change="saveProp(subclass.subclass, classIndex, 'subclass', valid)"
+													@change="saveProp(subclass.subclass, classIndex, 'subclass', meta.valid)"
 													autocomplete="off"
 													:id="`${classIndex}-subclass`"
 													type="text"
 													v-model="subclass.subclass"
-													:error="invalid && validated"
-													:error-message="errors[0]"
+													:error="!!errorMessage"
+													:error-message="errorMessage"
 												/>
 											</ValidationProvider>
 										</div>
@@ -218,15 +220,16 @@
 																			computed.abilities.constitution
 																		).hp
 																	}}</strong>
-																	<div
-																		slot="content"
-																		v-html="
-																			character.total_class_hp(
-																				classIndex,
-																				computed.abilities.constitution
-																			).info
-																		"
-																	/>
+																	<template v-slot:content>
+																		<div
+																			v-html="
+																				character.total_class_hp(
+																					classIndex,
+																					computed.abilities.constitution
+																				).info
+																			"
+																		/>
+																	</template>
 																</hk-popover>
 															</div>
 														</q-item-section>
@@ -244,7 +247,7 @@
 															<template v-if="subclass.class === 'custom'">
 																<a
 																	v-for="{ value, text } in dice_types"
-																	@click="setHitDice(classIndex, value, valid)"
+																	@click="setHitDice(classIndex, value, meta.valid)"
 																	:key="`d${value}-${classIndex}`"
 																	class="hit_die"
 																	:class="{ active: subclass.hit_dice === value }"
@@ -359,7 +362,7 @@
 																emit-value
 																map-options
 																class="mb-3"
-																@input="saveCasterType(classIndex, valid)"
+																@update:model-value="saveCasterType(classIndex, meta.valid)"
 															/>
 															<q-select
 																:dark="$store.getters.theme === 'dark'"
@@ -369,7 +372,7 @@
 																v-model="subclass.casting_ability"
 																class="mb-3"
 																:options="abilities"
-																@input="
+																@update:model-value="
 																	saveProp(
 																		subclass.casting_ability,
 																		classIndex,
@@ -388,7 +391,7 @@
 																map-options
 																class="mb-3"
 																:options="spell_knowledge_types"
-																@input="
+																@update:model-value="
 																	saveProp(
 																		subclass.spell_knowledge,
 																		classIndex,
@@ -449,7 +452,7 @@
 																:options="armor_types"
 																v-model="proficiencies[classIndex].armor"
 																class="mb-3"
-																@input="setProficiencies($event, classIndex, 'armor', valid)"
+																@update:model-value="setProficiencies($event, classIndex, 'armor', meta.valid)"
 															/>
 
 															<!-- WEAPONS -->
@@ -482,13 +485,12 @@
 																		</q-item-section>
 																	</q-item>
 
-																	<template v-for="weapon in scope.opt.weapons">
+																	<template v-for="weapon in scope.opt.weapons" :key="weapon.value">
 																		<q-item
-																			:key="weapon.value"
 																			clickable
 																			v-ripple
 																			@click="
-																				setWeaponProficiencies(weapon.value, classIndex, valid)
+																				setWeaponProficiencies(weapon.value, classIndex, meta.valid)
 																			"
 																			:active="
 																				proficiencies[classIndex].weapon.includes(weapon.value)
@@ -511,7 +513,7 @@
 																multiple
 																:options="abilities"
 																v-model="proficiencies[classIndex].saving_throw"
-																@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
+																@update:model-value="setProficiencies($event, classIndex, 'saving_throw', meta.valid)"
 															/>
 														</template>
 														<div v-else class="mb-3">
@@ -555,7 +557,7 @@
 															:max-values="subclass.skill_count || null"
 															:options="filtered_skills(subclass.class, subclass.skills)"
 															v-model="proficiencies[classIndex].skill.subtarget"
-															@input="setProficiencies($event, classIndex, 'skill', valid)"
+															@update:model-value="setProficiencies($event, classIndex, 'skill', meta.valid)"
 														/>
 													</div>
 												</q-expansion-item>
@@ -586,13 +588,15 @@
 					<q-dialog
 						v-if="character.hit_point_type === 'rolled'"
 						v-model="roll_hp_modal"
-						@before-hide="clear_invalid_rolls(valid)"
+						@before-hide="clear_invalid_rolls(meta.valid)"
 					>
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Rolled HP {{ character_classes[editClass].name }} </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Rolled HP {{ character_classes[editClass].name }} </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 
 							<div class="card-body">
 								<template v-if="character_classes[editClass].hit_dice">
@@ -605,32 +609,33 @@
 										<ValidationProvider
 											:rules="{ between: [1, character_classes[editClass].hit_dice] }"
 											:name="`Level ${level}`"
-											v-slot="{ errors, invalid, validated }"
+											v-slot="{ errorMessage }" :modelValue="character_classes[editClass].rolled_hit_points[level]" as="div"
 										>
 											<q-input
 												:dark="$store.getters.theme === 'dark'"
 												filled
 												square
 												dense
-												@change="setRolledHP($event.target.value, editClass, level, valid)"
+												@change="setRolledHP($event.target.value, editClass, level, meta.valid)"
 												autocomplete="off"
 												type="number"
 												v-model="character_classes[editClass].rolled_hit_points[level]"
 												:label="`Level ${level}`"
-												:error="invalid && validated"
-												:error-message="errors[0]"
+												:error="!!errorMessage"
+												:error-message="errorMessage"
 											>
-												<button
-													slot="after"
-													class="btn"
-													:disabled="
-														character_classes[editClass].rolled_hit_points &&
-														character_classes[editClass].rolled_hit_points[level]
-													"
-													@click.stop="rollHitDice(editClass, level, valid)"
-												>
-													Roll
-												</button>
+												<template v-slot:after>
+													<button
+														class="btn"
+														:disabled="
+															character_classes[editClass].rolled_hit_points &&
+															character_classes[editClass].rolled_hit_points[level]
+														"
+														@click.stop="rollHitDice(editClass, level, meta.valid)"
+													>
+														Roll
+													</button>
+												</template>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -643,10 +648,12 @@
 					<!-- EXPERIENCE MODAL -->
 					<q-dialog v-model="experience_modal">
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Experience points </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Experience points </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 							<div class="card-body">
 								<h3 class="xp">
 									<hk-animated-integer :value="Class.experience_points" /><small>xp</small>
@@ -662,8 +669,8 @@
 										placeholder="Amount"
 									/>
 									<div>
-										<a @click="handleXP('add', valid)" class="btn bg-green">Add</a>
-										<a @click="handleXP('remove', valid)" class="btn bg-red">Remove</a>
+										<a @click="handleXP('add', meta.valid)" class="btn bg-green">Add</a>
+										<a @click="handleXP('remove', meta.valid)" class="btn bg-red">Remove</a>
 									</div>
 								</div>
 							</div>
@@ -673,18 +680,20 @@
 					<!-- SPELLS KNOWN MODAL -->
 					<q-dialog v-model="spells_known_modal">
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Spells known </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Spells known </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 							<div class="spells-known card-body" v-if="character_classes[editClass].spells_known">
 								<h3>Cantrips & Spells known</h3>
 								<div class="columns">
 									<div>Level</div>
 									<div>Cantrips</div>
 									<div>Spells</div>
-									<template v-for="i in 20">
-										<div :key="`level-${i}`">
+									<template v-for="i in 20" :key="i">
+										<div>
 											{{ i }}
 										</div>
 										<q-input
@@ -692,7 +701,6 @@
 											filled
 											square
 											v-model="character_classes[editClass].spells_known.cantrips[i]"
-											:key="`cantrips-known-${i}`"
 											@change="setSpellsKnown(editClass, 'cantrips', i)"
 											:tabindex="`1${i < 10 ? `0${i}` : i}`"
 										/>
@@ -701,7 +709,6 @@
 											filled
 											square
 											v-model="character_classes[editClass].spells_known.spells[i]"
-											:key="`spells-known-${i}`"
 											@change="setSpellsKnown(editClass, 'spells', i)"
 											:tabindex="`2${i < 10 ? `0${i}` : i}`"
 										/>
@@ -726,6 +733,7 @@ import { dice } from "src/mixins/dice.js";
 import { db } from "src/firebase";
 import Features from "./features";
 import { classes } from "src/utils/characterConstants";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "CharacterClass",
@@ -818,35 +826,17 @@ export default {
 		},
 		selectClass(Class, classIndex, valid) {
 			if (this.Class.classes[classIndex].class) {
-				this.$snotify.error(
-					`Are you sure you want to change the class? Rolled Hit Points and custom Features & linked Modifiers will be lost.`,
-					`Change class`,
-					{
-						buttons: [
-							{
-								text: "Yes",
-								action: (toast) => {
-									this.setClass(Class, classIndex, valid);
-									this.$snotify.remove(toast.id);
-								},
-								bold: false,
-							},
-							{
-								text: "No",
-								action: (toast) => {
-									this.$snotify.remove(toast.id);
-								},
-								bold: true,
-							},
-						],
-					}
-				);
+				confirmAction({
+					title: `Change class`,
+					message: `Are you sure you want to change the class? Rolled Hit Points and custom Features & linked Modifiers will be lost.`,
+					onOk: () => this.setClass(Class, classIndex, valid),
+				});
 			} else {
 				this.setClass(Class, classIndex, valid);
 			}
 		},
 		setClass(Class, classIndex, valid) {
-			this.$set(this.Class.classes[classIndex], "class", Class);
+			this.Class.classes[classIndex]["class"] = Class;
 			this.save(valid, `classes.class`);
 		},
 		filtered_skills(Class, _skills) {
@@ -858,7 +848,7 @@ export default {
 			}
 		},
 		saveProp(value, classIndex, property, valid) {
-			this.$set(this.Class.classes[classIndex], property, value);
+			this.Class.classes[classIndex][property] = value;
 			this.save(valid, `classes.${classIndex}.${property}`);
 		},
 		setShowClass(classIndex) {
@@ -944,7 +934,7 @@ export default {
 			//Set rolled HP manually
 			value = parseInt(value) || 0;
 
-			this.$set(this.Class.classes[classIndex].rolled_hit_points, level, value);
+			this.Class.classes[classIndex].rolled_hit_points[level] = value;
 
 			this.save(valid, "class.rolled_hp");
 		},
@@ -965,7 +955,7 @@ export default {
 		},
 		clear_invalid_rolls(valid) {
 			if (!valid) {
-				this.$set(this.Class.classes[this.editClass], "rolled_hit_points", this.rolled_hp_copy);
+				this.Class.classes[this.editClass]["rolled_hit_points"] = this.rolled_hp_copy;
 			}
 			this.rolled_hp_copy = undefined;
 		},
@@ -978,31 +968,13 @@ export default {
 			this.$emit("change", "class.spells_known");
 		},
 		confirmDeleteClass(classIndex, name) {
-			this.$snotify.error(
-				`Are you sure you want to delete ${
+			confirmAction({
+				title: `Delete class`,
+				message: `Are you sure you want to delete ${
 					name ? `the class "${name}"` : `this class`
 				}? All linked features and modifiers will be removed.`,
-				`Delete class`,
-				{
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteClass(classIndex);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
-				}
-			);
+				onOk: () => this.deleteClass(classIndex),
+			});
 		},
 		addClass() {
 			this.add_class({

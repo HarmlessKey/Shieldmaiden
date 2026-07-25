@@ -9,8 +9,8 @@
 
 			<button class="google mt-2" @click="googleSignIn()">Sign up with Google</button>
 			<hr />
-			<ValidationObserver v-slot="{ handleSubmit, valid }">
-				<q-form v-if="!loading" @submit="handleSubmit(signUp)">
+			<ValidationObserver v-slot="{ handleSubmit, meta }" as="div">
+				<q-form v-if="!loading" @submit="handleSubmit($event, signUp)">
 					<h4 class="text-center neutral-2">With email and password</h4>
 
 					<hk-input
@@ -61,7 +61,7 @@
 						class="full-width"
 						color="primary"
 						type="submit"
-						:disabled="!valid"
+						:disabled="!meta.valid"
 					/>
 				</q-form>
 				<hk-loader v-else prefix="Signing you up" noBackground />

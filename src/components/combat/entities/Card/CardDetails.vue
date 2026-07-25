@@ -18,8 +18,8 @@
 		</div>
 		<Effects :entity="full_entity" />
 		<div class="stats">
-			<template v-for="(stat, key) of stats">
-				<div v-if="displayStats(full_entity)[key] !== undefined" :key="key">
+			<template v-for="(stat, key) of stats" :key="key">
+				<div v-if="displayStats(full_entity)[key] !== undefined">
 					<div class="truncate label value__label">{{ stat.label }}</div>
 					<div class="value">
 						<hk-icon :icon="stat.icon" class="mr-1" />
@@ -32,17 +32,16 @@
 			</template>
 		</div>
 		<div class="card-details__abilities">
-			<template v-for="(ability, index) in abilities">
+			<template v-for="(ability, index) in abilities" :key="ability">
 				<div
 					v-if="index === 0 || index === 3"
-					:key="index"
 					class="card-details__abilities-header label"
 				>
 					<div class="placeholder" />
 					<div>mod</div>
 					<div>save</div>
 				</div>
-				<div :key="ability" class="ability">
+				<div class="ability">
 					<div class="label">{{ ability.substring(0, 3) }}</div>
 					<div class="ability__score">{{ full_entity[ability] ?? 10 }}</div>
 					<hk-roll
@@ -142,7 +141,7 @@
 			/></template>
 			<template v-if="full_entity.challenge_rating">
 				<strong class="neutral-2">Challenge Rating</strong> {{ full_entity.challenge_rating }} ({{
-					monster_challenge_rating[full_entity.challenge_rating].xp | numeral("0,0")
+					formatNumber(monster_challenge_rating[full_entity.challenge_rating].xp, "0,0")
 				}}
 				XP)<br />
 			</template>
@@ -155,6 +154,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { formatNumber } from "src/utils/formatNumber";
 import { abilities, skills } from "src/utils/generalConstants";
 import { calc_mod, calc_skill_mod } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster.js";
@@ -222,6 +222,7 @@ export default {
 		},
 	},
 	methods: {
+		formatNumber,
 		calc_mod,
 		displayStats,
 		savingThrow(ability) {

@@ -1,11 +1,13 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			Get support
-			<a class="btn btn-sm bg-discord-purple" href="https://discord.gg/ZHDGj6GqJH" target="_blank" rel="noopener">
-				<i class="fab fa-discord mr-1" aria-hidden="true" /> Join Discord
-			</a>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				Get support
+				<a class="btn btn-sm bg-discord-purple" href="https://discord.gg/ZHDGj6GqJH" target="_blank" rel="noopener">
+					<i class="fab fa-discord mr-1" aria-hidden="true" /> Join Discord
+				</a>
+			</div>
+		</template>
 		<q-no-ssr class="card-body">
 			<p>
 				For any support needed, you can contact us on our Discord. 

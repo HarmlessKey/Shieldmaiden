@@ -202,7 +202,7 @@ export function comparePlayerToCharacter(sync_character, player) {
  */
 /* eslint-disable */
 export function browserDetect() {
-	if (process.browser) {
+	if (typeof window !== "undefined") {
 		// Opera 8.0+
 		const isOpera =
 			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(" OPR/") >= 0;

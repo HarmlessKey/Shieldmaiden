@@ -2,15 +2,14 @@
 	<div>
 		<div class="share" :class="{ small: is_small }">
 			<div class="qr-wrapper" v-if="qr">
-				<vue-qr
-					class="qr"
-					:text="url"
-					qid="playerLink"
-					:size="120"
-					:margin="5"
-					:logoSrc="require('src/assets/_img/logo/logo-icon-no-shield-cyan.svg')"
-					:logoScale="0.25"
-				/>
+				<div class="qr">
+					<qrcode-vue :value="url" :size="110" :margin="1" level="H" />
+					<img
+						class="qr__logo"
+						:src="require('src/assets/_img/logo/logo-icon-no-shield-cyan.svg')"
+						alt=""
+					/>
+				</div>
 			</div>
 			<div>
 				<h2 v-if="title" class="mb-2">
@@ -24,16 +23,17 @@
 					:dark="$store.getters.theme === 'dark'"
 					filled
 					square
-					:value="url"
+					:model-value="url"
 					autocomplete="off"
 					type="text"
 				>
-					<hk-share
-						title="Shieldmaiden"
-						text="Follow my campaigns on Shieldmaiden!"
-						:url="url"
-						slot="after"
-					/>
+					<template v-slot:after>
+						<hk-share
+							title="Shieldmaiden"
+							text="Follow my campaigns on Shieldmaiden!"
+							:url="url"
+						/>
+					</template>
 				</q-input>
 			</div>
 		</div>
@@ -49,12 +49,12 @@
 </template>
 
 <script>
-import VueQr from "vue-qr";
+import QrcodeVue from "qrcode.vue";
 
 export default {
 	name: "PlayerLink",
 	components: {
-		VueQr,
+		QrcodeVue,
 	},
 	props: {
 		qr: {
@@ -79,7 +79,7 @@ export default {
 	},
 	computed: {
 		share_available() {
-			return process.browser && navigator.share !== undefined;
+			return typeof window !== "undefined" && navigator.share !== undefined;
 		},
 	},
 	methods: {
@@ -121,6 +121,24 @@ export default {
 				padding: 3px;
 				border-radius: $border-radius;
 			}
+		}
+	}
+
+	.qr {
+		position: relative;
+		display: inline-block;
+		line-height: 0;
+
+		&__logo {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 28px;
+			height: 28px;
+			background-color: $neutral-1;
+			border-radius: 4px;
+			padding: 2px;
 		}
 	}
 }

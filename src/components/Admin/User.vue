@@ -79,7 +79,7 @@
 					class="mb-3"
 					:options="contributes"
 					v-model="user.contribute"
-					@input="setContribute($event)"
+					@update:model-value="setContribute($event)"
 				/>
 
 				<h3>Link a Patreon account</h3>
@@ -102,7 +102,7 @@
 		<hk-card header="Voucher">
 			<div class="card-body">
 				<h3>Gift user a subscription</h3>
-				<ValidationObserver v-slot="{ valid }">
+				<ValidationObserver v-slot="{ meta }" as="div">
 					<q-form>
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -128,7 +128,7 @@
 							v-if="duration === 'date'"
 							rules="required"
 							name="Date"
-							v-slot="{ errors, invalid, validated }"
+							v-slot="{ errorMessage }" :modelValue="voucher.date" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -139,8 +139,8 @@
 								placeholder="mm/dd/yyyy"
 								class="mb-2"
 								v-model="voucher.date"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 
@@ -154,7 +154,7 @@
 							class="mb-2"
 							autogrow
 						/>
-						<a class="btn" @click="setVoucher(valid)">Save</a>
+						<a class="btn" @click="setVoucher(meta.valid)">Save</a>
 					</q-form>
 				</ValidationObserver>
 			</div>
@@ -165,6 +165,7 @@
 <script>
 import { db } from "src/firebase";
 import { legacy_tiers } from "src/utils/generalConstants";
+import { notifySuccess } from "src/utils/notify";
 
 export default {
 	name: "AdminUser",
@@ -289,9 +290,7 @@ export default {
 					}
 					db.ref(`users/${this.id}/voucher`).set(this.voucher);
 				}
-				this.$snotify.success("Voucher given.", "Voucher set!", {
-					position: "rightTop",
-				});
+				notifySuccess("Voucher given.", "Voucher set!");
 			}
 		},
 		setPatronEmail() {
@@ -300,17 +299,13 @@ export default {
 			} else {
 				db.ref(`users/${this.id}/patreon_email`).set(this.user.patreon_email);
 			}
-			this.$snotify.success("Patreon email linked.", "Saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Patreon email linked.", "Saved!");
 		},
 		setContribute(value) {
 			value = !value ? null : value;
 			db.ref(`users/${this.id}/contribute`).set(value);
 
-			this.$snotify.success("Contribute set.", "Saved!", {
-				position: "rightTop",
-			});
+			notifySuccess("Contribute set.", "Saved!");
 		},
 		makeDate(input) {
 			let monthNames = [

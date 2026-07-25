@@ -102,7 +102,9 @@
 								clearable
 								placeholder="Search NPCs"
 							>
-								<q-icon slot="prepend" name="search" />
+								<template v-slot:prepend>
+									<q-icon name="search" />
+								</template>
 							</q-input>
 						</div>
 						<div class="col" v-if="groupFilterOptions.length">
@@ -145,7 +147,7 @@
 					</div>
 
 					<q-table
-						:data="filteredNpcs"
+						:rows="filteredNpcs"
 						:visible-columns="visibleColumns"
 						:columns="columns"
 						row-key="key"
@@ -282,8 +284,12 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
-						<hk-loader slot="loading" name="NPCs" />
+						<template v-slot:no-data>
+							<div />
+						</template>
+						<template v-slot:loading>
+							<hk-loader name="NPCs" />
+						</template>
 					</q-table>
 				</template>
 
@@ -309,10 +315,12 @@
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
 			<hk-card class="npc-dialog">
-				<div slot="header" class="card-header">
-					<span>Import NPC from JSON</span>
-					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Import NPC from JSON</span>
+						<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<ImportUserContent type="npcs" />
 				</div>
@@ -327,18 +335,20 @@
 		<!-- generate dialog-->
 		<q-dialog v-model="generate_dialog">
 			<hk-card class="npc-dialog" :persistent="generating">
-				<div slot="header" class="card-header">
-					<span>Monster Generation</span>
-					<q-btn
-						v-if="!generating"
-						padding="sm"
-						size="sm"
-						no-caps
-						icon="fas fa-times"
-						flat
-						v-close-popup
-					/>
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Monster Generation</span>
+						<q-btn
+							v-if="!generating"
+							padding="sm"
+							size="sm"
+							no-caps
+							icon="fas fa-times"
+							flat
+							v-close-popup
+						/>
+					</div>
+				</template>
 				<div v-if="content_count.npcs >= tier.benefits.npcs && show_warning" class="card-body">
 					<h2 class="orange">Insufficient NPC slots</h2>
 					<p>You don't have enough NPC slots to save your generated monster.</p>
@@ -363,6 +373,7 @@ import ContentHeader from "src/components/userContent/ContentHeader.vue";
 import ExportUserContent from "src/components/userContent/ExportUserContent.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 import NpcGroupManager from "src/components/npcs/NpcGroupManager.vue";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Npcs",
@@ -538,25 +549,10 @@ export default {
 			if (e.shiftKey) {
 				this.deleteNpc(key);
 			} else {
-				this.$snotify.error("Are you sure you want to delete " + npc.name + "?", "Delete NPC", {
-					timeout: false,
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteNpc(key);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
+				confirmAction({
+					title: "Delete NPC",
+					message: "Are you sure you want to delete " + npc.name + "?",
+					onOk: () => this.deleteNpc(key),
 				});
 			}
 		},

@@ -102,91 +102,97 @@
 								:columns="entityColumns"
 								:showHeader="false"
 							>
-								<div slot="image" slot-scope="data">
-									<!-- Player avatar -->
-									<span
-										v-if="data.row.entityType === 'player'"
-										:style="{
-											backgroundImage: avatar(data.row, campaign_players)
-												? 'url(\'' + avatar(data.row, campaign_players) + '\')'
-												: '',
-										}"
-										class="image"
-									>
-										<i
-											aria-hidden="true"
-											v-if="!avatar(data.row, campaign_players)"
-											class="hki-player"
-										/>
-									</span>
+								<template v-slot:image="data">
+									<div>
+										<!-- Player avatar -->
+										<span
+											v-if="data.row.entityType === 'player'"
+											:style="{
+												backgroundImage: avatar(data.row, campaign_players)
+													? 'url(\'' + avatar(data.row, campaign_players) + '\')'
+													: '',
+											}"
+											class="image"
+										>
+											<i
+												aria-hidden="true"
+												v-if="!avatar(data.row, campaign_players)"
+												class="hki-player"
+											/>
+										</span>
 
-									<!-- Companion avatar -->
-									<span
-										v-if="data.row.entityType === 'companion'"
-										:style="{
-											backgroundImage: avatar(data.row, entity_data)
-												? 'url(\'' + avatar(data.row, entity_data) + '\')'
-												: '',
-										}"
-										class="image"
-									>
-										<i
-											aria-hidden="true"
-											v-if="!avatar(data.row, entity_data)"
-											class="hki-companion"
-										/>
-									</span>
+										<!-- Companion avatar -->
+										<span
+											v-if="data.row.entityType === 'companion'"
+											:style="{
+												backgroundImage: avatar(data.row, entity_data)
+													? 'url(\'' + avatar(data.row, entity_data) + '\')'
+													: '',
+											}"
+											class="image"
+										>
+											<i
+												aria-hidden="true"
+												v-if="!avatar(data.row, entity_data)"
+												class="hki-companion"
+											/>
+										</span>
 
-									<!-- Friendly NPC avatar -->
-									<span
-										v-else-if="data.row.entityType === 'npc'"
-										class="image"
-										:style="{
-											backgroundImage: npcAvatar(data.row, entity_data)
-												? 'url(\'' + npcAvatar(data.row, entity_data) + '\')'
-												: '',
-											'border-color': data.row.color_label ? data.row.color_label : ``,
-											'background-color': data.row.color_label ? data.row.color_label : ``,
-											color: data.row.color_label ? data.row.color_label : ``,
-										}"
-									>
-										<i
-											aria-hidden="true"
-											v-if="!npcAvatar(data.row, entity_data)"
-											class="hki-monster"
-											:class="{ 'neutral-1': data.row.color_label }"
-										/>
-									</span>
-								</div>
+										<!-- Friendly NPC avatar -->
+										<span
+											v-else-if="data.row.entityType === 'npc'"
+											class="image"
+											:style="{
+												backgroundImage: npcAvatar(data.row, entity_data)
+													? 'url(\'' + npcAvatar(data.row, entity_data) + '\')'
+													: '',
+												'border-color': data.row.color_label ? data.row.color_label : ``,
+												'background-color': data.row.color_label ? data.row.color_label : ``,
+												color: data.row.color_label ? data.row.color_label : ``,
+											}"
+										>
+											<i
+												aria-hidden="true"
+												v-if="!npcAvatar(data.row, entity_data)"
+												class="hki-monster"
+												:class="{ 'neutral-1': data.row.color_label }"
+											/>
+										</span>
+									</div>
+								</template>
 
 								<!-- NAME -->
-								<span slot="name" slot-scope="data" class="green">
-									{{ data.item.capitalizeEach() }}
-								</span>
+								<template v-slot:name="data">
+									<span class="green">
+										{{ data.item.capitalizeEach() }}
+									</span>
+								</template>
 
 								<!-- ACTIONS -->
-								<div slot="actions" slot-scope="data" class="actions">
-									<a
-										v-if="data.row.entityType === 'npc'"
-										@click="
-											setDrawer({
-												show: true,
-												type: 'drawers/editEncounter/EditEntity',
-												data: { npc: data.row, encounter },
-											})
-										"
-										class="mr-2 btn btn-sm bg-neutral-5"
-									>
-										<i aria-hidden="true" class="fas fa-pencil"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-									</a>
-									<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
-										<i aria-hidden="true" class="fas fa-minus"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Remove character
-										</q-tooltip>
-									</a>
-								</div>
+								<template v-slot:actions="data">
+									<div class="actions">
+										<a
+											v-if="data.row.entityType === 'npc'"
+											@click="
+												setDrawer({
+													show: true,
+													type: 'drawers/editEncounter/EditEntity',
+													data: { npc: data.row, encounter },
+												})
+											"
+											class="mr-2 btn btn-sm bg-neutral-5"
+										>
+											<i aria-hidden="true" class="fas fa-pencil"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+										</a>
+										<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
+											<i aria-hidden="true" class="fas fa-minus"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Remove character
+											</q-tooltip>
+										</a>
+									</div>
+								</template>
 							</hk-table>
 
 							<h3 class="d-flex justify-between">
@@ -204,54 +210,58 @@
 
 							<!-- Enemy monsters -->
 							<hk-table :items="_monsters" :columns="entityColumns" :showHeader="false">
-								<span
-									slot="image"
-									slot-scope="data"
-									class="image"
-									:style="{
-										backgroundImage: npcAvatar(data.row, entity_data)
-											? 'url(\'' + npcAvatar(data.row, entity_data) + '\')'
-											: '',
-										border: data.row.color_label ? `2px solid ${data.row.color_label}` : 'none',
-										color: data.row.color_label ? data.row.color_label : ``,
-									}"
-								>
-									<hk-compendium-image
-										v-if="
-											!npcAvatar(data.row, entity_data) &&
-											data.row.id &&
-											entity_data[data.row.id].url
-										"
-										:value="entity_data[data.row.id].url"
-									/>
-								</span>
+								<template v-slot:image="data">
+									<span
+										class="image"
+										:style="{
+											backgroundImage: npcAvatar(data.row, entity_data)
+												? 'url(\'' + npcAvatar(data.row, entity_data) + '\')'
+												: '',
+											border: data.row.color_label ? `2px solid ${data.row.color_label}` : 'none',
+											color: data.row.color_label ? data.row.color_label : ``,
+										}"
+									>
+										<hk-compendium-image
+											v-if="
+												!npcAvatar(data.row, entity_data) &&
+												data.row.id &&
+												entity_data[data.row.id].url
+											"
+											:value="entity_data[data.row.id].url"
+										/>
+									</span>
+								</template>
 
 								<!-- NAME -->
-								<span slot="name" slot-scope="data" class="red">
-									{{ data.item.capitalizeEach() }}
-								</span>
+								<template v-slot:name="data">
+									<span class="red">
+										{{ data.item.capitalizeEach() }}
+									</span>
+								</template>
 
-								<div slot="actions" slot-scope="data" class="actions">
-									<a
-										@click="
-											setDrawer({
-												show: true,
-												type: 'drawers/editEncounter/EditEntity',
-												data: { npc: data.row, encounter },
-											})
-										"
-										class="mr-2 btn btn-sm bg-neutral-5"
-									>
-										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-										<i aria-hidden="true" class="fas fa-pencil"></i>
-									</a>
-									<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
-										<i aria-hidden="true" class="fas fa-minus"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Remove character
-										</q-tooltip>
-									</a>
-								</div>
+								<template v-slot:actions="data">
+									<div class="actions">
+										<a
+											@click="
+												setDrawer({
+													show: true,
+													type: 'drawers/editEncounter/EditEntity',
+													data: { npc: data.row, encounter },
+												})
+											"
+											class="mr-2 btn btn-sm bg-neutral-5"
+										>
+											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+											<i aria-hidden="true" class="fas fa-pencil"></i>
+										</a>
+										<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
+											<i aria-hidden="true" class="fas fa-minus"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Remove character
+											</q-tooltip>
+										</a>
+									</div>
+								</template>
 							</hk-table>
 						</template>
 						<template v-else>
@@ -266,16 +276,17 @@
 				<hk-loader v-else />
 			</hk-card>
 			<hk-card v-if="demo || (tier && tier.price === 'Free')" class="background-effects">
-				<video
-					slot="image"
-					class="video"
-					src="~assets/_vid/background-effects-rain.mp4"
-					muted
-					autoplay
-					playsinline
-					alt="Background Effects Rain"
-					loop
-				/>
+				<template v-slot:image>
+					<video
+						class="video"
+						src="~assets/_vid/background-effects-rain.mp4"
+						muted
+						autoplay
+						playsinline
+						alt="Background Effects Rain"
+						loop
+					/>
+				</template>
 				<div class="p-3 text-center">
 					<h3 class="text-bold">Background Effects</h3>
 					<p>
@@ -439,7 +450,7 @@ export default {
 					entityId: id,
 				});
 			} else {
-				this.$delete(this.encounter.entities, id);
+				delete this.encounter.entities[id];
 			}
 		},
 		async setDifficulty() {

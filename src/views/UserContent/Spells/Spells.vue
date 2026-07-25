@@ -2,22 +2,24 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="spells">
-				<ExportUserContent
-					slot="actions-left"
-					class="btn-sm bg-neutral-5 mr-2"
-					content-type="spell"
-					:content-id="spellIds"
-				>
-					<span>Export</span>
-				</ExportUserContent>
-				<button
-					v-if="tier.price !== 'Free'"
-					slot="actions-right"
-					class="btn btn-sm bg-neutral-5 mr-2"
-					@click="import_dialog = true"
-				>
-					Import
-				</button>
+				<template v-slot:actions-left>
+					<ExportUserContent
+						class="btn-sm bg-neutral-5 mr-2"
+						content-type="spell"
+						:content-id="spellIds"
+					>
+						<span>Export</span>
+					</ExportUserContent>
+				</template>
+				<template v-slot:actions-right>
+					<button
+						v-if="tier.price !== 'Free'"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						@click="import_dialog = true"
+					>
+						Import
+					</button>
+				</template>
 			</ContentHeader>
 
 			<div class="card-body" v-if="!loading_spells">
@@ -33,11 +35,13 @@
 						clearable
 						placeholder="Search spells"
 					>
-						<q-icon slot="prepend" name="search" />
+						<template v-slot:prepend>
+							<q-icon name="search" />
+						</template>
 					</q-input>
 
 					<q-table
-						:data="spells"
+						:rows="spells"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"
@@ -89,8 +93,12 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
-						<hk-loader slot="loading" name="spells" />
+						<template v-slot:no-data>
+							<div />
+						</template>
+						<template v-slot:loading>
+							<hk-loader name="spells" />
+						</template>
 					</q-table>
 				</template>
 
@@ -115,10 +123,12 @@
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
 			<hk-card :minWidth="400">
-				<div slot="header" class="card-header">
-					<span>Import spells from JSON</span>
-					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Import spells from JSON</span>
+						<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<ImportUserContent type="spells" />
 				</div>
@@ -134,6 +144,7 @@ import ContentHeader from "src/components/userContent/ContentHeader";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import { downloadJSON } from "src/utils/generalFunctions";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
+import { confirmAction } from "src/utils/notify";
 
 export default {
 	name: "Spells",
@@ -206,25 +217,10 @@ export default {
 			if (e.shiftKey) {
 				this.deleteSpell(key);
 			} else {
-				this.$snotify.error("Are you sure you want to delete " + spell.name + "?", "Delete spell", {
-					timeout: false,
-					buttons: [
-						{
-							text: "Yes",
-							action: (toast) => {
-								this.deleteSpell(key);
-								this.$snotify.remove(toast.id);
-							},
-							bold: false,
-						},
-						{
-							text: "No",
-							action: (toast) => {
-								this.$snotify.remove(toast.id);
-							},
-							bold: true,
-						},
-					],
+				confirmAction({
+					title: "Delete spell",
+					message: "Are you sure you want to delete " + spell.name + "?",
+					onOk: () => this.deleteSpell(key),
 				});
 			}
 		},

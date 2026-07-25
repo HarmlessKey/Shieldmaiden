@@ -23,25 +23,27 @@
 			>
 
 				<!-- COLLAPSE -->
-				<div slot="collapse" slot-scope="data">
-					<div class="mb-2">
-						<strong>{{ data.row.public_name }}</strong><br/>
-						{{ data.row.public_description }}
-					</div>
-					<template v-if="data.row.linked_item && data.row.identified">
-						<div class="linked-item">
-							<span>Qualities</span>
-							<a @click="showItem = !showItem" :class="{ collapsed: showItem }">
-								<i aria-hidden="true" class="fas fa-chevron-down"></i>
-							</a>
+				<template v-slot:collapse="data">
+					<div>
+						<div class="mb-2">
+							<strong>{{ data.row.public_name }}</strong><br/>
+							{{ data.row.public_description }}
 						</div>
-						<q-slide-transition>
-							<div v-if="Object.keys(data.row.full_linked_item).length" v-show="showItem" class="full-item">
-								<ViewItem :data="data.row.full_linked_item"/>
+						<template v-if="data.row.linked_item && data.row.identified">
+							<div class="linked-item">
+								<span>Qualities</span>
+								<a @click="showItem = !showItem" :class="{ collapsed: showItem }">
+									<i aria-hidden="true" class="fas fa-chevron-down"></i>
+								</a>
 							</div>
-						</q-slide-transition>
-					</template>
-				</div>
+							<q-slide-transition>
+								<div v-if="Object.keys(data.row.full_linked_item).length" v-show="showItem" class="full-item">
+									<ViewItem :data="data.row.full_linked_item"/>
+								</div>
+							</q-slide-transition>
+						</template>
+					</div>
+				</template>
 			</hk-table>
 		</template>
 	</div>

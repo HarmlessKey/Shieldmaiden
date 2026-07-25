@@ -1,15 +1,17 @@
 <template>
 	<hk-card>
-		<template v-if="!loading">
-			<div slot="header" class="card-header">
+		<template v-slot:header>
+			<div v-if="!loading" class="card-header">
 				<h1>{{ not_found ? "Item not found" : item.name }}</h1>
-				<hk-share 
-					v-if="!not_found" 
+				<hk-share
+					v-if="!not_found"
 					:title="item.meta.title.capitalizeEach()"
-					:text="item.meta.description" 
+					:text="item.meta.description"
 					size="sm"
 				/>
 			</div>
+		</template>
+		<template v-if="!loading">
 			<div class="card-body">
 				<div v-if="not_found">
 					<p>Could not find item <strong>{{ id }}</strong></p>
@@ -25,6 +27,7 @@
 </template>
 
 <script>
+	import { EventBus } from "src/event-bus";
 	import { mapGetters } from 'vuex';
 	import Item from "src/components/compendium/Item";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
@@ -62,7 +65,7 @@
 		mounted() {
 			if(this.item) {
 				this.loading = false;
-				this.$root.$emit('route-name', this.item?.name.capitalizeEach())
+				EventBus.emit('route-name', this.item?.name.capitalizeEach())
 			} else {
 				this.not_found = true;
 				this.loading = false;

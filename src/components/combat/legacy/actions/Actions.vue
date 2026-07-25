@@ -258,7 +258,7 @@ export default {
 			}
 		}
 	}
-	&::v-deep {
+	&:deep() {
 		.q-tab {
 			width: 100%;
 		}
@@ -266,7 +266,7 @@ export default {
 }
 
 .modes {
-	&::v-deep {
+	&:deep() {
 		.q-tabs {
 			&__content {
 				padding: 10px;
@@ -292,7 +292,7 @@ export default {
 }
 .overflow-visible {
 	overflow: visible;
-	&::v-deep {
+	&:deep() {
 		.q-panel {
 			overflow: visible;
 		}

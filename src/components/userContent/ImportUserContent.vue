@@ -14,7 +14,7 @@
 				square
 				accept=".json"
 				v-model="json_file"
-				@input="loadJSON()"
+				@update:model-value="loadJSON()"
 				label="Drag a file here or click to upload"
 			>
 				<template v-slot:prepend>
@@ -24,8 +24,8 @@
 
 			<h4 class="my-3 text-center">OR</h4>
 			<ValidationObserver v-slot="{ handleSubmit }">
-				<q-form @submit="handleSubmit(parseJSON)">
-					<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated }">
+				<q-form @submit="handleSubmit($event, parseJSON)">
+					<ValidationProvider rules="json" name="JSON" v-slot="{ errorMessage }" :modelValue="json_input" as="div">
 						<q-input
 							:dark="$store.getters.theme === 'dark'"
 							filled
@@ -33,8 +33,8 @@
 							label-slot
 							type="textarea"
 							v-model="json_input"
-							:error="invalid && validated"
-							:error-message="errors[0]"
+							:error="!!errorMessage"
+							:error-message="errorMessage"
 						>
 							<template #label>
 								<i class="fas fa-brackets-curly mr-1" aria-hidden="true" />
@@ -85,14 +85,14 @@
 						flat
 						dense
 						square
-						:data="parsed_data[import_type]"
+						:rows="parsed_data[import_type]"
 						:columns="columns"
 						:row-key="(row) => `${row.meta.key}-${row.meta.overwrite}`"
 						virtual-scroll
-						:pagination.sync="pagination"
+						v-model:pagination="pagination"
 						:rows-per-page-options="[0]"
 						selection="multiple"
-						:selected.sync="selected[import_type]"
+						v-model:selected="selected[import_type]"
 						hide-bottom
 						hide-top
 					>
@@ -100,23 +100,25 @@
 							<td>
 								<hk-popover v-if="props.row.meta.errors" header="Validation errors">
 									<q-icon name="error" class="red" />
-									<div slot="content">
-										<ol class="px-3">
-											<li
-												v-for="(error, i) in props.row.meta.errors"
-												:key="`${props.row.index}-error-${i}`"
-												class="red"
-											>
-												<strong v-if="error.instancePath" class="neutral-1">
-													{{ error.instancePath }}
-												</strong>
-												{{ error.message.capitalize() }}
-												<template v-if="error.keyword == 'additionalProperties'">
-													<span> '{{ error.params.additionalProperty }}'</span>
-												</template>
-											</li>
-										</ol>
-									</div>
+									<template v-slot:content>
+										<div>
+											<ol class="px-3">
+												<li
+													v-for="(error, i) in props.row.meta.errors"
+													:key="`${props.row.index}-error-${i}`"
+													class="red"
+												>
+													<strong v-if="error.instancePath" class="neutral-1">
+														{{ error.instancePath }}
+													</strong>
+													{{ error.message.capitalize() }}
+													<template v-if="error.keyword == 'additionalProperties'">
+														<span> '{{ error.params.additionalProperty }}'</span>
+													</template>
+												</li>
+											</ol>
+										</div>
+									</template>
 								</hk-popover>
 								{{ props.row.name.capitalizeEach() }}
 							</td>
@@ -131,11 +133,13 @@
 										{{ getLinkedEntities(import_type, props.row).length }}
 										{{ linked_entity_map[import_type] }}
 									</span>
-									<div slot="content">
-										<p v-for="item in getLinkedEntities(import_type, props.row)" :key="item.key">
-											{{ item.name.capitalize() }}
-										</p>
-									</div>
+									<template v-slot:content>
+										<div>
+											<p v-for="item in getLinkedEntities(import_type, props.row)" :key="item.key">
+												{{ item.name.capitalize() }}
+											</p>
+										</div>
+									</template>
 								</hk-popover>
 							</td>
 						</template>
@@ -155,9 +159,11 @@
 										/>
 										{{ props.row.meta.overwrite || "Select" }}
 									</button>
-									<div slot="content">
-										<DuplicateOptions v-model="props.row" />
-									</div>
+									<template v-slot:content>
+										<div>
+											<DuplicateOptions v-model="props.row" />
+										</div>
+									</template>
 								</hk-popover>
 							</td>
 						</template>
@@ -197,7 +203,7 @@
 			/>
 
 			<q-expansion-item v-if="countFailed > 0" class="mb-4">
-				<template slot="header">
+				<template v-slot:header>
 					<q-item-section avatar>
 						<strong class="red">{{ countFailed }}</strong>
 					</q-item-section>
@@ -218,20 +224,22 @@
 								<q-item-section avatar>
 									<hk-popover v-if="failed.errors" header="Validation errors">
 										<q-icon name="error" class="red" />
-										<div slot="content">
-											<ol class="px-3">
-												<li
-													v-for="(error, index) in failed.errors"
-													:key="`${i}-error-${index}`"
-													class="red"
-												>
-													<strong v-if="error.instancePath" class="neutral-1">
-														{{ error.instancePath }}
-													</strong>
-													{{ error.message.capitalize() }}
-												</li>
-											</ol>
-										</div>
+										<template v-slot:content>
+											<div>
+												<ol class="px-3">
+													<li
+														v-for="(error, index) in failed.errors"
+														:key="`${i}-error-${index}`"
+														class="red"
+													>
+														<strong v-if="error.instancePath" class="neutral-1">
+															{{ error.instancePath }}
+														</strong>
+														{{ error.message.capitalize() }}
+													</li>
+												</ol>
+											</div>
+										</template>
 									</hk-popover>
 								</q-item-section>
 							</q-item>
@@ -269,10 +277,12 @@
 
 		<q-dialog v-model="showSchema">
 			<hk-card>
-				<div slot="header" class="card-header">
-					<span>Schemas</span>
-					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Schemas</span>
+						<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<p>
 						You can use
@@ -305,6 +315,7 @@ import spellSchema from "src/schemas/hk-spell-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import DuplicateOptions from "./importer/DuplicateOptions";
+import { notifySuccess, notifyError } from "src/utils/notify";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
@@ -485,7 +496,7 @@ export default {
 				const result = monster ? JSON.parse(monster) : JSON.parse(this.json_input);
 				this.parse(result);
 			} catch {
-				this.$snotify.error("Invalid JSON");
+				notifyError("Invalid JSON");
 			}
 		},
 
@@ -782,13 +793,9 @@ export default {
 		copySchema() {
 			try {
 				navigator.clipboard.writeText(JSON.stringify(this.schema));
-				this.$snotify.success("Successful", "Schema copied", {
-					position: "rightTop",
-				});
+				notifySuccess("Successful", "Schema copied");
 			} catch {
-				this.$snotify.error("Unsuccessful", "Schema not copied", {
-					position: "rightTop",
-				});
+				notifyError("Unsuccessful", "Schema not copied");
 			}
 		},
 
@@ -808,15 +815,15 @@ export default {
 						if (ability.versatile && !ability.options) {
 							// Turn versatile into options
 							is_versatile = true;
-							this.$set(ability, "options", [
-								ability.versatile_one || "Option 1",
-								ability.versatile_two || "Option 2",
-							]);
+							ability["options"] = [
+							ability.versatile_one || "Option 1",
+							ability.versatile_two || "Option 2",
+						];
 						}
 						// Remove versatile
-						this.$delete(ability, "versatile");
-						this.$delete(ability, "versatile_one");
-						this.$delete(ability, "versatile_two");
+						delete ability["versatile"];
+						delete ability["versatile_one"];
+						delete ability["versatile_two"];
 
 						// In the actions find rolls with versatile options set
 						if (ability.action_list && ability.action_list.length) {
@@ -833,11 +840,11 @@ export default {
 												options = !options ? { [ability.options[1]]: {} } : options;
 												options[ability.options[1]][option] = roll[`versatile_${option}`];
 											}
-											this.$delete(roll, `versatile_${option}`);
+											delete roll[`versatile_${option}`];
 										}
 
 										if (is_versatile && options) {
-											this.$set(roll, "options", options);
+											roll["options"] = options;
 										}
 									}
 								}
@@ -980,7 +987,7 @@ export default {
 .q-expansion-item {
 	background-color: $neutral-9;
 }
-.no-table-margin::v-deep table {
+.no-table-margin:deep(table) {
 	margin-bottom: 0;
 }
 

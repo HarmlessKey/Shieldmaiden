@@ -44,13 +44,18 @@ export default {
 	props: {
 		value: {
 			type: Object,
-			required: true,
+			required: false,
+		},
+		modelValue: {
+			type: Object,
+			required: false,
 		},
 		disabled: {
 			type: Boolean,
 			default: false,
 		}
 	},
+	emits: ["input", "update:modelValue"],
 	data() {
 		return {
 			weather_effects: {
@@ -68,10 +73,11 @@ export default {
 	computed: {
 		weather: {
 			get() {
-				return this.value;
+				return this.modelValue !== undefined ? this.modelValue : this.value;
 			},
 			set(newVal) {
 				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},

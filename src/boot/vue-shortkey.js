@@ -1,5 +1,5 @@
-import shortkey from 'vue-shortkey';
+import shortkeyPlugin from 'src/directives/shortkey';
 
-export default async ({ Vue }) => {
-	Vue.use(shortkey, { prevent: ['input', 'textarea'] });
+export default async ({ app }) => {
+  app.use(shortkeyPlugin);
 };

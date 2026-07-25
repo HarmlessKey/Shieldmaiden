@@ -98,6 +98,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { confirmAction } from "src/utils/notify";
 import { audio } from "src/mixins/audio";
 
 export default {
@@ -125,26 +126,12 @@ export default {
 	methods: {
 		...mapActions(["setDrawer", "reset_demo", "set_finished"]),
 		confirmFinish() {
-			this.$snotify.error("Are you sure you want to finish the encounter?", "Finish Encounter", {
-				position: "centerCenter",
-				timeout: 0,
-				buttons: [
-					{
-						text: "Finish",
-						action: (toast) => {
-							this.finish();
-							this.$snotify.remove(toast.id);
-						},
-						bold: false,
-					},
-					{
-						text: "Cancel",
-						action: (toast) => {
-							this.$snotify.remove(toast.id);
-						},
-						bold: true,
-					},
-				],
+			confirmAction({
+				title: "Finish Encounter",
+				message: "Are you sure you want to finish the encounter?",
+				onOk: () => {
+					this.finish();
+				},
 			});
 		},
 		finish() {

@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import { itemServices } from "src/services/api/items"; 
+import { itemServices } from "src/services/api/items";
 
 
 const item_state = () => ({
@@ -36,10 +35,10 @@ const item_actions = {
   /**
    * Gets a single item from the database using and id (or kebab name)
    * and saves the item in de store
-   * 
+   *
    * @param {number | string} id | kebab name
    * @returns {object} item
-   */ 
+   */
   async fetch_api_item({ commit, state, dispatch}, id) {
     const cached = state.cached_items;
     let item = undefined;
@@ -58,7 +57,7 @@ const item_actions = {
       const services = await dispatch("get_api_item_services");
       try {
         item = await services.getItem(id);
-              
+
         // Create meta tags
         item.meta = {
           title: `${item.name.capitalizeEach()} D&D 5e`,
@@ -67,10 +66,10 @@ const item_actions = {
         item.meta.desciption += item.rarity + ' ';
         item.meta.desciption += item.type + ' \n';
         item.meta.desciption += item.desc;
-        
+
         const maxLength = 160 - (3);
         item.meta.description = `${item.meta.desciption.substring(0, maxLength).trim()}...`
-        
+
         commit("SET_CACHED_ITEM", item);
         commit("SET_CACHED_URL", { url: item.url, id: item._id });
       } catch(error) {
@@ -81,10 +80,10 @@ const item_actions = {
   },
 };
 const item_mutations = {
-  SET_ITEM_SERVICES(state, payload) { Vue.set(state, "item_services", payload); },
-  SET_ITEMS(state, payload) { Vue.set(state, "items", payload); },
-  SET_CACHED_ITEM(state, payload) { Vue.set(state.cached_items, payload["_id"], payload) },
-  SET_CACHED_URL(state, { url, id }) { Vue.set(state.cached_urls, url, id) },
+  SET_ITEM_SERVICES(state, payload) { state.item_services = payload; },
+  SET_ITEMS(state, payload) { state.items = payload; },
+  SET_CACHED_ITEM(state, payload) { state.cached_items[payload["_id"]] = payload; },
+  SET_CACHED_URL(state, { url, id }) { state.cached_urls[url] = id; },
 };
 
 export default {

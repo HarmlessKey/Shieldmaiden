@@ -91,7 +91,7 @@
 				v-for="(xp, index) in xpAward"
 				class="xp"
 				:key="`xp-${index}`"
-				@click="$delete(xpAward, index)"
+				@click="xpAward.splice(index, 1)"
 			>
 				{{ xp > 0 ? `+${xp}` : xp }}<small>xp</small>
 			</div>
@@ -102,6 +102,7 @@
 <script>
 import _ from "lodash";
 import { db } from "src/firebase";
+import { notifyHtml } from "src/utils/notify";
 import CampaignOverview from "src/components/trackCampaign/CampaignOverview.vue";
 import Live from "./live";
 
@@ -169,17 +170,16 @@ export default {
 							advantage = `<b class="${color}">${notification.advantage_disadvantage.capitalize()}</b>`;
 						}
 
-						this.$snotify.html(
-							`<div class="snotifyToast__body roll">
+						notifyHtml(
+							`<div class="roll">
 									<div class="roll_title truncate">${
 										notification.entity_name ? `${notification.entity_name}: ` : ``
 									}${notification.title}</div>
 									<div class="rolled" id="roll">${notification.total}</div>
 									<div class="roll_footer">${advantage ? advantage : ""}${notification.roll}</div>
-								</div> `,
+								</div>`,
 							{
 								timeout: 8000,
-								closeOnClick: true,
 							}
 						);
 					}
@@ -257,7 +257,7 @@ export default {
 			return undefined;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener("resize", this.setSize);
 	},
 };

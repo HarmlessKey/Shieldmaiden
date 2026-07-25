@@ -18,19 +18,18 @@
 		</div>
 
 		<template v-if="type === 'damage'">
-			<ValidationObserver v-slot="{ valid }">
+			<ValidationObserver v-slot="{ meta }" as="div">
 				<div class="damage_inputs">
 					<div>Amount</div>
 					<div>Type</div>
 					<a @click="addInput()" class="handle"
 						><i aria-hidden="true" class="fas fa-plus green"></i
 					></a>
-					<template v-for="(input, i) in damage">
+					<template v-for="(input, i) in damage" :key="`damage-${i}`">
 						<ValidationProvider
 							rules="required|numeric|min_value:0"
 							:name="`amount-${i}`"
-							v-slot="{ errors, invalid, validated }"
-							:key="`damage-${i}`"
+							v-slot="{ errorMessage }" :modelValue="damage[i].amount" as="div"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -43,8 +42,8 @@
 								type="number"
 								v-model="damage[i].amount"
 								min="0"
-								:error="invalid && validated"
-								:error-message="errors[0]"
+								:error="!!errorMessage"
+								:error-message="errorMessage"
 							/>
 						</ValidationProvider>
 
@@ -52,31 +51,30 @@
 							v-model="damage[i].damage_type"
 							label="Damage type"
 							dense
-							:key="`type-${i}`"
 							@input="$forceUpdate()"
 							:class="{ 'no-delete': i === 0 }"
 						/>
-						<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"
+						<a v-if="i > 0" @click="removeInput(i)" class="handle"
 							><i aria-hidden="true" class="fas fa-trash-alt red"></i
 						></a>
 					</template>
 				</div>
 				<button
 					class="btn btn-block"
-					@click="valid ? sendRequest() : null"
-					:disabled="!valid"
-					:class="{ disabled: !valid }"
+					@click="meta.valid ? sendRequest() : null"
+					:disabled="!meta.valid"
+					:class="{ disabled: !meta.valid }"
 				>
 					Send Request
 				</button>
 			</ValidationObserver>
 		</template>
 
-		<ValidationObserver v-if="type === 'healing'" v-slot="{ valid }">
+		<ValidationObserver v-if="type === 'healing'" v-slot="{ meta }" as="div">
 			<ValidationProvider
 				rules="required|numeric|min_value:0"
 				name="Manual input`"
-				v-slot="{ errors, invalid, validated }"
+				v-slot="{ errorMessage }" :modelValue="healingAmount" as="div"
 			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -87,14 +85,14 @@
 					v-model="healingAmount"
 					min="0"
 					class="healing-input"
-					:error="invalid && validated"
-					:error-message="errors[0]"
+					:error="!!errorMessage"
+					:error-message="errorMessage"
 				/>
 			</ValidationProvider>
 			<button
 				class="btn btn-block"
-				@click="valid ? sendRequest() : null"
-				:class="{ disabled: !valid }"
+				@click="meta.valid ? sendRequest() : null"
+				:class="{ disabled: !meta.valid }"
 			>
 				Send Request
 			</button>
@@ -105,6 +103,7 @@
 <script>
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
+import { notifySuccess } from "src/utils/notify";
 import { trackEncounter } from "src/mixins/trackEncounter";
 
 export default {
@@ -153,7 +152,7 @@ export default {
 			this.damage.push({ amount: "", damage_type: "acid" });
 		},
 		removeInput(i) {
-			this.$delete(this.damage, i);
+			this.damage.splice(i, 1);
 			this.$forceUpdate();
 		},
 		sendRequest() {
@@ -187,14 +186,13 @@ export default {
 				request
 			);
 
-			this.$snotify.success(
+			notifySuccess(
 				`Your ${this.type} request was successfuly sent.`,
-				`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`,
-				{ position: "centerTop" }
+				`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`
 			);
 			this.setDrawer({ show: false });
 		},
-		},
+	},
 };
 </script>
 

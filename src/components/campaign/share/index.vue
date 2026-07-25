@@ -36,7 +36,7 @@
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
 			<q-tab-panel name="background">
-				<ValidationObserver v-slot="{ valid }">
+				<ValidationObserver v-slot="{ meta }" as="div">
 					<hk-input
 						v-model="background.image"
 						label="Background image"
@@ -48,12 +48,14 @@
 						@input="
 							(value) => {
 								if (!value) {
-									$delete(background, 'image');
+									delete background.image;
 								}
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fas fa-image" />
+						<template v-slot:prepend>
+							<hk-icon icon="fas fa-image" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="background.video"
@@ -66,12 +68,14 @@
 						@input="
 							(value) => {
 								if (!value) {
-									$delete(background, 'video');
+									delete background.video;
 								}
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fas fa-video" />
+						<template v-slot:prepend>
+							<hk-icon icon="fas fa-video" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="background.youtube"
@@ -84,19 +88,21 @@
 						@input="
 							(value) => {
 								if (!value) {
-									$delete(background, 'youtube');
+									delete background.youtube;
 								}
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fab fa-youtube" />
+						<template v-slot:prepend>
+							<hk-icon icon="fab fa-youtube" />
+						</template>
 					</hk-input>
 					<div class="actions">
 						<button class="btn bg-neutral-5" @click="clearBackground">Clear</button>
 						<button
 							class="btn"
-							@click="valid ? setBackground() : null"
-							:disabled="isEmpty(background) || !valid"
+							@click="meta.valid ? setBackground() : null"
+							:disabled="isEmpty(background) || !meta.valid"
 						>
 							Set
 						</button>
@@ -105,7 +111,7 @@
 			</q-tab-panel>
 
 			<q-tab-panel name="share">
-				<ValidationObserver v-slot="{ valid }">
+				<ValidationObserver v-slot="{ meta }" as="div">
 					<hk-input
 						v-model="share.image"
 						label="Share image"
@@ -117,12 +123,14 @@
 						@input="
 							(value) => {
 								if (!value) {
-									$delete(share, 'image');
+									delete share.image;
 								}
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fas fa-image" />
+						<template v-slot:prepend>
+							<hk-icon icon="fas fa-image" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="share.youtube"
@@ -135,12 +143,14 @@
 						@input="
 							(value) => {
 								if (!value) {
-									$delete(share, 'youtube');
+									delete share.youtube;
 								}
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fab fa-youtube" />
+						<template v-slot:prepend>
+							<hk-icon icon="fab fa-youtube" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="share.message"
@@ -155,7 +165,7 @@
 						@input="
 							(value) => {
 								if (!value) {
-									$delete(share, 'message');
+									delete share.message;
 								}
 							}
 						"
@@ -163,8 +173,8 @@
 					<div class="actions">
 						<button
 							class="btn btn-block"
-							:disabled="isEmpty(share) || !valid"
-							@click="valid ? startShare() : null"
+							:disabled="isEmpty(share) || !meta.valid"
+							@click="meta.valid ? startShare() : null"
 						>
 							Share
 						</button>

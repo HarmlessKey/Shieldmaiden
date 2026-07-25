@@ -1,21 +1,23 @@
 <template>
 <div>
 	<ValidationObserver v-slot="{ handleSubmit }">
-		<q-form @submit="handleSubmit(saveModifier)" greedy>
+		<q-form @submit="handleSubmit($event, saveModifier)" greedy>
 			<hk-card :min-width="300" no-margin>
-				<div slot="header" class="card-header d-flex justify-content-between">
-					<span>
-						{{ modifier['.key'] ? 'Edit' : 'New' }} modifier
-					</span>
-					<q-btn flat v-close-popup round icon="close" size="sm" class="ml-2" />
-				</div>
+				<template v-slot:header>
+					<div class="card-header d-flex justify-content-between">
+						<span>
+							{{ modifier['.key'] ? 'Edit' : 'New' }} modifier
+						</span>
+						<q-btn flat v-close-popup round icon="close" size="sm" class="ml-2" />
+					</div>
+				</template>
 
 				<div class="card-body">				
 					<!-- MODIFIER -->
 					<div v-if="!scaling">
 						<div class="form-item mb-3">
 							<div class="mb-3">Origin: {{ modifier_origin }}</div>
-							<ValidationProvider rules="max:30|required" name="Name" v-slot="{ errors, invalid, validated }">
+							<ValidationProvider rules="max:30|required" name="Name" v-slot="{ errorMessage }" :modelValue="modifier.name" as="div">
 								<q-input
 									autocomplete="off"
 									dark filled square
@@ -25,8 +27,8 @@
 									maxlength="30"
 									name="name"
 									placeholder="Modifier name"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 						</div>
@@ -80,9 +82,8 @@
 											</q-item-section>
 										</q-item>
 
-										<template v-for="weapon in scope.opt.weapons">
+										<template v-for="weapon in scope.opt.weapons" :key="weapon.value">
 											<q-item
-												:key="weapon.value"
 												clickable
 												v-ripple
 												v-close-popup
@@ -113,23 +114,25 @@
 							
 							<!-- VALUE -->
 							<div class="form-item mb-3" v-if="['bonus', 'set'].includes(modifier.type)">
-								<ValidationProvider rules="required" name="Value" v-slot="{ errors, invalid, validated }">
+								<ValidationProvider rules="required" name="Value" v-slot="{ errorMessage }" :modelValue="modifier.value" as="div">
 									<q-input 
 										dark filled square
 										label="Value"
 										autocomplete="off"  
 										type="number" 
 										v-model.number="modifier.value"
-										@input="parseInt($event)" 
-										:error="invalid && validated"
-										:error-message="errors[0]"
+										@update:model-value="parseInt($event)" 
+										:error="!!errorMessage"
+										:error-message="errorMessage"
 									>
-										<a slot="after" @click="addScaling" class="btn btn-block">
-											<i class="far fa-chart-line" aria-hidden="true"/>
-											<q-tooltip anchor="top middle" self="center middle">
-												Level scaling
-											</q-tooltip>
-										</a>
+										<template v-slot:after>
+											<a @click="addScaling" class="btn btn-block">
+												<i class="far fa-chart-line" aria-hidden="true"/>
+												<q-tooltip anchor="top middle" self="center middle">
+													Level scaling
+												</q-tooltip>
+											</a>
+										</template>
 									</q-input>
 								</ValidationProvider>
 								
@@ -165,7 +168,7 @@
 										type="number" 
 										step="0.5"
 										v-model.number="modifier.multiplier"
-										@input="Number($event)" 
+										@update:model-value="Number($event)" 
 									/>
 							</div>
 
@@ -197,32 +200,32 @@
 
 						<!-- VALUE -->
 						<div class="form-item mb-3">
-							<ValidationProvider rules="required" name="Initial value" v-slot="{ errors, invalid, validated }">
+							<ValidationProvider rules="required" name="Initial value" v-slot="{ errorMessage }" :modelValue="modifier.value" as="div">
 								<q-input 
 									dark filled square
 									label="Initial value"
 									autocomplete="off"
 									type="number"
 									v-model.number="modifier.value"
-									@input="parseInt($event)"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									@update:model-value="parseInt($event)"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 						</div>
 						
 						<!-- STARTING LEVELS -->
 						<div class="form-item mb-3" v-if="modifier.origin.split('.')[0] !== 'class'">
-							<ValidationProvider rules="required" name="Start" v-slot="{ errors, invalid, validated }">
+							<ValidationProvider rules="required" name="Start" v-slot="{ errorMessage }" :modelValue="modifier.scaling.start" as="div">
 								<q-input 
 									dark filled square
 									label="Starting level"
 									autocomplete="off"  
 									type="number"
 									v-model.number="modifier.scaling.start"
-									@input="parseInt($event)"
-									:error="invalid && validated"
-									:error-message="errors[0]"
+									@update:model-value="parseInt($event)"
+									:error="!!errorMessage"
+									:error-message="errorMessage"
 								/>
 							</ValidationProvider>
 						</div>
@@ -232,10 +235,10 @@
 							<q-select 
 								dark filled square 
 								map-options emit-value 
-								:value="modifier.scaling.type" 
+								:model-value="modifier.scaling.type" 
 								:options="scaling_types" 
 								label="Scaling type"
-								@input="setScalingType"
+								@update:model-value="setScalingType"
 							/>
 						</div>
 						
@@ -243,30 +246,30 @@
 						<div v-if="modifier.scaling.type === 'scale'" class="form-item mb-3">
 							<div class="row q-col-gutter-md mb-2">
 								<div class="col-6">
-									<ValidationProvider rules="required" name="Size" v-slot="{ errors, invalid, validated }">
+									<ValidationProvider rules="required" name="Size" v-slot="{ errorMessage }" :modelValue="modifier.scaling.scale.size" as="div">
 										<q-input 
 											dark filled square
 											label="Scale size"
 											autocomplete="off"  
 											type="number" 
 											v-model.number="modifier.scaling.scale.size"
-											@input="parseInt($event)"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											@update:model-value="parseInt($event)"
+											:error="!!errorMessage"
+											:error-message="errorMessage"
 										/>
 									</ValidationProvider>
 								</div>
 								<div class="col-6">
-									<ValidationProvider rules="required" name="Scale value" v-slot="{ errors, invalid, validated }">
+									<ValidationProvider rules="required" name="Scale value" v-slot="{ errorMessage }" :modelValue="modifier.scaling.scale.value" as="div">
 										<q-input 
 											dark filled square
 											label="Scale value"
 											autocomplete="off"  
 											type="number" 
 											v-model.number="modifier.scaling.scale.value" 
-											@input="parseInt($event)"
-											:error="invalid && validated"
-											:error-message="errors[0]"
+											@update:model-value="parseInt($event)"
+											:error="!!errorMessage"
+											:error-message="errorMessage"
 										/>
 									</ValidationProvider>
 								</div>
@@ -280,10 +283,12 @@
 						</div>
 					</div>
 				</div>
-				<div slot="footer" class="card-footer d-flex justify-content-end">
-					<q-btn class="mr-2" label="Cancel" v-close-popup />
-					<q-btn type="submit" label="Save" no-caps color="primary" />
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer d-flex justify-content-end">
+						<q-btn class="mr-2" label="Cancel" v-close-popup />
+						<q-btn type="submit" label="Save" no-caps color="primary" />
+					</div>
+				</template>
 			</hk-card>
 		</q-form>
 	</ValidationObserver>
@@ -523,21 +528,21 @@
 			},
 			addScaling() {
 				if(!this.modifier.scaling) {
-					this.$set(this.modifier, "scaling", {});
+					this.modifier["scaling"] = {};
 				}
 				this.scaling = true;
 			},
 			setScalingType(type) {
-				this.$set(this.modifier.scaling, "type", type);
+				this.modifier.scaling["type"] = type;
 				if(type === "scale") {
-					this.$set(this.modifier.scaling, "scale", {});
+					this.modifier.scaling["scale"] = {};
 				} else {
-					this.$set(this.modifier.scaling, "steps", []);
+					this.modifier.scaling["steps"] = [];
 				}
 				this.$forceUpdate();
 			},
 			deleteScaling() {
-				this.$set(this.modifier, "scaling", null);
+				this.modifier["scaling"] = null;
 			},
 		}
 	}

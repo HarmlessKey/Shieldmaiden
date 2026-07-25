@@ -48,7 +48,7 @@ export default {
 }
 .overflow-visible {
 	overflow: visible;
-	&::v-deep {
+	&:deep() {
 		.q-panel {
 			overflow: visible;
 		}

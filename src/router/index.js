@@ -1,20 +1,12 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { route } from "quasar/wrappers";
+import { createRouter, createMemoryHistory, createWebHistory } from "vue-router";
 import routes from "./routes";
+import { Notify } from "quasar";
 
-Vue.use(VueRouter);
+export default route(function ({ store /*, ssrContext */ }) {
+	const createHistory = process.env.SERVER ? createMemoryHistory : createWebHistory;
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
-
-export default function ({ store, ssrContext }) {
-	const router = new VueRouter({
+	const router = createRouter({
 		scrollBehavior() {
 			const el = document.querySelector(".scroll");
 			if (el) {
@@ -23,12 +15,7 @@ export default function ({ store, ssrContext }) {
 			}
 		},
 		routes,
-
-		// Leave these as they are and change in quasar.conf.js instead!
-		// quasar.conf.js -> build -> vueRouterMode
-		// quasar.conf.js -> build -> publicPath
-		mode: process.env.VUE_ROUTER_MODE,
-		base: process.env.VUE_ROUTER_BASE,
+		history: createHistory(process.env.VUE_ROUTER_BASE),
 	});
 
 	// Check before each page load whether the page requires authentication/
@@ -42,7 +29,7 @@ export default function ({ store, ssrContext }) {
 		const offline_available = to.matched.some((record) => record.meta.offline); //Check if route is offline available
 
 		// Check if a user is offline, if the page is not available offline, send to home
-		if (process.browser && !navigator.onLine && !offline_available) {
+		if (process.env.CLIENT && !navigator.onLine && !offline_available) {
 			Notify.create({
 				message: "Page not available offline, redirected to home.",
 				icon: "fas fa-wifi-slash",
@@ -55,4 +42,4 @@ export default function ({ store, ssrContext }) {
 	});
 
 	return router;
-}
+});

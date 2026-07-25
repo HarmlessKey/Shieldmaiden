@@ -27,8 +27,8 @@
 				</q-item-section>
 			</q-item>
 		</template>
-		<template v-for="type in selected_type">
-			<q-item :key="`header-${type}`">
+		<template v-for="type in selected_type" :key="type">
+			<q-item>
 				<q-item-section>
 					<span class="d-flex justify-content-between">
 						{{ action_types[type].label }}
@@ -42,7 +42,6 @@
 				</q-item-section>
 			</q-item>
 			<RollActions
-				:key="`actions-${type}`"
 				:actor="actor"
 				:type="type"
 				rolls-only

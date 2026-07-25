@@ -216,7 +216,7 @@ export default {
 			white-space: nowrap;
 			line-height: 16px;
 		}
-		::v-deep {
+		:deep() {
 			.saves {
 				font-size: 13px;
 

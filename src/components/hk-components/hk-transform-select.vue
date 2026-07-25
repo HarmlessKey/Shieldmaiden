@@ -20,7 +20,7 @@
 				class="full-width"
 				label="Challenge rating"
 				clearable
-				@input="updateFilter"
+				@update:model-value="updateFilter"
 			/>
 		</div>
 		<div class="mb-2 d-flex justify-content-between">
@@ -111,7 +111,7 @@ export default {
 				sortBy: this.pagination.sortBy,
 				descending: this.pagination.descending,
 			}).then((result) => {
-				this.$set(this.pagination, "rowsNumber", result.meta.count);
+				this.pagination["rowsNumber"] = result.meta.count;
 				this.beasts = result.results;
 				this.loading = false;
 			});

@@ -29,6 +29,13 @@ export class monsterServices {
 		if (query) {
 			const queryParams = [];
 			const add = (key, value) => queryParams.push(`${key}=${encodeURIComponent(value)}`);
+			// The API expects multi-value filters as a repeated plain key
+			// (type=Beast&type=Dragon), not the bracket form (type[]=Beast).
+			const addAll = (key, values) => {
+				for (const value of values) {
+					add(key, value);
+				}
+			};
 
 			if (query.search) {
 				add("name", query.search);
@@ -37,34 +44,26 @@ export class monsterServices {
 				add("source", query.source);
 			}
 			if (query.types && query.types.length) {
-				for (const type of query.types) {
-					add("type[]", type);
-				}
+				addAll("type", query.types);
 			}
 			if (query.sizes && query.sizes.length) {
-				for (const size of query.sizes) {
-					add("size[]", size);
-				}
+				addAll("size", query.sizes);
 			}
 			if (query.environments && query.environments.length) {
-				for (const environment of query.environments) {
-					add("environment[]", environment);
-				}
+				addAll("environment", query.environments);
 			}
 			if (query.alignments && query.alignments.length) {
-				for (const alignment of query.alignments) {
-					add("alignment[]", alignment);
-				}
+				addAll("alignment", query.alignments);
 			}
 			if (query.challenge_ratings) {
 				// CRs are not evenly spaced (0, 1/8, 1/4, 1/2, 1, 2, …), so the range has to be
 				// sliced out of the CR list. Counting up from min in steps of 1 produces values
 				// like 1.125 that match no monster at all.
 				const { min, max } = query.challenge_ratings;
-				const selected = challenge_ratings.filter((rating) => rating >= min && rating <= max);
-				for (const cr of selected) {
-					add("challenge_rating[]", cr);
-				}
+				addAll(
+					"challenge_rating",
+					challenge_ratings.filter((rating) => rating >= min && rating <= max)
+				);
 			}
 
 			if (queryParams.length) {

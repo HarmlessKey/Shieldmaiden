@@ -5,7 +5,24 @@
 > SRD monster filter no longer works. Only filter by name is working, not the others
 > (environment, cr, type, etc).
 
-## Root cause
+## Root cause: array params use the wrong syntax
+
+The API was changed to expect multi-value filters as a **repeated plain key**. Confirmed against
+the live API by the reporter:
+
+| Query           | Result  |
+| --------------- | ------- |
+| `type=Beast`    | works   |
+| `type[]=Beast`  | ignored |
+
+`src/services/api/monsters.js` sent the bracket form for every multi-value filter — `type[]`,
+`size[]`, `environment[]`, `alignment[]` and `challenge_rating[]` — so all of them were silently
+dropped by the API and came back unfiltered. `name` and `source` are single plain keys and were
+never affected, which is exactly why "only filter by name is working".
+
+Multiple selections are sent as the key repeated: `type=Beast&type=Dragon`.
+
+## Second bug: challenge rating range
 
 `src/services/api/monsters.js` expands the challenge rating range with `lodash.range()`:
 
@@ -31,21 +48,8 @@ From that commit on, `min` can be `0.125`, `0.25` or `0.5`, and `range()` produc
 
 Every one of those queries returns **zero monsters**.
 
-### Why the other filters look broken too
-
-`filter` in `Entities.vue` / `Compendium/Monsters.vue` is a single object that persists for the
-lifetime of the view — the filter dialog is re-created on each open, but the object it writes into
-is not reset. `filterMonsters()` spreads the whole object into every request:
-
-```js
-this.query = { search: this.searchMonster, source: …, ...this.filter };
-```
-
-So once the user nudges the CR slider off `0` (the first three notches are 1/8, 1/4, 1/2 — exactly
-the ones that break), `challenge_ratings` stays in `filter` and poisons **every subsequent query**.
-Setting a type or an environment afterwards still returns nothing, which reads as "type and
-environment filtering are broken too". Only "Clear filter" recovers, and a plain name search done
-before the dialog is ever opened still works — matching the report exactly.
+This is masked by the param-name bug above — the CR params were being dropped wholesale — but it
+would break the CR filter as soon as the param names are fixed, so both need fixing together.
 
 The `min === 0` special case is wrong in its own right: it force-adds 1/8, 1/4 and 1/2 to any range
 starting at 0, so a `0 – 0` range also returns CR 1/8, 1/4 and 1/2 monsters.
@@ -65,6 +69,8 @@ options in `src/mixins/monster.js` — `"Swarm of tiny beasts"` and nearly every
 
 ## Scope
 
+- `src/services/api/monsters.js` — send multi-value filters as repeated plain keys instead of the
+  `field[]` form.
 - `src/utils/generalConstants.js` — add the canonical CR ladder + fraction labels as shared
   constants (per CLAUDE.md, shared constants live here).
 - `src/components/hk-components/hk-filter.vue` — use the shared constants instead of a private
@@ -74,19 +80,19 @@ options in `src/mixins/monster.js` — `"Swarm of tiny beasts"` and nearly every
 - `src/services/api/spells.js` — encode all values (same interpolation bug; its `level` range is
   integer-only so it is not affected by the CR issue).
 
-## Out of scope / open question
+## Open question: /spells
 
-The `field[]=value` array convention used for `type[]`, `size[]`, `environment[]`, `alignment[]`
-and `challenge_rating[]` is left unchanged. It matches axios' default array serialization and is
-used identically by the spells service, so it is very likely correct. `api.harmlesskey.com` is not
-reachable from the dev environment (egress policy), so this could not be verified against a live
-response — if filtering still misbehaves after this fix, the API's expected array syntax is the
-next thing to check.
+`src/services/api/spells.js` still sends `school[]`, `classes[]` and `level[]`. If the API change
+was global rather than limited to `/monsters`, the spell filters are broken in exactly the same way
+and need the same one-line change per param. Left alone here rather than guessed at, because
+changing it blind would break the spell filter if `/spells` still accepts the bracket form.
+`api.harmlesskey.com` is not reachable from the dev environment (egress policy), so this could not
+be checked directly.
 
 ## Verification
 
-- CR 1/8 – 30 returns monsters (previously empty).
-- CR 0 – 0 returns only CR 0 monsters (previously also 1/8, 1/4, 1/2).
+- Type "Beast" returns only beasts; selecting Beast + Dragon returns both.
+- Environment, size and alignment filter instead of being ignored.
+- CR 1/8 – 30 returns monsters; CR 0 – 0 returns only CR 0 (previously also 1/8, 1/4, 1/2).
 - Type "Swarm of tiny beasts" and alignment "Lawful good" survive the query string intact.
-- Setting type/environment after touching the CR slider still filters correctly.
-- Full-range CR slider adds no `challenge_rating[]` params and no filter badge.
+- Full-range CR slider adds no `challenge_rating` params and no filter badge.

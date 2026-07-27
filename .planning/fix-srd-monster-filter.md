@@ -7,13 +7,23 @@
 
 ## Root cause: array params use the wrong syntax
 
-The API was changed to expect multi-value filters as a **repeated plain key**. Confirmed against
-the live API by the reporter:
+The API was upgraded to **Express 5**, which changed the default `query parser` from `extended`
+(`qs`) to `simple` (Node's `querystring`). The simple parser does not interpret `[]`: `type[]=Beast`
+becomes the literal key `"type[]"`, so `req.query.type` is undefined and the filter is ignored.
+Multi-value filters must now be sent as a **repeated plain key**. Confirmed against the live API by
+the reporter:
 
 | Query           | Result  |
 | --------------- | ------- |
 | `type=Beast`    | works   |
 | `type[]=Beast`  | ignored |
+
+`query parser` is an application-wide Express setting, so every endpoint using the bracket form
+broke at the same moment — `/monsters` and `/spells`. `/items` and `/conditions` only send `name=`
+and are unaffected.
+
+Repeated plain keys parse to an array under both the `simple` and `extended` parsers, so this
+change is correct whether or not the API also restores `app.set("query parser", "extended")`.
 
 `src/services/api/monsters.js` sent the bracket form for every multi-value filter — `type[]`,
 `size[]`, `environment[]`, `alignment[]` and `challenge_rating[]` — so all of them were silently

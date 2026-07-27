@@ -29,24 +29,25 @@ export class spellServices {
 		if (query) {
 			const queryParams = [];
 			const add = (key, value) => queryParams.push(`${key}=${encodeURIComponent(value)}`);
+			// The API expects multi-value filters as a repeated plain key
+			// (school=evocation&school=necromancy), not the bracket form (school[]=evocation).
+			const addAll = (key, values) => {
+				for (const value of values) {
+					add(key, value);
+				}
+			};
 
 			if (query.search) {
 				add("name", query.search);
 			}
 			if (query.schools && query.schools.length) {
-				for (const school of query.schools) {
-					add("school[]", school);
-				}
+				addAll("school", query.schools);
 			}
 			if (query.classes && query.classes.length) {
-				for (const cls of query.classes) {
-					add("classes[]", cls);
-				}
+				addAll("classes", query.classes);
 			}
 			if (query.levels) {
-				for (const level of range(query.levels.min, query.levels.max + 1)) {
-					add("level[]", level);
-				}
+				addAll("level", range(query.levels.min, query.levels.max + 1));
 			}
 			if (queryParams.length) {
 				params += `&${queryParams.join("&")}`;

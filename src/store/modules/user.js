@@ -16,6 +16,10 @@ const user_state = () => ({
 	patreon_services: null,
 	user: undefined,
 	userInfo: undefined,
+	// Whether the initial userInfo fetch has completed. Needed to tell "still loading"
+	// apart from "loaded, but this user has no record/username yet" (e.g. a fresh
+	// Google sign-in, which creates an auth user but no users/<uid> record).
+	user_info_loaded: false,
 	tier: undefined,
 	voucher: undefined,
 	ai: {},
@@ -43,6 +47,9 @@ const user_getters = {
 	},
 	userInfo(state) {
 		return state.userInfo;
+	},
+	userInfoLoaded(state) {
+		return state.user_info_loaded;
 	},
 	userSettings(state) {
 		return state.userSettings;
@@ -127,10 +134,15 @@ const user_actions = {
 		// instead of racing a fixed timer.
 		const snapshot = await user.once("value");
 		const user_info = snapshot.val();
-		if (user_info) {
-			commit("SET_USERINFO", user_info);
-			await dispatch("enrichTier", user_info);
-		}
+		if (user_info) commit("SET_USERINFO", user_info);
+
+		// Flag the initial load as done even when there is no record: signing in with
+		// Google creates an auth user but no users/<uid> record until a username is set.
+		// Route guards rely on this to distinguish that state from "still loading".
+		commit("SET_USERINFO_LOADED", true);
+
+		// Enrichment is best effort and must never gate the username above.
+		if (user_info) await dispatch("enrichTier", user_info);
 
 		// Keep listening for live updates to the user record (e.g. external changes,
 		// voucher/patron updates). This must NOT be what the boot sequence awaits.
@@ -566,6 +578,9 @@ const user_mutations = {
 		const newVal = state.userInfo ? { ...state.userInfo, ...payload } : payload;
 		Vue.set(state, "userInfo", newVal);
 	},
+	SET_USERINFO_LOADED(state, payload) {
+		Vue.set(state, "user_info_loaded", payload);
+	},
 	SET_USER_SETTINGS(state, payload) {
 		Vue.set(state, "userSettings", payload);
 	},
@@ -646,6 +661,7 @@ const user_mutations = {
 	CLEAR_USER(state) {
 		Vue.set(state, "user", undefined);
 		Vue.set(state, "userInfo", undefined);
+		Vue.set(state, "user_info_loaded", false);
 		Vue.set(state, "tier", undefined);
 		Vue.set(state, "voucher", undefined);
 		Vue.set(state, "overencumbered", undefined);

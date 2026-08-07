@@ -1235,6 +1235,24 @@ const routes = [
 				],
 			},
 			{
+				path: "content-reports",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Content Reports",
+				},
+				children: [
+					{
+						path: "",
+						name: "Content Reports",
+						component: () => import("src/views/Admin/ContentReports.vue"),
+					},
+				],
+			},
+			{
 				path: "export_csv",
 				component: {
 					render(c) {

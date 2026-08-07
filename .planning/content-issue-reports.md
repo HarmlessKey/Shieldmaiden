@@ -173,14 +173,38 @@ Props: `type`, `contentId`, `contentName`, `edition`.
   Mirrors the class-per-domain / `db.ref()` pattern in `src/services/items.js`.
 - `src/store/modules/contentReports.js` (new, namespaced `content_reports`), registered in `src/store/index.js` (the store factory actually used by the app's SSR build — `src/store/store.js` turned out to be unused dead code, corrected during implementation) alongside the other modules there. State: `reports` cache keyed by `content_key`, `all_reports` (admin). Actions: `add_report`, `fetch_reports(type, content_id)` (filters to `status === "open"` client-side after the indexed fetch, for the public view), `fetch_all_reports` (admin, unfiltered), `set_report_status` (admin).
 
-## Admin
+## Admin — implemented
 
-- New page `src/views/Admin/ContentReports.vue`, added to the admin menu (`src/views/Admin/index.vue`) alongside existing entries (Users, Vouchers, etc.), gated the same way via `userInfo.admin` (existing `requiresAdmin` route meta / `admin.vue` layout guard — no new guard logic needed).
-- Loads `fetch_all_reports` once, then filters/sorts entirely client-side (dropdowns for
-  **type** and **status**, default status filter probably "open" so finished/false reports
-  don't clutter the default view — still reachable via the filter).
-- Table columns: type, content name, edition, issue, reporter, status, date. "Mark finished" /
-  "Mark false" row actions call `set_report_status`.
+- `src/views/Admin/ContentReports.vue`, route `/admin/content-reports` (registered in
+  `src/router/routes.js`, wrapper + child route matching the `vouchers`/`promotions`
+  pattern), added to the admin menu (`src/views/Admin/index.vue`). Gated the same way as
+  every other admin page via `userInfo.admin` (existing `requiresAdmin` route meta /
+  `admin.vue` layout guard — no new guard logic needed).
+- Loads `fetch_all_reports` once on mount, then filters entirely client-side via two
+  `q-select` dropdowns (**type**, **status**), default status filter `"open"` so
+  finished/false reports don't clutter the default view but stay reachable via the filter.
+- `q-table` (mirrors `src/views/Admin/Vouchers.vue`'s table conventions) with columns: type,
+  content name, edition, issue (truncated with a hover tooltip for the full text — issue can
+  be up to 500 chars), reporter (`user_id`, shown raw — no username lookup), status
+  (color-coded: green for `finished`, red for `false`), date. "Mark finished" / "Mark false"
+  row actions call `set_report_status`; whichever action matches the report's current status
+  is hidden (no point re-marking a `finished` report `finished`), but the other stays
+  available so a wrong call can be corrected.
+- Content name click behavior depends on type:
+  - **Monster**: fetches the full monster (`api_monsters/fetch_monster({ id: content_id,
+    edition })`) and opens it in the app's existing global drawer
+    (`setDrawer({ show: true, type: "drawers/ViewNpc", data: monster })` — the same
+    `drawers/ViewNpc.vue` → `compendium/Monster.vue` combo used elsewhere for NPCs), so an
+    admin can review the full stat block without leaving the page. A small `q-spinner` shows
+    next to the name while the fetch is in flight.
+  - **Spell/item**: still an external link to the content on the live site
+    (`/compendium/{type}s/{content_url}`, with a `5.5e/` segment when applicable) when
+    `content_url` is present — unchanged from the initial admin build. Only monster got the
+    drawer treatment since that's what was asked for; spell/item could get the same pattern
+    later (there's a `compendium/Spell.vue`/`Item.vue`, just no ready-made drawer wrapper for
+    them yet, unlike `drawers/ViewNpc.vue` for monsters).
+- Date column shows `DD-MM-YYYY` only (no time) — time isn't relevant here, and the initial
+  `toLocaleString()` was both locale-dependent and 12h-formatted, which wasn't wanted.
 
 ## Discord notification (Cloud Function) — next step
 

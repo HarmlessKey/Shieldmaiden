@@ -4,13 +4,23 @@
 		<div ref="card" class="monster-card">
 			<h1 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
-				<button
-					v-if="allowDownload"
-					class="btn btn-sm bg-neutral-5 download-btn"
-					@click="download_dialog = true"
-				>
-					Download <hk-icon icon="fas fa-download" class="ml-1" />
-				</button>
+				<div class="monster-card__actions">
+					<button
+						v-if="allowDownload"
+						class="btn btn-sm bg-neutral-5 download-btn"
+						@click="download_dialog = true"
+					>
+						Download <hk-icon icon="fas fa-download" class="ml-1" />
+					</button>
+					<ReportIssue
+						v-if="monster._id"
+						type="monster"
+						:content-id="monster._id"
+						:content-name="monster.name"
+						:content-url="monster.url"
+						:edition="monster.edition || edition"
+					/>
+				</div>
 			</h1>
 			<div class="monster-card__subtitle">
 				<template v-if="monster.size">{{ monster.size }}</template>
@@ -374,6 +384,7 @@ import { dice } from "src/mixins/dice.js";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions, mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell";
+import ReportIssue from "src/components/compendium/ReportIssue.vue";
 import { skills, abilities } from "src/utils/generalConstants";
 import { calc_skill_mod, downloadMonsterFile } from "src/utils/generalFunctions";
 
@@ -382,6 +393,7 @@ export default {
 	mixins: [general, dice, monsterMixin],
 	components: {
 		Spell,
+		ReportIssue,
 	},
 	props: {
 		// If the monster is fetched in a parent component you can send the full monster object in de data prop
@@ -622,6 +634,12 @@ export default {
 			white-space: nowrap;
 			font-family: "Open Sans", sans-serif;
 		}
+	}
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5em;
 	}
 	h2 {
 		font-size: 1.3em;

@@ -98,15 +98,29 @@
 				<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 			</div>
 		</div>
+
+		<ReportIssue
+			v-if="!custom && spell._id"
+			class="mt-3"
+			type="spell"
+			:content-id="spell._id"
+			:content-name="spell.name"
+			:content-url="spell.url"
+			:edition="spell.edition || $route.params.edition"
+		/>
 	</div>
 	<hk-loader v-else name="spell" />
 </template>
 
 <script>
 import { mapActions } from "vuex";
+import ReportIssue from "src/components/compendium/ReportIssue.vue";
 
 export default {
 	name: "Spell",
+	components: {
+		ReportIssue,
+	},
 	props: {
 		// If the spell is fetched in a parent component you can send the full spell object in de data prop
 		data: {

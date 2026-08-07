@@ -37,15 +37,29 @@
 				</tbody>
 			</table>
 		</div>
+
+		<ReportIssue
+			v-if="item._id"
+			class="mt-3"
+			type="item"
+			:content-id="item._id"
+			:content-name="item.name"
+			:content-url="item.url"
+			:edition="item.edition || edition"
+		/>
 	</div>
 	<hk-loader v-else name="item" />
 </template>
 
 <script>
 	import { mapActions } from "vuex";
+	import ReportIssue from "src/components/compendium/ReportIssue.vue";
 
 	export default {
 		name: "Item",
+		components: {
+			ReportIssue
+		},
 		props: {
 			// If the item is fetched in a parent component you can send the full item object in de data prop
 			data: {

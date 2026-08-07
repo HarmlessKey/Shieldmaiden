@@ -113,7 +113,17 @@ specific to the Spells copy flow (`CopyContent.vue` + `EditSpell.vue`). The
 fix is component-level, so it resolves the issue everywhere
 `hk-action-roll-form.vue` is used.
 
-## Scope of the fix (not yet implemented)
+## Fix status
 
-This file is an investigation report only. The actual code change (the
-one-line fix above) has not been applied yet.
+Implemented in `src/components/hk-components/hk-action-rolls/hk-action-roll-form.vue`:
+
+```diff
+ action_options() {
+-    return this.options || [""];
++    return this.options && this.options.length ? this.options : [""];
+ },
+```
+
+Confirmed against production data: the compendium API returns `options: []`
+on spells that don't use the versatile-options feature, which is exactly
+the case this fix restores the `[""]` fallback for.

@@ -275,7 +275,9 @@
 			<!-- INNATE SPELLCASTING -->
 			<template v-if="monster.innate_ability">
 				<p>
-					<strong><em>{{ is55e ? " Spellcasting " : " Innate spellcasting " }}</em></strong>
+					<strong
+						><em>{{ is55e ? " Spellcasting " : " Innate spellcasting " }}</em></strong
+					>
 					The {{ monster.name.capitalizeEach() }}'s innate spellcasting ability is
 					{{ monster.innate_ability.capitalize() }} (spell save DC {{ monster.innate_save_dc }},
 					{{
@@ -622,13 +624,14 @@ export default {
 	h1 {
 		margin-top: 0;
 		font-size: 1.75em;
-		line-height: 1.5em;
+		line-height: 1.1em;
 		column-span: all;
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		gap: 1em;
+		gap: 0.5em;
 		font-weight: 700;
+		padding-bottom: 0.5em;
 
 		button {
 			white-space: nowrap;
@@ -639,7 +642,8 @@ export default {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.5em;
+		justify-content: flex-end;
+		gap: 0.25em;
 	}
 	h2 {
 		font-size: 1.3em;

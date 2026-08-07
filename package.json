@@ -15,7 +15,8 @@
 		"docker-run": "docker run -p 8081:80 -d --name Harmlesskey harmlesskey/harmlesskey",
 		"prepare": "husky install",
 		"emulators": "firebase emulators:start --config firebase.emulator.json --project demo-shieldmaiden",
-		"ssr:emulator": "USE_FIREBASE_EMULATOR=true quasar dev -m ssr"
+		"ssr:emulator": "USE_FIREBASE_EMULATOR=true quasar dev -m ssr",
+		"verify:5.5e-content": "node scripts/verify-5.5e-content/index.js"
 	},
 	"dependencies": {
 		"@egjs/vue-flicking": "4.12.0",

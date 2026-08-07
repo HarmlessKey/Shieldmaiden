@@ -31,6 +31,7 @@ deploy.sh
 secret.js
 
 scripts/data/
+scripts/verify-5.5e-content/results/
 .ipynb_checkpoints/
 
 

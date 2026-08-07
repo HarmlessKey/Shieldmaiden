@@ -28,4 +28,5 @@ README.md
 firebase.emulator.json
 emulator/
 .planning/
+scripts/verify-5.5e-content/
 

@@ -16,6 +16,17 @@ require("firebase/database");
 const config = require("./config");
 
 async function init() {
+	console.log(`Targeting Firebase EMULATOR — project "${config.PROJECT_ID}"`);
+	console.log(`  auth:     ${config.AUTH_EMULATOR_HOST}`);
+	console.log(`  database: ${config.DATABASE_EMULATOR_HOST}`);
+
+	// Admin SDK has no useEmulator()-equivalent call — it only targets the
+	// emulator via these env vars. Set them here explicitly (not just via
+	// dotenv in config.js) so admin.initializeApp() below can never pick up
+	// ambient real credentials/hosts, even if something upstream changes.
+	process.env.FIREBASE_AUTH_EMULATOR_HOST = config.AUTH_EMULATOR_HOST;
+	process.env.FIREBASE_DATABASE_EMULATOR_HOST = config.DATABASE_EMULATOR_HOST;
+
 	if (!admin.apps.length) {
 		admin.initializeApp({
 			projectId: config.PROJECT_ID,
@@ -44,6 +55,11 @@ async function init() {
 	}
 	const auth = firebase.auth();
 	const db = firebase.database();
+	// Deliberately not wrapped in try/catch: these calls redirect all traffic
+	// for `auth`/`db` to localhost regardless of the databaseURL/projectId
+	// above. If either throws (e.g. already wired from a previous call in
+	// the same process), the script must crash rather than silently fall
+	// through to whatever host initializeApp() was configured with.
 	auth.useEmulator(`http://${config.AUTH_EMULATOR_HOST}`, { disableWarnings: true });
 	const [dbHost, dbPort] = config.DATABASE_EMULATOR_HOST.split(":");
 	db.useEmulator(dbHost, Number(dbPort));

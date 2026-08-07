@@ -7,6 +7,7 @@
 // https://v1.quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-env node */
 const ESLintPlugin = require("eslint-webpack-plugin");
+const resolveEnvFile = require("./env");
 
 module.exports = function (/* ctx */) {
 	return {
@@ -49,7 +50,7 @@ module.exports = function (/* ctx */) {
 		// Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
 		build: {
 			vueRouterMode: "history", // available values: 'hash', 'history'
-			env: require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` }).parsed,
+			env: require("dotenv").config({ path: resolveEnvFile(__dirname) }).parsed,
 			scssLoaderOptions: {
 				additionalData: "",
 			},

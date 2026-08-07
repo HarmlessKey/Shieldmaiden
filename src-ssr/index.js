@@ -15,9 +15,8 @@ const morgan = require("morgan");
 const compression = require("compression");
 
 const path = require("path");
-require("dotenv").config({
-	path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}.local`),
-});
+const resolveEnvFile = require("../env");
+require("dotenv").config({ path: resolveEnvFile(path.resolve(__dirname, "..")) });
 
 const ssr = require("quasar-ssr");
 const extension = require("./extension");

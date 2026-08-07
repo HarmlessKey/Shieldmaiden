@@ -9,16 +9,25 @@ const path = require("path");
 const admin = require("firebase-admin");
 
 const serviceAccountFilePath = path.resolve(process.cwd(), "firebaseServiceAccountKey.json");
-const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountFilePath, "utf8"));
+const USE_EMULATOR = process.env.USE_FIREBASE_EMULATOR === "true";
 
-
-process.env.GOOGLE_CLOUD_PROJECT = serviceAccount.project_id;
 if (!admin.apps.length) {
 	try {
-		admin.initializeApp({
-			credential: admin.credential.cert(serviceAccount),
-			databaseURL: process.env.VUE_APP_FIREBASE_DATABASE_URL,
-		});
+		if (USE_EMULATOR) {
+			// firebase-admin auto-detects FIREBASE_*_EMULATOR_HOST and needs no credential.
+			// databaseURL still supplies the RTDB namespace.
+			admin.initializeApp({
+				projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+				databaseURL: process.env.VUE_APP_FIREBASE_DATABASE_URL,
+			});
+		} else {
+			const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountFilePath, "utf8"));
+			process.env.GOOGLE_CLOUD_PROJECT = serviceAccount.project_id;
+			admin.initializeApp({
+				credential: admin.credential.cert(serviceAccount),
+				databaseURL: process.env.VUE_APP_FIREBASE_DATABASE_URL,
+			});
+		}
 	} catch (e) {
 		console.error(e);
 	}

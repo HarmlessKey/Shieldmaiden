@@ -1,5 +1,10 @@
 <template>
-	<ToolsPage title="Combat Tracker" bg_img="combat-tracker-header.webp">
+	<ToolsPage
+		title="Combat Tracker"
+		heading="D&D Combat Tracker"
+		bg_img="combat-tracker-header.webp"
+		:app_schema="app_schema"
+	>
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn color="primary" :class="btn_classes" no-caps push to="/demo">Try Demo Encounter</q-btn>
 		</template>
@@ -86,6 +91,35 @@
 			>To fully use our Combat Tracker you need an account, but you can try out all it has to offer
 			in our demo encounter.</em
 		>
+
+		<h2>Combat rules Shieldmaiden handles for you</h2>
+		<p>
+			The combat tracker automates the fiddly rules that are easy to forget mid-encounter, so you can
+			keep the game moving.
+		</p>
+		<ul>
+			<li>
+				<strong>Concentration.</strong> When a concentrating creature takes damage it must make a
+				Constitution saving throw with a DC equal to 10 or half the damage taken, whichever is
+				higher (SRD, "Concentration"). Set a concentration reminder and Shieldmaiden prompts you the
+				moment that creature is damaged.
+			</li>
+			<li>
+				<strong>Resistance, vulnerability and immunity.</strong> Resistance halves damage of a type,
+				vulnerability doubles it, and immunity ignores it. Define a creature's defenses once and the
+				tracker applies the maths every time you deal that damage type.
+			</li>
+			<li>
+				<strong>Temporary hit points.</strong> Temporary hit points are not added to your current
+				hit points and are lost first when you take damage. Shieldmaiden tracks them separately from
+				current and maximum HP, including maximum hit point modifiers.
+			</li>
+			<li>
+				<strong>Multi-target actions.</strong> Effects like <em>fireball</em> hit several
+				creatures at once. Select every target in the area, apply the damage in one action, and
+				still halve it individually for anyone who succeeds on their saving throw.
+			</li>
+		</ul>
 	</ToolsPage>
 </template>
 
@@ -102,6 +136,21 @@ export default {
 		return {
 			tracker: combat_tracker_texts.filter((item) => item.name !== "more"),
 			share: live_initiative_texts,
+			app_schema: {
+				name: "Shieldmaiden Combat Tracker",
+				description:
+					"Free D&D 5e combat tracker for initiative, hit points, conditions and concentration.",
+				featureList: [
+					"Initiative tracking",
+					"Hit point and temporary HP tracking",
+					"Condition tracking",
+					"Concentration reminders",
+					"Damage type resistances, vulnerabilities and immunities",
+					"Combat log with undo",
+					"Multi-target actions",
+					"Shared live initiative list for players",
+				],
+			},
 		};
 	},
 	meta() {

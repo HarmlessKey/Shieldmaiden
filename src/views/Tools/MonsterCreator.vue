@@ -1,5 +1,10 @@
 <template>
-	<ToolsPage title="Monster Creator" bg_img="monster-creator-header.webp">
+	<ToolsPage
+		title="Monster Creator"
+		heading="D&D Monster Creator"
+		bg_img="monster-creator-header.webp"
+		:app_schema="app_schema"
+	>
 		<template v-slot:action_btn="{ btn_classes }">
 			<q-btn
 				color="primary"
@@ -144,6 +149,18 @@ export default {
 	mixins: [dice],
 	data() {
 		return {
+			app_schema: {
+				name: "Shieldmaiden Monster Creator",
+				description:
+					"Free D&D 5e monster creator for custom statblocks with rollable actions, defenses and spellcasting.",
+				featureList: [
+					"Custom statblock creation",
+					"One-click rollable actions",
+					"Resistances, vulnerabilities and immunities",
+					"Spellcaster monsters",
+					"Export and import custom monsters",
+				],
+			},
 			action: {
 				options: ["1-handed", "2-handed"],
 				action_list: [

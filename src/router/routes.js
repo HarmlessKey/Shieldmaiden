@@ -29,8 +29,8 @@ const routes = [
 			sidebar: false,
 			offline: true,
 			description:
-				"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
-			title: "Combat Tracker for D&D",
+				"Shieldmaiden is a free D&D 5e DM companion app: run combat with our initiative tracker, build encounters, and create custom monsters and spells. Free forever.",
+			title: "Combat Tracker for D&D 5e - Free DM Companion App",
 		},
 	},
 	{ path: "/home", redirect: "/" },
@@ -617,9 +617,9 @@ const routes = [
 				name: "ToolsCombatTracker",
 				component: () => import("src/views/Tools/CombatTracker"),
 				meta: {
-					title: "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					title: "D&D Combat Tracker - Free Online Initiative Tracker for 5e",
 					description:
-						"Get a grip on tracking combat as a D&D DM with Shieldmaiden Combat Tracker. You can keep track of initiative, health, status effects, concentration spells, and much more. Use for free now! ",
+						"Free D&D 5e combat tracker. Track initiative, hit points, conditions and concentration, and share a live list with players. Try the demo, no account needed.",
 				},
 			},
 			{
@@ -630,9 +630,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
+					title: "D&D Encounter Builder - Free 5e Encounter & CR Difficulty Calculator",
 					description:
-						"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
+						"Build balanced D&D 5e encounters with instant difficulty calculation. Use SRD or custom monsters, then run the encounter in our combat tracker. Free to use.",
 				},
 				children: [
 					{
@@ -640,9 +640,9 @@ const routes = [
 						name: "ToolsEncounterBuilder",
 						component: () => import("src/views/Tools/EncounterBuilder"),
 						meta: {
-							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
+							title: "D&D Encounter Builder - Free 5e Encounter & CR Difficulty Calculator",
 							description:
-								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now!",
+								"Build balanced D&D 5e encounters with instant difficulty calculation. Use SRD or custom monsters, then run the encounter in our combat tracker. Free to use.",
 						},
 					},
 					{
@@ -650,10 +650,11 @@ const routes = [
 						name: "ToolsBuildEncounter",
 						component: () => import("src/components/encounters"),
 						meta: {
-							title: "D&D Encounter Builder - Build and manage encounters for D&D 5e",
+							title: "Build a D&D Encounter",
 							description:
-								"Build and manage your D&D 5e encounters with ease using our Encounter Builder. Add players, SRD or custom monsters, and calculate the difficulty of your encounter. Use for free now! ",
+								"Build your D&D 5e encounter: add players, SRD or custom monsters, and see the difficulty instantly.",
 							side: false,
+							noindex: true,
 						},
 					},
 				],
@@ -691,9 +692,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D Monster Creator - Create custom monsters for D&D 5e",
+					title: "D&D Monster Creator - Free Custom Statblock Maker for 5e",
 					description:
-						"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
+						"Create custom D&D 5e monsters with rollable actions, defenses and spellcasting. Use your statblocks in our combat tracker and encounter builder. Free to use.",
 				},
 				children: [
 					{
@@ -701,9 +702,9 @@ const routes = [
 						name: "ToolsMonsterCreator",
 						component: () => import("src/views/Tools/MonsterCreator"),
 						meta: {
-							title: "Dungeons & Dragons Monster Creator",
+							title: "D&D Monster Creator - Free Custom Statblock Maker for 5e",
 							description:
-								"Build custom monsters for your D&D campaign with ease. Create stat blocks with easy to roll actions to use in your Dungeons & Dragons encounters. Use for free now!",
+								"Create custom D&D 5e monsters with rollable actions, defenses and spellcasting. Use your statblocks in our combat tracker and encounter builder. Free to use.",
 						},
 					},
 					{
@@ -713,6 +714,7 @@ const routes = [
 						meta: {
 							title: "Create monster",
 							description: "Create your custom D&D 5e monster.",
+							noindex: true,
 						},
 					},
 				],
@@ -725,9 +727,9 @@ const routes = [
 					},
 				},
 				meta: {
-					title: "D&D Spell Creator - Create custom spells for D&D 5e",
+					title: "D&D Spell Creator - Make Custom Spells for 5e",
 					description:
-						"Create spells for D&D 5e to roll directly or use in your custom spellcaster monsters.",
+						"Create custom D&D 5e spells with scaling and one-click rollable actions, and give them to your custom spellcaster monsters. Free to use in our combat tracker.",
 				},
 				children: [
 					{
@@ -735,9 +737,9 @@ const routes = [
 						name: "ToolsSpellCreator",
 						component: () => import("src/views/Tools/SpellCreator"),
 						meta: {
-							title: "D&D Spell Creator - Create custom spells for D&D 5e ",
+							title: "D&D Spell Creator - Make Custom Spells for 5e",
 							description:
-								"Create custom spells for your D&D campaign with ease. Roll your customized spell directly or use them in your custom spellcaster monsters.",
+								"Create custom D&D 5e spells with scaling and one-click rollable actions, and give them to your custom spellcaster monsters. Free to use in our combat tracker.",
 						},
 					},
 					{
@@ -748,6 +750,7 @@ const routes = [
 							title: "Create spell",
 							description:
 								"Create your custom D&D 5e spell to roll directly or use in your custom spellcaster monsters.",
+							noindex: true,
 						},
 					},
 				],
@@ -757,9 +760,9 @@ const routes = [
 				name: "ToolsCharacterSync",
 				component: () => import("src/views/Tools/CharacterSync"),
 				meta: {
-					title: "Character Sync",
+					title: "D&D Beyond Character Import - Character Sync for Shieldmaiden",
 					description:
-						"Sync the D&D 5e characters of your players in Shieldmaiden. Update the stats of your players characters with one click.",
+						"Import and sync D&D Beyond and Dice Cloud characters into Shieldmaiden with our free browser extension. Update your players' stats with one click.",
 				},
 			},
 			{
@@ -1287,6 +1290,7 @@ const routes = [
 					title: "D&D Initiative Tracker Demo",
 					description:
 						"Run encounter with Shieldmaiden, an advanced Initiative Tracker for Dungeons & Dragons (D&D) 5th Edition (5e).",
+					noindex: true,
 				},
 			},
 		],
@@ -1501,7 +1505,9 @@ const routes = [
 		component: SignInPage,
 		meta: {
 			sidebar: false,
+			title: "Sign in",
 			description: "Sign in to your account on Shieldmaiden, a Combat Tracker for D&D.",
+			noindex: true,
 		},
 	},
 	{
@@ -1512,6 +1518,7 @@ const routes = [
 			sidebar: false,
 			title: "Sign up",
 			description: "Create an account for Shieldmaiden, a Combat Tracker for D&D",
+			noindex: true,
 		},
 	},
 	{
@@ -1522,6 +1529,7 @@ const routes = [
 			sidebar: false,
 			title: "Forgot password",
 			description: "Request to reset your Shieldmaiden password.",
+			noindex: true,
 		},
 	},
 	{

@@ -170,11 +170,16 @@ export default {
 				name: "robots",
 				content: "noindex, nofollow",
 			};
+		} else if (this.$route.matched.some((route) => route.meta.noindex || route.meta.requiresAuth)) {
+			// App routes (deep tool routes, auth pages, user content) are not landing pages
+			meta.noindex = {
+				name: "robots",
+				content: "noindex, follow",
+			};
 		}
 
 		return {
-			title:
-				this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+			title: this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
 			titleTemplate: (title) => `${title} | Shieldmaiden`,
 			link: {
 				canonical: {

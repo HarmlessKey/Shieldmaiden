@@ -44,22 +44,22 @@ export default {
 			tools: [
 				{
 					title: "Combat Tracker",
-					to: "/demo/run-encounter",
+					to: "/tools/combat-tracker",
 					icon: "fas fa-swords",
 				},
 				{
 					title: "Encounter Builder",
-					to: "/tools/encounter-builder/build-encounter",
+					to: "/tools/encounter-builder",
 					icon: "fas fa-hammer-war",
 				},
 				{
 					title: "Spell Creator",
-					to: "/tools/spell-creator/create-spell",
+					to: "/tools/spell-creator",
 					icon: "fas fa-wand-magic",
 				},
 				{
 					title: "Monster Creator",
-					to: "/tools/monster-creator/create-monster",
+					to: "/tools/monster-creator",
 					icon: "fas fa-dragon",
 				},
 				{

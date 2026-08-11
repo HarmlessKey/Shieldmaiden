@@ -103,6 +103,59 @@ export default {
 	props: {
 		maintenance: [Boolean, String],
 	},
+	meta() {
+		return {
+			script: {
+				organization: {
+					type: "application/ld+json",
+					innerHTML: JSON.stringify({
+						"@context": "https://schema.org",
+						"@type": "Organization",
+						name: "Shieldmaiden",
+						alternateName: "Harmless Key",
+						url: "https://shieldmaiden.app",
+						logo: "https://shieldmaiden.app/shieldmaiden_logo_full.png",
+						foundingDate: "2019-02",
+						email: "contact@harmlesskey.com",
+						sameAs: [
+							"https://github.com/HarmlessKey/Shieldmaiden",
+							"https://www.patreon.com/shieldmaidenapp",
+							"https://discord.gg/fhmKBM7",
+							"https://www.instagram.com/shieldmaidenapp",
+							"https://twitter.com/shieldmaidenapp",
+							"https://www.facebook.com/shieldmaidenapp",
+						],
+					}),
+				},
+				softwareApplication: {
+					type: "application/ld+json",
+					innerHTML: JSON.stringify({
+						"@context": "https://schema.org",
+						"@type": "SoftwareApplication",
+						name: "Shieldmaiden",
+						applicationCategory: "GameApplication",
+						operatingSystem: "Web browser",
+						url: "https://shieldmaiden.app",
+						description:
+							"Free D&D 5e DM companion app: combat tracker, encounter builder, monster creator, spell creator and a live initiative list for players.",
+						offers: {
+							"@type": "Offer",
+							price: "0",
+							priceCurrency: "EUR",
+						},
+						featureList: [
+							"Initiative and combat tracking",
+							"Encounter building with difficulty calculation",
+							"Custom monster creation",
+							"Custom spell creation",
+							"Shared live initiative list for players",
+							"D&D Beyond character sync",
+						],
+					}),
+				},
+			},
+		};
+	},
 	components: {
 		Header,
 		Top,

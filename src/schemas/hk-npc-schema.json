@@ -180,7 +180,7 @@
 			"minimum": 1,
 			"maximum": 99
 		},
-		"initiative": {
+		"initiative_modifier": {
 			"title": "Initiative bonus",
 			"description": "Flat initiative bonus override (5.5e stat blocks), defaults to the dexterity modifier when absent.",
 			"type": "integer",

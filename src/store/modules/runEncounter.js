@@ -384,7 +384,7 @@ const run_encounter_actions = {
 
 				entity.name = db_player.character_name;
 				entity.speed = db_player.speed || 0;
-				entity.initiative_bonus = db_player.initiative || 0;
+				entity.initiative_modifier = db_player.initiative || 0;
 				entity.ac = parseInt(db_player.ac);
 				entity.maxHp = entity.maxHpMod
 					? parseInt(db_player.maxHp + entity.maxHpMod)
@@ -403,7 +403,7 @@ const run_encounter_actions = {
 
 				// In test mode auto roll initiative
 				if (state.test) {
-					entity.initiative = Math.ceil(Math.random() * 20) + (entity.initiative_bons || 0);
+					entity.initiative = Math.ceil(Math.random() * 20) + (entity.initiative_modifier || 0);
 				}
 
 				// Defenses
@@ -516,7 +516,8 @@ const run_encounter_actions = {
 					entity.senses = data_npc.senses;
 					entity.languages = data_npc.languages;
 					entity.legendary_count = data_npc.legendary_count;
-					if (data_npc.initiative !== undefined) entity.initiative_bonus = data_npc.initiative;
+					if (data_npc.initiative_modifier !== undefined)
+						entity.initiative_modifier = data_npc.initiative_modifier;
 					if (data_npc.gear) entity.gear = data_npc.gear;
 
 					if (entity.challenge_rating)
@@ -533,8 +534,8 @@ const run_encounter_actions = {
 					if (state.test) {
 						entity.initiative =
 							Math.ceil(Math.random() * 20) +
-							(entity.initiative_bonus !== undefined
-								? entity.initiative_bonus
+							(entity.initiative_modifier !== undefined
+								? entity.initiative_modifier
 								: calc_mod(entity.dexterity));
 					}
 

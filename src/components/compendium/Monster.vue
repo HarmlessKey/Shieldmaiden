@@ -490,8 +490,8 @@ export default {
 		},
 		initiative_bonus() {
 			// 5.5e stat blocks can have a flat initiative bonus, default is the dexterity modifier
-			return this.monster.initiative !== undefined
-				? this.monster.initiative
+			return this.monster.initiative_modifier !== undefined
+				? this.monster.initiative_modifier
 				: this.calcMod(this.monster.dexterity);
 		},
 		immunities() {

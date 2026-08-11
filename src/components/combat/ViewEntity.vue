@@ -38,7 +38,7 @@
 						<br /><strong>Speed</strong>:
 						<span> {{ entity.speed }}</span>
 					</template>
-					<template v-if="entity.initiative_modifier !== undefined || entity.initiative_bonus">
+					<template v-if="entity.initiative_modifier !== undefined">
 						<br /><strong>Initiative</strong>:
 						<span>
 							{{
@@ -414,9 +414,7 @@ export default {
 			return entity;
 		},
 		initiative() {
-				return this.entity.initiative_modifier !== undefined
-					? this.entity.initiative_modifier
-					: this.entity.initiative_bonus;
+				return this.entity.initiative_modifier;
 			},
 			spellCasting() {
 				let casting = [];

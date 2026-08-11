@@ -343,19 +343,19 @@
 								:dark="$store.getters.theme === 'dark'"
 								filled
 								square
-								label="Initiative bonus"
+								label="Initiative modifier"
 								autocomplete="off"
 								type="number"
-								v-model.number="npc.initiative"
-								@input="parseToInt($event, npc, 'initiative')"
+								v-model.number="npc.initiative_modifier"
+								@input="parseToInt($event, npc, 'initiative_modifier')"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							>
 								<template #append>
-									<hk-popover header="Initiative bonus">
+									<hk-popover header="Initiative modifier">
 										<q-icon name="info" size="xs" class="blue" />
 										<template #content>
-											Overrides the initiative bonus, shown on 5.5e (2024) stat blocks.<br />
+											Overrides the initiative modifier, shown on 5.5e (2024) stat blocks.<br />
 											When left empty the dexterity modifier is used.
 										</template>
 									</hk-popover>

@@ -6,8 +6,7 @@
 export function displayStats(entity) {
 	if (!entity) return {};
 
-	// NPCs use initiative_modifier, players use initiative_bonus
-	const initiative = entity.initiative_modifier ?? entity.initiative_bonus;
+	const initiative = entity.initiative_modifier;
 
 	const stats = {
 		ac_bonus: entity.ac_bonus || 0,

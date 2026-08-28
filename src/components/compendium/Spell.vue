@@ -134,6 +134,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		// Edition to fetch the spell for when using the id prop; falls back to the route edition
+		edition: {
+			type: String,
+		},
 	},
 	data() {
 		return {
@@ -196,7 +200,10 @@ export default {
 		} else {
 			this.spell = this.custom
 				? await this.get_spell({ uid: this.userId, id: this.id })
-				: await this.fetch_api_spell({ id: this.id, edition: this.$route.params.edition });
+				: await this.fetch_api_spell({
+						id: this.id,
+						edition: this.edition || this.$route.params.edition,
+					});
 			this.cast_level = this.spell.level;
 			this.loading = false;
 		}

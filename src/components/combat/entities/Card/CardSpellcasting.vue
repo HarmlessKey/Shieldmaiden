@@ -47,7 +47,9 @@
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
-								<template #content> <Spell :id="spell.key" /> </template
+								<template #content>
+									<Spell :id="spell.key" :edition="entity.edition || default_edition" />
+								</template
 							></hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLevel(level).length ? "," : "" }}
@@ -102,7 +104,7 @@
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
-									<Spell :id="spell.key" />
+									<Spell :id="spell.key" :edition="entity.edition || default_edition" />
 								</template>
 							</hk-popover>
 							<template v-if="is_5_5e && spell.level !== undefined">
@@ -121,6 +123,7 @@
 <script>
 import { mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell.vue";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "CardDetails",
@@ -135,7 +138,9 @@ export default {
 		},
 	},
 	data() {
-		return {};
+		return {
+			default_edition,
+		};
 	},
 	computed: {
 		...mapGetters(["broadcast", "targeted"]),

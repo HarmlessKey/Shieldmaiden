@@ -63,13 +63,7 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
-							<q-btn
-								v-if="npcId"
-								class="mr-2"
-								color="neutral-5"
-								no-caps
-								@click="viewNpc"
-							>
+							<q-btn v-if="npcId" class="mr-2" color="neutral-5" no-caps @click="viewNpc">
 								View
 							</q-btn>
 							<router-link
@@ -387,17 +381,23 @@ export default {
 				uid: this.userId,
 				id: this.npcId,
 				npc: this.npc,
-			}).then(() => {
-				this.$snotify.success("Monster Saved.", "Critical hit!", {
-					position: "rightTop",
+			})
+				.then(() => {
+					this.$snotify.success("Monster Saved.", "Critical hit!", {
+						position: "rightTop",
+					});
+
+					this.unsaved_changes = false;
+
+					// Capitalize before stringify so changes found isn't triggered
+					this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
+					this.npc_copy = JSON.parse(JSON.stringify(this.npc));
+				})
+				.catch((error) => {
+					this.$snotify.error("Couldn't save monster.", "Save failed", {
+						position: "centerTop",
+					});
 				});
-
-				this.unsaved_changes = false;
-
-				// Capitalize before stringify so changes found isn't triggered
-				this.npc.name = this.npc.name ? this.npc.name.capitalizeEach() : undefined;
-				this.npc_copy = JSON.parse(JSON.stringify(this.npc));
-			});
 		},
 		handleSignUp(e) {
 			if (e === "success") {

@@ -587,10 +587,10 @@ export default {
 			},
 			set(val) {
 				const groups = {};
-				for (const id of val) {
+				for (const id of val || []) {
 					groups[id] = true;
 				}
-				this.$set(this.npc, "groups", Object.keys(groups).length ? groups : undefined);
+				this.$set(this.npc, "groups", Object.keys(groups).length ? groups : null);
 			},
 		},
 		groupOptions() {

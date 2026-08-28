@@ -192,7 +192,12 @@
 		<q-dialog v-model="copy_dialog">
 			<hk-card header="Copy NPC" :min-width="320">
 				<div class="card-body">
-					<CopyContent @copy="set" type="monster" button="copy" />
+					<CopyContent
+						@copy="set"
+						type="monster"
+						button="copy"
+						:initial-edition="campaignEdition"
+					/>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -204,6 +209,7 @@ import { mapActions, mapGetters } from "vuex";
 import { general } from "src/mixins/general.js";
 import { dice } from "src/mixins/dice.js";
 import CopyContent from "src/components/CopyContent";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "AddEntity",
@@ -217,6 +223,7 @@ export default {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
+			campaign: {},
 			copy_dialog: false,
 			entity: {},
 			dexterity: undefined,
@@ -240,6 +247,7 @@ export default {
 				uid: this.userId,
 				id: this.campaignId,
 			}).then(async (campaign) => {
+				this.campaign = campaign;
 				const players = {};
 
 				for (const id in campaign.players) {
@@ -255,6 +263,9 @@ export default {
 		...mapGetters(["entities", "broadcast"]),
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
+		},
+		campaignEdition() {
+			return this.campaign.edition || default_edition;
 		},
 	},
 	methods: {

@@ -206,6 +206,7 @@
 							type="spell"
 							:content="['srd', 'custom']"
 							button="plus"
+							:initial-edition="initialSpellEdition"
 							@copy="addSpell"
 							:disabled-srd="
 								category === 'caster' && npc.caster_spells
@@ -261,7 +262,7 @@
 </template>
 
 <script>
-import { abilities } from "src/utils/generalConstants";
+import { abilities, default_edition } from "src/utils/generalConstants";
 import CopyContent from "src/components/CopyContent";
 
 export default {
@@ -287,6 +288,9 @@ export default {
 			set(newValue) {
 				this.$emit("input", newValue);
 			},
+		},
+		initialSpellEdition() {
+			return this.npc.edition || default_edition;
 		},
 		caster_types() {
 			const is55e = this.npc.edition === "5.5e";

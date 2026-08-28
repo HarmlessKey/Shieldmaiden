@@ -80,6 +80,7 @@ export const monsterMixin = {
 				"Ooze",
 				"Plant",
 				"Swarm of tiny beasts",
+				"Swarm of tiny undead",
 				"Undead",
 			],
 			monster_alignment: [

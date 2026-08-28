@@ -160,6 +160,7 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Spell from "src/components/compendium/Spell";
 import Projectiles from "./Projectiles";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "RollSpell",
@@ -224,7 +225,10 @@ export default {
 						const spell = value.custom
 							? // userId comes from setHP mixin
 								await this.get_spell({ uid: this.userId, id: key })
-							: await this.fetch_api_spell(key);
+							: await this.fetch_api_spell({
+									id: key,
+									edition: this.actor.edition || default_edition,
+								});
 						spell.key = key;
 
 						if (this.type === "innate") {

@@ -913,6 +913,7 @@ export default {
 				if (!custom) {
 					let npc_data = await this.fetch_monster({ id, edition: this.apiEdition });
 					entity.npc = "srd";
+					entity.edition = npc_data.edition || default_edition;
 					if (rollHp && npc_data.hit_dice) {
 						let dice_values = npc_data.hit_dice.split("d");
 						let mod = dice_values[0] * this.calcMod(npc_data.constitution);

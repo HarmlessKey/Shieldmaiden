@@ -1,4 +1,4 @@
-import { abilities, skills } from "src/utils/generalConstants";
+import { abilities, skills, default_edition } from "src/utils/generalConstants";
 import { uuid, calc_mod } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
@@ -468,7 +468,10 @@ const run_encounter_actions = {
 						if (entity.npc === "custom") {
 							data_npc = await dispatch("npcs/get_npc", { uid, id: entity.id });
 						} else {
-							data_npc = await dispatch("api_monsters/fetch_monster", entity.id);
+							data_npc = await dispatch("api_monsters/fetch_monster", {
+								id: entity.id,
+								edition: db_entity.edition || default_edition,
+							});
 						}
 					} else {
 						entity.no_linked_npc = true;

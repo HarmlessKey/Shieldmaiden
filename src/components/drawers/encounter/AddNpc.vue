@@ -294,6 +294,7 @@ export default {
 			this.$set(this.entity, "maxHp", parseInt(result.hit_points));
 			this.$set(this.entity, "ac", parseInt(result.armor_class));
 			this.$set(this.entity, "name", result.name);
+			this.$set(this.entity, "edition", result.edition || default_edition);
 
 			this.dexterity = result.dexterity; // needed to roll initiative
 

@@ -18,7 +18,7 @@
 					Show Rules for {{ otherEdition.label }}
 				</router-link>
 			</p>
-			<CheatSheet compendium />
+			<CheatSheet compendium :edition="editionLabel" />
 		</div>
 	</hk-card>
 </template>

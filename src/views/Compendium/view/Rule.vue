@@ -50,7 +50,7 @@
 		},
 		computed: {
 			rule() {
-				return rules?.find(rule => rule.url === this.id);
+				return rules?.find(rule => rule.url === this.id && (rule.edition || "5e") === this.editionLabel);
 			},
 			listPath() {
 				return this.$route.params.edition ? `/compendium/rules/${this.$route.params.edition}` : "/compendium/rules";

@@ -70,6 +70,7 @@
 								setDrawer({
 									show: true,
 									type: 'campaign/resources/index',
+									data: { campaign: campaign },
 									classes: 'p-0',
 								})
 							"
@@ -124,7 +125,7 @@
 						</Splitpanes>
 					</Pane>
 					<hk-pane :size="paneSize('right')" min-size="20">
-						<Resources />
+						<Resources :campaign="campaign" />
 					</hk-pane>
 				</Splitpanes>
 				<Splitpanes v-else class="default-theme" horizontal>
@@ -187,7 +188,7 @@
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="resources" class="p-0">
-						<Resources />
+						<Resources :campaign="campaign" />
 					</q-tab-panel>
 					<q-tab-panel name="share">
 						<Share :campaign="campaign" />

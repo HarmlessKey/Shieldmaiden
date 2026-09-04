@@ -7,7 +7,7 @@
 
 		<h2>DM Screen</h2>
 		<p>
-			With our digital DM screen you have quick access to you D&D 5e rules, your custom encounters and a soundboard.
+			With our digital DM screen you have quick access to you D&D 5e and 5.5e rules, your custom encounters and a soundboard.
 		</p>
 
 		<q-img

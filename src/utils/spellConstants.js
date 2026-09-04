@@ -72,6 +72,88 @@ export const level_scaling = Object.freeze([
 	{ label: "Spell Level", value: "spell_level" },
 ]);
 
+// Card accent colors for the spell card download. `base` and `light` are lifted
+// directly from the fills used in the matching `logo-icon-no-shield-<color>.svg` brand
+// asset (base = the icon's darkest/richest fill, light = its lightest fill), so the
+// card colors read as the same brand color as the logo. `lighter` extends past `light`
+// towards white, `dark`/`darker`/`darkest` extend past `base` towards black, since the
+// icon's own palette doesn't get dark enough to use as text on the off-white card body.
+export const spell_card_colors = Object.freeze([
+	{
+		label: "Cyan",
+		value: "cyan",
+		lighter: "#f2fdfd",
+		light: "#e0fbfb",
+		base: "#3fa3ad",
+		dark: "#1f6b72",
+		darker: "#164f54",
+		darkest: "#0d3336",
+	},
+	{
+		label: "Blue",
+		value: "blue",
+		lighter: "#f6f7ff",
+		light: "#ecefff",
+		base: "#5c6ca7",
+		dark: "#3c466d",
+		darker: "#29314b",
+		darkest: "#171b2a",
+	},
+	{
+		label: "Yellow",
+		value: "yellow",
+		lighter: "#fffaf0",
+		light: "#fff4e0",
+		base: "#bd8b00",
+		dark: "#7b5a00",
+		darker: "#553f00",
+		darkest: "#2f2300",
+	},
+	{
+		label: "Red",
+		value: "red",
+		lighter: "#fff1f7",
+		light: "#ffe2ef",
+		base: "#d42758",
+		dark: "#8a1939",
+		darker: "#5f1228",
+		darkest: "#350a16",
+	},
+	{
+		label: "Orange",
+		value: "orange",
+		lighter: "#fffaf6",
+		light: "#fff4ed",
+		base: "#d1774a",
+		dark: "#884d30",
+		darker: "#5e3621",
+		darkest: "#341e13",
+	},
+	{
+		label: "Green",
+		value: "green",
+		lighter: "#f7fff6",
+		light: "#efffec",
+		base: "#6b8a6b",
+		dark: "#465a46",
+		darker: "#303e30",
+		darkest: "#1b231b",
+	},
+	// Grayscale, high-contrast variant for printing: lighter is pure white, darkest is
+	// pure black, base sits at 20% black (light gray) so it stays visibly distinct
+	// from white without wasting ink on a heavy fill.
+	{
+		label: "Print",
+		value: "print",
+		lighter: "#ffffff",
+		light: "#e6e6e6",
+		base: "#cccccc",
+		dark: "#999999",
+		darker: "#4d4d4d",
+		darkest: "#000000",
+	},
+]);
+
 export default {
 	spell_levels,
 	spell_schools,
@@ -82,4 +164,5 @@ export default {
 	spell_duration_types_time,
 	spell_duration_times,
 	level_scaling,
+	spell_card_colors,
 };

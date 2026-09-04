@@ -2,18 +2,26 @@
 	<hk-card>
 		<template v-if="!loading">
 			<div slot="header" class="card-header">
-				<h1>{{ not_found ? "Item not found" : item.name }}</h1>
-				<hk-share 
-					v-if="!not_found" 
-					:title="item.meta.title.capitalizeEach()"
-					:text="item.meta.description" 
-					size="sm"
-				/>
+				<h1>
+					{{ not_found ? "Item not found" : item.name }}
+					<span v-if="!not_found" class="neutral-2">{{ editionLabel }}</span>
+				</h1>
+				<div class="flex items-center gap-1">
+					<router-link v-if="!not_found" class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+						Show for {{ otherEdition.label }}
+					</router-link>
+					<hk-share
+						v-if="!not_found"
+						:title="item.meta.title.capitalizeEach()"
+						:text="item.meta.description"
+						size="sm"
+					/>
+				</div>
 			</div>
 			<div class="card-body">
 				<div v-if="not_found">
 					<p>Could not find item <strong>{{ id }}</strong></p>
-					<router-link to="/compendium/items" class="btn bg-neutral-5">
+					<router-link :to="listPath" class="btn bg-neutral-5">
 						Find items
 					</router-link>
 				</div>
@@ -28,6 +36,7 @@
 	import { mapGetters } from 'vuex';
 	import Item from "src/components/compendium/Item";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
+	import { otherEdition } from 'src/utils/generalFunctions';
 
 	export default {
 		name: "ViewItem",
@@ -45,17 +54,30 @@
 			}
 		},
 		async preFetch({ store, currentRoute }) {
-			await store.dispatch('api_items/fetch_api_item', currentRoute.params.id, { root: true });
+			await store.dispatch(
+				'api_items/fetch_api_item',
+				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+				{ root: true }
+			);
 		},
 		computed: {
 			...mapGetters("api_items", ["get_api_item"]),
 			item() {
-				return this.get_api_item(this.id)
+				return this.get_api_item(this.id, this.$route.params.edition)
+			},
+			listPath() {
+				return this.$route.params.edition ? `/compendium/items/${this.$route.params.edition}` : "/compendium/items";
+			},
+			otherEdition() {
+				return otherEdition(this.$route);
+			},
+			editionLabel() {
+				return this.$route.params.edition || "5e";
 			}
 		},
 		meta() {
 			return {
-				title: this.item?.meta?.title,
+				title: this.compendium_edition_text(this.item?.meta?.title),
 				meta: this.generate_compendium_meta(this.item?.meta)
 			}
 		},

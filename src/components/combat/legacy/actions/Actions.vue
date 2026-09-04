@@ -212,6 +212,7 @@ export default {
 				if (
 					current.special_abilities ||
 					current.actions ||
+					current.bonus_actions ||
 					current.legendary_actions ||
 					current.reactions
 				) {

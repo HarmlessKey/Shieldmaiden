@@ -19,9 +19,12 @@
 								<i aria-hidden="true" class="fas fa-copy mr-2"></i>
 								Copy
 							</button>
+							<button class="btn bg-neutral-5 ml-2" @click.prevent="download_dialog = true">
+								<i aria-hidden="true" class="fas fa-download" />
+							</button>
 							<button
 								class="btn bg-neutral-5 ml-2"
-								@click.prevent="setDrawer({ show: true, type: 'compendium/Spell', data: spell })"
+								@click.prevent="setDrawer({ show: true, type: 'drawers/ViewSpell', data: spell })"
 							>
 								<i aria-hidden="true" class="fas fa-eye" />
 							</button>
@@ -135,6 +138,8 @@
 		<q-dialog v-model="sign_up_dialog">
 			<SignUp @sign-up="handleSignUp" />
 		</q-dialog>
+
+		<SpellCardDownload v-model="download_dialog" :spells="[spell]" />
 	</div>
 	<hk-card v-else>
 		<hk-loader />
@@ -149,6 +154,7 @@ import SpellActions from "src/components/spells/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
+import SpellCardDownload from "src/components/spells/SpellCardDownload.vue";
 
 export default {
 	name: "EditSpell",
@@ -157,6 +163,7 @@ export default {
 		SpellActions,
 		CopyContent,
 		SignUp,
+		SpellCardDownload,
 	},
 	data() {
 		return {
@@ -171,6 +178,7 @@ export default {
 			copy_spell: false,
 			account_dialog: false,
 			sign_up_dialog: false,
+			download_dialog: false,
 			unsaved_changes: false,
 		};
 	},

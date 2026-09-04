@@ -4,13 +4,23 @@
 		<div ref="card" class="monster-card">
 			<h1 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
-				<button
-					v-if="allowDownload"
-					class="btn btn-sm bg-neutral-5 download-btn"
-					@click="download_dialog = true"
-				>
-					Download <hk-icon icon="fas fa-download" class="ml-1" />
-				</button>
+				<div class="monster-card__actions">
+					<button
+						v-if="allowDownload"
+						class="btn btn-sm bg-neutral-5 download-btn"
+						@click="download_dialog = true"
+					>
+						Download <hk-icon icon="fas fa-download" class="ml-1" />
+					</button>
+					<ReportIssue
+						v-if="monster._id"
+						type="monster"
+						:content-id="monster._id"
+						:content-name="monster.name"
+						:content-url="monster.url"
+						:edition="monster.edition || edition"
+					/>
+				</div>
 			</h1>
 			<div class="monster-card__subtitle">
 				<template v-if="monster.size">{{ monster.size }}</template>
@@ -23,10 +33,7 @@
 					<strong>AC </strong> {{ monster.armor_class || monster.ac }}
 					<span class="ml-2">
 						<strong>Initiative </strong>
-						{{
-							monster.dexterity > 10 ? `+${calcMod(monster.dexterity)}` : calcMod(monster.dexterity)
-						}}
-						({{ 10 + calcMod(monster.dexterity) }})
+						{{ mod2str(initiative_bonus) }} ({{ 10 + initiative_bonus }})
 					</span>
 				</div>
 				<div>
@@ -152,20 +159,16 @@
 					</hk-roll>
 				</template>
 				<div v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0">
-					<strong>Damage vulnerabilities</strong>
+					<strong>Vulnerabilities</strong>
 					{{ defensesDisplay(monster.damage_vulnerabilities).join(", ") }}
 				</div>
 				<div v-if="monster.damage_resistances && monster.damage_resistances.length > 0">
-					<strong>Damage resistances</strong>
+					<strong>Resistances</strong>
 					{{ defensesDisplay(monster.damage_resistances).join(", ") }}
 				</div>
-				<div v-if="monster.damage_immunities && monster.damage_immunities.length > 0">
-					<strong>Damage immunities</strong>
-					{{ defensesDisplay(monster.damage_immunities).join(", ") }}
-				</div>
-				<div v-if="monster.condition_immunities && monster.condition_immunities.length > 0">
-					<strong>Condition immunities</strong> {{ monster.condition_immunities.join(", ") }}
-				</div>
+				<div v-if="immunities"><strong>Immunities</strong> {{ immunities }}</div>
+
+				<div v-if="monster.gear"><strong>Gear</strong> {{ monster.gear }}</div>
 
 				<div>
 					<strong>Senses</strong>
@@ -182,11 +185,10 @@
 					<strong>Languages</strong> {{ monster.languages.join(", ") }}
 				</div>
 				<div v-if="monster.challenge_rating">
-					<strong>Challenge Rating</strong> {{ monster.challenge_rating }} ({{
-						monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0")
-					}}
-					XP; <template v-if="monster.challenge_rating">PB +{{ monster.proficiency }}</template
-					>)
+					<strong>CR</strong> {{ monster.challenge_rating }} (XP
+					{{ monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0") }}; PB +{{
+						monster.proficiency
+					}})
 				</div>
 			</div>
 
@@ -262,7 +264,8 @@
 								v-for="(spell, index) in spellsForLevel(level)"
 								:key="spell.name"
 							>
-								<hk-popover> {{ spell.name }}<Spell slot="content" :id="spell.key" /> </hk-popover
+								<hk-popover>
+									{{ spell.name }}<Spell slot="content" :id="spell.key" hide-report /> </hk-popover
 								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
@@ -273,7 +276,9 @@
 			<!-- INNATE SPELLCASTING -->
 			<template v-if="monster.innate_ability">
 				<p>
-					<strong><em> Innate spellcasting </em></strong>
+					<strong
+						><em>{{ is55e ? " Spellcasting " : " Innate spellcasting " }}</em></strong
+					>
 					The {{ monster.name.capitalizeEach() }}'s innate spellcasting ability is
 					{{ monster.innate_ability.capitalize() }} (spell save DC {{ monster.innate_save_dc }},
 					{{
@@ -297,7 +302,7 @@
 								<hk-popover>
 									{{ spell.name }}
 									<template #content>
-										<Spell :id="spell.key" />
+										<Spell :id="spell.key" hide-report />
 									</template> </hk-popover
 								>{{ index + 1 &lt; spellsForLimit(limit).length ? "," : "" }}
 							</i>
@@ -335,26 +340,9 @@
 									"
 									><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"
 										><span class="roll-button" /></hk-roll-action></template
-								><span class="monster-card__traits-description__title"
-									>{{ ability.name
-									}}{{
-										ability.recharge
-											? ` (Recharge ${
-													ability.recharge === "rest"
-														? "after a Short or Long Rest"
-														: ability.recharge
-												})`
-											: ``
-									}}{{
-										ability.limit
-											? ` (${ability.limit}/${
-													ability.limit_type ? ability.limit_type.capitalize() : `Day`
-												})`
-											: ``
-									}}{{
-										ability.legendary_cost > 1 ? ` (Costs ${ability.legendary_cost} Actions)` : ``
-									}}.
-								</span></hk-dice-text
+								><span class="monster-card__traits-description__title">{{
+									abilityTitle(ability)
+								}}</span></hk-dice-text
 							>
 						</template>
 					</template>
@@ -399,6 +387,7 @@ import { dice } from "src/mixins/dice.js";
 import { monsterMixin } from "src/mixins/monster.js";
 import { mapActions, mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell";
+import ReportIssue from "src/components/compendium/ReportIssue.vue";
 import { skills, abilities } from "src/utils/generalConstants";
 import { calc_skill_mod, downloadMonsterFile } from "src/utils/generalFunctions";
 
@@ -407,6 +396,7 @@ export default {
 	mixins: [general, dice, monsterMixin],
 	components: {
 		Spell,
+		ReportIssue,
 	},
 	props: {
 		// If the monster is fetched in a parent component you can send the full monster object in de data prop
@@ -415,6 +405,10 @@ export default {
 		},
 		// If the id prop is passed, the monster is fetched in the Monster component
 		id: {
+			type: String,
+		},
+		// Edition to fetch the monster for when looked up by id ("5e" or "5.5e"); defaults to "5e"
+		edition: {
 			type: String,
 		},
 		allowDownload: {
@@ -435,6 +429,11 @@ export default {
 					name_single: "Trait",
 				},
 				{ category: "actions", name: "Actions", name_single: "Action" },
+				{
+					category: "bonus_actions",
+					name: "Bonus Actions",
+					name_single: "Bonus action",
+				},
 				{
 					category: "legendary_actions",
 					name: "Legendary Actions",
@@ -473,7 +472,7 @@ export default {
 			this.monster = monster;
 			this.loading = false;
 		} else {
-			await this.fetch_monster(this.id).then((result) => {
+			await this.fetch_monster({ id: this.id, edition: this.edition }).then((result) => {
 				if (this.monster_challenge_rating[result.challenge_rating]) {
 					result.proficiency = this.monster_challenge_rating[result.challenge_rating].proficiency;
 				}
@@ -486,6 +485,27 @@ export default {
 		...mapGetters(["encounterId", "broadcast"]),
 		shares() {
 			return this.broadcast.shares || [];
+		},
+		is55e() {
+			return this.monster.edition === "5.5e" || this.edition === "5.5e";
+		},
+		initiative_bonus() {
+			// 5.5e stat blocks can have a flat initiative bonus, default is the dexterity modifier
+			return this.monster.initiative_modifier !== undefined
+				? this.monster.initiative_modifier
+				: this.calcMod(this.monster.dexterity);
+		},
+		immunities() {
+			// 2024 stat blocks merge damage and condition immunities into a single line
+			const damage =
+				this.monster.damage_immunities && this.monster.damage_immunities.length
+					? this.defensesDisplay(this.monster.damage_immunities).join(", ")
+					: null;
+			const condition =
+				this.monster.condition_immunities && this.monster.condition_immunities.length
+					? this.monster.condition_immunities.join(", ").capitalizeEach()
+					: null;
+			return damage && condition ? `${damage}; ${condition}` : damage || condition;
 		},
 		caster_spell_levels() {
 			if (this.monster.caster_spells) {
@@ -529,7 +549,7 @@ export default {
 			return Object.entries(this.monster.innate_spells)
 				.filter(([key, spell]) => {
 					spell.key = key;
-					if (spell.limit === 0) spell.imit = Infinity;
+					if (spell.limit === 0) spell.limit = Infinity;
 					return spell.limit == limit;
 				})
 				.map((item) => {
@@ -558,6 +578,23 @@ export default {
 		},
 		ability2str(ability) {
 			return ability.substring(0, 3);
+		},
+		abilityTitle(ability) {
+			let title = ability.name;
+			if (ability.recharge) {
+				title += ` (Recharge ${
+					ability.recharge === "rest" ? "after a Short or Long Rest" : ability.recharge
+				})`;
+			}
+			if (ability.limit) {
+				title += ` (${ability.limit}/${
+					ability.limit_type ? ability.limit_type.capitalize() : "Day"
+				})`;
+			}
+			if (ability.legendary_cost > 1) {
+				title += ` (Costs ${ability.legendary_cost} Actions)`;
+			}
+			return `${title}. `;
 		},
 		download(type) {
 			downloadMonsterFile(this.$refs.card, type, {
@@ -588,18 +625,26 @@ export default {
 	h1 {
 		margin-top: 0;
 		font-size: 1.75em;
-		line-height: 1.5em;
+		line-height: 1.1em;
 		column-span: all;
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		gap: 1em;
+		gap: 0.5em;
 		font-weight: 700;
+		padding-bottom: 0.5em;
 
 		button {
 			white-space: nowrap;
 			font-family: "Open Sans", sans-serif;
 		}
+	}
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.25em;
 	}
 	h2 {
 		font-size: 1.3em;

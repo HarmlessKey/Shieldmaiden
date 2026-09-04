@@ -7,7 +7,7 @@
 		<div class="card-body">
 			<div class="row q-col-gutter-md">
 				<!-- NAME -->
-				<div class="col-12 col-md-6">
+				<div class="col-12 col-md-9">
 					<ValidationProvider
 						rules="max:100|required"
 						name="Name"
@@ -28,8 +28,15 @@
 					</ValidationProvider>
 				</div>
 
-				<!-- LEVEL -->
+				<!-- EDITION -->
 				<div class="col-12 col-md-3">
+					<hk-edition-select v-model="spell.edition" />
+				</div>
+			</div>
+
+			<div class="row q-col-gutter-md">
+				<!-- LEVEL -->
+				<div class="col-12 col-md-4">
 					<ValidationProvider rules="required" name="Level" v-slot="{ errors, invalid, validated }">
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
@@ -48,7 +55,7 @@
 				</div>
 
 				<!-- SCHOOL -->
-				<div class="col-12 col-md-3">
+				<div class="col-12 col-md-8">
 					<ValidationProvider
 						rules="required"
 						name="School"

@@ -52,6 +52,32 @@ export function calc_skill_mod(
 	return parseInt(mod) + parseInt(bonus);
 }
 
+/**
+ * Returns the label and path to view the current compendium page in the other edition (5e <-> 5.5e)
+ *
+ * @param {import("vue-router").Route} route
+ * @returns {{ label: string, to: string }}
+ */
+export function otherEdition(route) {
+	const isCurrently55 = route.params.edition === "5.5e";
+	const base = route.path.replace(/\/5\.5e(?=\/|$)/, "");
+
+	let to;
+	if (isCurrently55) {
+		to = base;
+	} else if (route.params.id) {
+		const idIndex = base.lastIndexOf(`/${route.params.id}`);
+		to = `${base.slice(0, idIndex)}/5.5e${base.slice(idIndex)}`;
+	} else {
+		to = `${base}/5.5e`;
+	}
+
+	return {
+		label: isCurrently55 ? "5e" : "5.5e",
+		to,
+	};
+}
+
 export function displayCR(cr) {
 	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
 }
@@ -76,6 +102,24 @@ export function downloadJSON(data) {
 	document.body.appendChild(downloadAnchorNode); // required for firefox
 	downloadAnchorNode.click();
 	downloadAnchorNode.remove();
+}
+
+/**
+ * Removes the MongoDB version key (__v) from an object and everything nested in it.
+ * The content API should strip it from its responses, but doesn't always,
+ * and our content schemas don't allow the property.
+ *
+ * @param {*} data object or array, mutated in place
+ * @returns {*} the same data
+ */
+export function removeVersionKeys(data) {
+	if (Array.isArray(data)) {
+		data.forEach((value) => removeVersionKeys(value));
+	} else if (data && typeof data === "object") {
+		delete data.__v;
+		Object.values(data).forEach((value) => removeVersionKeys(value));
+	}
+	return data;
 }
 
 /**
@@ -452,6 +496,70 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 		pdf.save(`${filename}.pdf`);
 		document.body.removeChild(clone);
 	}
+}
+
+export async function downloadSpellFile(element, options = {}) {
+	const { filename = "shieldmaiden-spell" } = options;
+
+	// Captured at the card's own defined size (no wrapper/padding/forced width) - the
+	// card already renders its own footer, so no extra framing is added here.
+	const canvas = await html2canvas(element, {
+		scale: 2,
+		useCORS: true,
+	});
+	canvas.toBlob(blob => {
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(blob);
+		link.download = filename;
+		link.click();
+		URL.revokeObjectURL(link.href);
+	});
+}
+
+/**
+ * Captures an element as-is (no wrapper/padding/footer) and returns a PNG data URL.
+ * Used to grab raw card images for placement in a grid, e.g. downloadCardsPdf().
+ */
+export async function captureElementAsDataUrl(element, options = {}) {
+	const canvas = await html2canvas(element, { scale: 2, useCORS: true, ...options });
+	return canvas.toDataURL("image/png");
+}
+
+/**
+ * Lays out pre-rendered card images (e.g. from captureElementAsDataUrl) on A4 pages in a
+ * fixed grid and downloads the result as a PDF. `pageGroups` is an array of arrays of PNG
+ * data URLs, one inner array per PDF page, in the order they should appear on that page.
+ */
+export async function downloadCardsPdf(pageGroups, options = {}) {
+	const {
+		filename = "shieldmaiden-cards",
+		cardWidthMM = 63.5, // 2.5in
+		cardHeightMM = 88.9, // 3.5in
+		columns = 3,
+		rows = 3,
+		gapMM = 2,
+	} = options;
+
+	const pdf = new jsPDF("p", "mm", "a4");
+	const pageWidth = pdf.internal.pageSize.getWidth();
+	const pageHeight = pdf.internal.pageSize.getHeight();
+	const gridWidth = columns * cardWidthMM + (columns - 1) * gapMM;
+	const gridHeight = rows * cardHeightMM + (rows - 1) * gapMM;
+	const marginX = (pageWidth - gridWidth) / 2;
+	const marginY = (pageHeight - gridHeight) / 2;
+
+	pageGroups.forEach((images, pageIndex) => {
+		if (pageIndex > 0) pdf.addPage();
+		images.forEach((dataUrl, i) => {
+			const col = i % columns;
+			const row = Math.floor(i / columns);
+			const x = marginX + col * (cardWidthMM + gapMM);
+			const y = marginY + row * (cardHeightMM + gapMM);
+			pdf.addImage(dataUrl, "PNG", x, y, cardWidthMM, cardHeightMM);
+		});
+	});
+
+	pdf.save(`${filename}.pdf`);
 }
 
 export function campaignGroupKey(campaignId) {

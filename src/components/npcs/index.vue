@@ -3,9 +3,9 @@
 		<div class="form">
 			<BasicInfo v-model="npc" />
 
-			<Senses v-model="npc" />
-
 			<AbilityScores v-model="npc" />
+
+			<Senses v-model="npc" />
 
 			<Skills v-model="npc" />
 			

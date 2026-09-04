@@ -48,7 +48,7 @@
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
-									<Spell :id="spell.key" :edition="entity.edition || default_edition" />
+									<Spell :id="spell.key" :edition="entity.edition || default_edition" hide-report />
 								</template
 							></hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
@@ -104,7 +104,7 @@
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
-									<Spell :id="spell.key" :edition="entity.edition || default_edition" />
+									<Spell :id="spell.key" :edition="entity.edition || default_edition" hide-report />
 								</template>
 							</hk-popover>
 							<template v-if="is_5_5e && spell.level !== undefined">

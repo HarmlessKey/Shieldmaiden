@@ -264,7 +264,8 @@
 								v-for="(spell, index) in spellsForLevel(level)"
 								:key="spell.name"
 							>
-								<hk-popover> {{ spell.name }}<Spell slot="content" :id="spell.key" /> </hk-popover
+								<hk-popover>
+									{{ spell.name }}<Spell slot="content" :id="spell.key" hide-report /> </hk-popover
 								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
@@ -301,7 +302,7 @@
 								<hk-popover>
 									{{ spell.name }}
 									<template #content>
-										<Spell :id="spell.key" />
+										<Spell :id="spell.key" hide-report />
 									</template> </hk-popover
 								>{{ index + 1 &lt; spellsForLimit(limit).length ? "," : "" }}
 							</i>

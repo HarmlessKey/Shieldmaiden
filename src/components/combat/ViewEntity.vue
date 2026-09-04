@@ -286,7 +286,7 @@
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
-								<template #content> <Spell :id="spell.key" /> </template
+								<template #content> <Spell :id="spell.key" hide-report /> </template
 							></hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLevel(level).length ? "," : "" }}
@@ -343,7 +343,7 @@
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
-									<Spell :id="spell.key" />
+									<Spell :id="spell.key" hide-report />
 								</template>
 							</hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->

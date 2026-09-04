@@ -196,6 +196,7 @@
 									<Spell
 										:data="spell"
 										:title="false"
+										hide-report
 										v-if="showSpell === `${level}-${spell.key}`"
 									/>
 								</div>

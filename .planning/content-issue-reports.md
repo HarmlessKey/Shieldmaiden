@@ -36,6 +36,19 @@ came from the API, not from Firebase homebrew data (which uses Firebase push key
 Conditions (`compendium/Condition.vue`) are not included — not requested, and lower risk of
 transcription error (short, mostly static SRD text).
 
+**Not in every render context.** `compendium/Spell.vue` takes a `hide-report` prop that
+suppresses the button where the spell is a secondary, transient render rather than the thing
+being viewed:
+
+- Spell popovers in NPC/monster statblocks (`compendium/Monster.vue`,
+  `combat/ViewEntity.vue`, `combat/entities/Card/CardSpellcasting.vue`) — the floating card
+  that appears on hover.
+- Expanded spell descriptions in the combat Spells action dropdown
+  (`combat/actions/RollSpells.vue`, `combat/legacy/actions/Spellcasting.vue`).
+
+The button still renders on the compendium spell page, the spell drawer, the campaign
+compendium and the contribute preview.
+
 ## Data model
 
 Firebase Realtime Database, a single **flat** top-level node `content_reports/{reportId}`.

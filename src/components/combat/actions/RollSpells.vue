@@ -143,7 +143,12 @@
 						</q-item-section>
 					</template>
 					<div class="accordion-body description p-2">
-						<Spell :data="spell" :title="false" v-if="showSpell === `${level}-${spell.key}`" />
+						<Spell
+							:data="spell"
+							:title="false"
+							hide-report
+							v-if="showSpell === `${level}-${spell.key}`"
+						/>
 					</div>
 				</q-expansion-item>
 			</q-list>

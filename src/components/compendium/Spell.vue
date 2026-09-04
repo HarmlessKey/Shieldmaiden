@@ -107,7 +107,7 @@
 		</div>
 
 		<ReportIssue
-			v-if="!custom && spell._id"
+			v-if="!custom && !hideReport && spell._id"
 			class="mt-3"
 			type="spell"
 			:content-id="spell._id"
@@ -150,6 +150,11 @@ export default {
 			type: String,
 		},
 		allowDownload: {
+			type: Boolean,
+			default: false,
+		},
+		// Hide the Report Issue button, e.g. when the spell is shown in a popover or an action dropdown
+		hideReport: {
 			type: Boolean,
 			default: false,
 		},

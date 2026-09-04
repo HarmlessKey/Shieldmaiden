@@ -480,6 +480,70 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 	}
 }
 
+export async function downloadSpellFile(element, options = {}) {
+	const { filename = "shieldmaiden-spell" } = options;
+
+	// Captured at the card's own defined size (no wrapper/padding/forced width) - the
+	// card already renders its own footer, so no extra framing is added here.
+	const canvas = await html2canvas(element, {
+		scale: 2,
+		useCORS: true,
+	});
+	canvas.toBlob(blob => {
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(blob);
+		link.download = filename;
+		link.click();
+		URL.revokeObjectURL(link.href);
+	});
+}
+
+/**
+ * Captures an element as-is (no wrapper/padding/footer) and returns a PNG data URL.
+ * Used to grab raw card images for placement in a grid, e.g. downloadCardsPdf().
+ */
+export async function captureElementAsDataUrl(element, options = {}) {
+	const canvas = await html2canvas(element, { scale: 2, useCORS: true, ...options });
+	return canvas.toDataURL("image/png");
+}
+
+/**
+ * Lays out pre-rendered card images (e.g. from captureElementAsDataUrl) on A4 pages in a
+ * fixed grid and downloads the result as a PDF. `pageGroups` is an array of arrays of PNG
+ * data URLs, one inner array per PDF page, in the order they should appear on that page.
+ */
+export async function downloadCardsPdf(pageGroups, options = {}) {
+	const {
+		filename = "shieldmaiden-cards",
+		cardWidthMM = 63.5, // 2.5in
+		cardHeightMM = 88.9, // 3.5in
+		columns = 3,
+		rows = 3,
+		gapMM = 2,
+	} = options;
+
+	const pdf = new jsPDF("p", "mm", "a4");
+	const pageWidth = pdf.internal.pageSize.getWidth();
+	const pageHeight = pdf.internal.pageSize.getHeight();
+	const gridWidth = columns * cardWidthMM + (columns - 1) * gapMM;
+	const gridHeight = rows * cardHeightMM + (rows - 1) * gapMM;
+	const marginX = (pageWidth - gridWidth) / 2;
+	const marginY = (pageHeight - gridHeight) / 2;
+
+	pageGroups.forEach((images, pageIndex) => {
+		if (pageIndex > 0) pdf.addPage();
+		images.forEach((dataUrl, i) => {
+			const col = i % columns;
+			const row = Math.floor(i / columns);
+			const x = marginX + col * (cardWidthMM + gapMM);
+			const y = marginY + row * (cardHeightMM + gapMM);
+			pdf.addImage(dataUrl, "PNG", x, y, cardWidthMM, cardHeightMM);
+		});
+	});
+
+	pdf.save(`${filename}.pdf`);
+}
+
 export function campaignGroupKey(campaignId) {
 	return `campaign__${campaignId}`;
 }

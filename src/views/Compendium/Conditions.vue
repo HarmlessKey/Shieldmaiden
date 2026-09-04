@@ -24,14 +24,12 @@
 				borderless
 				filled
 				square
-				debounce="300"
 				clearable
 				placeholder="Search"
-				@keyup.enter="filter()"
-				@clear="filter()"
+				@keyup.enter="searchNow"
 			>
 				<q-icon slot="append" name="search" />
-				<button slot="after" class="btn" @click="filter()">Search</button>
+				<button slot="after" class="btn" @click="searchNow">Search</button>
 			</q-input>
 
 			<q-table
@@ -91,11 +89,13 @@
 
 <script>
 import ViewCondition from "src/components/compendium/Condition.vue";
+import { debouncedSearch } from "src/mixins/debouncedSearch.js";
 import { otherEdition } from "src/utils/generalFunctions";
 import { mapActions } from "vuex";
 
 export default {
 	name: "Conditions",
+	mixins: [debouncedSearch],
 	components: {
 		ViewCondition,
 	},
@@ -146,6 +146,9 @@ export default {
 	},
 	methods: {
 		...mapActions("api_conditions", ["fetch_conditions"]),
+		runSearch() {
+			this.filter();
+		},
 		filter() {
 			this.loading = true;
 			this.conditions = [];

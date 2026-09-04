@@ -24,11 +24,11 @@
 				borderless
 				filled
 				square
-				debounce="300"
 				clearable
 				placeholder="Search"
+				@keyup.enter="searchNow"
 			>
-				<button slot="append" class="btn bg-neutral-5" @click="filterSpells">
+				<button slot="append" class="btn bg-neutral-5" @click="searchNow">
 					<q-icon name="search" />
 				</button>
 				<q-btn slot="after" color="primary" no-caps @click="filter_dialog = true">
@@ -132,11 +132,13 @@
 
 <script>
 import ViewSpell from "src/components/compendium/Spell.vue";
+import { debouncedSearch } from "src/mixins/debouncedSearch.js";
 import { otherEdition } from "src/utils/generalFunctions";
 import { mapActions } from "vuex";
 
 export default {
 	name: "Spells",
+	mixins: [debouncedSearch],
 	components: {
 		ViewSpell,
 	},
@@ -205,6 +207,9 @@ export default {
 	},
 	methods: {
 		...mapActions("api_spells", ["fetch_api_spells"]),
+		runSearch() {
+			this.filterSpells();
+		},
 		filterSpells() {
 			this.loading = true;
 			this.spells = [];

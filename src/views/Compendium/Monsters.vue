@@ -36,13 +36,11 @@
 				borderless
 				filled
 				square
-				debounce="300"
 				clearable
 				placeholder="Search"
-				@keyup.enter="filterMonsters"
-				@clear="filterMonsters"
+				@keyup.enter="searchNow"
 			>
-				<button slot="append" class="btn bg-neutral-5" @click="filterMonsters">
+				<button slot="append" class="btn bg-neutral-5" @click="searchNow">
 					<q-icon name="search" />
 				</button>
 				<q-btn slot="after" color="primary" no-caps @click="filter_dialog = true">
@@ -177,6 +175,7 @@
 
 <script>
 import ViewMonster from "src/components/compendium/Monster.vue";
+import { debouncedSearch } from "src/mixins/debouncedSearch.js";
 import { monsterMixin } from "src/mixins/monster.js";
 import { otherEdition } from "src/utils/generalFunctions";
 import { mapActions } from "vuex";
@@ -184,7 +183,7 @@ import _ from "lodash";
 
 export default {
 	name: "Monsters",
-	mixins: [monsterMixin],
+	mixins: [monsterMixin, debouncedSearch],
 	components: {
 		ViewMonster,
 	},
@@ -327,6 +326,9 @@ export default {
 		clearFilter() {
 			this.filter_dialog = false;
 			this.$set(this, "filter", {});
+			this.filterMonsters();
+		},
+		runSearch() {
 			this.filterMonsters();
 		},
 		filterMonsters() {

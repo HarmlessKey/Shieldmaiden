@@ -38,6 +38,10 @@
 			// If the id prop is passed, the condition is fetched in the Condition component
 			id: {
 				type: String
+			},
+			// Edition to fetch the condition for when using the id prop; falls back to the route edition
+			edition: {
+				type: String
 			}
 		},
 		data() {
@@ -47,11 +51,11 @@
 			}
 		},
 		computed: {
-			edition() {
-				return this.$route.params.edition === "5.5e" ? "5.5e" : "5e";
+			resolvedEdition() {
+				return this.edition || (this.$route.params.edition === "5.5e" ? "5.5e" : "5e");
 			},
 			exhaustionLevels() {
-				return EXHAUSTION_LEVELS[this.edition];
+				return EXHAUSTION_LEVELS[this.resolvedEdition];
 			},
 		},
 		async beforeMount() {
@@ -59,7 +63,7 @@
 				this.condition = this.data;
 				this.loading = false;
 			} else {
-				this.condition = await this.fetch_condition({ id: this.id, edition: this.edition });
+				this.condition = await this.fetch_condition({ id: this.id, edition: this.resolvedEdition });
 				this.loading = false;
 			}
 		},

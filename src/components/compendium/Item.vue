@@ -45,7 +45,7 @@
 			:content-id="item._id"
 			:content-name="item.name"
 			:content-url="item.url"
-			:edition="item.edition || edition"
+			:edition="item.edition || resolvedEdition"
 		/>
 	</div>
 	<hk-loader v-else name="item" />
@@ -68,6 +68,10 @@
 			// If the id prop is passed, the item is fetched in the Monster component
 			id: {
 				type: String
+			},
+			// Edition to fetch the item for when using the id prop; falls back to the route edition
+			edition: {
+				type: String
 			}
 		},
 		data() {
@@ -77,8 +81,8 @@
 			}
 		},
 		computed: {
-			edition() {
-				return this.$route.params.edition === "5.5e" ? "5.5e" : "5e";
+			resolvedEdition() {
+				return this.edition || (this.$route.params.edition === "5.5e" ? "5.5e" : "5e");
 			}
 		},
 		async beforeMount() {
@@ -86,7 +90,7 @@
 				this.item = this.data;
 				this.loading = false;
 			} else {
-				this.item = await this.fetch_api_item({ id: this.id, edition: this.edition });
+				this.item = await this.fetch_api_item({ id: this.id, edition: this.resolvedEdition });
 				this.loading = false;
 			}
 		},

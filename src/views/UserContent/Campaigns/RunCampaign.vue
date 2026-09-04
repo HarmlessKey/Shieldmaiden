@@ -239,7 +239,7 @@ import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
 import { getCharacterSyncStorage } from "src/utils/generalFunctions";
-import { editions } from "src/utils/generalConstants";
+import { editions, default_edition } from "src/utils/generalConstants";
 import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
@@ -345,6 +345,7 @@ export default {
 			if (!this.campaign.edition) {
 				this.edition_dialog = true;
 			}
+			this.set_compendium_edition(this.campaign.edition || default_edition);
 		});
 		this.set_active_campaign(this.campaignId);
 	},
@@ -380,12 +381,13 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
+		...mapActions(["setDrawer", "set_compendium_edition"]),
 		...mapActions("campaigns", ["get_campaign", "set_active_campaign", "set_campaign_prop"]),
 		...mapActions("players", ["get_player"]),
 		async setEdition(edition) {
 			await this.set_campaign_prop({ id: this.campaignId, property: "edition", value: edition });
 			this.$set(this.campaign, "edition", edition);
+			this.set_compendium_edition(edition);
 			this.edition_dialog = false;
 		},
 		setSize(size) {

@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { browserDetect, extensionInstalled } from "src/utils/generalFunctions";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	state: () => ({
@@ -14,6 +15,7 @@ export default {
 		extensionInstalled: null,
 		music: null,
 		ambience: [],
+		compendium_edition: default_edition,
 	}),
 
 	getters: {
@@ -22,6 +24,9 @@ export default {
 		},
 		theme: (state) => {
 			return state.theme;
+		},
+		compendium_edition: (state) => {
+			return state.compendium_edition;
 		},
 		getDrawer(state) {
 			return state.drawer;
@@ -228,6 +233,9 @@ export default {
 		play_ambience({ commit }, payload) {
 			commit("SET_AMBIENCE", payload);
 		},
+		set_compendium_edition({ commit }, edition) {
+			commit("SET_COMPENDIUM_EDITION", edition);
+		},
 	},
 
 	mutations: {
@@ -275,6 +283,9 @@ export default {
 				ambience.push(payload);
 			}
 			Vue.set(state, "ambience", ambience);
+		},
+		SET_COMPENDIUM_EDITION(state, payload) {
+			Vue.set(state, "compendium_edition", payload);
 		},
 	},
 };

@@ -21,7 +21,7 @@
 				<CheatSheet :edition="campaign.edition || default_edition" />
 			</q-tab-panel>
 			<q-tab-panel name="compendium">
-				<Compendium />
+				<Compendium :edition="campaign.edition || default_edition" />
 			</q-tab-panel>
 			<q-tab-panel name="notes">
 				<Notes />

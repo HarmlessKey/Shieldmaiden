@@ -760,7 +760,8 @@
         "radius",
         "sphere",
         "square",
-        "square feet"
+        "square feet",
+        "wall"
       ]
     },
     "action-aoe-size": {

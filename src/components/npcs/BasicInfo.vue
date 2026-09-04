@@ -66,7 +66,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col-3">
-						<hk-edition-select v-model="npc.edition" />
+						<hk-edition-select :value="npc.edition" @input="setEdition" />
 					</div>
 				</div>
 
@@ -549,6 +549,18 @@
 				@clear="clearAvatar"
 			/>
 		</q-dialog>
+
+		<!-- EDITION CHANGE -->
+		<hk-dialog v-model="edition_dialog" header="Change edition" persistent :closable="false">
+			<p>
+				You are changing the edition, this will <strong>clear all spells</strong> from this
+				spellcaster.
+			</p>
+			<div slot="footer" class="card-footer d-flex justify-content-end full-width">
+				<q-btn class="mr-1" no-caps @click="cancelEdition">Cancel</q-btn>
+				<q-btn color="primary" no-caps label="OK" @click="confirmEdition" />
+			</div>
+		</hk-dialog>
 	</div>
 </template>
 
@@ -567,6 +579,8 @@ export default {
 		return {
 			languages: languages,
 			avatar_dialog: false,
+			edition_dialog: false,
+			pending_edition: undefined,
 			preview_new_upload: undefined,
 		};
 	},
@@ -627,6 +641,12 @@ export default {
 		current_avatar() {
 			return this.preview_new_upload || this.npc.storage_avatar || this.npc.avatar;
 		},
+		has_spells() {
+			return (
+				Object.keys(this.npc.caster_spells || {}).length > 0 ||
+				Object.keys(this.npc.innate_spells || {}).length > 0
+			);
+		},
 	},
 	mounted() {
 		if (this.$store.getters.user) {
@@ -640,6 +660,30 @@ export default {
 		...mapActions(["setDrawer"]),
 		viewNpc() {
 			this.setDrawer({ show: true, type: "drawers/ViewNpc", data: this.npc });
+		},
+		/**
+		 * Spells belong to an edition, so they can't carry over to another one.
+		 * Ask for confirmation before changing the edition of a spellcaster.
+		 */
+		setEdition(edition) {
+			const changed = (edition || undefined) !== (this.npc.edition || undefined);
+
+			if (changed && this.has_spells) {
+				this.pending_edition = edition;
+				this.edition_dialog = true;
+				return;
+			}
+			this.$set(this.npc, "edition", edition);
+		},
+		confirmEdition() {
+			this.$set(this.npc, "edition", this.pending_edition);
+			this.$delete(this.npc, "caster_spells");
+			this.$delete(this.npc, "innate_spells");
+			this.cancelEdition();
+		},
+		cancelEdition() {
+			this.edition_dialog = false;
+			this.pending_edition = undefined;
 		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {

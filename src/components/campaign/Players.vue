@@ -134,8 +134,8 @@
 				<div
 					class="col header text-center pp"
 					v-if="
-						userSettings.general &&
-						userSettings.general.passive_perception === undefined &&
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.passive_perception === undefined)) &&
 						!is_medium
 					"
 				>
@@ -145,8 +145,8 @@
 				<div
 					class="col header text-center pinv"
 					v-if="
-						userSettings.general &&
-						userSettings.general.passive_investigation === undefined &&
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.passive_investigation === undefined)) &&
 						!is_medium
 					"
 				>
@@ -156,7 +156,9 @@
 				<div
 					class="col header text-center pins"
 					v-if="
-						userSettings.general && userSettings.general.passive_insight === undefined && !is_medium
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.passive_insight === undefined)) &&
+						!is_medium
 					"
 				>
 					<i aria-hidden="true" class="fas fa-lightbulb-on" />
@@ -164,7 +166,11 @@
 				</div>
 				<div
 					class="col header text-center save"
-					v-if="userSettings.general && userSettings.general.save_dc === undefined && !is_medium"
+					v-if="
+						(!userSettings.general ||
+							(userSettings.general && userSettings.general.save_dc === undefined)) &&
+						!is_medium
+					"
 				>
 					<i aria-hidden="true" class="fas fa-hand-holding-magic" />
 					<q-tooltip anchor="top middle" self="center middle"> Save DC </q-tooltip>
@@ -223,8 +229,9 @@
 						<div
 							class="col pp"
 							v-if="
-								userSettings.general &&
-								userSettings.general.passive_perception === undefined &&
+								(!userSettings.general ||
+									(userSettings.general &&
+										userSettings.general.passive_perception === undefined)) &&
 								!is_medium
 							"
 							:key="'pp-' + key"
@@ -234,8 +241,9 @@
 						<div
 							class="col pinv"
 							v-if="
-								userSettings.general &&
-								userSettings.general.passive_investigation === undefined &&
+								(!userSettings.general ||
+									(userSettings.general &&
+										userSettings.general.passive_investigation === undefined)) &&
 								!is_medium
 							"
 							:key="'pinv-' + key"
@@ -245,8 +253,8 @@
 						<div
 							class="col pins"
 							v-if="
-								userSettings.general &&
-								userSettings.general.passive_insight === undefined &&
+								(!userSettings.general ||
+									(userSettings.general && userSettings.general.passive_insight === undefined)) &&
 								!is_medium
 							"
 							:key="'pins-' + key"
@@ -256,7 +264,9 @@
 						<div
 							class="col save"
 							v-if="
-								userSettings.general && userSettings.general.save_dc === undefined && !is_medium
+								(!userSettings.general ||
+									(userSettings.general && userSettings.general.save_dc === undefined)) &&
+								!is_medium
 							"
 							:key="'save-' + key"
 						>

@@ -106,6 +106,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { editions, default_edition } from "src/utils/generalConstants";
+import { removeVersionKeys } from "src/utils/generalFunctions";
 
 export default {
 	name: "CopyContent",
@@ -354,6 +355,7 @@ export default {
 				delete result.url;
 				delete result.meta;
 				delete result.release_date;
+				removeVersionKeys(result);
 
 				this.$emit("copy", { result, id, resource: this.copy_resource, ...extra });
 			}

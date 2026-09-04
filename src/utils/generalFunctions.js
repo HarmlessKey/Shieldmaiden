@@ -105,6 +105,24 @@ export function downloadJSON(data) {
 }
 
 /**
+ * Removes the MongoDB version key (__v) from an object and everything nested in it.
+ * The content API should strip it from its responses, but doesn't always,
+ * and our content schemas don't allow the property.
+ *
+ * @param {*} data object or array, mutated in place
+ * @returns {*} the same data
+ */
+export function removeVersionKeys(data) {
+	if (Array.isArray(data)) {
+		data.forEach((value) => removeVersionKeys(value));
+	} else if (data && typeof data === "object") {
+		delete data.__v;
+		Object.values(data).forEach((value) => removeVersionKeys(value));
+	}
+	return data;
+}
+
+/**
  * Generates a UUID
  *
  * @param {data} data

@@ -108,6 +108,7 @@ export class npcServices {
 		} catch (error) {
       console.error(`Error while adding NPC ${npc.name}`, npc)
       console.error("With error:", error)
+      throw error;
 		}
 	}
 
@@ -157,6 +158,7 @@ export class npcServices {
 		} catch (error) {
       console.error(`Error while saving NPC ${npc.name}`, npc)
       console.error("With error:", error)
+      throw error;
 		}
 	}
 

@@ -15,6 +15,7 @@
 					Leave
 				</router-link>
 				<div class="dm-screen__header-title flex-grow truncate">
+					<span class="neutral-2">{{ campaign.edition === "5.5e" ? "5.5e" : "5e" }}</span>
 					{{ campaign.name }}
 				</div>
 				<div class="d-flex justify-content-end items-center gap-1">
@@ -69,6 +70,7 @@
 								setDrawer({
 									show: true,
 									type: 'campaign/resources/index',
+									data: { campaign: campaign },
 									classes: 'p-0',
 								})
 							"
@@ -139,7 +141,7 @@
 						</Splitpanes>
 					</Pane>
 					<hk-pane :size="panes.right" min-size="20">
-						<Resources />
+						<Resources :campaign="campaign" />
 					</hk-pane>
 				</Splitpanes>
 				<Splitpanes v-else class="default-theme" horizontal>
@@ -202,7 +204,7 @@
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="resources" class="p-0">
-						<Resources />
+						<Resources :campaign="campaign" />
 					</q-tab-panel>
 					<q-tab-panel name="share">
 						<Share :campaign="campaign" />
@@ -219,6 +221,29 @@
 		<q-dialog v-if="!overencumbered" v-model="add_players_dialog">
 			<AddPlayers :campaign="search_campaign" @campaign-players="updatePlayers" />
 		</q-dialog>
+
+		<!-- Campaign edition dialog -->
+		<q-dialog v-model="edition_dialog" persistent>
+			<hk-card header="Which edition does this campaign use?" class="mb-0">
+				<div class="card-body">
+					<p>
+						This campaign was created before edition support was added. Select the edition this
+						campaign uses, it determines which rules and content are shown by default. You can
+						always change this later when editing the campaign.
+					</p>
+					<div class="d-flex justify-content-between gap-1">
+						<button
+							v-for="{ value, label } in edition_options"
+							:key="value"
+							class="btn btn-block bg-neutral-5"
+							@click="setEdition(value)"
+						>
+							{{ label }}
+						</button>
+					</div>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -230,6 +255,7 @@ import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
 import HkPane from "src/components/hk-components/hk-pane";
 import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { editions, default_edition } from "src/utils/generalConstants";
 import { loadPaneSizes, savePaneSizes } from "src/utils/dmScreenLayout";
 import AddPlayers from "src/components/campaign/AddPlayers";
 
@@ -260,6 +286,8 @@ export default {
 			players: {},
 			search_campaign: {},
 			add_players_dialog: false,
+			edition_dialog: false,
+			edition_options: editions,
 			mobile_tab: "encounters",
 			mobile_tabs: [
 				{
@@ -332,6 +360,12 @@ export default {
 					this.search_campaign[prop] = this.campaign[prop];
 				}
 			}
+
+			// Campaigns from before edition support: ask the user which edition is used
+			if (!this.campaign.edition) {
+				this.edition_dialog = true;
+			}
+			this.set_compendium_edition(this.campaign.edition || default_edition);
 		});
 		this.set_active_campaign(this.campaignId);
 	},
@@ -367,9 +401,15 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
-		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
+		...mapActions(["setDrawer", "set_compendium_edition"]),
+		...mapActions("campaigns", ["get_campaign", "set_active_campaign", "set_campaign_prop"]),
 		...mapActions("players", ["get_player"]),
+		async setEdition(edition) {
+			await this.set_campaign_prop({ id: this.campaignId, property: "edition", value: edition });
+			this.$set(this.campaign, "edition", edition);
+			this.set_compendium_edition(edition);
+			this.edition_dialog = false;
+		},
 		setSize(size) {
 			this.container = size;
 		},

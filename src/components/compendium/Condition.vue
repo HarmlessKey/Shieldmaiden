@@ -15,7 +15,7 @@
 				<th>Effect</th>
 			</thead>
 			<tbody>
-				<tr v-for="(effect, index) in effects" :key="index">
+				<tr v-for="(effect, index) in exhaustionLevels" :key="index">
 					<td>{{ index + 1 }}</td>
 					<td>{{ effect }}</td>
 				</tr>
@@ -26,6 +26,7 @@
 
 <script>
 	import { mapActions } from "vuex";
+	import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
 
 	export default {
 		name: "Condition",
@@ -37,30 +38,34 @@
 			// If the id prop is passed, the condition is fetched in the Condition component
 			id: {
 				type: String
+			},
+			// Edition to fetch the condition for when using the id prop; falls back to the route edition
+			edition: {
+				type: String
 			}
 		},
 		data() {
 			return {
 				condition: {},
 				loading: true,
-				effects: [
-					"Disadvantage on ability checks",
-					"Speed halved",
-					"Disadvantage on attack rolls and saving throws",
-					"Hit point maximum halved",
-					"Speed reduced to 0",
-					"Death",
-				]
 			}
+		},
+		computed: {
+			resolvedEdition() {
+				return this.edition || (this.$route.params.edition === "5.5e" ? "5.5e" : "5e");
+			},
+			exhaustionLevels() {
+				return EXHAUSTION_LEVELS[this.resolvedEdition];
+			},
 		},
 		async beforeMount() {
 			if(this.data) {
-				this.condition = this.data;		
+				this.condition = this.data;
 				this.loading = false;
 			} else {
-				this.condition = await this.fetch_condition(this.id);
+				this.condition = await this.fetch_condition({ id: this.id, edition: this.resolvedEdition });
 				this.loading = false;
-			}			
+			}
 		},
 		methods: {
 			...mapActions("api_conditions", ["fetch_condition"]),

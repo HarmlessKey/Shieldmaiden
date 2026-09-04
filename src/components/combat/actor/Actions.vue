@@ -76,6 +76,7 @@ export default {
 			show: false,
 			action_types: {
 				actions: { label: "Actions", name: "actions" },
+				bonus_actions: { label: "Bonus actions", name: "bonus" },
 				special_abilities: { label: "Special abilities", name: "special" },
 				legendary_actions: { label: "Legendary actions", name: "legendary" },
 				reactions: { label: "Reactions", name: "reactions" },

@@ -235,8 +235,7 @@
 						<button
 							v-for="{ value, label } in edition_options"
 							:key="value"
-							class="btn btn-block"
-							:class="value === '5.5e' ? 'bg-green' : 'bg-neutral-5'"
+							class="btn btn-block bg-neutral-5"
 							@click="setEdition(value)"
 						>
 							{{ label }}

@@ -38,6 +38,7 @@
 
 - [x] 7.1 In `src-ssr/api/index.js`, `require` `FEATURE_FLAGS` from `src/utils/featureFlags.js` and add a small `isFlagEnabled(id)` helper using the existing `admin.database()` instance (fallback to registry default when no stored value or on read error)
 - [x] 7.2 In `router.post("/ai/generate-monster", ...)`, check `isFlagEnabled("monster_generator")` right after token verification and before the credits lookup; if disabled, respond with a 4xx and a clear message, without calling `MonsterGenerator.generateMonster` or touching credits
+- [x] 7.3 Found via Docker/CI build failure: `src-ssr/*.js` isn't Babel-transpiled, and webpack 4's parser can't handle the ES2020 optional-chaining/nullish-coalescing (`?.`/`??`) used in the flag-default fallback. `npm run ssr` (dev) didn't catch it. Replaced with a plain `flagDefault()` helper; verified with a full `npx quasar build -m ssr`
 
 ## 8. Firebase rules (manual, outside this repo's tracked files)
 

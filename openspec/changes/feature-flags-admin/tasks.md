@@ -52,5 +52,5 @@
 
 ## 10. Wrap up
 
-- [ ] 10.1 Commit on `feature/feature-flags-admin` and push
-- [ ] 10.2 Open PR `feature/feature-flags-admin` -> `develop` (per Git Flow in CLAUDE.md)
+- [x] 10.1 Commit on `feature/feature-flags-admin` and push
+- [x] 10.2 Open PR `feature/feature-flags-admin` -> `develop` (per Git Flow in CLAUDE.md) — https://github.com/HarmlessKey/Shieldmaiden/pull/360

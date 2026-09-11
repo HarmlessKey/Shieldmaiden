@@ -18,13 +18,13 @@
 	"dependencies": {
 		"@egjs/vue-flicking": "4.12.0",
 		"@gtm-support/vue2-gtm": "^2.0.0",
-		"@octokit/rest": "^19.0.5",
+		"@octokit/rest": "^22.0.0",
 		"@quasar/extras": "^1.16.12",
 		"ajv": "^8.13.0",
 		"ajv-formats": "^2.1.1",
 		"animate.css": "^4.1.1",
 		"axios": "^1.7.0",
-		"core-js": "^3.37.1",
+		"core-js": "^3.47.0",
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
 		"firebase": "^8.0.0",
@@ -35,7 +35,7 @@
 		"jwt-decode": "^4.0.0",
 		"lodash": "^4.17.21",
 		"marked": "^4.0.16",
-		"morgan": "^1.10.0",
+		"morgan": "^1.10.1",
 		"node-fetch": "^2.7.0",
 		"quasar": "^1.0.0",
 		"sanitize-html": "^2.13.0",
@@ -48,7 +48,7 @@
 		"vue-qr": "^4.0.9",
 		"vue-shortkey": "^3.1.7",
 		"vue-snotify": "^3.2.1",
-		"vue2-flip-countdown": "^0.12.1",
+		"vue2-flip-countdown": "^1.0.0",
 		"vuedraggable": "^2.24.3",
 		"vuefire": "^1.4.5",
 		"vuejs-logger": "^1.10.2",
@@ -64,7 +64,7 @@
 		"eslint-webpack-plugin": "^2.4.0",
 		"husky": "^8.0.2",
 		"prettier": "^3.3.3",
-		"workbox-webpack-plugin": "^7.3.0"
+		"workbox-webpack-plugin": "^7.4.0"
 	},
 	"overrides": {
 		"chokidar": "^3.5.3",

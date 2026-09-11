@@ -160,6 +160,11 @@ export default {
 						});
 					});
 				});
+				Object.values(monster.innate_spells || {}).forEach((spell) => {
+					if (spell.limit === -1) {
+						spell.limit = 0;
+					}
+				});
 				this.cache_generated_npc(monster);
 
 				if (this.auto_download) {

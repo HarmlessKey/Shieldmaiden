@@ -50,7 +50,7 @@
 - [x] 9.2 Toggle `monster_generator` off on the admin page; reload the New Monster dialog in `EditNpc.vue` and confirm "Generate from description" is gone — confirmed by user
 - [x] 9.3 With the flag off, call `POST /ai/generate-monster` directly (e.g. via curl/Postman with a valid token) and confirm it's rejected without spending credits or calling the external API — confirmed by user ("API successfully blocks it")
 - [x] 9.4 Toggle the flag back on, reload, and confirm both the entry point and the endpoint work as before — confirmed by user ("toggle works")
-- [ ] 9.5 Delete the `feature_flags/monster_generator` node entirely (simulating "never toggled") and confirm the feature behaves as enabled (registry default)
+- [x] 9.5 Delete the `feature_flags/monster_generator` node entirely (simulating "never toggled") and confirm the feature behaves as enabled (registry default) — confirmed by user ("Delete node works, defaults to true")
 - [x] 9.6 Run `npm run lint` and fix any issues introduced
 
 ## 10. Wrap up

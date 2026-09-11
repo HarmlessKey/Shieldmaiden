@@ -1199,6 +1199,24 @@ const routes = [
 				],
 			},
 			{
+				path: "feature-flags",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Feature Flags",
+				},
+				children: [
+					{
+						path: "",
+						name: "Feature Flags",
+						component: () => import("src/views/Admin/FeatureFlags.vue"),
+					},
+				],
+			},
+			{
 				path: "promotions",
 				component: {
 					render(c) {

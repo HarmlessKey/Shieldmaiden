@@ -31,14 +31,18 @@ const router = new Router();
  * Reads a feature flag's stored value, falling back to its registry default
  * when unset or when the read fails (fail-open, never an accidental kill switch)
  */
+function flagDefault(id) {
+	return FEATURE_FLAGS[id] && FEATURE_FLAGS[id].default !== undefined ? FEATURE_FLAGS[id].default : true;
+}
+
 async function isFlagEnabled(id) {
 	try {
 		const snapshot = await admin.database().ref(`feature_flags/${id}/enabled`).once("value");
 		const value = snapshot.val();
-		return value === null ? FEATURE_FLAGS[id]?.default ?? true : value;
+		return value === null ? flagDefault(id) : value;
 	} catch (error) {
 		console.error(`Error reading feature flag "${id}":`, error);
-		return FEATURE_FLAGS[id]?.default ?? true;
+		return flagDefault(id);
 	}
 }
 

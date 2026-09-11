@@ -20,6 +20,7 @@ import encounters from "./modules/userContent/encounters.js";
 import characters from "./modules/userContent/characters.js";
 import trackCampaign from "./modules/trackCampaign.js";
 import contentReports from "./modules/contentReports.js";
+import featureFlags from "./modules/featureFlags.js";
 
 Vue.use(Vuex);
 
@@ -55,6 +56,7 @@ export default function () {
 			characters: characters,
 			trackCampaign: trackCampaign,
 			content_reports: contentReports,
+			feature_flags: featureFlags,
 		},
 		// enable strict mode (adds overhead!)
 		// for dev mode only

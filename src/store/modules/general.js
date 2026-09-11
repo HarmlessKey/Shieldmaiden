@@ -62,6 +62,9 @@ export default {
 		async initialize({ state, dispatch, commit, rootGetters }) {
 			if (state.initialized) return;
 
+			// Not user-specific, fetched regardless of auth state
+			dispatch("feature_flags/fetch_flags");
+
 			// In main.js before the Vue instance is rendered
 			// it's checked if there is a firebase authorization present.
 			// Therefore we can check here with 'auth' if there is a user.

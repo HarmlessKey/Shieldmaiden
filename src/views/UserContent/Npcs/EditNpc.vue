@@ -152,6 +152,7 @@
 						</button>
 						<h2 class="text-center my-2">OR</h2>
 						<button
+							v-if="isFlagEnabled('monster_generator')"
 							class="btn btn-lg btn-block bg-accent mb-2"
 							@click="generate_monster = true"
 							:disabled="!userId"
@@ -259,6 +260,7 @@ export default {
 	computed: {
 		...mapGetters(["user", "tier", "overencumbered"]),
 		...mapGetters("npcs", ["npc_count"]),
+		...mapGetters("feature_flags", ["isFlagEnabled"]),
 	},
 	watch: {
 		npc: {

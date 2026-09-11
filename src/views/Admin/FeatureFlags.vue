@@ -5,7 +5,7 @@
 				Flags are not real-time — a toggle here takes effect for clients on their next page
 				load/reload, not immediately for already-open tabs.
 			</p>
-			<q-list>
+			<q-list :dark="$store.getters.theme === 'dark'">
 				<q-item v-for="(flag, id) in feature_flags" :key="id">
 					<q-item-section>
 						<q-item-label>{{ flag.label }}</q-item-label>

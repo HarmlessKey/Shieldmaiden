@@ -328,6 +328,10 @@ export default {
 		if (this.extensionInstalled) {
 			this.sync_characters = await getCharacterSyncStorage();
 		}
+		// Fully hydrate the search index before it's relied on by `filtered_search_players`,
+		// otherwise editing a single player creates a partial index and the reactive watcher
+		// below wipes out every other party member from the displayed roster.
+		await this.get_players();
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,
@@ -403,7 +407,7 @@ export default {
 	methods: {
 		...mapActions(["setDrawer", "set_compendium_edition"]),
 		...mapActions("campaigns", ["get_campaign", "set_active_campaign", "set_campaign_prop"]),
-		...mapActions("players", ["get_player"]),
+		...mapActions("players", ["get_player", "get_players"]),
 		async setEdition(edition) {
 			await this.set_campaign_prop({ id: this.campaignId, property: "edition", value: edition });
 			this.$set(this.campaign, "edition", edition);

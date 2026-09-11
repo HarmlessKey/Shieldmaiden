@@ -32,6 +32,7 @@
 - [x] 6.1 In `src/views/UserContent/Npcs/EditNpc.vue`, map `feature_flags/isFlagEnabled` and wrap the "Generate from description" button with `v-if="isFlagEnabled('monster_generator')"`
 - [x] 6.2 Fix dangling "OR" divider: wrap both the divider and the "Generate from description" button together in `EditNpc.vue`, found during manual QA
 - [x] 6.3 Found during manual QA: the NPC list page (`src/views/UserContent/Npcs/Npcs.vue`) has its own "Generate" entry points (toolbar button + overflow-menu item) that also call the AI generator — gate both with `isFlagEnabled('monster_generator')`
+- [x] 6.4 Found during manual QA: the generic content import page (`src/views/UserContent/ImportContent/index.vue`, `/content/import`) also has its own "Generate" button opening the same `GenerateMonster.vue` — gate it too. Confirmed via `grep -rln "GenerateMonster" src` that these are now all three (and only three) usage sites
 
 ## 7. Monster generator: server enforcement
 

@@ -21,35 +21,38 @@ export class spellServices {
 	) {
 		const skip = (pageNumber - 1) * pageSize;
 		const fieldsString = fields.join(" ");
-		let params = `?skip=${skip}&limit=${pageSize}&fields=${fieldsString}`;
+		let params = `?skip=${skip}&limit=${pageSize}&fields=${encodeURIComponent(fieldsString)}`;
 
 		if (sortBy) {
-			params += `&sort=${sortBy}${descending ? ":desc" : ""}`;
+			params += `&sort=${encodeURIComponent(sortBy)}${descending ? ":desc" : ""}`;
 		}
 
 		if (query) {
 			const queryParams = [];
+			const add = (key, value) => queryParams.push(`${key}=${encodeURIComponent(value)}`);
+			// The API expects multi-value filters as a repeated plain key
+			// (school=evocation&school=necromancy), not the bracket form (school[]=evocation).
+			const addAll = (key, values) => {
+				for (const value of values) {
+					add(key, value);
+				}
+			};
 
 			if (query.search) {
-				queryParams.push(`name=${query.search}`);
+				add("name", query.search);
 			}
 			if (query.schools && query.schools.length) {
-				for (const school of query.schools) {
-					queryParams.push(`school[]=${school}`);
-				}
+				addAll("school", query.schools);
 			}
 			if (query.classes && query.classes.length) {
-				for (const cls of query.classes) {
-					queryParams.push(`classes[]=${cls}`);
-				}
+				addAll("classes", query.classes);
 			}
 			if (query.levels) {
-				const levels = range(query.levels.min, query.levels.max + 1);
-				for (const level of levels) {
-					queryParams.push(`level[]=${level}`);
-				}
+				addAll("level", range(query.levels.min, query.levels.max + 1));
 			}
-			params += `&${queryParams.join("&")}`;
+			if (queryParams.length) {
+				params += `&${queryParams.join("&")}`;
+			}
 		}
 
 		const ref = edition === "5.5e" ? `${SPELLS_REF}/5.5e` : SPELLS_REF;

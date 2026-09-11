@@ -46,10 +46,10 @@
 
 ## 9. Manual verification
 
-- [ ] 9.1 Run `npm run ssr`; confirm `/admin/feature-flags` lists `monster_generator` toggled on by default, and is unreachable when signed in as a non-admin
-- [ ] 9.2 Toggle `monster_generator` off on the admin page; reload the New Monster dialog in `EditNpc.vue` and confirm "Generate from description" is gone
-- [ ] 9.3 With the flag off, call `POST /ai/generate-monster` directly (e.g. via curl/Postman with a valid token) and confirm it's rejected without spending credits or calling the external API
-- [ ] 9.4 Toggle the flag back on, reload, and confirm both the entry point and the endpoint work as before
+- [x] 9.1 Run `npm run ssr`; confirm `/admin/feature-flags` lists `monster_generator` toggled on by default, and is unreachable when signed in as a non-admin — confirmed by user ("ff page works")
+- [x] 9.2 Toggle `monster_generator` off on the admin page; reload the New Monster dialog in `EditNpc.vue` and confirm "Generate from description" is gone — confirmed by user
+- [x] 9.3 With the flag off, call `POST /ai/generate-monster` directly (e.g. via curl/Postman with a valid token) and confirm it's rejected without spending credits or calling the external API — confirmed by user ("API successfully blocks it")
+- [x] 9.4 Toggle the flag back on, reload, and confirm both the entry point and the endpoint work as before — confirmed by user ("toggle works")
 - [ ] 9.5 Delete the `feature_flags/monster_generator` node entirely (simulating "never toggled") and confirm the feature behaves as enabled (registry default)
 - [x] 9.6 Run `npm run lint` and fix any issues introduced
 

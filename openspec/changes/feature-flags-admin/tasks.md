@@ -30,6 +30,8 @@
 ## 6. Monster generator: client entry point
 
 - [x] 6.1 In `src/views/UserContent/Npcs/EditNpc.vue`, map `feature_flags/isFlagEnabled` and wrap the "Generate from description" button with `v-if="isFlagEnabled('monster_generator')"`
+- [x] 6.2 Fix dangling "OR" divider: wrap both the divider and the "Generate from description" button together in `EditNpc.vue`, found during manual QA
+- [x] 6.3 Found during manual QA: the NPC list page (`src/views/UserContent/Npcs/Npcs.vue`) has its own "Generate" entry points (toolbar button + overflow-menu item) that also call the AI generator — gate both with `isFlagEnabled('monster_generator')`
 
 ## 7. Monster generator: server enforcement
 

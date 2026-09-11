@@ -14,7 +14,7 @@
 						<span>Export</span>
 					</ExportUserContent>
 					<button
-						v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
+						v-if="isFlagEnabled('monster_generator') && content_count.npcs >= tier.benefits.npcs && ai.total > 0"
 						class="btn btn-sm bg-neutral-5 mr-2"
 						@click="generate_dialog = true"
 					>
@@ -51,7 +51,7 @@
 										<q-item-section>Export</q-item-section>
 									</q-item>
 									<q-item
-										v-if="content_count.npcs >= tier.benefits.npcs && ai.total > 0"
+										v-if="isFlagEnabled('monster_generator') && content_count.npcs >= tier.benefits.npcs && ai.total > 0"
 										clickable
 										v-close-popup
 										@click="generate_dialog = true"
@@ -440,6 +440,7 @@ export default {
 		...mapGetters("players", ["players"]),
 		...mapGetters("campaigns", ["campaigns"]),
 		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
+		...mapGetters("feature_flags", ["isFlagEnabled"]),
 		visibleColumns() {
 			if (this.card_width > 800) {
 				return ["avatar", "name", "type", "challenge_rating", "actions"];

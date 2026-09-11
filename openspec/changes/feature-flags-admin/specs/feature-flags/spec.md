@@ -49,15 +49,19 @@ Flag state SHALL NOT be pushed live to already-open clients. A flag change SHALL
 - **THEN** the reloaded page reflects the flag as disabled, without any redeploy of the application
 
 ### Requirement: Monster generator flag gates the AI generator's entry point
-When the `monster_generator` flag is disabled, the client SHALL NOT present the "Generate from description" option in the New Monster dialog (`EditNpc.vue`).
+When the `monster_generator` flag is disabled, the client SHALL NOT present any entry point into the AI monster generator: the "Generate from description" option (and its preceding "OR" divider) in the New Monster dialog (`EditNpc.vue`), and the "Generate" button/menu item on the NPC list page (`Npcs.vue`).
 
-#### Scenario: Entry point hidden while disabled
+#### Scenario: Entry point hidden in the New Monster dialog while disabled
 - **WHEN** the `monster_generator` flag is disabled
-- **THEN** the New Monster dialog shows only "Copy existing monster" and "Create from scratch", without a "Generate from description" option
+- **THEN** the New Monster dialog shows only "Copy existing monster" and "Create from scratch", without a "Generate from description" option or the "OR" divider that would otherwise precede it
 
-#### Scenario: Entry point shown while enabled
+#### Scenario: Entry point hidden on the NPC list page while disabled
+- **WHEN** the `monster_generator` flag is disabled
+- **THEN** the NPC list page's toolbar button and overflow-menu item for "Generate" are both absent, regardless of NPC slot/AI credit state
+
+#### Scenario: Entry points shown while enabled
 - **WHEN** the `monster_generator` flag is enabled (including its default state)
-- **THEN** the New Monster dialog shows the "Generate from description" option as it does today
+- **THEN** both the New Monster dialog's "Generate from description" option and the NPC list page's "Generate" entry points behave as they did before this change (still subject to their existing slot/credit conditions)
 
 ### Requirement: Monster generator flag is enforced server-side
 The `POST /ai/generate-monster` endpoint SHALL check the `monster_generator` flag before generating a monster or spending AI credits, independent of whether the request came from the gated client UI.

@@ -150,15 +150,16 @@
 						<button class="btn btn-lg btn-block" @click="create_dialog = false">
 							Create from scratch
 						</button>
-						<h2 class="text-center my-2">OR</h2>
-						<button
-							v-if="isFlagEnabled('monster_generator')"
-							class="btn btn-lg btn-block bg-accent mb-2"
-							@click="generate_monster = true"
-							:disabled="!userId"
-						>
-							Generate from description
-						</button>
+						<template v-if="isFlagEnabled('monster_generator')">
+							<h2 class="text-center my-2">OR</h2>
+							<button
+								class="btn btn-lg btn-block bg-accent mb-2"
+								@click="generate_monster = true"
+								:disabled="!userId"
+							>
+								Generate from description
+							</button>
+						</template>
 					</template>
 					<template v-if="copy_monster">
 						<h2>Copy an existing monster</h2>

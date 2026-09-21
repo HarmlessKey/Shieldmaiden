@@ -1776,7 +1776,7 @@ const routes = [
 	{ path: "/npcs", redirect: "/content/npcs" },
 	{ path: "/reminders", redirect: "/content/reminders" },
 	{ path: "/items", redirect: "/content/items" },
-	{ path: "/encounters/*", redirect: "/content/campaigns" },
+	{ path: "/encounters/:pathMatch(.*)*", redirect: "/content/campaigns" },
 	{ path: "/followed", redirect: "/content/followed" },
 	{ path: "/settings", redirect: "/content/settings" },
 
@@ -1787,7 +1787,7 @@ const routes = [
 	{ path: "/encounter-builder", redirect: "/tools/encounter-builder/build-encounter" },
 
 	{
-		path: "*",
+		path: "/:catchAll(.*)*",
 		component: () => import("src/views/Pages/Error404.vue"),
 	},
 ];

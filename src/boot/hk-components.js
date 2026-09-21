@@ -1,68 +1,77 @@
-const HkInput = () => import("../components/hk-components/hk-input");
-const HkSelect = () => import("../components/hk-components/hk-select");
+import { defineAsyncComponent } from "vue";
+
+const lazy = (loader) => defineAsyncComponent(loader);
+
+const HkInput = lazy(() => import("../components/hk-components/hk-input"));
+const HkSelect = lazy(() => import("../components/hk-components/hk-select"));
 import HkDialog from "../components/hk-components/hk-dialog"; // can't load async because it's used in mounted
-const HkIcon = () => import("../components/hk-components/hk-icon");
-const HkTable = () => import("../components/hk-components/hk-table");
-const HkCard = () => import("../components/hk-components/hk-card");
-const HkCardDeck = () => import("../components/hk-components/hk-card-deck");
-const HkShowKeybind = () => import("../components/hk-components/hk-show-keybind");
-const HkRoll = () => import("../components/hk-components/hk-roll");
-const HkRollAction = () => import("../components/hk-components/hk-action-rolls/hk-roll-action");
-const HkAnimatedInteger = () => import("../components/hk-components/hk-animated-integer");
-const HkDiceText = () => import("../components/hk-components/hk-dice-text");
-const HkPopover = () => import("../components/hk-components/hk-popover");
-const HkLoader = () => import("../components/hk-components/hk-loader");
-const HkDmgTypeSelect = () => import("../components/hk-components/hk-dmg-type-select");
-const HkTip = () => import("../components/hk-components/hk-tip");
-const HkTimer = () => import("../components/hk-components/hk-timer");
-const HkShare = () => import("../components/hk-components/hk-share-button");
-const HkImageUploader = () => import("../components/hk-components/hk-image-uploader");
-const HkBackgroundSelect = () => import("../components/hk-components/hk-background-select");
-const HkMarkdownEditor = () => import("../components/hk-components/hk-markdown-editor");
-const HkXpBar = () => import("../components/hk-components/hk-xp-bar");
-const HkLinkCharacter = () => import("../components/hk-components/hk-link-character");
-const HkActionRollForm = () =>
-	import("../components/hk-components/hk-action-rolls/hk-action-roll-form");
-const HkActionRollsTable = () =>
-	import("../components/hk-components/hk-action-rolls/hk-action-rolls-table");
-const HkActionRollScaling = () =>
-	import("../components/hk-components/hk-action-rolls/hk-action-roll-scaling");
-const HkPane = () => import("../components/hk-components/hk-pane");
-const HkFilter = () => import("../components/hk-components/hk-filter");
-const HkTransformSelect = () => import("../components/hk-components/hk-transform-select");
-const HkEditionSelect = () => import("../components/hk-components/hk-edition-select");
+const HkIcon = lazy(() => import("../components/hk-components/hk-icon"));
+const HkTable = lazy(() => import("../components/hk-components/hk-table"));
+const HkCard = lazy(() => import("../components/hk-components/hk-card"));
+const HkCardDeck = lazy(() => import("../components/hk-components/hk-card-deck"));
+const HkShowKeybind = lazy(() => import("../components/hk-components/hk-show-keybind"));
+const HkRoll = lazy(() => import("../components/hk-components/hk-roll"));
+const HkRollAction = lazy(() =>
+	import("../components/hk-components/hk-action-rolls/hk-roll-action")
+);
+const HkAnimatedInteger = lazy(() => import("../components/hk-components/hk-animated-integer"));
+const HkDiceText = lazy(() => import("../components/hk-components/hk-dice-text"));
+const HkPopover = lazy(() => import("../components/hk-components/hk-popover"));
+const HkLoader = lazy(() => import("../components/hk-components/hk-loader"));
+const HkDmgTypeSelect = lazy(() => import("../components/hk-components/hk-dmg-type-select"));
+const HkTip = lazy(() => import("../components/hk-components/hk-tip"));
+const HkTimer = lazy(() => import("../components/hk-components/hk-timer"));
+const HkShare = lazy(() => import("../components/hk-components/hk-share-button"));
+const HkImageUploader = lazy(() => import("../components/hk-components/hk-image-uploader"));
+const HkBackgroundSelect = lazy(() => import("../components/hk-components/hk-background-select"));
+const HkMarkdownEditor = lazy(() => import("../components/hk-components/hk-markdown-editor"));
+const HkXpBar = lazy(() => import("../components/hk-components/hk-xp-bar"));
+const HkLinkCharacter = lazy(() => import("../components/hk-components/hk-link-character"));
+const HkActionRollForm = lazy(() =>
+	import("../components/hk-components/hk-action-rolls/hk-action-roll-form")
+);
+const HkActionRollsTable = lazy(() =>
+	import("../components/hk-components/hk-action-rolls/hk-action-rolls-table")
+);
+const HkActionRollScaling = lazy(() =>
+	import("../components/hk-components/hk-action-rolls/hk-action-roll-scaling")
+);
+const HkPane = lazy(() => import("../components/hk-components/hk-pane"));
+const HkFilter = lazy(() => import("../components/hk-components/hk-filter"));
+const HkTransformSelect = lazy(() => import("../components/hk-components/hk-transform-select"));
+const HkEditionSelect = lazy(() => import("../components/hk-components/hk-edition-select"));
 import HkCompendiumImage from "../components/hk-components/hk-compendium-image";
 
-export default async ({ Vue }) => {
-	Vue.component("hk-input", HkInput);
-	Vue.component("hk-select", HkSelect);
-	Vue.component("hk-dialog", HkDialog);
-	Vue.component("hk-icon", HkIcon);
-	Vue.component("hk-table", HkTable);
-	Vue.component("hk-card", HkCard);
-	Vue.component("hk-card-deck", HkCardDeck);
-	Vue.component("hk-show-keybind", HkShowKeybind);
-	Vue.component("hk-animated-integer", HkAnimatedInteger);
-	Vue.component("hk-roll", HkRoll);
-	Vue.component("hk-roll-action", HkRollAction);
-	Vue.component("hk-loader", HkLoader);
-	Vue.component("hk-dice-text", HkDiceText);
-	Vue.component("hk-popover", HkPopover);
-	Vue.component("hk-dmg-type-select", HkDmgTypeSelect);
-	Vue.component("hk-tip", HkTip);
-	Vue.component("hk-timer", HkTimer);
-	Vue.component("hk-share", HkShare);
-	Vue.component("hk-image-uploader", HkImageUploader);
-	Vue.component("hk-background-select", HkBackgroundSelect);
-	Vue.component("hk-markdown-editor", HkMarkdownEditor);
-	Vue.component("hk-xp-bar", HkXpBar);
-	Vue.component("hk-link-character", HkLinkCharacter);
-	Vue.component("hk-action-roll-form", HkActionRollForm);
-	Vue.component("hk-action-rolls-table", HkActionRollsTable);
-	Vue.component("hk-action-roll-scaling", HkActionRollScaling);
-	Vue.component("hk-pane", HkPane);
-	Vue.component("hk-filter", HkFilter);
-	Vue.component("hk-transform-select", HkTransformSelect);
-	Vue.component("hk-edition-select", HkEditionSelect);
-	Vue.component("hk-compendium-image", HkCompendiumImage);
+export default async ({ app }) => {
+	app.component("hk-input", HkInput);
+	app.component("hk-select", HkSelect);
+	app.component("hk-dialog", HkDialog);
+	app.component("hk-icon", HkIcon);
+	app.component("hk-table", HkTable);
+	app.component("hk-card", HkCard);
+	app.component("hk-card-deck", HkCardDeck);
+	app.component("hk-show-keybind", HkShowKeybind);
+	app.component("hk-animated-integer", HkAnimatedInteger);
+	app.component("hk-roll", HkRoll);
+	app.component("hk-roll-action", HkRollAction);
+	app.component("hk-loader", HkLoader);
+	app.component("hk-dice-text", HkDiceText);
+	app.component("hk-popover", HkPopover);
+	app.component("hk-dmg-type-select", HkDmgTypeSelect);
+	app.component("hk-tip", HkTip);
+	app.component("hk-timer", HkTimer);
+	app.component("hk-share", HkShare);
+	app.component("hk-image-uploader", HkImageUploader);
+	app.component("hk-background-select", HkBackgroundSelect);
+	app.component("hk-markdown-editor", HkMarkdownEditor);
+	app.component("hk-xp-bar", HkXpBar);
+	app.component("hk-link-character", HkLinkCharacter);
+	app.component("hk-action-roll-form", HkActionRollForm);
+	app.component("hk-action-rolls-table", HkActionRollsTable);
+	app.component("hk-action-roll-scaling", HkActionRollScaling);
+	app.component("hk-pane", HkPane);
+	app.component("hk-filter", HkFilter);
+	app.component("hk-transform-select", HkTransformSelect);
+	app.component("hk-edition-select", HkEditionSelect);
+	app.component("hk-compendium-image", HkCompendiumImage);
 };

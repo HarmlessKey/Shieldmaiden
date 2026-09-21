@@ -7,127 +7,125 @@
 			lands in the same place either way.
 		-->
 		<div class="pane__header top-menu" :class="cardView && 'card-header'">
-				<div
-					class="money"
-					:class="{ red: currency >= maxCurrencyAmount }"
-					@click="
-						viewerIsUser
-							? setDrawer({
-									show: true,
-									type: 'drawers/party/Currency',
-									data: { current: currency },
-								})
-							: null
-					"
-				>
-					<template v-if="currency">
-						<template v-for="(coin, key) in money">
-							<div v-if="coin" :key="key">
-								<template v-if="key === 'pp' && coin >= 1000"
-									>{{ $numeral(coin, "0.0a") }}
-								</template>
-								<template v-else>{{ coin }} </template>
-								<img
-									:src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)"
-									:alt="currencies[key].name"
-								/>
-							</div>
-						</template>
+			<div
+				class="money"
+				:class="{ red: currency >= maxCurrencyAmount }"
+				@click="
+					viewerIsUser
+						? setDrawer({
+								show: true,
+								type: 'drawers/party/Currency',
+								data: { current: currency },
+							})
+						: null
+				"
+			>
+				<template v-if="currency">
+					<template v-for="(coin, key) in money">
+						<div v-if="coin" :key="key">
+							<template v-if="key === 'pp' && coin >= 1000">{{ $numeral(coin, "0.0a") }} </template>
+							<template v-else>{{ coin }} </template>
+							<img
+								:src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)"
+								:alt="currencies[key].name"
+							/>
+						</div>
 					</template>
-					<span v-else class="text-italic white">No money</span>
-				</div>
-				<div class="d-flex justify-content-end">
-					<template v-if="viewerIsUser && page !== 'user'">
-						<button class="btn btn-sm bg-neutral-5 mr-1" @click="$emit('add-player', true)">
-							<i aria-hidden="true" class="fas fa-user-plus"></i>
-							<q-tooltip anchor="top middle" self="center middle">Manage Players</q-tooltip>
-						</button>
-						<button
-							v-if="
-								tier.price !== 'Free' &&
-								sync_characters &&
-								players &&
-								Object.keys(sync_characters).length &&
-								Object.values(players).some((item) => item.sync_character)
-							"
-							class="btn btn-sm bg-neutral-5 mr-1"
-							@click="syncAll"
-						>
-							<i aria-hidden="true" class="fas fa-sync-alt" />
-							<q-tooltip anchor="top middle" self="center middle">Sync all players</q-tooltip>
-						</button>
-						<button
-							class="btn btn-sm bg-neutral-5 mr-1"
-							@click="
-								setDrawer({
-									show: true,
-									type: 'campaign/EditDamageMeters',
-								})
-							"
-						>
-							<i aria-hidden="true" class="fas fa-swords" />
-							<q-tooltip anchor="top middle" self="center middle">Damage Meters</q-tooltip>
-						</button>
-						<button class="btn btn-sm mr-1 bg-neutral-5" @click="rest_dialog = true">
-							<i aria-hidden="true" class="fas fa-campfire" />
-							<q-tooltip anchor="top middle" self="center middle">Party rest</q-tooltip>
-						</button>
-						<button
-							class="btn btn-sm mr-1 bg-neutral-5"
-							@click="
-								setDrawer({
-									show: true,
-									type: 'drawers/party/health',
-								})
-							"
-						>
-							<i aria-hidden="true" class="fas fa-heart" />
-							<q-tooltip anchor="top middle" self="center middle">Edit Group Health</q-tooltip>
-						</button>
-						<button
-							class="btn btn-sm mr-1 bg-neutral-5"
-							v-if="isXpAdvancement"
-							@click="
-								setDrawer({
-									show: true,
-									type: 'drawers/party/xp',
-								})
-							"
-						>
-							XP
-							<q-tooltip anchor="top middle" self="center middle">
-								Award Experience Points
-							</q-tooltip>
-						</button>
-						<button
-							class="btn btn-sm bg-neutral-5"
-							@click="
-								setDrawer({
-									show: true,
-									type: 'drawers/party/Inventory',
-								})
-							"
-						>
-							<i aria-hidden="true" class="fas fa-treasure-chest" />
-							<q-tooltip anchor="top middle" self="center middle">Party Inventory</q-tooltip>
-						</button>
-					</template>
+				</template>
+				<span v-else class="text-italic white">No money</span>
+			</div>
+			<div class="d-flex justify-content-end">
+				<template v-if="viewerIsUser && page !== 'user'">
+					<button class="btn btn-sm bg-neutral-5 mr-1" @click="$emit('add-player', true)">
+						<i aria-hidden="true" class="fas fa-user-plus"></i>
+						<q-tooltip anchor="top middle" self="center middle">Manage Players</q-tooltip>
+					</button>
 					<button
-						class="btn btn-sm bg-neutral-5"
-						v-else-if="campaign.inventory && campaign.inventory.items"
+						v-if="
+							tier.price !== 'Free' &&
+							sync_characters &&
+							players &&
+							Object.keys(sync_characters).length &&
+							Object.values(players).some((item) => item.sync_character)
+						"
+						class="btn btn-sm bg-neutral-5 mr-1"
+						@click="syncAll"
+					>
+						<i aria-hidden="true" class="fas fa-sync-alt" />
+						<q-tooltip anchor="top middle" self="center middle">Sync all players</q-tooltip>
+					</button>
+					<button
+						class="btn btn-sm bg-neutral-5 mr-1"
 						@click="
 							setDrawer({
 								show: true,
-								type: 'drawers/party/ViewInventory',
+								type: 'campaign/EditDamageMeters',
 							})
 						"
 					>
-						<i aria-hidden="true" class="fas fa-treasure-chest mr-1" />
-						{{ Object.keys(campaign.inventory.items).length }}
+						<i aria-hidden="true" class="fas fa-swords" />
+						<q-tooltip anchor="top middle" self="center middle">Damage Meters</q-tooltip>
+					</button>
+					<button class="btn btn-sm mr-1 bg-neutral-5" @click="rest_dialog = true">
+						<i aria-hidden="true" class="fas fa-campfire" />
+						<q-tooltip anchor="top middle" self="center middle">Party rest</q-tooltip>
+					</button>
+					<button
+						class="btn btn-sm mr-1 bg-neutral-5"
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/party/health',
+							})
+						"
+					>
+						<i aria-hidden="true" class="fas fa-heart" />
+						<q-tooltip anchor="top middle" self="center middle">Edit Group Health</q-tooltip>
+					</button>
+					<button
+						class="btn btn-sm mr-1 bg-neutral-5"
+						v-if="isXpAdvancement"
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/party/xp',
+							})
+						"
+					>
+						XP
+						<q-tooltip anchor="top middle" self="center middle">
+							Award Experience Points
+						</q-tooltip>
+					</button>
+					<button
+						class="btn btn-sm bg-neutral-5"
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/party/Inventory',
+							})
+						"
+					>
+						<i aria-hidden="true" class="fas fa-treasure-chest" />
 						<q-tooltip anchor="top middle" self="center middle">Party Inventory</q-tooltip>
 					</button>
-				</div>
+				</template>
+				<button
+					class="btn btn-sm bg-neutral-5"
+					v-else-if="campaign.inventory && campaign.inventory.items"
+					@click="
+						setDrawer({
+							show: true,
+							type: 'drawers/party/ViewInventory',
+						})
+					"
+				>
+					<i aria-hidden="true" class="fas fa-treasure-chest mr-1" />
+					{{ Object.keys(campaign.inventory.items).length }}
+					<q-tooltip anchor="top middle" self="center middle">Party Inventory</q-tooltip>
+				</button>
 			</div>
+		</div>
 
 		<div class="pane__content">
 			<div
@@ -453,11 +451,11 @@
 					</p>
 					<q-checkbox
 						:dark="$store.getters.theme === 'dark'"
-						:value="all"
+						:model-value="all"
 						:indeterminate-value="false"
 						:false-value="null"
 						label="Select all"
-						@input="checkAll"
+						@update:model-value="checkAll"
 					/>
 					<hr class="my-1" />
 					<div v-for="{ label, property } in resets" :key="property">

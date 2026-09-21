@@ -8,7 +8,7 @@
 				square
 				dense
 				name="doneBy"
-				:value="player"
+				:model-value="player"
 				:options="characters"
 				v-validate="'required'"
 			>

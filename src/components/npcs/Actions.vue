@@ -51,11 +51,11 @@
 								filled
 								square
 								label="Count"
-								:value="npc.legendary_count"
+								:model-value="npc.legendary_count"
 								type="number"
 								class="my-3"
 								hint="Amount of legendary actions per turn."
-								@input="parseToInt($event, npc, 'legendary_count')"
+								@update:model-value="parseToInt($event, npc, 'legendary_count')"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
@@ -201,7 +201,7 @@
 														class="mb-3"
 														v-model.number="ability.legendary_cost"
 														hint="How many legendary actions does this cost?"
-														@input="parseToInt($event, ability, 'legendary_cost')"
+														@update:model-value="parseToInt($event, ability, 'legendary_cost')"
 														@keyup="$forceUpdate()"
 														:error="invalid && validated"
 														:error-message="errors[0]"
@@ -266,7 +266,7 @@
 																	autocomplete="off"
 																	type="number"
 																	v-model.number="ability.limit"
-																	@input="parseToInt($event, ability, 'limit')"
+																	@update:model-value="parseToInt($event, ability, 'limit')"
 																	@keyup="$forceUpdate()"
 																	:error="invalid && validated"
 																	:error-message="errors[0]"
@@ -281,7 +281,7 @@
 																class="limit-type"
 																v-model="ability.limit_type"
 																:options="limit_types"
-																@input="$forceUpdate()"
+																@update:model-value="$forceUpdate()"
 																prefix="/"
 															/>
 														</div>
@@ -328,7 +328,7 @@
 																	type="number"
 																	suffix="ft."
 																	@keyup="$forceUpdate()"
-																	@input="parseToInt($event, ability, 'reach')"
+																	@update:model-value="parseToInt($event, ability, 'reach')"
 																	:error="invalid && validated"
 																	:error-message="errors[0]"
 																/>
@@ -364,7 +364,7 @@
 																label="AOE type"
 																:options="aoe_types"
 																v-model="ability.aoe_type"
-																@input="$forceUpdate()"
+																@update:model-value="$forceUpdate()"
 															/>
 														</div>
 														<div class="col">
@@ -383,7 +383,7 @@
 																	suffix="ft."
 																	:disable="!ability.aoe_type"
 																	@keyup="$forceUpdate()"
-																	@input="parseToInt($event, ability, 'aoe_size')"
+																	@update:model-value="parseToInt($event, ability, 'aoe_size')"
 																	:error="invalid && validated"
 																	:error-message="errors[0]"
 																/>
@@ -410,7 +410,7 @@
 														class="mb-4"
 														@new-value="addOption"
 														@remove="removeOption($event, category, ability_index)"
-														@input="$forceUpdate()"
+														@update:model-value="$forceUpdate()"
 													>
 														<template v-slot:append>
 															<hk-popover header="Action options">
@@ -444,7 +444,7 @@
 																	:options="Object.values(attack_types)"
 																	v-model="action.type"
 																	class="mb-2"
-																	@input="$forceUpdate()"
+																	@update:model-value="$forceUpdate()"
 																/>
 															</div>
 
@@ -465,7 +465,7 @@
 																			label="Save ability"
 																			:options="abilities"
 																			v-model="action.save_ability"
-																			@input="$forceUpdate()"
+																			@update:model-value="$forceUpdate()"
 																			:error="invalid && validated"
 																			:error-message="errors[0]"
 																		/>
@@ -485,7 +485,7 @@
 																			label="Save DC"
 																			v-model.number="action.save_dc"
 																			@keyup="$forceUpdate()"
-																			@input="parseToInt($event, action, 'save_dc')"
+																			@update:model-value="parseToInt($event, action, 'save_dc')"
 																			:error="invalid && validated"
 																			:error-message="errors[0]"
 																		/>
@@ -510,7 +510,9 @@
 																			label="Attack modifier"
 																			v-model.number="action.attack_bonus"
 																			@keyup="$forceUpdate()"
-																			@input="parseToInt($event, action, 'attack_bonus')"
+																			@update:model-value="
+																				parseToInt($event, action, 'attack_bonus')
+																			"
 																			:error="invalid && validated"
 																			:error-message="errors[0]"
 																		/>

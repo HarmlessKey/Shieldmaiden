@@ -50,7 +50,7 @@
 					</q-input>
 
 					<q-table
-						:data="spells"
+						:rows="spells"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"

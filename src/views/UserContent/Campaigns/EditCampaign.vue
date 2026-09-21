@@ -93,7 +93,7 @@
 										placeholder="Custom background URL"
 										:error="invalid && validated"
 										:error-message="errors[0]"
-										@input="editCampaign.hk_background = null"
+										@update:model-value="editCampaign.hk_background = null"
 									>
 										<template v-slot:append>
 											<hk-popover header="Custom background" v-if="tier && tier.price !== 'Free'">

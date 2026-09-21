@@ -40,7 +40,7 @@
 								:error="invalid && validated"
 								:error-message="errors[0]"
 								@keyup="$forceUpdate()"
-								@input="
+								@update:model-value="
 									(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
 								"
 							/>
@@ -67,7 +67,7 @@
 									:error="invalid && validated"
 									:error-message="errors[0]"
 									@keyup="$forceUpdate()"
-									@input="
+									@update:model-value="
 										(value) =>
 											$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
 									"
@@ -98,7 +98,7 @@
 									:error="invalid && validated"
 									:error-message="errors[0]"
 									@keyup="$forceUpdate()"
-									@input="
+									@update:model-value="
 										(value) =>
 											$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
 									"
@@ -123,7 +123,7 @@
 								:error="invalid && validated"
 								:error-message="errors[0]"
 								@keyup="$forceUpdate()"
-								@input="
+								@update:model-value="
 									(value) =>
 										$set(
 											level_tier,

@@ -33,7 +33,7 @@
 							:false-value="null"
 							indeterminate-value="something-else"
 							:disable="npc.skills ? !npc.skills.includes(key) : true"
-							@input="$forceUpdate()"
+							@update:model-value="$forceUpdate()"
 						>
 							<template slot:label>
 								+{{

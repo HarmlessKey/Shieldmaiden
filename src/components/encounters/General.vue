@@ -91,7 +91,7 @@
 						v-model="editableEncounter.hk_background"
 						label="Background"
 						:disable="!!editableEncounter.background"
-						@input="setBackground($event)"
+						@update:model-value="setBackground($event)"
 						class="mb-3"
 					/>
 					<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
@@ -117,7 +117,7 @@
 									placeholder="Background URL"
 									:error="invalid && validated"
 									:error-message="errors[0]"
-									@input="editableEncounter.hk_background = null"
+									@update:model-value="editableEncounter.hk_background = null"
 								>
 									<template v-slot:append>
 										<hk-popover

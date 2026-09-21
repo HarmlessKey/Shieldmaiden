@@ -102,7 +102,7 @@
 				</template>
 			</q-input>
 			<q-table
-				:data="filteredCustomNpcs"
+				:rows="filteredCustomNpcs"
 				:visible-columns="visibleColumns"
 				:columns="columns"
 				row-key="key"
@@ -269,7 +269,7 @@
 				</template>
 			</q-input>
 			<q-table
-				:data="monsters"
+				:rows="monsters"
 				:columns="srdColumns"
 				row-key="_id"
 				card-class="bg-none"

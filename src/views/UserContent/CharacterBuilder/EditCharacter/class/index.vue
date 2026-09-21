@@ -83,7 +83,7 @@
 												label="Class"
 												v-model="subclass.class"
 												:options="class_list"
-												@input="selectClass($event, classIndex, valid)"
+												@update:model-value="selectClass($event, classIndex, valid)"
 											>
 											</q-select>
 
@@ -362,7 +362,7 @@
 																emit-value
 																map-options
 																class="mb-3"
-																@input="saveCasterType(classIndex, valid)"
+																@update:model-value="saveCasterType(classIndex, valid)"
 															/>
 															<q-select
 																:dark="$store.getters.theme === 'dark'"
@@ -372,7 +372,7 @@
 																v-model="subclass.casting_ability"
 																class="mb-3"
 																:options="abilities"
-																@input="
+																@update:model-value="
 																	saveProp(
 																		subclass.casting_ability,
 																		classIndex,
@@ -391,7 +391,7 @@
 																map-options
 																class="mb-3"
 																:options="spell_knowledge_types"
-																@input="
+																@update:model-value="
 																	saveProp(
 																		subclass.spell_knowledge,
 																		classIndex,
@@ -452,7 +452,9 @@
 																:options="armor_types"
 																v-model="proficiencies[classIndex].armor"
 																class="mb-3"
-																@input="setProficiencies($event, classIndex, 'armor', valid)"
+																@update:model-value="
+																	setProficiencies($event, classIndex, 'armor', valid)
+																"
 															/>
 
 															<!-- WEAPONS -->
@@ -515,7 +517,9 @@
 																multiple
 																:options="abilities"
 																v-model="proficiencies[classIndex].saving_throw"
-																@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
+																@update:model-value="
+																	setProficiencies($event, classIndex, 'saving_throw', valid)
+																"
 															/>
 														</template>
 														<div v-else class="mb-3">
@@ -559,7 +563,9 @@
 															:max-values="subclass.skill_count || null"
 															:options="filtered_skills(subclass.class, subclass.skills)"
 															v-model="proficiencies[classIndex].skill.subtarget"
-															@input="setProficiencies($event, classIndex, 'skill', valid)"
+															@update:model-value="
+																setProficiencies($event, classIndex, 'skill', valid)
+															"
 														/>
 													</div>
 												</q-expansion-item>

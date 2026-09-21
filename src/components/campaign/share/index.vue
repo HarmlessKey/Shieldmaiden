@@ -45,7 +45,7 @@
 						class="mb-2"
 						clearable
 						:disable="disableBackground('image')"
-						@input="
+						@update:model-value="
 							(value) => {
 								if (!value) {
 									$delete(background, 'image');
@@ -65,7 +65,7 @@
 						class="mb-2"
 						clearable
 						:disable="disableBackground('video')"
-						@input="
+						@update:model-value="
 							(value) => {
 								if (!value) {
 									$delete(background, 'video');
@@ -85,7 +85,7 @@
 						class="mb-2"
 						clearable
 						:disable="disableBackground('youtube')"
-						@input="
+						@update:model-value="
 							(value) => {
 								if (!value) {
 									$delete(background, 'youtube');
@@ -120,7 +120,7 @@
 						class="mb-2"
 						clearable
 						:disable="disableShare('image')"
-						@input="
+						@update:model-value="
 							(value) => {
 								if (!value) {
 									$delete(share, 'image');
@@ -140,7 +140,7 @@
 						class="mb-2"
 						clearable
 						:disable="disableShare('youtube')"
-						@input="
+						@update:model-value="
 							(value) => {
 								if (!value) {
 									$delete(share, 'youtube');
@@ -162,7 +162,7 @@
 						class="mb-2"
 						clearable
 						:disable="disableShare('message')"
-						@input="
+						@update:model-value="
 							(value) => {
 								if (!value) {
 									$delete(share, 'message');

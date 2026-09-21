@@ -76,7 +76,7 @@
 				</template>
 			</p>
 			<q-table
-				:data="monsters"
+				:rows="monsters"
 				:columns="columns"
 				row-key="_id"
 				card-class="bg-none"

@@ -27,7 +27,7 @@
 					<span v-else> Who performs the action? </span>
 				</template>
 				<template v-slot:option="scope">
-					<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+					<q-item v-bind="scope.itemProps">
 						<q-item-section avatar>
 							<Avatar :entity="scope.opt" class="img" :icons="false" />
 						</q-item-section>

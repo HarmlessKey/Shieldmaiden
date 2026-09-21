@@ -4,14 +4,20 @@
 			<div class="card-body">
 				<div class="row q-col-gutter-md mb-3" v-for="(ability, index) in abilities" :key="index">
 					<div class="col-4 col-md-3">
-						<ValidationProvider rules="required|between:0,99" :name="ability.capitalize()" v-slot="{ errors, invalid, validated }">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
+						<ValidationProvider
+							rules="required|between:0,99"
+							:name="ability.capitalize()"
+							v-slot="{ errors, invalid, validated }"
+						>
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
 								:label="`${ability.capitalize()} *`"
-								autocomplete="off"  
-								type="number" 
-								v-model.number="npc[ability]" 
-								@input="parseToInt($event, npc, ability)"
+								autocomplete="off"
+								type="number"
+								v-model.number="npc[ability]"
+								@update:model-value="parseToInt($event, npc, ability)"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							>
@@ -24,14 +30,14 @@
 						</ValidationProvider>
 					</div>
 					<div class="col pt-4">
-						<q-checkbox 
-							:dark="$store.getters.theme === 'dark'" 
-							v-model="npc.saving_throws" 
+						<q-checkbox
+							:dark="$store.getters.theme === 'dark'"
+							v-model="npc.saving_throws"
 							:val="ability"
-							:false-value="null" 
-							indeterminate-value="something-else" 
+							:false-value="null"
+							indeterminate-value="something-else"
 							label="Saving throw proficiency"
-							@input="$forceUpdate()"
+							@update:model-value="$forceUpdate()"
 						>
 							<q-tooltip anchor="top middle" self="center middle">
 								Saving throw proficiency
@@ -45,38 +51,38 @@
 </template>
 
 <script>
-	import { general } from 'src/mixins/general.js';
-	import { abilities } from 'src/utils/generalConstants';
+import { general } from "src/mixins/general.js";
+import { abilities } from "src/utils/generalConstants";
 
-	export default {
-		name: 'npc-AbilityScores',
-		props: ['value'],
-		mixins: [general],
-		data() {
-			return {
-				abilities: abilities
+export default {
+	name: "npc-AbilityScores",
+	props: ["value"],
+	mixins: [general],
+	data() {
+		return {
+			abilities: abilities,
+		};
+	},
+	computed: {
+		npc: {
+			get() {
+				let value = this.value;
+				if (!value.saving_throws) value.saving_throws = [];
+				return value;
+			},
+			set(newValue) {
+				this.$emit("input", newValue);
+			},
+		},
+	},
+	methods: {
+		parseToInt(value, object, property) {
+			if (value === undefined || value === "") {
+				this.$delete(object, property);
+			} else {
+				this.$set(object, property, parseInt(value));
 			}
 		},
-		computed: {
-			npc: {
-				get() {
-					let value = this.value;
-					if(!value.saving_throws) value.saving_throws = [];
-					return value;
-				},	
-				set(newValue) {
-					this.$emit('input', newValue);
-				}
-			}
-		},
-		methods: {
-			parseToInt(value, object, property) {
-				if(value === undefined || value === "") {
-					this.$delete(object, property);
-				} else {
-					this.$set(object, property, parseInt(value));
-				}
-			}
-		}
-	}
+	},
+};
 </script>

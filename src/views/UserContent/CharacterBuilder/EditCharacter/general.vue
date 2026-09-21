@@ -89,7 +89,7 @@
 						square
 						map-options
 						emit-value
-						@input="save(valid)"
+						@update:model-value="save(valid)"
 						v-model="character.advancement"
 						:options="advancement_options"
 						label="Advancement"
@@ -101,7 +101,7 @@
 						square
 						map-options
 						emit-value
-						@input="save(valid)"
+						@update:model-value="save(valid)"
 						v-model="character.hit_point_type"
 						:options="hit_point_options"
 						label="Hit point type"

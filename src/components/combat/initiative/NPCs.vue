@@ -40,7 +40,7 @@
 						max="99"
 						name="npcInit"
 						class="initiative-input"
-						@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
+						@update:model-value="set_initiative({ key: entity.key, initiative: entity.initiative })"
 						placeholder="0"
 						@keydown.enter="$refs?.[i]?.[0]?.$el?.click()"
 					>

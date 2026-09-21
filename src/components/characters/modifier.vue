@@ -173,7 +173,7 @@
 											autocomplete="off"
 											type="number"
 											v-model.number="modifier.value"
-											@input="parseInt($event)"
+											@update:model-value="parseInt($event)"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
@@ -232,7 +232,7 @@
 										type="number"
 										step="0.5"
 										v-model.number="modifier.multiplier"
-										@input="Number($event)"
+										@update:model-value="Number($event)"
 									/>
 								</div>
 
@@ -281,7 +281,7 @@
 										autocomplete="off"
 										type="number"
 										v-model.number="modifier.value"
-										@input="parseInt($event)"
+										@update:model-value="parseInt($event)"
 										:error="invalid && validated"
 										:error-message="errors[0]"
 									/>
@@ -303,7 +303,7 @@
 										autocomplete="off"
 										type="number"
 										v-model.number="modifier.scaling.start"
-										@input="parseInt($event)"
+										@update:model-value="parseInt($event)"
 										:error="invalid && validated"
 										:error-message="errors[0]"
 									/>
@@ -318,10 +318,10 @@
 									square
 									map-options
 									emit-value
-									:value="modifier.scaling.type"
+									:model-value="modifier.scaling.type"
 									:options="scaling_types"
 									label="Scaling type"
-									@input="setScalingType"
+									@update:model-value="setScalingType"
 								/>
 							</div>
 
@@ -342,7 +342,7 @@
 												autocomplete="off"
 												type="number"
 												v-model.number="modifier.scaling.scale.size"
-												@input="parseInt($event)"
+												@update:model-value="parseInt($event)"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											/>
@@ -362,7 +362,7 @@
 												autocomplete="off"
 												type="number"
 												v-model.number="modifier.scaling.scale.value"
-												@input="parseInt($event)"
+												@update:model-value="parseInt($event)"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											/>

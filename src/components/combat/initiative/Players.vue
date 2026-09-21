@@ -29,7 +29,7 @@
 						:class="{
 							'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
 						}"
-						@input="setInitiative(entity.key, entity.initiative)"
+						@update:model-value="setInitiative(entity.key, entity.initiative)"
 						@focus="$event.target.select()"
 					/>
 				</BasicEntity>

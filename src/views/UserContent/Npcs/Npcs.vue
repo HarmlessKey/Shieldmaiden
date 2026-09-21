@@ -123,7 +123,7 @@
 								map-options
 							>
 								<template v-slot:option="scope">
-									<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+									<q-item v-bind="scope.itemProps">
 										<q-item-section class="group-option">
 											<span>{{ scope.opt.label }}</span>
 											<span v-if="scope.opt.isCampaign" class="campaign-pill">Campaign</span>
@@ -145,7 +145,7 @@
 					</div>
 
 					<q-table
-						:data="filteredNpcs"
+						:rows="filteredNpcs"
 						:visible-columns="visibleColumns"
 						:columns="columns"
 						row-key="key"

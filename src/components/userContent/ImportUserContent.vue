@@ -14,7 +14,7 @@
 				square
 				accept=".json"
 				v-model="json_file"
-				@input="loadJSON()"
+				@update:model-value="loadJSON()"
 				label="Drag a file here or click to upload"
 			>
 				<template v-slot:prepend>
@@ -85,7 +85,7 @@
 						flat
 						dense
 						square
-						:data="parsed_data[import_type]"
+						:rows="parsed_data[import_type]"
 						:columns="columns"
 						:row-key="(row) => `${row.meta.key}-${row.meta.overwrite}`"
 						virtual-scroll

@@ -33,9 +33,9 @@
 					<div v-if="index" class="d-flex items-center mb-2">
 						<q-checkbox
 							:dark="$store.getters.theme === 'dark'"
-							:value="getValue('ignore', { key, index })"
+							:model-value="getValue('ignore', { key, index })"
 							:label="`Ignore for ${key}`"
-							@input="setValue($event, 'ignore', { key, index })"
+							@update:model-value="setValue($event, 'ignore', { key, index })"
 							:false-value="null"
 							indeterminate-value="something-else"
 						/>
@@ -59,21 +59,21 @@
 								<hk-dmg-type-select
 									class="mb-2"
 									:label="`Damage type ${index ? key : `${key} *`}`"
-									:value="getValue('damage_type', { key, index })"
-									@input="setValue($event, 'damage_type', { key, index })"
+									:model-value="getValue('damage_type', { key, index })"
+									@update:model-value="setValue($event, 'damage_type', { key, index })"
 								/>
 							</ValidationProvider>
 							<div class="d-flex items-center mb-2">
 								<q-checkbox
 									:dark="$store.getters.theme === 'dark'"
-									:value="getValue('magical', { key, index })"
+									:model-value="getValue('magical', { key, index })"
 									:label="`${index ? key : ''} Magical`"
 									:disable="
 										!['bludgeoning', 'piercing', 'slashing'].includes(
 											getValue('damage_type', { key, index })
 										)
 									"
-									@input="setValue($event, 'magical', { key, index })"
+									@update:model-value="setValue($event, 'magical', { key, index })"
 									:false-value="null"
 									indeterminate-value="something-else"
 								/>
@@ -104,8 +104,8 @@
 										filled
 										square
 										:label="`Dice count ${key} ${!index ? '*' : ''}`"
-										:value="getValue('dice_count', { key, index })"
-										@input="setValue($event, 'dice_count', { key, index })"
+										:model-value="getValue('dice_count', { key, index })"
+										@update:model-value="setValue($event, 'dice_count', { key, index })"
 										min="1"
 										max="99"
 										autocomplete="off"
@@ -128,8 +128,8 @@
 									clearable
 									:label="`Dice type ${key}`"
 									:options="dice_type"
-									:value="getValue('dice_type', { key, index })"
-									@input="setValue($event, 'dice_type', { key, index })"
+									:model-value="getValue('dice_type', { key, index })"
+									@update:model-value="setValue($event, 'dice_type', { key, index })"
 									class="mb-2"
 								/>
 							</div>
@@ -145,8 +145,8 @@
 										filled
 										square
 										:label="`Fixed value ${index > 0 ? key : ''}`"
-										:value="getValue('fixed_val', { key, index })"
-										@input="setValue($event, 'fixed_val', { key, index })"
+										:model-value="getValue('fixed_val', { key, index })"
+										@update:model-value="setValue($event, 'fixed_val', { key, index })"
 										autocomplete="off"
 										class="mb-2"
 										type="number"
@@ -197,7 +197,7 @@
 					square
 					readonly
 					autogrow
-					:value="
+					:model-value="
 						roll.scaling && roll.scaling.length
 							? scalingDesc(roll.scaling, spell.scaling, spell.level)
 							: 'No scaling set'
@@ -289,7 +289,7 @@
 				v-model="roll.scaling"
 				:roll="roll"
 				:spell="spell"
-				@input="$forceUpdate()"
+				@update:model-value="$forceUpdate()"
 			/>
 			<q-btn no-caps label="Back to form" @click.prevent="set_scaling = false" :disable="!valid" />
 		</ValidationObserver>

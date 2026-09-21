@@ -99,7 +99,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="(value) => parseToInt(value, spell, 'cast_time')"
+							@update:model-value="(value) => parseToInt(value, spell, 'cast_time')"
 						/>
 					</ValidationProvider>
 				</div>
@@ -121,7 +121,7 @@
 							:options="spell_cast_time_types"
 							v-model="spell.cast_time_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
 									if (value !== 'reaction') $delete(spell, 'cast_time_react_desc');
 								}
@@ -213,7 +213,7 @@
 							:options="spell_range_types"
 							v-model="spell.range_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
 									if (value !== 'ranged') $delete(spell, 'range');
 								}
@@ -246,7 +246,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="(value) => parseToInt(value, spell, 'range')"
+							@update:model-value="(value) => parseToInt(value, spell, 'range')"
 						>
 							<template v-slot:append>
 								<span class="neutral-2">ft.</span>
@@ -288,7 +288,7 @@
 							:options="spell_duration_types"
 							v-model="spell.duration_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
 									if (!spell_duration_types_time.includes(value)) {
 										$delete(spell, 'duration');
@@ -326,7 +326,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="(value) => parseToInt(value, spell, 'duration')"
+							@update:model-value="(value) => parseToInt(value, spell, 'duration')"
 						/>
 					</ValidationProvider>
 				</div>
@@ -377,7 +377,7 @@
 							:options="aoe_types"
 							v-model="spell.aoe_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
 									if (value === 'none') $delete(spell, 'aoe_size');
 								}
@@ -406,7 +406,7 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
-							@input="(value) => parseToInt(value, spell, 'aoe_size')"
+							@update:model-value="(value) => parseToInt(value, spell, 'aoe_size')"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						>

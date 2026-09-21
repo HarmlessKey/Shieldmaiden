@@ -39,7 +39,7 @@
 			</q-input>
 
 			<q-table
-				:data="conditions"
+				:rows="conditions"
 				:columns="columns"
 				row-key="_id"
 				card-class="bg-none"

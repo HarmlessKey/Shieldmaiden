@@ -27,7 +27,7 @@
 
 			<template v-if="characters">
 				<q-table
-					:data="characters"
+					:rows="characters"
 					:columns="columns"
 					row-key="key"
 					card-class="bg-none"

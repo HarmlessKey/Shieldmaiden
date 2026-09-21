@@ -21,7 +21,7 @@
 				square
 				v-for="(setting, index) in type_settings"
 				:options="setting.options"
-				:value="index"
+				:model-value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>

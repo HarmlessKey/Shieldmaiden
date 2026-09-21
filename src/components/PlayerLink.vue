@@ -24,7 +24,7 @@
 					:dark="$store.getters.theme === 'dark'"
 					filled
 					square
-					:value="url"
+					:model-value="url"
 					autocomplete="off"
 					type="text"
 				>

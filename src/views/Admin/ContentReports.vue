@@ -30,7 +30,7 @@
 			</div>
 
 			<q-table
-				:data="filteredReports"
+				:rows="filteredReports"
 				:columns="columns"
 				row-key="id"
 				card-class="bg-none"

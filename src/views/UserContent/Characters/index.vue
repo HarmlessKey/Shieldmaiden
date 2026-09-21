@@ -5,7 +5,7 @@
 
 			<q-table
 				v-if="characters.length"
-				:data="characters"
+				:rows="characters"
 				:columns="columns"
 				row-key="key"
 				card-class="bg-none"

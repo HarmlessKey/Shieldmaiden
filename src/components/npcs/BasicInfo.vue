@@ -42,7 +42,7 @@
 								maxlength="100"
 								autocomplete="off"
 								v-model="npc.name"
-								@input="capitalizeName"
+								@update:model-value="capitalizeName"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
@@ -68,7 +68,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col-3">
-						<hk-edition-select :value="npc.edition" @input="setEdition" />
+						<hk-edition-select :value="npc.edition" @update:model-value="setEdition" />
 					</div>
 				</div>
 
@@ -275,7 +275,7 @@
 							:options="groupOptions"
 						>
 							<template v-slot:option="scope">
-								<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+								<q-item v-bind="scope.itemProps">
 									<q-item-section class="group-option">
 										<span>{{ scope.opt.label }}</span>
 										<span v-if="scope.opt.isCampaign" class="campaign-pill">Campaign</span>
@@ -326,7 +326,7 @@
 								type="number"
 								class="mb-2"
 								v-model.number="npc.armor_class"
-								@input="parseToInt($event, npc, 'armor_class')"
+								@update:model-value="parseToInt($event, npc, 'armor_class')"
 								name="ac"
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -351,7 +351,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.initiative_modifier"
-								@input="parseToInt($event, npc, 'initiative_modifier')"
+								@update:model-value="parseToInt($event, npc, 'initiative_modifier')"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							>
@@ -384,7 +384,7 @@
 								type="number"
 								class="mb-2"
 								v-model.number="npc.hit_points"
-								@input="parseToInt($event, npc, 'hit_points')"
+								@update:model-value="parseToInt($event, npc, 'hit_points')"
 								name="hp"
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -445,7 +445,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.walk_speed"
-								@input="parseToInt($event, npc, 'walk_speed')"
+								@update:model-value="parseToInt($event, npc, 'walk_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -466,7 +466,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.swim_speed"
-								@input="parseToInt($event, npc, 'swim_speed')"
+								@update:model-value="parseToInt($event, npc, 'swim_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -487,7 +487,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.fly_speed"
-								@input="parseToInt($event, npc, 'fly_speed')"
+								@update:model-value="parseToInt($event, npc, 'fly_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -508,7 +508,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.burrow_speed"
-								@input="parseToInt($event, npc, 'burrow_speed')"
+								@update:model-value="parseToInt($event, npc, 'burrow_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -529,7 +529,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.climb_speed"
-								@input="parseToInt($event, npc, 'climb_speed')"
+								@update:model-value="parseToInt($event, npc, 'climb_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"

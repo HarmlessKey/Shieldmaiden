@@ -9,7 +9,7 @@
 			v-model="subclass.asi"
 			:options="levels"
 			multiple
-			@input="save(valid)"
+			@update:model-value="save(valid)"
 		/>
 		<q-list
 			:dark="$store.getters.theme === 'dark'"
@@ -79,8 +79,8 @@
 									{ value: 'asi', label: 'Ability Score Improvement' },
 									{ value: 'feat', label: 'Feat' },
 								]"
-								@input="saveFeatureType(level, $event)"
-								:value="asiOrFeat(level)"
+								@update:model-value="saveFeatureType(level, $event)"
+								:model-value="asiOrFeat(level)"
 							/>
 						</template>
 
@@ -94,9 +94,9 @@
 									square
 									:label="`Ability ${i + 1}`"
 									:options="abilities"
-									:value="asi_modifiers(level)[i]"
+									:model-value="asi_modifiers(level)[i]"
 									name="asi"
-									@input="saveASI($event, level, i, valid)"
+									@update:model-value="saveASI($event, level, i, valid)"
 								/>
 							</div>
 						</div>
@@ -110,7 +110,7 @@
 									label="Display on character sheet"
 									:false-value="null"
 									indeterminate-value="something-else"
-									@input="save(valid)"
+									@update:model-value="save(valid)"
 								/>
 								<ValidationProvider
 									rules="required|max:30"

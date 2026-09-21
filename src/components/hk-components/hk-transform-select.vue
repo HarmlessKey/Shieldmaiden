@@ -20,7 +20,7 @@
 				class="full-width"
 				label="Challenge rating"
 				clearable
-				@input="updateFilter"
+				@update:model-value="updateFilter"
 			/>
 		</div>
 		<div class="mb-2 d-flex justify-content-between">
@@ -56,7 +56,7 @@
 			color="dark"
 			:direction-links="true"
 			:boundary-links="true"
-			@input="fetchMonsters"
+			@update:model-value="fetchMonsters"
 		/>
 	</div>
 </template>

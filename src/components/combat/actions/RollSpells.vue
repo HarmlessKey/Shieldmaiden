@@ -18,7 +18,7 @@
 						v-else-if="type === 'caster'"
 						class="d-flex justify-content-between items-center full-width"
 					>
-						<strong>{{ level | numeral("Oo") }} level</strong>
+						<strong>{{ $numeral(level, "Oo") }} level</strong>
 						<div class="slots">
 							<span
 								v-for="i in actor[`${type}_spell_slots`][level]"
@@ -69,7 +69,7 @@
 							<q-item-label>
 								{{ spell.name.capitalizeEach() }}
 								<span v-if="castLevel(level, spell)" class="neutral-2">
-									({{ castLevel(level, spell) | numeral("Oo") }})
+									({{ $numeral(castLevel(level, spell), "Oo") }})
 								</span>
 							</q-item-label>
 						</q-item-section>

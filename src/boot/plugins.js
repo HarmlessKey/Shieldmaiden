@@ -1,8 +1,12 @@
 import "animate.css";
 import { Splitpanes, Pane } from "splitpanes";
 import { createGtm } from "@gtm-support/vue-gtm";
+import vuefire from "src/plugins/vuefire";
 
 export default async ({ app, router }) => {
+	// Provides the `firebase()` component option that vuefire 1.x used to provide.
+	app.use(vuefire);
+
 	app.component("Splitpanes", Splitpanes);
 	app.component("Pane", Pane);
 

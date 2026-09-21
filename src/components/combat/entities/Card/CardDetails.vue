@@ -142,7 +142,7 @@
 			/></template>
 			<template v-if="full_entity.challenge_rating">
 				<strong class="neutral-2">Challenge Rating</strong> {{ full_entity.challenge_rating }} ({{
-					monster_challenge_rating[full_entity.challenge_rating].xp | numeral("0,0")
+					$numeral(monster_challenge_rating[full_entity.challenge_rating].xp, "0,0")
 				}}
 				XP)<br />
 			</template>

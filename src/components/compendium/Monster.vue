@@ -186,7 +186,7 @@
 				</div>
 				<div v-if="monster.challenge_rating">
 					<strong>CR</strong> {{ monster.challenge_rating }} (XP
-					{{ monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0") }}; PB +{{
+					{{ $numeral(monster_challenge_rating[monster.challenge_rating].xp, "0,0") }}; PB +{{
 						monster.proficiency
 					}})
 				</div>
@@ -239,7 +239,7 @@
 				<p>
 					<strong><em> Spellcasting </em></strong>
 					The {{ monster.name.capitalizeEach() }} is a
-					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. its spellcasting ability is
+					{{ $numeral(monster.caster_level, "Oo") }}-level spellcaster. its spellcasting ability is
 					{{ monster.caster_ability.capitalize() }} (spell save DC {{ monster.caster_save_dc }},
 					{{
 						monster.caster_spell_attack > 0
@@ -254,7 +254,7 @@
 						<div :key="`spell-${level}`">
 							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
-								<strong>{{ level | numeral("Oo") }} level</strong> ({{
+								<strong>{{ $numeral(level, "Oo") }} level</strong> ({{
 									monster.caster_spell_slots[level]
 								}}
 								slots):

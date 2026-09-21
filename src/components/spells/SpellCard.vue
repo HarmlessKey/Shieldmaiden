@@ -35,7 +35,7 @@
 		</div>
 		<div class="spell-card__subheader">
 			<template v-if="spell.level === 0">Cantrip </template>
-			<template v-else>{{ spell.level | numeral("0o") }}-level </template>
+			<template v-else>{{ $numeral(spell.level, "0o") }}-level</template>
 			{{ spell.school }}
 			<span v-if="spell.ritual">(ritual)</span>
 		</div>

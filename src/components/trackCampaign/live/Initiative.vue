@@ -40,26 +40,27 @@
 			<div>
 				<table class="initiative-list targets">
 					<thead class="white text-shadow">
-						<th class="init">In.</th>
-						<th class="image"></th>
-						<th class="ac"><i aria-hidden="true" class="fas fa-shield"></i></th>
-						<th>Name</th>
-						<th class="hp"><i aria-hidden="true" class="fas fa-heart"></i></th>
-						<th class="conditions"></th>
+						<tr>
+							<th class="init">In.</th>
+							<th class="image"></th>
+							<th class="ac"><i aria-hidden="true" class="fas fa-shield"></i></th>
+							<th>Name</th>
+							<th class="hp"><i aria-hidden="true" class="fas fa-heart"></i></th>
+							<th class="conditions"></th>
+						</tr>
 					</thead>
-					<tbody
+					<transition-group
+						tag="tbody"
 						class="entities"
 						name="entities"
-						is="transition-group"
 						enter-active-class="animated animate__fadeIn"
 						leave-active-class="animated animate__fadeOut"
 					>
-						<template v-for="(entity, index) in targets">
-							<tr v-if="allEntities[0].key == entity.key && turn > 0" :key="index" class="top">
+						<template v-for="entity in targets" :key="entity.key">
+							<tr v-if="allEntities[0].key == entity.key && turn > 0" class="top">
 								<td colspan="6">Top of the round</td>
 							</tr>
 							<tr
-								:key="entity.key"
 								:class="{
 									pointer: characters.length !== 0,
 									targeted: targeted.includes(entity.key),
@@ -264,7 +265,7 @@
 								</td>
 							</tr>
 						</template>
-					</tbody>
+					</transition-group>
 				</table>
 			</div>
 		</q-scroll-area>

@@ -75,7 +75,7 @@
 							<!-- LIFETIME SUPPORT -->
 							<template v-slot:lifetime_support="data">
 								<span>
-									{{ (data.item / 100) | numeral("$0,0") }}
+									{{ $numeral(data.item / 100, "$0,0") }}
 								</span>
 							</template>
 

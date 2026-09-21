@@ -1,16 +1,11 @@
-import VueFire from "vuefire";
-import VueCookies from "vue-cookies";
 import numeral from "vue-numeral-filter";
 import "animate.css";
 import Croppa from "vue-croppa";
-import { Cookies } from "quasar";
 import { Splitpanes, Pane } from "splitpanes";
 import VueGtm from "@gtm-support/vue2-gtm";
 export default async ({ router, Vue }) => {
 	Vue.config.productionTip = false;
 
-	Vue.use(VueFire);
-	Vue.use(VueCookies);
 	Vue.use(numeral, { locale: "en" });
 	Vue.use(Croppa);
 

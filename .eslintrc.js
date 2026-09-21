@@ -5,8 +5,8 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    parser: 'babel-eslint',
-    ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+    parser: '@babel/eslint-parser',
+    ecmaVersion: 2022, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module' // Allows for the use of imports
   },
 
@@ -22,10 +22,10 @@ module.exports = {
 
     // Uncomment any of the lines below to choose desired strictness,
     // but leave only one uncommented!
-    // See https://eslint.vuejs.org/rules/#available-rules (look for Vuejs 2 ones)
-    'plugin:vue/essential', // Priority A: Essential (Error Prevention)
-    // 'plugin:vue/strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
-    // 'plugin:vue/recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
+    // See https://eslint.vuejs.org/rules/#available-rules (look for Vue 3 ones)
+    'plugin:vue/vue3-essential', // Priority A: Essential (Error Prevention)
+    // 'plugin:vue/vue3-strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
+    // 'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
 
     // https://github.com/prettier/eslint-config-prettier#installation
     // usage with Prettier, provided by 'eslint-config-prettier'.
@@ -56,6 +56,16 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
     'func-names': 'off',
 
+    // Vue 2 leftovers that vue3-essential does not already cover. These are the
+    // patterns that compile fine on Vue 3 but silently do nothing at runtime.
+    'vue/no-deprecated-dollar-listeners-api': 'error',
+    'vue/no-deprecated-dollar-scopedslots-api': 'error',
+    'vue/no-deprecated-destroyed-lifecycle': 'error',
+    'vue/no-deprecated-events-api': 'error',
+    'vue/no-deprecated-filter': 'error',
+    'vue/no-deprecated-slot-attribute': 'error',
+    'vue/no-deprecated-slot-scope-attribute': 'error',
+    'vue/no-deprecated-v-bind-sync': 'error',
 
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'

@@ -4,55 +4,78 @@
  */
 
 // Configuration for your app
-// https://v1.quasar.dev/quasar-cli/quasar-conf-js
+// https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js
 /* eslint-env node */
+const { configure } = require("quasar/wrappers");
 const ESLintPlugin = require("eslint-webpack-plugin");
 
-module.exports = function (/* ctx */) {
+// dotenv returns { error, parsed } — a missing file gives an error, not an empty parse,
+// so check `error` rather than `parsed`.
+function loadEnv(path) {
+	const result = require("dotenv").config({ path });
+	return result.error ? null : result.parsed;
+}
+
+const env = loadEnv(`.env.${process.env.NODE_ENV}.local`) || loadEnv(".env.dist") || {};
+
+// Every process.env.X referenced from src/ must exist in build.env, otherwise webpack
+// leaves a bare `process.env.X` in the browser bundle, which throws on first access.
+for (const key of [
+	"VUE_APP_ENV_NAME",
+	"VUE_APP_HK_API_ROOT",
+	"VUE_APP_FIREBASE_API_KEY",
+	"VUE_APP_FIREBASE_AUTH_DOMAIN",
+	"VUE_APP_FIREBASE_DATABASE_URL",
+	"VUE_APP_FIREBASE_PROJECT_ID",
+	"VUE_APP_FIREBASE_STORAGE_BUCKET",
+	"VUE_APP_FIREBASE_MESSAGING_SENDER_ID",
+	"VUE_APP_PATREON_CLIENT_ID",
+	"VUE_APP_PATREON_CLIENT_SECRET",
+	"MONSTER_GENERATOR_API_KEY",
+]) {
+	env[key] = env[key] ?? "";
+}
+env.MONSTER_GENERATOR_API_URL = env.MONSTER_GENERATOR_API_URL ?? env.MONSTER_GENERATOR_URL ?? "";
+
+module.exports = configure(function (ctx) {
 	return {
-		// https://v1.quasar.dev/quasar-cli/supporting-ts
+		// https://v2.quasar.dev/quasar-cli-webpack/supporting-ts
 		supportTS: false,
 
-		// https://v1.quasar.dev/quasar-cli/prefetch-feature
+		// https://v2.quasar.dev/quasar-cli-webpack/prefetch-feature
 		preFetch: true,
 
 		// app boot file (src/boot)
 		// --> boot files are part of "main.js"
-		// https://v1.quasar.dev/quasar-cli/boot-files
+		// https://v2.quasar.dev/quasar-cli-webpack/boot-files
 		boot: [
+			// These register global components, directives and prototype extensions.
+			// They must run on the server too or SSR cannot resolve them while rendering.
 			"prototypes",
-			{ path: "plugins", server: false },
-			{ path: "hk-components", server: false },
-			{ path: "vee-validate", server: false },
+			"plugins",
+			"hk-components",
+			"validation",
+			"shortkey",
+			"snotify",
+			// Firebase auth listeners are browser-only
 			{ path: "firebase-auth", server: false },
-			{ path: "vue-shortkey", server: false },
-			{ path: "vue-snotify", server: false },
 		],
 
-		// https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
+		// https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-css
 		css: ["styles.scss"],
 
 		// https://github.com/quasarframework/quasar/tree/dev/extras
 		extras: [
-			// 'ionicons-v4',
-			// 'mdi-v5',
-			// 'fontawesome-v5',
-			// 'eva-icons',
-			// 'themify',
-			// 'line-awesome',
-			// 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
 			"roboto-font", // optional, you are not bound to it
 			"material-icons", // optional, you are not bound to it
 		],
 
-		// Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
+		// Full list of options: https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-build
 		build: {
 			vueRouterMode: "history", // available values: 'hash', 'history'
-			env: require("dotenv").config({ path: `.env.${process.env.NODE_ENV}.local` }).parsed,
-			scssLoaderOptions: {
-				additionalData: "",
-			},
+			env,
+			// character-descriptions.vue compiles templates at runtime (dynamic stat
+			// tooltips), which needs the full Vue build rather than runtime-only.
 			vueCompiler: true,
 			transpile: true,
 
@@ -62,72 +85,52 @@ module.exports = function (/* ctx */) {
 			// Add dependencies for transpiling with Babel (Array of string/regex)
 			// (from node_modules, which are by default not transpiled).
 			// Applies only if "transpile" is set to true.
-			transpileDependencies: [
-				"vee-validate/dist/rules",
-				"vue-numeral-filter",
-				"htmlparser2",
-				"fast-png",
-				"iobuffer",
-				"@gtm-support/vue2-gtm",
-				"@gtm-support/core",
-				"@octokit",
-			],
+			transpileDependencies: ["htmlparser2", "fast-png", "iobuffer", "@gtm-support/core", "@octokit"],
 
-			// rtl: false, // https://v1.quasar.dev/options/rtl-support
-			// preloadChunks: true,
-			// showProgress: false,
-			// gzip: true,
-			// analyze: true,
-
-			// Options below are automatically set depending on the env, set them if you want to override
-			// extractCSS: false,
-
-			// https://v1.quasar.dev/quasar-cli/handling-webpack
+			// https://v2.quasar.dev/quasar-cli-webpack/handling-webpack
 			// "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
 			chainWebpack(chain) {
 				chain.plugin("eslint-webpack-plugin").use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
 			},
 		},
 
-		// Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
+		// Full list of options: https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-devServer
 		devServer: {
-			https: false,
 			port: 8080,
 			open: true, // opens browser window automatically
 		},
 
-		// https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
+		// https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-framework
 		framework: {
 			iconSet: "material-icons", // Quasar icon set
-			lang: "en-us", // Quasar language pack
-			config: {},
+			lang: "en-US", // Quasar language pack
 
-			// Possible values for "importStrategy":
-			// * 'auto' - (DEFAULT) Auto-import needed Quasar components & directives
-			// * 'all'  - Manually specify what to import
-			importStrategy: "auto",
-
-			// For special cases outside of where "auto" importStrategy can have an impact
-			// (like functional components as one of the examples),
-			// you can manually specify Quasar components/directives to be available everywhere:
-			//
-			// components: [],
-			// directives: [],
+			// index.template.html hard-codes `body--dark`, so Quasar has to start in dark
+			// mode or the SSR markup and the client markup disagree and hydration warns.
+			config: { dark: true },
 
 			// Quasar plugins
 			plugins: ["AppFullscreen", "Notify", "Cookies", "Meta", "Dialog"],
 		},
 
 		// animations: 'all', // --- includes all animations
-		// https://v1.quasar.dev/options/animations
+		// https://v2.quasar.dev/options/animations
 		animations: [],
 
-		// https://v1.quasar.dev/quasar-cli/developing-ssr/configuring-ssr
+		// https://v2.quasar.dev/quasar-cli-webpack/developing-ssr/configuring-ssr
 		ssr: {
-			pwa: true,
+			// PWA + SSR in dev is an infinite reload loop: GenerateSW emits a new
+			// service-worker.js on every HMR poll and skipWaiting + clientsClaim then
+			// force every open page to refresh, which triggers the next build.
+			pwa: ctx.prod,
+			prodPort: 3000,
+			maxAge: 1000 * 60 * 60 * 24 * 30,
+			middlewares: [ctx.prod ? "compression" : "", "api", "render" /* keep this as last one */].filter(
+				Boolean
+			),
 		},
 
-		// https://v1.quasar.dev/quasar-cli/developing-pwa/configuring-pwa
+		// https://v2.quasar.dev/quasar-cli-webpack/developing-pwa/configuring-pwa
 		pwa: {
 			workboxPluginMode: "GenerateSW",
 			workboxOptions: {
@@ -205,48 +208,21 @@ module.exports = function (/* ctx */) {
 			},
 		},
 
-		// Full list of options: https://v1.quasar.dev/quasar-cli/developing-cordova-apps/configuring-cordova
-		cordova: {
-			// noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
-		},
-
-		// Full list of options: https://v1.quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
+		// Full list of options: https://v2.quasar.dev/quasar-cli-webpack/developing-capacitor-apps/configuring-capacitor
 		capacitor: {
 			hideSplashscreen: true,
 		},
 
-		// Full list of options: https://v1.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
+		// Full list of options: https://v2.quasar.dev/quasar-cli-webpack/developing-electron-apps/configuring-electron
 		electron: {
 			bundler: "packager", // 'packager' or 'builder'
 
-			packager: {
-				// https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-				// OS X / Mac App Store
-				// appBundleId: '',
-				// appCategoryType: '',
-				// osxSign: '',
-				// protocol: 'myapp://path',
-				// Windows only
-				// win32metadata: { ... }
-			},
+			packager: {},
 
 			builder: {
 				// https://www.electron.build/configuration/configuration
-
 				appId: "hkq",
-			},
-
-			// More info: https://v1.quasar.dev/quasar-cli/developing-electron-apps/node-integration
-			nodeIntegration: true,
-
-			extendWebpack(cfg) {
-				// cfg.resolve.alias = {
-				//   ...cfg.resolve.alias,
-				//   '@': path.resolve(__dirname, './src')
-				// }
-				// do something with Electron main process Webpack cfg
-				// chainWebpack also available besides this extendWebpack
 			},
 		},
 	};
-};
+});

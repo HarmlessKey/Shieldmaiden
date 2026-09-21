@@ -9,7 +9,7 @@
 			"pages/*": ["src/pages/*"],
 			"assets/*": ["src/assets/*"],
 			"boot/*": ["src/boot/*"],
-			"vue$": ["node_modules/vue/dist/vue.esm.js"]
+			"vue$": ["node_modules/vue/dist/vue.esm-bundler.js"]
 		}
 	},
 	"exclude": ["dist", ".quasar", "node_modules"]

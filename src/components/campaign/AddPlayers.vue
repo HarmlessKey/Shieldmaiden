@@ -2,12 +2,14 @@
 	<div>
 		<!-- PLAYERS -->
 		<hk-card no-margin :min-width="320">
-			<div slot="header" class="card-header">
-				Players
-				<a @click="players_dialog = true" class="btn btn-sm">
-					<i aria-hidden="true" class="fas fa-plus green mr-1" /> Add players
-				</a>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					Players
+					<a @click="players_dialog = true" class="btn btn-sm">
+						<i aria-hidden="true" class="fas fa-plus green mr-1" /> Add players
+					</a>
+				</div>
+			</template>
 			<div class="card-body">
 				<ul class="entities hasImg" v-if="campaign_players.length">
 					<li v-for="player in campaign_players" :key="player.key">
@@ -47,17 +49,21 @@
 					<a @click="players_dialog = true" class="btn btn-block">Add players</a>
 				</div>
 			</div>
-			<div slot="footer" class="card-footer">
-				<q-btn label="Close" no-caps v-close-popup />
-			</div>
+			<template v-slot:footer>
+				<div class="card-footer">
+					<q-btn label="Close" no-caps v-close-popup />
+				</div>
+			</template>
 		</hk-card>
 
 		<q-dialog v-model="players_dialog">
 			<hk-card header="All Players" :min-width="300">
-				<div slot="header" class="card-header">
-					Add players
-					<q-btn icon="close" no-caps flat dense v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						Add players
+						<q-btn icon="close" no-caps flat dense v-close-popup />
+					</div>
+				</template>
 
 				<div class="card-body">
 					<ul class="entities hasImg">

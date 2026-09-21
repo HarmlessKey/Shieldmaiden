@@ -20,8 +20,12 @@
 				:pagination="{ rowsPerPage: 15 }"
 				wrap-cells
 			>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="players" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="players" />
+				</template>
 				<template v-slot:body="props">
 					<q-tr :props="props" :class="props.row.disabled ? 'text-neutral-3' : ''">
 						<q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -136,10 +140,12 @@
 									</template>
 								</q-input>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-end">
-								<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
-								<q-btn type="submit" no-caps label="Add Voucher" class="mr-1" color="primary" />
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-end">
+									<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
+									<q-btn type="submit" no-caps label="Add Voucher" class="mr-1" color="primary" />
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</div>

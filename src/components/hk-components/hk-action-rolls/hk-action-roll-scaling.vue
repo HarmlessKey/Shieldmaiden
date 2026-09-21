@@ -1,7 +1,9 @@
 <template>
 	<div>
 		<h2 class="d-flex justify-content-between mb-1">
-			<span> <i aria-hidden="true" class="fas fa-chart-line neutral-2 ml-1" /> {{ scaling_name }}</span>
+			<span>
+				<i aria-hidden="true" class="fas fa-chart-line neutral-2 ml-1" /> {{ scaling_name }}</span
+			>
 			<a v-if="levelTierAddable()" class="btn btn-sm bg-neutral-5" @click="addLevelTier()">
 				<i aria-hidden="true" class="fas fa-plus green" />
 				<q-tooltip anchor="center right" self="center left"> Add level tier </q-tooltip>
@@ -70,7 +72,9 @@
 											$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
 									"
 								>
-									<small slot="append">d{{ roll.dice_type }}</small>
+									<template v-slot:append>
+										<small>d{{ roll.dice_type }}</small>
+									</template>
 								</q-input>
 							</ValidationProvider>
 						</div>
@@ -104,27 +108,31 @@
 					</template>
 					<template v-if="type === 'projectile'">
 						<ValidationProvider
-								rules="between:1,10"
-								:name="`Projectile count ${tier_index}`"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									label="Projectile count"
-									v-model="level_tier.projectile_count"
-									autocomplete="off"
-									type="number"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-									@keyup="$forceUpdate()"
-									@input="
-										(value) =>
-											$set(level_tier, 'projectile_count', value != undefined ? parseInt(value) : value)
-									"
-								/>
-							</ValidationProvider>
+							rules="between:1,10"
+							:name="`Projectile count ${tier_index}`"
+							v-slot="{ errors, invalid, validated }"
+						>
+							<q-input
+								:dark="$store.getters.theme === 'dark'"
+								filled
+								square
+								label="Projectile count"
+								v-model="level_tier.projectile_count"
+								autocomplete="off"
+								type="number"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+								@keyup="$forceUpdate()"
+								@input="
+									(value) =>
+										$set(
+											level_tier,
+											'projectile_count',
+											value != undefined ? parseInt(value) : value
+										)
+								"
+							/>
+						</ValidationProvider>
 					</template>
 				</div>
 				<div>
@@ -154,11 +162,13 @@ export default {
 		},
 		roll: {
 			type: Object,
-			default: () => { return {} }
+			default: () => {
+				return {};
+			},
 		},
 		type: {
 			type: String,
-			default: "roll"
+			default: "roll",
 		},
 		spell: {
 			type: Object,
@@ -191,11 +201,7 @@ export default {
 	},
 	methods: {
 		levelTierAddable() {
-			return !(
-				this.spell.scaling === "spell_scale" &&
-				this.scaling &&
-				this.scaling.length >= 1
-			);
+			return !(this.spell.scaling === "spell_scale" && this.scaling && this.scaling.length >= 1);
 		},
 		addLevelTier() {
 			if (!this.scaling) {

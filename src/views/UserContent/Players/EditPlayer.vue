@@ -11,24 +11,26 @@
 				>
 					<hk-card-deck>
 						<hk-card>
-							<div class="card-header p-0 pr-4" slot="header">
-								<div class="d-flex justify-content-start items-center">
-									<div
-										class="img player-avatar"
-										@click="avatar_dialog = true"
-										:style="{
-											backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
-										}"
-									>
-										<i
-											aria-hidden="true"
-											v-if="!player.storage_avatar && !player.avatar && !preview_new_upload"
-											class="hki-player"
-										/>
+							<template v-slot:header>
+								<div class="card-header p-0 pr-4">
+									<div class="d-flex justify-content-start items-center">
+										<div
+											class="img player-avatar"
+											@click="avatar_dialog = true"
+											:style="{
+												backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
+											}"
+										>
+											<i
+												aria-hidden="true"
+												v-if="!player.storage_avatar && !player.avatar && !preview_new_upload"
+												class="hki-player"
+											/>
+										</div>
+										Basic info
 									</div>
-									Basic info
 								</div>
-							</div>
+							</template>
 							<div class="card-body">
 								<ValidationProvider
 									v-if="$route.name !== 'Edit character'"
@@ -253,7 +255,9 @@
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											>
-												<q-icon slot="prepend" name="fas fa-heart" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-heart" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle"
 													>Maximum Hit Points</q-tooltip
 												>
@@ -280,7 +284,9 @@
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											>
-												<q-icon slot="prepend" name="fas fa-shield" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-shield" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle">Armor class</q-tooltip>
 											</q-input>
 										</ValidationProvider>
@@ -305,7 +311,9 @@
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											>
-												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-hand-holding-magic" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle"
 													>Spell save DC</q-tooltip
 												>

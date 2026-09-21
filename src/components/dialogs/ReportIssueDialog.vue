@@ -5,7 +5,11 @@
 				Found a mistake in <strong>{{ contentName }}</strong
 				>?<br />Let us know what's wrong and we'll take a look.
 			</p>
-			<ValidationProvider rules="required|max:1000" name="Issue" v-slot="{ errors, invalid, validated }">
+			<ValidationProvider
+				rules="required|max:1000"
+				name="Issue"
+				v-slot="{ errors, invalid, validated }"
+			>
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
 					filled
@@ -18,16 +22,18 @@
 					:error-message="errors[0]"
 				/>
 			</ValidationProvider>
-			<div slot="footer" class="card-footer d-flex justify-content-end full-width">
-				<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
-				<q-btn
-					color="primary"
-					no-caps
-					label="Submit report"
-					:disabled="!valid || submitting"
-					@click="handleSubmit(submit)"
-				/>
-			</div>
+			<template v-slot:footer>
+				<div class="card-footer d-flex justify-content-end full-width">
+					<q-btn v-close-popup class="mr-1" no-caps>Cancel</q-btn>
+					<q-btn
+						color="primary"
+						no-caps
+						label="Submit report"
+						:disabled="!valid || submitting"
+						@click="handleSubmit(submit)"
+					/>
+				</div>
+			</template>
 		</hk-dialog>
 	</ValidationObserver>
 </template>

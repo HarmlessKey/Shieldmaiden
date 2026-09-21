@@ -185,7 +185,8 @@
 									v-if="
 										(playerSettings.conditions === undefined &&
 											(entity.entityType === 'player' ||
-												(entity.entityType == 'npc' && displayNPCField('conditions', entity) === undefined))) ||
+												(entity.entityType == 'npc' &&
+													displayNPCField('conditions', entity) === undefined))) ||
 										entity.entityType === 'companion'
 									"
 								>
@@ -311,9 +312,15 @@ export default {
 	},
 	computed: {
 		...mapGetters("api_conditions", ["conditions_by_edition"]),
-		playerSettings() { return this.displaySettings?.player || {}; },
-		npcSettings() { return this.displaySettings?.npc; },
-		allySettings() { return this.displaySettings?.ally; },
+		playerSettings() {
+			return this.displaySettings?.player || {};
+		},
+		npcSettings() {
+			return this.displaySettings?.npc;
+		},
+		allySettings() {
+			return this.displaySettings?.ally;
+		},
 		conditionCount() {
 			if (this.width < 400) return 1;
 			if (this.width < 450) return 2;
@@ -419,7 +426,7 @@ export default {
 			return returnConditions;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener("resize", this.setSize);
 	},
 };

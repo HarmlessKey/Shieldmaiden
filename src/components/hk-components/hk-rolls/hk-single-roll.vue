@@ -7,12 +7,14 @@
 		@keydown.backspace="removeRoll(index)"
 	>
 		<hk-card>
-			<div slot="header" class="card-header">
-				<div class="truncate">{{ roll.name }}</div>
-				<button class="btn btn-sm btn-clear" tabindex="-1" @click="removeRoll(index)">
-					<i aria-hidden="true" class="fas fa-times" />
-				</button>
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					<div class="truncate">{{ roll.name }}</div>
+					<button class="btn btn-sm btn-clear" tabindex="-1" @click="removeRoll(index)">
+						<i aria-hidden="true" class="fas fa-times" />
+					</button>
+				</div>
+			</template>
 
 			<div class="card-body">
 				<!-- TARGET -->
@@ -406,7 +408,9 @@
 								min="0"
 								@keydown.backspace.stop
 							>
-								<strong slot="append" class="pl-3 red">{{ overrideDamage }}</strong>
+								<template v-slot:append>
+									<strong class="pl-3 red">{{ overrideDamage }}</strong>
+								</template>
 							</q-input>
 							<q-input
 								v-else
@@ -426,65 +430,68 @@
 								min="0"
 								@keydown.backspace.stop
 							>
-								<strong slot="append" class="pl-3 red">{{ overrideHealing }}</strong>
+								<template v-slot:append>
+									<strong class="pl-3 red">{{ overrideHealing }}</strong>
+								</template>
 							</q-input>
 						</template>
 					</template>
 				</div>
 			</div>
 
-			<div
-				v-if="roll.target"
-				slot="footer"
-				class="card-footer"
-				:class="{
-					'step-highlight': demo && follow_tutorial && get_step('run', 'apply'),
-				}"
-			>
-				<template v-if="allMiss">
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Missed"
-						no-caps
-						@click="apply(1)"
-					/>
-				</template>
-				<template v-else>
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Full"
-						no-caps
-						@click="apply(1)"
-					/>
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Half"
-						no-caps
-						@click="apply(0.5)"
-					/>
-					<q-btn
-						color="neutral-9"
-						class="full-width neutral-1"
-						label="Double"
-						no-caps
-						@click="apply(2)"
-					/>
-				</template>
-				<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
-					<i aria-hidden="true" class="fas fa-times" />
-				</q-btn>
+			<template v-slot:footer>
+				<div
+					v-if="roll.target"
+					class="card-footer"
+					:class="{
+						'step-highlight': demo && follow_tutorial && get_step('run', 'apply'),
+					}"
+				>
+					<template v-if="allMiss">
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Missed"
+							no-caps
+							@click="apply(1)"
+						/>
+					</template>
+					<template v-else>
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Full"
+							no-caps
+							@click="apply(1)"
+						/>
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Half"
+							no-caps
+							@click="apply(0.5)"
+						/>
+						<q-btn
+							color="neutral-9"
+							class="full-width neutral-1"
+							label="Double"
+							no-caps
+							@click="apply(2)"
+						/>
+					</template>
+					<q-btn color="neutral-9" class="full-width neutral-1" no-caps @click="removeRoll(index)">
+						<i aria-hidden="true" class="fas fa-times" />
+					</q-btn>
 
-				<TutorialPopover
-					v-if="demo && index === 0"
-					tutorial="run"
-					step="apply"
-					position="right"
-					:offset="[10, 0]"
-				/>
-			</div>
+					<TutorialPopover
+						v-if="demo && index === 0"
+						tutorial="run"
+						step="apply"
+						position="right"
+						:offset="[10, 0]"
+					/>
+				</div>
+			</template>
 		</hk-card>
 	</div>
 </template>

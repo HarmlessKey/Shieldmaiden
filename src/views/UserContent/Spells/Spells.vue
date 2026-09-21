@@ -20,14 +20,15 @@
 					{{ batch_download_loading ? "Loading…" : `Download (${selected_spells.length})` }}
 					<hk-icon icon="fas fa-file-pdf" class="ml-1" />
 				</button>
-				<button
-					v-if="tier.price !== 'Free'"
-					slot="actions-right"
-					class="btn btn-sm bg-neutral-5 mr-2"
-					@click="import_dialog = true"
-				>
-					Import
-				</button>
+				<template v-slot:actions-right>
+					<button
+						v-if="tier.price !== 'Free'"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						@click="import_dialog = true"
+					>
+						Import
+					</button>
+				</template>
 			</ContentHeader>
 
 			<div class="card-body" v-if="!loading_spells">
@@ -43,7 +44,9 @@
 						clearable
 						placeholder="Search spells"
 					>
-						<q-icon slot="prepend" name="search" />
+						<template v-slot:prepend>
+							<q-icon name="search" />
+						</template>
 					</q-input>
 
 					<q-table
@@ -59,7 +62,7 @@
 						:filter="search"
 						wrap-cells
 						selection="multiple"
-						:selected.sync="selected_spells"
+						v-model:selected="selected_spells"
 					>
 						<template v-slot:body="props">
 							<q-tr :props="props">
@@ -104,8 +107,12 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
-						<hk-loader slot="loading" name="spells" />
+						<template v-slot:no-data>
+							<div />
+						</template>
+						<template v-slot:loading>
+							<hk-loader name="spells" />
+						</template>
 					</q-table>
 				</template>
 
@@ -130,10 +137,12 @@
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
 			<hk-card :minWidth="400">
-				<div slot="header" class="card-header">
-					<span>Import spells from JSON</span>
-					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Import spells from JSON</span>
+						<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<ImportUserContent type="spells" />
 				</div>

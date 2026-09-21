@@ -10,9 +10,9 @@
 		v-touch-hold.mouse="!disabled ? showDialog : null"
 		@click.stop.prevent="disabled ? null : roll ? rollDice($event) : emit($event)"
 		@keydown="checkAdvantage"
-    	@keyup="checkAdvantage"
+		@keyup="checkAdvantage"
 		@mouseenter="checkAdvantage"
-    	@mouseleave="checkAdvantage"
+		@mouseleave="checkAdvantage"
 	>
 		<slot name="default">
 			<span class="roll-button" :class="`roll-button__${color}`" />
@@ -77,8 +77,8 @@ export default {
 		},
 		color: {
 			type: String,
-			default: "cyan"
-		}
+			default: "cyan",
+		},
 	},
 	data() {
 		return {
@@ -121,7 +121,7 @@ export default {
 			window.addEventListener("keydown", this.checkKeyPress);
 		});
 	},
-	destroyed() {
+	unmounted() {
 		window.removeEventListener("keyup", this.checkKeypress);
 		window.removeEventListener("keydown", this.checkKeypress);
 	},

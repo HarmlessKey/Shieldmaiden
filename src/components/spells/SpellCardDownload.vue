@@ -59,11 +59,13 @@
 			/>
 		</template>
 
-		<div slot="footer" class="d-flex justify-content-end full-width items-center gap-1">
-			<button class="btn" :disabled="generating" @click="download">
-				{{ downloadLabel }} <hk-icon :icon="downloadIcon" class="ml-1" />
-			</button>
-		</div>
+		<template v-slot:footer>
+			<div class="d-flex justify-content-end full-width items-center gap-1">
+				<button class="btn" :disabled="generating" @click="download">
+					{{ downloadLabel }} <hk-icon :icon="downloadIcon" class="ml-1" />
+				</button>
+			</div>
+		</template>
 
 		<div v-if="generating" class="offscreen-render" aria-hidden="true">
 			<SpellCard

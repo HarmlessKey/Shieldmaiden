@@ -84,18 +84,22 @@
 				placeholder="Search custom NPCs"
 				class="mb-1"
 			>
-				<q-icon slot="prepend" name="search" />
-				<q-btn slot="after" no-caps color="primary" @click="npc_filter_dialog = true">
-					Filter
-					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge
-						v-if="npcActiveFilterCount"
-						floating
-						rounded
-						color="red"
-						:label="npcActiveFilterCount"
-					/>
-				</q-btn>
+				<template v-slot:prepend>
+					<q-icon name="search" />
+				</template>
+				<template v-slot:after>
+					<q-btn no-caps color="primary" @click="npc_filter_dialog = true">
+						Filter
+						<i class="fas fa-filter ml-2" aria-hidden="true" />
+						<q-badge
+							v-if="npcActiveFilterCount"
+							floating
+							rounded
+							color="red"
+							:label="npcActiveFilterCount"
+						/>
+					</q-btn>
+				</template>
 			</q-input>
 			<q-table
 				:data="filteredCustomNpcs"
@@ -217,8 +221,12 @@
 						</q-td>
 					</q-tr>
 				</template>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="monsters" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="monsters" />
+				</template>
 			</q-table>
 			<q-btn
 				v-if="!searchNpc && npcs.length < npc_count"
@@ -244,18 +252,22 @@
 				@change="filterMonsters"
 				@clear="filterMonsters"
 			>
-				<q-icon slot="prepend" name="search" />
-				<q-btn slot="after" no-caps color="primary" @click="filter_dialog = true">
-					Filter
-					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge
-						v-if="Object.keys(filter).length"
-						floating
-						rounded
-						color="red"
-						:label="Object.keys(filter).length"
-					/>
-				</q-btn>
+				<template v-slot:prepend>
+					<q-icon name="search" />
+				</template>
+				<template v-slot:after>
+					<q-btn no-caps color="primary" @click="filter_dialog = true">
+						Filter
+						<i class="fas fa-filter ml-2" aria-hidden="true" />
+						<q-badge
+							v-if="Object.keys(filter).length"
+							floating
+							rounded
+							color="red"
+							:label="Object.keys(filter).length"
+						/>
+					</q-btn>
+				</template>
 			</q-input>
 			<q-table
 				:data="monsters"
@@ -264,16 +276,18 @@
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
-				:pagination.sync="pagination"
+				v-model:pagination="pagination"
 				:loading="loading_monsters"
 				separator="none"
 				wrap-cells
 				:visible-columns="srdVisibleColumns"
 				@request="request"
 			>
-				<div slot="loading">
-					<hk-loader name="monsters" />
-				</div>
+				<template v-slot:loading>
+					<div>
+						<hk-loader name="monsters" />
+					</div>
+				</template>
 
 				<template v-slot:header="props">
 					<q-tr :props="props">
@@ -389,16 +403,18 @@
 					/>
 					<hk-filter v-model="filter" type="monster" />
 				</div>
-				<div slot="footer" class="card-footer">
-					<button class="btn bg-neutral-5" @click="clearFilter">
-						<i class="fas fa-times" aria-hidden="true" />
-						Clear filter
-					</button>
-					<button class="btn ml-2" @click="setFilter">
-						<i class="fas fa-filter" aria-hidden="true" />
-						Set filter
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<button class="btn bg-neutral-5" @click="clearFilter">
+							<i class="fas fa-times" aria-hidden="true" />
+							Clear filter
+						</button>
+						<button class="btn ml-2" @click="setFilter">
+							<i class="fas fa-filter" aria-hidden="true" />
+							Set filter
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
@@ -414,16 +430,18 @@
 						class="mt-2"
 					/>
 				</div>
-				<div slot="footer" class="card-footer">
-					<button class="btn bg-neutral-5" @click="clearNpcFilter">
-						<i class="fas fa-times" aria-hidden="true" />
-						Clear filter
-					</button>
-					<button class="btn ml-2" @click="npc_filter_dialog = false">
-						<i class="fas fa-filter" aria-hidden="true" />
-						Set filter
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<button class="btn bg-neutral-5" @click="clearNpcFilter">
+							<i class="fas fa-times" aria-hidden="true" />
+							Clear filter
+						</button>
+						<button class="btn ml-2" @click="npc_filter_dialog = false">
+							<i class="fas fa-filter" aria-hidden="true" />
+							Set filter
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
@@ -497,27 +515,29 @@
 									/>
 								</ValidationProvider>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-between">
-								<q-btn flat no-caps v-close-popup label="Cancel" />
-								<q-btn
-									type="submit"
-									label="Add more"
-									class="ml-1"
-									no-caps
-									flat
-									color="primary"
-									:disable="!valid"
-								/>
-								<q-btn
-									type="submit"
-									label="Add"
-									class="ml-1"
-									v-close-popup
-									no-caps
-									color="primary"
-									:disable="!valid"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-between">
+									<q-btn flat no-caps v-close-popup label="Cancel" />
+									<q-btn
+										type="submit"
+										label="Add more"
+										class="ml-1"
+										no-caps
+										flat
+										color="primary"
+										:disable="!valid"
+									/>
+									<q-btn
+										type="submit"
+										label="Add"
+										class="ml-1"
+										v-close-popup
+										no-caps
+										color="primary"
+										:disable="!valid"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>

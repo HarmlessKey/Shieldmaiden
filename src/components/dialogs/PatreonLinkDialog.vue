@@ -8,7 +8,9 @@
 		You can link your accounts at any time from your profile page, or use the button below to link
 		them directly.
 
-		<PatreonLinkButton slot="footer" />
+		<template v-slot:footer>
+			<PatreonLinkButton />
+		</template>
 	</hk-dialog>
 </template>
 

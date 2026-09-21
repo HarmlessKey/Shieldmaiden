@@ -7,45 +7,47 @@
 		}"
 		@focus="$emit('focus')"
 	>
-		<div v-if="targeted.length" slot="header-action" class="d-flex justify-content-between gap-1">
-			<button
-				v-for="({ key, method, icon, tooltip, step }, i) in display_options"
-				ref="options"
-				class="btn btn-sm bg-neutral-5"
-				:key="`option-${i}`"
-				v-shortkey="key"
-				:class="{
-					'step-highlight': step && demo && follow_tutorial && get_step('run', step),
-				}"
-				@click="method"
-				@shortkey="method"
-				@keydown.left="cycleOptions(i, 'left')"
-				@keydown.right="cycleOptions(i, 'right')"
-			>
-				<i aria-hidden="true" class="fas" :class="icon" />
-				<q-tooltip anchor="top middle" self="center middle">
-					{{ tooltip }}
-					<hk-show-keybind :binds="key" show />
-				</q-tooltip>
+		<template v-slot:header-action>
+			<div v-if="targeted.length" class="d-flex justify-content-between gap-1">
+				<button
+					v-for="({ key, method, icon, tooltip, step }, i) in display_options"
+					ref="options"
+					class="btn btn-sm bg-neutral-5"
+					:key="`option-${i}`"
+					v-shortkey="key"
+					:class="{
+						'step-highlight': step && demo && follow_tutorial && get_step('run', step),
+					}"
+					@click="method"
+					@shortkey="method"
+					@keydown.left="cycleOptions(i, 'left')"
+					@keydown.right="cycleOptions(i, 'right')"
+				>
+					<i aria-hidden="true" class="fas" :class="icon" />
+					<q-tooltip anchor="top middle" self="center middle">
+						{{ tooltip }}
+						<hk-show-keybind :binds="key" show />
+					</q-tooltip>
 
-				<TutorialPopover
-					v-if="demo && step"
-					tutorial="run"
-					:step="step"
-					position="bottom"
-					:offset="[0, 10]"
-				/>
-			</button>
-			<button
-				class="btn btn-sm bg-neutral-5"
-				@click="set_targeted({ type: 'untarget', key: 'all' })"
-			>
-				<i aria-hidden="true" class="fas fa-times red"></i>
-				<q-tooltip anchor="top middle" self="center middle">
-					Untarget {{ targeted.length > 1 ? "all" : "" }}
-				</q-tooltip>
-			</button>
-		</div>
+					<TutorialPopover
+						v-if="demo && step"
+						tutorial="run"
+						:step="step"
+						position="bottom"
+						:offset="[0, 10]"
+					/>
+				</button>
+				<button
+					class="btn btn-sm bg-neutral-5"
+					@click="set_targeted({ type: 'untarget', key: 'all' })"
+				>
+					<i aria-hidden="true" class="fas fa-times red"></i>
+					<q-tooltip anchor="top middle" self="center middle">
+						Untarget {{ targeted.length > 1 ? "all" : "" }}
+					</q-tooltip>
+				</button>
+			</div>
+		</template>
 
 		<div>
 			<!-- SINGLE TARGET -->

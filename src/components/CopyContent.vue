@@ -25,17 +25,16 @@
 			:error="!!noResult"
 			:error-message="noResult"
 		>
-			<button
-				v-if="copy_resource === 'srd'"
-				slot="before"
-				class="btn btn"
-				@click="show_filter = !show_filter"
-			>
-				<q-icon name="fas fa-filter" size="xs" />
-			</button>
-			<button slot="append" class="btn btn-sm btn-clear" @click="search()">
-				<q-icon name="fas fa-search" size="xs" />
-			</button>
+			<template v-slot:before>
+				<button v-if="copy_resource === 'srd'" class="btn btn" @click="show_filter = !show_filter">
+					<q-icon name="fas fa-filter" size="xs" />
+				</button>
+			</template>
+			<template v-slot:append>
+				<button class="btn btn-sm btn-clear" @click="search()">
+					<q-icon name="fas fa-search" size="xs" />
+				</button>
+			</template>
 		</hk-input>
 
 		<q-btn-toggle

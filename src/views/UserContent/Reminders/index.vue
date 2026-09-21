@@ -54,7 +54,9 @@
 							</q-td>
 						</q-tr>
 					</template>
-					<div slot="no-data" />
+					<template v-slot:no-data>
+						<div />
+					</template>
 				</q-table>
 			</template>
 

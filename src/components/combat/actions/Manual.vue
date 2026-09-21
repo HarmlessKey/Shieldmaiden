@@ -273,7 +273,7 @@ export default {
 	mounted() {
 		EventBus.$on("applyManualValue", this.applyManual);
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		EventBus.$off("applyManualValue", this.applyManual);
 	},
 	directives: {

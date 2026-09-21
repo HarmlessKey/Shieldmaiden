@@ -6,9 +6,11 @@
 				<div v-if="$route.query?.code" class="card-body">
 					Something went wrong while fetching your Patreon account, please try again.
 				</div>
-				<div slot="footer" class="card-footer">
-					<PatreonLinkButton class="btn-block" />
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<PatreonLinkButton class="btn-block" />
+					</div>
+				</template>
 			</hk-card>
 			<template v-else-if="patreon_user">
 				<hk-card class="patron-card">

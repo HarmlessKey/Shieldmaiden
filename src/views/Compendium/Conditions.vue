@@ -1,17 +1,19 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1>
-				<i aria-hidden="true" class="fas fa-flame mr-1"></i> Conditions
-				<span class="neutral-2">{{ editionLabel }}</span>
-			</h1>
-			<span class="neutral-3">
-				Resource
-				<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
-					resource.label
-				}}</a>
-			</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>
+					<i aria-hidden="true" class="fas fa-flame mr-1"></i> Conditions
+					<span class="neutral-2">{{ editionLabel }}</span>
+				</h1>
+				<span class="neutral-3">
+					Resource
+					<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
+						resource.label
+					}}</a>
+				</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<p>
 				<router-link class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
@@ -28,8 +30,12 @@
 				placeholder="Search"
 				@keyup.enter="searchNow"
 			>
-				<q-icon slot="append" name="search" />
-				<button slot="after" class="btn" @click="searchNow">Search</button>
+				<template v-slot:append>
+					<q-icon name="search" />
+				</template>
+				<template v-slot:after>
+					<button class="btn" @click="searchNow">Search</button>
+				</template>
 			</q-input>
 
 			<q-table
@@ -39,14 +45,18 @@
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
-				:pagination.sync="pagination"
+				v-model:pagination="pagination"
 				:loading="loading"
 				separator="none"
 				wrap-cells
 				@request="request"
 			>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="conditions" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="conditions" />
+				</template>
 
 				<template v-slot:header="props">
 					<q-tr :props="props">

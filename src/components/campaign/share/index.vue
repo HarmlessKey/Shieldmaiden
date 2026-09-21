@@ -53,7 +53,9 @@
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fas fa-image" />
+						<template v-slot:prepend>
+							<hk-icon icon="fas fa-image" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="background.video"
@@ -71,7 +73,9 @@
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fas fa-video" />
+						<template v-slot:prepend>
+							<hk-icon icon="fas fa-video" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="background.youtube"
@@ -89,7 +93,9 @@
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fab fa-youtube" />
+						<template v-slot:prepend>
+							<hk-icon icon="fab fa-youtube" />
+						</template>
 					</hk-input>
 					<div class="actions">
 						<button class="btn bg-neutral-5" @click="clearBackground">Clear</button>
@@ -122,7 +128,9 @@
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fas fa-image" />
+						<template v-slot:prepend>
+							<hk-icon icon="fas fa-image" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="share.youtube"
@@ -140,7 +148,9 @@
 							}
 						"
 					>
-						<hk-icon slot="prepend" icon="fab fa-youtube" />
+						<template v-slot:prepend>
+							<hk-icon icon="fab fa-youtube" />
+						</template>
 					</hk-input>
 					<hk-input
 						v-model="share.message"

@@ -56,6 +56,11 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
     'func-names': 'off',
 
+    // Naming conventions, not Vue 2 -> 3 correctness. Enforcing them would mean
+    // renaming ~150 components, which belongs in a separate refactor.
+    'vue/multi-word-component-names': 'off',
+    'vue/no-reserved-component-names': 'off',
+
     // Vue 2 leftovers that vue3-essential does not already cover. These are the
     // patterns that compile fine on Vue 3 but silently do nothing at runtime.
     'vue/no-deprecated-dollar-listeners-api': 'error',

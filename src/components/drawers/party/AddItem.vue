@@ -12,31 +12,36 @@
 			<q-form @submit="valid ? handleSubmit(addItem) : validate()" greedy>
 				<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
 					<q-input
-						:dark="$store.getters.theme === 'dark'" filled square
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
 						label="Public name *"
 						class="mb-3"
-						type="text" 
+						type="text"
 						v-model="item.public_name"
 						:error="invalid && validated"
 						:error-message="errors[0]"
 					>
-						<hk-popover 
-							slot="append" 
-							header="Public name" 
-							content="The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item."
-						>
-							<q-icon name="info" @click.stop class="pointer" />
-						</hk-popover>
+						<template v-slot:append>
+							<hk-popover
+								header="Public name"
+								content="The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item."
+							>
+								<q-icon name="info" @click.stop class="pointer" />
+							</hk-popover>
+						</template>
 					</q-input>
 				</ValidationProvider>
 
 				<ValidationProvider rules="max:2000" name="Name" v-slot="{ errors, invalid, validated }">
 					<q-input
-						:dark="$store.getters.theme === 'dark'" filled square
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
 						autogrow
 						label="Public description"
-						class="mb-3" 
-						v-model="item.public_description" 
+						class="mb-3"
+						v-model="item.public_description"
 						rows="4"
 						name="desc"
 						maxlength="2000"
@@ -49,9 +54,7 @@
 					<LinkedItem v-if="item.linked_item" :linked-item="item.linked_item">
 						<a class="btn btn-sm bg-neutral-5 mr-2" @click="item.linked_item = null">
 							<i aria-hidden="true" class="fas fa-unlink red" />
-							<q-tooltip anchor="top middle" self="center middle">
-								Unlink
-							</q-tooltip>
+							<q-tooltip anchor="top middle" self="center middle"> Unlink </q-tooltip>
 						</a>
 					</LinkedItem>
 					<a v-else class="btn bg-neutral-5" @click="link_dialog = true">
@@ -74,46 +77,44 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
-	import CopyContent from "src/components/CopyContent";
-	import LinkedItem from "./LinkedItem";
+import { mapActions } from "vuex";
+import CopyContent from "src/components/CopyContent";
+import LinkedItem from "./LinkedItem";
 
-	export default {
-		name: 'AddItemCampaign',
-		components: {
-			CopyContent,
-			LinkedItem
+export default {
+	name: "AddItemCampaign",
+	components: {
+		CopyContent,
+		LinkedItem,
+	},
+	data() {
+		return {
+			userId: this.$store.getters.user.uid,
+			campaignId: this.$route.params.campid,
+			item: {},
+			link_dialog: false,
+		};
+	},
+	methods: {
+		...mapActions("campaigns", ["add_campaign_item"]),
+		async linkItem({ id, resource }) {
+			const item = {
+				key: id,
+				custom: resource === "custom" ? true : null,
+			};
+			this.$set(this.item, "linked_item", item);
+			this.link_dialog = false;
 		},
-		data() {
-			return {
-				userId: this.$store.getters.user.uid,
-				campaignId: this.$route.params.campid,
-				item: {},
-				link_dialog: false
-			}
+		async addItem() {
+			await this.add_campaign_item({
+				campaignId: this.campaignId,
+				item: this.item,
+			});
+			this.$emit("close", true);
 		},
-		methods: {
-			...mapActions("campaigns", [
-				"add_campaign_item"
-			]),
-			async linkItem({ id, resource }) {
-				const item = { 
-					key: id,
-					custom: resource === "custom" ? true : null
-				};
-				this.$set(this.item, "linked_item", item);
-				this.link_dialog = false;
-			},
-			async addItem() {	
-				await this.add_campaign_item({
-					campaignId: this.campaignId,
-					item: this.item
-				})
-				this.$emit('close', true);
-			},
-			cancel() {
-				this.$emit('close', false);
-			}
-		}
-	};
+		cancel() {
+			this.$emit("close", false);
+		},
+	},
+};
 </script>

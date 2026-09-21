@@ -14,10 +14,12 @@
 						:key="key"
 						:class="{ current: t.name === tier?.name }"
 					>
-						<div slot="header" class="card-header flex-col items-start">
-							<strong>{{ t.name }}</strong>
-							<span class="neutral-2">{{ t.description }}</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header flex-col items-start">
+								<strong>{{ t.name }}</strong>
+								<span class="neutral-2">{{ t.description }}</span>
+							</div>
+						</template>
 						<div class="card-body">
 							<div class="top">
 								<span
@@ -113,35 +115,33 @@
 								</ul>
 							</q-slide-transition>
 						</div>
-						<div slot="footer">
-							<router-link
-								v-if="t.price === 'Free'"
-								class="btn btn-block btn-square bg-patreon-red"
-								:to="!user ? '/sign-up' : '/content'"
-							>
-								Use for Free
-							</router-link>
-							<a
-								v-else
-								:href="`https://www.patreon.com/join/shieldmaidenapp/checkout?rid=${t['.key']}&cadence=${annually ? 12 : 1}`"
-								target="_blank"
-								rel="noopener"
-								class="btn btn-block btn-square bg-patreon-red"
-								@click="selectTier(t)"
-								>Join {{ `$${price(t.price)}` }} tier</a
-							>
-						</div>
+						<template v-slot:footer>
+							<div>
+								<router-link
+									v-if="t.price === 'Free'"
+									class="btn btn-block btn-square bg-patreon-red"
+									:to="!user ? '/sign-up' : '/content'"
+								>
+									Use for Free
+								</router-link>
+								<a
+									v-else
+									:href="`https://www.patreon.com/join/shieldmaidenapp/checkout?rid=${t['.key']}&cadence=${annually ? 12 : 1}`"
+									target="_blank"
+									rel="noopener"
+									class="btn btn-block btn-square bg-patreon-red"
+									@click="selectTier(t)"
+									>Join {{ `$${price(t.price)}` }} tier</a
+								>
+							</div>
+						</template>
 					</hk-card>
 				</template>
 			</hk-card-deck>
 			<small class="d-block text-center">
-				<span class="neutral-3">*</span> Character Sync requires
-				<strong>Chrome</strong>, <strong>Firefox</strong> or <strong>Edge</strong> and the
-				<a
-					:href="storeUrl"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
+				<span class="neutral-3">*</span> Character Sync requires <strong>Chrome</strong>,
+				<strong>Firefox</strong> or <strong>Edge</strong> and the
+				<a :href="storeUrl" target="_blank" rel="noopener noreferrer">
 					D&D Character Sync Extension</a
 				>.
 			</small>

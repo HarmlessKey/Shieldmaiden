@@ -1,28 +1,30 @@
 <template>
 	<div>
 		<hk-card>
-			<div class="card-header p-0" slot="header">
-				<div class="d-flex justify-content-between items-center full-width pr-4">
-					<div
-						class="img"
-						@click="avatar_dialog = true"
-						:style="{
-							backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
-						}"
-					>
-						<i
-							aria-hidden="true"
-							v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload"
-							class="hki-monster"
-						/>
+			<template v-slot:header>
+				<div class="card-header p-0">
+					<div class="d-flex justify-content-between items-center full-width pr-4">
+						<div
+							class="img"
+							@click="avatar_dialog = true"
+							:style="{
+								backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
+							}"
+						>
+							<i
+								aria-hidden="true"
+								v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload"
+								class="hki-monster"
+							/>
+						</div>
+						<div class="flex-grow">Basic info</div>
+						<button v-if="npc" class="btn btn-sm bg-neutral-5" @click.prevent="viewNpc">
+							<i class="fas fa-eye" />
+							<q-tooltip anchor="top middle" self="center middle">View</q-tooltip>
+						</button>
 					</div>
-					<div class="flex-grow">Basic info</div>
-					<button v-if="npc" class="btn btn-sm bg-neutral-5" @click.prevent="viewNpc">
-						<i class="fas fa-eye" />
-						<q-tooltip anchor="top middle" self="center middle">View</q-tooltip>
-					</button>
 				</div>
-			</div>
+			</template>
 			<div class="card-body">
 				<!-- NAME -->
 				<div class="row q-col-gutter-md mb-2">
@@ -178,12 +180,14 @@
 										</q-item>
 									</q-list>
 								</template>
-								<div slot="after" v-if="npc.challenge_rating" class="pr-3">
-									+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Proficiency bonus
-									</q-tooltip>
-								</div>
+								<template v-slot:after>
+									<div v-if="npc.challenge_rating" class="pr-3">
+										+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Proficiency bonus
+										</q-tooltip>
+									</div>
+								</template>
 							</q-select>
 						</ValidationProvider>
 					</div>
@@ -556,10 +560,12 @@
 				You are changing the edition, this will <strong>clear all spells</strong> from this
 				spellcaster.
 			</p>
-			<div slot="footer" class="card-footer d-flex justify-content-end full-width">
-				<q-btn class="mr-1" no-caps @click="cancelEdition">Cancel</q-btn>
-				<q-btn color="primary" no-caps label="OK" @click="confirmEdition" />
-			</div>
+			<template v-slot:footer>
+				<div class="card-footer d-flex justify-content-end full-width">
+					<q-btn class="mr-1" no-caps @click="cancelEdition">Cancel</q-btn>
+					<q-btn color="primary" no-caps label="OK" @click="confirmEdition" />
+				</div>
+			</template>
 		</hk-dialog>
 	</div>
 </template>

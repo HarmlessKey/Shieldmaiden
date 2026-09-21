@@ -3,9 +3,7 @@
 		<hk-card>
 			<ContentHeader type="npcs">
 				<template v-if="card_width >= 600" #actions-left>
-					<button class="btn btn-sm bg-neutral-5 mr-2" @click="group_dialog = true">
-						Groups
-					</button>
+					<button class="btn btn-sm bg-neutral-5 mr-2" @click="group_dialog = true">Groups</button>
 					<ExportUserContent
 						class="btn-sm bg-neutral-5 mr-2"
 						content-type="npc"
@@ -81,7 +79,7 @@
 
 			<ExportUserContent
 				ref="exporter"
-				style="display:none"
+				style="display: none"
 				content-type="npc"
 				:content-id="npcIds"
 			/>
@@ -89,7 +87,7 @@
 			<div class="card-body" v-if="!loading_npcs">
 				<p class="neutral-2">These are your custom Non-Player Characters and monsters.</p>
 				<template v-if="npcs.length">
-					<div class="row q-col-gutter-sm mb-1" :class="{ 'column': card_width < 600 }">
+					<div class="row q-col-gutter-sm mb-1" :class="{ column: card_width < 600 }">
 						<div class="col">
 							<q-input
 								:dark="$store.getters.theme !== 'light'"
@@ -102,7 +100,9 @@
 								clearable
 								placeholder="Search NPCs"
 							>
-								<q-icon slot="prepend" name="search" />
+								<template v-slot:prepend>
+									<q-icon name="search" />
+								</template>
 							</q-input>
 						</div>
 						<div class="col" v-if="groupFilterOptions.length">
@@ -197,11 +197,11 @@
 											{{ col.value }}
 										</template>
 									</template>
-									<div v-else-if="$q.screen.gt.xs" class="text-right d-flex justify-content-between">
-										<a
-											class="btn btn-sm bg-neutral-5"
-											@click="viewNpc(props.key)"
-										>
+									<div
+										v-else-if="$q.screen.gt.xs"
+										class="text-right d-flex justify-content-between"
+									>
+										<a class="btn btn-sm bg-neutral-5" @click="viewNpc(props.key)">
 											<i aria-hidden="true" class="fas fa-eye" />
 											<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
 										</a>
@@ -228,25 +228,15 @@
 									<div v-else class="text-right">
 										<button class="btn btn-sm bg-neutral-5">
 											<i aria-hidden="true" class="fas fa-ellipsis-v" />
-											<q-popup-proxy
-												:dark="$store.getters.theme === 'dark'"
-												:breakpoint="576"
-											>
-												<q-list
-													:dark="$store.getters.theme === 'dark'"
-													class="bg-neutral-8"
-												>
+											<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+												<q-list :dark="$store.getters.theme === 'dark'" class="bg-neutral-8">
 													<q-item clickable v-close-popup @click="viewNpc(props.key)">
 														<q-item-section avatar>
 															<i aria-hidden="true" class="fas fa-eye" />
 														</q-item-section>
 														<q-item-section>View</q-item-section>
 													</q-item>
-													<q-item
-														clickable
-														v-close-popup
-														:to="`${$route.path}/${props.key}`"
-													>
+													<q-item clickable v-close-popup :to="`${$route.path}/${props.key}`">
 														<q-item-section avatar>
 															<i aria-hidden="true" class="fas fa-pencil" />
 														</q-item-section>
@@ -282,8 +272,12 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
-						<hk-loader slot="loading" name="NPCs" />
+						<template v-slot:no-data>
+							<div />
+						</template>
+						<template v-slot:loading>
+							<hk-loader name="NPCs" />
+						</template>
 					</q-table>
 				</template>
 
@@ -309,10 +303,12 @@
 		<!-- Bulk import dialog -->
 		<q-dialog v-model="import_dialog">
 			<hk-card class="npc-dialog">
-				<div slot="header" class="card-header">
-					<span>Import NPC from JSON</span>
-					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Import NPC from JSON</span>
+						<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<ImportUserContent type="npcs" />
 				</div>
@@ -327,18 +323,20 @@
 		<!-- generate dialog-->
 		<q-dialog v-model="generate_dialog">
 			<hk-card class="npc-dialog" :persistent="generating">
-				<div slot="header" class="card-header">
-					<span>Monster Generation</span>
-					<q-btn
-						v-if="!generating"
-						padding="sm"
-						size="sm"
-						no-caps
-						icon="fas fa-times"
-						flat
-						v-close-popup
-					/>
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Monster Generation</span>
+						<q-btn
+							v-if="!generating"
+							padding="sm"
+							size="sm"
+							no-caps
+							icon="fas fa-times"
+							flat
+							v-close-popup
+						/>
+					</div>
+				</template>
 				<div v-if="content_count.npcs >= tier.benefits.npcs && show_warning" class="card-body">
 					<h2 class="orange">Insufficient NPC slots</h2>
 					<p>You don't have enough NPC slots to save your generated monster.</p>
@@ -605,5 +603,4 @@ export default {
 	white-space: nowrap;
 	flex-shrink: 0;
 }
-
 </style>

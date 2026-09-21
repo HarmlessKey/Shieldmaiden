@@ -24,7 +24,9 @@
 						</template>
 					</slot>
 				</div>
-				<slot slot="footer" name="footer" />
+				<template v-slot:footer>
+					<slot name="footer" />
+				</template>
 			</hk-card>
 		</q-popup-proxy>
 	</span>
@@ -65,7 +67,7 @@ export default {
 		// Listen for other popovers opening
 		EventBus.$on("popover-opened", this.handleOtherPopoverOpened);
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		EventBus.$off("popover-opened", this.handleOtherPopoverOpened);
 	},
 	methods: {

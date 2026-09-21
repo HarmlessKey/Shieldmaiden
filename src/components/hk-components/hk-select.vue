@@ -1,10 +1,9 @@
 <template>
-	<div>
+	<div v-bind="wrapperAttrs">
 		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
 			<q-select
-				v-bind="$attrs"
-				v-on="$listeners"
-				v-model="modelValue"
+				v-bind="inputAttrs"
+				v-model="model"
 				:dark="$store.getters.theme === 'dark'"
 				:filled="filled"
 				:square="square"
@@ -12,9 +11,8 @@
 				:error="rules ? invalid && validated : null"
 				:error-message="errors[0]"
 			>
-				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
-				<template v-for="slot in Object.keys($scopedSlots)" :slot="slot" slot-scope="scope">
-					<slot :name="slot" v-bind="scope" />
+				<template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
+					<slot :name="slot" v-bind="scope || {}" />
 				</template>
 			</q-select>
 		</ValidationProvider>
@@ -24,8 +22,11 @@
 <script>
 export default {
 	name: "hk-select",
+	// See hk-input: attributes go to the q-select, not to the wrapper, so listeners
+	// do not fire twice.
+	inheritAttrs: false,
 	props: {
-		value: {
+		modelValue: {
 			type: [String, Array, Number],
 		},
 		filled: {
@@ -47,12 +48,24 @@ export default {
 			type: [Object, String],
 		},
 	},
+	emits: ["update:modelValue", "input"],
 	computed: {
-		modelValue: {
+		// class and style stay on the wrapper, as they did on Vue 2 where they were
+		// never part of $attrs.
+		wrapperAttrs() {
+			return { class: this.$attrs.class, style: this.$attrs.style };
+		},
+		inputAttrs() {
+			// eslint-disable-next-line no-unused-vars
+			const { class: _class, style: _style, ...rest } = this.$attrs;
+			return rest;
+		},
+		model: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
+				this.$emit("update:modelValue", newVal);
 				this.$emit("input", newVal);
 			},
 		},

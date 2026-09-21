@@ -141,7 +141,7 @@ export default {
 			this.scrolled = e.verticalPosition;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		this.$refs.scrollArea?.removeEventListener("scroll", this._scrollListener);
 	},
 };

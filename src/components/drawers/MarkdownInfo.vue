@@ -16,7 +16,9 @@
 			</p>
 
 			<hk-card small>
-				<div class="card-header" slot="header" id="ASDesc">Ability scores</div>
+				<template v-slot:header>
+					<div class="card-header" id="ASDesc">Ability scores</div>
+				</template>
 				<table class="table mb-0" aria-describedby="ASDesc">
 					<thead>
 						<th>Ability</th>
@@ -32,7 +34,9 @@
 			</hk-card>
 
 			<hk-card small>
-				<div class="card-header" slot="header" id="AMDesc">Ability modifiers</div>
+				<template v-slot:header>
+					<div class="card-header" id="AMDesc">Ability modifiers</div>
+				</template>
 				<table class="table mb-0" aria-describedby="AMDesc">
 					<thead>
 						<th>Ability</th>
@@ -48,7 +52,9 @@
 			</hk-card>
 
 			<hk-card header="Character values" small>
-				<div class="card-header" slot="header" id="CVDesc">Character values</div>
+				<template v-slot:header>
+					<div class="card-header" id="CVDesc">Character values</div>
+				</template>
 				<table class="table mb-0" aria-describedby="CVDesc">
 					<thead>
 						<th>Value</th>
@@ -64,7 +70,9 @@
 			</hk-card>
 
 			<hk-card header="Class values" small>
-				<div class="card-header" slot="header" id="ClVDesc">Class values</div>
+				<template v-slot:header>
+					<div class="card-header" id="ClVDesc">Class values</div>
+				</template>
 				<table class="table mb-0" aria-describedby="ClVDesc">
 					<thead>
 						<th>Value</th>

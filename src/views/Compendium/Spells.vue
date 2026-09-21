@@ -1,17 +1,19 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1>
-				<i aria-hidden="true" class="fas fa-wand-magic"></i> Spells
-				<span class="neutral-2">{{ editionLabel }}</span>
-			</h1>
-			<span class="neutral-3">
-				Resource
-				<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
-					resource.label
-				}}</a>
-			</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>
+					<i aria-hidden="true" class="fas fa-wand-magic"></i> Spells
+					<span class="neutral-2">{{ editionLabel }}</span>
+				</h1>
+				<span class="neutral-3">
+					Resource
+					<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
+						resource.label
+					}}</a>
+				</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<p>
 				<router-link class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
@@ -28,20 +30,24 @@
 				placeholder="Search"
 				@keyup.enter="searchNow"
 			>
-				<button slot="append" class="btn bg-neutral-5" @click="searchNow">
-					<q-icon name="search" />
-				</button>
-				<q-btn slot="after" color="primary" no-caps @click="filter_dialog = true">
-					Filter
-					<i class="fas fa-filter ml-2" aria-hidden="true" />
-					<q-badge
-						v-if="Object.keys(filter).length"
-						floating
-						rounded
-						color="red"
-						:label="Object.keys(filter).length"
-					/>
-				</q-btn>
+				<template v-slot:append>
+					<button class="btn bg-neutral-5" @click="searchNow">
+						<q-icon name="search" />
+					</button>
+				</template>
+				<template v-slot:after>
+					<q-btn color="primary" no-caps @click="filter_dialog = true">
+						Filter
+						<i class="fas fa-filter ml-2" aria-hidden="true" />
+						<q-badge
+							v-if="Object.keys(filter).length"
+							floating
+							rounded
+							color="red"
+							:label="Object.keys(filter).length"
+						/>
+					</q-btn>
+				</template>
 			</q-input>
 			<p v-if="!loading && pagination.rowsNumber === 0" class="red">
 				Nothing found
@@ -55,14 +61,18 @@
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
-				:pagination.sync="pagination"
+				v-model:pagination="pagination"
 				:loading="loading"
 				separator="none"
 				wrap-cells
 				@request="request"
 			>
-				<div slot="no-data" />
-				<hk-loader slot="loading" name="spells" />
+				<template v-slot:no-data>
+					<div />
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="spells" />
+				</template>
 
 				<template v-slot:header="props">
 					<q-tr :props="props">
@@ -115,16 +125,18 @@
 				<div class="card-body">
 					<hk-filter v-model="filter" type="spell" />
 				</div>
-				<div slot="footer" class="card-footer">
-					<button class="btn bg-neutral-5" @click="clearFilter">
-						<i class="fas fa-times" aria-hidden="true" />
-						Clear filter
-					</button>
-					<button class="btn ml-2" @click="setFilter">
-						<i class="fas fa-filter" aria-hidden="true" />
-						Set filter
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<button class="btn bg-neutral-5" @click="clearFilter">
+							<i class="fas fa-times" aria-hidden="true" />
+							Clear filter
+						</button>
+						<button class="btn ml-2" @click="setFilter">
+							<i class="fas fa-filter" aria-hidden="true" />
+							Set filter
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 	</hk-card>

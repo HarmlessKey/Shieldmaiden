@@ -74,7 +74,7 @@
 						@click="setSetting(setting.entity, setting.key, scope.opt.value)"
 					>
 						<q-item-section>
-							<q-item-label v-text="scope.opt.name" />
+							<q-item-label>{{ scope.opt.name }}</q-item-label>
 						</q-item-section>
 						<q-item-section avatar>
 							<q-icon :name="scope.opt.icon" size="small" :class="scope.opt.color" />

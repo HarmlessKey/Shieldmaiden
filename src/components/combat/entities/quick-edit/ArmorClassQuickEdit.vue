@@ -28,8 +28,10 @@
 			type="number"
 			@keydown.enter="setAC('ac', editable_entity.ac)"
 		>
-			<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-			<q-icon slot="prepend" size="xs" name="fas fa-shield" />
+			<template v-slot:prepend>
+				<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+				<q-icon size="xs" name="fas fa-shield" />
+			</template>
 			<template v-slot:after>
 				<q-btn
 					no-caps

@@ -21,7 +21,7 @@
 							<Avatar :entity="entitiesList[doneBy]" class="img" :icons="false" />
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="entitiesList[doneBy].name.capitalizeEach()" />
+							<q-item-label>{{ entitiesList[doneBy].name.capitalizeEach() }}</q-item-label>
 						</q-item-section>
 					</q-item>
 					<span v-else> Who performs the action? </span>
@@ -32,7 +32,7 @@
 							<Avatar :entity="scope.opt" class="img" :icons="false" />
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="scope.opt.name?.capitalizeEach()" />
+							<q-item-label>{{ scope.opt.name?.capitalizeEach() }}</q-item-label>
 						</q-item-section>
 					</q-item>
 				</template>

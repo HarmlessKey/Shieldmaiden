@@ -167,7 +167,7 @@
 											:active="new_item.name === weapon.label"
 										>
 											<q-item-section>
-												<q-item-label v-text="weapon.label" class="q-ml-lg" />
+												<q-item-label class="q-ml-lg">{{ weapon.label }}</q-item-label>
 											</q-item-section>
 										</q-item>
 									</template>
@@ -199,9 +199,8 @@
 										</q-item-section>
 									</q-item>
 
-									<template v-for="armor in scope.opt.armor">
+									<template v-for="armor in scope.opt.armor" :key="armor.value">
 										<q-item
-											:key="armor.value"
 											clickable
 											v-ripple
 											v-close-popup
@@ -209,7 +208,7 @@
 											:active="new_item.name === armor.label"
 										>
 											<q-item-section>
-												<q-item-label v-text="armor.label" class="q-ml-lg" />
+												<q-item-label class="q-ml-lg">{{ armor.label }}</q-item-label>
 											</q-item-section>
 											<q-item-section avatar>
 												<div class="ac_wrapper">

@@ -173,11 +173,9 @@
 						<div class="p-3 text-center">
 							<p>With a subscription you have access to our backgrounds and background effects.</p>
 							<p>
-								<template v-for="(effect, i) in effects">
-									<strong :key="`effect-${effect}`">{{ effect.toUpperCase() }}</strong>
-									<span class="neutral-2 mx-1" :key="`pipe-${effect}`" v-if="i < effects.length - 1"
-										>|</span
-									>
+								<template v-for="(effect, i) in effects" :key="effect">
+									<strong>{{ effect.toUpperCase() }}</strong>
+									<span class="neutral-2 mx-1" v-if="i < effects.length - 1">|</span>
 								</template>
 							</p>
 							<router-link class="btn btn-sm bg-neutral-5 full-width" to="/weather-demo">

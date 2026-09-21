@@ -6,9 +6,9 @@
 			</div>
 		</template>
 		<div class="card-body">
-			<template v-for="(group, i) in tools">
-				<h2 :key="`title-${i}`" :class="{ 'mt-3': i > 0 }">{{ group.title }}</h2>
-				<div class="row q-col-gutter-md" :key="i" :class="{ 'pb-2': i === 0 }">
+			<template v-for="(group, i) in tools" :key="i">
+				<h2 :class="{ 'mt-3': i > 0 }">{{ group.title }}</h2>
+				<div class="row q-col-gutter-md" :class="{ 'pb-2': i === 0 }">
 					<div v-for="(tool, key) in group.tools" class="col-12 col-sm-6 col-md-4" :key="key">
 						<router-link :to="tool.url">
 							<hk-card class="full-height tool">

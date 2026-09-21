@@ -2,24 +2,24 @@
 	<div v-if="tier">
 		<hk-card>
 			<ContentHeader type="spells">
-				<ExportUserContent
-					slot="actions-left"
-					class="btn-sm bg-neutral-5 mr-2"
-					content-type="spell"
-					:content-id="spellIds"
-				>
-					<span>Export</span>
-				</ExportUserContent>
-				<button
-					v-if="selected_spells.length"
-					slot="actions-left"
-					class="btn btn-sm bg-neutral-5 mr-2"
-					:disabled="batch_download_loading"
-					@click="openBatchDownload"
-				>
-					{{ batch_download_loading ? "Loading…" : `Download (${selected_spells.length})` }}
-					<hk-icon icon="fas fa-file-pdf" class="ml-1" />
-				</button>
+				<template v-slot:actions-left>
+					<ExportUserContent
+						class="btn-sm bg-neutral-5 mr-2"
+						content-type="spell"
+						:content-id="spellIds"
+					>
+						<span>Export</span>
+					</ExportUserContent>
+					<button
+						v-if="selected_spells.length"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						:disabled="batch_download_loading"
+						@click="openBatchDownload"
+					>
+						{{ batch_download_loading ? "Loading…" : `Download (${selected_spells.length})` }}
+						<hk-icon icon="fas fa-file-pdf" class="ml-1" />
+					</button>
+				</template>
 				<template v-slot:actions-right>
 					<button
 						v-if="tier.price !== 'Free'"

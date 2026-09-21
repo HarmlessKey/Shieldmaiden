@@ -250,8 +250,8 @@
 					spells prepared:
 				</p>
 				<p>
-					<template v-for="level in caster_spell_levels">
-						<div :key="`spell-${level}`">
+					<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+						<div>
 							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
 								<strong>{{ $numeral(level, "Oo") }} level</strong> ({{
@@ -293,8 +293,8 @@
 					spells, requiring no material components:
 				</p>
 				<p>
-					<template v-for="limit in innate_spell_levels">
-						<div :key="`spell-${limit}`">
+					<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+						<div>
 							<template v-if="limit === Infinity"> At will: </template>
 							<template v-else> {{ limit }}/day each: </template>
 							<i
@@ -354,7 +354,7 @@
 
 			<div v-if="monster.source || monster.environment" class="mt-4">
 				<span v-if="monster.source"> <strong>Source:</strong> {{ monster.source }} </span>
-				<template v-if="monster.environment?.length" class="mt-3">
+				<template v-if="monster.environment?.length">
 					<strong>Environment:</strong> {{ monster.environment.join(", ").capitalizeEach() }}
 				</template>
 			</div>

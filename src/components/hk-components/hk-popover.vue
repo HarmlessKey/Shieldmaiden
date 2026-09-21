@@ -10,8 +10,8 @@
 			:breakpoint="576"
 		>
 			<hk-card
-				@mouseover.native="cardHover = true"
-				@mouseout.native="cardHover = false"
+				@mouseover="cardHover = true"
+				@mouseout="cardHover = false"
 				:max-width="300"
 				:no-margin="true"
 				:small="true"

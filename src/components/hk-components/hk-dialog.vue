@@ -1,5 +1,5 @@
 <template>
-	<q-dialog ref="dialog" v-bind="$attrs" v-on="$listeners">
+	<q-dialog ref="dialog" v-bind="$attrs">
 		<hk-card v-bind="$attrs" :class="cardClass">
 			<template v-slot:header>
 				<div class="card-header">
@@ -24,6 +24,10 @@
 <script>
 export default {
 	name: "hk-dialog",
+	// $listeners is gone in Vue 3: listeners live in $attrs, which is bound
+	// explicitly on the q-dialog, so fallthrough has to be off to avoid applying
+	// everything twice.
+	inheritAttrs: false,
 	props: {
 		header: {
 			type: String,

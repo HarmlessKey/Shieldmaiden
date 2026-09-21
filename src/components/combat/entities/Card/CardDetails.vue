@@ -32,17 +32,13 @@
 			</template>
 		</div>
 		<div class="card-details__abilities">
-			<template v-for="(ability, index) in abilities">
-				<div
-					v-if="index === 0 || index === 3"
-					:key="index"
-					class="card-details__abilities-header label"
-				>
+			<template v-for="(ability, index) in abilities" :key="ability">
+				<div v-if="index === 0 || index === 3" class="card-details__abilities-header label">
 					<div class="placeholder" />
 					<div>mod</div>
 					<div>save</div>
 				</div>
-				<div :key="ability" class="ability">
+				<div class="ability">
 					<div class="label">{{ ability.substring(0, 3) }}</div>
 					<div class="ability__score">{{ full_entity[ability] ?? 10 }}</div>
 					<hk-roll

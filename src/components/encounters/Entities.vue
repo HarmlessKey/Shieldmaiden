@@ -230,7 +230,6 @@
 			</q-table>
 			<q-btn
 				v-if="!searchNpc && npcs.length < npc_count"
-				slot="bottom-row"
 				no-caps
 				color="primary"
 				label="Load more"

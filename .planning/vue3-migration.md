@@ -88,15 +88,21 @@ Keep the diff reviewable by attacking the problem in the order that shrinks it f
 
 ### 2.1 Delete dead weight before migrating it
 
-Four dependencies are referenced **only** in `src/boot/plugins.js` and nowhere else in
+Three dependencies are referenced **only** in `src/boot/plugins.js` and nowhere else in
 the app. They cost nothing to remove and remove themselves from the migration surface:
 
 | Package | Real usage |
 |---|---|
-| `vuefire` | none (`$bindAsObject`/`$firebaseRefs` never called) |
 | `vue-cookies` | none (`$cookies` never used; Quasar's `Cookies` is used instead) |
 | `vuejs-logger` | none (not even imported) |
 | `vue2-flip-countdown` | none (not even imported) |
+
+`vuefire` looks like a fourth, and it was removed as one at first — that was wrong.
+Nothing imports it outside `boot/plugins.js`, but the plugin installs a `firebase()`
+component option that 18 components and `mixins/HpManipulations.js` use, and templates
+depend on its `.key` / `.value` record conventions. vuefire 1.x is Vue 2 only and
+vuefire 3 requires the modular Firebase SDK, which `CLAUDE.md` rules out, so it is
+replaced by `src/plugins/vuefire.js` — see §2.2.
 
 `src/store/store.js` is also dead — it imports `store/modules/encounter` and
 `store/modules/content`, which do not exist. Delete it.
@@ -111,7 +117,8 @@ untouched, which is the single biggest lever on reviewability.
 |---|---|---|
 | `vue-snotify` | 150 calls in 52 files | `src/plugins/snotify.js` — provides `$snotify` over Quasar `Notify`/`Dialog`. Surface actually used: `success`, `error`, `warning`, `html`, `remove(id)`, `clear`, and options `{ timeout, buttons: [{ text, action(toast), bold }], position, closeOnClick }`. |
 | `vee-validate` v3 | 43 files, 155 × `v-slot="{ errors, invalid, validated }"` | `vee-validate` v4 + two shim components in `src/components/validation/` exposing the v3 slot contract (`ValidationProvider` → `errors`/`invalid`/`validated`; `ValidationObserver` → `handleSubmit`/`valid`/`validate`/`reset`). Value is auto-detected from the slot's `v-model` vnode, exactly as v3 did. |
-| `vue-shortkey` | 17 files | `src/directives/shortkey.js` — a correct `v-shortkey` directive: array and object (`{ name: keys }`) forms, `@shortkey` emitted as a native event, single shared keydown listener, honours the `input`/`textarea`/`contenteditable` guard. |
+| `vue-shortkey` | 17 files | `src/directives/shortkey.js` — a correct `v-shortkey` directive: array and object (`{ name: keys }`) forms, one shared keydown listener, the `@shortkey` handler read off the vnode so it also works on components, and the `input`/`textarea`/`contenteditable` guard. |
+| `vuefire` 1.x | 19 files | `src/plugins/vuefire.js` — the same `firebase()` component option on the Firebase v8 namespaced API, same `.key` / `.value` record shape, client-side only. |
 
 These shims are our own Vue 3 code, not Vue 2 compatibility layers — nothing imports from
 `vue2-*`, `@vue/compat`, or a Vue 2 package. Removing them in favour of the native Quasar

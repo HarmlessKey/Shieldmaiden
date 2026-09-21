@@ -30,8 +30,10 @@
 			color="white"
 			@keydown.enter="setHP('maxHpMod', editable_entity.maxHpMod)"
 		>
-			<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-			<q-icon slot="prepend" size="xs" name="fas fa-plus" />
+			<template v-slot:prepend>
+				<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+				<q-icon size="xs" name="fas fa-plus" />
+			</template>
 			<template v-slot:after>
 				<q-btn
 					no-caps
@@ -52,8 +54,10 @@
 			class="mb-2"
 			@keydown.enter="setHP('curHp', editable_entity.curHp)"
 		>
-			<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-			<q-icon slot="prepend" size="xs" name="fas fa-heartbeat" />
+			<template v-slot:prepend>
+				<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+				<q-icon size="xs" name="fas fa-heartbeat" />
+			</template>
 			<template v-slot:after>
 				<q-btn
 					no-caps
@@ -74,8 +78,6 @@
 		>
 			<template v-slot:prepend>
 				<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
-			</template>
-			<template v-slot:prepend>
 				<q-icon v-else size="xs" name="fas fa-heart" />
 			</template>
 			<template v-slot:after>

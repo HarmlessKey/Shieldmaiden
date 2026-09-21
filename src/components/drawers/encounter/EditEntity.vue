@@ -220,7 +220,7 @@
 								<q-icon :name="setting.icon" size="small" />
 							</q-item-section>
 							<q-item-section>
-								<q-item-label v-text="setting.name" />
+								<q-item-label>{{ setting.name }}</q-item-label>
 							</q-item-section>
 							<q-item-section side>
 								<q-icon
@@ -248,7 +248,7 @@
 							@click="setSetting(setting.key, scope.opt.value)"
 						>
 							<q-item-section>
-								<q-item-label v-text="scope.opt.name" />
+								<q-item-label>{{ scope.opt.name }}</q-item-label>
 							</q-item-section>
 							<q-item-section avatar>
 								<q-icon :name="scope.opt.icon" size="small" :class="scope.opt.color" />

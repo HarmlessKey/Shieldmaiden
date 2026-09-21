@@ -97,7 +97,7 @@
 					<template v-slot:header>
 						<div class="card-header">
 							<span> <i aria-hidden="true" class="fal fa-table"></i> Info Tables </span>
-							<a slot="after" class="btn bg-neutral-5">
+							<a class="btn bg-neutral-5">
 								<i aria-hidden="true" class="fas fa-plus"></i> Add table
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
 									<div class="bg-neutral-8 px-2 py-2">
@@ -215,7 +215,7 @@
 											<a @click="addRow(tableIndex)" class="remove green"
 												><i aria-hidden="true" class="fas fa-plus"
 											/></a>
-											<template v-for="(row, rowIndex) in table.rows">
+											<template v-for="(row, rowIndex) in table.rows" :key="rowIndex">
 												<div
 													v-for="(col, colIndex) in table.rows[rowIndex].columns"
 													:key="`column-${rowIndex}-${colIndex}`"
@@ -238,10 +238,7 @@
 														/>
 													</ValidationProvider>
 												</div>
-												<a
-													class="red remove"
-													@click="removeRow(tableIndex, rowIndex)"
-													:key="`remove-${rowIndex}`"
+												<a class="red remove" @click="removeRow(tableIndex, rowIndex)"
 													><i aria-hidden="true" class="fas fa-trash-alt"></i
 												></a>
 											</template>

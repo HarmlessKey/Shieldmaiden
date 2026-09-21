@@ -100,13 +100,11 @@
 									/>
 								</q-item-section>
 								<q-item-section>
-									<q-item-label
-										v-text="
-											panels.filter((item) => {
-												return item.value === panel;
-											})[0].label
-										"
-									/>
+									<q-item-label>{{
+										panels.filter((item) => {
+											return item.value === panel;
+										})[0].label
+									}}</q-item-label>
 								</q-item-section>
 							</q-item>
 						</template>
@@ -121,7 +119,7 @@
 								<q-item-section avatar>
 									<q-icon :name="scope.opt.icon" />
 								</q-item-section>
-								<q-item-label v-text="scope.opt.label" />
+								<q-item-label>{{ scope.opt.label }}</q-item-label>
 								<q-item-section> </q-item-section>
 							</q-item>
 						</template>

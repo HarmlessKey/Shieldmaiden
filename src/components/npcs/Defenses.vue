@@ -53,7 +53,7 @@
 										<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt" />
 									</q-item-section>
 									<q-item-section>
-										<q-item-label v-text="typeLabel(scope.opt)" />
+										<q-item-label>{{ typeLabel(scope.opt) }}</q-item-label>
 									</q-item-section>
 								</q-item>
 							</template>
@@ -99,7 +99,7 @@
 								<i aria-hidden="true" :class="`hki-${scope.opt}`" />
 							</q-item-section>
 							<q-item-section>
-								<q-item-label v-text="scope.opt.capitalize()" />
+								<q-item-label>{{ scope.opt.capitalize() }}</q-item-label>
 							</q-item-section>
 						</q-item>
 					</template>

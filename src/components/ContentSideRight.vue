@@ -98,8 +98,10 @@
 			</div>
 			<PatreonLinkButton v-if="userInfo.patron && !userInfo.patreon_id" />
 			<template v-slot:footer>
+				<!-- Was a v-else-if on this element. A v-if chain cannot cross a slot
+				     boundary in Vue 3, so the preceding condition is negated here. -->
 				<router-link
-					v-else-if="tier.name !== 'Deity'"
+					v-if="!(userInfo.patron && !userInfo.patreon_id) && tier.name !== 'Deity'"
 					to="/pricing"
 					class="btn btn-block btn-square bg-patreon-red"
 				>

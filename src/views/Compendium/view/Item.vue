@@ -1,7 +1,10 @@
 <template>
 	<hk-card>
 		<template v-if="!loading">
-			<div slot="header" class="card-header">
+			<!-- Plain child, not a named slot: hk-card renders its header slot right
+			     before the default slot, and a named slot would have to be a direct
+			     child of hk-card rather than nested in this v-if. -->
+			<div class="card-header">
 				<h1>
 					{{ not_found ? "Item not found" : item.name }}
 					<span v-if="!not_found" class="neutral-2">{{ editionLabel }}</span>
@@ -20,10 +23,10 @@
 			</div>
 			<div class="card-body">
 				<div v-if="not_found">
-					<p>Could not find item <strong>{{ id }}</strong></p>
-					<router-link :to="listPath" class="btn bg-neutral-5">
-						Find items
-					</router-link>
+					<p>
+						Could not find item <strong>{{ id }}</strong>
+					</p>
+					<router-link :to="listPath" class="btn bg-neutral-5"> Find items </router-link>
 				</div>
 				<Item v-else :data="item" />
 			</div>
@@ -33,62 +36,62 @@
 </template>
 
 <script>
-	import { mapGetters } from 'vuex';
-	import Item from "src/components/compendium/Item";
-	import { metaCompendium } from 'src/mixins/metaCompendium';
-	import { otherEdition } from 'src/utils/generalFunctions';
+import { mapGetters } from "vuex";
+import Item from "src/components/compendium/Item";
+import { metaCompendium } from "src/mixins/metaCompendium";
+import { otherEdition } from "src/utils/generalFunctions";
 
-	export default {
-		name: "ViewItem",
-		mixins: [
-			metaCompendium,
-		],
-		components: {
-			Item
+export default {
+	name: "ViewItem",
+	mixins: [metaCompendium],
+	components: {
+		Item,
+	},
+	data() {
+		return {
+			id: this.$route.params.id,
+			loading: true,
+			not_found: false,
+		};
+	},
+	async preFetch({ store, currentRoute }) {
+		await store.dispatch(
+			"api_items/fetch_api_item",
+			{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+			{ root: true }
+		);
+	},
+	computed: {
+		...mapGetters("api_items", ["get_api_item"]),
+		item() {
+			return this.get_api_item(this.id, this.$route.params.edition);
 		},
-		data() {
-			return {
-				id: this.$route.params.id,
-				loading: true,
-				not_found: false
-			}
+		listPath() {
+			return this.$route.params.edition
+				? `/compendium/items/${this.$route.params.edition}`
+				: "/compendium/items";
 		},
-		async preFetch({ store, currentRoute }) {
-			await store.dispatch(
-				'api_items/fetch_api_item',
-				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
-				{ root: true }
-			);
+		otherEdition() {
+			return otherEdition(this.$route);
 		},
-		computed: {
-			...mapGetters("api_items", ["get_api_item"]),
-			item() {
-				return this.get_api_item(this.id, this.$route.params.edition)
-			},
-			listPath() {
-				return this.$route.params.edition ? `/compendium/items/${this.$route.params.edition}` : "/compendium/items";
-			},
-			otherEdition() {
-				return otherEdition(this.$route);
-			},
-			editionLabel() {
-				return this.$route.params.edition || "5e";
-			}
+		editionLabel() {
+			return this.$route.params.edition || "5e";
 		},
-		meta() {
-			return {
-				title: this.compendium_edition_text(this.item?.meta?.title),
-				meta: this.generate_compendium_meta(this.item?.meta)
-			}
-		},
-		mounted() {
-			if(this.item) {
-				this.loading = false;
-				this.$root.$emit('route-name', this.item?.name.capitalizeEach())
-			} else {
-				this.not_found = true;
-				this.loading = false;
-			}
+	},
+	meta() {
+		return {
+			title: this.compendium_edition_text(this.item?.meta?.title),
+			meta: this.generate_compendium_meta(this.item?.meta),
+		};
+	},
+	mounted() {
+		if (this.item) {
+			this.loading = false;
+			this.$root.$emit("route-name", this.item?.name.capitalizeEach());
+		} else {
+			this.not_found = true;
+			this.loading = false;
 		}
-	}
+	},
+};
 </script>

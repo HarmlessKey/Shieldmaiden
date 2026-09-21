@@ -52,7 +52,7 @@
 			<template v-slot:option="scope">
 				<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
 					<q-item-section>
-						<q-item-label v-text="scope.opt.label" />
+						<q-item-label>{{ scope.opt.label }}</q-item-label>
 					</q-item-section>
 					<q-item-section side>
 						<q-checkbox

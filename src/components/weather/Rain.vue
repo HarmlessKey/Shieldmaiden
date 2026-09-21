@@ -1,8 +1,8 @@
 <template>
 	<div class="wrapper" :class="intensityClass">
-		<template v-for="i in 3">
-			<div class="rain a" :class="`layer${i}`" :key="`${i}-a`" />
-			<div class="rain" :class="`layer${i}`" :key="i" />
+		<template v-for="i in 3" :key="i">
+			<div class="rain a" :class="`layer${i}`" />
+			<div class="rain" :class="`layer${i}`" />
 		</template>
 		<!-- <audio v-if="audio" :src="audio_file" autoplay loop /> -->
 	</div>

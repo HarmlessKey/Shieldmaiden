@@ -485,9 +485,8 @@
 																		</q-item-section>
 																	</q-item>
 
-																	<template v-for="weapon in scope.opt.weapons">
+																	<template v-for="weapon in scope.opt.weapons" :key="weapon.value">
 																		<q-item
-																			:key="weapon.value"
 																			clickable
 																			v-ripple
 																			@click="
@@ -498,7 +497,9 @@
 																			"
 																		>
 																			<q-item-section>
-																				<q-item-label v-text="weapon.label" class="q-ml-lg" />
+																				<q-item-label class="q-ml-lg">{{
+																					weapon.label
+																				}}</q-item-label>
 																			</q-item-section>
 																		</q-item>
 																	</template>
@@ -693,8 +694,8 @@
 									<div>Level</div>
 									<div>Cantrips</div>
 									<div>Spells</div>
-									<template v-for="i in 20">
-										<div :key="`level-${i}`">
+									<template v-for="i in 20" :key="i">
+										<div>
 											{{ i }}
 										</div>
 										<q-input
@@ -702,7 +703,6 @@
 											filled
 											square
 											v-model="character_classes[editClass].spells_known.cantrips[i]"
-											:key="`cantrips-known-${i}`"
 											@change="setSpellsKnown(editClass, 'cantrips', i)"
 											:tabindex="`1${i < 10 ? `0${i}` : i}`"
 										/>
@@ -711,7 +711,6 @@
 											filled
 											square
 											v-model="character_classes[editClass].spells_known.spells[i]"
-											:key="`spells-known-${i}`"
 											@change="setSpellsKnown(editClass, 'spells', i)"
 											:tabindex="`2${i < 10 ? `0${i}` : i}`"
 										/>

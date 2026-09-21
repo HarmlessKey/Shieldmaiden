@@ -45,7 +45,7 @@
 								<q-icon :name="damage_type_icons[type]" :class="type" />
 							</q-item-section>
 							<q-item-section>
-								<q-item-label v-text="typeLabel(type)" />
+								<q-item-label>{{ typeLabel(type) }}</q-item-label>
 							</q-item-section>
 						</q-item>
 					</q-list>

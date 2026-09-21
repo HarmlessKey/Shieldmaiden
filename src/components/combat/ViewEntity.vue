@@ -40,11 +40,7 @@
 					</template>
 					<template v-if="entity.initiative_modifier !== undefined">
 						<br /><strong>Initiative</strong>:
-						<span>
-							{{
-								initiative > 0 ? `+${initiative}` : initiative
-							}}</span
-						>
+						<span> {{ initiative > 0 ? `+${initiative}` : initiative }}</span>
 					</template>
 				</template>
 				<template v-else>
@@ -277,8 +273,8 @@
 				><br />
 			</template>
 			<p>
-				<template v-for="level in caster_spell_levels">
-					<div :key="`spell-${level}`">
+				<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+					<div>
 						<template v-if="level === 0"> Cantrips (at will): </template>
 						<template v-else>
 							{{ $numeral(level, "Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
@@ -335,8 +331,8 @@
 				><br />
 			</template>
 			<p>
-				<template v-for="limit in innate_spell_levels">
-					<div :key="`spell-${limit}`">
+				<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+					<div>
 						<template v-if="limit === Infinity"> At will: </template>
 						<template v-else> {{ limit }}/day each: </template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
@@ -414,10 +410,10 @@ export default {
 			return entity;
 		},
 		initiative() {
-				return this.entity.initiative_modifier;
-			},
-			spellCasting() {
-				let casting = [];
+			return this.entity.initiative_modifier;
+		},
+		spellCasting() {
+			let casting = [];
 			if (this.entity.innate_ability)
 				casting.push({
 					name: "innate",

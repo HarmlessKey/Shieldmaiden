@@ -1,7 +1,10 @@
 <template>
 	<hk-card>
 		<template v-if="!loading">
-			<div slot="header" class="card-header">
+			<!-- hk-card renders its header slot immediately before the default slot, so a
+			     plain first child sits in the same place. A named slot is not possible
+			     here: it would have to be a direct child of hk-card, not nested in v-if. -->
+			<div class="card-header">
 				<h1>
 					<i aria-hidden="true" :class="`hki-${condition.name.toLowerCase()}`" />
 					{{ condition.name }}
@@ -21,10 +24,10 @@
 			</div>
 			<div class="card-body">
 				<template v-if="not_found">
-					<p>Could not find condition <strong>{{ id }}</strong></p>
-					<router-link :to="listPath" class="btn bg-neutral-5">
-						Find conditions
-					</router-link>
+					<p>
+						Could not find condition <strong>{{ id }}</strong>
+					</p>
+					<router-link :to="listPath" class="btn bg-neutral-5"> Find conditions </router-link>
 				</template>
 				<Condition v-else :data="condition" />
 			</div>
@@ -34,64 +37,64 @@
 </template>
 
 <script>
-	import Condition from "src/components/compendium/Condition";
-	import { mapGetters } from 'vuex';
-	import { metaCompendium } from 'src/mixins/metaCompendium';
-	import { otherEdition } from 'src/utils/generalFunctions';
+import Condition from "src/components/compendium/Condition";
+import { mapGetters } from "vuex";
+import { metaCompendium } from "src/mixins/metaCompendium";
+import { otherEdition } from "src/utils/generalFunctions";
 
-	export default {
-		name: 'ViewCondition',
-		mixins: [
-			metaCompendium
-		],
-		components: {
-			Condition
+export default {
+	name: "ViewCondition",
+	mixins: [metaCompendium],
+	components: {
+		Condition,
+	},
+	data() {
+		return {
+			id: this.$route.params.id,
+			loading: true,
+			not_found: false,
+		};
+	},
+	// Fetch the condition Server side, on the Client side retrieve it from the store
+	async preFetch({ store, currentRoute }) {
+		await store.dispatch(
+			"api_conditions/fetch_condition",
+			{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+			{ root: true }
+		);
+	},
+	computed: {
+		...mapGetters("api_conditions", ["get_condition"]),
+		condition() {
+			return this.get_condition(this.id, this.$route.params.edition);
 		},
-		data() {
-			return {
-				id: this.$route.params.id,
-				loading: true,
-				not_found: false
-			}
+		listPath() {
+			return this.$route.params.edition
+				? `/compendium/conditions/${this.$route.params.edition}`
+				: "/compendium/conditions";
 		},
-		// Fetch the condition Server side, on the Client side retrieve it from the store
-		async preFetch({ store, currentRoute }) {
-			await store.dispatch(
-				"api_conditions/fetch_condition",
-				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
-				{ root: true }
-			);
+		otherEdition() {
+			return otherEdition(this.$route);
 		},
-		computed: {
-			...mapGetters("api_conditions", ["get_condition"]),
-			condition() {
-				return this.get_condition(this.id, this.$route.params.edition);
-			},
-			listPath() {
-				return this.$route.params.edition ? `/compendium/conditions/${this.$route.params.edition}` : "/compendium/conditions";
-			},
-			otherEdition() {
-				return otherEdition(this.$route);
-			},
-			editionLabel() {
-				return this.$route.params.edition || "5e";
-			}
+		editionLabel() {
+			return this.$route.params.edition || "5e";
 		},
-		meta() {
-			return {
-				title: this.compendium_edition_text(this.condition.meta.title),
-				meta: this.generate_compendium_meta(this.condition.meta)
-			}
-		},
-		mounted() {
-			if(this.condition) {
-				this.loading = false;
-				// Root emit with the condition name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.condition.name);
-			} else {
-				this.not_found = true;
-				this.loading = false;
-			}
+	},
+	meta() {
+		return {
+			title: this.compendium_edition_text(this.condition.meta.title),
+			meta: this.generate_compendium_meta(this.condition.meta),
+		};
+	},
+	mounted() {
+		if (this.condition) {
+			this.loading = false;
+			// Root emit with the condition name, so it can be used in Crumble component
+			this.$root.$emit("route-name", this.condition.name);
+		} else {
+			this.not_found = true;
+			this.loading = false;
 		}
-	}
+	},
+};
 </script>

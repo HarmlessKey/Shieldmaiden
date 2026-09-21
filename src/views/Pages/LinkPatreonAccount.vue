@@ -32,7 +32,10 @@
 									>View profile</a
 								>
 							</div>
-							<div slot="footer" class="card-footer">
+							<!-- hk-card renders its footer slot right after the default slot, so a
+							     plain child keeps the same position. A named slot cannot be used here:
+							     it would have to be a direct child of hk-card, not nested in v-if. -->
+							<div class="card-footer">
 								<router-link
 									class="btn bg-neutral-5 mr-2"
 									:class="{ 'full-width': id_taken }"
@@ -74,7 +77,7 @@
 									{{ userInfo.patron?.expired ? "Renew" : "Subscribe" }}
 								</a>
 							</div>
-							<div slot="footer" class="card-footer">
+							<div class="card-footer">
 								<router-link
 									class="btn bg-neutral-5 mr-2"
 									:class="{ 'full-width': success }"

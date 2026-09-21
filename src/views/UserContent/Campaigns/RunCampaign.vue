@@ -100,15 +100,15 @@
 					v-else-if="container.width >= lg"
 					class="default-theme"
 					@resized="onOuterResized"
-					@mousedown.native.capture="dragFlags.outer = true"
-					@touchstart.native.capture="dragFlags.outer = true"
+					@mousedown.capture="dragFlags.outer = true"
+					@touchstart.capture="dragFlags.outer = true"
 				>
 					<Pane :size="panes.left" min-size="20">
 						<Splitpanes
 							horizontal
 							@resized="onLeftResized"
-							@mousedown.native.capture="dragFlags.left = true"
-							@touchstart.native.capture="dragFlags.left = true"
+							@mousedown.capture="dragFlags.left = true"
+							@touchstart.capture="dragFlags.left = true"
 						>
 							<hk-pane>
 								<SoundBoard />
@@ -122,8 +122,8 @@
 						<Splitpanes
 							horizontal
 							@resized="onMidResized"
-							@mousedown.native.capture="dragFlags.mid = true"
-							@touchstart.native.capture="dragFlags.mid = true"
+							@mousedown.capture="dragFlags.mid = true"
+							@touchstart.capture="dragFlags.mid = true"
 						>
 							<hk-pane :size="panes['mid-top']" min-size="20">
 								<Encounters />

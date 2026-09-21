@@ -44,7 +44,7 @@
 					<q-item-section avatar>
 						<i :class="icon" class="neutral-2" aria-hidden="true" />
 					</q-item-section>
-					<q-item-section v-text="title" />
+					<q-item-section>{{ title }}</q-item-section>
 				</template>
 				<div class="accordion-body" v-html="text" />
 			</q-expansion-item>
@@ -76,7 +76,7 @@
 					<q-item-section avatar>
 						<i :class="icon" class="neutral-2" aria-hidden="true" />
 					</q-item-section>
-					<q-item-section v-text="title" />
+					<q-item-section>{{ title }}</q-item-section>
 				</template>
 				<div class="accordion-body" v-html="text" />
 			</q-expansion-item>

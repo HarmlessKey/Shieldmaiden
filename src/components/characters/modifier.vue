@@ -125,9 +125,8 @@
 												</q-item-section>
 											</q-item>
 
-											<template v-for="weapon in scope.opt.weapons">
+											<template v-for="weapon in scope.opt.weapons" :key="weapon.value">
 												<q-item
-													:key="weapon.value"
 													clickable
 													v-ripple
 													v-close-popup
@@ -135,7 +134,7 @@
 													:active="modifier.subtarget === weapon.value"
 												>
 													<q-item-section>
-														<q-item-label v-text="weapon.label" class="q-ml-lg" />
+														<q-item-label class="q-ml-lg">{{ weapon.label }}</q-item-label>
 													</q-item-section>
 												</q-item>
 											</template>

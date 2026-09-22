@@ -112,10 +112,10 @@
 
 		<h2>Advertising Partners Privacy Policies</h2>
 
-		<P
-			>You may consult this list to find the Privacy Policy for each of the advertising partners of
-			Shieldmaiden.</P
-		>
+		<p>
+			You may consult this list to find the Privacy Policy for each of the advertising partners of
+			Shieldmaiden.
+		</p>
 
 		<p>
 			Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web

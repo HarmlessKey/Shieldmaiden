@@ -1,45 +1,46 @@
-import { defineAsyncComponent } from "vue";
-
-const lazy = (loader) => defineAsyncComponent(loader);
-
-const HkInput = lazy(() => import("../components/hk-components/hk-input"));
-const HkSelect = lazy(() => import("../components/hk-components/hk-select"));
-import HkDialog from "../components/hk-components/hk-dialog"; // can't load async because it's used in mounted
-const HkIcon = lazy(() => import("../components/hk-components/hk-icon"));
-const HkTable = lazy(() => import("../components/hk-components/hk-table"));
-const HkCard = lazy(() => import("../components/hk-components/hk-card"));
-const HkCardDeck = lazy(() => import("../components/hk-components/hk-card-deck"));
-const HkShowKeybind = lazy(() => import("../components/hk-components/hk-show-keybind"));
-const HkRoll = lazy(() => import("../components/hk-components/hk-roll"));
-const HkRollAction = lazy(() =>
-	import("../components/hk-components/hk-action-rolls/hk-roll-action")
-);
-const HkAnimatedInteger = lazy(() => import("../components/hk-components/hk-animated-integer"));
-const HkDiceText = lazy(() => import("../components/hk-components/hk-dice-text"));
-const HkPopover = lazy(() => import("../components/hk-components/hk-popover"));
-const HkLoader = lazy(() => import("../components/hk-components/hk-loader"));
-const HkDmgTypeSelect = lazy(() => import("../components/hk-components/hk-dmg-type-select"));
-const HkTip = lazy(() => import("../components/hk-components/hk-tip"));
-const HkTimer = lazy(() => import("../components/hk-components/hk-timer"));
-const HkShare = lazy(() => import("../components/hk-components/hk-share-button"));
-const HkImageUploader = lazy(() => import("../components/hk-components/hk-image-uploader"));
-const HkBackgroundSelect = lazy(() => import("../components/hk-components/hk-background-select"));
-const HkMarkdownEditor = lazy(() => import("../components/hk-components/hk-markdown-editor"));
-const HkXpBar = lazy(() => import("../components/hk-components/hk-xp-bar"));
-const HkLinkCharacter = lazy(() => import("../components/hk-components/hk-link-character"));
-const HkActionRollForm = lazy(() =>
-	import("../components/hk-components/hk-action-rolls/hk-action-roll-form")
-);
-const HkActionRollsTable = lazy(() =>
-	import("../components/hk-components/hk-action-rolls/hk-action-rolls-table")
-);
-const HkActionRollScaling = lazy(() =>
-	import("../components/hk-components/hk-action-rolls/hk-action-roll-scaling")
-);
-const HkPane = lazy(() => import("../components/hk-components/hk-pane"));
-const HkFilter = lazy(() => import("../components/hk-components/hk-filter"));
-const HkTransformSelect = lazy(() => import("../components/hk-components/hk-transform-select"));
-const HkEditionSelect = lazy(() => import("../components/hk-components/hk-edition-select"));
+// These are all registered synchronously, where Vue 2 registered most of them with an
+// `() => import(...)` factory.
+//
+// Vue 3 defers hydration of an async component's subtree until its chunk has loaded,
+// which is after the app has mounted. Anything that changes on mount has then already
+// changed by the time the subtree hydrates: a component's own `loading` flag, and
+// Quasar's `isRuntimeSsrPreHydration` (QImg renders a different tree once it is false).
+// The result was "Hydration completed but contains mismatches." in the console — an
+// error, not a warning, and it is logged in production builds too.
+//
+// Splitting them per component would mean auditing, for every one of them, whether it
+// can end up in server-rendered markup on any route, including the auth-gated ones.
+// Registering them all up front is the version that cannot silently break later.
+import HkInput from "../components/hk-components/hk-input";
+import HkSelect from "../components/hk-components/hk-select";
+import HkDialog from "../components/hk-components/hk-dialog";
+import HkIcon from "../components/hk-components/hk-icon";
+import HkTable from "../components/hk-components/hk-table";
+import HkCard from "../components/hk-components/hk-card";
+import HkCardDeck from "../components/hk-components/hk-card-deck";
+import HkShowKeybind from "../components/hk-components/hk-show-keybind";
+import HkRoll from "../components/hk-components/hk-roll";
+import HkRollAction from "../components/hk-components/hk-action-rolls/hk-roll-action";
+import HkAnimatedInteger from "../components/hk-components/hk-animated-integer";
+import HkDiceText from "../components/hk-components/hk-dice-text";
+import HkPopover from "../components/hk-components/hk-popover";
+import HkLoader from "../components/hk-components/hk-loader";
+import HkDmgTypeSelect from "../components/hk-components/hk-dmg-type-select";
+import HkTip from "../components/hk-components/hk-tip";
+import HkTimer from "../components/hk-components/hk-timer";
+import HkShare from "../components/hk-components/hk-share-button";
+import HkImageUploader from "../components/hk-components/hk-image-uploader";
+import HkBackgroundSelect from "../components/hk-components/hk-background-select";
+import HkMarkdownEditor from "../components/hk-components/hk-markdown-editor";
+import HkXpBar from "../components/hk-components/hk-xp-bar";
+import HkLinkCharacter from "../components/hk-components/hk-link-character";
+import HkActionRollForm from "../components/hk-components/hk-action-rolls/hk-action-roll-form";
+import HkActionRollsTable from "../components/hk-components/hk-action-rolls/hk-action-rolls-table";
+import HkActionRollScaling from "../components/hk-components/hk-action-rolls/hk-action-roll-scaling";
+import HkPane from "../components/hk-components/hk-pane";
+import HkFilter from "../components/hk-components/hk-filter";
+import HkTransformSelect from "../components/hk-components/hk-transform-select";
+import HkEditionSelect from "../components/hk-components/hk-edition-select";
 import HkCompendiumImage from "../components/hk-components/hk-compendium-image";
 
 export default async ({ app }) => {

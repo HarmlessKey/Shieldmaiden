@@ -37,13 +37,23 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { createMetaMixin } from "quasar";
 import Item from "src/components/compendium/Item";
+import { EventBus } from "src/event-bus";
 import { metaCompendium } from "src/mixins/metaCompendium";
 import { otherEdition } from "src/utils/generalFunctions";
 
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+function metaInfo() {
+	return {
+		title: this.compendium_edition_text(this.item?.meta?.title),
+		meta: this.generate_compendium_meta(this.item?.meta),
+	};
+}
+
 export default {
 	name: "ViewItem",
-	mixins: [metaCompendium],
+	mixins: [metaCompendium, createMetaMixin(metaInfo)],
 	components: {
 		Item,
 	},
@@ -78,16 +88,10 @@ export default {
 			return this.$route.params.edition || "5e";
 		},
 	},
-	meta() {
-		return {
-			title: this.compendium_edition_text(this.item?.meta?.title),
-			meta: this.generate_compendium_meta(this.item?.meta),
-		};
-	},
 	mounted() {
 		if (this.item) {
 			this.loading = false;
-			this.$root.$emit("route-name", this.item?.name.capitalizeEach());
+			EventBus.emit("route-name", this.item?.name.capitalizeEach());
 		} else {
 			this.not_found = true;
 			this.loading = false;

@@ -126,7 +126,7 @@ export default {
 			// If no theme is specified, it's called from initialize() so set it to the previously choosen theme if it exists, or dark otherwise.
 			if (!theme) {
 				theme = "dark";
-				if (process.browser) {
+				if (process.env.CLIENT) {
 					if (uid && rootGetters.userSettings) {
 						theme =
 							rootGetters.userSettings.general && rootGetters.userSettings.general.theme

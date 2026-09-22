@@ -36,11 +36,21 @@
 <script>
 import ViewMonster from "src/components/compendium/Monster";
 import { mapGetters } from "vuex";
+import { createMetaMixin } from "quasar";
+import { EventBus } from "src/event-bus";
 import { metaCompendium } from "src/mixins/metaCompendium";
+
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+function metaInfo() {
+	return {
+		title: this.monster.meta.title,
+		meta: this.generate_compendium_meta(this.monster.meta),
+	};
+}
 
 export default {
 	name: "Monster",
-	mixins: [metaCompendium],
+	mixins: [metaCompendium, createMetaMixin(metaInfo)],
 	components: {
 		ViewMonster,
 	},
@@ -61,16 +71,10 @@ export default {
 			return this.get_monster(this.id);
 		},
 	},
-	meta() {
-		return {
-			title: this.monster.meta.title,
-			meta: this.generate_compendium_meta(this.monster.meta),
-		};
-	},
 	mounted() {
 		if (this.monster) {
 			this.loading = false;
-			this.$root.$emit("route-name", this.monster.name.capitalizeEach());
+			EventBus.emit("route-name", this.monster.name.capitalizeEach());
 		} else {
 			this.not_found = true;
 			this.loading = false;

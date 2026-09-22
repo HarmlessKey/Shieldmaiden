@@ -31,13 +31,25 @@
 </template>
 
 <script>
+import { createMetaMixin } from "quasar";
 import { rules } from "src/utils/generalConstants";
 import { metaCompendium } from "src/mixins/metaCompendium";
 import { otherEdition } from "src/utils/generalFunctions";
 
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+function metaInfo() {
+	return {
+		title: this.rule?.name,
+		meta: this.generate_compendium_meta({
+			title: this.rule?.name,
+			description: this.rule?.description,
+		}),
+	};
+}
+
 export default {
 	name: "ViewRule",
-	mixins: [metaCompendium],
+	mixins: [metaCompendium, createMetaMixin(metaInfo)],
 	data() {
 		return {
 			id: this.$route.params.id,
@@ -60,15 +72,6 @@ export default {
 		editionLabel() {
 			return this.$route.params.edition || "5e";
 		},
-	},
-	meta() {
-		return {
-			title: this.rule?.name,
-			meta: this.generate_compendium_meta({
-				title: this.rule?.name,
-				description: this.rule?.description,
-			}),
-		};
 	},
 	mounted() {},
 };

@@ -39,12 +39,22 @@
 <script>
 import Condition from "src/components/compendium/Condition";
 import { mapGetters } from "vuex";
+import { createMetaMixin } from "quasar";
+import { EventBus } from "src/event-bus";
 import { metaCompendium } from "src/mixins/metaCompendium";
 import { otherEdition } from "src/utils/generalFunctions";
 
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+function metaInfo() {
+	return {
+		title: this.compendium_edition_text(this.condition.meta.title),
+		meta: this.generate_compendium_meta(this.condition.meta),
+	};
+}
+
 export default {
 	name: "ViewCondition",
-	mixins: [metaCompendium],
+	mixins: [metaCompendium, createMetaMixin(metaInfo)],
 	components: {
 		Condition,
 	},
@@ -80,17 +90,11 @@ export default {
 			return this.$route.params.edition || "5e";
 		},
 	},
-	meta() {
-		return {
-			title: this.compendium_edition_text(this.condition.meta.title),
-			meta: this.generate_compendium_meta(this.condition.meta),
-		};
-	},
 	mounted() {
 		if (this.condition) {
 			this.loading = false;
 			// Root emit with the condition name, so it can be used in Crumble component
-			this.$root.$emit("route-name", this.condition.name);
+			EventBus.emit("route-name", this.condition.name);
 		} else {
 			this.not_found = true;
 			this.loading = false;

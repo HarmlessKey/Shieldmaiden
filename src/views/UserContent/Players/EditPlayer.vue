@@ -397,19 +397,19 @@
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<!-- eslint-disable -->
-											<q-checkbox
-												slot="append"
-												size="xs"
-												:dark="$store.getters.theme === 'dark'"
-												v-model="player[`${ability}-save-profficient`]"
-												:false-value="null"
-												indeterminate-value="something-else"
-											>
-												<q-tooltip anchor="top middle" self="center middle">
-													Saving throw proficiency
-												</q-tooltip>
-											</q-checkbox>
+											<template v-slot:append>
+												<q-checkbox
+													size="xs"
+													:dark="$store.getters.theme === 'dark'"
+													v-model="player[`${ability}-save-profficient`]"
+													:false-value="null"
+													indeterminate-value="something-else"
+												>
+													<q-tooltip anchor="top middle" self="center middle">
+														Saving throw proficiency
+													</q-tooltip>
+												</q-checkbox>
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -439,7 +439,9 @@
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<q-icon slot="prepend" name="fas fa-eye" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-eye" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -464,7 +466,9 @@
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<q-icon slot="prepend" name="fas fa-search" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-search" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -489,7 +493,9 @@
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<q-icon slot="prepend" name="fas fa-lightbulb-on" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-lightbulb-on" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -584,17 +590,19 @@
 
 					<!-- COMPANIONS -->
 					<hk-card>
-						<div slot="header" class="card-header">
-							Companions
-							<a
-								v-if="isOwner() && npc_count"
-								class="btn btn-sm bg-neutral-5"
-								@click="companion_dialog = !companion_dialog"
-							>
-								<i aria-hidden="true" class="fas fa-plus green mr-1" />
-								Add companion
-							</a>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								Companions
+								<a
+									v-if="isOwner() && npc_count"
+									class="btn btn-sm bg-neutral-5"
+									@click="companion_dialog = !companion_dialog"
+								>
+									<i aria-hidden="true" class="fas fa-plus green mr-1" />
+									Add companion
+								</a>
+							</div>
+						</template>
 						<div class="card-body">
 							<template v-if="isOwner()">
 								<div v-if="!npc_count">
@@ -612,36 +620,38 @@
 								:columns="columns"
 								:items="companions"
 							>
-								<template slot="avatar" slot-scope="data">
+								<template v-slot:avatar="data">
 									<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
 										<i aria-hidden="true" v-if="!data.item" class="hki-monster" />
 									</div>
 								</template>
 
-								<template slot="name" slot-scope="data">
+								<template v-slot:name="data">
 									<router-link class="mx-2" :to="`/content/companions/${userId}/${data.row.key}`">
 										{{ data.item }}
 										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 									</router-link>
 								</template>
 
-								<div slot="actions" slot-scope="data" class="actions">
-									<router-link
-										class="btn btn-sm bg-neutral-5 mx-1"
-										:to="`/content/companions/${userId}/${data.row.key}`"
-									>
-										<i aria-hidden="true" class="fas fa-pencil"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-									</router-link>
-									<a
-										v-if="isOwner()"
-										class="btn btn-sm bg-neutral-5"
-										@click="removeCompanion(data.index, data.row.key)"
-									>
-										<i aria-hidden="true" class="fas fa-trash-alt"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
-									</a>
-								</div>
+								<template v-slot:actions="data">
+									<div class="actions">
+										<router-link
+											class="btn btn-sm bg-neutral-5 mx-1"
+											:to="`/content/companions/${userId}/${data.row.key}`"
+										>
+											<i aria-hidden="true" class="fas fa-pencil"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+										</router-link>
+										<a
+											v-if="isOwner()"
+											class="btn btn-sm bg-neutral-5"
+											@click="removeCompanion(data.index, data.row.key)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
+										</a>
+									</div>
+								</template>
 							</hk-table>
 							<div v-else-if="!isOwner()">
 								<p>You currently have no companions linked to your player character</p>

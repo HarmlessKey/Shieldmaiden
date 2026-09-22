@@ -115,31 +115,33 @@
 
 <script>
 import { mapActions } from "vuex";
+import { createMetaMixin } from "quasar";
 import { dice } from "src/mixins/dice.js";
 import ToolsPage from "src/components/ToolsPage.vue";
 
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+const metaMixin = createMetaMixin(() => ({
+	meta: {
+		twitterImage: {
+			name: "twitter:image",
+			content: require(`assets/_img/meta/shieldmaiden-monster-creator.png`),
+		},
+		ogImage: {
+			property: "og:image",
+			content: require(`assets/_img/meta/shieldmaiden-monster-creator.png`),
+		},
+		ogImageAlt: {
+			property: "og:image:alt",
+			content: "Shieldmaiden Monster Creator",
+		},
+	},
+}));
+
 export default {
 	name: "ToolsMonsterCreator",
+	mixins: [metaMixin],
 	components: {
 		ToolsPage,
-	},
-	meta() {
-		return {
-			meta: {
-				twitterImage: {
-					name: "twitter:image",
-					content: require(`assets/_img/meta/shieldmaiden-monster-creator.png`),
-				},
-				ogImage: {
-					property: "og:image",
-					content: require(`assets/_img/meta/shieldmaiden-monster-creator.png`),
-				},
-				ogImageAlt: {
-					property: "og:image:alt",
-					content: "Shieldmaiden Monster Creator",
-				},
-			},
-		};
 	},
 	mixins: [dice],
 	data() {

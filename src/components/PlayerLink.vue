@@ -76,7 +76,7 @@ export default {
 	},
 	computed: {
 		share_available() {
-			return process.browser && navigator.share !== undefined;
+			return process.env.CLIENT && navigator.share !== undefined;
 		},
 	},
 	methods: {

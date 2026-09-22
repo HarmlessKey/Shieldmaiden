@@ -17,7 +17,7 @@ const tip_actions = {
 	 * Checks local storage for saved tips and sets them in the store
 	 */
 	setTips({ commit }) {
-		if (process.browser) {
+		if (process.env.CLIENT) {
 			const storage = JSON.parse(localStorage.getItem("tips"));
 			const tips = storage ? storage : {};
 			commit("SET_TIPS", tips);

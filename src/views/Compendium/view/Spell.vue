@@ -41,13 +41,23 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { createMetaMixin } from "quasar";
 import Spell from "src/components/compendium/Spell";
+import { EventBus } from "src/event-bus";
 import { metaCompendium } from "src/mixins/metaCompendium";
 import { otherEdition } from "src/utils/generalFunctions";
 
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+function metaInfo() {
+	return {
+		title: this.compendium_edition_text(this.spell.meta.title),
+		meta: this.generate_compendium_meta(this.spell.meta),
+	};
+}
+
 export default {
 	name: "ViewSpell",
-	mixins: [metaCompendium],
+	mixins: [metaCompendium, createMetaMixin(metaInfo)],
 	components: {
 		Spell,
 	},
@@ -83,17 +93,11 @@ export default {
 			return this.$route.params.edition || "5e";
 		},
 	},
-	meta() {
-		return {
-			title: this.compendium_edition_text(this.spell.meta.title),
-			meta: this.generate_compendium_meta(this.spell.meta),
-		};
-	},
 	mounted() {
 		if (this.spell) {
 			this.loading = false;
 			// Root emit with the spell name, so it can be used in Crumble component
-			this.$root.$emit("route-name", this.spell.name);
+			EventBus.emit("route-name", this.spell.name);
 		} else {
 			this.not_found = true;
 			this.loading = false;

@@ -116,7 +116,7 @@ untouched, which is the single biggest lever on reviewability.
 | Package | Call sites | Replacement |
 |---|---|---|
 | `vue-snotify` | 150 calls in 52 files | `src/plugins/snotify.js` — provides `$snotify` over Quasar `Notify`/`Dialog`. Surface actually used: `success`, `error`, `warning`, `html`, `remove(id)`, `clear`, and options `{ timeout, buttons: [{ text, action(toast), bold }], position, closeOnClick }`. |
-| `vee-validate` v3 | 43 files, 155 × `v-slot="{ errors, invalid, validated }"` | `vee-validate` v4 + two shim components in `src/components/validation/` exposing the v3 slot contract (`ValidationProvider` → `errors`/`invalid`/`validated`; `ValidationObserver` → `handleSubmit`/`valid`/`validate`/`reset`). Value is auto-detected from the slot's `v-model` vnode, exactly as v3 did. |
+| `vee-validate` v3 | 43 files, 155 × `v-slot="{ errors, invalid, validated }"` | `src/plugins/validation/` — `ValidationProvider` / `ValidationObserver` with the v3 slot contract (`errors`/`invalid`/`validated`; `handleSubmit`/`valid`/`validate`/`reset`) and the app's own rules. Value is auto-detected from the slot's `v-model` vnode, exactly as v3 did. vee-validate v4 was dropped entirely: its API shares nothing with v3 except the package name, so it added a dependency without removing any work. |
 | `vue-shortkey` | 17 files | `src/directives/shortkey.js` — a correct `v-shortkey` directive: array and object (`{ name: keys }`) forms, one shared keydown listener, the `@shortkey` handler read off the vnode so it also works on components, and the `input`/`textarea`/`contenteditable` guard. |
 | `vuefire` 1.x | 19 files | `src/plugins/vuefire.js` — the same `firebase()` component option on the Firebase v8 namespaced API, same `.key` / `.value` record shape, client-side only. |
 
@@ -139,11 +139,11 @@ bugs.
 | `filters: {}` block | 1 | plain method |
 | `:pagination.sync` / `:selected.sync` | 8 | `v-model:pagination` / `v-model:selected` |
 | `beforeDestroy` / `destroyed` | 10 | `beforeUnmount` / `unmounted` |
-| `::v-deep` | 39 | `:deep()` (and drop entirely in global CSS) |
+| `::v-deep` | 39 | `:deep()`, hoisting one nesting level; BEM `&__suffix` children inside a deep block need their own `:deep()` selector, and the one occurrence in global CSS is deleted (it never compiled to anything valid) |
 | `$listeners` | 5 | merged into `$attrs`; `inheritAttrs: false` where needed |
 | `$scopedSlots` | 3 | `$slots` |
 | `<q-table :data>` | 17 | `:rows` |
-| `process.browser` | 7 | `typeof window !== "undefined"` |
+| `process.browser` | 7 | `process.env.CLIENT` (Quasar defines it in both builds) |
 | `meta()` option | 10 | `createMetaMixin()` |
 | `is="transition-group"` | 1 | `<transition-group tag="tbody">` |
 | transition CSS `.x-enter`/`.x-leave` | — | `.x-enter-from`/`.x-leave-from` |
@@ -251,3 +251,70 @@ player view, profile, admin.
 - Composition API / `<script setup>` rewrites.
 - Firebase v8 → modular (explicitly forbidden by `CLAUDE.md`).
 - Any behavioural or styling change not required by the framework upgrade.
+
+---
+
+## 6. Outcome
+
+### 6.1 Decisions that changed during the work
+
+- **vuefire is not dead code.** It was removed in phase 0 on the strength of a grep for
+  `$bindAsObject` / `VueFire`, which missed the `firebase()` component option it installs.
+  Restored as `src/plugins/vuefire.js` (§2.2).
+- **vee-validate was dropped entirely.** v4 was going to back the shims, but it shares no
+  API with v3, so it was a dependency that removed no work. The rules the app actually
+  uses are ~40 lines in `src/plugins/validation/rules.js`.
+- **hk-* components are registered synchronously.** Vue 3 defers hydration of an async
+  component's subtree until its chunk loads — after mount — so any state that changes on
+  mount has already changed when the subtree finally hydrates. That produced
+  "Hydration completed but contains mismatches." as a console **error**, in production
+  builds too. See §6.3.
+- **browserslist is `["defaults and supports es6-module"]`.** `"maintained node versions"`
+  makes webpack 5 treat the client bundle as non-web, which drops the `browser` condition
+  from `exports` maps and breaks jspdf 3.
+
+### 6.2 Verification results
+
+| Gate | Result |
+|---|---|
+| `npx eslint --ext .js,.vue ./` | clean |
+| `npx quasar build` (SPA) | succeeds, no warnings |
+| `npx quasar build -m ssr` | succeeds; 5 workbox "too large to precache" warnings (4 hero images + the vendor chunk) |
+| `npx quasar dev -m ssr` | compiles clean; console clean apart from the content API at `localhost:7000` not running locally |
+| `npm ci --dry-run` | lockfile valid |
+| Production SSR, 24 public routes | HTTP 200, **zero console errors** |
+| Production SSR, compendium lists + detail pages | **zero console errors** |
+| Vue 2 grep gates | all clear (remaining hits are `v-slot=` and explanatory comments) |
+
+Initial payload cost of the synchronous hk-* registration: app + chunk-common go from
+379.8 KB to 395.2 KB gzipped (+15.4 KB). `vendor` is unchanged.
+
+### 6.3 Vue 3 behaviours that bit, and are worth knowing
+
+1. **Async components and hydration.** Anything registered with
+   `defineAsyncComponent` hydrates late. Inside such a subtree, a `loading` flag flipped
+   in `mounted` and Quasar's `isRuntimeSsrPreHydration` (which changes what `QImg`
+   renders) have both already moved on, and every node below mismatches.
+2. **Capitalised HTML tags.** Vue 2 rendered `<P>` as a paragraph; Vue 3 tries to resolve
+   it as a component and renders nothing.
+3. **Render functions take no argument.** 37 routes used
+   `component: { render(c) { return c("router-view") } }` as a passthrough. They share one
+   `RouterPassthrough` component now; left unconverted they 500 with `c is not a function`.
+4. **Duplicate component options are silent.** Adding a second `methods:` block to a
+   component discards the first without any error. `no-dupe-keys` is now on in ESLint,
+   which also turned up one pre-existing duplicate `computed:` in `trackCampaign/Meters.vue`.
+5. **Invalid table nesting breaks hydration**, where Vue 2 tolerated it — `<th>` must be
+   inside a `<tr>`.
+
+### 6.4 Not covered
+
+- **Auth-gated screens have not been browser-tested** — DM screen, run encounter,
+  character builder, track campaign, profile, admin and the user-content pages all need
+  real credentials. They render server-side without errors and redirect correctly when
+  signed out, but the interactive paths are unverified. This is where the previous
+  attempt's only post-deploy bug hid, so it is the one gate left open.
+- A compendium detail page for a slug the content API does not know 500s instead of
+  rendering a 404 (the `preFetch` rejection propagates). Pre-existing on `develop`.
+- `src/services/patreon.js` logs `process.env` and the Patreon client secret to the
+  browser console, and the module is reachable from the client bundle. Pre-existing on
+  `develop`; fixing it means moving Patreon auth behind the BFF.

@@ -248,10 +248,12 @@
 								have a score lower than 8.
 							</p>
 							<table class="table" aria-describedby="tableDesc">
-								<tr>
-									<th>Score</th>
-									<th>Cost</th>
-								</tr>
+								<thead>
+									<tr>
+										<th>Score</th>
+										<th>Cost</th>
+									</tr>
+								</thead>
 								<tbody>
 									<tr v-for="{ score, cost } in point_buy" :key="score">
 										<td>{{ score }}</td>

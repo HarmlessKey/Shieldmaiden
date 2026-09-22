@@ -44,6 +44,9 @@ export default {
 		},
 	},
 	methods: {
+		setRouteName(name) {
+			this.last_route = name;
+		},
 		compendiumEditionCrumbs() {
 			const [, base, section, edition, id] = this.$route.path.split("/");
 			if (base !== "compendium" || edition !== "5.5e") return null;
@@ -93,11 +96,6 @@ export default {
 	},
 	beforeUnmount() {
 		EventBus.off("route-name", this.setRouteName);
-	},
-	methods: {
-		setRouteName(name) {
-			this.last_route = name;
-		},
 	},
 	watch: {
 		$route() {

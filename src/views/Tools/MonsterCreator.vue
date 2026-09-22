@@ -139,11 +139,10 @@ const metaMixin = createMetaMixin(() => ({
 
 export default {
 	name: "ToolsMonsterCreator",
-	mixins: [metaMixin],
+	mixins: [dice, metaMixin],
 	components: {
 		ToolsPage,
 	},
-	mixins: [dice],
 	data() {
 		return {
 			action: {

@@ -57,71 +57,75 @@
 					class="monster-card__abilities"
 					:class="table === 0 ? 'left' : 'right'"
 				>
-					<tr>
-						<th colspan="2"></th>
-						<th>mod</th>
-						<th>save</th>
-					</tr>
-					<tr
-						v-for="(ability, index) in abilities.slice(table * 3, table * 3 + 3)"
-						:class="`ability ability__${ability}`"
-						:key="index"
-					>
-						<td class="ability__label">{{ ability2str(ability.toUpperCase()) }}</td>
-						<td class="ability__score">{{ monster[ability] }}</td>
-						<td class="mod">
-							<hk-roll
-								:roll="{
-									d: 20,
-									n: 1,
-									m: calcMod(monster[ability]),
-									title: `${ability.capitalize()} check`,
-									entity_name: monster.name.capitalizeEach(),
-									notify: true,
-								}"
-								:share="
-									shares.includes('ability_rolls')
-										? {
-												encounter_id: encounterId,
-												entity_key: monster.key,
-											}
-										: null
-								"
-							>
-								{{ mod2str(calcMod(monster[ability])) }}
-							</hk-roll>
-						</td>
-						<td class="save">
-							<hk-roll
-								:roll="{
-									d: 20,
-									n: 1,
-									m: monster.saving_throws?.includes(ability)
-										? calcMod(monster[ability]) + monster.proficiency
-										: calcMod(monster[ability]),
-									title: `${ability.capitalize()} save`,
-									entity_name: monster.name.capitalizeEach(),
-									notify: true,
-								}"
-								:share="
-									shares.includes('ability_rolls')
-										? {
-												encounter_id: encounterId,
-												entity_key: monster.key,
-											}
-										: null
-								"
-							>
-								{{
-									mod2str(
-										monster.saving_throws?.includes(ability)
+					<thead>
+						<tr>
+							<th colspan="2"></th>
+							<th>mod</th>
+							<th>save</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							v-for="(ability, index) in abilities.slice(table * 3, table * 3 + 3)"
+							:class="`ability ability__${ability}`"
+							:key="index"
+						>
+							<td class="ability__label">{{ ability2str(ability.toUpperCase()) }}</td>
+							<td class="ability__score">{{ monster[ability] }}</td>
+							<td class="mod">
+								<hk-roll
+									:roll="{
+										d: 20,
+										n: 1,
+										m: calcMod(monster[ability]),
+										title: `${ability.capitalize()} check`,
+										entity_name: monster.name.capitalizeEach(),
+										notify: true,
+									}"
+									:share="
+										shares.includes('ability_rolls')
+											? {
+													encounter_id: encounterId,
+													entity_key: monster.key,
+												}
+											: null
+									"
+								>
+									{{ mod2str(calcMod(monster[ability])) }}
+								</hk-roll>
+							</td>
+							<td class="save">
+								<hk-roll
+									:roll="{
+										d: 20,
+										n: 1,
+										m: monster.saving_throws?.includes(ability)
 											? calcMod(monster[ability]) + monster.proficiency
-											: calcMod(monster[ability])
-									)
-								}}
-							</hk-roll>
-						</td>
-					</tr>
+											: calcMod(monster[ability]),
+										title: `${ability.capitalize()} save`,
+										entity_name: monster.name.capitalizeEach(),
+										notify: true,
+									}"
+									:share="
+										shares.includes('ability_rolls')
+											? {
+													encounter_id: encounterId,
+													entity_key: monster.key,
+												}
+											: null
+									"
+								>
+									{{
+										mod2str(
+											monster.saving_throws?.includes(ability)
+												? calcMod(monster[ability]) + monster.proficiency
+												: calcMod(monster[ability])
+										)
+									}}
+								</hk-roll>
+							</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 

@@ -1,3 +1,15 @@
+import { h } from "vue";
+import { RouterView } from "vue-router";
+
+// Route component for path segments that only exist to nest children: it renders
+// nothing but the nested <router-view>. On Vue 2 this was an inline
+// `render(c) { return c("router-view") }` per route; Vue 3 render functions take
+// no createElement argument, so it is one shared component instead.
+const RouterPassthrough = {
+	name: "RouterPassthrough",
+	render: () => h(RouterView),
+};
+
 const CharacterSyncPrivacyPolicy = () => import("src/views/Pages/CharacterSyncPrivacyPolicy.vue");
 const Sitemap = () => import("src/views/Pages/Sitemap.vue");
 const Privacy = () => import("src/views/Pages/Privacy.vue");
@@ -65,11 +77,7 @@ const routes = [
 
 			{
 				path: "import",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Import content",
 				},
@@ -98,11 +106,7 @@ const routes = [
 			// Campaigns
 			{
 				path: "campaigns",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Campaigns",
 				},
@@ -122,11 +126,7 @@ const routes = [
 			// Players
 			{
 				path: "players",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Players",
 				},
@@ -164,11 +164,7 @@ const routes = [
 			// Character builder
 			{
 				path: "character-builder",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Character builder",
 				},
@@ -275,11 +271,7 @@ const routes = [
 			// NPCs
 			{
 				path: "npcs",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "NPCs",
 				},
@@ -315,11 +307,7 @@ const routes = [
 			},
 			{
 				path: "companions",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Companions",
 				},
@@ -357,11 +345,7 @@ const routes = [
 			// Spells
 			{
 				path: "spells",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Spells",
 				},
@@ -399,11 +383,7 @@ const routes = [
 			// Reminders
 			{
 				path: "reminders",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Reminders",
 				},
@@ -441,11 +421,7 @@ const routes = [
 			// Items
 			{
 				path: "items",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Items",
 				},
@@ -483,11 +459,7 @@ const routes = [
 			// Characters
 			{
 				path: "characters",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Characters",
 				},
@@ -516,11 +488,7 @@ const routes = [
 			// Followed users
 			{
 				path: "followed",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Followed users",
 				},
@@ -540,11 +508,7 @@ const routes = [
 			// Settings
 			{
 				path: "settings",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Settings",
 				},
@@ -625,11 +589,7 @@ const routes = [
 			},
 			{
 				path: "encounter-builder",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Encounter Builder",
 					title: "D&D Encounter Builder - Build and manage encounters for D&D 5e and 5.5e",
@@ -664,11 +624,7 @@ const routes = [
 			},
 			{
 				path: "dm-screen",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "DM Screen",
 					title: "D&D 5e and 5.5e DM Screen",
@@ -690,11 +646,7 @@ const routes = [
 			},
 			{
 				path: "monster-creator",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Monster Creator",
 					title: "D&D Monster Creator - Create custom monsters for D&D 5e and 5.5e",
@@ -725,11 +677,7 @@ const routes = [
 			},
 			{
 				path: "spell-creator",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Spell Creator",
 					title: "D&D Spell Creator - Create custom spells for D&D 5e and 5.5e",
@@ -812,11 +760,7 @@ const routes = [
 			},
 			{
 				path: "monsters",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Monsters",
 					title: "Monsters D&D 5e",
@@ -864,11 +808,7 @@ const routes = [
 			},
 			{
 				path: "spells",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Spells",
 					title: "Spells D&D 5e",
@@ -916,11 +856,7 @@ const routes = [
 			},
 			{
 				path: "conditions",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Conditions",
 					title: "Conditions D&D 5e",
@@ -971,11 +907,7 @@ const routes = [
 			},
 			{
 				path: "items",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Items",
 					title: "Items D&D 5e",
@@ -1023,11 +955,7 @@ const routes = [
 			},
 			{
 				path: "rules",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					crumb: "Rules",
 					title: "Rules D&D 5e",
@@ -1122,11 +1050,7 @@ const routes = [
 			},
 			{
 				path: "users",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Users",
 				},
@@ -1148,11 +1072,7 @@ const routes = [
 			},
 			{
 				path: "patrons",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Patrons",
 				},
@@ -1182,11 +1102,7 @@ const routes = [
 			},
 			{
 				path: "vouchers",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Vouchers",
 				},
@@ -1200,11 +1116,7 @@ const routes = [
 			},
 			{
 				path: "promotions",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Promotions",
 				},
@@ -1218,11 +1130,7 @@ const routes = [
 			},
 			{
 				path: "subscriptions",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Subscriptions",
 				},
@@ -1236,11 +1144,7 @@ const routes = [
 			},
 			{
 				path: "content-reports",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Content Reports",
 				},
@@ -1254,11 +1158,7 @@ const routes = [
 			},
 			{
 				path: "export_csv",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Analytics",
 				},
@@ -1272,11 +1172,7 @@ const routes = [
 			},
 			{
 				path: "export",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Export",
 				},
@@ -1290,11 +1186,7 @@ const routes = [
 			},
 			{
 				path: "xml",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Generate XML",
 				},
@@ -1308,11 +1200,7 @@ const routes = [
 			},
 			{
 				path: "prerender",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Generete prerender paths JSON",
 				},
@@ -1326,11 +1214,7 @@ const routes = [
 			},
 			{
 				path: "monster-update",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Update monsters",
 				},
@@ -1344,11 +1228,7 @@ const routes = [
 			},
 			{
 				path: "search-table",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Generate search table",
 				},
@@ -1362,11 +1242,7 @@ const routes = [
 			},
 			{
 				path: "update-db-keys",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Update db keys",
 				},
@@ -1380,11 +1256,7 @@ const routes = [
 			},
 			{
 				path: "restruct-db",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Restructure Database",
 				},
@@ -1458,11 +1330,7 @@ const routes = [
 			},
 			{
 				path: "spells",
-				component: {
-					render(c) {
-						return c("router-view");
-					},
-				},
+				component: RouterPassthrough,
 				meta: {
 					title: "Spells",
 				},
@@ -1474,11 +1342,7 @@ const routes = [
 					},
 					{
 						path: ":id",
-						component: {
-							render(c) {
-								return c("router-view");
-							},
-						},
+						component: RouterPassthrough,
 						meta: {
 							title: "Spell contribute",
 						},

@@ -296,15 +296,15 @@ export default {
 				{},
 				this.share ? { encounter_id: this.encounterId } : null
 			);
-			this.$set(this.entity, "initiative", Number(roll.total));
+			this.entity.initiative = Number(roll.total);
 		},
 		set({ result, id, resource }) {
-			this.$set(this.entity, "id", id);
-			this.$set(this.entity, "npc", resource === "custom" ? "custom" : "api");
-			this.$set(this.entity, "maxHp", parseInt(result.hit_points));
-			this.$set(this.entity, "ac", parseInt(result.armor_class));
-			this.$set(this.entity, "name", result.name);
-			this.$set(this.entity, "edition", result.edition || default_edition);
+			this.entity.id = id;
+			this.entity.npc = resource === "custom" ? "custom" : "api";
+			this.entity.maxHp = parseInt(result.hit_points);
+			this.entity.ac = parseInt(result.armor_class);
+			this.entity.name = result.name;
+			this.entity.edition = result.edition || default_edition;
 
 			this.dexterity = result.dexterity; // needed to roll initiative
 

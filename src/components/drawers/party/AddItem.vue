@@ -102,7 +102,7 @@ export default {
 				key: id,
 				custom: resource === "custom" ? true : null,
 			};
-			this.$set(this.item, "linked_item", item);
+			this.item.linked_item = item;
 			this.link_dialog = false;
 		},
 		async addItem() {

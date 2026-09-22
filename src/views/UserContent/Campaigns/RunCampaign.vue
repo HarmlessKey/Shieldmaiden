@@ -412,7 +412,7 @@ export default {
 		...mapActions("players", ["get_player", "get_players"]),
 		async setEdition(edition) {
 			await this.set_campaign_prop({ id: this.campaignId, property: "edition", value: edition });
-			this.$set(this.campaign, "edition", edition);
+			this.campaign.edition = edition;
 			this.set_compendium_edition(edition);
 			this.edition_dialog = false;
 		},

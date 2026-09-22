@@ -91,7 +91,7 @@
 				v-for="(xp, index) in xpAward"
 				class="xp"
 				:key="`xp-${index}`"
-				@click="$delete(xpAward, index)"
+				@click="xpAward.splice(index, 1)"
 			>
 				{{ xp > 0 ? `+${xp}` : xp }}<small>xp</small>
 			</div>

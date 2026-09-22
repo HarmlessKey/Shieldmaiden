@@ -41,7 +41,7 @@
 								:error-message="errors[0]"
 								@keyup="$forceUpdate()"
 								@update:model-value="
-									(value) => $set(level_tier, 'level', value != undefined ? parseInt(value) : value)
+									(value) => (level_tier.level = value != undefined ? parseInt(value) : value)
 								"
 							/>
 						</ValidationProvider>
@@ -69,7 +69,7 @@
 									@keyup="$forceUpdate()"
 									@update:model-value="
 										(value) =>
-											$set(level_tier, 'dice_count', value != undefined ? parseInt(value) : value)
+											(level_tier.dice_count = value != undefined ? parseInt(value) : value)
 									"
 								>
 									<template v-slot:append>
@@ -99,8 +99,7 @@
 									:error-message="errors[0]"
 									@keyup="$forceUpdate()"
 									@update:model-value="
-										(value) =>
-											$set(level_tier, 'fixed_val', value != undefined ? parseInt(value) : value)
+										(value) => (level_tier.fixed_val = value != undefined ? parseInt(value) : value)
 									"
 								/>
 							</ValidationProvider>
@@ -125,11 +124,7 @@
 								@keyup="$forceUpdate()"
 								@update:model-value="
 									(value) =>
-										$set(
-											level_tier,
-											'projectile_count',
-											value != undefined ? parseInt(value) : value
-										)
+										(level_tier.projectile_count = value != undefined ? parseInt(value) : value)
 								"
 							/>
 						</ValidationProvider>
@@ -213,7 +208,7 @@ export default {
 			this.$forceUpdate();
 		},
 		removeLevelTier(tier_index) {
-			this.$delete(this.scaling, tier_index);
+			this.scaling.splice(tier_index, 1);
 			this.$forceUpdate();
 		},
 		scalingDesc(tiers, scaling, level) {

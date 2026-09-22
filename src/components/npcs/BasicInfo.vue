@@ -163,7 +163,7 @@
 											clickable
 											v-ripple
 											v-close-popup
-											@click="$set(npc, 'challenge_rating', scope.opt)"
+											@click="npc.challenge_rating = scope.opt"
 										>
 											<q-item-section>{{
 												scope.opt == 0.125
@@ -611,7 +611,7 @@ export default {
 				for (const id of val || []) {
 					groups[id] = true;
 				}
-				this.$set(this.npc, "groups", Object.keys(groups).length ? groups : null);
+				this.npc.groups = Object.keys(groups).length ? groups : null;
 			},
 		},
 		groupOptions() {
@@ -680,12 +680,12 @@ export default {
 				this.edition_dialog = true;
 				return;
 			}
-			this.$set(this.npc, "edition", edition);
+			this.npc.edition = edition;
 		},
 		confirmEdition() {
-			this.$set(this.npc, "edition", this.pending_edition);
-			this.$delete(this.npc, "caster_spells");
-			this.$delete(this.npc, "innate_spells");
+			this.npc.edition = this.pending_edition;
+			delete this.npc.caster_spells;
+			delete this.npc.innate_spells;
 			this.cancelEdition();
 		},
 		cancelEdition() {
@@ -694,9 +694,9 @@ export default {
 		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		// Capitalizes every word in the name of the NPC
@@ -705,21 +705,21 @@ export default {
 		},
 		saveBlob(value) {
 			// Clear the image url
-			this.$delete(this.npc, "avatar");
-			this.$set(this.npc, "blob", value.blob);
+			delete this.npc.avatar;
+			this.npc.blob = value.blob;
 			this.preview_new_upload = value.dataUrl;
 			this.avatar_dialog = false;
 		},
 		saveUrl(value) {
-			this.$delete(this.npc, "storage_avatar");
-			this.$set(this.npc, "avatar", value);
+			delete this.npc.storage_avatar;
+			this.npc.avatar = value;
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},
 		clearAvatar() {
-			this.$delete(this.npc, "avatar");
-			this.$delete(this.npc, "storage_avatar");
-			this.$delete(this.npc, "blob");
+			delete this.npc.avatar;
+			delete this.npc.storage_avatar;
+			delete this.npc.blob;
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},

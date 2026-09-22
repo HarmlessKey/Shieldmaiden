@@ -123,7 +123,7 @@
 							class="mb-2"
 							@update:model-value="
 								(value) => {
-									if (value !== 'reaction') $delete(spell, 'cast_time_react_desc');
+									if (value !== 'reaction') delete spell.cast_time_react_desc;
 								}
 							"
 							:error="invalid && validated"
@@ -215,7 +215,7 @@
 							class="mb-2"
 							@update:model-value="
 								(value) => {
-									if (value !== 'ranged') $delete(spell, 'range');
+									if (value !== 'ranged') delete spell.range;
 								}
 							"
 							:error="invalid && validated"
@@ -291,8 +291,8 @@
 							@update:model-value="
 								(value) => {
 									if (!spell_duration_types_time.includes(value)) {
-										$delete(spell, 'duration');
-										$delete(spell, 'duration_scale');
+										delete spell.duration;
+										delete spell.duration_scale;
 									}
 								}
 							"
@@ -379,7 +379,7 @@
 							class="mb-2"
 							@update:model-value="
 								(value) => {
-									if (value === 'none') $delete(spell, 'aoe_size');
+									if (value === 'none') delete spell.aoe_size;
 								}
 							"
 							:error="invalid && validated"
@@ -561,9 +561,9 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		setRitual() {

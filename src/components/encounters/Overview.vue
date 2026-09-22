@@ -474,7 +474,10 @@ export default {
 					entityId: id,
 				});
 			} else {
-				this.$delete(this.encounter.entities, id);
+				// Demo encounters are local-only and edited in place through the prop.
+				// This mutation predates the migration; $delete hid it from the rule.
+				// eslint-disable-next-line vue/no-mutating-props
+				delete this.encounter.entities[id];
 			}
 		},
 		async setDifficulty() {

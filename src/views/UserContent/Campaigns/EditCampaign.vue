@@ -109,14 +109,14 @@
 						</div>
 
 						<div class="mt-3 neutral-2 pointer">
-							<span class="btn btn-clear" @click="$set(editCampaign, 'private', null)">
+							<span class="btn btn-clear" @click="editCampaign.private = null">
 								<span :class="!editCampaign.private ? 'green' : 'neutral-2'">
 									<i aria-hidden="true" class="fas fa-eye"></i>
 									Public
 								</span>
 							</span>
 							/
-							<span class="btn btn-clear mr-2" @click="$set(editCampaign, 'private', true)">
+							<span class="btn btn-clear mr-2" @click="editCampaign.private = true">
 								<span :class="editCampaign.private ? 'red' : 'neutral-2'">
 									<i aria-hidden="true" class="fas fa-eye-slash"></i>
 									Private

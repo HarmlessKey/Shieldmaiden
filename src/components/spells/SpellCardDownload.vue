@@ -178,7 +178,7 @@ export default {
 	},
 	methods: {
 		setDescription(index, value) {
-			this.$set(this.descriptions_by_index, index, value);
+			this.descriptions_by_index[index] = value;
 		},
 		async download() {
 			this.generating = true;

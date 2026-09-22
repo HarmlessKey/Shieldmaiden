@@ -151,7 +151,7 @@ export default {
 			this.damage.push({ amount: "", damage_type: "acid" });
 		},
 		removeInput(i) {
-			this.$delete(this.damage, i);
+			this.damage.splice(i, 1);
 			this.$forceUpdate();
 		},
 		sendRequest() {

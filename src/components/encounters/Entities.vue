@@ -853,12 +853,12 @@ export default {
 		},
 		clearFilter() {
 			this.filter_dialog = false;
-			this.$set(this, "filter", {});
+			this.filter = {};
 			this.filterMonsters();
 		},
 		clearNpcFilter() {
 			this.npc_filter_dialog = false;
-			this.$set(this, "npcFilter", {});
+			this.npcFilter = {};
 			this.campaignOnly = false;
 		},
 		request(req) {
@@ -1086,9 +1086,15 @@ export default {
 			}
 		},
 		add_demo_entity(entity) {
-			this.encounter.entities
-				? this.$set(this.encounter.entities, uuid(), entity)
-				: this.$set(this.encounter, "entities", { [uuid()]: entity });
+			// Demo encounters are local-only and edited in place through the prop.
+			// This mutation predates the migration; $set simply hid it from the rule.
+			/* eslint-disable vue/no-mutating-props */
+			if (this.encounter.entities) {
+				this.encounter.entities[uuid()] = entity;
+			} else {
+				this.encounter.entities = { [uuid()]: entity };
+			}
+			/* eslint-enable vue/no-mutating-props */
 		},
 		async toggleCustomNpc(props, id) {
 			props.expand = !props.expand;
@@ -1102,7 +1108,7 @@ export default {
 						});
 						return;
 					}
-					this.$set(this.npcExpandData, id, npc);
+					this.npcExpandData[id] = npc;
 				} catch (e) {
 					props.expand = false;
 					this.$snotify.error("Failed to load NPC statblock.", "Load error", {

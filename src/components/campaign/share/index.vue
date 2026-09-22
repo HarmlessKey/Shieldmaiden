@@ -48,7 +48,7 @@
 						@update:model-value="
 							(value) => {
 								if (!value) {
-									$delete(background, 'image');
+									delete background.image;
 								}
 							}
 						"
@@ -68,7 +68,7 @@
 						@update:model-value="
 							(value) => {
 								if (!value) {
-									$delete(background, 'video');
+									delete background.video;
 								}
 							}
 						"
@@ -88,7 +88,7 @@
 						@update:model-value="
 							(value) => {
 								if (!value) {
-									$delete(background, 'youtube');
+									delete background.youtube;
 								}
 							}
 						"
@@ -123,7 +123,7 @@
 						@update:model-value="
 							(value) => {
 								if (!value) {
-									$delete(share, 'image');
+									delete share.image;
 								}
 							}
 						"
@@ -143,7 +143,7 @@
 						@update:model-value="
 							(value) => {
 								if (!value) {
-									$delete(share, 'youtube');
+									delete share.youtube;
 								}
 							}
 						"
@@ -165,7 +165,7 @@
 						@update:model-value="
 							(value) => {
 								if (!value) {
-									$delete(share, 'message');
+									delete share.message;
 								}
 							}
 						"

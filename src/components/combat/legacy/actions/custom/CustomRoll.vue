@@ -218,7 +218,7 @@ export default {
 			});
 		},
 		removeRoll(index) {
-			if (index != 0) this.$delete(this.custom_rolls, index);
+			if (index != 0) this.custom_rolls.splice(index, 1);
 		},
 	},
 };

@@ -300,14 +300,14 @@ export default {
 	},
 	methods: {
 		setColor(color) {
-			this.$set(this.reminder, "color", color);
+			this.reminder.color = color;
 		},
 		addVariable() {
 			if (this.newVar) {
 				if (!this.reminder.variables) {
-					this.$set(this.reminder, "variables", {});
+					this.reminder.variables = {};
 				}
-				this.$set(this.reminder.variables, this.newVar, [""]);
+				this.reminder.variables[this.newVar] = [""];
 				this.newVar = undefined;
 			}
 			this.$forceUpdate();
@@ -317,22 +317,23 @@ export default {
 			this.$forceUpdate();
 		},
 		removeOption(key, i) {
-			this.$delete(this.reminder.variables[key], i);
+			// variables[key] is an array of options; Vue.delete spliced.
+			this.reminder.variables[key].splice(i, 1);
 			this.$forceUpdate();
 		},
 		removeVar(key) {
-			this.$delete(this.reminder.variables, key);
+			delete this.reminder.variables[key];
 
 			// if the reminder is in use, the selection must be deleted too
 			if (this.reminder.selectedVars) {
-				this.$delete(this.reminder.selectedVars, key);
+				delete this.reminder.selectedVars[key];
 			}
 
 			this.$forceUpdate();
 		},
 		setOption(key, i) {
 			if (!this.reminder.selectedVars) {
-				this.$set(this.reminder, "selectedVars", {});
+				this.reminder.selectedVars = {};
 			}
 			this.reminder.selectedVars[key] = i;
 			this.$forceUpdate();

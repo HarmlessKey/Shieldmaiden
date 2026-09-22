@@ -56,7 +56,8 @@ import { abilities } from "src/utils/generalConstants";
 
 export default {
 	name: "npc-AbilityScores",
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	mixins: [general],
 	data() {
 		return {
@@ -66,12 +67,12 @@ export default {
 	computed: {
 		npc: {
 			get() {
-				let value = this.value;
+				let value = this.modelValue;
 				if (!value.saving_throws) value.saving_throws = [];
 				return value;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},

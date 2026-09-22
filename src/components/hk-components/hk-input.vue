@@ -59,10 +59,7 @@ export default {
 			default: false,
 		},
 	},
-	// "input" stays declared so consumers that listen for it keep working, and so
-	// Vue keeps onInput out of $attrs (it would otherwise reach q-input and fire
-	// a second time with a DOM Event instead of the value).
-	emits: ["update:modelValue", "input"],
+	emits: ["update:modelValue"],
 	computed: {
 		// class and style stay on the wrapper, the way they did on Vue 2 where they
 		// were never part of $attrs.
@@ -83,7 +80,6 @@ export default {
 					newVal = this.integer ? parseInt(newVal) : Number(newVal);
 				}
 				this.$emit("update:modelValue", newVal);
-				this.$emit("input", newVal);
 			},
 		},
 	},

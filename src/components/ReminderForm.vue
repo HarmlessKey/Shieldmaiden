@@ -247,7 +247,7 @@
 export default {
 	name: "ReminderForm",
 	props: {
-		value: {
+		modelValue: {
 			type: Object,
 			required: true,
 		},
@@ -280,21 +280,22 @@ export default {
 			newVar: undefined,
 		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		reminder: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},
 	mounted() {
-		if (Object.keys(this.value).length === 0) {
+		if (Object.keys(this.modelValue).length === 0) {
 			//Set default values
-			this.$set(this.reminder, "color", "green-light");
-			this.$set(this.reminder, "action", "remove");
+			this.reminder.color = "green-light";
+			this.reminder.action = "remove";
 		}
 	},
 	methods: {

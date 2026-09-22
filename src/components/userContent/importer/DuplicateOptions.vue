@@ -44,15 +44,16 @@ export default {
 		DuplicateOptionItem,
 	},
 	props: {
-		value: Object,
+		modelValue: Object,
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		imported: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 		existing() {

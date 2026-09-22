@@ -221,7 +221,7 @@
 					<q-form @submit="handleSubmit(linkMethod('password'))">
 						<hk-card header="Set a password">
 							<div class="card-body pb-0">
-								<hk-input :value="user.email" readonly class="mb-4" />
+								<hk-input :model-value="user.email" readonly class="mb-4" />
 								<hk-input
 									v-model="password"
 									autocomplete="new-password"

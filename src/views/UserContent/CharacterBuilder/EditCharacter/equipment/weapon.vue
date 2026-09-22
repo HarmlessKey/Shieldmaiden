@@ -162,7 +162,7 @@ import { abilities, damage_types } from "src/utils/generalConstants";
 export default {
 	name: "Weapon",
 	props: {
-		value: {
+		modelValue: {
 			type: Object,
 			required: true,
 		},
@@ -171,6 +171,7 @@ export default {
 			default: false,
 		},
 	},
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			abilities: abilities,
@@ -179,7 +180,7 @@ export default {
 	},
 	computed: {
 		weapon() {
-			return this.value;
+			return this.modelValue;
 		},
 		title() {
 			const type = this.weapon.weapon_type.split("_");
@@ -195,7 +196,7 @@ export default {
 		weapon: {
 			deep: true,
 			handler(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},

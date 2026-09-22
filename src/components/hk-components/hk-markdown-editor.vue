@@ -56,7 +56,7 @@ marked.setOptions({
 export default {
 	name: "hk-markdown-editor",
 	props: {
-		value: {
+		modelValue: {
 			type: String,
 		},
 		label: {
@@ -78,17 +78,18 @@ export default {
 			preview: false,
 		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		input: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 		marked() {
-			return sanitizeHtml(marked.parse(this.value || ""));
+			return sanitizeHtml(marked.parse(this.modelValue || ""));
 		},
 	},
 	methods: {

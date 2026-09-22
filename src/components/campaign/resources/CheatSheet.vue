@@ -40,7 +40,7 @@
 				</template>
 
 				<div class="accordion-body">
-					<hk-markdown-editor :value="description" read-only />
+					<hk-markdown-editor :model-value="description" read-only />
 					<span class="neutral-2">{{ src }}</span>
 				</div>
 			</q-expansion-item>

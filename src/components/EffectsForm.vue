@@ -3,7 +3,10 @@
 		<div class="row q-col-gutter-md mb-3">
 			<div class="col-12 col-md-3">
 				<q-select
-					:dark="$store.getters.theme === 'dark'" filled square dense
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					dense
 					emit-value
 					map-options
 					label="Effect type"
@@ -13,7 +16,12 @@
 				>
 					<template v-slot:append v-if="effect.type">
 						<q-icon name="info" @click.stop>
-							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+							<q-menu
+								:dark="$store.getters.theme === 'dark'"
+								anchor="top middle"
+								self="bottom middle"
+								max-width="250px"
+							>
 								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-8">
 										<strong>{{ effect.type.capitalize() }}</strong>
@@ -27,14 +35,16 @@
 						</q-icon>
 					</template>
 				</q-select>
-				<p class="validate red" v-if="errors.has('type')">{{ errors.first('type') }}</p>
-				<p v-if="effect.type" class="mt-2 px-2 d-block">
-				</p>
+				<p class="validate red" v-if="errors.has('type')">{{ errors.first("type") }}</p>
+				<p v-if="effect.type" class="mt-2 px-2 d-block"></p>
 			</div>
 			<template v-if="effect.type">
 				<div class="col-12 col-md-3">
 					<q-select
-						:dark="$store.getters.theme === 'dark'" filled square dense
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						dense
 						emit-value
 						map-options
 						label="Effect subtype"
@@ -46,8 +56,11 @@
 
 				<!-- DURATION -->
 				<div class="col-12 col-md-3">
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
+					<q-input
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						dense
 						v-model="effect.duration"
 						label="Duration"
 						type="number"
@@ -58,13 +71,16 @@
 						title="Duration"
 						data-vv-as="Duration"
 					/>
-					<p class="validate red" v-if="errors.has('duration')">{{ errors.first('duration') }}</p>
+					<p class="validate red" v-if="errors.has('duration')">{{ errors.first("duration") }}</p>
 				</div>
 
 				<!-- DURATION SCALE -->
 				<div class="col-12 col-md-3">
 					<q-select
-						:dark="$store.getters.theme === 'dark'" filled square dense
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						dense
 						emit-value
 						map-options
 						label="Time scale"
@@ -79,8 +95,11 @@
 			<template v-if="hasField('values')">
 				<!-- DICE COUNT -->
 				<div class="col-12 col-md-3">
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
+					<q-input
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						dense
 						v-model="effect.dice_count"
 						label="Dice count"
 						autocomplete="off"
@@ -95,7 +114,10 @@
 				<div class="col-12 col-md-3">
 					<!-- EFFECT DICE TYPE -->
 					<q-select
-						:dark="$store.getters.theme === 'dark'" filled square dense
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						dense
 						emit-value
 						map-options
 						label="Dice type"
@@ -106,8 +128,11 @@
 				</div>
 				<div class="col-12 col-md-3">
 					<!-- EFFECT FIXED VALUE -->
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
+					<q-input
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						dense
 						label="Fixed value"
 						v-model="effect.fixed_val"
 						autocomplete="off"
@@ -120,7 +145,12 @@
 					>
 						<template v-slot:append>
 							<q-icon name="info" @click.stop>
-								<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+								<q-menu
+									:dark="$store.getters.theme === 'dark'"
+									anchor="top middle"
+									self="bottom middle"
+									max-width="250px"
+								>
 									<q-card :dark="$store.getters.theme === 'dark'">
 										<q-card-section class="bg-neutral-8">
 											<strong>Fixed value</strong>
@@ -135,14 +165,24 @@
 					</q-input>
 				</div>
 				<div class="col-12 col-md-3">
-					<q-checkbox size="lg" :dark="$store.getters.theme === 'dark'" v-model="effect.primary" label="Add primary stat" :false-value="null" indeterminate-value="something-else" />
+					<q-checkbox
+						size="lg"
+						:dark="$store.getters.theme === 'dark'"
+						v-model="effect.primary"
+						label="Add primary stat"
+						:false-value="null"
+						indeterminate-value="something-else"
+					/>
 				</div>
 			</template>
 			<!-- DAMAGE TYPES -->
 			<template v-if="hasField('damage_types')">
 				<div class="col-12 col-md-4">
 					<q-select
-						:dark="$store.getters.theme === 'dark'" filled square dense
+						:dark="$store.getters.theme === 'dark'"
+						filled
+						square
+						dense
 						label="Damage type"
 						name="damage_type"
 						v-model="effect.damage_type"
@@ -150,13 +190,18 @@
 						v-validate="'required'"
 						data-vv-as="effect Subtype"
 					/>
-					<p class="validate red" v-if="errors.has(`damage_type`)">{{ errors.first(`damage_type`) }}</p>
+					<p class="validate red" v-if="errors.has(`damage_type`)">
+						{{ errors.first(`damage_type`) }}
+					</p>
 				</div>
 			</template>
 			<!-- DESCRIPTION -->
 			<div class="col-12" v-if="hasField('description')">
 				<q-input
-					:dark="$store.getters.theme === 'dark'" filled square dense
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					dense
 					v-model="effect.description"
 					label="Description"
 					name="description"
@@ -166,12 +211,17 @@
 					maxlength="101"
 					@change="$forceUpdate()"
 				/>
-				<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
+				<p class="validate red" v-if="errors.has('description')">
+					{{ errors.first("description") }}
+				</p>
 			</div>
 			<!-- ABILITIES -->
 			<div class="col-12 col-md-4" v-if="hasField('abilities')">
 				<q-select
-					:dark="$store.getters.theme === 'dark'" filled square dense
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					dense
 					label="Ability"
 					name="ability"
 					v-model="effect.ability"
@@ -186,7 +236,10 @@
 			<!-- SKILLS -->
 			<div class="col-12 col-md-4" v-if="hasField('skills')">
 				<q-select
-					:dark="$store.getters.theme === 'dark'" filled square dense
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					dense
 					map-options
 					emit-value
 					option-label="skill"
@@ -205,7 +258,10 @@
 			<!-- ATTACK -->
 			<div class="col-12 col-md-4" v-if="hasField('attack')">
 				<q-select
-					:dark="$store.getters.theme === 'dark'" filled square dense
+					:dark="$store.getters.theme === 'dark'"
+					filled
+					square
+					dense
 					map-options
 					emit-value
 					label="Made by/against"
@@ -222,29 +278,36 @@
 
 			<!-- MINIMUM -->
 			<div class="col-12 col-md-3" v-if="hasField('minimum')">
-				<q-checkbox size="lg" :dark="$store.getters.theme === 'dark'" v-model="effect.minimum" label="Fixed value is minimum" :false-value="null" indeterminate-value="something-else" />
+				<q-checkbox
+					size="lg"
+					:dark="$store.getters.theme === 'dark'"
+					v-model="effect.minimum"
+					label="Fixed value is minimum"
+					:false-value="null"
+					indeterminate-value="something-else"
+				/>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { effects } from '../mixins/effects';
-import { abilities, damage_types, dice_types, skills } from 'src/utils/generalConstants';
+import { effects } from "../mixins/effects";
+import { abilities, damage_types, dice_types, skills } from "src/utils/generalConstants";
 
 export default {
 	name: "EffectsForm",
 	mixins: [effects],
 	props: {
-		value: Object,
+		modelValue: Object,
 		variables: {
 			type: Boolean,
-			default: true
+			default: true,
 		},
 		selectOptions: {
 			type: Boolean,
-			default: false
-		}
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -260,18 +323,19 @@ export default {
 			],
 			byAgainst: [
 				{ value: "by", label: "Attacks made by" },
-				{ value: "against", label: "Attacks made against" }
-			]
-		}
+				{ value: "against", label: "Attacks made against" },
+			],
+		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		effect: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit('input', newValue);
-			}
+				this.$emit("update:modelValue", newValue);
+			},
 		},
 		type() {
 			return this.effect.type;
@@ -281,30 +345,30 @@ export default {
 		effect: {
 			handler() {
 				//Emits validation on every change
-				this.$emit('validation', this.$validator);
+				this.$emit("validation", this.$validator);
 			},
-			deep: true
+			deep: true,
 		},
 		type(newValue, oldValue) {
 			//Clear effect on type change
-			if(newValue !== oldValue) {
+			if (newValue !== oldValue) {
 				this.effect = { type: newValue };
 			}
-		}
+		},
 	},
 	methods: {
 		setPrimary(effect) {
 			if (effect.primary == undefined) {
-				effect.primary = false
+				effect.primary = false;
 			}
-			effect.primary = !effect.primary
+			effect.primary = !effect.primary;
 			this.$forceUpdate(); //IMPORTANT
 		},
 		setMinimum(effect) {
 			if (effect.minimum == undefined) {
-				effect.minimum = false
+				effect.minimum = false;
 			}
-			effect.minimum = !effect.minimum
+			effect.minimum = !effect.minimum;
 			this.$forceUpdate(); //IMPORTANT
 		},
 		hasField(field_name) {
@@ -312,25 +376,30 @@ export default {
 			let subtype = this.effect.subtype;
 			let ret = false;
 			if (type) {
-				if (this.effect_types[type].form_fields && this.effect_types[type].form_fields[field_name]) {
+				if (
+					this.effect_types[type].form_fields &&
+					this.effect_types[type].form_fields[field_name]
+				) {
 					ret = this.effect_types[type].form_fields[field_name];
 				}
 				if (subtype) {
-					if (this.effect_subtypes[type][subtype].form_fields && this.effect_subtypes[type][subtype].form_fields[field_name]) {
+					if (
+						this.effect_subtypes[type][subtype].form_fields &&
+						this.effect_subtypes[type][subtype].form_fields[field_name]
+					) {
 						ret = this.effect_subtypes[type][subtype].form_fields[field_name];
 					}
 				}
 			}
 			return ret;
-		}
-
-	}
-}
+		},
+	},
+};
 </script>
 
 <style scoped lang="scss">
 .component_box {
-	background:$black;
+	background: $black;
 	width: 40px;
 	text-align: center;
 	line-height: 36px;

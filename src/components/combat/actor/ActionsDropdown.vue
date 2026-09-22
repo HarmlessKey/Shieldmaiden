@@ -72,7 +72,7 @@ export default {
 		TutorialPopover,
 	},
 	props: {
-		value: {
+		modelValue: {
 			type: Boolean,
 			default: false,
 		},
@@ -85,6 +85,7 @@ export default {
 			default: () => [],
 		},
 	},
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			open: false,
@@ -95,10 +96,10 @@ export default {
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		showActions: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},

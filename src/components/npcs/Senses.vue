@@ -73,14 +73,15 @@ import { monsterMixin } from "src/mixins/monster.js";
 export default {
 	name: "npc-Senses",
 	mixins: [monsterMixin],
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	computed: {
 		npc: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},

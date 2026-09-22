@@ -73,7 +73,7 @@
 				:value="spell.description"
 				@input="$emit('update:description', $event.target.value)"
 			/>
-			<hk-markdown-editor v-else :value="spell.description" read-only />
+			<hk-markdown-editor v-else :model-value="spell.description" read-only />
 		</div>
 		<template v-if="spell.higher_level">
 			<div class="spell-card__subheader">At Higher Levels</div>

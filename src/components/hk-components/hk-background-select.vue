@@ -41,7 +41,7 @@ import { backgrounds } from "../../utils/generalConstants";
 export default {
 	name: "hk-background-select",
 	props: {
-		value: {
+		modelValue: {
 			type: String,
 			default: undefined,
 		},
@@ -55,13 +55,14 @@ export default {
 			background_options: backgrounds,
 		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		background: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 				this.$forceUpdate();
 			},
 		},

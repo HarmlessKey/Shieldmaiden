@@ -126,7 +126,8 @@ import { calc_skill_mod } from "src/utils/generalFunctions";
 
 export default {
 	name: "npc-Skills",
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	mixins: [general, monsterMixin],
 	data() {
 		return {
@@ -138,12 +139,12 @@ export default {
 	computed: {
 		npc: {
 			get() {
-				let value = this.value;
+				let value = this.modelValue;
 				if (!value.skills_expertise) value.skills_expertise = [];
 				return value;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		skills: {

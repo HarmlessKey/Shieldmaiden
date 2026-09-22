@@ -171,7 +171,7 @@ export default {
 	name: "hk-filter",
 	mixins: [monsterMixin],
 	props: {
-		value: {
+		modelValue: {
 			type: Object,
 			required: true,
 		},
@@ -184,24 +184,25 @@ export default {
 			default: () => [],
 		},
 	},
+	emits: ["update:modelValue", "change"],
 	data() {
-		const existingCR = this.value?.challenge_ratings;
+		const existingCR = this.modelValue?.challenge_ratings;
 		return {
 			spell_schools: spell_schools,
 			cr: existingCR
 				? { min: crToPosition(existingCR.min), max: crToPosition(existingCR.max) }
 				: { min: 0, max: 33 },
-			levels: this.value?.levels || { min: 0, max: 9 },
+			levels: this.modelValue?.levels || { min: 0, max: 9 },
 		};
 	},
 	computed: {
 		filter: {
 			get() {
-				const filter = this.value;
+				const filter = this.modelValue;
 				return filter;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 				this.$emit("change");
 			},
 		},

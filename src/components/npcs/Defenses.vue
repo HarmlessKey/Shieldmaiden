@@ -115,7 +115,8 @@ import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 
 export default {
 	name: "Defenses",
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			damage_types: damage_types,
@@ -126,10 +127,10 @@ export default {
 		...mapGetters("api_conditions", ["conditions_by_edition"]),
 		entity: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		condition_list() {

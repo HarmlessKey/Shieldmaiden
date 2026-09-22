@@ -10,7 +10,7 @@
 			<q-slide-transition>
 				<hk-markdown-editor
 					v-if="show_description"
-					:value="description || spell.description"
+					:model-value="description || spell.description"
 					read-only
 				/>
 			</q-slide-transition>
@@ -304,7 +304,7 @@ import { ValidationProvider } from "vee-validate";
 export default {
 	name: "HkActionRollForm",
 	props: {
-		value: Object,
+		modelValue: Object,
 		action_type: String,
 		versatile_options: {
 			type: Object,
@@ -342,13 +342,14 @@ export default {
 			],
 		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		roll: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		specials() {

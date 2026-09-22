@@ -273,7 +273,8 @@ import CopyContent from "src/components/CopyContent";
 
 export default {
 	name: "npc-SpellCasting",
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	components: {
 		CopyContent,
 	},
@@ -289,10 +290,10 @@ export default {
 	computed: {
 		npc: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		initialSpellEdition() {

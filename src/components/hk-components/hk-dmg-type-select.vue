@@ -56,7 +56,7 @@ import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 export default {
 	name: "hk-dmg-type-select",
 	props: {
-		value: {
+		modelValue: {
 			type: String,
 			default: undefined,
 		},
@@ -88,13 +88,14 @@ export default {
 			default: false,
 		},
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		damage_type: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 		damage_types() {

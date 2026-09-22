@@ -269,8 +269,9 @@ import { attack_types } from "src/utils/actionConstants";
 export default {
 	name: "spells-Actions",
 	props: {
-		value: Object,
+		modelValue: Object,
 	},
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			editing: false,
@@ -287,10 +288,10 @@ export default {
 	computed: {
 		spell: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},

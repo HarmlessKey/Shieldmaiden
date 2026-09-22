@@ -1,5 +1,9 @@
 <template>
-	<hk-dialog :value="value" :header="header" @input="$emit('input', $event)">
+	<hk-dialog
+		:model-value="modelValue"
+		:header="header"
+		@update:model-value="$emit('update:modelValue', $event)"
+	>
 		<hk-loader
 			v-if="generating"
 			no-background
@@ -106,7 +110,7 @@ export default {
 	},
 	props: {
 		// v-model: dialog open state
-		value: {
+		modelValue: {
 			type: Boolean,
 			default: false,
 		},
@@ -117,6 +121,7 @@ export default {
 			default: () => [],
 		},
 	},
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			generating: false,
@@ -218,7 +223,7 @@ export default {
 			}
 
 			this.generating = false;
-			this.$emit("input", false);
+			this.$emit("update:modelValue", false);
 		},
 	},
 };

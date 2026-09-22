@@ -48,7 +48,7 @@ export default {
 			type: [Object, String],
 		},
 	},
-	emits: ["update:modelValue", "input"],
+	emits: ["update:modelValue"],
 	computed: {
 		// class and style stay on the wrapper, as they did on Vue 2 where they were
 		// never part of $attrs.
@@ -66,7 +66,6 @@ export default {
 			},
 			set(newVal) {
 				this.$emit("update:modelValue", newVal);
-				this.$emit("input", newVal);
 			},
 		},
 	},

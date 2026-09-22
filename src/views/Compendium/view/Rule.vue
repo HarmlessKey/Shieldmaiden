@@ -23,7 +23,7 @@
 			</div>
 			<template v-else>
 				<div class="caption">{{ rule.caption }}</div>
-				<hk-markdown-editor :value="rule.description" read-only />
+				<hk-markdown-editor :model-value="rule.description" read-only />
 				<span class="neutral-2">{{ rule.src }}</span>
 			</template>
 		</div>

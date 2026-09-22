@@ -526,8 +526,9 @@ import { aoe_types } from "src/utils/actionConstants";
 export default {
 	name: "spells-BasicInfo",
 	props: {
-		value: Object,
+		modelValue: Object,
 	},
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			spell_levels: spell_constants.spell_levels,
@@ -576,10 +577,10 @@ export default {
 	computed: {
 		spell: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 				return newValue;
 			},
 		},

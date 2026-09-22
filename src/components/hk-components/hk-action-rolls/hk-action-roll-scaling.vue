@@ -156,7 +156,7 @@ import { dice_types } from "src/utils/generalConstants";
 export default {
 	name: "HkActionRollScaling",
 	props: {
-		value: {
+		modelValue: {
 			type: Array,
 			default: undefined,
 		},
@@ -180,13 +180,14 @@ export default {
 			dice_type: dice_types,
 		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		scaling: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		shown_level_tiers() {

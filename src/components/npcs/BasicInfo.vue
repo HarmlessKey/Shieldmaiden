@@ -68,7 +68,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col-3">
-						<hk-edition-select :value="npc.edition" @update:model-value="setEdition" />
+						<hk-edition-select :model-value="npc.edition" @update:model-value="setEdition" />
 					</div>
 				</div>
 
@@ -579,7 +579,8 @@ import { monsterMixin } from "src/mixins/monster.js";
 
 export default {
 	name: "npc-BasicInfo",
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	mixins: [general, monsterMixin],
 	data() {
 		return {
@@ -595,10 +596,10 @@ export default {
 		...mapGetters("campaigns", { all_campaigns: "campaigns" }),
 		npc: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		selectedGroups: {

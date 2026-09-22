@@ -91,7 +91,6 @@
 							min="0"
 							max="99"
 							v-model="initiative"
-							v-validate="'required'"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>

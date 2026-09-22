@@ -10,7 +10,6 @@
 				name="doneBy"
 				:model-value="player"
 				:options="characters"
-				v-validate="'required'"
 			>
 				<template v-slot:selected>
 					<q-item v-if="player" class="selected">

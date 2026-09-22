@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { browserDetect, extensionInstalled } from "src/utils/generalFunctions";
 import { default_edition } from "src/utils/generalConstants";
 
@@ -173,7 +172,7 @@ export default {
 				return 0.5 - Math.random();
 			});
 			key = key.join("");
-			Vue.set(newRoll, "key", key);
+			newRoll.key = key;
 
 			current.unshift(newRoll);
 			commit("SET_ACTION_ROLLS", current);
@@ -240,40 +239,41 @@ export default {
 
 	mutations: {
 		SET_INITIALIZED(state, payload) {
-			Vue.set(state, "initialized", payload);
+			state.initialized = payload;
 		},
 		SET_THEME(state, payload) {
-			Vue.set(state, "theme", payload);
+			state.theme = payload;
 		},
 		SET_SLIDE(state, payload) {
-			Vue.set(state, "drawer", payload);
+			state.drawer = payload;
 		},
 		SET_ROLLS(state, payload) {
-			Vue.set(state, "rolls", payload);
+			state.rolls = payload;
 		},
 		SET_ACTION_ROLLS(state, payload) {
-			Vue.set(state, "action_rolls", payload);
+			state.action_rolls = payload;
 		},
 		CLEAR_ACTION_ROLLS(state) {
-			Vue.set(state, "action_rolls", []);
+			state.action_rolls = [];
 		},
 		REMOVE_ACTION_ROLL(state, payload) {
-			Vue.delete(state.action_rolls, payload);
+			// action_rolls is an array and payload is an index: Vue.delete spliced.
+			state.action_rolls.splice(payload, 1);
 		},
 		TOGGLE_SIDE_COLLAPSE(state) {
-			Vue.set(state, "side_collapsed", !state.side_collapsed);
+			state.side_collapsed = !state.side_collapsed;
 		},
 		SET_SIDE_COLLAPSE(state, payload) {
-			Vue.set(state, "side_collapsed", payload);
+			state.side_collapsed = payload;
 		},
 		SET_SIDE_SMALL_SCREEN(state, payload) {
-			Vue.set(state, "side_small_screen", payload);
+			state.side_small_screen = payload;
 		},
 		SET_EXTENSION_INSTALLED(state, version) {
-			Vue.set(state, "extensionInstalled", version ?? false);
+			state.extensionInstalled = version ?? false;
 		},
 		SET_MUSIC(state, payload) {
-			Vue.set(state, "music", payload);
+			state.music = payload;
 		},
 		SET_AMBIENCE(state, payload) {
 			let ambience = state.ambience;
@@ -282,10 +282,10 @@ export default {
 			} else {
 				ambience.push(payload);
 			}
-			Vue.set(state, "ambience", ambience);
+			state.ambience = ambience;
 		},
 		SET_COMPENDIUM_EDITION(state, payload) {
-			Vue.set(state, "compendium_edition", payload);
+			state.compendium_edition = payload;
 		},
 	},
 };

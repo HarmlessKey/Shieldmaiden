@@ -85,12 +85,30 @@ module.exports = configure(function (ctx) {
 			// Add dependencies for transpiling with Babel (Array of string/regex)
 			// (from node_modules, which are by default not transpiled).
 			// Applies only if "transpile" is set to true.
-			transpileDependencies: ["htmlparser2", "fast-png", "iobuffer", "@gtm-support/core", "@octokit"],
+			transpileDependencies: [
+				"htmlparser2",
+				"fast-png",
+				"iobuffer",
+				"@gtm-support/core",
+				"@octokit",
+			],
 
 			// https://v2.quasar.dev/quasar-cli-webpack/handling-webpack
 			// "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
 			chainWebpack(chain) {
 				chain.plugin("eslint-webpack-plugin").use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
+
+				// Silence mini-css-extract-plugin "Conflicting order" warnings. Every
+				// module it flags is a Vue scoped style (a data-v-xxxxxxx attribute
+				// selector), so cross-component ordering cannot actually conflict.
+				["extract-css", "mini-css-extract"].forEach((name) => {
+					if (chain.plugins.has(name)) {
+						chain.plugin(name).tap((args) => {
+							args[0] = { ...(args[0] || {}), ignoreOrder: true };
+							return args;
+						});
+					}
+				});
 			},
 		},
 
@@ -125,9 +143,11 @@ module.exports = configure(function (ctx) {
 			pwa: ctx.prod,
 			prodPort: 3000,
 			maxAge: 1000 * 60 * 60 * 24 * 30,
-			middlewares: [ctx.prod ? "compression" : "", "api", "render" /* keep this as last one */].filter(
-				Boolean
-			),
+			middlewares: [
+				ctx.prod ? "compression" : "",
+				"api",
+				"render" /* keep this as last one */,
+			].filter(Boolean),
 		},
 
 		// https://v2.quasar.dev/quasar-cli-webpack/developing-pwa/configuring-pwa

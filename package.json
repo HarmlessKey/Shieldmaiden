@@ -20,7 +20,6 @@
 		"@gtm-support/vue-gtm": "^3.2.0",
 		"@octokit/rest": "^19.0.5",
 		"@quasar/extras": "^1.16.12",
-		"@vee-validate/rules": "^4.15.1",
 		"ajv": "^8.13.0",
 		"ajv-formats": "^2.1.1",
 		"animate.css": "^4.1.1",
@@ -45,7 +44,6 @@
 		"quasar": "^2.16.0",
 		"sanitize-html": "^2.13.0",
 		"splitpanes": "^3.2.0",
-		"vee-validate": "^4.15.1",
 		"vue": "^3.5.43",
 		"vue-advanced-cropper": "^2.8.9",
 		"vue-router": "^4.5.0",
@@ -93,8 +91,7 @@
 		"serve-static": "^2.0.0"
 	},
 	"browserslist": [
-		"defaults and supports es6-module",
-		"maintained node versions"
+		"defaults and supports es6-module"
 	],
 	"engines": {
 		"node": ">= 24.0.0",

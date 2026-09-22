@@ -170,7 +170,7 @@ export default {
 						}
 
 						this.$snotify.html(
-							`<div class="snotifyToast__body roll">
+							`<div class="hk-roll-toast">
 									<div class="roll_title truncate">${
 										notification.entity_name ? `${notification.entity_name}: ` : ``
 									}${notification.title}</div>

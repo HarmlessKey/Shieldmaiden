@@ -299,7 +299,7 @@
 <script>
 import { damage_types, dice_types } from "src/utils/generalConstants";
 import { spellScalingDescription } from "src/utils/spellFunctions";
-import { ValidationProvider } from "vee-validate";
+import { ValidationProvider } from "src/plugins/validation";
 
 export default {
 	name: "HkActionRollForm",

@@ -941,11 +941,9 @@ export default {
 			font-size: 15px;
 		}
 
-		&::v-deep {
-			.basic-entity__wrapper {
-				margin-bottom: 15px;
-				background-color: $neutral-8;
-			}
+		:deep(.basic-entity__wrapper) {
+			margin-bottom: 15px;
+			background-color: $neutral-8;
 		}
 
 		.save {

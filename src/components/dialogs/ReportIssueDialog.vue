@@ -106,10 +106,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
-	.hk-card {
-		border-radius: $border-radius !important;
-		margin-top: 75px;
-	}
+:deep(.hk-card) {
+	border-radius: $border-radius !important;
+	margin-top: 75px;
 }
 </style>

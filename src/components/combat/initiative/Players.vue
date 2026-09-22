@@ -96,11 +96,9 @@ export default {
 .player-initiative {
 	min-width: 60px;
 
-	::v-deep {
-		.q-field__control input {
-			padding: 0;
-			text-align: center;
-		}
+	:deep(.q-field__control input) {
+		padding: 0;
+		text-align: center;
 	}
 }
 </style>

@@ -386,12 +386,10 @@ export default {
 				outline: none;
 			}
 		}
-		::v-deep {
-			.disabled,
-			.disabled *,
-			[disabled] {
-				cursor: default !important;
-			}
+		:deep(.disabled),
+		:deep(.disabled *),
+		:deep([disabled]) {
+			cursor: default !important;
 		}
 		.knob {
 			width: 120px;

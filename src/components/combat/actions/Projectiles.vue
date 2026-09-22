@@ -121,10 +121,8 @@ export default {
 	justify-content: space-between;
 	margin-bottom: 2px;
 
-	&::v-deep {
-		.basic-entity__wrapper {
-			flex-grow: 1;
-		}
+	:deep(.basic-entity__wrapper) {
+		flex-grow: 1;
 	}
 }
 </style>

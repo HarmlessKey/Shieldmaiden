@@ -995,7 +995,7 @@ export default {
 .q-expansion-item {
 	background-color: $neutral-9;
 }
-.no-table-margin::v-deep table {
+.no-table-margin :deep(table) {
 	margin-bottom: 0;
 }
 

@@ -259,30 +259,24 @@ export default {
 			}
 		}
 	}
-	&::v-deep {
-		.q-tab {
-			width: 100%;
-		}
+	:deep(.q-tab) {
+		width: 100%;
 	}
 }
 
 .modes {
-	&::v-deep {
-		.q-tabs {
-			&__content {
-				padding: 10px;
-				margin: -10px;
-				gap: 0.5rem;
+	:deep(.q-tabs__content) {
+		padding: 10px;
+		margin: -10px;
+		gap: 0.5rem;
 
-				.q-tab {
-					border: solid 1px transparent;
-					border-radius: $border-radius;
-					width: 100%;
+		.q-tab {
+			border: solid 1px transparent;
+			border-radius: $border-radius;
+			width: 100%;
 
-					&:focus {
-						outline: $outline;
-					}
-				}
+			&:focus {
+				outline: $outline;
 			}
 		}
 	}
@@ -293,10 +287,8 @@ export default {
 }
 .overflow-visible {
 	overflow: visible;
-	&::v-deep {
-		.q-panel {
-			overflow: visible;
-		}
+	:deep(.q-panel) {
+		overflow: visible;
 	}
 }
 

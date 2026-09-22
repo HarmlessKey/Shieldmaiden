@@ -216,16 +216,14 @@ h3 {
 				> div {
 					padding-right: 6px;
 				}
-				&::v-deep {
-					.top-menu {
-						border-bottom: solid 2px $white;
-						padding-bottom: 2px;
-						margin-bottom: 23px;
+				:deep(.top-menu) {
+					border-bottom: solid 2px $white;
+					padding-bottom: 2px;
+					margin-bottom: 23px;
 
-						.money {
-							text-shadow: 0 0 3px $black;
-							color: $white;
-						}
+					.money {
+						text-shadow: 0 0 3px $black;
+						color: $white;
 					}
 				}
 			}

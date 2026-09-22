@@ -190,15 +190,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
-	.q-checkbox {
-		min-width: 0;
-		margin-right: 5px;
-
-		&__label {
-			min-width: 0;
-		}
-	}
+:deep(.q-checkbox) {
+	min-width: 0;
+	margin-right: 5px;
+}
+:deep(.q-checkbox__label) {
+	min-width: 0;
 }
 .initiative-input {
 	min-width: 90px;

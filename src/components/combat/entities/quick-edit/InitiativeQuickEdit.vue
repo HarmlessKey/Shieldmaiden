@@ -51,9 +51,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
-	.q-input {
-		max-width: 180px;
-	}
+:deep(.q-input) {
+	max-width: 180px;
 }
 </style>

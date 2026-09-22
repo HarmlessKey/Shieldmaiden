@@ -98,13 +98,11 @@ ul {
 		margin-bottom: 2px;
 		height: 32px;
 
-		::v-deep {
-			.basic-entity__wrapper {
-				position: relative;
-				z-index: 10;
-				font-size: 13px;
-				padding-right: 8px;
-			}
+		:deep(.basic-entity__wrapper) {
+			position: relative;
+			z-index: 10;
+			font-size: 13px;
+			padding-right: 8px;
 		}
 		.value {
 			font-weight: bold;

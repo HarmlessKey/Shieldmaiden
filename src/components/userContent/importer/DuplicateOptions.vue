@@ -79,7 +79,7 @@ export default {
 
 <style lang="scss" scoped>
 .q-btn-toggle {
-	&::v-deep .q-icon {
+	:deep(.q-icon) {
 		font-size: 18px;
 	}
 }

@@ -314,10 +314,8 @@ export default {
 	.q-scrollarea {
 		height: calc(100% - 45px);
 
-		&::v-deep {
-			.q-scrollarea__content {
-				position: unset;
-			}
+		:deep(.q-scrollarea__content) {
+			position: unset;
 		}
 	}
 
@@ -354,25 +352,23 @@ export default {
 			outline-offset: 1px;
 		}
 	}
-	::v-deep {
-		ul.entities {
-			margin-top: 0;
+	:deep(ul.entities) {
+		margin-top: 0;
 
-			li {
-				padding: 8px 8px 8px 0;
-				background: $neutral-5;
-				border-radius: $border-radius-small;
-				margin-bottom: 5px;
+		li {
+			padding: 8px 8px 8px 0;
+			background: $neutral-5;
+			border-radius: $border-radius-small;
+			margin-bottom: 5px;
 
-				.actions {
-					align-items: center;
-					padding: 0;
-					gap: 3px;
-				}
+			.actions {
+				align-items: center;
+				padding: 0;
+				gap: 3px;
+			}
 
-				&:hover {
-					background-color: $neutral-5;
-				}
+			&:hover {
+				background-color: $neutral-5;
 			}
 		}
 	}

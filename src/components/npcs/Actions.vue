@@ -62,26 +62,28 @@
 						</ValidationProvider>
 
 						<!-- ABILITIES -->
+						<!-- vuedraggable 4 renders the list through the #item slot; the wrapping
+						     transition-group is expressed with tag + component-data. -->
 						<draggable
-							tag="div"
+							tag="transition-group"
 							v-model="npc[category]"
+							:item-key="abilityKey"
+							:component-data="{
+								tag: 'div',
+								class: 'accordion',
+								type: 'transition',
+								name: 'action-list',
+								enterActiveClass: 'animated animate__fadeIn',
+								leaveActiveClass: 'animated animate__fadeOut',
+							}"
 							:animation="200"
-							class="accordion"
 							handle=".drag-handle"
 							ghost-class="drag-ghost"
 							drag-class="drag-dragging"
 							:force-fallback="true"
 						>
-							<transition-group
-								type="transition"
-								name="action-list"
-								enter-active-class="animated animate__fadeIn"
-								leave-active-class="animated animate__fadeOut"
-							>
-								<div
-									v-for="(ability, ability_index) in npc[category]"
-									:key="`ability-${ability_index}`"
-								>
+							<template #item="{ element: ability, index: ability_index }">
+								<div>
 									<ValidationObserver v-slot="{ valid }">
 										<q-expansion-item
 											:dark="$store.getters.theme === 'dark'"
@@ -577,7 +579,7 @@
 										</q-expansion-item>
 									</ValidationObserver>
 								</div>
-							</transition-group>
+							</template>
 						</draggable>
 					</div>
 				</template>
@@ -658,6 +660,9 @@ export default {
 				{ label: "Square Feet", value: "square feet" },
 			],
 			limit_types: ["day", "turn"],
+			// Non-reactive on purpose: only used to hand vuedraggable a stable item key.
+			ability_keys: new WeakMap(),
+			next_ability_key: 0,
 		};
 	},
 	computed: {
@@ -694,6 +699,17 @@ export default {
 	},
 	methods: {
 		...mapActions(["setActionRoll"]),
+		/**
+		 * vuedraggable 4 needs a stable key per item. Abilities have no id of their
+		 * own and their name can be empty or duplicated while editing, so identity
+		 * is tracked per object instead — which survives a reorder, unlike an index.
+		 */
+		abilityKey(ability) {
+			if (!this.ability_keys.has(ability)) {
+				this.ability_keys.set(ability, `ability-${this.next_ability_key++}`);
+			}
+			return this.ability_keys.get(ability);
+		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
 				delete object[property];

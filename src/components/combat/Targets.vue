@@ -40,9 +40,21 @@
 					<hk-icon v-if="group === 'down'" icon="fas fa-skull-crossbones" class="red mr-1" />
 					{{ group.capitalize() }} ({{ targets.length }})
 				</h2>
+				<!-- vuedraggable 4 renders the list itself through the #item slot and wraps
+				     it in the tag given by `tag` + component-data. model-value (rather than
+				     list) is deliberate: the array is never spliced, Sortable only moves the
+				     DOM node and @end applies the real reorder through initiative. -->
 				<draggable
-					tag="div"
-					:value="targets"
+					tag="transition-group"
+					:model-value="targets"
+					item-key="key"
+					:component-data="{
+						tag: 'ul',
+						class: ['targets', `${group}_targets`],
+						name: 'group',
+						enterActiveClass: 'animated animate__fadeInUp',
+						leaveActiveClass: 'animated animate__fadeOutDown',
+					}"
 					:animation="200"
 					handle=".drag-handle"
 					ghost-class="drag-ghost"
@@ -50,19 +62,9 @@
 					:force-fallback="true"
 					@end="onDrag"
 				>
-					<transition-group
-						:key="group"
-						tag="ul"
-						class="targets"
-						:class="`${group}_targets`"
-						name="group"
-						enter-active-class="animated animate__fadeInUp"
-						leave-active-class="animated animate__fadeOutDown"
-					>
+					<template #item="{ element: entity, index: i }">
 						<li
-							v-for="(entity, i) in targets"
 							class="d-flex justify-content-between target-li"
-							:key="entity.key"
 							:class="{
 								targeted: targeted.includes(entity.key),
 								top: _active[0].key === entity.key && encounter.turn !== 0,
@@ -138,7 +140,7 @@
 								:offset="[10, 0]"
 							/>
 						</li>
-					</transition-group>
+					</template>
 				</draggable>
 			</template>
 		</div>

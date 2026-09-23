@@ -43,6 +43,7 @@
 		"qrcode.vue": "^3.11.0",
 		"quasar": "^2.16.0",
 		"sanitize-html": "^2.13.0",
+		"source-map": "^0.6.1",
 		"splitpanes": "^3.2.0",
 		"vue": "^3.5.43",
 		"vue-advanced-cropper": "^2.8.9",

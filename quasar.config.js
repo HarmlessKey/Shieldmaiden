@@ -18,8 +18,14 @@ function loadEnv(path) {
 
 const env = loadEnv(`.env.${process.env.NODE_ENV}.local`) || loadEnv(".env.dist") || {};
 
-// Every process.env.X referenced from src/ must exist in build.env, otherwise webpack
-// leaves a bare `process.env.X` in the browser bundle, which throws on first access.
+// Every process.env.X referenced from *browser* code must exist in build.env, otherwise
+// webpack leaves a bare `process.env.X` in the client bundle, which throws on first
+// access — webpack 5 no longer shims `process`.
+//
+// Only keys read in browser code belong here. Anything read solely from src-ssr/ (the
+// MONSTER_GENERATOR_* pair) must be left out: defining it here inlines a build-time
+// value into the server bundle and shadows whatever the container's environment
+// supplies at runtime, which is where those keys actually come from.
 for (const key of [
 	"VUE_APP_ENV_NAME",
 	"VUE_APP_HK_API_ROOT",
@@ -31,11 +37,9 @@ for (const key of [
 	"VUE_APP_FIREBASE_MESSAGING_SENDER_ID",
 	"VUE_APP_PATREON_CLIENT_ID",
 	"VUE_APP_PATREON_CLIENT_SECRET",
-	"MONSTER_GENERATOR_API_KEY",
 ]) {
 	env[key] = env[key] ?? "";
 }
-env.MONSTER_GENERATOR_API_URL = env.MONSTER_GENERATOR_API_URL ?? env.MONSTER_GENERATOR_URL ?? "";
 
 module.exports = configure(function (ctx) {
 	return {

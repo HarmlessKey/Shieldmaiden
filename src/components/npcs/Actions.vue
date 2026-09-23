@@ -62,19 +62,17 @@
 						</ValidationProvider>
 
 						<!-- ABILITIES -->
-						<!-- vuedraggable 4 renders the list through the #item slot; the wrapping
-						     transition-group is expressed with tag + component-data. -->
+						<!-- vuedraggable 4 renders the list through the #item slot. `tag` is a
+						     plain `div` and not `transition-group`, which is what carried the
+						     enter/leave animation on Vue 2: TransitionGroup clones every keyed
+						     child, so the vnodes vuedraggable holds never get an `el` and its
+						     mounted hook throws on the null el. -->
 						<draggable
-							tag="transition-group"
+							tag="div"
 							v-model="npc[category]"
 							:item-key="abilityKey"
 							:component-data="{
-								tag: 'div',
 								class: 'accordion',
-								type: 'transition',
-								name: 'action-list',
-								enterActiveClass: 'animated animate__fadeIn',
-								leaveActiveClass: 'animated animate__fadeOut',
 							}"
 							:animation="200"
 							handle=".drag-handle"

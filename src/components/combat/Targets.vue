@@ -43,17 +43,19 @@
 				<!-- vuedraggable 4 renders the list itself through the #item slot and wraps
 				     it in the tag given by `tag` + component-data. model-value (rather than
 				     list) is deliberate: the array is never spliced, Sortable only moves the
-				     DOM node and @end applies the real reorder through initiative. -->
+				     DOM node and @end applies the real reorder through initiative.
+
+				     `tag` is a plain `ul` and not `transition-group`, which is what carried
+				     the enter/leave animation on Vue 2. TransitionGroup clones every keyed
+				     child (getTransitionRawChildren -> cloneVNode), so the vnodes
+				     vuedraggable holds on to never get an `el`, and its mounted hook throws
+				     on the null el. That took the whole Targets pane down with it. -->
 				<draggable
-					tag="transition-group"
+					tag="ul"
 					:model-value="targets"
 					item-key="key"
 					:component-data="{
-						tag: 'ul',
 						class: ['targets', `${group}_targets`],
-						name: 'group',
-						enterActiveClass: 'animated animate__fadeInUp',
-						leaveActiveClass: 'animated animate__fadeOutDown',
 					}"
 					:animation="200"
 					handle=".drag-handle"

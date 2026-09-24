@@ -222,6 +222,7 @@ import DamageMeters from "src/components/combat/side/DamageMeters.vue";
 import Log from "src/components/combat/legacy/side/Log.vue";
 import { currencyMixin } from "src/mixins/currency.js";
 import { mapActions, mapGetters } from "vuex";
+import { defineAsyncComponent } from "vue";
 
 export default {
 	name: "FinishedEncounter",
@@ -230,7 +231,7 @@ export default {
 	components: {
 		DamageMeters,
 		Log,
-		Players: () => import("src/components/campaign/Players.vue"),
+		Players: defineAsyncComponent(() => import("src/components/campaign/Players.vue")),
 	},
 	data() {
 		return {

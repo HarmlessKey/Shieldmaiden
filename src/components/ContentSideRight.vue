@@ -170,6 +170,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -178,10 +179,10 @@ export default {
 		page: String,
 	},
 	components: {
-		PlayerLink: () => import("src/components/PlayerLink"),
-		Tier: () => import("src/components/userContent/Tier"),
-		Tutorial: () => import("src/components/userContent/Tutorial.vue"),
-		PatreonLinkButton: () => import("src/components/PatreonLinkButton.vue"),
+		PlayerLink: defineAsyncComponent(() => import("src/components/PlayerLink")),
+		Tier: defineAsyncComponent(() => import("src/components/userContent/Tier")),
+		Tutorial: defineAsyncComponent(() => import("src/components/userContent/Tutorial.vue")),
+		PatreonLinkButton: defineAsyncComponent(() => import("src/components/PatreonLinkButton.vue")),
 	},
 	data() {
 		return {

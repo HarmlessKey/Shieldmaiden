@@ -108,6 +108,7 @@ import Sharing from "./Sharing.vue";
 import Weather from "src/components/weather";
 
 import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { defineAsyncComponent } from "vue";
 import { mapGetters } from "vuex";
 
 export default {
@@ -116,7 +117,7 @@ export default {
 	components: {
 		Meters,
 		Players,
-		Shares: () => import("./Shares"),
+		Shares: defineAsyncComponent(() => import("./Shares")),
 		Sharing,
 		Weather,
 	},

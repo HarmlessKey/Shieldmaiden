@@ -305,14 +305,28 @@ Initial payload cost of the synchronous hk-* registration: app + chunk-common go
    which also turned up one pre-existing duplicate `computed:` in `trackCampaign/Meters.vue`.
 5. **Invalid table nesting breaks hydration**, where Vue 2 tolerated it — `<th>` must be
    inside a `<tr>`.
+6. **`() => import()` is not an async component any more.** In a `components:` block or
+   `:is`, Vue 3 treats a bare function as a *functional* component, calls it, and renders
+   the returned Promise as the text `[object Promise]` — with no warning. It needs
+   `defineAsyncComponent`. Found on staging (campaigns sidebar); 17 registrations plus
+   `Drawer.vue`, which is why every drawer was affected too.
+7. **vuedraggable cannot wrap a `transition-group`** (`tag="transition-group"`): Vue clones
+   keyed transition children, so vuedraggable's vnodes never get an `el` and its mounted
+   hook throws, aborting the rest of the flush.
+8. **Quasar 2's `.q-scrollarea` is `contain: size`, not `contain: strict`.** Without layout
+   containment a `position: static` scroll area (as in `hk-pane`) is no longer the
+   containing block for absolute children, so they escape the pane.
+
+Items 6–8 produce no console error, or only one far from the symptom. Only clicking
+through the screens found them.
 
 ### 6.4 Not covered
 
-- **Auth-gated screens have not been browser-tested** — DM screen, run encounter,
-  character builder, track campaign, profile, admin and the user-content pages all need
-  real credentials. They render server-side without errors and redirect correctly when
-  signed out, but the interactive paths are unverified. This is where the previous
-  attempt's only post-deploy bug hid, so it is the one gate left open.
+- **Auth-gated screens: list/overview pages checked, interactions mostly not.** Signed in
+  with a real develop account, every `/content/*` page, the campaign overview, encounter
+  edit, run encounter, track campaign and profile render with a clean console in both the
+  dev server and the production build. Interactive paths behind them (character builder
+  steps, NPC editor drag-reorder, rolling with projectiles, admin) are still unverified.
 - A compendium detail page for a slug the content API does not know 500s instead of
   rendering a 404 (the `preFetch` rejection propagates). Pre-existing on `develop`.
 - `src/services/patreon.js` logs `process.env` and the Patreon client secret to the

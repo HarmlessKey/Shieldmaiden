@@ -1,7 +1,9 @@
 <template>
 	<div>
 		<hk-input v-model="query" :dense="!compendium" label="Search" class="mb-2" clearable>
-			<q-icon slot="prepend" name="search" />
+			<template v-slot:prepend>
+				<q-icon name="search" />
+			</template>
 		</hk-input>
 		<p class="red" v-if="query && !sheet.length">Nothing found</p>
 		<q-tabs
@@ -38,7 +40,7 @@
 				</template>
 
 				<div class="accordion-body">
-					<hk-markdown-editor :value="description" read-only />
+					<hk-markdown-editor :model-value="description" read-only />
 					<span class="neutral-2">{{ src }}</span>
 				</div>
 			</q-expansion-item>
@@ -112,7 +114,9 @@ export default {
 			return this.editionSheet;
 		},
 		compendiumRulesPath() {
-			return this.$route.params.edition ? `/compendium/rules/${this.$route.params.edition}` : "/compendium/rules";
+			return this.$route.params.edition
+				? `/compendium/rules/${this.$route.params.edition}`
+				: "/compendium/rules";
 		},
 	},
 };

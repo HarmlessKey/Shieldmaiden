@@ -123,7 +123,7 @@ export const dice = {
 
 				this.animateTrigger = !this.animateTrigger;
 				this.$snotify.html(
-					`<div class="snotifyToast__body roll">
+					`<div class="hk-roll-toast">
 						<div class="roll_title truncate">${entity_name ? `${entity_name}: ` : ``}${title}</div>
 						<div class="rolled" id="roll">${roll.total}</div>
 						<div class="roll_footer">${advantage ? advantage : ""}${sumThrows}${roll.mod}</div>

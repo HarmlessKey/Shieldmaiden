@@ -3,11 +3,11 @@
 		<q-btn-toggle
 			v-if="custom_content && custom_content.length && content.length === 2"
 			class="mb-3"
-			:value="copy_resource"
+			:model-value="copy_resource"
 			spread
 			no-caps
 			toggle-color="primary"
-			@input="changeCopyResource($event)"
+			@update:model-value="changeCopyResource($event)"
 			:options="options"
 		/>
 		<hk-input
@@ -25,17 +25,16 @@
 			:error="!!noResult"
 			:error-message="noResult"
 		>
-			<button
-				v-if="copy_resource === 'srd'"
-				slot="before"
-				class="btn btn"
-				@click="show_filter = !show_filter"
-			>
-				<q-icon name="fas fa-filter" size="xs" />
-			</button>
-			<button slot="append" class="btn btn-sm btn-clear" @click="search()">
-				<q-icon name="fas fa-search" size="xs" />
-			</button>
+			<template v-slot:before>
+				<button v-if="copy_resource === 'srd'" class="btn btn" @click="show_filter = !show_filter">
+					<q-icon name="fas fa-filter" size="xs" />
+				</button>
+			</template>
+			<template v-slot:append>
+				<button class="btn btn-sm btn-clear" @click="search()">
+					<q-icon name="fas fa-search" size="xs" />
+				</button>
+			</template>
 		</hk-input>
 
 		<q-btn-toggle
@@ -98,7 +97,7 @@
 			flat
 			direction-links
 			class="mt-3"
-			@input="fetchApiContent()"
+			@update:model-value="fetchApiContent()"
 		/>
 	</div>
 </template>

@@ -1,11 +1,11 @@
 <template>
 	<div class="weapon">
 		<div class="mb-2">
-			<i 
+			<i
 				class="mr-1"
 				:class="{
 					'fas fa-check green': proficient,
-					'fas fa-times red': !proficient
+					'fas fa-times red': !proficient,
 				}"
 				aria-hidden="true"
 			>
@@ -15,15 +15,13 @@
 			</i>
 			{{ title }}
 		</div>
-		<q-input
-			dark filled square dense
-			label="Name"
-			v-model="weapon.name"
-			class="mb-2"
-		/>
+		<q-input dark filled square dense label="Name" v-model="weapon.name" class="mb-2" />
 
-		<q-select 
-			dark filled square dense
+		<q-select
+			dark
+			filled
+			square
+			dense
 			label="Ability"
 			emit-value
 			map-options
@@ -40,7 +38,7 @@
 							</q-card-section>
 
 							<q-card-section>
-								What ability does your character use to wield this weapon?<br/>
+								What ability does your character use to wield this weapon?<br />
 								The modifier of this ability will be added to both the to hit and the damage roll.
 							</q-card-section>
 						</q-card>
@@ -52,15 +50,14 @@
 		<div class="mb-2">Base damage</div>
 		<div class="row q-col-gutter-md mb-2">
 			<div class="col">
-				<q-input
-					dark filled square dense
-					placeholder="Base damage"
-					v-model="weapon.damage"
-				/>
+				<q-input dark filled square dense placeholder="Base damage" v-model="weapon.damage" />
 			</div>
 			<div class="col">
-				<q-select 
-					dark filled square dense
+				<q-select
+					dark
+					filled
+					square
+					dense
 					placeholder="Damage type"
 					emit-value
 					map-options
@@ -71,30 +68,38 @@
 		</div>
 
 		<q-input
-			dark filled square dense
+			dark
+			filled
+			square
+			dense
 			label="Versatile damage"
 			v-model="weapon.versatile"
 			class="mb-2"
 		/>
-		
 
 		<template v-if="weapon.weapon_type.split('_')[1] === 'ranged'">
 			<div class="mb-2">Range</div>
 			<div class="row q-col-gutter-md mb-2">
 				<div class="col">
 					<q-input
-						dark filled square dense
+						dark
+						filled
+						square
+						dense
 						type="number"
 						label="Normal range"
-						:value="weapon.range ? weapon.range.split('/')[0] : undefined"
+						:model-value="weapon.range ? weapon.range.split('/')[0] : undefined"
 					/>
 				</div>
 				<div class="col">
 					<q-input
-						dark filled square dense
+						dark
+						filled
+						square
+						dense
 						type="number"
 						label="Long range"
-						:value="weapon.range ? weapon.range.split('/')[1] : undefined"
+						:model-value="weapon.range ? weapon.range.split('/')[1] : undefined"
 					/>
 				</div>
 			</div>
@@ -105,91 +110,96 @@
 			<div class="row q-col-gutter-md mb-2" v-if="!weapon.range">
 				<div class="col">
 					<q-input
-						dark filled square dense
+						dark
+						filled
+						square
+						dense
 						type="number"
 						label="Normal range"
-						:value="weapon.thrown ? weapon.thrown.split('/')[0] : undefined"
+						:model-value="weapon.thrown ? weapon.thrown.split('/')[0] : undefined"
 					/>
 				</div>
 				<div class="col">
 					<q-input
-						dark filled square dense
+						dark
+						filled
+						square
+						dense
 						type="number"
 						label="Long range"
-						:value="weapon.thrown ? weapon.thrown.split('/')[1] : undefined"
+						:model-value="weapon.thrown ? weapon.thrown.split('/')[1] : undefined"
 					/>
 				</div>
 			</div>
 		</template>
 
 		<div>
-			<q-checkbox 
-				dark 
+			<q-checkbox
+				dark
 				size="sm"
 				v-model="weapon.light"
 				:disable="weapon.heavy"
-				:false-value="null" 
+				:false-value="null"
 				indeterminate-value="something-else"
 				label="Light"
 			/>
 		</div>
-		<q-checkbox 
-			dark 
+		<q-checkbox
+			dark
 			size="sm"
 			v-model="weapon.heavy"
-			:disable="weapon.light" 
-			:false-value="null" 
+			:disable="weapon.light"
+			:false-value="null"
 			indeterminate-value="something-else"
 			label="Heavy"
-		/>		
+		/>
 	</div>
 </template>
 
 <script>
-	import { abilities, damage_types } from 'src/utils/generalConstants';
+import { abilities, damage_types } from "src/utils/generalConstants";
 
-	export default {
-		name: 'Weapon',
-		props: {
-			value: {
-				type: Object,
-				required: true
+export default {
+	name: "Weapon",
+	props: {
+		modelValue: {
+			type: Object,
+			required: true,
+		},
+		proficient: {
+			type: Boolean,
+			default: false,
+		},
+	},
+	emits: ["update:modelValue"],
+	data() {
+		return {
+			abilities: abilities,
+			damage_types: damage_types,
+		};
+	},
+	computed: {
+		weapon() {
+			return this.modelValue;
+		},
+		title() {
+			const type = this.weapon.weapon_type.split("_");
+			return `${type[0].capitalize()} ${type[1]} weapon: ${this.weapon.value.replace("_", " ").capitalize()}`;
+		},
+		weapon_damage_types() {
+			return this.damage_types.filter((type) => {
+				return ["piercing", "slashing", "bludgeoning"].includes(type.value);
+			});
+		},
+	},
+	watch: {
+		weapon: {
+			deep: true,
+			handler(newVal) {
+				this.$emit("update:modelValue", newVal);
 			},
-			proficient: {
-				type: Boolean,
-				default: false
-			}
 		},
-		data() {
-			return {
-				abilities: abilities,
-				damage_types: damage_types
-			}
-		},
-		computed: {
-			weapon() {
-				return this.value;
-			},
-			title() {
-				const type = this.weapon.weapon_type.split("_");
-				return `${type[0].capitalize()} ${type[1]} weapon: ${this.weapon.value.replace("_", " ").capitalize()}`
-			},
-			weapon_damage_types() {
-				return this.damage_types.filter(type => {
-					return ["piercing", "slashing", "bludgeoning"].includes(type.value);
-				});
-			}
-		},
-		watch: {
-			weapon: {
-				deep: true,
-				handler(newVal) {
-					this.$emit('input', newVal);
-				}
-			}
-		},
-		methods: {
-			
-		},
-	}
+	},
+	methods: {},
+};
 </script>

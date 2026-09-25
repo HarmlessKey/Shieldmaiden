@@ -73,8 +73,8 @@
 				</div>
 				<div>Multipliers</div>
 				<div></div>
-				<template v-for="key in targeted">
-					<div class="name truncate" :key="`name-${key}`">
+				<template v-for="key in targeted" :key="key">
+					<div class="name truncate">
 						{{ entities[key].name.capitalizeEach() }}
 					</div>
 					<div v-if="damage_type" class="defenses" :key="`defenses-${key}`">
@@ -92,7 +92,7 @@
 							</q-tooltip>
 						</div>
 					</div>
-					<div class="multipliers" :key="`multipliers-${key}`">
+					<div class="multipliers">
 						<div
 							v-for="{ value, name, label } in multipliers"
 							@click="setMultiplier(key, value)"
@@ -106,7 +106,7 @@
 							</q-tooltip>
 						</div>
 					</div>
-					<div class="value" :key="`value-${key}`">
+					<div class="value">
 						{{ calculateAmount(key) }}
 					</div>
 				</template>
@@ -176,7 +176,7 @@ export default {
 			for (const key of newTargets) {
 				// By default set multiplier to 1
 				if (!Object.keys(this.multiplier).includes(key)) {
-					this.$set(this.multiplier, key, 1);
+					this.multiplier[key] = 1;
 				}
 				// Check the reistances of a target
 				if (this.damage_type && !Object.keys(this.resistances).includes(key)) {
@@ -186,13 +186,13 @@ export default {
 			// Remove untargeted from multiplier list
 			for (let key in this.multiplier) {
 				if (!newTargets.includes(key)) {
-					this.$delete(this.multiplier, key);
+					delete this.multiplier[key];
 				}
 			}
 			// Remove untargeted from resistances list
 			for (let key in this.resistances) {
 				if (!newTargets.includes(key)) {
-					this.$delete(this.resistances, key);
+					delete this.resistances[key];
 				}
 			}
 		},
@@ -222,17 +222,17 @@ export default {
 					);
 				}
 				if (resistances && resistances.includes(this.damage_type)) {
-					this.$set(this.resistances, target, key);
+					this.resistances[target] = key;
 				}
 			}
 		},
 		setMultiplier(key, multiplier) {
-			this.$set(this.multiplier, key, multiplier);
+			this.multiplier[key] = multiplier;
 			this.$forceUpdate();
 		},
 		setDefense(target, defense) {
-			if (this.resistances[target] === defense) this.$delete(this.resistances, target);
-			else this.$set(this.resistances, target, defense);
+			if (this.resistances[target] === defense) delete this.resistances[target];
+			else this.resistances[target] = defense;
 			this.$forceUpdate();
 		},
 		submitManual(e, valid) {

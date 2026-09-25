@@ -91,7 +91,7 @@
 						v-model="editableEncounter.hk_background"
 						label="Background"
 						:disable="!!editableEncounter.background"
-						@input="setBackground($event)"
+						@update:model-value="setBackground($event)"
 						class="mb-3"
 					/>
 					<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
@@ -117,18 +117,19 @@
 									placeholder="Background URL"
 									:error="invalid && validated"
 									:error-message="errors[0]"
-									@input="editableEncounter.hk_background = null"
+									@update:model-value="editableEncounter.hk_background = null"
 								>
-									<hk-popover
-										slot="append"
-										header="Custom background"
-										v-if="demo || (tier && tier.price !== 'Free')"
-									>
-										<i class="fas fa-info-circle" aria-hidden="true" />
-										<template #content>
-											Setting a custom background will overwrite your selected background.
-										</template>
-									</hk-popover>
+									<template v-slot:append>
+										<hk-popover
+											header="Custom background"
+											v-if="demo || (tier && tier.price !== 'Free')"
+										>
+											<i class="fas fa-info-circle" aria-hidden="true" />
+											<template #content>
+												Setting a custom background will overwrite your selected background.
+											</template>
+										</hk-popover>
+									</template>
 								</q-input>
 							</div>
 						</div>
@@ -154,27 +155,27 @@
 					</div>
 
 					<hk-card v-if="!demo && (!tier || tier.price === 'Free')">
-						<div slot="header" class="card-header">
-							<span>
-								<i class="fas fa-cloud-showers" aria-hidden="true" />
-								<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
-								<i class="fas fa-fog" aria-hidden="true" />
-							</span>
-							<strong>Backgrounds & Effects</strong>
-							<span>
-								<i class="fas fa-bolt" aria-hidden="true" />
-								<i class="fas fa-tornado mx-2" aria-hidden="true" />
-								<i class="fas fa-waveform-path" aria-hidden="true" />
-							</span>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								<span>
+									<i class="fas fa-cloud-showers" aria-hidden="true" />
+									<i class="fas fa-cloud-snow mx-2" aria-hidden="true" />
+									<i class="fas fa-fog" aria-hidden="true" />
+								</span>
+								<strong>Backgrounds & Effects</strong>
+								<span>
+									<i class="fas fa-bolt" aria-hidden="true" />
+									<i class="fas fa-tornado mx-2" aria-hidden="true" />
+									<i class="fas fa-waveform-path" aria-hidden="true" />
+								</span>
+							</div>
+						</template>
 						<div class="p-3 text-center">
 							<p>With a subscription you have access to our backgrounds and background effects.</p>
 							<p>
-								<template v-for="(effect, i) in effects">
-									<strong :key="`effect-${effect}`">{{ effect.toUpperCase() }}</strong>
-									<span class="neutral-2 mx-1" :key="`pipe-${effect}`" v-if="i < effects.length - 1"
-										>|</span
-									>
+								<template v-for="(effect, i) in effects" :key="effect">
+									<strong>{{ effect.toUpperCase() }}</strong>
+									<span class="neutral-2 mx-1" v-if="i < effects.length - 1">|</span>
 								</template>
 							</p>
 							<router-link class="btn btn-sm bg-neutral-5 full-width" to="/weather-demo">
@@ -217,6 +218,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
 
 import EditWeather from "./Weather";
@@ -236,7 +238,7 @@ export default {
 	},
 	components: {
 		EditWeather,
-		Weather: () => import("src/components/weather"),
+		Weather: defineAsyncComponent(() => import("src/components/weather")),
 	},
 	mixins: [audio],
 	data() {
@@ -270,7 +272,7 @@ export default {
 			this.weather = this.encounter.weather;
 		}
 		if (this.editableEncounter && !this.editableEncounter.hk_background) {
-			this.$set(this.editableEncounter, "hk_background", null);
+			this.editableEncounter.hk_background = null;
 		}
 	},
 	methods: {
@@ -310,7 +312,7 @@ export default {
 			}
 		},
 		setBackground(value) {
-			this.$set(this.editableEncounter, "hk_background", value);
+			this.editableEncounter.hk_background = value;
 		},
 		getBackground(encounter) {
 			if (encounter.background) return encounter.background;

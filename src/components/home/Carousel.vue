@@ -32,9 +32,11 @@
 				</q-carousel-slide>
 			</q-carousel>
 		</div>
-		<div class="card-footer text-center" slot="footer">
-			<router-link to="/demo" class="btn btn-block btn-square"> Try demo encounter </router-link>
-		</div>
+		<template v-slot:footer>
+			<div class="card-footer text-center">
+				<router-link to="/demo" class="btn btn-block btn-square"> Try demo encounter </router-link>
+			</div>
+		</template>
 	</hk-card>
 </template>
 

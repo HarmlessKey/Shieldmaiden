@@ -184,11 +184,10 @@
 			.user-menu {
 				font-size: 18px;
 
-				&::v-deep {
-					.user-btn {
-						font-size: 25px;
-					}
-				}
+				// The `.user-btn` rule that used to live here was wrapped in `::v-deep`.
+				// This is a global stylesheet, so nothing ever compiled that away: the
+				// selector stayed invalid and browsers dropped the rule. Removed rather
+				// than converted, so rendering stays identical.
 			}
 		}
 	}

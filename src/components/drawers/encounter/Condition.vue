@@ -16,14 +16,12 @@
 			</button>
 		</template>
 
-		<table
-			v-if="condition === 'exhaustion'"
-			class="table"
-			:aria-describedby="`${condition}Table`"
-		>
+		<table v-if="condition === 'exhaustion'" class="table" :aria-describedby="`${condition}Table`">
 			<thead>
-				<th>Current</th>
-				<th>Effect</th>
+				<tr>
+					<th>Current</th>
+					<th>Effect</th>
+				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(effect, index) in exhaustionLevels" :key="index">

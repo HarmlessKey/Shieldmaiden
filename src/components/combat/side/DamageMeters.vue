@@ -10,11 +10,11 @@
 							<div class="value" :class="type.name === 'damage' ? 'red' : 'green'">
 								<small v-if="entity[type.over]" class="neutral-2 whitespace-nowrap mr-1">
 									(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
-									<template v-else>{{ entity[type.over] | numeral("0.0a") }} </template>
+									<template v-else>{{ $numeral(entity[type.over], "0.0a") }}</template>
 									over)
 								</small>
 								<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
-								<template v-else>{{ entity[type.name] | numeral("0.0a") }}</template>
+								<template v-else>{{ $numeral(entity[type.name], "0.0a") }}</template>
 							</div>
 						</BasicEntity>
 						<q-linear-progress
@@ -98,13 +98,11 @@ ul {
 		margin-bottom: 2px;
 		height: 32px;
 
-		::v-deep {
-			.basic-entity__wrapper {
-				position: relative;
-				z-index: 10;
-				font-size: 13px;
-				padding-right: 8px;
-			}
+		:deep(.basic-entity__wrapper) {
+			position: relative;
+			z-index: 10;
+			font-size: 13px;
+			padding-right: 8px;
 		}
 		.value {
 			font-weight: bold;

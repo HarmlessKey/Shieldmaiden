@@ -1,5 +1,4 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 import general from "./modules/general";
 import tutorial from "./modules/tutorial";
 import tips from "./modules/tips";
@@ -21,8 +20,6 @@ import characters from "./modules/userContent/characters.js";
 import trackCampaign from "./modules/trackCampaign.js";
 import contentReports from "./modules/contentReports.js";
 
-Vue.use(Vuex);
-
 /*
  * If not building with SSR mode, you can
  * directly export the Store instantiation;
@@ -33,7 +30,7 @@ Vue.use(Vuex);
  */
 
 export default function () {
-	return new Vuex.Store({
+	return createStore({
 		modules: {
 			general: general,
 			tutorial: tutorial,

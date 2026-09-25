@@ -29,7 +29,7 @@
 						:class="{
 							'step-highlight': demo && follow_tutorial && get_step('initiative', 'players'),
 						}"
-						@input="setInitiative(entity.key, entity.initiative)"
+						@update:model-value="setInitiative(entity.key, entity.initiative)"
 						@focus="$event.target.select()"
 					/>
 				</BasicEntity>
@@ -96,11 +96,9 @@ export default {
 .player-initiative {
 	min-width: 60px;
 
-	::v-deep {
-		.q-field__control input {
-			padding: 0;
-			text-align: center;
-		}
+	:deep(.q-field__control input) {
+		padding: 0;
+		text-align: center;
 	}
 }
 </style>

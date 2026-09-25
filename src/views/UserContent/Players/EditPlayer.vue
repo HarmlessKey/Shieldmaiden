@@ -11,24 +11,26 @@
 				>
 					<hk-card-deck>
 						<hk-card>
-							<div class="card-header p-0 pr-4" slot="header">
-								<div class="d-flex justify-content-start items-center">
-									<div
-										class="img player-avatar"
-										@click="avatar_dialog = true"
-										:style="{
-											backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
-										}"
-									>
-										<i
-											aria-hidden="true"
-											v-if="!player.storage_avatar && !player.avatar && !preview_new_upload"
-											class="hki-player"
-										/>
+							<template v-slot:header>
+								<div class="card-header p-0 pr-4">
+									<div class="d-flex justify-content-start items-center">
+										<div
+											class="img player-avatar"
+											@click="avatar_dialog = true"
+											:style="{
+												backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
+											}"
+										>
+											<i
+												aria-hidden="true"
+												v-if="!player.storage_avatar && !player.avatar && !preview_new_upload"
+												class="hki-player"
+											/>
+										</div>
+										Basic info
 									</div>
-									Basic info
 								</div>
-							</div>
+							</template>
 							<div class="card-body">
 								<ValidationProvider
 									v-if="$route.name !== 'Edit character'"
@@ -77,8 +79,8 @@
 										v-if="$route.name !== 'Add player'"
 										:playerId="playerId"
 										:control="player.control"
-										@set="$set(player, 'control', $event)"
-										@remove="$set(player, 'control', null)"
+										@set="player.control = $event"
+										@remove="player.control = null"
 									/>
 
 									<!-- Character Sync -->
@@ -90,7 +92,7 @@
 												square
 												class="mt-4"
 												type="text"
-												:value="linked_character ? linked_character.name : 'Not found'"
+												:model-value="linked_character ? linked_character.name : 'Not found'"
 												readonly
 												label-slot
 												:error="!linked_character"
@@ -224,8 +226,8 @@
 												type="number"
 												min="1"
 												max="20"
-												:value="player.level"
-												@input="parseToInt($event, player, 'level')"
+												:model-value="player.level"
+												@update:model-value="parseToInt($event, player, 'level')"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											/>
@@ -246,14 +248,16 @@
 												type="number"
 												min="1"
 												max="999"
-												:value="player.maxHp"
+												:model-value="player.maxHp"
 												name="maxHp"
 												placeholder="Maximum Hit Points*"
-												@input="parseToInt($event, player, 'maxHp')"
+												@update:model-value="parseToInt($event, player, 'maxHp')"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											>
-												<q-icon slot="prepend" name="fas fa-heart" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-heart" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle"
 													>Maximum Hit Points</q-tooltip
 												>
@@ -275,12 +279,14 @@
 												min="1"
 												max="99"
 												type="number"
-												:value="player.ac"
-												@input="parseToInt($event, player, 'ac')"
+												:model-value="player.ac"
+												@update:model-value="parseToInt($event, player, 'ac')"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											>
-												<q-icon slot="prepend" name="fas fa-shield" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-shield" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle">Armor class</q-tooltip>
 											</q-input>
 										</ValidationProvider>
@@ -300,12 +306,14 @@
 												min="1"
 												max="99"
 												type="number"
-												:value="player.spell_save_dc"
-												@input="parseToInt($event, player, 'spell_save_dc')"
+												:model-value="player.spell_save_dc"
+												@update:model-value="parseToInt($event, player, 'spell_save_dc')"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											>
-												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+												<template v-slot:prepend>
+													<q-icon name="fas fa-hand-holding-magic" />
+												</template>
 												<q-tooltip anchor="top middle" self="center middle"
 													>Spell save DC</q-tooltip
 												>
@@ -329,9 +337,9 @@
 												type="number"
 												min="0"
 												max="999"
-												:value="player.speed"
+												:model-value="player.speed"
 												placeholder="Speed"
-												@input="parseToInt($event, player, 'speed')"
+												@update:model-value="parseToInt($event, player, 'speed')"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											/>
@@ -352,8 +360,8 @@
 												min="-10"
 												max="99"
 												type="number"
-												:value="player.initiative"
-												@input="parseToInt($event, player, 'initiative')"
+												:model-value="player.initiative"
+												@update:model-value="parseToInt($event, player, 'initiative')"
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											/>
@@ -385,23 +393,23 @@
 											min="1"
 											max="99"
 											v-model="player[ability]"
-											@input="parseToInt($event, player, ability)"
+											@update:model-value="parseToInt($event, player, ability)"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<!-- eslint-disable -->
-											<q-checkbox
-												slot="append"
-												size="xs"
-												:dark="$store.getters.theme === 'dark'"
-												v-model="player[`${ability}-save-profficient`]"
-												:false-value="null"
-												indeterminate-value="something-else"
-											>
-												<q-tooltip anchor="top middle" self="center middle">
-													Saving throw proficiency
-												</q-tooltip>
-											</q-checkbox>
+											<template v-slot:append>
+												<q-checkbox
+													size="xs"
+													:dark="$store.getters.theme === 'dark'"
+													v-model="player[`${ability}-save-profficient`]"
+													:false-value="null"
+													indeterminate-value="something-else"
+												>
+													<q-tooltip anchor="top middle" self="center middle">
+														Saving throw proficiency
+													</q-tooltip>
+												</q-checkbox>
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -426,12 +434,14 @@
 											min="1"
 											max="99"
 											v-model="player.passive_perception"
-											@input="parseToInt($event, player, 'passive_perception')"
+											@update:model-value="parseToInt($event, player, 'passive_perception')"
 											placeholder="Perception"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<q-icon slot="prepend" name="fas fa-eye" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-eye" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -451,12 +461,14 @@
 											min="1"
 											max="99"
 											v-model="player.passive_investigation"
-											@input="parseToInt($event, player, 'passive_investigation')"
+											@update:model-value="parseToInt($event, player, 'passive_investigation')"
 											placeholder="Investigation"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<q-icon slot="prepend" name="fas fa-search" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-search" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -476,12 +488,14 @@
 											min="1"
 											max="99"
 											v-model="player.passive_insight"
-											@input="parseToInt($event, player, 'passive_insight')"
+											@update:model-value="parseToInt($event, player, 'passive_insight')"
 											placeholder="Insight"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
-											<q-icon slot="prepend" name="fas fa-lightbulb-on" />
+											<template v-slot:prepend>
+												<q-icon name="fas fa-lightbulb-on" />
+											</template>
 										</q-input>
 									</ValidationProvider>
 								</div>
@@ -576,17 +590,19 @@
 
 					<!-- COMPANIONS -->
 					<hk-card>
-						<div slot="header" class="card-header">
-							Companions
-							<a
-								v-if="isOwner() && npc_count"
-								class="btn btn-sm bg-neutral-5"
-								@click="companion_dialog = !companion_dialog"
-							>
-								<i aria-hidden="true" class="fas fa-plus green mr-1" />
-								Add companion
-							</a>
-						</div>
+						<template v-slot:header>
+							<div class="card-header">
+								Companions
+								<a
+									v-if="isOwner() && npc_count"
+									class="btn btn-sm bg-neutral-5"
+									@click="companion_dialog = !companion_dialog"
+								>
+									<i aria-hidden="true" class="fas fa-plus green mr-1" />
+									Add companion
+								</a>
+							</div>
+						</template>
 						<div class="card-body">
 							<template v-if="isOwner()">
 								<div v-if="!npc_count">
@@ -604,36 +620,38 @@
 								:columns="columns"
 								:items="companions"
 							>
-								<template slot="avatar" slot-scope="data">
+								<template v-slot:avatar="data">
 									<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
 										<i aria-hidden="true" v-if="!data.item" class="hki-monster" />
 									</div>
 								</template>
 
-								<template slot="name" slot-scope="data">
+								<template v-slot:name="data">
 									<router-link class="mx-2" :to="`/content/companions/${userId}/${data.row.key}`">
 										{{ data.item }}
 										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 									</router-link>
 								</template>
 
-								<div slot="actions" slot-scope="data" class="actions">
-									<router-link
-										class="btn btn-sm bg-neutral-5 mx-1"
-										:to="`/content/companions/${userId}/${data.row.key}`"
-									>
-										<i aria-hidden="true" class="fas fa-pencil"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
-									</router-link>
-									<a
-										v-if="isOwner()"
-										class="btn btn-sm bg-neutral-5"
-										@click="removeCompanion(data.index, data.row.key)"
-									>
-										<i aria-hidden="true" class="fas fa-trash-alt"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
-									</a>
-								</div>
+								<template v-slot:actions="data">
+									<div class="actions">
+										<router-link
+											class="btn btn-sm bg-neutral-5 mx-1"
+											:to="`/content/companions/${userId}/${data.row.key}`"
+										>
+											<i aria-hidden="true" class="fas fa-pencil"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+										</router-link>
+										<a
+											v-if="isOwner()"
+											class="btn btn-sm bg-neutral-5"
+											@click="removeCompanion(data.index, data.row.key)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
+										</a>
+									</div>
+								</template>
 							</hk-table>
 							<div v-else-if="!isOwner()">
 								<p>You currently have no companions linked to your player character</p>
@@ -781,7 +799,7 @@ export default {
 				return this.player.skills ? this.player.skills : [];
 			},
 			set(newValue) {
-				this.$set(this.player, "skills", newValue);
+				this.player.skills = newValue;
 			},
 		},
 		skills_expertise: {
@@ -789,7 +807,7 @@ export default {
 				return this.player.skills_expertise ? this.player.skills_expertise : [];
 			},
 			set(newValue) {
-				this.$set(this.player, "skills_expertise", newValue);
+				this.player.skills_expertise = newValue;
 			},
 		},
 		npcsAsCompanion() {
@@ -808,7 +826,7 @@ export default {
 		await this.get_players();
 		if (this.$route.name === "Add player") {
 			for (const ability of this.abilities) {
-				this.$set(this.player, ability, 10);
+				this.player[ability] = 10;
 			}
 		}
 
@@ -870,7 +888,7 @@ export default {
 			return comparePlayerToCharacter(this.linked_character, this.player);
 		},
 		async linkCharacter(url) {
-			this.$set(this.player, "sync_character", url);
+			this.player.sync_character = url;
 			this.linked_character = await getCharacterSyncCharacter(this.player.sync_character);
 			await this.sync();
 			this.link_dialog = false;
@@ -917,10 +935,10 @@ export default {
 		add({ result, id }) {
 			this.companion_dialog = false;
 			if (this.player.companions === undefined) {
-				this.$set(this.player, "companions", {});
+				this.player.companions = {};
 			}
 
-			this.$set(this.player.companions, id, true);
+			this.player.companions[id] = true;
 			result.key = id;
 			this.companions.push(result);
 			this.npcsAsCompanion.push(id);
@@ -933,8 +951,8 @@ export default {
 			this.$forceUpdate();
 		},
 		removeCompanion(index, id) {
-			this.$delete(this.companions, index);
-			this.$delete(this.player.companions, id);
+			this.companions.splice(index, 1);
+			delete this.player.companions[id];
 			this.companions_to_delete.push(id);
 
 			const npcsAsCompanionIndex = this.npcsAsCompanion.indexOf(id);
@@ -944,13 +962,13 @@ export default {
 		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === null || value === "") {
-				this.$set(object, property, null);
+				object[property] = null;
 			} else {
 				value = parseInt(value);
 				if (property === "level") {
 					value = value.between(1, 20);
 				}
-				this.$set(object, property, value);
+				object[property] = value;
 			}
 		},
 		skillMod(skill, key) {
@@ -976,21 +994,21 @@ export default {
 			return parseInt(mod);
 		},
 		saveBlob(value) {
-			this.$delete(this.player, "avatar");
-			this.$set(this.player, "blob", value.blob);
+			delete this.player.avatar;
+			this.player.blob = value.blob;
 			this.preview_new_upload = value.dataUrl;
 			this.avatar_dialog = false;
 		},
 		saveUrl(value) {
-			this.$delete(this.player, "storage_avatar");
-			this.$set(this.player, "avatar", value);
+			delete this.player.storage_avatar;
+			this.player.avatar = value;
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},
 		clearAvatar() {
-			this.$delete(this.player, "avatar");
-			this.$delete(this.player, "storage_avatar");
-			this.$delete(this.player, "blob");
+			delete this.player.avatar;
+			delete this.player.storage_avatar;
+			delete this.player.blob;
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},

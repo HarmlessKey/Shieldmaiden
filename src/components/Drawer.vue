@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { markRaw } from "vue";
 import { mapActions } from "vuex";
 
 export default {
@@ -41,12 +42,13 @@ export default {
 		},
 	},
 	mounted() {
+		// Vue 3 treats a bare function passed to `:is` as a functional component and
+		// would render the returned Promise as text, so the loaded definition is used.
+		// markRaw keeps the component definition out of the reactive data.
 		this.loader()
-			.then(() => {
-				this.component = () => this.loader();
-			})
-			.catch(() => {
-				this.component = () => import("./drawers/Error.vue");
+			.catch(() => import("./drawers/Error.vue"))
+			.then((module) => {
+				this.component = markRaw(module.default);
 			});
 	},
 	methods: {
@@ -63,10 +65,8 @@ export default {
 	height: 100%;
 	position: relative;
 
-	&::v-deep {
-		.q-scrollarea__content {
-			width: 100%;
-		}
+	:deep(.q-scrollarea__content) {
+		width: 100%;
 	}
 }
 </style>

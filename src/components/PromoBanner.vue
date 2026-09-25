@@ -27,7 +27,10 @@
 		</div>
 		<div class="promo-banner__footer">
 			<div class="remaining">
-				Get your first month<template v-if="eligible_tier_names"> of <strong>{{ eligible_tier_names }}</strong></template> with a <strong>{{ active_promotion.discount }}%</strong> discount.
+				Get your first month<template v-if="eligible_tier_names">
+					of <strong>{{ eligible_tier_names }}</strong></template
+				>
+				with a <strong>{{ active_promotion.discount }}%</strong> discount.
 				<template v-if="hours_remaining <= 1">Less than </template>
 				<span class="remaining__count">{{
 					days_remaining ? days_remaining : hours_remaining
@@ -124,7 +127,7 @@ export default {
 			this.now = new Date();
 		}, 60000);
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		clearInterval(this.timer);
 	},
 };

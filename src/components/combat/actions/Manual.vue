@@ -45,7 +45,7 @@
 								<q-icon :name="damage_type_icons[type]" :class="type" />
 							</q-item-section>
 							<q-item-section>
-								<q-item-label v-text="typeLabel(type)" />
+								<q-item-label>{{ typeLabel(type) }}</q-item-label>
 							</q-item-section>
 						</q-item>
 					</q-list>
@@ -66,7 +66,7 @@
 				center-color="neutral-6"
 				track-color="neutral-8"
 				:disable="!targeted?.length"
-				@input="value = $event"
+				@update:model-value="value = $event"
 				class="knob"
 			/>
 			<div class="input__wrapper">
@@ -271,10 +271,10 @@ export default {
 		},
 	},
 	mounted() {
-		EventBus.$on("applyManualValue", this.applyManual);
+		EventBus.on("applyManualValue", this.applyManual);
 	},
-	beforeDestroy() {
-		EventBus.$off("applyManualValue", this.applyManual);
+	beforeUnmount() {
+		EventBus.off("applyManualValue", this.applyManual);
 	},
 	directives: {
 		scrollWheel: {
@@ -386,12 +386,10 @@ export default {
 				outline: none;
 			}
 		}
-		::v-deep {
-			.disabled,
-			.disabled *,
-			[disabled] {
-				cursor: default !important;
-			}
+		:deep(.disabled),
+		:deep(.disabled *),
+		:deep([disabled]) {
+			cursor: default !important;
 		}
 		.knob {
 			width: 120px;

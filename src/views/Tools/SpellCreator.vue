@@ -23,7 +23,8 @@
 			<h2>Scaling</h2>
 			<p>
 				The actions of your spell change depending on caster level, or at what level the spell is
-				casted. Rolls will automatically scale when you cast the spell with a higher lever character, or using a higher spell slot.
+				casted. Rolls will automatically scale when you cast the spell with a higher lever
+				character, or using a higher spell slot.
 			</p>
 
 			<hk-popover header="Blight (phb 219)">
@@ -38,7 +39,7 @@
 							}"
 							v-for="i in 9"
 							:key="i"
-							@click="blight.level <= i ? cast_level = i : null"
+							@click="blight.level <= i ? (cast_level = i) : null"
 						>
 							{{ i }}
 						</div>
@@ -96,14 +97,14 @@ export default {
 									{
 										dice_count: 1,
 										dice_type: 8,
-										level: 1
-									}
-								]
-							}
+										level: 1,
+									},
+								],
+							},
 						],
 						save_ability: "constitution",
-						type: "save"
-					}
+						type: "save",
+					},
 				],
 				level: 4,
 				name: "Blight",
@@ -116,7 +117,7 @@ export default {
 };
 </script>
 
-<styles lang="scss" scoped>
+<style lang="scss" scoped>
 .caster__levels {
 	display: flex;
 	justify-content: center;
@@ -142,4 +143,4 @@ export default {
 		}
 	}
 }
-</styles>
+</style>

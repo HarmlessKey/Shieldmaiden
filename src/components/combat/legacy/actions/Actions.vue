@@ -21,18 +21,18 @@
 							<Avatar :entity="entitiesList[doneBy]" class="img" :icons="false" />
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="entitiesList[doneBy].name.capitalizeEach()" />
+							<q-item-label>{{ entitiesList[doneBy].name.capitalizeEach() }}</q-item-label>
 						</q-item-section>
 					</q-item>
 					<span v-else> Who performs the action? </span>
 				</template>
 				<template v-slot:option="scope">
-					<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+					<q-item v-bind="scope.itemProps">
 						<q-item-section avatar>
 							<Avatar :entity="scope.opt" class="img" :icons="false" />
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="scope.opt.name?.capitalizeEach()" />
+							<q-item-label>{{ scope.opt.name?.capitalizeEach() }}</q-item-label>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -259,30 +259,24 @@ export default {
 			}
 		}
 	}
-	&::v-deep {
-		.q-tab {
-			width: 100%;
-		}
+	:deep(.q-tab) {
+		width: 100%;
 	}
 }
 
 .modes {
-	&::v-deep {
-		.q-tabs {
-			&__content {
-				padding: 10px;
-				margin: -10px;
-				gap: 0.5rem;
+	:deep(.q-tabs__content) {
+		padding: 10px;
+		margin: -10px;
+		gap: 0.5rem;
 
-				.q-tab {
-					border: solid 1px transparent;
-					border-radius: $border-radius;
-					width: 100%;
+		.q-tab {
+			border: solid 1px transparent;
+			border-radius: $border-radius;
+			width: 100%;
 
-					&:focus {
-						outline: $outline;
-					}
-				}
+			&:focus {
+				outline: $outline;
 			}
 		}
 	}
@@ -293,10 +287,8 @@ export default {
 }
 .overflow-visible {
 	overflow: visible;
-	&::v-deep {
-		.q-panel {
-			overflow: visible;
-		}
+	:deep(.q-panel) {
+		overflow: visible;
 	}
 }
 

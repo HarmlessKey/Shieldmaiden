@@ -16,11 +16,13 @@
 						clearable
 						placeholder="Search"
 					>
-						<q-icon slot="prepend" name="search" />
+						<template v-slot:prepend>
+							<q-icon name="search" />
+						</template>
 					</q-input>
 
 					<q-table
-						:data="items"
+						:rows="items"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"
@@ -66,7 +68,9 @@
 								</div>
 							</q-td>
 						</template>
-						<div slot="no-data" />
+						<template v-slot:no-data>
+							<div />
+						</template>
 					</q-table>
 				</template>
 				<template> </template>

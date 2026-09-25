@@ -1,17 +1,19 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1>
-				<i aria-hidden="true" class="fas fa-book mr-1"></i> Rules
-				<span class="neutral-2">{{ editionLabel }}</span>
-			</h1>
-			<span class="neutral-3">
-				Resource
-				<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
-					resource.label
-				}}</a>
-			</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>
+					<i aria-hidden="true" class="fas fa-book mr-1"></i> Rules
+					<span class="neutral-2">{{ editionLabel }}</span>
+				</h1>
+				<span class="neutral-3">
+					Resource
+					<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
+						resource.label
+					}}</a>
+				</span>
+			</div>
+		</template>
 		<div class="card-body">
 			<p>
 				<router-link class="btn btn-sm bg-neutral-5" :to="otherEdition.to">

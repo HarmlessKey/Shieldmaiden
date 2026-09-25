@@ -91,7 +91,6 @@
 							min="0"
 							max="99"
 							v-model="initiative"
-							v-validate="'required'"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						/>
@@ -189,9 +188,11 @@
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								>
-									<q-icon slot="prepend" name="fas fa-paw-claws green">
-										<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
-									</q-icon>
+									<template v-slot:prepend>
+										<q-icon name="fas fa-paw-claws green">
+											<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
+										</q-icon>
+									</template>
 								</q-input>
 								<q-input
 									v-else
@@ -229,9 +230,11 @@
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								>
-									<q-icon slot="prepend" name="fas fa-paw-claws green">
-										<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
-									</q-icon>
+									<template v-slot:prepend>
+										<q-icon name="fas fa-paw-claws green">
+											<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
+										</q-icon>
+									</template>
 								</q-input>
 								<q-input
 									v-else
@@ -271,9 +274,11 @@
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								>
-									<q-icon slot="prepend" name="fas fa-paw-claws green">
-										<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
-									</q-icon>
+									<template v-slot:prepend>
+										<q-icon name="fas fa-paw-claws green">
+											<q-tooltip anchor="top middle" self="center middle"> Transformed </q-tooltip>
+										</q-icon>
+									</template>
 								</q-input>
 								<q-input
 									v-else
@@ -315,10 +320,14 @@
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								>
-									<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level }">
-										{{ calculatedLevel(playerBase.experience) }}
-										<q-tooltip anchor="top left" self="center left"> Level based on XP </q-tooltip>
-									</span>
+									<template v-slot:append>
+										<span v-if="isXpAdvancement()" :class="{ red: playerBase.level }">
+											{{ calculatedLevel(playerBase.experience) }}
+											<q-tooltip anchor="top left" self="center left">
+												Level based on XP
+											</q-tooltip>
+										</span>
+									</template>
 								</q-input>
 							</ValidationProvider>
 						</div>
@@ -616,7 +625,7 @@ export default {
 					this.entity.transformed.curHp = this.entity.transformed.maxHp;
 				}
 				if (this.entity.transformed.curHp <= 0) {
-					this.$delete(this.entity, "transformed");
+					delete this.entity.transformed;
 				}
 			}
 

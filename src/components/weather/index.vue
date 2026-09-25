@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
+
 export default {
 	name: "Weather",
 	props: {
@@ -86,12 +88,12 @@ export default {
 		},
 	},
 	components: {
-		Fog: () => import("./Fog"),
-		Rain: () => import("./Rain"),
-		Hail: () => import("./Hail"),
-		Snow: () => import("./Snow"),
-		Ash: () => import("./Ash"),
-		Sand: () => import("./Sand"),
+		Fog: defineAsyncComponent(() => import("./Fog")),
+		Rain: defineAsyncComponent(() => import("./Rain")),
+		Hail: defineAsyncComponent(() => import("./Hail")),
+		Snow: defineAsyncComponent(() => import("./Snow")),
+		Ash: defineAsyncComponent(() => import("./Ash")),
+		Sand: defineAsyncComponent(() => import("./Sand")),
 	},
 	data() {
 		return {
@@ -171,10 +173,8 @@ export default {
 		background-position: center bottom;
 		z-index: 1;
 
-		&::v-deep {
-			.wrapper {
-				pointer-events: none;
-			}
+		:deep(.wrapper) {
+			pointer-events: none;
 		}
 
 		&::before,

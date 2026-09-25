@@ -1,5 +1,9 @@
 <template>
-	<hk-dialog :value="value" :header="header" @input="$emit('input', $event)">
+	<hk-dialog
+		:model-value="modelValue"
+		:header="header"
+		@update:model-value="$emit('update:modelValue', $event)"
+	>
 		<hk-loader
 			v-if="generating"
 			no-background
@@ -59,11 +63,13 @@
 			/>
 		</template>
 
-		<div slot="footer" class="d-flex justify-content-end full-width items-center gap-1">
-			<button class="btn" :disabled="generating" @click="download">
-				{{ downloadLabel }} <hk-icon :icon="downloadIcon" class="ml-1" />
-			</button>
-		</div>
+		<template v-slot:footer>
+			<div class="d-flex justify-content-end full-width items-center gap-1">
+				<button class="btn" :disabled="generating" @click="download">
+					{{ downloadLabel }} <hk-icon :icon="downloadIcon" class="ml-1" />
+				</button>
+			</div>
+		</template>
 
 		<div v-if="generating" class="offscreen-render" aria-hidden="true">
 			<SpellCard
@@ -104,7 +110,7 @@ export default {
 	},
 	props: {
 		// v-model: dialog open state
-		value: {
+		modelValue: {
 			type: Boolean,
 			default: false,
 		},
@@ -115,6 +121,7 @@ export default {
 			default: () => [],
 		},
 	},
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			generating: false,
@@ -171,7 +178,7 @@ export default {
 	},
 	methods: {
 		setDescription(index, value) {
-			this.$set(this.descriptions_by_index, index, value);
+			this.descriptions_by_index[index] = value;
 		},
 		async download() {
 			this.generating = true;
@@ -216,7 +223,7 @@ export default {
 			}
 
 			this.generating = false;
-			this.$emit("input", false);
+			this.$emit("update:modelValue", false);
 		},
 	},
 };

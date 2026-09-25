@@ -4,12 +4,13 @@
 		<Tutorial v-if="!content_count.campaigns" />
 		<!-- Continue Campaign -->
 		<hk-card v-else class="banner">
-			<div
-				slot="image"
-				class="card-image"
-				:class="{ 'no-campaign': !active_campaign }"
-				:style="{ backgroundImage: 'url(\'' + getBackground(active_campaign) + '\'' }"
-			></div>
+			<template v-slot:image>
+				<div
+					class="card-image"
+					:class="{ 'no-campaign': !active_campaign }"
+					:style="{ backgroundImage: 'url(\'' + getBackground(active_campaign) + '\'' }"
+				></div>
+			</template>
 			<!-- Active campaign -->
 			<div class="card-body" v-if="active_campaign">
 				<div>

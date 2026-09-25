@@ -7,24 +7,25 @@
 		}"
 		@focus="$emit('focus')"
 	>
-		<button
-			slot="header-action"
-			class="btn btn-sm bg-neutral-5"
-			tabindex="-1"
-			:class="{ disabled: test }"
-			v-shortkey="{ main: ['='], alt: ['shift', '+'] }"
-			@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
-			@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
-		>
-			<i aria-hidden="true" class="fas fa-plus green" />
-			<span class="ml-1">
-				Add
-				<hk-show-keybind class="d-none d-sm-inline" :binds="['+']" />
-			</span>
-			<q-tooltip v-if="test" anchor="top middle" self="center middle"
-				>Unavailable in test mode</q-tooltip
+		<template v-slot:header-action>
+			<button
+				class="btn btn-sm bg-neutral-5"
+				tabindex="-1"
+				:class="{ disabled: test }"
+				v-shortkey="{ main: ['='], alt: ['shift', '+'] }"
+				@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
+				@shortkey="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
 			>
-		</button>
+				<i aria-hidden="true" class="fas fa-plus green" />
+				<span class="ml-1">
+					Add
+					<hk-show-keybind class="d-none d-sm-inline" :binds="['+']" />
+				</span>
+				<q-tooltip v-if="test" anchor="top middle" self="center middle"
+					>Unavailable in test mode</q-tooltip
+				>
+			</button>
+		</template>
 		<div
 			v-shortkey="{
 				downSingle: ['arrowdown'],
@@ -34,35 +35,38 @@
 			}"
 			@shortkey="cycle_target"
 		>
-			<template v-for="{ group, targets } in groups">
-				<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
+			<template v-for="{ group, targets } in groups" :key="group">
+				<h2 v-if="group !== 'active' && targets.length > 0">
 					<hk-icon v-if="group === 'down'" icon="fas fa-skull-crossbones" class="red mr-1" />
 					{{ group.capitalize() }} ({{ targets.length }})
 				</h2>
+				<!-- vuedraggable 4 renders the list itself through the #item slot and wraps
+				     it in the tag given by `tag` + component-data. model-value (rather than
+				     list) is deliberate: the array is never spliced, Sortable only moves the
+				     DOM node and @end applies the real reorder through initiative.
+
+				     `tag` is a plain `ul` and not `transition-group`, which is what carried
+				     the enter/leave animation on Vue 2. TransitionGroup clones every keyed
+				     child (getTransitionRawChildren -> cloneVNode), so the vnodes
+				     vuedraggable holds on to never get an `el`, and its mounted hook throws
+				     on the null el. That took the whole Targets pane down with it. -->
 				<draggable
-					tag="div"
-					:value="targets"
+					tag="ul"
+					:model-value="targets"
+					item-key="key"
+					:component-data="{
+						class: ['targets', `${group}_targets`],
+					}"
 					:animation="200"
 					handle=".drag-handle"
 					ghost-class="drag-ghost"
 					drag-class="drag-dragging"
 					:force-fallback="true"
-					:key="`sortable-${group}`"
 					@end="onDrag"
 				>
-					<transition-group
-						:key="group"
-						tag="ul"
-						class="targets"
-						:class="`${group}_targets`"
-						name="group"
-						enter-active-class="animated animate__fadeInUp"
-						leave-active-class="animated animate__fadeOutDown"
-					>
+					<template #item="{ element: entity, index: i }">
 						<li
-							v-for="(entity, i) in targets"
 							class="d-flex justify-content-between target-li"
-							:key="entity.key"
 							:class="{
 								targeted: targeted.includes(entity.key),
 								top: _active[0].key === entity.key && encounter.turn !== 0,
@@ -95,7 +99,7 @@
 								@shortkey="set_targeted({ type: 'single', key: entity.key })"
 							>
 								<TargetEntity :entity="entity">
-									<template v-if="!entity.active" slot="effects">
+									<template v-if="!entity.active" v-slot:effects>
 										<button
 											class="btn btn-sm bg-neutral-8"
 											v-if="entity.addNextRound"
@@ -138,7 +142,7 @@
 								:offset="[10, 0]"
 							/>
 						</li>
-					</transition-group>
+					</template>
 				</draggable>
 			</template>
 		</div>

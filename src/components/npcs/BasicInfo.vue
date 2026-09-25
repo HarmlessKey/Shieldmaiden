@@ -1,28 +1,30 @@
 <template>
 	<div>
 		<hk-card>
-			<div class="card-header p-0" slot="header">
-				<div class="d-flex justify-content-between items-center full-width pr-4">
-					<div
-						class="img"
-						@click="avatar_dialog = true"
-						:style="{
-							backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
-						}"
-					>
-						<i
-							aria-hidden="true"
-							v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload"
-							class="hki-monster"
-						/>
+			<template v-slot:header>
+				<div class="card-header p-0">
+					<div class="d-flex justify-content-between items-center full-width pr-4">
+						<div
+							class="img"
+							@click="avatar_dialog = true"
+							:style="{
+								backgroundImage: current_avatar ? `url('${current_avatar}')` : '',
+							}"
+						>
+							<i
+								aria-hidden="true"
+								v-if="!npc.storage_avatar && !npc.avatar && !preview_new_upload"
+								class="hki-monster"
+							/>
+						</div>
+						<div class="flex-grow">Basic info</div>
+						<button v-if="npc" class="btn btn-sm bg-neutral-5" @click.prevent="viewNpc">
+							<i class="fas fa-eye" />
+							<q-tooltip anchor="top middle" self="center middle">View</q-tooltip>
+						</button>
 					</div>
-					<div class="flex-grow">Basic info</div>
-					<button v-if="npc" class="btn btn-sm bg-neutral-5" @click.prevent="viewNpc">
-						<i class="fas fa-eye" />
-						<q-tooltip anchor="top middle" self="center middle">View</q-tooltip>
-					</button>
 				</div>
-			</div>
+			</template>
 			<div class="card-body">
 				<!-- NAME -->
 				<div class="row q-col-gutter-md mb-2">
@@ -40,7 +42,7 @@
 								maxlength="100"
 								autocomplete="off"
 								v-model="npc.name"
-								@input="capitalizeName"
+								@update:model-value="capitalizeName"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
@@ -66,7 +68,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col-3">
-						<hk-edition-select :value="npc.edition" @input="setEdition" />
+						<hk-edition-select :model-value="npc.edition" @update:model-value="setEdition" />
 					</div>
 				</div>
 
@@ -161,7 +163,7 @@
 											clickable
 											v-ripple
 											v-close-popup
-											@click="$set(npc, 'challenge_rating', scope.opt)"
+											@click="npc.challenge_rating = scope.opt"
 										>
 											<q-item-section>{{
 												scope.opt == 0.125
@@ -178,12 +180,14 @@
 										</q-item>
 									</q-list>
 								</template>
-								<div slot="after" v-if="npc.challenge_rating" class="pr-3">
-									+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Proficiency bonus
-									</q-tooltip>
-								</div>
+								<template v-slot:after>
+									<div v-if="npc.challenge_rating" class="pr-3">
+										+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Proficiency bonus
+										</q-tooltip>
+									</div>
+								</template>
 							</q-select>
 						</ValidationProvider>
 					</div>
@@ -271,7 +275,7 @@
 							:options="groupOptions"
 						>
 							<template v-slot:option="scope">
-								<q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+								<q-item v-bind="scope.itemProps">
 									<q-item-section class="group-option">
 										<span>{{ scope.opt.label }}</span>
 										<span v-if="scope.opt.isCampaign" class="campaign-pill">Campaign</span>
@@ -322,7 +326,7 @@
 								type="number"
 								class="mb-2"
 								v-model.number="npc.armor_class"
-								@input="parseToInt($event, npc, 'armor_class')"
+								@update:model-value="parseToInt($event, npc, 'armor_class')"
 								name="ac"
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -347,7 +351,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.initiative_modifier"
-								@input="parseToInt($event, npc, 'initiative_modifier')"
+								@update:model-value="parseToInt($event, npc, 'initiative_modifier')"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							>
@@ -380,7 +384,7 @@
 								type="number"
 								class="mb-2"
 								v-model.number="npc.hit_points"
-								@input="parseToInt($event, npc, 'hit_points')"
+								@update:model-value="parseToInt($event, npc, 'hit_points')"
 								name="hp"
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -441,7 +445,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.walk_speed"
-								@input="parseToInt($event, npc, 'walk_speed')"
+								@update:model-value="parseToInt($event, npc, 'walk_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -462,7 +466,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.swim_speed"
-								@input="parseToInt($event, npc, 'swim_speed')"
+								@update:model-value="parseToInt($event, npc, 'swim_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -483,7 +487,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.fly_speed"
-								@input="parseToInt($event, npc, 'fly_speed')"
+								@update:model-value="parseToInt($event, npc, 'fly_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -504,7 +508,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.burrow_speed"
-								@input="parseToInt($event, npc, 'burrow_speed')"
+								@update:model-value="parseToInt($event, npc, 'burrow_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -525,7 +529,7 @@
 								autocomplete="off"
 								type="number"
 								v-model.number="npc.climb_speed"
-								@input="parseToInt($event, npc, 'climb_speed')"
+								@update:model-value="parseToInt($event, npc, 'climb_speed')"
 								suffix="ft."
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -556,10 +560,12 @@
 				You are changing the edition, this will <strong>clear all spells</strong> from this
 				spellcaster.
 			</p>
-			<div slot="footer" class="card-footer d-flex justify-content-end full-width">
-				<q-btn class="mr-1" no-caps @click="cancelEdition">Cancel</q-btn>
-				<q-btn color="primary" no-caps label="OK" @click="confirmEdition" />
-			</div>
+			<template v-slot:footer>
+				<div class="card-footer d-flex justify-content-end full-width">
+					<q-btn class="mr-1" no-caps @click="cancelEdition">Cancel</q-btn>
+					<q-btn color="primary" no-caps label="OK" @click="confirmEdition" />
+				</div>
+			</template>
 		</hk-dialog>
 	</div>
 </template>
@@ -573,7 +579,8 @@ import { monsterMixin } from "src/mixins/monster.js";
 
 export default {
 	name: "npc-BasicInfo",
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	mixins: [general, monsterMixin],
 	data() {
 		return {
@@ -589,10 +596,10 @@ export default {
 		...mapGetters("campaigns", { all_campaigns: "campaigns" }),
 		npc: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		selectedGroups: {
@@ -604,7 +611,7 @@ export default {
 				for (const id of val || []) {
 					groups[id] = true;
 				}
-				this.$set(this.npc, "groups", Object.keys(groups).length ? groups : null);
+				this.npc.groups = Object.keys(groups).length ? groups : null;
 			},
 		},
 		groupOptions() {
@@ -673,12 +680,12 @@ export default {
 				this.edition_dialog = true;
 				return;
 			}
-			this.$set(this.npc, "edition", edition);
+			this.npc.edition = edition;
 		},
 		confirmEdition() {
-			this.$set(this.npc, "edition", this.pending_edition);
-			this.$delete(this.npc, "caster_spells");
-			this.$delete(this.npc, "innate_spells");
+			this.npc.edition = this.pending_edition;
+			delete this.npc.caster_spells;
+			delete this.npc.innate_spells;
 			this.cancelEdition();
 		},
 		cancelEdition() {
@@ -687,9 +694,9 @@ export default {
 		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		// Capitalizes every word in the name of the NPC
@@ -698,21 +705,21 @@ export default {
 		},
 		saveBlob(value) {
 			// Clear the image url
-			this.$delete(this.npc, "avatar");
-			this.$set(this.npc, "blob", value.blob);
+			delete this.npc.avatar;
+			this.npc.blob = value.blob;
 			this.preview_new_upload = value.dataUrl;
 			this.avatar_dialog = false;
 		},
 		saveUrl(value) {
-			this.$delete(this.npc, "storage_avatar");
-			this.$set(this.npc, "avatar", value);
+			delete this.npc.storage_avatar;
+			this.npc.avatar = value;
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},
 		clearAvatar() {
-			this.$delete(this.npc, "avatar");
-			this.$delete(this.npc, "storage_avatar");
-			this.$delete(this.npc, "blob");
+			delete this.npc.avatar;
+			delete this.npc.storage_avatar;
+			delete this.npc.blob;
 			this.preview_new_upload = undefined;
 			this.avatar_dialog = false;
 		},

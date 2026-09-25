@@ -25,12 +25,11 @@
 					<a @click="addInput()" class="handle"
 						><i aria-hidden="true" class="fas fa-plus green"></i
 					></a>
-					<template v-for="(input, i) in damage">
+					<template v-for="(input, i) in damage" :key="`damage-${i}`">
 						<ValidationProvider
 							rules="required|numeric|min_value:0"
 							:name="`amount-${i}`"
 							v-slot="{ errors, invalid, validated }"
-							:key="`damage-${i}`"
 						>
 							<q-input
 								:dark="$store.getters.theme === 'dark'"
@@ -52,11 +51,10 @@
 							v-model="damage[i].damage_type"
 							label="Damage type"
 							dense
-							:key="`type-${i}`"
-							@input="$forceUpdate()"
+							@update:model-value="$forceUpdate()"
 							:class="{ 'no-delete': i === 0 }"
 						/>
-						<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"
+						<a v-if="i > 0" @click="removeInput(i)" class="handle"
 							><i aria-hidden="true" class="fas fa-trash-alt red"></i
 						></a>
 					</template>
@@ -153,7 +151,7 @@ export default {
 			this.damage.push({ amount: "", damage_type: "acid" });
 		},
 		removeInput(i) {
-			this.$delete(this.damage, i);
+			this.damage.splice(i, 1);
 			this.$forceUpdate();
 		},
 		sendRequest() {
@@ -194,7 +192,7 @@ export default {
 			);
 			this.setDrawer({ show: false });
 		},
-		},
+	},
 };
 </script>
 

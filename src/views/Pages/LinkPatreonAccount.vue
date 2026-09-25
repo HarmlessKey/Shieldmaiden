@@ -6,9 +6,11 @@
 				<div v-if="$route.query?.code" class="card-body">
 					Something went wrong while fetching your Patreon account, please try again.
 				</div>
-				<div slot="footer" class="card-footer">
-					<PatreonLinkButton class="btn-block" />
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<PatreonLinkButton class="btn-block" />
+					</div>
+				</template>
 			</hk-card>
 			<template v-else-if="patreon_user">
 				<hk-card class="patron-card">
@@ -30,7 +32,10 @@
 									>View profile</a
 								>
 							</div>
-							<div slot="footer" class="card-footer">
+							<!-- hk-card renders its footer slot right after the default slot, so a
+							     plain child keeps the same position. A named slot cannot be used here:
+							     it would have to be a direct child of hk-card, not nested in v-if. -->
+							<div class="card-footer">
 								<router-link
 									class="btn bg-neutral-5 mr-2"
 									:class="{ 'full-width': id_taken }"
@@ -72,7 +77,7 @@
 									{{ userInfo.patron?.expired ? "Renew" : "Subscribe" }}
 								</a>
 							</div>
-							<div slot="footer" class="card-footer">
+							<div class="card-footer">
 								<router-link
 									class="btn bg-neutral-5 mr-2"
 									:class="{ 'full-width': success }"
@@ -178,25 +183,23 @@ export default {
 <style lang="scss" scoped>
 .hk-card.patron-card {
 	width: 300px;
-	&::v-deep {
-		.card-body {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			text-align: center;
+	:deep(.card-body) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
 
-			img {
-				width: 100px;
-				aspect-ratio: 1/1;
-				object-fit: cover;
-				object-position: center;
-				border-radius: 100%;
-				margin-bottom: 15px;
-			}
-			.name {
-				font-size: 18px;
-				font-weight: bold;
-			}
+		img {
+			width: 100px;
+			aspect-ratio: 1/1;
+			object-fit: cover;
+			object-position: center;
+			border-radius: 100%;
+			margin-bottom: 15px;
+		}
+		.name {
+			font-size: 18px;
+			font-weight: bold;
 		}
 	}
 }

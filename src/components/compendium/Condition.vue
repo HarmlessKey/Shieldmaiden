@@ -11,8 +11,10 @@
 		<!-- EXHAUSTION -->
 		<table v-if="condition.name == 'Exhaustion'" class="table">
 			<thead>
-				<th>Level</th>
-				<th>Effect</th>
+				<tr>
+					<th>Level</th>
+					<th>Effect</th>
+				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(effect, index) in exhaustionLevels" :key="index">
@@ -25,66 +27,66 @@
 </template>
 
 <script>
-	import { mapActions } from "vuex";
-	import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
+import { mapActions } from "vuex";
+import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
 
-	export default {
-		name: "Condition",
-		props: {
-			// If the condition is fetched in a parent component you can send the full condition object in de data prop
-			data: {
-				type: Object
-			},
-			// If the id prop is passed, the condition is fetched in the Condition component
-			id: {
-				type: String
-			},
-			// Edition to fetch the condition for when using the id prop; falls back to the route edition
-			edition: {
-				type: String
-			}
+export default {
+	name: "Condition",
+	props: {
+		// If the condition is fetched in a parent component you can send the full condition object in de data prop
+		data: {
+			type: Object,
 		},
-		data() {
-			return {
-				condition: {},
-				loading: true,
-			}
+		// If the id prop is passed, the condition is fetched in the Condition component
+		id: {
+			type: String,
 		},
-		computed: {
-			resolvedEdition() {
-				return this.edition || (this.$route.params.edition === "5.5e" ? "5.5e" : "5e");
-			},
-			exhaustionLevels() {
-				return EXHAUSTION_LEVELS[this.resolvedEdition];
-			},
+		// Edition to fetch the condition for when using the id prop; falls back to the route edition
+		edition: {
+			type: String,
 		},
-		async beforeMount() {
-			if(this.data) {
-				this.condition = this.data;
-				this.loading = false;
-			} else {
-				this.condition = await this.fetch_condition({ id: this.id, edition: this.resolvedEdition });
-				this.loading = false;
-			}
+	},
+	data() {
+		return {
+			condition: {},
+			loading: true,
+		};
+	},
+	computed: {
+		resolvedEdition() {
+			return this.edition || (this.$route.params.edition === "5.5e" ? "5.5e" : "5e");
 		},
-		methods: {
-			...mapActions("api_conditions", ["fetch_condition"]),
+		exhaustionLevels() {
+			return EXHAUSTION_LEVELS[this.resolvedEdition];
+		},
+	},
+	async beforeMount() {
+		if (this.data) {
+			this.condition = this.data;
+			this.loading = false;
+		} else {
+			this.condition = await this.fetch_condition({ id: this.id, edition: this.resolvedEdition });
+			this.loading = false;
 		}
-	};
+	},
+	methods: {
+		...mapActions("api_conditions", ["fetch_condition"]),
+	},
+};
 </script>
 
 <style lang="scss" scoped>
-	ul {
-		margin-top: 20px;
-		padding-left: 20px;
+ul {
+	margin-top: 20px;
+	padding-left: 20px;
 
-		li {
-			margin-bottom: 20px;
-		}
-
-		&.exhaustion {
-			list-style: none;
-			padding: 0;
-		}
+	li {
+		margin-bottom: 20px;
 	}
+
+	&.exhaustion {
+		list-style: none;
+		padding: 0;
+	}
+}
 </style>

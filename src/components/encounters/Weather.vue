@@ -42,14 +42,14 @@
 export default {
 	name: "EditWeather",
 	props: {
-		value: {
+		modelValue: {
 			type: Object,
 			required: true,
 		},
 		disabled: {
 			type: Boolean,
 			default: false,
-		}
+		},
 	},
 	data() {
 		return {
@@ -65,13 +65,14 @@ export default {
 			},
 		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		weather: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},

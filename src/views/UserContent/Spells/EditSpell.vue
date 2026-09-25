@@ -79,10 +79,12 @@
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">
 			<hk-card class="create-dialog">
-				<div slot="header" class="card-header">
-					<span>Copy existing Spell</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Copy existing Spell</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<CopyContent @copy="copy" type="spell" />
 				</div>
@@ -91,21 +93,25 @@
 
 		<q-dialog v-model="account_dialog">
 			<hk-card class="account-dialog">
-				<div slot="header" class="card-header">
-					<span>Save your spell</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Save your spell</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<p>Create an account to save your spell and use it on your spellcaster monsters.</p>
 					<button class="btn btn-block bg-accent" @click="sign_up_dialog = true">
 						Create Free Account
 					</button>
 				</div>
-				<div slot="footer" class="card-footer">
-					<q-btn no-caps @click="download">
-						Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
-					</q-btn>
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<q-btn no-caps @click="download">
+							Download <i aria-hidden="true" class="fas fa-arrow-alt-down ml-2" />
+						</q-btn>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
@@ -126,12 +132,14 @@
 						<CopyContent @copy="copy" type="spell" />
 					</template>
 				</div>
-				<div v-if="copy_spell" class="card-footer" slot="footer">
-					<button class="btn btn-sm bg-neutral-5" @click="create_dialog = false">
-						<i class="fas fa-times mr-1" aria-hidden="true" />
-						Create from scratch
-					</button>
-				</div>
+				<template v-slot:footer>
+					<div v-if="copy_spell" class="card-footer">
+						<button class="btn btn-sm bg-neutral-5" @click="create_dialog = false">
+							<i class="fas fa-times mr-1" aria-hidden="true" />
+							Create from scratch
+						</button>
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
@@ -247,7 +255,7 @@ export default {
 				.then((key) => {
 					// Set the spellId, so we know there is an existing spell
 					// even though we are on the AddSpell route, this we won't create multiple when hitting save again
-					this.$set(this, "spellId", key);
+					this.spellId = key;
 
 					this.$snotify.success("Spell Saved.", "Critical hit!", {
 						position: "rightTop",

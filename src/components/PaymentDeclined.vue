@@ -1,6 +1,8 @@
 <template>
 	<q-banner v-if="declined_payment" class="bg-orange mb-3 white" rounded inline-actions>
-		<q-icon slot="avatar" name="fas fa-ban" size="sm" />
+		<template v-slot:avatar>
+			<q-icon name="fas fa-ban" size="sm" />
+		</template>
 		<strong>Payment declined</strong><br />
 		<small class="declined">
 			Your last payment on Patreon was declined, your subscription will automatically be cancelled
@@ -12,7 +14,7 @@
 			>
 			to check your payment details.
 		</small>
-		<template slot="action">
+		<template v-slot:action>
 			<q-btn
 				flat
 				color="white"
@@ -25,14 +27,16 @@
 		</template>
 	</q-banner>
 	<q-banner v-else-if="pending_payment" class="bg-blue mb-3 white" rounded inline-actions>
-		<q-icon slot="avatar" name="fas fa-sync" size="sm" />
+		<template v-slot:avatar>
+			<q-icon name="fas fa-sync" size="sm" />
+		</template>
 		<strong>Payment pending</strong><br />
 		<small>
 			Thanks for your subscription! We're still waiting on data from Patreon, this might take a few
 			minutes.<br />
 			It might be needed to refresh the page for your subscription to update.
 		</small>
-		<template slot="action">
+		<template v-slot:action>
 			<q-btn
 				flat
 				color="white"

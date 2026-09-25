@@ -121,24 +121,27 @@
 							color="white"
 							v-model="editable_entity.ac_bonus"
 						>
-							<q-icon slot="append" size="xs" name="fas fa-shield-check" />
-							<q-btn
-								slot="after"
-								flat
-								dense
-								color="primary"
-								icon="check"
-								no-caps
-								v-close-popup
-								@click.stop="
-									edit_entity_prop({
-										key: entity.key,
-										entityType: entity.entityType,
-										prop: 'ac_bonus',
-										value: editable_entity.ac_bonus,
-									})
-								"
-							/>
+							<template v-slot:append>
+								<q-icon size="xs" name="fas fa-shield-check" />
+							</template>
+							<template v-slot:after>
+								<q-btn
+									flat
+									dense
+									color="primary"
+									icon="check"
+									no-caps
+									v-close-popup
+									@click.stop="
+										edit_entity_prop({
+											key: entity.key,
+											entityType: entity.entityType,
+											prop: 'ac_bonus',
+											value: editable_entity.ac_bonus,
+										})
+									"
+								/>
+							</template>
 						</q-input>
 						<q-input
 							class="mt-2"
@@ -151,25 +154,30 @@
 							color="white"
 							v-model="editable_entity.ac"
 						>
-							<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-							<q-icon slot="append" size="xs" name="fas fa-shield" />
-							<q-btn
-								slot="after"
-								flat
-								dense
-								no-caps
-								color="primary"
-								icon="check"
-								v-close-popup
-								@click.stop="
-									edit_entity_prop({
-										key: entity.key,
-										entityType: entity.entityType,
-										prop: 'ac',
-										value: editable_entity.ac,
-									})
-								"
-							/>
+							<template v-slot:prepend>
+								<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+							</template>
+							<template v-slot:append>
+								<q-icon size="xs" name="fas fa-shield" />
+							</template>
+							<template v-slot:after>
+								<q-btn
+									flat
+									dense
+									no-caps
+									color="primary"
+									icon="check"
+									v-close-popup
+									@click.stop="
+										edit_entity_prop({
+											key: entity.key,
+											entityType: entity.entityType,
+											prop: 'ac',
+											value: editable_entity.ac,
+										})
+									"
+								/>
+							</template>
 						</q-input>
 						<div class="d-flex justify-content-end mt-2">
 							<q-btn flat no-caps class="bg-neutral-8" v-close-popup>Close</q-btn>
@@ -251,24 +259,27 @@
 									color="white"
 									v-model="editable_entity.tempHp"
 								>
-									<q-icon slot="append" size="xs" name="fas fa-stopwatch" />
-									<q-btn
-										slot="after"
-										flat
-										dense
-										no-caps
-										color="primary"
-										icon="check"
-										v-close-popup
-										@click.stop="
-											edit_entity_prop({
-												key: entity.key,
-												entityType: entity.entityType,
-												prop: 'tempHp',
-												value: editable_entity.tempHp,
-											})
-										"
-									/>
+									<template v-slot:append>
+										<q-icon size="xs" name="fas fa-stopwatch" />
+									</template>
+									<template v-slot:after>
+										<q-btn
+											flat
+											dense
+											no-caps
+											color="primary"
+											icon="check"
+											v-close-popup
+											@click.stop="
+												edit_entity_prop({
+													key: entity.key,
+													entityType: entity.entityType,
+													prop: 'tempHp',
+													value: editable_entity.tempHp,
+												})
+											"
+										/>
+									</template>
 								</q-input>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -280,25 +291,30 @@
 									color="white"
 									v-model="editable_entity.maxHpMod"
 								>
-									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-									<q-icon slot="append" size="xs" name="fas fa-plus" />
-									<q-btn
-										slot="after"
-										flat
-										dense
-										no-caps
-										color="primary"
-										icon="check"
-										v-close-popup
-										@click.stop="
-											edit_entity_prop({
-												key: entity.key,
-												entityType: entity.entityType,
-												prop: 'maxHpMod',
-												value: editable_entity.maxHpMod,
-											})
-										"
-									/>
+									<template v-slot:prepend>
+										<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+									</template>
+									<template v-slot:append>
+										<q-icon size="xs" name="fas fa-plus" />
+									</template>
+									<template v-slot:after>
+										<q-btn
+											flat
+											dense
+											no-caps
+											color="primary"
+											icon="check"
+											v-close-popup
+											@click.stop="
+												edit_entity_prop({
+													key: entity.key,
+													entityType: entity.entityType,
+													prop: 'maxHpMod',
+													value: editable_entity.maxHpMod,
+												})
+											"
+										/>
+									</template>
 								</q-input>
 								<hr />
 								<q-input
@@ -312,25 +328,30 @@
 									class="mb-2"
 									v-model="editable_entity.curHp"
 								>
-									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-									<q-icon slot="append" size="xs" name="fas fa-heart" />
-									<q-btn
-										slot="after"
-										flat
-										dense
-										no-caps
-										color="primary"
-										icon="check"
-										v-close-popup
-										@click.stop="
-											edit_entity_prop({
-												key: entity.key,
-												entityType: entity.entityType,
-												prop: 'curHp',
-												value: editable_entity.curHp,
-											})
-										"
-									/>
+									<template v-slot:prepend>
+										<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+									</template>
+									<template v-slot:append>
+										<q-icon size="xs" name="fas fa-heart" />
+									</template>
+									<template v-slot:after>
+										<q-btn
+											flat
+											dense
+											no-caps
+											color="primary"
+											icon="check"
+											v-close-popup
+											@click.stop="
+												edit_entity_prop({
+													key: entity.key,
+													entityType: entity.entityType,
+													prop: 'curHp',
+													value: editable_entity.curHp,
+												})
+											"
+										/>
+									</template>
 								</q-input>
 								<q-input
 									:dark="$store.getters.theme === 'dark'"
@@ -342,35 +363,39 @@
 									color="white"
 									v-model="editable_entity.maxHp"
 								>
-									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
-									<span
-										slot="append"
-										v-if="displayStats().maxHpMod"
-										:class="displayStats().maxHpMod > 0 ? 'green' : 'red'"
-									>
-										{{
-											displayStats().maxHpMod > 0
-												? `+${displayStats().maxHpMod}`
-												: displayStats().maxHpMod
-										}}
-										<q-tooltip anchor="top middle" self="center middle"> Modifier </q-tooltip>
-									</span>
-									<q-btn
-										slot="after"
-										flat
-										dense
-										color="primary"
-										icon="check"
-										v-close-popup
-										@click.stop="
-											edit_entity_prop({
-												key: entity.key,
-												entityType: entity.entityType,
-												prop: 'maxHp',
-												value: editable_entity.maxHp,
-											})
-										"
-									/>
+									<template v-slot:prepend>
+										<q-icon v-if="entity.transformed" name="fas fa-paw-claws green" />
+									</template>
+									<template v-slot:append>
+										<span
+											v-if="displayStats().maxHpMod"
+											:class="displayStats().maxHpMod > 0 ? 'green' : 'red'"
+										>
+											{{
+												displayStats().maxHpMod > 0
+													? `+${displayStats().maxHpMod}`
+													: displayStats().maxHpMod
+											}}
+											<q-tooltip anchor="top middle" self="center middle"> Modifier </q-tooltip>
+										</span>
+									</template>
+									<template v-slot:after>
+										<q-btn
+											flat
+											dense
+											color="primary"
+											icon="check"
+											v-close-popup
+											@click.stop="
+												edit_entity_prop({
+													key: entity.key,
+													entityType: entity.entityType,
+													prop: 'maxHp',
+													value: editable_entity.maxHp,
+												})
+											"
+										/>
+									</template>
 								</q-input>
 								<div class="d-flex justify-content-end mt-2">
 									<q-btn flat no-caps class="bg-neutral-8" v-close-popup>Close</q-btn>

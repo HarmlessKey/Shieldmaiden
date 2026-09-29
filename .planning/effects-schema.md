@@ -12,6 +12,18 @@ Reference: D&D 5e (2014 SRD 5.1) and D&D 5.5e (2024 SRD 5.2) Conditions appendic
 > action/trait entries). See [monster-actions-effect-scan.md](monster-actions-effect-scan.md) for the
 > raw scan data this compatibility check is based on.
 
+> Update (2026-09-29, later): **The schema is now finalized as v2** in
+> `src/schemas/hk-effects-schema.json`, after a full sweep of both SRD PDFs. Everything
+> proposed below (Gaps 1–34 and the §4 superset) is either in v2 or superseded by it; the
+> mapping, the new constructs and worked examples are in
+> [effects-srd-catalogue.md](effects-srd-catalogue.md). Read that first; this document
+> stays as the rationale trail.
+
+> Update (2026-09-29): After 5.5e shipped, §1's 2024 notes were checked against the live
+> `/conditions/5.5e` text (Exhaustion, Incapacitated, Grappled, Invisible corrected; Dying and
+> Surprised removed as non-conditions) and Section 2b / Gaps 29–34 were added from the 330
+> 5.5e monsters at `/monsters/5.5e`.
+
 ---
 
 ## 1. Conditions broken down into the existing effect_type/subtype model
@@ -54,12 +66,14 @@ language became unified, Exhaustion was reworked, Prone's attack rules changed).
 - Level 6: death (special — see Gap #11 "death" effect_type)
 
 ### Exhaustion (2024: reworked — single stacking penalty model)
-- duration_type: cancelled
+> Corrected 2026-09-29 against `/conditions/5.5e`: 2024 Exhaustion imposes a numeric penalty, not
+> Disadvantage.
+- duration_type: cancelled (a Long Rest removes 1 level)
 - cancelable: yes
-- Each level of exhaustion (1-6):
-  - `disadvantage` / `roll` (2024 generalizes to "all d20 Tests" — see Gap #2, generic d20 roll subtype)
-  - `bonus` / `speed` with a per-level numeric penalty (-5 ft per level) — needs **variable-by-stack** support, see Gap #12
-  - At level 6: death
+- One condition with a `level` (1-6) on the instance:
+  - `bonus` / `d20_test` with value `-2 × level` (every D20 Test: attacks, ability checks, saves — see Gap #2 and Gap #29)
+  - `bonus` / `speed` with value `-5 × level` ft (see Gap #12 / Gap #29)
+  - At level 6: death (`outcome`)
 
 ### Frightened
 - duration_type: cancelled / trigger (often "while source of fear is in line of sight")
@@ -74,13 +88,20 @@ language became unified, Exhaustion was reworked, Prone's attack rules changed).
 - sub-effects:
   - `fixed` / `speed` (speed becomes 0)
   - `special` / `descriptive` — ends if grappler is incapacitated or moved out of reach
+  - 2024 adds: `disadvantage` / `attack` against any target **other than the grappler**
+    (conditional-on-target, Gap #7), "Speed 0 and can't increase", and the grappler can
+    drag/carry you. Escape DC is set by the source (Gap #24).
 
 ### Incapacitated (2024 expanded definition vs 2014)
 - duration_type: cancelled
 - cancelable: yes
 - sub-effects:
   - `restrict` / `action`, `reaction` (2024 also explicitly restricts bonus actions and speaking — see Gap #4 "bonus_action" subtype)
-  - 2024 also: can't take reactions, and Concentration is unaffected unless otherwise stated (note for documentation only)
+  - 2024 also (corrected 2026-09-29 against `/conditions/5.5e`): can't speak
+    (`restrict` / `speech`), **Concentration is broken** (`outcome` / break concentration,
+    or a trigger that removes the entity's Concentration instance — cascades per plan 2h),
+    and Disadvantage on Initiative if Incapacitated when rolling it (`disadvantage` /
+    `initiative`, Gap #34)
 
 ### Invisible
 - duration_type: cancelled / time
@@ -89,6 +110,8 @@ language became unified, Exhaustion was reworked, Prone's attack rules changed).
   - `advantage` / `attack` (target's attacks made with advantage — invisible attacker)
   - `disadvantage` / `attack` (attacks against the target have disadvantage)
   - `special` / `descriptive` — heavily affects detection/Perception, not easily modeled numerically
+  - 2024 adds: Advantage on Initiative (`advantage` / `initiative`, Gap #34) and "Concealed" —
+    unaffected by effects that require the target to be seen (`special` / `descriptive`)
 
 ### Paralyzed
 - duration_type: cancelled / trigger
@@ -155,18 +178,19 @@ language became unified, Exhaustion was reworked, Prone's attack rules changed).
   - `advantage` / `attack` (attacks against target have advantage)
   - `special` / `crit` — melee crit within 5ft (same as Paralyzed)
 
-### New/notable 2024 condition: "Dying" (replaces some "0 HP" handling)
-- 2024 SRD formalizes a "Dying" condition for creatures at 0 HP that aren't already dead/stable
-- sub-effects:
-  - `restrict` / `action`, `reaction`, `bonus_action` (incapacitated)
-  - `fixed` / `speed` (0)
-  - `special` / `descriptive` — must make death saving throws, falls prone
+### 2024: conditions defined by other conditions
+In SRD 5.2.1, Paralyzed, Petrified and Stunned say "You have the Incapacitated condition", and
+Unconscious says "You have the Incapacitated and Prone conditions". Model these as a reference
+to the included condition (Gap #30) rather than copying Incapacitated's sub-effects — then the
+2024 Incapacitated rules (no Bonus Actions, can't speak, Concentration broken) apply to all of
+them automatically. 2024 Stunned drops the 2014 "can't move, can speak only falteringly" text.
 
-### New/notable 2024 condition: "Surprised"
-- duration_type: trigger (until end of creature's first turn)
-- sub-effects:
-  - `restrict` / `action`, `reaction`, `bonus_action` — can't move or take actions/reactions on first turn of combat
-  - (existing model already mostly covers via `restrict`)
+### ~~"Dying"~~ and ~~"Surprised"~~ — not 2024 conditions (removed 2026-09-29)
+Earlier versions of this doc listed these as new 2024 conditions. They are not in SRD 5.2.1's
+condition list (`/conditions/5.5e` returns the same 15 conditions as 2014, no Dying/Surprised).
+0 HP / death saves remain tracker state, and 2024 surprise is only Disadvantage on the
+Initiative roll, which the 5.5e spec decided needs no tracker support. Remove both entries
+from `src/data/5.5e/conditions.js`.
 
 ---
 
@@ -725,6 +749,82 @@ timing (*Aboleth* disease — a single occurrence in the corpus) isn't worth new
 
 ---
 
+## 2b. Compatibility check against the 2024 (SRD 5.2.1) corpus
+
+Added 2026-09-29, after 5.5e shipped. Sources: `/conditions/5.5e` (15 conditions) and
+`/monsters/5.5e` (330 monsters, all action/bonus action/reaction/legendary/trait text).
+Headline counts are in [effects-implementation-plan.md §0c](effects-implementation-plan.md).
+Most 2014 gaps above still apply unchanged. 2024 text is much more regular — structured
+`Failure:` / `Success:` / `Failure or Success:` save blocks and consistent "has the X
+condition" phrasing — which makes the monster-action work (plan steps 6/7) easier, but it
+adds the gaps below.
+
+### Gap 29: Level-scaled numeric values (2024 Exhaustion)
+**Problem:** Gap 12 covers stacking, but 2024 Exhaustion needs a *numeric value that scales
+with the level*: D20 Tests `-2 × level`, Speed `-5 × level`.
+**Proposal:** allow `value_per_level` on `bonus` sub-effects; the resolved value is
+`value_per_level × instance.level`. The active instance carries `level` (1-6); re-applying
+the effect increments it. Level 6 fires an `outcome` (death).
+
+### Gap 30: Condition inclusion
+**Problem:** 2024 conditions include other conditions (Paralyzed/Petrified/Stunned →
+Incapacitated; Unconscious → Incapacitated + Prone). Monster text also nests them: "While
+Grappled, the target has the Restrained condition" (crocodile).
+**Proposal:** new sub-effect type `includes` with `source` + `source_key`
+(e.g. `{ type: "includes", source: "srd", source_key: "incapacitated" }`). The resolver
+expands it recursively at runtime (2e). Nothing is persisted for the included condition, so
+it ends exactly when the parent does. Immunity to the included condition does not block the
+parent (RAW: a creature immune to Incapacitated can still be Stunned — just not
+incapacitated by it); the resolver skips the included entry for immune entities.
+
+### Gap 31: Bloodied
+**Problem:** "Bloodied" (HP ≤ half max) is a 2024 rules keyword (18 monster entries):
+"While Bloodied, the berserker has Advantage on attack rolls and saving throws", "+damage
+if the target is Bloodied" (blood hawk), reactions triggered when a creature "becomes
+Bloodied" (black pudding).
+**Proposal:** a derived state, not a stored effect. Add `bloodied` as a sub-effect
+`condition` type (`{ type: "self_state", value: "bloodied" }` or
+`{ type: "target_state", value: "bloodied" }`) and an `on_bloodied` trigger fired by
+`HpManipulations.js` when HP crosses from above half to at-or-below half. Edition-agnostic —
+works for 2014 content too.
+
+### Gap 32: Save escalation
+**Problem:** 12+ monster actions escalate on repeated failure: "First Failure: Restrained
+... Second Failure: Petrified" (basilisk), "Failure: Incapacitated until the end of its next
+turn, at which point it repeats the save. Second Failure: Unconscious for 10 minutes"
+(brass dragon sleep breath). Also "After 1 minute, it succeeds automatically" (chuul).
+**Proposal:** on `save_ends` instances, optional `on_repeat_fail` (a reference to the effect
+to apply instead, with its own duration) and `max_rounds` (auto-success cap). The DM prompt
+shows the consequence of failure.
+
+### Gap 33: Next-turn duration anchor and edge
+**Problem:** the `next_turn` duration type assumed the caster's next turn. 2024 monsters use
+both anchors and both edges: "until the start of the assassin's next turn" (41) vs "until the
+end of its [target's] next turn" (31).
+**Proposal:** `next_turn_anchor: "caster" | "target"` and `next_turn_edge: "start" | "end"`
+on the instance (defaults `caster` / `start`). See plan 2h.
+
+### Gap 34: Initiative and concentration-save subtypes
+**Problem:** 2024 Invisible grants Advantage on Initiative, Incapacitated gives Disadvantage
+on it. Monster riders target Concentration saves specifically: "Disadvantage on saving throws
+to maintain Concentration until the end of its next turn" (adult black dragon).
+**Proposal:** add `initiative` and `concentration` to the `advantage` / `disadvantage`
+subtypes (and `initiative` to `bonus`). `d20_test` does include initiative in 2024, since
+Initiative is a Dexterity check.
+
+### Other 2024 notes (no new structure needed)
+- Repeat saves: every 5.5e occurrence is "at the end of each of its turns" — default
+  `save_trigger` to `end_turn_target`.
+- Reactions use `Trigger: ... Response: ...`; the triggers map onto the existing enum plus
+  `on_bloodied`.
+- Concentration (2024): save DC is `max(10, half damage)`, capped at 30, and Concentration
+  also ends when Incapacitated (via Gap 30 + the Incapacitated sub-effect).
+- Weapon Mastery (Sap, Slow, Vex, Topple) is a player-side 2024 mechanic. It fits the model
+  (next-turn durations + advantage/disadvantage/speed), but the 5.5e spec keeps mastery
+  display-only. Candidate SRD entries for `src/data/5.5e/effects.js` later, not required.
+
+---
+
 ## 3. New triggers and duration_types needed
 
 ### New `triggers`:
@@ -735,15 +835,16 @@ timing (*Aboleth* disease — a single occurrence in the corpus) isn't worth new
 | On being hit (target is hit by an attack) | `on_hit_taken` | Riposte-like reactions, Shield spell trigger |
 | On failed saving throw | `failed_save` | Massive Damage / outcome effects (Gap 11), many "on a failed save, X happens" riders |
 | On successful saving throw | `success_save` | Evasion-like halved/negated damage (Gap 9) |
-| Start of combat / on initiative roll | `combat_start` | Surprised condition (2024), Alert feat |
-| On reduced to 0 HP | `zero_hp` | Dying condition (2024), Relentless Endurance, Massive Damage |
+| Start of combat / on initiative roll | `combat_start` | Initiative advantage/disadvantage (2024 Invisible/Incapacitated), Alert feat |
+| On reduced to 0 HP | `zero_hp` | Relentless Endurance, Massive Damage |
+| On becoming Bloodied | `on_bloodied` | 2024 Bloodied reactions/traits (Gap 31) |
 | On long rest | `long_rest` | Exhaustion reduction, recharge-based features |
 | On short rest | `short_rest` | Recharge-based features (Warlock spell slots, etc.) |
 
 ### New `duration_types`:
 | label | value | rationale |
 |---|---|---|
-| Until end of next turn (caster or target) | `next_turn` | Many spells specify "until the end of its next turn" rather than full round-based duration — distinct from generic "time in rounds" since it's relative to whichever turn comes first |
+| Until start/end of next turn (caster or target) | `next_turn` | Many spells specify "until the end of its next turn" rather than full round-based duration — distinct from generic "time in rounds" since it's relative to whichever turn comes first. Anchor and edge are instance fields (Gap 33) |
 | Instantaneous | `instant` | Effects with no lingering duration (most damage/healing effects) — useful to explicitly mark "no duration tracking needed" rather than defaulting to `time` with 0 |
 | Until removed by specific action (e.g. stand up, escape) | `action_removed` | Prone (stand up), Grappled (escape), Restrained — distinguishes from generic `trigger` which implies an external event; here the *target itself* takes an action to end it |
 | Permanent / until long rest | `long_rest` | Exhaustion levels (reduced 1 per long rest in 2024, fully removed in 2014 with a long rest... actually 2014 also reduces by 1 per long rest with food/drink) |
@@ -751,6 +852,14 @@ timing (*Aboleth* disease — a single occurrence in the corpus) isn't worth new
 ---
 
 ## 4. Proposed extended effect_types / effect_subtypes (superset)
+
+> **Superseded by schema v2** — see [effects-srd-catalogue.md §6](effects-srd-catalogue.md)
+> for what changed. Notable differences from this proposal: `ability` now always means
+> ability *checks* and score changes use the new `ability_score` subtype (replaces the
+> Gap 22 "disambiguate by parent type" rule); Gap 29's `value_per_level` became
+> `scaling: { by: "level" }`; Gap 33's `next_turn_anchor`/`next_turn_edge` became
+> `duration.anchor`/`duration.edge`; the `long_rest` duration became `rest` + `rest_type`;
+> `escape` (Gap 24) and save-ends live on the application's `duration`, not the definition.
 
 ```js
 export const triggers = Object.freeze([

@@ -2,68 +2,86 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "https://harmlesskey.com/schemas/hk-effects-schema.json",
 	"title": "Effect",
-	"description": "A single effect (condition, spell effect, monster ability effect, etc.) made up of one or more sub-effects.",
+	"description": "An effect definition (condition, spell effect, class feature, item property, monster trait, hazard, disease, poison, curse) made up of one or more sub-effects. One schema covers D&D 5e (SRD 5.1) and 5.5e (SRD 5.2): edition differences live in separate data files that use the same shape. A definition never carries a duration; duration, save DC and choices are supplied when the effect is applied (see $defs.application and $defs.active_instance). Full rationale and SRD coverage: .planning/effects-srd-catalogue.md.",
 	"type": "object",
-	"required": ["name", "duration_type", "sub_effects"],
+	"required": ["name", "sub_effects"],
 	"properties": {
+		"key": {
+			"type": "string",
+			"pattern": "^[a-z0-9_-]+$",
+			"description": "Stable, edition-neutral key. Referenced by active instances as source_key. For SRD conditions this equals the HK API condition url (e.g. 'blinded')."
+		},
 		"name": {
 			"type": "string",
-			"description": "Display name of the effect, e.g. 'Blinded', 'Bless', 'Hunter's Mark'."
+			"description": "Display name, e.g. 'Blinded', 'Bless', 'Hunter's Mark'."
 		},
 		"description": {
 			"type": "string",
-			"description": "Freeform description / reminder text shown to the user."
+			"description": "Rules text / reminder shown to the user."
 		},
-		"duration_type": {
+		"category": {
 			"type": "string",
-			"enum": ["time", "cancelled", "trigger", "concentration", "next_turn", "instant", "action_removed", "long_rest"],
-			"description": "How long the effect lasts. See duration_types in effectsConstants.js."
+			"enum": ["condition", "spell", "feature", "item", "monster_trait", "hazard", "disease", "poison", "curse", "madness", "environment", "custom"],
+			"description": "What kind of rules element this is. Informational; drives grouping in the Effects drawer and which removal magic applies."
 		},
-		"duration_value": {
+		"tags": {
+			"type": "array",
+			"items": { "type": "string" },
+			"description": "Free tags, e.g. 'fear', 'charm', 'possession', 'illusion'. Used by source filters such as 'saving throws against effects that apply the Charmed condition'."
+		},
+		"magical": {
+			"type": "boolean",
+			"description": "True for effects created by spells, magic items or phenomena labelled magical. Relevant for Dispel Magic, Antimagic Field suppression and 'against spells and other magical effects' filters."
+		},
+		"spell_level": {
 			"type": "integer",
-			"minimum": 1,
-			"description": "Number of rounds, only relevant when duration_type is 'time'."
+			"minimum": 0,
+			"maximum": 9,
+			"description": "Level of the spell that creates the effect, when relevant (Dispel Magic, Globe of Invulnerability, Limited Magic Immunity)."
+		},
+		"removed_by": {
+			"type": "array",
+			"items": { "type": "string" },
+			"description": "Named removal sources, informational: e.g. 'lesser_restoration', 'greater_restoration', 'remove_curse', 'dispel_magic', 'heal', 'dispel_evil_and_good', 'protection_from_poison'."
 		},
 		"cancelable": {
 			"type": "boolean",
 			"default": true,
-			"description": "Whether the effect can be manually cancelled before its duration ends."
+			"description": "UI hint: whether the DM can remove the effect manually. Not persisted on instances."
 		},
-		"cancel_trigger": {
-			"$ref": "#/$defs/trigger",
-			"description": "Trigger that ends the effect early, only relevant when duration_type is 'trigger'."
+		"stacking": { "$ref": "#/$defs/stacking" },
+		"level": { "$ref": "#/$defs/level_track" },
+		"condition": {
+			"$ref": "#/$defs/condition_set",
+			"description": "Effect-wide gate. While false, every sub-effect is suppressed (the effect stays applied). E.g. Aura of Protection is inactive while its holder is Incapacitated; Cloak of Displacement is suppressed while Speed is 0."
 		},
-		"area": {
-			"$ref": "#/$defs/area"
+		"ends_when": {
+			"$ref": "#/$defs/condition_set",
+			"description": "Intrinsic state-based end condition, e.g. Rage ends if the holder is Incapacitated (2024) or Unconscious (2014); Mage Armor ends if the target dons armor; Dodge ends if Incapacitated or Speed 0. Combined (OR) with the application's duration.ends_when."
 		},
+		"sustain": { "$ref": "#/$defs/sustain" },
+		"area": { "$ref": "#/$defs/area" },
+		"aura": { "$ref": "#/$defs/aura" },
 		"sub_effects": {
 			"type": "array",
 			"minItems": 1,
 			"items": { "$ref": "#/$defs/sub_effect" }
+		},
+		"duration_type": {
+			"type": "string",
+			"description": "DEPRECATED (implementation plan 2c): durations belong to the application, not the definition. Accepted for legacy data only."
+		},
+		"duration_value": {
+			"type": "integer",
+			"description": "DEPRECATED, see duration_type."
+		},
+		"cancel_trigger": {
+			"type": "string",
+			"description": "DEPRECATED, use application.duration.cancel_triggers."
 		}
 	},
 
 	"$defs": {
-		"trigger": {
-			"type": "string",
-			"enum": [
-				"start_turn_target",
-				"end_turn_target",
-				"start_turn_caster",
-				"end_turn_caster",
-				"damage_taken",
-				"on_hit",
-				"on_crit",
-				"on_hit_taken",
-				"failed_save",
-				"success_save",
-				"combat_start",
-				"zero_hp",
-				"long_rest",
-				"short_rest"
-			]
-		},
-
 		"ability-select": {
 			"type": "string",
 			"enum": ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
@@ -72,219 +90,670 @@
 		"damage-type-select": {
 			"type": "string",
 			"enum": [
-				"non_magical_bludgeoning",
-				"non_magical_piercing",
-				"non_magical_slashing",
-				"bludgeoning",
-				"piercing",
-				"slashing",
-				"acid",
-				"cold",
-				"fire",
-				"force",
-				"lightning",
-				"necrotic",
-				"poison",
-				"psychic",
-				"radiant",
-				"thunder"
+				"acid", "bludgeoning", "cold", "fire", "force", "lightning", "necrotic",
+				"piercing", "poison", "psychic", "radiant", "slashing", "thunder",
+				"non_magical_bludgeoning", "non_magical_piercing", "non_magical_slashing"
+			],
+			"description": "The non_magical_* values are legacy aliases used by NPC data. New definitions express '… from nonmagical attacks' with the plain type plus sub_effect.bypass: ['magical']."
+		},
+
+		"creature-type-select": {
+			"type": "string",
+			"enum": [
+				"aberration", "beast", "celestial", "construct", "dragon", "elemental", "fey",
+				"fiend", "giant", "humanoid", "monstrosity", "ooze", "plant", "undead"
 			]
 		},
 
-		"condition_ref": {
+		"size-select": {
 			"type": "string",
-			"description": "Reference (id or value) to another condition, used by defense/i (immunity) sub-effects."
+			"enum": ["tiny", "small", "medium", "large", "huge", "gargantuan"]
 		},
 
-		"scaling": {
-			"type": "object",
-			"description": "Describes how a numeric value scales with an external factor (e.g. exhaustion stacks).",
-			"required": ["by", "per_unit_value"],
-			"properties": {
-				"by": {
-					"type": "string",
-					"enum": ["stacks", "caster_level", "spell_level", "char_level"]
-				},
-				"per_unit_value": {
-					"type": "number",
-					"description": "Value added/changed per unit of 'by' (e.g. -5 per exhaustion stack)."
-				}
-			}
+		"attack-type-select": {
+			"type": "string",
+			"enum": [
+				"melee", "ranged", "weapon", "spell", "unarmed",
+				"melee_weapon", "ranged_weapon", "melee_spell", "ranged_spell",
+				"opportunity", "thrown"
+			]
 		},
 
-		"condition_check": {
+		"time": {
 			"type": "object",
-			"description": "Optional condition that must be true for a sub-effect to apply, e.g. attacker position.",
-			"required": ["type"],
+			"required": ["value", "unit"],
 			"properties": {
-				"type": {
-					"type": "string",
-					"enum": ["attacker_distance", "attacker_has_condition", "target_has_condition", "line_of_sight"]
-				},
-				"value": {
-					"description": "Descriptor for the condition type, e.g. distance in feet, a condition value, or a boolean.",
-					"oneOf": [
-						{ "type": "number" },
-						{ "type": "string" },
-						{ "type": "boolean" }
-					]
-				},
-				"comparator": {
-					"type": "string",
-					"enum": ["lte", "gte", "eq", "neq"],
-					"description": "How 'value' should be compared, used for attacker_distance."
-				}
-			}
+				"value": { "$ref": "#/$defs/amount" },
+				"unit": { "type": "string", "enum": ["round", "minute", "hour", "day"] }
+			},
+			"additionalProperties": false
 		},
 
-		"area": {
+		"formula": {
 			"type": "object",
-			"description": "Area-of-effect metadata for spells/abilities that affect multiple targets.",
-			"required": ["shape", "size", "origin"],
+			"required": ["formula"],
+			"description": "A computed value. Variables: pb, str_mod, dex_mod, con_mod, int_mod, wis_mod, cha_mod, spellcasting_mod, str..cha (scores), speed, max_hp, level (effect level / stacks), char_level, class_level, spell_level, spell_save_dc, spell_attack, class.<column> (class table value, e.g. class.rage_damage, class.martial_arts_die), damage_taken (damage in the triggering event), last_damage (damage dealt by a sibling sub-effect in the same resolution). Prefix caster. to read the applying entity instead of the holder, e.g. 'caster.cha_mod'. Operators: + - * / ( ).",
 			"properties": {
-				"shape": {
-					"type": "string",
-					"enum": ["sphere", "cone", "cube", "line", "cylinder"]
-				},
-				"size": {
-					"type": "number",
-					"description": "Size of the area in feet."
-				},
-				"origin": {
-					"type": "string",
-					"enum": ["caster", "point", "target"]
-				}
-			}
+				"formula": { "type": "string" },
+				"min": { "type": "number" },
+				"max": { "type": "number" },
+				"round": { "type": "string", "enum": ["down", "up"], "default": "down" }
+			},
+			"additionalProperties": false
 		},
 
 		"dice_roll": {
 			"title": "Roll",
 			"type": "object",
 			"properties": {
-				"damage_type": {
-					"$ref": "#/$defs/damage-type-select"
+				"damage_type": { "$ref": "#/$defs/damage-type-select" },
+				"damage_type_choice": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/damage-type-select" },
+					"description": "Caster picks one of these types when the effect is applied (Chromatic Orb, Primal Strike, Divine Strike)."
 				},
-				"magical": {
-					"type": "boolean"
+				"magical": { "type": "boolean" },
+				"dice_count": { "title": "Dice count", "type": "integer", "minimum": 0, "maximum": 99 },
+				"dice_type": { "title": "Dice type", "type": "integer", "minimum": 1, "maximum": 100 },
+				"fixed_val": { "title": "Fixed val", "type": "integer", "minimum": -99, "maximum": 999 },
+				"modifier": { "$ref": "#/$defs/formula", "description": "Added to the roll, e.g. { formula: 'caster.wis_mod' }." }
+			},
+			"additionalProperties": false
+		},
+
+		"amount": {
+			"description": "A number, a dice roll, or a formula.",
+			"oneOf": [
+				{ "type": "number" },
+				{ "$ref": "#/$defs/dice_roll" },
+				{ "$ref": "#/$defs/formula" }
+			]
+		},
+
+		"scaling": {
+			"type": "object",
+			"description": "How a numeric value scales with an external factor. by 'level' reads the active instance's level (2024 Exhaustion: -2 per level on D20 Tests).",
+			"required": ["by"],
+			"properties": {
+				"by": {
+					"type": "string",
+					"enum": ["level", "stacks", "caster_level", "char_level", "class_level", "spell_level", "pb"]
 				},
-				"dice_count": {
-					"title": "Dice count",
-					"type": "integer",
-					"minimum": 1,
-					"maximum": 99
+				"per_unit_value": { "type": "number", "description": "Added per unit of 'by'." },
+				"per_unit_dice": { "type": "integer", "description": "Dice added per unit of 'by' (spell upcasting, Sneak Attack)." },
+				"base": { "type": "number", "description": "Unit count at which scaling starts (spell's base level)." }
+			},
+			"additionalProperties": false
+		},
+
+		"effect_ref": {
+			"type": "object",
+			"required": ["source", "source_key"],
+			"description": "Reference to another effect definition, resolved per campaign edition at runtime.",
+			"properties": {
+				"source": { "type": "string", "enum": ["srd", "custom", "api"] },
+				"source_key": { "type": "string" },
+				"name": { "type": "string", "description": "Denormalized display name." }
+			},
+			"additionalProperties": false
+		},
+
+		"trigger": {
+			"type": "string",
+			"description": "Event that fires a triggered sub-effect, a repeat save, or ends an effect. Scope is the holder unless noted.",
+			"enum": [
+				"on_apply", "on_expire",
+				"start_turn_target", "end_turn_target", "start_turn_caster", "end_turn_caster",
+				"combat_start",
+				"damage_taken", "damage_dealt",
+				"on_attack", "on_attacked", "on_force_save",
+				"on_hit", "on_hit_taken", "on_miss", "on_miss_taken",
+				"on_crit", "on_crit_taken", "on_natural_20", "on_natural_1",
+				"on_save_success", "on_save_fail", "on_check", "on_d20_fail",
+				"on_cast", "on_targeted_by_spell", "on_condition_applied",
+				"on_heal", "on_bloodied", "on_zero_hp", "on_death", "on_kill",
+				"on_enter_area", "start_turn_in_area", "end_turn_in_area", "on_move",
+				"short_rest", "long_rest", "dawn",
+				"failed_save", "success_save", "zero_hp"
+			]
+		},
+
+		"trigger_filter": {
+			"type": "object",
+			"description": "Narrows when a trigger counts. All given fields must match.",
+			"properties": {
+				"damage_types": { "type": "array", "items": { "$ref": "#/$defs/damage-type-select" } },
+				"attack_types": { "type": "array", "items": { "$ref": "#/$defs/attack-type-select" } },
+				"natural_roll": { "type": "array", "items": { "type": "integer", "minimum": 1, "maximum": 20 } },
+				"by": {
+					"type": "string",
+					"enum": ["any", "caster", "caster_or_allies", "counterpart", "enemy", "ally"],
+					"description": "Who must cause the event. Charm Person ends when 'caster_or_allies' deal damage; Hex only fires when 'caster' hits."
 				},
-				"dice_type": {
-					"title": "Dice type",
-					"type": "integer",
-					"minimum": 1,
-					"maximum": 20
+				"within": { "type": "number", "description": "Event source must be within this many feet (Fire Shield: 5)." },
+				"min_amount": { "type": "number", "description": "Minimum damage/healing in the event (Hydra heads: 25)." },
+				"source": { "$ref": "#/$defs/source_filter" }
+			},
+			"additionalProperties": false
+		},
+
+		"source_filter": {
+			"type": "object",
+			"description": "What kind of source a roll, damage instance or effect must come from.",
+			"properties": {
+				"magical": { "type": "boolean", "description": "Spells and other magical effects." },
+				"spell": { "type": "boolean" },
+				"spell_names": { "type": "array", "items": { "type": "string" }, "description": "e.g. ['magic-missile'] for Shield / Brooch of Shielding." },
+				"spell_schools": { "type": "array", "items": { "type": "string" } },
+				"spell_level_max": { "type": "integer", "minimum": 0, "maximum": 9 },
+				"creature_types": { "type": "array", "items": { "$ref": "#/$defs/creature-type-select" } },
+				"tags": { "type": "array", "items": { "type": "string" }, "description": "Effect tags, e.g. ['breath_weapon'], ['fear']." },
+				"conditions": { "type": "array", "items": { "type": "string" }, "description": "Effects that apply these conditions ('saving throws to avoid or end the Poisoned condition')." },
+				"is_caster": { "type": "boolean", "description": "Source is the entity that applied this effect (Bestow Curse: attacks against you; Charmed: the charmer)." }
+			},
+			"additionalProperties": false
+		},
+
+		"condition_check": {
+			"type": "object",
+			"required": ["type"],
+			"description": "A state test. subject defaults to 'self' (the holder), except for the legacy attacker_* types.",
+			"properties": {
+				"subject": {
+					"type": "string",
+					"enum": ["self", "counterpart", "caster", "trigger_source"],
+					"description": "counterpart = the other party in the roll or event (the attacker when the holder is attacked, the target when the holder attacks)."
 				},
-				"fixed_val": {
-					"title": "Fixed val",
-					"type": "integer",
-					"minimum": -99,
-					"maximum": 99
+				"type": {
+					"type": "string",
+					"enum": [
+						"distance", "can_see", "line_of_sight", "has_condition", "has_effect", "creature_type", "size",
+						"bloodied", "hp_threshold", "missing_hp", "hp_zero", "temp_hp_zero",
+						"sense", "ally_adjacent", "is_caster", "relationship",
+						"equipment", "environment", "combat_state", "movement", "roll_state",
+						"attacker_distance", "attacker_has_condition", "target_has_condition", "target_creature_type"
+					]
+				},
+				"value": {
+					"description": "Descriptor: feet, a condition/effect key, a creature type, a size, an HP value, a sense ('truesight'), an environment ('sunlight','bright_light','dim_light','darkness','underwater','running_water'), equipment ('armor','heavy_armor','shield','no_armor'), combat_state ('first_round','not_acted','surprised'), roll_state ('advantage','disadvantage'), relationship ('ally','enemy').",
+					"oneOf": [{ "type": "number" }, { "type": "string" }, { "type": "boolean" }]
+				},
+				"comparator": { "type": "string", "enum": ["lt", "lte", "eq", "neq", "gte", "gt"] },
+				"negate": { "type": "boolean", "description": "Inverts the result ('unless the holder is Incapacitated')." },
+				"description": { "type": "string", "description": "Human-readable version, shown when the engine can't evaluate it and asks the DM." }
+			},
+			"additionalProperties": false
+		},
+
+		"condition_set": {
+			"description": "A single check, an array (all must hold), or an all_of / any_of group.",
+			"oneOf": [
+				{ "$ref": "#/$defs/condition_check" },
+				{ "type": "array", "items": { "$ref": "#/$defs/condition_set" } },
+				{
+					"type": "object",
+					"required": ["any_of"],
+					"properties": { "any_of": { "type": "array", "items": { "$ref": "#/$defs/condition_set" } } },
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["all_of"],
+					"properties": { "all_of": { "type": "array", "items": { "$ref": "#/$defs/condition_set" } } },
+					"additionalProperties": false
 				}
+			]
+		},
+
+		"stacking": {
+			"type": "object",
+			"description": "What happens when the same effect is applied to a holder that already has it. Default 'none': the effect doesn't stack with itself; the more potent or longer instance is kept (2024 Conditions rule, 'Combining Magical Effects').",
+			"properties": {
+				"mode": { "type": "string", "enum": ["none", "level", "replace", "independent"], "default": "none" },
+				"per_caster": { "type": "boolean", "description": "Treat instances from different casters as different effects (Hunter's Mark from two rangers)." }
+			},
+			"additionalProperties": false
+		},
+
+		"level_track": {
+			"type": "object",
+			"description": "A per-instance level/counter that changes over time. Exhaustion (both editions), Raise Dead's -4 penalty that shrinks per Long Rest, Sight Rot's penalty that grows per Long Rest.",
+			"properties": {
+				"initial": { "type": "integer", "default": 1 },
+				"min": { "type": "integer", "default": 0 },
+				"max": { "type": "integer" },
+				"per_long_rest": { "type": "integer", "description": "Change when the holder finishes a Long Rest (-1 Exhaustion, +1 Sight Rot)." },
+				"per_short_rest": { "type": "integer" },
+				"per_dawn": { "type": "integer" },
+				"remove_at": { "type": "integer", "description": "Remove the effect when level reaches this value (Exhaustion: 0)." }
+			},
+			"additionalProperties": false
+		},
+
+		"sustain": {
+			"type": "object",
+			"description": "Keep-alive rule: the effect ends at the check point unless one of the triggers happened in the window. 2014 Rage: ends at end of turn unless the holder attacked a hostile creature or took damage since its last turn. 2024 Rage: extended by an attack roll, forcing a save, or a Bonus Action.",
+			"required": ["triggers"],
+			"properties": {
+				"triggers": { "type": "array", "items": { "$ref": "#/$defs/trigger" } },
+				"check": { "$ref": "#/$defs/trigger", "default": "end_turn_target" },
+				"manual_cost": { "type": "string", "enum": ["action", "bonus_action"], "description": "The holder can also extend it by spending this (2024 Rage: Bonus Action)." },
+				"description": { "type": "string" }
+			},
+			"additionalProperties": false
+		},
+
+		"area": {
+			"type": "object",
+			"description": "Area-of-effect metadata.",
+			"required": ["shape", "size"],
+			"properties": {
+				"shape": {
+					"type": "string",
+					"enum": ["sphere", "cone", "cube", "line", "cylinder", "emanation", "wall", "square"]
+				},
+				"size": { "type": "number", "description": "Radius, length or side in feet." },
+				"width": { "type": "number" },
+				"height": { "type": "number" },
+				"origin": { "type": "string", "enum": ["caster", "point", "target", "self"] },
+				"moves_with_holder": { "type": "boolean", "description": "Emanations move with their origin creature." }
 			}
+		},
+
+		"aura": {
+			"type": "object",
+			"description": "Sub-effects the holder projects onto other creatures in an Emanation (Aura of Protection, Spirit Guardians, Fear Aura, Aura of Authority, Pass without Trace). The tracker has no positions, so the DM chooses who is inside; the engine applies aura.sub_effects to those entities for as long as they are marked inside.",
+			"required": ["radius", "sub_effects"],
+			"properties": {
+				"radius": { "type": "number" },
+				"affects": { "type": "string", "enum": ["allies", "enemies", "all", "chosen"], "default": "chosen" },
+				"include_self": { "type": "boolean", "default": false },
+				"condition": { "$ref": "#/$defs/condition_set", "description": "Aura works only while true (e.g. holder not Incapacitated)." },
+				"sub_effects": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sub_effect" } }
+			}
+		},
+
+		"save_spec": {
+			"type": "object",
+			"description": "A saving throw attached to a sub-effect or an application.",
+			"properties": {
+				"ability": { "$ref": "#/$defs/ability-select" },
+				"abilities": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/ability-select" },
+					"description": "Target chooses one (Unarmed Strike Grapple/Shove: Strength or Dexterity)."
+				},
+				"dc": { "$ref": "#/$defs/amount", "description": "Usually set at application time; a formula like { formula: '10 + damage_taken / 2', max: 30 } for rule-based DCs." },
+				"on_success": {
+					"type": "string",
+					"enum": ["negate", "half", "partial"],
+					"default": "negate",
+					"description": "negate = no effect, half = damage halved and nothing else, partial = apply success_effects instead."
+				},
+				"success_effects": { "type": "array", "items": { "$ref": "#/$defs/sub_effect" }, "description": "Applied on a success when on_success is 'partial' (Stunning Strike success: Speed halved + next attack has Advantage)." },
+				"fail_by_5_effects": { "type": "array", "items": { "$ref": "#/$defs/sub_effect" }, "description": "Extra sub-effects when the save fails by 5 or more (Spider's Sting, Homunculus bite)." },
+				"advantage_if": { "$ref": "#/$defs/condition_set", "description": "The target saves with Advantage when true (Charm Person while fighting you; Large+ vs Ensnaring Strike)." },
+				"auto_fail_if": { "$ref": "#/$defs/condition_set", "description": "e.g. Plants vs Blight." },
+				"auto_success_if": { "$ref": "#/$defs/condition_set", "description": "e.g. Constructs vs Flesh to Stone; creatures that don't sleep vs Sleep." },
+				"immune_on_success": { "$ref": "#/$defs/time", "description": "A creature that succeeds is immune to this effect from this source for the time (Frightful Presence, Stench: 24 hours)." }
+			},
+			"additionalProperties": false
+		},
+
+		"repeat_save": {
+			"type": "object",
+			"description": "Save-to-end. The DM is prompted to roll at each trigger.",
+			"required": ["ability"],
+			"properties": {
+				"ability": { "$ref": "#/$defs/ability-select" },
+				"dc": { "$ref": "#/$defs/amount" },
+				"triggers": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/trigger" },
+					"default": ["end_turn_target"],
+					"description": "When the save is repeated. Most SRD effects: end_turn_target. Also damage_taken (Dominate Person, Hideous Laughter), start_turn_target (Burnt Othur Fumes, Conjure Elemental), start_turn_caster (Prismatic Spray violet)."
+				},
+				"advantage_on_triggers": { "type": "array", "items": { "$ref": "#/$defs/trigger" }, "description": "Hideous Laughter: Advantage when the save is triggered by damage." },
+				"costs_action": { "type": "boolean", "description": "The holder must take an action to repeat the save (Irresistible Dance)." },
+				"on_fail": { "type": "array", "items": { "$ref": "#/$defs/sub_effect" }, "description": "Sub-effects each time the repeat save fails (Phantasmal Killer / Weird / Burnt Othur: take the damage again)." },
+				"successes_to_end": { "type": "integer", "default": 1, "description": "Flesh to Stone, Contagion, Burnt Othur Fumes: 3." },
+				"failures_to_escalate": { "type": "integer", "description": "Failures (not necessarily consecutive) before escalate applies." },
+				"escalate": {
+					"type": "object",
+					"description": "Replace this effect with another when failures_to_escalate is reached (Flesh to Stone -> Petrified; basilisk Second Failure; Sleep 2024 -> Unconscious; Contagion 3 failures -> lasts the full duration).",
+					"properties": {
+						"effect": { "$ref": "#/$defs/effect_ref" },
+						"duration": { "$ref": "#/$defs/duration" },
+						"lock": { "type": "boolean", "description": "Stop saving and keep this effect for its full duration instead of replacing it (Contagion)." }
+					},
+					"additionalProperties": false
+				},
+				"auto_success_after": { "$ref": "#/$defs/time", "description": "'After 1 minute, it succeeds automatically.'" }
+			},
+			"additionalProperties": false
+		},
+
+		"escape": {
+			"type": "object",
+			"description": "An action-based way out (Grappled escape DC, Web, Entangle, Net, Ensnaring Strike).",
+			"properties": {
+				"dc": { "$ref": "#/$defs/amount" },
+				"checks": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"ability": { "$ref": "#/$defs/ability-select" },
+							"skill": { "type": "string" }
+						},
+						"additionalProperties": false
+					},
+					"description": "Allowed checks, e.g. Strength (Athletics) or Dexterity (Acrobatics)."
+				},
+				"by": { "type": "string", "enum": ["self", "self_or_within_reach", "any"], "default": "self" },
+				"cost": { "type": "string", "enum": ["action", "bonus_action", "movement"], "default": "action" }
+			},
+			"additionalProperties": false
+		},
+
+		"duration": {
+			"type": "object",
+			"description": "How long an applied effect lasts. Parts combine: '1 minute or until it takes damage, save ends at end of each turn' = type time + cancel_triggers + save.",
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"instant", "time", "cancelled", "concentration", "next_turn", "end_of_turn",
+						"rest", "dawn", "trigger", "save_ends", "special",
+						"action_removed", "long_rest"
+					],
+					"description": "cancelled = until removed/dispelled. next_turn = until the anchor's next turn edge. end_of_turn = until the end of the current turn. action_removed and long_rest are legacy aliases (use escape and rest)."
+				},
+				"value": { "$ref": "#/$defs/amount" },
+				"unit": { "type": "string", "enum": ["round", "minute", "hour", "day"], "default": "round" },
+				"anchor": { "type": "string", "enum": ["caster", "target"], "default": "caster", "description": "For next_turn: whose turn." },
+				"edge": { "type": "string", "enum": ["start", "end"], "default": "start", "description": "For next_turn: start or end of that turn." },
+				"rest_type": { "type": "string", "enum": ["short", "long", "short_or_long"], "default": "long" },
+				"cancel_triggers": {
+					"type": "array",
+					"description": "Events that end the effect early (Invisibility: on_attack, damage_dealt, on_cast; Charm Person: damage_taken by caster_or_allies; Hypnotic Pattern: damage_taken).",
+					"items": {
+						"type": "object",
+						"required": ["trigger"],
+						"properties": {
+							"trigger": { "$ref": "#/$defs/trigger" },
+							"filter": { "$ref": "#/$defs/trigger_filter" }
+						},
+						"additionalProperties": false
+					}
+				},
+				"ends_when": { "$ref": "#/$defs/condition_set", "description": "State-based end (grappler Incapacitated, caster dies, target more than 60 ft away, temporary HP gone)." },
+				"ends_by_action": {
+					"type": "string",
+					"enum": ["self", "other", "self_or_other"],
+					"description": "Another creature (or the holder) can end it with an action (shake awake: Sleep, Hypnotic Pattern, Eyebite Asleep)."
+				},
+				"save": { "$ref": "#/$defs/repeat_save" },
+				"escape": { "$ref": "#/$defs/escape" },
+				"on_expire": { "type": "array", "items": { "$ref": "#/$defs/sub_effect" }, "description": "Sub-effects when the duration ends (Haste: Incapacitated + Speed 0 until end of next turn)." }
+			},
+			"additionalProperties": false
+		},
+
+		"application": {
+			"type": "object",
+			"description": "How an effect is applied: by the Effects drawer, a monster action, a spell, or another effect (apply_effect). The same shape is stored (with instance fields) on the entity as an active effect.",
+			"required": ["effect"],
+			"properties": {
+				"effect": { "$ref": "#/$defs/effect_ref" },
+				"duration": { "$ref": "#/$defs/duration" },
+				"level": { "type": "integer", "description": "Initial level for leveled effects (Exhaustion levels gained)." },
+				"save": { "$ref": "#/$defs/save_spec", "description": "Save to avoid the effect when applied." },
+				"choices": {
+					"type": "object",
+					"description": "Caster choices that parameterize the definition (Hex ability, Protection from Energy damage type, Enhance Ability ability, Bestow Curse option, Guidance skill). Sub-effects reference them with choice.",
+					"additionalProperties": { "type": "string" }
+				},
+				"concentration_id": { "type": "string", "description": "Links the effect to the caster's Concentration instance for cascade removal." }
+			}
+		},
+
+		"active_instance": {
+			"type": "object",
+			"description": "An applied effect as persisted on an entity (users/{uid}/.../entities/{key}/effects/{id} or players/companions). Small reference; sub_effects are resolved from the definition at encounter init.",
+			"required": ["name", "source", "source_key"],
+			"properties": {
+				"name": { "type": "string" },
+				"source": { "type": "string", "enum": ["srd", "custom", "api"] },
+				"source_key": { "type": "string" },
+				"duration": { "$ref": "#/$defs/duration" },
+				"choices": { "type": "object", "additionalProperties": { "type": "string" } },
+				"caster_key": { "type": "string" },
+				"applied_round": { "type": "integer", "minimum": 0 },
+				"rounds_remaining": { "type": "integer" },
+				"save_dc": { "type": "integer" },
+				"level": { "type": "integer" },
+				"charges": { "type": "integer", "description": "Consumable counter: Mirror Image duplicates, Guardian of Faith damage pool, Resistance-style one-time uses." },
+				"save_successes": { "type": "integer" },
+				"save_failures": { "type": "integer" },
+				"concentration_id": { "type": "string" },
+				"parent_id": { "type": "string", "description": "Instance this one depends on (Crawler Mucus: Paralyzed while Poisoned; Crocodile: Restrained while Grappled). Removing the parent removes this one." },
+				"immune_until_round": { "type": "integer", "description": "Temporary immunity to this effect from this caster after a successful save." }
+			}
+		},
+
+		"action_effects": {
+			"type": "object",
+			"description": "Effects attached to a monster action or spell (implementation plan steps 6-7). Mirrors 2024 stat block notation: Hit / Failure / Success / Failure or Success.",
+			"properties": {
+				"save": { "$ref": "#/$defs/save_spec" },
+				"on_hit": { "type": "array", "items": { "$ref": "#/$defs/application" } },
+				"on_miss": { "type": "array", "items": { "$ref": "#/$defs/application" } },
+				"on_fail": { "type": "array", "items": { "$ref": "#/$defs/application" } },
+				"on_success": { "type": "array", "items": { "$ref": "#/$defs/application" } },
+				"always": { "type": "array", "items": { "$ref": "#/$defs/application" } }
+			},
+			"additionalProperties": false
+		},
+
+		"consume": {
+			"type": "object",
+			"description": "The sub-effect is used up. Guiding Bolt / Help / Vex / Sap: the next attack roll; Bardic Inspiration: one failed D20 Test; Death Ward: the first time the holder would drop to 0 HP.",
+			"properties": {
+				"uses": { "type": "integer", "minimum": 1, "default": 1 },
+				"on": { "type": "string", "enum": ["roll", "hit", "miss", "trigger", "fail"], "default": "roll" },
+				"scope": { "type": "string", "enum": ["sub_effect", "effect"], "default": "effect", "description": "effect = remove the whole instance when used up." }
+			},
+			"additionalProperties": false
 		},
 
 		"sub_effect": {
 			"type": "object",
 			"required": ["type"],
 			"properties": {
+				"id": { "type": "string", "description": "Local id so siblings and formulas can reference this sub-effect." },
 				"type": {
 					"type": "string",
 					"enum": [
-						"bonus", "base", "fixed",
+						"bonus", "base", "fixed", "floor", "cap",
 						"defense",
 						"advantage", "disadvantage", "grant_advantage", "grant_disadvantage",
-						"reroll",
-						"damage", "healing",
+						"reroll", "roll_floor", "critical",
+						"damage", "healing", "damage_modifier",
 						"auto_fail", "auto_success",
-						"restrict",
-						"grant_action",
-						"damage_modifier",
-						"score_swap",
-						"outcome",
-						"special"
-					]
+						"restrict", "compel", "deny",
+						"grant_action", "forced_movement",
+						"sense", "proficiency", "score_swap",
+						"includes", "apply_effect", "remove_effect",
+						"outcome", "special"
+					],
+					"description": "bonus = add; base = set a base value others still modify (Mage Armor, Unarmored Defense); fixed = set and ignore other modifiers (Speed 0); floor/cap = value can't go below/above (Barkskin AC 17, Ioun max 20); roll_floor = minimum die or total (Reliable Talent, 2024 Great Weapon Fighting); critical = crit range and crit rules; compel = forced behavior (must move away, must Dash); deny = can't gain a benefit (can't benefit from Invisible, no Advantage against, ignore cover); includes = has another condition for as long as this one lasts; apply_effect/remove_effect = triggered application/removal of another effect."
 				},
 				"sub_types": {
 					"type": "array",
 					"minItems": 1,
 					"items": { "$ref": "#/$defs/sub_type" }
 				},
+				"perspective": {
+					"type": "string",
+					"enum": ["self", "against"],
+					"default": "self",
+					"description": "self = the holder's own rolls/values; against = rolls other creatures make against the holder (Sundering Blow +5, Elusive, Greater Magic Resistance auto-miss). grant_advantage/grant_disadvantage are the legacy spelling of advantage/disadvantage + against."
+				},
 				"value": {
-					"type": "number",
-					"description": "Numeric value for bonus/base/fixed effect types."
+					"description": "Numeric value, or a formula (Aura of Protection: { formula: 'caster.cha_mod', min: 1 }).",
+					"oneOf": [{ "type": "number" }, { "type": "string" }, { "$ref": "#/$defs/formula" }]
 				},
-				"scaling": { "$ref": "#/$defs/scaling" },
 				"roll": { "$ref": "#/$defs/dice_roll" },
-				"abilities": {
-					"type": "array",
-					"items": { "$ref": "#/$defs/ability-select" },
-					"description": "Ability score(s) this sub-effect applies to, when sub_types includes 'ability' or 'save'."
-				},
-				"skills": {
-					"type": "array",
-					"items": { "type": "string" },
-					"description": "Skill(s) this sub-effect applies to, when sub_types includes 'skill'."
-				},
-				"damage_types": {
-					"type": "array",
-					"items": { "$ref": "#/$defs/damage-type-select" },
-					"description": "Damage type(s) this sub-effect applies to, used by defense (v/r/i) and damage_modifier sub-effects."
-				},
-				"conditions": {
-					"type": "array",
-					"items": { "$ref": "#/$defs/condition_ref" },
-					"description": "Condition(s) this sub-effect grants immunity to, used by defense/i."
-				},
-				"reroll_condition": {
+				"multiplier": { "type": "number", "description": "Applied after value/roll/scaling (0.5 halved, 2 doubled)." },
+				"scaling": { "$ref": "#/$defs/scaling" },
+				"min_level": { "type": "integer", "description": "Only active at this instance level or higher (2014 Exhaustion rows)." },
+				"max_level": { "type": "integer" },
+				"choice": {
 					"type": "string",
-					"description": "Description of when the reroll applies, e.g. 'result is 1 or 2'."
+					"enum": ["ability", "damage_type", "skill", "condition", "creature_type", "option"],
+					"description": "Value comes from application.choices (Hex, Protection from Energy, Enhance Ability, Guidance)."
 				},
-				"keep": {
+
+				"abilities": { "type": "array", "items": { "$ref": "#/$defs/ability-select" }, "description": "Rolls or scores using these abilities (Str-based D20 Tests; Str and Dex saves)." },
+				"skills": { "type": "array", "items": { "type": "string" } },
+				"context": {
 					"type": "string",
-					"enum": ["new", "higher", "lower"],
-					"description": "Which result to keep after a reroll."
+					"description": "Qualifier for checks: 'sight', 'hearing', 'smell', 'social', 'find_target', 'climb', 'escape_grapple', 'perceive_holder'. Evaluated by the DM when the engine can't."
 				},
-				"stacking": {
-					"type": "string",
-					"enum": ["highest", "replace", "add"],
-					"description": "How a fixed temp_hp value interacts with existing temp HP."
+				"attack_types": { "type": "array", "items": { "$ref": "#/$defs/attack-type-select" } },
+				"damage_types": { "type": "array", "items": { "$ref": "#/$defs/damage-type-select" } },
+				"all_damage": { "type": "boolean", "description": "Applies to every damage type (Petrified resistance, Warding Bond, Flesh Rot vulnerability)." },
+				"except_damage_types": { "type": "array", "items": { "$ref": "#/$defs/damage-type-select" }, "description": "With all_damage: 'Resistance to all damage except Force'." },
+				"bypass": {
+					"type": "array",
+					"items": { "type": "string", "enum": ["magical", "silvered", "adamantine"] },
+					"description": "Defense doesn't apply to damage from these sources (2014 '… from nonmagical attacks'; Fiendish Resilience: magical or silver weapons)."
 				},
+				"conditions": { "type": "array", "items": { "type": "string" }, "description": "Condition keys: immunity (defense i), deny condition_benefit, remove_effect targets." },
+				"mechanics": {
+					"type": "array",
+					"items": { "type": "string", "enum": ["speed_reduction", "max_hp_reduction", "forced_movement", "sleep", "possession", "aging", "divination", "shape_change", "crit"] },
+					"description": "Non-condition things a defense makes the holder immune to (Freedom of Movement: speed_reduction; Aura of Life: max_hp_reduction; Elf Trance: sleep)."
+				},
+				"creature_types": { "type": "array", "items": { "$ref": "#/$defs/creature-type-select" }, "description": "Counterpart creature types (Divine Smite +1d8 vs Fiend/Undead; Protection from Evil and Good)." },
+				"source": { "$ref": "#/$defs/source_filter" },
+
+				"effect": { "$ref": "#/$defs/effect_ref", "description": "includes / apply_effect target." },
+				"effects": { "type": "array", "items": { "$ref": "#/$defs/effect_ref" }, "description": "remove_effect candidates." },
+				"count": { "type": "integer", "description": "remove_effect: how many of the candidates (Lesser Restoration: 1)." },
+				"duration": { "$ref": "#/$defs/duration", "description": "apply_effect: duration of the applied effect." },
+				"suppress_existing": { "type": "boolean", "description": "defense i: existing instances of the conditions are suppressed while this is active instead of prevented only (Calm Emotions, Aura of Courage)." },
+
+				"reroll_condition": { "type": "string", "description": "When the reroll is allowed, e.g. 'natural 1', 'failed save', '1 or 2 on a damage die'." },
+				"keep": { "type": "string", "enum": ["new", "higher", "lower", "choice"] },
+				"reroll_bonus": { "$ref": "#/$defs/amount", "description": "Added to the reroll (Indomitable: Fighter level)." },
+				"with_advantage": { "type": "boolean", "description": "Reroll is made with Advantage (Countercharm)." },
+				"applies_to": { "type": "string", "enum": ["die", "total"], "default": "die", "description": "roll_floor: minimum natural die (Reliable Talent 10) or minimum total (Indomitable Might: Strength score)." },
+				"crit_range": { "type": "integer", "minimum": 2, "maximum": 20, "description": "critical/crit_range: lowest natural roll that counts (Improved Critical 19)." },
+
+				"stacking": { "type": "string", "enum": ["highest", "replace", "add"], "description": "temp_hp: how it interacts with existing temporary HP." },
+				"expires_with_effect": { "type": "boolean", "description": "temp_hp granted by this effect vanish when it ends (Polymorph, Animal Shapes)." },
+				"also_heal": { "type": "boolean", "description": "bonus max_hp also raises current HP by the same amount (Aid, Heroes' Feast)." },
+				"limit": { "type": "integer", "description": "restrict: capped to this many per turn instead of fully blocked (Slow: one attack)." },
+				"exclusive": {
+					"type": "array",
+					"items": { "type": "string", "enum": ["move", "action", "bonus_action", "reaction"] },
+					"description": "restrict: only one of these per turn (Slow: action or bonus action; Daze / Abjure Foes: move, action or bonus action)."
+				},
+				"allowed_actions": { "type": "array", "items": { "type": "string" }, "description": "grant_action / compel: which actions (Haste: attack_one, dash, disengage, hide, utilize; Cunning Action: dash, disengage, hide)." },
+				"fraction": { "type": "number", "description": "damage_modifier transfer: share of the damage moved (0.5)." },
+				"copy": { "type": "boolean", "description": "damage_modifier transfer: the recipient takes the same damage without reducing the holder's (Warding Bond)." },
+				"to": { "type": "string", "enum": ["caster", "counterpart", "linked"], "description": "Recipient for transfer / redirect." },
+				"to_type": { "type": "array", "items": { "$ref": "#/$defs/damage-type-select" }, "description": "damage_modifier convert_type: allowed new types." },
+				"direction": { "type": "string", "enum": ["incoming", "outgoing"], "default": "incoming", "description": "damage_modifier: damage the holder takes or deals." },
+				"range": { "type": "number", "description": "sense range / forced movement distance / reach in feet." },
+				"proficiency_level": { "type": "string", "enum": ["half", "proficient", "expertise"], "default": "proficient" },
+				"from_ability": { "$ref": "#/$defs/ability-select", "description": "score_swap: ability normally used." },
+				"to_ability": { "type": "string", "description": "score_swap: ability used instead, or 'spellcasting'." },
+
 				"trigger": { "$ref": "#/$defs/trigger" },
+				"trigger_filter": { "$ref": "#/$defs/trigger_filter" },
+				"frequency": {
+					"type": "string",
+					"enum": ["always", "once_per_turn", "once_per_round", "once_per_effect"],
+					"default": "always",
+					"description": "Throttle for triggered sub-effects (Sneak Attack, Divine Strike: once per turn; area damage: once per turn)."
+				},
 				"target": {
 					"type": "string",
-					"enum": ["self", "trigger_source"],
+					"enum": ["self", "trigger_source", "counterpart", "caster"],
 					"default": "self",
-					"description": "Who receives this sub-effect's damage/healing. 'self' (default) applies to the entity holding the effect, e.g. a Burning DoT. 'trigger_source' applies to whichever entity caused the trigger to fire, e.g. the attacker who hit a Black Pudding with a melee weapon. Only meaningful on damage/healing sub-effects paired with a trigger that has a counterpart entity (damage_taken, on_hit_taken, on_hit, on_crit)."
+					"description": "Who receives this sub-effect. trigger_source/counterpart: the other party of the triggering event (Fire Shield retaliation, Hex damage to the hexed target when the caster hits). caster: the entity that applied the effect."
 				},
-				"condition": { "$ref": "#/$defs/condition_check" },
+				"save": { "$ref": "#/$defs/save_spec", "description": "The recipient saves each time this sub-effect resolves (area damage, Stench, Searing Smite)." },
+				"condition": { "$ref": "#/$defs/condition_set" },
+				"consume": { "$ref": "#/$defs/consume" },
 				"description": {
 					"type": "string",
-					"description": "Freeform text, required for special/descriptive sub-effects."
+					"description": "Freeform text; required for special/descriptive and for anything the engine only surfaces to the DM."
 				}
-			}
+			},
+			"allOf": [
+				{
+					"if": { "properties": { "type": { "const": "includes" } } },
+					"then": { "properties": { "effect": true }, "required": ["effect"] }
+				},
+				{
+					"if": { "properties": { "type": { "const": "apply_effect" } } },
+					"then": { "properties": { "effect": true }, "required": ["effect"] }
+				},
+				{
+					"if": { "properties": { "type": { "const": "remove_effect" } } },
+					"then": {
+						"anyOf": [
+							{ "properties": { "effects": true }, "required": ["effects"] },
+							{ "properties": { "conditions": true }, "required": ["conditions"] }
+						]
+					}
+				}
+			]
 		},
 
 		"sub_type": {
 			"type": "string",
 			"enum": [
-				"ac", "max_hp", "temp_hp",
-				"attack", "damage", "ability", "skill", "save",
-				"concentration_save", "d20_test", "death_save",
-				"speed", "fly_speed", "climb_speed", "swim_speed", "burrow_speed", "reach",
+				"ac", "max_hp", "temp_hp", "speed", "fly_speed", "climb_speed", "swim_speed", "burrow_speed",
+				"reach", "size", "initiative", "passive_perception", "spell_save_dc", "spell_attack", "jump",
+				"healing", "healing_received", "ability_score",
+
+				"attack", "damage", "ability", "skill", "save", "concentration_save", "d20_test", "death_save",
+
 				"v", "r", "i",
-				"max_damage", "max_healing", "descriptive",
+
 				"roll", "fixed_value",
-				"crit", "incoming_crit_range",
-				"action", "reaction", "bonus_action", "movement", "speech",
-				"difficult_terrain", "size",
-				"extra_attack", "extra_action", "extra_bonus_action", "extra_reaction",
-				"halve_damage", "negate_damage", "redirect_damage",
-				"death", "unconscious", "stable", "destroyed"
+
+				"crit", "crit_range", "incoming_crit_range", "negate_incoming_crit", "extra_crit_dice",
+
+				"action", "bonus_action", "reaction", "movement", "speech",
+				"spellcasting", "verbal_components", "concentration", "opportunity_attack", "magic_action",
+				"stand_up", "short_rest", "long_rest", "teleport", "target_choice", "lie",
+
+				"move_away", "move_toward", "move_direction", "dash", "dodge", "attack_nearest",
+				"drop_held", "follow_command", "no_move",
+
+				"advantage", "disadvantage", "condition_benefit", "cover", "hidden",
+
+				"extra_attack", "extra_action", "extra_bonus_action", "extra_reaction", "bonus_action_option", "extra_turn",
+
+				"halve_damage", "negate_damage", "redirect_damage", "floor_at_1", "reduce_damage",
+				"threshold", "absorb", "transfer", "bypass_resistance", "bypass_immunity", "convert_type", "evasion",
+
+				"push", "pull", "move",
+
+				"darkvision", "blindsight", "tremorsense", "truesight", "see_invisible", "telepathy",
+
+				"weapon", "armor", "tool",
+
+				"death", "unconscious", "stable", "destroyed", "drop_to_1", "break_concentration", "removed", "revert_form",
+
+				"max_damage", "max_healing", "descriptive", "difficult_terrain", "hover", "breathing"
 			]
 		}
 	}

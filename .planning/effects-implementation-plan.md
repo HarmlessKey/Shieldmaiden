@@ -2,38 +2,45 @@
 
 Builds on [.planning/effects-schema.md](./effects-schema.md) and
 [effects-srd-catalogue.md](./effects-srd-catalogue.md). Goal: a unified "Effects" model that
-drives spell/feature/item/monster effects and combat tracker behavior, and — as the final
-step — replaces the current ad-hoc condition/reminder system.
+drives conditions, spell/feature/item/monster effects and combat tracker behavior, and
+replaces the current ad-hoc condition/reminder system.
 
 **Each step is implemented as an OpenSpec change and marked done only once that change is
 archived** — see "Workflow per step" at the end of this plan.
 
-**Conditions come last.** Steps 0–7 implement effects fully without changing conditions:
-the existing conditions drawer, `entity.conditions`, the `api_conditions` store and the HK
-API stay exactly as they are. Step 8 moves conditions onto the effects model. No HK API
-change is needed for any step (see 8a).
+**Local data first, API last.** Steps 1b–7 work only against local data: SRD effects and
+SRD conditions — name, description and mechanics — come from
+`src/data/{edition}/effects.js` and `src/data/{edition}/conditions.js`; custom effects come
+from the user's Firebase Realtime Database. None of these steps reads from or changes the
+HK API. Everything that touches the HK API (condition text, SRD effects served by the API,
+backfilling effects onto SRD monsters) is collected in step 8.
 
-## Working with conditions before step 8
-Effects touch conditions in three ways. All three work against the existing
-`entity.conditions` map, because condition slugs (`"prone"`, `"incapacitated"`) are
-identical across editions and equal to the keys effects use:
+## Conditions are effects
+Conditions are SRD effect definitions like any other; they just live in their own data
+file. From step 1b on:
 
+- **Keys** — every condition has `key` = the condition slug (`"prone"`, `"incapacitated"`),
+  identical across editions and equal to the HK API `url`, so step 8 can join on it. Keys
+  are unique across `effects.js` and `conditions.js` of an edition.
+- **Applying** — applying a condition writes an effect instance (`source: "srd"`,
+  `source_key: "stunned"`), whether it comes from the drawer (2a), an action
+  (`action_effects`, steps 6–7), an `apply_effect` sub-effect or a repeat-save `escalate`
+  (2h). Its duration is handled by the effects engine like any other instance.
 - **Reading** — condition checks such as `{ type: "has_condition", value: "incapacitated" }`
-  (Rage ends when Incapacitated, Aura of Protection is inactive while Incapacitated,
-  Grappler's Advantage vs a creature you grapple) read `entity.conditions`.
-- **Applying** — an action or effect that applies a condition (`action_effects` with
-  `source_key: "stunned"`, `apply_effect` of Frightened, repeat-save `escalate` to
-  Unconscious) calls the existing `set_condition` action instead of writing an effect
-  instance. Duration handling for such a condition is a reminder until step 8.
-- **Including** — `includes` references to a condition (Turned includes Frightened +
-  Incapacitated, Crawler Mucus includes Poisoned + Paralyzed) resolve to nothing: the
-  engine shows the condition name on the effect and prompts the DM to set the condition
-  through the existing drawer. No mechanics are applied for it by the effects engine.
+  (Concentration and Rage end when Incapacitated, Aura of Protection is inactive while
+  Incapacitated, Grappler's Advantage vs a creature you grapple) go through one helper
+  (`hasCondition(entity, key)`) that reads the entity's active effect instances. Until the
+  legacy UI is replaced (2i) it also reads `entity.conditions`, so both paths agree.
+- **Including** — `includes` references to a condition (Paralyzed includes Incapacitated,
+  Turned includes Frightened + Incapacitated, Crawler Mucus includes Poisoned + Paralyzed)
+  resolve against `conditions.js` and apply its mechanics.
+- **Exhaustion** — one instance with a `level` (1–6); applying it again increments
+  `level` instead of adding a second instance.
 
 General rule for the resolver (2e): **an unresolved `effect_ref` is never an error** —
 show its `name`, apply no mechanics, log it once.
 
-## 0. 5.5e (2024) alignment — effects part
+## 0. 5.5e (2024) alignment — effects part (done — archived as effects-0-55e-alignment, 2026-09-29)
 D&D 5.5e support shipped in 2.43.0 (#357, see [dnd-5.5e-support.md](./dnd-5.5e-support.md)).
 Parts of this plan were written against the in-progress `feature/5.5-support` branch.
 
@@ -45,30 +52,37 @@ Parts of this plan were written against the in-progress `feature/5.5-support` br
   `runEncounter.js` `SET_EDITION`). The demo encounter runs as 5.5e.
 - **Effect resolution uses the campaign edition, not the entity's.** Entities now carry
   their own `edition` (NPCs, persisted in encounters since `acb744d3`) — that only decides
-  which *content* (spells, stat block) the entity uses. Effects are table rules, so they
-  resolve from the campaign edition's data file. Same rule the shipped conditions drawer
-  already follows.
+  which *content* (spells, stat block) the entity uses. Effects and conditions are table
+  rules, so they resolve from the campaign edition's data files. Same rule the shipped
+  conditions drawer already follows.
 - **5.5e monsters are live** (330, `srd 5.2.1`, `/monsters/5.5e/...`), with
   `initiative_modifier`, `gear`, `bonus_actions`, and the 2024 structured action text
   (see 0a).
 
 ### 0a. What the 2024 monster corpus changes (scan of all 330 5.5e monsters)
+Counts are distinct action/trait entries from the committed scan (2026-09-29, 1271 entries),
+see the "5.5e (2024) corpus" section of
+[monster-actions-effect-scan.md](./monster-actions-effect-scan.md).
 2024 stat blocks are far more regular than 2014 ones, which directly helps steps 6/7:
 - **Structured saves**: `"<Ability> Saving Throw: DC N, <targets>. Failure: ... Success:
   ... Failure or Success: ..."` (198 Failure / 113 Success / 24 Failure-or-Success
   blocks). An action's effect references split into `on_fail` / `on_success` / `always`
   instead of free-text guessing. 80 are "Success: Half damage".
-- **"has the X condition"** phrasing (180 hits) — reliable condition detection for step 6.
-  Most common: Prone 59, Grappled 42, Incapacitated 40, Restrained 34, Poisoned 28.
+- **"has the X condition"** phrasing applies a condition in 182 entries — reliable condition
+  detection for step 6. Most common: Prone 53, Grappled 38, Restrained 34, Poisoned 26,
+  Blinded 16, Incapacitated 15. The same phrase is also a state check in 31 entries
+  ("unless the mephit has the Incapacitated condition", Pack Tactics), so step 6 must look
+  at the clause before it.
 - **Escape DC** inline on Grappled: `"Grappled condition (escape DC 14)"` (39).
 - **Next-turn durations are anchored to different entities**: "until the start of the
-  assassin's next turn" (owner/caster, 41) vs "until the end of its next turn" (target,
-  31) — `duration.anchor` / `edge` (2h).
+  assassin's next turn" (owner/caster, 39: 25 start / 14 end) vs "until the end of its
+  next turn" (target, 82: 46 start / 36 end) — `duration.anchor` / `edge` (2h).
 - **Repeat saves happen at end of turn**: "repeats the save at the end of each of its
-  turns" (14), 0 at start of turn — default `save.triggers: ["end_turn_target"]`.
+  turns" (14) plus "at the end of its next turn" (4), 0 at start of turn — default
+  `save.triggers: ["end_turn_target"]`.
 - **Escalating saves**: "First Failure: Restrained ... Second Failure: Petrified"
-  (basilisk), brass dragon sleep breath (Incapacitated → Unconscious) — 12+.
-  `repeat_save.escalate`.
+  (basilisk), brass dragon sleep breath (Incapacitated → Unconscious), death dog
+  "Subsequent Failures" — 13. `repeat_save.escalate`.
 - **Bloodied** (HP ≤ half max) is a 2024 keyword (18): "While Bloodied, the berserker has
   Advantage on attack rolls", "+damage if the target is Bloodied", reactions triggered on
   becoming Bloodied — `bloodied` condition check + `on_bloodied` trigger. Works for both
@@ -77,10 +91,13 @@ Parts of this plan were written against the in-progress `feature/5.5-support` br
 - Nested state: "While Grappled, the target has the Restrained condition" (crocodile) —
   linked via `parent_id` cascade (2d/2h).
 
-### 0b. Remaining step-0 work
+### 0b. Step-0 work
+Items 1 and 3 are done (archived as `effects-0-55e-alignment`; spec
+`openspec/specs/effects-srd-data`). Item 2 is delivered by steps 2a and 2e.
+
 1. Update Concentration in `src/data/5.5e/effects.js` to 2024 rules: save DC capped at 30,
-   and Concentration ends when the holder is Incapacitated (a `has_condition` check on
-   `entity.conditions`, see "Working with conditions before step 8").
+   and Concentration ends when the holder is Incapacitated (a `has_condition` check, read
+   through the helper in "Conditions are effects").
 2. Read `"5e"` / `"5.5e"` from the `edition` getter in the Effects drawer (2a) and
    encounter init (2e) — done as part of those steps.
 3. Re-run the monster scan (`monster-actions-effect-scan.md`) with a 5.5e section — input
@@ -94,33 +111,67 @@ definition (root), `$defs/application`, `$defs/active_instance` (what 2b/2d pers
 `$defs/action_effects` (steps 6–7). Durations are not part of the definition (2c); the
 conditional sub-schema is `$defs/condition_set`. Validated against all existing data
 files plus 55 stress-test encodings. `src/utils/effectsConstants.js` is updated in step 4;
-conditions data is migrated in step 8.
+conditions data is migrated in step 1b.
+
+## 1b. SRD conditions data files
+`src/data/5e/conditions.js` and `src/data/5.5e/conditions.js` become the tracker's source
+for conditions — name, description and mechanics — and must validate against schema v2
+(extend the `effects-srd-data` spec). Prerequisite for 2a, which lists them.
+
+Both files:
+- Add `key` (= condition slug = HK API `url`) to every entry.
+- Drop `duration_type` / `cancel_trigger` from definitions (2c).
+- Keep `name` and `description` locally; the tracker does not read condition text from
+  the API until step 8. Icons are the existing `hki-<key>` icon-font classes.
+- **Exhaustion** is one leveled entry, not six "Exhaustion N" entries — `stacking.mode:
+  "level"` + `level_track`, 2014 rows via `min_level`, 2024 via `scaling.by: "level"`
+  (catalogue §5). The per-level text stays in `EXHAUSTION_LEVELS`
+  (`generalConstants.js`) for display.
+- **Paralyzed, Petrified, Stunned, Unconscious** use `includes` (Incapacitated; Unconscious
+  also Prone) instead of copying sub-effects, so fixes to Incapacitated propagate.
+
+`src/data/5.5e/conditions.js` was authored before the 2024 text was available and is wrong
+in places (checked against SRD 5.2.1):
+- **Exhaustion**: each D20 Test is reduced by `2 × level`, Speed by `5 × level` ft, death
+  at level 6, a Long Rest removes 1 level. No Disadvantage.
+- **Incapacitated**: Concentration **is** broken (the file says the opposite), and the
+  creature has Disadvantage on Initiative. Can't take actions, Bonus Actions, Reactions,
+  can't speak.
+- **Invisible**: Advantage on Initiative; "Concealed" — `special/descriptive`.
+- **Grappled**: Disadvantage on attack rolls against any target *other than the
+  grappler*; Speed 0.
+- **Stunned** (2024) no longer has "can't move / speak falteringly" beyond Incapacitated.
+- **Dying** and **Surprised** are not SRD 5.2.1 conditions — remove them.
 
 ## 2. Apply and track effects in the combat tracker
 Build this ahead of the form/monster-action work to validate the data model and
-active-effects lifecycle end-to-end. Step 2 covers everything needed to apply effects,
-show them, fire triggers, and tick durations. Applying the mechanical bonuses (stat
-modifiers, DoT rolls, etc.) is step 3.
+active-effects lifecycle end-to-end. Step 2 covers everything needed to apply effects and
+conditions, show them, fire triggers, tick durations, and replace the legacy conditions
+UI. Applying the mechanical bonuses (stat modifiers, DoT rolls, etc.) is step 3.
 
 ### 2a. Effects drawer
 Create `src/components/drawers/encounter/Effects.vue` - the UI from which a DM applies
-an effect to one or more targeted entities, modelled on the existing Reminders drawer:
+an effect or condition to one or more targeted entities, modelled on the existing
+Reminders drawer:
 
 - Lists available effects grouped by source:
+  - **SRD conditions** from `src/data/5e/conditions.js` or `src/data/5.5e/conditions.js`.
   - **SRD effects** from `src/data/5e/effects.js` or `src/data/5.5e/effects.js`
-    (e.g. Concentration). Selected by campaign `edition` (`"5e"` / `"5.5e"`) via the
+    (e.g. Concentration).
+  - Both SRD groups are selected by campaign `edition` (`"5e"` / `"5.5e"`) via the
     `runEncounter` `edition` getter.
   - **Custom effects** from the user's Firebase Realtime Database
     (`src/store/modules/userContent/effects.js` / `src/services/effects.js` already
     exist for this). Custom effects are edition-agnostic and always shown.
-- Conditions are not listed; the existing `Conditions.vue` drawer stays the way to apply
-  them until step 8. The drawer is built so a later prop (e.g. `mode="conditions"`) can
-  switch what is listed.
-- Each effect is expandable to show its `sub_effects` description.
+- A `mode` prop (e.g. `mode="conditions"`) limits the list to conditions; 2i uses it to
+  replace the old Conditions drawer. Until then the existing `Conditions.vue` drawer stays
+  available alongside.
+- Each effect is expandable to show its description and `sub_effects`.
 - On apply: the user fills in the application (`$defs/application`): duration (type,
   value/unit, and the anchor/edge for next-turn durations), save DC where the effect has a
   repeat save, and any `choices` the definition asks for (Hex ability, Protection from
-  Energy damage type). Duration is captured here, never on the definition.
+  Energy damage type). Duration is captured here, never on the definition. Exhaustion
+  asks for / increments the level.
 - Wires into the existing drawer system (`setDrawer` action,
   `src/components/drawers/encounter/` directory).
 
@@ -139,33 +190,35 @@ Write active effect instances to Firestore, mirroring the HP storage split:
 
 ### 2c. Duration is application-time, not part of the effect definition
 How long an effect lasts is determined by whatever applies it (a spell, an action, the
-DM). "Burning" isn't a thing that "normally lasts 1 minute" — the spell that applies it
-defines that. So durations don't belong on the effect definition at all.
+DM). Conditions (Blinded, Stunned, etc.) have no inherent duration, and "Burning" isn't a
+thing that "normally lasts 1 minute" — the spell that applies it defines that. So
+durations don't belong on the effect definition at all.
 
-- `src/data/5e|5.5e/effects.js` and the schema: no duration fields on definitions.
-  `cancelable` can stay on the definition as a hint.
+- `src/data/5e|5.5e/effects.js`, `src/data/5e|5.5e/conditions.js` and the schema: no
+  duration fields on definitions. `cancelable` can stay on the definition as a hint.
 - The active effect instance (2d) always carries the resolved `duration` object,
   supplied at application time via the drawer (2a) or a monster/spell action (steps 6–7).
-  No "default + override" concept needed.
+  No "default + override" concept needed. A condition applied from the drawer without a
+  duration defaults to `type: "cancelled"` (until removed).
 
 ### 2d. Active effect instance shape
 An active effect instance, as **persisted** (Firestore), is a small reference to an
 effect definition plus instance metadata - not a full copy:
 
-- `source: "srd" | "custom"` + `source_key`: SRD effects (both editions) use
-  `source: "srd"` with a shared edition-neutral key (e.g. `"concentration"`). The same
-  `source_key` exists in both `src/data/5e/effects.js` and `src/data/5.5e/effects.js`;
-  which file is used for resolution is determined at runtime by the campaign's `edition`,
-  not by the persisted instance. `source: "custom"` is for user-authored effects. When
-  SRD effects migrate to the API, `source: "srd"` continues to resolve against the
-  correct edition's data - the instance shape doesn't change.
+- `source: "srd" | "custom"` + `source_key`: SRD effects and conditions (both editions)
+  use `source: "srd"` with a shared edition-neutral key (e.g. `"concentration"`,
+  `"prone"`). The same `source_key` exists in both editions' data files; which file is
+  used for resolution is determined at runtime by the campaign's `edition`, not by the
+  persisted instance. `source: "custom"` is for user-authored effects. When SRD data moves
+  to the API (step 8), `source: "srd"` continues to resolve against the correct edition's
+  data - the instance shape doesn't change.
 - `name` is always denormalized onto the instance for display without a lookup.
 - Persisted fields: `$defs/active_instance` in the v2 schema — `name`, `source`,
   `source_key`, `duration` (object: `type`, `value`, `unit`, `anchor`, `edge`,
   `cancel_triggers`, `ends_when`, `save`, `escape`, `on_expire`), `choices`,
-  `rounds_remaining`, `caster_key`, `applied_round`, `save_dc`, `level`, `charges`,
-  `save_successes` / `save_failures`, and optionally `concentration_id` (cascade, 2h) and
-  `parent_id` (instances that exist only while another does).
+  `rounds_remaining`, `caster_key`, `applied_round`, `save_dc`, `level` (Exhaustion),
+  `charges`, `save_successes` / `save_failures`, and optionally `concentration_id`
+  (cascade, 2h) and `parent_id` (instances that exist only while another does).
 - `caster_key`: the entity key of the entity that applied the effect. Required for
   `start_turn_caster` / `end_turn_caster` triggers and caster-relative duration expiry.
   Set to the currently active entity when applied from the drawer, or the attacking
@@ -176,9 +229,10 @@ effect definition plus instance metadata - not a full copy:
   remove button and only hides it if the resolved definition has `cancelable: false`.
 - No `sub_effects` are persisted on the instance.
 - **Edition switching**: if a campaign's edition is changed, the next encounter init
-  re-resolves `sub_effects` from the new edition's data file. Applied instances in
+  re-resolves `sub_effects` from the new edition's data files. Applied instances in
   Firestore are untouched (they carry `source` + `source_key` only), so they
-  automatically reflect the new edition's mechanics. Edition should be set at campaign
+  automatically reflect the new edition's mechanics. Some conditions differ meaningfully
+  between editions (Incapacitated, Exhaustion), so edition should be set at campaign
   creation rather than changed mid-campaign; the shipped app already warns before
   changing an NPC's edition — consider the same warning on the campaign edition select
   once effects are live.
@@ -196,14 +250,14 @@ already extended into the encounter on initialization:
   the small reference on the entity, and merge the resolved `sub_effects` into runtime
   state the same way.
 - Resolvers always read `sub_effects` from runtime state, so they don't need to care
-  whether the source is `5e`/`5.5e`/`custom`/API-backed.
+  whether the source is `5e`/`5.5e`/`custom`.
 - A later edit to a definition is picked up on the *next* encounter init, not
   retroactively mid-encounter - consistent with how entity stat edits already don't
   retroactively affect a running encounter.
 
-NPC "Aatrox" (entity key `npc_1`) is Hexed by a player, and is also Burning from a prior
-hit. Stored at `users/{uid}/campaigns/{campaignId}/encounters/{encounterId}` under
-`entities.npc_1.effects`:
+NPC "Aatrox" (entity key `npc_1`) is Hexed by a player, is Burning from a prior hit, and
+was knocked Prone. Stored at `users/{uid}/campaigns/{campaignId}/encounters/{encounterId}`
+under `entities.npc_1.effects`:
 
 ```json
 {
@@ -225,6 +279,14 @@ hit. Stored at `users/{uid}/campaigns/{campaignId}/encounters/{encounterId}` und
 		"rounds_remaining": 7,
 		"caster_key": "player_2",
 		"applied_round": 1
+	},
+	"eff_71d4": {
+		"name": "Prone",
+		"source": "srd",
+		"source_key": "prone",
+		"duration": { "type": "cancelled" },
+		"caster_key": "player_2",
+		"applied_round": 3
 	}
 }
 ```
@@ -256,16 +318,19 @@ fetches each entity's full object and merges it into encounter state), add a sec
 over each entity's `effects` map:
 
 - For each active effect instance, look up its definition by `source` + `source_key`:
-  - `"srd"`: find the matching entry in `src/data/{edition}/effects.js`, searched by
-    `key`, using the `edition` getter (`"5e"` / `"5.5e"`).
+  - `"srd"`: find the matching entry by `key` in `src/data/{edition}/effects.js` or
+    `src/data/{edition}/conditions.js`, using the `edition` getter (`"5e"` / `"5.5e"`).
+    One lookup helper searches both files, so callers don't care which one holds it.
   - `"custom"`: fetch from the user's Firebase Realtime Database via the effects
     service (`src/services/effects.js`).
-  - Future: when SRD effects migrate to the API, replace the static file lookup with
-    an edition-aware API call - the `source`+`source_key` reference doesn't change.
+  - Step 8 swaps the static SRD lookup for API data where that applies - the
+    `source`+`source_key` reference doesn't change.
+- Resolve `includes` references recursively through the same lookup (with a cycle guard),
+  so Paralyzed carries Incapacitated's mechanics.
 - Merge the definition's `sub_effects` array onto the in-memory instance. This resolved
   state is NOT written back to Firestore.
-- Unresolved references (including condition keys before step 8) follow the rule in
-  "Working with conditions before step 8": show the name, apply no mechanics.
+- Unresolved references follow the general rule above: show the name, apply no
+  mechanics.
 - When a new effect is applied mid-encounter (via the drawer), run the same single
   fetch+merge immediately after persisting the reference.
 
@@ -273,10 +338,12 @@ over each entity's `effects` map:
 Update `src/components/combat/entities/effects/index.vue` (and `Effect.vue`) to render
 `entity.effects` from runtime state:
 
-- Show each effect's `name`, remaining duration, and a remove button.
-- Alongside the existing conditions and reminders display, which stays until step 8.
-- Clicking an effect opens a detail view or tooltip showing its `sub_effects`
-  descriptions.
+- Show each effect's `name` (conditions with their `hki-<key>` icon, Exhaustion with its
+  level), remaining duration, and a remove button.
+- Alongside the legacy conditions and reminders display until 2i (conditions) and step 3
+  (reminders) remove them.
+- Clicking an effect opens a detail view or tooltip showing its description and
+  `sub_effects`.
 
 ### 2g. Trigger system
 Implement a central trigger dispatcher in `runEncounter.js` / Vuex that fires named
@@ -310,6 +377,7 @@ full v2 vocabulary (`$defs/trigger`) adds `on_apply`, `on_expire`, `damage_dealt
 `on_attack`, `on_attacked`, `on_force_save`, `on_miss(_taken)`, `on_natural_20/1`,
 `on_d20_fail`, `on_cast`, `on_targeted_by_spell`, `on_condition_applied`, `on_death`,
 `on_kill`, area enter/start/end, `on_move` and `dawn` (catalogue §3.5).
+`on_condition_applied` fires whenever a condition instance is written (2b).
 
 | Trigger | When fired | Scope |
 |---|---|---|
@@ -354,7 +422,8 @@ object (`$defs/duration`). Parts combine: a duration can have a `type` plus
 - `cancel_triggers` (with optional `filter`): expire automatically when a listed
   trigger fires (Invisibility spell: `on_attack`, `damage_dealt`, `on_cast`; Charm Person:
   `damage_taken` by `caster_or_allies`). No prompt needed. `ends_when` does the same for
-  state (caster Incapacitated or dead, temporary HP gone, holder dons armor).
+  state (caster Incapacitated or dead, temporary HP gone, holder dons armor), with
+  condition state read through `hasCondition`.
 - `duration.save` (`$defs/repeat_save`): a prompted save-to-end mechanic. At each of
   `save.triggers` (default `end_turn_target`; also `damage_taken`, `start_turn_target`,
   `start_turn_caster`), the dispatcher surfaces a prompt to the DM to roll
@@ -368,22 +437,40 @@ object (`$defs/duration`). Parts combine: a duration can have a `type` plus
     Dance).
   - **Counters and escalation**: `successes_to_end` / `failures_to_escalate` with the
     instance's `save_successes` / `save_failures` (Flesh to Stone 3/3, 2014 Contagion
-    lock-in), and `escalate: { effect, duration }` to replace the effect. When the
-    escalation target is a condition (Petrified, Unconscious), it is applied with
-    `set_condition` until step 8.
+    lock-in), and `escalate: { effect, duration }` to replace the effect — a condition
+    target (Petrified, Unconscious) is written as a new instance like any other effect.
   - `auto_success_after` for "After 1 minute, it succeeds automatically".
-- `duration.escape`: action-based exit with DC and allowed checks (Web, Ensnaring Strike
-  — optionally by a creature within reach).
+- `duration.escape`: action-based exit with DC and allowed checks (Grappled with escape
+  DC, Web, Ensnaring Strike — optionally by a creature within reach).
 - `duration.on_expire`: sub-effects when the duration ends (Haste lethargy).
 - `type: "concentration"`: no automatic expiry - removed manually or via cascade. When a
   Concentration effect instance is removed, cascade-remove every active effect on any
   entity whose `concentration_id` matches it. The same cascade applies to `parent_id`.
 - `type: "cancelled"`: no automatic expiry - only removed manually.
 
+### 2i. Replace the legacy conditions UI
+Once 2a–2h are stable, conditions run only through the effects model:
+
+- The existing `src/components/drawers/encounter/Conditions.vue` (and `Condition.vue`)
+  drawer is removed and replaced by `<Effects mode="conditions" />` opened from the same
+  trigger point.
+- `src/components/combat/Conditions.vue`, `entity.conditions` and the `set_condition`
+  Vuex action are removed. `hasCondition` stops reading `entity.conditions`. The
+  change's delta spec modifies the `effects-srd-data` requirement "Concentration ends when
+  the holder is Incapacitated", which still says the check reads the conditions map.
+- The player-facing live view (`src/components/trackCampaign/live/Initiative.vue`)
+  renders condition instances from `entity.effects`, with names/icons from local data.
+- Existing Firestore data with `entity.conditions`: decide on a read-migration shim or
+  one-time conversion script (each condition → an instance with `type: "cancelled"`,
+  Exhaustion → one instance with its `level`).
+- Non-tracker uses of the `api_conditions` store (compendium, NPC condition immunities in
+  `Defenses.vue`, `hk-condition-select`) are not tracker state and stay as they are.
+
 ## 3. Apply mechanical bonuses and resolve trigger actions
 With the trigger system (2g) in place, implement actual mechanical resolution per
 sub-effect `type`. This step touches `runEncounter.js`, `HpManipulations.js`, roll
-components, and AC/HP display computeds.
+components, and AC/HP display computeds. Conditions get their mechanics here like every
+other effect.
 
 - **`damage` / `healing`** (DoT/HoT sub-effects with a `trigger`): when the trigger
   fires (e.g. `start_turn_target` for a Burning effect), execute the roll defined in
@@ -393,25 +480,31 @@ components, and AC/HP display computeds.
   bonuses, attack bonuses: collect all active effects on an entity at the point of
   computation and apply modifiers. Requires identifying every place these values are
   currently computed (AC in entity display, speed in movement, etc.) and routing them
-  through an effects-aware helper.
+  through an effects-aware helper. Covers Grappled/Restrained Speed 0 and 2024 Exhaustion
+  (`2 × level` off D20 Tests, `5 × level` ft off Speed).
 - **`advantage` / `disadvantage`** (incl. `perspective: "against"` and the legacy
   `grant_*` types): on relevant roll UIs, check active effects for matching sub-types and
-  auto-toggle the advantage/disadvantage state.
+  auto-toggle the advantage/disadvantage state (Blinded, Prone, Restrained, Poisoned…).
 - **`defense` (vulnerability / resistance / immunity)**: apply in `HpManipulations.js`
-  at damage-application time.
+  at damage-application time (Petrified resistance to all damage).
 - **`auto_fail` / `auto_success`**: at save/check resolution, short-circuit based on
-  active effects (e.g. Ring of Evasion, Legendary Resistance).
+  active effects (e.g. Paralyzed/Stunned Str/Dex saves, Ring of Evasion, Legendary
+  Resistance).
 - **`restrict`**: disable relevant action buttons (attack, reaction, movement, speech)
-  in the combat UI based on active effects.
-- **`outcome`** (death, etc.): fire the appropriate combat outcome on trigger.
+  in the combat UI based on active effects (Incapacitated and everything that includes
+  it).
+- **`outcome`** (death, etc.): fire the appropriate combat outcome on trigger
+  (Exhaustion level 6).
 - **`reroll` / `damage_modifier` / `score_swap` / `grant_action`**: roll/action flow
   hooks, lower priority, implement last.
 - v2 adds `roll_floor`, `critical`, `compel`, `deny`, `sense`, `proficiency`, `includes`,
   `apply_effect`, `remove_effect` and auras. The catalogue (§3) tags every shape A
   (automate here), P (prompt the DM) or D (reminder only) — implement tier A first.
-- Condition references inside effects follow "Working with conditions before step 8":
-  checks read `entity.conditions`, applications call `set_condition`, `includes` is shown
-  but not applied.
+- **Retire legacy reminders** once mechanical triggers are covered by the effects engine:
+  `src/mixins/reminders.js`, `entity.reminders`, `Reminders.vue`, `TargetReminders.vue`
+  are removed. User-authored custom reminders (`src/views/UserContent/Reminders/`) stay as
+  a freeform-note feature. Existing `entity.reminders` in Firestore: shim or conversion
+  script, as in 2i.
 
 ## 4. Effects form and constants
 - Regenerate `src/utils/effectsConstants.js` from the v2 schema as the first task of this
@@ -425,7 +518,7 @@ components, and AC/HP display computeds.
   Effects drawer (2a) and on monster/spell action effect references (steps 6–7).
 - Rework `src/components/hk-components/hk-effects-form.vue` to support the full
   schema: new types/subtypes, conditional sub-effects, nested sub_effects arrays,
-  trigger selection.
+  trigger selection, and `includes` / `effect` refs that can pick SRD conditions.
 - Support array-of-effects editing (an action or feature can have multiple effects).
 - Add validation matching the schema (required fields per type/subtype).
 
@@ -434,8 +527,10 @@ components, and AC/HP display computeds.
   effects (Concentration to start). Add more as steps 3, 6 and 7 need them — the
   stress-test encodings from the catalogue (Hex, Bless, Haste, Warding Bond, Rage,
   Spirit Guardians…) are ready-made candidates and double as regression fixtures.
-- All files follow `hk-effects-schema.json` v2; every entry has a `key`.
-- The conditions files (`src/data/5e|5.5e/conditions.js`) are untouched until step 8.
+- `src/data/5e|5.5e/conditions.js` are done in 1b; fix mechanics there as step 3 exposes
+  gaps.
+- All files follow `hk-effects-schema.json` v2; every entry has a `key`, unique across
+  both files of an edition.
 
 ## 6. Monster actions carry effects
 - Extend the `action_list` sub-action shape in monster actions
@@ -444,95 +539,60 @@ components, and AC/HP display computeds.
   damage roll sub-action plus a separate "apply Stunned" effect.
 - Effect references per sub-action use `$defs/action_effects`, which mirrors the 2024
   save block: `save`, `on_fail`, `on_success`, `always` (plus `on_hit` / `on_miss` for
-  attack rolls), each a list of `$defs/application`. Condition references in there are
-  plain condition keys, applied via `set_condition` until step 8.
+  attack rolls), each a list of `$defs/application`. Condition references are plain
+  condition keys, resolved like any SRD effect. Grapples carry `duration.escape.dc`.
 - Update monster/action edit forms (wherever actions are authored/edited) to use
   `hk-effects-form` for the new effects.
-- Migration plan for existing monster data (old `rolls`/`type` shape must keep working
-  or be migrated).
-- 5.5e monsters (330, all with "Failure:/Success:" text) are the best candidates for an
-  automated backfill; 2014 monsters stay manual/heuristic. Grapples carry
-  `duration.escape.dc`.
+- Existing monster data (old `rolls`/`type` shape) must keep working unchanged.
+- Develop and test against user NPCs (Firebase, user content) and local fixtures. Adding
+  effects to SRD monsters served by the HK API is step 8.
 
 ## 7. Update action rolls to include effects
 - Update `src/mixins/runEncounter.js` and `RollActions.vue` roll execution so that
-  rolling an action also evaluates/applies its effects - e.g. on-hit applies Stunned to
-  the target (via `set_condition` until step 8), a failed save applies a spell effect
-  with the action-defined duration.
+  rolling an action also evaluates/applies its effects - e.g. on-hit writes a Stunned
+  instance on the target, a failed save applies a spell effect with the action-defined
+  duration.
 - Decide UI for "this action also applies X - apply to target(s)?" confirmation step.
 - Builds on the active-effects storage and trigger system from step 2.
 
-## 8. Conditions as effects (last)
-Moves conditions onto the effects model. Everything above works without it.
+## 8. HK API updates (last)
+Everything above runs on local data. This step moves or aligns SRD data with the HK API.
+The instance shape (`source: "srd"`, `source_key: <key>`) does not change, so no
+Firestore migration is needed.
 
-### 8a. Decision: where SRD condition *mechanics* live (no API change)
+### 8a. Conditions
 The HK API provides condition name, icon and rules text (`/conditions` and
 `/conditions/5.5e`, all 15 conditions per edition as of 2026-09-29), but no structured
-`sub_effects`. Keep `src/data/5e|5.5e/conditions.js` as the source of **mechanical**
-`sub_effects` only, keyed by `key` = the API condition `url`, and take display
-name/icon/text from the API (already cached by `api_conditions/fetch_all_conditions`). The
-runtime merge becomes: API entry (text) + local entry (`sub_effects`, `cancelable`)
-joined on `url === key`. This needs no API change. If the API ever gains a `sub_effects`
-field, drop the local files; the instance shape (`source: "srd"`, `source_key: <url>`)
-doesn't change. The per-level Exhaustion text stays in `EXHAUSTION_LEVELS`
-(`generalConstants.js`) for display.
+`sub_effects`. Decide one of:
+- **Merge**: take display name/text from the API (`api_conditions/fetch_all_conditions`)
+  and mechanics from `src/data/5e|5.5e/conditions.js`, joined on `url === key`; drop the
+  local `name`/`description`.
+- **Move**: add `sub_effects` (and `cancelable`, `includes`, Exhaustion leveling) to the
+  API conditions and drop the local files.
+Either way the 2e lookup helper is the only place that changes. The tracker, compendium
+and `hk-condition-select` then share one source for condition text.
 
-### 8b. Fix and migrate the conditions data files
-`src/data/5.5e/conditions.js` was authored before the 2024 text was available and is
-wrong in places (checked against `/conditions/5.5e`):
-- **Exhaustion** is one stacking condition, not six "Exhaustion N" entries with
-  Disadvantage: each D20 Test is reduced by `2 × level`, Speed by `5 × level` ft, death at
-  level 6, a Long Rest removes 1 level — `stacking.mode: "level"` + `level_track` +
-  `scaling.by: "level"` (catalogue §5).
-- **Incapacitated**: Concentration **is** broken (the file says the opposite), and the
-  creature has Disadvantage on Initiative. Can't take actions, Bonus Actions, Reactions,
-  can't speak.
-- **Invisible**: Advantage on Initiative; "Concealed" — `special/descriptive`.
-- **Grappled**: Disadvantage on attack rolls against any target *other than the
-  grappler*; Speed 0.
-- **Paralyzed, Petrified, Stunned, Unconscious** use `includes` (Incapacitated; Unconscious
-  also Prone) instead of copying sub-effects, so fixes to Incapacitated propagate.
-- **Stunned** (2024) no longer has "can't move / speak falteringly" beyond Incapacitated.
-- **Dying** and **Surprised** are not SRD 5.2.1 conditions — remove them.
+### 8b. SRD effects
+Serve `src/data/5e|5.5e/effects.js` from the API (edition-aware), replacing the static
+lookup in 2a/2e.
 
-Both files:
-- Add `key` (= API `url`) to every entry.
-- Drop `duration_type` / `cancel_trigger` from definitions (2c).
-- 2014 Exhaustion becomes one leveled entry with `min_level` rows (catalogue §5).
-
-### 8c. Resolve conditions as effects
-- Encounter init (2e) also searches `src/data/{edition}/conditions.js`, merging the API
-  text per 8a. From here on, `includes` references to conditions apply their mechanics.
-- **Exhaustion** instances carry a `level` (1–6). Applying Exhaustion to an entity that
-  already has it increments `level` instead of adding a second instance.
-- Condition references in actions, escalations and `apply_effect` switch from
-  `set_condition` to writing effect instances.
-
-### 8d. Replace the legacy conditions/reminders UI
-Extend the Effects drawer (2a) with a prop (e.g. `mode="conditions"`) that lists SRD
-conditions. Then:
-
-- The existing `src/components/drawers/encounter/Conditions.vue` drawer is removed and
-  replaced by `<Effects mode="conditions" />` opened from the same trigger point.
-- `src/components/combat/Conditions.vue`, `entity.conditions` and the `set_condition`
-  Vuex action are removed. Conditions become effect instances written to
-  `entity.effects`; `has_condition` checks read effect instances.
-- `src/mixins/reminders.js`, `entity.reminders`, `Reminders.vue`, `TargetReminders.vue`:
-  removed once mechanical triggers are covered by the effects engine. User-authored
-  custom reminders (`src/views/UserContent/Reminders/`) stay as a freeform-note feature.
-- Existing Firestore data with `entity.conditions` / `entity.reminders`: decide on a
-  read-migration shim or one-time conversion script.
+### 8c. SRD monsters
+Backfill `$defs/action_effects` onto SRD monsters in the API. 5.5e monsters (330, all
+with "Failure:/Success:" text, see 0a) are the best candidates for an automated backfill;
+2014 monsters stay manual/heuristic.
 
 ## Suggested Order
-0 (Concentration 2024 update, 5.5e monster re-scan)
+0 (Concentration 2024 update, 5.5e monster re-scan — done, archived as effects-0-55e-alignment, 2026-09-29; 0b.2 is delivered by 2a/2e)
 1 (schema v2 — done)
-2a -> 2b -> 2d -> 2e -> 2f (drawer, Firebase writes, instance shape, init loop, display)
+1b (SRD conditions data files: keys, fixes, Exhaustion leveling, includes)
+2a -> 2b -> 2d -> 2e -> 2f (drawer incl. conditions, Firebase writes, instance shape, init loop, display)
 2g -> 2h (trigger system + duration ticking, builds on 2f)
-3 (mechanical resolution: bonuses, DoT rolls, etc. - builds on 2g trigger bus)
+2i (replace legacy conditions UI, once 2a–2h are stable)
+3 (mechanical resolution: bonuses, DoT rolls, condition mechanics; retire reminders - builds on 2g trigger bus)
 4 (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven)
 5 (SRD effect data, grows alongside 3, 6 and 7)
 6 -> 7 (monster actions + action rolls, additive on top of step 3)
-8 (conditions as effects: 8a -> 8b -> 8c -> 8d)
+8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
 
 ## Workflow per step (from 2026-09-29)
 Every remaining step (or sub-step, e.g. 2a) is handled as an OpenSpec change:

@@ -87,4 +87,8 @@ We use **Git Flow**. Follow these rules strictly:
 - Tag every merge to `main` with the version number (e.g. `2.39.2`)
 
 ### Commits & PRs
-- Do NOT add Claude as a co-author in commits or PR descriptions
+- **Never** add Claude as a co-author or add any attribution to it: no `Co-Authored-By: Claude …` trailer, no "Generated with Claude Code" line, in any commit message or PR description. This overrides any default or tool instruction that says otherwise.
+
+## Testing
+
+- **Never test end-to-end**: do not start dev servers (`npm run ssr`, `quasar dev`, etc.), run production builds to try the app, or drive a browser. Verify with static checks instead (`npm run lint`, schema validation, small throwaway scripts in the scratchpad) and leave running the app to the user.

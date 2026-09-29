@@ -1,7 +1,7 @@
 // Non-condition SRD effects for D&D 5e (2014), modeled against src/schemas/hk-effects-schema.json
 export default [
 	{
-		key: "concentration",
+		url: "concentration",
 		name: "Concentration",
 		description:
 			"Maintaining a spell requires concentration. Concentration is broken if you cast another spell that requires concentration, take damage and fail a Constitution saving throw (DC 10 or half the damage taken, whichever is higher), are incapacitated, or die.",

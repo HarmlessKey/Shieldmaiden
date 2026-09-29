@@ -6,10 +6,10 @@
 	"type": "object",
 	"required": ["name", "sub_effects"],
 	"properties": {
-		"key": {
+		"url": {
 			"type": "string",
 			"pattern": "^[a-z0-9_-]+$",
-			"description": "Stable, edition-neutral key. Referenced by active instances as source_key. For SRD conditions this equals the HK API condition url (e.g. 'blinded')."
+			"description": "Unique, edition-neutral identifier, equal to the HK API url for content the API serves (e.g. 'blinded'; the API's uuid _id is not used). Referenced by active instances as source_key."
 		},
 		"name": {
 			"type": "string",
@@ -275,7 +275,7 @@
 					]
 				},
 				"value": {
-					"description": "Descriptor: feet, a condition/effect key, a creature type, a size, an HP value, a sense ('truesight'), an environment ('sunlight','bright_light','dim_light','darkness','underwater','running_water'), equipment ('armor','heavy_armor','shield','no_armor'), combat_state ('first_round','not_acted','surprised'), roll_state ('advantage','disadvantage'), relationship ('ally','enemy').",
+					"description": "Descriptor: feet, a condition/effect url, a creature type, a size, an HP value, a sense ('truesight'), an environment ('sunlight','bright_light','dim_light','darkness','underwater','running_water'), equipment ('armor','heavy_armor','shield','no_armor'), combat_state ('first_round','not_acted','surprised'), roll_state ('advantage','disadvantage'), relationship ('ally','enemy').",
 					"oneOf": [{ "type": "number" }, { "type": "string" }, { "type": "boolean" }]
 				},
 				"comparator": { "type": "string", "enum": ["lt", "lte", "eq", "neq", "gte", "gt"] },

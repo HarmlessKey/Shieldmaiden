@@ -1,7 +1,7 @@
 // Non-condition SRD effects for D&D 5.5e (2024), modeled against src/schemas/hk-effects-schema.json
 export default [
 	{
-		key: "concentration",
+		url: "concentration",
 		name: "Concentration",
 		description:
 			"Some spells and other effects require Concentration to remain active. Concentration ends if you start casting another spell or activate another effect that requires Concentration, take damage and fail a Constitution saving throw (DC 10 or half the damage taken, round down, whichever is higher, up to a maximum DC of 30), have the Incapacitated condition, or die.",

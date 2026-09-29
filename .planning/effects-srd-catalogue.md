@@ -43,7 +43,7 @@ invalid input (unknown types, triggers, missing references).
 | **Active instance** | `$defs/active_instance` | Firestore, on the entity (plan 2b/2d) | reference + runtime state: `caster_key`, `applied_round`, `rounds_remaining`, `level`, `charges`, save counters, `parent_id`, `concentration_id` |
 | **Action effects** | `$defs/action_effects` | monster actions / spells (plan steps 6–7) | 2024 stat-block branches: `save`, `on_hit`, `on_miss`, `on_fail`, `on_success`, `always` |
 
-**Edition handling:** one schema, two data sets. 5e and 5.5e definitions share `key`s and differ
+**Edition handling:** one schema, two data sets. 5e and 5.5e definitions share `url`s and differ
 only in content (e.g. `exhaustion` in both files, different `sub_effects`). The campaign edition
 picks the file (plan §0).
 
@@ -199,7 +199,7 @@ enter/start/end-turn-in-area triggers become prompts on those entities.
 
 ## 4. Edition differences the schema must carry
 
-Same `key`, different definitions per edition file:
+Same `url`, different definitions per edition file:
 
 | Key | 5e (2014) | 5.5e (2024) | Fields that differ |
 |---|---|---|---|
@@ -222,7 +222,7 @@ Same `key`, different definitions per edition file:
 
 ```js
 // 2024 Exhaustion
-{ key: "exhaustion", name: "Exhaustion", category: "condition",
+{ url: "exhaustion", name: "Exhaustion", category: "condition",
   stacking: { mode: "level" }, level: { initial: 1, max: 6, per_long_rest: -1, remove_at: 0 },
   sub_effects: [
     { type: "bonus", sub_types: ["d20_test"], scaling: { by: "level", per_unit_value: -2 } },
@@ -230,7 +230,7 @@ Same `key`, different definitions per edition file:
     { type: "outcome", sub_types: ["death"], min_level: 6 } ] }
 
 // 2024 Rage
-{ key: "rage", name: "Rage", category: "feature",
+{ url: "rage", name: "Rage", category: "feature",
   ends_when: { any_of: [{ type: "has_condition", value: "incapacitated" }, { type: "equipment", value: "heavy_armor" }] },
   sustain: { triggers: ["on_attack", "on_force_save"], manual_cost: "bonus_action", check: "end_turn_target" },
   sub_effects: [
@@ -240,14 +240,14 @@ Same `key`, different definitions per edition file:
     { type: "restrict", sub_types: ["spellcasting", "concentration"] } ] }
 
 // Hex (definition) + application with a choice
-{ key: "hex", name: "Hex", category: "spell", magical: true, spell_level: 1,
+{ url: "hex", name: "Hex", category: "spell", magical: true, spell_level: 1,
   sub_effects: [
     { type: "damage", trigger: "on_hit_taken", trigger_filter: { by: "caster" }, roll: { dice_count: 1, dice_type: 6, damage_type: "necrotic" } },
     { type: "disadvantage", sub_types: ["ability"], choice: "ability" } ] }
 { effect: { source: "srd", source_key: "hex" }, duration: { type: "concentration", value: 1, unit: "hour" }, choices: { ability: "wisdom" } }
 
 // Warding Bond
-{ key: "warding-bond", name: "Warding Bond", sub_effects: [
+{ url: "warding-bond", name: "Warding Bond", sub_effects: [
     { type: "bonus", sub_types: ["ac", "save"], value: 1 },
     { type: "defense", sub_types: ["r"], all_damage: true },
     { type: "damage_modifier", sub_types: ["transfer"], copy: true, fraction: 1, to: "caster" } ] }
@@ -280,7 +280,7 @@ The superset in effects-schema.md §4 and Gaps 1–34 are now expressed in the J
   `context`, `consume`, `frequency`, `trigger_filter`, `save` (per sub-effect), `limit`,
   `exclusive`, `allowed_actions`, transfer fields (`fraction`, `copy`, `to`), `to_type`,
   `direction`, `suppress_existing`, `also_heal`, `expires_with_effect`.
-- **Definition-level:** `key`, `category`, `tags`, `magical`, `spell_level`, `removed_by`,
+- **Definition-level:** `url` (originally `key`, renamed in plan step 1b), `category`, `tags`, `magical`, `spell_level`, `removed_by`,
   `stacking`, `level`, `condition`, `ends_when`, `sustain`, `aura`.
 - **New `$defs`:** `amount`/`formula`, `time`, `effect_ref`, `trigger_filter`, `source_filter`,
   `condition_set` (all_of/any_of), `stacking`, `level_track`, `sustain`, `save_spec`,
@@ -298,12 +298,10 @@ The superset in effects-schema.md §4 and Gaps 1–34 are now expressed in the J
 
 ## 7. Follow-ups
 
-1. **Conditions data files (plan step 8, last):** add `key` to every condition; drop
-   `duration_type`/`cancel_trigger` from definitions; rewrite the 5.5e conditions per plan
-   §8b using `includes`, `level`, `initiative` and `break_concentration`; encode 2014
-   Exhaustion with `min_level` rows (§5). Until then effects read and apply conditions
-   through the existing `entity.conditions` / `set_condition` (plan "Working with
-   conditions before step 8").
+1. **Conditions data files (plan step 1b):** add `url` to every condition; drop
+   `duration_type`/`cancel_trigger` from definitions; rewrite the 5.5e conditions using
+   `includes`, `level`, `initiative` and `restrict concentration`; encode 2014 Exhaustion
+   with `min_level` rows (§5). Done in OpenSpec change `effects-1b-srd-conditions-data`.
 2. **Effects form (plan step 4):** first regenerate `src/utils/effectsConstants.js` from the
    v2 schema (labels + which fields each type shows — the form reads these, not the schema),
    then rework `hk-effects-form.vue` to edit the v2 fields progressively; types marked D in

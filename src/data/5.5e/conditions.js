@@ -1,14 +1,16 @@
-// Conditions from the D&D 5.5e (2024) SRD 5.2, modeled against src/schemas/hk-effects-schema.json
+// Conditions from the D&D 5.5e (2024) SRD 5.2.1, modeled against src/schemas/hk-effects-schema.json
 export default [
 	{
+		url: "blinded",
 		name: "Blinded",
-		description: "A blinded creature can't see and automatically fails any ability check that requires sight. Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You can't see and automatically fail any ability check that requires sight. Attack rolls against you have Advantage, and your attack rolls have Disadvantage.",
 		cancelable: true,
 		sub_effects: [
 			{
 				type: "auto_fail",
 				sub_types: ["ability"],
+				context: "sight",
 				description: "Ability checks that require sight",
 			},
 			{
@@ -16,257 +18,211 @@ export default [
 				sub_types: ["attack"],
 			},
 			{
-				type: "grant_advantage",
+				type: "advantage",
 				sub_types: ["attack"],
+				perspective: "against",
 			},
 		],
 	},
 	{
+		url: "charmed",
 		name: "Charmed",
-		description: "A charmed creature can't attack the charmer or target the charmer with harmful abilities or magical effects. The charmer has advantage on any ability check to interact socially with the creature.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You can't attack the charmer or target the charmer with damaging abilities or magical effects. The charmer has Advantage on any ability check to interact with you socially.",
 		cancelable: true,
 		sub_effects: [
 			{
 				type: "restrict",
 				sub_types: ["attack"],
-				description: "Can't attack the charmer or target the charmer with harmful abilities or magical effects",
+				description: "Can't attack the charmer or target the charmer with damaging abilities or magical effects",
 			},
 			{
-				type: "grant_advantage",
-				sub_types: ["ability", "skill"],
-				description: "The charmer has advantage on social interaction checks with this creature",
+				type: "advantage",
+				sub_types: ["ability"],
+				perspective: "against",
+				context: "social",
+				condition: {
+					subject: "counterpart",
+					type: "is_caster",
+				},
+				description: "The charmer has Advantage on ability checks to interact with you socially",
 			},
 		],
 	},
 	{
+		url: "deafened",
 		name: "Deafened",
-		description: "A deafened creature can't hear and automatically fails any ability check that requires hearing.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You can't hear and automatically fail any ability check that requires hearing.",
 		cancelable: true,
 		sub_effects: [
 			{
 				type: "auto_fail",
 				sub_types: ["ability"],
+				context: "hearing",
 				description: "Ability checks that require hearing",
 			},
 		],
 	},
 	{
-		name: "Exhaustion 1",
-		description: "Disadvantage on D20 Tests. Speed decreases by 5 feet.",
-		duration_type: "cancelled",
+		url: "exhaustion",
+		name: "Exhaustion",
+		category: "condition",
+		description: "This condition is cumulative: each time you receive it, you gain 1 Exhaustion level. When you make a D20 Test, the roll is reduced by 2 times your Exhaustion level, and your Speed is reduced by 5 times your Exhaustion level in feet. You die if your Exhaustion level is 6. Finishing a Long Rest removes 1 level; when your Exhaustion level reaches 0, the condition ends.",
 		cancelable: true,
+		stacking: { mode: "level" },
+		level: { initial: 1, max: 6, per_long_rest: -1, remove_at: 0 },
 		sub_effects: [
 			{
-				type: "disadvantage",
+				type: "bonus",
 				sub_types: ["d20_test"],
+				scaling: { by: "level", per_unit_value: -2 },
+				description: "D20 Tests reduced by 2 × Exhaustion level",
 			},
 			{
 				type: "bonus",
 				sub_types: ["speed"],
-				value: -5,
+				scaling: { by: "level", per_unit_value: -5 },
+				description: "Speed reduced by 5 × Exhaustion level feet",
 			},
-		],
-	},
-	{
-		name: "Exhaustion 2",
-		description: "Disadvantage on D20 Tests. Speed decreases by 10 feet.",
-		duration_type: "cancelled",
-		cancelable: true,
-		sub_effects: [
-			{
-				type: "disadvantage",
-				sub_types: ["d20_test"],
-			},
-			{
-				type: "bonus",
-				sub_types: ["speed"],
-				value: -10,
-			},
-		],
-	},
-	{
-		name: "Exhaustion 3",
-		description: "Disadvantage on D20 Tests. Speed decreases by 15 feet.",
-		duration_type: "cancelled",
-		cancelable: true,
-		sub_effects: [
-			{
-				type: "disadvantage",
-				sub_types: ["d20_test"],
-			},
-			{
-				type: "bonus",
-				sub_types: ["speed"],
-				value: -15,
-			},
-		],
-	},
-	{
-		name: "Exhaustion 4",
-		description: "Disadvantage on D20 Tests. Speed decreases by 20 feet.",
-		duration_type: "cancelled",
-		cancelable: true,
-		sub_effects: [
-			{
-				type: "disadvantage",
-				sub_types: ["d20_test"],
-			},
-			{
-				type: "bonus",
-				sub_types: ["speed"],
-				value: -20,
-			},
-		],
-	},
-	{
-		name: "Exhaustion 5",
-		description: "Disadvantage on D20 Tests. Speed decreases by 25 feet.",
-		duration_type: "cancelled",
-		cancelable: true,
-		sub_effects: [
-			{
-				type: "disadvantage",
-				sub_types: ["d20_test"],
-			},
-			{
-				type: "bonus",
-				sub_types: ["speed"],
-				value: -25,
-			},
-		],
-	},
-	{
-		name: "Exhaustion 6",
-		description: "Death.",
-		duration_type: "cancelled",
-		cancelable: true,
-		sub_effects: [
 			{
 				type: "outcome",
 				sub_types: ["death"],
+				min_level: 6,
 			},
 		],
 	},
 	{
+		url: "frightened",
 		name: "Frightened",
-		description: "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight. The creature can't willingly move closer to the source of its fear.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You have Disadvantage on ability checks and attack rolls while the source of fear is within line of sight. You can't willingly move closer to the source of fear.",
 		cancelable: true,
 		sub_effects: [
 			{
 				type: "disadvantage",
 				sub_types: ["ability", "attack"],
 				condition: {
+					subject: "caster",
 					type: "line_of_sight",
-					value: true,
+					description: "While the source of fear is within line of sight",
 				},
 			},
 			{
 				type: "restrict",
 				sub_types: ["movement"],
-				description: "Can't willingly move closer to the source of its fear",
+				description: "Can't willingly move closer to the source of fear",
 			},
 		],
 	},
 	{
+		url: "grappled",
 		name: "Grappled",
-		description: "A grappled creature's speed becomes 0, and it can't benefit from any bonus to its speed. The condition ends if the grappler is incapacitated or if the creature is removed from the grappler's reach.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "Your Speed is 0 and can't increase. You have Disadvantage on attack rolls against any target other than the grappler. The grappler can drag or carry you when it moves, but every foot of movement costs it 1 extra foot unless you are Tiny or two or more sizes smaller than it. The condition ends if the grappler has the Incapacitated condition or you leave its reach.",
 		cancelable: true,
+		ends_when: {
+			subject: "caster",
+			type: "has_condition",
+			value: "incapacitated",
+			description: "Ends if the grappler has the Incapacitated condition.",
+		},
 		sub_effects: [
 			{
 				type: "fixed",
 				sub_types: ["speed"],
 				value: 0,
 			},
+			{
+				type: "disadvantage",
+				sub_types: ["attack"],
+				condition: {
+					subject: "counterpart",
+					type: "is_caster",
+					negate: true,
+					description: "Against any target other than the grappler",
+				},
+			},
+			{
+				type: "special",
+				sub_types: ["descriptive"],
+				description: "The grappler can drag or carry you, at 1 extra foot per foot moved unless you are Tiny or two or more sizes smaller",
+			},
 		],
 	},
 	{
+		url: "incapacitated",
 		name: "Incapacitated",
-		description: "An incapacitated creature can't take any action, Bonus Action, or Reaction. It can't speak, and Concentration is broken only as normal (taking damage, etc.).",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You can't take any action, Bonus Action, or Reaction. Your Concentration is broken. You can't speak. If you're Incapacitated when you roll Initiative, you have Disadvantage on the roll.",
 		cancelable: true,
 		sub_effects: [
 			{
 				type: "restrict",
-				sub_types: ["action", "reaction", "bonus_action"],
+				sub_types: ["action", "bonus_action", "reaction"],
+			},
+			{
+				type: "restrict",
+				sub_types: ["concentration"],
+				description: "Concentration is broken",
 			},
 			{
 				type: "restrict",
 				sub_types: ["speech"],
 			},
+			{
+				type: "disadvantage",
+				sub_types: ["initiative"],
+			},
 		],
 	},
 	{
+		url: "invisible",
 		name: "Invisible",
-		description: "An invisible creature is impossible to see without the aid of magic or a special sense. Attack rolls against the creature have disadvantage, and the creature's attack rolls have advantage.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "If you're Invisible when you roll Initiative, you have Advantage on the roll. You aren't affected by any effect that requires its target to be seen unless the effect's creator can somehow see you; any equipment you are wearing or carrying is also concealed. Attack rolls against you have Disadvantage, and your attack rolls have Advantage. If a creature can somehow see you, you don't gain this benefit against that creature.",
 		cancelable: true,
 		sub_effects: [
 			{
 				type: "advantage",
-				sub_types: ["attack"],
-			},
-			{
-				type: "grant_disadvantage",
-				sub_types: ["attack"],
-			},
-		],
-	},
-	{
-		name: "Paralyzed",
-		description: "A paralyzed creature is incapacitated and can't move or speak. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage. Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
-		duration_type: "cancelled",
-		cancelable: true,
-		sub_effects: [
-			{
-				type: "restrict",
-				sub_types: ["action", "reaction", "bonus_action"],
-			},
-			{
-				type: "restrict",
-				sub_types: ["speech"],
-			},
-			{
-				type: "fixed",
-				sub_types: ["speed"],
-				value: 0,
-			},
-			{
-				type: "auto_fail",
-				sub_types: ["save"],
-				abilities: ["strength", "dexterity"],
-			},
-			{
-				type: "grant_advantage",
-				sub_types: ["attack"],
+				sub_types: ["initiative"],
 			},
 			{
 				type: "special",
-				sub_types: ["incoming_crit_range"],
+				sub_types: ["descriptive"],
+				description: "Concealed: not affected by effects that require their target to be seen, unless the effect's creator can see you",
+			},
+			{
+				type: "advantage",
+				sub_types: ["attack"],
 				condition: {
-					type: "attacker_distance",
-					comparator: "lte",
-					value: 5,
+					subject: "counterpart",
+					type: "can_see",
+					negate: true,
+				},
+			},
+			{
+				type: "disadvantage",
+				sub_types: ["attack"],
+				perspective: "against",
+				condition: {
+					subject: "counterpart",
+					type: "can_see",
+					negate: true,
 				},
 			},
 		],
 	},
 	{
-		name: "Petrified",
-		description: "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance. Its weight increases by a factor of ten, and it ceases aging. The creature is incapacitated, can't move or speak, and is unaware of its surroundings. Attack rolls against the creature have advantage. The creature automatically fails Strength and Dexterity saving throws. The creature has resistance to all damage. The creature is immune to poison and disease, although a poison or disease already in its system is suspended, not neutralized.",
-		duration_type: "cancelled",
+		url: "paralyzed",
+		name: "Paralyzed",
+		category: "condition",
+		description: "You have the Incapacitated condition. Your Speed is 0 and can't increase. You automatically fail Strength and Dexterity saving throws. Attack rolls against you have Advantage. Any attack roll that hits you is a Critical Hit if the attacker is within 5 feet of you.",
 		cancelable: true,
 		sub_effects: [
 			{
-				type: "restrict",
-				sub_types: ["action", "reaction", "bonus_action"],
-			},
-			{
-				type: "restrict",
-				sub_types: ["speech"],
+				type: "includes",
+				effect: { source: "srd", source_key: "incapacitated", name: "Incapacitated" },
 			},
 			{
 				type: "fixed",
@@ -279,26 +235,68 @@ export default [
 				abilities: ["strength", "dexterity"],
 			},
 			{
-				type: "grant_advantage",
+				type: "advantage",
 				sub_types: ["attack"],
+				perspective: "against",
+			},
+			{
+				type: "critical",
+				sub_types: ["incoming_crit_range"],
+				condition: {
+					subject: "counterpart",
+					type: "distance",
+					comparator: "lte",
+					value: 5,
+				},
+				description: "Any attack roll that hits is a Critical Hit if the attacker is within 5 feet",
+			},
+		],
+	},
+	{
+		url: "petrified",
+		name: "Petrified",
+		category: "condition",
+		description: "You are transformed, along with any nonmagical objects you are wearing and carrying, into a solid inanimate substance (usually stone). Your weight increases by a factor of ten, and you cease aging. You have the Incapacitated condition. Your Speed is 0 and can't increase. Attack rolls against you have Advantage. You automatically fail Strength and Dexterity saving throws. You have Resistance to all damage and Immunity to the Poisoned condition.",
+		cancelable: true,
+		sub_effects: [
+			{
+				type: "includes",
+				effect: { source: "srd", source_key: "incapacitated", name: "Incapacitated" },
+			},
+			{
+				type: "fixed",
+				sub_types: ["speed"],
+				value: 0,
+			},
+			{
+				type: "advantage",
+				sub_types: ["attack"],
+				perspective: "against",
+			},
+			{
+				type: "auto_fail",
+				sub_types: ["save"],
+				abilities: ["strength", "dexterity"],
 			},
 			{
 				type: "defense",
 				sub_types: ["r"],
+				all_damage: true,
 				description: "Resistance to all damage",
 			},
 			{
 				type: "defense",
 				sub_types: ["i"],
 				conditions: ["poisoned"],
-				description: "Immune to poison and disease",
+				description: "Immunity to the Poisoned condition",
 			},
 		],
 	},
 	{
+		url: "poisoned",
 		name: "Poisoned",
-		description: "A poisoned creature has disadvantage on attack rolls and ability checks.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You have Disadvantage on attack rolls and ability checks.",
 		cancelable: true,
 		sub_effects: [
 			{
@@ -308,44 +306,50 @@ export default [
 		],
 	},
 	{
+		url: "prone",
 		name: "Prone",
-		description: "A prone creature's only movement option is to crawl, unless it stands up. The creature has disadvantage on attack rolls. An attack roll against the creature has advantage if the attacker is within 5 feet of the creature, otherwise the attack roll has disadvantage.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "Your only movement options are to crawl or to spend an amount of movement equal to half your Speed (round down) to right yourself and thereby end the condition. If your Speed is 0, you can't right yourself. You have Disadvantage on attack rolls. An attack roll against you has Advantage if the attacker is within 5 feet of you. Otherwise, that attack roll has Disadvantage.",
 		cancelable: true,
 		sub_effects: [
 			{
 				type: "restrict",
 				sub_types: ["movement"],
-				description: "Can only crawl, unless it stands up",
+				description: "Can only crawl, or spend half your Speed to right yourself (not possible at Speed 0)",
 			},
 			{
 				type: "disadvantage",
 				sub_types: ["attack"],
 			},
 			{
-				type: "grant_advantage",
+				type: "advantage",
 				sub_types: ["attack"],
+				perspective: "against",
 				condition: {
-					type: "attacker_distance",
+					subject: "counterpart",
+					type: "distance",
 					comparator: "lte",
 					value: 5,
 				},
 			},
 			{
-				type: "grant_disadvantage",
+				type: "disadvantage",
 				sub_types: ["attack"],
+				perspective: "against",
 				condition: {
-					type: "attacker_distance",
-					comparator: "gte",
-					value: 10,
+					subject: "counterpart",
+					type: "distance",
+					comparator: "gt",
+					value: 5,
 				},
 			},
 		],
 	},
 	{
+		url: "restrained",
 		name: "Restrained",
-		description: "A restrained creature's speed becomes 0. Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage. The creature has disadvantage on Dexterity saving throws.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "Your Speed is 0 and can't increase. Attack rolls against you have Advantage, and your attack rolls have Disadvantage. You have Disadvantage on Dexterity saving throws.",
 		cancelable: true,
 		sub_effects: [
 			{
@@ -358,8 +362,9 @@ export default [
 				sub_types: ["attack"],
 			},
 			{
-				type: "grant_advantage",
+				type: "advantage",
 				sub_types: ["attack"],
+				perspective: "against",
 			},
 			{
 				type: "disadvantage",
@@ -369,23 +374,15 @@ export default [
 		],
 	},
 	{
+		url: "stunned",
 		name: "Stunned",
-		description: "A stunned creature is incapacitated, can't move, and can speak only falteringly. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You have the Incapacitated condition. You automatically fail Strength and Dexterity saving throws. Attack rolls against you have Advantage.",
 		cancelable: true,
 		sub_effects: [
 			{
-				type: "restrict",
-				sub_types: ["action", "reaction", "bonus_action"],
-			},
-			{
-				type: "restrict",
-				sub_types: ["speech"],
-			},
-			{
-				type: "fixed",
-				sub_types: ["speed"],
-				value: 0,
+				type: "includes",
+				effect: { source: "srd", source_key: "incapacitated", name: "Incapacitated" },
 			},
 			{
 				type: "auto_fail",
@@ -393,24 +390,28 @@ export default [
 				abilities: ["strength", "dexterity"],
 			},
 			{
-				type: "grant_advantage",
+				type: "advantage",
 				sub_types: ["attack"],
+				perspective: "against",
 			},
 		],
 	},
 	{
+		url: "unconscious",
 		name: "Unconscious",
-		description: "An unconscious creature is incapacitated, can't move or speak, and is unaware of its surroundings. The creature drops whatever it's holding and falls prone. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage. Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
-		duration_type: "cancelled",
+		category: "condition",
+		description: "You have the Incapacitated and Prone conditions, and you drop whatever you're holding. When this condition ends, you remain Prone. Your Speed is 0 and can't increase. Attack rolls against you have Advantage. You automatically fail Strength and Dexterity saving throws. Any attack roll that hits you is a Critical Hit if the attacker is within 5 feet of you. You're unaware of your surroundings.",
 		cancelable: true,
 		sub_effects: [
 			{
-				type: "restrict",
-				sub_types: ["action", "reaction", "bonus_action"],
+				type: "includes",
+				effect: { source: "srd", source_key: "incapacitated", name: "Incapacitated" },
 			},
 			{
-				type: "restrict",
-				sub_types: ["speech"],
+				type: "apply_effect",
+				trigger: "on_apply",
+				effect: { source: "srd", source_key: "prone", name: "Prone" },
+				description: "You have the Prone condition, and remain Prone when this condition ends",
 			},
 			{
 				type: "fixed",
@@ -420,17 +421,12 @@ export default [
 			{
 				type: "special",
 				sub_types: ["descriptive"],
-				description: "Drops whatever it's holding and falls prone",
+				description: "Unaware of your surroundings; you drop whatever you're holding",
 			},
 			{
-				type: "restrict",
-				sub_types: ["movement"],
-				description: "Can only crawl, unless it stands up (Prone)",
-			},
-			{
-				type: "disadvantage",
+				type: "advantage",
 				sub_types: ["attack"],
-				description: "Prone",
+				perspective: "against",
 			},
 			{
 				type: "auto_fail",
@@ -438,85 +434,15 @@ export default [
 				abilities: ["strength", "dexterity"],
 			},
 			{
-				type: "grant_advantage",
-				sub_types: ["attack"],
-			},
-			{
-				type: "special",
+				type: "critical",
 				sub_types: ["incoming_crit_range"],
 				condition: {
-					type: "attacker_distance",
+					subject: "counterpart",
+					type: "distance",
 					comparator: "lte",
 					value: 5,
 				},
-			},
-		],
-	},
-	{
-		name: "Dying",
-		description: "A creature with 0 Hit Points and no Death Saves yet is Dying. A Dying creature is incapacitated and can't move or speak. It falls Prone and must make Death Saving Throws.",
-		duration_type: "trigger",
-		cancelable: true,
-		sub_effects: [
-			{
-				type: "restrict",
-				sub_types: ["action", "reaction", "bonus_action"],
-			},
-			{
-				type: "restrict",
-				sub_types: ["speech"],
-			},
-			{
-				type: "fixed",
-				sub_types: ["speed"],
-				value: 0,
-			},
-			{
-				type: "special",
-				sub_types: ["descriptive"],
-				description: "Falls prone and must make Death Saving Throws",
-			},
-			{
-				type: "restrict",
-				sub_types: ["movement"],
-				description: "Can only crawl, unless it stands up (Prone)",
-			},
-			{
-				type: "disadvantage",
-				sub_types: ["attack"],
-				description: "Prone",
-			},
-			{
-				type: "grant_advantage",
-				sub_types: ["attack"],
-				condition: {
-					type: "attacker_distance",
-					comparator: "lte",
-					value: 5,
-				},
-			},
-			{
-				type: "grant_disadvantage",
-				sub_types: ["attack"],
-				condition: {
-					type: "attacker_distance",
-					comparator: "gte",
-					value: 10,
-				},
-			},
-		],
-	},
-	{
-		name: "Surprised",
-		description: "A surprised creature can't move or take an action or a reaction on its first turn of combat, and it can't take a Reaction until that turn ends.",
-		duration_type: "trigger",
-		cancel_trigger: "end_turn_target",
-		cancelable: true,
-		sub_effects: [
-			{
-				type: "restrict",
-				sub_types: ["action", "reaction", "bonus_action", "movement"],
-				description: "Can't move or take an action, bonus action, or reaction on its first turn of combat",
+				description: "Any attack roll that hits is a Critical Hit if the attacker is within 5 feet",
 			},
 		],
 	},

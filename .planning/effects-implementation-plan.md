@@ -19,9 +19,11 @@ backfilling effects onto SRD monsters) is collected in step 8.
 Conditions are SRD effect definitions like any other; they just live in their own data
 file. From step 1b on:
 
-- **Keys** — every condition has `key` = the condition slug (`"prone"`, `"incapacitated"`),
-  identical across editions and equal to the HK API `url`, so step 8 can join on it. Keys
-  are unique across `effects.js` and `conditions.js` of an edition.
+- **`url`** — every SRD definition (condition or effect) is identified by `url`, the
+  condition slug (`"prone"`, `"incapacitated"`) — the same unique identifier the HK API
+  uses (the API's uuid `_id`s are not used). It is identical across editions, so step 8 can
+  join on it, and unique across `effects.js` and `conditions.js` of an edition. Instances
+  reference it as `source_key`.
 - **Applying** — applying a condition writes an effect instance (`source: "srd"`,
   `source_key: "stunned"`), whether it comes from the drawer (2a), an action
   (`action_effects`, steps 6–7), an `apply_effect` sub-effect or a repeat-save `escalate`
@@ -29,7 +31,7 @@ file. From step 1b on:
 - **Reading** — condition checks such as `{ type: "has_condition", value: "incapacitated" }`
   (Concentration and Rage end when Incapacitated, Aura of Protection is inactive while
   Incapacitated, Grappler's Advantage vs a creature you grapple) go through one helper
-  (`hasCondition(entity, key)`) that reads the entity's active effect instances. Until the
+  (`hasCondition(entity, url)`) that reads the entity's active effect instances. Until the
   legacy UI is replaced (2i) it also reads `entity.conditions`, so both paths agree.
 - **Including** — `includes` references to a condition (Paralyzed includes Incapacitated,
   Turned includes Frightened + Incapacitated, Crawler Mucus includes Poisoned + Paralyzed)
@@ -113,22 +115,26 @@ conditional sub-schema is `$defs/condition_set`. Validated against all existing 
 files plus 55 stress-test encodings. `src/utils/effectsConstants.js` is updated in step 4;
 conditions data is migrated in step 1b.
 
-## 1b. SRD conditions data files
+## 1b. SRD conditions data files (done — archived as effects-1b-srd-conditions-data, 2026-09-29)
 `src/data/5e/conditions.js` and `src/data/5.5e/conditions.js` become the tracker's source
 for conditions — name, description and mechanics — and must validate against schema v2
 (extend the `effects-srd-data` spec). Prerequisite for 2a, which lists them.
 
 Both files:
-- Add `key` (= condition slug = HK API `url`) to every entry.
+- Add `url` (= condition slug = HK API `url`) to every entry. The schema's root `key` is
+  renamed to `url`, and Concentration in `effects.js` switches from `key` to `url`.
 - Drop `duration_type` / `cancel_trigger` from definitions (2c).
 - Keep `name` and `description` locally; the tracker does not read condition text from
-  the API until step 8. Icons are the existing `hki-<key>` icon-font classes.
+  the API until step 8. Icons are the existing `hki-<url>` icon-font classes.
 - **Exhaustion** is one leveled entry, not six "Exhaustion N" entries — `stacking.mode:
   "level"` + `level_track`, 2014 rows via `min_level`, 2024 via `scaling.by: "level"`
   (catalogue §5). The per-level text stays in `EXHAUSTION_LEVELS`
   (`generalConstants.js`) for display.
 - **Paralyzed, Petrified, Stunned, Unconscious** use `includes` (Incapacitated; Unconscious
   also Prone) instead of copying sub-effects, so fixes to Incapacitated propagate.
+  *As built:* Unconscious brings Prone through `apply_effect` on `on_apply`, not
+  `includes` — the creature falls Prone and (2024) remains Prone when Unconscious ends,
+  while an `includes` Prone would be removed with it.
 
 `src/data/5.5e/conditions.js` was authored before the 2024 text was available and is wrong
 in places (checked against SRD 5.2.1):
@@ -206,7 +212,7 @@ An active effect instance, as **persisted** (Firestore), is a small reference to
 effect definition plus instance metadata - not a full copy:
 
 - `source: "srd" | "custom"` + `source_key`: SRD effects and conditions (both editions)
-  use `source: "srd"` with a shared edition-neutral key (e.g. `"concentration"`,
+  use `source: "srd"` with the definition's shared edition-neutral `url` (e.g. `"concentration"`,
   `"prone"`). The same `source_key` exists in both editions' data files; which file is
   used for resolution is determined at runtime by the campaign's `edition`, not by the
   persisted instance. `source: "custom"` is for user-authored effects. When SRD data moves
@@ -318,7 +324,7 @@ fetches each entity's full object and merges it into encounter state), add a sec
 over each entity's `effects` map:
 
 - For each active effect instance, look up its definition by `source` + `source_key`:
-  - `"srd"`: find the matching entry by `key` in `src/data/{edition}/effects.js` or
+  - `"srd"`: find the entry whose `url` equals `source_key` in `src/data/{edition}/effects.js` or
     `src/data/{edition}/conditions.js`, using the `edition` getter (`"5e"` / `"5.5e"`).
     One lookup helper searches both files, so callers don't care which one holds it.
   - `"custom"`: fetch from the user's Firebase Realtime Database via the effects
@@ -338,7 +344,7 @@ over each entity's `effects` map:
 Update `src/components/combat/entities/effects/index.vue` (and `Effect.vue`) to render
 `entity.effects` from runtime state:
 
-- Show each effect's `name` (conditions with their `hki-<key>` icon, Exhaustion with its
+- Show each effect's `name` (conditions with their `hki-<url>` icon, Exhaustion with its
   level), remaining duration, and a remove button.
 - Alongside the legacy conditions and reminders display until 2i (conditions) and step 3
   (reminders) remove them.
@@ -529,7 +535,7 @@ other effect.
   Spirit Guardians…) are ready-made candidates and double as regression fixtures.
 - `src/data/5e|5.5e/conditions.js` are done in 1b; fix mechanics there as step 3 exposes
   gaps.
-- All files follow `hk-effects-schema.json` v2; every entry has a `key`, unique across
+- All files follow `hk-effects-schema.json` v2; every entry has a `url`, unique across
   both files of an edition.
 
 ## 6. Monster actions carry effects
@@ -540,7 +546,7 @@ other effect.
 - Effect references per sub-action use `$defs/action_effects`, which mirrors the 2024
   save block: `save`, `on_fail`, `on_success`, `always` (plus `on_hit` / `on_miss` for
   attack rolls), each a list of `$defs/application`. Condition references are plain
-  condition keys, resolved like any SRD effect. Grapples carry `duration.escape.dc`.
+  condition `url`s, resolved like any SRD effect. Grapples carry `duration.escape.dc`.
 - Update monster/action edit forms (wherever actions are authored/edited) to use
   `hk-effects-form` for the new effects.
 - Existing monster data (old `rolls`/`type` shape) must keep working unchanged.
@@ -557,7 +563,7 @@ other effect.
 
 ## 8. HK API updates (last)
 Everything above runs on local data. This step moves or aligns SRD data with the HK API.
-The instance shape (`source: "srd"`, `source_key: <key>`) does not change, so no
+The instance shape (`source: "srd"`, `source_key: <url>`) does not change, so no
 Firestore migration is needed.
 
 ### 8a. Conditions
@@ -565,7 +571,7 @@ The HK API provides condition name, icon and rules text (`/conditions` and
 `/conditions/5.5e`, all 15 conditions per edition as of 2026-09-29), but no structured
 `sub_effects`. Decide one of:
 - **Merge**: take display name/text from the API (`api_conditions/fetch_all_conditions`)
-  and mechanics from `src/data/5e|5.5e/conditions.js`, joined on `url === key`; drop the
+  and mechanics from `src/data/5e|5.5e/conditions.js`, joined on `url`; drop the
   local `name`/`description`.
 - **Move**: add `sub_effects` (and `cancelable`, `includes`, Exhaustion leveling) to the
   API conditions and drop the local files.
@@ -584,7 +590,7 @@ with "Failure:/Success:" text, see 0a) are the best candidates for an automated 
 ## Suggested Order
 0 (Concentration 2024 update, 5.5e monster re-scan — done, archived as effects-0-55e-alignment, 2026-09-29; 0b.2 is delivered by 2a/2e)
 1 (schema v2 — done)
-1b (SRD conditions data files: keys, fixes, Exhaustion leveling, includes)
+1b (SRD conditions data files: `url`s, fixes, Exhaustion leveling, includes — done, archived as effects-1b-srd-conditions-data, 2026-09-29)
 2a -> 2b -> 2d -> 2e -> 2f (drawer incl. conditions, Firebase writes, instance shape, init loop, display)
 2g -> 2h (trigger system + duration ticking, builds on 2f)
 2i (replace legacy conditions UI, once 2a–2h are stable)

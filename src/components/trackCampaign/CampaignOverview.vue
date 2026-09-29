@@ -14,7 +14,7 @@
 			<div class="players">
 				<h3 class="text-shadow">Campaign Players</h3>
 				<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px' }">
-					<ViewPlayers
+					<Players
 						:userId="userId"
 						:campaignId="$route.params.campid"
 						:campaign="campaign"
@@ -87,11 +87,12 @@
 
 			<q-tab-panels v-model="panel" animated swipeable infinite class="transparent-bg">
 				<q-tab-panel name="players">
-					<ViewPlayers
+					<Players
 						:userId="userId"
 						:campaignId="$route.params.campid"
 						:campaign="campaign"
 						:players="players"
+						:sync-characters="sync_characters"
 					/>
 				</q-tab-panel>
 				<q-tab-panel name="meters">
@@ -104,16 +105,19 @@
 
 <script>
 import Meters from "src/components/trackCampaign/Meters.vue";
-import ViewPlayers from "src/components/campaign/Players.vue";
+import Players from "src/components/campaign/Players.vue";
 import Sharing from "./Sharing.vue";
 import Weather from "src/components/weather";
 
+import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { mapGetters } from "vuex";
+
 export default {
-	name: "Players",
+	name: "CampaignOverview",
 	props: ["players", "campaign", "width", "shares", "live", "showWeather", "muted"],
 	components: {
 		Meters,
-		ViewPlayers,
+		Players,
 		Shares: () => import("./Shares"),
 		Sharing,
 		Weather,
@@ -123,6 +127,7 @@ export default {
 			userId: this.$route.params.userid,
 			panel: "players",
 			showShares: false,
+			sync_characters: {},
 			panels: [
 				{
 					label: "Campaign players",
@@ -138,6 +143,7 @@ export default {
 		};
 	},
 	computed: {
+		...mapGetters(["extensionInstalled"]),
 		background_image() {
 			if (this.campaign.temporary_background && this.campaign.temporary_background.image)
 				return this.campaign.temporary_background.image;
@@ -157,7 +163,11 @@ export default {
 				: undefined;
 		},
 	},
-	methods: {},
+	async mounted() {
+		if (this.extensionInstalled) {
+			this.sync_characters = await getCharacterSyncStorage();
+		}
+	},
 };
 </script>
 

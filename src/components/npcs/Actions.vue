@@ -137,10 +137,48 @@
 													</hk-roll-action>
 												</q-item-section>
 												<q-item-section avatar>
-													<a @click.stop="remove(ability_index, category)" class="remove">
-														<i aria-hidden="true" class="fas fa-trash-alt red" />
-														<q-tooltip anchor="top middle" self="center middle"> Remove </q-tooltip>
-													</a>
+													<div class="d-flex gap-1">
+														<button
+															@click.stop.prevent
+															class="move btn btn-sm bg-neutral-5"
+															aria-label="Move to"
+														>
+															<i aria-hidden="true" class="fas fa-arrows-alt-v" />
+															<q-tooltip anchor="top middle" self="center middle">
+																Move to
+															</q-tooltip>
+															<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+																<div class="bg-neutral-9">
+																	<q-list>
+																		<q-item disable>
+																			<q-item-section>Move to</q-item-section>
+																		</q-item>
+																		<q-item
+																			v-for="target in actions.filter(
+																				(action) => action.category !== category
+																			)"
+																			:key="`move-${target.category}`"
+																			clickable
+																			v-close-popup
+																			@click="move(ability_index, category, target.category)"
+																		>
+																			<q-item-section>{{ target.name }}</q-item-section>
+																		</q-item>
+																	</q-list>
+																</div>
+															</q-popup-proxy>
+														</button>
+														<button
+															@click.stop="remove(ability_index, category)"
+															aria-label="Remove"
+															class="btn btn-sm bg-neutral-5"
+														>
+															<i aria-hidden="true" class="fas fa-trash-alt red" />
+															<q-tooltip anchor="top middle" self="center middle">
+																Remove
+															</q-tooltip>
+														</button>
+													</div>
 												</q-item-section>
 											</template>
 
@@ -601,20 +639,6 @@ export default {
 			edit_action: {},
 			edit_roll_index: undefined,
 			roll: undefined,
-			actions: [
-				{
-					category: "special_abilities",
-					name: "Special Abilities",
-					name_single: "Special ability",
-				},
-				{ category: "actions", name: "Actions", name_single: "Action" },
-				{
-					category: "legendary_actions",
-					name: "Legendary Actions",
-					name_single: "Legendary action",
-				},
-				{ category: "reactions", name: "Reactions", name_single: "Reaction" },
-			],
 			aoe_types: [
 				{ label: "Cone", value: "cone" },
 				{ label: "Cube", value: "cube" },
@@ -635,6 +659,28 @@ export default {
 			set(newValue) {
 				this.$emit("input", newValue);
 			},
+		},
+		actions() {
+			const is55e = this.npc.edition === "5.5e";
+			return [
+				{
+					category: "special_abilities",
+					name: is55e ? "Traits" : "Special Abilities",
+					name_single: is55e ? "Trait" : "Special ability",
+				},
+				{ category: "actions", name: "Actions", name_single: "Action" },
+				{
+					category: "bonus_actions",
+					name: "Bonus Actions",
+					name_single: "Bonus action",
+				},
+				{
+					category: "legendary_actions",
+					name: "Legendary Actions",
+					name_single: "Legendary action",
+				},
+				{ category: "reactions", name: "Reactions", name_single: "Reaction" },
+			];
 		},
 	},
 	methods: {
@@ -685,6 +731,31 @@ export default {
 		 */
 		remove(index, category) {
 			this.$delete(this.npc[category], index);
+			this.$forceUpdate();
+		},
+
+		/**
+		 * Move an action to a different category, keeping all its data
+		 *
+		 * @param {integer} index index of the action
+		 * @param {string} from category the action is moved from
+		 * @param {string} to category the action is moved to
+		 */
+		move(index, from, to) {
+			const ability = { ...this.npc[from][index] };
+
+			// legendary_cost is only allowed on legendary actions and required there
+			if (to === "legendary_actions") {
+				if (ability.legendary_cost === undefined) ability.legendary_cost = 1;
+			} else {
+				delete ability.legendary_cost;
+			}
+
+			if (this.npc[to] === undefined) {
+				this.npc[to] = [];
+			}
+			this.npc[to].push(ability);
+			this.$delete(this.npc[from], index);
 			this.$forceUpdate();
 		},
 

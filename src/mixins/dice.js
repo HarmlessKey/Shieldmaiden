@@ -268,8 +268,8 @@ export const dice = {
 						!roll.special || roll.length === 0
 							? undefined
 							: roll.special && Array.isArray(roll.special)
-							? roll.special
-							: [roll.special];
+								? roll.special
+								: [roll.special];
 					let magical = !!roll.magical;
 
 					// Check for options
@@ -359,9 +359,10 @@ export const dice = {
 		__levelScaling__(tiers, roll, ability, config) {
 			// SPELL SCALE
 			if (ability.scaling === "spell_scale") {
-				const scale = tiers[0].level;
-				const dice_count = tiers[0].dice_count;
-				const fixed_val = tiers[0].fixed_val;
+				const tier = tiers[0];
+				const scale = tier?.level;
+				const dice_count = tier?.dice_count;
+				const fixed_val = tier?.fixed_val;
 
 				// Calculate the increase based on spell level, on what level the spell is cast and the scale
 				const increase = parseInt(Math.floor((config.cast_level - ability.level) / scale));

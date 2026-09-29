@@ -273,9 +273,8 @@
 <script>
 import { db } from "src/firebase";
 import { general } from "src/mixins/general.js";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { trackEncounter } from "src/mixins/trackEncounter.js";
-import { conditions } from "src/mixins/conditions.js";
 
 import Health from "./Health.vue";
 import Name from "./Name.vue";
@@ -283,7 +282,7 @@ import Avatar from "./Avatar.vue";
 
 export default {
 	name: "Initiative",
-	mixins: [general, trackEncounter, conditions],
+	mixins: [general, trackEncounter],
 	components: {
 		Health,
 		Name,
@@ -311,6 +310,7 @@ export default {
 		};
 	},
 	computed: {
+		...mapGetters("api_conditions", ["conditions_by_edition"]),
 		playerSettings() { return this.displaySettings?.player || {}; },
 		npcSettings() { return this.displaySettings?.npc; },
 		allySettings() { return this.displaySettings?.ally; },
@@ -347,8 +347,12 @@ export default {
 			});
 		}
 	},
+	async created() {
+		await this.fetch_all_conditions({ edition: "5e" });
+	},
 	methods: {
 		...mapActions(["setDrawer"]),
+		...mapActions("api_conditions", ["fetch_all_conditions"]),
 		setSize() {
 			this.width = this.$refs.initiative.clientWidth;
 		},
@@ -407,11 +411,10 @@ export default {
 		returnConditions(entity_conditions) {
 			let returnConditions = [];
 			for (const key in entity_conditions) {
-				returnConditions.push(
-					this.conditionList.filter((item) => {
-						return item.value === key;
-					})[0]
-				);
+				const found = this.conditions_by_edition("5e").find((item) => item.url === key);
+				if (found) {
+					returnConditions.push({ value: found.url, name: found.name });
+				}
 			}
 			return returnConditions;
 		},

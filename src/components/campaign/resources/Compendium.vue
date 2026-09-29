@@ -44,26 +44,42 @@
 				/>
 			</q-input>
 
+			<q-btn-toggle
+				v-if="showEditionToggle"
+				class="mb-2"
+				v-model="editionModel"
+				spread
+				no-caps
+				toggle-color="primary"
+				:options="editionOptions"
+			/>
+
 			<!-- SHOW SEARCH RESULTS -->
 			<ul v-if="!show" class="results">
-				<li v-for="(result, index) in searchResults" :key="index" class="truncate">
-					<a @click="show = result['_id']">
+				<li
+					v-for="(result, index) in searchResults"
+					:key="index"
+					class="truncate d-flex justify-between cursor-pointer"
+					@click="show = result['_id']"
+				>
+					<span>
 						{{ result.name.capitalizeEach() }}
 						<q-tooltip anchor="top middle" self="center middle"> Show info </q-tooltip>
-					</a>
+					</span>
+					<span class="neutral-2">{{ result.edition || "5e" }}</span>
 				</li>
 			</ul>
 
 			<!-- SHOW SELECTED RESULT -->
 			<div v-if="show">
-				<a class="btn btn-clear btn-sm mb-2" @click="show = undefined">
+				<a class="btn btn-clear btn-sm mb-2 block" @click="show = undefined">
 					<i aria-hidden="true" class="fas fa-times red mr-1" />
 					Close
 				</a>
-				<ViewMonster v-if="current === 'monsters'" :id="show" />
-				<Spell v-if="current === 'spells'" :id="show" />
-				<Condition v-if="current === 'conditions'" :id="show" />
-				<Item v-if="current === 'items'" :id="show" />
+				<ViewMonster v-if="current === 'monsters'" :id="show" :edition="activeEdition" />
+				<Spell v-if="current === 'spells'" :id="show" :edition="activeEdition" />
+				<Condition v-if="current === 'conditions'" :id="show" :edition="activeEdition" />
+				<Item v-if="current === 'items'" :id="show" :edition="activeEdition" />
 			</div>
 		</template>
 	</div>
@@ -74,7 +90,8 @@ import ViewMonster from "src/components/compendium/Monster.vue";
 import Item from "src/components/compendium/Item.vue";
 import Spell from "src/components/compendium/Spell.vue";
 import Condition from "src/components/compendium/Condition.vue";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import { editions } from "src/utils/generalConstants";
 
 export default {
 	components: {
@@ -82,6 +99,14 @@ export default {
 		Item,
 		Spell,
 		Condition,
+	},
+	props: {
+		// Fixed edition to search/show, e.g. a campaign's edition. When omitted, the
+		// component shows its own toggle backed by the `compendium_edition` store value.
+		edition: {
+			type: String,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -98,7 +123,42 @@ export default {
 			noResult: "",
 		};
 	},
+	computed: {
+		...mapGetters(["compendium_edition"]),
+		showEditionToggle() {
+			return !this.edition;
+		},
+		activeEdition() {
+			return this.edition || this.compendium_edition;
+		},
+		// The API expects no edition for 5e content; only pass it for 5.5e
+		apiEdition() {
+			return this.activeEdition === "5.5e" ? "5.5e" : undefined;
+		},
+		editionOptions() {
+			return editions.map((e) => ({ label: e.label.replace("D&D ", ""), value: e.value }));
+		},
+		editionModel: {
+			get() {
+				return this.compendium_edition;
+			},
+			set(value) {
+				this.set_compendium_edition(value);
+			},
+		},
+	},
+	watch: {
+		activeEdition() {
+			this.show = undefined;
+			this.searchResults = [];
+			this.noResult = "";
+			if (this.search) {
+				this.searchType();
+			}
+		},
+	},
 	methods: {
+		...mapActions(["set_compendium_edition"]),
 		...mapActions("api_monsters", ["fetch_monsters"]),
 		...mapActions("api_items", ["fetch_api_items"]),
 		...mapActions("api_spells", ["fetch_api_spells"]),
@@ -129,7 +189,7 @@ export default {
 				data = this.fetch_conditions;
 			}
 
-			data({ query: { search: this.search } }).then((results) => {
+			data({ query: { search: this.search }, edition: this.apiEdition }).then((results) => {
 				if (results.meta.count === 0) {
 					this.noResult = 'No results for "' + this.search + '"';
 				} else {
@@ -153,6 +213,10 @@ ul.results {
 		vertical-align: center;
 		line-height: 46px;
 		padding: 0 10px;
+
+		&:hover {
+			background-color: $neutral-8;
+		}
 	}
 }
 </style>

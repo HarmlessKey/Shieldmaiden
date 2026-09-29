@@ -1,5 +1,6 @@
 import { mapActions } from 'vuex';
 import { experience } from 'src/mixins/experience.js';
+import { default_edition } from 'src/utils/generalConstants';
 
 export const difficulty = {
 
@@ -155,7 +156,7 @@ export const difficulty = {
 				//Calculate Monsters XP
 				// entity.npc is the type of the linked npc, srd or custom. Without a type, ignore the monster cause there is nothing linked.
 				if(entity.entityType === 'npc' && entity.npc) {
-					const npc = (entity.npc === "custom") ? await this.get_npc({ uid: this.user.uid, id: entity.id }) : await this.fetch_monster(entity.id);
+					const npc = (entity.npc === "custom") ? await this.get_npc({ uid: this.user.uid, id: entity.id }) : await this.fetch_monster({ id: entity.id, edition: entity.edition || default_edition });
 					const rating = npc.challenge_rating;
 
 					// If there is no rating for a monster, difficulty can't be calculated

@@ -37,15 +37,29 @@
 				</tbody>
 			</table>
 		</div>
+
+		<ReportIssue
+			v-if="item._id"
+			class="mt-3"
+			type="item"
+			:content-id="item._id"
+			:content-name="item.name"
+			:content-url="item.url"
+			:edition="item.edition || resolvedEdition"
+		/>
 	</div>
 	<hk-loader v-else name="item" />
 </template>
 
 <script>
 	import { mapActions } from "vuex";
+	import ReportIssue from "src/components/compendium/ReportIssue.vue";
 
 	export default {
 		name: "Item",
+		components: {
+			ReportIssue
+		},
 		props: {
 			// If the item is fetched in a parent component you can send the full item object in de data prop
 			data: {
@@ -53,6 +67,10 @@
 			},
 			// If the id prop is passed, the item is fetched in the Monster component
 			id: {
+				type: String
+			},
+			// Edition to fetch the item for when using the id prop; falls back to the route edition
+			edition: {
 				type: String
 			}
 		},
@@ -62,14 +80,19 @@
 				loading: true
 			}
 		},
+		computed: {
+			resolvedEdition() {
+				return this.edition || (this.$route.params.edition === "5.5e" ? "5.5e" : "5e");
+			}
+		},
 		async beforeMount() {
 			if(this.data) {
 				this.item = this.data;
 				this.loading = false;
 			} else {
-				this.item = await this.fetch_api_item(this.id);
+				this.item = await this.fetch_api_item({ id: this.id, edition: this.resolvedEdition });
 				this.loading = false;
-			}			
+			}
 		},
 		methods: {
 			...mapActions("api_items", ["fetch_api_item"]),

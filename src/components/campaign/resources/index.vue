@@ -18,10 +18,10 @@
 		</q-tabs>
 		<q-tab-panels v-model="tab" class="bg-transparent">
 			<q-tab-panel name="cheat_sheet">
-				<CheatSheet />
+				<CheatSheet :edition="campaign.edition || default_edition" />
 			</q-tab-panel>
 			<q-tab-panel name="compendium">
-				<Compendium />
+				<Compendium :edition="campaign.edition || default_edition" />
 			</q-tab-panel>
 			<q-tab-panel name="notes">
 				<Notes />
@@ -34,6 +34,7 @@
 import CheatSheet from "./CheatSheet.vue";
 import Compendium from "./Compendium.vue";
 import Notes from "./Notes.vue";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "CampaignInfo",
@@ -42,8 +43,15 @@ export default {
 		Compendium,
 		Notes,
 	},
+	props: {
+		campaign: {
+			type: Object,
+			default: () => ({}),
+		},
+	},
 	data() {
 		return {
+			default_edition,
 			tab: "cheat_sheet",
 			tabs: [
 				{

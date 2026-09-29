@@ -125,6 +125,7 @@
 						</div>
 						<div class="d-flex gap-1">
 							<q-btn
+								v-if="started"
 								class="full-width mb-3 bg-neutral-5"
 								no-caps
 								label="Add next round"
@@ -135,7 +136,7 @@
 								color="primary"
 								no-caps
 								type="submit"
-								label="Add directly"
+								:label="started ? 'Add directly' : 'Add'"
 							/>
 						</div>
 					</q-form>
@@ -174,12 +175,19 @@
 
 					<div v-if="selectedPlayers.length > 0" class="d-flex gap-1">
 						<q-btn
+							v-if="started"
 							class="full-width bg-neutral-5"
 							no-caps
 							label="Add next round"
 							@click="addPlayer('next')"
 						/>
-						<q-btn class="full-width" color="primary" type="submit" no-caps label="Add directly" />
+						<q-btn
+							class="full-width"
+							color="primary"
+							type="submit"
+							no-caps
+							:label="started ? 'Add directly' : 'Add'"
+						/>
 					</div>
 				</q-form>
 				<p v-else>
@@ -192,7 +200,12 @@
 		<q-dialog v-model="copy_dialog">
 			<hk-card header="Copy NPC" :min-width="320">
 				<div class="card-body">
-					<CopyContent @copy="set" type="monster" button="copy" />
+					<CopyContent
+						@copy="set"
+						type="monster"
+						button="copy"
+						:initial-edition="campaignEdition"
+					/>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -204,6 +217,7 @@ import { mapActions, mapGetters } from "vuex";
 import { general } from "src/mixins/general.js";
 import { dice } from "src/mixins/dice.js";
 import CopyContent from "src/components/CopyContent";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "AddEntity",
@@ -217,6 +231,7 @@ export default {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
+			campaign: {},
 			copy_dialog: false,
 			entity: {},
 			dexterity: undefined,
@@ -240,6 +255,7 @@ export default {
 				uid: this.userId,
 				id: this.campaignId,
 			}).then(async (campaign) => {
+				this.campaign = campaign;
 				const players = {};
 
 				for (const id in campaign.players) {
@@ -252,9 +268,15 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(["entities", "broadcast"]),
+		...mapGetters(["entities", "broadcast", "encounter"]),
+		started() {
+			return !!(this.encounter && this.encounter.round > 0);
+		},
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
+		},
+		campaignEdition() {
+			return this.campaign.edition || default_edition;
 		},
 	},
 	methods: {
@@ -283,6 +305,7 @@ export default {
 			this.$set(this.entity, "maxHp", parseInt(result.hit_points));
 			this.$set(this.entity, "ac", parseInt(result.armor_class));
 			this.$set(this.entity, "name", result.name);
+			this.$set(this.entity, "edition", result.edition || default_edition);
 
 			this.dexterity = result.dexterity; // needed to roll initiative
 

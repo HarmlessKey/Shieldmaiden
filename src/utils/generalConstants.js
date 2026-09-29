@@ -7,6 +7,34 @@ export const dice_types = Object.freeze([
 	{ value: 20, label: "d20" },
 ]);
 
+/** D&D rule editions. "5e" = 5e, "5.5e" = 5.5e */
+export const editions = Object.freeze([
+	{ value: "5e", label: "D&D 5e (2014)" },
+	{ value: "5.5e", label: "D&D 5.5e (2024)" },
+]);
+
+export const default_edition = "5e";
+
+/** Per-level exhaustion effects. Not covered by the conditions API (flat effects list only). */
+export const EXHAUSTION_LEVELS = Object.freeze({
+	"5e": [
+		"Disadvantage on ability checks",
+		"Speed halved",
+		"Disadvantage on attack rolls and saving throws",
+		"Hit point maximum halved",
+		"Speed reduced to 0",
+		"Death",
+	],
+	"5.5e": [
+		"−2 to all d20 tests, speed −5 ft.",
+		"−4 to all d20 tests, speed −10 ft.",
+		"−6 to all d20 tests, speed −15 ft.",
+		"−8 to all d20 tests, speed −20 ft.",
+		"−10 to all d20 tests, speed −25 ft.",
+		"Death",
+	],
+});
+
 /** Extension store URLs per browser */
 export const character_sync_stores = Object.freeze({
 	Chrome: {
@@ -647,6 +675,506 @@ export const rules = Object.freeze([
 			"A target has total cover if it is completely concealed by an obstacle." +
 			"If a target is behind multiple sources of cover, only the most protective degree of cover applies",
 		src: "phb 196",
+	},
+	{
+		type: "action",
+		name: "Attack",
+		url: "attack",
+		caption: "Melee or ranged attack",
+		description: "Make one attack roll with a weapon or an Unarmed Strike.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Magic",
+		url: "cast-a-spell-action",
+		caption: "Cast time of 1 action",
+		description:
+			"Cast a spell that has a casting time of an action, or use a feature or magic item that requires " +
+			"the Magic action to be activated.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Dash",
+		url: "dash",
+		caption: "Double movement speed",
+		description:
+			"Gain extra movement speed for the current turn. " +
+			"The increase equals your speed, after applying modifiers.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Disengage",
+		url: "disengage",
+		caption: "Prevent opportunity attacks",
+		description: "Your movement doesn't provoke opportunity attacks.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Dodge",
+		url: "dodge",
+		caption: "Increase defenses",
+		description:
+			"Until the end of your next turn, any attack roll made against you has disadvantage if you can see the attacker, " +
+			"and you make Dexterity saving throws with advantage.\n\n" +
+			"You lose this benefit if you are incapacitated or if your speed drops to 0.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Grapple",
+		url: "grapple",
+		caption: "Grab a creature",
+		description:
+			"As a special melee attack, you can replace one of the attacks of your Attack action with a grapple. " +
+			"Choose a creature within 5 feet of you that is no more than one size larger than you, and use a free hand to grab it.\n\n" +
+			"The target must succeed on a Strength (Athletics) or Dexterity (Acrobatics) saving throw (its choice) against a DC equal to " +
+			"8 + your Strength modifier + your Proficiency Bonus, or it has the *Grappled* condition.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Help",
+		url: "help",
+		caption: "Grant an ally advantage",
+		description:
+			"**Assist an Ability Check.** Choose one of your skill or tool proficiencies and one nearby ally. That ally " +
+			"has advantage on the next ability check it makes with the chosen skill or tool, before the start of your " +
+			"next turn.\n\n" +
+			"**Assist an Attack Roll.** You momentarily distract an enemy within 5 feet of you, giving advantage to the " +
+			"next attack roll by one of your allies against that enemy, before the start of your next turn.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Hide",
+		url: "hide",
+		caption: "Attempt to hide",
+		description:
+			"You must succeed on a DC 15 Dexterity (Stealth) check while you're Heavily Obscured or behind Three-Quarters " +
+			"Cover or Total Cover, and you must be out of any enemy's line of sight.\n\n" +
+			"On a success, you gain the *Invisible* condition while hidden. Your check's total becomes the DC for a " +
+			"creature to find you with a Wisdom (Perception) check.\n\n" +
+			"You stop being hidden immediately after any of the following happens: you make a sound louder than a " +
+			"whisper, an enemy finds you, you make an attack roll, or you cast a spell with a Verbal component.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Influence",
+		url: "influence",
+		caption: "Persuade or provoke a creature",
+		description:
+			"Make a Charisma (Deception, Intimidation, Performance, or Persuasion) or Wisdom (Animal Handling) check to " +
+			"alter a creature's attitude, describing or roleplaying how you're communicating with it.\n\n" +
+			"The DC is 15 or the target's Intelligence score, whichever is higher.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Shove",
+		url: "shove",
+		caption: "Push a creature",
+		description:
+			"As a special melee attack, you can replace one of the attacks of your Attack action with a shove. Choose a " +
+			"creature within 5 feet of you that is no more than one size larger than you.\n\n" +
+			"The target must succeed on a Strength (Athletics) or Dexterity (Acrobatics) saving throw (its choice) against a DC " +
+			"equal to 8 + your Strength modifier + your Proficiency Bonus, or you knock it prone or push it 5 feet away from " +
+			"you (your choice).",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Escape",
+		url: "escape",
+		caption: "Escape a grapple",
+		description:
+			"To escape a grapple, use your action to make a Strength (Athletics) or Dexterity (Acrobatics) check (your choice) " +
+			"against a DC equal to 8 + the grappler's Strength modifier + the grappler's Proficiency Bonus.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Ready",
+		url: "ready",
+		caption: "Choose a trigger and action",
+		description:
+			"Decide what perceivable circumstance will trigger your reaction and choose the action you will take in response to the trigger.\n\n" +
+			"When the trigger occurs, you can either use your reaction to execute your readied action, or ignore the trigger." +
+			"When you ready a spell, you cast it as normal but hold its energy, which you release with you reaction when the trigger occurs." +
+			"Therefore you lose the spell slot or points once the spell is readied.\n" +
+			"To be readied, a spell must have a casting time of 1 action, and holding onto the spell's magic requires concentration.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Search",
+		url: "search",
+		caption: "Attempt to find something",
+		description:
+			"Make a Wisdom (Insight, Medicine, Perception, or Survival) check to discern something that isn't obvious, " +
+			"such as a hidden creature (see *Hide*).",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Study",
+		url: "study",
+		caption: "Recall lore or a mystery",
+		description:
+			"Make an Intelligence (Arcana, History, Investigation, Nature, or Religion) check to recall lore or study a mystery.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Utilize",
+		url: "use-an-object",
+		caption: "Interact",
+		description:
+			"You normally interact with an object while doing something else, such as when you draw a sword as part of " +
+			"the Attack action. When an object requires an action for its use, you take the Utilize action instead.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "action",
+		name: "Use a Class Feature",
+		url: "use-a-class-feature-action",
+		caption: "Some features use an action",
+		description: "Use a racial or class feature that uses an action.",
+		edition: "5.5e",
+	},
+	{
+		type: "bonus_action",
+		name: "Offhand Attack",
+		url: "offhand-attack",
+		caption: "Attack with your offhand",
+		description:
+			"If you take the Attack action and attack with a Light weapon that you're holding in one hand, you can use a " +
+			"bonus action to attack with a different Light weapon that you're holding in your other hand, as long as you " +
+			"haven't already done so this turn.\n\n" +
+			"You don't add your ability modifier to the damage of this bonus-action attack, unless that modifier is negative.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "bonus_action",
+		name: "Cast a Spell",
+		url: "cast-a-spell-bonus-action",
+		caption: "Cast time of 1 bonus action",
+		description:
+			"You can't cast a spell with your action and a different spell with your bonus action in the same turn, unless the action is used to cast a cantrip.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "bonus_action",
+		name: "Use a Class Feature",
+		url: "use-a-class-feature-bonus-action",
+		caption: "Some features use a bonus action",
+		description: "Use a racial or class feature that uses a bonus action.",
+		edition: "5.5e",
+	},
+	{
+		type: "reaction",
+		name: "Opportunity Attack",
+		url: "opportunity-attack",
+		caption: "Enemy leaves your reach",
+		description:
+			"You can make an Opportunity Attack when a creature that you can see leaves your reach using its action, " +
+			"its Bonus Action, its Reaction, or one of its speeds.\n\n" +
+			"To make the attack, use your *reaction* to make one melee attack with a weapon or an Unarmed Strike " +
+			"against the provoking creature. The attack occurs right before the creature leaves your reach.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "reaction",
+		name: "Readied Action",
+		url: "readied-action",
+		caption: "Part of your Ready action",
+		description: "Execute the reaction specified by your Ready action.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "reaction",
+		name: "Use a Class Feature",
+		url: "use-a-class-feature-reaction",
+		caption: "Some features use a reaction",
+		description: "Use a racial or class feature that uses a reaction.",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Move",
+		url: "move",
+		caption: "Move a distance up to your speed",
+		description:
+			"During your move, you can pass through the space of an ally, a creature with the *Incapacitated* condition, " +
+			"a Tiny creature, or a creature that is two sizes larger or smaller than you.\n\n" +
+			"Another creature's space is difficult terrain for you unless that creature is Tiny or your ally.\n\n" +
+			"You can't willingly end your move in a space occupied by another creature. If you somehow end a turn there, " +
+			"you gain the *Prone* condition unless you are Tiny or are of a larger size than the other creature.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Stand Up",
+		url: "stand-up",
+		caption: "Half your movement speed",
+		description:
+			"Use half your movement speed to stand up.\n\n" +
+			"You can't stand up if you don't have enough movement left or if your speed is 0.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Grapple Move",
+		url: "grapple-move",
+		caption: "Speed halved",
+		description:
+			"Drag or carry a grappled creature with you.\n\n" +
+			"If you move while grappling another creature, your speed is halved, unless the creature is two or more sizes smaller than you.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "High Jump",
+		url: "high-jump",
+		caption: "3 + strength modifier",
+		description:
+			"You leap into the air a number of feet equal to **3 + your Strength modifier** (minimum of 0 feet) if you move " +
+			"at least 10 feet on foot immediately before the jump.\n\n" +
+			"When you make a standing high jump, you can jump only half that distance. Either way, each foot of the jump " +
+			"costs a foot of movement.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Long Jump",
+		url: "long-jump",
+		caption: "Strength score in feet",
+		description:
+			"You leap horizontally a number of feet up to your **Strength score** if you move at least 10 feet immediately " +
+			"before the jump.\n\n" +
+			"When you make a standing long jump, you can leap only half that distance. Either way, each foot you jump " +
+			"costs a foot of movement.\n\n" +
+			"If you land in difficult terrain, you must succeed on a DC 10 Dexterity (Acrobatics) check or gain the " +
+			"*Prone* condition.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Climb",
+		url: "climb",
+		caption: "Double movement cost",
+		description:
+			"Each foot of movement costs one extra foot (two extra in difficult terrain) when you're climbing. You ignore " +
+			"this extra cost if you have a Climb Speed and use it to climb.\n\n" +
+			"The climb may involve a Strength (Athletics) check if it is difficult.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Swim",
+		url: "swim",
+		caption: "Double movement cost",
+		description:
+			"Each foot of movement costs one extra foot (two extra in difficult terrain) when you're swimming. You ignore " +
+			"this extra cost if you have a Swim Speed and use it to swim.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Crawl",
+		url: "crawl",
+		caption: "Double movement cost",
+		description:
+			"Each foot of movement costs one extra foot (two extra in difficult terrain) when you're crawling, climbing or swimming.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Drop Prone",
+		url: "drop-prone",
+		caption: "Free",
+		description:
+			"You can drop prone without using any of your speed. You will gain the *Prone* condition.\n\n" +
+			"To move while prone, you must crawl.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Improvise",
+		url: "improvise",
+		caption: "Perform a stunt you imagine",
+		description:
+			"When a player wants to perform a kind of movement not detailed in the rules, " +
+			"you decide whether this is possible and what kind of roll needs to made, if any, to succeed the movement.",
+		edition: "5.5e",
+	},
+	{
+		type: "movement",
+		name: "Difficult Terrain",
+		url: "difficult-terrain",
+		caption: "Double movement cost",
+		description:
+			"You move at half speed in difficult terrain, moving 1 foot in difficult terrain costs 2 feet of speed.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Lightly Obscured",
+		url: "lightly-obscured",
+		caption: "Disadvantage on perception",
+		description:
+			"*Dim light, patchy fog, moderate foliage*\n\n" +
+			"Creatures have **disadvantage on Wisdom (Perception)** checks that rely on sight.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Heavily Obscured",
+		url: "heavily-obscured",
+		caption: "Effectively blind",
+		description:
+			"*Darkness, opaque fog, dense foliage*\n\n" +
+			"A creature in a heavily obscured area effectively suffers from the **blinded condition**",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Bright Light",
+		url: "bright-light",
+		caption: "Normal vision",
+		description:
+			"Gloomy days still provide bright light, as do torches, lanterns, fires and other sources of illumination within a specific radius.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Dim Light",
+		url: "dim-light",
+		caption: "Lightly obscured",
+		description:
+			"Creates a **lightly obscured** area.\n\n" +
+			"An area of dim light is usually a boundary between a source of bright light and surrounding darkness.\n\n" +
+			"The soft light of twilight and dawn also counts as dim light. A particularly brilliant full moon might bathe the land in dim light.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Darkness",
+		url: "darkness",
+		caption: "Heavily obscured",
+		description:
+			"Creates a **heavily obscured** area.\n\n" +
+			"Characters face darkness outdoors at night (even most moonlit nights), within the confines of an unlit dungeon or a subterranean vault, or in an area of magical darkness.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Blindsight",
+		url: "blindsight",
+		caption: "Perceive without sight",
+		description:
+			"If you have Blindsight, you can see within a specific range without relying on physical sight. Within that " +
+			"range, you can see anything that isn't behind Total Cover even if you have the *Blinded* condition or are " +
+			"in Darkness. You can also see a creature that has the *Invisible* condition within that range.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Darkvision",
+		url: "darkvision",
+		caption: "Limited vision in darkness",
+		description:
+			"If you have Darkvision, you can see in Dim Light within a specified range as if it were Bright Light, and " +
+			"in Darkness within that range as if it were Dim Light.\n\n" +
+			"You discern colors in that Darkness only as shades of gray.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Truesight",
+		url: "truesight",
+		caption: "See in darkness",
+		description:
+			"A creature with truesight can see everything in its true form, independent of the environment.\n\n" +
+			"A creature with truesight can, out to a specific range, see in normal and magical darkness, see invisible creatures and objects, automatically detect visual illusions and succeed on saving throws against them, and perceives the original form of a shapechanger or a creature that is transformed by magic.",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Half Cover",
+		url: "half-cover",
+		caption: "+2 AC and DEX saving throws",
+		description:
+			"A target with half cover has a **+2 bonus to AC and Dexterity saving throws**.\n\n" +
+			"The obstacle might be a low wall, a large piece of furniture, a narrow tree trunk, or a creature, whether that creature is an enemy or a friend.\n\n" +
+			"If a target is behind multiple sources of cover, only the most protective degree of cover applies",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Three-quarters Cover",
+		url: "three-quarters-cover",
+		caption: "+5 AC and DEX saving throws",
+		description:
+			"A target with three-quarters cover has a **+5 bonus to AC and Dexterity saving throws**.\n\n" +
+			"The obstacle might be a portcullis, an arrow slit, or a thick tree trunk.\n\n" +
+			"If a target is behind multiple sources of cover, only the most protective degree of cover applies",
+		src: "srd 5.2",
+		edition: "5.5e",
+	},
+	{
+		type: "environment",
+		name: "Full Cover",
+		url: "full-cover",
+		caption: "Can't be targeted directly",
+		description:
+			"A target with total cover can't be targeted directly by an attack or a spell, although some spells can reach such a target by including it in an area of effect.\n\n" +
+			"A target has total cover if it is completely concealed by an obstacle." +
+			"If a target is behind multiple sources of cover, only the most protective degree of cover applies",
+		src: "srd 5.2",
+		edition: "5.5e",
 	},
 ]);
 

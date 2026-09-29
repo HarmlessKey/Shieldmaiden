@@ -26,7 +26,7 @@
 			>
 				<template v-slot:header>
 					<q-item-section>
-						<router-link v-if="compendium" :to="`/compendium/rules/${url}`" stop.prevent>
+						<router-link v-if="compendium" :to="`${compendiumRulesPath}/${url}`" stop.prevent>
 							{{ name }}
 						</router-link>
 						<template v-else>{{ name }}</template>
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { rules } from "src/utils/generalConstants";
+import { rules, default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "CheatSheet",
@@ -55,6 +55,10 @@ export default {
 		compendium: {
 			type: Boolean,
 			default: false,
+		},
+		edition: {
+			type: String,
+			default: default_edition,
 		},
 	},
 	data() {
@@ -91,18 +95,24 @@ export default {
 			// This only works for real mobiles, not for small desktop screens
 			return this.$q.platform.is.mobile;
 		},
+		editionSheet() {
+			return this.cheatSheet.filter((item) => (item.edition || "5e") === this.edition);
+		},
 		sheet() {
 			if (this.query) {
-				return this.cheatSheet.filter(
+				return this.editionSheet.filter(
 					({ name, description }) =>
 						name.toLowerCase().includes(this.query.toLowerCase()) ||
 						description.toLowerCase().includes(this.query.toLowerCase())
 				);
 			}
 			if (this.tab_type) {
-				return this.cheatSheet.filter((item) => item.type === this.tab_type);
+				return this.editionSheet.filter((item) => item.type === this.tab_type);
 			}
-			return this.cheatSheet;
+			return this.editionSheet;
+		},
+		compendiumRulesPath() {
+			return this.$route.params.edition ? `/compendium/rules/${this.$route.params.edition}` : "/compendium/rules";
 		},
 	},
 };

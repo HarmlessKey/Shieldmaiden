@@ -41,6 +41,11 @@ export default {
 					url: "promotions",
 					icon: "fas fa-megaphone",
 				},
+				content_reports: {
+					name: "Content Reports",
+					url: "content-reports",
+					icon: "fas fa-flag",
+				},
 				// export: {
 				// 	name: "Export databases",
 				// 	url: "export",

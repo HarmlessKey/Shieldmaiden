@@ -4,7 +4,7 @@
 			<h1>
 				<i class="fas fa-dragon mr-1" aria-hidden="true" />
 				{{ source?.capitalize() }}
-				Monsters
+				Monsters <span class="neutral-2">{{ editionLabel }}</span>
 			</h1>
 			<span v-if="source === 'homebrew'" class="neutral-3">
 				Instagram
@@ -19,29 +19,28 @@
 			</span>
 			<span v-else class="neutral-3">
 				Resource
-				<a
-					class="btn btn-sm btn-clear"
-					href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
-					target="_blank"
-					rel="noopener"
-					>SRD 5.1</a
-				>
+				<a class="btn btn-sm btn-clear" :href="resource.url" target="_blank" rel="noopener">{{
+					resource.label
+				}}</a>
 			</span>
 		</div>
 		<div class="card-body">
+			<p v-if="source !== 'homebrew'">
+				<router-link class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+					Show Monsters for {{ otherEdition.label }}
+				</router-link>
+			</p>
 			<q-input
 				:dark="$store.getters.theme !== 'light'"
 				v-model="search"
 				borderless
 				filled
 				square
-				debounce="300"
 				clearable
 				placeholder="Search"
-				@keyup.enter="filterMonsters"
-				@clear="filterMonsters"
+				@keyup.enter="searchNow"
 			>
-				<button slot="append" class="btn bg-neutral-5" @click="filterMonsters">
+				<button slot="append" class="btn bg-neutral-5" @click="searchNow">
 					<q-icon name="search" />
 				</button>
 				<q-btn slot="after" color="primary" no-caps @click="filter_dialog = true">
@@ -141,7 +140,12 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" class="p-0" auto-width>
-							<ViewMonster :id="props.key" class="p-0" :allow-download="source === 'homebrew'" />
+							<ViewMonster
+								:id="props.key"
+								:edition="$route.params.edition"
+								class="p-0"
+								:allow-download="source === 'homebrew'"
+							/>
 						</q-td>
 					</q-tr>
 				</template>
@@ -171,13 +175,15 @@
 
 <script>
 import ViewMonster from "src/components/compendium/Monster.vue";
+import { debouncedSearch } from "src/mixins/debouncedSearch.js";
 import { monsterMixin } from "src/mixins/monster.js";
+import { otherEdition } from "src/utils/generalFunctions";
 import { mapActions } from "vuex";
 import _ from "lodash";
 
 export default {
 	name: "Monsters",
-	mixins: [monsterMixin],
+	mixins: [monsterMixin, debouncedSearch],
 	components: {
 		ViewMonster,
 	},
@@ -276,6 +282,23 @@ export default {
 				return { label: type, value: type };
 			});
 		},
+		resource() {
+			return this.$route.params.edition === "5.5e"
+				? {
+						label: "SRD 5.2",
+						url: "https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.pdf",
+					}
+				: {
+						label: "SRD 5.1",
+						url: "https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf",
+					};
+		},
+		editionLabel() {
+			return this.$route.params.edition || "5e";
+		},
+		otherEdition() {
+			return otherEdition(this.$route);
+		},
 		visibleColumns() {
 			switch (true) {
 				case this.width > 700:
@@ -305,6 +328,9 @@ export default {
 			this.$set(this, "filter", {});
 			this.filterMonsters();
 		},
+		runSearch() {
+			this.filterMonsters();
+		},
 		filterMonsters() {
 			this.loading = true;
 			this.monsters = [];
@@ -322,6 +348,7 @@ export default {
 		},
 		async fetchMonsters() {
 			await this.fetch_monsters({
+				edition: this.$route.params.edition,
 				pageNumber: this.pagination.page,
 				pageSize: this.pagination.rowsPerPage,
 				query: this.query,

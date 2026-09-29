@@ -4,12 +4,18 @@ on:
   push:
     branches: [develop, 'release/**']
   pull_request:
-    branches: [develop]
+    branches: [develop, main]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Only build PRs into main when they're hotfix PRs - other PR bases are
+    # covered by the develop trigger, and plain pushes to main don't deploy.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.base_ref != 'main' ||
+      startsWith(github.head_ref, 'hotfix/')
 
     steps:
       - uses: actions/checkout@v4

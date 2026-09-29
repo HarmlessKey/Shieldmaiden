@@ -92,13 +92,14 @@ export default {
 			title: {
 				name: "title",
 				content:
-					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					this.$route.meta.title ||
+					"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
 			},
 			description: {
 				name: "description",
 				content:
 					this.$route.meta.description ||
-					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+					"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 
 			// TWITTER
@@ -109,13 +110,14 @@ export default {
 			twitterTitle: {
 				name: "twitter:title",
 				content:
-					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					this.$route.meta.title ||
+					"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
 			},
 			twitterDescription: {
 				name: "twitter:description",
 				content:
 					this.$route.meta.description ||
-					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+					"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 			twitterImage: {
 				name: "twitter:image",
@@ -130,13 +132,14 @@ export default {
 			ogTitle: {
 				property: "og:title",
 				content:
-					this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+					this.$route.meta.title ||
+					"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
 			},
 			ogDescription: {
 				property: "og:description",
 				content:
 					this.$route.meta.description ||
-					"The ultimate D&D 5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+					"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
 			},
 			ogSiteName: {
 				property: "og:site_name",
@@ -174,7 +177,8 @@ export default {
 
 		return {
 			title:
-				this.$route.meta.title || "D&D Combat Tracker - Advanced initiative tracker for D&D 5e",
+				this.$route.meta.title ||
+				"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
 			titleTemplate: (title) => `${title} | Shieldmaiden`,
 			link: {
 				canonical: {

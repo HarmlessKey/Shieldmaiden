@@ -1,7 +1,7 @@
 <template>
 	<hk-card>
 		<div class="card-header" slot="header">
-			<h1>{{ title }} for D&D 5e</h1>
+			<h1>{{ title }} for D&D 5e and 5.5e</h1>
 			<slot name="action_btn" />
 		</div>
 		<div slot="image" class="card-image" :style="{ backgroundImage: `url(${img})` }"></div>

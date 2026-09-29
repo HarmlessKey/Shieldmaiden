@@ -1949,6 +1949,7 @@ html body {
 			.actions {
 				display: flex;
 				justify-content: flex-end;
+				align-items: center;
 				padding: 9px 12px;
 				user-select: none;
 			}
@@ -2382,6 +2383,7 @@ html body {
 				justify-content: flex-end;
 				background: none !important;
 				padding-right: 10px;
+				align-items: center;
 
 				a {
 					color: $neutral-2 !important;

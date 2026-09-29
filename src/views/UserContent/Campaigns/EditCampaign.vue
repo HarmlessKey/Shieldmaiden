@@ -27,6 +27,18 @@
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
+							label="Edition"
+							emit-value
+							map-options
+							class="mb-2"
+							v-model="editCampaign.edition"
+							:options="edition_options"
+						/>
+
+						<q-select
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
 							label="Advancement"
 							emit-value
 							map-options
@@ -141,6 +153,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { editions, default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "EditCampaign",
@@ -163,6 +176,7 @@ export default {
 					label: "Milestone",
 				},
 			],
+			edition_options: editions,
 			editCampaign: { ...this.campaign },
 		};
 	},

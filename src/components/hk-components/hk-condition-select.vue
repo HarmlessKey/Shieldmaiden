@@ -37,12 +37,15 @@
 </template>
 
 <script>
-import { conditions } from "src/mixins/conditions.js";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
 	name: "hk-condition-select",
-	mixins: [conditions],
 	props: {
+		edition: {
+			type: String,
+			default: "5e",
+		},
 		value: {
 			type: [String, Array],
 			default: undefined,
@@ -57,6 +60,7 @@ export default {
 		},
 	},
 	computed: {
+		...mapGetters("api_conditions", ["conditions_by_edition"]),
 		selected: {
 			get() {
 				return this.value;
@@ -66,12 +70,21 @@ export default {
 			},
 		},
 		condition_list() {
-			return this.conditionList.map((item) => {
-				return item.value;
+			return this.conditions_by_edition(this.edition).map((item) => {
+				return item.url;
 			});
 		},
 	},
+	watch: {
+		edition: {
+			immediate: true,
+			handler(edition) {
+				this.fetch_all_conditions({ edition });
+			},
+		},
+	},
 	methods: {
+		...mapActions("api_conditions", ["fetch_all_conditions"]),
 		select(option) {
 			if (this.multiple) {
 				if (this.selected) {

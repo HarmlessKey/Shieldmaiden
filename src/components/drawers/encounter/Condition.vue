@@ -1,30 +1,32 @@
 <template>
 	<div class="pb-5">
 		<BasicEntity :entity="entity" />
-		<h2 :id="`${cond.value}Table`" class="mt-3">
-			<i aria-hidden="true" :class="`hki-${cond.value}`" />
-			{{ cond.name }}
-		</h2>
+		<template v-if="cond">
+			<h2 :id="`${condition}Table`" class="mt-3">
+				<i aria-hidden="true" :class="`hki-${cond.value}`" />
+				{{ cond.name }}
+			</h2>
 
-		<button
-			v-if="entity.conditions[cond.value]"
-			class="btn btn-block bg-red mb-3"
-			@click="remove(cond.value)"
-		>
-			Remove condition
-		</button>
+			<button
+				v-if="entity.conditions[cond.value]"
+				class="btn btn-block bg-red mb-3"
+				@click="remove(cond.value)"
+			>
+				Remove condition
+			</button>
+		</template>
 
 		<table
-			v-if="cond.value === 'exhaustion'"
+			v-if="condition === 'exhaustion'"
 			class="table"
-			:aria-describedby="`${cond.value}Table`"
+			:aria-describedby="`${condition}Table`"
 		>
 			<thead>
 				<th>Current</th>
 				<th>Effect</th>
 			</thead>
 			<tbody>
-				<tr v-for="(effect, index) in effects" :key="index">
+				<tr v-for="(effect, index) in exhaustionLevels" :key="index">
 					<td>
 						<a
 							:class="{ active: entity.conditions['exhaustion'] >= index + 1 }"
@@ -42,7 +44,7 @@
 				</tr>
 			</tbody>
 		</table>
-		<ul>
+		<ul v-if="cond">
 			<li v-for="(effect, index) in cond.effects" :key="index">
 				{{ effect }}
 			</li>
@@ -51,13 +53,12 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
-import { conditions } from "src/mixins/conditions.js";
+import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
+import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
 
 export default {
 	name: "Condition",
-	mixins: [conditions],
 	components: {
 		BasicEntity,
 	},
@@ -66,23 +67,36 @@ export default {
 		return {
 			entity: this.data.entity,
 			condition: this.data.condition,
-			effects: [
-				"Disadvantage on ability checks",
-				"Speed halved",
-				"Disadvantage on attack rolls and saving throws",
-				"Hit point maximum halved",
-				"Speed reduced to 0",
-				"Death",
-			],
 		};
 	},
 	computed: {
-		cond() {
-			return this.conditionList.filter((item) => item.value === this.condition)[0];
+		...mapGetters("api_conditions", ["conditions_by_edition"]),
+		edition() {
+			return this.$store.getters.edition;
 		},
+		exhaustionLevels() {
+			return EXHAUSTION_LEVELS[this.edition === "5.5e" ? "5.5e" : "5e"];
+		},
+		cond() {
+			const found = this.conditions_by_edition(this.edition).find(
+				(item) => item.url === this.condition
+			);
+			return found
+				? {
+						value: found.url,
+						name: found.name,
+						condition: found.condition,
+						effects: found.effects,
+					}
+				: undefined;
+		},
+	},
+	async mounted() {
+		await this.fetch_all_conditions({ edition: this.edition });
 	},
 	methods: {
 		...mapActions(["set_condition"]),
+		...mapActions("api_conditions", ["fetch_all_conditions"]),
 		remove(condition) {
 			this.set_condition({
 				action: "remove",

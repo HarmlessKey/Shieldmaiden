@@ -11,6 +11,7 @@ export class spellServices {
 	}
 
 	async getSpells(
+		edition,
 		query,
 		pageNumber = 1,
 		pageSize = 15,
@@ -51,7 +52,9 @@ export class spellServices {
 			params += `&${queryParams.join("&")}`;
 		}
 
-		return this.HK.get(SPELLS_REF + params)
+		const ref = edition === "5.5e" ? `${SPELLS_REF}/5.5e` : SPELLS_REF;
+
+		return this.HK.get(ref + params)
 			.then((response) => {
 				return response.data;
 			})
@@ -60,8 +63,10 @@ export class spellServices {
 			});
 	}
 
-	async getSpell(id) {
-		return this.HK.get(`${SPELLS_REF}/${id}`)
+	async getSpell(id, edition) {
+		const ref = edition === "5.5e" ? `${SPELLS_REF}/5.5e/${id}` : `${SPELLS_REF}/${id}`;
+
+		return this.HK.get(ref)
 			.then((response) => {
 				return response.data;
 			})

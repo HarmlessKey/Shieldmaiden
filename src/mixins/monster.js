@@ -80,6 +80,7 @@ export const monsterMixin = {
 				"Ooze",
 				"Plant",
 				"Swarm of tiny beasts",
+				"Swarm of tiny undead",
 				"Undead",
 			],
 			monster_alignment: [
@@ -296,6 +297,7 @@ export const monsterMixin = {
 			for (const action_type of [
 				"special_abilities",
 				"actions",
+				"bonus_actions",
 				"legendary_actions",
 				"reactions",
 			]) {

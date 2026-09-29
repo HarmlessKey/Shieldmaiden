@@ -53,7 +53,7 @@ export default {
 	preFetch({ store, redirect }) {
 		if (!store.getters.user) {
 			redirect("/sign-in");
-		} else if (store.getters.userInfo.username) {
+		} else if (store.getters.userInfo && store.getters.userInfo.username) {
 			redirect("/profile");
 		}
 	},
@@ -61,7 +61,7 @@ export default {
 		...mapGetters(["user", "userInfo", "poster"]),
 	},
 	methods: {
-		...mapActions(["reinitialize"]),
+		...mapActions(["reinitialize", "setUserInfo"]),
 		async setUsername(valid) {
 			if (valid && this.check === "available") {
 				let user = {
@@ -70,13 +70,19 @@ export default {
 					email: this.user.email,
 				};
 
-				db.ref(`users/${this.user.uid}`).update(user);
+				await db.ref(`users/${this.user.uid}`).update(user);
 
 				//Save searchable results in search_user
-				db.ref(`search_users`).child(this.user.uid).set({
+				await db.ref(`search_users`).child(this.user.uid).set({
 					username: this.username.toLowerCase(),
 					email: this.user.email.toLowerCase(),
 				});
+
+				// Refresh userInfo from the database before navigating away. On a cold load
+				// the live listener was attached server side, so without this the client
+				// store still has no username and the route guards would bounce us right
+				// back here. It also resolves the reward tier for the new record.
+				await this.setUserInfo();
 
 				this.$gtm.trackEvent({
 					event: "sign-up",

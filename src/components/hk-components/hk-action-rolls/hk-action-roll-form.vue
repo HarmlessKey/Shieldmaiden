@@ -387,7 +387,7 @@ export default {
 			},
 		},
 		action_options() {
-			return this.options || [""];
+			return this.options && this.options.length ? this.options : [""];
 		},
 	},
 	methods: {

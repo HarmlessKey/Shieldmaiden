@@ -75,19 +75,32 @@ export default {
 	},
 	methods: {
 		...mapActions(["reinitialize", "setUser", "setUserInfo"]),
+
+		/**
+		 * Loads the signed in user into the store and routes them onwards.
+		 * A user without a username (a first Google sign-in creates an auth user but no
+		 * users/<uid> record) always goes to /set-username, since the rest of the app
+		 * requires a username.
+		 */
+		async handleSignedIn(user) {
+			await this.setUser(user);
+			await this.setUserInfo();
+			await this.reinitialize();
+
+			this.$emit("sign-in", "success");
+
+			const userInfo = this.$store.getters.userInfo;
+			if (!userInfo || !userInfo.username) {
+				this.$router.replace("/set-username");
+			} else if (this.$route.name === "signIn") {
+				this.$router.replace("/content");
+			}
+		},
 		async signIn() {
 			this.loading = true;
 			await auth.signInWithEmailAndPassword(this.email, this.password).then(
 				async (result) => {
-					await this.setUser(result.user);
-					await this.setUserInfo();
-					await this.reinitialize();
-
-					this.$emit("sign-in", "success");
-
-					if (this.$route.name === "signIn") {
-						this.$router.replace("/content");
-					}
+					await this.handleSignedIn(result.user);
 				},
 				(err) => {
 					this.$emit("sign-in", err.message);
@@ -104,15 +117,7 @@ export default {
 				auth
 					.signInWithRedirect(provider)
 					.then(async (result) => {
-						await this.setUser(result.user);
-						await this.setUserInfo();
-						await this.reinitialize();
-
-						this.$emit("sign-in", "success");
-
-						if (this.$route.name === "signIn") {
-							this.$router.replace("/content");
-						}
+						await this.handleSignedIn(result.user);
 					})
 					.catch((err) => {
 						this.$emit("sign-in", err.message);
@@ -123,15 +128,7 @@ export default {
 				auth
 					.signInWithPopup(provider)
 					.then(async (result) => {
-						await this.setUser(result.user);
-						await this.setUserInfo();
-						await this.reinitialize();
-
-						this.$emit("sign-in", "success");
-
-						if (this.$route.name === "signIn") {
-							this.$router.replace("/content");
-						}
+						await this.handleSignedIn(result.user);
 					})
 					.catch((err) => {
 						this.$emit("sign-in", err.message);

@@ -44,6 +44,7 @@
 						:npcs="npcs"
 						:displaySettings="displaySettings"
 						:screenWidth="width"
+						:edition="campaign.edition"
 					/>
 					<Rewards v-else :encounter="encounter" />
 				</div>
@@ -141,6 +142,7 @@
 							:npcs="npcs"
 							:displaySettings="displaySettings"
 							:screenWidth="width"
+							:edition="campaign.edition"
 						/>
 						<Rewards v-else :encounter="encounter" />
 					</q-tab-panel>

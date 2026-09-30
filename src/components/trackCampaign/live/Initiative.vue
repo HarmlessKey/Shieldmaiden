@@ -189,38 +189,37 @@
 										entity.entityType === 'companion'
 									"
 								>
-									<div class="d-flex justify-content-end" v-if="entity.conditions">
-										<template
-											v-for="({ value, name }, index) in returnConditions(entity.conditions)"
-										>
+									<div class="d-flex justify-content-end" v-if="effectsOf(entity).length">
+										<template v-for="({ key, name, icon, level }, index) in effectsOf(entity)">
 											<div
 												class="condition"
-												:key="`condition-${entity.key}-${value}`"
+												:key="`effect-${entity.key}-${key}`"
 												v-if="index + 1 <= conditionCount"
 											>
-												<span class="n" v-if="value === 'exhaustion'">
-													{{ entity.conditions[value] }}
+												<span class="n" v-if="level">
+													{{ level }}
 												</span>
-												<i aria-hidden="true" :class="`hki-${value}`" />
+												<i v-if="icon" aria-hidden="true" :class="`hki-${icon}`" />
+												<i v-else aria-hidden="true" class="fas fa-sparkles" />
 												<q-tooltip anchor="top middle" self="center middle">
 													{{ name }}
-													{{ value === "exhaustion" ? entity.conditions[value] : "" }}
+													{{ level || "" }}
 												</q-tooltip>
 											</div>
 										</template>
 										<strong
-											v-if="Object.keys(entity.conditions).length > conditionCount"
+											v-if="effectsOf(entity).length > conditionCount"
 											class="condtion"
-											:key="`more-conditions-${entity.key}`"
+											:key="`more-effects-${entity.key}`"
 										>
-											+{{ Object.keys(entity.conditions).length - conditionCount }}
+											+{{ effectsOf(entity).length - conditionCount }}
 											<q-tooltip anchor="top middle" self="center middle">
-												{{ Object.keys(entity.conditions).length - conditionCount }}
-												more conditions
+												{{ effectsOf(entity).length - conditionCount }}
+												more effects
 											</q-tooltip>
 										</strong>
 
-										<!-- All conditions -->
+										<!-- All effects -->
 										<q-popup-proxy square prevent>
 											<div class="bg-neutral-8">
 												<q-list>
@@ -234,24 +233,25 @@
 															/>
 														</q-item-section>
 														<q-item-section avatar>
-															{{ Object.keys(entity.conditions).length }}
+															{{ effectsOf(entity).length }}
 														</q-item-section>
 													</q-item>
 													<q-separator />
 													<q-item
 														clickable
 														v-close-popup
-														v-for="{ value, name } in returnConditions(entity.conditions)"
-														:key="`condition-list-${entity.key}-${value}`"
+														v-for="{ key, name, icon, level } in effectsOf(entity)"
+														:key="`effect-list-${entity.key}-${key}`"
 													>
 														<q-item-section avatar>
-															<i aria-hidden="true" :class="`hki-${value}`" />
+															<i v-if="icon" aria-hidden="true" :class="`hki-${icon}`" />
+															<i v-else aria-hidden="true" class="fas fa-sparkles" />
 														</q-item-section>
 														<q-item-section>
 															<span>
 																{{ name }}
-																<strong v-if="value === 'exhaustion'">
-																	{{ entity.conditions[value] }}
+																<strong v-if="level">
+																	{{ level }}
 																</strong>
 															</span>
 														</q-item-section>
@@ -273,8 +273,9 @@
 <script>
 import { db } from "src/firebase";
 import { general } from "src/mixins/general.js";
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 import { trackEncounter } from "src/mixins/trackEncounter.js";
+import { effectDisplayItems } from "src/utils/effectFunctions";
 
 import Health from "./Health.vue";
 import Name from "./Name.vue";
@@ -299,6 +300,8 @@ export default {
 		"npcs",
 		"displaySettings",
 		"screenWidth",
+		// Campaign edition, for the names of SRD effects
+		"edition",
 	],
 	data() {
 		return {
@@ -310,7 +313,6 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters("api_conditions", ["conditions_by_edition"]),
 		playerSettings() { return this.displaySettings?.player || {}; },
 		npcSettings() { return this.displaySettings?.npc; },
 		allySettings() { return this.displaySettings?.ally; },
@@ -347,12 +349,8 @@ export default {
 			});
 		}
 	},
-	async created() {
-		await this.fetch_all_conditions({ edition: "5e" });
-	},
 	methods: {
 		...mapActions(["setDrawer"]),
-		...mapActions("api_conditions", ["fetch_all_conditions"]),
 		setSize() {
 			this.width = this.$refs.initiative.clientWidth;
 		},
@@ -408,15 +406,14 @@ export default {
 				},
 			});
 		},
-		returnConditions(entity_conditions) {
-			let returnConditions = [];
-			for (const key in entity_conditions) {
-				const found = this.conditions_by_edition("5e").find((item) => item.url === key);
-				if (found) {
-					returnConditions.push({ value: found.url, name: found.name });
-				}
-			}
-			return returnConditions;
+		/**
+		 * Active effects of an entity: NPC effects are on the encounter,
+		 * player and companion effects on the campaign
+		 */
+		effectsOf(entity) {
+			const effects =
+				entity.entityType === "npc" ? entity.effects : this.camp_data(entity)?.effects;
+			return effectDisplayItems(effects, this.edition);
 		},
 	},
 	beforeDestroy() {

@@ -1,8 +1,25 @@
 import { abilities, skills, default_edition } from "src/utils/generalConstants";
 import { uuid, calc_mod } from "src/utils/generalFunctions";
+import {
+	generateEffectKey,
+	findSrdDefinition,
+	resolveDefinition,
+	matchTriggers,
+	normalizeTrigger,
+	describeSubEffect,
+	durationActions,
+	endsWhenExpiries,
+	cascadeTargets,
+	carriedOverReview,
+	resolveRepeatSave,
+	onExpireLines,
+	escalationInstance,
+	legacyConditionInstances,
+} from "src/utils/effectFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
 import Vue from "vue";
+import _ from "lodash";
 
 const demoEncounter = {
 	name: "Demo Encounter",
@@ -139,6 +156,14 @@ const getDefaultState = () => ({
 		multipliers: {},
 		defenses: {},
 	},
+	// Resolved effect definitions, keyed by "source:source_key"
+	effect_definitions: {},
+	// Trigger prompts waiting to be shown to the DM (EffectTriggerNotifier)
+	effect_prompts: [],
+	// Key of the entity whose turn it is, kept for the end-of-turn triggers
+	turn_entity: undefined,
+	// Carried-over effects to review at encounter start: [{ holderKey, effectKey, instance }]
+	effect_review: [],
 });
 
 const run_encounter_state = getDefaultState();
@@ -217,6 +242,40 @@ const run_encounter_getters = {
 	target_multipliers(state) {
 		return state.target_multipliers;
 	},
+	/**
+	 * Resolved definition of an active effect instance
+	 */
+	effect_definition: (state) => (instance) => {
+		return state.effect_definitions[`${instance.source}:${instance.source_key}`];
+	},
+	/**
+	 * Active effects of an entity, each with its resolved definition
+	 */
+	entity_effects: (state, getters) => (key) => {
+		return Object.entries(state.entities[key]?.effects || {}).map(([effectKey, instance]) => ({
+			key: effectKey,
+			instance,
+			definition: getters.effect_definition(instance),
+		}));
+	},
+	effect_prompts(state) {
+		return state.effect_prompts;
+	},
+	effect_review(state) {
+		return state.effect_review;
+	},
+	/**
+	 * Keys of the entities in initiative order, ordered like RunEncounter's _active:
+	 * active and not down, by name, then by initiative in the user's initOrder
+	 */
+	turn_order: (state, getters, rootState, rootGetters) => {
+		const order = rootGetters.userSettings?.encounter?.initOrder ? "asc" : "desc";
+		return _.chain(Object.keys(state.entities))
+			.filter((key) => state.entities[key].active && !state.entities[key].down)
+			.orderBy((key) => state.entities[key].name, "asc")
+			.orderBy((key) => Number(state.entities[key].initiative), order)
+			.value();
+	},
 };
 
 const run_encounter_actions = {
@@ -227,7 +286,7 @@ const run_encounter_actions = {
 	 * @param {string} eid Encounter id
 	 * @param {boolean} demo Wether this is the demo encounter
 	 */
-	async init_Encounter({ commit, rootGetters, dispatch }, { cid, eid, demo, test }) {
+	async init_Encounter({ state, commit, getters, rootGetters, dispatch }, { cid, eid, demo, test }) {
 		// Create the path to the encounter in firebase
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const path = `${uid}/${cid}/${eid}`;
@@ -238,6 +297,8 @@ const run_encounter_actions = {
 		commit("SET_CAMPAIGN_ID", cid);
 		commit("SET_ENCOUNTER_ID", eid);
 		commit("CLEAR_ENTITIES");
+		commit("CLEAR_EFFECT_DEFINITIONS");
+		commit("CLEAR_EFFECT_PROMPTS");
 		commit("SET_PATH", path);
 
 		try {
@@ -274,12 +335,36 @@ const run_encounter_actions = {
 				}
 			} else {
 				// The demo runs on the latest edition
-				commit("SET_EDITION", "2024");
+				commit("SET_EDITION", "5.5e");
 				const demo_encounter = rootGetters["encounters/demo_encounter"] || demoEncounter;
 				commit("SET_ENCOUNTER", { ...demo_encounter });
 				for (let key in demo_encounter.entities) {
 					await dispatch("add_entity", key);
 				}
+			}
+
+			// Legacy conditions maps become effect instances
+			await dispatch("convert_legacy_conditions");
+
+			// Remember whose turn it is for the end-of-turn triggers
+			commit(
+				"SET_TURN_ENTITY",
+				state.encounter?.round > 0 ? getters.turn_order[state.encounter.turn] : undefined
+			);
+
+			// Resolve the definitions of all loaded effects
+			const refs = Object.values(state.entities).flatMap((entity) =>
+				Object.values(entity.effects || {})
+			);
+			await dispatch("resolve_effect_definitions", refs);
+
+			// Carried-over effects whose caster or Concentration link is missing: let the DM review them
+			const review = carriedOverReview({ entities: state.entities });
+			commit("SET_EFFECT_REVIEW", review);
+			if (review.length) {
+				commit("ADD_EFFECT_PROMPTS", [
+					{ kind: "review", id: `review:${Date.now()}`, count: review.length },
+				]);
 			}
 		} catch (error) {
 			console.error(error);
@@ -322,8 +407,14 @@ const run_encounter_actions = {
 		entity.saves = db_entity.saves ? db_entity.saves : {};
 		entity.stable = db_entity.stable ? db_entity.stable : false;
 		entity.dead = db_entity.dead ? db_entity.dead : false;
-		entity.conditions = db_entity.conditions ? db_entity.conditions : {};
 		entity.reminders = db_entity.reminders ? db_entity.reminders : {};
+		// Active effect instances, keyed by effect key.
+		// NPC effects are stored on the encounter, players and companions get theirs from the campaign below.
+		const load_effects = !state.demo && !state.test;
+		entity.effects =
+			load_effects && entity.entityType === "npc" && db_entity.effects
+				? { ...db_entity.effects }
+				: {};
 		entity.color_label = db_entity.color_label ? db_entity.color_label : null;
 		entity.limited_uses = db_entity.limited_uses ? db_entity.limited_uses : {};
 
@@ -362,6 +453,9 @@ const run_encounter_actions = {
 					entity.saves = campaignPlayer.saves ? campaignPlayer.saves : {};
 					entity.stable = campaignPlayer.stable ? campaignPlayer.stable : false;
 					entity.dead = campaignPlayer.dead ? campaignPlayer.dead : false;
+					if (load_effects && campaignPlayer.effects) {
+						entity.effects = { ...campaignPlayer.effects };
+					}
 
 					//Get player transformed from campaign
 					if (campaignPlayer.transformed) {
@@ -444,6 +538,9 @@ const run_encounter_actions = {
 					entity.saves = campaignCompanion.saves ? campaignCompanion.saves : {};
 					entity.stable = campaignCompanion.stable ? campaignCompanion.stable : false;
 					entity.dead = campaignCompanion.dead ? campaignCompanion.dead : false;
+					if (load_effects && campaignCompanion.effects) {
+						entity.effects = { ...campaignCompanion.effects };
+					}
 
 					entity.ac = data_npc.old ? data_npc.ac : data_npc.armor_class;
 					entity.img = data_npc.storage_avatar || data_npc.avatar;
@@ -686,7 +783,11 @@ const run_encounter_actions = {
 	 * @param {integer} turn
 	 * @param {integer} round
 	 */
-	async set_turn({ state, commit, dispatch }, { turn, round }) {
+	async set_turn({ state, commit, dispatch, getters }, { turn, round }) {
+		const oldTurn = state.encounter?.turn || 0;
+		const oldRound = state.encounter?.round || 0;
+		const outgoingKey = state.turn_entity;
+
 		if (!state.demo && !state.test) {
 			for (const property of ["turn", "round"]) {
 				const value = property === "turn" ? turn : round;
@@ -705,6 +806,20 @@ const run_encounter_actions = {
 		}
 		commit("SET_TURN", turn);
 		commit("SET_ROUND", round);
+
+		// Effect triggers, only when combat moves forward
+		const incomingKey = round > 0 ? getters.turn_order[turn] : undefined;
+		commit("SET_TURN_ENTITY", incomingKey);
+		const forward = round > oldRound || (round === oldRound && turn > oldTurn);
+		if (forward) {
+			dispatch("fire_turn_triggers", {
+				outgoingKey,
+				incomingKey,
+				combatStart: oldRound === 0,
+				round,
+				oldRound,
+			});
+		}
 	},
 	set_log({ commit }, payload) {
 		commit("SET_LOG", payload);
@@ -1477,32 +1592,552 @@ const run_encounter_actions = {
 	},
 
 	/**
-	 * Sets conditions for entities
+	 * Converts the legacy conditions maps of the loaded encounter to effect instances.
+	 * The map is deleted once all instances of an entity are stored, so a failed run repeats.
+	 * No apply triggers fire. The demo converts in memory only, test runs don't convert.
+	 */
+	async convert_legacy_conditions({ state, commit, dispatch }) {
+		if (state.test) return;
+
+		for (const [key, db_entity] of Object.entries(state.encounter?.entities || {})) {
+			const entity = state.entities[key];
+			if (!entity || !db_entity?.conditions || !Object.keys(db_entity.conditions).length) {
+				continue;
+			}
+			const instances = legacyConditionInstances({
+				conditions: db_entity.conditions,
+				effects: entity.effects,
+				edition: state.edition,
+				round: state.encounter.round,
+			});
+			try {
+				for (const instance of instances) {
+					const effectKey = generateEffectKey(Object.keys(entity.effects));
+					if (!state.demo) {
+						await dispatch("persist_effect", { key, effectKey, value: instance });
+					}
+					commit("SET_EFFECT", { key, effectKey, instance });
+				}
+				if (!state.demo) {
+					await dispatch(
+						"encounters/delete_entity_conditions",
+						{ campaignId: state.campaignId, encounterId: state.encounterId, entityId: key },
+						{ root: true }
+					);
+				}
+			} catch (error) {
+				console.error(`Failed to convert the conditions of ${key}`, error);
+			}
+		}
+	},
+
+	/**
+	 * Applies an effect instance to an entity.
+	 * An SRD condition the entity already has is not added twice,
+	 * Exhaustion updates the level of its existing instance instead.
 	 *
 	 * @param {string} key Entity key
-	 * @param {string} action add, remove
-	 * @param {string} condition Name of the condition
-	 * @param {integer} level level of exhaustion condition
+	 * @param {object} instance Active effect instance ($defs/active_instance)
+	 * @param {object} definition Effect definition the instance references
+	 * @returns {string} Key of the new or updated effect instance, undefined if the write failed
 	 */
-	async set_condition({ state, commit, dispatch }, { action, key, condition, level }) {
-		const value = action === "remove" ? null : condition === "exhaustion" ? level : true;
-		if (!state.demo && !state.test) {
-			await dispatch(
-				"encounters/set_entity_condition",
+	async apply_effect({ state, commit, dispatch }, { key, instance, definition }) {
+		const effects = state.entities[key].effects;
+		const existingKey = Object.keys(effects).find(
+			(effectKey) =>
+				effects[effectKey].source === instance.source &&
+				effects[effectKey].source_key === instance.source_key
+		);
+		const isCondition = instance.source === "srd" && definition?.category === "condition";
+
+		if (isCondition && existingKey) {
+			if (instance.source_key !== "exhaustion") return existingKey;
+
+			const updated = { ...effects[existingKey], level: instance.level };
+			try {
+				if (!state.demo && !state.test) {
+					await dispatch("persist_effect", {
+						key,
+						effectKey: existingKey,
+						property: "level",
+						value: instance.level,
+					});
+				}
+			} catch (error) {
+				console.error(`Failed to update ${instance.name} on ${key}`, error);
+				return;
+			}
+			commit("SET_EFFECT", { key, effectKey: existingKey, instance: updated });
+			await dispatch("resolve_effect_definitions", [instance]).catch((error) =>
+				console.error(error)
+			);
+			return existingKey;
+		}
+
+		const effectKey = generateEffectKey(Object.keys(effects));
+		try {
+			if (!state.demo && !state.test) {
+				await dispatch("persist_effect", { key, effectKey, value: instance });
+			}
+		} catch (error) {
+			console.error(`Failed to apply ${instance.name} to ${key}`, error);
+			return;
+		}
+		commit("SET_EFFECT", { key, effectKey, instance });
+		await dispatch("resolve_effect_definitions", [instance]).catch((error) =>
+			console.error(error)
+		);
+
+		// Apply triggers, for new instances only
+		dispatch("fire_trigger", { trigger: "on_apply", entityKey: key, effectKey });
+		if (isCondition) {
+			dispatch("fire_trigger", { trigger: "on_condition_applied", entityKey: key });
+		}
+		return effectKey;
+	},
+
+	/**
+	 * Removes effect instances from an entity:
+	 * one instance by effectKey, or every instance of a definition by source + source_key
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} source "srd" or "custom"
+	 * @param {string} source_key url or id of the definition
+	 * @param {string} effectKey Key of a single instance
+	 * @param {string} reason Why it ended; set for automatic removals, which are announced
+	 * @param {boolean} skipExpire Don't show what happens when it ends (replaced by an escalation)
+	 */
+	async remove_effect(
+		{ state, commit, dispatch, getters },
+		{ key, source, source_key, effectKey, reason, skipExpire }
+	) {
+		const effects = state.entities[key]?.effects || {};
+		const effectKeys = effectKey
+			? [effectKey]
+			: Object.keys(effects).filter(
+					(k) => effects[k].source === source && effects[k].source_key === source_key
+			  );
+
+		for (const k of effectKeys) {
+			const instance = effects[k];
+			// Already removed, e.g. reached twice through a cascade
+			if (!instance) continue;
+
+			try {
+				if (!state.demo && !state.test) {
+					await dispatch("persist_effect", { key, effectKey: k, value: null });
+				}
+			} catch (error) {
+				console.error(`Failed to remove ${instance.name} from ${key}`, error);
+				continue;
+			}
+			commit("DELETE_EFFECT", { key, effectKey: k });
+
+			const name = (instance.name || "").capitalize();
+			if (reason) {
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "notice",
+						id: `notice:${key}:${k}:${Date.now()}`,
+						holderKey: key,
+						effectKey: k,
+						holderName: state.entities[key]?.name,
+						effectName: name,
+						reason,
+					},
+				]);
+			}
+
+			// What happens when it ends (Haste lethargy); not when replaced by an escalation
+			const expireLines = skipExpire
+				? []
+				: onExpireLines({ instance, definition: getters.effect_definition(instance) });
+			if (expireLines.length) {
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "on_expire",
+						id: `on_expire:${key}:${k}:${Date.now()}`,
+						holderKey: key,
+						effectKey: k,
+						holderName: state.entities[key]?.name,
+						effectName: name,
+						lines: expireLines,
+					},
+				]);
+			}
+
+			// Effects linked to this one end with it
+			const targets = cascadeTargets({
+				holderKey: key,
+				effectKey: k,
+				instance,
+				entities: state.entities,
+			});
+			for (const target of targets) {
+				await dispatch("remove_effect", {
+					key: target.holderKey,
+					effectKey: target.effectKey,
+					reason: `${name} ended`,
+				});
+			}
+		}
+	},
+
+	/**
+	 * Resolves a repeat save of an effect instance: counts it, ends the effect when enough
+	 * saves succeed, and escalates or locks it when enough fail
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {boolean} success Whether the save succeeded
+	 * @param {boolean} auto Succeeded automatically (auto_success_after)
+	 */
+	async resolve_repeat_save({ state, commit, dispatch, getters }, { key, effectKey, success, auto }) {
+		const instance = state.entities[key]?.effects?.[effectKey];
+		if (!instance?.duration?.save) return;
+
+		const name = (instance.name || "").capitalize();
+		const outcome = resolveRepeatSave(instance, success);
+
+		// An automatic success that doesn't end the effect is announced here; one that does is
+		// announced by the removal
+		if (auto && outcome.result !== "end") {
+			commit("ADD_EFFECT_PROMPTS", [
 				{
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					condition,
-					value,
+					kind: "notice",
+					id: `notice:auto:${key}:${effectKey}:${Date.now()}`,
+					holderKey: key,
+					effectKey,
+					holderName: state.entities[key]?.name,
+					effectName: name,
+					text: `${name}: the save succeeded automatically`,
 				},
-				{ root: true }
+			]);
+		}
+
+		if (outcome.onFail?.length) {
+			commit("ADD_EFFECT_PROMPTS", [
+				{
+					kind: "trigger",
+					id: `on_fail:${key}:${effectKey}:${Date.now()}`,
+					trigger: "on_save_fail",
+					holderKey: key,
+					effectKey,
+					holderName: state.entities[key]?.name,
+					effectName: name,
+					lines: outcome.onFail,
+				},
+			]);
+		}
+
+		if (outcome.result === "end") {
+			await dispatch("remove_effect", {
+				key,
+				effectKey,
+				reason: auto ? "the save succeeded automatically" : "saved",
+			});
+		} else if (outcome.result === "count") {
+			await dispatch("set_effect_prop", {
+				key,
+				effectKey,
+				property: outcome.property,
+				value: outcome.value,
+			});
+		} else if (outcome.result === "lock") {
+			await dispatch("set_effect_prop", {
+				key,
+				effectKey,
+				property: "save_failures",
+				value: outcome.value,
+			});
+			await dispatch("set_effect_prop", {
+				key,
+				effectKey,
+				property: "duration",
+				value: outcome.duration,
+			});
+		} else if (outcome.result === "escalate") {
+			const { effect } = outcome.escalate;
+			await dispatch("resolve_effect_definitions", [effect]);
+			const definition = getters.effect_definition(effect);
+			const replacement = escalationInstance({
+				instance,
+				definition,
+				round: state.encounter?.round,
+			});
+			await dispatch("remove_effect", {
+				key,
+				effectKey,
+				reason: `became ${replacement.name}`,
+				skipExpire: true,
+			});
+			await dispatch("apply_effect", { key, instance: replacement, definition });
+		}
+	},
+
+	/**
+	 * Resolves an escape attempt: a success ends the effect, a failure changes nothing
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {boolean} success
+	 */
+	async escape_effect({ dispatch }, { key, effectKey, success }) {
+		if (success) await dispatch("remove_effect", { key, effectKey, reason: "escaped" });
+	},
+
+	/**
+	 * Sets one property of an effect instance and saves it; null removes the property
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {string} property
+	 * @param {any} value
+	 */
+	async set_effect_prop({ state, commit, dispatch }, { key, effectKey, property, value }) {
+		const instance = state.entities[key]?.effects?.[effectKey];
+		if (!instance) return;
+
+		try {
+			if (!state.demo && !state.test) {
+				await dispatch("persist_effect", { key, effectKey, property, value });
+			}
+		} catch (error) {
+			console.error(`Failed to update ${instance.name} on ${key}`, error);
+			return;
+		}
+		const updated = { ...instance, [property]: value };
+		if (value === null || value === undefined) delete updated[property];
+		commit("SET_EFFECT", { key, effectKey, instance: updated });
+	},
+
+	/**
+	 * Resolves the definitions of effect instances that are not resolved yet in this encounter.
+	 * SRD definitions come from the campaign edition's data, custom ones from the user's effects.
+	 * An unresolved definition is stored with unresolved: true and warned about once.
+	 *
+	 * @param {object[]} refs Objects with source and source_key (e.g. active effect instances)
+	 */
+	async resolve_effect_definitions({ state, commit, dispatch, rootGetters }, refs = []) {
+		const pending = {};
+		for (const { source, source_key } of refs) {
+			const id = `${source}:${source_key}`;
+			if (!state.effect_definitions[id]) pending[id] = { source, source_key };
+		}
+
+		const lookup = async ({ source, source_key }) => {
+			if (source === "srd") return findSrdDefinition(state.edition, source_key);
+			if (source === "custom" && rootGetters.user) {
+				try {
+					const definition = await dispatch(
+						"effects/get_effect",
+						{ uid: rootGetters.user.uid, id: source_key },
+						{ root: true }
+					);
+					return definition || undefined;
+				} catch (error) {
+					console.error(`Failed to load custom effect ${source_key}`, error);
+				}
+			}
+			return undefined;
+		};
+
+		await Promise.all(
+			Object.entries(pending).map(async ([id, { source, source_key }]) => {
+				const definition = await resolveDefinition({ source, sourceKey: source_key, lookup });
+				if (definition.unresolved) {
+					// Another call may have resolved the same id in the meantime
+					if (state.effect_definitions[id]) return;
+					console.warn(`Effect definition ${id} could not be resolved`);
+				}
+				commit("SET_EFFECT_DEFINITION", { id, definition });
+			})
+		);
+	},
+
+	/**
+	 * Fires a trigger: finds the active effects that listen for it and queues a prompt
+	 * for the DM per matching effect instance. Then ticks and expires durations for it:
+	 * timed effects, turn edges, cancel triggers and end conditions.
+	 *
+	 * @param {string} trigger Trigger name ($defs/trigger), legacy spellings allowed
+	 * @param {string} entityKey Entity the trigger fired for (undefined for combat_start)
+	 * @param {object} event What is known: sourceKey, amount, damageTypes, attackTypes, naturalRoll, round
+	 * @param {string} effectKey Only this instance of entityKey (on_apply)
+	 * @returns {object[]} The matches (see matchTriggers)
+	 */
+	async fire_trigger(
+		{ state, commit, getters, dispatch },
+		{ trigger, entityKey, event = {}, effectKey }
+	) {
+		trigger = normalizeTrigger(trigger);
+		const matches = matchTriggers({
+			trigger,
+			entityKey,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			event,
+			effectKey,
+		});
+
+		if (matches.length) {
+			commit(
+				"ADD_EFFECT_PROMPTS",
+				matches.map(({ holderKey, effectKey, instance, definition, matches }) => ({
+					id: `${trigger}:${holderKey}:${effectKey}:${Date.now()}`,
+					trigger,
+					holderKey,
+					effectKey,
+					holderName: state.entities[holderKey]?.name,
+					effectName: (definition.name || instance.name || "").capitalize(),
+					lines: matches.map(({ sub_effect, unchecked }) =>
+						[describeSubEffect(sub_effect), ...unchecked].join(", ")
+					),
+				}))
 			);
 		}
-		if (action === "add") {
-			commit("SET_CONDITION", { key, condition, value });
+
+		// Durations: ticks, expiries and possible cancels, then end conditions
+		const actions = [
+			...durationActions({
+				trigger,
+				entityKey,
+				entities: state.entities,
+				event,
+				round: state.encounter?.round,
+			}),
+			...endsWhenExpiries({ entities: state.entities, definitionOf: getters.effect_definition }),
+		];
+		// An instance that ended gets no further actions (e.g. no save after it expired)
+		const ended = new Set();
+		for (const action of actions) {
+			const id = `${action.holderKey}:${action.effectKey}`;
+			if (ended.has(id)) continue;
+			if (action.kind === "expire") ended.add(id);
+
+			if (action.kind === "save_auto") {
+				await dispatch("resolve_repeat_save", {
+					key: action.holderKey,
+					effectKey: action.effectKey,
+					success: true,
+					auto: true,
+				});
+			} else if (action.kind === "save") {
+				const instance = state.entities[action.holderKey]?.effects?.[action.effectKey];
+				if (!instance) continue;
+				const save = instance.duration?.save || {};
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "save",
+						id: `save:${id}:${Date.now()}`,
+						holderKey: action.holderKey,
+						effectKey: action.effectKey,
+						holderName: state.entities[action.holderKey]?.name,
+						effectName: (instance.name || "").capitalize(),
+						ability: save.ability,
+						dc: instance.save_dc,
+						advantage: action.advantage,
+						costsAction: !!save.costs_action,
+						trigger,
+					},
+				]);
+			} else if (action.kind === "tick") {
+				await dispatch("set_effect_prop", {
+					key: action.holderKey,
+					effectKey: action.effectKey,
+					property: "rounds_remaining",
+					value: action.value,
+				});
+			} else if (action.kind === "expire") {
+				await dispatch("remove_effect", {
+					key: action.holderKey,
+					effectKey: action.effectKey,
+					reason: action.reason,
+				});
+			} else if (action.kind === "maybe") {
+				const instance = state.entities[action.holderKey]?.effects?.[action.effectKey];
+				if (!instance) continue;
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "maybe",
+						id: `maybe:${id}:${Date.now()}`,
+						holderKey: action.holderKey,
+						effectKey: action.effectKey,
+						holderName: state.entities[action.holderKey]?.name,
+						effectName: (instance.name || "").capitalize(),
+						reason: action.reason,
+						lines: action.unchecked,
+					},
+				]);
+			}
+		}
+		return matches;
+	},
+
+	/**
+	 * Fires the triggers for a turn change when combat moves forward:
+	 * end of the outgoing turn, then start of the incoming turn.
+	 * Starting the encounter fires combat_start and the first entity's start of turn.
+	 */
+	async fire_turn_triggers(
+		{ dispatch },
+		{ outgoingKey, incomingKey, combatStart, round, oldRound }
+	) {
+		// event.round is the round of the turn the trigger belongs to
+		if (combatStart) {
+			await dispatch("fire_trigger", { trigger: "combat_start", event: { round } });
+		} else if (outgoingKey) {
+			const event = { round: oldRound };
+			await dispatch("fire_trigger", { trigger: "end_turn_caster", entityKey: outgoingKey, event });
+			await dispatch("fire_trigger", { trigger: "end_turn_target", entityKey: outgoingKey, event });
+		}
+		if (incomingKey) {
+			const event = { round };
+			await dispatch("fire_trigger", { trigger: "start_turn_caster", entityKey: incomingKey, event });
+			await dispatch("fire_trigger", { trigger: "start_turn_target", entityKey: incomingKey, event });
+		}
+	},
+
+	/**
+	 * Writes an effect instance, or one property of it, to the database.
+	 * NPC effects live on the encounter, player and companion effects on the campaign.
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {object|null|any} value Instance (null removes it), or the property value
+	 * @param {string} property When set, only this property of the instance is written
+	 */
+	async persist_effect({ state, dispatch }, { key, effectKey, value, property }) {
+		const entityType = state.entities[key].entityType;
+
+		if (entityType === "npc") {
+			const payload = {
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId: key,
+				effectKey,
+				value,
+			};
+			await dispatch(
+				property ? "encounters/set_entity_effect_prop" : "encounters/set_entity_effect",
+				property ? { ...payload, property } : payload,
+				{ root: true }
+			);
 		} else {
-			commit("DELETE_CONDITION", { key, condition });
+			const payload = {
+				campaignId: state.campaignId,
+				type: `${entityType}s`,
+				id: key,
+				effectKey,
+				value,
+			};
+			await dispatch(
+				property
+					? "campaigns/set_campaign_entity_effect_prop"
+					: "campaigns/set_campaign_entity_effect",
+				property ? { ...payload, property } : payload,
+				{ root: true }
+			);
 		}
 	},
 
@@ -2137,11 +2772,11 @@ const run_encounter_mutations = {
 	DELETE_SAVE(state, { key, index }) {
 		Vue.delete(state.entities[key].saves, index);
 	},
-	SET_CONDITION(state, { key, condition, value }) {
-		Vue.set(state.entities[key].conditions, condition, value);
+	SET_EFFECT(state, { key, effectKey, instance }) {
+		Vue.set(state.entities[key].effects, effectKey, instance);
 	},
-	DELETE_CONDITION(state, { key, condition }) {
-		Vue.delete(state.entities[key].conditions, condition);
+	DELETE_EFFECT(state, { key, effectKey }) {
+		Vue.delete(state.entities[key].effects, effectKey);
 	},
 	SET_REMINDER(state, { entityKey, key, reminder }) {
 		Vue.set(state.entities[entityKey].reminders, key, reminder);
@@ -2157,6 +2792,24 @@ const run_encounter_mutations = {
 	},
 	CLEAR_ENTITIES(state) {
 		Vue.set(state, "entities", {});
+	},
+	SET_EFFECT_DEFINITION(state, { id, definition }) {
+		Vue.set(state.effect_definitions, id, definition);
+	},
+	CLEAR_EFFECT_DEFINITIONS(state) {
+		Vue.set(state, "effect_definitions", {});
+	},
+	SET_TURN_ENTITY(state, key) {
+		Vue.set(state, "turn_entity", key);
+	},
+	ADD_EFFECT_PROMPTS(state, prompts) {
+		state.effect_prompts.push(...prompts);
+	},
+	SET_EFFECT_REVIEW(state, review) {
+		Vue.set(state, "effect_review", review);
+	},
+	CLEAR_EFFECT_PROMPTS(state) {
+		Vue.set(state, "effect_prompts", []);
 	},
 	SET_LIMITED_USES(state, { key, category, index, value }) {
 		if (!state.entities[key].limited_uses[category])

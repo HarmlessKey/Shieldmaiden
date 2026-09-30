@@ -1,5 +1,5 @@
 <template>
-	<div v-if="effects?.length" class="entity-effects" :class="{ collapse: collapse }">
+	<div v-if="items?.length" class="entity-effects" :class="{ collapse: collapse }">
 		<Effect v-for="effect in visible" :key="effect.key" :effect="effect" :entity="entity" />
 		<div v-if="collapsed.length" class="entity-effects__collapsed" @click.stop>
 			+<hk-animated-integer :value="collapsed.length" />
@@ -21,6 +21,7 @@
 <script>
 import Effect from "./Effect.vue";
 import { remindersMixin } from "src/mixins/reminders";
+import { describeDuration, effectBadge } from "src/utils/effectFunctions";
 
 export default {
 	name: "Effects",
@@ -40,11 +41,12 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		conditions: {
+		reminders: {
 			type: Boolean,
 			default: false,
 		},
-		reminders: {
+		// Active effect instances; without either flag both kinds are shown
+		effects: {
 			type: Boolean,
 			default: false,
 		},
@@ -54,18 +56,7 @@ export default {
 		};
 	},
 	computed: {
-		effects() {
-			const conditions = this.entity.conditions
-				? Object.entries(this.entity.conditions).map(([key, value]) => {
-						return {
-							type: "condition",
-							key: key,
-							icon: key,
-							title: key.capitalize(),
-							value: key === "exhaustion" ? value : null,
-						};
-					})
-				: [];
+		items() {
 			const reminders = this.entity.reminders
 				? Object.entries(this.entity.reminders).map(([key, reminder]) => {
 						return {
@@ -79,13 +70,50 @@ export default {
 						};
 					})
 				: [];
-			if (this.reminders && !this.conditions) {
-				return reminders;
-			}
-			if (this.conditions && !this.reminders) {
-				return conditions;
-			}
-			return [...reminders, ...conditions];
+			const all = !this.reminders && !this.effects;
+			return [
+				...(all || this.reminders ? reminders : []),
+				...(all || this.effects ? this.effectItems : []),
+			];
+		},
+		entityKey() {
+			if (this.entity.key) return this.entity.key;
+			const entities = this.$store.getters.entities || {};
+			return Object.keys(entities).find((key) => entities[key] === this.entity);
+		},
+		/**
+		 * Active effect instances as chips
+		 */
+		effectItems() {
+			if (!this.entityKey || !this.$store.getters.entity_effects) return [];
+			const entities = this.$store.getters.entities || {};
+
+			return this.$store.getters.entity_effects(this.entityKey).map(({ key, instance, definition }) => {
+				const name = (definition?.name || instance.name || "").capitalize();
+				const isCondition = instance.source === "srd" && definition?.category === "condition";
+				const caster = entities[instance.caster_key];
+
+				return {
+					type: "effect",
+					key: `effect:${key}`,
+					effectKey: key,
+					entityKey: this.entityKey,
+					icon: isCondition ? instance.source_key : undefined,
+					initial: name.charAt(0),
+					title: name,
+					value: effectBadge(instance),
+					duration: describeDuration(instance, {
+						casterName: caster?.name || instance.caster_name,
+						holderName: this.entity.name,
+					}),
+					// The stored name when the caster isn't in this encounter
+					caster: caster
+						? caster.name
+						: instance.caster_name
+						? `${instance.caster_name} (not in this encounter)`
+						: undefined,
+				};
+			});
 		},
 		numberOfEffectsVisible() {
 			const ITEM_SIZE = 33;
@@ -93,13 +121,13 @@ export default {
 			return Math.floor((this.availableSpace) / ITEM_SIZE);
 		},
 		visible() {
-			return this.effects?.length > this.numberOfEffectsVisible && this.collapse
-				? this.effects?.slice(0, this.numberOfEffectsVisible - 1)
-				: this.effects;
+			return this.items?.length > this.numberOfEffectsVisible && this.collapse
+				? this.items?.slice(0, this.numberOfEffectsVisible - 1)
+				: this.items;
 		},
 		collapsed() {
-			return this.effects?.length > this.numberOfEffectsVisible && this.collapse
-				? this.effects?.slice(this.numberOfEffectsVisible - 1, this.effects?.length + 1)
+			return this.items?.length > this.numberOfEffectsVisible && this.collapse
+				? this.items?.slice(this.numberOfEffectsVisible - 1, this.items?.length + 1)
 				: [];
 		},
 	},

@@ -10,6 +10,7 @@
 				title: `${skill.skill} check`,
 				entity_name: entity.name.capitalizeEach(),
 				notify: true,
+				trigger: { name: 'on_check', entity_key: entity.key },
 			}"
 			:share="
 				shares.includes('skill_rolls')

@@ -568,6 +568,64 @@ const campaign_actions = {
 	},
 
 	/**
+	 * Set or remove an active effect instance on a player or companion
+	 *
+	 * @param {string} campaignId
+	 * @param {string} type Entity type players/companions
+	 * @param {string} id entityId
+	 * @param {string} effectKey
+	 * @param {object|null} value Active effect instance, null removes it
+	 */
+	async set_campaign_entity_effect(
+		{ rootGetters, commit, dispatch },
+		{ campaignId, type, id, effectKey, value }
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			await services.updateCampaignEntity(uid, campaignId, `/${type}/${id}/effects`, {
+				[effectKey]: value,
+			});
+			commit("SET_CAMPAIGN_ENTITY_EFFECT", { uid, campaignId, type, id, effectKey, value });
+		}
+	},
+
+	/**
+	 * Set a single property of an active effect instance on a player or companion
+	 *
+	 * @param {string} campaignId
+	 * @param {string} type Entity type players/companions
+	 * @param {string} id entityId
+	 * @param {string} effectKey
+	 * @param {string} property
+	 * @param {any} value
+	 */
+	async set_campaign_entity_effect_prop(
+		{ rootGetters, commit, dispatch },
+		{ campaignId, type, id, effectKey, property, value }
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_campaign_services");
+			await services.updateCampaignEntity(
+				uid,
+				campaignId,
+				`/${type}/${id}/effects/${effectKey}`,
+				{ [property]: value }
+			);
+			commit("SET_CAMPAIGN_ENTITY_EFFECT_PROP", {
+				uid,
+				campaignId,
+				type,
+				id,
+				effectKey,
+				property,
+				value,
+			});
+		}
+	},
+
+	/**
 	 * Updates a single property for a player or companion
 	 *
 	 * @param {string} uid
@@ -1137,6 +1195,22 @@ const campaign_mutations = {
 		} else {
 			Vue.set(state.cached_campaigns[uid][campaignId][type][id].transformed, property, value);
 		}
+	},
+	SET_CAMPAIGN_ENTITY_EFFECT(state, { uid, campaignId, type, id, effectKey, value }) {
+		const entity = state.cached_campaigns[uid]?.[campaignId]?.[type]?.[id];
+		if (!entity) return;
+
+		if (value === null) {
+			if (entity.effects) Vue.delete(entity.effects, effectKey);
+		} else if (entity.effects) {
+			Vue.set(entity.effects, effectKey, value);
+		} else {
+			Vue.set(entity, "effects", { [effectKey]: value });
+		}
+	},
+	SET_CAMPAIGN_ENTITY_EFFECT_PROP(state, { uid, campaignId, type, id, effectKey, property, value }) {
+		const effect = state.cached_campaigns[uid]?.[campaignId]?.[type]?.[id]?.effects?.[effectKey];
+		if (effect) Vue.set(effect, property, value);
 	},
 	SET_DEATH_SAVE(state, { uid, campaignId, type, id, index, value }) {
 		if (value === null) {

@@ -110,6 +110,23 @@ export const abilities = Object.freeze([
 	"charisma",
 ]);
 
+export const creature_types = Object.freeze([
+	"aberration",
+	"beast",
+	"celestial",
+	"construct",
+	"dragon",
+	"elemental",
+	"fey",
+	"fiend",
+	"giant",
+	"humanoid",
+	"monstrosity",
+	"ooze",
+	"plant",
+	"undead",
+]);
+
 export const damage_types = Object.freeze([
 	"non_magical_bludgeoning",
 	"non_magical_piercing",

@@ -22,7 +22,15 @@ export const setHP = {
 		...mapGetters(["encounter", "demo", "test"]),
 	},
 	methods: {
-		...mapActions(["set_save", "set_stable", "set_hp", "set_dead", "set_log", "set_meters"]),
+		...mapActions([
+			"set_save",
+			"set_stable",
+			"set_hp",
+			"set_dead",
+			"set_log",
+			"set_meters",
+			"fire_trigger",
+		]),
 		...mapActions("campaigns", ["update_damage_meters"]),
 
 		/**
@@ -148,6 +156,32 @@ export const setHP = {
 				this.checkReminders(target, "damage");
 			}
 
+			// Effect triggers, on the main HP pool
+			if (amount > 0 && !config.undo) {
+				const after = newhp !== undefined ? newhp : curHp;
+				const event = {
+					sourceKey: current?.key,
+					amount,
+					damageTypes: (config.actions || [])
+						.flatMap((action) => (action.rolls || []).map((roll) => roll.damage_type))
+						.filter(Boolean),
+				};
+				this.fire_trigger({ trigger: "damage_taken", entityKey: target.key, event });
+				if (current?.key) {
+					this.fire_trigger({
+						trigger: "damage_dealt",
+						entityKey: current.key,
+						event: { ...event, sourceKey: target.key },
+					});
+				}
+				if (curHp > 0 && after === 0) {
+					this.fire_trigger({ trigger: "on_zero_hp", entityKey: target.key, event });
+				}
+				if (curHp > maxHp / 2 && after <= maxHp / 2) {
+					this.fire_trigger({ trigger: "on_bloodied", entityKey: target.key, event });
+				}
+			}
+
 			//Notification
 			if (config.notify) {
 				this.$q.notify({
@@ -251,6 +285,15 @@ export const setHP = {
 				pool: pool,
 				newHp: newhp,
 			});
+
+			// Effect trigger
+			if (amount > 0 && !config.undo) {
+				this.fire_trigger({
+					trigger: "on_heal",
+					entityKey: target.key,
+					event: { sourceKey: current?.key, amount },
+				});
+			}
 
 			//Notification
 			if (config.notify) {

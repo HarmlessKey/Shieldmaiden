@@ -121,12 +121,26 @@
 							setDrawer({
 								show: true,
 								type: 'drawers/encounter/Conditions',
-								data: entities[targeted[0]],
+								data: [targeted[0]],
 							})
 						"
 					>
 						<q-item-section avatar><i aria-hidden="true" class="fas fa-flame"></i></q-item-section>
 						<q-item-section>Conditions</q-item-section>
+					</q-item>
+					<q-item
+						clickable
+						v-close-popup
+						@click="
+							setDrawer({
+								show: true,
+								type: 'drawers/encounter/Effects',
+								data: [targeted[0]],
+							})
+						"
+					>
+						<q-item-section avatar><i aria-hidden="true" class="fas fa-sparkles"></i></q-item-section>
+						<q-item-section>Effects</q-item-section>
 					</q-item>
 					<q-separator />
 					<q-item

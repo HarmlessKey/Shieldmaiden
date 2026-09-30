@@ -124,6 +124,19 @@ export class campaignServices {
 			});
 	}
 
+	/**
+	 * Updates a property of a campaign player or companion.
+	 * Unlike updateCampaign, waits for the write so a rejected write reaches the caller.
+	 *
+	 * @param {String} uid ID of active user
+	 * @param {String} id ID of the campaign
+	 * @param {string} path Path to the parent of the property, e.g. /players/{id}/effects
+	 * @param {object} value Object with { property: value }
+	 */
+	async updateCampaignEntity(uid, id, path, value) {
+		await CAMPAIGNS_REF.child(`${uid}/${id}${path}`).update(value);
+	}
+
 	async updateSearchCampaign(uid, id, path, value) {
 		path = `${uid}/results/${id}${path}`;
 		SEARCH_CAMPAIGNS_REF.child(path)

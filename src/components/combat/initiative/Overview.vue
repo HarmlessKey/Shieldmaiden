@@ -126,7 +126,6 @@ export default {
 			"set_active",
 			"set_hidden",
 			"set_initiative",
-			"set_condition",
 			"set_targetReminder",
 			"setDrawer",
 		]),

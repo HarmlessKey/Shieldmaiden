@@ -62,6 +62,14 @@
 		<q-item
 			clickable
 			v-close-popup
+			@click="setDrawer({ show: true, type: 'drawers/encounter/Effects', data: [entity.key] })"
+		>
+			<q-item-section avatar><i aria-hidden="true" class="fas fa-sparkles"></i></q-item-section>
+			<q-item-section>Effects</q-item-section>
+		</q-item>
+		<q-item
+			clickable
+			v-close-popup
 			@click="setDrawer({ show: true, type: 'drawers/encounter/DamageHealing' })"
 		>
 			<q-item-section avatar><i aria-hidden="true" class="fas fa-swords"></i></q-item-section>

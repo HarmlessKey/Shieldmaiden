@@ -57,6 +57,8 @@
 							title: `${ability.capitalize()} check`,
 							entity_name: full_entity.name.capitalizeEach(),
 							notify: true,
+							trigger:
+								type === 'mod' ? { name: 'on_check', entity_key: full_entity.key } : undefined,
 						}"
 						:share="
 							shares.includes('ability_rolls')
@@ -89,6 +91,7 @@
 							title: `${skill} check`,
 							entity_name: full_entity.name.capitalizeEach(),
 							notify: true,
+							trigger: { name: 'on_check', entity_key: full_entity.key },
 						}"
 						:share="
 							shares.includes('skill_rolls')

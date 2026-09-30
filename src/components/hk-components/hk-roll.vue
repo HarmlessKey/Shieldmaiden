@@ -162,7 +162,7 @@ export default {
 			}
 
 			if (this.roll) {
-				this.rollD(
+				const result = this.rollD(
 					e,
 					this.roll.d,
 					this.roll.n,
@@ -173,6 +173,14 @@ export default {
 					advantage_object,
 					this.share
 				);
+				// Optional effect trigger, e.g. { name: "on_check", entity_key }
+				if (this.roll.trigger?.entity_key) {
+					this.$store.dispatch("fire_trigger", {
+						trigger: this.roll.trigger.name,
+						entityKey: this.roll.trigger.entity_key,
+						event: { naturalRoll: result?.throwsTotal },
+					});
+				}
 			} else {
 				this.emit(e, advantage_object);
 			}

@@ -613,8 +613,50 @@ export default {
 		this.checkHitOrMiss();
 	},
 	methods: {
-		...mapActions(["removeActionRoll", "edit_entity_prop"]),
+		...mapActions(["removeActionRoll", "edit_entity_prop", "fire_trigger"]),
 		...mapActions("tutorial", ["completeStep"]),
+		/**
+		 * Fires on_hit / on_hit_taken, on_crit / on_crit_taken (natural 20 hit)
+		 * and on_save_success / on_save_fail for every action of the applied roll
+		 */
+		fireRollTriggers() {
+			const attackerKey = this.roll.current?.key;
+			const targetKey = this.roll.target?.key;
+			if (!targetKey) return;
+
+			this.roll.actions.forEach((action, index) => {
+				const naturalRoll = action.toHit?.throwsTotal;
+				const attackTypes = {
+					melee_weapon: ["melee_weapon", "melee", "weapon"],
+					ranged_weapon: ["ranged_weapon", "ranged", "weapon"],
+					spell_attack: ["spell", "melee_spell", "ranged_spell"],
+				}[action.type];
+				const fire = (trigger, entityKey, sourceKey) => {
+					if (!entityKey) return;
+					this.fire_trigger({
+						trigger,
+						entityKey,
+						event: { sourceKey, attackTypes, naturalRoll },
+					});
+				};
+
+				if (action.toHit && this.hitOrMiss[index] === "hit") {
+					fire("on_hit", attackerKey, targetKey);
+					fire("on_hit_taken", targetKey, attackerKey);
+					if (naturalRoll === 20) {
+						fire("on_crit", attackerKey, targetKey);
+						fire("on_crit_taken", targetKey, attackerKey);
+					}
+				}
+				if (action.type === "save" && this.savingThrowResult[index]) {
+					fire(
+						this.savingThrowResult[index] === "save" ? "on_save_success" : "on_save_fail",
+						targetKey,
+						attackerKey
+					);
+				}
+			});
+		},
 		checkHitOrMiss() {
 			this.roll.actions.forEach((action, index) => {
 				if (action.toHit) {
@@ -757,6 +799,9 @@ export default {
 
 			// Apply the rolled damage/healing
 			await this.setHP(totalValue, this.roll.target, this.roll.current, config);
+
+			// Effect triggers for hits, crits and saves
+			this.fireRollTriggers();
 
 			// Apply the special events
 			for (const special of specials) {

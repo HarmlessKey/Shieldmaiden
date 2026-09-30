@@ -95,6 +95,7 @@
 									title: `${ability.capitalize()} check`,
 									entity_name: entities[key].name.capitalizeEach(),
 									notify: true,
+									trigger: { name: 'on_check', entity_key: key },
 								}"
 								:share="
 									shares.includes('ability_rolls')
@@ -247,6 +248,13 @@ export default {
 					icon: "fa-stopwatch",
 					tooltip: "Reminders",
 					step: "reminders",
+				},
+				{
+					option: "effects",
+					method: () => this.setEffects(),
+					key: ["f"],
+					icon: "fa-sparkles",
+					tooltip: "Effects",
 				},
 				{
 					option: "transform",
@@ -408,6 +416,9 @@ export default {
 		setReminders() {
 			this.setDrawer({ show: true, type: "drawers/encounter/reminders/TargetReminders" });
 			this.completeTutorialStep("reminders");
+		},
+		setEffects() {
+			this.setDrawer({ show: true, type: "drawers/encounter/Effects" });
 		},
 		transform() {
 			this.setDrawer({ show: true, type: "drawers/Transform", data: this.target });

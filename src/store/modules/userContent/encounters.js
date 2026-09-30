@@ -501,41 +501,86 @@ const encounter_actions = {
 	},
 
 	/**
-	 * Set condition on an entity
+	 * Set or remove an active effect instance on an entity
 	 *
 	 * @param {string} campaignId
 	 * @param {string} encounterId
 	 * @param {string} entityId
-	 * @param {string} condition
-	 * @param {number|boolean} value
+	 * @param {string} effectKey
+	 * @param {object|null} value Active effect instance, null removes it
 	 */
-	async set_entity_condition(
+	async set_entity_effect(
 		{ rootGetters, commit, dispatch },
-		{ campaignId, encounterId, entityId, condition, value }
+		{ campaignId, encounterId, entityId, effectKey, value }
 	) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_encounter_services");
-			try {
-				await services.updateEncounter(
-					uid,
-					campaignId,
-					encounterId,
-					`/entities/${entityId}/conditions`,
-					{ [condition]: value }
-				);
-				commit("SET_ENTITY_CONDITION", {
-					uid,
-					campaignId,
-					encounterId,
-					entityId,
-					condition,
-					value,
-				});
-				return;
-			} catch (error) {
-				throw error;
-			}
+			await services.updateEncounter(
+				uid,
+				campaignId,
+				encounterId,
+				`/entities/${entityId}/effects`,
+				{ [effectKey]: value }
+			);
+			commit("SET_ENTITY_EFFECT", { uid, campaignId, encounterId, entityId, effectKey, value });
+		}
+	},
+
+	/**
+	 * Set a single property of an active effect instance on an entity
+	 *
+	 * @param {string} campaignId
+	 * @param {string} encounterId
+	 * @param {string} entityId
+	 * @param {string} effectKey
+	 * @param {string} property
+	 * @param {any} value
+	 */
+	async set_entity_effect_prop(
+		{ rootGetters, commit, dispatch },
+		{ campaignId, encounterId, entityId, effectKey, property, value }
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			await services.updateEncounter(
+				uid,
+				campaignId,
+				encounterId,
+				`/entities/${entityId}/effects/${effectKey}`,
+				{ [property]: value }
+			);
+			commit("SET_ENTITY_EFFECT_PROP", {
+				uid,
+				campaignId,
+				encounterId,
+				entityId,
+				effectKey,
+				property,
+				value,
+			});
+		}
+	},
+
+	/**
+	 * Deletes the legacy conditions map of an entity, once it has been converted to effects
+	 *
+	 * @param {string} campaignId
+	 * @param {string} encounterId
+	 * @param {string} entityId
+	 */
+	async delete_entity_conditions(
+		{ rootGetters, commit, dispatch },
+		{ campaignId, encounterId, entityId }
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (uid) {
+			const services = await dispatch("get_encounter_services");
+			await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}`, {
+				conditions: null,
+			});
+			commit("DELETE_ENTITY_CONDITIONS", { uid, campaignId, encounterId, entityId });
 		}
 	},
 
@@ -870,6 +915,7 @@ const encounter_actions = {
 						delete entity.hidden;
 						delete entity.reminders;
 						delete entity.conditions;
+						delete entity.effects;
 
 						if (entity.entityType === "npc") {
 							entity.curHp = entity.maxHp;
@@ -1264,20 +1310,33 @@ const encounter_mutations = {
 			});
 		}
 	},
-	SET_ENTITY_CONDITION(state, { uid, campaignId, encounterId, entityId, condition, value }) {
-		if (state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions) {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions,
-				condition,
-				value
-			);
+	DELETE_ENTITY_CONDITIONS(state, { uid, campaignId, encounterId, entityId }) {
+		const entity =
+			state.cached_encounters[uid]?.[campaignId]?.[encounterId]?.entities?.[entityId];
+		if (entity) Vue.delete(entity, "conditions");
+	},
+	SET_ENTITY_EFFECT(state, { uid, campaignId, encounterId, entityId, effectKey, value }) {
+		const entity =
+			state.cached_encounters[uid]?.[campaignId]?.[encounterId]?.entities?.[entityId];
+		if (!entity) return;
+
+		if (value === null) {
+			if (entity.effects) Vue.delete(entity.effects, effectKey);
+		} else if (entity.effects) {
+			Vue.set(entity.effects, effectKey, value);
 		} else {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entityId],
-				"conditions",
-				{ [condition]: value }
-			);
+			Vue.set(entity, "effects", { [effectKey]: value });
 		}
+	},
+	SET_ENTITY_EFFECT_PROP(
+		state,
+		{ uid, campaignId, encounterId, entityId, effectKey, property, value }
+	) {
+		const effect =
+			state.cached_encounters[uid]?.[campaignId]?.[encounterId]?.entities?.[entityId]?.effects?.[
+				effectKey
+			];
+		if (effect) Vue.set(effect, property, value);
 	},
 	SET_XP_VALUE(state, { uid, campaignId, encounterId, type, value }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].xp) {

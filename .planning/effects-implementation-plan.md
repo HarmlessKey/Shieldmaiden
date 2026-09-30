@@ -155,7 +155,16 @@ active-effects lifecycle end-to-end. Step 2 covers everything needed to apply ef
 conditions, show them, fire triggers, tick durations, and replace the legacy conditions
 UI. Applying the mechanical bonuses (stat modifiers, DoT rolls, etc.) is step 3.
 
-### 2a. Effects drawer
+### 2a. Effects drawer (done — archived as effects-2a-effects-drawer, 2026-09-29)
+*As built:* spec `openspec/specs/effects-drawer`. Helpers in `src/utils/effectFunctions.js`
+(`getSrdDefinitions`, `getRequiredChoices`, `buildEffectInstance`, `generateEffectKey`);
+`runEncounter` `apply_effect` / `remove_effect` keep instances in memory only. The drawer
+opens from an Effects option (hotkey `f`) next to Conditions. `caster_key` is the entity
+whose turn it is (computed like `RunEncounter._active[turn]`, only when round > 0), not
+the `actor` getter. The demo encounter's edition is now `"5.5e"` (was `"2024"`). Follow-up:
+"+ opens the application popover, shift+click applies until removed (archived as
+effects-2a1-apply-popover, 2026-09-30)".
+
 Create `src/components/drawers/encounter/Effects.vue` - the UI from which a DM applies
 an effect or condition to one or more targeted entities, modelled on the existing
 Reminders drawer:
@@ -181,20 +190,37 @@ Reminders drawer:
 - Wires into the existing drawer system (`setDrawer` action,
   `src/components/drawers/encounter/` directory).
 
-### 2b. Firebase write - apply and remove effects
-Write active effect instances to Firestore, mirroring the HP storage split:
+### 2b. Firebase write - apply and remove effects (done — archived as effects-2b-persist-effects, 2026-09-29)
+*As built:* spec `openspec/specs/effects-instance-storage`. Writes happen before the
+tracker updates. A failed write is logged and leaves that target unchanged. Stored
+instances are loaded raw in `add_entity` (2e adds resolution there). Encounter reset
+clears NPC effects. Rules blocks are live on the **develop** database only: upload them
+to production before releasing.
 
-- **NPCs**: `users/{uid}/campaigns/{campaignId}/encounters/{encounterId}/entities/{entityId}/effects/{effectId}`
+Write active effect instances to the Realtime Database, mirroring the HP storage split:
+
+- **NPCs**: `encounters/{uid}/{campaignId}/{encounterId}/entities/{entityId}/effects/{effectId}`
   via a new `set_entity_effect` action (analogous to `set_entity_prop` used for HP).
-  Check whether Firebase Security Rules for the encounter path already allow writing
-  arbitrary sub-keys on entities; add a rule for `/effects/**` if needed.
-- **Players / companions**: `users/{uid}/campaigns/{campaignId}/{players|companions}/{entityId}/effects/{effectId}`
+  Encounter entities have no `$other` rule, so writes pass today; an `effects` rule block
+  validates them.
+- **Players / companions**: `campaigns/{uid}/{campaignId}/{players|companions}/{entityId}/effects/{effectId}`
   via a new action in `campaigns.js` (analogous to `update_campaign_entity` used for HP).
+  These nodes end in `$other: false`, so the `effects` rule block is required.
 - Remove: delete the effect key at the same path.
+- The writes go inside the `runEncounter` `apply_effect` / `remove_effect` actions from 2a,
+  at their `// 2b: persist here` markers (already behind the `!demo && !test` guard). The
+  effect key is generated there with `generateEffectKey`.
 - Effect ID: generate a short unique key at apply-time (same pattern used for reminder
   keys or Firebase `.push()` keys).
 
-### 2c. Duration is application-time, not part of the effect definition
+### 2c. Duration is application-time, not part of the effect definition (done — delivered by 1b, 2a and 2b, 2026-09-29)
+*As built:* a design rule, not a change of its own. 1b removed duration fields from the
+SRD definitions (the `effects-srd-data` spec forbids them and the validator checks it).
+2a captures the duration in the drawer, defaulting to `cancelled`, and 2b saves it on the
+instance. Still open, in other steps: `hk-effects-form.vue` still asks for
+`duration_type` / `duration_value` (removed in step 4), and the legacy `duration_type`,
+`duration_value` and `cancel_trigger` properties remain on the schema root until the form
+stops writing them. `cancelable` is used from 2f.
 How long an effect lasts is determined by whatever applies it (a spell, an action, the
 DM). Conditions (Blinded, Stunned, etc.) have no inherent duration, and "Burning" isn't a
 thing that "normally lasts 1 minute" — the spell that applies it defines that. So
@@ -207,7 +233,16 @@ durations don't belong on the effect definition at all.
   No "default + override" concept needed. A condition applied from the drawer without a
   duration defaults to `type: "cancelled"` (until removed).
 
-### 2d. Active effect instance shape
+### 2d. Active effect instance shape (done — archived as effects-2e-resolve-definitions, 2026-09-29)
+*As built:* the instance shape was built in 2a and saved in 2b. The runtime half was
+delivered with 2e, but **not** by attaching `sub_effects` onto the in-memory instance as
+described below. Instance objects are shared with the cached encounter and campaign, and
+whole-encounter writes (reset, encounter builder) would carry resolved fields into the
+database, where the rules reject them. Resolved definitions live in
+`runEncounter.effect_definitions`, keyed `source:source_key`, and are read through the
+`entity_effects(key)` / `effect_definition(instance)` getters. Spec:
+`openspec/specs/effects-runtime-resolution`. The campaign edition-change warning below is
+still open (consider it with 2f/2i).
 An active effect instance, as **persisted** (Firestore), is a small reference to an
 effect definition plus instance metadata - not a full copy:
 
@@ -262,7 +297,7 @@ already extended into the encounter on initialization:
   retroactively affect a running encounter.
 
 NPC "Aatrox" (entity key `npc_1`) is Hexed by a player, is Burning from a prior hit, and
-was knocked Prone. Stored at `users/{uid}/campaigns/{campaignId}/encounters/{encounterId}`
+was knocked Prone. Stored at `encounters/{uid}/{campaignId}/{encounterId}`
 under `entities.npc_1.effects`:
 
 ```json
@@ -298,7 +333,7 @@ under `entities.npc_1.effects`:
 ```
 
 Player "Lyra" (entity key `player_1`) is concentrating on Hex. Stored at
-`users/{uid}/campaigns/{campaignId}` under `players.player_1.effects` (persists across
+`campaigns/{uid}/{campaignId}` under `players.player_1.effects` (persists across
 encounters, same as `curHp`):
 
 ```json
@@ -318,7 +353,13 @@ encounters, same as `curHp`):
 `caster_key`), so cancelling `eff_5c10` (Concentration ends) cascades to remove
 `eff_8f3a` - per the 2h cascade rule.
 
-### 2e. Extend encounter init to resolve sub_effects
+### 2e. Extend encounter init to resolve sub_effects (done — archived as effects-2e-resolve-definitions, 2026-09-29)
+*As built:* `findSrdDefinition`, `normalizeDefinition` (legacy custom `subeffects` /
+`subtype`) and `resolveDefinition` (`includes` flattening with `from` tags, each
+definition included once) are in `src/utils/effectFunctions.js`. The
+`resolve_effect_definitions` action runs at the end of `init_Encounter` and after each
+successful `apply_effect`. Unresolved definitions log one warning per encounter. See 2d
+for where the result lives.
 In the existing entity-init loop in `src/store/modules/runEncounter.js` (the pass that
 fetches each entity's full object and merges it into encounter state), add a second pass
 over each entity's `effects` map:
@@ -340,7 +381,14 @@ over each entity's `effects` map:
 - When a new effect is applied mid-encounter (via the drawer), run the same single
   fetch+merge immediately after persisting the reference.
 
-### 2f. Show active effects on combatant
+### 2f. Show active effects on combatant (done — archived as effects-2f-show-active-effects, 2026-09-29)
+*As built:* spec `openspec/specs/effects-display`. Effect chips come after the legacy
+chips in `combat/entities/effects` (new `effects` flag; no flag shows all kinds). The chip
+list computed was renamed `effects` → `items` because of the prop. The badge shows the
+Exhaustion level or `rounds_remaining`, and the tooltip uses `describeDuration`. Clicking a
+chip opens `drawers/encounter/effects/ActiveEffect.vue`, which shows the duration, caster,
+choices, repeat save and details (with "from" labels), the Exhaustion level table, and
+Remove (hidden for `cancelable: false`). The player live view stays for 2i.
 Update `src/components/combat/entities/effects/index.vue` (and `Effect.vue`) to render
 `entity.effects` from runtime state:
 
@@ -351,7 +399,20 @@ Update `src/components/combat/entities/effects/index.vue` (and `Effect.vue`) to 
 - Clicking an effect opens a detail view or tooltip showing its description and
   `sub_effects`.
 
-### 2g. Trigger system
+### 2g. Trigger system (done — archived as effects-2g-trigger-dispatcher, 2026-09-30)
+*As built:* spec `openspec/specs/effects-triggers`. `runEncounter/fire_trigger` uses
+`matchTriggers` (in `effectFunctions.js`) and queues prompts that
+`EffectTriggerNotifier.vue` (mounted in `RunEncounter.vue`) shows with Details / Dismiss.
+Nothing is automated.
+- Turn triggers fire from `set_turn` only when combat moves forward (`turn_order` getter,
+  `turn_entity` for the outgoing entity).
+- HP triggers fire from `HpManipulations`, and hit/crit/save triggers from
+  `hk-single-roll` apply.
+- `on_check` fires from `hk-roll` checks on the card, the targeted panel and the legacy
+  `ViewEntity`.
+- `on_apply` and `on_condition_applied` fire from `apply_effect`.
+- **Not built:** `short_rest` / `long_rest` (no rest feature exists; `TargetMenu.vue` turned
+  out to be unused), and save/check *modifiers*, which are step 3, not triggers.
 Implement a central trigger dispatcher in `runEncounter.js` / Vuex that fires named
 trigger events during combat. For each fired trigger, collect all active effects on all
 entities whose `sub_effects` contain a matching `trigger` field, and queue them for
@@ -377,6 +438,17 @@ The turn-change dispatch sequence:
 With ~10 entities and a handful of effects each, this scan is trivially fast.
 `caster_key` is also the anchor for duration expiry (2h): `duration.type: "next_turn"`
 and `"time"` use `caster_key` to identify whose turn tick to watch.
+
+**Caster not in the encounter (raised in 2b, decided and built in 2g):** the fallback
+below is implemented in `matchTriggers`. Player and companion
+effects live on the campaign and carry over between encounters, but their `caster_key`
+may point to an entity that isn't in the current encounter. NPC keys are new in every
+encounter, so an NPC caster is never found again. Player keys are stable, so a player
+caster is found when present. With the caster absent, `start_turn_caster` /
+`end_turn_caster` never fire for that effect. Rule: when `caster_key` doesn't
+match an entity in the running encounter, the dispatcher fires caster-anchored triggers
+on the target's own turn instead (`start_turn_caster` → `start_turn_target`,
+`end_turn_caster` → `end_turn_target`). The duration side is in 2h.
 
 Triggers to implement first, sourced from the schema and existing reminder logic. The
 full v2 vocabulary (`$defs/trigger`) adds `on_apply`, `on_expire`, `damage_dealt`,
@@ -409,7 +481,43 @@ full v2 vocabulary (`$defs/trigger`) adds `on_apply`, `on_expire`, `damage_dealt
 The existing reminder triggers (`damage_taken`, turn-change hooks in `runEncounter.js`)
 are the starting point - extend rather than replace.
 
-### 2h. Duration ticking and expiry
+### 2h. Duration ticking and expiry (split into 2h1 and 2h2)
+**2h1 — timing, cancel triggers, end conditions, cascade, missing caster (done — archived as
+effects-2h1-duration-expiry, 2026-09-30).** Spec `openspec/specs/effects-durations`.
+- `durationActions` / `endsWhenExpiries` / `cascadeTargets` / `carriedOverReview` /
+  `hasCondition` / `evaluateConditionSet` live in `effectFunctions.js`. `fire_trigger`
+  applies them. Ticks use `set_effect_prop`, and ends go through `remove_effect` with a
+  `reason`, which saves, announces and cascades.
+- Automatic ends are removed right away, with a short notice. Hand removals only announce
+  their cascade.
+- The drawer offers "Ends with <caster>'s Concentration", which sets `concentration_id`.
+- **Assumption for steps 6–7:** `caster_key` means "the entity whose turn it was when the
+  effect was applied". The same-turn skip for `next_turn` / `edge: "end"` relies on it.
+  An out-of-turn applier (a reaction) needs a separate `applied_turn` field.
+- **Known issue (2026-09-30): going back a turn desyncs timed durations.**
+  `rounds_remaining` is ticked at the end of the anchor's turn and saved, and going back
+  a turn undoes nothing (by design, spec "Going back a turn undoes nothing"). After going
+  back and forward again, a timed effect has been ticked twice for the same turn. Expired
+  or cascaded effects stay removed.
+  - Options considered:
+    - *Derive* the remaining rounds from `applied_round`. Rejected for now: it needs an
+      `applied_turn` field (schema + rules), breaks on turn-order changes, and breaks
+      carry-over between encounters, where round numbers restart.
+    - *Undo the tick* on previous turn: re-opening an entity's turn gives +1 round to the
+      timed effects anchored to it, capped at the full duration. A small follow-up change
+      if it matters in play.
+- Not in 2h1: `ends_when` checks that need distance, sight or senses, and expiry for
+  `rest` / `dawn` / `trigger` / `special`.
+
+**2h2 — repeat saves, escape, on_expire (done — archived as effects-2h2-repeat-saves,
+2026-09-30).** The `duration.save` bullets below (prompts,
+`on_fail`, `advantage_on_triggers`, `costs_action`, counters and `escalate`,
+`auto_success_after`), `duration.escape`, `duration.on_expire`, and expiry for
+`save_ends`. Spec `openspec/specs/effects-durations` (and `effects-drawer` for the form).
+- `resolveRepeatSave` / `escalationInstance` / `onExpireLines` live in `effectFunctions.js`.
+  The store actions are `resolve_repeat_save` and `escape_effect`. Rolls use the
+  `effectRolls` mixin.
+
 On each turn change (and on other relevant triggers), tick down durations and expire
 effects whose time has run out. Every field below lives in the instance's `duration`
 object (`$defs/duration`). Parts combine: a duration can have a `type` plus
@@ -454,8 +562,36 @@ object (`$defs/duration`). Parts combine: a duration can have a `type` plus
   entity whose `concentration_id` matches it. The same cascade applies to `parent_id`.
 - `type: "cancelled"`: no automatic expiry - only removed manually.
 
-### 2i. Replace the legacy conditions UI
+**Caster not in the encounter (raised in 2b; triggers decided in 2g; points 1–3 done in
+2h1).** All three points below are built. The fallback also covers an instance with no
+caster at all. Keep in the review clears `caster_key` / `concentration_id`, so the effect
+runs on its holder's turns and isn't reviewed again. Without its
+caster, a carried-over timed effect would never tick down, a caster-anchored
+`next_turn` would never expire, and the `concentration_id` cascade breaks when the
+Concentration instance lived on an NPC of an earlier encounter. Built:
+1. **Fallback anchor**: if `caster_key` isn't in the running encounter, treat
+   caster-anchored timing as target-anchored. `time` ticks on `end_turn_target`, and
+   `next_turn` with `anchor: "caster"` expires on the target's `{edge}` turn. No effect
+   gets stuck.
+2. **Review on encounter init**: list carried-over instances whose duration is not
+   `cancelled` and whose caster is absent (including a `concentration_id` that points to
+   no loaded instance), and let the DM keep or remove each one. This matches the table:
+   the DM decides whether Bless is still running.
+3. **Denormalize the caster's name**: store `caster_name` on the instance at apply time,
+   so the UI can show "from Goblin (not in this encounter)" without a lookup. This needs
+   `caster_name` in `$defs/active_instance`, in the Firebase rules `effects` blocks, and
+   in `buildEffectInstance`.
+
+### 2i. Replace the legacy conditions UI (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
 Once 2a–2h are stable, conditions run only through the effects model:
+
+**As built.** Specs: `effects-drawer`, `effects-display`, `effects-instance-storage` and the
+new `effects-player-view`.
+- Legacy maps are converted when an encounter loads (`convert_legacy_conditions`).
+- The Conditions option opens the Effects drawer in conditions mode, and the Effects option
+  no longer lists conditions.
+- The live view shows all effects under the "Conditions and effects" setting.
+- The database rules still accept a `conditions` node, which can go in a later cleanup.
 
 - The existing `src/components/drawers/encounter/Conditions.vue` (and `Condition.vue`)
   drawer is removed and replaced by `<Effects mode="conditions" />` opened from the same
@@ -496,6 +632,13 @@ other effect.
 - **`auto_fail` / `auto_success`**: at save/check resolution, short-circuit based on
   active effects (e.g. Paralyzed/Stunned Str/Dex saves, Ring of Evasion, Legendary
   Resistance).
+- **Roll sites for save/check modifiers** (found in 2g): ability checks, saves and skills
+  are rolled through `hk-roll` in `Card/CardDetails.vue`, `Card/CardSkills.vue`,
+  `Targeted.vue` (MOD/SAVE per targeted entity) and the legacy `ViewEntity.vue`. Target
+  saves against a DC are rolled in `hk-single-roll.vue`. These are the places where
+  `auto_fail`, `advantage` / `disadvantage` on `save` / `d20_test` and the 2024 Exhaustion
+  penalty have to change the roll. In 2g they are intentionally not triggers (they are
+  always-on modifiers, not events).
 - **`restrict`**: disable relevant action buttons (attack, reaction, movement, speech)
   in the combat UI based on active effects (Incapacitated and everything that includes
   it).
@@ -518,7 +661,10 @@ other effect.
   type, plus which fields each type shows (`value`/`roll`/`scaling`, `perspective`,
   filters, `effect` ref, `save`, `consume`…). The form reads these constants, not the
   schema, so they change together. Keep the constants in sync with the schema enums
-  (a small check that every schema enum value has a constants entry is enough).
+  (a small check that every schema enum value has a constants entry is enough). The same
+  check should cover the Firebase rules: the `effects` blocks in `firebase-rules.json`
+  (encounter entities, campaign players and companions, added in 2b) copy the
+  `$defs/duration.type` enum into a regex.
 - Remove the `duration_type`/`duration_value` fields from `hk-effects-form.vue` - the
   definition form no longer captures duration at all (2c). Duration is captured in the
   Effects drawer (2a) and on monster/spell action effect references (steps 6–7).
@@ -591,9 +737,9 @@ with "Failure:/Success:" text, see 0a) are the best candidates for an automated 
 0 (Concentration 2024 update, 5.5e monster re-scan — done, archived as effects-0-55e-alignment, 2026-09-29; 0b.2 is delivered by 2a/2e)
 1 (schema v2 — done)
 1b (SRD conditions data files: `url`s, fixes, Exhaustion leveling, includes — done, archived as effects-1b-srd-conditions-data, 2026-09-29)
-2a -> 2b -> 2d -> 2e -> 2f (drawer incl. conditions, Firebase writes, instance shape, init loop, display)
-2g -> 2h (trigger system + duration ticking, builds on 2f)
-2i (replace legacy conditions UI, once 2a–2h are stable)
+2a (done — archived as effects-2a-effects-drawer, 2026-09-29) -> 2b (done — archived as effects-2b-persist-effects, 2026-09-29) -> 2c (done — delivered by 1b, 2a and 2b, 2026-09-29) -> 2d (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2e (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2f (done — archived as effects-2f-show-active-effects, 2026-09-29) (drawer incl. conditions, Firebase writes, duration rule, instance shape, init loop, display)
+2g (done — archived as effects-2g-trigger-dispatcher, 2026-09-30) -> 2h1 (done — archived as effects-2h1-duration-expiry, 2026-09-30) -> 2h2 (done — archived as effects-2h2-repeat-saves, 2026-09-30) (trigger system + duration ticking, builds on 2f)
+2i (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
 3 (mechanical resolution: bonuses, DoT rolls, condition mechanics; retire reminders - builds on 2g trigger bus)
 4 (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven)
 5 (SRD effect data, grows alongside 3, 6 and 7)

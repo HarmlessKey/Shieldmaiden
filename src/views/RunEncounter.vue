@@ -180,6 +180,7 @@
 			</hk-card>
 		</q-dialog>
 		<q-resize-observer @resize="setSize" />
+		<EffectTriggerNotifier />
 	</q-no-ssr>
 	<q-no-ssr v-else class="combat-wrapper">
 		<hk-loader name="encounter" />
@@ -210,6 +211,7 @@ import Pane from "src/components/combat/Pane.vue";
 import Card from "src/components/combat/entities/Card";
 import Actor from "src/components/combat/actor";
 import Log from "src/components/combat/side/log";
+import EffectTriggerNotifier from "src/components/combat/EffectTriggerNotifier.vue";
 
 export default {
 	name: "RunEncounter",
@@ -233,6 +235,7 @@ export default {
 		Card,
 		Actor,
 		Log,
+		EffectTriggerNotifier,
 	},
 	mixins: [audio],
 	data() {

@@ -37,7 +37,7 @@
 					<BasicEntity :entity="current" />
 				</div>
 
-				<Conditions :entity="current" />
+				<Effects :entity="current" effects />
 				<Reminders :entity="current" />
 			</div>
 
@@ -56,7 +56,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Conditions from "src/components/combat/Conditions.vue";
+import Effects from "src/components/combat/entities/effects";
 import Reminders from "src/components/combat/Reminders.vue";
 import Actions from "src/components/combat/legacy/actions/Actions.vue";
 import { remindersMixin } from "src/mixins/reminders";
@@ -71,7 +71,7 @@ export default {
 	mixins: [remindersMixin, dice],
 	components: {
 		Actions,
-		Conditions,
+		Effects,
 		Reminders,
 		BasicEntity,
 		DeathSaves,

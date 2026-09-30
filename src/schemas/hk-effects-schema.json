@@ -530,6 +530,7 @@
 				"duration": { "$ref": "#/$defs/duration" },
 				"choices": { "type": "object", "additionalProperties": { "type": "string" } },
 				"caster_key": { "type": "string" },
+				"caster_name": { "type": "string", "maxLength": 200, "description": "Name of the caster when applied, shown when the caster isn't in the encounter." },
 				"applied_round": { "type": "integer", "minimum": 0 },
 				"rounds_remaining": { "type": "integer" },
 				"save_dc": { "type": "integer" },

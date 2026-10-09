@@ -2806,7 +2806,7 @@ export function damageModifiers({ entity, holderKey, entities = {}, definitionOf
 /**
  * Whether a damage type is one a modifier applies to (no damageTypes: any type)
  */
-function damageTypeMatches({ damageTypes, exceptTypes }, damageType) {
+export function damageTypeMatches({ damageTypes, exceptTypes }, damageType) {
 	if (damageTypes && !damageTypes.includes(damageType)) return false;
 	if (exceptTypes && exceptTypes.includes(damageType)) return false;
 	return true;
@@ -2823,7 +2823,8 @@ function damageTypeMatches({ damageTypes, exceptTypes }, damageType) {
  * @param {object} active { [toggleId]: rolled amount (reduce) or true (halve/negate) }
  * @param {object} save { ability, result: "save" | "fail" } of the target, if it saved
  * @param {function} defenseOf (damageType, part) => multiplier of the target's defenses
- * @returns {object} { parts, damage, healing, notes }
+ * @returns {object} { parts, damage, healing, notes }; a part names what the toggles did to it
+ *   (reduced, halved, negated) and whether it was absorbed
  */
 export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, save, defenseOf = () => 1 } = {}) {
 	const notes = [];
@@ -2849,7 +2850,8 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 	for (const toggle of modifiers.toggles || []) {
 		const value = active[toggle.id];
 		if (value === undefined || value === false) continue;
-		const matching = result.filter((part) => damageTypeMatches(toggle, part.damageType));
+		// A part without a damage type matches: the DM switched the toggle on
+		const matching = result.filter((part) => !part.damageType || damageTypeMatches(toggle, part.damageType));
 		if (!matching.length) continue;
 		if (toggle.kind === "reduce") {
 			// Subtracted from the matching parts in order, not below 0
@@ -2857,14 +2859,21 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 			for (const part of matching) {
 				const used = Math.min(left, part.amount);
 				part.amount -= used;
+				part.reduced = (part.reduced || 0) + used;
 				left -= used;
 			}
 			note(`${toggle.name}: −${Math.max(0, parseInt(value) || 0)}`);
 		} else if (toggle.kind === "halve") {
-			for (const part of matching) part.amount = Math.floor(part.amount / 2);
+			for (const part of matching) {
+				part.amount = Math.floor(part.amount / 2);
+				part.halved = true;
+			}
 			note(`${toggle.name}: halved`);
 		} else if (toggle.kind === "negate") {
-			for (const part of matching) part.amount = 0;
+			for (const part of matching) {
+				part.amount = 0;
+				part.negated = true;
+			}
 			note(`${toggle.name}: no damage`);
 		}
 	}
@@ -3071,7 +3080,14 @@ export function rollPlan(modifiers, { modifier = 0, advantage = {} } = {}) {
 	// For a roll's result the bonus dice are shown with their rolled values instead, and
 	// floors and rerolls only when they apply to the rolled die (rollD)
 	const roll_notes = [...before, ...after];
-	const changed = !!(flat || mods.dice?.length || mods.advantage?.length || mods.disadvantage?.length || auto);
+	const changed = !!(
+		flat ||
+		mods.dice?.length ||
+		mods.advantage?.length ||
+		mods.disadvantage?.length ||
+		auto ||
+		floorLines.length
+	);
 	return {
 		m: (parseInt(modifier) || 0) + flat,
 		flat,

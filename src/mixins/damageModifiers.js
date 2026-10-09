@@ -56,7 +56,9 @@ export const damageModifiersMixin = {
 								value: index,
 							})),
 						},
-						cancel: true,
+						// Quasar's dark dialogs default to amber
+						color: "primary",
+						cancel: { label: "Cancel", color: "neutral-5", unelevated: true, noCaps: true },
 						persistent: true,
 						ok: { label: "Apply", color: "primary", noCaps: true },
 						dark: this.$store.getters.theme === "dark",

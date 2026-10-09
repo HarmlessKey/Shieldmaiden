@@ -39,7 +39,9 @@ The sub-types SHALL be handled as follows:
 In the roll dialog, the tracker SHALL show a toggle for each of a target's reduce, halve and
 negate modifiers next to its damage. The toggle names the effect, what it does, its damage
 types, its condition and its frequency, for example "Resistance: −1d4 fire, once per turn".
-A toggle SHALL be off by default.
+A toggle SHALL be off by default. The roll dialog SHALL only show a toggle whose damage
+types match a damage type the roll deals. Damage without a type matches every toggle,
+so a roll without a damage type shows them all, and a switched-on toggle applies to it.
 - **reduce_damage**: switching it on rolls the reduction once: the `roll`, or the `value`,
   which can be a number or a formula over the holder's values. The rolled amount is shown.
   It is subtracted from the matching damage, not below 0.
@@ -47,6 +49,8 @@ A toggle SHALL be off by default.
 - **negate_damage**: the matching damage becomes 0.
 
 The order SHALL be: reductions, then halving, then resistance, vulnerability and immunity.
+Each damage roll's result in the roll dialog SHALL show what the toggles did to it, before
+its defenses ("(7) − 3 = 4 fire").
 Switching a toggle off restores the damage. Manual damage from the actor panel (including
 the top bar's apply button) and from the legacy actions panel SHALL offer the same toggles
 for each target before the damage is applied. They come in a dialog with a checkbox per
@@ -60,6 +64,14 @@ keeps the entered value. Nothing is asked when no toggle applies to the damage t
 #### Scenario: Off by default
 - **WHEN** the DM doesn't switch on the Resistance toggle
 - **THEN** the creature takes the full 7
+
+#### Scenario: Other damage types
+- **WHEN** the goblin's attack deals 7 slashing damage to that creature
+- **THEN** the roll dialog doesn't show the Resistance (fire) toggle
+
+#### Scenario: Manual damage without a type
+- **WHEN** the DM applies 8 manual damage without a type to that creature, checks Resistance and rolls a 2
+- **THEN** the creature takes 6 damage
 
 #### Scenario: Uncanny Dodge halves before resistance
 - **WHEN** a rogue with Uncanny Dodge and resistance to slashing is hit for 15 slashing, and the DM switches on Uncanny Dodge

@@ -12,7 +12,8 @@ to a d20 roll:
 With several floors, the highest SHALL count. The roll result SHALL name the effect and the
 change ("Reliable Talent: 7 → 10"). The floor is applied after Advantage or Disadvantage
 picks the die, and before bonuses are added. A natural 1 or 20 SHALL keep counting as the
-natural die that was rolled.
+natural die that was rolled. A value on the card or in the targeted panel that has a floor
+SHALL be marked as changed by effects, with the floor in its tooltip.
 
 #### Scenario: Reliable Talent
 - **WHEN** a creature with Reliable Talent rolls a Stealth check and the die shows 7
@@ -21,6 +22,10 @@ natural die that was rolled.
 #### Scenario: High roll unchanged
 - **WHEN** that creature's die shows 14
 - **THEN** the roll is unchanged and the floor isn't named
+
+#### Scenario: Marked on the card
+- **WHEN** the card of a creature with Reliable Talent is shown
+- **THEN** its skill modifiers are marked as changed, and the tooltip says "Reliable Talent: die at least 10"
 
 #### Scenario: Not for other rolls
 - **WHEN** that creature rolls a saving throw

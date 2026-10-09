@@ -72,7 +72,9 @@ export const restrictionsMixin = {
 						title: `${actorName} is restricted`,
 						message: `${lines.map(escapeHtml).join("<br />")}<br /><br />${okLabel}?`,
 						html: true,
-						cancel: true,
+						// Quasar's dark dialogs default to amber
+						color: "primary",
+						cancel: { label: "Cancel", color: "neutral-5", unelevated: true, noCaps: true },
 						persistent: true,
 						ok: { label: okLabel, color: "primary", noCaps: true },
 						dark: this.$store.getters.theme === "dark",

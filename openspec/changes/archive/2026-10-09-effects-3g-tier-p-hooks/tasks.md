@@ -53,7 +53,7 @@
 
 - [x] 5.1 Run `npm run lint` and verify there are no new errors
 - [x] 5.2 Run `openspec validate effects-3g-tier-p-hooks --strict` and verify it passes
-- [ ] 5.3 Ask the user to verify in the running app:
+- [x] 5.3 Ask the user to verify in the running app:
   - **Resistance (5.5e, fire):** a fire attack shows the toggle, off by default. Switching it on rolls 1d4 and lowers the damage; switching it off restores it.
   - **Manual fire damage** (actor panel, top bar button, legacy panel): applying asks "Damage modifiers" with a checkbox per toggle, unchecked. Checking Resistance rolls 1d4, lowers the damage and names it in a toast. Cancel applies nothing and keeps the value. Without matching toggles nothing is asked.
   - **Uncanny Dodge:** halves the damage before resistance
@@ -66,4 +66,17 @@
   - **Haste:** the details bar shows "Extra action" with the allowed actions
 
   Record the outcome here
-- [ ] 5.4 After archiving, mark 3g done in `.planning/effects-implementation-plan.md` (step 3 notes and the Suggested Order). Verify that the plan shows it.
+
+  Fixed during verification:
+  - The roll dialog showed every toggle for any damage roll. It now shows only toggles that match a damage type in the roll; a roll without a damage type still shows all of them.
+  - A switched-on toggle was ignored for damage without a type (manual damage without a type offers every toggle). `applyDamageModifiers` now applies it to untyped parts.
+  - The "Final result" line now shows what the toggles did (− reduction, / 2, no effect, absorbed) before the defenses.
+  - The "Damage modifiers" and "restricted" prompts used Quasar's amber color in dark mode. They now use primary, with a neutral Cancel button.
+  - A roll floor (Reliable Talent) now marks the value on the card as changed (`rollPlan` `changed`). Rerolls (Luck) still don't mark it.
+
+  Outcome (2026-10-09): the user verified every scenario above, with the fixes above. No other issues found.
+
+  Known gaps, not in this change:
+  - "Once per turn" isn't tracked (design Non-Goals).
+  - Reliable Talent applies to every skill, not only proficient ones. The data can't express that condition yet.
+- [x] 5.4 After archiving, mark 3g done in `.planning/effects-implementation-plan.md` (step 3 notes and the Suggested Order). Verify that the plan shows it.

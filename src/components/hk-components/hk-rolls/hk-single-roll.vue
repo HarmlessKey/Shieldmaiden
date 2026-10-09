@@ -337,6 +337,15 @@
 									>
 										{{ missSaveEffect(rolled.missSave, "calc") }}
 									</span>
+									<!-- What the switched-on damage modifier toggles did, before defenses -->
+									<template v-if="damagePart(action_index, rolled_index)">
+										<span v-if="damagePart(action_index, rolled_index).reduced">
+											− {{ damagePart(action_index, rolled_index).reduced }}</span
+										>
+										<span v-if="damagePart(action_index, rolled_index).halved"> / 2</span>
+										<span v-if="damagePart(action_index, rolled_index).negated"> no effect</span>
+										<span v-if="damagePart(action_index, rolled_index).absorbed"> absorbed</span>
+									</template>
 									<template v-if="resistances">
 										<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'v')"> * 2</span>
 										<span v-if="checkDefenses(rolled.damage_type, rolled.magical, 'r')"> / 2</span>
@@ -549,7 +558,7 @@ import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import { calc_mod } from "src/utils/generalFunctions";
 import { displayStats } from "src/utils/entityFunctions";
-import { rollPlan, applyDamageModifiers } from "src/utils/effectFunctions";
+import { rollPlan, applyDamageModifiers, damageTypeMatches } from "src/utils/effectFunctions";
 
 export default {
 	name: "hk-single-roll",
@@ -676,11 +685,17 @@ export default {
 			return this.$store.getters.damage_modifiers(key, this.roll.current?.key);
 		},
 		/**
-		 * Reduce / halve / negate toggles, when the roll deals damage
+		 * Reduce / halve / negate toggles that apply to a damage type the roll deals; a roll
+		 * without a damage type offers every toggle
 		 */
 		damageModifierToggles() {
-			if (!this.roll.actions.some((action) => action.type !== "healing")) return [];
-			return this.targetDamageModifiers?.toggles || [];
+			const damageTypes = this.roll.actions
+				.filter((action) => action.type !== "healing")
+				.flatMap((action) => action.rolls.map((rolled) => rolled.damage_type));
+			if (!damageTypes.length) return [];
+			return (this.targetDamageModifiers?.toggles || []).filter((toggle) =>
+				damageTypes.some((damageType) => !damageType || damageTypeMatches(toggle, damageType))
+			);
 		},
 	},
 	mounted() {
@@ -1105,11 +1120,17 @@ export default {
 				: toggle.value || 0;
 			this.$set(this.damageToggles, toggle.id, amount);
 		},
+		/**
+		 * A damage roll after the target's damage modifiers and defenses (damageResult)
+		 */
+		damagePart(action_index, rolled_index) {
+			if (this.roll.actions[action_index]?.type === "healing") return undefined;
+			return this.damageResult().parts.find(({ key }) => key === `${action_index}:${rolled_index}`);
+		},
 		totalRollValue(action, action_index, roll) {
 			// Damage: after the target's damage modifiers and defenses
 			if (action.type !== "healing") {
-				const rolled_index = action.rolls.indexOf(roll);
-				const part = this.damageResult().parts.find(({ key }) => key === `${action_index}:${rolled_index}`);
+				const part = this.damagePart(action_index, action.rolls.indexOf(roll));
 				if (part) return part.amount;
 			}
 			let total = parseInt(roll.rollResult.total) * this.missSaveFactor(action, action_index, roll);

@@ -828,7 +828,9 @@ Each sub-step is its own OpenSpec change:
 - **3f — moved to step 9** (2026-10-06): retiring the legacy reminders that effects
   replace is part of the encounter reminders rework.
 - **3g — tier-P hooks**: `reroll`, `damage_modifier`, `score_swap`, `grant_action`, and the
-  rest. (Proposed as effects-3g-tier-p-hooks, 2026-10-06.) Decided:
+  rest. **Done** — archived as
+  `openspec/changes/archive/2026-10-09-effects-3g-tier-p-hooks`. New spec
+  `effects-damage-modifiers`. Decided:
   - reduce / halve / negate are per-target toggles in the roll dialog and manual damage,
     off by default
   - drop to 1 (Death Ward, Undead Fortitude) is automatic with a notice; one with a save
@@ -841,6 +843,16 @@ Each sub-step is its own OpenSpec change:
   - the rest (`compel`, `deny`, `sense`…) are counted in the reminders chip
   - test effects: Death Ward, Uncanny Dodge, Evasion, Reliable Talent, Lucky/Luck, Undead
     Fortitude, Acid Absorption
+
+  Fixed during testing: the roll dialog showed toggles for every damage type, a switched-on
+  toggle was ignored for damage without a type, the result line didn't show the
+  reduction, the prompts were amber in dark mode, and roll floors didn't mark the card.
+
+  Not done, for later:
+  - `frequency` ("once per turn") isn't tracked
+  - Reliable Talent's proficiency requirement (the floor applies to every skill)
+  - rerolls don't mark values on the card
+  - trait-like test effects move to special abilities (6b, "Generic effects")
 
 ### Manual bonuses for later values
 Every value that effects can add a flat bonus to should also accept manual bonuses from the
@@ -937,6 +949,35 @@ other effect.
   - user-authored reminders (`src/views/UserContent/Reminders/`)
   - the premade reminders that duplicate an effect, such as "Reaction used"
 
+## Generic effects (direction for steps 4–7)
+Decided 2026-10-09. Effect definitions should be generic building blocks. The details
+(damage type, ability, amount…) are set when the effect is linked to an action or spell, or
+applied by hand in an encounter. They shouldn't be baked into a separate definition.
+- **One definition per mechanic, not per creature or spell.** There should be one
+  "Absorption" effect, not "Acid Absorption". When it's linked to a monster's action or
+  applied by hand, acid is chosen. The same goes for damage resistance or reduction (the
+  Resistance spell, Stoneskin) and similar effects with one parameter.
+- **Choices are set at two moments:**
+  - **When linking** to an action, spell or trait (steps 6–7): the author can fix a choice.
+    A clay golem's Absorption is acid.
+  - **When applying**: a choice the link leaves open is asked when the effect is applied,
+    in the drawer or from the roll. The Resistance spell lets the caster pick the damage
+    type, so the spell doesn't define it; it's chosen when the spell's effect is applied.
+  - An unset choice is always asked. A fixed one is not.
+- **Already in place:** `$defs/application.choices`, `active_instance.choices`, and
+  sub-effects that read a choice with `choice` (5.5e Resistance's `choice: "damage_type"`).
+  `damageModifiers` already narrows a toggle to the chosen type. What's missing:
+  - the schema can't mark a choice as fixed by the link vs. open until applied
+  - the definitions are still one per case (`Acid Absorption`, and Stoneskin with fixed
+    types)
+  - forms where an action or spell link sets or leaves open the choices
+- **Where it lands:**
+  - 4 (form): define choices on a generic definition.
+  - 5 (SRD data): collapse per-case definitions into generic ones with choices. Keep the
+    existing `url`s working (alias or migrate the instances in Firestore).
+  - 6–7 (actions): set or leave open the choices on each link, and ask for the open ones
+    when the effect is applied.
+
 ## 4. Effects form and constants
 - Regenerate `src/utils/effectsConstants.js` from the v2 schema as the first task of this
   step: labels and descriptions for every sub-effect type, subtype, trigger and duration
@@ -980,6 +1021,38 @@ other effect.
 - Existing monster data (old `rolls`/`type` shape) must keep working unchanged.
 - Develop and test against user NPCs (Firebase, user content) and local fixtures. Adding
   effects to SRD monsters served by the HK API is step 8.
+
+## 6b. Trait effects: effects on NPC special abilities
+Decided 2026-10-09. Some effects aren't applied with a duration. They're part of what a
+creature is, like a clay golem's Acid Absorption, Undead Fortitude or Magic Resistance.
+In 3g the DM applies these through the Effects drawer, so they show up in the creature's
+effects and conditions as if they were cast on it. They belong on the ability instead.
+- **Data:** a `special_abilities` entry can carry `effects`, a list of effect links (the
+  effect and its choices, no duration). They follow "Generic effects": the golem's
+  Absorption is linked with acid fixed. Extend `hk-npc-schema.json` and the NPC form
+  (with step 6's action effects).
+- **Combat tracker:** trait effects work like applied effects (triggers, damage modifiers,
+  roll modifiers, restrictions, drop to 1), but they aren't stored in `entity.effects`.
+  - The engine loops over `entity.effects` in many places (`effectFunctions.js`:
+    `activeDefinitions`, the trigger, modifier and defense collectors). Route them all
+    through one helper that yields the applied instances plus the trait instances. Derive
+    the trait instances from the NPC's abilities: `source: "trait"`, keyed by the ability.
+  - They have no duration, don't tick, don't expire and can't be removed in the drawer.
+    A `condition` on the effect still switches them off (Evasion while Incapacitated).
+- **Display:** not in the effects or conditions list on the card, the drawer or the live
+  view. The special ability shows that it's automated. Prompts and toasts name the ability
+  ("Undead Fortitude"), as they already do.
+- **Open questions:**
+  - Where per-encounter use state lives for traits that are consumed or limited
+    (Legendary Resistance 3/day). Maybe reuse the ability's `limit` / `limit_type` counters
+    instead of `consume`.
+  - Player and companion features (Evasion, Uncanny Dodge, Reliable Talent, Lucky) are the
+    same kind of always-on effect. Decide whether they get trait effects too, and where
+    they're stored on the character.
+- **Cleanup:** the 3g test effects that are really traits (Acid Absorption, Undead
+  Fortitude, Evasion, Uncanny Dodge, Reliable Talent, Lucky) move to trait links when this
+  lands. They become generic definitions under "Generic effects" (step 5).
+- **8c:** the SRD monster backfill adds trait effects as well as action effects.
 
 ## 7. Update action rolls to include effects
 - Update `src/mixins/runEncounter.js` and `RollActions.vue` roll execution so that
@@ -1044,10 +1117,10 @@ Ideas to work out when it's proposed:
 2a (done — archived as effects-2a-effects-drawer, 2026-09-29) -> 2b (done — archived as effects-2b-persist-effects, 2026-09-29) -> 2c (done — delivered by 1b, 2a and 2b, 2026-09-29) -> 2d (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2e (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2f (done — archived as effects-2f-show-active-effects, 2026-09-29) (drawer incl. conditions, Firebase writes, duration rule, instance shape, init loop, display)
 2g (done — archived as effects-2g-trigger-dispatcher, 2026-09-30) -> 2h1 (done — archived as effects-2h1-duration-expiry, 2026-09-30) -> 2h2 (done — archived as effects-2h2-repeat-saves, 2026-09-30) (trigger system + duration ticking, builds on 2f)
 2i (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
-3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (3f moved to 9)
-4 (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven)
+3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) (3f moved to 9)
+4 (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (SRD effect data, grows alongside 3, 6 and 7)
-6 -> 7 (monster actions + action rolls, additive on top of step 3)
+6 -> 6b -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
 8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
 

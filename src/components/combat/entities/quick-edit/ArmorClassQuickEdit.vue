@@ -1,22 +1,8 @@
 <template>
 	<quick-edit ref="popup" :entity="entity" v-slot="{ editable_entity }">
-		<hk-input
-			v-model="editable_entity.ac_bonus"
-			dense
-			label="AC bonus"
-			type="number"
-			@keydown.enter="setAC('ac_bonus', editable_entity.ac_bonus)"
-		>
-			<q-icon slot="prepend" size="xs" name="fas fa-shield-check" />
-			<q-btn
-				slot="after"
-				color="primary"
-				label="Save"
-				no-caps
-				v-close-popup
-				@click.stop="setAC('ac_bonus', editable_entity.ac_bonus)"
-			/>
-		</hk-input>
+		<button class="btn btn-sm btn-block bg-neutral-5" @click.stop="openBonuses('ac')">
+			<i aria-hidden="true" class="fas fa-shield-check mr-1" /> AC bonuses
+		</button>
 		<hk-input
 			v-model="editable_entity.ac"
 			class="mt-2"
@@ -55,7 +41,15 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["edit_entity_prop"]),
+		...mapActions(["edit_entity_prop", "setDrawer"]),
+		openBonuses(stat) {
+			this.$refs.popup.hide();
+			this.setDrawer({
+				show: true,
+				type: "drawers/encounter/StatBonuses",
+				data: { entityKey: this.entity.key, stat },
+			});
+		},
 		setAC(prop, value) {
 			if (prop === "ac" && value === undefined) {
 				return;

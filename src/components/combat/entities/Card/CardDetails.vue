@@ -21,12 +21,20 @@
 			<template v-for="(stat, key) of stats">
 				<div v-if="displayStats(full_entity)[key] !== undefined" :key="key">
 					<div class="truncate label value__label">{{ stat.label }}</div>
-					<div class="value">
+					<div
+						class="value"
+						:class="{ clickable: in_encounter }"
+						@click="in_encounter && openBonuses(stat.bonus)"
+					>
 						<hk-icon :icon="stat.icon" class="mr-1" />
 						<template v-if="key === 'maxHp'">
 							<hk-animated-integer :value="displayStats(full_entity).curHp" class="ml-1" /> /
 						</template>
-						{{ displayStats(full_entity)[key] }}
+						<EffectModifiedValue
+							:entity="full_entity"
+							:field="key"
+							:value="displayStats(full_entity)[key]"
+						/>
 					</div>
 				</div>
 			</template>
@@ -44,7 +52,17 @@
 				</div>
 				<div :key="ability" class="ability">
 					<div class="label">{{ ability.substring(0, 3) }}</div>
-					<div class="ability__score">{{ full_entity[ability] ?? 10 }}</div>
+					<div
+						class="ability__score"
+						:class="{ clickable: in_encounter }"
+						@click="in_encounter && openBonuses([ability, `check_${ability}`, `save_${ability}`])"
+					>
+						<EffectModifiedValue
+							:entity="full_entity"
+							:field="ability"
+							:value="full_entity[ability] ?? 10"
+						/>
+					</div>
 					<hk-roll
 						v-for="type in ['mod', 'save']"
 						:key="type"
@@ -53,8 +71,10 @@
 						:roll="{
 							d: 20,
 							n: 1,
-							m: modifier(ability, type),
-							title: `${ability.capitalize()} check`,
+							m: ability_plans[ability][type].m,
+							advantage: ability_plans[ability][type].advantage,
+							plan: ability_plans[ability][type],
+							title: `${ability.capitalize()} ${type === 'save' ? 'save' : 'check'}`,
 							entity_name: full_entity.name.capitalizeEach(),
 							notify: true,
 							trigger:
@@ -69,9 +89,12 @@
 								: null
 						"
 					>
-						{{
-							modifier(ability, type) > 0 ? `+${modifier(ability, type)}` : modifier(ability, type)
-						}}
+						<EffectModifiedValue
+							:notes="ability_plans[ability][type].notes"
+							:changed="ability_plans[ability][type].changed"
+							:advantage="ability_plans[ability][type].advantage"
+							:value="signed(ability_plans[ability][type].m)"
+						/>
 					</hk-roll>
 				</div>
 			</template>
@@ -110,25 +133,21 @@
 				</span>
 				<br />
 			</template>
-			<template
-				v-if="full_entity.damage_vulnerabilities && full_entity.damage_vulnerabilities.length > 0"
-			>
-				<strong class="neutral-2">Damage vulnerabilities</strong>
-				{{ defensesDisplay(full_entity.damage_vulnerabilities).join(", ") }}<br />
-			</template>
-			<template v-if="full_entity.damage_resistances && full_entity.damage_resistances.length > 0">
-				<strong class="neutral-2">Damage resistances</strong>
-				{{ defensesDisplay(full_entity.damage_resistances).join(", ") }}<br />
-			</template>
-			<template v-if="full_entity.damage_immunities && full_entity.damage_immunities.length > 0">
-				<strong class="neutral-2">Damage immunities</strong>
-				{{ defensesDisplay(full_entity.damage_immunities).join(", ") }}<br />
-			</template>
-			<template
-				v-if="full_entity.condition_immunities && full_entity.condition_immunities.length > 0"
-			>
-				<strong class="neutral-2">Condition immunities</strong>
-				{{ full_entity.condition_immunities.join(", ") }}<br />
+			<!-- Defenses, with the ones from effects marked (Petrified, Stoneskin) -->
+			<template v-for="list in defense_lists">
+				<template v-if="list.items.length">
+					<strong :key="`${list.field}-label`" class="neutral-2">{{ list.label }}</strong>
+					<span
+						v-for="(item, i) in list.items"
+						:key="`${list.field}-${item.value}`"
+						class="effect-modified-value"
+						:class="{ modified: item.sources }"
+						>{{ item.text }}<q-tooltip v-if="item.sources" anchor="top middle" self="center middle">{{
+							item.sources.join(", ")
+						}}</q-tooltip
+						><template v-if="i < list.items.length - 1">, </template></span
+					><br :key="`${list.field}-br`" />
+				</template>
 			</template>
 
 			<strong class="neutral-2">Senses</strong>
@@ -138,7 +157,13 @@
 					}}{{ sense.comments ? `${sense.comments}` : `` }},
 				</span>
 			</template>
-			passive perception {{ passivePerception() }}<br />
+			passive perception
+			<EffectModifiedValue
+				:entity="full_entity"
+				field="passive_perception"
+				bonus="passive_perception"
+				:value="full_entity.passive_perception ?? passivePerception()"
+			/><br />
 
 			<template v-if="full_entity.languages && full_entity.languages.length > 0"
 				><strong class="neutral-2">Languages</strong> {{ full_entity.languages.join(", ") }}<br
@@ -151,8 +176,18 @@
 			</template>
 		</p>
 
-		<h3 class="label">Skills</h3>
-		<CardSkills :entity="full_entity" :skill-modifier="skillModifier" />
+		<h3 class="label card-details__skills-header">
+			Skills
+			<button
+				v-if="in_encounter"
+				class="btn btn-sm bg-neutral-5"
+				@click="openBonuses(roll_bonus_stats)"
+			>
+				<i aria-hidden="true" class="fas fa-plus" />
+				<q-tooltip anchor="top middle" self="center middle">Roll bonuses</q-tooltip>
+			</button>
+		</h3>
+		<CardSkills :entity="full_entity" :skill-modifier="skillModifier" :skill-plans="skill_plans" />
 	</div>
 </template>
 
@@ -162,11 +197,13 @@ import { abilities, skills } from "src/utils/generalConstants";
 import { calc_mod, calc_skill_mod } from "src/utils/generalFunctions";
 import { monsterMixin } from "src/mixins/monster.js";
 import { experience } from "src/mixins/experience";
-import { displayStats } from "src/utils/entityFunctions";
+import { displayStats, skillBonusKey } from "src/utils/entityFunctions";
+import { rollPlan } from "src/utils/effectFunctions";
 import Effects from "../effects";
 import Avatar from "../Avatar.vue";
 import Name from "../Name.vue";
 import CardSkills from "./CardSkills.vue";
+import EffectModifiedValue from "../EffectModifiedValue.vue";
 
 export default {
 	name: "CardDetails",
@@ -176,6 +213,7 @@ export default {
 		Avatar,
 		Name,
 		CardSkills,
+		EffectModifiedValue,
 	},
 	props: {
 		entity: {
@@ -195,18 +233,22 @@ export default {
 				ac: {
 					icon: "fas fa-shield",
 					label: "Armor Class",
+					bonus: "ac",
 				},
 				maxHp: {
 					icon: "fas fa-heart",
 					label: "Hit Points",
+					bonus: "max_hp",
 				},
 				speed: {
 					icon: "fas fa-running",
 					label: "Walk Speed",
+					bonus: "speed",
 				},
 				initiative_modifier: {
 					icon: "fas fa-chevron-double-up",
 					label: "Initiative",
+					bonus: "initiative",
 				},
 			},
 		};
@@ -223,10 +265,92 @@ export default {
 			}
 			return entity;
 		},
+		/**
+		 * Damage vulnerabilities, resistances, immunities and condition immunities as shown:
+		 * [{ field, label, items: [{ value, text, sources }] }], sources naming the effects that
+		 * give an entry (defense_sources of the effective entity)
+		 */
+		defense_lists() {
+			const sources = this.full_entity.defense_sources || {};
+			const lists = [
+				{ field: "damage_vulnerabilities", kind: "v", label: "Damage vulnerabilities" },
+				{ field: "damage_resistances", kind: "r", label: "Damage resistances" },
+				{ field: "damage_immunities", kind: "i", label: "Damage immunities" },
+				{ field: "condition_immunities", kind: "ci", label: "Condition immunities" },
+			];
+			return lists.map((list) => ({
+				...list,
+				items: (this.full_entity[list.field] || []).map((value) => ({
+					value,
+					text:
+						list.kind === "ci" ? value : value.split("_").join(" ").capitalizeEach(),
+					sources: sources[`${list.kind}:${value}`],
+				})),
+			}));
+		},
+		// Bonuses can only be edited for entities in the running encounter
+		in_encounter() {
+			return !!this.$store.getters.entities?.[this.entity.key];
+		},
+		/**
+		 * Roll plans (effects and manual bonuses) of the ability checks and saves:
+		 * { [ability]: { mod, save } }
+		 */
+		ability_plans() {
+			const plans = {};
+			for (const ability of this.abilities) {
+				plans[ability] = {
+					mod: this.rollPlanFor({ kind: "check", ability }, this.modifier(ability, "mod")),
+					save: this.rollPlanFor({ kind: "save", ability }, this.modifier(ability, "save")),
+				};
+			}
+			return plans;
+		},
+		// All roll bonuses, for the drawer opened from the skill list
+		roll_bonus_stats() {
+			return [
+				"attack",
+				"damage",
+				"check_all",
+				"save_all",
+				"death_save",
+				"concentration_save",
+				...Object.values(this.skills).map((skill) => skillBonusKey(skill.value)),
+			];
+		},
+		/**
+		 * Roll plans of the skill checks: { [skill value]: plan }
+		 */
+		skill_plans() {
+			const plans = {};
+			for (const skill of Object.values(this.skills)) {
+				plans[skill.value] = this.rollPlanFor({ kind: "skill", skill: skill.value }, this.skillModifier(skill));
+			}
+			return plans;
+		},
 	},
 	methods: {
 		calc_mod,
 		displayStats,
+		openBonuses(stats) {
+			this.$store.dispatch("setDrawer", {
+				show: true,
+				type: "drawers/encounter/StatBonuses",
+				data: { entityKey: this.entity.key, ...(Array.isArray(stats) ? { stats } : { stat: stats }) },
+			});
+		},
+		/**
+		 * Roll plan for a d20 roll of this entity: its modifier with effects and manual bonuses
+		 */
+		rollPlanFor(roll, modifier) {
+			const modifiers = this.in_encounter
+				? this.$store.getters.roll_modifiers(this.entity.key, roll)
+				: undefined;
+			return rollPlan(modifiers, { modifier: parseInt(modifier) || 0 });
+		},
+		signed(value) {
+			return value > 0 ? `+${value}` : value;
+		},
 		savingThrow(ability) {
 			let proficiency;
 			if (this.full_entity.entityType === "player") {
@@ -273,6 +397,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// Defenses from effects, marked like other values changed by effects
+.effect-modified-value.modified {
+	color: $blue;
+	font-weight: bold;
+}
+.stats .value.clickable {
+	cursor: pointer;
+
+	&:hover {
+		background-color: $neutral-4;
+	}
+}
 .card-details {
 	&__top {
 		display: flex;
@@ -295,6 +431,11 @@ export default {
 	.entity-effects {
 		border-bottom: solid 1px $neutral-5;
 		padding-bottom: 5px;
+	}
+	&__skills-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 	&__abilities {
 		columns: 2;
@@ -350,6 +491,14 @@ export default {
 				text-align: center;
 				border-bottom-left-radius: $border-radius;
 				border-top-left-radius: $border-radius;
+
+				&.clickable {
+					cursor: pointer;
+
+					&:hover {
+						background-color: $neutral-8;
+					}
+				}
 			}
 			&__save {
 				border-bottom-right-radius: $border-radius;

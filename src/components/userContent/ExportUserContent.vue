@@ -217,6 +217,7 @@ export default {
 						delete entity.tempHp;
 						delete entity.maxHpMod;
 						delete entity.ac_bonus;
+						delete entity.bonuses;
 						delete entity.conditions;
 						delete entity.reminders;
 						delete entity.settings;

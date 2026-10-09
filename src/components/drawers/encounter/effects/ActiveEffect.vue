@@ -219,14 +219,18 @@ export default {
 		...mapActions(["apply_effect", "remove_effect", "setDrawer", "escape_effect"]),
 		startCase,
 		rollEscape({ ability, skill }) {
+			// An escape is a skill or ability check
 			const modifier = skill
 				? this.effectSkillModifier(this.entity, ability, skill)
-				: this.effectSaveModifier(this.entity, ability);
-			const total = this.rollEffectCheck({
+				: this.effectCheckModifier(this.entity, ability);
+			const { total, auto } = this.rollEffectCheck({
 				entity: this.entity,
 				title: `Escape ${this.name}: ${startCase(skill || ability)}`,
 				modifier,
+				roll: skill ? { kind: "skill", skill } : { kind: "check", ability },
 			});
+			// Automatic results resolve the attempt without a roll
+			if (auto) return this.resolveEscape(auto === "success");
 			// Without a numeric DC the roll is only shown; the DM resolves it
 			if (typeof this.escape.dc === "number" && total !== undefined) {
 				this.resolveEscape(total >= this.escape.dc);

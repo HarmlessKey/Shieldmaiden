@@ -33,7 +33,8 @@
 								:dark="$store.getters.theme === 'dark'"
 								filled
 								square
-								label="Max HP mod"
+								label="Manual max HP bonus"
+								hint="Sets the bonus labelled Manual; other bonuses are kept"
 								type="number"
 								name="maxHpMod"
 								v-model="maxHpMod"
@@ -69,6 +70,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { manualBonusTotal, withManualBonus, hpAfterMaxHpChange } from "src/utils/entityFunctions";
 
 export default {
 	data() {
@@ -137,63 +139,39 @@ export default {
 			}
 			if (this.maxHpMod !== undefined) {
 				for (const key of this.setFor) {
-					let maxHpMod = parseInt(this.maxHpMod);
 					const player = this.players[key];
-					let entity = { ...this.campaign.players[key] };
+					const entity = this.campaign.players[key] || {};
+					const baseMax = parseInt(player.maxHp) || 0;
+					const oldMax = baseMax + manualBonusTotal(entity, "max_hp");
 
-					// If the MaxHpMod is negative and larger than the maxHp
-					if (maxHpMod < 0 && Math.abs(maxHpMod) > player.maxHp) {
-						maxHpMod = -player.maxHp;
+					// Sets the "Manual" maximum HP bonus, other bonuses are kept
+					let bonuses = withManualBonus(entity, "max_hp", this.maxHpMod);
+					// The maximum can't go below 0
+					const newTotal = manualBonusTotal({ bonuses }, "max_hp");
+					if (baseMax + newTotal < 0) {
+						bonuses = withManualBonus(
+							{ bonuses },
+							"max_hp",
+							(bonuses.max_hp?.manual?.value || 0) - (baseMax + newTotal)
+						);
 					}
+					const newMax = baseMax + manualBonusTotal({ bonuses }, "max_hp");
+					const curHp = hpAfterMaxHpChange(entity.curHp, oldMax, newMax);
 
-					//Modify curHP with maxHpMod
-					if (entity.maxHpMod === 0) {
-						//If there was no current mod
-						//only modify curHp if maxHpMod = positive
-						if (maxHpMod > 0) {
-							entity.curHp = parseInt(parseInt(entity.curHp) + maxHpMod);
-						}
-					} else if (maxHpMod === 0) {
-						//if the new mod is 0, check if the old mod was positive
-						//If so, remove it from the curHp
-						if (entity.maxHpMod > 0) {
-							entity.curHp = parseInt(parseInt(entity.curHp) - entity.maxHpMod);
-						}
-					} else {
-						//If the new mod is positive
-						if (maxHpMod > 0) {
-							//check if the current mod was positive to 0
-							if (entity.maxHpMod > 0) {
-								//if so, first subtract current mod, then add new
-								entity.curHp = parseInt(parseInt(entity.curHp) - entity.maxHpMod + maxHpMod);
-							} else {
-								//else only add the new mod
-								entity.curHp = parseInt(parseInt(entity.curHp) + maxHpMod);
-							}
-						} else if (maxHpMod < 0) {
-							//if the new mod is negative,
-							//but the current is positive, still subtract current
-							if (entity.maxHpMod > 0) {
-								entity.curHp = parseInt(parseInt(entity.curHp) - entity.maxHpMod);
-							}
-						}
-					}
-					entity.maxHpMod = maxHpMod; //to store new in firebase
-
-					//CurHp can never be > maxHp
-					if (entity.curHp > player.maxHp + entity.maxHpMod) {
-						entity.curHp = parseInt(player.maxHp + entity.maxHpMod);
-					}
-
-					// Update curHp & maxHpMod
-					for (const property of ["curHp", "maxHpMod"]) {
+					// Update curHp and the bonuses; the old single-value bonuses are removed
+					for (const [property, value] of [
+						["curHp", curHp],
+						["bonuses", Object.keys(bonuses).length ? bonuses : null],
+						["ac_bonus", null],
+						["maxHpMod", null],
+					]) {
 						await this.update_campaign_entity({
 							uid: this.user.uid,
 							campaignId: this.campaignId,
 							type: "players",
 							id: key,
 							property,
-							value: entity[property],
+							value,
 						});
 					}
 				}

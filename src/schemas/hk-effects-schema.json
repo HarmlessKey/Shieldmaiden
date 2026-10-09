@@ -539,6 +539,19 @@
 				"save_successes": { "type": "integer" },
 				"save_failures": { "type": "integer" },
 				"concentration_id": { "type": "string" },
+				"concentration_for": {
+					"type": "object",
+					"description": "On a Concentration instance: the effect it is for, so applying the same effect shares it and a different one replaces it.",
+					"required": ["source", "source_key"],
+					"properties": {
+						"source": { "type": "string", "enum": ["srd", "custom", "api"] },
+						"source_key": { "type": "string" },
+						"name": { "type": "string", "maxLength": 200 }
+					},
+					"additionalProperties": false
+				},
+				"applied_turn_key": { "type": "string", "description": "Entity whose turn it was when applied, for the same-turn rule of next_turn durations. Falls back to caster_key." },
+				"temp_hp_granted": { "type": "integer", "minimum": 0, "description": "Temporary hit points granted by an expires_with_effect sub-effect, lost when the instance ends." },
 				"parent_id": { "type": "string", "description": "Instance this one depends on (Crawler Mucus: Paralyzed while Poisoned; Crocodile: Restrained while Grappled). Removing the parent removes this one." },
 				"immune_until_round": { "type": "integer", "description": "Temporary immunity to this effect from this caster after a successful save." }
 			}

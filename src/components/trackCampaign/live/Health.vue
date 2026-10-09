@@ -58,10 +58,10 @@
 						:class="{
 							green:
 								(entity.entityType === 'player' || entity.entityType === 'companion') &&
-								camp_data.maxHpMod > 0,
+								maxHpBonus > 0,
 							red:
 								(entity.entityType === 'player' || entity.entityType === 'companion') &&
-								camp_data.maxHpMod < 0,
+								maxHpBonus < 0,
 						}"
 						>{{ health.maxHp }}
 					</span>
@@ -109,6 +109,7 @@
 <script>
 import { general } from "src/mixins/general.js";
 import { trackEncounter } from "src/mixins/trackEncounter.js";
+import { manualBonusTotal } from "src/utils/entityFunctions";
 
 export default {
 	name: "Health",
@@ -139,6 +140,10 @@ export default {
 
 			return undefined;
 		},
+		// Manual max HP bonuses of a player or companion (bonuses, or the old maxHpMod)
+		maxHpBonus() {
+			return this.camp_data ? manualBonusTotal(this.camp_data, "max_hp") : 0;
+		},
 		health: function () {
 			let ret = {};
 			const key = this.entity.key;
@@ -163,19 +168,13 @@ export default {
 				curHp = this.camp_data !== undefined ? this.camp_data.curHp : this.entity.curHp;
 				tempHp = this.camp_data !== undefined ? this.camp_data.tempHp : this.entity.tempHp;
 
-				// Npc max hp in entity
+				// Max hp with the manual max HP bonuses (bonuses, or the old maxHpMod)
 				if (this.entity.entityType === "npc")
-					maxHp = this.entity.maxHpMod
-						? parseInt(this.entity.maxHp) + this.entity.maxHpMod
-						: this.entity.maxHp;
+					maxHp = parseInt(this.entity.maxHp) + manualBonusTotal(this.entity, "max_hp");
 				else if (this.entity.entityType === "player")
-					maxHp = this.camp_data.maxHpMod
-						? parseInt(this.players[key].maxHp) + this.camp_data.maxHpMod
-						: this.players[key].maxHp;
+					maxHp = parseInt(this.players[key].maxHp) + manualBonusTotal(this.camp_data, "max_hp");
 				else if (this.entity.entityType === "companion")
-					maxHp = this.camp_data.maxHpMod
-						? parseInt(this.npcs[key].hit_points) + this.camp_data.maxHpMod
-						: this.npcs[key].hit_points;
+					maxHp = parseInt(this.npcs[key].hit_points) + manualBonusTotal(this.camp_data, "max_hp");
 			}
 
 			ret = {

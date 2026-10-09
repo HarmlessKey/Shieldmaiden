@@ -33,7 +33,7 @@ function filterSkills(playerSkills) {
 	return returnArray;
 }
 function filterUnusedAttributes(player) {
-	const unused_attributes = ["ac_bonus", "curHp", "tempHp", "maxHpMod"];
+	const unused_attributes = ["ac_bonus", "curHp", "tempHp", "maxHpMod", "bonuses"];
 
 	Object.keys(player).forEach((attribute) => {
 		if (unused_attributes.includes(attribute)) {

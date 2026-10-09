@@ -109,12 +109,13 @@
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
-									label="AC bonus"
+									label="Manual AC bonus"
 									type="number"
 									name="ac_bonus"
-									v-model="entity.ac_bonus"
+									v-model="acBonus"
 									clearable
 									no-error-icon
+									:hint="otherBonuses('ac')"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								/>
@@ -153,12 +154,13 @@
 									:dark="$store.getters.theme === 'dark'"
 									filled
 									square
-									label="Max HP Mod"
+									label="Manual max HP bonus"
 									type="number"
 									name="maxHpMod"
 									v-model="maxHpMod"
 									clearable
 									no-error-icon
+									:hint="otherBonuses('max_hp')"
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								/>
@@ -382,6 +384,13 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import Transform from "./party/Transform.vue";
+import {
+	manualBonuses,
+	manualBonusTotal,
+	withManualBonus,
+	hpAfterMaxHpChange,
+	MANUAL_BONUS_ID,
+} from "src/utils/entityFunctions";
 
 export default {
 	name: "EditPlayer",
@@ -400,7 +409,9 @@ export default {
 			location: this.data.location,
 			entity: {},
 			playerBase: {},
+			// The "Manual" bonuses; other manual bonuses are kept as they are
 			maxHpMod: undefined,
+			acBonus: undefined,
 			xp: undefined,
 			setTransform: false,
 			advancement: undefined,
@@ -411,7 +422,9 @@ export default {
 		await this.get_campaign({ uid: this.userId, id: this.campaignId }).then((result) => {
 			const entity = result.players[this.entityKey];
 			this.entity = { ...entity };
-			this.maxHpMod = entity.maxHpMod;
+			const bonuses = manualBonuses(entity);
+			this.maxHpMod = bonuses.max_hp?.[MANUAL_BONUS_ID]?.value;
+			this.acBonus = bonuses.ac?.[MANUAL_BONUS_ID]?.value;
 			this.advancement = result.advancement;
 		});
 
@@ -454,6 +467,15 @@ export default {
 		},
 	},
 	methods: {
+		/**
+		 * The manual bonuses other than "Manual" of a value, as a hint under its field
+		 */
+		otherBonuses(stat) {
+			const others = Object.entries(manualBonuses(this.entity)[stat] || {})
+				.filter(([id]) => id !== MANUAL_BONUS_ID)
+				.map(([, { value, label }]) => `${label} ${value > 0 ? `+${value}` : value}`);
+			return others.length ? `Also: ${others.join(", ")}` : undefined;
+		},
 		...mapActions(["setDrawer", "edit_player"]),
 		...mapActions("players", ["get_player", "edit_player", "set_player_prop"]),
 		...mapActions("campaigns", [
@@ -558,59 +580,35 @@ export default {
 			}
 
 			//Parse to INT
-			this.entity.ac_bonus = this.entity.ac_bonus ? parseInt(this.entity.ac_bonus) : 0;
 			this.entity.tempHp = this.entity.tempHp ? parseInt(this.entity.tempHp) : 0;
-			this.entity.maxHpMod = this.entity.maxHpMod ? parseInt(this.entity.maxHpMod) : 0;
 			this.playerBase.ac = parseInt(this.playerBase.ac);
 			this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
 			this.entity.curHp = parseInt(this.entity.curHp);
-			let maxHpMod = this.maxHpMod ? parseInt(this.maxHpMod) : 0;
 
-			// If the MaxHpMod is negative and larger than the maxHp
-			if (maxHpMod < 0 && Math.abs(maxHpMod) > this.playerBase.maxHp) {
-				maxHpMod = -this.playerBase.maxHp;
+			// Manual bonuses: the AC and max HP fields set the "Manual" bonus, other bonuses stay
+			const baseMax = this.playerBase.maxHp || 0;
+			const oldMax = baseMax + manualBonusTotal(this.entity, "max_hp");
+			let bonuses = withManualBonus(this.entity, "ac", this.acBonus);
+			bonuses = withManualBonus({ bonuses }, "max_hp", this.maxHpMod);
+			// The maximum can't go below 0
+			const total = manualBonusTotal({ bonuses }, "max_hp");
+			if (baseMax + total < 0) {
+				bonuses = withManualBonus(
+					{ bonuses },
+					"max_hp",
+					(bonuses.max_hp?.[MANUAL_BONUS_ID]?.value || 0) - (baseMax + total)
+				);
 			}
+			const newMax = baseMax + manualBonusTotal({ bonuses }, "max_hp");
 
-			//Modify curHP with maxHpMod
-			if (this.entity.maxHpMod === 0) {
-				//If the there was no current mod
-				//only modify curHp if maxHpMod = positive
-				if (maxHpMod > 0) {
-					this.entity.curHp = parseInt(this.entity.curHp + maxHpMod);
-				}
-			} else if (maxHpMod === 0) {
-				//if the new mod is 0, check if the old mod was positive
-				//If so, remove it from the curHp
-				if (this.entity.maxHpMod > 0) {
-					this.entity.curHp = parseInt(this.entity.curHp - this.entity.maxHpMod);
-				}
-			} else {
-				//If the new mod is positive
-				if (maxHpMod > 0) {
-					//check if the current mod was positive too
-					if (this.entity.maxHpMod > 0) {
-						//if so, first substract current mod, then add new
-						this.entity.curHp = parseInt(
-							parseInt(this.entity.curHp) - this.entity.maxHpMod + maxHpMod
-						);
-					} else {
-						//else only add the new mod
-						this.entity.curHp = parseInt(parseInt(this.entity.curHp) + maxHpMod);
-					}
-				} else if (maxHpMod < 0) {
-					//if the new mod is negative,
-					//but the current is positive, still substract current
-					if (this.entity.maxHpMod > 0) {
-						this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod);
-					}
-				}
-			}
-			this.entity.maxHpMod = maxHpMod;
+			// Current HP follows the maximum: up with it, or down to it
+			this.entity.curHp = hpAfterMaxHpChange(this.entity.curHp, oldMax, newMax);
 
-			//CurHp can never be > maxHp
-			if (this.entity.curHp > this.playerBase.maxHp + this.entity.maxHpMod) {
-				this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod);
-			}
+			// Saved in the new format; the old single-value bonuses are removed
+			if (Object.keys(bonuses).length) this.$set(this.entity, "bonuses", bonuses);
+			else this.$delete(this.entity, "bonuses");
+			this.$delete(this.entity, "ac_bonus");
+			this.$delete(this.entity, "maxHpMod");
 			if (this.entity.transformed) {
 				if (this.entity.transformed.curHp > this.entity.transformed.maxHp) {
 					this.entity.transformed.curHp = this.entity.transformed.maxHp;

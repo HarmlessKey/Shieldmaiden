@@ -19,7 +19,9 @@
 				<div class="target-entity__content-info">
 					<div class="target-entity__content-info__ac" @click.stop>
 						<i aria-hidden="true" class="fas fa-shield" />
-						<hk-animated-integer :value="displayStats(entity).ac" class="ac" />
+						<EffectModifiedValue :entity="effective" field="ac">
+							<hk-animated-integer :value="displayStats(effective).ac" class="ac" />
+						</EffectModifiedValue>
 						<ArmorClassQuickEdit :entity="entity" />
 					</div>
 					<Name class="target-entity__content-info__name" :entity="entity" />
@@ -48,11 +50,16 @@
 						"
 						:target="entity"
 					/>
-					<HealthBar v-else :entity="entity" />
-					<div class="target-entity__health-values" @click.stop>
-						<hk-animated-integer :value="displayStats(entity).curHp" />
+					<div v-else-if="entity.dead" class="target-entity__health-dead red">
+						<i aria-hidden="true" class="fas fa-skull-crossbones" /> Dead
+					</div>
+					<HealthBar v-else :entity="effective" />
+					<div v-if="!entity.dead" class="target-entity__health-values" @click.stop>
+						<hk-animated-integer :value="displayStats(effective).curHp" />
 						/
-						<hk-animated-integer :value="displayStats(entity).maxHp" />
+						<EffectModifiedValue :entity="effective" field="maxHp">
+							<hk-animated-integer :value="displayStats(effective).maxHp" />
+						</EffectModifiedValue>
 						<HealthQuickEdit :entity="entity" />
 					</div>
 				</div>
@@ -71,6 +78,7 @@ import Avatar from "./Avatar.vue";
 import Name from "./Name.vue";
 import HealthBar from "./HealthBar.vue";
 import DeathSaves from "../DeathSaves.vue";
+import EffectModifiedValue from "./EffectModifiedValue.vue";
 import { displayStats } from "src/utils/entityFunctions";
 
 export default {
@@ -85,6 +93,7 @@ export default {
 		ArmorClassQuickEdit,
 		HealthQuickEdit,
 		DeathSaves,
+		EffectModifiedValue,
 	},
 	props: {
 		entity: {
@@ -96,6 +105,12 @@ export default {
 		return {
 			effectSpace: 0,
 		};
+	},
+	computed: {
+		// With the values its active effects give it; quick edits keep the stored entity
+		effective() {
+			return this.$store.getters.effective_entity?.(this.entity.key) || this.entity;
+		},
 	},
 	methods: {
 		displayStats, // imported utility function
@@ -192,6 +207,10 @@ export default {
 					font-weight: bold;
 					color: $neutral-1;
 				}
+				// Changed by effects or manual bonuses, as on the card
+				.effect-modified-value.modified .ac {
+					color: $blue;
+				}
 			}
 			&__name {
 				font-weight: bold;
@@ -214,6 +233,10 @@ export default {
 		&-values {
 			font-weight: bold;
 			white-space: nowrap;
+			line-height: 16px;
+		}
+		&-dead {
+			font-weight: bold;
 			line-height: 16px;
 		}
 		::v-deep {

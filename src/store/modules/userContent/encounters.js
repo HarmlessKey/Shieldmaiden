@@ -911,6 +911,8 @@ const encounter_actions = {
 						delete entity.stabilized;
 						delete entity.down;
 						delete entity.ac_bonus;
+						delete entity.maxHpMod;
+						delete entity.bonuses;
 						delete entity.meters;
 						delete entity.hidden;
 						delete entity.reminders;

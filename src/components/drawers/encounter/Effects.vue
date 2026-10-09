@@ -81,8 +81,10 @@
 													:definition="definitionOf(entry) || { name: entry.name }"
 													:conditions="srd.conditions"
 													:default-level="defaultExhaustionLevel"
-													:concentration-key="casterConcentrationKey"
-													:caster-name="casterName"
+													:effect="{ source: entry.source, source_key: entry.sourceKey, name: entry.name }"
+													:casters="casters"
+													:default-caster="turnEntityKey"
+													:caster-concentration="casterConcentration"
 													@apply="apply(entry, $event)"
 													@cancel="applying = undefined"
 												/>
@@ -197,17 +199,17 @@ export default {
 			if (!this.round) return undefined;
 			return this.turn_order[this.turn];
 		},
-		casterName() {
-			return this.entities[this.turnEntityKey]?.name;
-		},
 		/**
-		 * Key of the caster's active Concentration instance, to link applied effects to
+		 * Caster options: the entities in initiative order, then the rest
 		 */
-		casterConcentrationKey() {
-			const effects = this.entities[this.turnEntityKey]?.effects || {};
-			return Object.keys(effects).find(
-				(key) => effects[key].source === "srd" && effects[key].source_key === "concentration"
+		casters() {
+			const keys = _.uniq([...(this.turn_order || []), ...Object.keys(this.entities)]).filter(
+				(key) => this.entities[key]
 			);
+			return keys.map((key) => ({
+				label: (this.entities[key].name || key).capitalizeEach(),
+				value: key,
+			}));
 		},
 		/**
 		 * Exhaustion level shared by the targets:
@@ -247,6 +249,51 @@ export default {
 		},
 		exhaustionOf(key) {
 			return this.instancesOf(key, { source: "srd", sourceKey: "exhaustion" })[0];
+		},
+		/**
+		 * A caster's active Concentration instance: { key, for }, or undefined
+		 */
+		casterConcentration(casterKey) {
+			const effects = this.entities[casterKey]?.effects || {};
+			const key = Object.keys(effects).find(
+				(k) => effects[k].source === "srd" && effects[k].source_key === "concentration"
+			);
+			return key ? { key, for: effects[key].concentration_for } : undefined;
+		},
+		/**
+		 * Carries out a Concentration plan for the caster (concentrationPlan): ends a
+		 * Concentration it replaces, and applies a new one with the effect's "up to" time
+		 *
+		 * @returns {string|undefined} Key of the Concentration to link to, undefined when it failed
+		 */
+		async concentrateOn({ entry, plan, casterKey, duration = {} }) {
+			if (["share", "link"].includes(plan.action)) return plan.key;
+
+			if (plan.action === "replace") {
+				await this.remove_effect({
+					key: casterKey,
+					effectKey: plan.key,
+					reason: `started concentrating on ${entry.name}`,
+				});
+			}
+			const definition = this.srd.effects.find(({ url }) => url === "concentration") || {
+				name: "Concentration",
+			};
+			const upTo = duration.value
+				? { type: "time", value: duration.value, unit: duration.unit || "round" }
+				: { type: "cancelled" };
+			const instance = buildEffectInstance({
+				definition,
+				source: "srd",
+				sourceKey: "concentration",
+				application: { duration: upTo },
+				round: this.round,
+				casterKey,
+				casterName: this.entities[casterKey]?.name,
+				turnKey: this.turnEntityKey,
+				concentrationFor: { source: entry.source, source_key: entry.sourceKey, name: entry.name },
+			});
+			return this.apply_effect({ key: casterKey, instance, definition });
 		},
 		/**
 		 * Whether all, some or none of the targets have the effect
@@ -305,22 +352,44 @@ export default {
 			if (entry.sourceKey === "exhaustion") application.level = this.defaultExhaustionLevel;
 			this.apply(entry, application);
 		},
-		apply(entry, application) {
+		/**
+		 * Applies to every target. The caster is the application's caster_key (the form's
+		 * select; undefined for None), or the entity whose turn it is without the form.
+		 * A Concentration plan is carried out first, so the instances can link to it.
+		 */
+		async apply(entry, application) {
 			const definition = this.definitionOf(entry) || { name: entry.name };
+			const { caster_key, concentration: plan, ...rest } = application;
+			const casterKey = Object.prototype.hasOwnProperty.call(application, "caster_key")
+				? caster_key
+				: this.turnEntityKey;
+			this.applying = undefined;
+
+			let concentration_id = rest.concentration_id;
+			if (casterKey && plan && plan.action !== "none") {
+				concentration_id = await this.concentrateOn({
+					entry,
+					plan,
+					casterKey,
+					duration: rest.duration,
+				});
+				// The caster's Concentration couldn't be saved
+				if (!concentration_id) return;
+			}
 
 			for (const key of this.targets) {
 				const instance = buildEffectInstance({
 					definition: { ...definition, name: entry.name },
 					source: entry.source,
 					sourceKey: entry.sourceKey,
-					application,
+					application: { ...rest, concentration_id },
 					round: this.round,
-					casterKey: this.turnEntityKey,
-					casterName: this.casterName,
+					casterKey,
+					casterName: this.entities[casterKey]?.name,
+					turnKey: this.turnEntityKey,
 				});
 				this.apply_effect({ key, instance, definition });
 			}
-			this.applying = undefined;
 		},
 		remove(entry) {
 			for (const key of this.targets) {

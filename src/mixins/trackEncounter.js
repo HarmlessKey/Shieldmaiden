@@ -1,3 +1,5 @@
+import { manualBonusTotal } from "src/utils/entityFunctions";
+
 export const trackEncounter = {
 	data() {
 		return {
@@ -11,25 +13,26 @@ export const trackEncounter = {
 		displayAc(entity, player, npc, camp_data) {
 			let stats = {}
 
+			// Manual AC bonuses (bonuses, or the old single ac_bonus); effects aren't shown here
 			if(this.isTransformed(entity, camp_data)) {
 				stats.ac = (camp_data) ? parseInt(camp_data.transformed.ac) : parseInt(entity.transformed.ac);
-				stats.bonus = (camp_data) ? parseInt(camp_data.ac_bonus) : parseInt(entity.ac_bonus);
+				stats.bonus = manualBonusTotal(camp_data || entity, 'ac');
 			}
 			else {
 				if(entity.entityType === 'player') {
 					stats = {
 						ac: parseInt(player.ac),
-						bonus: parseInt(camp_data.ac_bonus),
+						bonus: manualBonusTotal(camp_data, 'ac'),
 					}
 				} else if (entity.entityType === 'companion') {
 					stats = {
 						ac: parseInt(npc.armor_class),
-						bonus: parseInt(camp_data.ac_bonus),
+						bonus: manualBonusTotal(camp_data, 'ac'),
 					}
 				} else {
 					stats = {
 						ac: parseInt(entity.ac),
-						bonus: parseInt(entity.ac_bonus),
+						bonus: manualBonusTotal(entity, 'ac'),
 					}
 				}
 			}

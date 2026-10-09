@@ -8,7 +8,7 @@
 						<Multipliers :entity-key="key" />
 					</div>
 					<button class="btn bg-neutral-5 btn-block btn-sm" @click="applyDamage">
-						Do <strong>{{ calculateAmount() }}</strong>
+						Do <strong>{{ amount }}</strong>
 						<i
 							v-if="manual.type"
 							class="mx-1"
@@ -75,13 +75,18 @@ export default {
 		target() {
 			return this.entities?.[this.key];
 		},
-	},
-	methods: {
-		calculateAmount() {
+		/**
+		 * The manual damage after multiplier and defenses: the DM's chosen defense, or the
+		 * target's effective defenses (its effects', as the defense buttons show them)
+		 */
+		amount() {
 			const multiplier = this.target_multipliers.multipliers?.[this.key];
 			const defense = this.target_multipliers.defenses?.[this.key];
-			return calculateManualDamage(this.manual, this.target, multiplier, defense);
+			const target = this.$store.getters.effective_entity?.(this.key) || this.target;
+			return calculateManualDamage(this.manual, target, multiplier, defense);
 		},
+	},
+	methods: {
 		applyDamage() {
 			EventBus.$emit("applyManualValue", "damage");
 		},

@@ -1,4 +1,11 @@
 import { mapActions, mapGetters } from "vuex";
+import { rollPlan } from "src/utils/effectFunctions";
+
+export const escapeHtml = (text) =>
+	String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+// A reroll condition for a natural 1 (Luck): "natural 1", "a 1" or "1"
+export const isNaturalOne = (condition) => /^(a |natural )?1$/i.test(String(condition || "").trim());
 
 export const dice = {
 	data() {
@@ -34,6 +41,81 @@ export const dice = {
 	methods: {
 		...mapActions(["setRoll"]),
 		...mapActions("campaigns", ["set_share"]),
+		/**
+		 * The notification of a roll: its total, the dice and modifier, Advantage/Disadvantage,
+		 * bonus dice and notes. With buttons (reroll offers) it stays a little longer.
+		 */
+		rollToast(roll, buttons = []) {
+			let advantage;
+			if (roll.ignored) {
+				const type = Object.keys(roll.advantage_disadvantage)[0].charAt(0).capitalize();
+				const color = type === "A" ? "green" : "red";
+				advantage = `<b class="${color}">${type}</b> <span class="neutral-2">${roll.ignored}</span> `;
+			}
+			const bonus_rolls = roll.bonus_rolls || [];
+			// Effect bonus dice and notes; labels can be the DM's own text, so escaped
+			const bonusText = bonus_rolls
+				.map(({ name, dice, sign, total }) => `${escapeHtml(name)} ${sign < 0 ? "−" : "+"}${dice}: ${Math.abs(total)}`)
+				.join("<br />");
+			const notesText = (roll.notes || []).map(escapeHtml).join("<br />");
+			const extraText =
+				bonusText || notesText
+					? `<div class="roll_notes neutral-2">${[bonusText, notesText].filter(Boolean).join("<br />")}</div>`
+					: "";
+			const bonusSum = bonus_rolls.reduce((total, bonus) => total + bonus.total, 0);
+			const bonusMod = bonusSum ? (bonusSum > 0 ? `+${bonusSum}` : `${bonusSum}`) : "";
+
+			this.animateTrigger = !this.animateTrigger;
+			this.$snotify.html(
+				`<div class="snotifyToast__body roll">
+					<div class="roll_title truncate">${roll.entity_name ? `${roll.entity_name}: ` : ``}${roll.title}</div>
+					<div class="rolled" id="roll">${roll.total}</div>
+					<div class="roll_footer">${advantage ? advantage : ""}${roll.throwsTotal}${roll.mod}${bonusMod}</div>
+					${extraText}
+				</div> `,
+				{
+					timeout: buttons.length ? 8000 : 3000,
+					closeOnClick: !buttons.length,
+					...(buttons.length ? { buttons } : {}),
+				}
+			);
+			this.rolled = roll.total;
+		},
+		/**
+		 * Rolls the d20 of a roll again for a reroll offer (Luck, Indomitable): the same modifier
+		 * plus the reroll's bonus, with Advantage when it says so, and keeps the new, higher or
+		 * lower roll. A single-use reroll is used up. Shows the kept roll.
+		 *
+		 * @param {object} roll The first roll (rollD's result)
+		 * @param {object} reroll The offer: { name, keep, bonus, withAdvantage, consume, holderKey, effectKey }
+		 */
+		rerollD(roll, reroll, { title, entity_name, extras = {} } = {}) {
+			const again = this.rollD(
+				{},
+				20,
+				1,
+				(parseInt(roll.m) || 0) + (reroll.bonus || 0),
+				title,
+				entity_name,
+				false,
+				reroll.withAdvantage ? { advantage: true } : {},
+				null,
+				{ ...extras, rerolls: [], notes: [] }
+			);
+			let kept = again;
+			if (reroll.keep === "higher" && roll.total > again.total) kept = roll;
+			if (reroll.keep === "lower" && roll.total < again.total) kept = roll;
+			const keptText = { higher: "higher kept", lower: "lower kept", choice: "DM's choice" }[reroll.keep] || "new roll kept";
+			const shown = {
+				...kept,
+				notes: [`${reroll.name}: rerolled ${roll.total} → ${again.total} (${keptText})`, ...(again.notes || [])],
+			};
+			if (reroll.consume && reroll.effectKey) {
+				this.$store.dispatch("consume_roll_modifiers", [{ holderKey: reroll.holderKey, effectKey: reroll.effectKey }]);
+			}
+			this.rollToast(shown);
+			return kept;
+		},
 		rollD(
 			e,
 			d = 20,
@@ -43,7 +125,8 @@ export const dice = {
 			entity_name = undefined,
 			notify = false,
 			advantage_disadvantage = {},
-			share = null
+			share = null,
+			extras = {}
 		) {
 			m = parseInt(m); //Removes + from modifier
 			const add = (a, b) => a + b;
@@ -92,8 +175,48 @@ export const dice = {
 			if (Math.sign(m) >= 0) {
 				s = "+";
 			}
+			// The d20 as rolled (after Advantage/Disadvantage), before a floor raises it
+			const isD20 = n === 1 && d === 20;
+			const natural = isD20 ? throws[0] : undefined;
+			const notes = [...(extras.notes || [])];
+			// A minimum die (Reliable Talent): a lower d20 counts as the floor
+			const dieFloor = isD20 ? extras.floor?.die : undefined;
+			if (dieFloor && throws[0] < dieFloor.value) {
+				notes.push(`${dieFloor.name}: ${throws[0]} → ${dieFloor.value}`);
+				throws[0] = dieFloor.value;
+			}
 			const sumThrows = throws.reduce(add);
-			const sumTotal = sumThrows + parseInt(m);
+			let sumTotal = sumThrows + parseInt(m);
+
+			// Bonus dice of effects (Bless +1d4, Bane −1d4), added to the total
+			const bonus_rolls = (extras.bonus_dice || [])
+				.filter((bonus) => bonus.dice_count > 0 && bonus.dice_type > 0)
+				.map(({ name, dice_count, dice_type, sign = 1 }) => {
+					const bonus_throws = [];
+					for (let j = 0; j < dice_count; j++) bonus_throws.push(Math.ceil(Math.random() * dice_type));
+					const total = sign * bonus_throws.reduce(add, 0);
+					return { name, dice: `${dice_count}d${dice_type}`, sign, throws: bonus_throws, total };
+				});
+			for (const bonus of bonus_rolls) sumTotal += bonus.total;
+
+			// A minimum total (Indomitable Might)
+			const totalFloor = isD20 ? extras.floor?.total : undefined;
+			if (totalFloor && sumTotal < totalFloor.value) {
+				notes.push(`${totalFloor.name}: total ${sumTotal} → ${totalFloor.value}`);
+				sumTotal = totalFloor.value;
+			}
+
+			// Rerolls to offer (Luck): "natural 1" only when the die shows a 1, others always
+			const rerolls = isD20
+				? (extras.rerolls || []).filter((reroll) => !isNaturalOne(reroll.condition) || natural === 1)
+				: [];
+			for (const reroll of rerolls) {
+				notes.push(
+					isNaturalOne(reroll.condition)
+						? `${reroll.name}: reroll the 1`
+						: `${reroll.name}: reroll${reroll.condition ? ` on ${reroll.condition}` : ""}`
+				);
+			}
 
 			const showRoll = m !== 0 ? `${n}d${d}${s}${m}` : `${n}d${d}`;
 
@@ -112,28 +235,21 @@ export const dice = {
 				ignored,
 			};
 			if (entity_name) roll.entity_name = entity_name;
+			if (bonus_rolls.length) roll.bonus_rolls = bonus_rolls;
+			if (notes.length) roll.notes = notes;
+			if (natural !== undefined) roll.natural = natural;
+			if (rerolls.length) roll.rerolls = rerolls;
 
 			if (notify) {
-				let advantage;
-				if (ignored) {
-					const type = Object.keys(advantage_disadvantage)[0].charAt(0).capitalize();
-					const color = type === "A" ? "green" : "red";
-					advantage = `<b class="${color}">${type}</b> <span class="neutral-2">${ignored}</span> `;
-				}
-
-				this.animateTrigger = !this.animateTrigger;
-				this.$snotify.html(
-					`<div class="snotifyToast__body roll">
-						<div class="roll_title truncate">${entity_name ? `${entity_name}: ` : ``}${title}</div>
-						<div class="rolled" id="roll">${roll.total}</div>
-						<div class="roll_footer">${advantage ? advantage : ""}${sumThrows}${roll.mod}</div>
-					</div> `,
-					{
-						timeout: 3000,
-						closeOnClick: true,
-					}
-				);
-				this.rolled = roll.total;
+				// Each reroll offer is a button that rolls the d20 again (Luck)
+				const buttons = rerolls.map((reroll) => ({
+					text: `Reroll (${reroll.name})`,
+					action: (toast) => {
+						this.$snotify.remove(toast.id);
+						this.rerollD(roll, reroll, { title, entity_name, extras });
+					},
+				}));
+				this.rollToast(roll, buttons);
 			}
 
 			//Save the roll in the encounter "shares" object
@@ -147,6 +263,10 @@ export const dice = {
 				delete share_roll.d;
 				delete share_roll.mod;
 				delete share_roll.ignored;
+				delete share_roll.bonus_rolls;
+				delete share_roll.notes;
+				delete share_roll.natural;
+				delete share_roll.rerolls;
 				if (!roll.ignored) {
 					delete share_roll.advantage_disadvantage;
 				} else {
@@ -198,6 +318,8 @@ export const dice = {
 				name: this.getAbilityName(ability, config),
 				actions: [],
 			};
+			// Spells are magical (for roll modifiers against magic); other actions are unknown
+			if (config.type === "spell") returnRoll.source = { magical: true };
 
 			if (config.option !== undefined) {
 				if (ability.options && ability.options.length) {
@@ -220,6 +342,8 @@ export const dice = {
 			}
 
 			const actions = ability.action_list; // All actions in the ability
+			// Single-use modifiers used by this roll (and earlier rolls of the same action, via config)
+			const consumed = config.consumed || [];
 
 			let i = 0;
 			// LOOP OVER ALL ACTIONS
@@ -228,24 +352,64 @@ export const dice = {
 				let attack_bonus = action.attack_bonus || config.attack_bonus;
 				let toHit = false;
 				let crit = false;
+				// Damage bonuses of the attacker's effects and manual damage bonuses, for attacks
+				let damageBonuses = [];
 				returnRoll.actions[i] = { type, rolls: [] };
 
 				// If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if (type === "melee_weapon" || type === "ranged_weapon" || type === "spell_attack") {
+					// The attacker's and the target's effects, when rolled in the tracker
+					const effects = config.attackerKey
+						? this.$store.getters.attack_modifiers?.({
+								attackerKey: config.attackerKey,
+								targetKey: config.targetKey,
+								attackType: type,
+								source: returnRoll.source,
+								consumed,
+							})
+						: undefined;
+					const plan = effects
+						? rollPlan(effects.modifiers, { modifier: attack_bonus, advantage: advantage_object })
+						: undefined;
 					returnRoll.actions[i].toHit = this.rollD(
 						e.e,
 						20,
 						1,
-						attack_bonus,
+						plan ? plan.m : attack_bonus,
 						`${ability.name} to hit`,
 						undefined,
 						false,
-						advantage_object
+						plan ? plan.advantage : advantage_object,
+						null,
+						plan
+							? {
+									bonus_dice: plan.bonus_dice,
+									notes: [...plan.roll_notes, ...effects.damage.reminders],
+									floor: plan.floor,
+									rerolls: plan.rerolls,
+								}
+							: {}
 					);
-					if (returnRoll.actions[i].toHit.throwsTotal >= 20) {
+					// The die as rolled, also when a floor raised it
+					const toHitRoll = returnRoll.actions[i].toHit;
+					const natural = toHitRoll.natural ?? toHitRoll.throwsTotal;
+					const critRange = effects?.modifiers.critRange || 20;
+					if (natural >= critRange) {
 						returnRoll.actions[i].crit = true;
 						crit = true;
+						if (natural < 20) returnRoll.actions[i].critNames = effects.modifiers.critRangeNames;
 					}
+					// A hit on this target is critical (Paralyzed within 5 ft): rolled as critical damage
+					if (effects?.modifiers.critOnHit.length) {
+						returnRoll.actions[i].critOnHit = effects.modifiers.critOnHit;
+						crit = true;
+					}
+					// Single-use modifiers end now; later rolls of this action skip them
+					if (plan?.consume.length) {
+						consumed.push(...plan.consume);
+						this.$store.dispatch("consume_roll_modifiers", plan.consume);
+					}
+					damageBonuses = effects?.damage.bonuses || [];
 					toHit = true;
 				}
 				// For a saving throw set the ability and DC for display
@@ -350,6 +514,50 @@ export const dice = {
 						missSave,
 						magical,
 						special,
+					});
+				}
+
+				// Damage bonuses of a hit (Divine Favor, Magic Weapon, manual): their own damage rolls,
+				// of their damage type or the attack's first, none of it on a miss, crit like the rest
+				const firstType = returnRoll.actions[i].rolls[0]?.damage_type;
+				for (const bonus of damageBonuses) {
+					const damage_type = bonus.damage_type || firstType;
+					if (!damage_type) continue;
+					let rollResult;
+					if (bonus.dice_count && bonus.dice_type) {
+						rollResult = this.rollD(
+							e.e,
+							bonus.dice_type,
+							this.getDiceCount(crit, bonus.dice_count),
+							bonus.value || 0,
+							bonus.name
+						);
+						if (crit && this.critSettings === "double") {
+							rollResult.total += rollResult.throwsTotal;
+							const { n, d, m, s } = rollResult;
+							rollResult.roll = m !== 0 ? `2x(${n}d${d})${s}${m}` : `2x(${n}d${d})`;
+						}
+						if (crit && this.critSettings === "max") {
+							const { n, d, m, s } = rollResult;
+							rollResult.total += n * d;
+							rollResult.roll = m !== 0 ? `(${n}d${d}+${n * d})${s}${m}` : `(${n}d${d}+${n * d}) `;
+						}
+					} else {
+						rollResult = {
+							title: bonus.name,
+							roll: bonus.value,
+							mod: bonus.value,
+							throws: [],
+							throwsTotal: 0,
+							total: parseInt(bonus.value),
+						};
+					}
+					returnRoll.actions[i].rolls.push({
+						rollResult,
+						damage_type,
+						missSave: 0,
+						magical: !!bonus.magical,
+						name: bonus.name,
 					});
 				}
 				i++;

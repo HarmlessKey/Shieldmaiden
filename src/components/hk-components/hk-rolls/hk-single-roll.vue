@@ -27,24 +27,40 @@
 						<!-- TO HIT ROLL -->
 						<template v-if="action.toHit">
 							<div class="toHit">
-								<div>
-									To hit:
-									<span class="advantage" v-if="action.toHit.ignored">
-										<span v-html="advantage(action.toHit.advantage_disadvantage)" />
-										<span class="ignored neutral-4">
-											{{ action.toHit.ignored }}
-										</span> </span
-									>{{ action.toHit.throwsTotal }}
-									<template v-if="parseInt(action.toHit.mod) !== 0">
-										{{
-											parseInt(action.toHit.mod) > 0
-												? `+ ${parseInt(action.toHit.mod)}`
-												: `- ${Math.abs(action.toHit.mod)}`
-										}}
-									</template>
+								<div class="toHit__roll">
+									<span class="toHit__base">
+										To hit:
+										<span class="advantage" v-if="action.toHit.ignored">
+											<span v-html="advantage(action.toHit.advantage_disadvantage)" />
+											<span class="ignored neutral-4">
+												{{ action.toHit.ignored }}
+											</span> </span
+										>{{ action.toHit.throwsTotal }}
+										<template v-if="parseInt(action.toHit.mod) !== 0">
+											{{
+												parseInt(action.toHit.mod) > 0
+													? `+ ${parseInt(action.toHit.mod)}`
+													: `- ${Math.abs(action.toHit.mod)}`
+											}}
+										</template>
+									</span>
+									<!-- Bonus dice of effects (Bless +1d4, Bane −1d4); the name is cut off when short of space -->
+									<span
+										v-for="(bonus, b) in action.toHit.bonus_rolls || []"
+										:key="`bonus-${b}`"
+										class="bonus-roll"
+									>
+										<span class="bonus-roll__value">{{ bonusRollText(bonus) }}</span>
+										<span class="bonus-roll__name neutral-2"
+											>(<span class="truncate">{{ bonus.name }}</span>)</span
+										>
+										<q-tooltip anchor="top middle" self="bottom middle">
+											{{ bonusRollDetail(bonus) }}
+										</q-tooltip>
+									</span>
 								</div>
 								<transition
-									v-if="action.toHit.throwsTotal == 1"
+									v-if="naturalOf(action.toHit) == 1"
 									:name="`${roll.key}`"
 									enter-active-class="animated animate__hinge"
 									appear
@@ -55,18 +71,24 @@
 									</div>
 								</transition>
 								<transition
-									v-else-if="action.toHit.throwsTotal == 20"
+									v-else-if="isCrit(action, action_index)"
 									name="heartBeat"
 									enter-active-class="animated animate__heartBeat"
 									appear
 								>
 									<div class="total crit green">
 										Crit
-										<b><hk-animated-integer :value="20" onMount /></b>
+										<b><hk-animated-integer :value="action.toHit.total" onMount /></b>
 									</div>
 								</transition>
 								<div v-else class="total">
 									<hk-animated-integer :value="action.toHit.total" onMount />
+								</div>
+							</div>
+							<!-- Effects on the attack: crit reason, bonus dice, Advantage sources, reminders -->
+							<div v-if="toHitNotes(action, action_index).length" class="save-notes neutral-2 mb-2">
+								<div v-for="(note, n) in toHitNotes(action, action_index)" :key="`hit-note-${n}`">
+									{{ note }}
 								</div>
 							</div>
 							<q-btn-toggle
@@ -144,6 +166,10 @@
 									}}</template>
 								</hk-roll>
 							</div>
+							<!-- Roll modifiers of the save: bonus dice, Advantage, reminders -->
+							<div v-if="saveNotes[action_index]?.length" class="save-notes neutral-2 mb-3">
+								<div v-for="(note, n) in saveNotes[action_index]" :key="`note-${n}`">{{ note }}</div>
+							</div>
 						</template>
 
 						<TutorialPopover
@@ -205,7 +231,7 @@
 													<q-tooltip anchor="top middle" self="center middle">Magical</q-tooltip>
 												</i>
 											</span>
-											{{ rolled.damage_type }}
+											<template v-if="rolled.name">{{ rolled.name }}: </template>{{ rolled.damage_type }}
 										</span>
 										<TutorialPopover
 											v-if="demo && index === 0"
@@ -237,7 +263,7 @@
 							<div class="accordion-body">
 								<div>
 									<b>Rolls: </b>
-									<template v-if="action.toHit && action.toHit.throwsTotal === 20">
+									<template v-if="action.toHit && isCrit(action, action_index)">
 										<b class="green">Crit!</b>
 										{{ crit_description[critSettings] }} </template
 									><br />
@@ -259,7 +285,7 @@
 														$event,
 														rolled.rollResult,
 														throw_index,
-														action.toHit && action.toHit.throwsTotal === 20
+														action.toHit && isCrit(action, action_index)
 													))
 												"
 												@animationend="animateRoll = undefined"
@@ -358,6 +384,30 @@
 						<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
 							<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
 						</div>
+					</div>
+				</div>
+
+				<!-- The target's damage modifiers: reductions to switch on (off by default), and what's
+				applied by itself (Evasion, Absorb) or only reminded of -->
+				<div
+					v-if="damageModifierToggles.length || damageModifierNotes().length"
+					class="damage-modifiers"
+				>
+					<q-checkbox
+						v-for="toggle in damageModifierToggles"
+						:key="toggle.id"
+						:value="damageToggles[toggle.id] !== undefined"
+						:label="damageToggleLabel(toggle)"
+						:dark="$store.getters.theme === 'dark'"
+						dense
+						@input="setDamageToggle(toggle, $event)"
+					>
+						<q-tooltip v-if="toggle.notes.length" anchor="top middle" self="bottom middle">
+							{{ toggle.notes.join(", ") }}
+						</q-tooltip>
+					</q-checkbox>
+					<div v-for="(note, n) in damageModifierNotes()" :key="`damage-note-${n}`" class="neutral-2">
+						{{ note }}
 					</div>
 				</div>
 
@@ -499,6 +549,7 @@ import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import { calc_mod } from "src/utils/generalFunctions";
 import { displayStats } from "src/utils/entityFunctions";
+import { rollPlan, applyDamageModifiers } from "src/utils/effectFunctions";
 
 export default {
 	name: "hk-single-roll",
@@ -519,6 +570,8 @@ export default {
 	mixins: [dice, setHP, experience],
 	data() {
 		return {
+			// The target's effective defense lists when the dialog opened (resistances)
+			targetDefenses: this.targetDefenseLists(),
 			edit_total: {
 				damage: false,
 				healing: false,
@@ -543,7 +596,10 @@ export default {
 			},
 			savingThrowResult: {},
 			rolledSaves: {},
+			saveNotes: {},
 			hitOrMiss: {},
+			// Switched-on damage modifier toggles of the target: { [id]: rolled amount | true }
+			damageToggles: {},
 			animateRoll: undefined,
 			resultColumns: {
 				total: {
@@ -585,11 +641,14 @@ export default {
 		resistances() {
 			if (this.roll.target) {
 				const resistances = {};
+				// The target's defenses with its effects' (Petrified, Stoneskin), as when the
+				// dialog opened: a snapshot, so the DM's overrides (setDefense) aren't recomputed away
+				const target = this.targetDefenses || this.roll.target;
 
 				// Resistances
 				for (const [key, defense] of Object.entries(this.defenses)) {
-					if (this.roll.target[defense.value]) {
-						for (const damage_type of this.roll.target[defense.value]) {
+					if (target[defense.value]) {
+						for (const damage_type of target[defense.value]) {
 							resistances[damage_type] = key;
 						}
 					}
@@ -608,12 +667,27 @@ export default {
 			if (Object.values(this.hitOrMiss).length === 0) return false;
 			return Object.values(this.hitOrMiss).every((value) => value === "miss");
 		},
+		/**
+		 * The target's damage modifiers, with the attacker as the other party (Uncanny Dodge)
+		 */
+		targetDamageModifiers() {
+			const key = this.roll.target?.key;
+			if (!key || !this.$store.getters.entities?.[key]) return undefined;
+			return this.$store.getters.damage_modifiers(key, this.roll.current?.key);
+		},
+		/**
+		 * Reduce / halve / negate toggles, when the roll deals damage
+		 */
+		damageModifierToggles() {
+			if (!this.roll.actions.some((action) => action.type !== "healing")) return [];
+			return this.targetDamageModifiers?.toggles || [];
+		},
 	},
 	mounted() {
 		this.checkHitOrMiss();
 	},
 	methods: {
-		...mapActions(["removeActionRoll", "edit_entity_prop", "fire_trigger"]),
+		...mapActions(["removeActionRoll", "fire_trigger", "set_bonus"]),
 		...mapActions("tutorial", ["completeStep"]),
 		/**
 		 * Fires on_hit / on_hit_taken, on_crit / on_crit_taken (natural 20 hit)
@@ -625,7 +699,7 @@ export default {
 			if (!targetKey) return;
 
 			this.roll.actions.forEach((action, index) => {
-				const naturalRoll = action.toHit?.throwsTotal;
+				const naturalRoll = this.naturalOf(action.toHit);
 				const attackTypes = {
 					melee_weapon: ["melee_weapon", "melee", "weapon"],
 					ranged_weapon: ["ranged_weapon", "ranged", "weapon"],
@@ -643,7 +717,7 @@ export default {
 				if (action.toHit && this.hitOrMiss[index] === "hit") {
 					fire("on_hit", attackerKey, targetKey);
 					fire("on_hit_taken", targetKey, attackerKey);
-					if (naturalRoll === 20) {
+					if (this.isCrit(action, index)) {
 						fire("on_crit", attackerKey, targetKey);
 						fire("on_crit_taken", targetKey, attackerKey);
 					}
@@ -660,18 +734,91 @@ export default {
 		checkHitOrMiss() {
 			this.roll.actions.forEach((action, index) => {
 				if (action.toHit) {
-					if (action.toHit.throwsTotal === 20) this.$set(this.hitOrMiss, index, "hit");
-					else if (action.toHit.throwsTotal === 1) this.$set(this.hitOrMiss, index, "miss");
+					// A critical hit hits: a natural 20, or a natural roll in an effect's crit range
+					if (action.crit || this.naturalOf(action.toHit) === 20) this.$set(this.hitOrMiss, index, "hit");
+					else if (this.naturalOf(action.toHit) === 1) this.$set(this.hitOrMiss, index, "miss");
 					else if (this.roll.target) {
-						if (displayStats(this.roll.target).ac <= action.toHit.total)
+						if (displayStats(this.effectiveTarget()).ac <= action.toHit.total)
 							this.$set(this.hitOrMiss, index, "hit");
 						else this.$set(this.hitOrMiss, index, "miss");
 					}
 				}
 			});
 		},
+		/**
+		 * Whether an attack is a critical hit: a natural 20 or a natural roll in an effect's crit
+		 * range (action.crit), or a hit against a target whose effects make hits critical
+		 * (action.critOnHit, Paralyzed within 5 ft)
+		 */
+		isCrit(action, index) {
+			if (!action?.toHit) return false;
+			if (action.crit || this.naturalOf(action.toHit) === 20) return true;
+			return !!action.critOnHit?.length && this.hitOrMiss[index] === "hit";
+		},
+		/**
+		 * The d20 as rolled: a floor (Reliable Talent) can raise throwsTotal, not the natural roll
+		 */
+		naturalOf(toHit) {
+			if (!toHit) return undefined;
+			return toHit.natural ?? toHit.throwsTotal;
+		},
+		/**
+		 * A bonus die of an effect in the to-hit line: "+ 3", "- 2"
+		 */
+		bonusRollText({ total }) {
+			return total < 0 ? `- ${Math.abs(total)}` : `+ ${total}`;
+		},
+		/**
+		 * Its tooltip: "Bless +1d4: 3"
+		 */
+		bonusRollDetail({ name, dice, sign, throws = [] }) {
+			return `${name} ${sign < 0 ? "−" : "+"}${dice}: ${throws.join(", ")}`;
+		},
+		/**
+		 * The notes of an attack's to-hit: why it's critical and the roll modifiers' notes
+		 * (Advantage sources, flat bonuses, reminders, assumed distance)
+		 */
+		toHitNotes(action, index) {
+			const toHit = action?.toHit;
+			if (!toHit) return [];
+			const notes = [];
+			if (action.critNames?.length) notes.push(`Critical on ${this.naturalOf(toHit)}: ${action.critNames.join(", ")}`);
+			if (action.critOnHit?.length) {
+				notes.push(
+					this.hitOrMiss[index] === "hit"
+						? `Critical hit: ${action.critOnHit.join(", ")}`
+						: `A hit is critical: ${action.critOnHit.join(", ")}`
+				);
+			}
+			// The bonus dice are shown in the to-hit line itself
+			return [...notes, ...(toHit.notes || [])];
+		},
+		/**
+		 * The target's damage defense lists with its effects' (Petrified, Stoneskin), or
+		 * undefined without a target
+		 */
+		targetDefenseLists() {
+			// Called from data(): computeds such as roll don't exist yet, so read the prop
+			const rollTarget = this.value?.target;
+			if (!rollTarget) return undefined;
+			const target =
+				(rollTarget.key && this.$store.getters.effective_entity?.(rollTarget.key)) || rollTarget;
+			return {
+				damage_vulnerabilities: target.damage_vulnerabilities,
+				damage_resistances: target.damage_resistances,
+				damage_immunities: target.damage_immunities,
+			};
+		},
+		/**
+		 * The target now, with the values its active effects give it (AC, ability scores);
+		 * roll.target is a snapshot from when the roll was made
+		 */
+		effectiveTarget() {
+			const key = this.roll.target?.key;
+			return (key && this.$store.getters.effective_entity?.(key)) || this.roll.target;
+		},
 		rollSave(e, action_index, action) {
-			const entity = this.roll.target;
+			const entity = this.effectiveTarget();
 			const ability = action.save_ability;
 
 			let proficiency;
@@ -686,19 +833,52 @@ export default {
 				? parseInt(calc_mod(entity[ability])) + proficiency
 				: parseInt(calc_mod(entity[ability]));
 
+			// The target's roll modifiers; a spell is magical, other sources are unknown
+			const key = this.roll.target?.key;
+			const modifiers =
+				key && this.$store.getters.entities?.[key]
+					? this.$store.getters.roll_modifiers(key, { kind: "save", ability, source: this.roll.source })
+					: undefined;
+			// hk-roll emits { e, advantage_disadvantage }: the DM's own choice
+			const plan = rollPlan(modifiers, {
+				modifier,
+				advantage: { ...(e?.advantage_disadvantage || {}) },
+			});
+
+			// Automatic failure or success: no roll
+			if (plan.auto) {
+				const failed = plan.auto.result === "fail";
+				this.$set(this.rolledSaves, action_index, failed ? "Auto fail" : "Auto save");
+				this.$set(this.savingThrowResult, action_index, failed ? "fail" : "save");
+				this.$set(this.saveNotes, action_index, plan.roll_notes);
+				return;
+			}
+
 			const roll = this.rollD(
-				e,
+				e?.e || {},
 				20,
 				1,
-				modifier,
-				`${entity.name?.capitalizeEach()}: ${ability} saving throw`
+				plan.m,
+				`${entity.name?.capitalizeEach()}: ${ability} saving throw`,
+				undefined,
+				false,
+				plan.advantage,
+				null,
+				{ bonus_dice: plan.bonus_dice, notes: plan.roll_notes, floor: plan.floor, rerolls: plan.rerolls }
 			);
-			this.$set(this.rolledSaves, action_index, roll.throwsTotal);
-			this.$set(
-				this.savingThrowResult,
-				action_index,
-				roll.throwsTotal >= action.save_dc ? "save" : "fail"
-			);
+			// The total counts against the DC, not only the dice
+			this.$set(this.rolledSaves, action_index, roll.total);
+			if (action.save_dc !== undefined) {
+				this.$set(this.savingThrowResult, action_index, roll.total >= action.save_dc ? "save" : "fail");
+			}
+			// The roll's notes: the plan's, plus a floor that raised the die and reroll offers
+			this.$set(this.saveNotes, action_index, [
+				...(roll.bonus_rolls || []).map(
+					({ name, dice, sign, total }) => `${name} ${sign < 0 ? "−" : "+"}${dice}: ${Math.abs(total)}`
+				),
+				...(roll.notes || plan.roll_notes),
+			]);
+			if (plan.consume.length) this.$store.dispatch("consume_roll_modifiers", plan.consume);
 		},
 		removeRoll(index) {
 			this.removeActionRoll(index);
@@ -757,7 +937,7 @@ export default {
 				};
 				if (action.toHit) {
 					new_action.hitOrMiss = this.hitOrMiss[index];
-					if (action.toHit.throwsTotal === 20) new_action.crit = true;
+					if (this.isCrit(action, index)) new_action.crit = true;
 				}
 				if (action.type === "save") new_action.savingThrowResult = this.savingThrowResult[index];
 
@@ -824,15 +1004,15 @@ export default {
 						event_config
 					);
 				} else if (event[0] === "drain") {
-					const value = this.roll.target.maxHpMod
-						? this.roll.target.maxHpMod - event[1]
-						: -event[1];
-					this.edit_entity_prop({
-						key: this.roll.target.key,
-						entityType: this.roll.target.entityType,
-						prop: "maxHpMod",
-						value,
-					});
+					// A maximum hit point reduction, labelled with the ability that drained it
+					if (event[1] > 0) {
+						this.set_bonus({
+							key: this.roll.target.key,
+							stat: "max_hp",
+							amount: -event[1],
+							label: this.roll.name,
+						});
+					}
 				}
 			}
 			if (this.get_step("run", "apply", "monster")) {
@@ -841,24 +1021,99 @@ export default {
 			// Remove the roll
 			this.removeRoll(this.index);
 		},
-		totalRollValue(action, action_index, roll) {
-			let total = parseInt(roll.rollResult.total);
-
+		/**
+		 * The share of a roll a failed attack or successful save leaves: its missSave
+		 */
+		missSaveFactor(action, action_index, roll) {
+			let factor = 1;
 			if (action.type === "save" && this.savingThrowResult[action_index] === "save") {
-				total = total * (roll.missSave || 0);
+				factor = factor * (roll.missSave || 0);
 			}
 			if (action.toHit && this.hitOrMiss[action_index] === "miss") {
-				total = total * roll.missSave;
+				factor = factor * roll.missSave;
 			}
-			if (this.checkDefenses(roll.damage_type, roll.magical, "v")) {
-				total = total * 2;
+			return factor;
+		},
+		/**
+		 * Multiplier of the target's defenses for a damage type: vulnerable ×2, resistant ×½,
+		 * immune 0 (the DM's overrides included)
+		 */
+		defenseMultiplier(damage_type, magical) {
+			if (this.checkDefenses(damage_type, magical, "i")) return 0;
+			let multiplier = 1;
+			if (this.checkDefenses(damage_type, magical, "v")) multiplier *= 2;
+			if (this.checkDefenses(damage_type, magical, "r")) multiplier /= 2;
+			return multiplier;
+		},
+		/**
+		 * The damage of every damage roll after the target's damage modifiers and defenses
+		 * (applyDamageModifiers): the parts by "action:roll", the damage, absorbed healing and
+		 * notes. A method, not a computed: setDefense changes a non-reactive object.
+		 */
+		damageResult() {
+			const parts = [];
+			this.roll.actions.forEach((action, action_index) => {
+				if (action.type === "healing") return;
+				const result = this.savingThrowResult[action_index];
+				const save =
+					action.type === "save" && result && action.save_ability
+						? { ability: action.save_ability, result }
+						: undefined;
+				action.rolls.forEach((rolled, rolled_index) => {
+					parts.push({
+						key: `${action_index}:${rolled_index}`,
+						damageType: rolled.damage_type,
+						magical: rolled.magical,
+						amount: parseInt(rolled.rollResult.total) || 0,
+						factor: this.missSaveFactor(action, action_index, rolled),
+						saveHalf: action.type === "save" && rolled.missSave === 0.5,
+						save,
+					});
+				});
+			});
+			return applyDamageModifiers({
+				parts,
+				modifiers: this.targetDamageModifiers || {},
+				active: this.damageToggles,
+				defenseOf: (damage_type, part) => this.defenseMultiplier(damage_type, part.magical),
+			});
+		},
+		/**
+		 * What the target's damage modifiers did or only remind of (Evasion, Absorb, transfer);
+		 * the toggles show their own amounts
+		 */
+		damageModifierNotes() {
+			if (!this.roll.actions.some((action) => action.type !== "healing")) return [];
+			const toggleNames = this.damageModifierToggles.map((toggle) => `${toggle.name}:`);
+			return [
+				...this.damageResult().notes.filter((note) => !toggleNames.some((name) => note.startsWith(name))),
+				...(this.targetDamageModifiers?.reminders || []),
+			];
+		},
+		damageToggleLabel(toggle) {
+			const rolled = this.damageToggles[toggle.id];
+			return toggle.kind === "reduce" && typeof rolled === "number" ? `${toggle.text} (rolled ${rolled})` : toggle.text;
+		},
+		/**
+		 * Switches a damage modifier on or off; a reduction rolls its amount when switched on
+		 */
+		setDamageToggle(toggle, on) {
+			if (!on) return this.$delete(this.damageToggles, toggle.id);
+			if (toggle.kind !== "reduce") return this.$set(this.damageToggles, toggle.id, true);
+			const amount = toggle.roll
+				? this.rollD({}, toggle.roll.dice_type, toggle.roll.dice_count, toggle.roll.fixed_val || 0, toggle.name).total
+				: toggle.value || 0;
+			this.$set(this.damageToggles, toggle.id, amount);
+		},
+		totalRollValue(action, action_index, roll) {
+			// Damage: after the target's damage modifiers and defenses
+			if (action.type !== "healing") {
+				const rolled_index = action.rolls.indexOf(roll);
+				const part = this.damageResult().parts.find(({ key }) => key === `${action_index}:${rolled_index}`);
+				if (part) return part.amount;
 			}
-			if (this.checkDefenses(roll.damage_type, roll.magical, "r")) {
-				total = total / 2;
-			}
-			if (this.checkDefenses(roll.damage_type, roll.magical, "i")) {
-				total = 0;
-			}
+			let total = parseInt(roll.rollResult.total) * this.missSaveFactor(action, action_index, roll);
+			total = total * this.defenseMultiplier(roll.damage_type, roll.magical);
 			return Math.floor(total);
 		},
 		totalActionValue(action, action_index) {
@@ -885,11 +1140,20 @@ export default {
 				});
 			}
 
+			if (type === "damage") {
+				return actions.length > 0 ? this.damageResult().damage : undefined;
+			}
+			// Healing, plus damage the target absorbs (Acid Absorption)
+			const absorbed = this.roll.actions.some((action) => action.type !== "healing")
+				? this.damageResult().healing
+				: 0;
 			if (actions.length > 0) {
-				total = 0;
+				total = absorbed;
 				for (const action of actions) {
 					total = total + this.totalActionValue(action, action.index);
 				}
+			} else if (absorbed) {
+				total = absorbed;
 			}
 			return total;
 		},
@@ -964,6 +1228,16 @@ export default {
 <style lang="scss" scoped>
 .single-roll {
 	outline: none;
+	// Never wider than the rolls column (300px): long lines shrink (bonus names are cut off)
+	// instead of stretching the card
+	width: 100%;
+	max-width: 300px;
+	min-width: 0;
+
+	.hk-card {
+		min-width: 0;
+		max-width: 100%;
+	}
 
 	&:focus {
 		.hk-card {
@@ -995,15 +1269,55 @@ export default {
 				margin-left: 5px;
 			}
 		}
+		.save-notes {
+			font-size: 12px;
+			line-height: 16px;
+		}
 		.toHit {
 			position: relative;
 			display: flex;
 			justify-content: space-between;
+			gap: 10px;
+			min-width: 0;
 			font-size: 18px;
 			margin-bottom: 10px;
 			line-height: 30px;
 			padding: 0 5px;
 			z-index: 99;
+
+			// The roll and its bonus dice on one line; bonus names shrink first (Bless → Ble…)
+			&__roll {
+				display: flex;
+				align-items: baseline;
+				gap: 5px;
+				min-width: 0;
+				white-space: nowrap;
+			}
+			&__base {
+				flex-shrink: 0;
+			}
+			.bonus-roll {
+				display: flex;
+				align-items: baseline;
+				gap: 4px;
+				min-width: 0;
+
+				&__value {
+					flex-shrink: 0;
+				}
+				&__name {
+					display: flex;
+					min-width: 0;
+					font-size: 13px;
+
+					.truncate {
+						min-width: 0;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+				}
+			}
 
 			.total {
 				font-size: 25px;
@@ -1020,6 +1334,15 @@ export default {
 			.total {
 				font-weight: bold;
 			}
+		}
+		// The target's damage modifiers: toggles and notes
+		.damage-modifiers {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+			margin-top: 10px;
+			padding: 0 5px;
+			font-size: 13px;
 		}
 		.total-damage {
 			font-size: 20px;

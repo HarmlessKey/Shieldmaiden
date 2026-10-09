@@ -36,7 +36,10 @@ export default {
 	computed: {
 		...mapGetters(["target_multipliers", "entities", "manual"]),
 		defense() {
-			const entity = JSON.parse(JSON.stringify(this.entities[this.entityKey]));
+			// With its effects' defenses (Petrified, Stoneskin)
+			const effective =
+				this.$store.getters.effective_entity?.(this.entityKey) || this.entities[this.entityKey];
+			const entity = JSON.parse(JSON.stringify(effective));
 			let resistance;
 			for (const [key, defense] of Object.entries(this.defenses)) {
 				let resistances = entity[defense.value];

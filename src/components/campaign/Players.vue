@@ -204,18 +204,19 @@
 						<div class="col ac" :key="'ac-' + key">
 							<i aria-hidden="true" class="fas fa-shield" />
 							<span
-								v-if="player.ac_bonus"
+								v-if="bonusTotal(player, 'ac')"
 								class="value"
 								:class="{
-									green: player.ac_bonus > 0,
-									red: player.ac_bonus < 0,
+									green: bonusTotal(player, 'ac') > 0,
+									red: bonusTotal(player, 'ac') < 0,
 								}"
 							>
 								{{
-									(player.transformed ? player.transformed.ac : players[key].ac) + player.ac_bonus
+									(player.transformed ? player.transformed.ac : players[key].ac) +
+									bonusTotal(player, "ac")
 								}}
 								<q-tooltip anchor="top middle" self="center middle">
-									Armor Class {{ player.ac_bonus }}
+									<div v-for="(line, i) in bonusLines(player, 'ac')" :key="i">{{ line }}</div>
 								</q-tooltip>
 							</span>
 							<span v-else class="value">{{
@@ -316,29 +317,27 @@
 											class="current"
 											:class="{
 												red:
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <=
-													33,
+													percentage(player.curHp, maxHp(players[key].maxHp, player)) <= 33,
 												orange:
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) >
-														33 &&
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <=
-														76,
-												green:
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 76,
+													percentage(player.curHp, maxHp(players[key].maxHp, player)) > 33 &&
+													percentage(player.curHp, maxHp(players[key].maxHp, player)) <= 76,
+												green: percentage(player.curHp, maxHp(players[key].maxHp, player)) > 76,
 											}"
 											>{{ player.curHp }}</span
 										>
 										<span class="neutral-2 mx-1">/</span>
 										<span
 											:class="{
-												green: player.maxHpMod > 0,
-												red: player.maxHpMod < 0,
+												green: bonusTotal(player, 'max_hp') > 0,
+												red: bonusTotal(player, 'max_hp') < 0,
 											}"
-											v-if="player.maxHpMod"
+											v-if="bonusTotal(player, 'max_hp')"
 										>
-											{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+											{{ maxHp(players[key].maxHp, player) }}
 											<q-tooltip anchor="top middle" self="center middle">
-												Max HP + {{ player.maxHpMod }}
+												<div v-for="(line, i) in bonusLines(player, 'max_hp')" :key="i">
+													{{ line }}
+												</div>
 											</q-tooltip>
 										</span>
 										<span v-else class="neutral-2">{{ players[key].maxHp }}</span>
@@ -474,6 +473,7 @@ import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
 import { comparePlayerToCharacter } from "src/utils/generalFunctions";
+import { manualBonuses, manualBonusTotal } from "src/utils/entityFunctions";
 
 export default {
 	name: "Players",
@@ -516,18 +516,13 @@ export default {
 					property: "curHp",
 				},
 				{
-					label: "Maximum Hit Point modifiers",
-					property: "maxHpMod",
-					value: 0,
+					label: "Manual bonuses (Armor Class, Hit Points, …)",
+					property: "bonuses",
+					value: null,
 				},
 				{
 					label: "Temporary Hit Points",
 					property: "tempHp",
-					value: 0,
-				},
-				{
-					label: "Armor Class Bonus",
-					property: "ac_bonus",
 					value: 0,
 				},
 				{
@@ -656,8 +651,19 @@ export default {
 		percentage(current, max) {
 			return Math.floor((current / max) * 100);
 		},
-		maxHp(maxHp, maxHpMod) {
-			return parseInt(maxHpMod ? maxHp + maxHpMod : maxHp);
+		/**
+		 * Maximum hit points with the manual maximum HP bonuses of the campaign player
+		 */
+		maxHp(maxHp, campaignPlayer) {
+			return parseInt(maxHp) + manualBonusTotal(campaignPlayer, "max_hp");
+		},
+		bonusTotal(campaignPlayer, stat) {
+			return manualBonusTotal(campaignPlayer, stat);
+		},
+		bonusLines(campaignPlayer, stat) {
+			return Object.values(manualBonuses(campaignPlayer)[stat] || {}).map(
+				({ value, label }) => `${label}: ${value > 0 ? `+${value}` : value}`
+			);
 		},
 		checkAll(value) {
 			this.selected_resets = value ? this.resets.map((item) => item.property) : [];
@@ -722,8 +728,8 @@ export default {
 		},
 		resetValue(property, value, id, player) {
 			const campaign_player = this.campaign?.players?.[id];
-			const maxHp = !this.selected_resets.includes("maxHpMod")
-				? this.maxHp(player.maxHp, campaign_player?.maxHpMod)
+			const maxHp = !this.selected_resets.includes("bonuses")
+				? this.maxHp(player.maxHp, campaign_player)
 				: player.maxHp;
 			const reset_value = property === "curHp" ? maxHp : value;
 
@@ -735,6 +741,19 @@ export default {
 				property,
 				value: reset_value,
 			});
+			// Removing manual bonuses also removes the old single-value bonuses
+			if (property === "bonuses") {
+				for (const legacy of ["ac_bonus", "maxHpMod"]) {
+					this.update_campaign_entity({
+						uid: this.userId,
+						campaignId: this.campaignId,
+						type: "players",
+						id,
+						property: legacy,
+						value: null,
+					});
+				}
+			}
 
 			// if curHp > maxHp the curHp must be reset as well
 			if (campaign_player.curHp > maxHp && property !== "curHp") {

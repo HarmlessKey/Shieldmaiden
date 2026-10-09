@@ -91,7 +91,9 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: modifier(entities[key][ability] || 10),
+									m: roll_plans[key][ability].mod.m,
+									advantage: roll_plans[key][ability].mod.advantage,
+									plan: roll_plans[key][ability].mod,
 									title: `${ability.capitalize()} check`,
 									entity_name: entities[key].name.capitalizeEach(),
 									notify: true,
@@ -107,11 +109,12 @@
 								"
 							>
 								<div class="mod bg-neutral-8">
-									{{
-										modifier(entities[key][ability] || 10) > 0
-											? `+${modifier(entities[key][ability] || 10)}`
-											: modifier(entities[key][ability] || 10)
-									}}
+									<EffectModifiedValue
+										:notes="roll_plans[key][ability].mod.notes"
+										:changed="roll_plans[key][ability].mod.changed"
+										:advantage="roll_plans[key][ability].mod.advantage"
+										:value="signed(roll_plans[key][ability].mod.m)"
+									/>
 								</div>
 							</hk-roll>
 							<hk-roll
@@ -119,7 +122,9 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: savingThrow(entities[key], ability),
+									m: roll_plans[key][ability].save.m,
+									advantage: roll_plans[key][ability].save.advantage,
+									plan: roll_plans[key][ability].save,
 									title: `${ability.capitalize()} save`,
 									entity_name: entities[key].name.capitalizeEach(),
 									notify: true,
@@ -134,7 +139,12 @@
 								"
 							>
 								<div class="mod bg-neutral-8">
-									{{ savingThrow(entities[key], ability) }}
+									<EffectModifiedValue
+										:notes="roll_plans[key][ability].save.notes"
+										:changed="roll_plans[key][ability].save.changed"
+										:advantage="roll_plans[key][ability].save.advantage"
+										:value="signed(roll_plans[key][ability].save.m)"
+									/>
 								</div>
 							</hk-roll>
 						</div>
@@ -194,6 +204,8 @@ import { calc_mod } from "src/utils/generalFunctions";
 import Multipliers from "./entities/multipliers/Multipliers.vue";
 import Defenses from "./entities/multipliers/Defenses.vue";
 import { calculateManualDamage } from "src/utils/combatFunctions";
+import { rollPlan } from "src/utils/effectFunctions";
+import EffectModifiedValue from "./entities/EffectModifiedValue.vue";
 
 export default {
 	name: "Targeted",
@@ -205,6 +217,7 @@ export default {
 		TutorialPopover,
 		Multipliers,
 		Defenses,
+		EffectModifiedValue,
 	},
 	props: {
 		outOfTurnActions: {
@@ -295,6 +308,27 @@ export default {
 		shares() {
 			return this.broadcast.shares || [];
 		},
+		/**
+		 * Roll plans (effects and manual bonuses) of the targeted entities' checks and saves:
+		 * { [key]: { [ability]: { mod, save } } }
+		 */
+		roll_plans() {
+			const plans = {};
+			for (const key of this.targeted) {
+				if (!this.entities[key]) continue;
+				const entity = this.effective(key);
+				plans[key] = {};
+				for (const ability of this.abilities) {
+					const plan = (roll, modifier) =>
+						rollPlan(this.$store.getters.roll_modifiers(key, roll), { modifier: parseInt(modifier) || 0 });
+					plans[key][ability] = {
+						mod: plan({ kind: "check", ability }, this.modifier(entity[ability] || 10)),
+						save: plan({ kind: "save", ability }, this.savingThrow(entity, ability)),
+					};
+				}
+			}
+			return plans;
+		},
 		target() {
 			return this.targeted.length === 1 ? this.entities[this.targeted[0]] : undefined;
 		},
@@ -362,22 +396,14 @@ export default {
 				action: "set",
 			});
 		},
-		displayStats(target) {
-			var stats = "";
-			if (target.transformed) {
-				stats = {
-					ac: target.transformedAc,
-					maxHp: target.transformedMaxHp,
-					curHp: target.transformedCurHp,
-				};
-			} else {
-				stats = {
-					ac: target.ac,
-					maxHp: target.maxHp,
-					curHp: target.curHp,
-				};
-			}
-			return stats;
+		/**
+		 * Entity with the values its active effects give it (ability scores for mods and saves)
+		 */
+		effective(key) {
+			return this.$store.getters.effective_entity(key) || this.entities[key];
+		},
+		signed(value) {
+			return value > 0 ? `+${value}` : value;
 		},
 		savingThrow(entity, ability) {
 			let proficiency;
@@ -395,7 +421,8 @@ export default {
 			return save > 0 ? `+${save}` : save;
 		},
 		calculateAmount(key) {
-			const target = this.entities[key];
+			// With its effects' defenses (Petrified, Stoneskin), as the defense buttons show them
+			const target = this.$store.getters.effective_entity?.(key) || this.entities[key];
 			const multiplier = this.target_multipliers.multipliers?.[key];
 			const defense = this.target_multipliers.defenses?.[key];
 			return calculateManualDamage(this.manual, target, multiplier, defense);

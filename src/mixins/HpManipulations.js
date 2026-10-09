@@ -1,6 +1,7 @@
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
 import { remindersMixin } from "src/mixins/reminders";
+import { dropToOneFor } from "src/utils/effectFunctions";
 
 export const setHP = {
 	mixins: [remindersMixin],
@@ -56,8 +57,29 @@ export const setHP = {
 			}
 		},
 
+		/**
+		 * Maximum of the main hit point pool, as changed by active effects (Aid, Exhaustion)
+		 */
+		effectiveMaxHp(target) {
+			const effective = target?.key && this.$store.getters.effective_entity?.(target.key);
+			return parseInt(effective ? effective.maxHp : target.maxHp);
+		},
+		/**
+		 * The target's "drop to 1 instead" for this damage, if one applies: its damage types come
+		 * from the config's actions (unknown for untyped damage)
+		 *
+		 * @returns {object|undefined} dropToOneFor's result
+		 */
+		dropToOneMatch(target, amount, config = {}) {
+			const modifiers = target?.key && this.$store.getters.damage_modifiers?.(target.key);
+			if (!modifiers?.dropToOne?.length) return undefined;
+			const damageTypes = (config.actions || [])
+				.flatMap((action) => (action.rolls || []).map((roll) => roll.damage_type))
+				.filter(Boolean);
+			return dropToOneFor({ dropToOne: modifiers.dropToOne, damageTypes, damage: amount });
+		},
 		async isDamage(amount, target, current, config) {
-			var maxHp = parseInt(target.maxHp);
+			var maxHp = this.effectiveMaxHp(target);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
 			var transCurHp = parseInt(target.transformedCurHp);
@@ -117,8 +139,15 @@ export const setHP = {
 				});
 			}
 			//If there is damage left after taking it from the tempHp and/or the transformation
+			let heldAtOne;
 			if (rest_amount > 0) {
 				var newhp = parseInt(curHp - rest_amount);
+
+				// Drop to 1 instead of 0 (Death Ward, Undead Fortitude): no death checks then
+				if (curHp > 0 && newhp <= 0 && !config.undo) {
+					heldAtOne = this.dropToOneMatch(target, amount, config);
+					if (heldAtOne) newhp = 1;
+				}
 
 				if (newhp <= 0 && target.entityType !== "npc") {
 					this.set_stable({
@@ -151,6 +180,9 @@ export const setHP = {
 					newHp: newhp,
 				});
 			}
+			if (heldAtOne) {
+				this.$store.dispatch("drop_to_one", { key: target.key, match: heldAtOne, damage: amount });
+			}
 			//Check if a reminder is triggered on damage taken
 			if (amount > 0) {
 				this.checkReminders(target, "damage");
@@ -159,9 +191,11 @@ export const setHP = {
 			// Effect triggers, on the main HP pool
 			if (amount > 0 && !config.undo) {
 				const after = newhp !== undefined ? newhp : curHp;
+				const dropsToZero = curHp > 0 && after === 0;
 				const event = {
 					sourceKey: current?.key,
 					amount,
+					dropsToZero,
 					damageTypes: (config.actions || [])
 						.flatMap((action) => (action.rolls || []).map((roll) => roll.damage_type))
 						.filter(Boolean),
@@ -174,7 +208,7 @@ export const setHP = {
 						event: { ...event, sourceKey: target.key },
 					});
 				}
-				if (curHp > 0 && after === 0) {
+				if (dropsToZero) {
 					this.fire_trigger({ trigger: "on_zero_hp", entityKey: target.key, event });
 				}
 				if (curHp > maxHp / 2 && after <= maxHp / 2) {
@@ -253,7 +287,7 @@ export const setHP = {
 				curHp = parseInt(target.transformedCurHp);
 				pool = "transformed";
 			} else {
-				maxHp = parseInt(target.maxHp);
+				maxHp = this.effectiveMaxHp(target);
 				curHp = parseInt(target.curHp);
 				pool = "";
 			}

@@ -6,7 +6,9 @@
 			:roll="{
 				d: 20,
 				n: 1,
-				m: skillModifier(skill),
+				m: plan(skill).m,
+				advantage: plan(skill).advantage,
+				plan: plan(skill),
 				title: `${skill.skill} check`,
 				entity_name: entity.name.capitalizeEach(),
 				notify: true,
@@ -36,7 +38,13 @@
 				<span class="truncate">
 					{{ skill.skill }}
 				</span>
-				<span class="modifier">{{ skillModifier(skill) }}</span>
+				<EffectModifiedValue
+					class="modifier"
+					:notes="plan(skill).notes"
+					:changed="plan(skill).changed"
+					:advantage="plan(skill).advantage"
+					:value="plan(skill).m"
+				/>
 			</span>
 		</hk-roll>
 	</div>
@@ -45,9 +53,13 @@
 <script>
 import { mapGetters } from "vuex";
 import { skills } from "src/utils/generalConstants";
+import EffectModifiedValue from "../EffectModifiedValue.vue";
 
 export default {
 	name: "CardSkills",
+	components: {
+		EffectModifiedValue,
+	},
 	props: {
 		entity: {
 			type: Object,
@@ -55,6 +67,11 @@ export default {
 		},
 		skillModifier: {
 			type: Function,
+		},
+		// Roll plans per skill value (effects and manual bonuses), from CardDetails
+		skillPlans: {
+			type: Object,
+			default: () => ({}),
 		},
 	},
 	data() {
@@ -66,6 +83,19 @@ export default {
 		...mapGetters(["encounterId", "broadcast"]),
 		shares() {
 			return this.broadcast.shares || [];
+		},
+	},
+	methods: {
+		// The skill's roll plan, or its plain modifier without one
+		plan(skill) {
+			return (
+				this.skillPlans[skill.value] || {
+					m: parseInt(this.skillModifier(skill)) || 0,
+					advantage: {},
+					notes: [],
+					changed: false,
+				}
+			);
 		},
 	},
 };

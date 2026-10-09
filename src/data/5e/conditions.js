@@ -34,6 +34,7 @@ export default [
 			{
 				type: "restrict",
 				sub_types: ["attack"],
+				condition: { subject: "counterpart", type: "is_caster", description: "Against the charmer" },
 				description: "Can't attack the charmer or target the charmer with harmful abilities or magical effects",
 			},
 			{

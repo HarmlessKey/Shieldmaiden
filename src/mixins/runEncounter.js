@@ -1,8 +1,12 @@
 import { dice } from "src/mixins/dice.js";
+import { restrictionsMixin } from "src/mixins/restrictions.js";
 import { mapActions, mapGetters } from "vuex";
 
+// Action types with a to-hit roll
+const ATTACK_ACTION_TYPES = ["melee_weapon", "ranged_weapon", "spell_attack"];
+
 export const runEncounter = {
-	mixins: [dice],
+	mixins: [dice, restrictionsMixin],
 	computed: {
 		...mapGetters(["entities", "broadcast"]),
 		_share() {
@@ -23,13 +27,38 @@ export const runEncounter = {
 		 * @param {array|object} targets array of keys or object with { [key]: projectile_count }
 		 * @param {string} option if an action/spell has options, this is the selected option
 		 */
-		roll_action({ e, action_index, action, category, entity, targets, option = undefined }) {
+		roll_action(args) {
+			// Restricted (Stunned, Slow's reactions, Charmed against the charmer): the DM confirms
+			const { action, category, entity, targets } = args;
+			const actionList = action.action_list || action.actions || [];
+			this.confirmRestrictions({
+				entity,
+				targets: Array.isArray(targets) ? targets : Object.keys(targets || {}),
+				category,
+				attack: actionList.some(({ type }) => ATTACK_ACTION_TYPES.includes(type)),
+			}).then((confirmed) => {
+				if (confirmed) this.doRollAction(args);
+			});
+		},
+		/**
+		 * Rolls an action or spell (roll_action without the restriction check)
+		 */
+		doRollAction({ e, action_index, action, category, entity, targets, option = undefined }) {
 			let roll;
 			const is_spell = ["innate", "caster"].includes(category);
 			const config = {
 				type: is_spell ? "spell" : "monster_action",
 				option,
+				// For the attacker's and target's effects on attack rolls (rollAction)
+				attackerKey: entity?.key,
+				// Single-use modifiers used by earlier rolls of this action (projectiles, targets)
+				consumed: [],
 			};
+
+			// Acting out of turn uses the actor's reaction (once, however many targets)
+			this.$store
+				.dispatch("use_reaction", { actorKey: entity?.key, category })
+				.catch((error) => console.error(error));
 
 			// Create projectile object if target = array
 			if (Array.isArray(targets)) {
@@ -37,10 +66,12 @@ export const runEncounter = {
 			}
 
 			if (is_spell) {
+				// Spell save DC and attack bonus as changed by the caster's active effects
+				const caster = this.$store.getters.effective_entity?.(entity.key) || entity;
 				action.action_list = action.actions;
-				config.attack_bonus = entity[`${category}_spell_attack`];
+				config.attack_bonus = caster[`${category}_spell_attack`];
 				config.caster_level = entity[`${category}_level`];
-				config.save_dc = entity[`${category}_save_dc`];
+				config.save_dc = caster[`${category}_save_dc`];
 
 				// Innate spells are cast at their assigned level, falling back to the lowest possible level
 				config.cast_level =
@@ -76,7 +107,7 @@ export const runEncounter = {
 
 					// Reroll for each target if it's not AOE
 					if (!action.aoe_type || action.aoe_type === "none") {
-						newRoll = this.rollAction(e, action, config);
+						newRoll = this.rollAction(e, action, { ...config, targetKey: key });
 						if (this._share) this.shareRoll(newRoll, entity, [key]);
 					}
 

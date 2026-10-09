@@ -81,6 +81,7 @@ import { general } from "src/mixins/general.js";
 import Name from "../entities/Name.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import BasicEntity from "../entities/BasicEntity.vue";
+import { rollPlan } from "src/utils/effectFunctions";
 
 export default {
 	name: "SetInitiativeNPC",
@@ -116,27 +117,58 @@ export default {
 	methods: {
 		...mapActions(["setDrawer", "set_initiative"]),
 		...mapActions("tutorial", ["completeStep"]),
+		/**
+		 * The entity with the values its active effects give it (initiative, Dexterity)
+		 */
+		effective(entity) {
+			return this.$store.getters.effective_entity?.(entity.key) || entity;
+		},
 		initiativeModifier(entity) {
+			entity = this.effective(entity);
 			// NPCs can have a flat initiative modifier override (5.5e stat blocks)
 			return entity.initiative_modifier !== undefined
 				? entity.initiative_modifier
 				: this.calcMod(entity.dexterity);
 		},
 		rollMonster(e, key, entity, advantage_disadvantage) {
-			const advantage_object = advantage_disadvantage ? advantage_disadvantage : {};
+			// Initiative is a Dexterity check: effects and manual bonuses (rollModifiers).
+			// An automatic result can't give an initiative number, so it's only named in the notes.
+			const modifiers = this.$store.getters.entities?.[key]
+				? this.$store.getters.roll_modifiers(key, { kind: "initiative" })
+				: undefined;
+			const plan = rollPlan(modifiers, {
+				modifier: this.initiativeModifier(entity),
+				advantage: { ...(advantage_disadvantage || {}) },
+			});
 			let roll = this.rollD(
 				e,
 				20,
 				1,
-				this.initiativeModifier(entity),
+				plan.m,
 				"Initiative",
 				entity.name,
 				false,
-				advantage_object,
-				this.share ? { encounter_id: this.encounterId, entity_key: key } : null
+				plan.advantage,
+				this.share ? { encounter_id: this.encounterId, entity_key: key } : null,
+				{ bonus_dice: plan.bonus_dice, notes: plan.roll_notes, floor: plan.floor, rerolls: plan.rerolls }
 			);
 			entity.initiative = roll.total;
 			this.setInitiative(key, entity.initiative);
+			if (plan.consume.length) this.$store.dispatch("consume_roll_modifiers", plan.consume);
+
+			// No roll result is shown for initiative: name what changed it
+			const notes = [
+				...(roll.bonus_rolls || []).map(
+					({ name, dice, sign, total }) => `${name} ${sign < 0 ? "−" : "+"}${dice}: ${Math.abs(total)}`
+				),
+				...plan.roll_notes,
+			];
+			if (notes.length) {
+				this.$snotify.info(notes.join("\n"), `${entity.name?.capitalizeEach?.() || entity.name}: initiative ${roll.total}`, {
+					timeout: 5000,
+					showProgressBar: false,
+				});
+			}
 		},
 		rollAll(e) {
 			for (let i in this.npcs) {
@@ -151,8 +183,9 @@ export default {
 				entity = this.npcs[npc_indx];
 
 				//Find lowest Dex
-				if (entity.dexterity < dex) {
-					dex = entity.dexterity;
+				const dexterity = this.effective(entity).dexterity;
+				if (dexterity < dex) {
+					dex = dexterity;
 				}
 			}
 			const advantage_object = e.advantage_disadvantage ? e.advantage_disadvantage : {};

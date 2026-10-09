@@ -118,6 +118,8 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { setHP } from "src/mixins/HpManipulations.js";
+import { restrictionsMixin } from "src/mixins/restrictions.js";
+import { damageModifiersMixin } from "src/mixins/damageModifiers.js";
 import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
@@ -126,7 +128,7 @@ export default {
 	components: {
 		TutorialPopover,
 	},
-	mixins: [setHP],
+	mixins: [setHP, restrictionsMixin, damageModifiersMixin],
 	props: ["current", "autofocus"],
 	data() {
 		return {
@@ -212,7 +214,9 @@ export default {
 	methods: {
 		...mapActions("tutorial", ["completeStep"]),
 		checkDefenses(target) {
-			const entity = JSON.parse(JSON.stringify(this.entities[target]));
+			// With its effects' defenses (Petrified, Stoneskin)
+			const effective = this.$store.getters.effective_entity?.(target) || this.entities[target];
+			const entity = JSON.parse(JSON.stringify(effective));
 			for (const [key, defense] of Object.entries(this.defenses)) {
 				let resistances = entity[defense.value];
 				if (resistances) {
@@ -262,12 +266,65 @@ export default {
 			return Math.floor(value);
 		},
 		async setManual(type, valid) {
+			// Restricted actor (Stunned, Charmed against the charmer): the DM confirms; cancel
+			// applies nothing and keeps the value
+			if (
+				valid &&
+				this.manualAmount != "" &&
+				this.targeted.length &&
+				!(await this.confirmRestrictions({
+					entity: this.current,
+					targets: this.targeted,
+					category: "actions",
+					attack: type === "damage",
+					okLabel: "Apply anyway",
+				}))
+			) {
+				return;
+			}
+			// The targets' reductions (Resistance 1d4, Uncanny Dodge): the DM switches them on;
+			// cancel applies nothing and keeps the value
+			let toggles = {};
+			if (valid && this.manualAmount != "" && type === "damage") {
+				toggles = await this.confirmDamageToggles(
+					this.manualDamageToggles(this.targeted, this.damage_type || undefined, this.current?.key)
+				);
+				if (!toggles) return;
+			}
 			if (valid && this.manualAmount != "") {
 				//Update HP
 				for (let i in this.targeted) {
 					let key = this.targeted[i];
 					let amount = {};
-					amount[type] = this.calculateAmount(key, type);
+					if (type === "damage") {
+						// The DM's multiplier and defense (resolved per target, null when none), with the
+						// target's damage modifiers
+						const result = this.manualDamageWithModifiers({
+							manual: {
+								value: this.manualAmount ? parseInt(this.manualAmount) : 0,
+								type: this.damage_type || undefined,
+								magical: this.magical,
+							},
+							key,
+							entity: this.$store.getters.effective_entity?.(key) || this.entities[key],
+							multiplier: this.multiplier[key],
+							defense: this.resistances[key] || null,
+							active: toggles[key],
+							attackerKey: this.current?.key,
+						});
+						amount.damage = result.damage;
+						// Absorbed damage heals instead (Acid Absorption)
+						if (result.healing) amount.healing = result.healing;
+						if (result.notes.length) {
+							this.$snotify.info(
+								result.notes.join("\n"),
+								(this.entities[key]?.name || "").capitalizeEach(),
+								{ timeout: 4000 }
+							);
+						}
+					} else {
+						amount[type] = this.calculateAmount(key, type);
+					}
 
 					// Set config for HpManipulation and log
 					const config = {
@@ -289,6 +346,13 @@ export default {
 					};
 
 					await this.setHP(amount, this.entities[key], this.current, config);
+				}
+
+				// Acting out of turn uses the actor's reaction
+				if (this.targeted.length) {
+					this.$store
+						.dispatch("use_reaction", { actorKey: this.current?.key })
+						.catch((error) => console.error(error));
 				}
 
 				//Reset input fields

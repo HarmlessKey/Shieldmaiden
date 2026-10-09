@@ -494,6 +494,8 @@ effects-2h1-duration-expiry, 2026-09-30).** Spec `openspec/specs/effects-duratio
 - **Assumption for steps 6–7:** `caster_key` means "the entity whose turn it was when the
   effect was applied". The same-turn skip for `next_turn` / `edge: "end"` relies on it.
   An out-of-turn applier (a reaction) needs a separate `applied_turn` field.
+  - Resolved in 2j: `applied_turn_key` stores the entity whose turn it was, and the caster
+    is chosen in the drawer.
 - **Known issue (2026-09-30): going back a turn desyncs timed durations.**
   `rounds_remaining` is ticked at the end of the anchor's turn and saved, and going back
   a turn undoes nothing (by design, spec "Going back a turn undoes nothing"). After going
@@ -608,7 +610,284 @@ new `effects-player-view`.
 - Non-tracker uses of the `api_conditions` store (compendium, NPC condition immunities in
   `Defenses.vue`, `hk-condition-select`) are not tracker state and stay as they are.
 
-## 3. Apply mechanical bonuses and resolve trigger actions
+### 2j. Concentration on the caster, and choosing the caster (done — archived as effects-2j-concentration-caster, 2026-10-02)
+Found while testing 3c1 (2026-10-02). The change also takes in the temporary HP follow-up
+below.
+
+**As built.** New main spec `effects-concentration`; `effects-drawer`, `effects-durations`,
+`effects-stat-modifiers` and `effects-instance-storage` updated.
+- Caster select in the application form (every entity + None, default the active entity).
+- Concentration on the caster: start, share for the same effect, replace a different one
+  after a warning, link to or replace a Concentration of unknown effect
+  (`concentration_for`). Its "up to" time counts down as a `time` duration.
+- Unlinked Concentration durations count down their own "up to" time.
+- `applied_turn_key` for the same-turn rule (falls back to `caster_key`). This resolves 2h1's
+  "Assumption for steps 6–7".
+- Temporary HP with `expires_with_effect` (Heroism, 2014 False Life) are removed when their
+  effect ends (`temp_hp_granted`).
+- Added on request: effect notifications show a small condition or effect icon instead of
+  snotify's large icon, and titles are no longer truncated.
+- New instance fields are in the schema and the database rules. **The rules must be
+  uploaded to production before release.**
+
+**Today:**
+- An effect applied with duration **Concentration** has no expiry. Its "up to" time is
+  stored but never counted down.
+- It can be linked to its caster's Concentration ("Ends with <caster>'s Concentration",
+  `concentration_id`), but only when the caster already has a Concentration instance.
+- Nothing is applied to the caster. The DM has to apply Concentration to the caster first,
+  then the spell effect, or the Concentration isn't tracked.
+
+**To do:**
+1. **Concentration on the caster.** When an effect is applied with a `concentration`
+   duration and a caster in the encounter:
+   - when the caster has no Concentration instance, apply one to the caster automatically,
+     with the same "up to" time
+   - link the target's instance to it (`concentration_id`)
+   
+   Applying one spell to several targets (Bless on three creatures) shares one Concentration
+   instance on the caster.
+2. **One Concentration at a time.** When the caster already concentrates on a *different*
+   spell, starting a new one ends the old Concentration first, after the DM confirms. Its
+   linked effects end through the existing cascade (2h1), with a notice.
+   - Telling "the same casting" from "a new spell" needs something to compare. For example,
+     store the spell/effect the Concentration is for on the Concentration instance (a
+     `concentration_for` / `source_key` field: schema `$defs/active_instance` + rules), or
+     ask the DM.
+3. **"Up to" time limit.** The caster's Concentration instance counts down like a `time`
+   duration (on `end_turn_caster`, holder fallback as in 2h1). When it runs out,
+   Concentration ends and the cascade removes the linked effects.
+4. **Choose the caster in the drawer.** Today the caster is whoever's turn it is
+   (`turnEntityKey`, 2a), which is wrong for spells applied out of turn (reactions, pre-cast
+   buffs before combat, the DM catching up). The drawer gets a caster select that defaults
+   to the active entity, and includes "none". This also fixes formulas that read the caster
+   (`caster.spellcasting_mod`, Heroism), and 2h1's same-turn rule for `next_turn`
+   durations, which assumes the applier is the active entity (see 2h1 "Assumption for
+   steps 6–7").
+
+Related follow-up (done in 2j):
+- **Temporary HP that ends with its effect** (`expires_with_effect`: 2014 False Life,
+  Heroism). Before 2j they stayed when the effect ended (3b non-goal). Solved by storing
+  the granted amount on the instance.
+
+### 2k. Reaction Used as an effect (done — archived as effects-2k-reaction-used, 2026-10-05; spec `openspec/specs/effects-reaction-used`)
+Raised while testing 2j (2026-10-02).
+
+Decided in the proposal:
+- Legendary actions are excluded.
+- Not applied directly (changed after the first build, 2026-10-05): a prompt
+  "<actor>: Reaction used?" offers Apply / Dismiss, one open prompt per entity. A
+  "Reaction Used" tag is shown in the actor's details bar (after its name) and in the Select
+  Actor list.
+- Regaining the reaction at the start of its next turn isn't announced (no notice).
+- Still open, unchanged: points 4 (retire the premade reaction reminder, now in step 9) and the
+  optional `restrict` on reactions (3e).
+
+**Today:** "Reaction used" is only a legacy premade reminder. It is in `src/mixins/reminders.js`
+(`premade.reaction`), removed at the start of the entity's turn. The legacy
+`combat/legacy/actions/Actions.vue` warns "Reaction used" when the chosen actor has that
+reminder. It isn't an effect, and nothing applies it automatically.
+
+**To do:**
+1. **A "Reaction Used" effect definition.** A tracker effect rather than an SRD condition,
+   in both editions' `src/data/*/effects.js`. Its duration is `next_turn` with
+   `anchor: "target"` and `edge: "start"`, so it ends at the start of the holder's next turn,
+   when the reaction is regained. It has no mechanical sub-effects; it's a marker.
+   - Optionally, a `restrict` on reactions once 3e exists.
+2. **Applied automatically for actions out of turn.** When an entity is the selected actor
+   (the current actor) of an action while it isn't its turn, the tracker applies Reaction
+   Used to it. The actions are:
+   - rolling an action (`rollAction`, monster actions)
+   - rolling a spell
+   - manual damage or healing ("done by")
+
+   This covers reactions such as an opportunity attack, Shield or Hellish Rebuke.
+   - **Applied by the target:** the instance's caster is always the entity itself
+     (`caster_key` = holder), never the entity whose turn it is. Its timing is the holder's
+     own turns, and it is listed as self-applied.
+   - Not applied when the entity already has Reaction Used (one instance), or on its own turn.
+   - Before combat (no one has the turn), nothing is applied.
+   - **To decide in the proposal:**
+     - whether the DM gets a notice or undo (an out-of-turn roll isn't always a reaction:
+       legendary actions, lair actions, the DM catching up on a missed turn)
+     - whether legendary actions are excluded. They're taken outside the creature's turn but
+       don't use its reaction, so they probably should be.
+3. **Show it where the actor is chosen.** The "Reaction used" warning reads the effect
+   instead of the reminder, and the action/roll UI marks an actor that has already used its
+   reaction.
+4. **Retire the premade reaction reminder** (with step 9, formerly 3f), converting existing reminders like
+   the legacy conditions (2i) if needed.
+
+Find during the proposal: where the current (non-legacy) tracker sets the actor of a roll
+or of manual damage/healing (`setActionRoll` / `roll.current`, the `doneBy` of
+`setHP`), and `turnEntityKey` for "not its turn".
+
+## 3. Apply mechanical bonuses and resolve trigger actions (split into 3a–3g)
+Each sub-step is its own OpenSpec change:
+- **3a — damage and healing sub-effects** (done — archived as effects-3a-damage-over-time,
+  2026-09-30; spec `openspec/specs/effects-damage-healing`): a Roll button on trigger, repeat-save `on_fail` and `on_expire` prompts. It
+  rolls the sub-effect (dice, value or formula, level scaling, chosen damage type) and opens
+  it in the existing roll dialog against the recipient (`self` / `caster` /
+  `trigger_source`), so defenses, save for half, the log, meters and HP triggers are reused.
+  Adds a safe formula evaluator and the 5.5e Burning hazard.
+- **3b — numeric modifiers** (done — archived as effects-3b-numeric-modifiers, 2026-10-01;
+  specs `openspec/specs/effects-stat-modifiers`, and `spellcasting_mod` in
+  `effects-damage-healing`):
+  `bonus` / `base` / `fixed` / `floor` / `cap` / `multiplier` on AC, all Speeds, max HP
+  (derived, with current-HP clamping and `also_heal`), initiative, passive Perception, spell
+  DC/attack and ability scores, through one pure `effectiveStats` and an `effective_entity`
+  getter. Values changed by effects are marked with a tooltip. Temp HP is granted from a
+  prompt button. DM tracker only; the player live view keeps stored values.
+  - *Added during apply:* the DM's manual bonuses became labelled lists,
+    `bonuses.<value>.<id> = { value, label }`, for every value above. Old `ac_bonus` /
+    `maxHpMod` are read as a "Manual" bonus and replaced on the first change. The values
+    show in the same tooltip as effects, and a bonuses drawer opens from the card. See
+    "Manual bonuses for later values" below.
+- **3c — roll modifiers** (done: 3c1 and 3c2 archived): `advantage` / `disadvantage` (incl. `against`), dice and flat
+  roll bonuses (Bless), the 2024 Exhaustion penalty, and `auto_fail` / `auto_success` at
+  the roll sites.
+  - Give the flat roll bonuses the same manual treatment as 3b: skills first, then saving
+    throws, ability checks, attack and damage rolls, death saves and Concentration saves.
+    See "Manual bonuses for later values".
+  - **Split into 3c1 and 3c2:**
+    - **3c1 — checks, skills, saves and initiative** (done — archived as
+      effects-3c1-check-save-modifiers, 2026-10-02; main spec `effects-roll-modifiers`).
+      Advantage/Disadvantage, flat and dice bonuses, auto-fail/success, single-use modifiers,
+      and reminders for what the tracker can't check. Manual `skill_*`, `check_*`, `save_*`,
+      `death_save` and `concentration_save` bonuses. Also fixes roll-dialog saves comparing
+      the dice instead of the total. Added during testing: Concentration saves rolled from
+      the damage prompt with the evaluated DC, and the SRD Bless, Bane, Guidance and
+      Resistance effects.
+    - **3c2 — attack and damage rolls** (done — archived as
+      effects-3c2-attack-damage-modifiers, 2026-10-05; specs `effects-roll-modifiers`,
+      `effects-stat-modifiers`).
+
+      As built:
+      - Attack to-hits use the attacker's and the target's modifiers. In an attack the
+        other party is known (counterpart conditions, 5.5e Grappled's `is_caster`).
+      - Melee/ranged assumes the distance (Prone, incoming crits).
+      - Effect crits (crit range, incoming crit) follow the Critical Hits setting.
+      - Damage bonuses on hits are separate named damage rolls.
+      - Single-use modifiers are used once per action.
+      - Manual `attack` / `damage` bonuses.
+      - Fixed: `resolveDefinition` dropped `magical`, which 3c1's magical saves needed.
+
+      Added during testing:
+      - bonus dice inline in the roll dialog's to-hit line, and roll cards capped at 300px
+      - attack reminders for every actor in the details bar (Reaction Used first, red; a
+        green A / red D; to hit, crit, damage, reminder count)
+      - the bonuses drawer's add form at the top
+
+      Decided at proposal:
+      - melee attacks count as within 5 ft, ranged as beyond
+      - effect crits: crit range and incoming crits
+      - manual `attack` / `damage` bonuses only
+      - SRD test effects: Guiding Bolt, Divine Favor, Magic Weapon, Dodge and Help
+
+      Scope:
+      - the attacker's modifiers and "against" modifiers (Blinded, Dodge, Prone)
+      - damage bonuses and next-attack effects (Guiding Bolt)
+      - manual `attack` / `damage` bonuses
+- **3d — defenses** (done — archived as effects-3d-defenses, 2026-10-05; spec
+  `openspec/specs/effects-defenses`): `defense` r/v/i on damage, and condition immunity.
+
+  As built:
+  - `effectiveDefenses` (on the effective entity) combines the creature's own defenses with
+    its effects'
+  - the roll dialog, manual damage (actor panel, top bar, Targeted panel, legacy panel) and
+    the card use them
+  - `apply_effect` skips immune targets and ends conditions a new immunity covers
+  - the drawer's damage-type choice offers an effect's own types (Protection from Energy)
+
+  Fixed during testing: the roll dialog's defense snapshot (taken in `data()` before the
+  `roll` computed existed), and the manual damage amounts that used the raw entity.
+
+  Not done, for later:
+  - immunity through included conditions
+  - `mechanics` immunities
+  - `damage_modifier` (3g)
+
+  Decided:
+  - an immune target is skipped with a notice, and its own `condition_immunities` count too
+  - gaining an immunity ends the condition, with a notice
+  - resistance and vulnerability to the same type cancel; immunity wins
+  - test effects: Stoneskin and Protection from Energy
+- **3e — `restrict` and `outcome`**: action disabling, Exhaustion 6. **Done** — archived as
+  `openspec/changes/archive/2026-10-06-effects-3e-restrictions-outcomes`. New spec
+  `effects-restrictions`. Decided:
+  - restricted rolls ask the DM to confirm (Roll anyway / Cancel)
+  - manual damage and healing are confirmed too (Apply anyway)
+  - restrictions show as chips in the details bar after Reaction Used
+  - death (Exhaustion 6) is a prompt with Mark dead, which sets 0 HP (and dead for players)
+  - Concentration breaks by itself at 0 HP, without a save prompt
+  - Charmed's attack restriction gets an `is_caster` condition (data fix)
+  - the targets overview shows dead players as "Dead" instead of a health bar
+
+  Not done, for later: triggered restrictions (Haste's lethargy), `limit` (Slow's one
+  attack), `compel` / `deny`, and the other outcomes (still reminders).
+- **3f — moved to step 9** (2026-10-06): retiring the legacy reminders that effects
+  replace is part of the encounter reminders rework.
+- **3g — tier-P hooks**: `reroll`, `damage_modifier`, `score_swap`, `grant_action`, and the
+  rest. (Proposed as effects-3g-tier-p-hooks, 2026-10-06.) Decided:
+  - reduce / halve / negate are per-target toggles in the roll dialog and manual damage,
+    off by default
+  - drop to 1 (Death Ward, Undead Fortitude) is automatic with a notice; one with a save
+    holds at 1 and prompts for it
+  - Evasion and Absorb are automatic
+  - roll floors are applied automatically
+  - rerolls are offered (a toast button, or a note in the roll dialog), never applied by
+    themselves
+  - extra actions are chips in the details bar
+  - the rest (`compel`, `deny`, `sense`…) are counted in the reminders chip
+  - test effects: Death Ward, Uncanny Dodge, Evasion, Reliable Talent, Lucky/Luck, Undead
+    Fortitude, Acid Absorption
+
+### Manual bonuses for later values
+Every value that effects can add a flat bonus to should also accept manual bonuses from the
+DM. That way the DM's bonuses and the effects' bonuses add up in one place, show in the
+same tooltip, and can be edited in the same bonuses drawer. Since 3b this covers:
+- AC
+- the Speeds
+- max HP
+- initiative
+- passive Perception
+- spell save DC and spell attack
+- the six ability scores
+
+**Next candidates.** These come mostly with 3c, as each gets effect bonuses:
+- **Skills**: a bonus per skill (Guidance-like, or a +1 skill item). This is the most
+  requested.
+- **Saving throws** per ability (Cloak of Protection: all saves) and **ability checks** per
+  ability.
+- **Attack rolls** and **damage rolls**. Possibly per attack type (melee, ranged, spell),
+  matching the `attack_types` filter.
+- **Death saves** and **Concentration saves**.
+
+**What adding a value takes** (the 3b pattern):
+- Add its key to `BONUS_LABELS` in `src/utils/entityFunctions.js` (this also extends
+  `BONUS_VALUES`).
+- Add it to the `$stat` regex of the three `bonuses` rules blocks in `firebase-rules.json`
+  (campaign companions, campaign players, encounter entities), and upload the rules.
+- Map it in `effectiveStats` (`statFields`) to the field or modifier it changes.
+- Map it in the `StatBonuses.vue` drawer (`field` and the stored value).
+- Make it clickable where it's shown (the card's skill list, saves and so on).
+
+**Keys.** Use snake_case keys with a prefix, so they stay valid Firebase keys and simple to
+match in the rules:
+- `skill_<skill>`: `skill_athletics`, `skill_animal_handling`, `skill_sleight_of_hand`. The
+  skill names in the data contain spaces and capitals ("animal Handling"), so they need
+  converting.
+- `save_<ability>`, `check_<ability>`
+- `attack`, `damage` (or `attack_melee`…)
+- `death_save`, `concentration_save`
+
+A bonus on every save or every check could use `save_all` / `check_all`.
+
+**Open question for 3c.** Roll bonuses have no stored value the way AC does: the drawer's
+"Stored" line would be the computed modifier (for example the skill modifier from ability,
+proficiency and `skill_modifiers`). Decide whether NPCs' existing stat-block
+`skill_modifiers` stay stat-block data (likely), or show as a read-only line in the drawer.
+
 With the trigger system (2g) in place, implement actual mechanical resolution per
 sub-effect `type`. This step touches `runEncounter.js`, `HpManipulations.js`, roll
 components, and AC/HP display computeds. Conditions get their mechanics here like every
@@ -649,11 +928,14 @@ other effect.
 - v2 adds `roll_floor`, `critical`, `compel`, `deny`, `sense`, `proficiency`, `includes`,
   `apply_effect`, `remove_effect` and auras. The catalogue (§3) tags every shape A
   (automate here), P (prompt the DM) or D (reminder only) — implement tier A first.
-- **Retire legacy reminders** once mechanical triggers are covered by the effects engine:
-  `src/mixins/reminders.js`, `entity.reminders`, `Reminders.vue`, `TargetReminders.vue`
-  are removed. User-authored custom reminders (`src/views/UserContent/Reminders/`) stay as
-  a freeform-note feature. Existing `entity.reminders` in Firestore: shim or conversion
-  script, as in 2i.
+- **Legacy reminders: not retired here** (decided 2026-10-06; the former 3f is now part of
+  step 9). The reminders system stays and step 9 reworks it. Until then everything keeps
+  working:
+  - `src/mixins/reminders.js`
+  - `entity.reminders`
+  - `Reminders.vue` and `TargetReminders.vue`
+  - user-authored reminders (`src/views/UserContent/Reminders/`)
+  - the premade reminders that duplicate an effect, such as "Reaction used"
 
 ## 4. Effects form and constants
 - Regenerate `src/utils/effectsConstants.js` from the v2 schema as the first task of this
@@ -733,6 +1015,28 @@ Backfill `$defs/action_effects` onto SRD monsters in the API. 5.5e monsters (330
 with "Failure:/Success:" text, see 0a) are the best candidates for an automated backfill;
 2014 monsters stay manual/heuristic.
 
+## 9. Encounter reminders on triggers (separate feature, after the effects)
+Idea, 2026-10-06. Build it once the effects work above is done. Turn reminders into actual
+reminders: the DM sets them on an encounter trigger, not on an entity, and the tracker
+shows them when the trigger fires. Examples:
+- "Round 3: the boss changes tactics, and may flee"
+- "Round 5: a sandstorm starts. Blind everyone."
+
+Ideas to work out when it's proposed:
+- **Triggers:** reuse the 2g trigger bus (round start, turn start/end, `combat_start`), and
+  add encounter-level ones such as "round N" or "every N rounds". Entity triggers such as
+  "boss bloodied" are optional.
+- **Display:** a prompt when the trigger fires, like the effect prompts. A prompt could
+  offer to apply an effect to chosen or all entities (the sandstorm's Blinded).
+- **Storage:** reminders belong to the encounter, not to `entity.reminders`.
+- **Legacy reminders (the former 3f):**
+  - Retire the premade reminders that effects now cover: "Reaction used" (2k point 4), and
+    any that duplicate a condition or effect.
+  - The remaining entity reminders (`entity.reminders`, `src/mixins/reminders.js`,
+    `Reminders.vue`, `TargetReminders.vue`) and the user-authored reminders
+    (`src/views/UserContent/Reminders/`) become this feature or move into it.
+  - Existing `entity.reminders` in Firestore need a shim or a conversion script, as in 2i.
+
 ## Suggested Order
 0 (Concentration 2024 update, 5.5e monster re-scan — done, archived as effects-0-55e-alignment, 2026-09-29; 0b.2 is delivered by 2a/2e)
 1 (schema v2 — done)
@@ -740,11 +1044,12 @@ with "Failure:/Success:" text, see 0a) are the best candidates for an automated 
 2a (done — archived as effects-2a-effects-drawer, 2026-09-29) -> 2b (done — archived as effects-2b-persist-effects, 2026-09-29) -> 2c (done — delivered by 1b, 2a and 2b, 2026-09-29) -> 2d (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2e (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2f (done — archived as effects-2f-show-active-effects, 2026-09-29) (drawer incl. conditions, Firebase writes, duration rule, instance shape, init loop, display)
 2g (done — archived as effects-2g-trigger-dispatcher, 2026-09-30) -> 2h1 (done — archived as effects-2h1-duration-expiry, 2026-09-30) -> 2h2 (done — archived as effects-2h2-repeat-saves, 2026-09-30) (trigger system + duration ticking, builds on 2f)
 2i (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
-3 (mechanical resolution: bonuses, DoT rolls, condition mechanics; retire reminders - builds on 2g trigger bus)
+3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (3f moved to 9)
 4 (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven)
 5 (SRD effect data, grows alongside 3, 6 and 7)
 6 -> 7 (monster actions + action rolls, additive on top of step 3)
 8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
+9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
 
 ## Workflow per step (from 2026-09-29)
 Every remaining step (or sub-step, e.g. 2a) is handled as an OpenSpec change:

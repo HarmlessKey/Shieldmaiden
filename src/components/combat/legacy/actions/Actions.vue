@@ -39,9 +39,7 @@
 			</q-select>
 
 			<div
-				v-if="
-					doneBy && entitiesList[doneBy]?.reminders && entitiesList[doneBy]?.reminders?.reaction
-				"
+				v-if="doneBy && reactionUsed(entitiesList[doneBy])"
 				class="reaction-used bg-red px-1 py-2 white mb-2 d-flex justify-between"
 			>
 				<span>Reaction used</span>
@@ -123,6 +121,7 @@ import Roll from "./Roll.vue";
 import Spellcasting from "./Spellcasting.vue";
 import { damage_types } from "src/utils/generalConstants";
 import Avatar from "../../entities/Avatar.vue";
+import { hasReactionUsed } from "src/utils/effectFunctions";
 
 export default {
 	name: "Actions",
@@ -205,6 +204,12 @@ export default {
 	methods: {
 		setSize(size) {
 			this.width = size.width;
+		},
+		/**
+		 * The entity used its reaction: the Reaction Used effect, or the legacy reminder
+		 */
+		reactionUsed(entity) {
+			return hasReactionUsed(entity) || !!entity?.reminders?.reaction;
 		},
 		returnTabs(current) {
 			let tabs = [{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }];

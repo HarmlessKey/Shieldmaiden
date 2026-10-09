@@ -1,8 +1,15 @@
 <template>
 	<div class="entity-card">
-		<CardDetails v-bind="$attrs" :entity="entity" />
-		<CardSpellCasting v-if="entity.caster_ability || entity.innate_ability" :entity="entity" />
-		<CardActions v-if="entity.entityType !== 'player'" :entity="entity" :rollable="rollable" />
+		<CardDetails v-bind="$attrs" :entity="card_entity" />
+		<CardSpellCasting
+			v-if="card_entity.caster_ability || card_entity.innate_ability"
+			:entity="card_entity"
+		/>
+		<CardActions
+			v-if="card_entity.entityType !== 'player'"
+			:entity="card_entity"
+			:rollable="rollable"
+		/>
 	</div>
 </template>
 
@@ -26,6 +33,12 @@ export default {
 		rollable: {
 			type: Boolean,
 			default: false,
+		},
+	},
+	computed: {
+		// With the values its active effects give it; the entity as passed outside an encounter
+		card_entity() {
+			return this.$store.getters.effective_entity?.(this.entity.key) || this.entity;
 		},
 	},
 };

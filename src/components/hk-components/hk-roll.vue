@@ -162,6 +162,25 @@ export default {
 			}
 
 			if (this.roll) {
+				// Effect roll modifiers (rollPlan): automatic results skip the roll
+				const plan = this.roll.plan;
+				if (plan?.auto) {
+					const result = plan.auto.result === "fail" ? "fails" : "succeeds";
+					this.$snotify.warning(
+						`${this.roll.title}: ${result} automatically (${plan.auto.names.join(", ")})`,
+						this.roll.entity_name || "Automatic result",
+						{ timeout: 4000, showProgressBar: false }
+					);
+					if (this.roll.trigger?.entity_key) {
+						this.$store.dispatch("fire_trigger", {
+							trigger: this.roll.trigger.name,
+							entityKey: this.roll.trigger.entity_key,
+							event: {},
+						});
+					}
+					return;
+				}
+
 				const result = this.rollD(
 					e,
 					this.roll.d,
@@ -171,14 +190,19 @@ export default {
 					this.roll.entity_name,
 					this.roll.notify ? this.roll.notify : false,
 					advantage_object,
-					this.share
+					this.share,
+					plan
+						? { bonus_dice: plan.bonus_dice, notes: plan.roll_notes, floor: plan.floor, rerolls: plan.rerolls }
+						: {}
 				);
+				// Single-use effects end after the roll they modified
+				if (plan?.consume?.length) this.$store.dispatch("consume_roll_modifiers", plan.consume);
 				// Optional effect trigger, e.g. { name: "on_check", entity_key }
 				if (this.roll.trigger?.entity_key) {
 					this.$store.dispatch("fire_trigger", {
 						trigger: this.roll.trigger.name,
 						entityKey: this.roll.trigger.entity_key,
-						event: { naturalRoll: result?.throwsTotal },
+						event: { naturalRoll: result?.natural ?? result?.throwsTotal },
 					});
 				}
 			} else {

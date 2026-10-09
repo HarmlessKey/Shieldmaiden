@@ -737,7 +737,7 @@ Each sub-step is its own OpenSpec change:
   (derived, with current-HP clamping and `also_heal`), initiative, passive Perception, spell
   DC/attack and ability scores, through one pure `effectiveStats` and an `effective_entity`
   getter. Values changed by effects are marked with a tooltip. Temp HP is granted from a
-  prompt button. DM tracker only; the player live view keeps stored values.
+  prompt button. DM tracker only; the player live view kept stored values until 3h.
   - *Added during apply:* the DM's manual bonuses became labelled lists,
     `bonuses.<value>.<id> = { value, label }`, for every value above. Old `ac_bonus` /
     `maxHpMod` are read as a "Manual" bonus and replaced on the first change. The values
@@ -853,6 +853,47 @@ Each sub-step is its own OpenSpec change:
   - Reliable Talent's proficiency requirement (the floor applies to every skill)
   - rerolls don't mark values on the card
   - trait-like test effects move to special abilities (6b, "Generic effects")
+
+### 3h. Public initiative shows effects like the tracker (done — archived as effects-3h-public-initiative, 2026-10-09)
+**As built** (`openspec/changes/archive/2026-10-09-effects-3h-public-initiative`; specs
+`effects-player-view`, `effects-stat-modifiers`, `effects-runtime-resolution`):
+- The live view uses the tracker's chips (read-only), built by the pure `effectChipItems`.
+  The caster is named only when players can see it.
+- AC, maximum hit points and the health bar are effective values from `effectSubject` +
+  `effectiveStats`. The tooltip lists the sources when the entity's effects are shown,
+  else only the net change.
+- The open questions are answered: custom definitions are read from the DM's
+  `effects/<uid>` (already readable), and no store module is needed (`live/index.vue`
+  computes it).
+- **Later:** let `add_entity` use `effectSubject` too, so the tracker and the live view
+  build their entities in one place. For now, comments in both name the other.
+
+The original plan, for reference:
+
+The player-facing live view (`src/components/trackCampaign/live/Initiative.vue`) still has
+its own effect display (`effectDisplayItems`) and shows stored values. 3b deliberately left
+it that way ("DM tracker only; the player live view keeps stored values"). Change that:
+- **Same effect component:** the live view shows effects with the tracker's component
+  (`src/components/combat/entities/effects`: `index.vue` and `Effect.vue`), not a copy.
+  That component reads the run-encounter store (`entities`, `entity_effects`). Split it so
+  the store-free part takes the instances and their resolved definitions as props. The
+  tracker passes them from the store, and the live view from its Firebase data (NPC effects
+  on the encounter, player and companion effects on the campaign). Actions only the DM may
+  take (remove, edit, roll prompts) are hidden in the live view.
+- **Values calculated by effects:** values the live view shows (AC, HP, max HP, temp HP,
+  speed, any others it shows) come from the same pure functions as the tracker
+  (`effectiveStats` / `effectiveEntity`, plus manual bonuses). Hasted AC +2 and Aid's max HP
+  then show on the public initiative as they do for the DM. Mark values changed by effects
+  the same way (`EffectModifiedValue`) when the value is shown.
+- **Keep the share settings:** values and effects the DM hides from players stay hidden. A
+  hidden AC isn't revealed because an effect changed it, and the effects follow the
+  "Conditions and effects" setting.
+- **Open questions:**
+  - How the live view resolves custom (user-made) effect definitions. It may not be able to
+    read the DM's custom effects; it may need the definition stored on the instance, or a
+    readable copy.
+  - Whether a value changed by effects shows its tooltip to players, or only the number.
+  - Whether the live view (player or anonymous) needs a store module, or computes from props.
 
 ### Manual bonuses for later values
 Every value that effects can add a flat bonus to should also accept manual bonuses from the
@@ -1117,7 +1158,7 @@ Ideas to work out when it's proposed:
 2a (done — archived as effects-2a-effects-drawer, 2026-09-29) -> 2b (done — archived as effects-2b-persist-effects, 2026-09-29) -> 2c (done — delivered by 1b, 2a and 2b, 2026-09-29) -> 2d (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2e (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2f (done — archived as effects-2f-show-active-effects, 2026-09-29) (drawer incl. conditions, Firebase writes, duration rule, instance shape, init loop, display)
 2g (done — archived as effects-2g-trigger-dispatcher, 2026-09-30) -> 2h1 (done — archived as effects-2h1-duration-expiry, 2026-09-30) -> 2h2 (done — archived as effects-2h2-repeat-saves, 2026-09-30) (trigger system + duration ticking, builds on 2f)
 2i (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
-3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) (3f moved to 9)
+3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) (3f moved to 9)
 4 (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (SRD effect data, grows alongside 3, 6 and 7)
 6 -> 6b -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)

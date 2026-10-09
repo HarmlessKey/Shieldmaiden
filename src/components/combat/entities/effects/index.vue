@@ -1,6 +1,6 @@
 <template>
 	<div v-if="items?.length" class="entity-effects" :class="{ collapse: collapse }">
-		<Effect v-for="effect in visible" :key="effect.key" :effect="effect" :entity="entity" />
+		<Effect v-for="effect in visible" :key="effect.key" :effect="effect" :entity="entity" :readonly="readonly" />
 		<div v-if="collapsed.length" class="entity-effects__collapsed" @click.stop>
 			+<hk-animated-integer :value="collapsed.length" />
 			<q-menu
@@ -11,7 +11,13 @@
 				transition-hide="jump-up"
 			>
 				<div class="entity-effects__collapsed-menu">
-					<Effect v-for="effect in collapsed" :key="effect.key" :effect="effect" :entity="entity" />
+					<Effect
+						v-for="effect in collapsed"
+						:key="effect.key"
+						:effect="effect"
+						:entity="entity"
+						:readonly="readonly"
+					/>
 				</div>
 			</q-menu>
 		</div>
@@ -21,7 +27,7 @@
 <script>
 import Effect from "./Effect.vue";
 import { remindersMixin } from "src/mixins/reminders";
-import { describeDuration, effectBadge } from "src/utils/effectFunctions";
+import { effectChipItems } from "src/utils/effectFunctions";
 
 export default {
 	name: "Effects",
@@ -47,6 +53,26 @@ export default {
 		},
 		// Active effect instances; without either flag both kinds are shown
 		effects: {
+			type: Boolean,
+			default: false,
+		},
+		// Effects as [{ key, instance, definition }] instead of the tracker's store (live view)
+		effectEntries: {
+			type: Array,
+			default: undefined,
+		},
+		// instance => { name, label } of the caster to show, with effectEntries
+		casterOf: {
+			type: Function,
+			default: undefined,
+		},
+		// The entity's name as shown, with effectEntries
+		holderName: {
+			type: String,
+			default: undefined,
+		},
+		// Chips don't open the DM's drawers (live view)
+		readonly: {
 			type: Boolean,
 			default: false,
 		},
@@ -85,34 +111,31 @@ export default {
 		 * Active effect instances as chips
 		 */
 		effectItems() {
+			if (this.effectEntries) {
+				return effectChipItems(this.effectEntries, {
+					entityKey: this.entity.key,
+					holderName: this.holderName,
+					casterOf: this.casterOf,
+				});
+			}
 			if (!this.entityKey || !this.$store.getters.entity_effects) return [];
 			const entities = this.$store.getters.entities || {};
 
-			return this.$store.getters.entity_effects(this.entityKey).map(({ key, instance, definition }) => {
-				const name = (definition?.name || instance.name || "").capitalize();
-				const isCondition = instance.source === "srd" && definition?.category === "condition";
-				const caster = entities[instance.caster_key];
-
-				return {
-					type: "effect",
-					key: `effect:${key}`,
-					effectKey: key,
-					entityKey: this.entityKey,
-					icon: isCondition ? instance.source_key : undefined,
-					initial: name.charAt(0),
-					title: name,
-					value: effectBadge(instance),
-					duration: describeDuration(instance, {
-						casterName: caster?.name || instance.caster_name,
-						holderName: this.entity.name,
-					}),
+			return effectChipItems(this.$store.getters.entity_effects(this.entityKey), {
+				entityKey: this.entityKey,
+				holderName: this.entity.name,
+				casterOf: (instance) => {
+					const caster = entities[instance.caster_key];
+					if (caster) return { name: caster.name, label: caster.name };
 					// The stored name when the caster isn't in this encounter
-					caster: caster
-						? caster.name
-						: instance.caster_name
-						? `${instance.caster_name} (not in this encounter)`
-						: undefined,
-				};
+					if (instance.caster_name) {
+						return {
+							name: instance.caster_name,
+							label: `${instance.caster_name} (not in this encounter)`,
+						};
+					}
+					return undefined;
+				},
 			});
 		},
 		numberOfEffectsVisible() {

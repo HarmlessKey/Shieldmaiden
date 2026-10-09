@@ -158,3 +158,136 @@ export function hpAfterMaxHpChange(curHp, oldMax, newMax) {
 	const delta = newMax - (parseInt(oldMax) || 0);
 	return delta > 0 ? Math.min(curHp + delta, newMax) : Math.min(curHp, newMax);
 }
+
+/**
+ * Proficiency bonus of a challenge rating (as monsterMixin's monster_challenge_rating table)
+ *
+ * @param {number|string} challenge_rating
+ * @returns {number|undefined}
+ */
+export function proficiencyOfChallengeRating(challenge_rating) {
+	const cr = parseFloat(challenge_rating);
+	if (!Number.isFinite(cr)) return undefined;
+	return 2 + Math.floor((Math.max(cr, 1) - 1) / 4);
+}
+
+// Fields of the transformed state, from campaign or encounter data
+function transformedFields(transformed) {
+	if (!transformed) return { transformed: false };
+	const maxHpMod = transformed.maxHpMod || 0;
+	return {
+		transformed: true,
+		transformedCurHp: transformed.curHp,
+		transformedAc: transformed.ac,
+		transformedMaxHpMod: maxHpMod,
+		transformedMaxHp: transformed.maxHp + maxHpMod,
+	};
+}
+
+// Stats of an NPC or companion from its NPC data or SRD monster
+function npcStats(data_npc) {
+	const stats = {
+		edition: data_npc.edition,
+		challenge_rating: data_npc.challenge_rating,
+		initiative_modifier: data_npc.initiative_modifier,
+		proficiency: proficiencyOfChallengeRating(data_npc.challenge_rating),
+		caster_ability: data_npc.caster_ability,
+		caster_save_dc: data_npc.caster_save_dc,
+		caster_spell_attack: data_npc.caster_spell_attack,
+		innate_ability: data_npc.innate_ability,
+		innate_save_dc: data_npc.innate_save_dc,
+		innate_spell_attack: data_npc.innate_spell_attack,
+	};
+	for (const ability of abilities) stats[ability] = data_npc[ability];
+	if (data_npc.old) {
+		stats.speed = data_npc.speed;
+	} else {
+		stats.saving_throws = data_npc.saving_throws;
+		stats.skills = data_npc.skills;
+		stats.skills_expertise = data_npc.skills_expertise;
+		for (const speed of ["walk_speed", "fly_speed", "swim_speed", "burrow_speed", "climb_speed"]) {
+			if (data_npc[speed]) stats[speed] = data_npc[speed];
+		}
+	}
+	return stats;
+}
+
+/**
+ * An entity with the fields effects read (effectiveStats), for views without the tracker's
+ * store (the player live view). Built from the same sources as the tracker's add_entity
+ * (store/modules/runEncounter.js); keep the two in line.
+ *
+ * @param {object} entity The encounter's entity
+ * @param {object} campaignEntry The campaign's player or companion (players and companions)
+ * @param {object} player The DM's player (players)
+ * @param {object} npc The DM's NPC (companions and custom NPCs) or the SRD monster (SRD NPCs)
+ * @returns {object}
+ */
+export function effectSubject({ entity = {}, campaignEntry, player, npc } = {}) {
+	const subject = {
+		name: entity.name,
+		entityType: entity.entityType,
+		initiative: entity.initiative,
+		ac: parseInt(entity.ac),
+		maxHp: parseInt(entity.maxHp),
+		curHp: entity.curHp,
+		tempHp: entity.tempHp,
+		effects: {},
+	};
+
+	if (entity.entityType === "player") {
+		const camp = campaignEntry || {};
+		Object.assign(subject, transformedFields(camp.transformed), {
+			curHp: camp.curHp,
+			tempHp: camp.tempHp,
+			bonuses: manualBonuses(camp),
+			effects: { ...(camp.effects || {}) },
+		});
+		if (player) {
+			subject.name = player.character_name;
+			subject.speed = player.speed || 0;
+			subject.initiative_modifier = player.initiative || 0;
+			subject.spell_save_dc = player.spell_save_dc;
+			subject.ac = parseInt(player.ac);
+			subject.maxHp = parseInt(player.maxHp);
+			subject.saving_throws = [];
+			for (const ability of abilities) {
+				subject[ability] = player[ability];
+				if (player[`${ability}-save-profficient`]) subject.saving_throws.push(ability);
+			}
+			subject.skills = player.skills;
+			subject.skills_expertise = player.skills_expertise;
+			subject.skills_jack_of_all_trades = player.skills_jack_of_all_trades;
+			subject.experience = player.experience;
+			subject.level = player.level;
+		}
+		return subject;
+	}
+
+	if (entity.entityType === "companion") {
+		const camp = campaignEntry || {};
+		Object.assign(subject, transformedFields(camp.transformed), {
+			curHp: camp.curHp,
+			tempHp: camp.tempHp,
+			bonuses: manualBonuses(camp),
+			effects: { ...(camp.effects || {}) },
+		});
+		if (npc) {
+			Object.assign(subject, npcStats(npc));
+			subject.maxHp = parseInt(npc.hit_points);
+			subject.ac = parseInt(npc.old ? npc.ac : npc.armor_class);
+		}
+		return subject;
+	}
+
+	// NPC: values from the encounter, stats from its NPC or monster
+	Object.assign(subject, transformedFields(entity.transformed), {
+		bonuses: manualBonuses(entity),
+		effects: { ...(entity.effects || {}) },
+		friendly: !!entity.friendly,
+		settings: entity.settings,
+		curHp: parseInt(entity.curHp),
+	});
+	if (npc) Object.assign(subject, npcStats(npc));
+	return subject;
+}

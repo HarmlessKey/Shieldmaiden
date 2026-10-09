@@ -528,6 +528,8 @@ const run_encounter_actions = {
 		await dispatch("init_Encounter", { cid: null, eid: null, demo: true });
 	},
 
+	// The player live view builds the fields effects read with effectSubject
+	// (src/utils/entityFunctions.js) from the same sources; keep the two in line.
 	async add_entity({ state, commit, rootGetters, dispatch }, key) {
 		const demo_entities = rootGetters["encounters/demo_encounter"]
 			? rootGetters["encounters/demo_encounter"].entities

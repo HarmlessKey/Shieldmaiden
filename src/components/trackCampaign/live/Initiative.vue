@@ -89,72 +89,13 @@
 												(entity.entityType == 'npc' && displayNPCField('ac', entity) == true)
 											"
 										>
-											<span
+											<!-- Effective AC: effects and manual bonuses, as in the tracker -->
+											<EffectModifiedValue
 												class="value"
-												:class="{
-													green:
-														displayAc(
-															entity,
-															players[entity.key],
-															npcs[entity.key],
-															camp_data(entity)
-														).bonus > 0,
-													red:
-														displayAc(
-															entity,
-															players[entity.key],
-															npcs[entity.key],
-															camp_data(entity)
-														).bonus < 0,
-												}"
-												v-if="
-													displayAc(
-														entity,
-														players[entity.key],
-														npcs[entity.key],
-														camp_data(entity)
-													).bonus
-												"
-											>
-												{{
-													displayAc(
-														entity,
-														players[entity.key],
-														npcs[entity.key],
-														camp_data(entity)
-													).ac +
-													displayAc(
-														entity,
-														players[entity.key],
-														npcs[entity.key],
-														camp_data(entity)
-													).bonus
-												}}
-												<q-tooltip anchor="top middle" self="center middle">
-													Armor Class +
-													{{
-														displayAc(
-															entity,
-															players[entity.key],
-															npcs[entity.key],
-															camp_data(entity)
-														).bonus
-													}}
-												</q-tooltip>
-											</span>
-											<span class="value" v-else>
-												{{
-													displayAc(
-														entity,
-														players[entity.key],
-														npcs[entity.key],
-														camp_data(entity)
-													).ac
-												}}
-												<q-tooltip anchor="top middle" self="center middle">
-													Armor class
-												</q-tooltip>
-											</span>
+												:value="acOf(entity).value"
+												:changed="acOf(entity).changed"
+												:notes="acOf(entity).notes"
+											/>
 										</template>
 										<span v-else class="value">?</span>
 									</div>
@@ -177,89 +118,22 @@
 										:players="players"
 										:npcs="npcs"
 										:displaySettings="displaySettings"
+										:effective="effectiveEntities[entity.key]"
 									/>
 								</td>
 
-								<td
-									class="conditions"
-									v-if="
-										(playerSettings.conditions === undefined &&
-											(entity.entityType === 'player' ||
-												(entity.entityType == 'npc' && displayNPCField('conditions', entity) === undefined))) ||
-										entity.entityType === 'companion'
-									"
-								>
-									<div class="d-flex justify-content-end" v-if="effectsOf(entity).length">
-										<template v-for="({ key, name, icon, level }, index) in effectsOf(entity)">
-											<div
-												class="condition"
-												:key="`effect-${entity.key}-${key}`"
-												v-if="index + 1 <= conditionCount"
-											>
-												<span class="n" v-if="level">
-													{{ level }}
-												</span>
-												<i v-if="icon" aria-hidden="true" :class="`hki-${icon}`" />
-												<i v-else aria-hidden="true" class="fas fa-sparkles" />
-												<q-tooltip anchor="top middle" self="center middle">
-													{{ name }}
-													{{ level || "" }}
-												</q-tooltip>
-											</div>
-										</template>
-										<strong
-											v-if="effectsOf(entity).length > conditionCount"
-											class="condtion"
-											:key="`more-effects-${entity.key}`"
-										>
-											+{{ effectsOf(entity).length - conditionCount }}
-											<q-tooltip anchor="top middle" self="center middle">
-												{{ effectsOf(entity).length - conditionCount }}
-												more effects
-											</q-tooltip>
-										</strong>
-
-										<!-- All effects -->
-										<q-popup-proxy square prevent>
-											<div class="bg-neutral-8">
-												<q-list>
-													<q-item>
-														<q-item-section>
-															<Name
-																:entity="entity"
-																:players="players"
-																:npcs="npcs"
-																:displaySettings="displaySettings"
-															/>
-														</q-item-section>
-														<q-item-section avatar>
-															{{ effectsOf(entity).length }}
-														</q-item-section>
-													</q-item>
-													<q-separator />
-													<q-item
-														clickable
-														v-close-popup
-														v-for="{ key, name, icon, level } in effectsOf(entity)"
-														:key="`effect-list-${entity.key}-${key}`"
-													>
-														<q-item-section avatar>
-															<i v-if="icon" aria-hidden="true" :class="`hki-${icon}`" />
-															<i v-else aria-hidden="true" class="fas fa-sparkles" />
-														</q-item-section>
-														<q-item-section>
-															<span>
-																{{ name }}
-																<strong v-if="level">
-																	{{ level }}
-																</strong>
-															</span>
-														</q-item-section>
-													</q-item>
-												</q-list>
-											</div>
-										</q-popup-proxy>
-									</div>
+								<td class="conditions" v-if="effectsShown(entity)">
+									<!-- The tracker's effect chips, read-only -->
+									<Effects
+										:entity="entity"
+										:effect-entries="effectEntries[entity.key] || []"
+										:caster-of="casterOf"
+										:holder-name="shownName(entity.key)"
+										:available-space="effectSpace"
+										effects
+										collapse
+										readonly
+									/>
 								</td>
 							</tr>
 						</template>
@@ -275,11 +149,11 @@ import { db } from "src/firebase";
 import { general } from "src/mixins/general.js";
 import { mapActions } from "vuex";
 import { trackEncounter } from "src/mixins/trackEncounter.js";
-import { effectDisplayItems } from "src/utils/effectFunctions";
-
 import Health from "./Health.vue";
 import Name from "./Name.vue";
 import Avatar from "./Avatar.vue";
+import Effects from "src/components/combat/entities/effects";
+import EffectModifiedValue from "src/components/combat/entities/EffectModifiedValue.vue";
 
 export default {
 	name: "Initiative",
@@ -288,6 +162,8 @@ export default {
 		Health,
 		Name,
 		Avatar,
+		Effects,
+		EffectModifiedValue,
 	},
 	props: [
 		"encounter",
@@ -300,8 +176,10 @@ export default {
 		"npcs",
 		"displaySettings",
 		"screenWidth",
-		// Campaign edition, for the names of SRD effects
-		"edition",
+		// Entities with the values effects and manual bonuses give them, by key
+		"effectiveEntities",
+		// Shown effects per entity key as [{ key, instance, definition }]
+		"effectEntries",
 	],
 	data() {
 		return {
@@ -316,15 +194,15 @@ export default {
 		playerSettings() { return this.displaySettings?.player || {}; },
 		npcSettings() { return this.displaySettings?.npc; },
 		allySettings() { return this.displaySettings?.ally; },
-		conditionCount() {
-			if (this.width < 400) return 1;
-			if (this.width < 450) return 2;
-			if (this.width < 550) return 3;
-			if (this.width < 600) return 4;
-			if (this.width < 750) return 5;
-			if (this.width < 850) return 6;
-			if (this.width < 900) return 7;
-			return 9;
+		// Space for effect chips (33px each) by the list's width
+		effectSpace() {
+			const ITEM_SIZE = 33;
+			if (this.width < 400) return ITEM_SIZE;
+			if (this.width < 450) return 2 * ITEM_SIZE;
+			if (this.width < 550) return 3 * ITEM_SIZE;
+			if (this.width < 600) return 4 * ITEM_SIZE;
+			if (this.width < 750) return 5 * ITEM_SIZE;
+			return 6 * ITEM_SIZE;
 		},
 	},
 	mounted() {
@@ -376,14 +254,6 @@ export default {
 			this.targeted = targeted;
 			this.setDrawer({ show: false });
 		},
-		camp_data(entity) {
-			let key = entity.key;
-			if (entity.entityType === "player") return this.campPlayers[key];
-
-			if (entity.entityType === "companion") return this.campCompanions[key];
-
-			return undefined;
-		},
 		damageRequest() {
 			this.setDrawer({
 				show: true,
@@ -407,13 +277,31 @@ export default {
 			});
 		},
 		/**
-		 * Active effects of an entity: NPC effects are on the encounter,
-		 * player and companion effects on the campaign
+		 * The AC to show: effective, marked when changed, with "Armor class" as the tooltip
+		 * when nothing changed it
 		 */
-		effectsOf(entity) {
-			const effects =
-				entity.entityType === "npc" ? entity.effects : this.camp_data(entity)?.effects;
-			return effectDisplayItems(effects, this.edition);
+		acOf(entity) {
+			const ac = this.displayAc(this.effectiveEntities?.[entity.key], this.effectsShown(entity));
+			return ac.changed ? ac : { ...ac, notes: ["Armor class"] };
+		},
+		/**
+		 * An entity's name as players see it (Name.vue), or undefined when they can't see it:
+		 * not in the encounter, a hidden NPC, or an NPC whose name is hidden
+		 */
+		shownName(key) {
+			const entity = this.encounter.entities?.[key];
+			if (!entity?.active) return undefined;
+			if (entity.entityType === "player") return this.players?.[key]?.character_name || undefined;
+			if (entity.entityType === "companion") return this.npcs?.[key]?.name || undefined;
+			if (entity.hidden || !this.displayNPCField("name", { ...entity, key })) return undefined;
+			return entity.name ? entity.name.capitalizeEach() : undefined;
+		},
+		/**
+		 * The caster of an effect for its chip, only when players can see who it is
+		 */
+		casterOf(instance) {
+			const name = instance.caster_key ? this.shownName(instance.caster_key) : undefined;
+			return name ? { name, label: name } : undefined;
 		},
 	},
 	beforeDestroy() {
@@ -531,6 +419,11 @@ export default {
 									mix-blend-mode: luminosity;
 									opacity: 0.95;
 									line-height: 40px;
+
+									// The contrast filter hides the marking's color
+									&.modified {
+										text-decoration: underline dotted;
+									}
 								}
 							}
 						}
@@ -582,21 +475,6 @@ export default {
 			}
 			.conditions {
 				padding: 9px 10px;
-
-				.condition {
-					position: relative;
-					cursor: pointer;
-					user-select: none;
-
-					.n {
-						font-size: 13px;
-						line-height: 13px;
-						position: absolute;
-						color: $red;
-						top: -5px;
-						left: 2px;
-					}
-				}
 			}
 			.entities-move {
 				transition: transform 0.6s;
@@ -722,13 +600,6 @@ export default {
 				}
 				.conditions {
 					padding-right: 15px;
-
-					.condition {
-						.img {
-							width: 40px;
-							height: 40px;
-						}
-					}
 				}
 			}
 		}

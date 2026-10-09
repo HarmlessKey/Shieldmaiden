@@ -1,7 +1,7 @@
 <template>
 	<div
 		class="entity-effects__effect"
-		:class="[effect.type, effect.color]"
+		:class="[effect.type, effect.color, { readonly }]"
 		@click.prevent.stop="open"
 	>
 		<div class="value" :class="effect.type === 'reminder' ? `bg-${effect.color}` : ''">
@@ -38,10 +38,16 @@ export default {
 			type: Object,
 			required: true,
 		},
+		// No drawer on click (live view)
+		readonly: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	methods: {
 		...mapActions(["setDrawer"]),
 		open() {
+			if (this.readonly) return;
 			if (this.effect.type === "effect") {
 				this.setDrawer({
 					show: true,
@@ -79,6 +85,9 @@ export default {
 		text-align: center;
 		cursor: pointer;
 
+		&.readonly {
+			cursor: default;
+		}
 		&.effect {
 			line-height: 30px;
 			.value {

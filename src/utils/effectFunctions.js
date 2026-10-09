@@ -401,6 +401,37 @@ export function effectBadge(instance) {
 }
 
 /**
+ * Chip items for the active effects of an entity (the tracker's chips and the live view's)
+ *
+ * @param {object[]} entries [{ key, instance, definition }]: effect key, instance, resolved definition
+ * @param {string} entityKey Key of the entity that has the effects
+ * @param {string} holderName Its name as shown, if any
+ * @param {function} casterOf instance => { name, label } of the caster as shown, or undefined:
+ *   name for the duration text, label for the "from" line
+ * @returns {object[]} { type, key, effectKey, entityKey, icon, initial, title, value, duration, caster }
+ */
+export function effectChipItems(entries = [], { entityKey, holderName, casterOf = () => undefined } = {}) {
+	return entries.map(({ key, instance, definition }) => {
+		const name = definition?.name || instance.name || "";
+		const title = name.charAt(0).toUpperCase() + name.slice(1);
+		const isCondition = instance.source === "srd" && definition?.category === "condition";
+		const caster = casterOf(instance);
+		return {
+			type: "effect",
+			key: `effect:${key}`,
+			effectKey: key,
+			entityKey,
+			icon: isCondition ? instance.source_key : undefined,
+			initial: title.charAt(0),
+			title,
+			value: effectBadge(instance),
+			duration: describeDuration(instance, { casterName: caster?.name, holderName }),
+			caster: caster?.label,
+		};
+	});
+}
+
+/**
  * Whether an instance counts down rounds: a timed duration, or a Concentration duration's
  * "up to" time when it isn't linked to a Concentration that ends it
  *
@@ -549,30 +580,6 @@ export function buildEffectInstance({
 	if (application.level) instance.level = application.level;
 
 	return instance;
-}
-
-/**
- * Display items for the effect instances of an entity, for views without the tracker store
- * (the player-facing live view). SRD names come from the local data of the edition.
- *
- * @param {object} effects Effect instances keyed by effect key
- * @param {string} edition Campaign edition
- * @returns {{ key: string, name: string, icon: string|undefined, level: number|undefined }[]}
- */
-export function effectDisplayItems(effects = {}, edition) {
-	return Object.entries(effects || {}).map(([key, instance]) => {
-		const definition =
-			instance.source === "srd" ? findSrdDefinition(edition, instance.source_key) : undefined;
-		const isCondition = definition?.category === "condition";
-		const isExhaustion = isCondition && instance.source_key === "exhaustion";
-		const name = definition?.name || instance.name || "";
-		return {
-			key,
-			name: name.charAt(0).toUpperCase() + name.slice(1),
-			icon: isCondition ? instance.source_key : undefined,
-			level: isExhaustion ? instance.level || 1 : undefined,
-		};
-	});
 }
 
 /**

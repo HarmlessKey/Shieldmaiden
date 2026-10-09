@@ -83,7 +83,7 @@
 													:default-level="defaultExhaustionLevel"
 													:effect="{ source: entry.source, source_key: entry.sourceKey, name: entry.name }"
 													:casters="casters"
-													:default-caster="turnEntityKey"
+													:default-caster="actorEntityKey"
 													:caster-concentration="casterConcentration"
 													@apply="apply(entry, $event)"
 													@cancel="applying = undefined"
@@ -155,7 +155,16 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["entities", "targeted", "edition", "round", "turn", "turn_order", "user"]),
+		...mapGetters([
+			"entities",
+			"targeted",
+			"edition",
+			"round",
+			"turn",
+			"turn_order",
+			"actor",
+			"user",
+		]),
 		targets() {
 			if (this.data !== undefined && this.data.length > 0) return this.data;
 			return this.targeted;
@@ -198,6 +207,17 @@ export default {
 		turnEntityKey() {
 			if (!this.round) return undefined;
 			return this.turn_order[this.turn];
+		},
+		/**
+		 * Key of the acting entity, the default caster: the actor selected out of turn,
+		 * else the entity whose turn it is. The Environment acts without a caster.
+		 */
+		actorEntityKey() {
+			if (!this.round) return undefined;
+			if (this.actor) {
+				return this.actor.key in this.entities ? this.actor.key : undefined;
+			}
+			return this.turnEntityKey;
 		},
 		/**
 		 * Caster options: the entities in initiative order, then the rest
@@ -354,7 +374,7 @@ export default {
 		},
 		/**
 		 * Applies to every target. The caster is the application's caster_key (the form's
-		 * select; undefined for None), or the entity whose turn it is without the form.
+		 * select; undefined for None), or the acting entity without the form.
 		 * A Concentration plan is carried out first, so the instances can link to it.
 		 */
 		async apply(entry, application) {
@@ -362,7 +382,7 @@ export default {
 			const { caster_key, concentration: plan, ...rest } = application;
 			const casterKey = Object.prototype.hasOwnProperty.call(application, "caster_key")
 				? caster_key
-				: this.turnEntityKey;
+				: this.actorEntityKey;
 			this.applying = undefined;
 
 			let concentration_id = rest.concentration_id;

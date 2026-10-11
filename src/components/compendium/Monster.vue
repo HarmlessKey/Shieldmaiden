@@ -465,7 +465,8 @@ export default {
 	},
 	async beforeMount() {
 		if (this.data) {
-			let monster = this.data;
+			// Copy so the passed in data (e.g. an NPC being edited) is never mutated
+			const monster = { ...this.data };
 			if (this.monster_challenge_rating[monster.challenge_rating]) {
 				monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
 			}
@@ -537,24 +538,13 @@ export default {
 		},
 		spellsForLevel(level) {
 			return Object.entries(this.monster.caster_spells)
-				.filter(([key, spell]) => {
-					spell.key = key;
-					return spell.level == level;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, spell]) => spell.level == level)
+				.map(([key, spell]) => ({ ...spell, key }));
 		},
 		spellsForLimit(limit) {
 			return Object.entries(this.monster.innate_spells)
-				.filter(([key, spell]) => {
-					spell.key = key;
-					if (spell.limit === 0) spell.limit = Infinity;
-					return spell.limit == limit;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, spell]) => (spell.limit || Infinity) == limit)
+				.map(([key, spell]) => ({ ...spell, key }));
 		},
 		skillModifier(ability, skill) {
 			const ability_mod = this.calcMod(this.monster[ability]);

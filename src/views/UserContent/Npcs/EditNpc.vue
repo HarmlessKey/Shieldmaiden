@@ -307,7 +307,7 @@ export default {
 			this.npc = {};
 		},
 		revertChanges() {
-			this.npc = JSON.parse(this.npc_copy);
+			this.npc = JSON.parse(JSON.stringify(this.npc_copy));
 			this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			this.unsaved_changes = false;
 		},

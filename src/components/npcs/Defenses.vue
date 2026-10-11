@@ -90,15 +90,12 @@
 </template>
 
 <script>
-	import { conditions } from 'src/mixins/conditions.js';
+	import { mapActions, mapGetters } from 'vuex';
 	import { damage_types, damage_type_icons } from 'src/utils/generalConstants';
 
 	export default {
 		name: 'Defenses',
 		props: ['value'],
-		mixins: [
-			conditions,
-		],
 		data() {
 			return {
 				damage_types: damage_types,
@@ -106,21 +103,26 @@
 			}
 		},
 		computed: {
+			...mapGetters("api_conditions", ["conditions_by_edition"]),
 			entity: {
 				get() {
 					return this.value;
-				},	
+				},
 				set(newValue) {
 					this.$emit('input', newValue);
 				}
 			},
 			condition_list() {
-				return this.conditionList.map(item => {
-					return item.value;
+				return this.conditions_by_edition("5e").map(item => {
+					return item.url;
 				});
 			}
 		},
+		async created() {
+			await this.fetch_all_conditions({ edition: "5e" });
+		},
 		methods: {
+			...mapActions("api_conditions", ["fetch_all_conditions"]),
 			typeLabel(value) {
 				value = value.split("_");
 				return value.join(" ").capitalizeEach();

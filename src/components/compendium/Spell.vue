@@ -64,6 +64,13 @@
 		<div class="spell__title">
 			<h3>
 				{{ spell.name.capitalizeEach() }} <span class="source neutral-2">{{ spell.source }}</span>
+				<button
+					v-if="allowDownload"
+					class="btn btn-sm bg-neutral-5 download-btn"
+					@click="download_dialog = true"
+				>
+					Download <hk-icon icon="fas fa-download" class="ml-1" />
+				</button>
 			</h3>
 			<i>
 				<template v-if="spell.level === 0">Cantrip </template>
@@ -98,15 +105,33 @@
 				<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 			</div>
 		</div>
+
+		<ReportIssue
+			v-if="!custom && !hideReport && spell._id"
+			class="mt-3"
+			type="spell"
+			:content-id="spell._id"
+			:content-name="spell.name"
+			:content-url="spell.url"
+			:edition="spell.edition || $route.params.edition"
+		/>
+
+		<SpellCardDownload v-if="allowDownload" v-model="download_dialog" :spells="[spell]" />
 	</div>
 	<hk-loader v-else name="spell" />
 </template>
 
 <script>
 import { mapActions } from "vuex";
+import ReportIssue from "src/components/compendium/ReportIssue.vue";
+import SpellCardDownload from "src/components/spells/SpellCardDownload.vue";
 
 export default {
 	name: "Spell",
+	components: {
+		ReportIssue,
+		SpellCardDownload,
+	},
 	props: {
 		// If the spell is fetched in a parent component you can send the full spell object in de data prop
 		data: {
@@ -120,6 +145,19 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		// Edition to fetch the spell for when using the id prop; falls back to the route edition
+		edition: {
+			type: String,
+		},
+		allowDownload: {
+			type: Boolean,
+			default: false,
+		},
+		// Hide the Report Issue button, e.g. when the spell is shown in a popover or an action dropdown
+		hideReport: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -130,6 +168,7 @@ export default {
 			cast_level: undefined,
 			caster_level: undefined,
 			attack_bonus: undefined,
+			download_dialog: false,
 		};
 	},
 	computed: {
@@ -182,7 +221,10 @@ export default {
 		} else {
 			this.spell = this.custom
 				? await this.get_spell({ uid: this.userId, id: this.id })
-				: await this.fetch_api_spell(this.id);
+				: await this.fetch_api_spell({
+						id: this.id,
+						edition: this.edition || this.$route.params.edition,
+					});
 			this.cast_level = this.spell.level;
 			this.loading = false;
 		}
@@ -203,9 +245,16 @@ export default {
 
 		h3 {
 			margin-bottom: 5px;
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 0.5em;
 
 			.source {
 				font-size: 12px;
+			}
+			.download-btn {
+				margin-left: auto;
 			}
 		}
 	}

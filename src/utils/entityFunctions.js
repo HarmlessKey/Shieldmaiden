@@ -6,11 +6,12 @@
 export function displayStats(entity) {
 	if (!entity) return {};
 
+	const initiative = entity.initiative_modifier;
+
 	const stats = {
 		ac_bonus: entity.ac_bonus || 0,
 		speed: entity.speed || entity.walk_speed,
-		initiative_bonus:
-			entity.initiative_bonus > 0 ? `+${entity.initiative_bonus}` : entity.initiative_bonus,
+		initiative_modifier: initiative > 0 ? `+${initiative}` : initiative,
 	};
 	if (entity.transformed) {
 		stats.ac = entity.transformedAc + stats.ac_bonus;

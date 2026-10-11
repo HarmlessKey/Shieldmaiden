@@ -47,7 +47,9 @@
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
-								<template #content> <Spell :id="spell.key" /> </template
+								<template #content>
+									<Spell :id="spell.key" :edition="entity.edition || default_edition" hide-report />
+								</template
 							></hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLevel(level).length ? "," : "" }}
@@ -80,7 +82,7 @@
 				</div>
 			</div>
 			<p>
-				<strong><em>Innate spellcasting</em></strong>
+				<strong><em>{{ is_5_5e ? "Spellcasting" : "Innate spellcasting" }}</em></strong>
 				The {{ entity.name.capitalizeEach() }}'s innate spellcasting ability is
 				{{ entity.innate_ability.capitalize() }} (spell save DC {{ entity.innate_save_dc }},
 				{{
@@ -91,7 +93,7 @@
 				to hit with spell attacks). The {{ entity.name.capitalizeEach() }} can cast the following
 				spells, requiring no material components:
 			</p>
-			<strong><em>Innate spells</em></strong
+			<strong><em>{{ is_5_5e ? "Spells" : "Innate spells" }}</em></strong
 			><br />
 			<p>
 				<template v-for="limit in innate_spell_levels">
@@ -102,9 +104,12 @@
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
-									<Spell :id="spell.key" />
+									<Spell :id="spell.key" :edition="entity.edition || default_edition" hide-report />
 								</template>
 							</hk-popover>
+							<template v-if="is_5_5e && spell.level !== undefined">
+								({{ spell.level | numeral("Oo") }})
+							</template>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLimit(limit).length ? "," : "" }}
 						</i>
@@ -118,6 +123,7 @@
 <script>
 import { mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell.vue";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "CardDetails",
@@ -132,10 +138,15 @@ export default {
 		},
 	},
 	data() {
-		return {};
+		return {
+			default_edition,
+		};
 	},
 	computed: {
 		...mapGetters(["broadcast", "targeted"]),
+		is_5_5e() {
+			return this.entity.edition === "5.5e";
+		},
 		spellCasting() {
 			let casting = [];
 			if (this.entity.innate_ability)
@@ -176,24 +187,13 @@ export default {
 	methods: {
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)
-				.filter(([key, item]) => {
-					item.key = key;
-					return item.level == level;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, item]) => item.level == level)
+				.map(([key, item]) => ({ ...item, key }));
 		},
 		spellsForLimit(limit) {
 			return Object.entries(this.entity.innate_spells)
-				.filter(([key, item]) => {
-					item.key = key;
-					if (item.limit === 0) item.limit = Infinity;
-					return item.limit == limit;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, item]) => (item.limit || Infinity) == limit)
+				.map(([key, item]) => ({ ...item, key }));
 		},
 	},
 };

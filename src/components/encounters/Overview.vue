@@ -166,6 +166,16 @@
 
 								<!-- ACTIONS -->
 								<div slot="actions" slot-scope="data" class="actions">
+									<strong
+										v-if="
+											data.row.entityType === 'npc' &&
+											data.row.npc !== 'custom' &&
+											(data.row.edition || default_edition) !== campaignEdition
+										"
+										class="orange"
+									>
+										{{ data.row.edition || default_edition }}
+									</strong>
 									<a
 										v-if="data.row.entityType === 'npc'"
 										@click="
@@ -175,7 +185,7 @@
 												data: { npc: data.row, encounter },
 											})
 										"
-										class="mr-2 btn btn-sm bg-neutral-5"
+										class="mx-2 btn btn-sm bg-neutral-5"
 									>
 										<i aria-hidden="true" class="fas fa-pencil"></i>
 										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
@@ -232,6 +242,15 @@
 								</span>
 
 								<div slot="actions" slot-scope="data" class="actions">
+									<strong
+										v-if="
+											data.row.npc !== 'custom' &&
+											(data.row.edition || default_edition) !== campaignEdition
+										"
+										class="orange"
+									>
+										{{ data.row.edition || default_edition }}
+									</strong>
 									<a
 										@click="
 											setDrawer({
@@ -240,7 +259,7 @@
 												data: { npc: data.row, encounter },
 											})
 										"
-										class="mr-2 btn btn-sm bg-neutral-5"
+										class="mx-2 btn btn-sm bg-neutral-5"
 									>
 										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
 										<i aria-hidden="true" class="fas fa-pencil"></i>
@@ -306,6 +325,7 @@
 import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import { difficulty } from "src/mixins/difficulty.js";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "Overview",
@@ -332,6 +352,7 @@ export default {
 			user: this.$store.getters ? this.$store.getters.user : undefined,
 			drawer: this.$store.getters.getDrawer,
 			showOverview: false,
+			default_edition,
 			encDifficulty: undefined,
 			showDifficulty: false,
 			loading: true,
@@ -360,6 +381,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(["overencumbered", "tier"]),
+		campaignEdition() {
+			return this.campaign.edition || default_edition;
+		},
 		_friendlies() {
 			if (this.encounter) {
 				return _.chain(this.encounter.entities)
@@ -466,7 +490,10 @@ export default {
 					} else if (entity.npc === "custom" && !this.demo) {
 						entities[entity.id] = await this.get_npc({ uid: this.user?.uid, id: entity.id });
 					} else if (entity.npc === "api" || entity.npc === "srd") {
-						entities[entity.id] = await this.fetch_monster(entity.id);
+						entities[entity.id] = await this.fetch_monster({
+							id: entity.id,
+							edition: entity.edition || default_edition,
+						});
 					}
 				}
 			}

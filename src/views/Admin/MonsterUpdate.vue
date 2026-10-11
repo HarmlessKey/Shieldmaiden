@@ -41,6 +41,7 @@
 				allowed_properties: [
 					"name",
 					"source",
+					"edition",
 					"avatar",
 					"size",
 					"type",
@@ -57,6 +58,8 @@
 					"friendly",
 					"player_id",
 					"armor_class",
+					"initiative",
+					"gear",
 					"hit_points",
 					"hit_dice",
 					"senses",
@@ -86,6 +89,7 @@
 					"innate_spells",
 					"special_abilities",
 					"actions",
+					"bonus_actions",
 					"legendary_count",
 					"legendary_actions",
 					"reactions"
@@ -109,6 +113,7 @@
 				action_abilities: [
 					"special_abilities",
 					"actions",
+					"bonus_actions",
 					"legendary_actions",
 					"reactions"
 				],

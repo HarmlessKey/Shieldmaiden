@@ -87,6 +87,20 @@ export default {
 	},
 	methods: {
 		...mapActions(["reinitialize", "setUser", "setUserInfo"]),
+
+		/**
+		 * Routes onwards after signing up. A user without a username (Google sign-up
+		 * creates an auth user but no users/<uid> record) always goes to /set-username,
+		 * since the rest of the app requires a username.
+		 */
+		routeAfterSignUp() {
+			const userInfo = this.$store.getters.userInfo;
+			if (!userInfo || !userInfo.username) {
+				this.$router.replace("/set-username");
+			} else if (this.$route.name === "signUp") {
+				this.$router.replace("/content");
+			}
+		},
 		async createUser(uid) {
 			let user = {
 				username: this.username,
@@ -119,9 +133,7 @@ export default {
 
 					this.$emit("sign-up", "success");
 
-					if (this.$route.name === "signUp") {
-						this.$router.replace("/content");
-					}
+					this.routeAfterSignUp();
 				},
 				(err) => {
 					this.$emit("sign-up", err.message);
@@ -146,9 +158,8 @@ export default {
 
 					this.$emit("sign-up", "success");
 
-					if (this.$route.name === "signUp") {
-						this.$router.replace("/set-username");
-					}
+					// An existing Google account that already has a username signs straight in.
+					this.routeAfterSignUp();
 				})
 				.catch((err) => {
 					this.$emit("sign-up", err.message);

@@ -7,6 +7,7 @@ import _ from "lodash";
 const convert_campaign = (campaign) => {
 	const properties = [
 		"name",
+		"edition",
 		"background",
 		"hk_background",
 		"player_count",

@@ -4,15 +4,19 @@
 			<div slot="header" class="card-header">
 				<h1>
 					{{ not_found ? "Spell not found" : spell.name.capitalizeEach() }}
+					<span v-if="!not_found" class="neutral-2">{{ editionLabel }}</span>
 				</h1>
-				<div>
+				<div class="flex items-center gap-1">
 					<span class="neutral-3">
 						{{ spell.page }}
 					</span>
-					<hk-share 
-						v-if="!not_found" 
-						:title="spell.meta.title" 
-						:text="spell.meta.description" 
+					<router-link v-if="!not_found" class="btn btn-sm bg-neutral-5" :to="otherEdition.to">
+						Show for {{ otherEdition.label }}
+					</router-link>
+					<hk-share
+						v-if="!not_found"
+						:title="spell.meta.title"
+						:text="spell.meta.description"
 						size="sm"
 						class="ml-1"
 					/>
@@ -21,7 +25,7 @@
 			<div class="card-body">
 				<template v-if="not_found">
 					<p>Could not find spell <strong>{{ id }}</strong></p>
-					<router-link to="/compendium/spells" class="btn bg-neutral-5">
+					<router-link :to="listPath" class="btn bg-neutral-5">
 						Find spells
 					</router-link>
 				</template>
@@ -36,6 +40,7 @@
 	import { mapGetters } from "vuex";
 	import Spell from "src/components/compendium/Spell";
 	import { metaCompendium } from 'src/mixins/metaCompendium';
+	import { otherEdition } from 'src/utils/generalFunctions';
 
 	export default {
 		name: "ViewSpell",
@@ -54,17 +59,30 @@
 		},
 		// Fetch the spell Server side, on the Client side retrieve it from the store
 		async preFetch({ store, currentRoute }) {
-			await store.dispatch("api_spells/fetch_api_spell", currentRoute.params.id, { root: true });
+			await store.dispatch(
+				"api_spells/fetch_api_spell",
+				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+				{ root: true }
+			);
 		},
 		computed: {
 			...mapGetters("api_spells", ["get_api_spell"]),
 			spell() {
-				return this.get_api_spell(this.id);
+				return this.get_api_spell(this.id, this.$route.params.edition);
+			},
+			listPath() {
+				return this.$route.params.edition ? `/compendium/spells/${this.$route.params.edition}` : "/compendium/spells";
+			},
+			otherEdition() {
+				return otherEdition(this.$route);
+			},
+			editionLabel() {
+				return this.$route.params.edition || "5e";
 			}
 		},
 		meta() {
 			return {
-				title: this.spell.meta.title,
+				title: this.compendium_edition_text(this.spell.meta.title),
 				meta: this.generate_compendium_meta(this.spell.meta)
 			}
 		},

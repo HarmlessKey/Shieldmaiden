@@ -68,6 +68,9 @@
 						<q-item-section :class="checkAvailable(level, spell.key) ? '' : 'is-disabled'">
 							<q-item-label>
 								{{ spell.name.capitalizeEach() }}
+								<span v-if="castLevel(level, spell)" class="neutral-2">
+									({{ castLevel(level, spell) | numeral("Oo") }})
+								</span>
 							</q-item-label>
 						</q-item-section>
 						<q-item-section avatar v-if="type === 'caster'">
@@ -132,13 +135,20 @@
 								:tooltip="`Roll ${spell.name}`"
 								type="spell"
 								color="yellow"
+								:cast-level="spell.cast_level || spell.level"
+								:caster-level="actor[`${type}_level`]"
 								:disabled="!checkAvailable(level, spell.key)"
 								@roll="startRoll(...arguments, spell.key, spell, type)"
 							/>
 						</q-item-section>
 					</template>
 					<div class="accordion-body description p-2">
-						<Spell :data="spell" :title="false" v-if="showSpell === `${level}-${spell.key}`" />
+						<Spell
+							:data="spell"
+							:title="false"
+							hide-report
+							v-if="showSpell === `${level}-${spell.key}`"
+						/>
 					</div>
 				</q-expansion-item>
 			</q-list>
@@ -155,6 +165,7 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import Spell from "src/components/compendium/Spell";
 import Projectiles from "./Projectiles";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "RollSpell",
@@ -203,6 +214,13 @@ export default {
 			const button = this.$refs[`${level}-${key}`]?.[0]?.$el;
 			button?.focus();
 		},
+		castLevel(level, spell) {
+			if (this.type === "caster") {
+				return level > 0 && level < Infinity ? level : undefined;
+			}
+			const castLevel = spell.cast_level || spell.level;
+			return castLevel > 0 ? castLevel : undefined;
+		},
 		async fetchSpells() {
 			let spells = [];
 
@@ -212,11 +230,15 @@ export default {
 						const spell = value.custom
 							? // userId comes from setHP mixin
 								await this.get_spell({ uid: this.userId, id: key })
-							: await this.fetch_api_spell(key);
+							: await this.fetch_api_spell({
+									id: key,
+									edition: this.actor.edition || default_edition,
+								});
 						spell.key = key;
 
 						if (this.type === "innate") {
 							spell.limit = value.limit == 0 ? Infinity : value.limit;
+							if (value.level !== undefined) spell.cast_level = value.level;
 						} else {
 							spell.level = value.level;
 						}

@@ -37,12 +37,24 @@
 				<q-icon name="fas fa-search" size="xs" />
 			</button>
 		</hk-input>
+
+		<q-btn-toggle
+			v-if="showEditionSelect"
+			class="mb-3"
+			v-model="edition"
+			spread
+			no-caps
+			toggle-color="primary"
+			:options="editionOptions"
+		/>
+
 		<q-slide-transition v-if="copy_resource === 'srd'">
 			<div v-show="show_filter" class="filter">
 				<h3>Filter {{ type }}s</h3>
 				<hk-filter v-model="filter" :type="type" @change="search()" />
 			</div>
 		</q-slide-transition>
+
 		<q-list :dark="$store.getters.theme === 'dark'">
 			<q-item
 				v-for="(result, index) in searchResults"
@@ -58,13 +70,23 @@
 					{{ result.name.capitalizeEach() }}
 				</q-item-section>
 				<q-item-section avatar>
-					<a
-						v-if="!disabledCustom.includes(result.key)"
-						class="btn btn-sm bg-neutral-5"
-						@click="copy(copy_resource === 'custom' ? result.key : result._id)"
-					>
-						<i aria-hidden="true" class="fas" :class="`fa-${button}`" />
-					</a>
+					<div class="d-flex gap-2 items-center">
+						<span v-if="showEditionSelect" class="neutral-2">{{ result.edition || "5e" }}</span>
+						<slot
+							name="action"
+							:result="result"
+							:disabled="disabledCustom.includes(result.key)"
+							:copy="(extra) => copy(copy_resource === 'custom' ? result.key : result._id, extra)"
+						>
+							<a
+								v-if="!disabledCustom.includes(result.key)"
+								class="btn btn-sm bg-neutral-5"
+								@click="copy(copy_resource === 'custom' ? result.key : result._id)"
+							>
+								<i aria-hidden="true" class="fas" :class="`fa-${button}`" />
+							</a>
+						</slot>
+					</div>
 				</q-item-section>
 			</q-item>
 		</q-list>
@@ -83,6 +105,8 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { editions, default_edition } from "src/utils/generalConstants";
+import { removeVersionKeys } from "src/utils/generalFunctions";
 
 export default {
 	name: "CopyContent",
@@ -122,6 +146,12 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		// Initial edition ("5e" | "5.5e") for the SRD tab; seeded from a campaign/NPC's
+		// own edition by the caller when one exists. User can still change it.
+		initialEdition: {
+			type: String,
+			default: default_edition,
+		},
 	},
 	data() {
 		return {
@@ -135,6 +165,7 @@ export default {
 			pageSize: 5,
 			page: 1,
 			totalPages: 0,
+			edition: this.initialEdition,
 		};
 	},
 	computed: {
@@ -149,6 +180,16 @@ export default {
 			return this.type === "monster"
 				? values.concat({ label: `Homebrew`, value: "homebrew" })
 				: values;
+		},
+		showEditionSelect() {
+			return (this.type === "monster" || this.type === "spell") && this.copy_resource === "srd";
+		},
+		editionOptions() {
+			return editions.map((e) => ({ label: e.label.replace("D&D ", ""), value: e.value }));
+		},
+		// The API expects no edition for 5e content; only pass it for 5.5e
+		apiEdition() {
+			return this.edition === "5.5e" ? "5.5e" : undefined;
 		},
 		custom_content() {
 			let content = [];
@@ -177,6 +218,14 @@ export default {
 			},
 		},
 	},
+	watch: {
+		edition() {
+			if (this.copy_resource === "srd") {
+				this.resetSearchResults();
+				this.fetchApiContent();
+			}
+		},
+	},
 	async mounted() {
 		// Get custom content
 		if (this.content.includes("custom") && this.userId) {
@@ -200,11 +249,14 @@ export default {
 		...mapActions("spells", ["get_spells", "get_spell"]),
 		changeCopyResource(value) {
 			this.query = "";
+			this.resetSearchResults();
+			this.copy_resource = value;
+		},
+		resetSearchResults() {
 			this.searchResults = [];
 			this.noResult = "";
 			this.page = 1;
 			this.totalPages = 0;
-			this.copy_resource = value;
 		},
 		async search() {
 			// CUSTOM
@@ -245,6 +297,7 @@ export default {
 			}
 
 			await data({
+				edition: this.apiEdition,
 				pageNumber: this.page,
 				pageSize: this.pageSize,
 				query: {
@@ -268,11 +321,12 @@ export default {
 		 * Emit the selected result
 		 *
 		 * @param {string} id
+		 * @param {object} extra additional properties merged into the emitted payload
 		 * @emits {object} result, id, recource (custom or SRD)
 		 */
-		async copy(id) {
+		async copy(id, extra = {}) {
 			if (this.returnId) {
-				this.$emit("copy", { id, resource: this.copy_resource });
+				this.$emit("copy", { id, resource: this.copy_resource, ...extra });
 			} else {
 				let result;
 
@@ -280,19 +334,19 @@ export default {
 					result =
 						this.copy_resource === "custom"
 							? await this.get_npc({ uid: this.userId, id })
-							: await this.fetch_monster(id);
+							: await this.fetch_monster({ id, edition: this.apiEdition });
 				}
 				if (this.type === "item") {
 					result =
 						this.copy_resource === "custom"
 							? await this.get_item({ uid: this.userId, id })
-							: await this.fetch_api_item(id);
+							: await this.fetch_api_item({ id, edition: this.apiEdition });
 				}
 				if (this.type === "spell") {
 					result =
 						this.copy_resource === "custom"
 							? await this.get_spell({ uid: this.userId, id })
-							: await this.fetch_api_spell(id);
+							: await this.fetch_api_spell({ id, edition: this.apiEdition });
 				}
 
 				// Remove properties not needed for custom monsters
@@ -301,13 +355,10 @@ export default {
 				delete result.url;
 				delete result.meta;
 				delete result.release_date;
+				removeVersionKeys(result);
 
-				this.$emit("copy", { result, id, resource: this.copy_resource });
+				this.$emit("copy", { result, id, resource: this.copy_resource, ...extra });
 			}
-
-			// Clear search
-			this.searchResults = [];
-			this.query = "";
 		},
 	},
 };

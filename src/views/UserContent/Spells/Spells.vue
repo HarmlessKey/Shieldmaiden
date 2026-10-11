@@ -11,6 +11,16 @@
 					<span>Export</span>
 				</ExportUserContent>
 				<button
+					v-if="selected_spells.length"
+					slot="actions-left"
+					class="btn btn-sm bg-neutral-5 mr-2"
+					:disabled="batch_download_loading"
+					@click="openBatchDownload"
+				>
+					{{ batch_download_loading ? "Loading…" : `Download (${selected_spells.length})` }}
+					<hk-icon icon="fas fa-file-pdf" class="ml-1" />
+				</button>
+				<button
 					v-if="tier.price !== 'Free'"
 					slot="actions-right"
 					class="btn btn-sm bg-neutral-5 mr-2"
@@ -48,9 +58,14 @@
 						:pagination="{ rowsPerPage: 15 }"
 						:filter="search"
 						wrap-cells
+						selection="multiple"
+						:selected.sync="selected_spells"
 					>
 						<template v-slot:body="props">
 							<q-tr :props="props">
+								<q-td auto-width>
+									<q-checkbox :dark="$store.getters.theme !== 'light'" v-model="props.selected" />
+								</q-td>
 								<q-td
 									v-for="col in props.cols"
 									:key="col.name"
@@ -124,6 +139,8 @@
 				</div>
 			</hk-card>
 		</q-dialog>
+
+		<SpellCardDownload v-model="batch_download_dialog" :spells="batch_download_spells" />
 	</div>
 </template>
 
@@ -134,6 +151,7 @@ import ContentHeader from "src/components/userContent/ContentHeader";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import { downloadJSON } from "src/utils/generalFunctions";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
+import SpellCardDownload from "src/components/spells/SpellCardDownload.vue";
 
 export default {
 	name: "Spells",
@@ -141,6 +159,7 @@ export default {
 		ContentHeader,
 		ImportUserContent,
 		ExportUserContent,
+		SpellCardDownload,
 	},
 	data() {
 		return {
@@ -148,6 +167,10 @@ export default {
 			import_dialog: false,
 			loading_spells: true,
 			search: "",
+			selected_spells: [],
+			batch_download_dialog: false,
+			batch_download_loading: false,
+			batch_download_spells: [],
 			columns: [
 				{
 					name: "name",
@@ -200,6 +223,17 @@ export default {
 		...mapActions("spells", ["get_spells", "get_spell", "delete_spell", "update_spell_count"]),
 		spellLevel(level) {
 			return level === 0 ? "Cantrip" : numeral(level).format("0o");
+		},
+		async openBatchDownload() {
+			this.batch_download_loading = true;
+			const results = await Promise.all(
+				this.selected_spells.map((spell) => this.get_spell({ uid: this.userId, id: spell.key }))
+			);
+			this.batch_download_spells = this.selected_spells
+				.map((spell, index) => (results[index] ? { ...results[index], key: spell.key } : null))
+				.filter(Boolean);
+			this.batch_download_loading = false;
+			this.batch_download_dialog = true;
 		},
 		confirmDelete(e, key, spell) {
 			//Instantly delete when shift is held

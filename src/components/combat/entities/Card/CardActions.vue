@@ -2,7 +2,7 @@
 	<div class="card-actions">
 		<div v-for="{ category, name } in actions" :key="category">
 			<template v-if="entity[category] && entity[category].length > 0">
-				<h3 v-if="category !== 'special_abilities'" class="label d-flex justify-content-between">
+				<h3 class="label d-flex justify-content-between">
 					{{ name }}
 					<LimitedUseCounter
 						v-if="category === 'legendary_actions' && entity.legendary_count"
@@ -198,10 +198,15 @@ export default {
 			actions: [
 				{
 					category: "special_abilities",
-					name: "Special Abilities",
-					name_single: "Special ability",
+					name: "Traits",
+					name_single: "Trait",
 				},
 				{ category: "actions", name: "Actions", name_single: "Action" },
+				{
+					category: "bonus_actions",
+					name: "Bonus Actions",
+					name_single: "Bonus action",
+				},
 				{
 					category: "legendary_actions",
 					name: "Legendary Actions",

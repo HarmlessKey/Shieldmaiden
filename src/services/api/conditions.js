@@ -9,7 +9,7 @@ export class conditionServices {
     });
   }
 
-  async getConditions(query, pageNumber = 1, pageSize = 15, fields=["ALL"], sortBy = "name", descending=false) {
+  async getConditions(edition, query, pageNumber = 1, pageSize = 15, fields=["ALL"], sortBy = "name", descending=false) {
     const skip = (pageNumber - 1)*pageSize;
     const fieldsString = fields.join(" ");
     let params = `?skip=${skip}&limit=${pageSize}&fields=${fieldsString}`;
@@ -17,26 +17,30 @@ export class conditionServices {
     if(sortBy) {
       params += `&sort=${sortBy}${descending ? ":desc" : ""}`;
     }
-    
+
     if(query) {
       const queryParams = [];
-      
+
       if(query.search) {
         queryParams.push(`name=${query.search}`);
       }
 
       params += `&${queryParams.join("&")}`;
     }
-    
-    return this.HK.get(CONDITIONS_REF + params).then((response) => {
+
+    const ref = edition === "5.5e" ? `${CONDITIONS_REF}/5.5e` : CONDITIONS_REF;
+
+    return this.HK.get(ref + params).then((response) => {
       return response.data;
     }).catch((error) => {
       throw error;
     });
   }
 
-  async getCondition(id) {
-    return this.HK.get(`${CONDITIONS_REF}/${id}`).then((response) => {
+  async getCondition(id, edition) {
+    const ref = edition === "5.5e" ? `${CONDITIONS_REF}/5.5e/${id}` : `${CONDITIONS_REF}/${id}`;
+
+    return this.HK.get(ref).then((response) => {
       return response.data;
     }).catch((error) => {
       throw error;

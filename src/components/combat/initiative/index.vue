@@ -35,9 +35,19 @@
 			:class="{ focused: focused_pane === 'npcs' }"
 			@focus="focusPane('npcs')"
 		>
-			<h2 class="componentHeader d-flex" :class="{ shadow: setShadowNPC > 0 }">
+			<h2 class="componentHeader d-flex items-center" :class="{ shadow: setShadowNPC > 0 }">
 				<span class="flex-grow"><i aria-hidden="true" class="fas fa-dragon"></i> NPC's</span>
-				<hk-roll @roll="rollNPCs($event)">
+				<button
+					class="btn btn-sm bg-neutral-5 mr-1"
+					:class="{ disabled: test }"
+					@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
+				>
+					<i class="fas fa-plus green mr-1" aria-hidden="true" /> Add
+					<q-tooltip v-if="test" anchor="top middle" self="center middle">
+						Unavailable in test mode
+					</q-tooltip>
+				</button>
+				<hk-roll @roll="rollNPCs($event)" class="d-flex items-center">
 					<button
 						class="btn btn-sm bg-neutral-5"
 						:class="{
@@ -139,6 +149,16 @@
 			</q-tab-panel>
 			<q-tab-panel name="npcs">
 				<h2>NPC's</h2>
+				<button
+					class="btn btn-block mb-3"
+					:class="{ disabled: test }"
+					@click="test ? null : setDrawer({ show: true, type: 'drawers/encounter/AddNpc' })"
+				>
+					<i class="fas fa-plus green mr-1" aria-hidden="true" /> Add NPC
+					<q-tooltip v-if="test" anchor="top middle" self="center middle">
+						Unavailable in test mode
+					</q-tooltip>
+				</button>
 				<NPCs :npcs="_npcs" />
 			</q-tab-panel>
 			<q-tab-panel name="overview">
@@ -205,7 +225,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["campaignId", "encounterId", "encounter", "entities", "path"]),
+		...mapGetters(["campaignId", "encounterId", "encounter", "entities", "path", "test"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		_players: function () {
 			return _.chain(this.entities)
@@ -227,7 +247,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["set_turn"]),
+		...mapActions(["set_turn", "setDrawer"]),
 		cyclePanes(e) {
 			const key = e.srcKey;
 			const current = this.focused_pane ? this.panes.indexOf(this.focused_pane) : -1;

@@ -55,6 +55,7 @@
 												v-close-popup
 												v-for="index in 6"
 												:key="index"
+												:class="{ 'bg-blue': checkExhaustion() === index }"
 												@click="setExhausted(index)"
 												@keydown.space="setExhausted(index)"
 											>
@@ -97,6 +98,18 @@
 								{{ effect }}
 							</li>
 						</ul>
+						<table v-if="value === 'exhaustion'" class="table">
+							<thead>
+								<th>Level</th>
+								<th>Effect</th>
+							</thead>
+							<tbody>
+								<tr v-for="(effect, i) in exhaustionLevels" :key="i">
+									<td>{{ i + 1 }}</td>
+									<td>{{ effect }}</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				</q-expansion-item>
 			</q-list>
@@ -107,13 +120,12 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { conditions } from "src/mixins/conditions.js";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import Effects from "src/components/combat/entities/effects";
+import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
 
 export default {
 	name: "Conditions",
-	mixins: [conditions],
 	components: {
 		BasicEntity,
 		Effects,
@@ -129,18 +141,35 @@ export default {
 	},
 	computed: {
 		...mapGetters(["entities", "targeted", "entities"]),
+		...mapGetters("api_conditions", ["conditions_by_edition"]),
+		edition() {
+			return this.$store.getters.edition;
+		},
+		conditionList() {
+			return this.conditions_by_edition(this.edition).map((condition) => ({
+				value: condition.url,
+				name: condition.name,
+				condition: condition.condition,
+				effects: condition.effects,
+			}));
+		},
+		exhaustionLevels() {
+			return EXHAUSTION_LEVELS[this.edition === "5.5e" ? "5.5e" : "5e"];
+		},
 		condition_targets: function () {
 			if (this.data !== undefined && this.data.length > 0) return this.data;
 
 			return this.targeted;
 		},
 	},
-	mounted() {
+	async mounted() {
+		await this.fetch_all_conditions({ edition: this.edition });
 		this.setEffectSize();
 		this.$refs[0]?.[0]?.focus();
 	},
 	methods: {
 		...mapActions(["setDrawer", "set_condition"]),
+		...mapActions("api_conditions", ["fetch_all_conditions"]),
 		focusButton(e, i) {
 			if (e.view.shiftKey) {
 				i = i - 1;

@@ -109,6 +109,7 @@ export default {
 			action_types: [
 				{ label: "Special", name: "special", type: "special_abilities" },
 				{ label: "Actions", name: "actions", type: "actions" },
+				{ label: "Bonus", name: "bonus", type: "bonus_actions" },
 				{ label: "Legendary", name: "legendary", type: "legendary_actions" },
 				{ label: "Reactions", name: "reactions", type: "reactions" },
 			],
@@ -124,11 +125,14 @@ export default {
 			get() {
 				let tab = "actions";
 				if (!this.current.actions) {
-					tab = "special";
-					if (!this.current.special_abilities) {
-						tab = "legendary";
-						if (!this.current.legendary_actions) {
-							tab = "reactions";
+					tab = "bonus";
+					if (!this.current.bonus_actions) {
+						tab = "special";
+						if (!this.current.special_abilities) {
+							tab = "legendary";
+							if (!this.current.legendary_actions) {
+								tab = "reactions";
+							}
 						}
 					}
 				}

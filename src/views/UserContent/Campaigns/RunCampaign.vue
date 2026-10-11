@@ -15,6 +15,7 @@
 					Leave
 				</router-link>
 				<div class="dm-screen__header-title flex-grow truncate">
+					<span class="neutral-2">{{ campaign.edition === "5.5e" ? "5.5e" : "5e" }}</span>
 					{{ campaign.name }}
 				</div>
 				<div class="d-flex justify-content-end items-center gap-1">
@@ -69,6 +70,7 @@
 								setDrawer({
 									show: true,
 									type: 'campaign/resources/index',
+									data: { campaign: campaign },
 									classes: 'p-0',
 								})
 							"
@@ -94,23 +96,39 @@
 						/>
 					</hk-pane>
 				</Splitpanes>
-				<Splitpanes v-else-if="container.width >= lg" class="default-theme">
-					<Pane :size="paneSize('left')" min-size="20">
-						<Splitpanes horizontal>
+				<Splitpanes
+					v-else-if="container.width >= lg"
+					class="default-theme"
+					@resized="onOuterResized"
+					@mousedown.native.capture="dragFlags.outer = true"
+					@touchstart.native.capture="dragFlags.outer = true"
+				>
+					<Pane :size="panes.left" min-size="20">
+						<Splitpanes
+							horizontal
+							@resized="onLeftResized"
+							@mousedown.native.capture="dragFlags.left = true"
+							@touchstart.native.capture="dragFlags.left = true"
+						>
 							<hk-pane>
 								<SoundBoard />
 							</hk-pane>
-							<hk-pane v-if="!campaign.private" :size="100 - paneSize('left-top')" min-size="20">
+							<hk-pane v-if="!campaign.private" :size="100 - panes['left-top']" min-size="20">
 								<Share :campaign="campaign" />
 							</hk-pane>
 						</Splitpanes>
 					</Pane>
-					<Pane :size="paneSize('mid')" min-size="20">
-						<Splitpanes horizontal>
-							<hk-pane :size="paneSize('mid-top')" min-size="20">
+					<Pane :size="panes.mid" min-size="20">
+						<Splitpanes
+							horizontal
+							@resized="onMidResized"
+							@mousedown.native.capture="dragFlags.mid = true"
+							@touchstart.native.capture="dragFlags.mid = true"
+						>
+							<hk-pane :size="panes['mid-top']" min-size="20">
 								<Encounters />
 							</hk-pane>
-							<hk-pane :size="100 - paneSize('mid-top')" min-size="20">
+							<hk-pane :size="100 - panes['mid-top']" min-size="20">
 								<Players
 									:userId="user.uid"
 									:campaignId="campaignId"
@@ -122,8 +140,8 @@
 							</hk-pane>
 						</Splitpanes>
 					</Pane>
-					<hk-pane :size="paneSize('right')" min-size="20">
-						<Resources />
+					<hk-pane :size="panes.right" min-size="20">
+						<Resources :campaign="campaign" />
 					</hk-pane>
 				</Splitpanes>
 				<Splitpanes v-else class="default-theme" horizontal>
@@ -186,7 +204,7 @@
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="resources" class="p-0">
-						<Resources />
+						<Resources :campaign="campaign" />
 					</q-tab-panel>
 					<q-tab-panel name="share">
 						<Share :campaign="campaign" />
@@ -203,6 +221,29 @@
 		<q-dialog v-if="!overencumbered" v-model="add_players_dialog">
 			<AddPlayers :campaign="search_campaign" @campaign-players="updatePlayers" />
 		</q-dialog>
+
+		<!-- Campaign edition dialog -->
+		<q-dialog v-model="edition_dialog" persistent>
+			<hk-card header="Which edition does this campaign use?" class="mb-0">
+				<div class="card-body">
+					<p>
+						This campaign was created before edition support was added. Select the edition this
+						campaign uses, it determines which rules and content are shown by default. You can
+						always change this later when editing the campaign.
+					</p>
+					<div class="d-flex justify-content-between gap-1">
+						<button
+							v-for="{ value, label } in edition_options"
+							:key="value"
+							class="btn btn-block bg-neutral-5"
+							@click="setEdition(value)"
+						>
+							{{ label }}
+						</button>
+					</div>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -212,7 +253,10 @@ import Players from "src/components/campaign/Players.vue";
 import SoundBoard from "src/components/campaign/soundBoard/index.vue";
 import Share from "src/components/campaign/share";
 import Resources from "src/components/campaign/resources";
+import HkPane from "src/components/hk-components/hk-pane";
 import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { editions, default_edition } from "src/utils/generalConstants";
+import { loadPaneSizes, savePaneSizes } from "src/utils/dmScreenLayout";
 import AddPlayers from "src/components/campaign/AddPlayers";
 
 import { mapGetters, mapActions } from "vuex";
@@ -226,6 +270,7 @@ export default {
 		Share,
 		Resources,
 		AddPlayers,
+		"hk-pane": HkPane,
 	},
 	data() {
 		return {
@@ -241,6 +286,8 @@ export default {
 			players: {},
 			search_campaign: {},
 			add_players_dialog: false,
+			edition_dialog: false,
+			edition_options: editions,
 			mobile_tab: "encounters",
 			mobile_tabs: [
 				{
@@ -273,12 +320,18 @@ export default {
 			md: 768,
 			lg: 992,
 			xl: 1200,
+			panes: loadPaneSizes(),
+			dragFlags: { outer: false, left: false, mid: false },
 		};
 	},
 	async mounted() {
 		if (this.extensionInstalled) {
 			this.sync_characters = await getCharacterSyncStorage();
 		}
+		// Fully hydrate the search index before it's relied on by `filtered_search_players`,
+		// otherwise editing a single player creates a partial index and the reactive watcher
+		// below wipes out every other party member from the displayed roster.
+		await this.get_players();
 		await this.get_campaign({
 			uid: this.user.uid,
 			id: this.campaignId,
@@ -311,6 +364,12 @@ export default {
 					this.search_campaign[prop] = this.campaign[prop];
 				}
 			}
+
+			// Campaigns from before edition support: ask the user which edition is used
+			if (!this.campaign.edition) {
+				this.edition_dialog = true;
+			}
+			this.set_compendium_edition(this.campaign.edition || default_edition);
 		});
 		this.set_active_campaign(this.campaignId);
 	},
@@ -346,25 +405,43 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer"]),
-		...mapActions("campaigns", ["get_campaign", "set_active_campaign"]),
-		...mapActions("players", ["get_player"]),
+		...mapActions(["setDrawer", "set_compendium_edition"]),
+		...mapActions("campaigns", ["get_campaign", "set_active_campaign", "set_campaign_prop"]),
+		...mapActions("players", ["get_player", "get_players"]),
+		async setEdition(edition) {
+			await this.set_campaign_prop({ id: this.campaignId, property: "edition", value: edition });
+			this.$set(this.campaign, "edition", edition);
+			this.set_compendium_edition(edition);
+			this.edition_dialog = false;
+		},
 		setSize(size) {
 			this.container = size;
 		},
-		paneSize(pane) {
-			switch (pane) {
-				case "left":
-					return 25;
-				case "mid":
-					return 45;
-				case "right":
-					return 30;
-				case "left-top":
-					return 60;
-				case "mid-top":
-					return 50;
-			}
+		updatePanes(partial) {
+			this.panes = { ...this.panes, ...partial };
+			savePaneSizes(partial);
+		},
+		onOuterResized(sizes) {
+			const fromDrag = this.dragFlags.outer;
+			this.dragFlags.outer = false;
+			if (!fromDrag || !Array.isArray(sizes) || sizes.length < 3) return;
+			this.updatePanes({
+				left: sizes[0].size,
+				mid: sizes[1].size,
+				right: sizes[2].size,
+			});
+		},
+		onLeftResized(sizes) {
+			const fromDrag = this.dragFlags.left;
+			this.dragFlags.left = false;
+			if (!fromDrag || !Array.isArray(sizes) || sizes.length < 1) return;
+			this.updatePanes({ "left-top": sizes[0].size });
+		},
+		onMidResized(sizes) {
+			const fromDrag = this.dragFlags.mid;
+			this.dragFlags.mid = false;
+			if (!fromDrag || !Array.isArray(sizes) || sizes.length < 1) return;
+			this.updatePanes({ "mid-top": sizes[0].size });
 		},
 		open_player_dialog() {
 			this.add_players_dialog = true;

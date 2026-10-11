@@ -1,31 +1,21 @@
 <template>
 	<hk-card header="">
 		<div class="card-header" slot="header">
-			<h1>Compendium D&D 5e</h1>
-			<span class="neutral-3">
-				Resource
-				<a
-					class="btn btn-sm btn-clear"
-					href="https://media.wizards.com/2016/downloads/DND/SRD-OGL_V5.1.pdf"
-					target="_blank"
-					rel="noopener"
-					>SRD 5.1</a
-				>
-			</span>
+			<h1>Compendium D&D 5e and 5.5e</h1>
 		</div>
 		<div class="card-body">
-			<ul class="entities hasImg">
+			<ul class="entities">
 				<li v-for="(item, index) in items" :key="index">
 					<i aria-hidden="true" class="icon neutral-2 mr-2" :class="item.icon" />
-					<router-link :to="$route.path + '/' + item.url">{{ item.name }}</router-link>
-				</li>
-			</ul>
-
-			<h3>Homebrew content by Shieldmaiden</h3>
-			<ul class="entities hasImg">
-				<li>
-					<i class="fas fa-beer icon neutral-2 mr-2" aria-hidden="true" />
-					<router-link to="/homebrew">Homebrew monsters</router-link>
+					<span class="flex-grow">
+						{{ item.name }}
+					</span>
+					<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${item.url}`"
+						>5e</router-link
+					>
+					<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${item.url}/5.5e`"
+						>5.5e</router-link
+					>
 				</li>
 			</ul>
 		</div>
@@ -72,12 +62,19 @@ export default {
 <style lang="scss" scoped>
 ul.entities {
 	li {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 5px;
+		padding: 0 15px;
+
 		.icon {
 			border: none;
 			background: none;
 			text-align: center;
 			font-size: 20px;
 			line-height: 48px;
+			width: 35px;
 		}
 	}
 }

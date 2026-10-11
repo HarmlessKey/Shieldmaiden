@@ -38,13 +38,11 @@
 						<br /><strong>Speed</strong>:
 						<span> {{ entity.speed }}</span>
 					</template>
-					<template v-if="entity.initiative_bonus">
+					<template v-if="entity.initiative_modifier !== undefined">
 						<br /><strong>Initiative</strong>:
 						<span>
 							{{
-								entity.initiative_bonus > 0
-									? `+${entity.initiative_bonus}`
-									: entity.initiative_bonus
+								initiative > 0 ? `+${initiative}` : initiative
 							}}</span
 						>
 					</template>
@@ -288,7 +286,7 @@
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
-								<template #content> <Spell :id="spell.key" /> </template
+								<template #content> <Spell :id="spell.key" hide-report /> </template
 							></hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLevel(level).length ? "," : "" }}
@@ -345,7 +343,7 @@
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
-									<Spell :id="spell.key" />
+									<Spell :id="spell.key" hide-report />
 								</template>
 							</hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
@@ -415,8 +413,11 @@ export default {
 			}
 			return entity;
 		},
-		spellCasting() {
-			let casting = [];
+		initiative() {
+				return this.entity.initiative_modifier;
+			},
+			spellCasting() {
+				let casting = [];
 			if (this.entity.innate_ability)
 				casting.push({
 					name: "innate",
@@ -489,24 +490,13 @@ export default {
 		},
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)
-				.filter(([key, item]) => {
-					item.key = key;
-					return item.level == level;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, item]) => item.level == level)
+				.map(([key, item]) => ({ ...item, key }));
 		},
 		spellsForLimit(limit) {
 			return Object.entries(this.entity.innate_spells)
-				.filter(([key, item]) => {
-					item.key = key;
-					if (item.limit === 0) item.limit = Infinity;
-					return item.limit == limit;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, item]) => (item.limit || Infinity) == limit)
+				.map(([key, item]) => ({ ...item, key }));
 		},
 	},
 };

@@ -42,8 +42,9 @@ export const runEncounter = {
 				config.caster_level = entity[`${category}_level`];
 				config.save_dc = entity[`${category}_save_dc`];
 
-				// Innate spells are cast at the lowest possible level
-				config.cast_level = category === "innate" ? action.level : action_index;
+				// Innate spells are cast at their assigned level, falling back to the lowest possible level
+				config.cast_level =
+					category === "innate" ? (action.cast_level ?? action.level) : action_index;
 			}
 
 			// Roll once for AOE

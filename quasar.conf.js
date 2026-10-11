@@ -139,7 +139,7 @@ module.exports = function (/* ctx */) {
 				short_name: "Shieldmaiden",
 				start_url: ".",
 				description:
-					"Shieldmaiden is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+					"Shieldmaiden is the initiative tracker for D&D 5e and 5.5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
 				orientation: "any",
 				theme_color: "#191a1c",
 				background_color: "#191a1c",

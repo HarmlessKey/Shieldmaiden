@@ -7,8 +7,9 @@
 //   2. every effect_types entry only lists known sub-types and sub-effect fields, every
 //      sub-effect field is common or used by a type, and every duration type only lists
 //      duration fields
-//   3. every type / sub-type pair and every type-specific key in the SRD effect and
-//      condition data of both editions is allowed by effect_types
+//   3. every type / sub-type pair and every type-specific key in the SRD effect data
+//      (effects.js, both editions) and the condition data of both editions is allowed by
+//      effect_types, and every choice kind (one, or a list) has a choice_kinds entry
 //   4. the duration types accepted by the `effects` blocks in firebase-rules.json match
 //      $defs/duration.type (skipped with a warning when the rules file is missing)
 //
@@ -18,7 +19,7 @@
 // Options:
 //   --schema <file>     effects schema (default src/schemas/hk-effects-schema.json)
 //   --constants <file>  effects constants (default src/utils/effectsConstants.js)
-//   --data <dir>        data root holding 5e/ and 5.5e/ (default src/data)
+//   --data <dir>        data root holding effects.js, 5e/ and 5.5e/ (default src/data)
 //   --rules <file>      database rules (default ../firebase_rules/firebase-rules.json)
 //
 // Prints one `source › subject › problem` line per problem and exits 1 if there are any.
@@ -39,7 +40,6 @@ const GENERAL = join(ROOT, "src/utils/generalConstants.js");
 const DATA = resolve(argValue("--data") || join(ROOT, "src/data"));
 const RULES = resolve(argValue("--rules") || join(ROOT, "../firebase_rules/firebase-rules.json"));
 const EDITIONS = ["5e", "5.5e"];
-const FILES = ["effects.js", "conditions.js"];
 
 // Schema enum pointer → [module, export]. "effects" is effectsConstants.js (keyed objects),
 // "general" is generalConstants.js (arrays).
@@ -75,7 +75,8 @@ const ENUM_MAP = {
 	"#/$defs/consume/properties/scope": ["effects", "consume_scopes"],
 	"#/$defs/sub_effect/properties/type": ["effects", "effect_types"],
 	"#/$defs/sub_effect/properties/perspective": ["effects", "perspectives"],
-	"#/$defs/sub_effect/properties/choice": ["effects", "choice_kinds"],
+	"#/$defs/choice_kind": ["effects", "choice_kinds"],
+	"#/properties/edition": ["general", "editions"],
 	"#/$defs/sub_effect/properties/bypass/items": ["effects", "bypass_sources"],
 	"#/$defs/sub_effect/properties/mechanics/items": ["effects", "mechanics"],
 	"#/$defs/sub_effect/properties/keep": ["effects", "reroll_keep"],
@@ -111,7 +112,8 @@ const modules = {
 };
 const valuesOf = (moduleName, exportName) => {
 	const value = modules[moduleName][exportName];
-	if (Array.isArray(value)) return value;
+	// Arrays of strings, or of { value, label } options (editions)
+	if (Array.isArray(value)) return value.map((item) => (item && typeof item === "object" ? item.value : item));
 	if (value && typeof value === "object") return Object.keys(value);
 	return undefined;
 };
@@ -206,33 +208,36 @@ const subEffectsIn = (value, found = []) => {
 	return found;
 };
 
-for (const edition of EDITIONS) {
-	for (const name of FILES) {
-		const file = join(DATA, edition, name);
-		let list;
-		try {
-			list = (await importModule(file)).default;
-		} catch (error) {
-			report(file, "(file)", `can't import: ${error.message}`);
-			continue;
-		}
-		for (const entry of Array.isArray(list) ? list : []) {
-			for (const sub_effect of subEffectsIn([entry])) {
-				const label = entry.url || entry.name;
-				const type = effect_types[sub_effect.type];
-				if (!type) {
-					report(file, label, `sub-effect type "${sub_effect.type}" has no effect_types entry`);
-					continue;
+const { choice_kinds = {} } = modules.effects;
+const dataFiles = [join(DATA, "effects.js"), ...EDITIONS.map((edition) => join(DATA, edition, "conditions.js"))];
+for (const file of dataFiles) {
+	let list;
+	try {
+		list = (await importModule(file)).default;
+	} catch (error) {
+		report(file, "(file)", `can't import: ${error.message}`);
+		continue;
+	}
+	for (const entry of Array.isArray(list) ? list : []) {
+		for (const sub_effect of subEffectsIn([entry])) {
+			const label = entry.edition ? `${entry.url || entry.name} (${entry.edition})` : entry.url || entry.name;
+			// A choice is one kind or a list of kinds
+			for (const kind of [sub_effect.choice].flat().filter((kind) => kind !== undefined)) {
+				if (!choice_kinds[kind]) report(file, label, `choice kind "${kind}" has no choice_kinds entry`);
+			}
+			const type = effect_types[sub_effect.type];
+			if (!type) {
+				report(file, label, `sub-effect type "${sub_effect.type}" has no effect_types entry`);
+				continue;
+			}
+			for (const sub_type of sub_effect.sub_types || []) {
+				if (!type.sub_types.includes(sub_type)) {
+					report(file, label, `${sub_effect.type} → "${sub_type}" is not allowed by effect_types`);
 				}
-				for (const sub_type of sub_effect.sub_types || []) {
-					if (!type.sub_types.includes(sub_type)) {
-						report(file, label, `${sub_effect.type} → "${sub_type}" is not allowed by effect_types`);
-					}
-				}
-				for (const key of Object.keys(sub_effect)) {
-					if (!common_sub_effect_fields.includes(key) && !type.fields.includes(key)) {
-						report(file, label, `${sub_effect.type} uses "${key}", which isn't in its fields`);
-					}
+			}
+			for (const key of Object.keys(sub_effect)) {
+				if (!common_sub_effect_fields.includes(key) && !type.fields.includes(key)) {
+					report(file, label, `${sub_effect.type} uses "${key}", which isn't in its fields`);
 				}
 			}
 		}

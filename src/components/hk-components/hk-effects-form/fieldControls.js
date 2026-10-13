@@ -17,7 +17,7 @@ import {
 	roll_sub_types,
 } from "src/utils/effectsConstants";
 import { abilities, creature_types, skills } from "src/utils/generalConstants";
-import { getSrdDefinitions } from "src/utils/effectFunctions";
+import { choiceKinds, getSrdDefinitions } from "src/utils/effectFunctions";
 
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
@@ -178,7 +178,8 @@ export const sub_effect_configurations = Object.freeze([
 	{
 		key: "choice",
 		label: "Choice",
-		description: "A value picked when the effect is applied, like a damage type, so one effect fits many cases",
+		description:
+			"Values picked when the effect is applied, like a damage type or a skill and a number, so one effect fits many cases",
 		keys: ["choice"],
 	},
 	{
@@ -280,10 +281,10 @@ const RULES = {
 	),
 	skills: forTypes([...VALUE_TYPES, ...ROLL_TYPES, "proficiency"], (s) => hasSubType(s, ["skill"])),
 	// A damage type choice picks one type, so "all damage" and its exceptions don't apply
-	all_damage: (s) => s.choice !== "damage_type",
+	all_damage: (s) => !choiceKinds(s).includes("damage_type"),
 	// "Except damage types" narrows "All damage types" on a defense (damage modifiers use it on its own)
 	except_damage_types: allOf(
-		(s) => s.choice !== "damage_type",
+		(s) => !choiceKinds(s).includes("damage_type"),
 		forTypes(["defense"], (s) => !!s.all_damage)
 	),
 	// Conditions and other immunities only exist as immunities, not as resistance or vulnerability
@@ -376,20 +377,38 @@ export function showsField(sub_effect, field) {
 }
 
 /**
- * The field a choice fills, unless it stays editable (a damage type choice uses the
- * listed damage types as its options)
+ * The fields the sub-effect's choices fill, except those that stay editable (a damage type
+ * choice uses the listed damage types as its options)
+ *
+ * @param {object} sub_effect
+ * @returns {string[]} e.g. ["skills", "value"] for choice: ["skill", "value"]
  */
-export function choiceDisabledField(sub_effect) {
-	if (!sub_effect.choice || sub_effect.choice === "damage_type") return undefined;
-	return choice_kinds[sub_effect.choice]?.field;
+export function choiceLockedFields(sub_effect) {
+	return choiceKinds(sub_effect)
+		.filter((kind) => kind !== "damage_type")
+		.map((kind) => choice_kinds[kind]?.field)
+		.filter(Boolean);
+}
+
+/**
+ * The choice value for a list of picked kinds: one kind as a string, more as a list, none as
+ * undefined (no choice)
+ *
+ * @param {string[]|string} kinds
+ * @returns {string|string[]|undefined}
+ */
+export function choiceValue(kinds) {
+	const list = [kinds].flat().filter(Boolean);
+	if (list.length > 1) return list;
+	return list[0];
 }
 
 /**
  * Whether a shown field is locked: read-only and empty, because something else fills it.
- * The field a choice fills, and Damage types while All damage types is checked.
+ * The fields a choice fills, and Damage types while All damage types is checked.
  */
 export function isLocked(sub_effect, field) {
-	if (field === choiceDisabledField(sub_effect)) return true;
+	if (choiceLockedFields(sub_effect).includes(field)) return true;
 	return field === "damage_types" && !!sub_effect.all_damage;
 }
 

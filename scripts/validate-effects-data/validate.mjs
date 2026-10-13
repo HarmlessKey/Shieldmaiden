@@ -1,20 +1,26 @@
-// Validates the SRD effect and condition data files of both editions.
+// Validates the SRD effect data (effects.js, shared by both editions) and the condition data
+// files of both editions (5e/conditions.js, 5.5e/conditions.js).
 //
-// Checks, per edition:
+// An edition's set is the effects without `edition`, the effects with that `edition` and that
+// edition's conditions.
+//
+// Checks, per entry:
 //   1. every entry validates against src/schemas/hk-effects-schema.json
 //   2. no entry carries `key`, `duration_type`, `duration_value` or `cancel_trigger`, nor an
 //      origin field (`category`, `spell_level`, `magical`, `tags`, `removed_by`), and no
 //      sub-effect carries `scaling` (definitions are generic)
-//   3. every entry has a `url`, unique across effects.js and conditions.js
-//   4. every `{ source: "srd", source_key }` reference resolves to a `url` in the same edition
-//   5. `includes` references don't form a cycle
-//   6. conditions.js holds exactly the 15 SRD conditions
+//   3. `edition` is only on effects, and is "5e" or "5.5e"
+// Checks, per edition set:
+//   4. every entry has a `url`, unique within the set
+//   5. every `{ source: "srd", source_key }` reference resolves to a `url` in the set
+//   6. `includes` references don't form a cycle
+// And: conditions.js holds exactly the 15 SRD conditions.
 //
 // Usage:
 //   node scripts/validate-effects-data/validate.mjs
 //
 // Options:
-//   --data <dir>  data root holding 5e/ and 5.5e/ (default src/data)
+//   --data <dir>  data root holding effects.js, 5e/ and 5.5e/ (default src/data)
 //
 // Prints one `file › entry url › problem` line per problem and exits 1 if there are any.
 
@@ -32,7 +38,7 @@ const argValue = (flag) => {
 };
 const DATA = resolve(argValue("--data") || join(ROOT, "src/data"));
 const EDITIONS = ["5e", "5.5e"];
-const FILES = ["effects.js", "conditions.js"];
+const EFFECTS_FILE = join(DATA, "effects.js");
 const FORBIDDEN = [
 	"key",
 	"duration_type",
@@ -114,67 +120,80 @@ function includesRefs(value, found = []) {
 	return found;
 }
 
-for (const edition of EDITIONS) {
-	const entries = []; // { file, entry }
-
-	for (const name of FILES) {
-		const file = join(DATA, edition, name);
-		let list;
-		try {
-			// Imported from a data: URL: the package has no "type": "module", and importing the
-			// .js file directly makes Node warn about reparsing it as ESM
-			const source = readFileSync(file, "utf8");
-			list = (await import(`data:text/javascript,${encodeURIComponent(source)}`)).default;
-		} catch (error) {
-			report(file, null, `can't import: ${error.message}`);
-			continue;
-		}
-		if (!Array.isArray(list)) {
+// Imported from a data: URL: the package has no "type": "module", and importing the .js file
+// directly makes Node warn about reparsing it as ESM
+async function importList(file) {
+	try {
+		const source = readFileSync(file, "utf8");
+		const module = await import(`data:text/javascript,${encodeURIComponent(source)}`);
+		if (!Array.isArray(module.default)) {
 			report(file, null, "default export is not an array");
-			continue;
+			return { list: [] };
 		}
-		list.forEach((entry) => entries.push({ file, entry }));
+		return { list: module.default };
+	} catch (error) {
+		report(file, null, `can't import: ${error.message}`);
+		return { list: [] };
+	}
+}
 
-		if (name === "conditions.js") {
-			const urls = list.map((entry) => entry.url);
-			SRD_CONDITIONS.filter((url) => !urls.includes(url)).forEach((url) =>
-				report(file, null, `missing SRD condition "${url}"`)
-			);
-			list
-				.filter((entry) => !SRD_CONDITIONS.includes(entry.url))
-				.forEach((entry) => report(file, entry, "not an SRD condition of this edition"));
+// Per entry: schema, forbidden fields, edition
+function checkEntry(file, entry, { isEffect }) {
+	if (!validate(entry)) {
+		for (const error of validate.errors) {
+			report(file, entry, `schema: ${error.instancePath || "/"} ${error.message}`);
 		}
 	}
+	FORBIDDEN.filter((field) => field in entry).forEach((field) => report(file, entry, `has forbidden field "${field}"`));
+	for (const sub_effect of subEffects(entry)) {
+		FORBIDDEN_SUB_EFFECT.filter((field) => field in sub_effect).forEach((field) =>
+			report(file, entry, `${sub_effect.type} sub-effect has forbidden field "${field}"`)
+		);
+	}
+	if ("edition" in entry) {
+		if (!isEffect) report(file, entry, "a condition has no edition: its file belongs to one edition");
+		else if (!EDITIONS.includes(entry.edition)) report(file, entry, `unknown edition "${entry.edition}"`);
+	}
+}
 
-	// Schema, forbidden fields, url presence and uniqueness
+const { list: effects } = await importList(EFFECTS_FILE);
+effects.forEach((entry) => checkEntry(EFFECTS_FILE, entry, { isEffect: true }));
+
+for (const edition of EDITIONS) {
+	const entries = effects
+		.filter((entry) => !entry.edition || entry.edition === edition)
+		.map((entry) => ({ file: EFFECTS_FILE, entry }));
+
+	const conditionsFile = join(DATA, edition, "conditions.js");
+	const { list: conditions } = await importList(conditionsFile);
+	conditions.forEach((entry) => {
+		checkEntry(conditionsFile, entry, { isEffect: false });
+		entries.push({ file: conditionsFile, entry });
+	});
+	const conditionUrls = conditions.map((entry) => entry.url);
+	SRD_CONDITIONS.filter((url) => !conditionUrls.includes(url)).forEach((url) =>
+		report(conditionsFile, null, `missing SRD condition "${url}"`)
+	);
+	conditions
+		.filter((entry) => !SRD_CONDITIONS.includes(entry.url))
+		.forEach((entry) => report(conditionsFile, entry, "not an SRD condition of this edition"));
+
+	// url presence and uniqueness within the edition set
 	const byUrl = new Map();
 	for (const { file, entry } of entries) {
-		if (!validate(entry)) {
-			for (const error of validate.errors) {
-				report(file, entry, `schema: ${error.instancePath || "/"} ${error.message}`);
-			}
-		}
-		FORBIDDEN.filter((field) => field in entry).forEach((field) =>
-			report(file, entry, `has forbidden field "${field}"`)
-		);
-		for (const sub_effect of subEffects(entry)) {
-			FORBIDDEN_SUB_EFFECT.filter((field) => field in sub_effect).forEach((field) =>
-				report(file, entry, `${sub_effect.type} sub-effect has forbidden field "${field}"`)
-			);
-		}
 		if (!entry.url) {
 			report(file, entry, "has no url");
 		} else if (byUrl.has(entry.url)) {
-			report(file, entry, `duplicate url, also in ${relative(ROOT, byUrl.get(entry.url).file)}`);
+			report(file, entry, `[${edition}] duplicate url, also in ${relative(ROOT, byUrl.get(entry.url).file)}`);
 		} else {
 			byUrl.set(entry.url, { file, entry });
 		}
 	}
 
-	// References resolve in this edition
+	// References resolve in this edition set
 	for (const { file, entry } of entries) {
 		for (const url of srdRefs(entry.sub_effects)) {
-			if (!byUrl.has(url)) report(file, entry, `references missing url "${url}"`);
+			if (!byUrl.has(url)) report(file, entry, `[${edition}] references missing url "${url}"`);
 		}
 	}
 

@@ -2,7 +2,7 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "https://harmlesskey.com/schemas/hk-effects-schema.json",
 	"title": "Effect",
-	"description": "A generic effect definition made up of one or more sub-effects. A definition says what an effect does, not where it comes from: it becomes a spell effect, feature or monster trait when it is linked to a spell, action or ability, and the link sets its origin (magical or not) and how it scales with a spell slot or caster. Conditions are the definitions in the SRD conditions lists. One schema covers D&D 5e (SRD 5.1) and 5.5e (SRD 5.2): edition differences live in separate data files that use the same shape. A definition never carries a duration; duration, save DC and choices are supplied when the effect is applied (see $defs.application and $defs.active_instance). Full rationale and SRD coverage: .planning/effects-srd-catalogue.md.",
+	"description": "A generic effect definition made up of one or more sub-effects. A definition says what an effect does, not where it comes from: it becomes a spell effect, feature or monster trait when it is linked to a spell, action or ability, and the link sets its origin (magical or not) and how it scales with a spell slot or caster. Conditions are the definitions in the SRD conditions lists. One schema covers D&D 5e (SRD 5.1) and 5.5e (SRD 5.2): an SRD effect that follows one edition's rules carries edition, one without it is used in both editions, and conditions live in one data file per edition. A definition never carries a duration; duration, save DC and choices are supplied when the effect is applied (see $defs.application and $defs.active_instance). Full rationale and SRD coverage: .planning/effects-srd-catalogue.md.",
 	"type": "object",
 	"required": ["name", "sub_effects"],
 	"properties": {
@@ -14,6 +14,11 @@
 		"name": {
 			"type": "string",
 			"description": "Display name, e.g. 'Blinded', 'Bless', 'Hunter's Mark'."
+		},
+		"edition": {
+			"type": "string",
+			"enum": ["5e", "5.5e"],
+			"description": "Only on SRD effects that follow one edition's rules text (Haste, Bless): the definition is only used in campaigns of that edition. Without it the definition is used in both editions (Armor Class Bonus, Reaction Used). Two versions of one effect share their url and differ in edition."
 		},
 		"description": {
 			"type": "string",
@@ -54,6 +59,12 @@
 		"ability-select": {
 			"type": "string",
 			"enum": ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+		},
+
+		"choice_kind": {
+			"type": "string",
+			"enum": ["ability", "damage_type", "skill", "condition", "creature_type", "option", "value"],
+			"description": "What a choice made when the effect is applied fills: abilities, damage_types, skills, conditions, creature_types, value, or a free option."
 		},
 
 		"damage-type-select": {
@@ -560,9 +571,11 @@
 				"min_level": { "type": "integer", "description": "Only active at this instance level or higher (2014 Exhaustion rows)." },
 				"max_level": { "type": "integer" },
 				"choice": {
-					"type": "string",
-					"enum": ["ability", "damage_type", "skill", "condition", "creature_type", "option", "value"],
-					"description": "Value comes from application.choices (Hex, Protection from Energy, Enhance Ability, Guidance). With 'value', the sub-effect's value is the number chosen when the effect is applied (a generic AC bonus), stored as a numeric string in choices.value."
+					"description": "Value comes from application.choices (Hex, Protection from Energy, Enhance Ability, Guidance). With 'value', the sub-effect's value is the number chosen when the effect is applied (a generic AC bonus), stored as a numeric string in choices.value. One kind, or a list of kinds when more than one field is chosen (Skill Bonus: ['skill', 'value']).",
+					"oneOf": [
+						{ "$ref": "#/$defs/choice_kind" },
+						{ "type": "array", "items": { "$ref": "#/$defs/choice_kind" }, "minItems": 2, "uniqueItems": true }
+					]
 				},
 
 				"abilities": { "type": "array", "items": { "$ref": "#/$defs/ability-select" }, "description": "Rolls or scores using these abilities (Str-based D20 Tests; Str and Dex saves)." },

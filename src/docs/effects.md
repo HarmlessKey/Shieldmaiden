@@ -32,8 +32,33 @@ So you build an effect once and use it everywhere: on many monsters, on spells, 
 
 - **SRD conditions**: the 15 conditions of the rules edition of your campaign, from Blinded
   to Unconscious, with Exhaustion as one condition with levels.
-- **SRD effects**: ready-made effects from the SRD, like Bless, Haste, Mage Armor, Absorption,
-  Evasion and Burning.
+- **SRD effects**: ready-made effects from the SRD, like Bless, Haste, Mage Armor, Rage,
+  Evasion and Burning. Effects that follow one edition's rules, like Haste, come in the version
+  of your campaign's edition, and some only exist in one edition (Burning and Hex are 5.5e).
+- **Basic effects**: SRD effects that are the same in both editions and are completed when you
+  apply them. Use them for quick bonuses during combat:
+  - **Bonuses**: Armor Class, attack rolls, damage rolls, saving throws, Initiative, Speed,
+    spell save DC, spell attack, Passive Perception and Hit Point maximum ask for a number. A
+    negative number is a penalty. A higher Hit Point maximum also raises current Hit Points.
+  - **Armor Class Minimum**, **Fly Speed** and **Hit Point Maximum Reduction** ask for a
+    number. **Damage Over Time** asks for a damage type and an amount, taken at the start of
+    each of the creature's turns.
+  - **Speed Halved**, **No Reactions**, **No Healing** (can't regain Hit Points: healing is
+    blocked, with a notification) and **Magic Resistance** (Advantage on saves against spells
+    and magical effects) need no choice.
+  - **Saving Throw Bonus (One Ability)**, **Ability Check Bonus**, **Ability Score Bonus** and
+    **Ability Score Minimum** ask for an ability and a number, **Skill Bonus** for a skill and a
+    number.
+  - **Advantage** or **Disadvantage** on the saving throws or ability checks of a chosen
+    ability, on attack rolls, or on attack rolls against the creature.
+  - **Damage Resistance**, **Vulnerability** and **Immunity** ask for a damage type, **Damage
+    Reduction** for a damage type and an amount, and **Absorption** for the damage type that
+    heals instead.
+
+  Items and spells that are only a plain bonus use these: Shield of Faith is an Armor Class
+  Bonus of 2, Gauntlets of Ogre Power an Ability Score Minimum of Strength 19, Barkskin an Armor
+  Class Minimum, Longstrider a Speed Bonus of 10. Linked to the spell or item, the number is
+  fixed there.
 - **Your custom effects**: built with the custom effect form, under **My content → Effects**.
 - **Monster actions and spells**: SRD monsters and your own NPCs can carry effects on their
   actions. Rolling the action applies them.
@@ -359,6 +384,11 @@ A value picked when the effect is applied, so one effect fits many cases. Choose
 picked: an ability, a damage type, a skill, a condition, a creature type, a free option, or a
 **value**. Only choices that fit the sub-effect are offered. The field the choice fills shows
 "Chosen when the effect is applied".
+
+You can pick more than one. A "Skill Bonus" is a Bonus on Skill checks with the choices
+**Skill** and **Value**: the skill and the number are both asked when the effect is applied. A
+"Damage Reduction" picks a damage type and a value. Each kind is asked once per effect: when
+two sub-effects of one effect both choose a value, they share the number.
 
 Fields that a choice can fill (Value, Damage types, Abilities, Skills, Conditions, Creature
 types) have an info icon that explains how to make them variable. Once a choice fills the field,

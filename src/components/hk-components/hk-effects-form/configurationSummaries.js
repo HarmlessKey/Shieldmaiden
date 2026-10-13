@@ -17,7 +17,7 @@ import {
 	check_values,
 	sizes,
 } from "src/utils/effectsConstants";
-import { describeSubEffect } from "src/utils/effectFunctions";
+import { choiceKinds, describeSubEffect } from "src/utils/effectFunctions";
 
 const label = (entries, value) => entries[value]?.label || String(value).replace(/_/g, " ");
 const lower = (text) => (text ? text.charAt(0).toLowerCase() + text.slice(1) : text);
@@ -202,8 +202,11 @@ const SUB_EFFECT_SUMMARIES = {
 		return { text: `This part goes to ${lower(label(targets, sub_effect.target || "self"))}.` };
 	},
 	choice(sub_effect) {
-		if (!sub_effect.choice) return { text: "Choose what is picked when the effect is applied.", incomplete: true };
-		return { text: `The ${lower(label(choice_kinds, sub_effect.choice))} is chosen when the effect is applied.` };
+		const kinds = choiceKinds(sub_effect);
+		if (!kinds.length) return { text: "Choose what is picked when the effect is applied.", incomplete: true };
+		const names = kinds.map((kind) => lower(label(choice_kinds, kind)));
+		const verb = kinds.length > 1 ? "are" : "is";
+		return { text: `The ${list(names)} ${verb} chosen when the effect is applied.` };
 	},
 	save(sub_effect) {
 		const save = sub_effect.save || {};

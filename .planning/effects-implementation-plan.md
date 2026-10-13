@@ -10,7 +10,8 @@ archived** — see "Workflow per step" at the end of this plan.
 
 **Local data first, API last.** Steps 1b–7 work only against local data: SRD effects and
 SRD conditions — name, description and mechanics — come from
-`src/data/{edition}/effects.js` and `src/data/{edition}/conditions.js`; custom effects come
+`src/data/effects.js` (shared, edition-specific entries marked with `edition`, since step 5)
+and `src/data/{edition}/conditions.js`; custom effects come
 from the user's Firebase Realtime Database. None of these steps reads from or changes the
 HK API. Everything that touches the HK API (condition text, SRD effects served by the API,
 backfilling effects onto SRD monsters) is collected in step 8.
@@ -1025,8 +1026,8 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
     such modifiers are reminders. Damage bonuses already take `magical` from their own roll.
 - **Where it lands:**
   - 4 (form): define choices on a generic definition.
-  - 5 (SRD data): collapse per-case definitions into generic ones with choices. Keep the
-    existing `url`s working (alias or migrate the instances in Firestore).
+  - 5 (SRD data): collapse per-case definitions into generic ones with choices. *As built:*
+    removed `url`s are not kept working (testing phase, decided 2026-10-13).
   - 6–7 (actions): set or leave open the choices on each link, and ask for the open ones
     when the effect is applied.
 
@@ -1049,15 +1050,47 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
 - Support array-of-effects editing (an action or feature can have multiple effects).
 - Add validation matching the schema (required fields per type/subtype).
 
-## 5. SRD effect data files
-- `src/data/5e/effects.js` and `src/data/5.5e/effects.js` contain non-condition SRD
-  effects (Concentration to start). Add more as steps 3, 6 and 7 need them — the
-  stress-test encodings from the catalogue (Hex, Bless, Haste, Warding Bond, Rage,
-  Spirit Guardians…) are ready-made candidates and double as regression fixtures.
+## 5. SRD effect data files (done — archived as effects-5-srd-effect-data, 2026-10-13)
+*As built:*
+- **One SRD effects file**: `src/data/effects.js` replaces `src/data/5e/effects.js` and
+  `src/data/5.5e/effects.js`. An effect that follows one edition's rules text carries
+  `edition: "5e"` or `"5.5e"` (the schema's new root `edition`); one without `edition` is used
+  in both editions. The two versions of an effect share their `url`. An edition's set is the
+  effects without `edition`, its own effects and its conditions; a `url` is unique within a
+  set. Conditions stay in `src/data/5e|5.5e/conditions.js`.
+- **Basic effects** (no `edition`): bonuses with a value choice (AC, attack, damage, saves,
+  initiative, Speed, spell DC, spell attack, passive Perception, max HP), two-choice bonuses
+  (one ability's saves or checks, one skill), Advantage / Disadvantage (saves or checks of a
+  chosen ability, attack rolls, attack rolls against), Damage Resistance / Vulnerability /
+  Immunity, Damage Reduction and Absorption. A DM can apply common bonuses without building a
+  custom effect.
+- **A sub-effect's `choice` can be a list** (`["skill", "value"]`). The engine reads it through
+  `choiceKinds` / `missingChoice`, and the form's Choice field is a multiple select.
+- **Items and plain-bonus spells are basic effects**: Gauntlets of Ogre Power, Ioun Stone
+  (Strength), Aid, Barkskin, Fly, Longstrider and Shield of Faith are no longer entries; their
+  spells and items link a basic effect (Ability Score Bonus / Minimum, Armor Class Bonus /
+  Minimum, Speed Bonus, Fly Speed, Hit Point Maximum Bonus) with the number fixed. Robe of the
+  Archmagi is removed too (several mechanics; step 6b links the basic effects to the item).
+- **Removed urls break** (testing phase): stored instances of `acid-absorption` and the removed
+  items and spells are unresolved references; no aliases. `fixChoices` (fill a definition's
+  choices with fixed values) is ready for step 6's links that fix a choice.
+- **Catalogue candidates added**: Hex (5.5e only), Hunter's Mark, Warding Bond, Rage (Rage
+  Damage is a value choice).
+- **Generics for monster actions** (from the monster scan): Hit Point Maximum Reduction, No
+  Healing (the tracker now limits healing: `healing_received` cap), Speed Halved, No
+  Reactions, Damage Over Time (damage type + a fixed amount) and Magic Resistance. Open for
+  step 6: dice on a link (Damage Over Time 2d6 + 3, upcast damage) and amounts taken from the
+  action's roll (Hit Point maximum reduced by the damage taken, Vampiric Touch).
+- **Surprised** is an SRD effect: 5e restricts movement, actions and reactions and notifies at
+  the start of the holder's turn; 5.5e is Disadvantage on Initiative. The set initiative
+  screen's "Set surprised" button still adds the premade reminder; switching it to the effect
+  belongs with steps 9 (retire premade reminders) and 10 (effects on the set initiative screen). Spirit Guardians and other aura effects are still to come.
 - `src/data/5e|5.5e/conditions.js` are done in 1b; fix mechanics there as step 3 exposes
   gaps.
-- All files follow `hk-effects-schema.json` v2; every entry has a `url`, unique across
-  both files of an edition.
+- All files follow `hk-effects-schema.json` v2, checked by
+  `scripts/validate-effects-data/validate.mjs`.
+- **Open question**: whether the Effects drawer shows the basic effects in their own group
+  at the top. It needs a marker on those entries (a list of their urls), not a schema change.
 
 ## 6. Monster actions carry effects
 - Extend the `action_list` sub-action shape in monster actions
@@ -1254,7 +1287,7 @@ let an AI write them instead, and import the result.
 2i (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
 3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) (3f moved to 9)
 4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
-5 (SRD effect data, grows alongside 3, 6 and 7)
+5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
 6 -> 6b -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
 8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)

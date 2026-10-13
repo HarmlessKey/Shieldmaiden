@@ -1,15 +1,17 @@
 import conditions_5e from "src/data/5e/conditions.js";
-import effects_5e from "src/data/5e/effects.js";
 import conditions_55e from "src/data/5.5e/conditions.js";
-import effects_55e from "src/data/5.5e/effects.js";
+import srd_effects from "src/data/effects.js";
 import { effect_types, effect_subtypes } from "src/utils/effectsConstants.js";
 import { abilities, damage_types as DAMAGE_TYPES, skills } from "src/utils/generalConstants.js";
 import { experience_table } from "src/utils/characterConstants.js";
 import { manualBonuses, skillBonusKey } from "src/utils/entityFunctions.js";
 
+// SRD effects without an edition are used in both editions
+const srdEffectsOf = (edition) => srd_effects.filter((definition) => !definition.edition || definition.edition === edition);
+
 const SRD_DEFINITIONS = {
-	"5e": { conditions: conditions_5e, effects: effects_5e },
-	"5.5e": { conditions: conditions_55e, effects: effects_55e },
+	"5e": { conditions: conditions_5e, effects: srdEffectsOf("5e") },
+	"5.5e": { conditions: conditions_55e, effects: srdEffectsOf("5.5e") },
 };
 
 const ROUNDS_PER_UNIT = { round: 1, minute: 10, hour: 600, day: 14400 };
@@ -644,6 +646,81 @@ export function isCountingDown(instance) {
 }
 
 /**
+ * The choice kinds of a sub-effect: `choice` is one kind or a list of kinds
+ *
+ * @param {object} sub_effect
+ * @returns {string[]} e.g. ["skill", "value"], [] without a choice
+ */
+export function choiceKinds(sub_effect) {
+	const choice = sub_effect?.choice;
+	if (Array.isArray(choice)) return choice.filter(Boolean);
+	return choice ? [choice] : [];
+}
+
+/**
+ * Whether a sub-effect waits for a choice the instance doesn't have yet
+ *
+ * @param {object} sub_effect
+ * @param {object} instance Active effect instance
+ * @returns {boolean}
+ */
+export function missingChoice(sub_effect, instance) {
+	return choiceKinds(sub_effect).some((kind) => instance?.choices?.[kind] === undefined);
+}
+
+// The sub-effect field each choice kind fills (option fills none)
+const CHOICE_FIELDS = {
+	ability: "abilities",
+	damage_type: "damage_types",
+	skill: "skills",
+	condition: "conditions",
+	creature_type: "creature_types",
+	value: "value",
+};
+
+/**
+ * Copy of a definition with some of its choices fixed: every sub-effect (nested lists
+ * included) that asks for a fixed kind gets the field filled and no longer asks for it, and a
+ * roll's damage type choice becomes its damage type. For links that fix a choice (a clay
+ * golem's Absorption is acid, effects plan steps 6–7).
+ *
+ * @param {object} definition Effect definition
+ * @param {object} choices Fixed choices by kind, e.g. { damage_type: "acid" }
+ * @returns {object} New object, the input is not modified
+ */
+export function fixChoices(definition, choices = {}) {
+	const fixed = Object.keys(choices).filter((kind) => choices[kind] !== undefined);
+	const fix = (value) => {
+		if (Array.isArray(value)) return value.map(fix);
+		if (!value || typeof value !== "object") return value;
+		const copy = {};
+		for (const [key, item] of Object.entries(value)) copy[key] = fix(item);
+
+		const kinds = choiceKinds(copy);
+		if (kinds.length) {
+			// Its text describes the open choice ("the chosen number"): the generated text
+			// (describeSubEffect) describes the fixed values instead
+			if (kinds.some((kind) => fixed.includes(kind))) delete copy.description;
+			for (const kind of kinds.filter((kind) => fixed.includes(kind))) {
+				const field = CHOICE_FIELDS[kind];
+				if (field) copy[field] = field === "value" ? choices[kind] : [choices[kind]];
+			}
+			const open = kinds.filter((kind) => !fixed.includes(kind));
+			if (open.length > 1) copy.choice = open;
+			else if (open.length) copy.choice = open[0];
+			else delete copy.choice;
+		}
+		// A roll whose damage type is chosen from a list
+		if (Array.isArray(copy.damage_type_choice) && fixed.includes("damage_type")) {
+			copy.damage_type = choices.damage_type;
+			delete copy.damage_type_choice;
+		}
+		return copy;
+	};
+	return fix(definition);
+}
+
+/**
  * Choices the caster has to make when applying a definition.
  * Collected from `choice` on sub-effects and `damage_type_choice` on rolls.
  *
@@ -667,10 +744,12 @@ export function getRequiredChoices(definition) {
 		if (!Array.isArray(sub_effects)) return;
 		for (const sub_effect of sub_effects) {
 			if (!sub_effect || typeof sub_effect !== "object") continue;
-			// A damage type chosen from the sub-effect's own types (Protection from Energy)
-			if (sub_effect.choice === "damage_type" && sub_effect.damage_types?.length) {
-				addChoice("damage_type", sub_effect.damage_types);
-			} else if (sub_effect.choice) addChoice(sub_effect.choice);
+			for (const kind of choiceKinds(sub_effect)) {
+				// A damage type chosen from the sub-effect's own types (Protection from Energy)
+				if (kind === "damage_type" && sub_effect.damage_types?.length) {
+					addChoice(kind, sub_effect.damage_types);
+				} else addChoice(kind);
+			}
 			if (Array.isArray(sub_effect.roll?.damage_type_choice)) {
 				addChoice("damage_type", sub_effect.roll.damage_type_choice);
 			}
@@ -1518,7 +1597,7 @@ const OTHER_PARTY_TARGETS = ["trigger_source", "counterpart"];
  * @returns {object} The same sub-effect, or a copy with the chosen value
  */
 export function withChosenValue(sub_effect, instance) {
-	if (sub_effect?.choice !== "value") return sub_effect;
+	if (!choiceKinds(sub_effect).includes("value")) return sub_effect;
 	const chosen = instance?.choices?.value;
 	const { value, ...rest } = sub_effect; // eslint-disable-line no-unused-vars
 	return chosen === undefined || chosen === "" ? rest : { ...rest, value: chosen };
@@ -1697,7 +1776,7 @@ export function effectRollParts({
 		const rolled = { dice_count, dice_type, fixed_val, magical };
 		if (!healing) {
 			const chosen =
-				(sub_effect.choice === "damage_type" || roll?.damage_type_choice?.length) &&
+				(choiceKinds(sub_effect).includes("damage_type") || roll?.damage_type_choice?.length) &&
 				instance.choices?.damage_type;
 			rolled.damage_type = chosen || roll?.damage_type || sub_effect.damage_types?.[0];
 		}
@@ -1813,7 +1892,7 @@ function statFields(sub_type, sub_effect, instance, entity) {
 		case "spell_attack":
 			return ["caster_spell_attack", "innate_spell_attack"].filter(has);
 		case "ability_score": {
-			const chosen = sub_effect.choice === "ability" ? [instance.choices?.ability] : [];
+			const chosen = choiceKinds(sub_effect).includes("ability") ? [instance.choices?.ability] : [];
 			return [...(sub_effect.abilities || []), ...chosen].filter((ability) => abilities.includes(ability));
 		}
 		default:
@@ -1902,7 +1981,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 			if (!fields.length) continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
-			if (sub_effect.choice && instance.choices?.[sub_effect.choice] === undefined) continue;
+			if (missingChoice(sub_effect, instance)) continue;
 
 			const notApplied = (text) =>
 				fields.forEach((field) => addModifier(field, { name, text, applied: false, effectKey }));
@@ -2113,7 +2192,7 @@ export function effectiveDefenses({ entity, holderKey, entities = {}, definition
 			if (!kinds.length) continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
-			if (sub_effect.choice && instance.choices?.[sub_effect.choice] === undefined) continue;
+			if (missingChoice(sub_effect, instance)) continue;
 			const subState = sub_effect.condition ? conditionState(sub_effect.condition, ctx) : true;
 			if (definitionState === false || subState === false) continue;
 			if (definitionState === "unknown" || subState === "unknown" || sub_effect.context) {
@@ -2134,7 +2213,7 @@ export function effectiveDefenses({ entity, holderKey, entities = {}, definition
 			if (sub_effect.all_damage) {
 				const except = sub_effect.except_damage_types || [];
 				types = PLAIN_DAMAGE_TYPES.filter((type) => !except.includes(type));
-			} else if (sub_effect.choice === "damage_type") {
+			} else if (choiceKinds(sub_effect).includes("damage_type")) {
 				const chosen = instance.choices?.damage_type;
 				const allowed = sub_effect.damage_types?.length ? sub_effect.damage_types : PLAIN_DAMAGE_TYPES;
 				if (allowed.includes(chosen)) types = [chosen];
@@ -2266,8 +2345,9 @@ function rollPartMatches(sub_effect, part, choices = {}) {
 	if (sub_effect.abilities?.length && !sub_effect.abilities.includes(part.ability)) return false;
 	if (part.kind === "skill" && sub_effect.skills?.length && !sub_effect.skills.includes(part.skill)) return false;
 	// A choice made when the effect was applied limits it (Enhance Ability, 2024 Guidance)
-	if (sub_effect.choice === "ability" && part.ability !== choices.ability) return false;
-	if (sub_effect.choice === "skill" && (part.kind !== "skill" || part.skill !== choices.skill)) return false;
+	const kinds = choiceKinds(sub_effect);
+	if (kinds.includes("ability") && part.ability !== choices.ability) return false;
+	if (kinds.includes("skill") && (part.kind !== "skill" || part.skill !== choices.skill)) return false;
 	return true;
 }
 
@@ -2380,7 +2460,7 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 			}
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
-			if (sub_effect.choice && instance.choices?.[sub_effect.choice] === undefined) continue;
+			if (missingChoice(sub_effect, instance)) continue;
 
 			const reminder = (text) => {
 				const detail = sub_effect.description || text || describeSubEffect(sub_effect);
@@ -2705,7 +2785,7 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 			if (sub_effect.perspective === "against") continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
-			if (sub_effect.choice && instance.choices?.[sub_effect.choice] === undefined) continue;
+			if (missingChoice(sub_effect, instance)) continue;
 
 			const reminder = () => {
 				const text = `${name}: ${sub_effect.description || describeSubEffect(sub_effect)}`;
@@ -2791,7 +2871,7 @@ export function restrictions({ entity, holderKey, entities = {}, definitionOf = 
 			if (sub_effect?.type !== "restrict" || sub_effect.trigger) continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
-			if (sub_effect.choice && instance.choices?.[sub_effect.choice] === undefined) continue;
+			if (missingChoice(sub_effect, instance)) continue;
 			const subState = sub_effect.condition ? conditionState(sub_effect.condition, ctx) : true;
 			if (definitionState === false || subState === false) continue;
 			const possible = definitionState === "unknown" || subState === "unknown";
@@ -2905,7 +2985,7 @@ function activeDefinitions({ entity, holderKey, entities, definitionOf, counterp
 function subEffectInPlay(sub_effect, { level, instance }) {
 	if (sub_effect.min_level !== undefined && level < sub_effect.min_level) return false;
 	if (sub_effect.max_level !== undefined && level > sub_effect.max_level) return false;
-	if (sub_effect.choice && instance.choices?.[sub_effect.choice] === undefined) return false;
+	if (missingChoice(sub_effect, instance)) return false;
 	return true;
 }
 
@@ -2940,7 +3020,7 @@ export function damageModifiers({ entity, holderKey, entities = {}, definitionOf
 			if (definitionState === "unknown") notes.push(definition.condition.description || "if its condition holds");
 			if (subState === "unknown") notes.push(sub_effect.condition.description || "if its condition holds");
 			const damageTypes =
-				sub_effect.choice === "damage_type"
+				choiceKinds(sub_effect).includes("damage_type")
 					? [instance.choices.damage_type]
 					: sub_effect.all_damage
 						? undefined
@@ -3205,6 +3285,37 @@ export function effectReminders({ entity, holderKey, entities = {}, definitionOf
 		}
 	}
 	return lines;
+}
+
+/**
+ * The most hit points a creature can regain from one heal, from its `cap` on
+ * `healing_received` (0: can't regain hit points, No Healing). A condition that's false leaves
+ * a cap out; one that can't be checked is assumed to hold and named in `possible`.
+ *
+ * @returns {{ cap: number|undefined, names: string[], possible: string[] }} cap undefined: no cap
+ */
+export function healingReceivedCap({ entity, holderKey, entities = {}, definitionOf = () => undefined } = {}) {
+	const result = { cap: undefined, names: [], possible: [] };
+	if (!entity) return result;
+	const vars = formulaVars(entity);
+	for (const active of activeDefinitions({ entity, holderKey, entities, definitionOf })) {
+		const { definition, instance, ctx, name, definitionState } = active;
+		for (const original of definition.sub_effects || []) {
+			const sub_effect = withChosenValue(original, instance);
+			if (sub_effect?.type !== "cap" || sub_effect.trigger) continue;
+			if (!(sub_effect.sub_types || []).includes("healing_received")) continue;
+			if (!subEffectInPlay(sub_effect, active)) continue;
+			const subState = sub_effect.condition ? conditionState(sub_effect.condition, ctx) : true;
+			if (definitionState === false || subState === false) continue;
+			const { value, missing } = resolveAmount(sub_effect.value, { ...vars, level: active.level });
+			if (missing.length || value === undefined) continue;
+			const cap = Math.max(0, Math.floor(value));
+			result.cap = result.cap === undefined ? cap : Math.min(result.cap, cap);
+			if (!result.names.includes(name)) result.names.push(name);
+			if (definitionState === "unknown" || subState === "unknown") result.possible.push(name);
+		}
+	}
+	return result;
 }
 
 /**

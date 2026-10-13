@@ -291,6 +291,20 @@ export const setHP = {
 				curHp = parseInt(target.curHp);
 				pool = "";
 			}
+			// Effects that limit healing (No Healing: can't regain hit points)
+			if (!config.undo) {
+				const limit = target?.key && this.$store.getters.healing_received_cap?.(target.key);
+				if (limit?.cap !== undefined && amount > limit.cap) {
+					this.$q.notify({
+						message: limit.cap ? "Healing limited" : "Can't regain hit points",
+						caption: `${target.name}: ${limit.names.join(", ")}${limit.possible.length ? " (if its condition holds)" : ""}`,
+						icon: "fas fa-heart-broken",
+						type: "warning",
+						position: "top",
+					});
+					amount = limit.cap;
+				}
+			}
 			let newhp = parseInt(curHp + amount);
 			let type = "healing";
 			let over = 0;

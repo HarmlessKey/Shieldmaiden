@@ -149,6 +149,7 @@ import {
 	isLocked,
 } from "./fieldControls";
 import { choice_kinds } from "src/utils/effectsConstants";
+import { choiceKinds } from "src/utils/effectFunctions";
 
 /**
  * One type-specific field of a sub-effect, edited in place. The control comes from the
@@ -185,8 +186,9 @@ export default {
 		lower() {
 			return this.control.label.toLowerCase();
 		},
+		// One of the sub-effect's choices fills this field
 		chosen() {
-			return !!this.value.choice && choice_kinds[this.value.choice]?.field === this.field;
+			return choiceKinds(this.value).some((kind) => choice_kinds[kind]?.field === this.field);
 		},
 		// The choice kind that can fill this field (value, damage type, ability…), if any
 		choiceKind() {

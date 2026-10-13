@@ -139,10 +139,11 @@
 			<!-- Choice -->
 			<template v-else-if="part.key === 'choice'">
 				<hk-select
-					:value="value.choice"
+					:value="choiceKinds"
 					:options="choiceOptions"
 					label="Chosen when applied"
-					hint="Asked when the effect is applied, so one effect works for every choice"
+					hint="Asked when the effect is applied, so one effect works for every choice. Pick more than one for a skill and a number."
+					multiple
 					emit-value
 					map-options
 					clearable
@@ -208,7 +209,8 @@ import ConfigurationList from "./ConfigurationList.vue";
 import ConsumeInput from "./ConsumeInput.vue";
 import SourceFilterEditor from "./SourceFilterEditor.vue";
 import TriggerFilterEditor from "./TriggerFilterEditor.vue";
-import { fieldsToClear, showsField, sub_effect_configurations } from "./fieldControls";
+import { choiceValue, fieldsToClear, showsField, sub_effect_configurations } from "./fieldControls";
+import { choiceKinds } from "src/utils/effectFunctions";
 import {
 	effect_types,
 	effect_subtypes,
@@ -278,14 +280,18 @@ export default {
 				(part) => this.opened.includes(part.key) || part.keys.some((key) => this.value[key] !== undefined)
 			);
 		},
+		// The picked choice kinds: `choice` is one kind or a list
+		choiceKinds() {
+			return choiceKinds(this.value);
+		},
 		/**
 		 * Choices this sub-effect can use: a choice fills a field, so the field has to be shown
-		 * for its type and Applies to (Option fills none). The current choice is always listed.
+		 * for its type and Applies to (Option fills none). Picked choices are always listed.
 		 */
 		choiceOptions() {
 			return this.toOptions(choice_kinds).filter(({ value: kind }) => {
 				const field = choice_kinds[kind].field;
-				return !field || kind === this.value.choice || showsField(this.value, field);
+				return !field || this.choiceKinds.includes(kind) || showsField(this.value, field);
 			});
 		},
 		selectedKeys() {
@@ -313,8 +319,12 @@ export default {
 			this.setField(this.value, "sub_types", sub_types);
 			this.clearUnused();
 		},
-		setChoice(choice) {
-			this.setField(this.value, "choice", choice);
+		/**
+		 * One kind is saved as a string, more as a list, none removes the choice. Fields that a
+		 * newly picked kind fills are cleared; fields of a removed kind become editable again.
+		 */
+		setChoice(kinds) {
+			this.setField(this.value, "choice", choiceValue(kinds));
 			this.clearUnused();
 		},
 		addPart(key) {

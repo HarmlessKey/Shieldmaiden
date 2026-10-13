@@ -30,6 +30,7 @@ import {
 	restrictions,
 	damageModifiers,
 	extraActions,
+	healingReceivedCap,
 	effectReminders,
 	deathOutcome,
 	concentrationSaveDc,
@@ -375,6 +376,19 @@ const run_encounter_getters = {
 			entities: state.entities,
 			definitionOf: getters.effect_definition,
 			counterpartKey,
+		});
+	},
+	/**
+	 * The most hit points an entity can regain from one heal (No Healing: 0)
+	 *
+	 * @returns {object} { cap, names, possible }, cap undefined without a cap
+	 */
+	healing_received_cap: (state, getters) => (key) => {
+		return healingReceivedCap({
+			entity: state.entities[key] && getters.effective_entity(key),
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
 		});
 	},
 	/**

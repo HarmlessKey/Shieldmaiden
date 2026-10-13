@@ -19,7 +19,9 @@ edition, a `url` SHALL occur at most once across the effect list and the conditi
 combined. Active effect instances SHALL reference a definition by `source: "srd"` and
 `source_key` equal to its `url`. Every definition SHALL validate against
 `src/schemas/hk-effects-schema.json` and SHALL NOT carry duration fields
-(`duration_type`, `duration_value`, `cancel_trigger`).
+(`duration_type`, `duration_value`, `cancel_trigger`), origin fields (`category`,
+`spell_level`, `magical`, `tags`, `removed_by`, `area`) or `cancelable`. No sub-effect SHALL carry
+`scaling`.
 
 #### Scenario: Concentration is resolvable in both editions
 - **WHEN** an effect instance with `source: "srd"` and `source_key: "concentration"` is resolved for a `"5e"` campaign and for a `"5.5e"` campaign
@@ -39,7 +41,7 @@ combined. Active effect instances SHALL reference a definition by `source: "srd"
 
 #### Scenario: Definitions validate against the effects schema
 - **WHEN** every entry of the 5e and 5.5e SRD effect and condition lists is validated against the effects schema
-- **THEN** all entries pass with no errors and none contains a duration field
+- **THEN** all entries pass with no errors and none contains a duration field, an origin field or a sub-effect with `scaling`
 
 ### Requirement: Concentration save on damage uses a structured, capped DC in 5.5e
 
@@ -116,10 +118,11 @@ Each edition's condition list SHALL contain exactly these 15 conditions, one ent
 with `url` equal to the HK API condition `url`: `blinded`,
 `charmed`, `deafened`, `exhaustion`, `frightened`, `grappled`, `incapacitated`,
 `invisible`, `paralyzed`, `petrified`, `poisoned`, `prone`, `restrained`, `stunned`,
-`unconscious`. Every entry SHALL have `category: "condition"`, a display `name`, and a
-`description` that summarises that edition's rules text. Entries that are not SRD
-conditions of that edition (such as `Dying` or `Surprised` in 5.5e, or per-level
-`Exhaustion N` entries) SHALL NOT be present.
+`unconscious`. Every entry SHALL have a display `name` and a `description` that summarises
+that edition's rules text. Being in the condition list is what makes a definition a
+condition; entries have no `category`. Entries that are not SRD conditions of that edition
+(such as `Dying` or `Surprised` in 5.5e, or per-level `Exhaustion N` entries) SHALL NOT be
+present.
 
 #### Scenario: Condition set matches the SRD
 - **WHEN** the `url`s of the 5e condition list and of the 5.5e condition list are read
@@ -166,9 +169,10 @@ throws; level 4 Hit Point maximum halved; level 5 Speed 0; level 6 death.
 
 ### Requirement: 5.5e Exhaustion scales with level
 
-The 5.5e Exhaustion definition SHALL express the 2024 rule as level-scaled values: each D20
-Test is reduced by 2 × level and Speed is reduced by 5 × level feet. It SHALL NOT impose
-Disadvantage on any roll.
+The 5.5e Exhaustion definition SHALL express the 2024 rule as formulas on the instance's
+level: each D20 Test gets a `bonus` with `value: { formula: "-2 * level" }` and Speed gets
+a `bonus` with `value: { formula: "-5 * level" }`. It SHALL NOT impose Disadvantage on any
+roll.
 
 #### Scenario: Level 3 penalties
 - **WHEN** the 5.5e Exhaustion sub-effects are evaluated at level 3
@@ -258,8 +262,8 @@ problems when any check fails.
 
 ### Requirement: 5.5e ships the Burning hazard
 
-The 5.5e SRD effect list SHALL contain a definition with `url: "burning"`, `name: "Burning"`
-and `category: "hazard"`, following the SRD 5.2.1 Rules Glossary. It SHALL have one `damage`
+The 5.5e SRD effect list SHALL contain a definition with `url: "burning"` and
+`name: "Burning"`, following the SRD 5.2.1 Rules Glossary. It SHALL have one `damage`
 sub-effect with `trigger: "start_turn_target"` and `roll: { dice_count: 1, dice_type: 4,
 damage_type: "fire" }`. Its description SHALL say that the creature takes 1d4 Fire damage at
 the start of each of its turns, and that it can end the effect with an action by giving
@@ -293,21 +297,21 @@ condition can't be checked, and the restriction is a possible one.
 
 Each edition's effect list SHALL contain these definitions, following that edition's SRD
 text (5.1 for 5e, 5.2.1 for 5.5e):
-- **Death Ward** (`death-ward`, spell, magical, 8 hours): a `damage_modifier` `floor_at_1`
-  with `consume` (`scope: "effect"`)
-- **Uncanny Dodge** (`uncanny-dodge`, feature): a `damage_modifier` `halve_damage` on attack
-  damage, with the condition that the holder can see the attacker
-- **Evasion** (`evasion`, feature): a `damage_modifier` `evasion` on Dexterity saves. In 5.5e
-  it doesn't apply while the holder is Incapacitated.
-- **Reliable Talent** (`reliable-talent`, feature): a `roll_floor` of 10 on the die for skill
+- **Death Ward** (`death-ward`): a `damage_modifier` `floor_at_1` with `consume`
+  (`scope: "effect"`)
+- **Uncanny Dodge** (`uncanny-dodge`): a `damage_modifier` `halve_damage` on attack damage,
+  with the condition that the holder can see the attacker
+- **Evasion** (`evasion`): a `damage_modifier` `evasion` on Dexterity saves. In 5.5e it
+  doesn't apply while the holder is Incapacitated.
+- **Reliable Talent** (`reliable-talent`): a `roll_floor` of 10 on the die for skill
   checks, with the proficiency requirement in its description
-- **Lucky** (5e) / **Luck** (5.5e) (`luck`, feature): a `reroll` on a natural 1 for attack
-  rolls, ability checks and saving throws (5.5e: D20 Tests), keeping the new roll
-- **Undead Fortitude** (`undead-fortitude`, monster trait): a `damage_modifier` `floor_at_1`
-  with `except_damage_types: ["radiant"]` and a Constitution save, DC `5 + damage_taken`.
-  The description names the critical hit exception.
-- **Acid Absorption** (`acid-absorption`, monster trait), in each edition whose SRD has it:
-  a `damage_modifier` `absorb` with `damage_types: ["acid"]`
+- **Lucky** (5e) / **Luck** (5.5e) (`luck`): a `reroll` on a natural 1 for attack rolls,
+  ability checks and saving throws (5.5e: D20 Tests), keeping the new roll
+- **Undead Fortitude** (`undead-fortitude`): a `damage_modifier` `floor_at_1` with
+  `except_damage_types: ["radiant"]` and a Constitution save, DC `5 + damage_taken`. The
+  description names the critical hit exception.
+- **Acid Absorption** (`acid-absorption`), in each edition whose SRD has it: a
+  `damage_modifier` `absorb` with `damage_types: ["acid"]`
 
 #### Scenario: Both editions
 - **WHEN** the 5e and 5.5e effect lists are read

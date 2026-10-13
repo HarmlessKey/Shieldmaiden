@@ -116,9 +116,8 @@ export default {
 						action: (toast) => {
 							const entity = this.entities[prompt.holderKey];
 							if (!entity) return this.$snotify.remove(toast.id);
-							// A magical effect's save counts as a save against magic
-							const instance = entity.effects?.[prompt.effectKey];
-							const definition = instance && this.$store.getters.effect_definition(instance);
+							// The save's source is unknown: definitions don't say whether they're
+							// magical, that comes with links to spells (effects plan steps 6–7)
 							const { total, auto } = this.rollEffectCheck({
 								entity,
 								title: `${ability} save (${prompt.effectName})`,
@@ -127,7 +126,6 @@ export default {
 								roll: {
 									kind: "save",
 									ability: prompt.ability,
-									source: definition?.magical ? { magical: true } : undefined,
 								},
 							});
 							// Automatic results resolve the save without a roll

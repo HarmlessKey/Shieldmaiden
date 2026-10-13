@@ -32,35 +32,38 @@
 						:filter="search"
 						wrap-cells
 					>
-						<template v-slot:body-cell="props">
-							<q-td v-if="props.col.name !== 'actions'">
-								<div class="truncate-cell">
-									<div class="truncate">
-										<router-link
-											v-if="props.col.name === 'name'"
-											:to="`${$route.path}/${props.key}`"
-										>
-											{{ props.value }}
+						<template v-slot:body="props">
+							<q-tr :props="props">
+								<q-td
+									v-for="col in props.cols"
+									:key="col.name"
+									:props="props"
+									:auto-width="col.name !== 'name'"
+								>
+									<template v-if="col.name !== 'actions'">
+										<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
+											{{ col.value }}
 										</router-link>
 										<template v-else>
-											{{ props.value }}
+											{{ col.value }}
 										</template>
+									</template>
+
+									<div v-else class="d-flex justify-content-end">
+										<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+											<i aria-hidden="true" class="fas fa-pencil" />
+											<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
+										</router-link>
+										<button
+											class="btn btn-sm bg-neutral-5 ml-2"
+											@click="confirmDelete($event, props.key, props.row)"
+										>
+											<i aria-hidden="true" class="fas fa-trash-alt" />
+											<q-tooltip anchor="top middle" self="center middle">Delete</q-tooltip>
+										</button>
 									</div>
-								</div>
-							</q-td>
-							<q-td v-else class="text-right d-flex justify-content-between">
-								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i aria-hidden="true" class="fas fa-pencil" />
-									<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
-								</router-link>
-								<button
-									class="btn btn-sm bg-neutral-5"
-									@click="confirmDelete($event, props.key, props.row)"
-								>
-									<i aria-hidden="true" class="fas fa-trash-alt" />
-									<q-tooltip anchor="top middle" self="center middle">Delete</q-tooltip>
-								</button>
-							</q-td>
+								</q-td>
+							</q-tr>
 						</template>
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="effects" />
@@ -109,7 +112,7 @@ export default {
 					field: "name",
 					sortable: true,
 					align: "left",
-					format: (val) => val.capitalizeEach(),
+					format: (val) => (val ? val.capitalizeEach() : "(no name)"),
 				},
 				{
 					name: "actions",

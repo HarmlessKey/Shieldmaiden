@@ -51,15 +51,13 @@ The amount rolled for a `damage` or `healing` sub-effect SHALL be:
   `modifier` formula, with the roll's `damage_type` and `magical`
 - otherwise its `value`: a number (or numeric string) as a fixed amount, or a formula
 
-With `scaling.by: "level"` or `"stacks"`, `per_unit_dice` SHALL add that many dice, and
-`per_unit_value` that much fixed value, per instance `level` above `scaling.base`
-(default 0). Other `scaling.by` values SHALL be ignored and named in the roll's name. When
-the sub-effect has `choice: "damage_type"` or its roll has `damage_type_choice`, the damage
-type SHALL be the instance's `choices.damage_type` when set. A damage sub-effect's type
-SHALL otherwise fall back to the first of its `damage_types`. Several damage or healing
-sub-effects of one prompt that go to the same recipient SHALL be rolled as one roll with one
-part per sub-effect. The roll SHALL be named after the effect. Effect damage SHALL never be a
-critical hit.
+A formula SHALL get the instance's `level` as the variable `level`, so an amount can grow
+with the effect's own level. Sub-effects have no `scaling`. When the sub-effect has
+`choice: "damage_type"` or its roll has `damage_type_choice`, the damage type SHALL be the
+instance's `choices.damage_type` when set. A damage sub-effect's type SHALL otherwise fall
+back to the first of its `damage_types`. Several damage or healing sub-effects of one prompt
+that go to the same recipient SHALL be rolled as one roll with one part per sub-effect. The
+roll SHALL be named after the effect. Effect damage SHALL never be a critical hit.
 
 #### Scenario: Dice with a damage type
 - **WHEN** a sub-effect has `roll: { dice_count: 1, dice_type: 4, damage_type: "fire" }`
@@ -74,8 +72,8 @@ critical hit.
 - **THEN** the roll is 1d6 cold
 
 #### Scenario: Level scaling
-- **WHEN** a sub-effect has `roll: { dice_count: 1, dice_type: 6 }` and `scaling: { by: "level", per_unit_dice: 1, base: 1 }`, and the instance has `level: 3`
-- **THEN** the roll is 3d6
+- **WHEN** a `damage` sub-effect has `value: { formula: "2 * level" }` and the instance has `level: 3`
+- **THEN** the roll is 6 damage
 
 #### Scenario: Two parts to one recipient
 - **WHEN** one prompt lists two damage sub-effects for the holder, 1d6 fire and 1d6 radiant
@@ -190,11 +188,10 @@ SHALL mark the result. A `healing` sub-effect's `save` SHALL be ignored.
 
 ### Requirement: Damage without an amount can still be rolled
 
-A `damage` or `healing` sub-effect that has neither `roll` nor `value` (custom effects saved
-by the legacy effect form) SHALL still offer Roll. The roll SHALL have an amount of 0 and a
-name saying the amount is not set, so the DM can enter the total in the roll dialog before
-applying it.
+A `damage` or `healing` sub-effect that has neither `roll` nor `value` SHALL still offer
+Roll. The roll SHALL have an amount of 0 and a name saying the amount is not set, so the DM
+can enter the total in the roll dialog before applying it.
 
 #### Scenario: Legacy custom damage
-- **WHEN** a custom effect's legacy sub-effect `{ type: "damage", subtype: "roll", trigger: "start_turn_target" }` fires
+- **WHEN** a sub-effect `{ type: "damage", trigger: "start_turn_target" }` without `roll` or `value` fires
 - **THEN** the prompt offers Roll, and the roll dialog opens with 0 damage and the name "<effect> (amount not set)"

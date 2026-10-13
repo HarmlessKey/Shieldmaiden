@@ -3,9 +3,7 @@ export default [
 	{
 		url: "blinded",
 		name: "Blinded",
-		category: "condition",
 		description: "A blinded creature can't see and automatically fails any ability check that requires sight. Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "auto_fail",
@@ -27,9 +25,7 @@ export default [
 	{
 		url: "charmed",
 		name: "Charmed",
-		category: "condition",
 		description: "A charmed creature can't attack the charmer or target the charmer with harmful abilities or magical effects. The charmer has advantage on any ability check to interact socially with the creature.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "restrict",
@@ -53,9 +49,7 @@ export default [
 	{
 		url: "deafened",
 		name: "Deafened",
-		category: "condition",
 		description: "A deafened creature can't hear and automatically fails any ability check that requires hearing.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "auto_fail",
@@ -68,9 +62,7 @@ export default [
 	{
 		url: "exhaustion",
 		name: "Exhaustion",
-		category: "condition",
 		description: "Exhaustion is measured in six levels, and its effects are cumulative. Level 1: disadvantage on ability checks. Level 2: speed halved. Level 3: disadvantage on attack rolls and saving throws. Level 4: hit point maximum halved. Level 5: speed reduced to 0. Level 6: death. Finishing a long rest reduces the exhaustion level by 1.",
-		cancelable: true,
 		stacking: { mode: "level" },
 		level: { initial: 1, max: 6, per_long_rest: -1, remove_at: 0 },
 		sub_effects: [
@@ -114,9 +106,7 @@ export default [
 	{
 		url: "frightened",
 		name: "Frightened",
-		category: "condition",
 		description: "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight. The creature can't willingly move closer to the source of its fear.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "disadvantage",
@@ -137,9 +127,7 @@ export default [
 	{
 		url: "grappled",
 		name: "Grappled",
-		category: "condition",
 		description: "A grappled creature's speed becomes 0, and it can't benefit from any bonus to its speed. The condition ends if the grappler is incapacitated, or if an effect removes the grappled creature from the reach of the grappler.",
-		cancelable: true,
 		ends_when: {
 			subject: "caster",
 			type: "has_condition",
@@ -157,9 +145,7 @@ export default [
 	{
 		url: "incapacitated",
 		name: "Incapacitated",
-		category: "condition",
 		description: "An incapacitated creature can't take actions or reactions.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "restrict",
@@ -170,9 +156,7 @@ export default [
 	{
 		url: "invisible",
 		name: "Invisible",
-		category: "condition",
 		description: "An invisible creature is impossible to see without the aid of magic. Attack rolls against the creature have disadvantage, and the creature's attack rolls have advantage.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "advantage",
@@ -188,9 +172,7 @@ export default [
 	{
 		url: "paralyzed",
 		name: "Paralyzed",
-		category: "condition",
 		description: "A paralyzed creature is incapacitated and can't move or speak. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage. Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "includes",
@@ -231,9 +213,7 @@ export default [
 	{
 		url: "petrified",
 		name: "Petrified",
-		category: "condition",
 		description: "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance. Its weight increases by a factor of ten, and it ceases aging. The creature is incapacitated, can't move or speak, and is unaware of its surroundings. Attack rolls against the creature have advantage. The creature automatically fails Strength and Dexterity saving throws. The creature has resistance to all damage. The creature is immune to poison and disease, although a poison or disease already in its system is suspended, not neutralized.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "includes",
@@ -275,9 +255,7 @@ export default [
 	{
 		url: "poisoned",
 		name: "Poisoned",
-		category: "condition",
 		description: "A poisoned creature has disadvantage on attack rolls and ability checks.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "disadvantage",
@@ -288,9 +266,7 @@ export default [
 	{
 		url: "prone",
 		name: "Prone",
-		category: "condition",
 		description: "A prone creature's only movement option is to crawl, unless it stands up. The creature has disadvantage on attack rolls. An attack roll against the creature has advantage if the attacker is within 5 feet of the creature, otherwise the attack roll has disadvantage.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "restrict",
@@ -328,9 +304,7 @@ export default [
 	{
 		url: "restrained",
 		name: "Restrained",
-		category: "condition",
 		description: "A restrained creature's speed becomes 0. Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage. The creature has disadvantage on Dexterity saving throws.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "fixed",
@@ -356,9 +330,7 @@ export default [
 	{
 		url: "stunned",
 		name: "Stunned",
-		category: "condition",
 		description: "A stunned creature is incapacitated, can't move, and can speak only falteringly. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "includes",
@@ -389,9 +361,7 @@ export default [
 	{
 		url: "unconscious",
 		name: "Unconscious",
-		category: "condition",
 		description: "An unconscious creature is incapacitated, can't move or speak, and is unaware of its surroundings. The creature drops whatever it's holding and falls prone. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage. Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
-		cancelable: true,
 		sub_effects: [
 			{
 				type: "includes",

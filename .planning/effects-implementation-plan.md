@@ -1012,6 +1012,17 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
   - the definitions are still one per case (`Acid Absorption`, and Stoneskin with fixed
     types)
   - forms where an action or spell link sets or leaves open the choices
+- **Origin and scaling are set on the link too** (decided 2026-10-12, done in step 4): a
+  definition says what an effect does, not where it comes from. `category`, `spell_level`,
+  `magical`, `tags`, `removed_by` and `scaling` were removed from the schema, the SRD data
+  and the engine. Conditions are the definitions in the SRD conditions lists
+  (`isSrdCondition`). A value that grows with the effect's own level uses the `level`
+  formula variable (5.5e Exhaustion: `-2 * level`). For steps 6–7 that means:
+  - the link sets how the effect scales with a spell slot or caster level (Magic Weapon
+    +2 / +3, upcast damage dice), since the definition no longer can
+  - the link says whether the effect is magical, so repeat saves against it count as saves
+    against magic again (Magic Resistance). Until then those saves have an unknown source and
+    such modifiers are reminders. Damage bonuses already take `magical` from their own roll.
 - **Where it lands:**
   - 4 (form): define choices on a generic definition.
   - 5 (SRD data): collapse per-case definitions into generic ones with choices. Keep the
@@ -1019,7 +1030,7 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
   - 6–7 (actions): set or leave open the choices on each link, and ask for the open ones
     when the effect is applied.
 
-## 4. Effects form and constants
+## 4. Effects form and constants (done — archived as effects-4-effects-form, 2026-10-13)
 - Regenerate `src/utils/effectsConstants.js` from the v2 schema as the first task of this
   step: labels and descriptions for every sub-effect type, subtype, trigger and duration
   type, plus which fields each type shows (`value`/`roll`/`scaling`, `perspective`,
@@ -1057,6 +1068,11 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
   save block: `save`, `on_fail`, `on_success`, `always` (plus `on_hit` / `on_miss` for
   attack rolls), each a list of `$defs/application`. Condition references are plain
   condition `url`s, resolved like any SRD effect. Grapples carry `duration.escape.dc`.
+- The link (`$defs/application`) also needs what step 4 removed from definitions: whether
+  the effect is magical, and how its values scale with a spell slot or caster level. See
+  "Generic effects".
+- Editing a list of effect links (an action or feature with several effects) was moved
+  here from step 4.
 - Update monster/action edit forms (wherever actions are authored/edited) to use
   `hk-effects-form` for the new effects.
 - Existing monster data (old `rolls`/`type` shape) must keep working unchanged.
@@ -1151,6 +1167,84 @@ Ideas to work out when it's proposed:
     (`src/views/UserContent/Reminders/`) become this feature or move into it.
   - Existing `entity.reminders` in Firestore need a shim or a conversion script, as in 2i.
 
+## 10. Apply effects from the set initiative screen
+Idea, 2026-10-12. Before round 1, the DM should be able to apply effects (and the other
+targeted actions) to entities, for example creatures that start the fight Invisible or
+under a pre-cast spell.
+- **One shared header-actions component:** the action buttons in the header of the
+  Targeted pane (`src/components/combat/Targeted.vue`, `options` / `display_options`)
+  become a component that can be used more than once. It takes the entity keys it acts on.
+  Today's buttons are:
+  - Conditions, Reminders and Effects
+  - Transform (single target only)
+  - Hide / Show and Edit
+  - Out of turn damage/healing (when out-of-turn actions are on)
+  - Untarget
+- **Overview header:** the set initiative screen's Overview pane
+  (`src/components/combat/initiative/index.vue`, "Active entities" header, and the
+  mobile Overview tab) uses that component with every action from the Targeted header.
+  The Targeted pane uses the same component, and its behavior and keybinds don't change.
+- **To work out when it's proposed:**
+  - Which entities the Overview actions act on. The set initiative screen has no targeting
+    today. Options: add selection to `Overview.vue`, or reuse the tracker's `targeted`.
+  - Keybinds: the Targeted pane's shortkeys must not fire twice when both panes could be
+    mounted, or on the wrong screen.
+  - Actions that don't fit before combat: out of turn damage/healing, and possibly
+    Untarget if there's no targeting. Decide whether to hide them or keep them.
+  - Durations applied before round 1 (round 0): check `applied_round`, the same-turn rule
+    and `next_turn` ticking (2h1) when the first turn starts.
+
+## 11. Set encounter reminders from the edit encounter screen
+Idea, 2026-10-12. Builds on step 9. The DM prepares the encounter's trigger reminders
+("Round 3: the boss may flee") while building the encounter, not only during combat.
+- **Where:** the edit encounter screen (`src/views/UserContent/Encounters/EditEncounter.vue`)
+  gets a reminders section to add, edit and remove the encounter's reminders.
+- **Same data and editor as step 9:** the reminders are stored on the encounter in the
+  shape step 9 defines, and the screen uses the same reminder editor as the tracker. The
+  tracker shows reminders set here when their triggers fire.
+- **To work out when it's proposed:**
+  - Entity triggers ("boss bloodied") on the edit screen: they need the encounter's
+    entities, which may change before combat.
+  - Whether a reminder that offers to apply an effect (step 9's sandstorm) can pick its
+    effect and targets here.
+
+## 12. Import effects, and an AI skill to build them
+Idea, 2026-10-13. Build it after effects can be linked to monsters and spells (steps 6–7),
+so the skill can cover links too. Complex effects take time to build in the form. Users can
+let an AI write them instead, and import the result.
+- **Import effects in Shieldmaiden:** the import page (`ImportUserContent.vue`,
+  `src/views/UserContent/ImportContent/`) supports campaigns, encounters, NPCs and spells,
+  each checked against its schema. Add custom effects:
+  - Accept one effect or a list, check each against `hk-effects-schema.json`, and use the
+    existing error list and skip / overwrite / duplicate options.
+  - **References between imported effects:** custom effects reference each other by database
+    id, which an AI can't know. The import file uses local ids for these, and the importer
+    replaces them with the real ids after saving. SRD references (`url`s) work as they are.
+  - Respect the custom effect limit of the user's tier.
+  - After steps 6–7: NPCs with linked action, trait and spell effects, imported together with
+    the custom effects they use.
+- **The skill, as a downloadable zip** (Agent Skills format): a `SKILL.md` with the
+  instructions, and references:
+  - the effects schema, and `src/docs/effects.md`
+  - the type, sub-type and field rules (from `effectsConstants.js` and the form's field rules),
+    so the AI only uses fields that matter
+  - the SRD condition and effect `url`s it can reference, and the formula variables
+  - worked examples: Bless, a generic Absorption, an aura, Stoning, an AC bonus with a value
+    choice, and (after 6–7) a monster with linked effects
+  - the exact import file format, a checklist to run before answering (generic definitions:
+    no origin fields, no area, no scaling; choices instead of fixed types), and asking the user
+    about anything ambiguous
+- **Kept in sync:** a build script generates the zip from those source files, so it can't
+  drift from the schema. The How effects work page and the import page link to it.
+- **Works with:** Claude loads the zip as a skill (claude.ai, Claude Code). Other assistants
+  (custom GPTs, Gemini Gems) can take `SKILL.md` and the references as instructions and
+  knowledge files; the JSON and Shieldmaiden's import check are the same.
+- **To work out when it's proposed:**
+  - Where the zip is served from (bundled static file, or built per release) and how it's
+    versioned with the schema.
+  - Whether the import format is a plain array of effects or a wrapper with a version and
+    content type, like the other exports.
+
 ## Suggested Order
 0 (Concentration 2024 update, 5.5e monster re-scan — done, archived as effects-0-55e-alignment, 2026-09-29; 0b.2 is delivered by 2a/2e)
 1 (schema v2 — done)
@@ -1159,11 +1253,14 @@ Ideas to work out when it's proposed:
 2g (done — archived as effects-2g-trigger-dispatcher, 2026-09-30) -> 2h1 (done — archived as effects-2h1-duration-expiry, 2026-09-30) -> 2h2 (done — archived as effects-2h2-repeat-saves, 2026-09-30) (trigger system + duration ticking, builds on 2f)
 2i (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
 3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) (3f moved to 9)
-4 (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
+4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (SRD effect data, grows alongside 3, 6 and 7)
 6 -> 6b -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
 8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
+10 (apply effects from the set initiative screen: shared header-actions component for the Targeted and Overview headers; can be done any time after 4)
+11 (set encounter reminders from the edit encounter screen; after 9)
+12 (import effects, and a downloadable AI skill that writes importable effects; after 6 -> 6b -> 7)
 
 ## Workflow per step (from 2026-09-29)
 Every remaining step (or sub-step, e.g. 2a) is handled as an OpenSpec change:
@@ -1182,3 +1279,10 @@ Every remaining step (or sub-step, e.g. 2a) is handled as an OpenSpec change:
 A step is not done while its change is still open in `openspec/changes/`, even if the
 code is merged. Steps completed before this workflow (step 1, schema v2) stay marked done
 as they are.
+
+**User documentation (from 2026-10-13):** `src/docs/effects.md` (the page
+`/documentation/effects`) already describes the finished feature, including steps 5–11:
+linking effects to actions, spells and traits (When, Duration, Choices, Level, Magical,
+Scaling), trait effects, applying effects from action rolls and the set initiative screen, and
+encounter reminders. Every later step's change SHALL include a task to bring that page in line
+with what it actually builds: labels, behavior and examples.

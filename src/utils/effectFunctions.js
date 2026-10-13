@@ -46,28 +46,231 @@ export function findSrdDefinition(edition, url) {
 	);
 }
 
+// Urls of the SRD conditions (the same 15 in both editions)
+const SRD_CONDITION_URLS = new Set(
+	Object.values(SRD_DEFINITIONS).flatMap(({ conditions }) => conditions.map(({ url }) => url))
+);
+
 /**
- * Copy of a definition with sub_effects in the v2 shape.
- * Custom effects saved by the legacy form use subeffects / subtype.
+ * Whether a definition reference is an SRD condition. Conditions are the definitions in the
+ * SRD conditions lists; definitions have no category.
+ *
+ * @param {string} source "srd", "custom" or "api"
+ * @param {string} url source_key of the definition
+ * @returns {boolean}
+ */
+export function isSrdCondition(source, url) {
+	return source === "srd" && SRD_CONDITION_URLS.has(url);
+}
+
+/**
+ * Copy of a definition with a sub_effects array.
+ * Only the v2 shape is read: a definition without sub_effects gets none.
  *
  * @param {object} raw Effect definition
  * @returns {object} New object, the input is not modified
  */
 export function normalizeDefinition(raw = {}) {
-	const source_sub_effects = Array.isArray(raw.sub_effects)
-		? raw.sub_effects
-		: Array.isArray(raw.subeffects)
-		? raw.subeffects
+	const sub_effects = Array.isArray(raw.sub_effects)
+		? raw.sub_effects.map((sub_effect) => ({ ...sub_effect }))
 		: [];
+	return { ...raw, sub_effects };
+}
 
-	const sub_effects = source_sub_effects.map((sub_effect) => {
-		if (typeof sub_effect?.subtype !== "string" || sub_effect.sub_types) return { ...sub_effect };
-		const { subtype, ...rest } = sub_effect;
-		return { ...rest, sub_types: [subtype] };
+// Definition fields from before durations moved to the application (plan 2c)
+const DEPRECATED_DEFINITION_FIELDS = ["duration_type", "duration_value", "cancel_trigger"];
+
+// Keys whose values are numbers in the schema; numeric strings under them become numbers
+const NUMERIC_KEYS = new Set([
+	"value",
+	"dc",
+	"spell_level_max",
+	"dice_count",
+	"dice_type",
+	"fixed_val",
+	"min",
+	"max",
+	"multiplier",
+	"min_level",
+	"max_level",
+	"initial",
+	"per_long_rest",
+	"per_short_rest",
+	"per_dawn",
+	"remove_at",
+	"size",
+	"width",
+	"height",
+	"radius",
+	"within",
+	"min_amount",
+	"natural_roll",
+	"uses",
+	"count",
+	"crit_range",
+	"limit",
+	"fraction",
+	"range",
+	"successes_to_end",
+	"failures_to_escalate",
+	"reroll_bonus",
+]);
+
+/**
+ * Copy of an effect definition as the effects form saves it: without empty strings,
+ * null, undefined, empty arrays and empty objects (at any depth), with numeric strings
+ * under numeric keys turned into numbers, and without the deprecated duration fields.
+ * 0 and false are kept.
+ *
+ * @param {object} effect Effect definition
+ * @returns {object} New object, the input is not modified
+ */
+export function cleanEffectDefinition(effect = {}) {
+	const isEmpty = (value) =>
+		value === undefined ||
+		value === null ||
+		value === "" ||
+		(Array.isArray(value) && !value.length) ||
+		(typeof value === "object" && !Array.isArray(value) && !Object.keys(value).length);
+
+	const clean = (value, numeric) => {
+		if (Array.isArray(value)) {
+			return value.map((item) => clean(item, numeric)).filter((item) => !isEmpty(item));
+		}
+		if (value && typeof value === "object") {
+			const result = {};
+			for (const [key, item] of Object.entries(value)) {
+				const cleaned = clean(item, NUMERIC_KEYS.has(key));
+				if (!isEmpty(cleaned)) result[key] = cleaned;
+			}
+			return result;
+		}
+		if (numeric && typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) {
+			return Number(value);
+		}
+		return typeof value === "string" ? value.trim() : value;
+	};
+
+	const cleaned = clean(effect, false);
+	DEPRECATED_DEFINITION_FIELDS.forEach((field) => delete cleaned[field]);
+	return cleaned;
+}
+
+/**
+ * Variables a formula can use ($defs/formula). Each can be prefixed with `caster.`, and
+ * `class.<column>` reads a class table column.
+ */
+export const FORMULA_VARIABLES = Object.freeze([
+	"pb",
+	"str_mod",
+	"dex_mod",
+	"con_mod",
+	"int_mod",
+	"wis_mod",
+	"cha_mod",
+	"spellcasting_mod",
+	"str",
+	"dex",
+	"con",
+	"int",
+	"wis",
+	"cha",
+	"speed",
+	"max_hp",
+	"level",
+	"spell_save_dc",
+	"spell_attack",
+	"damage_taken",
+	"last_damage",
+]);
+
+/**
+ * Why a formula can't be used, for the effects form
+ *
+ * @param {string} formula Formula text
+ * @returns {string|undefined} The problem, or undefined when the formula is valid
+ */
+export function formulaProblem(formula) {
+	const text = String(formula ?? "").trim();
+	if (!text) return "The formula is empty";
+
+	const names = text.match(/[a-z_][a-z0-9_.]*/gi) || [];
+	const unknown = names.filter((name) => {
+		const bare = name.startsWith("caster.") ? name.slice("caster.".length) : name;
+		return !FORMULA_VARIABLES.includes(bare) && !/^class\.[a-z_][a-z0-9_]*$/i.test(bare);
 	});
+	if (unknown.length) return `Unknown variable: ${unknown.join(", ")}`;
 
-	const { subeffects, ...definition } = raw; // eslint-disable-line no-unused-vars
-	return { ...definition, sub_effects };
+	const vars = Object.fromEntries(names.map((name) => [name, 1]));
+	const { missing } = evaluateFormula(text, vars);
+	return missing.length ? "The formula can't be read" : undefined;
+}
+
+// Sub-effect lists, whose items are named "Sub-effect <n>" in error messages
+const SUB_EFFECT_LISTS = ["sub_effects", "success_effects", "fail_by_5_effects", "on_fail", "on_expire"];
+const COMBINATOR_KEYWORDS = ["oneOf", "anyOf", "allOf", "if", "not"];
+
+/**
+ * Readable messages for Ajv errors of an effect definition: one line per failing field,
+ * e.g. "Sub-effect 2 › Scaling › By: must be one of level, stacks, …".
+ * Only the deepest errors are kept; branches of oneOf / anyOf are merged per field.
+ *
+ * @param {object[]} errors Ajv errors (allErrors)
+ * @returns {string[]}
+ */
+export function schemaErrorMessages(errors = []) {
+	const fieldName = (key) => {
+		const text = String(key).replace(/_/g, " ");
+		return text.charAt(0).toUpperCase() + text.slice(1);
+	};
+	const pathLabel = (path) => {
+		const segments = path.split("/").slice(1);
+		const labels = [];
+		segments.forEach((segment, i) => {
+			if (/^\d+$/.test(segment)) {
+				const list = segments[i - 1];
+				const n = Number(segment) + 1;
+				if (SUB_EFFECT_LISTS.includes(list)) labels[labels.length - 1] = `Sub-effect ${n}`;
+				else labels[labels.length - 1] = `${labels[labels.length - 1]} ${n}`;
+			} else {
+				labels.push(fieldName(segment));
+			}
+		});
+		return labels.length ? labels.join(" › ") : "Effect";
+	};
+
+	const byPath = new Map();
+	for (const error of errors) {
+		const path = error.instancePath || "";
+		if (!byPath.has(path)) byPath.set(path, []);
+		byPath.get(path).push(error);
+	}
+	const paths = [...byPath.keys()];
+	const deepest = paths.filter((path) => !paths.some((other) => other.startsWith(`${path}/`)));
+
+	return deepest.map((path) => {
+		const plain = byPath.get(path).filter((error) => !COMBINATOR_KEYWORDS.includes(error.keyword));
+		let message;
+		if (!plain.length) {
+			message = "doesn't have a valid value";
+		} else if (plain.every((error) => error.keyword === "required")) {
+			const fields = [...new Set(plain.map((error) => fieldName(error.params.missingProperty)))];
+			message = `needs ${fields.join(" or ")}`;
+		} else if (plain.every((error) => error.keyword === "type")) {
+			const types = [...new Set(plain.map((error) => error.params.type))];
+			message = `must be a ${types.join(" or ")}`;
+		} else {
+			const parts = plain.map((error) => {
+				if (error.keyword === "enum") return `must be one of ${error.params.allowedValues.join(", ")}`;
+				if (error.keyword === "additionalProperties") {
+					return `has an unknown field "${error.params.additionalProperty}"`;
+				}
+				return error.message;
+			});
+			message = [...new Set(parts)].join("; ");
+		}
+		return `${pathLabel(path)}: ${message}`;
+	});
 }
 
 /**
@@ -78,7 +281,7 @@ export function normalizeDefinition(raw = {}) {
  * @param {string} source "srd", "custom" or "api"
  * @param {string} sourceKey url or id of the definition
  * @param {function} lookup async ({ source, source_key }) => raw definition or undefined
- * @returns {Promise<object>} { name, description, category, cancelable, sub_effects, unresolved }
+ * @returns {Promise<object>} { name, description, sub_effects, unresolved }
  */
 export async function resolveDefinition({ source, sourceKey, lookup }) {
 	const seen = new Set([`${source}:${sourceKey}`]);
@@ -118,10 +321,6 @@ export async function resolveDefinition({ source, sourceKey, lookup }) {
 		return {
 			name: definition.name,
 			description: definition.description,
-			category: definition.category,
-			// Saves against it are against magic (3c1), its damage bonuses are magical (3c2)
-			magical: definition.magical,
-			cancelable: definition.cancelable,
 			ends_when: definition.ends_when,
 			condition: definition.condition,
 			sub_effects,
@@ -414,7 +613,7 @@ export function effectChipItems(entries = [], { entityKey, holderName, casterOf 
 	return entries.map(({ key, instance, definition }) => {
 		const name = definition?.name || instance.name || "";
 		const title = name.charAt(0).toUpperCase() + name.slice(1);
-		const isCondition = instance.source === "srd" && definition?.category === "condition";
+		const isCondition = isSrdCondition(instance.source, instance.source_key);
 		const caster = casterOf(instance);
 		return {
 			type: "effect",
@@ -596,7 +795,7 @@ export function legacyConditionInstances({ conditions = {}, effects = {}, editio
 	const existing = Object.values(effects || {});
 	return Object.entries(conditions || {}).flatMap(([url, value]) => {
 		const definition = findSrdDefinition(edition, url);
-		if (definition?.category !== "condition") return [];
+		if (!definition || !isSrdCondition("srd", url)) return [];
 		if (existing.some((instance) => instance.source === "srd" && instance.source_key === url)) {
 			return [];
 		}
@@ -1309,6 +1508,22 @@ const OTHER_PARTY_TARGETS = ["trigger_source", "counterpart"];
  * Formula variables by name: the holder's as `name`, the caster's as `caster.name`, plus
  * the instance's level and the event's amount (damage_taken)
  */
+/**
+ * A sub-effect with its value taken from the instance's choices, for a sub-effect whose value
+ * is chosen when the effect is applied (choice: "value"). Choices are stored as strings
+ * ("2"); resolveAmount reads numeric strings. Other sub-effects are returned as they are.
+ *
+ * @param {object} sub_effect
+ * @param {object} instance Active effect instance
+ * @returns {object} The same sub-effect, or a copy with the chosen value
+ */
+export function withChosenValue(sub_effect, instance) {
+	if (sub_effect?.choice !== "value") return sub_effect;
+	const chosen = instance?.choices?.value;
+	const { value, ...rest } = sub_effect; // eslint-disable-line no-unused-vars
+	return chosen === undefined || chosen === "" ? rest : { ...rest, value: chosen };
+}
+
 function flatFormulaVars({ vars = {}, instance = {}, event = {} }) {
 	const flat = Object.create(null);
 	for (const [name, value] of Object.entries(vars.self || {})) flat[name] = value;
@@ -1320,11 +1535,12 @@ function flatFormulaVars({ vars = {}, instance = {}, event = {} }) {
 
 /**
  * The amount of a sub-effect as dice and a fixed value: its roll (with modifier formula) or
- * its value, plus level scaling. Notes say what was left out.
+ * its value. Formulas get the instance's level as `level` (in flat). Notes say what was left
+ * out.
  *
  * @returns {{ dice_count, dice_type, fixed_val, magical, notes: string[] }}
  */
-function amountRoll(sub_effect, instance, flat) {
+function amountRoll(sub_effect, flat) {
 	const notes = [];
 	const addMissing = (missing) => {
 		if (missing.length) notes.push(`${missing.join(", ")} not included`);
@@ -1351,17 +1567,6 @@ function amountRoll(sub_effect, instance, flat) {
 		notes.push("amount not set");
 	}
 
-	const scaling = sub_effect.scaling;
-	if (scaling?.by) {
-		if (["level", "stacks"].includes(scaling.by)) {
-			const units = Math.max(0, (parseInt(instance.level) || 0) - (scaling.base || 0));
-			dice_count += (scaling.per_unit_dice || 0) * units;
-			fixed_val += (scaling.per_unit_value || 0) * units;
-		} else {
-			notes.push(`scaling by ${scaling.by.replace(/_/g, " ")} not included`);
-		}
-	}
-
 	return { dice_count, dice_type, fixed_val: Math.floor(fixed_val), magical: !!roll?.magical, notes };
 }
 
@@ -1379,12 +1584,13 @@ export function alsoHealAmount({ instance = {}, definition, vars = {} }) {
 	const flat = flatFormulaVars({ vars, instance });
 	const level = parseInt(instance.level) || 1;
 	let amount = 0;
-	for (const sub_effect of definition.sub_effects || []) {
+	for (const original of definition.sub_effects || []) {
+		const sub_effect = withChosenValue(original, instance);
 		if (sub_effect.type !== "bonus" || !sub_effect.also_heal) continue;
 		if (!sub_effect.sub_types?.includes("max_hp")) continue;
 		if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 		if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
-		const { fixed_val, dice_count } = amountRoll(sub_effect, instance, flat);
+		const { fixed_val, dice_count } = amountRoll(sub_effect, flat);
 		if (!dice_count) amount += fixed_val * (sub_effect.multiplier ?? 1);
 	}
 	return Math.max(0, Math.floor(amount));
@@ -1413,7 +1619,7 @@ export function tempHpParts({ sub_effects = [], instance = {}, event = {}, vars 
 				(sub_effect.max_level === undefined || level <= sub_effect.max_level)
 		)
 		.map((sub_effect) => {
-			const { dice_count, dice_type, fixed_val, notes } = amountRoll(sub_effect, instance, flat);
+			const { dice_count, dice_type, fixed_val, notes } = amountRoll(withChosenValue(sub_effect, instance), flat);
 			return {
 				dice_count,
 				dice_type,
@@ -1478,7 +1684,10 @@ export function effectRollParts({
 		if (!recipientKey || !entities[recipientKey]) continue;
 		const dealerKey = otherParty ? holderKey : casterPresent ? instance.caster_key : holderKey;
 
-		const { dice_count, dice_type, fixed_val, magical, notes } = amountRoll(sub_effect, instance, flat);
+		const { dice_count, dice_type, fixed_val, magical, notes } = amountRoll(
+			withChosenValue(sub_effect, instance),
+			flat
+		);
 		const addMissing = (missing) => {
 			if (missing.length) notes.push(`${missing.join(", ")} not included`);
 		};
@@ -1684,7 +1893,8 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 		for (const [key, value] of Object.entries(casterVars || {})) flat[`caster.${key}`] = value;
 		flat.level = level;
 
-		for (const sub_effect of definition.sub_effects || []) {
+		for (const original of definition.sub_effects || []) {
+			const sub_effect = withChosenValue(original, instance);
 			if (!NUMERIC_TYPES.includes(sub_effect.type)) continue;
 			const fields = [
 				...new Set((sub_effect.sub_types || []).flatMap((sub_type) => statFields(sub_type, sub_effect, instance, entity))),
@@ -1701,7 +1911,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 				continue;
 			}
 
-			// The amount: value (number or formula) plus level scaling, times a multiplier
+			// The amount: value (number, or formula with the instance's level), times a multiplier
 			const hasValue = sub_effect.value !== undefined;
 			let amount = 0;
 			if (hasValue) {
@@ -1712,15 +1922,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 				}
 				amount = resolved.value;
 			}
-			const scaling = sub_effect.scaling;
-			if (scaling?.by) {
-				if (!["level", "stacks"].includes(scaling.by)) {
-					notApplied(`scaling by ${scaling.by.replace(/_/g, " ")} not supported`);
-					continue;
-				}
-				amount += (scaling.per_unit_value || 0) * Math.max(0, level - (scaling.base || 0));
-			}
-			const hasAmount = hasValue || !!scaling?.by;
+			const hasAmount = hasValue;
 			const multiplier = typeof sub_effect.multiplier === "number" ? sub_effect.multiplier : undefined;
 
 			let entry;
@@ -2159,7 +2361,8 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 		const definitionState = definition.condition ? conditionState(definition.condition, ctx) : true;
 
 		const entries = [];
-		for (const sub_effect of definition.sub_effects || []) {
+		for (const original of definition.sub_effects || []) {
+			const sub_effect = withChosenValue(original, instance);
 			let type = sub_effect.type;
 			const sub_types = sub_effect.sub_types || [];
 			if (isAttack && type === "critical") {
@@ -2229,24 +2432,17 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 					}
 					value = resolved.value;
 				}
-				if (sub_effect.scaling?.by) {
-					if (!["level", "stacks"].includes(sub_effect.scaling.by)) {
-						reminder(`scaling by ${sub_effect.scaling.by.replace(/_/g, " ")} not supported`);
-						continue;
-					}
-					value += (sub_effect.scaling.per_unit_value || 0) * Math.max(0, level - (sub_effect.scaling.base || 0));
-				}
-				if (rollSpec) {
+				const dice_count = parseInt(rollSpec?.dice_count) || 0;
+				const dice_type = parseInt(rollSpec?.dice_type) || 0;
+				if (rollSpec && dice_count && dice_type) {
 					const fixed = parseInt(rollSpec.fixed_val) || 0;
 					const sign = sub_effect.multiplier < 0 || fixed < 0 ? -1 : 1;
-					entry.dice = {
-						name,
-						dice_count: parseInt(rollSpec.dice_count) || 0,
-						dice_type: parseInt(rollSpec.dice_type) || 0,
-						sign,
-					};
+					entry.dice = { name, dice_count, dice_type, sign };
 					// A positive fixed value is added; a negative one only gives the dice their sign
 					if (fixed > 0) value += fixed;
+				} else if (rollSpec) {
+					// A roll without dice (only a fixed value, or only `magical` for damage)
+					value += parseInt(rollSpec.fixed_val) || 0;
 				} else if (typeof sub_effect.multiplier === "number") {
 					value *= sub_effect.multiplier;
 				}
@@ -2503,7 +2699,8 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 		const definitionState = definition.condition ? conditionState(definition.condition, ctx) : true;
 
 		let found = false;
-		for (const sub_effect of definition.sub_effects || []) {
+		for (const original of definition.sub_effects || []) {
+			const sub_effect = withChosenValue(original, instance);
 			if (sub_effect.type !== "bonus" || !(sub_effect.sub_types || []).includes("damage")) continue;
 			if (sub_effect.perspective === "against") continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
@@ -2539,7 +2736,8 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 				(Array.isArray(rollSpec.damage_type_choice) ? instance.choices?.damage_type : undefined);
 			const bonus = {
 				name,
-				magical: !!definition.magical,
+				// Definitions are generic: the roll says whether its damage is magical
+				magical: !!rollSpec.magical,
 				damage_type,
 				dice_count: parseInt(rollSpec.dice_count) || 0,
 				dice_type: parseInt(rollSpec.dice_type) || 0,
@@ -2730,7 +2928,8 @@ export function damageModifiers({ entity, holderKey, entities = {}, definitionOf
 	const vars = formulaVars(entity);
 	for (const active of activeDefinitions({ entity, holderKey, entities, definitionOf, counterpartKey })) {
 		const { effectKey, instance, definition, ctx, name, definitionState } = active;
-		(definition.sub_effects || []).forEach((sub_effect, index) => {
+		(definition.sub_effects || []).forEach((original, index) => {
+			const sub_effect = withChosenValue(original, instance);
 			if (sub_effect?.type !== "damage_modifier" || sub_effect.trigger) return;
 			if ((sub_effect.direction || "incoming") !== "incoming") return;
 			if (!subEffectInPlay(sub_effect, active)) return;
@@ -3025,7 +3224,8 @@ export function damageBonusLines({ entity, definitionOf = () => undefined } = {}
 		const groupKey = `${instance.source}:${instance.source_key}`;
 		if (seen.has(groupKey)) continue;
 		const name = definition.name || instance.name || "";
-		for (const sub_effect of definition.sub_effects || []) {
+		for (const original of definition.sub_effects || []) {
+			const sub_effect = withChosenValue(original, instance);
 			if (sub_effect.type !== "bonus" || !(sub_effect.sub_types || []).includes("damage")) continue;
 			if (sub_effect.perspective === "against") continue;
 			const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};

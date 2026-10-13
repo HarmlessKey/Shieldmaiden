@@ -1,6 +1,7 @@
 import { db } from 'src/firebase';
 import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
 import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num, email, confirmed} from "vee-validate/dist/rules";
+import { formulaProblem } from "src/utils/effectFunctions";
 
 export default async ({ router, Vue }) => {
   Vue.component('ValidationProvider', ValidationProvider);
@@ -129,6 +130,14 @@ export default async ({ router, Vue }) => {
           return false
       }
       return true;
+    }
+  });
+
+  // Effect formula: known variables, numbers, + - * / and parentheses
+  extend('formula', {
+    validate: (value) => {
+      const problem = formulaProblem(value);
+      return problem ? problem : true;
     }
   });
 

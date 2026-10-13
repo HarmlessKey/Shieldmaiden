@@ -2,7 +2,9 @@
 //
 // Checks, per edition:
 //   1. every entry validates against src/schemas/hk-effects-schema.json
-//   2. no entry carries `key`, `duration_type`, `duration_value` or `cancel_trigger`
+//   2. no entry carries `key`, `duration_type`, `duration_value` or `cancel_trigger`, nor an
+//      origin field (`category`, `spell_level`, `magical`, `tags`, `removed_by`), and no
+//      sub-effect carries `scaling` (definitions are generic)
 //   3. every entry has a `url`, unique across effects.js and conditions.js
 //   4. every `{ source: "srd", source_key }` reference resolves to a `url` in the same edition
 //   5. `includes` references don't form a cycle
@@ -31,7 +33,23 @@ const argValue = (flag) => {
 const DATA = resolve(argValue("--data") || join(ROOT, "src/data"));
 const EDITIONS = ["5e", "5.5e"];
 const FILES = ["effects.js", "conditions.js"];
-const FORBIDDEN = ["key", "duration_type", "duration_value", "cancel_trigger"];
+const FORBIDDEN = [
+	"key",
+	"duration_type",
+	"duration_value",
+	"cancel_trigger",
+	"category",
+	"spell_level",
+	"magical",
+	"tags",
+	"removed_by",
+	// Every effect can be removed by the DM
+	"cancelable",
+	// The area is the action's or spell's, set on it (effects plan step 6)
+	"area",
+];
+// Sub-effect fields that no longer exist (scaling is set on links to spells, steps 6–7)
+const FORBIDDEN_SUB_EFFECT = ["scaling"];
 const SRD_CONDITIONS = [
 	"blinded",
 	"charmed",
@@ -68,6 +86,19 @@ function srdRefs(value, found = []) {
 	} else if (value && typeof value === "object") {
 		if (value.source === "srd" && typeof value.source_key === "string") found.push(value.source_key);
 		Object.values(value).forEach((item) => srdRefs(item, found));
+	}
+	return found;
+}
+
+// Every sub-effect (an object with a string `type` in a list) anywhere inside a value
+function subEffects(value, found = []) {
+	if (Array.isArray(value)) {
+		value.forEach((item) => {
+			if (item && typeof item === "object" && typeof item.type === "string") found.push(item);
+			subEffects(item, found);
+		});
+	} else if (value && typeof value === "object") {
+		Object.values(value).forEach((item) => subEffects(item, found));
 	}
 	return found;
 }
@@ -126,6 +157,11 @@ for (const edition of EDITIONS) {
 		FORBIDDEN.filter((field) => field in entry).forEach((field) =>
 			report(file, entry, `has forbidden field "${field}"`)
 		);
+		for (const sub_effect of subEffects(entry)) {
+			FORBIDDEN_SUB_EFFECT.filter((field) => field in sub_effect).forEach((field) =>
+				report(file, entry, `${sub_effect.type} sub-effect has forbidden field "${field}"`)
+			);
+		}
 		if (!entry.url) {
 			report(file, entry, "has no url");
 		} else if (byUrl.has(entry.url)) {

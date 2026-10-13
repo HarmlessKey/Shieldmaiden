@@ -37,8 +37,9 @@
 				v-model="choices[choice.kind]"
 				:dark="$store.getters.theme === 'dark'"
 				:label="choiceLabel(choice.kind)"
-				:error="!choices[choice.kind]"
-				error-message="Required"
+				:type="choice.kind === 'value' ? 'number' : 'text'"
+				:error="!choiceValid(choice.kind)"
+				:error-message="choice.kind === 'value' ? 'Enter a number' : 'Required'"
 				class="mb-2"
 				filled
 				square
@@ -586,7 +587,7 @@ export default {
 			if (this.hasEscape && (!this.positive(this.escape.dc) || !this.escape.checks.length)) {
 				return false;
 			}
-			return this.requiredChoices.every(({ kind }) => !!this.choices[kind]);
+			return this.requiredChoices.every(({ kind }) => this.choiceValid(kind));
 		},
 	},
 	watch: {
@@ -597,6 +598,14 @@ export default {
 	methods: {
 		choiceLabel(kind) {
 			return startCase(kind);
+		},
+		/**
+		 * Whether a choice is made; a value choice must be a number (it can be negative)
+		 */
+		choiceValid(kind) {
+			const choice = this.choices[kind];
+			if (kind === "value") return choice !== undefined && choice !== null && choice !== "" && Number.isFinite(Number(choice));
+			return !!choice;
 		},
 		positive(value) {
 			return Number.isInteger(value) && value > 0;
@@ -659,7 +668,8 @@ export default {
 			const application = { duration, caster_key: this.casterKey || undefined };
 			const choices = {};
 			for (const { kind } of this.requiredChoices) {
-				choices[kind] = this.choices[kind];
+				// Choices are stored as strings (a value choice too: "2")
+				choices[kind] = kind === "value" ? String(Number(this.choices[kind])) : this.choices[kind];
 			}
 			if (Object.keys(choices).length) application.choices = choices;
 			if (this.isExhaustion) application.level = this.level;

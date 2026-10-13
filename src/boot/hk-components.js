@@ -33,7 +33,7 @@ const HkTransformSelect = () => import("../components/hk-components/hk-transform
 const HkConditionSelect = () => import("../components/hk-components/hk-condition-select");
 const HkEditionSelect = () => import("../components/hk-components/hk-edition-select");
 import HkCompendiumImage from "../components/hk-components/hk-compendium-image";
-import HkEffectsForm from "../components/hk-components/hk-effects-form";
+const HkEffectsForm = () => import("../components/hk-components/hk-effects-form.vue");
 
 export default async ({ Vue }) => {
 	Vue.component("hk-input", HkInput);

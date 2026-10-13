@@ -21,7 +21,8 @@
 				</template>
 				<template v-for="(value, kind) in instance.choices || {}">
 					<dt :key="`choice-kind-${kind}`">{{ startCase(kind) }}</dt>
-					<dd :key="`choice-value-${kind}`">{{ startCase(value) }}</dd>
+					<!-- A chosen value keeps its sign ("-2"); startCase would drop it -->
+					<dd :key="`choice-value-${kind}`">{{ kind === "value" ? value : startCase(value) }}</dd>
 				</template>
 				<template v-if="repeatSave">
 					<dt>Repeat save</dt>
@@ -81,13 +82,7 @@
 				:show-exhaustion-table="false"
 			/>
 
-			<button
-				v-if="definition?.cancelable !== false"
-				class="btn btn-block bg-red mt-3"
-				@click="remove"
-			>
-				Remove effect
-			</button>
+			<button class="btn btn-block bg-red mt-3" @click="remove">Remove effect</button>
 		</template>
 		<p v-else class="mt-3">This effect is no longer active.</p>
 	</div>
@@ -98,7 +93,7 @@ import { startCase } from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
-import { describeDuration } from "src/utils/effectFunctions";
+import { describeDuration, isSrdCondition } from "src/utils/effectFunctions";
 import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
 import { effectRolls } from "src/mixins/effectRolls";
 
@@ -146,7 +141,7 @@ export default {
 			return (this.definition?.name || this.instance.name || "").capitalize();
 		},
 		icon() {
-			return this.instance.source === "srd" && this.definition?.category === "condition"
+			return isSrdCondition(this.instance.source, this.instance.source_key)
 				? this.instance.source_key
 				: undefined;
 		},
@@ -244,7 +239,6 @@ export default {
 			await this.apply_effect({
 				key: this.data.entityKey,
 				instance: { ...this.instance, level },
-				definition: this.definition || { category: "condition" },
 			});
 		},
 		async remove() {

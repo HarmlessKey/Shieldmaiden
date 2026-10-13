@@ -86,6 +86,14 @@ module.exports = function (/* ctx */) {
 			// "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
 			chainWebpack(chain) {
 				chain.plugin("eslint-webpack-plugin").use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
+
+				// Markdown files (documentation pages) are imported as strings
+				chain.module
+					.rule("markdown")
+					.test(/\.md$/)
+					.use("raw-loader")
+					.loader("raw-loader")
+					.options({ esModule: false });
 			},
 		},
 

@@ -118,6 +118,7 @@ import EffectDetails from "src/components/drawers/encounter/effects/EffectDetail
 import ApplyEffect from "src/components/drawers/encounter/effects/ApplyEffect.vue";
 import {
 	getSrdDefinitions,
+	isSrdCondition,
 	getRequiredChoices,
 	buildEffectInstance,
 } from "src/utils/effectFunctions.js";
@@ -178,7 +179,7 @@ export default {
 				source: "srd",
 				sourceKey: definition.url,
 				name: definition.name,
-				isCondition: definition.category === "condition",
+				isCondition: isSrdCondition("srd", definition.url),
 			});
 			// Conditions have their own mode, the Conditions option
 			if (this.mode === "conditions") {

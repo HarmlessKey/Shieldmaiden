@@ -1601,6 +1601,26 @@ const routes = [
 		},
 	},
 	{
+		path: "/documentation/effects",
+		component: () => import("src/layouts/default"),
+		meta: {
+			offline: true,
+			title: "How effects work",
+		},
+		children: [
+			{
+				path: "",
+				name: "Effects documentation",
+				component: () => import("src/views/Pages/EffectsDocumentation"),
+				meta: {
+					title: "How effects work",
+					description:
+						"How to build custom effects in Shieldmaiden: sub-effects, triggers, saves, conditions, formulas and durations.",
+				},
+			},
+		],
+	},
+	{
 		path: "/support",
 		component: () => import("src/layouts/default"),
 		meta: {

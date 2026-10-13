@@ -69,8 +69,8 @@ the DM's own choice.
 ### Requirement: Flat and dice bonuses are added
 
 Every collected `bonus` modifier SHALL add to the roll:
-- a number or formula `value` (evaluated as in effects-damage-healing, for the roller), plus
-  `scaling.by: "level"` × `per_unit_value`, as a flat bonus
+- a number or formula `value` (evaluated as in effects-damage-healing, for the roller, with
+  the instance's level as `level`), as a flat bonus
 - a `roll` as bonus dice, whose sign follows a negative `fixed_val` or a negative
   `multiplier` (Bane −1d4)
 
@@ -84,7 +84,7 @@ formula can't be evaluated SHALL be left out and named in the result.
 - **THEN** the modifier is +0, and the result names "Slow −2"
 
 #### Scenario: 2024 Exhaustion
-- **WHEN** a creature with 5.5e Exhaustion level 2 makes any check, save or initiative roll
+- **WHEN** a creature with 5.5e Exhaustion level 2 (`bonus` on `d20_test` with `value: { formula: "-2 * level" }`) makes any check, save or initiative roll
 - **THEN** the roll's modifier is 4 lower
 
 #### Scenario: Bless
@@ -124,8 +124,9 @@ check. That is the case when:
 
 Its description, or its effect and kind ("Frightened: Disadvantage"), SHALL be listed with
 the roll's result as a reminder. A `source` filter with `magical` SHALL count as checkable for
-target saves in the roll dialog against a spell (magical), for repeat saves of an effect
-whose definition is `magical`, and for spell attacks. In an attack the other party is known
+target saves in the roll dialog against a spell (magical) and for spell attacks. Repeat saves
+of an effect have an unknown source: effect definitions don't say whether they are magical
+(that comes with links to spells, steps 6–7). In an attack the other party is known
 (effects-roll-modifiers "The other party is checked in attacks").
 
 #### Scenario: Frightened
@@ -137,7 +138,7 @@ whose definition is `magical`, and for spell attacks. In an attack the other par
 - **THEN** the save is rolled with Advantage
 
 #### Scenario: Robe against an unknown source
-- **WHEN** that creature rolls a save from its card
+- **WHEN** that creature rolls a save from its card, or a repeat save of an effect
 - **THEN** the save is rolled normally, with the reminder "Robe of the Archmagi: Advantage on saving throws against spells and other magical effects"
 
 #### Scenario: Dodge

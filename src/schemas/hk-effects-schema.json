@@ -2,7 +2,7 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "https://harmlesskey.com/schemas/hk-effects-schema.json",
 	"title": "Effect",
-	"description": "An effect definition (condition, spell effect, class feature, item property, monster trait, hazard, disease, poison, curse) made up of one or more sub-effects. One schema covers D&D 5e (SRD 5.1) and 5.5e (SRD 5.2): edition differences live in separate data files that use the same shape. A definition never carries a duration; duration, save DC and choices are supplied when the effect is applied (see $defs.application and $defs.active_instance). Full rationale and SRD coverage: .planning/effects-srd-catalogue.md.",
+	"description": "A generic effect definition made up of one or more sub-effects. A definition says what an effect does, not where it comes from: it becomes a spell effect, feature or monster trait when it is linked to a spell, action or ability, and the link sets its origin (magical or not) and how it scales with a spell slot or caster. Conditions are the definitions in the SRD conditions lists. One schema covers D&D 5e (SRD 5.1) and 5.5e (SRD 5.2): edition differences live in separate data files that use the same shape. A definition never carries a duration; duration, save DC and choices are supplied when the effect is applied (see $defs.application and $defs.active_instance). Full rationale and SRD coverage: .planning/effects-srd-catalogue.md.",
 	"type": "object",
 	"required": ["name", "sub_effects"],
 	"properties": {
@@ -19,36 +19,6 @@
 			"type": "string",
 			"description": "Rules text / reminder shown to the user."
 		},
-		"category": {
-			"type": "string",
-			"enum": ["condition", "spell", "feature", "item", "monster_trait", "hazard", "disease", "poison", "curse", "madness", "environment", "custom"],
-			"description": "What kind of rules element this is. Informational; drives grouping in the Effects drawer and which removal magic applies."
-		},
-		"tags": {
-			"type": "array",
-			"items": { "type": "string" },
-			"description": "Free tags, e.g. 'fear', 'charm', 'possession', 'illusion'. Used by source filters such as 'saving throws against effects that apply the Charmed condition'."
-		},
-		"magical": {
-			"type": "boolean",
-			"description": "True for effects created by spells, magic items or phenomena labelled magical. Relevant for Dispel Magic, Antimagic Field suppression and 'against spells and other magical effects' filters."
-		},
-		"spell_level": {
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 9,
-			"description": "Level of the spell that creates the effect, when relevant (Dispel Magic, Globe of Invulnerability, Limited Magic Immunity)."
-		},
-		"removed_by": {
-			"type": "array",
-			"items": { "type": "string" },
-			"description": "Named removal sources, informational: e.g. 'lesser_restoration', 'greater_restoration', 'remove_curse', 'dispel_magic', 'heal', 'dispel_evil_and_good', 'protection_from_poison'."
-		},
-		"cancelable": {
-			"type": "boolean",
-			"default": true,
-			"description": "UI hint: whether the DM can remove the effect manually. Not persisted on instances."
-		},
 		"stacking": { "$ref": "#/$defs/stacking" },
 		"level": { "$ref": "#/$defs/level_track" },
 		"condition": {
@@ -60,7 +30,6 @@
 			"description": "Intrinsic state-based end condition, e.g. Rage ends if the holder is Incapacitated (2024) or Unconscious (2014); Mage Armor ends if the target dons armor; Dodge ends if Incapacitated or Speed 0. Combined (OR) with the application's duration.ends_when."
 		},
 		"sustain": { "$ref": "#/$defs/sustain" },
-		"area": { "$ref": "#/$defs/area" },
 		"aura": { "$ref": "#/$defs/aura" },
 		"sub_effects": {
 			"type": "array",
@@ -132,7 +101,7 @@
 		"formula": {
 			"type": "object",
 			"required": ["formula"],
-			"description": "A computed value. Variables: pb, str_mod, dex_mod, con_mod, int_mod, wis_mod, cha_mod, spellcasting_mod, str..cha (scores), speed, max_hp, level (effect level / stacks), char_level, class_level, spell_level, spell_save_dc, spell_attack, class.<column> (class table value, e.g. class.rage_damage, class.martial_arts_die), damage_taken (damage in the triggering event), last_damage (damage dealt by a sibling sub-effect in the same resolution). Prefix caster. to read the applying entity instead of the holder, e.g. 'caster.cha_mod'. Operators: + - * / ( ).",
+			"description": "A computed value. Variables: pb, str_mod, dex_mod, con_mod, int_mod, wis_mod, cha_mod, spellcasting_mod, str..cha (scores), speed, max_hp, level (the effect's own level / stacks), spell_save_dc, spell_attack, class.<column> (class table value, e.g. class.rage_damage, class.martial_arts_die), damage_taken (damage in the triggering event), last_damage (damage dealt by a sibling sub-effect in the same resolution). Prefix caster. to read the applying entity instead of the holder, e.g. 'caster.cha_mod'. Operators: + - * / ( ).",
 			"properties": {
 				"formula": { "type": "string" },
 				"min": { "type": "number" },
@@ -168,22 +137,6 @@
 				{ "$ref": "#/$defs/dice_roll" },
 				{ "$ref": "#/$defs/formula" }
 			]
-		},
-
-		"scaling": {
-			"type": "object",
-			"description": "How a numeric value scales with an external factor. by 'level' reads the active instance's level (2024 Exhaustion: -2 per level on D20 Tests).",
-			"required": ["by"],
-			"properties": {
-				"by": {
-					"type": "string",
-					"enum": ["level", "stacks", "caster_level", "char_level", "class_level", "spell_level", "pb"]
-				},
-				"per_unit_value": { "type": "number", "description": "Added per unit of 'by'." },
-				"per_unit_dice": { "type": "integer", "description": "Dice added per unit of 'by' (spell upcasting, Sneak Attack)." },
-				"base": { "type": "number", "description": "Unit count at which scaling starts (spell's base level)." }
-			},
-			"additionalProperties": false
 		},
 
 		"effect_ref": {
@@ -247,7 +200,6 @@
 				"spell_schools": { "type": "array", "items": { "type": "string" } },
 				"spell_level_max": { "type": "integer", "minimum": 0, "maximum": 9 },
 				"creature_types": { "type": "array", "items": { "$ref": "#/$defs/creature-type-select" } },
-				"tags": { "type": "array", "items": { "type": "string" }, "description": "Effect tags, e.g. ['breath_weapon'], ['fear']." },
 				"conditions": { "type": "array", "items": { "type": "string" }, "description": "Effects that apply these conditions ('saving throws to avoid or end the Poisoned condition')." },
 				"is_caster": { "type": "boolean", "description": "Source is the entity that applied this effect (Bestow Curse: attacks against you; Charmed: the charmer)." }
 			},
@@ -343,22 +295,6 @@
 			"additionalProperties": false
 		},
 
-		"area": {
-			"type": "object",
-			"description": "Area-of-effect metadata.",
-			"required": ["shape", "size"],
-			"properties": {
-				"shape": {
-					"type": "string",
-					"enum": ["sphere", "cone", "cube", "line", "cylinder", "emanation", "wall", "square"]
-				},
-				"size": { "type": "number", "description": "Radius, length or side in feet." },
-				"width": { "type": "number" },
-				"height": { "type": "number" },
-				"origin": { "type": "string", "enum": ["caster", "point", "target", "self"] },
-				"moves_with_holder": { "type": "boolean", "description": "Emanations move with their origin creature." }
-			}
-		},
 
 		"aura": {
 			"type": "object",
@@ -616,18 +552,17 @@
 					"description": "self = the holder's own rolls/values; against = rolls other creatures make against the holder (Sundering Blow +5, Elusive, Greater Magic Resistance auto-miss). grant_advantage/grant_disadvantage are the legacy spelling of advantage/disadvantage + against."
 				},
 				"value": {
-					"description": "Numeric value, or a formula (Aura of Protection: { formula: 'caster.cha_mod', min: 1 }).",
+					"description": "Numeric value, or a formula (Aura of Protection: { formula: 'caster.cha_mod', min: 1 }). A value that grows with the effect's own level uses the level variable (2024 Exhaustion: { formula: '-2 * level' }).",
 					"oneOf": [{ "type": "number" }, { "type": "string" }, { "$ref": "#/$defs/formula" }]
 				},
 				"roll": { "$ref": "#/$defs/dice_roll" },
-				"multiplier": { "type": "number", "description": "Applied after value/roll/scaling (0.5 halved, 2 doubled)." },
-				"scaling": { "$ref": "#/$defs/scaling" },
+				"multiplier": { "type": "number", "description": "Applied after value/roll (0.5 halved, 2 doubled)." },
 				"min_level": { "type": "integer", "description": "Only active at this instance level or higher (2014 Exhaustion rows)." },
 				"max_level": { "type": "integer" },
 				"choice": {
 					"type": "string",
-					"enum": ["ability", "damage_type", "skill", "condition", "creature_type", "option"],
-					"description": "Value comes from application.choices (Hex, Protection from Energy, Enhance Ability, Guidance)."
+					"enum": ["ability", "damage_type", "skill", "condition", "creature_type", "option", "value"],
+					"description": "Value comes from application.choices (Hex, Protection from Energy, Enhance Ability, Guidance). With 'value', the sub-effect's value is the number chosen when the effect is applied (a generic AC bonus), stored as a numeric string in choices.value."
 				},
 
 				"abilities": { "type": "array", "items": { "$ref": "#/$defs/ability-select" }, "description": "Rolls or scores using these abilities (Str-based D20 Tests; Str and Dex saves)." },

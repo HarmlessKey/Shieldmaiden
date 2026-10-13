@@ -3,6 +3,7 @@ import { uuid, calc_mod } from "src/utils/generalFunctions";
 import {
 	generateEffectKey,
 	findSrdDefinition,
+	isSrdCondition,
 	resolveDefinition,
 	matchTriggers,
 	normalizeTrigger,
@@ -1983,22 +1984,20 @@ const run_encounter_actions = {
 	 *
 	 * @param {string} key Entity key
 	 * @param {object} instance Active effect instance ($defs/active_instance)
-	 * @param {object} definition Effect definition the instance references
 	 * @returns {string} Key of the new or updated effect instance, undefined if the write failed
 	 */
-	async apply_effect({ state, commit, dispatch, getters }, { key, instance, definition }) {
+	async apply_effect({ state, commit, dispatch, getters }, { key, instance }) {
 		const effects = state.entities[key].effects;
 		const existingKey = Object.keys(effects).find(
 			(effectKey) =>
 				effects[effectKey].source === instance.source &&
 				effects[effectKey].source_key === instance.source_key
 		);
-		const isCondition = instance.source === "srd" && definition?.category === "condition";
+		const isCondition = isSrdCondition(instance.source, instance.source_key);
 
 		// A creature immune to the condition (its own immunities or an effect's) doesn't get it
-		const srdCondition =
-			instance.source === "srd" ? findSrdDefinition(state.edition, instance.source_key) : undefined;
-		if (srdCondition?.category === "condition") {
+		const srdCondition = isCondition ? findSrdDefinition(state.edition, instance.source_key) : undefined;
+		if (srdCondition) {
 			const immunities = getters.effective_entity(key)?.condition_immunities || [];
 			if (immunities.includes(instance.source_key)) {
 				const holderName = (state.entities[key]?.name || "").capitalizeEach();
@@ -2151,8 +2150,8 @@ const run_encounter_actions = {
 		if (!immunities.length) return;
 		for (const [effectKey, instance] of Object.entries(state.entities[key]?.effects || {})) {
 			if (instance.source !== "srd" || !immunities.includes(instance.source_key)) continue;
+			if (!isSrdCondition(instance.source, instance.source_key)) continue;
 			const condition = findSrdDefinition(state.edition, instance.source_key);
-			if (condition?.category !== "condition") continue;
 			await dispatch("remove_effect", {
 				key,
 				effectKey,

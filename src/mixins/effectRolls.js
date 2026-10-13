@@ -4,8 +4,8 @@ import { experience } from "src/mixins/experience";
 import { calc_mod, calc_skill_mod } from "src/utils/generalFunctions";
 import {
 	effectRollParts,
-	findSrdDefinition,
 	formulaVars,
+	isSrdCondition,
 	proficiencyBonus,
 	tempHpParts,
 	rollPlan,
@@ -27,11 +27,9 @@ export const effectRolls = {
 		 * @param {object} instance { source, source_key } of the effect, if there is one
 		 */
 		effectToastIcon(instance) {
-			const definition =
-				instance?.source === "srd"
-					? findSrdDefinition(this.$store.getters.edition, instance.source_key)
-					: undefined;
-			return definition?.category === "condition" ? `hki-${instance.source_key}` : "fas fa-sparkles";
+			return isSrdCondition(instance?.source, instance?.source_key)
+				? `hki-${instance.source_key}`
+				: "fas fa-sparkles";
 		},
 		/**
 		 * Shows an effect notification with a small effect icon instead of snotify's own icon.

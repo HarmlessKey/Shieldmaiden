@@ -9,7 +9,6 @@
 				integer
 				rules="min_value:1"
 				placeholder="1"
-				dense
 				@input="setNumber(value, 'uses', $event)"
 			/>
 		</div>
@@ -22,7 +21,6 @@
 				emit-value
 				map-options
 				clearable
-				dense
 				@input="setField(value, 'on', $event)"
 			/>
 		</div>
@@ -35,7 +33,6 @@
 				emit-value
 				map-options
 				clearable
-				dense
 				@input="setField(value, 'scope', $event)"
 			/>
 		</div>

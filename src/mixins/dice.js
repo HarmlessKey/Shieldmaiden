@@ -355,6 +355,8 @@ export const dice = {
 				// Damage bonuses of the attacker's effects and manual damage bonuses, for attacks
 				let damageBonuses = [];
 				returnRoll.actions[i] = { type, rolls: [] };
+				// Effects linked to the action, shown in the roll result (applying them is step 7)
+				if (action.effects) returnRoll.actions[i].effects = action.effects;
 
 				// If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if (type === "melee_weapon" || type === "ranged_weapon" || type === "spell_attack") {
@@ -418,7 +420,10 @@ export const dice = {
 					returnRoll.actions[i].save_dc = config.save_dc || action.save_dc || 10;
 				}
 
-				for (const roll of action.rolls) {
+				// A sub-action can be only an attack or a save (its effects are linked to the outcome),
+				// and type other has nothing to roll
+				const rolls = type === "other" ? [] : action.rolls || [];
+				for (const roll of rolls) {
 					// Create editable Roll object with important props from roll object via anonymous function
 					let editableRoll = (({ damage_type, dice_count, dice_type, fixed_val }) => ({
 						damage_type,

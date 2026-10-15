@@ -11,7 +11,6 @@
 					rules="required"
 					emit-value
 					map-options
-					dense
 					@input="setType"
 				>
 					<template v-slot:option="scope">
@@ -33,7 +32,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setSubTypes"
 				/>
 			</div>
@@ -45,7 +43,6 @@
 			type="textarea"
 			autogrow
 			class="mt-2"
-			dense
 			@input="setField(value, 'description', $event)"
 		/>
 
@@ -86,7 +83,6 @@
 							rules="required"
 							emit-value
 							map-options
-							dense
 							@input="setField(value, 'trigger', $event)"
 						/>
 					</div>
@@ -99,7 +95,6 @@
 							emit-value
 							map-options
 							clearable
-							dense
 							@input="setField(value, 'frequency', $event)"
 						/>
 					</div>
@@ -132,7 +127,6 @@
 				emit-value
 				map-options
 				clearable
-				dense
 				@input="setField(value, 'target', $event)"
 			/>
 
@@ -147,7 +141,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setChoice"
 				/>
 			</template>
@@ -172,7 +165,6 @@
 						label="From level"
 						type="number"
 						integer
-						dense
 						@input="setNumber(value, 'min_level', $event)"
 					/>
 				</div>
@@ -182,7 +174,6 @@
 						label="Up to level"
 						type="number"
 						integer
-						dense
 						@input="setNumber(value, 'max_level', $event)"
 					/>
 				</div>
@@ -193,7 +184,6 @@
 				:value="value.id"
 				label="Id"
 				hint="Lets formulas and other sub-effects refer to this one"
-				dense
 				@input="setField(value, 'id', $event)"
 			/>
 			</template>

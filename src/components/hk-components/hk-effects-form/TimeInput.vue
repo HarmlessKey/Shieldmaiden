@@ -18,7 +18,6 @@
 				rules="required"
 				emit-value
 				map-options
-				dense
 				@input="setField(value, 'unit', $event)"
 			/>
 		</div>

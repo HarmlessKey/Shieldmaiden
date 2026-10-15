@@ -26,14 +26,7 @@
 				>
 					<div class="card-action-title">
 						<template
-							v-if="
-								rollable &&
-								action.action_list &&
-								action.action_list[0] &&
-								action.action_list[0].type !== 'other' &&
-								action.action_list[0].rolls &&
-								action.action_list[0].rolls.length
-							"
+							v-if="rollable && hasRolls(action)"
 						>
 							<hk-roll-action
 								:action="action"
@@ -176,6 +169,7 @@ import { mapGetters } from "vuex";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import LimitedUseCounter from "../../actions/LimitedUseCounter.vue";
+import { hasRolls } from "src/utils/generalFunctions";
 
 export default {
 	name: "CardActions",
@@ -223,6 +217,7 @@ export default {
 		...mapGetters(["targeted"]),
 	},
 	methods: {
+		hasRolls,
 		startRoll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted?.length) {
 				this.rollObject = {

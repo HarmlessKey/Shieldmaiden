@@ -204,6 +204,10 @@ import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
+import { cleanActionEffects } from "src/utils/effectFunctions";
+
+// The NPC fields that hold abilities with an action_list
+const NPC_ABILITY_GROUPS = ["special_abilities", "actions", "bonus_actions", "legendary_actions", "reactions"];
 
 export default {
 	name: "EditNpc",
@@ -343,9 +347,26 @@ export default {
 			return npc;
 		},
 		/**
+		 * Leaves only set fields in the effects linked to the sub-actions, and no empty outcome
+		 * lists or effects, so the saved NPC matches the schema and the database rules
+		 */
+		cleanSubActionEffects() {
+			for (const category of NPC_ABILITY_GROUPS) {
+				for (const ability of this.npc[category] || []) {
+					for (const entry of ability?.action_list || []) {
+						if (!entry || entry.effects === undefined) continue;
+						const effects = cleanActionEffects(entry.effects);
+						if (effects) this.$set(entry, "effects", effects);
+						else this.$delete(entry, "effects");
+					}
+				}
+			}
+		},
+		/**
 		 * Checks if a new NPC must be added, or an existing NPC must be saved.
 		 **/
 		saveNpc() {
+			this.cleanSubActionEffects();
 			if (!this.npcId) {
 				this.addNpc();
 			} else {

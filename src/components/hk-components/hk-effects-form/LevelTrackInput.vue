@@ -7,7 +7,6 @@
 				:placeholder="field.placeholder"
 				type="number"
 				integer
-				dense
 				@input="setNumber(value, field.key, $event)"
 			/>
 		</div>

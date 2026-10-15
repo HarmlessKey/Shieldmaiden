@@ -9,7 +9,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'ability', $event)"
 				/>
 			</div>
@@ -22,7 +21,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'abilities', $event)"
 				/>
 			</div>
@@ -35,7 +33,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'on_success', $event)"
 				/>
 			</div>

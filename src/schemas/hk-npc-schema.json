@@ -781,8 +781,9 @@
     },
     "action-list": {
       "title": "Action list",
+      "description": "The sub-actions of an ability, rolled one after the other: each has its own attack or save, rolls and effects (a bite that hits for damage, then a Constitution save against poison).",
       "type": "array",
-      "maxItems": 1,
+      "maxItems": 5,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -916,6 +917,11 @@
                 }
               }
             }
+          },
+          "effects": {
+            "title": "Effects",
+            "description": "Effects linked to this entry, by outcome. Follows $defs/action_effects of the effects schema (hk-effects-schema.json).",
+            "$ref": "https://harmlesskey.com/schemas/hk-effects-schema.json#/$defs/action_effects"
           }
         }
       }

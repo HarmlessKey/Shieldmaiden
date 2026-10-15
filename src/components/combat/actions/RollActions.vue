@@ -93,12 +93,7 @@
 							</span>
 						</q-item-label>
 					</q-item-section>
-					<q-item-section
-						v-if="
-							action.action_list?.[0]?.type !== 'other' && action.action_list?.[0]?.rolls?.length
-						"
-						avatar
-					>
+					<q-item-section v-if="hasRolls(action)" avatar>
 						<div
 							class="roll-wrapper"
 							:class="{
@@ -179,6 +174,7 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import { isNil } from "lodash";
+import { hasRolls } from "src/utils/generalFunctions";
 import Projectiles from "./Projectiles";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import LimitedUseCounter from "./LimitedUseCounter.vue";
@@ -211,6 +207,7 @@ export default {
 			rollObject: {},
 			projectile_dialog: false,
 			isNil: isNil,
+			hasRolls: hasRolls,
 		};
 	},
 	computed: {
@@ -229,10 +226,7 @@ export default {
 					}
 					return { ...action, action_index };
 				})
-				.filter(
-					(action) =>
-						action.action_list?.[0]?.type !== "other" && action.action_list?.[0]?.rolls?.length
-				);
+				.filter(hasRolls);
 		},
 	},
 	methods: {

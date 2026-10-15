@@ -78,6 +78,17 @@ export function otherEdition(route) {
 	};
 }
 
+/**
+ * Whether an NPC ability (or monster action) has something to roll: any entry of its
+ * action_list that isn't of type other and has rolls, not only the first
+ *
+ * @param {object} ability { action_list: [{ type, rolls }] }
+ * @returns {boolean}
+ */
+export function hasRolls(ability) {
+	return (ability?.action_list || []).some((action) => action?.type !== "other" && action?.rolls?.length > 0);
+}
+
 export function displayCR(cr) {
 	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
 }

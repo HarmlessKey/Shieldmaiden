@@ -12,7 +12,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'triggers', $event)"
 				/>
 			</div>
@@ -25,7 +24,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'check', $event)"
 				/>
 			</div>
@@ -37,7 +35,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'manual_cost', $event)"
 				/>
 			</div>
@@ -46,7 +43,6 @@
 			:value="value.description"
 			label="Description"
 			class="mt-2"
-			dense
 			@input="setField(value, 'description', $event)"
 		/>
 	</div>

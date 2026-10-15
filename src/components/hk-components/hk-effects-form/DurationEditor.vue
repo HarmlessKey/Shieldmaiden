@@ -10,7 +10,6 @@
 					rules="required"
 					emit-value
 					map-options
-					dense
 					@input="setType"
 				/>
 			</div>
@@ -23,7 +22,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'anchor', $event)"
 				/>
 			</div>
@@ -36,7 +34,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'edge', $event)"
 				/>
 			</div>
@@ -49,7 +46,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'rest_type', $event)"
 				/>
 			</div>
@@ -73,7 +69,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'unit', $event)"
 				/>
 			</div>
@@ -86,7 +81,6 @@
 				emit-value
 				map-options
 				clearable
-				dense
 				@input="setField(value, 'ends_by_action', $event)"
 			/>
 		</div>
@@ -114,7 +108,6 @@
 					class="full-width"
 					emit-value
 					map-options
-					dense
 					@input="setField(cancel, 'trigger', $event)"
 				/>
 				<a class="btn btn-sm btn-clear" @click="removeCancelTrigger(i)">

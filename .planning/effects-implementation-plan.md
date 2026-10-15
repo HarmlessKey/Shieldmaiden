@@ -1092,7 +1092,7 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
 - **Open question**: whether the Effects drawer shows the basic effects in their own group
   at the top. It needs a marker on those entries (a list of their urls), not a schema change.
 
-## 6. Monster actions carry effects
+## 6. Monster actions carry effects (done — archived as effects-6-npc-action-effects, 2026-10-15)
 - Extend the `action_list` sub-action shape in monster actions
   (`src/components/combat/actions/RollActions.vue`, monster docs in
   `src/store/modules/content/monsters.js`) to allow effects per sub-action - e.g. a
@@ -1111,6 +1111,38 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
 - Existing monster data (old `rolls`/`type` shape) must keep working unchanged.
 - Develop and test against user NPCs (Firebase, user content) and local fixtures. Adding
   effects to SRD monsters served by the HK API is step 8.
+
+*As built (change `effects-6-npc-action-effects`):*
+- **Link shape**: `$defs/effect_link` in the effects schema: `effect`, `duration`, `choices`,
+  `level`, `magical`, nothing else. `$defs/action_effects` lists links per outcome (`on_hit`,
+  `on_miss`, `on_fail`, `on_success`, `always`) and has no `save` of its own: `on_fail` /
+  `on_success` use the sub-action's own save ability and DC. Scaling is not on links yet (spells).
+- **Sub-actions (hybrid)**: links live on each `action_list` entry (`action_list[i].effects`),
+  next to its rolls, in all five groups (special abilities included). An ability has up to 5
+  entries (`maxItems` 5, was 1). Rolls and effects on the same outcome share one entry (bite:
+  damage + Grappled on a hit); a second attack or save is a second entry (bite: damage on a hit,
+  then a Constitution save with Poisoned on a failed save). `ability.effects` stays free for 6b.
+- **NPC form**: an expanded ability lists its entries under **Actions** (Add action at the end
+  of that line, up to 5; remove on every entry but the first), each a collapse item with a
+  one-line header ("Save · DC15 CON · 1 roll, 2 effects"); expanded, it shows its
+  inputs, rolls and an Effects list per entry with a
+  dialog: Effect, When (`action_outcomes` / `outcomesFor` in `effectsConstants.js`), Duration
+  (the drawer's duration fields in one shared component, `ApplicationDuration.vue`, plus Ends
+  early when, `cancel_triggers`, now in the drawer too; ends when and effects when it ends stay
+  on definitions),
+  Choices (fixed or Chosen when applied; a value is a number stored as a string), Level (level
+  track only), Magical. Links whose outcome no longer fits the type are kept and flagged.
+  `EditNpc.vue` cleans links before saving (`cleanActionEffects`).
+- **Rolling**: `rollAction` rolls every entry; an entry without rolls (or of type other) adds no
+  damage. Roll buttons appear when any entry has rolls (`hasRolls`). Captions and stat blocks
+  still show the first entry only, and linked effects aren't applied from rolls: both are step 7.
+  The roll result (`hk-single-roll.vue`) separates the actions with a divider and lists each
+  action's linked effects with Applies / Doesn't apply / "Hit or miss?" for the chosen result,
+  as a preview for step 7.
+- **Rules / import**: the NPC rules accept the `effects` block on every `action_list` entry;
+  the import resolves the NPC schema's reference to the effects schema.
+- **Open for step 7**: a save that only happens on a hit (the ghoul's claws: the Constitution
+  save follows a hit) is a second sub-action that rolls whether the attack hit or not.
 
 ## 6b. Trait effects: effects on NPC special abilities
 Decided 2026-10-09. Some effects aren't applied with a duration. They're part of what a
@@ -1151,6 +1183,20 @@ effects and conditions as if they were cast on it. They belong on the ability in
   duration.
 - Decide UI for "this action also applies X - apply to target(s)?" confirmation step.
 - Builds on the active-effects storage and trigger system from step 2.
+- **Start from step 6's roll result** (added 2026-10-15): `hk-single-roll.vue` already lists each
+  rolled action's linked effects with Applies / Doesn't apply / "Hit or miss?" / "Fail or
+  save?" for the chosen result (`linkedEffects`). Step 6 shows them without saying how to apply
+  them; this step makes the effects that apply actually get applied to the roll's target from
+  there (with the roll's Apply, or per effect), so the DM doesn't have to go to the Effects
+  drawer:
+  - fixed choices on the link are used (`fixChoices`), open choices are asked once
+  - a link without a duration asks for one, as the drawer does
+  - the caster is the creature that rolled; `magical` on the link goes to the instance
+  - apply once per target, also for AOE rolls with several targets
+- Open from step 6: a save that only follows a hit (the ghoul's claws) is a second action that
+  rolls whether the attack hit or not; decide whether its effects wait for the hit.
+- Open from step 6: captions and stat blocks (tracker action list, card, compendium) still show
+  only the first action of an ability; show all of them.
 
 ## 8. HK API updates (last)
 Everything above runs on local data. This step moves or aligns SRD data with the HK API.
@@ -1288,7 +1334,7 @@ let an AI write them instead, and import the result.
 3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) (3f moved to 9)
 4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
-6 -> 6b -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
+6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
 8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
 10 (apply effects from the set initiative screen: shared header-actions component for the Targeted and Overview headers; can be done any time after 4)

@@ -331,13 +331,7 @@
 								class="monster-card__traits-description"
 								:input_text="ability.desc"
 								><template
-									v-if="
-										ability.action_list &&
-										ability.action_list[0] &&
-										ability.action_list[0].type !== 'other' &&
-										ability.action_list[0].rolls &&
-										ability.action_list[0].rolls.length
-									"
+									v-if="hasRolls(ability)"
 									><hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability"
 										><span class="roll-button" /></hk-roll-action></template
 								><span class="monster-card__traits-description__title">{{
@@ -389,7 +383,7 @@ import { mapActions, mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell";
 import ReportIssue from "src/components/compendium/ReportIssue.vue";
 import { skills, abilities } from "src/utils/generalConstants";
-import { calc_skill_mod, downloadMonsterFile } from "src/utils/generalFunctions";
+import { calc_skill_mod, downloadMonsterFile, hasRolls } from "src/utils/generalFunctions";
 
 export default {
 	name: "ViewMonster",
@@ -532,6 +526,7 @@ export default {
 	},
 	methods: {
 		...mapActions("api_monsters", ["fetch_monster"]),
+		hasRolls,
 		passivePerception() {
 			return 10 + parseInt(this.skillModifier("wisdom", "perception"));
 		},

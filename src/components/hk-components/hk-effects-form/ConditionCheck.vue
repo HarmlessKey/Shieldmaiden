@@ -12,7 +12,6 @@
 					hide-bottom-space
 					emit-value
 					map-options
-					dense
 					@input="setType"
 				/>
 			</div>
@@ -25,7 +24,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'subject', $event)"
 				/>
 			</div>
@@ -34,7 +32,6 @@
 					:value="!!value.negate"
 					:dark="dark"
 					label="Not"
-					dense
 					@input="setField(value, 'negate', $event || undefined)"
 				/>
 			</div>
@@ -50,7 +47,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'comparator', $event)"
 				/>
 			</div>
@@ -60,7 +56,6 @@
 					:value="typeof value.value === 'number' ? value.value : undefined"
 					:label="typeLabel"
 					type="number"
-					dense
 					@input="setNumber(value, 'value', $event)"
 				/>
 				<hk-select
@@ -71,7 +66,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'value', $event)"
 				/>
 				<hk-select
@@ -82,7 +76,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'value', $event)"
 				/>
 				<hk-select
@@ -93,7 +86,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'value', $event)"
 				/>
 				<SuggestInput
@@ -112,7 +104,6 @@
 			label="Description"
 			hint="Shown when the DM has to decide"
 			class="mt-1"
-			dense
 			@input="setField(value, 'description', $event)"
 		/>
 	</div>

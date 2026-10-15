@@ -504,16 +504,34 @@
 			}
 		},
 
+		"effect_link": {
+			"type": "object",
+			"description": "An effect linked to an action, spell or ability: the effect and how it is applied when the link fires. Origin (magical) is set here, not on the definition. No save of its own (the action's or spell's save is used) and no runtime fields.",
+			"required": ["effect"],
+			"properties": {
+				"effect": { "$ref": "#/$defs/effect_ref" },
+				"duration": { "$ref": "#/$defs/duration" },
+				"choices": {
+					"type": "object",
+					"description": "Choices fixed by the link (a clay golem's Absorption is acid). A choice that is not set is asked when the effect is applied. A value choice is a number written as a string.",
+					"propertyNames": { "$ref": "#/$defs/choice_kind" },
+					"additionalProperties": { "type": "string" }
+				},
+				"level": { "type": "integer", "minimum": 1, "description": "Levels applied, for an effect with a level track (2 levels of Exhaustion)." },
+				"magical": { "type": "boolean", "description": "The effect comes from magic: saves against it count as saves against magic." }
+			},
+			"additionalProperties": false
+		},
+
 		"action_effects": {
 			"type": "object",
-			"description": "Effects attached to a monster action or spell (implementation plan steps 6-7). Mirrors 2024 stat block notation: Hit / Failure / Success / Failure or Success.",
+			"description": "Effects linked to one action-list entry of a monster action or spell (implementation plan steps 6-7). Mirrors 2024 stat block notation: Hit / Miss / Failure / Success / Failure or Success. on_fail and on_success use the entry's own save ability and DC.",
 			"properties": {
-				"save": { "$ref": "#/$defs/save_spec" },
-				"on_hit": { "type": "array", "items": { "$ref": "#/$defs/application" } },
-				"on_miss": { "type": "array", "items": { "$ref": "#/$defs/application" } },
-				"on_fail": { "type": "array", "items": { "$ref": "#/$defs/application" } },
-				"on_success": { "type": "array", "items": { "$ref": "#/$defs/application" } },
-				"always": { "type": "array", "items": { "$ref": "#/$defs/application" } }
+				"on_hit": { "type": "array", "items": { "$ref": "#/$defs/effect_link" } },
+				"on_miss": { "type": "array", "items": { "$ref": "#/$defs/effect_link" } },
+				"on_fail": { "type": "array", "items": { "$ref": "#/$defs/effect_link" } },
+				"on_success": { "type": "array", "items": { "$ref": "#/$defs/effect_link" } },
+				"always": { "type": "array", "items": { "$ref": "#/$defs/effect_link" } }
 			},
 			"additionalProperties": false
 		},

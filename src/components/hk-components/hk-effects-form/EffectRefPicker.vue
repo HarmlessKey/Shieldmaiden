@@ -12,7 +12,6 @@
 		emit-value
 		map-options
 		clearable
-		dense
 		@filter="filter"
 		@input="select"
 	>

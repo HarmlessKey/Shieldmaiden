@@ -11,7 +11,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'by', $event)"
 				/>
 			</div>
@@ -24,7 +23,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'cost', $event)"
 				/>
 			</div>
@@ -46,7 +44,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(check, 'ability', $event)"
 				/>
 			</div>
@@ -58,7 +55,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(check, 'skill', $event)"
 				/>
 			</div>

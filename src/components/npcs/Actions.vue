@@ -123,15 +123,7 @@
 															: ``
 													}}
 												</q-item-section>
-												<q-item-section
-													avatar
-													v-if="
-														ability.action_list &&
-														ability.action_list[0] &&
-														ability.action_list[0].type !== 'other' &&
-														ability.action_list[0].rolls
-													"
-												>
+												<q-item-section avatar v-if="hasRolls(ability)">
 													<hk-roll-action :tooltip="`Roll ${ability.name}`" :action="ability">
 														<span class="roll-button" />
 													</hk-roll-action>
@@ -422,149 +414,218 @@
 													</q-select>
 
 													<!-- ACTIONS -->
-													<div
-														v-for="(action, action_index) in ability.action_list"
-														:key="`action-${action_index}`"
+													<label
+														class="group mb-0 d-flex justify-content-between items-center mt-3"
 													>
-														<label class="group mt-3">Type of action</label>
-														<div class="row q-col-gutter-md">
-															<!-- ACTION TYPE -->
-															<div class="col">
-																<q-select
-																	:dark="$store.getters.theme === 'dark'"
-																	filled
-																	square
-																	map-options
-																	emit-value
-																	label="Action type"
-																	:options="Object.values(attack_types)"
-																	v-model="action.type"
-																	class="mb-2"
-																	@input="$forceUpdate()"
-																/>
-															</div>
-
-															<!-- SAVE -->
-															<template v-if="action.type === 'save'">
-																<div class="col">
-																	<ValidationProvider
-																		rules="required"
-																		name="Save DC"
-																		v-slot="{ errors, invalid, validated }"
-																	>
-																		<q-select
-																			:dark="$store.getters.theme === 'dark'"
-																			filled
-																			square
-																			map-options
-																			emit-value
-																			label="Save ability"
-																			:options="abilities"
-																			v-model="action.save_ability"
-																			@input="$forceUpdate()"
-																			:error="invalid && validated"
-																			:error-message="errors[0]"
-																		/>
-																	</ValidationProvider>
-																</div>
-																<div class="col">
-																	<ValidationProvider
-																		rules="required|between:1,99"
-																		name="Save DC"
-																		v-slot="{ errors, invalid, validated }"
-																	>
-																		<q-input
-																			:dark="$store.getters.theme === 'dark'"
-																			filled
-																			square
-																			type="number"
-																			label="Save DC"
-																			v-model.number="action.save_dc"
-																			@keyup="$forceUpdate()"
-																			@input="parseToInt($event, action, 'save_dc')"
-																			:error="invalid && validated"
-																			:error-message="errors[0]"
-																		/>
-																	</ValidationProvider>
-																</div>
-															</template>
-
-															<template
-																v-else-if="!['healing', 'damage', 'other'].includes(action.type)"
+														<span>Actions</span>
+														<a
+															v-if="
+																!ability.action_list || ability.action_list.length < max_sub_actions
+															"
+															class="btn btn-sm btn-clear"
+															@click="addSubAction(category, ability_index)"
+														>
+															<i aria-hidden="true" class="fas fa-plus green"></i>
+															<span class="d-none d-md-inline ml-1">Add action</span>
+															<q-tooltip anchor="top middle" self="center middle">
+																Another attack or save rolled with this ability, like a save against
+																poison after a hit
+															</q-tooltip>
+														</a>
+													</label>
+													<div class="accordion actions-list">
+														<ValidationObserver
+															v-for="(action, action_index) in ability.action_list"
+															:key="`action-${action_index}`"
+															v-slot="{ valid: actionValid }"
+															slim
+														>
+															<q-expansion-item
+																:dark="$store.getters.theme === 'dark'"
+																switch-toggle-side
+																:group="`${category}-${ability_index}-actions`"
+																:default-opened="
+																	opened_action === `${category}-${ability_index}-${action_index}`
+																"
 															>
-																<div class="col">
-																	<ValidationProvider
-																		rules="between:-10,99"
-																		name="Attack modifier"
-																		v-slot="{ errors, invalid, validated }"
-																	>
-																		<q-input
-																			:dark="$store.getters.theme === 'dark'"
-																			filled
-																			square
-																			type="number"
-																			label="Attack modifier"
-																			v-model.number="action.attack_bonus"
-																			@keyup="$forceUpdate()"
-																			@input="parseToInt($event, action, 'attack_bonus')"
-																			:error="invalid && validated"
-																			:error-message="errors[0]"
-																		/>
-																	</ValidationProvider>
-																</div>
-															</template>
-														</div>
+																<template v-slot:header>
+																	<q-item-section avatar v-if="!actionValid">
+																		<q-icon name="error" color="red" />
+																		<q-tooltip anchor="top middle" self="center middle">
+																			Validation errors
+																		</q-tooltip>
+																	</q-item-section>
+																	<q-item-section class="truncate">
+																		{{ actionHeader(action) }}
+																	</q-item-section>
+																	<q-item-section v-if="action_index > 0" avatar>
+																		<button
+																			class="btn btn-sm bg-neutral-5"
+																			aria-label="Remove action"
+																			@click.stop.prevent="
+																				removeSubAction(category, ability_index, action_index)
+																			"
+																		>
+																			<i aria-hidden="true" class="fas fa-trash-alt red" />
+																			<q-tooltip anchor="top middle" self="center middle">
+																				Remove action
+																			</q-tooltip>
+																		</button>
+																	</q-item-section>
+																</template>
 
-														<template v-if="action.type !== 'other'">
-															<!-- ACTION ROLLS -->
-															<div class="hk-card mt-3 rolls">
-																<div class="card-header d-flex justify-content-between">
-																	<span
-																		><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span
-																	>
-																	<a
-																		class="btn btn-sm bg-neutral-5"
-																		@click="
-																			newRoll(
-																				ability_index,
-																				ability,
-																				category,
-																				action_index,
-																				action
-																			)
-																		"
-																	>
-																		<i aria-hidden="true" class="fas fa-plus green"></i>
-																		<span class="d-none d-md-inline ml-1">Add roll</span>
-																	</a>
-																</div>
+																<div class="accordion-body">
+																	<div class="row q-col-gutter-md">
+																		<!-- ACTION TYPE -->
+																		<div class="col">
+																			<q-select
+																				:dark="$store.getters.theme === 'dark'"
+																				filled
+																				square
+																				map-options
+																				emit-value
+																				label="Action type"
+																				:options="Object.values(attack_types)"
+																				v-model="action.type"
+																				class="mb-2"
+																				@input="$forceUpdate()"
+																			/>
+																		</div>
 
-																<!-- ROLLS TABLE -->
-																<hk-action-rolls-table
-																	v-if="action.rolls"
-																	:rolls="action.rolls"
-																	:type="action.type"
-																	:versatile="ability.versatile"
-																	:versatile-options="[
-																		ability.versatile_one,
-																		ability.versatile_two,
-																	]"
-																	@edit="
-																		editRoll(
-																			$event,
-																			ability_index,
-																			ability,
-																			category,
-																			action_index,
-																			action
-																		)
-																	"
-																	@delete="
-																		deleteRoll($event, ability_index, category, action_index)
-																	"
-																/>
-															</div>
-														</template>
+																		<!-- SAVE -->
+																		<template v-if="action.type === 'save'">
+																			<div class="col">
+																				<ValidationProvider
+																					rules="required"
+																					name="Save DC"
+																					v-slot="{ errors, invalid, validated }"
+																				>
+																					<q-select
+																						:dark="$store.getters.theme === 'dark'"
+																						filled
+																						square
+																						map-options
+																						emit-value
+																						label="Save ability"
+																						:options="abilities"
+																						v-model="action.save_ability"
+																						@input="$forceUpdate()"
+																						:error="invalid && validated"
+																						:error-message="errors[0]"
+																					/>
+																				</ValidationProvider>
+																			</div>
+																			<div class="col">
+																				<ValidationProvider
+																					rules="required|between:1,99"
+																					name="Save DC"
+																					v-slot="{ errors, invalid, validated }"
+																				>
+																					<q-input
+																						:dark="$store.getters.theme === 'dark'"
+																						filled
+																						square
+																						type="number"
+																						label="Save DC"
+																						v-model.number="action.save_dc"
+																						@keyup="$forceUpdate()"
+																						@input="parseToInt($event, action, 'save_dc')"
+																						:error="invalid && validated"
+																						:error-message="errors[0]"
+																					/>
+																				</ValidationProvider>
+																			</div>
+																		</template>
+
+																		<template
+																			v-else-if="
+																				!['healing', 'damage', 'other'].includes(action.type)
+																			"
+																		>
+																			<div class="col">
+																				<ValidationProvider
+																					rules="between:-10,99"
+																					name="Attack modifier"
+																					v-slot="{ errors, invalid, validated }"
+																				>
+																					<q-input
+																						:dark="$store.getters.theme === 'dark'"
+																						filled
+																						square
+																						type="number"
+																						label="Attack modifier"
+																						v-model.number="action.attack_bonus"
+																						@keyup="$forceUpdate()"
+																						@input="parseToInt($event, action, 'attack_bonus')"
+																						:error="invalid && validated"
+																						:error-message="errors[0]"
+																					/>
+																				</ValidationProvider>
+																			</div>
+																		</template>
+																	</div>
+
+																	<template v-if="action.type !== 'other'">
+																		<!-- ACTION ROLLS -->
+																		<div class="mt-3 rolls">
+																			<label class="group justify-content-between mb-0">
+																				<span
+																					><i aria-hidden="true" class="fas fa-dice-d20" />
+																					Rolls</span
+																				>
+																				<a
+																					class="btn btn-sm btn-clear"
+																					@click="
+																						newRoll(
+																							ability_index,
+																							ability,
+																							category,
+																							action_index,
+																							action
+																						)
+																					"
+																				>
+																					<i aria-hidden="true" class="fas fa-plus green"></i>
+																					<span class="d-none d-md-inline ml-1">Add roll</span>
+																				</a>
+																			</label>
+
+																			<!-- ROLLS TABLE -->
+																			<hk-action-rolls-table
+																				v-if="action.rolls"
+																				:rolls="action.rolls"
+																				:type="action.type"
+																				:versatile="ability.versatile"
+																				:versatile-options="[
+																					ability.versatile_one,
+																					ability.versatile_two,
+																				]"
+																				@edit="
+																					editRoll(
+																						$event,
+																						ability_index,
+																						ability,
+																						category,
+																						action_index,
+																						action
+																					)
+																				"
+																				@delete="
+																					deleteRoll($event, ability_index, category, action_index)
+																				"
+																			/>
+																		</div>
+																	</template>
+
+																	<!-- EFFECTS -->
+																	<ActionEffects
+																		:value="action"
+																		:edition="npc.edition"
+																		@change="$forceUpdate()"
+																	/>
+																</div>
+															</q-expansion-item>
+														</ValidationObserver>
 													</div>
 												</template>
 											</div>
@@ -622,6 +683,8 @@ import { mapActions } from "vuex";
 import { dice } from "src/mixins/dice.js";
 import { attack_types } from "src/utils/actionConstants";
 import draggable from "vuedraggable";
+import ActionEffects from "src/components/hk-components/hk-effects-form/ActionEffects.vue";
+import { hasRolls } from "src/utils/generalFunctions";
 
 export default {
 	name: "npc-Actions",
@@ -629,6 +692,7 @@ export default {
 	mixins: [general, monsterMixin, dice],
 	components: {
 		draggable,
+		ActionEffects,
 	},
 	data() {
 		return {
@@ -649,6 +713,10 @@ export default {
 				{ label: "Square Feet", value: "square feet" },
 			],
 			limit_types: ["day", "turn"],
+			// Most entries an ability's action_list can have (hk-npc-schema.json)
+			max_sub_actions: 5,
+			// "<category>-<ability_index>-<action_index>" of the action that was just added, opened
+			opened_action: undefined,
 		};
 	},
 	computed: {
@@ -685,6 +753,7 @@ export default {
 	},
 	methods: {
 		...mapActions(["setActionRoll"]),
+		hasRolls,
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
 				this.$delete(object, property);
@@ -756,6 +825,68 @@ export default {
 			}
 			this.npc[to].push(ability);
 			this.$delete(this.npc[from], index);
+			this.$forceUpdate();
+		},
+
+		/**
+		 * Add a sub-action (an entry in the ability's action_list), a save by default
+		 *
+		 * @param {string} category actions / legendary_actions / special_abilities…
+		 * @param {integer} ability_index index of the ability
+		 */
+		addSubAction(category, ability_index) {
+			const ability = this.npc[category][ability_index];
+			if (!ability.action_list) this.$set(ability, "action_list", []);
+			if (ability.action_list.length >= this.max_sub_actions) return;
+			ability.action_list.push({ type: "save" });
+			this.opened_action = `${category}-${ability_index}-${ability.action_list.length - 1}`;
+			this.$forceUpdate();
+		},
+
+		/**
+		 * One-line header of an action's collapse item: its type, to hit or save, and how many
+		 * rolls and linked effects it has
+		 *
+		 * @param {object} action entry of an ability's action_list
+		 * @returns {string} e.g. "Save · DC15 CON · 1 roll, 2 effects"
+		 */
+		actionHeader(action) {
+			const parts = [attack_types[action.type]?.label || "Action"];
+			if (action.type === "save") {
+				const save = [
+					action.save_dc ? `DC${action.save_dc}` : "",
+					action.save_ability ? action.save_ability.substring(0, 3).toUpperCase() : "",
+				].filter(Boolean);
+				if (save.length) parts.push(save.join(" "));
+			} else if (
+				!["healing", "damage", "other"].includes(action.type) &&
+				Number.isInteger(action.attack_bonus)
+			) {
+				parts.push(`${action.attack_bonus < 0 ? "" : "+"}${action.attack_bonus} to hit`);
+			}
+
+			const counts = [];
+			const rolls = action.type === "other" ? 0 : (action.rolls || []).length;
+			if (rolls) counts.push(`${rolls} ${rolls === 1 ? "roll" : "rolls"}`);
+			const effects = Object.values(action.effects || {}).reduce(
+				(count, links) => count + (Array.isArray(links) ? links.length : 0),
+				0
+			);
+			if (effects) counts.push(`${effects} ${effects === 1 ? "effect" : "effects"}`);
+			if (counts.length) parts.push(counts.join(", "));
+			return parts.join(" · ");
+		},
+
+		/**
+		 * Remove a sub-action with its rolls and effects. The first one stays.
+		 *
+		 * @param {string} category actions / legendary_actions / special_abilities…
+		 * @param {integer} ability_index index of the ability
+		 * @param {integer} action_index index of the sub-action
+		 */
+		removeSubAction(category, ability_index, action_index) {
+			if (action_index < 1) return;
+			this.$delete(this.npc[category][ability_index].action_list, action_index);
 			this.$forceUpdate();
 		},
 
@@ -857,7 +988,7 @@ export default {
 
 <style lang="scss" scoped>
 label.group {
-	display: block;
+	display: flex;
 	line-height: 30px;
 	margin-bottom: 10px;
 	border-bottom: solid 1px $neutral-5;

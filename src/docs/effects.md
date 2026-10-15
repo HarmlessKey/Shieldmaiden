@@ -101,14 +101,19 @@ removed.
   concentrates on another effect, you choose whether that Concentration is replaced. **Ends
   with <caster>'s Concentration** links the effect to an existing Concentration, so it ends
   when the Concentration ends.
-- **Repeat save to end**: the target repeats a saving throw to end the effect. Set the
-  **Ability**, the **DC**, when to **Repeat the save** (end of the target's turn, start of the
-  target's turn, when it takes damage), the **Successes needed to end**, whether it **Becomes
-  a condition after failures** (**After failures**, **Becomes**), and whether it **Succeeds
-  automatically after** some time.
-- **Can escape**: the target can escape with an action. Set the **Escape DC**, the
-  **Checks** (Strength (Athletics), Dexterity (Acrobatics)) and **Who can try**: itself,
-  itself or a creature within reach, or anyone.
+- **End effect**: how the effect can end besides its duration. Pick one or more options; each
+  gets a tab with its fields:
+  - **Repeat save to end**: the target repeats a saving throw to end the effect. Set the
+    **Ability**, the **DC**, when to **Repeat the save** (end of the target's turn, start of
+    the target's turn, when it takes damage), the **Successes needed to end**, whether it
+    **Becomes a condition after failures** (**After failures**, **Becomes**), and whether it
+    **Succeeds automatically after** some time.
+  - **Escape**: the target can escape with an action. Set the **Escape DC**, the **Checks**
+    (Strength (Athletics), Dexterity (Acrobatics)) and **Who can try**: itself, itself or a
+    creature within reach, or anyone.
+  - **Ends early when**: events of the creature that has the effect that end it early: it
+    takes damage, deals damage, hits with an attack, regains hit points or becomes Bloodied (a
+    magical sleep that ends when the sleeper takes damage).
 
 What a linked effect already defines (duration, save, choices) is filled in for you.
 
@@ -564,10 +569,17 @@ saved.
 
 ## Durations
 
-An effect's own definition has no duration. A duration is set where the effect is used: on a
-link to an action, spell or ability, in the Effects drawer, and in the custom effect form where
-one effect applies another (**Apply effect** and a save's **Escalate**). These fields are the
-same everywhere.
+An effect's own definition has no duration. A duration is set where the effect is used:
+
+- In the Effects drawer and on a link to an action, the duration has the drawer's fields:
+  the duration and **End effect** (repeat save, escape, ends early when). See
+  [From the Effects drawer](#from-the-effects-drawer).
+- In the custom effect form, where one effect applies another (**Apply effect** and a save's
+  **Escalate**), the duration has all the fields below.
+
+What ends an effect in other ways (**Ends when**) and what happens when it ends (a sub-effect
+with the trigger **When it ends**) belong to the effect itself, so they're set on the custom
+effect, not on a link.
 
 - **Duration**: instantaneous, time, until removed, Concentration, until a next turn, until
   the end of this turn, until a rest, until dawn, until a trigger, until saved, or special.
@@ -603,29 +615,45 @@ their effects already linked.
 
 ### Action effects
 
-Every action, bonus action, reaction and legendary action has an **Effects** list next to its
-rolls. Each linked effect has:
+Every action, bonus action, reaction, legendary action and special ability (trait) has a list
+of **Actions**: what is rolled when it's used. Each action is a collapsed item with one line:
+its type, to hit or save, and how many rolls and effects it has ("Save · DC15 CON · 1 roll, 2
+effects").
+Expand it to set its type (an attack, a save, damage, healing or other), its attack modifier or
+save ability and DC, its **Rolls** and its **Effects**. Each linked effect has:
 
+- **When**: when it applies, following the 2024 stat block notation. Only the moments that fit
+  the action's type are offered:
+  - **On a hit** / **On a miss**: for attacks.
+  - **On a failed save** / **On a successful save**: for a save. The action's save ability and
+    DC are used.
+  - **Always**: whatever the result, for every type.
 - **Effect**: the condition, SRD effect or custom effect.
-- **When**: when it applies, following the 2024 stat block notation:
-  - **On a hit** / **On a miss**: for attack actions.
-  - **On a failed save** / **On a successful save**: for actions with a saving throw. The
-    action's save ability and DC are used.
-  - **Always**: whatever the result.
-- **Duration**: how long it lasts once applied. See [Durations](#durations). A grapple gets an
-  escape DC here, a poison a repeat save.
 - **Choices**: for each choice of the effect, either fix it here (a clay golem's Absorption is
-  acid) or leave it **Chosen when applied**, so it's asked when the action is used.
-- **Level**: for an effect with a level track, the levels it applies (a creature that inflicts
-  2 levels of Exhaustion).
+  acid) or leave it empty (or clear it): it shows **Chosen when applied** and is asked when the
+  action is used. A value is a
+  number.
+- **Level**: only for an effect with a level track, the levels it applies (a creature that
+  inflicts 2 levels of Exhaustion).
+- **Duration**: how long it lasts once applied, with the same fields as the Effects drawer:
+  the duration and **End effect** (**Repeat save to end**, **Escape**, **Ends early when**). A
+  grapple gets an Escape here, a poison a repeat save; on a save action, a repeat save starts
+  with its ability and DC. Leave the duration empty (or clear it) and it's asked when
+  the effect is applied.
 - **Magical**: the effect comes from magic. Saves against it count as saves against magic, so
-  Magic Resistance gives Advantage on its repeat saves. Effects linked to spells are magical.
-- **Scaling**: how the effect grows with a higher spell slot. Values grow by an amount per slot
-  level above the spell's level, and rolls by a number of dice: Magic Weapon is +1, +2 with a
-  level 3–5 slot and +3 with a level 6 or higher slot.
+  Magic Resistance gives Advantage on its repeat saves.
 
-An action can have several effects: a hit can deal its damage, apply Grappled with an escape DC,
-and Restrained for as long as the grapple lasts.
+An action can have several effects: a hit can deal its damage, apply Grappled with an escape
+DC, and Restrained for as long as the grapple lasts. That's one action.
+
+Use **Add action** (up to 5) when the ability has a second attack or save. A bite that deals
+piercing damage on a hit and then makes the target save against poison is two actions: a
+melee attack with its piercing roll, and a Constitution save with its poison roll and an **On a
+failed save** Poisoned effect. Rolling the ability rolls every action. Every action but the first
+can be removed.
+
+If you change an action's type after linking effects, effects whose **When** no longer fits are
+kept and marked, so you can pick another moment.
 
 The area of an action or spell (its AOE type and size, like a 15-foot cone) belongs to the
 action or spell itself, not to its effects. Every creature in the area that the action targets
@@ -633,14 +661,19 @@ gets the linked effects.
 
 ### Spell effects
 
-Spells link effects the same way. The spell's level and the slot it's cast with drive the
-link's scaling. Concentration spells apply their effects with a Concentration duration, linked
-to the caster's Concentration.
+Spells link effects the same way. Effects linked to spells are magical. Concentration spells
+apply their effects with a Concentration duration, linked to the caster's Concentration.
+
+Spell links also have **Scaling**: how the effect grows with a higher spell slot. Values grow
+by an amount per slot level above the spell's level, and rolls by a number of dice: Magic
+Weapon is +1, +2 with a level 3–5 slot and +3 with a level 6 or higher slot. Monster actions
+don't have Scaling.
 
 ### Trait effects
 
-A special ability (trait) can have **Effects** too. Trait effects have no **When** and no
-**Duration**: they're always active, as described in [Traits](#traits). Their choices are fixed
+A special ability (trait) can have always-active **trait effects** as well as the effects of
+its actions. Trait effects have no **When** and no **Duration**: they're always active, as
+described in [Traits](#traits). Their choices are fixed
 on the link. Use them for what a creature *is*: Magic Resistance, Undead Fortitude, Evasion, a
 golem's Absorption, Legendary Resistance.
 
@@ -687,10 +720,11 @@ How often → once per turn, and Save → Constitution, On a success → half da
 Trigger → Fails a saving throw. Its duration is "until saved" with a Save to end:
 Constitution, Successes to end 3, Failures to escalate 3, Escalate → Becomes Petrified.
 
-**Ghoul's claws**: on the ghoul's Claws action, link Paralyzed with When → On a failed save
-(the action's DC 10 Constitution save), Duration → 1 minute with a Save to end at the end of
-each of the target's turns. Rolling the claws against a creature that fails its save paralyzes
-it.
+**Ghoul's claws**: the ghoul's Claws has two actions: the melee attack with its slashing roll,
+and a DC 10 Constitution save. On the save, link Paralyzed with When → On a failed save,
+Duration → 1 minute with End effect → Repeat save to end at the end of each of the target's
+turns.
+Rolling the claws against a creature that fails its save paralyzes it.
 
 **Clay golem's Acid Absorption**: on the special ability, link the generic Absorption effect as
 a trait effect, with the damage type choice fixed to acid. Acid damage now heals the golem.

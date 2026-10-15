@@ -25,7 +25,6 @@
 			value="Chosen when the effect is applied"
 			:label="control.label"
 			readonly
-			dense
 		>
 			<ChoiceInfo slot="append" :kind="choiceKind" chosen />
 		</hk-input>
@@ -52,7 +51,6 @@
 			:hint="control.hint"
 			:integer="!!control.integer"
 			type="number"
-			dense
 			@input="setNumber(value, field, $event)"
 		/>
 
@@ -63,7 +61,6 @@
 			:name="control.label"
 			:rules="required ? 'required' : undefined"
 			:hint="control.hint"
-			dense
 			@input="setField(value, field, $event)"
 		/>
 
@@ -72,7 +69,6 @@
 			:value="!!current"
 			:label="control.label"
 			:dark="dark"
-			dense
 			@input="toggle"
 		/>
 
@@ -95,7 +91,6 @@
 			:hint="hint"
 			:readonly="disabled"
 			multiple
-			dense
 			@input="setField(value, field, $event)"
 		>
 			<ChoiceInfo v-if="choiceKind && !coveredByAll" slot="append" :kind="choiceKind" :chosen="chosen" />
@@ -125,7 +120,6 @@
 			:clearable="!multiple && !disabled"
 			emit-value
 			map-options
-			dense
 			@input="setField(value, field, $event)"
 		>
 			<ChoiceInfo v-if="choiceKind" slot="append" :kind="choiceKind" :chosen="chosen" />

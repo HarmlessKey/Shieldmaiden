@@ -9,7 +9,6 @@
 					type="number"
 					integer
 					rules="between:0,99"
-					dense
 					@input="setNumber(value, 'dice_count', $event)"
 				/>
 			</div>
@@ -21,7 +20,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'dice_type', $event)"
 				/>
 			</div>
@@ -33,7 +31,6 @@
 					type="number"
 					integer
 					rules="between:-99,999"
-					dense
 					@input="setNumber(value, 'fixed_val', $event)"
 				/>
 			</div>
@@ -45,7 +42,6 @@
 						:value="value.damage_type"
 						label="Damage type"
 						clearable
-						dense
 						@input="setField(value, 'damage_type', $event)"
 					/>
 				</div>
@@ -54,7 +50,6 @@
 						:value="value.damage_type_choice"
 						label="Or the caster picks one of"
 						multiple
-						dense
 						@input="setField(value, 'damage_type_choice', $event)"
 					/>
 				</div>
@@ -63,7 +58,6 @@
 				:value="!!value.magical"
 				:dark="dark"
 				label="Magical damage"
-				dense
 				class="mt-2"
 				@input="setField(value, 'magical', $event || undefined)"
 			/>

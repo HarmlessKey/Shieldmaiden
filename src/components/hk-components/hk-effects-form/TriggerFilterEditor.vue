@@ -9,7 +9,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'by', $event)"
 				/>
 			</div>
@@ -18,7 +17,6 @@
 					:value="value.within"
 					label="Within (feet)"
 					type="number"
-					dense
 					@input="setNumber(value, 'within', $event)"
 				/>
 			</div>
@@ -27,7 +25,6 @@
 					:value="value.min_amount"
 					label="Minimum amount"
 					type="number"
-					dense
 					@input="setNumber(value, 'min_amount', $event)"
 				/>
 			</div>
@@ -36,7 +33,6 @@
 					:value="value.damage_types"
 					label="Damage types"
 					multiple
-					dense
 					@input="setField(value, 'damage_types', $event)"
 				/>
 			</div>
@@ -49,7 +45,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'attack_types', $event)"
 				/>
 			</div>
@@ -62,7 +57,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'natural_roll', $event)"
 				/>
 			</div>

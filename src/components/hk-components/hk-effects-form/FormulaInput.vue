@@ -6,7 +6,6 @@
 				:label="label"
 				:name="name"
 				rules="required|formula"
-				dense
 				@input="setField(value, 'formula', $event)"
 			>
 				<hk-popover slot="append" header="Formula variables">
@@ -27,7 +26,6 @@
 				:value="value.min"
 				label="Min"
 				type="number"
-				dense
 				@input="setNumber(value, 'min', $event)"
 			/>
 		</div>
@@ -36,7 +34,6 @@
 				:value="value.max"
 				label="Max"
 				type="number"
-				dense
 				@input="setNumber(value, 'max', $event)"
 			/>
 		</div>
@@ -48,7 +45,6 @@
 				emit-value
 				map-options
 				clearable
-				dense
 				@input="setField(value, 'round', $event)"
 			/>
 		</div>

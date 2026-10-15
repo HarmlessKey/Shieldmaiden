@@ -22,6 +22,7 @@
 				<div
 					v-for="(action, action_index) in roll.actions"
 					:key="`action-${index}-${action_index}`"
+					class="rolled-action"
 				>
 					<div>
 						<!-- TO HIT ROLL -->
@@ -387,8 +388,26 @@
 						</q-expansion-item>
 					</q-list>
 
+					<!-- EFFECTS LINKED TO THE ACTION: whether they apply with the chosen result -->
+					<div v-if="linkedEffects(action, action_index).length" class="linked-effects">
+						<div
+							v-for="(linked, linked_index) in linkedEffects(action, action_index)"
+							:key="`linked-${linked_index}`"
+							class="linked-effects__effect"
+							:class="{ 'neutral-3': linked.applies === false }"
+						>
+							<span class="truncate">
+								<i aria-hidden="true" class="fas fa-sparkles mr-1" />
+								<b>{{ linked.name }}</b>
+								<span class="neutral-2"> · {{ linked.when }}</span>
+							</span>
+							<span v-if="linked.applies === true" class="green">Applies</span>
+							<span v-else-if="linked.applies === false">Doesn't apply</span>
+							<span v-else class="neutral-2">{{ linked.pending }}</span>
+						</div>					</div>
+
 					<!-- TOTAL OF THE ACTION -->
-					<div v-if="roll.actions.length > 1" class="total-action-damage">
+					<div v-if="roll.actions.length > 1 && action.rolls.length" class="total-action-damage">
 						<div>Total {{ action.type === "healing" ? "healing" : "damage" }}</div>
 						<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
 							<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
@@ -559,6 +578,7 @@ import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import { calc_mod } from "src/utils/generalFunctions";
 import { displayStats } from "src/utils/entityFunctions";
 import { rollPlan, applyDamageModifiers, damageTypeMatches } from "src/utils/effectFunctions";
+import { action_outcomes, outcomesFor } from "src/utils/effectsConstants";
 
 export default {
 	name: "hk-single-roll",
@@ -776,6 +796,37 @@ export default {
 		naturalOf(toHit) {
 			if (!toHit) return undefined;
 			return toHit.natural ?? toHit.throwsTotal;
+		},
+		/**
+		 * The effects linked to a rolled action that fit its type, and whether each applies with
+		 * the chosen hit or miss and failed or successful save: true, false, or undefined while
+		 * the result isn't chosen (with a hint in `pending`)
+		 *
+		 * @returns {{ name: string, when: string, applies: boolean|undefined, pending?: string }[]}
+		 */
+		linkedEffects(action, action_index) {
+			const effects = action.effects || {};
+			const hitOrMiss = this.hitOrMiss[action_index];
+			const save = this.savingThrowResult[action_index];
+			// The result an outcome needs, the chosen result it's compared with, and the hint without one
+			const outcomes = {
+				on_hit: { needs: "hit", chosen: hitOrMiss, pending: "Hit or miss?" },
+				on_miss: { needs: "miss", chosen: hitOrMiss, pending: "Hit or miss?" },
+				on_fail: { needs: "fail", chosen: save, pending: "Fail or save?" },
+				on_success: { needs: "save", chosen: save, pending: "Fail or save?" },
+				always: { needs: "always", chosen: "always" },
+			};
+			return outcomesFor(action.type).flatMap((outcome) =>
+				(Array.isArray(effects[outcome]) ? effects[outcome] : []).map((link) => {
+					const { needs, chosen, pending } = outcomes[outcome];
+					return {
+						name: link.effect?.name || link.effect?.source_key || "Effect",
+						when: action_outcomes[outcome].label,
+						applies: chosen ? chosen === needs : undefined,
+						pending,
+					};
+				})
+			);
 		},
 		/**
 		 * A bonus die of an effect in the to-hit line: "+ 3", "- 2"
@@ -1356,6 +1407,29 @@ export default {
 				font-weight: bold;
 			}
 		}
+		// Several actions in one roll (a bite, then a save against its poison): a divider between them
+		.rolled-action + .rolled-action {
+			margin-top: 20px;
+			padding-top: 15px;
+			border-top: solid 1px $neutral-5;
+		}
+		// The effects linked to an action, and whether they apply with the chosen result
+		.linked-effects {
+			margin-top: 10px;
+			padding: 0 5px;
+			font-size: 13px;
+			line-height: 20px;
+
+			&__effect {
+				display: flex;
+				justify-content: space-between;
+				gap: 10px;
+				min-width: 0;
+
+				> span:last-child {
+					flex-shrink: 0;
+				}
+			}		}
 		// The target's damage modifiers: toggles and notes
 		.damage-modifiers {
 			display: flex;

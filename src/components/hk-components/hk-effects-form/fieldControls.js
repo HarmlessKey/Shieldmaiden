@@ -16,10 +16,44 @@ import {
 	suggestions,
 	roll_sub_types,
 } from "src/utils/effectsConstants";
-import { abilities, creature_types, skills } from "src/utils/generalConstants";
+import { startCase } from "lodash";
+import { abilities, creature_types, damage_types, skills } from "src/utils/generalConstants";
 import { choiceKinds, getSrdDefinitions } from "src/utils/effectFunctions";
 
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+
+const startCaseOption = (value) => ({ label: startCase(value), value });
+
+/**
+ * Label and options of a choice asked when an effect is applied (the Effects drawer) or fixed
+ * on a link (the NPC form).
+ *
+ * @param {{ kind: string, options?: string[] }} choice From getRequiredChoices
+ * @param {object} [context]
+ * @param {{ name: string, url: string }[]} [context.conditions] SRD conditions of the edition
+ * @returns {{ label: string, options?: { label, value }[] }} No options for a free text or
+ * number choice (option, value)
+ */
+export function choiceField({ kind, options } = {}, { conditions = [] } = {}) {
+	const label = startCase(kind);
+	switch (kind) {
+		case "ability":
+			return { label, options: abilities.map(startCaseOption) };
+		case "damage_type":
+			return {
+				label,
+				options: (options || damage_types.filter((type) => !type.startsWith("non_magical"))).map(startCaseOption),
+			};
+		case "skill":
+			return { label, options: skillOptions };
+		case "condition":
+			return { label, options: conditions.map(({ name, url }) => ({ label: name, value: url })) };
+		case "creature_type":
+			return { label, options: creature_types.map(startCaseOption) };
+		default:
+			return { label };
+	}
+}
 
 /**
  * Options for a select from a keyed constants object. Legacy entries are left out,

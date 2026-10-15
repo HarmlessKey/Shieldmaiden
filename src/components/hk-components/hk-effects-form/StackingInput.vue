@@ -9,7 +9,6 @@
 				emit-value
 				map-options
 				clearable
-				dense
 				@input="setField(value, 'mode', $event)"
 			>
 				<template v-slot:option="scope">
@@ -27,7 +26,6 @@
 				:value="!!value.per_caster"
 				:dark="dark"
 				label="Instances from different casters are different effects"
-				dense
 				@input="setField(value, 'per_caster', $event || undefined)"
 			/>
 		</div>

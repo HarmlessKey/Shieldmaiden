@@ -819,6 +819,30 @@ export const choice_kinds = keyed({
 	value: { label: "Value", field: "value" },
 });
 
+/**
+ * Outcomes of an action-list entry that linked effects apply on ($defs/action_effects), in
+ * display order. types: the entry's action types the outcome fits (none = every type).
+ */
+export const action_outcomes = keyed({
+	on_hit: { label: "On a hit", types: ["melee_weapon", "ranged_weapon", "spell_attack"] },
+	on_miss: { label: "On a miss", types: ["melee_weapon", "ranged_weapon", "spell_attack"] },
+	on_fail: { label: "On a failed save", types: ["save"] },
+	on_success: { label: "On a successful save", types: ["save"] },
+	always: { label: "Always" },
+});
+
+/**
+ * The outcomes that fit an action type
+ *
+ * @param {string} type Action type of the entry ("melee_weapon", "save", "other"…)
+ * @returns {string[]} e.g. ["on_hit", "on_miss", "always"]
+ */
+export function outcomesFor(type) {
+	return Object.values(action_outcomes)
+		.filter(({ types }) => !types || types.includes(type))
+		.map(({ value }) => value);
+}
+
 export const bypass_sources = keyed({
 	magical: { label: "Magical" },
 	silvered: { label: "Silvered" },
@@ -947,6 +971,7 @@ export default {
 	consume_scopes,
 	perspectives,
 	choice_kinds,
+	action_outcomes,
 	bypass_sources,
 	mechanics,
 	reroll_keep,

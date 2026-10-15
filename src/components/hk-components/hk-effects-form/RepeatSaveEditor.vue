@@ -10,7 +10,6 @@
 					rules="required"
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'ability', $event)"
 				/>
 			</div>
@@ -24,7 +23,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'triggers', $event)"
 				/>
 			</div>
@@ -37,7 +35,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'advantage_on_triggers', $event)"
 				/>
 			</div>
@@ -50,7 +47,6 @@
 					integer
 					rules="min_value:1"
 					placeholder="1"
-					dense
 					@input="setNumber(value, 'successes_to_end', $event)"
 				/>
 			</div>
@@ -62,7 +58,6 @@
 					type="number"
 					integer
 					rules="min_value:1"
-					dense
 					@input="setNumber(value, 'failures_to_escalate', $event)"
 				/>
 			</div>
@@ -71,7 +66,6 @@
 			:value="!!value.costs_action"
 			:dark="dark"
 			label="The holder must take an action to repeat it"
-			dense
 			class="mt-2"
 			@input="setField(value, 'costs_action', $event || undefined)"
 		/>
@@ -96,7 +90,6 @@
 					:value="!!escalate.lock"
 					:dark="dark"
 					label="Stop saving and keep this effect for its full duration instead"
-					dense
 					class="mt-2"
 					@input="setField(escalate, 'lock', $event || undefined)"
 				/>

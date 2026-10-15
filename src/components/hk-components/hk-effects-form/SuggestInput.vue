@@ -15,7 +15,6 @@
 		map-options
 		filled
 		square
-		dense
 		@filter="filter"
 		@input="$emit('input', $event && $event.length ? $event : undefined)"
 	/>
@@ -35,7 +34,6 @@
 		clearable
 		filled
 		square
-		dense
 		@filter="filter"
 		@input-value="$emit('input', $event || undefined)"
 		@input="$emit('input', $event || undefined)"

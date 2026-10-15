@@ -8,7 +8,6 @@
 				:label="flag.label"
 				:dark="dark"
 				toggle-indeterminate
-				dense
 				@input="setField(value, flag.key, $event)"
 			>
 				<q-tooltip anchor="top middle" self="center middle">
@@ -43,7 +42,6 @@
 					type="number"
 					integer
 					rules="between:0,9"
-					dense
 					@input="setNumber(value, 'spell_level_max', $event)"
 				/>
 			</div>
@@ -56,7 +54,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'creature_types', $event)"
 				/>
 			</div>
@@ -69,7 +66,6 @@
 					use-chips
 					emit-value
 					map-options
-					dense
 					@input="setField(value, 'conditions', $event)"
 				/>
 			</div>

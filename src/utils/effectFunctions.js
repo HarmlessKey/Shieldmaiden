@@ -1,7 +1,7 @@
 import conditions_5e from "src/data/5e/conditions.js";
 import conditions_55e from "src/data/5.5e/conditions.js";
 import srd_effects from "src/data/effects.js";
-import { effect_types, effect_subtypes } from "src/utils/effectsConstants.js";
+import { action_outcomes, effect_types, effect_subtypes } from "src/utils/effectsConstants.js";
 import { abilities, damage_types as DAMAGE_TYPES, skills } from "src/utils/generalConstants.js";
 import { experience_table } from "src/utils/characterConstants.js";
 import { manualBonuses, skillBonusKey } from "src/utils/entityFunctions.js";
@@ -118,6 +118,36 @@ const NUMERIC_KEYS = new Set([
 	"reroll_bonus",
 ]);
 
+const isEmptyValue = (value) =>
+	value === undefined ||
+	value === null ||
+	value === "" ||
+	(Array.isArray(value) && !value.length) ||
+	(typeof value === "object" && !Array.isArray(value) && !Object.keys(value).length);
+
+/**
+ * Copy of a value without empty strings, null, undefined, empty arrays and empty objects (at
+ * any depth), with numeric strings under numeric keys turned into numbers and strings trimmed.
+ * 0 and false are kept.
+ */
+function cleanValue(value, numeric = false) {
+	if (Array.isArray(value)) {
+		return value.map((item) => cleanValue(item, numeric)).filter((item) => !isEmptyValue(item));
+	}
+	if (value && typeof value === "object") {
+		const result = {};
+		for (const [key, item] of Object.entries(value)) {
+			const cleaned = cleanValue(item, NUMERIC_KEYS.has(key));
+			if (!isEmptyValue(cleaned)) result[key] = cleaned;
+		}
+		return result;
+	}
+	if (numeric && typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) {
+		return Number(value);
+	}
+	return typeof value === "string" ? value.trim() : value;
+}
+
 /**
  * Copy of an effect definition as the effects form saves it: without empty strings,
  * null, undefined, empty arrays and empty objects (at any depth), with numeric strings
@@ -128,34 +158,60 @@ const NUMERIC_KEYS = new Set([
  * @returns {object} New object, the input is not modified
  */
 export function cleanEffectDefinition(effect = {}) {
-	const isEmpty = (value) =>
-		value === undefined ||
-		value === null ||
-		value === "" ||
-		(Array.isArray(value) && !value.length) ||
-		(typeof value === "object" && !Array.isArray(value) && !Object.keys(value).length);
-
-	const clean = (value, numeric) => {
-		if (Array.isArray(value)) {
-			return value.map((item) => clean(item, numeric)).filter((item) => !isEmpty(item));
-		}
-		if (value && typeof value === "object") {
-			const result = {};
-			for (const [key, item] of Object.entries(value)) {
-				const cleaned = clean(item, NUMERIC_KEYS.has(key));
-				if (!isEmpty(cleaned)) result[key] = cleaned;
-			}
-			return result;
-		}
-		if (numeric && typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) {
-			return Number(value);
-		}
-		return typeof value === "string" ? value.trim() : value;
-	};
-
-	const cleaned = clean(effect, false);
+	const cleaned = cleanValue(effect);
 	DEPRECATED_DEFINITION_FIELDS.forEach((field) => delete cleaned[field]);
 	return cleaned;
+}
+
+/**
+ * Copy of an effect link as the NPC form saves it ($defs/effect_link): only its own fields,
+ * without empty values, and without `magical: false`. Choices stay strings (a value choice is
+ * a number written as a string); an unset choice is left out, so it's asked when applied.
+ *
+ * @param {object} link { effect, duration?, choices?, level?, magical? }
+ * @returns {object|undefined} New object, or undefined when it has no effect
+ */
+export function cleanEffectLink(link = {}) {
+	const effect = cleanValue(link.effect);
+	if (!effect?.source || !effect?.source_key) return undefined;
+	const cleaned = { effect };
+
+	const duration = cleanValue(link.duration);
+	// What ends an effect and what it does when it ends belong to its definition
+	for (const field of ["ends_when", "on_expire", "ends_by_action", "rest_type"]) delete duration?.[field];
+	if (!isEmptyValue(duration)) cleaned.duration = duration;
+
+	const choices = {};
+	for (const [kind, value] of Object.entries(link.choices || {})) {
+		const text = value === undefined || value === null ? "" : String(value).trim();
+		if (text !== "") choices[kind] = text;
+	}
+	if (Object.keys(choices).length) cleaned.choices = choices;
+
+	const level = parseInt(link.level);
+	if (level >= 1) cleaned.level = level;
+	if (link.magical === true) cleaned.magical = true;
+	return cleaned;
+}
+
+/**
+ * Copy of the effects of an action-list entry ($defs/action_effects) as the NPC form saves
+ * them: every link cleaned, links without an effect, empty outcome lists and unknown keys left
+ * out.
+ *
+ * @param {object} effects { on_hit?: [], on_miss?: [], on_fail?: [], on_success?: [], always?: [] }
+ * @returns {object|undefined} New object, or undefined when no outcome has a link
+ */
+export function cleanActionEffects(effects) {
+	if (!effects || typeof effects !== "object") return undefined;
+	const cleaned = {};
+	for (const outcome of Object.keys(action_outcomes)) {
+		const links = (Array.isArray(effects[outcome]) ? effects[outcome] : Object.values(effects[outcome] || {}))
+			.map((link) => cleanEffectLink(link))
+			.filter(Boolean);
+		if (links.length) cleaned[outcome] = links;
+	}
+	return Object.keys(cleaned).length ? cleaned : undefined;
 }
 
 /**
@@ -1236,6 +1292,132 @@ export function escapeFromForm({ dc, checks, by }) {
 	const escape = { dc, checks: (checks || []).map((check) => ({ ...ESCAPE_CHECKS[check] })).filter((c) => c.ability) };
 	if (by && by !== "self") escape.by = by;
 	return escape;
+}
+
+/**
+ * Form state of the duration fields of the Effects drawer and of effect links
+ * (ApplicationDuration.vue), at its defaults
+ *
+ * @param {object} [defaultSave] { ability, dc } a new repeat save starts with
+ * @returns {object} { type, value, unit, anchor, edge, hasSave, save, saveExtras, hasEscape, escape, cancelTriggers }
+ */
+export function durationFormDefaults({ defaultSave } = {}) {
+	return {
+		type: "cancelled",
+		value: undefined,
+		unit: "round",
+		anchor: "caster",
+		edge: "start",
+		hasSave: false,
+		save: { ability: defaultSave?.ability, dc: defaultSave?.dc, triggers: ["end_turn_target"] },
+		saveExtras: {
+			successes: 1,
+			escalates: false,
+			failures: 2,
+			becomes: undefined,
+			autoSuccess: false,
+			autoValue: 1,
+			autoUnit: "minute",
+		},
+		hasEscape: false,
+		escape: { dc: undefined, checks: ["athletics", "acrobatics"], by: "self" },
+		cancelTriggers: [],
+	};
+}
+
+/**
+ * $defs/duration from the duration form (durationFormDefaults): only the fields its type uses,
+ * the repeat save and escape when they're on, and the events that end it early
+ *
+ * @param {object} form Duration form state
+ * @param {object} [options]
+ * @param {{ name: string, url: string }[]} [options.conditions] SRD conditions, for the name of the
+ * condition a repeat save escalates to
+ * @returns {object} Duration
+ */
+export function durationFromForm(form, { conditions = [] } = {}) {
+	const { type, value, unit, anchor, edge } = form;
+	const duration = { type };
+	if (["time", "concentration"].includes(type) && value) {
+		duration.value = value;
+		duration.unit = unit;
+	}
+	if (type === "next_turn") {
+		duration.anchor = anchor;
+		duration.edge = edge;
+	}
+	if (form.hasSave) {
+		const extras = form.saveExtras;
+		const becomes = conditions.find(({ url }) => url === extras.becomes);
+		duration.save = repeatSaveFromForm({
+			...form.save,
+			successes: extras.successes,
+			escalate: extras.escalates
+				? { failures: extras.failures, effect: { source: "srd", source_key: extras.becomes, name: becomes?.name } }
+				: undefined,
+			autoAfter: extras.autoSuccess ? { value: extras.autoValue, unit: extras.autoUnit } : undefined,
+		});
+	}
+	if (form.hasEscape) duration.escape = escapeFromForm(form.escape);
+	if (form.cancelTriggers?.length) duration.cancel_triggers = form.cancelTriggers.map((trigger) => ({ trigger }));
+	return duration;
+}
+
+/**
+ * The duration form state of a stored duration, the inverse of durationFromForm. Fields the
+ * form doesn't have (ends_when, on_expire, filters on cancel triggers…) are left out.
+ *
+ * @param {object} duration $defs/duration
+ * @param {object} [options]
+ * @param {object} [options.defaultSave] { ability, dc } for a repeat save that isn't there yet
+ * @returns {object} Duration form state
+ */
+export function durationToForm(duration, { defaultSave } = {}) {
+	const form = durationFormDefaults({ defaultSave });
+	if (!duration) return form;
+
+	form.type = duration.type || "cancelled";
+	if (typeof duration.value === "number") form.value = duration.value;
+	for (const field of ["unit", "anchor", "edge"]) {
+		if (duration[field]) form[field] = duration[field];
+	}
+
+	const save = duration.save;
+	if (save) {
+		form.hasSave = true;
+		form.save = {
+			ability: save.ability,
+			dc: typeof save.dc === "number" ? save.dc : undefined,
+			triggers: save.triggers?.length ? [...save.triggers] : ["end_turn_target"],
+		};
+		if (save.successes_to_end > 1) form.saveExtras.successes = save.successes_to_end;
+		if (save.failures_to_escalate > 0 && save.escalate?.effect?.source_key) {
+			form.saveExtras.escalates = true;
+			form.saveExtras.failures = save.failures_to_escalate;
+			form.saveExtras.becomes = save.escalate.effect.source_key;
+		}
+		if (save.auto_success_after?.value > 0) {
+			form.saveExtras.autoSuccess = true;
+			form.saveExtras.autoValue = save.auto_success_after.value;
+			form.saveExtras.autoUnit = save.auto_success_after.unit || "round";
+		}
+	}
+
+	const escape = duration.escape;
+	if (escape) {
+		form.hasEscape = true;
+		const checks = (escape.checks || [])
+			.map(({ skill }) => skill)
+			.filter((skill) => ESCAPE_CHECKS[skill]);
+		form.escape = {
+			dc: typeof escape.dc === "number" ? escape.dc : undefined,
+			checks: checks.length ? checks : ["athletics", "acrobatics"],
+			by: escape.by || "self",
+		};
+	}
+
+	form.cancelTriggers = (duration.cancel_triggers || []).map(({ trigger }) => trigger).filter(Boolean);
+	return form;
 }
 
 /**

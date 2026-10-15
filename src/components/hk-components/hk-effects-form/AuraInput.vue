@@ -8,7 +8,6 @@
 					name="Aura radius"
 					rules="required"
 					type="number"
-					dense
 					@input="setNumber(value, 'radius', $event)"
 				/>
 			</div>
@@ -21,7 +20,6 @@
 					emit-value
 					map-options
 					clearable
-					dense
 					@input="setField(value, 'affects', $event)"
 				/>
 			</div>
@@ -30,7 +28,6 @@
 					:value="!!value.include_self"
 					:dark="dark"
 					label="Includes the holder"
-					dense
 					@input="setField(value, 'include_self', $event || undefined)"
 				/>
 			</div>

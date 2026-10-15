@@ -24,7 +24,6 @@
 			:rules="required ? 'required' : undefined"
 			:hint="hint"
 			type="number"
-			dense
 			@input="$emit('input', toNumber($event))"
 		/>
 		<DiceRollInput v-else-if="mode === 'roll'" :value="objectValue" :damage="damage" />

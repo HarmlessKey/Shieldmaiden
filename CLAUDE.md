@@ -59,11 +59,25 @@ src/
 - Extension communication uses `window.postMessage` bridge (not `chrome.runtime` directly)
 - Utility functions go in `src/utils/generalFunctions.js`
 
-## Planning Artifacts
-Feature specs live in `.planning/`. 
-- Always check `.planning/` for an existing spec before investigating or implementing anything
-- When writing a spec, always write it to `.planning/<feature-name>.md`
-- Never begin implementation without a spec file present in `.planning/`
+## Planning with OpenSpec
+We use [OpenSpec](https://github.com/Fission-AI/OpenSpec) for spec-driven development. Everything lives in `openspec/`:
+- `openspec/specs/` — current source-of-truth specs per capability
+- `openspec/changes/<change-name>/` — active change proposals (proposal, design, specs deltas, tasks)
+- `openspec/changes/archive/` — completed changes
+- `.planning/` is legacy — read it for historical context only, do not add new specs there
+
+Workflow (skills / `/opsx:*` commands):
+- `/opsx:explore` — think through an idea or problem before committing to a change
+- `/opsx:propose` — create a change with all artifacts (proposal, design, specs, tasks)
+- `/opsx:apply` — implement the tasks of an existing change
+- `/opsx:archive` — archive a change once it is implemented
+
+Rules:
+- Always check `openspec/changes/` and `openspec/specs/` for an existing change or spec before investigating or implementing anything
+- **When asked to develop a feature, always propose an OpenSpec change first** (`/opsx:propose`) and wait for the user to review it before implementing
+- Never begin implementing a feature without an OpenSpec change present in `openspec/changes/`
+- Small fixes or requests that are clearly not a feature (typos, one-line bug fixes, config tweaks, dependency bumps, docs) don't need a spec
+- If you're uncertain whether something warrants a spec, ask the user whether to create one before starting
 
 
 ## Git Workflow

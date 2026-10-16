@@ -84,5 +84,5 @@ Each entry point starts its loading state just before `resolve_npc` and clears i
 
 ## 6. Wrap up
 
-- [ ] 6.1 Create `feature/clean-dangling-search-npcs` from `develop`, commit and push
-- [ ] 6.2 Open a PR `feature/clean-dangling-search-npcs` → `develop`
+- [x] 6.1 Create `feature/clean-dangling-search-npcs` from `develop`, commit and push
+- [x] 6.2 Open a PR `feature/clean-dangling-search-npcs` → `develop` (#365)

@@ -753,6 +753,36 @@ const BY_LABELS = {
 	ally: "if caused by an ally",
 };
 
+// Filter fields an attack knows before its damage is rolled, and who may cause the hit
+const HIT_TAKEN_FILTER_FIELDS = ["by", "attack_types"];
+const HIT_TAKEN_BY = [undefined, "any", "caster", "counterpart"];
+
+/**
+ * Whether a sub-effect is damage its holder takes when hit that is rolled with the attack
+ * (Hex, Hunter's Mark): `damage` on `on_hit_taken` to the holder itself, without a save or
+ * frequency, and a filter of only who hit it (the caster or anyone) and attack types. Anything
+ * else stays a prompt after the roll is applied.
+ *
+ * @param {object} sub_effect
+ * @returns {boolean}
+ */
+export function hitTakenDamage(sub_effect = {}) {
+	if (sub_effect.type !== "damage" || normalizeTrigger(sub_effect.trigger) !== "on_hit_taken") return false;
+	if (sub_effect.target && sub_effect.target !== "self") return false;
+	if (sub_effect.save || sub_effect.frequency) return false;
+	const filter = sub_effect.trigger_filter || {};
+	const other = Object.keys(filter).some((key) => !HIT_TAKEN_FILTER_FIELDS.includes(key) && !isEmptyValue(filter[key]));
+	return !other && HIT_TAKEN_BY.includes(filter.by);
+}
+
+/**
+ * Whether hit-taken damage applies to a hit by this attacker: by the instance's caster only, or
+ * by anyone
+ */
+function hitTakenBy(sub_effect, instance, attackerKey) {
+	return sub_effect.trigger_filter?.by !== "caster" || (!!attackerKey && instance.caster_key === attackerKey);
+}
+
 /**
  * Checks a sub-effect's trigger_filter against what an event knows
  *
@@ -1548,6 +1578,8 @@ const ESCAPE_CHECKS = {
  */
 export function repeatSaveFromForm({ ability, dc, triggers, successes, escalate, autoAfter }) {
 	const save = { ability, dc, triggers: [...(triggers || ["end_turn_target"])] };
+	// No DC on a spell link: the caster's spell save DC is used when it's applied (effects 6c)
+	if (dc === undefined || dc === null || dc === "") delete save.dc;
 	if (successes > 1) save.successes_to_end = successes;
 	if (escalate?.failures > 0 && escalate.effect?.source_key) {
 		save.failures_to_escalate = escalate.failures;
@@ -1578,8 +1610,6 @@ export function escapeFromForm({ dc, checks, by }) {
  * @returns {object} { type, value, unit, anchor, edge, hasSave, save, saveExtras, hasEscape, escape, cancelTriggers }
  */
 export function durationFormDefaults({ defaultSave } = {}) {
-	// No DC on a spell link: the caster's spell save DC is used when it's applied (effects 6c)
-	if (dc === undefined || dc === null || dc === "") delete save.dc;
 	return {
 		type: "cancelled",
 		value: undefined,
@@ -3193,8 +3223,43 @@ export function attackModifiers({ attackerKey, targetKey, attackType, source, en
 }
 
 /**
+ * The damage a sub-effect adds to a hit, from its roll and value
+ *
+ * @param {object} sub_effect With the chosen value
+ * @param {object} instance For a chosen damage type
+ * @param {string} name The effect's name
+ * @param {object} vars Formula variables
+ * @returns {object|null|undefined} { name, magical, damage_type, dice_count, dice_type, value };
+ *   null when it adds nothing, undefined when its value can't be worked out
+ */
+function damageAmount(sub_effect, instance, name, vars) {
+	const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};
+	let value = 0;
+	if (sub_effect.value !== undefined) {
+		const resolved = resolveAmount(sub_effect.value, vars);
+		if (resolved.missing.length || resolved.value === undefined) return undefined;
+		value = resolved.value;
+	}
+	value += parseInt(rollSpec.fixed_val) || 0;
+	const damage_type =
+		rollSpec.damage_type ||
+		(Array.isArray(rollSpec.damage_type_choice) ? instance.choices?.damage_type : undefined);
+	const bonus = {
+		name,
+		// Definitions are generic: the roll says whether its damage is magical
+		magical: !!rollSpec.magical,
+		damage_type,
+		dice_count: parseInt(rollSpec.dice_count) || 0,
+		dice_type: parseInt(rollSpec.dice_type) || 0,
+		value: Math.floor(value),
+	};
+	return bonus.value || (bonus.dice_count && bonus.dice_type) ? bonus : null;
+}
+
+/**
  * The extra damage of an attacker's hit: its effects' bonus sub-effects on damage (own
- * perspective, for this attack type) and its manual damage bonuses. A bonus with a damage
+ * perspective, for this attack type), the target's hit-taken damage caused by this attacker
+ * (Hex, Hunter's Mark: `from: "target"`, see hitTakenDamage) and its manual damage bonuses. A bonus with a damage
  * type (the roll's, or the chosen one) is damage of that type; without one, rollAction uses
  * the attack's first damage type. The same definition twice counts once.
  *
@@ -3260,35 +3325,78 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 				continue;
 			}
 
-			const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};
-			let value = 0;
-			if (sub_effect.value !== undefined) {
-				const resolved = resolveAmount(sub_effect.value, flat);
-				if (resolved.missing.length || resolved.value === undefined) {
-					reminder();
-					continue;
-				}
-				value = resolved.value;
+			const bonus = damageAmount(sub_effect, instance, name, flat);
+			if (bonus === undefined) {
+				reminder();
+				continue;
 			}
-			value += parseInt(rollSpec.fixed_val) || 0;
-			const damage_type =
-				rollSpec.damage_type ||
-				(Array.isArray(rollSpec.damage_type_choice) ? instance.choices?.damage_type : undefined);
-			const bonus = {
-				name,
-				// Definitions are generic: the roll says whether its damage is magical
-				magical: !!rollSpec.magical,
-				damage_type,
-				dice_count: parseInt(rollSpec.dice_count) || 0,
-				dice_type: parseInt(rollSpec.dice_type) || 0,
-				value: Math.floor(value),
-			};
-			if (bonus.value || (bonus.dice_count && bonus.dice_type)) {
+			if (bonus) {
 				result.bonuses.push(bonus);
 				found = true;
 			}
 		}
 		if (found) seen.add(groupKey);
+	}
+
+	// The target's damage when this attacker hits it (Hex, Hunter's Mark), rolled with the attack
+	const target = entities[targetKey];
+	const seenOnTarget = new Set();
+	for (const [, instance] of target && targetKey !== attackerKey ? effectEntries(target, targetKey) : []) {
+		const definition = definitionOf(instance);
+		if (!definition || definition.unresolved) continue;
+		const groupKey = `${instance.source}:${instance.source_key}`;
+		if (seenOnTarget.has(groupKey)) continue;
+
+		const name = effectLabel(definition, instance);
+		const level = parseInt(instance.level) || 1;
+		const ctx = {
+			holderKey: targetKey,
+			instance,
+			entities,
+			definitionOf,
+			counterpartKey: attackerKey,
+			attackType,
+			assumptions: result.assumptions,
+		};
+		const flat = Object.create(null);
+		for (const [key, value] of Object.entries(formulaVars(target))) flat[key] = value;
+		for (const [key, value] of Object.entries(formulaVars(entities[instance.caster_key]) || {})) {
+			flat[`caster.${key}`] = value;
+		}
+		flat.level = level;
+		const definitionState = definition.condition ? conditionState(definition.condition, ctx) : true;
+
+		let found = false;
+		for (const original of definition.sub_effects || []) {
+			const sub_effect = withChosenValue(original, instance);
+			if (!hitTakenDamage(sub_effect) || !hitTakenBy(sub_effect, instance, attackerKey)) continue;
+			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
+			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
+			if (missingChoice(sub_effect, instance)) continue;
+
+			const reminder = () => {
+				const text = `${name}: ${sub_effect.description || describeSubEffect(sub_effect)}`;
+				if (!result.reminders.includes(text)) result.reminders.push(text);
+			};
+			const subState = sub_effect.condition ? conditionState(sub_effect.condition, ctx) : true;
+			if (definitionState === false || subState === false) continue;
+			const typeState = attackTypeState(sub_effect.trigger_filter?.attack_types, attackType);
+			if (typeState === false) continue;
+			if (definitionState === "unknown" || subState === "unknown" || typeState === "unknown") {
+				reminder();
+				continue;
+			}
+			const bonus = damageAmount(sub_effect, instance, name, flat);
+			if (bonus === undefined) {
+				reminder();
+				continue;
+			}
+			if (bonus) {
+				result.bonuses.push({ ...bonus, from: "target" });
+				found = true;
+			}
+		}
+		if (found) seenOnTarget.add(groupKey);
 	}
 
 	// Manual damage bonuses: flat, of the attack's damage type
@@ -3812,6 +3920,55 @@ export function damageBonusLines({ entity, definitionOf = () => undefined } = {}
 			if (sub_effect.condition || definition.condition) text += " (conditional)";
 			lines.push({ name, text, effectKey, applied: true });
 			seen.add(groupKey);
+		}
+	}
+	return lines;
+}
+
+/**
+ * Lines for the details bar of the damage other creatures take when this attacker hits them
+ * (Hex, Hunter's Mark; see hitTakenDamage): instances with `by: "caster"` cast by the attacker
+ * on any creature, and damage caused by anyone on the targeted creature. Filters and conditions
+ * are named in the text; they're only checked when it attacks.
+ *
+ * @param {string} attackerKey
+ * @param {string} targetKey The single targeted creature, if any
+ * @param {object} entities Entities of the encounter
+ * @param {function} definitionOf instance => resolved definition
+ * @returns {object[]} [{ holderKey, name, text, targeted }], e.g. text "+1d6 necrotic"
+ */
+export function hitTakenDamageLines({ attackerKey, targetKey, entities = {}, definitionOf = () => undefined } = {}) {
+	const lines = [];
+	if (!attackerKey) return lines;
+	for (const [holderKey, holder] of Object.entries(entities)) {
+		if (holderKey === attackerKey) continue;
+		const seen = new Set();
+		for (const [, instance] of effectEntries(holder, holderKey)) {
+			const definition = definitionOf(instance);
+			if (!definition || definition.unresolved) continue;
+			const groupKey = `${instance.source}:${instance.source_key}`;
+			if (seen.has(groupKey)) continue;
+			const name = effectLabel(definition, instance);
+			for (const original of definition.sub_effects || []) {
+				const sub_effect = withChosenValue(original, instance);
+				if (!hitTakenDamage(sub_effect)) continue;
+				const byCaster = sub_effect.trigger_filter?.by === "caster";
+				if (byCaster ? instance.caster_key !== attackerKey : holderKey !== targetKey) continue;
+				const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};
+				const parts = [];
+				if (rollSpec.dice_count && rollSpec.dice_type) parts.push(`+${rollSpec.dice_count}d${rollSpec.dice_type}`);
+				const value = typeof sub_effect.value === "number" ? sub_effect.value : parseInt(rollSpec.fixed_val) || 0;
+				if (value) parts.push(signedText(value));
+				if (typeof sub_effect.value === "object" || typeof sub_effect.value === "string") parts.push("+formula");
+				const damageType = rollSpec.damage_type || (rollSpec.damage_type_choice ? instance.choices?.damage_type : undefined);
+				let text = parts.join(" ") || describeSubEffect(sub_effect);
+				if (damageType) text += ` ${damageType}`;
+				const attackTypes = sub_effect.trigger_filter?.attack_types;
+				if (attackTypes?.length) text += ` (${attackTypes.join(", ").replace(/_/g, " ")})`;
+				if (sub_effect.condition || definition.condition) text += " (conditional)";
+				lines.push({ holderKey, name, text, targeted: holderKey === targetKey });
+				seen.add(groupKey);
+			}
 		}
 	}
 	return lines;

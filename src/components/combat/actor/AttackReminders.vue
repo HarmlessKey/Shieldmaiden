@@ -20,12 +20,13 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { damageBonusLines, hasReactionUsed } from "src/utils/effectFunctions";
+import { damageBonusLines, hasReactionUsed, hitTakenDamageLines } from "src/utils/effectFunctions";
 
 /**
  * The actor's Reaction Used (first, red), restrictions and extra actions, and what its effects do to its attacks:
  * Advantage/Disadvantage, bonuses, critical hits and damage bonuses, with the single targeted
- * creature's "attacks against it" when one is targeted. For players, whose attacks aren't
+ * creature's "attacks against it" and the damage it takes when the actor hits it (Hex) when one
+ * is targeted; that damage on creatures that aren't targeted is a reminder. For players, whose attacks aren't
  * rolled in the tracker, and NPCs alike. Melee/ranged isn't known here, so filters are named
  * and distance rules stay reminders; an NPC's rolls apply them for the actual attack.
  */
@@ -113,6 +114,15 @@ export default {
 			const entity = this.effective_entity(this.actor.key) || this.actor;
 			return damageBonusLines({ entity, definitionOf: this.effect_definition });
 		},
+		// Damage other creatures take when it hits them (Hex), targeted or not
+		hitTakenLines() {
+			return hitTakenDamageLines({
+				attackerKey: this.actor.key,
+				targetKey: this.targetKey,
+				entities: this.entities,
+				definitionOf: this.effect_definition,
+			});
+		},
 		chips() {
 			const chips = [];
 			// Always first
@@ -180,18 +190,29 @@ export default {
 				chips.push({ text: m.critRange ? `Crit ${m.critRange}–20` : "Hits crit", icon: "fas fa-crosshairs", lines: crit });
 			}
 
-			// Damage bonuses on hits
-			if (this.damageLines.length) {
+			// Damage bonuses on hits: its own, and what the target takes when it hits it (Hex)
+			const targetedHitTaken = this.hitTakenLines.filter((line) => line.targeted);
+			const damageLines = [
+				...this.damageLines.map((line) => ({ ...line, tooltip: `${line.name}: ${line.text}` })),
+				...targetedHitTaken.map((line) => ({ ...line, tooltip: `${line.name}: ${line.text}${against}` })),
+			];
+			if (damageLines.length) {
 				chips.push({
-					text: `Damage ${this.damageLines.map((line) => line.text.split(" (")[0]).join(" ")}`,
+					text: `Damage ${damageLines.map((line) => line.text.split(" (")[0]).join(" ")}`,
 					icon: "fas fa-sword",
-					lines: this.damageLines.map((line) => `${line.name}: ${line.text}`),
+					lines: damageLines.map((line) => line.tooltip),
 				});
 			}
 
-			// What the tracker can't check (sight, distance, filters), single-use modifiers and the
-			// effects it only reminds of
-			const reminders = [...new Set([...m.reminders, ...m.usedUp, ...effectReminders])];
+			// What the tracker can't check (sight, distance, filters), single-use modifiers, the
+			// effects it only reminds of, and creatures it hits harder that aren't targeted (Hex)
+			const hitTakenReminders = this.hitTakenLines
+				.filter((line) => !line.targeted)
+				.map((line) => {
+					const holder = (this.entities[line.holderKey]?.name || "").capitalizeEach();
+					return `${line.name} on ${holder}: ${line.text} when you hit it`;
+				});
+			const reminders = [...new Set([...m.reminders, ...m.usedUp, ...effectReminders, ...hitTakenReminders])];
 			if (reminders.length) chips.push(this.remindersChip(reminders));
 			return chips;
 		},

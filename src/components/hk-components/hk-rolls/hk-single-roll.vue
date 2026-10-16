@@ -227,7 +227,10 @@
 										</div>
 										<span class="type truncate" :class="rolled.damage_type">
 											<span class="type__icon-wrapper">
-												<i :class="damage_type_icons[rolled.damage_type]" aria-hidden="true" />
+												<i
+													:class="[damage_type_icons[rolled.damage_type], rolled.damage_type]"
+													aria-hidden="true"
+												/>
 												<i v-if="rolled.magical" class="fas fa-sparkles magical" aria-hidden="true">
 													<q-tooltip anchor="top middle" self="center middle">Magical</q-tooltip>
 												</i>
@@ -740,18 +743,19 @@ export default {
 					ranged_weapon: ["ranged_weapon", "ranged", "weapon"],
 					spell_attack: ["spell", "melee_spell", "ranged_spell"],
 				}[action.type];
-				const fire = (trigger, entityKey, sourceKey) => {
+				const fire = (trigger, entityKey, sourceKey, extra = {}) => {
 					if (!entityKey) return;
 					this.fire_trigger({
 						trigger,
 						entityKey,
-						event: { sourceKey, attackTypes, naturalRoll },
+						event: { sourceKey, attackTypes, naturalRoll, ...extra },
 					});
 				};
 
 				if (action.toHit && this.hitOrMiss[index] === "hit") {
 					fire("on_hit", attackerKey, targetKey);
-					fire("on_hit_taken", targetKey, attackerKey);
+					// Its hit-taken damage (Hex) was rolled with the attack: no prompt for it
+					fire("on_hit_taken", targetKey, attackerKey, { fromAttackRoll: true });
 					if (this.isCrit(action, index)) {
 						fire("on_crit", attackerKey, targetKey);
 						fire("on_crit_taken", targetKey, attackerKey);
@@ -1460,6 +1464,8 @@ export default {
 
 				&__icon-wrapper {
 					position: relative;
+					// Space between the damage type icon and its label
+					margin-right: 8px;
 
 					.magical {
 						position: absolute;

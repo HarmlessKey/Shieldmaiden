@@ -346,6 +346,10 @@ export default {
 					};
 
 					await this.setHP(amount, this.entities[key], this.current, config);
+					// Hit or not isn't known: the target's damage when the actor hits it (Hex) is a prompt
+					if (type === "damage") {
+						this.$store.dispatch("prompt_hit_taken_damage", { attackerKey: this.current?.key, targetKey: key });
+					}
 				}
 
 				// Acting out of turn uses the actor's reaction

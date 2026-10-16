@@ -9,6 +9,7 @@ import {
 	isSrdCondition,
 	resolveDefinition,
 	matchTriggers,
+	hitTakenDamage,
 	normalizeTrigger,
 	describeSubEffect,
 	durationActions,
@@ -2688,7 +2689,9 @@ const run_encounter_actions = {
 				const others = subs.filter(
 					({ sub_effect }) =>
 						!isConcentrationSave(sub_effect) &&
-						!breaks.some((b) => b.sub_effect === sub_effect)
+						!breaks.some((b) => b.sub_effect === sub_effect) &&
+						// Rolled with the attack (Hex): not prompted for again
+						!(trigger === "on_hit_taken" && event.fromAttackRoll && hitTakenDamage(sub_effect))
 				);
 				if (!others.length) continue;
 				prompts.push({
@@ -2788,6 +2791,48 @@ const run_encounter_actions = {
 			}
 		}
 		return matches;
+	},
+
+	/**
+	 * After manual damage, which doesn't say whether it was a hit: prompts for the target's
+	 * damage when this attacker hits it (Hex, Hunter's Mark), as an on_hit_taken prompt with
+	 * Roll. Fires no trigger and changes no duration ("ends when hit" effects stay).
+	 *
+	 * @param {string} attackerKey The creature that dealt the damage
+	 * @param {string} targetKey The creature that took it
+	 * @returns {object[]} The prompts queued
+	 */
+	prompt_hit_taken_damage({ state, commit, getters }, { attackerKey, targetKey }) {
+		if (!attackerKey || !targetKey || attackerKey === targetKey) return [];
+		const trigger = "on_hit_taken";
+		const matches = matchTriggers({
+			trigger,
+			entityKey: targetKey,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			event: { sourceKey: attackerKey },
+		});
+		const prompts = [];
+		for (const { holderKey, effectKey, instance, definition, matches: subs } of matches) {
+			const damage = subs.filter(({ sub_effect }) => hitTakenDamage(sub_effect));
+			if (!damage.length) continue;
+			prompts.push({
+				id: `${trigger}:manual:${holderKey}:${effectKey}:${Date.now()}`,
+				trigger,
+				holderKey,
+				effectKey,
+				holderName: state.entities[holderKey]?.name,
+				effectName: effectLabel(definition, instance).capitalize(),
+				lines: damage.map(({ sub_effect, unchecked }) =>
+					[describeSubEffect(sub_effect), "if it was a hit with an attack roll", ...unchecked].join(", ")
+				),
+				sub_effects: damage.map(({ sub_effect }) => sub_effect),
+				instance: { ...instance },
+				event: { sourceKey: attackerKey },
+			});
+		}
+		if (prompts.length) commit("ADD_EFFECT_PROMPTS", prompts);
+		return prompts;
 	},
 
 	/**

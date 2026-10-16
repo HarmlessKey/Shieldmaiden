@@ -165,7 +165,8 @@ until you reset them. A trait effect without a limit is never used up. Players' 
 - **Prompts**: when a trigger happens, like the start of a creature's turn, the tracker shows a
   prompt with buttons to roll damage or healing, grant temporary hit points, or roll a save.
 - **Rolls**: Advantage, Disadvantage, bonus dice, automatic failures and rerolls from effects
-  are used in the tracker's rolls and shown in the roll result ("Bless +1d4: 3").
+  are used in the tracker's rolls and shown in the roll result ("Bless +1d4: 3"). Damage the
+  target takes when its caster hits it, like Hex, is rolled with the caster's attack.
 - **Durations**: timed effects count down at the right turn, and end with their caster's
   Concentration, a successful save, or their own end conditions. You get a short notice when
   an effect ends.
@@ -381,6 +382,18 @@ healing need a trigger to be rolled.
 
 When a trigger fires, the tracker shows a prompt for the holder with buttons to roll the
 damage, grant temporary hit points or apply the effect.
+
+**Damage when hit** is the exception. Hex and Hunter's Mark deal it: damage on **Is hit by an
+attack** to the holder itself, caused by the caster or by anyone, at most filtered by attack
+type. It is rolled with the attack, as its own damage roll named after the effect ("Hex 1d6
+necrotic"), so there's no prompt for it afterwards. It's only added on a hit, and a critical
+hit doubles it like the attack's own dice. The caster's details bar shows it in the Damage
+chip when the cursed creature is targeted, and as a reminder ("Hex on Goblin: +1d6 necrotic
+when you hit it") when it isn't. Manual damage with **Attack** can't tell a hit from a failed
+save, so after it the tracker shows a prompt with **Roll** for that damage, "if it was a hit
+with an attack roll". Damage with a save, **How often**, or another filter (distance, natural
+roll, minimum amount), and damage to someone else (Fire Shield), keeps the prompt after the
+roll is applied.
 
 ### Target
 

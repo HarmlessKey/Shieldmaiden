@@ -896,6 +896,25 @@ it that way ("DM tracker only; the player live view keeps stored values"). Chang
   - Whether a value changed by effects shows its tooltip to players, or only the number.
   - Whether the live view (player or anonymous) needs a store module, or computes from props.
 
+### 3i. Hit-taken damage rolled with the attack (done — archived as effects-3i-hit-taken-damage, 2026-10-16)
+Found while testing Hex in 6c (2026-10-16): Hex and Hunter's Mark are held by the target as
+`damage` on `on_hit_taken` with `trigger_filter.by: "caster"`. That damage only came as a
+prompt after the roll was applied, not in the attack like Divine Favor (3c2), whose
+`damageBonuses` only read the attacker's effects. Decided: roll it with the attack, as a
+separate change.
+- `hitTakenDamage(sub_effect)` decides what's rolled with the attack: damage to the holder
+  itself, no save or frequency, a filter of only `by` (caster/any/counterpart) and
+  `attack_types`. `damageBonuses` reads the target's effects with it (`from: "target"`), and
+  `fire_trigger` leaves those sub-effects out of the attack's `on_hit_taken` prompt
+  (`fromAttackRoll`).
+- Added at apply (user requests):
+  - the details bar shows that damage in the Damage chip for the targeted creature, and as a
+    reminder for creatures that aren't targeted (`hitTakenDamageLines`)
+  - manual damage (Attack, also the legacy panel) prompts for it with Roll, "if it was a hit
+    with an attack roll" (`prompt_hit_taken_damage`), without firing `on_hit_taken`
+- Fixed along the way: no gap between the damage type icon and its label in the roll result,
+  and the icon now has its damage type's color (`hk-single-roll.vue`)
+
 ### Manual bonuses for later values
 Every value that effects can add a flat bonus to should also accept manual bonuses from the
 DM. That way the DM's bonuses and the effects' bonuses add up in one place, show in the
@@ -1203,25 +1222,6 @@ effects and conditions as if they were cast on it. They belong on the ability in
 - **Later:** player features (Evasion, Uncanny Dodge, Reliable Talent, Lucky on a player
   character) need a place on the character; not planned as a step yet.
 
-## 7. Update action rolls to include effects
-- Update `src/mixins/runEncounter.js` and `RollActions.vue` roll execution so that
-  rolling an action also evaluates/applies its effects - e.g. on-hit writes a Stunned
-  instance on the target, a failed save applies a spell effect with the action-defined
-  duration.
-- Decide UI for "this action also applies X - apply to target(s)?" confirmation step.
-- Builds on the active-effects storage and trigger system from step 2.
-- **Start from step 6's roll result** (added 2026-10-15): `hk-single-roll.vue` already lists each
-  rolled action's linked effects with Applies / Doesn't apply / "Hit or miss?" / "Fail or
-  save?" for the chosen result (`linkedEffects`). Step 6 shows them without saying how to apply
-  them; this step makes the effects that apply actually get applied to the roll's target from
-  there (with the roll's Apply, or per effect), so the DM doesn't have to go to the Effects
-  drawer:
-  - fixed choices on the link are used (`fixChoices`), open choices are asked once
-  - a link without a duration asks for one, as the drawer does
-  - the caster is the creature that rolled; `magical` on the link goes to the instance
-  - apply once per target, also for AOE rolls with several targets
-- Open from step 6: a save that only follows a hit (the ghoul's claws) is a second action that
-  rolls whether the attack hit or not; decide whether its effects wait for the hit.
 ## 6c. Spell actions carry effects (done — archived as effects-6c-spell-effects, 2026-10-16)
 Added 2026-10-16: linking effects to spells was assumed under "steps 6–7" but had no step of
 its own. Same model as step 6, for the user's custom spells.
@@ -1280,6 +1280,31 @@ its own. Same model as step 6, for the user's custom spells.
   plain assignment (`spell.actions`, an NPC's action categories, an NPC action's `rolls`),
   which weren't reactive, so effects and rolls added to a new action didn't show.
 
+## 7. Update action rolls to include effects
+- Update `src/mixins/runEncounter.js` and `RollActions.vue` roll execution so that
+  rolling an action also evaluates/applies its effects - e.g. on-hit writes a Stunned
+  instance on the target, a failed save applies a spell effect with the action-defined
+  duration.
+- Decide UI for "this action also applies X - apply to target(s)?" confirmation step.
+- Builds on the active-effects storage and trigger system from step 2.
+- Covers spell links too (step 6c): the slot a spell is cast with drives the link's scaling
+  and its duration by slot level (`scaledLink` with the spell's scaling, level, cast level and
+  the caster's level; a tier that drops Concentration, like Bestow Curse at 5th, starts no
+  Concentration), a
+  Concentration spell's effects link to the caster's Concentration, and a repeat save stored
+  without a DC gets the caster's spell save DC when applied.
+- **Start from step 6's roll result** (added 2026-10-15): `hk-single-roll.vue` already lists each
+  rolled action's linked effects with Applies / Doesn't apply / "Hit or miss?" / "Fail or
+  save?" for the chosen result (`linkedEffects`). Step 6 shows them without saying how to apply
+  them; this step makes the effects that apply actually get applied to the roll's target from
+  there (with the roll's Apply, or per effect), so the DM doesn't have to go to the Effects
+  drawer:
+  - fixed choices on the link are used (`fixChoices`), open choices are asked once
+  - a link without a duration asks for one, as the drawer does
+  - the caster is the creature that rolled; `magical` on the link goes to the instance
+  - apply once per target, also for AOE rolls with several targets
+- Open from step 6: a save that only follows a hit (the ghoul's claws) is a second action that
+  rolls whether the attack hit or not; decide whether its effects wait for the hit.
 - Open from step 6: captions and stat blocks (tracker action list, card, compendium) still show
   only the first action of an ability; show all of them.
 
@@ -1287,12 +1312,6 @@ its own. Same model as step 6, for the user's custom spells.
 Everything above runs on local data. This step moves or aligns SRD data with the HK API.
 The instance shape (`source: "srd"`, `source_key: <url>`) does not change, so no
 Firestore migration is needed.
-- Covers spell links too (step 6c): the slot a spell is cast with drives the link's scaling
-  and its duration by slot level (`scaledLink` with the spell's scaling, level, cast level and
-  the caster's level; a tier that drops Concentration, like Bestow Curse at 5th, starts no
-  Concentration), a
-  Concentration spell's effects link to the caster's Concentration, and a repeat save stored
-  without a DC gets the caster's spell save DC when applied.
 
 ### 8a. Conditions
 The HK API provides condition name, icon and rules text (`/conditions` and
@@ -1315,6 +1334,11 @@ Backfill `$defs/action_effects` onto SRD monsters in the API. 5.5e monsters (330
 with "Failure:/Success:" text, see 0a) are the best candidates for an automated backfill;
 2014 monsters stay manual/heuristic.
 
+### 8d. SRD spells
+Backfill spell links (step 6c: action effects with scaling) onto SRD spells in the API, per
+edition. The SRD effects catalogue ([effects-srd-catalogue.md](./effects-srd-catalogue.md))
+already says which spells link which effect.
+
 ## 9. Encounter reminders on triggers (separate feature, after the effects)
 Idea, 2026-10-06. Build it once the effects work above is done. Turn reminders into actual
 reminders: the DM sets them on an encounter trigger, not on an entity, and the tracker
@@ -1334,11 +1358,6 @@ Ideas to work out when it's proposed:
     any that duplicate a condition or effect.
   - The remaining entity reminders (`entity.reminders`, `src/mixins/reminders.js`,
     `Reminders.vue`, `TargetReminders.vue`) and the user-authored reminders
-### 8d. SRD spells
-Backfill spell links (step 6c: action effects with scaling) onto SRD spells in the API, per
-edition. The SRD effects catalogue ([effects-srd-catalogue.md](./effects-srd-catalogue.md))
-already says which spells link which effect.
-
     (`src/views/UserContent/Reminders/`) become this feature or move into it.
   - Existing `entity.reminders` in Firestore need a shim or a conversion script, as in 2i.
 
@@ -1427,7 +1446,7 @@ let an AI write them instead, and import the result.
 2a (done — archived as effects-2a-effects-drawer, 2026-09-29) -> 2b (done — archived as effects-2b-persist-effects, 2026-09-29) -> 2c (done — delivered by 1b, 2a and 2b, 2026-09-29) -> 2d (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2e (done — archived as effects-2e-resolve-definitions, 2026-09-29) -> 2f (done — archived as effects-2f-show-active-effects, 2026-09-29) (drawer incl. conditions, Firebase writes, duration rule, instance shape, init loop, display)
 2g (done — archived as effects-2g-trigger-dispatcher, 2026-09-30) -> 2h1 (done — archived as effects-2h1-duration-expiry, 2026-09-30) -> 2h2 (done — archived as effects-2h2-repeat-saves, 2026-09-30) (trigger system + duration ticking, builds on 2f)
 2i (done — archived as effects-2i-replace-legacy-conditions, 2026-09-30)
-3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) (3f moved to 9)
+3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) -> 3i (done — archived as effects-3i-hit-taken-damage, 2026-10-16; found while testing 6c) (3f moved to 9)
 4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
 6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 6c (done — archived as effects-6c-spell-effects, 2026-10-16) -> 7 (monster actions, trait effects on special abilities, spell actions, action rolls; additive on top of step 3)

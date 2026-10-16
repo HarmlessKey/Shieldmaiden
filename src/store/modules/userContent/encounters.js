@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { encounterServices } from "src/services/encounters";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Parse entity number values to ints
@@ -299,7 +300,7 @@ const encounter_actions = {
 			const used_slots = await services.getCampaignEncounterCount(uid, campaignId);
 
 			if (used_slots >= available_slots) {
-				throw "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				const search_encounter = convert_encounter(encounter);

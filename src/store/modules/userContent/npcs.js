@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { npcServices } from "src/services/npcs";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Converts a full npc to a search_npc
@@ -184,7 +185,7 @@ const npc_actions = {
 			const used_slots = await services.getNpcCount(uid);
 
 			if (used_slots >= available_slots) {
-				return "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				const search_npc = convert_npc(npc);

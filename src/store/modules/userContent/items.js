@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { itemServices } from "src/services/items";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Converts a full item to a search_item
@@ -121,7 +122,7 @@ const item_actions = {
 			const used_slots = await services.getItemCount(uid);
 
 			if (used_slots >= available_slots) {
-				throw "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				const search_item = convert_item(item);

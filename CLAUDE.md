@@ -102,5 +102,28 @@ We use **Git Flow**. Follow these rules strictly:
 ### Tags
 - Tag every merge to `main` with the version number (e.g. `2.39.2`)
 
+### Release Workflow
+
+When asked to "release", do the following end-to-end without stopping for confirmation unless something fails or is ambiguous:
+
+1. **Preflight**
+   - Working tree must be clean (`git status`); if not, stop and ask
+   - `git fetch origin` and make sure local `develop` and `main` are up to date with `origin` (fast-forward them; stop if they diverge)
+   - Check `openspec/changes/` for un-archived changes that are implemented and nudge to archive them first — don't release open OpenSpec changes
+2. **Decide the bump** by reviewing what's on `develop` since the last tag (`git log <last-tag>..develop --oneline`, `git describe --tags --abbrev=0 main`):
+   - Any new feature (feature branch/PR merge, archived OpenSpec change adding a capability) → **minor**
+   - Only bugfixes, chores, dependency bumps, docs → **patch**
+   - State the chosen bump and the reasoning in one line; if it's unclear, ask
+3. **Create the release branch** from `develop`, named after the new version: `git checkout -b release/<version> develop` (e.g. `release/2.44.0`)
+4. **Bump the version**: `npm version <patch|minor> --no-git-tag-version` (updates `package.json` and `package-lock.json` without creating a `v`-prefixed tag), then commit with message `Version bump`
+5. **Merge into main**: `git checkout main && git merge --no-ff release/<version>` (default message: `Merge branch 'release/<version>' into main`)
+6. **Tag main**: `git tag <version>` — plain version, **no `v` prefix** (e.g. `2.44.0`)
+7. **Merge into develop**: `git checkout develop && git merge --no-ff release/<version>`
+8. **Push branches**: `git push origin main develop` — do **not** push the tag
+9. **Clean up**: delete the local release branch (`git branch -d release/<version>`) and report the new version, the local tag, and a short summary of what went into it
+10. **Ask to push the tag**: end by asking whether to push the tag. **Never push a tag on your own initiative** — pushing a version tag triggers the production deploy (`.github/workflows/build_main.yml`)
+    - Only when explicitly told to: `git push origin <version>`
+    - The GitHub release is created automatically by the `release` job in `build_main.yml` after the production build succeeds — do not create it manually with `gh release create`. After pushing, you may check the run with `gh run list --workflow build_main.yml --limit 1`
+
 ### Commits & PRs
 - Do NOT add Claude as a co-author in commits or PR descriptions

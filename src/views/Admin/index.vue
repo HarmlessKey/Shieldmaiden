@@ -36,6 +36,11 @@ export default {
 					url: "vouchers",
 					icon: "fas fa-ticket",
 				},
+				feature_flags: {
+					name: "Feature Flags",
+					url: "feature-flags",
+					icon: "fas fa-toggle-on",
+				},
 				promotions: {
 					name: "Promotions",
 					url: "promotions",

@@ -3,7 +3,13 @@
 		<div class="card-body">
 			<div v-if="tier.price !== 'Free'">
 				<ImportUserContent ref="import" :json-input="json_input">
-					<button class="btn bg-accent" @click="ai_dialog = !ai_dialog">Generate</button>
+					<button
+						v-if="isFlagEnabled('monster_generator')"
+						class="btn bg-accent"
+						@click="ai_dialog = !ai_dialog"
+					>
+						Generate
+					</button>
 				</ImportUserContent>
 			</div>
 			<template v-else>
@@ -36,6 +42,7 @@ export default {
 	},
 	computed: {
 		...mapGetters(["tier", "ai"]),
+		...mapGetters("feature_flags", ["isFlagEnabled"]),
 	},
 	data() {
 		return {

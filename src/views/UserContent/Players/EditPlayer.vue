@@ -714,6 +714,7 @@ import GiveCharacterControl from "./GiveCharacterControl.vue";
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { general } from "src/mixins/general.js";
+import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 import Defenses from "src/components/npcs/Defenses";
 import CopyContent from "../../../components/CopyContent.vue";
 import { abilities, skills } from "src/utils/generalConstants";
@@ -898,9 +899,16 @@ export default {
 			if (this.player_count >= this.tier.benefits.players) {
 				this.$snotify.error("You have too many players.", "Error");
 			} else {
-				await this.add_player(this.player).then(() => {
+				try {
+					await this.add_player(this.player);
 					this.$router.replace("/content/players");
-				});
+				} catch (error) {
+					if (error instanceof NotEnoughSlotsError) {
+						this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, "No slots left");
+						return;
+					}
+					throw error;
+				}
 			}
 		},
 		async editPlayer() {

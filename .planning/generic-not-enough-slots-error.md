@@ -8,5 +8,11 @@
 - Replace every `throw "Not enough slots"` with `throw new NotEnoughSlotsError()`.
 - `spells.add_spell` throws the error instead of returning the string.
 
+## User-facing handling
+Callers used to show a generic "Couldn't save …" (or nothing at all, for campaigns and encounters). Each one now catches `NotEnoughSlotsError` and shows `NOT_ENOUGH_SLOTS_MESSAGE` (exported from `src/utils/errors.js`) with the title "No slots left":
+- `EditNpc`, `EditSpell`, `EditReminder`, `EditItem`, `EditPlayer`, `CharacterBuilder`: before the generic error
+- `Campaigns.vue`, `Encounters/index.vue`: new try/catch (previously unhandled); other errors are rethrown
+
 ## Out of scope
-No caller currently matches on the message, so no handler changes are needed.
+- `ImportUserContent` keeps its per-item `failed_imports` handling.
+- Cleaning up the existing DB records stored under the key "Not enough slots" (caused by the old `return` instead of `throw` in `npcs.js` since 2023-04-14 and always in `spells.js`).

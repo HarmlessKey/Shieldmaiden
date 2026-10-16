@@ -73,7 +73,7 @@ const ENUM_MAP = {
 	"#/$defs/effect_link/properties/duration_scaling/items/properties/duration/properties/type": ["effects", "duration_tier_types"],
 	"#/$defs/effect_link/properties/duration_scaling/items/properties/duration/properties/unit": ["effects", "time_units"],
 	"#/$defs/active_instance/properties/source": ["effects", "effect_sources"],
-	"#/$defs/active_instance/properties/concentration_for/properties/source": ["effects", "effect_sources"],
+	"#/$defs/active_instance/properties/concentration_for/properties/source": ["effects", "concentration_sources"],
 	"#/$defs/consume/properties/on": ["effects", "consume_on"],
 	"#/$defs/consume/properties/scope": ["effects", "consume_scopes"],
 	"#/$defs/sub_effect/properties/type": ["effects", "effect_types"],

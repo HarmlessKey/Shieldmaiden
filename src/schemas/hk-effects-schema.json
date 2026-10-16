@@ -485,13 +485,14 @@
 				"charges": { "type": "integer", "description": "Consumable counter: Mirror Image duplicates, Guardian of Faith damage pool, Resistance-style one-time uses." },
 				"save_successes": { "type": "integer" },
 				"save_failures": { "type": "integer" },
+				"magical": { "type": "boolean", "description": "Applied by magic (a magical link): its repeat saves are saves against magic." },
 				"concentration_id": { "type": "string" },
 				"concentration_for": {
 					"type": "object",
-					"description": "On a Concentration instance: the effect it is for, so applying the same effect shares it and a different one replaces it.",
+					"description": "On a Concentration instance: the effect it is for, or the spell (source spell, source_key the spell's key) for effects applied from a spell cast, so applying the same effect or spell shares it and a different one replaces it.",
 					"required": ["source", "source_key"],
 					"properties": {
-						"source": { "type": "string", "enum": ["srd", "custom", "api"] },
+						"source": { "type": "string", "enum": ["srd", "custom", "api", "spell"] },
 						"source_key": { "type": "string" },
 						"name": { "type": "string", "maxLength": 200 }
 					},

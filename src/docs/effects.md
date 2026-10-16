@@ -128,16 +128,39 @@ starts.
 
 ### From actions and spells
 
-When a creature uses an action or a spell with linked effects, the roll dialog shows which
-effects it applies and to whom. After the roll:
+When a creature rolls an action or a spell with linked effects, each target's roll card lists
+the effects under the action, with whether they apply to that target:
 
 - **On a hit** and **On a miss** effects follow the attack roll.
-- **On a failed save** and **On a successful save** effects follow each target's save.
+- **On a failed save** and **On a successful save** effects follow that target's save.
 - **Always** effects apply whatever the result.
+- A save that comes after an attack in the same ability waits for the hit: when the attack
+  missed, its effects show **Attack missed** (the ghoul's claws).
 
-You confirm the effects before they are applied, and you can leave targets out. Choices the
-link leaves open are asked once. The duration, save DC and caster come from the action: the
-creature that rolled is the caster.
+A spell that only applies effects, like Aid or Bless (no rolls, no attack or save, only
+**Always** effects), has an **Apply** button instead of the roll button in the creature's spell
+list. It uses the slot and applies the effects to every targeted creature right away, without a
+roll card. When one of its effects leaves a choice open or has no duration, the roll card opens
+instead to ask for it.
+
+An effect that applies has a checkbox, checked by default. Applying the roll (**Full**,
+**Half**, **Double** or **Missed**) also applies every checked effect to that target. A roll
+without damage or healing, like Hold Person, has a single **Apply** button. Uncheck an effect to
+leave it out. An area roll has a card per target, so each target only gets the effects that
+apply to it.
+
+The link fills in the rest: its fixed choices, level, duration and **Magical**, and the
+creature that rolled is the caster. When the link leaves a choice open, a select shows under the
+effect, and the roll can't be applied until you choose (or uncheck the effect). A link without a
+duration shows a duration field, starting at **Until removed**. A target immune to a condition
+doesn't get it; you get a notice.
+
+For a spell, the slot it's cast with sets the effect's value, level and duration (see
+[Spell effects](#spell-effects)), and a repeat save without a DC uses the caster's spell save
+DC. An effect with a Concentration duration makes the caster concentrate on **the spell**: its
+other effects and targets share that Concentration, and casting a different Concentration spell
+ends the old one and the effects linked to it. Effects of a magical link are magical, so their
+repeat saves count as saves against magic (Magic Resistance).
 
 ### Traits
 
@@ -670,8 +693,9 @@ DC, and Restrained for as long as the grapple lasts. That's one action.
 Use **Add action** (up to 5) when the ability has a second attack or save. A bite that deals
 piercing damage on a hit and then makes the target save against poison is two actions: a
 melee attack with its piercing roll, and a Constitution save with its poison roll and an **On a
-failed save** Poisoned effect. Rolling the ability rolls every action. Every action but the first
-can be removed.
+failed save** Poisoned effect. Rolling the ability rolls every action, and the tracker's action
+list and the creature's card show every action ("+4 to hit (1d6 + 2) · CON 12 (2d6)"). Every
+action but the first can be removed.
 
 If you change an action's type after linking effects, effects whose **When** no longer fits are
 kept and marked, so you can pick another moment.

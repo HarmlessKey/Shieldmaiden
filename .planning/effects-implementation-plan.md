@@ -1280,7 +1280,7 @@ its own. Same model as step 6, for the user's custom spells.
   plain assignment (`spell.actions`, an NPC's action categories, an NPC action's `rolls`),
   which weren't reactive, so effects and rolls added to a new action didn't show.
 
-## 7. Update action rolls to include effects
+## 7. Update action rolls to include effects (done — archived as effects-7-apply-linked-effects, 2026-10-16)
 - Update `src/mixins/runEncounter.js` and `RollActions.vue` roll execution so that
   rolling an action also evaluates/applies its effects - e.g. on-hit writes a Stunned
   instance on the target, a failed save applies a spell effect with the action-defined
@@ -1307,6 +1307,48 @@ its own. Same model as step 6, for the user's custom spells.
   rolls whether the attack hit or not; decide whether its effects wait for the hit.
 - Open from step 6: captions and stat blocks (tracker action list, card, compendium) still show
   only the first action of an ability; show all of them.
+
+*As built (`openspec/changes/archive/2026-10-16-effects-7-apply-linked-effects`; new spec
+`effects-apply-from-rolls`, and `effects-action-links` and `effects-instance-storage` updated):*
+- **Decided at proposal (user):**
+  - effects apply with the roll's Apply buttons, and each line has a checkbox (on by default)
+  - open choices and a missing duration are asked inline in the roll card
+  - a save after an attack waits for its hit ("Attack missed")
+  - showing every action in captions is part of this step
+- **Roll card** (`hk-single-roll.vue`):
+  - checkboxes on lines that apply, open choices and a duration field under checked lines
+  - Apply disabled, with a red note naming what's missing, while something is missing (a
+    disabled button can't show a tooltip)
+  - a single Apply button for rolls without damage or healing
+  - `linkOutcomeState` decides applies / Attack missed / pending
+- **Engine:**
+  - `linkApplication(link, { cast, definition })` gives what's applied: `scaledLink` for the
+    cast, the caster's DC on a repeat save without one, and the open choices
+  - spell rolls carry `cast` (`spellCast` in `mixins/runEncounter.js`)
+- **Store:**
+  - `apply_linked_effects` builds and applies the instances (caster, `magical`, Concentration
+    once per apply)
+  - the drawer's Concentration code moved to the store's `concentrate_on`, shared by both
+- **Concentration for the spell:** `concentration_for: { source: "spell", source_key, name }`.
+  Same spell shares, another is replaced without asking, unknown origin is linked, a tier
+  without Concentration starts none. Monster actions keep the drawer's per-effect rule.
+- **Magical:** instances store `magical`, and the repeat-save prompt rolls as a save against
+  magic. The detail view only rolls escapes, so it doesn't change.
+- **Apply-only spells (user request at apply):** `applyOnlySpell` covers spells without rolls,
+  attacks or saves whose links are all Always (Aid, Bless). They get an Apply button in
+  `RollSpells.vue`. `apply_spell` in the mixin uses the slot and applies to every target without
+  a roll card; it falls back to the roll card when a link has an open choice or no duration.
+  The spell config is shared with `doRollAction` (`spellConfig`).
+- **Captions:** `captionEntries` in `generalFunctions.js`; `RollActions.vue` and
+  `CardActions.vue` show every entry. The compendium shows descriptions only.
+- **Data:**
+  - schema: `active_instance.magical`, `concentration_for.source: "spell"`
+  - constants: `concentration_sources`
+  - rules: the three instance blocks
+- **Not done:**
+  - casting a Concentration spell without links
+  - the damage of a save after a missed attack (only its effects wait)
+  - player attacks (manual damage)
 
 ## 8. HK API updates (last)
 Everything above runs on local data. This step moves or aligns SRD data with the HK API.
@@ -1449,7 +1491,7 @@ let an AI write them instead, and import the result.
 3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) -> 3i (done — archived as effects-3i-hit-taken-damage, 2026-10-16; found while testing 6c) (3f moved to 9)
 4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
-6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 6c (done — archived as effects-6c-spell-effects, 2026-10-16) -> 7 (monster actions, trait effects on special abilities, spell actions, action rolls; additive on top of step 3)
+6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 6c (done — archived as effects-6c-spell-effects, 2026-10-16) -> 7 (done — archived as effects-7-apply-linked-effects, 2026-10-16; monster actions, trait effects on special abilities, spell actions, action rolls; additive on top of step 3)
 8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill, 8d SRD spell backfill)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
 10 (apply effects from the set initiative screen: shared header-actions component for the Targeted and Overview headers; can be done any time after 4)

@@ -253,7 +253,7 @@ export default {
 		this.setEffectSize();
 	},
 	methods: {
-		...mapActions(["apply_effect", "remove_effect"]),
+		...mapActions(["apply_effect", "remove_effect", "concentrate_on"]),
 		...mapActions("effects", ["get_effects", "get_effect"]),
 		setEffectSize() {
 			const basicEntity = this.$refs.basicEntity?.[0];
@@ -282,39 +282,19 @@ export default {
 			return key ? { key, for: effects[key].concentration_for } : undefined;
 		},
 		/**
-		 * Carries out a Concentration plan for the caster (concentrationPlan): ends a
-		 * Concentration it replaces, and applies a new one with the effect's "up to" time
+		 * Carries out a Concentration plan for the caster (concentrationPlan) with the store's
+		 * concentrate_on, shared with effects applied from rolls
 		 *
 		 * @returns {string|undefined} Key of the Concentration to link to, undefined when it failed
 		 */
-		async concentrateOn({ entry, plan, casterKey, duration = {} }) {
-			if (["share", "link"].includes(plan.action)) return plan.key;
-
-			if (plan.action === "replace") {
-				await this.remove_effect({
-					key: casterKey,
-					effectKey: plan.key,
-					reason: `started concentrating on ${entry.name}`,
-				});
-			}
-			const definition = this.srd.effects.find(({ url }) => url === "concentration") || {
-				name: "Concentration",
-			};
-			const upTo = duration.value
-				? { type: "time", value: duration.value, unit: duration.unit || "round" }
-				: { type: "cancelled" };
-			const instance = buildEffectInstance({
-				definition,
-				source: "srd",
-				sourceKey: "concentration",
-				application: { duration: upTo },
-				round: this.round,
+		concentrateOn({ entry, plan, casterKey, duration = {} }) {
+			return this.concentrate_on({
 				casterKey,
-				casterName: this.entities[casterKey]?.name,
-				turnKey: this.turnEntityKey,
+				plan,
 				concentrationFor: { source: entry.source, source_key: entry.sourceKey, name: entry.name },
+				duration,
+				turnKey: this.turnEntityKey,
 			});
-			return this.apply_effect({ key: casterKey, instance, definition });
 		},
 		/**
 		 * Whether all, some or none of the targets have the effect

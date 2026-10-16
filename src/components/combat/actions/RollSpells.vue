@@ -74,8 +74,21 @@
 							</q-item-label>
 						</q-item-section>
 						<q-item-section avatar v-if="type === 'caster'">
+							<!-- Only applies effects (Aid): applied without a roll -->
+							<q-btn
+								v-if="applyOnlySpell(spell)"
+								label="Apply"
+								color="yellow"
+								size="sm"
+								no-caps
+								dense
+								:disable="!checkAvailable(level, spell.key)"
+								@click.stop="startApply(level, spell, type)"
+							>
+								<q-tooltip anchor="top middle" self="center middle">Apply {{ spell.name }}</q-tooltip>
+							</q-btn>
 							<hk-roll-action
-								v-if="spell.actions && spell.actions.length"
+								v-else-if="spell.actions && spell.actions.length"
 								:ref="`${level}-${spell.key}`"
 								:action="spell"
 								:tooltip="`Roll ${spell.name}`"
@@ -128,8 +141,20 @@
 									</q-tooltip>
 								</span>
 							</span>
+							<q-btn
+								v-if="applyOnlySpell(spell)"
+								label="Apply"
+								color="yellow"
+								size="sm"
+								no-caps
+								dense
+								:disable="!checkAvailable(level, spell.key)"
+								@click.stop="startApply(spell.key, spell, type)"
+							>
+								<q-tooltip anchor="top middle" self="center middle">Apply {{ spell.name }}</q-tooltip>
+							</q-btn>
 							<hk-roll-action
-								v-if="spell.actions && spell.actions.length"
+								v-else-if="spell.actions && spell.actions.length"
 								:ref="`${level}-${spell.key}`"
 								:action="spell"
 								:tooltip="`Roll ${spell.name}`"
@@ -166,6 +191,7 @@ import { runEncounter } from "src/mixins/runEncounter.js";
 import Spell from "src/components/compendium/Spell";
 import Projectiles from "./Projectiles";
 import { default_edition } from "src/utils/generalConstants";
+import { applyOnlySpell } from "src/utils/effectFunctions";
 
 export default {
 	name: "RollSpell",
@@ -306,6 +332,28 @@ export default {
 					timeout: 1000,
 				});
 			}
+		},
+		applyOnlySpell,
+		/**
+		 * Applies a spell that only applies effects to the targets (effects 7)
+		 *
+		 * @param {number|string} level Slot level (caster) or spell key (innate), for limited uses
+		 */
+		startApply(level, spell, category) {
+			if (!this.targeted?.length) {
+				this.$q.notify({ message: "Select a target first.", color: "warning", position: "top", timeout: 1000 });
+				return;
+			}
+			const action = {
+				e: { e: {} },
+				action_index: level,
+				action: spell,
+				category,
+				entity: this.actor,
+				targets: [...this.targeted],
+			};
+			this.apply_spell(action);
+			this.$emit("roll", action);
 		},
 		roll(assigned_projectiles) {
 			const action = {

@@ -568,6 +568,12 @@ export const effect_sources = keyed({
 	api: { label: "API" },
 });
 
+// What a Concentration is for: an effect, or a spell whose cast applied effects (effects step 7)
+export const concentration_sources = keyed({
+	...effect_sources,
+	spell: { label: "Spell" },
+});
+
 export const triggers = keyed({
 	on_apply: { label: "When applied" },
 	on_expire: { label: "When it ends" },

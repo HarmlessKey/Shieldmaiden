@@ -45,33 +45,39 @@
 								{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : `` }}
 							</span>
 						</q-item-label>
-						<q-item-label v-if="action.action_list?.[0]?.type !== 'other'" caption>
-							<!-- Rolls -->
-							<span v-if="!isNil(action.action_list?.[0]?.attack_bonus)">
-								{{ toHit(action) }} to hit
-							</span>
-							<span v-if="action.action_list?.[0]?.rolls">
+						<q-item-label v-if="captionEntries(action).length" caption>
+							<!-- Every action of the ability: its to-hit or save, and its rolls -->
+							<span
+								v-for="(entry, entry_index) in captionEntries(action)"
+								:key="`entry-${action.action_index}-${entry_index}`"
+							>
+								<span v-if="entry_index > 0" class="neutral-2"> · </span>
+								<span v-if="!isNil(entry.attack_bonus)">{{ toHit(entry) }} to hit</span>
+								<span v-if="entry.type === 'save' && entry.save_dc">
+									<span v-if="entry.save_ability">
+										{{ entry.save_ability.substring(0, 3).toUpperCase() }}
+									</span>
+									{{ entry.save_dc }}
+								</span>
 								<span
-									v-for="(roll, roll_index) in action.action_list?.[0]?.rolls"
-									:key="`roll-${action.action_index}-${roll_index}`"
+									v-for="(roll, roll_index) in entry.rolls || []"
+									:key="`roll-${action.action_index}-${entry_index}-${roll_index}`"
 								>
 									(<i
 										aria-hidden="true"
 										:class="[
-											action.action_list[0]?.type === 'healing'
-												? 'fas fa-heart green'
-												: damage_type_icons[roll.damage_type],
+											entry.type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
 											roll.damage_type,
 										]"
 									/>
 									{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``
 									}}{{ roll.fixed_val && roll.dice_count ? fixed(roll) : roll.fixed_val }})
-									{{ showPlus(roll_index, action.action_list?.[0]?.rolls?.length) }}
+									{{ showPlus(roll_index, entry.rolls.length) }}
 									<q-tooltip anchor="top middle" self="center middle">
 										{{
-											action.action_list[0]?.type === "healing"
+											entry.type === "healing"
 												? "Healing"
-												: `${roll.damage_type.capitalize()} damage`
+												: `${(roll.damage_type || "").capitalize()} damage`
 										}}
 									</q-tooltip>
 								</span>
@@ -85,14 +91,6 @@
 							<span v-if="action.range">
 								<span class="blue">|</span> {{ action.range }}<small class="neutral-2">ft.</small>
 								<q-tooltip anchor="top middle" self="center middle"> Range </q-tooltip>
-							</span>
-							<!-- Saving trow -->
-							<span v-if="action.action_list[0]?.type === 'save' && action.action_list[0]?.save_dc">
-								<span class="blue">|</span>
-								<span v-if="action.action_list[0]?.save_ability">
-									{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
-								</span>
-								{{ action.action_list[0].save_dc }}
 							</span>
 							<!-- AOE -->
 							<span v-if="action.aoe_type">
@@ -184,7 +182,7 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import { isNil } from "lodash";
-import { hasRolls } from "src/utils/generalFunctions";
+import { hasRolls, captionEntries } from "src/utils/generalFunctions";
 import { traitEffectsLabel } from "src/utils/effectFunctions";
 import Projectiles from "./Projectiles";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
@@ -248,10 +246,9 @@ export default {
 			const button = this.$refs[i]?.[0]?.$el;
 			button?.focus();
 		},
-		toHit(action) {
-			return action.action_list?.[0].attack_bonus < 0
-				? `-${Math.abs(action.action_list[0].attack_bonus)}`
-				: `+${action.action_list[0].attack_bonus}`;
+		captionEntries,
+		toHit(entry) {
+			return entry.attack_bonus < 0 ? `-${Math.abs(entry.attack_bonus)}` : `+${entry.attack_bonus}`;
 		},
 		fixed(roll) {
 			return roll.fixed_val < 0 ? `- ${Math.abs(roll.fixed_val)}` : `+ ${roll.fixed_val}`;

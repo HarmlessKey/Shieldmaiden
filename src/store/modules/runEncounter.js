@@ -40,6 +40,7 @@ import {
 	concentrationSaveDc,
 	tempHpToLose,
 	buildEffectInstance,
+	concentrationPlan,
 	reactionUsedApplies,
 	hasReactionUsed,
 } from "src/utils/effectFunctions";
@@ -1656,6 +1657,113 @@ const run_encounter_actions = {
 			turnKey,
 		});
 		return dispatch("apply_effect", { key: actorKey, instance, definition });
+	},
+
+	/**
+	 * Carries out a Concentration plan for a caster (concentrationPlan): ends a Concentration it
+	 * replaces, and applies a new one up to the duration's time. Used by the Effects drawer and
+	 * by effects applied from a roll.
+	 *
+	 * @param {string} casterKey
+	 * @param {object} plan { action: start | share | link | replace, key? }
+	 * @param {object} concentrationFor { source, source_key, name } of the effect or spell
+	 * @param {object} duration The applied duration, for the "up to" time
+	 * @param {string} turnKey Entity that has the turn
+	 * @returns {string|undefined} Key of the Concentration to link to, undefined when it failed
+	 */
+	async concentrate_on({ state, dispatch }, { casterKey, plan, concentrationFor, duration = {}, turnKey }) {
+		if (["share", "link"].includes(plan.action)) return plan.key;
+
+		if (plan.action === "replace") {
+			await dispatch("remove_effect", {
+				key: casterKey,
+				effectKey: plan.key,
+				reason: `started concentrating on ${concentrationFor.name}`,
+			});
+		}
+		const definition = findSrdDefinition(state.edition, "concentration") || { name: "Concentration" };
+		const upTo = duration.value
+			? { type: "time", value: duration.value, unit: duration.unit || "round" }
+			: { type: "cancelled" };
+		const instance = buildEffectInstance({
+			definition,
+			source: "srd",
+			sourceKey: "concentration",
+			application: { duration: upTo },
+			round: state.encounter?.round,
+			casterKey,
+			casterName: state.entities[casterKey]?.name,
+			turnKey,
+			concentrationFor,
+		});
+		return dispatch("apply_effect", { key: casterKey, instance, definition });
+	},
+
+	/**
+	 * Applies the linked effects of a roll to its target (effects 7), as the Effects drawer
+	 * applies effects: the rolling creature is the caster, `magical` is kept, and a Concentration
+	 * duration starts, shares or replaces the caster's Concentration, once per call. For a spell
+	 * cast the Concentration is for the spell, so all its effects share it.
+	 *
+	 * @param {string} targetKey The roll's target
+	 * @param {string} casterKey The creature that rolled
+	 * @param {object[]} items [{ source, sourceKey, name, definition, application, magical }] (linkApplication)
+	 * @param {object} cast The spell cast, for a spell roll
+	 * @returns {string[]} Keys of the applied instances
+	 */
+	async apply_linked_effects({ state, dispatch }, { targetKey, casterKey, items = [], cast }) {
+		if (!state.entities[targetKey]) return [];
+		const turnKey = state.encounter?.round ? state.turn_entity : undefined;
+		const applied = [];
+		// The Concentration the Concentration effects link to; null when it couldn't be saved
+		let concentrationId;
+
+		for (const item of items) {
+			const application = { ...(item.application || {}) };
+			if (casterKey && application.duration?.type === "concentration") {
+				if (concentrationId === undefined) {
+					const effects = state.entities[casterKey]?.effects || {};
+					const current = Object.keys(effects).find(
+						(key) => effects[key].source === "srd" && effects[key].source_key === "concentration"
+					);
+					const concentrationFor = cast?.spell?.key
+						? { source: "spell", source_key: cast.spell.key, name: cast.spell.name }
+						: { source: item.source, source_key: item.sourceKey, name: item.name };
+					const plan = concentrationPlan({
+						casterKey,
+						concentration: current ? { key: current, for: effects[current].concentration_for } : undefined,
+						effect: concentrationFor,
+						unknownChoice: "link",
+					});
+					concentrationId =
+						(await dispatch("concentrate_on", {
+							casterKey,
+							plan,
+							concentrationFor,
+							duration: application.duration,
+							turnKey,
+						})) || null;
+				}
+				if (!concentrationId) continue;
+				application.concentration_id = concentrationId;
+			}
+
+			const definition = item.definition || { name: item.name };
+			const instance = buildEffectInstance({
+				definition: { ...definition, name: item.name || definition.name },
+				source: item.source,
+				sourceKey: item.sourceKey,
+				application,
+				round: state.encounter?.round,
+				casterKey,
+				casterName: state.entities[casterKey]?.name,
+				turnKey,
+			});
+			if (item.magical) instance.magical = true;
+			const key = await dispatch("apply_effect", { key: targetKey, instance, definition });
+			if (key) applied.push(key);
+		}
+		return applied;
 	},
 
 	/**

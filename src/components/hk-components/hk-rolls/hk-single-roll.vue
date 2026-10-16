@@ -391,23 +391,74 @@
 						</q-expansion-item>
 					</q-list>
 
-					<!-- EFFECTS LINKED TO THE ACTION: whether they apply with the chosen result -->
+					<!-- EFFECTS LINKED TO THE ACTION: whether they apply with the chosen result, and
+					applied with the roll when checked (effects 7) -->
 					<div v-if="linkedEffects(action, action_index).length" class="linked-effects">
-						<div
-							v-for="(linked, linked_index) in linkedEffects(action, action_index)"
-							:key="`linked-${linked_index}`"
-							class="linked-effects__effect"
-							:class="{ 'neutral-3': linked.applies === false }"
-						>
-							<span class="truncate">
-								<i aria-hidden="true" class="fas fa-sparkles mr-1" />
-								<b>{{ linked.name }}</b>
-								<span class="neutral-2"> · {{ linked.when }}</span>
-							</span>
-							<span v-if="linked.applies === true" class="green">Applies</span>
-							<span v-else-if="linked.applies === false">Doesn't apply</span>
-							<span v-else class="neutral-2">{{ linked.pending }}</span>
-						</div>					</div>
+						<div v-for="linked in linkedEffects(action, action_index)" :key="`linked-${linked.key}`">
+							<div class="linked-effects__effect" :class="{ 'neutral-3': linked.applies === false }">
+								<span class="truncate">
+									<q-checkbox
+										v-if="canApplyLinks && linked.applies === true"
+										:value="linkForm(linked.key).checked"
+										:dark="$store.getters.theme === 'dark'"
+										size="xs"
+										class="mr-1"
+										@input="setLinkForm(linked.key, 'checked', $event)"
+									>
+										<q-tooltip anchor="top middle" self="center middle">
+											Applied with the roll when checked
+										</q-tooltip>
+									</q-checkbox>
+									<i v-else aria-hidden="true" class="fas fa-sparkles mr-1" />
+									<b>{{ linked.name }}</b>
+									<span class="neutral-2"> · {{ linked.when }}</span>
+								</span>
+								<span v-if="linked.applies === true" class="green">Applies</span>
+								<span v-else-if="linked.applies === false">{{ linked.label || "Doesn't apply" }}</span>
+								<span v-else class="neutral-2">{{ linked.pending }}</span>
+							</div>
+
+							<!-- What the link leaves open: its choices and duration -->
+							<div
+								v-if="canApplyLinks && linked.applies === true && linkForm(linked.key).checked"
+								class="linked-effects__fields"
+							>
+								<template v-for="choice in openChoices(linked)">
+									<hk-select
+										v-if="choiceField(choice).options"
+										:key="`${linked.key}-${choice.kind}`"
+										:value="linkForm(linked.key).choices[choice.kind]"
+										:options="choiceField(choice).options"
+										:label="`${choiceField(choice).label} *`"
+										emit-value
+										map-options
+										class="mb-1"
+										@input="setLinkChoice(linked.key, choice.kind, $event)"
+									/>
+									<hk-input
+										v-else
+										:key="`${linked.key}-${choice.kind}`"
+										:value="linkForm(linked.key).choices[choice.kind]"
+										:label="`${choiceField(choice).label} *`"
+										:type="choice.kind === 'value' ? 'number' : 'text'"
+										class="mb-1"
+										@input="setLinkChoice(linked.key, choice.kind, $event)"
+									/>
+								</template>
+								<ApplicationDuration
+									v-if="!linked.link.duration"
+									:conditions="srdConditions"
+									dense
+									@input="setLinkForm(linked.key, 'duration', $event)"
+									@valid="setLinkForm(linked.key, 'durationValid', $event)"
+								/>
+								<div v-if="linkMissing(linked)" class="red">
+									<i aria-hidden="true" class="fas fa-exclamation-triangle mr-1" />
+									{{ linkMissing(linked) }}, or uncheck it to apply the roll
+								</div>
+							</div>
+						</div>
+					</div>
 
 					<!-- TOTAL OF THE ACTION -->
 					<div v-if="roll.actions.length > 1 && action.rolls.length" class="total-action-damage">
@@ -528,6 +579,18 @@
 						class="full-width neutral-1"
 						label="Missed"
 						no-caps
+						:disable="linksBlocked"
+						@click="apply(1)"
+					/>
+				</template>
+				<!-- Nothing to roll for damage or healing (Hold Person): apply its effects -->
+				<template v-else-if="!hasValueRolls">
+					<q-btn
+						color="neutral-9"
+						class="full-width neutral-1"
+						label="Apply"
+						no-caps
+						:disable="linksBlocked"
 						@click="apply(1)"
 					/>
 				</template>
@@ -537,6 +600,7 @@
 						class="full-width neutral-1"
 						label="Full"
 						no-caps
+						:disable="linksBlocked"
 						@click="apply(1)"
 					/>
 					<q-btn
@@ -544,6 +608,7 @@
 						class="full-width neutral-1"
 						label="Half"
 						no-caps
+						:disable="linksBlocked"
 						@click="apply(0.5)"
 					/>
 					<q-btn
@@ -551,6 +616,7 @@
 						class="full-width neutral-1"
 						label="Double"
 						no-caps
+						:disable="linksBlocked"
 						@click="apply(2)"
 					/>
 				</template>
@@ -578,9 +644,20 @@ import { setHP } from "src/mixins/HpManipulations";
 import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
+import ApplicationDuration from "src/components/hk-components/hk-effects-form/ApplicationDuration.vue";
+import { choiceField } from "src/components/hk-components/hk-effects-form/fieldControls";
 import { calc_mod } from "src/utils/generalFunctions";
 import { displayStats } from "src/utils/entityFunctions";
-import { rollPlan, applyDamageModifiers, damageTypeMatches } from "src/utils/effectFunctions";
+import {
+	rollPlan,
+	applyDamageModifiers,
+	damageTypeMatches,
+	linkOutcomeState,
+	linkApplication,
+	findSrdDefinition,
+	getRequiredChoices,
+	getSrdDefinitions,
+} from "src/utils/effectFunctions";
 import { action_outcomes, outcomesFor } from "src/utils/effectsConstants";
 
 export default {
@@ -588,6 +665,7 @@ export default {
 	components: {
 		TutorialPopover,
 		BasicEntity,
+		ApplicationDuration,
 	},
 	props: {
 		value: {
@@ -630,6 +708,10 @@ export default {
 			rolledSaves: {},
 			saveNotes: {},
 			hitOrMiss: {},
+			// Per linked effect (key "<action>:<outcome>:<link>"): { checked, choices, duration, durationValid }
+			linkForms: {},
+			// Custom effect definitions of the links, by key; false when not found
+			customLinkDefinitions: {},
 			// Switched-on damage modifier toggles of the target: { [id]: rolled amount | true }
 			damageToggles: {},
 			animateRoll: undefined,
@@ -720,9 +802,51 @@ export default {
 				damageTypes.some((damageType) => !damageType || damageTypeMatches(toggle, damageType))
 			);
 		},
+		/**
+		 * Linked effects can be applied: the roll has a target in the encounter (effects 7)
+		 */
+		canApplyLinks() {
+			return !!this.roll.target?.key && !!this.$store.getters.entities?.[this.roll.target.key];
+		},
+		// The roll deals damage or healing; without (Hold Person) the card has one Apply button
+		hasValueRolls() {
+			return this.roll.actions.some((action) => action.rolls?.length);
+		},
+		srdConditions() {
+			return getSrdDefinitions(this.$store.getters.edition).conditions || [];
+		},
+		/**
+		 * The checked linked effects that apply, with the choices and duration they leave open
+		 * and the card's answers merged in: what applying the roll applies
+		 */
+		linksToApply() {
+			if (!this.canApplyLinks) return [];
+			return this.roll.actions.flatMap((action, action_index) =>
+				this.linkedEffects(action, action_index)
+					.filter((linked) => linked.applies === true && this.linkForm(linked.key).checked)
+					.map((linked) => {
+						const form = this.linkForm(linked.key);
+						const definition = this.linkDefinition(linked.link);
+						const item = linkApplication(linked.link, { cast: this.roll.cast, definition });
+						const choices = { ...item.application.choices };
+						for (const kind of item.openChoices) {
+							const answer = form.choices[kind];
+							if (answer !== undefined && answer !== null && answer !== "") choices[kind] = String(answer);
+						}
+						const application = { ...item.application, choices };
+						if (!linked.link.duration) application.duration = form.duration || { type: "cancelled" };
+						return { linked, item: { ...item, application, definition: definition || undefined } };
+					})
+			);
+		},
+		// A checked linked effect misses a choice or has an invalid duration: Apply waits
+		linksBlocked() {
+			return this.linksToApply.some(({ linked }) => !!this.linkMissing(linked));
+		},
 	},
 	mounted() {
 		this.checkHitOrMiss();
+		this.loadLinkDefinitions();
 	},
 	methods: {
 		...mapActions(["removeActionRoll", "fire_trigger", "set_bonus"]),
@@ -803,33 +927,119 @@ export default {
 		},
 		/**
 		 * The effects linked to a rolled action that fit its type, and whether each applies with
-		 * the chosen hit or miss and failed or successful save: true, false, or undefined while
-		 * the result isn't chosen (with a hint in `pending`)
+		 * the chosen hit or miss and failed or successful save: true, false (with `label`, e.g.
+		 * "Attack missed"), or undefined while the result isn't chosen (with a hint in `pending`).
+		 * A save after an attack in the same roll waits for the hit.
 		 *
-		 * @returns {{ name: string, when: string, applies: boolean|undefined, pending?: string }[]}
+		 * @returns {{ key: string, link: object, outcome: string, name: string, when: string, applies: boolean|undefined, label?: string, pending?: string }[]}
 		 */
+		/**
+		 * The card's answers for a linked effect; checked by default
+		 */
+		linkForm(key) {
+			return this.linkForms[key] || { checked: true, choices: {}, duration: undefined, durationValid: true };
+		},
+		setLinkForm(key, field, value) {
+			this.$set(this.linkForms, key, { ...this.linkForm(key), [field]: value });
+		},
+		setLinkChoice(key, kind, value) {
+			const form = this.linkForm(key);
+			this.$set(this.linkForms, key, { ...form, choices: { ...form.choices, [kind]: value } });
+		},
+		choiceField(choice) {
+			return choiceField(choice, { conditions: this.srdConditions });
+		},
+		/**
+		 * The definition of a linked effect: SRD in the campaign's edition (or the other), or the
+		 * user's custom effect once loaded
+		 */
+		linkDefinition(link) {
+			const effect = link?.effect || {};
+			if (effect.source === "srd") {
+				const edition = this.$store.getters.edition || "5.5e";
+				return (
+					findSrdDefinition(edition, effect.source_key) ||
+					findSrdDefinition(edition === "5e" ? "5.5e" : "5e", effect.source_key)
+				);
+			}
+			return this.customLinkDefinitions[effect.source_key] || undefined;
+		},
+		/**
+		 * Loads the custom effects the rolled actions link to, for their choices
+		 */
+		async loadLinkDefinitions() {
+			const uid = this.$store.getters.user?.uid;
+			if (!uid) return;
+			const keys = new Set();
+			for (const action of this.roll.actions) {
+				for (const links of Object.values(action.effects || {})) {
+					for (const link of Array.isArray(links) ? links : []) {
+						if (link.effect?.source === "custom") keys.add(link.effect.source_key);
+					}
+				}
+			}
+			for (const id of keys) {
+				try {
+					const definition = await this.$store.dispatch("effects/get_effect", { uid, id });
+					this.$set(this.customLinkDefinitions, id, definition || false);
+				} catch (error) {
+					this.$set(this.customLinkDefinitions, id, false);
+				}
+			}
+		},
+		/**
+		 * The choices a linked effect's definition asks for that its link leaves open
+		 */
+		openChoices(linked) {
+			const definition = this.linkDefinition(linked.link);
+			if (!definition) return [];
+			const fixed = linked.link.choices || {};
+			return getRequiredChoices(definition).filter(({ kind }) => fixed[kind] === undefined);
+		},
+		/**
+		 * What a checked linked effect still needs before the roll can be applied, in words
+		 */
+		linkMissing(linked) {
+			const form = this.linkForm(linked.key);
+			const missing = this.openChoices(linked).find(({ kind }) => {
+				const answer = form.choices[kind];
+				return answer === undefined || answer === null || answer === "";
+			});
+			if (missing) return `Choose a ${this.choiceField(missing).label.toLowerCase()} for ${linked.name}`;
+			if (!linked.link.duration && form.durationValid === false) return `Complete the duration of ${linked.name}`;
+			return undefined;
+		},
+		/**
+		 * Applies the checked linked effects that apply to the roll's target, with the creature
+		 * that rolled as the caster (effects 7)
+		 */
+		async applyLinkedEffects() {
+			const items = this.linksToApply.map(({ item }) => item);
+			if (!items.length) return;
+			await this.$store.dispatch("apply_linked_effects", {
+				targetKey: this.roll.target.key,
+				casterKey: this.roll.current?.key,
+				items,
+				cast: this.roll.cast,
+			});
+		},
 		linkedEffects(action, action_index) {
 			const effects = action.effects || {};
-			const hitOrMiss = this.hitOrMiss[action_index];
-			const save = this.savingThrowResult[action_index];
-			// The result an outcome needs, the chosen result it's compared with, and the hint without one
-			const outcomes = {
-				on_hit: { needs: "hit", chosen: hitOrMiss, pending: "Hit or miss?" },
-				on_miss: { needs: "miss", chosen: hitOrMiss, pending: "Hit or miss?" },
-				on_fail: { needs: "fail", chosen: save, pending: "Fail or save?" },
-				on_success: { needs: "save", chosen: save, pending: "Fail or save?" },
-				always: { needs: "always", chosen: "always" },
-			};
 			return outcomesFor(action.type).flatMap((outcome) =>
-				(Array.isArray(effects[outcome]) ? effects[outcome] : []).map((link) => {
-					const { needs, chosen, pending } = outcomes[outcome];
-					return {
-						name: link.effect?.name || link.effect?.source_key || "Effect",
-						when: action_outcomes[outcome].label,
-						applies: chosen ? chosen === needs : undefined,
-						pending,
-					};
-				})
+				(Array.isArray(effects[outcome]) ? effects[outcome] : []).map((link, link_index) => ({
+					key: `${action_index}:${outcome}:${link_index}`,
+					link,
+					outcome,
+					name: link.effect?.name || link.effect?.source_key || "Effect",
+					when: action_outcomes[outcome].label,
+					...linkOutcomeState({
+						actions: this.roll.actions,
+						index: action_index,
+						outcome,
+						hitOrMiss: this.hitOrMiss,
+						saves: this.savingThrowResult,
+					}),
+				}))
 			);
 		},
 		/**
@@ -1052,6 +1262,9 @@ export default {
 
 			// Effect triggers for hits, crits and saves
 			this.fireRollTriggers();
+
+			// The checked linked effects that apply (effects 7)
+			await this.applyLinkedEffects();
 
 			// Apply the special events
 			for (const special of specials) {
@@ -1433,7 +1646,12 @@ export default {
 				> span:last-child {
 					flex-shrink: 0;
 				}
-			}		}
+			}
+			// What a checked effect leaves open: its choices and duration
+			&__fields {
+				margin: 5px 0 10px 24px;
+			}
+		}
 		// The target's damage modifiers: toggles and notes
 		.damage-modifiers {
 			display: flex;

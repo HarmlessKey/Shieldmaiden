@@ -292,8 +292,9 @@ for spells with several actions. An entry without rolls, or of type other, SHALL
 and SHALL NOT make the roll fail. An ability SHALL get a roll button when any of its entries is
 not of type other and has rolls, not only the first.
 
-Captions and stat blocks (the tracker's action list and card, the compendium) SHALL keep
-showing the first entry only in this step.
+The tracker's action list and the entity card SHALL show every entry of an ability in its
+caption: each entry's to-hit or save ability and DC and its rolls, in order, separated by
+" · ". Entries of type other without rolls are left out.
 
 #### Scenario: Bite with a poison save
 - **WHEN** the DM rolls the bite with an attack entry and a Constitution save entry against a target
@@ -307,24 +308,9 @@ showing the first entry only in this step.
 - **WHEN** an ability's first entry is of type other and its second entry is an attack with rolls
 - **THEN** the ability has a roll button
 
-### Requirement: The roll result shows linked effects, without applying them
-
-Rolling an action in the tracker SHALL NOT apply its linked effects. The roll result SHALL
-list, under each rolled action, the effects linked to it on an outcome that fits its type, one
-line each: the effect name, its outcome ("On a hit"…), and whether it applies with the result
-chosen in the roll: **Applies** (Always, or the chosen hit, miss, failed or successful save
-matches), **Doesn't apply** (dimmed), or "Hit or miss?" / "Fail or save?" while that result
-isn't chosen. Applying them from the roll result is step 7. With several actions in one roll, the actions SHALL be
-separated by space and a divider. The monster stat blocks SHALL NOT show linked effects in this
-step.
-
-#### Scenario: Rolling an action with a link
-- **WHEN** the DM rolls a bite that has an On a hit Grappled link, and the attack hits
-- **THEN** the roll and damage work as before, the result shows "Grappled · On a hit · Applies", and no effect is applied
-
-#### Scenario: Save not chosen yet
-- **WHEN** the DM rolls a poison save action with an On a failed save Poisoned link against a target and hasn't chosen Fail or Save
-- **THEN** the result shows "Poisoned · On a failed save · Fail or save?", and choosing Save changes it to "Doesn't apply"
+#### Scenario: Caption with two entries
+- **WHEN** the bite has an attack entry (+4, 1d6+2 piercing) and a save entry (DC 12 CON, 2d6 poison)
+- **THEN** the tracker's action list and the entity card show both, the attack first and the save after " · "
 
 ### Requirement: The documentation describes action links as built
 

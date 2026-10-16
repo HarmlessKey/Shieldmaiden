@@ -190,10 +190,12 @@ characters). The optional fields SHALL be type-checked:
 - `choices` values are strings
 - `caster_key`, `concentration_id`, `parent_id` and `applied_turn_key` are strings
 - `caster_name` is a string of at most 200 characters
-- `concentration_for` has `source` (`srd`, `custom` or `api`), `source_key` (string, at most
-  100 characters) and an optional `name` (string, at most 200 characters), and nothing else
+- `concentration_for` has `source` (`srd`, `custom`, `api`, or `spell` for a spell cast),
+  `source_key` (string, at most 100 characters) and an optional `name` (string, at most 200
+  characters), and nothing else
 - `applied_round`, `rounds_remaining`, `save_dc`, `level`, `charges`, `save_successes`,
   `save_failures`, `immune_until_round` and `temp_hp_granted` are numbers
+- `magical` is a boolean
 
 Any other field on an instance SHALL be rejected. Existing rules for other entity data SHALL
 NOT change.
@@ -209,6 +211,14 @@ NOT change.
 #### Scenario: Concentration fields accepted
 - **WHEN** the owner writes a Concentration instance with `concentration_for: { source: "srd", source_key: "bless", name: "Bless" }`, `applied_turn_key: "npc_1"` and `temp_hp_granted: 5`
 - **THEN** the write succeeds
+
+#### Scenario: Concentration for a spell accepted
+- **WHEN** the owner writes a Concentration instance with `concentration_for: { source: "spell", source_key: "-Nx1abc", name: "Hold Person" }`
+- **THEN** the write succeeds
+
+#### Scenario: Magical instance accepted
+- **WHEN** the owner writes a Paralyzed instance with `magical: true`
+- **THEN** the write succeeds, and `magical: "yes"` is rejected
 
 #### Scenario: Invalid concentration_for rejected
 - **WHEN** an instance with `concentration_for: { source: "srd" }` or `concentration_for: { source: "srd", source_key: "bless", extra: 1 }` is written

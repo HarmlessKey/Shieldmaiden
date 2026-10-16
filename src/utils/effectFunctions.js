@@ -449,6 +449,113 @@ export function scaledLink(link = {}, { scaling, spellLevel, castLevel, casterLe
 }
 
 /**
+ * What applying a linked effect applies (effects 7): the link for this cast (scaledLink, for a
+ * spell), a repeat save without a DC with the caster's spell save DC, and the choices the
+ * definition asks for that the link leaves open, to ask in the roll card.
+ *
+ * @param {object} link Effect link
+ * @param {object} cast The spell cast { spell: { level, scaling }, castLevel, casterLevel, saveDc }; none for monster actions
+ * @param {object} definition The effect's definition, to know its choices
+ * @returns {object} { source, sourceKey, name, application: { duration?, choices, level? }, magical, openChoices }
+ */
+export function linkApplication(link = {}, { cast, definition } = {}) {
+	const applied = scaledLink(
+		link,
+		cast
+			? {
+					scaling: cast.spell?.scaling,
+					spellLevel: parseInt(cast.spell?.level) || 0,
+					castLevel: cast.castLevel,
+					casterLevel: cast.casterLevel,
+			  }
+			: {}
+	);
+	const effect = applied.effect || {};
+
+	const duration = applied.duration ? JSON.parse(JSON.stringify(applied.duration)) : undefined;
+	const dc = duration?.save?.dc;
+	if (duration?.save && (dc === undefined || dc === null || dc === "") && cast?.saveDc) {
+		duration.save.dc = cast.saveDc;
+	}
+
+	const choices = { ...(applied.choices || {}) };
+	const openChoices = definition
+		? getRequiredChoices(definition)
+				.map(({ kind }) => kind)
+				.filter((kind) => choices[kind] === undefined)
+		: [];
+
+	const application = { choices };
+	if (duration) application.duration = duration;
+	if (applied.level !== undefined) application.level = applied.level;
+	return {
+		source: effect.source,
+		sourceKey: effect.source_key,
+		name: effect.name || definition?.name || effect.source_key,
+		application,
+		magical: !!applied.magical,
+		openChoices,
+	};
+}
+
+/**
+ * Whether a spell only applies effects, so it's applied without a roll (effects 7): it has
+ * actions, none has rolls or is an attack or save, and every linked effect is on Always (Aid,
+ * Bless, Mage Armor)
+ *
+ * @param {object} spell With `actions`
+ * @returns {boolean}
+ */
+export function applyOnlySpell(spell) {
+	const actions = Array.isArray(spell?.actions) ? spell.actions : Object.values(spell?.actions || {});
+	if (!actions.length) return false;
+	let links = 0;
+	for (const action of actions) {
+		if (!action || action.rolls?.length) return false;
+		if (["melee_weapon", "ranged_weapon", "spell_attack", "save"].includes(action.type)) return false;
+		for (const [outcome, list] of Object.entries(action.effects || {})) {
+			const count = Array.isArray(list) ? list.length : Object.keys(list || {}).length;
+			if (!count) continue;
+			if (outcome !== "always") return false;
+			links += count;
+		}
+	}
+	return links > 0;
+}
+
+/**
+ * Whether a linked effect applies with the result chosen in a roll (effects 6–7): true, false,
+ * or undefined while the result isn't chosen, with the text to show. A save action after an
+ * attack action in the same roll waits for that attack's hit (the ghoul's claws).
+ *
+ * @param {object[]} actions The rolled actions
+ * @param {number} index The action the link is on
+ * @param {string} outcome on_hit, on_miss, on_fail, on_success or always
+ * @param {object} hitOrMiss Chosen "hit" / "miss" by action index
+ * @param {object} saves Chosen "fail" / "save" by action index
+ * @returns {{ applies: boolean|undefined, label?: string, pending?: string }}
+ */
+export function linkOutcomeState({ actions = [], index, outcome, hitOrMiss = {}, saves = {} } = {}) {
+	if (actions[index]?.type === "save") {
+		for (let i = index - 1; i >= 0; i--) {
+			if (!actions[i]?.toHit) continue;
+			if (hitOrMiss[i] === "miss") return { applies: false, label: "Attack missed" };
+			if (!hitOrMiss[i]) return { applies: undefined, pending: "Hit or miss?" };
+			break;
+		}
+	}
+	const outcomes = {
+		on_hit: { needs: "hit", chosen: hitOrMiss[index], pending: "Hit or miss?" },
+		on_miss: { needs: "miss", chosen: hitOrMiss[index], pending: "Hit or miss?" },
+		on_fail: { needs: "fail", chosen: saves[index], pending: "Fail or save?" },
+		on_success: { needs: "save", chosen: saves[index], pending: "Fail or save?" },
+		always: { needs: "always", chosen: "always" },
+	};
+	const { needs, chosen, pending } = outcomes[outcome] || outcomes.always;
+	return chosen ? { applies: chosen === needs } : { applies: undefined, pending };
+}
+
+/**
  * Copy of the trait links of a special ability as the NPC form saves them (effects 6b): every
  * link cleaned (cleanEffectLink) and without a duration, links without an effect left out.
  *

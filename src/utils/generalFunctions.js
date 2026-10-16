@@ -90,6 +90,18 @@ export function hasRolls(ability) {
 }
 
 /**
+ * The action-list entries of an ability to show in its caption (the tracker's action list and
+ * the entity card): every entry, except entries of type other without rolls
+ *
+ * @param {object} ability NPC ability with `action_list`
+ * @returns {object[]} The entries, in order
+ */
+export function captionEntries(ability) {
+	const entries = Array.isArray(ability?.action_list) ? ability.action_list : Object.values(ability?.action_list || {});
+	return entries.filter((entry) => entry && (entry.type !== "other" || entry.rolls?.length));
+}
+
+/**
  * How many rolls and linked effects an action-list entry (NPC) or spell action has, in words,
  * for its collapsed header: "1 roll, 2 effects". Type other has no rolls.
  *

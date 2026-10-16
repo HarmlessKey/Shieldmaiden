@@ -33,6 +33,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import ReminderForm from "src/components/ReminderForm";
+import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 
 export default {
 	name: "EditReminder",
@@ -110,6 +111,10 @@ export default {
 					this.$router.replace(`/content/reminders`);
 				},
 				(error) => {
+					if (error instanceof NotEnoughSlotsError) {
+						this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, "No slots left", { position: "rightTop" });
+						return;
+					}
 					this.$snotify.error("Couldn't save reminder.", "Save failed", { position: "rightTop" });
 					console.error(error);
 				}

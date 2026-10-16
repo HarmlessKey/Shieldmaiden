@@ -1,6 +1,7 @@
 import Vue from "vue";
 import { campaignServices } from "src/services/campaigns";
 import { encounterServices } from "src/services/encounters";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Converts a full campaign to a search_campaign
@@ -294,7 +295,7 @@ const campaign_actions = {
 			const used_slots = await services.getCampaignCount(uid);
 
 			if (used_slots >= available_slots) {
-				throw "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				const search_campaign = convert_campaign(campaign);

@@ -202,6 +202,7 @@ import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
@@ -369,6 +370,12 @@ export default {
 					this.unsaved_changes = false;
 				})
 				.catch((error) => {
+					if (error instanceof NotEnoughSlotsError) {
+						this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, "No slots left", {
+							position: "rightTop",
+						});
+						return;
+					}
 					this.$snotify.error("Couldn't save monster.", "Save failed", {
 						position: "rightTop",
 					});

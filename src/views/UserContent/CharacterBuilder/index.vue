@@ -77,6 +77,7 @@
 	import { experience } from 'src/mixins/experience.js';
 	import { mapGetters, mapActions } from "vuex";
 	import ContentHeader from "src/components/userContent/ContentHeader";
+	import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 
 	export default {
 		name: 'CharacterBuilder',
@@ -145,6 +146,12 @@
 				await this.add_character().then(key => {
 					this.$router.replace(`${this.$route.path}/${key}`);
 				}).catch(error => {
+					if(error instanceof NotEnoughSlotsError) {
+						this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, 'No slots left', {
+							position: "rightTop"
+						});
+						return;
+					}
 					this.$snotify.error('Couldn\'t create character.', 'Save failed', {
 						position: "rightTop"
 					});

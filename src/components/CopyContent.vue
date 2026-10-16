@@ -76,14 +76,20 @@
 							name="action"
 							:result="result"
 							:disabled="disabledCustom.includes(result.key)"
-							:copy="(extra) => copy(copy_resource === 'custom' ? result.key : result._id, extra)"
+							:resolving="resolving_id === resultId(result)"
+							:copy="(extra) => copy(resultId(result), extra)"
 						>
 							<a
 								v-if="!disabledCustom.includes(result.key)"
 								class="btn btn-sm bg-neutral-5"
-								@click="copy(copy_resource === 'custom' ? result.key : result._id)"
+								:class="{ disabled: !!resolving_id }"
+								@click="copy(resultId(result))"
 							>
-								<i aria-hidden="true" class="fas" :class="`fa-${button}`" />
+								<i
+									aria-hidden="true"
+									class="fas"
+									:class="resolving_id === resultId(result) ? 'fa-spinner fa-spin' : `fa-${button}`"
+								/>
 							</a>
 						</slot>
 					</div>
@@ -107,6 +113,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { editions, default_edition } from "src/utils/generalConstants";
 import { removeVersionKeys } from "src/utils/generalFunctions";
+import { notifyUnresolvedNpc } from "src/utils/errors";
 
 export default {
 	name: "CopyContent",
@@ -166,6 +173,7 @@ export default {
 			page: 1,
 			totalPages: 0,
 			edition: this.initialEdition,
+			resolving_id: null, // id of the result that is being fetched after it was picked
 		};
 	},
 	computed: {
@@ -242,7 +250,7 @@ export default {
 	},
 	methods: {
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
-		...mapActions("npcs", ["get_npcs", "get_npc"]),
+		...mapActions("npcs", ["get_npcs", "resolve_npc"]),
 		...mapActions("api_items", ["fetch_api_items", "fetch_api_item"]),
 		...mapActions("items", ["get_items", "get_item"]),
 		...mapActions("api_spells", ["fetch_api_spells", "fetch_api_spell"]),
@@ -251,6 +259,9 @@ export default {
 			this.query = "";
 			this.resetSearchResults();
 			this.copy_resource = value;
+		},
+		resultId(result) {
+			return this.copy_resource === "custom" ? result.key : result._id;
 		},
 		resetSearchResults() {
 			this.searchResults = [];
@@ -327,14 +338,30 @@ export default {
 		async copy(id, extra = {}) {
 			if (this.returnId) {
 				this.$emit("copy", { id, resource: this.copy_resource, ...extra });
-			} else {
+				return;
+			}
+			// Only one result can be fetched at a time
+			if (this.resolving_id) {
+				return;
+			}
+			this.resolving_id = id;
+			try {
 				let result;
 
 				if (this.type === "monster") {
-					result =
-						this.copy_resource === "custom"
-							? await this.get_npc({ uid: this.userId, id })
-							: await this.fetch_monster({ id, edition: this.apiEdition });
+					if (this.copy_resource === "custom") {
+						const { status, npc } = await this.resolve_npc({ uid: this.userId, id });
+						if (status !== "exists") {
+							notifyUnresolvedNpc(this.$snotify, status);
+							if (status === "ghost") {
+								this.searchResults = this.searchResults.filter((r) => r.key !== id);
+							}
+							return;
+						}
+						result = npc;
+					} else {
+						result = await this.fetch_monster({ id, edition: this.apiEdition });
+					}
 				}
 				if (this.type === "item") {
 					result =
@@ -358,6 +385,8 @@ export default {
 				removeVersionKeys(result);
 
 				this.$emit("copy", { result, id, resource: this.copy_resource, ...extra });
+			} finally {
+				this.resolving_id = null;
 			}
 		},
 	},

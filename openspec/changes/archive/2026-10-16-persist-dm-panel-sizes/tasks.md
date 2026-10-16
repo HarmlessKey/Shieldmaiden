@@ -21,13 +21,13 @@
 
 ## 4. Manual verification
 
-- [ ] 4.1 Run `npm run ssr` and open a campaign at >= `lg` width; drag each splitter, reload, confirm sizes are restored
-- [ ] 4.2 Resize the browser window to a different width and reload; confirm proportions (not pixels) are preserved
-- [ ] 4.3 In DevTools, set `localStorage["dm-screen-panes-v1"]` to invalid JSON, an out-of-range value, and an unknown key; reload and confirm graceful fallback to defaults for the bad entries
-- [ ] 4.4 Confirm mobile (narrow viewport) and `legacy_campaign_layout` enabled both still render with their existing hardcoded sizes and write nothing to storage
+- [x] 4.1 Run `npm run ssr` and open a campaign at >= `lg` width; drag each splitter, reload, confirm sizes are restored
+- [x] 4.2 Resize the browser window to a different width and reload; confirm proportions (not pixels) are preserved
+- [x] 4.3 In DevTools, set `localStorage["dm-screen-panes-v1"]` to invalid JSON, an out-of-range value, and an unknown key; reload and confirm graceful fallback to defaults for the bad entries
+- [x] 4.4 Confirm mobile (narrow viewport) and `legacy_campaign_layout` enabled both still render with their existing hardcoded sizes and write nothing to storage
 - [x] 4.5 Run `npm run lint` and fix any issues introduced
 
 ## 5. Wrap up
 
-- [ ] 5.1 Commit on `feature/persist-dm-panel-sizes` and push
-- [ ] 5.2 Open PR `feature/persist-dm-panel-sizes` → `develop` (per Git Flow in CLAUDE.md)
+- [x] 5.1 Commit on `feature/persist-dm-panel-sizes` and push
+- [x] 5.2 Open PR `feature/persist-dm-panel-sizes` → `develop` (per Git Flow in CLAUDE.md)

@@ -15,6 +15,14 @@ export const editions = Object.freeze([
 
 export const default_edition = "5e";
 
+/** How long a snotify notification is shown, in milliseconds (snotify's default is SHORT) */
+export const NOTIFY_DURATION = Object.freeze({
+	SHORT: 2000,
+	MEDIUM: 4000,
+	LONG: 6000,
+	VERY_LONG: 8000,
+});
+
 /** Per-level exhaustion effects. Not covered by the conditions API (flat effects list only). */
 export const EXHAUSTION_LEVELS = Object.freeze({
 	"5e": [

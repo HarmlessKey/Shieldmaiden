@@ -278,6 +278,7 @@ import AddPlayers from "src/components/campaign/AddPlayers";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import Tutorial from "src/components/userContent/Tutorial";
 import ExportUserContent from "src/components/userContent/ExportUserContent";
+import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 
 export default {
 	name: "Campaigns",
@@ -347,7 +348,17 @@ export default {
 					timestamp: Date.now(),
 				};
 
-				await this.add_campaign({ campaign });
+				try {
+					await this.add_campaign({ campaign });
+				} catch (error) {
+					if (error instanceof NotEnoughSlotsError) {
+						this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, "No slots left", {
+							position: "rightTop",
+						});
+						return;
+					}
+					throw error;
+				}
 
 				this.newCampaign = "";
 				this.$snotify.success("Campaign added.", "Critical hit!", {

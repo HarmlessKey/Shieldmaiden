@@ -78,6 +78,8 @@ Rules:
 - Never begin implementing a feature without an OpenSpec change present in `openspec/changes/`
 - Small fixes or requests that are clearly not a feature (typos, one-line bug fixes, config tweaks, dependency bumps, docs) don't need a spec
 - If you're uncertain whether something warrants a spec, ask the user whether to create one before starting
+- When proposing a new change, first check `openspec/changes/` for un-archived changes that are already implemented (all tasks done, or merged into `develop`) and suggest archiving them (`/opsx:archive`)
+- Before creating a PR, check whether the branch contains un-archived changes and nudge the user to archive them first — we don't publish open OpenSpec changes
 
 
 ## Git Workflow

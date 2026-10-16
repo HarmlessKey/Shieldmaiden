@@ -129,7 +129,7 @@ const npc_actions = {
 			}
 		}
 
-		return await dispatch("cache_npc", { uid, id, npc });
+		return dispatch("cache_npc", { uid, id, npc });
 	},
 
 	/**
@@ -185,7 +185,7 @@ const npc_actions = {
 			console.warn(`Couldn't load NPC ${id} of user ${uid}`, error);
 			return { status: "unknown" };
 		}
-		return await dispatch("check_ghost_npc", { uid, id });
+		return dispatch("check_ghost_npc", { uid, id });
 	},
 
 	/**

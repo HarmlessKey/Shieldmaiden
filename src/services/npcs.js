@@ -18,6 +18,7 @@ async function onceWithTimeout(ref, timeout) {
 		timer = setTimeout(() => reject(new Error(`Timed out reading ${ref.toString()}`)), timeout);
 	});
 	try {
+		// Await is needed, otherwise finally clears the timer before the read settles
 		return await Promise.race([ref.once("value"), timed_out]);
 	} finally {
 		clearTimeout(timer);
@@ -97,7 +98,7 @@ export class npcServices {
 	 * @returns {DataSnapshot} Snapshot, so callers can use exists()
 	 */
 	async getNpcFromServer(uid, id, timeout = 8000) {
-		return await onceWithTimeout(NPCS_REF.child(uid).child(id), timeout);
+		return onceWithTimeout(NPCS_REF.child(uid).child(id), timeout);
 	}
 
 	/**

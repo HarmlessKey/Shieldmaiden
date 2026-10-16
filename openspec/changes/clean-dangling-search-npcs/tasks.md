@@ -77,10 +77,10 @@ Each entry point starts its loading state just before `resolve_npc` and clears i
 - [x] 5.3 Open existing NPCs at every entry point and confirm the loading state and timing are unchanged, and that no extra reads happen (DevTools network/WebSocket frames)
 - [x] 5.4 With DevTools set to offline, open a ghost and confirm the "could not be loaded" error, that the loading state clears or Edit NPC navigates away, and that the search entry is **not** removed
 - [x] 5.5 Open a real NPC whose `null` is in the Vuex cache (create it in another tab after a failed lookup) and confirm it loads without the 1.5 s delay and nothing is removed
-- [ ] 5.6 Open another user's companion through the edit-companion route with a missing NPC and confirm nothing is removed
-- [ ] 5.7 Run an encounter that references a ghost NPC and confirm no ghost check runs and nothing is removed
-- [ ] 5.8 Regression-test editing (with and without an image upload) and deleting NPCs against the production security rules, so the multi-path updates are accepted
-- [ ] 5.9 Confirm the 2 known production ghosts (`UfKEEPhkIjgNlN70NAAbBaLbI3h2` and `rmhyfWXSycRZXf7zfYSlcvpJ2rd2`, key `Not enough slots`) would be classified as ghosts. Test this with a copy of the data, not production
+- [x] 5.6 Open another user's companion through the edit-companion route with a missing NPC and confirm nothing is removed
+- [x] 5.7 Run an encounter that references a ghost NPC and confirm no ghost check runs and nothing is removed
+- [x] 5.8 Regression-test editing (with and without an image upload) and deleting NPCs against the production security rules, so the multi-path updates are accepted
+- [x] 5.9 Confirm the 2 known production ghosts (`UfKEEPhkIjgNlN70NAAbBaLbI3h2` and `rmhyfWXSycRZXf7zfYSlcvpJ2rd2`, key `Not enough slots`) would be classified as ghosts. Test this with a copy of the data, not production
 
 ## 6. Wrap up
 

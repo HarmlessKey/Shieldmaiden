@@ -219,15 +219,24 @@
 										/>
 										<a
 											class="btn btn-sm bg-neutral-5"
+											:class="{ disabled: deleting_npcs[props.key] }"
 											@click="confirmDelete($event, props.key, props.row)"
 										>
-											<i aria-hidden="true" class="fas fa-trash-alt" />
+											<i
+												aria-hidden="true"
+												class="fas"
+												:class="deleting_npcs[props.key] ? 'fa-spinner fa-spin' : 'fa-trash-alt'"
+											/>
 											<q-tooltip anchor="top middle" self="center middle"> Delete </q-tooltip>
 										</a>
 									</div>
 									<div v-else class="text-right">
 										<button class="btn btn-sm bg-neutral-5">
-											<i aria-hidden="true" class="fas fa-ellipsis-v" />
+											<i
+												aria-hidden="true"
+												class="fas"
+												:class="deleting_npcs[props.key] ? 'fa-spinner fa-spin' : 'fa-ellipsis-v'"
+											/>
 											<q-popup-proxy
 												:dark="$store.getters.theme === 'dark'"
 												:breakpoint="576"
@@ -268,6 +277,7 @@
 													<q-item
 														clickable
 														v-close-popup
+														:disable="!!deleting_npcs[props.key]"
 														@click="confirmDelete($event, props.key, props.row)"
 													>
 														<q-item-section avatar>
@@ -357,6 +367,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { campaignGroupKey } from "src/utils/generalFunctions";
+import { notifyUnresolvedNpc } from "src/utils/errors";
 import { monsterMixin } from "src/mixins/monster";
 import ImportUserContent from "src/components/userContent/ImportUserContent.vue";
 import ContentHeader from "src/components/userContent/ContentHeader.vue";
@@ -381,6 +392,7 @@ export default {
 			generate_dialog: false,
 			group_dialog: false,
 			loading_npcs: true,
+			deleting_npcs: {}, // NPC ids that are being deleted, { [id]: true }
 			show_warning: true,
 			search: "",
 			groupFilter: [],
@@ -571,8 +583,19 @@ export default {
 				console.error("Failed to load NPC", e);
 			}
 		},
-		deleteNpc(key) {
-			this.delete_npc(key);
+		async deleteNpc(key) {
+			if (this.deleting_npcs[key]) {
+				return;
+			}
+			this.$set(this.deleting_npcs, key, true);
+			try {
+				const status = await this.delete_npc(key);
+				if (status === "ghost" || status === "unknown") {
+					notifyUnresolvedNpc(this.$snotify, status);
+				}
+			} finally {
+				this.$delete(this.deleting_npcs, key);
+			}
 		},
 		setGenerating(value) {
 			this.generating = value;

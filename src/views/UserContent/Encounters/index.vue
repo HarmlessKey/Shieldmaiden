@@ -365,6 +365,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 
 export default {
 	name: "Encounters",
@@ -471,16 +472,26 @@ export default {
 		},
 		async addEncounter() {
 			this.add = false;
-			await this.add_encounter({
-				campaignId: this.campaignId,
-				encounter: {
-					name: this.newEncounter,
-					round: 0,
-					turn: 0,
-					finished: false,
-					timestamp: Date.now(),
-				},
-			});
+			try {
+				await this.add_encounter({
+					campaignId: this.campaignId,
+					encounter: {
+						name: this.newEncounter,
+						round: 0,
+						turn: 0,
+						finished: false,
+						timestamp: Date.now(),
+					},
+				});
+			} catch (error) {
+				if (error instanceof NotEnoughSlotsError) {
+					this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, "No slots left", {
+						position: "rightTop",
+					});
+					return;
+				}
+				throw error;
+			}
 			this.newEncounter = "";
 			this.$snotify.success("Encounter added.", "Critical hit!", {
 				position: "rightTop",

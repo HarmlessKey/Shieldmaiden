@@ -204,6 +204,11 @@ import SpellCasting from "src/components/npcs/SpellCasting";
 import Actions from "src/components/npcs/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import {
+	NotEnoughSlotsError,
+	NOT_ENOUGH_SLOTS_MESSAGE,
+	notifyUnresolvedNpc,
+} from "src/utils/errors";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
 
@@ -247,13 +252,19 @@ export default {
 	async mounted() {
 		if (this.npcId) {
 			this.loading = true;
-			await this.get_npc({ uid: this.userId, id: this.npcId }).then((npc) => {
-				npc.name = npc.name ? npc.name.capitalizeEach() : undefined;
-				this.npc = npc;
-				this.npc_copy = JSON.parse(JSON.stringify(npc));
-				this.unsaved_changes = false;
-				this.loading = false;
-			});
+			const { status, npc } = await this.resolve_npc({ uid: this.userId, id: this.npcId });
+
+			// Never show an empty editor for an id that didn't resolve, saving it would create a new NPC under that key
+			if (status !== "exists") {
+				notifyUnresolvedNpc(this.$snotify, status);
+				this.$router.replace("/content/npcs");
+				return;
+			}
+			npc.name = npc.name ? npc.name.capitalizeEach() : undefined;
+			this.npc = npc;
+			this.npc_copy = JSON.parse(JSON.stringify(npc));
+			this.unsaved_changes = false;
+			this.loading = false;
 		} else {
 			this.create_dialog = true;
 		}
@@ -281,7 +292,7 @@ export default {
 	methods: {
 		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
-		...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
+		...mapActions("npcs", ["add_npc", "edit_npc", "resolve_npc"]),
 		isOwner() {
 			return this.$route.name !== "Edit Companion";
 		},
@@ -310,7 +321,7 @@ export default {
 			this.npc = {};
 		},
 		revertChanges() {
-			this.npc = JSON.parse(this.npc_copy);
+			this.npc = JSON.parse(JSON.stringify(this.npc_copy));
 			this.npc_copy = JSON.parse(JSON.stringify(this.npc));
 			this.unsaved_changes = false;
 		},
@@ -372,6 +383,12 @@ export default {
 					this.unsaved_changes = false;
 				})
 				.catch((error) => {
+					if (error instanceof NotEnoughSlotsError) {
+						this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, "No slots left", {
+							position: "rightTop",
+						});
+						return;
+					}
 					this.$snotify.error("Couldn't save monster.", "Save failed", {
 						position: "rightTop",
 					});

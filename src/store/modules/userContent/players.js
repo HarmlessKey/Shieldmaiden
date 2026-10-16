@@ -2,6 +2,7 @@ import Vue from "vue";
 import { playerServices } from "src/services/players";
 import { getCharacterSyncCharacter, characterToPlayer } from "src/utils/generalFunctions";
 import { skills } from "src/utils/generalConstants";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Parse number values to ints
@@ -251,7 +252,7 @@ const player_actions = {
 			const used_slots = await services.getPlayerCount(uid);
 
 			if (used_slots >= available_slots) {
-				throw "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				player = filterUnusedAttributes(player);

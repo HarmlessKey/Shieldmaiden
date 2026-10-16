@@ -490,24 +490,13 @@ export default {
 		},
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)
-				.filter(([key, item]) => {
-					item.key = key;
-					return item.level == level;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, item]) => item.level == level)
+				.map(([key, item]) => ({ ...item, key }));
 		},
 		spellsForLimit(limit) {
 			return Object.entries(this.entity.innate_spells)
-				.filter(([key, item]) => {
-					item.key = key;
-					if (item.limit === 0) item.limit = Infinity;
-					return item.limit == limit;
-				})
-				.map((item) => {
-					return item[1];
-				});
+				.filter(([, item]) => (item.limit || Infinity) == limit)
+				.map(([key, item]) => ({ ...item, key }));
 		},
 	},
 };

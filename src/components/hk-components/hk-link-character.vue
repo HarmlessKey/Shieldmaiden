@@ -1,9 +1,11 @@
 <template>
 	<hk-card :min-width="300">
-		<div slot="header" class="card-header">
-			Link a character
-			<q-btn icon="close" no-caps flat dense v-close-popup />
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				Link a character
+				<q-btn icon="close" no-caps flat dense v-close-popup />
+			</div>
+		</template>
 		<div class="card-body">
 			<q-list :dark="$store.getters.theme === 'dark'" class="bg-neutral-8">
 				<q-item v-for="character in sync_characters" :key="character.url">

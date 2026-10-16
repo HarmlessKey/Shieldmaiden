@@ -1,11 +1,11 @@
 <template>
 	<div class="rewards">
-		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px' }">
 			<div>
 				<h2>Rewards</h2>
 				<template v-if="encounter.xp_awarded">
 					<h2 class="white">Experience Points</h2>
-					<div class="xp animated bounceIn" >
+					<div class="xp animated bounceIn">
 						<span class="green">{{ xpAmount }} </span> <span class="neutral-2">XP</span>
 					</div>
 				</template>
@@ -16,32 +16,33 @@
 						<div class="currency animated bounceIn">
 							<div v-for="(coin, key) in currencies" :key="key">
 								<img :src="require(`src/assets/_img/currency/${coin.color}.svg`)" />
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square dense
+								<q-input
+									:dark="$store.getters.theme === 'dark'"
+									filled
+									square
+									dense
 									disable
 									:label="coin.name"
 									class="text-center"
-									autocomplete="off" 
-									type="number" min="0" 
-									name="name" 
-									:value="encounter.currency[key]"
+									autocomplete="off"
+									type="number"
+									min="0"
+									name="name"
+									:model-value="encounter.currency[key]"
 								/>
 							</div>
 						</div>
 					</div>
 				</template>
-				
+
 				<h2>Items</h2>
-				<hk-table 
-					:items="items"
-					:columns="itemColumns"
-					:showHeader="false"
-					:collapse="true"
-				>
-					<div slot="collapse" slot-scope="data">
-						<h3>{{ data.row.public_name }}</h3>
-						{{ data.row.public_description }}
-					</div>
+				<hk-table :items="items" :columns="itemColumns" :showHeader="false" :collapse="true">
+					<template v-slot:collapse="data">
+						<div>
+							<h3>{{ data.row.public_name }}</h3>
+							{{ data.row.public_description }}
+						</div>
+					</template>
 				</hk-table>
 			</div>
 		</q-scroll-area>
@@ -49,54 +50,53 @@
 </template>
 
 <script>
-	import { db } from 'src/firebase';
-	import { currencyMixin } from 'src/mixins/currency.js';
+import { db } from "src/firebase";
+import { currencyMixin } from "src/mixins/currency.js";
 
-	export default {
-		name: 'app',
-		mixins: [currencyMixin],
-		props: [
-			'encounter'
-		],
-		data() {
-			return {
-				userId: this.$route.params.userid,
-				campaignId: this.$route.params.campid,
-				encounterId: this.$route.params.encid,
-				itemColumns: {
-					public_name: {
-						label: 'Name',
-						truncate: true,
-					}
-				}
-			}
-		},
-		firebase() {
-			return {
-				players: {
-					source: db.ref(`players/${this.userId}`),
-					asObject: true,
+export default {
+	name: "app",
+	mixins: [currencyMixin],
+	props: ["encounter"],
+	data() {
+		return {
+			userId: this.$route.params.userid,
+			campaignId: this.$route.params.campid,
+			encounterId: this.$route.params.encid,
+			itemColumns: {
+				public_name: {
+					label: "Name",
+					truncate: true,
 				},
-				items: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/items`).orderByChild('encounter_id').equalTo(this.encounter.key)
-			}
-		},
-		computed: {
-			xpAmount() {
-				return this.encounter.xp.overwrite || this.encounter.xp.calculated;
 			},
+		};
+	},
+	firebase() {
+		return {
+			players: {
+				source: db.ref(`players/${this.userId}`),
+				asObject: true,
+			},
+			items: db
+				.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/items`)
+				.orderByChild("encounter_id")
+				.equalTo(this.encounter.key),
+		};
+	},
+	computed: {
+		xpAmount() {
+			return this.encounter.xp.overwrite || this.encounter.xp.calculated;
 		},
-		methods: {
-			
-		},
-	}
+	},
+	methods: {},
+};
 </script>
 
 <style lang="scss" scoped>
 .rewards {
 	height: 100%;
 	overflow: hidden;
-	
-	.q-scrollarea { 
+
+	.q-scrollarea {
 		height: calc(100% - 30px);
 
 		> div {
@@ -154,13 +154,13 @@
 		}
 	}
 }
-@media only screen and (max-width: 720px) { 
-		.rewards {
-			overflow: visible !important;
+@media only screen and (max-width: 720px) {
+	.rewards {
+		overflow: visible !important;
 
-			.q-scrollarea {
-				overflow: visible !important;
-			}
+		.q-scrollarea {
+			overflow: visible !important;
 		}
 	}
+}
 </style>

@@ -56,13 +56,11 @@
 								/>
 							</q-item-section>
 							<q-item-section>
-								<q-item-label
-									v-text="
-										panels.filter((item) => {
-											return item.value === panel;
-										})[0].label
-									"
-								/>
+								<q-item-label>{{
+									panels.filter((item) => {
+										return item.value === panel;
+									})[0].label
+								}}</q-item-label>
 							</q-item-section>
 						</q-item>
 					</template>
@@ -78,7 +76,7 @@
 								<q-icon :name="scope.opt.icon" />
 							</q-item-section>
 							<q-item-section>
-								<q-item-label v-text="scope.opt.label" />
+								<q-item-label>{{ scope.opt.label }}</q-item-label>
 							</q-item-section>
 						</q-item>
 					</template>
@@ -110,6 +108,7 @@ import Sharing from "./Sharing.vue";
 import Weather from "src/components/weather";
 
 import { getCharacterSyncStorage } from "src/utils/generalFunctions";
+import { defineAsyncComponent } from "vue";
 import { mapGetters } from "vuex";
 
 export default {
@@ -118,7 +117,7 @@ export default {
 	components: {
 		Meters,
 		Players,
-		Shares: () => import("./Shares"),
+		Shares: defineAsyncComponent(() => import("./Shares")),
 		Sharing,
 		Weather,
 	},
@@ -218,16 +217,14 @@ h3 {
 				> div {
 					padding-right: 6px;
 				}
-				&::v-deep {
-					.top-menu {
-						border-bottom: solid 2px $white;
-						padding-bottom: 2px;
-						margin-bottom: 23px;
+				:deep(.top-menu) {
+					border-bottom: solid 2px $white;
+					padding-bottom: 2px;
+					margin-bottom: 23px;
 
-						.money {
-							text-shadow: 0 0 3px $black;
-							color: $white;
-						}
+					.money {
+						text-shadow: 0 0 3px $black;
+						color: $white;
 					}
 				}
 			}

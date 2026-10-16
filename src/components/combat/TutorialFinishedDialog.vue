@@ -1,10 +1,12 @@
 <template>
 	<q-dialog v-model="tutorial_finished" persistent>
 		<hk-card>
-			<div class="card-header" slot="header">
-				Tutorial finished
-				<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat @click="close" />
-			</div>
+			<template v-slot:header>
+				<div class="card-header">
+					Tutorial finished
+					<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat @click="close" />
+				</div>
+			</template>
 			<div class="card-body text-center">
 				<h3>Thanks for finishing our tutorial!</h3>
 				<p>
@@ -18,9 +20,11 @@
 				</p>
 				<router-link to="/sign-up" class="btn btn-lg btn-block">Create account</router-link>
 			</div>
-			<div slot="footer" class="card-footer">
-				<button class="btn bg-neutral-5" @click="resetTutorial">Reset tutorial</button>
-			</div>
+			<template v-slot:footer>
+				<div class="card-footer">
+					<button class="btn bg-neutral-5" @click="resetTutorial">Reset tutorial</button>
+				</div>
+			</template>
 		</hk-card>
 	</q-dialog>
 </template>

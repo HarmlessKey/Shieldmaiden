@@ -144,19 +144,20 @@
 						:error="invalid && validated"
 						:error-message="errors[0]"
 					>
-						<a
-							slot="after"
-							class="btn bg-neutral-5"
-							@click="addVariable()"
-							:class="{
-								disabled:
-									!newVar ||
-									errors[0] ||
-									(reminder.variables && Object.keys(reminder.variables).includes(newVar)),
-							}"
-						>
-							<q-icon name="fas fa-plus" />
-						</a>
+						<template v-slot:after>
+							<a
+								class="btn bg-neutral-5"
+								@click="addVariable()"
+								:class="{
+									disabled:
+										!newVar ||
+										errors[0] ||
+										(reminder.variables && Object.keys(reminder.variables).includes(newVar)),
+								}"
+							>
+								<q-icon name="fas fa-plus" />
+							</a>
+						</template>
 					</q-input>
 				</ValidationProvider>
 			</div>
@@ -200,23 +201,25 @@
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						>
-							<div slot="before" v-if="selectOptions">
-								<button
-									class="btn btn-sm bg-neutral-4"
-									@click="setOption(key, reminder.variables[key][i])"
-								>
-									<i
-										aria-hidden="true"
-										class="fas fa-check"
-										:class="{
-											green:
-												reminder.selectedVars &&
-												reminder.selectedVars[key] === reminder.variables[key][i],
-										}"
-									></i>
-								</button>
-							</div>
-							<template slot="append">
+							<template v-slot:before>
+								<div v-if="selectOptions">
+									<button
+										class="btn btn-sm bg-neutral-4"
+										@click="setOption(key, reminder.variables[key][i])"
+									>
+										<i
+											aria-hidden="true"
+											class="fas fa-check"
+											:class="{
+												green:
+													reminder.selectedVars &&
+													reminder.selectedVars[key] === reminder.variables[key][i],
+											}"
+										></i>
+									</button>
+								</div>
+							</template>
+							<template v-slot:append>
 								<q-icon
 									name="fas fa-trash-alt"
 									class="red pointer"
@@ -244,7 +247,7 @@
 export default {
 	name: "ReminderForm",
 	props: {
-		value: {
+		modelValue: {
 			type: Object,
 			required: true,
 		},
@@ -277,33 +280,34 @@ export default {
 			newVar: undefined,
 		};
 	},
+	emits: ["update:modelValue"],
 	computed: {
 		reminder: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 	},
 	mounted() {
-		if (Object.keys(this.value).length === 0) {
+		if (Object.keys(this.modelValue).length === 0) {
 			//Set default values
-			this.$set(this.reminder, "color", "green-light");
-			this.$set(this.reminder, "action", "remove");
+			this.reminder.color = "green-light";
+			this.reminder.action = "remove";
 		}
 	},
 	methods: {
 		setColor(color) {
-			this.$set(this.reminder, "color", color);
+			this.reminder.color = color;
 		},
 		addVariable() {
 			if (this.newVar) {
 				if (!this.reminder.variables) {
-					this.$set(this.reminder, "variables", {});
+					this.reminder.variables = {};
 				}
-				this.$set(this.reminder.variables, this.newVar, [""]);
+				this.reminder.variables[this.newVar] = [""];
 				this.newVar = undefined;
 			}
 			this.$forceUpdate();
@@ -313,22 +317,23 @@ export default {
 			this.$forceUpdate();
 		},
 		removeOption(key, i) {
-			this.$delete(this.reminder.variables[key], i);
+			// variables[key] is an array of options; Vue.delete spliced.
+			this.reminder.variables[key].splice(i, 1);
 			this.$forceUpdate();
 		},
 		removeVar(key) {
-			this.$delete(this.reminder.variables, key);
+			delete this.reminder.variables[key];
 
 			// if the reminder is in use, the selection must be deleted too
 			if (this.reminder.selectedVars) {
-				this.$delete(this.reminder.selectedVars, key);
+				delete this.reminder.selectedVars[key];
 			}
 
 			this.$forceUpdate();
 		},
 		setOption(key, i) {
 			if (!this.reminder.selectedVars) {
-				this.$set(this.reminder, "selectedVars", {});
+				this.reminder.selectedVars = {};
 			}
 			this.reminder.selectedVars[key] = i;
 			this.$forceUpdate();

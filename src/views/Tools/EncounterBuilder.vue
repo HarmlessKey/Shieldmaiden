@@ -62,30 +62,32 @@
 </template>
 
 <script>
+import { createMetaMixin } from "quasar";
 import ToolsPage from "src/components/ToolsPage.vue";
+
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+const metaMixin = createMetaMixin(() => ({
+	meta: {
+		twitterImage: {
+			name: "twitter:image",
+			content: require(`assets/_img/meta/shieldmaiden-encounter-builder.png`),
+		},
+		ogImage: {
+			property: "og:image",
+			content: require(`assets/_img/meta/shieldmaiden-encounter-builder.png`),
+		},
+		ogImageAlt: {
+			property: "og:image:alt",
+			content: "Shieldmaiden Encounter Builder",
+		},
+	},
+}));
 
 export default {
 	name: "ToolsEncounterBuilder",
+	mixins: [metaMixin],
 	components: {
 		ToolsPage,
-	},
-	meta() {
-		return {
-			meta: {
-				twitterImage: {
-					name: "twitter:image",
-					content: require(`assets/_img/meta/shieldmaiden-encounter-builder.png`),
-				},
-				ogImage: {
-					property: "og:image",
-					content: require(`assets/_img/meta/shieldmaiden-encounter-builder.png`),
-				},
-				ogImageAlt: {
-					property: "og:image:alt",
-					content: "Shieldmaiden Encounter Builder",
-				},
-			},
-		};
 	},
 };
 </script>

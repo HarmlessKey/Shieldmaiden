@@ -57,71 +57,75 @@
 					class="monster-card__abilities"
 					:class="table === 0 ? 'left' : 'right'"
 				>
-					<tr>
-						<th colspan="2"></th>
-						<th>mod</th>
-						<th>save</th>
-					</tr>
-					<tr
-						v-for="(ability, index) in abilities.slice(table * 3, table * 3 + 3)"
-						:class="`ability ability__${ability}`"
-						:key="index"
-					>
-						<td class="ability__label">{{ ability2str(ability.toUpperCase()) }}</td>
-						<td class="ability__score">{{ monster[ability] }}</td>
-						<td class="mod">
-							<hk-roll
-								:roll="{
-									d: 20,
-									n: 1,
-									m: calcMod(monster[ability]),
-									title: `${ability.capitalize()} check`,
-									entity_name: monster.name.capitalizeEach(),
-									notify: true,
-								}"
-								:share="
-									shares.includes('ability_rolls')
-										? {
-												encounter_id: encounterId,
-												entity_key: monster.key,
-											}
-										: null
-								"
-							>
-								{{ mod2str(calcMod(monster[ability])) }}
-							</hk-roll>
-						</td>
-						<td class="save">
-							<hk-roll
-								:roll="{
-									d: 20,
-									n: 1,
-									m: monster.saving_throws?.includes(ability)
-										? calcMod(monster[ability]) + monster.proficiency
-										: calcMod(monster[ability]),
-									title: `${ability.capitalize()} save`,
-									entity_name: monster.name.capitalizeEach(),
-									notify: true,
-								}"
-								:share="
-									shares.includes('ability_rolls')
-										? {
-												encounter_id: encounterId,
-												entity_key: monster.key,
-											}
-										: null
-								"
-							>
-								{{
-									mod2str(
-										monster.saving_throws?.includes(ability)
+					<thead>
+						<tr>
+							<th colspan="2"></th>
+							<th>mod</th>
+							<th>save</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							v-for="(ability, index) in abilities.slice(table * 3, table * 3 + 3)"
+							:class="`ability ability__${ability}`"
+							:key="index"
+						>
+							<td class="ability__label">{{ ability2str(ability.toUpperCase()) }}</td>
+							<td class="ability__score">{{ monster[ability] }}</td>
+							<td class="mod">
+								<hk-roll
+									:roll="{
+										d: 20,
+										n: 1,
+										m: calcMod(monster[ability]),
+										title: `${ability.capitalize()} check`,
+										entity_name: monster.name.capitalizeEach(),
+										notify: true,
+									}"
+									:share="
+										shares.includes('ability_rolls')
+											? {
+													encounter_id: encounterId,
+													entity_key: monster.key,
+												}
+											: null
+									"
+								>
+									{{ mod2str(calcMod(monster[ability])) }}
+								</hk-roll>
+							</td>
+							<td class="save">
+								<hk-roll
+									:roll="{
+										d: 20,
+										n: 1,
+										m: monster.saving_throws?.includes(ability)
 											? calcMod(monster[ability]) + monster.proficiency
-											: calcMod(monster[ability])
-									)
-								}}
-							</hk-roll>
-						</td>
-					</tr>
+											: calcMod(monster[ability]),
+										title: `${ability.capitalize()} save`,
+										entity_name: monster.name.capitalizeEach(),
+										notify: true,
+									}"
+									:share="
+										shares.includes('ability_rolls')
+											? {
+													encounter_id: encounterId,
+													entity_key: monster.key,
+												}
+											: null
+									"
+								>
+									{{
+										mod2str(
+											monster.saving_throws?.includes(ability)
+												? calcMod(monster[ability]) + monster.proficiency
+												: calcMod(monster[ability])
+										)
+									}}
+								</hk-roll>
+							</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 
@@ -186,7 +190,7 @@
 				</div>
 				<div v-if="monster.challenge_rating">
 					<strong>CR</strong> {{ monster.challenge_rating }} (XP
-					{{ monster_challenge_rating[monster.challenge_rating].xp | numeral("0,0") }}; PB +{{
+					{{ $numeral(monster_challenge_rating[monster.challenge_rating].xp, "0,0") }}; PB +{{
 						monster.proficiency
 					}})
 				</div>
@@ -239,7 +243,7 @@
 				<p>
 					<strong><em> Spellcasting </em></strong>
 					The {{ monster.name.capitalizeEach() }} is a
-					{{ monster.caster_level | numeral("Oo") }}-level spellcaster. its spellcasting ability is
+					{{ $numeral(monster.caster_level, "Oo") }}-level spellcaster. its spellcasting ability is
 					{{ monster.caster_ability.capitalize() }} (spell save DC {{ monster.caster_save_dc }},
 					{{
 						monster.caster_spell_attack > 0
@@ -250,11 +254,11 @@
 					spells prepared:
 				</p>
 				<p>
-					<template v-for="level in caster_spell_levels">
-						<div :key="`spell-${level}`">
+					<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+						<div>
 							<template v-if="level === 0"><strong>Cantrips</strong> (at will): </template>
 							<template v-else>
-								<strong>{{ level | numeral("Oo") }} level</strong> ({{
+								<strong>{{ $numeral(level, "Oo") }} level</strong> ({{
 									monster.caster_spell_slots[level]
 								}}
 								slots):
@@ -265,7 +269,10 @@
 								:key="spell.name"
 							>
 								<hk-popover>
-									{{ spell.name }}<Spell slot="content" :id="spell.key" hide-report /> </hk-popover
+									{{ spell.name
+									}}<template v-slot:content>
+										<Spell :id="spell.key" hide-report />
+									</template> </hk-popover
 								>{{ index + 1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
@@ -290,8 +297,8 @@
 					spells, requiring no material components:
 				</p>
 				<p>
-					<template v-for="limit in innate_spell_levels">
-						<div :key="`spell-${limit}`">
+					<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+						<div>
 							<template v-if="limit === Infinity"> At will: </template>
 							<template v-else> {{ limit }}/day each: </template>
 							<i
@@ -351,7 +358,7 @@
 
 			<div v-if="monster.source || monster.environment" class="mt-4">
 				<span v-if="monster.source"> <strong>Source:</strong> {{ monster.source }} </span>
-				<template v-if="monster.environment?.length" class="mt-3">
+				<template v-if="monster.environment?.length">
 					<strong>Environment:</strong> {{ monster.environment.join(", ").capitalizeEach() }}
 				</template>
 			</div>
@@ -368,14 +375,16 @@
 					<div>{{ label }} <small v-if="pdf_only">(PFD only)</small></div>
 				</button>
 			</div>
-			<div slot="footer" class="d-flex justify-content-end full-width items-center gap-1">
-				<!-- <button class="btn btn-block" @click="download('pdf')">
+			<template v-slot:footer>
+				<div class="d-flex justify-content-end full-width items-center gap-1">
+					<!-- <button class="btn btn-block" @click="download('pdf')">
 					Download PDF <hk-icon icon="fas fa-file-pdf" class="ml-1" />
 				</button> -->
-				<button class="btn" :disabled="layout === 'full'" @click="download('png')">
-					Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
-				</button>
-			</div>
+					<button class="btn" :disabled="layout === 'full'" @click="download('png')">
+						Download PNG <hk-icon icon="fas fa-image" class="ml-1" />
+					</button>
+				</div>
+			</template>
 		</hk-dialog>
 	</div>
 	<hk-loader v-else name="monster" />

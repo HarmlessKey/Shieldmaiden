@@ -1,13 +1,13 @@
 # Shieldmaiden
 
-D&D combat tracker web app built with Vue 2 + Quasar 1 + Firebase.
+D&D combat tracker web app built with Vue 3 + Quasar 2 + Firebase.
 
 ## Tech Stack
 
-- **Framework**: Vue 2.7 + Quasar 1 (SSR mode)
-- **Build**: Webpack 4 via `@quasar/app ~2.4.3`
+- **Framework**: Vue 3.5 + Quasar 2 (SSR mode), Options API throughout
+- **Build**: Webpack 5 via `@quasar/app-webpack ~3.15.1` (**not** v4 — it dropped Vuex support)
 - **Backend**: Firebase v8 (namespaced API — do NOT migrate to modular v10+ API)
-- **State**: Vuex with modules in `src/store/modules/`
+- **State**: Vuex 4 with modules in `src/store/modules/`
 - **Node**: >= 24, npm >= 10.2.4
 
 ## Dev Commands
@@ -30,9 +30,15 @@ npm run lint      # ESLint
 ## Key Constraints
 
 - **Firebase v8 namespaced API** is used across 63+ files — do not switch to modular API
-- Vue 2 / Quasar 1 ecosystem locks transitive deps (postcss 7, webpack 4, etc.)
-- Many audit vulnerabilities are unfixable without framework migration — do not attempt to fix them
 - `package.json` uses `overrides` to force-update transitive deps
+- Four Vue 2 packages were replaced by in-repo equivalents rather than migrated at every
+  call site — `$snotify` (`src/plugins/snotify.js`), `ValidationProvider` /
+  `ValidationObserver` (`src/plugins/validation/`), `v-shortkey`
+  (`src/directives/shortkey.js`) and vuefire's `firebase()` option
+  (`src/plugins/vuefire.js`). They are plain Vue 3 code, not compatibility layers
+- Register globally-used components **synchronously**. Vue 3 defers hydration of an async
+  component's subtree until its chunk loads, which is after mount, so anything that
+  changes on mount mismatches — that is a console error in production, not just dev
 
 ## Project Structure
 

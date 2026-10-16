@@ -141,7 +141,7 @@ export default {
 			this.scrolled = e.verticalPosition;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		this.$refs.scrollArea?.removeEventListener("scroll", this._scrollListener);
 	},
 };
@@ -173,22 +173,20 @@ export default {
 		background-repeat: no-repeat;
 		z-index: 97;
 	}
-	::v-deep {
-		a.learn-more {
-			font-weight: bold;
-			color: $neutral-1;
+	:deep(a.learn-more) {
+		font-weight: bold;
+		color: $neutral-1;
 
-			&:hover {
-				text-decoration: underline;
-			}
-			&::after {
-				content: "...";
-			}
+		&:hover {
+			text-decoration: underline;
 		}
-		.footer {
-			.content {
-				max-width: 1280px;
-			}
+		&::after {
+			content: "...";
+		}
+	}
+	:deep(.footer) {
+		.content {
+			max-width: 1280px;
 		}
 	}
 }

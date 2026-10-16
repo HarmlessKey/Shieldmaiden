@@ -30,7 +30,7 @@
 			</div>
 
 			<q-table
-				:data="filteredReports"
+				:rows="filteredReports"
 				:columns="columns"
 				row-key="id"
 				card-class="bg-none"
@@ -41,15 +41,23 @@
 				:pagination="{ rowsPerPage: 15 }"
 				wrap-cells
 			>
-				<div slot="no-data">No reports found.</div>
-				<hk-loader slot="loading" name="players" />
+				<template v-slot:no-data>
+					<div>No reports found.</div>
+				</template>
+				<template v-slot:loading>
+					<hk-loader name="players" />
+				</template>
 				<template v-slot:body="props">
 					<q-tr :props="props">
 						<q-td key="type" :props="props">{{ props.row.type }}</q-td>
 						<q-td key="content_name" :props="props">
 							<a v-if="props.row.type === 'monster'" @click="viewMonster(props.row)">
 								{{ props.row.content_name }}
-								<q-spinner v-if="loading_monster_id === props.row.content_id" size="1em" class="ml-1" />
+								<q-spinner
+									v-if="loading_monster_id === props.row.content_id"
+									size="1em"
+									class="ml-1"
+								/>
 							</a>
 							<a
 								v-else-if="contentLink(props.row)"
@@ -65,7 +73,12 @@
 						<q-td key="issue" :props="props">
 							<div class="issue-cell">
 								{{ props.row.issue }}
-								<q-tooltip v-if="props.row.issue" anchor="top middle" self="center middle" max-width="400px">
+								<q-tooltip
+									v-if="props.row.issue"
+									anchor="top middle"
+									self="center middle"
+									max-width="400px"
+								>
 									{{ props.row.issue }}
 								</q-tooltip>
 							</div>
@@ -134,7 +147,13 @@ export default {
 			],
 			columns: [
 				{ name: "type", label: "Type", field: "type", align: "left", sortable: true },
-				{ name: "content_name", label: "Content", field: "content_name", align: "left", sortable: true },
+				{
+					name: "content_name",
+					label: "Content",
+					field: "content_name",
+					align: "left",
+					sortable: true,
+				},
 				{ name: "edition", label: "Edition", field: "edition", align: "left", sortable: true },
 				{ name: "issue", label: "Issue", field: "issue", align: "left" },
 				{ name: "user_id", label: "Reporter", field: "user_id", align: "left" },
@@ -177,7 +196,10 @@ export default {
 		async viewMonster(report) {
 			this.loading_monster_id = report.content_id;
 			try {
-				const monster = await this.fetch_monster({ id: report.content_id, edition: report.edition });
+				const monster = await this.fetch_monster({
+					id: report.content_id,
+					edition: report.edition,
+				});
 				this.setDrawer({ show: true, type: "drawers/ViewNpc", data: monster });
 			} catch (error) {
 				this.$snotify.error(error);

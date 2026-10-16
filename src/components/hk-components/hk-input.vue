@@ -1,10 +1,9 @@
 <template>
-	<div>
+	<div v-bind="wrapperAttrs">
 		<ValidationProvider :rules="rules" :name="name" v-slot="{ errors, invalid, validated }">
 			<q-input
-				v-bind="$attrs"
-				v-on="$listeners"
-				v-model="modelValue"
+				v-bind="inputAttrs"
+				v-model="model"
 				:dark="$store.getters.theme === 'dark'"
 				:type="type"
 				:filled="filled"
@@ -13,7 +12,9 @@
 				:error="rules ? invalid && validated : null"
 				:error-message="errors[0]"
 			>
-				<slot v-for="slot in Object.keys($slots)" :name="slot" :slot="slot" />
+				<template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
+					<slot :name="slot" v-bind="scope || {}" />
+				</template>
 			</q-input>
 		</ValidationProvider>
 	</div>
@@ -24,8 +25,11 @@ import { isNil } from "lodash";
 
 export default {
 	name: "hk-input",
+	// Attributes are forwarded to the q-input rather than the wrapper, otherwise
+	// listeners like @click and @keydown would fire twice (once per element).
+	inheritAttrs: false,
 	props: {
-		value: {
+		modelValue: {
 			type: [String, Number],
 		},
 		filled: {
@@ -55,16 +59,27 @@ export default {
 			default: false,
 		},
 	},
+	emits: ["update:modelValue"],
 	computed: {
-		modelValue: {
+		// class and style stay on the wrapper, the way they did on Vue 2 where they
+		// were never part of $attrs.
+		wrapperAttrs() {
+			return { class: this.$attrs.class, style: this.$attrs.style };
+		},
+		inputAttrs() {
+			// eslint-disable-next-line no-unused-vars
+			const { class: _class, style: _style, ...rest } = this.$attrs;
+			return rest;
+		},
+		model: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newVal) {
 				if (this.type === "number" && !isNil(newVal)) {
 					newVal = this.integer ? parseInt(newVal) : Number(newVal);
 				}
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 			},
 		},
 	},

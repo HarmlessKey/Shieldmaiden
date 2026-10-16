@@ -1,8 +1,10 @@
 <template>
 	<hk-card header="">
-		<div class="card-header" slot="header">
-			<h1>Compendium D&D 5e and 5.5e</h1>
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<h1>Compendium D&D 5e and 5.5e</h1>
+			</div>
+		</template>
 		<div class="card-body">
 			<ul class="entities">
 				<li v-for="(item, index) in items" :key="index">

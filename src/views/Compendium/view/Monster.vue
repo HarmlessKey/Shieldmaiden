@@ -2,7 +2,10 @@
 	<hk-card>
 		<hk-loader v-if="loading" name="monster" />
 		<template v-else>
-			<div slot="header" class="card-header">
+			<!-- Plain child, not a named slot: hk-card renders its header slot right
+			     before the default slot, and a named slot would have to be a direct
+			     child of hk-card rather than nested in this v-else. -->
+			<div class="card-header">
 				<h1>
 					{{ not_found ? "Monster not found" : monster.name.capitalizeEach() }}
 					<span v-if="!not_found" class="neutral-2">{{ editionLabel }}</span>
@@ -37,12 +40,22 @@
 <script>
 import ViewMonster from "src/components/compendium/Monster";
 import { mapGetters } from "vuex";
+import { createMetaMixin } from "quasar";
+import { EventBus } from "src/event-bus";
 import { metaCompendium } from "src/mixins/metaCompendium";
 import { otherEdition } from "src/utils/generalFunctions";
 
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+function metaInfo() {
+	return {
+		title: this.compendium_edition_text(this.monster.meta.title),
+		meta: this.generate_compendium_meta(this.monster.meta),
+	};
+}
+
 export default {
 	name: "Monster",
-	mixins: [metaCompendium],
+	mixins: [metaCompendium, createMetaMixin(metaInfo)],
 	components: {
 		ViewMonster,
 	},
@@ -78,16 +91,10 @@ export default {
 			return this.$route.params.edition || "5e";
 		},
 	},
-	meta() {
-		return {
-			title: this.compendium_edition_text(this.monster.meta.title),
-			meta: this.generate_compendium_meta(this.monster.meta),
-		};
-	},
 	mounted() {
 		if (this.monster) {
 			this.loading = false;
-			this.$root.$emit("route-name", this.monster.name.capitalizeEach());
+			EventBus.emit("route-name", this.monster.name.capitalizeEach());
 		} else {
 			this.not_found = true;
 			this.loading = false;

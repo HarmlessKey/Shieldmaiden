@@ -44,7 +44,7 @@
 					<q-item-section avatar>
 						<i :class="icon" class="neutral-2" aria-hidden="true" />
 					</q-item-section>
-					<q-item-section v-text="title" />
+					<q-item-section>{{ title }}</q-item-section>
 				</template>
 				<div class="accordion-body" v-html="text" />
 			</q-expansion-item>
@@ -76,7 +76,7 @@
 					<q-item-section avatar>
 						<i :class="icon" class="neutral-2" aria-hidden="true" />
 					</q-item-section>
-					<q-item-section v-text="title" />
+					<q-item-section>{{ title }}</q-item-section>
 				</template>
 				<div class="accordion-body" v-html="text" />
 			</q-expansion-item>
@@ -90,11 +90,31 @@
 </template>
 
 <script>
+import { createMetaMixin } from "quasar";
 import { combat_tracker_texts, live_initiative_texts } from "src/utils/generalConstants";
 import ToolsPage from "src/components/ToolsPage.vue";
 
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+const metaMixin = createMetaMixin(() => ({
+	meta: {
+		twitterImage: {
+			name: "twitter:image",
+			content: require(`assets/_img/meta/shieldmaiden-combat-tracker.png`),
+		},
+		ogImage: {
+			property: "og:image",
+			content: require(`assets/_img/meta/shieldmaiden-combat-tracker.png`),
+		},
+		ogImageAlt: {
+			property: "og:image:alt",
+			content: "Shieldmaiden Combat Tracker",
+		},
+	},
+}));
+
 export default {
 	name: "ToolsCombatTracker",
+	mixins: [metaMixin],
 	components: {
 		ToolsPage,
 	},
@@ -102,24 +122,6 @@ export default {
 		return {
 			tracker: combat_tracker_texts.filter((item) => item.name !== "more"),
 			share: live_initiative_texts,
-		};
-	},
-	meta() {
-		return {
-			meta: {
-				twitterImage: {
-					name: "twitter:image",
-					content: require(`assets/_img/meta/shieldmaiden-combat-tracker.png`),
-				},
-				ogImage: {
-					property: "og:image",
-					content: require(`assets/_img/meta/shieldmaiden-combat-tracker.png`),
-				},
-				ogImageAlt: {
-					property: "og:image:alt",
-					content: "Shieldmaiden Combat Tracker",
-				},
-			},
 		};
 	},
 };

@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import { EventBus } from "src/event-bus";
+
 export default {
 	name: "Crumble",
 	data() {
@@ -30,7 +32,9 @@ export default {
 					breadcrumbArray.push({
 						path: path,
 						to: breadcrumbArray[i - 1] ? breadcrumbArray[i - 1].to + "/" + path : "/" + path,
-						name: this.$route.matched[i] ? this.$route.matched[i].meta.crumb || this.$route.matched[i].meta.title || path : path,
+						name: this.$route.matched[i]
+							? this.$route.matched[i].meta.crumb || this.$route.matched[i].meta.title || path
+							: path,
 					});
 				}
 				return breadcrumbArray;
@@ -40,6 +44,9 @@ export default {
 		},
 	},
 	methods: {
+		setRouteName(name) {
+			this.last_route = name;
+		},
 		compendiumEditionCrumbs() {
 			const [, base, section, edition, id] = this.$route.path.split("/");
 			if (base !== "compendium" || edition !== "5.5e") return null;
@@ -57,7 +64,10 @@ export default {
 				{
 					path: "compendium",
 					to: "/compendium",
-					name: this.$route.matched[0]?.meta.crumb || this.$route.matched[0]?.meta.title || "Compendium",
+					name:
+						this.$route.matched[0]?.meta.crumb ||
+						this.$route.matched[0]?.meta.title ||
+						"Compendium",
 				},
 				{
 					path: section,
@@ -79,10 +89,13 @@ export default {
 		},
 	},
 	mounted() {
-		// Replace the last name in breadcrumb with a value emitted from a component
-		this.$root.$on("route-name", (name) => {
-			this.last_route = name;
-		});
+		// Replace the last name in breadcrumb with a value emitted from a component.
+		// Vue 3 instances are not event emitters, so this goes over the event bus
+		// rather than $root.
+		EventBus.on("route-name", this.setRouteName);
+	},
+	beforeUnmount() {
+		EventBus.off("route-name", this.setRouteName);
 	},
 	watch: {
 		$route() {

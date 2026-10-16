@@ -3,6 +3,10 @@
 		enter-active-class="animated animate__slideInLeft"
 		leave-active-class="animated animate__slideOutLeft"
 	>
+		<!-- The child is always rendered; App.vue toggles the whole Sidebar component,
+		     so this transition has never animated, on Vue 2 either. Left as-is rather
+		     than changing behaviour during the migration. -->
+		<!-- eslint-disable-next-line vue/require-toggle-inside-transition -->
 		<div
 			@click.stop=""
 			id="sidebar"

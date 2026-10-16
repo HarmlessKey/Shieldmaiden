@@ -2,15 +2,16 @@
 	<div>
 		<div class="share" :class="{ small: is_small }">
 			<div class="qr-wrapper" v-if="qr">
-				<vue-qr
-					class="qr"
-					:text="url"
-					qid="playerLink"
-					:size="120"
-					:margin="5"
-					:logoSrc="require('src/assets/_img/logo/logo-icon-no-shield-cyan.svg')"
-					:logoScale="0.25"
-				/>
+				<!-- qrcode.vue has no logo option; the logo is overlaid instead, which
+				     the H error-correction level leaves room for. -->
+				<div class="qr">
+					<QrcodeVue :value="url" :size="120" :margin="2" level="H" />
+					<img
+						class="qr-logo"
+						:src="require('src/assets/_img/logo/logo-icon-no-shield-cyan.svg')"
+						alt=""
+					/>
+				</div>
 			</div>
 			<div>
 				<h2 v-if="title" class="mb-2">
@@ -24,16 +25,13 @@
 					:dark="$store.getters.theme === 'dark'"
 					filled
 					square
-					:value="url"
+					:model-value="url"
 					autocomplete="off"
 					type="text"
 				>
-					<hk-share
-						title="Shieldmaiden"
-						text="Follow my campaigns on Shieldmaiden!"
-						:url="url"
-						slot="after"
-					/>
+					<template v-slot:after>
+						<hk-share title="Shieldmaiden" text="Follow my campaigns on Shieldmaiden!" :url="url" />
+					</template>
 				</q-input>
 			</div>
 		</div>
@@ -49,12 +47,12 @@
 </template>
 
 <script>
-import VueQr from "vue-qr";
+import QrcodeVue from "qrcode.vue";
 
 export default {
 	name: "PlayerLink",
 	components: {
-		VueQr,
+		QrcodeVue,
 	},
 	props: {
 		qr: {
@@ -79,7 +77,7 @@ export default {
 	},
 	computed: {
 		share_available() {
-			return process.browser && navigator.share !== undefined;
+			return process.env.CLIENT && navigator.share !== undefined;
 		},
 	},
 	methods: {
@@ -103,6 +101,20 @@ export default {
 .share {
 	.copy {
 		word-break: break-all;
+	}
+
+	.qr {
+		position: relative;
+		line-height: 0;
+
+		.qr-logo {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 30px;
+			height: 30px;
+			transform: translate(-50%, -50%);
+		}
 	}
 
 	&.small {

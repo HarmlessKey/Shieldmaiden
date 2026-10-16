@@ -10,9 +10,9 @@
 		v-touch-hold.mouse="!disabled ? showDialog : null"
 		@click.stop.prevent="disabled ? null : roll ? rollDice($event) : emit($event)"
 		@keydown="checkAdvantage"
-    	@keyup="checkAdvantage"
+		@keyup="checkAdvantage"
 		@mouseenter="checkAdvantage"
-    	@mouseleave="checkAdvantage"
+		@mouseleave="checkAdvantage"
 	>
 		<slot name="default">
 			<span class="roll-button" :class="`roll-button__${color}`" />
@@ -77,8 +77,8 @@ export default {
 		},
 		color: {
 			type: String,
-			default: "cyan"
-		}
+			default: "cyan",
+		},
 	},
 	data() {
 		return {
@@ -121,7 +121,7 @@ export default {
 			window.addEventListener("keydown", this.checkKeyPress);
 		});
 	},
-	destroyed() {
+	unmounted() {
 		window.removeEventListener("keyup", this.checkKeypress);
 		window.removeEventListener("keydown", this.checkKeypress);
 	},
@@ -129,9 +129,9 @@ export default {
 		checkKeyPress(e) {
 			if (e.type === "keydown") {
 				if (e.key === "Shift") {
-					this.$set(this.advantage, "advantage", true);
+					this.advantage.advantage = true;
 				} else if (e.key === "Control") {
-					this.$set(this.advantage, "disadvantage", true);
+					this.advantage.disadvantage = true;
 				}
 			}
 			if (e.type === "keyup") {
@@ -142,9 +142,9 @@ export default {
 		},
 		checkAdvantage(e) {
 			if (e.shiftKey) {
-				this.$set(this.advantage, "advantage", true);
+				this.advantage.advantage = true;
 			} else if (e.ctrlKey) {
-				this.$set(this.advantage, "disadvantage", true);
+				this.advantage.disadvantage = true;
 			}
 		},
 		clearAdvantage() {

@@ -6,7 +6,7 @@
 				v-ripple
 				v-close-popup
 				:class="{ active: selected_type?.length === available_types?.length }"
-				@click="(selected_type = available_types), (show = true)"
+				@click="((selected_type = available_types), (show = true))"
 			>
 				<q-item-section>All</q-item-section>
 			</q-item>
@@ -17,7 +17,7 @@
 				v-ripple
 				v-close-popup
 				:class="{ active: selected_type?.length === 1 && selected_type.includes(key) }"
-				@click="(selected_type = [key]), (show = true)"
+				@click="((selected_type = [key]), (show = true))"
 			>
 				<q-item-section>
 					{{ action_types[key].label }}
@@ -27,8 +27,8 @@
 				</q-item-section>
 			</q-item>
 		</template>
-		<template v-for="type in selected_type">
-			<q-item :key="`header-${type}`">
+		<template v-for="type in selected_type" :key="type">
+			<q-item>
 				<q-item-section>
 					<span class="d-flex justify-content-between">
 						{{ action_types[type].label }}
@@ -41,13 +41,7 @@
 					</span>
 				</q-item-section>
 			</q-item>
-			<RollActions
-				:key="`actions-${type}`"
-				:actor="actor"
-				:type="type"
-				rolls-only
-				@roll="show = false"
-			/>
+			<RollActions :actor="actor" :type="type" rolls-only @roll="show = false" />
 		</template>
 	</ActionsDropdown>
 </template>

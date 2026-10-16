@@ -1,15 +1,21 @@
 <template>
 	<hk-card class="npc-group-manager">
-		<div slot="header" class="card-header">
-			<template v-if="selectedGroup">
-				<a @click="selectedGroup = null" class="btn btn-sm bg-neutral-5 mr-2" aria-label="Back to groups">
-					<i aria-hidden="true" class="fas fa-arrow-left" />
-				</a>
-				<span>{{ selectedGroup.name ? selectedGroup.name.capitalizeEach() : "" }}</span>
-			</template>
-			<span v-else>Manage NPC Groups</span>
-			<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
-		</div>
+		<template v-slot:header>
+			<div class="card-header">
+				<template v-if="selectedGroup">
+					<a
+						@click="selectedGroup = null"
+						class="btn btn-sm bg-neutral-5 mr-2"
+						aria-label="Back to groups"
+					>
+						<i aria-hidden="true" class="fas fa-arrow-left" />
+					</a>
+					<span>{{ selectedGroup.name ? selectedGroup.name.capitalizeEach() : "" }}</span>
+				</template>
+				<span v-else>Manage NPC Groups</span>
+				<q-btn padding="sm" size="sm" no-caps icon="fas fa-times" flat v-close-popup />
+			</div>
+		</template>
 		<div class="card-body">
 			<!-- GROUP DETAIL VIEW -->
 			<template v-if="selectedGroup">
@@ -64,7 +70,11 @@
 						class="member d-flex justify-content-between items-center"
 					>
 						<span>{{ npc.name ? npc.name.capitalizeEach() : npc.key }}</span>
-						<a class="btn btn-sm bg-neutral-5" @click="removeNpcFromGroup(npc.key)" aria-label="Remove NPC from group">
+						<a
+							class="btn btn-sm bg-neutral-5"
+							@click="removeNpcFromGroup(npc.key)"
+							aria-label="Remove NPC from group"
+						>
 							<i aria-hidden="true" class="fas fa-times red" />
 						</a>
 					</div>
@@ -88,9 +98,7 @@
 						/>
 					</div>
 					<div class="col-auto">
-						<q-btn no-caps color="primary" :disable="!newGroupName" @click="addGroup">
-							Add
-						</q-btn>
+						<q-btn no-caps color="primary" :disable="!newGroupName" @click="addGroup"> Add </q-btn>
 					</div>
 				</div>
 
@@ -105,10 +113,18 @@
 							{{ group.name ? group.name.capitalizeEach() : group.key }}
 						</a>
 						<div class="d-flex">
-							<a class="btn btn-sm bg-neutral-5 mr-1" @click="selectGroup(group)" aria-label="Edit group">
+							<a
+								class="btn btn-sm bg-neutral-5 mr-1"
+								@click="selectGroup(group)"
+								aria-label="Edit group"
+							>
 								<i aria-hidden="true" class="fas fa-pencil" />
 							</a>
-							<a class="btn btn-sm bg-neutral-5" @click="confirmDeleteGroup(group)" aria-label="Delete group">
+							<a
+								class="btn btn-sm bg-neutral-5"
+								@click="confirmDeleteGroup(group)"
+								aria-label="Delete group"
+							>
 								<i aria-hidden="true" class="fas fa-trash-alt" />
 							</a>
 						</div>
@@ -128,7 +144,11 @@
 							<a @click="selectGroup(group)" class="group-name truncate">
 								{{ group.name ? group.name.capitalizeEach() : group.key }}
 							</a>
-							<a class="btn btn-sm bg-neutral-5" @click="selectGroup(group)" aria-label="Edit campaign group">
+							<a
+								class="btn btn-sm bg-neutral-5"
+								@click="selectGroup(group)"
+								aria-label="Edit campaign group"
+							>
 								<i aria-hidden="true" class="fas fa-pencil" />
 							</a>
 						</div>
@@ -172,9 +192,7 @@ export default {
 		},
 		groupMembers() {
 			if (!this.selectedGroup) return [];
-			return this.npcs.filter(
-				(npc) => npc.groups && npc.groups[this.selectedGroup.key]
-			);
+			return this.npcs.filter((npc) => npc.groups && npc.groups[this.selectedGroup.key]);
 		},
 		groupNpcIds: {
 			get() {

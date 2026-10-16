@@ -36,14 +36,18 @@
 						<i aria-hidden="true" class="fas fa-plus green" />
 						<span class="d-none d-md-inline-block ml-1">New {{ type.slice(0, -1) }}</span>
 					</button>
+					<!-- Vue Router 4 dropped the `tag` prop; `custom` + navigate is the
+					     replacement for rendering the link as a button. -->
 					<router-link
 						v-else
-						tag="button"
-						class="btn btn-sm bg-neutral-5"
+						custom
 						:to="`${$route.path}/add-${type.slice(0, -1)}`"
+						v-slot="{ navigate }"
 					>
-						<i aria-hidden="true" class="fas fa-plus green" />
-						<span class="d-none d-md-inline-block ml-1">New {{ type.slice(0, -1) }}</span>
+						<button class="btn btn-sm bg-neutral-5" @click="navigate">
+							<i aria-hidden="true" class="fas fa-plus green" />
+							<span class="d-none d-md-inline-block ml-1">New {{ type.slice(0, -1) }}</span>
+						</button>
 					</router-link>
 				</template>
 			</template>

@@ -1,7 +1,10 @@
 <template>
 	<hk-card>
 		<template v-if="!loading">
-			<div slot="header" class="card-header">
+			<!-- Plain child, not a named slot: hk-card renders its header slot right
+			     before the default slot, and a named slot would have to be a direct
+			     child of hk-card rather than nested in this v-if. -->
+			<div class="card-header">
 				<h1>
 					{{ not_found ? "Spell not found" : spell.name.capitalizeEach() }}
 					<span v-if="!not_found" class="neutral-2">{{ editionLabel }}</span>
@@ -24,10 +27,10 @@
 			</div>
 			<div class="card-body">
 				<template v-if="not_found">
-					<p>Could not find spell <strong>{{ id }}</strong></p>
-					<router-link :to="listPath" class="btn bg-neutral-5">
-						Find spells
-					</router-link>
+					<p>
+						Could not find spell <strong>{{ id }}</strong>
+					</p>
+					<router-link :to="listPath" class="btn bg-neutral-5"> Find spells </router-link>
 				</template>
 				<Spell v-else :data="spell" />
 			</div>
@@ -37,64 +40,68 @@
 </template>
 
 <script>
-	import { mapGetters } from "vuex";
-	import Spell from "src/components/compendium/Spell";
-	import { metaCompendium } from 'src/mixins/metaCompendium';
-	import { otherEdition } from 'src/utils/generalFunctions';
+import { mapGetters } from "vuex";
+import { createMetaMixin } from "quasar";
+import Spell from "src/components/compendium/Spell";
+import { EventBus } from "src/event-bus";
+import { metaCompendium } from "src/mixins/metaCompendium";
+import { otherEdition } from "src/utils/generalFunctions";
 
-	export default {
-		name: "ViewSpell",
-		mixins: [
-			metaCompendium
-		],
-		components: {
-			Spell
+// Vue 3 dropped the `meta()` component option; Quasar exposes it as a mixin.
+function metaInfo() {
+	return {
+		title: this.compendium_edition_text(this.spell.meta.title),
+		meta: this.generate_compendium_meta(this.spell.meta),
+	};
+}
+
+export default {
+	name: "ViewSpell",
+	mixins: [metaCompendium, createMetaMixin(metaInfo)],
+	components: {
+		Spell,
+	},
+	data() {
+		return {
+			id: this.$route.params.id,
+			loading: true,
+			not_found: false,
+		};
+	},
+	// Fetch the spell Server side, on the Client side retrieve it from the store
+	async preFetch({ store, currentRoute }) {
+		await store.dispatch(
+			"api_spells/fetch_api_spell",
+			{ id: currentRoute.params.id, edition: currentRoute.params.edition },
+			{ root: true }
+		);
+	},
+	computed: {
+		...mapGetters("api_spells", ["get_api_spell"]),
+		spell() {
+			return this.get_api_spell(this.id, this.$route.params.edition);
 		},
-		data() {
-			return {
-				id: this.$route.params.id,
-				loading: true,
-				not_found: false
-			}
+		listPath() {
+			return this.$route.params.edition
+				? `/compendium/spells/${this.$route.params.edition}`
+				: "/compendium/spells";
 		},
-		// Fetch the spell Server side, on the Client side retrieve it from the store
-		async preFetch({ store, currentRoute }) {
-			await store.dispatch(
-				"api_spells/fetch_api_spell",
-				{ id: currentRoute.params.id, edition: currentRoute.params.edition },
-				{ root: true }
-			);
+		otherEdition() {
+			return otherEdition(this.$route);
 		},
-		computed: {
-			...mapGetters("api_spells", ["get_api_spell"]),
-			spell() {
-				return this.get_api_spell(this.id, this.$route.params.edition);
-			},
-			listPath() {
-				return this.$route.params.edition ? `/compendium/spells/${this.$route.params.edition}` : "/compendium/spells";
-			},
-			otherEdition() {
-				return otherEdition(this.$route);
-			},
-			editionLabel() {
-				return this.$route.params.edition || "5e";
-			}
+		editionLabel() {
+			return this.$route.params.edition || "5e";
 		},
-		meta() {
-			return {
-				title: this.compendium_edition_text(this.spell.meta.title),
-				meta: this.generate_compendium_meta(this.spell.meta)
-			}
-		},
-		mounted() {
-			if(this.spell) {
-				this.loading = false;
-				// Root emit with the spell name, so it can be used in Crumble component
-				this.$root.$emit('route-name', this.spell.name);
-			} else {
-				this.not_found = true;
-				this.loading = false;
-			}
+	},
+	mounted() {
+		if (this.spell) {
+			this.loading = false;
+			// Root emit with the spell name, so it can be used in Crumble component
+			EventBus.emit("route-name", this.spell.name);
+		} else {
+			this.not_found = true;
+			this.loading = false;
 		}
-	}
+	},
+};
 </script>

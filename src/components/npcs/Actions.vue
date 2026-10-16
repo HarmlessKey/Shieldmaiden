@@ -1,32 +1,34 @@
 <template>
 	<div>
 		<hk-card>
-			<div slot="header" class="card-header d-flex justify-content-between">
-				Abilities
-				<a class="btn btn-sm bg-neutral-5">
-					<i aria-hidden="true" class="fas fa-plus green"></i>
-					<span class="d-none d-md-inline ml-1">Add</span>
-					<q-tooltip anchor="top middle" self="center middle"> Add </q-tooltip>
-					<q-popup-proxy :dark="$store.getters.theme === 'dark'">
-						<div class="bg-neutral-9">
-							<q-list>
-								<q-item
-									v-for="{ category, name_single } in actions"
-									:key="`add-${category}`"
-									clickable
-									v-close-popup
-									@click="add(category)"
-								>
-									<q-item-section avatar>
-										<i aria-hidden="true" class="fas fa-plus"></i>
-									</q-item-section>
-									<q-item-section>{{ name_single }}</q-item-section>
-								</q-item>
-							</q-list>
-						</div>
-					</q-popup-proxy>
-				</a>
-			</div>
+			<template v-slot:header>
+				<div class="card-header d-flex justify-content-between">
+					Abilities
+					<a class="btn btn-sm bg-neutral-5">
+						<i aria-hidden="true" class="fas fa-plus green"></i>
+						<span class="d-none d-md-inline ml-1">Add</span>
+						<q-tooltip anchor="top middle" self="center middle"> Add </q-tooltip>
+						<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+							<div class="bg-neutral-9">
+								<q-list>
+									<q-item
+										v-for="{ category, name_single } in actions"
+										:key="`add-${category}`"
+										clickable
+										v-close-popup
+										@click="add(category)"
+									>
+										<q-item-section avatar>
+											<i aria-hidden="true" class="fas fa-plus"></i>
+										</q-item-section>
+										<q-item-section>{{ name_single }}</q-item-section>
+									</q-item>
+								</q-list>
+							</div>
+						</q-popup-proxy>
+					</a>
+				</div>
+			</template>
 
 			<div class="card-body -mt-3">
 				<template v-for="{ name, category, name_single } in actions">
@@ -49,37 +51,37 @@
 								filled
 								square
 								label="Count"
-								:value="npc.legendary_count"
+								:model-value="npc.legendary_count"
 								type="number"
 								class="my-3"
 								hint="Amount of legendary actions per turn."
-								@input="parseToInt($event, npc, 'legendary_count')"
+								@update:model-value="parseToInt($event, npc, 'legendary_count')"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
 						</ValidationProvider>
 
 						<!-- ABILITIES -->
+						<!-- vuedraggable 4 renders the list through the #item slot. `tag` is a
+						     plain `div` and not `transition-group`, which is what carried the
+						     enter/leave animation on Vue 2: TransitionGroup clones every keyed
+						     child, so the vnodes vuedraggable holds never get an `el` and its
+						     mounted hook throws on the null el. -->
 						<draggable
 							tag="div"
 							v-model="npc[category]"
+							:item-key="abilityKey"
+							:component-data="{
+								class: 'accordion',
+							}"
 							:animation="200"
-							class="accordion"
 							handle=".drag-handle"
 							ghost-class="drag-ghost"
 							drag-class="drag-dragging"
 							:force-fallback="true"
 						>
-							<transition-group
-								type="transition"
-								name="action-list"
-								enter-active-class="animated animate__fadeIn"
-								leave-active-class="animated animate__fadeOut"
-							>
-								<div
-									v-for="(ability, ability_index) in npc[category]"
-									:key="`ability-${ability_index}`"
-								>
+							<template #item="{ element: ability, index: ability_index }">
+								<div>
 									<ValidationObserver v-slot="{ valid }">
 										<q-expansion-item
 											:dark="$store.getters.theme === 'dark'"
@@ -199,7 +201,7 @@
 														class="mb-3"
 														v-model.number="ability.legendary_cost"
 														hint="How many legendary actions does this cost?"
-														@input="parseToInt($event, ability, 'legendary_cost')"
+														@update:model-value="parseToInt($event, ability, 'legendary_cost')"
 														@keyup="$forceUpdate()"
 														:error="invalid && validated"
 														:error-message="errors[0]"
@@ -264,7 +266,7 @@
 																	autocomplete="off"
 																	type="number"
 																	v-model.number="ability.limit"
-																	@input="parseToInt($event, ability, 'limit')"
+																	@update:model-value="parseToInt($event, ability, 'limit')"
 																	@keyup="$forceUpdate()"
 																	:error="invalid && validated"
 																	:error-message="errors[0]"
@@ -279,7 +281,7 @@
 																class="limit-type"
 																v-model="ability.limit_type"
 																:options="limit_types"
-																@input="$forceUpdate()"
+																@update:model-value="$forceUpdate()"
 																prefix="/"
 															/>
 														</div>
@@ -326,7 +328,7 @@
 																	type="number"
 																	suffix="ft."
 																	@keyup="$forceUpdate()"
-																	@input="parseToInt($event, ability, 'reach')"
+																	@update:model-value="parseToInt($event, ability, 'reach')"
 																	:error="invalid && validated"
 																	:error-message="errors[0]"
 																/>
@@ -362,7 +364,7 @@
 																label="AOE type"
 																:options="aoe_types"
 																v-model="ability.aoe_type"
-																@input="$forceUpdate()"
+																@update:model-value="$forceUpdate()"
 															/>
 														</div>
 														<div class="col">
@@ -381,7 +383,7 @@
 																	suffix="ft."
 																	:disable="!ability.aoe_type"
 																	@keyup="$forceUpdate()"
-																	@input="parseToInt($event, ability, 'aoe_size')"
+																	@update:model-value="parseToInt($event, ability, 'aoe_size')"
 																	:error="invalid && validated"
 																	:error-message="errors[0]"
 																/>
@@ -408,17 +410,19 @@
 														class="mb-4"
 														@new-value="addOption"
 														@remove="removeOption($event, category, ability_index)"
-														@input="$forceUpdate()"
+														@update:model-value="$forceUpdate()"
 													>
-														<hk-popover slot="append" header="Action options">
-															<i class="fas fa-info-circle" aria-hidden="true" />
-															<template #content>
-																Options allow you to create slightly different rolls for the actions
-																and choose to use this action with one of the options. Think of
-																versatile weapon attacks where you roll a different damage die for
-																1- or 2-handed attacks.
-															</template>
-														</hk-popover>
+														<template v-slot:append>
+															<hk-popover header="Action options">
+																<i class="fas fa-info-circle" aria-hidden="true" />
+																<template #content>
+																	Options allow you to create slightly different rolls for the
+																	actions and choose to use this action with one of the options.
+																	Think of versatile weapon attacks where you roll a different
+																	damage die for 1- or 2-handed attacks.
+																</template>
+															</hk-popover>
+														</template>
 													</q-select>
 
 													<!-- ACTIONS -->
@@ -440,7 +444,7 @@
 																	:options="Object.values(attack_types)"
 																	v-model="action.type"
 																	class="mb-2"
-																	@input="$forceUpdate()"
+																	@update:model-value="$forceUpdate()"
 																/>
 															</div>
 
@@ -461,7 +465,7 @@
 																			label="Save ability"
 																			:options="abilities"
 																			v-model="action.save_ability"
-																			@input="$forceUpdate()"
+																			@update:model-value="$forceUpdate()"
 																			:error="invalid && validated"
 																			:error-message="errors[0]"
 																		/>
@@ -481,7 +485,7 @@
 																			label="Save DC"
 																			v-model.number="action.save_dc"
 																			@keyup="$forceUpdate()"
-																			@input="parseToInt($event, action, 'save_dc')"
+																			@update:model-value="parseToInt($event, action, 'save_dc')"
 																			:error="invalid && validated"
 																			:error-message="errors[0]"
 																		/>
@@ -506,7 +510,9 @@
 																			label="Attack modifier"
 																			v-model.number="action.attack_bonus"
 																			@keyup="$forceUpdate()"
-																			@input="parseToInt($event, action, 'attack_bonus')"
+																			@update:model-value="
+																				parseToInt($event, action, 'attack_bonus')
+																			"
 																			:error="invalid && validated"
 																			:error-message="errors[0]"
 																		/>
@@ -571,7 +577,7 @@
 										</q-expansion-item>
 									</ValidationObserver>
 								</div>
-							</transition-group>
+							</template>
 						</draggable>
 					</div>
 				</template>
@@ -596,16 +602,18 @@
 								/>
 								<div v-else>Select an action type first</div>
 							</div>
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
-								<q-btn
-									color="primary"
-									type="submit"
-									no-caps
-									:disabled="!valid"
-									:label="edit_roll_index !== undefined ? 'Save' : 'Add'"
-								/>
-							</div>
+							<template v-slot:footer>
+								<div class="card-footer d-flex justify-content-end">
+									<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
+									<q-btn
+										color="primary"
+										type="submit"
+										no-caps
+										:disabled="!valid"
+										:label="edit_roll_index !== undefined ? 'Save' : 'Add'"
+									/>
+								</div>
+							</template>
 						</hk-card>
 					</q-form>
 				</ValidationObserver>
@@ -625,7 +633,8 @@ import draggable from "vuedraggable";
 
 export default {
 	name: "npc-Actions",
-	props: ["value"],
+	props: ["modelValue"],
+	emits: ["update:modelValue"],
 	mixins: [general, monsterMixin, dice],
 	components: {
 		draggable,
@@ -649,15 +658,18 @@ export default {
 				{ label: "Square Feet", value: "square feet" },
 			],
 			limit_types: ["day", "turn"],
+			// Non-reactive on purpose: only used to hand vuedraggable a stable item key.
+			ability_keys: new WeakMap(),
+			next_ability_key: 0,
 		};
 	},
 	computed: {
 		npc: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 			},
 		},
 		actions() {
@@ -685,11 +697,22 @@ export default {
 	},
 	methods: {
 		...mapActions(["setActionRoll"]),
+		/**
+		 * vuedraggable 4 needs a stable key per item. Abilities have no id of their
+		 * own and their name can be empty or duplicated while editing, so identity
+		 * is tracked per object instead — which survives a reorder, unlike an index.
+		 */
+		abilityKey(ability) {
+			if (!this.ability_keys.has(ability)) {
+				this.ability_keys.set(ability, `ability-${this.next_ability_key++}`);
+			}
+			return this.ability_keys.get(ability);
+		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		/**
@@ -730,7 +753,7 @@ export default {
 		 * @param {string} category actions / legendary_actions / special_abilities
 		 */
 		remove(index, category) {
-			this.$delete(this.npc[category], index);
+			this.npc[category].splice(index, 1);
 			this.$forceUpdate();
 		},
 
@@ -755,7 +778,7 @@ export default {
 				this.npc[to] = [];
 			}
 			this.npc[to].push(ability);
-			this.$delete(this.npc[from], index);
+			this.npc[from].splice(index, 1);
 			this.$forceUpdate();
 		},
 
@@ -812,12 +835,12 @@ export default {
 				action.rolls = !action.rolls ? [] : action.rolls;
 				action.rolls.push(this.roll);
 			} else {
-				this.$set(action.rolls, this.edit_roll_index, this.roll);
+				action.rolls[this.edit_roll_index] = this.roll;
 			}
 			this.action_dialog = false;
 		},
 		deleteRoll(roll_index, ability_index, category, action_index) {
-			this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
+			this.npc[category][ability_index].action_list[action_index].rolls.splice(roll_index, 1);
 			this.$forceUpdate();
 		},
 
@@ -844,7 +867,7 @@ export default {
 					if (action.rolls) {
 						for (const roll of action.rolls) {
 							if (roll.options) {
-								this.$delete(roll.options, details.value);
+								delete roll.options[details.value];
 							}
 						}
 					}
@@ -943,9 +966,7 @@ h3 {
 .action-list {
 	transition: transform 0.5s;
 }
-::v-deep {
-	.q-item {
-		user-select: none;
-	}
+:deep(.q-item) {
+	user-select: none;
 }
 </style>

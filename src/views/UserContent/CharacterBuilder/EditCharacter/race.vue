@@ -3,26 +3,28 @@
 		<ValidationObserver v-slot="{ valid }">
 			<q-form greedy>
 				<hk-card>
-					<div class="card-header" slot="header">
-						<span>Race</span>
-						<small class="saved green" v-if="saved" @animationend="saved = false">
-							<i aria-hidden="true" class="fas fa-check" />
-							Saved
-						</small>
-						<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-							<i aria-hidden="true" class="fas fa-times" />
-							Couldn't save
-						</small>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>Race</span>
+							<small class="saved green" v-if="saved" @animationend="saved = false">
+								<i aria-hidden="true" class="fas fa-check" />
+								Saved
+							</small>
+							<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+								<i aria-hidden="true" class="fas fa-times" />
+								Couldn't save
+							</small>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-select
 							:dark="$store.getters.theme === 'dark'"
 							filled
 							square
 							label="Race"
-							:value="race.race"
+							:model-value="race.race"
 							:options="race_list"
-							@input="selectRace($event, valid)"
+							@update:model-value="selectRace($event, valid)"
 						/>
 						<template v-if="race.race === 'custom'">
 							<ValidationProvider
@@ -89,13 +91,15 @@
 
 				<!-- Traits -->
 				<hk-card>
-					<div class="card-header" slot="header">
-						Traits
-						<button class="btn btn-sm bg-neutral-5" @click.prevent="addTrait(valid)">
-							<i class="fas fa-plus green" aria-hidden="true" />
-							Add trait
-						</button>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							Traits
+							<button class="btn btn-sm bg-neutral-5" @click.prevent="addTrait(valid)">
+								<i class="fas fa-plus green" aria-hidden="true" />
+								Add trait
+							</button>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-list dark square class="accordion">
 							<q-expansion-item
@@ -287,9 +291,9 @@ export default {
 					this.deleteTrait(i, valid);
 				}
 
-				this.$set(this.character, "race", {
+				this.character.race = {
 					...value,
-				});
+				};
 			}
 			this.save(valid);
 		},

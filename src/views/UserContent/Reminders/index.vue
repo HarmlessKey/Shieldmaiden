@@ -9,7 +9,7 @@
 
 			<template v-if="reminders.length">
 				<q-table
-					:data="reminders"
+					:rows="reminders"
 					:columns="columns"
 					row-key="key"
 					card-class="bg-none"
@@ -54,7 +54,9 @@
 							</q-td>
 						</q-tr>
 					</template>
-					<div slot="no-data" />
+					<template v-slot:no-data>
+						<div />
+					</template>
 				</q-table>
 			</template>
 

@@ -10,9 +10,11 @@
 							alt="Shieldmaiden general"
 						/>
 					</template>
-					<div slot="header" class="card-header">Combat Tracker</div>
+					<template v-slot:header>
+						<div class="card-header">Combat Tracker</div>
+					</template>
 					We track everything in combat you can think of.
-					<template slot="footer">
+					<template v-slot:footer>
 						<a href="#general" class="btn btn-block">Learn More</a>
 					</template>
 				</hk-card>
@@ -24,9 +26,11 @@
 							alt="Shieldmaiden encounter builder"
 						/>
 					</template>
-					<div slot="header" class="card-header">Encounter Builder</div>
+					<template v-slot:header>
+						<div class="card-header">Encounter Builder</div>
+					</template>
 					Quickly create your encounters with ease.
-					<template slot="footer">
+					<template v-slot:footer>
 						<a href="#builder" class="btn btn-block">Learn More</a>
 					</template>
 				</hk-card>
@@ -38,9 +42,11 @@
 							alt="Shieldmaiden share initiative"
 						/>
 					</template>
-					<div slot="header" class="card-header">Share Initiative</div>
+					<template v-slot:header>
+						<div class="card-header">Share Initiative</div>
+					</template>
 					On a second screen, or with anyone in the world.
-					<template slot="footer">
+					<template v-slot:footer>
 						<a href="#share" class="btn btn-block">Learn More</a>
 					</template>
 				</hk-card>
@@ -52,9 +58,11 @@
 							alt="Shieldmaiden campaign tracker"
 						/>
 					</template>
-					<div slot="header" class="card-header">Campaign Manager</div>
+					<template v-slot:header>
+						<div class="card-header">Campaign Manager</div>
+					</template>
 					Manage more than just your encounters.
-					<template slot="footer">
+					<template v-slot:footer>
 						<a href="#campaign" class="btn btn-block">Learn More</a>
 					</template>
 				</hk-card>

@@ -91,7 +91,7 @@
 				v-for="(xp, index) in xpAward"
 				class="xp"
 				:key="`xp-${index}`"
-				@click="$delete(xpAward, index)"
+				@click="xpAward.splice(index, 1)"
 			>
 				{{ xp > 0 ? `+${xp}` : xp }}<small>xp</small>
 			</div>
@@ -170,7 +170,7 @@ export default {
 						}
 
 						this.$snotify.html(
-							`<div class="snotifyToast__body roll">
+							`<div class="hk-roll-toast">
 									<div class="roll_title truncate">${
 										notification.entity_name ? `${notification.entity_name}: ` : ``
 									}${notification.title}</div>
@@ -257,7 +257,7 @@ export default {
 			return undefined;
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener("resize", this.setSize);
 	},
 };

@@ -14,13 +14,10 @@
 						autocomplete="off" 
 						id="patron_id"
 						type="number"
-						:class="{'input': true, 'error': errors.has('patron_id') }" 
-						v-model="patron.patron_id" 
-						v-validate="'required|numeric'" 
-						data-vv-as="Patron ID"
-						name="patron_id" 
+						class="input"
+						v-model="patron.patron_id"
+						name="patron_id"
 					/>
-					<p class="validate red" v-if="errors.has('patron_id')">{{ errors.first('patron_id') }}</p>
 				</template>
 
 				<label for="email" class="mt-4">Email</label>
@@ -30,37 +27,28 @@
 					autocomplete="off" 
 					type="text"
 					id="email"
-					:class="{'input': true, 'error': errors.has('email') }" 
-					v-model="patron.email" 
-					v-validate="'required|email'" 
-					data-vv-as="Email"
-					name="email" 
+					class="input"
+					v-model="patron.email"
+					name="email"
 					placeholder="Email" />
-				<p class="validate red" v-if="errors.has('email')">{{ errors.first('email') }}</p>
 
 				<label for="tier" class="mt-4">Tier</label>
 				<q-select 
 					id="tier"
 					v-model="patron.tier_id"
-					v-validate="'required'" 
-					data-vv-as="Tier"
-					name="tier" 
+					name="tier"
 					placeholder="Tier">
 					<option v-for="(tier, key) in tiers" :key="key" :value="key">{{ tier.name }}</option>
 				</q-select>
-				<p class="validate red" v-if="errors.has('tier')">{{ errors.first('tier') }}</p>
 
 				<label for="status" class="mt-4">Status</label>
 				<q-select 
 					id="status"
 					v-model="patron.status"
-					v-validate="'required'" 
-					data-vv-as="Status"
 					name="status">
 					<option value="active_patron" selected="selected">Active</option>
 					<option value="former_patron">Former</option>
 				</q-select>
-					<p class="validate red" v-if="errors.has('status')">{{ errors.first('status') }}</p>
 			</div>
 		</div>
 		<button class="btn" @click="addPatron">

@@ -15,11 +15,13 @@
 					clearable
 					placeholder="Search players"
 				>
-					<q-icon slot="prepend" name="search" />
+					<template v-slot:prepend>
+						<q-icon name="search" />
+					</template>
 				</q-input>
 
 				<q-table
-					:data="players"
+					:rows="players"
 					:columns="columns"
 					row-key="key"
 					card-class="bg-none"
@@ -120,8 +122,12 @@
 							</q-td>
 						</q-tr>
 					</template>
-					<div slot="no-data" />
-					<hk-loader slot="loading" name="players" />
+					<template v-slot:no-data>
+						<div />
+					</template>
+					<template v-slot:loading>
+						<hk-loader name="players" />
+					</template>
 				</q-table>
 			</template>
 
@@ -256,16 +262,16 @@ export default {
 			this.link_dialog = false;
 		},
 		async syncCharacter(id, sync_character) {
-			this.$set(this.syncing, id, "syncing");
+			this.syncing[id] = "syncing";
 			try {
 				await this.sync_player({ uid: this.userId, id, sync_character });
-				this.$set(this.syncing, id, "success");
+				this.syncing[id] = "success";
 			} catch (e) {
 				this.syncing[id] = "error";
 				this.$snotify.error(e, "Sync failed", {});
 			} finally {
 				setTimeout(() => {
-					this.$delete(this.syncing, id);
+					delete this.syncing[id];
 				}, 2000);
 			}
 		},

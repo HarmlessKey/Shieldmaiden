@@ -216,14 +216,13 @@ export default {
 			white-space: nowrap;
 			line-height: 16px;
 		}
-		::v-deep {
-			.saves {
-				font-size: 13px;
-
-				&__wrapper {
-					width: 100%;
-				}
-			}
+		// Sass cannot append a `&__suffix` inside :deep(), so the BEM element gets
+		// its own :deep() selector.
+		:deep(.saves) {
+			font-size: 13px;
+		}
+		:deep(.saves__wrapper) {
+			width: 100%;
 		}
 	}
 }

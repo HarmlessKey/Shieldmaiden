@@ -6,7 +6,7 @@
 			</h3>
 			<i>
 				<template v-if="spell.level === 0">Cantrip </template>
-				<template v-else>{{ spell.level | numeral("0o") }}-level </template>
+				<template v-else>{{ $numeral(spell.level, "0o") }}-level</template>
 				{{ spell.school }}
 			</i>
 		</div>
@@ -31,7 +31,7 @@
 		</div>
 
 		<div class="spell__description">
-			<hk-markdown-editor :value="spell.description" read-only />
+			<hk-markdown-editor :model-value="spell.description" read-only />
 			<div v-if="spell.higher_level">
 				<strong class="pl-2"><em>At Higher Levels.</em></strong> {{ spell.higher_level }}
 			</div>

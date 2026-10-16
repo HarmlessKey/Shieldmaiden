@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import { Flicking } from "@egjs/vue-flicking";
-import "@egjs/vue-flicking/dist/flicking.css";
+import Flicking from "@egjs/vue3-flicking";
+import "@egjs/vue3-flicking/dist/flicking.css";
 
 export default {
 	name: "Feedback",

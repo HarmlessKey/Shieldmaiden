@@ -3,18 +3,20 @@
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveItem(valid))">
 				<hk-card header="Your Item">
-					<div slot="header" class="card-header">
-						{{ item.name ? item.name : "New item" }}
+					<template v-slot:header>
+						<div class="card-header">
+							{{ item.name ? item.name : "New item" }}
 
-						<a
-							v-if="$route.name == 'Add item' && !itemId"
-							class="btn btn-sm bg-neutral-5"
-							@click="copy_dialog = true"
-						>
-							Copy item
-							<i aria-hidden="true" class="ml-1 fas fa-copy" />
-						</a>
-					</div>
+							<a
+								v-if="$route.name == 'Add item' && !itemId"
+								class="btn btn-sm bg-neutral-5"
+								@click="copy_dialog = true"
+							>
+								Copy item
+								<i aria-hidden="true" class="ml-1 fas fa-copy" />
+							</a>
+						</div>
+					</template>
 					<div class="card-body">
 						<!-- NAME -->
 						<ValidationProvider
@@ -92,49 +94,51 @@
 				</hk-card>
 
 				<hk-card>
-					<div slot="header" class="card-header">
-						<span> <i aria-hidden="true" class="fal fa-table"></i> Info Tables </span>
-						<a slot="after" class="btn bg-neutral-5">
-							<i aria-hidden="true" class="fas fa-plus"></i> Add table
-							<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
-								<div class="bg-neutral-8 px-2 py-2">
-									<p>Add a table</p>
-									<ValidationProvider
-										rules="required|numeric|between:1,10"
-										name="Columns"
-										v-slot="{ errors, invalid, validated }"
-									>
-										<q-input
-											:dark="$store.getters.theme === 'dark'"
-											filled
-											square
-											label="Columns"
-											type="number"
-											max="10"
-											min="1"
-											class="mb-4"
-											v-model="columns"
-											:error="invalid && validated"
-											:error-message="errors[0]"
-											hint="How many columns?"
-										/>
-										<div class="d-flex justify-content-end mt-2">
-											<q-btn flat class="bg-neutral-8 mr-1" no-caps v-close-popup>Cancel</q-btn>
-											<q-btn
-												color="primary"
-												v-close-popup
-												no-caps
-												@click="!invalid ? addTable() : null"
-												:disabled="invalid"
-											>
-												Add table
-											</q-btn>
-										</div>
-									</ValidationProvider>
-								</div>
-							</q-popup-proxy>
-						</a>
-					</div>
+					<template v-slot:header>
+						<div class="card-header">
+							<span> <i aria-hidden="true" class="fal fa-table"></i> Info Tables </span>
+							<a class="btn bg-neutral-5">
+								<i aria-hidden="true" class="fas fa-plus"></i> Add table
+								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+									<div class="bg-neutral-8 px-2 py-2">
+										<p>Add a table</p>
+										<ValidationProvider
+											rules="required|numeric|between:1,10"
+											name="Columns"
+											v-slot="{ errors, invalid, validated }"
+										>
+											<q-input
+												:dark="$store.getters.theme === 'dark'"
+												filled
+												square
+												label="Columns"
+												type="number"
+												max="10"
+												min="1"
+												class="mb-4"
+												v-model="columns"
+												:error="invalid && validated"
+												:error-message="errors[0]"
+												hint="How many columns?"
+											/>
+											<div class="d-flex justify-content-end mt-2">
+												<q-btn flat class="bg-neutral-8 mr-1" no-caps v-close-popup>Cancel</q-btn>
+												<q-btn
+													color="primary"
+													v-close-popup
+													no-caps
+													@click="!invalid ? addTable() : null"
+													:disabled="invalid"
+												>
+													Add table
+												</q-btn>
+											</div>
+										</ValidationProvider>
+									</div>
+								</q-popup-proxy>
+							</a>
+						</div>
+					</template>
 					<div class="card-body">
 						<q-list v-if="item.tables" :dark="$store.getters.theme === 'dark'" :class="`accordion`">
 							<ValidationObserver
@@ -211,7 +215,7 @@
 											<a @click="addRow(tableIndex)" class="remove green"
 												><i aria-hidden="true" class="fas fa-plus"
 											/></a>
-											<template v-for="(row, rowIndex) in table.rows">
+											<template v-for="(row, rowIndex) in table.rows" :key="rowIndex">
 												<div
 													v-for="(col, colIndex) in table.rows[rowIndex].columns"
 													:key="`column-${rowIndex}-${colIndex}`"
@@ -234,10 +238,7 @@
 														/>
 													</ValidationProvider>
 												</div>
-												<a
-													class="red remove"
-													@click="removeRow(tableIndex, rowIndex)"
-													:key="`remove-${rowIndex}`"
+												<a class="red remove" @click="removeRow(tableIndex, rowIndex)"
 													><i aria-hidden="true" class="fas fa-trash-alt"></i
 												></a>
 											</template>
@@ -263,10 +264,12 @@
 
 		<q-dialog v-model="copy_dialog">
 			<hk-card header="Copy Existing Item" :min-width="300">
-				<div slot="header" class="card-header">
-					<span>Copy existing item</span>
-					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						<span>Copy existing item</span>
+						<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<CopyContent @copy="copy" type="item" />
 				</div>
@@ -345,7 +348,7 @@ export default {
 		addItem() {
 			this.add_item(this.item).then(
 				(key) => {
-					this.$set(this, "itemId", key);
+					this.itemId = key;
 
 					this.$snotify.success("Item Saved.", "Critical hit!", {
 						position: "rightTop",
@@ -393,7 +396,7 @@ export default {
 			if (this.columns !== undefined) {
 				this.columns = parseInt(this.columns);
 				if (this.item.tables === undefined) {
-					this.$set(this.item, "tables", []);
+					this.item.tables = [];
 				}
 				this.item.tables.push({
 					columns: this.columns,
@@ -413,10 +416,10 @@ export default {
 			});
 		},
 		removeRow(tableIndex, rowIndex) {
-			this.$delete(this.item.tables[tableIndex].rows, rowIndex);
+			this.item.tables[tableIndex].rows.splice(rowIndex, 1);
 		},
 		removeTable(key) {
-			this.$delete(this.item.tables, key);
+			this.item.tables.splice(key, 1);
 		},
 	},
 };

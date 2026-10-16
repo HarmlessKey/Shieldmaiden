@@ -6,7 +6,7 @@
 		class="mb-3 bg-neutral-8"
 	>
 		Welcome <strong>{{ userInfo.username }}</strong>
-		<template slot="action">
+		<template v-slot:action>
 			<q-btn
 				size="sm"
 				flat

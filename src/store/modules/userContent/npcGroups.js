@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { NpcGroupServices } from "src/services/npc_groups";
 import _ from "lodash";
 
@@ -104,23 +103,23 @@ const npc_group_actions = {
 
 const npc_group_mutations = {
 	SET_NPC_GROUP_SERVICES(state, payload) {
-		Vue.set(state, "npc_group_services", payload);
+		state.npc_group_services = payload;
 	},
 	SET_NPC_GROUPS(state, value) {
-		Vue.set(state, "npc_groups", value);
+		state.npc_groups = value;
 	},
 	SET_NPC_GROUP(state, { id, group }) {
 		if (state.npc_groups) {
-			Vue.set(state.npc_groups, id, group);
+			state.npc_groups[id] = group;
 		} else {
-			Vue.set(state, "npc_groups", { [id]: group });
+			state.npc_groups = { [id]: group };
 		}
 	},
 	REMOVE_NPC_GROUP(state, id) {
-		Vue.delete(state.npc_groups, id);
+		delete state.npc_groups[id];
 	},
 	CLEAR_STORE(state) {
-		Vue.set(state, "npc_groups", undefined);
+		state.npc_groups = undefined;
 	},
 };
 

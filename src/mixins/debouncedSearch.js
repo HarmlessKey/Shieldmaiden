@@ -31,7 +31,7 @@ export const debouncedSearch = {
 			this.runSearch();
 		},
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		clearTimeout(this.searchTimeout);
 	},
 };

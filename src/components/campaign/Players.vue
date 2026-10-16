@@ -1,6 +1,12 @@
 <template>
-	<tag :is="cardView ? 'hk-card' : 'div'" :class="!cardView ? 'normal-view' : ''">
-		<div slot="header" class="pane__header top-menu" :class="cardView && 'card-header'">
+	<component :is="cardView ? 'hk-card' : 'div'" :class="!cardView ? 'normal-view' : ''">
+		<!--
+			Not a named slot: Vue 3 drops named slots when :is resolves to a plain
+			element, which is the default here (cardView is false). hk-card renders
+			its header slot immediately before the default slot, so a plain child
+			lands in the same place either way.
+		-->
+		<div class="pane__header top-menu" :class="cardView && 'card-header'">
 			<div
 				class="money"
 				:class="{ red: currency >= maxCurrencyAmount }"
@@ -17,7 +23,7 @@
 				<template v-if="currency">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
-							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral("0.0a") }} </template>
+							<template v-if="key === 'pp' && coin >= 1000">{{ $numeral(coin, "0.0a") }} </template>
 							<template v-else>{{ coin }} </template>
 							<img
 								:src="require(`src/assets/_img/currency/${currencies[key].color}.svg`)"
@@ -419,7 +425,7 @@
 				</template>
 			</div>
 			<hk-loader v-else name="players" />
-			<div slot="footer" v-if="viewerIsUser && page !== 'user'">
+			<div v-if="viewerIsUser && page !== 'user'">
 				<button class="btn btn-lg btn-block bg-neutral-5 mt-4" @click="rest_dialog = true">
 					<i aria-hidden="true" class="fas fa-campfire" /> Rest party
 				</button>
@@ -432,10 +438,12 @@
 
 		<q-dialog v-if="viewerIsUser && page !== 'user'" v-model="rest_dialog">
 			<hk-card :min-width="300">
-				<div slot="header" class="card-header">
-					Party rest
-					<q-btn icon="close" no-caps flat dense v-close-popup />
-				</div>
+				<template v-slot:header>
+					<div class="card-header">
+						Party rest
+						<q-btn icon="close" no-caps flat dense v-close-popup />
+					</div>
+				</template>
 				<div class="card-body">
 					<p>Reset health and modifiers for every party member.</p>
 					<p>
@@ -443,11 +451,11 @@
 					</p>
 					<q-checkbox
 						:dark="$store.getters.theme === 'dark'"
-						:value="all"
+						:model-value="all"
 						:indeterminate-value="false"
 						:false-value="null"
 						label="Select all"
-						@input="checkAll"
+						@update:model-value="checkAll"
 					/>
 					<hr class="my-1" />
 					<div v-for="{ label, property } in resets" :key="property">
@@ -459,14 +467,16 @@
 						/>
 					</div>
 				</div>
-				<div slot="footer" class="card-footer">
-					<q-btn color="primary" label="Rest" @click="reset()" />
-				</div>
+				<template v-slot:footer>
+					<div class="card-footer">
+						<q-btn color="primary" label="Rest" @click="reset()" />
+					</div>
+				</template>
 			</hk-card>
 		</q-dialog>
 
 		<q-resize-observer @resize="onResize" />
-	</tag>
+	</component>
 </template>
 
 <script>
@@ -704,19 +714,22 @@ export default {
 			}
 		},
 		async syncCharacter(id, sync_character) {
-			this.$set(this.syncing, id, "syncing");
+			this.syncing[id] = "syncing";
 			try {
 				const linked_character = await this.sync_player({ uid: this.userId, id, sync_character });
 				if (linked_character) {
-					this.$set(this.players, id, { ...this.players[id], ...linked_character });
+					// Pre-existing in-place update of the players prop; $set hid it from
+					// the rule. Behaviour is unchanged by the migration.
+					// eslint-disable-next-line vue/no-mutating-props
+					this.players[id] = { ...this.players[id], ...linked_character };
 				}
-				this.$set(this.syncing, id, "success");
+				this.syncing[id] = "success";
 			} catch (e) {
 				this.syncing[id] = "error";
 				this.$snotify.error(e, "Sync failed", {});
 			} finally {
 				setTimeout(() => {
-					this.$delete(this.syncing, id);
+					delete this.syncing[id];
 				}, 2000);
 			}
 		},

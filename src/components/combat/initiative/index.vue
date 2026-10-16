@@ -113,13 +113,11 @@
 							/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label
-								v-text="
-									panels.filter((item) => {
-										return item.value === panel;
-									})[0].label
-								"
-							/>
+							<q-item-label>{{
+								panels.filter((item) => {
+									return item.value === panel;
+								})[0].label
+							}}</q-item-label>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -135,7 +133,7 @@
 							<q-icon :name="scope.opt.icon" />
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-text="scope.opt.label" />
+							<q-item-label>{{ scope.opt.label }}</q-item-label>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -316,10 +314,8 @@ export default {
 	.q-scrollarea {
 		height: calc(100% - 45px);
 
-		&::v-deep {
-			.q-scrollarea__content {
-				position: unset;
-			}
+		:deep(.q-scrollarea__content) {
+			position: unset;
 		}
 	}
 
@@ -356,25 +352,23 @@ export default {
 			outline-offset: 1px;
 		}
 	}
-	::v-deep {
-		ul.entities {
-			margin-top: 0;
+	:deep(ul.entities) {
+		margin-top: 0;
 
-			li {
-				padding: 8px 8px 8px 0;
-				background: $neutral-5;
-				border-radius: $border-radius-small;
-				margin-bottom: 5px;
+		li {
+			padding: 8px 8px 8px 0;
+			background: $neutral-5;
+			border-radius: $border-radius-small;
+			margin-bottom: 5px;
 
-				.actions {
-					align-items: center;
-					padding: 0;
-					gap: 3px;
-				}
+			.actions {
+				align-items: center;
+				padding: 0;
+				gap: 3px;
+			}
 
-				&:hover {
-					background-color: $neutral-5;
-				}
+			&:hover {
+				background-color: $neutral-5;
 			}
 		}
 	}

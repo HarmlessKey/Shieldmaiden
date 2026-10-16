@@ -15,12 +15,12 @@
 		</q-tabs>
 		<q-tab-panels v-model="current_tab" class="bg-transparent" :key="over">
 			<q-tab-panel v-for="tab in tabs" :key="`panel-${tab}`" :name="tab">
-				<template v-for="type in over ? over_types : types">
-					<h3 :key="`header-${type}`">
+				<template v-for="type in over ? over_types : types" :key="type">
+					<h3>
 						<i class="mr-1 fas" :class="icon(type)" aria-hidden="true" />
 						{{ type.capitalize() }} {{ tab.toLowerCase() }}
 					</h3>
-					<ul class="meters" :key="`list-${type}`">
+					<ul class="meters">
 						<li
 							v-for="(player, i) in meters(`${type}${tab === 'Taken' ? tab : ''}`)"
 							class="meters__player"
@@ -46,7 +46,7 @@
 										<q-input
 											:dark="$store.getters.theme === 'dark'"
 											type="number"
-											:value="player.value"
+											:model-value="player.value"
 											dense
 											autofocus
 											@focus="$event.target.select()"
@@ -109,7 +109,7 @@ export default {
 						avatar: this.players[key].storage_avatar || this.players[key].avatar,
 						name: this.players[key].character_name,
 						value: player.meters ? player.meters[type] || 0 : 0,
-				  }))
+					}))
 				: [];
 			return _.orderBy(players, ["value", "name"], ["desc", "asc"]);
 		},
@@ -129,7 +129,7 @@ export default {
 			const prop = tab === "Taken" ? `${type}${tab}` : type;
 
 			const meters = this.campaign.players[key].meters || {};
-			this.$set(meters, prop, value ? value.min() : value);
+			meters[prop] = value ? value.min() : value;
 
 			await this.update_campaign_entity({
 				uid: this.user.uid,

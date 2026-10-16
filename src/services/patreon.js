@@ -1,6 +1,7 @@
 const axios = require("axios");
-const dotenv = require("dotenv");
-dotenv.config({ path: ".env.production.local" });
+// No dotenv here: this module is reachable from the browser bundle (via the user
+// store) and webpack 5 does not shim node builtins. The env values it reads are
+// injected at build time by quasar.config.js > build.env.
 
 const REDIRECT_URI = "/link-patreon-account";
 const AUTH_REF = "/api/oauth2/token";

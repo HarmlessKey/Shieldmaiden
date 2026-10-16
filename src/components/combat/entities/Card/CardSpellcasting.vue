@@ -24,7 +24,7 @@
 			</div>
 			<p>
 				<strong><em>Spellcasting</em></strong>
-				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral("Oo") }}-level
+				The {{ entity.name.capitalizeEach() }} is a {{ $numeral(entity.caster_level, "Oo") }}-level
 				spellcaster. Its spellcasting ability is {{ entity.caster_ability.capitalize() }} (spell
 				save DC {{ entity.caster_save_dc }},
 				{{
@@ -38,18 +38,21 @@
 			<strong><em>Spells</em></strong
 			><br />
 			<p>
-				<template v-for="level in caster_spell_levels">
-					<div :key="`spell-${level}`">
+				<template v-for="level in caster_spell_levels" :key="`spell-${level}`">
+					<div>
 						<template v-if="level === 0"> Cantrips (at will): </template>
 						<template v-else>
-							{{ level | numeral("Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
+							{{ $numeral(level, "Oo") }} level ({{ entity.caster_spell_slots[level] }} slots):
 						</template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
 							<hk-popover>
 								{{ spell.name }}
 								<template #content>
-									<Spell :id="spell.key" :edition="entity.edition || default_edition" hide-report />
-								</template
+									<Spell
+										:id="spell.key"
+										:edition="entity.edition || default_edition"
+										hide-report
+									/> </template
 							></hk-popover>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLevel(level).length ? "," : "" }}
@@ -82,7 +85,9 @@
 				</div>
 			</div>
 			<p>
-				<strong><em>{{ is_5_5e ? "Spellcasting" : "Innate spellcasting" }}</em></strong>
+				<strong
+					><em>{{ is_5_5e ? "Spellcasting" : "Innate spellcasting" }}</em></strong
+				>
 				The {{ entity.name.capitalizeEach() }}'s innate spellcasting ability is
 				{{ entity.innate_ability.capitalize() }} (spell save DC {{ entity.innate_save_dc }},
 				{{
@@ -93,11 +98,12 @@
 				to hit with spell attacks). The {{ entity.name.capitalizeEach() }} can cast the following
 				spells, requiring no material components:
 			</p>
-			<strong><em>{{ is_5_5e ? "Spells" : "Innate spells" }}</em></strong
+			<strong
+				><em>{{ is_5_5e ? "Spells" : "Innate spells" }}</em></strong
 			><br />
 			<p>
-				<template v-for="limit in innate_spell_levels">
-					<div :key="`spell-${limit}`">
+				<template v-for="limit in innate_spell_levels" :key="`spell-${limit}`">
+					<div>
 						<template v-if="limit === Infinity"> At will: </template>
 						<template v-else> {{ limit }}/day each: </template>
 						<i aria-hidden="true" v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
@@ -108,7 +114,7 @@
 								</template>
 							</hk-popover>
 							<template v-if="is_5_5e && spell.level !== undefined">
-								({{ spell.level | numeral("Oo") }})
+								({{ $numeral(spell.level, "Oo") }})
 							</template>
 							<!-- eslint-disable-next-line vue/no-parsing-error -->
 							{{ index + 1 < spellsForLimit(limit).length ? "," : "" }}

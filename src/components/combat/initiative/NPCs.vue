@@ -9,16 +9,17 @@
 		<ul class="entities">
 			<li v-for="(entity, i) in npcs" :key="entity.key">
 				<BasicEntity :entity="entity" :size="48" :padding="8">
-					<q-checkbox
-						slot="name"
-						:dark="$store.getters.theme === 'dark'"
-						v-model="selected"
-						:val="i"
-						tabindex="-1"
-						class="flex-grow"
-					>
-						<Name :entity="entity" />
-					</q-checkbox>
+					<template v-slot:name>
+						<q-checkbox
+							:dark="$store.getters.theme === 'dark'"
+							v-model="selected"
+							:val="i"
+							tabindex="-1"
+							class="flex-grow"
+						>
+							<Name :entity="entity" />
+						</q-checkbox>
+					</template>
 					<div class="actions">
 						<button
 							class="btn btn-sm bg-neutral-9"
@@ -39,7 +40,7 @@
 						max="99"
 						name="npcInit"
 						class="initiative-input"
-						@input="set_initiative({ key: entity.key, initiative: entity.initiative })"
+						@update:model-value="set_initiative({ key: entity.key, initiative: entity.initiative })"
 						placeholder="0"
 						@keydown.enter="$refs?.[i]?.[0]?.$el?.click()"
 					>
@@ -189,15 +190,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
-	.q-checkbox {
-		min-width: 0;
-		margin-right: 5px;
-
-		&__label {
-			min-width: 0;
-		}
-	}
+:deep(.q-checkbox) {
+	min-width: 0;
+	margin-right: 5px;
+}
+:deep(.q-checkbox__label) {
+	min-width: 0;
 }
 .initiative-input {
 	min-width: 90px;

@@ -1,12 +1,12 @@
 <template>
 	<div class="wrapper" :class="intensityClass">
-		<template v-for="i in 3">
-			<div :id="`sandlayer_0${i}`" class="sand" :key="i">
+		<template v-for="i in 3" :key="i">
+			<div :id="`sandlayer_0${i}`" class="sand">
 				<div class="image01" />
 				<div class="image02" />
 			</div>
-			<div class="particles a" :class="`layer${i}`" :key="`particles-${i}-a`" />
-			<div class="particles" :class="`layer${i}`" :key="`particles-${i}`" />
+			<div class="particles a" :class="`layer${i}`" />
+			<div class="particles" :class="`layer${i}`" />
 		</template>
 	</div>
 </template>
@@ -136,22 +136,30 @@ export default {
 		background: rgba(168, 168, 168, 0.2);
 
 		#sandlayer_01 {
-			animation: sandlayer_01_opacity 10s linear infinite, sandlayer_moveme 7s linear infinite;
+			animation:
+				sandlayer_01_opacity 10s linear infinite,
+				sandlayer_moveme 7s linear infinite;
 		}
 		#sandlayer_02,
 		#sandlayer_03 {
-			animation: sandlayer_02_opacity 21s linear infinite, sandlayer_moveme 3s linear infinite;
+			animation:
+				sandlayer_02_opacity 21s linear infinite,
+				sandlayer_moveme 3s linear infinite;
 		}
 	}
 	&.medium {
 		background: rgba(168, 168, 168, 0.4);
 
 		#sandlayer_01 {
-			animation: sandlayer_01_opacity 10s linear infinite, sandlayer_moveme 6s linear infinite;
+			animation:
+				sandlayer_01_opacity 10s linear infinite,
+				sandlayer_moveme 6s linear infinite;
 		}
 		#sandlayer_02,
 		#sandlayer_03 {
-			animation: sandlayer_02_opacity 21s linear infinite, sandlayer_moveme 2s linear infinite;
+			animation:
+				sandlayer_02_opacity 21s linear infinite,
+				sandlayer_moveme 2s linear infinite;
 		}
 
 		.layer1 {
@@ -183,11 +191,15 @@ export default {
 		background: rgba(168, 168, 168, 0.6);
 
 		#sandlayer_01 {
-			animation: sandlayer_01_opacity 10s linear infinite, sandlayer_moveme 5s linear infinite;
+			animation:
+				sandlayer_01_opacity 10s linear infinite,
+				sandlayer_moveme 5s linear infinite;
 		}
 		#sandlayer_02,
 		#sandlayer_03 {
-			animation: sandlayer_02_opacity 21s linear infinite, sandlayer_moveme 1s linear infinite;
+			animation:
+				sandlayer_02_opacity 21s linear infinite,
+				sandlayer_moveme 1s linear infinite;
 		}
 
 		.layer1 {

@@ -1,8 +1,10 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header d-flex justify-content-between">
-			<span>Basic Info</span>
-		</div>
+		<template v-slot:header>
+			<div class="card-header d-flex justify-content-between">
+				<span>Basic Info</span>
+			</div>
+		</template>
 
 		<div class="card-body">
 			<div class="row q-col-gutter-md">
@@ -97,7 +99,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="(value) => parseToInt(value, spell, 'cast_time')"
+							@update:model-value="(value) => parseToInt(value, spell, 'cast_time')"
 						/>
 					</ValidationProvider>
 				</div>
@@ -119,9 +121,9 @@
 							:options="spell_cast_time_types"
 							v-model="spell.cast_time_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
-									if (value !== 'reaction') $delete(spell, 'cast_time_react_desc');
+									if (value !== 'reaction') delete spell.cast_time_react_desc;
 								}
 							"
 							:error="invalid && validated"
@@ -211,9 +213,9 @@
 							:options="spell_range_types"
 							v-model="spell.range_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
-									if (value !== 'ranged') $delete(spell, 'range');
+									if (value !== 'ranged') delete spell.range;
 								}
 							"
 							:error="invalid && validated"
@@ -244,9 +246,11 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="(value) => parseToInt(value, spell, 'range')"
+							@update:model-value="(value) => parseToInt(value, spell, 'range')"
 						>
-							<span slot="append" class="neutral-2">ft.</span>
+							<template v-slot:append>
+								<span class="neutral-2">ft.</span>
+							</template>
 						</q-input>
 					</ValidationProvider>
 				</div>
@@ -284,11 +288,11 @@
 							:options="spell_duration_types"
 							v-model="spell.duration_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
 									if (!spell_duration_types_time.includes(value)) {
-										$delete(spell, 'duration');
-										$delete(spell, 'duration_scale');
+										delete spell.duration;
+										delete spell.duration_scale;
 									}
 								}
 							"
@@ -322,7 +326,7 @@
 							type="number"
 							:error="invalid && validated"
 							:error-message="errors[0]"
-							@input="(value) => parseToInt(value, spell, 'duration')"
+							@update:model-value="(value) => parseToInt(value, spell, 'duration')"
 						/>
 					</ValidationProvider>
 				</div>
@@ -373,9 +377,9 @@
 							:options="aoe_types"
 							v-model="spell.aoe_type"
 							class="mb-2"
-							@input="
+							@update:model-value="
 								(value) => {
-									if (value === 'none') $delete(spell, 'aoe_size');
+									if (value === 'none') delete spell.aoe_size;
 								}
 							"
 							:error="invalid && validated"
@@ -402,11 +406,13 @@
 							autocomplete="off"
 							class="mb-2"
 							type="number"
-							@input="(value) => parseToInt(value, spell, 'aoe_size')"
+							@update:model-value="(value) => parseToInt(value, spell, 'aoe_size')"
 							:error="invalid && validated"
 							:error-message="errors[0]"
 						>
-							<span slot="append" class="neutral-2">ft.</span>
+							<template v-slot:append>
+								<span class="neutral-2">ft.</span>
+							</template>
 						</q-input>
 					</ValidationProvider>
 				</div>
@@ -444,13 +450,14 @@
 							:error-message="errors[0]"
 							@change="$forceUpdate()"
 						>
-							<hk-popover
-								slot="append"
-								header="At higher levels"
-								content="In what way does the spell change at higher levels?"
-							>
-								<q-icon name="info" />
-							</hk-popover>
+							<template v-slot:append>
+								<hk-popover
+									header="At higher levels"
+									content="In what way does the spell change at higher levels?"
+								>
+									<q-icon name="info" />
+								</hk-popover>
+							</template>
 						</q-select>
 					</ValidationProvider>
 				</div>
@@ -519,8 +526,9 @@ import { aoe_types } from "src/utils/actionConstants";
 export default {
 	name: "spells-BasicInfo",
 	props: {
-		value: Object,
+		modelValue: Object,
 	},
+	emits: ["update:modelValue"],
 	data() {
 		return {
 			spell_levels: spell_constants.spell_levels,
@@ -553,9 +561,9 @@ export default {
 	methods: {
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
-				this.$delete(object, property);
+				delete object[property];
 			} else {
-				this.$set(object, property, parseInt(value));
+				object[property] = parseInt(value);
 			}
 		},
 		setRitual() {
@@ -569,10 +577,10 @@ export default {
 	computed: {
 		spell: {
 			get() {
-				return this.value;
+				return this.modelValue;
 			},
 			set(newValue) {
-				this.$emit("input", newValue);
+				this.$emit("update:modelValue", newValue);
 				return newValue;
 			},
 		},

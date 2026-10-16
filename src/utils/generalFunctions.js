@@ -246,7 +246,7 @@ export function comparePlayerToCharacter(sync_character, player) {
  */
 /* eslint-disable */
 export function browserDetect() {
-	if (process.browser) {
+	if (process.env.CLIENT) {
 		// Opera 8.0+
 		const isOpera =
 			(!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(" OPR/") >= 0;
@@ -276,18 +276,18 @@ export function browserDetect() {
 		return isOpera
 			? "Opera"
 			: isFirefox
-			? "Firefox"
-			: isSafari
-			? "Safari"
-			: isEdgeChromium
-			? "Edge"
-			: isChrome
-			? "Chrome"
-			: isIE
-			? "IE"
-			: isEdge
-			? "Edge"
-			: "Don't know";
+				? "Firefox"
+				: isSafari
+					? "Safari"
+					: isEdgeChromium
+						? "Edge"
+						: isChrome
+							? "Chrome"
+							: isIE
+								? "IE"
+								: isEdge
+									? "Edge"
+									: "Don't know";
 	}
 	return "Not a browser";
 }
@@ -450,12 +450,12 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 
 		wrapper.appendChild(clone);
 		wrapper.appendChild(footer);
-		
+
 		const canvas = await html2canvas(wrapper, {
 			scale: 2,
-			useCORS: true
+			useCORS: true,
 		});
-		canvas.toBlob(blob => {
+		canvas.toBlob((blob) => {
 			const link = document.createElement("a");
 			link.href = URL.createObjectURL(blob);
 			link.download = filename;
@@ -469,30 +469,30 @@ export async function downloadMonsterFile(element, filetype = "png", options = {
 		document.body.appendChild(clone);
 		const canvas = await html2canvas(clone, {
 			scale: 2,
-			useCORS: true
+			useCORS: true,
 		});
 		const imgData = canvas.toDataURL("image/png");
 		const pdf = new jsPDF("p", "mm", "a4");
 		let pageWidth = pdf.internal.pageSize.getWidth();
 		const pageHeight = pdf.internal.pageSize.getHeight();
-	
+
 		if (layout === "single-column") {
 			pageWidth = pageWidth / 2;
 		}
-	
+
 		const contentWidth = pageWidth - margin * 2;
 		const contentHeight = (canvas.height * contentWidth) / canvas.width;
-	
+
 		pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight);
-	
+
 		const pageCount = pdf.internal.getNumberOfPages();
 		for (let i = 1; i <= pageCount; i++) {
 			pdf.setPage(i);
 			pdf.setFontSize(10);
 			pdf.setTextColor(100);
-			pdf.text(footerText, margin, pageHeight - margin, { align: 'left' });
+			pdf.text(footerText, margin, pageHeight - margin, { align: "left" });
 		}
-	
+
 		pdf.save(`${filename}.pdf`);
 		document.body.removeChild(clone);
 	}
@@ -507,7 +507,7 @@ export async function downloadSpellFile(element, options = {}) {
 		scale: 2,
 		useCORS: true,
 	});
-	canvas.toBlob(blob => {
+	canvas.toBlob((blob) => {
 		const link = document.createElement("a");
 		link.href = URL.createObjectURL(blob);
 		link.download = filename;

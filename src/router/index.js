@@ -1,8 +1,6 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from "vue-router";
+import { Notify } from "quasar";
 import routes from "./routes";
-
-Vue.use(VueRouter);
 
 /*
  * If not building with SSR mode, you can
@@ -13,10 +11,16 @@ Vue.use(VueRouter);
  * with the Router instance.
  */
 
-export default function ({ store, ssrContext }) {
-	const router = new VueRouter({
+export default function ({ store }) {
+	const createHistory = process.env.SERVER
+		? createMemoryHistory
+		: process.env.VUE_ROUTER_MODE === "history"
+			? createWebHistory
+			: createWebHashHistory;
+
+	const router = createRouter({
 		scrollBehavior() {
-			const el = document.querySelector(".scroll");
+			const el = process.env.CLIENT ? document.querySelector(".scroll") : null;
 			if (el) {
 				el.scrollLeft = 0;
 				el.scrollTop = 0;
@@ -24,11 +28,10 @@ export default function ({ store, ssrContext }) {
 		},
 		routes,
 
-		// Leave these as they are and change in quasar.conf.js instead!
-		// quasar.conf.js -> build -> vueRouterMode
-		// quasar.conf.js -> build -> publicPath
-		mode: process.env.VUE_ROUTER_MODE,
-		base: process.env.VUE_ROUTER_BASE,
+		// Leave these as they are and change in quasar.config.js instead!
+		// quasar.config.js -> build -> vueRouterMode
+		// quasar.config.js -> build -> publicPath
+		history: createHistory(process.env.VUE_ROUTER_BASE),
 	});
 
 	// Check before each page load whether the page requires authentication/
@@ -42,14 +45,14 @@ export default function ({ store, ssrContext }) {
 		const offline_available = to.matched.some((record) => record.meta.offline); //Check if route is offline available
 
 		// Check if a user is offline, if the page is not available offline, send to home
-		if (process.browser && !navigator.onLine && !offline_available) {
+		if (process.env.CLIENT && !navigator.onLine && !offline_available) {
 			Notify.create({
 				message: "Page not available offline, redirected to home.",
 				icon: "fas fa-wifi-slash",
 				color: "negative",
 				position: "top",
 			});
-			next("/");
+			return next("/");
 		}
 		next();
 	});

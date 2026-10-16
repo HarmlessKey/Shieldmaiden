@@ -38,9 +38,11 @@
 				</q-item>
 				<q-list :dark="$store.getters.theme === 'dark'">
 					<hk-roll
-						v-for="i in [0, 1]" :key="`${i}-versatile-roll`"
+						v-for="i in [0, 1]"
+						:key="`${i}-versatile-roll`"
 						:color="color"
-						@roll="roll($event, action, i)">
+						@roll="roll($event, action, i)"
+					>
 						<q-item clickable v-close-popup>
 							<q-item-section avatar>{{ i + 1 }}</q-item-section>
 							<q-item-section>
@@ -53,7 +55,8 @@
 		</q-popup-proxy>
 	</span>
 	<hk-roll
-		v-else :tooltip="tooltip"
+		v-else
+		:tooltip="tooltip"
 		:disabled="disabled"
 		:color="color"
 		@roll="roll($event, action)"
@@ -119,7 +122,7 @@ export default {
 			}
 			const projectiles = this.projectileScaling(config);
 
-			if (this.$listeners && this.$listeners["roll"]) {
+			if (this.$attrs.onRoll) {
 				this.$emit("roll", e, projectiles, option);
 			} else {
 				[...Array(projectiles).keys()].forEach(() => {

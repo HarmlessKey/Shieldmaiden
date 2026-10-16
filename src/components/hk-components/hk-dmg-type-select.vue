@@ -1,7 +1,13 @@
 <template>
-	<ValidationProvider :rules="validationRules" :name="label" v-slot="{ errors, invalid, validated }">
-		<q-select 
-			:dark="$store.getters.theme === 'dark'" filled square
+	<ValidationProvider
+		:rules="validationRules"
+		:name="label"
+		v-slot="{ errors, invalid, validated }"
+	>
+		<q-select
+			:dark="$store.getters.theme === 'dark'"
+			filled
+			square
 			:dense="dense"
 			:clearable="clearable"
 			:use-input="hide_selected"
@@ -17,7 +23,7 @@
 		>
 			<template v-slot:selected>
 				<span v-if="damage_type && !hide_selected" class="truncate">
-					<i aria-hidden="true" :class="[damage_type_icons[damage_type], damage_type]"/>
+					<i aria-hidden="true" :class="[damage_type_icons[damage_type], damage_type]" />
 					{{ typeLabel(damage_type) }} damage
 				</span>
 				<span v-else>
@@ -33,10 +39,10 @@
 					@click="damage_type = scope.opt"
 				>
 					<q-item-section avatar>
-						<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
+						<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt" />
 					</q-item-section>
 					<q-item-section>
-						<q-item-label v-text="typeLabel(scope.opt)"/>
+						<q-item-label>{{ typeLabel(scope.opt) }}</q-item-label>
 					</q-item-section>
 				</q-item>
 			</template>
@@ -45,84 +51,87 @@
 </template>
 
 <script>
-	import { damage_types, damage_type_icons } from "src/utils/generalConstants";
+import { damage_types, damage_type_icons } from "src/utils/generalConstants";
 
-	export default {
-		name: 'hk-dmg-type-select',
-		props: {
-			value: {
-				type: String,
-				default: undefined
-			},
-			label: {
-				type: String,
-				default: undefined
-			},
-			placeholder: {
-				type: String,
-				default: undefined
-			},
-			clearable: {
-				type: Boolean,
-				required: false,
-				default: false
-			},
-			dense: {
-				type: Boolean,
-				required: false,
-				default: false
-			},
-			validationRules: {
-				type: String,
-				required: false,
-				default: ""
-			},
-			nonMagical: {
-				type: Boolean,
-				default: false
-			}
+export default {
+	name: "hk-dmg-type-select",
+	props: {
+		modelValue: {
+			type: String,
+			default: undefined,
 		},
-		computed: {
-			damage_type: {
-				get() {
-					return this.value;
-				},
-				set(newVal) {
-					this.$emit("input", newVal);
-				}
-			},
-			damage_types() {
-				if(!this.nonMagical) {
-					return damage_types.filter(type => !type.startsWith("non_magical"));
-				}
-				return damage_types;
-			}
+		label: {
+			type: String,
+			default: undefined,
 		},
-		data() {
-			return {
-				damage_type_icons: damage_type_icons,
-				filtered_damage_types: damage_types,
-				hide_selected: false
-			}
+		placeholder: {
+			type: String,
+			default: undefined,
 		},
-		methods: {
-			typeLabel(value) {
-				value = value.split("_");
-				return value.join(" ").capitalizeEach();
+		clearable: {
+			type: Boolean,
+			required: false,
+			default: false,
+		},
+		dense: {
+			type: Boolean,
+			required: false,
+			default: false,
+		},
+		validationRules: {
+			type: String,
+			required: false,
+			default: "",
+		},
+		nonMagical: {
+			type: Boolean,
+			default: false,
+		},
+	},
+	emits: ["update:modelValue"],
+	computed: {
+		damage_type: {
+			get() {
+				return this.modelValue;
 			},
-			filterTypes(val, update) {
-				if (val === '') {
-					update(() => {
-						this.filtered_damage_types = this.damage_types;
-					})
-					return;
-				}
-
+			set(newVal) {
+				this.$emit("update:modelValue", newVal);
+			},
+		},
+		damage_types() {
+			if (!this.nonMagical) {
+				return damage_types.filter((type) => !type.startsWith("non_magical"));
+			}
+			return damage_types;
+		},
+	},
+	data() {
+		return {
+			damage_type_icons: damage_type_icons,
+			filtered_damage_types: damage_types,
+			hide_selected: false,
+		};
+	},
+	methods: {
+		typeLabel(value) {
+			value = value.split("_");
+			return value.join(" ").capitalizeEach();
+		},
+		filterTypes(val, update) {
+			if (val === "") {
 				update(() => {
-					const needle = val.toLowerCase();
-					this.filtered_damage_types = this.damage_types.filter(v => v.toLowerCase().indexOf(needle) > -1);
+					this.filtered_damage_types = this.damage_types;
 				});
+				return;
 			}
-		}
-	}
+
+			update(() => {
+				const needle = val.toLowerCase();
+				this.filtered_damage_types = this.damage_types.filter(
+					(v) => v.toLowerCase().indexOf(needle) > -1
+				);
+			});
+		},
+	},
+};
 </script>

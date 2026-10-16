@@ -31,7 +31,7 @@
 				:left-label-value="crLabel(cr.min)"
 				:right-label-value="crLabel(cr.max)"
 				class="px-2"
-				@input="setCR"
+				@update:model-value="setCR"
 			/>
 		</template>
 		<template v-if="type === 'monster'">
@@ -45,13 +45,13 @@
 				:options="monster_types"
 			/>
 			<hk-select
-			class="mb-3"
-			label="Size"
-			v-model="filter.sizes"
-			use-chips
-			multiple
-			clearable
-			:options="monster_sizes"
+				class="mb-3"
+				label="Size"
+				v-model="filter.sizes"
+				use-chips
+				multiple
+				clearable
+				:options="monster_sizes"
 			/>
 			<hk-select
 				class="mb-3"
@@ -81,7 +81,7 @@
 				:left-label-value="crLabel(cr.min)"
 				:right-label-value="crLabel(cr.max)"
 				class="px-2"
-				@input="setCR"
+				@update:model-value="setCR"
 			/>
 		</template>
 		<template v-if="type === 'spell'">
@@ -110,7 +110,7 @@
 				:max="9"
 				:left-label-value="minLevelMarker"
 				:right-label-value="maxLevelMarker"
-				@input="setLevels"
+				@update:model-value="setLevels"
 			/>
 		</template>
 	</div>
@@ -121,8 +121,46 @@ import { monsterMixin } from "src/mixins/monster.js";
 import { spell_schools } from "src/utils/spellConstants";
 import numeral from "numeral";
 
-const CR_VALUES = [0, 0.125, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
-const CR_LABELS = ["0", "1/8", "1/4", "1/2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"];
+const CR_VALUES = [
+	0, 0.125, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+	22, 23, 24, 25, 26, 27, 28, 29, 30,
+];
+const CR_LABELS = [
+	"0",
+	"1/8",
+	"1/4",
+	"1/2",
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"10",
+	"11",
+	"12",
+	"13",
+	"14",
+	"15",
+	"16",
+	"17",
+	"18",
+	"19",
+	"20",
+	"21",
+	"22",
+	"23",
+	"24",
+	"25",
+	"26",
+	"27",
+	"28",
+	"29",
+	"30",
+];
 
 function crToPosition(cr) {
 	const idx = CR_VALUES.indexOf(cr);
@@ -133,7 +171,7 @@ export default {
 	name: "hk-filter",
 	mixins: [monsterMixin],
 	props: {
-		value: {
+		modelValue: {
 			type: Object,
 			required: true,
 		},
@@ -146,26 +184,27 @@ export default {
 			default: () => [],
 		},
 	},
+	emits: ["update:modelValue", "change"],
 	data() {
-		const existingCR = this.value?.challenge_ratings;
+		const existingCR = this.modelValue?.challenge_ratings;
 		return {
 			spell_schools: spell_schools,
 			cr: existingCR
 				? { min: crToPosition(existingCR.min), max: crToPosition(existingCR.max) }
 				: { min: 0, max: 33 },
-			levels: this.value?.levels || { min: 0, max: 9 },
-		}
+			levels: this.modelValue?.levels || { min: 0, max: 9 },
+		};
 	},
 	computed: {
 		filter: {
 			get() {
-				const filter = this.value;
+				const filter = this.modelValue;
 				return filter;
 			},
 			set(newVal) {
-				this.$emit("input", newVal);
+				this.$emit("update:modelValue", newVal);
 				this.$emit("change");
-			}
+			},
 		},
 		minLevelMarker() {
 			return this.levels?.min ? numeral(this.levels.min).format("0o") : "Cantrip";
@@ -179,29 +218,29 @@ export default {
 			deep: true,
 			handler() {
 				this.$emit("change");
-			}
-		}
+			},
+		},
 	},
 	methods: {
 		crLabel(position) {
 			return CR_LABELS[position] ?? String(position);
 		},
 		setLevels(value) {
-			if(!this.filter.levels) {
-				this.$set(this.filter, "levels", {});
+			if (!this.filter.levels) {
+				this.filter.levels = {};
 			}
-			this.$set(this.filter.levels, "min", value.min);
-			this.$set(this.filter.levels, "max", value.max);
+			this.filter.levels.min = value.min;
+			this.filter.levels.max = value.max;
 			this.$forceUpdate();
 		},
 		setCR(value) {
-			if(!this.filter.challenge_ratings) {
-				this.$set(this.filter, "challenge_ratings", {});
+			if (!this.filter.challenge_ratings) {
+				this.filter.challenge_ratings = {};
 			}
-			this.$set(this.filter.challenge_ratings, "min", CR_VALUES[value.min]);
-			this.$set(this.filter.challenge_ratings, "max", CR_VALUES[value.max]);
+			this.filter.challenge_ratings.min = CR_VALUES[value.min];
+			this.filter.challenge_ratings.max = CR_VALUES[value.max];
 			this.$forceUpdate();
-		}
-	}
+		},
+	},
 };
 </script>

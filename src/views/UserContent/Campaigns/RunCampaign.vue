@@ -100,15 +100,15 @@
 					v-else-if="container.width >= lg"
 					class="default-theme"
 					@resized="onOuterResized"
-					@mousedown.native.capture="dragFlags.outer = true"
-					@touchstart.native.capture="dragFlags.outer = true"
+					@mousedown.capture="dragFlags.outer = true"
+					@touchstart.capture="dragFlags.outer = true"
 				>
 					<Pane :size="panes.left" min-size="20">
 						<Splitpanes
 							horizontal
 							@resized="onLeftResized"
-							@mousedown.native.capture="dragFlags.left = true"
-							@touchstart.native.capture="dragFlags.left = true"
+							@mousedown.capture="dragFlags.left = true"
+							@touchstart.capture="dragFlags.left = true"
 						>
 							<hk-pane>
 								<SoundBoard />
@@ -122,8 +122,8 @@
 						<Splitpanes
 							horizontal
 							@resized="onMidResized"
-							@mousedown.native.capture="dragFlags.mid = true"
-							@touchstart.native.capture="dragFlags.mid = true"
+							@mousedown.capture="dragFlags.mid = true"
+							@touchstart.capture="dragFlags.mid = true"
 						>
 							<hk-pane :size="panes['mid-top']" min-size="20">
 								<Encounters />
@@ -187,7 +187,9 @@
 					emit-value
 					class="px-4 bg-neutral-9 tab-select"
 				>
-					<hk-icon slot="prepend" :icon="tab_icon" />
+					<template v-slot:prepend>
+						<hk-icon :icon="tab_icon" />
+					</template>
 				</hk-select>
 				<q-tab-panels v-model="mobile_tab" class="bg-transparent" animated swipeable infinite>
 					<q-tab-panel name="encounters">
@@ -410,7 +412,7 @@ export default {
 		...mapActions("players", ["get_player", "get_players"]),
 		async setEdition(edition) {
 			await this.set_campaign_prop({ id: this.campaignId, property: "edition", value: edition });
-			this.$set(this.campaign, "edition", edition);
+			this.campaign.edition = edition;
 			this.set_compendium_edition(edition);
 			this.edition_dialog = false;
 		},
@@ -514,23 +516,21 @@ export default {
 	.splitpanes__pane,
 	.q-tab-panel {
 		padding: 0;
-		&::v-deep {
-			.pane {
-				&__header {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					background-color: $neutral-8;
-					min-height: 51px;
-					padding: 10px;
-					position: sticky;
-					top: 0;
-					z-index: 10;
-				}
-				&__content {
-					padding: 10px;
-				}
-			}
+		// Sass cannot append a `&__suffix` inside :deep(), so the BEM elements get
+		// their own :deep() selectors.
+		:deep(.pane__header) {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background-color: $neutral-8;
+			min-height: 51px;
+			padding: 10px;
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
+		:deep(.pane__content) {
+			padding: 10px;
 		}
 	}
 }

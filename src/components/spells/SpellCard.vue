@@ -35,7 +35,7 @@
 		</div>
 		<div class="spell-card__subheader">
 			<template v-if="spell.level === 0">Cantrip </template>
-			<template v-else>{{ spell.level | numeral("0o") }}-level </template>
+			<template v-else>{{ $numeral(spell.level, "0o") }}-level</template>
 			{{ spell.school }}
 			<span v-if="spell.ritual">(ritual)</span>
 		</div>
@@ -73,7 +73,7 @@
 				:value="spell.description"
 				@input="$emit('update:description', $event.target.value)"
 			/>
-			<hk-markdown-editor v-else :value="spell.description" read-only />
+			<hk-markdown-editor v-else :model-value="spell.description" read-only />
 		</div>
 		<template v-if="spell.higher_level">
 			<div class="spell-card__subheader">At Higher Levels</div>

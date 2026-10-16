@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { contentReportServices } from "src/services/contentReports";
 
 // Converts the { [reportId]: report } object returned by Firebase into a sorted array
@@ -28,7 +27,10 @@ const content_report_getters = {
 
 const content_report_actions = {
 	async get_content_report_services({ getters, commit }) {
-		if (getters.content_report_services === null || !Object.keys(getters.content_report_services).length) {
+		if (
+			getters.content_report_services === null ||
+			!Object.keys(getters.content_report_services).length
+		) {
 			commit("SET_CONTENT_REPORT_SERVICES", new contentReportServices());
 		}
 		return getters.content_report_services;
@@ -120,17 +122,17 @@ const content_report_actions = {
 
 const content_report_mutations = {
 	SET_CONTENT_REPORT_SERVICES(state, payload) {
-		Vue.set(state, "content_report_services", payload);
+		state.content_report_services = payload;
 	},
 	SET_REPORTS(state, { key, reports }) {
-		Vue.set(state.reports, key, reports);
+		state.reports[key] = reports;
 	},
 	SET_ALL_REPORTS(state, reports) {
-		Vue.set(state, "all_reports", reports);
+		state.all_reports = reports;
 	},
 	UPDATE_REPORT_STATUS(state, { reportId, status }) {
 		const report = state.all_reports.find((report) => report.id === reportId);
-		if (report) Vue.set(report, "status", status);
+		if (report) report.status = status;
 	},
 };
 

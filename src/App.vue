@@ -14,14 +14,14 @@
 					"
 					:small-screen="small_screen"
 				/>
-				<div
+				<component
 					:is="$route.name === 'home' ? 'div' : 'q-scroll-area'"
 					class="scrollable-content"
 					:dark="$store.getters.theme === 'dark'"
 					:thumb-style="{ width: '5px' }"
 				>
 					<router-view />
-				</div>
+				</component>
 			</div>
 		</div>
 		<transition
@@ -34,7 +34,6 @@
 		</transition>
 
 		<q-no-ssr>
-			<vue-snotify />
 			<HkRolls />
 		</q-no-ssr>
 		<q-resize-observer @resize="setSize" />
@@ -50,12 +49,116 @@ import { mapActions, mapGetters } from "vuex";
 import HkRolls from "./components/hk-components/hk-rolls";
 import { general } from "./mixins/general";
 
-import { Cookies } from "quasar";
+import { Cookies, createMetaMixin } from "quasar";
 import { jwtDecode as jwt_decode } from "jwt-decode";
+
+// Vue 3 dropped the `meta()` component option; Quasar exposes the same hook as a mixin.
+function metaInfo() {
+	const meta = {
+		title: {
+			name: "title",
+			content:
+				this.$route.meta.title ||
+				"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
+		},
+		description: {
+			name: "description",
+			content:
+				this.$route.meta.description ||
+				"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+		},
+
+		// TWITTER
+		twitterCard: {
+			property: "twitter:card",
+			content: "summary",
+		},
+		twitterTitle: {
+			name: "twitter:title",
+			content:
+				this.$route.meta.title ||
+				"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
+		},
+		twitterDescription: {
+			name: "twitter:description",
+			content:
+				this.$route.meta.description ||
+				"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+		},
+		twitterImage: {
+			name: "twitter:image",
+			content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
+		},
+		twitterSite: {
+			name: "twitter:site",
+			content: "@ShieldmaidenApp",
+		},
+
+		// OG
+		ogTitle: {
+			property: "og:title",
+			content:
+				this.$route.meta.title ||
+				"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
+		},
+		ogDescription: {
+			property: "og:description",
+			content:
+				this.$route.meta.description ||
+				"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
+		},
+		ogSiteName: {
+			property: "og:site_name",
+			content: "Shieldmaiden",
+		},
+		ogType: {
+			property: "og:type",
+			content: "website",
+		},
+		ogUrl: {
+			property: "og:url",
+			content: `https://shieldmaiden.app${this.$route.path}`,
+		},
+		ogImage: {
+			property: "og:image",
+			content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
+		},
+		ogImageType: {
+			property: "og:image:type",
+			content: "image/png",
+		},
+		ogImageAlt: {
+			property: "og:image:alt",
+			content: "Shieldmaiden Logo",
+		},
+	};
+
+	// NoIndex on non-production environments
+	if (process.env.VUE_APP_ENV_NAME !== "live") {
+		meta.noindex = {
+			name: "robots",
+			content: "noindex, nofollow",
+		};
+	}
+
+	return {
+		title:
+			this.$route.meta.title ||
+			"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
+		titleTemplate: (title) => `${title} | Shieldmaiden`,
+		link: {
+			canonical: {
+				rel: "canonical",
+				href: `https://shieldmaiden.app${this.$route.path}`,
+			},
+		},
+		meta: meta,
+	};
+}
 
 export default {
 	name: "App",
-	mixins: [general],
+	mixins: [general, createMetaMixin(metaInfo)],
 	components: {
 		Header,
 		Sidebar,
@@ -63,7 +166,8 @@ export default {
 		HkRolls,
 	},
 	async preFetch({ store, ssrContext }) {
-		const cookies = Cookies.parseSSR(ssrContext);
+		// parseSSR only exists on the server; in the browser Cookies works directly.
+		const cookies = process.env.SERVER ? Cookies.parseSSR(ssrContext) : Cookies;
 		const access_token = cookies.get("access_token");
 		if (!access_token) return;
 
@@ -87,114 +191,12 @@ export default {
 		await store.dispatch("setUserInfo");
 		await store.dispatch("initialize");
 	},
-	meta() {
-		const meta = {
-			title: {
-				name: "title",
-				content:
-					this.$route.meta.title ||
-					"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
-			},
-			description: {
-				name: "description",
-				content:
-					this.$route.meta.description ||
-					"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
-			},
-
-			// TWITTER
-			twitterCard: {
-				property: "twitter:card",
-				content: "summary",
-			},
-			twitterTitle: {
-				name: "twitter:title",
-				content:
-					this.$route.meta.title ||
-					"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
-			},
-			twitterDescription: {
-				name: "twitter:description",
-				content:
-					this.$route.meta.description ||
-					"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
-			},
-			twitterImage: {
-				name: "twitter:image",
-				content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
-			},
-			twitterSite: {
-				name: "twitter:site",
-				content: "@ShieldmaidenApp",
-			},
-
-			// OG
-			ogTitle: {
-				property: "og:title",
-				content:
-					this.$route.meta.title ||
-					"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
-			},
-			ogDescription: {
-				property: "og:description",
-				content:
-					this.$route.meta.description ||
-					"The ultimate D&D 5e and 5.5e DM companion app. Manage encounters, track combat & health bars, import D&D Beyond characters, and much more. Use Shieldmaiden for free now!",
-			},
-			ogSiteName: {
-				property: "og:site_name",
-				content: "Shieldmaiden",
-			},
-			ogType: {
-				property: "og:type",
-				content: "website",
-			},
-			ogUrl: {
-				property: "og:url",
-				content: `https://shieldmaiden.app${this.$route.path}`,
-			},
-			ogImage: {
-				property: "og:image",
-				content: "https://shieldmaiden.app/shieldmaiden-combat-tracker.png",
-			},
-			ogImageType: {
-				property: "og:image:type",
-				content: "image/png",
-			},
-			ogImageAlt: {
-				property: "og:image:alt",
-				content: "Shieldmaiden Logo",
-			},
-		};
-
-		// NoIndex on non-production environments
-		if (process.env.VUE_APP_ENV_NAME !== "live") {
-			meta.noindex = {
-				name: "robots",
-				content: "noindex, nofollow",
-			};
-		}
-
-		return {
-			title:
-				this.$route.meta.title ||
-				"D&D Combat Tracker - Advanced initiative tracker for D&D 5e and 5.5e",
-			titleTemplate: (title) => `${title} | Shieldmaiden`,
-			link: {
-				canonical: {
-					rel: "canonical",
-					href: `https://shieldmaiden.app${this.$route.path}`,
-				},
-			},
-			meta: meta,
-		};
-	},
 	data() {
 		return {
 			width: 0,
 			small_screen: true,
 			broadcast: undefined,
-			connection: process.browser && !navigator.onLine ? "offline" : "online",
+			connection: process.env.CLIENT && !navigator.onLine ? "offline" : "online",
 		};
 	},
 	watch: {
@@ -256,20 +258,12 @@ export default {
 			});
 		}
 
-		window.addEventListener("offline", () => {
-			this.connection = "offline";
-		});
-		window.addEventListener("online", () => {
-			this.connection = "online";
-		});
+		window.addEventListener("offline", this.setOffline);
+		window.addEventListener("online", this.setOnline);
 	},
-	destroyed() {
-		window.removeEventListener("offline", () => {
-			this.connection = "offline";
-		});
-		window.removeEventListener("online", () => {
-			this.connection = "online";
-		});
+	unmounted() {
+		window.removeEventListener("offline", this.setOffline);
+		window.removeEventListener("online", this.setOnline);
 	},
 	methods: {
 		...mapActions([
@@ -280,6 +274,12 @@ export default {
 			"setUser",
 			"setTips",
 		]),
+		setOffline() {
+			this.connection = "offline";
+		},
+		setOnline() {
+			this.connection = "online";
+		},
 		setSize(size) {
 			this.small_screen = size.width < 576;
 			this.width = size.width;

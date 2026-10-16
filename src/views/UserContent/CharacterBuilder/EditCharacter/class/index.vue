@@ -3,27 +3,29 @@
 		<ValidationObserver v-slot="{ valid }">
 			<q-form greedy>
 				<hk-card>
-					<div class="card-header" slot="header">
-						<span>Class</span>
-						<div>
-							<small class="saved green" v-if="saved" @animationend="saved = false">
-								<i aria-hidden="true" class="fas fa-check" />
-								Saved
-							</small>
-							<small class="saved orange" v-if="invalid" @animationend="invalid = false">
-								<i aria-hidden="true" class="fas fa-times" />
-								Couldn't save
-							</small>
-							<button
-								class="btn btn-sm bg-neutral-5 ml-1"
-								v-if="character.advancement === 'experience'"
-								@click.prevent="experience_modal = !experience_modal"
-							>
-								<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
-								Experience
-							</button>
+					<template v-slot:header>
+						<div class="card-header">
+							<span>Class</span>
+							<div>
+								<small class="saved green" v-if="saved" @animationend="saved = false">
+									<i aria-hidden="true" class="fas fa-check" />
+									Saved
+								</small>
+								<small class="saved orange" v-if="invalid" @animationend="invalid = false">
+									<i aria-hidden="true" class="fas fa-times" />
+									Couldn't save
+								</small>
+								<button
+									class="btn btn-sm bg-neutral-5 ml-1"
+									v-if="character.advancement === 'experience'"
+									@click.prevent="experience_modal = !experience_modal"
+								>
+									<i class="fas fa-pencil-alt mr-1 neutral-2" aria-hidden="true" />
+									Experience
+								</button>
+							</div>
 						</div>
-					</div>
+					</template>
 					<!-- EXPERIENCE -->
 					<div
 						v-if="
@@ -81,7 +83,7 @@
 												label="Class"
 												v-model="subclass.class"
 												:options="class_list"
-												@input="selectClass($event, classIndex, valid)"
+												@update:model-value="selectClass($event, classIndex, valid)"
 											>
 											</q-select>
 
@@ -218,15 +220,16 @@
 																			computed.abilities.constitution
 																		).hp
 																	}}</strong>
-																	<div
-																		slot="content"
-																		v-html="
-																			character.total_class_hp(
-																				classIndex,
-																				computed.abilities.constitution
-																			).info
-																		"
-																	/>
+																	<template v-slot:content>
+																		<div
+																			v-html="
+																				character.total_class_hp(
+																					classIndex,
+																					computed.abilities.constitution
+																				).info
+																			"
+																		/>
+																	</template>
 																</hk-popover>
 															</div>
 														</q-item-section>
@@ -359,7 +362,7 @@
 																emit-value
 																map-options
 																class="mb-3"
-																@input="saveCasterType(classIndex, valid)"
+																@update:model-value="saveCasterType(classIndex, valid)"
 															/>
 															<q-select
 																:dark="$store.getters.theme === 'dark'"
@@ -369,7 +372,7 @@
 																v-model="subclass.casting_ability"
 																class="mb-3"
 																:options="abilities"
-																@input="
+																@update:model-value="
 																	saveProp(
 																		subclass.casting_ability,
 																		classIndex,
@@ -388,7 +391,7 @@
 																map-options
 																class="mb-3"
 																:options="spell_knowledge_types"
-																@input="
+																@update:model-value="
 																	saveProp(
 																		subclass.spell_knowledge,
 																		classIndex,
@@ -449,7 +452,9 @@
 																:options="armor_types"
 																v-model="proficiencies[classIndex].armor"
 																class="mb-3"
-																@input="setProficiencies($event, classIndex, 'armor', valid)"
+																@update:model-value="
+																	setProficiencies($event, classIndex, 'armor', valid)
+																"
 															/>
 
 															<!-- WEAPONS -->
@@ -482,9 +487,8 @@
 																		</q-item-section>
 																	</q-item>
 
-																	<template v-for="weapon in scope.opt.weapons">
+																	<template v-for="weapon in scope.opt.weapons" :key="weapon.value">
 																		<q-item
-																			:key="weapon.value"
 																			clickable
 																			v-ripple
 																			@click="
@@ -495,7 +499,9 @@
 																			"
 																		>
 																			<q-item-section>
-																				<q-item-label v-text="weapon.label" class="q-ml-lg" />
+																				<q-item-label class="q-ml-lg">{{
+																					weapon.label
+																				}}</q-item-label>
 																			</q-item-section>
 																		</q-item>
 																	</template>
@@ -511,7 +517,9 @@
 																multiple
 																:options="abilities"
 																v-model="proficiencies[classIndex].saving_throw"
-																@input="setProficiencies($event, classIndex, 'saving_throw', valid)"
+																@update:model-value="
+																	setProficiencies($event, classIndex, 'saving_throw', valid)
+																"
 															/>
 														</template>
 														<div v-else class="mb-3">
@@ -555,7 +563,9 @@
 															:max-values="subclass.skill_count || null"
 															:options="filtered_skills(subclass.class, subclass.skills)"
 															v-model="proficiencies[classIndex].skill.subtarget"
-															@input="setProficiencies($event, classIndex, 'skill', valid)"
+															@update:model-value="
+																setProficiencies($event, classIndex, 'skill', valid)
+															"
 														/>
 													</div>
 												</q-expansion-item>
@@ -589,10 +599,12 @@
 						@before-hide="clear_invalid_rolls(valid)"
 					>
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Rolled HP {{ character_classes[editClass].name }} </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Rolled HP {{ character_classes[editClass].name }} </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 
 							<div class="card-body">
 								<template v-if="character_classes[editClass].hit_dice">
@@ -620,17 +632,18 @@
 												:error="invalid && validated"
 												:error-message="errors[0]"
 											>
-												<button
-													slot="after"
-													class="btn"
-													:disabled="
-														character_classes[editClass].rolled_hit_points &&
-														character_classes[editClass].rolled_hit_points[level]
-													"
-													@click.stop="rollHitDice(editClass, level, valid)"
-												>
-													Roll
-												</button>
+												<template v-slot:after>
+													<button
+														class="btn"
+														:disabled="
+															character_classes[editClass].rolled_hit_points &&
+															character_classes[editClass].rolled_hit_points[level]
+														"
+														@click.stop="rollHitDice(editClass, level, valid)"
+													>
+														Roll
+													</button>
+												</template>
 											</q-input>
 										</ValidationProvider>
 									</div>
@@ -643,10 +656,12 @@
 					<!-- EXPERIENCE MODAL -->
 					<q-dialog v-model="experience_modal">
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Experience points </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Experience points </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 							<div class="card-body">
 								<h3 class="xp">
 									<hk-animated-integer :value="Class.experience_points" /><small>xp</small>
@@ -673,18 +688,20 @@
 					<!-- SPELLS KNOWN MODAL -->
 					<q-dialog v-model="spells_known_modal">
 						<hk-card>
-							<div slot="header" class="card-header d-flex justify-content-between">
-								<span> Spells known </span>
-								<q-btn flat v-close-popup round icon="close" size="sm" />
-							</div>
+							<template v-slot:header>
+								<div class="card-header d-flex justify-content-between">
+									<span> Spells known </span>
+									<q-btn flat v-close-popup round icon="close" size="sm" />
+								</div>
+							</template>
 							<div class="spells-known card-body" v-if="character_classes[editClass].spells_known">
 								<h3>Cantrips & Spells known</h3>
 								<div class="columns">
 									<div>Level</div>
 									<div>Cantrips</div>
 									<div>Spells</div>
-									<template v-for="i in 20">
-										<div :key="`level-${i}`">
+									<template v-for="i in 20" :key="i">
+										<div>
 											{{ i }}
 										</div>
 										<q-input
@@ -692,7 +709,6 @@
 											filled
 											square
 											v-model="character_classes[editClass].spells_known.cantrips[i]"
-											:key="`cantrips-known-${i}`"
 											@change="setSpellsKnown(editClass, 'cantrips', i)"
 											:tabindex="`1${i < 10 ? `0${i}` : i}`"
 										/>
@@ -701,7 +717,6 @@
 											filled
 											square
 											v-model="character_classes[editClass].spells_known.spells[i]"
-											:key="`spells-known-${i}`"
 											@change="setSpellsKnown(editClass, 'spells', i)"
 											:tabindex="`2${i < 10 ? `0${i}` : i}`"
 										/>
@@ -846,7 +861,7 @@ export default {
 			}
 		},
 		setClass(Class, classIndex, valid) {
-			this.$set(this.Class.classes[classIndex], "class", Class);
+			this.Class.classes[classIndex].class = Class;
 			this.save(valid, `classes.class`);
 		},
 		filtered_skills(Class, _skills) {
@@ -858,7 +873,7 @@ export default {
 			}
 		},
 		saveProp(value, classIndex, property, valid) {
-			this.$set(this.Class.classes[classIndex], property, value);
+			this.Class.classes[classIndex][property] = value;
 			this.save(valid, `classes.${classIndex}.${property}`);
 		},
 		setShowClass(classIndex) {
@@ -944,7 +959,7 @@ export default {
 			//Set rolled HP manually
 			value = parseInt(value) || 0;
 
-			this.$set(this.Class.classes[classIndex].rolled_hit_points, level, value);
+			this.Class.classes[classIndex].rolled_hit_points[level] = value;
 
 			this.save(valid, "class.rolled_hp");
 		},
@@ -965,7 +980,7 @@ export default {
 		},
 		clear_invalid_rolls(valid) {
 			if (!valid) {
-				this.$set(this.Class.classes[this.editClass], "rolled_hit_points", this.rolled_hp_copy);
+				this.Class.classes[this.editClass].rolled_hit_points = this.rolled_hp_copy;
 			}
 			this.rolled_hp_copy = undefined;
 		},

@@ -100,8 +100,10 @@
 						</ul>
 						<table v-if="value === 'exhaustion'" class="table">
 							<thead>
-								<th>Level</th>
-								<th>Effect</th>
+								<tr>
+									<th>Level</th>
+									<th>Effect</th>
+								</tr>
 							</thead>
 							<tbody>
 								<tr v-for="(effect, i) in exhaustionLevels" :key="i">

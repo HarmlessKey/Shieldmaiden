@@ -400,6 +400,32 @@ export default [
 		],
 	},
 	{
+		url: "advantage-on-skill-checks",
+		name: "Advantage on Skill Checks",
+		description: "Advantage on checks with one skill, chosen when the effect is applied.",
+		sub_effects: [
+			{
+				type: "advantage",
+				sub_types: ["skill"],
+				choice: "skill",
+				description: "Advantage on checks with the chosen skill",
+			},
+		],
+	},
+	{
+		url: "disadvantage-on-skill-checks",
+		name: "Disadvantage on Skill Checks",
+		description: "Disadvantage on checks with one skill, chosen when the effect is applied.",
+		sub_effects: [
+			{
+				type: "disadvantage",
+				sub_types: ["skill"],
+				choice: "skill",
+				description: "Disadvantage on checks with the chosen skill",
+			},
+		],
+	},
+	{
 		url: "advantage-on-attack-rolls",
 		name: "Advantage on Attack Rolls",
 		description: "Advantage on its attack rolls.",

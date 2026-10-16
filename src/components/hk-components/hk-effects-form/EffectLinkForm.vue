@@ -1,6 +1,7 @@
 <template>
 	<div class="effect-link-form">
 		<hk-select
+			v-if="!trait"
 			:value="outcome"
 			:options="outcomeOptions"
 			label="When *"
@@ -11,7 +12,7 @@
 			class="mb-3"
 			@input="$emit('update:outcome', $event)"
 		/>
-		<p v-if="outcome && !outcomeFits" class="red mb-3">
+		<p v-if="!trait && outcome && !outcomeFits" class="red mb-3">
 			<i aria-hidden="true" class="fas fa-exclamation-triangle mr-1" />
 			{{ outcomeLabel(outcome) }} doesn't fit a {{ actionTypeLabel }} action. Pick another
 			moment, or change the action type.
@@ -32,17 +33,19 @@
 			<!-- CHOICES -->
 			<div v-if="definition && requiredChoices.length" class="mb-3">
 				<label class="group">Choices</label>
-				<!-- An empty choice is chosen when the effect is applied -->
+				<!-- An empty choice is chosen when the effect is applied; a trait's are all required -->
 				<template v-for="choice in requiredChoices">
 					<hk-select
 						v-if="choiceField(choice).options"
 						:key="`choice-${choice.kind}`"
 						:value="choiceValue(choice.kind)"
 						:options="choiceField(choice).options"
-						:label="choiceField(choice).label"
-						:display-value="choiceValue(choice.kind) === null ? chosenWhenApplied : undefined"
-						:class="{ 'choice-open': choiceValue(choice.kind) === null }"
-						stack-label
+						:label="trait ? `${choiceField(choice).label} *` : choiceField(choice).label"
+						:name="choiceField(choice).label"
+						:rules="trait ? 'required' : undefined"
+						:display-value="!trait && choiceValue(choice.kind) === null ? chosenWhenApplied : undefined"
+						:class="{ 'choice-open': !trait && choiceValue(choice.kind) === null }"
+						:stack-label="!trait"
 						clearable
 						emit-value
 						map-options
@@ -53,10 +56,12 @@
 						v-else
 						:key="`choice-${choice.kind}`"
 						:value="choiceValue(choice.kind)"
-						:label="choiceField(choice).label"
+						:label="trait ? `${choiceField(choice).label} *` : choiceField(choice).label"
+						:name="choiceField(choice).label"
+						:rules="trait ? 'required' : undefined"
 						:type="choice.kind === 'value' ? 'number' : 'text'"
-						:placeholder="chosenWhenApplied"
-						stack-label
+						:placeholder="trait ? undefined : chosenWhenApplied"
+						:stack-label="!trait"
 						clearable
 						class="mb-2"
 						@input="setChoice(choice.kind, $event)"
@@ -87,8 +92,9 @@
 			/>
 		</template>
 
-		<!-- DURATION: the Effects drawer's duration fields -->
+		<!-- DURATION: the Effects drawer's duration fields; a trait effect is always active -->
 		<ApplicationDuration
+			v-if="!trait"
 			:value="value.duration"
 			:default-save="defaultSave"
 			:conditions="conditions"
@@ -120,7 +126,8 @@ import { default_edition } from "src/utils/generalConstants";
 import { findSrdDefinition, getRequiredChoices, getSrdDefinitions } from "src/utils/effectFunctions";
 
 /**
- * Edits an effect link ($defs/effect_link) of an action-list entry in place, its outcome
+ * Edits an effect link ($defs/effect_link) of an action-list entry or, with `trait`, of a
+ * special ability (no When or Duration, every choice required) in place, its outcome
  * (`outcome`, with .sync) and reports whether its duration is valid (`durationValid`, with
  * .sync). The duration uses the Effects drawer's fields (ApplicationDuration). The definition is read in the NPC's edition, to know its choices
  * and whether it has a level track.
@@ -143,6 +150,8 @@ export default {
 		defaultSave: { type: Object, default: undefined },
 		// Whether the duration fields are valid (.sync)
 		durationValid: { type: Boolean, default: true },
+		// A trait link (effects 6b): no When and Duration, every choice required
+		trait: { type: Boolean, default: false },
 	},
 	data() {
 		return {

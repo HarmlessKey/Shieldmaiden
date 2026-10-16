@@ -204,7 +204,7 @@ import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
 import SignUp from "src/components/SignUp.vue";
 import GenerateMonster from "src/components/npcs/GenerateMonster.vue";
-import { cleanActionEffects } from "src/utils/effectFunctions";
+import { cleanActionEffects, cleanTraitEffects } from "src/utils/effectFunctions";
 
 // The NPC fields that hold abilities with an action_list
 const NPC_ABILITY_GROUPS = ["special_abilities", "actions", "bonus_actions", "legendary_actions", "reactions"];
@@ -358,6 +358,12 @@ export default {
 						const effects = cleanActionEffects(entry.effects);
 						if (effects) this.$set(entry, "effects", effects);
 						else this.$delete(entry, "effects");
+					}
+					// Trait links of a special ability (effects 6b)
+					if (category === "special_abilities" && ability && ability.effects !== undefined) {
+						const traits = cleanTraitEffects(ability.effects);
+						if (traits) this.$set(ability, "effects", traits);
+						else this.$delete(ability, "effects");
 					}
 				}
 			}

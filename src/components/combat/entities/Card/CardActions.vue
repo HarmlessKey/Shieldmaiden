@@ -60,6 +60,16 @@
 									{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : `` }}
 								</em></strong
 							>
+							<!-- Automated: always-active trait effects (effects 6b) -->
+							<i
+								v-if="category === 'special_abilities' && traitEffectsLabel(action)"
+								aria-hidden="true"
+								class="fas fa-sparkles ml-1 neutral-2"
+							>
+								<q-tooltip anchor="top middle" self="bottom middle">
+									Automated: {{ traitEffectsLabel(action) }}
+								</q-tooltip>
+							</i>
 
 							<template v-if="action.limit || action.recharge || action.legendary_cost">
 								<template v-if="action.legendary_cost || action.recharge">
@@ -170,6 +180,7 @@ import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import LimitedUseCounter from "../../actions/LimitedUseCounter.vue";
 import { hasRolls } from "src/utils/generalFunctions";
+import { traitEffectsLabel } from "src/utils/effectFunctions";
 
 export default {
 	name: "CardActions",
@@ -218,6 +229,7 @@ export default {
 	},
 	methods: {
 		hasRolls,
+		traitEffectsLabel,
 		startRoll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted?.length) {
 				this.rollObject = {

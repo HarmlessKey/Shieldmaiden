@@ -536,7 +536,8 @@
           "aoe_type": { "$ref": "#/$defs/action-aoe-type" },
           "aoe_size": { "$ref": "#/$defs/action-aoe-size" },
           "options": { "$ref": "#/$defs/action-options" },
-          "action_list": { "$ref": "#/$defs/action-list" }
+          "action_list": { "$ref": "#/$defs/action-list" },
+          "effects": { "$ref": "#/$defs/trait-effects" }
         },
         "required": ["name"]
       }
@@ -777,6 +778,17 @@
       "type": "array",
       "items": {
         "type": "string"
+      }
+    },
+    "trait-effects": {
+      "title": "Trait effects",
+      "description": "Always-active effects of a special ability (a clay golem's Acid Absorption): effect links of the effects schema (hk-effects-schema.json, $defs/effect_link) without a duration. Every choice is fixed on the link.",
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "https://harmlesskey.com/schemas/hk-effects-schema.json#/$defs/effect_link" },
+          { "not": { "type": "object", "required": ["duration"] } }
+        ]
       }
     },
     "action-list": {

@@ -50,7 +50,8 @@ So you build an effect once and use it everywhere: on many monsters, on spells, 
     **Ability Score Minimum** ask for an ability and a number, **Skill Bonus** for a skill and a
     number.
   - **Advantage** or **Disadvantage** on the saving throws or ability checks of a chosen
-    ability, on attack rolls, or on attack rolls against the creature.
+    ability, on checks with a chosen skill, on attack rolls, or on attack rolls against the
+    creature.
   - **Damage Resistance**, **Vulnerability** and **Immunity** ask for a damage type, **Damage
     Reduction** for a damage type and an amount, and **Absorption** for the damage type that
     heals instead.
@@ -141,10 +142,17 @@ creature that rolled is the caster.
 ### Traits
 
 Special abilities with effects, like Magic Resistance, Undead Fortitude or a golem's
-Absorption, are **trait effects**. They're always active for that creature: they don't have a
-duration, don't show in its list of effects, and can't be removed. A trait still switches off
-when its own condition says so (Evasion doesn't work while the creature is Incapacitated). The
-special ability shows that it's automated, and prompts name the ability ("Undead Fortitude").
+Absorption, are **trait effects**. They're always active for that NPC or companion, in every
+encounter, without applying anything: they don't have a duration, don't show in its list of
+effects or on the public initiative, and can't be removed. A trait still switches off when its
+own condition says so (Evasion doesn't work while the creature is Incapacitated). The special
+ability shows a sparkles icon whose tooltip names its effects ("Automated: Absorption (acid)"),
+and prompts name the ability ("Undead Fortitude").
+
+A trait with limited uses (Legendary Resistance 3/day) counts a use each time its effect is used
+up, on the same counter as the ability's other uses. Once the uses are spent the effect is off
+until you reset them. A trait effect without a limit is never used up. Players' features
+(Evasion on a rogue) don't have trait effects yet.
 
 ## Effects in combat
 
@@ -672,9 +680,18 @@ don't have Scaling.
 ### Trait effects
 
 A special ability (trait) can have always-active **trait effects** as well as the effects of
-its actions. Trait effects have no **When** and no **Duration**: they're always active, as
-described in [Traits](#traits). Their choices are fixed
-on the link. Use them for what a creature *is*: Magic Resistance, Undead Fortitude, Evasion, a
+its actions. They're listed under **Trait effects** below the ability's actions; **Add effect**
+opens a dialog with:
+
+- **Effect**: the condition, SRD effect or custom effect.
+- **Choices**: every choice of the effect is required, because nothing can be chosen when an
+  always-active effect is applied (a clay golem's Absorption is acid).
+- **Level**: only for an effect with a level track.
+- **Magical**: the effect comes from magic.
+
+Trait effects have no **When** and no **Duration**: they're always active, as described in
+[Traits](#traits). Changes to an NPC's trait effects apply the next time an encounter is
+loaded. Use them for what a creature *is*: Magic Resistance, Undead Fortitude, Evasion, a
 golem's Absorption, Legendary Resistance.
 
 ## Encounter reminders

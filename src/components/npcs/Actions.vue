@@ -627,6 +627,15 @@
 															</q-expansion-item>
 														</ValidationObserver>
 													</div>
+
+													<!-- TRAIT EFFECTS: always active, special abilities only (effects 6b) -->
+													<ActionEffects
+														v-if="category === 'special_abilities'"
+														:value="ability"
+														:edition="npc.edition"
+														trait
+														@change="$forceUpdate()"
+													/>
 												</template>
 											</div>
 										</q-expansion-item>

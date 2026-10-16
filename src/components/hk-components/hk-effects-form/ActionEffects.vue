@@ -1,14 +1,26 @@
 <template>
 	<div class="mt-3 action-effects">
 		<label class="group justify-content-between">
-			<span><i aria-hidden="true" class="fas fa-sparkles" /> Effects</span>
+			<span>
+				<i aria-hidden="true" class="fas fa-sparkles" /> {{ trait ? "Trait effects" : "Effects" }}
+				<hk-popover v-if="trait" header="Trait effects" class="ml-1">
+					<i aria-hidden="true" class="fas fa-info-circle neutral-2" />
+					<template #content>
+						Effects that are always active on the creature, in every encounter, without
+						applying them: a golem's Acid Absorption or Magic Resistance. They have no duration,
+						can't be removed and don't show in its list of effects. Every choice is fixed here.
+					</template>
+				</hk-popover>
+			</span>
 			<a class="btn btn-sm btn-clear" @click="add">
 				<i aria-hidden="true" class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add effect</span>
 			</a>
 		</label>
 
-		<div v-if="!links.length" class="card-body neutral-3">No effects</div>
+		<div v-if="!links.length" class="card-body neutral-3">
+			{{ trait ? "No trait effects" : "No effects" }}
+		</div>
 		<!-- One line per link, like the rolls table -->
 		<hk-table v-else :items="links" :columns="columns" :showHeader="false">
 			<strong slot="effect" slot-scope="data">
@@ -62,6 +74,7 @@
 									:action-type="actionType"
 									:edition="edition"
 									:default-save="defaultSave"
+									:trait="trait"
 								/>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
@@ -71,7 +84,10 @@
 									type="submit"
 									no-caps
 									:disabled="
-										!valid || !editing.durationValid || !editing.link.effect || !editing.outcome
+										!valid ||
+										!editing.durationValid ||
+										!editing.link.effect ||
+										(!trait && !editing.outcome)
 									"
 									:label="editing.from ? 'Save' : 'Add'"
 								/>
@@ -93,33 +109,41 @@ import { describeDuration } from "src/utils/effectFunctions";
 
 /**
  * The effects linked to one action-list entry of an NPC ability ($defs/action_effects),
- * edited in place on `value` (the entry). Links are added and edited in a dialog that works on
- * a copy. Emits `change` after every change, so the NPC form can update.
+ * edited in place on `value` (the entry). With `trait`, the always-active trait effects of a
+ * special ability instead (`value` is the ability, `value.effects` a list of links without
+ * When or Duration, effects 6b). Links are added and edited in a dialog that works on a copy.
+ * Emits `change` after every change, so the NPC form can update.
  */
 export default {
 	name: "ActionEffects",
 	components: { EffectLinkForm },
 	props: {
-		// The action-list entry: { type, rolls?, effects? }
+		// The action-list entry: { type, rolls?, effects? }, or with `trait` the special ability
 		value: { type: Object, required: true },
 		// Edition of the NPC
 		edition: { type: String, default: undefined },
+		// Trait links of a special ability
+		trait: { type: Boolean, default: false },
 	},
 	data() {
 		return {
 			dialog: false,
 			// { link, outcome, durationValid, from?: { outcome, index } }
 			editing: undefined,
-			// Columns of the links table (hk-table), like the rolls table
-			columns: {
+		};
+	},
+	computed: {
+		// Columns of the links table (hk-table), like the rolls table; trait links have no When
+		columns() {
+			const columns = {
 				effect: { truncate: true, maxContent: true },
 				when: { truncate: true, maxContent: true },
 				summary: { truncate: true },
 				actions: { noPadding: true, maxContent: true },
-			},
-		};
-	},
-	computed: {
+			};
+			if (this.trait) delete columns.when;
+			return columns;
+		},
 		actionType() {
 			return this.value.type;
 		},
@@ -131,8 +155,14 @@ export default {
 		actionTypeLabel() {
 			return (attack_types[this.actionType]?.label || this.actionType || "").toLowerCase();
 		},
-		// Links of all outcome lists, in outcome order
+		// Links of all outcome lists, in outcome order; a trait's list as it is
 		links() {
+			if (this.trait) {
+				return (Array.isArray(this.value.effects) ? this.value.effects : []).map((link, index) => ({
+					index,
+					link,
+				}));
+			}
 			const effects = this.value.effects || {};
 			return Object.keys(action_outcomes).flatMap((outcome) =>
 				(Array.isArray(effects[outcome]) ? effects[outcome] : []).map((link, index) => ({
@@ -156,7 +186,9 @@ export default {
 		summary(link) {
 			const parts = [];
 			const duration = link.duration;
-			if (duration) {
+			if (this.trait) {
+				// Always active: no duration
+			} else if (duration) {
 				// A dice or formula amount isn't spelled out
 				const value = typeof duration.value === "number" ? duration.value : undefined;
 				parts.push(
@@ -188,7 +220,7 @@ export default {
 			this.editing = {
 				link: {},
 				// The first fitting outcome: On a hit, On a failed save or Always
-				outcome: fitting[0],
+				outcome: this.trait ? undefined : fitting[0],
 				durationValid: true,
 			};
 			this.dialog = true;
@@ -204,6 +236,16 @@ export default {
 		},
 		save() {
 			const { link, outcome, from } = this.editing;
+			if (this.trait) {
+				if (!link.effect) return;
+				const list = Array.isArray(this.value.effects) ? [...this.value.effects] : [];
+				if (from) list.splice(from.index, 1, link);
+				else list.push(link);
+				this.$set(this.value, "effects", list);
+				this.dialog = false;
+				this.$emit("change");
+				return;
+			}
 			if (!link.effect || !outcome) return;
 
 			if (from && from.outcome === outcome) {
@@ -225,6 +267,12 @@ export default {
 		 * Removes a link, and its outcome list and the effects object when they are empty
 		 */
 		removeAt(outcome, index) {
+			if (this.trait) {
+				const list = (Array.isArray(this.value.effects) ? this.value.effects : []).filter((link, i) => i !== index);
+				if (list.length) this.$set(this.value, "effects", list);
+				else this.$delete(this.value, "effects");
+				return;
+			}
 			const effects = this.value.effects;
 			if (!effects || !Array.isArray(effects[outcome])) return;
 			const list = effects[outcome].filter((link, i) => i !== index);

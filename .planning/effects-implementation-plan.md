@@ -1144,7 +1144,7 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
 - **Open for step 7**: a save that only happens on a hit (the ghoul's claws: the Constitution
   save follows a hit) is a second sub-action that rolls whether the attack hit or not.
 
-## 6b. Trait effects: effects on NPC special abilities
+## 6b. Trait effects: effects on NPC special abilities (done — archived as effects-6b-trait-effects, 2026-10-16)
 Decided 2026-10-09. Some effects aren't applied with a duration. They're part of what a
 creature is, like a clay golem's Acid Absorption, Undead Fortitude or Magic Resistance.
 In 3g the DM applies these through the Effects drawer, so they show up in the creature's
@@ -1175,6 +1175,33 @@ effects and conditions as if they were cast on it. They belong on the ability in
   Fortitude, Evasion, Uncanny Dodge, Reliable Talent, Lucky) move to trait links when this
   lands. They become generic definitions under "Generic effects" (step 5).
 - **8c:** the SRD monster backfill adds trait effects as well as action effects.
+
+*As built (change `effects-6b-trait-effects`):*
+- **Data:** `special_abilities[i].effects` is a list of `effect_link`s without a duration
+  (`$defs/trait-effects` in `hk-npc-schema.json`), separate from the action links on its
+  `action_list`; every choice is fixed. The NPC rules accept it on special abilities only.
+- **NPC form:** a **Trait effects** list on each special ability, after its Actions (the action
+  Effects list in `trait` mode: no When column; the link dialog without When and Duration, all
+  choices required).
+- **Engine:** `traitInstances(entity, holderKey)` builds them as instances keyed
+  `trait:<ability>:<link>` (caster = the creature, `trait` field); `effectEntries(entity,
+  holderKey)` (applied + trait) replaced the collectors' loops over `entity.effects`. Durations,
+  `ends_when` expiry, cascades, Reaction Used and the carried-over review stay on applied
+  instances. `effectLabel` names trait effects by their ability in modifiers, notes and prompts.
+- **Store:** trait definitions are resolved in `add_entity` (encounter load and mid-encounter
+  adds); `effect_instance(key, effectKey)` finds applied or trait instances; `remove_effect` on a
+  trait key goes to `use_trait_effect`; `set_effect_prop` ignores trait keys.
+- **Open questions, decided (2026-10-15):**
+  - Limited traits: a used-up trait effect counts a use on the ability's `limit` / `limit_type`
+    counter (`limited_uses.special_abilities`); spent abilities' trait effects are off until
+    reset; without a limit a trait effect is never used up.
+  - Companions get trait effects (they're NPCs); players don't yet.
+- **Display:** not in the card's effects, the drawer list or the live view's chips; the special
+  ability shows a sparkles icon ("Automated: Absorption (acid)") on the card and in the actor's
+  action list. The live view's effective values include trait effects (`effectSubject` gets the
+  NPC's special abilities and limited uses).
+- **Later:** player features (Evasion, Uncanny Dodge, Reliable Talent, Lucky on a player
+  character) need a place on the character; not planned as a step yet.
 
 ## 7. Update action rolls to include effects
 - Update `src/mixins/runEncounter.js` and `RollActions.vue` roll execution so that
@@ -1334,7 +1361,7 @@ let an AI write them instead, and import the result.
 3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) (3f moved to 9)
 4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
-6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
+6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
 8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
 10 (apply effects from the set initiative screen: shared header-actions component for the Targeted and Overview headers; can be done any time after 4)

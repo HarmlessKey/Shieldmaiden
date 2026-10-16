@@ -197,6 +197,8 @@ function npcStats(data_npc) {
 		innate_ability: data_npc.innate_ability,
 		innate_save_dc: data_npc.innate_save_dc,
 		innate_spell_attack: data_npc.innate_spell_attack,
+		// Their trait effects (effects 6b) count for the effective values, not for the effects list
+		special_abilities: data_npc.special_abilities,
 	};
 	for (const ability of abilities) stats[ability] = data_npc[ability];
 	if (data_npc.old) {
@@ -284,6 +286,8 @@ export function effectSubject({ entity = {}, campaignEntry, player, npc } = {}) 
 	Object.assign(subject, transformedFields(entity.transformed), {
 		bonuses: manualBonuses(entity),
 		effects: { ...(entity.effects || {}) },
+		// Spent limited traits switch their trait effects off
+		limited_uses: entity.limited_uses,
 		friendly: !!entity.friendly,
 		settings: entity.settings,
 		curHp: parseInt(entity.curHp),

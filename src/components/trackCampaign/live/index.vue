@@ -182,6 +182,7 @@ import {
 	effectiveStats,
 	findSrdDefinition,
 	resolveDefinition,
+	traitInstances,
 } from "src/utils/effectFunctions";
 import { effectSubject } from "src/utils/entityFunctions";
 import { default_edition } from "src/utils/generalConstants";
@@ -369,6 +370,12 @@ export default {
 			const refs = {};
 			for (const effects of Object.values(this.effectInstances)) {
 				for (const { source, source_key } of Object.values(effects)) {
+					refs[`${source}:${source_key}`] = { source, source_key };
+				}
+			}
+			// Trait effects of NPCs and companions count for their effective values (effects 6b)
+			for (const [key, subject] of Object.entries(this.subjects)) {
+				for (const { source, source_key } of Object.values(traitInstances(subject, key))) {
 					refs[`${source}:${source_key}`] = { source, source_key };
 				}
 			}

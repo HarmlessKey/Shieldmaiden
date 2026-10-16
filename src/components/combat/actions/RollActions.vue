@@ -17,6 +17,16 @@
 					>
 						<q-item-label>
 							<strong>{{ action.name }}</strong>
+							<!-- Automated: always-active trait effects (effects 6b) -->
+							<i
+								v-if="type === 'special_abilities' && traitEffectsLabel(action)"
+								aria-hidden="true"
+								class="fas fa-sparkles ml-1 neutral-2"
+							>
+								<q-tooltip anchor="top middle" self="bottom middle">
+									Automated: {{ traitEffectsLabel(action) }}
+								</q-tooltip>
+							</i>
 							<span class="neutral-3">
 								{{
 									action.recharge
@@ -175,6 +185,7 @@ import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import { isNil } from "lodash";
 import { hasRolls } from "src/utils/generalFunctions";
+import { traitEffectsLabel } from "src/utils/effectFunctions";
 import Projectiles from "./Projectiles";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import LimitedUseCounter from "./LimitedUseCounter.vue";
@@ -208,6 +219,7 @@ export default {
 			projectile_dialog: false,
 			isNil: isNil,
 			hasRolls: hasRolls,
+			traitEffectsLabel: traitEffectsLabel,
 		};
 	},
 	computed: {

@@ -2,6 +2,9 @@ import { abilities, skills, default_edition } from "src/utils/generalConstants";
 import { uuid, calc_mod } from "src/utils/generalFunctions";
 import {
 	generateEffectKey,
+	traitInstances,
+	isTraitKey,
+	effectLabel,
 	findSrdDefinition,
 	isSrdCondition,
 	resolveDefinition,
@@ -278,6 +281,16 @@ const run_encounter_getters = {
 		return state.effect_definitions[`${instance.source}:${instance.source_key}`];
 	},
 	/**
+	 * An active effect of an entity by key: an applied instance, or a trait effect
+	 * ("trait:…", built from its special abilities)
+	 */
+	effect_instance: (state) => (key, effectKey) => {
+		const entity = state.entities[key];
+		if (!entity) return undefined;
+		if (isTraitKey(effectKey)) return traitInstances(entity, key)[effectKey];
+		return entity.effects?.[effectKey];
+	},
+	/**
 	 * Active effects of an entity, each with its resolved definition
 	 */
 	entity_effects: (state, getters) => (key) => {
@@ -337,6 +350,19 @@ const run_encounter_getters = {
 		}
 		for (const { holderKey, effectKey } of consumed) {
 			const holder = entities[holderKey];
+			// A trait effect used up counts a use on its ability (effects 6b), not saved yet
+			if (holder && isTraitKey(effectKey)) {
+				const index = effectKey.split(":")[1];
+				const used = parseInt(holder.limited_uses?.special_abilities?.[index]) || 0;
+				entities[holderKey] = {
+					...holder,
+					limited_uses: {
+						...(holder.limited_uses || {}),
+						special_abilities: { ...(holder.limited_uses?.special_abilities || {}), [index]: used + 1 },
+					},
+				};
+				continue;
+			}
 			if (!holder?.effects?.[effectKey]) continue;
 			const effects = { ...holder.effects };
 			delete effects[effectKey];
@@ -876,6 +902,10 @@ const run_encounter_actions = {
 			}
 		}
 		commit("ADD_ENTITY", { key, entity });
+
+		// The definitions of its trait effects (effects 6b), also for creatures added mid-encounter
+		const traits = Object.values(traitInstances(entity, key));
+		if (traits.length) await dispatch("resolve_effect_definitions", traits);
 	},
 
 	/**
@@ -2134,7 +2164,7 @@ const run_encounter_actions = {
 	 * @param {string} effectKey Key of the instance
 	 */
 	check_death_outcome({ state, commit, getters }, { key, effectKey }) {
-		const instance = state.entities[key]?.effects?.[effectKey];
+		const instance = getters.effect_instance(key, effectKey);
 		if (!instance) return;
 		const definition = getters.effect_definition(instance);
 		if (!deathOutcome({ instance, definition })) return;
@@ -2175,6 +2205,36 @@ const run_encounter_actions = {
 	},
 
 	/**
+	 * A trait effect was used up (consume, effects 6b). It isn't stored, so nothing is removed:
+	 * when its special ability has a limit, a use is counted on it (limited_uses), which switches
+	 * the trait effect off once the uses are spent; without a limit nothing happens.
+	 *
+	 * @param {string} key The creature
+	 * @param {string} effectKey "trait:<abilityIndex>:<linkIndex>"
+	 * @param {string} reason Why it ended, for the notice ("used")
+	 */
+	async use_trait_effect({ state, commit, dispatch, getters }, { key, effectKey, reason }) {
+		const instance = getters.effect_instance(key, effectKey);
+		if (!instance?.trait?.limit) return;
+		const { ability_index, ability_name } = instance.trait;
+		await dispatch("set_limitedUses", { key, index: ability_index, category: "special_abilities" });
+		if (!reason) return;
+		commit("ADD_EFFECT_PROMPTS", [
+			{
+				kind: "notice",
+				id: `notice:${key}:${effectKey}:${Date.now()}`,
+				holderKey: key,
+				effectKey,
+				holderName: state.entities[key]?.name,
+				effectName: ability_name || instance.name,
+				source: instance.source,
+				source_key: instance.source_key,
+				reason,
+			},
+		]);
+	},
+
+	/**
 	 * Removes effect instances from an entity:
 	 * one instance by effectKey, or every instance of a definition by source + source_key
 	 *
@@ -2189,6 +2249,11 @@ const run_encounter_actions = {
 		{ state, commit, dispatch, getters },
 		{ key, source, source_key, effectKey, reason, skipExpire }
 	) {
+		// A trait effect isn't stored: using it up counts a use on its ability (effects 6b)
+		if (isTraitKey(effectKey)) {
+			await dispatch("use_trait_effect", { key, effectKey, reason });
+			return;
+		}
 		const effects = state.entities[key]?.effects || {};
 		const effectKeys = effectKey
 			? [effectKey]
@@ -2312,11 +2377,11 @@ const run_encounter_actions = {
 	 * @param {object} match dropToOneFor's result: { entry, ability, dc, notes }
 	 * @param {number} damage The damage taken
 	 */
-	async drop_to_one({ state, commit, dispatch }, { key, match, damage }) {
+	async drop_to_one({ state, commit, dispatch, getters }, { key, match, damage }) {
 		const { entry, ability, dc, notes = [] } = match || {};
 		if (!entry) return;
 		const holderName = state.entities[key]?.name;
-		const instance = state.entities[key]?.effects?.[entry.effectKey];
+		const instance = getters.effect_instance(key, entry.effectKey);
 		const base = {
 			holderKey: key,
 			effectKey: entry.effectKey,
@@ -2488,6 +2553,8 @@ const run_encounter_actions = {
 	 * @param {any} value
 	 */
 	async set_effect_prop({ state, commit, dispatch }, { key, effectKey, property, value }) {
+		// Trait effects aren't stored and keep no charges or counters (effects 6b)
+		if (isTraitKey(effectKey)) return;
 		const instance = state.entities[key]?.effects?.[effectKey];
 		if (!instance) return;
 
@@ -2584,7 +2651,7 @@ const run_encounter_actions = {
 			const prompts = [];
 			for (const { holderKey, effectKey, instance, definition, matches: subs } of matches) {
 				const holderName = state.entities[holderKey]?.name;
-				const effectName = (definition.name || instance.name || "").capitalize();
+				const effectName = effectLabel(definition, instance).capitalize();
 
 				// A Concentration save gets its own save prompt, with the DC from the damage.
 				// None when the damage drops the holder to 0 HP: on_zero_hp breaks it outright.

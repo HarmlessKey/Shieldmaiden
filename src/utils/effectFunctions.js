@@ -66,6 +66,101 @@ export function isSrdCondition(source, url) {
 }
 
 /**
+ * Whether an effect key is a trait effect's (traitInstances), not an applied instance's
+ *
+ * @param {string} effectKey
+ * @returns {boolean}
+ */
+export function isTraitKey(effectKey) {
+	return typeof effectKey === "string" && effectKey.startsWith("trait:");
+}
+
+/**
+ * The name an active effect is shown by in modifiers, notes and prompts: a trait effect by
+ * its special ability ("Acid Absorption"), others by their definition or instance name
+ *
+ * @param {object} definition Resolved definition
+ * @param {object} instance Active effect instance
+ * @returns {string}
+ */
+export function effectLabel(definition, instance) {
+	return instance?.trait?.ability_name || definition?.name || instance?.name || "";
+}
+
+/**
+ * The always-active effects linked to an NPC's or companion's special abilities (trait
+ * links, effects step 6b), as instances in the applied shape. They aren't stored: they're
+ * built from the creature's special abilities, keyed "trait:<abilityIndex>:<linkIndex>". The
+ * links of an ability whose limited uses are spent are left out. Players have none.
+ *
+ * @param {object} entity Tracker entity
+ * @param {string} [holderKey] The entity's key, its trait effects' caster
+ * @returns {object} { [effectKey]: instance } with instance.trait { ability_index, ability_name, link_index, limit }
+ */
+export function traitInstances(entity, holderKey) {
+	const instances = {};
+	if (!entity || entity.entityType === "player") return instances;
+
+	(entity.special_abilities || []).forEach((ability, ability_index) => {
+		const links = Array.isArray(ability?.effects) ? ability.effects : Object.values(ability?.effects || {});
+		if (!links.length) return;
+		const limit = parseInt(ability.limit) || undefined;
+		const used = parseInt(entity.limited_uses?.special_abilities?.[ability_index]) || 0;
+		if (limit && used >= limit) return;
+
+		links.forEach((link, link_index) => {
+			const effect = link?.effect;
+			if (!effect?.source || !effect?.source_key) return;
+			const instance = {
+				name: effect.name || effect.source_key,
+				source: effect.source,
+				source_key: effect.source_key,
+				caster_name: entity.name,
+				trait: { ability_index, ability_name: ability.name, link_index, limit },
+			};
+			if (holderKey !== undefined) instance.caster_key = holderKey;
+			if (link.choices && Object.keys(link.choices).length) instance.choices = { ...link.choices };
+			if (link.level !== undefined) instance.level = link.level;
+			if (link.magical) instance.magical = true;
+			instances[`trait:${ability_index}:${link_index}`] = instance;
+		});
+	});
+	return instances;
+}
+
+/**
+ * The trait links of a special ability in words, for its automated marker: each effect with
+ * its fixed choices ("Absorption (acid), Magic Resistance")
+ *
+ * @param {object} ability Special ability with `effects`
+ * @returns {string} Empty without trait links
+ */
+export function traitEffectsLabel(ability) {
+	const links = Array.isArray(ability?.effects) ? ability.effects : Object.values(ability?.effects || {});
+	return links
+		.filter((link) => link?.effect)
+		.map((link) => {
+			const name = link.effect.name || link.effect.source_key;
+			const choices = Object.values(link.choices || {}).join(", ");
+			return choices ? `${name} (${choices})` : name;
+		})
+		.join(", ");
+}
+
+/**
+ * The effects that are active on an entity: its applied instances plus its trait effects.
+ * The engine reads these; lists of a creature's effects (card, drawer, live view) read
+ * entity.effects, which never holds trait effects.
+ *
+ * @param {object} entity Tracker entity
+ * @param {string} [holderKey] The entity's key
+ * @returns {[string, object][]} [effectKey, instance]
+ */
+export function effectEntries(entity, holderKey) {
+	return [...Object.entries(entity?.effects || {}), ...Object.entries(traitInstances(entity, holderKey))];
+}
+
+/**
  * Copy of a definition with a sub_effects array.
  * Only the v2 shape is read: a definition without sub_effects gets none.
  *
@@ -192,6 +287,24 @@ export function cleanEffectLink(link = {}) {
 	if (level >= 1) cleaned.level = level;
 	if (link.magical === true) cleaned.magical = true;
 	return cleaned;
+}
+
+/**
+ * Copy of the trait links of a special ability as the NPC form saves them (effects 6b): every
+ * link cleaned (cleanEffectLink) and without a duration, links without an effect left out.
+ *
+ * @param {object[]} links The ability's effects
+ * @returns {object[]|undefined} New list, or undefined when no link is left
+ */
+export function cleanTraitEffects(links) {
+	const list = (Array.isArray(links) ? links : Object.values(links || {}))
+		.map((link) => {
+			const cleaned = cleanEffectLink(link);
+			if (cleaned) delete cleaned.duration;
+			return cleaned;
+		})
+		.filter(Boolean);
+	return list.length ? list : undefined;
 }
 
 /**
@@ -554,7 +667,7 @@ export function matchTriggers({ trigger, entityKey, entities = {}, definitionOf,
 	const results = [];
 
 	for (const [holderKey, entity] of Object.entries(entities)) {
-		for (const [key, instance] of Object.entries(entity?.effects || {})) {
+		for (const [key, instance] of effectEntries(entity, holderKey)) {
 			if (effectKey !== undefined && (holderKey !== entityKey || key !== effectKey)) continue;
 
 			const listens = [];
@@ -954,7 +1067,7 @@ export function hasCondition(entityKey, url, { entities = {}, definitionOf = () 
 	const entity = entities[entityKey];
 	if (!entity) return false;
 
-	return Object.values(entity.effects || {}).some((instance) => {
+	return effectEntries(entity, entityKey).some(([, instance]) => {
 		if (instance.source === "srd" && instance.source_key === url) return true;
 		const definition = definitionOf(instance);
 		return (definition?.sub_effects || []).some(
@@ -1003,7 +1116,7 @@ export function evaluateConditionSet(set, ctx) {
 			result = hasCondition(subjectKey, set.value, ctx);
 			break;
 		case "has_effect":
-			result = Object.values(subject.effects || {}).some((i) => i.source_key === set.value);
+			result = effectEntries(subject, subjectKey).some(([, i]) => i.source_key === set.value);
 			break;
 		case "bloodied":
 			result = curHp > 0 && curHp <= maxHp / 2;
@@ -2139,11 +2252,11 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 	const addModifier = (field, modifier) => (modifiers[field] = modifiers[field] || []).push(modifier);
 	const selfVars = formulaVars(entity);
 
-	for (const [effectKey, instance] of Object.entries(entity.effects || {})) {
+	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
 
-		const name = definition.name || instance.name || "";
+		const name = effectLabel(definition, instance);
 		const groupKey = `${instance.source}:${instance.source_key}`;
 		const level = parseInt(instance.level) || 1;
 		const ctx = { holderKey, instance, entities, definitionOf };
@@ -2356,14 +2469,14 @@ export function effectiveDefenses({ entity, holderKey, entities = {}, definition
 	};
 
 	const seen = new Set();
-	for (const instance of Object.values(entity?.effects || {})) {
+	for (const [, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
 		const groupKey = `${instance.source}:${instance.source_key}`;
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 
-		const name = definition.name || instance.name || "";
+		const name = effectLabel(definition, instance);
 		const level = parseInt(instance.level) || 1;
 		const ctx = { holderKey, instance, entities, definitionOf };
 		const definitionState = definition.condition ? conditionState(definition.condition, ctx) : true;
@@ -2599,11 +2712,11 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 
 	// Per instance its contributions, so the same definition twice counts once
 	const contributions = [];
-	for (const [effectKey, instance] of Object.entries(entity.effects || {})) {
+	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
 
-		const name = definition.name || instance.name || "";
+		const name = effectLabel(definition, instance);
 		const level = parseInt(instance.level) || 1;
 		const ctx = {
 			holderKey,
@@ -2935,13 +3048,13 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 
 	const selfVars = formulaVars(attacker);
 	const seen = new Set();
-	for (const instance of Object.values(attacker.effects || {})) {
+	for (const [, instance] of effectEntries(attacker, attackerKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
 		const groupKey = `${instance.source}:${instance.source_key}`;
 		if (seen.has(groupKey)) continue;
 
-		const name = definition.name || instance.name || "";
+		const name = effectLabel(definition, instance);
 		const level = parseInt(instance.level) || 1;
 		const ctx = {
 			holderKey: attackerKey,
@@ -3038,14 +3151,14 @@ export function restrictions({ entity, holderKey, entities = {}, definitionOf = 
 	const result = [];
 	if (!entity) return result;
 	const seen = new Set();
-	for (const instance of Object.values(entity.effects || {})) {
+	for (const [, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
 		const groupKey = `${instance.source}:${instance.source_key}`;
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 
-		const name = definition.name || instance.name || "";
+		const name = effectLabel(definition, instance);
 		const level = parseInt(instance.level) || 1;
 		const ctx = { holderKey, instance, entities, definitionOf, counterpartKey };
 		const definitionState = definition.condition ? conditionState(definition.condition, ctx) : true;
@@ -3141,7 +3254,7 @@ const APPLIED_DAMAGE_MODIFIERS = [...Object.keys(DAMAGE_TOGGLE_KINDS), "floor_at
 function activeDefinitions({ entity, holderKey, entities, definitionOf, counterpartKey }) {
 	const list = [];
 	const seen = new Set();
-	for (const [effectKey, instance] of Object.entries(entity?.effects || {})) {
+	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
 		const groupKey = `${instance.source}:${instance.source_key}`;
@@ -3153,7 +3266,7 @@ function activeDefinitions({ entity, holderKey, entities, definitionOf, counterp
 			instance,
 			definition,
 			ctx,
-			name: definition.name || instance.name || "",
+			name: effectLabel(definition, instance),
 			level: parseInt(instance.level) || 1,
 			definitionState: definition.condition ? conditionState(definition.condition, ctx) : true,
 		});
@@ -3511,12 +3624,12 @@ export function healingReceivedCap({ entity, holderKey, entities = {}, definitio
 export function damageBonusLines({ entity, definitionOf = () => undefined } = {}) {
 	const lines = [];
 	const seen = new Set();
-	for (const [effectKey, instance] of Object.entries(entity?.effects || {})) {
+	for (const [effectKey, instance] of effectEntries(entity)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
 		const groupKey = `${instance.source}:${instance.source_key}`;
 		if (seen.has(groupKey)) continue;
-		const name = definition.name || instance.name || "";
+		const name = effectLabel(definition, instance);
 		for (const original of definition.sub_effects || []) {
 			const sub_effect = withChosenValue(original, instance);
 			if (sub_effect.type !== "bonus" || !(sub_effect.sub_types || []).includes("damage")) continue;

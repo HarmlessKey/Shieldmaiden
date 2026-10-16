@@ -3,6 +3,10 @@ import { npcServices } from "src/services/npcs";
 import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
+// Delay between the two server reads of the ghost check (see check_ghost_npc)
+const GHOST_CHECK_DELAY = 1500;
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // Converts a full npc to a search_npc
 const convert_npc = (npc) => {
 	const properties = ["name", "challenge_rating", "avatar", "storage_avatar", "type", "groups"];
@@ -109,7 +113,7 @@ const npc_actions = {
 			}
 		}
 	},
-	async get_npc({ state, commit, dispatch }, { uid, id }) {
+	async get_npc({ state, dispatch }, { uid, id }) {
 		let npc = state.cached_npcs[uid] ? state.cached_npcs[uid][id] : undefined;
 
 		// The npc is not in the store and needs to be fetched from the database
@@ -125,6 +129,18 @@ const npc_actions = {
 			}
 		}
 
+		return await dispatch("cache_npc", { uid, id, npc });
+	},
+
+	/**
+	 * Removes custom spells that no longer exist from an NPC and caches it
+	 *
+	 * @param {string} uid
+	 * @param {string} id
+	 * @param {object|null} npc
+	 * @returns {object|null} the cached npc
+	 */
+	async cache_npc({ commit, dispatch }, { uid, id, npc }) {
 		if (npc && npc.caster_spells) {
 			await dispatch("cacheNpcSpell", { uid, npc_id: id, spell_list: npc.caster_spells }).then(
 				(to_delete) => {
@@ -146,6 +162,110 @@ const npc_actions = {
 
 		commit("SET_CACHED_NPC", { uid, id, npc });
 		return npc;
+	},
+
+	/**
+	 * Resolves an NPC that the user picked from their search list
+	 * (Edit NPC, encounter builder, NPC picker and delete).
+	 * Normally this is just get_npc. Only when get_npc returns null, check_ghost_npc runs
+	 * to find out if it's a search entry without an NPC (a "ghost") and clean it up.
+	 * Background loading (encounters, export, companions, etc.) should keep using get_npc.
+	 *
+	 * @param {string} uid
+	 * @param {string} id
+	 * @returns {object} { status: "exists", npc } | { status: "ghost" } | { status: "unknown" }
+	 */
+	async resolve_npc({ dispatch }, { uid, id }) {
+		try {
+			const npc = await dispatch("get_npc", { uid, id });
+			if (npc) {
+				return { status: "exists", npc };
+			}
+		} catch (error) {
+			console.warn(`Couldn't load NPC ${id} of user ${uid}`, error);
+			return { status: "unknown" };
+		}
+		return await dispatch("check_ghost_npc", { uid, id });
+	},
+
+	/**
+	 * Checks if an NPC that resolved to null really doesn't exist, and if so removes its search entry.
+	 * Only dispatched by resolve_npc. Every check must pass before anything is removed,
+	 * when in doubt the result is "unknown" and nothing changes.
+	 * Only the search entry is removed, it can always be rebuilt from the NPC with convert_npc.
+	 *
+	 * @param {string} uid
+	 * @param {string} id
+	 * @returns {object} { status: "exists", npc } | { status: "ghost" } | { status: "unknown" }
+	 */
+	async check_ghost_npc({ state, rootGetters, commit, dispatch }, { uid, id }) {
+		const inconclusive = (reason, error) => {
+			console.warn(`Ghost check for NPC ${id} of user ${uid} is inconclusive: ${reason}`, error || "");
+			return { status: "unknown" };
+		};
+
+		// 1. Only NPCs of the signed in user (not e.g. another user's companion)
+		const user_uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid || uid !== user_uid) {
+			return inconclusive("not an NPC of the signed in user");
+		}
+
+		// 2. A valid database key
+		if (typeof id !== "string" || !id.length || /[.#$[\]/]/.test(id)) {
+			return inconclusive("invalid id");
+		}
+
+		const services = await dispatch("get_npc_services");
+
+		// 3, 4, 5. Connected, and a fresh server read (not the cache) that returns nothing
+		const npc_exists_on_server = async () => {
+			if (!(await services.isConnected())) {
+				throw new Error("Not connected to the database");
+			}
+			const snapshot = await services.getNpcFromServer(uid, id);
+			return snapshot.exists() ? snapshot.val() : null;
+		};
+
+		try {
+			let npc = await npc_exists_on_server();
+			if (npc) {
+				return { status: "exists", npc: await dispatch("cache_npc", { uid, id, npc }) };
+			}
+
+			// 6. The search entry still exists, otherwise it was already cleaned up (e.g. in another tab)
+			if (!(await services.searchNpcExists(uid, id))) {
+				commit("REMOVE_NPC", id);
+				commit("REMOVE_CACHED_NPC", { uid, id });
+				return { status: "ghost" };
+			}
+
+			// 7. Read again after a delay, in case the NPC is being written from another tab or device
+			await wait(GHOST_CHECK_DELAY);
+			npc = await npc_exists_on_server();
+			if (npc) {
+				return { status: "exists", npc: await dispatch("cache_npc", { uid, id, npc }) };
+			}
+
+			// 8. Only now remove the search entry
+			await services.removeSearchNpc(uid, id);
+		} catch (error) {
+			return inconclusive("check failed", error);
+		}
+
+		console.warn(`Removed search entry of NPC ${id} of user ${uid}, the NPC doesn't exist`);
+
+		// Keep the store in sync, the search entry is already removed so this can't make it a false ghost
+		try {
+			if (!state.npcs) {
+				await dispatch("get_npcs");
+			}
+			commit("REMOVE_NPC", id);
+			commit("REMOVE_CACHED_NPC", { uid, id });
+			await dispatch("update_npc_count");
+		} catch (error) {
+			console.warn(`Couldn't update the NPC store after removing ghost NPC ${id}`, error);
+		}
+		return { status: "ghost" };
 	},
 
 	async cacheNpcSpell({ dispatch }, { uid, npc_id, spell_list }) {
@@ -278,15 +398,20 @@ const npc_actions = {
 	/**
 	 * Deletes an existing NPC
 	 * A user can only delete their own NPC's so use uid from the store
+	 * When the NPC turns out to be a ghost, only its search entry is removed (see check_ghost_npc)
 	 *
 	 * @param {string} id
+	 * @returns {string} "deleted" | "ghost" | "unknown"
 	 */
 	async delete_npc({ rootGetters, commit, dispatch }, id) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_npc_services");
 			try {
-				const npc = await dispatch("get_npc", { uid, id });
+				const { status, npc } = await dispatch("resolve_npc", { uid, id });
+				if (status !== "exists") {
+					return status;
+				}
 
 				// DELETE COMPANION FROM PLAYER
 				if (npc.player_id) {
@@ -319,7 +444,7 @@ const npc_actions = {
 				commit("REMOVE_CACHED_NPC", { uid, id });
 
 				await dispatch("update_npc_count");
-				return;
+				return "deleted";
 			} catch (error) {
 				throw error;
 			}

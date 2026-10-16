@@ -180,18 +180,28 @@
 									/>
 									<a
 										class="btn btn-sm bg-neutral-5 mx-1"
+										:class="{ disabled: resolving_npcs[props.key] }"
 										@click="multi_add($event, props.key, 'npc', props.row.name, true)"
 									>
-										<i aria-hidden="true" class="fas fa-plus"></i>
+										<i
+											aria-hidden="true"
+											class="fas"
+											:class="resolving_npcs[props.key] ? 'fa-spinner fa-spin' : 'fa-plus'"
+										></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add with average HP
 										</q-tooltip>
 									</a>
 									<a
 										class="btn btn-sm bg-neutral-5"
+										:class="{ disabled: resolving_npcs[props.key] }"
 										@click="multi_add($event, props.key, 'npc', props.row.name, true, true)"
 									>
-										<i aria-hidden="true" class="fas fa-dice-d20"></i>
+										<i
+											aria-hidden="true"
+											class="fas"
+											:class="resolving_npcs[props.key] ? 'fa-spinner fa-spin' : 'fa-dice-d20'"
+										></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Add with rolled HP
 										</q-tooltip>
@@ -330,18 +340,28 @@
 								/>
 								<a
 									class="btn btn-sm bg-neutral-5 mx-1"
+									:class="{ disabled: resolving_npcs[props.key] }"
 									@click="multi_add($event, props.key, 'npc', props.row.name, false)"
 								>
-									<i aria-hidden="true" class="fas fa-plus"></i>
+									<i
+										aria-hidden="true"
+										class="fas"
+										:class="resolving_npcs[props.key] ? 'fa-spinner fa-spin' : 'fa-plus'"
+									></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Add with average HP
 									</q-tooltip>
 								</a>
 								<a
 									class="btn btn-sm bg-neutral-5"
+									:class="{ disabled: resolving_npcs[props.key] }"
 									@click="multi_add($event, props.key, 'npc', props.row.name, false, true)"
 								>
-									<i aria-hidden="true" class="fas fa-dice-d20"></i>
+									<i
+										aria-hidden="true"
+										class="fas"
+										:class="resolving_npcs[props.key] ? 'fa-spinner fa-spin' : 'fa-dice-d20'"
+									></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Add with rolled HP
 									</q-tooltip>
@@ -533,6 +553,7 @@ import { dice } from "src/mixins/dice.js";
 import { general } from "src/mixins/general.js";
 import { uuid, campaignGroupKey } from "src/utils/generalFunctions";
 import { editions, default_edition } from "src/utils/generalConstants";
+import { notifyUnresolvedNpc } from "src/utils/errors";
 import ViewMonster from "src/components/compendium/Monster.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
@@ -606,6 +627,7 @@ export default {
 				},
 			},
 			npcExpandData: {},
+			resolving_npcs: {}, // NPC ids that are being added, { [id]: true }
 			monster_resource_setter: undefined,
 			loading_monsters: true,
 			loading_npcs: true,
@@ -803,7 +825,7 @@ export default {
 	methods: {
 		...mapActions(["setDrawer"]),
 		...mapActions("api_monsters", ["fetch_monsters", "fetch_monster"]),
-		...mapActions("npcs", ["get_npcs", "get_npc"]),
+		...mapActions("npcs", ["get_npcs", "get_npc", "resolve_npc"]),
 		...mapActions("npcGroups", ["get_npc_groups"]),
 		...mapActions("players", ["get_players", "get_player"]),
 		...mapActions("encounters", ["add_player_encounter", "add_npc_encounter"]),
@@ -862,17 +884,30 @@ export default {
 			});
 		},
 		async multi_add(e, id, type, name, custom = false, rollHp = false) {
+			if (this.resolving_npcs[id]) {
+				return;
+			}
 			if (!this.to_add[id]) {
 				this.to_add[id] = 1;
 			}
-			for (let i = 0; i < this.to_add[id]; i++) {
-				await this.add(e, id, type, name, custom, rollHp);
+			let added = 0;
+			this.$set(this.resolving_npcs, id, true);
+			try {
+				for (let i = 0; i < this.to_add[id]; i++) {
+					// Stop at the first NPC that couldn't be resolved, so the warning only shows once
+					if (!(await this.add(e, id, type, name, custom, rollHp))) {
+						break;
+					}
+					added++;
+				}
+			} finally {
+				this.$delete(this.resolving_npcs, id);
 			}
 
 			// Notification for NPCs
-			if (type === "npc") {
+			if (type === "npc" && added) {
 				this.$snotify.success(
-					`${this.to_add[id]} NPC${this.to_add > 1 ? "s" : ""} added successfully`,
+					`${added} NPC${added > 1 ? "s" : ""} added successfully`,
 					"NPC added",
 					{ position: "centerTop" }
 				);
@@ -943,7 +978,11 @@ export default {
 
 				// CUSTOM NPC
 				else {
-					let npc_data = await this.get_npc({ uid: this.user.uid, id });
+					const { status, npc: npc_data } = await this.resolve_npc({ uid: this.user.uid, id });
+					if (status !== "exists") {
+						notifyUnresolvedNpc(this.$snotify, status);
+						return false;
+					}
 					entity.npc = "custom";
 					entity.ac = npc_data.old ? npc_data.ac : npc_data.armor_class;
 
@@ -1052,6 +1091,7 @@ export default {
 					notifyHP.mod = "";
 				}
 			}
+			return true;
 		},
 		async addAllPlayers(e) {
 			for (let player in this.campaign.players) {

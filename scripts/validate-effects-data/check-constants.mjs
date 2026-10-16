@@ -11,7 +11,8 @@
 //      (effects.js, both editions) and the condition data of both editions is allowed by
 //      effect_types, and every choice kind (one, or a list) has a choice_kinds entry
 //   4. the duration types accepted by the `effects` blocks in firebase-rules.json match
-//      $defs/duration.type (skipped with a warning when the rules file is missing)
+//      $defs/duration.type, or a spell link's duration tier types under duration_scaling
+//      (skipped with a warning when the rules file is missing)
 //
 // Usage:
 //   node scripts/validate-effects-data/check-constants.mjs
@@ -69,6 +70,8 @@ const ENUM_MAP = {
 	"#/$defs/duration/properties/edge": ["effects", "turn_edges"],
 	"#/$defs/duration/properties/rest_type": ["effects", "rest_types"],
 	"#/$defs/duration/properties/ends_by_action": ["effects", "ends_by_action"],
+	"#/$defs/effect_link/properties/duration_scaling/items/properties/duration/properties/type": ["effects", "duration_tier_types"],
+	"#/$defs/effect_link/properties/duration_scaling/items/properties/duration/properties/unit": ["effects", "time_units"],
 	"#/$defs/active_instance/properties/source": ["effects", "effect_sources"],
 	"#/$defs/active_instance/properties/concentration_for/properties/source": ["effects", "effect_sources"],
 	"#/$defs/consume/properties/on": ["effects", "consume_on"],
@@ -248,7 +251,10 @@ for (const file of dataFiles) {
 if (!existsSync(RULES)) {
 	warnings.push(`rules file not found (${RULES}), skipped the rules check`);
 } else {
-	const durationEnum = schema.$defs?.duration?.properties?.type?.enum || [];
+	const fullDurationEnum = schema.$defs?.duration?.properties?.type?.enum || [];
+	// A spell link's duration tiers only take their own types
+	const tierDurationEnum =
+		schema.$defs?.effect_link?.properties?.duration_scaling?.items?.properties?.duration?.properties?.type?.enum || [];
 	const rules = JSON.parse(readFileSync(RULES, "utf8"));
 	let found = 0;
 	const walkRules = (value, path, inEffects) => {
@@ -257,6 +263,7 @@ if (!existsSync(RULES)) {
 			const itemPath = [...path, key];
 			if (inEffects && key === "duration" && item?.type?.[".validate"]) {
 				found++;
+				const durationEnum = path.includes("duration_scaling") ? tierDurationEnum : fullDurationEnum;
 				const where = `${itemPath.join("/")}/type`;
 				const match = item.type[".validate"].match(/matches\(\/\^\(([^)]*)\)\$\//);
 				if (!match) {

@@ -153,6 +153,7 @@ import BasicInfo from "src/components/spells/BasicInfo";
 import SpellActions from "src/components/spells/Actions";
 import CopyContent from "src/components/CopyContent";
 import { downloadJSON } from "src/utils/generalFunctions";
+import { cleanActionEffects } from "src/utils/effectFunctions";
 import SignUp from "src/components/SignUp.vue";
 import SpellCardDownload from "src/components/spells/SpellCardDownload.vue";
 
@@ -234,7 +235,20 @@ export default {
 		/**
 		 * Checks if a new Spell must be added, or an existing Spell must be saved.
 		 **/
+		/**
+		 * Leaves only set fields in the effects linked to the spell's actions, and no empty
+		 * outcome lists or effects, so the saved spell matches the schema and the database rules
+		 */
+		cleanSpellActionEffects() {
+			for (const action of this.spell.actions || []) {
+				if (!action || action.effects === undefined) continue;
+				const effects = cleanActionEffects(action.effects);
+				if (effects) this.$set(action, "effects", effects);
+				else this.$delete(action, "effects");
+			}
+		},
 		saveSpell() {
+			this.cleanSpellActionEffects();
 			if (!this.spellId) {
 				this.addSpell();
 			} else {

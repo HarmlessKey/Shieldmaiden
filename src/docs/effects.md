@@ -669,13 +669,38 @@ gets the linked effects.
 
 ### Spell effects
 
-Spells link effects the same way. Effects linked to spells are magical. Concentration spells
-apply their effects with a Concentration duration, linked to the caster's Concentration.
+Your custom spells link effects the same way: every spell action has an **Effects** list below
+its rolls, with the same dialog. Spell actions look like NPC actions too: a one-line header
+("Paralyze · Save · WIS · 1 effect"), and the Save ability only for a save. **On a failed save**
+and **On a successful save** use the action's save ability and the caster's spell save DC.
 
-Spell links also have **Scaling**: how the effect grows with a higher spell slot. Values grow
-by an amount per slot level above the spell's level, and rolls by a number of dice: Magic
-Weapon is +1, +2 with a level 3–5 slot and +3 with a level 6 or higher slot. Monster actions
-don't have Scaling.
+A new spell link starts with **Magical** on, and for a Concentration spell with a Concentration
+duration of the spell's duration, linked to the caster's Concentration when it's applied.
+**Spell duration**, after the Duration select, sets the duration to the spell's: Concentration
+up to the spell's duration, Time, or Until removed for a spell that lasts until dispelled. The
+End effect options stay. An Instantaneous or Special spell has no Spell duration button. A
+**Repeat save to end** can leave its **DC** empty: it then uses the caster's spell save DC.
+
+When the spell scales, the dialog also has **Scaling**: how the effect's value (and level, for
+an effect with a level track) grows. The tiers follow the spell's own scaling, like its rolls:
+
+- **Spell scale**: one tier, **Every … slot levels** above the spell's level, **Add to value**
+  (2014 Magic Weapon: +1 every 2 slot levels).
+- **Spell level**: tiers **From slot level**, each with the **Value** from that slot on (2024
+  Magic Weapon: 2 from a 3rd-level slot, 3 from a 6th-level slot).
+- **Character level**: tiers **From caster level**, for cantrips.
+
+Scaling only changes the effect's value and level, not dice.
+
+A link with a duration also has **Duration by slot level**, whatever the spell's scaling: tiers
+with **From slot level** and the **Duration** from that slot on (Time, Concentration or Until
+removed, with its value and unit). The highest tier reached counts, and the ways the effect can
+end (repeat save, escape, ends early) stay. 2024 Hex: up to 1 hour, 4 hours from a 2nd-level
+slot, 8 hours from a 3rd-level slot and 24 hours from a 5th-level slot. Bestow Curse drops
+Concentration from a 5th-level slot: a Time tier of 8 hours. A tier's slot level has to be
+above the spell's level.
+
+Monster actions and traits don't have Scaling or Duration by slot level.
 
 ### Trait effects
 
@@ -746,9 +771,9 @@ Rolling the claws against a creature that fails its save paralyzes it.
 **Clay golem's Acid Absorption**: on the special ability, link the generic Absorption effect as
 a trait effect, with the damage type choice fixed to acid. Acid damage now heals the golem.
 
-**Magic Weapon**: on the spell, link the SRD Magic Weapon effect with Magical on, a
-Concentration duration of up to 1 hour, and Scaling +1 at a level 3 slot and +1 more at a
-level 6 slot (2024 rules).
+**Magic Weapon**: on a spell with Spell level scaling, link Attack Roll Bonus (and Damage Roll
+Bonus) with the value fixed to 1, Magical on, a Concentration duration of up to 1 hour, and the
+Scaling tiers From slot level 3 → 2 and From slot level 6 → 3 (2024 rules).
 
 ## Saving
 

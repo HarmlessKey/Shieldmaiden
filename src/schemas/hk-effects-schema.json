@@ -518,8 +518,46 @@
 					"additionalProperties": { "type": "string" }
 				},
 				"level": { "type": "integer", "minimum": 1, "description": "Levels applied, for an effect with a level track (2 levels of Exhaustion)." },
-				"magical": { "type": "boolean", "description": "The effect comes from magic: saves against it count as saves against magic." }
+				"magical": { "type": "boolean", "description": "The effect comes from magic: saves against it count as saves against magic." },
+				"scaling": {
+					"type": "array",
+					"description": "Links on spells only: how the link's value choice and level grow, read through the spell's scaling type. spell_scale: one tier, value and effect_level added per `level` slot levels above the spell's level. spell_level: from a slot of at least `level`, the value and level are `value` and `effect_level`. character_level: the same by the caster's level.",
+					"items": {
+						"type": "object",
+						"required": ["level"],
+						"anyOf": [{ "required": ["value"] }, { "required": ["effect_level"] }],
+						"properties": {
+							"level": { "type": "integer", "minimum": 1, "maximum": 20 },
+							"value": { "type": "number" },
+							"effect_level": { "type": "integer", "minimum": 0 }
+						},
+						"additionalProperties": false
+					}
+				},
+				"duration_scaling": {
+					"type": "array",
+					"description": "Links on spells only, with a duration: from a slot of at least `level`, the duration's type, value and unit are the tier's (the highest tier reached). The duration's repeat save, escape and early ends stay. Read by slot level, whatever the spell's scaling type (Hex, Bestow Curse).",
+					"items": {
+						"type": "object",
+						"required": ["level", "duration"],
+						"properties": {
+							"level": { "type": "integer", "minimum": 1, "maximum": 9 },
+							"duration": {
+								"type": "object",
+								"required": ["type"],
+								"properties": {
+									"type": { "type": "string", "enum": ["time", "concentration", "cancelled"] },
+									"value": { "type": "integer", "minimum": 1 },
+									"unit": { "type": "string", "enum": ["round", "minute", "hour", "day"] }
+								},
+								"additionalProperties": false
+							}
+						},
+						"additionalProperties": false
+					}
+				}
 			},
+			"dependencies": { "duration_scaling": ["duration"] },
 			"additionalProperties": false
 		},
 

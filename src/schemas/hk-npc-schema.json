@@ -787,7 +787,35 @@
       "items": {
         "allOf": [
           { "$ref": "https://harmlesskey.com/schemas/hk-effects-schema.json#/$defs/effect_link" },
-          { "not": { "type": "object", "required": ["duration"] } }
+          { "not": { "type": "object", "required": ["duration"] } },
+          { "not": { "type": "object", "required": ["scaling"] } },
+          { "not": { "type": "object", "required": ["duration_scaling"] } }
+        ]
+      }
+    },
+    "npc-action-effects": {
+      "title": "Effects",
+      "description": "Effects linked to an action-list entry, by outcome: $defs/action_effects of the effects schema (hk-effects-schema.json). NPC links don't scale (scaling and duration_scaling are for spell links).",
+      "allOf": [
+        { "$ref": "https://harmlesskey.com/schemas/hk-effects-schema.json#/$defs/action_effects" },
+        {
+          "type": "object",
+          "properties": {
+            "on_hit": { "$ref": "#/$defs/links-without-scaling" },
+            "on_miss": { "$ref": "#/$defs/links-without-scaling" },
+            "on_fail": { "$ref": "#/$defs/links-without-scaling" },
+            "on_success": { "$ref": "#/$defs/links-without-scaling" },
+            "always": { "$ref": "#/$defs/links-without-scaling" }
+          }
+        }
+      ]
+    },
+    "links-without-scaling": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "not": { "type": "object", "required": ["scaling"] } },
+          { "not": { "type": "object", "required": ["duration_scaling"] } }
         ]
       }
     },
@@ -930,11 +958,7 @@
               }
             }
           },
-          "effects": {
-            "title": "Effects",
-            "description": "Effects linked to this entry, by outcome. Follows $defs/action_effects of the effects schema (hk-effects-schema.json).",
-            "$ref": "https://harmlesskey.com/schemas/hk-effects-schema.json#/$defs/action_effects"
-          }
+          "effects": { "$ref": "#/$defs/npc-action-effects" }
         }
       }
     }

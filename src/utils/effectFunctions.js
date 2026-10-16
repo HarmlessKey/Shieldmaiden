@@ -286,7 +286,166 @@ export function cleanEffectLink(link = {}) {
 	const level = parseInt(link.level);
 	if (level >= 1) cleaned.level = level;
 	if (link.magical === true) cleaned.magical = true;
+
+	// Spell links (effects 6c): tiers with a level and a value and/or an effect level
+	const scaling = (Array.isArray(link.scaling) ? link.scaling : Object.values(link.scaling || {}))
+		.map((tier) => {
+			const cleanedTier = {};
+			const tierLevel = parseInt(tier?.level);
+			if (tierLevel >= 1) cleanedTier.level = tierLevel;
+			const value = tier?.value === "" || tier?.value === null ? NaN : Number(tier?.value);
+			if (Number.isFinite(value)) cleanedTier.value = value;
+			const effectLevel = parseInt(tier?.effect_level);
+			if (effectLevel >= 0) cleanedTier.effect_level = effectLevel;
+			return cleanedTier;
+		})
+		.filter((tier) => tier.level && (tier.value !== undefined || tier.effect_level !== undefined));
+	if (scaling.length) cleaned.scaling = scaling;
+
+	// Spell links: the duration by slot level, only with a duration
+	const durationScaling = (
+		Array.isArray(link.duration_scaling) ? link.duration_scaling : Object.values(link.duration_scaling || {})
+	)
+		.map(cleanDurationTier)
+		.filter(Boolean);
+	if (durationScaling.length && cleaned.duration) cleaned.duration_scaling = durationScaling;
 	return cleaned;
+}
+
+const DURATION_TIER_TYPES = ["time", "concentration", "cancelled"];
+const DURATION_UNITS = ["round", "minute", "hour", "day"];
+
+/**
+ * Copy of a duration tier of a spell link ($defs/effect_link duration_scaling) with only its
+ * own fields: a slot level 1–9 and a Time, Concentration or Until removed duration. Time needs
+ * a value; Concentration's is optional; Until removed has none.
+ *
+ * @param {object} tier { level, duration: { type, value?, unit? } }
+ * @returns {object|undefined} New tier, or undefined when it's incomplete
+ */
+export function cleanDurationTier(tier) {
+	const level = Number(tier?.level);
+	const type = tier?.duration?.type;
+	if (!Number.isInteger(level) || level < 1 || level > 9 || !DURATION_TIER_TYPES.includes(type)) {
+		return undefined;
+	}
+	const duration = { type };
+	if (type !== "cancelled") {
+		const raw = tier.duration.value;
+		const value = raw === "" || raw === null || raw === undefined ? undefined : Number(raw);
+		if (value !== undefined && !(Number.isInteger(value) && value > 0)) return undefined;
+		if (value === undefined && type === "time") return undefined;
+		if (value !== undefined) {
+			duration.value = value;
+			duration.unit = DURATION_UNITS.includes(tier.duration.unit) ? tier.duration.unit : "round";
+		}
+	}
+	return { level, duration };
+}
+
+/**
+ * Whether a spell link's duration tiers keep the link dialog from saving: a tier that
+ * cleanDurationTier drops, or one whose slot level isn't above the spell's
+ *
+ * @param {object} link Effect link
+ * @param {number} spellLevel The spell's level
+ * @returns {boolean}
+ */
+export function durationScalingIncomplete(link = {}, spellLevel = 0) {
+	if (!link.duration || !Array.isArray(link.duration_scaling)) return false;
+	return link.duration_scaling.some((tier) => {
+		const cleaned = cleanDurationTier(tier);
+		return !cleaned || cleaned.level <= (parseInt(spellLevel) || 0);
+	});
+}
+
+/**
+ * The effect duration of a spell's duration (effects 6c), for the Spell duration button of a
+ * spell link: Concentration up to the spell's duration, Time, or Until removed for a spell that
+ * lasts until dispelled. Instantaneous, Special and Time without a duration have none.
+ *
+ * @param {object} spell { duration_type, duration, duration_scale }
+ * @returns {object|undefined} $defs/duration { type, value?, unit? }
+ */
+export function spellDuration(spell = {}) {
+	const type = (spell.duration_type || "").toLowerCase();
+	const value = parseInt(spell.duration);
+	const timed = value > 0 ? { value, unit: (spell.duration_scale || "round").toLowerCase() } : {};
+
+	switch (type) {
+		case "concentration":
+			return { type: "concentration", ...timed };
+		case "time":
+			return timed.value ? { type: "time", ...timed } : undefined;
+		case "until_dispelled":
+		case "until_dispelled_or_triggered":
+			return { type: "cancelled" };
+		default:
+			return undefined;
+	}
+}
+
+/**
+ * A spell link as it applies for one cast (effects 6c): its value choice and level after its
+ * scaling tiers, read through the spell's scaling type, and without the tiers.
+ * - spell_scale: one tier; per `level` slot levels above the spell's level, `value` is added to
+ *   the value choice and `effect_level` to the level
+ * - spell_level: from a slot of at least `level`, the value is `value` and the level
+ *   `effect_level` (the highest tier reached)
+ * - character_level: the same by the caster's level
+ * - none / anything else: unchanged
+ * The duration follows `duration_scaling` by slot level, whatever the scaling type: the highest
+ * tier with a level of at most the slot replaces the duration's type, value and unit.
+ *
+ * @param {object} link Effect link with scaling
+ * @param {object} cast
+ * @param {string} cast.scaling The spell's scaling type
+ * @param {number} cast.spellLevel The spell's level
+ * @param {number} cast.castLevel The slot it's cast with
+ * @param {number} cast.casterLevel The caster's level
+ * @returns {object} New link without scaling and duration_scaling; choices.value stays a string
+ */
+export function scaledLink(link = {}, { scaling, spellLevel, castLevel, casterLevel } = {}) {
+	const { scaling: tiers = [], duration_scaling: durationTiers = [], ...scaled } = link;
+	if (link.choices) scaled.choices = { ...link.choices };
+
+	if (link.duration && Array.isArray(durationTiers)) {
+		const slot = castLevel ?? spellLevel;
+		const tier = [...durationTiers]
+			.sort((a, b) => a.level - b.level)
+			.filter((tier) => slot >= tier.level)
+			.pop();
+		if (tier) {
+			const { value, unit, ...rest } = link.duration;
+			scaled.duration = { ...rest, ...tier.duration };
+		}
+	}
+	if (!Array.isArray(tiers) || !tiers.length) return scaled;
+
+	let value = scaled.choices?.value !== undefined ? Number(scaled.choices.value) : undefined;
+	let level = scaled.level;
+
+	if (scaling === "spell_scale") {
+		const tier = tiers[0];
+		const step = parseInt(tier.level);
+		const steps = step > 0 ? Math.floor(((castLevel ?? spellLevel) - spellLevel) / step) : 0;
+		if (steps > 0) {
+			if (tier.value !== undefined) value = (value || 0) + steps * tier.value;
+			if (tier.effect_level !== undefined) level = (level || 0) + steps * tier.effect_level;
+		}
+	} else if (scaling === "spell_level" || scaling === "character_level") {
+		const reached = scaling === "spell_level" ? castLevel ?? spellLevel : casterLevel;
+		const ordered = [...tiers].sort((a, b) => a.level - b.level);
+		for (const tier of ordered) {
+			if (!(reached >= tier.level)) continue;
+			if (tier.value !== undefined) value = tier.value;
+			if (tier.effect_level !== undefined) level = tier.effect_level;
+		}
+	}
+
+	if (value !== undefined && Number.isFinite(value)) scaled.choices = { ...(scaled.choices || {}), value: String(value) };
+	if (level !== undefined) scaled.level = level;
+	return scaled;
 }
 
 /**
@@ -300,7 +459,11 @@ export function cleanTraitEffects(links) {
 	const list = (Array.isArray(links) ? links : Object.values(links || {}))
 		.map((link) => {
 			const cleaned = cleanEffectLink(link);
-			if (cleaned) delete cleaned.duration;
+			if (cleaned) {
+				delete cleaned.duration;
+				delete cleaned.scaling;
+				delete cleaned.duration_scaling;
+			}
 			return cleaned;
 		})
 		.filter(Boolean);
@@ -1415,6 +1578,8 @@ export function escapeFromForm({ dc, checks, by }) {
  * @returns {object} { type, value, unit, anchor, edge, hasSave, save, saveExtras, hasEscape, escape, cancelTriggers }
  */
 export function durationFormDefaults({ defaultSave } = {}) {
+	// No DC on a spell link: the caster's spell save DC is used when it's applied (effects 6c)
+	if (dc === undefined || dc === null || dc === "") delete save.dc;
 	return {
 		type: "cancelled",
 		value: undefined,

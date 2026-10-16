@@ -89,6 +89,25 @@ export function hasRolls(ability) {
 	return (ability?.action_list || []).some((action) => action?.type !== "other" && action?.rolls?.length > 0);
 }
 
+/**
+ * How many rolls and linked effects an action-list entry (NPC) or spell action has, in words,
+ * for its collapsed header: "1 roll, 2 effects". Type other has no rolls.
+ *
+ * @param {object} action { type, rolls, effects: { on_hit: [], … } }
+ * @returns {string} Empty without rolls and effects
+ */
+export function actionCounts(action) {
+	const counts = [];
+	const rolls = action?.type === "other" ? 0 : (action?.rolls || []).length;
+	if (rolls) counts.push(`${rolls} ${rolls === 1 ? "roll" : "rolls"}`);
+	const effects = Object.values(action?.effects || {}).reduce(
+		(count, links) => count + (Array.isArray(links) ? links.length : 0),
+		0
+	);
+	if (effects) counts.push(`${effects} ${effects === 1 ? "effect" : "effects"}`);
+	return counts.join(", ");
+}
+
 export function displayCR(cr) {
 	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
 }

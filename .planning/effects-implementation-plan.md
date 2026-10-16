@@ -1222,6 +1222,64 @@ effects and conditions as if they were cast on it. They belong on the ability in
   - apply once per target, also for AOE rolls with several targets
 - Open from step 6: a save that only follows a hit (the ghoul's claws) is a second action that
   rolls whether the attack hit or not; decide whether its effects wait for the hit.
+## 6c. Spell actions carry effects (done — archived as effects-6c-spell-effects, 2026-10-16)
+Added 2026-10-16: linking effects to spells was assumed under "steps 6–7" but had no step of
+its own. Same model as step 6, for the user's custom spells.
+- **Data:** a spell's `actions[i]` (type, save ability, rolls) get `effects`
+  (`$defs/action_effects`: `on_hit`, `on_miss`, `on_fail`, `on_success`, `always`).
+  `on_fail` / `on_success` use the action's save ability and the caster's spell save DC (spells
+  have no DC of their own). Extend `hk-spell-schema.json` and the spell rules.
+  - The spell rules already have an `effects` block on each **roll**
+    (`spells/…/actions/$actionIndex/rolls/$rollIndex/effects`, committed in `47c4aab`); move it
+    to the action, like the NPC rules.
+- **Scaling on the link** (removed from definitions in step 4, see "Generic effects"):
+  `effect_link` gets `scaling`, how values and dice grow with the slot level above the spell's
+  level (Magic Weapon +1 / +2 / +3), or with caster level for cantrips. Only spell links offer
+  it; monster links don't.
+- **Defaults for spell links:** Magical on; for a Concentration spell, a Concentration duration
+  (linked to the caster's Concentration when it's applied in step 7).
+- **Spell form** (`src/components/spells/Actions.vue`): an Effects list per action, reusing
+  `ActionEffects` / `EffectLinkForm` with a Scaling field; actions as collapse items like the
+  NPC form if it helps.
+- Effect-only spells (Bless, Shield of Faith) link their effect on an action of type other
+  with When → Always.
+- Develop against the user's custom spells; SRD spells from the HK API get their links in
+  step 8 (8d).
+
+*As built (`openspec/changes/archive/2026-10-16-effects-6c-spell-effects`; new spec
+`effects-spell-links`, and `effects-action-links` updated):*
+- **Data:** spell `actions[i].effects` (`$defs/action_effects`); `effect_link.scaling` tiers
+  `{ level, value?, effect_level? }`, read through the spell's `scaling` (user decision):
+  `spell_scale` one step tier, `spell_level` tiers by slot, `character_level` tiers by caster
+  level. Scaling changes only the link's value choice and level. NPC action and trait links
+  reject `scaling` (`$defs/npc-action-effects` and `trait-effects` in `hk-npc-schema.json`).
+  The spell rules' `effects` block moved from each roll to the action, with `scaling`.
+- **Engine:** `scaledLink(link, { scaling, spellLevel, castLevel, casterLevel })` for step 7;
+  `cleanEffectLink` keeps and cleans `scaling`.
+- **Spell form:** the NPC form's Effects list on every spell action, in spell mode: a
+  **Scaling** field (`LinkScalingInput.vue`) when the spell scales; new links Magical and, for a
+  Concentration spell, with a Concentration duration of the spell's duration; a repeat save's
+  DC may be empty ("Caster's spell save DC", `ApplicationDuration` `saveDcOptional`). Spell
+  actions look like NPC actions (user request): one-line header ("Paralyze · Save · WIS · 1
+  effect", counts from the shared `actionCounts`), "Action type", Save ability only for saves,
+  the NPC rolls header.
+- **Added during apply (user requests):**
+  - a **Spell duration** button after the link's Duration select (`spellDuration(spell)`; also
+    the Concentration default of new links)
+  - **Duration by slot level**: `effect_link.duration_scaling` tiers
+    `{ level: <slot 1–9>, duration: { type: time | concentration | cancelled, value?, unit? } }`,
+    only with a `duration`. They're read by slot level whatever the spell's scaling (Hex's is
+    none), and replace only the duration's type, value and unit. That covers Hex, Hunter's
+    Mark, the Dominate spells and Bestow Curse dropping Concentration at 5th. It's in the
+    schemas (NPC links reject it), the spell rules, `cleanEffectLink`, `scaledLink`,
+    `LinkDurationScaling.vue` and the docs.
+- **Found, not changed:** the SRD Magic Weapon effect has a fixed +1, not a value choice, so
+  scaling can't raise it; link the basic Attack/Damage Roll Bonus instead, or give it a value
+  choice (with 8d). `spell_level` scaling of rolls isn't applied by `dice.js`.
+- **Fixed along the way:** the spell form's missing `deleteRoll` method, and lists created by
+  plain assignment (`spell.actions`, an NPC's action categories, an NPC action's `rolls`),
+  which weren't reactive, so effects and rolls added to a new action didn't show.
+
 - Open from step 6: captions and stat blocks (tracker action list, card, compendium) still show
   only the first action of an ability; show all of them.
 
@@ -1229,6 +1287,12 @@ effects and conditions as if they were cast on it. They belong on the ability in
 Everything above runs on local data. This step moves or aligns SRD data with the HK API.
 The instance shape (`source: "srd"`, `source_key: <url>`) does not change, so no
 Firestore migration is needed.
+- Covers spell links too (step 6c): the slot a spell is cast with drives the link's scaling
+  and its duration by slot level (`scaledLink` with the spell's scaling, level, cast level and
+  the caster's level; a tier that drops Concentration, like Bestow Curse at 5th, starts no
+  Concentration), a
+  Concentration spell's effects link to the caster's Concentration, and a repeat save stored
+  without a DC gets the caster's spell save DC when applied.
 
 ### 8a. Conditions
 The HK API provides condition name, icon and rules text (`/conditions` and
@@ -1270,6 +1334,11 @@ Ideas to work out when it's proposed:
     any that duplicate a condition or effect.
   - The remaining entity reminders (`entity.reminders`, `src/mixins/reminders.js`,
     `Reminders.vue`, `TargetReminders.vue`) and the user-authored reminders
+### 8d. SRD spells
+Backfill spell links (step 6c: action effects with scaling) onto SRD spells in the API, per
+edition. The SRD effects catalogue ([effects-srd-catalogue.md](./effects-srd-catalogue.md))
+already says which spells link which effect.
+
     (`src/views/UserContent/Reminders/`) become this feature or move into it.
   - Existing `entity.reminders` in Firestore need a shim or a conversion script, as in 2i.
 
@@ -1361,8 +1430,8 @@ let an AI write them instead, and import the result.
 3 (mechanical resolution: bonuses, DoT rolls, condition mechanics - builds on 2g trigger bus; retiring reminders moved to 9): 3a (done — archived as effects-3a-damage-over-time, 2026-09-30) -> 3b (done — archived as effects-3b-numeric-modifiers, 2026-10-01) -> 3c1 (done — archived as effects-3c1-check-save-modifiers, 2026-10-02) -> 2j (done — archived as effects-2j-concentration-caster, 2026-10-02, incl. temp HP expiry) -> 2k (done — archived as effects-2k-reaction-used, 2026-10-05) -> 3c2 (done — archived as effects-3c2-attack-damage-modifiers, 2026-10-05) -> 3d (done — archived as effects-3d-defenses, 2026-10-05) -> 3e (done — archived as effects-3e-restrictions-outcomes, 2026-10-06) -> 3g (done — archived as effects-3g-tier-p-hooks, 2026-10-09) -> 3h (done — archived as effects-3h-public-initiative, 2026-10-09) (3f moved to 9)
 4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
-6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 7 (monster actions, trait effects on special abilities, action rolls; additive on top of step 3)
-8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill)
+6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 6c (done — archived as effects-6c-spell-effects, 2026-10-16) -> 7 (monster actions, trait effects on special abilities, spell actions, action rolls; additive on top of step 3)
+8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill, 8d SRD spell backfill)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
 10 (apply effects from the set initiative screen: shared header-actions component for the Targeted and Overview headers; can be done any time after 4)
 11 (set encounter reminders from the edit encounter screen; after 9)

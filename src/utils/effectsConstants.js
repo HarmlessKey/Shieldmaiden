@@ -550,6 +550,13 @@ export const time_units = keyed({
 	day: { label: "Days" },
 });
 
+// Durations a spell link's duration tier can have ($defs/effect_link duration_scaling, effects 6c)
+export const duration_tier_types = keyed({
+	time: { label: "Time" },
+	concentration: { label: "Concentration" },
+	cancelled: { label: "Until removed" },
+});
+
 export const rounding = keyed({
 	down: { label: "Round down" },
 	up: { label: "Round up" },

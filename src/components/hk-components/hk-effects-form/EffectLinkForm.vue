@@ -92,15 +92,35 @@
 			/>
 		</template>
 
+		<!-- SCALING: spell links, read through the spell's scaling type -->
+		<LinkScalingInput
+			v-if="spellScales"
+			:value="value"
+			:scaling="spell.scaling"
+			:leveled="hasLevelTrack"
+			class="mb-3"
+		/>
+
 		<!-- DURATION: the Effects drawer's duration fields; a trait effect is always active -->
 		<ApplicationDuration
 			v-if="!trait"
 			:value="value.duration"
 			:default-save="defaultSave"
 			:conditions="conditions"
+			:save-dc-optional="!!spell"
+			:preset="spellDuration"
+			preset-label="Spell duration"
 			optional
 			@input="setField(value, 'duration', $event)"
 			@valid="$emit('update:durationValid', $event)"
+		/>
+
+		<!-- DURATION BY SLOT LEVEL: spell links with a duration -->
+		<LinkDurationScaling
+			v-if="spell && value.duration"
+			:value="value"
+			:spell-level="parseInt(spell.level) || 0"
+			class="mt-3"
 		/>
 
 		<!-- MAGICAL -->
@@ -119,11 +139,18 @@ import { mapActions, mapGetters } from "vuex";
 import editorMixin from "./editorMixin";
 import ApplicationDuration from "./ApplicationDuration.vue";
 import EffectRefPicker from "./EffectRefPicker.vue";
+import LinkScalingInput from "./LinkScalingInput.vue";
+import LinkDurationScaling from "./LinkDurationScaling.vue";
 import { choiceField } from "./fieldControls";
 import { action_outcomes, outcomesFor } from "src/utils/effectsConstants";
 import { attack_types } from "src/utils/actionConstants";
 import { default_edition } from "src/utils/generalConstants";
-import { findSrdDefinition, getRequiredChoices, getSrdDefinitions } from "src/utils/effectFunctions";
+import {
+	findSrdDefinition,
+	getRequiredChoices,
+	getSrdDefinitions,
+	spellDuration,
+} from "src/utils/effectFunctions";
 
 /**
  * Edits an effect link ($defs/effect_link) of an action-list entry or, with `trait`, of a
@@ -137,6 +164,8 @@ export default {
 	components: {
 		ApplicationDuration,
 		EffectRefPicker,
+		LinkScalingInput,
+		LinkDurationScaling,
 	},
 	mixins: [editorMixin],
 	props: {
@@ -152,6 +181,9 @@ export default {
 		durationValid: { type: Boolean, default: true },
 		// A trait link (effects 6b): no When and Duration, every choice required
 		trait: { type: Boolean, default: false },
+		// A spell link (effects 6c): the spell { level, scaling, … }; Scaling when it scales, and
+		// a repeat save's DC may be the caster's spell save DC
+		spell: { type: Object, default: undefined },
 	},
 	data() {
 		return {
@@ -186,6 +218,13 @@ export default {
 		},
 		hasLevelTrack() {
 			return !!this.definition?.level;
+		},
+		spellScales() {
+			return !!this.spell?.scaling && this.spell.scaling !== "none";
+		},
+		// The spell's duration as an effect duration, for the Spell duration button
+		spellDuration() {
+			return this.spell ? spellDuration(this.spell) : undefined;
 		},
 		showLevel() {
 			if (this.definition === false) return this.value.level !== undefined;

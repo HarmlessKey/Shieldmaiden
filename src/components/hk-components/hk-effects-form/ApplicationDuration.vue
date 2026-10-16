@@ -13,7 +13,15 @@
 			filled
 			square
 			:dense="dense"
-		/>
+		>
+			<template v-if="preset" #after>
+				<q-btn :label="presetLabel" no-caps flat @click="usePreset">
+					<q-tooltip anchor="top middle" self="bottom middle">
+						{{ presetDescription }}
+					</q-tooltip>
+				</q-btn>
+			</template>
+		</q-select>
 		<div v-if="['time', 'concentration'].includes(form.type)" class="row q-col-gutter-sm mb-2">
 			<div class="col">
 				<q-input
@@ -135,8 +143,9 @@
 								<q-input
 									v-model.number="form.save.dc"
 									:dark="dark"
-									:error="!positive(form.save.dc)"
+									:error="!saveDcValid"
 									error-message="Enter a positive number"
+									:hint="saveDcOptional && !positive(form.save.dc) ? 'Caster\'s spell save DC' : undefined"
 									label="DC"
 									type="number"
 									min="1"
@@ -323,7 +332,12 @@
 import { startCase } from "lodash";
 import { abilities } from "src/utils/generalConstants";
 import { duration_types, triggers } from "src/utils/effectsConstants";
-import { durationFormDefaults, durationFromForm, durationToForm } from "src/utils/effectFunctions";
+import {
+	describeDuration,
+	durationFormDefaults,
+	durationFromForm,
+	durationToForm,
+} from "src/utils/effectFunctions";
 
 const toOption = (value) => ({ label: startCase(value), value });
 
@@ -361,6 +375,8 @@ const END_OPTIONS = [
  * Keeps its own form state, initialized from `value`, and emits the built duration (`input`)
  * and whether the fields are valid (`valid`). With `optional`, the duration select starts
  * empty and can be cleared: it then emits undefined, and the duration is chosen when applied.
+ * With `preset` ({ type, value?, unit? }), a button after the select sets the type, value and
+ * unit to the preset's (the spell's duration on a spell link) and keeps the End effect options.
  */
 export default {
 	name: "ApplicationDuration",
@@ -373,6 +389,11 @@ export default {
 		// SRD conditions of the edition, for a repeat save that becomes a condition
 		conditions: { type: Array, default: () => [] },
 		dense: { type: Boolean, default: false },
+		// The repeat save's DC can be left empty: the caster's spell save DC is used (spell links)
+		saveDcOptional: { type: Boolean, default: false },
+		// { type, value?, unit? } the preset button sets, and its label
+		preset: { type: Object, default: undefined },
+		presetLabel: { type: String, default: "Use preset" },
 	},
 	data() {
 		const form = durationToForm(this.value, { defaultSave: this.defaultSave });
@@ -417,6 +438,9 @@ export default {
 		dark() {
 			return this.$store.getters.theme === "dark";
 		},
+		presetDescription() {
+			return this.preset ? describeDuration({ duration: this.preset }) : undefined;
+		},
 		typeOptions() {
 			const options = [...DURATION_TYPES];
 			// A stored type the form doesn't offer is kept
@@ -440,6 +464,12 @@ export default {
 			if (this.form.type === "concentration" && empty) return true;
 			return this.positive(value);
 		},
+		// A repeat save's DC: a positive number, or empty when it may be the caster's spell save DC
+		saveDcValid() {
+			const dc = this.form.save.dc;
+			if (this.saveDcOptional && (dc === undefined || dc === null || dc === "")) return true;
+			return this.positive(dc);
+		},
 		// Whether each End effect option's fields are valid (unselected ones are)
 		endOptionValid() {
 			const { save, saveExtras: extras, escape } = this.form;
@@ -447,7 +477,7 @@ export default {
 				save:
 					!this.form.hasSave ||
 					(!!save.ability &&
-						this.positive(save.dc) &&
+						this.saveDcValid &&
 						save.triggers.length > 0 &&
 						this.positive(extras.successes) &&
 						(!extras.escalates || (this.positive(extras.failures) && !!extras.becomes)) &&
@@ -483,6 +513,17 @@ export default {
 	methods: {
 		positive(value) {
 			return Number.isInteger(value) && value > 0;
+		},
+		/**
+		 * Sets the type, value and unit to the preset's; the End effect options stay
+		 */
+		usePreset() {
+			const { type, value, unit } = this.preset;
+			this.form.type = type;
+			if (["time", "concentration"].includes(type)) {
+				this.form.value = value;
+				if (unit) this.form.unit = unit;
+			}
 		},
 		/**
 		 * Selects End effect options: a new one opens its tab, a removed one loses its values

@@ -75,6 +75,7 @@
 									:edition="edition"
 									:default-save="defaultSave"
 									:trait="trait"
+									:spell="spell"
 								/>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
@@ -87,7 +88,8 @@
 										!valid ||
 										!editing.durationValid ||
 										!editing.link.effect ||
-										(!trait && !editing.outcome)
+										(!trait && !editing.outcome) ||
+										scalingIncomplete(editing.link)
 									"
 									:label="editing.from ? 'Save' : 'Add'"
 								/>
@@ -105,7 +107,7 @@ import EffectLinkForm from "./EffectLinkForm.vue";
 import { choiceField } from "./fieldControls";
 import { action_outcomes, outcomesFor, triggers } from "src/utils/effectsConstants";
 import { attack_types } from "src/utils/actionConstants";
-import { describeDuration } from "src/utils/effectFunctions";
+import { describeDuration, durationScalingIncomplete, spellDuration } from "src/utils/effectFunctions";
 
 /**
  * The effects linked to one action-list entry of an NPC ability ($defs/action_effects),
@@ -124,6 +126,8 @@ export default {
 		edition: { type: String, default: undefined },
 		// Trait links of a special ability
 		trait: { type: Boolean, default: false },
+		// Links of a spell's action (effects 6c): the spell, for scaling and defaults
+		spell: { type: Object, default: undefined },
 	},
 	data() {
 		return {
@@ -147,9 +151,11 @@ export default {
 		actionType() {
 			return this.value.type;
 		},
-		// A repeat save on a save sub-action starts with its ability and DC
+		// A repeat save on a save sub-action starts with its ability and DC; a spell's has no DC
+		// of its own (the caster's spell save DC)
 		defaultSave() {
 			if (this.actionType !== "save") return undefined;
+			if (this.spell) return { ability: this.value.save_ability };
 			return { ability: this.value.save_ability, dc: this.value.save_dc };
 		},
 		actionTypeLabel() {
@@ -213,12 +219,37 @@ export default {
 			}
 			if (link.level !== undefined) parts.push(`level ${link.level}`);
 			if (link.magical) parts.push("magical");
+			if (link.scaling?.length) parts.push("scales");
+			if (duration && link.duration_scaling?.length) parts.push("longer at higher levels");
 			return parts.join(" · ");
+		},
+		/**
+		 * Whether a spell link has a scaling tier without a level, or without a value and level,
+		 * or a duration tier that isn't complete
+		 */
+		scalingIncomplete(link) {
+			if (this.spell && durationScalingIncomplete(link, parseInt(this.spell.level) || 0)) return true;
+			return (link?.scaling || []).some(
+				(tier) =>
+					!tier.level ||
+					((tier.value === undefined || tier.value === "") &&
+						(tier.effect_level === undefined || tier.effect_level === ""))
+			);
+		},
+		/**
+		 * A new link: on a spell it's magical, and a Concentration spell's link lasts as long as
+		 * the spell's Concentration
+		 */
+		newLink() {
+			if (!this.spell) return {};
+			const link = { magical: true };
+			if (this.spell.duration_type === "concentration") link.duration = spellDuration(this.spell);
+			return link;
 		},
 		add() {
 			const fitting = outcomesFor(this.actionType);
 			this.editing = {
-				link: {},
+				link: this.newLink(),
 				// The first fitting outcome: On a hit, On a failed save or Always
 				outcome: this.trait ? undefined : fitting[0],
 				durationValid: true,

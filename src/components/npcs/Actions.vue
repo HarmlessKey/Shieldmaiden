@@ -693,7 +693,7 @@ import { dice } from "src/mixins/dice.js";
 import { attack_types } from "src/utils/actionConstants";
 import draggable from "vuedraggable";
 import ActionEffects from "src/components/hk-components/hk-effects-form/ActionEffects.vue";
-import { hasRolls } from "src/utils/generalFunctions";
+import { hasRolls, actionCounts } from "src/utils/generalFunctions";
 
 export default {
 	name: "npc-Actions",
@@ -794,8 +794,9 @@ export default {
 				],
 			};
 
+			// $set, so the list and the actions pushed to it are reactive
 			if (this.npc[category] === undefined) {
-				this.npc[category] = [];
+				this.$set(this.npc, category, []);
 			}
 			this.npc[category].push(action);
 			this.$forceUpdate();
@@ -830,7 +831,7 @@ export default {
 			}
 
 			if (this.npc[to] === undefined) {
-				this.npc[to] = [];
+				this.$set(this.npc, to, []);
 			}
 			this.npc[to].push(ability);
 			this.$delete(this.npc[from], index);
@@ -874,15 +875,8 @@ export default {
 				parts.push(`${action.attack_bonus < 0 ? "" : "+"}${action.attack_bonus} to hit`);
 			}
 
-			const counts = [];
-			const rolls = action.type === "other" ? 0 : (action.rolls || []).length;
-			if (rolls) counts.push(`${rolls} ${rolls === 1 ? "roll" : "rolls"}`);
-			const effects = Object.values(action.effects || {}).reduce(
-				(count, links) => count + (Array.isArray(links) ? links.length : 0),
-				0
-			);
-			if (effects) counts.push(`${effects} ${effects === 1 ? "effect" : "effects"}`);
-			if (counts.length) parts.push(counts.join(", "));
+			const counts = actionCounts(action);
+			if (counts) parts.push(counts);
 			return parts.join(" · ");
 		},
 
@@ -949,7 +943,7 @@ export default {
 			let action = ability.action_list[this.edit_action.action_index];
 
 			if (this.edit_roll_index === undefined) {
-				action.rolls = !action.rolls ? [] : action.rolls;
+				if (!action.rolls) this.$set(action, "rolls", []);
 				action.rolls.push(this.roll);
 			} else {
 				this.$set(action.rolls, this.edit_roll_index, this.roll);

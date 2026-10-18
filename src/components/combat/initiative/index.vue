@@ -75,8 +75,13 @@
 			:class="{ focused: focused_pane === 'overview' }"
 			@focus="focusPane('overview')"
 		>
-			<h2 class="componentHeader" :class="{ shadow: setShadowOverview > 0 }">
+			<h2
+				class="componentHeader d-flex items-center justify-content-between"
+				:class="{ shadow: setShadowOverview > 0 }"
+			>
 				<span>Active entities</span>
+				<!-- The targeted entities' actions, as in the tracker's Targeted pane (effects 8) -->
+				<TargetActions />
 			</h2>
 			<q-scroll-area
 				:dark="$store.getters.theme === 'dark'"
@@ -166,6 +171,7 @@
 					Start encounter
 					<TutorialPopover v-if="demo" tutorial="initiative" step="start" :offset="[0, 10]" />
 				</a>
+				<TargetActions class="mb-3" />
 				<Overview :active="_active" :idle="_idle" />
 			</q-tab-panel>
 		</q-tab-panels>
@@ -182,6 +188,7 @@ import Players from "./Players.vue";
 import NPCs from "./NPCs.vue";
 import Overview from "./Overview.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import TargetActions from "src/components/combat/TargetActions.vue";
 
 export default {
 	name: "SetInitiative",
@@ -193,6 +200,7 @@ export default {
 		NPCs,
 		Overview,
 		TutorialPopover,
+		TargetActions,
 	},
 	data() {
 		return {

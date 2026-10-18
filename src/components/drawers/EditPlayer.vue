@@ -46,7 +46,7 @@
 					</div>
 				</div>
 				<div
-					v-if="!entity.saves || Object.keys(entity.saves).length < 6"
+					v-if="!entity.saves || Object.keys(entity.saves).length < 5"
 					class="d-flex justify-content-between"
 				>
 					<button
@@ -73,6 +73,20 @@
 				><i aria-hidden="true" class="fas fa-hand-holding-magic"></i> Revive</a
 			>
 
+			<!-- DAMAGE AND HEALING, with the effects of the run campaign screen -->
+			<template v-if="data.context">
+				<h2>Damage and healing</h2>
+				<PlayerHealth
+					inline
+					:campaign-id="campaignId"
+					:player-id="entityKey"
+					:context="data.context"
+					class="mb-3"
+					@done="syncHp"
+				/>
+				<hr />
+			</template>
+
 			<!-- EDIT PLAYER -->
 			<ValidationObserver v-slot="{ handleSubmit }">
 				<q-form @submit="handleSubmit(edit)">
@@ -98,75 +112,38 @@
 					</ValidationProvider>
 
 					<h2>Temporary</h2>
-					<div class="row q-col-gutter-md mb-2">
-						<div class="col">
-							<ValidationProvider
-								rules="between:-99,99"
-								name="AC"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									label="Manual AC bonus"
-									type="number"
-									name="ac_bonus"
-									v-model="acBonus"
-									clearable
-									no-error-icon
-									:hint="otherBonuses('ac')"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
-							</ValidationProvider>
-						</div>
+					<ValidationProvider
+						rules="between:0,999"
+						name="Temp HP"
+						v-slot="{ errors, invalid, validated }"
+					>
+						<q-input
+							:dark="$store.getters.theme === 'dark'"
+							filled
+							square
+							label="Temp HP"
+							type="number"
+							name="tempHp"
+							v-model="entity.tempHp"
+							clearable
+							no-error-icon
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+					</ValidationProvider>
 
-						<div class="col">
-							<ValidationProvider
-								rules="between:0,999"
-								name="Temp HP"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									label="Temp HP"
-									type="number"
-									name="tempHp"
-									v-model="entity.tempHp"
-									clearable
-									no-error-icon
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
-							</ValidationProvider>
-						</div>
-
-						<div class="col" v-if="!entity.transformed">
-							<ValidationProvider
-								rules="between:-999,999"
-								name="Max Hp mod"
-								v-slot="{ errors, invalid, validated }"
-							>
-								<q-input
-									:dark="$store.getters.theme === 'dark'"
-									filled
-									square
-									label="Manual max HP bonus"
-									type="number"
-									name="maxHpMod"
-									v-model="maxHpMod"
-									clearable
-									no-error-icon
-									:hint="otherBonuses('max_hp')"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
-							</ValidationProvider>
-						</div>
-					</div>
+					<!-- MANUAL BONUSES, as the tracker's bonuses drawer -->
+					<h3 class="mt-2 mb-1">Add a bonus</h3>
+					<BonusAddForm :stats="bonusStats" class="mb-2" @add="addBonus" />
+					<template v-for="stat in bonusStats">
+						<h3 :key="`${stat}-title`" class="mt-2 mb-1">{{ bonusLabel(stat) }} bonuses</h3>
+						<ManualBonusRows
+							:key="`${stat}-rows`"
+							:bonuses="bonusRows(stat)"
+							@update="updateBonus(stat, $event)"
+							@remove="removeBonus(stat, $event)"
+						/>
+					</template>
 
 					<hr />
 					<h2 class="mb-0">Override</h2>
@@ -384,19 +361,31 @@
 import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import Transform from "./party/Transform.vue";
+import PlayerHealth from "src/components/campaign/PlayerHealth.vue";
+import BonusAddForm from "src/components/bonuses/BonusAddForm.vue";
+import ManualBonusRows from "src/components/bonuses/ManualBonusRows.vue";
+import { effectiveStats } from "src/utils/effectFunctions";
 import {
-	manualBonuses,
-	manualBonusTotal,
-	withManualBonus,
+	campaignEntities,
 	hpAfterMaxHpChange,
-	MANUAL_BONUS_ID,
+	manualBonuses,
+	withBonus,
+	withoutBonus,
+	BONUS_LABELS,
 } from "src/utils/entityFunctions";
 
+/**
+ * data: { key, location, context? }; with context (from the run campaign screen: basePlayers,
+ * definitionOf) the drawer has damage and healing with the player's effects
+ */
 export default {
 	name: "EditPlayer",
 	mixins: [experience],
 	components: {
 		Transform,
+		PlayerHealth,
+		BonusAddForm,
+		ManualBonusRows,
 	},
 	props: ["data"],
 	data() {
@@ -409,9 +398,10 @@ export default {
 			location: this.data.location,
 			entity: {},
 			playerBase: {},
-			// The "Manual" bonuses; other manual bonuses are kept as they are
-			maxHpMod: undefined,
-			acBonus: undefined,
+			// The manual bonuses, saved as they change: { <stat>: { <id>: { value, label } } }
+			bonuses: {},
+			// Current and base maximum hit points as saved, to tell what the Override changed
+			savedHp: { curHp: 0, maxHp: 0 },
 			xp: undefined,
 			setTransform: false,
 			advancement: undefined,
@@ -422,14 +412,14 @@ export default {
 		await this.get_campaign({ uid: this.userId, id: this.campaignId }).then((result) => {
 			const entity = result.players[this.entityKey];
 			this.entity = { ...entity };
-			const bonuses = manualBonuses(entity);
-			this.maxHpMod = bonuses.max_hp?.[MANUAL_BONUS_ID]?.value;
-			this.acBonus = bonuses.ac?.[MANUAL_BONUS_ID]?.value;
+			this.bonuses = manualBonuses(entity);
 			this.advancement = result.advancement;
+			this.savedHp.curHp = parseInt(entity.curHp) || 0;
 		});
 
 		await this.get_player({ uid: this.userId, id: this.entityKey }).then((result) => {
 			this.playerBase = result;
+			this.savedHp.maxHp = parseInt(result.maxHp) || 0;
 			if (this.isXpAdvancement() && this.playerBase.experience === undefined) {
 				this.set_player_prop({
 					uid: this.userId,
@@ -456,6 +446,10 @@ export default {
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("xp")) || false;
 		},
+		// A transformed player's maximum is the beast's: only its AC bonuses apply
+		bonusStats() {
+			return this.entity.transformed ? ["ac"] : ["ac", "max_hp"];
+		},
 		death_fails() {
 			let fails = 0;
 			for (let key in this.entity.saves) {
@@ -467,14 +461,80 @@ export default {
 		},
 	},
 	methods: {
+		bonusLabel(stat) {
+			return BONUS_LABELS[stat] || stat;
+		},
+		bonusRows(stat) {
+			return Object.entries(this.bonuses[stat] || {}).map(([id, bonus]) => ({ id, ...bonus }));
+		},
+		addBonus({ stat, amount, label }) {
+			this.saveBonuses(withBonus({ bonuses: this.bonuses }, stat, { amount, label }));
+		},
+		updateBonus(stat, { bonus, amount, label }) {
+			this.saveBonuses(withBonus({ bonuses: this.bonuses }, stat, { id: bonus.id, amount, label }));
+		},
+		removeBonus(stat, bonus) {
+			this.saveBonuses(withoutBonus({ bonuses: this.bonuses }, stat, bonus.id));
+		},
 		/**
-		 * The manual bonuses other than "Manual" of a value, as a hint under its field
+		 * Saves the bonuses at once, as the tracker's bonuses drawer: a raised maximum heals and
+		 * hit points stay within the maximum (campaigns/save_campaign_bonuses)
 		 */
-		otherBonuses(stat) {
-			const others = Object.entries(manualBonuses(this.entity)[stat] || {})
-				.filter(([id]) => id !== MANUAL_BONUS_ID)
-				.map(([, { value, label }]) => `${label} ${value > 0 ? `+${value}` : value}`);
-			return others.length ? `Also: ${others.join(", ")}` : undefined;
+		async saveBonuses(bonuses) {
+			this.bonuses = bonuses;
+			await this.save_campaign_bonuses({
+				campaignId: this.campaignId,
+				playerId: this.entityKey,
+				bonuses,
+				context: this.data.context,
+			});
+			await this.syncHp();
+		},
+		/**
+		 * After damage, healing or a bonus change: the player's hit points and bonuses as saved,
+		 * so Save doesn't undo them
+		 */
+		async syncHp() {
+			const campaign = await this.get_campaign({ uid: this.userId, id: this.campaignId });
+			const saved = campaign.players?.[this.entityKey] || {};
+			this.bonuses = manualBonuses(saved);
+			for (const property of [
+				"curHp",
+				"tempHp",
+				"transformed",
+				"dead",
+				"stable",
+				"saves",
+				"bonuses",
+				"ac_bonus",
+				"maxHpMod",
+			]) {
+				if (saved[property] === undefined) this.$delete(this.entity, property);
+				else this.$set(this.entity, property, JSON.parse(JSON.stringify(saved[property])));
+			}
+			this.savedHp.curHp = parseInt(saved.curHp) || 0;
+		},
+		/**
+		 * The player's maximum hit points with its effects and manual bonuses, for a base maximum,
+		 * as the run campaign screen shows it (effectiveStats)
+		 */
+		effectiveMaxHp(baseMax) {
+			const players = {
+				...(this.$store.state.campaigns.cached_campaigns[this.userId]?.[this.campaignId]?.players || {}),
+				[this.entityKey]: this.entity,
+			};
+			const basePlayers = {
+				...(this.data.context?.basePlayers || {}),
+				[this.entityKey]: { ...this.playerBase, maxHp: baseMax },
+			};
+			const entities = campaignEntities(players, basePlayers);
+			const { values } = effectiveStats({
+				entity: entities[this.entityKey],
+				holderKey: this.entityKey,
+				entities,
+				definitionOf: this.data.context?.definitionOf,
+			});
+			return parseInt(values.maxHp ?? baseMax) || 0;
 		},
 		...mapActions(["setDrawer", "edit_player"]),
 		...mapActions("players", ["get_player", "edit_player", "set_player_prop"]),
@@ -485,6 +545,7 @@ export default {
 			"revive_entity",
 			"update_campaign_entity",
 			"edit_campaign_player",
+			"save_campaign_bonuses",
 			"set_share",
 			"set_death_save",
 		]),
@@ -524,15 +585,20 @@ export default {
 		isXpAdvancement() {
 			return this.advancement !== "milestone";
 		},
-		set_save(value, index) {
+		async set_save(value, index) {
 			index = value ? index + 1 : index;
-			this.set_death_save({
+			await this.set_death_save({
 				campaignId: this.campaignId,
 				type: "players",
 				id: this.entityKey,
 				index,
 				value,
 			});
+			// The drawer's copy too: the next save counts the ones made (and Save keeps them)
+			const saves = { ...(this.entity.saves || {}) };
+			if (value) saves[index] = value;
+			else delete saves[index];
+			this.$set(this.entity, "saves", saves);
 		},
 		closeTransform(beast) {
 			this.entity.transformed = beast;
@@ -549,30 +615,35 @@ export default {
 			});
 			this.entity.transformed = null;
 		},
-		stabilize() {
-			this.stabilize_entity({
+		// Stabilize, death and revive: the drawer re-reads the player, so it shows the new state
+		// and Save doesn't undo it
+		async stabilize() {
+			await this.stabilize_entity({
 				uid: this.userId,
 				campaignId: this.campaignId,
 				type: "players",
 				id: this.entityKey,
 			});
+			await this.syncHp();
 		},
-		kill() {
-			this.kill_entity({
+		async kill() {
+			await this.kill_entity({
 				uid: this.userId,
 				campaignId: this.campaignId,
 				type: "players",
 				id: this.entityKey,
 			});
+			await this.syncHp();
 		},
-		revive() {
-			this.revive_entity({
+		async revive() {
+			await this.revive_entity({
 				uid: this.userId,
 				campaignId: this.campaignId,
 				type: "players",
 				id: this.entityKey,
 				curHp: 1,
 			});
+			await this.syncHp();
 		},
 		edit() {
 			if (this.location === "encounter") {
@@ -585,30 +656,16 @@ export default {
 			this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
 			this.entity.curHp = parseInt(this.entity.curHp);
 
-			// Manual bonuses: the AC and max HP fields set the "Manual" bonus, other bonuses stay
-			const baseMax = this.playerBase.maxHp || 0;
-			const oldMax = baseMax + manualBonusTotal(this.entity, "max_hp");
-			let bonuses = withManualBonus(this.entity, "ac", this.acBonus);
-			bonuses = withManualBonus({ bonuses }, "max_hp", this.maxHpMod);
-			// The maximum can't go below 0
-			const total = manualBonusTotal({ bonuses }, "max_hp");
-			if (baseMax + total < 0) {
-				bonuses = withManualBonus(
-					{ bonuses },
-					"max_hp",
-					(bonuses.max_hp?.[MANUAL_BONUS_ID]?.value || 0) - (baseMax + total)
-				);
+			// The manual bonuses are saved as they change (saveBonuses); the entity has them as saved.
+			// Current hit points against the maximum with bonuses and effects: a typed value stays
+			// within it; otherwise they follow a changed base maximum (up with it, or down to it)
+			const newMax = this.effectiveMaxHp(this.playerBase.maxHp);
+			if (this.entity.curHp !== this.savedHp.curHp) {
+				this.entity.curHp = Math.min(this.entity.curHp, newMax);
+			} else {
+				const oldMax = this.effectiveMaxHp(this.savedHp.maxHp);
+				this.entity.curHp = hpAfterMaxHpChange(this.entity.curHp, oldMax, newMax);
 			}
-			const newMax = baseMax + manualBonusTotal({ bonuses }, "max_hp");
-
-			// Current HP follows the maximum: up with it, or down to it
-			this.entity.curHp = hpAfterMaxHpChange(this.entity.curHp, oldMax, newMax);
-
-			// Saved in the new format; the old single-value bonuses are removed
-			if (Object.keys(bonuses).length) this.$set(this.entity, "bonuses", bonuses);
-			else this.$delete(this.entity, "bonuses");
-			this.$delete(this.entity, "ac_bonus");
-			this.$delete(this.entity, "maxHpMod");
 			if (this.entity.transformed) {
 				if (this.entity.transformed.curHp > this.entity.transformed.maxHp) {
 					this.entity.transformed.curHp = this.entity.transformed.maxHp;

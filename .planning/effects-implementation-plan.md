@@ -14,7 +14,7 @@ SRD conditions — name, description and mechanics — come from
 and `src/data/{edition}/conditions.js`; custom effects come
 from the user's Firebase Realtime Database. None of these steps reads from or changes the
 HK API. Everything that touches the HK API (condition text, SRD effects served by the API,
-backfilling effects onto SRD monsters) is collected in step 8.
+backfilling effects onto SRD monsters) is collected in step 11.
 
 ## Conditions are effects
 Conditions are SRD effect definitions like any other; they just live in their own data
@@ -22,7 +22,7 @@ file. From step 1b on:
 
 - **`url`** — every SRD definition (condition or effect) is identified by `url`, the
   condition slug (`"prone"`, `"incapacitated"`) — the same unique identifier the HK API
-  uses (the API's uuid `_id`s are not used). It is identical across editions, so step 8 can
+  uses (the API's uuid `_id`s are not used). It is identical across editions, so step 11 can
   join on it, and unique across `effects.js` and `conditions.js` of an edition. Instances
   reference it as `source_key`.
 - **Applying** — applying a condition writes an effect instance (`source: "srd"`,
@@ -126,7 +126,7 @@ Both files:
   renamed to `url`, and Concentration in `effects.js` switches from `key` to `url`.
 - Drop `duration_type` / `cancel_trigger` from definitions (2c).
 - Keep `name` and `description` locally; the tracker does not read condition text from
-  the API until step 8. Icons are the existing `hki-<url>` icon-font classes.
+  the API until step 11. Icons are the existing `hki-<url>` icon-font classes.
 - **Exhaustion** is one leveled entry, not six "Exhaustion N" entries — `stacking.mode:
   "level"` + `level_track`, 2014 rows via `min_level`, 2024 via `scaling.by: "level"`
   (catalogue §5). The per-level text stays in `EXHAUSTION_LEVELS`
@@ -252,7 +252,7 @@ effect definition plus instance metadata - not a full copy:
   `"prone"`). The same `source_key` exists in both editions' data files; which file is
   used for resolution is determined at runtime by the campaign's `edition`, not by the
   persisted instance. `source: "custom"` is for user-authored effects. When SRD data moves
-  to the API (step 8), `source: "srd"` continues to resolve against the correct edition's
+  to the API (step 11), `source: "srd"` continues to resolve against the correct edition's
   data - the instance shape doesn't change.
 - `name` is always denormalized onto the instance for display without a lookup.
 - Persisted fields: `$defs/active_instance` in the v2 schema — `name`, `source`,
@@ -371,7 +371,7 @@ over each entity's `effects` map:
     One lookup helper searches both files, so callers don't care which one holds it.
   - `"custom"`: fetch from the user's Firebase Realtime Database via the effects
     service (`src/services/effects.js`).
-  - Step 8 swaps the static SRD lookup for API data where that applies - the
+  - Step 11 swaps the static SRD lookup for API data where that applies - the
     `source`+`source_key` reference doesn't change.
 - Resolve `includes` references recursively through the same lookup (with a cycle guard),
   so Paralyzed carries Incapacitated's mechanics.
@@ -1103,7 +1103,7 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
 - **Surprised** is an SRD effect: 5e restricts movement, actions and reactions and notifies at
   the start of the holder's turn; 5.5e is Disadvantage on Initiative. The set initiative
   screen's "Set surprised" button still adds the premade reminder; switching it to the effect
-  belongs with steps 9 (retire premade reminders) and 10 (effects on the set initiative screen). Spirit Guardians and other aura effects are still to come.
+  belongs with steps 9 (retire premade reminders) and 8 (effects on the set initiative screen). Spirit Guardians and other aura effects are still to come.
 - `src/data/5e|5.5e/conditions.js` are done in 1b; fix mechanics there as step 3 exposes
   gaps.
 - All files follow `hk-effects-schema.json` v2, checked by
@@ -1129,7 +1129,7 @@ applied by hand in an encounter. They shouldn't be baked into a separate definit
   `hk-effects-form` for the new effects.
 - Existing monster data (old `rolls`/`type` shape) must keep working unchanged.
 - Develop and test against user NPCs (Firebase, user content) and local fixtures. Adding
-  effects to SRD monsters served by the HK API is step 8.
+  effects to SRD monsters served by the HK API is step 11.
 
 *As built (change `effects-6-npc-action-effects`):*
 - **Link shape**: `$defs/effect_link` in the effects schema: `effect`, `duration`, `choices`,
@@ -1193,7 +1193,7 @@ effects and conditions as if they were cast on it. They belong on the ability in
 - **Cleanup:** the 3g test effects that are really traits (Acid Absorption, Undead
   Fortitude, Evasion, Uncanny Dodge, Reliable Talent, Lucky) move to trait links when this
   lands. They become generic definitions under "Generic effects" (step 5).
-- **8c:** the SRD monster backfill adds trait effects as well as action effects.
+- **11c:** the SRD monster backfill adds trait effects as well as action effects.
 
 *As built (change `effects-6b-trait-effects`):*
 - **Data:** `special_abilities[i].effects` is a list of `effect_link`s without a duration
@@ -1244,7 +1244,7 @@ its own. Same model as step 6, for the user's custom spells.
 - Effect-only spells (Bless, Shield of Faith) link their effect on an action of type other
   with When → Always.
 - Develop against the user's custom spells; SRD spells from the HK API get their links in
-  step 8 (8d).
+  step 11 (11d).
 
 *As built (`openspec/changes/archive/2026-10-16-effects-6c-spell-effects`; new spec
 `effects-spell-links`, and `effects-action-links` updated):*
@@ -1275,7 +1275,7 @@ its own. Same model as step 6, for the user's custom spells.
     `LinkDurationScaling.vue` and the docs.
 - **Found, not changed:** the SRD Magic Weapon effect has a fixed +1, not a value choice, so
   scaling can't raise it; link the basic Attack/Damage Roll Bonus instead, or give it a value
-  choice (with 8d). `spell_level` scaling of rolls isn't applied by `dice.js`.
+  choice (with 11d). `spell_level` scaling of rolls isn't applied by `dice.js`.
 - **Fixed along the way:** the spell form's missing `deleteRoll` method, and lists created by
   plain assignment (`spell.actions`, an NPC's action categories, an NPC action's `rolls`),
   which weren't reactive, so effects and rolls added to a new action didn't show.
@@ -1350,61 +1350,9 @@ its own. Same model as step 6, for the user's custom spells.
   - the damage of a save after a missed attack (only its effects wait)
   - player attacks (manual damage)
 
-## 8. HK API updates (last)
-Everything above runs on local data. This step moves or aligns SRD data with the HK API.
-The instance shape (`source: "srd"`, `source_key: <url>`) does not change, so no
-Firestore migration is needed.
-
-### 8a. Conditions
-The HK API provides condition name, icon and rules text (`/conditions` and
-`/conditions/5.5e`, all 15 conditions per edition as of 2026-09-29), but no structured
-`sub_effects`. Decide one of:
-- **Merge**: take display name/text from the API (`api_conditions/fetch_all_conditions`)
-  and mechanics from `src/data/5e|5.5e/conditions.js`, joined on `url`; drop the
-  local `name`/`description`.
-- **Move**: add `sub_effects` (and `cancelable`, `includes`, Exhaustion leveling) to the
-  API conditions and drop the local files.
-Either way the 2e lookup helper is the only place that changes. The tracker, compendium
-and `hk-condition-select` then share one source for condition text.
-
-### 8b. SRD effects
-Serve `src/data/5e|5.5e/effects.js` from the API (edition-aware), replacing the static
-lookup in 2a/2e.
-
-### 8c. SRD monsters
-Backfill `$defs/action_effects` onto SRD monsters in the API. 5.5e monsters (330, all
-with "Failure:/Success:" text, see 0a) are the best candidates for an automated backfill;
-2014 monsters stay manual/heuristic.
-
-### 8d. SRD spells
-Backfill spell links (step 6c: action effects with scaling) onto SRD spells in the API, per
-edition. The SRD effects catalogue ([effects-srd-catalogue.md](./effects-srd-catalogue.md))
-already says which spells link which effect.
-
-## 9. Encounter reminders on triggers (separate feature, after the effects)
-Idea, 2026-10-06. Build it once the effects work above is done. Turn reminders into actual
-reminders: the DM sets them on an encounter trigger, not on an entity, and the tracker
-shows them when the trigger fires. Examples:
-- "Round 3: the boss changes tactics, and may flee"
-- "Round 5: a sandstorm starts. Blind everyone."
-
-Ideas to work out when it's proposed:
-- **Triggers:** reuse the 2g trigger bus (round start, turn start/end, `combat_start`), and
-  add encounter-level ones such as "round N" or "every N rounds". Entity triggers such as
-  "boss bloodied" are optional.
-- **Display:** a prompt when the trigger fires, like the effect prompts. A prompt could
-  offer to apply an effect to chosen or all entities (the sandstorm's Blinded).
-- **Storage:** reminders belong to the encounter, not to `entity.reminders`.
-- **Legacy reminders (the former 3f):**
-  - Retire the premade reminders that effects now cover: "Reaction used" (2k point 4), and
-    any that duplicate a condition or effect.
-  - The remaining entity reminders (`entity.reminders`, `src/mixins/reminders.js`,
-    `Reminders.vue`, `TargetReminders.vue`) and the user-authored reminders
-    (`src/views/UserContent/Reminders/`) become this feature or move into it.
-  - Existing `entity.reminders` in Firestore need a shim or a conversion script, as in 2i.
-
-## 10. Apply effects from the set initiative screen
-Idea, 2026-10-12. Before round 1, the DM should be able to apply effects (and the other
+## 8. Apply effects outside combat: the set initiative screen and the campaign's players (done — archived as effects-8-effects-outside-combat, 2026-10-18)
+Idea, 2026-10-12; done first (before the reminders) and extended with the campaign's players
+on 2026-10-16. Before round 1, the DM should be able to apply effects (and the other
 targeted actions) to entities, for example creatures that start the fight Invisible or
 under a pre-cast spell.
 - **One shared header-actions component:** the action buttons in the header of the
@@ -1429,8 +1377,146 @@ under a pre-cast spell.
     Untarget if there's no targeting. Decide whether to hide them or keep them.
   - Durations applied before round 1 (round 0): check `applied_round`, the same-turn rule
     and `next_turn` ticking (2h1) when the first turn starts.
+- **Surprised becomes an effect (added 2026-10-16):** the set initiative screen's "Set
+  surprised" / "Remove surprised" toggle (`Overview.vue` `setSurprised`, keybind **S**) applies
+  and removes the SRD **Surprised** effect (`src/data/effects.js`, url `surprised`, in the
+  campaign's edition) instead of the premade `surprised` reminder
+  (`src/mixins/reminders.js` `premade.surprised`, a start-of-turn reminder that removes
+  itself).
+  - **Per edition:**
+    - 5e Surprised: can't move or take an action on its first turn, and no reaction until that
+      turn ends. Its duration is until the end of its next turn (`next_turn`, anchor target,
+      edge end), so its restrictions show in the details bar and it ends by itself.
+    - 5.5e Surprised: Disadvantage on the Initiative roll. It matters while initiative is
+      rolled, so the initiative roll on this screen must use it (3c1's initiative
+      modifiers), and it can end when combat starts (or after the creature's first turn,
+      to work out).
+  - **Display:** `Avatar.vue` shows the surprised icon from the effect, not from
+    `entity.reminders.surprised`; the effect also shows as a chip like any effect.
+  - **Old data:** encounters saved with `reminders.surprised` are converted to the effect when
+    loaded, as the legacy conditions were (2i), or are read as surprised until converted.
+  - **The premade reminder** goes: it's one of the premade reminders effects replace (step 9
+    retires the rest, like Reaction used).
 
-## 11. Set encounter reminders from the edit encounter screen
+- **The campaign's players, from the run campaign screen (added 2026-10-16):** the DM can
+  apply, see and remove effects on the campaign's players between encounters, for example a
+  curse, a long-lasting buff (Aid, Mage Armor) or Exhaustion after a long march. Player
+  effects are already stored on the campaign (`campaigns/{uid}/{campaignId}/players/{playerId}/effects`,
+  2b) and carry into the next encounter, so this is a way to edit them outside combat.
+  - **Where:** the Players pane of the run campaign screen
+    (`src/views/UserContent/Campaigns/RunCampaign.vue`, `src/components/campaign/Players.vue`):
+    the players' effect chips, and the Effects drawer to apply them to selected players.
+  - **To work out when it's proposed:**
+    - How players are selected on the run campaign screen (one, several, all).
+    - Which drawer actions fit outside combat: Effects (and Conditions, since conditions are
+      effects), Exhaustion levels; probably not out-of-turn damage.
+    - Durations outside combat: there are no rounds or turns. Time durations count in minutes
+      and hours, not rounds; turn-based ones (next turn, end of turn) don't make sense; a
+      Concentration needs a caster that may not be in the campaign. Decide what the drawer
+      offers here, and what happens to these effects when an encounter loads (the DM's review
+      of carried-over player effects).
+    - Companions: whether they get the same, since their effects are stored on the campaign
+      too.
+    - Whether the shared header-actions component above is also used here.
+
+*As built (change `effects-8-effects-outside-combat`):*
+- **Decided at proposal (user):**
+  - the set initiative screen reuses the tracker's targeting
+  - campaign players get per-player chips and an Effects button
+  - the campaign drawer offers every duration the encounter drawer does
+  - 5.5e Surprised ends when combat starts
+- **Set initiative screen:**
+  - `TargetActions.vue` is the shared header (buttons, shortcuts, arrow keys, Untarget,
+    drawer methods). `Targeted.vue` uses it with out of turn damage; the Overview header and
+    the mobile Overview tab use it without.
+  - Overview rows target on click, and shift/ctrl adds. Row buttons stop the click.
+- **Surprised:**
+  - `surprisedInstance` and `hasSurprised` in `effectFunctions.js`. 5e:
+    `next_turn`/target/end, checked to end at the end of the first turn. 5.5e: until removed,
+    then removed in `set_turn` when round 0 becomes 1.
+  - `Avatar.vue` reads the effect, and `premade.surprised` is gone.
+  - `convert_legacy_surprised` runs after `convert_legacy_conditions` on load.
+- **Campaign players:**
+  - store: `apply_campaign_effect`, `remove_campaign_effect` and `campaign_concentrate_on` in
+    the campaigns store (immunity, Exhaustion level, Concentration with cascade)
+  - chips: `campaign/PlayerEffects.vue`, inline after the player's name. For the DM, a chip opens
+    the tracker's `ActiveEffect` drawer in campaign mode (details, Exhaustion level, Remove; no
+    escape rolls). Its first version, a popover, was replaced at the user's request.
+  - drawer: `drawers/campaign/Effects.vue` (the encounter drawer's lists and `ApplyEffect`, with
+    the campaign's players as casters)
+  - `Players.vue`: chips after the name, and an Effects button next to Edit player
+  - AC and max HP (and the HP colors, and Party rest's heal) include the players' effects and
+    manual bonuses, through `effectiveStats` on the player merged with its campaign data (user
+    request at apply). A transformed player keeps its transformed AC and HP.
+- **One hit point calculation (user request at apply):**
+  - Pure `damageResult`, `healingResult` and `hpAfterEffects` in `effectFunctions.js`.
+    `HpManipulations.isDamage` / `isHealing`, the tracker's also-heal and `sync_effect_hp` use
+    them. A scratchpad check compared them with the old arithmetic over 5000 random cases.
+  - The campaign's effect actions take `context: { basePlayers, definitionOf }` from
+    `Players.vue`: also heal, keep HP within the maximum, immunities end conditions, lost temp
+    HP. They return notices (`applyNotices`, `removeNotices`, shown with `showNotices`).
+  - Manual damage and healing on the run campaign screen (`campaign/PlayerHealth.vue` on the
+    player's hit points; `campaign_player_damage` / `campaign_player_heal`), with
+    `calculateManualDamage` and the effective defenses, `damageResult` / `healingResult`,
+    `healingReceivedCap`, and a Concentration save notice (`concentrationSaveDc`). Nothing is
+    logged; the encounter's damage modifier toggles (reduce, absorb) aren't offered there.
+  - `PlayerHealth` uses `hk-dmg-type-select` (colored icons) and is also in the Edit player
+    drawer, which gets `context` from `Players.vue` and re-reads the HP fields after damage or
+    healing so Save doesn't undo them (user request at apply).
+- **Manual bonuses with labels (user request at apply):**
+  - Pure `withBonus` / `withoutBonus` in `entityFunctions.js` (generated `eff_` id, label default
+    "Manual", legacy single values converted); the tracker's `set_bonus` / `remove_bonus` use
+    them. `withManualBonus` is gone.
+  - Shared `src/components/bonuses/BonusAddForm.vue` (not a form element, so it can sit in the
+    Edit drawer's form) and `ManualBonusRows.vue`, used by `StatBonuses.vue`, the Edit player
+    drawer (AC, max HP; saved at once through `save_campaign_bonuses`, then the drawer re-reads
+    the player so Save doesn't undo them; a first version kept them until Save, which the user
+    found lost them; the Override's Cur HP is saved within the maximum with bonuses and
+    effects, `effectiveStats`, and follows a changed base max through `hpAfterMaxHpChange`) and
+    Group Health (max HP bonuses added to each selected
+    player). Current HP follows the maximum through `hpAfterMaxHpChange`.
+  - The player's AC opens `drawers/campaign/Bonuses.vue` for the DM (stored and effective AC,
+    effect lines, manual bonuses saved at once through `campaigns/save_campaign_bonuses`, which
+    heals a raised maximum and clamps HP like the tracker's `save_bonuses`). It takes
+    `stat: "max_hp"` too, though nothing opens it for that yet. `campaignEntities` moved to
+    `entityFunctions.js` for the store and the drawer.
+- **Found while testing:**
+  - The tracker card's Initiative shows the initiative roll's advantage/disadvantage (A/D)
+    and adds its flat Dexterity check bonuses, as the set initiative screen rolls it
+    (`roll_modifiers` with `kind: "initiative"`). The roll's notes are added to the tooltip
+    (`EffectModifiedValue` `extraNotes`).
+  - The Overview rows have `user-select: none`, so shift+click doesn't select text.
+  - Concentration after manual damage on the run campaign screen: `campaign_player_damage`
+    returns `{ notices, prompts }` with the tracker's `concentration_save` prompt;
+    `PlayerHealth` shows it with the tracker's toast (`effectRolls.effectToast`), Succeeded /
+    Failed without Roll; Failed is `remove_campaign_effect`. Dropping to 0 hit points ends it
+    without a save, as `fire_trigger` does. It replaced a plain notice with the DC.
+- **Not done:** companions on the run campaign screen (the pane doesn't list them), and shift+click
+  quick apply in the campaign drawer.
+
+## 9. Encounter reminders on triggers (separate feature, after the effects)
+Idea, 2026-10-06. Build it once the effects work above is done. Turn reminders into actual
+reminders: the DM sets them on an encounter trigger, not on an entity, and the tracker
+shows them when the trigger fires. Examples:
+- "Round 3: the boss changes tactics, and may flee"
+- "Round 5: a sandstorm starts. Blind everyone."
+
+Ideas to work out when it's proposed:
+- **Triggers:** reuse the 2g trigger bus (round start, turn start/end, `combat_start`), and
+  add encounter-level ones such as "round N" or "every N rounds". Entity triggers such as
+  "boss bloodied" are optional.
+- **Display:** a prompt when the trigger fires, like the effect prompts. A prompt could
+  offer to apply an effect to chosen or all entities (the sandstorm's Blinded).
+- **Storage:** reminders belong to the encounter, not to `entity.reminders`.
+- **Legacy reminders (the former 3f):**
+  - Retire the premade reminders that effects now cover: "Reaction used" (2k point 4), and
+    any that duplicate a condition or effect.
+  - The remaining entity reminders (`entity.reminders`, `src/mixins/reminders.js`,
+    `Reminders.vue`, `TargetReminders.vue`) and the user-authored reminders
+    (`src/views/UserContent/Reminders/`) become this feature or move into it.
+  - Existing `entity.reminders` in Firestore need a shim or a conversion script, as in 2i.
+
+## 10. Set encounter reminders from the edit encounter screen
 Idea, 2026-10-12. Builds on step 9. The DM prepares the encounter's trigger reminders
 ("Round 3: the boss may flee") while building the encounter, not only during combat.
 - **Where:** the edit encounter screen (`src/views/UserContent/Encounters/EditEncounter.vue`)
@@ -1444,7 +1530,85 @@ Idea, 2026-10-12. Builds on step 9. The DM prepares the encounter's trigger remi
   - Whether a reminder that offers to apply an effect (step 9's sandstorm) can pick its
     effect and targets here.
 
-## 12. Import effects, and an AI skill to build them
+## 11. HK API updates (last)
+Moved here from step 8 on 2026-10-16: the API connection comes after the reminders work
+(steps 8–10). Everything above runs on local data. This step moves or aligns SRD data with
+the HK API. The instance shape (`source: "srd"`, `source_key: <url>`) does not change, so no
+Firestore migration is needed.
+
+### 11a. Conditions
+The HK API provides condition name, icon and rules text (`/conditions` and
+`/conditions/5.5e`, all 15 conditions per edition as of 2026-09-29), but no structured
+`sub_effects`. Decide one of:
+- **Merge**: take display name/text from the API (`api_conditions/fetch_all_conditions`)
+  and mechanics from `src/data/5e|5.5e/conditions.js`, joined on `url`; drop the
+  local `name`/`description`.
+- **Move**: add `sub_effects` (and `cancelable`, `includes`, Exhaustion leveling) to the
+  API conditions and drop the local files.
+Either way the 2e lookup helper is the only place that changes. The tracker, compendium
+and `hk-condition-select` then share one source for condition text.
+
+### 11b. SRD effects
+Serve `src/data/5e|5.5e/effects.js` from the API (edition-aware), replacing the static
+lookup in 2a/2e.
+
+### 11c. SRD monsters
+Backfill `$defs/action_effects` onto SRD monsters in the API. 5.5e monsters (330, all
+with "Failure:/Success:" text, see 0a) are the best candidates for an automated backfill;
+2014 monsters stay manual/heuristic.
+
+### 11d. SRD spells
+Backfill spell links (step 6c: action effects with scaling) onto SRD spells in the API, per
+edition. The SRD effects catalogue ([effects-srd-catalogue.md](./effects-srd-catalogue.md))
+already says which spells link which effect.
+
+## 12. Fetch effects and conditions from the API, with search and bonus effects in the bonus drawers
+Idea, 2026-10-18. Builds on step 11 (11a, 11b): once the API serves the SRD conditions and
+effects, the app fetches and lists them from it, and the lists get a name search. Today the
+drawers combine the local SRD lists (`src/data/5e|5.5e`, `findSrdDefinition`) with the user's
+custom effects (`effects/get_effects`), with no search. Conditions are fetched separately
+(`api_conditions/fetch_all_conditions`, `hk-condition-select`).
+- **Fetching:**
+  - SRD conditions and effects come from the API (edition-aware) through one store module,
+    cached like the other API content.
+  - The 2e lookup helper (`findSrdDefinition`) stays the only place that resolves `source: "srd"`
+    instances. It reads the fetched data, so instances keep working when the API is slow or
+    down: the local files stay as a fallback, or the data is cached.
+  - Every place that lists or resolves effects uses it:
+    - the Effects drawers, encounter and campaign (`drawers/encounter/Effects.vue`,
+      `drawers/campaign/Effects.vue`)
+    - the effect pickers in the effects, NPC and spell forms (`EffectRefPicker.vue`)
+    - `hk-condition-select`, `npcs/Defenses.vue`
+    - the custom effects list (`views/UserContent/Effects`), the compendium
+- **Search:** a name filter on every effect list:
+  - the Effects drawers (SRD conditions, SRD effects and custom effects together)
+  - the effect pickers, and the custom effects list
+  - Matches on the name, case- and accent-insensitive.
+  - To work out: filter in the client over the fetched lists, or the API's `query` (as
+    `fetch_conditions` already takes) for large lists.
+- **Bonus effects in the manual bonus drawers:** every manual bonus drawer also lists the
+  existing effects that are simple bonuses to its value, and can apply them:
+  - **Which drawers:**
+    - the tracker's `StatBonuses.vue`
+    - the campaign's `drawers/campaign/Bonuses.vue` (AC)
+    - the Edit player drawer (AC, max HP)
+    - Group Health (max HP, to each selected player)
+  - **Which effects:** SRD effects (Armor Class Bonus, Hit Point Maximum Bonus) and custom
+    effects whose only mechanics are a numeric modifier to that value (`ac`, `max_hp`, …). A
+    value choice is fine; conditions, triggers and other sub-effects are not. This becomes a
+    pure helper in `effectFunctions.js` (e.g. `isSimpleBonusEffect(definition, stat)`).
+  - **Applying:** through the normal apply actions (`apply_effect`, `apply_campaign_effect`),
+    so also heal, immunities and notices work as everywhere else. The effect's choices (the
+    value) are asked inline; the duration defaults to until removed. The applied effect then
+    shows under "From effects" in the drawer, not as a manual bonus.
+  - With the search above when the list is long.
+- **To work out when it's proposed:**
+  - Whether the bonus drawers offer a caster and Concentration (Shield of Faith-style bonuses
+    with a caster), or only caster-less, until-removed effects.
+  - Which values besides AC and max HP get bonus effects in the tracker's drawer (speed, saves,
+    skills), and how "simple" is decided for roll bonuses.
+
+## 13. Import effects, and an AI skill to build them
 Idea, 2026-10-13. Build it after effects can be linked to monsters and spells (steps 6–7),
 so the skill can cover links too. Complex effects take time to build in the form. Users can
 let an AI write them instead, and import the result.
@@ -1492,11 +1656,12 @@ let an AI write them instead, and import the result.
 4 (done — archived as effects-4-effects-form, 2026-10-13) (effectsConstants regeneration + EffectsForm rework, once step 2 data shape is proven; 4–7 follow "Generic effects")
 5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
 6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 6c (done — archived as effects-6c-spell-effects, 2026-10-16) -> 7 (done — archived as effects-7-apply-linked-effects, 2026-10-16; monster actions, trait effects on special abilities, spell actions, action rolls; additive on top of step 3)
-8 (HK API updates: 8a conditions, 8b SRD effects, 8c SRD monster backfill, 8d SRD spell backfill)
+8 (done — archived as effects-8-effects-outside-combat, 2026-10-18; apply effects outside combat: the set initiative screen, with a shared header-actions component for the Targeted and Overview headers, Surprised as an effect instead of a reminder, and the campaign's players on the run campaign screen)
 9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
-10 (apply effects from the set initiative screen: shared header-actions component for the Targeted and Overview headers; can be done any time after 4)
-11 (set encounter reminders from the edit encounter screen; after 9)
-12 (import effects, and a downloadable AI skill that writes importable effects; after 6 -> 6b -> 7)
+10 (set encounter reminders from the edit encounter screen; after 9)
+11 (HK API updates, moved from 8 on 2026-10-16: 11a conditions, 11b SRD effects, 11c SRD monster backfill, 11d SRD spell backfill)
+12 (fetch effects and conditions from the API, a name search on every effect list, and bonus effects listed and applied from the manual bonus drawers; after 11a, 11b)
+13 (import effects, and a downloadable AI skill that writes importable effects; after 6 -> 6b -> 7)
 
 ## Workflow per step (from 2026-09-29)
 Every remaining step (or sub-step, e.g. 2a) is handled as an OpenSpec change:

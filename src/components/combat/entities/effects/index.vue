@@ -1,6 +1,13 @@
 <template>
 	<div v-if="items?.length" class="entity-effects" :class="{ collapse: collapse }">
-		<Effect v-for="effect in visible" :key="effect.key" :effect="effect" :entity="entity" :readonly="readonly" />
+		<Effect
+			v-for="effect in visible"
+			:key="effect.key"
+			:effect="effect"
+			:entity="entity"
+			:readonly="readonly"
+			:effect-drawer-data="effectDrawerData"
+		/>
 		<div v-if="collapsed.length" class="entity-effects__collapsed" @click.stop>
 			+<hk-animated-integer :value="collapsed.length" />
 			<q-menu
@@ -17,6 +24,7 @@
 						:effect="effect"
 						:entity="entity"
 						:readonly="readonly"
+						:effect-drawer-data="effectDrawerData"
 					/>
 				</div>
 			</q-menu>
@@ -69,6 +77,12 @@ export default {
 		// The entity's name as shown, with effectEntries
 		holderName: {
 			type: String,
+			default: undefined,
+		},
+		// effect chip => the ActiveEffect drawer's data, with effectEntries (the campaign's player
+		// effects, effects 8)
+		effectDrawerData: {
+			type: Function,
 			default: undefined,
 		},
 		// Chips don't open the DM's drawers (live view)

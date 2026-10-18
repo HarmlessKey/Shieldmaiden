@@ -19,7 +19,7 @@
 			<hk-icon icon="fas fa-paw-claws" :class="{ 'neutral-1': entity.color_label }" />
 			<q-tooltip anchor="top middle" self="center middle">Transformed</q-tooltip>
 		</template>
-		<template v-else-if="icons && entity.reminders?.surprised">
+		<template v-else-if="icons && surprised">
 			<hk-icon icon="hki hki-surprised" class="orange" />
 			<q-tooltip anchor="top middle" self="center middle">Surprised</q-tooltip>
 		</template>
@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import { hasSurprised } from "src/utils/effectFunctions";
+
 export default {
 	name: "Avatar",
 	props: {
@@ -53,13 +55,17 @@ export default {
 		font_size() {
 			return Math.ceil(this.size * 0.75);
 		},
+		// The Surprised effect (effects 8)
+		surprised() {
+			return hasSurprised(this.entity);
+		},
 		backgroundImage() {
-			const { img, hidden, transformed, reminders } = this.entity;
+			const { img, hidden, transformed } = this.entity;
 			if (!img) return "";
 			if (!this.icons) return `url(${img})`;
-			if (!hidden && !transformed && !reminders?.surprised) return `url(${img})`;
+			if (!hidden && !transformed && !this.surprised) return `url(${img})`;
 			return "";
-		}
+		},
 	},
 };
 </script>

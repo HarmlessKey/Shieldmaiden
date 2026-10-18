@@ -3,8 +3,12 @@
 		<hk-tip value="initiative-overview" title="Actions">
 			<template #content>
 				<p>
+					Click an entity to target it, shift+click to target more. The header's actions, like
+					Effects, act on the targeted entities.
+				</p>
+				<p>
 					<i aria-hidden="true" class="hki-surprised" />
-					Reminds you this entity was surprised when their turn starts.
+					Gives the entity the Surprised effect.
 				</p>
 				<p>
 					<i aria-hidden="true" class="fas fa-eye-slash white" />
@@ -23,26 +27,29 @@
 				v-for="entity in active"
 				v-bind:key="entity.key"
 				class="entity"
+				:class="{ targeted: targeted.includes(entity.key) }"
 				tabindex="0"
-				@keydown.s="setSurprised(entity.key, !entity.reminders.surprised)"
+				@click="selectTarget($event, entity.key)"
+				@keydown.space.prevent="selectTarget($event, entity.key)"
+				@keydown.s="setSurprised(entity.key, !surprised(entity))"
 				@keydown.h="set_hidden({ key: entity.key, hidden: !entity.hidden })"
 				@keydown.a="set_active({ key: entity.key, active: false })"
 			>
 				<BasicEntity :entity="entity" :size="48" :padding="8">
 					<strong class="set-initiative">{{ entity.initiative }}</strong>
 					<div class="actions">
-						<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
+						<!-- Surprised: the SRD Surprised effect of the campaign's edition (effects 8) -->
 						<button
-							v-if="!entity.reminders.surprised"
+							v-if="!surprised(entity)"
 							class="btn btn-sm bg-neutral-8"
-							@click="setSurprised(entity.key, true)"
+							@click.stop="setSurprised(entity.key, true)"
 						>
 							<i aria-hidden="true" class="hki-surprised"></i>
 							<q-tooltip anchor="top middle" self="center middle"
 								>Set surprised <hk-show-keybind :binds="['s']"
 							/></q-tooltip>
 						</button>
-						<button v-else class="btn btn-sm bg-neutral-8" @click="setSurprised(entity.key, false)">
+						<button v-else class="btn btn-sm bg-neutral-8" @click.stop="setSurprised(entity.key, false)">
 							<i aria-hidden="true" class="hki-surprised"></i>
 							<q-tooltip anchor="top middle" self="center middle"
 								>Remove surprised <hk-show-keybind :binds="['s']"
@@ -52,7 +59,7 @@
 						<button
 							v-if="!entity.hidden"
 							class="btn btn-sm bg-neutral-8"
-							@click="set_hidden({ key: entity.key, hidden: true })"
+							@click.stop="set_hidden({ key: entity.key, hidden: true })"
 						>
 							<i aria-hidden="true" class="fas fa-eye-slash"></i>
 							<q-tooltip anchor="top middle" self="center middle"
@@ -62,7 +69,7 @@
 						<button
 							v-else
 							class="btn btn-sm bg-neutral-8"
-							@click="set_hidden({ key: entity.key, hidden: false })"
+							@click.stop="set_hidden({ key: entity.key, hidden: false })"
 						>
 							<i aria-hidden="true" class="fas fa-eye"></i>
 							<q-tooltip anchor="top middle" self="center middle"
@@ -71,7 +78,7 @@
 						</button>
 						<button
 							class="btn btn-sm bg-neutral-8"
-							@click="set_active({ key: entity.key, active: false })"
+							@click.stop="set_active({ key: entity.key, active: false })"
 						>
 							<i aria-hidden="true" class="fas fa-minus"></i>
 							<q-tooltip anchor="top middle" self="center middle"
@@ -109,44 +116,67 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { general } from "src/mixins/general.js";
-import { remindersMixin } from "src/mixins/reminders";
 import BasicEntity from "../entities/BasicEntity.vue";
+import { findSrdDefinition, hasSurprised, surprisedInstance } from "src/utils/effectFunctions";
 
 export default {
 	name: "SetInitiativeNPC",
-	mixins: [general, remindersMixin],
+	mixins: [general],
 	components: {
 		BasicEntity,
 	},
 	props: ["active", "idle"],
+	computed: {
+		...mapGetters(["targeted", "edition"]),
+	},
 	methods: {
 		...mapActions([
 			"set_active",
 			"set_hidden",
 			"set_initiative",
-			"set_targetReminder",
+			"set_targeted",
 			"setDrawer",
+			"apply_effect",
+			"remove_effect",
 		]),
-		setSurprised(entity_key, value) {
-			const reminder = this.premade.surprised;
-			delete reminder[".key"];
-			const action = value ? "add" : "remove";
-
-			this.set_targetReminder({
-				action: action,
-				entity: entity_key,
-				key: "surprised",
-				reminder: reminder,
-				type: "premade",
-			});
+		/**
+		 * Targets an entity as in the tracker: a click targets only it, shift or ctrl+click adds
+		 * or removes it (effects 8)
+		 */
+		selectTarget(event, key) {
+			this.set_targeted({ type: event.shiftKey || event.ctrlKey ? "multi" : "single", key });
+		},
+		surprised(entity) {
+			return hasSurprised(entity);
+		},
+		/**
+		 * Applies or removes the SRD Surprised effect of the campaign's edition (effects 8)
+		 */
+		setSurprised(key, value) {
+			if (!value) {
+				return this.remove_effect({ key, source: "srd", source_key: "surprised" });
+			}
+			const definition = findSrdDefinition(this.edition, "surprised") || { name: "Surprised" };
+			const instance = surprisedInstance({ edition: this.edition, definition });
+			return this.apply_effect({ key, instance, definition });
 		},
 	},
 };
 </script>
 
 <style lang="scss" scoped>
+.entity {
+	cursor: pointer;
+	// Shift+click targets several; it shouldn't select the text in between
+	user-select: none;
+
+	// Targeted on the set initiative screen, like the tracker's targets
+	&.targeted {
+		outline: $blue solid 3px;
+	}
+}
 .set-initiative {
 	font-weight: bold;
 	font-size: 20px;

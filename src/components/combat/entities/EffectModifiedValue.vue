@@ -57,6 +57,11 @@ export default {
 			type: Array,
 			default: undefined,
 		},
+		// Tooltip lines after the entity's effect_modifiers (a value that's also a roll: initiative)
+		extraNotes: {
+			type: Array,
+			default: undefined,
+		},
 		// Marked state instead of the entity's stored values (rollPlan changed)
 		changed: {
 			type: Boolean,
@@ -89,7 +94,10 @@ export default {
 		},
 		tooltipLines() {
 			if (this.notes) return this.notes.map((note) => ({ note }));
-			return this.entity.effect_modifiers?.[this.resolvedField] || [];
+			return [
+				...(this.entity.effect_modifiers?.[this.resolvedField] || []),
+				...(this.extraNotes || []).map((note) => ({ note })),
+			];
 		},
 	},
 	methods: {

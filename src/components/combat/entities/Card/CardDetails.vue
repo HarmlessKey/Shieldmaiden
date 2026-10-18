@@ -30,10 +30,14 @@
 						<template v-if="key === 'maxHp'">
 							<hk-animated-integer :value="displayStats(full_entity).curHp" class="ml-1" /> /
 						</template>
+						<!-- Initiative is a roll too: its advantage and dice from effects (Invisible) -->
 						<EffectModifiedValue
 							:entity="full_entity"
 							:field="key"
-							:value="displayStats(full_entity)[key]"
+							:value="key === 'initiative_modifier' ? initiative_value : displayStats(full_entity)[key]"
+							:advantage="key === 'initiative_modifier' ? initiative_plan.advantage : undefined"
+							:extra-notes="key === 'initiative_modifier' ? initiative_plan.notes : undefined"
+							:changed="key === 'initiative_modifier' && initiative_plan.changed ? true : undefined"
 						/>
 					</div>
 				</div>
@@ -305,6 +309,17 @@ export default {
 				};
 			}
 			return plans;
+		},
+		// The initiative roll's plan, as the set initiative screen rolls it: its advantage, dice and
+		// flat Dexterity check bonuses on top of the initiative modifier (which has its own effect
+		// modifiers and manual bonuses)
+		initiative_plan() {
+			return this.rollPlanFor({ kind: "initiative" }, 0);
+		},
+		initiative_value() {
+			const shown = displayStats(this.full_entity).initiative_modifier;
+			if (!this.initiative_plan.flat) return shown;
+			return this.signed((parseInt(this.full_entity.initiative_modifier) || 0) + this.initiative_plan.flat);
 		},
 		// All roll bonuses, for the drawer opened from the skill list
 		roll_bonus_stats() {

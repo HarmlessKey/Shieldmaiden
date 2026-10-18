@@ -23,7 +23,7 @@
 			</q-chip>
 			<template v-else>
 				<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt" class="mr-1" />
-				{{ typeLabel(scope.opt) }} damage
+				{{ typeLabel(scope.opt) }}<template v-if="!short"> damage</template>
 			</template>
 		</template>
 		<template v-slot:option="scope">
@@ -64,6 +64,11 @@ export default {
 			default: false,
 		},
 		multiple: {
+			type: Boolean,
+			default: false,
+		},
+		// The selected type without " damage" ("Fire"), for narrow places
+		short: {
 			type: Boolean,
 			default: false,
 		},

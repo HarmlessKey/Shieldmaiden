@@ -41,6 +41,9 @@ import {
 	tempHpToLose,
 	buildEffectInstance,
 	concentrationPlan,
+	hasSurprised,
+	surprisedInstance,
+	hpAfterEffects,
 	reactionUsedApplies,
 	hasReactionUsed,
 } from "src/utils/effectFunctions";
@@ -48,6 +51,8 @@ import {
 	manualBonuses,
 	manualBonusTotal,
 	hpAfterMaxHpChange,
+	withBonus,
+	withoutBonus,
 	MANUAL_BONUS_ID,
 } from "src/utils/entityFunctions";
 import { monsterMixin } from "src/mixins/monster";
@@ -530,8 +535,10 @@ const run_encounter_actions = {
 				}
 			}
 
-			// Legacy conditions maps become effect instances
+			// Legacy conditions maps become effect instances, and the surprised reminder the
+			// Surprised effect (effects 8)
 			await dispatch("convert_legacy_conditions");
+			await dispatch("convert_legacy_surprised");
 
 			// Remember whose turn it is for the end-of-turn triggers
 			commit(
@@ -1006,6 +1013,19 @@ const run_encounter_actions = {
 		commit("SET_TURN", turn);
 		commit("SET_ROUND", round);
 
+		// 5.5e Surprised only counts for the Initiative roll: it ends when combat starts (effects 8)
+		if (oldRound === 0 && round > 0 && state.edition === "5.5e") {
+			for (const [key, entity] of Object.entries(state.entities)) {
+				if (!hasSurprised(entity)) continue;
+				await dispatch("remove_effect", {
+					key,
+					source: "srd",
+					source_key: "surprised",
+					reason: "combat started",
+				});
+			}
+		}
+
 		// Effect triggers, only when combat moves forward
 		const incomingKey = round > 0 ? getters.turn_order[turn] : undefined;
 		commit("SET_TURN_ENTITY", incomingKey);
@@ -1477,16 +1497,7 @@ const run_encounter_actions = {
 	 * @param {string} label Defaults to "Manual"
 	 */
 	async set_bonus({ state, dispatch }, { key, stat, id, amount, label }) {
-		const bonuses = JSON.parse(JSON.stringify(state.entities[key]?.bonuses || {}));
-		const list = bonuses[stat] || {};
-		const bonusId =
-			id ||
-			generateEffectKey(Object.values(bonuses).flatMap((entries) => Object.keys(entries || {})));
-		list[bonusId] = {
-			value: parseInt(amount) || 0,
-			label: (label || "").trim().slice(0, 50) || "Manual",
-		};
-		bonuses[stat] = list;
+		const bonuses = withBonus(state.entities[key], stat, { id, amount, label });
 		return dispatch("save_bonuses", { key, bonuses });
 	},
 
@@ -1498,10 +1509,8 @@ const run_encounter_actions = {
 	 * @param {string} id Bonus id
 	 */
 	async remove_bonus({ state, dispatch }, { key, stat, id }) {
-		const bonuses = JSON.parse(JSON.stringify(state.entities[key]?.bonuses || {}));
-		if (!bonuses[stat]?.[id]) return true;
-		delete bonuses[stat][id];
-		return dispatch("save_bonuses", { key, bonuses });
+		if (!manualBonuses(state.entities[key])[stat]?.[id]) return true;
+		return dispatch("save_bonuses", { key, bonuses: withoutBonus(state.entities[key], stat, id) });
 	},
 
 	/**
@@ -2091,6 +2100,38 @@ const run_encounter_actions = {
 	},
 
 	/**
+	 * Converts the premade surprised reminder of the loaded encounter's entities to the SRD
+	 * Surprised effect (effects 8). The reminder is removed once the effect is stored, so a
+	 * failed run repeats. No apply triggers fire. The demo converts in memory only, test runs
+	 * don't convert.
+	 */
+	async convert_legacy_surprised({ state, commit, dispatch }) {
+		if (state.test) return;
+
+		for (const [key, entity] of Object.entries(state.entities || {})) {
+			if (!entity?.reminders?.surprised) continue;
+			try {
+				if (!hasSurprised(entity)) {
+					const definition = findSrdDefinition(state.edition, "surprised") || { name: "Surprised" };
+					const instance = surprisedInstance({
+						edition: state.edition,
+						definition,
+						round: state.encounter?.round || 0,
+					});
+					const effectKey = generateEffectKey(Object.keys(entity.effects || {}));
+					if (!state.demo) {
+						await dispatch("persist_effect", { key, effectKey, value: instance });
+					}
+					commit("SET_EFFECT", { key, effectKey, instance });
+				}
+				await dispatch("set_targetReminder", { action: "remove", entity: key, key: "surprised" });
+			} catch (error) {
+				console.error(`Failed to convert the surprised reminder of ${key}`, error);
+			}
+		}
+	},
+
+	/**
 	 * Converts the legacy conditions maps of the loaded encounter to effect instances.
 	 * The map is deleted once all instances of an entity are stored, so a failed run repeats.
 	 * No apply triggers fire. The demo converts in memory only, test runs don't convert.
@@ -2222,14 +2263,8 @@ const run_encounter_actions = {
 				caster: formulaVars(state.entities[instance.caster_key]),
 			},
 		});
-		const holder = state.entities[key];
-		if (heal > 0 && holder) {
-			const max = getters.effective_entity(key)?.maxHp ?? holder.maxHp;
-			const curHp = parseInt(holder.curHp) || 0;
-			const newHp = Math.min(curHp + heal, parseInt(max));
-			if (newHp > curHp) await dispatch("set_hp", { key, newHp });
-		}
-		await dispatch("sync_effect_hp", key);
+		// Healed and kept within the maximum, as for the campaign's players (effects 8)
+		await dispatch("sync_effect_hp", { key, heal });
 
 		// Temporary hit points without a trigger are granted when applied (False Life)
 		const tempHp = (resolved?.sub_effects || []).filter(
@@ -2530,20 +2565,25 @@ const run_encounter_actions = {
 	},
 
 	/**
-	 * Keeps an entity's current hit points within its effective maximum: when effects lowered
-	 * the maximum below current HP, current HP is set to it and saved. The transformed pool
-	 * is left alone.
+	 * Keeps an entity's current hit points within its effective maximum, after healing it by
+	 * `heal` (Aid's also_heal): when effects lowered the maximum below current HP, current HP is
+	 * set to it and saved. The transformed pool is left alone. The same calculation as the
+	 * campaign's players outside an encounter (hpAfterEffects, effects 8).
 	 *
-	 * @param {string} key Entity key
+	 * @param {string|object} key Entity key, or { key, heal }
 	 */
-	async sync_effect_hp({ state, getters, dispatch }, key) {
+	async sync_effect_hp({ state, getters, dispatch }, args) {
+		const { key, heal = 0 } = typeof args === "object" ? args : { key: args };
 		const entity = state.entities[key];
 		if (!entity) return;
-		const max = parseInt(getters.effective_entity(key)?.maxHp);
-		const curHp = parseInt(entity.curHp);
-		if (Number.isFinite(max) && Number.isFinite(curHp) && curHp > max) {
-			await dispatch("set_hp", { key, newHp: Math.max(0, max) });
-		}
+		const newHp = hpAfterEffects({
+			entity,
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			heal,
+		});
+		if (newHp !== undefined) await dispatch("set_hp", { key, newHp });
 	},
 
 	/**

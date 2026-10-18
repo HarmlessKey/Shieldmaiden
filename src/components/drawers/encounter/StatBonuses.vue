@@ -5,45 +5,7 @@
 			<h2 class="mt-3">{{ title }}</h2>
 
 			<h3>Add a bonus</h3>
-			<q-form class="bonus-list__add mb-3" @submit="add">
-				<q-select
-					v-if="stats.length > 1"
-					v-model="newStat"
-					:dark="$store.getters.theme === 'dark'"
-					:options="statOptions"
-					class="bonus-list__stat"
-					filled
-					square
-					dense
-					emit-value
-					map-options
-					label="For"
-				/>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					v-model="newAmount"
-					class="bonus-list__amount"
-					filled
-					square
-					dense
-					type="number"
-					label="Value"
-				/>
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					v-model="newLabel"
-					class="bonus-list__label"
-					filled
-					square
-					dense
-					maxlength="50"
-					label="Label"
-					placeholder="Manual"
-				/>
-				<button type="submit" class="btn btn-sm" :disabled="!parseInt(newAmount)">
-					<i aria-hidden="true" class="fas fa-plus" /> Add
-				</button>
-			</q-form>
+			<BonusAddForm :stats="stats" class="mb-3" @add="add" />
 
 			<div v-for="section in sections" :key="section.stat" class="stat-section">
 				<div
@@ -96,37 +58,11 @@
 					</template>
 
 					<h3>Manual bonuses</h3>
-					<ul v-if="section.manual.length" class="bonus-list">
-						<li v-for="bonus in section.manual" :key="bonus.id">
-							<q-input
-								:dark="$store.getters.theme === 'dark'"
-								:value="bonus.value"
-								class="bonus-list__amount"
-								filled
-								square
-								dense
-								type="number"
-								label="Value"
-								@change="update(section.stat, bonus, { amount: $event.target.value })"
-							/>
-							<q-input
-								:dark="$store.getters.theme === 'dark'"
-								:value="bonus.label"
-								class="bonus-list__label"
-								filled
-								square
-								dense
-								maxlength="50"
-								label="Label"
-								@change="update(section.stat, bonus, { label: $event.target.value })"
-							/>
-							<button class="btn btn-sm bg-neutral-5" @click="remove(section.stat, bonus)">
-								<i aria-hidden="true" class="fas fa-trash-alt red" />
-								<q-tooltip anchor="top middle" self="center middle">Remove</q-tooltip>
-							</button>
-						</li>
-					</ul>
-					<p v-else class="neutral-2">No manual bonuses.</p>
+					<ManualBonusRows
+						:bonuses="section.manual"
+						@update="update(section.stat, $event)"
+						@remove="remove(section.stat, $event)"
+					/>
 				</div>
 			</div>
 
@@ -138,6 +74,8 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
+import BonusAddForm from "src/components/bonuses/BonusAddForm.vue";
+import ManualBonusRows from "src/components/bonuses/ManualBonusRows.vue";
 import { BONUS_LABELS, skillBonusKey } from "src/utils/entityFunctions";
 import { calc_mod, calc_skill_mod } from "src/utils/generalFunctions";
 import { abilities, skills } from "src/utils/generalConstants";
@@ -159,13 +97,12 @@ export default {
 	name: "StatBonuses",
 	components: {
 		BasicEntity,
+		BonusAddForm,
+		ManualBonusRows,
 	},
 	props: ["data"],
 	data() {
 		return {
-			newStat: undefined,
-			newAmount: undefined,
-			newLabel: undefined,
 			open: {},
 		};
 	},
@@ -177,9 +114,6 @@ export default {
 		title() {
 			return this.stats.length === 1 ? `${this.label(this.stats[0])} bonuses` : "Bonuses";
 		},
-		statOptions() {
-			return this.stats.map((stat) => ({ label: this.label(stat), value: stat }));
-		},
 		entity() {
 			return this.entities[this.data?.entityKey];
 		},
@@ -188,14 +122,6 @@ export default {
 		},
 		sections() {
 			return this.stats.map((stat) => this.section(stat));
-		},
-	},
-	watch: {
-		stats: {
-			handler(stats) {
-				this.newStat = stats[0];
-			},
-			immediate: true,
 		},
 	},
 	methods: {
@@ -316,23 +242,15 @@ export default {
 		toggle(section) {
 			this.$set(this.open, section.stat, !this.isOpen(section));
 		},
-		update(stat, bonus, { amount = bonus.value, label = bonus.label }) {
+		update(stat, { bonus, amount, label }) {
 			this.set_bonus({ key: this.data.entityKey, stat, id: bonus.id, amount, label });
 		},
 		remove(stat, bonus) {
 			this.remove_bonus({ key: this.data.entityKey, stat, id: bonus.id });
 		},
-		async add() {
-			if (!parseInt(this.newAmount) || !this.newStat) return;
-			await this.set_bonus({
-				key: this.data.entityKey,
-				stat: this.newStat,
-				amount: this.newAmount,
-				label: this.newLabel,
-			});
-			this.$set(this.open, this.newStat, true);
-			this.newAmount = undefined;
-			this.newLabel = undefined;
+		async add({ stat, amount, label }) {
+			await this.set_bonus({ key: this.data.entityKey, stat, amount, label });
+			this.$set(this.open, stat, true);
 		},
 		openEffect(effectKey) {
 			this.setDrawer({
@@ -410,24 +328,6 @@ h3 {
 	&__value {
 		min-width: 40px;
 		font-weight: bold;
-	}
-	&__amount {
-		width: 80px;
-		flex-shrink: 0;
-	}
-	&__label {
-		flex-grow: 1;
-		min-width: 0;
-	}
-	&__stat {
-		width: 150px;
-		flex-shrink: 0;
-	}
-	&__add {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 5px;
 	}
 }
 </style>

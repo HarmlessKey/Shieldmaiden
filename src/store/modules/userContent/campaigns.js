@@ -2,6 +2,28 @@ import Vue from "vue";
 import { campaignServices } from "src/services/campaigns";
 import { encounterServices } from "src/services/encounters";
 import _ from "lodash";
+import {
+	alsoHealAmount,
+	applyNotices,
+	buildEffectInstance,
+	cascadeTargets,
+	concentrationSaveDc,
+	damageResult,
+	effectiveDefenses,
+	effectiveStats,
+	effectLabel,
+	formulaVars,
+	generateEffectKey,
+	healingReceivedCap,
+	healingResult,
+	hpAfterEffects,
+	isConcentrationSave,
+	isSrdCondition,
+	removeNotices,
+	tempHpToLose,
+} from "src/utils/effectFunctions";
+import { calculateManualDamage } from "src/utils/combatFunctions";
+import { campaignEntities, manualBonuses, manualBonusTotal } from "src/utils/entityFunctions";
 
 // Converts a full campaign to a search_campaign
 const convert_campaign = (campaign) => {
@@ -626,6 +648,439 @@ const campaign_actions = {
 	},
 
 	/**
+	 * Carries out a Concentration plan for a campaign player outside an encounter (effects 8),
+	 * as the encounter's concentrate_on does: share or link returns the existing key, replace
+	 * removes it (and what's linked to it) first, start applies a new Concentration on the caster
+	 *
+	 * @returns {string|undefined} Key of the Concentration to link to
+	 */
+	async campaign_concentrate_on(
+		{ dispatch },
+		{ campaignId, casterKey, casterName, plan, concentrationFor, duration = {}, context }
+	) {
+		if (["share", "link"].includes(plan.action)) return plan.key;
+		if (plan.action === "replace") {
+			await dispatch("remove_campaign_effect", { campaignId, playerId: casterKey, effectKey: plan.key, context });
+		}
+		const definition = { name: "Concentration" };
+		const upTo = duration.value
+			? { type: "time", value: duration.value, unit: duration.unit || "round" }
+			: { type: "cancelled" };
+		const result = await dispatch("apply_campaign_effect", {
+			campaignId,
+			playerId: casterKey,
+			entry: { source: "srd", sourceKey: "concentration", name: "Concentration" },
+			definition,
+			application: { duration: upTo },
+			casterKey,
+			casterName,
+			concentrationFor,
+			context,
+		});
+		return result?.key;
+	},
+
+	/**
+	 * Sets a campaign player's current hit points after its effects changed (effects 8): healed
+	 * by `heal` and kept within its effective maximum, with the tracker's calculation
+	 * (hpAfterEffects)
+	 *
+	 * @param {object} context { basePlayers, definitionOf } from the screen
+	 */
+	async sync_campaign_player_hp({ state, rootGetters, dispatch }, { campaignId, playerId, heal = 0, context }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid || !context) return;
+		const entities = campaignEntities(state.cached_campaigns[uid]?.[campaignId]?.players, context.basePlayers);
+		const newHp = hpAfterEffects({
+			entity: entities[playerId],
+			holderKey: playerId,
+			entities,
+			definitionOf: context.definitionOf,
+			heal,
+		});
+		if (newHp !== undefined) {
+			await dispatch("update_campaign_entity", {
+				uid,
+				campaignId,
+				type: "players",
+				id: playerId,
+				property: "curHp",
+				value: newHp,
+			});
+		}
+	},
+
+	/**
+	 * Saves a campaign player's manual bonuses outside an encounter (effects 8), as the tracker's
+	 * save_bonuses: the old single-value bonuses are removed, a raised maximum heals by as much
+	 * and hit points stay within the maximum
+	 *
+	 * @param {object} bonuses { <stat>: { <id>: { value, label } } } (withBonus / withoutBonus)
+	 * @param {object} context { basePlayers, definitionOf } from the screen
+	 */
+	async save_campaign_bonuses({ state, rootGetters, dispatch }, { campaignId, playerId, bonuses, context }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		const player = state.cached_campaigns[uid]?.[campaignId]?.players?.[playerId];
+		if (!uid || !player) return;
+		const cleaned = manualBonuses({ bonuses });
+		const raised = manualBonusTotal({ bonuses: cleaned }, "max_hp") - manualBonusTotal(player, "max_hp");
+		for (const [property, value] of [
+			["bonuses", Object.keys(cleaned).length ? cleaned : null],
+			["ac_bonus", null],
+			["maxHpMod", null],
+		]) {
+			await dispatch("update_campaign_entity", { uid, campaignId, type: "players", id: playerId, property, value });
+		}
+		// A transformed player's hit points are the beast's
+		if (!player.transformed) {
+			await dispatch("sync_campaign_player_hp", { campaignId, playerId, heal: Math.max(0, raised), context });
+		}
+	},
+
+	/**
+	 * Sets the level of a campaign player's leveled effect (Exhaustion) outside an encounter
+	 * (effects 8), keeping its hit points within the maximum
+	 *
+	 * @returns {string[]} Notices (a death outcome at this level)
+	 */
+	async set_campaign_effect_level(
+		{ state, rootGetters, dispatch },
+		{ campaignId, playerId, effectKey, level, context }
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid) return [];
+		await dispatch("set_campaign_entity_effect_prop", {
+			campaignId,
+			type: "players",
+			id: playerId,
+			effectKey,
+			property: "level",
+			value: level,
+		});
+		await dispatch("sync_campaign_player_hp", { campaignId, playerId, context });
+		const instance = state.cached_campaigns[uid]?.[campaignId]?.players?.[playerId]?.effects?.[effectKey];
+		if (!instance || !context) return [];
+		const holderName = context.basePlayers?.[playerId]?.character_name;
+		return applyNotices({ instance, definition: context.definitionOf(instance), holderName }).filter((notice) =>
+			notice.includes("dies")
+		);
+	},
+
+	/**
+	 * Applies an effect to a campaign player outside an encounter (effects 8): written to the
+	 * campaign, so it carries into the next encounter. As in an encounter: an immune player
+	 * doesn't get a condition, Exhaustion updates its level, and a Concentration plan from the
+	 * apply form starts, shares, links or replaces the caster player's Concentration.
+	 *
+	 * @param {string} campaignId
+	 * @param {string} playerId
+	 * @param {string[]} immunities The player's condition immunities
+	 * @param {object} entry { source, sourceKey, name } of the effect
+	 * @param {object} definition Its definition
+	 * @param {object} application The apply form's application (duration, choices, level, concentration plan)
+	 * @param {string} casterKey A campaign player's id, or none
+	 * @param {string} casterName
+	 * @param {object} concentrationFor For a Concentration instance: what it's for
+	 * @param {object} context { basePlayers, definitionOf } from the screen: with it, the player's
+	 *   hit points change as in the tracker (also_heal, within the maximum), a new immunity ends
+	 *   the conditions it covers, and what needs a roll or choice comes back as notices
+	 * @returns {{ key?: string, immune?: boolean, notices: string[] }}
+	 */
+	async apply_campaign_effect(
+		{ state, rootGetters, dispatch },
+		{
+			campaignId,
+			playerId,
+			immunities = [],
+			entry,
+			definition = {},
+			application = {},
+			casterKey,
+			casterName,
+			concentrationFor,
+			context,
+		}
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid) return { notices: [] };
+		const players = state.cached_campaigns[uid]?.[campaignId]?.players || {};
+		const isCondition = isSrdCondition(entry.source, entry.sourceKey);
+		if (isCondition && immunities.includes(entry.sourceKey)) return { immune: true, notices: [] };
+
+		const { concentration: plan, caster_key, ...rest } = application;
+		let concentration_id = rest.concentration_id;
+		if (casterKey && plan && plan.action !== "none") {
+			concentration_id = await dispatch("campaign_concentrate_on", {
+				campaignId,
+				casterKey,
+				casterName,
+				plan,
+				concentrationFor: { source: entry.source, source_key: entry.sourceKey, name: entry.name },
+				duration: rest.duration,
+				context,
+			});
+			if (!concentration_id) return { notices: [] };
+		}
+
+		// A condition the player has already isn't added twice; Exhaustion takes the new level
+		const effects = players[playerId]?.effects || {};
+		const existingKey = Object.keys(effects).find(
+			(key) => effects[key].source === entry.source && effects[key].source_key === entry.sourceKey
+		);
+		if (isCondition && existingKey) {
+			let notices = [];
+			if (entry.sourceKey === "exhaustion" && rest.level) {
+				notices = await dispatch("set_campaign_effect_level", {
+					campaignId,
+					playerId,
+					effectKey: existingKey,
+					level: rest.level,
+					context,
+				});
+			}
+			return { key: existingKey, notices };
+		}
+
+		const instance = buildEffectInstance({
+			definition: { ...definition, name: entry.name || definition.name },
+			source: entry.source,
+			sourceKey: entry.sourceKey,
+			application: { ...rest, concentration_id },
+			round: 0,
+			casterKey,
+			casterName,
+			concentrationFor,
+		});
+		const effectKey = generateEffectKey(Object.keys(effects));
+		await dispatch("set_campaign_entity_effect", {
+			campaignId,
+			type: "players",
+			id: playerId,
+			effectKey,
+			value: instance,
+		});
+		if (!context) return { key: effectKey, notices: [] };
+
+		// As in the tracker's apply_effect: also_heal (Aid), within the maximum
+		const entities = campaignEntities(players, context.basePlayers);
+		const heal = alsoHealAmount({
+			instance,
+			definition,
+			vars: { self: formulaVars(entities[playerId]), caster: formulaVars(entities[casterKey]) },
+		});
+		await dispatch("sync_campaign_player_hp", { campaignId, playerId, heal, context });
+
+		// An immunity it just gained ends the conditions it covers (Heroism: Frightened)
+		const holderName = context.basePlayers?.[playerId]?.character_name;
+		const notices = [];
+		const updated = campaignEntities(players, context.basePlayers)[playerId];
+		const { condition_immunities = [] } = effectiveDefenses({
+			entity: updated,
+			holderKey: playerId,
+			entities: campaignEntities(players, context.basePlayers),
+			definitionOf: context.definitionOf,
+		});
+		for (const [key, other] of Object.entries(updated?.effects || {})) {
+			if (key === effectKey || !isSrdCondition(other.source, other.source_key)) continue;
+			if (!condition_immunities.includes(other.source_key)) continue;
+			notices.push(...(await dispatch("remove_campaign_effect", { campaignId, playerId, effectKey: key, context })));
+			notices.push(`${other.name}: ${holderName} is now immune, so it ended`);
+		}
+		notices.push(...applyNotices({ instance, definition, holderName }));
+		return { key: effectKey, notices };
+	},
+
+	/**
+	 * Removes an effect from a campaign player outside an encounter (effects 8), with the
+	 * effects that end with it: linked to it as Concentration, or its children (cascadeTargets).
+	 * With `context`, as in the tracker: temporary hit points it granted are lost, and hit points
+	 * stay within the maximum; its "when it ends" sub-effects come back as notices.
+	 *
+	 * @returns {string[]} Notices
+	 */
+	async remove_campaign_effect({ state, rootGetters, dispatch }, { campaignId, playerId, effectKey, context }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid) return [];
+		const players = state.cached_campaigns[uid]?.[campaignId]?.players || {};
+		const instance = players[playerId]?.effects?.[effectKey];
+		if (!instance) return [];
+		const linked = cascadeTargets({ holderKey: playerId, effectKey, instance, entities: players });
+		const definition = context?.definitionOf?.(instance);
+		const notices = context ? removeNotices({ instance, definition }) : [];
+		const lose = tempHpToLose({ instance, tempHp: players[playerId]?.tempHp });
+
+		await dispatch("set_campaign_entity_effect", {
+			campaignId,
+			type: "players",
+			id: playerId,
+			effectKey,
+			value: null,
+		});
+		if (lose > 0) {
+			await dispatch("update_campaign_entity", {
+				uid,
+				campaignId,
+				type: "players",
+				id: playerId,
+				property: "tempHp",
+				// No temporary hit points left: removed, as the tracker's set_hp does
+				value: null,
+			});
+			const name = definition ? effectLabel(definition, instance) : instance.name;
+			notices.push(`${name}: ${context?.basePlayers?.[playerId]?.character_name || "The player"} loses ${lose} temporary hit points`);
+		}
+		await dispatch("sync_campaign_player_hp", { campaignId, playerId, context });
+		for (const { holderKey, effectKey: linkedKey } of linked) {
+			notices.push(
+				...(await dispatch("remove_campaign_effect", { campaignId, playerId: holderKey, effectKey: linkedKey, context }))
+			);
+		}
+		return notices;
+	},
+
+	/**
+	 * Manual damage to a campaign player outside an encounter (effects 8), with the tracker's
+	 * calculations: its defenses as changed by its effects (calculateManualDamage), then
+	 * temporary hit points, the transformed pool and hit points (damageResult)
+	 *
+	 * @param {number} amount
+	 * @param {string} damageType
+	 * @param {boolean} magical
+	 * @param {object} context { basePlayers, definitionOf }
+	 * @returns {object} { notices: string[] (defenses, 0 hit points, death, Concentration lost),
+	 *   prompts: the tracker's concentration_save prompts, for the screen to show }
+	 */
+	async campaign_player_damage(
+		{ state, rootGetters, dispatch },
+		{ campaignId, playerId, amount, damageType, magical, context }
+	) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid || !context) return { notices: [], prompts: [] };
+		const entities = campaignEntities(state.cached_campaigns[uid]?.[campaignId]?.players, context.basePlayers);
+		const entity = entities[playerId];
+		if (!entity) return { notices: [], prompts: [] };
+		const args = { entity, holderKey: playerId, entities, definitionOf: context.definitionOf };
+		const defended = { ...entity, ...effectiveDefenses(args) };
+		const damage = calculateManualDamage({ value: parseInt(amount) || 0, type: damageType, magical }, defended);
+		const maxHp = parseInt(effectiveStats(args).values.maxHp ?? entity.maxHp);
+		const result = damageResult({
+			amount: damage,
+			curHp: entity.curHp,
+			tempHp: entity.tempHp,
+			transformed: !!entity.transformed,
+			transformedCurHp: entity.transformed?.curHp,
+			maxHp,
+		});
+
+		const write = (property, value) =>
+			dispatch("update_campaign_entity", { uid, campaignId, type: "players", id: playerId, property, value });
+		if (result.tempHp !== undefined) await write("tempHp", result.tempHp || null);
+		if (result.transformedCurHp !== undefined) {
+			await dispatch("update_transformed_entity", {
+				uid,
+				campaignId,
+				type: "players",
+				id: playerId,
+				property: "curHp",
+				value: Math.max(0, result.transformedCurHp),
+			});
+		}
+		if (result.curHp !== undefined) await write("curHp", result.curHp);
+
+		const name = entity.name;
+		const notices = [];
+		if (damage !== (parseInt(amount) || 0)) notices.push(`${name} takes ${damage} damage after defenses`);
+		if (result.dies) {
+			await write("dead", true);
+			notices.push(`${name} dies: the damage left over is at least their maximum hit points`);
+		} else if (result.atZero && parseInt(entity.curHp) > 0) {
+			notices.push(`${name} drops to 0 hit points`);
+		}
+		// Concentration, as the tracker's fire_trigger: a save prompt with the DC from the damage,
+		// or, dropping to 0 hit points, it ends without a save
+		const prompts = [];
+		if (result.taken > 0) {
+			const dropsToZero = result.atZero && parseInt(entity.curHp) > 0;
+			for (const [effectKey, instance] of Object.entries(entity.effects || {})) {
+				const definition = context.definitionOf(instance);
+				const sub_effect = (definition?.sub_effects || []).find(isConcentrationSave);
+				if (!sub_effect) continue;
+				const effectName = effectLabel(definition, instance).capitalize();
+				if (dropsToZero) {
+					const removed = await dispatch("remove_campaign_effect", {
+						campaignId,
+						playerId,
+						effectKey,
+						context,
+					});
+					notices.push(`${name} loses ${effectName}: dropped to 0 hit points`, ...(removed || []));
+					continue;
+				}
+				const { ability, dc } = concentrationSaveDc(sub_effect, damage);
+				prompts.push({
+					kind: "concentration_save",
+					holderKey: playerId,
+					effectKey,
+					holderName: name,
+					effectName,
+					instance,
+					ability,
+					dc,
+					damage,
+					dcText: sub_effect.description,
+				});
+			}
+		}
+		return { notices, prompts };
+	},
+
+	/**
+	 * Manual healing of a campaign player outside an encounter (effects 8), with the tracker's
+	 * calculations: limited by its effects (healingReceivedCap), capped at its effective maximum
+	 * (healingResult); healing from 0 resets its death saves
+	 *
+	 * @returns {string[]} Notices (limited healing)
+	 */
+	async campaign_player_heal({ state, rootGetters, dispatch }, { campaignId, playerId, amount, context }) {
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		if (!uid || !context) return [];
+		const entities = campaignEntities(state.cached_campaigns[uid]?.[campaignId]?.players, context.basePlayers);
+		const entity = entities[playerId];
+		if (!entity) return [];
+		const args = { entity, holderKey: playerId, entities, definitionOf: context.definitionOf };
+		const notices = [];
+		let heal = parseInt(amount) || 0;
+		const limit = healingReceivedCap(args);
+		if (limit?.cap !== undefined && heal > limit.cap) {
+			notices.push(`${entity.name} ${limit.cap ? "regains less" : "can't regain hit points"}: ${limit.names.join(", ")}`);
+			heal = limit.cap;
+		}
+		const write = (property, value) =>
+			dispatch("update_campaign_entity", { uid, campaignId, type: "players", id: playerId, property, value });
+		if (entity.transformed) {
+			const result = healingResult({ amount: heal, curHp: entity.transformed.curHp, maxHp: entity.transformed.maxHp });
+			await dispatch("update_transformed_entity", {
+				uid,
+				campaignId,
+				type: "players",
+				id: playerId,
+				property: "curHp",
+				value: result.curHp,
+			});
+			return notices;
+		}
+		const maxHp = parseInt(effectiveStats(args).values.maxHp ?? entity.maxHp);
+		const result = healingResult({ amount: heal, curHp: entity.curHp, maxHp });
+		// Healing from 0 resets the death saves, as in the tracker
+		if (parseInt(entity.curHp) === 0 && result.curHp > 0) {
+			await write("saves", null);
+			await write("dead", null);
+		}
+		await write("curHp", result.curHp);
+		return notices;
+	},
+
+	/**
 	 * Updates a single property for a player or companion
 	 *
 	 * @param {string} uid
@@ -869,8 +1324,9 @@ const campaign_actions = {
 			saves: null,
 			stable: true,
 		};
+		// Awaited, so callers can read the player after it (the Edit player drawer)
 		for (const [property, value] of Object.entries(update)) {
-			dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
+			await dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
 		}
 	},
 
@@ -881,7 +1337,7 @@ const campaign_actions = {
 			dead: true,
 		};
 		for (const [property, value] of Object.entries(update)) {
-			dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
+			await dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
 		}
 	},
 
@@ -893,7 +1349,7 @@ const campaign_actions = {
 			curHp,
 		};
 		for (const [property, value] of Object.entries(update)) {
-			dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
+			await dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
 		}
 	},
 

@@ -1959,6 +1959,37 @@ export function hasReactionUsed(entity) {
 }
 
 /**
+ * Whether an entity has the SRD Surprised effect (effects 8)
+ */
+export function hasSurprised(entity) {
+	return Object.values(entity?.effects || {}).some(
+		(instance) => instance?.source === "srd" && instance.source_key === "surprised"
+	);
+}
+
+/**
+ * The SRD Surprised effect as the set initiative screen applies it (effects 8), without a
+ * caster: 5e until the end of the holder's first turn, 5.5e until removed (it's removed when
+ * combat starts, its Disadvantage only counts for the Initiative roll)
+ *
+ * @param {string} edition The campaign's edition
+ * @param {object} definition The edition's Surprised definition
+ * @param {number} round The current round (0 before combat)
+ * @returns {object} Active effect instance
+ */
+export function surprisedInstance({ edition, definition, round = 0 } = {}) {
+	const duration =
+		edition === "5e" ? { type: "next_turn", anchor: "target", edge: "end" } : { type: "cancelled" };
+	return buildEffectInstance({
+		definition: definition || { name: "Surprised" },
+		source: "srd",
+		sourceKey: "surprised",
+		application: { duration },
+		round,
+	});
+}
+
+/**
  * Whether acting uses the actor's reaction: it acts while another entity has the turn,
  * it isn't a legendary action, and it hasn't used its reaction yet
  *
@@ -2270,6 +2301,165 @@ export function alsoHealAmount({ instance = {}, definition, vars = {} }) {
 		if (!dice_count) amount += fixed_val * (sub_effect.multiplier ?? 1);
 	}
 	return Math.max(0, Math.floor(amount));
+}
+
+/**
+ * Damage to a creature's hit point pools (the tracker's isDamage, and the campaign's players
+ * outside an encounter, effects 8): temporary hit points first, then the transformed pool, then
+ * hit points. A pool the damage doesn't reach isn't in the result.
+ *
+ * @param {number} amount The damage, after defenses
+ * @param {number} curHp
+ * @param {number} tempHp
+ * @param {boolean} transformed
+ * @param {number} transformedCurHp
+ * @param {number} maxHp The effective maximum, for death by overkill
+ * @param {function} dropToOne damage => a "drop to 1 instead" match (Death Ward), or undefined
+ * @returns {{ tempHp?: number, transformedCurHp?: number, curHp?: number, taken: number,
+ *   overkill: number, atZero?: boolean, dies?: boolean, heldAtOne?: object }}
+ *   taken: damage the hit point pools took (capped at what they had); atZero: hit points at 0;
+ *   dies: overkill of at least the maximum
+ */
+export function damageResult({
+	amount,
+	curHp,
+	tempHp,
+	transformed = false,
+	transformedCurHp,
+	maxHp,
+	dropToOne,
+} = {}) {
+	amount = parseInt(amount) || 0;
+	curHp = parseInt(curHp);
+	tempHp = parseInt(tempHp);
+	const result = { taken: amount, overkill: 0 };
+	let rest = amount;
+
+	if (tempHp) {
+		const newTemp = tempHp - amount;
+		rest = newTemp < 0 ? -newTemp : 0;
+		result.tempHp = Math.max(0, newTemp);
+	}
+	if (transformed) {
+		const newTrans = parseInt(transformedCurHp) - rest;
+		rest = newTrans < 0 ? -newTrans : 0;
+		result.transformedCurHp = newTrans;
+	}
+	if (rest > 0) {
+		let newHp = curHp - rest;
+		// Drop to 1 instead of 0 (Death Ward, Undead Fortitude)
+		if (curHp > 0 && newHp <= 0 && dropToOne) {
+			const match = dropToOne(amount);
+			if (match) {
+				result.heldAtOne = match;
+				newHp = 1;
+			}
+		}
+		if (newHp <= 0) result.atZero = true;
+		if (newHp < 0) {
+			newHp = 0;
+			result.overkill = tempHp ? rest + tempHp - curHp : rest - curHp;
+			result.taken = tempHp ? curHp + tempHp : curHp;
+			if (result.overkill >= parseInt(maxHp)) result.dies = true;
+		}
+		result.curHp = newHp;
+	}
+	return result;
+}
+
+/**
+ * Healing of a creature's hit points (the tracker's isHealing, and the campaign's players
+ * outside an encounter, effects 8), capped at the maximum
+ *
+ * @param {number} amount The healing, after caps (No Healing)
+ * @param {number} curHp
+ * @param {number} maxHp The effective maximum (or the transformed pool's)
+ * @returns {{ curHp: number, healed: number, overhealing: number }}
+ */
+export function healingResult({ amount, curHp, maxHp } = {}) {
+	amount = parseInt(amount) || 0;
+	curHp = parseInt(curHp) || 0;
+	maxHp = parseInt(maxHp);
+	let newHp = curHp + amount;
+	let healed = amount;
+	let overhealing = 0;
+	if (newHp > maxHp) {
+		newHp = maxHp;
+		overhealing = amount - maxHp + curHp;
+		healed = maxHp - curHp;
+	}
+	return { curHp: newHp, healed, overhealing };
+}
+
+/**
+ * A creature's current hit points after its effects changed (effects 8, the campaign's players
+ * outside an encounter, like the tracker's apply_effect and sync_effect_hp): healed by `heal`
+ * (Aid's also_heal), and never above its effective maximum
+ *
+ * @param {object} entity The creature with its effects (curHp, maxHp, effects, bonuses)
+ * @param {string} holderKey
+ * @param {object} entities For formulas reading the caster
+ * @param {function} definitionOf instance => resolved definition
+ * @param {number} heal Hit points healed (0 to only keep it within the maximum)
+ * @returns {number|undefined} The new current hit points, undefined when they don't change
+ */
+export function hpAfterEffects({ entity, holderKey, entities = {}, definitionOf = () => undefined, heal = 0 } = {}) {
+	if (!entity) return undefined;
+	const curHp = parseInt(entity.curHp);
+	if (!Number.isFinite(curHp)) return undefined;
+	const { values } = effectiveStats({ entity, holderKey, entities, definitionOf });
+	const max = parseInt(values.maxHp ?? entity.maxHp);
+	let newHp = curHp + Math.max(0, parseInt(heal) || 0);
+	if (Number.isFinite(max)) newHp = Math.min(newHp, max);
+	newHp = Math.max(0, newHp);
+	return newHp !== curHp ? newHp : undefined;
+}
+
+/**
+ * What applying an effect outside an encounter can't do by itself, as notices for the DM
+ * (effects 8): temporary hit points it grants when applied (False Life), its "when applied"
+ * sub-effects, and a death outcome at its level (Exhaustion 6)
+ *
+ * @param {object} instance The applied instance
+ * @param {object} definition Its definition
+ * @param {string} holderName
+ * @returns {string[]}
+ */
+export function applyNotices({ instance = {}, definition, holderName } = {}) {
+	if (!definition || definition.unresolved) return [];
+	const name = effectLabel(definition, instance);
+	const level = parseInt(instance.level) || 1;
+	const atLevel = (sub_effect) =>
+		(sub_effect.min_level === undefined || level >= sub_effect.min_level) &&
+		(sub_effect.max_level === undefined || level <= sub_effect.max_level);
+	const notices = [];
+	for (const original of definition.sub_effects || []) {
+		const sub_effect = withChosenValue(original, instance);
+		if (!atLevel(sub_effect)) continue;
+		const text = sub_effect.description || describeSubEffect(sub_effect);
+		if (sub_effect.type === "fixed" && sub_effect.sub_types?.includes("temp_hp") && !sub_effect.trigger) {
+			notices.push(`${name}: ${holderName} gets temporary hit points, ${text}`);
+		} else if (normalizeTrigger(sub_effect.trigger) === "on_apply") {
+			notices.push(`${name}, when applied: ${text}`);
+		}
+	}
+	if (deathOutcome({ instance, definition })) {
+		notices.push(`${name}: ${holderName} dies at this level. Mark them dead in the next encounter.`);
+	}
+	return notices;
+}
+
+/**
+ * What removing an effect outside an encounter can't do by itself, as notices (effects 8):
+ * its sub-effects when it ends (Haste's lethargy)
+ *
+ * @returns {string[]}
+ */
+export function removeNotices({ instance = {}, definition } = {}) {
+	const name = definition ? effectLabel(definition, instance) : instance.name || "";
+	return onExpireSubEffects({ instance, definition }).map(
+		(sub_effect) => `${name}, when it ends: ${sub_effect.description || describeSubEffect(sub_effect)}`
+	);
 }
 
 /**

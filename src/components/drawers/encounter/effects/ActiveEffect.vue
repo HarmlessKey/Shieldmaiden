@@ -1,6 +1,7 @@
 <template>
 	<div class="pb-5">
-		<BasicEntity v-if="entity" :entity="entity" />
+		<BasicEntity v-if="entity && !campaign" :entity="entity" />
+		<h3 v-else-if="campaign" class="mb-0">{{ campaign.playerName }}</h3>
 		<template v-if="instance">
 			<h2 class="mt-3">
 				<i v-if="icon" aria-hidden="true" :class="`hki-${icon}`" />
@@ -13,7 +14,7 @@
 				<dd>{{ duration }}</dd>
 				<template v-if="instance.applied_round !== undefined">
 					<dt>Applied</dt>
-					<dd>{{ instance.applied_round ? `Round ${instance.applied_round}` : "Before combat" }}</dd>
+					<dd>{{ appliedText }}</dd>
 				</template>
 				<template v-if="instance.caster_key || instance.caster_name">
 					<dt>Caster</dt>
@@ -34,7 +35,8 @@
 				</template>
 			</dl>
 
-			<div v-if="escape" class="escape mb-3">
+			<!-- Escapes are rolled in an encounter, not on the campaign screen -->
+			<div v-if="escape && !campaign" class="escape mb-3">
 				<strong>Escape</strong>
 				<div class="neutral-2 mb-2">{{ escapeText }}</div>
 				<div class="escape__actions">
@@ -93,8 +95,9 @@ import { startCase } from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
-import { describeDuration, isSrdCondition } from "src/utils/effectFunctions";
+import { describeDuration, findSrdDefinition, isSrdCondition } from "src/utils/effectFunctions";
 import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
+import { showNotices } from "src/utils/generalFunctions";
 import { effectRolls } from "src/mixins/effectRolls";
 
 const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
@@ -124,18 +127,54 @@ export default {
 		EffectDetails,
 	},
 	mixins: [effectRolls],
-	// { entityKey, effectKey }
+	// { entityKey, effectKey } in the tracker, or { campaign, effectKey } for a campaign
+	// player's effect outside an encounter (effects 8):
+	// campaign: { campaignId, playerId, playerName, names (players' names by id), edition,
+	// context ({ basePlayers, definitionOf } for the campaign's actions) }
 	props: ["data"],
+	data() {
+		return {
+			// A campaign player's custom effect definition, false when not found
+			customDefinition: undefined,
+		};
+	},
 	computed: {
-		...mapGetters(["entities", "edition", "effect_definition"]),
+		...mapGetters({ entities: "entities", encounterEdition: "edition", effect_definition: "effect_definition" }),
+		campaign() {
+			return this.data?.campaign;
+		},
+		edition() {
+			return this.campaign ? this.campaign.edition : this.encounterEdition;
+		},
 		entity() {
+			if (this.campaign) {
+				const uid = this.$store.getters.user?.uid;
+				const player =
+					this.$store.state.campaigns.cached_campaigns[uid]?.[this.campaign.campaignId]?.players?.[
+						this.campaign.playerId
+					];
+				return player ? { ...player, key: this.campaign.playerId, name: this.campaign.playerName } : undefined;
+			}
 			return this.entities[this.data.entityKey];
 		},
 		instance() {
 			return this.entity?.effects?.[this.data.effectKey];
 		},
 		definition() {
-			return this.instance ? this.effect_definition(this.instance) : undefined;
+			if (!this.instance) return undefined;
+			if (!this.campaign) return this.effect_definition(this.instance);
+			if (this.instance.source === "srd") {
+				const other = this.edition === "5e" ? "5.5e" : "5e";
+				return (
+					findSrdDefinition(this.edition, this.instance.source_key) ||
+					findSrdDefinition(other, this.instance.source_key)
+				);
+			}
+			return this.customDefinition || undefined;
+		},
+		appliedText() {
+			if (this.instance.applied_round) return `Round ${this.instance.applied_round}`;
+			return this.campaign ? "Outside an encounter" : "Before combat";
 		},
 		name() {
 			return (this.definition?.name || this.instance.name || "").capitalize();
@@ -152,10 +191,15 @@ export default {
 			return EXHAUSTION_LEVELS[this.edition === "5.5e" ? "5.5e" : "5e"];
 		},
 		caster() {
+			if (this.campaign) {
+				const name = this.campaign.names?.[this.instance.caster_key];
+				return name ? { name } : undefined;
+			}
 			return this.entities[this.instance.caster_key];
 		},
 		casterLabel() {
 			if (this.caster) return this.caster.name;
+			if (this.campaign) return this.instance.caster_name || "Not in this campaign";
 			return this.instance.caster_name
 				? `${this.instance.caster_name} (not in this encounter)`
 				: "Not in this encounter";
@@ -236,15 +280,64 @@ export default {
 			if (!this.instance) this.setDrawer({ show: false });
 		},
 		async setLevel(level) {
+			if (this.campaign) {
+				this.notify(
+					await this.$store.dispatch("campaigns/set_campaign_effect_level", {
+						campaignId: this.campaign.campaignId,
+						playerId: this.campaign.playerId,
+						effectKey: this.data.effectKey,
+						level,
+						context: this.campaign.context,
+					})
+				);
+				return;
+			}
 			await this.apply_effect({
 				key: this.data.entityKey,
 				instance: { ...this.instance, level },
 			});
 		},
 		async remove() {
-			await this.remove_effect({ key: this.data.entityKey, effectKey: this.data.effectKey });
+			if (this.campaign) {
+				this.notify(
+					await this.$store.dispatch("campaigns/remove_campaign_effect", {
+						campaignId: this.campaign.campaignId,
+						playerId: this.campaign.playerId,
+						effectKey: this.data.effectKey,
+						context: this.campaign.context,
+					})
+				);
+			} else {
+				await this.remove_effect({ key: this.data.entityKey, effectKey: this.data.effectKey });
+			}
 			if (!this.instance) this.setDrawer({ show: false });
 		},
+		/**
+		 * The campaign actions' notices: what the tracker would prompt for (effects 8)
+		 */
+		notify(notices) {
+			showNotices(this.$q, notices);
+		},
+		/**
+		 * A campaign player's custom effect definition, loaded once (the tracker's are resolved
+		 * when the encounter loads)
+		 */
+		async loadCustomDefinition() {
+			const uid = this.$store.getters.user?.uid;
+			if (!this.campaign || this.instance?.source !== "custom" || !uid) return;
+			try {
+				const definition = await this.$store.dispatch("effects/get_effect", {
+					uid,
+					id: this.instance.source_key,
+				});
+				this.customDefinition = definition || false;
+			} catch (error) {
+				this.customDefinition = false;
+			}
+		},
+	},
+	mounted() {
+		this.loadCustomDefinition();
 	},
 };
 </script>

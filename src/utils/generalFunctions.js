@@ -90,6 +90,19 @@ export function hasRolls(ability) {
 }
 
 /**
+ * Shows the notices of the campaign's effect and hit point actions (effects 8): what the
+ * tracker would prompt for, like a roll for temporary hit points or a Concentration save
+ *
+ * @param {object} $q Quasar ($q of a component)
+ * @param {string[]} notices
+ */
+export function showNotices($q, notices = []) {
+	for (const message of notices || []) {
+		$q.notify({ message, type: "warning", position: "top", timeout: 6000 });
+	}
+}
+
+/**
  * The action-list entries of an ability to show in its caption (the tracker's action list and
  * the entity card): every entry, except entries of type other without rolls
  *

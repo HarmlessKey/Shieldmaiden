@@ -12,7 +12,8 @@ removes the resulting active effect instances on the targeted entities.
 
 The tracker SHALL offer an "Effects" option wherever the Conditions and Reminders options
 are offered for targeted entities (the targeted-entity options bar with a keyboard
-shortcut, the per-entity target menu, and the mobile menu). Choosing it SHALL open the
+shortcut, the per-entity target menu, and the mobile menu), and so SHALL the set initiative
+screen's Overview header for the entities targeted there. Choosing it SHALL open the
 Effects drawer for the targeted entities, or for the entity keys passed to the drawer when
 opened from a single entity's menu. The drawer SHALL list its targets at the top. With no
 targets it SHALL show a prompt to select one or more targets and SHALL NOT offer apply
@@ -39,6 +40,10 @@ SHALL be no separate legacy Conditions drawer.
 #### Scenario: Conditions from an entity's menu
 - **WHEN** the DM chooses Conditions from one entity's target menu or from the mobile menu
 - **THEN** the Effects drawer opens in conditions mode with only that entity as target
+
+#### Scenario: From the set initiative screen
+- **WHEN** the DM targets two entities in the set initiative screen's Overview and chooses Effects in its header
+- **THEN** the Effects drawer opens listing both entities as targets
 
 ### Requirement: Effects are listed by source and campaign edition
 

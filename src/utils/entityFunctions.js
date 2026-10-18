@@ -124,23 +124,70 @@ export function manualBonusTotal(data, key) {
 }
 
 /**
- * Manual bonuses of saved entity data with the "Manual" bonus of one value set; 0 or empty
- * removes it. Old single-value bonuses are converted. Values without bonuses are left out.
+ * Manual bonuses of saved entity data with one bonus added or changed. Old single-value
+ * bonuses are converted. The tracker's set_bonus and the campaign's drawers use it.
  *
  * @param {object} data Entity data, see manualBonuses
- * @param {string} key Value key, e.g. "ac"
+ * @param {string} stat Value key (BONUS_VALUES), e.g. "ac"
+ * @param {string} id Bonus id; a new one is generated when left out
  * @param {number} amount
+ * @param {string} label Defaults to "Manual", at most 50 characters
+ * @returns {object} New bonuses object, for saving as `bonuses`
+ */
+export function withBonus(data, stat, { id, amount, label } = {}) {
+	const bonuses = JSON.parse(JSON.stringify(manualBonuses(data)));
+	const list = bonuses[stat] || {};
+	let bonusId = id;
+	if (!bonusId) {
+		// The same format as the effects' keys (generateEffectKey, not imported: it imports this file)
+		const existing = Object.values(bonuses).flatMap((entries) => Object.keys(entries));
+		do {
+			bonusId = `eff_${Math.random().toString(36).slice(2, 6).padEnd(4, "0")}`;
+		} while (existing.includes(bonusId));
+	}
+	list[bonusId] = {
+		value: parseInt(amount) || 0,
+		label: (label || "").trim().slice(0, 50) || "Manual",
+	};
+	bonuses[stat] = list;
+	return bonuses;
+}
+
+/**
+ * Manual bonuses of saved entity data with one bonus removed. Old single-value bonuses are
+ * converted. Values without bonuses are left out.
+ *
+ * @param {object} data Entity data, see manualBonuses
+ * @param {string} stat Value key
+ * @param {string} id Bonus id
  * @returns {object} New bonuses object, for saving as `bonuses` (empty: save null)
  */
-export function withManualBonus(data, key, amount) {
+export function withoutBonus(data, stat, id) {
 	const bonuses = JSON.parse(JSON.stringify(manualBonuses(data)));
-	const list = bonuses[key] || {};
-	const value = parseInt(amount);
-	if (value) list[MANUAL_BONUS_ID] = { value, label: "Manual" };
-	else delete list[MANUAL_BONUS_ID];
-	if (Object.keys(list).length) bonuses[key] = list;
-	else delete bonuses[key];
+	if (bonuses[stat]) {
+		delete bonuses[stat][id];
+		if (!Object.keys(bonuses[stat]).length) delete bonuses[stat];
+	}
 	return bonuses;
+}
+
+/**
+ * The campaign's players as creatures for effect calculations (effects 8): each player's own
+ * data with its campaign data (curHp, bonuses, effects) on top
+ *
+ * @param {object} players The campaign's players { [id]: campaign data }
+ * @param {object} basePlayers The players' own data { [id]: player }
+ * @returns {object} { [id]: creature }, only players with their own data
+ */
+export function campaignEntities(players = {}, basePlayers = {}) {
+	return Object.fromEntries(
+		Object.entries(players || {})
+			.filter(([id]) => basePlayers[id])
+			.map(([id, player]) => [
+				id,
+				{ ...basePlayers[id], ...player, key: id, name: basePlayers[id].character_name },
+			])
+	);
 }
 
 /**

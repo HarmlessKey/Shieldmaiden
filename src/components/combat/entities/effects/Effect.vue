@@ -38,6 +38,12 @@ export default {
 			type: Object,
 			required: true,
 		},
+		// effect chip => the ActiveEffect drawer's data, instead of { entityKey, effectKey } in the
+		// tracker (the campaign's player effects, effects 8)
+		effectDrawerData: {
+			type: Function,
+			default: undefined,
+		},
 		// No drawer on click (live view)
 		readonly: {
 			type: Boolean,
@@ -52,10 +58,12 @@ export default {
 				this.setDrawer({
 					show: true,
 					type: "drawers/encounter/effects/ActiveEffect",
-					data: {
-						entityKey: this.effect.entityKey,
-						effectKey: this.effect.effectKey,
-					},
+					data: this.effectDrawerData
+						? this.effectDrawerData(this.effect)
+						: {
+								entityKey: this.effect.entityKey,
+								effectKey: this.effect.effectKey,
+						  },
 				});
 				return;
 			}

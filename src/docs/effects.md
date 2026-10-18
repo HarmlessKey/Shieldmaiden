@@ -120,11 +120,56 @@ What a linked effect already defines (duration, save, choices) is filled in for 
 
 ### Before combat
 
-Effects can also be applied on the **Set initiative** screen, before the first round: the
-**Overview** header has the same actions as the header of the targeted creatures (conditions,
-reminders, effects, transform, hide and show, edit). Use it for creatures that start the fight
-invisible, or under a spell cast before combat. Durations start counting when the first turn
-starts.
+Effects can also be applied on the **Set initiative** screen, before the first round. Click a
+creature in the **Overview** to target it (shift+click for more); the Overview header then has
+the same actions as the Targeted header in combat: Conditions, Reminders, Effects, Transform,
+Hide / Show, Edit and Untarget, with the same shortcuts. Out of turn damage isn't offered
+before combat. Use it for creatures that start the fight invisible, or under a spell cast
+before combat. Durations start counting when the first turn starts, and the targets stay
+targeted when combat starts.
+
+**Set surprised** (or **S**) gives a creature the **Surprised** effect of your campaign's
+edition, with the surprised icon on its avatar:
+
+- **5e**: it can't move or take an action on its first turn, and can't take a reaction until
+  that turn ends. It ends at the end of its first turn.
+- **5.5e**: Disadvantage on its Initiative roll. It's removed when combat starts.
+
+**Remove surprised** removes it. Encounters saved with the old surprised reminder get the
+effect instead when you open them.
+
+### Between encounters
+
+On the **run campaign** screen, each player shows its effects as chips after its name: the ones
+it carries from the last encounter, like Exhaustion, and the ones you apply there. Click a chip
+for its details and **Remove**. A player's AC and maximum hit points include what its effects
+and manual bonuses change, marked green or red, with a tooltip listing them.
+
+Effects change hit points there as in combat: a bonus to the maximum that also heals (Aid)
+heals, current hit points never stay above the maximum, an immunity ends the conditions it
+covers, and temporary hit points an effect granted go when it ends. What would be a prompt in
+combat, like rolling temporary hit points (False Life), "when applied" or "when it ends"
+effects, or Exhaustion 6, is a notice telling you what to do.
+
+Click a player's hit points for **Damage** and **Heal**: an amount, a damage type and Magical.
+The **Edit player** drawer has the same damage and healing. Damage goes through the player's
+resistances, vulnerabilities and immunities (also from effects), then temporary hit points;
+healing stops at the maximum and follows effects that limit healing. A concentrating player
+gets the same Concentration save prompt as in combat, with the DC: **Succeeded** keeps the
+Concentration, **Failed** ends it and the effects linked to it. Dropping to 0 hit points ends
+it without a save.
+
+Manual bonuses work as in combat's bonuses drawer: in **Edit player**, add an AC or max HP
+bonus with a value and a label (like "Ring of Protection"), and change or remove each one; in
+**Group Health**, add max HP bonuses for the selected players. Click a player's AC for its AC
+bonuses: its AC with and without bonuses, the effects that change it, and its manual bonuses,
+saved right away. Current hit points follow a changed maximum.
+
+The **Effects** button on a player opens the Effects drawer for
+that player, with the same conditions, effects and apply form as in combat, and the campaign's
+players as casters. A Concentration effect starts the caster player's Concentration, and
+removing it ends the effects linked to it. The effects are kept on the campaign and carry into
+the next encounter; durations that count rounds start counting there.
 
 ### From actions and spells
 

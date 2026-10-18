@@ -1,7 +1,7 @@
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
 import { remindersMixin } from "src/mixins/reminders";
-import { dropToOneFor } from "src/utils/effectFunctions";
+import { damageResult, dropToOneFor, healingResult } from "src/utils/effectFunctions";
 
 export const setHP = {
 	mixins: [remindersMixin],
@@ -85,7 +85,6 @@ export const setHP = {
 			var transCurHp = parseInt(target.transformedCurHp);
 			var type = "damage";
 			var over = 0;
-			var rest_amount = amount;
 
 			//Death saves at 0 hp, if automate is on
 			if (
@@ -110,70 +109,38 @@ export const setHP = {
 				}
 			}
 
-			//First check if there is tempHp and put damage in there first.
-			if (tempHp) {
-				let newTemp = parseInt(tempHp - amount);
-
-				//Adjust the rest amount
-				rest_amount = newTemp < 0 ? -newTemp : 0;
-
-				//Set the new HP
-				this.set_hp({
-					key: target.key,
-					pool: "temp",
-					newHp: newTemp,
-				});
-			}
-			//Then check if the target is transformed and put rest damage in the transformation
-			if (target.transformed == true) {
-				var newTrans = parseInt(transCurHp - rest_amount);
-
-				//Adjust the rest amount
-				rest_amount = newTrans < 0 ? -newTrans : 0;
-
-				//Set the new HP
-				this.set_hp({
-					key: target.key,
-					pool: "transformed",
-					newHp: newTrans,
-				});
-			}
-			//If there is damage left after taking it from the tempHp and/or the transformation
-			let heldAtOne;
-			if (rest_amount > 0) {
-				var newhp = parseInt(curHp - rest_amount);
-
+			// Temporary hit points first, then the transformation, then hit points (shared with
+			// the campaign's players outside an encounter, effects 8)
+			const result = damageResult({
+				amount,
+				curHp,
+				tempHp,
+				transformed: target.transformed == true,
+				transformedCurHp: transCurHp,
+				maxHp,
 				// Drop to 1 instead of 0 (Death Ward, Undead Fortitude): no death checks then
-				if (curHp > 0 && newhp <= 0 && !config.undo) {
-					heldAtOne = this.dropToOneMatch(target, amount, config);
-					if (heldAtOne) newhp = 1;
-				}
-
-				if (newhp <= 0 && target.entityType !== "npc") {
+				dropToOne: config.undo ? undefined : (damage) => this.dropToOneMatch(target, damage, config),
+			});
+			if (result.tempHp !== undefined) {
+				this.set_hp({ key: target.key, pool: "temp", newHp: result.tempHp });
+			}
+			if (result.transformedCurHp !== undefined) {
+				this.set_hp({ key: target.key, pool: "transformed", newHp: result.transformedCurHp });
+			}
+			const heldAtOne = result.heldAtOne;
+			var newhp = result.curHp;
+			if (newhp !== undefined) {
+				if (result.atZero && target.entityType !== "npc") {
 					this.set_stable({
 						key: target.key,
 						action: "unset",
 					});
 				}
-
-				//When there is an overkill
-				if (newhp < 0) {
-					newhp = 0;
-
-					if (tempHp) {
-						over = parseInt(rest_amount) + parseInt(tempHp) - parseInt(curHp); //overkill
-						amount = parseInt(curHp) + parseInt(tempHp);
-					} else {
-						over = parseInt(rest_amount) - parseInt(curHp); //overkill
-						amount = parseInt(curHp);
-					}
-					//Character dies if the overkill is >= maxHp
-					if (
-						over >= maxHp &&
-						(target.entityType === "player" || target.entityType === "companion")
-					) {
-						this.set_dead({ key: target.key });
-					}
+				over = result.overkill;
+				amount = result.taken;
+				//Character dies if the overkill is >= maxHp
+				if (result.dies && (target.entityType === "player" || target.entityType === "companion")) {
+					this.set_dead({ key: target.key });
 				}
 				this.set_hp({
 					key: target.key,
@@ -305,9 +272,12 @@ export const setHP = {
 					amount = limit.cap;
 				}
 			}
-			let newhp = parseInt(curHp + amount);
 			let type = "healing";
-			let over = 0;
+			// Capped at the maximum (shared with the campaign's players outside an encounter, effects 8)
+			const result = healingResult({ amount, curHp, maxHp });
+			const newhp = result.curHp;
+			let over = result.overhealing;
+			amount = result.healed;
 
 			//If the target is a player and the curHp was 0, saves need to be reset
 			if ((target.entityType === "player" || target.entityType === "companion") && curHp === 0) {
@@ -319,12 +289,6 @@ export const setHP = {
 					key: target.key,
 					action: "unset",
 				});
-			}
-
-			if (newhp > maxHp) {
-				newhp = maxHp;
-				over = amount - maxHp + curHp; //overhealing
-				amount = maxHp - curHp;
 			}
 
 			//Heal the target

@@ -20,14 +20,7 @@ export const remindersMixin = {
 					notify: "Reaction regained",
 					trigger: "startTurn",
 				},
-				surprised: {
-					".key": "surprised",
-					action: "remove",
-					color: "orange-light",
-					title: "Is surprised",
-					notify: "Is surprised",
-					trigger: "startTurn",
-				},
+				// Surprised is the SRD Surprised effect since effects step 8
 			},
 		};
 	},

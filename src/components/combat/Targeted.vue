@@ -247,7 +247,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["set_targeted", "set_save", "set_stable", "set_targetReminder"]),
+		...mapActions(["set_targeted", "set_save", "set_stable"]),
 		modifier: calc_mod,
 		shadow() {
 			this.setShadow = this.$refs.scroll.scrollPosition;

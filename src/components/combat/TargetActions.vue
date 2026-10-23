@@ -74,7 +74,7 @@ export default {
 					option: "reminders",
 					method: () => this.setReminders(),
 					key: ["m"],
-					icon: "fa-stopwatch",
+					icon: "fa-bell",
 					tooltip: "Reminders",
 					step: "reminders",
 				},

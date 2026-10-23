@@ -34,12 +34,11 @@
 
 <script>
 import Effect from "./Effect.vue";
-import { remindersMixin } from "src/mixins/reminders";
 import { effectChipItems } from "src/utils/effectFunctions";
+import { fillVariables, reminderColor, triggerText } from "src/utils/reminderFunctions";
 
 export default {
 	name: "Effects",
-	mixins: [remindersMixin],
 	components: {
 		Effect,
 	},
@@ -97,19 +96,20 @@ export default {
 	},
 	computed: {
 		items() {
-			const reminders = this.entity.reminders
-				? Object.entries(this.entity.reminders).map(([key, reminder]) => {
-						return {
+			// The encounter's reminders about this entity that aren't done (effects 9); none outside
+			// an encounter (the run campaign screen passes its own effect entries)
+			const reminders = this.effectEntries
+				? []
+				: Object.entries(this.$store.getters.reminders || {})
+						.filter(([, reminder]) => reminder?.entity_key === this.entityKey)
+						.filter(([, reminder]) => !reminder.fired || reminder.repeat)
+						.map(([key, reminder]) => ({
 							type: "reminder",
-							key: key,
-							title: reminder?.selectedVars
-								? this.replaceReminderVariables(title, reminder?.selectedVars)
-								: reminder.title,
-							value: reminder?.rounds,
-							color: reminder?.color,
-						};
-					})
-				: [];
+							key,
+							title: fillVariables(reminder.title, reminder.variables),
+							trigger: triggerText(reminder.trigger),
+							color: reminderColor(reminder.color),
+						}));
 			const all = !this.reminders && !this.effects;
 			return [
 				...(all || this.reminders ? reminders : []),

@@ -58,7 +58,7 @@ export default {
 				},
 				{
 					type: "reminders",
-					icon: "fa-stopwatch",
+					icon: "fa-bell",
 				},
 				{
 					type: "items",

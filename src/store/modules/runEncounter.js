@@ -55,6 +55,12 @@ import {
 	withoutBonus,
 	MANUAL_BONUS_ID,
 } from "src/utils/entityFunctions";
+import {
+	cleanReminder,
+	convertLegacyReminder,
+	promptTitle,
+	remindersToFire,
+} from "src/utils/reminderFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
 import Vue from "vue";
@@ -203,6 +209,8 @@ const getDefaultState = () => ({
 	turn_entity: undefined,
 	// Carried-over effects to review at encounter start: [{ holderKey, effectKey, instance }]
 	effect_review: [],
+	// The encounter's reminders (effects 9): { [id]: reminder }, see reminderFunctions.js
+	reminders: {},
 });
 
 const run_encounter_state = getDefaultState();
@@ -237,6 +245,9 @@ const run_encounter_getters = {
 	},
 	encounter(state) {
 		return state.encounter;
+	},
+	reminders(state) {
+		return state.reminders;
 	},
 	requests(state) {
 		return state.requests;
@@ -491,6 +502,7 @@ const run_encounter_actions = {
 		commit("CLEAR_ENTITIES");
 		commit("CLEAR_EFFECT_DEFINITIONS");
 		commit("CLEAR_EFFECT_PROMPTS");
+		commit("SET_RUN_REMINDERS", {});
 		commit("SET_PATH", path);
 
 		try {
@@ -514,6 +526,7 @@ const run_encounter_actions = {
 				}
 
 				commit("SET_ENCOUNTER", encounter);
+				commit("SET_RUN_REMINDERS", JSON.parse(JSON.stringify(encounter.reminders || {})));
 
 				// Setup the requests connection
 				const requests_ref = db.ref(`encounters/${uid}/${cid}/${eid}/requests`);
@@ -530,6 +543,7 @@ const run_encounter_actions = {
 				commit("SET_EDITION", "5.5e");
 				const demo_encounter = rootGetters["encounters/demo_encounter"] || demoEncounter;
 				commit("SET_ENCOUNTER", { ...demo_encounter });
+				commit("SET_RUN_REMINDERS", JSON.parse(JSON.stringify(demo_encounter.reminders || {})));
 				for (let key in demo_encounter.entities) {
 					await dispatch("add_entity", key);
 				}
@@ -539,6 +553,8 @@ const run_encounter_actions = {
 			// Surprised effect (effects 8)
 			await dispatch("convert_legacy_conditions");
 			await dispatch("convert_legacy_surprised");
+			// Entity reminders become reminders about that entity on the encounter (effects 9)
+			await dispatch("convert_legacy_reminders");
 
 			// Remember whose turn it is for the end-of-turn triggers
 			commit(
@@ -1037,6 +1053,9 @@ const run_encounter_actions = {
 				combatStart: oldRound === 0,
 				round,
 				oldRound,
+				// For the encounter's reminders at a turn of the round (effects 9)
+				turn: turn + 1,
+				turns: getters.turn_order.length,
 			});
 		}
 	},
@@ -1583,6 +1602,8 @@ const run_encounter_actions = {
 			);
 		}
 		commit("SET_ENTITY_PROPERTY", { key, prop: "active", value: active });
+		// Set inactive: its "defeated or removed" reminders (effects 9)
+		if (active === false) await dispatch("fire_reminders", { event: { type: "defeated", entityKey: key } });
 	},
 
 	/**
@@ -2101,9 +2122,10 @@ const run_encounter_actions = {
 
 	/**
 	 * Converts the premade surprised reminder of the loaded encounter's entities to the SRD
-	 * Surprised effect (effects 8). The reminder is removed once the effect is stored, so a
-	 * failed run repeats. No apply triggers fire. The demo converts in memory only, test runs
-	 * don't convert.
+	 * Surprised effect (effects 8). The reminder is removed after this by
+	 * convert_legacy_reminders (effects 9), with the entity's other reminders; an entity that
+	 * already has Surprised isn't given a second one, so a failed run repeats. No apply triggers
+	 * fire. The demo converts in memory only, test runs don't convert.
 	 */
 	async convert_legacy_surprised({ state, commit, dispatch }) {
 		if (state.test) return;
@@ -2124,9 +2146,50 @@ const run_encounter_actions = {
 					}
 					commit("SET_EFFECT", { key, effectKey, instance });
 				}
-				await dispatch("set_targetReminder", { action: "remove", entity: key, key: "surprised" });
+				// The reminder itself goes with the entity's other reminders (convert_legacy_reminders)
 			} catch (error) {
 				console.error(`Failed to convert the surprised reminder of ${key}`, error);
+			}
+		}
+	},
+
+	/**
+	 * Converts the reminders stored on the loaded encounter's entities to reminders about that
+	 * entity on the encounter (effects 9, convertLegacyReminder): damage-triggered and retired
+	 * premade ones are dropped. The entity's reminders are removed once the new ones are stored;
+	 * the new ids come from the entity and the old key, so a failed run repeats without
+	 * duplicates. The demo converts in memory only, test runs don't convert.
+	 */
+	async convert_legacy_reminders({ state, commit, dispatch }) {
+		if (state.test) return;
+		const round = state.encounter?.round || 0;
+
+		for (const [key, entity] of Object.entries(state.entities || {})) {
+			const legacy = entity?.reminders;
+			if (!legacy || !Object.keys(legacy).length) continue;
+			try {
+				for (const [oldKey, old] of Object.entries(legacy)) {
+					const reminder = convertLegacyReminder(oldKey, old, key, round);
+					if (!reminder) continue;
+					const id = `legacy-${key}-${oldKey}`.replace(/[.#$/[\]]/g, "_");
+					await dispatch("set_encounter_reminder", { id, reminder });
+				}
+				if (!state.demo) {
+					await dispatch(
+						"encounters/set_entity_prop",
+						{
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entityId: key,
+							property: "reminders",
+							value: null,
+						},
+						{ root: true }
+					);
+				}
+				commit("SET_ENTITY_PROPERTY", { key, prop: "reminders", value: {} });
+			} catch (error) {
+				console.error(`Failed to convert the reminders of ${key}`, error);
 			}
 		}
 	},
@@ -2785,6 +2848,10 @@ const run_encounter_actions = {
 		{ trigger, entityKey, event = {}, effectKey }
 	) {
 		trigger = normalizeTrigger(trigger);
+		// An NPC at 0 hit points is defeated: its "defeated or removed" reminders (effects 9)
+		if (trigger === "on_zero_hp" && state.entities[entityKey]?.entityType === "npc") {
+			await dispatch("fire_reminders", { event: { type: "defeated", entityKey } });
+		}
 		const matches = matchTriggers({
 			trigger,
 			entityKey,
@@ -2987,24 +3054,69 @@ const run_encounter_actions = {
 	 * Fires the triggers for a turn change when combat moves forward:
 	 * end of the outgoing turn, then start of the incoming turn.
 	 * Starting the encounter fires combat_start and the first entity's start of turn.
+	 * The encounter's reminders (effects 9) fire in between: the round's start, then those at
+	 * this turn of the round (turn is 1-based, turns the number of turns in the round).
 	 */
 	async fire_turn_triggers(
 		{ dispatch },
-		{ outgoingKey, incomingKey, combatStart, round, oldRound }
+		{ outgoingKey, incomingKey, combatStart, round, oldRound, turn, turns }
 	) {
 		// event.round is the round of the turn the trigger belongs to
 		if (combatStart) {
 			await dispatch("fire_trigger", { trigger: "combat_start", event: { round } });
+			await dispatch("fire_reminders", { event: { type: "combat_start", round } });
 		} else if (outgoingKey) {
 			const event = { round: oldRound };
 			await dispatch("fire_trigger", { trigger: "end_turn_caster", entityKey: outgoingKey, event });
 			await dispatch("fire_trigger", { trigger: "end_turn_target", entityKey: outgoingKey, event });
+			await dispatch("fire_reminders", { event: { type: "turn_end", round: oldRound, entityKey: outgoingKey } });
+		}
+		// A new round's reminders, before the first turn of that round starts
+		if (combatStart || round > oldRound) {
+			await dispatch("fire_reminders", { event: { type: "round_start", round } });
+		}
+		// The encounter's reminders at this turn of the round (burning ground at turn 4)
+		if (incomingKey && turn) {
+			await dispatch("fire_reminders", { event: { type: "encounter_turn", round, turn, turns } });
 		}
 		if (incomingKey) {
 			const event = { round };
 			await dispatch("fire_trigger", { trigger: "start_turn_caster", entityKey: incomingKey, event });
 			await dispatch("fire_trigger", { trigger: "start_turn_target", entityKey: incomingKey, event });
+			await dispatch("fire_reminders", { event: { type: "turn_start", round, entityKey: incomingKey } });
 		}
+	},
+
+	/**
+	 * Fires the encounter's reminders for an event (effects 9): queues a reminder prompt for
+	 * each and marks once reminders as fired. "Defeated" only counts during combat.
+	 *
+	 * @param {object} event { type, round, entityKey }, see reminderFunctions.remindersToFire
+	 * @returns {object[]} The queued prompts
+	 */
+	async fire_reminders({ state, commit, dispatch }, { event }) {
+		const round = event.round ?? state.encounter?.round ?? 0;
+		if (event.type === "defeated" && !(round > 0)) return [];
+		const prompts = [];
+		for (const id of remindersToFire(state.reminders, { ...event, round })) {
+			const reminder = state.reminders[id];
+			const holderName = reminder.entity_key ? state.entities[reminder.entity_key]?.name : undefined;
+			prompts.push({
+				kind: "reminder",
+				id: `reminder:${id}:${Date.now()}`,
+				reminderId: id,
+				reminder: JSON.parse(JSON.stringify(reminder)),
+				holderKey: reminder.entity_key,
+				holderName,
+				round,
+				title: promptTitle(reminder, holderName?.capitalizeEach(), round),
+			});
+			if (!reminder.repeat) {
+				await dispatch("set_encounter_reminder", { id, reminder: { ...reminder, fired: true } });
+			}
+		}
+		if (prompts.length) commit("ADD_EFFECT_PROMPTS", prompts);
+		return prompts;
 	},
 
 	/**
@@ -3306,6 +3418,12 @@ const run_encounter_actions = {
 	},
 
 	async remove_entity({ commit, state, dispatch }, key) {
+		// Its "defeated or removed" reminders fire, then its reminders go: they can't fire any more
+		await dispatch("fire_reminders", { event: { type: "defeated", entityKey: key } });
+		for (const [id, reminder] of Object.entries(state.reminders)) {
+			if (reminder.entity_key === key) await dispatch("remove_encounter_reminder", { id });
+		}
+
 		// First untarget if targeted
 		const targeted = state.targeted.filter((target) => {
 			return target !== key;
@@ -3366,6 +3484,8 @@ const run_encounter_actions = {
 				{ root: true }
 			);
 		} else {
+			// Its "defeated or removed" reminders (effects 9)
+			await dispatch("fire_reminders", { event: { type: "defeated", entityKey: key } });
 			//SET DEAD
 			if (!state.demo && !state.test) {
 				await dispatch(
@@ -3399,106 +3519,58 @@ const run_encounter_actions = {
 	},
 
 	/**
-	 * Updates reminders on an entity
+	 * Writes one of the encounter's reminders to the database (effects 9); demo and test runs
+	 * keep it in memory only
 	 *
-	 * @param {string} action add, remove, update, update-timer
-	 * @param {string} entity Entity key
-	 * @param {string} key Reminder key
-	 * @param {object} reminder full reminder object, or integer with rounds
-	 **/
-	async set_targetReminder({ state, commit, dispatch }, { action, entity, key, reminder, type }) {
-		// Add a new reminder
-		if (action === "add") {
-			if (type === "premade") {
-				if (!state.demo && !state.test) {
-					await dispatch(
-						"encounters/set_reminder",
-						{
-							campaignId: state.campaignId,
-							encounterId: state.encounterId,
-							entity,
-							key,
-							reminder,
-						},
-						{ root: true }
-					);
-				}
-				commit("SET_REMINDER", { entityKey: entity, key, reminder });
-			}
-			if (type === "custom") {
-				if (!state.demo && !state.test) {
-					key = await dispatch(
-						"encounters/add_reminder",
-						{
-							campaignId: state.campaignId,
-							encounterId: state.encounterId,
-							key: entity,
-							reminder,
-						},
-						{ root: true }
-					);
-					commit("SET_REMINDER", { entityKey: entity, key, reminder });
-				} else {
-					let reminderKey = Date.now() + Math.random().toString(36).substring(4);
-					commit("SET_REMINDER", { entityKey: entity, key: reminderKey, reminder });
-				}
-			}
-		}
+	 * @param {string} id
+	 * @param {object|null} reminder null removes it
+	 */
+	async persist_reminder({ state, dispatch }, { id, reminder }) {
+		if (state.demo || state.test) return;
+		await dispatch(
+			"encounters/save_encounter_reminder",
+			{ campaignId: state.campaignId, encounterId: state.encounterId, id, reminder },
+			{ root: true }
+		);
+	},
 
-		// Remove a reminder
-		else if (action === "remove") {
-			if (!state.demo && !state.test) {
-				await dispatch(
-					"encounters/set_reminder",
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						reminder: null,
-					},
-					{ root: true }
-				);
-			}
-			commit("DELETE_REMINDER", { entityKey: entity, key });
-		}
+	/**
+	 * Adds or changes one of the encounter's reminders (effects 9)
+	 *
+	 * @param {string} id Leave out for a new reminder
+	 * @param {object} reminder See reminderFunctions.js; cleaned before it's stored
+	 * @returns {string} The reminder's id
+	 */
+	async set_encounter_reminder({ state, commit, dispatch }, { id, reminder }) {
+		const reminderId = id || Date.now() + Math.random().toString(36).substring(4);
+		const clean = cleanReminder(reminder);
+		await dispatch("persist_reminder", { id: reminderId, reminder: clean });
+		commit("SET_RUN_REMINDER", { id: reminderId, reminder: clean });
+		return reminderId;
+	},
 
-		// Update an existing reminder
-		else if (action === "update") {
-			if (!state.demo && !state.test) {
-				await dispatch(
-					"encounters/set_reminder",
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						reminder,
-					},
-					{ root: true }
-				);
-			}
-			commit("SET_REMINDER", { entityKey: entity, key, reminder });
-		}
+	/**
+	 * Removes one of the encounter's reminders (effects 9)
+	 *
+	 * @param {string} id
+	 */
+	async remove_encounter_reminder({ state, commit, dispatch }, { id }) {
+		if (!state.reminders[id]) return;
+		await dispatch("persist_reminder", { id, reminder: null });
+		commit("DELETE_RUN_REMINDER", id);
+	},
 
-		// Update only the rounds property
-		else if (action === "update-timer") {
-			if (!state.demo && !state.test) {
-				await dispatch(
-					"encounters/update_reminder",
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						property: "rounds",
-						value: reminder,
-					},
-					{ root: true }
-				);
-			}
-			commit("UPDATE_REMINDER_ROUNDS", { entityKey: entity, key, rounds: reminder });
-		}
+	/**
+	 * Re-arms a once reminder that fired, so it fires again (effects 9)
+	 *
+	 * @param {string} id
+	 */
+	async rearm_encounter_reminder({ state, dispatch }, { id }) {
+		const reminder = state.reminders[id];
+		if (!reminder?.fired) return;
+		const rearmed = { ...reminder };
+		delete rearmed.fired;
+		await dispatch("set_encounter_reminder", { id, reminder: rearmed });
 	},
 
 	/**
@@ -3687,14 +3759,14 @@ const run_encounter_mutations = {
 	DELETE_EFFECT(state, { key, effectKey }) {
 		Vue.delete(state.entities[key].effects, effectKey);
 	},
-	SET_REMINDER(state, { entityKey, key, reminder }) {
-		Vue.set(state.entities[entityKey].reminders, key, reminder);
+	SET_RUN_REMINDERS(state, reminders) {
+		Vue.set(state, "reminders", reminders || {});
 	},
-	UPDATE_REMINDER_ROUNDS(state, { entityKey, key, rounds }) {
-		Vue.set(state.entities[entityKey].reminders[key], "rounds", rounds);
+	SET_RUN_REMINDER(state, { id, reminder }) {
+		Vue.set(state.reminders, id, reminder);
 	},
-	DELETE_REMINDER(state, { entityKey, key }) {
-		Vue.delete(state.entities[entityKey].reminders, key);
+	DELETE_RUN_REMINDER(state, id) {
+		Vue.delete(state.reminders, id);
 	},
 	REMOVE_ENTITY(state, key) {
 		Vue.delete(state.entities, key);

@@ -9,7 +9,45 @@
 			</li>
 		</ul>
 		<hr />
-		<template v-if="targets.length > 0">
+		<!-- One effect, from a reminder's prompt (effects 9): its apply form for these targets -->
+		<template v-if="single">
+			<q-option-group
+				v-if="options.encounter"
+				v-model="targetChoice"
+				:options="[
+					{ label: 'Everyone in combat', value: 'everyone' },
+					{ label: 'Current targets', value: 'targets' },
+				]"
+				:dark="$store.getters.theme === 'dark'"
+				inline
+				class="mb-2"
+			/>
+			<h3 class="mb-1">
+				<i v-if="single.isCondition" aria-hidden="true" :class="`hki-${single.sourceKey}`" class="mr-1" />
+				{{ single.name }}
+			</h3>
+			<q-spinner v-if="loading === single.id" />
+			<template v-else>
+				<EffectDetails :definition="definitionOf(single)" :edition="edition" />
+				<p v-if="!targets.length" class="mt-3">
+					{{ targetChoice === "targets" ? "Target one or more entities." : "Nobody is in combat." }}
+				</p>
+				<ApplyEffect
+					v-else
+					class="mt-3"
+					:definition="definitionOf(single) || { name: single.name }"
+					:conditions="srd.conditions"
+					:default-level="defaultExhaustionLevel"
+					:effect="{ source: single.source, source_key: single.sourceKey, name: single.name }"
+					:casters="casters"
+					:default-caster="actorEntityKey"
+					:caster-concentration="casterConcentration"
+					@apply="applySingle($event)"
+					@cancel="setDrawer(false)"
+				/>
+			</template>
+		</template>
+		<template v-else-if="targets.length > 0">
 			<div v-for="group in groups" :key="group.name" class="mb-3">
 				<h3 class="mb-1">{{ group.name }}</h3>
 				<q-list :dark="$store.getters.theme === 'dark'" square class="accordion">
@@ -132,9 +170,11 @@ export default {
 		ApplyEffect,
 	},
 	props: {
-		// Entity keys, falls back to the targeted entities
+		// Entity keys, falls back to the targeted entities. Or { keys, entry, encounter } for one
+		// effect (a reminder's prompt, effects 9): entry { source, source_key, name } opens its
+		// apply form; encounter lets the DM choose everyone in combat or the current targets
 		data: {
-			type: Array,
+			type: [Array, Object],
 			default: undefined,
 		},
 		// "conditions" lists only SRD conditions, otherwise SRD and custom effects are listed
@@ -153,6 +193,8 @@ export default {
 			customEffects: [],
 			// Full custom definitions by id, false when it couldn't be loaded
 			customDefinitions: {},
+			// One effect for the encounter: "everyone" in combat or the current "targets"
+			targetChoice: "everyone",
 		};
 	},
 	computed: {
@@ -166,8 +208,29 @@ export default {
 			"actor",
 			"user",
 		]),
+		// The drawer's data as { keys, entry, encounter }
+		options() {
+			if (Array.isArray(this.data)) return { keys: this.data };
+			return this.data || {};
+		},
+		// The one effect to apply, as a list entry
+		single() {
+			const entry = this.options.entry;
+			if (!entry?.source || !entry?.source_key) return undefined;
+			return {
+				id: `${entry.source}:${entry.source_key}`,
+				source: entry.source,
+				sourceKey: entry.source_key,
+				name: entry.name || entry.source_key,
+				isCondition: isSrdCondition(entry.source, entry.source_key),
+			};
+		},
 		targets() {
-			if (this.data !== undefined && this.data.length > 0) return this.data;
+			if (this.options.encounter) {
+				if (this.targetChoice === "targets") return this.targeted;
+				return Object.keys(this.entities).filter((key) => this.entities[key].active && !this.entities[key].down);
+			}
+			if (this.options.keys?.length > 0) return this.options.keys;
 			return this.targeted;
 		},
 		srd() {
@@ -247,13 +310,20 @@ export default {
 		},
 	},
 	async mounted() {
-		if (this.mode !== "conditions" && this.user) {
+		if (this.single) {
+			await this.loadDefinition(this.single);
+		} else if (this.mode !== "conditions" && this.user) {
 			this.customEffects = (await this.get_effects()) ? this.$store.getters["effects/effects"] : [];
 		}
 		this.setEffectSize();
 	},
 	methods: {
-		...mapActions(["apply_effect", "remove_effect", "concentrate_on"]),
+		...mapActions(["apply_effect", "remove_effect", "concentrate_on", "setDrawer"]),
+		// The one effect applied: as from the list, then the drawer closes
+		async applySingle(application) {
+			await this.apply(this.single, application);
+			this.setDrawer(false);
+		},
 		...mapActions("effects", ["get_effects", "get_effect"]),
 		setEffectSize() {
 			const basicEntity = this.$refs.basicEntity?.[0];

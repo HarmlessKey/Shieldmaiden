@@ -40,16 +40,17 @@ export const effectRolls = {
 		 * @param {string} title
 		 * @param {string} body
 		 * @param {object} instance { source, source_key } of the effect, for its icon
+		 * @param {string} icon Icon class instead of the effect's (a reminder's bell)
 		 * @param {object} config Snotify config (timeout, buttons…)
 		 */
-		effectToast(type, { title, body, instance, config = {} }) {
+		effectToast(type, { title, body, instance, icon, config = {} }) {
 			const text = String(body || "")
 				.split("\n")
 				.map(escapeHtml)
 				.join("<br />");
 			const html =
 				`<div class="effect-toast">` +
-				`<i aria-hidden="true" class="effect-toast__icon ${this.effectToastIcon(instance)}"></i>` +
+				`<i aria-hidden="true" class="effect-toast__icon ${icon || this.effectToastIcon(instance)}"></i>` +
 				`<div class="effect-toast__text">` +
 				(title ? `<div class="snotifyToast__title">${escapeHtml(title)}</div>` : "") +
 				(text ? `<div class="snotifyToast__body">${text}</div>` : "") +

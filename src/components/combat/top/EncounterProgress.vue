@@ -22,6 +22,17 @@
 			</template>
 			<div v-else class="turn set-initiative">Set initiative</div>
 		</q-linear-progress>
+		<!-- The encounter's own reminders (effects 9); the targets' have their own button -->
+		<button
+			class="btn btn-sm bg-neutral-6 encounter-reminders"
+			@click="setDrawer({ show: true, type: 'drawers/encounter/reminders/TargetReminders', data: { encounter: true } })"
+		>
+			<i aria-hidden="true" class="fas fa-bell" />
+			<span v-if="encounterReminderCount" class="encounter-reminders__count">
+				{{ encounterReminderCount }}
+			</span>
+			<q-tooltip anchor="top middle" self="center middle">Encounter reminders</q-tooltip>
+		</button>
 		<template v-if="encounter.round > 0">
 			<button
 				class="btn btn-sm bg-neutral-6"
@@ -80,7 +91,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { remindersMixin } from "src/mixins/reminders";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
 export default {
@@ -88,7 +98,6 @@ export default {
 	components: {
 		TutorialPopover,
 	},
-	mixins: [remindersMixin],
 	props: {
 		activeEntities: {
 			type: Number,
@@ -105,11 +114,18 @@ export default {
 		},
 	},
 	computed: {
-		...mapGetters(["encounter"]),
+		...mapGetters(["encounter", "reminders"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
+		// The encounter's own reminders that aren't done
+		encounterReminderCount() {
+			return Object.values(this.reminders || {}).filter(
+				(reminder) => !reminder.entity_key && (!reminder.fired || reminder.repeat)
+			).length;
+		},
 	},
 	methods: {
 		...mapActions([
+			"setDrawer",
 			"set_turn",
 			"set_targeted",
 			"update_round",
@@ -121,7 +137,6 @@ export default {
 		...mapActions("tutorial", ["setGameState"]),
 		startEncounter() {
 			this.set_turn({ turn: 0, round: 1 });
-			this.checkReminders(this.next, "startTurn");
 		},
 		nextTurn() {
 			let turn = this.encounter.turn + 1;
@@ -135,7 +150,6 @@ export default {
 			this.set_turn({ turn, round });
 			this.set_targeted({ type: "untarget", key: "all" });
 			this.set_actor(null);
-			this.checkReminders(this.current, "endTurn");
 			this.setManual({ key: "clear" });
 			this.setMultipliers({ type: "clear" });
 		},
@@ -223,6 +237,24 @@ export default {
 			font-weight: bold;
 			font-size: 15px;
 			height: 100%;
+		}
+	}
+	.encounter-reminders {
+		position: relative;
+
+		&__count {
+			position: absolute;
+			top: -6px;
+			right: -6px;
+			min-width: 16px;
+			height: 16px;
+			padding: 0 4px;
+			border-radius: 8px;
+			background-color: $blue;
+			color: $white;
+			font-size: 11px;
+			line-height: 16px;
+			font-weight: bold;
 		}
 	}
 }

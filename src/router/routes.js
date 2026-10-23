@@ -463,18 +463,20 @@ const routes = [
 						path: "add-reminder",
 						name: "Add reminder",
 						component: () => import("src/views/UserContent/Reminders/EditReminder.vue"),
+						// Personal reminders are deprecated (effects 9): this only shows the notice
 						meta: {
-							title: "Add reminder",
-							description: "Add a new reminder on Shieldmaiden.",
+							title: "Reminders",
+							description: "Personal reminders on Shieldmaiden.",
 						},
 					},
 					{
 						path: ":id",
 						name: "Edit reminder",
 						component: () => import("src/views/UserContent/Reminders/EditReminder.vue"),
+						// Read-only since personal reminders are deprecated (effects 9)
 						meta: {
-							title: "Edit reminder",
-							description: "Edit an existing reminder Shieldmaiden.",
+							title: "Reminder",
+							description: "A personal reminder on Shieldmaiden.",
 						},
 					},
 				],

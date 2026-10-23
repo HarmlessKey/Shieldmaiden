@@ -1,157 +1,112 @@
 <template>
-	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
-		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveReminder(valid))">
-				<div class="card-body">
-					<div class="reminder" v-if="reminder">
-						<reminder-form v-model="reminder" />
-						<div class="trigger">
-							<template v-if="reminder && reminder.trigger">
-								<h3>Trigger info</h3>
-								<div v-html="triggerInfo[reminder.trigger]" />
-							</template>
-						</div>
-					</div>
-					<div class="d-flex justify-content-start items-center">
-						<router-link to="/content/reminders" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-						<q-btn v-if="$route.name == 'AddReminder'" type="submit" color="blue" no-caps
-							>Add reminder</q-btn
-						>
-						<q-btn v-else color="blue" type="submit" no-caps>Save</q-btn>
-						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
-							<q-tooltip anchor="top middle" self="center middle">
-								There are validation errors
-							</q-tooltip>
-						</q-icon>
-					</div>
+	<hk-card>
+		<!-- Deprecated (effects 9): personal reminders can be viewed, not created or edited -->
+		<div slot="header" class="card-header d-flex justify-content-between">
+			<span>Reminder</span>
+			<span class="deprecated">
+				<i aria-hidden="true" class="fas fa-exclamation-triangle orange mr-1" /> Deprecated
+			</span>
+		</div>
+		<div class="card-body">
+			<!-- The "add reminder" route: only the notice -->
+			<RemindersDeprecated v-if="!reminderId" />
+
+			<hk-loader v-if="loading" name="reminder" />
+			<div class="reminder" v-else-if="reminder">
+				<reminder-form v-model="reminder" disabled />
+				<div class="trigger">
+					<template v-if="reminder.trigger && triggerInfo[reminder.trigger.type]">
+						<h3>Trigger info</h3>
+						<div v-html="triggerInfo[reminder.trigger.type]" />
+					</template>
 				</div>
-			</q-form>
-		</ValidationObserver>
+			</div>
+			<p v-else-if="reminderId" class="neutral-2">This reminder doesn't exist.</p>
+
+			<router-link to="/content/reminders" class="btn bg-neutral-5 mt-3">
+				<i aria-hidden="true" class="fas fa-arrow-left mr-1" /> Back to reminders
+			</router-link>
+		</div>
 	</hk-card>
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapActions } from "vuex";
 import ReminderForm from "src/components/ReminderForm";
+import RemindersDeprecated from "src/components/userContent/RemindersDeprecated.vue";
 
+/**
+ * A personal reminder in the reminder form, disabled: personal reminders are deprecated
+ * (effects 9), so there's no saving; the header says Deprecated. The "add reminder" route only
+ * shows the notice.
+ */
 export default {
 	name: "EditReminder",
 	components: {
 		ReminderForm,
+		RemindersDeprecated,
 	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
 			reminderId: this.$route.params.id,
-			reminder: {},
-			reminder_copy: {},
-			loading: true,
-			unsaved_changes: false,
-
+			reminder: undefined,
+			loading: false,
+			// Per trigger type
 			triggerInfo: {
-				startTurn:
-					"When the entity with the <b>Start of turn</b> reminder gets its turn, the notification will show. You can use this reminder when a spell causes the entity to take damage on the start of their turn.",
-				endTurn:
-					"When the entity with the <b>End of turn</b> reminder ends its, the notification will show. You can use this reminder when the entity is allowed to make a saving throw at the end of their turn.",
-				damage:
-					"A notification will show when an entity with this <b>On damage taken</b> reminder takes damage. Perfect for when someone is concentrating.",
-				timed:
-					"A <b>timed</b> trigger is set with an amount of rounds. Each round lasts 6 seconds, making a duration of 1 minute last 10 rounds. During an encounter, whenever the entity with the reminder gets its turn, 1 round is removed from the counter. When the counter reaches 0, you receive a notification that the reminder has been removed.",
+				combat_start: "Set on the <b>encounter</b>. It comes up when you start combat.",
+				round_start:
+					"Set on the <b>encounter</b>. It comes up when the chosen round starts, before the first turn of that round, or with <b>At turn</b>, when that turn of the round starts.",
+				every_rounds:
+					"Set on the <b>encounter</b>. It comes up at the start of every so many rounds, from the round you choose (round 1 if you leave it empty), or with <b>At turn</b>, when that turn of those rounds starts.",
+				turn_start:
+					"Set on an <b>entity</b>. It comes up when that entity's turn starts, every round or only in the round you choose.",
+				turn_end:
+					"Set on an <b>entity</b>. It comes up when that entity's turn ends, every round or only in the round you choose.",
+				in_rounds:
+					"Set on an <b>entity</b>. It comes up at the start of its turn, the chosen number of rounds after you set it. Each round lasts 6 seconds, so 1 minute is 10 rounds.",
+				defeated:
+					"Set on an <b>entity</b>. It comes up when it drops to 0 hit points (monsters), is marked dead (players), or is set inactive or removed from the encounter, during combat.",
 			},
 		};
 	},
-	computed: {
-		...mapGetters(["tier", "players", "overencumbered"]),
-	},
-	watch: {
-		reminder: {
-			deep: true,
-			handler(newVal) {
-				if (JSON.stringify(newVal) !== this.reminder_copy) {
-					this.unsaved_changes = true;
-				} else {
-					this.unsaved_changes = false;
-				}
-			},
-		},
-	},
 	async mounted() {
-		if (this.reminderId) {
-			this.loading = true;
-			this.reminder = await this.get_reminder({ uid: this.userId, id: this.reminderId });
-			this.reminder_copy = JSON.stringify(this.reminder);
-			this.unsaved_changes = false;
-			this.loading = false;
+		if (!this.reminderId) return;
+		this.loading = true;
+		try {
+			// A copy: the form brings an old reminder to the new shape for showing, nothing is saved
+			const reminder = await this.get_reminder({ uid: this.userId, id: this.reminderId });
+			this.reminder = reminder ? JSON.parse(JSON.stringify(reminder)) : undefined;
+		} catch (error) {
+			console.error(error);
 		}
+		this.loading = false;
 	},
 	methods: {
-		...mapActions("reminders", ["get_reminder", "add_reminder", "edit_reminder"]),
-
-		saveReminder(valid) {
-			if (!valid) {
-				this.$snotify.error("There are validation errors.", "Critical miss!", {
-					position: "rightTop",
-				});
-				return;
-			}
-			if (this.$route.name == "Add reminder" && !this.reminderId) {
-				this.addReminder();
-			} else {
-				this.editReminder();
-			}
-		},
-		async addReminder() {
-			this.add_reminder(this.reminder).then(
-				(key) => {
-					this.$set(this, "reminderId", key);
-					this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" });
-					this.reminder_copy = JSON.stringify(this.reminder);
-					this.unsaved_changes = false;
-					this.$router.replace(`/content/reminders`);
-				},
-				(error) => {
-					this.$snotify.error("Couldn't save reminder.", "Save failed", { position: "rightTop" });
-					console.error(error);
-				}
-			);
-		},
-		async editReminder() {
-			console.log("edit reminder", this.uid);
-			await this.edit_reminder({
-				uid: this.userId,
-				id: this.reminderId,
-				reminder: this.reminder,
-			});
-
-			this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" });
-
-			this.reminder_copy = JSON.stringify(this.reminder);
-			this.unsaved_changes = false;
-			this.$router.replace(`/content/reminders`);
-		},
+		...mapActions("reminders", ["get_reminder"]),
 	},
 };
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
-	padding: 20px;
-
-	.reminder {
-		display: grid;
-		grid-column-gap: 20px;
-		grid-template-columns: 450px 1fr;
-	}
+.deprecated {
+	color: $neutral-2;
+	font-weight: normal;
+}
+.reminder {
+	display: grid;
+	grid-column-gap: 20px;
+	grid-template-columns: 450px 1fr;
 }
 @media only screen and (max-width: 850px) {
-	.container-fluid {
-		.reminder {
-			grid-template-columns: 300px 1fr;
-		}
+	.reminder {
+		grid-template-columns: 300px 1fr;
 	}
 }
 @media only screen and (max-width: 730px) {
-	.container-fluid {
+	.reminder {
+		grid-template-columns: 1fr;
+
 		.trigger {
 			display: none;
 		}

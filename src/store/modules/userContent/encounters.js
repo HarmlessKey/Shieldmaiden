@@ -625,76 +625,6 @@ const encounter_actions = {
 	},
 
 	/**
-	 * Adds a reminder to an entity
-	 *
-	 * @param {string} campaignId CampaignId
-	 * @param {string} encounterId EncounterId
-	 * @param {string} key Entity key
-	 * @param {object} reminder full reminder object, or integer with rounds
-	 */
-	async add_reminder(
-		{ rootGetters, dispatch, commit },
-		{ campaignId, encounterId, key, reminder }
-	) {
-		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
-		if (uid) {
-			const services = await dispatch("get_encounter_services");
-			try {
-				const reminder_key = await services.addReminder(
-					uid,
-					campaignId,
-					encounterId,
-					key,
-					reminder
-				);
-				commit("SET_REMINDER", {
-					uid,
-					campaignId,
-					encounterId,
-					entity: key,
-					key: reminder_key,
-					reminder,
-				});
-				return reminder_key;
-			} catch (error) {
-				throw error;
-			}
-		}
-	},
-
-	/**
-	 * Updates reminders on an entity
-	 *
-	 * @param {string} campaignId CampaignId
-	 * @param {string} encounterId EncounterId
-	 * @param {string} entity Entity key
-	 * @param {string} key Reminder key
-	 * @param {string} property
-	 * @param {any} value
-	 */
-	async update_reminder(
-		{ rootGetters, dispatch, commit },
-		{ campaignId, encounterId, entity, key, property, value }
-	) {
-		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
-		if (uid) {
-			const services = await dispatch("get_encounter_services");
-			try {
-				await services.updateEncounter(
-					uid,
-					campaignId,
-					encounterId,
-					`/entities/${entity}/reminders/${key}`,
-					{ [property]: value }
-				);
-				commit("UPDATE_REMINDER", { uid, campaignId, encounterId, entity, key, property, value });
-			} catch (error) {
-				throw error;
-			}
-		}
-	},
-
-	/**
 	 * Updates the override settings for the live initiative screen on an entity
 	 *
 	 * @param {string} campaignId CampaignId
@@ -779,26 +709,20 @@ const encounter_actions = {
 	 * @param {string} key Reminder key
 	 * @param {object} reminder full reminder object, or integer with rounds
 	 */
-	async set_reminder(
-		{ rootGetters, dispatch, commit },
-		{ campaignId, encounterId, entity, key, reminder }
-	) {
+	/**
+	 * Sets or removes one of the encounter's reminders (effects 9: `encounter.reminders/<id>`)
+	 *
+	 * @param {string} campaignId
+	 * @param {string} encounterId
+	 * @param {string} id Reminder id
+	 * @param {object|null} reminder The reminder (reminderFunctions.cleanReminder), null removes it
+	 */
+	async save_encounter_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, id, reminder }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
-		if (uid) {
-			const services = await dispatch("get_encounter_services");
-			try {
-				await services.updateEncounter(
-					uid,
-					campaignId,
-					encounterId,
-					`/entities/${entity}/reminders`,
-					{ [key]: reminder }
-				);
-				commit("SET_REMINDER", { uid, campaignId, encounterId, entity, key, reminder });
-			} catch (error) {
-				throw error;
-			}
-		}
+		if (!uid) return;
+		const services = await dispatch("get_encounter_services");
+		await services.updateEncounter(uid, campaignId, encounterId, "/reminders", { [id]: reminder ?? null });
+		commit("SET_ENCOUNTER_REMINDER", { uid, campaignId, encounterId, id, reminder: reminder ?? null });
 	},
 
 	/**
@@ -924,6 +848,11 @@ const encounter_actions = {
 						}
 						entity.initiative = 0;
 					}
+				}
+
+				// The encounter's reminders stay, and fire again (effects 9)
+				for (const reminder of Object.values(encounter.reminders || {})) {
+					if (reminder) delete reminder.fired;
 				}
 
 				// Reset encounter values
@@ -1372,18 +1301,15 @@ const encounter_mutations = {
 			});
 		}
 	},
-	SET_REMINDER(state, { uid, campaignId, encounterId, entity, key, reminder }) {
-		if (state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders) {
-			Vue.set(
-				state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders,
-				key,
-				reminder
-			);
-		} else {
-			Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity], "reminders", {
-				[key]: reminder,
-			});
+	SET_ENCOUNTER_REMINDER(state, { uid, campaignId, encounterId, id, reminder }) {
+		const encounter = state.cached_encounters[uid]?.[campaignId]?.[encounterId];
+		if (!encounter) return;
+		if (reminder === null) {
+			if (encounter.reminders) Vue.delete(encounter.reminders, id);
+			return;
 		}
+		if (!encounter.reminders) Vue.set(encounter, "reminders", {});
+		Vue.set(encounter.reminders, id, reminder);
 	},
 	SET_LOOT(state, { uid, campaignId, encounterId, id, item }) {
 		if (
@@ -1428,13 +1354,6 @@ const encounter_mutations = {
 		) {
 			Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot, id);
 		}
-	},
-	UPDATE_REMINDER(state, { uid, campaignId, encounterId, entity, key, property, value }) {
-		Vue.set(
-			state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders[key],
-			property,
-			value
-		);
 	},
 	SET_ENTITY_SETTING(state, { uid, campaignId, encounterId, entityId, key, value }) {
 		if (state.cached_encounters[uid][campaignId][encounterId].entities[entityId].settings) {

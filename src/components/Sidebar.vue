@@ -84,7 +84,7 @@
 						</q-item>
 						<q-item clickable v-ripple to="/content/reminders">
 							<q-item-section avatar>
-								<i aria-hidden="true" class="fas fa-stopwatch" />
+								<i aria-hidden="true" class="fas fa-bell" />
 							</q-item-section>
 							<q-item-section class="title">Reminders</q-item-section>
 							<q-tooltip

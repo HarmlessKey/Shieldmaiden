@@ -206,10 +206,10 @@ export default {
 			this.width = size.width;
 		},
 		/**
-		 * The entity used its reaction: the Reaction Used effect, or the legacy reminder
+		 * The entity used its reaction: the Reaction Used effect (the legacy reminder is retired)
 		 */
 		reactionUsed(entity) {
-			return hasReactionUsed(entity) || !!entity?.reminders?.reaction;
+			return hasReactionUsed(entity);
 		},
 		returnTabs(current) {
 			let tabs = [{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }];

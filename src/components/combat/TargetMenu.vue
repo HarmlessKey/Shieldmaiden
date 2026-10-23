@@ -34,7 +34,7 @@
 				})
 			"
 		>
-			<q-item-section avatar><i aria-hidden="true" class="fas fa-stopwatch"></i></q-item-section>
+			<q-item-section avatar><i aria-hidden="true" class="fas fa-bell"></i></q-item-section>
 			<q-item-section>Reminders</q-item-section>
 		</q-item>
 		<q-item

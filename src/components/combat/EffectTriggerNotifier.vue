@@ -1,7 +1,8 @@
 <script>
 import { startCase } from "lodash";
 import { mapActions, mapGetters } from "vuex";
-import { TRIGGER_LABELS } from "src/utils/effectFunctions";
+import { TRIGGER_LABELS, findSrdDefinition } from "src/utils/effectFunctions";
+import { cleanDamage, damageText, fillVariables } from "src/utils/reminderFunctions";
 import { effectRolls } from "src/mixins/effectRolls";
 
 /**
@@ -17,6 +18,7 @@ import { effectRolls } from "src/mixins/effectRolls";
  * - reaction_used: an entity acted out of turn (Apply Reaction Used / Dismiss)
  * - death: an effect's death outcome applies, Exhaustion 6 (Mark dead / Dismiss)
  * - drop_to_one: held at 1 hit point until a save, Undead Fortitude (Roll / Succeeded / Failed)
+ * - reminder: an encounter reminder fired (Apply <effect> / Dismiss, or Keep / Remove)
  * - temp_hp_lost: temporary hit points ended with their effect (closes by itself)
  * Trigger and on_expire prompts with damage or healing also get Roll, which opens the roll
  * dialog, and trigger prompts with temporary hit points get Grant temp HP.
@@ -46,7 +48,7 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["setDrawer", "remove_effect", "resolve_repeat_save"]),
+		...mapActions(["setDrawer", "remove_effect", "resolve_repeat_save", "remove_encounter_reminder"]),
 		/**
 		 * The effect a prompt is about, for its icon: the prompt's copy, the running instance,
 		 * or the source of an instance that already ended
@@ -86,6 +88,8 @@ export default {
 					return this.showDeath(prompt);
 				case "drop_to_one":
 					return this.showDropToOne(prompt);
+				case "reminder":
+					return this.showReminder(prompt);
 				case "temp_hp_lost":
 					return this.showNotice({
 						...prompt,
@@ -433,6 +437,124 @@ export default {
 					},
 				],
 			});
+		},
+		/**
+		 * A reminder that fired (effects 9): its title and text, Dismiss (once) or Keep / Remove
+		 * (repeating), and Apply <effect> when it names an effect that still exists
+		 */
+		async showReminder(prompt) {
+			const reminder = prompt.reminder || {};
+			const effectName = await this.reminderEffectName(reminder.effect);
+			const holderGone = prompt.holderKey && !this.entities[prompt.holderKey];
+			const lines = [fillVariables(reminder.text || "", reminder.variables)];
+			if (reminder.effect && !effectName) {
+				lines.push(`${reminder.effect.name || "Its effect"} can't be found any more.`);
+			}
+			const damage = damageText(reminder.damage);
+			if (damage) lines.push(damage.capitalize());
+
+			const buttons = [];
+			// Damage (the encounter's reminders only): rolled once, a roll for each target
+			if (damage && !prompt.holderKey) {
+				buttons.push(
+					this.reminderDamageButton("Damage targets", reminder, () => [...this.$store.getters.targeted])
+				);
+			}
+			if (effectName && !holderGone) {
+				buttons.push({
+					text: `Apply ${effectName}`,
+					action: (toast) => {
+						this.setDrawer({
+							show: true,
+							type: "drawers/encounter/Effects",
+							data: {
+								keys: prompt.holderKey ? [prompt.holderKey] : undefined,
+								entry: { ...reminder.effect, name: effectName },
+								encounter: !prompt.holderKey,
+							},
+						});
+						this.$snotify.remove(toast.id);
+					},
+					bold: true,
+				});
+			}
+			if (reminder.repeat) {
+				buttons.push(
+					{ text: "Keep", action: (toast) => this.$snotify.remove(toast.id), bold: false },
+					{
+						text: "Remove",
+						action: (toast) => {
+							this.remove_encounter_reminder({ id: prompt.reminderId });
+							this.$snotify.remove(toast.id);
+						},
+						bold: false,
+					}
+				);
+			} else {
+				buttons.push(this.dismissButton());
+			}
+
+			this.effectToast("warning", {
+				title: prompt.title,
+				body: lines.filter(Boolean).join("\n"),
+				icon: "fas fa-bell",
+				config: { timeout: 0, buttons },
+			});
+		},
+		/**
+		 * A button that rolls a reminder's damage once and opens it in the roll dialog for each
+		 * recipient, where the DM applies it. Dealt by the Environment (setHP needs a dealer).
+		 *
+		 * @param {function} recipients () => entity keys, read on click (targets change)
+		 */
+		reminderDamageButton(text, reminder, recipients) {
+			return {
+				text,
+				action: (toast) => {
+					const keys = recipients().filter((key) => this.entities[key]);
+					if (!keys.length) {
+						this.$snotify.warning("Nobody to damage: target one or more creatures.", "Reminder", {
+							timeout: 3000,
+						});
+						return;
+					}
+					const damage = cleanDamage(reminder.damage);
+					const name = fillVariables(reminder.title || "Reminder", reminder.variables);
+					const roll = this.rollAction(
+						{ e: {} },
+						{ name, action_list: [{ type: "damage", rolls: [{ dice_count: 0, dice_type: 4, fixed_val: 0, ...damage }] }] },
+						{}
+					);
+					// Dealt by the Environment, as the Select Actor list's: no meters, logged by name
+					const environment = { key: "environment", name: "Environment", entityType: "environment" };
+					for (const key of keys) {
+						const copy = JSON.parse(JSON.stringify(roll));
+						copy.target = this.entities[key];
+						copy.current = environment;
+						this.setActionRoll(copy);
+					}
+					this.$snotify.remove(toast.id);
+				},
+				bold: true,
+			};
+		},
+		/**
+		 * The name of a reminder's effect: the campaign edition's SRD definition or the user's
+		 * custom effect; undefined when it can't be found
+		 */
+		async reminderEffectName(effect) {
+			if (!effect?.source || !effect?.source_key) return undefined;
+			if (effect.source === "srd") {
+				return findSrdDefinition(this.$store.getters.edition, effect.source_key)?.name;
+			}
+			const uid = this.$store.getters.user?.uid;
+			if (!uid) return undefined;
+			try {
+				const definition = await this.$store.dispatch("effects/get_effect", { uid, id: effect.source_key });
+				return definition?.name;
+			} catch (error) {
+				return undefined;
+			}
 		},
 		showReview(prompt) {
 			const effects = prompt.count === 1 ? "effect" : "effects";

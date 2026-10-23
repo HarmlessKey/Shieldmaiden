@@ -1,10 +1,8 @@
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
-import { remindersMixin } from "src/mixins/reminders";
 import { damageResult, dropToOneFor, healingResult } from "src/utils/effectFunctions";
 
 export const setHP = {
-	mixins: [remindersMixin],
 	data() {
 		return {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
@@ -150,11 +148,6 @@ export const setHP = {
 			if (heldAtOne) {
 				this.$store.dispatch("drop_to_one", { key: target.key, match: heldAtOne, damage: amount });
 			}
-			//Check if a reminder is triggered on damage taken
-			if (amount > 0) {
-				this.checkReminders(target, "damage");
-			}
-
 			// Effect triggers, on the main HP pool
 			if (amount > 0 && !config.undo) {
 				const after = newhp !== undefined ? newhp : curHp;

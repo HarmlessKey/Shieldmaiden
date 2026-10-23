@@ -88,7 +88,6 @@
 import { mapActions, mapGetters } from "vuex";
 import Menu from "./Menu.vue";
 import EncounterProgress from "./EncounterProgress.vue";
-import { remindersMixin } from "src/mixins/reminders";
 import { dice } from "src/mixins/dice";
 
 export default {
@@ -112,7 +111,7 @@ export default {
 			type: Object,
 		},
 	},
-	mixins: [remindersMixin, dice],
+	mixins: [dice],
 	data() {
 		return {
 			campid: this.$route.params.campid,
@@ -130,23 +129,8 @@ export default {
 		...mapActions(["setDrawer", "remove_limitedUses"]),
 	},
 	watch: {
-		//Watch turn to trigger reminders when an entity starts their turn
-		turn(newVal, oldVal) {
-			this.checkReminders(this.current, "startTurn");
-
-			//Check if the turn went up or down	considering round changes
-			//Fails with only 2 entities !!
-			if (
-				(newVal > oldVal && oldVal != 0) ||
-				(newVal > oldVal && oldVal === 0 && newVal === 1) ||
-				(newVal === 0 && oldVal > newVal && oldVal !== 1)
-			) {
-				this.timedReminders(this.current, "up");
-			} else {
-				//Update next in initiative order
-				this.timedReminders(this.next, "down");
-			}
-
+		// Reminders fire from the store since effects 9 (fire_reminders)
+		turn() {
 			// Check limited uses
 			if (this.current.limited_uses && Object.keys(this.current.limited_uses).length > 0) {
 				// Check all actions for limited uses that can be regained at the start of the turn

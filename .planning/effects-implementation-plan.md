@@ -1494,7 +1494,7 @@ under a pre-cast spell.
 - **Not done:** companions on the run campaign screen (the pane doesn't list them), and shift+click
   quick apply in the campaign drawer.
 
-## 9. Encounter reminders on triggers (separate feature, after the effects)
+## 9. Encounter reminders on triggers (separate feature, after the effects) (done — archived as effects-9-encounter-reminders, 2026-10-23)
 Idea, 2026-10-06. Build it once the effects work above is done. Turn reminders into actual
 reminders: the DM sets them on an encounter trigger, not on an entity, and the tracker
 shows them when the trigger fires. Examples:
@@ -1515,6 +1515,67 @@ Ideas to work out when it's proposed:
     `Reminders.vue`, `TargetReminders.vue`) and the user-authored reminders
     (`src/views/UserContent/Reminders/`) become this feature or move into it.
   - Existing `entity.reminders` in Firestore need a shim or a conversion script, as in 2i.
+
+*As built (change `effects-9-encounter-reminders`):*
+- **Decided at proposal (user):**
+  - legacy entity reminders move into the new system
+  - triggers: encounter rounds, entity turns, defeated/removed (no HP triggers)
+  - prompts notify and can offer an effect
+  - once or repeating
+  - damage-triggered reminders are dropped
+- **Data:** `encounter.reminders/<id>` (`title`, `text`, `color`, `entity_key`, `trigger { type,
+  round, every, from }`, `repeat`, `fired`, `effect`, `variables`, `template_id`), with a
+  Firebase rules node. Pure helpers in `src/utils/reminderFunctions.js`: `remindersToFire`,
+  `triggerText`, `promptTitle`, `fillVariables`, `convertLegacyReminder`,
+  `reminderFromTemplate`, `resolveTrigger`, `formTrigger`, `cleanReminder`.
+- **Store:** `set_encounter_reminder` / `remove_encounter_reminder` /
+  `rearm_encounter_reminder` (through `encounters/save_encounter_reminder`), and
+  `fire_reminders`:
+  - from `fire_turn_triggers`: turn end, then round start, then turn start
+  - from `fire_trigger` on `on_zero_hp` for NPCs, `set_dead`, `set_active` (inactive) and
+    `remove_entity` ("defeated" only from round 1)
+  - Removing an entity removes its reminders after they fired (found at apply).
+- **Conversion:** `convert_legacy_reminders` runs after `convert_legacy_surprised` with fixed
+  ids (`legacy-<entity>-<key>`), so a failed run doesn't duplicate. `convert_legacy_surprised`
+  no longer removes the reminder itself. Reset keeps reminders and clears `fired`.
+- **UI:**
+  - a `reminder` prompt in `EffectTriggerNotifier.vue` (bell icon, `effectToast` got `icon`)
+  - the Effects drawer's `data: { keys, entry, encounter }` for one effect
+  - the new `ReminderForm.vue`, with "start of its turn in N rounds" (`in_rounds`, form and
+    templates only) for the old timer
+  - the Reminders drawer (`TargetReminders.vue`: the added reminders on top, the form below to
+    add one; no personal reminders or tabs, user request at apply) and `Reminder.vue` by id.
+    Personal reminders under My content are deprecated (user request at apply): view and delete
+    only, with a notice (`RemindersDeprecated.vue`) pointing to effects and encounter reminders;
+    `ContentHeader` got `noAdd`; the detail page shows the reminder form with its new
+    `disabled` prop and no save button.
+    Two buttons open it, and the button decides what it's for (user request at apply): the
+    targets' Reminders option, and an encounter Reminders button in `EncounterProgress.vue`
+    between the progress bar and the turn buttons, with a count (`data: { encounter: true }`)
+  - chips from the encounter's reminders
+  - a turn on the encounter's round triggers (user request at apply: burning ground at turn
+    4 of every round): `trigger.turn`, an `encounter_turn` event from `fire_turn_triggers`
+    (`set_turn` passes the 1-based turn and the round's turn count) between the round's start
+    and the turn's entity reminders; fewer turns fire it at the last turn
+  - no once/repeating choice (user feedback at apply: it overlapped with the triggers):
+    `triggerRepeats` decides (every N rounds, a turn in every round), in `cleanReminder` and
+    `reminderFromTemplate`; a converted "remove on trigger" turn reminder stays once; an edit
+    lets the new trigger decide
+  - color as an NPC's color label (user request at apply): a CSS color from the Shieldmaiden
+    palette (`colors` mixin, read on mount for SSR) instead of a class name; old names show
+    through `reminderColor` (their CSS variable); `cleanColor` and the rules accept both
+  - damage instead of an effect (user request at apply): `damage { dice_count, dice_type,
+    fixed_val, damage_type }`, one or the other (`cleanReminder`, the rules), the form's
+    Nothing / Offer an effect / Damage choice (Damage only for the encounter's reminders: on a
+    creature it's an effect; the form, `cleanReminder` and the rules), and the prompt's Damage
+    targets
+    (Damage everyone was left out at the user's request): one `rollAction` copied per recipient into the roll dialog, dealt by the
+    Environment actor (`setHP` needs a dealer; found in testing)
+- **Retired:** `src/mixins/reminders.js` (premade list, `checkReminders`, `timedReminders`),
+  the turn watchers' reminder checks (top bar, encounter progress, mobile, legacy), the damage
+  check in `HpManipulations`, `set_targetReminder`, the encounters store's entity reminder
+  writes and `services.addReminder`. The mobile current view called `checkReminders` without
+  the mixin, so it threw on every turn; that's gone too.
 
 ## 10. Set encounter reminders from the edit encounter screen
 Idea, 2026-10-12. Builds on step 9. The DM prepares the encounter's trigger reminders
@@ -1657,7 +1718,7 @@ let an AI write them instead, and import the result.
 5 (done — archived as effects-5-srd-effect-data, 2026-10-13) (SRD effect data: one shared file with `edition`, basic effects, choice lists; grows further alongside 6 and 7)
 6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 6c (done — archived as effects-6c-spell-effects, 2026-10-16) -> 7 (done — archived as effects-7-apply-linked-effects, 2026-10-16; monster actions, trait effects on special abilities, spell actions, action rolls; additive on top of step 3)
 8 (done — archived as effects-8-effects-outside-combat, 2026-10-18; apply effects outside combat: the set initiative screen, with a shared header-actions component for the Targeted and Overview headers, Surprised as an effect instead of a reminder, and the campaign's players on the run campaign screen)
-9 (encounter reminders on triggers, incl. the former 3f: a separate feature, after the effects are done)
+9 (done — archived as effects-9-encounter-reminders, 2026-10-23; encounter reminders on triggers, incl. the former 3f)
 10 (set encounter reminders from the edit encounter screen; after 9)
 11 (HK API updates, moved from 8 on 2026-10-16: 11a conditions, 11b SRD effects, 11c SRD monster backfill, 11d SRD spell backfill)
 12 (fetch effects and conditions from the API, a name search on every effect list, and bonus effects listed and applied from the manual bonus drawers; after 11a, 11b)

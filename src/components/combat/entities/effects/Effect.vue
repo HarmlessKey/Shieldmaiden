@@ -1,10 +1,12 @@
 <template>
 	<div
 		class="entity-effects__effect"
-		:class="[effect.type, effect.color, { readonly }]"
+		:class="[effect.type, effect.type === 'reminder' ? undefined : effect.color, { readonly }]"
 		@click.prevent.stop="open"
 	>
-		<div class="value" :class="effect.type === 'reminder' ? `bg-${effect.color}` : ''">
+		<!-- A reminder: a bell in its color (effects 9) -->
+		<i v-if="effect.type === 'reminder'" aria-hidden="true" class="fas fa-bell bell" :style="{ color: effect.color }" />
+		<div v-else class="value">
 			<strong v-if="effect.value">
 				{{ effect.value }}
 			</strong>
@@ -20,6 +22,9 @@
 				<div class="neutral-2">{{ effect.duration }}</div>
 				<div v-if="effect.caster" class="neutral-2">from {{ effect.caster }}</div>
 			</template>
+			<div v-else-if="effect.type === 'reminder' && effect.trigger" class="neutral-2">
+				{{ effect.trigger }}
+			</div>
 		</q-tooltip>
 	</div>
 </template>
@@ -70,10 +75,8 @@ export default {
 			this.setDrawer({
 				show: true,
 				type: "drawers/encounter/reminders/Reminder",
-				data: {
-					key: this.effect.key,
-					entity: this.entity,
-				},
+				// One of the encounter's reminders, by id (effects 9)
+				data: { id: this.effect.key },
 			});
 		},
 	},
@@ -121,19 +124,10 @@ export default {
 			}
 		}
 		&.reminder {
-			padding: 6px;
-			.value {
-				width: 100%;
-				aspect-ratio: 1/1;
-				border-radius: $border-radius;
-				line-height: 18px;
+			line-height: 30px;
 
-				strong {
-					filter: invert(1) grayscale(1) brightness(1.3) contrast(9000);
-					mix-blend-mode: luminosity;
-					opacity: 0.95;
-					width: 100%;
-				}
+			.bell {
+				font-size: 15px;
 			}
 		}
 	}

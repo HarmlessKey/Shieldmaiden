@@ -1,11 +1,9 @@
 <template>
 	<hk-card v-if="tier">
-		<ContentHeader type="reminders" />
+		<ContentHeader type="reminders" no-add />
 		<div class="card-body" v-if="!loading_reminders">
-			<p class="neutral-2">
-				Reminders create useful notifications during encounters, so you don't forget someone was
-				concentrating for instance.
-			</p>
+			<!-- Deprecated (effects 9): view and delete only -->
+			<RemindersDeprecated />
 
 			<template v-if="reminders.length">
 				<q-table
@@ -40,8 +38,8 @@
 
 								<div v-else class="d-flex justify-content-end">
 									<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-										<i aria-hidden="true" class="fas fa-pencil"></i>
-										<q-tooltip anchor="top middle" self="center middle"> Edit </q-tooltip>
+										<i aria-hidden="true" class="fas fa-eye"></i>
+										<q-tooltip anchor="top middle" self="center middle"> View </q-tooltip>
 									</router-link>
 									<button
 										class="btn btn-sm bg-neutral-5 ml-2"
@@ -58,20 +56,7 @@
 				</q-table>
 			</template>
 
-			<router-link
-				v-if="!reminders.length && !overencumbered"
-				class="btn btn-lg bg-neutral-5"
-				:to="`${$route.path}/add-reminder`"
-			>
-				<i aria-hidden="true" class="fas fa-plus green"></i> Create your first reminder
-			</router-link>
-			<router-link
-				v-else-if="tier.price === 'Free'"
-				class="btn bg-neutral-8 btn-block"
-				to="/pricing"
-			>
-				Get more reminder slots
-			</router-link>
+			<p v-if="!reminders.length" class="neutral-2">You have no personal reminders.</p>
 		</div>
 		<hk-loader v-else name="reminders" />
 	</hk-card>
@@ -80,11 +65,13 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
+import RemindersDeprecated from "src/components/userContent/RemindersDeprecated.vue";
 
 export default {
 	name: "Reminders",
 	components: {
 		ContentHeader,
+		RemindersDeprecated,
 	},
 	data() {
 		return {

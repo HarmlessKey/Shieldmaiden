@@ -803,18 +803,49 @@ golem's Absorption, Legendary Resistance.
 
 ## Encounter reminders
 
-Reminders are notes the tracker shows at the right moment. You set them on an encounter, in the
-encounter's edit screen or during combat:
+Reminders are notes the tracker shows at the right moment. There are two buttons: the
+**Encounter reminders** button in the encounter's progress bar, next to the turn buttons (it
+shows how many are set), for reminders about the encounter; and the targets' **Reminders**
+option, for reminders about the targeted creatures. The drawer lists the reminders already
+added on top, and has a form below to **Add a reminder**, which stays open for the next one.
+Most reminders are added while you prepare the encounter:
 
-- **When**: the start of a round, a specific round ("Round 3"), every few rounds, the start or end
-  of a creature's turn, the start of combat, or something that happens to a creature, like the
-  boss becoming Bloodied.
-- **Reminder**: the text, like "The boss changes tactics and may flee".
-- **Apply an effect**: a reminder can also offer to apply an effect to chosen creatures or to
-  everyone: a sandstorm that starts in round 5 and blinds everyone in it.
+- **Trigger**, for the encounter:
+  - **When combat starts**
+  - **Start of round N**: "Round 3: the boss may flee"
+  - **Every N rounds**, from a round you choose: a lair that acts every other round
+  - Both can come up **At turn** T of the round instead of at its start (the T-th turn in
+    initiative order, or the last one when there are fewer): burning ground that burns
+    whoever stands in it at turn 4 of every round, without an effect on each creature
+- **Trigger**, for a creature:
+  - **Start of its turn** or **End of its turn**, every round or only in one round
+  - **Start of its turn in N rounds**: a timer, like a spell that ends in 10 rounds
+  - **When it's defeated or removed**: a monster drops to 0 hit points, a player is marked dead,
+    or it's set inactive or removed from the encounter, during combat
+- The trigger decides whether it comes back: **Every N rounds** and a turn in every round come
+  up each time, with **Keep** and **Remove** in the prompt; the others come up once and are then
+  done. For "every round from round 2", choose **Every N rounds** with 1, from round 2.
+- **Text**: like "The boss changes tactics and may flee".
+- **Offer an effect** or **Damage**, one or the other:
+  - an effect: the prompt gets **Apply** for it, which opens its apply form, for the creature,
+    or for **Everyone in combat** or the **Current targets**: a sandstorm that starts in round 5
+    and blinds everyone
+  - damage, for the encounter's reminders only (on one creature, use an effect): dice, a die
+    and a fixed value, with a damage type ("2d6 fire"). The prompt gets **Damage targets**
+    (target the creatures it hits first), which rolls it once and opens it in the roll dialog
+    for each of them: lava that rises every round
 
-When the moment comes, the reminder shows as a prompt, like the prompts of effects. Reminders
-for a creature's turn or state follow that creature.
+When the moment comes, the reminder shows as a prompt, like the prompts of effects. It only
+comes up when combat moves forward, not when you go back a turn. A creature's reminders show
+as chips on it. In the drawer's list you can edit a reminder, re-arm a done one, or remove it.
+Resetting the encounter keeps its reminders, and they come up again.
+
+Reminders set before this version were on a creature: they're moved to the encounter when it's
+opened. **On damage taken** isn't a trigger any more: those reminders are gone. The premade
+**Concentrating** and **Reaction used** reminders are gone too; effects cover them. Personal
+reminders under My content are deprecated: you can still view and delete them, but not create
+or edit them, and the tracker doesn't offer them. Use effects for what happens to a creature,
+and encounter reminders for what comes up at a moment in the encounter.
 
 ## What the tracker does for you
 

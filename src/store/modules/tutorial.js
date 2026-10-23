@@ -207,7 +207,7 @@ const TUTORIALS = {
 				description:
 					"<p>Reminders will notify you when an event is triggered on a target.<p>" +
 					"<p>You can be notified when a <strong>concentrating</strong> target takes damage for instance.<p>" +
-					'You can apply reminders to your target(s) using the <strong><i class="fas fa-stopwatch"></i></strong> button.',
+					'You can apply reminders to your target(s) using the <strong><i class="fas fa-bell"></i></strong> button.',
 				next: true,
 				completed: false,
 			},

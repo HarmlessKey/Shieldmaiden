@@ -115,7 +115,8 @@ The actor panel SHALL show a "Reaction Used" tag in the actor's details bar, aft
 name, when the actor has Reaction Used. It is shown the same way for every kind of entity.
 The Select Actor list SHALL mark the entities that have Reaction Used.
 The legacy actions panel's "Reaction used" warning SHALL show when the chosen entity has the
-Reaction Used effect, as well as for the legacy reminder.
+Reaction Used effect. The legacy "Reaction used" reminder is retired, so the warning SHALL NOT
+look for it.
 
 #### Scenario: Actor panel
 - **WHEN** the DM selects `npc_2` as the actor and it has Reaction Used

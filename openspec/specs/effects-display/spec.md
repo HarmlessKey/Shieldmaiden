@@ -15,7 +15,8 @@ show one chip per active effect instance of that entity, after the reminders. An
 condition's chip SHALL show that condition's icon. Any other effect SHALL show a generic
 effect icon with the first letter of its name. Chips SHALL follow the existing overflow
 behavior: when space runs out, the remaining chips move into the "+N" menu. Reminder chips
-SHALL keep working unchanged. There SHALL be no separate legacy condition chips.
+SHALL show the encounter's reminders about that entity that aren't done, with their title and
+color. There SHALL be no separate legacy condition chips.
 
 #### Scenario: Prone NPC
 - **WHEN** an NPC has a Prone effect instance
@@ -36,6 +37,10 @@ SHALL keep working unchanged. There SHALL be no separate legacy condition chips.
 #### Scenario: Overflow
 - **WHEN** an entity has more chips than fit in its row
 - **THEN** the chips that don't fit are listed in the "+N" menu, including effect chips
+
+#### Scenario: Reminder chip
+- **WHEN** the encounter has a reminder about the goblin that isn't done, and a done one
+- **THEN** the goblin's row shows a chip for the first and none for the done one
 
 ### Requirement: Chips show a badge and a tooltip
 

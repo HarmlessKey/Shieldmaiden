@@ -1223,10 +1223,10 @@ export const combat_tracker_texts = Object.freeze([
 		icon: "fas fa-bell",
 		title: "Reminders",
 		text:
-			"Add reminders to entities that trigger notifications when certain events occur. " +
-			"Great for <b>concentration</b> because you'll get notified when a target was concentrating " +
-			"as soon as it takes damage, or for instance when a target needs to takes damage on the start of " +
-			"their turn for.",
+			"Add reminders to your encounter that come up at the right moment: when combat starts, " +
+			"at a round or a turn of the round, at a creature's turn, or when it's defeated. " +
+			"Great for <b>lair actions</b>, a boss that changes tactics in round 3, or burning ground " +
+			"that deals damage every round.",
 	},
 	{
 		name: "damage-types",

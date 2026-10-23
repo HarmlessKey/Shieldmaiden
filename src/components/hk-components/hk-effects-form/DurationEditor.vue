@@ -4,7 +4,7 @@
 			<div class="col-12 col-md-6">
 				<hk-select
 					:value="value.type"
-					:options="toOptions(duration_types, value.type)"
+					:options="toOptions(duration_types)"
 					label="Duration *"
 					name="Duration type"
 					rules="required"
@@ -101,7 +101,7 @@
 			<div class="d-flex items-center gap-1">
 				<hk-select
 					:value="cancel.trigger"
-					:options="toOptions(triggers, cancel.trigger)"
+					:options="toOptions(triggers)"
 					label="Trigger *"
 					name="Cancel trigger"
 					rules="required"

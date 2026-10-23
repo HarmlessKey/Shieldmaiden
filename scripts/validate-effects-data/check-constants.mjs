@@ -3,7 +3,7 @@
 //
 // Checks:
 //   1. every enum in src/schemas/hk-effects-schema.json is mapped to a constants export,
-//      and the values match both ways (legacy aliases included)
+//      and the values match both ways (except the NPC-only damage types)
 //   2. every effect_types entry only lists known sub-types and sub-effect fields, every
 //      sub-effect field is common or used by a type, and every duration type only lists
 //      duration fields
@@ -93,6 +93,11 @@ const ENUM_MAP = {
 	"#/$defs/sub_effect/properties/target": ["effects", "targets"],
 	"#/$defs/sub_type": ["effects", "effect_subtypes"],
 };
+// Constants that are not in the schema: NPC defenses "from nonmagical attacks", which
+// effects express with the plain type and bypass: ["magical"]
+const NOT_IN_SCHEMA = {
+	damage_types: ["non_magical_bludgeoning", "non_magical_piercing", "non_magical_slashing"],
+};
 
 // Lists of sub-effects inside a definition
 const NESTED_LISTS = ["sub_effects", "success_effects", "fail_by_5_effects", "on_fail", "on_expire"];
@@ -150,7 +155,7 @@ for (const { pointer, values } of enums) {
 		.filter((value) => !constants.includes(value))
 		.forEach((value) => report(source, exportName, `no entry for "${value}" (${pointer})`));
 	constants
-		.filter((value) => !values.includes(value))
+		.filter((value) => !values.includes(value) && !NOT_IN_SCHEMA[exportName]?.includes(value))
 		.forEach((value) => report(source, exportName, `"${value}" is not in the schema (${pointer})`));
 }
 const enumPointers = new Set(enums.map(({ pointer }) => pointer));

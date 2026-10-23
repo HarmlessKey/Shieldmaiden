@@ -174,9 +174,6 @@ export function normalizeDefinition(raw = {}) {
 	return { ...raw, sub_effects };
 }
 
-// Definition fields from before durations moved to the application (plan 2c)
-const DEPRECATED_DEFINITION_FIELDS = ["duration_type", "duration_value", "cancel_trigger"];
-
 // Keys whose values are numbers in the schema; numeric strings under them become numbers
 const NUMERIC_KEYS = new Set([
 	"value",
@@ -246,16 +243,13 @@ function cleanValue(value, numeric = false) {
 /**
  * Copy of an effect definition as the effects form saves it: without empty strings,
  * null, undefined, empty arrays and empty objects (at any depth), with numeric strings
- * under numeric keys turned into numbers, and without the deprecated duration fields.
- * 0 and false are kept.
+ * under numeric keys turned into numbers. 0 and false are kept.
  *
  * @param {object} effect Effect definition
  * @returns {object} New object, the input is not modified
  */
 export function cleanEffectDefinition(effect = {}) {
-	const cleaned = cleanValue(effect);
-	DEPRECATED_DEFINITION_FIELDS.forEach((field) => delete cleaned[field]);
-	return cleaned;
+	return cleanValue(effect);
 }
 
 /**
@@ -806,22 +800,6 @@ export function describeSubEffect(sub_effect) {
 	return sub_types ? `${type}: ${sub_types}${against}${from}` : `${type}${against}${from}`;
 }
 
-const TRIGGER_ALIASES = {
-	failed_save: "on_save_fail",
-	success_save: "on_save_success",
-	zero_hp: "on_zero_hp",
-};
-
-/**
- * Current name of a trigger, mapping the legacy spellings
- *
- * @param {string} trigger
- * @returns {string}
- */
-export function normalizeTrigger(trigger) {
-	return TRIGGER_ALIASES[trigger] || trigger;
-}
-
 /**
  * Trigger names in words, used in prompts: "Goblin: Burning, at the start of its turn"
  */
@@ -874,7 +852,7 @@ const HIT_TAKEN_BY = [undefined, "any", "caster", "counterpart"];
  * @returns {boolean}
  */
 export function hitTakenDamage(sub_effect = {}) {
-	if (sub_effect.type !== "damage" || normalizeTrigger(sub_effect.trigger) !== "on_hit_taken") return false;
+	if (sub_effect.type !== "damage" || sub_effect.trigger !== "on_hit_taken") return false;
 	if (sub_effect.target && sub_effect.target !== "self") return false;
 	if (sub_effect.save || sub_effect.frequency) return false;
 	const filter = sub_effect.trigger_filter || {};
@@ -963,7 +941,6 @@ function checkFilter(filter = {}, event = {}, instance = {}) {
  * @returns {object[]} [{ holderKey, effectKey, instance, definition, matches: [{ sub_effect, unchecked }] }]
  */
 export function matchTriggers({ trigger, entityKey, entities = {}, definitionOf, event = {}, effectKey }) {
-	trigger = normalizeTrigger(trigger);
 	const results = [];
 
 	for (const [holderKey, entity] of Object.entries(entities)) {
@@ -990,7 +967,7 @@ export function matchTriggers({ trigger, entityKey, entities = {}, definitionOf,
 
 			const matches = [];
 			for (const sub_effect of definition.sub_effects || []) {
-				if (!listens.includes(normalizeTrigger(sub_effect.trigger))) continue;
+				if (!listens.includes(sub_effect.trigger)) continue;
 				const { pass, unchecked } = checkFilter(sub_effect.trigger_filter, event, instance);
 				if (pass) matches.push({ sub_effect, unchecked });
 			}
@@ -1003,12 +980,10 @@ export function matchTriggers({ trigger, entityKey, entities = {}, definitionOf,
 const DURATION_LABELS = {
 	instant: "Instantaneous",
 	rest: "Until a rest",
-	long_rest: "Until a long rest",
 	dawn: "Until dawn",
 	trigger: "Until triggered",
 	save_ends: "Until saved",
 	special: "Special",
-	action_removed: "Until removed with an action",
 };
 
 const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
@@ -1551,7 +1526,6 @@ const lowerFirst = (text) => text.charAt(0).toLowerCase() + text.slice(1);
  * @returns {object[]} { kind: "tick", holderKey, effectKey, value } | { kind: "expire", holderKey, effectKey, reason } | { kind: "maybe", holderKey, effectKey, unchecked } | { kind: "save", holderKey, effectKey, advantage } | { kind: "save_auto", holderKey, effectKey }
  */
 export function durationActions({ trigger, entityKey, entities = {}, event = {}, round }) {
-	trigger = normalizeTrigger(trigger);
 	const actions = [];
 	// Repeat saves come last, so an expiry on the same trigger wins
 	const saves = [];
@@ -1563,9 +1537,7 @@ export function durationActions({ trigger, entityKey, entities = {}, event = {},
 			// Repeat saves at their triggers
 			const save = duration.save;
 			if (save?.ability) {
-				const triggers = (save.triggers?.length ? save.triggers : ["end_turn_target"]).map(
-					normalizeTrigger
-				);
+				const triggers = save.triggers?.length ? save.triggers : ["end_turn_target"];
 				const matches = CASTER_TRIGGERS.includes(trigger)
 					? anchorKey(instance, holderKey, entities, "caster") === entityKey
 					: holderKey === entityKey;
@@ -1582,7 +1554,7 @@ export function durationActions({ trigger, entityKey, entities = {}, event = {},
 									kind: "save",
 									holderKey,
 									effectKey,
-									advantage: (save.advantage_on_triggers || []).map(normalizeTrigger).includes(trigger),
+									advantage: (save.advantage_on_triggers || []).includes(trigger),
 							  }
 					);
 				}
@@ -1650,7 +1622,7 @@ export function durationActions({ trigger, entityKey, entities = {}, event = {},
 			// Cancel triggers, for the holder's own events
 			if (holderKey === entityKey && Array.isArray(duration.cancel_triggers)) {
 				for (const entry of duration.cancel_triggers) {
-					if (normalizeTrigger(entry.trigger) !== trigger) continue;
+					if (entry.trigger !== trigger) continue;
 					const { pass, unchecked } = checkFilter(entry.filter, event, instance);
 					if (!pass) continue;
 					const label = TRIGGER_LABELS[trigger] || trigger.replace(/_/g, " ");
@@ -1876,7 +1848,7 @@ export function resolveRepeatSave(instance, success) {
 export function onExpireSubEffects({ instance = {}, definition }) {
 	const own = instance.duration?.on_expire || [];
 	const fromDefinition = (definition?.sub_effects || []).filter(
-		(sub_effect) => normalizeTrigger(sub_effect.trigger) === "on_expire"
+		(sub_effect) => sub_effect.trigger === "on_expire"
 	);
 	return [...own, ...fromDefinition];
 }
@@ -2439,7 +2411,7 @@ export function applyNotices({ instance = {}, definition, holderName } = {}) {
 		const text = sub_effect.description || describeSubEffect(sub_effect);
 		if (sub_effect.type === "fixed" && sub_effect.sub_types?.includes("temp_hp") && !sub_effect.trigger) {
 			notices.push(`${name}: ${holderName} gets temporary hit points, ${text}`);
-		} else if (normalizeTrigger(sub_effect.trigger) === "on_apply") {
+		} else if (sub_effect.trigger === "on_apply") {
 			notices.push(`${name}, when applied: ${text}`);
 		}
 	}
@@ -3062,8 +3034,6 @@ const ROLL_PART_SUB_TYPES = {
 	attack: ["attack", "d20_test"],
 };
 const ROLL_TYPES = ["advantage", "disadvantage", "bonus", "auto_fail", "auto_success", "roll_floor", "reroll"];
-// Legacy spelling of an "against" advantage/disadvantage
-const GRANT_TYPES = { grant_advantage: "advantage", grant_disadvantage: "disadvantage" };
 
 // The attack_types an attack action is
 const ATTACK_TYPE_KINDS = {
@@ -3230,18 +3200,15 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 		const entries = [];
 		for (const original of definition.sub_effects || []) {
 			const sub_effect = withChosenValue(original, instance);
-			let type = sub_effect.type;
+			const type = sub_effect.type;
 			const sub_types = sub_effect.sub_types || [];
 			if (isAttack && type === "critical") {
 				// The attacker's crit range, or a hit against the target being critical
 				if (against ? !sub_types.includes("incoming_crit_range") : !sub_types.includes("crit_range")) continue;
 				if (!against && !(sub_effect.crit_range >= 2)) continue;
 			} else {
-				// The target's side of an attack takes only "against" modifiers (or the legacy grant_*)
-				if (against) {
-					if (sub_effect.perspective !== "against" && !GRANT_TYPES[type]) continue;
-					type = GRANT_TYPES[type] || type;
-				} else if (sub_effect.perspective === "against") continue;
+				// The target's side of an attack takes only "against" modifiers
+				if (against !== (sub_effect.perspective === "against")) continue;
 				if (!ROLL_TYPES.includes(type)) continue;
 				if (!parts.some((part) => rollPartMatches(sub_effect, part, instance.choices))) continue;
 			}

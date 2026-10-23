@@ -5,7 +5,7 @@
 			<div class="col-12 col-sm-5">
 				<hk-select
 					:value="value.type"
-					:options="toOptions(condition_check_types, value.type)"
+					:options="toOptions(condition_check_types)"
 					label="Check"
 					name="Check"
 					rules="required"

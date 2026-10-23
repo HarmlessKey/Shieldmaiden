@@ -4,7 +4,7 @@
 			<div class="col-12" :class="{ 'col-md-5': typeEntry && typeEntry.sub_types.length }">
 				<hk-select
 					:value="value.type"
-					:options="toOptions(effect_types, value.type)"
+					:options="toOptions(effect_types)"
 					:hint="typeEntry ? typeEntry.description : undefined"
 					label="Type *"
 					name="Type"
@@ -77,7 +77,7 @@
 					<div class="col-12 col-md-6">
 						<hk-select
 							:value="value.trigger"
-							:options="toOptions(triggers, value.trigger)"
+							:options="toOptions(triggers)"
 							label="When *"
 							name="Trigger"
 							rules="required"
@@ -247,7 +247,7 @@ export default {
 		},
 		subTypeOptions() {
 			const allowed = this.typeEntry ? this.typeEntry.sub_types : [];
-			return this.toOptions(effect_subtypes, this.value.sub_types).filter((option) =>
+			return this.toOptions(effect_subtypes).filter((option) =>
 				allowed.includes(option.value)
 			);
 		},

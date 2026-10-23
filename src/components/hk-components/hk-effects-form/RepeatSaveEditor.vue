@@ -16,7 +16,7 @@
 			<div class="col-12 col-md-6">
 				<hk-select
 					:value="value.triggers"
-					:options="toOptions(triggers, value.triggers)"
+					:options="toOptions(triggers)"
 					label="Repeated at"
 					placeholder="End of the holder's turn"
 					multiple
@@ -29,7 +29,7 @@
 			<div class="col-12 col-md-6">
 				<hk-select
 					:value="value.advantage_on_triggers"
-					:options="toOptions(triggers, value.advantage_on_triggers)"
+					:options="toOptions(triggers)"
 					label="With Advantage when repeated at"
 					multiple
 					use-chips

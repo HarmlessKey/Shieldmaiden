@@ -10,7 +10,6 @@ import {
 	resolveDefinition,
 	matchTriggers,
 	hitTakenDamage,
-	normalizeTrigger,
 	describeSubEffect,
 	durationActions,
 	endsWhenExpiries,
@@ -2837,7 +2836,7 @@ const run_encounter_actions = {
 	 * for the DM per matching effect instance. Then ticks and expires durations for it:
 	 * timed effects, turn edges, cancel triggers and end conditions.
 	 *
-	 * @param {string} trigger Trigger name ($defs/trigger), legacy spellings allowed
+	 * @param {string} trigger Trigger name ($defs/trigger)
 	 * @param {string} entityKey Entity the trigger fired for (undefined for combat_start)
 	 * @param {object} event What is known: sourceKey, amount, damageTypes, attackTypes, naturalRoll, round
 	 * @param {string} effectKey Only this instance of entityKey (on_apply)
@@ -2847,7 +2846,6 @@ const run_encounter_actions = {
 		{ state, commit, getters, dispatch },
 		{ trigger, entityKey, event = {}, effectKey }
 	) {
-		trigger = normalizeTrigger(trigger);
 		// An NPC at 0 hit points is defeated: its "defeated or removed" reminders (effects 9)
 		if (trigger === "on_zero_hp" && state.entities[entityKey]?.entityType === "npc") {
 			await dispatch("fire_reminders", { event: { type: "defeated", entityKey } });

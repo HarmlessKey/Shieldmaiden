@@ -56,18 +56,13 @@ export function choiceField({ kind, options } = {}, { conditions = [] } = {}) {
 }
 
 /**
- * Options for a select from a keyed constants object. Legacy entries are left out,
- * unless they are the current value, so old data still shows its label.
+ * Options for a select from a keyed constants object
  *
- * @param {object} entries Keyed constants ({ [value]: { value, label, description?, legacy? } })
- * @param {string|string[]} [current] Current value(s)
+ * @param {object} entries Keyed constants ({ [value]: { value, label, description? } })
  * @returns {{ label: string, value: string, description?: string }[]}
  */
-export function toOptions(entries, current) {
-	const selected = [].concat(current ?? []);
-	return Object.values(entries)
-		.filter((entry) => !entry.legacy || selected.includes(entry.value))
-		.map(({ label, value, description }) => ({ label, value, description }));
+export function toOptions(entries) {
+	return Object.values(entries).map(({ label, value, description }) => ({ label, value, description }));
 }
 
 /**
@@ -267,8 +262,6 @@ const VALUE_TYPES = ["bonus", "base", "fixed", "floor", "cap"];
 const ROLL_TYPES = [
 	"advantage",
 	"disadvantage",
-	"grant_advantage",
-	"grant_disadvantage",
 	"reroll",
 	"roll_floor",
 	"auto_fail",

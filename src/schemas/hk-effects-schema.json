@@ -40,18 +40,6 @@
 			"type": "array",
 			"minItems": 1,
 			"items": { "$ref": "#/$defs/sub_effect" }
-		},
-		"duration_type": {
-			"type": "string",
-			"description": "DEPRECATED (implementation plan 2c): durations belong to the application, not the definition. Accepted for legacy data only."
-		},
-		"duration_value": {
-			"type": "integer",
-			"description": "DEPRECATED, see duration_type."
-		},
-		"cancel_trigger": {
-			"type": "string",
-			"description": "DEPRECATED, use application.duration.cancel_triggers."
 		}
 	},
 
@@ -71,10 +59,9 @@
 			"type": "string",
 			"enum": [
 				"acid", "bludgeoning", "cold", "fire", "force", "lightning", "necrotic",
-				"piercing", "poison", "psychic", "radiant", "slashing", "thunder",
-				"non_magical_bludgeoning", "non_magical_piercing", "non_magical_slashing"
+				"piercing", "poison", "psychic", "radiant", "slashing", "thunder"
 			],
-			"description": "The non_magical_* values are legacy aliases used by NPC data. New definitions express '… from nonmagical attacks' with the plain type plus sub_effect.bypass: ['magical']."
+			"description": "'… from nonmagical attacks' is the plain type plus sub_effect.bypass: ['magical']."
 		},
 
 		"creature-type-select": {
@@ -177,8 +164,7 @@
 				"on_cast", "on_targeted_by_spell", "on_condition_applied",
 				"on_heal", "on_bloodied", "on_zero_hp", "on_death", "on_kill",
 				"on_enter_area", "start_turn_in_area", "end_turn_in_area", "on_move",
-				"short_rest", "long_rest", "dawn",
-				"failed_save", "success_save", "zero_hp"
+				"short_rest", "long_rest", "dawn"
 			]
 		},
 
@@ -220,7 +206,7 @@
 		"condition_check": {
 			"type": "object",
 			"required": ["type"],
-			"description": "A state test. subject defaults to 'self' (the holder), except for the legacy attacker_* types.",
+			"description": "A state test. subject defaults to 'self' (the holder).",
 			"properties": {
 				"subject": {
 					"type": "string",
@@ -233,8 +219,7 @@
 						"distance", "can_see", "line_of_sight", "has_condition", "has_effect", "creature_type", "size",
 						"bloodied", "hp_threshold", "missing_hp", "hp_zero", "temp_hp_zero",
 						"sense", "ally_adjacent", "is_caster", "relationship",
-						"equipment", "environment", "combat_state", "movement", "roll_state",
-						"attacker_distance", "attacker_has_condition", "target_has_condition", "target_creature_type"
+						"equipment", "environment", "combat_state", "movement", "roll_state"
 					]
 				},
 				"value": {
@@ -412,10 +397,9 @@
 					"type": "string",
 					"enum": [
 						"instant", "time", "cancelled", "concentration", "next_turn", "end_of_turn",
-						"rest", "dawn", "trigger", "save_ends", "special",
-						"action_removed", "long_rest"
+						"rest", "dawn", "trigger", "save_ends", "special"
 					],
-					"description": "cancelled = until removed/dispelled. next_turn = until the anchor's next turn edge. end_of_turn = until the end of the current turn. action_removed and long_rest are legacy aliases (use escape and rest)."
+					"description": "cancelled = until removed/dispelled. next_turn = until the anchor's next turn edge. end_of_turn = until the end of the current turn."
 				},
 				"value": { "$ref": "#/$defs/amount" },
 				"unit": { "type": "string", "enum": ["round", "minute", "hour", "day"], "default": "round" },
@@ -596,7 +580,7 @@
 					"enum": [
 						"bonus", "base", "fixed", "floor", "cap",
 						"defense",
-						"advantage", "disadvantage", "grant_advantage", "grant_disadvantage",
+						"advantage", "disadvantage",
 						"reroll", "roll_floor", "critical",
 						"damage", "healing", "damage_modifier",
 						"auto_fail", "auto_success",
@@ -617,7 +601,7 @@
 					"type": "string",
 					"enum": ["self", "against"],
 					"default": "self",
-					"description": "self = the holder's own rolls/values; against = rolls other creatures make against the holder (Sundering Blow +5, Elusive, Greater Magic Resistance auto-miss). grant_advantage/grant_disadvantage are the legacy spelling of advantage/disadvantage + against."
+					"description": "self = the holder's own rolls/values; against = rolls other creatures make against the holder (Sundering Blow +5, Elusive, Greater Magic Resistance auto-miss)."
 				},
 				"value": {
 					"description": "Numeric value, or a formula (Aura of Protection: { formula: 'caster.cha_mod', min: 1 }). A value that grows with the effect's own level uses the level variable (2024 Exhaustion: { formula: '-2 * level' }).",
@@ -745,8 +729,6 @@
 				"attack", "damage", "ability", "skill", "save", "concentration_save", "d20_test", "death_save",
 
 				"v", "r", "i",
-
-				"roll", "fixed_value",
 
 				"crit", "crit_range", "incoming_crit_range", "negate_incoming_crit", "extra_crit_dice",
 

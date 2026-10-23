@@ -23,8 +23,7 @@ the sub-types that apply to them are:
   save's ability (Constitution)
 
 A sub-effect with `abilities` SHALL apply only to rolls of those abilities. A sub-effect with
-`perspective: "against"`, or the legacy `grant_advantage` / `grant_disadvantage`, SHALL NOT
-apply to the holder's own rolls. Level limits (`min_level`, `max_level`), `choice`, unresolved
+`perspective: "against"` SHALL NOT apply to the holder's own rolls. Level limits (`min_level`, `max_level`), `choice`, unresolved
 definitions, and the same definition on one entity twice SHALL be handled as for numeric
 modifiers (effects-stat-modifiers).
 
@@ -268,8 +267,7 @@ bonuses, single-use modifiers, reminders). An attack action is a monster action 
 with type `melee_weapon`, `ranged_weapon` or `spell_attack`. The modifiers come from:
 - **the attacker:** its effects' sub-effects on `attack` or `d20_test` (not `against`), and
   its manual `attack` bonuses
-- **the target:** its effects' sub-effects on `attack` with `perspective: "against"` (or the
-  legacy `grant_advantage` / `grant_disadvantage`)
+- **the target:** its effects' sub-effects on `attack` with `perspective: "against"`
 
 A sub-effect with `attack_types` SHALL apply only when the attack is of one of them:
 - `melee_weapon` is `melee`, `weapon` and `melee_weapon`

@@ -11,9 +11,7 @@ turns, damage, rolls, checks and being applied.
 ### Requirement: Matching effects are found per trigger
 
 When a trigger fires for an entity, the tracker SHALL collect every active effect instance
-whose resolved definition has at least one sub-effect with that `trigger`. The legacy
-spellings `failed_save`, `success_save` and `zero_hp` SHALL count as `on_save_fail`,
-`on_save_success` and `on_zero_hp`. For holder-scoped triggers, only the instances on that
+whose resolved definition has at least one sub-effect with that `trigger`. For holder-scoped triggers, only the instances on that
 entity SHALL be collected. For `start_turn_caster` and `end_turn_caster`, the instances on
 any entity whose `caster_key` is that entity SHALL be collected. For `combat_start`, the
 instances on every entity SHALL be collected. Instances with an unresolved definition SHALL
@@ -26,10 +24,6 @@ be ignored.
 #### Scenario: Caster-scoped trigger
 - **WHEN** `end_turn_caster` fires for `player_1`, and `npc_1` and `npc_2` each have an instance with `caster_key: "player_1"` whose definition has an `end_turn_caster` sub-effect
 - **THEN** both instances are collected
-
-#### Scenario: Legacy spelling
-- **WHEN** `on_save_fail` fires for an entity whose custom effect has a sub-effect with `trigger: "failed_save"`
-- **THEN** that instance is collected
 
 #### Scenario: No listeners
 - **WHEN** `start_turn_target` fires for an entity that only has Prone

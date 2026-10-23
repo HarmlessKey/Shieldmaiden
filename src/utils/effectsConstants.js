@@ -2,9 +2,8 @@
  * Labels and form metadata for the effects schema (src/schemas/hk-effects-schema.json).
  *
  * Every enum the effects form offers has a keyed object here: { [value]: { value, label,
- * description?, legacy? } }. Legacy aliases are kept so old data can still be labelled,
- * but the form doesn't offer them. Abilities, damage types, creature types and skills
- * come from generalConstants.js.
+ * description? } }. Abilities, damage types, creature types and skills come from
+ * generalConstants.js.
  *
  * Keep in sync with the schema: node scripts/validate-effects-data/check-constants.mjs
  */
@@ -154,20 +153,6 @@ export const effect_types = keyed({
 		description: "Disadvantage on rolls, or on rolls made against the holder",
 		sub_types: ROLL_SUB_TYPES,
 		fields: ["perspective", ...ROLL_FILTER_FIELDS],
-	},
-	grant_advantage: {
-		label: "Grant advantage",
-		description: "Legacy: Advantage against the holder",
-		legacy: true,
-		sub_types: ROLL_SUB_TYPES,
-		fields: ROLL_FILTER_FIELDS,
-	},
-	grant_disadvantage: {
-		label: "Grant disadvantage",
-		description: "Legacy: Disadvantage against the holder",
-		legacy: true,
-		sub_types: ROLL_SUB_TYPES,
-		fields: ROLL_FILTER_FIELDS,
 	},
 	reroll: {
 		label: "Reroll",
@@ -414,10 +399,6 @@ export const effect_subtypes = keyed({
 	r: { label: "Resistant" },
 	i: { label: "Immune" },
 
-	// Legacy damage sub-types of the old form
-	roll: { label: "Roll", legacy: true },
-	fixed_value: { label: "Fixed value", legacy: true },
-
 	// Critical hits
 	crit: { label: "Critical hit" },
 	crit_range: { label: "Critical range" },
@@ -614,9 +595,6 @@ export const triggers = keyed({
 	short_rest: { label: "Short Rest" },
 	long_rest: { label: "Long Rest" },
 	dawn: { label: "Dawn" },
-	failed_save: { label: "Fails a saving throw", legacy: true },
-	success_save: { label: "Succeeds on a saving throw", legacy: true },
-	zero_hp: { label: "Drops to 0 hit points", legacy: true },
 });
 
 export const trigger_by = keyed({
@@ -662,10 +640,6 @@ export const condition_check_types = keyed({
 	combat_state: { label: "Combat state", input: "combat_state" },
 	movement: { label: "Movement", input: "number", description: "Feet moved this turn" },
 	roll_state: { label: "Roll state", input: "roll_state" },
-	attacker_distance: { label: "Attacker distance", input: "number", legacy: true },
-	attacker_has_condition: { label: "Attacker has condition", input: "condition", legacy: true },
-	target_has_condition: { label: "Target has condition", input: "condition", legacy: true },
-	target_creature_type: { label: "Target creature type", input: "creature_type", legacy: true },
 });
 
 /**
@@ -774,8 +748,6 @@ export const duration_types = keyed({
 	trigger: { label: "Until a trigger", fields: [] },
 	save_ends: { label: "Until saved", fields: [] },
 	special: { label: "Special", fields: [] },
-	action_removed: { label: "Until removed with an action", legacy: true, fields: [] },
-	long_rest: { label: "Until a Long Rest", legacy: true, fields: [] },
 });
 
 export const duration_anchors = keyed({

@@ -223,7 +223,7 @@ export default {
 				case "conditions":
 					return this.conditionOptions;
 				default:
-					return this.control.options ? this.toOptions(this.control.options, this.current) : [];
+					return this.control.options ? this.toOptions(this.control.options) : [];
 			}
 		},
 		numberRules() {

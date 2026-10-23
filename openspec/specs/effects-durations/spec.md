@@ -89,7 +89,7 @@ with their Concentration (effects-concentration).
 ### Requirement: Cancel triggers end an effect
 
 When a trigger fires for an entity, every instance on that entity whose
-`duration.cancel_triggers` lists that trigger (legacy spellings normalised) SHALL be
+`duration.cancel_triggers` lists that trigger SHALL be
 removed, when the entry's `filter` passes for the event. When the filter can't be checked
 from what the event knows, the instance SHALL NOT be removed; instead the DM SHALL be
 prompted that it may have ended, naming the unchecked condition.

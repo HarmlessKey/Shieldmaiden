@@ -4,7 +4,7 @@
 			<div class="col-12">
 				<hk-select
 					:value="value.triggers"
-					:options="toOptions(triggers, value.triggers)"
+					:options="toOptions(triggers)"
 					label="Kept going by *"
 					name="Sustain triggers"
 					rules="required"
@@ -18,7 +18,7 @@
 			<div class="col-12 col-md-6">
 				<hk-select
 					:value="value.check"
-					:options="toOptions(triggers, value.check)"
+					:options="toOptions(triggers)"
 					label="Checked at"
 					placeholder="End of the holder's turn"
 					emit-value

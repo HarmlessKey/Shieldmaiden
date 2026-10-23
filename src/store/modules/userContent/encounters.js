@@ -18,6 +18,27 @@ function parseInts(entity) {
 }
 
 /**
+ * Ids of the encounter's reminders about an entity (effects 10)
+ *
+ * @param {object} encounter
+ * @param {string} entityId
+ * @returns {string[]}
+ */
+function entityReminderIds(encounter, entityId) {
+	return Object.entries(encounter?.reminders || {})
+		.filter(([, reminder]) => reminder?.entity_key === entityId)
+		.map(([id]) => id);
+}
+
+/**
+ * Removes a ghost entity and its reminders from a loaded encounter object
+ */
+function dropEntity(encounter, entityId) {
+	delete encounter.entities[entityId];
+	for (const id of entityReminderIds(encounter, entityId)) delete encounter.reminders[id];
+}
+
+/**
  * @typedef {Object} Encounter
  * @property {Array} entities
  * @property {boolean} finished
@@ -196,7 +217,7 @@ const encounter_actions = {
 					if (!no_ghosts && !npc) {
 						const npc_id = entity.id;
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
-						delete encounter.entities[entityId];
+						dropEntity(encounter, entityId);
 						console.warn(`Ghost NPC ${npc_id} deleted.`);
 					}
 				}
@@ -205,7 +226,7 @@ const encounter_actions = {
 					const companion = await dispatch("npcs/get_npc", { uid, id: entityId }, { root: true });
 					if (!no_ghosts && !companion) {
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
-						delete encounter.entities[entityId];
+						dropEntity(encounter, entityId);
 						console.warn(`Ghost companion ${entityId} deleted.`);
 					}
 				}
@@ -218,7 +239,7 @@ const encounter_actions = {
 					);
 					if (!no_ghosts && !player) {
 						await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
-						delete encounter.entities[entityId];
+						dropEntity(encounter, entityId);
 						console.warn(`Ghost player ${entityId} deleted.`);
 
 						// Also remove companions
@@ -234,6 +255,9 @@ const encounter_actions = {
 									entityId: companion.key,
 								});
 								delete encounter.entities[companion.id];
+								for (const reminderId of entityReminderIds(encounter, companion.key)) {
+									delete encounter.reminders[reminderId];
+								}
 							}
 						}
 					}
@@ -701,32 +725,34 @@ const encounter_actions = {
 	},
 
 	/**
-	 * Sets reminders on an entity
-	 *
-	 * @param {string} campaignId CampaignId
-	 * @param {string} encounterId EncounterId
-	 * @param {string} entity Entity key
-	 * @param {string} key Reminder key
-	 * @param {object} reminder full reminder object, or integer with rounds
-	 */
-	/**
 	 * Sets or removes one of the encounter's reminders (effects 9: `encounter.reminders/<id>`)
 	 *
 	 * @param {string} campaignId
 	 * @param {string} encounterId
-	 * @param {string} id Reminder id
+	 * @param {string} id Reminder id; a new one is made when not given (effects 10)
 	 * @param {object|null} reminder The reminder (reminderFunctions.cleanReminder), null removes it
+	 * @returns {string} The reminder id
 	 */
 	async save_encounter_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, id, reminder }) {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (!uid) return;
+		const reminderId = id || Date.now() + Math.random().toString(36).substring(4);
 		const services = await dispatch("get_encounter_services");
-		await services.updateEncounter(uid, campaignId, encounterId, "/reminders", { [id]: reminder ?? null });
-		commit("SET_ENCOUNTER_REMINDER", { uid, campaignId, encounterId, id, reminder: reminder ?? null });
+		await services.updateEncounter(uid, campaignId, encounterId, "/reminders", {
+			[reminderId]: reminder ?? null,
+		});
+		commit("SET_ENCOUNTER_REMINDER", {
+			uid,
+			campaignId,
+			encounterId,
+			id: reminderId,
+			reminder: reminder ?? null,
+		});
+		return reminderId;
 	},
 
 	/**
-	 * Deletes an entity from an encounter
+	 * Deletes an entity from an encounter, with its reminders: they can't fire any more (effects 10)
 	 *
 	 * @param {string} campaignId
 	 * @param {string} encounterId
@@ -750,6 +776,15 @@ const encounter_actions = {
 				if (encounter_entities && Object.keys(encounter_entities).includes(entityId)) {
 					await services.deleteEntity(uid, campaignId, encounterId, entityId);
 					commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
+
+					const reminderIds = entityReminderIds(encounter, entityId);
+					if (reminderIds.length) {
+						const removed = Object.fromEntries(reminderIds.map((id) => [id, null]));
+						await services.updateEncounter(uid, campaignId, encounterId, "/reminders", removed);
+						for (const id of reminderIds) {
+							commit("SET_ENCOUNTER_REMINDER", { uid, campaignId, encounterId, id, reminder: null });
+						}
+					}
 
 					const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
 					commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });

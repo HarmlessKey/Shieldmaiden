@@ -1577,7 +1577,7 @@ Ideas to work out when it's proposed:
   writes and `services.addReminder`. The mobile current view called `checkReminders` without
   the mixin, so it threw on every turn; that's gone too.
 
-## 10. Set encounter reminders from the edit encounter screen
+## 10. Set encounter reminders from the edit encounter screen (done — archived as effects-10-edit-encounter-reminders, 2026-10-23)
 Idea, 2026-10-12. Builds on step 9. The DM prepares the encounter's trigger reminders
 ("Round 3: the boss may flee") while building the encounter, not only during combat.
 - **Where:** the edit encounter screen (`src/views/UserContent/Encounters/EditEncounter.vue`)
@@ -1590,6 +1590,32 @@ Idea, 2026-10-12. Builds on step 9. The DM prepares the encounter's trigger remi
     entities, which may change before combat.
   - Whether a reminder that offers to apply an effect (step 9's sandstorm) can pick its
     effect and targets here.
+
+*As built (change `effects-10-edit-encounter-reminders`):*
+- **Decided at proposal (user):**
+  - creature reminders too, with a **For** choice (The encounter, or one of the encounter's
+    creatures)
+  - a Reminders tab
+  - not in the demo builder
+- **Effects and targets:** the effect is picked in the form (SRD of the campaign's edition and
+  custom effects). Targets are chosen when the prompt fires, as in step 9.
+- **UI:** `src/components/encounters/Reminders.vue`, a tab after Loot (bell icon), only when
+  not in the demo.
+  - The list shows the encounter's own reminders first, then per creature, with edit, re-arm and
+    remove.
+  - Step 9's `ReminderForm` sits below, with the scope from For. Switching For drops a trigger
+    that doesn't fit (`triggerFits`) and damage for a creature.
+  - Adding goes through `reminderFromTemplate` with the encounter's round (0 before combat).
+  - Editing loads the reminder into the same form (Save / Cancel). The trigger decides
+    `repeat`. The subject can change.
+- **Store:** `encounters/save_encounter_reminder` makes the id when none is given and returns
+  it.
+  - `delete_entity` removes the entity's reminders: the edit screen's remove, ghosts removed
+    in `get_encounter` (also from the loaded object), and nothing left over after the
+    tracker's `remove_entity`.
+  - No firing outside the tracker.
+  - `get_encounter` returns the cached encounter object, so the tab's list updates through
+    `SET_ENCOUNTER_REMINDER`.
 
 ## 11. HK API updates (last)
 Moved here from step 8 on 2026-10-16: the API connection comes after the reminders work
@@ -1719,7 +1745,7 @@ let an AI write them instead, and import the result.
 6 (done — archived as effects-6-npc-action-effects, 2026-10-15) -> 6b (done — archived as effects-6b-trait-effects, 2026-10-16) -> 6c (done — archived as effects-6c-spell-effects, 2026-10-16) -> 7 (done — archived as effects-7-apply-linked-effects, 2026-10-16; monster actions, trait effects on special abilities, spell actions, action rolls; additive on top of step 3)
 8 (done — archived as effects-8-effects-outside-combat, 2026-10-18; apply effects outside combat: the set initiative screen, with a shared header-actions component for the Targeted and Overview headers, Surprised as an effect instead of a reminder, and the campaign's players on the run campaign screen)
 9 (done — archived as effects-9-encounter-reminders, 2026-10-23; encounter reminders on triggers, incl. the former 3f)
-10 (set encounter reminders from the edit encounter screen; after 9)
+10 (done — archived as effects-10-edit-encounter-reminders, 2026-10-23; set encounter reminders from the edit encounter screen: a Reminders tab with a For choice, and an entity's reminders removed with it)
 11 (HK API updates, moved from 8 on 2026-10-16: 11a conditions, 11b SRD effects, 11c SRD monster backfill, 11d SRD spell backfill)
 12 (fetch effects and conditions from the API, a name search on every effect list, and bonus effects listed and applied from the manual bonus drawers; after 11a, 11b)
 13 (import effects, and a downloadable AI skill that writes importable effects; after 6 -> 6b -> 7)

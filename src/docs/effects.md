@@ -808,6 +808,14 @@ Reminders are notes the tracker shows at the right moment. There are two buttons
 shows how many are set), for reminders about the encounter; and the targets' **Reminders**
 option, for reminders about the targeted creatures. The drawer lists the reminders already
 added on top, and has a form below to **Add a reminder**, which stays open for the next one.
+
+You can also prepare them while you build the encounter, on the **Reminders** tab of the edit
+encounter screen. It lists the encounter's reminders, the encounter's own first and then those
+of each creature, to edit, re-arm or remove, with the same form below. Choose under **For**
+whether a reminder is about **The encounter** or one of its creatures. **Start of its turn in N
+rounds** counts from the encounter's current round there, which is 0 before combat. Removing a creature from the encounter
+removes its reminders too.
+
 Most reminders are added while you prepare the encounter:
 
 - **Trigger**, for the encounter:

@@ -1755,7 +1755,7 @@ custom effects (`effects/get_effects`), with no search. Conditions are fetched s
   - the compendium and the condition selects read `/v2/conditions/{edition}`; a condition
     page shows it through `EffectDetails`. The app no longer reads the old `/conditions`.
 
-## 12b. Copy an existing effect in the effects form
+## 12b. Copy an existing effect in the effects form (done — archived as effects-12b-copy-effect, 2026-10-30)
 Idea, 2026-10-30. Building an effect from scratch takes time, and many custom effects are a
 variation on one that exists (an SRD effect with other numbers, or one of the user's own).
 The NPC and spell forms already let you start from a copy; the effects form should work the
@@ -1799,6 +1799,23 @@ To work out when it's proposed:
 - Whether the copied name gets a suffix ("Bless (copy)") so it's told apart from the SRD
   effect in the lists. The NPC and spell copies keep the name.
 - Whether copying a condition is wanted, or only effects.
+
+*As built (change `effects-12b-copy-effect`):*
+- **Decided at proposal (user):** the SRD search runs over the fetched lists in the browser;
+  the copy keeps the name; SRD conditions can be copied too and become custom effects.
+- `copyableEffect(definition)` (`effectFunctions.js`): `cleanEffectDefinition` (a deep copy)
+  without `url`, `_id`, `key`, `edition`, `is_condition` and `meta`. Copying first keeps the
+  shared SRD lists and the cached custom effect untouched.
+- `CopyContent` `type="effect"`:
+  - Custom: the `effects/effects` list, matched with `matchesName`
+  - SRD: `searchSrdEffects` awaits the edition's fetch, lists effects and conditions
+    ("Condition" next to those), filters, sorts and pages in the browser, and says when the
+    lists couldn't be loaded; the edition toggle, no filter button
+  - SRD results are identified by `_id || url`, so monsters, spells and items are unchanged
+- `EditEffect.vue`: the create dialog for a new effect, Copy in the card header while the
+  effect is new, and `copy({ result })`. The unused `api_effects` action mapping is removed.
+- No tier check was needed: the effects list already stops a user at their limit from
+  adding one.
 
 ## 13. Import effects, and an AI skill to build them
 Idea, 2026-10-13. Build it after effects can be linked to monsters and spells (steps 6–7),
@@ -1853,7 +1870,7 @@ let an AI write them instead, and import the result.
 10 (done — archived as effects-10-edit-encounter-reminders, 2026-10-23; set encounter reminders from the edit encounter screen: a Reminders tab with a For choice, and an entity's reminders removed with it)
 11 (HK API updates, moved from 8 on 2026-10-16: 11a conditions, 11b SRD effects, 11c SRD monster backfill, 11d SRD spell backfill)
 12 (done — archived as effects-12-api-effects, 2026-10-30; fetch effects and conditions from the API, a name search on every effect list, bonus effects listed and applied from the manual bonus drawers, and the compendium conditions on v2; after 11a, 11b)
-12b (copy an existing custom or SRD effect in the effects form, as for monsters and spells; after 12)
+12b (done — archived as effects-12b-copy-effect, 2026-10-30; copy an existing custom effect, SRD effect or SRD condition in the effects form, as for monsters and spells; after 12)
 13 (import effects, and a downloadable AI skill that writes importable effects; after 6 -> 6b -> 7)
 
 ## Workflow per step (from 2026-09-29)

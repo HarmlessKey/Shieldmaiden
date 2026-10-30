@@ -14,14 +14,26 @@
 										</q-tooltip>
 									</q-icon>
 								</span>
-								<router-link
-									to="/documentation/effects"
-									target="_blank"
-									class="btn btn-sm bg-neutral-5"
-								>
-									<i aria-hidden="true" class="fas fa-question-circle mr-1" />
-									How effects work
-								</router-link>
+								<div class="d-flex gap-1">
+									<!-- Copy while the effect is new, as for NPCs and spells (effects 12b) -->
+									<button
+										v-if="!effectId"
+										type="button"
+										class="btn btn-sm bg-neutral-5"
+										@click="copy_dialog = true"
+									>
+										<i aria-hidden="true" class="fas fa-copy mr-1" />
+										Copy
+									</button>
+									<router-link
+										to="/documentation/effects"
+										target="_blank"
+										class="btn btn-sm bg-neutral-5"
+									>
+										<i aria-hidden="true" class="fas fa-question-circle mr-1" />
+										How effects work
+									</router-link>
+								</div>
 							</div>
 							<div class="card-body">
 								<hk-effects-form v-model="effect" :effect-key="effectId" />
@@ -66,6 +78,45 @@
 				</div>
 			</q-form>
 		</ValidationObserver>
+
+		<!-- COPY DIALOG -->
+		<q-dialog v-model="copy_dialog">
+			<hk-card class="create-dialog">
+				<div slot="header" class="card-header">
+					<span>Copy existing effect</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
+				<div class="card-body">
+					<CopyContent @copy="copy" type="effect" />
+				</div>
+			</hk-card>
+		</q-dialog>
+
+		<q-dialog v-model="create_dialog" persistent position="top">
+			<hk-card class="create-dialog" header="How do you want to do this?">
+				<div class="card-body">
+					<template v-if="!copy_effect">
+						<button class="btn btn-lg btn-block" @click="copy_effect = true">
+							Copy existing effect
+						</button>
+						<h2 class="text-center my-2">OR</h2>
+						<button class="btn btn-lg btn-block mb-2" @click="create_dialog = false">
+							Create from scratch
+						</button>
+					</template>
+					<template v-if="copy_effect">
+						<h2>Copy an existing effect</h2>
+						<CopyContent @copy="copy" type="effect" />
+					</template>
+				</div>
+				<div v-if="copy_effect" class="card-footer" slot="footer">
+					<button class="btn btn-sm bg-neutral-5" @click="create_dialog = false">
+						<i class="fas fa-times mr-1" aria-hidden="true" />
+						Create from scratch
+					</button>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 	<hk-card v-else>
 		<hk-loader />
@@ -76,6 +127,7 @@
 import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import { cleanEffectDefinition, schemaErrorMessages } from "src/utils/effectFunctions";
+import CopyContent from "src/components/CopyContent";
 
 let validateEffect;
 
@@ -96,7 +148,9 @@ async function getEffectValidator() {
 
 export default {
 	name: "EditEffect",
-	components: {},
+	components: {
+		CopyContent,
+	},
 	data() {
 		return {
 			userId:
@@ -107,6 +161,9 @@ export default {
 			effect_copy: {},
 			unsaved_changes: false,
 			schema_errors: [],
+			copy_dialog: false,
+			create_dialog: false,
+			copy_effect: false,
 		};
 	},
 	async mounted() {
@@ -121,6 +178,8 @@ export default {
 				this.unsaved_changes = false;
 				this.loading = false;
 			});
+		} else {
+			this.create_dialog = true;
 		}
 	},
 	computed: {
@@ -143,8 +202,16 @@ export default {
 	},
 	methods: {
 		...mapActions(["setSlide"]),
-		...mapActions("api_effects", ["fetch_effects", "fetch_effect"]),
 		...mapActions("effects", ["add_effect", "edit_effect", "get_effect"]),
+		/**
+		 * Fills the form with a copied effect (CopyContent, already without its url and edition).
+		 * It's a new effect: the form shows unsaved changes and Save adds it.
+		 */
+		copy({ result }) {
+			this.copy_dialog = false;
+			this.create_dialog = false;
+			this.effect = cleanEffectDefinition(result);
+		},
 		reset() {
 			this.effect = {};
 		},
@@ -259,3 +326,15 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.hk-card.create-dialog {
+	max-width: 95vw;
+	width: 576px;
+	margin-top: 100px;
+
+	.card-body {
+		overflow: auto;
+	}
+}
+</style>

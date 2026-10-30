@@ -86,9 +86,9 @@ Every effect needs at least one sub-effect.
 ### From the Effects drawer
 
 In the combat tracker, target one or more creatures and open **Effects** in the header of the
-targeted creatures. **Conditions** opens the same drawer with only the conditions. Effects are
-grouped as SRD effects and your custom effects; conditions follow the rules edition of the
-campaign. Expand an effect to read what it does. Type in the search field above the list to
+targeted creatures. **Conditions** opens the same drawer with only the conditions. SRD effects
+and your custom effects are on separate tabs (**Effects** and **Custom**), 10 per page;
+conditions follow the rules edition of the campaign. Expand an effect to read what it does. Type in the search field above the list to
 find an effect by a part of its name; case and accents don't matter. The effect pickers of the
 effect, NPC and spell forms, the reminder form and your custom effects list search the same
 way.
@@ -266,6 +266,14 @@ until you reset them. A trait effect without a limit is never used up. Players' 
 
 Create custom effects under **My content → Effects**. The form has a name and description, the
 list of sub-effects, and the effect's configuration.
+
+A new effect asks how you want to start: **Copy existing effect** or **Create from scratch**.
+While the effect isn't saved yet, **Copy** at the top of the form does the same. Search one of
+your custom effects, or an SRD effect or condition of either rules edition, and copy it: the
+form is filled with everything it does, ready to change. The copy keeps the name, so rename it
+if you like. It is a new custom effect, used in both editions, and the original stays as it
+is. A copied condition is a custom effect too: it doesn't get the condition icon and isn't in
+the Conditions list.
 
 ### Configuration
 

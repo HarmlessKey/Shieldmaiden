@@ -26,7 +26,7 @@
 			:error-message="noResult"
 		>
 			<button
-				v-if="copy_resource === 'srd'"
+				v-if="copy_resource === 'srd' && type !== 'effect'"
 				slot="before"
 				class="btn btn"
 				@click="show_filter = !show_filter"
@@ -48,7 +48,7 @@
 			:options="editionOptions"
 		/>
 
-		<q-slide-transition v-if="copy_resource === 'srd'">
+		<q-slide-transition v-if="copy_resource === 'srd' && type !== 'effect'">
 			<div v-show="show_filter" class="filter">
 				<h3>Filter {{ type }}s</h3>
 				<hk-filter v-model="filter" :type="type" @change="search()" />
@@ -63,7 +63,7 @@
 				:disabled="
 					copy_resource === 'custom'
 						? disabledCustom.includes(result.key)
-						: disabledSrd.includes(result._id)
+						: disabledSrd.includes(srdId(result))
 				"
 			>
 				<q-item-section>
@@ -71,17 +71,21 @@
 				</q-item-section>
 				<q-item-section avatar>
 					<div class="d-flex gap-2 items-center">
-						<span v-if="showEditionSelect" class="neutral-2">{{ result.edition || "5e" }}</span>
+						<!-- SRD effects: the lists are per edition, conditions are marked (effects 12b) -->
+						<span v-if="type === 'effect' && result.isCondition" class="neutral-2">Condition</span>
+						<span v-else-if="showEditionSelect && type !== 'effect'" class="neutral-2">
+							{{ result.edition || "5e" }}
+						</span>
 						<slot
 							name="action"
 							:result="result"
 							:disabled="disabledCustom.includes(result.key)"
-							:copy="(extra) => copy(copy_resource === 'custom' ? result.key : result._id, extra)"
+							:copy="(extra) => copy(copy_resource === 'custom' ? result.key : srdId(result), extra)"
 						>
 							<a
 								v-if="!disabledCustom.includes(result.key)"
 								class="btn btn-sm bg-neutral-5"
-								@click="copy(copy_resource === 'custom' ? result.key : result._id)"
+								@click="copy(copy_resource === 'custom' ? result.key : srdId(result))"
 							>
 								<i aria-hidden="true" class="fas" :class="`fa-${button}`" />
 							</a>
@@ -107,6 +111,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { editions, default_edition } from "src/utils/generalConstants";
 import { removeVersionKeys } from "src/utils/generalFunctions";
+import { copyableEffect, getSrdDefinitions, matchesName } from "src/utils/effectFunctions";
 
 export default {
 	name: "CopyContent",
@@ -172,6 +177,7 @@ export default {
 		...mapGetters("npcs", ["npcs"]),
 		...mapGetters("items", ["items"]),
 		...mapGetters("spells", ["spells"]),
+		...mapGetters("effects", ["effects"]),
 		options() {
 			const values = [
 				{ label: `Custom`, value: "custom" },
@@ -182,7 +188,7 @@ export default {
 				: values;
 		},
 		showEditionSelect() {
-			return (this.type === "monster" || this.type === "spell") && this.copy_resource === "srd";
+			return ["monster", "spell", "effect"].includes(this.type) && this.copy_resource === "srd";
 		},
 		editionOptions() {
 			return editions.map((e) => ({ label: e.label.replace("D&D ", ""), value: e.value }));
@@ -199,6 +205,8 @@ export default {
 				content = this.items;
 			} else if (this.type === "spell") {
 				content = this.spells;
+			} else if (this.type === "effect") {
+				content = this.effects;
 			}
 			return content;
 		},
@@ -238,6 +246,9 @@ export default {
 			if (this.type === "spell") {
 				await this.get_spells();
 			}
+			if (this.type === "effect") {
+				await this.get_effects();
+			}
 		}
 	},
 	methods: {
@@ -247,6 +258,13 @@ export default {
 		...mapActions("items", ["get_items", "get_item"]),
 		...mapActions("api_spells", ["fetch_api_spells", "fetch_api_spell"]),
 		...mapActions("spells", ["get_spells", "get_spell"]),
+		...mapActions("effects", ["get_effects", "get_effect"]),
+		/**
+		 * Id of an SRD result: the API's _id, or the url for SRD effects, which have none
+		 */
+		srdId(result) {
+			return result._id || result.url;
+		},
 		changeCopyResource(value) {
 			this.query = "";
 			this.resetSearchResults();
@@ -263,6 +281,8 @@ export default {
 			if (this.copy_resource === "custom") {
 				if (this.query) {
 					const results = this.custom_content.filter((result) => {
+						// Effects match as the other effect lists: case and accents (effects 12b)
+						if (this.type === "effect") return matchesName(result.name, this.query);
 						return result.name.toLowerCase().includes(this.query.toLowerCase());
 					});
 
@@ -280,12 +300,15 @@ export default {
 			}
 			// API
 			else {
+				// SRD effects are paged in the browser: a new search starts at the first page
+				if (this.type === "effect") this.page = 1;
 				await this.fetchApiContent();
 				this.page = 1;
 			}
 		},
 
 		async fetchApiContent() {
+			if (this.type === "effect") return this.searchSrdEffects();
 			let data;
 
 			if (this.type === "monster") {
@@ -318,6 +341,36 @@ export default {
 		},
 
 		/**
+		 * SRD effects and conditions of the edition (effects 12b): searched and paged in the
+		 * browser over the lists fetched from the API, without a request per search
+		 */
+		async searchSrdEffects() {
+			await this.$store.dispatch("api_effects/fetch_srd_definitions", { edition: this.edition });
+			if (this.$store.getters["api_effects/srd_failed"](this.edition)) {
+				this.searchResults = [];
+				this.totalPages = 0;
+				this.noResult = "The SRD effects couldn't be loaded.";
+				return;
+			}
+			const { effects, conditions } = getSrdDefinitions(this.edition);
+			const results = [
+				...effects.map(({ url, name }) => ({ url, name, isCondition: false })),
+				...conditions.map(({ url, name }) => ({ url, name, isCondition: true })),
+			]
+				.filter(({ name }) => matchesName(name, this.query))
+				.sort((a, b) => a.name.localeCompare(b.name));
+
+			this.totalPages = Math.ceil(results.length / this.pageSize);
+			if (!results.length) {
+				this.searchResults = [];
+				this.noResult = 'Nothing found for "' + this.query + '"';
+				return;
+			}
+			this.noResult = "";
+			this.searchResults = results.slice((this.page - 1) * this.pageSize, this.page * this.pageSize);
+		},
+
+		/**
 		 * Emit the selected result
 		 *
 		 * @param {string} id
@@ -347,6 +400,17 @@ export default {
 						this.copy_resource === "custom"
 							? await this.get_spell({ uid: this.userId, id })
 							: await this.fetch_api_spell({ id, edition: this.apiEdition });
+				}
+				// A copy of the definition, so the SRD lists and the cached effect aren't changed
+				if (this.type === "effect") {
+					const definition =
+						this.copy_resource === "custom"
+							? await this.get_effect({ uid: this.userId, id })
+							: [
+									...getSrdDefinitions(this.edition).effects,
+									...getSrdDefinitions(this.edition).conditions,
+							  ].find(({ url }) => url === id);
+					result = copyableEffect(definition);
 				}
 
 				// Remove properties not needed for custom monsters

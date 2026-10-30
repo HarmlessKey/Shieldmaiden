@@ -365,6 +365,20 @@ export function cleanEffectDefinition(effect = {}) {
 }
 
 /**
+ * A definition as a new custom effect (effects 12b): a cleaned copy without what makes it the
+ * original (url, ids, edition, the API's markers). References to other effects are kept. The
+ * input is not modified, so SRD lists and cached custom effects are safe to copy from.
+ *
+ * @param {object} definition SRD or custom effect definition
+ * @returns {object} New object
+ */
+export function copyableEffect(definition = {}) {
+	const copy = cleanEffectDefinition(definition);
+	for (const field of ["url", "_id", "key", "edition", "is_condition", "meta"]) delete copy[field];
+	return copy;
+}
+
+/**
  * Copy of an effect link as the NPC form saves it ($defs/effect_link): only its own fields,
  * without empty values, and without `magical: false`. Choices stay strings (a value choice is
  * a number written as a string); an unset choice is left out, so it's asked when applied.

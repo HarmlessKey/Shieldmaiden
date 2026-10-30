@@ -202,6 +202,18 @@ list. It uses the slot and applies the effects to every targeted creature right 
 roll card. When one of its effects leaves a choice open or has no duration, the roll card opens
 instead to ask for it.
 
+An NPC ability with linked effects can be used in the tracker without any damage rolls too:
+
+- An attack or save with linked effects has a roll button, even when it deals no damage. The
+  roll card rolls to hit (the giant spider's Web) or shows the save's ability and DC (the
+  chuul's Paralyzing Tentacles), and its single **Apply** applies the effects of the chosen
+  result.
+- An ability that only has **Always** effects and no attack, save or rolls, like a knight's
+  Parry or a duergar's Invisibility, has an **Apply** button instead. It uses the ability (its
+  recharge, uses per day or legendary actions, and the reaction out of turn) and applies the
+  effects to every targeted creature right away. For an effect on the creature itself, target
+  the creature.
+
 An effect that applies has a checkbox, checked by default. Applying the roll (**Full**,
 **Half**, **Double** or **Missed**) also applies every checked effect to that target. A roll
 without damage or healing, like Hold Person, has a single **Apply** button. Uncheck an effect to

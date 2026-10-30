@@ -74,39 +74,84 @@ export const runEncounter = {
 			};
 		},
 		/**
-		 * Casts a spell that only applies effects (applyOnlySpell, effects 7): like a roll it
-		 * confirms restrictions, uses the reaction out of turn and the slot, then applies its
-		 * linked effects to every target without a roll card. A link that leaves a choice open
-		 * or has no duration makes it a roll, so the roll card asks for them.
+		 * Spends what using an action or spell costs: its limited use or recharge, the slot (or
+		 * the innate spell's use) and the legendary actions it costs
 		 *
-		 * @param {number} action_index Spell level (caster) or spell key (innate), for limited uses
-		 * @param {object} action The spell, with its key
-		 * @param {string} category innate | caster
-		 * @param {object} entity The caster
+		 * @param {number|string} action_index Index of the ability, spell level (caster) or spell key (innate)
+		 */
+		spendUse({ action_index, action, category, entity }) {
+			const is_spell = ["innate", "caster"].includes(category);
+			if (action.limit || action.recharge || (is_spell && action_index)) {
+				this.set_limitedUses({
+					key: entity.key,
+					index: action_index,
+					category,
+				});
+			}
+			if (action.legendary_cost) {
+				this.set_limitedUses({
+					key: entity.key,
+					index: "legendaries_used",
+					category,
+					cost: action.legendary_cost,
+				});
+			}
+		},
+		/**
+		 * The definition of a linked effect: SRD in the campaign's edition (or the other), or the
+		 * user's custom effect
+		 */
+		async linkDefinition(link) {
+			const effect = link?.effect || {};
+			if (effect.source === "srd") {
+				const edition = this.$store.getters.edition || "5.5e";
+				return (
+					findSrdDefinition(edition, effect.source_key) ||
+					findSrdDefinition(edition === "5e" ? "5.5e" : "5e", effect.source_key)
+				);
+			}
+			const uid = this.$store.getters.user?.uid;
+			if (effect.source === "custom" && uid) {
+				return this.$store
+					.dispatch("effects/get_effect", { uid, id: effect.source_key })
+					.catch(() => undefined);
+			}
+			return undefined;
+		},
+		/**
+		 * Uses a spell or NPC ability that only applies effects (applyOnlySpell,
+		 * applyOnlyAbility): like a roll it confirms restrictions, uses the reaction out of turn
+		 * and spends the use, then applies its Always links to every target without a roll card.
+		 * A link that leaves a choice open or has no duration makes it a roll, so the roll card
+		 * asks for them.
+		 *
+		 * @param {number|string} action_index Index of the ability, spell level (caster) or spell key (innate), for limited uses
+		 * @param {object} action The NPC ability, or the spell with its key
+		 * @param {string} category actions | bonus_actions | reactions | legendary_actions | special_abilities | innate | caster
+		 * @param {object} entity The creature using it, the caster of the effects
 		 * @param {string[]} targets Keys of the targets
 		 */
-		async apply_spell({ e, action_index, action, category, entity, targets = [] }) {
-			const confirmed = await this.confirmRestrictions({ entity, targets, category, attack: false });
+		async apply_action({ e, action_index, action, category, entity, targets = [] }) {
+			const confirmed = await this.confirmRestrictions({
+				entity,
+				targets,
+				category,
+				attack: false,
+				okLabel: "Apply anyway",
+			});
 			if (!confirmed) return;
 
-			const config = this.spellConfig({ action, action_index, category, entity });
-			const cast = spellCast(action, config);
-			const edition = this.$store.getters.edition || "5.5e";
-			const uid = this.$store.getters.user?.uid;
+			const is_spell = ["innate", "caster"].includes(category);
+			// The spell cast, for its scaling, save DC and Concentration; none for NPC abilities
+			const cast = is_spell
+				? spellCast(action, this.spellConfig({ action, action_index, category, entity }))
+				: undefined;
+			const entries = (is_spell ? action.actions : action.action_list) || [];
 			const items = [];
-			for (const spellAction of action.actions || []) {
-				for (const link of spellAction?.effects?.always || []) {
-					const effect = link.effect || {};
-					let definition;
-					if (effect.source === "srd") {
-						definition =
-							findSrdDefinition(edition, effect.source_key) ||
-							findSrdDefinition(edition === "5e" ? "5.5e" : "5e", effect.source_key);
-					} else if (effect.source === "custom" && uid) {
-						definition = await this.$store
-							.dispatch("effects/get_effect", { uid, id: effect.source_key })
-							.catch(() => undefined);
-					}
+			for (const entry of Array.isArray(entries) ? entries : Object.values(entries)) {
+				const links = entry?.effects?.always;
+				for (const link of Array.isArray(links) ? links : []) {
+					const definition = await this.linkDefinition(link);
 					const item = linkApplication(link, { cast, definition });
 					// Something to ask: the roll card asks for it
 					if (item.openChoices.length || !link.duration) {
@@ -119,9 +164,7 @@ export const runEncounter = {
 			this.$store
 				.dispatch("use_reaction", { actorKey: entity?.key, category })
 				.catch((error) => console.error(error));
-			if (action.limit || action.recharge || action_index) {
-				this.set_limitedUses({ key: entity.key, index: action_index, category });
-			}
+			this.spendUse({ action_index, action, category, entity });
 			for (const targetKey of targets) {
 				await this.$store.dispatch("apply_linked_effects", {
 					targetKey,
@@ -178,21 +221,7 @@ export const runEncounter = {
 			}
 
 			// Check for limited uses
-			if (action.limit || action.recharge || (is_spell && action_index)) {
-				this.set_limitedUses({
-					key: entity.key,
-					index: action_index,
-					category,
-				});
-			}
-			if (action.legendary_cost) {
-				this.set_limitedUses({
-					key: entity.key,
-					index: "legendaries_used",
-					category,
-					cost: action.legendary_cost,
-				});
-			}
+			this.spendUse({ action_index, action, category, entity });
 
 			for (const [key, projectiles] of Object.entries(targets)) {
 				for (let i = 1; i <= projectiles; i++) {

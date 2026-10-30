@@ -101,7 +101,7 @@
 							</span>
 						</q-item-label>
 					</q-item-section>
-					<q-item-section v-if="hasRolls(action)" avatar>
+					<q-item-section v-if="rollableAbility(action)" avatar>
 						<div
 							class="roll-wrapper"
 							:class="{
@@ -125,6 +125,21 @@
 								<span class="roll-button" />
 							</hk-roll-action>
 						</div>
+					</q-item-section>
+					<!-- Only applies effects (Parry): applied without a roll -->
+					<q-item-section v-else-if="applyOnlyAbility(action)" avatar>
+						<q-btn
+							:ref="action.action_index"
+							label="Apply"
+							color="blue"
+							size="sm"
+							no-caps
+							dense
+							:disable="!checkAvailable(type, action.action_index, action)"
+							@click.stop="startApply(action.action_index, action, type)"
+						>
+							<q-tooltip anchor="top middle" self="center middle">Apply {{ action.name }}</q-tooltip>
+						</q-btn>
 					</q-item-section>
 					<!-- Spend limited actions that can't be rolled -->
 					<q-item-section
@@ -182,8 +197,8 @@ import { setHP } from "src/mixins/HpManipulations.js";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import { isNil } from "lodash";
-import { hasRolls, captionEntries } from "src/utils/generalFunctions";
-import { traitEffectsLabel } from "src/utils/effectFunctions";
+import { captionEntries } from "src/utils/generalFunctions";
+import { traitEffectsLabel, rollableAbility, applyOnlyAbility } from "src/utils/effectFunctions";
 import Projectiles from "./Projectiles";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import LimitedUseCounter from "./LimitedUseCounter.vue";
@@ -216,7 +231,8 @@ export default {
 			rollObject: {},
 			projectile_dialog: false,
 			isNil: isNil,
-			hasRolls: hasRolls,
+			rollableAbility: rollableAbility,
+			applyOnlyAbility: applyOnlyAbility,
 			traitEffectsLabel: traitEffectsLabel,
 		};
 	},
@@ -236,7 +252,7 @@ export default {
 					}
 					return { ...action, action_index };
 				})
-				.filter(hasRolls);
+				.filter((action) => rollableAbility(action) || applyOnlyAbility(action));
 		},
 	},
 	methods: {
@@ -294,6 +310,30 @@ export default {
 		cancelRoll() {
 			this.projectile_dialog = false;
 			this.rollObject = {};
+		},
+		/**
+		 * Applies an ability that only applies effects to the targets, like a spell's Apply
+		 */
+		startApply(action_index, action, category) {
+			if (!this.targeted?.length) {
+				this.$q.notify({
+					message: "Select a target first.",
+					color: "warning",
+					position: "top",
+					timeout: 1000,
+				});
+				return;
+			}
+			const args = {
+				e: { e: {} },
+				action_index,
+				action,
+				category,
+				entity: this.actor,
+				targets: [...this.targeted],
+			};
+			this.apply_action(args);
+			this.$emit("roll", args);
 		},
 		spendLimited(category, index, regain = false, cost = 1) {
 			this.set_limitedUses({ key: this.actor.key, index, category, regain, cost });

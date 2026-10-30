@@ -56,7 +56,7 @@
 import ActionsDropdown from "./ActionsDropdown.vue";
 import RollActions from "../actions/RollActions.vue";
 import LimitedUseCounter from "../actions/LimitedUseCounter.vue";
-import { hasRolls } from "src/utils/generalFunctions";
+import { rollableAbility, applyOnlyAbility } from "src/utils/effectFunctions";
 
 export default {
 	name: "ActorActions",
@@ -87,8 +87,10 @@ export default {
 	computed: {
 		available_types() {
 			const types = [];
+			// Abilities to roll, or that only apply effects (Parry)
+			const usable = (action) => rollableAbility(action) || applyOnlyAbility(action);
 			for (const action_type of Object.keys(this.action_types)) {
-				if (this.actor[action_type]?.find(hasRolls)) {
+				if (this.actor[action_type]?.some(usable)) {
 					types.push(action_type);
 				}
 			}

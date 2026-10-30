@@ -2,6 +2,7 @@ import {
 	action_outcomes,
 	effect_types,
 	effect_subtypes,
+	outcomesFor,
 	srd_condition_urls,
 } from "src/utils/effectsConstants.js";
 import { abilities, damage_types as DAMAGE_TYPES, skills } from "src/utils/generalConstants.js";
@@ -641,6 +642,57 @@ export function applyOnlySpell(spell) {
 		}
 	}
 	return links > 0;
+}
+
+/**
+ * The entries of an NPC ability's action_list, and for each whether it has dice, is an attack
+ * or save, and how many linked effects it has on an outcome that fits its type (as the roll
+ * card lists them)
+ *
+ * @param {object} ability NPC ability with `action_list`
+ * @returns {{ dice: boolean, rolled: boolean, links: number }[]}
+ */
+function abilityEntries(ability) {
+	const entries = Array.isArray(ability?.action_list)
+		? ability.action_list
+		: Object.values(ability?.action_list || {});
+	return entries.filter(Boolean).map((entry) => ({
+		dice: entry.type !== "other" && entry.rolls?.length > 0,
+		rolled: ["melee_weapon", "ranged_weapon", "spell_attack", "save"].includes(entry.type),
+		links: outcomesFor(entry.type).reduce((count, outcome) => {
+			const list = entry.effects?.[outcome];
+			return count + (Array.isArray(list) ? list.length : 0);
+		}, 0),
+	}));
+}
+
+/**
+ * Whether an NPC ability gets the tracker's roll button: it has dice (hasRolls), or linked
+ * effects and an attack or save to decide them, rolled without dice (the giant spider's Web,
+ * the chuul's Paralyzing Tentacles). An attack or save without links and dice has none.
+ *
+ * @param {object} ability NPC ability with `action_list`
+ * @returns {boolean}
+ */
+export function rollableAbility(ability) {
+	const entries = abilityEntries(ability);
+	if (entries.some(({ dice }) => dice)) return true;
+	return entries.some(({ links }) => links > 0) && entries.some(({ rolled }) => rolled);
+}
+
+/**
+ * Whether an NPC ability only applies effects, so the tracker applies it without a roll, like
+ * applyOnlySpell: it has linked effects, and no entry has dice or is an attack or save, so
+ * every link is on Always (the knight's Parry, the duergar's Invisibility)
+ *
+ * @param {object} ability NPC ability with `action_list`
+ * @returns {boolean}
+ */
+export function applyOnlyAbility(ability) {
+	const entries = abilityEntries(ability);
+	return (
+		entries.some(({ links }) => links > 0) && !entries.some(({ dice, rolled }) => dice || rolled)
+	);
 }
 
 /**

@@ -1349,6 +1349,9 @@ its own. Same model as step 6, for the user's custom spells.
   - casting a Concentration spell without links
   - the damage of a save after a missed attack (only its effects wait)
   - player attacks (manual damage)
+- **Follow-up (2026-10-30):** NPC abilities with linked effects but no rolls (a save that only
+  applies a condition, Web, Parry) get the roll button or an Apply like spells, see
+  [npc-linked-effects-without-rolls.md](./npc-linked-effects-without-rolls.md).
 
 ## 8. Apply effects outside combat: the set initiative screen and the campaign's players (done — archived as effects-8-effects-outside-combat, 2026-10-18)
 Idea, 2026-10-12; done first (before the reminders) and extended with the campaign's players

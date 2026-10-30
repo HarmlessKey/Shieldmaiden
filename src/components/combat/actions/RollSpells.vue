@@ -352,7 +352,7 @@ export default {
 				entity: this.actor,
 				targets: [...this.targeted],
 			};
-			this.apply_spell(action);
+			this.apply_action(action);
 			this.$emit("roll", action);
 		},
 		roll(assigned_projectiles) {

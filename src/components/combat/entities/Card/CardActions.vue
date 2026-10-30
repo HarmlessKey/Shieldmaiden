@@ -26,7 +26,7 @@
 				>
 					<div class="card-action-title">
 						<template
-							v-if="rollable && hasRolls(action)"
+							v-if="rollable && rollableAbility(action)"
 						>
 							<hk-roll-action
 								:action="action"
@@ -37,6 +37,20 @@
 								<span class="roll-button" />
 							</hk-roll-action>
 						</template>
+						<!-- Only applies effects (Parry): applied without a roll -->
+						<q-btn
+							v-else-if="rollable && applyOnlyAbility(action)"
+							label="Apply"
+							color="blue"
+							size="sm"
+							class="apply-button"
+							no-caps
+							dense
+							:disable="!checkAvailable(category, action_index, action)"
+							@click.stop="startApply(action_index, action, category)"
+						>
+							<q-tooltip anchor="top middle" self="center middle">Apply {{ action.name }}</q-tooltip>
+						</q-btn>
 						<div class="card-action-title__name">
 							<strong
 								><em>
@@ -174,8 +188,8 @@ import { mapGetters } from "vuex";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import LimitedUseCounter from "../../actions/LimitedUseCounter.vue";
-import { hasRolls, captionEntries } from "src/utils/generalFunctions";
-import { traitEffectsLabel } from "src/utils/effectFunctions";
+import { captionEntries } from "src/utils/generalFunctions";
+import { traitEffectsLabel, rollableAbility, applyOnlyAbility } from "src/utils/effectFunctions";
 
 export default {
 	name: "CardActions",
@@ -223,7 +237,8 @@ export default {
 		...mapGetters(["targeted"]),
 	},
 	methods: {
-		hasRolls,
+		rollableAbility,
+		applyOnlyAbility,
 		captionEntries,
 		traitEffectsLabel,
 		startRoll(e, projectiles, option, action_index, action, category) {
@@ -265,6 +280,28 @@ export default {
 		cancelRoll() {
 			this.projectile_dialog = false;
 			this.rollObject = {};
+		},
+		/**
+		 * Applies an ability that only applies effects to the targets, like a spell's Apply
+		 */
+		startApply(action_index, action, category) {
+			if (!this.targeted?.length) {
+				this.$q.notify({
+					message: "Select a target first.",
+					color: "warning",
+					position: "top",
+					timeout: 1000,
+				});
+				return;
+			}
+			this.apply_action({
+				e: { e: {} },
+				action_index,
+				action,
+				category,
+				entity: this.entity,
+				targets: [...this.targeted],
+			});
 		},
 		spendLimited(category, index, regain = false, cost = 1) {
 			this.set_limitedUses({ key: this.entity.key, index, category, regain, cost });
@@ -318,6 +355,9 @@ export default {
 			}
 		}
 
+		.apply-button {
+			margin-right: 5px;
+		}
 		.roll-button {
 			margin-right: 5px;
 			display: inline-block;

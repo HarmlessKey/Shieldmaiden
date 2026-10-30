@@ -129,7 +129,8 @@ parenthetical) and the description. Output: one JSON object, the ability as stor
 - An NPC ability gets a roll button only when an entry has rolls (`hasRolls`). Abilities whose
   only content is linked effects (a save that just applies Paralyzed, Parry, Duergar
   Invisibility) can't apply their links from the tracker; spells have `applyOnlySpell` for
-  this, NPC abilities don't.
+  this, NPC abilities don't. Fixed in
+  [npc-linked-effects-without-rolls.md](./npc-linked-effects-without-rolls.md).
 - The link dialog doesn't offer `ends_when` or `rest_type` and `cleanEffectLink` drops them, so
   editing a copied SRD monster in the NPC form loses "while Grappled" and "Short or Long Rest".
   The engine evaluates `duration.ends_when` (`endsWhenExpiries`).

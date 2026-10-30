@@ -1081,7 +1081,8 @@ const campaign_actions = {
 	},
 
 	/**
-	 * Updates a single property for a player or companion
+	 * Updates a single property for a player or companion. Current hit points above 0 also end
+	 * dead, stable and the death saves, as reviving does
 	 *
 	 * @param {string} uid
 	 * @param {string} campaignId
@@ -1097,9 +1098,15 @@ const campaign_actions = {
 		if (uid) {
 			const services = await dispatch("get_campaign_services");
 			const path = `/${type}/${id}`;
+			const update = { [property]: value };
+			if (property === "curHp" && parseInt(value) > 0) {
+				Object.assign(update, { dead: null, stable: null, saves: null });
+			}
 			try {
-				await services.updateCampaign(uid, campaignId, path, { [property]: value });
-				commit("UPDATE_CAMPAIGN_ENTITY", { uid, campaignId, type, id, property, value });
+				await services.updateCampaign(uid, campaignId, path, update);
+				for (const [prop, val] of Object.entries(update)) {
+					commit("UPDATE_CAMPAIGN_ENTITY", { uid, campaignId, type, id, property: prop, value: val });
+				}
 				return;
 			} catch (error) {
 				throw error;

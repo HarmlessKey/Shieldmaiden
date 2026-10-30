@@ -272,8 +272,9 @@ export const setHP = {
 			let over = result.overhealing;
 			amount = result.healed;
 
-			//If the target is a player and the curHp was 0, saves need to be reset
-			if ((target.entityType === "player" || target.entityType === "companion") && curHp === 0) {
+			//If the target is a player and the curHp was 0, saves need to be reset (not when no
+			//hit points are regained, No Healing)
+			if ((target.entityType === "player" || target.entityType === "companion") && curHp === 0 && newhp > 0) {
 				this.set_save({
 					key: target.key,
 					check: "reset",

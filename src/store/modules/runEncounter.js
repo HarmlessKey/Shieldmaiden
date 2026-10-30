@@ -2116,6 +2116,13 @@ const run_encounter_actions = {
 				}
 			}
 			commit("SET_ENTITY_PROPERTY", { key, prop: "curHp", value: newHp });
+			// Hit points above 0 end dead, stable and the death saves (saved with curHp by
+			// update_campaign_entity)
+			if (type !== "npcs" && newHp > 0) {
+				commit("SET_ENTITY_PROPERTY", { key, prop: "saves", value: {} });
+				commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: false });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
+			}
 		}
 	},
 
@@ -3474,18 +3481,21 @@ const run_encounter_actions = {
 			}
 			commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
 		} else if (action === "unset") {
-			await dispatch(
-				"campaigns/update_campaign_entity",
-				{
-					uid: rootGetters.user.uid,
-					campaignId: state.campaignId,
-					type,
-					id: key,
-					property: "dead",
-					value: null,
-				},
-				{ root: true }
-			);
+			if (!state.demo && !state.test) {
+				await dispatch(
+					"campaigns/update_campaign_entity",
+					{
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type,
+						id: key,
+						property: "dead",
+						value: null,
+					},
+					{ root: true }
+				);
+			}
+			commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
 		} else {
 			// Its "defeated or removed" reminders (effects 9)
 			await dispatch("fire_reminders", { event: { type: "defeated", entityKey: key } });

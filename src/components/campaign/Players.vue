@@ -70,6 +70,7 @@
 							setDrawer({
 								show: true,
 								type: 'drawers/party/health',
+								data: { context: effectContext },
 							})
 						"
 					>

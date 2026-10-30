@@ -1,44 +1,41 @@
-// Validates the SRD effect data (effects.js, shared by both editions) and the condition data
-// files of both editions (5e/conditions.js, 5.5e/conditions.js).
+// Validates the SRD effects and conditions the HK API serves (effects 12): per edition,
+// /v2/effects/<edition> with that edition's effects, the generic ones and its conditions.
 //
-// An edition's set is the effects without `edition`, the effects with that `edition` and that
-// edition's conditions.
+// An edition's set is the effects without `edition` (the API's "generic"), the effects with
+// that `edition` and that edition's conditions.
 //
-// Checks, per entry:
+// Checks, per entry (in the app's shape, see srdData.mjs):
 //   1. every entry validates against src/schemas/hk-effects-schema.json
 //   2. no entry carries `key`, `duration_type`, `duration_value` or `cancel_trigger`, nor an
 //      origin field (`category`, `spell_level`, `magical`, `tags`, `removed_by`), and no
 //      sub-effect carries `scaling` (definitions are generic)
-//   3. `edition` is only on effects, and is "5e" or "5.5e"
+//   3. as served: an effect's `edition` is "generic" or the list's edition, a condition's
+//      `edition` is the list's edition
 // Checks, per edition set:
 //   4. every entry has a `url`, unique within the set
 //   5. every `{ source: "srd", source_key }` reference resolves to a `url` in the set
 //   6. `includes` references don't form a cycle
-// And: conditions.js holds exactly the 15 SRD conditions.
+//   7. the conditions are exactly the 15 SRD conditions
+// And: a generic effect is the same in both editions.
 //
 // Usage:
 //   node scripts/validate-effects-data/validate.mjs
 //
 // Options:
-//   --data <dir>  data root holding effects.js, 5e/ and 5.5e/ (default src/data)
+//   --api <root>  the API (default VUE_APP_HK_API_ROOT, or https://api.harmlesskey.com)
+//   --from <dir>  read <dir>/5e.json and <dir>/5.5e.json (raw API responses) instead
 //
-// Prints one `file › entry url › problem` line per problem and exits 1 if there are any.
+// Prints one `edition › entry url › problem` line per problem and exits 1 if there are any,
+// also when the data can't be read.
 
 import { readFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
+import { EDITIONS, SRD_CONDITIONS, loadRaw, splitRaw } from "./srdData.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const args = process.argv.slice(2);
-const argValue = (flag) => {
-	const i = args.indexOf(flag);
-	return i >= 0 ? args[i + 1] : undefined;
-};
-const DATA = resolve(argValue("--data") || join(ROOT, "src/data"));
-const EDITIONS = ["5e", "5.5e"];
-const EFFECTS_FILE = join(DATA, "effects.js");
 const FORBIDDEN = [
 	"key",
 	"duration_type",
@@ -56,33 +53,21 @@ const FORBIDDEN = [
 ];
 // Sub-effect fields that no longer exist (scaling is set on links to spells, steps 6–7)
 const FORBIDDEN_SUB_EFFECT = ["scaling"];
-const SRD_CONDITIONS = [
-	"blinded",
-	"charmed",
-	"deafened",
-	"exhaustion",
-	"frightened",
-	"grappled",
-	"incapacitated",
-	"invisible",
-	"paralyzed",
-	"petrified",
-	"poisoned",
-	"prone",
-	"restrained",
-	"stunned",
-	"unconscious",
-];
 
 const schema = JSON.parse(readFileSync(join(ROOT, "src/schemas/hk-effects-schema.json"), "utf8"));
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
 const validate = ajv.compile(schema);
 
-const problems = [];
-const report = (file, entry, message) => {
-	const label = entry?.url || entry?.name || "(file)";
-	problems.push(`${relative(ROOT, file)} › ${label} › ${message}`);
+const { source, raw, problems: loadProblems, failed } = await loadRaw(process.argv.slice(2));
+if (failed) {
+	console.log(loadProblems.join("\n"));
+	process.exit(1);
+}
+const problems = [...loadProblems];
+const report = (edition, entry, message) => {
+	const label = entry?.url || entry?.name || "(list)";
+	problems.push(`${edition} › ${label} › ${message}`);
 };
 
 // Every { source: "srd", source_key } object anywhere inside a value
@@ -120,80 +105,74 @@ function includesRefs(value, found = []) {
 	return found;
 }
 
-// Imported from a data: URL: the package has no "type": "module", and importing the .js file
-// directly makes Node warn about reparsing it as ESM
-async function importList(file) {
-	try {
-		const source = readFileSync(file, "utf8");
-		const module = await import(`data:text/javascript,${encodeURIComponent(source)}`);
-		if (!Array.isArray(module.default)) {
-			report(file, null, "default export is not an array");
-			return { list: [] };
-		}
-		return { list: module.default };
-	} catch (error) {
-		report(file, null, `can't import: ${error.message}`);
-		return { list: [] };
-	}
-}
-
-// Per entry: schema, forbidden fields, edition
-function checkEntry(file, entry, { isEffect }) {
+// Per entry: schema, forbidden fields
+function checkEntry(edition, entry) {
 	if (!validate(entry)) {
 		for (const error of validate.errors) {
-			report(file, entry, `schema: ${error.instancePath || "/"} ${error.message}`);
+			report(edition, entry, `schema: ${error.instancePath || "/"} ${error.message}`);
 		}
 	}
-	FORBIDDEN.filter((field) => field in entry).forEach((field) => report(file, entry, `has forbidden field "${field}"`));
+	FORBIDDEN.filter((field) => field in entry).forEach((field) => report(edition, entry, `has forbidden field "${field}"`));
 	for (const sub_effect of subEffects(entry)) {
 		FORBIDDEN_SUB_EFFECT.filter((field) => field in sub_effect).forEach((field) =>
-			report(file, entry, `${sub_effect.type} sub-effect has forbidden field "${field}"`)
+			report(edition, entry, `${sub_effect.type} sub-effect has forbidden field "${field}"`)
 		);
-	}
-	if ("edition" in entry) {
-		if (!isEffect) report(file, entry, "a condition has no edition: its file belongs to one edition");
-		else if (!EDITIONS.includes(entry.edition)) report(file, entry, `unknown edition "${entry.edition}"`);
 	}
 }
 
-const { list: effects } = await importList(EFFECTS_FILE);
-effects.forEach((entry) => checkEntry(EFFECTS_FILE, entry, { isEffect: true }));
+// The editions as served
+for (const edition of EDITIONS) {
+	for (const entry of raw[edition]) {
+		if (entry.is_condition && entry.edition !== edition) {
+			report(edition, entry, `condition has edition "${entry.edition}", expected "${edition}"`);
+		}
+		if (!entry.is_condition && entry.edition !== "generic" && entry.edition !== edition) {
+			report(edition, entry, `effect has edition "${entry.edition}", expected "generic" or "${edition}"`);
+		}
+	}
+}
+
+const lists = splitRaw(raw);
+
+// A generic effect is the same in both editions
+const generic = (edition) => new Map(lists[edition].effects.filter((e) => !e.edition).map((e) => [e.url, e]));
+const [genericA, genericB] = EDITIONS.map(generic);
+for (const [url, entry] of genericA) {
+	if (!genericB.has(url)) report(EDITIONS[1], entry, `generic effect missing (it is in ${EDITIONS[0]})`);
+	else if (JSON.stringify(entry) !== JSON.stringify(genericB.get(url))) {
+		report(EDITIONS[1], entry, `generic effect differs from ${EDITIONS[0]}`);
+	}
+}
+for (const [url, entry] of genericB) {
+	if (!genericA.has(url)) report(EDITIONS[0], entry, `generic effect missing (it is in ${EDITIONS[1]})`);
+}
 
 for (const edition of EDITIONS) {
-	const entries = effects
-		.filter((entry) => !entry.edition || entry.edition === edition)
-		.map((entry) => ({ file: EFFECTS_FILE, entry }));
+	const { conditions, effects } = lists[edition];
+	const entries = [...effects, ...conditions];
+	entries.forEach((entry) => checkEntry(edition, entry));
 
-	const conditionsFile = join(DATA, edition, "conditions.js");
-	const { list: conditions } = await importList(conditionsFile);
-	conditions.forEach((entry) => {
-		checkEntry(conditionsFile, entry, { isEffect: false });
-		entries.push({ file: conditionsFile, entry });
-	});
+	// The 15 SRD conditions
 	const conditionUrls = conditions.map((entry) => entry.url);
 	SRD_CONDITIONS.filter((url) => !conditionUrls.includes(url)).forEach((url) =>
-		report(conditionsFile, null, `missing SRD condition "${url}"`)
+		report(edition, null, `missing SRD condition "${url}"`)
 	);
 	conditions
 		.filter((entry) => !SRD_CONDITIONS.includes(entry.url))
-		.forEach((entry) => report(conditionsFile, entry, "not an SRD condition of this edition"));
+		.forEach((entry) => report(edition, entry, "not an SRD condition of this edition"));
 
 	// url presence and uniqueness within the edition set
 	const byUrl = new Map();
-	for (const { file, entry } of entries) {
-		if (!entry.url) {
-			report(file, entry, "has no url");
-		} else if (byUrl.has(entry.url)) {
-			report(file, entry, `[${edition}] duplicate url, also in ${relative(ROOT, byUrl.get(entry.url).file)}`);
-		} else {
-			byUrl.set(entry.url, { file, entry });
-		}
+	for (const entry of entries) {
+		if (!entry.url) report(edition, entry, "has no url");
+		else if (byUrl.has(entry.url)) report(edition, entry, "duplicate url");
+		else byUrl.set(entry.url, entry);
 	}
 
 	// References resolve in this edition set
-	for (const { file, entry } of entries) {
+	for (const entry of entries) {
 		for (const url of srdRefs(entry.sub_effects)) {
-			if (!byUrl.has(url)) report(file, entry, `[${edition}] references missing url "${url}"`);
+			if (!byUrl.has(url)) report(edition, entry, `references missing url "${url}"`);
 		}
 	}
 
@@ -202,12 +181,12 @@ for (const edition of EDITIONS) {
 	const walk = (url, path) => {
 		const node = byUrl.get(url);
 		if (!node) return;
-		for (const next of includesRefs(node.entry.sub_effects)) {
+		for (const next of includesRefs(node.sub_effects)) {
 			if (path.includes(next)) {
 				const cycle = [...path.slice(path.indexOf(next)), next].join(" → ");
 				if (!reported.has(cycle)) {
 					reported.add(cycle);
-					report(node.file, node.entry, `includes cycle: ${cycle}`);
+					report(edition, node, `includes cycle: ${cycle}`);
 				}
 			} else {
 				walk(next, [...path, next]);
@@ -219,7 +198,7 @@ for (const edition of EDITIONS) {
 
 if (problems.length) {
 	console.log(problems.join("\n"));
-	console.log(`\n${problems.length} problem(s)`);
+	console.log(`\n${problems.length} problem(s) in ${source}`);
 	process.exit(1);
 }
-console.log(`OK: ${EDITIONS.join(", ")} effects and conditions are valid`);
+console.log(`OK: ${EDITIONS.join(", ")} effects and conditions are valid (${source})`);

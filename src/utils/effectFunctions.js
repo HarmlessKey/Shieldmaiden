@@ -1,32 +1,46 @@
-import conditions_5e from "src/data/5e/conditions.js";
-import conditions_55e from "src/data/5.5e/conditions.js";
-import srd_effects from "src/data/effects.js";
-import { action_outcomes, effect_types, effect_subtypes } from "src/utils/effectsConstants.js";
+import {
+	action_outcomes,
+	effect_types,
+	effect_subtypes,
+	srd_condition_urls,
+} from "src/utils/effectsConstants.js";
 import { abilities, damage_types as DAMAGE_TYPES, skills } from "src/utils/generalConstants.js";
 import { experience_table } from "src/utils/characterConstants.js";
 import { manualBonuses, skillBonusKey } from "src/utils/entityFunctions.js";
 
-// SRD effects without an edition are used in both editions
-const srdEffectsOf = (edition) => srd_effects.filter((definition) => !definition.edition || definition.edition === edition);
+/**
+ * The SRD definitions per edition, fetched from the HK API (effects 12): the api_effects
+ * store's reactive `lists` ({ "5e": { conditions, effects } | null, "5.5e": … }), so reading
+ * them in a computed property or getter updates when they arrive
+ */
+let SRD_SOURCE = {};
+const NO_DEFINITIONS = Object.freeze({ conditions: [], effects: [] });
 
-const SRD_DEFINITIONS = {
-	"5e": { conditions: conditions_5e, effects: srdEffectsOf("5e") },
-	"5.5e": { conditions: conditions_55e, effects: srdEffectsOf("5.5e") },
-};
+/**
+ * Registers where the SRD definitions are read from: the api_effects store's lists, or plain
+ * lists in scripts and checks
+ *
+ * @param {object} source { "5e": { conditions, effects }, "5.5e": … }
+ */
+export function registerSrdDefinitions(source) {
+	SRD_SOURCE = source || {};
+}
+
+const srdDefinitionsOf = (edition) => SRD_SOURCE[edition === "5.5e" ? "5.5e" : "5e"] || NO_DEFINITIONS;
 
 const ROUNDS_PER_UNIT = { round: 1, minute: 10, hour: 600, day: 14400 };
 
 const byName = (a, b) => a.name.localeCompare(b.name);
 
 /**
- * SRD condition and effect definitions of a rules edition.
+ * SRD condition and effect definitions of a rules edition, as far as they are fetched.
  * Effects are table rules, so pass the campaign edition, not the entity's.
  *
  * @param {string} edition "5e" or "5.5e", anything else falls back to "5e"
  * @returns {{ conditions: object[], effects: object[] }} sorted by name
  */
 export function getSrdDefinitions(edition) {
-	const definitions = SRD_DEFINITIONS[edition === "5.5e" ? "5.5e" : "5e"];
+	const definitions = srdDefinitionsOf(edition);
 	return {
 		conditions: [...definitions.conditions].sort(byName),
 		effects: [...definitions.effects].sort(byName),
@@ -38,24 +52,122 @@ export function getSrdDefinitions(edition) {
  *
  * @param {string} edition "5e" or "5.5e", anything else falls back to "5e"
  * @param {string} url Definition url, e.g. "prone"
- * @returns {object|undefined}
+ * @returns {object|undefined} undefined as well while the edition isn't fetched
  */
 export function findSrdDefinition(edition, url) {
-	const definitions = SRD_DEFINITIONS[edition === "5.5e" ? "5.5e" : "5e"];
+	const definitions = srdDefinitionsOf(edition);
 	return (
 		definitions.effects.find((definition) => definition.url === url) ||
 		definitions.conditions.find((definition) => definition.url === url)
 	);
 }
 
-// Urls of the SRD conditions (the same 15 in both editions)
-const SRD_CONDITION_URLS = new Set(
-	Object.values(SRD_DEFINITIONS).flatMap(({ conditions }) => conditions.map(({ url }) => url))
-);
+// Lowercase, without accents: "Énervation" → "enervation"
+const searchable = (text) =>
+	String(text ?? "")
+		.normalize("NFD")
+		.replace(/\p{Diacritic}/gu, "")
+		.toLowerCase();
 
 /**
- * Whether a definition reference is an SRD condition. Conditions are the definitions in the
- * SRD conditions lists; definitions have no category.
+ * Whether a name matches a search: a part of it, ignoring case and accents (effects 12).
+ * An empty search matches every name.
+ *
+ * @param {string} name
+ * @param {string} needle The search
+ * @returns {boolean}
+ */
+export function matchesName(name, needle) {
+	const search = searchable(needle).trim();
+	return !search || searchable(name).includes(search);
+}
+
+// Sub-types that are the bonus value of the same name (effects 12)
+const SAME_NAME_VALUES = [
+	"ac",
+	"max_hp",
+	"speed",
+	"fly_speed",
+	"swim_speed",
+	"climb_speed",
+	"burrow_speed",
+	"initiative",
+	"passive_perception",
+	"spell_save_dc",
+	"spell_attack",
+	"death_save",
+	"concentration_save",
+	"attack",
+	"damage",
+];
+const SKILL_VALUES = () => Object.values(skills).map(({ value }) => value);
+
+/**
+ * The manual bonus values (BONUS_VALUES keys) an effect changes: those of any of its
+ * sub-effects, by their sub-types (effects 12), like the API's sub_type filter. A chosen
+ * ability or skill counts for each of them.
+ *
+ * @param {object} definition Effect definition
+ * @returns {string[]}
+ */
+export function effectValues(definition = {}) {
+	const values = new Set();
+	for (const sub_effect of definition.sub_effects || []) {
+		const kinds = choiceKinds(sub_effect);
+		const chosenAbility = kinds.includes("ability");
+		const ofAbilities = (prefix) => {
+			const list = sub_effect.abilities?.length && !chosenAbility ? sub_effect.abilities : abilities;
+			return list.map((ability) => `${prefix}${ability}`);
+		};
+		for (const sub_type of sub_effect.sub_types || []) {
+			if (SAME_NAME_VALUES.includes(sub_type)) values.add(sub_type);
+			else if (sub_type === "ability_score") ofAbilities("").forEach((v) => values.add(v));
+			else if (sub_type === "save" || sub_type === "ability") {
+				const prefix = sub_type === "save" ? "save_" : "check_";
+				if (sub_effect.abilities?.length || chosenAbility) ofAbilities(prefix).forEach((v) => values.add(v));
+				else values.add(`${prefix}all`);
+			} else if (sub_type === "skill") {
+				const list = sub_effect.skills?.length && !kinds.includes("skill") ? sub_effect.skills : SKILL_VALUES();
+				list.forEach((skill) => values.add(skillBonusKey(skill)));
+			} else if (sub_type === "d20_test") {
+				["attack", "check_all", "save_all"].forEach((v) => values.add(v));
+			}
+		}
+	}
+	return [...values];
+}
+
+/**
+ * The choices a bonus drawer's values fix for an effect (effects 12): its ability or skill
+ * choice, when the values name exactly one ability or skill
+ *
+ * @param {object} definition Effect definition
+ * @param {string[]} values The drawer's BONUS_VALUES keys
+ * @returns {object} e.g. { ability: "dexterity" }
+ */
+export function effectChoicesFor(definition = {}, values = []) {
+	const kinds = (definition.sub_effects || []).flatMap(choiceKinds);
+	const choices = {};
+	if (kinds.includes("ability")) {
+		const named = new Set(
+			values
+				.map((value) => value.replace(/^(check|save)_/, ""))
+				.filter((ability) => abilities.includes(ability))
+		);
+		if (named.size === 1) choices.ability = [...named][0];
+	}
+	if (kinds.includes("skill")) {
+		const named = SKILL_VALUES().filter((skill) => values.includes(skillBonusKey(skill)));
+		if (named.length === 1) choices.skill = named[0];
+	}
+	return choices;
+}
+
+const SRD_CONDITION_URLS = new Set(srd_condition_urls);
+
+/**
+ * Whether a definition reference is an SRD condition, also before the definitions are
+ * fetched. Conditions are the 15 SRD conditions; definitions have no category.
  *
  * @param {string} source "srd", "custom" or "api"
  * @param {string} url source_key of the definition

@@ -30,6 +30,7 @@
 						separator="none"
 						:pagination="{ rowsPerPage: 15 }"
 						:filter="search"
+						:filter-method="filterByName"
 						wrap-cells
 					>
 						<template v-slot:body="props">
@@ -65,7 +66,9 @@
 								</q-td>
 							</q-tr>
 						</template>
-						<div slot="no-data" />
+						<div slot="no-data" class="neutral-2">
+							<template v-if="search">No effects match.</template>
+						</div>
 						<hk-loader slot="loading" name="effects" />
 					</q-table>
 				</template>
@@ -93,6 +96,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
+import { matchesName } from "src/utils/effectFunctions";
 
 export default {
 	name: "Effects",
@@ -132,6 +136,10 @@ export default {
 	},
 	methods: {
 		...mapActions(["setSlide"]),
+		// The search matches the name, ignoring case and accents (effects 12)
+		filterByName(rows, search) {
+			return rows.filter((row) => matchesName(row.name, search));
+		},
 		...mapActions("effects", ["get_effects", "get_effect", "delete_effect"]),
 		confirmDelete(e, key, effect) {
 			//Instantly delete when shift is held

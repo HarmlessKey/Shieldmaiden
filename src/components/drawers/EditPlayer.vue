@@ -135,6 +135,16 @@
 					<!-- MANUAL BONUSES, as the tracker's bonuses drawer -->
 					<h3 class="mt-2 mb-1">Add a bonus</h3>
 					<BonusAddForm :stats="bonusStats" class="mb-2" @add="addBonus" />
+					<!-- Effects that change these values, from the run campaign screen (effects 12) -->
+					<BonusEffects
+						v-if="data.context"
+						:values="bonusStats"
+						:edition="campaign.edition || defaultEdition"
+						:casters="campaignCasters(campaign, data.context.basePlayers)"
+						:caster-concentration="(key) => campaignCasterConcentration(campaign, key)"
+						class="mb-2"
+						@apply="applyBonusEffect"
+					/>
 					<template v-for="stat in bonusStats">
 						<h3 :key="`${stat}-title`" class="mt-2 mb-1">{{ bonusLabel(stat) }} bonuses</h3>
 						<ManualBonusRows
@@ -364,6 +374,9 @@ import Transform from "./party/Transform.vue";
 import PlayerHealth from "src/components/campaign/PlayerHealth.vue";
 import BonusAddForm from "src/components/bonuses/BonusAddForm.vue";
 import ManualBonusRows from "src/components/bonuses/ManualBonusRows.vue";
+import BonusEffects from "src/components/bonuses/BonusEffects.vue";
+import { applyCampaignEffectMixin } from "src/mixins/applyCampaignEffect.js";
+import { default_edition } from "src/utils/generalConstants";
 import { effectiveStats } from "src/utils/effectFunctions";
 import {
 	campaignEntities,
@@ -380,12 +393,13 @@ import {
  */
 export default {
 	name: "EditPlayer",
-	mixins: [experience],
+	mixins: [experience, applyCampaignEffectMixin],
 	components: {
 		Transform,
 		PlayerHealth,
 		BonusAddForm,
 		ManualBonusRows,
+		BonusEffects,
 	},
 	props: ["data"],
 	data() {
@@ -406,6 +420,7 @@ export default {
 			setTransform: false,
 			advancement: undefined,
 			initiative: 0,
+			defaultEdition: default_edition,
 		};
 	},
 	async mounted() {
@@ -443,6 +458,10 @@ export default {
 	},
 	computed: {
 		...mapGetters(["broadcast"]),
+		// The cached campaign, with its players' campaign data
+		campaign() {
+			return this.$store.state.campaigns.cached_campaigns[this.userId]?.[this.campaignId] || {};
+		},
 		share() {
 			return (this.broadcast.shares && this.broadcast.shares.includes("xp")) || false;
 		},
@@ -463,6 +482,21 @@ export default {
 	methods: {
 		bonusLabel(stat) {
 			return BONUS_LABELS[stat] || stat;
+		},
+		// An effect from BonusEffects, to this player on the campaign (applyCampaignEffectMixin)
+		applyBonusEffect({ entry, definition, application }) {
+			const basePlayers = this.data.context?.basePlayers || {};
+			return this.applyCampaignEffectTo({
+				campaignId: this.campaignId,
+				playerId: this.entityKey,
+				playerName: this.playerBase.character_name,
+				immunities: this.playerBase.condition_immunities || [],
+				entry,
+				definition,
+				application,
+				casterName: basePlayers[application.caster_key]?.character_name,
+				context: this.data.context,
+			});
 		},
 		bonusRows(stat) {
 			return Object.entries(this.bonuses[stat] || {}).map(([id, bonus]) => ({ id, ...bonus }));

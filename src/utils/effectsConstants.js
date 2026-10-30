@@ -59,6 +59,26 @@ const ROLL_FILTER_FIELDS = ["abilities", "skills", "context", "attack_types", "c
 // Sub-types that are rolls (the rest of Bonus' sub-types are values), for the form's field rules
 export const roll_sub_types = Object.freeze([...ROLL_SUB_TYPES]);
 
+// Urls of the SRD conditions, the same 15 in both editions. Their definitions come from the
+// API (effects 12); this list recognises a condition without them.
+export const srd_condition_urls = Object.freeze([
+	"blinded",
+	"charmed",
+	"deafened",
+	"exhaustion",
+	"frightened",
+	"grappled",
+	"incapacitated",
+	"invisible",
+	"paralyzed",
+	"petrified",
+	"poisoned",
+	"prone",
+	"restrained",
+	"stunned",
+	"unconscious",
+]);
+
 /**
  * Sub-effect fields every type can use. The form shows them always (type, sub_types,
  * description) or as optional parts.

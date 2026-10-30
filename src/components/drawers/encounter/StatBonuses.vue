@@ -7,6 +7,16 @@
 			<h3>Add a bonus</h3>
 			<BonusAddForm :stats="stats" class="mb-3" @add="add" />
 
+			<!-- Effects that change these values, applied as from the Effects drawer (effects 12) -->
+			<BonusEffects
+				:values="stats"
+				:edition="edition"
+				:casters="casters"
+				:caster-concentration="casterConcentration"
+				class="mb-3"
+				@apply="applyEffect"
+			/>
+
 			<div v-for="section in sections" :key="section.stat" class="stat-section">
 				<div
 					class="stat-section__header"
@@ -76,6 +86,8 @@ import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import BonusAddForm from "src/components/bonuses/BonusAddForm.vue";
 import ManualBonusRows from "src/components/bonuses/ManualBonusRows.vue";
+import BonusEffects from "src/components/bonuses/BonusEffects.vue";
+import { applyEffectMixin } from "src/mixins/applyEffect.js";
 import { BONUS_LABELS, skillBonusKey } from "src/utils/entityFunctions";
 import { calc_mod, calc_skill_mod } from "src/utils/generalFunctions";
 import { abilities, skills } from "src/utils/generalConstants";
@@ -95,10 +107,12 @@ import {
  */
 export default {
 	name: "StatBonuses",
+	mixins: [applyEffectMixin],
 	components: {
 		BasicEntity,
 		BonusAddForm,
 		ManualBonusRows,
+		BonusEffects,
 	},
 	props: ["data"],
 	data() {
@@ -107,7 +121,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["entities", "effective_entity", "roll_modifiers"]),
+		...mapGetters(["entities", "effective_entity", "roll_modifiers", "edition"]),
 		stats() {
 			return this.data?.stats?.length ? this.data.stats : [this.data?.stat].filter(Boolean);
 		},
@@ -126,6 +140,10 @@ export default {
 	},
 	methods: {
 		...mapActions(["setDrawer", "set_bonus", "remove_bonus"]),
+		// An effect from BonusEffects, to this entity (applyEffectMixin)
+		applyEffect({ entry, definition, application }) {
+			return this.applyEffectTo({ entry, definition, application, keys: [this.data.entityKey] });
+		},
 		label(stat) {
 			return BONUS_LABELS[stat] || stat;
 		},

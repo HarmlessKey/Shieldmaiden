@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const CONDITIONS_REF = "/conditions";
+// The SRD conditions are served on the API's v2 path, per edition (effects 12)
+const CONDITIONS_REF = "/v2/conditions";
 
 export class conditionServices {
   constructor() {
@@ -28,7 +29,7 @@ export class conditionServices {
       params += `&${queryParams.join("&")}`;
     }
 
-    const ref = edition === "5.5e" ? `${CONDITIONS_REF}/5.5e` : CONDITIONS_REF;
+    const ref = `${CONDITIONS_REF}/${edition === "5.5e" ? "5.5e" : "5e"}`;
 
     return this.HK.get(ref + params).then((response) => {
       return response.data;
@@ -38,7 +39,7 @@ export class conditionServices {
   }
 
   async getCondition(id, edition) {
-    const ref = edition === "5.5e" ? `${CONDITIONS_REF}/5.5e/${id}` : `${CONDITIONS_REF}/${id}`;
+    const ref = `${CONDITIONS_REF}/${edition === "5.5e" ? "5.5e" : "5e"}/${id}`;
 
     return this.HK.get(ref).then((response) => {
       return response.data;

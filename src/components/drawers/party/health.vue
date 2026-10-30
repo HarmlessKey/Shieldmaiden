@@ -31,6 +31,18 @@
 					@remove="removeBonus"
 				/>
 
+				<!-- Effects that change the maximum, to each selected player (effects 12) -->
+				<BonusEffects
+					:values="['max_hp']"
+					:edition="campaign.edition || defaultEdition"
+					:casters="campaignCasters(campaign, players)"
+					:caster-concentration="(key) => campaignCasterConcentration(campaign, key)"
+					:disabled="!setFor.length"
+					disabled-message="Select the players to apply an effect to."
+					class="mt-3"
+					@apply="applyBonusEffect"
+				/>
+
 				<h3 class="mt-3">Set HP changes for:</h3>
 				<div v-for="(player, key) in players" :key="key">
 					<q-checkbox
@@ -58,6 +70,9 @@
 import { mapActions } from "vuex";
 import BonusAddForm from "src/components/bonuses/BonusAddForm.vue";
 import ManualBonusRows from "src/components/bonuses/ManualBonusRows.vue";
+import BonusEffects from "src/components/bonuses/BonusEffects.vue";
+import { applyCampaignEffectMixin } from "src/mixins/applyCampaignEffect.js";
+import { default_edition } from "src/utils/generalConstants";
 import {
 	manualBonuses,
 	manualBonusTotal,
@@ -67,10 +82,14 @@ import {
 } from "src/utils/entityFunctions";
 
 export default {
+	mixins: [applyCampaignEffectMixin],
 	components: {
 		BonusAddForm,
 		ManualBonusRows,
+		BonusEffects,
 	},
+	// data: { context } from the run campaign screen, for effects (effects 12)
+	props: ["data"],
 	data() {
 		return {
 			user: this.$store.getters.user,
@@ -82,6 +101,7 @@ export default {
 			// Max HP bonuses to add: { max_hp: { <id>: { value, label } } }
 			bonuses: {},
 			awardHp: undefined,
+			defaultEdition: default_edition,
 		};
 	},
 	computed: {
@@ -126,6 +146,25 @@ export default {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["get_campaign", "update_campaign_entity"]),
 		...mapActions("players", ["get_player"]),
+		/**
+		 * An effect from BonusEffects, to every selected player on the campaign
+		 * (applyCampaignEffectMixin)
+		 */
+		async applyBonusEffect({ entry, definition, application }) {
+			for (const playerId of this.setFor) {
+				await this.applyCampaignEffectTo({
+					campaignId: this.campaignId,
+					playerId,
+					playerName: this.players[playerId]?.character_name,
+					immunities: this.players[playerId]?.condition_immunities || [],
+					entry,
+					definition,
+					application,
+					casterName: this.players[application.caster_key]?.character_name,
+					context: this.data?.context,
+				});
+			}
+		},
 		addBonus({ amount, label }) {
 			this.bonuses = withBonus({ bonuses: this.bonuses }, "max_hp", { amount, label });
 		},

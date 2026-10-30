@@ -17,84 +17,49 @@
 			editable
 		/>
 		<hr />
-		<div v-for="group in groups" :key="group.name" class="mb-3">
-			<h3 class="mb-1">{{ group.name }}</h3>
-			<q-list :dark="$store.getters.theme === 'dark'" square class="accordion">
-				<q-expansion-item
-					v-for="entry in group.entries"
-					:key="entry.id"
-					:value="expanded === entry.id"
-					:dark="$store.getters.theme === 'dark'"
-					switch-toggle-side
-					@input="toggle(entry, $event)"
-				>
-					<template v-slot:header>
-						<q-item-section>
-							<div class="d-flex justify-content-start items-center">
-								<i
-									v-if="entry.isCondition"
-									aria-hidden="true"
-									:class="`hki-${entry.sourceKey}`"
-									class="icon"
-								/>
-								<span class="truncate">{{ entry.name }}</span>
-							</div>
-						</q-item-section>
-
-						<q-item-section avatar>
-							<div class="d-flex items-center">
-								<button v-if="has(entry)" class="btn btn-sm btn-clear" @click.stop="remove(entry)">
-									<i aria-hidden="true" class="fas fa-minus-circle red" />
-									<q-tooltip anchor="top middle" self="center middle">Remove</q-tooltip>
-								</button>
-								<button class="btn btn-sm btn-clear" @click.stop="onApplyClick(entry)">
-									<i aria-hidden="true" class="fas fa-plus-circle green" />
-									<q-tooltip anchor="top middle" self="center middle">Apply</q-tooltip>
-									<q-menu
-										:value="applying === entry.id"
-										:dark="$store.getters.theme === 'dark'"
-										anchor="bottom right"
-										self="top right"
-										no-parent-event
-										square
-										@input="applying = $event ? entry.id : undefined"
-									>
-										<div class="apply-menu">
-											<ApplyEffect
-												:definition="definitionOf(entry) || { name: entry.name }"
-												:conditions="srd.conditions"
-												:default-level="defaultExhaustionLevel"
-												:effect="{ source: entry.source, source_key: entry.sourceKey, name: entry.name }"
-												:casters="casters"
-												:caster-concentration="casterConcentration"
-												@apply="apply(entry, $event)"
-												@cancel="applying = undefined"
-											/>
-										</div>
-									</q-menu>
-								</button>
-							</div>
-						</q-item-section>
-					</template>
-
-					<div class="accordion-body">
-						<q-spinner v-if="loading === entry.id" />
-						<EffectDetails v-else :definition="definitionOf(entry)" :edition="edition" />
-					</div>
-				</q-expansion-item>
-			</q-list>
-		</div>
+		<!-- Search on the name, over every group (effects 12) -->
+		<q-input
+			v-model="search"
+			:dark="$store.getters.theme === 'dark'"
+			placeholder="Search effects"
+			filled
+			square
+			dense
+			clearable
+			class="mb-3"
+		>
+			<q-icon slot="prepend" name="search" />
+		</q-input>
+		<p v-if="srdFailed" class="neutral-2">The SRD conditions and effects couldn't be loaded.</p>
+		<p v-else-if="search && !visibleGroups.length" class="neutral-2">No effects match.</p>
+		<!-- A tab per group when there are several -->
+		<h3 v-if="visibleGroups.length === 1" class="mb-1">{{ visibleGroups[0].name }}</h3>
+		<EffectList
+			:groups="visibleGroups"
+			:definition-of="definitionOf"
+			:load-definition="loadDefinition"
+			:edition="edition"
+			:conditions="srd.conditions"
+			:casters="casters"
+			:caster-concentration="casterConcentration"
+			:default-level="defaultExhaustionLevel"
+			:exhaustion-level="exhaustionLevel"
+			:presence="presence"
+			class="mb-3"
+			@apply="apply"
+			@remove="remove"
+		/>
 	</div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
-import ApplyEffect from "src/components/drawers/encounter/effects/ApplyEffect.vue";
-import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
+import EffectList from "src/components/drawers/encounter/effects/EffectList.vue";
 import PlayerEffects from "src/components/campaign/PlayerEffects.vue";
-import { getSrdDefinitions, isSrdCondition } from "src/utils/effectFunctions";
+import { getSrdDefinitions, isSrdCondition, matchesName } from "src/utils/effectFunctions";
 import { default_edition } from "src/utils/generalConstants";
 import { showNotices } from "src/utils/generalFunctions";
+import { applyCampaignEffectMixin } from "src/mixins/applyCampaignEffect.js";
 
 /**
  * The Effects drawer for one of the campaign's players outside an encounter (effects 8): the
@@ -106,20 +71,18 @@ import { showNotices } from "src/utils/generalFunctions";
  */
 export default {
 	name: "CampaignEffects",
+	mixins: [applyCampaignEffectMixin],
 	components: {
-		ApplyEffect,
-		EffectDetails,
+		EffectList,
 		PlayerEffects,
 	},
 	props: ["data"],
 	data() {
 		return {
-			expanded: undefined,
-			applying: undefined,
-			loading: undefined,
 			customEffects: [],
 			// Full custom definitions by id, false when it couldn't be loaded
 			customDefinitions: {},
+			search: "",
 		};
 	},
 	computed: {
@@ -140,6 +103,16 @@ export default {
 		},
 		srd() {
 			return getSrdDefinitions(this.edition);
+		},
+		// The SRD definitions come from the API (effects 12)
+		srdFailed() {
+			return this.$store.getters["api_effects/srd_failed"](this.edition);
+		},
+		// The groups with the entries that match the search, without empty groups
+		visibleGroups() {
+			return this.groups
+				.map((group) => ({ ...group, entries: group.entries.filter(({ name }) => matchesName(name, this.search)) }))
+				.filter((group) => group.entries.length);
 		},
 		// Names of the campaign's players by id
 		names() {
@@ -172,7 +145,7 @@ export default {
 			];
 			if (this.customEffects.length) {
 				groups.push({
-					name: "Custom effects",
+					name: "Custom",
 					entries: this.customEffects.map(({ key, name }) => ({
 						id: `custom:${key}`,
 						source: "custom",
@@ -184,11 +157,17 @@ export default {
 			}
 			return groups;
 		},
-		defaultExhaustionLevel() {
-			const exhaustion = Object.values(this.playerEffects).find(
+		exhaustion() {
+			return Object.values(this.playerEffects).find(
 				(instance) => instance.source === "srd" && instance.source_key === "exhaustion"
 			);
-			return Math.min((exhaustion?.level || 0) + 1, 6);
+		},
+		// The player's Exhaustion level, undefined without it
+		exhaustionLevel() {
+			return this.exhaustion?.level || undefined;
+		},
+		defaultExhaustionLevel() {
+			return Math.min((this.exhaustion?.level || 0) + 1, 6);
 		},
 	},
 	async mounted() {
@@ -198,7 +177,7 @@ export default {
 	},
 	methods: {
 		...mapActions("effects", ["get_effects", "get_effect"]),
-		...mapActions("campaigns", ["apply_campaign_effect", "remove_campaign_effect"]),
+		...mapActions("campaigns", ["remove_campaign_effect"]),
 		definitionOf(entry) {
 			if (entry.source === "srd") {
 				return [...this.srd.conditions, ...this.srd.effects].find(
@@ -209,7 +188,6 @@ export default {
 		},
 		async loadDefinition(entry) {
 			if (entry.source !== "custom" || entry.sourceKey in this.customDefinitions) return;
-			this.loading = entry.id;
 			let definition = false;
 			try {
 				definition = await this.get_effect({ uid: this.$store.getters.user.uid, id: entry.sourceKey });
@@ -217,15 +195,6 @@ export default {
 				console.error(error);
 			}
 			this.$set(this.customDefinitions, entry.sourceKey, definition || false);
-			this.loading = undefined;
-		},
-		async toggle(entry, open) {
-			this.expanded = open ? entry.id : undefined;
-			if (open) await this.loadDefinition(entry);
-		},
-		async onApplyClick(entry) {
-			await this.loadDefinition(entry);
-			this.applying = entry.id;
 		},
 		effectKeysOf(entry) {
 			return Object.keys(this.playerEffects).filter(
@@ -234,42 +203,26 @@ export default {
 					this.playerEffects[key].source_key === entry.sourceKey
 			);
 		},
-		has(entry) {
-			return this.effectKeysOf(entry).length > 0;
+		// Whether the player has it, "all" or "none" (EffectList)
+		presence(entry) {
+			return this.effectKeysOf(entry).length ? "all" : "none";
 		},
-		/**
-		 * The caster player's Concentration { key, for }, or undefined
-		 */
+		// The caster player's Concentration { key, for }, or undefined
 		casterConcentration(casterKey) {
-			const effects = this.campaign.players?.[casterKey]?.effects || {};
-			const key = Object.keys(effects).find(
-				(k) => effects[k].source === "srd" && effects[k].source_key === "concentration"
-			);
-			return key ? { key, for: effects[key].concentration_for } : undefined;
+			return this.campaignCasterConcentration(this.campaign, casterKey);
 		},
 		async apply(entry, application) {
-			this.applying = undefined;
-			const casterKey = application.caster_key;
-			const result = await this.apply_campaign_effect({
+			await this.applyCampaignEffectTo({
 				campaignId: this.campaignId,
 				playerId: this.playerId,
+				playerName: this.playerName,
 				immunities: this.players[this.playerId]?.condition_immunities || [],
 				entry,
-				definition: this.definitionOf(entry) || { name: entry.name },
+				definition: this.definitionOf(entry),
 				application,
-				casterKey,
-				casterName: casterKey ? this.names[casterKey] : undefined,
+				casterName: this.names[application.caster_key],
 				context: this.data?.context,
 			});
-			if (result?.immune) {
-				this.$q.notify({
-					message: `${this.playerName} is immune to ${entry.name}`,
-					color: "warning",
-					position: "top",
-					timeout: 2500,
-				});
-			}
-			this.notify(result?.notices);
 		},
 		async remove(entry) {
 			for (const effectKey of this.effectKeysOf(entry)) {
@@ -296,29 +249,5 @@ export default {
 <style lang="scss" scoped>
 h3 {
 	font-size: 15px;
-}
-.apply-menu {
-	width: 300px;
-	padding: 0 10px;
-}
-.q-item__section {
-	line-height: 27px;
-
-	.icon {
-		color: $neutral-3;
-		font-size: 23px;
-		margin-right: 12px;
-	}
-	button {
-		border-radius: 50%;
-		height: 35px;
-		width: 35px;
-		margin: -8px 0;
-
-		&:focus {
-			outline: none;
-			background-color: $neutral-5 !important;
-		}
-	}
 }
 </style>

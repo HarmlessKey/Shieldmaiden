@@ -1623,7 +1623,11 @@ Moved here from step 8 on 2026-10-16: the API connection comes after the reminde
 the HK API. The instance shape (`source: "srd"`, `source_key: <url>`) does not change, so no
 Firestore migration is needed.
 
-### 11a. Conditions
+### 11a. Conditions (done in the API project, 2026-10-28: Move)
+The API's `/v2/effects/{5e|5.5e}` serves the conditions with their mechanics (`is_condition:
+true`), equal to the former local files; `/v2/conditions/{edition}` serves them alone. The old
+`/conditions` keeps the icon and rules text for the compendium and the condition selects.
+
 The HK API provides condition name, icon and rules text (`/conditions` and
 `/conditions/5.5e`, all 15 conditions per edition as of 2026-09-29), but no structured
 `sub_effects`. Decide one of:
@@ -1635,7 +1639,7 @@ The HK API provides condition name, icon and rules text (`/conditions` and
 Either way the 2e lookup helper is the only place that changes. The tracker, compendium
 and `hk-condition-select` then share one source for condition text.
 
-### 11b. SRD effects
+### 11b. SRD effects (done in the API project, 2026-10-27: `/v2/effects/{5e|5.5e|generic}`)
 Serve `src/data/5e|5.5e/effects.js` from the API (edition-aware), replacing the static
 lookup in 2a/2e.
 
@@ -1649,7 +1653,7 @@ Backfill spell links (step 6c: action effects with scaling) onto SRD spells in t
 edition. The SRD effects catalogue ([effects-srd-catalogue.md](./effects-srd-catalogue.md))
 already says which spells link which effect.
 
-## 12. Fetch effects and conditions from the API, with search and bonus effects in the bonus drawers
+## 12. Fetch effects and conditions from the API, with search and bonus effects in the bonus drawers (done — archived as effects-12-api-effects, 2026-10-30)
 Idea, 2026-10-18. Builds on step 11 (11a, 11b): once the API serves the SRD conditions and
 effects, the app fetches and lists them from it, and the lists get a name search. Today the
 drawers combine the local SRD lists (`src/data/5e|5.5e`, `findSrdDefinition`) with the user's
@@ -1694,6 +1698,107 @@ custom effects (`effects/get_effects`), with no search. Conditions are fetched s
     with a caster), or only caster-less, until-removed effects.
   - Which values besides AC and max HP get bonus effects in the tracker's drawer (speed, saves,
     skills), and how "simple" is decided for roll bonuses.
+
+*As built (change `effects-12-api-effects`):*
+- **Decided at proposal (user):**
+  - API only: `src/data/effects.js` and `src/data/5e|5.5e/conditions.js` are removed
+  - all of step 12 in one change
+  - the tracker's drawer lists effects for every value it shows
+  - an optional caster and Concentration in the bonus drawers
+  - a drawer lists any effect with a sub-effect on its values, like the API's `sub_type`
+    filter, filtered in the app (custom effects included), not only plain bonuses
+  - conditions left out of the bonus drawers
+- **API:** the effects moved to `/v2` while proposing, and the conditions were added to
+  `/v2/effects/{edition}`.
+- **Fetching:**
+  - `services/api/effects.js` (`/v2/effects/<edition>`, one request per edition)
+  - the store module `api_effects` (`src/store/modules/content/effects.js`):
+    - `fetch_srd_definitions` shares one request per edition and splits on `is_condition`
+    - it drops `_id`, `is_condition`, the conditions' `edition` and `"generic"`
+    - a failure isn't kept, so the next call retries
+    - getters `srd_loaded` and `srd_failed`
+  - `effectFunctions.registerSrdDefinitions` reads the store's reactive `lists`. It is
+    registered in the client-only boot file `boot/api-effects.js`, which also starts both
+    fetches. A Vuex module can't reach its own state object, and Quasar replaces the state
+    before the boot files run.
+  - `isSrdCondition` uses `srd_condition_urls` (`effectsConstants.js`), so a condition keeps
+    its icon without the API.
+  - `resolve_effect_definitions` and the live view's `resolveDefinitions` wait for their
+    edition.
+- **Scripts:** `scripts/validate-effects-data/srdData.mjs` loads the API (`--api`) or saved
+  responses (`--from`) for `validate.mjs` and `check-constants.mjs`.
+  - `validate.mjs` also checks that generic effects are the same in both editions, and that
+    the editions are served as expected.
+  - It stops early when the data can't be read.
+- **Search:**
+  - `matchesName` (case and accents)
+  - the Effects drawers, with "No effects match", and in conditions mode a note when the
+    SRD lists couldn't be loaded
+  - `EffectRefPicker`, `ReminderForm` and the custom effects list (`filter-method`)
+- **Bonus drawers:**
+  - `effectValues` and `effectChoicesFor` (an ability or skill is preset when the drawer
+    names exactly one)
+  - `components/bonuses/BonusEffects.vue`, with search above 8 entries
+  - The component loads the full custom effect definitions once, because the search list
+    only has names.
+  - `ApplyEffect` got `presetChoices`, and `type="button"`, since it now sits inside the
+    Edit player and Group Health forms.
+  - The apply code moved to `mixins/applyEffect.js` (tracker) and
+    `mixins/applyCampaignEffect.js` (campaign; with `campaignCasters`).
+  - Group Health now gets the screen's effect context, so hit points follow an applied
+    maximum.
+  - Edit player lists effects only when opened from the run campaign screen (with its
+    context).
+- **Added during testing:**
+  - every effect list is the shared `EffectList.vue` (details, apply popover, shift+click),
+    with a tab per group (Effects, Custom; Conditions in the campaign drawer) and 10 per page
+  - the compendium and the condition selects read `/v2/conditions/{edition}`; a condition
+    page shows it through `EffectDetails`. The app no longer reads the old `/conditions`.
+
+## 12b. Copy an existing effect in the effects form
+Idea, 2026-10-30. Building an effect from scratch takes time, and many custom effects are a
+variation on one that exists (an SRD effect with other numbers, or one of the user's own).
+The NPC and spell forms already let you start from a copy; the effects form should work the
+same way.
+
+How copying works today (`EditNpc.vue`, `EditSpell.vue`, `EditItem.vue`):
+- A new NPC or spell opens a "How do you want to do this?" dialog: **Copy existing …** or
+  **Create from scratch**.
+- While creating (not when editing a saved one), the top bar has a **Copy** button that opens
+  the same search in a dialog.
+- Both use the shared `components/CopyContent.vue` (`type="monster" | "spell" | "item"`): a
+  Custom / SRD toggle, a name search, an edition toggle for SRD content, a short paged
+  result list, and a copy button per result. It fetches the full object, strips `_id`, `key`,
+  `url`, `meta` and `release_date`, and emits `copy({ result })`. The form replaces its
+  content with the result, which then counts as unsaved changes.
+
+For effects (`views/UserContent/Effects/EditEffect.vue`):
+- **The same dialog and button**: a new effect opens the create dialog, and the Copy button
+  shows while creating.
+- **`CopyContent` gets `type="effect"`:**
+  - **Custom**: the user's custom effects (`effects/get_effects` for the list,
+    `effects/get_effect` for the full definition).
+  - **SRD**: the edition's SRD effects from the `api_effects` lists fetched in step 12,
+    searched with `matchesName`, with the edition toggle. Conditions too, so a DM can build
+    a variant of one (a homebrew Grappled).
+- **What the copy keeps and drops:**
+  - The definition as the form edits it (`cleanEffectDefinition`): name, description,
+    sub-effects, stacking, level, condition, ends when, sustain, aura.
+  - Dropped: `url`, `_id`, `is_condition` and `edition`, since a custom effect is used in every
+    edition. An SRD effect with an edition copies that edition's version.
+  - References in the sub-effects (`includes`, `apply_effect`, `remove_effect`) stay as they
+    are: SRD `url`s and custom ids still resolve.
+- **Tier limit:** like the other content, a user at the custom effect limit of their tier
+  can't save a new one; the copy is a new effect.
+- **Docs:** `src/docs/effects.md` mentions copying an effect when creating one.
+
+To work out when it's proposed:
+- Whether the SRD search is in the client over the fetched lists (no request, consistent with
+  step 12) or the API's `name` filter on `/v2/effects/{edition}` (as `CopyContent` does for
+  monsters and spells). The client is the likely choice.
+- Whether the copied name gets a suffix ("Bless (copy)") so it's told apart from the SRD
+  effect in the lists. The NPC and spell copies keep the name.
+- Whether copying a condition is wanted, or only effects.
 
 ## 13. Import effects, and an AI skill to build them
 Idea, 2026-10-13. Build it after effects can be linked to monsters and spells (steps 6–7),
@@ -1747,7 +1852,8 @@ let an AI write them instead, and import the result.
 9 (done — archived as effects-9-encounter-reminders, 2026-10-23; encounter reminders on triggers, incl. the former 3f)
 10 (done — archived as effects-10-edit-encounter-reminders, 2026-10-23; set encounter reminders from the edit encounter screen: a Reminders tab with a For choice, and an entity's reminders removed with it)
 11 (HK API updates, moved from 8 on 2026-10-16: 11a conditions, 11b SRD effects, 11c SRD monster backfill, 11d SRD spell backfill)
-12 (fetch effects and conditions from the API, a name search on every effect list, and bonus effects listed and applied from the manual bonus drawers; after 11a, 11b)
+12 (done — archived as effects-12-api-effects, 2026-10-30; fetch effects and conditions from the API, a name search on every effect list, bonus effects listed and applied from the manual bonus drawers, and the compendium conditions on v2; after 11a, 11b)
+12b (copy an existing custom or SRD effect in the effects form, as for monsters and spells; after 12)
 13 (import effects, and a downloadable AI skill that writes importable effects; after 6 -> 6b -> 7)
 
 ## Workflow per step (from 2026-09-29)

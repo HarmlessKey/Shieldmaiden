@@ -31,6 +31,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { effectRefOptions } from "./fieldControls";
+import { matchesName } from "src/utils/effectFunctions";
 
 const refValue = (ref) => (ref ? `${ref.source}:${ref.source_key}` : undefined);
 
@@ -79,8 +80,7 @@ export default {
 			return options;
 		},
 		filtered() {
-			if (!this.needle) return this.options;
-			return this.options.filter((option) => option.label.toLowerCase().includes(this.needle));
+			return this.options.filter((option) => matchesName(option.label, this.needle));
 		},
 		selected() {
 			return this.multiple ? this.refs.map(refValue) : refValue(this.value);
@@ -97,7 +97,7 @@ export default {
 		...mapActions("effects", ["get_effects"]),
 		filter(value, update) {
 			update(() => {
-				this.needle = (value || "").toLowerCase();
+				this.needle = value || "";
 			});
 		},
 		refOf(value) {

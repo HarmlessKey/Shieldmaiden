@@ -488,6 +488,10 @@ export default {
 		 */
 		async resolveDefinitions(refs = []) {
 			if (!this.resolving) this.resolving = new Set();
+			// The SRD definitions come from the API (effects 12); custom ones can include them
+			if (refs.length) {
+				await this.$store.dispatch("api_effects/fetch_srd_definitions", { edition: this.edition });
+			}
 			const services = new EffectServices();
 			const lookup = async ({ source, source_key }) => {
 				if (source === "srd") return findSrdDefinition(this.edition, source_key);

@@ -86,7 +86,7 @@ const conditions_actions = {
 
         // Create meta tags
         const maxLength = 160 - 29;
-				const description =  (condition.effects) ? `${condition.effects.join(" ").substring(0, maxLength).trim()}...` : "";
+				const description =  (condition.description) ? `${condition.description.substring(0, maxLength).trim()}...` : "";
 
         condition.meta = {
           title: `${condition.name} D&D 5e and 5.5e`,

@@ -30,7 +30,7 @@
 		/>
 
 		<!-- Choices -->
-		<template v-for="choice in requiredChoices">
+		<template v-for="choice in askedChoices">
 			<q-input
 				v-if="!choiceOptions(choice)"
 				:key="`choice-${choice.kind}`"
@@ -111,8 +111,9 @@
 		</ApplicationDuration>
 
 		<div class="d-flex justify-content-end gap-1">
-			<button class="btn btn-sm bg-neutral-5" @click="$emit('cancel')">Cancel</button>
-			<button class="btn btn-sm" :disabled="!valid" @click="apply">
+			<!-- type="button": the form can be inside another form (a bonus drawer, effects 12) -->
+			<button type="button" class="btn btn-sm bg-neutral-5" @click="$emit('cancel')">Cancel</button>
+			<button type="button" class="btn btn-sm" :disabled="!valid" @click="apply">
 				<i aria-hidden="true" class="fas fa-plus" />
 				{{ plan.action === "replace" ? "Replace and apply" : "Apply" }}
 			</button>
@@ -163,12 +164,17 @@ export default {
 			type: Function,
 			default: () => undefined,
 		},
+		// Choices already made, not asked: { ability: "dexterity" } from a bonus drawer (effects 12)
+		presetChoices: {
+			type: Object,
+			default: () => ({}),
+		},
 	},
 	data() {
 		return {
 			level: this.defaultLevel,
 			choices: Object.fromEntries(
-				getRequiredChoices(this.definition).map(({ kind }) => [kind, undefined])
+				getRequiredChoices(this.definition).map(({ kind }) => [kind, this.presetChoices[kind]])
 			),
 			// Built by ApplicationDuration
 			duration: { type: "cancelled" },
@@ -222,6 +228,10 @@ export default {
 		},
 		requiredChoices() {
 			return getRequiredChoices(this.definition);
+		},
+		// The required choices that aren't preset
+		askedChoices() {
+			return this.requiredChoices.filter(({ kind }) => this.presetChoices[kind] === undefined);
 		},
 		valid() {
 			if (!this.durationValid) return false;

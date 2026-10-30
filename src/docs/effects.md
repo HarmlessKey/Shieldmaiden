@@ -30,6 +30,11 @@ So you build an effect once and use it everywhere: on many monsters, on spells, 
 
 ### Where effects come from
 
+The SRD conditions and effects are loaded from the Harmless Key API when you open Shieldmaiden.
+If they can't be loaded, they show by their name without their rules, and are loaded again the
+next time they're needed. The conditions in the compendium are the same: a condition's page
+shows its description and what it does, as in the Effects drawer.
+
 - **SRD conditions**: the 15 conditions of the rules edition of your campaign, from Blinded
   to Unconscious, with Exhaustion as one condition with levels.
 - **SRD effects**: ready-made effects from the SRD, like Bless, Haste, Mage Armor, Rage,
@@ -83,7 +88,10 @@ Every effect needs at least one sub-effect.
 In the combat tracker, target one or more creatures and open **Effects** in the header of the
 targeted creatures. **Conditions** opens the same drawer with only the conditions. Effects are
 grouped as SRD effects and your custom effects; conditions follow the rules edition of the
-campaign. Expand an effect to read what it does.
+campaign. Expand an effect to read what it does. Type in the search field above the list to
+find an effect by a part of its name; case and accents don't matter. The effect pickers of the
+effect, NPC and spell forms, the reminder form and your custom effects list search the same
+way.
 
 **Apply** opens a short form. **Shift+click** applies the effect right away until it's
 removed.
@@ -165,6 +173,12 @@ bonus with a value and a label (like "Ring of Protection"), and change or remove
 bonuses: its AC with and without bonuses, the effects that change it, and its manual bonuses,
 saved right away. Current hit points follow a changed maximum.
 
+These drawers also list the **Effects** that change their values, as the bonuses drawer in
+combat does: AC lists Armor Class Bonus, Armor Class Minimum, Mage Armor, Haste and the like,
+maximum hit points Hit Point Maximum Bonus and Reduction. Apply one with the same form as in
+the Effects drawer, with a player as the caster and Concentration if you like. In **Group
+Health** it's applied to every selected player.
+
 The **Effects** button on a player opens the Effects drawer for
 that player, with the same conditions, effects and apply form as in combat, and the campaign's
 players as casters. A Concentration effect starts the caster player's Concentration, and
@@ -230,6 +244,13 @@ until you reset them. A trait effect without a limit is never used up. Players' 
   level, roll a repeat save or an escape, and remove it. Every effect can be removed.
 - **Changed values**: values changed by effects, like AC and Speed, are marked. Their tooltip
   lists the effects and manual bonuses that change them.
+- **Bonuses drawer**: click a value on a creature's card, like AC or Speed, to see its manual
+  bonuses and the effects that change it. Under **Effects** it also lists every SRD effect and
+  custom effect with a sub-effect on that value (not conditions), in the same list as the
+  Effects drawer (details, the apply form, shift+click to apply until removed, Effects and Custom tabs, 10 per page), to apply right
+  there: Armor Class Bonus 2 with a cleric as the caster and Concentration is a Shield of
+  Faith. An ability or skill the drawer is about is chosen for you, like Dexterity in the
+  Dexterity drawer.
 - **Prompts**: when a trigger happens, like the start of a creature's turn, the tracker shows a
   prompt with buttons to roll damage or healing, grant temporary hit points, or roll a save.
 - **Rolls**: Advantage, Disadvantage, bonus dice, automatic failures and rerolls from effects

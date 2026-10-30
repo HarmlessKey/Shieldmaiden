@@ -409,7 +409,7 @@
 
 <script>
 import { default_edition } from "src/utils/generalConstants";
-import { getSrdDefinitions } from "src/utils/effectFunctions";
+import { getSrdDefinitions, matchesName } from "src/utils/effectFunctions";
 import {
 	ENCOUNTER_TRIGGER_TYPES,
 	ENTITY_TRIGGER_TYPES,
@@ -522,9 +522,7 @@ export default {
 			return [...srd.conditions.map(srdOption), ...srd.effects.map(srdOption), ...custom];
 		},
 		filteredEffects() {
-			const needle = this.effectFilter.toLowerCase();
-			if (!needle) return this.effectOptions;
-			return this.effectOptions.filter((option) => option.label.toLowerCase().includes(needle));
+			return this.effectOptions.filter((option) => matchesName(option.label, this.effectFilter));
 		},
 		effectValue() {
 			const effect = this.reminder.effect;

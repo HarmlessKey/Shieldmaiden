@@ -13,6 +13,16 @@
 			<h3>Add a bonus</h3>
 			<BonusAddForm :stats="[stat]" class="mb-3" @add="add" />
 
+			<!-- Effects that change this value, applied as from the Effects drawer (effects 12) -->
+			<BonusEffects
+				:values="[stat]"
+				:edition="edition"
+				:casters="casters"
+				:caster-concentration="(key) => campaignCasterConcentration(campaign, key)"
+				class="mb-3"
+				@apply="applyEffect"
+			/>
+
 			<template v-if="lines.length">
 				<h3>From effects</h3>
 				<ul class="effect-lines">
@@ -35,6 +45,9 @@
 <script>
 import BonusAddForm from "src/components/bonuses/BonusAddForm.vue";
 import ManualBonusRows from "src/components/bonuses/ManualBonusRows.vue";
+import BonusEffects from "src/components/bonuses/BonusEffects.vue";
+import { applyCampaignEffectMixin } from "src/mixins/applyCampaignEffect.js";
+import { default_edition } from "src/utils/generalConstants";
 import { effectiveStats } from "src/utils/effectFunctions";
 import {
 	BONUS_LABELS,
@@ -57,9 +70,11 @@ const FIELDS = { ac: "ac", max_hp: "maxHp" };
  */
 export default {
 	name: "CampaignBonuses",
+	mixins: [applyCampaignEffectMixin],
 	components: {
 		BonusAddForm,
 		ManualBonusRows,
+		BonusEffects,
 	},
 	props: ["data"],
 	computed: {
@@ -69,9 +84,18 @@ export default {
 		field() {
 			return FIELDS[this.stat];
 		},
-		players() {
+		campaign() {
 			const uid = this.$store.getters.user?.uid;
-			return this.$store.state.campaigns.cached_campaigns[uid]?.[this.data.campaignId]?.players || {};
+			return this.$store.state.campaigns.cached_campaigns[uid]?.[this.data.campaignId] || {};
+		},
+		players() {
+			return this.campaign.players || {};
+		},
+		edition() {
+			return this.campaign.edition || default_edition;
+		},
+		casters() {
+			return this.campaignCasters(this.campaign, this.data.context?.basePlayers);
 		},
 		player() {
 			return this.players[this.data.playerId];
@@ -129,6 +153,21 @@ export default {
 		},
 		add({ amount, label }) {
 			this.save(withBonus(this.player, this.stat, { amount, label }));
+		},
+		// An effect from BonusEffects, to this player on the campaign (applyCampaignEffectMixin)
+		applyEffect({ entry, definition, application }) {
+			const basePlayers = this.data.context?.basePlayers || {};
+			return this.applyCampaignEffectTo({
+				campaignId: this.data.campaignId,
+				playerId: this.data.playerId,
+				playerName: this.entity?.name,
+				immunities: basePlayers[this.data.playerId]?.condition_immunities || [],
+				entry,
+				definition,
+				application,
+				casterName: basePlayers[application.caster_key]?.character_name,
+				context: this.data.context,
+			});
 		},
 		update({ bonus, amount, label }) {
 			this.save(withBonus(this.player, this.stat, { id: bonus.id, amount, label }));

@@ -48,100 +48,43 @@
 			</template>
 		</template>
 		<template v-else-if="targets.length > 0">
-			<div v-for="group in groups" :key="group.name" class="mb-3">
-				<h3 class="mb-1">{{ group.name }}</h3>
-				<q-list :dark="$store.getters.theme === 'dark'" square class="accordion">
-					<q-expansion-item
-						v-for="entry in group.entries"
-						:key="entry.id"
-						:value="expanded === entry.id"
-						:dark="$store.getters.theme === 'dark'"
-						switch-toggle-side
-						@input="toggle(entry, $event)"
-					>
-						<template v-slot:header>
-							<q-item-section>
-								<div class="d-flex justify-content-start items-center">
-									<i
-										v-if="entry.isCondition"
-										aria-hidden="true"
-										:class="`hki-${entry.sourceKey}`"
-										class="icon"
-									/>
-									<span class="truncate">{{ entry.name }}</span>
-									<span
-										v-if="entry.sourceKey === 'exhaustion' && exhaustionLevel !== undefined"
-										class="exhaustion neutral-11 ml-2"
-									>
-										{{ exhaustionLevel || "?" }}
-										<q-tooltip anchor="top middle" self="center middle">
-											{{ exhaustionLevel ? `Level ${exhaustionLevel}` : "Levels differ between targets" }}
-										</q-tooltip>
-									</span>
-								</div>
-							</q-item-section>
-
-							<q-item-section avatar>
-								<div class="d-flex items-center">
-									<span
-										v-if="presence(entry) !== 'none'"
-										class="presence mr-2"
-										:class="presence(entry)"
-									>
-										<q-tooltip anchor="top middle" self="center middle">
-											{{ presence(entry) === "all" ? "All targets" : "Some targets" }}
-										</q-tooltip>
-									</span>
-									<button
-										v-if="presence(entry) !== 'none'"
-										class="btn btn-sm btn-clear"
-										@click.stop="remove(entry)"
-									>
-										<i aria-hidden="true" class="fas fa-minus-circle red" />
-										<q-tooltip anchor="top middle" self="center middle">Remove</q-tooltip>
-									</button>
-									<button class="btn btn-sm btn-clear" @click.stop="onApplyClick(entry, $event)">
-										<i aria-hidden="true" class="fas fa-plus-circle green" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Apply (shift+click: until removed)
-										</q-tooltip>
-										<q-menu
-											:value="applying === entry.id"
-											:dark="$store.getters.theme === 'dark'"
-											anchor="bottom right"
-											self="top right"
-											no-parent-event
-											square
-											@input="applying = $event ? entry.id : undefined"
-										>
-											<div class="apply-menu">
-												<ApplyEffect
-													:definition="definitionOf(entry) || { name: entry.name }"
-													:conditions="srd.conditions"
-													:default-level="defaultExhaustionLevel"
-													:effect="{ source: entry.source, source_key: entry.sourceKey, name: entry.name }"
-													:casters="casters"
-													:default-caster="actorEntityKey"
-													:caster-concentration="casterConcentration"
-													@apply="apply(entry, $event)"
-													@cancel="applying = undefined"
-												/>
-											</div>
-										</q-menu>
-									</button>
-								</div>
-							</q-item-section>
-						</template>
-
-						<div class="accordion-body">
-							<q-spinner v-if="loading === entry.id" />
-							<template v-else>
-								<EffectDetails :definition="definitionOf(entry)" :edition="edition" />
-							</template>
-						</div>
-					</q-expansion-item>
-				</q-list>
-			</div>
+			<!-- Search on the name, over every group (effects 12) -->
+			<q-input
+				v-model="search"
+				:dark="$store.getters.theme === 'dark'"
+				:placeholder="mode === 'conditions' ? 'Search conditions' : 'Search effects'"
+				filled
+				square
+				dense
+				clearable
+				class="mb-3"
+			>
+				<q-icon slot="prepend" name="search" />
+			</q-input>
+			<p v-if="srdFailed" class="neutral-2">
+				The SRD {{ mode === "conditions" ? "conditions" : "effects" }} couldn't be loaded.
+			</p>
+			<p v-else-if="search && !visibleGroups.length" class="neutral-2">
+				No {{ mode === "conditions" ? "conditions" : "effects" }} match.
+			</p>
+			<!-- A tab per group when there are several -->
+			<h3 v-if="visibleGroups.length === 1" class="mb-1">{{ visibleGroups[0].name }}</h3>
+			<EffectList
+				:groups="visibleGroups"
+				:definition-of="definitionOf"
+				:load-definition="loadDefinition"
+				:edition="edition"
+				:conditions="srd.conditions"
+				:casters="casters"
+				:default-caster="actorEntityKey"
+				:caster-concentration="casterConcentration"
+				:default-level="defaultExhaustionLevel"
+				:exhaustion-level="exhaustionLevel"
+				:presence="presence"
+				class="mb-3"
+				@apply="apply"
+				@remove="remove"
+			/>
 		</template>
 		<p v-else class="mt-4">Select one or multiple targets to apply or remove effects.</p>
 	</div>
@@ -154,20 +97,19 @@ import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import Effects from "src/components/combat/entities/effects";
 import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
 import ApplyEffect from "src/components/drawers/encounter/effects/ApplyEffect.vue";
-import {
-	getSrdDefinitions,
-	isSrdCondition,
-	getRequiredChoices,
-	buildEffectInstance,
-} from "src/utils/effectFunctions.js";
+import EffectList from "src/components/drawers/encounter/effects/EffectList.vue";
+import { getSrdDefinitions, isSrdCondition, matchesName } from "src/utils/effectFunctions.js";
+import { applyEffectMixin } from "src/mixins/applyEffect.js";
 
 export default {
 	name: "EffectsDrawer",
+	mixins: [applyEffectMixin],
 	components: {
 		BasicEntity,
 		Effects,
 		EffectDetails,
 		ApplyEffect,
+		EffectList,
 	},
 	props: {
 		// Entity keys, falls back to the targeted entities. Or { keys, entry, encounter } for one
@@ -186,28 +128,18 @@ export default {
 	data() {
 		return {
 			effectSpace: 0,
-			expanded: undefined,
-			// Entry whose application popover is open
-			applying: undefined,
+			// The one effect's definition loading
 			loading: undefined,
 			customEffects: [],
 			// Full custom definitions by id, false when it couldn't be loaded
 			customDefinitions: {},
 			// One effect for the encounter: "everyone" in combat or the current "targets"
 			targetChoice: "everyone",
+			search: "",
 		};
 	},
 	computed: {
-		...mapGetters([
-			"entities",
-			"targeted",
-			"edition",
-			"round",
-			"turn",
-			"turn_order",
-			"actor",
-			"user",
-		]),
+		...mapGetters(["targeted", "edition", "user"]),
 		// The drawer's data as { keys, entry, encounter }
 		options() {
 			if (Array.isArray(this.data)) return { keys: this.data };
@@ -236,6 +168,16 @@ export default {
 		srd() {
 			return getSrdDefinitions(this.edition);
 		},
+		// The SRD definitions come from the API (effects 12)
+		srdFailed() {
+			return this.$store.getters["api_effects/srd_failed"](this.edition);
+		},
+		// The groups with the entries that match the search, without empty groups
+		visibleGroups() {
+			return this.groups
+				.map((group) => ({ ...group, entries: group.entries.filter(({ name }) => matchesName(name, this.search)) }))
+				.filter((group) => group.entries.length);
+		},
 		groups() {
 			const srdEntry = (definition) => ({
 				id: `srd:${definition.url}`,
@@ -252,7 +194,7 @@ export default {
 			const groups = [{ name: "Effects", entries: this.srd.effects.map(srdEntry) }];
 			if (this.customEffects.length) {
 				groups.push({
-					name: "Custom effects",
+					name: "Custom",
 					entries: this.customEffects.map(({ key, name }) => ({
 						id: `custom:${key}`,
 						source: "custom",
@@ -263,37 +205,6 @@ export default {
 				});
 			}
 			return groups;
-		},
-		/**
-		 * Key of the entity whose turn it is, ordered like RunEncounter's _active.
-		 * Nobody has the turn before combat starts.
-		 */
-		turnEntityKey() {
-			if (!this.round) return undefined;
-			return this.turn_order[this.turn];
-		},
-		/**
-		 * Key of the acting entity, the default caster: the actor selected out of turn,
-		 * else the entity whose turn it is. The Environment acts without a caster.
-		 */
-		actorEntityKey() {
-			if (!this.round) return undefined;
-			if (this.actor) {
-				return this.actor.key in this.entities ? this.actor.key : undefined;
-			}
-			return this.turnEntityKey;
-		},
-		/**
-		 * Caster options: the entities in initiative order, then the rest
-		 */
-		casters() {
-			const keys = _.uniq([...(this.turn_order || []), ...Object.keys(this.entities)]).filter(
-				(key) => this.entities[key]
-			);
-			return keys.map((key) => ({
-				label: (this.entities[key].name || key).capitalizeEach(),
-				value: key,
-			}));
 		},
 		/**
 		 * Exhaustion level shared by the targets:
@@ -318,7 +229,7 @@ export default {
 		this.setEffectSize();
 	},
 	methods: {
-		...mapActions(["apply_effect", "remove_effect", "concentrate_on", "setDrawer"]),
+		...mapActions(["remove_effect", "setDrawer"]),
 		// The one effect applied: as from the list, then the drawer closes
 		async applySingle(application) {
 			await this.apply(this.single, application);
@@ -340,31 +251,6 @@ export default {
 		},
 		exhaustionOf(key) {
 			return this.instancesOf(key, { source: "srd", sourceKey: "exhaustion" })[0];
-		},
-		/**
-		 * A caster's active Concentration instance: { key, for }, or undefined
-		 */
-		casterConcentration(casterKey) {
-			const effects = this.entities[casterKey]?.effects || {};
-			const key = Object.keys(effects).find(
-				(k) => effects[k].source === "srd" && effects[k].source_key === "concentration"
-			);
-			return key ? { key, for: effects[key].concentration_for } : undefined;
-		},
-		/**
-		 * Carries out a Concentration plan for the caster (concentrationPlan) with the store's
-		 * concentrate_on, shared with effects applied from rolls
-		 *
-		 * @returns {string|undefined} Key of the Concentration to link to, undefined when it failed
-		 */
-		concentrateOn({ entry, plan, casterKey, duration = {} }) {
-			return this.concentrate_on({
-				casterKey,
-				plan,
-				concentrationFor: { source: entry.source, source_key: entry.sourceKey, name: entry.name },
-				duration,
-				turnKey: this.turnEntityKey,
-			});
 		},
 		/**
 		 * Whether all, some or none of the targets have the effect
@@ -398,69 +284,13 @@ export default {
 			this.$set(this.customDefinitions, entry.sourceKey, definition || false);
 			this.loading = undefined;
 		},
-		async toggle(entry, open) {
-			this.expanded = open ? entry.id : undefined;
-			if (open) await this.loadDefinition(entry);
-		},
 		/**
-		 * Opens the application popover, shift+click applies until removed
-		 */
-		async onApplyClick(entry, event) {
-			await this.loadDefinition(entry);
-			if (event.shiftKey) this.quickApply(entry);
-			else this.applying = entry.id;
-		},
-		/**
-		 * Applies until removed, or opens the popover when the effect needs choices.
-		 * Exhaustion gets the default level.
-		 */
-		quickApply(entry) {
-			if (getRequiredChoices(this.definitionOf(entry)).length) {
-				this.applying = entry.id;
-				return;
-			}
-			const application = { duration: { type: "cancelled" } };
-			if (entry.sourceKey === "exhaustion") application.level = this.defaultExhaustionLevel;
-			this.apply(entry, application);
-		},
-		/**
-		 * Applies to every target. The caster is the application's caster_key (the form's
-		 * select; undefined for None), or the acting entity without the form.
-		 * A Concentration plan is carried out first, so the instances can link to it.
+		 * Applies to every target (applyEffectMixin): with the form's caster, or the acting entity
+		 * without the form
 		 */
 		async apply(entry, application) {
 			const definition = this.definitionOf(entry) || { name: entry.name };
-			const { caster_key, concentration: plan, ...rest } = application;
-			const casterKey = Object.prototype.hasOwnProperty.call(application, "caster_key")
-				? caster_key
-				: this.actorEntityKey;
-			this.applying = undefined;
-
-			let concentration_id = rest.concentration_id;
-			if (casterKey && plan && plan.action !== "none") {
-				concentration_id = await this.concentrateOn({
-					entry,
-					plan,
-					casterKey,
-					duration: rest.duration,
-				});
-				// The caster's Concentration couldn't be saved
-				if (!concentration_id) return;
-			}
-
-			for (const key of this.targets) {
-				const instance = buildEffectInstance({
-					definition: { ...definition, name: entry.name },
-					source: entry.source,
-					sourceKey: entry.sourceKey,
-					application: { ...rest, concentration_id },
-					round: this.round,
-					casterKey,
-					casterName: this.entities[casterKey]?.name,
-					turnKey: this.turnEntityKey,
-				});
-				this.apply_effect({ key, instance, definition });
-			}
+			await this.applyEffectTo({ entry, definition, application, keys: this.targets });
 		},
 		remove(entry) {
 			for (const key of this.targets) {
@@ -474,54 +304,6 @@ export default {
 <style lang="scss" scoped>
 h3 {
 	font-size: 15px;
-}
-.q-item__section {
-	line-height: 27px;
-
-	.icon {
-		color: $neutral-3;
-		font-size: 23px;
-		margin-right: 12px;
-	}
-	button {
-		border-radius: 50%;
-		height: 35px;
-		width: 35px;
-		margin: -8px 0;
-
-		&:focus {
-			outline: none;
-			background-color: $neutral-5 !important;
-		}
-	}
-	.exhaustion {
-		display: block;
-		width: 15px;
-		height: 15px;
-		border-radius: 50%;
-		background: $red;
-		text-align: center;
-		font-size: 12px;
-		line-height: 15px;
-		font-weight: bold !important;
-	}
-	.presence {
-		display: block;
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-
-		&.all {
-			background: $green;
-		}
-		&.some {
-			border: solid 2px $green;
-		}
-	}
-}
-.apply-menu {
-	width: 300px;
-	padding: 0 10px;
 }
 ul.targets {
 	list-style: none;

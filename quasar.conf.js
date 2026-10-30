@@ -27,6 +27,7 @@ module.exports = function (/* ctx */) {
 			{ path: "firebase-auth", server: false },
 			{ path: "vue-shortkey", server: false },
 			{ path: "vue-snotify", server: false },
+			{ path: "api-effects", server: false },
 		],
 
 		// https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

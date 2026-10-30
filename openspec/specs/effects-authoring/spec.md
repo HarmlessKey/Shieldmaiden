@@ -271,13 +271,16 @@ stored effect.
 A check SHALL fail and name each problem when:
 - a value of a schema enum the form offers has no constants entry, or a constants entry
   isn't in the schema
-- a type/sub-type pair used in the SRD effect data (the shared file, all editions) or the
-  condition data of either edition isn't allowed by the constants
+- a type/sub-type pair used in the SRD effects or conditions (as the HK API serves them, both
+  editions) isn't allowed by the constants
 - a choice kind used in the SRD data, alone or in a list, isn't in the constants
 - the duration types accepted by the `effects` blocks in the database rules differ from the
   schema's `duration.type` enum
 
-When the rules file isn't available, the check SHALL skip the rules part with a warning.
+The SRD data SHALL be read from the HK API by default, or from JSON files given on the
+command line. When the rules file isn't available, the check SHALL skip the rules part with
+a warning. When the API can't be reached and no file is given, the check SHALL fail and say
+so.
 
 #### Scenario: New schema enum value
 - **WHEN** a trigger is added to the schema without a constants entry
@@ -292,8 +295,12 @@ When the rules file isn't available, the check SHALL skip the rules part with a 
 - **THEN** the check warns that the rules part was skipped, and still checks the rest
 
 #### Scenario: Shared SRD file is checked
-- **WHEN** an entry without `edition` in the shared SRD effects file uses a type/sub-type pair the constants don't allow
+- **WHEN** an effect the API serves as `"generic"` uses a type/sub-type pair the constants don't allow
 - **THEN** the check fails and names the entry
+
+#### Scenario: API unreachable
+- **WHEN** the API can't be reached and no effects file is given
+- **THEN** the check fails and says that the SRD effects couldn't be read
 
 ### Requirement: The effects form is documented
 

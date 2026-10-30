@@ -2789,8 +2789,9 @@ const run_encounter_actions = {
 
 	/**
 	 * Resolves the definitions of effect instances that are not resolved yet in this encounter.
-	 * SRD definitions come from the campaign edition's data, custom ones from the user's effects.
-	 * An unresolved definition is stored with unresolved: true and warned about once.
+	 * SRD definitions come from the campaign edition's data, fetched from the API first (effects
+	 * 12), custom ones from the user's effects. An unresolved definition is stored with
+	 * unresolved: true and warned about once.
 	 *
 	 * @param {object[]} refs Objects with source and source_key (e.g. active effect instances)
 	 */
@@ -2799,6 +2800,10 @@ const run_encounter_actions = {
 		for (const { source, source_key } of refs) {
 			const id = `${source}:${source_key}`;
 			if (!state.effect_definitions[id]) pending[id] = { source, source_key };
+		}
+		// Custom effects can include SRD ones, so the SRD definitions are needed for any of them
+		if (Object.keys(pending).length) {
+			await dispatch("api_effects/fetch_srd_definitions", { edition: state.edition }, { root: true });
 		}
 
 		const lookup = async ({ source, source_key }) => {

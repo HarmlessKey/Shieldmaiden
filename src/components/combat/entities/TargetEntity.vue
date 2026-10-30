@@ -54,7 +54,12 @@
 						<i aria-hidden="true" class="fas fa-skull-crossbones" /> Dead
 					</div>
 					<HealthBar v-else :entity="effective" />
-					<div v-if="!entity.dead" class="target-entity__health-values" @click.stop>
+					<div
+						v-if="!entity.dead"
+						class="target-entity__health-values"
+						@click.stop
+						@keydown.space.stop
+					>
 						<hk-animated-integer :value="displayStats(effective).curHp" />
 						/
 						<EffectModifiedValue :entity="effective" field="maxHp">

@@ -207,14 +207,11 @@
 						class="col ac"
 						:class="{ editable: viewerIsUser }"
 						:key="'ac-' + key"
-						@click="
-							viewerIsUser &&
-								setDrawer({
-									show: true,
-									type: 'drawers/campaign/Bonuses',
-									data: { campaignId, playerId: key, stat: 'ac', context: effectContext },
-								})
-						"
+						:tabindex="viewerIsUser ? 0 : undefined"
+						:role="viewerIsUser ? 'button' : undefined"
+						@click="viewerIsUser && openAcBonuses(key)"
+						@keydown.enter="viewerIsUser && openAcBonuses(key)"
+						@keydown.space.prevent="viewerIsUser && openAcBonuses(key)"
 					>
 							<i aria-hidden="true" class="fas fa-shield" />
 							<!-- Transformed: its transformed AC with the manual bonuses -->
@@ -753,6 +750,18 @@ export default {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
 		...mapActions("players", ["set_player_prop", "sync_player"]),
+		openAcBonuses(playerId) {
+			this.setDrawer({
+				show: true,
+				type: "drawers/campaign/Bonuses",
+				data: {
+					campaignId: this.campaignId,
+					playerId,
+					stat: "ac",
+					context: this.effectContext,
+				},
+			});
+		},
 		onResize(size) {
 			let width = size.width;
 			let small = 400;

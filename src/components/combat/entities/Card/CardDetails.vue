@@ -24,7 +24,11 @@
 					<div
 						class="value"
 						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
 						@click="in_encounter && openBonuses(stat.bonus)"
+						@keydown.enter="in_encounter && openBonuses(stat.bonus)"
+						@keydown.space.prevent="in_encounter && openBonuses(stat.bonus)"
 					>
 						<hk-icon :icon="stat.icon" class="mr-1" />
 						<template v-if="key === 'maxHp'">
@@ -59,7 +63,13 @@
 					<div
 						class="ability__score"
 						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
 						@click="in_encounter && openBonuses([ability, `check_${ability}`, `save_${ability}`])"
+						@keydown.enter="in_encounter && openBonuses([ability, `check_${ability}`, `save_${ability}`])"
+						@keydown.space.prevent="
+							in_encounter && openBonuses([ability, `check_${ability}`, `save_${ability}`])
+						"
 					>
 						<EffectModifiedValue
 							:entity="full_entity"

@@ -2,7 +2,11 @@
 	<span
 		class="effect-modified-value"
 		:class="{ modified: isModified, clickable }"
+		:tabindex="clickable ? 0 : undefined"
+		:role="clickable ? 'button' : undefined"
 		@click="clickable ? openBonuses($event) : undefined"
+		@keydown.enter="clickable ? openBonuses($event) : undefined"
+		@keydown.space="clickable ? openSpaceBonuses($event) : undefined"
 	>
 		<slot>{{ value }}</slot>
 		<b v-if="advantageLetter" class="advantage-letter" :class="advantageLetter === 'A' ? 'green' : 'red'">{{
@@ -101,6 +105,10 @@ export default {
 		},
 	},
 	methods: {
+		openSpaceBonuses(event) {
+			event.preventDefault();
+			this.openBonuses(event);
+		},
 		openBonuses(event) {
 			event.stopPropagation();
 			this.$store.dispatch("setDrawer", {

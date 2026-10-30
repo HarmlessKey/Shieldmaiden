@@ -21,7 +21,11 @@
 				<div
 					class="stat-section__header"
 					:class="{ collapsible: sections.length > 1 }"
+					:tabindex="sections.length > 1 ? 0 : undefined"
+					:role="sections.length > 1 ? 'button' : undefined"
 					@click="sections.length > 1 && toggle(section)"
+					@keydown.enter="sections.length > 1 && toggle(section)"
+					@keydown.space.prevent="sections.length > 1 && toggle(section)"
 				>
 					<i
 						v-if="sections.length > 1"

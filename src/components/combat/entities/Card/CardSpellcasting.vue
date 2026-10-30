@@ -12,7 +12,11 @@
 					<div
 						class="value"
 						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
 						@click="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.enter="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_save_dc')"
 					>
 						<EffectModifiedValue
 							:entity="entity"
@@ -26,7 +30,11 @@
 					<div
 						class="value"
 						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
 						@click="in_encounter && openBonuses('spell_attack')"
+						@keydown.enter="in_encounter && openBonuses('spell_attack')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_attack')"
 					>
 						<EffectModifiedValue
 							:entity="entity"
@@ -89,7 +97,11 @@
 					<div
 						class="value"
 						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
 						@click="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.enter="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_save_dc')"
 					>
 						<EffectModifiedValue
 							:entity="entity"
@@ -103,7 +115,11 @@
 					<div
 						class="value"
 						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
 						@click="in_encounter && openBonuses('spell_attack')"
+						@keydown.enter="in_encounter && openBonuses('spell_attack')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_attack')"
 					>
 						<EffectModifiedValue
 							:entity="entity"

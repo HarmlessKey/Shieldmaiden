@@ -18,7 +18,12 @@
 		</hk-card>
 		<hk-card>
 			<!-- eslint-disable-next-line vue/no-v-html -->
-			<div class="card-body effects-documentation__text" @click="followAnchor" v-html="html" />
+			<div
+				class="card-body effects-documentation__text"
+				@click="followAnchor"
+				@keydown.enter="followAnchor"
+				v-html="html"
+			/>
 		</hk-card>
 	</div>
 </template>

@@ -5,6 +5,7 @@
 			class="fas choice-info"
 			:class="chosen ? 'fa-dice blue' : 'fa-info-circle neutral-2'"
 			@click.stop
+			@keydown.enter.stop
 		/>
 		<template #content>
 			<template v-if="chosen">

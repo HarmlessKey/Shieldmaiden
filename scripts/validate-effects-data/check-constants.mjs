@@ -98,6 +98,11 @@ const ENUM_MAP = {
 const NOT_IN_SCHEMA = {
 	damage_types: ["non_magical_bludgeoning", "non_magical_piercing", "non_magical_slashing"],
 };
+// Schema values without a constant: the API marks effects used in both editions "generic",
+// which the app reads as no edition; it isn't a campaign edition (effects 12)
+const NOT_IN_CONSTANTS = {
+	editions: ["generic"],
+};
 
 // Lists of sub-effects inside a definition
 const NESTED_LISTS = ["sub_effects", "success_effects", "fail_by_5_effects", "on_fail", "on_expire"];
@@ -152,7 +157,7 @@ for (const { pointer, values } of enums) {
 		continue;
 	}
 	values
-		.filter((value) => !constants.includes(value))
+		.filter((value) => !constants.includes(value) && !NOT_IN_CONSTANTS[exportName]?.includes(value))
 		.forEach((value) => report(source, exportName, `no entry for "${value}" (${pointer})`));
 	constants
 		.filter((value) => !values.includes(value) && !NOT_IN_SCHEMA[exportName]?.includes(value))

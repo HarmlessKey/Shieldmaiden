@@ -319,6 +319,16 @@ const player_actions = {
 				const search_player = convert_player(player);
 				await services.editPlayer(uid, id, player, search_player);
 
+				// Get the campaign to check which companions are already registered in it
+				const campaign =
+					player.campaign_id && companions.length
+						? await dispatch(
+								"campaigns/get_campaign",
+								{ uid, id: player.campaign_id },
+								{ root: true }
+							)
+						: undefined;
+
 				// If there are companions, save the playerId in the NPC (So the player can edit this specific NPC)
 				for (const companion of companions) {
 					await dispatch(
@@ -332,8 +342,9 @@ const player_actions = {
 						{ root: true }
 					);
 
-					// If the player is in a campaign, update the companion's curHp in the campaign
-					if (player.campaign_id) {
+					// If the player is in a campaign and the companion is new to it, set its curHp in the campaign
+					// Existing companions keep their current HP
+					if (campaign && !campaign.companions?.[companion.key]) {
 						await dispatch(
 							"campaigns/update_companion",
 							{

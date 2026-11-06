@@ -669,12 +669,13 @@ const campaign_actions = {
 	 * @param {string} property
 	 * @param {string|number} value
 	 */
-	async update_companion({ dispatch }, { uid, id, companionId, property, value }) {
+	async update_companion({ commit, dispatch }, { uid, id, companionId, property, value }) {
 		if (uid) {
 			const services = await dispatch("get_campaign_services");
 			try {
 				const path = `/companions/${companionId}`;
 				await services.updateCampaign(uid, id, path, { [property]: value });
+				commit("UPDATE_COMPANION", { uid, id, companionId, property, value });
 				return;
 			} catch (error) {
 				throw error;
@@ -1158,6 +1159,14 @@ const campaign_mutations = {
 				Vue.set(state.cached_campaigns[uid][id], "companions", { [companionId]: companion });
 			}
 		}
+	},
+	UPDATE_COMPANION(state, { uid, id, companionId, property, value }) {
+		const campaign = state.cached_campaigns[uid] && state.cached_campaigns[uid][id];
+		if (!campaign) return;
+
+		if (!campaign.companions) Vue.set(campaign, "companions", {});
+		if (!campaign.companions[companionId]) Vue.set(campaign.companions, companionId, {});
+		Vue.set(campaign.companions[companionId], property, value);
 	},
 	DELETE_COMPANION(state, { uid, id, companionId }) {
 		if (state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {

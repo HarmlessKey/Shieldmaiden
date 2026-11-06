@@ -127,6 +127,7 @@
 import _ from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import { cleanEffectDefinition, schemaErrorMessages } from "src/utils/effectFunctions";
+import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 import CopyContent from "src/components/CopyContent";
 
 let validateEffect;
@@ -271,6 +272,12 @@ export default {
 					this.saved();
 				})
 				.catch((error) => {
+					if (error instanceof NotEnoughSlotsError) {
+						this.$snotify.error(NOT_ENOUGH_SLOTS_MESSAGE, "No slots left", {
+							position: "rightTop",
+						});
+						return;
+					}
 					this.$snotify.error("Couldn't save effect.", "Save failed", {
 						position: "rightTop",
 					});

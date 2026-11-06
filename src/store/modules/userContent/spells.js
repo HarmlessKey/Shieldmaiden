@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { SpellServices } from "src/services/spells";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Converts a full spell to a search_spell
@@ -138,7 +139,7 @@ const spell_actions = {
 			const used_slots = await services.getSpellCount(uid);
 
 			if (used_slots >= available_slots) {
-				return "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				const search_spell = convert_spell(spell);

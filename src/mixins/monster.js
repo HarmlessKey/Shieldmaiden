@@ -118,11 +118,7 @@ export const monsterMixin = {
 	},
 	methods: {
 		defensesDisplay(defenses) {
-			defenses.forEach((defense, i) => {
-				defense = defense.split("_");
-				defenses[i] = defense.join(" ").capitalizeEach();
-			});
-			return defenses;
+			return defenses.map((defense) => defense.split("_").join(" ").capitalizeEach());
 		},
 		/**
 		 * Parse an old monster to the new format

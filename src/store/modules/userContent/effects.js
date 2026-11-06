@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { EffectServices } from "src/services/effects";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Converts a full effect to a search_effect
@@ -122,7 +123,7 @@ const effect_actions = {
 			const used_slots = await services.getEffectCount(uid);
 
 			if (used_slots >= available_slots) {
-				return "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				const search_effect = convert_effect(effect);

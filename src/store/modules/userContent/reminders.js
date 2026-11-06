@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { reminderServices } from "src/services/reminders";
+import { NotEnoughSlotsError } from "src/utils/errors";
 import _ from "lodash";
 
 // Converts a full reminder to a search_reminder
@@ -141,7 +142,7 @@ const reminder_actions = {
 			const used_slots = await services.getReminderCount(uid);
 
 			if (used_slots >= available_slots) {
-				throw "Not enough slots";
+				throw new NotEnoughSlotsError();
 			}
 			try {
 				const search_reminder = convert_reminder(reminder);

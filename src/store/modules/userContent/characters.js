@@ -1,6 +1,7 @@
 import { CharacterServices } from "src/services/characters";
 import Vue from 'vue';
 import _ from 'lodash';
+import { NotEnoughSlotsError } from "src/utils/errors";
 
 const character_state = () => ({
   character_services: null,
@@ -110,7 +111,7 @@ const character_actions = {
       const used_slots = await services.getCharacterCount(uid);
 
       if(used_slots >= available_slots) {
-        throw "Not enough slots";
+        throw new NotEnoughSlotsError();
       }
       try {
         const character = {

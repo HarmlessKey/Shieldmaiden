@@ -1647,6 +1647,11 @@ lookup in 2a/2e.
 Backfill `$defs/action_effects` onto SRD monsters in the API. 5.5e monsters (330, all
 with "Failure:/Success:" text, see 0a) are the best candidates for an automated backfill;
 2014 monsters stay manual/heuristic.
+- The API serves them from `/v2/monsters/<edition>` (`HarmlessKey_API`, change
+  `add-monsters-v2-effects`); the backfill writes with `PUT /v2/monsters/<edition>/:id`.
+- Tooling (2026-10-30): the `monster-action-parser` skill converts one ability's text to its
+  JSON, with a benchmark to check it on Haiku. See
+  [monster-action-parser-skill.md](./monster-action-parser-skill.md).
 
 ### 11d. SRD spells
 Backfill spell links (step 6c: action effects with scaling) onto SRD spells in the API, per

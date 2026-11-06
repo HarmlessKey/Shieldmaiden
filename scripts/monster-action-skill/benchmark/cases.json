@@ -1,0 +1,790 @@
+[
+	{
+		"id": "b01-scimitar",
+		"monster": "Goblin Warrior",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Scimitar",
+		"desc": "Melee Attack Roll: +4, reach 5 ft. Hit: 5 (1d6 + 2) Slashing damage, plus 2 (1d4) Slashing damage if the attack roll had Advantage.",
+		"tests": ["melee attack", "conditional extra damage is not rolled"],
+		"expected": {
+			"name": "Scimitar",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 4,
+					"rolls": [{ "damage_type": "slashing", "dice_count": 1, "dice_type": 6, "fixed_val": 2, "miss_mod": 0 }]
+				}
+			]
+		}
+	},
+	{
+		"id": "b02-shortbow",
+		"monster": "Skeleton",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Shortbow",
+		"desc": "Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.",
+		"tests": ["ranged attack", "range as a string"],
+		"expected": {
+			"name": "Shortbow",
+			"range": "80/320",
+			"action_list": [
+				{
+					"type": "ranged_weapon",
+					"attack_bonus": 5,
+					"rolls": [{ "damage_type": "piercing", "dice_count": 1, "dice_type": 6, "fixed_val": 3, "miss_mod": 0 }]
+				}
+			]
+		}
+	},
+	{
+		"id": "b03-giant-spider-bite",
+		"monster": "Giant Spider",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Bite",
+		"desc": "Melee Attack Roll: +5, reach 5 ft. Hit: 7 (1d8 + 3) Piercing damage plus 7 (2d6) Poison damage.",
+		"tests": ["two damage types in one entry"],
+		"expected": {
+			"name": "Bite",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 5,
+					"rolls": [
+						{ "damage_type": "piercing", "dice_count": 1, "dice_type": 8, "fixed_val": 3, "miss_mod": 0 },
+						{ "damage_type": "poison", "dice_count": 2, "dice_type": 6, "miss_mod": 0 }
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "b04-crocodile-bite",
+		"monster": "Crocodile",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Bite",
+		"desc": "Melee Attack Roll: +4, reach 5 ft. Hit: 6 (1d8 + 2) Piercing damage. If the target is Medium or smaller, it has the Grappled condition (escape DC 12). While Grappled, the target has the Restrained condition.",
+		"tests": ["grapple with escape DC", "condition while grappled (ends_when)", "target qualifier ignored"],
+		"expected": {
+			"name": "Bite",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 4,
+					"rolls": [{ "damage_type": "piercing", "dice_count": 1, "dice_type": 8, "fixed_val": 2, "miss_mod": 0 }],
+					"effects": {
+						"on_hit": [
+							{
+								"effect": { "source": "srd", "source_key": "grappled", "name": "Grappled" },
+								"duration": {
+									"type": "cancelled",
+									"escape": {
+										"dc": 12,
+										"checks": [
+											{ "ability": "strength", "skill": "athletics" },
+											{ "ability": "dexterity", "skill": "acrobatics" }
+										]
+									}
+								}
+							},
+							{
+								"effect": { "source": "srd", "source_key": "restrained", "name": "Restrained" },
+								"duration": {
+									"type": "cancelled",
+									"ends_when": { "type": "has_condition", "value": "grappled", "negate": true }
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b05-ghoul-claw-2024",
+		"monster": "Ghoul",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Claw",
+		"desc": "Melee Attack Roll: +4, reach 5 ft. Hit: 6 (1d8 + 2) Slashing damage. If the target is a creature that isn't an Undead or an Elf, it is subjected to the following effect. Constitution Saving Throw: DC 10. Failure: The target has the Paralyzed condition until the end of its next turn.",
+		"tests": ["attack then save (2024 'subjected to the following effect')", "next turn, target, end"],
+		"expected": {
+			"name": "Claw",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 4,
+					"rolls": [{ "damage_type": "slashing", "dice_count": 1, "dice_type": 8, "fixed_val": 2, "miss_mod": 0 }]
+				},
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 10,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "paralyzed", "name": "Paralyzed" },
+								"duration": { "type": "next_turn", "anchor": "target", "edge": "end" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b06-chuul-paralyzing-tentacles",
+		"monster": "Chuul",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Paralyzing Tentacles",
+		"desc": "Constitution Saving Throw: DC 13, one creature Grappled by the chuul. Failure: The target has the Poisoned condition and repeats the save at the end of each of its turns, ending the effect on itself on a success. After 1 minute, it succeeds automatically. While Poisoned, the target has the Paralyzed condition.",
+		"tests": ["save without rolls", "repeat save with an automatic success after 1 minute", "condition while poisoned (ends_when)"],
+		"expected": {
+			"name": "Paralyzing Tentacles",
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 13,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "poisoned", "name": "Poisoned" },
+								"duration": {
+									"type": "time",
+									"value": 1,
+									"unit": "minute",
+									"save": { "ability": "constitution", "dc": 13, "triggers": ["end_turn_target"] }
+								}
+							},
+							{
+								"effect": { "source": "srd", "source_key": "paralyzed", "name": "Paralyzed" },
+								"duration": {
+									"type": "cancelled",
+									"ends_when": { "type": "has_condition", "value": "poisoned", "negate": true }
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b07-basilisk-petrifying-gaze",
+		"monster": "Basilisk",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Petrifying Gaze (Recharge 4–6)",
+		"desc": "Constitution Saving Throw: DC 12, each creature in a 30-foot Cone. If the basilisk sees its reflection within the Cone, the basilisk must make this save. First Failure: The target has the Restrained condition and repeats the save at the end of its next turn if it is still Restrained, ending the effect on itself on a success. Second Failure: The target has the Petrified condition instead of the Restrained condition.",
+		"tests": ["recharge 4-6", "cone", "First/Second Failure escalation without a duration of its own"],
+		"expected": {
+			"name": "Petrifying Gaze",
+			"recharge": "4-6",
+			"aoe_type": "cone",
+			"aoe_size": 30,
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 12,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "restrained", "name": "Restrained" },
+								"duration": {
+									"type": "cancelled",
+									"save": {
+										"ability": "constitution",
+										"dc": 12,
+										"triggers": ["end_turn_target"],
+										"failures_to_escalate": 1,
+										"escalate": { "effect": { "source": "srd", "source_key": "petrified", "name": "Petrified" } }
+									}
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b08-red-dragon-fire-breath",
+		"monster": "Adult Red Dragon",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Fire Breath (Recharge 5–6)",
+		"desc": "Dexterity Saving Throw: DC 21, each creature in a 60-foot Cone. Failure: 59 (17d6) Fire damage. Success: Half damage.",
+		"tests": ["save for half damage", "cone", "recharge 5-6"],
+		"expected": {
+			"name": "Fire Breath",
+			"recharge": "5-6",
+			"aoe_type": "cone",
+			"aoe_size": 60,
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "dexterity",
+					"save_dc": 21,
+					"rolls": [{ "damage_type": "fire", "dice_count": 17, "dice_type": 6, "save_fail_mod": 0.5 }]
+				}
+			]
+		}
+	},
+	{
+		"id": "b09-bronze-dragon-thunderclap",
+		"monster": "Adult Bronze Dragon",
+		"edition": "5.5e",
+		"group": "legendary_actions",
+		"name": "Thunderclap",
+		"desc": "Constitution Saving Throw: DC 20, each creature in a 20-foot-radius Sphere centered on a point the dragon can see within 90 feet. Failure: 10 (3d6) Thunder damage, and the target has the Deafened condition until the end of its next turn.",
+		"tests": ["legendary action, default cost 1", "sphere with range", "no damage on a success", "damage and a condition on a failure"],
+		"expected": {
+			"name": "Thunderclap",
+			"legendary_cost": 1,
+			"range": "90",
+			"aoe_type": "sphere",
+			"aoe_size": 20,
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 20,
+					"rolls": [{ "damage_type": "thunder", "dice_count": 3, "dice_type": 6, "save_fail_mod": 0 }],
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "deafened", "name": "Deafened" },
+								"duration": { "type": "next_turn", "anchor": "target", "edge": "end" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b10-iron-golem-fire-absorption",
+		"monster": "Iron Golem",
+		"edition": "5.5e",
+		"group": "special_abilities",
+		"name": "Fire Absorption",
+		"desc": "Whenever the golem is subjected to Fire damage, it takes no damage and instead regains a number of Hit Points equal to the Fire damage dealt.",
+		"tests": ["trait effect with a fixed choice", "no siphon on a trait"],
+		"expected": {
+			"name": "Fire Absorption",
+			"action_list": [{ "type": "other" }],
+			"effects": [
+				{
+					"effect": { "source": "srd", "source_key": "absorption", "name": "Absorption" },
+					"choices": { "damage_type": "fire" }
+				}
+			]
+		}
+	},
+	{
+		"id": "b11-zombie-undead-fortitude",
+		"monster": "Zombie",
+		"edition": "5e",
+		"group": "special_abilities",
+		"name": "Undead Fortitude",
+		"desc": "If damage reduces the zombie to 0 hit points, it must make a Constitution saving throw with a DC of 5 + the damage taken, unless the damage is radiant or from a critical hit. On a success, the zombie drops to 1 hit point instead.",
+		"tests": ["trait effect", "a trait's own save is not a save entry"],
+		"expected": {
+			"name": "Undead Fortitude",
+			"action_list": [{ "type": "other" }],
+			"effects": [{ "effect": { "source": "srd", "source_key": "undead-fortitude", "name": "Undead Fortitude" } }]
+		}
+	},
+	{
+		"id": "b12-kobold-sunlight-sensitivity",
+		"monster": "Kobold Warrior",
+		"edition": "5.5e",
+		"group": "special_abilities",
+		"name": "Sunlight Sensitivity",
+		"desc": "While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.",
+		"tests": ["conditional trait gets no trait effect"],
+		"expected": {
+			"name": "Sunlight Sensitivity",
+			"action_list": [{ "type": "other" }]
+		}
+	},
+	{
+		"id": "b13-ghast-stench",
+		"monster": "Ghast",
+		"edition": "5.5e",
+		"group": "special_abilities",
+		"name": "Stench",
+		"desc": "Constitution Saving Throw: DC 10, any creature that starts its turn in a 5-foot Emanation originating from the ghast. Failure: The target has the Poisoned condition until the start of its next turn. Success: The target is immune to this ghast's Stench for 24 hours.",
+		"tests": ["trait that forces a save", "emanation", "next turn, target, start", "immunity after success ignored"],
+		"expected": {
+			"name": "Stench",
+			"aoe_type": "emanation",
+			"aoe_size": 5,
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 10,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "poisoned", "name": "Poisoned" },
+								"duration": { "type": "next_turn", "anchor": "target", "edge": "start" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b14-gnoll-rampage",
+		"monster": "Gnoll Warrior",
+		"edition": "5.5e",
+		"group": "bonus_actions",
+		"name": "Rampage (1/Day)",
+		"desc": "Immediately after dealing damage to a creature that is already Bloodied, the gnoll moves up to half its Speed, and it makes one Rend attack.",
+		"tests": ["bonus action", "1/Day limit", "nothing to roll"],
+		"expected": {
+			"name": "Rampage",
+			"limit": 1,
+			"limit_type": "day",
+			"action_list": [{ "type": "other" }]
+		}
+	},
+	{
+		"id": "b15-knight-parry",
+		"monster": "Knight",
+		"edition": "5e",
+		"group": "reactions",
+		"name": "Parry",
+		"desc": "The knight adds 2 to its AC against one melee attack that would hit it. To do so, the knight must see the attacker and be wielding a melee weapon.",
+		"tests": ["reaction", "self-buff with a value choice", "until the end of the turn"],
+		"expected": {
+			"name": "Parry",
+			"action_list": [
+				{
+					"type": "other",
+					"effects": {
+						"always": [
+							{
+								"effect": { "source": "srd", "source_key": "armor-class-bonus", "name": "Armor Class Bonus" },
+								"duration": { "type": "end_of_turn" },
+								"choices": { "value": "2" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b16-owlbear-multiattack",
+		"monster": "Owlbear",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Multiattack",
+		"desc": "The owlbear makes two Rend attacks.",
+		"tests": ["multiattack has nothing to roll"],
+		"expected": {
+			"name": "Multiattack",
+			"action_list": [{ "type": "other" }]
+		}
+	},
+	{
+		"id": "b17-harpy-luring-song",
+		"monster": "Harpy",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Luring Song",
+		"desc": "The harpy sings a magical melody, which lasts until the harpy's Concentration ends on it. Wisdom Saving Throw: DC 11, each Humanoid and Giant in a 300-foot Emanation originating from the harpy when the song starts. Failure: The target has the Charmed condition until the song ends and repeats the save at the end of each of its turns, ending the effect on itself on a success. While Charmed, the target has the Incapacitated condition, ignores the Luring Song of other harpies, and moves toward the harpy on its turns. Success: The target is immune to this harpy's Luring Song for 24 hours.",
+		"tests": ["magical", "concentration duration", "repeat save", "condition while charmed (ends_when)", "compelled movement ignored"],
+		"expected": {
+			"name": "Luring Song",
+			"aoe_type": "emanation",
+			"aoe_size": 300,
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "wisdom",
+					"save_dc": 11,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "charmed", "name": "Charmed" },
+								"duration": {
+									"type": "concentration",
+									"save": { "ability": "wisdom", "dc": 11, "triggers": ["end_turn_target"] }
+								},
+								"magical": true
+							},
+							{
+								"effect": { "source": "srd", "source_key": "incapacitated", "name": "Incapacitated" },
+								"duration": {
+									"type": "cancelled",
+									"ends_when": { "type": "has_condition", "value": "charmed", "negate": true }
+								},
+								"magical": true
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b18-ghoul-claws-2014",
+		"monster": "Ghoul",
+		"edition": "5e",
+		"group": "actions",
+		"name": "Claws",
+		"desc": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 7 (2d4 + 2) slashing damage. If the target is a creature other than an elf or undead, it must succeed on a DC 10 Constitution saving throw or be paralyzed for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success.",
+		"tests": ["2014 attack then save", "time duration with a repeat save"],
+		"expected": {
+			"name": "Claws",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 4,
+					"rolls": [{ "damage_type": "slashing", "dice_count": 2, "dice_type": 4, "fixed_val": 2, "miss_mod": 0 }]
+				},
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 10,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "paralyzed", "name": "Paralyzed" },
+								"duration": {
+									"type": "time",
+									"value": 1,
+									"unit": "minute",
+									"save": { "ability": "constitution", "dc": 10, "triggers": ["end_turn_target"] }
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b19-vampire-bite",
+		"monster": "Vampire",
+		"edition": "5e",
+		"group": "actions",
+		"name": "Bite (Vampire Form Only)",
+		"desc": "Melee Weapon Attack: +9 to hit, reach 5 ft., one willing creature, or a creature that is grappled by the vampire, incapacitated, or restrained. Hit: 7 (1d6 + 4) piercing damage plus 10 (3d6) necrotic damage. The target's hit point maximum is reduced by an amount equal to the necrotic damage taken, and the vampire regains hit points equal to that amount. The reduction lasts until the target finishes a long rest. The target dies if this effect reduces its hit point maximum to 0.",
+		"tests": ["roll specials siphon_full and drain", "no save, so no link for the reduction", "a parenthetical that isn't a usage limit"],
+		"expected": {
+			"name": "Bite",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 9,
+					"rolls": [
+						{ "damage_type": "piercing", "dice_count": 1, "dice_type": 6, "fixed_val": 4, "miss_mod": 0 },
+						{ "damage_type": "necrotic", "dice_count": 3, "dice_type": 6, "miss_mod": 0, "special": ["siphon_full", "drain"] }
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "b20-giant-spider-web",
+		"monster": "Giant Spider",
+		"edition": "5e",
+		"group": "actions",
+		"name": "Web (Recharge 5–6)",
+		"desc": "Ranged Weapon Attack: +5 to hit, range 30/60 ft., one creature. Hit: The target is restrained by webbing. As an action, the restrained target can make a DC 12 Strength check, bursting the webbing on a success. The webbing can also be attacked and destroyed (AC 10; hp 5; vulnerability to fire damage; immunity to bludgeoning, poison, and psychic damage).",
+		"tests": ["attack without damage", "escape with a plain Strength check"],
+		"expected": {
+			"name": "Web",
+			"recharge": "5-6",
+			"range": "30/60",
+			"action_list": [
+				{
+					"type": "ranged_weapon",
+					"attack_bonus": 5,
+					"effects": {
+						"on_hit": [
+							{
+								"effect": { "source": "srd", "source_key": "restrained", "name": "Restrained" },
+								"duration": { "type": "cancelled", "escape": { "dc": 12, "checks": [{ "ability": "strength" }] } }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b21-red-dragon-wing-attack",
+		"monster": "Adult Red Dragon",
+		"edition": "5e",
+		"group": "legendary_actions",
+		"name": "Wing Attack (Costs 2 Actions)",
+		"desc": "The dragon beats its wings. Each creature within 10 feet of the dragon must succeed on a DC 22 Dexterity saving throw or take 15 (2d6 + 8) bludgeoning damage and be knocked prone. The dragon can then fly up to half its flying speed.",
+		"tests": ["legendary cost 2", "emanation around itself", "save without half damage", "prone on a failure"],
+		"expected": {
+			"name": "Wing Attack",
+			"legendary_cost": 2,
+			"aoe_type": "emanation",
+			"aoe_size": 10,
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "dexterity",
+					"save_dc": 22,
+					"rolls": [{ "damage_type": "bludgeoning", "dice_count": 2, "dice_type": 6, "fixed_val": 8, "save_fail_mod": 0 }],
+					"effects": {
+						"on_fail": [
+							{ "effect": { "source": "srd", "source_key": "prone", "name": "Prone" }, "duration": { "type": "cancelled" } }
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b22-mummy-rotting-fist",
+		"monster": "Mummy",
+		"edition": "5e",
+		"group": "actions",
+		"name": "Rotting Fist",
+		"desc": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) bludgeoning damage plus 10 (3d6) necrotic damage. If the target is a creature, it must succeed on a DC 12 Constitution saving throw or be cursed with mummy rot. The cursed target can't regain hit points, and its hit point maximum decreases by 10 (3d6) for every 24 hours that elapse. If the curse reduces the target's hit point maximum to 0, the target dies, and its body turns to dust. The curse lasts until removed by the remove curse spell or other magic.",
+		"tests": ["catalogue effect from a phrase (can't regain hit points)", "magical from 'magic'", "slow effects over 24 hours ignored"],
+		"expected": {
+			"name": "Rotting Fist",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 5,
+					"rolls": [
+						{ "damage_type": "bludgeoning", "dice_count": 2, "dice_type": 6, "fixed_val": 3, "miss_mod": 0 },
+						{ "damage_type": "necrotic", "dice_count": 3, "dice_type": 6, "miss_mod": 0 }
+					]
+				},
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 12,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "no-healing", "name": "No Healing" },
+								"duration": { "type": "cancelled" },
+								"magical": true
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b23-unicorn-healing-touch",
+		"monster": "Unicorn",
+		"edition": "5e",
+		"group": "actions",
+		"name": "Healing Touch (3/Day)",
+		"desc": "The unicorn touches another creature with its horn. The target magically regains 11 (2d8 + 2) hit points. In addition, the touch removes all diseases and neutralizes all poisons afflicting the target.",
+		"tests": ["healing", "3/Day limit"],
+		"expected": {
+			"name": "Healing Touch",
+			"limit": 3,
+			"limit_type": "day",
+			"action_list": [{ "type": "healing", "rolls": [{ "dice_count": 2, "dice_type": 8, "fixed_val": 2 }] }]
+		}
+	},
+	{
+		"id": "b24-fire-elemental-touch",
+		"monster": "Fire Elemental",
+		"edition": "5e",
+		"group": "actions",
+		"name": "Touch",
+		"desc": "Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) fire damage. If the target is a creature or a flammable object, it ignites. Until a creature takes an action to douse the fire, the target takes 5 (1d10) fire damage at the start of each of its turns.",
+		"tests": ["damage over time with fixed damage type and value", "later damage is not rolled"],
+		"expected": {
+			"name": "Touch",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 6,
+					"rolls": [{ "damage_type": "fire", "dice_count": 2, "dice_type": 6, "fixed_val": 3, "miss_mod": 0 }],
+					"effects": {
+						"on_hit": [
+							{
+								"effect": { "source": "srd", "source_key": "damage-over-time", "name": "Damage Over Time" },
+								"duration": { "type": "cancelled" },
+								"choices": { "damage_type": "fire", "value": "5" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b25-shadow-draining-swipe",
+		"monster": "Shadow",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Draining Swipe",
+		"desc": "Melee Attack Roll: +4, reach 5 ft. Hit: 5 (1d6 + 2) Necrotic damage, and the target's Strength score decreases by 1d4. The target dies if this reduces that score to 0. If a Humanoid is slain by this attack, a Shadow rises from the corpse 1d4 hours later. The reduction lasts until the target finishes a Short or Long Rest.",
+		"tests": ["ability score reduction: ability fixed, rolled value left open", "until a Short or Long Rest"],
+		"expected": {
+			"name": "Draining Swipe",
+			"reach": 5,
+			"action_list": [
+				{
+					"type": "melee_weapon",
+					"attack_bonus": 4,
+					"rolls": [{ "damage_type": "necrotic", "dice_count": 1, "dice_type": 6, "fixed_val": 2, "miss_mod": 0 }],
+					"effects": {
+						"on_hit": [
+							{
+								"effect": { "source": "srd", "source_key": "ability-score-bonus", "name": "Ability Score Bonus" },
+								"duration": { "type": "rest", "rest_type": "short_or_long" },
+								"choices": { "ability": "strength" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b26-mummy-dreadful-glare",
+		"monster": "Mummy",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Dreadful Glare",
+		"desc": "Wisdom Saving Throw: DC 11, one creature the mummy can see within 60 feet. Failure: The target has the Frightened condition until the end of the mummy's next turn. Success: The target is immune to this mummy's Dreadful Glare for 24 hours.",
+		"tests": ["single target range", "next turn, caster (the monster), end"],
+		"expected": {
+			"name": "Dreadful Glare",
+			"range": "60",
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "wisdom",
+					"save_dc": 11,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "frightened", "name": "Frightened" },
+								"duration": { "type": "next_turn", "anchor": "caster", "edge": "end" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b27-copper-dragon-slowing-breath",
+		"monster": "Adult Copper Dragon",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Slowing Breath (Recharge 5–6)",
+		"desc": "Constitution Saving Throw: DC 18, each creature in a 60-foot Cone. Failure: The target can't take Reactions; its Speed is halved; and it can take either an action or a Bonus Action on its turn, not both. This effect lasts until the end of its next turn.",
+		"tests": ["several catalogue effects from phrases", "one shared duration", "unsupported restriction left out"],
+		"expected": {
+			"name": "Slowing Breath",
+			"recharge": "5-6",
+			"aoe_type": "cone",
+			"aoe_size": 60,
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 18,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "no-reactions", "name": "No Reactions" },
+								"duration": { "type": "next_turn", "anchor": "target", "edge": "end" }
+							},
+							{
+								"effect": { "source": "srd", "source_key": "speed-halved", "name": "Speed Halved" },
+								"duration": { "type": "next_turn", "anchor": "target", "edge": "end" }
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b28-air-elemental-whirlwind",
+		"monster": "Air Elemental",
+		"edition": "5.5e",
+		"group": "actions",
+		"name": "Whirlwind (Recharge 4–6)",
+		"desc": "Strength Saving Throw: DC 13, one Medium or smaller creature in the elemental's space. Failure: 24 (4d10 + 2) Thunder damage, and the target is pushed up to 20 feet straight away from the elemental and has the Prone condition. Success: Half damage.",
+		"tests": ["save for half with a condition on a failure", "push ignored"],
+		"expected": {
+			"name": "Whirlwind",
+			"recharge": "4-6",
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "strength",
+					"save_dc": 13,
+					"rolls": [{ "damage_type": "thunder", "dice_count": 4, "dice_type": 10, "fixed_val": 2, "save_fail_mod": 0.5 }],
+					"effects": {
+						"on_fail": [
+							{ "effect": { "source": "srd", "source_key": "prone", "name": "Prone" }, "duration": { "type": "cancelled" } }
+						]
+					}
+				}
+			]
+		}
+	},
+	{
+		"id": "b29-sphinx-weight-of-years",
+		"monster": "Sphinx of Valor",
+		"edition": "5.5e",
+		"group": "legendary_actions",
+		"name": "Weight of Years",
+		"desc": "Constitution Saving Throw: DC 16, one creature the sphinx can see within 120 feet. Failure: The target gains 1 Exhaustion level.",
+		"tests": ["leveled effect (Exhaustion level)", "legendary action without a cost"],
+		"expected": {
+			"name": "Weight of Years",
+			"legendary_cost": 1,
+			"range": "120",
+			"action_list": [
+				{
+					"type": "save",
+					"save_ability": "constitution",
+					"save_dc": 16,
+					"effects": {
+						"on_fail": [
+							{
+								"effect": { "source": "srd", "source_key": "exhaustion", "name": "Exhaustion" },
+								"duration": { "type": "cancelled" },
+								"level": 1
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+]

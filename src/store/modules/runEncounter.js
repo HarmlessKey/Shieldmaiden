@@ -1,8 +1,68 @@
 import { abilities, skills, default_edition } from "src/utils/generalConstants";
 import { uuid, calc_mod } from "src/utils/generalFunctions";
+import {
+	generateEffectKey,
+	traitInstances,
+	isTraitKey,
+	effectLabel,
+	findSrdDefinition,
+	isSrdCondition,
+	resolveDefinition,
+	matchTriggers,
+	hitTakenDamage,
+	describeSubEffect,
+	durationActions,
+	endsWhenExpiries,
+	cascadeTargets,
+	carriedOverReview,
+	resolveRepeatSave,
+	onExpireSubEffects,
+	escalationInstance,
+	legacyConditionInstances,
+	effectiveStats,
+	effectiveEntity,
+	alsoHealAmount,
+	formulaVars,
+	rollModifiers,
+	attackModifiers,
+	damageBonuses,
+	effectiveDefenses,
+	isConcentrationSave,
+	isConcentrationBreak,
+	restrictions,
+	damageModifiers,
+	extraActions,
+	healingReceivedCap,
+	effectReminders,
+	deathOutcome,
+	concentrationSaveDc,
+	tempHpToLose,
+	buildEffectInstance,
+	concentrationPlan,
+	hasSurprised,
+	surprisedInstance,
+	hpAfterEffects,
+	reactionUsedApplies,
+	hasReactionUsed,
+} from "src/utils/effectFunctions";
+import {
+	manualBonuses,
+	manualBonusTotal,
+	hpAfterMaxHpChange,
+	withBonus,
+	withoutBonus,
+	MANUAL_BONUS_ID,
+} from "src/utils/entityFunctions";
+import {
+	cleanReminder,
+	convertLegacyReminder,
+	promptTitle,
+	remindersToFire,
+} from "src/utils/reminderFunctions";
 import { monsterMixin } from "src/mixins/monster";
 import { db } from "src/firebase";
 import Vue from "vue";
+import _ from "lodash";
 
 const demoEncounter = {
 	name: "Demo Encounter",
@@ -139,6 +199,16 @@ const getDefaultState = () => ({
 		multipliers: {},
 		defenses: {},
 	},
+	// Resolved effect definitions, keyed by "source:source_key"
+	effect_definitions: {},
+	// Trigger prompts waiting to be shown to the DM (EffectTriggerNotifier)
+	effect_prompts: [],
+	// Key of the entity whose turn it is, kept for the end-of-turn triggers
+	turn_entity: undefined,
+	// Carried-over effects to review at encounter start: [{ holderKey, effectKey, instance }]
+	effect_review: [],
+	// The encounter's reminders (effects 9): { [id]: reminder }, see reminderFunctions.js
+	reminders: {},
 });
 
 const run_encounter_state = getDefaultState();
@@ -173,6 +243,9 @@ const run_encounter_getters = {
 	},
 	encounter(state) {
 		return state.encounter;
+	},
+	reminders(state) {
+		return state.reminders;
 	},
 	requests(state) {
 		return state.requests;
@@ -217,6 +290,193 @@ const run_encounter_getters = {
 	target_multipliers(state) {
 		return state.target_multipliers;
 	},
+	/**
+	 * Resolved definition of an active effect instance
+	 */
+	effect_definition: (state) => (instance) => {
+		return state.effect_definitions[`${instance.source}:${instance.source_key}`];
+	},
+	/**
+	 * An active effect of an entity by key: an applied instance, or a trait effect
+	 * ("trait:…", built from its special abilities)
+	 */
+	effect_instance: (state) => (key, effectKey) => {
+		const entity = state.entities[key];
+		if (!entity) return undefined;
+		if (isTraitKey(effectKey)) return traitInstances(entity, key)[effectKey];
+		return entity.effects?.[effectKey];
+	},
+	/**
+	 * Active effects of an entity, each with its resolved definition
+	 */
+	entity_effects: (state, getters) => (key) => {
+		return Object.entries(state.entities[key]?.effects || {}).map(([effectKey, instance]) => ({
+			key: effectKey,
+			instance,
+			definition: getters.effect_definition(instance),
+		}));
+	},
+	/**
+	 * Copy of an entity with the effective values its active effects give it (AC, Speeds,
+	 * max HP, initiative, passive Perception, spellcasting, ability scores), with
+	 * effect_modifiers explaining them and stored holding the replaced values.
+	 * undefined for an unknown key. The stored entity isn't changed.
+	 */
+	effective_entity: (state, getters) => (key) => {
+		const entity = state.entities[key];
+		if (!entity) return undefined;
+		const args = {
+			entity,
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+		};
+		return effectiveEntity(entity, effectiveStats(args), effectiveDefenses(args));
+	},
+	/**
+	 * d20 modifiers of an entity's effects and manual bonuses for a roll (rollModifiers).
+	 * Formula values read the effective entity. undefined for an unknown key.
+	 *
+	 * @param {string} key Entity key
+	 * @param {object} roll { kind: "check" | "skill" | "save" | "initiative", ability, skill, source }
+	 */
+	roll_modifiers: (state, getters) => (key, roll) => {
+		if (!state.entities[key]) return undefined;
+		return rollModifiers({
+			entity: getters.effective_entity(key),
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			roll,
+		});
+	},
+	/**
+	 * Roll modifiers of an attack (attackModifiers) and the damage bonuses of a hit
+	 * (damageBonuses), with both parties' effective values
+	 *
+	 * @param {object[]} consumed [{ holderKey, effectKey }] used up earlier in the same action,
+	 *   left out although their removal may not be saved yet
+	 * @returns {{ modifiers: object, damage: object }|undefined}
+	 */
+	attack_modifiers: (state, getters) => ({ attackerKey, targetKey, attackType, source, consumed = [] }) => {
+		if (!state.entities[attackerKey]) return undefined;
+		const entities = { ...state.entities };
+		for (const key of [attackerKey, targetKey]) {
+			if (key && entities[key]) entities[key] = getters.effective_entity(key) || entities[key];
+		}
+		for (const { holderKey, effectKey } of consumed) {
+			const holder = entities[holderKey];
+			// A trait effect used up counts a use on its ability (effects 6b), not saved yet
+			if (holder && isTraitKey(effectKey)) {
+				const index = effectKey.split(":")[1];
+				const used = parseInt(holder.limited_uses?.special_abilities?.[index]) || 0;
+				entities[holderKey] = {
+					...holder,
+					limited_uses: {
+						...(holder.limited_uses || {}),
+						special_abilities: { ...(holder.limited_uses?.special_abilities || {}), [index]: used + 1 },
+					},
+				};
+				continue;
+			}
+			if (!holder?.effects?.[effectKey]) continue;
+			const effects = { ...holder.effects };
+			delete effects[effectKey];
+			entities[holderKey] = { ...holder, effects };
+		}
+		const args = { attackerKey, targetKey, attackType, entities, definitionOf: getters.effect_definition };
+		return {
+			modifiers: attackModifiers({ ...args, source }),
+			damage: damageBonuses(args),
+		};
+	},
+	/**
+	 * What an entity's effects stop it from doing (restrictions), with a counterpart (the
+	 * target of an attack) when given
+	 *
+	 * @returns {object[]} [{ kind, name, description, possible, againstKey }]
+	 */
+	restrictions: (state, getters) => (key, counterpartKey) => {
+		if (!state.entities[key]) return [];
+		return restrictions({
+			entity: getters.effective_entity(key),
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			counterpartKey,
+		});
+	},
+	/**
+	 * Damage modifiers on the damage an entity takes, with the attacker as counterpart when given
+	 *
+	 * @returns {object} { toggles, evasion, absorb, dropToOne, reminders }
+	 */
+	damage_modifiers: (state, getters) => (key, counterpartKey) => {
+		return damageModifiers({
+			entity: state.entities[key] && getters.effective_entity(key),
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			counterpartKey,
+		});
+	},
+	/**
+	 * The most hit points an entity can regain from one heal (No Healing: 0)
+	 *
+	 * @returns {object} { cap, names, possible }, cap undefined without a cap
+	 */
+	healing_received_cap: (state, getters) => (key) => {
+		return healingReceivedCap({
+			entity: state.entities[key] && getters.effective_entity(key),
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+		});
+	},
+	/**
+	 * An entity's extra actions (Haste)
+	 *
+	 * @returns {object[]} [{ kind, name, description, allowedActions, possible }]
+	 */
+	extra_actions: (state, getters) => (key) => {
+		if (!state.entities[key]) return [];
+		return extraActions({
+			entity: getters.effective_entity(key),
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+		});
+	},
+	/**
+	 * Reminder lines for an entity's effects the tracker doesn't apply (compel, senses…)
+	 */
+	effect_reminders: (state, getters) => (key) => {
+		if (!state.entities[key]) return [];
+		return effectReminders({
+			entity: getters.effective_entity(key),
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+		});
+	},
+	effect_prompts(state) {
+		return state.effect_prompts;
+	},
+	effect_review(state) {
+		return state.effect_review;
+	},
+	/**
+	 * Keys of the entities in initiative order, ordered like RunEncounter's _active:
+	 * active and not down, by name, then by initiative in the user's initOrder
+	 */
+	turn_order: (state, getters, rootState, rootGetters) => {
+		const order = rootGetters.userSettings?.encounter?.initOrder ? "asc" : "desc";
+		return _.chain(Object.keys(state.entities))
+			.filter((key) => state.entities[key].active && !state.entities[key].down)
+			.orderBy((key) => state.entities[key].name, "asc")
+			.orderBy((key) => Number(state.entities[key].initiative), order)
+			.value();
+	},
 };
 
 const run_encounter_actions = {
@@ -227,7 +487,7 @@ const run_encounter_actions = {
 	 * @param {string} eid Encounter id
 	 * @param {boolean} demo Wether this is the demo encounter
 	 */
-	async init_Encounter({ commit, rootGetters, dispatch }, { cid, eid, demo, test }) {
+	async init_Encounter({ state, commit, getters, rootGetters, dispatch }, { cid, eid, demo, test }) {
 		// Create the path to the encounter in firebase
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const path = `${uid}/${cid}/${eid}`;
@@ -238,6 +498,9 @@ const run_encounter_actions = {
 		commit("SET_CAMPAIGN_ID", cid);
 		commit("SET_ENCOUNTER_ID", eid);
 		commit("CLEAR_ENTITIES");
+		commit("CLEAR_EFFECT_DEFINITIONS");
+		commit("CLEAR_EFFECT_PROMPTS");
+		commit("SET_RUN_REMINDERS", {});
 		commit("SET_PATH", path);
 
 		try {
@@ -261,6 +524,7 @@ const run_encounter_actions = {
 				}
 
 				commit("SET_ENCOUNTER", encounter);
+				commit("SET_RUN_REMINDERS", JSON.parse(JSON.stringify(encounter.reminders || {})));
 
 				// Setup the requests connection
 				const requests_ref = db.ref(`encounters/${uid}/${cid}/${eid}/requests`);
@@ -274,12 +538,46 @@ const run_encounter_actions = {
 				}
 			} else {
 				// The demo runs on the latest edition
-				commit("SET_EDITION", "2024");
+				commit("SET_EDITION", "5.5e");
 				const demo_encounter = rootGetters["encounters/demo_encounter"] || demoEncounter;
 				commit("SET_ENCOUNTER", { ...demo_encounter });
+				commit("SET_RUN_REMINDERS", JSON.parse(JSON.stringify(demo_encounter.reminders || {})));
 				for (let key in demo_encounter.entities) {
 					await dispatch("add_entity", key);
 				}
+			}
+
+			// Legacy conditions maps become effect instances, and the surprised reminder the
+			// Surprised effect (effects 8)
+			await dispatch("convert_legacy_conditions");
+			await dispatch("convert_legacy_surprised");
+			// Entity reminders become reminders about that entity on the encounter (effects 9)
+			await dispatch("convert_legacy_reminders");
+
+			// Remember whose turn it is for the end-of-turn triggers
+			commit(
+				"SET_TURN_ENTITY",
+				state.encounter?.round > 0 ? getters.turn_order[state.encounter.turn] : undefined
+			);
+
+			// Resolve the definitions of all loaded effects
+			const refs = Object.values(state.entities).flatMap((entity) =>
+				Object.values(entity.effects || {})
+			);
+			await dispatch("resolve_effect_definitions", refs);
+
+			// Current hit points within the effective maximum (carried-over effects)
+			for (const key of Object.keys(state.entities)) {
+				await dispatch("sync_effect_hp", key);
+			}
+
+			// Carried-over effects whose caster or Concentration link is missing: let the DM review them
+			const review = carriedOverReview({ entities: state.entities });
+			commit("SET_EFFECT_REVIEW", review);
+			if (review.length) {
+				commit("ADD_EFFECT_PROMPTS", [
+					{ kind: "review", id: `review:${Date.now()}`, count: review.length },
+				]);
 			}
 		} catch (error) {
 			console.error(error);
@@ -294,6 +592,8 @@ const run_encounter_actions = {
 		await dispatch("init_Encounter", { cid: null, eid: null, demo: true });
 	},
 
+	// The player live view builds the fields effects read with effectSubject
+	// (src/utils/entityFunctions.js) from the same sources; keep the two in line.
 	async add_entity({ state, commit, rootGetters, dispatch }, key) {
 		const demo_entities = rootGetters["encounters/demo_encounter"]
 			? rootGetters["encounters/demo_encounter"].entities
@@ -322,8 +622,14 @@ const run_encounter_actions = {
 		entity.saves = db_entity.saves ? db_entity.saves : {};
 		entity.stable = db_entity.stable ? db_entity.stable : false;
 		entity.dead = db_entity.dead ? db_entity.dead : false;
-		entity.conditions = db_entity.conditions ? db_entity.conditions : {};
 		entity.reminders = db_entity.reminders ? db_entity.reminders : {};
+		// Active effect instances, keyed by effect key.
+		// NPC effects are stored on the encounter, players and companions get theirs from the campaign below.
+		const load_effects = !state.demo && !state.test;
+		entity.effects =
+			load_effects && entity.entityType === "npc" && db_entity.effects
+				? { ...db_entity.effects }
+				: {};
 		entity.color_label = db_entity.color_label ? db_entity.color_label : null;
 		entity.limited_uses = db_entity.limited_uses ? db_entity.limited_uses : {};
 
@@ -357,11 +663,14 @@ const run_encounter_actions = {
 				if (campaignPlayer) {
 					entity.curHp = campaignPlayer.curHp;
 					entity.tempHp = state.test ? 0 : campaignPlayer.tempHp;
-					entity.ac_bonus = state.test ? 0 : campaignPlayer.ac_bonus;
-					entity.maxHpMod = state.test ? 0 : campaignPlayer.maxHpMod;
+					// Manual bonuses; old ac_bonus / maxHpMod are read as a "Manual" bonus
+					entity.bonuses = state.test ? {} : manualBonuses(campaignPlayer);
 					entity.saves = campaignPlayer.saves ? campaignPlayer.saves : {};
 					entity.stable = campaignPlayer.stable ? campaignPlayer.stable : false;
 					entity.dead = campaignPlayer.dead ? campaignPlayer.dead : false;
+					if (load_effects && campaignPlayer.effects) {
+						entity.effects = { ...campaignPlayer.effects };
+					}
 
 					//Get player transformed from campaign
 					if (campaignPlayer.transformed) {
@@ -385,10 +694,11 @@ const run_encounter_actions = {
 				entity.name = db_player.character_name;
 				entity.speed = db_player.speed || 0;
 				entity.initiative_modifier = db_player.initiative || 0;
+				// For the spellcasting_mod formula variable (effects such as Heroism)
+				entity.spell_save_dc = db_player.spell_save_dc;
 				entity.ac = parseInt(db_player.ac);
-				entity.maxHp = entity.maxHpMod
-					? parseInt(db_player.maxHp + entity.maxHpMod)
-					: parseInt(db_player.maxHp);
+				// The stored maximum; manual bonuses and effects are added by effective_entity
+				entity.maxHp = parseInt(db_player.maxHp);
 				entity.curHp = state.test ? entity.maxHp : entity.curHp;
 				entity.saving_throws = [];
 				// Ability scores
@@ -435,15 +745,17 @@ const run_encounter_actions = {
 					// Get companion status from campaign
 					entity.curHp = campaignCompanion.curHp;
 					entity.tempHp = campaignCompanion.tempHp;
-					entity.ac_bonus = campaignCompanion.ac_bonus;
-					entity.maxHpMod = campaignCompanion.maxHpMod;
+					// Manual bonuses; old ac_bonus / maxHpMod are read as a "Manual" bonus
+					entity.bonuses = manualBonuses(campaignCompanion);
 
-					entity.maxHp = entity.maxHpMod
-						? parseInt(data_npc.hit_points + entity.maxHpMod)
-						: parseInt(data_npc.hit_points);
+					// The stored maximum; manual bonuses and effects are added by effective_entity
+					entity.maxHp = parseInt(data_npc.hit_points);
 					entity.saves = campaignCompanion.saves ? campaignCompanion.saves : {};
 					entity.stable = campaignCompanion.stable ? campaignCompanion.stable : false;
 					entity.dead = campaignCompanion.dead ? campaignCompanion.dead : false;
+					if (load_effects && campaignCompanion.effects) {
+						entity.effects = { ...campaignCompanion.effects };
+					}
 
 					entity.ac = data_npc.old ? data_npc.ac : data_npc.armor_class;
 					entity.img = data_npc.storage_avatar || data_npc.avatar;
@@ -479,13 +791,14 @@ const run_encounter_actions = {
 
 					// Values from encounter
 					entity.tempHp = db_entity.tempHp;
-					entity.maxHpMod = db_entity.maxHpMod;
-					entity.ac_bonus = db_entity.ac_bonus;
+					// Manual bonuses; old ac_bonus / maxHpMod are read as a "Manual" bonus
+					entity.bonuses = manualBonuses(db_entity);
 					entity.friendly = !!db_entity.friendly;
-					entity.maxHp = entity.maxHpMod
-						? parseInt(db_entity.maxHp + entity.maxHpMod)
-						: parseInt(db_entity.maxHp);
-					entity.curHp = state.test ? parseInt(entity.maxHp) : parseInt(db_entity.curHp);
+					// The stored maximum; manual bonuses and effects are added by effective_entity
+					entity.maxHp = parseInt(db_entity.maxHp);
+					entity.curHp = state.test
+						? parseInt(entity.maxHp) + manualBonusTotal(entity, "max_hp")
+						: parseInt(db_entity.curHp);
 					entity.settings = db_entity.settings;
 
 					if (db_entity.transformed) {
@@ -612,6 +925,10 @@ const run_encounter_actions = {
 			}
 		}
 		commit("ADD_ENTITY", { key, entity });
+
+		// The definitions of its trait effects (effects 6b), also for creatures added mid-encounter
+		const traits = Object.values(traitInstances(entity, key));
+		if (traits.length) await dispatch("resolve_effect_definitions", traits);
 	},
 
 	/**
@@ -686,7 +1003,11 @@ const run_encounter_actions = {
 	 * @param {integer} turn
 	 * @param {integer} round
 	 */
-	async set_turn({ state, commit, dispatch }, { turn, round }) {
+	async set_turn({ state, commit, dispatch, getters }, { turn, round }) {
+		const oldTurn = state.encounter?.turn || 0;
+		const oldRound = state.encounter?.round || 0;
+		const outgoingKey = state.turn_entity;
+
 		if (!state.demo && !state.test) {
 			for (const property of ["turn", "round"]) {
 				const value = property === "turn" ? turn : round;
@@ -705,6 +1026,36 @@ const run_encounter_actions = {
 		}
 		commit("SET_TURN", turn);
 		commit("SET_ROUND", round);
+
+		// 5.5e Surprised only counts for the Initiative roll: it ends when combat starts (effects 8)
+		if (oldRound === 0 && round > 0 && state.edition === "5.5e") {
+			for (const [key, entity] of Object.entries(state.entities)) {
+				if (!hasSurprised(entity)) continue;
+				await dispatch("remove_effect", {
+					key,
+					source: "srd",
+					source_key: "surprised",
+					reason: "combat started",
+				});
+			}
+		}
+
+		// Effect triggers, only when combat moves forward
+		const incomingKey = round > 0 ? getters.turn_order[turn] : undefined;
+		commit("SET_TURN_ENTITY", incomingKey);
+		const forward = round > oldRound || (round === oldRound && turn > oldTurn);
+		if (forward) {
+			dispatch("fire_turn_triggers", {
+				outgoingKey,
+				incomingKey,
+				combatStart: oldRound === 0,
+				round,
+				oldRound,
+				// For the encounter's reminders at a turn of the round (effects 9)
+				turn: turn + 1,
+				turns: getters.turn_order.length,
+			});
+		}
 	},
 	set_log({ commit }, payload) {
 		commit("SET_LOG", payload);
@@ -730,15 +1081,27 @@ const run_encounter_actions = {
 	 * @param {string} value user's input value for the property
 	 */
 	async edit_entity_prop(
-		{ state, rootGetters, commit, dispatch },
+		{ state, rootGetters, commit, dispatch, getters },
 		{ key, entityType, prop, value }
 	) {
 		// Entity values
 		const entity = state.entities[key];
-		let maxHpMod = entity.maxHpMod ? parseInt(entity.maxHpMod) : 0;
-		let maxHpIncMod = entity.maxHp; // In the store maxHp is saved inc maxHpMod
-		// Below returns maxHp without maxHpMod, needed for some changes
-		let maxHp = maxHpMod > 0 ? entity.maxHp - maxHpMod : entity.maxHp + Math.abs(maxHpMod);
+
+		// The main pool's bonuses are manual bonuses now: an AC bonus or max HP modifier sets
+		// the "Manual" bonus
+		if (prop === "ac_bonus" || (prop === "maxHpMod" && !entity.transformed)) {
+			await dispatch("set_manual_bonus", {
+				key,
+				stat: prop === "ac_bonus" ? "ac" : "max_hp",
+				amount: value,
+			});
+			return;
+		}
+
+		// The main pool's maxHp is stored without bonuses; its maximum is the effective one
+		let maxHpMod = 0;
+		let maxHpIncMod = getters.effective_entity(key)?.maxHp ?? entity.maxHp;
+		let maxHp = entity.maxHp;
 		let curHp = entity.curHp;
 
 		if (value === undefined || value === "") value = null;
@@ -804,8 +1167,9 @@ const run_encounter_actions = {
 			const valueIncMod = maxHpMod ? value + maxHpMod : value;
 			if (!value || value < 0) value = 0;
 
-			// CurHp can't be > (maxHp + maxHpMod)
-			if (curHp > valueIncMod) {
+			// CurHp can't be > (maxHp + maxHpMod); the main pool is synced with its effective
+			// maximum after the store is updated
+			if (entity.transformed && curHp > valueIncMod) {
 				curHp = valueIncMod;
 
 				if (!state.demo && !state.test) {
@@ -1057,11 +1421,127 @@ const run_encounter_actions = {
 
 		// UPDATE STORE
 
-		// Save maxHp including maxHpMod in the store
-		if (prop === "maxHp" || prop === "transformedMaxHp") {
+		// Save the transformed maxHp including its maxHpMod in the store
+		if (prop === "transformedMaxHp") {
 			value = maxHpMod ? value + maxHpMod : value;
 		}
 		commit("SET_ENTITY_PROPERTY", { key, prop, value });
+
+		// Current hit points within the new effective maximum
+		if (prop === "maxHp") await dispatch("sync_effect_hp", key);
+	},
+
+	/**
+	 * Saves an entity's manual bonuses: the whole bonuses node, and removes the old
+	 * single-value ac_bonus / maxHpMod. Players and companions save on the campaign, NPCs on
+	 * the encounter. When the effective maximum hit points change, current hit points follow
+	 * (hpAfterMaxHpChange).
+	 *
+	 * @param {string} key Entity key
+	 * @param {object} bonuses { <stat>: { <id>: { value, label } } }
+	 * @returns {boolean} false when the write failed (nothing changed)
+	 */
+	async save_bonuses({ state, rootGetters, commit, dispatch, getters }, { key, bonuses }) {
+		const entity = state.entities[key];
+		if (!entity) return false;
+
+		// Leave out empty lists; an empty node is removed
+		const cleaned = {};
+		for (const [stat, list] of Object.entries(bonuses || {})) {
+			if (list && Object.keys(list).length) cleaned[stat] = list;
+		}
+		const saved = Object.keys(cleaned).length ? cleaned : null;
+		const before = parseInt(getters.effective_entity(key)?.maxHp);
+
+		try {
+			if (!state.demo && !state.test) {
+				for (const [property, value] of [
+					["bonuses", saved],
+					["ac_bonus", null],
+					["maxHpMod", null],
+				]) {
+					if (entity.entityType === "npc") {
+						await dispatch(
+							"encounters/set_entity_prop",
+							{
+								campaignId: state.campaignId,
+								encounterId: state.encounterId,
+								entityId: key,
+								property,
+								value,
+							},
+							{ root: true }
+						);
+					} else {
+						await dispatch(
+							"campaigns/update_campaign_entity",
+							{
+								uid: rootGetters.user.uid,
+								campaignId: state.campaignId,
+								type: `${entity.entityType}s`,
+								id: key,
+								property,
+								value,
+							},
+							{ root: true }
+						);
+					}
+				}
+			}
+		} catch (error) {
+			console.error(`Failed to save the bonuses of ${entity.name}`, error);
+			return false;
+		}
+		commit("SET_ENTITY_PROPERTY", { key, prop: "bonuses", value: cleaned });
+
+		// Current hit points follow the maximum: up with it, or down to it
+		const after = parseInt(getters.effective_entity(key)?.maxHp);
+		if (Number.isFinite(before) && Number.isFinite(after) && before !== after) {
+			const curHp = parseInt(entity.curHp) || 0;
+			const newHp = hpAfterMaxHpChange(curHp, before, after);
+			if (newHp !== curHp) await dispatch("set_hp", { key, newHp });
+		}
+		return true;
+	},
+
+	/**
+	 * Adds or changes a manual bonus
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} stat Value it applies to (BONUS_VALUES), e.g. "ac"
+	 * @param {string} id Bonus id; a new one is generated when left out
+	 * @param {number} amount
+	 * @param {string} label Defaults to "Manual"
+	 */
+	async set_bonus({ state, dispatch }, { key, stat, id, amount, label }) {
+		const bonuses = withBonus(state.entities[key], stat, { id, amount, label });
+		return dispatch("save_bonuses", { key, bonuses });
+	},
+
+	/**
+	 * Removes a manual bonus
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} stat Value it applies to
+	 * @param {string} id Bonus id
+	 */
+	async remove_bonus({ state, dispatch }, { key, stat, id }) {
+		if (!manualBonuses(state.entities[key])[stat]?.[id]) return true;
+		return dispatch("save_bonuses", { key, bonuses: withoutBonus(state.entities[key], stat, id) });
+	},
+
+	/**
+	 * Sets the bonus labelled "Manual" of a value, as the single-value inputs do; 0 or empty
+	 * removes it
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} stat Value it applies to
+	 * @param {number} amount
+	 */
+	async set_manual_bonus({ dispatch }, { key, stat, amount }) {
+		const value = parseInt(amount);
+		if (!value) return dispatch("remove_bonus", { key, stat, id: MANUAL_BONUS_ID });
+		return dispatch("set_bonus", { key, stat, id: MANUAL_BONUS_ID, amount: value, label: "Manual" });
 	},
 
 	/**
@@ -1120,6 +1600,8 @@ const run_encounter_actions = {
 			);
 		}
 		commit("SET_ENTITY_PROPERTY", { key, prop: "active", value: active });
+		// Set inactive: its "defeated or removed" reminders (effects 9)
+		if (active === false) await dispatch("fire_reminders", { event: { type: "defeated", entityKey: key } });
 	},
 
 	/**
@@ -1150,6 +1632,167 @@ const run_encounter_actions = {
 	 */
 	set_actor({ commit }, entity) {
 		commit("SET_ACTOR", entity);
+	},
+
+	/**
+	 * An entity acted (rolled an action or spell, or did manual damage/healing): when another
+	 * entity has the turn, it may have used its reaction. Queues a prompt that offers
+	 * Reaction Used (apply_reaction_used); an out-of-turn action isn't always a reaction.
+	 *
+	 * @param {string} actorKey Entity that acted
+	 * @param {string} category Category of a rolled action; legendary actions don't use the reaction
+	 */
+	use_reaction({ state, getters, commit }, { actorKey, category }) {
+		const turnKey =
+			state.encounter?.round > 0 ? getters.turn_order[state.encounter.turn] : undefined;
+		if (!reactionUsedApplies({ actorKey, turnKey, category, entities: state.entities })) return;
+
+		commit("ADD_EFFECT_PROMPTS", [
+			{
+				kind: "reaction_used",
+				id: `reaction_used:${actorKey}:${Date.now()}`,
+				holderKey: actorKey,
+				holderName: state.entities[actorKey]?.name,
+				turnKey,
+				// For the prompt's icon
+				source: "srd",
+				source_key: "reaction-used",
+			},
+		]);
+	},
+
+	/**
+	 * Applies Reaction Used to an entity, until the start of its next turn, applied by itself.
+	 * Nothing when it already has it or isn't in the encounter.
+	 *
+	 * @param {string} actorKey Entity that used its reaction
+	 * @param {string} turnKey Entity whose turn it was when it acted
+	 * @returns {string|undefined} Key of the new instance, undefined when nothing was applied
+	 */
+	async apply_reaction_used({ state, dispatch }, { actorKey, turnKey }) {
+		const actor = state.entities[actorKey];
+		if (!actor || hasReactionUsed(actor)) return;
+
+		const definition = findSrdDefinition(state.edition, "reaction-used") || { name: "Reaction Used" };
+		const instance = buildEffectInstance({
+			definition,
+			source: "srd",
+			sourceKey: "reaction-used",
+			application: { duration: { type: "next_turn", anchor: "target", edge: "start" } },
+			round: state.encounter.round,
+			casterKey: actorKey,
+			casterName: state.entities[actorKey]?.name,
+			turnKey,
+		});
+		return dispatch("apply_effect", { key: actorKey, instance, definition });
+	},
+
+	/**
+	 * Carries out a Concentration plan for a caster (concentrationPlan): ends a Concentration it
+	 * replaces, and applies a new one up to the duration's time. Used by the Effects drawer and
+	 * by effects applied from a roll.
+	 *
+	 * @param {string} casterKey
+	 * @param {object} plan { action: start | share | link | replace, key? }
+	 * @param {object} concentrationFor { source, source_key, name } of the effect or spell
+	 * @param {object} duration The applied duration, for the "up to" time
+	 * @param {string} turnKey Entity that has the turn
+	 * @returns {string|undefined} Key of the Concentration to link to, undefined when it failed
+	 */
+	async concentrate_on({ state, dispatch }, { casterKey, plan, concentrationFor, duration = {}, turnKey }) {
+		if (["share", "link"].includes(plan.action)) return plan.key;
+
+		if (plan.action === "replace") {
+			await dispatch("remove_effect", {
+				key: casterKey,
+				effectKey: plan.key,
+				reason: `started concentrating on ${concentrationFor.name}`,
+			});
+		}
+		const definition = findSrdDefinition(state.edition, "concentration") || { name: "Concentration" };
+		const upTo = duration.value
+			? { type: "time", value: duration.value, unit: duration.unit || "round" }
+			: { type: "cancelled" };
+		const instance = buildEffectInstance({
+			definition,
+			source: "srd",
+			sourceKey: "concentration",
+			application: { duration: upTo },
+			round: state.encounter?.round,
+			casterKey,
+			casterName: state.entities[casterKey]?.name,
+			turnKey,
+			concentrationFor,
+		});
+		return dispatch("apply_effect", { key: casterKey, instance, definition });
+	},
+
+	/**
+	 * Applies the linked effects of a roll to its target (effects 7), as the Effects drawer
+	 * applies effects: the rolling creature is the caster, `magical` is kept, and a Concentration
+	 * duration starts, shares or replaces the caster's Concentration, once per call. For a spell
+	 * cast the Concentration is for the spell, so all its effects share it.
+	 *
+	 * @param {string} targetKey The roll's target
+	 * @param {string} casterKey The creature that rolled
+	 * @param {object[]} items [{ source, sourceKey, name, definition, application, magical }] (linkApplication)
+	 * @param {object} cast The spell cast, for a spell roll
+	 * @returns {string[]} Keys of the applied instances
+	 */
+	async apply_linked_effects({ state, dispatch }, { targetKey, casterKey, items = [], cast }) {
+		if (!state.entities[targetKey]) return [];
+		const turnKey = state.encounter?.round ? state.turn_entity : undefined;
+		const applied = [];
+		// The Concentration the Concentration effects link to; null when it couldn't be saved
+		let concentrationId;
+
+		for (const item of items) {
+			const application = { ...(item.application || {}) };
+			if (casterKey && application.duration?.type === "concentration") {
+				if (concentrationId === undefined) {
+					const effects = state.entities[casterKey]?.effects || {};
+					const current = Object.keys(effects).find(
+						(effectKey) =>
+							effects[effectKey].source === "srd" && effects[effectKey].source_key === "concentration"
+					);
+					const concentrationFor = cast?.spell?.key
+						? { source: "spell", source_key: cast.spell.key, name: cast.spell.name }
+						: { source: item.source, source_key: item.sourceKey, name: item.name };
+					const plan = concentrationPlan({
+						casterKey,
+						concentration: current ? { key: current, for: effects[current].concentration_for } : undefined,
+						effect: concentrationFor,
+						unknownChoice: "link",
+					});
+					concentrationId =
+						(await dispatch("concentrate_on", {
+							casterKey,
+							plan,
+							concentrationFor,
+							duration: application.duration,
+							turnKey,
+						})) || null;
+				}
+				if (!concentrationId) continue;
+				application.concentration_id = concentrationId;
+			}
+
+			const definition = item.definition || { name: item.name };
+			const instance = buildEffectInstance({
+				definition: { ...definition, name: item.name || definition.name },
+				source: item.source,
+				sourceKey: item.sourceKey,
+				application,
+				round: state.encounter?.round,
+				casterKey,
+				casterName: state.entities[casterKey]?.name,
+				turnKey,
+			});
+			if (item.magical) instance.magical = true;
+			const key = await dispatch("apply_effect", { key: targetKey, instance, definition });
+			if (key) applied.push(key);
+		}
+		return applied;
 	},
 
 	/**
@@ -1473,36 +2116,1060 @@ const run_encounter_actions = {
 				}
 			}
 			commit("SET_ENTITY_PROPERTY", { key, prop: "curHp", value: newHp });
+			// Hit points above 0 end dead, stable and the death saves (saved with curHp by
+			// update_campaign_entity)
+			if (type !== "npcs" && newHp > 0) {
+				commit("SET_ENTITY_PROPERTY", { key, prop: "saves", value: {} });
+				commit("SET_ENTITY_PROPERTY", { key, prop: "stable", value: false });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
+			}
 		}
 	},
 
 	/**
-	 * Sets conditions for entities
+	 * Converts the premade surprised reminder of the loaded encounter's entities to the SRD
+	 * Surprised effect (effects 8). The reminder is removed after this by
+	 * convert_legacy_reminders (effects 9), with the entity's other reminders; an entity that
+	 * already has Surprised isn't given a second one, so a failed run repeats. No apply triggers
+	 * fire. The demo converts in memory only, test runs don't convert.
+	 */
+	async convert_legacy_surprised({ state, commit, dispatch }) {
+		if (state.test) return;
+
+		for (const [key, entity] of Object.entries(state.entities || {})) {
+			if (!entity?.reminders?.surprised) continue;
+			try {
+				if (!hasSurprised(entity)) {
+					const definition = findSrdDefinition(state.edition, "surprised") || { name: "Surprised" };
+					const instance = surprisedInstance({
+						edition: state.edition,
+						definition,
+						round: state.encounter?.round || 0,
+					});
+					const effectKey = generateEffectKey(Object.keys(entity.effects || {}));
+					if (!state.demo) {
+						await dispatch("persist_effect", { key, effectKey, value: instance });
+					}
+					commit("SET_EFFECT", { key, effectKey, instance });
+				}
+				// The reminder itself goes with the entity's other reminders (convert_legacy_reminders)
+			} catch (error) {
+				console.error(`Failed to convert the surprised reminder of ${key}`, error);
+			}
+		}
+	},
+
+	/**
+	 * Converts the reminders stored on the loaded encounter's entities to reminders about that
+	 * entity on the encounter (effects 9, convertLegacyReminder): damage-triggered and retired
+	 * premade ones are dropped. The entity's reminders are removed once the new ones are stored;
+	 * the new ids come from the entity and the old key, so a failed run repeats without
+	 * duplicates. The demo converts in memory only, test runs don't convert.
+	 */
+	async convert_legacy_reminders({ state, commit, dispatch }) {
+		if (state.test) return;
+		const round = state.encounter?.round || 0;
+
+		for (const [key, entity] of Object.entries(state.entities || {})) {
+			const legacy = entity?.reminders;
+			if (!legacy || !Object.keys(legacy).length) continue;
+			try {
+				for (const [oldKey, old] of Object.entries(legacy)) {
+					const reminder = convertLegacyReminder(oldKey, old, key, round);
+					if (!reminder) continue;
+					const id = `legacy-${key}-${oldKey}`.replace(/[.#$/[\]]/g, "_");
+					await dispatch("set_encounter_reminder", { id, reminder });
+				}
+				if (!state.demo) {
+					await dispatch(
+						"encounters/set_entity_prop",
+						{
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entityId: key,
+							property: "reminders",
+							value: null,
+						},
+						{ root: true }
+					);
+				}
+				commit("SET_ENTITY_PROPERTY", { key, prop: "reminders", value: {} });
+			} catch (error) {
+				console.error(`Failed to convert the reminders of ${key}`, error);
+			}
+		}
+	},
+
+	/**
+	 * Converts the legacy conditions maps of the loaded encounter to effect instances.
+	 * The map is deleted once all instances of an entity are stored, so a failed run repeats.
+	 * No apply triggers fire. The demo converts in memory only, test runs don't convert.
+	 */
+	async convert_legacy_conditions({ state, commit, dispatch }) {
+		if (state.test) return;
+
+		for (const [key, db_entity] of Object.entries(state.encounter?.entities || {})) {
+			const entity = state.entities[key];
+			if (!entity || !db_entity?.conditions || !Object.keys(db_entity.conditions).length) {
+				continue;
+			}
+			const instances = legacyConditionInstances({
+				conditions: db_entity.conditions,
+				effects: entity.effects,
+				edition: state.edition,
+				round: state.encounter.round,
+			});
+			try {
+				for (const instance of instances) {
+					const effectKey = generateEffectKey(Object.keys(entity.effects));
+					if (!state.demo) {
+						await dispatch("persist_effect", { key, effectKey, value: instance });
+					}
+					commit("SET_EFFECT", { key, effectKey, instance });
+				}
+				if (!state.demo) {
+					await dispatch(
+						"encounters/delete_entity_conditions",
+						{ campaignId: state.campaignId, encounterId: state.encounterId, entityId: key },
+						{ root: true }
+					);
+				}
+			} catch (error) {
+				console.error(`Failed to convert the conditions of ${key}`, error);
+			}
+		}
+	},
+
+	/**
+	 * Applies an effect instance to an entity.
+	 * An SRD condition the entity already has is not added twice,
+	 * Exhaustion updates the level of its existing instance instead.
 	 *
 	 * @param {string} key Entity key
-	 * @param {string} action add, remove
-	 * @param {string} condition Name of the condition
-	 * @param {integer} level level of exhaustion condition
+	 * @param {object} instance Active effect instance ($defs/active_instance)
+	 * @returns {string} Key of the new or updated effect instance, undefined if the write failed
 	 */
-	async set_condition({ state, commit, dispatch }, { action, key, condition, level }) {
-		const value = action === "remove" ? null : condition === "exhaustion" ? level : true;
-		if (!state.demo && !state.test) {
-			await dispatch(
-				"encounters/set_entity_condition",
+	async apply_effect({ state, commit, dispatch, getters }, { key, instance }) {
+		const effects = state.entities[key].effects;
+		const existingKey = Object.keys(effects).find(
+			(candidate) =>
+				effects[candidate].source === instance.source &&
+				effects[candidate].source_key === instance.source_key
+		);
+		const isCondition = isSrdCondition(instance.source, instance.source_key);
+
+		// A creature immune to the condition (its own immunities or an effect's) doesn't get it
+		const srdCondition = isCondition ? findSrdDefinition(state.edition, instance.source_key) : undefined;
+		if (srdCondition) {
+			const immunities = getters.effective_entity(key)?.condition_immunities || [];
+			if (immunities.includes(instance.source_key)) {
+				const holderName = (state.entities[key]?.name || "").capitalizeEach();
+				const conditionName = (srdCondition.name || instance.name || "").capitalize();
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "notice",
+						id: `immune:${key}:${instance.source_key}:${Date.now()}`,
+						holderKey: key,
+						holderName: state.entities[key]?.name,
+						effectName: conditionName,
+						source: "srd",
+						source_key: instance.source_key,
+						text: `${holderName} is immune to ${conditionName}`,
+					},
+				]);
+				return undefined;
+			}
+		}
+
+		if (isCondition && existingKey) {
+			if (instance.source_key !== "exhaustion") return existingKey;
+
+			const updated = { ...effects[existingKey], level: instance.level };
+			try {
+				if (!state.demo && !state.test) {
+					await dispatch("persist_effect", {
+						key,
+						effectKey: existingKey,
+						property: "level",
+						value: instance.level,
+					});
+				}
+			} catch (error) {
+				console.error(`Failed to update ${instance.name} on ${key}`, error);
+				return;
+			}
+			commit("SET_EFFECT", { key, effectKey: existingKey, instance: updated });
+			await dispatch("resolve_effect_definitions", [instance]).catch((error) =>
+				console.error(error)
+			);
+			await dispatch("sync_effect_hp", key);
+			// Exhaustion 6: death is offered
+			await dispatch("check_death_outcome", { key, effectKey: existingKey });
+			return existingKey;
+		}
+
+		const effectKey = generateEffectKey(Object.keys(effects));
+		try {
+			if (!state.demo && !state.test) {
+				await dispatch("persist_effect", { key, effectKey, value: instance });
+			}
+		} catch (error) {
+			console.error(`Failed to apply ${instance.name} to ${key}`, error);
+			return;
+		}
+		commit("SET_EFFECT", { key, effectKey, instance });
+		await dispatch("resolve_effect_definitions", [instance]).catch((error) =>
+			console.error(error)
+		);
+
+		// Maximum hit points: Aid-style also_heal, then keep current HP within the maximum
+		const resolved = getters.effect_definition(instance);
+		const heal = alsoHealAmount({
+			instance,
+			definition: resolved,
+			vars: {
+				self: formulaVars(state.entities[key]),
+				caster: formulaVars(state.entities[instance.caster_key]),
+			},
+		});
+		// Healed and kept within the maximum, as for the campaign's players (effects 8)
+		await dispatch("sync_effect_hp", { key, heal });
+
+		// Temporary hit points without a trigger are granted when applied (False Life)
+		const tempHp = (resolved?.sub_effects || []).filter(
+			(sub_effect) =>
+				sub_effect.type === "fixed" && sub_effect.sub_types?.includes("temp_hp") && !sub_effect.trigger
+		);
+		if (tempHp.length && !resolved?.unresolved) {
+			commit("ADD_EFFECT_PROMPTS", [
 				{
-					campaignId: state.campaignId,
-					encounterId: state.encounterId,
-					entityId: key,
-					condition,
-					value,
+					kind: "temp_hp",
+					id: `temp_hp:${key}:${effectKey}:${Date.now()}`,
+					holderKey: key,
+					effectKey,
+					holderName: state.entities[key]?.name,
+					effectName: (resolved.name || instance.name || "").capitalize(),
+					lines: tempHp.map(describeSubEffect),
+					sub_effects: tempHp,
+					instance: { ...instance },
+					event: {},
 				},
+			]);
+		}
+
+		// Apply triggers, for new instances only
+		dispatch("fire_trigger", { trigger: "on_apply", entityKey: key, effectKey });
+		if (isCondition) {
+			dispatch("fire_trigger", { trigger: "on_condition_applied", entityKey: key });
+		}
+		// An immunity it just gained ends the conditions it covers (Heroism: Frightened)
+		await dispatch("end_immune_conditions", key);
+		// A death outcome at its level (Exhaustion 6) is offered
+		await dispatch("check_death_outcome", { key, effectKey });
+		return effectKey;
+	},
+
+	/**
+	 * When an instance's death outcome applies at its level (Exhaustion 6), queues a prompt
+	 * that offers to mark the creature dead
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the instance
+	 */
+	check_death_outcome({ state, commit, getters }, { key, effectKey }) {
+		const instance = getters.effect_instance(key, effectKey);
+		if (!instance) return;
+		const definition = getters.effect_definition(instance);
+		if (!deathOutcome({ instance, definition })) return;
+		const name = ((definition && definition.name) || instance.name || "").capitalize();
+		commit("ADD_EFFECT_PROMPTS", [
+			{
+				kind: "death",
+				id: `death:${key}:${effectKey}:${Date.now()}`,
+				holderKey: key,
+				effectKey,
+				holderName: state.entities[key]?.name,
+				effectName: instance.level ? `${name} ${instance.level}` : name,
+				source: instance.source,
+				source_key: instance.source_key,
+			},
+		]);
+	},
+
+	/**
+	 * Ends the SRD conditions an entity is immune to (its own or its effects' condition
+	 * immunities), each with the reason "immune to <condition>"
+	 *
+	 * @param {string} key Entity key
+	 */
+	async end_immune_conditions({ state, getters, dispatch }, key) {
+		const immunities = getters.effective_entity(key)?.condition_immunities || [];
+		if (!immunities.length) return;
+		for (const [effectKey, instance] of Object.entries(state.entities[key]?.effects || {})) {
+			if (instance.source !== "srd" || !immunities.includes(instance.source_key)) continue;
+			if (!isSrdCondition(instance.source, instance.source_key)) continue;
+			const condition = findSrdDefinition(state.edition, instance.source_key);
+			await dispatch("remove_effect", {
+				key,
+				effectKey,
+				reason: `immune to ${(condition.name || instance.name || "").capitalize()}`,
+			});
+		}
+	},
+
+	/**
+	 * A trait effect was used up (consume, effects 6b). It isn't stored, so nothing is removed:
+	 * when its special ability has a limit, a use is counted on it (limited_uses), which switches
+	 * the trait effect off once the uses are spent; without a limit nothing happens.
+	 *
+	 * @param {string} key The creature
+	 * @param {string} effectKey "trait:<abilityIndex>:<linkIndex>"
+	 * @param {string} reason Why it ended, for the notice ("used")
+	 */
+	async use_trait_effect({ state, commit, dispatch, getters }, { key, effectKey, reason }) {
+		const instance = getters.effect_instance(key, effectKey);
+		if (!instance?.trait?.limit) return;
+		const { ability_index, ability_name } = instance.trait;
+		await dispatch("set_limitedUses", { key, index: ability_index, category: "special_abilities" });
+		if (!reason) return;
+		commit("ADD_EFFECT_PROMPTS", [
+			{
+				kind: "notice",
+				id: `notice:${key}:${effectKey}:${Date.now()}`,
+				holderKey: key,
+				effectKey,
+				holderName: state.entities[key]?.name,
+				effectName: ability_name || instance.name,
+				source: instance.source,
+				source_key: instance.source_key,
+				reason,
+			},
+		]);
+	},
+
+	/**
+	 * Removes effect instances from an entity:
+	 * one instance by effectKey, or every instance of a definition by source + source_key
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} source "srd" or "custom"
+	 * @param {string} source_key url or id of the definition
+	 * @param {string} effectKey Key of a single instance
+	 * @param {string} reason Why it ended; set for automatic removals, which are announced
+	 * @param {boolean} skipExpire Don't show what happens when it ends (replaced by an escalation)
+	 */
+	async remove_effect(
+		{ state, commit, dispatch, getters },
+		{ key, source, source_key, effectKey, reason, skipExpire }
+	) {
+		// A trait effect isn't stored: using it up counts a use on its ability (effects 6b)
+		if (isTraitKey(effectKey)) {
+			await dispatch("use_trait_effect", { key, effectKey, reason });
+			return;
+		}
+		const effects = state.entities[key]?.effects || {};
+		const effectKeys = effectKey
+			? [effectKey]
+			: Object.keys(effects).filter(
+					(k) => effects[k].source === source && effects[k].source_key === source_key
+			  );
+
+		for (const k of effectKeys) {
+			const instance = effects[k];
+			// Already removed, e.g. reached twice through a cascade
+			if (!instance) continue;
+
+			try {
+				if (!state.demo && !state.test) {
+					await dispatch("persist_effect", { key, effectKey: k, value: null });
+				}
+			} catch (error) {
+				console.error(`Failed to remove ${instance.name} from ${key}`, error);
+				continue;
+			}
+			commit("DELETE_EFFECT", { key, effectKey: k });
+
+			const name = (instance.name || "").capitalize();
+			// Regaining a reaction at the start of a turn isn't announced
+			const reactionRegained = instance.source === "srd" && instance.source_key === "reaction-used";
+			if (reason && !reactionRegained) {
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "notice",
+						id: `notice:${key}:${k}:${Date.now()}`,
+						holderKey: key,
+						effectKey: k,
+						holderName: state.entities[key]?.name,
+						effectName: name,
+						// The instance is gone; its source gives the notice its icon
+						source: instance.source,
+						source_key: instance.source_key,
+						reason,
+					},
+				]);
+			}
+
+			// Temporary hit points that end with it (Heroism); not when replaced by an escalation
+			const holder = state.entities[key];
+			const lose = skipExpire ? 0 : tempHpToLose({ instance, tempHp: holder?.tempHp });
+			if (lose > 0) {
+				await dispatch("set_hp", { key, pool: "temp", newHp: 0 });
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "temp_hp_lost",
+						id: `temp_hp_lost:${key}:${k}:${Date.now()}`,
+						holderKey: key,
+						effectKey: k,
+						holderName: holder?.name,
+						effectName: name,
+						source: instance.source,
+						source_key: instance.source_key,
+						amount: lose,
+					},
+				]);
+			}
+
+			// What happens when it ends (Haste lethargy); not when replaced by an escalation
+			const expireSubEffects = skipExpire
+				? []
+				: onExpireSubEffects({ instance, definition: getters.effect_definition(instance) });
+			if (expireSubEffects.length) {
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "on_expire",
+						id: `on_expire:${key}:${k}:${Date.now()}`,
+						holderKey: key,
+						effectKey: k,
+						holderName: state.entities[key]?.name,
+						effectName: name,
+						lines: expireSubEffects.map(describeSubEffect),
+						// For rolling damage and healing (the instance is gone by then)
+						sub_effects: expireSubEffects,
+						instance: { ...instance },
+						event: {},
+					},
+				]);
+			}
+
+			// Effects linked to this one end with it
+			const targets = cascadeTargets({
+				holderKey: key,
+				effectKey: k,
+				instance,
+				entities: state.entities,
+			});
+			for (const target of targets) {
+				await dispatch("remove_effect", {
+					key: target.holderKey,
+					effectKey: target.effectKey,
+					reason: `${name} ended`,
+				});
+			}
+		}
+		// Cascade holders are synced by their own remove_effect
+		await dispatch("sync_effect_hp", key);
+	},
+
+	/**
+	 * Ends the single-use effects a roll used (rollPlan consume), announced as "used"
+	 *
+	 * @param {object[]} consume [{ holderKey, effectKey }]
+	 */
+	async consume_roll_modifiers({ dispatch }, consume = []) {
+		for (const { holderKey, effectKey } of consume) {
+			await dispatch("remove_effect", { key: holderKey, effectKey, reason: "used" });
+		}
+	},
+
+	/**
+	 * Damage left a creature at 1 hit point instead of 0 (isDamage, dropToOneFor). Without a
+	 * save a notice names the effect, and a single-use one ends (Death Ward). With a save
+	 * (Undead Fortitude) a prompt asks for it; a failure drops it to 0.
+	 *
+	 * @param {string} key The creature
+	 * @param {object} match dropToOneFor's result: { entry, ability, dc, notes }
+	 * @param {number} damage The damage taken
+	 */
+	async drop_to_one({ state, commit, dispatch, getters }, { key, match, damage }) {
+		const { entry, ability, dc, notes = [] } = match || {};
+		if (!entry) return;
+		const holderName = state.entities[key]?.name;
+		const instance = getters.effect_instance(key, entry.effectKey);
+		const base = {
+			holderKey: key,
+			effectKey: entry.effectKey,
+			holderName,
+			effectName: entry.name,
+			source: instance?.source,
+			source_key: instance?.source_key,
+		};
+		if (entry.save) {
+			commit("ADD_EFFECT_PROMPTS", [
+				{
+					...base,
+					kind: "drop_to_one",
+					id: `drop_to_one:${key}:${entry.effectKey}:${Date.now()}`,
+					ability,
+					dc,
+					damage,
+					description: entry.description,
+					notes,
+				},
+			]);
+			return;
+		}
+		// The notice's title is the creature's name
+		commit("ADD_EFFECT_PROMPTS", [
+			{
+				...base,
+				kind: "notice",
+				id: `notice:${key}:${entry.effectKey}:${Date.now()}`,
+				text: [`${entry.name}: drops to 1 hit point instead of 0`, ...notes].join("\n"),
+			},
+		]);
+		// Used up: the whole effect ends (Death Ward), without a second notice
+		if (entry.consume && (entry.consume.scope || "effect") === "effect") {
+			await dispatch("remove_effect", { key, effectKey: entry.effectKey });
+		}
+	},
+
+	/**
+	 * Keeps an entity's current hit points within its effective maximum, after healing it by
+	 * `heal` (Aid's also_heal): when effects lowered the maximum below current HP, current HP is
+	 * set to it and saved. The transformed pool is left alone. The same calculation as the
+	 * campaign's players outside an encounter (hpAfterEffects, effects 8).
+	 *
+	 * @param {string|object} key Entity key, or { key, heal }
+	 */
+	async sync_effect_hp({ state, getters, dispatch }, args) {
+		const { key, heal = 0 } = typeof args === "object" ? args : { key: args };
+		const entity = state.entities[key];
+		if (!entity) return;
+		const newHp = hpAfterEffects({
+			entity,
+			holderKey: key,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			heal,
+		});
+		if (newHp !== undefined) await dispatch("set_hp", { key, newHp });
+	},
+
+	/**
+	 * Resolves a repeat save of an effect instance: counts it, ends the effect when enough
+	 * saves succeed, and escalates or locks it when enough fail
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {boolean} success Whether the save succeeded
+	 * @param {boolean} auto Succeeded automatically (auto_success_after)
+	 */
+	async resolve_repeat_save({ state, commit, dispatch, getters }, { key, effectKey, success, auto }) {
+		const instance = state.entities[key]?.effects?.[effectKey];
+		if (!instance?.duration?.save) return;
+
+		const name = (instance.name || "").capitalize();
+		const outcome = resolveRepeatSave(instance, success);
+
+		// An automatic success that doesn't end the effect is announced here; one that does is
+		// announced by the removal
+		if (auto && outcome.result !== "end") {
+			commit("ADD_EFFECT_PROMPTS", [
+				{
+					kind: "notice",
+					id: `notice:auto:${key}:${effectKey}:${Date.now()}`,
+					holderKey: key,
+					effectKey,
+					holderName: state.entities[key]?.name,
+					effectName: name,
+					text: `${name}: the save succeeded automatically`,
+				},
+			]);
+		}
+
+		if (outcome.onFail?.length) {
+			commit("ADD_EFFECT_PROMPTS", [
+				{
+					kind: "trigger",
+					id: `on_fail:${key}:${effectKey}:${Date.now()}`,
+					trigger: "on_save_fail",
+					holderKey: key,
+					effectKey,
+					holderName: state.entities[key]?.name,
+					effectName: name,
+					lines: outcome.onFail,
+					// For rolling damage and healing
+					sub_effects: outcome.onFailSubEffects,
+					instance: { ...instance },
+					event: {},
+				},
+			]);
+		}
+
+		if (outcome.result === "end") {
+			await dispatch("remove_effect", {
+				key,
+				effectKey,
+				reason: auto ? "the save succeeded automatically" : "saved",
+			});
+		} else if (outcome.result === "count") {
+			await dispatch("set_effect_prop", {
+				key,
+				effectKey,
+				property: outcome.property,
+				value: outcome.value,
+			});
+		} else if (outcome.result === "lock") {
+			await dispatch("set_effect_prop", {
+				key,
+				effectKey,
+				property: "save_failures",
+				value: outcome.value,
+			});
+			await dispatch("set_effect_prop", {
+				key,
+				effectKey,
+				property: "duration",
+				value: outcome.duration,
+			});
+		} else if (outcome.result === "escalate") {
+			const { effect } = outcome.escalate;
+			await dispatch("resolve_effect_definitions", [effect]);
+			const definition = getters.effect_definition(effect);
+			const replacement = escalationInstance({
+				instance,
+				definition,
+				round: state.encounter?.round,
+			});
+			await dispatch("remove_effect", {
+				key,
+				effectKey,
+				reason: `became ${replacement.name}`,
+				skipExpire: true,
+			});
+			await dispatch("apply_effect", { key, instance: replacement, definition });
+		}
+	},
+
+	/**
+	 * Resolves an escape attempt: a success ends the effect, a failure changes nothing
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {boolean} success
+	 */
+	async escape_effect({ dispatch }, { key, effectKey, success }) {
+		if (success) await dispatch("remove_effect", { key, effectKey, reason: "escaped" });
+	},
+
+	/**
+	 * Sets one property of an effect instance and saves it; null removes the property
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {string} property
+	 * @param {any} value
+	 */
+	async set_effect_prop({ state, commit, dispatch }, { key, effectKey, property, value }) {
+		// Trait effects aren't stored and keep no charges or counters (effects 6b)
+		if (isTraitKey(effectKey)) return;
+		const instance = state.entities[key]?.effects?.[effectKey];
+		if (!instance) return;
+
+		try {
+			if (!state.demo && !state.test) {
+				await dispatch("persist_effect", { key, effectKey, property, value });
+			}
+		} catch (error) {
+			console.error(`Failed to update ${instance.name} on ${key}`, error);
+			return;
+		}
+		const updated = { ...instance, [property]: value };
+		if (value === null || value === undefined) delete updated[property];
+		commit("SET_EFFECT", { key, effectKey, instance: updated });
+		// A level change can lower the maximum hit points (Exhaustion), or be death (Exhaustion 6)
+		if (property === "level") {
+			await dispatch("sync_effect_hp", key);
+			await dispatch("check_death_outcome", { key, effectKey });
+		}
+	},
+
+	/**
+	 * Resolves the definitions of effect instances that are not resolved yet in this encounter.
+	 * SRD definitions come from the campaign edition's data, fetched from the API first (effects
+	 * 12), custom ones from the user's effects. An unresolved definition is stored with
+	 * unresolved: true and warned about once.
+	 *
+	 * @param {object[]} refs Objects with source and source_key (e.g. active effect instances)
+	 */
+	async resolve_effect_definitions({ state, commit, dispatch, rootGetters }, refs = []) {
+		const pending = {};
+		for (const { source, source_key } of refs) {
+			const id = `${source}:${source_key}`;
+			if (!state.effect_definitions[id]) pending[id] = { source, source_key };
+		}
+		// Custom effects can include SRD ones, so the SRD definitions are needed for any of them
+		if (Object.keys(pending).length) {
+			await dispatch("api_effects/fetch_srd_definitions", { edition: state.edition }, { root: true });
+		}
+
+		const lookup = async ({ source, source_key }) => {
+			if (source === "srd") return findSrdDefinition(state.edition, source_key);
+			if (source === "custom" && rootGetters.user) {
+				try {
+					const definition = await dispatch(
+						"effects/get_effect",
+						{ uid: rootGetters.user.uid, id: source_key },
+						{ root: true }
+					);
+					return definition || undefined;
+				} catch (error) {
+					console.error(`Failed to load custom effect ${source_key}`, error);
+				}
+			}
+			return undefined;
+		};
+
+		await Promise.all(
+			Object.entries(pending).map(async ([id, { source, source_key }]) => {
+				const definition = await resolveDefinition({ source, sourceKey: source_key, lookup });
+				if (definition.unresolved) {
+					// Another call may have resolved the same id in the meantime
+					if (state.effect_definitions[id]) return;
+					console.warn(`Effect definition ${id} could not be resolved`);
+				}
+				commit("SET_EFFECT_DEFINITION", { id, definition });
+			})
+		);
+	},
+
+	/**
+	 * Fires a trigger: finds the active effects that listen for it and queues a prompt
+	 * for the DM per matching effect instance. Then ticks and expires durations for it:
+	 * timed effects, turn edges, cancel triggers and end conditions.
+	 *
+	 * @param {string} trigger Trigger name ($defs/trigger)
+	 * @param {string} entityKey Entity the trigger fired for (undefined for combat_start)
+	 * @param {object} event What is known: sourceKey, amount, damageTypes, attackTypes, naturalRoll, round
+	 * @param {string} effectKey Only this instance of entityKey (on_apply)
+	 * @returns {object[]} The matches (see matchTriggers)
+	 */
+	async fire_trigger(
+		{ state, commit, getters, dispatch },
+		{ trigger, entityKey, event = {}, effectKey: onlyEffectKey }
+	) {
+		// An NPC at 0 hit points is defeated: its "defeated or removed" reminders (effects 9)
+		if (trigger === "on_zero_hp" && state.entities[entityKey]?.entityType === "npc") {
+			await dispatch("fire_reminders", { event: { type: "defeated", entityKey } });
+		}
+		const matches = matchTriggers({
+			trigger,
+			entityKey,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			event,
+			effectKey: onlyEffectKey,
+		});
+
+		// Concentration instances a save-less outcome breaks, ended after the prompts
+		const concentrationBreaks = [];
+		if (matches.length) {
+			const prompts = [];
+			for (const { holderKey, effectKey, instance, definition, matches: subs } of matches) {
+				const holderName = state.entities[holderKey]?.name;
+				const effectName = effectLabel(definition, instance).capitalize();
+
+				// A Concentration save gets its own save prompt, with the DC from the damage.
+				// None when the damage drops the holder to 0 HP: on_zero_hp breaks it outright.
+				const saves = subs.filter(({ sub_effect }) => isConcentrationSave(sub_effect));
+				if (event.dropsToZero) saves.length = 0;
+				for (const { sub_effect } of saves) {
+					const { ability, dc } = concentrationSaveDc(sub_effect, event.amount);
+					prompts.push({
+						kind: "concentration_save",
+						id: `concentration:${holderKey}:${effectKey}:${Date.now()}`,
+						holderKey,
+						effectKey,
+						holderName,
+						effectName,
+						ability,
+						dc,
+						damage: event.amount,
+						dcText: sub_effect.description,
+					});
+				}
+
+				// Concentration broken without a save (dropping to 0 hit points): it just ends
+				const breaks = subs.filter(
+					({ sub_effect, unchecked }) => isConcentrationBreak(sub_effect) && !unchecked?.length
+				);
+				if (breaks.length) {
+					concentrationBreaks.push({
+						holderKey,
+						effectKey,
+						reason: trigger === "on_zero_hp" ? "dropped to 0 hit points" : trigger.replace(/_/g, " "),
+					});
+				}
+
+				const others = subs.filter(
+					({ sub_effect }) =>
+						!isConcentrationSave(sub_effect) &&
+						!breaks.some((b) => b.sub_effect === sub_effect) &&
+						// Rolled with the attack (Hex): not prompted for again
+						!(trigger === "on_hit_taken" && event.fromAttackRoll && hitTakenDamage(sub_effect))
+				);
+				if (!others.length) continue;
+				prompts.push({
+					id: `${trigger}:${holderKey}:${effectKey}:${Date.now()}`,
+					trigger,
+					holderKey,
+					effectKey,
+					holderName,
+					effectName,
+					lines: others.map(({ sub_effect, unchecked }) =>
+						[describeSubEffect(sub_effect), ...unchecked].join(", ")
+					),
+					// For rolling damage and healing
+					sub_effects: others.map(({ sub_effect }) => sub_effect),
+					instance: { ...instance },
+					event: { sourceKey: event.sourceKey, amount: event.amount },
+				});
+			}
+			if (prompts.length) commit("ADD_EFFECT_PROMPTS", prompts);
+		}
+		for (const { holderKey, effectKey, reason } of concentrationBreaks) {
+			await dispatch("remove_effect", { key: holderKey, effectKey, reason });
+		}
+
+		// Durations: ticks, expiries and possible cancels, then end conditions
+		const actions = [
+			...durationActions({
+				trigger,
+				entityKey,
+				entities: state.entities,
+				event,
+				round: state.encounter?.round,
+			}),
+			...endsWhenExpiries({ entities: state.entities, definitionOf: getters.effect_definition }),
+		];
+		// An instance that ended gets no further actions (e.g. no save after it expired)
+		const ended = new Set();
+		for (const action of actions) {
+			const id = `${action.holderKey}:${action.effectKey}`;
+			if (ended.has(id)) continue;
+			if (action.kind === "expire") ended.add(id);
+
+			if (action.kind === "save_auto") {
+				await dispatch("resolve_repeat_save", {
+					key: action.holderKey,
+					effectKey: action.effectKey,
+					success: true,
+					auto: true,
+				});
+			} else if (action.kind === "save") {
+				const instance = state.entities[action.holderKey]?.effects?.[action.effectKey];
+				if (!instance) continue;
+				const save = instance.duration?.save || {};
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "save",
+						id: `save:${id}:${Date.now()}`,
+						holderKey: action.holderKey,
+						effectKey: action.effectKey,
+						holderName: state.entities[action.holderKey]?.name,
+						effectName: (instance.name || "").capitalize(),
+						ability: save.ability,
+						dc: instance.save_dc,
+						advantage: action.advantage,
+						costsAction: !!save.costs_action,
+						trigger,
+					},
+				]);
+			} else if (action.kind === "tick") {
+				await dispatch("set_effect_prop", {
+					key: action.holderKey,
+					effectKey: action.effectKey,
+					property: "rounds_remaining",
+					value: action.value,
+				});
+			} else if (action.kind === "expire") {
+				await dispatch("remove_effect", {
+					key: action.holderKey,
+					effectKey: action.effectKey,
+					reason: action.reason,
+				});
+			} else if (action.kind === "maybe") {
+				const instance = state.entities[action.holderKey]?.effects?.[action.effectKey];
+				if (!instance) continue;
+				commit("ADD_EFFECT_PROMPTS", [
+					{
+						kind: "maybe",
+						id: `maybe:${id}:${Date.now()}`,
+						holderKey: action.holderKey,
+						effectKey: action.effectKey,
+						holderName: state.entities[action.holderKey]?.name,
+						effectName: (instance.name || "").capitalize(),
+						reason: action.reason,
+						lines: action.unchecked,
+					},
+				]);
+			}
+		}
+		return matches;
+	},
+
+	/**
+	 * After manual damage, which doesn't say whether it was a hit: prompts for the target's
+	 * damage when this attacker hits it (Hex, Hunter's Mark), as an on_hit_taken prompt with
+	 * Roll. Fires no trigger and changes no duration ("ends when hit" effects stay).
+	 *
+	 * @param {string} attackerKey The creature that dealt the damage
+	 * @param {string} targetKey The creature that took it
+	 * @returns {object[]} The prompts queued
+	 */
+	prompt_hit_taken_damage({ state, commit, getters }, { attackerKey, targetKey }) {
+		if (!attackerKey || !targetKey || attackerKey === targetKey) return [];
+		const trigger = "on_hit_taken";
+		const matches = matchTriggers({
+			trigger,
+			entityKey: targetKey,
+			entities: state.entities,
+			definitionOf: getters.effect_definition,
+			event: { sourceKey: attackerKey },
+		});
+		const prompts = [];
+		for (const { holderKey, effectKey, instance, definition, matches: subs } of matches) {
+			const damage = subs.filter(({ sub_effect }) => hitTakenDamage(sub_effect));
+			if (!damage.length) continue;
+			prompts.push({
+				id: `${trigger}:manual:${holderKey}:${effectKey}:${Date.now()}`,
+				trigger,
+				holderKey,
+				effectKey,
+				holderName: state.entities[holderKey]?.name,
+				effectName: effectLabel(definition, instance).capitalize(),
+				lines: damage.map(({ sub_effect, unchecked }) =>
+					[describeSubEffect(sub_effect), "if it was a hit with an attack roll", ...unchecked].join(", ")
+				),
+				sub_effects: damage.map(({ sub_effect }) => sub_effect),
+				instance: { ...instance },
+				event: { sourceKey: attackerKey },
+			});
+		}
+		if (prompts.length) commit("ADD_EFFECT_PROMPTS", prompts);
+		return prompts;
+	},
+
+	/**
+	 * Fires the triggers for a turn change when combat moves forward:
+	 * end of the outgoing turn, then start of the incoming turn.
+	 * Starting the encounter fires combat_start and the first entity's start of turn.
+	 * The encounter's reminders (effects 9) fire in between: the round's start, then those at
+	 * this turn of the round (turn is 1-based, turns the number of turns in the round).
+	 */
+	async fire_turn_triggers(
+		{ dispatch },
+		{ outgoingKey, incomingKey, combatStart, round, oldRound, turn, turns }
+	) {
+		// event.round is the round of the turn the trigger belongs to
+		if (combatStart) {
+			await dispatch("fire_trigger", { trigger: "combat_start", event: { round } });
+			await dispatch("fire_reminders", { event: { type: "combat_start", round } });
+		} else if (outgoingKey) {
+			const event = { round: oldRound };
+			await dispatch("fire_trigger", { trigger: "end_turn_caster", entityKey: outgoingKey, event });
+			await dispatch("fire_trigger", { trigger: "end_turn_target", entityKey: outgoingKey, event });
+			await dispatch("fire_reminders", { event: { type: "turn_end", round: oldRound, entityKey: outgoingKey } });
+		}
+		// A new round's reminders, before the first turn of that round starts
+		if (combatStart || round > oldRound) {
+			await dispatch("fire_reminders", { event: { type: "round_start", round } });
+		}
+		// The encounter's reminders at this turn of the round (burning ground at turn 4)
+		if (incomingKey && turn) {
+			await dispatch("fire_reminders", { event: { type: "encounter_turn", round, turn, turns } });
+		}
+		if (incomingKey) {
+			const event = { round };
+			await dispatch("fire_trigger", { trigger: "start_turn_caster", entityKey: incomingKey, event });
+			await dispatch("fire_trigger", { trigger: "start_turn_target", entityKey: incomingKey, event });
+			await dispatch("fire_reminders", { event: { type: "turn_start", round, entityKey: incomingKey } });
+		}
+	},
+
+	/**
+	 * Fires the encounter's reminders for an event (effects 9): queues a reminder prompt for
+	 * each and marks once reminders as fired. "Defeated" only counts during combat.
+	 *
+	 * @param {object} event { type, round, entityKey }, see reminderFunctions.remindersToFire
+	 * @returns {object[]} The queued prompts
+	 */
+	async fire_reminders({ state, commit, dispatch }, { event }) {
+		const round = event.round ?? state.encounter?.round ?? 0;
+		// round is always a number here (?? 0), so <= 0 also covers "no round yet"
+		if (event.type === "defeated" && round <= 0) return [];
+		const prompts = [];
+		for (const id of remindersToFire(state.reminders, { ...event, round })) {
+			const reminder = state.reminders[id];
+			const holderName = reminder.entity_key ? state.entities[reminder.entity_key]?.name : undefined;
+			prompts.push({
+				kind: "reminder",
+				id: `reminder:${id}:${Date.now()}`,
+				reminderId: id,
+				reminder: JSON.parse(JSON.stringify(reminder)),
+				holderKey: reminder.entity_key,
+				holderName,
+				round,
+				title: promptTitle(reminder, holderName?.capitalizeEach(), round),
+			});
+			if (!reminder.repeat) {
+				await dispatch("set_encounter_reminder", { id, reminder: { ...reminder, fired: true } });
+			}
+		}
+		if (prompts.length) commit("ADD_EFFECT_PROMPTS", prompts);
+		return prompts;
+	},
+
+	/**
+	 * Writes an effect instance, or one property of it, to the database.
+	 * NPC effects live on the encounter, player and companion effects on the campaign.
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the effect instance
+	 * @param {object|null|any} value Instance (null removes it), or the property value
+	 * @param {string} property When set, only this property of the instance is written
+	 */
+	async persist_effect({ state, dispatch }, { key, effectKey, value, property }) {
+		const entityType = state.entities[key].entityType;
+
+		if (entityType === "npc") {
+			const payload = {
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId: key,
+				effectKey,
+				value,
+			};
+			await dispatch(
+				property ? "encounters/set_entity_effect_prop" : "encounters/set_entity_effect",
+				property ? { ...payload, property } : payload,
 				{ root: true }
 			);
-		}
-		if (action === "add") {
-			commit("SET_CONDITION", { key, condition, value });
 		} else {
-			commit("DELETE_CONDITION", { key, condition });
+			const payload = {
+				campaignId: state.campaignId,
+				type: `${entityType}s`,
+				id: key,
+				effectKey,
+				value,
+			};
+			await dispatch(
+				property
+					? "campaigns/set_campaign_entity_effect_prop"
+					: "campaigns/set_campaign_entity_effect",
+				property ? { ...payload, property } : payload,
+				{ root: true }
+			);
 		}
 	},
 
@@ -1762,6 +3429,12 @@ const run_encounter_actions = {
 	},
 
 	async remove_entity({ commit, state, dispatch }, key) {
+		// Its "defeated or removed" reminders fire, then its reminders go: they can't fire any more
+		await dispatch("fire_reminders", { event: { type: "defeated", entityKey: key } });
+		for (const [id, reminder] of Object.entries(state.reminders)) {
+			if (reminder.entity_key === key) await dispatch("remove_encounter_reminder", { id });
+		}
+
 		// First untarget if targeted
 		const targeted = state.targeted.filter((target) => {
 			return target !== key;
@@ -1809,19 +3482,24 @@ const run_encounter_actions = {
 			}
 			commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
 		} else if (action === "unset") {
-			await dispatch(
-				"campaigns/update_campaign_entity",
-				{
-					uid: rootGetters.user.uid,
-					campaignId: state.campaignId,
-					type,
-					id: key,
-					property: "dead",
-					value: null,
-				},
-				{ root: true }
-			);
+			if (!state.demo && !state.test) {
+				await dispatch(
+					"campaigns/update_campaign_entity",
+					{
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type,
+						id: key,
+						property: "dead",
+						value: null,
+					},
+					{ root: true }
+				);
+			}
+			commit("DELETE_ENTITY_PROPERTY", { key, prop: "dead" });
 		} else {
+			// Its "defeated or removed" reminders (effects 9)
+			await dispatch("fire_reminders", { event: { type: "defeated", entityKey: key } });
 			//SET DEAD
 			if (!state.demo && !state.test) {
 				await dispatch(
@@ -1855,106 +3533,58 @@ const run_encounter_actions = {
 	},
 
 	/**
-	 * Updates reminders on an entity
+	 * Writes one of the encounter's reminders to the database (effects 9); demo and test runs
+	 * keep it in memory only
 	 *
-	 * @param {string} action add, remove, update, update-timer
-	 * @param {string} entity Entity key
-	 * @param {string} key Reminder key
-	 * @param {object} reminder full reminder object, or integer with rounds
-	 **/
-	async set_targetReminder({ state, commit, dispatch }, { action, entity, key, reminder, type }) {
-		// Add a new reminder
-		if (action === "add") {
-			if (type === "premade") {
-				if (!state.demo && !state.test) {
-					await dispatch(
-						"encounters/set_reminder",
-						{
-							campaignId: state.campaignId,
-							encounterId: state.encounterId,
-							entity,
-							key,
-							reminder,
-						},
-						{ root: true }
-					);
-				}
-				commit("SET_REMINDER", { entityKey: entity, key, reminder });
-			}
-			if (type === "custom") {
-				if (!state.demo && !state.test) {
-					key = await dispatch(
-						"encounters/add_reminder",
-						{
-							campaignId: state.campaignId,
-							encounterId: state.encounterId,
-							key: entity,
-							reminder,
-						},
-						{ root: true }
-					);
-					commit("SET_REMINDER", { entityKey: entity, key, reminder });
-				} else {
-					let reminderKey = Date.now() + Math.random().toString(36).substring(4);
-					commit("SET_REMINDER", { entityKey: entity, key: reminderKey, reminder });
-				}
-			}
-		}
+	 * @param {string} id
+	 * @param {object|null} reminder null removes it
+	 */
+	async persist_reminder({ state, dispatch }, { id, reminder }) {
+		if (state.demo || state.test) return;
+		await dispatch(
+			"encounters/save_encounter_reminder",
+			{ campaignId: state.campaignId, encounterId: state.encounterId, id, reminder },
+			{ root: true }
+		);
+	},
 
-		// Remove a reminder
-		else if (action === "remove") {
-			if (!state.demo && !state.test) {
-				await dispatch(
-					"encounters/set_reminder",
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						reminder: null,
-					},
-					{ root: true }
-				);
-			}
-			commit("DELETE_REMINDER", { entityKey: entity, key });
-		}
+	/**
+	 * Adds or changes one of the encounter's reminders (effects 9)
+	 *
+	 * @param {string} id Leave out for a new reminder
+	 * @param {object} reminder See reminderFunctions.js; cleaned before it's stored
+	 * @returns {string} The reminder's id
+	 */
+	async set_encounter_reminder({ state, commit, dispatch }, { id, reminder }) {
+		const reminderId = id || Date.now() + Math.random().toString(36).substring(4);
+		const clean = cleanReminder(reminder);
+		await dispatch("persist_reminder", { id: reminderId, reminder: clean });
+		commit("SET_RUN_REMINDER", { id: reminderId, reminder: clean });
+		return reminderId;
+	},
 
-		// Update an existing reminder
-		else if (action === "update") {
-			if (!state.demo && !state.test) {
-				await dispatch(
-					"encounters/set_reminder",
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						reminder,
-					},
-					{ root: true }
-				);
-			}
-			commit("SET_REMINDER", { entityKey: entity, key, reminder });
-		}
+	/**
+	 * Removes one of the encounter's reminders (effects 9)
+	 *
+	 * @param {string} id
+	 */
+	async remove_encounter_reminder({ state, commit, dispatch }, { id }) {
+		if (!state.reminders[id]) return;
+		await dispatch("persist_reminder", { id, reminder: null });
+		commit("DELETE_RUN_REMINDER", id);
+	},
 
-		// Update only the rounds property
-		else if (action === "update-timer") {
-			if (!state.demo && !state.test) {
-				await dispatch(
-					"encounters/update_reminder",
-					{
-						campaignId: state.campaignId,
-						encounterId: state.encounterId,
-						entity,
-						key,
-						property: "rounds",
-						value: reminder,
-					},
-					{ root: true }
-				);
-			}
-			commit("UPDATE_REMINDER_ROUNDS", { entityKey: entity, key, rounds: reminder });
-		}
+	/**
+	 * Re-arms a once reminder that fired, so it fires again (effects 9)
+	 *
+	 * @param {string} id
+	 */
+	async rearm_encounter_reminder({ state, dispatch }, { id }) {
+		const reminder = state.reminders[id];
+		if (!reminder?.fired) return;
+		const rearmed = { ...reminder };
+		delete rearmed.fired;
+		await dispatch("set_encounter_reminder", { id, reminder: rearmed });
 	},
 
 	/**
@@ -2137,26 +3767,44 @@ const run_encounter_mutations = {
 	DELETE_SAVE(state, { key, index }) {
 		Vue.delete(state.entities[key].saves, index);
 	},
-	SET_CONDITION(state, { key, condition, value }) {
-		Vue.set(state.entities[key].conditions, condition, value);
+	SET_EFFECT(state, { key, effectKey, instance }) {
+		Vue.set(state.entities[key].effects, effectKey, instance);
 	},
-	DELETE_CONDITION(state, { key, condition }) {
-		Vue.delete(state.entities[key].conditions, condition);
+	DELETE_EFFECT(state, { key, effectKey }) {
+		Vue.delete(state.entities[key].effects, effectKey);
 	},
-	SET_REMINDER(state, { entityKey, key, reminder }) {
-		Vue.set(state.entities[entityKey].reminders, key, reminder);
+	SET_RUN_REMINDERS(state, reminders) {
+		Vue.set(state, "reminders", reminders || {});
 	},
-	UPDATE_REMINDER_ROUNDS(state, { entityKey, key, rounds }) {
-		Vue.set(state.entities[entityKey].reminders[key], "rounds", rounds);
+	SET_RUN_REMINDER(state, { id, reminder }) {
+		Vue.set(state.reminders, id, reminder);
 	},
-	DELETE_REMINDER(state, { entityKey, key }) {
-		Vue.delete(state.entities[entityKey].reminders, key);
+	DELETE_RUN_REMINDER(state, id) {
+		Vue.delete(state.reminders, id);
 	},
 	REMOVE_ENTITY(state, key) {
 		Vue.delete(state.entities, key);
 	},
 	CLEAR_ENTITIES(state) {
 		Vue.set(state, "entities", {});
+	},
+	SET_EFFECT_DEFINITION(state, { id, definition }) {
+		Vue.set(state.effect_definitions, id, definition);
+	},
+	CLEAR_EFFECT_DEFINITIONS(state) {
+		Vue.set(state, "effect_definitions", {});
+	},
+	SET_TURN_ENTITY(state, key) {
+		Vue.set(state, "turn_entity", key);
+	},
+	ADD_EFFECT_PROMPTS(state, prompts) {
+		state.effect_prompts.push(...prompts);
+	},
+	SET_EFFECT_REVIEW(state, review) {
+		Vue.set(state, "effect_review", review);
+	},
+	CLEAR_EFFECT_PROMPTS(state) {
+		Vue.set(state, "effect_prompts", []);
 	},
 	SET_LIMITED_USES(state, { key, category, index, value }) {
 		if (!state.entities[key].limited_uses[category])

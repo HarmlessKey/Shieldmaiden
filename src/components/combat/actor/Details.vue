@@ -17,7 +17,10 @@
 		<div class="target-details__name">
 			<Name :entity="actor" />
 		</div>
-		<div class="target-details__filler" />
+		<div class="target-details__filler">
+			<!-- Reaction Used and what its effects do to its attacks -->
+			<AttackReminders v-if="actor" :actor="actor" class="target-details__reminders" />
+		</div>
 		<slot />
 	</div>
 </template>
@@ -28,11 +31,13 @@ import { abilities } from "src/utils/generalConstants";
 import { displayStats } from "src/utils/entityFunctions";
 import { general } from "src/mixins/general";
 import Name from "../entities/Name.vue";
+import AttackReminders from "./AttackReminders.vue";
 
 export default {
 	name: "TargetDetails",
 	components: {
 		Name,
+		AttackReminders,
 	},
 	mixins: [general],
 	props: {
@@ -119,6 +124,13 @@ export default {
 	}
 	&__filler {
 		flex-grow: 1;
+		display: flex;
+		align-items: center;
+		min-width: 0;
+	}
+	&__reminders {
+		// lg and xl; removed below lg
+		margin-left: 55px;
 	}
 }
 
@@ -126,6 +138,9 @@ export default {
 	.target-details {
 		&__show-card {
 			display: inline-block;
+		}
+		&__reminders {
+			margin-left: 0;
 		}
 	}
 }

@@ -78,19 +78,10 @@
 
 			<!-- Initiative, AC bonus and TempHp -->
 			<hr />
-			<div class="d-flex justify-content-between">
-				<q-input
-					:dark="$store.getters.theme === 'dark'"
-					filled
-					square
-					label="AC Bonus"
-					autocomplete="off"
-					type="number"
-					name="ac_bonus"
-					v-model="entity.ac_bonus"
-					placeholder="AC Bonus"
-					@change="editValue('ac_bonus', entity.ac_bonus)"
-				></q-input>
+			<div class="d-flex justify-content-between items-center">
+				<button class="btn btn-sm bg-neutral-5" @click="openBonuses('ac')">
+					<i aria-hidden="true" class="fas fa-shield-check mr-1" /> AC bonuses
+				</button>
 
 				<q-input
 					:dark="$store.getters.theme === 'dark'"
@@ -106,7 +97,9 @@
 					@change="editValue('tempHp', entity.tempHp)"
 				></q-input>
 
+				<!-- The transformed pool keeps its own single modifier -->
 				<q-input
+					v-if="entity.transformed"
 					:dark="$store.getters.theme === 'dark'"
 					filled
 					square
@@ -120,10 +113,13 @@
 					@change="editValue('maxHpMod', entity.maxHpMod)"
 				>
 					<template v-slot:label>
-						<i aria-hidden="true" v-if="entity.transformed" class="fas fa-paw-claws green" />
+						<i aria-hidden="true" class="fas fa-paw-claws green" />
 						Max HP Mod
 					</template>
 				</q-input>
+				<button v-else class="btn btn-sm bg-neutral-5" @click="openBonuses('max_hp')">
+					<i aria-hidden="true" class="fas fa-plus mr-1" /> Max HP bonuses
+				</button>
 			</div>
 
 			<!-- Override values: AC, maxHp, curHp -->
@@ -263,7 +259,7 @@
 				:dark="$store.getters.theme === 'dark'"
 				filled
 				square
-				label="AC Bonus"
+				label="Manual AC bonus"
 				autocomplete="off"
 				type="number"
 				name="ac_bonus"
@@ -290,7 +286,7 @@
 				:dark="$store.getters.theme === 'dark'"
 				filled
 				square
-				label="Max HP Modifier"
+				label="Manual max HP bonus"
 				autocomplete="off"
 				type="number"
 				name="maxHpMod"
@@ -302,7 +298,8 @@
 
 			<p class="mt-4">
 				These values will be set for all targeted entities. If one of the entities all ready has
-				this value set, it will be <span class="red">overwritten</span> with the new value.
+				this value set, it will be <span class="red">overwritten</span> with the new value. The
+				manual bonuses set the bonus labelled "Manual"; other bonuses are kept, and 0 removes it.
 			</p>
 		</template>
 
@@ -446,7 +443,15 @@ export default {
 			"transform_entity",
 			"set_entity_setting",
 			"clear_entity_settings",
+			"setDrawer",
 		]),
+		openBonuses(stat) {
+			this.setDrawer({
+				show: true,
+				type: "drawers/encounter/StatBonuses",
+				data: { entityKey: this.edit_targets[0], stat },
+			});
+		},
 		editValue(prop, value) {
 			for (const key of this.edit_targets) {
 				const entity = this.entities[key];

@@ -54,17 +54,11 @@
 						<hk-animated-integer :value="health.curHp" />
 					</span>
 					<span class="neutral-2">/</span
-					><span
-						:class="{
-							green:
-								(entity.entityType === 'player' || entity.entityType === 'companion') &&
-								camp_data.maxHpMod > 0,
-							red:
-								(entity.entityType === 'player' || entity.entityType === 'companion') &&
-								camp_data.maxHpMod < 0,
-						}"
-						>{{ health.maxHp }}
-					</span>
+					><EffectModifiedValue
+						:value="health.maxHp"
+						:changed="maxHpValue.changed"
+						:notes="maxHpValue.notes"
+					/>
 					<template v-if="health.tempHp"> +{{ health.tempHp }} </template>
 				</span>
 			</div>
@@ -109,10 +103,15 @@
 <script>
 import { general } from "src/mixins/general.js";
 import { trackEncounter } from "src/mixins/trackEncounter.js";
+import { manualBonusTotal } from "src/utils/entityFunctions";
+import EffectModifiedValue from "src/components/combat/entities/EffectModifiedValue.vue";
 
 export default {
 	name: "Health",
 	mixins: [general, trackEncounter],
+	components: {
+		EffectModifiedValue,
+	},
 	props: [
 		"entity",
 		"campPlayers",
@@ -120,6 +119,8 @@ export default {
 		"npcs",
 		"players",
 		"displaySettings",
+		// The effective entity (effects and manual bonuses), for the maximum hit points
+		"effective",
 	],
 	data() {
 		return {
@@ -139,6 +140,11 @@ export default {
 
 			return undefined;
 		},
+		// The maximum's marking and tooltip; transformed maximums aren't changed by effects
+		maxHpValue() {
+			if (!this.effective || this.effective.transformed) return { changed: false, notes: [] };
+			return this.effectiveValue(this.effective, "maxHp", "Hit point maximum", this.effectsShown(this.entity));
+		},
 		health: function () {
 			let ret = {};
 			const key = this.entity.key;
@@ -146,10 +152,9 @@ export default {
 			let maxHp, curHp, tempHp;
 
 			if (this.isTransformed(this.entity, this.camp_data)) {
-				maxHp =
-					this.camp_data !== undefined
-						? this.camp_data.transformed.maxHp
-						: this.entity.transformed.maxHp;
+				// As the tracker: the transformed maximum with its own modifier
+				const transformed = this.camp_data !== undefined ? this.camp_data.transformed : this.entity.transformed;
+				maxHp = this.effective ? this.effective.transformedMaxHp : transformed.maxHp;
 				curHp =
 					this.camp_data !== undefined
 						? this.camp_data.transformed.curHp
@@ -163,19 +168,15 @@ export default {
 				curHp = this.camp_data !== undefined ? this.camp_data.curHp : this.entity.curHp;
 				tempHp = this.camp_data !== undefined ? this.camp_data.tempHp : this.entity.tempHp;
 
-				// Npc max hp in entity
-				if (this.entity.entityType === "npc")
-					maxHp = this.entity.maxHpMod
-						? parseInt(this.entity.maxHp) + this.entity.maxHpMod
-						: this.entity.maxHp;
+				// Max hp with effects and manual bonuses (the effective entity), or else
+				// with the manual max HP bonuses only (bonuses, or the old maxHpMod)
+				if (this.effective) maxHp = this.effective.maxHp;
+				else if (this.entity.entityType === "npc")
+					maxHp = parseInt(this.entity.maxHp) + manualBonusTotal(this.entity, "max_hp");
 				else if (this.entity.entityType === "player")
-					maxHp = this.camp_data.maxHpMod
-						? parseInt(this.players[key].maxHp) + this.camp_data.maxHpMod
-						: this.players[key].maxHp;
+					maxHp = parseInt(this.players[key].maxHp) + manualBonusTotal(this.camp_data, "max_hp");
 				else if (this.entity.entityType === "companion")
-					maxHp = this.camp_data.maxHpMod
-						? parseInt(this.npcs[key].hit_points) + this.camp_data.maxHpMod
-						: this.npcs[key].hit_points;
+					maxHp = parseInt(this.npcs[key].hit_points) + manualBonusTotal(this.camp_data, "max_hp");
 			}
 
 			ret = {

@@ -7,45 +7,8 @@
 		}"
 		@focus="$emit('focus')"
 	>
-		<div v-if="targeted.length" slot="header-action" class="d-flex justify-content-between gap-1">
-			<button
-				v-for="({ key, method, icon, tooltip, step }, i) in display_options"
-				ref="options"
-				class="btn btn-sm bg-neutral-5"
-				:key="`option-${i}`"
-				v-shortkey="key"
-				:class="{
-					'step-highlight': step && demo && follow_tutorial && get_step('run', step),
-				}"
-				@click="method"
-				@shortkey="method"
-				@keydown.left="cycleOptions(i, 'left')"
-				@keydown.right="cycleOptions(i, 'right')"
-			>
-				<i aria-hidden="true" class="fas" :class="icon" />
-				<q-tooltip anchor="top middle" self="center middle">
-					{{ tooltip }}
-					<hk-show-keybind :binds="key" show />
-				</q-tooltip>
-
-				<TutorialPopover
-					v-if="demo && step"
-					tutorial="run"
-					:step="step"
-					position="bottom"
-					:offset="[0, 10]"
-				/>
-			</button>
-			<button
-				class="btn btn-sm bg-neutral-5"
-				@click="set_targeted({ type: 'untarget', key: 'all' })"
-			>
-				<i aria-hidden="true" class="fas fa-times red"></i>
-				<q-tooltip anchor="top middle" self="center middle">
-					Untarget {{ targeted.length > 1 ? "all" : "" }}
-				</q-tooltip>
-			</button>
-		</div>
+		<!-- The targeted entities' actions, shared with the set initiative screen (effects 8) -->
+		<TargetActions slot="header-action" :out-of-turn="outOfTurnActions" />
 
 		<div>
 			<!-- SINGLE TARGET -->
@@ -91,10 +54,13 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: modifier(entities[key][ability] || 10),
+									m: roll_plans[key][ability].mod.m,
+									advantage: roll_plans[key][ability].mod.advantage,
+									plan: roll_plans[key][ability].mod,
 									title: `${ability.capitalize()} check`,
 									entity_name: entities[key].name.capitalizeEach(),
 									notify: true,
+									trigger: { name: 'on_check', entity_key: key },
 								}"
 								:share="
 									shares.includes('ability_rolls')
@@ -106,11 +72,12 @@
 								"
 							>
 								<div class="mod bg-neutral-8">
-									{{
-										modifier(entities[key][ability] || 10) > 0
-											? `+${modifier(entities[key][ability] || 10)}`
-											: modifier(entities[key][ability] || 10)
-									}}
+									<EffectModifiedValue
+										:notes="roll_plans[key][ability].mod.notes"
+										:changed="roll_plans[key][ability].mod.changed"
+										:advantage="roll_plans[key][ability].mod.advantage"
+										:value="signed(roll_plans[key][ability].mod.m)"
+									/>
 								</div>
 							</hk-roll>
 							<hk-roll
@@ -118,7 +85,9 @@
 								:roll="{
 									d: 20,
 									n: 1,
-									m: savingThrow(entities[key], ability),
+									m: roll_plans[key][ability].save.m,
+									advantage: roll_plans[key][ability].save.advantage,
+									plan: roll_plans[key][ability].save,
 									title: `${ability.capitalize()} save`,
 									entity_name: entities[key].name.capitalizeEach(),
 									notify: true,
@@ -133,7 +102,12 @@
 								"
 							>
 								<div class="mod bg-neutral-8">
-									{{ savingThrow(entities[key], ability) }}
+									<EffectModifiedValue
+										:notes="roll_plans[key][ability].save.notes"
+										:changed="roll_plans[key][ability].save.changed"
+										:advantage="roll_plans[key][ability].save.advantage"
+										:value="signed(roll_plans[key][ability].save.m)"
+									/>
 								</div>
 							</hk-roll>
 						</div>
@@ -193,6 +167,9 @@ import { calc_mod } from "src/utils/generalFunctions";
 import Multipliers from "./entities/multipliers/Multipliers.vue";
 import Defenses from "./entities/multipliers/Defenses.vue";
 import { calculateManualDamage } from "src/utils/combatFunctions";
+import { rollPlan } from "src/utils/effectFunctions";
+import EffectModifiedValue from "./entities/EffectModifiedValue.vue";
+import TargetActions from "./TargetActions.vue";
 
 export default {
 	name: "Targeted",
@@ -204,6 +181,8 @@ export default {
 		TutorialPopover,
 		Multipliers,
 		Defenses,
+		EffectModifiedValue,
+		TargetActions,
 	},
 	props: {
 		outOfTurnActions: {
@@ -230,62 +209,29 @@ export default {
 			"target_multipliers",
 		]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
-		options() {
-			const options = [
-				{
-					option: "conditions",
-					method: () => this.setConditions(),
-					key: ["c"],
-					icon: "fa-flame",
-					tooltip: "Conditions",
-					step: "conditions",
-				},
-				{
-					option: "reminders",
-					method: () => this.setReminders(),
-					key: ["m"],
-					icon: "fa-stopwatch",
-					tooltip: "Reminders",
-					step: "reminders",
-				},
-				{
-					option: "transform",
-					method: () => this.transform(),
-					key: ["t"],
-					icon: "fa-paw-claws",
-					tooltip: "Transform",
-					step: "transform",
-				},
-				{
-					option: "hide",
-					method: () => this.setHidden(),
-					key: ["h"],
-					icon: "fa-eye",
-					tooltip: "Hide / Show",
-				},
-				{
-					option: "edit",
-					method: () => this.edit(),
-					key: ["e"],
-					icon: "fa-pencil",
-					tooltip: "Edit",
-					step: "edit",
-				},
-			];
-			if (this.outOfTurnActions) {
-				options.unshift({
-					option: "damage",
-					method: () => this.opportunityAttack(),
-					key: ["shift", "d"],
-					icon: "fa-swords",
-					tooltip: "Out of turn damage/healing",
-					step: "opportunity",
-				});
-			}
-			return options;
-		},
 		shares() {
 			return this.broadcast.shares || [];
+		},
+		/**
+		 * Roll plans (effects and manual bonuses) of the targeted entities' checks and saves:
+		 * { [key]: { [ability]: { mod, save } } }
+		 */
+		roll_plans() {
+			const plans = {};
+			for (const key of this.targeted) {
+				if (!this.entities[key]) continue;
+				const entity = this.effective(key);
+				plans[key] = {};
+				for (const ability of this.abilities) {
+					const plan = (roll, modifier) =>
+						rollPlan(this.$store.getters.roll_modifiers(key, roll), { modifier: parseInt(modifier) || 0 });
+					plans[key][ability] = {
+						mod: plan({ kind: "check", ability }, this.modifier(entity[ability] || 10)),
+						save: plan({ kind: "save", ability }, this.savingThrow(entity, ability)),
+					};
+				}
+			}
+			return plans;
 		},
 		target() {
 			return this.targeted.length === 1 ? this.entities[this.targeted[0]] : undefined;
@@ -299,45 +245,10 @@ export default {
 			}
 			return fails;
 		},
-		display_options() {
-			return this.targeted.length > 1
-				? this.options.filter((opt) => {
-						return !["transform"].includes(opt.option);
-					})
-				: this.options;
-		},
 	},
 	methods: {
-		...mapActions([
-			"set_targeted",
-			"setDrawer",
-			"set_save",
-			"set_stable",
-			"set_targetReminder",
-			"set_hidden",
-		]),
-		...mapActions("tutorial", ["completeStep"]),
+		...mapActions(["set_targeted", "set_save", "set_stable"]),
 		modifier: calc_mod,
-		focusOptions() {
-			this.$refs.options[0].focus();
-		},
-		cycleOptions(i, dir) {
-			let select;
-			if (dir === "right") {
-				select = i < this.options.length - 1 ? i + 1 : 0;
-			} else {
-				select = i > 0 ? i - 1 : this.options.length - 1;
-			}
-			this.$refs.options[select].focus();
-		},
-		setHidden() {
-			for (const key of this.targeted) {
-				this.set_hidden({
-					key,
-					hidden: !this.entities[key].hidden,
-				});
-			}
-		},
 		shadow() {
 			this.setShadow = this.$refs.scroll.scrollPosition;
 		},
@@ -354,22 +265,14 @@ export default {
 				action: "set",
 			});
 		},
-		displayStats(target) {
-			var stats = "";
-			if (target.transformed) {
-				stats = {
-					ac: target.transformedAc,
-					maxHp: target.transformedMaxHp,
-					curHp: target.transformedCurHp,
-				};
-			} else {
-				stats = {
-					ac: target.ac,
-					maxHp: target.maxHp,
-					curHp: target.curHp,
-				};
-			}
-			return stats;
+		/**
+		 * Entity with the values its active effects give it (ability scores for mods and saves)
+		 */
+		effective(key) {
+			return this.$store.getters.effective_entity(key) || this.entities[key];
+		},
+		signed(value) {
+			return value > 0 ? `+${value}` : value;
 		},
 		savingThrow(entity, ability) {
 			let proficiency;
@@ -387,35 +290,11 @@ export default {
 			return save > 0 ? `+${save}` : save;
 		},
 		calculateAmount(key) {
-			const target = this.entities[key];
+			// With its effects' defenses (Petrified, Stoneskin), as the defense buttons show them
+			const target = this.$store.getters.effective_entity?.(key) || this.entities[key];
 			const multiplier = this.target_multipliers.multipliers?.[key];
 			const defense = this.target_multipliers.defenses?.[key];
 			return calculateManualDamage(this.manual, target, multiplier, defense);
-		},
-		completeTutorialStep(step) {
-			if (this.get_step("run", step)) {
-				this.completeStep({ tutorial: "run" });
-			}
-		},
-		opportunityAttack() {
-			this.setDrawer({ show: true, type: "drawers/encounter/DamageHealing" });
-			this.completeTutorialStep("opportunity");
-		},
-		setConditions() {
-			this.setDrawer({ show: true, type: "drawers/encounter/Conditions" });
-			this.completeTutorialStep("conditions");
-		},
-		setReminders() {
-			this.setDrawer({ show: true, type: "drawers/encounter/reminders/TargetReminders" });
-			this.completeTutorialStep("reminders");
-		},
-		transform() {
-			this.setDrawer({ show: true, type: "drawers/Transform", data: this.target });
-			this.completeTutorialStep("transform");
-		},
-		edit() {
-			this.setDrawer({ show: true, type: "drawers/encounter/EditEntity" });
-			this.completeTutorialStep("edit");
 		},
 	},
 };

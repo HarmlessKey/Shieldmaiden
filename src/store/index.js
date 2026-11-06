@@ -9,11 +9,13 @@ import api_spells from "./modules/content/spells.js";
 import api_monsters from "./modules/content/monsters.js";
 import api_items from "./modules/content/items.js";
 import api_conditions from "./modules/content/conditions.js";
+import api_effects from "./modules/content/effects.js";
 import campaigns from "./modules/userContent/campaigns.js";
 import npcs from "./modules/userContent/npcs.js";
 import npcGroups from "./modules/userContent/npcGroups.js";
 import items from "./modules/userContent/items.js";
 import spells from "./modules/userContent/spells.js";
+import effects from "./modules/userContent/effects.js";
 import reminders from "./modules/userContent/reminders.js";
 import players from "./modules/userContent/players.js";
 import encounters from "./modules/userContent/encounters.js";
@@ -45,10 +47,12 @@ export default function () {
 			api_monsters: api_monsters,
 			api_items: api_items,
 			api_conditions: api_conditions,
+			api_effects: api_effects,
 			npcs: npcs,
 			npcGroups: npcGroups,
 			items: items,
 			spells: spells,
+			effects: effects,
 			reminders: reminders,
 			players: players,
 			encounters: encounters,

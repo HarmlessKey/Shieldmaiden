@@ -20,8 +20,9 @@
 		</div>
 		<div>
 			<slot name="actions-left" />
+			<template v-if="noAdd" />
 			<template
-				v-if="
+				v-else-if="
 					tier.benefits[type] === 'infinite' ||
 					(!overencumbered && content_count[type] < tier.benefits[type])
 				"
@@ -69,6 +70,11 @@ export default {
 		type: {
 			type: String,
 			required: true,
+		},
+		// No new content of this type (deprecated reminders): no add button or slot upsell
+		noAdd: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	computed: {

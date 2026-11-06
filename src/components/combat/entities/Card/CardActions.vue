@@ -26,14 +26,7 @@
 				>
 					<div class="card-action-title">
 						<template
-							v-if="
-								rollable &&
-								action.action_list &&
-								action.action_list[0] &&
-								action.action_list[0].type !== 'other' &&
-								action.action_list[0].rolls &&
-								action.action_list[0].rolls.length
-							"
+							v-if="rollable && hasRolls(action)"
 						>
 							<hk-roll-action
 								:action="action"
@@ -67,6 +60,16 @@
 									{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : `` }}
 								</em></strong
 							>
+							<!-- Automated: always-active trait effects (effects 6b) -->
+							<i
+								v-if="category === 'special_abilities' && traitEffectsLabel(action)"
+								aria-hidden="true"
+								class="fas fa-sparkles ml-1 neutral-2"
+							>
+								<q-tooltip anchor="top middle" self="bottom middle">
+									Automated: {{ traitEffectsLabel(action) }}
+								</q-tooltip>
+							</i>
 
 							<template v-if="action.limit || action.recharge || action.legendary_cost">
 								<template v-if="action.legendary_cost || action.recharge">
@@ -97,22 +100,27 @@
 						</div>
 					</div>
 					<!-- Roll Summary -->
-					<div
-						v-if="
-							action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'
-						"
-					>
-						<span v-if="action.action_list[0].rolls">
+					<div v-if="captionEntries(action).length">
+						<!-- Every action of the ability: its save and its rolls -->
+						<span
+							v-for="(entry, entry_index) in captionEntries(action)"
+							:key="`entry-${action_index}-${entry_index}`"
+						>
+							<span v-if="entry_index > 0" class="neutral-2"> · </span>
+							<span v-if="entry.type === 'save' && entry.save_dc">
+								<span v-if="entry.save_ability">
+									{{ entry.save_ability.substring(0, 3).toUpperCase() }}
+								</span>
+								{{ entry.save_dc }}
+							</span>
 							<span
-								v-for="(roll, roll_index) in action.action_list[0].rolls"
-								:key="`roll-${action_index}-${roll_index}`"
+								v-for="(roll, roll_index) in entry.rolls || []"
+								:key="`roll-${action_index}-${entry_index}-${roll_index}`"
 							>
 								(<i
 									aria-hidden="true"
 									:class="[
-										action.action_list[0].type === 'healing'
-											? 'fas fa-heart green'
-											: damage_type_icons[roll.damage_type],
+										entry.type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
 										roll.damage_type,
 									]"
 								/>
@@ -125,12 +133,10 @@
 								</template>
 								<template v-else>{{ roll.fixed_val }})</template>
 								<!-- eslint-disable-next-line vue/no-parsing-error -->
-								{{ roll_index + 1 < action.action_list[0].rolls.length ? "+" : "" }}
+								{{ roll_index + 1 < entry.rolls.length ? "+" : "" }}
 								<q-tooltip anchor="top middle" self="center middle">
 									{{
-										action.action_list[0].type === "healing"
-											? "Healing"
-											: `${roll.damage_type.capitalize()} damage`
+										entry.type === "healing" ? "Healing" : `${(roll.damage_type || "").capitalize()} damage`
 									}}
 								</q-tooltip>
 							</span>
@@ -144,14 +150,6 @@
 						<span v-if="action.range">
 							<span class="blue">|</span> {{ action.range }}<small class="neutral-2">ft.</small>
 							<q-tooltip anchor="top middle" self="center middle"> Range </q-tooltip>
-						</span>
-						<!-- Saving trow -->
-						<span v-if="action.action_list[0].type === 'save' && action.action_list[0].save_dc">
-							<span class="blue">|</span>
-							<span v-if="action.action_list[0].save_ability">
-								{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
-							</span>
-							{{ action.action_list[0].save_dc }}
 						</span>
 						<!-- AOE -->
 						<span v-if="action.aoe_type">
@@ -176,6 +174,8 @@ import { mapGetters } from "vuex";
 import { damage_type_icons } from "src/utils/generalConstants";
 import { runEncounter } from "src/mixins/runEncounter.js";
 import LimitedUseCounter from "../../actions/LimitedUseCounter.vue";
+import { hasRolls, captionEntries } from "src/utils/generalFunctions";
+import { traitEffectsLabel } from "src/utils/effectFunctions";
 
 export default {
 	name: "CardActions",
@@ -223,6 +223,9 @@ export default {
 		...mapGetters(["targeted"]),
 	},
 	methods: {
+		hasRolls,
+		captionEntries,
+		traitEffectsLabel,
 		startRoll(e, projectiles, option, action_index, action, category) {
 			if (this.targeted?.length) {
 				this.rollObject = {

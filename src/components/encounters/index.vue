@@ -77,6 +77,13 @@
 						<q-tab-panel name="loot">
 							<Loot :encounter="encounter" :campaign="campaign" />
 						</q-tab-panel>
+						<q-tab-panel v-if="!demo" name="reminders">
+							<Reminders
+								:encounter="encounter"
+								:campaign="campaign"
+								:campaign_players="campaign_players"
+							/>
+						</q-tab-panel>
 						<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
 							<Xp :encounter="encounter" :campaign="campaign" />
 						</q-tab-panel>
@@ -106,6 +113,7 @@ import Xp from "./Xp.vue";
 import Entities from "./Entities.vue";
 import Overview from "./Overview.vue";
 import General from "./General.vue";
+import Reminders from "./Reminders.vue";
 import { mapGetters, mapActions } from "vuex";
 import SignedIn from "src/components/userContent/SignedIn.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
@@ -118,6 +126,7 @@ export default {
 		Entities,
 		Overview,
 		General,
+		Reminders,
 		SignedIn,
 		TutorialPopover,
 	},
@@ -146,6 +155,8 @@ export default {
 			};
 			if (!this.demo) {
 				tabs.loot = { name: "loot", label: "Loot", icon: "fas fa-treasure-chest" };
+				// The encounter's reminders, prepared before combat (effects 10)
+				tabs.reminders = { name: "reminders", label: "Reminders", icon: "fas fa-bell" };
 			}
 			if (this.campaign.advancement === "experience") {
 				tabs.xp = { name: "xp", label: "XP", icon: "fas fa-sparkles" };

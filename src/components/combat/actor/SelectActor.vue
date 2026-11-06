@@ -72,6 +72,10 @@
 					<q-item-section class="list-item">
 						<BasicEntity :entity="entity" />
 					</q-item-section>
+					<q-item-section v-if="reactionUsed(entity)" side class="reaction-used">
+						<hk-icon icon="fas fa-reply" />
+						<q-tooltip anchor="top middle" self="bottom middle">Reaction Used</q-tooltip>
+					</q-item-section>
 				</q-item>
 			</q-list>
 		</q-popup-proxy>
@@ -84,6 +88,7 @@ import { EventBus } from "src/event-bus";
 import Avatar from "../entities/Avatar.vue";
 import BasicEntity from "../entities/BasicEntity.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
+import { hasReactionUsed } from "src/utils/effectFunctions";
 
 export default {
 	name: "SelectActor",
@@ -129,6 +134,9 @@ export default {
 	},
 	methods: {
 		...mapActions(["set_actor"]),
+		reactionUsed(entity) {
+			return hasReactionUsed(entity);
+		},
 		setActor(entity) {
 			this.set_actor(entity);
 			this.show_menu = false;
@@ -225,6 +233,10 @@ export default {
 	overflow: hidden;
 	padding-left: 8px;
 	margin-left: -8px;
+}
+.reaction-used {
+	color: $red;
+	font-size: 15px;
 }
 </style>
 

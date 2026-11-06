@@ -8,32 +8,49 @@ export const trackEncounter = {
 		isTransformed(entity, campData) {
 			return (entity.entityType === 'player' || entity.entityType === 'companion') ? campData.transformed : entity.transformed;
 		},
-		displayAc(entity, player, npc, camp_data) {
-			let stats = {}
-
-			if(this.isTransformed(entity, camp_data)) {
-				stats.ac = (camp_data) ? parseInt(camp_data.transformed.ac) : parseInt(entity.transformed.ac);
-				stats.bonus = (camp_data) ? parseInt(camp_data.ac_bonus) : parseInt(entity.ac_bonus);
-			}
-			else {
-				if(entity.entityType === 'player') {
-					stats = {
-						ac: parseInt(player.ac),
-						bonus: parseInt(camp_data.ac_bonus),
-					}
-				} else if (entity.entityType === 'companion') {
-					stats = {
-						ac: parseInt(npc.armor_class),
-						bonus: parseInt(camp_data.ac_bonus),
-					}
-				} else {
-					stats = {
-						ac: parseInt(entity.ac),
-						bonus: parseInt(entity.ac_bonus),
-					}
-				}
-			}
-			return stats
+		/**
+		 * AC of an entity on the live view, from its effective entity (effects and manual
+		 * bonuses, as in the tracker): { value, changed, notes } for EffectModifiedValue
+		 *
+		 * @param {object} effective The effective entity
+		 * @param {boolean} effectsShown Whether the entity's effects are shown to players
+		 */
+		displayAc(effective, effectsShown) {
+			const field = effective?.transformed ? 'transformedAc' : 'ac';
+			return this.effectiveValue(effective, field, 'Armor Class', effectsShown);
+		},
+		/**
+		 * A value of an effective entity for EffectModifiedValue on the live view. The tooltip
+		 * names the effects and manual bonuses when the entity's effects are shown to players,
+		 * and only the net change when they're hidden.
+		 *
+		 * @param {object} effective The effective entity
+		 * @param {string} field e.g. "ac" or "maxHp"
+		 * @param {string} label Name of the value for the net change, e.g. "Armor Class"
+		 * @param {boolean} effectsShown Whether the entity's effects are shown to players
+		 * @returns {object} { value, changed, notes }
+		 */
+		effectiveValue(effective, field, label, effectsShown) {
+			const value = parseInt(effective?.[field]);
+			const stored = effective?.stored && field in effective.stored ? parseInt(effective.stored[field]) : value;
+			const change = (value || 0) - (stored || 0);
+			if (!change) return { value, changed: false, notes: [] };
+			const notes = effectsShown
+				? (effective.effect_modifiers?.[field] || []).map(
+						({ name, text, applied }) => `${name}: ${text}${applied === false ? ' (not applied)' : ''}`
+				  )
+				: [`${label} ${change > 0 ? '+' : '−'}${Math.abs(change)}`];
+			return { value, changed: true, notes };
+		},
+		/**
+		 * Whether an entity's effects are shown to players: the "Conditions and effects"
+		 * setting, per NPC for NPCs; companions always
+		 */
+		effectsShown(entity) {
+			if (entity.entityType === 'companion') return true;
+			if (this.playerSettings?.conditions !== undefined) return false;
+			if (entity.entityType === 'player') return true;
+			return entity.entityType === 'npc' && this.displayNPCField('conditions', entity) === undefined;
 		},
 		displayImg(entity, player, npc) {
 			//Check what image should be displayed

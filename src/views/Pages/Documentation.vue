@@ -77,6 +77,19 @@
 					</hk-card>
 				</section>
 
+				<section id="effects">
+					<hk-card header="Effects">
+						<div class="card-body">
+							<p class="mb-0">
+								Effects are what conditions, spells and features do to a creature in combat. You can
+								build your own custom effects, from a simple bonus to Armor Class to an aura that deals
+								damage each turn. Read <router-link to="/documentation/effects">How effects work</router-link>
+								for an explanation of every part of the effect form.
+							</p>
+						</div>
+					</hk-card>
+				</section>
+
 				<section id="encounters">
 					<hk-card header="Encounters">
 						<div class="card-body">

@@ -1,9 +1,8 @@
 import { db } from "src/firebase";
 import { mapActions, mapGetters } from "vuex";
-import { remindersMixin } from "src/mixins/reminders";
+import { damageResult, dropToOneFor, healingResult } from "src/utils/effectFunctions";
 
 export const setHP = {
-	mixins: [remindersMixin],
 	data() {
 		return {
 			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
@@ -22,7 +21,15 @@ export const setHP = {
 		...mapGetters(["encounter", "demo", "test"]),
 	},
 	methods: {
-		...mapActions(["set_save", "set_stable", "set_hp", "set_dead", "set_log", "set_meters"]),
+		...mapActions([
+			"set_save",
+			"set_stable",
+			"set_hp",
+			"set_dead",
+			"set_log",
+			"set_meters",
+			"fire_trigger",
+		]),
 		...mapActions("campaigns", ["update_damage_meters"]),
 
 		/**
@@ -48,14 +55,34 @@ export const setHP = {
 			}
 		},
 
+		/**
+		 * Maximum of the main hit point pool, as changed by active effects (Aid, Exhaustion)
+		 */
+		effectiveMaxHp(target) {
+			const effective = target?.key && this.$store.getters.effective_entity?.(target.key);
+			return parseInt(effective ? effective.maxHp : target.maxHp);
+		},
+		/**
+		 * The target's "drop to 1 instead" for this damage, if one applies: its damage types come
+		 * from the config's actions (unknown for untyped damage)
+		 *
+		 * @returns {object|undefined} dropToOneFor's result
+		 */
+		dropToOneMatch(target, amount, config = {}) {
+			const modifiers = target?.key && this.$store.getters.damage_modifiers?.(target.key);
+			if (!modifiers?.dropToOne?.length) return undefined;
+			const damageTypes = (config.actions || [])
+				.flatMap((action) => (action.rolls || []).map((roll) => roll.damage_type))
+				.filter(Boolean);
+			return dropToOneFor({ dropToOne: modifiers.dropToOne, damageTypes, damage: amount });
+		},
 		async isDamage(amount, target, current, config) {
-			var maxHp = parseInt(target.maxHp);
+			var maxHp = this.effectiveMaxHp(target);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
 			var transCurHp = parseInt(target.transformedCurHp);
 			var type = "damage";
 			var over = 0;
-			var rest_amount = amount;
 
 			//Death saves at 0 hp, if automate is on
 			if (
@@ -80,72 +107,73 @@ export const setHP = {
 				}
 			}
 
-			//First check if there is tempHp and put damage in there first.
-			if (tempHp) {
-				let newTemp = parseInt(tempHp - amount);
-
-				//Adjust the rest amount
-				rest_amount = newTemp < 0 ? -newTemp : 0;
-
-				//Set the new HP
-				this.set_hp({
-					key: target.key,
-					pool: "temp",
-					newHp: newTemp,
-				});
+			// Temporary hit points first, then the transformation, then hit points (shared with
+			// the campaign's players outside an encounter, effects 8)
+			const result = damageResult({
+				amount,
+				curHp,
+				tempHp,
+				transformed: target.transformed == true,
+				transformedCurHp: transCurHp,
+				maxHp,
+				// Drop to 1 instead of 0 (Death Ward, Undead Fortitude): no death checks then
+				dropToOne: config.undo ? undefined : (damage) => this.dropToOneMatch(target, damage, config),
+			});
+			if (result.tempHp !== undefined) {
+				this.set_hp({ key: target.key, pool: "temp", newHp: result.tempHp });
 			}
-			//Then check if the target is transformed and put rest damage in the transformation
-			if (target.transformed == true) {
-				var newTrans = parseInt(transCurHp - rest_amount);
-
-				//Adjust the rest amount
-				rest_amount = newTrans < 0 ? -newTrans : 0;
-
-				//Set the new HP
-				this.set_hp({
-					key: target.key,
-					pool: "transformed",
-					newHp: newTrans,
-				});
+			if (result.transformedCurHp !== undefined) {
+				this.set_hp({ key: target.key, pool: "transformed", newHp: result.transformedCurHp });
 			}
-			//If there is damage left after taking it from the tempHp and/or the transformation
-			if (rest_amount > 0) {
-				var newhp = parseInt(curHp - rest_amount);
-
-				if (newhp <= 0 && target.entityType !== "npc") {
+			const heldAtOne = result.heldAtOne;
+			var newhp = result.curHp;
+			if (newhp !== undefined) {
+				if (result.atZero && target.entityType !== "npc") {
 					this.set_stable({
 						key: target.key,
 						action: "unset",
 					});
 				}
-
-				//When there is an overkill
-				if (newhp < 0) {
-					newhp = 0;
-
-					if (tempHp) {
-						over = parseInt(rest_amount) + parseInt(tempHp) - parseInt(curHp); //overkill
-						amount = parseInt(curHp) + parseInt(tempHp);
-					} else {
-						over = parseInt(rest_amount) - parseInt(curHp); //overkill
-						amount = parseInt(curHp);
-					}
-					//Character dies if the overkill is >= maxHp
-					if (
-						over >= maxHp &&
-						(target.entityType === "player" || target.entityType === "companion")
-					) {
-						this.set_dead({ key: target.key });
-					}
+				over = result.overkill;
+				amount = result.taken;
+				//Character dies if the overkill is >= maxHp
+				if (result.dies && (target.entityType === "player" || target.entityType === "companion")) {
+					this.set_dead({ key: target.key });
 				}
 				this.set_hp({
 					key: target.key,
 					newHp: newhp,
 				});
 			}
-			//Check if a reminder is triggered on damage taken
-			if (amount > 0) {
-				this.checkReminders(target, "damage");
+			if (heldAtOne) {
+				this.$store.dispatch("drop_to_one", { key: target.key, match: heldAtOne, damage: amount });
+			}
+			// Effect triggers, on the main HP pool
+			if (amount > 0 && !config.undo) {
+				const after = newhp !== undefined ? newhp : curHp;
+				const dropsToZero = curHp > 0 && after === 0;
+				const event = {
+					sourceKey: current?.key,
+					amount,
+					dropsToZero,
+					damageTypes: (config.actions || [])
+						.flatMap((action) => (action.rolls || []).map((roll) => roll.damage_type))
+						.filter(Boolean),
+				};
+				this.fire_trigger({ trigger: "damage_taken", entityKey: target.key, event });
+				if (current?.key) {
+					this.fire_trigger({
+						trigger: "damage_dealt",
+						entityKey: current.key,
+						event: { ...event, sourceKey: target.key },
+					});
+				}
+				if (dropsToZero) {
+					this.fire_trigger({ trigger: "on_zero_hp", entityKey: target.key, event });
+				}
+				if (curHp > maxHp / 2 && after <= maxHp / 2) {
+					this.fire_trigger({ trigger: "on_bloodied", entityKey: target.key, event });
+				}
 			}
 
 			//Notification
@@ -219,16 +247,34 @@ export const setHP = {
 				curHp = parseInt(target.transformedCurHp);
 				pool = "transformed";
 			} else {
-				maxHp = parseInt(target.maxHp);
+				maxHp = this.effectiveMaxHp(target);
 				curHp = parseInt(target.curHp);
 				pool = "";
 			}
-			let newhp = parseInt(curHp + amount);
+			// Effects that limit healing (No Healing: can't regain hit points)
+			if (!config.undo) {
+				const limit = target?.key && this.$store.getters.healing_received_cap?.(target.key);
+				if (limit?.cap !== undefined && amount > limit.cap) {
+					this.$q.notify({
+						message: limit.cap ? "Healing limited" : "Can't regain hit points",
+						caption: `${target.name}: ${limit.names.join(", ")}${limit.possible.length ? " (if its condition holds)" : ""}`,
+						icon: "fas fa-heart-broken",
+						type: "warning",
+						position: "top",
+					});
+					amount = limit.cap;
+				}
+			}
 			let type = "healing";
-			let over = 0;
+			// Capped at the maximum (shared with the campaign's players outside an encounter, effects 8)
+			const result = healingResult({ amount, curHp, maxHp });
+			const newhp = result.curHp;
+			let over = result.overhealing;
+			amount = result.healed;
 
-			//If the target is a player and the curHp was 0, saves need to be reset
-			if ((target.entityType === "player" || target.entityType === "companion") && curHp === 0) {
+			//If the target is a player and the curHp was 0, saves need to be reset (not when no
+			//hit points are regained, No Healing)
+			if ((target.entityType === "player" || target.entityType === "companion") && curHp === 0 && newhp > 0) {
 				this.set_save({
 					key: target.key,
 					check: "reset",
@@ -239,18 +285,21 @@ export const setHP = {
 				});
 			}
 
-			if (newhp > maxHp) {
-				newhp = maxHp;
-				over = amount - maxHp + curHp; //overhealing
-				amount = maxHp - curHp;
-			}
-
 			//Heal the target
 			this.set_hp({
 				key: target.key,
 				pool: pool,
 				newHp: newhp,
 			});
+
+			// Effect trigger
+			if (amount > 0 && !config.undo) {
+				this.fire_trigger({
+					trigger: "on_heal",
+					entityKey: target.key,
+					event: { sourceKey: current?.key, amount },
+				});
+			}
 
 			//Notification
 			if (config.notify) {

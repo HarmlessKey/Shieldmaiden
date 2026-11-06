@@ -30,8 +30,10 @@ const HkActionRollScaling = () =>
 const HkPane = () => import("../components/hk-components/hk-pane");
 const HkFilter = () => import("../components/hk-components/hk-filter");
 const HkTransformSelect = () => import("../components/hk-components/hk-transform-select");
+const HkConditionSelect = () => import("../components/hk-components/hk-condition-select");
 const HkEditionSelect = () => import("../components/hk-components/hk-edition-select");
 import HkCompendiumImage from "../components/hk-components/hk-compendium-image";
+const HkEffectsForm = () => import("../components/hk-components/hk-effects-form.vue");
 
 export default async ({ Vue }) => {
 	Vue.component("hk-input", HkInput);
@@ -49,6 +51,7 @@ export default async ({ Vue }) => {
 	Vue.component("hk-dice-text", HkDiceText);
 	Vue.component("hk-popover", HkPopover);
 	Vue.component("hk-dmg-type-select", HkDmgTypeSelect);
+	Vue.component("hk-condition-select", HkConditionSelect);
 	Vue.component("hk-tip", HkTip);
 	Vue.component("hk-timer", HkTimer);
 	Vue.component("hk-share", HkShare);
@@ -65,4 +68,5 @@ export default async ({ Vue }) => {
 	Vue.component("hk-transform-select", HkTransformSelect);
 	Vue.component("hk-edition-select", HkEditionSelect);
 	Vue.component("hk-compendium-image", HkCompendiumImage);
+	Vue.component("hk-effects-form", HkEffectsForm);
 };

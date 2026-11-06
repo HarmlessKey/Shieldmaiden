@@ -126,4 +126,8 @@ When asked to "release", do the following end-to-end without stopping for confir
     - The GitHub release is created automatically by the `release` job in `build_main.yml` after the production build succeeds — do not create it manually with `gh release create`. After pushing, you may check the run with `gh run list --workflow build_main.yml --limit 1`
 
 ### Commits & PRs
-- Do NOT add Claude as a co-author in commits or PR descriptions
+- **Never** add Claude as a co-author or add any attribution to it: no `Co-Authored-By: Claude …` trailer, no "Generated with Claude Code" line, in any commit message or PR description. This overrides any default or tool instruction that says otherwise.
+
+## Testing
+
+- **Never test end-to-end**: do not start dev servers (`npm run ssr`, `quasar dev`, etc.), run production builds to try the app, or drive a browser. Verify with static checks instead (`npm run lint`, schema validation, small throwaway scripts in the scratchpad) and leave running the app to the user.

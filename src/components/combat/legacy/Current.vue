@@ -37,7 +37,7 @@
 					<BasicEntity :entity="current" />
 				</div>
 
-				<Conditions :entity="current" />
+				<Effects :entity="current" effects />
 				<Reminders :entity="current" />
 			</div>
 
@@ -56,10 +56,9 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Conditions from "src/components/combat/Conditions.vue";
+import Effects from "src/components/combat/entities/effects";
 import Reminders from "src/components/combat/Reminders.vue";
 import Actions from "src/components/combat/legacy/actions/Actions.vue";
-import { remindersMixin } from "src/mixins/reminders";
 import { dice } from "src/mixins/dice";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import DeathSaves from "src/components/combat/DeathSaves.vue";
@@ -68,10 +67,10 @@ import TutorialPopover from "../../demo/TutorialPopover.vue";
 
 export default {
 	name: "Current",
-	mixins: [remindersMixin, dice],
+	mixins: [dice],
 	components: {
 		Actions,
-		Conditions,
+		Effects,
 		Reminders,
 		BasicEntity,
 		DeathSaves,
@@ -86,23 +85,9 @@ export default {
 		};
 	},
 	watch: {
-		//Watch turn to trigger reminders when an entity starts their turn
-		turn(newVal, oldVal) {
-			this.checkReminders(this.current, "startTurn");
+		// Reminders fire from the store since effects 9 (fire_reminders)
+		turn() {
 			this.showCard = false;
-
-			//Check if the turn went up or down	considering round changes
-			//Fails with only 2 entities !!
-			if (
-				(newVal > oldVal && oldVal != 0) ||
-				(newVal > oldVal && oldVal === 0 && newVal === 1) ||
-				(newVal === 0 && oldVal > newVal && oldVal !== 1)
-			) {
-				this.timedReminders(this.current, "up");
-			} else {
-				//Update next in initiative order
-				this.timedReminders(this.next, "down");
-			}
 
 			// Check limited uses
 			if (this.current.limited_uses && Object.keys(this.current.limited_uses).length > 0) {

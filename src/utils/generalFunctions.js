@@ -78,6 +78,61 @@ export function otherEdition(route) {
 	};
 }
 
+/**
+ * Whether an NPC ability (or monster action) has something to roll: any entry of its
+ * action_list that isn't of type other and has rolls, not only the first
+ *
+ * @param {object} ability { action_list: [{ type, rolls }] }
+ * @returns {boolean}
+ */
+export function hasRolls(ability) {
+	return (ability?.action_list || []).some((action) => action?.type !== "other" && action?.rolls?.length > 0);
+}
+
+/**
+ * Shows the notices of the campaign's effect and hit point actions (effects 8): what the
+ * tracker would prompt for, like a roll for temporary hit points or a Concentration save
+ *
+ * @param {object} $q Quasar ($q of a component)
+ * @param {string[]} notices
+ */
+export function showNotices($q, notices = []) {
+	for (const message of notices || []) {
+		$q.notify({ message, type: "warning", position: "top", timeout: 6000 });
+	}
+}
+
+/**
+ * The action-list entries of an ability to show in its caption (the tracker's action list and
+ * the entity card): every entry, except entries of type other without rolls
+ *
+ * @param {object} ability NPC ability with `action_list`
+ * @returns {object[]} The entries, in order
+ */
+export function captionEntries(ability) {
+	const entries = Array.isArray(ability?.action_list) ? ability.action_list : Object.values(ability?.action_list || {});
+	return entries.filter((entry) => entry && (entry.type !== "other" || entry.rolls?.length));
+}
+
+/**
+ * How many rolls and linked effects an action-list entry (NPC) or spell action has, in words,
+ * for its collapsed header: "1 roll, 2 effects". Type other has no rolls.
+ *
+ * @param {object} action { type, rolls, effects: { on_hit: [], … } }
+ * @returns {string} Empty without rolls and effects
+ */
+export function actionCounts(action) {
+	const counts = [];
+	const rolls = action?.type === "other" ? 0 : (action?.rolls || []).length;
+	if (rolls) counts.push(`${rolls} ${rolls === 1 ? "roll" : "rolls"}`);
+	const effects = Object.values(action?.effects || {}).reduce(
+		(count, links) => count + (Array.isArray(links) ? links.length : 0),
+		0
+	);
+	if (effects) counts.push(`${effects} ${effects === 1 ? "effect" : "effects"}`);
+	return counts.join(", ");
+}
+
 export function displayCR(cr) {
 	return cr == 0.125 ? "1/8" : cr == 0.25 ? "1/4" : cr == 0.5 ? "1/2" : cr;
 }

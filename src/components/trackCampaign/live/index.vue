@@ -21,6 +21,7 @@
 				:players="players"
 				:npcs="npcs"
 				:displaySettings="displaySettings"
+				:effectiveEntities="effectiveEntities"
 				@setWeather="setWeather"
 				:timer="timer['.value']"
 			/>
@@ -44,6 +45,8 @@
 						:npcs="npcs"
 						:displaySettings="displaySettings"
 						:screenWidth="width"
+						:effectiveEntities="effectiveEntities"
+						:effectEntries="effectEntries"
 					/>
 					<Rewards v-else :encounter="encounter" />
 				</div>
@@ -141,6 +144,8 @@
 							:npcs="npcs"
 							:displaySettings="displaySettings"
 							:screenWidth="width"
+							:effectiveEntities="effectiveEntities"
+							:effectEntries="effectEntries"
 						/>
 						<Rewards v-else :encounter="encounter" />
 					</q-tab-panel>
@@ -171,6 +176,16 @@
 <script>
 import _ from "lodash";
 import { db } from "src/firebase";
+import { EffectServices } from "src/services/effects";
+import {
+	effectiveEntity,
+	effectiveStats,
+	findSrdDefinition,
+	resolveDefinition,
+	traitInstances,
+} from "src/utils/effectFunctions";
+import { effectSubject } from "src/utils/entityFunctions";
+import { default_edition } from "src/utils/generalConstants";
 
 import Turns from "./Turns.vue";
 import Initiative from "./Initiative.vue";
@@ -197,6 +212,10 @@ export default {
 			rolls: [],
 			weather: true,
 			showShares: false,
+			// Resolved effect definitions by "source:source_key" (the DM's custom effects)
+			definitions: {},
+			// SRD monsters of SRD NPCs by "edition:id", for the stats effects read
+			monsters: {},
 			panels: [
 				{
 					label: "Initiative list",
@@ -325,10 +344,186 @@ export default {
 			});
 			return tabs;
 		},
+		edition() {
+			return this.campaign.edition || default_edition;
+		},
+		/**
+		 * Active effect instances per entity key: NPC effects are on the encounter,
+		 * player and companion effects on the campaign
+		 */
+		effectInstances() {
+			const instances = {};
+			for (const [key, entity] of Object.entries(this.encounter.entities || {})) {
+				if (!entity?.active) continue;
+				// Players and companions keep their effects on the campaign, NPCs on the encounter
+				const holder = this.campaignEntry(entity.entityType, key) || entity;
+				instances[key] = holder.effects || {};
+			}
+			return instances;
+		},
+		// Every definition the shown effects use, once
+		effectRefs() {
+			const refs = {};
+			for (const effects of Object.values(this.effectInstances)) {
+				for (const { source, source_key } of Object.values(effects)) {
+					refs[`${source}:${source_key}`] = { source, source_key };
+				}
+			}
+			// Trait effects of NPCs and companions count for their effective values (effects 6b)
+			for (const [key, subject] of Object.entries(this.subjects)) {
+				for (const { source, source_key } of Object.values(traitInstances(subject, key))) {
+					refs[`${source}:${source_key}`] = { source, source_key };
+				}
+			}
+			return Object.values(refs);
+		},
+		// SRD NPCs with effects or casting one, whose monster stats formulas may need
+		monsterRefs() {
+			const casters = new Set();
+			for (const effects of Object.values(this.effectInstances)) {
+				for (const instance of Object.values(effects)) {
+					if (instance.caster_key) casters.add(instance.caster_key);
+				}
+			}
+			const refs = {};
+			for (const [key, entity] of Object.entries(this.encounter.entities || {})) {
+				if (!entity?.active || !entity.npc || entity.npc === "custom" || !entity.id) continue;
+				if (!Object.keys(this.effectInstances[key] || {}).length && !casters.has(key)) continue;
+				const edition = entity.edition || default_edition;
+				refs[`${edition}:${entity.id}`] = { id: entity.id, edition };
+			}
+			return Object.values(refs);
+		},
+		/**
+		 * The active entities with the fields effects read (effectSubject), hidden ones included:
+		 * they can be the caster of a shown effect
+		 */
+		subjects() {
+			const subjects = {};
+			for (const [key, entity] of Object.entries(this.encounter.entities || {})) {
+				if (!entity?.active) continue;
+				const type = entity.entityType;
+				let npc;
+				if (type === "companion") npc = this.npcs?.[key];
+				else if (type === "npc" && entity.npc === "custom") npc = this.npcs?.[entity.id];
+				else if (type === "npc" && entity.npc) {
+					npc = this.monsters[`${entity.edition || default_edition}:${entity.id}`];
+				}
+				subjects[key] = effectSubject({
+					entity,
+					campaignEntry: this.campaignEntry(type, key),
+					player: type === "player" ? this.players?.[key] : undefined,
+					npc,
+				});
+			}
+			return subjects;
+		},
+		/**
+		 * The active entities with the values their effects and manual bonuses give them,
+		 * calculated as in the tracker (effective_entity)
+		 */
+		effectiveEntities() {
+			const effective = {};
+			for (const [key, subject] of Object.entries(this.subjects)) {
+				effective[key] = effectiveEntity(
+					subject,
+					effectiveStats({
+						entity: subject,
+						holderKey: key,
+						entities: this.subjects,
+						definitionOf: this.definitionOf,
+					})
+				);
+			}
+			return effective;
+		},
+		/**
+		 * The shown effects per entity key as [{ key, instance, definition }], for the chips
+		 */
+		effectEntries() {
+			const entries = {};
+			for (const [key, effects] of Object.entries(this.effectInstances)) {
+				entries[key] = Object.entries(effects).map(([effectKey, instance]) => ({
+					key: effectKey,
+					instance,
+					definition: this.definitionOf(instance),
+				}));
+			}
+			return entries;
+		},
+	},
+	watch: {
+		effectRefs: {
+			handler: "resolveDefinitions",
+			immediate: true,
+		},
+		monsterRefs: {
+			handler: "fetchMonsters",
+			immediate: true,
+		},
 	},
 	methods: {
+		/** The campaign's entry of a player or companion; undefined for NPCs */
+		campaignEntry(type, key) {
+			if (type === "player") return this.campaign.players?.[key];
+			if (type === "companion") return this.campaign.companions?.[key];
+			return undefined;
+		},
 		setWeather(value) {
 			this.weather = value;
+		},
+		/**
+		 * The resolved definition of an instance; undefined while it's being read
+		 */
+		definitionOf(instance) {
+			return this.definitions[`${instance.source}:${instance.source_key}`];
+		},
+		/**
+		 * Resolves definitions that aren't known yet: SRD ones from the campaign's edition, custom
+		 * ones from the DM's custom effects (not the viewer's, and not through the effects store,
+		 * which holds the viewer's own). A definition that can't be read is stored unresolved.
+		 */
+		async resolveDefinitions(refs = []) {
+			if (!this.resolving) this.resolving = new Set();
+			// The SRD definitions come from the API (effects 12); custom ones can include them
+			if (refs.length) {
+				await this.$store.dispatch("api_effects/fetch_srd_definitions", { edition: this.edition });
+			}
+			const services = new EffectServices();
+			const lookup = async ({ source, source_key }) => {
+				if (source === "srd") return findSrdDefinition(this.edition, source_key);
+				if (source === "custom") return (await services.getEffect(this.userId, source_key)) || undefined;
+				return undefined;
+			};
+			await Promise.all(
+				refs.map(async ({ source, source_key }) => {
+					const id = `${source}:${source_key}`;
+					if (this.definitions[id] || this.resolving.has(id)) return;
+					this.resolving.add(id);
+					const definition = await resolveDefinition({ source, sourceKey: source_key, lookup });
+					this.$set(this.definitions, id, definition);
+					this.resolving.delete(id);
+				})
+			);
+		},
+		/**
+		 * Fetches the SRD monsters that aren't known yet, once each
+		 */
+		async fetchMonsters(refs = []) {
+			if (!this.fetching) this.fetching = new Set();
+			await Promise.all(
+				refs.map(async ({ id, edition }) => {
+					const cacheKey = `${edition}:${id}`;
+					if (this.monsters[cacheKey] || this.fetching.has(cacheKey)) return;
+					this.fetching.add(cacheKey);
+					try {
+						const monster = await this.$store.dispatch("api_monsters/fetch_monster", { id, edition });
+						if (monster) this.$set(this.monsters, cacheKey, monster);
+					} catch (error) {
+						console.error(`Failed to fetch monster ${cacheKey}`, error);
+					}
+				})
+			);
 		},
 		getBackground(encounter) {
 			if (encounter && encounter.background) return encounter.background;

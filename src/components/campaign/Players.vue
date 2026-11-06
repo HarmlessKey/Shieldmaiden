@@ -70,6 +70,7 @@
 							setDrawer({
 								show: true,
 								type: 'drawers/party/health',
+								data: { context: effectContext },
 							})
 						"
 					>
@@ -201,29 +202,58 @@
 							</div>
 							<i aria-hidden="true" v-if="!avatar(players[key])" class="hki-player" />
 						</div>
-						<div class="col ac" :key="'ac-' + key">
+						<!-- Opens the AC bonuses drawer for the DM (effects 8) -->
+					<div
+						class="col ac"
+						:class="{ editable: viewerIsUser }"
+						:key="'ac-' + key"
+						:tabindex="viewerIsUser ? 0 : undefined"
+						:role="viewerIsUser ? 'button' : undefined"
+						@click="viewerIsUser && openAcBonuses(key)"
+						@keydown.enter="viewerIsUser && openAcBonuses(key)"
+						@keydown.space.prevent="viewerIsUser && openAcBonuses(key)"
+					>
 							<i aria-hidden="true" class="fas fa-shield" />
+							<!-- Transformed: its transformed AC with the manual bonuses -->
+							<template v-if="player.transformed">
+								<span
+									v-if="bonusTotal(player, 'ac')"
+									class="value"
+									:class="{ green: bonusTotal(player, 'ac') > 0, red: bonusTotal(player, 'ac') < 0 }"
+								>
+									{{ player.transformed.ac + bonusTotal(player, "ac") }}
+									<q-tooltip anchor="top middle" self="center middle">
+										<div v-for="(line, i) in bonusLines(player, 'ac')" :key="i">{{ line }}</div>
+									</q-tooltip>
+								</span>
+								<span v-else class="value">{{ player.transformed.ac }}</span>
+							</template>
+							<!-- Its AC as its effects and manual bonuses change it (effects 8) -->
 							<span
-								v-if="player.ac_bonus"
+								v-else
 								class="value"
-								:class="{
-									green: player.ac_bonus > 0,
-									red: player.ac_bonus < 0,
-								}"
+								:class="{ green: statChange(key, 'ac') > 0, red: statChange(key, 'ac') < 0 }"
 							>
-								{{
-									(player.transformed ? player.transformed.ac : players[key].ac) + player.ac_bonus
-								}}
-								<q-tooltip anchor="top middle" self="center middle">
-									Armor Class {{ player.ac_bonus }}
+								{{ statValue(key, "ac") }}
+								<q-tooltip v-if="statLines(key, 'ac').length" anchor="top middle" self="center middle">
+									<div v-for="(line, i) in statLines(key, 'ac')" :key="i">{{ line }}</div>
 								</q-tooltip>
 							</span>
-							<span v-else class="value">{{
-								player.transformed ? player.transformed.ac : players[key].ac
-							}}</span>
 						</div>
 						<div class="col name" :key="'name-' + key">
-							{{ players[key].character_name }}
+							<span class="truncate">{{ players[key].character_name }}</span>
+							<!-- Its effects outside an encounter, inline after the name (effects 8) -->
+							<PlayerEffects
+								v-if="player.effects"
+								:campaign-id="campaignId"
+								:player-id="key"
+								:player-name="players[key].character_name"
+								:effects="player.effects"
+								:names="playerNames"
+								:edition="campaign.edition"
+								:context="effectContext"
+								:editable="viewerIsUser"
+							/>
 						</div>
 
 						<div
@@ -273,7 +303,23 @@
 							{{ players[key].spell_save_dc }}
 						</div>
 
-						<div class="col health" :key="'health-' + key">
+						<div class="col health" :class="{ editable: viewerIsUser }" :key="'health-' + key">
+							<!-- Manual damage and healing outside an encounter (effects 8) -->
+							<q-menu
+								v-if="viewerIsUser"
+								:dark="$store.getters.theme === 'dark'"
+								anchor="top right"
+								self="bottom right"
+								:ref="`health-${key}`"
+							>
+								<PlayerHealth
+									:campaign-id="campaignId"
+									:player-id="key"
+									:player-name="players[key].character_name"
+									:context="effectContext"
+									@done="$refs[`health-${key}`][0].hide()"
+								/>
+							</q-menu>
 							<template v-if="player.curHp <= 0">
 								<div v-if="player.stable" class="green">
 									<span><i aria-hidden="true" class="fas fa-fist-raised" /> Stable</span>
@@ -281,14 +327,16 @@
 								<div v-else-if="player.dead" class="red">
 									<span><i aria-hidden="true" class="fas fa-skull-crossbones" /> Dead</span>
 								</div>
+								<!-- The 5 death saves, as the Edit player drawer: made ones, then empty slots -->
 								<div v-else class="saves d-flex justify-content-end">
-									<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
-										<span v-show="check === 'succes'" class="green"
+									<div v-for="n in 5" :key="`save-${n}`" class="save">
+										<span v-if="player.saves && player.saves[n] === 'succes'" class="green"
 											><i aria-hidden="true" class="fas fa-check"></i
 										></span>
-										<span v-show="check === 'fail'" class="red"
+										<span v-else-if="player.saves && player.saves[n] === 'fail'" class="red"
 											><i aria-hidden="true" class="fas fa-times"></i
 										></span>
+										<span v-else class="neutral-2"><i aria-hidden="true" class="fas fa-dot-circle"></i></span>
 									</div>
 								</div>
 							</template>
@@ -315,30 +363,25 @@
 										<span
 											class="current"
 											:class="{
-												red:
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <=
-													33,
+												red: percentage(player.curHp, statValue(key, 'maxHp')) <= 33,
 												orange:
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) >
-														33 &&
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <=
-														76,
-												green:
-													percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 76,
+													percentage(player.curHp, statValue(key, 'maxHp')) > 33 &&
+													percentage(player.curHp, statValue(key, 'maxHp')) <= 76,
+												green: percentage(player.curHp, statValue(key, 'maxHp')) > 76,
 											}"
 											>{{ player.curHp }}</span
 										>
 										<span class="neutral-2 mx-1">/</span>
+										<!-- Its maximum as its effects and manual bonuses change it (effects 8) -->
 										<span
-											:class="{
-												green: player.maxHpMod > 0,
-												red: player.maxHpMod < 0,
-											}"
-											v-if="player.maxHpMod"
+											v-if="statChange(key, 'maxHp')"
+											:class="{ green: statChange(key, 'maxHp') > 0, red: statChange(key, 'maxHp') < 0 }"
 										>
-											{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+											{{ statValue(key, "maxHp") }}
 											<q-tooltip anchor="top middle" self="center middle">
-												Max HP + {{ player.maxHpMod }}
+												<div v-for="(line, i) in statLines(key, 'maxHp')" :key="i">
+													{{ line }}
+												</div>
 											</q-tooltip>
 										</span>
 										<span v-else class="neutral-2">{{ players[key].maxHp }}</span>
@@ -381,12 +424,25 @@
 								</button>
 							</template>
 							<button
+								class="btn btn-sm bg-neutral-5 mr-1"
+								@click="
+									setDrawer({
+										show: true,
+										type: 'drawers/campaign/Effects',
+										data: { campaignId, playerId: key, campaign, players, context: effectContext },
+									})
+								"
+							>
+								<i aria-hidden="true" class="fas fa-sparkles" />
+								<q-tooltip anchor="top middle" self="center middle">Effects</q-tooltip>
+							</button>
+							<button
 								class="btn btn-sm bg-neutral-5"
 								@click="
 									setDrawer({
 										show: true,
 										type: 'drawers/EditPlayer',
-										data: { key, location: 'overview' },
+										data: { key, location: 'overview', context: effectContext },
 									})
 								"
 							>
@@ -474,9 +530,18 @@ import { mapGetters, mapActions } from "vuex";
 import { experience } from "src/mixins/experience.js";
 import { currencyMixin } from "src/mixins/currency.js";
 import { comparePlayerToCharacter } from "src/utils/generalFunctions";
+import { manualBonuses, manualBonusTotal } from "src/utils/entityFunctions";
+import PlayerEffects from "./PlayerEffects.vue";
+import PlayerHealth from "./PlayerHealth.vue";
+import { effectiveStats, findSrdDefinition } from "src/utils/effectFunctions";
+import { default_edition } from "src/utils/generalConstants";
 
 export default {
 	name: "Players",
+	components: {
+		PlayerEffects,
+		PlayerHealth,
+	},
 	props: {
 		userId: {
 			type: String,
@@ -501,8 +566,20 @@ export default {
 		},
 	},
 	mixins: [experience, currencyMixin],
+	watch: {
+		// Custom effect definitions for the players' stat changes (effects 8)
+		"campaign.players": {
+			immediate: true,
+			deep: true,
+			handler() {
+				this.loadCustomDefinitions();
+			},
+		},
+	},
 	data() {
 		return {
+			// Custom effect definitions by key, false when not found (effects 8)
+			customDefinitions: {},
 			width: 0,
 			is_small: false,
 			is_medium: false,
@@ -516,18 +593,13 @@ export default {
 					property: "curHp",
 				},
 				{
-					label: "Maximum Hit Point modifiers",
-					property: "maxHpMod",
-					value: 0,
+					label: "Manual bonuses (Armor Class, Hit Points, …)",
+					property: "bonuses",
+					value: null,
 				},
 				{
 					label: "Temporary Hit Points",
 					property: "tempHp",
-					value: 0,
-				},
-				{
-					label: "Armor Class Bonus",
-					property: "ac_bonus",
 					value: 0,
 				},
 				{
@@ -558,6 +630,47 @@ export default {
 			//If the viewer is the user that runs the campaign
 			//Edit functions are enabled
 			return this.userId === this.viewerId;
+		},
+		/**
+		 * The players' values as their effects and manual bonuses change them, as the tracker
+		 * computes them (effects 8): { [key]: { values, modifiers, stored: { ac, maxHp } } }
+		 */
+		playerStats() {
+			const entities = {};
+			for (const [key, campaignPlayer] of Object.entries(this.campaign.players || {})) {
+				if (!this.players?.[key]) continue;
+				entities[key] = { ...this.players[key], ...campaignPlayer, key, name: this.players[key].character_name };
+			}
+			const result = {};
+			for (const [key, entity] of Object.entries(entities)) {
+				const { values, modifiers } = effectiveStats({
+					entity,
+					holderKey: key,
+					entities,
+					definitionOf: this.definitionOf,
+				});
+				result[key] = {
+					values,
+					modifiers,
+					stored: { ac: parseInt(entity.ac) || 0, maxHp: parseInt(entity.maxHp) || 0 },
+				};
+			}
+			return result;
+		},
+		/**
+		 * What the campaign's effect and hit point actions need to calculate as the tracker does
+		 * (effects 8): the players' own data and the effects' definitions
+		 */
+		effectContext() {
+			return { basePlayers: this.players || {}, definitionOf: this.definitionOf };
+		},
+		// The campaign's players' names by id, for the casters of their effects (effects 8)
+		playerNames() {
+			return Object.fromEntries(
+				Object.keys(this.campaign.players || {})
+					.filter((id) => this.players?.[id])
+					.map((id) => [id, this.players[id].character_name])
+			);
 		},
 		page() {
 			return this.$route.path.split("/")[1];
@@ -637,6 +750,18 @@ export default {
 		...mapActions(["setDrawer"]),
 		...mapActions("campaigns", ["update_campaign_entity"]),
 		...mapActions("players", ["set_player_prop", "sync_player"]),
+		openAcBonuses(playerId) {
+			this.setDrawer({
+				show: true,
+				type: "drawers/campaign/Bonuses",
+				data: {
+					campaignId: this.campaignId,
+					playerId,
+					stat: "ac",
+					context: this.effectContext,
+				},
+			});
+		},
 		onResize(size) {
 			let width = size.width;
 			let small = 400;
@@ -656,8 +781,67 @@ export default {
 		percentage(current, max) {
 			return Math.floor((current / max) * 100);
 		},
-		maxHp(maxHp, maxHpMod) {
-			return parseInt(maxHpMod ? maxHp + maxHpMod : maxHp);
+		/**
+		 * Maximum hit points with the manual maximum HP bonuses of the campaign player
+		 */
+		/**
+		 * A player's value as its effects and manual bonuses change it (effects 8): "ac" or "maxHp"
+		 */
+		statValue(key, field) {
+			const stats = this.playerStats[key];
+			if (!stats) return parseInt(this.players[key]?.[field]) || 0;
+			return stats.values[field] ?? stats.stored[field];
+		},
+		statChange(key, field) {
+			const stats = this.playerStats[key];
+			return stats ? this.statValue(key, field) - stats.stored[field] : 0;
+		},
+		// "Shield of Faith: +2", "Manual: +1"
+		statLines(key, field) {
+			return (this.playerStats[key]?.modifiers[field] || [])
+				.filter((modifier) => modifier.applied)
+				.map(({ name, text }) => `${name}: ${text}`);
+		},
+		definitionOf(instance) {
+			const edition = this.campaign.edition || default_edition;
+			if (instance.source === "srd") {
+				return (
+					findSrdDefinition(edition, instance.source_key) ||
+					findSrdDefinition(edition === "5e" ? "5.5e" : "5e", instance.source_key)
+				);
+			}
+			return this.customDefinitions[instance.source_key] || undefined;
+		},
+		/**
+		 * Loads the custom effects the players have, for their stat changes
+		 */
+		async loadCustomDefinitions() {
+			const uid = this.$store.getters.user?.uid;
+			if (!uid) return;
+			for (const player of Object.values(this.campaign.players || {})) {
+				for (const instance of Object.values(player?.effects || {})) {
+					const id = instance?.source === "custom" ? instance.source_key : undefined;
+					if (!id || id in this.customDefinitions) continue;
+					this.$set(this.customDefinitions, id, false);
+					try {
+						const definition = await this.$store.dispatch("effects/get_effect", { uid, id });
+						this.$set(this.customDefinitions, id, definition || false);
+					} catch (error) {
+						console.error(error);
+					}
+				}
+			}
+		},
+		bonusTotal(campaignPlayer, stat) {
+			return manualBonusTotal(campaignPlayer, stat);
+		},
+		bonusLines(campaignPlayer, stat) {
+			return Object.values(manualBonuses(campaignPlayer)[stat] || {}).map(
+				({ value, label }) => {
+					const shown = value > 0 ? `+${value}` : value;
+					return `${label}: ${shown}`;
+				}
+			);
 		},
 		checkAll(value) {
 			this.selected_resets = value ? this.resets.map((item) => item.property) : [];
@@ -721,10 +905,8 @@ export default {
 			}
 		},
 		resetValue(property, value, id, player) {
-			const campaign_player = this.campaign?.players?.[id];
-			const maxHp = !this.selected_resets.includes("maxHpMod")
-				? this.maxHp(player.maxHp, campaign_player?.maxHpMod)
-				: player.maxHp;
+			// With its effects and manual bonuses (Aid), unless the bonuses are reset too
+			const maxHp = !this.selected_resets.includes("bonuses") ? this.statValue(id, "maxHp") : player.maxHp;
 			const reset_value = property === "curHp" ? maxHp : value;
 
 			this.update_campaign_entity({
@@ -735,6 +917,19 @@ export default {
 				property,
 				value: reset_value,
 			});
+			// Removing manual bonuses also removes the old single-value bonuses
+			if (property === "bonuses") {
+				for (const legacy of ["ac_bonus", "maxHpMod"]) {
+					this.update_campaign_entity({
+						uid: this.userId,
+						campaignId: this.campaignId,
+						type: "players",
+						id,
+						property: legacy,
+						value: null,
+					});
+				}
+			}
 
 			// if curHp > maxHp the curHp must be reset as well
 			if (campaign_player.curHp > maxHp && property !== "curHp") {
@@ -832,6 +1027,10 @@ export default {
 			padding: 0;
 			width: 45px;
 
+			&.editable {
+				cursor: pointer;
+			}
+
 			i,
 			.value {
 				left: 5px;
@@ -851,13 +1050,29 @@ export default {
 			}
 		}
 		&.name {
+			// The name, then its effect chips on the same line; the name is cut off first
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			min-width: 0;
 			white-space: nowrap;
 			overflow: hidden;
-			text-overflow: ellipsis;
+
+			.truncate {
+				flex-grow: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
 		}
 		&.health {
 			text-align: right;
 			padding: 8px 10px;
+
+			// Opens manual damage and healing for the DM (effects 8)
+			&.editable {
+				cursor: pointer;
+			}
 
 			.current {
 				font-weight: bold;
@@ -877,8 +1092,16 @@ export default {
 		&.save {
 			text-align: center;
 		}
+		// The 5 death saves: equal slots, the icons (check, cross, dot) centered in them
 		.saves {
+			align-items: center;
+			height: 100%;
+
 			.save {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 16px;
 				margin-left: 4px;
 			}
 		}

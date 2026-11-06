@@ -2553,6 +2553,29 @@ html body {
 	.snotifyToast__body {
 		font-size: 12px !important;
 	}
+	// Effect notifications (effectRolls.effectToast): a small effect icon instead of snotify's
+	.snotifyToast__inner:has(> .effect-toast) {
+		padding: 10px 15px;
+		min-height: 0;
+	}
+	.effect-toast {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+		width: 100%;
+
+		&__icon {
+			flex: 0 0 18px;
+			font-size: 18px;
+			line-height: 20px;
+			text-align: center;
+			color: rgba(255, 255, 255, 0.85);
+		}
+		&__text {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
 	.snotifyToast__buttons {
 		border-top: 2px solid rgba(0, 0, 0, 0.1);
 

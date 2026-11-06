@@ -131,7 +131,11 @@ module.exports = function (/* ctx */) {
 		pwa: {
 			workboxPluginMode: "GenerateSW",
 			workboxOptions: {
-				skipWaiting: true,
+				// NO skipWaiting: a new service worker must install in the background
+				// and wait, so a deploy never pulls the precache out from under a
+				// running session (see .planning/fix-deploy-blank-page.md). The
+				// switch happens on the next page load via SKIP_WAITING in
+				// src-pwa/register-service-worker.js.
 				clientsClaim: true,
 			},
 			manifest: {

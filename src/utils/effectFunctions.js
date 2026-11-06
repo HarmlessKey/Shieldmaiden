@@ -4,9 +4,27 @@ import {
 	effect_subtypes,
 	srd_condition_urls,
 } from "src/utils/effectsConstants.js";
-import { abilities, damage_types as DAMAGE_TYPES, skills } from "src/utils/generalConstants.js";
+import {
+	abilities,
+	custom_effects_released,
+	damage_types as DAMAGE_TYPES,
+	skills,
+} from "src/utils/generalConstants.js";
 import { experience_table } from "src/utils/characterConstants.js";
 import { manualBonuses, skillBonusKey } from "src/utils/entityFunctions.js";
+
+/**
+ * The effect lists' groups (EffectList) with a Custom tab that says custom effects are coming
+ * soon, while they aren't released. Only next to other groups, so a search without results still
+ * shows that nothing matches.
+ *
+ * @param {object[]} groups [{ name, entries }]
+ * @returns {object[]}
+ */
+export function withCustomComingSoon(groups) {
+	if (custom_effects_released || !groups.length) return groups;
+	return [...groups, { name: "Custom", entries: [], notice: "Coming soon" }];
+}
 
 /**
  * The SRD definitions per edition, fetched from the HK API (effects 12): the api_effects

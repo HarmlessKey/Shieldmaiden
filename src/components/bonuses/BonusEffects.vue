@@ -39,8 +39,9 @@ import {
 	effectValues,
 	getSrdDefinitions,
 	matchesName,
+	withCustomComingSoon,
 } from "src/utils/effectFunctions";
-import { default_edition } from "src/utils/generalConstants";
+import { custom_effects_released, default_edition } from "src/utils/generalConstants";
 
 /**
  * The effects that change a bonus drawer's values (effects 12), to apply from it: the SRD
@@ -115,10 +116,12 @@ export default {
 		},
 		// The SRD and custom effects as tabs, without empty ones
 		groups() {
-			return [
+			const groups = [
 				{ name: "Effects", entries: this.visible.filter(({ source }) => source === "srd") },
 				{ name: "Custom", entries: this.visible.filter(({ source }) => source === "custom") },
 			].filter(({ entries }) => entries.length);
+			// Signed-in users see that custom effects are coming soon
+			return this.$store.getters.user ? withCustomComingSoon(groups) : groups;
 		},
 	},
 	async mounted() {
@@ -130,7 +133,7 @@ export default {
 		 */
 		async loadCustomEffects() {
 			const uid = this.$store.getters.user?.uid;
-			if (!uid) return;
+			if (!uid || !custom_effects_released) return;
 			try {
 				await this.$store.dispatch("effects/get_effects");
 				const list = this.$store.getters["effects/effects"] || [];

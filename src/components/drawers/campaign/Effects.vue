@@ -56,8 +56,13 @@
 import { mapActions } from "vuex";
 import EffectList from "src/components/drawers/encounter/effects/EffectList.vue";
 import PlayerEffects from "src/components/campaign/PlayerEffects.vue";
-import { getSrdDefinitions, isSrdCondition, matchesName } from "src/utils/effectFunctions";
-import { default_edition } from "src/utils/generalConstants";
+import {
+	getSrdDefinitions,
+	isSrdCondition,
+	matchesName,
+	withCustomComingSoon,
+} from "src/utils/effectFunctions";
+import { custom_effects_released, default_edition } from "src/utils/generalConstants";
 import { showNotices } from "src/utils/generalFunctions";
 import { applyCampaignEffectMixin } from "src/mixins/applyCampaignEffect.js";
 
@@ -110,9 +115,11 @@ export default {
 		},
 		// The groups with the entries that match the search, without empty groups
 		visibleGroups() {
-			return this.groups
-				.map((group) => ({ ...group, entries: group.entries.filter(({ name }) => matchesName(name, this.search)) }))
-				.filter((group) => group.entries.length);
+			return withCustomComingSoon(
+				this.groups
+					.map((group) => ({ ...group, entries: group.entries.filter(({ name }) => matchesName(name, this.search)) }))
+					.filter((group) => group.entries.length)
+			);
 		},
 		// Names of the campaign's players by id
 		names() {
@@ -171,7 +178,7 @@ export default {
 		},
 	},
 	async mounted() {
-		if (this.$store.getters.user) {
+		if (this.$store.getters.user && custom_effects_released) {
 			this.customEffects = (await this.get_effects()) ? this.$store.getters["effects/effects"] : [];
 		}
 	},

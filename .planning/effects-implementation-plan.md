@@ -1859,6 +1859,71 @@ let an AI write them instead, and import the result.
   - Whether the import format is a plain array of effects or a wrapper with a version and
     content type, like the other exports.
 
+## 14. Release custom effects (after the effects feature is merged)
+Decided 2026-11-06, while testing the effects feature (PR #366): releasing custom effects
+together with the rest of the effects system is too much at once. The effects feature ships
+with custom effects held back behind one flag, and they are released later as their own
+feature.
+
+**Held back on `feature/effects` (no OpenSpec change; spec `effects-authoring`, "Custom
+effects are held back until their release"):**
+- The flag `custom_effects_released = false` in `src/utils/generalConstants.js`.
+- My content > Effects (`src/views/UserContent/Effects/index.vue`): the route and the
+  sidebar link stay; the page shows a "Custom effects are coming soon" notice instead of the
+  search, list and create buttons, doesn't load the user's effects, and passes `no-add` to
+  `ContentHeader` (no New effect button).
+- `src/router/routes.js`: a `customEffectsReleased` `beforeEnter` guard on `add-effect` and
+  `:id` redirects to `/content/effects`.
+- The effect lists (`EffectList.vue`) show a group with a `notice` instead of entries;
+  `withCustomComingSoon(groups)` in `effectFunctions.js` adds a Custom tab with "Coming soon"
+  next to the other groups. It is used in:
+  - `drawers/encounter/Effects.vue` (signed-in, not conditions mode)
+  - `drawers/campaign/Effects.vue`
+  - `bonuses/BonusEffects.vue` (signed-in)
+- Those three don't load custom effects while the flag is off (`get_effects` is guarded).
+- `components/userContent/RemindersDeprecated.vue` says building your own effects is coming
+  soon, instead of linking to Effects under My content.
+
+**Not held back (still reachable):** the NPC and spell forms' effect pickers ("My effects"
+group in `EffectRefPicker` / `fieldControls.js`), stored instances of custom effects (they
+still resolve), the copy dialog's Custom tab (only reachable from the effects form, which
+redirects), and `src/docs/effects.md`, which still describes building custom effects.
+
+**The release (change `effects-14-release-custom-effects`, a `feature/*` branch from
+`develop` once `feature/effects` is merged):**
+- Remove the flag and every use of it, instead of setting it to `true`, so no dead branches
+  stay behind:
+  - the coming-soon notice and its styles on the Effects page, and `:no-add` on its header;
+    load the effects in `mounted` again
+  - the `customEffectsReleased` guard and its import in `routes.js`
+  - `withCustomComingSoon` and its three callers; the `get_effects` guards in the two
+    drawers and `loadCustomEffects` in `BonusEffects.vue`
+  - the `notice` support in `EffectList.vue` (template, `notice` computed, tab label, doc
+    comment), unless something else uses it by then
+- Restore the reminders deprecation notice's link: "Build your own under Effects", linking to
+  `/content/effects`.
+- Specs: remove "Custom effects are held back until their release" from `effects-authoring`
+  (a REMOVED delta). The other specs already describe custom effects as available.
+- Docs: check that `src/docs/effects.md` matches what is released.
+
+To work out when it's proposed:
+- Whether anything else is released with it (step 13's effect import, the AI skill), or that
+  stays separate.
+- Whether the NPC and spell pickers should also hide custom effects until the release (they
+  aren't held back now).
+
+Manual tests: the custom effects checks taken out of PR #366's test plan are in
+[custom-effects-test-plan.md](./custom-effects-test-plan.md); the release PR's test plan uses
+them.
+
+Verification: `npm run lint`, `grep -rn custom_effects_released src` finds nothing, and a
+manual test by the user:
+- My content > Effects lists the effects, with New effect and "Create your first Effect"
+- `/content/effects/add-effect` and an effect's page open the form
+- the Effects drawers and the bonus drawers list custom effects in the Custom tab, with
+  their count
+- the reminders deprecation notice links to Effects
+
 ## Suggested Order
 0 (Concentration 2024 update, 5.5e monster re-scan — done, archived as effects-0-55e-alignment, 2026-09-29; 0b.2 is delivered by 2a/2e)
 1 (schema v2 — done)
@@ -1877,6 +1942,7 @@ let an AI write them instead, and import the result.
 12 (done — archived as effects-12-api-effects, 2026-10-30; fetch effects and conditions from the API, a name search on every effect list, bonus effects listed and applied from the manual bonus drawers, and the compendium conditions on v2; after 11a, 11b)
 12b (done — archived as effects-12b-copy-effect, 2026-10-30; copy an existing custom effect, SRD effect or SRD condition in the effects form, as for monsters and spells; after 12)
 13 (import effects, and a downloadable AI skill that writes importable effects; after 6 -> 6b -> 7)
+14 (release custom effects: remove the `custom_effects_released` flag and its coming-soon gating; its own feature branch after the effects feature is merged into `develop`; before or together with 13, which imports custom effects)
 
 ## Workflow per step (from 2026-09-29)
 Every remaining step (or sub-step, e.g. 2a) is handled as an OpenSpec change:

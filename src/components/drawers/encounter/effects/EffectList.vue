@@ -14,9 +14,11 @@
 				v-for="group in groups"
 				:key="group.name"
 				:name="group.name"
-				:label="`${group.name} (${group.entries.length})`"
+				:label="group.notice ? group.name : `${group.name} (${group.entries.length})`"
 			/>
 		</q-tabs>
+		<!-- A group without entries yet (custom effects coming soon) -->
+		<p v-if="notice" class="neutral-2 mb-0">{{ notice }}</p>
 		<q-list :dark="$store.getters.theme === 'dark'" square class="accordion">
 			<q-expansion-item
 				v-for="entry in paged"
@@ -136,7 +138,8 @@ const PAGE_SIZE = 10;
  * details, the apply button opens the apply form in a popover, shift+click applies until removed.
  * A tab per group when there are several, 10 entries per page. The drawer applies and removes.
  *
- * Groups: [{ name, entries: [{ id, source, sourceKey, name, isCondition }] }], without empty ones
+ * Groups: [{ name, entries: [{ id, source, sourceKey, name, isCondition }], notice }], without empty
+ * ones; a group with a notice shows that text instead of entries
  *
  * @emits apply (entry, application)
  * @emits remove (entry)
@@ -235,6 +238,9 @@ export default {
 		},
 		entries() {
 			return this.current?.entries || [];
+		},
+		notice() {
+			return this.current?.notice;
 		},
 		pages() {
 			return Math.ceil(this.entries.length / PAGE_SIZE);

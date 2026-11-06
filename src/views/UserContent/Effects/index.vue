@@ -1,9 +1,23 @@
 <template>
 	<div v-if="tier">
 		<hk-card>
-			<ContentHeader type="effects" />
+			<ContentHeader type="effects" :no-add="!released" />
 
-			<div class="card-body" v-if="!loading_effects">
+			<!-- Not released yet: only the notice -->
+			<div v-if="!released" class="card-body">
+				<div class="coming-soon">
+					<div class="coming-soon__title">
+						<i aria-hidden="true" class="fas fa-sparkles blue mr-1" />
+						Custom effects are coming soon
+					</div>
+					<p>
+						Soon you can build your own effects here: spells, features and items that change a
+						creature's rolls and values, with their durations and saves. Until then, conditions and
+						SRD effects are available in the combat tracker.
+					</p>
+				</div>
+			</div>
+			<div class="card-body" v-else-if="!loading_effects">
 				<p class="neutral-2">These are your custom effects.</p>
 				<template v-if="effects.length">
 					<q-input
@@ -97,6 +111,7 @@
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
 import { matchesName } from "src/utils/effectFunctions";
+import { custom_effects_released } from "src/utils/generalConstants";
 
 export default {
 	name: "Effects",
@@ -106,6 +121,7 @@ export default {
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
+			released: custom_effects_released,
 			import_dialog: false,
 			loading_effects: true,
 			search: "",
@@ -131,6 +147,7 @@ export default {
 		...mapGetters("effects", ["effects"]),
 	},
 	async mounted() {
+		if (!this.released) return;
 		await this.get_effects();
 		this.loading_effects = false;
 	},
@@ -178,3 +195,20 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.coming-soon {
+	border-left: solid 4px $blue;
+	background-color: $neutral-8;
+	border-radius: $border-radius;
+	padding: 10px 15px;
+
+	&__title {
+		font-weight: bold;
+		margin-bottom: 5px;
+	}
+	p {
+		margin-bottom: 0;
+	}
+}
+</style>

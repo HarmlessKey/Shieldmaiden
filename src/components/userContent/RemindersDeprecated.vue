@@ -12,8 +12,8 @@
 			<li>
 				<strong>Effects</strong> track what's going on with a creature: conditions, spells like
 				Bless or Hex, concentration and their durations. They change its rolls and values, and
-				prompt you when something should happen, like a save at the end of its turn. Build your own
-				under <router-link to="/content/effects">Effects</router-link>.
+				prompt you when something should happen, like a save at the end of its turn. Apply them in
+				the combat tracker; building your own effects is coming soon.
 			</li>
 			<li>
 				<strong>Encounter reminders</strong> come up at the right moment in an encounter: when

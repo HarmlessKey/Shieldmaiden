@@ -392,3 +392,39 @@ condition icon, not offered in the Conditions option).
 #### Scenario: SRD lists not loaded
 - **WHEN** the SRD lists couldn't be fetched and the user opens the SRD tab
 - **THEN** the search says the SRD effects couldn't be loaded, and the Custom tab still works
+
+### Requirement: Custom effects are held back until their release
+
+Custom effects SHALL ship disabled behind one flag, `custom_effects_released` in
+`src/utils/generalConstants.js` (decided after the effects feature was built: releasing them
+with it was too much at once). While it is `false`:
+- Effects under My content SHALL keep its route and its sidebar link, and SHALL show a
+  "Custom effects are coming soon" notice instead of the search, the list and the create
+  buttons; its header SHALL have no New effect button. The user's custom effects SHALL NOT be
+  loaded there.
+- The form routes (`/content/effects/add-effect` and `/content/effects/<id>`) SHALL redirect
+  to Effects under My content.
+- The Effects drawers (tracker and run campaign screen) and the bonus drawers' effect lists
+  SHALL NOT load the user's custom effects. For a signed-in user they SHALL show a Custom tab
+  that says only "Coming soon", next to the other groups; it SHALL NOT be shown when a search
+  leaves no other group, in conditions mode, or in the demo.
+- The personal reminders' deprecation notice SHALL NOT point to Effects under My content.
+
+Setting the flag to `true` SHALL restore everything above. Releasing custom effects (step 14
+of `.planning/effects-implementation-plan.md`) removes the flag and this gating.
+
+#### Scenario: My content Effects before the release
+- **WHEN** a user opens Effects under My content
+- **THEN** it shows the coming-soon notice, no list and no New effect button
+
+#### Scenario: The form route before the release
+- **WHEN** a user opens `/content/effects/add-effect`
+- **THEN** they are sent to Effects under My content
+
+#### Scenario: Custom tab before the release
+- **WHEN** a signed-in DM opens the Effects drawer in the tracker
+- **THEN** it has an Effects tab with the SRD effects and a Custom tab that says "Coming soon"
+
+#### Scenario: Search without results
+- **WHEN** the DM searches for "zzz" in the Effects drawer
+- **THEN** it says no effects match, without a Custom tab

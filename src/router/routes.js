@@ -15,6 +15,14 @@ const RunEncounter = () => import("src/views/RunEncounter.vue");
 const EncounterBuilder = () => import("src/views/UserContent/Encounters/EditEncounter.vue");
 const User = () => import("src/views/User.vue");
 
+import { custom_effects_released } from "src/utils/generalConstants";
+
+// Until custom effects are released, their form goes to the overview's "coming soon" notice
+const customEffectsReleased = (to, from, next) => {
+	if (custom_effects_released) next();
+	else next("/content/effects");
+};
+
 // This is where you add all your site routes
 // Each route is set as an object in the array
 // For a the most basic route just set
@@ -421,6 +429,7 @@ const routes = [
 						path: "add-effect",
 						name: "Add effect",
 						component: () => import("src/views/UserContent/Effects/EditEffect.vue"),
+						beforeEnter: customEffectsReleased,
 						meta: {
 							title: "Add effect",
 							description: "Add a new effect on Harmless Key.",
@@ -430,6 +439,7 @@ const routes = [
 						path: ":id",
 						name: "Edit effect",
 						component: () => import("src/views/UserContent/Effects/EditEffect.vue"),
+						beforeEnter: customEffectsReleased,
 						meta: {
 							title: "Edit effect",
 							description: "Edit an existing effect Harmless Key.",

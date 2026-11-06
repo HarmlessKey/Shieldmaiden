@@ -1346,3 +1346,7 @@ export const live_initiative_texts = Object.freeze([
 ]);
 
 export const legacy_tiers = Object.freeze(["legacy", "3403110", "3403128", "3403171"]);
+
+// Custom effects (My content > Effects) are released later: until then their overview shows a
+// "coming soon" notice instead of the list and the create buttons. Set to true to release them.
+export const custom_effects_released = false;

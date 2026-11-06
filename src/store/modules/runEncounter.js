@@ -430,7 +430,25 @@ const run_encounter_actions = {
 				// COMPANION
 				if (entity.entityType === "companion") {
 					data_npc = await dispatch("npcs/get_npc", { uid, id: key });
-					const campaignCompanion = campaign.companions[key];
+					let campaignCompanion = campaign?.companions?.[key];
+
+					// The companion is missing in the campaign, register it with full hit points
+					if (!campaignCompanion) {
+						campaignCompanion = { curHp: data_npc.hit_points };
+						if (!state.demo) {
+							await dispatch(
+								"campaigns/update_companion",
+								{
+									uid,
+									id: state.campaignId,
+									companionId: key,
+									property: "curHp",
+									value: data_npc.hit_points,
+								},
+								{ root: true }
+							);
+						}
+					}
 
 					// Get companion status from campaign
 					entity.curHp = campaignCompanion.curHp;

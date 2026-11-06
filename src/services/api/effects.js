@@ -3,7 +3,7 @@ import axios from "axios";
 // SRD effects and conditions are served on the API's v2 paths (effects 12)
 const EFFECTS_REF = "/v2/effects";
 
-export class effectServices {
+export class EffectServices {
 	constructor() {
 		this.HK = axios.create({
 			baseURL: process.env.VUE_APP_HK_API_ROOT,

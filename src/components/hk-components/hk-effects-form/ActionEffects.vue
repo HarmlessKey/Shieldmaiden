@@ -154,7 +154,7 @@ export default {
 		// A repeat save on a save sub-action starts with its ability and DC; a spell's has no DC
 		// of its own (the caster's spell save DC)
 		defaultSave() {
-			if (this.actionType !== "save") return undefined;
+			if (this.value.type !== "save") return undefined;
 			if (this.spell) return { ability: this.value.save_ability };
 			return { ability: this.value.save_ability, dc: this.value.save_dc };
 		},
@@ -299,8 +299,10 @@ export default {
 		 */
 		removeAt(outcome, index) {
 			if (this.trait) {
-				const list = (Array.isArray(this.value.effects) ? this.value.effects : []).filter((link, i) => i !== index);
-				if (list.length) this.$set(this.value, "effects", list);
+				const traitList = (Array.isArray(this.value.effects) ? this.value.effects : []).filter(
+					(link, i) => i !== index
+				);
+				if (traitList.length) this.$set(this.value, "effects", traitList);
 				else this.$delete(this.value, "effects");
 				return;
 			}

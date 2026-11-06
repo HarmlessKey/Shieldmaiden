@@ -68,9 +68,9 @@ function extractJson(text) {
 	return JSON.parse(candidate);
 }
 
-function ask(c, workspace) {
+function ask(c, cwd) {
 	return new Promise((resolvePromise) => {
-		const child = spawn(claude, ["-p", "--allowedTools", "Skill", "--model", model], { cwd: workspace });
+		const child = spawn(claude, ["-p", "--allowedTools", "Skill", "--model", model], { cwd });
 		let stdout = "";
 		let stderr = "";
 		child.stdout.on("data", (chunk) => (stdout += chunk));
@@ -111,7 +111,8 @@ async function worker() {
 				note = `no JSON in the reply (${parseError.message})`;
 			}
 		}
-		console.log(`${c.id} ${((Date.now() - started) / 1000).toFixed(1)}s${note ? ` ${note}` : ""}`);
+		const noteText = note ? ` ${note}` : "";
+		console.log(`${c.id} ${((Date.now() - started) / 1000).toFixed(1)}s${noteText}`);
 	}
 }
 await Promise.all(Array.from({ length: concurrency }, worker));

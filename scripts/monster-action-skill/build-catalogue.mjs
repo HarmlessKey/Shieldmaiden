@@ -75,9 +75,9 @@ const HINTS = {
 	surprised: "is surprised",
 };
 
-const argValue = (args, flag) => {
-	const i = args.indexOf(flag);
-	return i >= 0 ? args[i + 1] : undefined;
+const argValue = (argv, flag) => {
+	const i = argv.indexOf(flag);
+	return i >= 0 ? argv[i + 1] : undefined;
 };
 
 /**

@@ -112,7 +112,11 @@ export function effectRefOptions({ custom = [], excludeKey } = {}) {
 	}
 
 	const srdOptions = [...srd.values()]
-		.sort((a, b) => (a.group === b.group ? a.name.localeCompare(b.name) : a.group === "Conditions" ? -1 : 1))
+		.sort((a, b) => {
+			// Conditions first, then by name
+			if (a.group !== b.group) return a.group === "Conditions" ? -1 : 1;
+			return a.name.localeCompare(b.name);
+		})
 		.map(({ name, url, group, editions }) => ({
 			label: name,
 			value: `srd:${url}`,

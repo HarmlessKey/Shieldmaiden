@@ -165,9 +165,9 @@ export default {
 				// Effect roll modifiers (rollPlan): automatic results skip the roll
 				const plan = this.roll.plan;
 				if (plan?.auto) {
-					const result = plan.auto.result === "fail" ? "fails" : "succeeds";
+					const outcome = plan.auto.result === "fail" ? "fails" : "succeeds";
 					this.$snotify.warning(
-						`${this.roll.title}: ${result} automatically (${plan.auto.names.join(", ")})`,
+						`${this.roll.title}: ${outcome} automatically (${plan.auto.names.join(", ")})`,
 						this.roll.entity_name || "Automatic result",
 						{ timeout: 4000, showProgressBar: false }
 					);

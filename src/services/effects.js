@@ -16,14 +16,10 @@ export class EffectServices {
 	 * @returns All the content of search_effects reference
 	 */
 	async getEffects(uid) {
-		try {
-			const effects = await SEARCH_EFFECTS_REF.child(`${uid}/results`).once("value", (snapshot) => {
-				return snapshot;
-			});
-			return effects.val();
-		} catch (error) {
-			throw error;
-		}
+		const effects = await SEARCH_EFFECTS_REF.child(`${uid}/results`).once("value", (snapshot) => {
+			return snapshot;
+		});
+		return effects.val();
 	}
 
 	/**
@@ -33,13 +29,9 @@ export class EffectServices {
 	 * @returns Number of effects of a user
 	 */
 	async getEffectCount(uid) {
-		try {
-			const path = `${uid}/metadata/count`;
-			let count = await SEARCH_EFFECTS_REF.child(path).once("value");
-			return count.val();
-		} catch (error) {
-			throw error;
-		}
+		const path = `${uid}/metadata/count`;
+		let count = await SEARCH_EFFECTS_REF.child(path).once("value");
+		return count.val();
 	}
 
 	/**
@@ -50,14 +42,10 @@ export class EffectServices {
 	 * @returns An entire effect from the 'effects' reference
 	 */
 	async getEffect(uid, id) {
-		try {
-			const effect = await EFFECTS_REF.child(uid)
-				.child(id)
-				.once("value", (snapshot) => snapshot);
-			return effect.val();
-		} catch (error) {
-			throw error;
-		}
+		const effect = await EFFECTS_REF.child(uid)
+			.child(id)
+			.once("value", (snapshot) => snapshot);
+		return effect.val();
 	}
 
 	/**
@@ -71,20 +59,16 @@ export class EffectServices {
 	 * @returns Key of the newly added effect
 	 */
 	async addEffect(uid, effect, search_effect) {
-		try {
-			effect.name = effect.name.toLowerCase();
-			const newEffect = await EFFECTS_REF.child(uid).push(effect);
+		effect.name = effect.name.toLowerCase();
+		const newEffect = await EFFECTS_REF.child(uid).push(effect);
 
-			effect.created = firebase.database.ServerValue.TIMESTAMP;
-			effect.updated = firebase.database.ServerValue.TIMESTAMP;
+		effect.created = firebase.database.ServerValue.TIMESTAMP;
+		effect.updated = firebase.database.ServerValue.TIMESTAMP;
 
-			// Update search_effects
-			SEARCH_EFFECTS_REF.child(`${uid}/results/${newEffect.key}`).set(search_effect);
+		// Update search_effects
+		SEARCH_EFFECTS_REF.child(`${uid}/results/${newEffect.key}`).set(search_effect);
 
-			return newEffect.key;
-		} catch (error) {
-			throw error;
-		}
+		return newEffect.key;
 	}
 
 	/**
@@ -117,15 +101,10 @@ export class EffectServices {
 	 * @param {String} id ID of effect to edit
 	 */
 	async deleteEffect(uid, id) {
-		try {
-			EFFECTS_REF.child(uid).child(id).remove();
+		EFFECTS_REF.child(uid).child(id).remove();
 
-			//Update search_effects
-			SEARCH_EFFECTS_REF.child(`${uid}/results`).child(id).remove();
-			return;
-		} catch (error) {
-			throw error;
-		}
+		//Update search_effects
+		SEARCH_EFFECTS_REF.child(`${uid}/results`).child(id).remove();
 	}
 
 	/**

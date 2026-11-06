@@ -167,20 +167,20 @@ export default {
 				return { ...base, roll: true, lines: modifiers?.lines || [] };
 			}
 			if (stat === "damage") {
-				const lines = damageBonusLines({
+				const damageLines = damageBonusLines({
 					entity: this.effective,
 					definitionOf: this.$store.getters.effect_definition,
 				});
-				return { ...base, roll: true, lines };
+				return { ...base, roll: true, lines: damageLines };
 			}
 			const roll = this.rollOf(stat);
 
 			// A roll value: the modifier without and with effects and manual bonuses
 			if (roll) {
-				const stored = this.baseModifier(roll);
+				const storedModifier = this.baseModifier(roll);
 				const modifiers = this.roll_modifiers(this.data.entityKey, roll);
-				const plan = rollPlan(modifiers, { modifier: stored });
-				return { ...base, roll: true, stored, effective: plan.m, lines: modifiers?.lines || [] };
+				const plan = rollPlan(modifiers, { modifier: storedModifier });
+				return { ...base, roll: true, stored: storedModifier, effective: plan.m, lines: modifiers?.lines || [] };
 			}
 			// Bonuses on all checks or saves, and death saves: manual bonuses only
 			if (/^(check|save)_all$|^death_save$/.test(stat)) {

@@ -533,10 +533,11 @@ export function scaledLink(link = {}, { scaling, spellLevel, castLevel, casterLe
 		const slot = castLevel ?? spellLevel;
 		const tier = [...durationTiers]
 			.sort((a, b) => a.level - b.level)
-			.filter((tier) => slot >= tier.level)
+			.filter((candidate) => slot >= candidate.level)
 			.pop();
 		if (tier) {
-			const { value, unit, ...rest } = link.duration;
+			// The tier's duration replaces the link's time
+			const { value: _value, unit: _unit, ...rest } = link.duration; // eslint-disable-line no-unused-vars
 			scaled.duration = { ...rest, ...tier.duration };
 		}
 	}
@@ -1142,14 +1143,9 @@ export function describeDuration(instance, { casterName, holderName } = {}) {
 		case "next_turn": {
 			const edge = duration.edge || "start";
 			const anchor = duration.anchor || "caster";
-			const whose =
-				anchor === "target"
-					? holderName
-						? `${holderName}'s`
-						: "its"
-					: casterName
-					? `${casterName}'s`
-					: "the caster's";
+			let whose;
+			if (anchor === "target") whose = holderName ? `${holderName}'s` : "its";
+			else whose = casterName ? `${casterName}'s` : "the caster's";
 			return `Until the ${edge} of ${whose} next turn`;
 		}
 		case "end_of_turn":
@@ -1271,7 +1267,7 @@ export function fixChoices(definition, choices = {}) {
 			// Its text describes the open choice ("the chosen number"): the generated text
 			// (describeSubEffect) describes the fixed values instead
 			if (kinds.some((kind) => fixed.includes(kind))) delete copy.description;
-			for (const kind of kinds.filter((kind) => fixed.includes(kind))) {
+			for (const kind of kinds.filter((fixedKind) => fixed.includes(fixedKind))) {
 				const field = CHOICE_FIELDS[kind];
 				if (field) copy[field] = field === "value" ? choices[kind] : [choices[kind]];
 			}
@@ -1945,9 +1941,9 @@ export function resolveRepeatSave(instance, success) {
 	const save = instance.duration?.save || {};
 
 	if (success) {
-		const value = (instance.save_successes || 0) + 1;
-		if (value >= (save.successes_to_end || 1)) return { result: "end" };
-		return { result: "count", property: "save_successes", value };
+		const successes = (instance.save_successes || 0) + 1;
+		if (successes >= (save.successes_to_end || 1)) return { result: "end" };
+		return { result: "count", property: "save_successes", value: successes };
 	}
 
 	const value = (instance.save_failures || 0) + 1;
@@ -2257,7 +2253,8 @@ export function evaluateFormula(formula, vars = {}) {
 		while (peek()?.op === "*" || peek()?.op === "/") {
 			const op = take().op;
 			const right = unary();
-			value = op === "*" ? value * right : right === 0 ? 0 : value / right;
+			if (op === "*") value *= right;
+			else value = right === 0 ? 0 : value / right; // Division by 0 is 0, not Infinity
 		}
 		return value;
 	};
@@ -2271,19 +2268,19 @@ export function evaluateFormula(formula, vars = {}) {
 		return value;
 	};
 
-	let value;
+	let result;
 	try {
-		value = expression();
+		result = expression();
 		if (position < tokens.length) throw new Error("trailing");
 	} catch (error) {
 		return { value: 0, missing: [text] };
 	}
 	if (missing.length) return { value: 0, missing };
 
-	value = spec.round === "up" ? Math.ceil(value) : Math.floor(value);
-	if (typeof spec.min === "number") value = Math.max(value, spec.min);
-	if (typeof spec.max === "number") value = Math.min(value, spec.max);
-	return { value, missing };
+	result = spec.round === "up" ? Math.ceil(result) : Math.floor(result);
+	if (typeof spec.min === "number") result = Math.max(result, spec.min);
+	if (typeof spec.max === "number") result = Math.min(result, spec.max);
+	return { value: result, missing };
 }
 
 /**
@@ -2643,10 +2640,12 @@ export function effectRollParts({
 
 		const target = sub_effect.target || "self";
 		const otherParty = OTHER_PARTY_TARGETS.includes(target);
-		const recipientKey =
-			target === "self" ? holderKey : target === "caster" ? instance.caster_key : otherParty ? event.sourceKey : undefined;
+		let recipientKey;
+		if (target === "self") recipientKey = holderKey;
+		else if (target === "caster") recipientKey = instance.caster_key;
+		else if (otherParty) recipientKey = event.sourceKey;
 		if (!recipientKey || !entities[recipientKey]) continue;
-		const dealerKey = otherParty ? holderKey : casterPresent ? instance.caster_key : holderKey;
+		const dealerKey = !otherParty && casterPresent ? instance.caster_key : holderKey;
 
 		const { dice_count, dice_type, fixed_val, magical, notes } = amountRoll(
 			withChosenValue(sub_effect, instance),
@@ -2821,6 +2820,12 @@ function combineStat(stored, entries) {
 	return value;
 }
 
+/** map[key], created with make() the first time it's asked for */
+function bucket(map, key, make = () => []) {
+	if (!map[key]) map[key] = make();
+	return map[key];
+}
+
 /**
  * Effective values of an entity from the numeric sub-effects of its active effects.
  * Stored values aren't changed; only fields whose value differs are returned.
@@ -2839,7 +2844,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 
 	// Collect entries per field: { groupKey, effectKey, name, kind, amount | base, text }
 	const byField = {};
-	const addModifier = (field, modifier) => (modifiers[field] = modifiers[field] || []).push(modifier);
+	const addModifier = (field, modifier) => bucket(modifiers, field).push(modifier);
 	const selfVars = formulaVars(entity);
 
 	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
@@ -2911,7 +2916,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 			if (!entry) continue;
 
 			for (const field of fields) {
-				(byField[field] = byField[field] || []).push({ ...entry, groupKey, effectKey, name });
+				bucket(byField, field).push({ ...entry, groupKey, effectKey, name });
 			}
 		}
 	}
@@ -2923,7 +2928,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 			: statFields(key, {}, {}, entity).filter((field) => !abilities.includes(field));
 		for (const [bonusId, bonus] of Object.entries(list)) {
 			for (const field of fields) {
-				(byField[field] = byField[field] || []).push({
+				bucket(byField, field).push({
 					kind: "bonus",
 					amount: bonus.value,
 					text: signed(bonus.value),
@@ -2959,7 +2964,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 
 		// The same definition more than once: only its strongest instance counts
 		const groups = {};
-		for (const entry of entries) (groups[entry.groupKey] = groups[entry.groupKey] || new Set()).add(entry.effectKey);
+		for (const entry of entries) bucket(groups, entry.groupKey, () => new Set()).add(entry.effectKey);
 		for (const [groupKey, effectKeys] of Object.entries(groups)) {
 			if (effectKeys.size < 2) continue;
 			let best;
@@ -3045,7 +3050,7 @@ export function effectiveDefenses({ entity, holderKey, entities = {}, definition
 	const result = { sources: {}, reminders: [] };
 	// Per damage type the defenses it has: { fire: Set(["r", "v"]) }
 	const byType = {};
-	const addType = (type, kind) => (byType[type] = byType[type] || new Set()).add(kind);
+	const addType = (type, kind) => bucket(byType, type, () => new Set()).add(kind);
 	for (const [kind, field] of Object.entries(DEFENSE_LISTS)) {
 		for (const type of own(field)) addType(type, kind);
 	}
@@ -3977,14 +3982,10 @@ export function damageModifiers({ entity, holderKey, entities = {}, definitionOf
 			const notes = [];
 			if (definitionState === "unknown") notes.push(definition.condition.description || "if its condition holds");
 			if (subState === "unknown") notes.push(sub_effect.condition.description || "if its condition holds");
-			const damageTypes =
-				choiceKinds(sub_effect).includes("damage_type")
-					? [instance.choices.damage_type]
-					: sub_effect.all_damage
-						? undefined
-						: sub_effect.damage_types?.length
-							? sub_effect.damage_types
-							: undefined;
+			// undefined is every damage type
+			let damageTypes;
+			if (choiceKinds(sub_effect).includes("damage_type")) damageTypes = [instance.choices.damage_type];
+			else if (!sub_effect.all_damage && sub_effect.damage_types?.length) damageTypes = sub_effect.damage_types;
 			const exceptTypes = sub_effect.except_damage_types?.length ? sub_effect.except_damage_types : undefined;
 			const description = sub_effect.description || describeSubEffect(sub_effect);
 
@@ -4001,7 +4002,8 @@ export function damageModifiers({ entity, holderKey, entities = {}, definitionOf
 								dice_type: parseInt(rollSpec.dice_type),
 								fixed_val: parseInt(rollSpec.fixed_val) || 0,
 							};
-							amountText = `−${toggle.roll.dice_count}d${toggle.roll.dice_type}${toggle.roll.fixed_val ? `+${toggle.roll.fixed_val}` : ""}`;
+							const fixedText = toggle.roll.fixed_val ? `+${toggle.roll.fixed_val}` : "";
+							amountText = `−${toggle.roll.dice_count}d${toggle.roll.dice_type}${fixedText}`;
 						} else if (sub_effect.value !== undefined) {
 							const flat = { ...vars, level: active.level };
 							const resolved = resolveAmount(sub_effect.value, flat);
@@ -4399,7 +4401,10 @@ export function rollPlan(modifiers, { modifier = 0, advantage = {} } = {}) {
 		([appliesTo, { name, value }]) => `${name}: ${appliesTo === "total" ? "total" : "die"} at least ${value}`
 	);
 	const rerolls = mods.rerolls || [];
-	const rerollLines = rerolls.map(({ name, condition }) => `${name}: reroll${condition ? ` on ${condition}` : ""}`);
+	const rerollLines = rerolls.map(({ name, condition }) => {
+		const on = condition ? ` on ${condition}` : "";
+		return `${name}: reroll${on}`;
+	});
 
 	const notes = [...before, ...diceLines, ...after, ...floorLines, ...rerollLines];
 	// For a roll's result the bonus dice are shown with their rolled values instead, and

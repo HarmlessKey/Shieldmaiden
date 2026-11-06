@@ -106,7 +106,8 @@ export default {
 				.filter(Boolean)
 				.join(", ");
 			const title = `${prompt.holderName || "Unknown"}: ${prompt.effectName} — ${ability} save${dc}`;
-			const body = `Repeat the save ${TRIGGER_LABELS[prompt.trigger] || ""}${notes ? ` (${notes})` : ""}.`;
+			const noteText = notes ? ` (${notes})` : "";
+			const body = `Repeat the save ${TRIGGER_LABELS[prompt.trigger] || ""}${noteText}.`;
 			const resolve = (toast, success) => {
 				this.resolve_repeat_save({ key: prompt.holderKey, effectKey: prompt.effectKey, success });
 				this.$snotify.remove(toast.id);
@@ -397,11 +398,11 @@ export default {
 					buttons: [
 						{
 							text: "Apply",
-							action: (toast) => {
+							action: (clicked) => {
 								this.$store
 									.dispatch("apply_reaction_used", { actorKey: key, turnKey: prompt.turnKey })
 									.catch((error) => console.error(error));
-								this.$snotify.remove(toast.id);
+								this.$snotify.remove(clicked.id);
 							},
 							bold: true,
 						},

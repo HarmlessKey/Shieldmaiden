@@ -491,12 +491,9 @@ export default {
 			},
 		},
 		triggerOptions() {
-			const types =
-				this.scope === "encounter"
-					? ENCOUNTER_TRIGGER_TYPES
-					: this.scope === "entity"
-						? ENTITY_TRIGGER_TYPES
-						: [...ENCOUNTER_TRIGGER_TYPES, ...ENTITY_TRIGGER_TYPES];
+			let types = [...ENCOUNTER_TRIGGER_TYPES, ...ENTITY_TRIGGER_TYPES];
+			if (this.scope === "encounter") types = ENCOUNTER_TRIGGER_TYPES;
+			else if (this.scope === "entity") types = ENTITY_TRIGGER_TYPES;
 			return types.map((value) => ({ value, label: REMINDER_TRIGGER_LABELS[value] }));
 		},
 		triggerType: {
@@ -593,7 +590,8 @@ export default {
 			this.$delete(reminder, "action");
 			this.$delete(reminder, "rounds");
 			if (this.scope === "entity") this.$delete(reminder, "damage");
-			this.offer = reminder.damage ? "damage" : reminder.effect ? "effect" : "none";
+			if (reminder.damage) this.offer = "damage";
+			else this.offer = reminder.effect ? "effect" : "none";
 		},
 		// The prompt offers an effect or damage, not both: switching clears the other
 		setOffer(offer) {

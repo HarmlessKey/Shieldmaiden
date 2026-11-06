@@ -400,10 +400,12 @@ export default {
 		if (this.optional && !this.value) form.type = null;
 		// Ends early when stays selected while its events are being picked
 		const hasCancel = form.cancelTriggers.length > 0;
+		// The first selected end option's tab is open
+		const tab = [form.hasSave && "save", form.hasEscape && "escape", hasCancel && "cancel"].find(Boolean);
 		return {
 			form,
 			hasCancel,
-			tab: form.hasSave ? "save" : form.hasEscape ? "escape" : hasCancel ? "cancel" : undefined,
+			tab,
 			endOptionList: END_OPTIONS,
 			endOptionLabels: { save: "Repeat save", escape: "Escape", cancel: "Ends early" },
 			units: ["round", "minute", "hour", "day"].map((unit) => ({ label: startCase(`${unit}s`), value: unit })),

@@ -70,7 +70,7 @@
 					</tr>
 					<tr>
 						<td>
-							<a @click="remove"><i aria-hidden="true" class="fas fa-times" /></a>
+							<a aria-label="Remove effect" @click="remove"><i aria-hidden="true" class="fas fa-times" /></a>
 						</td>
 						<td>Remove</td>
 					</tr>
@@ -251,7 +251,8 @@ export default {
 				.join(" or ");
 			const dc = this.escape.dc !== undefined ? `DC ${this.escape.dc} · ` : "";
 			const cost = startCase(this.escape.cost || "action").toLowerCase();
-			return `${dc}${checks} · ${ESCAPE_BY[this.escape.by || "self"]} · costs ${cost === "action" ? "an action" : `a ${cost}`}`;
+			const costText = cost === "action" ? "an action" : `a ${cost}`;
+			return `${dc}${checks} · ${ESCAPE_BY[this.escape.by || "self"]} · costs ${costText}`;
 		},
 	},
 	methods: {

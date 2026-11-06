@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { effectServices } from "src/services/api/effects";
+import { EffectServices } from "src/services/api/effects";
 
 const EDITIONS = ["5e", "5.5e"];
 const editionKey = (edition) => (edition === "5.5e" ? "5.5e" : "5e");
@@ -52,7 +52,7 @@ const effects_getters = {
 const effects_actions = {
 	get_effect_services: async ({ getters, commit }) => {
 		if (getters.effect_services === null || !Object.keys(getters.effect_services).length) {
-			commit("SET_EFFECT_SERVICES", new effectServices());
+			commit("SET_EFFECT_SERVICES", new EffectServices());
 		}
 		return getters.effect_services;
 	},

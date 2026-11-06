@@ -355,13 +355,9 @@ export default {
 			const instances = {};
 			for (const [key, entity] of Object.entries(this.encounter.entities || {})) {
 				if (!entity?.active) continue;
-				const effects =
-					entity.entityType === "player"
-						? this.campaign.players?.[key]?.effects
-						: entity.entityType === "companion"
-						? this.campaign.companions?.[key]?.effects
-						: entity.effects;
-				instances[key] = effects || {};
+				// Players and companions keep their effects on the campaign, NPCs on the encounter
+				const holder = this.campaignEntry(entity.entityType, key) || entity;
+				instances[key] = holder.effects || {};
 			}
 			return instances;
 		},
@@ -415,12 +411,7 @@ export default {
 				}
 				subjects[key] = effectSubject({
 					entity,
-					campaignEntry:
-						type === "player"
-							? this.campaign.players?.[key]
-							: type === "companion"
-							? this.campaign.companions?.[key]
-							: undefined,
+					campaignEntry: this.campaignEntry(type, key),
 					player: type === "player" ? this.players?.[key] : undefined,
 					npc,
 				});
@@ -472,6 +463,12 @@ export default {
 		},
 	},
 	methods: {
+		/** The campaign's entry of a player or companion; undefined for NPCs */
+		campaignEntry(type, key) {
+			if (type === "player") return this.campaign.players?.[key];
+			if (type === "companion") return this.campaign.companions?.[key];
+			return undefined;
+		},
 		setWeather(value) {
 			this.weather = value;
 		},

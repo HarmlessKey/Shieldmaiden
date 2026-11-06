@@ -61,12 +61,8 @@ const effect_actions = {
 
 		if (!effects && uid) {
 			const services = await dispatch("get_effect_services");
-			try {
-				effects = await services.getEffects(uid);
-				commit("SET_EFFECTS", effects || {});
-			} catch (error) {
-				throw error;
-			}
+			effects = await services.getEffects(uid);
+			commit("SET_EFFECTS", effects || {});
 		}
 		return effects;
 	},
@@ -79,13 +75,8 @@ const effect_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_effect_services");
-			try {
-				let count = (await services.getEffectCount(uid)) || 0;
-				commit("SET_EFFECT_COUNT", count);
-				return;
-			} catch (error) {
-				throw error;
-			}
+			let count = (await services.getEffectCount(uid)) || 0;
+			commit("SET_EFFECT_COUNT", count);
 		}
 	},
 
@@ -94,15 +85,11 @@ const effect_actions = {
 		// The effect is not in the store and needs to be fetched from the database
 		if (!effect) {
 			const services = await dispatch("get_effect_services");
-			try {
-				effect = await services.getEffect(uid, id);
-				if (effect === null) {
-					return false;
-				}
-				commit("SET_CACHED_EFFECT", { uid, id, effect });
-			} catch (error) {
-				throw error;
+			effect = await services.getEffect(uid, id);
+			if (effect === null) {
+				return false;
 			}
+			commit("SET_CACHED_EFFECT", { uid, id, effect });
 		}
 		return effect;
 	},
@@ -125,19 +112,15 @@ const effect_actions = {
 			if (used_slots >= available_slots) {
 				throw new NotEnoughSlotsError();
 			}
-			try {
-				const search_effect = convert_effect(effect);
-				const id = await services.addEffect(uid, effect, search_effect);
-				commit("SET_EFFECT", { id, search_effect });
-				commit("SET_CACHED_EFFECT", { uid, id, effect });
+			const search_effect = convert_effect(effect);
+			const id = await services.addEffect(uid, effect, search_effect);
+			commit("SET_EFFECT", { id, search_effect });
+			commit("SET_CACHED_EFFECT", { uid, id, effect });
 
-				const new_count = await services.updateEffectCount(uid, 1);
-				commit("SET_EFFECT_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
-				return id;
-			} catch (error) {
-				throw error;
-			}
+			const new_count = await services.updateEffectCount(uid, 1);
+			commit("SET_EFFECT_COUNT", new_count);
+			dispatch("checkEncumbrance", "", { root: true });
+			return id;
 		}
 	},
 
@@ -153,15 +136,10 @@ const effect_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_effect_services");
-			try {
-				const search_effect = convert_effect(effect);
-				await services.editEffect(uid, id, effect, search_effect);
-				commit("SET_EFFECT", { id, search_effect });
-				commit("SET_CACHED_EFFECT", { uid, id, effect });
-				return;
-			} catch (error) {
-				throw error;
-			}
+			const search_effect = convert_effect(effect);
+			await services.editEffect(uid, id, effect, search_effect);
+			commit("SET_EFFECT", { id, search_effect });
+			commit("SET_CACHED_EFFECT", { uid, id, effect });
 		}
 	},
 
@@ -175,18 +153,13 @@ const effect_actions = {
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		if (uid) {
 			const services = await dispatch("get_effect_services");
-			try {
-				await services.deleteEffect(uid, id);
-				commit("REMOVE_EFFECT", id);
-				commit("REMOVE_CACHED_EFFECT", { uid, id });
+			await services.deleteEffect(uid, id);
+			commit("REMOVE_EFFECT", id);
+			commit("REMOVE_CACHED_EFFECT", { uid, id });
 
-				const new_count = await services.updateEffectCount(uid, -1);
-				commit("SET_EFFECT_COUNT", new_count);
-				dispatch("checkEncumbrance", "", { root: true });
-				return;
-			} catch (error) {
-				throw error;
-			}
+			const new_count = await services.updateEffectCount(uid, -1);
+			commit("SET_EFFECT_COUNT", new_count);
+			dispatch("checkEncumbrance", "", { root: true });
 		}
 	},
 

@@ -70,14 +70,15 @@ export default {
 			for (const restriction of list) {
 				// Attacks against a named creature (the charmer) are their own chip
 				const group = restriction.kind === "attack" ? `attack:${restriction.againstKey || ""}` : restriction.kind;
-				(groups[group] = groups[group] || []).push(restriction);
+				if (!groups[group]) groups[group] = [];
+				groups[group].push(restriction);
 			}
 			return Object.values(groups).map((items) => {
 				const { kind, againstKey } = items[0];
 				const possible = items.every((item) => item.possible) && !againstKey;
 				const against = againstKey ? this.entities[againstKey]?.name?.capitalizeEach() : undefined;
-				const verb =
-					kind === "attack" ? (against ? `attack ${against}` : "attack") : verbs[kind] || kind.replace(/_/g, " ");
+				let verb = verbs[kind] || kind.replace(/_/g, " ");
+				if (kind === "attack") verb = against ? `attack ${against}` : "attack";
 				return {
 					icon: "fas fa-ban",
 					text: `${possible ? "May not" : "Can't"} ${verb}`,
@@ -100,7 +101,10 @@ export default {
 				extra_turn: "Extra turn",
 			};
 			const groups = {};
-			for (const item of list) (groups[item.kind] = groups[item.kind] || []).push(item);
+			for (const item of list) {
+				if (!groups[item.kind]) groups[item.kind] = [];
+				groups[item.kind].push(item);
+			}
 			return Object.entries(groups).map(([kind, items]) => ({
 				icon: "fas fa-plus",
 				text: labels[kind],
@@ -176,7 +180,10 @@ export default {
 							.map((line) => `${line.name}: ${line.text}`),
 						...m.flat
 							.filter((bonus) => bonus.bonusId !== undefined)
-							.map(({ name, value }) => `${name}: ${value > 0 ? `+${value}` : value}`),
+							.map(({ name, value }) => {
+								const shown = value > 0 ? `+${value}` : value;
+								return `${name}: ${shown}`;
+							}),
 					],
 				});
 			}

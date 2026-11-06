@@ -159,7 +159,8 @@ export default {
 			// No roll result is shown for initiative: name what changed it
 			const notes = [
 				...(roll.bonus_rolls || []).map(
-					({ name, dice, sign, total }) => `${name} ${sign < 0 ? "−" : "+"}${dice}: ${Math.abs(total)}`
+					({ name, dice: bonusDice, sign, total }) =>
+						`${name} ${sign < 0 ? "−" : "+"}${bonusDice}: ${Math.abs(total)}`
 				),
 				...plan.roll_notes,
 			];

@@ -248,10 +248,10 @@ export const effectRolls = {
 
 			// Automatic failure or success: no roll
 			if (plan.auto) {
-				const result = plan.auto.result === "fail" ? "fails" : "succeeds";
+				const outcome = plan.auto.result === "fail" ? "fails" : "succeeds";
 				this.effectToast("warning", {
 					title: entity?.name?.capitalizeEach() || "Automatic result",
-					body: `${title}: ${result} automatically (${plan.auto.names.join(", ")})`,
+					body: `${title}: ${outcome} automatically (${plan.auto.names.join(", ")})`,
 					config: { timeout: 4000, showProgressBar: false },
 				});
 				return { auto: plan.auto.result };

@@ -829,9 +829,9 @@ const campaign_actions = {
 			(key) => effects[key].source === entry.source && effects[key].source_key === entry.sourceKey
 		);
 		if (isCondition && existingKey) {
-			let notices = [];
+			let levelNotices = [];
 			if (entry.sourceKey === "exhaustion" && rest.level) {
-				notices = await dispatch("set_campaign_effect_level", {
+				levelNotices = await dispatch("set_campaign_effect_level", {
 					campaignId,
 					playerId,
 					effectKey: existingKey,
@@ -839,7 +839,7 @@ const campaign_actions = {
 					context,
 				});
 			}
-			return { key: existingKey, notices };
+			return { key: existingKey, notices: levelNotices };
 		}
 
 		const instance = buildEffectInstance({
@@ -1059,14 +1059,18 @@ const campaign_actions = {
 		const write = (property, value) =>
 			dispatch("update_campaign_entity", { uid, campaignId, type: "players", id: playerId, property, value });
 		if (entity.transformed) {
-			const result = healingResult({ amount: heal, curHp: entity.transformed.curHp, maxHp: entity.transformed.maxHp });
+			const transformedResult = healingResult({
+				amount: heal,
+				curHp: entity.transformed.curHp,
+				maxHp: entity.transformed.maxHp,
+			});
 			await dispatch("update_transformed_entity", {
 				uid,
 				campaignId,
 				type: "players",
 				id: playerId,
 				property: "curHp",
-				value: result.curHp,
+				value: transformedResult.curHp,
 			});
 			return notices;
 		}

@@ -108,8 +108,6 @@ export default {
 				top: -5px;
 				left: 4px;
 			}
-		}
-		&.effect {
 			.generic {
 				color: $neutral-4;
 			}

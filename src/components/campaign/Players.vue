@@ -837,7 +837,10 @@ export default {
 		},
 		bonusLines(campaignPlayer, stat) {
 			return Object.values(manualBonuses(campaignPlayer)[stat] || {}).map(
-				({ value, label }) => `${label}: ${value > 0 ? `+${value}` : value}`
+				({ value, label }) => {
+					const shown = value > 0 ? `+${value}` : value;
+					return `${label}: ${shown}`;
+				}
 			);
 		},
 		checkAll(value) {

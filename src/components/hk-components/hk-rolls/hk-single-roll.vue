@@ -1051,8 +1051,8 @@ export default {
 		/**
 		 * Its tooltip: "Bless +1d4: 3"
 		 */
-		bonusRollDetail({ name, dice, sign, throws = [] }) {
-			return `${name} ${sign < 0 ? "−" : "+"}${dice}: ${throws.join(", ")}`;
+		bonusRollDetail({ name, dice: bonusDice, sign, throws = [] }) {
+			return `${name} ${sign < 0 ? "−" : "+"}${bonusDice}: ${throws.join(", ")}`;
 		},
 		/**
 		 * The notes of an attack's to-hit: why it's critical and the roll modifiers' notes
@@ -1154,7 +1154,8 @@ export default {
 			// The roll's notes: the plan's, plus a floor that raised the die and reroll offers
 			this.$set(this.saveNotes, action_index, [
 				...(roll.bonus_rolls || []).map(
-					({ name, dice, sign, total }) => `${name} ${sign < 0 ? "−" : "+"}${dice}: ${Math.abs(total)}`
+					({ name, dice: bonusDice, sign, total }) =>
+						`${name} ${sign < 0 ? "−" : "+"}${bonusDice}: ${Math.abs(total)}`
 				),
 				...(roll.notes || plan.roll_notes),
 			]);

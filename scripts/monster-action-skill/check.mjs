@@ -74,7 +74,7 @@ function schemaProblems(ability, group) {
 	};
 	if (validateNpc(npc)) return [];
 	return validateNpc.errors.map(
-		(e) => `schema: ${e.instancePath.replace(`/${group}/0`, "") || "/"} ${e.message}`
+		(e) => `schema: ${e.instancePath.replace("/" + group + "/0", "") || "/"} ${e.message}`
 	);
 }
 
@@ -153,7 +153,11 @@ function semanticProblems(ability, { edition }) {
 // ---- Normalizing and comparing ----
 
 const sortBy = (list, key = (x) => JSON.stringify(x)) =>
-	[...list].sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0));
+	[...list].sort((a, b) => {
+		const [ka, kb] = [key(a), key(b)];
+		if (ka === kb) return 0;
+		return ka < kb ? -1 : 1;
+	});
 
 /**
  * Drops undefined, null, empty arrays and empty objects, recursively
@@ -238,7 +242,7 @@ function leaves(value, path = "", out = {}) {
 function compare(expected, actual) {
 	const e = leaves(expected);
 	const a = leaves(actual);
-	const paths = [...new Set([...Object.keys(e), ...Object.keys(a)])].sort();
+	const paths = [...new Set([...Object.keys(e), ...Object.keys(a)])].sort((x, y) => x.localeCompare(y));
 	const diffs = paths.filter((p) => e[p] !== a[p]).map((p) => ({ path: p, expected: e[p], actual: a[p] }));
 	return { diffs, accuracy: paths.length ? (paths.length - diffs.length) / paths.length : 1 };
 }
@@ -391,11 +395,11 @@ function scoreResults(dir) {
 		}
 	}
 	const passed = report.filter((r) => r.pass).length;
-	const accuracy = report.reduce((sum, r) => sum + r.accuracy, 0) / report.length;
-	console.log(`\n${passed}/${report.length} passed, field accuracy ${(accuracy * 100).toFixed(1)}%`);
+	const overallAccuracy = report.reduce((sum, r) => sum + r.accuracy, 0) / report.length;
+	console.log(`\n${passed}/${report.length} passed, field accuracy ${(overallAccuracy * 100).toFixed(1)}%`);
 	writeFileSync(
 		join(dir, "report.json"),
-		JSON.stringify({ passed, total: report.length, accuracy, cases: report }, null, "\t")
+		JSON.stringify({ passed, total: report.length, accuracy: overallAccuracy, cases: report }, null, "\t")
 	);
 	return passed < report.length;
 }

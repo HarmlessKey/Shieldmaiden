@@ -55,7 +55,10 @@ export const dice = {
 			const bonus_rolls = roll.bonus_rolls || [];
 			// Effect bonus dice and notes; labels can be the DM's own text, so escaped
 			const bonusText = bonus_rolls
-				.map(({ name, dice, sign, total }) => `${escapeHtml(name)} ${sign < 0 ? "−" : "+"}${dice}: ${Math.abs(total)}`)
+				.map(
+					({ name, dice: bonusDice, sign, total }) =>
+						`${escapeHtml(name)} ${sign < 0 ? "−" : "+"}${bonusDice}: ${Math.abs(total)}`
+				)
 				.join("<br />");
 			const notesText = (roll.notes || []).map(escapeHtml).join("<br />");
 			const extraText =
@@ -63,7 +66,8 @@ export const dice = {
 					? `<div class="roll_notes neutral-2">${[bonusText, notesText].filter(Boolean).join("<br />")}</div>`
 					: "";
 			const bonusSum = bonus_rolls.reduce((total, bonus) => total + bonus.total, 0);
-			const bonusMod = bonusSum ? (bonusSum > 0 ? `+${bonusSum}` : `${bonusSum}`) : "";
+			let bonusMod = "";
+			if (bonusSum) bonusMod = bonusSum > 0 ? `+${bonusSum}` : `${bonusSum}`;
 
 			this.animateTrigger = !this.animateTrigger;
 			this.$snotify.html(
@@ -211,11 +215,10 @@ export const dice = {
 				? (extras.rerolls || []).filter((reroll) => !isNaturalOne(reroll.condition) || natural === 1)
 				: [];
 			for (const reroll of rerolls) {
-				notes.push(
-					isNaturalOne(reroll.condition)
-						? `${reroll.name}: reroll the 1`
-						: `${reroll.name}: reroll${reroll.condition ? ` on ${reroll.condition}` : ""}`
-				);
+				let when = "";
+				if (isNaturalOne(reroll.condition)) when = " the 1";
+				else if (reroll.condition) when = ` on ${reroll.condition}`;
+				notes.push(`${reroll.name}: reroll${when}`);
 			}
 
 			const showRoll = m !== 0 ? `${n}d${d}${s}${m}` : `${n}d${d}`;

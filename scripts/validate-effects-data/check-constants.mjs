@@ -231,7 +231,7 @@ for (const [edition, { conditions, effects }] of Object.entries(splitRaw(raw))) 
 		for (const sub_effect of subEffectsIn([entry])) {
 			const label = entry.url || entry.name;
 			// A choice is one kind or a list of kinds
-			for (const kind of [sub_effect.choice].flat().filter((kind) => kind !== undefined)) {
+			for (const kind of [sub_effect.choice].flat().filter((choice) => choice !== undefined)) {
 				if (!choice_kinds[kind]) reportData(edition, label, `choice kind "${kind}" has no choice_kinds entry`);
 			}
 			const type = effect_types[sub_effect.type];

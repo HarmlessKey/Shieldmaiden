@@ -19,9 +19,9 @@ export const damageModifiersMixin = {
 		 * @param {string} attackerKey The actor, for conditions on the attacker
 		 * @returns {object[]} [{ key, toggle }]
 		 */
-		manualDamageToggles(targets = [], damageType, attackerKey) {
+		manualDamageToggles(targets, damageType, attackerKey) {
 			const items = [];
-			for (const key of targets) {
+			for (const key of targets || []) {
 				const modifiers = this.$store.getters.damage_modifiers?.(key, attackerKey);
 				for (const toggle of modifiers?.toggles || []) {
 					if (damageType && toggle.damageTypes && !toggle.damageTypes.includes(damageType)) continue;

@@ -153,11 +153,8 @@ export default {
 
 			if (this.isTransformed(this.entity, this.camp_data)) {
 				// As the tracker: the transformed maximum with its own modifier
-				maxHp = this.effective
-					? this.effective.transformedMaxHp
-					: this.camp_data !== undefined
-					? this.camp_data.transformed.maxHp
-					: this.entity.transformed.maxHp;
+				const transformed = this.camp_data !== undefined ? this.camp_data.transformed : this.entity.transformed;
+				maxHp = this.effective ? this.effective.transformedMaxHp : transformed.maxHp;
 				curHp =
 					this.camp_data !== undefined
 						? this.camp_data.transformed.curHp

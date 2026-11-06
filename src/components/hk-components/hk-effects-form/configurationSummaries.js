@@ -29,7 +29,8 @@ const amount = (value) => {
 	if (typeof value === "number") return `${value}`;
 	if (value?.formula) return value.formula;
 	if (value?.dice_count && value?.dice_type) {
-		return `${value.dice_count}d${value.dice_type}${value.fixed_val ? `+${value.fixed_val}` : ""}`;
+		const fixed = value.fixed_val ? `+${value.fixed_val}` : "";
+		return `${value.dice_count}d${value.dice_type}${fixed}`;
 	}
 	return undefined;
 };
@@ -61,8 +62,10 @@ export function describeConditionSet(set) {
 			return `${subject} ${has} the ${name} condition`;
 		case "effect":
 			return `${subject} ${has} the ${name} effect`;
-		case "creature_type":
-			return `${subject} ${is} ${hasValue ? `a ${words(set.value)}` : "a creature of that type"}`;
+		case "creature_type": {
+			const creature = hasValue ? `a ${words(set.value)}` : "a creature of that type";
+			return `${subject} ${is} ${creature}`;
+		}
 		case "size":
 			return `${subject} ${is} ${hasValue ? label(sizes, set.value) : "that size"}`;
 		case "number": {
@@ -73,9 +76,11 @@ export function describeConditionSet(set) {
 		}
 		default: {
 			const values = check_values[type?.input];
-			const value = hasValue ? ` ${values ? lower(label(values, set.value)) : words(set.value)}` : "";
+			let value = "";
+			if (hasValue) value = ` ${values ? lower(label(values, set.value)) : words(set.value)}`;
 			const check = `${lower(type?.label || words(set.type))}${value}`;
-			return `${subject}: ${set.negate ? `not ${check}` : check}`;
+			const negated = set.negate ? `not ${check}` : check;
+			return `${subject}: ${negated}`;
 		}
 	}
 }
@@ -105,7 +110,10 @@ const EFFECT_SUMMARIES = {
 			[level.per_dawn, "at dawn"],
 		]
 			.filter(([change]) => change)
-			.map(([change, when]) => `${change > 0 ? `+${change}` : change} ${when}`);
+			.map(([change, when]) => {
+				const shown = change > 0 ? `+${change}` : change;
+				return `${shown} ${when}`;
+			});
 		let text = `${list(parts)}.`;
 		if (changes.length) text += ` Changes ${list(changes)}.`;
 		if (level.remove_at !== undefined) text += ` Ends at level ${level.remove_at}.`;
@@ -212,9 +220,10 @@ const SUB_EFFECT_SUMMARIES = {
 		const save = sub_effect.save || {};
 		const abilities = save.ability ? [save.ability] : save.abilities || [];
 		const dc = amount(save.dc);
-		let text = abilities.length
-			? `${capitalize(list(abilities, "or"))} save${dc ? ` (DC ${dc})` : ", DC set when applied"}`
-			: `A save${dc ? ` (DC ${dc})` : ""}, ability not set`;
+		const dcText = dc ? ` (DC ${dc})` : "";
+		let text;
+		if (abilities.length) text = `${capitalize(list(abilities, "or"))} save${dcText || ", DC set when applied"}`;
+		else text = `A save${dcText}, ability not set`;
 		text += `. On a success: ${lower(label(save_on_success, save.on_success || "negate"))}.`;
 		if (save.success_effects?.length) text += ` ${save.success_effects.length} other effect(s) on a success.`;
 		if (save.fail_by_5_effects?.length) text += ` ${save.fail_by_5_effects.length} extra effect(s) when failed by 5 or more.`;
@@ -242,7 +251,8 @@ const SUB_EFFECT_SUMMARIES = {
 		const uses = consume.uses || 1;
 		const on = lower(label(consume_on, consume.on || "roll"));
 		const scope = lower(label(consume_scopes, consume.scope || "effect"));
-		return { text: `Used up after ${uses === 1 ? on : `${uses} × ${on}`}, which removes ${scope}.` };
+		const times = uses === 1 ? on : `${uses} × ${on}`;
+		return { text: `Used up after ${times}, which removes ${scope}.` };
 	},
 	levels(sub_effect) {
 		const { min_level: min, max_level: max } = sub_effect;
@@ -274,8 +284,8 @@ const SUB_EFFECT_SUMMARIES = {
  */
 export function summarizeConfiguration(level, key, target = {}) {
 	if (level === "effect") {
-		const summary = EFFECT_SUMMARIES[key];
-		return summary ? summary(target[key] || {}) : { text: "" };
+		const effectSummary = EFFECT_SUMMARIES[key];
+		return effectSummary ? effectSummary(target[key] || {}) : { text: "" };
 	}
 	const summary = SUB_EFFECT_SUMMARIES[key];
 	return summary ? summary(target) : { text: "" };

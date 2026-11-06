@@ -121,6 +121,9 @@ import {
 	check_values,
 } from "src/utils/effectsConstants";
 
+/** The kind of value a check type takes ("number", "effect", "none"…) */
+const inputOf = (type) => condition_check_types[type]?.input;
+
 /** One $defs/condition_check, edited in place */
 export default {
 	name: "ConditionCheck",
@@ -141,19 +144,20 @@ export default {
 	},
 	computed: {
 		input() {
-			return condition_check_types[this.value.type]?.input;
+			return inputOf(this.value.type);
 		},
 		typeLabel() {
 			const type = condition_check_types[this.value.type];
 			return type ? type.description || type.label : "Value";
 		},
 		valueSuggestions() {
-			if (this.input === "effect") {
+			const input = inputOf(this.value.type);
+			if (input === "effect") {
 				return effectRefOptions()
 					.filter((option) => option.group === "SRD effects")
 					.map((option) => ({ label: option.label, value: option.ref.source_key }));
 			}
-			const values = check_values[this.input];
+			const values = check_values[input];
 			return values ? this.toOptions(values) : [];
 		},
 	},
@@ -162,7 +166,7 @@ export default {
 			const before = this.input;
 			this.setField(this.value, "type", type);
 			// A different kind of value doesn't carry over
-			if (condition_check_types[type]?.input !== before) {
+			if (inputOf(type) !== before) {
 				this.$delete(this.value, "value");
 				this.$delete(this.value, "comparator");
 			}

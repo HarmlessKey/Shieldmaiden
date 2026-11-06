@@ -103,8 +103,8 @@ export function triggerRepeats(trigger = {}) {
  * @param {number} round The encounter's current round
  * @returns {object}
  */
-export function resolveTrigger(trigger = {}, round) {
-	if (trigger.type !== "in_rounds") return { ...trigger };
+export function resolveTrigger(trigger, round) {
+	if (trigger?.type !== "in_rounds") return { ...trigger };
 	const left = Math.max(1, parseInt(trigger.rounds) || 1);
 	return { type: "turn_start", round: Math.min(999, (parseInt(round) || 0) + left) };
 }
@@ -185,7 +185,8 @@ export function remindersToFire(reminders = {}, event = {}) {
  * @param {string} entityName For entity triggers; "its" when left out
  * @returns {string}
  */
-export function triggerText(trigger = {}, entityName) {
+export function triggerText(storedTrigger, entityName) {
+	const trigger = storedTrigger || {};
 	const whose = entityName ? `${entityName}'s` : "its";
 	const inRound = trigger.round ? ` in round ${trigger.round}` : "";
 	const atTurn = trigger.turn ? `, turn ${trigger.turn}` : "";
@@ -198,7 +199,8 @@ export function triggerText(trigger = {}, entityName) {
 			const every = parseInt(trigger.every) || 1;
 			const rounds = every === 1 ? "Every round" : `Every ${every} rounds`;
 			const from = parseInt(trigger.from) || 1;
-			return `${from > 1 ? `${rounds} from round ${from}` : rounds}${atTurn}`;
+			const range = from > 1 ? `${rounds} from round ${from}` : rounds;
+			return `${range}${atTurn}`;
 		}
 		case "turn_start":
 			return `Start of ${whose} turn${inRound}`;
@@ -219,7 +221,8 @@ export function triggerText(trigger = {}, entityName) {
  * @param {number} round The current round, for a reminder about the encounter
  * @returns {string}
  */
-export function promptTitle(reminder = {}, entityName, round) {
+export function promptTitle(storedReminder, entityName, round) {
+	const reminder = storedReminder || {};
 	const title = fillVariables(reminder.title || "Reminder", reminder.variables);
 	if (reminder.entity_key) return `${entityName || "Unknown"}: ${title}`;
 	if (reminder.trigger?.type === "combat_start") return `Combat starts: ${title}`;
@@ -370,7 +373,8 @@ export function damageText(damage) {
 	const clean = cleanDamage(damage);
 	if (!clean) return "";
 	const dice = clean.dice_count ? `${clean.dice_count}d${clean.dice_type}` : "";
-	const fixed = clean.fixed_val ? `${dice && clean.fixed_val > 0 ? "+" : ""}${clean.fixed_val}` : "";
+	const sign = dice && clean.fixed_val > 0 ? "+" : "";
+	const fixed = clean.fixed_val ? `${sign}${clean.fixed_val}` : "";
 	const type = clean.damage_type ? ` ${clean.damage_type.replace(/_/g, " ")}` : "";
 	return `${dice}${fixed}${type} damage`;
 }

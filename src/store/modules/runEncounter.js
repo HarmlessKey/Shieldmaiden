@@ -21,7 +21,6 @@ import {
 	legacyConditionInstances,
 	effectiveStats,
 	effectiveEntity,
-	tempHpParts,
 	alsoHealAmount,
 	formulaVars,
 	rollModifiers,
@@ -1753,7 +1752,8 @@ const run_encounter_actions = {
 				if (concentrationId === undefined) {
 					const effects = state.entities[casterKey]?.effects || {};
 					const current = Object.keys(effects).find(
-						(key) => effects[key].source === "srd" && effects[key].source_key === "concentration"
+						(effectKey) =>
+							effects[effectKey].source === "srd" && effects[effectKey].source_key === "concentration"
 					);
 					const concentrationFor = cast?.spell?.key
 						? { source: "spell", source_key: cast.spell.key, name: cast.spell.name }
@@ -2252,9 +2252,9 @@ const run_encounter_actions = {
 	async apply_effect({ state, commit, dispatch, getters }, { key, instance }) {
 		const effects = state.entities[key].effects;
 		const existingKey = Object.keys(effects).find(
-			(effectKey) =>
-				effects[effectKey].source === instance.source &&
-				effects[effectKey].source_key === instance.source_key
+			(candidate) =>
+				effects[candidate].source === instance.source &&
+				effects[candidate].source_key === instance.source_key
 		);
 		const isCondition = isSrdCondition(instance.source, instance.source_key);
 
@@ -2856,7 +2856,7 @@ const run_encounter_actions = {
 	 */
 	async fire_trigger(
 		{ state, commit, getters, dispatch },
-		{ trigger, entityKey, event = {}, effectKey }
+		{ trigger, entityKey, event = {}, effectKey: onlyEffectKey }
 	) {
 		// An NPC at 0 hit points is defeated: its "defeated or removed" reminders (effects 9)
 		if (trigger === "on_zero_hp" && state.entities[entityKey]?.entityType === "npc") {
@@ -2868,7 +2868,7 @@ const run_encounter_actions = {
 			entities: state.entities,
 			definitionOf: getters.effect_definition,
 			event,
-			effectKey,
+			effectKey: onlyEffectKey,
 		});
 
 		// Concentration instances a save-less outcome breaks, ended after the prompts
@@ -3106,7 +3106,8 @@ const run_encounter_actions = {
 	 */
 	async fire_reminders({ state, commit, dispatch }, { event }) {
 		const round = event.round ?? state.encounter?.round ?? 0;
-		if (event.type === "defeated" && !(round > 0)) return [];
+		// round is always a number here (?? 0), so <= 0 also covers "no round yet"
+		if (event.type === "defeated" && round <= 0) return [];
 		const prompts = [];
 		for (const id of remindersToFire(state.reminders, { ...event, round })) {
 			const reminder = state.reminders[id];

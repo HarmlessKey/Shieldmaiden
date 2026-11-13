@@ -45,6 +45,7 @@ import {
 	hpAfterEffects,
 	reactionUsedApplies,
 	hasReactionUsed,
+	durationToRounds,
 } from "src/utils/effectFunctions";
 import {
 	manualBonuses,
@@ -72,9 +73,6 @@ const demoEncounter = {
 			active: true,
 			entityType: "player",
 			initiative: 0,
-			conditions: {
-				exhaustion: 1,
-			},
 			character_name: "Barbarian",
 			maxHp: 41,
 			maxHpMod: 0,
@@ -171,6 +169,72 @@ const demoEncounter = {
 	finished: false,
 	round: 0,
 	turn: 0,
+};
+
+/**
+ * The premade demo encounter's starting effects per edition: { [edition]: { [entityKey]:
+ * { [effectKey]: instance } } }. Hex isn't in the 5e SRD, so there the Warlock concentrates on
+ * Bane on all three monsters.
+ */
+const demoRage = {
+	// Raging for 10 rounds, with a Rage Damage of +2 (level 4)
+	eff_rage: {
+		name: "Rage",
+		source: "srd",
+		source_key: "rage",
+		applied_round: 0,
+		caster_key: "playerone",
+		caster_name: "Barbarian",
+		duration: { type: "time", value: 10, unit: "round" },
+		rounds_remaining: 10,
+		choices: { value: 2 },
+	},
+};
+// The Warlock's Concentration on a spell, for up to its duration
+const demoConcentration = (spell, duration) => ({
+	eff_conc: {
+		name: "Concentration",
+		source: "srd",
+		source_key: "concentration",
+		applied_round: 0,
+		caster_key: "playertwo",
+		caster_name: "Warlock",
+		concentration_for: spell,
+		duration: { type: "time", ...duration },
+		rounds_remaining: durationToRounds(duration),
+	},
+});
+// A spell of the Warlock on a monster, ending with its Concentration
+const demoSpell = (effectKey, spell, duration, choices) => ({
+	[effectKey]: {
+		name: spell.name,
+		source: spell.source,
+		source_key: spell.source_key,
+		applied_round: 0,
+		caster_key: "playertwo",
+		caster_name: "Warlock",
+		concentration_id: "eff_conc",
+		duration: { type: "concentration", ...duration },
+		...(choices ? { choices } : {}),
+	},
+});
+const HEX = { source: "srd", source_key: "hex", name: "Hex" };
+const BANE = { source: "srd", source_key: "bane", name: "Bane" };
+const HEX_DURATION = { value: 10, unit: "minute" };
+const BANE_DURATION = { value: 1, unit: "minute" };
+const demoEffects = {
+	"5.5e": {
+		playerone: demoRage,
+		playertwo: demoConcentration(HEX, HEX_DURATION),
+		monsterone: demoSpell("eff_hex", HEX, HEX_DURATION, { ability: "strength" }),
+	},
+	"5e": {
+		playerone: demoRage,
+		playertwo: demoConcentration(BANE, BANE_DURATION),
+		monsterone: demoSpell("eff_bane", BANE, BANE_DURATION),
+		monstertwo: demoSpell("eff_bane", BANE, BANE_DURATION),
+		monsterthree: demoSpell("eff_bane", BANE, BANE_DURATION),
+	},
 };
 
 const getDefaultState = () => ({
@@ -538,8 +602,9 @@ const run_encounter_actions = {
 					await dispatch("add_entity", key);
 				}
 			} else {
-				// The demo runs on the latest edition
-				commit("SET_EDITION", "5.5e");
+				// The demo runs on the edition chosen in its start modal, the latest without a choice
+				// (kept by reset_demo: it lives in the encounters store)
+				commit("SET_EDITION", rootGetters["encounters/demo_edition"] || "5.5e");
 				const demo_encounter = rootGetters["encounters/demo_encounter"] || demoEncounter;
 				commit("SET_ENCOUNTER", { ...demo_encounter });
 				commit("SET_RUN_REMINDERS", JSON.parse(JSON.stringify(demo_encounter.reminders || {})));
@@ -633,6 +698,11 @@ const run_encounter_actions = {
 			load_effects && entity.entityType === "npc" && db_entity.effects
 				? { ...db_entity.effects }
 				: {};
+		// The premade demo starts with its edition's effects, copied so a reset starts from them
+		// again; a built demo encounter starts without
+		if (state.demo && !rootGetters["encounters/demo_encounter"]) {
+			entity.effects = JSON.parse(JSON.stringify(demoEffects[state.edition]?.[key] || {}));
+		}
 		entity.color_label = db_entity.color_label ? db_entity.color_label : null;
 		entity.limited_uses = db_entity.limited_uses ? db_entity.limited_uses : {};
 

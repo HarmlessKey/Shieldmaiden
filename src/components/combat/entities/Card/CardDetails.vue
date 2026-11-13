@@ -195,7 +195,7 @@
 			<button
 				v-if="in_encounter"
 				class="btn btn-sm bg-neutral-5"
-				@click="openBonuses(roll_bonus_stats)"
+				@click="openBonuses(roll_bonus_stats, 'Roll Modifiers')"
 			>
 				<i aria-hidden="true" class="fas fa-plus" />
 				<q-tooltip anchor="top middle" self="center middle">Roll bonuses</q-tooltip>
@@ -357,11 +357,15 @@ export default {
 	methods: {
 		calc_mod,
 		displayStats,
-		openBonuses(stats) {
+		openBonuses(stats, title) {
 			this.$store.dispatch("setDrawer", {
 				show: true,
 				type: "drawers/encounter/StatBonuses",
-				data: { entityKey: this.entity.key, ...(Array.isArray(stats) ? { stats } : { stat: stats }) },
+				data: {
+					entityKey: this.entity.key,
+					...(Array.isArray(stats) ? { stats } : { stat: stats }),
+					...(title ? { title } : {}),
+				},
 			});
 		},
 		/**

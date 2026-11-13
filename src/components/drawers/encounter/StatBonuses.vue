@@ -1,22 +1,24 @@
 <template>
 	<div class="pb-5">
 		<template v-if="effective">
-			<BasicEntity :entity="effective" />
-			<h2 class="mt-3">{{ title }}</h2>
+			<BasicEntity :entity="effective" class="mb-3" />
 
-			<h3>Add a bonus</h3>
-			<BonusAddForm :stats="stats" class="mb-3" @add="add" />
+			<!-- Several values: the overview and adding on their own tabs, under the title -->
+			<h2 v-if="tabbed">{{ title }}</h2>
+			<q-tabs
+				v-if="tabbed"
+				v-model="tab"
+				:dark="$store.getters.theme === 'dark'"
+				no-caps
+				align="justify"
+				class="bg-neutral-9 mb-2"
+			>
+				<q-tab name="overview" label="Overview" />
+				<q-tab name="add" label="Add new" />
+			</q-tabs>
 
-			<!-- Effects that change these values, applied as from the Effects drawer (effects 12) -->
-			<BonusEffects
-				:values="stats"
-				:edition="edition"
-				:casters="casters"
-				:caster-concentration="casterConcentration"
-				class="mb-3"
-				@apply="applyEffect"
-			/>
-
+			<!-- Overview first: per value its stored and effective value, effects and manual bonuses -->
+			<template v-if="!tabbed || tab === 'overview'">
 			<div v-for="section in sections" :key="section.stat" class="stat-section">
 				<div
 					class="stat-section__header"
@@ -79,7 +81,23 @@
 					/>
 				</div>
 			</div>
+			</template>
 
+			<template v-if="!tabbed || tab === 'add'">
+			<h2 v-if="!tabbed" class="mt-3">{{ title }}</h2>
+			<h3>Add a bonus</h3>
+			<BonusAddForm :stats="stats" class="mb-3" @add="add" />
+
+			<!-- Effects that change these values, applied as from the Effects drawer (effects 12) -->
+			<BonusEffects
+				:values="stats"
+				:edition="edition"
+				:casters="casters"
+				:caster-concentration="casterConcentration"
+				class="mb-3"
+				@apply="applyEffect"
+			/>
+			</template>
 		</template>
 		<p v-else class="mt-3">This entity is no longer in the encounter.</p>
 	</div>
@@ -122,6 +140,7 @@ export default {
 	data() {
 		return {
 			open: {},
+			tab: "overview",
 		};
 	},
 	computed: {
@@ -130,7 +149,11 @@ export default {
 			return this.data?.stats?.length ? this.data.stats : [this.data?.stat].filter(Boolean);
 		},
 		title() {
-			return this.stats.length === 1 ? `${this.label(this.stats[0])} bonuses` : "Bonuses";
+			if (this.data?.title) return this.data.title;
+			// One value, or an ability with its check and save: named after it
+			const [first] = this.stats;
+			if (this.stats.length === 1 || abilities.includes(first)) return `${this.label(first)} Modifiers`;
+			return "Modifiers";
 		},
 		entity() {
 			return this.entities[this.data?.entityKey];
@@ -140,6 +163,10 @@ export default {
 		},
 		sections() {
 			return this.stats.map((stat) => this.section(stat));
+		},
+		// Several values (skills, abilities): overview and adding on separate tabs
+		tabbed() {
+			return this.stats.length > 1;
 		},
 	},
 	methods: {
@@ -273,6 +300,8 @@ export default {
 		async add({ stat, amount, label }) {
 			await this.set_bonus({ key: this.data.entityKey, stat, amount, label });
 			this.$set(this.open, stat, true);
+			// Show the new bonus in its value's section
+			this.tab = "overview";
 		},
 		openEffect(effectKey) {
 			this.setDrawer({

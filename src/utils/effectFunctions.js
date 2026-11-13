@@ -2080,6 +2080,15 @@ export function hasSurprised(entity) {
 }
 
 /**
+ * Whether an entity has the SRD Concentration effect
+ */
+export function hasConcentration(entity) {
+	return Object.values(entity?.effects || {}).some(
+		(instance) => instance?.source === "srd" && instance.source_key === "concentration"
+	);
+}
+
+/**
  * The SRD Surprised effect as the set initiative screen applies it (effects 8), without a
  * caster: 5e until the end of the holder's first turn, 5.5e until removed (it's removed when
  * combat starts, its Disadvantage only counts for the Initiative roll)

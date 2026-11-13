@@ -340,9 +340,21 @@ the entity:
   once
 - the "damage" trigger, and the premade "Concentrating" and "Reaction used" reminders, SHALL be
   dropped
+- the premade "Concentrating" reminder SHALL first give the entity the SRD Concentration effect,
+  with the entity as its caster and lasting until removed, unless it already has Concentration
+- the premade "Reaction used" reminder SHALL first give the entity the SRD Reaction Used effect,
+  with the entity as its caster until the start of its next turn, unless it already has it
 
 Title, text, color and chosen variables SHALL be kept. The premade "Concentrating" and
 "Reaction used" reminders SHALL no longer be offered.
+
+#### Scenario: Concentrating reminder
+- **WHEN** an encounter loads with the premade "Concentrating" reminder on a wizard without Concentration
+- **THEN** the wizard has a Concentration effect it is the caster of, until removed, and no `reminders` on the entity
+
+#### Scenario: Reaction used reminder
+- **WHEN** an encounter loads with the premade "Reaction used" reminder on a goblin without Reaction Used
+- **THEN** the goblin has Reaction Used until the start of its next turn, and no `reminders` on the entity
 
 #### Scenario: Timed reminder
 - **WHEN** an encounter in round 2 loads with a goblin reminder timed with 3 rounds left

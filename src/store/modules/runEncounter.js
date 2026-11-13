@@ -40,6 +40,7 @@ import {
 	buildEffectInstance,
 	concentrationPlan,
 	hasSurprised,
+	hasConcentration,
 	surprisedInstance,
 	hpAfterEffects,
 	reactionUsedApplies,
@@ -551,6 +552,8 @@ const run_encounter_actions = {
 			// Surprised effect (effects 8)
 			await dispatch("convert_legacy_conditions");
 			await dispatch("convert_legacy_surprised");
+			// The premade concentration and reaction reminders become Concentration and Reaction Used
+			await dispatch("convert_legacy_premade");
 			// Entity reminders become reminders about that entity on the encounter (effects 9)
 			await dispatch("convert_legacy_reminders");
 
@@ -2155,6 +2158,66 @@ const run_encounter_actions = {
 				// The reminder itself goes with the entity's other reminders (convert_legacy_reminders)
 			} catch (error) {
 				console.error(`Failed to convert the surprised reminder of ${key}`, error);
+			}
+		}
+	},
+
+	/**
+	 * Converts the premade concentration and reaction reminders of the loaded encounter's
+	 * entities to their SRD effects, with the entity as the caster:
+	 * - concentration: Concentration until removed (the reminder didn't say what it
+	 *   concentrated on)
+	 * - reaction: Reaction Used until the start of the entity's next turn
+	 * The reminders are removed after this by convert_legacy_reminders, with the entity's other
+	 * reminders; an entity that already has the effect isn't given a second one, so a failed run
+	 * repeats. No apply triggers fire. The demo converts in memory only, test runs don't convert.
+	 */
+	async convert_legacy_premade({ state, getters, commit, dispatch }) {
+		if (state.test) return;
+
+		const round = state.encounter?.round || 0;
+		// Whose turn it is, for the same-turn rule of Reaction Used
+		const turnKey = round > 0 ? getters.turn_order[state.encounter.turn] : undefined;
+		const premade = [
+			{
+				reminder: "concentration",
+				sourceKey: "concentration",
+				name: "Concentration",
+				has: hasConcentration,
+				duration: { type: "cancelled" },
+			},
+			{
+				reminder: "reaction",
+				sourceKey: "reaction-used",
+				name: "Reaction Used",
+				has: hasReactionUsed,
+				duration: { type: "next_turn", anchor: "target", edge: "start" },
+			},
+		];
+
+		for (const [key, entity] of Object.entries(state.entities || {})) {
+			for (const { reminder, sourceKey, name, has, duration } of premade) {
+				if (!entity?.reminders?.[reminder] || has(state.entities[key])) continue;
+				try {
+					const definition = findSrdDefinition(state.edition, sourceKey) || { name };
+					const instance = buildEffectInstance({
+						definition,
+						source: "srd",
+						sourceKey,
+						application: { duration: { ...duration } },
+						round,
+						casterKey: key,
+						casterName: entity.name,
+						turnKey,
+					});
+					const effectKey = generateEffectKey(Object.keys(state.entities[key].effects || {}));
+					if (!state.demo) {
+						await dispatch("persist_effect", { key, effectKey, value: instance });
+					}
+					commit("SET_EFFECT", { key, effectKey, instance });
+				} catch (error) {
+					console.error(`Failed to convert the ${reminder} reminder of ${key}`, error);
+				}
 			}
 		}
 	},

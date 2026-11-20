@@ -123,19 +123,27 @@
 										Check anyway
 									</button>
 								</template>
-								<div v-else-if="duplicates[action_index].rolled" class="neutral-2 mb-1">
+								<div v-else-if="duplicates[action_index].rolled" class="mb-1">
 									<b>{{ duplicates[action_index].name }}</b>
-									({{ duplicates[action_index].left }} left):
-									{{ duplicateDiceText(duplicates[action_index]) }}
-									<template v-if="duplicates[action_index].ac !== undefined">
+									<span class="neutral-2"> ({{ duplicates[action_index].left }} left)</span>
+									Rolled
+									<template v-for="(die, die_index) in duplicates[action_index].dice"
+										><template v-if="die_index">, </template
+										><b
+											:key="`duplicate-die-${die_index}`"
+											:class="duplicates[action_index].min !== undefined && die >= duplicates[action_index].min ? 'green' : 'red'"
+											>{{ die }}</b
+										></template
+									>
+									needed {{ duplicates[action_index].min !== undefined ? duplicates[action_index].min : "–" }}
+									<span v-if="duplicates[action_index].ac !== undefined" class="neutral-2">
 										· duplicate AC {{ duplicates[action_index].ac }}
-									</template>
+									</span>
 								</div>
 								<hk-select
 									v-if="duplicates[action_index].rolled"
 									:value="duplicates[action_index].outcome"
 									:options="duplicateOptions(duplicates[action_index])"
-									label="Attack goes to"
 									dense
 									emit-value
 									map-options
@@ -1086,11 +1094,6 @@ export default {
 		goesToDuplicate(index) {
 			const check = this.duplicates[index];
 			return !!check && !check.skipped && !!check.rolled && check.outcome !== "creature";
-		},
-		duplicateDiceText({ when, sides, dice = [], min }) {
-			const needs = min === undefined ? "no roll is enough" : `needs ${min}`;
-			if (when === "hit") return `d${sides}: ${dice.join(", ")} (${needs})`;
-			return `d${sides} = ${dice[0]} (${needs})`;
 		},
 		duplicateOptions({ when, ac }) {
 			const options = [{ label: "Hits a duplicate", value: "duplicate_hit" }];

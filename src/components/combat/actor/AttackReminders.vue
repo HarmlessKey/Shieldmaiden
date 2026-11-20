@@ -20,7 +20,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { damageBonusLines, hasReactionUsed, hitTakenDamageLines } from "src/utils/effectFunctions";
+import { combineBonusTexts, damageBonusLines, hasReactionUsed, hitTakenDamageLines } from "src/utils/effectFunctions";
 
 /**
  * The actor's Reaction Used (first, red), restrictions and extra actions, and what its effects do to its attacks:
@@ -171,7 +171,8 @@ export default {
 			];
 			if (bonuses.length) {
 				chips.push({
-					text: `To hit ${bonuses.map((b) => b.text).join(" ")}`,
+					// Added up: two −1d4 penalties read "−2d4"; the lines list them one by one
+					text: `To hit ${combineBonusTexts(bonuses.map((b) => b.text)).join(" ") || "+0"}`,
 					icon: "fas fa-dice-d20",
 					// Effects' bonus lines name their filters ("+1 (weapon)"); manual bonuses aren't lines
 					lines: [
@@ -205,7 +206,7 @@ export default {
 			];
 			if (damageLines.length) {
 				chips.push({
-					text: `Damage ${damageLines.map((line) => line.text.split(" (")[0]).join(" ")}`,
+					text: `Damage ${combineBonusTexts(damageLines.map((line) => line.text.split(" (")[0])).join(" ") || "+0"}`,
 					icon: "fas fa-sword",
 					lines: damageLines.map((line) => line.tooltip),
 				});

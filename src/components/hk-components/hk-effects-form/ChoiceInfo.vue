@@ -16,6 +16,10 @@
 				<p v-if="kind === 'damage_type'" class="mb-0">
 					List the types the caster can pick from here, or leave it empty to allow every type.
 				</p>
+				<p v-else-if="kind === 'roll'" class="mb-0">
+					The dice set here are the default. The chosen roll replaces the dice, fixed value and
+					modifier; the damage type stays.
+				</p>
 				<p v-else class="mb-0">
 					Remove the Choice configuration of this sub-effect to set a fixed {{ name }} here.
 				</p>
@@ -42,6 +46,7 @@ const EXAMPLES = {
 	condition: "One immunity effect works for every condition: the condition is picked when it's applied.",
 	creature_type: "One favored enemy effect works for every creature type: the type is picked when it's applied.",
 	value: "One Armor Class Bonus works for +1, +2 and +3: the number is entered when it's applied.",
+	roll: "One Burning effect works for 1d6 and 3d6 fire each turn: the dice are entered when it's applied, with this roll as the default.",
 };
 
 /**

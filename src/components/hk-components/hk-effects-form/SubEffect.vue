@@ -199,7 +199,14 @@ import ConfigurationList from "./ConfigurationList.vue";
 import ConsumeInput from "./ConsumeInput.vue";
 import SourceFilterEditor from "./SourceFilterEditor.vue";
 import TriggerFilterEditor from "./TriggerFilterEditor.vue";
-import { choiceValue, fieldsToClear, showsField, sub_effect_configurations } from "./fieldControls";
+import {
+	choiceValue,
+	exclusiveChoiceKinds,
+	fieldsToClear,
+	rollKeysToClear,
+	showsField,
+	sub_effect_configurations,
+} from "./fieldControls";
 import { choiceKinds } from "src/utils/effectFunctions";
 import {
 	effect_types,
@@ -279,9 +286,14 @@ export default {
 		 * for its type and Applies to (Option fills none). Picked choices are always listed.
 		 */
 		choiceOptions() {
+			// Value and Roll replace each other, so each is offered while the other is picked
+			const withoutAmountChoice = {
+				...this.value,
+				choice: choiceValue(this.choiceKinds.filter((kind) => !["value", "roll"].includes(kind))),
+			};
 			return this.toOptions(choice_kinds).filter(({ value: kind }) => {
 				const field = choice_kinds[kind].field;
-				return !field || this.choiceKinds.includes(kind) || showsField(this.value, field);
+				return !field || this.choiceKinds.includes(kind) || showsField(withoutAmountChoice, field);
 			});
 		},
 		selectedKeys() {
@@ -300,6 +312,12 @@ export default {
 			const { keys, sub_types } = fieldsToClear(this.value);
 			keys.forEach((key) => this.$delete(this.value, key));
 			if (sub_types) this.setField(this.value, "sub_types", sub_types);
+			// Roll parts a Value or Roll choice makes unused; an emptied roll goes
+			const roll = this.value.roll;
+			if (roll && typeof roll === "object") {
+				rollKeysToClear(this.value).forEach((key) => this.$delete(roll, key));
+				if (!Object.keys(roll).length) this.$delete(this.value, "roll");
+			}
 		},
 		setType(type) {
 			this.setField(this.value, "type", type);
@@ -314,7 +332,8 @@ export default {
 		 * newly picked kind fills are cleared; fields of a removed kind become editable again.
 		 */
 		setChoice(kinds) {
-			this.setField(this.value, "choice", choiceValue(kinds));
+			// Value and Roll exclude each other: the one just picked wins
+			this.setField(this.value, "choice", choiceValue(exclusiveChoiceKinds(kinds, this.choiceKinds)));
 			this.clearUnused();
 		},
 		addPart(key) {

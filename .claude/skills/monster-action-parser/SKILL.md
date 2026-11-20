@@ -178,19 +178,25 @@ A link:
 {
   "effect": { "source": "srd", "source_key": "grappled", "name": "Grappled" },
   "duration": { "type": "cancelled", "escape": { "dc": 13, "checks": [{ "ability": "strength", "skill": "athletics" }, { "ability": "dexterity", "skill": "acrobatics" }] } },
-  "choices": { "damage_type": "fire", "value": "5" },
+  "choices": { "damage_type": "fire", "roll": { "dice_count": 1, "dice_type": 10 } },
   "level": 1,
   "magical": true
 }
 ```
 
 - **effect**: a `url` from the catalogue that exists in the monster's edition, with its `name`.
-  No match in the catalogue → no link.
+  No match in the catalogue → no link. When the catalogue has an effect for this monster's
+  ability (Mummy Rot, Strength Drain, Weakening Breath), link that one instead of generic
+  effects for its parts.
 - **duration**: every action link has one. Build it with the duration table below.
 - **choices**: only the choice kinds the catalogue lists for that effect. Set a choice when the
   text gives it (`"damage_type": "fire"`, `"ability": "strength"`, `"value": "5"`); leave it out
-  when it doesn't (an amount equal to the damage taken, a rolled amount like 1d4). Values are
-  strings. No choices → no `choices` field.
+  when it doesn't (an amount equal to the damage taken). Every choice is a string, except a
+  **roll**: an object with the dice the text gives, never their average. "5 (1d10)" →
+  `"roll": { "dice_count": 1, "dice_type": 10 }`; "9 (2d6 + 2)" → `{ "dice_count": 2,
+  "dice_type": 6, "fixed_val": 2 }`; a plain "3" → `{ "fixed_val": 3 }`. A **value** choice
+  can't hold dice: a rolled amount like 1d4 on a value-only effect is left out. No choices → no
+  `choices` field.
 - **level**: only for effects marked `(level)`: "gains 1 Exhaustion level" → `"level": 1`.
 - **magical**: `true` on **every** link of the ability when its description contains the word
   "magic", "magical" or "magically", or when it has a `spell_attack` entry. Otherwise leave it

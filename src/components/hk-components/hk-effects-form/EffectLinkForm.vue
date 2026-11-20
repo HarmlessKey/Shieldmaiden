@@ -35,8 +35,18 @@
 				<label class="group">Choices</label>
 				<!-- An empty choice is chosen when the effect is applied; a trait's are all required -->
 				<template v-for="choice in requiredChoices">
+					<!-- A roll: dice count, die and fixed value; empty is chosen when applied -->
+					<ChosenRollInput
+						v-if="choice.kind === 'roll'"
+						:key="`choice-${choice.kind}`"
+						:value="value.choices && value.choices.roll"
+						:required="trait"
+						:open-text="trait ? undefined : chosenWhenApplied"
+						class="mb-2"
+						@input="setRoll"
+					/>
 					<hk-select
-						v-if="choiceField(choice).options"
+						v-else-if="choiceField(choice).options"
 						:key="`choice-${choice.kind}`"
 						:value="choiceValue(choice.kind)"
 						:options="choiceField(choice).options"
@@ -151,6 +161,7 @@ import {
 	getSrdDefinitions,
 	spellDuration,
 } from "src/utils/effectFunctions";
+import ChosenRollInput from "./ChosenRollInput.vue";
 
 /**
  * Edits an effect link ($defs/effect_link) of an action-list entry or, with `trait`, of a
@@ -163,6 +174,7 @@ export default {
 	name: "EffectLinkForm",
 	components: {
 		ApplicationDuration,
+		ChosenRollInput,
 		EffectRefPicker,
 		LinkScalingInput,
 		LinkDurationScaling,
@@ -257,6 +269,17 @@ export default {
 		},
 		setEffect(effect) {
 			this.setField(this.value, "effect", effect);
+		},
+		/**
+		 * A fixed roll { dice_count, dice_type, fixed_val }; empty leaves it to be chosen when
+		 * applied. An incomplete roll is kept as entered, so its fields show the error and Save
+		 * stays disabled.
+		 */
+		setRoll(roll) {
+			const choices = { ...(this.value.choices || {}) };
+			if (roll) choices.roll = roll;
+			else delete choices.roll;
+			this.setField(this.value, "choices", Object.keys(choices).length ? choices : undefined);
 		},
 		setChoice(kind, value) {
 			let choice = value === null || value === undefined ? "" : String(value).trim();

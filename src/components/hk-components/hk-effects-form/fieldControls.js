@@ -18,7 +18,7 @@ import {
 } from "src/utils/effectsConstants";
 import { startCase } from "lodash";
 import { abilities, creature_types, damage_types, skills } from "src/utils/generalConstants";
-import { choiceKinds, getSrdDefinitions } from "src/utils/effectFunctions";
+import { STAT_SUB_TYPES, choiceKinds, getSrdDefinitions } from "src/utils/effectFunctions";
 
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
@@ -289,18 +289,27 @@ const MULTIPLIED = [
 ];
 
 const hasSubType = (sub_effect, list) => (sub_effect.sub_types || []).some((sub_type) => list.includes(sub_type));
+// A roll with dice, on a value rolled once when the effect is applied (Strength Drain −1d4)
+const hasDice = (sub_effect) => !!(sub_effect.roll?.dice_count && sub_effect.roll?.dice_type);
 // For these types, the test decides; other types always show the field
+// Types whose Roll has a damage type and magical (DiceRollInput's damage fields)
+export const DAMAGE_ROLL_TYPES = ["damage", "damage_modifier", "critical"];
+
 const forTypes = (types, test) => (sub_effect) => !types.includes(sub_effect.type) || test(sub_effect);
 const allOf = (...tests) => (sub_effect) => tests.every((test) => test(sub_effect));
 
 const RULES = {
-	// Dice on a roll (Bless), temporary hit points (False Life), extra critical dice
+	// Dice on a roll (Bless), temporary hit points (False Life), a value rolled when applied
+	// (Strength Drain), extra critical dice
 	roll: allOf(
-		forTypes(VALUE_TYPES, (s) => hasSubType(s, [...ROLLS, "temp_hp"])),
+		forTypes(VALUE_TYPES, (s) => hasSubType(s, [...ROLLS, "temp_hp", ...STAT_SUB_TYPES])),
 		forTypes(["critical"], (s) => hasSubType(s, ["extra_crit_dice"]))
 	),
-	// Speed halved, or a negative multiplier for a penalty on rolls (Bane)
-	multiplier: forTypes(VALUE_TYPES, (s) => hasSubType(s, [...MULTIPLIED, ...ROLLS])),
+	// Speed halved, or a negative multiplier for a penalty on rolls (Bane) and rolled values
+	multiplier: forTypes(
+		VALUE_TYPES,
+		(s) => hasSubType(s, [...MULTIPLIED, ...ROLLS]) || (hasDice(s) && hasSubType(s, STAT_SUB_TYPES))
+	),
 	perspective: forTypes(VALUE_TYPES, (s) => hasSubType(s, ROLLS)),
 	context: forTypes(VALUE_TYPES, (s) => hasSubType(s, ROLLS)),
 	creature_types: forTypes(VALUE_TYPES, (s) => hasSubType(s, ROLLS)),
@@ -403,8 +412,46 @@ export function showsField(sub_effect, field) {
 	if (!type || !type.fields.includes(field)) return false;
 	const when = sub_effect_fields[field]?.when;
 	if (when && !when(sub_effect)) return false;
+	// A chosen roll replaces the value; a chosen value isn't rolled, so only a damage roll's
+	// damage type and magical are left of the Roll (rollKeysToClear)
+	if (field === "value" && choiceKinds(sub_effect).includes("roll")) return false;
+	if (field === "roll" && choiceKinds(sub_effect).includes("value") && !DAMAGE_ROLL_TYPES.includes(sub_effect.type)) {
+		return false;
+	}
 	const rule = RULES[field];
 	return rule ? rule(sub_effect) : true;
+}
+
+/**
+ * The keys of a sub-effect's roll that its choices make unused: the dice, fixed value and
+ * modifier with a Value choice (a chosen value isn't rolled), the modifier with a Roll choice
+ * (the chosen roll replaces it; the dice stay as its default). Damage type and magical stay.
+ *
+ * @param {object} sub_effect
+ * @returns {string[]}
+ */
+export function rollKeysToClear(sub_effect) {
+	const roll = sub_effect?.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : undefined;
+	if (!roll) return [];
+	const kinds = choiceKinds(sub_effect);
+	let unused = [];
+	if (kinds.includes("value")) unused = ["dice_count", "dice_type", "fixed_val", "modifier"];
+	else if (kinds.includes("roll")) unused = ["modifier"];
+	return unused.filter((key) => roll[key] !== undefined);
+}
+
+/**
+ * Picked choice kinds with Value and Roll excluding each other: the one just picked wins
+ *
+ * @param {string[]} kinds The kinds picked now
+ * @param {string[]} previous The kinds picked before
+ * @returns {string[]}
+ */
+export function exclusiveChoiceKinds(kinds = [], previous = []) {
+	const list = [kinds].flat().filter(Boolean);
+	if (!list.includes("value") || !list.includes("roll")) return list;
+	const added = list.find((kind) => ["value", "roll"].includes(kind) && !previous.includes(kind)) || "roll";
+	return list.filter((kind) => kind === added || !["value", "roll"].includes(kind));
 }
 
 /**
@@ -416,7 +463,8 @@ export function showsField(sub_effect, field) {
  */
 export function choiceLockedFields(sub_effect) {
 	return choiceKinds(sub_effect)
-		.filter((kind) => kind !== "damage_type")
+		// A damage type choice offers the listed types; a roll choice's roll is its default
+		.filter((kind) => kind !== "damage_type" && kind !== "roll")
 		.map((kind) => choice_kinds[kind]?.field)
 		.filter(Boolean);
 }

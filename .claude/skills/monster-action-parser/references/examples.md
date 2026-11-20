@@ -94,7 +94,7 @@ Description: Dexterity Saving Throw: DC 19, each creature in a 90-foot-long, 5-f
 ## 4. Grapple, a condition while grappled, and damage every turn (5e)
 
 The grapple gets the escape. Restrained and the damage last while the target is Grappled:
-`ends_when`. The damage over time takes the average (7) as its value.
+`ends_when`. The damage over time takes the dice (2d6) as its roll, not the average.
 
 ```text
 Edition: 5e
@@ -135,7 +135,7 @@ Description: Melee Weapon Attack: +8 to hit, reach 10 ft., one target. Hit: 11 (
           {
             "effect": { "source": "srd", "source_key": "damage-over-time", "name": "Damage Over Time" },
             "duration": { "type": "cancelled", "ends_when": { "type": "has_condition", "value": "grappled", "negate": true } },
-            "choices": { "damage_type": "piercing", "value": "7" }
+            "choices": { "damage_type": "piercing", "roll": { "dice_count": 2, "dice_type": 6 } }
           }
         ]
       }

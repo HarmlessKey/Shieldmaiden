@@ -45,9 +45,10 @@ shows its description and what it does, as in the Effects drawer.
   - **Bonuses**: Armor Class, attack rolls, damage rolls, saving throws, Initiative, Speed,
     spell save DC, spell attack, Passive Perception and Hit Point maximum ask for a number. A
     negative number is a penalty. A higher Hit Point maximum also raises current Hit Points.
-  - **Armor Class Minimum**, **Fly Speed** and **Hit Point Maximum Reduction** ask for a
-    number. **Damage Over Time** asks for a damage type and an amount, taken at the start of
-    each of the creature's turns.
+  - **Armor Class Minimum** and **Fly Speed** ask for a number. **Hit Point Maximum
+    Reduction** asks for a roll (dice like 1d10, a fixed number, or both), rolled once when
+    applied. **Damage Over Time** asks for a damage type and a roll, rolled at the start of each
+    of the creature's turns.
   - **Speed Halved**, **No Reactions**, **No Healing** (can't regain Hit Points: healing is
     blocked, with a notification) and **Magic Resistance** (Advantage on saves against spells
     and magical effects) need no choice.
@@ -239,9 +240,14 @@ until you reset them. A trait effect without a limit is never used up. Players' 
 ## Effects in combat
 
 - **Effect chips**: every creature shows its effects as chips, with a badge for the Exhaustion
-  level or the rounds left. The tooltip shows the duration and the caster.
+  level or the rounds left. The tooltip shows the duration and the caster. When a creature has
+  the same effect from the same caster more than once (a Shadow's Strength Drain after two
+  hits), the copies share one chip with "×2" in its corner, and the badge shows the copy that
+  ends first.
 - **Detail view**: click a chip to read the effect, see its duration, change the Exhaustion
-  level, roll a repeat save or an escape, and remove it. Every effect can be removed.
+  level, roll a repeat save or an escape, and remove it. Every effect can be removed. For a
+  chip with copies, the detail view lists every copy with its round, rounds left and rolled
+  values ("Strength −3"). Click a copy to see it, or remove copies one by one.
 - **Changed values**: values changed by effects, like AC and Speed, are marked. Their tooltip
   lists the effects and manual bonuses that change them.
 - **Bonuses drawer**: click a value on a creature's card, like AC or Speed, to see its manual
@@ -292,10 +298,10 @@ changes: Armor Class, Speed, saving throws, Reactions… You can pick more than 
 a Bonus that applies to attack rolls and saving throws.
 
 The form only shows the fields that matter for the type and what it applies to. A Bonus on
-Armor Class only needs a Value. A Bonus on Speed also offers a Multiplier, and a Bonus on
-saving throws also offers a Roll and the roll filters (Whose rolls, Abilities, Context,
-Creature types). When you change the type or Applies to, fields that are no longer used are
-cleared.
+Armor Class offers a Value or a Roll (see [Rolled values](#rolled-values)). A Bonus on Speed
+also offers a Multiplier, and a Bonus on saving throws also offers the roll filters (Whose
+rolls, Abilities, Context, Creature types). When you change the type or Applies to, fields that
+are no longer used are cleared.
 
 | Type | What it does | Example |
 |---|---|---|
@@ -347,7 +353,41 @@ cleared.
   a multiplier multiplies the whole value: 2014 Exhaustion halves Speed with a multiplier of 0.5.
 
 Bonus dice are rolled together with the roll they change and shown by name ("Bless +1d4: 3").
-A negative fixed value or multiplier makes dice a penalty (Bane is −1d4).
+A negative fixed value or multiplier makes dice a penalty (Bane is −1d4). With dice, a negative
+fixed value only gives the dice their sign: 1d4 with a fixed value of −1 is −1d4, not 1d4 − 1.
+A positive fixed value is added to the dice. Use a multiplier of −1 to make a penalty clear.
+
+This works the same for damage bonuses on attacks. A Bonus on damage rolls with a Roll of 1d4
+and a Multiplier of −1 subtracts 1d4 from the hit, and a Value of −2 subtracts 2. A damage
+penalty lowers the damage of its damage type, or of the attack's first damage type when it has
+none. It's subtracted before resistance and other damage modifiers: 12 bludgeoning with a −2
+penalty against a creature resistant to bludgeoning deals (12 − 2) / 2 = 5. The roll dialog
+shows the penalty, with its dice, on the line of the damage it lowers. It
+never takes that type's damage below 0: a −4 on a hit with 2 slashing is limited to −2. A
+penalty of a type the hit doesn't deal, like −1d4 radiant on a slashing hit, isn't rolled at
+all.
+
+### Rolled values
+
+A Roll on a value (a Bonus, Set base value, Fixed value, Minimum value or Maximum value on
+Armor Class, Speed, Hit Point maximum, an ability score, Initiative and the like) is rolled
+**once, when the effect is applied**. The total is kept on the effect and used as its value for
+as long as the effect lasts. It isn't rolled again when the effect changes level or the
+encounter is opened again. Each creature the effect is applied to gets its own roll.
+
+Use a **Multiplier** of −1 to make it a penalty. A Shadow's Strength Drain is a Bonus on
+Ability score, Strength, with a Roll of 1d4 and a Multiplier of −1. When it's applied, you get
+a notice with the roll ("Strength Drain: 1d4 = 3, Strength −3"), and the changed value's tooltip
+shows the roll ("Strength Drain: −3 (1d4)"). A rolled Hit Point maximum bonus with **Also raise
+current hit points** heals by the rolled amount.
+
+- With **Choice → Value**, the chosen number is used and nothing is rolled.
+- Temporary hit points keep their own **Grant temp HP** prompt.
+- An effect that wasn't rolled when it was applied, like a trait effect, or an effect applied
+  before its Roll was added, doesn't change the value. Its tooltip says "not rolled". Remove
+  the effect and apply it again to roll.
+- Applying the same effect to a creature twice doesn't add up: the instance that changes the
+  value most counts.
 
 ### Whose rolls
 
@@ -504,8 +544,8 @@ Who gets this sub-effect:
 ### Choice
 
 A value picked when the effect is applied, so one effect fits many cases. Choose what is
-picked: an ability, a damage type, a skill, a condition, a creature type, a free option, or a
-**value**. Only choices that fit the sub-effect are offered. The field the choice fills shows
+picked: an ability, a damage type, a skill, a condition, a creature type, a free option, a
+**value** or a **roll**. Only choices that fit the sub-effect are offered. The field the choice fills shows
 "Chosen when the effect is applied".
 
 You can pick more than one. A "Skill Bonus" is a Bonus on Skill checks with the choices
@@ -513,8 +553,8 @@ You can pick more than one. A "Skill Bonus" is a Bonus on Skill checks with the 
 "Damage Reduction" picks a damage type and a value. Each kind is asked once per effect: when
 two sub-effects of one effect both choose a value, they share the number.
 
-Fields that a choice can fill (Value, Damage types, Abilities, Skills, Conditions, Creature
-types) have an info icon that explains how to make them variable. Once a choice fills the field,
+Fields that a choice can fill (Value, Roll, Damage types, Abilities, Skills, Conditions,
+Creature types) have an info icon that explains how to make them variable. Once a choice fills the field,
 the icon becomes a die.
 
 For a damage type choice, the **Damage types** field becomes **Allowed types (empty = any)**:
@@ -526,6 +566,28 @@ A **value** choice makes the number itself a choice. Build one "Armor Class Bonu
 Armor Class with a value choice) and use it for +1, +2 or +3: the number is asked when the
 effect is applied, and each creature keeps its own. A negative number is a penalty. The same
 works for a bonus on saving throws, a damage reduction, or any other sub-effect with a Value.
+A chosen value isn't rolled: the Roll's dice are hidden, and a Damage sub-effect keeps only the
+Roll's damage type and magical.
+
+A **roll** choice makes the dice a choice. It's what you want for damage over time: build one
+"Burning" (Damage at the start of the target's turn, with a 1d6 fire Roll and a roll choice)
+and apply it as 1d6 or 3d6. When applying, the roll is asked like any other roll: **Dice**,
+**Die** and **Fixed value**, filled in with the Roll's dice. Give dice (a count and a die), a
+fixed value, or both. The Roll you set in the form is that default; its damage type and
+magical stay, and the chosen roll replaces its dice, fixed value and modifier (add a modifier
+like the caster's Wisdom to the fixed value).
+With a roll choice the Value field is hidden, because the chosen roll replaces it.
+
+The chosen roll is used wherever the sub-effect's Roll is:
+- **Damage and healing** roll it every time they happen (each turn for damage over time).
+- **Values** like Strength, AC or the hit point maximum roll it once when the effect is
+  applied, as a rolled value (see [Rolled values](#rolled-values)).
+- **Roll and damage bonuses** roll it on every roll they add to (a −2d4 penalty instead of
+  −1d4).
+
+A link on a monster action, trait or spell can fix the roll, so one effect serves different
+creatures: a generic Weakening Breath with a roll choice, linked with 1d4 on a young gold
+dragon and 1d10 on an ancient one. Applying it from the dragon's roll doesn't ask again.
 
 ### Save
 
@@ -586,7 +648,8 @@ tracker doesn't know the source of a roll, the sub-effect is shown as a reminder
 ### Id
 
 A name for this sub-effect that formulas and other sub-effects can use to refer to it.
-You'll rarely need it.
+You'll rarely need it. A [rolled value](#rolled-values) is kept under its id, so give it one if
+you might reorder the sub-effects of an effect that's already applied.
 
 ## Effect configuration
 
@@ -597,7 +660,10 @@ What happens when the effect is applied to a creature that already has it.
 - **Doesn't stack** (default): the stronger or longer instance is kept.
 - **Adds a level**: applying it again raises its level (Exhaustion). Needs a level track.
 - **Replaces**: the new instance replaces the old one.
-- **Independent**: every instance applies separately.
+- **Independent**: every instance applies separately, each with its own choices, level and
+  rolled values. A Shadow's Strength Drain lowers Strength again with every hit: two hits
+  that rolled 3 and 2 take a Strength of 16 to 11, and the tooltip lists both. This counts
+  everywhere: effective stats, d20 rolls, damage bonuses and damage modifiers.
 - **Instances from different casters are different effects**: Hunter's Mark from two
   rangers counts twice.
 
@@ -900,6 +966,10 @@ creature instead of being applied:
 
 **Bless**: Type Bonus, Applies to attack rolls and saving throws, Roll 1 × d4. Apply it with a
 Concentration duration.
+
+**Strength Drain**: Type Bonus, Applies to Ability score, Abilities Strength, Roll 1 × d4,
+Multiplier −1. Each time it's applied, 1d4 is rolled and the target's Strength goes down by
+the result until the effect is removed.
 
 **Absorption** (generic): Type Damage modifier, Applies to Absorb, configuration Choice →
 Damage type, no damage types listed. When applied, the DM picks the damage type.

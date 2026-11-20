@@ -22,8 +22,8 @@
 				</template>
 				<template v-for="(value, kind) in instance.choices || {}">
 					<dt :key="`choice-kind-${kind}`">{{ startCase(kind) }}</dt>
-					<!-- A chosen value keeps its sign ("-2"); startCase would drop it -->
-					<dd :key="`choice-value-${kind}`">{{ kind === "value" ? value : startCase(value) }}</dd>
+					<!-- A chosen value keeps its sign ("-2") and a roll its dice ("2d6"); startCase would change them -->
+					<dd :key="`choice-value-${kind}`">{{ choiceText(kind, value) }}</dd>
 				</template>
 				<template v-if="repeatSave">
 					<dt>Repeat save</dt>
@@ -34,6 +34,26 @@
 					<dd>{{ saveProgress }}</dd>
 				</template>
 			</dl>
+
+			<!-- Copies of this effect from the same caster share a chip; each can be shown and removed -->
+			<div v-if="copies.length > 1" class="copies mb-3">
+				<strong>{{ copies.length }} copies</strong>
+				<div
+					v-for="copy in copies"
+					:key="copy.key"
+					class="copies__copy"
+					:class="{ active: copy.key === shownKey }"
+					@click="selectedKey = copy.key"
+				>
+					<div>
+						<div>{{ copyTitle(copy) }}</div>
+						<div class="neutral-2">{{ copyDetails(copy) }}</div>
+					</div>
+					<a class="btn btn-sm bg-neutral-5" aria-label="Remove this copy" @click.stop="remove(copy.key)">
+						<i aria-hidden="true" class="fas fa-trash-alt" />
+					</a>
+				</div>
+			</div>
 
 			<!-- Escapes are rolled in an encounter, not on the campaign screen -->
 			<div v-if="escape && !campaign" class="escape mb-3">
@@ -70,7 +90,7 @@
 					</tr>
 					<tr>
 						<td>
-							<a aria-label="Remove effect" @click="remove"><i aria-hidden="true" class="fas fa-times" /></a>
+							<a aria-label="Remove effect" @click="remove()"><i aria-hidden="true" class="fas fa-times" /></a>
 						</td>
 						<td>Remove</td>
 					</tr>
@@ -84,7 +104,7 @@
 				:show-exhaustion-table="false"
 			/>
 
-			<button class="btn btn-block bg-red mt-3" @click="remove">Remove effect</button>
+			<button class="btn btn-block bg-red mt-3" @click="remove()">Remove effect</button>
 		</template>
 		<p v-else class="mt-3">This effect is no longer active.</p>
 	</div>
@@ -95,7 +115,15 @@ import { startCase } from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
-import { describeDuration, findSrdDefinition, isSrdCondition } from "src/utils/effectFunctions";
+import {
+	chosenRollText,
+	copyKey,
+	describeDuration,
+	findSrdDefinition,
+	isCountingDown,
+	isSrdCondition,
+	rolledValueTexts,
+} from "src/utils/effectFunctions";
 import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
 import { showNotices } from "src/utils/generalFunctions";
 import { effectRolls } from "src/mixins/effectRolls";
@@ -136,6 +164,10 @@ export default {
 		return {
 			// A campaign player's custom effect definition, false when not found
 			customDefinition: undefined,
+			// The copy shown, when the effect has copies from the same caster
+			selectedKey: undefined,
+			// copyKey of the copies, kept when the shown copy is removed
+			groupId: undefined,
 		};
 	},
 	computed: {
@@ -157,8 +189,30 @@ export default {
 			}
 			return this.entities[this.data.entityKey];
 		},
+		/**
+		 * Copies of the effect from the same caster on this entity, newest first (push keys sort
+		 * by creation time): [{ key, instance }]
+		 */
+		copies() {
+			const effects = this.entity?.effects || {};
+			const groupId = this.groupId || (effects[this.data.effectKey] ? copyKey(effects[this.data.effectKey]) : undefined);
+			if (!groupId) return [];
+			return Object.entries(effects)
+				.filter(([, instance]) => instance && copyKey(instance) === groupId)
+				.map(([key, instance]) => ({ key, instance }))
+				.sort((a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0));
+		},
+		/**
+		 * The shown copy: the chosen one, or the newest when it was removed
+		 */
+		shownKey() {
+			const effects = this.entity?.effects || {};
+			const chosen = this.selectedKey || this.data.effectKey;
+			if (effects[chosen]) return chosen;
+			return this.copies[0]?.key;
+		},
 		instance() {
-			return this.entity?.effects?.[this.data.effectKey];
+			return this.shownKey ? this.entity?.effects?.[this.shownKey] : undefined;
 		},
 		definition() {
 			if (!this.instance) return undefined;
@@ -277,7 +331,7 @@ export default {
 			}
 		},
 		async resolveEscape(success) {
-			await this.escape_effect({ key: this.data.entityKey, effectKey: this.data.effectKey, success });
+			await this.escape_effect({ key: this.data.entityKey, effectKey: this.shownKey, success });
 			if (!this.instance) this.setDrawer({ show: false });
 		},
 		async setLevel(level) {
@@ -286,7 +340,7 @@ export default {
 					await this.$store.dispatch("campaigns/set_campaign_effect_level", {
 						campaignId: this.campaign.campaignId,
 						playerId: this.campaign.playerId,
-						effectKey: this.data.effectKey,
+						effectKey: this.shownKey,
 						level,
 						context: this.campaign.context,
 					})
@@ -298,20 +352,48 @@ export default {
 				instance: { ...this.instance, level },
 			});
 		},
-		async remove() {
+		/**
+		 * Removes one copy, the shown one by default. With other copies left, the newest of them
+		 * is shown; without, the drawer closes.
+		 */
+		async remove(effectKey = this.shownKey) {
 			if (this.campaign) {
 				this.notify(
 					await this.$store.dispatch("campaigns/remove_campaign_effect", {
 						campaignId: this.campaign.campaignId,
 						playerId: this.campaign.playerId,
-						effectKey: this.data.effectKey,
+						effectKey,
 						context: this.campaign.context,
 					})
 				);
 			} else {
-				await this.remove_effect({ key: this.data.entityKey, effectKey: this.data.effectKey });
+				await this.remove_effect({ key: this.data.entityKey, effectKey });
 			}
 			if (!this.instance) this.setDrawer({ show: false });
+		},
+		/**
+		 * A choice as shown: a value as stored ("-2"), a roll as dice ("2d6+1"), others in words
+		 */
+		choiceText(kind, value) {
+			if (kind === "roll") return chosenRollText(value);
+			return kind === "value" ? value : startCase(value);
+		},
+		/**
+		 * A copy's rolled values in words, or its name without any
+		 */
+		copyTitle({ instance }) {
+			return rolledValueTexts(instance, this.definition).join(", ") || this.name;
+		},
+		/**
+		 * A copy's applied round, rounds left and choices: "Round 2 · 5 rounds left"
+		 */
+		copyDetails({ instance }) {
+			const parts = [instance.applied_round ? `Round ${instance.applied_round}` : this.campaign ? "Outside an encounter" : "Before combat"];
+			if (isCountingDown(instance)) parts.push(plural(instance.rounds_remaining, "round") + " left");
+			for (const [kind, value] of Object.entries(instance.choices || {})) {
+				parts.push(`${startCase(kind)}: ${this.choiceText(kind, value)}`);
+			}
+			return parts.join(" · ");
 		},
 		/**
 		 * The campaign actions' notices: what the tracker would prompt for (effects 8)
@@ -337,6 +419,17 @@ export default {
 			}
 		},
 	},
+	watch: {
+		// Another chip opened in the same drawer: start at its copy
+		"data.effectKey": {
+			handler(effectKey) {
+				this.selectedKey = effectKey;
+				const instance = this.entity?.effects?.[effectKey];
+				this.groupId = instance ? copyKey(instance) : undefined;
+			},
+			immediate: true,
+		},
+	},
 	mounted() {
 		this.loadCustomDefinition();
 	},
@@ -360,6 +453,26 @@ dl.instance {
 	}
 	dd {
 		margin: 0;
+	}
+}
+.copies {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+
+	&__copy {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
+		padding: 8px 10px;
+		background: $neutral-9;
+		border-left: solid 3px transparent;
+		cursor: pointer;
+
+		&.active {
+			border-left-color: $blue;
+		}
 	}
 }
 .escape {

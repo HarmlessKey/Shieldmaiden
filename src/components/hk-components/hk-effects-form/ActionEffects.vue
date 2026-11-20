@@ -107,7 +107,12 @@ import EffectLinkForm from "./EffectLinkForm.vue";
 import { choiceField } from "./fieldControls";
 import { action_outcomes, outcomesFor, triggers } from "src/utils/effectsConstants";
 import { attack_types } from "src/utils/actionConstants";
-import { describeDuration, durationScalingIncomplete, spellDuration } from "src/utils/effectFunctions";
+import {
+	chosenRollText,
+	describeDuration,
+	durationScalingIncomplete,
+	spellDuration,
+} from "src/utils/effectFunctions";
 
 /**
  * The effects linked to one action-list entry of an NPC ability ($defs/action_effects),
@@ -213,6 +218,10 @@ export default {
 				parts.push("duration chosen when applied");
 			}
 			for (const [kind, choice] of Object.entries(link.choices || {})) {
+				if (kind === "roll") {
+					parts.push(`Roll: ${chosenRollText(choice)}`);
+					continue;
+				}
 				const field = choiceField({ kind });
 				const option = (field.options || []).find(({ value }) => value === choice);
 				parts.push(`${field.label}: ${option ? option.label : choice}`);

@@ -42,9 +42,21 @@ const HINTS = {
 	"speed-halved": "its Speed is halved",
 	"no-reactions": "can't take Reactions",
 	"damage-over-time":
-		"takes N (XdY) <Type> damage at the start of each of its turns: choices damage_type and value (the average N)",
+		"takes N (XdY) <Type> damage at the start of each of its turns: choices damage_type and roll (the dice XdY, not the average N)",
 	"hit-point-maximum-reduction":
-		"its Hit Point maximum decreases by …, when a save decides it (otherwise roll special `drain`): value only when it's a fixed number",
+		"its Hit Point maximum decreases by …, when a save decides it (otherwise roll special `drain`): roll when the text gives one (5 (1d10) → 1d10, or a fixed number); none for an amount equal to the damage taken",
+	"strength-drain": "its Strength score is reduced by 1d4 (a Shadow's touch); every hit counts again",
+	"weakening-breath":
+		"5.5e gold dragon breath: Disadvantage on Strength-based D20 Tests and subtracts N (XdY) from its damage rolls: choice roll (the dice XdY)",
+	"giggling-magic":
+		"5.5e copper dragon: rolls XdY whenever it makes an ability check or attack roll and subtracts it: choice roll (the dice XdY)",
+	"death-dog-disease": "a death dog's Bite disease (Poisoned, Hit Point maximum decreases every 24 hours)",
+	"giant-rat-disease": "a diseased giant rat's Bite disease (5e)",
+	"mummy-rot": "cursed with mummy rot (can't regain Hit Points, Hit Point maximum decreases every 24 hours)",
+	"mummy-lord-rot": "a 5.5e mummy lord's Rotting Fist curse (no benefit from a Long Rest)",
+	"otyugh-disease": "an otyugh's Bite disease (Poisoned, Hit Point maximum decreases)",
+	"nightmare-haunting": "a night hag's Nightmare Haunting (5e)",
+	leadership: "a 5e knight's Leadership: allies add a d4 to attack rolls and saving throws",
 	"ability-score-bonus":
 		"its <Ability> score decreases by N: choice ability; value only when it's a fixed number, negative",
 	"armor-class-bonus": "adds N to its AC, +N bonus to AC: choice value",
@@ -169,8 +181,10 @@ nothing here matches a mechanic, link nothing: the description keeps it.
 
 **choices**: the choices the effect asks for. Fix a choice in the link's \`choices\` when the
 text gives it (\`{ "damage_type": "fire", "value": "10" }\`; a value is a number written as a
-string); leave it out when the text doesn't. \`(level)\`: the effect has levels, set the link's
-\`level\`.
+string); leave it out when the text doesn't. A **roll** is an object with the dice the text
+gives, not their average: "5 (1d10)" → \`{ "roll": { "dice_count": 1, "dice_type": 10 } }\`,
+"7 (2d6 + 1)" → \`{ "dice_count": 2, "dice_type": 6, "fixed_val": 1 }\`, a plain number "3" →
+\`{ "fixed_val": 3 }\`. \`(level)\`: the effect has levels, set the link's \`level\`.
 
 ## Conditions
 

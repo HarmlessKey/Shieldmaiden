@@ -595,7 +595,11 @@ export default {
 			player: {},
 			drawer: this.$store.getters.getDrawer,
 			to_add: {},
-			edition: this.campaign.edition || default_edition,
+			// The /demo builder starts on the demo's edition (start modal), 5.5e before a choice
+			edition:
+				this.$route.name === "DemoBuildEncounter"
+					? this.$store.getters["encounters/demo_edition"] || "5.5e"
+					: this.campaign.edition || default_edition,
 			editionOptions: editions.map((e) => ({ label: e.label.replace("D&D ", ""), value: e.value })),
 			campaignOnly: false,
 			npcFilter: {},
@@ -708,9 +712,14 @@ export default {
 				this.filterMonsters();
 			}
 		},
+		// The edition chosen in the demo's start modal, after the builder mounted under it
+		demo_edition(edition) {
+			if (edition && this.$route.name === "DemoBuildEncounter") this.edition = edition;
+		},
 	},
 	computed: {
 		...mapGetters(["content_count"]),
+		...mapGetters("encounters", ["demo_edition"]),
 		...mapGetters("npcs", ["npcs", "npc_count"]),
 		...mapGetters("npcGroups", { npc_groups: "npc_groups" }),
 		// The API expects no edition for 5e content; only pass it for 5.5e

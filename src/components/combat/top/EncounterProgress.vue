@@ -114,7 +114,7 @@ export default {
 		},
 	},
 	computed: {
-		...mapGetters(["encounter", "reminders"]),
+		...mapGetters(["encounter", "reminders", "demo"]),
 		...mapGetters("tutorial", ["follow_tutorial", "get_step"]),
 		// The encounter's own reminders that aren't done
 		encounterReminderCount() {
@@ -130,7 +130,6 @@ export default {
 			"set_targeted",
 			"update_round",
 			"set_actor",
-			"demo",
 			"setManual",
 			"setMultipliers",
 		]),

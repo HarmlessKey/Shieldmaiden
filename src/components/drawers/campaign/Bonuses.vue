@@ -1,27 +1,19 @@
 <template>
 	<div class="pb-5">
 		<template v-if="player">
-			<h2>{{ title }}</h2>
+			<h2 v-if="entity && entity.name">{{ entity.name }}</h2>
 
+			<!-- Overview first: the stored and effective value, effects and manual bonuses -->
+			<div class="stat-header">
+				<strong class="truncate">{{ label }}</strong>
+				<span class="stat-header__effective">{{ effective }}</span>
+			</div>
 			<dl class="stat-values">
 				<dt>Stored</dt>
 				<dd>{{ stored }}</dd>
 				<dt>With bonuses</dt>
 				<dd class="effective">{{ effective }}</dd>
 			</dl>
-
-			<h3>Add a bonus</h3>
-			<BonusAddForm :stats="[stat]" class="mb-3" @add="add" />
-
-			<!-- Effects that change this value, applied as from the Effects drawer (effects 12) -->
-			<BonusEffects
-				:values="[stat]"
-				:edition="edition"
-				:casters="casters"
-				:caster-concentration="(key) => campaignCasterConcentration(campaign, key)"
-				class="mb-3"
-				@apply="applyEffect"
-			/>
 
 			<template v-if="lines.length">
 				<h3>From effects</h3>
@@ -37,6 +29,20 @@
 
 			<h3>Manual bonuses</h3>
 			<ManualBonusRows :bonuses="rows" @update="update" @remove="remove" />
+
+			<h2 class="mt-3">{{ title }}</h2>
+			<h3>Add a bonus</h3>
+			<BonusAddForm :stats="[stat]" class="mb-3" @add="add" />
+
+			<!-- Effects that change this value, applied as from the Effects drawer (effects 12) -->
+			<BonusEffects
+				:values="[stat]"
+				:edition="edition"
+				:casters="casters"
+				:caster-concentration="(key) => campaignCasterConcentration(campaign, key)"
+				class="mb-3"
+				@apply="applyEffect"
+			/>
 		</template>
 		<p v-else class="mt-3">This player is no longer in the campaign.</p>
 	</div>
@@ -106,8 +112,11 @@ export default {
 		entity() {
 			return this.entities[this.data.playerId];
 		},
+		label() {
+			return BONUS_LABELS[this.stat] || this.stat;
+		},
 		title() {
-			return `${this.entity?.name || ""} ${BONUS_LABELS[this.stat] || this.stat} bonuses`.trim();
+			return `${this.label} Modifiers`;
 		},
 		stats() {
 			if (!this.entity) return { values: {}, modifiers: {} };
@@ -180,6 +189,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.stat-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	line-height: 30px;
+
+	strong {
+		flex-grow: 1;
+		min-width: 0;
+	}
+	&__effective {
+		font-weight: bold;
+	}
+}
 dl.stat-values {
 	display: grid;
 	grid-template-columns: auto 1fr;

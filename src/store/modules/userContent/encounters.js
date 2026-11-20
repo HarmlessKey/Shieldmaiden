@@ -68,6 +68,8 @@ const encounter_state = () => ({
 	encounters: {},
 	encounter_count: {},
 	demo_encounter: undefined,
+	// The demo's edition chosen in the start modal; undefined until a choice in this visit
+	demo_edition: undefined,
 });
 
 const encounter_getters = {
@@ -92,6 +94,9 @@ const encounter_getters = {
 	},
 	encounter_services: (state) => {
 		return state.encounter_services;
+	},
+	demo_edition: (state) => {
+		return state.demo_edition;
 	},
 	demo_encounter: (state) => {
 		return state.demo_encounter;
@@ -1143,6 +1148,22 @@ const encounter_actions = {
 		commit("SAVE_DEMO", encounter);
 	},
 
+	/**
+	 * Forget the custom demo encounter, so the demo runs the premade one
+	 */
+	clear_demo_encounter({ commit }) {
+		commit("SAVE_DEMO", undefined);
+	},
+
+	/**
+	 * The edition the demo runs in, chosen in the demo's start modal
+	 *
+	 * @param {string} edition "5e" or "5.5e"
+	 */
+	set_demo_edition({ commit }, edition) {
+		commit("SET_DEMO_EDITION", edition);
+	},
+
 	async add_demo_entity({ commit }, { key, entity }) {
 		commit("ADD_DEMO_ENTITY", { key, entity });
 	},
@@ -1450,6 +1471,9 @@ const encounter_mutations = {
 	},
 	SAVE_DEMO(state, encounter) {
 		Vue.set(state, "demo_encounter", encounter);
+	},
+	SET_DEMO_EDITION(state, edition) {
+		Vue.set(state, "demo_edition", edition);
 	},
 	ADD_DEMO_ENTITY(state, { key, entity }) {
 		Vue.set(state.demo_encounter.entities, key, entity);

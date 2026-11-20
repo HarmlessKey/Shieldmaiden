@@ -199,7 +199,7 @@ import ConfigurationList from "./ConfigurationList.vue";
 import ConsumeInput from "./ConsumeInput.vue";
 import SourceFilterEditor from "./SourceFilterEditor.vue";
 import TriggerFilterEditor from "./TriggerFilterEditor.vue";
-import { choiceValue, fieldsToClear, showsField, sub_effect_configurations } from "./fieldControls";
+import { choiceValue, fieldsToClear, showsField, subEffectConfigurations } from "./fieldControls";
 import { choiceKinds } from "src/utils/effectFunctions";
 import {
 	effect_types,
@@ -210,7 +210,7 @@ import {
 	choice_kinds,
 } from "src/utils/effectsConstants";
 
-const WIDE_FIELDS = ["value", "roll", "duration", "reroll_bonus", "effect", "effects"];
+const WIDE_FIELDS = ["value", "roll", "duration", "reroll_bonus", "effect", "effects", "check"];
 
 /** One sub-effect ($defs/sub_effect), edited in place */
 export default {
@@ -236,7 +236,6 @@ export default {
 			frequencies,
 			targets,
 			choice_kinds,
-			configurations: sub_effect_configurations,
 			// Configurations selected that have no value yet
 			opened: [],
 		};
@@ -244,6 +243,10 @@ export default {
 	computed: {
 		typeEntry() {
 			return effect_types[this.value.type];
+		},
+		// The type's configurations (a Duplicates sub-effect has no trigger)
+		configurations() {
+			return subEffectConfigurations(this.value.type);
 		},
 		subTypeOptions() {
 			const allowed = this.typeEntry ? this.typeEntry.sub_types : [];

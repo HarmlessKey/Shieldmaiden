@@ -936,6 +936,9 @@ export function describeSubEffect(sub_effect) {
 		return `Includes ${sub_effect.effect.name || startCase(sub_effect.effect.source_key)}${from}`;
 	}
 	if (sub_effect.description) return `${sub_effect.description}${from}`;
+	if (sub_effect.type === "duplicates" && sub_effect.count) {
+		return `${plural(sub_effect.count, "duplicate")}${from}`;
+	}
 
 	const type = effect_types[sub_effect.type]?.label || startCase(sub_effect.type);
 	const sub_types = (sub_effect.sub_types || [])
@@ -1174,13 +1177,17 @@ export function describeDuration(instance, { casterName, holderName } = {}) {
 }
 
 /**
- * Badge value for an effect chip: Exhaustion level or rounds left of a timed effect
+ * Badge value for an effect chip: Exhaustion level, duplicates left of an effect with
+ * duplicates, or rounds left of a timed effect
  *
  * @param {object} instance Active effect instance
+ * @param {object} [definition] Its resolved definition, for the duplicates
  * @returns {number|undefined}
  */
-export function effectBadge(instance) {
+export function effectBadge(instance, definition) {
 	if (instance?.source === "srd" && instance.source_key === "exhaustion") return instance.level;
+	const duplicates = duplicatesOf(instance, definition);
+	if (duplicates) return duplicates.left;
 	if (isCountingDown(instance)) return instance.rounds_remaining;
 	return undefined;
 }
@@ -1193,7 +1200,7 @@ export function effectBadge(instance) {
  * @param {string} holderName Its name as shown, if any
  * @param {function} casterOf instance => { name, label } of the caster as shown, or undefined:
  *   name for the duration text, label for the "from" line
- * @returns {object[]} { type, key, effectKey, entityKey, icon, initial, title, value, duration, caster }
+ * @returns {object[]} { type, key, effectKey, entityKey, icon, initial, title, value, duration, duplicates, caster }
  */
 export function effectChipItems(entries = [], { entityKey, holderName, casterOf = () => undefined } = {}) {
 	return entries.map(({ key, instance, definition }) => {
@@ -1201,6 +1208,7 @@ export function effectChipItems(entries = [], { entityKey, holderName, casterOf 
 		const title = name.charAt(0).toUpperCase() + name.slice(1);
 		const isCondition = isSrdCondition(instance.source, instance.source_key);
 		const caster = casterOf(instance);
+		const duplicates = duplicatesOf(instance, definition);
 		return {
 			type: "effect",
 			key: `effect:${key}`,
@@ -1209,8 +1217,9 @@ export function effectChipItems(entries = [], { entityKey, holderName, casterOf 
 			icon: isCondition ? instance.source_key : undefined,
 			initial: title.charAt(0),
 			title,
-			value: effectBadge(instance),
+			value: effectBadge(instance, definition),
 			duration: describeDuration(instance, { casterName: caster?.name, holderName }),
+			duplicates: duplicates ? `${plural(duplicates.left, "duplicate")} left` : undefined,
 			caster: caster?.label,
 		};
 	});
@@ -1441,7 +1450,163 @@ export function buildEffectInstance({
 
 	if (application.level) instance.level = application.level;
 
+	// Duplicates the effect starts with (Mirror Image), from its own sub-effects
+	const duplicates = ownDuplicatesSubEffect(definition);
+	if (duplicates) instance.charges = duplicates.count;
+
 	return instance;
+}
+
+/**
+ * The first Duplicates sub-effect of a definition's own sub-effects (not its includes)
+ *
+ * @param {object} definition Effect definition
+ * @returns {object|undefined} The sub-effect, with a count of at least 1
+ */
+function ownDuplicatesSubEffect(definition) {
+	return (definition?.sub_effects || []).find(
+		(sub_effect) => sub_effect?.type === "duplicates" && parseInt(sub_effect.count) >= 1
+	);
+}
+
+/**
+ * The duplicates of an instance: its Duplicates sub-effect, the duplicates left (charges, or
+ * the full count when it has none) and the maximum (the sub-effect's count)
+ *
+ * @param {object} instance Active effect instance
+ * @param {object} definition Its resolved definition
+ * @returns {object|null} { sub_effect, left, max }, null without a Duplicates sub-effect
+ */
+export function duplicatesOf(instance, definition) {
+	const sub_effect = ownDuplicatesSubEffect(definition);
+	if (!instance || !sub_effect) return null;
+	const max = parseInt(sub_effect.count);
+	const charges = parseInt(instance.charges);
+	const left = Number.isNaN(charges) ? max : Math.max(0, Math.min(charges, max));
+	return { sub_effect, left, max };
+}
+
+/**
+ * The effect with duplicates an attack against an entity checks: of its applied effects with
+ * duplicates left, the one with the most left
+ *
+ * @param {object} entity Tracker entity
+ * @param {string} entityKey Its key
+ * @param {function} definitionOf instance => resolved definition
+ * @returns {object|null} { effectKey, instance, definition, sub_effect, left, max }
+ */
+export function targetDuplicates(entity, entityKey, definitionOf = () => undefined) {
+	let best = null;
+	for (const [effectKey, instance] of Object.entries(entity?.effects || {})) {
+		const definition = definitionOf(instance);
+		if (!definition || definition.unresolved) continue;
+		const duplicates = duplicatesOf(instance, definition);
+		if (!duplicates || duplicates.left < 1) continue;
+		if (!best || duplicates.left > best.left) best = { effectKey, instance, definition, ...duplicates };
+	}
+	return best;
+}
+
+/**
+ * The minimum roll of a duplicates check for the duplicates left: the number, or the row of
+ * the table for that many duplicates, else the closest lower row
+ *
+ * @param {object} check $defs/duplicates_check
+ * @param {number} left Duplicates left
+ * @returns {number|undefined} undefined when no row fits (the check fails)
+ */
+export function duplicatesMinRoll(check = {}, left) {
+	const { min_roll } = check;
+	if (typeof min_roll === "number") return min_roll;
+	if (!Array.isArray(min_roll)) return undefined;
+	const row = min_roll
+		.filter((item) => item && item.count <= left)
+		.sort((a, b) => b.count - a.count)[0];
+	return row ? row.min : undefined;
+}
+
+const rollDie = (sides) => Math.floor(Math.random() * sides) + 1;
+
+/**
+ * The duplicate check for one attack (Mirror Image).
+ * targeted: one die; on the minimum the attack goes to a duplicate and hits it when its total
+ * reaches the duplicate's AC (natural 20 hits, natural 1 misses), or always without an AC.
+ * hit: only for an attack that hits the creature; a die per duplicate left, one reaching the
+ * minimum sends the hit to a duplicate.
+ *
+ * @param {object} sub_effect The Duplicates sub-effect
+ * @param {number} left Duplicates left
+ * @param {object} attack { total, natural } of the attack roll
+ * @param {number} [ac] The duplicate's AC, when the sub-effect has one
+ * @param {function} [random] sides => die result, for tests
+ * @returns {object} { when, dice, sides, min, ac, outcome: "duplicate_hit"|"duplicate_miss"|"creature", rolled }
+ */
+export function duplicateCheck({ sub_effect = {}, left = 0, attack = {}, ac, random = rollDie } = {}) {
+	const check = sub_effect.check || {};
+	const sides = parseInt(check.dice_type) || 20;
+	const when = check.when === "hit" ? "hit" : "targeted";
+	const min = duplicatesMinRoll(check, left);
+	const result = { when, dice: [], sides, min, ac, outcome: "creature", rolled: true };
+	if (left < 1) return { ...result, rolled: false };
+
+	const count = when === "hit" ? left : 1;
+	for (let i = 0; i < count; i++) result.dice.push(random(sides));
+	if (min === undefined || !result.dice.some((die) => die >= min)) return result;
+
+	if (when === "hit" || ac === undefined || ac === null) {
+		result.outcome = "duplicate_hit";
+		return result;
+	}
+	const { total, natural } = attack;
+	let hits = total >= ac;
+	if (natural === 20) hits = true;
+	if (natural === 1) hits = false;
+	result.outcome = hits ? "duplicate_hit" : "duplicate_miss";
+	return result;
+}
+
+const SENSE_NAMES = { blindsight: "Blindsight", truesight: "Truesight", tremorsense: "Tremorsense" };
+
+/**
+ * Whether the duplicates work against an attacker: the Duplicates sub-effect's condition with
+ * the attacker as the other party. A check the tracker can't make counts as holding (the DM
+ * can still change the outcome).
+ *
+ * @param {object} sub_effect The Duplicates sub-effect
+ * @param {string} holderKey The entity with the duplicates
+ * @param {object} instance Its instance
+ * @param {string} attackerKey The attacker
+ * @param {object} entities Entities of the encounter
+ * @param {function} definitionOf instance => resolved definition
+ * @returns {object} { works: boolean, reason } reason e.g. "the attacker has Truesight"
+ */
+export function duplicatesWorkAgainst({
+	sub_effect = {},
+	holderKey,
+	instance,
+	attackerKey,
+	entities = {},
+	definitionOf = () => undefined,
+} = {}) {
+	const condition = sub_effect.condition;
+	if (!condition || !attackerKey) return { works: true };
+	const ctx = { holderKey, instance, entities, definitionOf, counterpartKey: attackerKey };
+	if (conditionState(condition, ctx) !== false) return { works: true };
+
+	// The reason: the first top-level check that's false
+	const items = Array.isArray(condition) ? condition : [condition];
+	const failing = items.find((item) => conditionState(item, ctx) === false) || {};
+	const who = failing.subject === "counterpart" ? "the attacker" : "the holder";
+	let reason;
+	if (failing.description) reason = failing.description;
+	else if (failing.type === "has_condition") {
+		const name = startCase(failing.value);
+		reason = failing.negate ? `${who} is ${name}` : `${who} isn't ${name}`;
+	} else if (failing.type === "sense") {
+		const name = SENSE_NAMES[failing.value] || startCase(failing.value);
+		reason = failing.negate ? `${who} has ${name}` : `${who} doesn't have ${name}`;
+	} else reason = "its condition doesn't hold";
+	return { works: false, reason };
 }
 
 /**
@@ -1548,10 +1713,50 @@ export function evaluateConditionSet(set, ctx) {
 			result = compare(curHp, set.value);
 			break;
 		}
+		case "sense":
+			result = hasSense(subjectKey, set.value, ctx);
+			break;
 		default:
 			return false;
 	}
 	return set.negate ? !result : result;
+}
+
+/**
+ * Whether an entity has a sense: from its stat block senses ({ blindsight: { blindsight: true,
+ * range } }), or from a Sense sub-effect of one of its active effects whose condition isn't
+ * false. A sense with a range is assumed to reach. A player without stat block senses only
+ * has the senses its effects give it.
+ *
+ * @param {string} entityKey
+ * @param {string} sense e.g. "blindsight", "truesight"
+ * @param {object} entities Entities of the encounter
+ * @param {function} definitionOf instance => resolved definition
+ * @returns {boolean}
+ */
+export function hasSense(entityKey, sense, { entities = {}, definitionOf = () => undefined, senseDepth = 0 } = {}) {
+	const entity = entities[entityKey];
+	if (!entity || !sense) return false;
+
+	const statBlock = entity.senses?.[sense];
+	if (statBlock && (typeof statBlock !== "object" || Object.values(statBlock).some(Boolean))) return true;
+
+	// A Sense sub-effect's condition could test senses again: don't go deeper than once
+	if (senseDepth > 1) return false;
+	return effectEntries(entity, entityKey).some(([, instance]) => {
+		const definition = definitionOf(instance);
+		if (!definition || definition.unresolved) return false;
+		const level = parseInt(instance.level) || 1;
+		const ctx = { holderKey: entityKey, instance, entities, definitionOf, senseDepth: senseDepth + 1 };
+		if (definition.condition && conditionState(definition.condition, ctx) === false) return false;
+		return (definition.sub_effects || []).some(
+			(sub_effect) =>
+				sub_effect.type === "sense" &&
+				(sub_effect.sub_types || []).includes(sense) &&
+				subEffectInPlay(sub_effect, { level, instance }) &&
+				!(sub_effect.condition && conditionState(sub_effect.condition, ctx) === false)
+		);
+	});
 }
 
 /**
@@ -1566,7 +1771,15 @@ function conditionSubjectKey(set, ctx = {}) {
 	return undefined;
 }
 
-const EVALUABLE_CHECKS = ["has_condition", "has_effect", "bloodied", "hp_zero", "temp_hp_zero", "hp_threshold"];
+const EVALUABLE_CHECKS = [
+	"has_condition",
+	"has_effect",
+	"bloodied",
+	"hp_zero",
+	"temp_hp_zero",
+	"hp_threshold",
+	"sense",
+];
 
 /**
  * Distance to the other party as assumed from the attack type: a melee weapon attack is

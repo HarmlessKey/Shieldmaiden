@@ -33,6 +33,30 @@
 					<dt>Saves</dt>
 					<dd>{{ saveProgress }}</dd>
 				</template>
+				<!-- Duplicates left (Mirror Image), changed by hand for attacks the roll dialog doesn't see -->
+				<template v-if="duplicates">
+					<dt>Duplicates</dt>
+					<dd class="duplicates">
+						<button
+							v-if="!campaign"
+							class="btn btn-sm btn-square bg-neutral-5"
+							aria-label="One duplicate less"
+							@click="setDuplicates(duplicates.left - 1)"
+						>
+							<i aria-hidden="true" class="fas fa-minus" />
+						</button>
+						<span>{{ duplicates.left }} of {{ duplicates.max }}</span>
+						<button
+							v-if="!campaign"
+							class="btn btn-sm btn-square bg-neutral-5"
+							aria-label="One duplicate more"
+							:disabled="duplicates.left >= duplicates.max"
+							@click="setDuplicates(duplicates.left + 1)"
+						>
+							<i aria-hidden="true" class="fas fa-plus" />
+						</button>
+					</dd>
+				</template>
 			</dl>
 
 			<!-- Escapes are rolled in an encounter, not on the campaign screen -->
@@ -95,7 +119,7 @@ import { startCase } from "lodash";
 import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
-import { describeDuration, findSrdDefinition, isSrdCondition } from "src/utils/effectFunctions";
+import { describeDuration, duplicatesOf, findSrdDefinition, isSrdCondition } from "src/utils/effectFunctions";
 import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
 import { showNotices } from "src/utils/generalFunctions";
 import { effectRolls } from "src/mixins/effectRolls";
@@ -171,6 +195,10 @@ export default {
 				);
 			}
 			return this.customDefinition || undefined;
+		},
+		// { left, max } of an effect with a Duplicates sub-effect (Mirror Image)
+		duplicates() {
+			return duplicatesOf(this.instance, this.definition);
 		},
 		appliedText() {
 			if (this.instance.applied_round) return `Round ${this.instance.applied_round}`;
@@ -298,6 +326,17 @@ export default {
 				instance: { ...this.instance, level },
 			});
 		},
+		/**
+		 * Sets the duplicates left; 0 ends the effect
+		 */
+		async setDuplicates(value) {
+			await this.$store.dispatch("set_duplicates", {
+				key: this.data.entityKey,
+				effectKey: this.data.effectKey,
+				value,
+			});
+			if (!this.instance) this.setDrawer({ show: false });
+		},
 		async remove() {
 			if (this.campaign) {
 				this.notify(
@@ -360,6 +399,11 @@ dl.instance {
 	}
 	dd {
 		margin: 0;
+	}
+	dd.duplicates {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 }
 .escape {

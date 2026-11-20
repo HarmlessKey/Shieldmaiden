@@ -239,9 +239,13 @@ until you reset them. A trait effect without a limit is never used up. Players' 
 ## Effects in combat
 
 - **Effect chips**: every creature shows its effects as chips, with a badge for the Exhaustion
-  level or the rounds left. The tooltip shows the duration and the caster.
+  level, the duplicates left (Mirror Image), or the rounds left. The tooltip shows the
+  duration, the duplicates left and the caster.
 - **Detail view**: click a chip to read the effect, see its duration, change the Exhaustion
-  level, roll a repeat save or an escape, and remove it. Every effect can be removed.
+  level or the duplicates left, roll a repeat save or an escape, and remove it. Every effect
+  can be removed.
+- **Duplicates**: attacks rolled against a creature with duplicates (Mirror Image) make the
+  duplicate check in the roll. See [Duplicates](#duplicates).
 - **Changed values**: values changed by effects, like AC and Speed, are marked. Their tooltip
   lists the effects and manual bonuses that change them.
 - **Bonuses drawer**: click a value on a creature's card, like AC or Speed, to see its manual
@@ -327,6 +331,7 @@ cleared.
 | Apply effect | Applies another effect, usually on a trigger | A failed save makes the target Prone |
 | Remove effect | Removes effects or conditions | Lesser Restoration |
 | Outcome | Something happens: death, unconscious, drop to 1 hit point, lose Concentration | Exhaustion level 6 |
+| Duplicates | Illusory duplicates that attacks can hit instead of the holder | Mirror Image |
 | Special | A rule the tracker shows you but doesn't apply | Difficult terrain, hovering |
 
 ### Amounts: Value and Roll
@@ -456,6 +461,83 @@ Maximum.
 - **How many**: for Remove effect, how many of them it removes (Lesser Restoration: 1).
 - **Duration of the applied effect**: for Apply effect, how long the applied effect lasts.
   See [Durations](#durations).
+
+### Duplicates
+
+A Duplicates sub-effect gives the holder illusory duplicates that attacks can hit instead of
+it, like Mirror Image. It has no Applies to, Value, Roll, Multiplier or Trigger: switching a
+sub-effect to Duplicates clears them.
+
+- **Duplicates**: how many the effect starts with. Applying the effect stores this number on
+  the creature, and applying it again starts over with the full number.
+- **Check**: when the check is made, and the die.
+  - **Before the attack roll**: one die is rolled for each attack against the holder. On the
+    minimum the attack goes to a duplicate instead of the holder (2014 rules).
+  - **On a hit**: when an attack hits the holder, a die is rolled for each duplicate left.
+    When one reaches the minimum, a duplicate is hit instead (2024 rules). A miss rolls
+    nothing.
+- **Minimum roll**: one number, or **Per duplicates left**: a minimum for each number of
+  duplicates left. With a number that has no row, the closest lower row is used.
+- **Duplicate AC**: a formula with the holder's values, like `10 + dex_mod`. An attack that
+  goes to a duplicate hits it when its total reaches this AC (a natural 20 hits, a natural 1
+  misses). Without it, an attack that goes to a duplicate always hits it.
+- **Condition**: the attackers the duplicates work against, with the attacker as **the other
+  party**. Mirror Image doesn't fool a Blinded attacker, or one with Blindsight or Truesight.
+  The tracker checks the attacker's Blinded condition, and its senses from its stat block and
+  from Sense sub-effects of its effects. A sense with a range is assumed to reach.
+
+In the tracker, every attack roll against the holder (melee, ranged or spell attack) makes the
+check, in the order of the roll's attacks, each with the duplicates left after the earlier
+ones. The roll shows the dice, the minimum and the duplicate's AC, and whether the attack hits
+a duplicate, misses a duplicate or goes to the creature. You can change the outcome. When the
+condition doesn't hold, the roll says why ("Mirror Image doesn't work: the attacker has
+Truesight"), and **Check anyway** makes the check. An attack that goes to a duplicate deals
+the creature no damage, and its hit and miss effects and on-hit triggers don't happen. Each hit
+on a duplicate destroys one when you apply the roll, and the effect ends when none are left.
+Saving throws and damage without an attack roll aren't checked. For attacks the roll doesn't
+see, like a player's attack entered by hand, change the duplicates left in the effect's detail
+view.
+
+**2014 Mirror Image**: Duplicates 3, Before the attack roll, d20, Per duplicates left 3 → 6,
+2 → 8, 1 → 11, Duplicate AC `10 + dex_mod`, and the condition below.
+
+```json
+{
+	"type": "duplicates",
+	"count": 3,
+	"check": {
+		"when": "targeted",
+		"dice_type": 20,
+		"min_roll": [
+			{ "count": 3, "min": 6 },
+			{ "count": 2, "min": 8 },
+			{ "count": 1, "min": 11 }
+		]
+	},
+	"ac": { "formula": "10 + dex_mod" },
+	"condition": [
+		{ "subject": "counterpart", "type": "has_condition", "value": "blinded", "negate": true },
+		{ "subject": "counterpart", "type": "sense", "value": "blindsight", "negate": true },
+		{ "subject": "counterpart", "type": "sense", "value": "truesight", "negate": true }
+	]
+}
+```
+
+**2024 Mirror Image**: Duplicates 3, On a hit, d6, Minimum roll 3, no Duplicate AC, and the
+same condition.
+
+```json
+{
+	"type": "duplicates",
+	"count": 3,
+	"check": { "when": "hit", "dice_type": 6, "min_roll": 3 },
+	"condition": [
+		{ "subject": "counterpart", "type": "has_condition", "value": "blinded", "negate": true },
+		{ "subject": "counterpart", "type": "sense", "value": "blindsight", "negate": true },
+		{ "subject": "counterpart", "type": "sense", "value": "truesight", "negate": true }
+	]
+}
+```
 
 ## Sub-effect configuration
 

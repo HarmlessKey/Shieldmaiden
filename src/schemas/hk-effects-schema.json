@@ -570,6 +570,36 @@
 			"additionalProperties": false
 		},
 
+		"duplicates_check": {
+			"type": "object",
+			"description": "The check of a duplicates sub-effect. targeted: one die before the attack roll is compared to the holder's AC (2014 Mirror Image). hit: when the attack hits the holder, one die per duplicate left, one reaching the minimum is enough (2024 Mirror Image).",
+			"required": ["when", "dice_type", "min_roll"],
+			"properties": {
+				"when": { "type": "string", "enum": ["targeted", "hit"] },
+				"dice_type": { "type": "integer", "minimum": 2, "maximum": 100 },
+				"min_roll": {
+					"description": "The minimum roll: one number, or the minimum per number of duplicates left (the closest lower row is used).",
+					"oneOf": [
+						{ "type": "integer", "minimum": 1 },
+						{
+							"type": "array",
+							"minItems": 1,
+							"items": {
+								"type": "object",
+								"required": ["count", "min"],
+								"properties": {
+									"count": { "type": "integer", "minimum": 1, "description": "The number left (duplicates) this row is for." },
+									"min": { "type": "integer", "minimum": 1 }
+								},
+								"additionalProperties": false
+							}
+						}
+					]
+				}
+			},
+			"additionalProperties": false
+		},
+
 		"sub_effect": {
 			"type": "object",
 			"required": ["type"],
@@ -588,7 +618,7 @@
 						"grant_action", "forced_movement",
 						"sense", "proficiency", "score_swap",
 						"includes", "apply_effect", "remove_effect",
-						"outcome", "special"
+						"outcome", "duplicates", "special"
 					],
 					"description": "bonus = add; base = set a base value others still modify (Mage Armor, Unarmored Defense); fixed = set and ignore other modifiers (Speed 0); floor/cap = value can't go below/above (Barkskin AC 17, Ioun max 20); roll_floor = minimum die or total (Reliable Talent, 2024 Great Weapon Fighting); critical = crit range and crit rules; compel = forced behavior (must move away, must Dash); deny = can't gain a benefit (can't benefit from Invisible, no Advantage against, ignore cover); includes = has another condition for as long as this one lasts; apply_effect/remove_effect = triggered application/removal of another effect."
 				},
@@ -645,7 +675,9 @@
 
 				"effect": { "$ref": "#/$defs/effect_ref", "description": "includes / apply_effect target." },
 				"effects": { "type": "array", "items": { "$ref": "#/$defs/effect_ref" }, "description": "remove_effect candidates." },
-				"count": { "type": "integer", "description": "remove_effect: how many of the candidates (Lesser Restoration: 1)." },
+				"count": { "type": "integer", "description": "remove_effect: how many of the candidates (Lesser Restoration: 1). duplicates: the number of duplicates the effect starts with (Mirror Image: 3)." },
+				"check": { "$ref": "#/$defs/duplicates_check", "description": "duplicates: when an attack goes to a duplicate." },
+				"ac": { "$ref": "#/$defs/formula", "description": "duplicates: the duplicate's AC, with the holder's variables (2014 Mirror Image: 10 + dex_mod). Without it, an attack that goes to a duplicate hits it." },
 				"duration": { "$ref": "#/$defs/duration", "description": "apply_effect: duration of the applied effect." },
 				"suppress_existing": { "type": "boolean", "description": "defense i: existing instances of the conditions are suppressed while this is active instead of prevented only (Calm Emotions, Aura of Courage)." },
 
@@ -706,6 +738,21 @@
 				{
 					"if": { "properties": { "type": { "const": "apply_effect" } } },
 					"then": { "properties": { "effect": true }, "required": ["effect"] }
+				},
+				{
+					"if": { "properties": { "type": { "const": "duplicates" } }, "required": ["type"] },
+					"then": {
+						"required": ["count", "check"],
+						"properties": { "count": { "minimum": 1 } },
+						"not": {
+							"anyOf": [
+								{ "required": ["sub_types"] },
+								{ "required": ["value"] },
+								{ "required": ["roll"] },
+								{ "required": ["trigger"] }
+							]
+						}
+					}
 				},
 				{
 					"if": { "properties": { "type": { "const": "remove_effect" } } },

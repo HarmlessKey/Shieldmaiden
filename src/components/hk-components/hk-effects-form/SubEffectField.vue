@@ -1,7 +1,7 @@
 <template>
 	<div class="sub-effect-field">
 		<!-- Object blocks: added and removed as a whole -->
-		<template v-if="['roll', 'duration'].includes(control.control)">
+		<template v-if="['roll', 'duration', 'formula'].includes(control.control)">
 			<template v-if="current">
 				<div class="d-flex justify-content-between items-center mb-1">
 					<span class="neutral-2">{{ control.label }}</span>
@@ -11,6 +11,12 @@
 					</a>
 				</div>
 				<DiceRollInput v-if="control.control === 'roll'" :value="current" :damage="damageRoll" />
+				<FormulaInput
+					v-else-if="control.control === 'formula'"
+					:value="current"
+					:label="control.label"
+					:name="control.label"
+				/>
 				<DurationEditor v-else :value="current" />
 			</template>
 			<a v-else class="btn btn-sm bg-neutral-5" @click="addBlock(value, field, initialBlock)">
@@ -18,6 +24,9 @@
 				{{ control.label }}
 			</a>
 		</template>
+
+		<!-- The check of a Duplicates sub-effect (Mirror Image) -->
+		<DuplicatesCheckInput v-else-if="control.control === 'duplicates_check'" :value="value" :label="label" />
 
 		<!-- A value chosen when the effect is applied (choice: value) -->
 		<hk-input
@@ -134,6 +143,8 @@ import ChoiceInfo from "./ChoiceInfo.vue";
 import DiceRollInput from "./DiceRollInput.vue";
 import SuggestInput from "./SuggestInput.vue";
 import EffectRefPicker from "./EffectRefPicker.vue";
+import FormulaInput from "./FormulaInput.vue";
+import DuplicatesCheckInput from "./DuplicatesCheckInput.vue";
 import {
 	sub_effect_fields,
 	abilityOptions,
@@ -157,6 +168,8 @@ export default {
 		DiceRollInput,
 		SuggestInput,
 		EffectRefPicker,
+		FormulaInput,
+		DuplicatesCheckInput,
 		// Async: DurationEditor contains sub-effect lists (design decision 2)
 		DurationEditor: () => import("./DurationEditor.vue"),
 	},
@@ -172,7 +185,10 @@ export default {
 	},
 	computed: {
 		control() {
-			return sub_effect_fields[this.field] || { label: this.field, control: "text" };
+			const control = sub_effect_fields[this.field] || { label: this.field, control: "text" };
+			// A field can be labelled differently for a type (count: "How many", or "Duplicates")
+			const { by_type, ...base } = control;
+			return { ...base, ...(by_type?.[this.value.type] || {}) };
 		},
 		current() {
 			return this.value[this.field];
@@ -240,7 +256,9 @@ export default {
 			return ["damage", "damage_modifier", "critical"].includes(this.value.type);
 		},
 		initialBlock() {
-			return this.control.control === "duration" ? { type: "time", unit: "round" } : {};
+			if (this.control.control === "duration") return { type: "time", unit: "round" };
+			if (this.control.control === "formula") return { formula: this.control.initial || "" };
+			return {};
 		},
 	},
 	methods: {

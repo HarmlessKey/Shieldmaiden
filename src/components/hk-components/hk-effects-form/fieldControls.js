@@ -257,6 +257,31 @@ export const sub_effect_configurations = Object.freeze([
 	},
 ]);
 
+// Sub-effect configurations a type can't have: a Duplicates check isn't triggered, it runs in
+// the attack roll dialog
+const EXCLUDED_CONFIGURATIONS = {
+	duplicates: ["trigger"],
+};
+
+/**
+ * The sub-effect configurations offered for a type
+ *
+ * @param {string} type Sub-effect type
+ * @returns {object[]} Entries of sub_effect_configurations
+ */
+export function subEffectConfigurations(type) {
+	const excluded = EXCLUDED_CONFIGURATIONS[type] || [];
+	return sub_effect_configurations.filter(({ key }) => !excluded.includes(key));
+}
+
+/**
+ * The fields of the configurations a type can't have (cleared when switching to it)
+ */
+function excludedConfigurationKeys(type) {
+	const excluded = EXCLUDED_CONFIGURATIONS[type] || [];
+	return sub_effect_configurations.filter(({ key }) => excluded.includes(key)).flatMap(({ keys }) => keys);
+}
+
 // Field rules: a type lists the fields it can use, and these narrow them down to the ones
 // that matter for the chosen sub-types (Applies to). A Bonus on Armor Class only needs a value.
 
@@ -352,7 +377,20 @@ export const sub_effect_fields = Object.freeze({
 	creature_types: { label: "Creature types", control: "creature_types" },
 	effect: { label: "Effect", control: "effect" },
 	effects: { label: "Effects", control: "effects" },
-	count: { label: "How many", control: "number", integer: true, min: 1 },
+	count: {
+		label: "How many",
+		control: "number",
+		integer: true,
+		min: 1,
+		by_type: { duplicates: { label: "Duplicates", hint: "How many the effect starts with" } },
+	},
+	check: { label: "Check", control: "duplicates_check" },
+	ac: {
+		label: "Duplicate AC",
+		control: "formula",
+		initial: "10 + dex_mod",
+		hint: "The holder's values, e.g. 10 + dex_mod. Without it, an attack that goes to a duplicate hits it",
+	},
 	duration: { label: "Duration of the applied effect", control: "duration" },
 	suppress_existing: { label: "Suppress existing instances", control: "toggle" },
 	reroll_condition: { label: "When the reroll is allowed", control: "text", hint: "e.g. natural 1" },
@@ -453,8 +491,10 @@ export function isLocked(sub_effect, field) {
  */
 export function fieldsToClear(sub_effect) {
 	const type = effect_types[sub_effect.type];
+	const excluded = excludedConfigurationKeys(sub_effect.type);
 	const keys = Object.keys(sub_effect).filter((key) => {
 		if (key === "sub_types") return false;
+		if (excluded.includes(key)) return true;
 		if (common_sub_effect_fields.includes(key)) return false;
 		return !showsField(sub_effect, key);
 	});

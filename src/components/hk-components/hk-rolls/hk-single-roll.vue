@@ -114,6 +114,43 @@
 									get_step('run', 'to-hit', 'monster') ? completeStep({ tutorial: 'run' }) : null
 								"
 							/>
+							<!-- The target's duplicates (Mirror Image): the check, its dice and outcome -->
+							<div v-if="duplicates[action_index]" class="duplicates-check mb-3">
+								<template v-if="duplicates[action_index].skipped">
+									<div class="neutral-2">
+										{{ duplicates[action_index].name }} doesn't work:
+										{{ duplicates[action_index].reason }}
+									</div>
+									<button
+										class="btn btn-sm btn-clear mt-1"
+										@click="checkDuplicatesAnyway(action_index)"
+									>
+										Check anyway
+									</button>
+								</template>
+								<div v-else-if="duplicates[action_index].rolled" class="neutral-2 mb-1">
+									<b>{{ duplicates[action_index].name }}</b>
+									({{ duplicates[action_index].left }} left):
+									{{ duplicateDiceText(duplicates[action_index]) }}
+									<template v-if="duplicates[action_index].ac !== undefined">
+										· duplicate AC {{ duplicates[action_index].ac }}
+									</template>
+								</div>
+								<q-btn-toggle
+									v-if="duplicates[action_index].rolled"
+									:value="duplicates[action_index].outcome"
+									class="neutral-1"
+									spread
+									no-caps
+									:dark="$store.getters.theme === 'dark'"
+									dense
+									toggle-color="primary"
+									color="neutral-9"
+									:options="duplicateOptions(duplicates[action_index])"
+									@input="setDuplicateOutcome(action_index, $event)"
+									@keydown.enter="shortkeyApply"
+								/>
+							</div>
 						</template>
 
 						<!-- SAVING THROW -->
@@ -246,7 +283,13 @@
 										/>
 									</div>
 								</q-item-section>
-								<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
+								<q-item-section
+									avatar
+									:class="[
+										action.type === 'healing' ? 'green' : 'red',
+										{ 'duplicate-struck': goesToDuplicate(action_index) },
+									]"
+								>
 									<q-item-label>
 										<strong
 											><hk-animated-integer :value="totalRollValue(action, action_index, rolled)"
@@ -317,7 +360,10 @@
 								<div v-if="savingThrowResult[action_index] === 'save'" class="mt-3">
 									Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
 								</div>
-								<div v-if="hitOrMiss[action_index] === 'miss'" class="mt-3">
+								<div v-if="goesToDuplicate(action_index)" class="mt-3">
+									{{ duplicateOutcomeText(action_index) }}: <b>no damage to the creature</b>
+								</div>
+								<div v-else-if="hitOrMiss[action_index] === 'miss'" class="mt-3">
 									Missed attack: <b>{{ missSaveEffect(rolled.missSave, "text") }}</b>
 								</div>
 								<template v-for="({ name, modifier }, key) in defenses">
@@ -333,8 +379,9 @@
 								<div>
 									<b>Final result</b><br />
 									(<hk-animated-integer :value="rolled.rollResult.total" />)
+									<span v-if="goesToDuplicate(action_index)"> {{ duplicateOutcomeText(action_index) }}</span>
 									<span
-										v-if="
+										v-else-if="
 											savingThrowResult[action_index] === 'save' ||
 											hitOrMiss[action_index] === 'miss'
 										"
@@ -371,7 +418,7 @@
 									v-if="
 										rolled.special?.length &&
 										(savingThrowResult[action_index] === 'fail' ||
-											hitOrMiss[action_index] === 'hit')
+											creatureHitOrMiss[action_index] === 'hit')
 									"
 									class="mt-3"
 								>
@@ -657,6 +704,11 @@ import {
 	findSrdDefinition,
 	getRequiredChoices,
 	getSrdDefinitions,
+	targetDuplicates,
+	duplicateCheck,
+	duplicatesWorkAgainst,
+	formulaVars,
+	resolveAmount,
 } from "src/utils/effectFunctions";
 import { action_outcomes, outcomesFor } from "src/utils/effectsConstants";
 
@@ -708,6 +760,9 @@ export default {
 			rolledSaves: {},
 			saveNotes: {},
 			hitOrMiss: {},
+			// The duplicate check per attack against a target with duplicates (Mirror Image):
+			// { name, effectKey, left, when, dice, min, ac, outcome, rolled, manual, forced, skipped, reason }
+			duplicates: {},
 			// Per linked effect (key "<action>:<outcome>:<link>"): { checked, choices, duration, durationValid }
 			linkForms: {},
 			// Custom effect definitions of the links, by key; false when not found
@@ -778,8 +833,19 @@ export default {
 			return undefined; // Default = undefined = roll twice
 		},
 		allMiss() {
-			if (Object.values(this.hitOrMiss).length === 0) return false;
-			return Object.values(this.hitOrMiss).every((value) => value === "miss");
+			if (Object.values(this.creatureHitOrMiss).length === 0) return false;
+			return Object.values(this.creatureHitOrMiss).every((value) => value === "miss");
+		},
+		/**
+		 * Hit or miss per attack for the creature itself: an attack that goes to a duplicate
+		 * (Mirror Image) doesn't hit it
+		 */
+		creatureHitOrMiss() {
+			const result = { ...this.hitOrMiss };
+			for (const index of Object.keys(result)) {
+				if (this.goesToDuplicate(index)) result[index] = "miss";
+			}
+			return result;
 		},
 		/**
 		 * The target's damage modifiers, with the attacker as the other party (Uncanny Dodge)
@@ -844,8 +910,18 @@ export default {
 			return this.linksToApply.some(({ linked }) => !!this.linkMissing(linked));
 		},
 	},
+	watch: {
+		// A hit decides the 2024 check, and the count left for the following attacks
+		hitOrMiss: {
+			deep: true,
+			handler() {
+				this.checkDuplicates();
+			},
+		},
+	},
 	mounted() {
 		this.checkHitOrMiss();
+		this.checkDuplicates();
 		this.loadLinkDefinitions();
 	},
 	methods: {
@@ -876,7 +952,8 @@ export default {
 					});
 				};
 
-				if (action.toHit && this.hitOrMiss[index] === "hit") {
+				// A hit on a duplicate doesn't hit the creature: no hit triggers
+				if (action.toHit && this.creatureHitOrMiss[index] === "hit") {
 					fire("on_hit", attackerKey, targetKey);
 					// Its hit-taken damage (Hex) was rolled with the attack: no prompt for it
 					fire("on_hit_taken", targetKey, attackerKey, { fromAttackRoll: true });
@@ -907,6 +984,101 @@ export default {
 					}
 				}
 			});
+		},
+		/**
+		 * Makes the duplicate check of every attack against a target with duplicates (Mirror
+		 * Image), in action order, each with the duplicates left after the earlier ones. Dice
+		 * already rolled for an attack are kept; the DM's outcome (manual) and "Check anyway"
+		 * (forced) stay. Saving throws and damage without an attack roll aren't checked.
+		 */
+		checkDuplicates() {
+			const targetKey = this.roll.target?.key;
+			const entities = this.$store.getters.entities || {};
+			const definitionOf = (instance) => this.$store.getters.effect_definition?.(instance);
+			const found = targetKey && entities[targetKey] ? targetDuplicates(entities[targetKey], targetKey, definitionOf) : null;
+			if (!found) {
+				this.duplicates = {};
+				return;
+			}
+			const { effectKey, instance, definition, sub_effect } = found;
+			const name = (definition.name || instance.name || "Duplicates").capitalize();
+			const target = this.effectiveTarget();
+			const ac = sub_effect.ac ? resolveAmount(sub_effect.ac, formulaVars(target)).value : undefined;
+			const works = duplicatesWorkAgainst({
+				sub_effect,
+				holderKey: targetKey,
+				instance,
+				attackerKey: this.roll.current?.key,
+				entities,
+				definitionOf,
+			});
+
+			let left = found.left;
+			const result = {};
+			this.roll.actions.forEach((action, index) => {
+				if (!action.toHit) return;
+				const previous = this.duplicates[index] || {};
+				const base = { name, effectKey, left, manual: previous.manual, forced: previous.forced };
+				// No duplicates left after the earlier attacks: no check
+				if (left < 1) return;
+				if (!works.works && !previous.forced) {
+					result[index] = { ...base, skipped: true, reason: works.reason, outcome: "creature" };
+					return;
+				}
+				// 2024: only a hit on the creature is checked
+				if (sub_effect.check?.when === "hit" && this.hitOrMiss[index] !== "hit") return;
+
+				const stored = [...(previous.dice || [])];
+				const check = duplicateCheck({
+					sub_effect,
+					left,
+					attack: { total: action.toHit.total, natural: this.naturalOf(action.toHit) },
+					ac: Number.isFinite(ac) ? ac : undefined,
+					random: (sides) => (stored.length ? stored.shift() : Math.floor(Math.random() * sides) + 1),
+				});
+				const outcome = previous.manual || check.outcome;
+				result[index] = { ...base, ...check, outcome };
+				if (outcome === "duplicate_hit") left--;
+			});
+			this.duplicates = result;
+		},
+		/**
+		 * The DM changes the outcome of an attack's duplicate check; the following attacks are
+		 * checked again with the duplicates left
+		 */
+		setDuplicateOutcome(index, outcome) {
+			this.$set(this.duplicates, index, { ...this.duplicates[index], manual: outcome, outcome });
+			this.checkDuplicates();
+		},
+		/**
+		 * The check was skipped (Blindsight, Truesight, Blinded): make it anyway
+		 */
+		checkDuplicatesAnyway(index) {
+			this.$set(this.duplicates, index, { ...this.duplicates[index], forced: true, skipped: false });
+			this.checkDuplicates();
+		},
+		/**
+		 * Whether an attack goes to a duplicate instead of the creature (hit or missed)
+		 */
+		goesToDuplicate(index) {
+			const check = this.duplicates[index];
+			return !!check && !check.skipped && !!check.rolled && check.outcome !== "creature";
+		},
+		duplicateDiceText({ when, sides, dice = [], min }) {
+			const needs = min === undefined ? "no roll is enough" : `needs ${min}`;
+			if (when === "hit") return `d${sides}: ${dice.join(", ")} (${needs})`;
+			return `d${sides} = ${dice[0]} (${needs})`;
+		},
+		duplicateOptions({ when, ac }) {
+			const options = [{ label: "Hits a duplicate", value: "duplicate_hit" }];
+			if (when === "targeted" && ac !== undefined) {
+				options.push({ label: "Misses a duplicate", value: "duplicate_miss" });
+			}
+			options.push({ label: "Goes to the creature", value: "creature" });
+			return options;
+		},
+		duplicateOutcomeText(index) {
+			return this.duplicates[index]?.outcome === "duplicate_miss" ? "Misses a duplicate" : "Hits a duplicate";
 		},
 		/**
 		 * Whether an attack is a critical hit: a natural 20 or a natural roll in an effect's crit
@@ -1036,9 +1208,13 @@ export default {
 						actions: this.roll.actions,
 						index: action_index,
 						outcome,
-						hitOrMiss: this.hitOrMiss,
+						hitOrMiss: this.creatureHitOrMiss,
 						saves: this.savingThrowResult,
 					}),
+					// An attack that goes to a duplicate didn't target the creature: no hit or miss effects
+					...(this.goesToDuplicate(action_index)
+						? { applies: false, label: this.duplicateOutcomeText(action_index) }
+						: {}),
 				}))
 			);
 		},
@@ -1217,8 +1393,8 @@ export default {
 					type: action.type,
 				};
 				if (action.toHit) {
-					new_action.hitOrMiss = this.hitOrMiss[index];
-					if (this.isCrit(action, index)) new_action.crit = true;
+					new_action.hitOrMiss = this.creatureHitOrMiss[index];
+					if (this.isCrit(action, index) && !this.goesToDuplicate(index)) new_action.crit = true;
 				}
 				if (action.type === "save") new_action.savingThrowResult = this.savingThrowResult[index];
 
@@ -1231,7 +1407,7 @@ export default {
 					// Special events | only on a hit or failed save
 					if (
 						rolled.special &&
-						(this.savingThrowResult[index] === "fail" || this.hitOrMiss[index] === "hit")
+						(this.savingThrowResult[index] === "fail" || this.creatureHitOrMiss[index] === "hit")
 					) {
 						for (const event of rolled.special) {
 							const special = {};
@@ -1266,6 +1442,18 @@ export default {
 
 			// The checked linked effects that apply (effects 7)
 			await this.applyLinkedEffects();
+
+			// Each hit on a duplicate destroys one (Mirror Image)
+			const duplicateHits = Object.values(this.duplicates).filter(
+				(check) => check.rolled && !check.skipped && check.outcome === "duplicate_hit"
+			);
+			if (duplicateHits.length) {
+				await this.$store.dispatch("use_duplicates", {
+					key: this.roll.target.key,
+					effectKey: duplicateHits[0].effectKey,
+					count: duplicateHits.length,
+				});
+			}
 
 			// Apply the special events
 			for (const special of specials) {
@@ -1309,6 +1497,8 @@ export default {
 		 * The share of a roll a failed attack or successful save leaves: its missSave
 		 */
 		missSaveFactor(action, action_index, roll) {
+			// An attack that goes to a duplicate deals the creature nothing, not even on a miss
+			if (action.toHit && this.goesToDuplicate(action_index)) return 0;
 			let factor = 1;
 			if (action.type === "save" && this.savingThrowResult[action_index] === "save") {
 				factor = factor * (roll.missSave || 0);
@@ -1562,6 +1752,14 @@ export default {
 		.save-notes {
 			font-size: 12px;
 			line-height: 16px;
+		}
+		.duplicates-check {
+			font-size: 12px;
+			line-height: 16px;
+		}
+		.duplicate-struck {
+			text-decoration: line-through;
+			opacity: 0.6;
 		}
 		.toHit {
 			position: relative;

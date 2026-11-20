@@ -48,7 +48,7 @@ See proposal.md for the motivation. What the code does today:
   "check": {
     "when": "targeted",
     "dice_type": 20,
-    "min_roll": [{ "duplicates": 3, "min": 6 }, { "duplicates": 2, "min": 8 }, { "duplicates": 1, "min": 11 }]
+    "min_roll": [{ "count": 3, "min": 6 }, { "count": 2, "min": 8 }, { "count": 1, "min": 11 }]
   },
   "ac": { "formula": "10 + dex_mod" },
   "condition": [
@@ -61,7 +61,8 @@ See proposal.md for the motivation. What the code does today:
 
 - `count`: integer ≥ 1. `check.when`: `targeted` | `hit`. `check.dice_type`: one of the die
   sizes the schema already uses. `check.min_roll`: integer, or an array of
-  `{ duplicates: integer ≥ 1, min: integer }`. `ac`: `$defs/formula`.
+  `{ count: integer ≥ 1, min: integer }` (`count`: the number left the row is for, named
+  generically like the sub-effect's own `count`). `ac`: `$defs/formula`.
 - The schema uses an `if type = duplicates` branch: `count` and `check` are required, and
   `sub_types`, `value`, `roll`, `trigger` are not allowed.
 - **Why an array for the table:** an object keyed by `"3"`, `"2"`, `"1"` would be turned into

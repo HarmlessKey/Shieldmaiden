@@ -76,6 +76,7 @@ const ENUM_MAP = {
 	"#/$defs/active_instance/properties/concentration_for/properties/source": ["effects", "concentration_sources"],
 	"#/$defs/consume/properties/on": ["effects", "consume_on"],
 	"#/$defs/consume/properties/scope": ["effects", "consume_scopes"],
+	"#/$defs/duplicates_check/properties/when": ["effects", "duplicates_check_when"],
 	"#/$defs/sub_effect/properties/type": ["effects", "effect_types"],
 	"#/$defs/sub_effect/properties/perspective": ["effects", "perspectives"],
 	"#/$defs/choice_kind": ["effects", "choice_kinds"],

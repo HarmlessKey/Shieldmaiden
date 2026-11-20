@@ -46,6 +46,7 @@ import {
 	reactionUsedApplies,
 	hasReactionUsed,
 	durationToRounds,
+	duplicatesOf,
 } from "src/utils/effectFunctions";
 import {
 	manualBonuses,
@@ -2441,7 +2442,13 @@ const run_encounter_actions = {
 			return existingKey;
 		}
 
-		const effectKey = generateEffectKey(Object.keys(effects));
+		// An effect with duplicates applied again starts over with the full count (Mirror Image
+		// cast again): the old instance is replaced, so there's one
+		if (instance.charges !== undefined && existingKey && !isCondition) {
+			await dispatch("remove_effect", { key, effectKey: existingKey, skipExpire: true });
+		}
+
+		const effectKey = generateEffectKey(Object.keys(state.entities[key].effects));
 		try {
 			if (!state.demo && !state.test) {
 				await dispatch("persist_effect", { key, effectKey, value: instance });
@@ -2712,6 +2719,42 @@ const run_encounter_actions = {
 		for (const { holderKey, effectKey } of consume) {
 			await dispatch("remove_effect", { key: holderKey, effectKey, reason: "used" });
 		}
+	},
+
+	/**
+	 * Destroys duplicates of an effect with duplicates (Mirror Image): attacks that hit one
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the instance
+	 * @param {number} count Duplicates destroyed
+	 */
+	async use_duplicates({ dispatch, getters }, { key, effectKey, count = 1 }) {
+		const instance = getters.effect_instance(key, effectKey);
+		if (!instance || !count) return;
+		const duplicates = duplicatesOf(instance, getters.effect_definition(instance));
+		if (!duplicates) return;
+		await dispatch("set_duplicates", { key, effectKey, value: duplicates.left - count });
+	},
+
+	/**
+	 * Sets the duplicates left of an effect with duplicates, between 0 and its count. Saved
+	 * like a level change; at 0 the effect ends, as when it's used up.
+	 *
+	 * @param {string} key Entity key
+	 * @param {string} effectKey Key of the instance
+	 * @param {number} value Duplicates left
+	 */
+	async set_duplicates({ dispatch, getters }, { key, effectKey, value }) {
+		const instance = getters.effect_instance(key, effectKey);
+		if (!instance) return;
+		const duplicates = duplicatesOf(instance, getters.effect_definition(instance));
+		if (!duplicates) return;
+		const left = Math.max(0, Math.min(parseInt(value) || 0, duplicates.max));
+		if (left === 0) {
+			await dispatch("remove_effect", { key, effectKey, reason: "used" });
+			return;
+		}
+		await dispatch("set_effect_prop", { key, effectKey, property: "charges", value: left });
 	},
 
 	/**

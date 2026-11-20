@@ -375,6 +375,13 @@ export const effect_types = keyed({
 		],
 		fields: [],
 	},
+	duplicates: {
+		label: "Duplicates",
+		description: "Illusory duplicates that attacks can hit instead of the holder (Mirror Image)",
+		sub_types: [],
+		fields: ["count", "check", "ac"],
+		required: ["count", "check"],
+	},
 	special: {
 		label: "Special",
 		description: "A rule the tracker shows to the DM but doesn't apply",
@@ -805,6 +812,18 @@ export const consume_scopes = keyed({
 	sub_effect: { label: "Only this part" },
 });
 
+// When the check of a duplicates sub-effect is made ($defs/duplicates_check)
+export const duplicates_check_when = keyed({
+	targeted: {
+		label: "Before the attack roll",
+		description: "One die decides if the attack goes to a duplicate (2014 Mirror Image)",
+	},
+	hit: {
+		label: "On a hit",
+		description: "A die per duplicate left; one reaching the minimum sends the hit to a duplicate (2024 Mirror Image)",
+	},
+});
+
 export const perspectives = keyed({
 	self: { label: "The holder's own rolls" },
 	against: { label: "Rolls against the holder" },
@@ -974,6 +993,7 @@ export default {
 	ends_by_action,
 	consume_on,
 	consume_scopes,
+	duplicates_check_when,
 	perspectives,
 	choice_kinds,
 	action_outcomes,

@@ -20,6 +20,7 @@
 			{{ effect.title }}
 			<template v-if="effect.type === 'effect'">
 				<div class="neutral-2">{{ effect.duration }}</div>
+				<div v-if="effect.duplicates" class="neutral-2">{{ effect.duplicates }}</div>
 				<div v-if="effect.caster" class="neutral-2">from {{ effect.caster }}</div>
 			</template>
 			<div v-else-if="effect.type === 'reminder' && effect.trigger" class="neutral-2">

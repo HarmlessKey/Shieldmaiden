@@ -15,7 +15,7 @@ A sub-effect with `type: "duplicates"` SHALL have:
     `dice_type` is rolled.
   - `when: "hit"`: only when the attack hits the holder. One die of `dice_type` is rolled per
     duplicate left, and one die reaching the minimum is enough.
-  - `min_roll`: the minimum roll, either one number, or a list of `{ duplicates, min }` that
+  - `min_roll`: the minimum roll, either one number, or a list of `{ count, min }` that
     gives the minimum for the number of duplicates left
 - optionally `ac`: the duplicate's AC as a formula, with the holder's variables (`10 +
   dex_mod`). Without `ac`, an attack that goes to a duplicate hits it.
@@ -26,7 +26,7 @@ the effects schema, and a Duplicates sub-effect SHALL have no `sub_types`, `valu
 `trigger`.
 
 #### Scenario: 2014 Mirror Image
-- **WHEN** a definition has `{ type: "duplicates", count: 3, check: { when: "targeted", dice_type: 20, min_roll: [{ duplicates: 3, min: 6 }, { duplicates: 2, min: 8 }, { duplicates: 1, min: 11 }] }, ac: { formula: "10 + dex_mod" } }`
+- **WHEN** a definition has `{ type: "duplicates", count: 3, check: { when: "targeted", dice_type: 20, min_roll: [{ count: 3, min: 6 }, { count: 2, min: 8 }, { count: 1, min: 11 }] }, ac: { formula: "10 + dex_mod" } }`
 - **THEN** it validates, and it describes three duplicates with the 2014 table and AC 10 + Dex modifier
 
 #### Scenario: 2024 Mirror Image

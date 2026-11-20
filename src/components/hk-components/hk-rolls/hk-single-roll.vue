@@ -131,19 +131,15 @@
 										· duplicate AC {{ duplicates[action_index].ac }}
 									</template>
 								</div>
-								<q-btn-toggle
+								<hk-select
 									v-if="duplicates[action_index].rolled"
 									:value="duplicates[action_index].outcome"
-									class="neutral-1"
-									spread
-									no-caps
-									:dark="$store.getters.theme === 'dark'"
-									dense
-									toggle-color="primary"
-									color="neutral-9"
 									:options="duplicateOptions(duplicates[action_index])"
+									label="Attack goes to"
+									dense
+									emit-value
+									map-options
 									@input="setDuplicateOutcome(action_index, $event)"
-									@keydown.enter="shortkeyApply"
 								/>
 							</div>
 						</template>

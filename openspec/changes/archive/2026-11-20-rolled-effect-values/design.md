@@ -121,10 +121,11 @@ lists it in `penalties` ([{ name, amount }]); the penalty part ends at 0 with `s
 and `penalty` when it was limited. The factor, toggles, absorption and defenses then work on
 what's left, so a resisted 12 − 2 is (12 − 2) / 2 = 5, and odd amounts round once.
 
-The dialog shows the damage line as "(12 − 2 Feeble) / 2 = 5", with the penalty's dice and
-roll, and "limited" when it was ("− 2 Bane (1d4: 4, limited)"). The penalty has no roll line
-of its own: next to the damage line it was a second number that didn't count. Totals still
-add up the parts.
+The dialog shows the damage line as "(12 − 2) / 2 = 5": all penalties as one number, with
+each effect's dice, rolls and "limited" in its tooltip ("Bane −2 (1d4: 4, limited)"; copies of
+one effect together, "Weak Grip −5 (2d4: 3 + 2)"). The penalty has no roll line of its own:
+next to the damage line it was a second number that didn't count. Totals still add up the
+parts.
 
 Both callers (`hk-single-roll.vue`, `damageModifiers.js`) get this for free, and manual
 negative damage bonuses go through the same path.

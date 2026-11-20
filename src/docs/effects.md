@@ -362,7 +362,8 @@ and a Multiplier of −1 subtracts 1d4 from the hit, and a Value of −2 subtrac
 penalty lowers the damage of its damage type, or of the attack's first damage type when it has
 none. It's subtracted before resistance and other damage modifiers: 12 bludgeoning with a −2
 penalty against a creature resistant to bludgeoning deals (12 − 2) / 2 = 5. The roll dialog
-shows the penalty, with its dice, on the line of the damage it lowers. It
+shows the penalties as one number on the line of the damage they lower; hover it for each
+effect's dice and rolls. It
 never takes that type's damage below 0: a −4 on a hit with 2 slashing is limited to −2. A
 penalty of a type the hit doesn't deal, like −1d4 radiant on a slashing hit, isn't rolled at
 all.

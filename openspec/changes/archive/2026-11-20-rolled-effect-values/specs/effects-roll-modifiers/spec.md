@@ -21,8 +21,9 @@ A damage bonus that comes out negative SHALL be a penalty. It lowers the hit's d
 damage type, or of the attack's first damage type when it has none. A penalty SHALL be
 subtracted from the damage of its type in the same hit before damage modifiers and defenses,
 so resistance halves what's left. It SHALL NOT get a roll line of its own: the line of the
-damage it lowers SHALL show the subtraction with the effect's name, its dice and roll, and
-whether it was limited. A penalty SHALL be limited to the damage of its type in
+damage it lowers SHALL show the penalties as one "− N", whose tooltip lists each effect with
+its dice, every die rolled, and whether it was limited (see effects-display "Effects' extra
+values are shown as one value"). A penalty SHALL be limited to the damage of its type in
 the same hit, so that type's damage SHALL NOT go below 0. When the hit has no damage of the
 penalty's type, the penalty SHALL NOT be rolled or shown. Manual damage bonuses below 0 SHALL
 be penalties too.
@@ -60,7 +61,7 @@ bonus with its effect.
 
 #### Scenario: Penalty dice
 - **WHEN** a creature with an effect `{ type: "bonus", sub_types: ["damage"], roll: { dice_count: 1, dice_type: 4 }, multiplier: -1 }` hits with a weapon attack dealing 1d8+3 slashing, rolling 7 on the d8 and 2 on the d4
-- **THEN** the slashing line shows (10 − 2 <effect> (1d4: 2)) = 8, there's no separate line for the effect, and the hit deals 8 slashing
+- **THEN** the slashing line shows (10 − 2) = 8 with "<effect> −2 (1d4: 2)" in the tooltip of the − 2, there's no separate line for the effect, and the hit deals 8 slashing
 
 #### Scenario: Negative fixed value gives the sign
 - **WHEN** the effect's roll is `{ dice_count: 1, dice_type: 4, fixed_val: -1 }` without a multiplier
@@ -72,7 +73,7 @@ bonus with its effect.
 
 #### Scenario: Penalty doesn't go below 0
 - **WHEN** a creature with a −1d4 damage penalty hits for 2 slashing and the d4 rolls 4
-- **THEN** the slashing line shows − 2 for the penalty (1d4: 4, limited) and the hit deals 0 slashing
+- **THEN** the slashing line shows − 2, its tooltip reads "<effect> −2 (1d4: 4, limited)", and the hit deals 0 slashing
 
 #### Scenario: Penalty before resistance
 - **WHEN** a hit for 10 slashing with a −2 penalty hits a creature resistant to slashing
